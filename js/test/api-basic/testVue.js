@@ -1,4 +1,4 @@
-var api = new sapi();
+var api = new SApi();
 api.init("http://127.0.0.1:8080/semantic.jserv");
 
 console.log(api.jserv);
