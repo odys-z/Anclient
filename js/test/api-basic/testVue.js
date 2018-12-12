@@ -20,7 +20,6 @@ api.loadPage("a_functions", req);
  * @param {string} isSelectFirst 是否默认选中第一行.
  * @param {function} onCheckf function for row checked/uncheck - f(ix, row).
  * @param {function} onCheckAllf function for all rows checked/uncheck - f(rows).
- */
 function loadPage(pagerId, listId, queryId, onSelectf, isSelectFirst, onCheckf, onCheckAllf) {
 
 	if(pagerId == null)
@@ -171,3 +170,4 @@ function loadPage(pagerId, listId, queryId, onSelectf, isSelectFirst, onCheckf, 
 	//bindPage(1, pgSize);
 	bindPage(_pageInfo.page, _pageInfo.pageSize);
 }
+ */
