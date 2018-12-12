@@ -3,8 +3,7 @@ api.init("http://127.0.0.1:8080/semantic.jserv");
 
 console.log(api.jserv);
 
-var req = protocol
-			.query("a_functions", "f")
+var req = protocol.query("a_functions", "f")
 			.page(100, 0)
 			.j("a_roles", "r", "r.roleId=f.roleId");
 console.log(req);
