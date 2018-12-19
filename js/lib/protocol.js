@@ -13,6 +13,19 @@ var protocol = new function protocol() {
 	this.query = function (tbl, alias) {
 		return new queryObj(this, tbl, alias);
 	}
+
+	/**formatQuery - format query.serv request object
+	 * @param  {string} tabl  from table
+	 * @return {object} fromatter to build request object
+	 */
+	this.query = function (tabl) {
+		var hd = formatHeader();
+		if (typeof froms == "string")
+			return { header: hd, tabls: formatTablJoins(froms), exprs: expr, conds: cond, orders: order, group: groupings };
+		else
+			return { header: hd, tabls: froms, exprs: expr, conds: cond, orders: order, group: groupings};
+	}
+
 }
 
 function queryObj(query, tabl, alias) {
@@ -40,5 +53,9 @@ function queryObj(query, tabl, alias) {
 			this.joinings = [];
 		this.joinings.push({tabl: tbl, alias: alias, conds: conds});
 		return this;
+	}
+
+	this.commit = function() {
+		return sql;
 	}
 }

@@ -1,14 +1,14 @@
-var api = new SApi();
-api.init("http://127.0.0.1:8080/semantic.jserv");
+var japi = new Japi();
+japi.init("test.jserv", "http://127.0.0.1:8080/semantic.jserv");
 
-console.log(api.jserv);
+console.log(japi.jserv);
 
 var req = protocol.query("a_functions", "f")
 			.page(100, 0)
 			.j("a_roles", "r", "r.roleId=f.roleId");
 console.log(req);
 
-api.loadPage("a_functions", req);
+japi.loadPage("a_functions", req);
 
 /**Load list (#listId) with ir-t defined in pager (#paerId) and condition defined in form (#queryId)
  * @description Load main list page
