@@ -3,6 +3,7 @@ package io.odysz.jclient;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
 /**
@@ -16,7 +17,17 @@ public class SemantiClient {
 	 * e.g. on success when an http post request finished. */
 	@FunctionalInterface
 	public interface IjCallback {
-		void onCallback(String code, Object Data) throws IOException, SQLException, SemanticException;
+		void onCallback(String code, SemanticObject Data) throws IOException, SemanticException;
 	}
 
+	public static SemantiClient query(String port, String t) {
+		
+		return new SemantiClient();
+	}
+	
+	public void commit(IjCallback callback)
+			throws SemanticException, IOException {
+
+		callback.onCallback("ok", new SemanticObject());
+	}
 }

@@ -1,27 +1,27 @@
 package io.odysz.jclient;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.junit.Test;
+
+import io.odysz.common.Utils;
+import io.odysz.semantics.x.SemanticException;
 
 /**
  * Unit test for simple App.
  */
-public class SemantiClientTest extends TestCase {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public SemantiClientTest( String testName ) {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite() {
-        return new TestSuite( SemantiClientTest.class );
+public class SemantiClientTest {
+   
+    @Test
+    public void SemanticTest() throws SemanticException, IOException {
+    	SemantiClient.query("query", "echo")
+    		.commit((code, obj) -> {
+    			OutputStream os = new ByteArrayOutputStream();
+    			obj.json(os);
+    			Utils.logi(os.toString());
+    		});
     }
 
 }
