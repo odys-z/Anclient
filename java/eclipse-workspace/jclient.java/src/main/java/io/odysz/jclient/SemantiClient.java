@@ -27,6 +27,29 @@ public class SemantiClient {
 	
 	public void commit(IjCallback callback)
 			throws SemanticException, IOException {
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
+		// TODO import HttpClient
 
 		callback.onCallback("ok", new SemanticObject());
 	}
