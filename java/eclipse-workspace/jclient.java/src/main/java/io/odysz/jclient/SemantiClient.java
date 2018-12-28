@@ -1,7 +1,6 @@
 package io.odysz.jclient;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
