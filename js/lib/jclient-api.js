@@ -14,7 +14,7 @@ function Japi () {
 	/**load records paged at server side.
 	 * @param {object} query query object
 	 * Use JProtocol to generate query object:<pre>
-	var qobj = protocol.query(tabl)
+	var qobj = Protocol.query(tabl)
 					.j()
 					.expr()
 					.where()
@@ -41,8 +41,10 @@ function Japi () {
 			contentType: "application/json; charset=utf-8",
 			data: JSON.stringify(query),
 			success: function (data) {
-				if (this.cfg.verbose)
-					console.log(data);
+				if (checkResponse(data)) {
+					console.error("checking respons failed. response:")
+					console.error(data);
+				}
 				if (typeof onSuccess === "function")
 					onSuccess(data);
 			},
@@ -53,4 +55,10 @@ function Japi () {
 			}
 		});
 	}
+}
+
+function checkResponse(resp) {
+	if (typeof resp === "undefined" || resp === null || resp.length < 2)
+		return "err_NA";
+	else return false;
 }

@@ -1,5 +1,9 @@
 /**Json protocol handler to support Japi */
-var protocol = new function protocol() {
+var Protocol = new function () {
+	this.cfg = {
+		ssInfo: "ss-k",
+	};
+
 	this.code = {
 		err: "err",
 		/** Session exception */
@@ -9,7 +13,7 @@ var protocol = new function protocol() {
 
 		/** Network failed */
 		netEx: "net-err"
-	}
+	};
 
 
 	/**formatQuery - format query.serv request object
@@ -27,6 +31,8 @@ function queryObj(query, tabl, alias) {
 	this.query = query;
 	this.mtbl = tabl;
 	this.malias = alias;
+	this.exprs = [];
+	this.joinings = [];
 
 	this.page = function(size, idx) {
 		this.page = idx;
@@ -44,9 +50,9 @@ function queryObj(query, tabl, alias) {
 	 */
 	this.join = function(jt, t, a, on) {
 		// parse "j:tbl:alias [conds]"
-		if (typeof this.joins === "undefined")
-			this.joins = new Array();
-		this.joins.push({t: jt, tabl: t, alias: a, on: on})
+		// if (typeof this.joinings === "undefined")
+		// 	this.joinings = new Array();
+		this.joinings.push({t: jt, tabl: t, alias: a, on: on});
 		return this;
 	}
 
@@ -62,17 +68,29 @@ function queryObj(query, tabl, alias) {
 		return this.join("l", tabl, alias, conds);
 	}
 
+	this.expr = function(exp, as) {
+		exprs.push({expr: exp, as: as});
+	}
 
 	this.commit = function() {
-		var hd = formatHeader();
+		var hd = this.formatHeader();
 		// return { header: hd, tabls: froms, exprs: expr, conds: cond, orders: order, group: groupings};
-		return { header: hd, req: [
-						{ a: "R",
-						  exprs: expr,
-						  f: mtbl,
-						  j: joinings,
-						  conds: cond,
-						  orders: order,
-						  group: groupings}]};
+		return {header: hd,
+				body: [{a: "R",
+						exprs: this.exprs,
+						f: this.mtbl,
+						j: this.joinings,
+						conds: this.cond,
+						orders: this.order,
+						group: this.groupings}]};
+	}
+
+	this.formatHeader = function() {
+		var sstr = localStorage.getItem(Protocol.cfg.ssInfo);
+		if(sstr != null && typeof sstr != "undefined" && sstr.length > 0) {
+			var ssinf = JSON.parse(sstr);
+			// return {md: ssinf.md, ssid: ssinf.ssid, uid: ssinf.uid, iv: ssinf.iv};
+			return ssinf;
+		}
 	}
 }
