@@ -1,6 +1,6 @@
 package io.odysz.jclient;
 
-/**Should replaced by SemanticObject?
+/**FIXME Should been replaced by SemanticObject? 
  * @author ody
  *
  */

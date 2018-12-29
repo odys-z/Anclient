@@ -1,14 +1,22 @@
 package io.odysz.jclient;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.odysz.common.AESHelper;
+import io.odysz.common.Configs;
+import io.odysz.common.Utils;
+import io.odysz.semantic.jprotocol.JBody;
+import io.odysz.semantic.jprotocol.JMessage.Port;
+import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.jprotocol.JProtocol.SCallback;
+import io.odysz.semantic.jserv.R.QueryReq;
+import io.odysz.semantic.jserv.x.SsException;
+import io.odysz.semantic.jsession.SessionReq;
 import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.sql.parts.Sql;
 
 /**
  * For how to use lambda expressions, see {@link #testAsych(IrCallback)}.
@@ -16,20 +24,7 @@ import io.odysz.semantics.x.SemanticException;
  *
  */
 public class JsonClient {
-	private static final boolean verbose = false;
-
-	/**Interface with {@link #onCallback(String, Object)} for called on events happen,
-	 * e.g. on success when an http post request finished. */
-	@FunctionalInterface
-	public interface IrCallback {
-		void onCallback(String code, Object Data) throws IOException, SQLException, SemanticException;
-	}
-	
-	public static enum Req { query, update, insert, delete, userData };
-	
-//	static {
-//		clients = new HashMap<String, JsonClient>(2);
-//	}
+	static final boolean verbose = false;
 
 	/**A helper method for test that let user get comfort with lambda expression.
 	 * sample code:<pre>
@@ -49,7 +44,7 @@ public class JsonClient {
 	 * @param callback a {@link IrCallback} implementation
 	 */
 	@SuppressWarnings("unused")
-	private void testAsych(IrCallback callback) {
+	private void testAsych(SCallback callback) {
 		new Thread(new Runnable() {
 		    public void run() {
 		    	try {
@@ -85,10 +80,8 @@ JsonClient.login("admin", "admin", onOk, null);
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		IrCallback onOk = (ok, msg) -> {
+		SCallback onOk = (ok, msg) -> {
 			try {
-//				JsonClient.client("admin")
-//						.setUserAct("query", "", null, null)
 				JsonClient.login("127.0.0.1/ifire", "admin", "admin")
 						.setUserAct("query", "", null, null)
 						.query(null, "a_domain", "test-main", -1, 0)
@@ -99,21 +92,8 @@ JsonClient.login("admin", "admin", onOk, null);
 			} catch (Exception e) { e.printStackTrace(); } };
 
 		JsonClient.loginAsyncTest("admin", "admin", onOk, null);
-
-		/* output:
-		Main thread going on... (wait for a while)
-		code: 0101
-		data: D-XYZ
-
-		new JsonClient("").testAsych((code, data) -> {
-			System.out.println(String.format("code: %s\ndata: %s", code, data));
-		});
-		System.out.println("Main thread going on...");
-		 */
 	}
 
-	/** [uid, client-instance(logged in with ssid)] */
-//	static HashMap<String, JsonClient> clients;
 	/**last logged in uid when success on calling login()*/
 	static String lastUid;
 	/**get logged in uid's client. If uid == null, return the last logged in uid's client.
@@ -127,7 +107,7 @@ JsonClient.login("admin", "admin", onOk, null);
 	}
 	 */
 
-	public static void loginAsyncTest(String uid, String pswdPlain, IrCallback onOk, IrCallback onErr) throws Exception {
+	public static void loginAsyncTest(String uid, String pswdPlain, SCallback onOk, SCallback onErr) throws Exception {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
 		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
@@ -205,7 +185,7 @@ JsonClient.login("admin", "admin", onOk, null);
   		return inst[0];
 	}
 
-	private Req req;
+	private Port port;
 	private String servId;
 	private String t;
 	private String maint;
@@ -218,14 +198,11 @@ JsonClient.login("admin", "admin", onOk, null);
 	  "url":"index.html"
 	 }</pre> */
 	protected JsonObject[] ssInf;
+
 	protected String[] usrAct;
-//	private String sessionHeader;
-//	private String sessionId;
-//	private String sessionUsr;
-//	private String homepage;
-//	private String header;
+
 	/** post body payload set by payload() directly */
-	private JsonObjectBuilder data;
+	private JBody body;
 	/** [[0: j/l/r, 1: tabl:alais, 2: on and conditions]]  */
 	private ArrayList<String[]> joins;
 
@@ -241,10 +218,11 @@ JsonClient.login("admin", "admin", onOk, null);
 
 	// String servRoot = "http://221.236.26.28/ifire";
 	protected String servRoot = "http://localhost:8080/ifire";
+
 	protected JsonClient(JsonObject[] sessionInfo) {
 		try { servRoot = Configs.getCfg("url.serv");
 		} catch (ExceptionInInitializerError e) {
-			IrSingleton.warn("--- FATAL ---\nCenter server URL missing in config.xml: ", "url.serv");
+			Utils.warn("--- FATAL ---\nCenter server URL missing in config.xml: ", "url.serv");
 		}
 
 		// sessionHeader = formatHeader(sessionId, userId, homepage, tk, iv64);
@@ -294,7 +272,7 @@ JsonClient.login("admin", "admin", onOk, null);
 	 * @throws Exception
 	 */
 	public JsonClient query(String servId, String t, String funcId, int page, int size) throws Exception {
-		this.req = Req.query;
+		this.port = Port.query;
 		this.servId = servId;
 		this.t = t;
 		this.maint = t;
@@ -315,7 +293,7 @@ JsonClient.login("admin", "admin", onOk, null);
 		if (exprs == null)
 			exprs = new ArrayList<String[]>();
 		// expr: [ tabl, expr, alais(optional) ]
-		exprs.add(Protocol.prepareExpr(alais, expr,
+		exprs.add(JBody.expr(alais, expr,
 				tabl != null && tabl.length > 0 ? tabl[0]
 						: maint != null ? maint : t));
 		return this;
@@ -348,7 +326,7 @@ JsonClient.login("admin", "admin", onOk, null);
 		if (joins != null)
 			throw new SQLException("main-table must been set before any joins");
 		if (exprs != null)
-			IrSingleton.warn("It's not safe to set main table (%s) after exprs be set", mtabl);
+			Utils.warn("It's not safe to set main table (%s) after exprs be set", mtabl);
 		maint = mtabl;
 		joins = new ArrayList<String[]>();
 		joins.add(new String[] {"main-table", mtabl, null});
@@ -369,13 +347,13 @@ JsonClient.login("admin", "admin", onOk, null);
 	public JsonClient where(String logic, String field, String v, String... tabl) {
 		if (conds == null)
 			conds = new ArrayList<String[]> ();
-		conds.add(Protocol.prepareCond(logic, field, v, tabl));
+		conds.add(JBody.jcondt(logic, field, v, tabl));
 		return this;
 	}
 
-	public JsonClient data(JsonObjectBuilder dat) {
-		req = Req.userData;
-		this.data = dat;
+	public JsonClient data(JBody dat) {
+		port = Port.user;
+		this.body = dat;
 		return this;
 	}
 
@@ -392,8 +370,8 @@ JsonClient.login("admin", "admin", onOk, null);
 				System.out.println(url);
 
 				JsonObjectBuilder payload;
-				if (req == Req.query)
-					payload = Protocol.formatQuery(ssInf[0], usrAct, joins, exprs, conds, orders, groupings);
+				if (port == Port.query)
+					payload = QueryReq.formatQuery(ssInf[0], usrAct, joins, exprs, conds, orders, groupings);
 				else 
 					throw new SQLException("currently test() is used only for query condition verification.");
 
@@ -403,7 +381,7 @@ JsonClient.login("admin", "admin", onOk, null);
 		return this;
 	}
 
-	JsonObjectBuilder payload = null;
+	List<JBody> payload = null;
 	/**Post in asynchrony style - start a thread then call HttpServClient.post(url, ... ). <br>
 	 * 'onResponse' is called in the thread when returned back after blocked on http.
 	 * @param onResponse
@@ -411,37 +389,37 @@ JsonClient.login("admin", "admin", onOk, null);
 	 * @throws IOException
 	 * @throws IrSessionException
 	 */
-	public JsonClient post(IrCallback onResponse) throws IOException, SsException {
+	public JsonClient post(SCallback onResponse) throws IOException, SsException {
 		String url = formatUrl();
 		/*
 		JsonObjectBuilder body = Json.createObjectBuilder();
 		body.add("header", sessionHeader == null ? "" : sessionHeader); // null when login
 		HttpServClient.post(url, body.build().toString(), onResponse);
 		*/
-		if (req == Req.query)
-			payload = Protocol.formatQuery(ssInf[0], usrAct, joins, exprs, conds, orders, groupings);
-		else if (req == Req.update) {
+		if (port == Port.query)
+			payload = QueryReq.formatQuery(ssInf[0], usrAct, joins, exprs, conds, orders, groupings);
+		else if (port == Req.update) {
 		}
-		else if (req == Req.delete) {
+		else if (port == Req.delete) {
 		}
-		else if (req == Req.insert) {
+		else if (port == Req.insert) {
 		}
-		else if (req == Req.userData) {
+		else if (port == Req.userData) {
 			if (ssInf == null) {
-				payload = data;
+				payload = body;
 			}
 			else {
 	//			JsonObjectBuilder pay = Json.createObjectBuilder();
 	//			pay.add("header", ssInf[0]);
-				if (data == null)
-					data = Json.createObjectBuilder();
+				if (body == null)
+					body = Json.createObjectBuilder();
 				if (usrAct != null) {
 					JsonObject ss = Protocol.attachUsrAct(ssInf[0], usrAct);
-					data.add("header", ss);
+					body.add("header", ss);
 				}
 				else
-					data.add("header", ssInf[0]);
-				payload = data;
+					body.add("header", ssInf[0]);
+				payload = body;
 			}
 		}
 
@@ -450,7 +428,7 @@ JsonClient.login("admin", "admin", onOk, null);
 		    public void run() {
 		    	try {
 		    		HttpServClient.post(url, payload == null ? "" : payload.build().toString(), onResponse);
-				} catch (IOException | SQLException | IrSemanticsException e) {
+				} catch (IOException | SQLException | SemanticException e) {
 					e.printStackTrace();
 				}
 		    }
@@ -469,73 +447,6 @@ JsonClient.login("admin", "admin", onOk, null);
 			for (String[] para : urlparas)
 				url += String.format("&%s=%s", (Object[])para);
 		return url;
-	}
-
-	public static class HttpServClient {
-		//private final String USER_AGENT = "Mozilla/5.0";
-		private static final String USER_AGENT = "JsonClient/1.0";
-
-		public HttpServClient(String url) { }
-
-		/**Post in synchronized style. Call this within a worker thread.<br>
-		 * See {@link JsonClient#main(String[])} for a query example.<br>
-		 * IMPORTANT onResponse is called synchronized.
-		 * @param url
-		 * @param body
-		 * @param onResponse
-		 * @throws IOException
-		 * @throws SQLException 
-		 * @throws IrSemanticsException 
-		 */
-		public static void post(String url, String body, IrCallback onResponse)
-				throws IOException, SQLException, IrSemanticsException {
-			URL obj = new URL(url);
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-			//add reuqest header
-			con.setRequestMethod("POST");
-			con.setRequestProperty("User-Agent", USER_AGENT);
-			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-			con.setRequestProperty("Content-Type", "text/plain"); 
-		    con.setRequestProperty("charset", "utf-8");
-
-//			String urlParameters = "sn=C02G8416DRJM&cn=&locale=&caller=&num=12345";
-			
-			// Send post request
-			con.setDoOutput(true);
-
-			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-			
-			// DEBUGGED: these 2 lines won't send Chinese characters:
-			// wr.writeChars(body);
-			// wr.writeByte(body);
-			// See https://docs.oracle.com/javase/6/docs/api/java/io/DataOutputStream.html#writeBytes(java.lang.String)
-			// --- by discarding its high eight bits --- !!!
-			// also see https://stackoverflow.com/questions/17078207/gson-not-sending-in-utf-8
-			byte[] utf8JsonString = body.getBytes("UTF8");
-			wr.write(utf8JsonString, 0, utf8JsonString.length);
-
-			wr.flush();
-			wr.close();
-
-			if (verbose) System.out.println(url);;
-
-			int responseCode = con.getResponseCode();
-			if (responseCode == 200) {
-
-				JsonReader rder = Json.createReader(con.getInputStream());
-				JsonObject x = (JsonObject) rder.read();
-				rder.close();
-	
-				if (verbose) System.out.println(x.toString());
-				onResponse.onCallback(String.valueOf(x.get("code")), x);
-			}
-			else {
-				// onResponse.onCallback("http-error", String.valueOf(responseCode));
-				System.err.println("HTTP ERROR: code: " + responseCode);
-				throw new IOException("HTTP ERROR: code: " + responseCode + "\n" + url);
-			}
-		}
 	}
 
 }
