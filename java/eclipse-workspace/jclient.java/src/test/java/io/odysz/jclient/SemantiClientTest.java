@@ -16,7 +16,7 @@ public class SemantiClientTest {
    
     @Test
     public void SemanticTest() throws SemanticException, IOException {
-    	SemantiClient.query("query", "echo")
+    	Clients.login("admin", "123456").query("query", "echo", -1, -1)
     		.commit((code, obj) -> {
     			OutputStream os = new ByteArrayOutputStream();
     			obj.json(os);
