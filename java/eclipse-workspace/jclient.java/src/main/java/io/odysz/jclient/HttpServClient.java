@@ -1,33 +1,40 @@
 package io.odysz.jclient;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
 
 import io.odysz.semantic.jprotocol.JBody;
+import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
+import io.odysz.semantic.jsession.SessionReq;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
 public class HttpServClient {
 	private static final String USER_AGENT = "JClient.java/1.0";
 
-	public HttpServClient(String url) { }
+//	private String servRt;
+//	private JHelper<? extends JBody> jreqHelper;
+
+//	public HttpServClient(String servRoot, JHelper<? extends JBody> jreqHelper) {
+//		this.servRt = servRoot;
+//	}
 
 	/**Post in synchronized style. Call this within a worker thread.<br>
 	 * See {@link JsonClient#main(String[])} for a query example.<br>
 	 * IMPORTANT onResponse is called synchronized.
 	 * @param url
-	 * @param body
+	 * @param jreq
 	 * @param onResponse
 	 * @throws IOException
-	 * @throws SQLException 
 	 * @throws SemanticException 
+	 * @throws SQLException 
 	 */
-	public static void post(String url, JMessage<? extends JBody> body, SCallback onResponse)
-			throws IOException, SQLException, SemanticException {
+	public void post(String url, JMessage<? extends JBody> jreq, SCallback onResponse)
+			throws IOException, SemanticException, SQLException {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -41,7 +48,6 @@ public class HttpServClient {
 		// Send post request
 		con.setDoOutput(true);
 
-		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 		
 		// DEBUGGED: these 2 lines won't send Chinese characters:
 		// wr.writeChars(body);
@@ -49,22 +55,29 @@ public class HttpServClient {
 		// See https://docs.oracle.com/javase/6/docs/api/java/io/DataOutputStream.html#writeBytes(java.lang.String)
 		// --- by discarding its high eight bits --- !!!
 		// also see https://stackoverflow.com/questions/17078207/gson-not-sending-in-utf-8
-		byte[] utf8JsonString = body.getBytes("UTF8");
-		wr.write(utf8JsonString, 0, utf8JsonString.length);
+		//
+//		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+//		byte[] utf8JsonString = jreq.getBytes("UTF8");
+//		wr.write(utf8JsonString, 0, utf8JsonString.length);
+//		wr.flush();
+//		wr.close();
 
-		wr.flush();
-		wr.close();
+		JHelper<SessionReq> jSsReqHelper = new JHelper<SessionReq>();
+		jSsReqHelper.writeJson(con.getOutputStream(), jreq);
 
+<<<<<<< HEAD
 		if (ClientFlags.http) System.out.println(url);;
+=======
+
+		if (Clients.console) System.out.println(url);;
+>>>>>>> branch 'master' of https://github.com/odys-z/jclient.git
 
 		int responseCode = con.getResponseCode();
 		if (responseCode == 200) {
 
-			JsonReader rder = Json.createReader(con.getInputStream());
-			JsonObject x = (JsonObject) rder.read();
-			rder.close();
+			SemanticObject x = jSsReqHelper.readJson(con.getInputStream());
 
-			if (JsonClient.verbose) System.out.println(x.toString());
+			if (Clients.console) System.out.println(x.toString());
 			onResponse.onCallback(String.valueOf(x.get("code")), x);
 		}
 		else {
