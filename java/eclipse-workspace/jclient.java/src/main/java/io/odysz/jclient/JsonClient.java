@@ -9,6 +9,7 @@ import io.odysz.common.AESHelper;
 import io.odysz.common.Configs;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JBody;
+import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JMessage.Port;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
@@ -24,9 +25,9 @@ import io.odysz.transact.sql.parts.Sql;
  *
  */
 public class JsonClient {
-	static final boolean verbose = false;
+	static final boolean console = false;
 
-	/**A helper method for test that let user get comfort with lambda expression.
+	/**A helper method for test that let users get comfort with lambda expression.
 	 * sample code:<pre>
 	new JsonClient("").testAsych((code, data) -> {
 		System.out.println(String.format("code: %s\ndata: %s", code, data));
@@ -246,17 +247,6 @@ JsonClient.login("admin", "admin", onOk, null);
 		servId = "login";
 	}
 
-	/**Seam as ir-frame.js/setUserAction()<pre>
-  	ssinf.usrAct = {
-		funcId: funcId,
-		funcName: funcName,
-		url: url,
-		cmd: cmd
-	};</pre>
-	 * @param string
-	 * @param string2
-	 * @return
-	 */
 	protected JsonClient setUserAct(String funcId, String funcName, String url, String cmd) {
 		usrAct = new String[] {funcId, funcName, url, cmd};
 		return this;
@@ -362,20 +352,20 @@ JsonClient.login("admin", "admin", onOk, null);
 	 * @throws SQLException 
 	 */
 	public JsonClient console() throws SQLException {
-		if(verbose) {
+		if(console) {
 			try {
 				System.out.println("JsonClient.test():");
 
 				String url = formatUrl();
 				System.out.println(url);
 
-				JsonObjectBuilder payload;
+				JMessage payload;
 				if (port == Port.query)
 					payload = QueryReq.formatQuery(ssInf[0], usrAct, joins, exprs, conds, orders, groupings);
 				else 
 					throw new SQLException("currently test() is used only for query condition verification.");
 
-				System.out.println(payload.build().toString());
+				System.out.println(payload.toString());
 			} catch (Exception ex) { ex.printStackTrace(); }
 		}
 		return this;
@@ -398,13 +388,13 @@ JsonClient.login("admin", "admin", onOk, null);
 		*/
 		if (port == Port.query)
 			payload = QueryReq.formatQuery(ssInf[0], usrAct, joins, exprs, conds, orders, groupings);
-		else if (port == Req.update) {
+		else if (port == Port.update) {
 		}
-		else if (port == Req.delete) {
+		else if (port == Port.delete) {
 		}
-		else if (port == Req.insert) {
+		else if (port == Port.insert) {
 		}
-		else if (port == Req.userData) {
+		else if (port == Port.session) {
 			if (ssInf == null) {
 				payload = body;
 			}
@@ -421,6 +411,11 @@ JsonClient.login("admin", "admin", onOk, null);
 					body.add("header", ssInf[0]);
 				payload = body;
 			}
+		}
+		else if (port == Port.user) {
+			// TODO we need a sample here
+			// TODO we need a sample here
+			// TODO we need a sample here
 		}
 
 		// HttpServClient.post(url, payload == null ? "" : payload.build().toString(), onResponse);

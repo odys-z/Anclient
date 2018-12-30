@@ -55,7 +55,7 @@ public class HttpServClient {
 		wr.flush();
 		wr.close();
 
-		if (JsonClient.verbose) System.out.println(url);;
+		if (ClientFlags.http) System.out.println(url);;
 
 		int responseCode = con.getResponseCode();
 		if (responseCode == 200) {
