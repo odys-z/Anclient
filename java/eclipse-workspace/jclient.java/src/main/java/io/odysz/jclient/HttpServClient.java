@@ -65,12 +65,7 @@ public class HttpServClient {
 		JHelper<SessionReq> jSsReqHelper = new JHelper<SessionReq>();
 		jSsReqHelper.writeJson(con.getOutputStream(), jreq);
 
-<<<<<<< HEAD
-		if (ClientFlags.http) System.out.println(url);;
-=======
-
 		if (Clients.console) System.out.println(url);;
->>>>>>> branch 'master' of https://github.com/odys-z/jclient.git
 
 		int responseCode = con.getResponseCode();
 		if (responseCode == 200) {

@@ -60,7 +60,7 @@ public class SessionClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public SessionClient query(String t, String funcId, int page, int size) throws Exception {
+	public SessionClient query(String t, String funcId, int page, int size) throws SemanticException {
 		this.port = Port.query;
 		this.t = t;
 		this.maint = t;
@@ -73,6 +73,7 @@ public class SessionClient {
 		usrAct = new String[] {funcId, funcName, url, cmd};
 		return this;
 	}
+
 	public SessionClient urlPara(String pname, String pv) {
 		if (urlparas == null)
 			urlparas = new ArrayList<String[]>();

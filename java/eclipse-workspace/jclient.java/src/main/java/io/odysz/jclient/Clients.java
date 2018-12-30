@@ -1,11 +1,16 @@
 package io.odysz.jclient;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
+
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JMessage.MsgCode;
 import io.odysz.semantic.jsession.SessionReq;
+import io.odysz.semantics.x.SemanticException;
 
 /**
  * @author ody
@@ -29,9 +34,12 @@ public class Clients<T extends JBody> {
 	 * @param uid
 	 * @param pswdPlain
 	 * @return
+	 * @throws SQLException 
+	 * @throws SemanticException 
+	 * @throws GeneralSecurityException 
 	 * @throws Exception
 	 */
-	public static SessionClient login(String uid, String pswdPlain) throws Exception {
+	public static SessionClient login(String uid, String pswdPlain) throws IOException, SemanticException, SQLException, GeneralSecurityException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
 		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
