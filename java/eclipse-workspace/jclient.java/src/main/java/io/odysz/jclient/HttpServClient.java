@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
 
+import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
@@ -15,13 +16,6 @@ import io.odysz.semantics.x.SemanticException;
 
 public class HttpServClient {
 	private static final String USER_AGENT = "JClient.java/1.0";
-
-//	private String servRt;
-//	private JHelper<? extends JBody> jreqHelper;
-
-//	public HttpServClient(String servRoot, JHelper<? extends JBody> jreqHelper) {
-//		this.servRt = servRoot;
-//	}
 
 	/**Post in synchronized style. Call this within a worker thread.<br>
 	 * See {@link JsonClient#main(String[])} for a query example.<br>
@@ -55,7 +49,6 @@ public class HttpServClient {
 		// See https://docs.oracle.com/javase/6/docs/api/java/io/DataOutputStream.html#writeBytes(java.lang.String)
 		// --- by discarding its high eight bits --- !!!
 		// also see https://stackoverflow.com/questions/17078207/gson-not-sending-in-utf-8
-		//
 //		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 //		byte[] utf8JsonString = jreq.getBytes("UTF8");
 //		wr.write(utf8JsonString, 0, utf8JsonString.length);
@@ -63,14 +56,14 @@ public class HttpServClient {
 //		wr.close();
 
 		JHelper<SessionReq> jSsReqHelper = new JHelper<SessionReq>();
-		jSsReqHelper.writeJson(con.getOutputStream(), jreq);
+		jSsReqHelper.writeJson(con.getOutputStream(), jreq, SessionReq.class);
 
-		if (Clients.console) System.out.println(url);;
+		if (Clients.console) Utils.logi(url);;
 
 		int responseCode = con.getResponseCode();
 		if (responseCode == 200) {
 
-			SemanticObject x = jSsReqHelper.readJson(con.getInputStream());
+			SemanticObject x = JHelper.readResp(con.getInputStream());
 
 			if (Clients.console) System.out.println(x.toString());
 			onResponse.onCallback(String.valueOf(x.get("code")), x);

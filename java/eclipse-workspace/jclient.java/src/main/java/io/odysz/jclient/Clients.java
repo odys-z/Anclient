@@ -30,7 +30,6 @@ public class Clients<T extends JBody> {
 	}
 	
 	/**Login and return a client instance (with session managed by jserv).
-	 * @param servRoot
 	 * @param uid
 	 * @param pswdPlain
 	 * @return
@@ -39,7 +38,8 @@ public class Clients<T extends JBody> {
 	 * @throws GeneralSecurityException 
 	 * @throws Exception
 	 */
-	public static SessionClient login(String uid, String pswdPlain) throws IOException, SemanticException, SQLException, GeneralSecurityException {
+	public static SessionClient login(String uid, String pswdPlain)
+			throws IOException, SemanticException, SQLException, GeneralSecurityException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
 		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
@@ -58,13 +58,15 @@ public class Clients<T extends JBody> {
 						// SemanticObject sessionInfo = SessionReq.parseLoginMsg(msg, uid, tk64, iv64);
 						inst[0] = new SessionClient(msg, servRt, conn);
 
-						if (Clients.console) System.out.println(String.format(
+						if (Clients.console) Utils.logi(
 									"login succeed - uid: %s, ss-inf: %s",
-									uid, msg.toString()));
+									uid, msg.toString());
 					}
 					else 
-						Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg);
+						Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg.json());
 				});
+  		if (inst[0] == null)
+  			throw new IOException("HttpServClient return null client.");
   		return inst[0].httpClient(httpClient);
 	}
 
