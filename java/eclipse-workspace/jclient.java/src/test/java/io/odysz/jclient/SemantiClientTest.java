@@ -30,7 +30,7 @@ public class SemantiClientTest {
 //    		});
     	try {
     		Clients.init("http://localhost:8080/semantic.jserv");
-    		Clients.login("admin", "123456");
+    		Clients.login("admin", "admin@admin");
     	} catch (IOException io) {
     		Utils.warn("network failed");
     	}

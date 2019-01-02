@@ -56,7 +56,7 @@ public class HttpServClient {
 //		wr.close();
 
 		JHelper<SessionReq> jSsReqHelper = new JHelper<SessionReq>();
-		jSsReqHelper.writeJson(con.getOutputStream(), jreq, SessionReq.class);
+		jSsReqHelper.writeJsonReq(con.getOutputStream(), jreq, SessionReq.class);
 
 		if (Clients.console) Utils.logi(url);;
 

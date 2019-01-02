@@ -63,7 +63,7 @@ public class Clients<T extends JBody> {
 									uid, msg.toString());
 					}
 					else 
-						Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg.json());
+						Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg.getString("error"));
 				});
   		if (inst[0] == null)
   			throw new IOException("HttpServClient return null client.");
