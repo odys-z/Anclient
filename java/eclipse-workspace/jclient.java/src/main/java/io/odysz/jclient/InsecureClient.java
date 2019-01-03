@@ -5,7 +5,8 @@ import io.odysz.semantics.SemanticObject;
 public class InsecureClient extends SessionClient {
 
 	InsecureClient(String servRt, String conn) {
-		super(robotSsInf(), servRt, conn);
+		// super(robotSsInf(), servRt, conn);
+		super(robotSsInf());
 	}
 
 	private static SemanticObject robotSsInf() {

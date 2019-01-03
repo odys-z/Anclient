@@ -9,6 +9,7 @@ import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JMessage.MsgCode;
+import io.odysz.semantic.jprotocol.JMessage.Port;
 import io.odysz.semantic.jsession.SessionReq;
 import io.odysz.semantics.x.SemanticException;
 
@@ -51,12 +52,12 @@ public class Clients<T extends JBody> {
 
 		HttpServClient httpClient = new HttpServClient();
 		// String.format("%s/login.serv?t=login", servRt);
-		String url = req.servUrl(servRt, conn);
+		String url = servUrl(Port.session);
   		httpClient.post(url, req, (code, msg) -> {
 					if (MsgCode.ok.eq(code)) {
 						// create a logged in client
-						// SemanticObject sessionInfo = SessionReq.parseLoginMsg(msg, uid, tk64, iv64);
-						inst[0] = new SessionClient(msg, servRt, conn);
+						// inst[0] = new SessionClient(msg, servRt, conn);
+						inst[0] = new SessionClient(msg);
 
 						if (Clients.console) Utils.logi(
 									"login succeed - uid: %s, ss-inf: %s",
@@ -67,10 +68,15 @@ public class Clients<T extends JBody> {
 				});
   		if (inst[0] == null)
   			throw new IOException("HttpServClient return null client.");
-  		return inst[0].httpClient(httpClient);
+  		// return inst[0].httpClient(httpClient);
+  		return inst[0];
 	}
 
 	public static SessionClient readOnly(String uid, String pswdPlain) throws Exception {
 		return new InsecureClient(servRt, conn);
+	}
+
+	public static String servUrl(Port port) {
+		return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
 	}
 }

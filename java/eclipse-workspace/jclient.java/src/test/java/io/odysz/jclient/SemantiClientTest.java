@@ -8,6 +8,10 @@ import org.junit.Test;
 import org.junit.jupiter.api.BeforeAll;
 
 import io.odysz.common.Utils;
+import io.odysz.semantic.jprotocol.JHelper;
+import io.odysz.semantic.jprotocol.JMessage;
+import io.odysz.semantic.jprotocol.JMessage.Port;
+import io.odysz.semantic.jserv.R.QueryReq;
 import io.odysz.semantics.x.SemanticException;
 
 /**
@@ -20,14 +24,8 @@ public class SemantiClientTest {
 	}
    
     @Test
-    public void SemanticTest() throws IOException, SemanticException, SQLException, GeneralSecurityException {
-//    	Clients.login("admin", "123456")
-//    		.query("query", "echo", -1, -1)
-//    		.commit((code, obj) -> {
-//    			OutputStream os = new ByteArrayOutputStream();
-//    			obj.json(os);
-//    			Utils.logi(os.toString());
-//    		});
+    public void SemanticLoginTest() throws IOException,
+    		SemanticException, SQLException, GeneralSecurityException {
     	try {
     		Clients.init("http://localhost:8080/semantic.jserv");
     		Clients.login("admin", "admin@admin");
@@ -36,4 +34,16 @@ public class SemantiClientTest {
     	}
     }
 
+    @Test
+    public void SemanticQueryTest() throws IOException,
+    		SemanticException, SQLException, GeneralSecurityException {
+   		Clients.init("http://localhost:8080/semantic.jserv");
+
+    	SessionClient client = Clients.login("admin", "admin@admin");
+    	JMessage<QueryReq> req = client.query("query", "echo", -1, -1);
+    	HttpServClient httpClient = new HttpServClient();
+  		httpClient.post(Clients.servUrl(Port.query), req,
+  				(code, obj) -> { JHelper.logi(obj); });
+    	client.logout();
+    }
 }
