@@ -63,14 +63,17 @@ public class HttpServClient {
 		int responseCode = con.getResponseCode();
 		if (responseCode == 200) {
 
-			SemanticObject x = JHelper.readResp(con.getInputStream());
+			if (con.getContentLengthLong() == 0)
+				throw new SemanticException("Error: server return null at %s ", url);
 
-			if (Clients.console) System.out.println(x.toString());
+			SemanticObject x = JHelper.readResp(con.getInputStream());
+			if (Clients.console) JHelper.logi(x);
+
 			onResponse.onCallback(String.valueOf(x.get("code")), x);
 		}
 		else {
 			// onResponse.onCallback("http-error", String.valueOf(responseCode));
-			System.err.println("HTTP ERROR: code: " + responseCode);
+			Utils.warn("HTTP ERROR: code: %s", responseCode);
 			throw new IOException("HTTP ERROR: code: " + responseCode + "\n" + url);
 		}
 	}

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import io.odysz.common.Utils;
+import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JMessage.Port;
 import io.odysz.semantic.jserv.R.QueryReq;
@@ -44,14 +45,15 @@ public class SessionClient {
 //	}
 
 	/**
-	 * @param t e.g. e_areas
+	 * @param t e.g. "e_areas"
+	 * @param alias e.g. "a"
 	 * @param funcId current function ID
-	 * @param page
+	 * @param page -1 for no paging at server side.
 	 * @param size
 	 * @return
 	 * @throws Exception
 	 */
-	public JMessage<QueryReq> query(String t, String funcId, int page, int size) throws SemanticException {
+	public JMessage<QueryReq> query(String t, String alias, String funcId, int page, int size) throws SemanticException {
 //		this.port = Port.query;
 //		this.t = t;
 		req = new JMessage<QueryReq>(Port.query);
@@ -59,10 +61,15 @@ public class SessionClient {
 		req.t = t;
 //		this.page = page;
 //		this.size = size;
-		QueryReq itm = QueryReq.formatReq(req, ssInf);
+
+		JHeader header = new JHeader(funcId, ssInf.getString("uid"));
+		header.usrAct(funcId, "query", t, "R");
+		req.header(header);
+
+		QueryReq itm = QueryReq.formatReq(req, ssInf, t, alias);
 		req.body(itm);
 		itm.page(page, size);
-		req.header().usrAct(funcId, "query", t, "R");
+
 		return req;
 	}
 

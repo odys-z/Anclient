@@ -40,10 +40,14 @@ public class SemantiClientTest {
    		Clients.init("http://localhost:8080/semantic.jserv");
 
     	SessionClient client = Clients.login("admin", "admin@admin");
-    	JMessage<QueryReq> req = client.query("query", "echo", -1, -1);
+    	JMessage<QueryReq> req = client.query("a_user", "u", "test", -1, -1);
+    	req.body(0).j("a_roles", "r", "u.roleId = r.roleId")
+    				.where("=", "u.userId", "admin");
     	HttpServClient httpClient = new HttpServClient();
   		httpClient.post(Clients.servUrl(Port.query), req,
-  				(code, obj) -> { JHelper.logi(obj); });
+  				(code, obj) -> {
+  					JHelper.logi(obj);
+  					});
     	client.logout();
     }
 }

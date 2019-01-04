@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JBody;
+import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JMessage.MsgCode;
 import io.odysz.semantic.jprotocol.JMessage.Port;
@@ -59,9 +60,11 @@ public class Clients<T extends JBody> {
 						// inst[0] = new SessionClient(msg, servRt, conn);
 						inst[0] = new SessionClient(msg);
 
-						if (Clients.console) Utils.logi(
-									"login succeed - uid: %s, ss-inf: %s",
-									uid, msg.toString());
+						if (Clients.console)
+							JHelper.logi(msg);
+//							Utils.logi(
+//									"login succeed - uid: %s, ss-inf: %s",
+//									uid, msg.toString());
 					}
 					else 
 						Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg.getString("error"));
