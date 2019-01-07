@@ -19,7 +19,7 @@ import io.odysz.semantic.jserv.R.QueryReq;
 import io.odysz.semantics.x.SemanticException;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple App. 
  */
 public class SemantiClientTest {
 	@BeforeAll

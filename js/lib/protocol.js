@@ -75,12 +75,15 @@ function SessionReq(uid, token, iv) {
 	this.iv = iv;
 }
 
-function QueryReq(query, tabl, alias) {
+function QueryReq(tabl, alias, pageInf) {
 	this.query = query;
 	this.mtbl = tabl;
 	this.malias = alias;
 	this.exprs = [];
 	this.joinings = [];
+
+	if (pageInf)
+		this.page(pageInf.size, pageInf.page);
 
 	this.page = function(size, idx) {
 		this.page = idx;

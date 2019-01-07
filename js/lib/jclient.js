@@ -69,6 +69,13 @@ function $J () {
 function SessionClient (ssInf) {
 	this.ssInf = ssInf;
 
+	this.query = function (t, alias, funcId, pageInf) {
+		var req = new QueryReq(t, alias, pageInf);
+		req.userAct = formatUserAct();
+		req.header = formatHeader(this.ssInf);
+		return req;
+	}
+
 	/**load records paged at server side.
 	 * @param {object} query query object
 	 * Use JProtocol to generate query object:<pre>
