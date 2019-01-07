@@ -1,33 +1,81 @@
-/**Json protocol handler to support Japi */
+/**Json protocol helper to support jclient.
+ * All JBody and JHelper static helpers are here. */
 var Protocol = new function () {
+	this.Port = {	heartbeat: "ping.serv", session: "login.serv",
+					insert: "c.serv", query: "r.serv", update: "u.serv",
+					delete: "d.serv", echo: "echo.serv", user: "user.serv" };
+
+	this.MsgCode = {ok: "ok", exSession: "exSession", exSemantic: "exSemantic",
+					exIo: "exIo", exTransct: "exTransct", exDA: "exDA",
+					exGeneral: "exGeneral"};
+
 	this.cfg = {
 		ssInfo: "ss-k",
 	};
 
-	this.code = {
-		err: "err",
-		/** Session exception */
-		ssEx: "ss_err",
-		/** Semantics exception */
-		semanticEx: "??",
+	// this.code = {
+	// 	err: "err",
+	// 	/** Session exception */
+	// 	ssEx: "ss_err",
+	// 	/** Semantics exception */
+	// 	semanticEx: "??",
+	//
+	// 	/** Network failed */
+	// 	netEx: "net-err"
+	// };
 
-		/** Network failed */
-		netEx: "net-err"
-	};
+	/**Format login request message.
+	 * @param {string} uid
+	 * @param {string} tk64
+	 * @param {string} iv64
+	 * @return login request message
+	 */
+	this.formatSessionLogin = function (uid, tk64, iv64) {
+		var body = new SessionReq(uid, tk64, iv64);
+		body.a = 'login';
+		return new JMessage(Protocol.Port.session, null, body);
+	}
 
-
-	/**formatQuery - format query.serv request object
+	/**Format a query request object, including all information for construct a "select" statement.
 	 * @param  {string} tabl  from table
 	 * @param  {string} alias
 	 * @return {object} fromatter to build request object
 	 */
-	this.query = function (tbl, alias) {
-		return new queryObj(this, tbl, alias);
+	this.formatQueryReq = function (tbl, alias) {
+		return new QueryReq(this, tbl, alias);
 	}
-
 }
 
-function queryObj(query, tabl, alias) {
+function JMessage (port, header, body) {
+	this.version = "1.0";
+	this.seq = Math.round(Math.random() * 1000);
+
+	this.port = port; // for robustness?
+	var prts = Protocol.Port;
+	var msg = this;
+	Object.getOwnPropertyNames(prts).forEach(function(val, idx, array) {
+		if (prts[val] === port) {
+			// console.log(val + ' -> ' + obj[val]);
+			msg.port = val;
+			return false;
+		}
+	});
+
+	if (header)
+		this.header = header;
+	else this.header = {};
+
+	this.body = [];
+	this.body.push(body);
+}
+
+function SessionReq(uid, token, iv) {
+	this.uid = uid;
+	this.token = token;
+	this.iv = iv;
+}
+
+function QueryReq(query, tabl, alias) {
 	this.query = query;
 	this.mtbl = tabl;
 	this.malias = alias;
