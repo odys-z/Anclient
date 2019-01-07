@@ -18,20 +18,25 @@ public class SessionClient {
 	
 	private JMessage<QueryReq> req;
 	
+	/**Session login response from server.
+	 * @param sessionInfo
+	 */
 	SessionClient(SemanticObject sessionInfo) {
 		this.ssInf = sessionInfo;
 	}
 	
-	/**
-	 * @param t e.g. "e_areas"
-	 * @param alias e.g. "a"
+	/**Format a query request object, including all information for construct a "select" statement.
+	 * @param t main table, (sometimes function category), e.g. "e_areas"
+	 * @param alias from table alias, e.g. "a"
 	 * @param funcId current function ID
 	 * @param page -1 for no paging at server side.
 	 * @param size
-	 * @return
+	 * @return formatted query object.
 	 * @throws Exception
 	 */
-	public JMessage<QueryReq> query(String t, String alias, String funcId, int page, int size) throws SemanticException {
+	public JMessage<QueryReq> query(String t, String alias, String funcId,
+			int page, int size) throws SemanticException {
+
 		req = new JMessage<QueryReq>(Port.query);
 		req.t = t;
 
@@ -54,7 +59,7 @@ public class SessionClient {
 	}
 
 	/**Print Json Request (no request sent to server)
-	 * @return
+	 * @return this object
 	 * @throws SQLException 
 	 */
 	public SessionClient console() throws SQLException {

@@ -18,7 +18,7 @@ public class HttpServClient {
 	private static final String USER_AGENT = "JClient.java/1.0";
 
 	/**Post in synchronized style. Call this within a worker thread.<br>
-	 * See {@link JsonClient#main(String[])} for a query example.<br>
+	 * See {@link SemantiClientTest} for a query example.<br>
 	 * IMPORTANT onResponse is called synchronized.
 	 * @param url
 	 * @param jreq
