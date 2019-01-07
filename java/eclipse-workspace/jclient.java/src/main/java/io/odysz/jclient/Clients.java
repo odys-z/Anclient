@@ -57,14 +57,10 @@ public class Clients<T extends JBody> {
   		httpClient.post(url, req, (code, msg) -> {
 					if (MsgCode.ok.eq(code)) {
 						// create a logged in client
-						// inst[0] = new SessionClient(msg, servRt, conn);
 						inst[0] = new SessionClient(msg);
 
 						if (Clients.console)
 							JHelper.logi(msg);
-//							Utils.logi(
-//									"login succeed - uid: %s, ss-inf: %s",
-//									uid, msg.toString());
 					}
 					else 
 						Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg.getString("error"));

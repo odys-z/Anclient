@@ -51,6 +51,8 @@ public class SemantiClientTest {
     	// TODO expr alias not working?
     	// select userName userName from a_user u join a_roles r on u.roleId = r.roleId where u.userId = 'admin'
     	req.body(0).expr("userName", "uname")
+    				.expr("userId", "uid")
+    				.expr("roleName", "role")
     				.j("a_roles", "r", "u.roleId = r.roleId")
     				.where("=", "u.userId", "'admin'");
     	HttpServClient httpClient = new HttpServClient();
@@ -62,10 +64,10 @@ public class SemantiClientTest {
 					List<SResultset> rses = (List<SResultset>) o;
   					for (SResultset rs : rses) {
   						// rs = (SResultset)o;
-  						rs.printSomeData(false, 2, "userId", "userName");
+  						rs.printSomeData(false, 2, "uid", "uname", "role");
   						rs.beforeFirst();
   						while(rs.next()) {
-  							String uid0 = rs.getString("userId");
+  							String uid0 = rs.getString("uid");
   							assertTrue(uid0 != null);
   						}
   					}
