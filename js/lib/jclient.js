@@ -1,4 +1,5 @@
-/**Java equivalent of
+/**Jclient.js API
+ * Java equivalent of
  * io.odysz.jclient.Clients;
  * io.odysz.jclient.SessionClient;
  */
@@ -10,7 +11,8 @@ function $J () {
 	}
 
 	this.servUrl = function (port) {
-		return this.cfg.defaultServ + '/' + port + '?conn=' + this.cfg.connId;
+		return this.cfg.defaultServ + '/'
+			+ Protocol.Port[port] + '?conn=' + this.cfg.connId;
 	}
 
 	this.init = function (connId, urlRoot) {
@@ -30,6 +32,14 @@ function $J () {
 		var c = aes.encrypt(usrId, pswd, iv);
 		// var qobj = formatLogin(logId, c, bytesToB64(iv));
 		var req = Protocol.formatSessionLogin(usrId, c, aes.bytesToB64(iv));
+
+		this.post(req, function(resp) {
+							var sessionClient = new SessionClient(resp.msg);
+							if (typeof onLogin === "function")
+								onLogin(sessionClient);
+							else console.log(sessionClient);
+						}, onError);
+		/*
 		var url = $J.servUrl(Protocol.Port.session);
 
 		$.ajax({type: 'POST',
@@ -63,6 +73,42 @@ function $J () {
 					}
 				}
 			});
+			*/
+	}
+
+	this.post = function (jreq, onOk, onErr) {
+		var url = $J.servUrl(jreq.port);
+
+		$.ajax({type: 'POST',
+				// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
+				url: url,
+				contentType: "application/json; charset=utf-8",
+				data: JSON.stringify(jreq),
+				success: function (resp) {
+					// response Content-Type = application/json;charset=UTF-8
+					// code != ok
+					if (resp.code !== Protocol.MsgCode.ok)
+						if (typeof onErr === "function")
+							onErr(Protocol.MsgCode.exIo, resp);
+						else console.error(resp);
+					// code == ok
+					else {
+						if (typeof onOk === "function")
+							onOk(resp);
+						else console.log(resp);
+					}
+				},
+				error: function (resp) {
+					if (typeof onErr === "function")
+						onErr(Protocol.MsgCode.exIo, resp);
+					else {
+						console.error("Accessing server failed.");
+						console.error("Url: " + url);
+						console.error("respons:");
+						console.error(resp);
+					}
+				}
+			});
 	}
 }
 
@@ -70,10 +116,16 @@ function SessionClient (ssInf) {
 	this.ssInf = ssInf;
 
 	this.query = function (t, alias, funcId, pageInf) {
-		var req = new QueryReq(t, alias, pageInf);
-		req.userAct = formatUserAct();
-		req.header = formatHeader(this.ssInf);
-		return req;
+		var qryItem = new QueryReq(t, alias, pageInf);
+		var header = Protocol.formatHeader(this.ssInf);
+		header.userAct({func: 'func01',
+						cmd: 'select',
+						cate: 'test',
+						remarks: 'test query.serv'});
+		var jreq = new JMessage(Protocol.Port.query, header, qryItem);
+		// jreq.header(header);
+		// jreq.body(qryItem);
+		return jreq;
 	}
 
 	/**load records paged at server side.
