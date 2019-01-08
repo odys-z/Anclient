@@ -44,12 +44,17 @@ var Protocol = new function () {
 	this.formatQueryReq = function (tbl, alias) {
 		return new QueryReq(this, tbl, alias);
 	}
+
+	this.formatHeader = function (ssInf) {
+		return new JHeader(ssInf.ssid, ssInf.uid);
+	}
 }
 
 function JMessage (port, header, body) {
 	this.version = "1.0";
 	this.seq = Math.round(Math.random() * 1000);
 
+	/**Protocol.Port property name, use this name to get port url */
 	this.port = port; // for robustness?
 	var prts = Protocol.Port;
 	var msg = this;
@@ -66,30 +71,56 @@ function JMessage (port, header, body) {
 	else this.header = {};
 
 	this.body = [];
+	// this.body.push(body.parentMsg(this));
 	this.body.push(body);
+}
+
+function JHeader (ssid, userId) {
+	this.ssid = ssid;
+	this.uid = userId;
+
+	/**Set user action (for DB log on DB transaction)
+	 * @param {object} act {funcId, remarks, cate, cmd}
+	 */
+	this.userAct = function(act) {
+		this.usrAct = [];
+		this.usrAct.push(act.funcId);
+		this.usrAct.push(act.cate);
+		this.usrAct.push(act.cmd);
+		this.usrAct.push(act.remarks);
+	}
 }
 
 function SessionReq(uid, token, iv) {
 	this.uid = uid;
 	this.token = token;
 	this.iv = iv;
+
+	// this.parentMsg = function (parent) {
+	// 	this.parent = parent;
+	// 	return this;
+	// }
+
 }
 
 function QueryReq(tabl, alias, pageInf) {
 	this.query = query;
-	this.mtbl = tabl;
-	this.malias = alias;
+	this.mtabl = tabl;
+	this.mAlias = alias;
 	this.exprs = [];
-	this.joinings = [];
-
-	if (pageInf)
-		this.page(pageInf.size, pageInf.page);
+	this.joins = [];
+	this.where = [];
 
 	this.page = function(size, idx) {
 		this.page = idx;
 		this.pgSize = size;
 		return this;
 	}
+
+	// this.parentMsg = function (parent) {
+	// 	this.parent = parent;
+	// 	return this;
+	// }
 
 	/**add joins to the query request object
 	 * @param {string} jt join type, example: "j" for inner join, "l" for left outer join
@@ -103,7 +134,7 @@ function QueryReq(tabl, alias, pageInf) {
 		// parse "j:tbl:alias [conds]"
 		// if (typeof this.joinings === "undefined")
 		// 	this.joinings = new Array();
-		this.joinings.push({t: jt, tabl: t, alias: a, on: on});
+		this.joins.push([jt, t, a, on]);
 		return this;
 	}
 
@@ -112,7 +143,7 @@ function QueryReq(tabl, alias, pageInf) {
 		// 	this.joinings = [];
 		// this.joinings.push({type: "j", tabl: tbl, alias: alias, conds: conds});
 		// return this;
-		return this.join("j", tabl, alias, conds);
+		return this.join("j", tbl, alias, conds);
 	}
 
 	this.l = function(tbl, alias, conds) {
@@ -120,7 +151,16 @@ function QueryReq(tabl, alias, pageInf) {
 	}
 
 	this.expr = function(exp, as) {
-		exprs.push({expr: exp, as: as});
+		//this.exprs.push({expr: exp, as: as});
+		this.exprs.push([exp, as]);
+		return this;
+	}
+
+	this.whereCond = function(logic, loper, roper) {
+		// for elements order, see
+		// java/io.odysz.transact.sql.query.Query$Ix$Predicate
+		this.where.push([logic, loper, roper]);
+		return this;
 	}
 
 	this.commit = function() {
@@ -136,12 +176,15 @@ function QueryReq(tabl, alias, pageInf) {
 						group: this.groupings}]};
 	}
 
-	this.formatHeader = function() {
-		var sstr = localStorage.getItem(Protocol.cfg.ssInfo);
-		if(sstr != null && typeof sstr != "undefined" && sstr.length > 0) {
-			var ssinf = JSON.parse(sstr);
-			// return {md: ssinf.md, ssid: ssinf.ssid, uid: ssinf.uid, iv: ssinf.iv};
-			return ssinf;
-		}
-	}
+	// this.formatHeader = function() {
+	// 	var sstr = localStorage.getItem(Protocol.cfg.ssInfo);
+	// 	if(sstr != null && typeof sstr != "undefined" && sstr.length > 0) {
+	// 		var ssinf = JSON.parse(sstr);
+	// 		// return {md: ssinf.md, ssid: ssinf.ssid, uid: ssinf.uid, iv: ssinf.iv};
+	// 		return ssinf;
+	// 	}
+	// }
+
+	if (pageInf)
+		this.page(pageInf.size, pageInf.page);
 }

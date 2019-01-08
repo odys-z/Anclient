@@ -23,12 +23,13 @@ function test() {
 }
 
 function query() {
-	var req = ssClient
-		.query("a_user", "u", "test", {page: 0, size: 20})
+	var req = ssClient.query("a_user", "u", "test", {page: 0, size: 20});
+	req.body[0]
 		.expr("userName", "un").expr("userId", "uid").expr("roleName", "role")
 		.j("a_roles", "r", "u.roleId = r.roleId")
-  		.where("=", "u.userId", "'admin'");
+		.whereCond("=", "u.userId", "'admin'");
 
-	$J.post(req, function() {
+	$J.post(req, function(resp) {
+		console.log(resp);
 		});
 }
