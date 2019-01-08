@@ -72,7 +72,6 @@ public class HttpServClient {
 			onResponse.onCallback(String.valueOf(x.get("code")), x);
 		}
 		else {
-			// onResponse.onCallback("http-error", String.valueOf(responseCode));
 			Utils.warn("HTTP ERROR: code: %s", responseCode);
 			throw new IOException("HTTP ERROR: code: " + responseCode + "\n" + url);
 		}
