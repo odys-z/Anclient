@@ -5,7 +5,6 @@ import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 
 import io.odysz.common.AESHelper;
-import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
@@ -22,9 +21,14 @@ public class Clients<T extends JBody> {
 	public static final boolean console = true;
 
 	public static String servRt;
+	/** DB connection ID. same in connects.xml/t/c/id at server side. */
 	private static String conn;
 
 
+	/**Initialize configuration.
+	 * @param servRoot
+	 * @param connId
+	 */
 	public static void init(String servRoot, String... connId) {
 		servRt = servRoot;
 		conn = connId == null || connId.length == 0 || connId[0] == null ?
@@ -34,11 +38,11 @@ public class Clients<T extends JBody> {
 	/**Login and return a client instance (with session managed by jserv).
 	 * @param uid
 	 * @param pswdPlain
-	 * @return
-	 * @throws SQLException 
-	 * @throws SemanticException 
-	 * @throws GeneralSecurityException 
-	 * @throws Exception
+	 * @return null if failed, a SessionClient instance if login succeed.
+	 * @throws SQLException the request makes server generate wrong SQL.
+	 * @throws SemanticException Request can not parsed correctly 
+	 * @throws GeneralSecurityException  other error
+	 * @throws Exception, most likely the network failed
 	 */
 	public static SessionClient login(String uid, String pswdPlain)
 			throws IOException, SemanticException, SQLException, GeneralSecurityException {
@@ -57,17 +61,14 @@ public class Clients<T extends JBody> {
   		httpClient.post(url, req, (code, msg) -> {
 					if (MsgCode.ok.eq(code)) {
 						// create a logged in client
-						// inst[0] = new SessionClient(msg, servRt, conn);
 						inst[0] = new SessionClient(msg);
 
 						if (Clients.console)
 							JHelper.logi(msg);
-//							Utils.logi(
-//									"login succeed - uid: %s, ss-inf: %s",
-//									uid, msg.toString());
 					}
 					else 
-						Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg.getString("error"));
+						// Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg.getString("error"));
+						throw new SemanticException("loging failed\ncode: %s\nerror: %s", code, msg.getString("error"));
 				});
   		if (inst[0] == null)
   			throw new IOException("HttpServClient return null client.");
@@ -75,11 +76,21 @@ public class Clients<T extends JBody> {
   		return inst[0];
 	}
 
+	/**Get a insecure client - for no session handling request.
+	 * @param uid
+	 * @param pswdPlain
+	 * @return a client can only read data from server.
+	 * @throws Exception
+	 */
 	public static SessionClient readOnly(String uid, String pswdPlain) throws Exception {
 		return new InsecureClient(servRt, conn);
 	}
 
-	public static String servUrl(Port port) {
+	/**Helper for generate serv url (with configured server root and db connection ID).
+	 * @param port
+	 * @return url, e.g. http://localhost:8080/query.serv?conn=null
+	 */
+	static String servUrl(Port port) {
 		return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
 	}
 }

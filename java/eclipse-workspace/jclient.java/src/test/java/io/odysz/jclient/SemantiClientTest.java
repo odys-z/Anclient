@@ -19,7 +19,7 @@ import io.odysz.semantic.jserv.R.QueryReq;
 import io.odysz.semantics.x.SemanticException;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple App. 
  */
 public class SemantiClientTest {
 	@BeforeAll
@@ -48,9 +48,10 @@ public class SemantiClientTest {
 
     	SessionClient client = Clients.login("admin", "admin@admin");
     	JMessage<QueryReq> req = client.query("a_user", "u", "test", -1, -1);
-    	// TODO expr alias not working?
-    	// select userName userName from a_user u join a_roles r on u.roleId = r.roleId where u.userId = 'admin'
+    	// select userName uname, userId uid, roleName role from a_user u join a_roles r on u.roleId = r.roleId where u.userId = 'admin'
     	req.body(0).expr("userName", "uname")
+    				.expr("userId", "uid")
+    				.expr("roleName", "role")
     				.j("a_roles", "r", "u.roleId = r.roleId")
     				.where("=", "u.userId", "'admin'");
     	HttpServClient httpClient = new HttpServClient();
@@ -61,11 +62,10 @@ public class SemantiClientTest {
   					@SuppressWarnings("unchecked")
 					List<SResultset> rses = (List<SResultset>) o;
   					for (SResultset rs : rses) {
-  						// rs = (SResultset)o;
-  						rs.printSomeData(false, 2, "userId", "userName");
+  						rs.printSomeData(false, 2, "uid", "uname", "role");
   						rs.beforeFirst();
   						while(rs.next()) {
-  							String uid0 = rs.getString("userId");
+  							String uid0 = rs.getString("uid");
   							assertTrue(uid0 != null);
   						}
   					}
