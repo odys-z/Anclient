@@ -39,41 +39,6 @@ function $J () {
 								onLogin(sessionClient);
 							else console.log(sessionClient);
 						}, onError);
-		/*
-		var url = $J.servUrl(Protocol.Port.session);
-
-		$.ajax({type: 'POST',
-				// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
-				url: url,
-				contentType: "application/json; charset=utf-8",
-				data: JSON.stringify(req),
-				success: function (resp) {
-					// response Content-Type = application/json;charset=UTF-8
-					// code != ok
-					if (resp.code !== Protocol.MsgCode.ok)
-						if (typeof onError === "function")
-							onError(Protocol.MsgCode.exIo, resp);
-						else console.error(resp);
-					// code == ok
-					else {
-						var sessionClient = new SessionClient(resp.msg);
-						if (typeof onLogin === "function")
-							onLogin(sessionClient);
-						else console.log(sessionClient);
-					}
-				},
-				error: function (data) {
-					if (typeof onError === "function")
-						onError(Protocol.MsgCode.exIo, data);
-					else {
-						console.error("Accessing server failed.");
-						console.error("Url: " + url);
-						console.error("respons:");
-						console.error(data);
-					}
-				}
-			});
-			*/
 	}
 
 	this.post = function (jreq, onOk, onErr) {
@@ -83,6 +48,8 @@ function $J () {
 				// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
 				url: url,
 				contentType: "application/json; charset=utf-8",
+                crossDomain: true,
+                //xhrFields: { withCredentials: true },
 				data: JSON.stringify(jreq),
 				success: function (resp) {
 					// response Content-Type = application/json;charset=UTF-8
@@ -123,8 +90,6 @@ function SessionClient (ssInf) {
 						cate: 'test',
 						remarks: 'test query.serv'});
 		var jreq = new JMessage(Protocol.Port.query, header, qryItem);
-		// jreq.header(header);
-		// jreq.body(qryItem);
 		return jreq;
 	}
 
