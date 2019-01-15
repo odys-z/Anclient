@@ -48,6 +48,25 @@ var Protocol = new function () {
 	this.formatHeader = function (ssInf) {
 		return new JHeader(ssInf.ssid, ssInf.uid);
 	}
+
+	this.rs2arr = function (rs) {
+		var cols = [];
+		var rows = [];
+		rs.forEach((r, rx) => {
+			if (rx === 0) {
+				cols = r;
+			}
+			else {
+				rw = {};
+				r.forEach((c, cx) => {
+					rw[cols[cx]] = c;
+				})
+				rows.push(rw);
+			}
+		});
+
+		return rows;
+	}
 }
 
 function JMessage (port, header, body) {
