@@ -49,6 +49,7 @@ function load() {
 	if (typeof ssClient === "undefined")
 		login();
 
+	// This asynchronized process will report error, but enough to show how to use JClient.js with vue.js.
 	var req = ssClient.query("e_devices", "d", "test", {page: 0, size: 20});
 	req.body[0]
 		.expr("a.areaid", "areaId").expr("a.areaName", "areaName")
