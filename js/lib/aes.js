@@ -43,7 +43,6 @@ function AES () {
 	}
 
 	this.decrypt = function (cipherB64, key, iv) {
-	//function decrypt(cipherB64, key, iv) {
 		// check https://stackoverflow.com/questions/12710001/how-to-convert-uint8-array-to-base64-encoded-string
 		//var encryptedBytes = new Uint8Array(atob(cipherB64).split("").map(function(c) {
 		//   return c.charCodeAt(0); }));
@@ -61,7 +60,6 @@ function AES () {
 	}
 
 	this.pad16m = function (str, paddings, dir) {
-	// function pad16m(str, paddings, dir) {
 		var len = str.length;
 		len = Math.ceil(len / 16);
 		return this.pad(str, len * 16, paddings, dir);
@@ -72,7 +70,6 @@ function AES () {
 	var STR_PAD_BOTH = 3;
 
 	this.pad = function (str, len, paddings, dir) {
-	// function pad(str, len, paddings, dir) {
 		if (typeof(len) == "undefined") { var len = 0; }
 		if (typeof(paddings) == "undefined") { var paddings = '-'; }
 		if (typeof(dir) == "undefined") { var dir = STR_PAD_LEFT; }
