@@ -81,9 +81,6 @@ function testVue() {
 		data: {
 		groceryList: [
 				{ id: 0, text: 'Vegetables' },
-				// { id: 1, text: 'Cheese' },
-				// { id: 3, text: 'Meat' },
-				// { id: 2, text: 'Whatever else humans are supposed to eat' }
 			] }
 	});
 }
