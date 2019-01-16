@@ -6,7 +6,6 @@ function AES () {
 	 * @return {byte[]} iv
 	 */
 	this.getIv128 = function () {
-	// function getIv128() {
 		var iv = new Array(16);
 		for (var i = 0; i < 16; i++) {
 			iv[i] = Math.random() * 101;
@@ -16,7 +15,6 @@ function AES () {
 	}
 
 	this.encrypt = function (txt, key, iv) {
-	// function encrypt(txt, key, iv) {
 		//txt = pad(txt, 16);
 		txt = this.pad16m(txt);
 		if (this.verbose) console.log("txt: " + txt);
@@ -35,12 +33,10 @@ function AES () {
 	}
 
 	this.bytesToB64 = function (byteArr) {
-	// function bytesToB64(byteArr) {
 		return btoa(String.fromCharCode.apply(null, byteArr));
 	}
 
 	this.b64ToBytes = function (b64Str) {
-	// function b64ToBytes(b64Str) {
 		return new Uint8Array(atob(b64Str).split("").map(function(c) {
 			return c.charCodeAt(0);
 		}));
