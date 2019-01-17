@@ -11,6 +11,8 @@
 	<script type="text/javascript" src="testVue.js"></script>
 </head>
 <body>
+	<a href='http://localhost:8080/semantic.jserv/login.serv?conn=null&t=init&header=any&k=infochange-v2'>
+			Initialize Root Key</a>
 	<p id="p-api"/>
 	<div></div>
 	<input type='button' onclick='testAES()' value='testAES'></input>
@@ -19,8 +21,6 @@
 	<input type='button' onclick='testVue()' value='vue'></input>
 
 	<div id="obj-7">
-		<a href='http://localhost:8080/semantic.jserv/login.serv?conn=null&t=init&header=any&k=infochange-v2'>
-			http://localhost:8080/semantic.jserv/login.serv?conn=null&t=init&header=any&k=infochange-v2</a>
 		<p>req.expr("a.areaid", "areaId").expr("a.areaName", "areaName")<br>
 		.expr("deviceId", "id").expr("deviceName", "text").expr("fireStatus", "status")<br>
 		.j("e_areas", "a", "d.areaId = a.areaId")<br>
