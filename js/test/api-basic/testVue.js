@@ -70,7 +70,7 @@ Vue.component('comp-item', {
 	// "prop", which is like a custom attribute.
 	// This prop is called 'rec'.
 	props: ['rec'],
-	template: '<li> [ID: {{ rec.id }}] The item text: {{ rec.text }}</li>'
+	template: '<li>Vue Item [ID: {{ rec.id }}] The item text: {{ rec.text }}</li>'
 });
 
 var obj7;
