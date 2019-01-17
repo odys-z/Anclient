@@ -43,8 +43,12 @@ function query() {
 }
 
 function load() {
-	if (typeof obj7 === "undefined")
+	if (typeof obj7 === "undefined") {
 		testVue();
+		// FIXME not correct
+		alert('try again');
+		return;
+	}
 
 	if (typeof ssClient === "undefined")
 		login();
