@@ -1,28 +1,36 @@
+import $ from 'jquery';
+import AES from './aes.js';
+import {Protocol, JMessage, JHeader, SessionReq, QueryReq} from './protocol.js';
+
 /**Jclient.js API
  * Java equivalent of
  * io.odysz.jclient.Clients;
  * io.odysz.jclient.SessionClient;
  */
-function $J () {
-	this.cfg = {
-		connId: null,
-		verbose: true,
-		defaultServ: null,
+class J {
+	/**@param {string} serv serv path root, e.g. 'http://localhost/semantic-jserv'
+	 */
+	constructor (urlRoot) {
+	 	this.cfg = {
+			connId: null,
+			verbose: true,
+			defaultServ: urlRoot,
+		}
 	}
 
-	this.servUrl = function (port) {
+	servUrl (port) {
 		return this.cfg.defaultServ + '/'
 			+ Protocol.Port[port] + '?conn=' + this.cfg.connId;
 	}
 
-	this.init = function (connId, urlRoot) {
+	init (connId, urlRoot) {
 		this.cfg[connId] = urlRoot;
 
 		if (this.cfg.defaultServ === null)
 			this.cfg.defaultServ = urlRoot;
 	}
 
-	this.login = function (usrId, pswd, onLogin, onError) {
+	login (usrId, pswd, onLogin, onError) {
 		// byte[] iv =   AESHelper.getRandom();
 		// String iv64 = AESHelper.encode64(iv);
 		// String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
@@ -41,15 +49,21 @@ function $J () {
 						}, onError);
 	}
 
-	this.post = function (jreq, onOk, onErr) {
-		var url = $J.servUrl(jreq.port);
+	static checkResponse(resp) {
+		if (typeof resp === "undefined" || resp === null || resp.length < 2)
+			return "err_NA";
+		else return false;
+	}
+
+	post (jreq, onOk, onErr) {
+		var url = this.servUrl(jreq.port);
 
 		$.ajax({type: 'POST',
 				// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
 				url: url,
 				contentType: "application/json; charset=utf-8",
-                crossDomain: true,
-                //xhrFields: { withCredentials: true },
+				crossDomain: true,
+				//xhrFields: { withCredentials: true },
 				data: JSON.stringify(jreq),
 				success: function (resp) {
 					// response Content-Type = application/json;charset=UTF-8
@@ -79,10 +93,13 @@ function $J () {
 	}
 }
 
-function SessionClient (ssInf) {
-	this.ssInf = ssInf;
+class SessionClient {
+	constructor (ssInf) {
+		this.ssInf = ssInf;
+	}
 
-	this.query = function (t, alias, funcId, pageInf) {
+
+	query (t, alias, funcId, pageInf) {
 		var qryItem = new QueryReq(t, alias, pageInf);
 		var header = Protocol.formatHeader(this.ssInf);
 		header.userAct({func: 'func01',
@@ -111,7 +128,7 @@ function SessionClient (ssInf) {
 	 * @param {function} onError on ajax error function: f(respons-data) {...}
 	 * @param
 	 */
-	this.loadPage = function (query, pgSize, pgIx, onSuccess, onError) {
+	loadPage (query, pgSize, pgIx, onSuccess, onError) {
 		if (typeof pgSize === "undefined")
 			pgSize = -1;
 		if (typeof pgIx === "undefined")
@@ -139,8 +156,8 @@ function SessionClient (ssInf) {
 	}
 }
 
-function checkResponse(resp) {
-	if (typeof resp === "undefined" || resp === null || resp.length < 2)
-		return "err_NA";
-	else return false;
+class Inseclient {
+
 }
+
+export {J, SessionClient, Inseclient};

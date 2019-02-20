@@ -1,6 +1,11 @@
-/**Require */
-function AES () {
+/**<h4>Design notes:</h4>
+ * AES is just only one of crypto algorithms, so we need make this pluginized so
+ * can be overriden by user. */
+import AESLib from './ricmoo-aes.js';
+
+export default function AES () {
 	var verbose = false;
+	AESLib(window);
 
 	/**get byte[] of random 128bits iv
 	 * @return {byte[]} iv
@@ -94,7 +99,7 @@ function AES () {
 }
 
 /**Test JS AES */
-function testAES() {
+export function testAES() {
 	var aes = new AES();
 
 	var iv = aes.getIv128();
