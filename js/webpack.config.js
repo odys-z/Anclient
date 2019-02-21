@@ -1,6 +1,6 @@
 /**TODO We should separate this file into two files, one for basic semantics config,
  * one for the vue layer. */
- ar path = require('path')
+ var path = require('path')
  var webpack = require('webpack')
 
  const VueLoaderPlugin = require('vue-loader/lib/plugin')
@@ -11,7 +11,7 @@
  module.exports = {
    mode: v, // "production" | "development" | "none"
    devtool: 'source-map',
-   entry: {jvue: './lib/view/vue/app.vue', jclient: './lib/jclient.js'},
+   entry: {jvue: './lib/view/vue/homepage.vue', jclient: './lib/jclient.js'},
 
    output: {
      filename: "[name]-0.0.1.min.js", // string

@@ -17,6 +17,12 @@
   "author": "odys-z@github.com",
   "license": "Apache-2.0",
   "dependencies": {
+    "jquery": "^3.3.1",
+    "mini-css-extract-plugin": "^0.5.0",
+    "node-sass": "^4.11.0",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^7.1.0",
+    "vue-template-compiler": "^2.6.6",
     "webpack": "^4.29.5"
   },
   "devDependencies": {

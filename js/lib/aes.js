@@ -1,7 +1,7 @@
 /**<h4>Design notes:</h4>
  * AES is just only one of crypto algorithms, so we need make this pluginized so
  * can be overriden by user. */
-import AESLib from './ricmoo-aes.js';
+import AESLib from './opensources/ricmoo-aes.js';
 
 export default function AES () {
 	var verbose = false;
