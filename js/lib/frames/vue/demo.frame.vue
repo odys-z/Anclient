@@ -32,6 +32,8 @@
 	watch: { },
 	provide() { },
   }
+
+  export {VLogin, VHome, View}
 </script>
 <style>
 </style>
