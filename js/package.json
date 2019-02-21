@@ -1,0 +1,22 @@
+{
+  "name": "jclient",
+  "version": "1.0.0",
+  "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
+  "main": "webpack.config.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Open file://test/index.html in a browser.\" && exit 1"
+  },
+  "keywords": [
+    "jclient",
+    "semantic jserv"
+  ],
+  "author": "odys-z@github.com",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "webpack": "^4.29.5"
+  }
+}

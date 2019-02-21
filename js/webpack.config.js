@@ -11,7 +11,7 @@
  module.exports = {
    mode: v, // "production" | "development" | "none"
    devtool: 'source-map',
-   entry: {jvue: './lib/views/vue/app.vue', jclient: './lib/jclient.js'},
+   entry: {jvue: './lib/view/vue/app.vue', jclient: './lib/jclient.js'},
 
    output: {
      filename: "[name]-0.0.1.min.js", // string
