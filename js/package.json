@@ -2,7 +2,7 @@
   "name": "jclient",
   "version": "1.0.0",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
-  "main": "webpack.config.js",
+  "main": "./test/vue/index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -18,5 +18,12 @@
   "license": "Apache-2.0",
   "dependencies": {
     "webpack": "^4.29.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.0",
+    "vue": "^2.6.6",
+    "vue-loader": "^15.6.4"
   }
 }

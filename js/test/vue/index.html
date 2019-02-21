@@ -1,41 +1,21 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta charset="utf-8">
-	<script type="text/javascript" src="../3rd-lib/jquery-3.3.1.min.js"></script>
-	<script type="text/javascript" src="../3rd-lib/ricmoo-aes.js"></script>
-    <script type="text/javascript" src="../3rd-lib/vue-2.5.17.min.js"></script>
-	<script type="text/javascript" src="../../lib/aes.js"></script>
-	<script type="text/javascript" src="../../lib/protocol.js"></script>
-	<script type="text/javascript" src="../../lib/jclient.js"></script>
-	<script type="text/javascript" src="testVue.js"></script>
+	<meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Dynamic Menu</title>
 </head>
 <body>
-	<a href='http://localhost:8080/semantic.jserv/login.serv?conn=null&t=init&header=any&k=infochange-v2'>
-			Initialize Root Key</a>
-	<p id="p-api"/>
-	<div></div>
-	<input type='button' onclick='testAES()' value='testAES'></input>
-	<input type='button' onclick='test()' value='query'></input>
-	<input type='button' onclick='load()' value='load'></input>
-	<input type='button' onclick='testVue()' value='vue'></input>
+	<h1>JClient+Vue Home Page</h1>
+	<div id='app'></div>
+    <script type='text/javascript' src='../../webpack-06/cache/vue-router.min.js'></script>
+	<script type='text/javascript' src='../dist/jvue.min.js'></script>
 
-	<div id="obj-7">
-		<p>req.expr("a.areaid", "areaId").expr("a.areaName", "areaName")<br>
-		.expr("deviceId", "id").expr("deviceName", "text").expr("fireStatus", "status")<br>
-		.j("e_areas", "a", "d.areaId = a.areaId")<br>
-		.whereCond("=", "a.areaId", "'000027'");</p>
-		<p>select userId uid, userName uname, pwd pswd, encAuxiliary iv, dept url
-			from a_user u where u.userId = 'admin'<p>
-		<table>
-			<!-- The item is called 'comp', and '-item' is a reserved word. -->
-			<comp-item
-				v-for="item in groceryList"
-				v-bind:rec="item"
-				v-bind:key="item.id">
-			</comp-item>
-		</table>
-	</div>
+	<script>
+	window.onload = function () {
+		jvue.trees();
+	}
+	</script>
 
 </body>
 </html>
