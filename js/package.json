@@ -1,6 +1,6 @@
 {
   "name": "jclient",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main": "./test/vue/index.js",
   "directories": {

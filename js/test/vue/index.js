@@ -1,16 +1,10 @@
 import Vue from 'vue/dist/vue.js'
 import VueRouter from 'vue-router';
 
-import SidebarMenu from '../lib/components/vue/menu/SidebarMenu.vue'
-
-// from application, referencing lib main entry, the view
-// import App from './App.vue'
-import jvue from '../lib/views/jview-menu-dyna.vue'
-
-Vue.use(SidebarMenu)
+// import SidebarMenu from '../lib/components/vue/menu/SidebarMenu.vue'
+import jvue from '../../lib/view/vue/homepage.vue'
 
 Vue.use(jvue)
-
 Vue.use(VueRouter)
 
 const Dashboard = { template: '<div>Dashboard Page</div>' }
