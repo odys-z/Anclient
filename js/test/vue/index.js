@@ -7,6 +7,7 @@ import jvue from '../../lib/view/vue/homepage.vue'
 Vue.use(jvue)
 Vue.use(VueRouter)
 
+// User controls
 const Dashboard = { template: '<div>Dashboard Page</div>' }
 const Charts = { template: '<div>Charts Page</div>' }
 const Tables = { template: '<div>Tables Page</div>' }
@@ -16,33 +17,27 @@ const Registration = { template: '<div>Registration Page</div>' }
 
 const router = new VueRouter({
   routes: [
-    {
-      path: '/',
+    { path: '/',
       name: 'Dashboard',
       component: Dashboard,
     },
-    {
-      path: '/charts',
+    { path: '/charts',
       name: 'Charts',
       component: Charts,
     },
-    {
-      path: '/tables',
+    { path: '/tables',
       name: 'Tables',
       component: Tables,
     },
-    {
-      path: '/auth',
+    { path: '/auth',
       name: 'Auth',
       component: Auth,
       children: [
-        {
-          path: 'login',
+        { path: 'login',
           name: 'Login',
           component: Login,
         },
-        {
-          path: 'registration',
+        { path: 'registration',
           name: 'Registration',
           component: Registration,
         }
@@ -56,7 +51,7 @@ var menu2 = [
 	  title: 'Count'
 	},
 	{ href: '/',
-	  title: 'Contriessssssss',
+	  title: 'Contries',
 	  icon: 'fa fa-user'
 	},
 	{ href: '/charts',
@@ -73,7 +68,7 @@ var menu2 = [
 	  title: 'Disabled x',
 	  icon: 'fa fa-cog',
 	  disabled: true,
-	  badge: { text: '2000', }
+	  badge: { text: 'BDG', }
 	},
 
 	// Browser complain: ReferenceError: separator is not defined
