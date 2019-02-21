@@ -63,16 +63,21 @@
 	//   }
 	// })
   export default {
-	  name: 'details',
-	  data: () => {
-		  ok: 'OK',
-		  title: 'Details'
-	  },
-	  methods: {
-		  onOk: function() {
-			  close();
-		  }
-	  }
+	name: 'details',
+	data: () => {
+		ok: 'OK',
+		title: 'Details'
+	},
+	methods: {
+
+		//vervified at jsfiddle
+		onOk: function() {
+			this.close();
+		},
+		close: function() {
+			this.$emit('close');
+		}
+	}
   }
 </script>
 
