@@ -72,7 +72,6 @@ public class Clients<T extends JBody> {
 				});
   		if (inst[0] == null)
   			throw new IOException("HttpServClient return null client.");
-  		// return inst[0].httpClient(httpClient);
   		return inst[0];
 	}
 
