@@ -13,7 +13,7 @@
   import { animationMixin } from '../../view/vue/menu/mixin'
 
   export default {
-	name: 'example',
+	name: 'frame',
 	components: { VLogin, VHome },
 
 	props: {

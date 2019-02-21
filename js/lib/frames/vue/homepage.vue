@@ -48,7 +48,7 @@ export default {
               ]
             },
           ]
-        }
+        },
         { href: '/',
           title: 'Dashboard',
           icon: 'fa fa-user'

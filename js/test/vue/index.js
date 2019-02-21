@@ -2,18 +2,16 @@ import Vue from 'vue/dist/vue.js'
 import VueRouter from 'vue-router';
 
 // import SidebarMenu from '../lib/components/vue/menu/SidebarMenu.vue'
-import jvue from '../../lib/view/vue/homepage.vue'
+// import jvue from '../../lib/view/vue/homepage.vue'
+import {jvue, Login} from '../../dist/jvue-0.0.1.min.js'
+
+import Params from './beans/sys/params.vue'
 
 Vue.use(jvue)
 Vue.use(VueRouter)
 
 // User controls
-const Dashboard = { template: '<div>Dashboard Page</div>' }
-const Charts = { template: '<div>Charts Page</div>' }
-const Tables = { template: '<div>Tables Page</div>' }
-const Auth = { template: '<div>Auth <router-view/></div>' }
-const Login = { template: '<div>Login Page</div>' }
-const Registration = { template: '<div>Registration Page</div>' }
+const dashboard = { template: '<div>Dashboard Page</div>' }
 
 const router = new VueRouter({
   routes: [
@@ -29,8 +27,8 @@ const router = new VueRouter({
       name: 'Tables',
       component: Tables,
     },
-    { path: '/auth',
-      name: 'Auth',
+    { path: '/sys',
+      name: 'System',
       component: Auth,
       children: [
         { path: 'login',
@@ -48,48 +46,25 @@ const router = new VueRouter({
 
 var menu2 = [
 	{ header: true,
-	  title: 'Count'
+	  title: 'Loading...'
 	},
-	{ href: '/',
-	  title: 'Contries',
-	  icon: 'fa fa-user'
-	},
-	{ href: '/charts',
-	  title: 'Map x',
+	{ separar: true },
+	{ href: '/userInfo',
+	  title: 'Personal Info',
 	  icon: 'fa fa-chart-area',
-	  badge: { text: 'Estonia',
-	           class: 'badge-danger' }
-	},
-	{ href: '/tables',
-	  title: 'Tables',
-	  icon: 'fa fa-table'
-	},
-	{ href: '/disabled',
-	  title: 'Disabled x',
-	  icon: 'fa fa-cog',
-	  disabled: true,
-	  badge: { text: 'BDG', }
-	},
-
-	// Browser complain: ReferenceError: separator is not defined
-	// { header: true,
-	//   component: separator,
-	//   visibleOnCollapse: true
-	// },
-	// so let's handle this in vue app.
-	{ seperator: true},
-
-	{ header: true,
-	  title: 'German'
+	  badge: {
+		text: '*',
+		class: 'badge-danger'
+	  }
 	},
 ];
 
-Vue.component('sidebar-menu', SidebarMenu);
+// Vue.component('sidebar-menu', SidebarMenu);
 
 export function menu(id) {
 	if (id === undefined)
 		id = '#app';
 	var obj = new Vue(Object.assign({}, jvue, { el: id }, {router: router}));
-	obj.bindMenu(menu2);
+	obj.bindMenu(menu2, dashboard);
 	return obj;
 }
