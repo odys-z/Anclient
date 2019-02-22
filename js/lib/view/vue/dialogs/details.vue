@@ -15,8 +15,8 @@
 	</div>
 -->
 <template>
-  <transition name="modal" id='details'>
-    <div class="modal-mask">
+  <transition name="modal" >
+    <div class="modal-mask" id='details'>
       <div class="modal-wrapper">
         <div class="modal-container">
 

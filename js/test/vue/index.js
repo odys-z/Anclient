@@ -3,11 +3,13 @@ import VueRouter from 'vue-router';
 
 // import SidebarMenu from '../lib/components/vue/menu/SidebarMenu.vue'
 // import jvue from '../../lib/view/vue/homepage.vue'
-import {jvue, Login} from '../../dist/jvue-0.0.1.min.js'
+import {VLogin, VHome} from '../../dist/jvue-0.0.1.min.js'
 
 import Params from './beans/sys/params.vue'
+import UserInfo from './beans/sys/user-info.vue'
 
-Vue.use(jvue)
+Vue.use(VLogin)
+Vue.use(VHome)
 Vue.use(VueRouter)
 
 // User controls
@@ -19,28 +21,22 @@ const router = new VueRouter({
       name: 'Dashboard',
       component: Dashboard,
     },
-    { path: '/charts',
-      name: 'Charts',
-      component: Charts,
+    { path: '/login',
+      name: 'Login',
+      component: Login,
     },
-    { path: '/tables',
-      name: 'Tables',
-      component: Tables,
+    { path: '/sys/params',
+      name: 'System Params',
+      component: Params,
     },
-    { path: '/sys',
-      name: 'System',
-      component: Auth,
-      children: [
-        { path: 'login',
-          name: 'Login',
-          component: Login,
-        },
-        { path: 'registration',
-          name: 'Registration',
-          component: Registration,
-        }
-      ]
+    { path: 'user-info',
+      name: 'Personal Info',
+      component: UserInfo,
     },
+    { path: 'roles',
+      name: 'Roles',
+      component: Roles,
+    }
   ]
 })
 
@@ -49,7 +45,7 @@ var menu2 = [
 	  title: 'Loading...'
 	},
 	{ separar: true },
-	{ href: '/userInfo',
+	{ href: '/user-info',
 	  title: 'Personal Info',
 	  icon: 'fa fa-chart-area',
 	  badge: {
@@ -59,12 +55,30 @@ var menu2 = [
 	},
 ];
 
-// Vue.component('sidebar-menu', SidebarMenu);
 
-export function menu(id) {
+// Move to app.vue? ////////////////////////////////////////////////////////////
+//
+export function appLogin(id, jserv) {
 	if (id === undefined)
-		id = '#app';
-	var obj = new Vue(Object.assign({}, jvue, { el: id }, {router: router}));
-	obj.bindMenu(menu2, dashboard);
+		id = '#login';
+	var obj = new Vue(Object.assign({},
+		{ el: id,
+		  // router: router,
+		  components { VLogin }
+		}));
+	obj.onLoad(jserv);
+	return obj;
+}
+
+
+export function appHome(id, jserv) {
+	if (id === undefined)
+		id = '#home';
+	var obj = new Vue(Object.assign({},
+		{ el: id,
+		  router: router,
+		  components { VHome }
+		}));
+	obj.onLoad(jserv);
 	return obj;
 }

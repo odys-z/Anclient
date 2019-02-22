@@ -88,6 +88,9 @@ export default {
     }
   },
   methods: {
+	logout: function(url) {
+		window.top.location = url;
+	},
     onCollapse(collapsed) {
       console.log(collapsed)
       this.collapsed = collapsed

@@ -7,6 +7,7 @@
 		<h4>{{title}}</h4>
 		<input id='login-userId' :bind='uid' class='login' placeholder="login Id"></input>
 		<input id='login-pswd' :bind='pswd' class='pswd' placeholder="password"></input>
+		<input type='button' value='ok' v-click='onOk("home.html")'></input>
 	 </div>
  </template>
  <script>
@@ -16,8 +17,13 @@
 		return {
 			title: 'Login',
 			uid: '',
-			pswd: ''
+			pswd: '',
 		}
+	},
+	methods: {
+		onOk: function(url) {
+			window.top.location = url;
+		},
 	}
   }
  </script>

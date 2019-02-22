@@ -27,13 +27,18 @@
 	} },
 
 	created() { },
-	methods: { },
+	methods: {
+		onLoad: function(serv) {
+			// init jclient with serv usrl root
+			console.log('onLoad()');
+		}
+	},
 	computed: { },
 	watch: { },
 	provide() { },
   }
 
-  export {VLogin, VHome, View}
+  export {VLogin, VHome}
 </script>
 <style>
 </style>
