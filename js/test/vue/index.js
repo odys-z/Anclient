@@ -6,7 +6,7 @@ import VueRouter from 'vue-router';
 import {VLogin, VHome} from '../../dist/jvue-0.0.1.min.js'
 
 import Params from './beans/sys/params.vue'
-import UserInfo from './beans/sys/user-info.vue'
+import UserInfo from './beans/sys/user-infos.vue'
 
 Vue.use(VLogin)
 Vue.use(VHome)
@@ -64,7 +64,7 @@ export function appLogin(id, jserv) {
 	var obj = new Vue(Object.assign({},
 		{ el: id,
 		  // router: router,
-		  components { VLogin }
+		  components: { VLogin }
 		}));
 	obj.onLoad(jserv);
 	return obj;
@@ -77,7 +77,7 @@ export function appHome(id, jserv) {
 	var obj = new Vue(Object.assign({},
 		{ el: id,
 		  router: router,
-		  components { VHome }
+		  components: { VHome }
 		}));
 	obj.onLoad(jserv);
 	return obj;
