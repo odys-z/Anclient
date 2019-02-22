@@ -4,9 +4,10 @@
  */
 
 <template>
-	 <div id='app-frame'></div>
+	 <div id='frame'></div>
 </template>
 <script>
+  import Vue from 'vue/dist/vue.js'
   import VLogin from './login.vue'
   import VHome from './homepage.vue'
 
@@ -17,7 +18,7 @@
 	components: { VLogin, VHome },
 
 	props: {
-		theme: { 'default' },
+		theme: [ 'default' ],
 	},
 
 	mixins: [animationMixin],
@@ -28,17 +29,34 @@
 
 	created() { },
 	methods: {
-		onLoad: function(serv) {
-			// init jclient with serv usrl root
-			console.log('onLoad()');
-		}
+		bindLogin: function(jserv) {
+			console.log('Frame.bindLogin():');
+			this.jserv = jserv;
+			console.log(this);
+
+			// bind to div
+			var login = new Vue(Object.assign({}, VLogin, { el: '#frame' }));
+			login.onLoad(jserv);
+		},
+		bindHome: function(jserv, router) {
+			console.log('Frame.bindHome(' + jserv + ')');
+			this.jserv = jserv;
+			console.log(this);
+
+			// bind to div
+			var home = new Vue(Object.assign({},
+				VHome,
+				{ el: '#frame',
+				  router: router }));
+			home.onLoad(jserv);
+		},
 	},
 	computed: { },
 	watch: { },
 	provide() { },
   }
-
-  export {VLogin, VHome}
+  export * from './login.vue'
+  export * from './homepage.vue'
 </script>
 <style>
 </style>

@@ -7,6 +7,7 @@
  const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
  var v = 'development';
+ var version = "0.0.1";
 
  module.exports = {
    mode: v, // "production" | "development" | "none"
@@ -14,10 +15,13 @@
    entry: {japp: './test/vue/index.js'},
 
    output: {
-     filename: "[name]-0.0.1.min.js", // string
+     filename: "[name]-" + version + ".min.js",
 
      path: path.resolve(__dirname, 'dist'),
-     publicPath: "./dist/", // string
+     publicPath: "./dist/",
+
+     library: 'japp',
+     libraryTarget: 'umd'
    },
 
    plugins: [

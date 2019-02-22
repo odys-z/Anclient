@@ -3,17 +3,19 @@
 <head>
 	<meta charset='utf-8'>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Dynamic Menu</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+		integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <title>Portal</title>
 </head>
 <body>
 	<h1>This is a portal.</h1>
 	<div id='login'></div>
-    <script type='text/javascript' src='../../webpack-06/cache/vue-router.min.js'></script>
-	<script type='text/javascript' src='../dist/japp-0.0.1.min.js'></script>
+    <script type='text/javascript' src='../3rd-lib/vue-router.min.js'></script>
+	<script type='text/javascript' src='../../dist/japp-0.0.1.min.js'></script>
 
 	<script>
 	window.onload = function () {
-		jvue.appLogin('#app', 'http://127.0.0.1:8080/semantic.jserv');
+		japp.appLogin('#login', 'http://127.0.0.1:8080/semantic.jserv');
 	}
 	</script>
 

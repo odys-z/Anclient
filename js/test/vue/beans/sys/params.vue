@@ -1,5 +1,7 @@
 <template>
 	<div>
+		<h1>Params.vue</h1>
+		<h5>toolebar here</h5>
 		<list-toolbar/>
 		<semantable/>
 	</div>

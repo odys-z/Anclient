@@ -1,7 +1,7 @@
 <!-- Home Page Component -->
 <template>
   <div id="home" :class="[{'collapsed' : collapsed}]">
-    <h1>Banner - {{sys.title}}</h1>
+    <h1>Banner - {{sysInfo.title}}</h1>
     <div class="home">
       <!--
       <div>select theme:
@@ -12,13 +12,22 @@
       <hr style="margin: 50px 0px;border: 1px solid #e3e3e3;">
       -->
       <sidebar-menu :menu="menu" :collapsed="collapsed" @collapse="onCollapse"
-		:theme="selectedTheme" :showOneChild="true" @itemClick="onItemClick"/>
+            :theme="selectedTheme" :showOneChild="true" @itemClick="onItemClick"/>
       <router-view/>
     </div>
   </div>
 </template>
 
 <script>
+  import Vue from 'vue/dist/vue.js'
+  import VueRouter from 'vue-router';
+  import SidebarMenu from '../../view/vue/menu/SidebarMenu.vue'
+
+  Vue.use(VueRouter)
+  Vue.use(SidebarMenu);
+
+  Vue.component('sidebar-menu', SidebarMenu);
+
 const separator = {
   template: `<hr style="border-color: rgba(0, 0, 0, 0.1); margin: 20px;">`
 }
@@ -27,9 +36,16 @@ export default {
   name: 'home',
   data() {
     return {
-      menu: [
+      sysInfo: {
+        title: 'SYSTEM TITLE',
+      },
+	  menu: [
         { header: true,
-          title: 'Main Navigation'
+          title: 'Static Default'
+        },
+        { href: '/',
+          title: 'Dashboard',
+          icon: 'fa fa-user'
         },
         { title: 'Multiple Level Functions',
           icon: 'fa fa-list-alt',
@@ -48,10 +64,6 @@ export default {
               ]
             },
           ]
-        },
-        { href: '/',
-          title: 'Dashboard',
-          icon: 'fa fa-user'
         },
         { title: 'Administration',
           icon: 'fa fa-file',
@@ -84,12 +96,16 @@ export default {
       ],
       collapsed: false,
       // themes: ['', 'white-theme'],
-      // selectedTheme: 'white-theme'
+      selectedTheme: 'white-theme'
     }
   },
   methods: {
 	logout: function(url) {
 		window.top.location = url;
+	},
+	onLoad: function(jserv) {
+		console.log('VHome.onLoad()');
+		console.log(jserv);
 	},
     onCollapse(collapsed) {
       console.log(collapsed)

@@ -7,7 +7,7 @@
 		<h4>{{title}}</h4>
 		<input id='login-userId' :bind='uid' class='login' placeholder="login Id"></input>
 		<input id='login-pswd' :bind='pswd' class='pswd' placeholder="password"></input>
-		<input type='button' value='ok' v-click='onOk("home.html")'></input>
+		<input type='button' value='ok' v-on:click='onOk("home.html")'></input>
 	 </div>
  </template>
  <script>
@@ -21,8 +21,13 @@
 		}
 	},
 	methods: {
+		onLoad: function(jserv) {
+			console.log('VLogin.onLoad()');
+			console.log(jserv);
+		},
 		onOk: function(url) {
 			window.top.location = url;
+			console.log('VLogin.onOk(' + url + ')');
 		},
 	}
   }
