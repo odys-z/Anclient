@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Dynamic Menu</title>
+</head>
+<body>
+	<h1>This is a home page.</h1>
+	<div id='home'></div>
+    <script type='text/javascript' src='../../webpack-06/cache/vue-router.min.js'></script>
+	<script type='text/javascript' src='../dist/japp-0.0.1.min.js'></script>
+
+	<script>
+	window.onload = function () {
+		jvue.appHome('#app', 'http://127.0.0.1:8080/semantic.jserv');
+	}
+	</script>
+
+</body>
+</html>
