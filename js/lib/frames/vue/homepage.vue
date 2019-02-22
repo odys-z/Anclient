@@ -71,7 +71,7 @@ export default {
           child: [
             { href: '/sys/params',
               title: 'System Parameters',
-              icon: 'fa fa-gear'
+              icon: 'fa fa-cog'
             },
             { href: '/sys/roles',
               title: 'Roles',
