@@ -31,9 +31,9 @@
 </template>
 
 <script>
-import Item from './Item.vue'
-import SubItem from './SubItem.vue'
-import MobileItem from './MobileItem.vue'
+import Item from './item.vue'
+import SubItem from './subItem.vue'
+import MobileItem from './mobileItem.vue'
 import { animationMixin } from './mixin'
 
 export default {

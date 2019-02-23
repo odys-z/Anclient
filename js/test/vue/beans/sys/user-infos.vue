@@ -6,15 +6,15 @@
 </template>
 
 <script>
-  import {listToolbar, semantable} from '../../../../dist/jvue-0.0.1.min.js'
+  import {Listoolbar, Semantable} from '../../../../dist/jvue-0.0.1.min.js'
 
   export default {
-	  name: 'UserInfo',
-	  data () {
-		  return {
-			  paras: []
-		  }
-	  }
+	name: 'UserInfos',
+	data () {
+		return {
+			users: []
+		}
+	}
   }
 </script>
 

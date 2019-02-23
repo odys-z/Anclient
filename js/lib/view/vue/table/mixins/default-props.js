@@ -1,3 +1,6 @@
+/**Ported from original source.
+ * Not used?
+ */
 export default {
   /**
    * Key-value pairs with the headings to overwrite (label to display)

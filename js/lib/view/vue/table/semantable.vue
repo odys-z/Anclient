@@ -28,27 +28,28 @@
 
 <script>
 /*eslint-disable*/
-import $ from 'jquery';
+  import $ from 'jquery';
 
-export default {
+  export default {
+	name: 'Semantable',
 	// component's data must be a function
 	// https://stackoverflow.com/questions/42396867/how-to-get-data-to-work-when-used-within-a-component-and-axios?rq=1
 	// https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function
-  data: () => ({
-	columns: ['col-a', 'col-b', 'C'],
-	rows: [
+	data: () => ({
+	  columns: ['col-a', 'col-b', 'C'],
+	  rows: [
 		['cell-01', 'cell-02', 'cell-03'],
 		['cell-11', 'cell-12', 'cell-13'],
 		['cell-21', 'cell-22', 'cell-23'],
 		['cell-31', 'cell-32', 'cell-33'],
 		['cell-41', 'cell-42', 'cell-43'],
-	],
-    pageSize: 5,
-    currentPage: 0,
-	totalPage: 0
-  }),
+	  ],
+	  pageSize: 5,
+	  currentPage: 0,
+	  totalPage: 0
+	}),
 
-  methods:{
+	methods:{
 	  bind: function (columns, rows) {
 		console.log(this);
 		Object.assign(this, {
@@ -60,19 +61,19 @@ export default {
 		console.log(this);
 	  },
 
-    sort:function(s) {
-      if(s === this.currentSort) {
-        this.currentSortDir = this.currentSortDir==='asc'?'desc':'asc';
-      }
-      this.currentSort = s;
-    },
-    nextPage:function() {
-      if((this.currentPage*this.pageSize) < this.users.length) this.currentPage++;
-    },
-    prevPage:function() {
-      if(this.currentPage > 1) this.currentPage--;
-    },
-    goPage: function(pgEvent) {
+	  sort:function(s) {
+		  if(s === this.currentSort) {
+			  this.currentSortDir = this.currentSortDir==='asc'?'desc':'asc';
+		  }
+		  this.currentSort = s;
+	  },
+	nextPage:function() {
+		if((this.currentPage*this.pageSize) < this.users.length) this.currentPage++;
+	},
+	prevPage:function() {
+		if(this.currentPage > 1) this.currentPage--;
+	},
+	goPage: function(pgEvent) {
 		console.log('go page ' + this.$refs.pager.value);
 		console.log(pgEvent);
 	}

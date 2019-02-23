@@ -1,3 +1,4 @@
+<!-- TODO move this to lib/view/vue/mixins -->
 <template>
   <div>
     <ul :class="[$style.pagination, classes.wrapper]">
