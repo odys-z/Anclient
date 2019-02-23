@@ -1,4 +1,4 @@
-<!-- Home Page Component -->
+<!-- Home Page Component
 <template>
   <div id="home" :class="[{'collapsed' : collapsed}]">
 	<slot name='banner'>
@@ -11,14 +11,11 @@
     </div>
   </div>
 </template>
+ -->
 
 <script>
   import Vue from 'vue/dist/vue.js'
   import VueRouter from 'vue-router';
-  // import { animationMixin } from '../../view/vue/menu/mixin'
-
-  // import jvue from '../../../dist/jvue-0.0.1.min.js'
-  // import jvue from '../../../dist/jvue-0.0.1.min.js'
 
   import {SidebarMenu} from '../../../dist/jvue-0.0.1.min.js'
 
@@ -134,9 +131,22 @@
 	// render static html slot
 	// https://stackoverflow.com/questions/48975136/how-to-render-a-list-of-static-content-with-vue-named-slot
 	render(h){
-        let links = this.$slots.links.map(l => h('li', {class: "comp-item"}, [l]))
-        return h('ul', {class: 'comp'}, links)
-    },
+        // let links = this.$slots.links.map(l => h('li', {class: "comp-item"}, [l]))
+        // return h('ul', {class: 'comp'}, links)
+
+		return h('div',
+				{'class': { 'collapsed': this.collapsed } },
+				[ h('p', 'Example Text'),
+				  h(SidebarMenu,
+					{ props: {menu: this.menu,
+							  collapsed: this.collapsed,
+							  theme: this.selectedTheme,
+						  	 },
+					on: { collapse: this.onCollapse },
+					})
+				]);
+	},
+
 	data() {
 		return {
 			sysInfo: {
