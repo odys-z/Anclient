@@ -3,12 +3,12 @@ import VueRouter from 'vue-router';
 
 // import SidebarMenu from '../lib/components/vue/menu/SidebarMenu.vue'
 // import jvue from '../../lib/view/vue/homepage.vue'
-import jlib from '../../dist/jvue-0.0.1.min.js'
+// import jlib from '../../dist/jvue-0.0.1.min.js'
 
 // import Params from './beans/sys/params.vue'
 // import UserInfo from './beans/sys/user-infos.vue'
 
-import jframe from './framework/demo.app.vu'
+import jframe from './framework/demo.app.vue'
 
 Vue.use(VueRouter)
 
@@ -63,7 +63,7 @@ export function appLogin(selector, jserv) {
 	if (selector === undefined)
 		selector = '#login';
 	var obj = new Vue(Object.assign({},
-		jvue, jframe,
+		jframe,
 		{ el: selector, }));
 	obj.bindLogin(jserv);
 	return obj;
@@ -77,8 +77,8 @@ export function appHome(selector, jserv) {
 	if (selector === undefined)
 		selector = '#home';
 	var obj = new Vue(Object.assign({},
-		jvue, jframe,
+		jframe,
 		{ el: selector, }));
-	obj.bindHome(jserv, router);
+	obj.bindHome(jserv);
 	return obj;
 }

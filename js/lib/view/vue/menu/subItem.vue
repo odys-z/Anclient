@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import Item from './Item.vue'
+import Item from './item.vue'
 import { itemMixin, animationMixin } from './mixin'
 
 export default {
@@ -41,7 +41,7 @@ export default {
     Item
   },
   beforeCreate() {
-    this.$options.components.Item = require('./Item.vue').default
+    this.$options.components.Item = require('./item.vue').default
   }
 }
 </script>

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import SubItem from './SubItem.vue'
+import SubItem from './subItem.vue'
 import { itemMixin } from './mixin'
 
 export default {

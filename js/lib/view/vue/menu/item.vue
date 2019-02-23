@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import SubItem from './SubItem.vue'
+import SubItem from './subItem.vue'
 import { itemMixin, animationMixin } from './mixin'
 
 export default {

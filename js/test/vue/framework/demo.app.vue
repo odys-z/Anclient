@@ -8,9 +8,9 @@
 <script>
   import Vue from 'vue/dist/vue.js'
   import VLogin from './login.vue'
-  import VHome from './homepage.vue'
+  import VHome from './home.vue'
 
-  import { animationMixin } from '../../view/vue/menu/mixin'
+  import { animationMixin } from '../../../lib/view/vue/menu/mixin'
 
   // const Dashboard = { template: '<div>Dashboard Page</div>' }
   //
@@ -126,7 +126,7 @@
 	provide() { },
   }
   export * from './login.vue'
-  export * from './homepage.vue'
+  export * from './home.vue'
 </script>
 <style>
 </style>

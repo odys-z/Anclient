@@ -5,14 +5,6 @@
 		<h1>Banner - {{sysInfo.title}}</h1>
 	</slot>
     <div class="home">
-      <!--
-      <div>select theme:
-        <select v-model="selectedTheme">
-          <option v-for="(theme, index) in themes" :key="index">{{theme == '' ? 'default-theme' : theme}}</option>
-        </select>
-      </div>
-      <hr style="margin: 50px 0px;border: 1px solid #e3e3e3;">
-      -->
       <sidebar-menu :menu="menu" :collapsed="collapsed" @collapse="onCollapse"
             :theme="selectedTheme" :showOneChild="true" @itemClick="onItemClick"/>
       <router-view/>
@@ -139,6 +131,12 @@
 	// 	SidebarMenu
 	// },
 
+	// render static html slot
+	// https://stackoverflow.com/questions/48975136/how-to-render-a-list-of-static-content-with-vue-named-slot
+	render(h){
+        let links = this.$slots.links.map(l => h('li', {class: "comp-item"}, [l]))
+        return h('ul', {class: 'comp'}, links)
+    },
 	data() {
 		return {
 			sysInfo: {
