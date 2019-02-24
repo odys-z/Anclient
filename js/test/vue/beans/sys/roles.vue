@@ -4,30 +4,43 @@
  -->
  <template>
 	 <div>
-		<h4>{{title}}</h4>
-		<input id='login-userId' :bind='uid' class='login' placeholder="login Id"></input>
-		<input id='login-pswd' :bind='pswd' class='pswd' placeholder="password"></input>
-		<input type='button' value='ok' v-on:click='onOk("home.html")'></input>
+		<h4 class='current-func'>{{title}}</h4>
+		<modal-parent id='role-details'/>
+		<list-toolbar>
+			<div slot='tools'>Condition Controls Goes Here
+				<input type='button' value='[txt.search]' @click='onQuery'></input>
+			</div>
+		</list-toolbar>
 	 </div>
  </template>
  <script>
+  import {Listoolbar, ModalParent} from '../../../dist/jvue-snapshot.min.js'
+
+  Vue.component('modal-parent', ModalParent);
+  Vue.component('list-toolbar', Listoolbar);
+
   export default {
-	name: 'VLogin',
+	name: 'VRoles',
 	data() {
 		return {
-			title: 'Demo Login',
+			title: 'Roles',
 			uid: '',
 			pswd: '',
+			txt: {
+				search: 'zh:Query'
+			}
 		}
 	},
 	methods: {
 		onLoad: function(jserv) {
-			console.log('VLogin.onLoad()');
+			console.log('VRoles.onLoad()');
 			console.log(jserv);
 		},
-		onOk: function(url) {
-			window.top.location = url;
-			console.log('VLogin.onOk(' + url + ')');
+		onQuery: function() {
+			console.log('VRoles.onQuery()');
+		},
+		onEdit: function() {
+			console.log('VRoles.onEdit()');
 		},
 	}
   }

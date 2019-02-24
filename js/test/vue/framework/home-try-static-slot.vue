@@ -1,4 +1,5 @@
 <!-- Home Page Component
+This file is deprecated. Keeping here for showing render() function's sample code. 
 <template>
   <div id="home" :class="[{'collapsed' : collapsed}]">
 	<slot name='banner'>

@@ -6,9 +6,11 @@
 	https://github.com/vuejs/vue-loader/issues/1234
 	But user shouldn't import every UI wedget one by one. So we provided them in a pack.
  */
-  import Listoolbar from './mixins/listoolbar.vue'
-  import Semantable from './table/semantable.vue'
-  import SidebarMenu from './menu/sidebarMenu.vue'
+  // import Listoolbar from './mixins/listoolbar.vue'
+  // import Semantable from './table/semantable.vue'
+  // import SidebarMenu from './menu/sidebarMenu.vue'
 
   //  way of vuent
   export {default as SidebarMenu} from './menu/sidebarMenu.vue'
+  export {default as Listoolbar} from './mixins/Listoolbar.vue'
+  export {default as Semantable} from './table/Semantable.vue'

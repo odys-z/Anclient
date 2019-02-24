@@ -62,10 +62,10 @@ Vue.use(VueRouter)
 export function appLogin(selector, jserv) {
 	if (selector === undefined)
 		selector = '#login';
-	var obj = new Vue(Object.assign({},
+	var app = new Vue(Object.assign({},
 		jframe,
 		{ el: selector, }));
-	obj.bindLogin(jserv);
+	app.bindLogin(jserv);
 	return obj;
 }
 
@@ -76,9 +76,9 @@ export function appLogin(selector, jserv) {
 export function appHome(selector, jserv) {
 	if (selector === undefined)
 		selector = '#home';
-	var obj = new Vue(Object.assign({},
+	var app = new Vue(Object.assign({},
 		jframe,
 		{ el: selector, }));
-	obj.bindHome(jserv);
+	app.bindHome(jserv);
 	return obj;
 }

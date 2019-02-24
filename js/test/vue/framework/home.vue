@@ -1,9 +1,7 @@
 <!-- Home Page Component -->
 <template>
   <div id="home" :class="[{'collapsed' : collapsed}]">
-	<slot name='banner'>
-		<h1>Banner - {{sysInfo.title}}</h1>
-	</slot>
+	<h1>Banner - {{sysInfo.title}}</h1>
     <div class="home">
       <!--
       <div>select theme:
@@ -25,27 +23,19 @@
   import VueRouter from 'vue-router';
   // import { animationMixin } from '../../view/vue/menu/mixin'
 
-  // import jvue from '../../../dist/jvue-0.0.1.min.js'
-  // import jvue from '../../../dist/jvue-0.0.1.min.js'
-
-  import {SidebarMenu} from '../../../dist/jvue-0.0.1.min.js'
+  import {SidebarMenu} from '../../../dist/jvue-snapshot.min.js'
 
   import Params from '../beans/sys/params.vue'
   import UserInfo from '../beans/sys/user-infos.vue'
   import Logout from '../beans/sys/logout.vue'
   import Roles from '../beans/sys/roles.vue'
 
-
   Vue.use(VueRouter)
 
   Vue.use(Logout)
   Vue.use(Roles)
-
   Vue.use(Params)
   Vue.use(UserInfo)
-
-  // Vue.use(SidebarMenu)
-  // Vue.use(jvue)
 
   const Dashboard = { template: '<div>Dashboard Page</div>' }
 
@@ -169,8 +159,8 @@
 	    },
 	    onItemClick(event, item) {
 	      console.log('onItemClick')
-	      // console.log(event)
-	      // console.log(item)
+	      console.log(event)
+	      console.log(item)
 	    }
 	}
 }
