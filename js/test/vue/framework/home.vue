@@ -56,11 +56,11 @@
       name: 'System Params',
       component: Params,
     },
-    { path: 'user-info',
+    { path: '/user-info',
       name: 'Personal Info',
       component: UserInfo,
     },
-    { path: 'roles',
+    { path: '/sys/roles',
       name: 'Roles',
       component: Roles,
     } ]

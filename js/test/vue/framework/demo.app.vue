@@ -8,8 +8,8 @@
 <script>
   import Vue from 'vue/dist/vue.js'
   import VLogin from './login.vue'
-  // import VHome from './home.vue'
-  import VHome from './home-try-static-slot.vue'
+  import VHome from './home.vue'
+  // import VHome from './home-try-static-slot.vue'
 
   import { animationMixin } from '../../../lib/view/vue/menu/mixin'
 

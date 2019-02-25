@@ -1,20 +1,20 @@
-<!--Application Frame
-	This component is included a typical application senario frame, the demo.frame.vue.
-	When customerized by index.js, it becomes a real application instance.
+<!--Business Bean - Roles CRUD
+	This component include a typical application senario of editing roles' rights.
  -->
  <template>
 	 <div>
-		<h4 class='current-func'>{{title}}</h4>
+		<h4 class='current-func'>ROLES: {{title}}</h4>
 		<modalog ref='role-details'>
-			<role-info/>
+			<role-info slot='modal-form'/>
 		</modalog>
 		<modalog ref='another-dialog'>
-			<another-dialog/>
+			<another-info slot='modal-form'/>
 		</modalog>
 		<listoolbar>
 			<div slot='tools'>Condition Controls Goes Here
-				<input type='button' value='[txt.search]' @click='onQuery'></input>
-				<input type='button' value='[txt.edit]' @click="onEdit('role-details')"></input>
+				<input type='button' :value='[txt.search]' @click='onQuery'></input>
+				<input type='button' :value="[txt.edit] + ' - dialog1'" @click="onEdit('role-details')"></input>
+				<input type='button' :value="[txt.edit] + ' - dialog2'" @click="onEdit('another-dialog')"></input>
 			</div>
 		</listoolbar>
 	 </div>
@@ -24,13 +24,15 @@
   import Vue from 'vue/dist/vue.js'
   import {Listoolbar, Modalog} from '../../../../dist/jvue-SNAPSHOT.min.js'
 
-  Vue.component('modal-parent', Modalog);
+  import RoleForm from './role-details.vue'
+
+  Vue.component('modalog', Modalog);
   Vue.component('listoolbar', Listoolbar);
 
-  const roleForm = { template: '<div><h1>Role Details</h1><p>form content ...</p></div>' }
-  Vue.component('role-info', roleForm);
+  // const roleForm = { template: '<div><h1>Role Details</h1><p>form content ...</p></div>' }
+  Vue.component('role-info', RoleForm);
   const antForm = { template: '<div><h1>Another Details</h1><p>Another content ...</p></div>' }
-  Vue.component('another-dialog', antForm);
+  Vue.component('another-info', antForm);
 
   export default {
 	name: 'VRoles',
@@ -54,7 +56,7 @@
 		},
 		onEdit: function(ref) {
 			console.log('VRoles.onEdit()');
-			this.$refs[ref].pop(currentRole);
+			this.$refs[ref].pop(this.currentRole);
 		},
 	}
   }

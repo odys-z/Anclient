@@ -32,16 +32,14 @@
 
    module: {
  	rules: [
- 		{test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" },
+		// npm install babel-plugin-syntax-jsx babel-plugin-transform-vue-jsx babel-helper-vue-jsx-merge-props babel-preset-env --save-dev
+		{test: /\.js$/, exclude: /node_modules/, loader: "babel-loader",
+			options: { plugins: ['transform-vue-jsx'] }},
  		{test: /\.css$/,
 		 use: [ 'style-loader',
 				'css-loader',
 				'postcss-loader',
 			  ] },
- 		// npm install --save-dev mini-css-extract-plugin
- 		// npm install postcss-loader --save-dev
- 		// npm install sass-loader --save-dev
- 		// npm install npm-sass
  		{test: /\.scss$/,
  		 use: [ 'vue-style-loader',
  				'css-loader',

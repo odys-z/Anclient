@@ -2,14 +2,17 @@
 	<div>
 		<h1>Params.vue</h1>
 		<h5>toolebar here</h5>
-		<list-toolbar/>
+		<listoolbar/>
 		<semantable/>
 	</div>
 </template>
 
 <script>
   import Vue from 'vue/dist/vue.js'
-  import {listToolbar, semantable} from '../../../../dist/jvue-SNAPSHOT.min.js'
+  import {Listoolbar, Semantable} from '../../../../dist/jvue-SNAPSHOT.min.js'
+
+  Vue.component('listoolbar', Listoolbar);
+  Vue.component('semantable', Semantable);
 
   export default {
 	  name: 'SysParams',

@@ -16,3 +16,4 @@
 
   export {default as SidebarMenu} from './menu/sidebarMenu.vue'
   export {default as Semantable} from './table/semantable.vue'
+  export {default as Tree} from './tree/tree.vue'

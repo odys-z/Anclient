@@ -14,7 +14,7 @@
 
 	          <div class="modal-body">
 	            <slot name="modal-form">
-	              default body
+	              default form content
 	            </slot>
 	          </div>
 
@@ -91,7 +91,7 @@ export default {
 }
 
 .modal-container {
-  width: 300px;
+  width: 500px;
   margin: 0px auto;
   padding: 20px 30px;
   background-color: #fff;

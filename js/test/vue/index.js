@@ -80,5 +80,5 @@ export function appHome(selector, jserv) {
 		jframe,
 		{ el: selector, }));
 	app.bindHome(jserv);
-	return obj;
+	return app;
 }

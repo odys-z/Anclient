@@ -1,6 +1,5 @@
 <template>
-  <div slot='toolbar'>
-  </div>
+	<div><slot name='tools'></slot></div>
 </template>
 
 <script>
