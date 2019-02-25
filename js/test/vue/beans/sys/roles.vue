@@ -5,29 +5,42 @@
  <template>
 	 <div>
 		<h4 class='current-func'>{{title}}</h4>
-		<modal-parent id='role-details'/>
-		<list-toolbar>
+		<modalog ref='role-details'>
+			<role-info/>
+		</modalog>
+		<modalog ref='another-dialog'>
+			<another-dialog/>
+		</modalog>
+		<listoolbar>
 			<div slot='tools'>Condition Controls Goes Here
 				<input type='button' value='[txt.search]' @click='onQuery'></input>
+				<input type='button' value='[txt.edit]' @click="onEdit('role-details')"></input>
 			</div>
-		</list-toolbar>
+		</listoolbar>
 	 </div>
  </template>
- <script>
-  import {Listoolbar, ModalParent} from '../../../dist/jvue-snapshot.min.js'
 
-  Vue.component('modal-parent', ModalParent);
-  Vue.component('list-toolbar', Listoolbar);
+ <script>
+  import Vue from 'vue/dist/vue.js'
+  import {Listoolbar, Modalog} from '../../../../dist/jvue-SNAPSHOT.min.js'
+
+  Vue.component('modal-parent', Modalog);
+  Vue.component('listoolbar', Listoolbar);
+
+  const roleForm = { template: '<div><h1>Role Details</h1><p>form content ...</p></div>' }
+  Vue.component('role-info', roleForm);
+  const antForm = { template: '<div><h1>Another Details</h1><p>Another content ...</p></div>' }
+  Vue.component('another-dialog', antForm);
 
   export default {
 	name: 'VRoles',
 	data() {
 		return {
 			title: 'Roles',
-			uid: '',
-			pswd: '',
+			currentRole: {},
 			txt: {
-				search: 'zh:Query'
+				search: 'zh:Query',
+				edit: 'zh:Edit',
 			}
 		}
 	},
@@ -39,8 +52,9 @@
 		onQuery: function() {
 			console.log('VRoles.onQuery()');
 		},
-		onEdit: function() {
+		onEdit: function(ref) {
 			console.log('VRoles.onEdit()');
+			this.$refs[ref].pop(currentRole);
 		},
 	}
   }

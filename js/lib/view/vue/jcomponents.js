@@ -10,7 +10,9 @@
   // import Semantable from './table/semantable.vue'
   // import SidebarMenu from './menu/sidebarMenu.vue'
 
-  //  way of vuent
+  //  way of vuent: https://vuentjs.org/
+  export {default as Listoolbar} from './mixins/listoolbar.vue'
+  export {default as Modalog} from './dialogs/modal-dialog.vue'
+
   export {default as SidebarMenu} from './menu/sidebarMenu.vue'
-  export {default as Listoolbar} from './mixins/Listoolbar.vue'
-  export {default as Semantable} from './table/Semantable.vue'
+  export {default as Semantable} from './table/semantable.vue'

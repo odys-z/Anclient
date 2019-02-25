@@ -6,7 +6,8 @@
 </template>
 
 <script>
-  import {Listoolbar, Semantable} from '../../../../dist/jvue-0.0.1.min.js'
+  import Vue from 'vue/dist/vue.js'
+  import {Listoolbar, Semantable} from '../../../../dist/jvue-SNAPSHOT.min.js'
 
   export default {
 	name: 'UserInfos',

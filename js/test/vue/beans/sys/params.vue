@@ -8,7 +8,8 @@
 </template>
 
 <script>
-  import {listToolbar, semantable} from '../../../../dist/jvue-0.0.1.min.js'
+  import Vue from 'vue/dist/vue.js'
+  import {listToolbar, semantable} from '../../../../dist/jvue-SNAPSHOT.min.js'
 
   export default {
 	  name: 'SysParams',

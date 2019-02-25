@@ -66,7 +66,7 @@ export function appLogin(selector, jserv) {
 		jframe,
 		{ el: selector, }));
 	app.bindLogin(jserv);
-	return obj;
+	return app;
 }
 
 /**Bind VHome to div('#id'), set jserv root = jserv

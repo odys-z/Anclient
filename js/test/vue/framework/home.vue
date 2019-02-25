@@ -23,7 +23,7 @@
   import VueRouter from 'vue-router';
   // import { animationMixin } from '../../view/vue/menu/mixin'
 
-  import {SidebarMenu} from '../../../dist/jvue-snapshot.min.js'
+  import {SidebarMenu} from '../../../dist/jvue-SNAPSHOT.min.js'
 
   import Params from '../beans/sys/params.vue'
   import UserInfo from '../beans/sys/user-infos.vue'
