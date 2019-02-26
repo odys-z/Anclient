@@ -13,8 +13,10 @@
 		<listoolbar>
 			<div slot='tools'>Condition Controls Goes Here
 				<input type='button' :value='[txt.search]' @click='onQuery'></input>
-				<input type='button' :value="[txt.edit] + ' - dialog1'" @click="onEdit('role-details')"></input>
-				<input type='button' :value="[txt.edit] + ' - dialog2'" @click="onEdit('another-dialog')"></input>
+				<input type='button' :value="[txt.edit] + ' - 1'" @click="onEdit('role-details')"
+					title='modalog ref: role-details'></input>
+				<input type='button' :value="[txt.edit] + ' - 2'" @click="onEdit('another-dialog')"
+					title='modalog ref: another-dialog'></input>
 			</div>
 		</listoolbar>
 	 </div>
@@ -26,11 +28,13 @@
 
   import RoleForm from './role-details.vue'
 
+  // Component from JVue
   Vue.component('modalog', Modalog);
   Vue.component('listoolbar', Listoolbar);
 
-  // const roleForm = { template: '<div><h1>Role Details</h1><p>form content ...</p></div>' }
+  // Application Beans
   Vue.component('role-info', RoleForm);
+
   const antForm = { template: '<div><h1>Another Details</h1><p>Another content ...</p></div>' }
   Vue.component('another-info', antForm);
 
