@@ -40,7 +40,6 @@
   const Dashboard = { template: '<div>Dashboard Page</div>' }
 
   Vue.component('sidebar-menu', SidebarMenu);
-  // jvue.init();
 
   const router = new VueRouter({
     routes: [
@@ -167,6 +166,7 @@
 </script>
 
 <style lang="scss">
+// This is a local caching for network problem in China, use the following if possible.
 // @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600');
 @import url('../../../lib/opensources/googlefonts.css');
 
@@ -184,6 +184,7 @@ body {
 #home {
   padding-left: 350px;
 }
+
 #home.collapsed {
   padding-left: 50px;
 }

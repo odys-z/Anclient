@@ -93,11 +93,11 @@ class J {
 	}
 }
 
+/**Client with session logged in.*/
 class SessionClient {
 	constructor (ssInf) {
 		this.ssInf = ssInf;
 	}
-
 
 	query (t, alias, funcId, pageInf) {
 		var qryItem = new QueryReq(t, alias, pageInf);
@@ -110,7 +110,7 @@ class SessionClient {
 		return jreq;
 	}
 
-	/**load records paged at server side.
+	/**load semantabl with records paged at server side.
 	 * @param {object} query query object
 	 * Use JProtocol to generate query object:<pre>
 	var qobj = Protocol.query(tabl)
@@ -156,6 +156,8 @@ class SessionClient {
 	}
 }
 
+/**Client without session information.
+ * This is needed for some senarios like rigerstering new account.*/
 class Inseclient {
 
 }
