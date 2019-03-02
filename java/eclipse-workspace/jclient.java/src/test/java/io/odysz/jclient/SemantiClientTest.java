@@ -1,6 +1,7 @@
 package io.odysz.jclient;
 
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -77,9 +78,4 @@ public class SemantiClientTest {
   				});
     	client.logout();
     }
-
-	private void assertEquals(String string, String uid0) {
-		// TODO Auto-generated method stub
-		
-	}
 }
