@@ -1,6 +1,6 @@
 package io.odysz.jclient;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -14,6 +14,7 @@ import io.odysz.common.Utils;
 import io.odysz.module.rs.SResultset;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
+import io.odysz.semantic.jprotocol.JMessage.MsgCode;
 import io.odysz.semantic.jprotocol.JMessage.Port;
 import io.odysz.semantic.jserv.R.QueryReq;
 import io.odysz.semantics.x.SemanticException;
@@ -31,10 +32,10 @@ public class SemantiClientTest {
     public void SemanticLoginTest() throws IOException,
     		SemanticException, SQLException, GeneralSecurityException {
     	try {
-    		Clients.init("http://localhost:8080/semantic.jserv");
+    		Clients.init("http://localhost:8080/jserv-sample");
     		Clients.login("admin", "admin@admin");
     	} catch (IOException io) {
-    		Utils.warn("network failed");
+    		Utils.warn("loging failed: %s", io.getMessage());
     	}
     }
 
@@ -44,10 +45,10 @@ public class SemantiClientTest {
     	Utils.printCaller(false);
     	JHelper.printCaller(false);
 
-   		Clients.init("http://localhost:8080/semantic.jserv");
+   		Clients.init("http://localhost:8080/jserv-sample");
 
     	SessionClient client = Clients.login("admin", "admin@admin");
-    	JMessage<QueryReq> req = client.query("a_user", "u", "test", -1, -1);
+    	JMessage<QueryReq> req = client.query("inet", "a_user", "u", "test", -1, -1); // TODO test conn = null
     	// select userName uname, userId uid, roleName role from a_user u join a_roles r on u.roleId = r.roleId where u.userId = 'admin'
     	req.body(0).expr("userName", "uname")
     				.expr("userId", "uid")
@@ -59,17 +60,26 @@ public class SemantiClientTest {
   				(code, obj) -> {
   					JHelper.logi(obj);
   					Object o = obj.get("rs");
-  					@SuppressWarnings("unchecked")
-					List<SResultset> rses = (List<SResultset>) o;
-  					for (SResultset rs : rses) {
-  						rs.printSomeData(false, 2, "uid", "uname", "role");
-  						rs.beforeFirst();
-  						while(rs.next()) {
-  							String uid0 = rs.getString("uid");
-  							assertTrue(uid0 != null);
+  					if (MsgCode.ok.eq(obj.getString("code"))) {
+  						@SuppressWarnings("unchecked")
+						List<SResultset> rses = (List<SResultset>) o;
+  						for (SResultset rs : rses) {
+  							rs.printSomeData(false, 2, "uid", "uname", "role");
+  							rs.beforeFirst();
+  							while(rs.next()) {
+  								String uid0 = rs.getString("uid");
+  								assertEquals("admin", uid0);
+  							}
   						}
   					}
+  					else
+  						fail(obj.getString("error"));
   				});
     	client.logout();
     }
+
+	private void assertEquals(String string, String uid0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

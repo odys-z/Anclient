@@ -34,7 +34,7 @@ public class SessionClient {
 	 * @return formatted query object.
 	 * @throws Exception
 	 */
-	public JMessage<QueryReq> query(String t, String alias, String funcId,
+	public JMessage<QueryReq> query(String conn, String t, String alias, String funcId,
 			int page, int size) throws SemanticException {
 
 		req = new JMessage<QueryReq>(Port.query);
@@ -44,7 +44,7 @@ public class SessionClient {
 		header.usrAct(funcId, "query", t, "R");
 		req.header(header);
 
-		QueryReq itm = QueryReq.formatReq(req, ssInf, t, alias);
+		QueryReq itm = QueryReq.formatReq(conn, req, ssInf, t, alias);
 		req.body(itm);
 		itm.page(page, size);
 
