@@ -15,8 +15,6 @@ import io.odysz.common.Utils;
 import io.odysz.module.rs.SResultset;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
-import io.odysz.semantic.jprotocol.JMessage.MsgCode;
-import io.odysz.semantic.jprotocol.JMessage.Port;
 import io.odysz.semantic.jserv.R.QueryReq;
 import io.odysz.semantics.x.SemanticException;
 
@@ -24,6 +22,8 @@ import io.odysz.semantics.x.SemanticException;
  * Unit test for simple App. 
  */
 public class SemantiClientTest {
+	private SessionClient client;
+
 	@BeforeAll
 	public void init() {
 		Utils.printCaller(false);
@@ -48,34 +48,38 @@ public class SemantiClientTest {
 
    		Clients.init("http://localhost:8080/jserv-sample");
 
-    	SessionClient client = Clients.login("admin", "admin@admin");
+    	client = Clients.login("admin", "admin@admin");
     	JMessage<QueryReq> req = client.query("inet", "a_user", "u", "test", -1, -1); // TODO test conn = null
     	// select userName uname, userId uid, roleName role from a_user u join a_roles r on u.roleId = r.roleId where u.userId = 'admin'
     	req.body(0).expr("userName", "uname")
     				.expr("userId", "uid")
-    				.expr("roleName", "role")
+    				.expr("r.roleId", "role")
     				.j("a_roles", "r", "u.roleId = r.roleId")
     				.where("=", "u.userId", "'admin'");
-    	HttpServClient httpClient = new HttpServClient();
-  		httpClient.post(Clients.servUrl(Port.query), req,
-  				(code, obj) -> {
-  					JHelper.logi(obj);
-  					Object o = obj.get("rs");
-  					if (MsgCode.ok.eq(obj.getString("code"))) {
-  						@SuppressWarnings("unchecked")
-						List<SResultset> rses = (List<SResultset>) o;
-  						for (SResultset rs : rses) {
-  							rs.printSomeData(false, 2, "uid", "uname", "role");
-  							rs.beforeFirst();
-  							while(rs.next()) {
-  								String uid0 = rs.getString("uid");
-  								assertEquals("admin", uid0);
-  							}
-  						}
+    	client.commit(req, (code, data) -> {
+    		  	@SuppressWarnings("unchecked")
+				List<SResultset> rses = (List<SResultset>) data.get("rs");
+  				for (SResultset rs : rses) {
+  					rs.printSomeData(true, 2, "uid", "uname", "role");
+  					rs.beforeFirst();
+  					while(rs.next()) {
+  						String uid0 = rs.getString("uid");
+  						assertEquals("admin", uid0);
+  								
+  						String roleId = rs.getString("role");
+  						getMenu("admin", roleId);
   					}
-  					else
-  						fail(obj.getString("error"));
-  				});
-    	client.logout();
+  				}
+    		}, (code, err) -> {
+  				fail(err.getString("error"));
+  				client.logout();
+    	});
     }
+
+
+
+	private void getMenu(String string, String roleId) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -1,12 +1,17 @@
 package io.odysz.jclient;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import io.odysz.common.Utils;
+import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHeader;
+import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
+import io.odysz.semantic.jprotocol.JMessage.MsgCode;
 import io.odysz.semantic.jprotocol.JMessage.Port;
+import io.odysz.semantic.jprotocol.JProtocol.SCallback;
 import io.odysz.semantic.jserv.R.QueryReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
@@ -15,8 +20,6 @@ public class SessionClient {
 
 	private SemanticObject ssInf;
 	private ArrayList<String[]> urlparas;
-	
-	private JMessage<QueryReq> req;
 	
 	/**Session login response from server.
 	 * @param sessionInfo
@@ -37,11 +40,11 @@ public class SessionClient {
 	public JMessage<QueryReq> query(String conn, String t, String alias, String funcId,
 			int page, int size) throws SemanticException {
 
-		req = new JMessage<QueryReq>(Port.query);
+		JMessage<QueryReq> req = new JMessage<QueryReq>(Port.query);
 		req.t = t;
 
 		JHeader header = new JHeader(funcId, ssInf.getString("uid"));
-		header.usrAct(funcId, "query", t, "R");
+		JHeader.usrAct(funcId, "query", t, "R");
 		req.header(header);
 
 		QueryReq itm = QueryReq.formatReq(conn, req, ssInf, t, alias);
@@ -49,6 +52,22 @@ public class SessionClient {
 		itm.page(page, size);
 
 		return req;
+	}
+	
+	public <T extends JBody> JMessage<? extends JBody> userReq(String conn, String t, Port port, String[] act, T req)
+			throws SemanticException {
+		if (ssInf == null)
+			throw new SemanticException("SessionClient can not visit jserv without session information.");
+
+		JMessage<?> jmsg = new JMessage<T>(port);
+		jmsg.t = t;
+		
+		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
+		header.act(act);
+		jmsg.header(header);
+		jmsg.body(req);
+
+		return jmsg;
 	}
 
 	public SessionClient urlPara(String pname, String pv) {
@@ -59,10 +78,11 @@ public class SessionClient {
 	}
 
 	/**Print Json Request (no request sent to server)
+	 * @param req 
 	 * @return this object
 	 * @throws SQLException 
 	 */
-	public SessionClient console() throws SQLException {
+	public SessionClient console(JMessage<QueryReq> req) throws SQLException {
 		if(Clients.console) {
 			try {
 				Utils.logi(req.toStringEx());
@@ -71,8 +91,25 @@ public class SessionClient {
 		return this;
 	}
 
+	public void commit(JMessage<QueryReq> req, SCallback onOk, SCallback... onErr)
+			throws SemanticException, IOException, SQLException {
+    	HttpServClient httpClient = new HttpServClient();
+  		httpClient.post(Clients.servUrl(Port.query), req,
+  				(code, obj) -> {
+  					JHelper.logi(obj);
+  					SemanticObject o = (SemanticObject) obj.get("data");
+  					if (MsgCode.ok.eq(obj.getString("code"))) {
+  						onOk.onCallback(code, o);
+  					}
+  					else {
+  						if (onErr != null && onErr.length > 0 && onErr[0] != null)
+  							onErr[0].onCallback(code, o);
+  						else Utils.warn("code: %s\nerror: %s", code, o.get("error"));
+  					}
+  				});
+	}
+
 	public void logout() {
-		
 	}
 
 }
