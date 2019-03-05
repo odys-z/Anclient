@@ -73,19 +73,11 @@ public class SemantiClientTest {
   						String roleId = rs.getString("role");
   						getMenu("admin", roleId);
   					}
-<<<<<<< HEAD
-  					else
-  						fail(obj.getString("error"));
-  				});
-  		// TODO load menu
-    	client.logout();
-=======
   				}
     		}, (code, err) -> {
   				fail(err.getString("error"));
   				client.logout();
     	});
->>>>>>> refs/remotes/origin/master
     }
 
 	private void getMenu(String string, String roleId) throws SemanticException, IOException, SQLException {
