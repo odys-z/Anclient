@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import io.odysz.common.Utils;
+import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JHelper;
@@ -20,6 +21,7 @@ public class SessionClient {
 
 	private SemanticObject ssInf;
 	private ArrayList<String[]> urlparas;
+	private JHeader header;
 	
 	/**Session login response from server.
 	 * @param sessionInfo
@@ -54,7 +56,7 @@ public class SessionClient {
 		return req;
 	}
 	
-	public <T extends JBody> JMessage<? extends JBody> userReq(String conn, String t, Port port, String[] act, T req)
+	public <T extends JBody> JMessage<? extends JBody> userReq(String conn, String t, IPort port, String[] act, T req)
 			throws SemanticException {
 		if (ssInf == null)
 			throw new SemanticException("SessionClient can not visit jserv without session information.");
@@ -62,12 +64,19 @@ public class SessionClient {
 		JMessage<?> jmsg = new JMessage<T>(port);
 		jmsg.t = t;
 		
-		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
-		header.act(act);
+		// JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
+		// header.act(act);
+		header().act(act);
 		jmsg.header(header);
 		jmsg.body(req);
 
 		return jmsg;
+	}
+
+	public JHeader header() {
+		if (header == null)
+			header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
+		return header;
 	}
 
 	public SessionClient urlPara(String pname, String pv) {
@@ -82,7 +91,7 @@ public class SessionClient {
 	 * @return this object
 	 * @throws SQLException 
 	 */
-	public SessionClient console(JMessage<QueryReq> req) throws SQLException {
+	public SessionClient console(JMessage<? extends JBody> req) throws SQLException {
 		if(Clients.console) {
 			try {
 				Utils.logi(req.toStringEx());
@@ -91,7 +100,7 @@ public class SessionClient {
 		return this;
 	}
 
-	public void commit(JMessage<QueryReq> req, SCallback onOk, SCallback... onErr)
+	public void commit(JMessage<? extends JBody> req, SCallback onOk, SCallback... onErr)
 			throws SemanticException, IOException, SQLException {
     	HttpServClient httpClient = new HttpServClient();
   		httpClient.post(Clients.servUrl(Port.query), req,
@@ -103,13 +112,14 @@ public class SessionClient {
   					}
   					else {
   						if (onErr != null && onErr.length > 0 && onErr[0] != null)
-  							onErr[0].onCallback(code, o);
-  						else Utils.warn("code: %s\nerror: %s", code, o.get("error"));
+  							onErr[0].onCallback(code, obj);
+  						else Utils.warn("code: %s\nerror: %s", code, obj.get("error"));
   					}
   				});
 	}
 
 	public void logout() {
 	}
+
 
 }

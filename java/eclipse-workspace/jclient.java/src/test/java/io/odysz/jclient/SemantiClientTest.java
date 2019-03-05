@@ -12,7 +12,11 @@ import org.junit.Test;
 import org.junit.jupiter.api.BeforeAll;
 
 import io.odysz.common.Utils;
+import io.odysz.jsample.protocol.Samport;
 import io.odysz.module.rs.SResultset;
+import io.odysz.semantic.ext.DatasetReq;
+import io.odysz.semantic.jprotocol.JBody;
+import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jserv.R.QueryReq;
@@ -76,10 +80,25 @@ public class SemantiClientTest {
     	});
     }
 
+	private void getMenu(String string, String roleId) throws SemanticException, IOException, SQLException {
+		DatasetReq req = new DatasetReq(null);
 
+		String t = "menu";
+		// JHeader header = new JHeader("menu", ssInf.getString("uid"));
+		JHeader header = client.header();
+		String[] act = JHeader.usrAct("menu", "query", t, "R");
 
-	private void getMenu(String string, String roleId) {
-		// TODO Auto-generated method stub
+		JMessage<? extends JBody> jmsg = client.userReq("inet", t, Samport.menu, act, req);
+		jmsg.header(header);
+
+		client.console(jmsg);
 		
+    	client.commit(jmsg, (code, data) -> {
+    		@SuppressWarnings("unchecked")
+			List<SResultset> rses = (List<SResultset>) data.get("menu");
+  			for (SResultset rs : rses) {
+
+  			}
+    	});
 	}
 }
