@@ -103,7 +103,7 @@ public class SessionClient {
 	public void commit(JMessage<? extends JBody> req, SCallback onOk, SCallback... onErr)
 			throws SemanticException, IOException, SQLException {
     	HttpServClient httpClient = new HttpServClient();
-  		httpClient.post(Clients.servUrl(Port.query), req,
+  		httpClient.post(Clients.servUrl(req.port()), req,
   				(code, obj) -> {
   					JHelper.logi(obj);
   					SemanticObject o = (SemanticObject) obj.get("data");

@@ -5,6 +5,7 @@ import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 
 import io.odysz.common.AESHelper;
+import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
@@ -89,7 +90,7 @@ public class Clients<T extends JBody> {
 	 * @param port
 	 * @return url, e.g. http://localhost:8080/query.serv?conn=null
 	 */
-	static String servUrl(Port port) {
+	static String servUrl(IPort port) {
 		return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
 	}
 }
