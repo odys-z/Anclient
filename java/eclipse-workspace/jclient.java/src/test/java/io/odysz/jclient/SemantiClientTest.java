@@ -76,6 +76,7 @@ public class SemantiClientTest {
   					else
   						fail(obj.getString("error"));
   				});
+  		// TODO load menu
     	client.logout();
     }
 }
