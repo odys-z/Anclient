@@ -62,7 +62,7 @@ public class Clients<T extends JBody> {
   		httpClient.post(url, req, (code, msg) -> {
 					if (MsgCode.ok.eq(code)) {
 						// create a logged in client
-						inst[0] = new SessionClient(msg);
+						inst[0] = new SessionClient(msg.data());
 
 						if (Clients.console)
 							JHelper.logi(msg);

@@ -26,6 +26,8 @@ import io.odysz.semantics.x.SemanticException;
  * Unit test for simple App. 
  */
 public class SemantiClientTest {
+	private static final String jserv = "http://localhost:8080/semantic.jserv";
+
 	private SessionClient client;
 
 	@BeforeAll
@@ -37,7 +39,8 @@ public class SemantiClientTest {
     public void SemanticLoginTest() throws IOException,
     		SemanticException, SQLException, GeneralSecurityException {
     	try {
-    		Clients.init("http://localhost:8080/jserv-sample");
+    		// Clients.init("http://localhost:8080/jserv-sample");
+    		Clients.init(jserv);
     		Clients.login("admin", "admin@admin");
     	} catch (IOException io) {
     		Utils.warn("loging failed: %s", io.getMessage());
@@ -50,7 +53,7 @@ public class SemantiClientTest {
     	Utils.printCaller(false);
     	JHelper.printCaller(false);
 
-   		Clients.init("http://localhost:8080/jserv-sample");
+   		Clients.init(jserv);
 
     	client = Clients.login("admin", "admin@admin");
     	JMessage<QueryReq> req = client.query("inet", "a_user", "u", "test", -1, -1); // TODO test conn = null
@@ -97,6 +100,7 @@ public class SemantiClientTest {
     		@SuppressWarnings("unchecked")
 			List<SResultset> rses = (List<SResultset>) data.get("menu");
   			for (SResultset rs : rses) {
+  				rs.printSomeData(false, 1, "functId", "funcName");
 
   			}
     	});
