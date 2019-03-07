@@ -10,7 +10,6 @@ import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
-import io.odysz.semantic.jsession.SessionReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
@@ -55,8 +54,9 @@ public class HttpServClient {
 //		wr.flush();
 //		wr.close();
 
-		JHelper<SessionReq> jSsReqHelper = new JHelper<SessionReq>();
-		jSsReqHelper.writeJsonReq(con.getOutputStream(), jreq, SessionReq.class);
+		// JHelper<SessionReq> jSsReqHelper = new JHelper<SessionReq>();
+		// jSsReqHelper.writeJsonReq(con.getOutputStream(), jreq, SessionReq.class);
+		JHelper.writeJsonReq(con.getOutputStream(), jreq);
 
 		if (Clients.console) Utils.logi(url);;
 

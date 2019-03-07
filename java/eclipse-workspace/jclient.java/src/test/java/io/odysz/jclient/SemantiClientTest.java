@@ -84,7 +84,7 @@ public class SemantiClientTest {
     }
 
 	private void getMenu(String string, String roleId) throws SemanticException, IOException, SQLException {
-		DatasetReq req = new DatasetReq(null);
+		DatasetReq req = new DatasetReq(null, "jserv-sample");
 
 		String t = "menu";
 		// JHeader header = new JHeader("menu", ssInf.getString("uid"));
