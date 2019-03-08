@@ -20,6 +20,7 @@ import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jserv.R.QueryReq;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
 /**
@@ -98,9 +99,10 @@ public class SemantiClientTest {
 		
     	client.commit(jmsg, (code, data) -> {
     		@SuppressWarnings("unchecked")
-			List<SResultset> rses = (List<SResultset>) data.get("menu");
-  			for (SResultset rs : rses) {
-  				rs.printSomeData(false, 1, "functId", "funcName");
+			List<SemanticObject> rses = (List<SemanticObject>) data.get("menu");
+  			for (SemanticObject rs : rses) {
+  				// rs.printSomeData(false, 1, "functId", "funcName");
+  				rs.print(System.out);
 
   			}
     	});
