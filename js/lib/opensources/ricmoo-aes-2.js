@@ -1,6 +1,11 @@
 "use strict";
+
 export default
-(function(root) {
+function (root) {
+// 	console.log('AAAAAAAAAA');
+// };
+//
+// function AES(root) {
 
     function checkInt(value) {
         return (parseInt(value) === value);
@@ -801,4 +806,5 @@ export default
     }*/
 
 
-})(this);
+        root.aesjs = aesjs;
+}// )(this);

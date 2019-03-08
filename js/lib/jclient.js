@@ -34,6 +34,7 @@ class J {
 		// byte[] iv =   AESHelper.getRandom();
 		// String iv64 = AESHelper.encode64(iv);
 		// String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+		console.log('J.login(' + usrId + ', ' + pswd + ', ...)');
 
 		var aes = new AES();
 		var iv = aes.getIv128();
@@ -41,12 +42,14 @@ class J {
 		// var qobj = formatLogin(logId, c, bytesToB64(iv));
 		var req = Protocol.formatSessionLogin(usrId, c, aes.bytesToB64(iv));
 
-		this.post(req, function(resp) {
-							var sessionClient = new SessionClient(resp.msg);
-							if (typeof onLogin === "function")
-								onLogin(sessionClient);
-							else console.log(sessionClient);
-						}, onError);
+		this.post(req,
+				  function(resp) {
+					var sessionClient = new SessionClient(resp.msg);
+					if (typeof onLogin === "function")
+						onLogin(sessionClient);
+					else console.log(sessionClient);
+				  },
+				  onError);
 	}
 
 	static checkResponse(resp) {

@@ -15,7 +15,9 @@
 
 	<script>
 	window.onload = function () {
-		japp.appLogin('#login', 'http://127.0.0.1:8080/semantic.jserv');
+		// load login control which will handling login action:
+		// sending http post to http://.../login.jserv?t=login
+		japp.appLogin('#login', 'http://127.0.0.1:8080/semantic.jserv', 'home.html');
 	}
 	</script>
 

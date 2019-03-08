@@ -1,13 +1,5 @@
 import Vue from 'vue/dist/vue.js'
 import VueRouter from 'vue-router';
-
-// import SidebarMenu from '../lib/components/vue/menu/SidebarMenu.vue'
-// import jvue from '../../lib/view/vue/homepage.vue'
-// import jlib from '../../dist/jvue-0.0.1.min.js'
-
-// import Params from './beans/sys/params.vue'
-// import UserInfo from './beans/sys/user-infos.vue'
-
 import jframe from './framework/demo.app.vue'
 
 Vue.use(VueRouter)
@@ -58,14 +50,15 @@ Vue.use(VueRouter)
 /**Bind VLoing to div('#id'), set jserv root = jserv
  * @param {string} selector html DOM selector
  * @param {string} jserv semantic.jserv url root path
+ * @param {string} homepage home page url loaded when logged in successfully
  */
-export function appLogin(selector, jserv) {
+export function appLogin(selector, jserv, homepage) {
 	if (selector === undefined)
 		selector = '#login';
 	var app = new Vue(Object.assign({},
 		jframe,
 		{ el: selector, }));
-	app.bindLogin(jserv);
+	app.bindLogin(homepage, jserv);
 	return app;
 }
 

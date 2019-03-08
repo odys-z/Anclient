@@ -29,13 +29,14 @@
 
 	created() { },
 	methods: {
-		bindLogin: function(jserv) {
+		bindLogin: function(home, jserv) {
 			console.log('app.bindLogin():');
 			this.jserv = jserv;
 			console.log(this);
 
 			// bind to div
 			var login = new Vue(Object.assign({}, VLogin, { el: '#frame' }));
+			login.home = home;
 			login.onLoad(jserv);
 		},
 		bindHome: function(jserv, router) {

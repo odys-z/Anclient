@@ -1,11 +1,12 @@
 /**<h4>Design notes:</h4>
  * AES is just only one of crypto algorithms, so we need make this pluginized so
  * can be overriden by user. */
-import AESLib from './opensources/ricmoo-aes.js';
+import AESLib from './opensources/ricmoo-aes-2.js';
 
 export default function AES () {
 	var verbose = false;
-	AESLib(window);
+	var aesLib = new AESLib(window);
+	// aesLib(window);
 
 	/**get byte[] of random 128bits iv
 	 * @return {byte[]} iv
