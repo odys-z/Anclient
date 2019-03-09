@@ -2,6 +2,9 @@ import $ from 'jquery';
 import AES from './aes.js';
 import {Protocol, JMessage, JHeader, SessionReq, QueryReq} from './protocol.js';
 
+/**AES lib instance*/
+var aes;
+
 /**Jclient.js API
  * Java equivalent of
  * io.odysz.jclient.Clients;
@@ -16,6 +19,7 @@ class J {
 			verbose: true,
 			defaultServ: urlRoot,
 		}
+		aes = new AES();
 	}
 
 	servUrl (port) {
@@ -36,20 +40,24 @@ class J {
 		// String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 		console.log('J.login(' + usrId + ', ' + pswd + ', ...)');
 
-		var aes = new AES();
 		var iv = aes.getIv128();
 		var c = aes.encrypt(usrId, pswd, iv);
 		// var qobj = formatLogin(logId, c, bytesToB64(iv));
 		var req = Protocol.formatSessionLogin(usrId, c, aes.bytesToB64(iv));
 
 		this.post(req,
-				  function(resp) {
-					var sessionClient = new SessionClient(resp.msg);
-					if (typeof onLogin === "function")
-						onLogin(sessionClient);
-					else console.log(sessionClient);
-				  },
-				  onError);
+			/**@param {object} resp
+			 * code: "ok"
+			 * data: Object { uid: "admin", ssid: "3sjUJk2JszDm", "user-name": "admin" }
+			 * port: "session"
+			 */
+			function(resp) {
+				var sessionClient = new SessionClient(resp.data, iv, true);
+				if (typeof onLogin === "function")
+					onLogin(sessionClient);
+				else console.log(sessionClient);
+			},
+			onError);
 	}
 
 	static checkResponse(resp) {
@@ -98,8 +106,50 @@ class J {
 
 /**Client with session logged in.*/
 class SessionClient {
-	constructor (ssInf) {
-		this.ssInf = ssInf;
+	static get ssInfo() { return "ss-info"; }
+
+	/**Create SessionClient with credential information or load from localStorage.
+	 * Use Case 1 (persisted): logged in, then create a client with response,
+	 * 		save in local storage, then load it in new page.
+	 * Use Case 1 (not persisted): logged in, then create a client with response,
+	 * 		user's app handled the object, then provided to other functions,
+	 * 		typicall a home.vue component.
+	 * <p><b>Note</b></p>
+	 * <p>Local storage may be sometimes confusing if not familiar with W3C standars.<br>
+	 * The local storage can't be cross domain referenced. It's can not been loaded by home page
+	 * if you linked from login page like this, as showed by this example in login.vue:</p>
+	 * <p>window.top.location = response.home</p>
+	 * <p>One recommended practice is initializing home.vue with login credential
+	 * by login.vue, in app.vue.</p>
+	 * <p>But this design makes home page and login component integrated. It's not
+	 * friedly to application pattern like a port page with login which is independent
+	 * to the system background home page.</p>
+	 * <p>How should this pattern can be improved is open for discussion.
+	 * If your are interested in this subject, leave any comments in wiki page please.</p>
+	 * @param {object} ssInf login response form server: {ssid, uid}
+	 * @param {byte[]} iv iv used for cipher when login.
+	 * @param {boolean} dontPersist don't save into local storage.
+	 */
+	constructor (ssInf, iv, dontPersist) {
+		if (ssInf) {
+			// logged in, create from credential
+			this.ssInf = ssInf;
+			this.ssInf.iv = aes.bytesToB64(iv);
+			if (!dontPersist) {
+				var infStr = JSON.stringify(this.ssInf);
+				localStorage.setItem(SessionClient.ssInfo, infStr);
+			}
+		}
+		else {
+			// jumped, create from local storage
+			var sstr = localStorage.getItem(SessionClient.ssInfo);
+			if (sstr) {
+				this.ssInf = JSON.parse(sstr);
+				this.ssInf.iv = aes.b64ToBytes(this.ssInf.iv);
+			}
+			else
+				console.error("Can't find credential in local storage. SessionClient creating failed.");
+		}
 	}
 
 	query (t, alias, funcId, pageInf) {
@@ -113,6 +163,9 @@ class SessionClient {
 		return jreq;
 	}
 
+	commit (jmsg, onOk, onErr) {
+
+	}
 	/**load semantabl with records paged at server side.
 	 * @param {object} query query object
 	 * Use JProtocol to generate query object:<pre>

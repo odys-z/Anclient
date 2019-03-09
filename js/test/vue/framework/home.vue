@@ -21,8 +21,8 @@
 <script>
   import Vue from 'vue/dist/vue.js'
   import VueRouter from 'vue-router';
-  // import { animationMixin } from '../../view/vue/menu/mixin'
 
+  import {J, SessionClient} from '../../../dist/jclient-SNAPSHOT.min.js';
   import {SidebarMenu} from '../../../dist/jvue-SNAPSHOT.min.js'
 
   import Params from '../beans/sys/params.vue'
@@ -121,12 +121,25 @@
     },
   ];
 
+
+  var $J;
+  var ssClient;
+
+  /**See jclient.java/io.odysz.jsample.protocol.Samport */
+  class Samport {
+	static get menu() { return "menu.sample"; }
+  }
+
   export default {
 	name: 'VHome',
 	router,
 	// components: {
 	// 	SidebarMenu
 	// },
+	beforeCreate() {
+		$J = new J(jserv);
+		ssClient = new SessionClient();
+	}
 
 	data() {
 		return {
@@ -141,60 +154,92 @@
 			// themes: ['', 'white-theme'],
 			selectedTheme: 'white-theme',
 			currentRoute: '',
+			/**Default DB connection */
+			conn: 'jserv-sample',
 		}
 	},
 	methods: {
 		logout: function(url) {
 			window.top.location = url;
 		},
-		onLoad: function(jserv) {
-			console.log('VHome.onLoad()');
-			console.log(jserv);
-			this.menu = menu2;
+		onLoad: function(jserv, debugUser, debugPswd) {
+			console.log('VHome.onLoad(): getting menu...');
+			// console.log(jserv);
+			// this.menu = menu2;
+			initHome(this, debugUser, debugPswd);
 		},
-	    onCollapse(collapsed) {
-	      console.log(collapsed)
-	      this.collapsed = collapsed
-	    },
-	    onItemClick(event, item) {
-	      console.log('onItemClick')
-	      console.log(event)
-	      console.log(item)
-	    }
+		onCollapse(collapsed) {
+		  console.log(collapsed)
+		  this.collapsed = collapsed
+		},
+		onItemClick(event, item) {
+		  console.log('onItemClick')
+		  console.log(event)
+		  console.log(item)
+		}
 	}
-}
+  }
+
+  function initHome(home, debugUser, debugPswd) {
+	if (ssClient === undefined || ssClient.ssInf === undefined) {
+		// create a fake session client for debug
+		$J.login(debugUser, debugPswd, function(client){
+			ssClient = client;
+			console.log(ssClient);
+			loadMenu(home);
+		});
+	}
+	else {
+		console.log(ssClient);
+		loadMenu(home);
+	}
+  }
+
+  /**Compare with jclient.java/test/io.odysz.jclient.SemantiClientTest*/
+  function loadMenu(homeVue) {
+	var req = new DatasetCfg(homeVue.conn);
+	var t = "menu";
+	var act = { func: 'home.vue',
+				cmd: 'load-menu',
+				cate: t,
+				remarks: 'test jclient.js loading menu from menu.sample'};
+	var jmsg = ssClient.userReq(homeVue.conn, t, Samport.menu, act, req);
+	ssClient.commit(jmsg, {
+		homeVue.menu = resp.menu.data;
+	});
+  }
 </script>
 
 <style lang="scss">
-// This is a local caching for network problem in China, use the following if possible.
-// @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600');
-@import url('../../../lib/opensources/googlefonts.css');
+	// This is a local caching for network problem in China, use the following if possible.
+	// @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600');
+	@import url('../../../lib/opensources/googlefonts.css');
 
-body,
-html {
-  margin: 0;
-  padding: 0;
-}
+	body,
+	html {
+	  margin: 0;
+	  padding: 0;
+	}
 
-body {
-  font-family: 'Source Sans Pro', sans-serif;
-  background-color: #f2f4f7;
-}
+	body {
+	  font-family: 'Source Sans Pro', sans-serif;
+	  background-color: #f2f4f7;
+	}
 
-#home {
-  padding-left: 350px;
-}
+	#home {
+	  padding-left: 350px;
+	}
 
-#home.collapsed {
-  padding-left: 50px;
-}
+	#home.collapsed {
+	  padding-left: 50px;
+	}
 
-.home {
-  padding: 50px;
-}
+	.home {
+	  padding: 50px;
+	}
 
-.badge-danger {
-  background-color: #ff2a2a;
-  color: #fff;
-}
+	.badge-danger {
+	  background-color: #ff2a2a;
+	  color: #fff;
+	}
 </style>

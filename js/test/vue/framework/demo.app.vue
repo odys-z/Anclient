@@ -42,13 +42,18 @@
 		bindHome: function(jserv, router) {
 			console.log('app.bindHome(' + jserv + ')');
 			this.jserv = jserv;
-			console.log(this);
+			// console.log(this);
 
 			// bind to div
 			var home = new Vue(Object.assign({},
 				VHome,
 				{ el: '#frame', }));
-			home.onLoad(jserv);
+
+			// if (fakeSession) {
+			// 	// use a fake session for develope, debuging
+			// 	// When deployed, the local storage should working, this branch shouldn't reached
+			// }
+			home.onLoad(jserv, "admin", "admin@admin");
 		},
 	},
 	computed: { },

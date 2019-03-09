@@ -17,10 +17,10 @@ class Protocol {
 	 * @param  {string} tabl  from table
 	 * @param  {string} alias
 	 * @return {object} fromatter to build request object
-	 */
 	static formatQueryReq (tbl, alias) {
 		return new QueryReq(this, tbl, alias);
 	}
+	 */
 
 	static formatHeader (ssInf) {
 		return new JHeader(ssInf.ssid, ssInf.uid);
@@ -180,4 +180,21 @@ class QueryReq {
 	}
 }
 
+///////////////// io.odysz.semantic.ext ////////////////////////////////////////
+class DatasetCfg extends QueryReq {
+	constructor (conn) {
+		this.conn = conn;
+	}
+
+	static get geTreeSemtcs() { return this.trSmtcs; }
+
+	function treeSemtcs(TreeSemantics semtcs) {
+		this.trSmtcs = semtcs;
+		return this;
+	}
+
+}
+
+
+///////////////// END //////////////////////////////////////////////////////////
 export {Protocol, JMessage, JHeader, SessionReq, QueryReq}

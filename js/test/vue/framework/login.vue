@@ -14,6 +14,7 @@
   import {J} from '../../../dist/jclient-SNAPSHOT.min.js';
 
   var $J;
+  var ssClient;
 
   export default {
 	name: 'VLogin',
@@ -36,10 +37,12 @@
 		onLogin: function() {
 			// window.top.location = this.home;
 			console.log('VLogin.onLogin(' + this.home + ')');
+			var home = this.home;
 
 			$J.login("admin", "admin@admin", function(client){
 				ssClient = client;
 				console.log(ssClient.ssInf);
+				window.top.location = home;
 			});
 		},
 	}
