@@ -44,6 +44,7 @@ class J {
 		var c = aes.encrypt(usrId, pswd, iv);
 		// var qobj = formatLogin(logId, c, bytesToB64(iv));
 		var req = Protocol.formatSessionLogin(usrId, c, aes.bytesToB64(iv));
+		var J = this;
 
 		this.post(req,
 			/**@param {object} resp
@@ -53,6 +54,7 @@ class J {
 			 */
 			function(resp) {
 				var sessionClient = new SessionClient(resp.data, iv, true);
+				sessionClient.J = J;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
 				else console.log(sessionClient);
@@ -150,6 +152,12 @@ class SessionClient {
 			else
 				console.error("Can't find credential in local storage. SessionClient creating failed.");
 		}
+
+		this.J = {};
+	}
+	
+	commit(jmsg, onOk, onError) {
+		this.J.post(jmsg, onOk, onError);
 	}
 
 	query (t, alias, funcId, pageInf) {
