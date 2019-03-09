@@ -204,7 +204,7 @@
 				cate: t,
 				remarks: 'test jclient.js loading menu from menu.sample'};
 	var jmsg = ssClient.userReq(homeVue.conn, t, Samport.menu, act, req);
-	ssClient.commit(jmsg, {
+	$J.commit(jmsg, {
 		homeVue.menu = resp.menu.data;
 	});
   }

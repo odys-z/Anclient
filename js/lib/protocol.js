@@ -182,11 +182,15 @@ class QueryReq {
 
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
 class DatasetCfg extends QueryReq {
-	constructor (conn) {
+	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
+	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
+	 */
+	constructor (conn, sk) {
 		this.conn = conn;
+		this.sk = sk;
 	}
 
-	static get geTreeSemtcs() { return this.trSmtcs; }
+	get geTreeSemtcs() { return this.trSmtcs; }
 
 	function treeSemtcs(TreeSemantics semtcs) {
 		this.trSmtcs = semtcs;

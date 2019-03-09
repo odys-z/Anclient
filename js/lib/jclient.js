@@ -163,9 +163,6 @@ class SessionClient {
 		return jreq;
 	}
 
-	commit (jmsg, onOk, onErr) {
-
-	}
 	/**load semantabl with records paged at server side.
 	 * @param {object} query query object
 	 * Use JProtocol to generate query object:<pre>
