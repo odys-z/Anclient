@@ -56,7 +56,7 @@ public class SessionClient {
 		return req;
 	}
 	
-	public <T extends JBody> JMessage<? extends JBody> userReq(String conn, String t, IPort port, String[] act, T req)
+	public <T extends JBody> JMessage<? extends JBody> userReq(String t, IPort port, String[] act, T req)
 			throws SemanticException {
 		if (ssInf == null)
 			throw new SemanticException("SessionClient can not visit jserv without session information.");

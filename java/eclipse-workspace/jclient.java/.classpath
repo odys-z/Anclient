@@ -23,6 +23,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry kind="lib" path="lib/jserv-sample-protocol.jar"/>
+	<classpathentry kind="lib" path="lib/jserv-sample-protocol.jar" sourcepath="/semantic.jserv"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

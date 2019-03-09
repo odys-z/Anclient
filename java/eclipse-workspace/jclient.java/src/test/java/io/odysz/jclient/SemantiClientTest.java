@@ -90,9 +90,10 @@ public class SemantiClientTest {
 		String t = "menu";
 		// JHeader header = new JHeader("menu", ssInf.getString("uid"));
 		JHeader header = client.header();
-		String[] act = JHeader.usrAct("menu", "query", t, "R");
+		String[] act = JHeader.usrAct("SemanticClientTest", "init", t,
+				"test jclient.java loading menu from menu.sample");
 
-		JMessage<? extends JBody> jmsg = client.userReq("inet", t, Samport.menu, act, req);
+		JMessage<? extends JBody> jmsg = client.userReq(t, Samport.menu, act, req);
 		jmsg.header(header);
 
 		client.console(jmsg);
