@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import AES from './aes.js';
-import {Protocol, JMessage, JHeader, SessionReq, QueryReq} from './protocol.js';
+import {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg} from './protocol.js';
 
 /**AES lib instance*/
 var aes;
@@ -152,8 +152,8 @@ class SessionClient {
 		}
 	}
 
-	query (t, alias, funcId, pageInf) {
-		var qryItem = new QueryReq(t, alias, pageInf);
+	query (conn, t, alias, funcId, pageInf) {
+		var qryItem = new QueryReq(conn, t, alias, pageInf);
 		var header = Protocol.formatHeader(this.ssInf);
 		header.userAct({func: 'func01',
 						cmd: 'select',
@@ -161,6 +161,12 @@ class SessionClient {
 						remarks: 'test query.serv'});
 		var jreq = new JMessage(Protocol.Port.query, header, qryItem);
 		return jreq;
+	}
+
+	userReq(conn, t, port, act, bodyItem) {
+		var header = Protocol.formatHeader(this.ssInf);
+		header.userAct = act;
+		return new JMessage(port, header, bodyItem);
 	}
 
 	commit (jmsg, onOk, onErr) {
@@ -218,4 +224,5 @@ class Inseclient {
 
 }
 
+export * from './protocol.js';
 export {J, SessionClient, Inseclient};

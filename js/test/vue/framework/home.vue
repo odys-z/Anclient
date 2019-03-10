@@ -22,7 +22,7 @@
   import Vue from 'vue/dist/vue.js'
   import VueRouter from 'vue-router';
 
-  import {J, SessionClient} from '../../../dist/jclient-SNAPSHOT.min.js';
+  import {J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
   import {SidebarMenu} from '../../../dist/jvue-SNAPSHOT.min.js'
 
   import Params from '../beans/sys/params.vue'
@@ -136,10 +136,8 @@
 	// components: {
 	// 	SidebarMenu
 	// },
-	beforeCreate() {
-		$J = new J(jserv);
-		ssClient = new SessionClient();
-	}
+	created() {
+	},
 
 	data() {
 		return {
@@ -164,6 +162,9 @@
 		},
 		onLoad: function(jserv, debugUser, debugPswd) {
 			console.log('VHome.onLoad(): getting menu...');
+			this.jserv = jserv;
+			$J = new J(jserv);
+			ssClient = new SessionClient();
 			// console.log(jserv);
 			// this.menu = menu2;
 			initHome(this, debugUser, debugPswd);
@@ -204,7 +205,7 @@
 				cate: t,
 				remarks: 'test jclient.js loading menu from menu.sample'};
 	var jmsg = ssClient.userReq(homeVue.conn, t, Samport.menu, act, req);
-	ssClient.commit(jmsg, {
+	ssClient.commit(jmsg, function(resp) {
 		homeVue.menu = resp.menu.data;
 	});
   }

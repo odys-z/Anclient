@@ -113,8 +113,9 @@ class SessionReq {
 }
 
 class QueryReq {
-	constructor (tabl, alias, pageInf) {
-		this.query = query;
+	constructor (conn, tabl, alias, pageInf) {
+		this.conn = conn;
+		// this.query = query;
 		this.mtabl = tabl;
 		this.mAlias = alias;
 		this.exprs = [];
@@ -183,18 +184,20 @@ class QueryReq {
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
 class DatasetCfg extends QueryReq {
 	constructor (conn) {
-		this.conn = conn;
+		// this.conn = conn;
+		super(conn);
 	}
 
 	static get geTreeSemtcs() { return this.trSmtcs; }
 
-	function treeSemtcs(TreeSemantics semtcs) {
+	/**Set tree semantics
+	 * @param {TreeSemantics} semtcs */
+	treeSemtcs(semtcs) {
 		this.trSmtcs = semtcs;
 		return this;
 	}
-
 }
 
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Protocol, JMessage, JHeader, SessionReq, QueryReq}
+export {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg}
