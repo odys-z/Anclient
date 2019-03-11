@@ -23,15 +23,25 @@ class J {
 	}
 
 	servUrl (port) {
-		return this.cfg.defaultServ + '/'
-			+ Protocol.Port[port] + '?conn=' + this.cfg.connId;
+		// Protocol can't visited when debugging, but working:
+		console.log(Protocol.Port);
+		console.log("Protocol.Port[" + port + "] : " + Protocol.Port[port]);
+
+		if (Protocol.Port[port] !== undefined)
+			return this.cfg.defaultServ + '/'
+				+ Protocol.Port[port] + '?conn=' + this.cfg.connId;
+		else
+			return this.cfg.defaultServ + '/'
+				+ port + '?conn=' + this.cfg.connId;
 	}
 
-	init (connId, urlRoot) {
-		this.cfg[connId] = urlRoot;
+	init (urlRoot, connId) {
+		this.cfg.cconnId = connId;
+		this.cfg.defaultServ = urlRoot;
+	}
 
-		if (this.cfg.defaultServ === null)
-			this.cfg.defaultServ = urlRoot;
+	understandPorts (newPorts) {
+		Object.assign(Protocol.Port, newPorts);
 	}
 
 	login (usrId, pswd, onLogin, onError) {
@@ -102,10 +112,11 @@ class J {
 				}
 			});
 	}
-}
+  }
+  export const _J = new J();
 
-/**Client with session logged in.*/
-class SessionClient {
+  /**Client with session logged in.*/
+  class SessionClient {
 	static get ssInfo() { return "ss-info"; }
 
 	/**Create SessionClient with credential information or load from localStorage.
@@ -170,7 +181,7 @@ class SessionClient {
 	}
 
 	commit (jmsg, onOk, onErr) {
-
+		_J.post(jmsg, onOk, onErr);
 	}
 	/**load semantabl with records paged at server side.
 	 * @param {object} query query object
@@ -216,13 +227,13 @@ class SessionClient {
 			}
 		});
 	}
-}
+  }
 
-/**Client without session information.
- * This is needed for some senarios like rigerstering new account.*/
-class Inseclient {
+  /**Client without session information.
+   * This is needed for some senarios like rigerstering new account.*/
+  class Inseclient {
 
-}
+  }
 
-export * from './protocol.js';
-export {J, SessionClient, Inseclient};
+  export * from './protocol.js';
+  export {J, SessionClient, Inseclient};

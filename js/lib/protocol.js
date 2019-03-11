@@ -182,10 +182,11 @@ class QueryReq {
 }
 
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
-class DatasetCfg extends QueryReq {
-	constructor (conn) {
-		// this.conn = conn;
-		super(conn);
+class DatasetCfg {
+	constructor (conn, sk, sqlArgs) {
+		// super(conn);
+		this.sk = sk;
+		this.sqlArgs = sqlArgs;
 	}
 
 	static get geTreeSemtcs() { return this.trSmtcs; }

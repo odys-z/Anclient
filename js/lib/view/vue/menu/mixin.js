@@ -8,12 +8,12 @@ export const itemMixin = {
     },
     created() {
         this.active = this.item && this.item.href ? this.isLinkActive(this.item) : false
-        this.childActive = this.item && this.item.child ? this.isChildActive(this.item.child) : false
-        if (this.item && this.item.child) {
+        this.childActive = this.item && this.item.children ? this.isChildActive(this.item.children) : false
+        if (this.item && this.item.children) {
             if (this.showChild) {
                 this.itemShow = true
             } else {
-                this.itemShow = this.isLinkActive(this.item) || this.isChildActive(this.item.child)
+                this.itemShow = this.isLinkActive(this.item) || this.isChildActive(this.item.children)
                 if ( this.showOneChild && !this.showChild && (this.active || this.childActive) && this.firstItem ) {
                     this.emitActiveShow(this._uid)
                 }
@@ -23,7 +23,7 @@ export const itemMixin = {
         if ( !this.$router ) {
             window.addEventListener('hashchange', () => {
                 this.active = this.item && this.item.href ? this.isLinkActive(this.item) : false
-                this.childActive = this.item && this.item.child ? this.isChildActive(this.item.child) : false
+                this.childActive = this.item && this.item.children ? this.isChildActive(this.item.children) : false
             })
         }
     },
@@ -43,8 +43,8 @@ export const itemMixin = {
                 if (this.isLinkActive(item)) {
                     return true
                 }
-                if (item.child) {
-                    if ( this.isChildActive(item.child) ) {
+                if (item.children) {
+                    if ( this.isChildActive(item.children) ) {
                         return true
                     }
                 }
@@ -59,11 +59,11 @@ export const itemMixin = {
                 return
             }
 
-            if (this.isCollapsed && this.firstItem && !this.item.child) {
+            if (this.isCollapsed && this.firstItem && !this.item.children) {
                 this.$parent.$emit('clickItem')
             }
 
-            if (!mobileItem && this.item.child) {
+            if (!mobileItem && this.item.children) {
                 if ( this.isCollapsed && this.firstItem ) {
                     event.preventDefault()
                     return
@@ -99,7 +99,7 @@ export const itemMixin = {
                         this.toggleDropdown()
                     }
                 }
-            } else if (!mobileItem && !this.isCollapsed && this.firstItem && !this.item.child) {
+            } else if (!mobileItem && !this.isCollapsed && this.firstItem && !this.item.children) {
                 this.emitActiveShow(null)
             }
         }
@@ -109,7 +109,7 @@ export const itemMixin = {
             return this.$router && this.item && this.item.href !== undefined
         },
         show() {
-            if ( !this.item || !this.item.child ) return false
+            if ( !this.item || !this.item.children ) return false
             if ( this.firstItem && this.showOneChild && !this.showChild ) {
                 if ( !this.activeShow.uid ) {
                     return false
@@ -124,7 +124,7 @@ export const itemMixin = {
     watch: {
         $route() {
             this.active = this.item && this.item.href ? this.isLinkActive(this.item) : false
-            this.childActive = this.item && this.item.child ? this.isChildActive(this.item.child) : false
+            this.childActive = this.item && this.item.children ? this.isChildActive(this.item.children) : false
         }
     },
     inject:['showChild', 'showOneChild', 'emitActiveShow', 'activeShow', 'emitItemClick', 'rtl'],

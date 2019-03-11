@@ -22,7 +22,7 @@
   import Vue from 'vue/dist/vue.js'
   import VueRouter from 'vue-router';
 
-  import {J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
+  import {_J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
   import {SidebarMenu} from '../../../dist/jvue-SNAPSHOT.min.js'
 
   import Params from '../beans/sys/params.vue'
@@ -122,13 +122,20 @@
   ];
 
 
-  var $J;
   var ssClient;
 
   /**See jclient.java/io.odysz.jsample.protocol.Samport */
-  class Samport {
-	static get menu() { return "menu.sample"; }
+  var Samport = {
+	// static get menu() { return "menu.sample"; }
+	menu: "menu.sample"
   }
+
+  var sk = new class {
+	static get menu () {return "sys.menu.vue-sample"};
+  }();
+
+  // Now JMessage can handle user defined ports, e.g. servlet "menu.sample"
+  _J.understandPorts(Samport);
 
   export default {
 	name: 'VHome',
@@ -163,11 +170,11 @@
 		onLoad: function(jserv, debugUser, debugPswd) {
 			console.log('VHome.onLoad(): getting menu...');
 			this.jserv = jserv;
-			$J = new J(jserv);
+			// $J = new J(jserv);
 			ssClient = new SessionClient();
 			// console.log(jserv);
 			// this.menu = menu2;
-			initHome(this, debugUser, debugPswd);
+			initHome(this, jserv, this.conn, debugUser, debugPswd);
 		},
 		onCollapse(collapsed) {
 		  console.log(collapsed)
@@ -181,10 +188,12 @@
 	}
   }
 
-  function initHome(home, debugUser, debugPswd) {
+  function initHome(home, jserv, conn, debugUser, debugPswd) {
+	_J.init(jserv, conn);
+
 	if (ssClient === undefined || ssClient.ssInf === undefined) {
 		// create a fake session client for debug
-		$J.login(debugUser, debugPswd, function(client){
+		_J.login(debugUser, debugPswd, function(client){
 			ssClient = client;
 			console.log(ssClient);
 			loadMenu(home);
@@ -198,7 +207,7 @@
 
   /**Compare with jclient.java/test/io.odysz.jclient.SemantiClientTest*/
   function loadMenu(homeVue) {
-	var req = new DatasetCfg(homeVue.conn);
+	var req = new DatasetCfg(homeVue.conn, sk.menu);
 	var t = "menu";
 	var act = { func: 'home.vue',
 				cmd: 'load-menu',
@@ -206,7 +215,8 @@
 				remarks: 'test jclient.js loading menu from menu.sample'};
 	var jmsg = ssClient.userReq(homeVue.conn, t, Samport.menu, act, req);
 	ssClient.commit(jmsg, function(resp) {
-		homeVue.menu = resp.menu.data;
+		console.log(resp);
+		homeVue.menu = resp.data.menu;
 	});
   }
 </script>
