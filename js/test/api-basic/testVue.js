@@ -5,7 +5,7 @@ $J.init(null, "http://127.0.0.1:8080/semantic.jserv");
 var ssClient;
 
 function login() {
-	$J.login("admin", "admin@admin", function(client){
+	$J.login("admin", "", function(client){
 		ssClient = client;
 		console.log(ssClient.ssInf);
 		query();

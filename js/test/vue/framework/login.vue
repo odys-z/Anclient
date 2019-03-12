@@ -5,8 +5,8 @@
 <template>
 	<div>
 		<h4>{{title}}</h4>
-		<input id='login-userId' :bind='uid' class='login' placeholder="login Id"></input>
-		<input id='login-pswd' :bind='pswd' class='pswd' placeholder="password"></input>
+		<input id='login-userId' v-model='uid' class='login' placeholder="login Id" required></input>
+		<input id='login-pswd' v-model="pswd" class='pswd' type="password" placeholder="password" required></input>
 		<input type='button' value='ok' v-on:click='onLogin()'></input>
 	</div>
 </template>
@@ -39,7 +39,7 @@
 			console.log('VLogin.onLogin(' + this.home + ')');
 			var home = this.home;
 
-			$J.login("admin", "admin@admin", function(client){
+			$J.login(this.uid, this.pswd, function(client){
 				ssClient = client;
 				console.log(ssClient.ssInf);
 				window.top.location = home;
