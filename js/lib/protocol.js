@@ -113,8 +113,9 @@ class SessionReq {
 }
 
 class QueryReq {
-	constructor (tabl, alias, pageInf) {
-		this.query = query;
+	constructor (conn, tabl, alias, pageInf) {
+		this.conn = conn;
+		// this.query = query;
 		this.mtabl = tabl;
 		this.mAlias = alias;
 		this.exprs = [];
@@ -181,6 +182,7 @@ class QueryReq {
 }
 
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
+<<<<<<< HEAD
 class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
@@ -188,17 +190,25 @@ class DatasetCfg extends QueryReq {
 	constructor (conn, sk) {
 		this.conn = conn;
 		this.sk = sk;
+=======
+class DatasetCfg {
+	constructor (conn, sk, sqlArgs) {
+		// super(conn);
+		this.sk = sk;
+		this.sqlArgs = sqlArgs;
+>>>>>>> refs/remotes/origin/master
 	}
 
 	get geTreeSemtcs() { return this.trSmtcs; }
 
-	function treeSemtcs(TreeSemantics semtcs) {
+	/**Set tree semantics
+	 * @param {TreeSemantics} semtcs */
+	treeSemtcs(semtcs) {
 		this.trSmtcs = semtcs;
 		return this;
 	}
-
 }
 
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Protocol, JMessage, JHeader, SessionReq, QueryReq}
+export {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg}

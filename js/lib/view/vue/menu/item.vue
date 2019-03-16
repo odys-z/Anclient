@@ -4,9 +4,9 @@
             <router-link class="vsm-link" :to="item.href" :disabled="item.disabled" :event="item.disabled ? '' : 'click'" @click.native="clickEvent">
                 <i v-if="item.icon" class="vsm-icon" :class="item.icon"></i>
                 <template v-if="!isCollapsed">
-                  <span v-if="item.badge" :style="[rtl ? (item.child ? {'margin-left' : '30px'} : '') : (item.child ? {'margin-right' : '30px'} : '')]" class="vsm-badge" :class="[item.badge.class ? item.badge.class : 'default-badge']">{{item.badge.text}}</span>
+                  <span v-if="item.badge" :style="[rtl ? (item.children ? {'margin-left' : '30px'} : '') : (item.children ? {'margin-right' : '30px'} : '')]" class="vsm-badge" :class="[item.badge.class ? item.badge.class : 'default-badge']">{{item.badge.text}}</span>
                   <span class="vsm-title">{{item.title}}</span>
-                  <i v-if="item.child" class="vsm-arrow" :class="{'open-arrow' : show}" ></i>
+                  <i v-if="item.children" class="vsm-arrow" :class="{'open-arrow' : show}" ></i>
                 </template>
             </router-link>
         </template>
@@ -14,18 +14,18 @@
             <a class="vsm-link" :href="item.href ? item.href : '#'" :disabled="item.disabled" @click="clickEvent">
                 <i v-if="item.icon" class="vsm-icon" :class="item.icon"></i>
                 <template v-if="!isCollapsed">
-                  <span v-if="item.badge" :style="[rtl ? (item.child ? {'margin-left' : '30px'} : '') : (item.child ? {'margin-right' : '30px'} : '')]" class="vsm-badge" :class="[item.badge.class ? item.badge.class : 'default-badge']">{{item.badge.text}}</span>
+                  <span v-if="item.badge" :style="[rtl ? (item.children ? {'margin-left' : '30px'} : '') : (item.children ? {'margin-right' : '30px'} : '')]" class="vsm-badge" :class="[item.badge.class ? item.badge.class : 'default-badge']">{{item.badge.text}}</span>
                   <span class="vsm-title">{{item.title}}</span>
-                  <i v-if="item.child" class="vsm-arrow" :class="{'open-arrow' : show}" ></i>
+                  <i v-if="item.children" class="vsm-arrow" :class="{'open-arrow' : show}" ></i>
                 </template>
             </a>
         </template>
-        <template v-if="item.child">
+        <template v-if="item.children">
             <template v-if="!isCollapsed">
                 <transition name="expand" @enter="expandEnter" @afterEnter="expandAfterEnter" @beforeLeave="expandBeforeLeave">
                     <div class="vsm-dropdown" v-if="show">
                         <div class="vsm-list">
-                            <sub-item v-for="(subItem, index) in item.child" :item="subItem" :key="index" />
+                            <sub-item v-for="(subItem, index) in item.children" :item="subItem" :key="index" />
                         </div>
                     </div>
                 </transition>

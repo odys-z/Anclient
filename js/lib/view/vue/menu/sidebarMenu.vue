@@ -20,8 +20,8 @@
       </transition>
       <div class="vsm-dropdown" :style="[{'position' : 'absolute'}, {'top' : `${mobileItemHeight}px`}, {'left' : rtl ? '0px': sidebarWidth}, {'right' : rtl ? sidebarWidth: '0px'}, {'max-height' : `calc(100vh - ${mobileItemPos + mobileItemHeight}px)`}, {'overflow-y' : 'auto'}]">
         <transition name="expand" @enter="expandEnter" @afterEnter="expandAfterEnter" @beforeLeave="expandBeforeLeave">
-          <div class="vsm-list" v-if="mobileItem && mobileItem.child">
-            <sub-item v-for="(subItem, index) in mobileItem.child" :item="subItem" :key="index"/>
+          <div class="vsm-list" v-if="mobileItem && mobileItem.children">
+            <sub-item v-for="(subItem, index) in mobileItem.children" :item="subItem" :key="index"/>
           </div>
         </transition>
       </div>

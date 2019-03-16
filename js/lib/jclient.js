@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import AES from './aes.js';
-import {Protocol, JMessage, JHeader, SessionReq, QueryReq} from './protocol.js';
+import {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg} from './protocol.js';
 
 /**AES lib instance*/
 var aes;
@@ -23,15 +23,25 @@ class J {
 	}
 
 	servUrl (port) {
-		return this.cfg.defaultServ + '/'
-			+ Protocol.Port[port] + '?conn=' + this.cfg.connId;
+		// Protocol can't visited when debugging, but working:
+		console.log(Protocol.Port);
+		console.log("Protocol.Port[" + port + "] : " + Protocol.Port[port]);
+
+		if (Protocol.Port[port] !== undefined)
+			return this.cfg.defaultServ + '/'
+				+ Protocol.Port[port] + '?conn=' + this.cfg.connId;
+		else
+			return this.cfg.defaultServ + '/'
+				+ port + '?conn=' + this.cfg.connId;
 	}
 
-	init (connId, urlRoot) {
-		this.cfg[connId] = urlRoot;
+	init (urlRoot, connId) {
+		this.cfg.cconnId = connId;
+		this.cfg.defaultServ = urlRoot;
+	}
 
-		if (this.cfg.defaultServ === null)
-			this.cfg.defaultServ = urlRoot;
+	understandPorts (newPorts) {
+		Object.assign(Protocol.Port, newPorts);
 	}
 
 	login (usrId, pswd, onLogin, onError) {
@@ -104,10 +114,11 @@ class J {
 				}
 			});
 	}
-}
+  }
+  export const _J = new J();
 
-/**Client with session logged in.*/
-class SessionClient {
+  /**Client with session logged in.*/
+  class SessionClient {
 	static get ssInfo() { return "ss-info"; }
 
 	/**Create SessionClient with credential information or load from localStorage.
@@ -160,8 +171,8 @@ class SessionClient {
 		this.J.post(jmsg, onOk, onError);
 	}
 
-	query (t, alias, funcId, pageInf) {
-		var qryItem = new QueryReq(t, alias, pageInf);
+	query (conn, t, alias, funcId, pageInf) {
+		var qryItem = new QueryReq(conn, t, alias, pageInf);
 		var header = Protocol.formatHeader(this.ssInf);
 		header.userAct({func: 'func01',
 						cmd: 'select',
@@ -171,6 +182,18 @@ class SessionClient {
 		return jreq;
 	}
 
+<<<<<<< HEAD
+=======
+	userReq(conn, t, port, act, bodyItem) {
+		var header = Protocol.formatHeader(this.ssInf);
+		header.userAct = act;
+		return new JMessage(port, header, bodyItem);
+	}
+
+	commit (jmsg, onOk, onErr) {
+		_J.post(jmsg, onOk, onErr);
+	}
+>>>>>>> refs/remotes/origin/master
 	/**load semantabl with records paged at server side.
 	 * @param {object} query query object
 	 * Use JProtocol to generate query object:<pre>
@@ -215,12 +238,13 @@ class SessionClient {
 			}
 		});
 	}
-}
+  }
 
-/**Client without session information.
- * This is needed for some senarios like rigerstering new account.*/
-class Inseclient {
+  /**Client without session information.
+   * This is needed for some senarios like rigerstering new account.*/
+  class Inseclient {
 
-}
+  }
 
-export {J, SessionClient, Inseclient};
+  export * from './protocol.js';
+  export {J, SessionClient, Inseclient};

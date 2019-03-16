@@ -53,7 +53,7 @@
 			// 	// use a fake session for develope, debuging
 			// 	// When deployed, the local storage should working, this branch shouldn't reached
 			// }
-			home.onLoad(jserv, "admin", "admin@admin");
+			home.onLoad(jserv, "admin", "ppp");
 		},
 	},
 	computed: { },
