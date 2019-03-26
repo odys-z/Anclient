@@ -42,7 +42,8 @@ public class SemantiClientTest {
     	try {
     		// Clients.init("http://localhost:8080/jserv-sample");
     		Clients.init(jserv);
-    		Clients.login("admin", "admin@admin");
+    		String pswd = System.getProperty("pswd");
+    		Clients.login("admin", pswd);
     	} catch (IOException io) {
     		Utils.warn("loging failed: %s", io.getMessage());
     	}
