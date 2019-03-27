@@ -120,6 +120,4 @@ public class SessionClient {
 
 	public void logout() {
 	}
-
-
 }

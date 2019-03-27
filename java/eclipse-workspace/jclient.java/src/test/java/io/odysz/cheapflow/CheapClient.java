@@ -3,6 +3,7 @@ package io.odysz.cheapflow;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,15 @@ import org.junit.jupiter.api.Test;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.SessionClient;
+import io.odysz.jsample.cheap.CheapReq;
+import io.odysz.jsample.protocol.Samport;
+import io.odysz.semantic.jprotocol.JBody;
+import io.odysz.semantic.jprotocol.JHeader;
+import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
+import io.odysz.sworkflow.EnginDesign.Req;
 
 class CheapClient {
 	static final String jserv = "http://localhost:8080/semantic.jserv";
@@ -51,18 +59,37 @@ class CheapClient {
     	}
     }
 
-	private void start(SessionClient ssc, String wfid, SCallback onOk) {
-		// TODO Auto-generated method stub
+	private void start(SessionClient client, String wfid, SCallback onOk) throws SemanticException, IOException, SQLException {
+		CheapReq req = new CheapReq(null, "jserv-sample")
+				.nodeDesc("Desc: bla")
+				.newChildInstRow().childInsert("remarks", "client - 01")
+				.newChildInstRow().childInsert("remarks", "client - 02");
+
+		String t = Req.start.name();
+		JHeader header = client.header();
+		String[] act = JHeader.usrAct("CheapClient Test", "start", t,
+				"test jclient.java starting wf " + wfId);
+
+		JMessage<? extends JBody> jmsg = client.userReq(t, Samport.cheapflow, act, req);
+		jmsg.header(header);
+
+		client.console(jmsg);
 		
+    	client.commit(jmsg, (code, data) -> {
+    		@SuppressWarnings("unchecked")
+			List<SemanticObject> rses = (List<SemanticObject>) data.get("evt");
+  			for (SemanticObject rs : rses) {
+  				rs.print(System.out);
+  			}
+    	});
+
 	}
 
 	private void step(SessionClient ssc, String wfid, String cmd, SCallback onOk) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	private void step3(SessionClient ssc, String wfid, String cmd, SCallback onOk) {
-		// TODO Auto-generated method stub
 		
 	}
 
