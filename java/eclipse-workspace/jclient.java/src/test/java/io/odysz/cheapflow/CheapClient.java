@@ -66,21 +66,18 @@ class CheapClient {
 				.newChildInstRow().childInsert("remarks", "client - 02");
 
 		String t = Req.start.name();
-		JHeader header = client.header();
+//		JHeader header = client.header();
 		String[] act = JHeader.usrAct("CheapClient Test", "start", t,
 				"test jclient.java starting wf " + wfId);
 
 		JMessage<? extends JBody> jmsg = client.userReq(t, Samport.cheapflow, act, req);
-		jmsg.header(header);
+		jmsg.header(client.header());
 
 		client.console(jmsg);
 		
     	client.commit(jmsg, (code, data) -> {
-    		@SuppressWarnings("unchecked")
-			List<SemanticObject> rses = (List<SemanticObject>) data.get("evt");
-  			for (SemanticObject rs : rses) {
-  				rs.print(System.out);
-  			}
+			SemanticObject rs = (SemanticObject) data.get("evt");
+			rs.print(System.out);
     	});
 
 	}
