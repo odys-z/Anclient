@@ -49,6 +49,8 @@ public class Clients<T extends JBody> {
 			throws IOException, SemanticException, SQLException, GeneralSecurityException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
+		if (uid == null || pswdPlain == null)
+			throw new SemanticException("user id and password can not be null.");
 		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 		
 		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
