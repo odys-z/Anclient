@@ -3,9 +3,8 @@ package io.odysz.cheapflow;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
-import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.common.Utils;
@@ -29,7 +28,7 @@ class CheapClient {
 	static final String cmdB = "t01.01.stepB";
 	static final String cmd3 = "t01.02.go03";
 
-	@BeforeAll
+	@Before
 	public static void init() {
 		Utils.printCaller(false);
 	}
@@ -61,12 +60,13 @@ class CheapClient {
 
 	private void start(SessionClient client, String wfid, SCallback onOk) throws SemanticException, IOException, SQLException {
 		CheapReq req = new CheapReq(null, "jserv-sample")
+				.req(Req.start).wftype(wfid)
 				.nodeDesc("Desc: bla")
+				.childTabl("task_details")
 				.newChildInstRow().childInsert("remarks", "client detail - 01")
 				.newChildInstRow().childInsert("remarks", "client detail - 02");
 
 		String t = Req.start.name();
-//		JHeader header = client.header();
 		String[] act = JHeader.usrAct("CheapClient Test", "start", t,
 				"test jclient.java starting wf " + wfId);
 
