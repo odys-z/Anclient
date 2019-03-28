@@ -62,8 +62,8 @@ class CheapClient {
 	private void start(SessionClient client, String wfid, SCallback onOk) throws SemanticException, IOException, SQLException {
 		CheapReq req = new CheapReq(null, "jserv-sample")
 				.nodeDesc("Desc: bla")
-				.newChildInstRow().childInsert("remarks", "client - 01")
-				.newChildInstRow().childInsert("remarks", "client - 02");
+				.newChildInstRow().childInsert("remarks", "client detail - 01")
+				.newChildInstRow().childInsert("remarks", "client detail - 02");
 
 		String t = Req.start.name();
 		JHeader header = client.header();
