@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.common.Utils;
@@ -16,7 +15,6 @@ import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
-import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.sworkflow.EnginDesign.Req;
 
@@ -28,12 +26,9 @@ class CheapClient {
 	static final String cmdB = "t01.01.stepB";
 	static final String cmd3 = "t01.02.go03";
 
-	@Before
-	public static void init() {
-		Utils.printCaller(false);
-	}
 	@Test
 	void test() throws SemanticException, SQLException, GeneralSecurityException {
+		Utils.printCaller(false);
 		// fail("Not yet implemented");
     	try {
     		// Clients.init("http://localhost:8080/jserv-sample");
@@ -76,8 +71,8 @@ class CheapClient {
 		client.console(jmsg);
 		
     	client.commit(jmsg, (code, data) -> {
-			SemanticObject rs = (SemanticObject) data.get("evt");
-			rs.print(System.out);
+			String e = (String) data.get("evt");
+			Utils.logi(e);
     	});
 
 	}
