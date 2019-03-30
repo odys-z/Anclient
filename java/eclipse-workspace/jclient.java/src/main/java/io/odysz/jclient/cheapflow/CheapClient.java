@@ -3,6 +3,7 @@ package io.odysz.jclient.cheapflow;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import io.odysz.common.LangExt;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jsample.cheap.CheapReq;
 import io.odysz.jsample.protocol.Samport;
@@ -107,8 +108,9 @@ public class CheapClient {
 		ssclient.console(jmsg);
 		
     	ssclient.commit(jmsg, (code, data) -> {
-			SemanticObject e = (SemanticObject) data.get("rights");
-			onOk.onCallback("ok", e);
+//			SemanticObject e = (SemanticObject) data.get("rights");
+//			onOk.onCallback("ok", new SemanticObject().put("rights", e));
+    		onOk.onCallback(code, data);
     	});
 
 	

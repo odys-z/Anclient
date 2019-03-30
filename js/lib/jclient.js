@@ -5,11 +5,11 @@ import {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg} from './p
 /**AES lib instance*/
 var aes;
 
-/**Jclient.js API
- * Java equivalent of
- * io.odysz.jclient.Clients;
- * io.odysz.jclient.SessionClient;
- */
+  /**Jclient.js API
+   * Java equivalent of
+   * io.odysz.jclient.Clients;
+   * io.odysz.jclient.SessionClient;
+   */
 class J {
 	/**@param {string} serv serv path root, e.g. 'http://localhost/semantic-jserv'
 	 */
@@ -114,11 +114,12 @@ class J {
 				}
 			});
 	}
-  }
-  export const _J = new J();
+}
 
-  /**Client with session logged in.*/
-  class SessionClient {
+export const _J = new J();
+
+/**Client with session logged in.*/
+class SessionClient {
 	static get ssInfo() { return "ss-info"; }
 
 	/**Create SessionClient with credential information or load from localStorage.
@@ -166,7 +167,7 @@ class J {
 
 		this.J = {};
 	}
-	
+
 	commit(jmsg, onOk, onError) {
 		this.J.post(jmsg, onOk, onError);
 	}
@@ -182,8 +183,6 @@ class J {
 		return jreq;
 	}
 
-<<<<<<< HEAD
-=======
 	userReq(conn, t, port, act, bodyItem) {
 		var header = Protocol.formatHeader(this.ssInf);
 		header.userAct = act;
@@ -193,7 +192,7 @@ class J {
 	commit (jmsg, onOk, onErr) {
 		_J.post(jmsg, onOk, onErr);
 	}
->>>>>>> refs/remotes/origin/master
+
 	/**load semantabl with records paged at server side.
 	 * @param {object} query query object
 	 * Use JProtocol to generate query object:<pre>
@@ -238,13 +237,12 @@ class J {
 			}
 		});
 	}
-  }
+}
 
-  /**Client without session information.
-   * This is needed for some senarios like rigerstering new account.*/
-  class Inseclient {
+/**Client without session information.
+ * This is needed for some senarios like rigerstering new account.*/
+class Inseclient {
+}
 
-  }
-
-  export * from './protocol.js';
-  export {J, SessionClient, Inseclient};
+export * from './protocol.js';
+export {J, SessionClient, Inseclient};
