@@ -3,6 +3,7 @@ package io.odysz.cheapflow;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,7 @@ class CheapClientTest {
 	static final String cmdB = "t01.01.stepB";
 	static final String cmd3 = "t01.02.go03";
 
+	@SuppressWarnings("unchecked")
 	@Test
 	void test() throws SemanticException, SQLException, GeneralSecurityException {
 		Utils.printCaller(false);
@@ -60,6 +62,13 @@ class CheapClientTest {
 //					cheap.step(wfId, cmdA, atc, (c1, dt) -> {
 //					});
     			
+					// concurrency 3, load flow
+					cheap.loadFlow(wfId, evt.taskId(), act, (c1, dat1) -> {
+						ArrayList<String[]> l = (ArrayList<String[]>) dat1.get("data");
+						for (String[] row : l) {
+							Utils.logi(row);
+						}
+					});
 				} catch (TransException e) {
 					e.printStackTrace();
 				}

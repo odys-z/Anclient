@@ -21,9 +21,12 @@
 
 <script>
   import Vue from 'vue/dist/vue.js'
-  import {Tree} from '../../../../dist/jvue-SNAPSHOT.min.js'
+  import {_J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
+  import {Semantable} from '../../../../dist/jvue-SNAPSHOT.min.js'
 
   // Vue.component('tree', Tree);
+
+  Vue.component('semantable', Semantable);
 
   export default {
 	name: 'VCheapFlow',
@@ -44,12 +47,31 @@
 	methods: {
 		onLoad: function(jserv) {
 			console.log('VCheap.onLoad()');
-			console.log(jserv);
+			loadFlow();
 		},
 		onSave: function(rec) {
 			console.log('VCheap.onSave()');
 		},
 	}
+  }
+
+  function loadFlow(ssClient) {
+	var req = ssClient.query("a_user", "u", "test", {page: 0, size: 20});
+		req.body[0]
+			.expr("userName", "un").expr("userId", "uid").expr("roleName", "role")
+			.j("a_roles", "r", "u.roleId = r.roleId")
+			.whereCond("=", "u.userId", "'admin'");
+
+		J.post(req, function(resp) {
+			console.log(resp);
+			// bind
+			// bind(resp);
+			// semantbl.bind(resp.rs[0][0], resp.rs[0].slice(1));
+
+			// working: semantbl.bind();
+			semantbl.bind();
+			// semantbl.bind(resp.rs[0][0], resp.rs[0].slice(1));
+		});
   }
 </script>
 <style>

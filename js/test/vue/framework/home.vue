@@ -127,7 +127,8 @@
   /**See jclient.java/io.odysz.jsample.protocol.Samport */
   var Samport = {
 	// static get menu() { return "menu.sample"; }
-	menu: "menu.sample"
+	menu: "menu.sample",
+	cheapflow: "cheapflow.smaple"
   }
 
   var sk = new class {

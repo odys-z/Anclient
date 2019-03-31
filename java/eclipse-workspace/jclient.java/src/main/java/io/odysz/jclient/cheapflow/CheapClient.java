@@ -3,7 +3,6 @@ package io.odysz.jclient.cheapflow;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import io.odysz.common.LangExt;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jsample.cheap.CheapReq;
 import io.odysz.jsample.protocol.Samport;
@@ -27,6 +26,21 @@ public class CheapClient {
 
 	public CheapClient(SessionClient ssclient) {
 		this.ssclient = ssclient;
+	}
+	
+	public void loadFlow(String wfId, String taskId, String[] act, SCallback onOk) throws SemanticException, SQLException, IOException {
+		CheapReq req = new CheapReq(null)
+				.loadFlow(wfId, taskId);
+
+		String t = Req.load.name();
+
+		JMessage<? extends JBody> jmsg = ssclient.userReq(t, Samport.cheapflow, act, req);
+		jmsg.header(ssclient.header());
+
+    	ssclient.commit(jmsg, (code, data) -> {
+//			SemanticObject e = (SemanticObject) data.get("evt");
+			onOk.onCallback("ok", data);
+    	});
 	}
 
 	/**Send a starting request to CheapServ.
