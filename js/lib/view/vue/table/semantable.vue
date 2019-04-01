@@ -32,6 +32,7 @@
 
   export default {
 	name: 'Semantable',
+	props: ['heads'],
 	// component's data must be a function
 	// https://stackoverflow.com/questions/42396867/how-to-get-data-to-work-when-used-within-a-component-and-axios?rq=1
 	// https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function
@@ -50,8 +51,14 @@
 	}),
 
 	methods:{
-	  bind: function (columns, rows) {
-		console.log(this);
+	  /**Bind html table with columns and rows
+	   * @param {array} columns columns
+	   * @param {array} rows rows
+	   * @param {array} heads array of {visible, text, expr},
+	   * where expr must presented in columns, and columns are shown in the elements sequence.
+	   * If this parameter is missing, all columns will be shown.*/
+	  bind: function (columns, rows, heads) {
+		// console.log(this);
 		Object.assign(this, {
 			// working because already registered?
 			// https://vuejs.org/v2/guide/reactivity.html#Declaring-Reactive-Properties
@@ -59,6 +66,12 @@
 			rows: rows
 		});
 		console.log(this);
+	  },
+
+	  query: function (heads, queryReq) {
+	  },
+
+	  dataset: function(sk, heads) {
 	  },
 
 	  sort:function(s) {

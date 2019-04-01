@@ -20,6 +20,8 @@
 	window.onload = function () {
 		// load login control which will handling login action:
 		// sending http post to http://.../login.jserv?t=login
+		//
+		// japp is the library name compiled from index.js, see webpack.test.config.js
 		japp.appLogin('#login', 'http://127.0.0.1:8080/semantic.jserv', 'home.html');
 	}
 	</script>

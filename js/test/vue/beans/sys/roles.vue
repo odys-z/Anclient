@@ -1,7 +1,7 @@
 <!--Business Bean - Roles CRUD
 	This component include a typical application senario of editing roles' rights.
  -->
- <template>
+<template>
 	 <div>
 		<h4 class='current-func'>ROLES: {{title}}</h4>
 		<modalog ref='role-details'>
@@ -20,9 +20,9 @@
 			</div>
 		</listoolbar>
 	 </div>
- </template>
+</template>
 
- <script>
+<script>
   import Vue from 'vue/dist/vue.js'
   import {Listoolbar, Modalog} from '../../../../dist/jvue-SNAPSHOT.min.js'
 
@@ -64,6 +64,6 @@
 		},
 	}
   }
- </script>
- <style>
- </style>
+</script>
+<style>
+</style>

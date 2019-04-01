@@ -187,6 +187,7 @@ class DatasetCfg extends QueryReq {
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
 	 */
 	constructor (conn, sk) {
+		super(conn, sk);
 		this.conn = conn;
 		this.sk = sk;
 	}
@@ -200,7 +201,6 @@ class DatasetCfg extends QueryReq {
 		return this;
 	}
 }
-
 
 ///////////////// END //////////////////////////////////////////////////////////
 export {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg}

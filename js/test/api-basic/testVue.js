@@ -12,8 +12,8 @@ function login() {
 	});
 }
 
-function query() {
-	var req = ssClient.query("a_user", "u", "test", {page: 0, size: 20});
+function query(conn) {
+	var req = ssClient.query(conn, "a_user", "u", "test", {page: 0, size: 20});
 	req.body[0]
 		.expr("userName", "un").expr("userId", "uid").expr("roleName", "role")
 		.j("a_roles", "r", "u.roleId = r.roleId")

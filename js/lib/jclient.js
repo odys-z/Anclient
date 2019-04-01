@@ -114,6 +114,17 @@ class J {
 				}
 			});
 	}
+
+	// TODO moved to protocol.js?
+	respCols(resp) {
+		return resp !== null && resp !== undefined && resp.code === "ok"
+			? resp.data.rs[0][0] : [];
+	}
+
+	respRows(resp) {
+		return resp !== null && resp !== undefined && resp.code === "ok"
+			? resp.data.rs[0].slice(1) : [];
+	}
 }
 
 export const _J = new J();
@@ -245,4 +256,5 @@ class Inseclient {
 }
 
 export * from './protocol.js';
+export * from './frames/cheapflow/cheap-client.js';
 export {J, SessionClient, Inseclient};

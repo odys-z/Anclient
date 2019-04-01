@@ -53,7 +53,12 @@
 			// 	// use a fake session for develope, debuging
 			// 	// When deployed, the local storage should working, this branch shouldn't reached
 			// }
-			home.onLoad(jserv, "admin", "ppp");
+			let uri = window.location.search.substring(1);
+			let params = new URLSearchParams(uri);
+			var pswd = params.get("pswd");
+			if (pswd === null || pswd === undefined)
+				console.error("You need provide password in url as paramenter 'pswd'");
+			else home.onLoad(jserv, "admin", pswd);
 		},
 	},
 	computed: { },

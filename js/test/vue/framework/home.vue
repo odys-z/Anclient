@@ -29,6 +29,7 @@
   import UserInfo from '../beans/sys/user-infos.vue'
   import Logout from '../beans/sys/logout.vue'
   import Roles from '../beans/sys/roles.vue'
+  import CheapForm from '../beans/cheapflow/cheap-taskform.vue'
 
   Vue.use(VueRouter)
 
@@ -36,35 +37,63 @@
   Vue.use(Roles)
   Vue.use(Params)
   Vue.use(UserInfo)
+  Vue.use(CheapForm)
 
   const Dashboard = { template: '<div>Dashboard Page</div>' }
 
   Vue.component('sidebar-menu', SidebarMenu);
 
+  /**See jclient.java/io.odysz.jsample.protocol.Samport */
+  var Samport = {
+	/** see semantic.jserv/io.odysz.jsample.SysMenu */
+	menu: "menu.sample",
+	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
+	cheapflow: "cheapflow.sample"
+  }
+
+  // Now JMessage can handle user defined ports, e.g. servlet "menu.sample"
+  _J.understandPorts(Samport);
+
+  var vframe = {
+	  jclient: null,	// will be initialized once logged in.
+	  ports: Samport,
+	  // args are explained by views (Semantics only understood by business)
+	  // wfId and taskId are for testing, shouldn't handled by home.vue
+	  // - cheap-tskform.vue need it to load a form.
+	  args: {wfId: 't01', taskId: '000001'},
+  };
+
   const router = new VueRouter({
-    routes: [
-    { path: '/',
-      name: 'Dashboard',
-      component: Dashboard,
-    },
-    { path: '/logout',
-      name: 'Logout',
-      component: Logout,
-    },
-    { path: '/sys/params',
-      name: 'System Params',
-      component: Params,
-    },
-    { path: '/user-info',
-      name: 'Personal Info',
-      component: UserInfo,
-    },
-    { path: '/sys/roles',
-      name: 'Roles',
-      component: Roles,
-    } ]
+	routes: [
+	{ path: '/',
+	  name: 'Dashboard',
+	  component: Dashboard,
+	},
+	{ path: '/logout',
+	  name: 'Logout',
+	  component: Logout,
+	},
+	{ path: '/taskflow',
+	  name: 'cheapflow',
+	  component: CheapForm,
+	  // J, vargs are the contract between home and CRUD components. The know these.
+	  props: {J: _J, vargs: vframe},
+	},
+	{ path: '/sys/params',
+	  name: 'System Params',
+	  component: Params,
+	},
+	{ path: '/user-info',
+	  name: 'Personal Info',
+	  component: UserInfo,
+	},
+	{ path: '/sys/roles',
+	  name: 'Roles',
+	  component: Roles,
+	}]
   })
 
+  /**Static data for testing. Not used after loaded */
   var menu2 = [
     { header: true,
       title: 'Static Default'
@@ -121,29 +150,15 @@
     },
   ];
 
-
-  var ssClient;
-
-  /**See jclient.java/io.odysz.jsample.protocol.Samport */
-  var Samport = {
-	// static get menu() { return "menu.sample"; }
-	menu: "menu.sample",
-	cheapflow: "cheapflow.smaple"
-  }
-
+  /**Semantics' key configured in Dataset.xml at server side */
   var sk = new class {
 	static get menu () {return "sys.menu.vue-sample"};
   }();
 
-  // Now JMessage can handle user defined ports, e.g. servlet "menu.sample"
-  _J.understandPorts(Samport);
-
   export default {
 	name: 'VHome',
 	router,
-	// components: {
-	// 	SidebarMenu
-	// },
+
 	created() {
 	},
 
@@ -172,7 +187,7 @@
 			console.log('VHome.onLoad(): getting menu...');
 			this.jserv = jserv;
 			// $J = new J(jserv);
-			ssClient = new SessionClient();
+			vframe.jclient = new SessionClient();
 			// console.log(jserv);
 			// this.menu = menu2;
 			initHome(this, jserv, this.conn, debugUser, debugPswd);
@@ -192,16 +207,16 @@
   function initHome(home, jserv, conn, debugUser, debugPswd) {
 	_J.init(jserv, conn);
 
-	if (ssClient === undefined || ssClient.ssInf === undefined) {
+	if (vframe.jclient === null || vframe.ssInf === undefined) {
 		// create a fake session client for debug
 		_J.login(debugUser, debugPswd, function(client){
-			ssClient = client;
-			console.log(ssClient);
+			vframe.jclient = client;
+			console.log(vframe);
 			loadMenu(home);
 		});
 	}
 	else {
-		console.log(ssClient);
+		console.log(vframe);
 		loadMenu(home);
 	}
   }
@@ -214,8 +229,8 @@
 				cmd: 'load-menu',
 				cate: t,
 				remarks: 'test jclient.js loading menu from menu.sample'};
-	var jmsg = ssClient.userReq(homeVue.conn, t, Samport.menu, act, req);
-	ssClient.commit(jmsg, function(resp) {
+	var jmsg = vframe.jclient.userReq(homeVue.conn, t, Samport.menu, act, req);
+	vframe.jclient.commit(jmsg, function(resp) {
 		console.log(resp);
 		homeVue.menu = resp.data.menu;
 	});
