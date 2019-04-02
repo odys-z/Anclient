@@ -1,4 +1,4 @@
-/* This is a pack to register all components implemented in view/vue/ *.vue.
+/* This is a pact to register all components implemented in view/vue/ *.vue.
 	After reading vue docs many times, it's still not sure if this is the correct
 	way to provide all vue components as lib. See
 	https://vuejs.org/v2/guide/components-registration.html
@@ -11,6 +11,9 @@
   // import SidebarMenu from './menu/sidebarMenu.vue'
 
   //  way of vuent: https://vuentjs.org/
+  export {default as Combobox} from './widgets/combobox.vue'
+  export {default as Combobox} from './widgets/calendar.vue'
+
   export {default as Listoolbar} from './mixins/listoolbar.vue'
   export {default as Modalog} from './dialogs/modal-dialog.vue'
 
