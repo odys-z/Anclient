@@ -77,7 +77,7 @@
 	  name: 'cheapflow',
 	  component: CheapForm,
 	  // J, vargs are the contract between home and CRUD components. The know these.
-	  props: {J: _J, vargs: vframe},
+	  props: {J: _J, vargs: vframe, debug: true},
 	},
 	{ path: '/sys/params',
 	  name: 'System Params',

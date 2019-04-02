@@ -4,12 +4,17 @@
       <table class="table table-striped table-bordered" style="width:100%">
           <thead width="100%">
               <tr>
-                <th v-for="key in columns" :key="key" ><i class="fas fa-sort-alpha-down float-right">{{key}}</i></th>
+                <th v-for="key in columns" :key="key" v-if="isVisible(key)" >
+					<i class="fas float-right">{{head(key)}}</i>
+				</th>
               </tr>
           </thead>
           <tbody>
-              <tr v-for="(row, index) in rows" :key="index">
-                <td v-for="cell in row">{{cell}}</td>
+              <tr v-for="(row, rix) in rows" :key="rix">
+				<!--
+                <td v-for="(hd, cix) in columns" v-if="isVisible(hd)">{{cell(hd, rix, cix)}}</td>
+				-->
+                <td v-for="(hd, cix) in columns" v-if="isVisible(hd)" v-html='cell(hd, rix, cix)'></td>
               </tr>
           </tbody>
       </table>
@@ -30,42 +35,117 @@
 /*eslint-disable*/
   import $ from 'jquery';
 
+  /**[column-ix (for retrieve data), heads-ix (for find header text)] */
+  var colmap = {};
+
   export default {
 	name: 'Semantable',
-	props: ['heads'],
+	props: ['heads', 'options', 'debug'],	// options: {select: single}
 	// component's data must be a function
 	// https://stackoverflow.com/questions/42396867/how-to-get-data-to-work-when-used-within-a-component-and-axios?rq=1
 	// https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function
 	data: () => ({
-	  columns: ['col-a', 'col-b', 'C'],
+	  columns: ['A', 'B', 'C'],
 	  rows: [
 		['cell-01', 'cell-02', 'cell-03'],
 		['cell-11', 'cell-12', 'cell-13'],
-		['cell-21', 'cell-22', 'cell-23'],
-		['cell-31', 'cell-32', 'cell-33'],
-		['cell-41', 'cell-42', 'cell-43'],
 	  ],
-	  pageSize: 5,
+	  pageSize: 20,
 	  currentPage: 0,
-	  totalPage: 0
+	  totalPage: 1
 	}),
 
 	methods:{
+	  /** get column header. TODO support style */
+	  head: function (hd) {
+		if (colmap[hd] === undefined || colmap[hd][1] === undefined
+			|| this.heads === undefined)
+			return hd;
+		var opt = this.heads[colmap[hd][1]];
+		if (opt === undefined || opt.text === undefined)
+			return hd;
+		return opt.text;
+	  },
+
+	  /** get cell's html, with checkbox, style, etc. */
+	  cell: function (hd, rix, cix) {
+		if (colmap[hd] === undefined)
+			return this.rows[rix][cix];
+		else {
+			if (this.debug)
+				console.log("head: " + hd + ", rix=" + rix + ", cix=" + cix +
+					", colmap[hd]: " + colmap[hd] + ", rows[rix][colmap[hd][0]]: " + this.rows[rix][colmap[hd][0]]);
+
+			var opt = this.heads[colmap[hd][1]];
+			if (opt != undefined) {
+				// support style
+				var styl = opt.cellStyle === undefined ? '' : opt.cellStyle;
+				var isChkbox = opt.check === undefined ? false : true;
+				if (isChkbox)
+					return '<input type="checkbox" style="' + styl + '"></input>';
+			}
+
+			// get ride of "null"
+			var txt = this.rows[rix][colmap[hd][0]];
+			txt = txt === null ? "" : txt;
+			return '<div style="' + styl + '">' + txt + '</div>';
+		}
+	  },
+
+	  isVisible: function (hd) {
+		if (colmap[hd] === undefined || colmap[hd][1] === undefined)
+			return true;
+		if (this.heads === undefined)
+			return true;
+		var v = this.heads[colmap[hd][1]];
+		if (v === undefined || v.visible === undefined)
+			return true;
+		return v.visible;
+	  },
+
 	  /**Bind html table with columns and rows
 	   * @param {array} columns columns
 	   * @param {array} rows rows
-	   * @param {array} heads array of {visible, text, expr},
+	   * @param {array} heads array of head objects, {expr, visible, text, check},
 	   * where expr must presented in columns, and columns are shown in the elements sequence.
 	   * If this parameter is missing, all columns will be shown.*/
 	  bind: function (columns, rows, heads) {
-		// console.log(this);
+		if (typeof heads === 'object' && heads.length !== undefined) {
+			this.heads = heads;
+			// organize cols and rows according to heads
+			// 1. new-cols holding defined heads
+			var newCols = new Array(heads.length);
+			for (var ix = 0; ix < heads.length; ix++) {
+				if (heads[ix].expr) {
+					// like: check: [undefined, heads[0]], undefined will be resolved later
+					colmap[heads[ix].expr] = [undefined, ix];
+					newCols[ix] = heads[ix].expr;
+				}
+			}
+
+			// 2. if column doesn't exists in map, append unspecified cols - typically from rs
+			// 3. else map new columns to old columns - index used for retrieve data
+			for (var ix = 0; ix < columns.length; ix++) {
+				if (colmap[columns[ix]] === undefined) {
+					newCols.push(columns[ix]);
+					colmap[columns[ix]] = [ix];
+				}
+				else {
+					// like check: 3 (3 is provided in data columns and rows)
+					colmap[columns[ix]][0] = ix;
+				}
+			}
+		}
 		Object.assign(this, {
 			// working because already registered?
 			// https://vuejs.org/v2/guide/reactivity.html#Declaring-Reactive-Properties
-			columns: columns,
+
+			// columns: columns,
+			columns: newCols,
 			rows: rows
 		});
-		console.log(this);
+		console.log('bind(): colmap ----------------------------------- -----------------------');
+		console.log(colmap);
 	  },
 
 	  query: function (heads, queryReq) {
@@ -130,7 +210,8 @@
     },
 
   mounted () {
-    this.$refs.pager.addEventListener('keypress', this.goPage);
+	this.$refs.pager.addEventListener('keypress', this.goPage);
+	// colmap = {};
   },
 
 }
@@ -156,7 +237,7 @@
 	}
 
 	td {
-		padding-left: 3em;
+		/*padding-left: 1em;*/
 		border: solid;
 		border-width: 1px;
 		border-color: #afa;

@@ -7,7 +7,7 @@
 		<h4 class='current-func' v-if='txt.title'>{{txt.title}}</h4>
 		<div class='lay-block'>
 			<div>{{wf.name}} - {{task.name}}</div>
-			<semantable id='list' :heads='colHeads'>
+			<semantable id='list' :heads='colHeads' :options='{single: true}' :debug='true'/>
 		</div>
 		<slot name='details'>
 			<h1>Task Details {{txt.title}}</h1>
@@ -24,15 +24,21 @@
   Vue.component('semantable', Semantable);
 
   const colHeads = [
-	  {col: 'instId', hidden: true, },
-	  {col: 'sort', txt: 'zh:SORT'},
-	  {col: 'nodeName', txt: 'zh:N-NAME'},
-	  {col: 'nodeId', txt: 'zh:N-NAME'},
+	  {expr: 'instId', visible: false,},
+	  {expr: 'checked', check: true, text: '',},
+	  {expr: 'sort', text: 'zh:SORT', cellStyle: 'color:red',},
+	  {expr: 'nodeName', text: 'zh:N-NAME', cellStyle: 'text-align: center',},
+	  {expr: 'nodeId', visible: false,},
+	  {expr: 'taskId', visible: false,},
+	  {expr: 'handleTxt', text: 'zh:HANDLE TXT',},
+	  {expr: 'descpt', text: 'zh:DES'},
+	  {expr: 'oper', text: 'zh:OPER',},
+	  {expr: 'opertime', text: 'zh:DATE',},
   ];
 
   export default {
 	name: 'VCheapFlow',
-	props: ['J', 'vargs',],
+	props: ['J', 'vargs', 'debug'],
 	data() {
 		return {
 			colHeads: colHeads,
@@ -78,7 +84,7 @@
 
   function loadFlow(jclient, args) {
 	var req = new CheapReq()
-		.loadFlow(args.wfId, args.tskId);
+		.loadFlow(args.wfId, args.taskId);
 
 	var t = chpEnumReq.load;
 	var act = { func: 'cheap',
