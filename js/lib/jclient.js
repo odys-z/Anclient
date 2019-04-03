@@ -108,7 +108,7 @@ class J {
 					else {
 						console.error("Accessing server failed.");
 						console.error("Url: " + url);
-						console.error("respons:");
+						console.error("ajax error:");
 						console.error(resp);
 					}
 				}

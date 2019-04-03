@@ -60,6 +60,7 @@
 	  // args are explained by views (Semantics only understood by business)
 	  // wfId and taskId are for testing, shouldn't handled by home.vue
 	  // - cheap-tskform.vue need it to load a form.
+	  // In a crud senario, it should be used to communicate between main lists and popping forms.
 	  args: {wfId: 't01', taskId: '000001'},
   };
 

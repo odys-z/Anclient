@@ -3,12 +3,18 @@
  -->
 <template>
 	 <div>
-		<h4 class='current-func'>ROLES: {{title}}</h4>
+		<h4 class='current-func'>ROLES v0.1: {{title}}</h4>
 		<modalog ref='role-details'>
-			<role-info slot='modal-form'/>
+			<div slot='modal-form'>
+				<p style='color:blue'>Dialog 1</p>
+				<p style='color:blue'>Poppings</p>
+			</div>
 		</modalog>
 		<modalog ref='another-dialog'>
-			<another-info slot='modal-form'/>
+			<div slot='modal-form'>
+				<p style='color:cyan'>Dialog 2</p>
+				<p style='color:cyan'>Poppings</p>
+			</div>
 		</modalog>
 		<listoolbar>
 			<div slot='tools'>Condition Controls Goes Here
@@ -35,7 +41,7 @@
   // Application Beans
   Vue.component('role-info', RoleForm);
 
-  const antForm = { template: '<div><h1>Another Details</h1><p>Another content ...</p></div>' }
+  const antForm = { template: '<div><h1>Dialog 2</h1><p>Another content ...</p><slot name="modal-form">x</slot></div>' }
   Vue.component('another-info', antForm);
 
   export default {

@@ -11,7 +11,7 @@
   // import SidebarMenu from './menu/sidebarMenu.vue'
 
   //  way of vuent: https://vuentjs.org/
-  export {default as Combobox} from './widgets/combobox.vue'
+  export {default as Combobox}  from './widgets/combobox.vue'
   export {default as Canlendar} from './widgets/calendar.vue'
 
   export {default as Listoolbar} from './mixins/listoolbar.vue'

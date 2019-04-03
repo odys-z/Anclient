@@ -1,6 +1,8 @@
 <template>
   <div >
+	<!--
 	<button type="button" v-if="debug" @click="pop">modal dialog</button>
+	-->
 	<transition name="modal" >
 	    <div class="modal-mask" id='modal' v-if="showing" :bus="bus">
 	      <div class="modal-wrapper">
@@ -42,7 +44,7 @@ export default {
   name: 'VList',
   data () {
     return {
-		debug: false,
+		// debug: false,
 		showing: false,
 		bus: new Vue(),
 		text: {
@@ -56,12 +58,16 @@ export default {
 	}
   },
   methods: {
-	pop: function () {
+	pop: function (text) {
+		if (text !== undefined)
+			this.text = text;
 		this.showing = true;
 	},
+	
 	onOk: function () {
 		this.onClose('ok');
 	},
+
 	onClose: function (code) {
 		console.log(code);
 		this.showing = false;
