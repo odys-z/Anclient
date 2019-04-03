@@ -11,7 +11,7 @@
 
 <script>
   export default {
-	props: ['options', debug],
+	props: ['options', 'debug'],
 	data: {
 		selected: 'A',
 		options: [

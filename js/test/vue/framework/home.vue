@@ -24,11 +24,13 @@
 
   import {_J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
   import {SidebarMenu} from '../../../dist/jvue-SNAPSHOT.min.js'
+  import {Samport} from './Samport.js'
 
   import Params from '../beans/sys/params.vue'
   import UserInfo from '../beans/sys/user-infos.vue'
   import Logout from '../beans/sys/logout.vue'
   import Roles from '../beans/sys/roles.vue'
+  import CheapList from '../beans/cheapflow/cheap-tasks.vue'
   import CheapForm from '../beans/cheapflow/cheap-taskform.vue'
 
   Vue.use(VueRouter)
@@ -43,55 +45,56 @@
 
   Vue.component('sidebar-menu', SidebarMenu);
 
-  /**See jclient.java/io.odysz.jsample.protocol.Samport */
-  var Samport = {
-	/** see semantic.jserv/io.odysz.jsample.SysMenu */
-	menu: "menu.sample",
-	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
-	cheapflow: "cheapflow.sample"
-  }
+  // /**See jclient.java/io.odysz.jsample.protocol.Samport */
+  // var Samport = {
+	// /** see semantic.jserv/io.odysz.jsample.SysMenu */
+	// menu: "menu.sample",
+	// /** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
+	// cheapflow: "cheapflow.sample"
+  // }
 
   // Now JMessage can handle user defined ports, e.g. servlet "menu.sample"
   _J.understandPorts(Samport);
 
+  const tempV4flowArgs = {wfId: 't01', taskId: '000001', port: Samport.cheapflow};
+
   var vframe = {
 	  jclient: null,	// will be initialized once logged in.
-	  ports: Samport,
+	  // ports: Samport,
 	  // args are explained by views (Semantics only understood by business)
 	  // wfId and taskId are for testing, shouldn't handled by home.vue
 	  // - cheap-tskform.vue need it to load a form.
 	  // In a crud senario, it should be used to communicate between main lists and popping forms.
-	  args: {wfId: 't01', taskId: '000001'},
+	  args: tempV4flowArgs,
   };
 
   const router = new VueRouter({
 	routes: [
 	{ path: '/',
 	  name: 'Dashboard',
-	  component: Dashboard,
-	},
+	  component: Dashboard, },
 	{ path: '/logout',
 	  name: 'Logout',
-	  component: Logout,
-	},
+	  component: Logout, },
 	{ path: '/taskflow',
 	  name: 'cheapflow',
 	  component: CheapForm,
 	  // J, vargs are the contract between home and CRUD components. The know these.
-	  props: {J: _J, vargs: vframe, debug: true},
-	},
+	  props: {J: _J, vargs: vframe, debug: true}, },
 	{ path: '/sys/params',
 	  name: 'System Params',
-	  component: Params,
-	},
+	  component: Params, },
 	{ path: '/user-info',
 	  name: 'Personal Info',
-	  component: UserInfo,
-	},
+	  component: UserInfo, },
 	{ path: '/sys/roles',
 	  name: 'Roles',
-	  component: Roles,
-	}]
+	  component: Roles, },
+	{ path: '/tasks',
+	  name: 'Tasks',
+	  component: CheapList,
+	  props: {J: _J, vargs: vframe, debug: true}, },
+	]
   })
 
   /**Static data for testing. Not used after loaded */

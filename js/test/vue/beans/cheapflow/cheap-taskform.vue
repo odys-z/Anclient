@@ -72,7 +72,7 @@
 		_J = this.J;
 		_client = this.vargs.jclient;
 		_args = this.vargs.args;
-		_ports = this.vargs.ports;
+		_port = this.vargs.port;
 		loadFlow(_client, _args);
 	}
   }
@@ -80,7 +80,7 @@
   var _J;
   var _client;
   var _args;
-  var _ports;
+  var _port;
 
   function loadFlow(jclient, args) {
 	var req = new CheapReq()
@@ -91,7 +91,7 @@
 				cmd: 'load',
 				cate: t,
 				remarks: 'test loading flow'};
-	var jmsg = jclient.userReq(null, t, _ports.cheapflow, act, req);
+	var jmsg = jclient.userReq(null, t, _port, act, req);
 	jclient.commit(jmsg, function(resp) {
 		console.log(resp);
 	 	var semantbl = new Vue(Object.assign({}, Semantable, { el: "#list" }));

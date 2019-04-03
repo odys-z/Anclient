@@ -44,6 +44,10 @@ class J {
 		Object.assign(Protocol.Port, newPorts);
 	}
 
+	port(name) {
+		return Protocol.Port[name];
+	}
+
 	login (usrId, pswd, onLogin, onError) {
 		// byte[] iv =   AESHelper.getRandom();
 		// String iv64 = AESHelper.encode64(iv);
