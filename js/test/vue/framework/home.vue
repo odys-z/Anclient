@@ -59,13 +59,16 @@
   const tempV4flowArgs = {wfId: 't01', taskId: '000001', port: Samport.cheapflow};
 
   var vframe = {
-	  jclient: null,	// will be initialized once logged in.
-	  // ports: Samport,
-	  // args are explained by views (Semantics only understood by business)
-	  // wfId and taskId are for testing, shouldn't handled by home.vue
-	  // - cheap-tskform.vue need it to load a form.
-	  // In a crud senario, it should be used to communicate between main lists and popping forms.
-	  args: tempV4flowArgs,
+	port: Samport.cheapflow, // bug: port can only know to beans. Living here because cheap-taskform.vue is routed in menu.
+	J: _J,
+	jclient: null,	// will be initialized once logged in.
+	// ports: Samport,
+	// args are explained by views (Semantics only understood by business)
+	// wfId and taskId are for testing, shouldn't handled by home.vue
+	// - cheap-tskform.vue need it to load a form.
+	// In a crud senario, it should be used to communicate between main lists and popping forms.
+	args: tempV4flowArgs,
+	debug: true
   };
 
   const router = new VueRouter({
@@ -80,7 +83,7 @@
 	  name: 'cheapflow',
 	  component: CheapForm,
 	  // J, vargs are the contract between home and CRUD components. The know these.
-	  props: {J: _J, vargs: vframe, debug: true}, },
+	  props: {vargs: vframe}, },
 	{ path: '/sys/params',
 	  name: 'System Params',
 	  component: Params, },
@@ -93,7 +96,7 @@
 	{ path: '/tasks',
 	  name: 'Tasks',
 	  component: CheapList,
-	  props: {J: _J, vargs: vframe, debug: true}, },
+	  props: {vargs: vframe}, },
 	]
   })
 

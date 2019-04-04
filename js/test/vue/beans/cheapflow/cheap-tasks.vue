@@ -4,7 +4,7 @@
 <template>
 	 <div>
 		<h4 class='current-func'>{{title}}</h4>
-		<modalog ref='flow-details' :dlg-style='flowstyle'>
+		<modalog ref='flow-details' :dlg-style='flowstyle' v-on:dlg-evt='onDlgEvent'>
 			<flow-form slot='modal-form' :vargs='crud'/>
 		</modalog>
 		<listoolbar>
@@ -51,7 +51,7 @@
 
   export default {
 	name: 'VRoles',
-	props: ['J', 'vargs', 'debug'],
+	props: ['vargs',],
 	data() {
 		return {
 			title: '',
@@ -73,18 +73,29 @@
 		},
 		onEdit: function(ref) {
 			console.log('VTasks.onEdit()');
-			// this.dlgStyle = rolestyle;
 			this.$refs[ref].pop(this.currentRole);
 		},
+		onDlgEvent: function(s) {
+			console.log('---- on event ---- ' + s.evt);
+			console.log(s);
+		}
+	},
+	on: {
+		dlgLoaded: function(style) {
+			console.log('dlgLoaded style:');
+			console.log(style);
+		},
+		dlgClosed: function(code, args) {
+		}
 	},
 	mounted() {
 		console.log('VTasks.mounted()');
-		this.crud.J = this.J;
+		this.crud.J = this.vargs.J;
 		console.log(this.vargs.jclient);
 		this.crud.jclient = this.vargs.jclient;
 		_.merge(this.crud.args, this.vargs.args);
 		console.log(this.crud.args);
-		this.crud.port = this.J.port('cheapflow');
+		this.crud.port = this.crud.J.port('cheapflow');
 	}
   }
 </script>

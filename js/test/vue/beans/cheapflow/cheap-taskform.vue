@@ -7,7 +7,7 @@
 		<h4 class='current-func' v-if='txt.title'>{{txt.title}}</h4>
 		<div class='lay-block'>
 			<div>{{wf.name}} - {{task.name}}</div>
-			<semantable id='list' :heads='colHeads' :options='{single: true}' :debug='true'/>
+			<semantable id='list' :th='th' :options='{single: true}' :debug='true'/>
 		</div>
 		<slot name='details'>
 			<h1>Task Details {{txt.title}}</h1>
@@ -23,7 +23,7 @@
 
   Vue.component('semantable', Semantable);
 
-  const colHeads = [
+  const th = [
 	  {expr: 'instId', visible: false,},
 	  {expr: 'checked', check: true, text: '',},
 	  {expr: 'sort', text: 'zh:SORT', cellStyle: 'color:red',},
@@ -38,10 +38,10 @@
 
   export default {
 	name: 'VCheapFlow',
-	props: ['J', 'vargs', 'debug'],
+	props: ['vargs'],
 	data() {
 		return {
-			colHeads: colHeads,
+			th: th,
 			wf: {
 				name: 'wf-name',
 			},
@@ -68,8 +68,9 @@
 	},
 	mounted() {
 		console.log('VCheap.mounted()');
-		// console.log(this.J);
-		_J = this.J;
+		console.log(this.vargs.J);
+		_J = this.vargs.J;
+		_debug = this.vargs.debug;
 		_client = this.vargs.jclient;
 		_args = this.vargs.args;
 		_port = this.vargs.port;
@@ -81,6 +82,7 @@
   var _client;
   var _args;
   var _port;
+  var _debug;
 
   function loadFlow(jclient, args) {
 	var req = new CheapReq()
@@ -92,14 +94,14 @@
 				cate: t,
 				remarks: 'test loading flow'};
 	var jmsg = jclient.userReq(null, t, _port, act, req);
-	jclient.commit(jmsg, function(resp) {
+	jclient.commit(jmsg, function(resp, J) {
 		console.log(resp);
 	 	var semantbl = new Vue(Object.assign({}, Semantable, { el: "#list" }));
 
 		// semantbl.bind(resp.rs[0][0], resp.rs[0].slice(1));
 		var ths = _J.respCols(resp);
 		var trs = _J.respRows(resp);
-		semantbl.bind(ths, trs, colHeads);
+		semantbl.bind(ths, trs, th);
 	});
   }
 

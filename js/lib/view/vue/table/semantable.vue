@@ -1,5 +1,8 @@
 <template ref='semantbl'>
+	<!--
   <div class="col-md-12" ref='semantbl'>
+	-->
+  <div ref='semantbl'>
     <div class="table-responsive">
       <table class="table table-striped table-bordered" style="width:100%">
           <thead width="100%">
@@ -40,13 +43,23 @@
 
   export default {
 	name: 'Semantable',
-	props: ['heads', 'options', 'debug'],	// options: {select: single}
+	props: ['th', 'options', 'debug'],	// options: {select: single}
 	// component's data must be a function
 	// https://stackoverflow.com/questions/42396867/how-to-get-data-to-work-when-used-within-a-component-and-axios?rq=1
 	// https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function
 	data: () => ({
 	  columns: ['A', 'B', 'C'],
 	  rows: [
+		['cell-01', 'cell-02', 'cell-03'],
+		['cell-11', 'cell-12', 'cell-13'],
+		['cell-01', 'cell-02', 'cell-03'],
+		['cell-11', 'cell-12', 'cell-13'],
+		['cell-01', 'cell-02', 'cell-03'],
+		['cell-11', 'cell-12', 'cell-13'],
+		['cell-01', 'cell-02', 'cell-03'],
+		['cell-11', 'cell-12', 'cell-13'],
+		['cell-01', 'cell-02', 'cell-03'],
+		['cell-11', 'cell-12', 'cell-13'],
 		['cell-01', 'cell-02', 'cell-03'],
 		['cell-11', 'cell-12', 'cell-13'],
 	  ],
@@ -59,9 +72,9 @@
 	  /** get column header. TODO support style */
 	  head: function (hd) {
 		if (colmap[hd] === undefined || colmap[hd][1] === undefined
-			|| this.heads === undefined)
+			|| this.th === undefined)
 			return hd;
-		var opt = this.heads[colmap[hd][1]];
+		var opt = this.th[colmap[hd][1]];
 		if (opt === undefined || opt.text === undefined)
 			return hd;
 		return opt.text;
@@ -76,7 +89,7 @@
 				console.log("head: " + hd + ", rix=" + rix + ", cix=" + cix +
 					", colmap[hd]: " + colmap[hd] + ", rows[rix][colmap[hd][0]]: " + this.rows[rix][colmap[hd][0]]);
 
-			var opt = this.heads[colmap[hd][1]];
+			var opt = this.th[colmap[hd][1]];
 			if (opt != undefined) {
 				// support style
 				var styl = opt.cellStyle === undefined ? '' : opt.cellStyle;
@@ -95,9 +108,9 @@
 	  isVisible: function (hd) {
 		if (colmap[hd] === undefined || colmap[hd][1] === undefined)
 			return true;
-		if (this.heads === undefined)
+		if (this.th === undefined)
 			return true;
-		var v = this.heads[colmap[hd][1]];
+		var v = this.th[colmap[hd][1]];
 		if (v === undefined || v.visible === undefined)
 			return true;
 		return v.visible;
@@ -111,7 +124,7 @@
 	   * If this parameter is missing, all columns will be shown.*/
 	  bind: function (columns, rows, heads) {
 		if (typeof heads === 'object' && heads.length !== undefined) {
-			this.heads = heads;
+			this.th = heads;
 			// organize cols and rows according to heads
 			// 1. new-cols holding defined heads
 			var newCols = new Array(heads.length);

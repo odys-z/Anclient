@@ -4,8 +4,8 @@
 	<button type="button" v-if="debug" @click="pop">modal dialog</button>
 	-->
 	<transition name="modal" >
-	    <div class="modal-mask" id='modal' v-if="showing" :bus="bus">
-	      <div class="modal-wrapper">
+	    <div class="modal-mask" id='modal' v-if="showing" >
+	      <div class="modal-wrapper" ref="modalWrapper">
 	        <div class="modal-container">
 
 	          <div class="modal-header">
@@ -49,18 +49,18 @@ export default {
   data () {
     return {
 		showing: false,
-		bus: new Vue(),
+		// bus: new Vue(),
 		jstyle: {
 			ok: {text: '[OK]'},
 			footer: {visible: true},
 		},
 	}
   },
-  on: {
-	close: function() {
-		this.showing = false;
-	}
-  },
+  // on: {
+	// close: function() {
+	// 	this.showing = false;
+	// }
+  // },
   methods: {
 	pop: function (record) {
 		if (this.dlgStyle !== undefined) {
@@ -68,6 +68,12 @@ export default {
 			_.merge(this.jstyle, this.dlgStyle);
 		}
 		this.showing = true;
+
+		this.$nextTick(function() {
+			this.$emit('dlg-evt',
+						{evt: 'shown',
+						 args: {height: this.$refs.modalWrapper.clientHeight}});
+		});
 	},
 
 	onOk: function () {
@@ -77,10 +83,21 @@ export default {
 	onClose: function (code) {
 		console.log(code);
 		this.showing = false;
-		this.bus.$emit('onClose', code);
+		// this.bus.$emit('dlgClosed', code);
+		this.$emit('dlg-evt',
+				{evt: 'close',
+				 args: {result: code},
+			 	});
 	}
   },
   mounted() {
+	console.log('emitting ...');
+	var w = this.$refs.modalWrapper;
+	w = w ? w.clientHeight : 0;
+	this.$emit('dlg-evt',
+				{evt: 'mounted',
+				 args: {height: w},
+			 	});
   }
 }
 
