@@ -23,7 +23,7 @@
   import VueRouter from 'vue-router';
 
   import {_J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
-  import {SidebarMenu} from '../../../dist/jvue-SNAPSHOT.min.js'
+  import {SidebarMenu, FileUpload} from '../../../dist/jvue-SNAPSHOT.min.js'
   import {Samport} from './Samport.js'
 
   import Params from '../beans/sys/params.vue'
@@ -41,17 +41,11 @@
   Vue.use(UserInfo)
   Vue.use(CheapForm)
 
-  const Dashboard = { template: '<div>Dashboard Page</div>' }
-
   Vue.component('sidebar-menu', SidebarMenu);
+  Vue.component('file-upload', FileUpload);
 
-  // /**See jclient.java/io.odysz.jsample.protocol.Samport */
-  // var Samport = {
-	// /** see semantic.jserv/io.odysz.jsample.SysMenu */
-	// menu: "menu.sample",
-	// /** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
-	// cheapflow: "cheapflow.sample"
-  // }
+  const Dashboard = { template: '<div>Dashboard Page</div>' }
+  const TestUpload = { template: '<div>Test File Upload Page<file-upload/></div>' }
 
   // Now JMessage can handle user defined ports, e.g. servlet "menu.sample"
   _J.understandPorts(Samport);

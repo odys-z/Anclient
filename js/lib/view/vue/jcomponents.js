@@ -13,6 +13,7 @@
   //  way of vuent: https://vuentjs.org/
   export {default as Combobox}  from './widgets/combobox.vue'
   export {default as Canlendar} from './widgets/calendar.vue'
+  export {default as FileUpload} from './widgets/fileupload.vue'
 
   export {default as Listoolbar} from './mixins/listoolbar.vue'
   export {default as Modalog} from './dialogs/modal-dialog.vue'
