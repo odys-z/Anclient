@@ -122,6 +122,7 @@
 	<style>
 		.progress {
 		    height: 100px;
+			position: relative;
 		}
 
 		.progress > svg {
@@ -143,8 +144,8 @@
 	  <li></li><li></li><li></li><li></li>
 	</ul>
 
-	<div class="progress" id="progress"><p>txt</p></div>
-	<script src="progressbar.js"></script>
+	<div class="progress" id="progress"></div>
+	<script src="progressbar.min.js"></script>
 	<script >
 		window.onload = function onLoad() {
 			var c = new ProgressBar.Circle('#progress', {
@@ -152,6 +153,9 @@
 				duration: 3000,
 	    		easing: 'easeInOut',
 				text: { value: 'A',
+						style: {
+							// fontFamily: '"Raleway", Helvetica, sans-serif'
+						},
 						autoStyleContainer: false },
 				step: function(state, circle) {
 					// circle.path.setAttribute('stroke', state.color);
