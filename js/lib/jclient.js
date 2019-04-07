@@ -252,6 +252,10 @@ class SessionClient {
 			}
 		});
 	}
+
+	upload (filename, fileDescpt) {
+
+	}
 }
 
 /**Client without session information.
