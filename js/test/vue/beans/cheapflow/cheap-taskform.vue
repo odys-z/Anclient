@@ -7,7 +7,7 @@
 		<h4 class='current-func' v-if='txt.title'>{{txt.title}}</h4>
 		<div class='lay-block'>
 			<div>{{wf.name}} - {{task.name}}</div>
-			<semantable id='list' :th='th' :options='{single: true}' :debug='true'/>
+			<semantable id='list' :th='th' :options='{single: true}' :jstyle='{jh: "113px"}' :debug='true'/>
 		</div>
 		<slot name='details'>
 			<h1>Task Details {{txt.title}}</h1>
@@ -134,4 +134,8 @@
 	overflow: auto;
 	/* height: 600px; */
   }
+/*
+  #list {
+	  height: 300px;
+  } */
 </style>

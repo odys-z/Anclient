@@ -1,9 +1,12 @@
-<template ref='semantbl'>
+<template >
 	<!--
   <div class="col-md-12" ref='semantbl'>
 	-->
   <div ref='semantbl'>
-    <div class="table-responsive">
+	  <!--
+    <div class="table-responsive" :style="{height: jstyle.jh}" >
+		-->
+    <div >
       <table class="table table-striped table-bordered" style="width:100%">
           <thead width="100%">
               <tr>
@@ -12,17 +15,19 @@
 				</th>
               </tr>
           </thead>
-          <tbody>
-              <tr v-for="(row, rix) in rows" :key="rix">
-				<!--
-                <td v-for="(hd, cix) in columns" v-if="isVisible(hd)">{{cell(hd, rix, cix)}}</td>
-				-->
-                <td v-for="(hd, cix) in columns" v-if="isVisible(hd)" v-html='cell(hd, rix, cix)'></td>
-              </tr>
-          </tbody>
+		  <div style="overflow:auto; display:block" :style="{height: jstyle.jh}" >
+			<tbody  >
+				<tr v-for="(row, rix) in rows" :key="rix">
+					<!--
+					<td v-for="(hd, cix) in columns" v-if="isVisible(hd)">{{cell(hd, rix, cix)}}</td>
+					-->
+					<td v-for="(hd, cix) in columns" v-if="isVisible(hd)" v-html='cell(hd, rix, cix)'></td>
+				</tr>
+			</tbody>
+	  	</div>
       </table>
     </div>
-	<span style='white-space: nowrap; display: flex; align-items: center;'>
+	<span style='white-space: nowrap; display: flex; align-items: center; position: fixed;'>
 	    <button @click="prevPage" class="float-left btn btn-outline-info btn-sm">|&lt;</button>
 	    <button @click="prevPage" class="float-left btn btn-outline-info btn-sm">Previous</button>
 		<input ref='pager' type='text' pattern= '[+-]?[0-9]+' placeholder="Page 0" size="2" :value="currentPage"
@@ -43,7 +48,7 @@
 
   export default {
 	name: 'Semantable',
-	props: ['th', 'options', 'debug'],	// options: {select: single}
+	props: ['th', 'options', 'jstyle', 'debug'],	// options: {select: single}
 	// component's data must be a function
 	// https://stackoverflow.com/questions/42396867/how-to-get-data-to-work-when-used-within-a-component-and-axios?rq=1
 	// https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function
