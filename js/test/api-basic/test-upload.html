@@ -129,6 +129,13 @@
 		    height: 100%;
 		    display: block;
 		}
+
+		.progress__label {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+		}
 	</style>
 </head>
 <body>
@@ -145,36 +152,40 @@
 	</ul>
 
 	<div class="progress" id="progress"></div>
-	<script src="progressbar.min.js"></script>
+	<script src="progressbar.js"></script>
 	<script >
-		window.onload = function onLoad() {
-			var c = new ProgressBar.Circle('#progress', {
-				color: '#FCB03C',
+		window.onload = createThrobber('#progress');
+		function createThrobber(dom) {
+			// var c = new ProgressBar.Circle('#progress', {
+			var c = new ProgressBar.Circle(dom, {
+				color: '#7CB03C',
+				strokeWidth: 5.1,
+				trailColor: '#f4f4f4',
 				duration: 3000,
 	    		easing: 'easeInOut',
 				text: { value: 'A',
+						className: 'progress__label',
 						style: {
 							// fontFamily: '"Raleway", Helvetica, sans-serif'
 						},
 						autoStyleContainer: false },
 				step: function(state, circle) {
 					// circle.path.setAttribute('stroke', state.color);
-					// circle.path.setAttribute('stroke-width', state.width);
-					// var value = Math.round(circle.value() * 100);
-					console.log(circle.value());
+					circle.path.setAttribute('stroke-width', 5);
+					var value = Math.round(circle.value() * 100);
+					if (value === 100) {
+						circle.path.setAttribute('stroke', '#0f0');
+						circle.text.style.color = '#0f0';
+					}
+
 					if (circle.value() === 0)
-					  // circle.setText('');
-					  circle.text = '0';
+					  circle.setText('');
 					else
-					  // circle.setText(circle.value);
-					  circle.text = 'B';
+					  circle.setText(value);
 				}
 			}) ;
-
-			// c.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
-			// c.text.style.fontSize = '2rem';
-
-			c.animate(1);
+			c.animate(0.1);
+			return c;
 		};
 	</script>
 
@@ -203,6 +214,11 @@
 	    for (let i = 0; i < files.length; i++) {
 	      const li = document.createElement("li");
 	      list.appendChild(li);
+
+		  const thrb = document.createElement('div');
+		  thrb.classList.add('progress');
+		  thrb.id = 'file-img-' + i;
+		  li.appendChild(thrb);
 
 	      const img = document.createElement("img");
 	      img.src = window.URL.createObjectURL(files[i]);
@@ -240,29 +256,40 @@
 	  const imgs = document.querySelectorAll(".obj");
 
 	  for (let i = 0; i < imgs.length; i++) {
-	    new FileUpload(imgs[i], imgs[i].file);
+	    new FileUpload(imgs[i], '#' + 'file-img-' + i, imgs[i].file);
 	  }
 	}
 
-	function FileUpload(img, file) {
+	function FileUpload(img, pid, file) {
 	  const reader = new FileReader();
-	  this.ctrl = createThrobber(img);
+	  this.ctrl = createThrobber(pid);
 	  const xhr = new XMLHttpRequest();
 	  this.xhr = xhr;
 
 	  const self = this;
 	  this.xhr.upload.addEventListener("progress", function(e) {
 	        if (e.lengthComputable) {
-	          const percentage = Math.round((e.loaded * 100) / e.total);
-	          self.ctrl.update(percentage);
+	          // const percentage = Math.round((e.loaded * 100) / e.total);
+	          // self.ctrl.update(percentage);
+	          const percentage = Math.round(e.loaded / e.total);
+			  self.ctrl.animate(percentage);
 	        }
 	      }, false);
 
 	  xhr.upload.addEventListener("load", function(e){
-	          self.ctrl.update(100);
+	          // self.ctrl.update(100);
+	          self.ctrl.animate(1);
 	          const canvas = self.ctrl.ctx.canvas;
 	          canvas.parentNode.removeChild(canvas);
 	      }, false);
+
+		// TODO add error listener here
+		// TODO add error listener here
+		// TODO add error listener here
+		// TODO add error listener here
+		// TODO add error listener here
+		// TODO add error listener here
+
 	  xhr.open("POST", "http://demos.hacks.mozilla.org/paul/demos/resources/webservices/devnull.php");
 	  xhr.overrideMimeType('text/plain; charset=x-user-defined-binary');
 	  reader.onload = function(evt) {
