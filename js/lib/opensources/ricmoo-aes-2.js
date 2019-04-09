@@ -2,10 +2,6 @@
 
 export default
 function (root) {
-// 	console.log('AAAAAAAAAA');
-// };
-//
-// function AES(root) {
 
     function checkInt(value) {
         return (parseInt(value) === value);

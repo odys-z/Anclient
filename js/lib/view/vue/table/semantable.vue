@@ -40,7 +40,6 @@
 </template>
 
 <script>
-/*eslint-disable*/
   import $ from 'jquery';
 
   /**[column-ix (for retrieve data), heads-ix (for find header text)] */

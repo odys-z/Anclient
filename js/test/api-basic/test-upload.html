@@ -139,19 +139,23 @@
 	</style>
 </head>
 <body>
-	<input type="file" id="fileElem" multiple accept="image/*" style="display:none" onchange="handleFiles(this.files)">
-	<a href="#" id="fileSelect">Select some files</a>
-	<div id="fileList">
-	  <p>No files selected!</p>
-	</div>
-	<input type="button" onclick="sendFiles()" value="upload">
+	<form id='form'>
+		<input type="file" id="fileElem" multiple accept="image/*" style="display:none" onchange="handleFiles(this.files)">
+		<a href="#" id="fileSelect">Select some files</a>
+		<div id="fileList">
+		  <p>No files selected!</p>
+		</div>
+		<input type="button" onclick="sendFiles()" value="upload">
+		<input type="button" onclick="sendFilesFormData()" value="upload form data">
 
-	<ul class="loader small">
-	  <li></li><li></li><li></li><li></li>
-	  <li></li><li></li><li></li><li></li>
-	</ul>
+		<ul class="loader small">
+		  <li></li><li></li><li></li><li></li>
+		  <li></li><li></li><li></li><li></li>
+		</ul>
 
-	<div class="progress" id="progress"></div>
+		<div class="progress" id="progress"></div>
+	</from>
+
 	<script src="progressbar.js"></script>
 	<script >
 		window.onload = createThrobber('#progress');
@@ -254,12 +258,12 @@
 
 	function sendFiles() {
 	  const imgs = document.querySelectorAll(".obj");
-
 	  for (let i = 0; i < imgs.length; i++) {
 	    new FileUpload(imgs[i], '#' + 'file-img-' + i, imgs[i].file);
 	  }
 	}
 
+	/** none stream mode */
 	function FileUpload(img, pid, file) {
 	  const reader = new FileReader();
 	  this.ctrl = createThrobber(pid);
@@ -277,42 +281,100 @@
 	      }, false);
 
 	  xhr.upload.addEventListener("load", function(e){
+		  // self.ctrl.update(100);
+		  // const canvas = self.ctrl.ctx.canvas;
+		  // canvas.parentNode.removeChild(canvas);
+		  console.log(e);
+		  self.ctrl.animate(1);
+	  }, false);
+
+	  xhr.upload.addEventListener("error", function(e){
 	          // self.ctrl.update(100);
-	          self.ctrl.animate(1);
-	          const canvas = self.ctrl.ctx.canvas;
-	          canvas.parentNode.removeChild(canvas);
+	          // const canvas = self.ctrl.ctx.canvas;
+	          // canvas.parentNode.removeChild(canvas);
+
+	          // self.ctrl.animate(0, {},
+				// self.ctrl.setText('error'));
+			self.ctrl.setText('error');
 	      }, false);
 
-		// TODO add error listener here
-		// TODO add error listener here
-		// TODO add error listener here
-		// TODO add error listener here
-		// TODO add error listener here
-		// TODO add error listener here
-
-	  xhr.open("POST", "http://demos.hacks.mozilla.org/paul/demos/resources/webservices/devnull.php");
-	  xhr.overrideMimeType('text/plain; charset=x-user-defined-binary');
+	  xhr.open('POST', 'http://localhost:8080/semantic.jserv/file.serv?t=upload&file=' +
+	  	file.name + '&b64=true');
+	  // xhr.overrideMimeType('text/plain; charset=x-user-defined-binary');
+	  xhr.overrideMimeType('text/plain; charset=utf-8');
 	  reader.onload = function(evt) {
-	    xhr.send(evt.target.result);
+	    // xhr.send(evt.target.result);
+		// var a = btoa(String.fromCharCode.apply(null, evt.target.result));
+		// var a = btoa(evt.target.result);
+		var b = new Uint8Array(evt.target.result);
+		// console.log(b);
+		// var a = btoa(b);
+		var a = btoa(String.fromCharCode.apply(null, b));
+		// console.log(a);
+		// console.log(atob(a));
+	    xhr.send(a);
 	  };
-	  reader.readAsBinaryString(file);
+	  // reader.readAsBinaryString(file);
+	  reader.readAsArrayBuffer(file);
+	  // reader.readAsText(file);
 	}
 
-	// function showThrobber () {
-	// 	if ($('throbber')) {
-	// 		$('throbber').innerHTML = '<span id="ajaxThrobber"><img ' +
-	// 			'src="http://sandbox.sourcelabs.com/staticimages/indicator.black.gif"/>' +
-	// 			'</span><iframe style="display:none;" src="/mfm/?throb=throb"></iframe>';
-	// 	}
-	// };
-	//
-	// showThrobber();
+	function sendFilesFormData() {
+	  const imgs = document.querySelectorAll(".obj");
+	  for (let i = 0; i < imgs.length; i++) {
+	    new FileUploadFormData(imgs[i], '#' + 'file-img-' + i, imgs[i].file);
+	  }
+	}
+	function FileUploadFormData(img, pid, file) {
+	  this.ctrl = createThrobber(pid);
 
-	// document.hideThrobber = function() {
-	//     if ($('throbber')) {
-	//         $('throbber').innerHTML = '';
-	//     }
-	// };
+	  const that = this;
+
+	  var formData = new FormData($('#form')[0]);
+	  formData.append("file", file, file.name);
+
+	  $.ajax({
+        type: "POST",
+        url: 'http://localhost:8080/semantic.jserv/file.serv?t=upload&file=' +
+	  			file.name,
+        xhr: function () {
+            var myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+                myXhr.upload.addEventListener('progress', progressHandling, false);
+            }
+            return myXhr;
+        },
+        success: function (data) {
+            // your callback here
+			console.log(data);
+        },
+        error: function (error) {
+            // handle error
+			console.log(error);
+        },
+        async: true,
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        timeout: 60000
+      });
+	}
+
+	function progressHandling (event) {
+	    var percent = 0;
+	    var position = event.loaded || event.position;
+	    var total = event.total;
+	    // var progress_bar_id = "#progress-wrp";
+	    if (event.lengthComputable) {
+	        percent = Math.ceil(position / total * 100);
+			console.log(percent);
+	    }
+	    // update progressbars classes so it fits your code
+	    // $(progress_bar_id + " .progress-bar").css("width", +percent + "%");
+	    // $(progress_bar_id + " .status").text(percent + "%");
+	};
+
 </script>
 </body>
 </html>

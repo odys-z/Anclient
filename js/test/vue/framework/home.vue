@@ -91,6 +91,10 @@
 	  name: 'Tasks',
 	  component: CheapList,
 	  props: {vargs: vframe}, },
+	{ path: '/upload',
+	  name: 'File Upload',
+	  component: FileUpload,
+	},
 	]
   })
 
