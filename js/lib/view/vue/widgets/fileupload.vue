@@ -17,11 +17,6 @@
 			placeholder="add local file" @change="handleFiles" style="display:none" >
 		<a href="#" id="fileSelect" @click="triggerFiels">Select some files</a>
 		<input type="button" value="upload" @click="upload"></input>
-
-		<!--
-		<input type="file" ref="fileElem" multiple accept="image/*" style="display:none">
-		<div id='progress' class='progress'></div>
-		-->
 	</div>
 </template>
 
