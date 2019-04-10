@@ -9,22 +9,24 @@
 				@click="remove(file.id);"
 				v-bind:title="tooltip">
 				<img :src="file.src" class="preview"></img>
-				<div style="width: 6em">{{file.info}}</div>
+				<div class="progress" :id="'up-' + file.id"/>
+				<div style="width: 6em; transform: translate(0, -60px);">{{file.info}}</div>
 			</li>
 		</ol>
 		<input type="file" ref="fileElem" multiple accept="image/*"
 			placeholder="add local file" @change="handleFiles" style="display:none" >
 		<a href="#" id="fileSelect" @click="triggerFiels">Select some files</a>
-		<input type="button" value="upload" ></input>
+		<input type="button" value="upload" @click="upload"></input>
 
 		<!--
 		<input type="file" ref="fileElem" multiple accept="image/*" style="display:none">
-		-->
 		<div id='progress' class='progress'></div>
+		-->
 	</div>
 </template>
 
 <script>
+  import $ from 'jquery'
   import * as ProgressBar from '../../../opensources/progressbar.js'
 
   // Vue.component('progress-circle', ProgressBar.circle);
@@ -34,19 +36,41 @@
 	props: ['options', 'debug'],
 	data: () => ({
 		tooltip: "click to remove the file",
-		files: [{name: 'n', id: '0', src: '', info: 'add file'}],
+		// 'http://localhost:8080/semantic.jserv/file.serv?t=upload&file=',
+		serv: 'http://localhost:8080/semantic.jserv/file.serv',
+		files: [],
+		file_seq: 0,
 	}),
 	methods: {
 		upload() {
+			for (let i = 0; i < this.files.length; i++) {
+				var f = this.files[i];
+				if (f.upload == true)
+					continue;
+				var progId = '#up-' + f.id;
+				f.upload = true;
+				this.fileUpload(progId, f.file, f);
+			}
 		},
 
 		remove(fileId) {
-			for (var ix = 0; ix < files.length; ix++) {
-				if (files[ix].id === fileId) {
-					files.remove(ix);
+			for (var ix = 0; ix < this.files.length; ix++) {
+				var finf = this.files[ix];
+				if (finf.id === fileId) {
+					// uploaded file can't been removed
+					if (!finf.upload)
+						this.files.splice(ix, 1);
 					break;
 				}
 			}
+
+			// var fileInfs = this.$refs.fileElem.files;
+			// for (var ix = 0; ix < fileInfs.length; ix++) {
+			// 	if (fileInfs[ix].id === fileId) {
+			// 		fileInfs.splice(ix, 1);
+			// 		break;
+			// 	}
+			// }
 		},
 
 		triggerFiels() {
@@ -57,49 +81,78 @@
 			console.log('handleFiles:');
 			var fileInfs = this.$refs.fileElem.files;
 			console.log(fileInfs);
-			console.log(this.$refs.fileElem);
-			if (!fileInfs.length) {
-				// fileList.innerHTML = "<p>No files selected!</p>";
-			}
-			else {
-				/*
-				fileList.innerHTML = "";
-				const list = document.createElement("ul");
-				fileList.appendChild(list);
-				for (let i = 0; i < files.length; i++) {
-					const li = document.createElement("li");
-					list.appendChild(li);
 
-					const thrb = document.createElement('div');
-					thrb.classList.add('progress');
-					thrb.id = 'file-img-' + i;
-					li.appendChild(thrb);
+			var reg = /\s+|\.+/gi
 
-					const img = document.createElement("img");
-					img.src = window.URL.createObjectURL(files[i]);
-					img.height = 60;
-					img.classList.add("obj");
-					img.file = files[i];
-					// img.onload = function() {
-					//   window.URL.revokeObjectURL(this.src);
-					// }
-					li.appendChild(img);
-					const info = document.createElement("span");
-					info.innerHTML = files[i].name + ": " + files[i].size + " bytes";
-					li.appendChild(info);
-				} */
-				this.files = [];
+			if (fileInfs !== undefined && fileInfs.length > 0) {
+				/* Design Memo:
+				 * You can modify this logic to remove already selected files by user.
+				 * Modifying the source, that's how opensource working.
+				 * this.files = [];
+				 */
 				for (let i = 0; i < fileInfs.length; i++) {
 					var f = fileInfs[i];
-					console.log('push:');
-					console.log(f);
-					this.files.push({ id: 'file-img-' + i,
+					// console.log('push:');
+					// console.log(f);
+					this.files.push({ id: this.file_seq++ + '-' + f.name.replace(reg, '_'),
 						filename: f.name,
-						info: f.name + ": " + f.size,
+						info: f.name + " [" + f.size + "]",
+						sise: f.size,
 					 	src: window.URL.createObjectURL(f),
+						upload: false,
 						file: f});
 				}
 			}
+		},
+
+		fileUpload(throbId, file, fileInf) {
+			const that = this;
+			var circle = this.createThrobber(throbId);
+
+			var formData = new FormData();
+			formData.append("file", file, file.name);
+
+			// 'http://localhost:8080/semantic.jserv/file.serv?t=upload&file='
+			// var servUrl = this.serv + '?t=upload&file=' + file.name;
+			var servUrl = this.serv + '?t=upload';
+			$.ajax({
+				type: "POST",
+				url: servUrl,
+				xhr: function () {
+					var myXhr = $.ajaxSettings.xhr();
+					if (myXhr.upload) {
+						// use event handlers for progressbar visuals
+					    myXhr.upload.addEventListener('progress', function(e) {
+										if (e.lengthComputable) {
+											const percentage = Math.round(e.loaded / e.total);
+											circle.animate(percentage);
+										}
+									}, false);
+					    myXhr.upload.addEventListener('load', function(e) {
+										circle.animate(1);
+									}, false);
+					    myXhr.upload.addEventListener('error', function(e) {
+										circle.animate(0);
+										circle.setText('error');
+									}, false);
+					}
+					return myXhr;
+				},
+				success: function (data) {
+					console.log(data);
+					file.Info = data.fileId;
+				},
+				error: function (error) {
+					console.log(error);
+					fileInf.upload = false;
+				},
+				async: true,
+				data: formData,
+				cache: false,
+				contentType: false,
+				processData: false,
+				timeout: 60000
+			});
 		},
 
 		createThrobber(domId) {
@@ -139,11 +192,11 @@
 		if (this.options !== undefined && this.options.tooltip !== undefined)
 			this.tooltip = this.options.tooltip;
 
-		this.createThrobber('#progress');
-
-		// this.files.push( {name: 'm', id: '1', src: '', info: 'add file ...'} );
+		// this.createThrobber('#progress');
 	}
   }
+
+
 </script>
 
 <style>
@@ -155,6 +208,7 @@
 	.progress {
 		height: 60px;
 		position: relative;
+		transform: translate(0, -60px);
 	}
 
 	.progress > svg {

@@ -256,6 +256,7 @@
 	//   }
 	// }
 
+	/**Deprecated */
 	function sendFiles() {
 	  const imgs = document.querySelectorAll(".obj");
 	  for (let i = 0; i < imgs.length; i++) {
@@ -263,7 +264,7 @@
 	  }
 	}
 
-	/** none stream mode */
+	/**Deprecated: none stream mode */
 	function FileUpload(img, pid, file) {
 	  const reader = new FileReader();
 	  this.ctrl = createThrobber(pid);
@@ -320,11 +321,12 @@
 	}
 
 	function sendFilesFormData() {
-	  const imgs = document.querySelectorAll(".obj");
-	  for (let i = 0; i < imgs.length; i++) {
-	    new FileUploadFormData(imgs[i], '#' + 'file-img-' + i, imgs[i].file);
-	  }
+		const imgs = document.querySelectorAll(".obj");
+		for (let i = 0; i < imgs.length; i++) {
+			new FileUploadFormData(imgs[i], '#' + 'file-img-' + i, imgs[i].file);
+		}
 	}
+
 	function FileUploadFormData(img, pid, file) {
 	  this.ctrl = createThrobber(pid);
 
@@ -345,11 +347,9 @@
             return myXhr;
         },
         success: function (data) {
-            // your callback here
 			console.log(data);
         },
         error: function (error) {
-            // handle error
 			console.log(error);
         },
         async: true,
