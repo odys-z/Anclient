@@ -13,7 +13,6 @@ const regex = {
 	join: /\s*([jJrRlL])\s*:\s*(\w+)(\s*:\s*(\w+)){0,1}\s+(.+)\s*/i,
 
 	/**Regex for replacing variable in joining's ON condition.<br>
-	 * <b>Note:</b>The regex is used by both formatTablJoins() and easyTree.configWithArgs()
 	 * [0] abc = {@ x.y} devi=ccd
 	 * [1] abc =
 	 * [2] x.y
@@ -215,5 +214,16 @@ const tag = new function {
 		else return v;
 	}
 
-
  }();
+
+/**Common handlers for easyui, like ir-t, ir-list etc.*/
+const easyTag = new function {
+}();
+
+/**Common handlers for easyui, like ir-t, ir-list etc.*/
+const easy = new function {
+}();
+
+/**Common handlers for easyui, like ir-t, ir-list etc.*/
+const easy = new function {
+}();
