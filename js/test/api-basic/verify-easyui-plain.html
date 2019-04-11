@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script type="text/javascript" src="../3rd-lib/jquery.easyui.min.js"></script>
+	<!--
+	<script type="text/javascript" src="../3rd-lib/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="../3rd-lib/ricmoo-aes.js"></script>
+	<script type="text/javascript" src="../../lib/aes.js"></script>
+	<script type="text/javascript" src="../../lib/protocol.js"></script>
+	 -->
+	<script type="text/javascript" src="../../dist/jclient-SNAPSHOT.min.js"></script>
+	<script type="text/javascript" src="../../lib/easyui/semantic-adapter.js"></script>
+	<script type="text/javascript" src="verify-easyui.js"></script>
+</head>
+<body>
+	<div id="p" title="" style="padding:1px;background:#fafafa;" data-options="fit:true">
+		<div>
+			<input id='uid' type="text" style="width:170px;height:22px;" />
+			<input id='pswd' type="text"
+					style="width:170px;height:22px;" placeholder="password"/>
+			<a id="btnQuery" href="#" data-options="iconCls:'icon-search'"
+						onclick="login()">Query</a>
+		</div>
+		<div id="list" data-options="fit:true,border:false">
+			<div data-options="region:'north',border:true" style="height:50px;margin-top:1px;">
+				<form id="irquery">
+					<table style="height:40px">
+						<tr>
+							<td width="70px" align="right">ROLE:</td>
+							<td width="130px">
+								<input id="txtusername" name="a_role.roleName like" type="text"
+									style="width:170px;height:22px;" />
+								<input  name="a_domain.parentId eq" type="hidden" value="roleClass"/>
+							</td>
+							<td width="80px">
+								<a id="btnQuery" href="#"
+									data-options="iconCls:'icon-search'"
+									onclick="loadPage('irpager', 'irlist')">Query</a>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+
+			<div data-options="region:'center',border:false">
+				<div style="width:100%;height:100%;">
+					<div data-options="region:'west',iconCls:'icon-ok'" style="width:400px">
+						<table id="irlist" ir-pks="roleId" ir-type="datagrid"
+								data-options="fit:true,rownumbers:true,singleSelect:true,toolbar:'#tb', striped:true,">
+							<thead>
+								<tr>
+									<th data-options="field:'roleId',width:0" align="center" hidden="hidden">roleId</th>
+									<th data-options="field:'roleName',width:100" align="center">ROLE</th>
+									<th data-options="field:'roleClass',width:100"
+											align="center" ir-expr="a_domain.domainName">ROLE PRIORITY</th>
+								</tr>
+							</thead>
+						</table>
+
+						<div id="tb">
+							<a id='btnExam' href="#"
+									data-options="iconCls:'icon-save',plain:true"
+									onclick="saveRole()" >SAVE</a>
+						</div>
+
+						<div id="irpager" ir-size="20" ir-serv="query"
+						ir-t="a_roles,l:a_domain roleClass=domainValue"></div>
+
+					</div>
+					<div data-options="region:'center',iconCls:'icon-ok'," style="width:70%">
+
+						<table width="100%" cellspacing="0" border="0" height="100%">
+							<tr>
+								<td style="width:50%;height:100%">
+									<div data-options="fit:true,border:false">
+										<div data-options="region:'center',split:false,"
+												style="width:100%" title="role-rights">
+											<ul id="irtree" ir-serv="tree" ir-t="role_funcs" ir-sql="trees.role_funcs"
+												lines="true" style="margin-top: 3px;"
+												data-options="animate:true,checkbox:true" ir-argsfunc="getRoleId"
+												ir-batchup="callback: jsonFormatSample('#irtree', 'a_role_funcs')" ></ul>
+										</div>
+									</div>
+								</td>
+								<td style="width:50%">
+									<!-- workflow rights -->
+									<div data-options="fit:true,border:false,">
+										<div data-options="region:'center',split:false"
+												style="width:100%" title="Work flow rights">
+											<ul id="process" ></ul>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		loadPage();
+		$('#irlist').datagrid({
+			onClickRow: function(index, data) {
+
+				init(data.roleId);
+				$('#process').tree({
+					url: '../../Content/Jsons/process.json',
+					method:'get',
+					checkbox: true,
+					lines: true,
+					animate: true,
+
+				});
+			}
+		});
+	</script>
+</body>
+</html>
