@@ -93,7 +93,7 @@
 				cmd: 'load',
 				cate: t,
 				remarks: 'test loading flow'};
-	var jmsg = jclient.userReq(null, t, _port, act, req);
+	var jmsg = jclient.userReq(null, t, _port, req, act);
 	jclient.commit(jmsg, function(resp, J) {
 		console.log(resp);
 	 	var semantbl = new Vue(Object.assign({}, Semantable, { el: "#list" }));

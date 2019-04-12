@@ -6,6 +6,9 @@
 	<script type="text/javascript" src="../3rd-lib/ricmoo-aes.js"></script>
     <script type="text/javascript" src="../3rd-lib/vue-2.5.17.min.js"></script>
 	<script type="text/javascript" src="../../lib/aes.js"></script>
+	<!-- NOT WORKING -->
+	<!-- NOT WORKING -->
+	<!-- NOT WORKING -->
 	<script type="text/javascript" src="../../lib/protocol.js"></script>
 	<script type="text/javascript" src="../../lib/jclient.js"></script>
 	<script type="text/javascript" src="testVue.js"></script>
@@ -36,5 +39,17 @@
 		</table>
 	</div>
 
+	<script>
+	// ES5 class
+		function v (x) {
+			console.log(x);
+			this.s = function () {
+				console.log('sss');
+			};
+		};
+
+		const obj = new v("aaa");
+		obj.s();
+	</script>
 </body>
 </html>

@@ -234,7 +234,7 @@
 				cmd: 'load-menu',
 				cate: t,
 				remarks: 'test jclient.js loading menu from menu.sample'};
-	var jmsg = vframe.jclient.userReq(homeVue.conn, t, Samport.menu, act, req);
+	var jmsg = vframe.jclient.userReq(homeVue.conn, t, Samport.menu, req, act);
 	vframe.jclient.commit(jmsg, function(resp) {
 		console.log(resp);
 		homeVue.menu = resp.data.menu;
