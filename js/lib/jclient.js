@@ -5,11 +5,11 @@ import {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg} from './p
 /**AES lib instance*/
 var aes;
 
-  /**Jclient.js API
-   * Java equivalent of
-   * io.odysz.jclient.Clients;
-   * io.odysz.jclient.SessionClient;
-   */
+/**Jclient.js API
+ * Java equivalent of
+ * io.odysz.jclient.Clients;
+ * io.odysz.jclient.SessionClient;
+ */
 class J {
 	/**@param {string} serv serv path root, e.g. 'http://localhost/semantic-jserv'
 	 */
@@ -128,6 +128,29 @@ class J {
 	respRows(resp) {
 		return resp !== null && resp !== undefined && resp.code === "ok"
 			? resp.data.rs[0].slice(1) : [];
+	}
+
+	respObjs(resp, start, len) {
+		var cols = this.respCols(resp);
+
+		if (typeof start !== 'Number')
+			start = 1;
+		// start from 0
+		else start++;
+
+		if (typeof len !== 'Number')
+			len = resp.data.rs[0].length - 1;
+		else
+			len = Math.min(len, resp.data.rs[0].length - 1 - start);
+
+		var objs = [];
+		for (var rx = start; rx < start + len; rx++) {
+			var obj = {};
+			for (var cx = 0; cx < cols.length; cx++)
+				obj[cols[cx]] = resp.data.rs[0][rx][cx];
+			objs.push(obj);
+		}
+		return objs;
 	}
 }
 

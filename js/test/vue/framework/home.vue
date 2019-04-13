@@ -212,18 +212,29 @@
   function initHome(home, jserv, conn, debugUser, debugPswd) {
 	_J.init(jserv, conn);
 
+	// branch 1: session in localStorage lost after hyper link (browsing from file system)
 	if (vframe.jclient === null || vframe.ssInf === undefined) {
 		// create a fake session client for debug
 		_J.login(debugUser, debugPswd, function(client){
 			vframe.jclient = client;
-			console.log(vframe);
-			loadMenu(home);
+			// console.log(vframe);
+			// loadMenu(home);
 		});
 	}
 	else {
-		console.log(vframe);
-		loadMenu(home);
+		var ssInf = localStorage.getItem(SessionClient.ssInfo);
+		// branch 2: session in localStorage restored after hyper link (browsing online not cross domain)
+		if (ssInf) {
+		}
+		// branch 3: session in cookie restored after hyper link (login crossed domain)
+		else {
+			ssInf = $.cookie(SessionClient.ssInfo);
+		}
+		vframe.jclient = new SessionClient(ssInf, iv, true);
 	}
+	
+	console.log(vframe);
+	loadMenu(home);
   }
 
   /**Compare with jclient.java/test/io.odysz.jclient.SemantiClientTest*/
