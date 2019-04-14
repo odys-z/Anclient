@@ -1,39 +1,28 @@
 /**@module jeasy*/
 
-// global consts
-{
-	var _servUrl ="http://localhost:8080/semantic.jserv/";
-
-	/** neable session checking*/
-	var ssCheck = true;
-
-	/** global flags: enable console.log() */
-	var irLog = true;
-
+//////////////////   jeasy API version 1.0    //////////////////////////////////
+// This part comes from the open source jclient.js/easyui.
+// Because the current project is not using webpack, so the two parts is merged
+// into one js file for business module's convenient avoiding including 2 files.
+////////////////////////////////////////////////////////////////////////////////
+/** project utils
+ * @module eng-cost/utils */
+const jconsts = {
+	serv: 'http://localhost:8080/semantic.jserv',
+	conn: 'inet',
+	/**datas.xml/sk */
+	sk: {
+		menu: 'sys.menu.ez-test',
+	}
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-//
-// jclient easyui adapter version 1.0
-//
-////////////////////////////////////////////////////////////////////////////////
+var J = jvue._J;
+J.init(jconsts.serv, jconsts.conn);
 
-/** regular utils
- * @module jeasy/utils */
+// otherwise server can't understand business defined ports.
+J.understandPorts(engports);
 
-/** html tag ids and supported ir-attrs
- * @module jeasy/session */
-
-/**Gloable variable, key of localStorage
- * For W3C standard, see: https://www.w3.org/TR/webstorage/#the-storage-interface<br>
- * For ussage, see: https://hacks.mozilla.org/2009/06/localstorage/<br>
- * and https://stackoverflow.com/questions/19861265/getting-the-value-of-a-variable-from-localstorage-from-a-different-javascript-fi*/
-var ssInfo = "ssinfo";
-var ssClient;
-
-var J = new $J();
-J.init(null, _servUrl);
 
 /**Login Utility.<br>
  * requesting login.serv with login-obj: <br>
@@ -47,25 +36,37 @@ J.init(null, _servUrl);
 function login(logId, pswd, onLogin, home, onError) {
     var checkEasyUI = false;
     checkEasyUI = checkDevice(navigator.userAgent||navigator.vendor||window.opera);
-	if (checkLog(logId, pswd))
+	if (checkLogInput(logId, pswd))
 		return;
 	logId = logId.trim();
 
-	localStorage.setItem(ssInfo, null);
-	J.login(logId, pswd, function(client) {
+	localStorage.setItem(ssk, null);
+	$.cookie(ssk, null, {path: "/", expires: 3000});
+	J.login(logId, pswd,
+			function(client) {
 				ssClient = client;
-				if (typeof onLogin !== "function") {
-					localStorage.setItem(ssInfo, client.ssInf);
+				if (typeof onLogin === "function") {
+					var ss = JSON.stringify(client.ssInf);
+					localStorage.setItem(ssk, ss);
+					$.cookie(ssk, ss, {path: "/", expires: 10000});
 					onLogin(client);
 				}
 				else {
-					localStorage.setItem(ssInfo, client.ssInf);
-					// go home page
-					window.top.location = home === undfined ? "index.html" : home;
+					console.error("onLogin is not a function");
 				}
 			},
 			onError);
-		});
+}
+
+function loadSessionInf() {
+	var ssinf = localStorage.getItem(ssk);
+	if (ssinf)
+		return JSON.parse(ssinf);
+
+	ssinf = $.cookie(ssk);
+	if (ssinf)
+		ssinf = JSON.parse(client.ssInf);
+	return ssinf;
 }
 
 /**Check user's input
@@ -73,6 +74,19 @@ function login(logId, pswd, onLogin, home, onError) {
  * @param {string} pswd
  * @return {boolean} true = error()
  */
-function checkLog(logId, pswd) {
-	// your validation here
+function checkLogInput(logId, pswd) {
+    var checkEasyUI = false;
+    checkEasyUI = checkDevice(navigator.userAgent||navigator.vendor||window.opera);
+	if (logId == null || typeof logId == "undefined" || $.trim(logId) == "") {
+		if(checkEasyUI) alert('登录账号不能为空');
+		else $.messager.alert('提示', '登录账号不能为空！', 'info');
+		return true;
+	} else if (pswd == null || typeof pswd == "undefined" || pswd == "") {
+		if(checkEasyUI)
+			alert('登录密码不能为空');
+        else
+			$.messager.alert('提示', '密码不能为空！', 'info');
+		return true;
+	}
+}
 }
