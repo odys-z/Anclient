@@ -16,12 +16,18 @@ const jconsts = {
 	}
 }
 
+const samports = {
+	/** see semantic.jserv/io.odysz.jsample.SysMenu */
+	menu: "menu.sample",
+	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
+	cheapflow: "cheapflow.sample"
+}
 
 var J = jvue._J;
 J.init(jconsts.serv, jconsts.conn);
 
 // otherwise server can't understand business defined ports.
-J.understandPorts(engports);
+J.understandPorts(samports);
 
 
 /**Login Utility.<br>
@@ -75,18 +81,53 @@ function loadSessionInf() {
  * @return {boolean} true = error()
  */
 function checkLogInput(logId, pswd) {
-    var checkEasyUI = false;
-    checkEasyUI = checkDevice(navigator.userAgent||navigator.vendor||window.opera);
-	if (logId == null || typeof logId == "undefined" || $.trim(logId) == "") {
-		if(checkEasyUI) alert('登录账号不能为空');
-		else $.messager.alert('提示', '登录账号不能为空！', 'info');
-		return true;
-	} else if (pswd == null || typeof pswd == "undefined" || pswd == "") {
-		if(checkEasyUI)
-			alert('登录密码不能为空');
-        else
-			$.messager.alert('提示', '密码不能为空！', 'info');
-		return true;
+	var checkEasyUI = false;
+	// check user inputs
+}
+
+//////////////////   jeasy API version 1.0    //////////////////////////////////
+// This part comes from the open source jclient.js/easyui.
+// Because the current project is not using webpack, so the two parts is merged
+// into one js file for business module's convenient avoiding including 2 files.
+////////////////////////////////////////////////////////////////////////////////
+/** html tag ids and supported ir-attrs
+ * @module jeasy/session */
+
+/**Gloable variable, key of localStorage
+ * For W3C standard, see: https://www.w3.org/TR/webstorage/#the-storage-interface<br>
+ * For ussage, see: https://hacks.mozilla.org/2009/06/localstorage/<br>
+ * and https://stackoverflow.com/questions/19861265/getting-the-value-of-a-variable-from-localstorage-from-a-different-javascript-fi*/
+var ssk = jvue.SessionClient.ssInfo;
+var ssClient;
+
+/** Set by initFunctree.onSelect();
+ * consumed by formatHeader().
+ */
+function setUserAction (funcId, funcName, url, cmd) {
+	var sstr = localStorage.getItem(ssk);
+	if(sstr != null && typeof sstr != "undefined" && sstr.length > 0) {
+		var ssinf = JSON.parse(sstr);
+		if (funcId === null)
+			funcId = ssinf.userAct.funcId;
+		if (funcName === null)
+			funcName = ssinf.usrAct.funcName;
+		if (url === null)
+			url = ssinf.usrAct.url;
+		ssinf.usrAct = {
+			funcId: funcId,
+			funcName: funcName,
+			url: url,
+			cmd: cmd
+		};
+		localStorage.setItem(ssk, JSON.stringify(ssinf));
 	}
 }
+
+function setUserActionCmd(cmd) {
+	var sstr = localStorage.getItem(ssk);
+	if(sstr != null && typeof sstr != "undefined" && sstr.length > 0) {
+		var ssinf = JSON.parse(sstr);
+		ssinf.usrAct.cmd = cmd;
+		localStorage.setItem(ssk, JSON.stringify(ssinf));
+	}
 }

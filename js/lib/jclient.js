@@ -23,6 +23,12 @@ class J {
 	}
 
 	servUrl (port) {
+		// This is a common error in jeasy frame
+		if (port === undefined || port === null) {
+			console.error("Port is null!");
+			return;
+		}
+
 		// Protocol can't visited when debugging, but working:
 		console.log(Protocol.Port);
 		console.log("Protocol.Port[" + port + "] : " + Protocol.Port[port]);
@@ -112,6 +118,8 @@ class J {
 					else {
 						console.error("Accessing server failed.");
 						console.error("Url: " + url);
+						console.error("req");
+						console.error(jreq);
 						console.error("ajax error:");
 						console.error(resp);
 					}
