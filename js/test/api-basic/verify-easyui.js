@@ -12,7 +12,7 @@ function login() {
 }
 
 function query(conn) {
-	var req = ssClient.query(conn, "a_user", "u", "test", {page: 0, size: 20});
+	var req = ssClient.query(conn, "a_user", "u", {page: 0, size: 20});
 	req.body[0]
 		.expr("userName", "un").expr("userId", "uid").expr("roleName", "role")
 		.j("a_roles", "r", "u.roleId = r.roleId")

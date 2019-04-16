@@ -154,10 +154,33 @@ class QueryReq {
 		return this.join("l", tabl, alias, conds);
 	}
 
+	r (tbl, alias, conds) {
+		return this.join("r", tabl, alias, conds);
+	}
+
+	joinss (js) {
+		if (js !== undefined && js.length !== undefined)
+			for (var ix = 0; ix < js.length; ix++)
+				this.join(js[ix].t, js[ix].tabl, js[ix].as, js[ix].on);
+	}
+
 	expr (exp, as) {
 		//this.exprs.push({expr: exp, as: as});
 		this.exprs.push([exp, as]);
 		return this;
+	}
+
+	exprss (exps) {
+		if (exps !== undefined && exps.length !== undefined)
+			for (var ix = 0; ix < exps.length; ix++)
+				if (exps[ix].exp !== undefined)
+					this.expr(exps[ix].exp, exps[ix].as);
+				else if (exps[ix].length !== undefined)
+					this.expr(exps[ix][0], exps[ix][1]);
+				else {
+					console.error('Can not parse expr:');
+					console.error(exps);
+				}
 	}
 
 	whereCond (logic, loper, roper) {
@@ -165,6 +188,33 @@ class QueryReq {
 		// java/io.odysz.transact.sql.query.Query$Ix$Predicate
 		this.where.push([logic, loper, roper]);
 		return this;
+	}
+
+	/** @param {Array} conds [{op, l, r}] */
+	wheres (conds) {
+		if (conds !== undefined && conds.length !== undefined)
+			for (var ix = 0; ix < conds.length; ix++)
+				this.whereCond(conds[ix].op, conds[ix].l, conds[ix].r);
+	}
+
+	orderby (col, asc) {
+		if (this.orders === undefined)
+			this.orders = [];
+		this.orders.push(col, asc);
+	}
+
+	orderbys (cols) {
+		if (cols !== undefined && cols.length !== undefined)
+			for (var ix = 0; ix < cols.length; ix++)
+				this.expr(cols[ix].col, cols[ix].asc);
+	}
+
+	groupby (col) {
+		console.warn("groupby() is still to be implemented");
+	}
+
+	groupbys (cols) {
+		console.warn("groupby() is still to be implemented");
 	}
 
 	commit () {

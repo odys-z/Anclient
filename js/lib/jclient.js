@@ -30,15 +30,21 @@ class J {
 		}
 
 		// Protocol can't visited when debugging, but working:
-		console.log(Protocol.Port);
-		console.log("Protocol.Port[" + port + "] : " + Protocol.Port[port]);
+		// console.log(Protocol.Port);
+		// console.log("Protocol.Port[" + port + "] : " + Protocol.Port[port]);
 
+		var ulr;
 		if (Protocol.Port[port] !== undefined)
-			return this.cfg.defaultServ + '/'
-				+ Protocol.Port[port] + '?conn=' + this.cfg.connId;
+			ulr = this.cfg.defaultServ + '/'
+				+ Protocol.Port[port]; // + '?conn=' + this.cfg.connId;
 		else
-			return this.cfg.defaultServ + '/'
-				+ port + '?conn=' + this.cfg.connId;
+			ulr = this.cfg.defaultServ + '/'
+				+ port; // + '?conn=' + this.cfg.connId;
+
+		if (this.cfg.connId)
+			ulr += '?conn=' + this.cfg.connId;
+
+		return ulr;
 	}
 
 	init (urlRoot, connId) {
@@ -103,7 +109,7 @@ class J {
 					// code != ok
 					if (resp.code !== Protocol.MsgCode.ok)
 						if (typeof onErr === "function")
-							onErr(Protocol.MsgCode.exIo, resp);
+							onErr(resp.code, resp);
 						else console.error(resp);
 					// code == ok
 					else {
@@ -116,11 +122,10 @@ class J {
 					if (typeof onErr === "function")
 						onErr(Protocol.MsgCode.exIo, resp);
 					else {
-						console.error("Accessing server failed.");
-						console.error("Url: " + url);
+						console.error("ajax error:");
 						console.error("req");
 						console.error(jreq);
-						console.error("ajax error:");
+						console.error("Url: " + url);
 						console.error(resp);
 					}
 				}
@@ -219,13 +224,16 @@ class SessionClient {
 		this.J.post(jmsg, onOk, onError);
 	}
 
-	query (conn, t, alias, funcId, pageInf) {
+	query(conn, t, alias, pageInf, act) {
 		var qryItem = new QueryReq(conn, t, alias, pageInf);
 		var header = Protocol.formatHeader(this.ssInf);
-		header.userAct({func: 'func01',
+		if (typeof act === 'object')
+			header.act = act;
+		else
+			header.userAct({func: 'query',
 						cmd: 'select',
-						cate: 'test',
-						remarks: 'test query.serv'});
+						cate: 'r',
+						remarks: 'session query.serv'});
 		var jreq = new JMessage(Protocol.Port.query, header, qryItem);
 		return jreq;
 	}
