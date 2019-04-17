@@ -4,7 +4,7 @@
  * @module jclient/html */
 
 if (J === undefined)
-	console.error("You need initialize J - include jeasy-api.js first.");
+	console.error("You need initialize J - use <script>jeasy-api.js</script> first.");
 
 /**This port instance should arleady understand application's prots
  * - initialized in project's frame */
@@ -20,23 +20,49 @@ var globalArgs = {};
 const ir = {
 	/** target name */
 	t: "ir-t",
-	/** a.k.a. ir-grid, used by pager to specify grid id. */
-	grid: 'ir-grid',
-
-	checkexpr: 'ir-checkexpr',
 	/** e.g. ds.sql-key in dataset.xml */
 	sk: 'ir-sk',
 	root: 'ir-sroot',
-
 	/** tree item on change handler name */
 	onchange: "ir-onchange",
 
+	/** a.k.a. ir-grid, used by pager to specify grid id. */
+	grid: 'ir-grid',
+	/* easyui "data-options", alias is defined here, e.g. alais = "field: personName" */
+	ezDataopts: 'data-options',
+
+	expr: 'ir-expr',
+
+	/** intial page size, later will using easyui pagination's size (by EzGrid.page()) */
+	pagesize: 'ir-size',
+
+	/** ? ? */
+	checkexpr: 'ir-checkexpr',
+
+	/** combobox */
+	combobox: 'ir-cbb',
+
+	cbbtree: 'ir-cbbtree',
+
 	deflt: {
 		gridId: 'irlist',
-	}
+	},
+
+	ignored: {
+		cond: ' -- ALL -- ',
+	},
 };
 
+/* test helper:
+ * http://www.regular-expressions.info/javascriptexample.html
+ */
 const regex = {
+	/**reqex for ir-t maintable
+	 * [0] aUser:b
+	 * [1] aUser
+	 * [2] :b
+	 * [3] b */
+	maintbl: /\s*(\w+)\s*(:\s*(\w+))?/i,
 	/**regex for matching join definition is html.<br>
 	 * [0] j:b_cates:t1   person=b_cates.persId 'v' % t1.col<br>
 	 * [1] j<br>
@@ -61,7 +87,6 @@ const regex = {
 	onCondParm: /\s*(.*)\{\@\s*(.+)\s*\}(.*)/i,
 
 	/* e.g. b_articles.pubDate desc
-	 * test helper: http://www.regular-expressions.info/javascriptexample.html
 	 * TEST1: [0]a.FullPath desc [1]a. [2]a [3]FullPath [4] desc [5]desc
 	 * TEST2: [0]FullPath desc [1]undefined [2]undefined [3]FullPath [4] desc [5]desc
 	 * TEST3: [0]FullPath [1]undefined [2]undefined [3]FullPath [4] undefined [5]undefined
@@ -69,7 +94,7 @@ const regex = {
 	order: /\s*((\w+)\.){0,1}(\w+)(\s+(asc|desc){0,1}){0,1}\s*/i,
 
 	/** [2] func name, [4] tabl, [5] field */
-	expr: /\s*((\w+)\s*\s*\()?\s*((\w+)\s*\.)?\s*(\w+)\s*\)?\s*/i,
+	// expr: /\s*((\w+)\s*\s*\()?\s*((\w+)\s*\.)?\s*(\w+)\s*\)?\s*/i,
 
 	/**regex for matching expr like "field:sqlAlias"*/
 	alais: /field\s*:\s*\'(\w+)\'/i,
@@ -93,7 +118,7 @@ function Tag (debug) {
 
 	/**Format table-joins request object: [{tabl, t, on, as}]
 	 * @param {string} t "b_articles, j:b_cate, l:b_author:a authorId=authorId and a.name like 'tom'"
-	 * @return {Array} [{tabl, t, on, as}]
+	 * @return {Array} [{tabl, t, on, as}], where t = main-table | j | r | l
 	 */
 	this.joins = function (t) {
 		var tss = t.split(','); // [t1, j:b_cates[:alais] cateId=cateId, ...]
@@ -114,7 +139,10 @@ function Tag (debug) {
 					// No need to parse all logic condition to array
 					var v = this.findVar(mOnVar[2]);
 					if (typeof v !== "undefined") {
-						oncond = mOnVar[1] + "'" + v + "'";
+						if (typeof v.length === "number")
+							oncond = mOnVar[1] + this.concatArray(v);
+						else
+							oncond = mOnVar[1] + "'" + v + "'";
 					}
 					else {
 						if (this.debug) console.log('WARN - found parameter condition '
@@ -128,10 +156,30 @@ function Tag (debug) {
 				//tabls.push({"t": m[1], "tabl": m[2], "as": m[4], "on": m[5]});
 				tabls.push({"t": m[1], "tabl": m[2], "as": m[4], "on": oncond});
 			}
-			else
-				tabls.push({"t": "main-table", "tabl": tss[i].trim()});
+			else {
+				var mt = regex.maintbl.exec(tss[i]);
+				// " aUser:b" = aUser:b, aUser, :b, b
+				if (mt[1] === undefined)
+					console.error("Can't parse main table: " + tss[i]);
+				else
+					tabls.push({"t": "main-table", "tabl": mt[1], "as": mt[3]});
+			}
 		}
 		return tabls;
+	};
+
+	/** Conver js array into stirng quoted with "'"
+	 * @param {array} arr
+	 * @return {string} ('el1', ...)
+	 */
+	this.concatArray = function (arr) {
+		var buf = "(";
+		for (var ix = 0; ix < arr.length; ix++) {
+			if (buf !== "(")
+				buf += ", ";
+			buf += "'" + arr[ix] + "'";
+		}
+		return buf + ")";
 	};
 
 	/**Find j-orderby tag and compose order-by request array:<br>
@@ -149,9 +197,9 @@ function Tag (debug) {
 				if(typeof match[5] != "undefined" && match[5] == "desc")
 					asc = "desc";
 				var tabl = maintabl;
-				if(typeof match[2] != "undefined")
+				if(match[2] !== undefined)
 					tabl = match[2];
-				if(typeof match[3] == "undfined") {
+				if(match[3] === undefined) {
 					// col can't be null
 					alert("Someting wrong in html: " + ordstr);
 					return orders;
@@ -166,7 +214,6 @@ function Tag (debug) {
 	 * @param {string} exp j-expr = "max(bas_person.PersonName)",
 	 * @param {string} attrDataopt (alais in easyui "datat-options") field: personName,
 	 * FIXME defining alias in data-options is not correct
-	 */
 	this.expr = function (exp, attrDataopt) {
 		var expr = {};
 		// alais = "field: personName"
@@ -204,6 +251,7 @@ function Tag (debug) {
 		}
 		return expr;
 	};
+	 */
 
 	/**Match expr in "target" with regexAlais.
 	 * @param {string} target: string to be matched
@@ -238,7 +286,10 @@ function Tag (debug) {
 		if (v === window) {
 			if (window[vn])
 				return window[vn];
-			else return vn;
+			else {
+				console.error("Can't find variable for " + vn);
+				return vn;
+			}
 		}
 		else if (typeof v === "object") {
 			if (typeof v[field] === "function")
@@ -253,7 +304,7 @@ function Tag (debug) {
 	 * @param {Array} argBuff args that alread has arguments setting by caller.
 	 * @return {Array} [0] ds, [1] sql-key, [2] argBuff + [arg1, var1, arg2, ...]
 	 */
-	this.parseArgs = function (t, argBuff) {
+	this.parseSk = function (t, argBuff) {
 		if ( t === null || typeof t === "undefined" )
 			return [];
 
@@ -269,8 +320,8 @@ function Tag (debug) {
 		args.push( tk[0] ); // ds
 		args.push( tk[1] ); // sql-key
 
-		if (typeof argBuff !== "object")
-			argBuff = [];
+		// if (typeof argBuff !== "object")
+		// 	argBuff = [];
 
 		// replace variables
 		// var regexCbbArg = /{\@\s*(.+)\s*\}/g;
@@ -279,23 +330,72 @@ function Tag (debug) {
 			if ( mOnVar ) {
 				// if there is variable in args clause, replace with value
 				var v = tag.findVar( mOnVar[1] );
-				argBuff.push( v );
+				// argBuff.push( v );
 			}
-			else
-				argBuff.push( argss[ix] );
+			// else
+			// 	argBuff.push( argss[ix] );
 		}
-		args.push( argBuff );
+		// args.push( argBuff );
 		return args;
 	};
 };
-
 const tag = new Tag(true);
 
-/**Common handlers for easyui, like ir-t, ir-list etc.*/
-function EzHtml (J) { };
+/**Common handlers for ir attributes, like ir-t, ir-list etc.*/
+function EzHtml (J) {
+	/**Parse table and joinning definition in html
+	 * @param {string} pagerId pager id. default "irpager"
+	 * @return {Array} [{t: "main-table/j/r/l", tabl: "table-1", as: "alais", on: cond-string}]<br>
+	 * where cond-string = "col1=col2"
+	 */
+	this.tabls = function (gridId) {
+		var t = $(gridId).attr(ir.t);
+		if (t === undefined)
+			console.error("In jeasy api v1.0, pager's t is moved to list/grid's tag - must presented there.");
+		else
+			return tag.joins(t);
+	}
+
+	/**Find th-expr definitons in easyui list/grid head.
+	 * @param {string} gridId list id to be bind
+	 * @param {string} defltabl main table name, used as html ignored table name
+	 * @return {Array} [{expr: col, gfunc, tabl, as: c1}, ...]
+	 */
+	this.thExprs = function (gridId, defltabl) {
+		if (defltabl) defltabl = defltabl.trim();
+
+		var ths = $(gridId + " th");
+		var exprs = new Array();
+
+		var al_k = {}; // for checking duplicated alais
+
+		for(var i = 0; i < ths.length; ++i) {
+			var expr = {};
+			var th = ths[i];
+			var al = tag.findAlais($(th).attr(ir.ezDataopts));
+			expr.alais = al;
+
+			if(al_k[al]) {
+				console.log("WARN - found duplicating alais: " + al + ". Ignoring...");
+				continue;
+			} else al_k[al] = true;
+
+			// can handle raw expr (user specified expression)
+			var exp = $(th).attr(ir.expr);
+			if (typeof exp === "string")
+				exprs.push({exp: exp, as: al});
+			else
+				exprs.push({exp: al, as: al});
+		}
+		return exprs;
+	}
+};
 const EasyHtml = new EzHtml(J);
 
-function EzCbb (J) { };
+function EzCbb (J) {
+	this.configWithArgs = function(cbbId) {
+	}
+};
 const EasyCbb = new EzCbb(J);
 
 function EzTree(J) {
@@ -304,10 +404,10 @@ function EzTree(J) {
 	this.log = true,
 	this.alertOnErr = true,
 
-	// @deprecated
+	// TODO @deprecated
 	// bind cbb tree with data from s-tree.serv.
 	// sk is specified by ir-sk
-	this.cbbStree = function ( cbbId, t, sk, valueExpr, textExpr, onChangef, isSelect, onSuccessf) {
+	this.cbbStree = function ( cbbId, sk, valueExpr, textExpr, onChangef, isSelect, onSuccessf) {
 		this.combotree (cbbId, sk, null, onChangef);
 		// if (cbbId.substring(0, 1) != "#")
 		// 	cbbId = "#" + cbbId;
@@ -322,7 +422,7 @@ function EzTree(J) {
 		// easyTree.cbbEx ( cbbId, t, sk, null, null, exprs, isSelect, onChangef, onSuccessf );
 	};
 
-	// @deprecated
+	// TODO @deprecated
 	// bind cbb tree with results form s-tree.serv (data is filtered by rootId)
 	this.cbbEx = function ( cbbtreeid, t, sk, rootId, conds, exprs, selectId, onselectf, onSuccessf, treeType, isMultiple) {
 		this.combotree(cbbtreeid, sk, rootId, selectId, onselectf, isMultiple);
@@ -372,6 +472,7 @@ function EzTree(J) {
 		// });
 	};
 
+	// TODO to be deleted
 	//easyTree.treegridEx( treegrid, t, sk, rootId, exprs, selectId, onselectf );
 	this.treegridEx = function( treegrid, t, sk, rootId, exprs, selectId, onselectf ) {
 		if (treegrid.substring(0, 1) != "#")
@@ -408,12 +509,36 @@ function EzTree(J) {
 		});
 	};
 
+	/**Bind configured dataset to easyui combotree.
+	 * @param {string} treeId
+	 * @param {string} sk if not provide, will find from $('#treeId') ir-cbbtree.
+	 * 		<br>format:<br>
+	 * 		ir-sk = "xml-tbl.dataset-key, {@obj1.prop1}, const-arg2, ..."
+	 * @param {array} sqlArgs [{name: value}], if not provided, will find from  $('#treeId') ir-cbbtree
+	 * @param {string} selectId default selection
+	 * @param {function} onChangef callback
+	 * @param {boolean} isMultple multi-select
+	 */
 	this.combotree = function(treeId, sk, sqlArgs, rootId, selectId, onChangef, isMultiple) {
 		if (treeId.substring(0, 1) != "#")
 			treeId = "#" + treeId;
+		var tree = $(treeId);
 
-		if (typeof sk === "undefined" || sk === null)
-			sk = tree.attr(ir.sk);
+		if (typeof sk === "undefined" || sk === null) {
+			// ir-sk = "xml-tbl.dataset-key, {@obj1.prop1}, const-arg2, ..."
+			sk = tree.attr(ir.cbbtree);
+		}
+		// get sk from ir-sk attr
+		// get args from ir-sk attr
+		if (sk === undefined || sk === null)
+			console.error(ir.sk + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
+		else {
+			var parsed = tag.parseSk(sk);
+			sk = parsed[0];
+			if (sqlArgs === undefined)
+				sqlArgs = {};
+			Object.assign(sqlArgs, parsed[1]);
+		}
 
 		if (typeof onChangef === "undefined" || onChangef === null)
 			onChangef = tree.attr(ir.onchange);
@@ -422,9 +547,10 @@ function EzTree(J) {
 
 		// request JMessage body
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
-					engcost.conn,		// connection id in connexts.xml
-					sk);				// sk in datast.xml
+					jconsts.conn,		// connection id in connexts.xml
+					sk);				// sk in dataset.xml
 		req.rootId = rootId;
+
 		req.sqlArgs = sqlArgs;
 
 		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
@@ -432,7 +558,7 @@ function EzTree(J) {
 		// Port.stree is port of SemanticTree.
 		// t=load/reforest/retree
 		// user act is ignored for reading
-		var jmsg = ssClient.userReq(engcost.conn, 'load', Port.stree, req);
+		var jmsg = ssClient.userReq(jconsts.conn, 'load', Port.stree, req);
 
 		// get data, then bind easyui combotree
 		ssClient.commit(jmsg, function(resp) {
@@ -672,184 +798,136 @@ function EzTree(J) {
 			sk = tree.attr(_aSemantik);
 
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
-					engcost.conn,		// connection id in connexts.xml
+					jconsts.conn,		// connection id in connexts.xml
 					sk);				// sk in datast.xml
-		var jmsg = ssClient.userReq(engcost.conn, 'retree', jvue.Protocol.Port.stree, req, act);
+		var jmsg = ssClient.userReq(jconsts.conn, 'retree', jvue.Protocol.Port.stree, req, act);
 
 		// ssClient is created after logged in.
 		ssClient.commit(jmsg, onSuccess);
 	};
 };
-
 const EasyTree = new EzTree (J);
 
 function EzGrid (J) {
-	this.page = function (pagerId, onSelect, onCheck, onCheckAll, onLoad) {
-		$.messager.progress();
+	this.pageInfo = {};
 
-		if(pagerId == null)
-			pagerId = _pager;
-		else if(typeof pagerId != "undefined" && pagerId.substring(0, 1) != "#")
+	/**This method is used to bind CRUD main list.
+	 * Data (rows) are paged at server sied.
+	 * @param {string} pagerId the easyui pager's id
+	 * @param {string} qformId the query form that can be used as condition to generate sql where clause.
+	 * TODO documentation
+	 */
+	this.page = function (pagerId, qformId, onLoad, onSelect, onCheck, onCheckAll) {
+		if(pagerId === null || pagerId === undefined || typeof pagerId !== 'string') {
+			console.error("pager id is not valid");
+			return;
+		}
+		else if(pagerId.substring(0, 1) != "#")
 			pagerId = "#" + pagerId;
-		else if (typeof pagerId === "undefined")
-			pagerId = _pager;
 
 		var listId = $(pagerId).attr(ir.grid);
-		if (listId === undfined || listId === null || listId.trim() === '')
-			listId = ir.deflt.gridId;
-
-		if(typeof listId === 'string' && listId.substring(0, 1) != "#")
-			listId = '#' + listId;
-		else if (listId === undefined)
-			listId = '#' + ir.deflt.gridId;
+		if (listId === undefined || listId === null || listId.trim() === '') {
+			console.error("gird/list id defined in pager is not valid. A " + ir.grid + " in pager tag must defined.");
+			return;
+		}
+		listId = '#' + listId;
 
 		// semantics key (config.xml/semantics)
 		var semantik = $(pagerId).attr(ir.sk);
 
-		//获取列表样式,判断列表是datagrid还是treegrid
-		var listType = $(listId).attr(_listType);
-		if(typeof listType == "undefined") listType = "datagrid";
-
-		var IsSelect = $(listId).attr(_irselect);
-		if(typeof IsSelect == "undefined") IsSelect = "false";
-
-		var pgSize = $(pagerId).attr(_aPagesize);
-		var t = $(pagerId).attr(_aT);
-		if (t != _pageInfo.t) {
-			_pageInfo = {
-				t: t,
+		var pgSize = $(pagerId).attr(ir.pagesize);
+		if (pgSize === undefined)
+			pgSize = -1;
+		// Remember some variabl for later calling onPage()
+		if (this.pageInfo[pagerId] === undefined) {
+			this.pageInfo[pagerId] = {
+				queryId: qformId,
 				total: 0,
-				page: 1,
+				page: 0,
+				size: pgSize,
+			};
+			$(pagerId).pagination({
 				pageSize: pgSize,
-				pageList: _pageInfo.pageList
+				onSelectPage: this.onPage,
+			});
+		}
+
+		var req;
+		if (semantik !== undefined)
+			// dataset way
+			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+						jconsts.conn,	// connection id in connexts.xml
+						semantik);		// sk in datast.xml
+		else {
+			// try query.serv way
+			var tbls = EasyHtml.tabls(listId);
+			if (tbls !== undefined) {
+				// create a query request
+				var maint = tbls[0].tabl;
+				var mainAlias = tbls[0].as;
+				req = ssClient.query(null,	// let the server finde connection
+							maint,			// main table
+							mainAlias,		// main alias
+							this.pageInfo[pagerId]); // this.pageInfo, saving page ix for consequent querying
+				var q = req.body[0];
+
+				// handle query defined in grid attrs
+				// [{exp: t.col as: c}, ...]
+				var exprs = EasyHtml.thExprs(listId, mainAlias);
+				q.exprss(exprs);
+
+				// joins ( already parsed )
+				q.joinss(tbls.splice(1, tbls.length - 1));
+
+				// where clause
+				var wheres = EasyQueryForm.conds(qformId, mainAlias);
+				// q.wheres("=", "u.userId", "'" + uid + "'");
+				q.wheres(wheres);
 			}
 		}
-		_pageInfo.pageList(pgSize);
+		// post request, handle response
+		ssClient.commit(req, function(resp) {
+			EasyMsger.progress();
+			// var users = J.respObjs(resp, 0, 1);
+			// var rows = resp.data.rs[0].splice(1);
+			var rows = jeasy.rows(resp);
+			EasyGrid.bindPage (listId, rows, onSelect, onCheck, onCheckAll, onLoad);
 
-		var tabl = findTabls(pagerId);
-		var order = findOrders(listId, tabl[0].tabl);
-		var expr = findTableExprs(listId, tabl[0].tabl);
-		var cond = findConds2(tabl[0].tabl, queryId);
-
-		var groupAttr = $(pagerId).attr(_aGroup);
-		var groupings = findGroups(tabl[0].tabl, groupAttr);
-
-		//var qobj = { tabls: tabl, exprs: expr, conds: cond, orders: order, group: groupings};
-		var qobj = formatQuery(expr, tabl, cond, groupings, order);
-
-		var pager = $(pagerId).pagination({
-			total: _pageInfo.total,
-			//pageSize: pgSize,
-			//pageList: [10, 20, 50, 100, pgSize]
-			pageSize: _pageInfo.pageSize,
-			pageList: _pageInfo.pageList(pgSize)
-		});
-		var conn = $(pagerId).attr(_aConn);
-
-		var servId = $(pagerId).attr(_aServ);
-
-		var servUrl = _servUrl + servId + ".serv";
-		// t is not used by quere.serv, but send this for reserved extension?
-		if(typeof conn != "undefined")
-			servUrl += "?t=" + tabl[0].tabl + "&conn=" + conn;
-		else servUrl += "?t=" + tabl[0].tabl;
-
-		// Semantics for data format, e.g. tree structure configuration key, see config.xml/semantics/easyuitree-area
-		if (typeof semantik != "undefined")
-			servUrl += "&sk=" + semantik;
-
-		//var bindPage = function (pageNumb, pageSize) {
-		var bindPage = function (pageNumb, pageSize) {
-			$.ajax({type: "POST",
-				//url: servUrl + "?t=" + t + "&page=" + (pageNumb - 1) + "&size=" + pageSize,
-				url: servUrl + "&page=" + (pageNumb - 1) + "&size=" + pageSize,
-				contentType: "application/json; charset=utf-8",
-				data: JSON.stringify(qobj),
-				success: function (data) {
-					$.messager.progress('close'); //关闭进度条
-					_pageInfo.page = pageNumb;
-					_pageInfo.pageSize = pageSize;
-
-					var resp = JSON.parse(data);
-					if (irLog) console.log(resp);
-					if (typeof resp.code != "undefined" && resp.code == "ss_err") {
-						// needing ir-ifire.js
-						ssChecker.expire();
-						// $.messager.alert({title: "提示", msg: "登录信息不正确或登录超时，请重新登录！", icon: "info",
-						// 	fn: function() {window.top.location = _loginHtml;}});
-					} else if (typeof resp.code != "undefined" && resp.code != "OK")
-						alert("loading failed: " + resp.msg);
-					else {
-						if(listType == "datagrid") {
-							if (onSelectf)
-								$(listId).datagrid({ onSelect: onSelectf });
-						    if (onUnSelectf)
-						    {
-								$(listId).datagrid({ onUnselect: onUnSelectf });
-								}
-							else if(IsSelect == "true") {
-								$(listId).datagrid({
-									onSelect: function (index, row) { GetSelectData(index, row); }
-								});
-							}
-
-							if (onCheckf)
-								$(listId).datagrid({ onCheck: onCheckf,
-									onUncheck: onCheckf});
-							if (onCheckAllf)
-								$(listId).datagrid({ onCheckAll: onCheckAllf,
-									onUncheckAll: onCheckAllf});
-							if(onSuccessf)
-								$(listId).datagrid({ onLoadSuccess: onSuccessf });
-							$(listId).datagrid("loadData", resp);
-							if(isSelectFirst != false) {
-								//默认选中第一行
-								$(listId).datagrid("selectRow", 0);
-							}
-						} else if(listType == "treegrid") {
-							if (onSelectf)
-								$(listId).treegrid({ onSelect: onSelectf });
-							if(onSuccessf)
-								$(listId).treegrid({ onLoadSuccess: onSuccessf });
-							$(listId).treegrid("loadData", resp);
-							if($(listId).attr("ir-collapse") == "true")
-								$(listId).treegrid('collapseAll');
-							if (onCheckf)
-								$(listId).treegrid({ onCheck: onCheckf,
-									onUncheck: onCheckf});
-							if (onCheckAllf)
-								$(listId).treegrid({ onCheckAll: onCheckAllf,
-									onUncheckAll: onCheckAllf});
-						}
-						$(pagerId).pagination("refresh", {total: resp.total, pageNumber: pageNumb, pageSize: pageSize});
-					}
-				},
-				error: function(data) {
-					//关闭进度条
-					$.messager.progress('close');
-					alert("loading failed: " + servUrl);
-				}
-			});
-		};
-
-		// pager.onSelectPage = bindList;
-		$(pagerId).pagination({onSelectPage: bindPage});
-
-		//bindPage(1, pgSize);
-		bindPage(_pageInfo.page, _pageInfo.pageSize);
+			var total = jeasy.total(resp, 0);
+			var pgInf = EasyGrid.pageInfo[pagerId];
+			pgInf.total = total;
+			EasyGrid.bindPager(pagerId, total, pgInf.page, pgInf.size);
+		}, EasyMsger.error);
 	};
 
-	this.bind = function (gridId, json, onSelect, onCheck, onCheckAll, onLoad) {
+	this.bindPager = function (pagerId, total, page, size) {
+		$(pagerId).pagination("refresh", {
+			total: total,
+			pageNumber: page + 1,
+			pageSize: size,
+		});
+	};
+
+	/** Helper function to load page on pager's event. */
+	this.onPage = function (pageNumb, size) {
+		// onPage is pagination's onSelectPage handler, so this.id = pager-id
+		var pgInf = EasyGrid.pageInfo['#' + this.id];
+		pgInf.page = pageNumb - 1;
+		pgInf.size = size;
+		EasyGrid.page(this.id, pgInf.queryId);
+	}
+
+	this.bindPage = function (gridId, json, onSelect, onCheck, onCheckAll, onLoad) {
 		if (gridId.substring(0, 1) != "#")
 			gridId = "#" + gridId;
 		var g = $(gridId);
 
-		if (onSelectf)
-			g.datagrid({ onSelect: onSelectf });
+		if (onSelect)
+			g.datagrid({ onSelect: onSelect });
 
-		if (onCheckf)
-			g.datagrid({ onCheck: onCheckf,
-				onUncheck: onCheckf});
+		if (onCheck)
+			g.datagrid({ onCheck: onCheck,
+				onUncheck: onCheck});
 		if (onCheckAll)
 			g.datagrid({ onCheckAll: onCheckAll,
 				onUncheckAll: onCheckAll});
@@ -860,6 +938,7 @@ function EzGrid (J) {
 			g.datagrid("selectRow", 0);
 		}
 
+		EasyMsger.close();
 		if (typeof onLoad === "function")
 			onLoad ( resp.rows, resp.total );
 	};
@@ -867,9 +946,113 @@ function EzGrid (J) {
 const EasyGrid = new EzGrid(J);
 
 function EzQueryForm(J) {
+	this.load = function(formId) {
+		// 1. load ir-combobox
+		$(formId + " ["+ ir.combobox + "]").each(function(key, domval) {
+			EasyCbb.configWithArgs(domval.id);
+		});
+
+		// 2. combotree
+		$(formId + " ["+ ir.cbbtree + "]").each(function(key, domval) {
+			EasyTree.combotree(domval.id);
+		});
+	};
+
+	/**Find condition array from query form, in fields with name attribute
+	 * - can be serialized by jquery serializeArray().
+	 * @param {} queryid
+	 * @param {} defltTabl
+	 * @return {array} [{field, v, logic}]
+	 */
+	this.conds = function (queryid, deftTabl) {
+		if(typeof queryid != "undefined" && queryid.substring(0, 1) != "#")
+			queryid = "#" + queryid;
+		else if (typeof queryid === "undefined")
+			queryid = _query;
+
+		var conds;
+		// if (typeof getQueryConds != "undefined") {
+		// 	conds = getQueryConds();
+		// 	if (conds) return conds;
+		// }
+
+		var fields = $( queryid ).serializeArray();
+		if (!fields || fields.length <= 0) {
+			console.log("ERROR - No query condition form found in " + queryid);
+			return null;
+		}
+		return this.formatConds(deftTabl, fields);
+	}
+
+	/**Format query condition according to "name" attr in tag of form (form-id=queryId).
+	 * name="t.col", where t can be alais (handled by serv)
+	 * @param {string} defltTabl main table
+	 * @param {fields} fields condition fields like that selected by $(".name")
+	 * @return {array} [{op: logic, l: "tabl"."col", r: val} ...]
+	 */
+	this.formatConds = function (defltTabl, fields) {
+		// [{field: "recId", v: "rec.001", logic: "=", tabl: "b_articles"}, ...]
+		var conds = new Array();
+		$.each( fields, function( i, field ) {
+			// Ignore items like "-- ALL --" in combobox
+			if (field.value === ir.ignored.cond) return;
+			if (field.value === undefined || field.value === '') return;
+
+			// $( ).append( field.value + " " );
+			var n = field.name.replace(/\s\s+/g, ' ');
+			var namess = n.split(' '); // table.column >/=
+
+			if (namess.length < 2) {
+				console.log("WARN - name attr in form (id=irquery) must indicating logic operand: " + n);
+				return;
+			}
+			conds.push({op: namess[1].trim(), l: namess[0],
+					r: "'" + field.value + "'"});	// FIXME: what about \' ?
+		});
+		return conds;
+	}
 };
 const EasyQueryForm = new EzQueryForm(J);
 
 function EzModalog() {
 };
 const EasyModalog = new EzModalog(J);
+
+function EzMsger() {
+	this.init = function() {
+		this.msg = {};
+		this.progressing = false;
+	};
+
+	this.init();
+
+	this.progress = function() {
+		if (EasyMsger.progressing === false) {
+			$.messager.progress();
+			EasyMsger.progressing = true;
+		}
+	};
+
+	this.close = function() {
+		$.messager.progress('close');
+		this.progressing = false;
+	};
+
+	/** Report error to user only once. Flags are refreshed by init() */
+	this.error = function(code, resp) {
+		// Don't change this into Chinese, set another function here.
+		if (EasyMsger.msg[code] === null || EasyMsger.msg[code] === undefined) {
+			EasyMsger.msg[code] = code;
+			console.error(resp)
+			if (code === jvue.Protocol.MsgCode.exSession)
+				$.messager.alert('warn', 'Session Error! Please re-login');
+			else if (code === jvue.Protocol.MsgCode.exIo)
+				$.messager.alert('warn', 'Network Problem!');
+		}
+		else {
+			console.warn('Error message ignored:')
+			console.warn(resp);
+		}
+	}
+};
+const EasyMsger = new EzMsger(J);

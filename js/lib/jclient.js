@@ -267,7 +267,6 @@ class SessionClient {
 	 * Use JProtocol to parse the respons data.
 	 * @param {function} onError on ajax error function: f(respons-data) {...}
 	 * @param
-	 */
 	loadPage (query, pgSize, pgIx, onSuccess, onError) {
 		if (typeof pgSize === "undefined")
 			pgSize = -1;
@@ -294,6 +293,7 @@ class SessionClient {
 			}
 		});
 	}
+	 */
 
 	upload (filename, fileDescpt) {
 

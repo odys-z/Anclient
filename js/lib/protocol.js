@@ -48,9 +48,9 @@ class Protocol {
 
 /**Static methods of Protocol */
 {
-	Protocol.Port = {	heartbeat: "ping.serv", session: "login.serv",
-						insert: "c.serv", query: "r.serv", update: "u.serv",
-						delete: "d.serv", echo: "echo.serv", user: "user.serv" };
+	Protocol.Port = {	heartbeat: "ping.serv", echo: "echo.serv", session: "login.serv",
+						insert: "c.serv", query: "r.serv", update: "u.serv", delete: "d.serv",
+						dataset: "ds.serv", stree: "s-tree.serv" };
 
 	Protocol.MsgCode = {ok: "ok", exSession: "exSession", exSemantic: "exSemantic",
 						exIo: "exIo", exTransct: "exTransct", exDA: "exDA",
