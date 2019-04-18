@@ -224,8 +224,8 @@ class SessionClient {
 		this.J.post(jmsg, onOk, onError);
 	}
 
-	query(conn, t, alias, pageInf, act) {
-		var qryItem = new QueryReq(conn, t, alias, pageInf);
+	query(conn, maintbl, alias, pageInf, act) {
+		var qryItem = new QueryReq(conn, maintbl, alias, pageInf);
 		var header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object')
 			header.act = act;
@@ -238,7 +238,7 @@ class SessionClient {
 		return jreq;
 	}
 
-	userReq(conn, t, port, bodyItem, act) {
+	userReq(conn, port, bodyItem, act) {
 		var header = Protocol.formatHeader(this.ssInf);
 		// TODO make sure reading act can be null / undefined
 		header.userAct = act;

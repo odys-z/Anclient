@@ -1,7 +1,7 @@
 /** easyui html handler
  * <p>Easyui is html based api. All jclient integration is via html intervention.</p>
  * <p>This module is a helper for handling html tag attribute string parsing.</p>
- * @module jclient/html */
+ * @module jeasy/html */
 
 if (J === undefined)
 	console.error("You need initialize J - use <script>jeasy-api.js</script> first.");
@@ -42,10 +42,14 @@ const ir = {
 	/** combobox */
 	combobox: 'ir-cbb',
 
+	all: 'ir-all',
+
 	cbbtree: 'ir-cbbtree',
 
 	deflt: {
 		gridId: 'irlist',
+		modalId: 'irmodal',
+		_All_: '-- ALL --',
 	},
 
 	ignored: {
@@ -300,42 +304,35 @@ function Tag (debug) {
 	};
 
 	/** Parse String like "ds.sql-key arg1, {@obj.var1}, arg2, ..."
-	 * @param {string} t
-	 * @param {Array} argBuff args that alread has arguments setting by caller.
+	 * @param {string} irsk
 	 * @return {Array} [0] ds, [1] sql-key, [2] argBuff + [arg1, var1, arg2, ...]
 	 */
-	this.parseSk = function (t, argBuff) {
-		if ( t === null || typeof t === "undefined" )
+	this.parseSk = function (irsk) {
+		if ( irsk === null || typeof irsk === "undefined" )
 			return [];
 
 		var args = [];
-		var tss = t.trim().split(" ");
+		var skss = irsk.trim().split(",");
 
-		var sqlId = tss[0];
-		var tk = sqlId.split('.');
-		if (tk.length === 1) {
-			tk[1] = tk[0];
-			tk[0] = "ds"; // default table name in datset.xml
+		var sk = skss[0];
+		if (sk.substring(0, 4) === "cbb.") {
+			// fault tolerance to old version
+			console.warn("sk's table name (cbb) ignored. In jeasy v1.0, there is only 1 xml table configued in dataset.xml.")
+			sk = sk.substring(4);
 		}
-		args.push( tk[0] ); // ds
-		args.push( tk[1] ); // sql-key
-
-		// if (typeof argBuff !== "object")
-		// 	argBuff = [];
+		args.push( sk );
 
 		// replace variables
 		// var regexCbbArg = /{\@\s*(.+)\s*\}/g;
-		for ( var ix = 1; ix < tss.length; ix++ ) {
-			var mOnVar = regex.cbbArg.exec( tss[ix] );
+		for ( var ix = 1; ix < skss.length; ix++ ) {
+			var mOnVar = regex.cbbArg.exec( skss[ix] );
 			if ( mOnVar ) {
-				// if there is variable in args clause, replace with value
 				var v = tag.findVar( mOnVar[1] );
-				// argBuff.push( v );
+				args.push (v);
 			}
-			// else
-			// 	argBuff.push( argss[ix] );
+			else
+				args.push (skss[ix]);
 		}
-		// args.push( argBuff );
 		return args;
 	};
 };
@@ -343,13 +340,31 @@ const tag = new Tag(true);
 
 /**Common handlers for ir attributes, like ir-t, ir-list etc.*/
 function EzHtml (J) {
+	/**Get attr value from tag-id */
+	this.ir = function (tagId, atr) {
+		if (tagId.substring(0, 1) != "#")
+			tagId = "#" + tagId;
+		var a = $(tagId).attr(atr);
+		return a;
+	};
+
+	this.has = function (tagId, atr) {
+		var a = this.ir(tagId, atr);
+		return a !== undefined;
+	};
+
 	/**Parse table and joinning definition in html
 	 * @param {string} pagerId pager id. default "irpager"
 	 * @return {Array} [{t: "main-table/j/r/l", tabl: "table-1", as: "alais", on: cond-string}]<br>
 	 * where cond-string = "col1=col2"
 	 */
 	this.tabls = function (gridId) {
-		var t = $(gridId).attr(ir.t);
+		// var t = $(gridId).attr(ir.t);
+		// FIXME
+		// FIXME
+		// FIXME
+		// FIXME
+		var t = this.ir(gridId, ir.t);
 		if (t === undefined)
 			console.error("In jeasy api v1.0, pager's t is moved to list/grid's tag - must presented there.");
 		else
@@ -393,7 +408,70 @@ function EzHtml (J) {
 const EasyHtml = new EzHtml(J);
 
 function EzCbb (J) {
-	this.configWithArgs = function(cbbId) {
+	this.combobox = function(cbbId, sk, sqlArgs, selectId, _All_, onChangef) {
+		if (cbbId.substring(0, 1) != "#")
+			cbbId = "#" + cbbId;
+		var tree = $(cbbId);
+
+		if (typeof sk === "undefined" || sk === null) {
+			// ir-sk = "xml-tbl.dataset-key, {@obj1.prop1}, const-arg2, ..."
+			sk = tree.attr(ir.combobox);
+		}
+		// get sk from ir-sk attr
+		// get args from ir-sk attr
+		if (sk === undefined || sk === null)
+			console.error(ir.combobox + " attr in " + cbbId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
+		else {
+			var parsed = tag.parseSk(sk);
+			sk = parsed.shift();
+			if (sqlArgs === undefined)
+				sqlArgs = [];
+			sqlArgs = sqlArgs.concat(parsed);
+		}
+
+		// shall add '-- ALL --'?
+		if (_All_ === null || _All_ === undefined)
+			_All_ = false;
+		if (!_All_) // try ir-all
+			if (EasyHtml.has(cbbId, ir.all))
+				_All_ = true;
+
+		if (typeof onChangef === "undefined" || onChangef === null)
+			onChangef = tree.attr(ir.onchange);
+		if (typeof onChangef === "string")
+			onChangef = eval(onChangef);
+
+		// request JMessage body
+		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
+					jconsts.conn,		// connection id in connexts.xml
+					sk);				// sk in dataset.xml
+		req.sqlArgs = sqlArgs;
+
+		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
+		// DatasetReq is used as message body for semantic tree.
+		// Port.stree is port of SemanticTree.
+		// t=load/reforest/retree
+		// user act is ignored for reading
+		var jmsg = ssClient.userReq(jconsts.conn, Port.dataset, req);
+
+		// get data, then bind easyui combotree
+		ssClient.commit(jmsg, function(resp) {
+			console.log(resp);
+			var cbb = $(cbbId);
+			// var rows = resp.data;
+			var rows = jeasy.rows(resp);
+			if (_All_)
+				rows.unshift({text: ir.deflt._All_, value: ir.deflt._All_});
+			cbb.combobox({
+				data: rows,
+				// multiple: isMultiple,
+				onSelect: typeof onChangef === "function" ? onChangef : function(e) {
+					console.log(e);
+				}
+			});
+			if(typeof(selectId) != "undefined" && selectId != null)
+				tree.combotree('setValue', selectId);
+		});
 	}
 };
 const EasyCbb = new EzCbb(J);
@@ -531,13 +609,13 @@ function EzTree(J) {
 		// get sk from ir-sk attr
 		// get args from ir-sk attr
 		if (sk === undefined || sk === null)
-			console.error(ir.sk + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
+			console.error(ir.cbbtree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
 		else {
 			var parsed = tag.parseSk(sk);
-			sk = parsed[0];
+			sk = parsed.shift();
 			if (sqlArgs === undefined)
-				sqlArgs = {};
-			Object.assign(sqlArgs, parsed[1]);
+				sqlArgs = [];
+			sqlArgs = sqlArgs.concat(parsed);
 		}
 
 		if (typeof onChangef === "undefined" || onChangef === null)
@@ -548,7 +626,8 @@ function EzTree(J) {
 		// request JMessage body
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
 					jconsts.conn,		// connection id in connexts.xml
-					sk);				// sk in dataset.xml
+					sk,					// sk in dataset.xml
+					'sqltree');			// ask for configured dataset as tree
 		req.rootId = rootId;
 
 		req.sqlArgs = sqlArgs;
@@ -558,16 +637,18 @@ function EzTree(J) {
 		// Port.stree is port of SemanticTree.
 		// t=load/reforest/retree
 		// user act is ignored for reading
-		var jmsg = ssClient.userReq(jconsts.conn, 'load', Port.stree, req);
+		var jmsg = ssClient.userReq(jconsts.conn, Port.stree, req);
 
 		// get data, then bind easyui combotree
 		ssClient.commit(jmsg, function(resp) {
 			console.log(resp);
 			var tree = $(treeId);
 			tree.combotree({
-				data: resp.rows,
+				data: resp.data,
 				multiple: isMultiple,
-				onSelect: typeof onChangef === "function" ? onChangef : function() {}
+				onSelect: typeof onChangef === "function" ? onChangef : function(e) {
+					console.log(e);
+				}
 			});
 			if(typeof(selectId) != "undefined" && selectId != null)
 				tree.combotree('setValue', selectId);
@@ -945,11 +1026,13 @@ function EzGrid (J) {
 };
 const EasyGrid = new EzGrid(J);
 
+////////////////////////  Easy API for Basic CRUD   ////////////////////////////
+//
 function EzQueryForm(J) {
 	this.load = function(formId) {
 		// 1. load ir-combobox
 		$(formId + " ["+ ir.combobox + "]").each(function(key, domval) {
-			EasyCbb.configWithArgs(domval.id);
+			EasyCbb.combobox(domval.id);
 		});
 
 		// 2. combotree
@@ -996,7 +1079,8 @@ function EzQueryForm(J) {
 		$.each( fields, function( i, field ) {
 			// Ignore items like "-- ALL --" in combobox
 			if (field.value === ir.ignored.cond) return;
-			if (field.value === undefined || field.value === '') return;
+			if (field.value === undefined || field.value === '' || field.value === ir.deflt._All_)
+				return;
 
 			// $( ).append( field.value + " " );
 			var n = field.name.replace(/\s\s+/g, ' ');
@@ -1014,9 +1098,165 @@ function EzQueryForm(J) {
 };
 const EasyQueryForm = new EzQueryForm(J);
 
-function EzModalog() {
+function EzModal() {
+	/**add details */
+	this.addDetails = function (src, title, h, w, init, isUeditor, modalId) {
+		jeasy.setUserActionCmd("insert");
+		this.showDialog(src, title, h, w, init, isUeditor, modalId);
+	};
+
+	/**popping a dialog for edit details
+	 * @param src
+	 * @param title
+	 * @param h
+	 * @param w
+	 * @param init
+	 * @param isUeditor
+	 * @param modalId
+	 * @param listId
+	 * */
+	this.editDetails = function (src, title, h, w, init, isUeditor, modalId, listId) {
+		// alert($("#irmodal").attr("id"));
+		var row = null;
+
+		if(typeof listId != "undefined" && listId.substring(0, 1) != "#")
+			listId = "#" + listId;
+		else listId = _list;
+
+		// Is target table a datagrid or a treegrid?
+		var listType = $(listId).attr(_listType);
+		if(listType == "treegrid")
+			row = $(listId).treegrid("getSelected");
+		else
+			row = $(listId).datagrid("getSelected");
+		if(!row) {
+			$.messager.alert('提示', '请选择要修改的数据行!', 'info');
+			return;
+		}
+
+		// iterate over row's cells
+		var pkvals = new Array();
+		var pks = {};
+		var pksAttr = $(listId).attr(_aPks);
+		if (pksAttr) {
+			var ss = pksAttr.split(',');
+			for (var s in ss)
+			pks[ss[s].trim()] = true;
+		}
+		for(var key in row)
+			if(pks[key] && row.hasOwnProperty(key)) {
+				v = row[key];
+				pkvals.push({"pk": key, "v": v});
+			}
+
+		jeasy.setUserActionCmd("edit");
+
+		this.showDialog(src, title, h, w, init, isUeditor, modalId, row, pkvals);
+	};
+
+	/**
+	 * @param {string} src html
+	 * @param {string} title
+	 * @param {number} h
+	 * @param {number} w
+	 * @param {string} init handler
+	 * @param {bool} isUeditor is u editer
+	 * @param {string} modalId div id for modal
+	 * @param {object} row data
+	 * @param {object} pkvals pk
+	 */
+	this.showDialog = function (src, title, h, w, init, isUeditor, modalId, row, pkvals) {
+		if (modalId === undefined)
+			modalId = ir.deflt.modalId;
+		else if (modalId.substring(0, 1) != "#")
+			modalId = "#" + modalId;
+
+		if (jeasy.log) console.log(src);
+
+		var win_options = {
+			resizable: false,
+			modal: true,
+			width: w,
+			height: h,
+			collapsible: false,
+			minimizable: false,
+			maximizable: false,
+			title: title
+		};
+
+		var newWin = $('<div>');
+		newWin.attr('id', modalId.substr(1, modalId.length - 1) + '-newwin');
+		$(modalId).append(newWin);
+		if(!('top' in win_options)) {
+			win_options.top = 5;
+		}
+		newWin.window(win_options);
+		newWin.window({
+			href: src,
+			onMove: function(left, top) {
+				var position = {
+					left: left,
+					top: top
+				};
+				if(top <= 0) {
+					position.top = 5;
+					$(this).window('move', position);
+				}
+				if(left + win_options.width <= 20) {
+					position.left = left + 50;
+					$(this).window('move', position);
+				}
+				if(top >= $(window).height()) {
+					position.top = $(window).height() - 30;
+					$(this).window('move', position);
+				}
+				if(left >= $(window).width() - 20) {
+					position.left = $(window).width() - 30;
+					$(this).window('move', position);
+				}
+			},
+			onClose: function() {
+				// dispose Ueditor, to be removed
+				if(typeof(isUeditor) != "undefined" && isUeditor == true) {
+					if(typeof(UE.getEditor('container')) != 'undefined') {
+						UE.getEditor('container').destroy();
+					}
+				}
+				newWin.remove();
+			},
+			onLoad: function() {
+				// EasyModal.callInit(init, row, pkvals)
+				// load details form, call user's onload handler (in ir-modal)
+				EasyModal.loadForm(row, pkvals);
+			}
+		});
+
+		if(win_options.height < $(window).height()) {
+			newWin.window('center');
+		}
+	};
+
+	// this.callInit = function (initName, row, pkvals) {
+	// 	if(typeof initName == "undefined") {
+	// 		if(typeof init == "undefined") {
+	// 			console.log("ERROR: callInit(): Init() function not found, initName is also not defined.");
+	// 			return;
+	// 		}
+	// 		if(typeof(row) == "undefined")
+	// 			init();
+	// 		else
+	// 			init(row, pkvals);
+	// 	} else {
+	// 		var f = eval(initName);
+	// 		f(row, pkvals);
+	// 	}
+	// }
+	this.loadForm = function (row, pks) {
+		console.log('todo TODO 		console.log(todo TODO )');
+	};
+
 };
-const EasyModalog = new EzModalog(J);
+const EasyModal = new EzModal(J);
 
 function EzMsger() {
 	this.init = function() {

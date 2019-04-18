@@ -232,20 +232,20 @@
 		}
 		vframe.jclient = new SessionClient(ssInf, iv, true);
 	}
-	
+
 	console.log(vframe);
 	loadMenu(home);
   }
 
   /**Compare with jclient.java/test/io.odysz.jclient.SemantiClientTest*/
   function loadMenu(homeVue) {
-	var req = new DatasetCfg(homeVue.conn, sk.menu);
-	var t = "menu";
+	// var t = ""; // t is ignored by port menu.
+	var req = new DatasetCfg(homeVue.conn, sk.menu, "");
 	var act = { func: 'home.vue',
 				cmd: 'load-menu',
 				cate: t,
 				remarks: 'test jclient.js loading menu from menu.sample'};
-	var jmsg = vframe.jclient.userReq(homeVue.conn, t, Samport.menu, req, act);
+	var jmsg = vframe.jclient.userReq(homeVue.conn, Samport.menu, req, act);
 	vframe.jclient.commit(jmsg, function(resp) {
 		console.log(resp);
 		homeVue.menu = resp.data.menu;

@@ -236,10 +236,13 @@ class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
 	 */
-	constructor (conn, sk) {
+	constructor (conn, sk, ask) {
 		super(conn, sk);
 		this.conn = conn;
 		this.sk = sk;
+		this.a = ask;
+		if (ask === undefined)
+			console.warn("Dataset request message need a 'ask' to indicate function branch.");
 	}
 
 	get geTreeSemtcs() { return this.trSmtcs; }
