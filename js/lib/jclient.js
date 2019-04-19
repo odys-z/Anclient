@@ -227,8 +227,10 @@ class SessionClient {
 	query(conn, maintbl, alias, pageInf, act) {
 		var qryItem = new QueryReq(conn, maintbl, alias, pageInf);
 		var header = Protocol.formatHeader(this.ssInf);
-		if (typeof act === 'object')
+		if (typeof act === 'object') {
 			header.act = act;
+			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
+		}
 		else
 			header.userAct({func: 'query',
 						cmd: 'select',
@@ -240,9 +242,27 @@ class SessionClient {
 
 	userReq(conn, port, bodyItem, act) {
 		var header = Protocol.formatHeader(this.ssInf);
-		// TODO make sure reading act can be null / undefined
-		header.userAct = act;
+		if (typeof act === 'object') {
+			header.userAct = act;
+			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
+		}
+		// don't touch act for asynchronized client events?
+		// else act(null);
+
 		return new JMessage(port, header, bodyItem);
+	}
+
+	usrAct(funcId, cate, cmd, remarks) {
+		if (this.currentAct === undefined)
+			this.currentAct = {};
+		Object.assign(this.currentAct,
+			{func: funcId, cate: cate, cmd: cmd, remarks: remarks});
+	}
+
+	usrCmd(cmd) {
+		if (this.currentAct === undefined)
+			this.currentAct = {};
+		this.currentAct.cmd = cmd;
 	}
 
 	commit (jmsg, onOk, onErr) {
