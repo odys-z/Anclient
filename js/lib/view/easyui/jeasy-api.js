@@ -1,9 +1,5 @@
-/**@module jeasy*/
-
-//////////////////   jeasy API version 1.0    //////////////////////////////////
-// This part comes from the open source jclient.js/easyui.
-// Because the current project is not using webpack, so the two parts is merged
-// into one js file for business module's convenient avoiding including 2 files.
+////////////////     engineering-costs project common      /////////////////////
+// This part include a project configurations for jeasy-api, and an API which
 ////////////////////////////////////////////////////////////////////////////////
 /** project utils
  * @module eng-cost/utils */
@@ -25,6 +21,7 @@ const samports = {
 
 var J = jvue._J;
 J.init(jconsts.serv, jconsts.conn);
+window.J = J;
 
 // otherwise server can't understand business defined ports.
 J.understandPorts(samports);
@@ -61,7 +58,7 @@ function login(logId, pswd, onLogin, home, onError) {
 					console.error("onLogin is not a function");
 				}
 			},
-			onError);
+			typeof onError === "function" ? onError : EasyMsger.error);
 }
 
 function loadSessionInf() {
@@ -100,34 +97,60 @@ function checkLogInput(logId, pswd) {
 var ssk = jvue.SessionClient.ssInfo;
 var ssClient;
 
-/** Set by initFunctree.onSelect();
- * consumed by formatHeader().
- */
-function setUserAction (funcId, funcName, url, cmd) {
-	var sstr = localStorage.getItem(ssk);
-	if(sstr != null && typeof sstr != "undefined" && sstr.length > 0) {
-		var ssinf = JSON.parse(sstr);
-		if (funcId === null)
-			funcId = ssinf.userAct.funcId;
-		if (funcName === null)
-			funcName = ssinf.usrAct.funcName;
-		if (url === null)
-			url = ssinf.usrAct.url;
-		ssinf.usrAct = {
-			funcId: funcId,
-			funcName: funcName,
-			url: url,
-			cmd: cmd
-		};
-		localStorage.setItem(ssk, JSON.stringify(ssinf));
-	}
-}
+function jeasyAPI (J, log) {
+	{	this.c = 'I';
+		this.r = 'R';
+		this.u = 'U';
+		this.d = 'D';
 
-function setUserActionCmd(cmd) {
-	var sstr = localStorage.getItem(ssk);
-	if(sstr != null && typeof sstr != "undefined" && sstr.length > 0) {
-		var ssinf = JSON.parse(sstr);
-		ssinf.usrAct.cmd = cmd;
-		localStorage.setItem(ssk, JSON.stringify(ssinf));
+		this.J = J;
+		this.log = log;
+		this.mainRows = {};
+	}
+
+	/** Get rows from jclient response for easyui datagrid, etc.
+	 * @param {object} resp jclient got response */
+	this.rows = function (resp) {
+		if (resp) {
+			var cols = this.J.respCols(resp);
+			var rows = this.J.respRows(resp);
+			if (cols !== undefined && rows != undefined) {
+				var rows2 = [];
+				for (var rx = 0; rx < rows.length; rx++) {
+					var ri = {};
+					for (var cx = 0; cx < cols.length; cx++)
+						ri[cols[cx]] = rows[rx][cx];
+					rows2[rx] = ri;
+				}
+				return rows2
+			}
+		}
+		return [];
+	};
+
+	/** get "total" from jclient response */
+	this.total = function (resp, rsIx) {
+		if (resp !== undefined && rsIx >= 0) {
+			return resp.data.total[rsIx];
+		}
+	};
+
+
+	/**Set main row when user selected a row in main list of a CRUD typical case.
+	 * @param {string} listId easyui list id
+	 * @param {object} easyui datagrid row that user selected
+	 * @return {object} row found row or new set row.
+	 */
+	this.mainRow = function (listId, row) {
+		var p = regex.desharp_(listId);
+		this.mainRows[ p ] = row;
+	}
+
+	/**
+	 * @return {object} row found row or new set row.
+	 */
+	this.getMainRow = function(listId) {
+		var p = regex.desharp_(listId);
+		return this.mainRows[ p ];
 	}
 }

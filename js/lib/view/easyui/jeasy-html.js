@@ -46,6 +46,12 @@ const ir = {
 
 	cbbtree: 'ir-cbbtree',
 
+	/** Modal dialog form tag, value = callback-name: ir-modal='onModal' */
+	modal: 'ir-modal',
+
+	/** Field name in form, which is to be loaded as record's alias, like "field" of easyui datagrid data-options*/
+	field: 'ir-field',
+
 	deflt: {
 		gridId: 'irlist',
 		modalId: 'irmodal',
@@ -112,6 +118,27 @@ const regex = {
 
 	/** Parse String like "ds.sql-key arg1, {@obj.var1}, arg2, ..."*/
 	cbbArg: /{\@\s*(.+)\s*\}/i,
+
+	/**Add # at start if none
+	 * @param {string} str
+	 * @param {string} defltStr default if  str is undefined or null
+	 * @return {string} "#str" */
+	sharp_: function (str, defltStr) {
+		if (str === undefined || str === null )
+			str = defltStr;
+		if (typeof str === "string" && str.substring(0, 1) !== '#')
+			return '#' + str;
+		return str;
+	},
+
+	/**Add # at start if none
+	 * @param {string} str string with or without a starting '#'
+	 * @return {string} "str" without starting '#' */
+	desharp_: function (str) {
+		if (typeof str === "string" && str.substring(0, 1) === '#')
+			return str.substring(1);
+		return str;
+	}
 };
 
 /**html tag's attribute parser.
@@ -273,11 +300,21 @@ function Tag (debug) {
 
 	/**find var from string like "x.y.z"
 	 * @param {string} vn var name
+	 * @param {object} argPool args buffer for looking varialbkles, if not found, try in window globaly.
 	 * @return {object} value represented by vn, e.g. "x.y.z" */
-	this.findVar = function (vn) {
+	this.findVar = function (vn, argPool) {
 		var v = window;
 		var field;
+
 		var vnss = regex.vn.exec(vn);
+
+		// does arg pool has the variable?
+		if (argPool !== undefined && argPool[vnss[1]] !== undefined) {
+			v = argPool[vnss[1]];
+			field = vnss[2];
+			vnss = regex.vn.exec(vnss[2]);
+		}
+
 		while (vnss) {
 			if (v[vnss[1]]) {
 				v = v[vnss[1]];
@@ -305,9 +342,10 @@ function Tag (debug) {
 
 	/** Parse String like "ds.sql-key arg1, {@obj.var1}, arg2, ..."
 	 * @param {string} irsk
+	 * @param {object} argBuff
 	 * @return {Array} [0] ds, [1] sql-key, [2] argBuff + [arg1, var1, arg2, ...]
 	 */
-	this.parseSk = function (irsk) {
+	this.parseSk = function (irsk, argBuff) {
 		if ( irsk === null || typeof irsk === "undefined" )
 			return [];
 
@@ -327,7 +365,7 @@ function Tag (debug) {
 		for ( var ix = 1; ix < skss.length; ix++ ) {
 			var mOnVar = regex.cbbArg.exec( skss[ix] );
 			if ( mOnVar ) {
-				var v = tag.findVar( mOnVar[1] );
+				var v = tag.findVar( mOnVar[1], argBuff );
 				args.push (v);
 			}
 			else
@@ -359,14 +397,9 @@ function EzHtml (J) {
 	 * where cond-string = "col1=col2"
 	 */
 	this.tabls = function (gridId) {
-		// var t = $(gridId).attr(ir.t);
-		// FIXME
-		// FIXME
-		// FIXME
-		// FIXME
 		var t = this.ir(gridId, ir.t);
 		if (t === undefined)
-			console.error("In jeasy api v1.0, pager's t is moved to list/grid's tag - must presented there.");
+			console.error("In jeasy api v1.0, pager's t is moved to list/grid/details-form's tag - must presented there.");
 		else
 			return tag.joins(t);
 	}
@@ -403,29 +436,52 @@ function EzHtml (J) {
 				exprs.push({exp: al, as: al});
 		}
 		return exprs;
+	};
+
+	/**Find field-expr definitons in easyui list/grid head.
+	 * @param {string} gridId list id to be bind
+	 * @param {string} defltabl main table name, used as html ignored table name
+	 * @return {Array} [{expr: col, gfunc, tabl, as: c1}, ...]
+	 */
+	this.formExprs = function (formId, defltTabl) {
+		var exprs = [];
+		$(formId + " ["+ ir.field + "]").each( function(key, domval) {
+			var as = this.attributes[ir.field] === undefined ?
+						undefined : this.attributes[ir.field].value;
+			var expr = this.attributes[ir.expr] === undefined ?
+						undefined : this.attributes[ir.expr].value;
+			if (expr === undefined)
+				expr = as;
+			if (defltTabl)
+				// FIXME why thExprs() don't need a table alias?
+				exprs.push({exp: defltTabl + "." + expr, as: as});
+			else
+				exprs.push({exp: expr, as: as});
+		} );
+		return exprs;
 	}
 };
 const EasyHtml = new EzHtml(J);
 
 function EzCbb (J) {
-	this.combobox = function(cbbId, sk, sqlArgs, selectId, _All_, onChangef) {
+	this.combobox = function(cbbId, sk, argbuff, selectId, _All_, onChangef) {
 		if (cbbId.substring(0, 1) != "#")
 			cbbId = "#" + cbbId;
-		var tree = $(cbbId);
+		var cbb = $(cbbId);
 
 		if (typeof sk === "undefined" || sk === null) {
 			// ir-sk = "xml-tbl.dataset-key, {@obj1.prop1}, const-arg2, ..."
-			sk = tree.attr(ir.combobox);
+			sk = cbb.attr(ir.combobox);
 		}
 		// get sk from ir-sk attr
 		// get args from ir-sk attr
 		if (sk === undefined || sk === null)
-			console.error(ir.combobox + " attr in " + cbbId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
+			console.error(ir.combobox + " attr in " + cbbId + " is undefined. In jeasy v1.0, only dataset configured combobox is suppored (must have a sk).");
 		else {
-			var parsed = tag.parseSk(sk);
+			var parsed = tag.parseSk(sk, argbuff);
 			sk = parsed.shift();
-			if (sqlArgs === undefined)
-				sqlArgs = [];
+			// if (sqlArgs === undefined)
+			var sqlArgs = [];
 			sqlArgs = sqlArgs.concat(parsed);
 		}
 
@@ -437,7 +493,7 @@ function EzCbb (J) {
 				_All_ = true;
 
 		if (typeof onChangef === "undefined" || onChangef === null)
-			onChangef = tree.attr(ir.onchange);
+			onChangef = cbb.attr(ir.onchange);
 		if (typeof onChangef === "string")
 			onChangef = eval(onChangef);
 
@@ -469,8 +525,8 @@ function EzCbb (J) {
 					console.log(e);
 				}
 			});
-			if(typeof(selectId) != "undefined" && selectId != null)
-				tree.combotree('setValue', selectId);
+			if(typeof(selectId) === "string")
+				cbb.combobox('setValue', selectId);
 		});
 	}
 };
@@ -903,15 +959,14 @@ function EzGrid (J) {
 			console.error("pager id is not valid");
 			return;
 		}
-		else if(pagerId.substring(0, 1) != "#")
-			pagerId = "#" + pagerId;
+		else pagerId = regex.sharp_(pagerId);
 
 		var listId = $(pagerId).attr(ir.grid);
 		if (listId === undefined || listId === null || listId.trim() === '') {
 			console.error("gird/list id defined in pager is not valid. A " + ir.grid + " in pager tag must defined.");
 			return;
 		}
-		listId = '#' + listId;
+		listId = regex.sharp_(listId);
 
 		// semantics key (config.xml/semantics)
 		var semantik = $(pagerId).attr(ir.sk);
@@ -946,7 +1001,7 @@ function EzGrid (J) {
 				// create a query request
 				var maint = tbls[0].tabl;
 				var mainAlias = tbls[0].as;
-				req = ssClient.query(null,	// let the server finde connection
+				req = ssClient.query(null,	// let the server find connection
 							maint,			// main table
 							mainAlias,		// main alias
 							this.pageInfo[pagerId]); // this.pageInfo, saving page ix for consequent querying
@@ -963,7 +1018,7 @@ function EzGrid (J) {
 				// where clause
 				var wheres = EasyQueryForm.conds(qformId, mainAlias);
 				// q.wheres("=", "u.userId", "'" + uid + "'");
-				q.wheres(wheres);
+				q.whereCond(wheres);
 			}
 		}
 		// post request, handle response
@@ -1003,12 +1058,24 @@ function EzGrid (J) {
 			gridId = "#" + gridId;
 		var g = $(gridId);
 
-		if (onSelect)
-			g.datagrid({ onSelect: onSelect });
+		g.datagrid({ onSelect: function(ix, row) {
+				jeasy.mainRow(gridId, row);
+				if (onSelect)
+					onSelect(ix, row);
+			} });
 
-		if (onCheck)
-			g.datagrid({ onCheck: onCheck,
-				onUncheck: onCheck});
+		g.datagrid({
+			onCheck: function(ix, row) {
+				jeasy.mainRow(gridId, row);
+				if (onCheck)
+					onCheck(ix, row);
+			},
+			onUncheck: function(ix, row) {
+				jeasy.mainRow(gridId);
+				if (onCheck)
+					onCheck(ix, row);
+			} });
+
 		if (onCheckAll)
 			g.datagrid({ onCheckAll: onCheckAll,
 				onUncheckAll: onCheckAll});
@@ -1054,15 +1121,10 @@ function EzQueryForm(J) {
 			queryid = _query;
 
 		var conds;
-		// if (typeof getQueryConds != "undefined") {
-		// 	conds = getQueryConds();
-		// 	if (conds) return conds;
-		// }
-
 		var fields = $( queryid ).serializeArray();
 		if (!fields || fields.length <= 0) {
-			console.log("ERROR - No query condition form found in " + queryid);
-			return null;
+			console.log("No query condition form found in " + queryid);
+			return ;
 		}
 		return this.formatConds(deftTabl, fields);
 	}
@@ -1100,9 +1162,16 @@ const EasyQueryForm = new EzQueryForm(J);
 
 function EzModal() {
 	/**add details */
-	this.addDetails = function (src, title, h, w, init, isUeditor, modalId) {
-		jeasy.setUserActionCmd("insert");
-		this.showDialog(src, title, h, w, init, isUeditor, modalId);
+	this.addDetails = function (src, title, h, w, init, isUeditor, modalId, gridId) {
+		ssClient.usrCmd("insert");
+
+		// try to find the row
+		var row;
+		if (gridId)
+		 	row = jeasy.mainRow(gridId);
+		else row = jeasy.getMainRow(ir.deflt.gridId);
+
+		this.showDialog(jeasy.c, src, title, h, w, init, isUeditor, modalId, row);
 	};
 
 	/**popping a dialog for edit details
@@ -1116,42 +1185,19 @@ function EzModal() {
 	 * @param listId
 	 * */
 	this.editDetails = function (src, title, h, w, init, isUeditor, modalId, listId) {
-		// alert($("#irmodal").attr("id"));
 		var row = null;
 
-		if(typeof listId != "undefined" && listId.substring(0, 1) != "#")
-			listId = "#" + listId;
-		else listId = _list;
+		listId = regex.sharp_(listId, ir.deflt.gridId);
 
-		// Is target table a datagrid or a treegrid?
-		var listType = $(listId).attr(_listType);
-		if(listType == "treegrid")
-			row = $(listId).treegrid("getSelected");
-		else
-			row = $(listId).datagrid("getSelected");
-		if(!row) {
-			$.messager.alert('提示', '请选择要修改的数据行!', 'info');
+		var row = jeasy.getMainRow(listId);
+		if(row === undefined) {
+			EasyMsger.alert(EasyMsger.m.none_selected);
 			return;
 		}
 
-		// iterate over row's cells
-		var pkvals = new Array();
-		var pks = {};
-		var pksAttr = $(listId).attr(_aPks);
-		if (pksAttr) {
-			var ss = pksAttr.split(',');
-			for (var s in ss)
-			pks[ss[s].trim()] = true;
-		}
-		for(var key in row)
-			if(pks[key] && row.hasOwnProperty(key)) {
-				v = row[key];
-				pkvals.push({"pk": key, "v": v});
-			}
+		ssClient.usrCmd("edit");
 
-		jeasy.setUserActionCmd("edit");
-
-		this.showDialog(src, title, h, w, init, isUeditor, modalId, row, pkvals);
+		this.showDialog(jeasy.u, src, title, h, w, init, isUeditor, modalId, row);
 	};
 
 	/**
@@ -1165,13 +1211,12 @@ function EzModal() {
 	 * @param {object} row data
 	 * @param {object} pkvals pk
 	 */
-	this.showDialog = function (src, title, h, w, init, isUeditor, modalId, row, pkvals) {
+	this.showDialog = function (crud, src, title, h, w, init, isUeditor, modalId, row) {
 		if (modalId === undefined)
 			modalId = ir.deflt.modalId;
-		else if (modalId.substring(0, 1) != "#")
-			modalId = "#" + modalId;
+		modalId = regex.sharp_(modalId);
 
-		if (jeasy.log) console.log(src);
+		console.log(src);
 
 		var win_options = {
 			resizable: false,
@@ -1184,15 +1229,18 @@ function EzModal() {
 			title: title
 		};
 
-		var newWin = $('<div>');
-		newWin.attr('id', modalId.substr(1, modalId.length - 1) + '-newwin');
+		var _modalId = regex.desharp_(modalId);
+		var newWin = $('<div>').attr('id', _modalId);
 		$(modalId).append(newWin);
+		// console.log($(modalId, $('iframe').get(0).contentWindow.document));
+
 		if(!('top' in win_options)) {
 			win_options.top = 5;
 		}
 		newWin.window(win_options);
 		newWin.window({
 			href: src,
+			id: _modalId,
 			onMove: function(left, top) {
 				var position = {
 					left: left,
@@ -1227,7 +1275,7 @@ function EzModal() {
 			onLoad: function() {
 				// EasyModal.callInit(init, row, pkvals)
 				// load details form, call user's onload handler (in ir-modal)
-				EasyModal.loadForm(row, pkvals);
+				EasyModal.callInit(crud, modalId, init, row);
 			}
 		});
 
@@ -1251,10 +1299,144 @@ function EzModal() {
 	// 		f(row, pkvals);
 	// 	}
 	// }
-	this.loadForm = function (row, pks) {
-		console.log('todo TODO 		console.log(todo TODO )');
+	this.callInit = function (crud, formId, fn, row) {
+		var f;
+		if (typeof fn === 'function')
+			f = fn;
+		else if (typeof fn === 'string')
+			f = eval(fn);
+		if (f) {
+			f(crud, formId, ssClient, row);
+		}
+		else
+			console.error("can't find function " + fn);
 	};
 
+	/**Details form loading, a helper called by user onModal() to load a CRUD details form.<br>
+	 * @param {string} formId: optional form id, default "irform".
+	 * @param {string} irt: serv target (at least main table),
+	 * can be configured from $(formId)[ir-t] (set the parameter as null)
+	 * @param {Array/Object} pk: Value(s) will be appended to query's where clause.
+	 * 1. Object: {pk, v} pk value for quering record. (only pk for main table, on table name)<br>
+	 * 2. Array: [{condt}] conditions returned by EasyQeuryForm.conds();
+	 * @param {function} callback onload event handler<br>
+	 * Functions that for special tasks, e.g. loading svg should done here.
+	 */
+	this.load = function (formId, irt, pk, callback) {
+		// find sql "from" clause
+		var joins;
+		if (irt === null || irt === undefined) {
+		 	irt = EasyHtml.ir(formId, ir.t);
+			joins = EasyHtml.tabls(formId);
+		}
+		else if (typeof irt === 'string')
+		 	joins = tag.joins(irt);
+
+		var mainAlias = joins[0].as;
+		var exprs = EasyHtml.formExprs(formId, mainAlias);
+		var wheres = EasyQueryForm.conds(formId, mainAlias);
+
+		var req = ssClient.query(null,	// let the server find connection
+					joins[0].tabl,		// main table
+					joins[0].as);		// main alias
+
+		var q = req.body[0];
+		q.exprss(exprs)
+			.joinss(joins.splice(1, joins.length - 1))
+			.whereCond(wheres);
+		if (pk !== undefined && Array.isArray(pk))
+			q.whereCond(pk);
+		else if (typeof pk === "object" && pk.pk !== undefined)
+			q.whereCond("=", pk.pk, "'" + pk.v + "'");
+
+		// post request, handle response
+		EasyMsger.progress();
+		ssClient.commit(req, function(resp) {
+			var rows = jeasy.rows(resp);
+			EasyModal.bindWidgets (formId, rows[0], callback);
+		}, EasyMsger.error);
+	};
+
+	this.bindWidgets = function(formId, rec) {
+		$(formId + " ["+ ir.field + "]").each( function(key, domval) {
+			// value is a DOM, see http://api.jquery.com/each/
+			var v = rec[this.attributes[ir.field].value];
+			// ir-field presented
+			if ( this.attributes[ir.field].name !== undefined ) {
+				// set value like a text input
+				// case 1: bind ir-combobox
+				if (this.attributes[ir.combobox]) {
+					if (this.attributes[ir.combobox].name !== undefined) {
+						// an ir-combobox from configured dataset
+						// this.value = v;
+						EasyCbb.combobox(domval.id, null, {row: rec}, v);
+					}
+					else console.log("EasyModal.bindWidgets(): ignoring combobox " + domval.id + " " + domval.name);
+				}
+				// case 2: bind ir-cbbtree
+				else if (this.attributes[ir.cbbtree]) {
+					EasyTree.combotree( domval.id, null, {row: rec}, null, v);
+				}
+				// case 3: bind easyui-datebox/datetimebox
+				else if (this.classList && (this.classList.contains('easyui-datetimebox')
+										|| this.classList.contains('easyui-datebox')   ) ) {
+					//$("#installDate").datebox("setValue", row.installDate);
+					if ( v !== undefined && v.trim().length > 0) {
+						try {
+							var dt = new Date(v);
+							$('#' + domval.id).datebox('setValue', v);
+						} catch ( ex ) {
+							console.log("loadSimpleForm(): Value " + v + " can't been set to datebox " + domval.id);
+						}
+					}
+				}
+				// case 4: bind easyui-numberspinner
+				else if (this.classList && (this.classList.contains('easyui-numberspinner')))
+					try {
+						$('#' + domval.id).numberspinner('setValue', v);
+					} catch ( ex ) {
+						console.log("loadSimpleForm(): Value " + v +
+							" can't been set to easyui numberspinner " + domval.id);
+					}
+				// case 5: grid?
+				// case 6: bind text input - should this moved to the first?
+				else
+					// this.value = resp.rows[0][this.attributes[_aField].value];
+					this.value = v;
+			}
+		});
+
+		EasyMsger.close();
+		if (typeof callback === "function")
+			callback();
+	}
+
+	/** close dialog
+	 * @param {string} dlgId dialog id
+	 */
+	this.close = function (dlgId) {
+		dlgId = regex.sharp_(dlgId, ir.deflt.modalId);
+		$(dlgId).window('close');
+	};
+
+	/**Save form. Any form element with 'name' attribute will be saved into tabl.
+	 * @param {stirng} crud jeasy.c | r | u | d
+	 * @param {string} dlgid formId to be packaged
+	 * @param {string} tabl target table
+	 * @param {string} pk {pk, v} for update condition, ignored when crud = jeasy.c
+	 * @return {UpdateReq} request formatted according to form's html.
+	 */
+	this.save = function (conn, crud, dlgId, tabl, pk) {
+		dlgId = regex.sharp_(dlgId, ir.deflt.modalId);
+
+		var nvs = $(dlgId).serializeArray();
+		if (crud === jeasy.c) {
+			return ssClient.insert(conn, tabl);
+		}
+		else {
+			return ssClient.update(conn, tabl, pk);
+		}
+	}
 };
 const EasyModal = new EzModal(J);
 
@@ -1293,6 +1475,31 @@ function EzMsger() {
 			console.warn('Error message ignored:')
 			console.warn(resp);
 		}
+	};
+
+	/**easyui messager.alert('info')
+	 * @param {string} code alerting code to supress duplicated alarm.
+	 * @param {function} m message code, one of EzMsger.m.
+	 * Function type is checked here to prevent users send string parameter anywhere when they want to.
+	 */
+	this.alert = function (m) {
+		if (typeof m === 'function' && m.name in this.m) {
+			$.messager.alert('info', m(), 'info');
+			return;
+		}
+
+		console.warn("We check m's existence because including message string anywhere is not encouraged in jeasy.",
+					"You can replace EasyMsger.m with your m object to update and extend messages, in one place.",
+					m);
+	};
+
+	this.ok = function () {
+		this.alert(this.m.ok);
 	}
+
+	this.m = {
+		ok: () => "OK!",
+		none_selected: () => "Please select a record!",
+	};
 };
 const EasyMsger = new EzMsger(J);
