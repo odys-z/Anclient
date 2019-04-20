@@ -49,7 +49,7 @@ public class SessionClient {
 		JHeader.usrAct(funcId, "query", t, "R");
 		req.header(header);
 
-		QueryReq itm = QueryReq.formatReq(conn, req, ssInf, t, alias);
+		QueryReq itm = QueryReq.formatReq(conn, req, t, alias);
 		req.body(itm);
 		itm.page(page, size);
 

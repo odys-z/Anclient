@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import AES from './aes.js';
-import {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg} from './protocol.js';
+import {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DatasetCfg} from './protocol.js';
 
 /**AES lib instance*/
 var aes;
@@ -240,15 +240,57 @@ class SessionClient {
 		return jreq;
 	}
 
+	update(conn, maintbl, pk) {
+		if (this.currentAct === undefined || this.currentAct.func === undefined)
+			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
+						"To setup user's action information, call ssClient.usrAct().");
+
+		if (pk === undefined) {
+			console.error("To update a table, {pk, v} must presented.", pk);
+			return;
+		}
+
+		var upd = new UpdateReq(conn, maintbl, pk);
+		upd.a = 'U';
+		this.currentAct.cmd = 'update';
+		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
+		return jmsg;
+	}
+
+	insert(conn, maintbl) {
+		if (this.currentAct === undefined || this.currentAct.func === undefined)
+			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
+						"To setup user's action information, call ssClient.usrAct().");
+
+		var upd = new UpdateReq(conn, maintbl);
+		upd.a = 'I';
+		this.currentAct.cmd = 'insert';
+		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
+		return jmsg;
+	}
+
+	delete(conn, maintbl, pk) {
+		if (this.currentAct === undefined || this.currentAct.func === undefined)
+			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
+						"To setup user's action information, call ssClient.usrAct().");
+		if (pk === undefined) {
+			console.error("To delete a table, {pk, v} must presented.", pk);
+			return;
+		}
+
+		var upd = new UpdateReq(conn, maintbl, pk);
+		upd.a = 'D';
+		this.currentAct.cmd = 'delete';
+		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
+		return jmsg;
+	}
+
 	userReq(conn, port, bodyItem, act) {
 		var header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
 			header.userAct = act;
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}
-		// don't touch act for asynchronized client events?
-		// else act(null);
-
 		return new JMessage(port, header, bodyItem);
 	}
 

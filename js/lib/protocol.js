@@ -162,6 +162,7 @@ class QueryReq {
 		if (js !== undefined && js.length !== undefined)
 			for (var ix = 0; ix < js.length; ix++)
 				this.join(js[ix].t, js[ix].tabl, js[ix].as, js[ix].on);
+		return this;
 	}
 
 	expr (exp, as) {
@@ -179,42 +180,51 @@ class QueryReq {
 					this.expr(exps[ix][0], exps[ix][1]);
 				else {
 					console.error('Can not parse expr:');
-					console.error(exps);
+					console.error(exps[ix]);
+					console.error('Correct Format:')
+					console.error('[exp, as]');
 				}
+		return this;
 	}
 
 	whereCond (logic, loper, roper) {
-		// for elements order, see
-		// java/io.odysz.transact.sql.query.Query$Ix$Predicate
-		this.where.push([logic, loper, roper]);
+		if (Array.isArray(logic))
+			this.where = this.where.concat(logic);
+		else if (logic !== undefined)
+			this.where.push([logic, loper, roper]);
 		return this;
 	}
 
 	/** @param {Array} conds [{op, l, r}] */
-	wheres (conds) {
-		if (conds !== undefined && conds.length !== undefined)
-			for (var ix = 0; ix < conds.length; ix++)
-				this.whereCond(conds[ix].op, conds[ix].l, conds[ix].r);
-	}
+	// wheres (conds) {
+	// 	if (conds !== undefined && conds !== null && conds.length !== undefined)
+	// 		for (var ix = 0; ix < conds.length; ix++)
+	// 			this.whereCond(conds[ix].op, conds[ix].l, conds[ix].r);
+	// 	return this;
+	// }
 
 	orderby (col, asc) {
 		if (this.orders === undefined)
 			this.orders = [];
 		this.orders.push(col, asc);
+		return this;
 	}
 
 	orderbys (cols) {
 		if (cols !== undefined && cols.length !== undefined)
 			for (var ix = 0; ix < cols.length; ix++)
 				this.expr(cols[ix].col, cols[ix].asc);
+		return this;
 	}
 
 	groupby (col) {
 		console.warn("groupby() is still to be implemented");
+		return this;
 	}
 
 	groupbys (cols) {
 		console.warn("groupby() is still to be implemented");
+		return this;
 	}
 
 	commit () {
@@ -231,6 +241,56 @@ class QueryReq {
 	}
 }
 
+class UpdateReq {
+	constructor (conn, tabl, pk) {
+		this.conn = conn;
+		this.mtabl = tabl;
+		this.nvs = [];
+		this.where = [];
+		if (Array.isArray(pk))
+			this.where.push(pk);
+		else if (typeof pk === "object")
+		 	if (pk.pk !== undefined)
+				this.where.push([pk.pk, pk.v]);
+			else console.error("UpdateReq: Can't understand pk: ", pk);
+	}
+
+	nv (n, v) {
+		this.nvs.push([n, v]);
+		return this;
+	}
+
+	nvs (vs) {
+		this.nvs = this.nvs.concat(vs);
+		return this;
+	}
+
+	whereCond (logic, loper, roper) {
+		if (Array.isArray(logic))
+			this.where = this.where.concat(logic);
+		else if (logic !== undefined)
+			this.where.push([logic, loper, roper]);
+		return this;
+	}
+
+	/** @param {Array} conds [{op, l, r}]
+	wheres (conds) {
+		if (conds !== undefined && conds !== null && conds.length !== undefined)
+			for (var ix = 0; ix < conds.length; ix++)
+				this.whereCond(conds[ix].op, conds[ix].l, conds[ix].r);
+		return this;
+	}
+	 * */
+
+	post (pst) {
+		if (this.post === undefined)
+			this.post = [];
+		if (Array.isArray(pst)) {
+			this.post = this.post.concat(pst);
+		}
+		else pust.push(pst);
+	}
+}
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
 class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
@@ -241,8 +301,8 @@ class DatasetCfg extends QueryReq {
 		this.conn = conn;
 		this.sk = sk;
 		this.a = ask;
-		if (ask === undefined)
-			console.warn("Dataset request message need a 'ask' to indicate function branch.");
+		// if (ask === undefined)
+		// 	console.warn("Dataset request message need a 'ask' to indicate function branch.");
 	}
 
 	get geTreeSemtcs() { return this.trSmtcs; }
@@ -256,4 +316,4 @@ class DatasetCfg extends QueryReq {
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Protocol, JMessage, JHeader, SessionReq, QueryReq, DatasetCfg}
+export {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DatasetCfg}
