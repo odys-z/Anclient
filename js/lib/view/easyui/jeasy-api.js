@@ -1,21 +1,19 @@
-////////////////     engineering-costs project common      /////////////////////
-// This part include a project configurations for jeasy-api, and an API which
-////////////////////////////////////////////////////////////////////////////////
-/** project utils
- * @module eng-cost/utils */
+/**************       Sample project section     *******************************
+ * A sample project usually have common module to configure jeasy API like this:
+ * NOTE: Replace all '* /' with end of block comments - without space.
 const jconsts = {
 	serv: 'http://localhost:8080/semantic.jserv',
 	conn: 'inet',
-	/**datas.xml/sk */
+	/**datas.xml/sk * /
 	sk: {
 		menu: 'sys.menu.ez-test',
 	}
 }
 
 const samports = {
-	/** see semantic.jserv/io.odysz.jsample.SysMenu */
+	/** see semantic.jserv/io.odysz.jsample.SysMenu * /
 	menu: "menu.sample",
-	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
+	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ * /
 	cheapflow: "cheapflow.sample"
 }
 
@@ -35,7 +33,7 @@ J.understandPorts(samports);
  * @param {function} onLogin callback on logged in
  * @param {string} home main page url. default = index.html
  * @param {function} robotOnFailed callback if logId == 'robot' and failed on pswd or uid
- */
+ * /
 function login(logId, pswd, onLogin, home, onError) {
     var checkEasyUI = false;
     checkEasyUI = checkDevice(navigator.userAgent||navigator.vendor||window.opera);
@@ -49,6 +47,8 @@ function login(logId, pswd, onLogin, home, onError) {
 			function(client) {
 				ssClient = client;
 				if (typeof onLogin === "function") {
+					// store session info temperary locally - window url will be changed
+					// a more secure way is using a certification.
 					var ss = JSON.stringify(client.ssInf);
 					localStorage.setItem(ssk, ss);
 					$.cookie(ssk, ss, {path: "/", expires: 10000});
@@ -76,13 +76,14 @@ function loadSessionInf() {
  * @param {string} logId
  * @param {string} pswd
  * @return {boolean} true = error()
- */
+ * /
 function checkLogInput(logId, pswd) {
 	var checkEasyUI = false;
 	// check user inputs
 }
+******************       Sample project section end     ***********************/
 
-//////////////////   jeasy API version 1.0    //////////////////////////////////
+///////////////////////   jeasy API version 1.0    /////////////////////////////
 // This part comes from the open source jclient.js/easyui.
 // Because the current project is not using webpack, so the two parts is merged
 // into one js file for business module's convenient avoiding including 2 files.
@@ -98,10 +99,11 @@ var ssk = jvue.SessionClient.ssInfo;
 var ssClient;
 
 function jeasyAPI (J, log) {
-	{	this.c = 'I';
-		this.r = 'R';
-		this.u = 'U';
-		this.d = 'D';
+	{	// for shorter sentence
+		this.c = jvue.Protocol.CRUD.c;
+		this.r = jvue.Protocol.CRUD.r;
+		this.u = jvue.Protocol.CRUD.u;
+		this.d = jvue.Protocol.CRUD.d;
 
 		this.J = J;
 		this.log = log;
@@ -154,3 +156,4 @@ function jeasyAPI (J, log) {
 		return this.mainRows[ p ];
 	}
 }
+const jeasy = new jeasyAPI(J);

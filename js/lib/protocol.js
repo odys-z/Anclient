@@ -48,6 +48,8 @@ class Protocol {
 
 /**Static methods of Protocol */
 {
+	Protocol.CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
+	
 	Protocol.Port = {	heartbeat: "ping.serv", echo: "echo.serv", session: "login.serv",
 						insert: "c.serv", query: "r.serv", update: "u.serv", delete: "d.serv",
 						dataset: "ds.serv", stree: "s-tree.serv" };

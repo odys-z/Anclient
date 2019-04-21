@@ -1191,7 +1191,7 @@ function EzModal() {
 
 		var row = jeasy.getMainRow(listId);
 		if(row === undefined) {
-			EasyMsger.alert(EasyMsger.m.none_selected);
+			EasyMsger.info(EasyMsger.m.none_selected);
 			return;
 		}
 
@@ -1430,6 +1430,8 @@ function EzModal() {
 		dlgId = regex.sharp_(dlgId, ir.deflt.modalId);
 
 		var nvs = $(dlgId).serializeArray();
+		if (nvs === undefined || nvs.length === 0)
+			return;
 		if (crud === jeasy.c) {
 			return ssClient.insert(conn, tabl);
 		}
@@ -1467,7 +1469,8 @@ function EzMsger() {
 			EasyMsger.msg[code] = code;
 			console.error(resp)
 			if (code === jvue.Protocol.MsgCode.exSession)
-				$.messager.alert('warn', 'Session Error! Please re-login');
+				//$.messager.alert('warn', 'Session Error! Please re-login.');
+				$.messager.alert('warn', resp.error);
 			else if (code === jvue.Protocol.MsgCode.exIo)
 				$.messager.alert('warn', 'Network Problem!');
 		}
@@ -1482,9 +1485,11 @@ function EzMsger() {
 	 * @param {function} m message code, one of EzMsger.m.
 	 * Function type is checked here to prevent users send string parameter anywhere when they want to.
 	 */
-	this.alert = function (m) {
+	this.info = function (m, style) {
+		if (style === undefined)
+			style = 'info';
 		if (typeof m === 'function' && m.name in this.m) {
-			$.messager.alert('info', m(), 'info');
+			$.messager.alert(style, m(), style);
 			return;
 		}
 
@@ -1493,9 +1498,27 @@ function EzMsger() {
 					m);
 	};
 
+	/**See info()
+	 * @param {function} m
+	 */
+	this.alert = function (m) {
+		this.info(m, 'warn');
+	};
+
 	this.ok = function () {
-		this.alert(this.m.ok);
-	}
+		this.info(this.m.ok);
+	};
+
+	/**Replace/extend an individual message.
+	 * You'd better replace the entire m if switching to another language other than English.
+	 * @param {string} code
+	 * @param {string} msg message
+	 */
+	this.setM = function (code, msg) {
+		var mf = {};
+		mf[code] = () => msg;
+		Object.assign(this.m, mf);
+	};
 
 	this.m = {
 		ok: () => "OK!",

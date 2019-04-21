@@ -95,6 +95,10 @@ class J {
 	}
 
 	post (jreq, onOk, onErr) {
+		if (jreq === undefined) {
+			console.error('jreq is null');
+			return;
+		}
 		var url = this.servUrl(jreq.port);
 
 		$.ajax({type: 'POST',
