@@ -180,11 +180,8 @@
 		},
 	},
 	mounted() {
-
 		if (this.options !== undefined && this.options.tooltip !== undefined)
 			this.tooltip = this.options.tooltip;
-
-		// this.createThrobber('#progress');
 	}
   }
 
