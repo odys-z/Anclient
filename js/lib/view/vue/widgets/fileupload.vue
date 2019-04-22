@@ -87,8 +87,6 @@
 				 */
 				for (let i = 0; i < fileInfs.length; i++) {
 					var f = fileInfs[i];
-					// console.log('push:');
-					// console.log(f);
 					this.files.push({ id: this.file_seq++ + '-' + f.name.replace(reg, '_'),
 						filename: f.name,
 						info: f.name + " [" + f.size + "]",
@@ -108,7 +106,6 @@
 			formData.append("file", file, file.name);
 
 			// 'http://localhost:8080/semantic.jserv/file.serv?t=upload&file='
-			// var servUrl = this.serv + '?t=upload&file=' + file.name;
 			var servUrl = this.serv + '?t=upload';
 			$.ajax({
 				type: "POST",
