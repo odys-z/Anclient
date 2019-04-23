@@ -1022,20 +1022,56 @@ function EzGrid (J) {
 			}
 		}
 		// post request, handle response
+		EasyMsger.progress();
 		ssClient.commit(req, function(resp) {
-			EasyMsger.progress();
-			// var users = J.respObjs(resp, 0, 1);
-			// var rows = resp.data.rs[0].splice(1);
 			var rows = jeasy.rows(resp);
-			EasyGrid.bindPage (listId, rows, onSelect, onCheck, onCheckAll, onLoad);
-
 			var total = jeasy.total(resp, 0);
+			EasyGrid.bindPage (listId, rows, total, onSelect, onCheck, onCheckAll, onLoad);
+
 			var pgInf = EasyGrid.pageInfo[pagerId];
 			pgInf.total = total;
 			EasyGrid.bindPager(pagerId, total, pgInf.page, pgInf.size);
 		}, EasyMsger.error);
 	};
 
+	/** a wrapper of this.page(), for convenient.
+	 * @param {string} pagerId
+	 * @param {object} opts
+	 * rowpk: row's pk
+	 * select: select an item when load
+	 */
+	this.page_opts = function (pagerId, opts) {
+		pagerId = regex.sharp_(pagerId, ir.deflt.pagerId);
+
+		this.page(pagerId, null,
+			// onload, select row ...
+			function (rows, total) {
+				// opt 1. select row
+				if (opts !== undefined
+					&& typeof opts.rowpk === 'string' && typeof opts.select === 'string'
+					&& rows !== undefined && rows.length !== undefined) {
+						
+					var gridId = $(pagerId).attr(ir.grid);
+					gridId = regex.sharp_(gridId);
+
+					for (var ix = 0; ix < rows.length; ix++) {
+						if (rows[ix][opts.rowpk] == opts.select) {
+							console.log('------------------- Why failed? $(pagerId).datagrid("selectRow", ' + ix + ')$ ------------------- ');
+							$(gridId).datagrid('unselectAll');
+							$(gridId).datagrid('selectRow', ix);
+							break;
+						}
+					}
+				}
+		});
+	}
+
+	/**call easyui $(pagerId).pagination("refresh", ...
+	 * @param {string} pagerId
+	 * @param {int} total
+	 * @param {int} page
+	 * @param {int} size
+	 */
 	this.bindPager = function (pagerId, total, page, size) {
 		$(pagerId).pagination("refresh", {
 			total: total,
@@ -1053,7 +1089,7 @@ function EzGrid (J) {
 		EasyGrid.page(this.id, pgInf.queryId);
 	}
 
-	this.bindPage = function (gridId, json, onSelect, onCheck, onCheckAll, onLoad) {
+	this.bindPage = function (gridId, json, total, onSelect, onCheck, onCheckAll, onLoad) {
 		if (gridId.substring(0, 1) != "#")
 			gridId = "#" + gridId;
 		var g = $(gridId);
@@ -1088,7 +1124,7 @@ function EzGrid (J) {
 
 		EasyMsger.close();
 		if (typeof onLoad === "function")
-			onLoad ( resp.rows, resp.total );
+			onLoad ( json, total );
 	};
 };
 const EasyGrid = new EzGrid(J);
@@ -1115,7 +1151,7 @@ function EzQueryForm(J) {
 	 * @return {array} [{field, v, logic}]
 	 */
 	this.conds = function (queryid, deftTabl) {
-		if(typeof queryid != "undefined" && queryid.substring(0, 1) != "#")
+		if(queryid !== null && queryid !== undefined && queryid.substring(0, 1) != "#")
 			queryid = "#" + queryid;
 		else if (typeof queryid === "undefined")
 			queryid = _query;
@@ -1152,8 +1188,12 @@ function EzQueryForm(J) {
 				console.log("WARN - name attr in form (id=irquery) must indicating logic operand: " + n);
 				return;
 			}
-			conds.push({op: namess[1].trim(), l: namess[0],
-					r: "'" + field.value + "'"});	// FIXME: what about \' ?
+
+			// public static final int predicateOper = 0;
+			// public static final int predicateL = 1;
+			// public static final int predicateR = 2;
+			conds.push([namess[1].trim(), namess[0],
+					"'" + field.value + "'"]);	// FIXME: what about \' ?
 		});
 		return conds;
 	}
@@ -1357,10 +1397,11 @@ function EzModal() {
 		}, EasyMsger.error);
 	};
 
-	this.bindWidgets = function(formId, rec) {
+	this.bindWidgets = function(formId, rec, callback) {
 		$(formId + " ["+ ir.field + "]").each( function(key, domval) {
 			// value is a DOM, see http://api.jquery.com/each/
-			var v = rec[this.attributes[ir.field].value];
+			var f = this.attributes[ir.field].value;
+			var v = rec[f];
 			// ir-field presented
 			if ( this.attributes[ir.field].name !== undefined ) {
 				// set value like a text input
@@ -1398,10 +1439,18 @@ function EzModal() {
 						console.log("loadSimpleForm(): Value " + v +
 							" can't been set to easyui numberspinner " + domval.id);
 					}
-				// case 5: grid?
+				// case 5.1: datagrid pager
+				if (this.attributes[ir.grid]) {
+					EasyGrid.page_opts(this.id,
+						{rowpk: f, select: v});
+				}
+				// case 5.2: datagrid
+				else if  (this.classList && (this.classList.contains('easyui-textbox')))
+					;
 				// case 6: bind text input - should this moved to the first?
+				else if  (this.classList && (this.classList.contains('easyui-textbox')))
+					$(regex.sharp_(this.id)).textbox({value: v});
 				else
-					// this.value = resp.rows[0][this.attributes[_aField].value];
 					this.value = v;
 			}
 		});
@@ -1429,23 +1478,31 @@ function EzModal() {
 	this.save = function (conn, crud, dlgId, tabl, pk) {
 		dlgId = regex.sharp_(dlgId, ir.deflt.modalId);
 
-		var nvs = $(dlgId).serializeArray();
+		var nvs = $(dlgId + ' [name]').serializeArray();
+
 		if (nvs === undefined || nvs.length === 0)
-			return;
+			console.warn("No saving values found in form: " + dlgId,
+						"Only children with name attribute of " + dlgId + " can be serrialized.");
+
 		if (crud === jeasy.c) {
-			return ssClient.insert(conn, tabl);
+			return ssClient.insert(conn, tabl, nvs);
 		}
 		else {
-			return ssClient.update(conn, tabl, pk);
+			return ssClient.update(conn, tabl, pk, nvs);
 		}
 	}
 };
 const EasyModal = new EzModal(J);
 
 function EzMsger() {
-	this.init = function() {
-		this.msg = {};
-		this.progressing = false;
+	this.init = function(code) {
+		if (code === undefined) {
+			this.msg = {};
+			this.progressing = false;
+		}
+		else {
+			this.msg[code] = undefined;
+		}
 	};
 
 	this.init();
@@ -1473,6 +1530,7 @@ function EzMsger() {
 				$.messager.alert('warn', resp.error);
 			else if (code === jvue.Protocol.MsgCode.exIo)
 				$.messager.alert('warn', 'Network Problem!');
+			else $.messager.alert('warn', resp.error);
 		}
 		else {
 			console.warn('Error message ignored:')
@@ -1505,8 +1563,11 @@ function EzMsger() {
 		this.info(m, 'warn');
 	};
 
-	this.ok = function () {
-		this.info(this.m.ok);
+	this.ok = function (mcode) {
+		if (mcode)
+			this.info(mcode);
+		else
+			this.info(this.m.ok);
 	};
 
 	/**Replace/extend an individual message.
@@ -1522,6 +1583,7 @@ function EzMsger() {
 
 	this.m = {
 		ok: () => "OK!",
+		saved: () => "Saving Successfully!",
 		none_selected: () => "Please select a record!",
 	};
 };

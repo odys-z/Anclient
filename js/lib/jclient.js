@@ -244,7 +244,7 @@ class SessionClient {
 		return jreq;
 	}
 
-	update(conn, maintbl, pk) {
+	update(conn, maintbl, pk, nvs) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -258,10 +258,16 @@ class SessionClient {
 		upd.a = 'U';
 		this.currentAct.cmd = 'update';
 		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
+
+		if (nvs !== undefined) {
+			if (Array.isArray(nvs))
+				upd.nv(nvs);
+			else console.error("updating nvs must be an array of name-value.", nvs)
+		}
 		return jmsg;
 	}
 
-	insert(conn, maintbl) {
+	insert(conn, maintbl, nvs) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -270,6 +276,12 @@ class SessionClient {
 		upd.a = 'I';
 		this.currentAct.cmd = 'insert';
 		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
+
+		if (nvs !== undefined) {
+			if (Array.isArray(nvs))
+				upd.nv(nvs);
+			else console.error("updating nvs must be an array of name-value.", nvs)
+		}
 		return jmsg;
 	}
 

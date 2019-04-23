@@ -44,12 +44,26 @@ class Protocol {
 
 		return rows;
 	}
+
+	static nv2arr (nv) {
+		return [nv.name, nv.value];
+	}
+
+	static nvs2arr(nvs) {
+		var arr = [];
+		if(nvs) {
+			for (var ix = 0; ix < nvs.length; ix++)
+				// Ix.nvn = 0; Ix.nvv = 1
+				arr.push([nvs[ix].name, nvs[ix].value]);
+		}
+		return arr;
+	}
 } ;
 
 /**Static methods of Protocol */
 {
 	Protocol.CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
-	
+
 	Protocol.Port = {	heartbeat: "ping.serv", echo: "echo.serv", session: "login.serv",
 						insert: "c.serv", query: "r.serv", update: "u.serv", delete: "d.serv",
 						dataset: "ds.serv", stree: "s-tree.serv" };
@@ -258,14 +272,17 @@ class UpdateReq {
 	}
 
 	nv (n, v) {
-		this.nvs.push([n, v]);
+		if (Array.isArray(n))
+			this.nvs = this.nvs.concat(Protocol.nvs2arr(n));
+		else
+			this.nvs.push([n, v]);
 		return this;
 	}
 
-	nvs (vs) {
-		this.nvs = this.nvs.concat(vs);
-		return this;
-	}
+	// nv_s (vs) {
+	// 	this.nvs = this.nvs.concat(vs);
+	// 	return this;
+	// }
 
 	whereCond (logic, loper, roper) {
 		if (Array.isArray(logic))
