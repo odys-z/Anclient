@@ -315,13 +315,19 @@ class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
 	 */
-	constructor (conn, sk, ask) {
+	constructor (conn, sk, ask, args) {
 		super(conn, sk);
 		this.conn = conn;
 		this.sk = sk;
-		this.a = ask;
+		this.t(ask);
 		// if (ask === undefined)
 		// 	console.warn("Dataset request message need a 'ask' to indicate function branch.");
+		this.checkt(ask);
+
+		this.sqlArgs = args;
+
+		// define t that can be understood by server
+		this.t = {sqltree: 'sqltree', retree: 'retree', reforest: 'reforest'};
 	}
 
 	get geTreeSemtcs() { return this.trSmtcs; }
@@ -331,6 +337,36 @@ class DatasetCfg extends QueryReq {
 	treeSemtcs(semtcs) {
 		this.trSmtcs = semtcs;
 		return this;
+	}
+
+	t(ask) {
+		if (typeof sk === 'string' && sk.length > 0 && ask !== this.t.sqltree) {
+			console.warn('DatasetReq.a is ignored for sk is defined.', sk);
+			this.a = this.t.sqltree;
+		}
+		else {
+			this.a = ask;
+			checkt(ask);
+		}
+	}
+
+	sqlArgs(args) {
+		if (this.sqlArgs === undefined)
+			this.sqlArgs = [];
+		if (typeof args === 'string')
+			this.sqlArgs = this.sqlArgs.concat([args]);
+		else if (Arry.isArray(sqlArgs))
+			req.sqlArgs = sqlArgs;
+		else console.error('sql args is not an arry: ', sqlArgs);
+			this.sqlArgs = this.sqlArgs.concat(args);
+		return this;
+	}
+
+	/** Check is t can be undertood by s-tree.serv
+	 * @param {string} t*/
+	this.checkt(t) {
+		if (t !== this.t.sqltree && t !== this.t.retree && t !== this.t.reforest)
+			console.warn("t won't be understood by server:", t, "Should be one of", this.t);
 	}
 }
 
