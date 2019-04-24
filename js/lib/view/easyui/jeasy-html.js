@@ -711,9 +711,10 @@ function EzTree(J) {
 		});
 	};
 
-	/**Bind asyUI tree, with click/select function.<br>
+	/**Bind easyUI tree, with click/select function.<br>
 	 * Data is gotten from s-tree.serv, with sk = 'sk'.
-	 * - easyui treegrid must recursive looped to get all selected items.
+	 * - easyui treegrid must recursive looped to get all selected items.<br>
+	 * FIXME What about main list is a tree grid?
 	 * @param {string} idTree easy tree id:
 	 * <ul class="easyui-tree" lines="true" style="margin-top: 3px;" data-options="animate:true,checkbox:true"
 	 * id="irtree" ir-serv="tree" ir-t="role_funcs" ir-sql="trees.role_funcs" ir-argsfunc="getRoleId" ir-batchup="callback: jsonFormatSample('#irtree', 'a_role_funcs')" ></ul>
@@ -762,6 +763,15 @@ function EzTree(J) {
 		});
 	};
 
+	/**Bind easyui tree with data from serv.
+	 * @param {string} treeId html tag id
+	 * @param {array} json rows
+	 * @param {string} treeType tree | treegrid
+	 * @param {function} onClick on click callback
+	 * @param {function} onSelect on selection chaged callback
+	 * @param {function} onCheck on selection chaged callback
+	 * @param {function} onLoad on binding success callback
+	 */
 	this.bind = function (treeId, json, treeType, onClick, onSelect, onCheck, onLoad) {
 		if (treeId.substring(0, 1) != "#")
 			treeId = "#" + treeId;
@@ -800,116 +810,10 @@ function EzTree(J) {
 	 * onChangef: on selection chaged callback, default = [ir-onchange]<br>
 	 * onClickf: on selection chaged callback, default = [ir-onchange]<br>
 	 * onSuccessf: on binding success callback<br>
-	 *  */
 	this.configWithArgs2 = function ( treeId, para ) {
 		this.stree ( treeId, para.t, para.args, para.isSelect,
 			para.onChangef, para.onClickf, para.onSuccessf );
 	},
-
-	/**load configured tree
-	 * @param {string} idTree easy tree id:
-	 * <ul class="easyui-tree" lines="true" style="margin-top: 3px;" data-options="animate:true,checkbox:true"
-	 * id="irtree" ir-serv="tree" ir-t="role_funcs" ir-sql="trees.role_funcs" ir-argsfunc="getRoleId" ir-batchup="callback: jsonFormatSample('#irtree', 'a_role_funcs')" ></ul>
-	 * @param {string} t sql dataset key, default using ir-t="ds.sql-key":
-	 * @param {Array} args args for configured sql
-	 * @param {string/boolean} isSelect select the first or the selected id
-	 * @param {string/function} onChangef on selection chaged callback, default = [ir-onchange]
-	 * @param {string/function} onClickf on selection chaged callback, default = [ir-onchange]
-	 * @param {function} onSuccessf on binding success callback
-	this.configWithArgs = function ( treeId, t, args, isSelect, onChangef, onClickf, onSuccessf ) {
-		if (treeId.substring(0, 1) != "#")
-			treeId = "#" + treeId;
-
-		var tree = $(treeId);
-
-		// ir-t= ... {@obj.prop}
-		if (typeof args === "undefined")
-			args = [];
-		else if (typeof args === "string")
-			args = args.split(",");
-
-		if (typeof t === "undefined" || t === null)
-			t = tree.attr(_aT);
-		t = tree.attr(_aT);
-
-		if (typeof t === "undefined") {
-			// TODO we need a more considerable design (a new tag?)
-			alert ("Current Semantics API needing t (ir-t) to load configured sql and s-tree semantics.\nThis tag will be replaced later.");
-			return;
-		}
-
-		args = irUtils.parseTArgs(t, args);
-
-		// FIXME &ds=... is not supported yet
-		var url = _servUrl + "s-tree.serv?t=sql&ds=" + args[0] + "&sk=" + args[1];
-
-		for ( var i = 0; args[2] != null && typeof args[2] != "undefined" && i < args[2].length; i++ )
-			url += "&args=" + args[2][i];
-
-		var conn = tree.attr(_aConn);
-		if(typeof conn !== "undefined")
-			url += "&conn=" + conn;
-
-		// header
-		var qobj = formatQuery();
-
-		$.ajax({type: "POST",
-			// TODO let's support paging:
-			// url: url + "&page=" + (pageNumb - 1) + "&size=" + pageSize,
-			url: url + "&page=-1",
-			contentType: "application/json; charset=utf-8",
-			data: JSON.stringify(qobj),
-			success: function (message) {
-				if(easyTree.log)
-					console.log("easyTree.configWithArgs() on success callback: ack from server - " + message);
-				if(message.length > 0) {
-					tree.tree({
-						data: JSON.parse(message).rows,
-						onSelect: function(node) {
-							if (typeof onChangef === "string")
-								onChangef = eval(onChangef);
-							if(typeof onChangef === "function")
-								onChangef(node)
-						},
-						onCheck: function(node) {
-							if (typeof onChangef === "string")
-								onChangef = eval(onChangef);
-							if(typeof onChangef === "function")
-								onChangef(node)
-						},
-						onClick: function(node) {
-							if (typeof onClickf === "string")
-								onClickf = eval(onClickf);
-							if(typeof onClickf === "function")
-								onClickf(node)
-						},
-
-						// not understood
-						onLoadSuccess: function(node, data) {
-							if(data.length > 0) {
-								var n = tree.tree('find', data[0].id);
-								tree.tree('select', n.target);
-							}
-						},
-						// onLoadSuccess: function(node, data) {
-						// 	if (typeof onSuccessf === "string")
-						// 		onSuccessf = eval(onSuccessf);
-						// 	if (typeof onSuccessf === "function")
-						// 		onSuccessf(node, data);
-						// },
-					});
-
-					if (typeof onSuccessf === "string")
-						onSuccessf = eval(onSuccessf);
-					if (typeof onSuccessf === "function")
-						onSuccessf(node, data);
-				}
-			},
-			error: function (message) {
-				console.log("easyTree.configWithArgs() on error callback: ack from server - " + message);
-			}
-		});
-	};
 	 *  */
 
 	/**Ask server (SemanticTree) travel throw sub-tree from rootId, re-organize fullpath.
@@ -1050,7 +954,7 @@ function EzGrid (J) {
 				if (opts !== undefined
 					&& typeof opts.rowpk === 'string' && typeof opts.select === 'string'
 					&& rows !== undefined && rows.length !== undefined) {
-						
+
 					var gridId = $(pagerId).attr(ir.grid);
 					gridId = regex.sharp_(gridId);
 
