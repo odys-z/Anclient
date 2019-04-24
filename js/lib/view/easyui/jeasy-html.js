@@ -501,7 +501,7 @@ function EzCbb (J) {
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
 					jconsts.conn,		// connection id in connexts.xml
 					sk);				// sk in dataset.xml
-		req.sqlArgs = sqlArgs;
+		req.sqlArgs = sqlArgs;// FIXME FUNCTION
 
 		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
 		// DatasetReq is used as message body for semantic tree.
@@ -686,7 +686,7 @@ function EzTree(J) {
 					'sqltree');			// ask for configured dataset as tree
 		req.rootId = rootId;
 
-		req.sqlArgs = sqlArgs;
+		req.sqlArgs = sqlArgs; // FIXME FUNCTION
 
 		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
 		// DatasetReq is used as message body for semantic tree.
@@ -729,8 +729,9 @@ function EzTree(J) {
 			treeId = "#" + treeId;
 		var tree = $(treeId);
 
-		if (typeof sk === "undefined" || sk === null)
-			sk = tree.attr(_aSemantik);
+		if (typeof sk === "undefined" || sk === null) {
+			sk = tree.attr(ir.sk);
+		}
 
 		if (typeof onChangef === "undefined" || onChangef === null)
 			onChangef = tree.attr(ir.onchange);
@@ -740,26 +741,30 @@ function EzTree(J) {
 		// request JMessage body
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
 					jconsts.conn,		// connection id in connexts.xml
-					sk);				// sk in datast.xml
+					sk,					// sk in datast.xml
+					'sqltree');	// TODO sk != undefined, delete and test
 
+		// FIXME using function instead of assign
 		if (typeof sqlArgs === 'string')
-			req.args = [sqlArgs];
-		else req.args = sqlArgs;
+			req.sqlArgs = [sqlArgs];
+		else if (Array.isArray(sqlArgs))
+			req.sqlArgs = sqlArgs;
+		else console.error('sql args is not an arry: ', sqlArgs);
 
 		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
 		// DatasetReq is used as message body for semantic tree.
 		// Port.stree is port of SemanticTree.
 		// t=load/reforest/retree
 		// user act is ignored for reading
-		var jmsg = ssClient.userReq(jconsts.conn, 'load', jvue.Protocol.Port.stree, req);
+		var jmsg = ssClient.userReq(jconsts.conn, jvue.Protocol.Port.stree, req);
 
 		// get data, then bind easyui tree
 		// ssClient is created after logged in.
 		ssClient.commit(jmsg, function(resp) {
 			console.log(resp);
 			EasyTree.bind(treeId,	// id
-					'tree',			// easyui tree()
 					resp.data,		// forest,
+					'tree',			// easyui tree()
 					onClick,
 					onChange,
 					onSuccess);
