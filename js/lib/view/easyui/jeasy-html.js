@@ -719,7 +719,7 @@ function EzTree(J) {
 	 * <ul class="easyui-tree" lines="true" style="margin-top: 3px;" data-options="animate:true,checkbox:true"
 	 * id="irtree" ir-serv="tree" ir-t="role_funcs" ir-sql="trees.role_funcs" ir-argsfunc="getRoleId" ir-batchup="callback: jsonFormatSample('#irtree', 'a_role_funcs')" ></ul>
 	 * @param {string} sk semantics key, default = [ir-semantics]
-	 * @param {string[]} sqlArgs default null
+	 * @param {string | string[]} sqlArgs default null
 	 * @param {function} onClick on selection chaged callback, default = [ir-onchange]
 	 * @param {function} onChange on selection chaged callback, default = [ir-onchange]
 	 * @param {function} onSuccess on binding success callback
@@ -741,7 +741,10 @@ function EzTree(J) {
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
 					jconsts.conn,		// connection id in connexts.xml
 					sk);				// sk in datast.xml
-		req.args = sqlArgs;
+
+		if (typeof sqlArgs === 'string')
+			req.args = [sqlArgs];
+		else req.args = sqlArgs;
 
 		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
 		// DatasetReq is used as message body for semantic tree.
