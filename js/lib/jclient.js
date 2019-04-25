@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import AES from './aes.js';
-import {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DatasetCfg} from './protocol.js';
+import {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DeleteReq, DatasetCfg} from './protocol.js';
 
 /**AES lib instance*/
 var aes;

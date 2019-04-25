@@ -279,11 +279,6 @@ class UpdateReq {
 		return this;
 	}
 
-	// nv_s (vs) {
-	// 	this.nvs = this.nvs.concat(vs);
-	// 	return this;
-	// }
-
 	whereCond (logic, loper, roper) {
 		if (Array.isArray(logic))
 			this.where = this.where.concat(logic);
@@ -291,15 +286,6 @@ class UpdateReq {
 			this.where.push([logic, loper, roper]);
 		return this;
 	}
-
-	/** @param {Array} conds [{op, l, r}]
-	wheres (conds) {
-		if (conds !== undefined && conds !== null && conds.length !== undefined)
-			for (var ix = 0; ix < conds.length; ix++)
-				this.whereCond(conds[ix].op, conds[ix].l, conds[ix].r);
-		return this;
-	}
-	 * */
 
 	post (pst) {
 		if (this.post === undefined)
@@ -310,24 +296,30 @@ class UpdateReq {
 		else pust.push(pst);
 	}
 }
+
+class DeleteReq extends UpdateReq {
+	constructor (conn, tabl, pk) {
+		super (conn, tabl, pk);
+		this.a = Protocol.CRUD.d;
+	}
+}
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
+// define t that can be understood by server
+const ds_t = {sqltree: 'sqltree', retree: 'retree', reforest: 'reforest'};
+
 class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
 	 */
-	constructor (conn, sk, ask, args) {
+	constructor (conn, sk, t, args) {
 		super(conn, sk);
+
 		this.conn = conn;
 		this.sk = sk;
-		this.t(ask);
-		// if (ask === undefined)
-		// 	console.warn("Dataset request message need a 'ask' to indicate function branch.");
-		this.checkt(ask);
-
 		this.sqlArgs = args;
 
-		// define t that can be understood by server
-		this.t = {sqltree: 'sqltree', retree: 'retree', reforest: 'reforest'};
+		this._t(t);
+		this.checkt(t);
 	}
 
 	get geTreeSemtcs() { return this.trSmtcs; }
@@ -339,14 +331,14 @@ class DatasetCfg extends QueryReq {
 		return this;
 	}
 
-	t(ask) {
-		if (typeof sk === 'string' && sk.length > 0 && ask !== this.t.sqltree) {
+	_t(ask) {
+		if (typeof sk === 'string' && sk.length > 0 && ask !== ds_t.sqltree) {
 			console.warn('DatasetReq.a is ignored for sk is defined.', sk);
-			this.a = this.t.sqltree;
+			this.a = ds_t.sqltree;
 		}
 		else {
 			this.a = ask;
-			checkt(ask);
+			this.checkt(ask);
 		}
 	}
 
@@ -364,11 +356,11 @@ class DatasetCfg extends QueryReq {
 
 	/** Check is t can be undertood by s-tree.serv
 	 * @param {string} t*/
-	this.checkt(t) {
-		if (t !== this.t.sqltree && t !== this.t.retree && t !== this.t.reforest)
-			console.warn("t won't be understood by server:", t, "Should be one of", this.t);
+	checkt(t) {
+		if (t !== ds_t.sqltree && t !== ds_t.retree && t !== ds_t.reforest)
+			console.warn("t won't be understood by server:", t, "Should be one of", ds_t);
 	}
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DatasetCfg}
+export {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DeleteReq, DatasetCfg}

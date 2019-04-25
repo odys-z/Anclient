@@ -54,6 +54,7 @@ const ir = {
 
 	deflt: {
 		gridId: 'irlist',
+		pagerId: 'irpager',
 		modalId: 'irmodal',
 		_All_: '-- ALL --',
 	},
@@ -240,49 +241,6 @@ function Tag (debug) {
 		}
 		return orders;
 	};
-
-	/** Parse expr form "field: personName", ...
-	 * @param {string} exp j-expr = "max(bas_person.PersonName)",
-	 * @param {string} attrDataopt (alais in easyui "datat-options") field: personName,
-	 * FIXME defining alias in data-options is not correct
-	this.expr = function (exp, attrDataopt) {
-		var expr = {};
-		// alais = "field: personName"
-		var alais = attr;
-		// al = personName
-		var al = tag.findAlais(attr);
-
-		expr.alais = al;
-
-		if(al_k[al]) {
-			console.log("WARN - found duplicating alais: " + al + ". Ignoring...");
-		} else al_k[al] = true;
-
-		// var exp = $(th).attr(_aExpr);
-		if (typeof exp != "undefined") {
-			// j-expr = "max(bas_person.PersonName)"
-			var match = regex.expr.exec(exp);
-			if (match) {
-				if (typeof match[2] != "undefined")
-					expr.gfunc = match[2];
-				if (typeof match[4] != "undefined")
-					expr.tabl = match[4];
-				if (typeof match[5] != "undefined") {
-					if (typeof match[2] != "undefined")
-						expr.expr = exp;
-					else expr.expr = match[5];
-				}
-				// exprs.push(expr);
-			} else
-				console.log("Can't parse expr: " + exp);
-		} else {
-			// j-expr = null
-			// exprs.push({"tabl": deftTabl, "expr": al, "alais": al});
-			expr = {"tabl": deftTabl, "expr": al, "alias": al};
-		}
-		return expr;
-	};
-	 */
 
 	/**Match expr in "target" with regexAlais.
 	 * @param {string} target: string to be matched
@@ -608,40 +566,40 @@ function EzTree(J) {
 
 	// TODO to be deleted
 	//easyTree.treegridEx( treegrid, t, sk, rootId, exprs, selectId, onselectf );
-	this.treegridEx = function( treegrid, t, sk, rootId, exprs, selectId, onselectf ) {
-		if (treegrid.substring(0, 1) != "#")
-			treegrid = "#" + treegrid;
-		var url = _servUrl + "s-tree.serv?t=" + t
-			+ "&sk=" + sk + "&root=" + rootId;
-		//var conds = [formatCond("=", "orgId", orgId, "e_areas")];
-		// semantics configured at server side: var order = formatOrders("fullpath");
-		var qobj = formatQuery( exprs, t );
-
-		$.ajax({type: "POST",
-			url: url,
-			data: JSON.stringify(qobj),
-			contentType: "application/json; charset=utf-9",
-			success: function (data) {
-					if (easyTree.log) console.log("Bind treegrid msg : " + data);
-					var resp = JSON.parse(data);
-
-					if (typeof resp.total != "undefined") {
-						if (typeof onselectf === "function")
-							$(treegrid).treegrid({ onSelect: onselectf });
-						$(treegrid).treegrid("loadData", resp);
-					}
-					else {
-						$.messager.alert({title: "提示", msg: "不能加载区域", icon: "info"});
-					}
-				},
-			error: function (data) {
-				console.log("ERROR - bind combotree " + treegrid + " failed.");
-				console.log(data);
-				if (easyTree.alertOnErr)
-					$.messager.alert({title: "ERROR", msg: "can't load s-tree", icon: "info"});
-			}
-		});
-	};
+	// this.treegridEx = function( treegrid, t, sk, rootId, exprs, selectId, onselectf ) {
+	// 	if (treegrid.substring(0, 1) != "#")
+	// 		treegrid = "#" + treegrid;
+	// 	var url = _servUrl + "s-tree.serv?t=" + t
+	// 		+ "&sk=" + sk + "&root=" + rootId;
+	// 	//var conds = [formatCond("=", "orgId", orgId, "e_areas")];
+	// 	// semantics configured at server side: var order = formatOrders("fullpath");
+	// 	var qobj = formatQuery( exprs, t );
+	//
+	// 	$.ajax({type: "POST",
+	// 		url: url,
+	// 		data: JSON.stringify(qobj),
+	// 		contentType: "application/json; charset=utf-9",
+	// 		success: function (data) {
+	// 				if (easyTree.log) console.log("Bind treegrid msg : " + data);
+	// 				var resp = JSON.parse(data);
+	//
+	// 				if (typeof resp.total != "undefined") {
+	// 					if (typeof onselectf === "function")
+	// 						$(treegrid).treegrid({ onSelect: onselectf });
+	// 					$(treegrid).treegrid("loadData", resp);
+	// 				}
+	// 				else {
+	// 					$.messager.alert({title: "提示", msg: "不能加载区域", icon: "info"});
+	// 				}
+	// 			},
+	// 		error: function (data) {
+	// 			console.log("ERROR - bind combotree " + treegrid + " failed.");
+	// 			console.log(data);
+	// 			if (easyTree.alertOnErr)
+	// 				$.messager.alert({title: "ERROR", msg: "can't load s-tree", icon: "info"});
+	// 		}
+	// 	});
+	// };
 
 	/**Bind configured dataset to easyui combotree.
 	 * @param {string} treeId
@@ -871,14 +829,14 @@ function EzGrid (J) {
 			console.error("pager id is not valid");
 			return;
 		}
-		else pagerId = regex.sharp_(pagerId);
+		else pagerId = regex.sharp_(pagerId, ir.deflt.pagerId);
 
-		var listId = $(pagerId).attr(ir.grid);
-		if (listId === undefined || listId === null || listId.trim() === '') {
+		var gridId = $(pagerId).attr(ir.grid);
+		if (gridId === undefined || gridId === null || gridId.trim() === '') {
 			console.error("gird/list id defined in pager is not valid. A " + ir.grid + " in pager tag must defined.");
 			return;
 		}
-		listId = regex.sharp_(listId);
+		gridId = regex.sharp_(gridId, ir.deflt.gridId);
 
 		// semantics key (config.xml/semantics)
 		var semantik = $(pagerId).attr(ir.sk);
@@ -908,7 +866,7 @@ function EzGrid (J) {
 						semantik);		// sk in datast.xml
 		else {
 			// try query.serv way
-			var tbls = EasyHtml.tabls(listId);
+			var tbls = EasyHtml.tabls(gridId);
 			if (tbls !== undefined) {
 				// create a query request
 				var maint = tbls[0].tabl;
@@ -921,7 +879,7 @@ function EzGrid (J) {
 
 				// handle query defined in grid attrs
 				// [{exp: t.col as: c}, ...]
-				var exprs = EasyHtml.thExprs(listId, mainAlias);
+				var exprs = EasyHtml.thExprs(gridId, mainAlias);
 				q.exprss(exprs);
 
 				// joins ( already parsed )
@@ -938,7 +896,7 @@ function EzGrid (J) {
 		ssClient.commit(req, function(resp) {
 			var rows = jeasy.rows(resp);
 			var total = jeasy.total(resp, 0);
-			EasyGrid.bindPage (listId, rows, total, onSelect, onCheck, onCheckAll, onLoad);
+			EasyGrid.bindPage (gridId, rows, total, onSelect, onCheck, onCheckAll, onLoad);
 
 			var pgInf = EasyGrid.pageInfo[pagerId];
 			pgInf.total = total;
@@ -978,6 +936,75 @@ function EzGrid (J) {
 		});
 	}
 
+	/**Load grid without a pager
+	 * @param {string} gridId
+	 * @param {Object} opts
+	 * t: ir-t string (override html ir-t)
+	 * queryId: query form Id<br>
+	 * rowpk: row's pk<br>
+	 * select: select an item when load<br>
+	 */
+	this.grid_opts = function (gridId, opts) {
+		gridId = regex.sharp_(gridId, ir.deflt.gridId);
+
+		var semantik = $(gridId).attr(ir.sk);
+		var pgSize = -1;
+
+		// Remember some variabl for later calling onPage()
+		if (this.pageInfo[gridId] === undefined) {
+			this.pageInfo[gridId] = {
+				queryId: opts.queryId,
+				total: 0,
+				page: -1,
+				size: -1,
+			};
+		}
+
+		var req;
+		if (semantik !== undefined)
+			// dataset way
+			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+						jconsts.conn,	// connection id in connexts.xml
+						semantik);		// sk in datast.xml
+		else {
+			// try query.serv way
+			var tbls = opts.t;
+			if (tbls === undefined || (typeof tbls === 'string' && tbls.trim().length < 2))
+				tbls = EasyHtml.tabls(gridId);
+
+			if (tbls !== undefined) {
+				// create a query request
+				var maint = tbls[0].tabl;
+				var mainAlias = tbls[0].as;
+				req = ssClient.query(null,	// let the server find connection
+							maint,			// main table
+							mainAlias,		// main alias
+							this.pageInfo[pagerId]); // this.pageInfo, saving page ix for consequent querying
+				var q = req.body[0];
+
+				// handle query defined in grid attrs
+				// [{exp: t.col as: c}, ...]
+				var exprs = EasyHtml.thExprs(gridId, mainAlias);
+				q.exprss(exprs);
+
+				// joins ( already parsed )
+				q.joinss(tbls.splice(1, tbls.length - 1));
+
+				// where clause
+				var wheres = EasyQueryForm.conds(qformId, mainAlias);
+				// q.wheres("=", "u.userId", "'" + uid + "'");
+				q.whereCond(wheres);
+			}
+		}
+		// post request, handle response
+		EasyMsger.progress();
+		ssClient.commit(req, function(resp) {
+			var rows = jeasy.rows(resp);
+			var total = jeasy.total(resp, 0);
+			EasyGrid.bindPage (gridId, rows, total, opts.onSelect, opts.onCheck, opts.onCheckAll, opts.onLoad);
+		}, EasyMsger.error);
+	};
+
 	/**call easyui $(pagerId).pagination("refresh", ...
 	 * @param {string} pagerId
 	 * @param {int} total
@@ -999,7 +1026,7 @@ function EzGrid (J) {
 		pgInf.page = pageNumb - 1;
 		pgInf.size = size;
 		EasyGrid.page(this.id, pgInf.queryId);
-	}
+	};
 
 	this.bindPage = function (gridId, json, total, onSelect, onCheck, onCheckAll, onLoad) {
 		if (gridId.substring(0, 1) != "#")
@@ -1236,21 +1263,6 @@ function EzModal() {
 		}
 	};
 
-	// this.callInit = function (initName, row, pkvals) {
-	// 	if(typeof initName == "undefined") {
-	// 		if(typeof init == "undefined") {
-	// 			console.log("ERROR: callInit(): Init() function not found, initName is also not defined.");
-	// 			return;
-	// 		}
-	// 		if(typeof(row) == "undefined")
-	// 			init();
-	// 		else
-	// 			init(row, pkvals);
-	// 	} else {
-	// 		var f = eval(initName);
-	// 		f(row, pkvals);
-	// 	}
-	// }
 	this.callInit = function (crud, formId, fn, row) {
 		var f;
 		if (typeof fn === 'function')
@@ -1357,8 +1369,11 @@ function EzModal() {
 						{rowpk: f, select: v});
 				}
 				// case 5.2: datagrid
-				else if  (this.classList && (this.classList.contains('easyui-textbox')))
-					;
+				else if  (this.classList && (this.classList.contains('easyui-datagrid'))) {
+					if (jeasy.log)
+						console.log('Trying bind datagrid automatically, ir-field: ', f, v);
+					EasyGird.datagrid(this.id, v);
+				}
 				// case 6: bind text input - should this moved to the first?
 				else if  (this.classList && (this.classList.contains('easyui-textbox')))
 					$(regex.sharp_(this.id)).textbox({value: v});
