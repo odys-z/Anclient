@@ -106,7 +106,7 @@ function jeasyAPI (J, log) {
 		this.d = jvue.Protocol.CRUD.d;
 
 		this.J = J;
-		this.log = log;
+		this.log = log === false ? false : true;
 		this.mainRows = {};
 	}
 
@@ -136,7 +136,6 @@ function jeasyAPI (J, log) {
 			return resp.data.total[rsIx];
 		}
 	};
-
 
 	/**Set main row when user selected a row in main list of a CRUD typical case.
 	 * @param {string} listId easyui list id

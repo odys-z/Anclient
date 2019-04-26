@@ -65,7 +65,8 @@ class Protocol {
 	Protocol.CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
 	Protocol.Port = {	heartbeat: "ping.serv", echo: "echo.serv", session: "login.serv",
-						insert: "c.serv", query: "r.serv", update: "u.serv", delete: "d.serv",
+						query: "r.serv", update: "u.serv",
+						insert: "c.serv", delete: "d.serv",
 						dataset: "ds.serv", stree: "s-tree.serv" };
 
 	Protocol.MsgCode = {ok: "ok", exSession: "exSession", exSemantic: "exSemantic",
@@ -342,14 +343,15 @@ class DatasetCfg extends QueryReq {
 		}
 	}
 
-	sqlArgs(args) {
+	args(args) {
 		if (this.sqlArgs === undefined)
 			this.sqlArgs = [];
+
 		if (typeof args === 'string')
 			this.sqlArgs = this.sqlArgs.concat([args]);
-		else if (Arry.isArray(sqlArgs))
-			req.sqlArgs = sqlArgs;
-		else console.error('sql args is not an arry: ', sqlArgs);
+		else if (Array.isArray(args))
+			this.sqlArgs = args;
+		else console.error('sql args is not an arry: ', args);
 			this.sqlArgs = this.sqlArgs.concat(args);
 		return this;
 	}
