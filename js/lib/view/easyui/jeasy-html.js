@@ -25,8 +25,8 @@ const ir = {
 	sk: 'ir-sk',
 
 	root: 'ir-sroot',
-	/** tree item on change handler name */
-	onchange: "ir-onchange",
+	/** grid item on select handler name (according easyUI document, there is not 'onChange')*/
+	onselect: "ir-onselect",
 
 	oncheck: "ir-oncheck",
 	onload: "ir-onload",
@@ -168,6 +168,39 @@ function Tag (debug) {
 		}
 	};
 
+	/**<p>Try merge arg references in sk string into opts.sqlArgs.</p>
+	 * Output: opts.sqlArgs<br>
+	 * Input: opts.args, sk string<br>
+	 * That means this function also change data in opts.
+	 * @param {Object} opts
+	 * @param {string} sk string like that from ir-tree, ir-cbb, etc.
+	 * @return {Array} sk (first splited string in parameter sk) */
+	this.mergargs = function(opts, sk) {
+		// if (sk === undefined || sk === null)
+		// 	console.error(ir.cbbtree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
+		// else {
+		// 	var parsed = tag.parseSk(sk, opts.args);
+		// 	sk = parsed.shift();
+		// 	if (sqlArgs === undefined)
+		// 		sqlArgs = [];
+		// 	sqlArgs = sqlArgs.concat(parsed);
+		// }
+
+		// if (sk === undefined || sk === null)
+		// 	console.error("sk attr in is undefined. In jeasy v1.0, only configurd dataset is suppored - must have sk in ir-tree, ir-combbox etc.",
+		// 			opts, sk);
+		// else {
+			var parsed = tag.parseSk(sk, opts.args);
+			sk = parsed.shift();
+			if (opts.sqlArgs === undefined)
+				opts.sqlArgs = [];
+			else if (typeof opts.sqlArgs === 'string')
+				opts.sqlArgs = [opts.sqlArgs];
+			opts.sqlArgs = opts.sqlArgs.concat(parsed);
+			return sk;
+		// }
+	};
+
 	/**Format table-joins request object: [{tabl, t, on, as}]
 	 * @param {string} t "b_articles, j:b_cate, l:b_author:a authorId=authorId and a.name like 'tom'"
 	 * @return {Array} [{tabl, t, on, as}], where t = main-table | j | r | l
@@ -278,9 +311,14 @@ function Tag (debug) {
 
 	/**find var from string like "x.y.z"
 	 * @param {string} vn var name
-	 * @param {object} argPool args buffer for looking varialbkles, if not found, try in window globaly.
-	 * @return {object} value represented by vn, e.g. "x.y.z" */
+	 * @param {Object} argPool args buffer for looking varialbkles, if not found, try in window globaly.
+	 * @return {Object} value represented by vn, e.g. "x.y.z" */
 	this.findVar = function (vn, argPool) {
+		if (window[vn])
+			return window[vn];
+		if (argPool !== undefined && argPool[vn])
+			return argPool[vn];
+			
 		var v = window;
 		var field;
 
@@ -320,7 +358,7 @@ function Tag (debug) {
 
 	/** Parse String like "ds.sql-key arg1, {@obj.var1}, arg2, ..."
 	 * @param {string} irsk
-	 * @param {object} argBuff
+	 * @param {Object} argBuff
 	 * @return {Array} [0] ds, [1] sql-key, [2] argBuff + [arg1, var1, arg2, ...]
 	 */
 	this.parseSk = function (irsk, argBuff) {
@@ -452,7 +490,7 @@ function EzHtml (J) {
 	 * opts.select: selected id TODO merge with variables<br>
 	 * opts.all: add an "-- ALL --" item<br>
 	 * opts.onclick: on click function or function name<br>
-	 * opts.onchange: on change function or function name<br>
+	 * opts.onselect: on item select function or function name<br>
 	 * opts.onload: on load function or function name<br>
 	 * opts.oncheck: on check function or function name<br>
 	 * opts.oncheckAll: on check all function or function name<br>
@@ -466,9 +504,15 @@ function EzHtml (J) {
 			opts.sk = tag.merge(opts.sk, tagId, ir.sk);
 			opts.all = tag.merge(opts.all, tagId, ir.all);
 			opts.query = tag.merge(opts.query, tagId, ir.query);
+
 			opts.cbb = tag.merge(opts.cbb, tagId, ir.combobox);
+			opts.cbb = tag.mergargs(opts, opts.cbb);
+
 			opts.cbbtree = tag.merge(opts.cbbtree, tagId, ir.cbbtree);
+			opts.cbbtree = tag.mergargs(opts, opts.cbbtree);
+
 			opts.tree = tag.merge(opts.tree, tagId, ir.tree);
+			opts.tree = tag.mergargs(opts, opts.tree);
 
 			opts.pagesize = tag.merge(opts.pagesize, tagId, ir.pagesize);
 			if (!opts.pagesize) opts.pagesize = -1;
@@ -477,9 +521,9 @@ function EzHtml (J) {
 			if (typeof opts.onclick === 'string')
 				opts.onclick = eval(opts.onclick);
 
-			opts.onchange = tag.merge(opts.onchange, tagId, ir.onchange);
-			if (typeof opts.onchange === 'string')
-				opts.onchange = eval(opts.onchange);
+			opts.onselect = tag.merge(opts.onselect, tagId, ir.onselect);
+			if (typeof opts.onselect === 'string')
+				opts.onselect = eval(opts.onselect);
 
 			opts.onload = tag.merge(opts.onload, tagId, ir.onload);
 			if (typeof opts.onload === 'string')
@@ -513,7 +557,7 @@ function EzCbb (J) {
 	 * sqlArgs: arguments directly provided and send back to server - needed by sk<br>
 	 * select: selected id<br>
 	 * all: add an "-- ALL --" item<br>
-	 * onchange: onchange function or function name<br>
+	 * onselect: onselect function or function name<br>
 	 */
 	this.combobox = function(cbbId, opts) {
 		// this.combobox = function(cbbId, sk, argbuff, selectId, _All_, onChangef) {
@@ -545,10 +589,10 @@ function EzCbb (J) {
 		// 	if (EasyHtml.has(cbbId, ir.all))
 		// 		_All_ = true;
 
-		if (typeof opts.onchange === "undefined" || opts.onchange === null)
-			opts.onchange = cbb.attr(ir.onchange);
-		if (typeof opts.onchange === "string")
-			opts.onchange = eval(opts.onchange);
+		// if (typeof opts.onselect === "undefined" || opts.onselect === null)
+		// 	opts.onselect = cbb.attr(ir.onselect);
+		// if (typeof opts.onselect === "string")
+		// 	opts.onselect = eval(opts.onselect);
 
 		// request JMessage body
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
@@ -573,7 +617,7 @@ function EzCbb (J) {
 				rows.unshift({text: ir.deflt._All_, value: ir.deflt._All_});
 			cbb.combobox({
 				data: rows,
-				onSelect: typeof opts.onchange === "function" ? opts.onchange : function(e) {
+				onSelect: typeof opts.onselect === "function" ? opts.onselect : function(e) {
 					if (jeasy.log) console.log(e);
 				}
 			});
@@ -668,7 +712,7 @@ function EzTree(J) {
 	 * all: add an "-- ALL --" item<br>
 	 * rootId: root id <br>
 	 * multi: is multiple selected<br>
-	 * onchange: onchange function or function name<br>
+	 * onselect: onselect function or function name<br>
 	 */
 	this.combotree = function(treeId, opts) {
 		treeId = regex.sharp_(treeId, ir.deflt.cbbtreeId);
@@ -678,19 +722,19 @@ function EzTree(J) {
 		var sqlArgs = opts.sqlArgs;
 
 		if (sk === undefined || sk === null)
-			console.error(ir.cbbtree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
-		else {
-			var parsed = tag.parseSk(sk, opts.args);
-			sk = parsed.shift();
-			if (sqlArgs === undefined)
-				sqlArgs = [];
-			sqlArgs = sqlArgs.concat(parsed);
-		}
+			console.error(ir.cbbtree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have an sk from dataset.xml).");
+		// else {
+		// 	var parsed = tag.parseSk(sk, opts.args);
+		// 	sk = parsed.shift();
+		// 	if (sqlArgs === undefined)
+		// 		sqlArgs = [];
+		// 	sqlArgs = sqlArgs.concat(parsed);
+		// }
 
-		if (typeof opts.onchange === "undefined" || opts.onchange === null)
-			opts.onchange = tree.attr(ir.onchange);
-		if (typeof opts.onchange === "string")
-			opts.onchange = eval(opts.onchange);
+		// if (typeof opts.onselect === "undefined" || opts.onselect === null)
+		// 	opts.onselect = tree.attr(ir.onselect);
+		// if (typeof opts.onselect === "string")
+		// 	opts.onselect = eval(opts.onselect);
 
 		// request JMessage body
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
@@ -736,7 +780,7 @@ function EzTree(J) {
 	 * all: add an "-- ALL --" item<br>
 	 * rootId: root id <br>
 	 * multi: is multiple selected<br>
-	 * onchange: onchange function or function name<br>
+	 * onselect: onselect function or function name<br>
 	 * onload: on load callback<br>
 	 * onClick: on item click event handler<br>
 	 */
@@ -748,22 +792,22 @@ function EzTree(J) {
 		var sk = opts.tree;
 
 		// js opts.sk overriding ir-tree
-		if (sk.length > 1 && typeof opts.sk === 'string' && opts.sk.length > 1)
-			console.warn("opts has both sk and " + ir.tree +", the latter is ignored.", opts.sk, opts.tree);
-		if (typeof opts.sk === 'string' && opts.sk.length > 1)
-			sk = opts.sk;
+		// if (sk !== undefined && sk.length > 1 && typeof opts.sk === 'string' && opts.sk.length > 1)
+		// 	console.warn("opts has both sk and " + ir.tree +", the latter is ignored.", opts.sk, opts.tree);
+		// if (typeof opts.sk === 'string' && opts.sk.length > 1)
+		// 	sk = opts.sk;
 
 		if (sk === undefined || sk === null)
-			console.error(ir.cbbtree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
-		else {
-			var parsed = tag.parseSk(sk, opts.args);
-			sk = parsed.shift();
-			if (opts.sqlArgs === undefined)
-				opts.sqlArgs = [];
-			else if (typeof opts.sqlArgs === 'string')
-				opts.sqlArgs = [opts.sqlArgs];
-			opts.sqlArgs = opts.sqlArgs.concat(parsed);
-		}
+			console.error(ir.tree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have sk from dataset.xml).");
+		// else {
+		// 	var parsed = tag.parseSk(sk, opts.args);
+		// 	sk = parsed.shift();
+		// 	if (opts.sqlArgs === undefined)
+		// 		opts.sqlArgs = [];
+		// 	else if (typeof opts.sqlArgs === 'string')
+		// 		opts.sqlArgs = [opts.sqlArgs];
+		// 	opts.sqlArgs = opts.sqlArgs.concat(parsed);
+		// }
 
 		// request JMessage body
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
@@ -772,7 +816,7 @@ function EzTree(J) {
 					'sqltree')	// TODO sk != undefined, delete and test
 					.args(opts.sqlArgs);
 
-		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
+		// all request are created as user reqs except query, update, insert, delete and 'ext' class like dataset.
 		// DatasetReq is used as message body for semantic tree.
 		// Port.stree is port of SemanticTree.
 		// t=load/reforest/retree
@@ -787,7 +831,7 @@ function EzTree(J) {
 					resp.data,		// forest,
 					'tree',			// easyui tree()
 					opts.onclick,
-					opts.onchange,
+					opts.onselect,
 					opts.onload);
 		});
 	};
@@ -952,7 +996,7 @@ function EzGrid (J) {
 
 	/** a wrapper of this.page(), for convenient.
 	 * @param {string} pagerId
-	 * @param {object} opts
+	 * @param {Object} opts
 	 * rowpk: row's pk
 	 * select: select an item when load
 	this.page_opts = function (pagerId, opts) {
@@ -1092,7 +1136,7 @@ function EzGrid (J) {
 			onCheck: function(ix, row) {
 				jeasy.mainRow(gridId, row);
 				if (opts.oncheck)
-					oopts.oncheck(ix, row);
+					opts.oncheck(ix, row);
 			},
 			onUncheck: function(ix, row) {
 				jeasy.mainRow(gridId);
@@ -1237,8 +1281,8 @@ function EzModal() {
 	 * @param {string} init handler
 	 * @param {bool} isUeditor is u editer
 	 * @param {string} modalId div id for modal
-	 * @param {object} row data
-	 * @param {object} pkvals pk
+	 * @param {Object} row data
+	 * @param {Object} pkvals pk
 	 */
 	this.showDialog = function (crud, src, title, h, w, init, isUeditor, modalId, row) {
 		if (modalId === undefined)
@@ -1388,14 +1432,14 @@ function EzModal() {
 						// an ir-combobox from configured dataset
 						// this.value = v;
 						// EasyCbb.combobox(domval.id, null, {row: rec}, v);
-						// EasyCbb.combobox(domval.id, {args: rec, select: v, onchange: onChange});
+						// EasyCbb.combobox(domval.id, {args: rec, select: v, onselect: onChange});
 						EasyCbb.combobox(domval.id, opts);
 					}
 					else console.log("EasyModal.bindWidgets(): ignoring combobox " + domval.id + " " + domval.name);
 				}
 				// case 2: bind ir-cbbtree
 				else if (this.attributes[ir.cbbtree]) {
-					// EasyTree.combotree( domval.id, {args: rec, select: v, onchange: onChange});
+					// EasyTree.combotree( domval.id, {args: rec, select: v, onselect: onChange});
 					EasyTree.combotree( domval.id, opts);
 				}
 				// case 3: bind easyui-datebox/datetimebox
@@ -1422,14 +1466,14 @@ function EzModal() {
 				// case 5.1: datagrid pager
 				if (this.attributes[ir.grid]) {
 					EasyGrid.pager(this.id,
-						// {pk: f, select: v, onchange: onChange});
+						// {pk: f, select: v, onselect: onChange});
 						opts);
 				}
 				// case 5.2: datagrid
 				else if  (this.classList && (this.classList.contains('easyui-datagrid'))) {
 					if (jeasy.log)
 						console.log('Trying bind datagrid automatically, ir-field: ', f, v);
-					// EasyGird.datagrid(this.id, {select: v, onchange: onChange});
+					// EasyGird.datagrid(this.id, {select: v, onselect: onChange});
 					EasyGird.datagrid(this.id, opts);
 				}
 				// case 6: bind text input - should this moved to the first?
