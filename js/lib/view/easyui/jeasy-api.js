@@ -66,6 +66,7 @@ function loadSessionInf() {
 	if (ssinf)
 		return JSON.parse(ssinf);
 
+	// A better way is using a certificate
 	ssinf = $.cookie(ssk);
 	if (ssinf)
 		ssinf = JSON.parse(client.ssInf);

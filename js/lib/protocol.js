@@ -101,6 +101,14 @@ class JMessage {
 		// this.body.push(body.parentMsg(this));
 		this.body.push(body);
 	}
+
+	/** A short cut for body[0].post()
+	 * @param {UpdateReq} pst post sql request
+	 * @return {UpdateReq} the  first request body[0].post returned value.*/
+	post(pst) {
+		if (this.body !== undefined && this.body.length > 0)
+			return this.body[0].post(pst);
+	}
 }
 
 class JHeader {
@@ -289,12 +297,17 @@ class UpdateReq {
 	}
 
 	post (pst) {
+		if (pst === undefined) {
+			console.warn('You really wanna an undefined post operation?');
+			return this;
+		}
 		if (this.postUpds === undefined)
 			this.postUpds = [];
 		if (Array.isArray(pst)) {
 			this.postUpds = this.postUpds.concat(pst);
 		}
-		else push.push(pst);
+		else this.postUpds.push(pst);
+		return this;
 	}
 }
 
