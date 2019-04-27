@@ -10,12 +10,6 @@ if (J === undefined)
  * - initialized in project's frame */
 const Port = jvue.Protocol.Port;
 
-/** Globale args' buffer used resolving args defined in html tags.
- * Resolved and referenced args are refreshed here.
- * Each time a new CRUD senario is reloaded, this args should refreshed.
- * TODO move to jeasy API.*/
-// var globalArgs = {};
-
 /** attribute names in html tag defining attres for handling by jeasy-html frame */
 const ir = {
 	/** target name, pager use ir-grid, grid use ir-t*/
@@ -24,7 +18,7 @@ const ir = {
 	 * TODO Planning to support client defined query. */
 	sk: 'ir-sk',
 
-	root: 'ir-sroot',
+	root: 'ir-root',
 	/** grid item on select handler name (according easyUI document, there is not 'onChange')*/
 	onselect: "ir-onselect",
 
@@ -318,7 +312,7 @@ function Tag (debug) {
 			return window[vn];
 		if (argPool !== undefined && argPool[vn])
 			return argPool[vn];
-			
+
 		var v = window;
 		var field;
 
@@ -396,8 +390,9 @@ const tag = new Tag(jeasy.log);
 function EzHtml (J) {
 	/**Get attr value from tag-id */
 	this.ir = function (tagId, atr) {
-		if (tagId.substring(0, 1) != "#")
-			tagId = "#" + tagId;
+		// if (tagId.substring(0, 1) != "#")
+		// 	tagId = "#" + tagId;
+		tagId = regex.sharp_(tagId);
 		var a = $(tagId).attr(atr);
 		return a;
 	};
@@ -477,6 +472,36 @@ function EzHtml (J) {
 		return exprs;
 	};
 
+	/**Collect all cheched items from easyui treee.
+	 * @param {string} treeId
+	 * @param {Object} opts options:<br>
+	 * cols: {p1: v1, p2, v2, ...}
+	 * 		p: the DB field name, v: the easy tree item's propterty where the value will be got.
+	 * append: {p1: v1, ...} appending values, e.g. {role: '0101'} is used to get all functions of role 0101.
+	 * @return {Array} columns to be insert / update, etc.
+	 * TODO may be we can support ir-checkTreeItem ="field: value, ..."?, but can user care nothing about easyUI?
+	 */
+	this.checkedTreeItem = function (treeId, opts) {
+		var nodes = $(regex.sharp_(treeId, ir.deflt.treeId)).tree('getChecked');
+		var eaches = new Array();
+		for (var i = 0; i < nodes.length; i++) {
+			var r = {};
+
+			if (opts.cols)
+			Object.keys(opts.cols).forEach(function (k, ix) {
+				if(k === undefined || opts[k] === undefined || opts[k] === null)
+					// opts.cols.k = ez-name, so r.k <= node[i].name's value
+					r[k] = nodes[i][opts.cols[k]];
+			});
+
+			Object.assign(r, opts.append);
+			// TODO if supporting ir-checkTreeItem, we need handling variables
+
+		    eaches.push(r);
+		}
+		return eaches;
+	};
+
 	/**Merget js arg (opts) with html tag(#tagId)'s attributes,
 	 * with the js args ovrriding html attributes
 	 * - except arrays like sqlArgs, they are concated.
@@ -485,9 +510,9 @@ function EzHtml (J) {
 	 * Options of sqlArgs, args and select are not handled.<br>
 	 * opts.sk: semantic key string with parameters, like roels.ez, {@obj1.var1}<br>
 	 * opts.query: query form id, ir-query<br>
-	 * opts.args: arguments buffer where to find variables needed by sk TODO merge with variables<br>
-	 * opts.sqlArgs: arguments directly provided and send back to server - needed by sk TODO merge with variables<br>
-	 * opts.select: selected id TODO merge with variables<br>
+	 * opts.args: arguments buffer where to find variables needed by sk sql <br>
+	 * opts.sqlArgs: arguments directly provided and send back to server - needed by sk <br>
+	 * opts.select: selected id <br>
 	 * opts.all: add an "-- ALL --" item<br>
 	 * opts.onclick: on click function or function name<br>
 	 * opts.onselect: on item select function or function name<br>
@@ -502,8 +527,9 @@ function EzHtml (J) {
 		if (opts) {
 			opts.t = tag.merge(opts.t, tagId, ir.t);
 			opts.sk = tag.merge(opts.sk, tagId, ir.sk);
-			opts.all = tag.merge(opts.all, tagId, ir.all);
+			opts.all = opts.all || EasyHtml.has(tagId, ir.all);
 			opts.query = tag.merge(opts.query, tagId, ir.query);
+			opts.root = tag.merge(opts.root, tagId, ir.root);
 
 			opts.cbb = tag.merge(opts.cbb, tagId, ir.combobox);
 			opts.cbb = tag.mergargs(opts, opts.cbb);
@@ -571,16 +597,16 @@ function EzCbb (J) {
 		// }
 		var sk = opts.cbb;
 		var sqlArgs = opts.sqlArgs;
-		if (sqlArgs === undefined)
-			sqlArgs = [];
+		// if (sqlArgs === undefined)
+		// 	sqlArgs = [];
 
-		if (sk === undefined || sk === null)
-			console.error(ir.combobox + " for " + cbbId + " is undefined. In jeasy v1.0, only dataset configured combobox is suppored (must have a sk).");
-		else {
-			var parsed = tag.parseSk(sk, opts.argbuff);
-			sk = parsed.shift();
-			sqlArgs = sqlArgs.concat(parsed);
-		}
+		// if (sk === undefined || sk === null)
+		// 	console.error(ir.combobox + " for " + cbbId + " is undefined. In jeasy v1.0, only dataset configured combobox is suppored (must have a sk).");
+		// else {
+		// 	var parsed = tag.parseSk(sk, opts.argbuff);
+		// 	sk = parsed.shift();
+		// 	sqlArgs = sqlArgs.concat(parsed);
+		// }
 
 		// shall add '-- ALL --'?
 		// if (_All_ === null || _All_ === undefined)
@@ -598,7 +624,7 @@ function EzCbb (J) {
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
 					jconsts.conn,		// connection id in connexts.xml
 					sk);				// sk in dataset.xml
-		req.sqlArgs = sqlArgs;			// TODO can be a function?
+		req.args(opts.sqlArgs);
 
 		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
 		// DatasetReq is used as message body for semantic tree.
@@ -621,8 +647,8 @@ function EzCbb (J) {
 					if (jeasy.log) console.log(e);
 				}
 			});
-			if(typeof(selectId) === "string")
-				cbb.combobox('setValue', selectId);
+			if(typeof(opts.select) === "string")
+				cbb.combobox('setValue', opts.select);
 		});
 	};
 };
@@ -723,18 +749,6 @@ function EzTree(J) {
 
 		if (sk === undefined || sk === null)
 			console.error(ir.cbbtree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have an sk from dataset.xml).");
-		// else {
-		// 	var parsed = tag.parseSk(sk, opts.args);
-		// 	sk = parsed.shift();
-		// 	if (sqlArgs === undefined)
-		// 		sqlArgs = [];
-		// 	sqlArgs = sqlArgs.concat(parsed);
-		// }
-
-		// if (typeof opts.onselect === "undefined" || opts.onselect === null)
-		// 	opts.onselect = tree.attr(ir.onselect);
-		// if (typeof opts.onselect === "string")
-		// 	opts.onselect = eval(opts.onselect);
 
 		// request JMessage body
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
@@ -742,8 +756,7 @@ function EzTree(J) {
 					sk,					// sk in dataset.xml
 					'sqltree');			// ask for configured dataset as tree
 		req.rootId = opts.rootId;
-
-		req.sqlArgs = sqlArgs; // FIXME FUNCTION
+		req.args(opts.sqlArgs);
 
 		// all request are created as user reqs except query, update, insert, delete and ext like dataset.
 		// DatasetReq is used as message body for semantic tree.
@@ -791,23 +804,8 @@ function EzTree(J) {
 		opts = EasyHtml.opts(treeId, opts);
 		var sk = opts.tree;
 
-		// js opts.sk overriding ir-tree
-		// if (sk !== undefined && sk.length > 1 && typeof opts.sk === 'string' && opts.sk.length > 1)
-		// 	console.warn("opts has both sk and " + ir.tree +", the latter is ignored.", opts.sk, opts.tree);
-		// if (typeof opts.sk === 'string' && opts.sk.length > 1)
-		// 	sk = opts.sk;
-
-		if (sk === undefined || sk === null)
-			console.error(ir.tree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have sk from dataset.xml).");
-		// else {
-		// 	var parsed = tag.parseSk(sk, opts.args);
-		// 	sk = parsed.shift();
-		// 	if (opts.sqlArgs === undefined)
-		// 		opts.sqlArgs = [];
-		// 	else if (typeof opts.sqlArgs === 'string')
-		// 		opts.sqlArgs = [opts.sqlArgs];
-		// 	opts.sqlArgs = opts.sqlArgs.concat(parsed);
-		// }
+		if (sk === undefined || sk === null || sk === '')
+			console.error(ir.tree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd semantic tree is suppored (must have an sk from dataset.xml).");
 
 		// request JMessage body
 		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
@@ -1371,47 +1369,50 @@ function EzModal() {
 	};
 
 	/**Details form loading, a helper called by user onModal() to load a CRUD details form.<br>
-	 * @param {string} formId: optional form id, default "irform".
-	 * @param {string} irt: serv target (at least main table),
-	 * can be configured from $(formId)[ir-t] (set the parameter as null)
-	 * @param {Array/Object} pk: Value(s) will be appended to query's where clause.
-	 * 1. Object: {pk, v} pk value for quering record. (only pk for main table, on table name)<br>
-	 * 2. Array: [{condt}] conditions returned by EasyQeuryForm.conds();
-	 * @param {function} callback onload event handler<br>
-	 * Functions that for special tasks, e.g. loading svg should done here.
+	 * @param {string} modalId: optional form id, default "irform".
+	 * @param {Object} opts options:
+	 * t: serv target (at least main table),<br>
+	 * 		can be configured from $(formId)[ir-t] (set the parameter as null)
+	 * pk: Value(s) will be appended to query's where clause.
+	 * 		1. Object: {pk, v} pk value for quering record. (only pk for main table, on table name)<br>
+	 * 		2. Array: [{condt}] conditions returned by EasyQeuryForm.conds();
+	 * onload: event handler<br>
+	 * 		Functions that for special tasks, e.g. loading svg should done here.
 	 */
-	this.load = function (formId, irt, pk, callback) {
+	this.load = function (modalId, opts) {
+		// this.load = function (formId, irt, pk, callback) {
+		modalId = regex.sharp_(modalId, ir.deflt.modalId);
+		opts = EasyHtml.opts(modalId, opts);
 		// find sql "from" clause
-		var joins;
-		if (irt === null || irt === undefined) {
-		 	irt = EasyHtml.ir(formId, ir.t);
-			joins = EasyHtml.tabls(formId);
-		}
-		else if (typeof irt === 'string')
-		 	joins = tag.joins(irt);
+		var joins = tag.joins(opts.t);
 
 		var mainAlias = joins[0].as;
-		var exprs = EasyHtml.formExprs(formId, mainAlias);
-		var wheres = EasyQueryForm.conds(formId, mainAlias);
+		var exprs = EasyHtml.formExprs(modalId, mainAlias);
+		var wheres = EasyQueryForm.conds(modalId, mainAlias);
 
 		var req = ssClient.query(null,	// let the server find connection
 					joins[0].tabl,		// main table
 					joins[0].as);		// main alias
 
 		var q = req.body[0];
+		var pk = opts.pk;
 		q.exprss(exprs)
 			.joinss(joins.splice(1, joins.length - 1))
 			.whereCond(wheres);
 		if (pk !== undefined && Array.isArray(pk))
 			q.whereCond(pk);
-		else if (typeof pk === "object" && pk.pk !== undefined)
+		else if (typeof pk === "object" && pk.pk !== undefined) {
+			// some times user's code use 'this' in callback, makes arguments wrong
+			if (pk.v === undefined)
+				console.error('pk may not correct', pk);
 			q.whereCond("=", pk.pk, "'" + pk.v + "'");
+		}
 
 		// post request, handle response
 		EasyMsger.progress();
 		ssClient.commit(req, function(resp) {
 			var rows = jeasy.rows(resp);
-			EasyModal.bindWidgets (formId, rows[0], callback);
+			EasyModal.bindWidgets (modalId, rows[0], opts.onload);
 		}, EasyMsger.error);
 	};
 
@@ -1485,8 +1486,12 @@ function EzModal() {
 		});
 
 		EasyMsger.close();
-		if (typeof callback === "function")
+		if (typeof callback === "function") {
+			if (jeasy.log)
+				console.log("EzModal.bindWidgets() doesn't calling callback on all task finished, "
+					+ "but called when all autobinding fields are iterated while waiting response from serv.")
 			callback();
+		}
 	}
 
 	/** close dialog
