@@ -289,12 +289,12 @@ class UpdateReq {
 	}
 
 	post (pst) {
-		if (this.post === undefined)
-			this.post = [];
+		if (this.postUpds === undefined)
+			this.postUpds = [];
 		if (Array.isArray(pst)) {
-			this.post = this.post.concat(pst);
+			this.postUpds = this.postUpds.concat(pst);
 		}
-		else pust.push(pst);
+		else push.push(pst);
 	}
 }
 
