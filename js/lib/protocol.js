@@ -45,18 +45,32 @@ class Protocol {
 		return rows;
 	}
 
-	static nv2arr (nv) {
+	static nv2cell (nv) {
 		return [nv.name, nv.value];
 	}
 
-	static nvs2arr(nvs) {
-		var arr = [];
+	static nvs2row (nvs) {
+		var row = [];
+		if (nvs) {
+			for (var ix = 0; ix < nvs.length; ix++)
+				row.push(this.nv2cell(nvs[ix]));
+		}
+		return row;
+	}
+
+	/** convert [[{name, value}]] to [[[name, value]]]
+	 * @param {Array} 2d array of n-v pairs
+	 * @return {Array} 3d array that can be used by server as nv rows
+	 */
+	static nvs2rows(nvs) {
+		var rows = [];
 		if(nvs) {
 			for (var ix = 0; ix < nvs.length; ix++)
 				// Ix.nvn = 0; Ix.nvv = 1
-				arr.push([nvs[ix].name, nvs[ix].value]);
+				// rows.push([nvs[ix].name, nvs[ix].value]);
+				rows.push(this.nvs2row(nvs[ix]));
 		}
-		return arr;
+		return rows;
 	}
 } ;
 
@@ -282,7 +296,7 @@ class UpdateReq {
 
 	nv (n, v) {
 		if (Array.isArray(n))
-			this.nvs = this.nvs.concat(Protocol.nvs2arr(n));
+			this.nvs = this.nvs.concat(Protocol.nvs2row(n));
 		else
 			this.nvs.push([n, v]);
 		return this;
@@ -301,6 +315,9 @@ class UpdateReq {
 			console.warn('You really wanna an undefined post operation?');
 			return this;
 		}
+		else if (typeof pst.version === 'string' && typeof pst.seq === 'number')
+			console.warn('You pobably adding a JMessage as post operation? It should only be JBody(s).');
+
 		if (this.postUpds === undefined)
 			this.postUpds = [];
 		if (Array.isArray(pst)) {
@@ -315,6 +332,36 @@ class DeleteReq extends UpdateReq {
 	constructor (conn, tabl, pk) {
 		super (conn, tabl, pk);
 		this.a = Protocol.CRUD.d;
+	}
+}
+
+class InsertReq extends UpdateReq {
+	constructor (conn, tabl) {
+		super (conn, tabl);
+		this.a = Protocol.CRUD.c;
+	}
+
+	columns (cols) {
+		if (this.cols === undefined)
+			this.cols = [];
+		if (Array.isArray(cols)){
+			this.cols = this.cols.concat(cols);
+		}
+		else this.cols.push(cols);
+	}
+
+	valus (vals, v) {
+		if (this.nvss === undefined)
+			this.nvss = [];
+
+		if (Array.isArray(vals)) {
+			// this.nvss = this.nvss.concat(Protocol.nvs2rows(vals));
+			this.nvss = this.nvss.concat(vals);
+		}
+		else if (vals !== undefined){
+			this.nvs.push([vals, v]);
+		}
+		return this;
 	}
 }
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
@@ -378,4 +425,4 @@ class DatasetCfg extends QueryReq {
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DeleteReq, DatasetCfg}
+export {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg}

@@ -50,6 +50,10 @@ const ir = {
 
 	all: 'ir-all',
 
+	/**The row in a grid/tree/cbb to be selected:
+	 * ir-select = "field-name: variable" */
+	select: 'ir-select',
+
 	/** Modal dialog form tag, value = callback-name: ir-modal='onModal' */
 	modal: 'ir-modal',
 
@@ -118,8 +122,8 @@ const regex = {
 	 */
 	vn: /\s*(\w+)\.(.*)/i,
 
-	/** Parse String like "ds.sql-key arg1, {@obj.var1}, arg2, ..."*/
-	cbbArg: /{\@\s*(.+)\s*\}/i,
+	/** Parse string like "ds.sql-key arg1, {@obj.var1}, arg2, ..."*/
+	cbbArg: /\{\@\s*(.+)\s*\}/i,
 
 	/**Add # at start if none
 	 * @param {string} str
@@ -143,13 +147,13 @@ const regex = {
 	}
 };
 
-/**html tag's attribute parser.
+/**[Internal API] html tag's attribute parser.
  * Parsing ir-expr="max(t.col)", etc.
  */
 function Tag (debug) {
 	this.debug = debug;
 
-	/**Try suplement jsvar with html tag's attributes
+	/**Try supplement jsvar with html tag's attributes
 	 * @param {any} jsvar
 	 * @param {string} targId html tag id.
 	 * @param {string} attr html attribute name */
@@ -308,15 +312,21 @@ function Tag (debug) {
 	 * @param {Object} argPool args buffer for looking varialbkles, if not found, try in window globaly.
 	 * @return {Object} value represented by vn, e.g. "x.y.z" */
 	this.findVar = function (vn, argPool) {
+		// vn is a global variable
 		if (window[vn])
 			return window[vn];
+		// vn is a variable in argPool
 		if (argPool !== undefined && argPool[vn])
 			return argPool[vn];
 
+		// now vn must has at least one "."
 		var v = window;
 		var field;
 
 		var vnss = regex.vn.exec(vn);
+		// found a null value
+		if (vnss === null)
+			return null;
 
 		// does arg pool has the variable?
 		if (argPool !== undefined && argPool[vnss[1]] !== undefined) {
@@ -383,10 +393,39 @@ function Tag (debug) {
 		}
 		return args;
 	};
+
+	/** Parse String like "ds.sql-key arg1, {@obj.var1}, arg2, ..."
+	 * @param {string} irselect e.g. "roleId: {@roleId}, ...", or "roleId: {@role.roleId}"
+	 * @param {Object} argBuff e.g. {roleId: 'aaa'}
+	 * @return {Array} e.g. {roleId: roleId's value('aaa'), ...}
+	 */
+	this.parseSelect = function (irselect, argBuff) {
+		if ( irselect === null || typeof irselect === "undefined" )
+			return {};
+
+		var args = {};
+		var nvss = irselect.trim().split(",");
+
+		// replace variables
+		// var regex.cbbArg = /\{\@\s*(.+)\s*\}/g;
+		for ( var ix = 1; ix < nvss.length; ix++ ) {
+			var nvs = nvss[ix].split(":");
+			var mOnVar = regex.cbbArg.exec( nvs[1] );
+			var nv = {}	// found selecting n-v
+			if ( mOnVar ) {
+				var v = tag.findVar( mOnVar[1], argBuff );
+				nv[nvs[0].trim()] = v;
+			}
+			else
+				nv[nvs[0].trim()] = nvss[ix];
+			Object.assign(args, nv);
+		}
+		return args;
+	}
 };
 const tag = new Tag(jeasy.log);
 
-/**Common handlers for ir attributes, like ir-t, ir-list etc.*/
+/**[Internal API] Common handlers for ir attributes, like ir-t, ir-list etc.*/
 function EzHtml (J) {
 	/**Get attr value from tag-id */
 	this.ir = function (tagId, atr) {
@@ -475,31 +514,53 @@ function EzHtml (J) {
 	/**Collect all cheched items from easyui treee.
 	 * @param {string} treeId
 	 * @param {Object} opts options:<br>
-	 * cols: {p1: v1, p2, v2, ...}
+	 * cols: {p1: v1, p2: v2, ...}
 	 * 		p: the DB field name, v: the easy tree item's propterty where the value will be got.
 	 * append: {p1: v1, ...} appending values, e.g. {role: '0101'} is used to get all functions of role 0101.
-	 * @return {Array} columns to be insert / update, etc.
-	 * TODO may be we can support ir-checkTreeItem ="field: value, ..."?, but can user care nothing about easyUI?
+	 * @return {Array} columns to be insert / update, etc.<br>
+	 *	 [ [ [ "funcId", "1A"   ],		- value-row 0, col 0 (funcId)<br>
+	 *	     [ "roleId", "0101" ],		- value-row 0, col 1 (this.roleId == '0101')<br>
+	 *	   ],<br>
+	 *	   [ [ "funcId", "0101" ],		- value-row 1, col 0 (funcId)<br>
+	 *	     [ "roleId", "0101" ],		- value-row 1, col 1 (this.roleId == '0101')<br>
+	 *	 ]<br>
+	 *	 this means two records will be inserted like<br>
+	 *	 insert a_role_funcs (funId, roleId) values ('1A', '0101'), ('0101', '0101')<br>
+	 * TODO may be we can support ir-checkTreeItem ="field: value, ..."?, but user must know easyUI item's properties?
 	 */
 	this.checkedTreeItem = function (treeId, opts) {
 		var nodes = $(regex.sharp_(treeId, ir.deflt.treeId)).tree('getChecked');
 		var eaches = new Array();
+		var colnames = new Array();
+		var first = true;
 		for (var i = 0; i < nodes.length; i++) {
-			var r = {};
+			var r = [];
 
-			if (opts.cols)
-			Object.keys(opts.cols).forEach(function (k, ix) {
-				if(k === undefined || opts[k] === undefined || opts[k] === null)
+			if (opts.cols) {
+				Object.keys(opts.cols).forEach(function (k, ix) {
 					// opts.cols.k = ez-name, so r.k <= node[i].name's value
-					r[k] = nodes[i][opts.cols[k]];
-			});
+					r.push([k, nodes[i][opts.cols[k]]]);
+					if (first) {
+						colnames.push(k);
+					}
+				});
+			}
 
-			Object.assign(r, opts.append);
+			if (opts.append) {
+				Object.keys(opts.append).forEach(function (k, ix) {
+					r.push([k, opts.append[k]]);
+					if (first) {
+						colnames.push(k);
+					}
+				});
+			}
+			first = false;
+			// Object.assign(r, opts.append);
+
 			// TODO if supporting ir-checkTreeItem, we need handling variables
-
 		    eaches.push(r);
 		}
-		return eaches;
+		return [colnames, eaches];
 	};
 
 	/**Merget js arg (opts) with html tag(#tagId)'s attributes,
@@ -530,6 +591,19 @@ function EzHtml (J) {
 			opts.all = opts.all || EasyHtml.has(tagId, ir.all);
 			opts.query = tag.merge(opts.query, tagId, ir.query);
 			opts.root = tag.merge(opts.root, tagId, ir.root);
+
+			opts.select = tag.merge(opts.select, tagId, ir.select);
+			if (typeof opts.select === 'string') {
+				// var ss = opts.select.split(":");
+				// if (ss.length !== 2 || ss[1] === undefined || ss[1] === null)
+				// 	console.error('select id can not been parsed.', opts.select);
+				// else {
+				// 	// convert string to object {n: v}
+				// 	opts.select = {};
+				// 	opts.select[ss[0]] = tag.findVar(ss[1].trim(), opts.args);
+				// }
+				opts.select = tag.parseSelect(opts.select, opts.args);
+			}
 
 			opts.cbb = tag.merge(opts.cbb, tagId, ir.combobox);
 			opts.cbb = tag.mergargs(opts, opts.cbb);
@@ -660,74 +734,6 @@ function EzTree(J) {
 	this.log = true,
 	this.alertOnErr = true,
 
-	// TODO @deprecated
-	// bind cbb tree with data from s-tree.serv.
-	// sk is specified by ir-sk
-	this.cbbStree = function ( cbbId, sk, valueExpr, textExpr, onChangef, isSelect, onSuccessf) {
-		this.combotree (cbbId, sk, null, onChangef);
-		// if (cbbId.substring(0, 1) != "#")
-		// 	cbbId = "#" + cbbId;
-		// var cbb = $(cbbId);
-		//
-		// if (typeof t === "undefined" || t === null)
-		// 	t = cbb.attr(_aT);
-		// if (typeof sk === "undefined" || sk === null)
-		// 	sk = cbb.attr(_aSemantik);
-		//
-		// var exprs = new Array();
-		// easyTree.cbbEx ( cbbId, t, sk, null, null, exprs, isSelect, onChangef, onSuccessf );
-	};
-
-	// TODO @deprecated
-	// bind cbb tree with results form s-tree.serv (data is filtered by rootId)
-	this.cbbEx = function ( cbbtreeid, t, sk, rootId, conds, exprs, selectId, onselectf, onSuccessf, treeType, isMultiple) {
-		this.combotree(cbbtreeid, sk, rootId, selectId, onselectf, isMultiple);
-		// var treeType = treeType || "combotree";
-		// if (cbbtreeid.substring(0, 1) != "#")
-		// 	cbbtreeid = "#" + cbbtreeid;
-		// if (typeof isMultiple == "undefined" || isMultiple == null || isMultiple == '')
-		// 	isMultiple = false;//default: single check
-		// var url = _servUrl + "s-tree.serv?t=any&sk=" + sk;
-		// //var conds = [formatCond("=", "orgId", orgId, "e_areas")];
-		// // semantics configured at server side: var order = formatOrders("fullpath");
-		// //var qobj = formatQuery(exprs, "e_areas", conds, null, order);
-		// var qobj = formatQuery(exprs, t, conds);
-		//
-		// $.ajax({type: "POST",
-		// 	url: url,
-		// 	data: JSON.stringify(qobj),
-		// 	contentType: "application/json; charset=utf-9",
-		// 	success: function (data) {
-		// 		if (irLog) console.log("Bind combotree success: " + data);
-		// 		var resp = JSON.parse(data);
-		// 		 //$("#"+cbbtree).combotree( {data: resp} );
-		//
-		// 		if (typeof resp.total != "undefined") {
-		// 			$(cbbtreeid)[treeType]({
-		// 				data: resp.rows,
-		// 				multiple: isMultiple,
-		// 				onSelect: typeof onselectf === "function" ? onselectf : function() {}
-		// 			});
-		// 			if(typeof(selectId) != "undefined" && selectId != null)
-		// 				$(cbbtreeid)[treeType]('setValue', selectId);
-		//
-		// 			if (typeof onSuccessf === "function")
-		// 				onSuccessf(resp.rows);
-		// 		}
-		// 		else {
-		// 			console.error("ERROR - bind combotree " + cbbtreeid + " failed.");
-		// 			console.error(data);
-		// 		}
-		// 	},
-		// 	error: function (data) {
-		// 		console.log("ERROR - bind combotree " + cbbtreeid + " failed.");
-		// 		console.log(data);
-		// 		if (easyTree.alertOnErr)
-		// 			$.messager.alert({title: "ERROR", msg: "can't load s-tree for " + cbbtreeid, icon: "info"});
-		// 	}
-		// });
-	};
-
 	/**Bind configured dataset to easyui combotree.
 	 * @param {string} treeId
 	 * @param {Object} opts<br>
@@ -834,7 +840,7 @@ function EzTree(J) {
 		});
 	};
 
-	/**Bind easyui tree with data from serv.
+	/**[Internal API] Bind easyui tree with data from serv.
 	 * @param {string} treeId html tag id
 	 * @param {array} json rows
 	 * @param {string} treeType tree | treegrid
@@ -927,9 +933,9 @@ function EzGrid (J) {
 		}
 		gridId = regex.sharp_(gridId, ir.deflt.gridId);
 
-		// semantics key (config.xml/semantics)
-		// var semantik = $(pagerId).attr(ir.sk);
 		opts = EasyHtml.opts(gridId, opts);
+
+		// semantics key (config.xml/semantics)
 		var semantik = opts.sk;
 
 		// Remember some variabl for later calling onPage()
@@ -1124,13 +1130,12 @@ function EzGrid (J) {
 			gridId = "#" + gridId;
 		var g = $(gridId);
 
-		g.datagrid({ onSelect: function(ix, row) {
+		g.datagrid(
+			{ onSelect: function(ix, row) {
 				jeasy.mainRow(gridId, row);
 				if (opts.onselect)
 					opts.onselect(ix, row);
-			} });
-
-		g.datagrid({
+			},
 			onCheck: function(ix, row) {
 				jeasy.mainRow(gridId, row);
 				if (opts.oncheck)
@@ -1147,10 +1152,14 @@ function EzGrid (J) {
 				onUncheckAll: opts.onCheckAll});
 
 		g.datagrid("loadData", json);
-		if(typeof isSelectFirst === "undefined" || isSelectFirst != false) {
-			// select row 1
-			g.datagrid("selectRow", 0);
-		}
+
+		if (typeof opts.select === 'object')
+			var ix = jeasy.findRowIdx(json, opts.select)
+			g.datagrid("selectRow", ix);
+		// if(typeof isSelectFirst === "undefined" || isSelectFirst != false) {
+		// 	// select row 1
+		// 	g.datagrid("selectRow", 0);
+		// }
 
 		EasyMsger.close();
 		if (typeof opts.onload === "function")
@@ -1422,7 +1431,7 @@ function EzModal() {
 			var f = this.attributes[ir.field].value;
 			var v = rec ? rec[f] : undefined;
 
-			var opts = EasyHtml.opts(domval.id, {select: v, args: rec, pk: f});
+			var opts = EasyHtml.opts(domval.id, {args: rec, pk: f});
 
 			// ir-field presented, this widget  needing been auto bound
 			if ( this.attributes[ir.field].name !== undefined ) {
@@ -1466,9 +1475,11 @@ function EzModal() {
 					}
 				// case 5.1: datagrid pager
 				if (this.attributes[ir.grid]) {
-					EasyGrid.pager(this.id,
-						// {pk: f, select: v, onselect: onChange});
-						opts);
+					// merge grid's attributes, with pager's attributes overriding gird's
+					var gridId = EasyHtml.ir(this.id, ir.grid);
+					opts = EasyHtml.opts(gridId, opts);
+
+					EasyGrid.pager(this.id, opts);
 				}
 				// case 5.2: datagrid
 				else if  (this.classList && (this.classList.contains('easyui-datagrid'))) {

@@ -146,7 +146,7 @@ function jeasyAPI (J, log) {
 	this.mainRow = function (listId, row) {
 		var p = regex.desharp_(listId);
 		this.mainRows[ p ] = row;
-	}
+	};
 
 	/**
 	 * @return {object} row found row or new set row.
@@ -154,6 +154,55 @@ function jeasyAPI (J, log) {
 	this.getMainRow = function(listId) {
 		var p = regex.desharp_(listId);
 		return this.mainRows[ p ];
+	};
+
+	/**Select row if row[idName] === selectId
+	 * @param {Array} rows
+	 * @param {Object} select {n, v}
+	 * n: the field in row to be compared
+	 * v: the value to be compared
+	 * @return {Number} index in rows if found, or -1
+	 */
+	this.findRowIdx = function (rows, select) {
+		if (typeof select === 'object') {
+			var valName = Object.getOwnPropertyNames(select)[0];
+			var val = select[valName];
+			for (var ix = 0; ix < rows.length; ix++) {
+				if (rows[ix][valName] == val) {
+					return ix;
+				}
+			}
+		}
+		return -1;
+	};
+
+	/**create request JBody for adding post operation (no header etc.).
+	 * @param {string} crud jeasy.c | r | u | d
+	 * @param {Object} opts
+	 * t: main table<br>
+	 * pk: for where conditiong<br>
+	 * nvs: for update values<br>
+	 * cols: columns to be inserted<br>
+	 * values: rows value for insert<br>
+	 * @return {UpdateReq} with a = crud
+	 */
+	this.postBody = function (crud, opts) {
+		if (crud === jeasy.c) {
+			var ins = new jvue.InsertReq(null, opts.t);
+			ins.a = crud;
+			if (Array.isArray(opts.cols)) {
+				ins.columns(opts.cols);
+				ins.valus(opts.values);
+			}
+			else console.warn('WARN - inserting empty columns?', opts);
+			return ins;
+		}
+		else {
+			var upd = new jvue.UpdateReq(null, opts.t, opts.pk);
+			upd.a = crud;
+			upd.nv(opts.nvs)
+			return upd;
+		}
 	}
 }
 const jeasy = new jeasyAPI(J);

@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import AES from './aes.js';
-import {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DeleteReq, DatasetCfg} from './protocol.js';
+import {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
 
 /**AES lib instance*/
 var aes;
@@ -255,7 +255,7 @@ class SessionClient {
 		}
 
 		var upd = new UpdateReq(conn, maintbl, pk);
-		upd.a = 'U';
+		upd.a = Protocol.CRUD.u;
 		this.currentAct.cmd = 'update';
 		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
 
@@ -272,8 +272,8 @@ class SessionClient {
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
 
-		var upd = new UpdateReq(conn, maintbl);
-		upd.a = 'I';
+		var upd = new InsertReq(conn, maintbl);
+		// upd.a = Protocol.CRUD.c;
 		this.currentAct.cmd = 'insert';
 		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
 
@@ -295,7 +295,7 @@ class SessionClient {
 		}
 
 		var upd = new UpdateReq(conn, maintbl, pk);
-		upd.a = 'D';
+		upd.a = Protocol.CRUD.d;
 		this.currentAct.cmd = 'delete';
 		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
 		return jmsg;
