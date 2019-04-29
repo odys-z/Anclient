@@ -228,6 +228,18 @@ class SessionClient {
 		this.J.post(jmsg, onOk, onError);
 	}
 
+	/**
+	 * create a query message.
+	 * @param {string} conn connection id
+	 * @param {string} maintbl target table
+	 * @param {string} alias target table alias
+	 * @param {Object} pageInf<br>
+	 * page: page index, -1 for no paging<br>
+	 * size: page size, default 20, -1 for no paging
+	 * @param {Object} act user's action for logging<br>
+	 * {func, cate, cmd, remarks};
+	 * @return {JMessage} the request message
+	 */
 	query(conn, maintbl, alias, pageInf, act) {
 		var qryItem = new QueryReq(conn, maintbl, alias, pageInf);
 		var header = Protocol.formatHeader(this.ssInf);
