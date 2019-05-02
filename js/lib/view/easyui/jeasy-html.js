@@ -199,7 +199,7 @@ function Tag (debug) {
 		// }
 	};
 
-	/**Format table-joins request object: [{tabl, t, on, as}]
+	/**Format table-joins request array: [{tabl, t, on, as}], used for QueryReq.join(...).
 	 * @param {string} t "b_articles, j:b_cate, l:b_author:a authorId=authorId and a.name like 'tom'"
 	 * @return {Array} [{tabl, t, on, as}], where t = main-table | j | r | l
 	 */
@@ -210,9 +210,10 @@ function Tag (debug) {
 		for(var i = 0; i < tss.length; ++i) {
 			var m = regex.join.exec(tss[i]);
 			if(m) {
-				var tAls = m[4];
-				if(typeof m[4] == "undefined")
-					tAls = "";
+				// var tAls = m[4];
+				// if(typeof m[4] == "undefined")
+				// 	tAls = "";
+
 				// try match variable in ON condition
 				var oncond = m[5];
 				// mOnVar = x.y
@@ -441,7 +442,8 @@ function EzHtml (J) {
 		return a !== undefined;
 	};
 
-	/**Parse table and joinning definition in html
+	/**@deprecated: as all options using opts() merging attributes, this function should deprecated.
+	 * Parse table and joinning definition in html
 	 * @param {string} pagerId pager id. default "irpager"
 	 * @return {Array} [{t: "main-table/j/r/l", tabl: "table-1", as: "alais", on: cond-string}]<br>
 	 * where cond-string = "col1=col2"
@@ -567,14 +569,17 @@ function EzHtml (J) {
 	 * with the js args ovrriding html attributes
 	 * - except arrays like sqlArgs, they are concated.
 	 * @param {string} tagId tag id that alredy sharped
-	 * @param {Object} opts options<br>
+	 * @param {Object} opts options to be merged (overriding tag attributes)<br>
 	 * Options of sqlArgs, args and select are not handled.<br>
 	 * opts.sk: semantic key string with parameters, like roels.ez, {@obj1.var1}<br>
-	 * opts.query: query form id, ir-query<br>
-	 * opts.args: arguments buffer where to find variables needed by sk sql <br>
-	 * opts.sqlArgs: arguments directly provided and send back to server - needed by sk <br>
-	 * opts.select: selected id <br>
 	 * opts.all: add an "-- ALL --" item<br>
+	 * opts.query: query form id, ir-query<br>
+	 * opts.root: ree root ID<br>
+	 * opts.cbb: combobox sk<br>
+	 * opts.cbbtree: combotree sk<br>
+	 * opts.tree: tree sk<br>
+	 * opts.pagesize: page size, if parameter is -1 or undefined, will be overriden by tag attribute<br>
+	 * opts.select: selected id <br>
 	 * opts.onclick: on click function or function name<br>
 	 * opts.onselect: on item select function or function name<br>
 	 * opts.onload: on load function or function name<br>
@@ -614,8 +619,10 @@ function EzHtml (J) {
 			opts.tree = tag.merge(opts.tree, tagId, ir.tree);
 			opts.tree = tag.mergargs(opts, opts.tree);
 
+			if (opts.pagesize < 0)
+				opts.pagesize = undefined;
 			opts.pagesize = tag.merge(opts.pagesize, tagId, ir.pagesize);
-			if (!opts.pagesize) opts.pagesize = -1;
+			if (opts.pagesize === undefined) opts.pagesize = -1;
 
 			opts.onclick = tag.merge(opts.onclick, tagId, ir.onclick);
 			if (typeof opts.onclick === 'string')
@@ -670,7 +677,7 @@ function EzCbb (J) {
 		// 	sk = cbb.attr(ir.combobox);
 		// }
 		var sk = opts.cbb;
-		var sqlArgs = opts.sqlArgs;
+		// var sqlArgs = opts.sqlArgs;
 		// if (sqlArgs === undefined)
 		// 	sqlArgs = [];
 
@@ -724,6 +731,12 @@ function EzCbb (J) {
 			if(typeof(opts.select) === "string")
 				cbb.combobox('setValue', opts.select);
 		});
+	};
+
+	this.getValue = function(cbbId) {
+		var cbb = $(regex.sharp_(cbbId));
+		if (cbb)
+			return cbb.combobox('getValue');
 	};
 };
 const EasyCbb = new EzCbb(J);
@@ -916,6 +929,9 @@ function EzGrid (J) {
 	 * Data (rows) are paged at server sied.
 	 * @param {string} pagerId the easyui pager's id
 	 * @param {Object} opts<br>
+	 * opts.args: arguments buffer where to find variables needed by sk sql <br>
+	 * opts.sqlArgs: arguments directly provided and send back to server - needed by sk <br>
+	 * See also EzHtml.opts().
 	 *
 	 */
 	this.pager = function (pagerId, opts) {
@@ -934,6 +950,7 @@ function EzGrid (J) {
 		gridId = regex.sharp_(gridId, ir.deflt.gridId);
 
 		opts = EasyHtml.opts(gridId, opts);
+		opts = EasyHtml.opts(pagerId, opts);
 
 		// semantics key (config.xml/semantics)
 		var semantik = opts.sk;
@@ -952,6 +969,10 @@ function EzGrid (J) {
 			});
 		}
 
+		// TODO handle sqlArgs
+	 	// opts.args: arguments buffer where to find variables needed by sk sql <br>
+	 	// opts.sqlArgs: arguments directly provided and send back to server - needed by sk <br>
+
 		var req;
 		if (semantik !== undefined)
 			// dataset way
@@ -960,6 +981,7 @@ function EzGrid (J) {
 						semantik);		// sk in datast.xml
 		else {
 			// try query.serv way
+			// TODO change to tag.joins(opts.t)
 			var tbls = EasyHtml.tabls(gridId);
 			if (tbls !== undefined) {
 				// create a query request
@@ -984,6 +1006,7 @@ function EzGrid (J) {
 				// q.wheres("=", "u.userId", "'" + uid + "'");
 				q.whereCond(wheres);
 			}
+			else console.error('Grid can support both ir-grid or ir-t, but none of them can be found.', opts);
 		}
 		// post request, handle response
 		EasyMsger.progress();
@@ -997,38 +1020,6 @@ function EzGrid (J) {
 			EasyGrid.bindPager(pagerId, total, pgInf.page, pgInf.size);
 		}, EasyMsger.error);
 	};
-
-	/** a wrapper of this.page(), for convenient.
-	 * @param {string} pagerId
-	 * @param {Object} opts
-	 * rowpk: row's pk
-	 * select: select an item when load
-	this.page_opts = function (pagerId, opts) {
-		pagerId = regex.sharp_(pagerId, ir.deflt.pagerId);
-
-		this.page(pagerId, null,
-			// onload, select row ...
-			function (rows, total) {
-				// opt 1. select row
-				if (opts !== undefined
-					&& typeof opts.rowpk === 'string' && typeof opts.select === 'string'
-					&& rows !== undefined && rows.length !== undefined) {
-
-					var gridId = $(pagerId).attr(ir.grid);
-					gridId = regex.sharp_(gridId);
-
-					for (var ix = 0; ix < rows.length; ix++) {
-						if (rows[ix][opts.rowpk] == opts.select) {
-							console.log('------------------- Why failed? $(pagerId).datagrid("selectRow", ' + ix + ')$ ------------------- ');
-							$(gridId).datagrid('unselectAll');
-							$(gridId).datagrid('selectRow', ix);
-							break;
-						}
-					}
-				}
-		});
-	}
-	 */
 
 	/**Load grid without a pager
 	 * @param {string} gridId
@@ -1045,15 +1036,15 @@ function EzGrid (J) {
 
 		// var semantik = $(gridId).attr(ir.sk);
 		var semantik = opts.sk;
-		var pgSize = opts.pagesize;
+		// var pgSize = opts.pagesize;
 
 		// Remember some variabl for later calling onPage()
 		if (this.pageInfo[gridId] === undefined) {
 			this.pageInfo[gridId] = {
 				queryId: opts.queryId,
 				total: 0,
-				page: -1,
-				size: -1,
+				page: opts.page,
+				size: opts.pagesize,
 			};
 		}
 
@@ -1065,9 +1056,10 @@ function EzGrid (J) {
 						semantik);		// sk in datast.xml
 		else {
 			// try query.serv way
-			var tbls = opts.t;
-			if (tbls === undefined || (typeof tbls === 'string' && tbls.trim().length < 2))
-				tbls = EasyHtml.tabls(gridId);
+			// var tbls = opts.t;
+			var tbls = tag.joins(opts.t);
+			// if (tbls === undefined || (typeof tbls === 'string' && tbls.trim().length < 2))
+			// 	tbls = EasyHtml.tabls(gridId);
 
 			if (tbls !== undefined) {
 				// create a query request
@@ -1076,7 +1068,7 @@ function EzGrid (J) {
 				req = ssClient.query(null,	// let the server find connection
 							maint,			// main table
 							mainAlias,		// main alias
-							this.pageInfo[pagerId]); // this.pageInfo, saving page ix for consequent querying
+							this.pageInfo[gridId]); // this.pageInfo, saving page ix for consequent querying
 				var q = req.body[0];
 
 				// handle query defined in grid attrs
@@ -1092,13 +1084,15 @@ function EzGrid (J) {
 				// q.wheres("=", "u.userId", "'" + uid + "'");
 				q.whereCond(wheres);
 			}
+			else console.error('Grid can support both ir-grid or ir-t, but none of them can be found.', opts);
 		}
 		// post request, handle response
 		EasyMsger.progress();
 		ssClient.commit(req, function(resp) {
 			var rows = jeasy.rows(resp);
 			var total = jeasy.total(resp, 0);
-			EasyGrid.bindPage (gridId, rows, total, opts.onSelect, opts.onCheck, opts.onCheckAll, opts.onLoad);
+			// EasyGrid.bindPage (gridId, rows, total, opts.onSelect, opts.onCheck, opts.onCheckAll, opts.onLoad);
+			EasyGrid.bindPage (gridId, rows, total, opts);
 		}, EasyMsger.error);
 	};
 

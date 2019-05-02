@@ -126,11 +126,9 @@ class J {
 					if (typeof onErr === "function")
 						onErr(Protocol.MsgCode.exIo, resp);
 					else {
-						console.error("ajax error:");
-						console.error("req");
-						console.error(jreq);
-						console.error("Url: " + url);
-						console.error(resp);
+						console.error("ajax error:", url);
+						console.error("req", jreq);
+						console.error("response", resp);
 					}
 				}
 			});

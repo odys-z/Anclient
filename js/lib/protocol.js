@@ -419,8 +419,10 @@ class DatasetCfg extends QueryReq {
 	/** Check is t can be undertood by s-tree.serv
 	 * @param {string} t*/
 	checkt(t) {
-		if (t !== ds_t.sqltree && t !== ds_t.retree && t !== ds_t.reforest)
-			console.warn("t won't be understood by server:", t, "Should be one of", ds_t);
+		// if (t !== ds_t.sqltree && t !== ds_t.retree && t !== ds_t.reforest) {
+		if (t !== undefined && !ds_t.hasOwnProperty(t)) {
+			console.warn("DatasetCfg.t won't been understood by server:", t, "Should be one of", ds_t);
+		}
 	}
 }
 
