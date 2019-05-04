@@ -28,6 +28,7 @@
     "postcss-loader": "^3.0.0",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
+    "tar": "^4.4.8",
     "vue": "^2.6.6",
     "vue-loader": "^15.6.4",
     "vue-router": "^3.0.2",
