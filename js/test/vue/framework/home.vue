@@ -47,7 +47,7 @@
   const Dashboard = { template: '<div>Dashboard Page</div>' }
   const TestUpload = { template: '<div>Test File Upload Page<file-upload/></div>' }
 
-  // Now JMessage can handle user defined ports, e.g. servlet "menu.sample"
+  // Now JMessage can handle user defined ports, e.g. servlet "menu.serv"
   _J.understandPorts(Samport);
 
   const tempV4flowArgs = {wfId: 't01', taskId: '000001', port: Samport.cheapflow};
@@ -244,7 +244,7 @@
 	var act = { func: 'home.vue',
 				cmd: 'load-menu',
 				cate: t,
-				remarks: 'test jclient.js loading menu from menu.sample'};
+				remarks: 'test jclient.js loading menu from menu.serv'};
 	var jmsg = vframe.jclient.userReq(homeVue.conn, Samport.menu, req, act);
 	vframe.jclient.commit(jmsg, function(resp) {
 		console.log(resp);

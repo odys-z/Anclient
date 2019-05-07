@@ -58,6 +58,24 @@ class Protocol {
 		return row;
 	}
 
+	/** convert [{name, value}, ...] to [n1, n2, ...]
+	 * @param {Array} [n-v, ...]
+	 * @return {Array} [n1, n2, ...]
+	 */
+	static nvs2cols(nvArr) {
+		var cols = [];
+		if (nvArr) {
+			for (var ix = 0; ix < nvArr.length; ix++) {
+				if (nvArr[ix].name) {
+					cols.push(nvArr[ix].name);
+				}
+				else
+					cols.push(ix);
+			}
+		}
+		return cols;
+	}
+
 	/** convert [[{name, value}]] to [[[name, value]]]
 	 * @param {Array} 2d array of n-v pairs
 	 * @return {Array} 3d array that can be used by server as nv rows
@@ -295,10 +313,12 @@ class UpdateReq {
 	}
 
 	nv (n, v) {
-		if (Array.isArray(n))
+		if (Array.isArray(n)) {
 			this.nvs = this.nvs.concat(Protocol.nvs2row(n));
-		else
+		}
+		else {
 			this.nvs.push([n, v]);
+		}
 		return this;
 	}
 
@@ -318,12 +338,15 @@ class UpdateReq {
 		else if (typeof pst.version === 'string' && typeof pst.seq === 'number')
 			console.warn('You pobably adding a JMessage as post operation? It should only be JBody(s).');
 
-		if (this.postUpds === undefined)
+		if (this.postUpds === undefined) {
 			this.postUpds = [];
+		}
 		if (Array.isArray(pst)) {
 			this.postUpds = this.postUpds.concat(pst);
 		}
-		else this.postUpds.push(pst);
+		else {
+			this.postUpds.push(pst);
+		}
 		return this;
 	}
 }
@@ -350,16 +373,39 @@ class InsertReq extends UpdateReq {
 		else this.cols.push(cols);
 	}
 
-	valus (vals, v) {
+	/**Set inserting value(s).
+	 * Becareful about function name - 'values' shall be reserved.
+	 * @param {string|Array} n_row field name or n-v array<br>
+	 * n_row can be typically return of jqueyr serializeArray, a.k.a [{name, value}, ...].<br>
+	 * Note:<br>
+	 * 1. Only one row on each calling.<br>
+	 * 2. Don't use both n-v mode and row mode, can't handle that.
+	 * @param {string} v value if n_row is name. Optional.
+	 * @return {InsertReq} this
+	 */
+	valus (n_row, v) {
 		if (this.nvss === undefined)
 			this.nvss = [];
 
-		if (Array.isArray(vals)) {
-			// this.nvss = this.nvss.concat(Protocol.nvs2rows(vals));
-			this.nvss = this.nvss.concat(vals);
+		if (Array.isArray(n_row)) {
+			if (Array.isArray(n_row[0])) {
+				// already a 2-d array
+				this.nvss = this.nvss.concat([n_row]);
+			}
+			else {
+				// guess as a n-v array
+				if (this.cols === undefined)
+					this.columns(Protocol.nvs2cols(n_row));
+				this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
+			}
 		}
-		else if (vals !== undefined){
-			this.nvs.push([vals, v]);
+		else if (n_row !== undefined){
+			if (this.nvss.length == 0) {
+				this.nvss.push([[n_row, v]]);
+			}
+			else {
+				this.nvss[0].push([n_row, v]);
+			}
 		}
 		return this;
 	}

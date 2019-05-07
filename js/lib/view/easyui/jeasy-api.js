@@ -12,7 +12,7 @@ const jconsts = {
 
 const samports = {
 	/** see semantic.jserv/io.odysz.jsample.SysMenu * /
-	menu: "menu.sample",
+	menu: "menu.serv",
 	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ * /
 	cheapflow: "cheapflow.sample"
 }

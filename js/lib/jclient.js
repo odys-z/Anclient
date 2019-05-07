@@ -282,14 +282,14 @@ class SessionClient {
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
 
-		var upd = new InsertReq(conn, maintbl);
-		// upd.a = Protocol.CRUD.c;
+		var ins = new InsertReq(conn, maintbl);
+		// ins.a = Protocol.CRUD.c;
 		this.currentAct.cmd = 'insert';
-		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
+		var jmsg = this.userReq(conn, Protocol.Port.insert, ins, this.currentAct);
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
-				upd.nv(nvs);
+				ins.valus(nvs);
 			else console.error("updating nvs must be an array of name-value.", nvs)
 		}
 		return jmsg;

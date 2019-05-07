@@ -309,6 +309,8 @@ function Tag (debug) {
 	};
 
 	/**find var from string like "x.y.z"
+	 * If not found, the vn will be returned, no error reported.
+	 * This is for auto form bounding, where this is common for many widgets.
 	 * @param {string} vn var name
 	 * @param {Object} argPool args buffer for looking varialbkles, if not found, try in window globaly.
 	 * @return {Object} value represented by vn, e.g. "x.y.z" */
@@ -327,7 +329,8 @@ function Tag (debug) {
 		var vnss = regex.vn.exec(vn);
 		// found a null value
 		if (vnss === null)
-			return null;
+			// return null;
+			return vn;
 
 		// does arg pool has the variable?
 		if (argPool !== undefined && argPool[vnss[1]] !== undefined) {
@@ -349,7 +352,7 @@ function Tag (debug) {
 			if (window[vn])
 				return window[vn];
 			else {
-				console.error("Can't find variable for " + vn);
+				// console.error("Can't find variable for " + vn);
 				return vn;
 			}
 		}
@@ -395,13 +398,12 @@ function Tag (debug) {
 		return args;
 	};
 
-	/** Parse String like "ds.sql-key arg1, {@obj.var1}, arg2, ..."
+	/** Parse String select string.
 	 * @param {string} irselect e.g. "roleId: {@roleId}, ...", or "roleId: {@role.roleId}"
 	 * @param {Object} argBuff e.g. {roleId: 'aaa'}
 	 * @return {Array} e.g. {roleId: roleId's value('aaa'), ...}
-	 */
 	this.parseSelect = function (irselect, argBuff) {
-		if ( irselect === null || typeof irselect === "undefined" )
+		if ( irselect === null || irselect === undefined )
 			return {};
 
 		var args = {};
@@ -423,6 +425,7 @@ function Tag (debug) {
 		}
 		return args;
 	}
+	 */
 };
 const tag = new Tag(jeasy.log);
 
@@ -607,7 +610,7 @@ function EzHtml (J) {
 				// 	opts.select = {};
 				// 	opts.select[ss[0]] = tag.findVar(ss[1].trim(), opts.args);
 				// }
-				opts.select = tag.parseSelect(opts.select, opts.args);
+				opts.select = tag.findVar(opts.select, opts.args);
 			}
 
 			opts.cbb = tag.merge(opts.cbb, tagId, ir.combobox);
@@ -976,7 +979,7 @@ function EzGrid (J) {
 		var req;
 		if (semantik !== undefined)
 			// dataset way
-			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			req = new jvue.DatasetCfg(	// SysMenu.java (menu.serv) uses DatasetReq as JMessage body
 						jconsts.conn,	// connection id in connexts.xml
 						semantik);		// sk in datast.xml
 		else {
@@ -1051,7 +1054,7 @@ function EzGrid (J) {
 		var req;
 		if (semantik !== undefined)
 			// dataset way
-			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			req = new jvue.DatasetCfg(	// SysMenu.java (menu.serv) uses DatasetReq as JMessage body
 						jconsts.conn,	// connection id in connexts.xml
 						semantik);		// sk in datast.xml
 		else {
@@ -1425,7 +1428,7 @@ function EzModal() {
 			var f = this.attributes[ir.field].value;
 			var v = rec ? rec[f] : undefined;
 
-			var opts = EasyHtml.opts(domval.id, {args: rec, pk: f});
+			var opts = EasyHtml.opts(domval.id, {args: rec, select: v});
 
 			// ir-field presented, this widget  needing been auto bound
 			if ( this.attributes[ir.field].name !== undefined ) {
@@ -1468,7 +1471,7 @@ function EzModal() {
 							" can't been set to easyui numberspinner " + domval.id);
 					}
 				// case 5.1: datagrid pager
-				if (this.attributes[ir.grid]) {
+				else if (this.attributes[ir.grid]) {
 					// merge grid's attributes, with pager's attributes overriding gird's
 					var gridId = EasyHtml.ir(this.id, ir.grid);
 					opts = EasyHtml.opts(gridId, opts);
@@ -1483,7 +1486,7 @@ function EzModal() {
 					EasyGird.datagrid(this.id, opts);
 				}
 				// case 6: bind text input - should this moved to the first?
-				else if  (this.classList && (this.classList.contains('easyui-textbox')))
+				else if  (this.classList && (this.classList.contains('easyui-textbox') || this.classList.contains('textbox')))
 					$(regex.sharp_(this.id)).textbox({value: v});
 				else
 					this.value = v;
