@@ -21,6 +21,7 @@ const ir = {
 	root: 'ir-root',
 	/** grid item on select handler name (according easyUI document, there is not 'onChange')*/
 	onselect: "ir-onselect",
+	onchange: "ir-onchange",
 
 	oncheck: "ir-oncheck",
 	onload: "ir-onload",
@@ -144,7 +145,33 @@ const regex = {
 		if (typeof str === "string" && str.substring(0, 1) === '#')
 			return str.substring(1);
 		return str;
-	}
+	},
+
+	/**split target with <i>separator</i> then the the ith element
+	 * @param {string} target
+	 * @param {string} separator
+	 * @param {int} ith optinal if undefined, return all splitted array
+	 * @return {Array|string} the ith element or all the array.
+	 */
+	split: function (target, separator, ith) {
+		if (target === undefined) { return; }
+
+		if (separator === undefined) {
+			console.error('can not separate', separator, target);
+			return;
+		}
+
+		target = target.trim();
+
+		if (separator != ',') {
+			console.error('Your separator not supported yet...', separator);
+		}
+
+		var ss = target.split(/\s*,\s*/);
+
+		if (ith !== undefined) { return ss[ith]; }
+		else { return ss; }
+	},
 };
 
 /**[Internal API] html tag's attribute parser.
@@ -574,6 +601,9 @@ function EzHtml (J) {
 	 * @param {string} tagId tag id that alredy sharped
 	 * @param {Object} opts options to be merged (overriding tag attributes)<br>
 	 * Options of sqlArgs, args and select are not handled.<br>
+	 * opts.conn: connection id. if not defined, using jconsts.conn from jeasy-api.<br>
+	 * opts.t: ir-t value, a function branch tag. in jeasy v1.0, only used by stree.serv<br>
+	 * opts.maintabl: target db table. If undefined, try split from first of ir-t<br>
 	 * opts.sk: semantic key string with parameters, like roels.ez, {@obj1.var1}<br>
 	 * opts.all: add an "-- ALL --" item<br>
 	 * opts.query: query form id, ir-query<br>
@@ -588,13 +618,26 @@ function EzHtml (J) {
 	 * opts.onload: on load function or function name<br>
 	 * opts.oncheck: on check function or function name<br>
 	 * opts.oncheckAll: on check all function or function name<br>
+	 * opts.onerror: on error call back, merged with EasyMsger.error(m.fail)<br>
+	 * opts.onok: on ok call back, merged with EasyMsger.info(m.ok)<br>
+	 * <b>note</b>: pk is not handled here
 	 * @return {Object} merged options
 	 */
 	this.opts = function (tagId, opts) {
 		if (typeof opts !== 'object')
 			opts = {};
 		if (opts) {
+			opts.conn = tag.merge(opts.conn, tagId, ir.conn);
+			if (opts.conn === undefined || opts.conn === null) {
+				opts.conn = jconsts.conn;
+			}
+
 			opts.t = tag.merge(opts.t, tagId, ir.t);
+			// try find maintable
+			if (typeof opts.maintabl !== 'string' && typeof t !== 'string') {
+				opts.maintabl = regex.split(opts.t, ',', 0);
+			}
+
 			opts.sk = tag.merge(opts.sk, tagId, ir.sk);
 			opts.all = opts.all || EasyHtml.has(tagId, ir.all);
 			opts.query = tag.merge(opts.query, tagId, ir.query);
@@ -602,14 +645,6 @@ function EzHtml (J) {
 
 			opts.select = tag.merge(opts.select, tagId, ir.select);
 			if (typeof opts.select === 'string') {
-				// var ss = opts.select.split(":");
-				// if (ss.length !== 2 || ss[1] === undefined || ss[1] === null)
-				// 	console.error('select id can not been parsed.', opts.select);
-				// else {
-				// 	// convert string to object {n: v}
-				// 	opts.select = {};
-				// 	opts.select[ss[0]] = tag.findVar(ss[1].trim(), opts.args);
-				// }
 				opts.select = tag.findVar(opts.select, opts.args);
 			}
 
@@ -622,18 +657,24 @@ function EzHtml (J) {
 			opts.tree = tag.merge(opts.tree, tagId, ir.tree);
 			opts.tree = tag.mergargs(opts, opts.tree);
 
-			if (opts.pagesize < 0)
+			if (opts.pagesize < 0) {
 				opts.pagesize = undefined;
+			}
 			opts.pagesize = tag.merge(opts.pagesize, tagId, ir.pagesize);
 			if (opts.pagesize === undefined) opts.pagesize = -1;
 
 			opts.onclick = tag.merge(opts.onclick, tagId, ir.onclick);
-			if (typeof opts.onclick === 'string')
+			if (typeof opts.onclick === 'string') {
 				opts.onclick = eval(opts.onclick);
+			}
 
 			opts.onselect = tag.merge(opts.onselect, tagId, ir.onselect);
 			if (typeof opts.onselect === 'string')
 				opts.onselect = eval(opts.onselect);
+
+			opts.onchange = tag.merge(opts.onchange, tagId, ir.onchange);
+			if (typeof opts.onchange === 'string')
+				opts.onchange = eval(opts.onchange);
 
 			opts.onload = tag.merge(opts.onload, tagId, ir.onload);
 			if (typeof opts.onload === 'string')
@@ -646,6 +687,21 @@ function EzHtml (J) {
 			opts.oncheckAll = tag.merge(opts.oncheckAll, tagId, ir.oncheckAll);
 			if (typeof opts.oncheckAll === 'string')
 				opts.oncheckAll = eval(opts.oncheckAll);
+
+			// opts.onerror = tag.merge(opts.onerror, tagId, ir.onerror);
+			if (typeof opts.onerror === 'string') {
+				opts.onerror = eval(opts.onerror);
+			}
+			else if (typeof opts.onerror === undefined) {
+				opts.onerror = EasyMsger.error;
+			}
+
+			if (typeof opts.onok === 'string') {
+				opts.onok = eval(opts.onok);
+			}
+			else if (typeof opts.onok === undefined) {
+				opts.onok = EasyMsger.ok;
+			}
 		}
 
 		Object.keys(opts).forEach(function (k, ix) {
@@ -729,6 +785,9 @@ function EzCbb (J) {
 				data: rows,
 				onSelect: typeof opts.onselect === "function" ? opts.onselect : function(e) {
 					if (jeasy.log) console.log(e);
+				},
+				onChange: typeof opts.onchange === "function" ? opts.onchange : function(e) {
+					if (jeasy.log) console.log(e);
 				}
 			});
 			if(typeof(opts.select) === "string")
@@ -794,7 +853,13 @@ function EzTree(J) {
 			tree.combotree({
 				data: resp.data,
 				multiple: opts.multi !== undefined && opts.multi !== null && opts.multi === true,
-				onSelect: typeof onChangef === "function" ? onChangef : function(e) {
+//				onSelect: typeof onChangef === "function" ? onChangef : function(e) {
+//					if (jeasy.log) console.log(e);
+//				}
+				onSelect: typeof opts.onselect === "function" ? opts.onselect : function(e) {
+					if (jeasy.log) console.log(e);
+				},
+				onChange: typeof opts.onchange === "function" ? opts.onchange : function(e) {
 					if (jeasy.log) console.log(e);
 				}
 			});
@@ -852,6 +917,7 @@ function EzTree(J) {
 					'tree',			// easyui tree()
 					opts.onclick,
 					opts.onselect,
+					opts.oncheck,
 					opts.onload);
 		});
 	};
@@ -979,7 +1045,7 @@ function EzGrid (J) {
 		var req;
 		if (semantik !== undefined)
 			// dataset way
-			req = new jvue.DatasetCfg(	// SysMenu.java (menu.serv) uses DatasetReq as JMessage body
+			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
 						jconsts.conn,	// connection id in connexts.xml
 						semantik);		// sk in datast.xml
 		else {
@@ -1054,7 +1120,7 @@ function EzGrid (J) {
 		var req;
 		if (semantik !== undefined)
 			// dataset way
-			req = new jvue.DatasetCfg(	// SysMenu.java (menu.serv) uses DatasetReq as JMessage body
+			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
 						jconsts.conn,	// connection id in connexts.xml
 						semantik);		// sk in datast.xml
 		else {
@@ -1161,6 +1227,36 @@ function EzGrid (J) {
 		EasyMsger.close();
 		if (typeof opts.onload === "function")
 			opts.onload ( json, total );
+	};
+
+	/** delete selected row.
+	 * If no row is selected, call opts.onalert, or EzMsger.alert(m.none_selected);
+	 * @param {string} gridId easy grid in whiche the selected row to be deleted
+	 * @param {Object} opts
+	 * opts.maintable: target table.<br>
+	 * opts.pk: pk condition for sql where clause.<br>
+	 * opts.select the selected record id overriding auto retrieved selected row's id.<br>
+	 * opts.onload: the success callback, default: EasyMsger.ok<br>
+	 * opts.onerror: the error handle, default: EasyMsger.error.<br>
+	 * @param {UpdateReq} the delete request (a = 'D')
+	 */
+	this.delrow = function(gridId, opts) {
+		gridId = regex.sharp_(gridId, ir.deflt.gridId);
+		opts = EasyHtml.opts(gridId, opts);
+
+		var rw = jeasy.getMainRow(gridId);
+		if (rw === undefined || rw === null) {
+			if (typeof opts.onerror === 'function')
+				opts.onerror(EasyMsger.m.none_selected);
+			else
+				EasyMsger.alert(EasyMsger.m.none_selected);
+			return;
+		}
+
+		var pkv = rw[opts.pk];
+		var rq = ssClient.delete(opts.conn, opts.maintable,
+			{pk: opts.pk, v: pkv}, opts.posts);
+		ssClient.commit(rq, opts.onok, opts.onerror);
 	};
 };
 const EasyGrid = new EzGrid(J);
@@ -1410,7 +1506,7 @@ function EzModal() {
 		else if (typeof pk === "object" && pk.pk !== undefined) {
 			// some times user's code use 'this' in callback, makes arguments wrong
 			if (pk.v === undefined)
-				console.error('pk may not correct', pk);
+				console.warn('pk may not correct', pk);
 			q.whereCond("=", pk.pk, "'" + pk.v + "'");
 		}
 
@@ -1462,7 +1558,18 @@ function EzModal() {
 						}
 					}
 				}
-				// case 4: bind easyui-numberspinner
+				// case 4: bind easyui-numberbox
+				else if (this.classList && (this.classList.contains('easyui-numberbox') )) {
+					//$("#installDate").datebox("setValue", row.installDate);
+					if ( v !== undefined && v.trim().length > 0) {
+						try {
+							$('#' + domval.id).numberbox('setValue', v);
+						} catch ( ex ) {
+							console.log("loadSimpleForm(): Value " + v + " can't been set to numberbox " + domval.id);
+						}
+					}
+				}
+				// case 5: bind easyui-numberspinner
 				else if (this.classList && (this.classList.contains('easyui-numberspinner')))
 					try {
 						$('#' + domval.id).numberspinner('setValue', v);
@@ -1470,7 +1577,7 @@ function EzModal() {
 						console.log("loadSimpleForm(): Value " + v +
 							" can't been set to easyui numberspinner " + domval.id);
 					}
-				// case 5.1: datagrid pager
+				// case 6.1: datagrid pager
 				else if (this.attributes[ir.grid]) {
 					// merge grid's attributes, with pager's attributes overriding gird's
 					var gridId = EasyHtml.ir(this.id, ir.grid);
@@ -1478,18 +1585,20 @@ function EzModal() {
 
 					EasyGrid.pager(this.id, opts);
 				}
-				// case 5.2: datagrid
+				// case 6.2: datagrid
 				else if  (this.classList && (this.classList.contains('easyui-datagrid'))) {
 					if (jeasy.log)
 						console.log('Trying bind datagrid automatically, ir-field: ', f, v);
 					// EasyGird.datagrid(this.id, {select: v, onselect: onChange});
 					EasyGird.datagrid(this.id, opts);
 				}
-				// case 6: bind text input - should this moved to the first?
-				else if  (this.classList && (this.classList.contains('easyui-textbox') || this.classList.contains('textbox')))
+				// case 7: bind text input - should this moved to the first?
+				else if  (this.nodeName!="TEXTAREA"&&this.classList && (this.classList.contains('easyui-textbox') || this.classList.contains('textbox')))
 					$(regex.sharp_(this.id)).textbox({value: v});
-				else
-					this.value = v;
+				else{
+				     if(v !== undefined && v.trim().length > 0)
+				       this.value = v;
+				}
 			}
 		});
 
@@ -1624,10 +1733,22 @@ function EzMsger() {
 		Object.assign(this.m, mf);
 	};
 
+	/**Message strings.
+	 * Use EzMsgr.setM to setup application's message strings.
+	 * NO CHINESE HERE for m!
+	 * Replace m with your varialbe or call setM(msg-func) if you'd like to,
+	 * in ir-jeasy-engcost.js
+	 */
 	this.m = {
 		ok: () => "OK!",
-		saved: () => "Saving Successfully!",
+		fail: () => "Operation Failed!",
+		// NO CHINESE HERE !
+	 	// Replace m with your varialbe or call setM(msg-func) if you'd like to,
+		// in ir-jeasy-engcost.js
+		saved: () => "Saved Successfully!",
 		none_selected: () => "Please select a record!",
 	};
 };
 const EasyMsger = new EzMsger(J);
+// call message initializer
+jconsts.initMsg(EasyMsger);

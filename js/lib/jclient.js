@@ -222,6 +222,11 @@ class SessionClient {
 		this.J = _J;
 	}
 
+	/**Post the request message (JMessage with body of subclass of JBody).
+	 * @param {JMessage} jmsg request message
+	 * @param {function} onOk
+	 * @param {function} onError
+	 */
 	commit(jmsg, onOk, onError) {
 		this.J.post(jmsg, onOk, onError);
 	}

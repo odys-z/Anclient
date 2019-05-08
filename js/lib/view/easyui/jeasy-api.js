@@ -1,16 +1,37 @@
+///////////////////////   jeasy API version 1.0    /////////////////////////////
+// This part comes from the open source jclient.js/easyui.
+// Because the current project is not using webpack, so the two parts is merged
+// into one js file for business module's convenient avoiding including 2 files.
+////////////////////////////////////////////////////////////////////////////////
+/** html tag ids and supported ir-attrs
+ * @module jeasy/session */
+
 /**************       Sample project section     *******************************
  * A sample project usually have common module to configure jeasy API like this:
  * NOTE: Replace all '* /' with end of block comments - without space.
+ *
+ * application config
+ * @module jserv-sample/easui-demo * /
 const jconsts = {
-	serv: 'http://localhost:8080/semantic.jserv',
-	conn: 'inet',
-	/**datas.xml/sk * /
+	// if your tomcat server.xml is configured like:
+	// <Context docBase="engcosts" path="/your-path reloadable="true"
+	// 		source="org.eclipse.jst.j2ee.server:..."/></Host>
+	// serv: 'http://localhost:8080/jserv-sample',
+	conn: '...',
+	// datas.xml/sk, sk for ir-combobox, ir-cbbtree shouldn't be here.
 	sk: {
 		menu: 'sys.menu.ez-test',
+	},
+
+	/** Application Message Strings, a callback called when jeasy-html.js loaded.
+	 * @param {EzMsger} msger easyUI messager wrapper
+	 * /
+	initMsg: function (msger) {
+		msger.setM('saved', 'Overriding mssage in your favor!');
 	}
 }
 
-const samports = {
+const engports = {
 	/** see semantic.jserv/io.odysz.jsample.SysMenu * /
 	menu: "menu.serv",
 	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ * /
@@ -21,76 +42,9 @@ var J = jvue._J;
 J.init(jconsts.serv, jconsts.conn);
 window.J = J;
 
-// otherwise server can't understand business defined ports.
-J.understandPorts(samports);
-
-
-/**Login Utility.<br>
- * requesting login.serv with login-obj: <br>
- * {a: "login/logout", uid: "user-id", pswd: "uid-cipher-by-pswd", iv: "session-iv"}
- * @param {string} userId user id in plain
- * @param {string} pswd password in plain
- * @param {function} onLogin callback on logged in
- * @param {string} home main page url. default = index.html
- * @param {function} robotOnFailed callback if logId == 'robot' and failed on pswd or uid
- * /
-function login(logId, pswd, onLogin, home, onError) {
-    var checkEasyUI = false;
-    checkEasyUI = checkDevice(navigator.userAgent||navigator.vendor||window.opera);
-	if (checkLogInput(logId, pswd))
-		return;
-	logId = logId.trim();
-
-	localStorage.setItem(ssk, null);
-	$.cookie(ssk, null, {path: "/", expires: 3000});
-	J.login(logId, pswd,
-			function(client) {
-				ssClient = client;
-				if (typeof onLogin === "function") {
-					// store session info temperary locally - window url will be changed
-					// a more secure way is using a certification.
-					var ss = JSON.stringify(client.ssInf);
-					localStorage.setItem(ssk, ss);
-					$.cookie(ssk, ss, {path: "/", expires: 10000});
-					onLogin(client);
-				}
-				else {
-					console.error("onLogin is not a function");
-				}
-			},
-			typeof onError === "function" ? onError : EasyMsger.error);
-}
-
-function loadSessionInf() {
-	var ssinf = localStorage.getItem(ssk);
-	if (ssinf)
-		return JSON.parse(ssinf);
-
-	// A better way is using a certificate
-	ssinf = $.cookie(ssk);
-	if (ssinf)
-		ssinf = JSON.parse(client.ssInf);
-	return ssinf;
-}
-
-/**Check user's input
- * @param {string} logId
- * @param {string} pswd
- * @return {boolean} true = error()
- * /
-function checkLogInput(logId, pswd) {
-	var checkEasyUI = false;
-	// check user inputs
-}
-******************       Sample project section end     ***********************/
-
-///////////////////////   jeasy API version 1.0    /////////////////////////////
-// This part comes from the open source jclient.js/easyui.
-// Because the current project is not using webpack, so the two parts is merged
-// into one js file for business module's convenient avoiding including 2 files.
-////////////////////////////////////////////////////////////////////////////////
-/** html tag ids and supported ir-attrs
- * @module jeasy/session */
+// otherwise jclient can't understand business defined ports.
+J.understandPorts(engports);
+* *******************    project configure section end    *********************/
 
 /**Gloable variable, key of localStorage
  * For W3C standard, see: https://www.w3.org/TR/webstorage/#the-storage-interface<br>
