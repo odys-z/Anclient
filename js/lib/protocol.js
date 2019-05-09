@@ -387,10 +387,17 @@ class InsertReq extends UpdateReq {
 		if (this.nvss === undefined)
 			this.nvss = [];
 
+		var warned = false;
 		if (Array.isArray(n_row)) {
 			if (Array.isArray(n_row[0])) {
 				// already a 2-d array
-				this.nvss = this.nvss.concat([n_row]);
+				if (Array.isArray(n_row[0][0]) && !warned) {
+					console.warn('InsertReq is trying to handle multi rows in on value call, it is wrong. You must use InsertReq.nvRows(rows) instead.',
+							n_row);
+					warned = true;
+					this.nvss = this.nvss.concat(n_row);
+				}
+				else {this.nvss = this.nvss.concat([n_row]);}
 			}
 			else {
 				// guess as a n-v array
@@ -408,6 +415,14 @@ class InsertReq extends UpdateReq {
 			}
 		}
 		return this;
+	}
+
+	nvRows(rows) {
+		if (Array.isArray(rows)) {
+			for (var ix = 0; ix < rows.length && Array.isArray(rows[ix]); ix++) {
+				this.values(rows[ix]);
+			}
+		}
 	}
 }
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////

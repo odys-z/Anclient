@@ -308,6 +308,10 @@ class SessionClient {
 			console.error("To delete a table, {pk, v} must presented.", pk);
 			return;
 		}
+		if (maintbl === undefined || maintbl === null || maintabl === "") {
+			console.error("To delete a table, maintbl must presented.");
+			return;
+		}
 
 		var upd = new UpdateReq(conn, maintbl, pk);
 		upd.a = Protocol.CRUD.d;
