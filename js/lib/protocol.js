@@ -208,11 +208,11 @@ class QueryReq {
 	}
 
 	l (tbl, alias, conds) {
-		return this.join("l", tabl, alias, conds);
+		return this.join("l", tbl, alias, conds);
 	}
 
 	r (tbl, alias, conds) {
-		return this.join("r", tabl, alias, conds);
+		return this.join("r", tbl, alias, conds);
 	}
 
 	joinss (js) {
