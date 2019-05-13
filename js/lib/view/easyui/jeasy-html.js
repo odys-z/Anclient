@@ -250,7 +250,8 @@ function Tag (debug) {
 					// No need to parse all logic condition to array
 					var v = this.findVar(mOnVar[2]);
 					if (typeof v !== "undefined") {
-						if (typeof v.length === "number")
+						// if (typeof v.length === "number")
+						if (Array.isArray(v))
 							oncond = mOnVar[1] + this.concatArray(v);
 						else
 							oncond = mOnVar[1] + "'" + v + "'";
@@ -343,7 +344,7 @@ function Tag (debug) {
 	 * @return {Object} value represented by vn, e.g. "x.y.z" */
 	this.findVar = function (vn, argPool) {
 		// vn is a global variable
-		if (window[vn])
+		if (window[vn] !== undefined)
 			return window[vn];
 		// vn is a variable in argPool
 		if (argPool !== undefined && argPool[vn])
@@ -634,8 +635,9 @@ function EzHtml (J) {
 
 			opts.t = tag.merge(opts.t, tagId, ir.t);
 			// try find maintable
-			if (typeof opts.maintabl !== 'string' && typeof t !== 'string') {
-				opts.maintabl = regex.split(opts.t, ',', 0);
+			if (typeof opts.maintabl !== 'string' && typeof opts.t === 'string') {
+				var tbls = tag.joins(opts.t);
+				opts.maintabl = tbls[0].tabl;
 			}
 
 			opts.sk = tag.merge(opts.sk, tagId, ir.sk);
@@ -911,6 +913,9 @@ function EzTree(J) {
 		// get data, then bind easyui tree
 		// ssClient is created after logged in.
 		ssClient.commit(jmsg, function(resp) {
+			// resp.data.forEach(function (v, i) {
+			// 	v.checked = false;
+			// });
 			console.log(resp);
 			EasyTree.bind(treeId,	// id
 					resp.data,		// forest,
@@ -1254,7 +1259,7 @@ function EzGrid (J) {
 		}
 
 		var pkv = rw[opts.pk];
-		var rq = ssClient.delete(opts.conn, opts.maintable,
+		var rq = ssClient.delete(opts.conn, opts.maintabl,
 			{pk: opts.pk, v: pkv}, opts.posts);
 		ssClient.commit(rq, opts.onok, opts.onerror);
 	};
@@ -1540,6 +1545,16 @@ function EzModal() {
 					}
 					else console.log("EasyModal.bindWidgets(): ignoring combobox " + domval.id + " " + domval.name);
 				}
+				// case 1.1: bind easyui-combobox no ir-cbb
+				else if (this.classList && (this.classList.contains('easyui-combobox') )) {
+					if ( v !== undefined && v!== null && v.trim().length > 0) {
+						try {
+							$('#' + domval.id).combobox('setValue', v);
+						} catch ( ex ) {
+							console.log("loadSimpleForm(): Value " + v + " can't been set to combobox " + domval.id);
+						}
+					}
+				}
 				// case 2: bind ir-cbbtree
 				else if (this.attributes[ir.cbbtree]) {
 					// EasyTree.combotree( domval.id, {args: rec, select: v, onselect: onChange});
@@ -1549,7 +1564,7 @@ function EzModal() {
 				else if (this.classList && (this.classList.contains('easyui-datetimebox')
 										|| this.classList.contains('easyui-datebox')   ) ) {
 					//$("#installDate").datebox("setValue", row.installDate);
-					if ( v !== undefined && v.trim().length > 0) {
+					if ( v !== undefined && v!== null && v.trim().length > 0) {
 						try {
 							var dt = new Date(v);
 							$('#' + domval.id).datebox('setValue', v);
@@ -1561,7 +1576,7 @@ function EzModal() {
 				// case 4: bind easyui-numberbox
 				else if (this.classList && (this.classList.contains('easyui-numberbox') )) {
 					//$("#installDate").datebox("setValue", row.installDate);
-					if ( v !== undefined && v.trim().length > 0) {
+					if ( v !== undefined && v!== null && v.trim().length > 0) {
 						try {
 							$('#' + domval.id).numberbox('setValue', v);
 						} catch ( ex ) {
@@ -1596,7 +1611,7 @@ function EzModal() {
 				else if  (this.nodeName!="TEXTAREA"&&this.classList && (this.classList.contains('easyui-textbox') || this.classList.contains('textbox')))
 					$(regex.sharp_(this.id)).textbox({value: v});
 				else{
-				     if(v !== undefined && v.trim().length > 0)
+				     if(v !== undefined && v!== null && v.trim().length > 0)
 				       this.value = v;
 				}
 			}
@@ -1698,14 +1713,15 @@ function EzMsger() {
 	this.info = function (m, style) {
 		if (style === undefined)
 			style = 'info';
-		if (typeof m === 'function' && m.name in this.m) {
+		if (typeof m === 'function') {
 			$.messager.alert(style, m(), style);
 			return;
 		}
-
-		console.warn("We check m's existence because including message string anywhere is not encouraged in jeasy.",
-					"You can replace EasyMsger.m with your m object to update and extend messages, in one place.",
-					m);
+		else {
+			console.warn("Your message is not found.", m,
+				"We check m's existence in EzMsger.m because including message string anywhere is not encouraged in jeasy.",
+				"You can replace EasyMsger.m with your m object to update and extend messages, in one place.");
+		}
 	};
 
 	/**See info()
@@ -1734,7 +1750,7 @@ function EzMsger() {
 	};
 
 	/**Message strings.
-	 * Use EzMsgr.setM to setup application's message strings.
+	 * Use EzMsger.setM to setup application's message strings.
 	 * NO CHINESE HERE for m!
 	 * Replace m with your varialbe or call setM(msg-func) if you'd like to,
 	 * in ir-jeasy-engcost.js
@@ -1743,10 +1759,11 @@ function EzMsger() {
 		ok: () => "OK!",
 		fail: () => "Operation Failed!",
 		// NO CHINESE HERE !
-	 	// Replace m with your varialbe or call setM(msg-func) if you'd like to,
-		// in ir-jeasy-engcost.js
+	 	// Replace m with your variable or call setM(msg-func) if you'd like to,
+		// in ir-jeasy-engcost.js/jconsts.initMsg (or jeasy-api.js sample project config section)
 		saved: () => "Saved Successfully!",
 		none_selected: () => "Please select a record!",
+		deleted: () => "Delete Successfully!"
 	};
 };
 const EasyMsger = new EzMsger(J);

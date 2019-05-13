@@ -56,6 +56,10 @@ class J {
 		Object.assign(Protocol.Port, newPorts);
 	}
 
+	opts(options) {
+		Protocol.opts(options);
+	}
+
 	port(name) {
 		return Protocol.Port[name];
 	}

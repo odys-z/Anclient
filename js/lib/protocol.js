@@ -1,6 +1,15 @@
 /**Json protocol helper to support jclient.
  * All JBody and JHelper static helpers are here. */
 class Protocol {
+	static opts(options) {
+		if (options) {
+			if (options.noNull !== undefined)
+				Protocol.valOptions.noNull = options.noNull === true || options.noNull === 'true';
+			if (options.noBoolean !== undefined)
+				Protocol.valOptions.noBoolean = options.noBoolean === true || options.noBoolean === 'true';
+		}
+	}
+
 	/**Format login request message.
 	 * @param {string} uid
 	 * @param {string} tk64
@@ -106,12 +115,17 @@ class Protocol {
 						exGeneral: "exGeneral"};
 
 	Protocol.cfg  = {	ssInfo: "ss-k", };
+
+	Protocol.valOptions = {};
 }
 
 class JMessage {
 	constructor (port, header, body) {
 		this.version = "1.0";
 		this.seq = Math.round(Math.random() * 1000);
+
+		// string options, like no-null: true for asking server replace null with ''.
+		this.opts = Protocol.valOptions;
 
 		/**Protocol.Port property name, use this name to get port url */
 		this.port = port; // for robustness?

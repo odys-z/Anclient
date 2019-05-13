@@ -63,6 +63,8 @@ function jeasyAPI (J, log) {
 		this.J = J;
 		this.log = log === false ? false : true;
 		this.mainRows = {};
+
+		J.opts({noNull: true, noBoolean: false});
 	}
 
 	/** Get rows from jclient response for easyui datagrid, etc.
@@ -138,7 +140,7 @@ function jeasyAPI (J, log) {
 	 * nvs: for update values<br>
 	 * cols: columns to be inserted<br>
 	 * values: rows value for insert<br>
-	 * @return {UpdateReq} with a = crud
+	 * @return {UpdateReq} with a = <i>crud</i>
 	 */
 	this.postBody = function (crud, opts) {
 		if (crud === jeasy.c) {
