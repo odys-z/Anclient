@@ -1197,7 +1197,7 @@ function EzGrid (J) {
 		if (gridId.substring(0, 1) != "#")
 			gridId = "#" + gridId;
 		var g = $(gridId);
-
+		jeasy.mainRow(gridId, undefined);
 		g.datagrid(
 			{ onSelect: function(ix, row) {
 				jeasy.mainRow(gridId, row);
@@ -1218,7 +1218,8 @@ function EzGrid (J) {
 		if (opts.onCheckAll)
 			g.datagrid({ onCheckAll: opts.onCheckAll,
 				onUncheckAll: opts.onCheckAll});
-
+		if(opts.onload)
+			g.datagrid({ onLoadSuccess: opts.onload});
 		g.datagrid("loadData", json);
 
 		if (typeof opts.select === 'object')
@@ -1230,8 +1231,8 @@ function EzGrid (J) {
 		// }
 
 		EasyMsger.close();
-		if (typeof opts.onload === "function")
-			opts.onload ( json, total );
+//		if (typeof opts.onload === "function")
+//			opts.onload ( json, total );
 	};
 
 	/** delete selected row.
@@ -1545,6 +1546,11 @@ function EzModal() {
 					}
 					else console.log("EasyModal.bindWidgets(): ignoring combobox " + domval.id + " " + domval.name);
 				}
+				// case 2: bind ir-cbbtree
+				else if (this.attributes[ir.cbbtree]) {
+					// EasyTree.combotree( domval.id, {args: rec, select: v, onselect: onChange});
+					EasyTree.combotree( domval.id, opts);
+				}
 				// case 1.1: bind easyui-combobox no ir-cbb
 				else if (this.classList && (this.classList.contains('easyui-combobox') )) {
 					if ( v !== undefined && v!== null && v.trim().length > 0) {
@@ -1554,11 +1560,6 @@ function EzModal() {
 							console.log("loadSimpleForm(): Value " + v + " can't been set to combobox " + domval.id);
 						}
 					}
-				}
-				// case 2: bind ir-cbbtree
-				else if (this.attributes[ir.cbbtree]) {
-					// EasyTree.combotree( domval.id, {args: rec, select: v, onselect: onChange});
-					EasyTree.combotree( domval.id, opts);
 				}
 				// case 3: bind easyui-datebox/datetimebox
 				else if (this.classList && (this.classList.contains('easyui-datetimebox')
@@ -1700,8 +1701,8 @@ function EzMsger() {
 			else $.messager.alert('warn', resp.error);
 		}
 		else {
-			console.warn('Error message ignored:')
-			console.warn(resp);
+			console.warn('Error message ignored:', resp,
+				'Call EasyMsger.init("' + code + '") to enable error message again.');
 		}
 	};
 

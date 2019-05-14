@@ -152,15 +152,15 @@ class J {
 	respObjs(resp, start, len) {
 		var cols = this.respCols(resp);
 
-		if (typeof start !== 'Number')
+		if (typeof start !== 'number')
 			start = 1;
 		// start from 0
 		else start++;
 
-		if (typeof len !== 'Number')
+		if (typeof len !== 'number')
 			len = resp.data.rs[0].length - 1;
 		else
-			len = Math.min(len, resp.data.rs[0].length - 1 - start);
+			len = Math.min(len, resp.data.rs[0].length - start);
 
 		var objs = [];
 		for (var rx = start; rx < start + len; rx++) {
@@ -312,7 +312,7 @@ class SessionClient {
 			console.error("To delete a table, {pk, v} must presented.", pk);
 			return;
 		}
-		if (maintbl === undefined || maintbl === null || maintabl === "") {
+		if (maintbl === undefined || maintbl === null || maintbl === "") {
 			console.error("To delete a table, maintbl must presented.");
 			return;
 		}
@@ -320,7 +320,11 @@ class SessionClient {
 		var upd = new UpdateReq(conn, maintbl, pk);
 		upd.a = Protocol.CRUD.d;
 		this.currentAct.cmd = 'delete';
-		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
+
+		var jmsg = this.userReq(conn,
+				// port = update, it's where the servlet handling this.
+				Protocol.Port.update,
+				upd, this.currentAct);
 		return jmsg;
 	}
 

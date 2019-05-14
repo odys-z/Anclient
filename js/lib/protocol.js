@@ -387,6 +387,14 @@ class InsertReq extends UpdateReq {
 		else this.cols.push(cols);
 	}
 
+	/**Override Update.nv() - insert is using valus() for nvss.
+	 * @param {string} n
+	 * @param {string} v
+	 * @return {InsertReq} this*/
+	nv (n, v) {
+		this.valus(n, v);
+	}
+
 	/**Set inserting value(s).
 	 * Becareful about function name - 'values' shall be reserved.
 	 * @param {string|Array} n_row field name or n-v array<br>
@@ -420,7 +428,8 @@ class InsertReq extends UpdateReq {
 				this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
 			}
 		}
-		else if (n_row !== undefined){
+		else if (typeof n_row === 'string'){
+			this.columns(n_row);
 			if (this.nvss.length == 0) {
 				this.nvss.push([[n_row, v]]);
 			}
@@ -428,6 +437,8 @@ class InsertReq extends UpdateReq {
 				this.nvss[0].push([n_row, v]);
 			}
 		}
+		else console.error('Setting n-v with', n, v,
+			'Check the type of n - only string for column, or n is an array represeting a row\'s n-vs!');
 		return this;
 	}
 
