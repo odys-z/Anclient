@@ -266,25 +266,26 @@ class QueryReq {
 		return this;
 	}
 
-	/** @param {Array} conds [{op, l, r}] */
-	// wheres (conds) {
-	// 	if (conds !== undefined && conds !== null && conds.length !== undefined)
-	// 		for (var ix = 0; ix < conds.length; ix++)
-	// 			this.whereCond(conds[ix].op, conds[ix].l, conds[ix].r);
-	// 	return this;
-	// }
-
-	orderby (col, asc) {
+	orderby (tabl, col, asc) {
 		if (this.orders === undefined)
 			this.orders = [];
-		this.orders.push(col, asc);
+		this.orders.push([tabl, col, asc]);
 		return this;
 	}
 
 	orderbys (cols) {
-		if (cols !== undefined && cols.length !== undefined)
-			for (var ix = 0; ix < cols.length; ix++)
-				this.expr(cols[ix].col, cols[ix].asc);
+		if (Array.isArray(cols))
+			for (var ix = 0; ix < cols.length; ix++) {
+				if (Array.isArray(cols[ix])) {
+					if (this.orders === undefined)
+						this.orders = [];
+					this.orders.push(cols[ix]);
+				}
+				else {
+					this.orderby(cols[ix].tabl, cols[ix].col, cols[ix].asc);
+				}
+
+			}
 		return this;
 	}
 
