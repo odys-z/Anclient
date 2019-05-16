@@ -46,6 +46,38 @@ window.J = J;
 J.understandPorts(engports);
 * *******************    project configure section end    *********************/
 
+//////////////////////////      Example Section     ////////////////////////////
+/*******   Example: general way of handling complex data at server sied   ******
+var conn = jconsts.conn;
+// This function is requsting tools.serv for function branch 'A'
+function saveToolA() {
+	var dat = {borrowId: 'borrow-001', items: []};
+	dat.items.push(['item001', 3]); // return 3 of tiem001
+
+	var usrReq = new jvue.UserReq(conn, "r_tools_borrows") // req.tabl
+						// turn back tools - or any function branch tag handled by tools.serv
+						.a("A")
+
+						// or reaplace these 2 set() with data(dat)
+						.set('borrowId', 'borrow-001')
+						.set('items', [['item001', 3]]);
+
+	var jmsg = ssClient
+		// ssClient's current user action is handled by jeasy when loading menu
+		.usrCmd('save') // return ssClient itself
+		.userReq(conn, engports.tools, usrReq); // return the JMessage<UserReq> object
+
+	// You should get sqls at server side (tools.serv) like this:
+	// delete from r_tools_borrows where borrowId = 'borrow-001'
+	// insert into detailsTbl  (item001) values ('3.0')
+	// update borrowTbl  set total= where borrowId = 'borrow-001'
+	ssClient.commit(jmsg, function(resp) {
+				EasyMsger.ok(EasyMsger.m.saved);
+			}, EasyMsger.error);
+}
+***************************** end of example section **************************/
+
+
 /**Gloable variable, key of localStorage
  * For W3C standard, see: https://www.w3.org/TR/webstorage/#the-storage-interface<br>
  * For ussage, see: https://hacks.mozilla.org/2009/06/localstorage/<br>

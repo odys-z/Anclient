@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import AES from './aes.js';
-import {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
+import {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
 
 /**AES lib instance*/
 var aes;
@@ -328,6 +328,12 @@ class SessionClient {
 		return jmsg;
 	}
 
+	/**Create a user request JMessage.
+	 * @param {string} conn connection id
+	 * @param {string} port
+	 * @param {Protocol.UserReq} bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
+	 * @param {Object} act action, optional.
+	 * @return {JMessage<UserReq>} JMessage */
 	userReq(conn, port, bodyItem, act) {
 		var header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
@@ -337,17 +343,28 @@ class SessionClient {
 		return new JMessage(port, header, bodyItem);
 	}
 
+	/**Set user's current action to be logged.
+	 * @param {string} funcId curent function id
+	 * @param {string} cate category flag
+	 * @param {string} cmd
+	 * @param {string} remarks
+	 * @return {SessionClient} this */
 	usrAct(funcId, cate, cmd, remarks) {
 		if (this.currentAct === undefined)
 			this.currentAct = {};
 		Object.assign(this.currentAct,
 			{func: funcId, cate: cate, cmd: cmd, remarks: remarks});
+		return this;
 	}
 
+	/**Set user's current action to be logged.
+	 * @param {string} cmd user's command, e.g. 'save'
+	 * @return {SessionClient} this */
 	usrCmd(cmd) {
 		if (this.currentAct === undefined)
 			this.currentAct = {};
 		this.currentAct.cmd = cmd;
+		return this;
 	}
 
 	commit (jmsg, onOk, onErr) {
@@ -358,6 +375,9 @@ class SessionClient {
 /**Client without session information.
  * This is needed for some senarios like rigerstering new account.*/
 class Inseclient {
+	commit (jmsg, onOk, onErr) {
+		_J.post(jmsg, onOk, onErr);
+	}
 }
 
 export * from './protocol.js';

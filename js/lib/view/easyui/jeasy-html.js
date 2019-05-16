@@ -36,6 +36,8 @@ const ir = {
 	/** Field name in form, which is to be loaded as record's alias, like "field" of easyui datagrid data-options*/
 	field: 'ir-field',
 
+	orderby: 'ir-orderby',
+
 	/** intial page size, later will using easyui pagination's size (by EzGrid.page()) */
 	pagesize: 'ir-size',
 
@@ -108,7 +110,7 @@ const regex = {
 	 * TEST2: [0]FullPath desc [1]undefined [2]undefined [3]FullPath [4] desc [5]desc
 	 * TEST3: [0]FullPath [1]undefined [2]undefined [3]FullPath [4] undefined [5]undefined
 	 */
-	order: /\s*((\w+)\.){0,1}(\w+)(\s+(asc|desc){0,1}){0,1}\s*/i,
+	order: /\s*((\w+)\.){0,1}(\w+)(\s+(asc|desc|ASC|DESC){0,1}){0,1}\s*/i,
 
 	/** [2] func name, [4] tabl, [5] field */
 	// expr: /\s*((\w+)\s*\s*\()?\s*((\w+)\s*\.)?\s*(\w+)\s*\)?\s*/i,
@@ -150,7 +152,7 @@ const regex = {
 	/**split target with <i>separator</i> then the the ith element
 	 * @param {string} target
 	 * @param {string} separator
-	 * @param {int} ith optinal if undefined, return all splitted array
+	 * @param {int} ith optinal.<br>If undefined, return all splitted array
 	 * @return {Array|string} the ith element or all the array.
 	 */
 	split: function (target, separator, ith) {
@@ -300,6 +302,9 @@ function Tag (debug) {
 	 * @param {string} maintabl
 	 */
 	this.orders = function(ordstr, maintabl) {
+		if (typeof ordstr !== 'string')
+			return;
+
 		var orders = new Array();
 		var ordss = ordstr.split(',');
 		for(var i = 0; i < ordss.length; ++i) {
@@ -316,7 +321,8 @@ function Tag (debug) {
 					alert("Someting wrong in html: " + ordstr);
 					return orders;
 				}
-				orders.push({"tabl": tabl, "field": match[3], "asc": asc });
+				// orders.push({"tabl": tabl, "col": match[3], "asc": asc });
+				orders.push( [tabl + "." + match[3], asc] );
 			}
 		}
 		return orders;
@@ -644,6 +650,7 @@ function EzHtml (J) {
 			opts.all = opts.all || EasyHtml.has(tagId, ir.all);
 			opts.query = tag.merge(opts.query, tagId, ir.query);
 			opts.root = tag.merge(opts.root, tagId, ir.root);
+			opts.orderby = tag.merge(opts.orderby, tagId, ir.orderby);
 
 			opts.select = tag.merge(opts.select, tagId, ir.select);
 			if (typeof opts.select === 'string') {
@@ -1079,6 +1086,9 @@ function EzGrid (J) {
 				var wheres = EasyQueryForm.conds(opts.query, mainAlias);
 				// q.wheres("=", "u.userId", "'" + uid + "'");
 				q.whereCond(wheres);
+
+				// order by
+				q.orderbys(tag.orders(opts.orderby));
 			}
 			else console.error('Grid can support both ir-grid or ir-t, but none of them can be found.', opts);
 		}

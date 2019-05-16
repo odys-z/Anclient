@@ -175,6 +175,28 @@ class JHeader {
 	}
 }
 
+class UserReq {
+	constructor (conn, tabl) {
+		this.conn = conn;
+		this.tabl = tabl
+		this.data = {};
+	}
+
+	get(prop) {
+		return this.data[prop];
+	}
+
+	set(prop, v) {
+		this.data[prop] = v;
+		return this;
+	}
+
+	a(a) {
+		this.a = a;
+		return this;
+	}
+}
+
 class SessionReq {
 	constructor (uid, token, iv) {
 		this.uid = uid;
@@ -514,4 +536,4 @@ class DatasetCfg extends QueryReq {
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Protocol, JMessage, JHeader, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg}
+export {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg}
