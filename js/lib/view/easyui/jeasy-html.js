@@ -626,10 +626,10 @@ function EzHtml (J) {
 			opts.cbb = tag.merge(opts.cbb, tagId, ir.combobox);
 			opts.cbb = tag.mergargs(opts, opts.cbb);
 
-			opts.grid = tag.merg(opts.grid, tagId, ir.grid);
+			opts.grid = tag.merge(opts.grid, tagId, ir.grid);
 			opts.grid = tag.mergargs(opts, opts.grid);
 
-			opts.treegrid = tag.merg(opts.treegrid, tagId, ir.treegrid);
+			opts.treegrid = tag.merge(opts.treegrid, tagId, ir.treegrid);
 			opts.treegrid = tag.mergargs(opts, opts.treegrid);
 
 			opts.cbbtree = tag.merge(opts.cbbtree, tagId, ir.cbbtree);
@@ -1111,10 +1111,11 @@ function EzGrid (J) {
 			// 			jconsts.conn,	// connection id in connexts.xml
 			// 			opts.sk);		// sk in datast.xml
 			req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
-						jconsts.conn,		// connection id in connexts.xml
-						sk,					// sk in datast.xml
+						jconsts.conn,	// connection id in connexts.xml
+						opts.treegrid,	// sk in datast.xml
 						'sqltree')
 						.args(opts.sqlArgs);
+			req = ssClient.userReq(jconsts.conn, jvue.Protocol.Port.stree, req);
 		}
 		else {
 			// try query.serv way
@@ -1675,12 +1676,13 @@ function EzMsger() {
 		this.progressing = false;
 	};
 
-	/** Report error to user only once. Flags are refreshed by init() */
+	/** Report error to user only once. Flags are refreshed by init()
+	 * Don't change this into Chinese, set another message-popping function to replace this if like to.
+	 */
 	this.error = function(code, resp) {
-		// Don't change this into Chinese, set another function here.
 		if (EasyMsger.msg[code] === null || EasyMsger.msg[code] === undefined) {
 			EasyMsger.msg[code] = code;
-			console.error(resp)
+			console.error(resp);
 			if (code === jvue.Protocol.MsgCode.exSession)
 				//$.messager.alert('warn', 'Session Error! Please re-login.');
 				$.messager.alert('warn', resp.error);

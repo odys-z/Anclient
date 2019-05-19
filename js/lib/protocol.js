@@ -480,6 +480,8 @@ const ds_t = {sqltree: 'sqltree', retree: 'retree', reforest: 'reforest'};
 class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
+	 * @param {string} t function branch tag (JBody#a)
+	 * @param {object} args arguments to be formatted to sql args.
 	 */
 	constructor (conn, sk, t, args) {
 		super(conn, sk);
