@@ -1165,10 +1165,15 @@ function EzGrid (J) {
 		// post request, handle response
 		EasyMsger.progress();
 		ssClient.commit(req, function(resp) {
-			var rows = jeasy.rows(resp);
-			var total = jeasy.total(resp, 0);
-			EasyGrid.bindPage (gridId, rows, total, opts, 'eztreegrid');
-		}, EasyMsger.error);
+			console.log(resp);
+			EasyMsger.close();
+			EasyTree.bind(gridId,	// id
+					resp.data,		// forest,
+					'treegrid',
+					opts.onclick,
+					opts.onselect,
+					opts.onload);
+		});
 	}
 
 	/**call easyui $(pagerId).pagination("refresh", ...
