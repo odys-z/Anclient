@@ -119,6 +119,20 @@ class Protocol {
 	Protocol.valOptions = {};
 }
 
+/** Regex helper */
+class Jregex  {
+	/**Add single quotes to str, if not yet.
+	 * @param {string} str
+	 * @return {string} quoted */
+	static quote(str) {
+		if (str === undefined || str === null )
+			str = "''";
+		else if (typeof str === "string" && str.substring(0, 1) !== "'"
+			&& str.substring(0, 2) != "''")
+			return "'" + str + "'";
+	}
+}
+
 class JMessage {
 	constructor (port, header, body) {
 		this.version = "1.0";
@@ -367,6 +381,19 @@ class UpdateReq {
 		return this;
 	}
 
+	/**Wrapper of #wherecodn(), will take rop as consts and add "''".<br>
+	 * whereCond(logic, lop, Jregex.quote(rop));
+	 * @param logic logic operator
+	 * @param lop left operand
+	 * @param rop right operand
+	 * @return {UpdateReq} this */
+	where_ (logic, lop, rop) {
+		return this.whereCond(logic, lop, Jregex.quote(rop));
+	}
+
+	/**Add post operation
+	 * @param {UserReq | UpdateReq | QueryReq} pst post request
+	 * @return {UpdateReq} this */
 	post (pst) {
 		if (pst === undefined) {
 			console.warn('You really wanna an undefined post operation?');
@@ -460,7 +487,7 @@ class InsertReq extends UpdateReq {
 				this.nvss[0].push([n_row, v]);
 			}
 		}
-		else console.error('Setting n-v with', n, v,
+		else console.error('Error when setting n-v with', n_row, v,
 			'Check the type of n - only string for column, or n is an array represeting a row\'s n-vs!');
 		return this;
 	}
@@ -468,7 +495,7 @@ class InsertReq extends UpdateReq {
 	nvRows(rows) {
 		if (Array.isArray(rows)) {
 			for (var ix = 0; ix < rows.length && Array.isArray(rows[ix]); ix++) {
-				this.values(rows[ix]);
+				this.valus(rows[ix]);
 			}
 		}
 	}

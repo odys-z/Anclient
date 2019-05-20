@@ -1,3 +1,4 @@
+
 /** easyui html handler
  * <p>Easyui is html based api. All jclient integration is via html intervention.</p>
  * <p>This module is a helper for handling html tag attribute string parsing.</p>
@@ -21,6 +22,7 @@ const ir = {
 	root: 'ir-root',
 	/** grid item on select handler name (according easyUI document, there is not 'onChange')*/
 	onselect: "ir-onselect",
+	onchange: "ir-onchange",
 
 	oncheck: "ir-oncheck",
 	onload: "ir-onload",
@@ -40,6 +42,8 @@ const ir = {
 	expr: 'ir-expr',
 	/** Field name in form, which is to be loaded as record's alias, like "field" of easyui datagrid data-options*/
 	field: 'ir-field',
+
+	orderby: 'ir-orderby',
 
 	/** intial page size, later will using easyui pagination's size (by EzGrid.page()) */
 	pagesize: 'ir-size',
@@ -118,7 +122,7 @@ const regex = {
 	 * TEST2: [0]FullPath desc [1]undefined [2]undefined [3]FullPath [4] desc [5]desc
 	 * TEST3: [0]FullPath [1]undefined [2]undefined [3]FullPath [4] undefined [5]undefined
 	 */
-	order: /\s*((\w+)\.){0,1}(\w+)(\s+(asc|desc){0,1}){0,1}\s*/i,
+	order: /\s*((\w+)\.){0,1}(\w+)(\s+(asc|desc|ASC|DESC){0,1}){0,1}\s*/i,
 
 	/** [2] func name, [4] tabl, [5] field */
 	// expr: /\s*((\w+)\s*\s*\()?\s*((\w+)\s*\.)?\s*(\w+)\s*\)?\s*/i,
@@ -155,7 +159,33 @@ const regex = {
 		if (typeof str === "string" && str.substring(0, 1) === '#')
 			return str.substring(1);
 		return str;
-	}
+	},
+
+	/**split target with <i>separator</i> then the the ith element
+	 * @param {string} target
+	 * @param {string} separator
+	 * @param {int} ith optinal.<br>If undefined, return all splitted array
+	 * @return {Array|string} the ith element or all the array.
+	 */
+	split: function (target, separator, ith) {
+		if (target === undefined) { return; }
+
+		if (separator === undefined) {
+			console.error('can not separate', separator, target);
+			return;
+		}
+
+		target = target.trim();
+
+		if (separator != ',') {
+			console.error('Your separator not supported yet...', separator);
+		}
+
+		var ss = target.split(/\s*,\s*/);
+
+		if (ith !== undefined) { return ss[ith]; }
+		else { return ss; }
+	},
 };
 
 /**[Internal API] html tag's attribute parser.
@@ -234,7 +264,8 @@ function Tag (debug) {
 					// No need to parse all logic condition to array
 					var v = this.findVar(mOnVar[2]);
 					if (typeof v !== "undefined") {
-						if (typeof v.length === "number")
+						// if (typeof v.length === "number")
+						if (Array.isArray(v))
 							oncond = mOnVar[1] + this.concatArray(v);
 						else
 							oncond = mOnVar[1] + "'" + v + "'";
@@ -283,6 +314,9 @@ function Tag (debug) {
 	 * @param {string} maintabl
 	 */
 	this.orders = function(ordstr, maintabl) {
+		if (typeof ordstr !== 'string')
+			return;
+
 		var orders = new Array();
 		var ordss = ordstr.split(',');
 		for(var i = 0; i < ordss.length; ++i) {
@@ -299,7 +333,8 @@ function Tag (debug) {
 					alert("Someting wrong in html: " + ordstr);
 					return orders;
 				}
-				orders.push({"tabl": tabl, "field": match[3], "asc": asc });
+				// orders.push({"tabl": tabl, "col": match[3], "asc": asc });
+				orders.push( [tabl + "." + match[3], asc] );
 			}
 		}
 		return orders;
@@ -320,12 +355,14 @@ function Tag (debug) {
 	};
 
 	/**find var from string like "x.y.z"
+	 * If not found, the vn will be returned, no error reported.
+	 * This is for auto form bounding, where this is common for many widgets.
 	 * @param {string} vn var name
 	 * @param {Object} argPool args buffer for looking varialbkles, if not found, try in window globaly.
 	 * @return {Object} value represented by vn, e.g. "x.y.z" */
 	this.findVar = function (vn, argPool) {
 		// vn is a global variable
-		if (window[vn])
+		if (window[vn] !== undefined)
 			return window[vn];
 		// vn is a variable in argPool
 		if (argPool !== undefined && argPool[vn])
@@ -338,7 +375,8 @@ function Tag (debug) {
 		var vnss = regex.vn.exec(vn);
 		// found a null value
 		if (vnss === null)
-			return null;
+			// return null;
+			return vn;
 
 		// does arg pool has the variable?
 		if (argPool !== undefined && argPool[vnss[1]] !== undefined) {
@@ -360,7 +398,7 @@ function Tag (debug) {
 			if (window[vn])
 				return window[vn];
 			else {
-				console.error("Can't find variable for " + vn);
+				// console.error("Can't find variable for " + vn);
 				return vn;
 			}
 		}
@@ -410,9 +448,8 @@ function Tag (debug) {
 	 * @param {string} irselect e.g. "roleId: {@roleId}, ...", or "roleId: {@role.roleId}"
 	 * @param {Object} argBuff e.g. {roleId: 'aaa'}
 	 * @return {Array} e.g. {roleId: roleId's value('aaa'), ...}
-	 */
 	this.parseSelect = function (irselect, argBuff) {
-		if ( irselect === null || typeof irselect === "undefined" )
+		if ( irselect === null || irselect === undefined )
 			return {};
 
 		var args = {};
@@ -434,6 +471,7 @@ function Tag (debug) {
 		}
 		return args;
 	}
+	 */
 };
 const tag = new Tag(jeasy.log);
 
@@ -527,9 +565,10 @@ function EzHtml (J) {
 	/**Collect all cheched items from easyui treee.
 	 * @param {string} treeId
 	 * @param {Object} opts options:<br>
-	 * cols: {p1: v1, p2: v2, ...}
-	 * 		p: the DB field name, v: the easy tree item's propterty where the value will be got.
-	 * append: {p1: v1, ...} appending values, e.g. {role: '0101'} is used to get all functions of role 0101.
+	 * cols: {p1: v1, p2: v2, ...}<br>
+	 * 		p: the DB field name, v: the easy tree item's propterty where the value will be got.<br>
+	 * append: {p1: v1, ...} appending values, e.g. {role: '0101'} is used to get all functions of role 0101.<br>
+	 * check: checked column name, OPTIONAL<br>
 	 * @return {Array} columns to be insert / update, etc.<br>
 	 *	 [ [ [ "funcId", "1A"   ],		- value-row 0, col 0 (funcId)<br>
 	 *	     [ "roleId", "0101" ],		- value-row 0, col 1 (this.roleId == '0101')<br>
@@ -542,7 +581,20 @@ function EzHtml (J) {
 	 * TODO may be we can support ir-checkTreeItem ="field: value, ..."?, but user must know easyUI item's properties?
 	 */
 	this.checkedTreeItem = function (treeId, opts) {
-		var nodes = $(regex.sharp_(treeId, ir.deflt.treeId)).tree('getChecked');
+		var nodes;
+		if (opts !== undefined && typeof opts.eztype === 'string')
+		 	nodes = $(regex.sharp_(treeId, ir.deflt.treeId))[opts.eztype]('getChecked');
+		else
+			// use tree as default
+		 	nodes = $(regex.sharp_(treeId, ir.deflt.treeId)).tree('getChecked');
+
+		if (nodes === undefined) {
+		 	if (jconsts.verbose < 3) {
+				console.error('can not collect checked items. ', treeId, opts);
+			}
+			return [];
+		}
+
 		var eaches = new Array();
 		var colnames = new Array();
 		var first = true;
@@ -582,6 +634,9 @@ function EzHtml (J) {
 	 * @param {string} tagId tag id that alredy sharped
 	 * @param {Object} opts options to be merged (overriding tag attributes)<br>
 	 * Options of sqlArgs, args and select are not handled.<br>
+	 * opts.conn: connection id. if not defined, using jconsts.conn from jeasy-api.<br>
+	 * opts.t: ir-t value, a function branch tag. in jeasy v1.0, only used by stree.serv<br>
+	 * opts.maintabl: target db table. If undefined, try split from first of ir-t<br>
 	 * opts.sk: semantic key string with parameters, like roels.ez, {@obj1.var1}<br>
 	 * opts.all: add an "-- ALL --" item<br>
 	 * opts.query: query form id, ir-query<br>
@@ -598,29 +653,36 @@ function EzHtml (J) {
 	 * opts.onload: on load function or function name<br>
 	 * opts.oncheck: on check function or function name<br>
 	 * opts.oncheckAll: on check all function or function name<br>
+	 * opts.onerror: on error call back, merged with EasyMsger.error(m.fail)<br>
+	 * opts.onok: on ok call back, merged with EasyMsger.info(m.ok)<br>
+	 * <b>note</b>: pk is not handled here
 	 * @return {Object} merged options
 	 */
 	this.opts = function (tagId, opts) {
 		if (typeof opts !== 'object')
 			opts = {};
 		if (opts) {
+			opts.conn = tag.merge(opts.conn, tagId, ir.conn);
+			if (opts.conn === undefined || opts.conn === null) {
+				opts.conn = jconsts.conn;
+			}
+
 			opts.t = tag.merge(opts.t, tagId, ir.t);
+			// try find maintable
+			if (typeof opts.maintabl !== 'string' && typeof opts.t === 'string') {
+				var tbls = tag.joins(opts.t);
+				opts.maintabl = tbls[0].tabl;
+			}
+
 			opts.sk = tag.merge(opts.sk, tagId, ir.sk);
 			opts.all = opts.all || EasyHtml.has(tagId, ir.all);
 			opts.query = tag.merge(opts.query, tagId, ir.query);
 			opts.root = tag.merge(opts.root, tagId, ir.root);
+			opts.orderby = tag.merge(opts.orderby, tagId, ir.orderby);
 
 			opts.select = tag.merge(opts.select, tagId, ir.select);
 			if (typeof opts.select === 'string') {
-				// var ss = opts.select.split(":");
-				// if (ss.length !== 2 || ss[1] === undefined || ss[1] === null)
-				// 	console.error('select id can not been parsed.', opts.select);
-				// else {
-				// 	// convert string to object {n: v}
-				// 	opts.select = {};
-				// 	opts.select[ss[0]] = tag.findVar(ss[1].trim(), opts.args);
-				// }
-				opts.select = tag.parseSelect(opts.select, opts.args);
+				opts.select = tag.findVar(opts.select, opts.args);
 			}
 
 			opts.cbb = tag.merge(opts.cbb, tagId, ir.combobox);
@@ -638,18 +700,24 @@ function EzHtml (J) {
 			opts.tree = tag.merge(opts.tree, tagId, ir.tree);
 			opts.tree = tag.mergargs(opts, opts.tree);
 
-			if (opts.pagesize < 0)
+			if (opts.pagesize < 0) {
 				opts.pagesize = undefined;
+			}
 			opts.pagesize = tag.merge(opts.pagesize, tagId, ir.pagesize);
 			if (opts.pagesize === undefined) opts.pagesize = -1;
 
 			opts.onclick = tag.merge(opts.onclick, tagId, ir.onclick);
-			if (typeof opts.onclick === 'string')
+			if (typeof opts.onclick === 'string') {
 				opts.onclick = eval(opts.onclick);
+			}
 
 			opts.onselect = tag.merge(opts.onselect, tagId, ir.onselect);
 			if (typeof opts.onselect === 'string')
 				opts.onselect = eval(opts.onselect);
+
+			opts.onchange = tag.merge(opts.onchange, tagId, ir.onchange);
+			if (typeof opts.onchange === 'string')
+				opts.onchange = eval(opts.onchange);
 
 			opts.onload = tag.merge(opts.onload, tagId, ir.onload);
 			if (typeof opts.onload === 'string')
@@ -662,6 +730,21 @@ function EzHtml (J) {
 			opts.oncheckAll = tag.merge(opts.oncheckAll, tagId, ir.oncheckAll);
 			if (typeof opts.oncheckAll === 'string')
 				opts.oncheckAll = eval(opts.oncheckAll);
+
+			// opts.onerror = tag.merge(opts.onerror, tagId, ir.onerror);
+			if (typeof opts.onerror === 'string') {
+				opts.onerror = eval(opts.onerror);
+			}
+			else if (typeof opts.onerror === undefined) {
+				opts.onerror = EasyMsger.error;
+			}
+
+			if (typeof opts.onok === 'string') {
+				opts.onok = eval(opts.onok);
+			}
+			else if (typeof opts.onok === undefined) {
+				opts.onok = EasyMsger.ok;
+			}
 		}
 
 		Object.keys(opts).forEach(function (k, ix) {
@@ -690,6 +773,7 @@ function EzCbb (J) {
 		cbbId = regex.sharp_(cbbId, ir.deflt.cbbId);
 		opts = EasyHtml.opts(cbbId, opts);
 		var cbb = $(cbbId);
+
 		var sk = opts.cbb;
 
 		// request JMessage body
@@ -707,7 +791,7 @@ function EzCbb (J) {
 
 		// get data, then bind easyui combotree
 		ssClient.commit(jmsg, function(resp) {
-			console.log(resp);
+			if (jconsts.verbose > 5) console.log(resp);
 			var cbb = $(cbbId);
 			// var rows = resp.data;
 			var rows = jeasy.rows(resp);
@@ -716,6 +800,9 @@ function EzCbb (J) {
 			cbb.combobox({
 				data: rows,
 				onSelect: typeof opts.onselect === "function" ? opts.onselect : function(e) {
+					if (jeasy.log) console.log(e);
+				},
+				onChange: typeof opts.onchange === "function" ? opts.onchange : function(e) {
 					if (jeasy.log) console.log(e);
 				}
 			});
@@ -784,7 +871,13 @@ function EzTree(J) {
 			tree.combotree({
 				data: resp.data,
 				multiple: opts.multi !== undefined && opts.multi !== null && opts.multi === true,
-				onSelect: typeof onChangef === "function" ? onChangef : function(e) {
+//				onSelect: typeof onChangef === "function" ? onChangef : function(e) {
+//					if (jeasy.log) console.log(e);
+//				}
+				onSelect: typeof opts.onselect === "function" ? opts.onselect : function(e) {
+					if (jeasy.log) console.log(e);
+				},
+				onChange: typeof opts.onchange === "function" ? opts.onchange : function(e) {
 					if (jeasy.log) console.log(e);
 				}
 			});
@@ -836,12 +929,16 @@ function EzTree(J) {
 		// get data, then bind easyui tree
 		// ssClient is created after logged in.
 		ssClient.commit(jmsg, function(resp) {
+			// resp.data.forEach(function (v, i) {
+			// 	v.checked = false;
+			// });
 			console.log(resp);
 			EasyTree.bind(treeId,	// id
 					resp.data,		// forest,
 					'tree',			// easyui tree()
 					opts.onclick,
 					opts.onselect,
+					opts.oncheck,
 					opts.onload);
 		});
 	};
@@ -998,6 +1095,9 @@ function EzGrid (J) {
 				var wheres = EasyQueryForm.conds(opts.query, mainAlias);
 				// q.wheres("=", "u.userId", "'" + uid + "'");
 				q.whereCond(wheres);
+
+				// order by
+				q.orderbys(tag.orders(opts.orderby));
 			}
 			else console.error('Grid can support both ir-grid or ir-t, but none of them can be found.', opts);
 		}
@@ -1076,6 +1176,9 @@ function EzGrid (J) {
 				var wheres = EasyQueryForm.conds(opts.query, mainAlias);
 				// q.wheres("=", "u.userId", "'" + uid + "'");
 				q.whereCond(wheres);
+
+				// order by
+				q.orderbys(tag.orders(opts.orderby));
 			}
 			else console.error('Grid can support both ir-grid or ir-t, but none of them can be found.', opts);
 		}
@@ -1173,7 +1276,7 @@ function EzGrid (J) {
 					opts.onclick,
 					opts.onselect,
 					opts.onload);
-		});
+		}, EasyMsger.error);
 	}
 
 	/**call easyui $(pagerId).pagination("refresh", ...
@@ -1222,6 +1325,7 @@ function EzGrid (J) {
 	this.bindPage = function (gridId, json, total, opts, ezTreegrid) {
 		gridId = regex.sharp_(gridId);
 		var g = $(gridId);
+		jeasy.mainRow(gridId, undefined);
 
 		// g.datagrid(
 		var ezOpts = {
@@ -1259,6 +1363,12 @@ function EzGrid (J) {
 			}
 			g.datagrid("loadData", json);
 		}
+		if (opts.onCheckAll)
+			g.datagrid({ onCheckAll: opts.onCheckAll,
+				onUncheckAll: opts.onCheckAll});
+		if(opts.onload)
+			g.datagrid({ onLoadSuccess: opts.onload});
+		g.datagrid("loadData", json);
 
 		if (typeof opts.select === 'object') {
 			var ix = jeasy.findRowIdx(json, opts.select)
@@ -1275,8 +1385,38 @@ function EzGrid (J) {
 		// }
 
 		EasyMsger.close();
-		if (typeof opts.onload === "function")
-			opts.onload ( json, total );
+//		if (typeof opts.onload === "function")
+//			opts.onload ( json, total );
+	};
+
+	/** delete selected row.
+	 * If no row is selected, call opts.onalert, or EzMsger.alert(m.none_selected);
+	 * @param {string} gridId easy grid in whiche the selected row to be deleted
+	 * @param {Object} opts
+	 * opts.maintable: target table.<br>
+	 * opts.pk: pk condition for sql where clause.<br>
+	 * opts.select the selected record id overriding auto retrieved selected row's id.<br>
+	 * opts.onload: the success callback, default: EasyMsger.ok<br>
+	 * opts.onerror: the error handle, default: EasyMsger.error.<br>
+	 * @param {UpdateReq} the delete request (a = 'D')
+	 */
+	this.delrow = function(gridId, opts) {
+		gridId = regex.sharp_(gridId, ir.deflt.gridId);
+		opts = EasyHtml.opts(gridId, opts);
+
+		var rw = jeasy.getMainRow(gridId);
+		if (rw === undefined || rw === null) {
+			if (typeof opts.onerror === 'function')
+				opts.onerror(EasyMsger.m.none_selected);
+			else
+				EasyMsger.alert(EasyMsger.m.none_selected);
+			return;
+		}
+
+		var pkv = rw[opts.pk];
+		var rq = ssClient.delete(opts.conn, opts.maintabl,
+			{pk: opts.pk, v: pkv}, opts.posts);
+		ssClient.commit(rq, opts.onok, opts.onerror);
 	};
 };
 const EasyGrid = new EzGrid(J);
@@ -1526,7 +1666,7 @@ function EzModal() {
 		else if (typeof pk === "object" && pk.pk !== undefined) {
 			// some times user's code use 'this' in callback, makes arguments wrong
 			if (pk.v === undefined)
-				console.error('pk may not correct', pk);
+				console.warn('pk may not correct', pk);
 			q.whereCond("=", pk.pk, "'" + pk.v + "'");
 		}
 
@@ -1544,7 +1684,7 @@ function EzModal() {
 			var f = this.attributes[ir.field].value;
 			var v = rec ? rec[f] : undefined;
 
-			var opts = EasyHtml.opts(domval.id, {args: rec, pk: f});
+			var opts = EasyHtml.opts(domval.id, {args: rec, select: v});
 
 			// ir-field presented, this widget  needing been auto bound
 			if ( this.attributes[ir.field].name !== undefined ) {
@@ -1565,11 +1705,21 @@ function EzModal() {
 					// EasyTree.combotree( domval.id, {args: rec, select: v, onselect: onChange});
 					EasyTree.combotree( domval.id, opts);
 				}
+				// case 1.1: bind easyui-combobox no ir-cbb
+				else if (this.classList && (this.classList.contains('easyui-combobox') )) {
+					if ( v !== undefined && v!== null && v.trim().length > 0) {
+						try {
+							$('#' + domval.id).combobox('setValue', v);
+						} catch ( ex ) {
+							console.log("loadSimpleForm(): Value " + v + " can't been set to combobox " + domval.id);
+						}
+					}
+				}
 				// case 3: bind easyui-datebox/datetimebox
 				else if (this.classList && (this.classList.contains('easyui-datetimebox')
 										|| this.classList.contains('easyui-datebox')   ) ) {
 					//$("#installDate").datebox("setValue", row.installDate);
-					if ( v !== undefined && v.trim().length > 0) {
+					if ( v !== undefined && v!== null && v.trim().length > 0) {
 						try {
 							var dt = new Date(v);
 							$('#' + domval.id).datebox('setValue', v);
@@ -1578,7 +1728,18 @@ function EzModal() {
 						}
 					}
 				}
-				// case 4: bind easyui-numberspinner
+				// case 4: bind easyui-numberbox
+				else if (this.classList && (this.classList.contains('easyui-numberbox') )) {
+					//$("#installDate").datebox("setValue", row.installDate);
+					if ( v !== undefined && v!== null && v.trim().length > 0) {
+						try {
+							$('#' + domval.id).numberbox('setValue', v);
+						} catch ( ex ) {
+							console.log("loadSimpleForm(): Value " + v + " can't been set to numberbox " + domval.id);
+						}
+					}
+				}
+				// case 5: bind easyui-numberspinner
 				else if (this.classList && (this.classList.contains('easyui-numberspinner')))
 					try {
 						$('#' + domval.id).numberspinner('setValue', v);
@@ -1586,26 +1747,28 @@ function EzModal() {
 						console.log("loadSimpleForm(): Value " + v +
 							" can't been set to easyui numberspinner " + domval.id);
 					}
-				// case 5.1: datagrid pager
-				if (this.attributes[ir.grid]) {
+				// case 6.1: datagrid pager
+				else if (this.attributes[ir.grid]) {
 					// merge grid's attributes, with pager's attributes overriding gird's
 					var gridId = EasyHtml.ir(this.id, ir.grid);
 					opts = EasyHtml.opts(gridId, opts);
 
 					EasyGrid.pager(this.id, opts);
 				}
-				// case 5.2: datagrid
+				// case 6.2: datagrid
 				else if  (this.classList && (this.classList.contains('easyui-datagrid'))) {
 					if (jeasy.log)
 						console.log('Trying bind datagrid automatically, ir-field: ', f, v);
 					// EasyGird.datagrid(this.id, {select: v, onselect: onChange});
-					EasyGrid.datagrid(this.id, opts);
+					EasyGird.datagrid(this.id, opts);
 				}
-				// case 6: bind text input - should this moved to the first?
-				else if  (this.classList && (this.classList.contains('easyui-textbox')))
+				// case 7: bind text input - should this moved to the first?
+				else if  (this.nodeName!="TEXTAREA"&&this.classList && (this.classList.contains('easyui-textbox') || this.classList.contains('textbox')))
 					$(regex.sharp_(this.id)).textbox({value: v});
-				else
-					this.value = v;
+				else{
+				     if(v !== undefined && v!== null && v.trim().length > 0)
+				       this.value = v;
+				}
 			}
 		});
 
@@ -1635,12 +1798,20 @@ function EzModal() {
 	 * @param {string} dlgid formId to be packaged
 	 * @param {string} tabl target table
 	 * @param {string} pk {pk, v} for update condition, ignored when crud = jeasy.c
+	 * @param {string} regexExclude exclude expressiong<br>
+	 * <p>This function uses jquery.serializeArray() to serialize all tag's value with attribute 'name'.
+	 * But this introduce a problem with easyUI checkbox in treegrid or datagride. When a checkbox is
+	 * checked, the juery serializeArray() will include it's value, this is not expected when serialize a form.
+	 * So an exlude expression is used to exclude checked value from datagride, etc.
+	 * E.g. $(dlgId + ' [name]').not('.datagrid [name]').serializeArray() where exlcude check box value in datagrid and treegrid.</p>
+	 * So, if you want to exlude it, set regexExclude = '.datagrid [name]'
+	 * This is what easyUI not that easy like the first look.
 	 * @return {UpdateReq} request {a = c | u | d} formatted according to form's html.
 	 */
-	this.save = function (conn, crud, dlgId, tabl, pk) {
+	this.save = function (conn, crud, dlgId, tabl, pk, regexExclude) {
 		dlgId = regex.sharp_(dlgId, ir.deflt.modalId);
 
-		var nvs = $(dlgId + ' [name]').serializeArray();
+		var nvs = $(dlgId + ' [name]').not(regexExclude).serializeArray();
 
 		if (nvs === undefined || nvs.length === 0)
 			console.warn("No saving values found in form: " + dlgId,
@@ -1685,6 +1856,10 @@ function EzMsger() {
 	 * Don't change this into Chinese, set another message-popping function to replace this if like to.
 	 */
 	this.error = function(code, resp) {
+		if (EasyMsger.progressing === true) {
+			EasyMsger.close();
+		}
+
 		if (EasyMsger.msg[code] === null || EasyMsger.msg[code] === undefined) {
 			EasyMsger.msg[code] = code;
 			console.error(resp);
@@ -1696,8 +1871,8 @@ function EzMsger() {
 			else $.messager.alert('warn', resp.error);
 		}
 		else {
-			console.warn('Error message ignored:')
-			console.warn(resp);
+			console.warn('Error message ignored:', resp,
+				'Call EasyMsger.init("' + code + '") to enable error message again.');
 		}
 	};
 
@@ -1709,14 +1884,15 @@ function EzMsger() {
 	this.info = function (m, style) {
 		if (style === undefined)
 			style = 'info';
-		if (typeof m === 'function' && m.name in this.m) {
+		if (typeof m === 'function') {
 			$.messager.alert(style, m(), style);
 			return;
 		}
-
-		console.warn("We check m's existence because including message string anywhere is not encouraged in jeasy.",
-					"You can replace EasyMsger.m with your m object to update and extend messages, in one place.",
-					m);
+		else {
+			console.warn("Your message is not found.", m,
+				"We check m's existence in EzMsger.m because including message string anywhere is not encouraged in jeasy.",
+				"You can replace EasyMsger.m with your m object to update and extend messages, in one place.");
+		}
 	};
 
 	/**See info()
@@ -1744,10 +1920,23 @@ function EzMsger() {
 		Object.assign(this.m, mf);
 	};
 
+	/**Message strings.
+	 * Use EzMsger.setM to setup application's message strings.
+	 * NO CHINESE HERE for m!
+	 * Replace m with your varialbe or call setM(msg-func) if you'd like to,
+	 * in ir-jeasy-engcost.js
+	 */
 	this.m = {
 		ok: () => "OK!",
-		saved: () => "Saving Successfully!",
+		fail: () => "Operation Failed!",
+		// NO CHINESE HERE !
+	 	// Replace m with your variable or call setM(msg-func) if you'd like to,
+		// in ir-jeasy-engcost.js/jconsts.initMsg (or jeasy-api.js sample project config section)
+		saved: () => "Saved Successfully!",
 		none_selected: () => "Please select a record!",
+		deleted: () => "Delete Successfully!"
 	};
 };
 const EasyMsger = new EzMsger(J);
+// call message initializer
+jconsts.initMsg(EasyMsger);

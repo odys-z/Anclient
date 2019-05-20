@@ -180,7 +180,8 @@ function jeasyAPI (J, log) {
 			ins.a = crud;
 			if (Array.isArray(opts.cols)) {
 				ins.columns(opts.cols);
-				ins.valus(opts.values);
+				// ins.valus(opts.values);
+				ins.nvRows(opts.values);
 			}
 			else console.warn('WARN - inserting empty columns?', opts);
 			return ins;
