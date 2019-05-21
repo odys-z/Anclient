@@ -63,6 +63,10 @@ public class CheapClient {
 
 		String t = Req.start.name();
 
+		// FIXME This is wrong, must using CheapReq!
+		// FIXME This is wrong, must using CheapReq!
+		// FIXME This is wrong, must using CheapReq!
+		// FIXME This is wrong, must using CheapReq!
 		JMessage<? extends JBody> jmsg = ssclient.userReq(t, Samport.cheapflow, act, req);
 		jmsg.header(ssclient.header());
 
@@ -112,7 +116,7 @@ public class CheapClient {
 				.cmdsRight(currentNodeId, usrId, taskId)
 				.wftype(wfid);
 
-		String t = Req.cmdsRight.name();
+		String t = Req.rights.name();
 		String[] act = JHeader.usrAct("", "read", t,
 				"jclient.java querying rights " + wfId);
 

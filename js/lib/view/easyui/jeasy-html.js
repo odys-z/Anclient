@@ -868,6 +868,8 @@ function EzTree(J) {
 		ssClient.commit(jmsg, function(resp) {
 			console.log(resp);
 			var tree = $(treeId);
+			if (opts.all)
+				resp.data.unshift({text: ir.deflt._All_, id: ir.deflt._All_, value: ir.deflt._All_});
 			tree.combotree({
 				data: resp.data,
 				multiple: opts.multi !== undefined && opts.multi !== null && opts.multi === true,
@@ -953,30 +955,38 @@ function EzTree(J) {
 	 * @param {function} onLoad on binding success callback
 	 */
 	this.bind = function (treeId, json, treeType, onClick, onSelect, onCheck, onLoad) {
+
 		if (treeId.substring(0, 1) != "#")
 			treeId = "#" + treeId;
 		var tree = $(treeId);
-		tree[treeType]({
-			// data: JSON.parse(message).rows,
-			data: json,
-			onSelect: function(node) {
-				if(typeof onSelect === "function")
-					onSelect(node)
-			},
-			onCheck: function(node) {
-				if(typeof onCheck === "function")
-					onCheck(node)
-			},
-			onClick: function(node) {
-				if(typeof onClick === "function")
-					onClick(node)
-			},
-			onLoadSuccess: function(node, data) {
-				if (typeof onLoad === "function")
-					onLoad(node, data);
-			},
-			style: "height: 81px"
-		});
+		var ezOpts = {};
+		// g.datagrid(
+		ezOpts = {
+		data: json,
+		onSelect: function(node) {
+			jeasy.mainRow(treeId, node);
+			if(typeof onSelect === "function")
+				onSelect(node)
+		},
+		onCheck: function(node) {
+			jeasy.mainRow(treeId, node);
+			if(typeof onCheck === "function")
+				onCheck(node)
+		},
+		onClick: function(node) {
+			jeasy.mainRow(treeId, node);
+			if(typeof onClick === "function")
+				onClick(node)
+		},
+		onLoadSuccess: function(node, data) {
+			jeasy.mainRow(treeId, node);
+			if (typeof onLoad === "function")
+				onLoad(node, data);
+		},
+		style: "height: 81px"
+		}
+
+			tree[treeType](ezOpts);
 	};
 
 	/**Ask server (SemanticTree) travel throw sub-tree from rootId, re-organize fullpath.
@@ -1934,7 +1944,9 @@ function EzMsger() {
 		// in ir-jeasy-engcost.js/jconsts.initMsg (or jeasy-api.js sample project config section)
 		saved: () => "Saved Successfully!",
 		none_selected: () => "Please select a record!",
-		deleted: () => "Delete Successfully!"
+		deleted: () => "Delete Successfully!",
+
+		cheap_started: () => "Workflow Started.",
 	};
 };
 const EasyMsger = new EzMsger(J);

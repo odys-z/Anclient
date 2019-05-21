@@ -1,6 +1,6 @@
 
 import $ from 'jquery';
-import {Protocol, JMessage, JHeader, QueryReq} from '../../protocol.js';
+import {Protocol, JMessage, JHeader, QueryReq, UserReq} from '../../protocol.js';
 
 
 /**See semantic.workflow/io.odysz.sworkflow.EnginDesign.Req */
@@ -29,8 +29,26 @@ class CheapReq {
 	// protected ArrayList<String[]> taskNvs;
 	// protected ArrayList<ArrayList<String[]>> childInserts
 
-	constructor (wftype) {
+	constructor (wftype, port) {
 		this.wftype = wftype;
+		if (port === undefined)
+			this.port = 'cheapflow.sample';
+		else this.port = port;
+	}
+
+	/**set a.<br>
+	 * a() can only been called once.
+	 * @param {string} a
+	 * @return {UserReq} this */
+	a(a) {
+		this.a = a;
+		return this;
+	}
+
+	arg(n, v) {
+		if (cmdArgs === undefined)
+			cmdArgs = [];
+		cmdArgs.concat([n, v]);
 	}
 
 	nodeDesc (descpt) {
@@ -40,15 +58,28 @@ class CheapReq {
 
 	taskNv (n, v) {
 		if (this.taskNvs === undefined || this.taskNvs === null)
-			tthis.askNvs = [];
+			this.taskNvs = [];
 		this.taskNvs.push([n, v]);
 		return this;
 	}
 
-	newChildInstRow () {
+	taskRow (row) {
+		if (Array.isArray(row)) {
+			for (var ix = 0; ix < row.length && Array.isArray(row[ix]); ix++) {
+				this.taskNv(row[ix][0], row[ix][1]);
+			}
+		}
+		else {
+			console.error('CheapReq.taskRow(row) argument format:\n',
+						'[[n, v], ...]\n',
+						row);
+		}
+	}
+
+	post (jbody) {
 		if (this.childInserts === undefined || this.childInserts === null)
 			this.childInserts = [];
-		else this.childInserts.push([]);
+		else this.childInserts.push(jbody);
 	}
 
 	childInsert (n, v) {
@@ -56,25 +87,21 @@ class CheapReq {
 		return this;
 	}
 
-	req (r) {
-		this.a = r;
-		return this;
-	}
+	// req (r) {
+	// 	this.a = r;
+	// 	return this;
+	// }
 
-	reqCmd (cmd) {
-		this.cmdArgs = [cmd];
-		return req(chpEnumReq.cmd);
-	}
+	// use ssClient.usrCmd() instead
+	// reqCmd (cmd) {
+	// 	this.cmdArgs = [cmd];
+	// 	return req(chpEnumReq.cmd);
+	// }
 
-	cmdsRight (nodeId, usrId, taskId) {
-		this.cmdArgs = [nodeId, usrId, taskId];
-		return req(chpEnumReq.cmdsRight);
-	}
-
-	loadFlow (wfId, taskId) {
-		this.cmdArgs = [wfId, taskId];
-		return this.req(chpEnumReq.load);
-	}
+	// cmdsRight (nodeId, usrId, taskId) {
+	// 	this.cmdArgs = [nodeId, usrId, taskId];
+	// 	return req(chpEnumReq.cmdsRight);
+	// }
 }
 
 export {CheapReq, chpEnumReq};

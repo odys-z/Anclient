@@ -40,10 +40,15 @@
 	    <version>0.7.0-SNAPSHOT</version>
 	</dependency>
 	
+	<!-- jserv-sample is a web application, but this project needing it's protocols.
+		Referencing a war need some tricks. see answer by Morteza Malvandi 
+		https://stackoverflow.com/questions/31020038/how-can-i-add-war-file-to-another-java-web-application-dependencies
+	 -->
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>jserv-sample</artifactId>
 	    <version>1.0.0-SNAPSHOT</version>
+	    <classifier>classes</classifier>
 	</dependency>
 	
   </dependencies>

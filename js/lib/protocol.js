@@ -205,6 +205,10 @@ class UserReq {
 		return this;
 	}
 
+	/**set a.<br>
+	 * a() can only been called once.
+	 * @param {string} a
+	 * @return {UserReq} this */
 	a(a) {
 		this.a = a;
 		return this;
@@ -363,6 +367,12 @@ class UpdateReq {
 			else console.error("UpdateReq: Can't understand pk: ", pk);
 	}
 
+	/** add n-v
+	 * @param {string} n
+	 * @param {object} v
+	 * TODO what about v is QueryReq ?
+	 * @return {UpdateReq} this
+	 */
 	nv (n, v) {
 		if (Array.isArray(n)) {
 			this.nvs = this.nvs.concat(Protocol.nvs2row(n));
