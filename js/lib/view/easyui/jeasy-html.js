@@ -799,6 +799,7 @@ function EzCbb (J) {
 				rows.unshift({text: ir.deflt._All_, value: ir.deflt._All_});
 			cbb.combobox({
 				data: rows,
+				multiple: opts.multi !== undefined && opts.multi !== null && opts.multi === true,
 				onSelect: typeof opts.onselect === "function" ? opts.onselect : function(e) {
 					if (jeasy.log) console.log(e);
 				},
@@ -1357,9 +1358,20 @@ function EzGrid (J) {
 
 		g.datagrid(ezOpts);
 
+		// FIXME this not correct!
+		// FIXME this not correct!
+		// FIXME this not correct!
+
+		// var ezfunc = g[ezTreegrid];	// ezTreegrid = 'treegrid', 'datagrid', 'tree', ...
+		// ezfunc("loadData", json);	// now ezfunc is a function
+
+		// FIXME this not correct!
+		// FIXME this not correct!
+		// FIXME this not correct!
+		// FIXME this not correct!
 		if (ezTreegrid) {
 			g.treegrid(opts);
-			if (opts.onCheckAll) {
+			if (opts != undefined && opts.onCheckAll) {
 				g.treegrid({ onCheckAll: opts.oncheckAll,
 					onUncheckAll: opts.oncheckAll});
 			}
@@ -1367,7 +1379,7 @@ function EzGrid (J) {
 		}
 		else {
 			g.datagrid(opts);
-			if (opts.onCheckAll) {
+			if (opts !== undefined && opts.onCheckAll) {
 				g.datagrid({ onCheckAll: opts.oncheckAll,
 					onUncheckAll: opts.oncheckAll});
 			}
@@ -1947,6 +1959,7 @@ function EzMsger() {
 		deleted: () => "Delete Successfully!",
 
 		cheap_started: () => "Workflow Started.",
+		cheap_no_rights: () => "You don't have the command rights.",
 	};
 };
 const EasyMsger = new EzMsger(J);

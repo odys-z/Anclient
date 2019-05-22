@@ -131,6 +131,11 @@ class Jregex  {
 			&& str.substring(0, 2) != "''")
 			return "'" + str + "'";
 	}
+
+	static isblank(s) {
+		return s === undefined || s === null
+			|| (typeof s === 'string' && s.trim() === '');
+	}
 }
 
 class JMessage {
@@ -511,17 +516,27 @@ class InsertReq extends UpdateReq {
 	}
 }
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
-// define t that can be understood by server
-const ds_t = {sqltree: 'sqltree', retree: 'retree', reforest: 'reforest'};
+/** define t that can be understood by stree.serv */
+const stree_t = {
+	/** load dataset configured and format into tree with semantics defined by sk. */
+	sqltree: 'sqltree',
+	/** Reformat the tree structure - reformat the 'fullpath', from the root */
+	retree: 'retree',
+	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+	reforest: 'reforest',
+	/** Query with client provided QueryReq object, and format the result into tree. */
+	query: ''};
 
 class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
-	 * @param {string} t function branch tag (JBody#a)
+	 * @param {stree_t} t function branch tag (JBody#a).
+	 * Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query
 	 * @param {object} args arguments to be formatted to sql args.
+	 * @param {string} maintbl if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk.
 	 */
-	constructor (conn, sk, t, args) {
-		super(conn, sk);
+	constructor (conn, sk, t, args, maintbl) {
+		super(conn, Jregex.isblank(t) ? maintabl : sk);
 
 		this.conn = conn;
 		this.sk = sk;
@@ -533,7 +548,8 @@ class DatasetCfg extends QueryReq {
 
 	get geTreeSemtcs() { return this.trSmtcs; }
 
-	/**Set tree semantics
+	/**Set tree semantics<br>
+	 * You are recommended not to use this except your are the semantic-* developer.
 	 * @param {TreeSemantics} semtcs */
 	treeSemtcs(semtcs) {
 		this.trSmtcs = semtcs;
@@ -541,9 +557,9 @@ class DatasetCfg extends QueryReq {
 	}
 
 	_t(ask) {
-		if (typeof sk === 'string' && sk.length > 0 && ask !== ds_t.sqltree) {
+		if (typeof sk === 'string' && sk.length > 0 && ask !== stree_t.sqltree) {
 			console.warn('DatasetReq.a is ignored for sk is defined.', sk);
-			this.a = ds_t.sqltree;
+			this.a = stree_t.sqltree;
 		}
 		else {
 			this.a = ask;
@@ -567,12 +583,12 @@ class DatasetCfg extends QueryReq {
 	/** Check is t can be undertood by s-tree.serv
 	 * @param {string} t*/
 	checkt(t) {
-		// if (t !== ds_t.sqltree && t !== ds_t.retree && t !== ds_t.reforest) {
-		if (t !== undefined && !ds_t.hasOwnProperty(t)) {
-			console.warn("DatasetCfg.t won't been understood by server:", t, "Should be one of", ds_t);
+		// if (t !== stree_t.sqltree && t !== stree_t.retree && t !== stree_t.reforest) {
+		if (t !== undefined && !stree_t.hasOwnProperty(t)) {
+			console.warn("DatasetCfg.t won't been understood by server:", t, "Should be one of", stree_t);
 		}
 	}
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg}
+export {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg, stree_t}

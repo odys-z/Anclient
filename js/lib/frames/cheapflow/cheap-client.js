@@ -19,6 +19,13 @@ const chpEnumReq = {
 	timeout: "timeout",
 }
 
+/** @See io.odysz.sworkflow.CheapException */
+const CheapCode = {
+	ok: 'ok',
+	err: 'wf_err',
+	err_rights: 'wf_err_rights',
+}
+
 ///////////////// io.odysz.sworkflow ///////////////////////////////////////////
 class CheapReq {
 	// a (req.name)
@@ -104,4 +111,4 @@ class CheapReq {
 	// }
 }
 
-export {CheapReq, chpEnumReq};
+export {CheapReq, chpEnumReq, CheapCode};
