@@ -6,7 +6,10 @@ import {Protocol, JMessage, JHeader, QueryReq, UserReq} from '../../protocol.js'
 /**See semantic.workflow/io.odysz.sworkflow.EnginDesign.Req */
 const chpEnumReq = {
 	heartbeat: "ping",
+	/** load workflow list */
 	load: "load",
+	/** load a node's commnads */
+	nodeCmds: 'node-cmds',
 	TgetDef: "get-def",
 	findRoute: "findroute",
 	cmdsRight: "right",
