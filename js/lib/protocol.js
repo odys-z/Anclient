@@ -319,7 +319,7 @@ class QueryReq {
 	}
 
 	orderbys (cols) {
-		if (Array.isArray(cols))
+		if (Array.isArray(cols)) {
 			for (var ix = 0; ix < cols.length; ix++) {
 				if (Array.isArray(cols[ix])) {
 					if (this.orders === undefined)
@@ -331,16 +331,27 @@ class QueryReq {
 				}
 
 			}
+		}
+		else console.log('QueryReq#orderbys() - argument is not an array.', cols);
 		return this;
 	}
 
-	groupby (col) {
-		console.warn("groupby() is still to be implemented");
+	groupby (expr) {
+		// console.warn("groupby() is still to be implemented");
+		if (this.groups === undefined)
+			this.groups = [];
+		this.groups.push(expr);
 		return this;
 	}
 
-	groupbys (cols) {
-		console.warn("groupby() is still to be implemented");
+	groupbys (exprss) {
+		// console.warn("groupby() is still to be implemented");
+		if (Array.isArray(exprss)) {
+			for (var ix = 0; ix < exprss.length; ix++) {
+				this.groupby(exprss[ix]);
+			}
+		}
+		else console.log('QueryReq#groupbys() - argument is not an array.', exprss);
 		return this;
 	}
 
@@ -534,9 +545,10 @@ class DatasetCfg extends QueryReq {
 	 * Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query
 	 * @param {object} args arguments to be formatted to sql args.
 	 * @param {string} maintbl if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk.
+	 * @param {string} alias if t is null or undefined, use this to replace alias in super (QueryReq).
 	 */
-	constructor (conn, sk, t, args, maintbl) {
-		super(conn, Jregex.isblank(t) ? maintabl : sk);
+	constructor (conn, sk, t, args, maintbl, alias) {
+		super(conn, Jregex.isblank(t) ? maintbl : sk, alias);
 
 		this.conn = conn;
 		this.sk = sk;
@@ -591,4 +603,4 @@ class DatasetCfg extends QueryReq {
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg, stree_t}
+export {Jregex, Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg, stree_t}

@@ -56,9 +56,21 @@ class CheapReq {
 	}
 
 	arg(n, v) {
-		if (cmdArgs === undefined)
-			cmdArgs = [];
-		cmdArgs.concat([n, v]);
+		if (v !== undefined) { // getting
+			if (this.cmdArgs === undefined)
+				this.cmdArgs = {};
+			// this.cmdArgs = Object.assign(this.cmdArgs, {n, v});
+			this.cmdArgs[n] = v;
+			return this;
+		}
+		else {
+			if (this.cmdArgs === undefined) return;
+			// for (var ix = 0; ix < this.cmdArgs.length; ix++) {
+			// 	if (this.cmdArgs[ix][0] === n)
+			// 		return this.cmdArgs[ix][1];
+			// }
+			return this.cmdArgs[n];
+		}
 	}
 
 	nodeDesc (descpt) {
@@ -84,12 +96,26 @@ class CheapReq {
 						'[[n, v], ...]\n',
 						row);
 		}
+		return this;
+	}
+
+	taskId (tid) {
+		return this.arg('taskId', tid);
+	}
+
+	nodeId (nid) {
+		return this.arg('nodeId', nid);
+	}
+
+	instId (iid) {
+		return this.arg('instId', iid);
 	}
 
 	post (jbody) {
 		if (this.childInserts === undefined || this.childInserts === null)
 			this.childInserts = [];
 		else this.childInserts.push(jbody);
+		return this;
 	}
 
 	childInsert (n, v) {
