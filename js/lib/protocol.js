@@ -351,7 +351,9 @@ class QueryReq {
 				this.groupby(exprss[ix]);
 			}
 		}
-		else console.log('QueryReq#groupbys() - argument is not an array.', exprss);
+		else if (exprss != undefined) {
+            console.log('QueryReq#groupbys() - argument is not an array.', exprss);
+        }
 		return this;
 	}
 
