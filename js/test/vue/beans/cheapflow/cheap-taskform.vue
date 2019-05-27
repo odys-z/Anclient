@@ -105,7 +105,7 @@
 	});
   }
 
-  // Backup for roles.vue - will be moved in the future
+  // Backup for roles.vue - will be removed in the future
   // function loadFlow(jclient) {
 	// var req = jclient.query(null, "a_user", "u", {page: 0, size: 20});
 	// 	req.body[0]
