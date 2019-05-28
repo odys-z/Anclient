@@ -100,11 +100,12 @@ function jeasyAPI (J, log) {
 	}
 
 	/** Get rows from jclient response for easyui datagrid, etc.
-	 * @param {object} resp jclient got response */
-	this.rows = function (resp) {
+	 * @param {object} resp jclient got response
+	 * @param {int} ixRs resultset index */
+	this.rows = function (resp, ixRs) {
 		if (resp) {
-			var cols = this.J.respCols(resp);
-			var rows = this.J.respRows(resp);
+			var cols = this.J.respCols(resp, ixRs);
+			var rows = this.J.respRows(resp, ixRs);
 			if (cols !== undefined && rows != undefined) {
 				var rows2 = [];
 				for (var rx = 0; rx < rows.length; rx++) {

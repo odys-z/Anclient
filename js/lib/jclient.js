@@ -148,14 +148,18 @@ class J {
 	}
 
 	// TODO moved to protocol.js?
-	respCols(resp) {
+	respCols(resp, ix) {
+		if (ix === null || ix === undefined )
+			ix = 0;
 		return resp !== null && resp !== undefined && resp.code === "ok"
-			? resp.data.rs[0][0] : [];
+			? resp.data.rs[ix][0] : [];
 	}
 
-	respRows(resp) {
+	respRows(resp, ix) {
+		if (ix === null || ix === undefined )
+			ix = 0;
 		return resp !== null && resp !== undefined && resp.code === "ok"
-			? resp.data.rs[0].slice(1) : [];
+			? resp.data.rs[ix].slice(1) : [];
 	}
 
 	respObjs(resp, start, len) {
@@ -235,7 +239,7 @@ class SessionClient {
 		this.J = _J;
 	}
 
-	get userInfo() { return ssInf; }
+	get userInfo() { return this.ssInf; }
 
 	/**Post the request message (JMessage with body of subclass of JBody).
 	 * @param {JMessage} jmsg request message

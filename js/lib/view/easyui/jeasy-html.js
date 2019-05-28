@@ -45,6 +45,8 @@ const ir = {
 
 	orderby: 'ir-orderby',
 
+	groupby: 'ir-groupby',
+
 	/** intial page size, later will using easyui pagination's size (by EzGrid.page()) */
 	pagesize: 'ir-size',
 
@@ -94,15 +96,36 @@ const regex = {
 	 * [2] :b
 	 * [3] b */
 	maintbl: /\s*(\w+)\s*(:\s*(\w+))?/i,
+
+	// deprecated join: /\s*([jJrRlL])\s*:\s*(\w+)(\s*:\s*(\w+)){0,1}\s+(.+)\s*/i,
 	/**regex for matching join definition is html.<br>
-	 * [0] j:b_cates:t1   person=b_cates.persId 'v' % t1.col<br>
-	 * [1] j<br>
-	 * [2] b_cates<br>
-	 * [3]  : t1<br>
-	 * [4] t1<br>
-	 * [5] person=b_cates.persId 'v' % t1.col<br>
+	 * deprecated :<br>
+	 * [0] j:b_cates:t1   person=b_cates.persId 'v' % t1.col <br>
+	 * [1] j <br>
+	 * [2] b_cates <br>
+	 * [3]  : t1 <br>
+	 * [4] t1 <br>
+	 * [5] person=b_cates.persId 'v' % t1.col <br>
+
+	 * [0] j:{@tb}:a a.x=b.y <br>
+	 * [1] j <br>
+	 * [2] {@ <br>
+	 * [3] tb <br>
+	 * [4] } <br>
+	 * [5] :a <br>
+	 * [6] a <br>
+	 * [7] a.x=b.y <br>
+
+	 * [0] j:tb :a a.x=b.y and a.z=c.w <br>
+	 * [1] j <br>
+	 * [2] undefined <br>
+	 * [3] tb <br>
+	 * [4] undefined  <br>
+	 * [5] :a <br>
+	 * [6] a <br>
+	 * [7] a.x=b.y and a.z=c.w <br>
 	 */
-	join: /\s*([jJrRlL])\s*:\s*(\w+)(\s*:\s*(\w+)){0,1}\s+(.+)\s*/i,
+	join: /\s*([jJrRlL])\s*:\s*(\{\@)?\s*(\w+)\s*(\})?(\s*:\s*(\w+)){0,1}\s+(.+)\s*/i,
 
 	/**Regex for replacing variable in joining's ON condition.<br>
 	 * [0] abc = {@ x.y} devi=ccd
@@ -123,9 +146,6 @@ const regex = {
 	 * TEST3: [0]FullPath [1]undefined [2]undefined [3]FullPath [4] undefined [5]undefined
 	 */
 	order: /\s*((\w+)\.){0,1}(\w+)(\s+(asc|desc|ASC|DESC){0,1}){0,1}\s*/i,
-
-	/** [2] func name, [4] tabl, [5] field */
-	// expr: /\s*((\w+)\s*\s*\()?\s*((\w+)\s*\.)?\s*(\w+)\s*\)?\s*/i,
 
 	/**regex for matching expr like "field:sqlAlias"*/
 	alais: /field\s*:\s*\'(\w+)\'/i,
@@ -244,21 +264,21 @@ function Tag (debug) {
 	 * @param {string} t "b_articles, j:b_cate, l:b_author:a authorId=authorId and a.name like 'tom'"
 	 * @return {Array} [{tabl, t, on, as}], where t = main-table | j | r | l
 	 */
-	this.joins = function (t) {
+	this.joins = function (t, joins) {
 		var tss = t.split(','); // [t1, j:b_cates[:alais] cateId=cateId, ...]
 		var tabls = new Array();
 
 		for(var i = 0; i < tss.length; ++i) {
 			var m = regex.join.exec(tss[i]);
 			if(m) {
-				// var tAls = m[4];
-				// if(typeof m[4] == "undefined")
-				// 	tAls = "";
+				// [0] j:{@tb}:a a.x=b.y[1] j
+				// [2] {@  (undefined)	[3] tb		[4] } (undefined)
+				// [5] :a				[6] a		[7] a.x=b.y
 
 				// try match variable in ON condition
-				var oncond = m[5];
+				var oncond = m[7];
 				// mOnVar = x.y
-				var mOnVar = regex.onCondParm.exec(m[5]);
+				var mOnVar = regex.onCondParm.exec(m[7]);
 				if (mOnVar) {
 					// if there is variable in on condtion clause, replace with value
 					// No need to parse all logic condition to array
@@ -272,7 +292,7 @@ function Tag (debug) {
 					}
 					else {
 						if (this.debug) console.log('WARN - found parameter condition '
-								+ m[5] + ' in table joining, but no variable can be used to replace the variable.' )
+								+ m[7] + ' in table joining, but no variable can be used to replace the variable.' )
 						oncond = mOnVar[1] + "'" + mOnVar[2] + "'";
 					}
 					if (mOnVar.length > 2)
@@ -280,7 +300,19 @@ function Tag (debug) {
 				}
 
 				//tabls.push({"t": m[1], "tabl": m[2], "as": m[4], "on": m[5]});
-				tabls.push({"t": m[1], "tabl": m[2], "as": m[4], "on": oncond});
+				if (m[2] === '{@' && m[4] === '}') {
+					// sub select joining
+					if (joins === undefined || typeof joins[m[3]] !== 'object') {
+						console.error('You sepcified using sub query as joining table, but can not found the definition',
+										m, joins);
+					}
+					else {
+						var subselect = joins[m[3]];
+						tabls.push({"t": m[1], "tabl": subselect, "as": m[6], "on": oncond});
+					}
+				}
+				else
+					tabls.push({"t": m[1], "tabl": m[3], "as": m[6], "on": oncond});
 			}
 			else {
 				var mt = regex.maintbl.exec(tss[i]);
@@ -338,6 +370,15 @@ function Tag (debug) {
 			}
 		}
 		return orders;
+	};
+
+	this.groups = function(grpstr) {
+		if (typeof grpstr !== 'string')
+			return;
+
+		var grps = new Array();
+		var grpss = grpstr.split(',');
+		return grpss;
 	};
 
 	/**Match expr in "target" with regexAlais.
@@ -497,12 +538,12 @@ function EzHtml (J) {
 	 * @return {Array} [{t: "main-table/j/r/l", tabl: "table-1", as: "alais", on: cond-string}]<br>
 	 * where cond-string = "col1=col2"
 	 */
-	this.tabls = function (gridId) {
+	this.tabls = function (gridId, extJoins) {
 		var t = this.ir(gridId, ir.t);
 		if (t === undefined)
 			console.error("In jeasy api v1.0, pager's t is moved to list/grid/details-form's tag - must presented there.");
 		else
-			return tag.joins(t);
+			return tag.joins(t, extJoins);
 	}
 
 	/**Find th-expr definitons in easyui list/grid head.
@@ -655,6 +696,7 @@ function EzHtml (J) {
 	 * opts.oncheckAll: on check all function or function name<br>
 	 * opts.onerror: on error call back, merged with EasyMsger.error(m.fail)<br>
 	 * opts.onok: on ok call back, merged with EasyMsger.info(m.ok)<br>
+	 * opts.joins: UserReq | QueryReq, user defined sub-query used as joining table.
 	 * <b>note</b>: pk is not handled here
 	 * @return {Object} merged options
 	 */
@@ -670,7 +712,7 @@ function EzHtml (J) {
 			opts.t = tag.merge(opts.t, tagId, ir.t);
 			// try find maintable
 			if (typeof opts.maintabl !== 'string' && typeof opts.t === 'string') {
-				var tbls = tag.joins(opts.t);
+				var tbls = tag.joins(opts.t, opts.joins);
 				opts.maintabl = tbls[0].tabl;
 			}
 
@@ -679,6 +721,7 @@ function EzHtml (J) {
 			opts.query = tag.merge(opts.query, tagId, ir.query);
 			opts.root = tag.merge(opts.root, tagId, ir.root);
 			opts.orderby = tag.merge(opts.orderby, tagId, ir.orderby);
+			opts.groupby = tag.merge(opts.groupby, tagId, ir.groupby);
 
 			opts.select = tag.merge(opts.select, tagId, ir.select);
 			if (typeof opts.select === 'string') {
@@ -754,6 +797,69 @@ function EzHtml (J) {
 
 		return opts;
 	};
+
+	/** bind easy ui objects, replacing EzGrid.bindPage(), EzTree.bind().
+	 * @param {string} eztype, 'treegrid' | 'datagrid' | 'tree' | 'combotree'
+	 * @param {string} tagId
+	 * @param {object} opts. See EzHtml#opts(), in addition of
+	 * opts.style: addint style to easy object, e.g. height: 81px.
+	 * @return {any} any of the selected easyUI function returned, e.g. return of 'datagird()'
+	 */
+	this.ez = function (eztype, tagId, json, opts) {
+
+
+		var ezOpts = { data: json, }
+		jeasy.mainRow(tagId, undefined);
+		if (typeof opts === 'object')
+			// ezOpts = Object.assign(ezOpts, opts);
+			ezOpts = Object.assign(ezOpts, {
+				onSelect: function(ix, nn) {
+
+					if (typeof ix === 'number')
+						node = nn;
+					else if (typeof ix === 'object')
+						node = ix;
+					else console.error('TODO ............');
+
+					jeasy.mainRow(tagId, node);
+					if(typeof opts.onselect === "function")
+						opts.onselect(node)
+			},
+			onCheck: function(ix,nn){
+
+				if (typeof ix === 'number')
+						node = nn;
+					else if (typeof ix === 'object')
+						node = ix;
+					else console.error('TODO ............');
+
+					jeasy.mainRow(tagId, node);
+				if(typeof opts.oncheck === "function")
+						opts.oncheck(node)
+			},
+
+			onClick:function(ix,nn) {
+				if (typeof ix === 'number')
+						node = nn;
+					else if (typeof ix === 'object')
+						node = ix;
+					else console.error('TODO ............');
+
+				jeasy.mainRow(tagId, node);
+
+				if(typeof opts.onclick === "function")
+						opts.onclick(node)
+			},
+			onLoadSuccess: function(node, data) {
+				//jeasy.mainRow(tagId, node);
+				if(typeof opts.onload === "function")
+						opts.onload(node,data)
+			},
+			style: "height: 81px"
+			});
+
+		return $(regex.sharp_(tagId))[eztype](ezOpts);
+	};
 };
 const EasyHtml = new EzHtml(J);
 
@@ -811,6 +917,9 @@ function EzCbb (J) {
 				cbb.combobox('setValue', opts.select);
 			else if(typeof(opts.select) === "number")
 				cbb.combobox('setValue', opts.select);
+			//select is true,default first row
+			else if(opts.select === true)
+				cbb.combobox('setValue', rows[0].value);
 		});
 	};
 
@@ -957,37 +1066,14 @@ function EzTree(J) {
 	 */
 	this.bind = function (treeId, json, treeType, onClick, onSelect, onCheck, onLoad) {
 
-		if (treeId.substring(0, 1) != "#")
-			treeId = "#" + treeId;
-		var tree = $(treeId);
-		var ezOpts = {};
-		// g.datagrid(
-		ezOpts = {
-		data: json,
-		onSelect: function(node) {
-			jeasy.mainRow(treeId, node);
-			if(typeof onSelect === "function")
-				onSelect(node)
-		},
-		onCheck: function(node) {
-			jeasy.mainRow(treeId, node);
-			if(typeof onCheck === "function")
-				onCheck(node)
-		},
-		onClick: function(node) {
-			jeasy.mainRow(treeId, node);
-			if(typeof onClick === "function")
-				onClick(node)
-		},
-		onLoadSuccess: function(node, data) {
-			jeasy.mainRow(treeId, node);
-			if (typeof onLoad === "function")
-				onLoad(node, data);
-		},
-		style: "height: 81px"
+		var ezOpts = {
+			onclick:onClick,
+			onselect:onSelect,
+			oncheck:onCheck,
+			onload:onLoad
 		}
-
-			tree[treeType](ezOpts);
+		EasyHtml.ez(treeType, treeId, json, ezOpts);
+		EasyMsger.close();
 	};
 
 	/**Ask server (SemanticTree) travel throw sub-tree from rootId, re-organize fullpath.
@@ -1066,13 +1152,9 @@ function EzGrid (J) {
 			};
 			$(pagerId).pagination({
 				pageSize: opts.pagesize,
-				onSelectPage: this.onPage,
+				onSelectPage: opts.onchangepage==undefined?this.onPage:opts.onchangepage,
 			});
 		}
-
-		// TODO handle sqlArgs
-	 	// opts.args: arguments buffer where to find variables needed by sk sql <br>
-	 	// opts.sqlArgs: arguments directly provided and send back to server - needed by sk <br>
 
 		var req;
 		if (semantik !== undefined)
@@ -1083,7 +1165,7 @@ function EzGrid (J) {
 		else {
 			// try query.serv way
 			// TODO change to tag.joins(opts.t)
-			var tbls = EasyHtml.tabls(gridId);
+			var tbls = EasyHtml.tabls(gridId, opts.joins);
 			if (tbls !== undefined) {
 				// create a query request
 				var maint = tbls[0].tabl;
@@ -1109,6 +1191,11 @@ function EzGrid (J) {
 
 				// order by
 				q.orderbys(tag.orders(opts.orderby));
+
+				// group by
+				q.groupbys(tag.groups(opts.groupby));
+
+
 			}
 			else console.error('Grid can support both ir-grid or ir-t, but none of them can be found.', opts);
 		}
@@ -1121,7 +1208,7 @@ function EzGrid (J) {
 
 			var pgInf = EasyGrid.pageInfo[pagerId];
 			pgInf.total = total;
-			EasyGrid.bindPager(pagerId, total, pgInf.page, pgInf.size);
+			EasyGrid.bindPager(pagerId, total, pgInf.page, pgInf.size, opts.onpagechange);
 		}, EasyMsger.error);
 	};
 
@@ -1161,7 +1248,7 @@ function EzGrid (J) {
 		else {
 			// try query.serv way
 			// var tbls = opts.t;
-			var tbls = tag.joins(opts.t);
+			var tbls = tag.joins(opts.t, opts.joins);
 			// if (tbls === undefined || (typeof tbls === 'string' && tbls.trim().length < 2))
 			// 	tbls = EasyHtml.tabls(gridId);
 
@@ -1190,6 +1277,9 @@ function EzGrid (J) {
 
 				// order by
 				q.orderbys(tag.orders(opts.orderby));
+
+				// group by
+				q.groupbys(tag.groups(opts.groupby));
 			}
 			else console.error('Grid can support both ir-grid or ir-t, but none of them can be found.', opts);
 		}
@@ -1218,7 +1308,7 @@ function EzGrid (J) {
 		}
 
 		var req;
-		if (opts.treegrid !== undefined) {
+		if (opts.t == undefined && opts.treegrid !== undefined) {
 			// dataset way
 
 			// req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
@@ -1234,25 +1324,20 @@ function EzGrid (J) {
 		else {
 			// try query.serv way
 			// var tbls = opts.t;
-			var tbls = tag.joins(opts.t);
-			// if (tbls === undefined || (typeof tbls === 'string' && tbls.trim().length < 2))
-			// 	tbls = EasyHtml.tabls(gridId);
+			var tbls = tag.joins(opts.t, opts.joins);
 
 			if (tbls !== undefined) {
 				// create a query request
 				var maint = tbls[0].tabl;
 				var mainAlias = tbls[0].as;
-				// req = ssClient.query(null,	// let the server find connection
-				// 			maint,			// main table
-				// 			mainAlias,		// main alias
-				// 			this.pageInfo[gridId]); // this.pageInfo, saving page ix for consequent querying
-				// var q = req.body[0];
 
 				var q = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
 							jconsts.conn,		// connection id in connexts.xml
-							sk,					// sk in datast.xml
-							'sqltree')
-							.args(opts.sqlArgs);
+							opts.treegrid,      // sk in datast.xml
+							'',					// a()
+							opts.sqlArgs,
+							maint,              // main table - used when sk is null
+							mainAlias)          // main alias - used when sk is null
 
 				// all request are created as user reqs except query, update, insert, delete and 'ext' class like dataset.
 				// DatasetReq is used as message body for semantic tree.
@@ -1273,6 +1358,9 @@ function EzGrid (J) {
 				var wheres = EasyQueryForm.conds(opts.query, mainAlias);
 				// q.wheres("=", "u.userId", "'" + uid + "'");
 				q.whereCond(wheres);
+
+				// order by
+				q.orderbys(tag.orders(opts.orderby));
 			}
 			else console.error('Treegrid can support both ir-grid or ir-t, but none of them can be found.', opts);
 		}
@@ -1286,6 +1374,7 @@ function EzGrid (J) {
 					'treegrid',
 					opts.onclick,
 					opts.onselect,
+					opts.oncheck,
 					opts.onload);
 		}, EasyMsger.error);
 	}
@@ -1296,7 +1385,7 @@ function EzGrid (J) {
 	 * @param {int} page
 	 * @param {int} size
 	 */
-	this.bindPager = function (pagerId, total, page, size) {
+	this.bindPager = function (pagerId, total, page, size, onpagechange) {
 		// Design Notes: How to implement jeasy based on easyUI with keeping component design in mind?
 		if (jconsts.verbose >= 2) console.warn('Debug Notes (verbose 2):\n',
 			'If you see this error message from easyUI:\n',
@@ -1314,6 +1403,7 @@ function EzGrid (J) {
 			total: total,
 			pageNumber: page + 1,
 			pageSize: size,
+			'pagechange': onpagechange
 		});
 	};
 
@@ -1334,29 +1424,10 @@ function EzGrid (J) {
 	 * @param {boolean} ezTreegrid is treegrid?
 	 */
 	this.bindPage = function (gridId, json, total, opts, ezTreegrid) {
-		gridId = regex.sharp_(gridId);
-		var g = $(gridId);
-		jeasy.mainRow(gridId, undefined);
 
-		// g.datagrid(
-		var ezOpts = {
-			onSelect: function(ix, row) {
-				jeasy.mainRow(gridId, row);
-				if (opts.onselect)
-					opts.onselect(ix, row);
-			},
-			onCheck: function(ix, row) {
-				jeasy.mainRow(gridId, row);
-				if (opts.oncheck)
-					opts.oncheck(ix, row);
-			},
-			onUncheck: function(ix, row) {
-				jeasy.mainRow(gridId);
-				if (opts.oncheck)
-					opts.oncheck(ix, row);
-			} };
-
-		g.datagrid(ezOpts);
+		EasyHtml.ez('datagrid', gridId, json, opts);
+		EasyMsger.close();
+		return;
 
 		// FIXME this not correct!
 		// FIXME this not correct!
@@ -1499,16 +1570,25 @@ function EzQueryForm(J) {
 			var n = field.name.replace(/\s\s+/g, ' ');
 			var namess = n.split(' '); // table.column >/=
 
+			// is constant of expression? default: false. value will be quoted (as constants)
+	 		var asExpr = false;
+
 			if (namess.length < 2) {
 				console.log("WARN - name attr in form (id=irquery) must indicating logic operand: " + n);
 				return;
 			}
+			else if (namess.length === 3 && namess[2].trim().toLowerCase() === 'expr') {
+				asExpr = true;
+			}
 
-			// public static final int predicateOper = 0;
-			// public static final int predicateL = 1;
-			// public static final int predicateR = 2;
-			conds.push([namess[1].trim(), namess[0],
+			if (asExpr) {
+				conds.push([namess[1].trim(), namess[0],
+					field.value]);
+			}
+			else  {
+				conds.push([namess[1].trim(), namess[0],
 					"'" + field.value + "'"]);	// FIXME: what about \' ?
+			}
 		});
 		return conds;
 	}
@@ -1668,7 +1748,7 @@ function EzModal() {
 		modalId = regex.sharp_(modalId, ir.deflt.modalId);
 		opts = EasyHtml.opts(modalId, opts);
 		// find sql "from" clause
-		var joins = tag.joins(opts.t);
+		var joins = tag.joins(opts.t, opts.joins);
 
 		var mainAlias = joins[0].as;
 		var exprs = EasyHtml.formExprs(modalId, mainAlias);
@@ -1960,6 +2040,7 @@ function EzMsger() {
 
 		cheap_started: () => "Workflow Started.",
 		cheap_no_rights: () => "You don't have the command rights.",
+		cheap_competation: () => "Can't step to target nodes. Already exists?",
 	};
 };
 const EasyMsger = new EzMsger(J);

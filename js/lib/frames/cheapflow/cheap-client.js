@@ -9,7 +9,7 @@ const chpEnumReq = {
 	/** load workflow list */
 	load: "load",
 	/** load a node's commnads */
-	nodeCmds: 'node-cmds',
+	nodeCmds: 'nodeCmds',
 	TgetDef: "get-def",
 	findRoute: "findroute",
 	cmdsRight: "right",
@@ -27,6 +27,7 @@ const CheapCode = {
 	ok: 'ok',
 	err: 'wf_err',
 	err_rights: 'wf_err_rights',
+	err_competation: 'wf_err_competing',
 }
 
 ///////////////// io.odysz.sworkflow ///////////////////////////////////////////
