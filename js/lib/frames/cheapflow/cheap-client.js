@@ -56,6 +56,11 @@ class CheapReq {
 		return this;
 	}
 
+	cmd(c) {
+		this.cmd = c;
+		return this;
+	}
+
 	arg(n, v) {
 		if (v !== undefined) { // getting
 			if (this.cmdArgs === undefined)
@@ -112,14 +117,24 @@ class CheapReq {
 		return this.arg('instId', iid);
 	}
 
+	usrId (uid) {
+		return this.arg('usrId', uid);
+	}
+
+	/**Add a post update request to the transact batch operations
+	 * @param {UpdateReq | InsertReq} jbody post request
+	 * @return {CheapReq} this*/
 	post (jbody) {
+		// FIXME there is no such thing in CheapReq.java
 		if (this.childInserts === undefined || this.childInserts === null)
 			this.childInserts = [];
 		else this.childInserts.push(jbody);
 		return this;
 	}
 
+	// FIXME
 	childInsert (n, v) {
+		// FIXME call post() instead
 		this.childInserts[this.childInserts.length - 1].push([n, v]);
 		return this;
 	}

@@ -420,7 +420,7 @@ class UpdateReq {
 	}
 
 	/**Add post operation
-	 * @param {UserReq | UpdateReq | QueryReq} pst post request
+	 * @param {UpdateReq | InsertReq} pst post request
 	 * @return {UpdateReq} this */
 	post (pst) {
 		if (pst === undefined) {
