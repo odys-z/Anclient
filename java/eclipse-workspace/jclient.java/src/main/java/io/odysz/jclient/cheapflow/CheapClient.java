@@ -57,9 +57,10 @@ public class CheapClient {
 		CheapReq req = new CheapReq(null)
 				.req(Req.start).wftype(wfid)
 				.nodeDesc("Desc: bla")
-				.childTabl("task_details")
-				.newChildInstRow().childInsert("remarks", "client detail - 01")
-				.newChildInstRow().childInsert("remarks", "client detail - 02");
+				// .childTabl("task_details")
+				// .newChildInstRow().childInsert("remarks", "client detail - 01")
+				// .newChildInstRow().childInsert("remarks", "client detail - 02")
+				;
 
 		String t = Req.start.name();
 
