@@ -1,5 +1,7 @@
 package io.odysz.cheapflow;
 
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ import io.odysz.sworkflow.CheapEvent;
 import io.odysz.transact.x.TransException;
 
 class CheapClientTest {
-	static final String jserv = "http://localhost:8080/semantic.jserv";
+	static final String jserv = "http://localhost:8080/engcosts";
 
 	static final String wfId = "t01";
 	static final String cmdA = "t01.01.stepA";
@@ -37,42 +39,37 @@ class CheapClientTest {
     		CheapClient cheap = new CheapClient(ssc);
     		String[] act = JHeader.usrAct("CheapClient Test", "start", "cheap",
 				"test jclient.java starting wf " + wfId);
-    		cheap.start(wfId, act, (c, dat) -> {
-    			// fail("Not yet implemented");
-				try {
-					// concurrency 1: ask current rights
-					CheapEvent evt = new CheapEvent(dat);
-					cheap.rights(wfId, evt.taskId(), evt.currentNodeId(), "admin", (c0, dat0) -> {
-						((SemanticObject)dat0).print(System.out);
-					});
-
-					// TODO let's do after js
-					// TODO let's do after js
-					// TODO let's do after js
-					// TODO let's do after js
-					// TODO let's do after js
-					// TODO let's do after js
-					// TODO let's do after js
-					// TODO let's do after js
-					// TODO let's do after js
-					// TODO let's do after js
-					// concurrency 2: step the started task
-//					String[] atc = JHeader.usrAct("CheapClient Test", "step", "cheap",
-//							"test jclient.java stepping wf " + wfId);
-//					cheap.step(wfId, cmdA, atc, (c1, dt) -> {
-//					});
-    			
-					// concurrency 3, load flow
-					cheap.loadFlow(wfId, evt.taskId(), act, (c1, dat1) -> {
-						ArrayList<String[]> l = (ArrayList<String[]>) dat1.get("data");
-						for (String[] row : l) {
-							Utils.logi(row);
-						}
-					});
-				} catch (TransException e) {
-					e.printStackTrace();
-				}
-    		});
+    		cheap.start(wfId, act,
+    			(c, dat) -> {
+	    			// fail("Not yet implemented");
+					try {
+						// concurrency 1: ask current rights
+						CheapEvent evt = new CheapEvent(dat);
+						cheap.rights(wfId, evt.taskId(), evt.currentNodeId(), "admin", (c0, dat0) -> {
+							((SemanticObject)dat0).print(System.out);
+						});
+	
+						// concurrency 2: step the started task
+	//					String[] atc = JHeader.usrAct("CheapClient Test", "step", "cheap",
+	//							"test jclient.java stepping wf " + wfId);
+	//					cheap.step(wfId, cmdA, atc, (c1, dt) -> {
+	//					});
+	    			
+						// concurrency 3, load flow
+						cheap.loadFlow(wfId, evt.taskId(), act, (c1, dat1) -> {
+							ArrayList<String[]> l = (ArrayList<String[]>) dat1.get("data");
+							for (String[] row : l) {
+								Utils.logi(row);
+							}
+						});
+					} catch (TransException e) {
+						e.printStackTrace();
+					}
+	    		},
+    		(c, dat) -> {
+    				dat.print(System.err);
+    				fail(c + ": try use the db from semantic-workflow/test/res");
+    			});
     		
 //    		cheap.step(wfId, cmd3, act, (c, dt) -> {
 //    			
@@ -80,6 +77,7 @@ class CheapClientTest {
 
     	} catch (IOException io) {
     		Utils.warn("loging failed: %s", io.getMessage());
+    		fail(io.getMessage());
     	}
     }
 

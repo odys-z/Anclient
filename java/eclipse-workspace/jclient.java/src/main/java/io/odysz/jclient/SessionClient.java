@@ -10,12 +10,13 @@ import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
-import io.odysz.semantic.jprotocol.JMessage.MsgCode;
 import io.odysz.semantic.jprotocol.JMessage.Port;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
 import io.odysz.semantic.jserv.R.QueryReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
+
+import static io.odysz.jsample.cheap.CheapCode.*;
 
 public class SessionClient {
 
@@ -107,7 +108,7 @@ public class SessionClient {
   				(code, obj) -> {
   					JHelper.logi(obj);
   					SemanticObject o = (SemanticObject) obj.get("data");
-  					if (MsgCode.ok.eq(obj.getString("code"))) {
+  					if (isOk(obj.code())) {
   						onOk.onCallback(code, o);
   					}
   					else {

@@ -27,7 +27,7 @@ import io.odysz.semantics.x.SemanticException;
  * Unit test for simple App. 
  */
 public class SemantiClientTest {
-	private static final String jserv = "http://localhost:8080/semantic.jserv";
+	private static final String jserv = "http://localhost:8080/engcosts/semantic.jserv";
 
 	private SessionClient client;
 
@@ -58,13 +58,16 @@ public class SemantiClientTest {
    		Clients.init(jserv);
 
     	client = Clients.login("admin", "admin@admin");
-    	JMessage<QueryReq> req = client.query("inet", "a_user", "u", "test", -1, -1); // TODO test conn = null
-    	// select userName uname, userId uid, roleName role from a_user u join a_roles r on u.roleId = r.roleId where u.userId = 'admin'
+    	JMessage<QueryReq> req = client.query("inet",
+    			"a_user", "u", "test",
+    			-1, -1); // don't paging
+
     	req.body(0).expr("userName", "uname")
     				.expr("userId", "uid")
     				.expr("r.roleId", "role")
     				.j("a_roles", "r", "u.roleId = r.roleId")
     				.where("=", "u.userId", "'admin'");
+
     	client.commit(req, (code, data) -> {
     		  	@SuppressWarnings("unchecked")
 				List<SResultset> rses = (List<SResultset>) data.get("rs");

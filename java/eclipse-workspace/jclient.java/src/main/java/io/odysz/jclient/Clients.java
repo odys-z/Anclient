@@ -28,12 +28,10 @@ public class Clients<T extends JBody> {
 
 	/**Initialize configuration.
 	 * @param servRoot
-	 * @param connId
 	 */
-	public static void init(String servRoot, String... connId) {
+	public static void init(String servRoot) {
 		servRt = servRoot;
-		conn = connId == null || connId.length == 0 || connId[0] == null ?
-				null : connId[0];
+		conn = null; // client can't control engine connect. configured in workflow-meta.xml
 	}
 	
 	/**Login and return a client instance (with session managed by jserv).

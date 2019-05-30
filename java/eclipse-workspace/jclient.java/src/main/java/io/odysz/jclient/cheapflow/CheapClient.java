@@ -15,7 +15,7 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.sworkflow.EnginDesign.Req;
 
 public class CheapClient {
-	static final String jserv = "http://localhost:8080/semantic.jserv";
+//	static final String jserv = "http://localhost:8080/engcosts";
 
 	static final String wfId = "t01";
 	static final String cmdA = "t01.01.stepA";
@@ -53,7 +53,7 @@ public class CheapClient {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public void start(String wfid, String[] act, SCallback onOk) throws SemanticException, IOException, SQLException {
+	public void start(String wfid, String[] act, SCallback onOk, SCallback onErr) throws SemanticException, IOException, SQLException {
 		CheapReq req = new CheapReq(null)
 				.req(Req.start).wftype(wfid)
 				.nodeDesc("Desc: bla")
@@ -73,11 +73,12 @@ public class CheapClient {
 
 		ssclient.console(jmsg);
 		
-    	ssclient.commit(jmsg, (code, data) -> {
-			SemanticObject e = (SemanticObject) data.get("evt");
-			onOk.onCallback("ok", e);
-    	});
-
+    	ssclient.commit(jmsg,
+    		(code, data) -> {
+    			SemanticObject e = (SemanticObject) data.get("evt");
+    			onOk.onCallback("ok", e);
+    		},
+    		onErr);
 	}
 
 	/**Send a stepping command request to CheapServ.
