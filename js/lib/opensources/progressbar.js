@@ -1218,8 +1218,8 @@ var Tweenable = (function () {
 
   /**
    * @typedef {{
-   *   formatString: string
-   *   chunkNames: Array.<string>
+   *   formatString: string,
+   *   chunkNames: Array<string>
    * }}
    * @private
    */
