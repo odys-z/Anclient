@@ -206,6 +206,8 @@ const regex = {
 		if (ith !== undefined) { return ss[ith]; }
 		else { return ss; }
 	},
+
+	isblank: jvue.Jregex.isblank,
 };
 
 /**[Internal API] html tag's attribute parser.
@@ -406,7 +408,7 @@ function Tag (debug) {
 		if (window[vn] !== undefined)
 			return window[vn];
 		// vn is a variable in argPool
-		if (argPool !== undefined && argPool[vn])
+		if (argPool !== undefined && argPool[vn] !== undefined)
 			return argPool[vn];
 
 		// now vn must has at least one "."
@@ -806,15 +808,12 @@ function EzHtml (J) {
 	 * @return {any} any of the selected easyUI function returned, e.g. return of 'datagird()'
 	 */
 	this.ez = function (eztype, tagId, json, opts) {
-
-
 		var ezOpts = { data: json, }
 		jeasy.mainRow(tagId, undefined);
 		if (typeof opts === 'object')
 			// ezOpts = Object.assign(ezOpts, opts);
 			ezOpts = Object.assign(ezOpts, {
 				onSelect: function(ix, nn) {
-
 					if (typeof ix === 'number')
 						node = nn;
 					else if (typeof ix === 'object')
@@ -823,10 +822,9 @@ function EzHtml (J) {
 
 					jeasy.mainRow(tagId, node);
 					if(typeof opts.onselect === "function")
-						opts.onselect(node)
+						opts.onselect(ix, node)
 			},
-			onCheck: function(ix,nn){
-
+			onCheck: function(ix, nn){
 				if (typeof ix === 'number')
 						node = nn;
 					else if (typeof ix === 'object')
@@ -835,10 +833,10 @@ function EzHtml (J) {
 
 					jeasy.mainRow(tagId, node);
 				if(typeof opts.oncheck === "function")
-						opts.oncheck(node)
+						opts.oncheck(ix, node)
 			},
 
-			onClick:function(ix,nn) {
+			onClick:function(ix, nn) {
 				if (typeof ix === 'number')
 						node = nn;
 					else if (typeof ix === 'object')
@@ -848,12 +846,12 @@ function EzHtml (J) {
 				jeasy.mainRow(tagId, node);
 
 				if(typeof opts.onclick === "function")
-						opts.onclick(node)
+						opts.onclick(ix, node)
 			},
 			onLoadSuccess: function(node, data) {
 				//jeasy.mainRow(tagId, node);
 				if(typeof opts.onload === "function")
-						opts.onload(node,data)
+						opts.onload(node, data)
 			},
 			style: "height: 81px"
 			});

@@ -105,7 +105,7 @@ class J {
 		}
 		if (jreq.port === undefined || jreq.port == '') {
 			// TODO docs...
-			console.error('Port is null - you probably created a requesting JMessage with new [User/Query/...]Req().\n',
+			console.error('Port is null - you probably created a requesting JMessage with "new [User/Query/...]Req()".\n',
 				'Creating a new request message can mainly throught one of 2 way:\n',
 				'Way 1: Using a html/vue helper, like those in jeasy-html.js/EasyModal.save().\n',
 				'Way 2: Using a ssClient request API, e.g. ssClient.delete().',
