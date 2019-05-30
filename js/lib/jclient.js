@@ -2,13 +2,16 @@ import $ from 'jquery';
 import AES from './aes.js';
 import {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
 
-/**AES lib instance*/
+/**@modual jclient/core */
+
+/**@type {AES}  AES lib instance*/
 var aes;
 
 /**Jclient.js API
  * Java equivalent of
  * io.odysz.jclient.Clients;
  * io.odysz.jclient.SessionClient;
+ * @class
  */
 class J {
 	/**@param {string} serv serv path root, e.g. 'http://localhost/semantic-jserv'
