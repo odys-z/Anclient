@@ -1,11 +1,19 @@
-/**@module aes ricomoo aes wrapper
- * <h4>Design notes:</h4>
- * AES is just only one of crypto algorithms, so we need make this pluginized so
- * can be overriden by user. */
+/* ricomoo aes wrapper
+ * Design notes:
+ * AES is just only one of crypto algorithms, so we need make this pluginized so 
+ * can be overriden by user.
+ */
 import AESLib from './opensources/ricmoo-aes-2.js';
 
-/**
+/* The ricomoo AES Wrapper.
+ * The dependee class is ported from github/ricomoo, the original soruce file doesn't have any license declarations.
+ * @module jclient/js/aes */
+
+/**AES class 
  * @class
+ * @property {AESLib} aesLib the ricomoo/aes
+ * @protpery {function} encrypt
+ *
  */
 export default function AES () {
 	var verbose = false;
@@ -103,7 +111,10 @@ export default function AES () {
 	}
 }
 
-/**Test JS AES */
+/**
+ * @constructor
+ * Test JS AES 
+ * @class*/
 export function testAES() {
 	var aes = new AES();
 

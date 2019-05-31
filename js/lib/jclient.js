@@ -2,9 +2,14 @@ import $ from 'jquery';
 import AES from './aes.js';
 import {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
 
-/**@modual jclient/core */
+/**The lower API of jclient/js
+ * @module jclient/js/core
+ * */
 
-/**@type {AES}  AES lib instance*/
+/**
+ * AES instance
+ * @type {AES}
+ * */
 var aes;
 
 /**Jclient.js API
@@ -12,6 +17,11 @@ var aes;
  * io.odysz.jclient.Clients;
  * io.odysz.jclient.SessionClient;
  * @class
+ * @property cfg the configurations,<br>
+ * cfg.connId,<br>
+ * cfg.verbose,<br>
+ * cfg.defaultServ:<br>
+ * where defaultserv is the serv root, will be concated with port name for different poert.
  */
 class J {
 	/**@param {string} serv serv path root, e.g. 'http://localhost/semantic-jserv'
@@ -25,6 +35,10 @@ class J {
 		aes = new AES();
 	}
 
+    /**Get port url of the port.
+     * @param {string} port the port name
+     * @return the url
+     */
 	servUrl (port) {
 		// This is a common error in jeasy frame
 		if (port === undefined || port === null) {
@@ -50,13 +64,24 @@ class J {
 		return ulr;
 	}
 
+    /** initialize with url and default connection id
+     * @param {stirng} urlRoot root url
+     * @param {string} connId connection Id
+     * @retun {J} this */
 	init (urlRoot, connId) {
 		this.cfg.cconnId = connId;
 		this.cfg.defaultServ = urlRoot;
+        return this;
 	}
 
+    /** Understand the prots' name of the calling app's.<br>
+     * As jclient defined the basice ports, more ports extension shoould been understood by the API lib.
+     * This function must been callded to extned port's names.
+     * @param {string} new Ports
+     * @return {J} this */
 	understandPorts (newPorts) {
 		Object.assign(Protocol.Port, newPorts);
+        return this;
 	}
 
 	opts(options) {
@@ -67,6 +92,12 @@ class J {
 		return Protocol.Port[name];
 	}
 
+    /**Login to jserv
+     * @param {string} usrId
+     * @param {string} pswd
+     * @param {function} onLogin on login ok handler
+     * @param {function} on failed
+     */
 	login (usrId, pswd, onLogin, onError) {
 		// byte[] iv =   AESHelper.getRandom();
 		// String iv64 = AESHelper.encode64(iv);
@@ -95,12 +126,19 @@ class J {
 			onError);
 	}
 
+    /**Check Response form jserv
+     * @param {any} resp
+     */
 	static checkResponse(resp) {
 		if (typeof resp === "undefined" || resp === null || resp.length < 2)
 			return "err_NA";
 		else return false;
 	}
 
+    /**Post a request, using Ajax.
+     * @param {JMessage} jreq
+     * @param {function} onOk
+     * @param {function} onErr */
 	post (jreq, onOk, onErr) {
 		if (jreq === undefined) {
 			console.error('jreq is null');
@@ -151,6 +189,10 @@ class J {
 	}
 
 	// TODO moved to protocol.js?
+    /** Get the cols from jserv's rows (response from port returning SResultsets)
+     * @param {SemanticObject} resp
+     * @param {ix} the rs index
+     * @return {array} array of column names */
 	respCols(resp, ix) {
 		if (ix === null || ix === undefined )
 			ix = 0;
@@ -158,6 +200,10 @@ class J {
 			? resp.data.rs[ix][0] : [];
 	}
 
+    /** Get the rows from jserv's rows (response from port returning SResultsets)
+     * @param {SemanticObject} resp
+     * @param {ix} the rs index
+     * @return {array} array of rows */
 	respRows(resp, ix) {
 		if (ix === null || ix === undefined )
 			ix = 0;
@@ -165,6 +211,12 @@ class J {
 			? resp.data.rs[ix].slice(1) : [];
 	}
 
+    /** Get the objects from jserv's rows (response from port returning SResultsets)
+     * @param {SemanticObject} resp
+     * @param {ix} the rs index
+     * @param {int} len max length
+     * @return {array} array of objects<br>
+     * e.g [ [col1: cell1], ...] */
 	respObjs(resp, start, len) {
 		var cols = this.respCols(resp);
 
