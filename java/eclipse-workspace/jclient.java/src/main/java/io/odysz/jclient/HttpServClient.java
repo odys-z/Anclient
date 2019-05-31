@@ -67,7 +67,10 @@ public class HttpServClient {
 				throw new SemanticException("Error: server return null at %s ", url);
 
 			SemanticObject x = JHelper.readResp(con.getInputStream());
-			if (Clients.console) JHelper.logi(x);
+			if (Clients.console) {
+				Utils.printCaller(false);
+				JHelper.logi(x);
+			}
 
 			onResponse.onCallback(String.valueOf(x.get("code")), x);
 		}

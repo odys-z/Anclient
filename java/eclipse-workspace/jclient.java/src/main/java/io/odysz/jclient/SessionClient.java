@@ -106,7 +106,10 @@ public class SessionClient {
     	HttpServClient httpClient = new HttpServClient();
   		httpClient.post(Clients.servUrl(req.port()), req,
   				(code, obj) -> {
-  					JHelper.logi(obj);
+  					if(Clients.console) {
+  						Utils.printCaller(false);
+  						JHelper.logi(obj);
+  					}
   					SemanticObject o = (SemanticObject) obj.get("data");
   					if (isOk(obj.code())) {
   						onOk.onCallback(code, o);
