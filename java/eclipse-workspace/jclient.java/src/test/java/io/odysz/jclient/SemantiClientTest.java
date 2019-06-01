@@ -59,14 +59,14 @@ public class SemantiClientTest {
 
     	client = Clients.login("admin", "admin@admin");
     	JMessage<QueryReq> req = client.query("inet",
-    			"a_user", "u", "test",
+    			"a_user", "U", "test",
     			-1, -1); // don't paging
 
     	req.body(0).expr("userName", "uname")
     				.expr("userId", "uid")
-    				.expr("r.roleId", "role")
-    				.j("a_roles", "r", "u.roleId = r.roleId")
-    				.where("=", "u.userId", "'admin'");
+    				.expr("R.roleId", "role")
+    				.j("a_roles", "R", "U.roleId = R.roleId")
+    				.where("=", "U.userId", "'admin'");
 
     	client.commit(req, (code, data) -> {
     		  	@SuppressWarnings("unchecked")

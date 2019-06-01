@@ -10,6 +10,7 @@ import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
+import io.odysz.semantic.jserv.U.UpdateReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.sworkflow.EnginDesign.Req;
@@ -45,6 +46,8 @@ public class CheapClient {
 
 	/**Send a starting request to CheapServ.
 	 * @param wfid
+	 * @param instDescpt 
+	 * @param posts
 	 * @param act client action for logging user's finger print at server side, typically got with
 	 * <pre>JHeader.usrAct("CheapClient Test", "start", t,
 		"test jclient.java starting wf " + wfId);</pre>
@@ -53,11 +56,11 @@ public class CheapClient {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public void start(String wfid, String[] act, SCallback onOk, SCallback onErr) throws SemanticException, IOException, SQLException {
+	public void start(String wfid, String instDescpt, UpdateReq posts, String[] act, SCallback onOk, SCallback onErr) throws SemanticException, IOException, SQLException {
 		CheapReq req = new CheapReq(null)
 				.req(Req.start).wftype(wfid)
-				.nodeDesc("Desc: bla")
-				// .childTabl("task_details")
+				.nodeDesc(instDescpt)
+				.post(posts)
 				// .newChildInstRow().childInsert("remarks", "client detail - 01")
 				// .newChildInstRow().childInsert("remarks", "client detail - 02")
 				;
@@ -92,11 +95,14 @@ public class CheapClient {
 	 * @throws SemanticException
 	 * @throws IOException
 	 */
-	public void step(String wfid, String cmd, String[] act, SCallback onOk)
+	public void step(String wfid, String taskId, String cmd, String[] act, SCallback onOk)
 			throws SQLException, SemanticException, IOException {
 		CheapReq req = new CheapReq(null)
+				.wftype(wfid)
+				.req(Req.cmd)
 				.reqCmd(cmd)
-				.wftype(wfid);
+				.taskId(taskId)
+				;
 
 		String t = Req.cmd.name();
 

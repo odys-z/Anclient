@@ -22,7 +22,7 @@ public class Clients<T extends JBody> {
 	public static final boolean console = true;
 
 	public static String servRt;
-	/** DB connection ID. same in connects.xml/t/c/id at server side. */
+	/** DB connection ID. same in connects.xml/t/C/id at server side. */
 	private static String conn;
 
 

@@ -16,6 +16,8 @@ import io.odysz.jclient.cheapflow.CheapClient;
 import io.odysz.jsample.cheap.CheapCode;
 import io.odysz.module.rs.SResultset;
 import io.odysz.semantic.jprotocol.JHeader;
+import io.odysz.semantic.jprotocol.JProtocol.CRUD;
+import io.odysz.semantic.jserv.U.UpdateReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.sworkflow.CheapEvent;
@@ -37,10 +39,18 @@ class CheapClientTest {
     		String pswd = System.getProperty("pswd");
     		SessionClient ssc = Clients.login("admin", pswd);
     		
+    		UpdateReq newTaskDetail1 = UpdateReq
+    				.formatReq(null, null, "task_details", CRUD.C)
+    				.nv("remarks", "by java client 1")
+//    				.post(UpdateReq
+//    						.formatReq(null, null, "task_details", CRUD.C)
+//    						.nv("remarks", "by java client 2"))
+    				;
+
     		CheapClient cheap = new CheapClient(ssc);
     		String[] act = JHeader.usrAct("CheapClient Test", "start", "cheap",
 				"test jclient.java starting wf " + wfId);
-    		cheap.start(wfId, act,
+			cheap.start(wfId, "start", newTaskDetail1, act,
     			(c, dat) -> {
 	    			// fail("Not yet implemented");
 					try {
@@ -54,10 +64,30 @@ class CheapClientTest {
 						// concurrency 2: step the started task -> A
 						String[] atc = JHeader.usrAct("CheapClient Test", "step", "cheap",
 								"test t01.01 -> t01.02A ");
-						cheap.step(wfId, cmdA, atc, (c1, dt) -> {
+						cheap.step(wfId, evt.taskId(), cmdA, atc, (c1, dt) -> {
 							assertEquals(CheapCode.ok, c1);
+							try {
+								CheapEvent ev2 = new CheapEvent((SemanticObject)dt);
+								assertEquals("t01.02A", ev2.nextNodeId());
+							} catch (Exception e) {
+								e.printStackTrace();
+								fail(e.getMessage());
+							}
 						});
 	    			
+						atc = JHeader.usrAct("CheapClient Test", "step", "cheap",
+								"test t01.01 -> t01.02B ");
+						cheap.step(wfId, evt.taskId(), cmdB, atc, (c1, dt) -> {
+							assertEquals(CheapCode.ok, c1);
+							try {
+								CheapEvent ev2 = new CheapEvent((SemanticObject)dt);
+								assertEquals("t01.02B", ev2.nextNodeId());
+							} catch (Exception e) {
+								e.printStackTrace();
+								fail(e.getMessage());
+							}
+						});
+						
 						// concurrency 3, load flow
 						cheap.loadFlow(wfId, evt.taskId(), act, (c1, dat1) -> {
 							Utils.printCaller(false);
@@ -78,7 +108,7 @@ class CheapClientTest {
     				fail(c + ": try use the db from semantic-workflow/test/res");
     			});
     		
-//    		cheap.step(wfId, cmd3, act, (c, dt) -> {
+//    		cheap.step(wfId, cmd3, act, (C, dt) -> {
 //    			
 //    		});
 
