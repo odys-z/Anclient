@@ -16,8 +16,7 @@ import io.odysz.jclient.cheapflow.CheapClient;
 import io.odysz.jsample.cheap.CheapCode;
 import io.odysz.module.rs.SResultset;
 import io.odysz.semantic.jprotocol.JHeader;
-import io.odysz.semantic.jprotocol.JProtocol.CRUD;
-import io.odysz.semantic.jserv.U.UpdateReq;
+import io.odysz.semantic.jserv.U.InsertReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.sworkflow.CheapEvent;
@@ -39,13 +38,16 @@ class CheapClientTest {
     		String pswd = System.getProperty("pswd");
     		SessionClient ssc = Clients.login("admin", pswd);
     		
-    		UpdateReq newTaskDetail1 = UpdateReq
-    				.formatReq(null, null, "task_details", CRUD.C)
+    		// create 3 task details
+    		InsertReq newTaskDetail1 = (InsertReq) InsertReq
+    				.formatReq(null, null, "task_details")
     				.nv("remarks", "by java client 1")
-//    				.post(UpdateReq
-//    						.formatReq(null, null, "task_details", CRUD.C)
-//    						.nv("remarks", "by java client 2"))
-    				;
+    				.post(InsertReq
+    						.formatReq(null, null, "task_details")
+    						.nv("remarks", "by java client 2"))
+    				.post(InsertReq
+    						.formatReq(null, null, "task_details")
+    						.nv("remarks", "by java client 3"));
 
     		CheapClient cheap = new CheapClient(ssc);
     		String[] act = JHeader.usrAct("CheapClient Test", "start", "cheap",
