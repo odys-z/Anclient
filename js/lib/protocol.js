@@ -419,6 +419,20 @@ class UpdateReq {
 		return this.whereCond(logic, lop, Jregex.quote(rop));
 	}
 
+	/**Attach a file.
+	 * The u.serv will handle this in a default attachment table - configured in semantics
+	 * @param {string} fn file name (from the client locally)
+	 * @param {string} b64 base 64 encoded string
+	 * @return {UpdateReq} this
+	 */
+	attach(fn, b64) {
+		if (this.attacheds === undefined) {
+			this.attacheds = [];
+		}
+		this.attacheds.push({fn: fn, b64: b64});
+		return this;
+	}
+
 	/**Add post operation
 	 * @param {UpdateReq | InsertReq} pst post request
 	 * @return {UpdateReq} this */

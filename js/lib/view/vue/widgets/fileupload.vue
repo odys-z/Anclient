@@ -37,6 +37,7 @@
 		file_seq: 0,
 	}),
 	methods: {
+		/**Upload all files on click */
 		upload() {
 			for (let i = 0; i < this.files.length; i++) {
 				var f = this.files[i];
@@ -48,6 +49,9 @@
 			}
 		},
 
+		/**Remove a file on click.
+		 * @param {string} fileId file id
+		 */
 		remove(fileId) {
 			for (var ix = 0; ix < this.files.length; ix++) {
 				var finf = this.files[ix];

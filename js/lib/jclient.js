@@ -10,7 +10,7 @@ import {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, D
  * AES instance
  * @type {AES}
  * */
-var aes;
+const aes = new AES();
 
 /**Jclient.js API
  * Java equivalent of
@@ -32,7 +32,7 @@ class J {
 			verbose: true,
 			defaultServ: urlRoot,
 		}
-		aes = new AES();
+		// aes = new AES();
 	}
 
     /**Get port url of the port.
@@ -452,4 +452,4 @@ class Inseclient {
 
 export * from './protocol.js';
 export * from './frames/cheapflow/cheap-client.js';
-export {J, SessionClient, Inseclient};
+export {J, SessionClient, Inseclient, aes};
