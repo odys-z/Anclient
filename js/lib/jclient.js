@@ -296,6 +296,26 @@ class SessionClient {
 
 	get userInfo() { return this.ssInf; }
 
+	/**Get a header the jserv can verify successfully.
+	 * This method is not recommended used directly.
+	 * @param {Object} act user's action for logging<br>
+	 * {func, cate, cmd, remarks};
+	 * @return the logged in header */
+	getHeader(act) {
+		var header = Protocol.formatHeader(this.ssInf);
+		if (typeof act === 'object') {
+			header.userAct(act);
+		}
+		else {
+			header.userAct(
+				{func: 'ext',
+				 cmd: 'unknow',
+				 cate: 'ext',
+				 remarks: 'raw header'} );
+		}
+		return header;
+	}
+
 	/**Post the request message (JMessage with body of subclass of JBody).
 	 * @param {JMessage} jmsg request message
 	 * @param {function} onOk
@@ -319,16 +339,29 @@ class SessionClient {
 	 */
 	query(conn, maintbl, alias, pageInf, act) {
 		var qryItem = new QueryReq(conn, maintbl, alias, pageInf);
+
 		var header = Protocol.formatHeader(this.ssInf);
+		// if (typeof act === 'object') {
+		// 	header.act = act;
+		// 	this.usrAct(act.func, act.cate, act.cmd, act.remarks);
+		// }
+		// else
+		// 	header.userAct({func: 'query',
+		// 				cmd: 'select',
+		// 				cate: 'r',
+		// 				remarks: 'session query.serv'});
 		if (typeof act === 'object') {
-			header.act = act;
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}
-		else
-			header.userAct({func: 'query',
-						cmd: 'select',
-						cate: 'r',
-						remarks: 'session query.serv'});
+		else {
+			act = { func: 'query',
+					cmd: 'select',
+					cate: 'r',
+					remarks: 'session query'};
+		}
+
+		var header = this.getHeader(act);
+
 		var jreq = new JMessage(Protocol.Port.query, header, qryItem);
 		return jreq;
 	}

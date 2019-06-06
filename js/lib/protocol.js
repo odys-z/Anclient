@@ -183,11 +183,11 @@ class JHeader {
 	}
 
 	/**Set user action (for DB log on DB transaction)
-	 * @param {object} act {funcId, remarks, cate, cmd}
+	 * @param {object} act {funcId(tolerate func), remarks, cate, cmd}
 	 */
 	userAct (act) {
 		this.usrAct = [];
-		this.usrAct.push(act.funcId);
+		this.usrAct.push(act.func === undefined ? act.funcId : act.func);
 		this.usrAct.push(act.cate);
 		this.usrAct.push(act.cmd);
 		this.usrAct.push(act.remarks);
@@ -419,6 +419,10 @@ class UpdateReq {
 		return this.whereCond(logic, lop, Jregex.quote(rop));
 	}
 
+	whereEq (lcol, rconst) {
+		where_("=", lcol, rconst);
+	}
+	
 	/**Attach a file.
 	 * The u.serv will handle this in a default attachment table - configured in semantics
 	 * @param {string} fn file name (from the client locally)
