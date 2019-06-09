@@ -422,7 +422,7 @@ class UpdateReq {
 	whereEq (lcol, rconst) {
 		where_("=", lcol, rconst);
 	}
-	
+
 	/**Attach a file.
 	 * The u.serv will handle this in a default attachment table - configured in semantics
 	 * @param {string} fn file name (from the client locally)
@@ -481,6 +481,7 @@ class InsertReq extends UpdateReq {
 			this.cols = this.cols.concat(cols);
 		}
 		else this.cols.push(cols);
+		return this;
 	}
 
 	/**Override Update.nv() - insert is using valus() for nvss.
@@ -488,7 +489,7 @@ class InsertReq extends UpdateReq {
 	 * @param {string} v
 	 * @return {InsertReq} this*/
 	nv (n, v) {
-		this.valus(n, v);
+		return this.valus(n, v);
 	}
 
 	/**Set inserting value(s).
@@ -544,6 +545,7 @@ class InsertReq extends UpdateReq {
 				this.valus(rows[ix]);
 			}
 		}
+		return this;
 	}
 }
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
