@@ -420,7 +420,7 @@ class UpdateReq {
 	}
 
 	whereEq (lcol, rconst) {
-		where_("=", lcol, rconst);
+		return this.where_("=", lcol, rconst);
 	}
 
 	/**Attach a file.
