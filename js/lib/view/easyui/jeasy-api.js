@@ -176,6 +176,7 @@ function jeasyAPI (J, log) {
 	 * @return {UpdateReq} with a = <i>crud</i>
 	 */
 	this.postBody = function (crud, opts) {
+		
 		if (crud === jeasy.c) {
 			var ins = new jvue.InsertReq(null, opts.t);
 			ins.a = crud;
@@ -188,9 +189,10 @@ function jeasyAPI (J, log) {
 			return ins;
 		}
 		else {
+			
 			var upd = new jvue.UpdateReq(null, opts.t, opts.pk);
 			upd.a = crud;
-			upd.nv(opts.nvs)
+			upd.nv(opts.nvs);
 			return upd;
 		}
 	}

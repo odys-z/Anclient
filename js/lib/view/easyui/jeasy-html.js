@@ -207,6 +207,9 @@ const regex = {
 		else { return ss; }
 	},
 
+	/** t.col won't match */
+	col_without_tbl: /^\s*(\w+)\s*$/i,
+
 	isblank: jvue.Jregex.isblank,
 };
 
@@ -487,6 +490,15 @@ function Tag (debug) {
 		return args;
 	};
 
+	/** Does the col name (ir-expr) don't have an alias ?
+	 * @param {string} tblCol
+	 * @return {boolean} true: yes, has an alias or table name.*/
+	this.colHasTblAlias = function(tblCol) {
+		if (regex.col_without_tbl.exec(tblCol))
+			return false;
+		else return true;
+	};
+
 	/** Parse String like "ds.sql-key arg1, {@obj.var1}, arg2, ..."
 	 * @param {string} irselect e.g. "roleId: {@roleId}, ...", or "roleId: {@role.roleId}"
 	 * @param {Object} argBuff e.g. {roleId: 'aaa'}
@@ -596,11 +608,17 @@ function EzHtml (J) {
 						undefined : this.attributes[ir.expr].value;
 			if (expr === undefined)
 				expr = as;
-			if (defltTabl)
-				// FIXME why thExprs() don't need a table alias?
-				exprs.push({exp: defltTabl + "." + expr, as: as});
-			else
+			if (defltTabl) {
+				if (tag.colHasTblAlias(expr)) {
+					exprs.push({exp: expr, as: as});
+				}
+				else {
+					exprs.push({exp: defltTabl + "." + expr, as: as});
+				}
+			}
+			else {
 				exprs.push({exp: expr, as: as});
+			}
 		} );
 		return exprs;
 	};
@@ -1294,7 +1312,7 @@ function EzGrid (J) {
 	this.treegrid = function (gridId, opts) {
 		gridId = regex.sharp_(gridId, ir.deflt.gridId);
 		opts = EasyHtml.opts(gridId, opts);
-
+		console.log(opts);
 		// Remember some variabl for later calling onPage()
 		if (this.pageInfo[gridId] === undefined) {
 			this.pageInfo[gridId] = {
@@ -1335,7 +1353,11 @@ function EzGrid (J) {
 							'',					// a()
 							opts.sqlArgs,
 							maint,              // main table - used when sk is null
-							mainAlias)          // main alias - used when sk is null
+							mainAlias) ;
+					console.log(this.pageInfo[gridId].page);
+					// debug ?
+					//q.page(20,0);
+							// main alias - used when sk is null
 
 				// all request are created as user reqs except query, update, insert, delete and 'ext' class like dataset.
 				// DatasetReq is used as message body for semantic tree.
@@ -1365,7 +1387,13 @@ function EzGrid (J) {
 		// post request, handle response
 		EasyMsger.progress();
 		ssClient.commit(req, function(resp) {
+			//EasyGrid.bindPage (gridId, rows, total, opts);
 			console.log(resp);
+
+			//console.log(jeasy.rows(resp));
+			//console.log(jeasy.total(resp, 0));
+
+
 			EasyMsger.close();
 			EasyTree.bind(gridId,	// id
 					resp.data,		// forest,
@@ -1504,10 +1532,21 @@ function EzGrid (J) {
 			return;
 		}
 
-		var pkv = rw[opts.pk];
-		var rq = ssClient.delete(opts.conn, opts.maintabl,
-			{pk: opts.pk, v: pkv}, opts.posts);
-		ssClient.commit(rq, opts.onok, opts.onerror);
+		$.messager.confirm('删除', '确定删除吗?', function(r){
+
+    		if (r){
+
+		    	var pkv = rw[opts.pk];
+				var rq = ssClient.delete(opts.conn, opts.maintabl,
+					{pk: opts.pk, v: pkv}, opts.posts);
+				ssClient.commit(rq, opts.onok, opts.onerror);
+	    	}
+   	 });
+
+//		var pkv = rw[opts.pk];
+//		var rq = ssClient.delete(opts.conn, opts.maintabl,
+//					{pk: opts.pk, v: pkv}, opts.posts);
+//		ssClient.commit(rq, opts.onok, opts.onerror);
 	};
 };
 const EasyGrid = new EzGrid(J);
@@ -1515,6 +1554,7 @@ const EasyGrid = new EzGrid(J);
 ////////////////////////  Easy API for Basic CRUD   ////////////////////////////
 //
 function EzQueryForm(J) {
+	//bug easyui <input>  id ? success:faliure.
 	this.load = function(formId) {
 		// 1. load ir-combobox
 		$(formId + " ["+ ir.combobox + "]").each(function(key, domval) {
@@ -1862,12 +1902,20 @@ function EzModal() {
 					// EasyGird.datagrid(this.id, {select: v, onselect: onChange});
 					EasyGird.datagrid(this.id, opts);
 				}
-				// case 7: bind text input - should this moved to the first?
-				else if  (this.nodeName!="TEXTAREA"&&this.classList && (this.classList.contains('easyui-textbox') || this.classList.contains('textbox')))
+				// case 7: bind img to base64 string
+				// https://stackoverflow.com/questions/20756042/javascript-how-to-display-image-from-byte-array-using-javascript-or-servlet
+				else if (this.nodeName == 'IMG') {
+					// $(regex.sharp_(this.id)).attr('src', `data:image/png;base64,${v}`)
+					$(this).attr('src', `data:image/png;base64,${v}`)
+				}
+				// case x: bind text input - should this moved to the first?
+				else if (this.nodeName != 'TEXTAREA' && this.classList
+						&& (this.classList.contains('easyui-textbox') || this.classList.contains('textbox'))) {
 					$(regex.sharp_(this.id)).textbox({value: v});
-				else{
-				     if(v !== undefined && v!== null && v.trim().length > 0)
-				       this.value = v;
+				}
+				else {
+					if(v !== undefined && v!== null && v.trim().length > 0)
+						this.value = v;
 				}
 			}
 		});
