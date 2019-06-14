@@ -401,6 +401,14 @@ class UpdateReq {
 		return this;
 	}
 
+	/**Take exp as an expression
+	 * @param {string} n
+	 * @param {string} exp the expression string like "3 * 2"
+	 * @return {InsertReq} this*/
+	nExpr (n, exp) {
+		return this.nv(n, {exp});
+	}
+
 	whereCond (logic, loper, roper) {
 		if (Array.isArray(logic))
 			this.where = this.where.concat(logic);
@@ -490,6 +498,14 @@ class InsertReq extends UpdateReq {
 	 * @return {InsertReq} this*/
 	nv (n, v) {
 		return this.valus(n, v);
+	}
+
+	/**Take exp as an expression
+	 * @param {string} n
+	 * @param {string} exp the expression string like "3 * 2"
+	 * @return {InsertReq} this*/
+	nExpr(n, exp) {
+		return this.nv(n, {exp});
 	}
 
 	/**Set inserting value(s).
