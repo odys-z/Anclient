@@ -1906,7 +1906,9 @@ function EzModal() {
 				// https://stackoverflow.com/questions/20756042/javascript-how-to-display-image-from-byte-array-using-javascript-or-servlet
 				else if (this.nodeName == 'IMG') {
 					// $(regex.sharp_(this.id)).attr('src', `data:image/png;base64,${v}`)
-					$(this).attr('src', `data:image/png;base64,${v}`)
+					if (!regex.isblank(v)) {
+						$(this).attr('src', `data:image/png;base64,${v}`)
+					}
 				}
 				// case x: bind text input - should this moved to the first?
 				else if (this.nodeName != 'TEXTAREA' && this.classList
