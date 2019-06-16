@@ -1,18 +1,23 @@
 
 /* */
 
-function CheapClient (ssclient, cheaport) {
-	this.connId = null;
+// import $ from 'jquery';
+// import {Protocol, JMessage, JHeader, QueryReq, UserReq} from '../../protocol.js';
+import {CheapReq, chpEnumReq, CheapCode} from 'cheap-req.js'
 
-	if (typeof cheaport === 'string')
-		this.cheaport = cheaport;
-	else this.cheaport = jvue.CheapReq.port;
+class CheapClient {
+	constructor (ssclient, cheaport) {
+		this.connId = null;
 
-	this.jclient = ssclient;
-	this.cheapReq = jvue.chpEnumReq;
+		if (typeof cheaport === 'string')
+			this.cheaport = cheaport;
+		else this.cheaport = CheapReq.port;
 
-	this.conn = function (conn) {
-		this.connId = conn;
+		this.jclient = ssclient;
+		this.cheapReq = chpEnumReq;
+
+		this.conn = function (conn) {
+			this.connId = conn;
 	};
 
 	/**Load a task's workflow nodes joined with instances.
@@ -20,9 +25,9 @@ function CheapClient (ssclient, cheaport) {
 	 * @param {object} opts<br>
 	 * opts.taskId: task id<br>
 	 */
-	this.loadFlow = function (wfId, opts) {
+	loadFlow (wfId, opts) {
 		// this.cmdArgs = [wfId, taskId];
-		var cheapReq = new jvue.CheapReq(wfId)
+		var cheapReq = new CheapReq(wfId)
 						.a(this.cheapReq.load)
 						.taskId(opts.taskId);
 		var jmsg = this.jclient.userReq(this.connId, engports.cheapflow, cheapReq);
@@ -41,14 +46,14 @@ function CheapClient (ssclient, cheaport) {
 	 * opts.nodeId: node Id<br>
 	 * opts.usrId: user Id<br>
 	 */
-	this.loadCmds = function (wfId, opts) {
+	loadCmds (wfId, opts) {
 		if (typeof wfId !== 'string' || typeof opts.nodeId !== 'string') {
 			console.error('Parameters invalid: wfId, opts.nodeId',
 				wfId, opts);
 			return;
 		}
 
-		var cheapReq = new jvue.CheapReq(wfId)
+		var cheapReq = new CheapReq(wfId)
 						.a(this.cheapReq.nodeCmds)
 						.nodeId(opts.nodeId)
 						.usrId(opts.usrId)
@@ -69,14 +74,14 @@ function CheapClient (ssclient, cheaport) {
 	 * opts.onok {function}: on ok callback<br>
 	 * @return {CheapClient} this
 	 */
-	this.start = function (cheapReq, opts) {
+	start (cheapReq, opts) {
 		cheapReq.a(this.cheapReq.start)	// this.cheapReq is the req enum
 				.taskId(opts.taskId)
 		var jmsg = this.jclient.userReq(this.connId, engports.cheapflow, cheapReq);
 		this.jclient.commit(jmsg, opts.onok, function (c, d) {
 			if (typeof opts.onerror === 'function')
 				opts.onerror(c, d);
-			else if (c === jvue.CheapCode.err_rights)
+			else if (c === CheapCode.err_rights)
 				EasyMsger.alert(EasyMsger.m.cheap_no_rights);
 			else
 				EasyMsger.error(c, d);
@@ -84,14 +89,14 @@ function CheapClient (ssclient, cheaport) {
 		return this;
 	}
 
-	this.step = function (cheapBody, opts) {
+	step (cheapBody, opts) {
 		cheapBody.a(this.cheapReq.cmd);
 		var jmsg = this.jclient.userReq(this.connId, engports.cheapflow, cheapBody);
 		this.jclient.commit(jmsg, opts.onok, opts.onerror);
 	}
 
-	this.rights = function (wfid, taskId, currentNodeId, usrId, opts) {
-		var req = new jvue.CheapReq(this.jclient, this.cheaport)
+	rights (wfid, taskId, currentNodeId, usrId, opts) {
+		var req = new CheapReq(this.jclient, this.cheaport)
 						.a(this.cheapReq.load)
 						.arg('wfId', wfid)
 						.arg('taskId', taskId)
@@ -100,3 +105,5 @@ function CheapClient (ssclient, cheaport) {
 		this.jclient.commit(req, opts.onok);
 	}
 }
+
+export {CheapClient};

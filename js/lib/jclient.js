@@ -484,5 +484,6 @@ class Inseclient {
 }
 
 export * from './protocol.js';
+export * from './frames/cheapflow/cheap-req.js';
 export * from './frames/cheapflow/cheap-client.js';
 export {J, SessionClient, Inseclient, aes};

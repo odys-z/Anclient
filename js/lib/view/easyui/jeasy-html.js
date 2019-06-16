@@ -999,9 +999,6 @@ function EzTree(J) {
 			tree.combotree({
 				data: resp.data,
 				multiple: opts.multi !== undefined && opts.multi !== null && opts.multi === true,
-//				onSelect: typeof onChangef === "function" ? onChangef : function(e) {
-//					if (jeasy.log) console.log(e);
-//				}
 				onSelect: typeof opts.onselect === "function" ? opts.onselect : function(e) {
 					if (jeasy.log) console.log(e);
 				},
@@ -1081,7 +1078,6 @@ function EzTree(J) {
 	 * @param {function} onLoad on binding success callback
 	 */
 	this.bind = function (treeId, json, treeType, onClick, onSelect, onCheck, onLoad) {
-
 		var ezOpts = {
 			onclick:onClick,
 			onselect:onSelect,
