@@ -8,8 +8,8 @@ import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import io.odysz.common.Utils;
 import io.odysz.jsample.protocol.Samport;
@@ -27,26 +27,26 @@ import io.odysz.semantics.x.SemanticException;
  * Unit test for simple App. 
  */
 public class SemantiClientTest {
-	private static final String jserv = "http://localhost:8080/engcosts/semantic.jserv";
-
+	private static String jserv = null;
+	private static String pswd = null;
+	
 	private SessionClient client;
 
 	@BeforeAll
-	public void init() {
+	public static void init() {
 		Utils.printCaller(false);
-	}
-   
-    @Test
-    public void SemanticLoginTest() throws IOException,
-    		SemanticException, SQLException, GeneralSecurityException {
-    	try {
-    		// Clients.init("http://localhost:8080/jserv-sample");
-    		Clients.init(jserv);
-    		String pswd = System.getProperty("pswd");
-    		Clients.login("admin", pswd);
-    	} catch (IOException io) {
-    		Utils.warn("loging failed: %s", io.getMessage());
-    	}
+		jserv = System.getProperty("jserv");
+		if (jserv == null)
+			fail("\nTo test SemantiClient, you need start a jsample server and define @jserv like this to run test:\n" +
+				"-Djserv=http://localhost:8080/doc-base\n" +
+				"In Eclipse, it is defined in:\n" +
+				"Run -> Debug Configurations ... -> Junit [your test case name] -> Arguments");
+   		pswd = System.getProperty("pswd");
+   		if (pswd == null)
+			fail("\nTo test SemantiClient, you need configure a user and it's password at jsample server, then define @pswd like this to run test:\n" +
+				"-Dpswd=*******");
+
+    	Clients.init(jserv);
     }
 
     @Test
@@ -55,18 +55,17 @@ public class SemantiClientTest {
     	Utils.printCaller(false);
     	JHelper.printCaller(false);
 
-   		Clients.init(jserv);
-
-    	client = Clients.login("admin", "admin@admin");
+    	client = Clients.login("admin", pswd);
     	JMessage<QueryReq> req = client.query("inet",
-    			"a_user", "U", "test",
+    			"a_user", "u", "test",
     			-1, -1); // don't paging
 
-    	req.body(0).expr("userName", "uname")
-    				.expr("userId", "uid")
-    				.expr("R.roleId", "role")
-    				.j("a_roles", "R", "U.roleId = R.roleId")
-    				.where("=", "U.userId", "'admin'");
+    	req.body(0)
+    		.expr("userName", "uname")
+    		.expr("userId", "uid")
+    		.expr("r.roleId", "role")
+    		.j("a_roles", "r", "u.roleId = r.roleId")
+    		.where("=", "u.userId", "'admin'");
 
     	client.commit(req, (code, data) -> {
     		  	@SuppressWarnings("unchecked")

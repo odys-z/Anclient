@@ -46,7 +46,7 @@ public class SessionClient {
 		JMessage<QueryReq> req = new JMessage<QueryReq>(Port.query);
 		req.t = t;
 
-		JHeader header = new JHeader(funcId, ssInf.getString("uid"));
+		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
 		JHeader.usrAct(funcId, "query", t, "R");
 		req.header(header);
 
