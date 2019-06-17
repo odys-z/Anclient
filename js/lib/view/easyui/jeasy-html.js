@@ -1078,6 +1078,7 @@ function EzTree(J) {
 	 * @param {function} onLoad on binding success callback
 	 */
 	this.bind = function (treeId, json, treeType, onClick, onSelect, onCheck, onLoad) {
+
 		var ezOpts = {
 			onclick:onClick,
 			onselect:onSelect,
@@ -1385,10 +1386,6 @@ function EzGrid (J) {
 		ssClient.commit(req, function(resp) {
 			//EasyGrid.bindPage (gridId, rows, total, opts);
 			console.log(resp);
-
-			//console.log(jeasy.rows(resp));
-			//console.log(jeasy.total(resp, 0));
-
 
 			EasyMsger.close();
 			EasyTree.bind(gridId,	// id
