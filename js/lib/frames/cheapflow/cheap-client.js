@@ -3,7 +3,7 @@
 
 // import $ from 'jquery';
 // import {Protocol, JMessage, JHeader, QueryReq, UserReq} from '../../protocol.js';
-import {CheapReq, chpEnumReq, CheapCode} from 'cheap-req.js'
+import {CheapReq, chpEnumReq, CheapCode} from './cheap-req.js'
 
 class CheapClient {
 	constructor (ssclient, cheaport) {
@@ -18,7 +18,8 @@ class CheapClient {
 
 		this.conn = function (conn) {
 			this.connId = conn;
-	};
+		}
+	}
 
 	/**Load a task's workflow nodes joined with instances.
 	 * @param {string} wfId
