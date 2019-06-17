@@ -7,6 +7,8 @@ class Protocol {
 				Protocol.valOptions.noNull = options.noNull === true || options.noNull === 'true';
 			if (options.noBoolean !== undefined)
 				Protocol.valOptions.noBoolean = options.noBoolean === true || options.noBoolean === 'true';
+
+			Protocol.valOptions = Object.assign(Protocol.valOptions, options);
 		}
 	}
 
