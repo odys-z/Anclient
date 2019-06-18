@@ -70,8 +70,11 @@ class CheapReq {
 		}
 	}
 
-	nodeDesc (descpt) {
-		this.ndescpt = descpt;
+	/**Add descriptiong to node instance (e.g. task_nodes.descpt)
+	 * @param {string} descript descriptions
+	 * @return {CheapReq} this*/
+	instDesc (descpt) {
+		this.instDescpt = descpt;
 		return this;
 	}
 
@@ -112,14 +115,37 @@ class CheapReq {
 		return this.arg('usrId', uid);
 	}
 
-	/**Add a post update request to the transact batch operations
-	 * @param {UpdateReq | InsertReq} jbody post request
-	 * @return {CheapReq} this*/
-	post (jbody) {
-		// FIXME there is no such thing in CheapReq.java
-		if (this.childInserts === undefined || this.childInserts === null)
-			this.childInserts = [];
-		else this.childInserts.push(jbody);
+	// /**Add a post update request to the transact batch operations
+	//  * @param {UpdateReq | InsertReq} jbody post request
+	//  * @return {CheapReq} this*/
+	// post (jbody) {
+	// 	// FIXME there is no such thing in CheapReq.java
+	// 	if (this.childInserts === undefined || this.childInserts === null)
+	// 		this.childInserts = [];
+	// 	else this.childInserts.push(jbody);
+	// 	return this;
+	// }
+
+	/**Add post operation
+	 * @param {UpdateReq | InsertReq} pst post request
+	 * @return {UpdateReq} this */
+	post (pst) {
+		if (pst === undefined) {
+			console.warn('You really wanna an undefined post operation?');
+			return this;
+		}
+		else if (typeof pst.version === 'string' && typeof pst.seq === 'number')
+			console.warn('You pobably adding a JMessage as post operation? It should only be JBody(s).');
+
+		if (this.postUpds === undefined) {
+			this.postUpds = [];
+		}
+		if (Array.isArray(pst)) {
+			this.postUpds = this.postUpds.concat(pst);
+		}
+		else {
+			this.postUpds.push(pst);
+		}
 		return this;
 	}
 
