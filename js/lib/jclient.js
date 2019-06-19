@@ -108,6 +108,7 @@ class J {
 		var c = aes.encrypt(usrId, pswd, iv);
 		// var qobj = formatLogin(logId, c, bytesToB64(iv));
 		var req = Protocol.formatSessionLogin(usrId, c, aes.bytesToB64(iv));
+
 		var J = this;
 
 		this.post(req,
@@ -314,6 +315,36 @@ class SessionClient {
 				 remarks: 'raw header'} );
 		}
 		return header;
+	}
+
+	setPswd(oldPswd, newPswd, opts) {
+		var usrId = this.ssInf.uid;
+		var iv_tok = aes.getIv128();
+		var iv_new = aes.getIv128();
+		var iv_old = aes.getIv128();
+
+		// var tk = aes.encrypt(usrId, pswd, iv_tok);
+		var tk = this.ssInf.ssid;
+		var key = this.ssInf.ssid; // FIXME
+
+		var newPswd = aes.encrypt(newPswd, key, iv_new);
+		var oldPswd = aes.encrypt(oldPswd, key, iv_old);
+
+		var body = new SessionReq(usrId,
+			tk, aes.bytesToB64(iv_tok)) //  tk and iv_tok shouldn't bee used
+				.a('pswd')
+				.md('pswd', newPswd)
+				.md('iv_pswd', aes.bytesToB64(iv_new))
+				.md('oldpswd', oldPswd)
+				.md('iv_old', aes.bytesToB64(iv_old));
+		var jmsg = new JMessage(Protocol.Port.session, this.getHeader(), body);
+
+		if (opts === undefined) {
+			opts = {};
+		}
+
+		this.J.post(jmsg, opts.onok, opts.onerror);
+		return this;
 	}
 
 	/**Post the request message (JMessage with body of subclass of JBody).

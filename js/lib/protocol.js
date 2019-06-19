@@ -228,6 +228,22 @@ class SessionReq {
 		this.token = token;
 		this.iv = iv;
 	}
+
+	/**set a.<br>
+	 * a() can only been called once.
+	 * @param {string} a
+	 * @return {SessionReq} this */
+	a(a) {
+		this.a = a;
+		return this;
+	}
+
+	md(k, v) {
+		if (this.mds === undefined)
+			this.mds = {};
+		this.mds[k] = v;
+		return this;
+	}
 }
 
 class QueryReq {

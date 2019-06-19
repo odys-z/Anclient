@@ -1741,7 +1741,9 @@ function EzModal() {
 			onLoad: function() {
 				// EasyModal.callInit(init, row, pkvals)
 				// load details form, call user's onload handler (in ir-modal)
-				EasyModal.callInit(crud, modalId, init, row);
+				if (typeof init === 'function') {
+					EasyModal.callInit(crud, modalId, init, row);
+				}
 			}
 		});
 
@@ -2020,15 +2022,21 @@ function EzMsger() {
 	};
 
 	/**easyui messager.alert('info')
-	 * @param {string} code alerting code to supress duplicated alarm.
 	 * @param {function} m message code, one of EzMsger.m.
 	 * Function type is checked here to prevent users send string parameter anywhere when they want to.
+	 * @param {string} titl title
+	 * @param {function} callback
 	 */
-	this.info = function (m, style) {
-		if (style === undefined)
-			style = 'info';
+	this.info = function (m, titl, callback) {
+		if (titl === undefined)
+			titl = 'info';
 		if (typeof m === 'function') {
-			$.messager.alert(style, m(), style);
+			if (typeof callback !== 'function') {
+				$.messager.alert(titl, m(), titl);
+			}
+			else {
+				$.messager.confirm({title: titl, msg: m(), fn: callback});
+			}
 			return;
 		}
 		else {
@@ -2045,11 +2053,11 @@ function EzMsger() {
 		this.info(m, 'warn');
 	};
 
-	this.ok = function (mcode) {
+	this.ok = function (mcode, callback) {
 		if (mcode)
-			this.info(mcode);
+			this.info(mcode, undefined, callback);
 		else
-			this.info(this.m.ok);
+			this.info(this.m.ok, undefined, callback);
 	};
 
 	/**Replace/extend an individual message.
