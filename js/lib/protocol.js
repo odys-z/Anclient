@@ -116,6 +116,8 @@ class Protocol {
 						exIo: "exIo", exTransct: "exTransct", exDA: "exDA",
 						exGeneral: "exGeneral"};
 
+	Protocol.Notify = {changePswd: "changePswd", todos: "todos"};
+
 	Protocol.cfg  = {	ssInfo: "ss-k", };
 
 	Protocol.valOptions = {};

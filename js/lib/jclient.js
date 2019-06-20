@@ -178,8 +178,10 @@ class J {
 					}
 				},
 				error: function (resp) {
-					if (typeof onErr === "function")
+					if (typeof onErr === "function") {
+						console.error("ajax error:", url);
 						onErr(Protocol.MsgCode.exIo, resp);
+					}
 					else {
 						console.error("ajax error:", url);
 						console.error("req", jreq);
@@ -296,6 +298,12 @@ class SessionClient {
 	}
 
 	get userInfo() { return this.ssInf; }
+
+	consumeNotifies() {
+		if (this.ssInf) {
+			return this.ssInf['_notifies_'];
+		}
+	}
 
 	/**Get a header the jserv can verify successfully.
 	 * This method is not recommended used directly.
