@@ -638,15 +638,20 @@ class DatasetCfg extends QueryReq {
 	}
 
 	args(args) {
-		if (this.sqlArgs === undefined)
+		if (this.sqlArgs === undefined){
 			this.sqlArgs = [];
+		}
 
-		if (typeof args === 'string')
+		if (typeof args === 'string') {
 			this.sqlArgs = this.sqlArgs.concat([args]);
-		else if (Array.isArray(args))
+		}
+		else if (Array.isArray(args)) {
 			this.sqlArgs = args;
-		else console.error('sql args is not an arry: ', args);
+		}
+		else {
+			console.error('sql args is not an arry: ', args);
 			this.sqlArgs = this.sqlArgs.concat(args);
+		}
 		return this;
 	}
 

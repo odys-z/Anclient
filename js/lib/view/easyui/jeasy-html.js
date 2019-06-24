@@ -737,6 +737,8 @@ function EzHtml (J) {
 			}
 
 			opts.sk = tag.merge(opts.sk, tagId, ir.sk);
+			opts.sk = tag.mergargs(opts, opts.sk);
+
 			opts.all = opts.all || EasyHtml.has(tagId, ir.all);
 			opts.query = tag.merge(opts.query, tagId, ir.query);
 			opts.root = tag.merge(opts.root, tagId, ir.root);
@@ -1253,11 +1255,14 @@ function EzGrid (J) {
 		}
 
 		var req;
-		if (semantik !== undefined)
+		if (semantik !== undefined) {
 			// dataset way
-			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			var q = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
 						jconsts.conn,	// connection id in connexts.xml
-						semantik);		// sk in datast.xml
+						semantik)		// sk in datast.xml
+					.args(opts.sqlArgs);
+			req = ssClient.userReq(jconsts.conn, Port.dataset, q);
+		}
 		else {
 			// try query.serv way
 			// var tbls = opts.t;
@@ -1741,7 +1746,7 @@ function EzModal() {
 			onLoad: function() {
 				// EasyModal.callInit(init, row, pkvals)
 				// load details form, call user's onload handler (in ir-modal)
-				if (typeof init === 'function') {
+				if (typeof init === 'string' || typeof init === 'function') {
 					EasyModal.callInit(crud, modalId, init, row);
 				}
 			}
@@ -2035,7 +2040,10 @@ function EzMsger() {
 				$.messager.alert(titl, m(), titl);
 			}
 			else {
-				$.messager.confirm({title: titl, msg: m(), fn: callback});
+				$.messager.confirm(titl, m(), function(r) {
+					if(r)
+						callback();
+				});
 			}
 			return;
 		}
