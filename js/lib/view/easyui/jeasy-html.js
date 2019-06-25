@@ -739,7 +739,13 @@ function EzHtml (J) {
 			opts.sk = tag.merge(opts.sk, tagId, ir.sk);
 			opts.sk = tag.mergargs(opts, opts.sk);
 
-			opts.all = opts.all || EasyHtml.has(tagId, ir.all);
+			// opts.all = opts.all || EasyHtml.has(tagId, ir.all);
+			if (EasyHtml.has(tagId, ir.all)) {
+				opts.all = tag.merge(opts.all, tagId, ir.all);
+				if (opts.all === undefined || opts.all === null)
+					opts.all = true;
+			}
+
 			opts.query = tag.merge(opts.query, tagId, ir.query);
 			opts.root = tag.merge(opts.root, tagId, ir.root);
 			opts.orderby = tag.merge(opts.orderby, tagId, ir.orderby);
@@ -920,7 +926,8 @@ function EzCbb (J) {
 			// var rows = resp.data;
 			var rows = jeasy.rows(resp);
 			if (opts.all)
-				rows.unshift({text: ir.deflt._All_, value: ir.deflt._All_});
+				// rows.unshift({text: ir.deflt._All_, value: ir.deflt._All_});
+				rows.unshift({text: opts.all, value: ir.deflt._All_});
 			cbb.combobox({
 				data: rows,
 				multiple: opts.multi !== undefined && opts.multi !== null && opts.multi === true,
@@ -935,9 +942,11 @@ function EzCbb (J) {
 				cbb.combobox('setValue', opts.select);
 			else if(typeof(opts.select) === "number")
 				cbb.combobox('setValue', opts.select);
-			//select is true,default first row
+			//select is true,default first row 
 			else if(opts.select === true)
 				cbb.combobox('setValue', rows[0].value);
+			if (typeof opts.onok === 'function')
+				opts.onok(rows);
 		});
 	};
 
@@ -1059,9 +1068,14 @@ function EzTree(J) {
 			// resp.data.forEach(function (v, i) {
 			// 	v.checked = false;
 			// });
+			var data = resp.data;
 			console.log(resp);
+			if($.isFunction(opts.filter)){
+				data = opts.filter(resp.data);
+			}
+
 			EasyTree.bind(treeId,	// id
-					resp.data,		// forest,
+					data,		// forest,
 					'tree',			// easyui tree()
 					opts.onclick,
 					opts.onselect,

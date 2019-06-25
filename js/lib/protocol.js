@@ -392,6 +392,12 @@ class QueryReq {
 }
 
 class UpdateReq {
+	/**Create an update / insert request.
+	 * @param {string} conn connection id
+	 * @param {string} tabl table
+	 * @param {object} pk {pk, v} conditions for pk.<br>
+	 * If pk is null, use this object's where_() | whereEq() | whereCond().
+	 */
 	constructor (conn, tabl, pk) {
 		this.conn = conn;
 		this.mtabl = tabl;
@@ -429,6 +435,11 @@ class UpdateReq {
 		return this.nv(n, {exp});
 	}
 
+	/**Append where clause condiont
+	 * @param {string} logic "=" | "<>" , ...
+	 * @param {string} loper left operand, typically a tabl.col.
+	 * @param {string} roper right operand, typically a string constant.
+	 * @return {UpdateReq} this */
 	whereCond (logic, loper, roper) {
 		if (Array.isArray(logic))
 			this.where = this.where.concat(logic);
@@ -447,6 +458,10 @@ class UpdateReq {
 		return this.whereCond(logic, lop, Jregex.quote(rop));
 	}
 
+	/** A wrapper of where_("=", lcol, rconst)
+	 * @param {string} lcol left operand,
+	 * @param {string} rconst right constant, will be quoted.
+	 * @return {UpdateReq} this */
 	whereEq (lcol, rconst) {
 		return this.where_("=", lcol, rconst);
 	}
