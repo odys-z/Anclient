@@ -31,15 +31,17 @@ const jconsts = {
 		menu: 'sys.menu.ez-test',
 	},
 
-	/**Application Message Strings, a callback called when jeasy-html.js is loaded.<br>
+	/**Application Message Strings, the callback function called when jeasy-html.js is loaded.<br>
 	 * These messages will override the default jeasy lib's messsges.<br>
-	 * Putting all readable strings altoger in one place is also odysz's coding style,
-	 * but have a look if your client is not an English speaker.
+	 * Putting all readable strings altoger in one place is also recommended coding style,
+	 * that means it's not mandatory, but you'd better have a look if your client is not an English speaker.
 	 * @param {EzMsger} msger easyUI messager wrapper
 	 */
 	initMsg: function (msger) {
 		msger.setM('saved', '保存成功!');
 		msger.setM('deleted', '削除しました!');
+
+		msger.setM('noPswd', 'Login id and password can not be null!');
 	}
 }
 
@@ -79,7 +81,6 @@ J.understandPorts(samports);
  */
 function login(logId, pswd, onLogin, home, onError) {
     var checkEasyUI = false;
-    checkEasyUI = checkDevice(navigator.userAgent||navigator.vendor||window.opera);
 	if (checkLogInput(logId, pswd))
 		return;
 	logId = logId.trim();
@@ -104,23 +105,16 @@ function login(logId, pswd, onLogin, home, onError) {
 			typeof onError === "function" ? onError : EasyMsger.error);
 }
 
-/**Check user's input
+/**Check user's input.
  * @param {string} logId
  * @param {string} pswd
- * @return {boolean} true = error()
+ * @return {boolean} true error
  */
 function checkLogInput(logId, pswd) {
-    var checkEasyUI = false;
-    checkEasyUI = checkDevice(navigator.userAgent||navigator.vendor||window.opera);
-	if (logId == null || typeof logId == "undefined" || $.trim(logId) == "") {
-		if(checkEasyUI) alert('登录账号不能为空');
-		else $.messager.alert('提示', '登录账号不能为空！', 'info');
-		return true;
-	} else if (pswd == null || typeof pswd == "undefined" || pswd == "") {
-		if(checkEasyUI)
-			alert('登录密码不能为空');
-        else
-			$.messager.alert('提示', '密码不能为空！', 'info');
+	if (regex.isblank(logId) ||regex.isblank(pswd)) {
+		// For the message definition, see
+		// Line 44: jconsts.initMsg, setM('noPswd').
+		EasyMsger.alert(EasyMsger.m.noPswd);
 		return true;
 	}
 }

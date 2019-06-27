@@ -24,9 +24,16 @@ const chpEnumReq = {
 /** @See io.odysz.sworkflow.CheapException */
 const CheapCode = {
 	ok: 'ok',
+
 	err: 'wf_err',
+
 	err_rights: 'wf_err_rights',
+
 	err_competation: 'wf_err_competing',
+
+	err_internal: "wf_err_internal",
+
+	err_config: "wf_err_config",
 }
 
 ///////////////// io.odysz.sworkflow ///////////////////////////////////////////
