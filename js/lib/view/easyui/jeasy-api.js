@@ -31,7 +31,7 @@ const jconsts = {
 	}
 }
 
-const engports = {
+const samports = {
 	/** see semantic.jserv/io.odysz.jsample.SysMenu * /
 	menu: "menu.serv",
 	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ * /

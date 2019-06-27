@@ -116,6 +116,8 @@ class Protocol {
 						exIo: "exIo", exTransct: "exTransct", exDA: "exDA",
 						exGeneral: "exGeneral"};
 
+	Protocol.Notify = {changePswd: "changePswd", todos: "todos"};
+
 	Protocol.cfg  = {	ssInfo: "ss-k", };
 
 	Protocol.valOptions = {};
@@ -227,6 +229,22 @@ class SessionReq {
 		this.uid = uid;
 		this.token = token;
 		this.iv = iv;
+	}
+
+	/**set a.<br>
+	 * a() can only been called once.
+	 * @param {string} a
+	 * @return {SessionReq} this */
+	a(a) {
+		this.a = a;
+		return this;
+	}
+
+	md(k, v) {
+		if (this.mds === undefined)
+			this.mds = {};
+		this.mds[k] = v;
+		return this;
 	}
 }
 
@@ -374,6 +392,12 @@ class QueryReq {
 }
 
 class UpdateReq {
+	/**Create an update / insert request.
+	 * @param {string} conn connection id
+	 * @param {string} tabl table
+	 * @param {object} pk {pk, v} conditions for pk.<br>
+	 * If pk is null, use this object's where_() | whereEq() | whereCond().
+	 */
 	constructor (conn, tabl, pk) {
 		this.conn = conn;
 		this.mtabl = tabl;
@@ -411,6 +435,11 @@ class UpdateReq {
 		return this.nv(n, {exp});
 	}
 
+	/**Append where clause condiont
+	 * @param {string} logic "=" | "<>" , ...
+	 * @param {string} loper left operand, typically a tabl.col.
+	 * @param {string} roper right operand, typically a string constant.
+	 * @return {UpdateReq} this */
 	whereCond (logic, loper, roper) {
 		if (Array.isArray(logic))
 			this.where = this.where.concat(logic);
@@ -429,6 +458,10 @@ class UpdateReq {
 		return this.whereCond(logic, lop, Jregex.quote(rop));
 	}
 
+	/** A wrapper of where_("=", lcol, rconst)
+	 * @param {string} lcol left operand,
+	 * @param {string} rconst right constant, will be quoted.
+	 * @return {UpdateReq} this */
 	whereEq (lcol, rconst) {
 		return this.where_("=", lcol, rconst);
 	}
@@ -620,15 +653,20 @@ class DatasetCfg extends QueryReq {
 	}
 
 	args(args) {
-		if (this.sqlArgs === undefined)
+		if (this.sqlArgs === undefined){
 			this.sqlArgs = [];
+		}
 
-		if (typeof args === 'string')
+		if (typeof args === 'string') {
 			this.sqlArgs = this.sqlArgs.concat([args]);
-		else if (Array.isArray(args))
+		}
+		else if (Array.isArray(args)) {
 			this.sqlArgs = args;
-		else console.error('sql args is not an arry: ', args);
+		}
+		else {
+			console.error('sql args is not an arry: ', args);
 			this.sqlArgs = this.sqlArgs.concat(args);
+		}
 		return this;
 	}
 

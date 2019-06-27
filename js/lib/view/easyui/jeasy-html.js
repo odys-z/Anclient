@@ -737,7 +737,15 @@ function EzHtml (J) {
 			}
 
 			opts.sk = tag.merge(opts.sk, tagId, ir.sk);
-			opts.all = opts.all || EasyHtml.has(tagId, ir.all);
+			opts.sk = tag.mergargs(opts, opts.sk);
+
+			// opts.all = opts.all || EasyHtml.has(tagId, ir.all);
+			if (EasyHtml.has(tagId, ir.all)) {
+				opts.all = tag.merge(opts.all, tagId, ir.all);
+				if (opts.all === undefined || opts.all === null)
+					opts.all = true;
+			}
+
 			opts.query = tag.merge(opts.query, tagId, ir.query);
 			opts.root = tag.merge(opts.root, tagId, ir.root);
 			opts.orderby = tag.merge(opts.orderby, tagId, ir.orderby);
@@ -918,7 +926,8 @@ function EzCbb (J) {
 			// var rows = resp.data;
 			var rows = jeasy.rows(resp);
 			if (opts.all)
-				rows.unshift({text: ir.deflt._All_, value: ir.deflt._All_});
+				// rows.unshift({text: ir.deflt._All_, value: ir.deflt._All_});
+				rows.unshift({text: opts.all, value: ir.deflt._All_});
 			cbb.combobox({
 				data: rows,
 				multiple: opts.multi !== undefined && opts.multi !== null && opts.multi === true,
@@ -933,9 +942,11 @@ function EzCbb (J) {
 				cbb.combobox('setValue', opts.select);
 			else if(typeof(opts.select) === "number")
 				cbb.combobox('setValue', opts.select);
-			//select is true,default first row
+			//select is true,default first row 
 			else if(opts.select === true)
 				cbb.combobox('setValue', rows[0].value);
+			if (typeof opts.onok === 'function')
+				opts.onok(rows);
 		});
 	};
 
@@ -1057,9 +1068,14 @@ function EzTree(J) {
 			// resp.data.forEach(function (v, i) {
 			// 	v.checked = false;
 			// });
+			var data = resp.data;
 			console.log(resp);
+			if($.isFunction(opts.filter)){
+				data = opts.filter(resp.data);
+			}
+
 			EasyTree.bind(treeId,	// id
-					resp.data,		// forest,
+					data,		// forest,
 					'tree',			// easyui tree()
 					opts.onclick,
 					opts.onselect,
@@ -1253,11 +1269,14 @@ function EzGrid (J) {
 		}
 
 		var req;
-		if (semantik !== undefined)
+		if (semantik !== undefined) {
 			// dataset way
-			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			var q = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
 						jconsts.conn,	// connection id in connexts.xml
-						semantik);		// sk in datast.xml
+						semantik)		// sk in datast.xml
+					.args(opts.sqlArgs);
+			req = ssClient.userReq(jconsts.conn, Port.dataset, q);
+		}
 		else {
 			// try query.serv way
 			// var tbls = opts.t;
@@ -1741,7 +1760,9 @@ function EzModal() {
 			onLoad: function() {
 				// EasyModal.callInit(init, row, pkvals)
 				// load details form, call user's onload handler (in ir-modal)
-				EasyModal.callInit(crud, modalId, init, row);
+				if (typeof init === 'string' || typeof init === 'function') {
+					EasyModal.callInit(crud, modalId, init, row);
+				}
 			}
 		});
 
@@ -2020,15 +2041,24 @@ function EzMsger() {
 	};
 
 	/**easyui messager.alert('info')
-	 * @param {string} code alerting code to supress duplicated alarm.
 	 * @param {function} m message code, one of EzMsger.m.
 	 * Function type is checked here to prevent users send string parameter anywhere when they want to.
+	 * @param {string} titl title
+	 * @param {function} callback
 	 */
-	this.info = function (m, style) {
-		if (style === undefined)
-			style = 'info';
+	this.info = function (m, titl, callback) {
+		if (titl === undefined)
+			titl = 'info';
 		if (typeof m === 'function') {
-			$.messager.alert(style, m(), style);
+			if (typeof callback !== 'function') {
+				$.messager.alert(titl, m(), titl);
+			}
+			else {
+				$.messager.confirm(titl, m(), function(r) {
+					if(r)
+						callback();
+				});
+			}
 			return;
 		}
 		else {
@@ -2045,11 +2075,11 @@ function EzMsger() {
 		this.info(m, 'warn');
 	};
 
-	this.ok = function (mcode) {
+	this.ok = function (mcode, callback) {
 		if (mcode)
-			this.info(mcode);
+			this.info(mcode, undefined, callback);
 		else
-			this.info(this.m.ok);
+			this.info(this.m.ok, undefined, callback);
 	};
 
 	/**Replace/extend an individual message.
