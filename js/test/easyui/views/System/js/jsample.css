@@ -1,0 +1,8 @@
+.preview {
+	height: 40px;
+}
+
+.b64img {
+	height:60px;width:100px;
+	object-fit: contain;
+}

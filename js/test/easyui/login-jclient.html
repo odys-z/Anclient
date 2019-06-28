@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>用户登录</title>
+	<link rel="stylesheet" href="../pclogin.css">
+	<script src="../Content/jquery-1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../Content/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+
+	<link href="../Content/jquery-easyui-1.7.0/themes/default/easyui.css" rel="stylesheet" />
+	<script src="../Content/jquery-easyui-1.7.0/jquery.easyui.min.js"></script>
+	<script src="../Content/jquery-easyui-1.7.0/locale/easyui-lang-zh_CN.js"></script>
+
+	<script src="../Content/base64js.min.js"></script>
+	<script src="../Content/ricmoo-aes.js" type="text/javascript" charset="utf-8"></script>
+
+	<script src="../Content/jclient/jclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../Content/jclient/ir-jeasy-engcost.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../Content/jclient/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../Content/jclient/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>
+  	<div style="width: 1366px;height: 113px;position: relative; margin: 0 auto;">
+  		<div>
+  			工程项目成本管理服务平台
+  		</div>
+  	</div>
+  	<div style="width: 1366px; margin: 0 auto;">
+		<div class="login" >
+		<div class="login-screen">
+			<div class="app-title">
+				<h1>用户登录</h1>
+			</div>
+
+			<div class="login-form">
+				<div class="control-group">
+				<input type="text" class="login-field" value="admin" placeholder="用户名" id="userId">
+				<label class="login-field-icon fui-user" for="login-name"></label>
+				</div>
+
+				<div class="control-group">
+				<input type="password" class="login-field" value="123456" placeholder="密码" id="pswd">
+				<label class="login-field-icon fui-lock" for="login-pass" ></label>
+				</div>
+
+				<a class="btn btn-primary btn-large btn-block" href="#" onclick="login_()">login</a>
+				<a  class="login-link" href="registUser.html">注册?</a> <a class="login-link" href="#">忘记密码?</a>
+			</div>
+		</div>
+		</div>
+	</div>
+
+<script>
+	$(document).keypress(function(e){
+		if (e.which === 13){
+			login_();
+		}
+	});
+
+	function login_() {
+		EasyMsger.init(); // clean error flag, error messager will pop again.
+		login($('#userId').val(), $('#pswd').val(),
+			function(jclient) {
+				window.top.location = "index-jclient.html";
+			},
+			'index-jclient.html',
+		);
+	}
+</script>
+</body>
+</html>
