@@ -377,6 +377,19 @@ class QueryReq {
 		return this;
 	}
 
+	/**limit clause.
+	 * @param {string} expr1
+	 * @param {string} expr2
+	 */
+	limit (expr1, expr2) {
+		this.limt = [];
+		if (expr1)
+			this.limt.push(expr1);
+
+		if (expr2)
+			this.limt.push(expr2);
+	}
+
 	commit () {
 		var hd = this.formatHeader();
 		// return { header: hd, tabls: froms, exprs: expr, conds: cond, orders: order, group: groupings};
@@ -464,6 +477,13 @@ class UpdateReq {
 	 * @return {UpdateReq} this */
 	whereEq (lcol, rconst) {
 		return this.where_("=", lcol, rconst);
+	}
+
+	/**limit clause.
+	 * @param {string} cnt count
+	 */
+	limit (cnt) {
+		this.limt = cnt;
 	}
 
 	/**Attach a file.
