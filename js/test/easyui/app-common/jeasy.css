@@ -23,10 +23,10 @@ A {
 	line-height: 25px;
 	font-size: 19px;
 	font-weight: bold;
-	background: url('../Content/images/topicon.gif') no-repeat 9px 14px;
+	background: url('app-common/odysz.png') no-repeat 9px 14px;
 }
 
-.l-topmenu-welcome {
+/* .l-topmenu-welcome {
 	position: absolute;
 	height: 23px;
 	padding-top: 9px;
@@ -39,4 +39,23 @@ A {
 .l-topmenu-welcome a {
 	color: #ffffff;
 	text-decoration: underline;
+	}
+ */
+
+.banner {
+	height: 100%;
+	background-image:
+		linear-gradient(30deg, #cde7f5 0%, #9ef3d5 100%),
+		linear-gradient( #ff6262, #ff6262);
+	background-blend-mode: normal,
+		normal;
+}
+
+.banner-text {
+	width: 358px;
+	height: 38px;
+	background: url('app-common/odysz.png') no-repeat;
+	margin-left: 24px;
+	margin-top: 15px;
+	float: left;
 	}

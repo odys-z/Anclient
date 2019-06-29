@@ -12,6 +12,7 @@
 	<script src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="app-common/jeasy.css">
 
 	<script src="../../dist/jclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="app-common/jsampl-easyui.js" type="text/javascript" charset="utf-8"></script>
@@ -21,13 +22,11 @@
 
 <body class="easyui-layout">
 	<div data-options="region:'north',border:false" style="height: 60px; padding: 0px">
-		<div id="topmenu" class="l-topmenu">
-			<div class="l-topmenu-logo">JClient/EasyUI Sample Demo</div>
-			<div class="l-topmenu-welcome">
-				<font color="#ffffff">
-					<span id='currentUser' class="space"></span>&nbsp; &nbsp;
-					<a id="btnExport" onclick="logout('login-jclient.html')" >Exit</a>
-				</font>
+		<div id="topmenu" class="banner">
+			<div class="banner-text">JClient/EasyUI Sample Demo</div>
+			<div onclick="logout('login.html')" >
+				<span id='currentUser' class="space"></span>&nbsp; &nbsp;
+				<a id="btnExport">Log out</a>
 			</div>
 		</div>
 	</div>
@@ -36,7 +35,7 @@
 	</div>
 	<div data-options="region:'center',title:'',border:false">
 		<div id="tt" class="easyui-tabs" data-options="fit:true">
-			<div title="首页" style="padding: 20px;">
+			<div title="Home" style="padding: 20px;">
 				<h3><br></h3>
 			</div>
 		</div>
@@ -62,7 +61,7 @@
 
 			// all request are created as user reqs except query, update, insert, delete and ext like dataset.
 			// user act is ignored for reading
-			var jmsg = ssClient.userReq(jconsts.conn, engports.menu, req);
+			var jmsg = ssClient.userReq(jconsts.conn, samports.menu, req);
 
 			// ssClient is created after logged in.
 			ssClient.commit(jmsg, function(resp) {
@@ -128,7 +127,7 @@
 			loadUserInf(ssinf.uid, function(usr) {
 					Object.assign(user, usr);
 					// uname? Because expr("userName", "uname"), see loaduserInf().
-					$("#currentUser").html("欢迎您：" + user.uname);
+					$("#currentUser").html("User: " + user.uname);
 					ssClient.userInf = user;
 					jloadMenu();
 				});
@@ -163,7 +162,6 @@
 				$('#tt').tabs('select', node.text);
 			} else {
 				// This is extremly wrong!
-				// if(node.text == '管理系统'||node.url == ''||node.url == undefined) {} else {
 				if(node.url == ''||node.url == undefined) {} else {
 					$('#tt').tabs(
 						'add', {
@@ -226,20 +224,18 @@
 			}
 		}
 
-	function logout(loginPage) {
-
-		var header = jvue.Protocol.formatHeader(ssk);
-		var body = {a:"logout"};
-		 var req = new jvue.JMessage(jvue.Protocol.Port.session, header, body);
-		J.post(req,function(){
-
-			localStorage.setItem(ssk, null);
-			window.location = loginPage;
-		},function(){
-			window.location = loginPage;
-			localStorage.setItem(ssk, null);
-		});
-	}
+		function logout(loginPage) {
+			var header = jvue.Protocol.formatHeader(ssk);
+			var body = {a:"logout"};
+			 var req = new jvue.JMessage(jvue.Protocol.Port.session, header, body);
+			J.post(req,function(){
+				localStorage.setItem(ssk, null);
+				window.location = loginPage;
+			},function(){
+				window.location = loginPage;
+				localStorage.setItem(ssk, null);
+			});
+		}
 	</script>
 </body>
 
