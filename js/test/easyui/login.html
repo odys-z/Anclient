@@ -20,10 +20,10 @@
 </head>
 
 <body>
-  	<div style="width: 1366px;height: 113px;position: relative; margin: 0 auto;">
+  	<div style="width: 80%;height: 100px;position: relative; margin: 0 auto;">
   		<div>JSample/js Demo</div>
   	</div>
-  	<div style="width: 1366px; margin: 0 auto;">
+  	<div style="width: 80%; margin: 0 auto;">
 		<div class="login" >
 		<div class="login-screen">
 			<div class="easyui-title">
@@ -54,7 +54,7 @@
 	});
 
 	function login_() {
-		EasyMsger.init(); // clean error flag, error messager will pop again.
+		EasyMsger.init(); // clean error flag, alert message will pop again.
 		login($('#userId').val(), $('#pswd').val(),
 			function(jclient) {
 				window.top.location = "index-jclient.html";
