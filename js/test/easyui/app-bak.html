@@ -34,12 +34,26 @@
 		<ul id="irtree" class="easyui-tree" style="margin-top: 3px;"></ul>
 	</div>
 	<div data-options="region:'center',title:'',border:false">
+		<div id="tt" class="easyui-tabs" data-options="fit:true">
+			<div title="Home" style="padding: 20px;">
+				<h3><br></h3>
+			</div>
+		</div>
 	</div>
-		<iframe id='sample-view' scrolling="auto" frameborder="0" style="width:100%;height:100%;"></iframe>
+	<div id="mm" class="easyui-menu" style="width:170px;">
+		<div id="mm-tabclosrefresh" data-options="name:6">Reload</div>
+		<div id="mm-tabclose" data-options="name:1">Close</div>
+		<div id="mm-tabcloseall" data-options="name:2">Close All</div>
+		<div id="mm-tabcloseother" data-options="name:3">Close Others</div>
+		<div class="menu-sep"></div>
+		<div id="mm-tabcloseright" data-options="name:4">Close All Right of This</div>
+		<div id="mm-tabcloseleft" data-options="name:5">Close All Left of This</div>
+	</div>
+
 	<script>
-		/* load menu<br>
-		 * Load menu from menu.sample (port = menu, dataset-sk = sk.menu)
-		 */
+		/* load menu */
+
+		// MODIFY 2 Load menu from menu.sample (port = menu, dataset-sk = sk.menu)
 		function jloadMenu() {
 			var req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
 						jconsts.conn,		// connection id in connexts.xml
@@ -59,12 +73,11 @@
 						null,				// click callback
 						function(node) {	// onSelect - change user act when clicked (FIXME what about tabs?)
 							console.log(node);
-							// index.html window is not function pages' window
+							addTab(node);
+							// index-jclient.html window is not function pages' window
 							// https://stackoverflow.com/questions/4689145/pass-jquery-variables-between-iframe-and-parent
-							// $('iframe').get(0).contentWindow.ssClient = ssClient;
-							$('#sample-view').contentWindow.ssClient = ssClient;
+							$('iframe').get(0).contentWindow.ssClient = ssClient;
 							ssClient.usrAct (node.id, node.text, node.url);
-							$('#sample-view').attr('src', node.url);
 						});
 				}, EasyMsger.error);
 		}
@@ -101,7 +114,7 @@
 		}
 
 		$(function() {
-			// Local storage is more secure, enable this when only debugging online is needed.
+			// FIXME local storage is more secure, change this when only debugging online is needed.
 			var ssinf = loadSessionInf();
 			if (ssinf === undefined) {
 				console.error('Not logged in?');
@@ -118,74 +131,98 @@
 					ssClient.userInf = user;
 					jloadMenu();
 				});
+
+			$('#tt').tabs({
+				fit: true,
+				border: false
+			});
+
+			$('#tt').tabs({
+				onContextMenu: function(e, title, index) {
+					e.preventDefault();
+					if(index > 0) {
+						$('#mm').menu('show', {
+							left: e.pageX,
+							top: e.pageY
+						}).data("tabTitle", title);
+					}
+				}
+			});
+
+			// Context Menu Click
+			$("#mm").menu({
+				onClick: function(item) {
+					closeTab(this, item.name);
+				}
+			});
 		});
 
-		// function addTab(node) {
-		// 	if($('#tt').tabs('exists', node.text)) {
-		// 		$('#tt').tabs('select', node.text);
-		// 	} else {
-		// 		// if(node.url == ''||node.url == undefined) {} else {
-		// 		if(!regex.isblank(node.url)) {
-		// 			$('#tt').tabs(
-		// 				'add', {
-		// 					fit: true,
-		// 					border: false,
-		// 					title: node.text,
-		// 					selected: true,
-		// 					closable: true,
-		// 					id: node.text,
-		// 					content: '<iframe scrolling="auto" frameborder="0"  src=' +
-		// 						node.url +
-		// 						' style="width:100%;height:99.5%;"></iframe>',
-		// 			});
-		// 		}
-		// 	}
-		// }
-		//
-		// function closeTab(menu, type) {
-		// 	var allTabs = $("#tt").tabs('tabs');
-		// 	var allTabtitle = [];
-		// 	$.each(allTabs, function(i, n) {
-		// 		var opt = $(n).panel('options');
-		// 		if(opt.closable)
-		// 			allTabtitle.push(opt.title);
-		// 	});
-		// 	var curTabTitle = $(menu).data("tabTitle");
-		// 	var curTabIndex = $("#tt").tabs("getTabIndex", $("#tt").tabs("getTab", curTabTitle));
-		// 	switch(type) {
-		// 		case 1:
-		// 			$("#tt").tabs("close", curTabIndex);
-		// 			return false;
-		// 			break;
-		// 		case 2:
-		// 			for(var i = 0; i < allTabtitle.length; i++) {
-		// 				$('#tt').tabs('close', allTabtitle[i]);
-		// 			}
-		// 			break;
-		// 		case 3:
-		// 			for(var i = 0; i < allTabtitle.length; i++) {
-		// 				if(curTabTitle != allTabtitle[i])
-		// 					$('#tt').tabs('close', allTabtitle[i]);
-		// 			}
-		// 			$('#tt').tabs('select', curTabTitle);
-		// 			break;
-		// 		case 4:
-		// 			for(var i = curTabIndex; i < allTabtitle.length; i++) {
-		// 				$('#tt').tabs('close', allTabtitle[i]);
-		// 			}
-		// 			$('#tt').tabs('select', curTabTitle);
-		// 			break;
-		// 		case 5:
-		// 			for(var i = 0; i < curTabIndex - 1; i++) {
-		// 				$('#tt').tabs('close', allTabtitle[i]);
-		// 			}
-		// 			$('#tt').tabs('select', curTabTitle);
-		// 			break;
-		// 		case 6: //刷新
-		// 			var panel = $("#tt").tabs("getTab", curTabTitle).panel("refresh");
-		// 			break;
-		// 	}
-		// }
+		function addTab(node) {
+			if($('#tt').tabs('exists', node.text)) {
+				$('#tt').tabs('select', node.text);
+			} else {
+				// if(node.url == ''||node.url == undefined) {} else {
+				if(!regex.isblank(node.url)) {
+					$('#tt').tabs(
+						'add', {
+							fit: true,
+							border: false,
+							title: node.text,
+							selected: true,
+							closable: true,
+							id: node.text,
+							content: '<iframe scrolling="auto" frameborder="0"  src=' +
+								node.url +
+								' style="width:100%;height:99.5%;"></iframe>',
+					});
+				}
+			}
+		}
+
+		function closeTab(menu, type) {
+			var allTabs = $("#tt").tabs('tabs');
+			var allTabtitle = [];
+			$.each(allTabs, function(i, n) {
+				var opt = $(n).panel('options');
+				if(opt.closable)
+					allTabtitle.push(opt.title);
+			});
+			var curTabTitle = $(menu).data("tabTitle");
+			var curTabIndex = $("#tt").tabs("getTabIndex", $("#tt").tabs("getTab", curTabTitle));
+			switch(type) {
+				case 1:
+					$("#tt").tabs("close", curTabIndex);
+					return false;
+					break;
+				case 2:
+					for(var i = 0; i < allTabtitle.length; i++) {
+						$('#tt').tabs('close', allTabtitle[i]);
+					}
+					break;
+				case 3:
+					for(var i = 0; i < allTabtitle.length; i++) {
+						if(curTabTitle != allTabtitle[i])
+							$('#tt').tabs('close', allTabtitle[i]);
+					}
+					$('#tt').tabs('select', curTabTitle);
+					break;
+				case 4:
+					for(var i = curTabIndex; i < allTabtitle.length; i++) {
+						$('#tt').tabs('close', allTabtitle[i]);
+					}
+					$('#tt').tabs('select', curTabTitle);
+					break;
+				case 5:
+					for(var i = 0; i < curTabIndex - 1; i++) {
+						$('#tt').tabs('close', allTabtitle[i]);
+					}
+					$('#tt').tabs('select', curTabTitle);
+					break;
+				case 6: //刷新
+					var panel = $("#tt").tabs("getTab", curTabTitle).panel("refresh");
+					break;
+			}
+		}
 
 		function logout(loginPage) {
 			var header = jvue.Protocol.formatHeader(ssk);
