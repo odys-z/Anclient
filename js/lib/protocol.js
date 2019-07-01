@@ -120,6 +120,11 @@ class Protocol {
 
 	Protocol.cfg  = {	ssInfo: "ss-k", };
 
+	Protocol.Semantics = {
+		chkCntDel: 'checkSqlCountOnDel',
+		chkCntIns: 'checkSqlCountOnInsert',
+	};
+
 	Protocol.valOptions = {};
 }
 

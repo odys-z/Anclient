@@ -232,7 +232,8 @@ function Tag (debug) {
 		}
 	};
 
-	/**<p>Try merge arg references in sk string into opts.sqlArgs, rethrn the splited sk.</p>
+	/**<p>Try merge arg references in ir-sk, ir-cbb, ir-grid's string into
+	 * opts.sqlArgs, rethrn the splited sk.</p>
 	 * Output: opts.sqlArgs<br>
 	 * Input: opts.args, sk string<br>
 	 * That means this function also change data in opts.
@@ -240,29 +241,14 @@ function Tag (debug) {
 	 * @param {string} sk string like that from ir-tree, ir-cbb, etc.
 	 * @return {Array} sk (first splited string in parameter sk) */
 	this.mergargs = function(opts, sk) {
-		// if (sk === undefined || sk === null)
-		// 	console.error(ir.cbbtree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have ir-sk).");
-		// else {
-		// 	var parsed = tag.parseSk(sk, opts.args);
-		// 	sk = parsed.shift();
-		// 	if (sqlArgs === undefined)
-		// 		sqlArgs = [];
-		// 	sqlArgs = sqlArgs.concat(parsed);
-		// }
-
-		// if (sk === undefined || sk === null)
-		// 	console.error("sk attr in is undefined. In jeasy v1.0, only configurd dataset is suppored - must have sk in ir-tree, ir-combbox etc.",
-		// 			opts, sk);
-		// else {
-			var parsed = tag.parseSk(sk, opts.args);
-			sk = parsed.shift();
-			if (opts.sqlArgs === undefined)
-				opts.sqlArgs = [];
-			else if (typeof opts.sqlArgs === 'string')
-				opts.sqlArgs = [opts.sqlArgs];
-			opts.sqlArgs = opts.sqlArgs.concat(parsed);
-			return sk;
-		// }
+		var parsed = tag.parseSk(sk, opts.args);
+		sk = parsed.shift();
+		if (opts.sqlArgs === undefined)
+			opts.sqlArgs = [];
+		else if (typeof opts.sqlArgs === 'string')
+			opts.sqlArgs = [opts.sqlArgs];
+		opts.sqlArgs = opts.sqlArgs.concat(parsed);
+		return sk;
 	};
 
 	/**Format table-joins request array: [{tabl, t, on, as}], used for QueryReq.join(...).
@@ -444,7 +430,6 @@ function Tag (debug) {
 			if (window[vn])
 				return window[vn];
 			else {
-				// console.error("Can't find variable for " + vn);
 				return vn;
 			}
 		}
@@ -479,6 +464,7 @@ function Tag (debug) {
 		// replace variables
 		// var regexCbbArg = /{\@\s*(.+)\s*\}/g;
 		for ( var ix = 1; ix < skss.length; ix++ ) {
+			// Design Notes: keep consists with EzHtml.opts() { branch: ir-select }
 			var mOnVar = regex.cbbArg.exec( skss[ix] );
 			if ( mOnVar ) {
 				var v = tag.findVar( mOnVar[1], argBuff );
@@ -753,7 +739,15 @@ function EzHtml (J) {
 
 			opts.select = tag.merge(opts.select, tagId, ir.select);
 			if (typeof opts.select === 'string') {
-				opts.select = tag.findVar(opts.select, opts.args);
+				// Notes: keep consists with Tag.parseSk()'s replace variables section
+				var mOnVar = regex.cbbArg.exec( opts.select );
+				if ( mOnVar ) {
+					var v = tag.findVar( mOnVar[1], opts.args );
+					if (v)
+						// in case not found, show the expression directly
+						opts.select = v;
+				}
+				// opts.select = tag.findVar(opts.select, opts.args);
 			}
 
 			opts.cbb = tag.merge(opts.cbb, tagId, ir.combobox);
@@ -942,7 +936,7 @@ function EzCbb (J) {
 				cbb.combobox('setValue', opts.select);
 			else if(typeof(opts.select) === "number")
 				cbb.combobox('setValue', opts.select);
-			//select is true,default first row 
+			//select is true,default first row
 			else if(opts.select === true)
 				cbb.combobox('setValue', rows[0].value);
 			if (typeof opts.onok === 'function')
@@ -1464,6 +1458,9 @@ function EzGrid (J) {
 	this.bindPage = function (gridId, json, total, opts, ezTreegrid) {
 
 		EasyHtml.ez('datagrid', gridId, json, opts);
+		//默认选中第一行
+		if(opts.select || regex.isblank(opts.select))
+			$(gridId).datagrid("selectRow", 0);
 		EasyMsger.close();
 		return;
 
@@ -1527,7 +1524,8 @@ function EzGrid (J) {
 	 * opts.maintable: target table.<br>
 	 * opts.pk: pk condition for sql where clause.<br>
 	 * opts.select the selected record id overriding auto retrieved selected row's id.<br>
-	 * opts.onload: the success callback, default: EasyMsger.ok<br>
+	 * opts.onload: the success callback, default: EasyMsger.ok.<br>
+	 * opts.onalert: the alert messager popped when none of the rows selected.<br>
 	 * opts.onerror: the error handle, default: EasyMsger.error.<br>
 	 * @param {UpdateReq} the delete request (a = 'D')
 	 */
@@ -1537,28 +1535,50 @@ function EzGrid (J) {
 
 		var rw = jeasy.getMainRow(gridId);
 		if (rw === undefined || rw === null) {
-			if (typeof opts.onerror === 'function')
-				opts.onerror(EasyMsger.m.none_selected);
+			if (typeof opts.onalert === 'function')
+				opts.onalert(EasyMsger.m.none_selected);
 			else
 				EasyMsger.alert(EasyMsger.m.none_selected);
 			return;
 		}
 
-		$.messager.confirm('删除', '确定删除吗?', function(r){
+		// $.messager.confirm('删除', '确定删除吗?', function(r){
+		// 	if (r){
+		// 		var pkv = rw[opts.pk];
+		// 		var rq = ssClient.delete(opts.conn, opts.maintabl,
+		// 			{pk: opts.pk, v: pkv}, opts.posts);
+		//
+		// 		// ssClient.commit(rq, opts.onok, opts.onerror);
+		// 		ssClient.commit(rq, opts.onok,function(msgCode,resp){
+		// 		console.log(resp);
+		// 		var regex = /(\w+)\.\w+:\s+(\w+)\s+\d+/;
+		// 		var result;
+		// 		var mainTable;
+		// 		var childTable;
+		// 		result = regex.exec(resp.error);
+		// 		//console.log(result[1]);
+		// 		if(result[1] && result[2]){
+		// 			mainTable  = tableMap[result[1]] || result[1];
+		// 			childTable = tableMap[result[2]] || result[2];
+		// 			$.messager.alert("删除失败","请先删除: ("+mainTable+ ")关联的(" + childTable+")信息再试！","error");
+		// 		}
+		// 	});
+		// }
 
-    		if (r){
-
-		    	var pkv = rw[opts.pk];
+		EasyMsger.confirm(
+			EasyMsger.m.conf_del,
+			EasyMsger.m.confg_del_title,
+			function (conf) {
+				var pkv = rw[opts.pk];
 				var rq = ssClient.delete(opts.conn, opts.maintabl,
 					{pk: opts.pk, v: pkv}, opts.posts);
-				ssClient.commit(rq, opts.onok, opts.onerror);
-	    	}
-   	 });
-
-//		var pkv = rw[opts.pk];
-//		var rq = ssClient.delete(opts.conn, opts.maintabl,
-//					{pk: opts.pk, v: pkv}, opts.posts);
-//		ssClient.commit(rq, opts.onok, opts.onerror);
+				ssClient.commit(rq, opts.onok, function(c, d) {
+					if (typeof opts.onerror === 'function')
+						opts.onerror(c, d);
+					else EasyMsger.error(c, d);
+				});
+			}
+		);
 	};
 };
 const EasyGrid = new EzGrid(J);
@@ -1962,20 +1982,32 @@ function EzModal() {
 	 * @param {string} dlgid formId to be packaged
 	 * @param {string} tabl target table
 	 * @param {string} pk {pk, v} for update condition, ignored when crud = jeasy.c
-	 * @param {string} regexExclude exclude expressiong<br>
-	 * <p>This function uses jquery.serializeArray() to serialize all tag's value with attribute 'name'.
+	 * @param {string} opts options:<br>
+	 * <p>{string} opts.regexExclude exclude expressiong<br>
+	 * This function uses jquery.serializeArray() to serialize all tag's value with attribute 'name'.
 	 * But this introduce a problem with easyUI checkbox in treegrid or datagride. When a checkbox is
 	 * checked, the juery serializeArray() will include it's value, this is not expected when serialize a form.
 	 * So an exlude expression is used to exclude checked value from datagride, etc.
 	 * E.g. $(dlgId + ' [name]').not('.datagrid [name]').serializeArray() where exlcude check box value in datagrid and treegrid.</p>
-	 * So, if you want to exlude it, set regexExclude = '.datagrid [name]'
-	 * This is what easyUI not that easy like the first look.
-	 * @return {UpdateReq} request {a = c | u | d} formatted according to form's html.
+	 * <p>So, if you want to exlude it, set regexExclude = '.datagrid [name]'
+	 * (This is what easyUI not that easy like the first look.)</p>
+	 * <p>{boolean} opts.withEmpty with emtpy value like ''. default is ignored with "[value === '']"</p>
+	 * @return {JMesssage} request {a = c | u | d} formatted according to form's html.
 	 */
-	this.save = function (conn, crud, dlgId, tabl, pk, regexExclude) {
+	this.save = function (conn, crud, dlgId, tabl, pk, opts) {
 		dlgId = regex.sharp_(dlgId, ir.deflt.modalId);
 
-		var nvs = $(dlgId + ' [name]').not(regexExclude).serializeArray();
+		var frm = $(dlgId + ' [name]');
+		if (opts) {
+			frm = frm.not(opts.regexExclude);
+			if (opts.withEmpty !== true)
+				frm = frm.not("[value = '']");
+		}
+		else {
+			frm = frm.not("[value = '']");
+		}
+
+		var nvs = frm.serializeArray();
 
 		if (nvs === undefined || nvs.length === 0)
 			console.warn("No saving values found in form: " + dlgId,
@@ -2072,7 +2104,7 @@ function EzMsger() {
 	 * @param {function} m
 	 */
 	this.alert = function (m) {
-		this.info(m, 'warn');
+		this.info(m, this.m.warn_title);
 	};
 
 	this.ok = function (mcode, callback) {
@@ -2080,6 +2112,10 @@ function EzMsger() {
 			this.info(mcode, undefined, callback);
 		else
 			this.info(this.m.ok, undefined, callback);
+	};
+
+	this.confirm = function(m, titl, onconfirm) {
+		$.messager.confirm(titl, m(), onconfirm);
 	};
 
 	/**Replace/extend an individual message.
@@ -2100,18 +2136,26 @@ function EzMsger() {
 	 * in ir-jeasy-engcost.js
 	 */
 	this.m = {
-		ok: () => "OK!",
-		fail: () => "Operation Failed!",
 		// NO CHINESE HERE !
 	 	// Replace m with your variable or call setM(msg-func) if you'd like to,
 		// in ir-jeasy-engcost.js/jconsts.initMsg (or jeasy-api.js sample project config section)
+		ok: () => "OK!",
+		fail: () => "Operation Failed!",
+
+		warn_title: "Warning",
+
 		saved: () => "Saved Successfully!",
 		none_selected: () => "Please select a record!",
+
 		deleted: () => "Delete Successfully!",
+		conf_del: () => "Delete?",
+		conf_del_title: "Confirm Deleting",
 
 		cheap_started: () => "Workflow Started.",
 		cheap_no_rights: () => "You don't have the command rights.",
 		cheap_competation: () => "Can't step to target nodes. Already exists?",
+		
+		function_rights: () => "You don't have the function rights."
 	};
 };
 const EasyMsger = new EzMsger(J);
