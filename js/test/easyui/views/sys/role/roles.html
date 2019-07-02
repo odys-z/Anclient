@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Role Management</title>
+		<!-- You'd better use these online resources other than those poor Chinese programmers
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+			integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			crossorigin="anonymous"></script>
+
+		<script src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+		<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+		-->
+		<script src="../../3rd-lib/jquery-3.4.1.min.js"></script>
+		<script src="../../3rd-lib/jquery.easyui.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui.css">
+		<link rel="stylesheet" type="text/css" href="../3rd/icon.css">
+
+		<script src="../../3rd-lib/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="app-common/jeasy.css">
+
+		<script src="../../../dist/jclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="app-common/jsampl-easyui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../../lib/view/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../../lib/view/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<div id="loading" style="position:absolute;z-index:1000;top:0px;left:0px;width:100%;height:100%;filter: alpha(opacity=60);background:#F8F8F8;text-align :center;padding-top:20%;">
+			<image src="../../Content/images/loading.gif" />
+			<h1><font color="#15428B">Loading ···</font></h1>
+		</div>
+
+		<div id="p" class="easyui-panel" style="padding:1px;background:#fafafa;" data-options="fit:true">
+			<div id="list" class="easyui-layout" data-options="fit:true,border:false">
+				<div data-options="region:'north',border:true" style="height:50px;margin-top:1px;">
+					<form id="irquery">
+						<table style="height:40px">
+							<tr>
+
+								<td width="110px" align="right">Orgnization</td>
+								<td width="130px">
+									<input name="a.orgId eq" class="easyui-validatebox textbox" id="q_orgId"
+										ir-cbb="org.all"
+										ir-onselect="orgSelect"
+										style="width:170px;height:22px;"/>
+								</td>
+
+								<td width="70px" align="right">Role:</td>
+								<td width="130px">
+									<input id="txtusername" name="a.roleName like" type="text" class="easyui-validatebox textbox" style="width:170px;height:22px;" />
+									<input  name="code.parentId eq" type="hidden" value="roleClass"/>
+									<input name="a.orgId eq" type="hidden" id="q_orgIdHidden">
+								</td>
+								<td width="80px">
+									<a id="btnQuery" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="roleQuery()">Search</a>
+								</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+
+				<div data-options="region:'center',border:false">
+					<div class="easyui-layout" style="width:100%;height:100%;">
+
+						<div data-options="region:'west',iconCls:'icon-ok',border:false" style="width:400px">
+
+							<table id="irlist" ir-t="a_roles:a,l:a_reg_org:reg reg.orgId = a.orgId,l:a_domain:code a.roleClass=code.domainValue"
+								class="easyui-datagrid" data-options="fit:true,rownumbers:true,singleSelect:true,toolbar:'#tb', striped:true,">
+								<thead>
+									<tr>
+										<th data-options="field:'roleId',width:0" align="center" hidden="hidden">roleId</th>
+										<th data-options="field:'roleName',width:100" align="center">Role</th>
+										<th data-options="field:'orgName',width:100" align="center" ir-expr="reg.orgName">Orgnization</th>
+									</tr>
+								</thead>
+							</table>
+
+							<div id="tb">
+								<a id='btnExam' href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="saveRoleFunc()" >Save</a>
+							</div>
+
+							<div id="irpager" ir-size="20" ir-grid="irlist"></div>
+
+						</div>
+						<div data-options="region:'center',iconCls:'icon-ok',border:false" style="width:70%">
+
+							<table width="100%" cellspacing="0" border="0" height="100%">
+								<tr>
+									<td style="width:50%;height:100%">
+										<div class="easyui-layout" data-options="fit:true,border:false">
+											<div data-options="region:'center',split:false,border:false" style="width:100%" title="Role's Functions">
+												<ul id="irtree"  ir-tree="trees.role_funcs, {@roleId}" class="easyui-tree"  lines="true" style="margin-top: 3px;" data-options="animate:true,checkbox:true" ></ul>
+											</div>
+
+										</div>
+									</td>
+									<td style="width:50%">
+										<div class="easyui-layout" data-options="fit:true,border:false,">
+											<div data-options="region:'center',split:false,border:false" style="width:100%" title="Workflow Commands">
+												<ul id="process" ir-tree="role-wf-rights, {@roleId}"
+													class="easyui-tree" data-options="animate:true,checkbox:true" ></ul>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

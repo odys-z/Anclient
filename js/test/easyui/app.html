@@ -4,14 +4,22 @@
 	<meta charset="UTF-8">
 	<title>JClient/EasyUI Demo</title>
 
+	<!-- You'd better use these online resources other than those poor Chinese programmers
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"
 		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
 		crossorigin="anonymous"></script>
-	<script src="../3rd-lib/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
 
 	<script src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+	-->
+	<script src="../3rd-lib/jquery-3.4.1.min.js"></script>
+	<script src="../3rd-lib/jquery.easyui.min.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../3rd/icon.css">
+	
+	<script src="../3rd-lib/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="app-common/jeasy.css">
 
 	<script src="../../dist/jclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
@@ -34,8 +42,9 @@
 		<ul id="irtree" class="easyui-tree" style="margin-top: 3px;"></ul>
 	</div>
 	<div data-options="region:'center',title:'',border:false">
+		<iframe id='sample-view' src='views/welcome.html'
+			scrolling="auto" frameborder="0" style="width:100%;height:100%;"></iframe>
 	</div>
-		<iframe id='sample-view' scrolling="auto" frameborder="0" style="width:100%;height:100%;"></iframe>
 	<script>
 		/* load menu<br>
 		 * Load menu from menu.sample (port = menu, dataset-sk = sk.menu)
@@ -62,7 +71,7 @@
 							// index.html window is not function pages' window
 							// https://stackoverflow.com/questions/4689145/pass-jquery-variables-between-iframe-and-parent
 							// $('iframe').get(0).contentWindow.ssClient = ssClient;
-							$('#sample-view').contentWindow.ssClient = ssClient;
+							$('#sample-view').get(0).contentWindow.ssClient = ssClient;
 							ssClient.usrAct (node.id, node.text, node.url);
 							$('#sample-view').attr('src', node.url);
 						});
