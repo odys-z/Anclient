@@ -2063,7 +2063,7 @@ function EzMsger() {
 				//$.messager.alert('warn', 'Session Error! Please re-login.');
 				$.messager.alert('warn', resp.error);
 			else if (code === jvue.Protocol.MsgCode.exIo)
-				$.messager.alert('warn', 'Network Problem!');
+				$.messager.alert('warn', 'Network Failed!');
 			else $.messager.alert('warn', resp.error);
 		}
 		else {
@@ -2096,7 +2096,8 @@ function EzMsger() {
 		else {
 			console.warn("Your message is not found.", m,
 				"We check m's existence in EzMsger.m because including message string anywhere is not encouraged in jeasy.",
-				"You can replace EasyMsger.m with your m object to update and extend messages, in one place.");
+				"You can replace EasyMsger.m with your m object to update and extend messages, in one place.",
+				"See jconst.initMsg() in test/easyui/app-common/jsample-easyui.js.");
 		}
 	};
 
@@ -2154,7 +2155,7 @@ function EzMsger() {
 		cheap_started: () => "Workflow Started.",
 		cheap_no_rights: () => "You don't have the command rights.",
 		cheap_competation: () => "Can't step to target nodes. Already exists?",
-		
+
 		function_rights: () => "You don't have the function rights."
 	};
 };
