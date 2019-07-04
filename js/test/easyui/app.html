@@ -14,10 +14,10 @@
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
 	-->
 	<script src="../3rd-lib/jquery-3.4.1.min.js"></script>
-	<script src="../3rd-lib/jquery.easyui.min.js"></script>
+	<script src="../3rd-lib/easyui-1.8.1/jquery.easyui.min.js"></script>
 
-	<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui.css">
-	<link rel="stylesheet" type="text/css" href="../3rd/icon.css">
+	<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui-1.8.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui-1.8.1/themes/icon.css">
 
 	<script src="../3rd-lib/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" href="app-common/jeasy.css">
@@ -71,9 +71,11 @@
 							// index.html window is not function pages' window
 							// https://stackoverflow.com/questions/4689145/pass-jquery-variables-between-iframe-and-parent
 							// $('iframe').get(0).contentWindow.ssClient = ssClient;
-							$('#sample-view').get(0).contentWindow.ssClient = ssClient;
-							ssClient.usrAct (node.id, node.text, node.url);
-							$('#sample-view').attr('src', node.url);
+							try {
+								$('#sample-view').get(0).contentWindow.ssClient = ssClient;
+								ssClient.usrAct (node.id, node.text, node.url);
+								$('#sample-view').attr('src', node.url);
+							} catch (e) {console.error(e);}
 						});
 				}, EasyMsger.error);
 		}
