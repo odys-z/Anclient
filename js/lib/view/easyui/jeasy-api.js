@@ -176,7 +176,6 @@ function jeasyAPI (J, log) {
 	 * @return {UpdateReq} with a = <i>crud</i>
 	 */
 	this.postBody = function (crud, opts) {
-
 		if (crud === jeasy.c) {
 			var ins = new jvue.InsertReq(null, opts.t);
 			ins.a = crud;
