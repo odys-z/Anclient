@@ -11,8 +11,10 @@ import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JMessage.Port;
+import io.odysz.semantic.jprotocol.JProtocol.CRUD;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
 import io.odysz.semantic.jserv.R.QueryReq;
+import io.odysz.semantic.jserv.U.UpdateReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
@@ -21,6 +23,8 @@ import static io.odysz.jsample.cheap.CheapCode.*;
 public class SessionClient {
 
 	private SemanticObject ssInf;
+	public SemanticObject userInfo () { return ssInf; }
+	
 	private ArrayList<String[]> urlparas;
 	private JHeader header;
 	
@@ -57,6 +61,20 @@ public class SessionClient {
 		return req;
 	}
 	
+	public <T extends JBody> JMessage<? extends JBody> update(String conn, String tbl, String... act)
+			throws SemanticException {
+
+		UpdateReq itm = UpdateReq.formatReq(conn, null, tbl, CRUD.U);
+		JMessage<? extends JBody> jmsg = userReq(tbl, Port.update, act, itm);
+
+		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
+		if (act != null && act.length > 0)
+			header.act(act);
+		
+		return jmsg.header(header) 
+					.body(itm);
+	}
+
 	public <T extends JBody> JMessage<? extends JBody> userReq(String t, IPort port, String[] act, T req)
 			throws SemanticException {
 		if (ssInf == null)
@@ -65,8 +83,6 @@ public class SessionClient {
 		JMessage<?> jmsg = new JMessage<T>(port);
 		jmsg.t = t;
 		
-		// JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
-		// header.act(act);
 		header().act(act);
 		jmsg.header(header);
 		jmsg.body(req);
@@ -79,7 +95,7 @@ public class SessionClient {
 			header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
 		return header;
 	}
-
+	
 	public SessionClient urlPara(String pname, String pv) {
 		if (urlparas == null)
 			urlparas = new ArrayList<String[]>();

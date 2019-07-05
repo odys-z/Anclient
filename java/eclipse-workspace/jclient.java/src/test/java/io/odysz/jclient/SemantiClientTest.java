@@ -4,13 +4,18 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.jsample.protocol.Samport;
 import io.odysz.module.rs.SResultset;
@@ -19,7 +24,11 @@ import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHeader;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
+import io.odysz.semantic.jprotocol.JMessage.MsgCode;
+import io.odysz.semantic.jprotocol.JProtocol.CRUD;
 import io.odysz.semantic.jserv.R.QueryReq;
+import io.odysz.semantic.jserv.U.InsertReq;
+import io.odysz.semantic.jserv.U.UpdateReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
@@ -29,6 +38,7 @@ import io.odysz.semantics.x.SemanticException;
 public class SemantiClientTest {
 	private static String jserv = null;
 	private static String pswd = null;
+	private static String filename = "src/test/res/Sun_Yat-sen_2.jpg";
 	
 	private SessionClient client;
 
@@ -79,6 +89,9 @@ public class SemantiClientTest {
   								
   						String roleId = rs.getString("role");
   						getMenu("admin", roleId);
+  						
+  						// function/semantics tests
+  						testUpload(client);
   					}
   				}
     		}, (code, err) -> {
@@ -87,7 +100,8 @@ public class SemantiClientTest {
     	});
     }
 
-	private void getMenu(String string, String roleId) throws SemanticException, IOException, SQLException {
+	private void getMenu(String string, String roleId)
+			throws SemanticException, IOException, SQLException {
 		DatasetReq req = new DatasetReq(null, "jserv-sample");
 
 		String t = "menu";
@@ -105,10 +119,35 @@ public class SemantiClientTest {
     		@SuppressWarnings("unchecked")
 			List<SemanticObject> rses = (List<SemanticObject>) data.get("menu");
   			for (SemanticObject rs : rses) {
-  				// rs.printSomeData(false, 1, "functId", "funcName");
   				rs.print(System.out);
-
   			}
+    	});
+	}
+
+	static void testUpload(SessionClient client) throws SemanticException, IOException, SQLException {
+		Path p = Paths.get(filename);
+		byte[] f = Files.readAllBytes(p);
+		String b64 = AESHelper.encode64(f);
+
+		JMessage<? extends JBody> jmsg = client.update(null, "a_users");
+		UpdateReq upd = (UpdateReq) jmsg.body(0);
+		upd.nv("img", (String) client.userInfo().get("usrName"))
+			.whereEq("userId", "admin")
+			.post(((UpdateReq) new UpdateReq(null, "a_attach")
+					.a(CRUD.D))
+					.whereEq("cate", "a_users")
+					.whereEq("recId", "admin")
+					.post(((InsertReq) new InsertReq(null, "a_attach"))
+							.attach("uri", b64)));
+
+		jmsg.header(client.header());
+
+		client.console(jmsg);
+		
+    	client.commit(jmsg, (code, data) -> {
+    		if (MsgCode.ok.eq(code))
+    			Utils.logi(code);
+    		else Utils.warn(data.toString());
     	});
 	}
 }
