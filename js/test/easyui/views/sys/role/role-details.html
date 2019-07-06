@@ -63,29 +63,6 @@
 								</tr>
 							</thead>
 						</table>
-
-						<!-- ir-t style, should also works for binding
-						<table id="wfright" class="easyui-datagrid"
-						   ir-t="oz_workflow:w,
-								j:oz_wfnodes:n n.wfId=w.wfId,
-								l:oz_wfcmds:cmd cmd.nodeId=n.nodeId,
-								l:oz_wfrights:a a.nodeId=n.nodeId and a.cmdFilter='a',
-								l:oz_wfrights:b a.nodeId=n.nodeId and b.cmdFilter='b'"
-							data-options="fit:true, rownumbers:true,singleSelect:true, striped:true ">
-							<thead>
-								<tr>
-									<th data-options="field:'nodeId',width:0" ir-expr='n.nodeId' hidden="hidden">nodeId</th>
-									<th data-options="field:'cmd',width:0" ir-expr='cmd.cmd' hidden="hidden">cmdId</th>
-									<th data-options="field:'nodeName',width:60" ir-expr='n.nodeName' align="center" >Node</th>
-									<th data-options="field:'cmdName',width:60" ir-expr='cmd.txt' align="center" >Command</th>
-									<th data-options="field:'canCommit',checkbox:true,width:40"
-												ir-expr="ifnull(a.cmdFilter, false, true)" align="center">Commit</th>
-									<th data-options="field:'canExt',checkbox:true,width:40"
-												ir-expr="b.cmdFilter is not null" align="center">Ext</th>
-								</tr>
-							</thead>
-						</table>
-						-->
 					</div>
 				</div>
 			</td>

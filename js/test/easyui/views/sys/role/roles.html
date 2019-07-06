@@ -25,33 +25,25 @@
 		<script src="../../../app-common/jsampl-easyui.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../../../../lib/view/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../../../../lib/view/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
+		<script src="role.js" type="text/javascript" charset="utf-8"></script>
 	</head>
 
 	<body>
-		<div id="loading" style="position:absolute;z-index:1000;top:0px;left:0px;width:100%;height:100%;filter: alpha(opacity=60);background:#F8F8F8;text-align :center;padding-top:20%;">
-			<image src="../../../app-common/imgs/loading.gif" />
-			<h1><font color="#15428B">Loading ···</font></h1>
-		</div>
-
 		<div id="p" class="easyui-panel" style="padding:1px;background:#fafafa;" data-options="fit:true">
 			<div id="list" class="easyui-layout" data-options="fit:true,border:false">
 				<div data-options="region:'north',border:true" style="height:50px;margin-top:1px;">
 					<form id="irquery">
 						<table style="height:40px">
 							<tr>
-
 								<td width="110px" align="right">Orgnization</td>
 								<td width="130px">
-									<input name="a.orgId eq" class="easyui-validatebox textbox" id="q_orgId"
-										ir-cbb="org.all"
-										ir-onselect="orgSelect"
-										style="width:170px;height:22px;"/>
+									<input name="a.orgId eq" id="q_orgId" ir-cbb="org.all"
+										class="easyui-validatebox textbox" style="width:170px;height:22px;"/>
 								</td>
 
 								<td width="70px" align="right">Role:</td>
 								<td width="130px">
 									<input id="txtusername" name="a.roleName like" type="text" class="easyui-validatebox textbox" style="width:170px;height:22px;" />
-									<input  name="code.parentId eq" type="hidden" value="roleClass"/>
 									<input name="a.orgId eq" type="hidden" id="q_orgIdHidden">
 								</td>
 								<td width="80px">
@@ -65,23 +57,30 @@
 				<div data-options="region:'center',border:false">
 					<div class="easyui-layout" style="width:100%;height:100%;">
 
-						<div data-options="region:'west',iconCls:'icon-ok',border:false" style="width:400px">
+						<div data-options="region:'west',iconCls:'icon-ok',border:false" style="width:30%">
 
-							<table id="irlist" ir-t="a_roles:a,l:a_reg_org:reg reg.orgId = a.orgId,l:a_domain:code a.roleClass=code.domainValue"
+							<table id="irlist" ir-t="a_roles:a,l:a_orgs:o o.orgId = a.orgId"
 								class="easyui-datagrid" data-options="fit:true,rownumbers:true,singleSelect:true,toolbar:'#tb', striped:true,">
 								<thead>
 									<tr>
 										<th data-options="field:'roleId',width:0" align="center" hidden="hidden">roleId</th>
-										<th data-options="field:'roleName',width:100" align="center">Role</th>
-										<th data-options="field:'orgName',width:100" align="center" ir-expr="reg.orgName">Orgnization</th>
+										<th data-options="field:'roleName',width:110" align="center">Role</th>
+										<th data-options="field:'orgName',width:180" align="center" ir-expr="o.orgName">Orgnization</th>
 									</tr>
 								</thead>
 							</table>
 
 							<div id="tb">
-								<a id='btnExam' href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="saveRoleFunc()" >Save</a>
+								<a id='btnExam' href="#" class="easyui-linkbutton" onclick="saveRoleFunc()"
+									data-options="iconCls:'icon-save',plain:true" >Save</a>
 							</div>
 
+							<!--This is where jcliend/js/easyui onload handler's starting point
+							 	- binding the list, with page size information and target easyUi grid.
+								$('#irpager') is bound by EzGrid.pager('#irlist'), see comments on page(pagerId)
+								ir-size is deprecated - using easyui pagination's size instead.
+								ir-grid = id of target list (on easyui grid is supported)
+							-->
 							<div id="irpager" ir-size="20" ir-grid="irlist"></div>
 
 						</div>
@@ -108,10 +107,21 @@
 								</tr>
 							</table>
 						</div>
-
 					</div>
 				</div>
 			</div>
 		</div>
+
+		<script>
+		window.onload = function () {
+			EasyQueryForm.load('#irquery');
+			EasyGrid.pager('irpager', {query: 'irquery'});
+		};
+
+		function loadlist() {
+			EasyGrid.pager('irpager', {query: 'irquery'});
+		}
+
+		</script>
 	</body>
 </html>

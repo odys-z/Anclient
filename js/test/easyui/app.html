@@ -38,7 +38,7 @@
 			</div>
 		</div>
 	</div>
-	<div data-options="region:'west',split:true,title:'System Function'" style="width: 200px; padding: 10px;">
+	<div data-options="region:'west',split:true,title:'System Function'" style="width: 240px; padding: 10px;">
 		<ul id="irtree" class="easyui-tree" style="margin-top: 3px;"></ul>
 	</div>
 	<div data-options="region:'center',title:'',border:false">
@@ -72,9 +72,9 @@
 							// https://stackoverflow.com/questions/4689145/pass-jquery-variables-between-iframe-and-parent
 							// $('iframe').get(0).contentWindow.ssClient = ssClient;
 							try {
-								$('#sample-view').get(0).contentWindow.ssClient = ssClient;
 								ssClient.usrAct (node.id, node.text, node.url);
 								$('#sample-view').attr('src', node.url);
+								// $('#sample-view').get(0).contentWindow.ssClient = ssClient;
 							} catch (e) {console.error(e);}
 						});
 				}, EasyMsger.error);
