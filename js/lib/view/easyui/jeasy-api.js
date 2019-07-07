@@ -1,10 +1,8 @@
-///////////////////////   jeasy API version 1.0    /////////////////////////////
-// This part comes from the open source jclient.js/easyui.
-// Because the current project is not using webpack, so the two parts is merged
-// into one js file for business module's convenient avoiding including 2 files.
-////////////////////////////////////////////////////////////////////////////////
-/** html tag ids and supported ir-attrs
- * @module jeasy/session */
+/**<h6>jeasy API version 1.0</h6>
+ * <p>This part comes with the open source jclient.js.easyui.*.</p>
+ * <p>Because the current project is not using webpack, so these parts are merged
+ * into some js file for business module's convenient.</p>
+ * @module jclient.js.easyui */
 
 /**************       Sample project section     *******************************
  * A sample project usually have common module to configure jeasy API like this:

@@ -1,9 +1,22 @@
+/** Jsample for EasuUI, function module sys/users.
+ * @module jclient.js.jsample.easyui */
+
+/** The function page roles.html is shown int the iframe of app.html,
+ * so use this to initialize. */
 ssClient = parent.ssClient;
 
 function Role () {
+	/**Initialize detail form
+	 * @param {string} crud, typically one of jeasy.crud.c | r | u | d,
+	 * user can use this for other branch tag.
+	 * @param {string} formId form Id, this can be ignored
+	 * - the component know what is itself's function.
+	 * @param {jclient.vue.SessionClient} ssClient the session client
+	 * @param {object} row the selected row in main list (a record bind to the roles.html)
+	 */
 	this.init = function (crud, formId, ssClient, row) {
-		client = ssClient;
 		// don't use 'this', this function is called in callback
+		role.client = ssClient;
 		role.cmd = crud;
 		role.row = row;
 		role.roleForm = formId; // you can hard coding here
@@ -14,8 +27,9 @@ function Role () {
 		// Framework desgin defection detour. See also EasyGrid#bindPager().
 		// Remove pager that handled by EasyGrid.
 		//
-		// Design Notes: user component's tried to design a wideget that a framework can handle,
-		// but it's still matter to user components, and tell another module to handle someone else's.
+		// Design Notes: user components is trying to bind a wideget that a framework can handle,
+		// a function handled by framework and it's still visible (matter) to user components,
+		// and tell another module to handle someone else's.
 		// This is ridiculous - by easyUI's global html and ui objects accessibility!
 		//
 		// We can handle pager id in EzModal#bindWidgets() to left this burden from user.
@@ -33,16 +47,13 @@ function Role () {
 			// a_roles' id. tip: don't use "this.roleId"
 			pk: {pk: 'roleId', v: role.roleId},
 			onload: function () {
-				console.log("Typical CRUD (2) - EasyModal.load(role) - ", row.roleId,
+				if (jeasy.log >= 2) {
+					console.log("[2] Typical CRUD - EasyModal.load(role) - ", row.roleId,
 							"Binding function tree and workflow rights");
+				}
 				role.rolefuncs(row.roleId);
-				// role.cheaprights(row.roleId);
-
 			} };
 		EasyModal.load(formId, opts);
-
-		// because '#wfs' combobox don't have an ir-field attribute, it's not handled by EzModal.load()
-		EasyCbb.combobox('wfs');
 	};
 
 	this.rolefuncs = function (roleId) {

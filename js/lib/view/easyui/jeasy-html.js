@@ -1,8 +1,8 @@
 
-/** easyui html handler
+/** Easyui Html Handler
  * <p>Easyui is html based api. All jclient integration is via html intervention.</p>
  * <p>This module is a helper for handling html tag attribute string parsing.</p>
- * @module jeasy/html */
+ * @module jclient.js.easyui.html */
 
 if (J === undefined)
 	console.error("You need initialize J - use <script>jeasy-api.js</script> first.");

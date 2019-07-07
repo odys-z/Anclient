@@ -1,138 +1,137 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title>User Management</title>
-		<link href="../../../Content/jquery-easyui-1.7.0/themes/default/easyui.css" rel="stylesheet" />
-		<script src="../../../Content/jquery-easyui-1.7.0/jquery.min.js"></script>
-		<script src="../../../Content/jquery-easyui-1.7.0/jquery.easyui.min.js"></script>
-		<link href="../../../Content/icon.css" rel="stylesheet" />
+<head>
+	<meta charset="UTF-8">
+	<title>Role Management</title>
+	<!-- You'd better use these online resources other than those poor Chinese programmers
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+		crossorigin="anonymous"></script>
 
-		<script src="../../../Content/base64js.min.js"></script>
-		<script src="../../../Content/ricmoo-aes.js" type="text/javascript" charset="utf-8"></script>
+	<script src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+	-->
+	<script src="../../../../3rd-lib/jquery-3.4.1.min.js"></script>
+	<script src="../../../../3rd-lib/easyui-1.8.1/jquery.easyui.min.js"></script>
 
-		<script src="../../../Content/jclient/jclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../../Content/jclient/ir-jeasy-engcost.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../../Content/jclient/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../../Content/jclient/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
-		<link href="js/jsample.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../../../../3rd-lib/easyui-1.8.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../../../3rd-lib/easyui-1.8.1/themes/icon.css">
 
-		<script src="js/user.js"></script>
-	</head>
-	<body style="padding: 0px; background: #EAEEF5;">
+	<script src="../../../../3rd-lib/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
 
-		<div id="p" class="easyui-panel" title="User Accounts" style="padding:1px;background:#fafafa;" data-options="fit:true">
-			<!-- 主页面列表 -->
-			<div id="list" class="easyui-layout" data-options="fit:true,border:false">
-				<div data-options="region:'north',border:true" style="height:50px;margin-top:1px;">
-					<form id="irquery">
-						<table style="height:40px">
-							<tr>
-								<td width="100px" align="right">User Name:</td>
-								<td width="130px">
-									<input  name="u.userName like" type="text" class="easyui-validatebox textbox" style="width:170px;height:22px;" />
-								</td>
-								<td width="70" align="right">Project:</td>
-								<td width="150px">
-									<input id="q-org" ir-cbbtree="projects.ez, {@ssClient.userInf.orgId}" type="text"
-										class="easyui-combobox easyui-validatebox textbox" style="width:170px;height:22px;"
-										data-options="valueField:'value',textField:'text'" />
-								</td>
-								<td width="70" align="right">Role:</td>
-								<td width="100px">
-									<input id="q-role" ir-cbb="roles" ir-all name="u.roleId eq" type="text"
-										class="easyui-combobox easyui-validatebox textbox" style="width:170px;height:22px;"
-										data-options="valueField:'value',textField:'text'" />
-								</td>
-								<td width="80px">
-									<a id="btnQuery" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'"
-										onclick="EasyGrid.pager('irpager', {query:'irquery'})">Search</a>
-								</td>
-							</tr>
+	<script src="../../../../../dist/jclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../../app-common/jsampl-easyui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../../../../lib/view/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../../../../lib/view/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
+	<script src="user.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body style="padding: 0px; background: #EAEEF5;">
+
+	<div id="p" class="easyui-panel" title="User Accounts" style="padding:1px;background:#fafafa;" data-options="fit:true">
+		<!-- 主页面列表 -->
+		<div id="list" class="easyui-layout" data-options="fit:true,border:false">
+			<div data-options="region:'north',border:false" style="height:50px;margin-top:1px;">
+				<form id="irquery">
+					<table style="height:40px">
+						<tr>
+							<td width="100px" align="right">User Name:</td>
+							<td width="230px">
+								<input  name="u.userName like" type="text" class="easyui-validatebox textbox"
+									style="width:170px;height:22px;" />
+							</td>
+							<td width="70" align="right">Role:</td>
+							<td width="100px">
+								<input id="q-role" ir-cbb="roles" ir-all name="u.roleId eq" type="text"
+									class="easyui-combobox easyui-validatebox textbox" style="width:170px;height:22px;"
+									data-options="valueField:'value',textField:'text'" />
+							</td>
+							<td width="80px">
+								<a id="btnQuery" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'"
+									onclick="EasyGrid.pager('irpager', {query:'irquery'})">Search</a>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+
+			<div data-options="region:'center',border:false">
+				<div class="easyui-layout" style="width:100%;height:100%;">
+					<div data-options="region:'center',iconCls:'icon-ok'">
+						<!--In jclient.js/easyUi api, grid binding supports 2 way:
+					 		1: ir-t:  specify main-table, joins, and jeasy-html will handle this with QueryReq, visiting Port.query;
+					 		2: ir-sk: specify dataset.xml/ds.sk sql-args, jeasy-html will handle this with DatasetReq, visiting Port.dataset.
+							3: superOrgs is the array of orgIds, values will be used for joining condition.
+							You will get this sql:
+							select * from (select t.*, @ic_num := @ic_num + 1 as rnum from (
+								select userId userId, userName userName, mobile mobile, dept.orgId orgId, o.orgName orgName, dept.departName departName, dept.departId departId, r.roleId roleId, r.roleName roleName, notes notes
+								from a_user u join a_reg_org o on u.orgId = o.orgId
+								left outer join a_org_depart dept on u.departId = dept.departId
+								left outer join a_roles r on u.roleId = r.roleId OR u.roleId = 'admin' AND u.orgId in ('Mossad', 'MI6', 'CIA', 'SVR', 'ChaoYang People')
+							) t, (select @ic_num := 0) ic_t) t1 where rnum > 0 and rnum <= 20
+						 -->
+						<table id="irlist" class="easyui-datagrid"
+							ir-t="a_users:u, j:a_orgs:o u.orgId=o.orgId,
+											l:a_roles:r u.roleId=r.roleId or u.roleId = 'admin' and u.orgId in {@superOrgs}"
+							ir-orderby="u.userId desc, o.orgId"
+							data-options="fit:true, rownumbers:true,singleSelect:true, striped:true, toolbar:'#tb'">
+							<thead>
+								<tr>
+									<th data-options="field:'userId',width:100" align="center">Account ID</th>
+									<th data-options="field:'userName',width:120" align="center" >Name</th>
+									<th data-options="field:'orgId',width:0" align="center" ir-expr="o.orgId" hidden="hidden" >orgId</th>
+									<th data-options="field:'orgName',width:160" align="center" ir-expr="o.orgName">Orgnization</th>
+									<th data-options="field:'roleId',width:100" align="center" ir-expr="r.roleId" hidden="hidden">roleId</th>
+									<th data-options="field:'roleName',width:100" align="center" ir-expr="r.roleName">Role</th>
+									<th data-options="field:'notes',width:160" ir-expr="substr(remarks, 1, 16)" align="center" >Remarks</th>
+								</tr>
+							</thead>
 						</table>
-					</form>
-				</div>
+						<div id="tb">
+							<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true"
+								onclick="EasyModal.addDetails('users-details.html','Add User',460,710,'user.initUser')"
+								title="Add a New User">New User</a>
+							<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true"
+								onclick="EasyModal.editDetails('users-details.html','Edit User',460,710, 'user.initUser')"
+								title="Edit the Selected User">Edit User</a>
 
-				<div data-options="region:'center',border:false">
-					<div class="easyui-layout" style="width:100%;height:100%;">
-						<div data-options="region:'center',iconCls:'icon-ok'">
-							<!--In jclient.js/easyUi api, grid binding supports 2 way:
-						 		1: ir-t:  specify main-table, joins, and jeasy-html will handle this with QueryReq, visiting Port.query;
-						 		2: ir-sk: specify dataset.xml/ds.sk sql-args, jeasy-html will handle this with DatasetReq, visiting Port.dataset.
-								3: superOrgs is the array of orgIds, values will be used for joining condition.
-								You will get this sql:
-								select * from (select t.*, @ic_num := @ic_num + 1 as rnum from (
-									select userId userId, userName userName, mobile mobile, dept.orgId orgId, o.orgName orgName, dept.departName departName, dept.departId departId, r.roleId roleId, r.roleName roleName, notes notes
-									from a_user u join a_reg_org o on u.orgId = o.orgId
-									left outer join a_org_depart dept on u.departId = dept.departId
-									left outer join a_roles r on u.roleId = r.roleId OR u.roleId = 'admin' AND u.orgId in ('Mossad', 'MI6', 'CIA', 'SVR', 'ChaoYang People')
-								) t, (select @ic_num := 0) ic_t) t1 where rnum > 0 and rnum <= 20
-							 -->
-							<table id="irlist" class="easyui-datagrid"
-								ir-t="a_user:u, j:a_reg_org:o u.orgId=o.orgId,
-												l:a_org_depart:dept u.departId=dept.departId,
-												l:a_roles:r u.roleId=r.roleId or u.roleId = 'admin' and u.orgId in {@superOrgs}"
-								ir-orderby="u.userId desc, o.orgId"
-								data-options="fit:true, rownumbers:true,singleSelect:true, striped:true, toolbar:'#tb'">
-								<thead>
-									<tr>
-										<th data-options="field:'userId',width:100" align="center">Account ID</th>
-										<th data-options="field:'userName',width:120" align="center" >Name</th>
-										<th data-options="field:'mobile',width:120" ir-expr="u.mobile" align="center">Mobile</th>
-										<th data-options="field:'orgId',width:0" align="center" ir-expr="dept.orgId" hidden="hidden" >orgId</th>
-										<th data-options="field:'orgName',width:160" align="center" ir-expr="o.orgName">Orgnization</th>
-										<th data-options="field:'departName',width:160" align="center" ir-expr="dept.departName">Department</th>
-										<th data-options="field:'departId',width:0" align="center" ir-expr="dept.departId" hidden="hidden">departId</th>
-										<th data-options="field:'roleId',width:100" align="center" ir-expr="r.roleId" hidden="hidden">roleId</th>
-										<th data-options="field:'roleName',width:100" align="center" ir-expr="r.roleName">Role</th>
-										<th data-options="field:'notes',width:160" ir-expr="substring(notes, 1, 16)" align="center" >Remarks</th>
-									</tr>
-								</thead>
-							</table>
-							<div id="tb">
-								<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true"
-									onclick="EasyModal.addDetails('users-details.html','Add User',460,710,'initUser')"
-									title="Add a New User">New User</a>
-								<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true"
-									onclick="EasyModal.editDetails('users-details.html','Edit User',460,710, 'initUser')"
-									title="Edit the Selected User">Edit User</a>
+							<!-- pk: the key value to be find from 'irlist',
+								e.g. value of "field:userId" will be used as pk = {userId: '00001'} when calling EzGrid.delete().
+							-->
+							<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true"
+								onclick="EasyGrid.delrow('irlist', {pk: 'userId', onok: loadlist})"
+								title="Delete the Selected User">Delete User</a>
 
-								<!-- pk: the key value to be find from 'irlist',
-									e.g. value of "field:userId" will be used as pk = {userId: '00001'} when calling EzGrid.delete().
-								-->
-								<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-cross',plain:true"
-									onclick="EasyGrid.delrow('irlist', {pk: 'userId', onok: loadlist})"
-									title="Delete the Selected User">Delete User</a>
-
-								<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true"
-									onclick="EasyModal.editDetails('role-details.html','编辑',525,820, 'role.init')"
-									title="Edit Role - 2nd Dialog Demo">His Role</a>
-							</div>
+							<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true"
+								onclick="EasyModal.editDetails('role-details.html','编辑',525,820, 'role.init')"
+								title="Edit Role - 2nd Dialog Demo">His Role</a>
 						</div>
 					</div>
 				</div>
-				<div data-options="region:'south', split:true" style="height:35px;">
-					<!-- $('#irpager') is bound by EzGrid.pager('#irlist'), see comments on page(pagerId)
-						ir-size is deprecated - using easyui pagination's size instead.
-						ir-grid = id of target list (on easyui grid is supported)
-					-->
-					<div id="irpager" ir-size="20" ir-grid="irlist"
-						style="background:#efefef;border:0px solid #ccc;" ></div>
-				</div>
-
 			</div>
+			<div data-options="region:'south', split:true" style="height:35px;">
+				<!-- $('#irpager') is bound by EzGrid.pager('#irlist'), see comments on page(pagerId)
+					ir-size is deprecated - using easyui pagination's size instead.
+					ir-grid = id of target list (on easyui grid is supported)
+				-->
+				<div id="irpager" ir-size="20" ir-grid="irlist"
+					style="background:#efefef;border:0px solid #ccc;" ></div>
+			</div>
+
 		</div>
+	</div>
 
-		<script>
-		window.onload = function () {
-			EasyQueryForm.load('#irquery');
-			EasyGrid.pager('irpager', {query: 'irquery'});
-		};
+	<script>
+	window.onload = function () {
+		EasyQueryForm.load('#irquery');
+		EasyGrid.pager('irpager', {query: 'irquery'});
+	};
 
-		function loadlist() {
-			EasyGrid.pager('irpager', {query: 'irquery'});
-		}
+	function loadlist() {
+		EasyGrid.pager('irpager', {query: 'irquery'});
+	}
 
-		</script>
-	</body>
+	</script>
+</body>
 </html>

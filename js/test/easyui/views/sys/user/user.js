@@ -6,7 +6,8 @@ var client;
 var userId;
 var user;
 
-var superOrgs = ['Mossad', 'MI6', 'CIA', 'SVR', 'ChaoYang People'];
+/**They are every where */
+var superOrgs = ['ChaoYang People'];
 
 function User () {
 	this.initUser = function(crud, formId, ssClient, row) {
@@ -18,7 +19,7 @@ function User () {
 		userId = row === undefined ? undefined : row.userId;
 		user = row;
 
-		var opts = {t: "a_user:u,l:a_attaches:att att.busiTbl='a_user' and att.busiId=u.userId",
+		var opts = {t: "a_users:u,l:a_attaches:att att.busiTbl='a_users' and att.busiId=u.userId",
 					pk: {pk: 'userId', v: userId},
 					onload: function () {
 								console.log("Typical CRUD - EasyModal.load() Callback");
@@ -30,7 +31,7 @@ function User () {
 	}
 
 	/** save user's informantion */
-	this.save function() {
+	this.save = function() {
 		userId = $('#userId').val().trim();
 		// create a JMessage with an UpdateReq body
 		var q = EasyModal.save (null,		// default connId
@@ -42,19 +43,18 @@ function User () {
 		// You append post updates here (call q.post(UpdateReq))
 		// Example here is adding file attachment as a post request and commit in callback of file loaded.
 		// See role details modal dialog for example of none-callback style.
-
-	    if (fileclient.file) {
-	        // save with attach files
-	        fileclient.getFiles64(function(file, b64) {
-			    // 3 insert attached files
-			    var ins = new jvue.InsertReq(jconsts.conn, 'a_attaches')
+		if (fileclient.file) {
+			// save with attach files
+			fileclient.getFiles64(function(file, b64) {
+				// 3 insert attached files
+				var ins = new jvue.InsertReq(jconsts.conn, 'a_attaches')
 					.nv('busiId', userId)
 					.nv('busiTbl', 'a_user')
 					.nv('attName', file.name)
 					.nv('uri', b64);
 
-			    // 2. delete all attachments
-			    var del = new jvue.DeleteReq(jconsts.conn, 'a_attaches')
+				// 2. delete all attachments
+				var del = new jvue.DeleteReq(jconsts.conn, 'a_attaches')
 					.whereEq('busiId', userId)
 					.whereEq('busiTbl', 'a_user')
 					.post(ins);
@@ -62,15 +62,15 @@ function User () {
 			// 1. delete is post updating user
 			q.post(del).nv("pswd", "123456");
 
-			    client.commit(q,
-				    function(resp) {
-					    // You can fire saved event at client side here.
-					    EasyMsger.ok(EasyMsger.m.saved);
-				    }, EasyMsger.error);
-		    });
-	    }
-	    else {
-	        // save without saving file
+				client.commit(q,
+					function(resp) {
+						// You can fire saved event at client side here.
+						EasyMsger.ok(EasyMsger.m.saved);
+					}, EasyMsger.error);
+			});
+		}
+		else {
+			// save without saving file
 			client.commit(q,
 				function(resp) {
 					// You can fire saved event at client side here.
@@ -80,57 +80,3 @@ function User () {
 	}
 }
 var user = new User();
-
-function FileClient () {
-	/**Init a file upload client control.
-	 * see https://codepen.io/matt-west/pen/CfilG
-	 * @param {string} fileInput the html file fileInput
-	 * @param {string} prevuId preview div id
-	 * @param {regex} ftype file type regex, default: /image.* /
-	 */
-	this.init = function(fileInput, prevuId, ftype) {
-		var fileInput = document.getElementById(regex.desharp_(fileInput));
-		var fileDisplayArea = document.getElementById(prevuId);
-
-		fileInput.addEventListener('change', function(e) {
-			// { name: "a2.png", lastModified: 1553155518000, webkitRelativePath: "", size: 151541, type: "image/png" }
-			fileclient.file = fileInput.files[0];
-
-			// var imageType = /image.*/;
-			var imageType = ftype === undefined ? /image.*/ : ftype;
-
-			if (fileclient.file.type.match(imageType)) {
-				var reader = new FileReader();
-
-				reader.onload = function(e) {
-					fileDisplayArea.innerHTML = "";
-
-					var img = new Image();
-					img.src = reader.result;
-					img.classList.add('preview');
-
-					fileDisplayArea.appendChild(img);
-				}
-				reader.readAsDataURL(fileclient.file);
-			} else {
-				fileDisplayArea.innerHTML = "File not supported!"
-			}
-		});
-	};
-
-	this.getFiles64 = function(onok) {
-		var freader = new FileReader();
-		// e: ProgressEvent
-		freader.onload = function (e) {
-			console.log(e, freader.result);
-			var b64 = jvue.aes.bytesToB64(new Uint8Array(freader.result));
-			if (typeof onok === 'function') {
-				onok(fileclient.file, b64);
-			}
-		}
-		if (fileclient.file) {
-			freader.readAsArrayBuffer(fileclient.file);
-		}
-	}
-}
-var fileclient = new FileClient;
