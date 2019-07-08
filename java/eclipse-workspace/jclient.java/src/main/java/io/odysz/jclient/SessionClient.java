@@ -14,6 +14,7 @@ import io.odysz.semantic.jprotocol.JMessage.Port;
 import io.odysz.semantic.jprotocol.JProtocol.CRUD;
 import io.odysz.semantic.jprotocol.JProtocol.SCallback;
 import io.odysz.semantic.jserv.R.QueryReq;
+import io.odysz.semantic.jserv.U.InsertReq;
 import io.odysz.semantic.jserv.U.UpdateReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
@@ -38,20 +39,21 @@ public class SessionClient {
 	/**Format a query request object, including all information for construct a "select" statement.
 	 * @param t main table, (sometimes function category), e.g. "e_areas"
 	 * @param alias from table alias, e.g. "a"
-	 * @param funcId current function ID
 	 * @param page -1 for no paging at server side.
 	 * @param size
+	 * @param funcId current function ID
 	 * @return formatted query object.
 	 * @throws Exception
 	 */
-	public JMessage<QueryReq> query(String conn, String t, String alias, String funcId,
-			int page, int size) throws SemanticException {
+	public JMessage<QueryReq> query(String conn, String t, String alias,
+			int page, int size, String... funcId) throws SemanticException {
 
 		JMessage<QueryReq> req = new JMessage<QueryReq>(Port.query);
 		req.t = t;
 
 		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
-		JHeader.usrAct(funcId, "query", t, "R");
+		if (funcId != null && funcId.length > 0)
+			JHeader.usrAct(funcId[0], "query", t, "R");
 		req.header(header);
 
 		QueryReq itm = QueryReq.formatReq(conn, req, t, alias);
@@ -61,7 +63,8 @@ public class SessionClient {
 		return req;
 	}
 	
-	public <T extends JBody> JMessage<? extends JBody> update(String conn, String tbl, String... act)
+	@SuppressWarnings("unchecked")
+	public JMessage<UpdateReq> update(String conn, String tbl, String... act)
 			throws SemanticException {
 
 		UpdateReq itm = UpdateReq.formatReq(conn, null, tbl, CRUD.U);
@@ -71,9 +74,24 @@ public class SessionClient {
 		if (act != null && act.length > 0)
 			header.act(act);
 		
-		return jmsg.header(header) 
+		return (JMessage<UpdateReq>) jmsg.header(header) 
 					.body(itm);
 	}
+
+	@SuppressWarnings("unchecked")
+	public JMessage<InsertReq> insert(String conn, String tbl, String... act)
+			throws SemanticException {
+		InsertReq itm = InsertReq.formatReq(conn, null, tbl);
+		JMessage<? extends JBody> jmsg = userReq(tbl, Port.update, act, itm);
+
+		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
+		if (act != null && act.length > 0)
+			header.act(act);
+		
+		return (JMessage<InsertReq>) jmsg.header(header) 
+					.body(itm);
+	}
+
 
 	public <T extends JBody> JMessage<? extends JBody> userReq(String t, IPort port, String[] act, T req)
 			throws SemanticException {
