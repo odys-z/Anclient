@@ -142,6 +142,10 @@ public class SemantiClientTest {
 					.whereEq("busiTbl", "a_users")
 					.whereEq("busiId", "admin")
 					.post((InsertReq.formatReq(null, null, "a_attaches")
+							.nv("attName", "'s Portrait")
+							// The parent pk can't be resulved, we must provide the value.
+							// See https://odys-z.github.io/notes/semantics/best-practices.html#fk-ins-cate
+							.nv("busiId", "admin")
 							.nv("busiTbl", "a_users")
 							.nv("uri", b64))));
 
