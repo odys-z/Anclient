@@ -82,7 +82,7 @@ public class SessionClient {
 	public JMessage<InsertReq> insert(String conn, String tbl, String... act)
 			throws SemanticException {
 		InsertReq itm = InsertReq.formatReq(conn, null, tbl);
-		JMessage<? extends JBody> jmsg = userReq(tbl, Port.update, act, itm);
+		JMessage<? extends JBody> jmsg = userReq(tbl, Port.insert, act, itm);
 
 		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
 		if (act != null && act.length > 0)

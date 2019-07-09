@@ -66,8 +66,10 @@ public class SemantiClientTest {
     	Utils.printCaller(false);
     	JHelper.printCaller(false);
 
+    	String sys = "sys-sqlite";
+    	
     	client = Clients.login("admin", pswd);
-    	JMessage<QueryReq> req = client.query("inet",
+    	JMessage<QueryReq> req = client.query(sys,
     			"a_users", "u",
     			-1, -1); // don't paging
 
@@ -167,18 +169,22 @@ public class SemantiClientTest {
 	private void testReports(SessionClient client)
 			throws SemanticException, IOException, SQLException {
 		String orcl = "orcl.alarm-report";
+
 		// 1. generate a report
-		InsertReq recs = InsertReq.formatReq(orcl, null, "a_reprecords");
+		InsertReq recs = InsertReq.formatReq(orcl, null, "b_reprecords")
+				.cols(new String[] {"deviceId", "val"});
+
 		for (int i = 0; i < 20; i++) {
 			ArrayList<Object[]> row = new ArrayList<Object[]> ();
-			row.add(new String[] {"devicId", String.format("d00%2s", i)});
+			row.add(new String[] {"deviceId", String.format("d00%2s", i)});
 			row.add(new Object[] {"val", new ExprPart(randomVal())});
 			recs.valus(row);
 		}
 		
-		JMessage<? extends JBody> jmsg = client.insert(orcl, "a_reports");
+		JMessage<? extends JBody> jmsg = client.insert(orcl, "b_reports");
 		InsertReq rept = ((InsertReq) jmsg.body(0));
-		rept.nv("areaId", "US")
+		rept.cols(new String[] {"areaId", "ignored"} )
+			.nv("areaId", "US")
 			.nv("ignored", new ExprPart("0"))
 			.post(recs);
 
@@ -186,17 +192,23 @@ public class SemantiClientTest {
     		// 2. read last 10 days'
     		(code, data) -> {
     			JMessage<QueryReq> j = client
-    					.query(orcl, "a_reports", "r", -1, 0);
-    			j.body(0).j("a_reprecords", "rec", "r.repId = rec.repId")
+    				.query(orcl, "b_reports", "r", -1, 0);
+
+    			j.body(0)
+    				.j("b_reprecords", "rec", "r.repId = rec.repId")
     				.where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)");
 
-    			client.commit(j, (c, d) -> {
-					SResultset rs = (SResultset) d.rs(0);
-						rs.printSomeData(false, 2, "recId");
+    			client.commit(j,
+    				(c, d) -> {
+						SResultset rs = (SResultset) d.rs(0);
+							rs.printSomeData(false, 2, "recId");
 					},
-				(c, err) -> {
-					fail(String.format("code: %s, error: %s", c, err.error()));
-				});
+					(c, err) -> {
+						fail(String.format("code: %s, error: %s", c, err.error()));
+					});
+    		},
+    		(c, err) -> {
+				fail(String.format("code: %s, error: %s", c, err.error()));
     		});
 	}
 
