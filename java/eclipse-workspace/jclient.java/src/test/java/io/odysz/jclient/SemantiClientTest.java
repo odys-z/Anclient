@@ -196,7 +196,8 @@ public class SemantiClientTest {
 
     			j.body(0)
     				.j("b_reprecords", "rec", "r.repId = rec.repId")
-    				.where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)");
+    				// .where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)");
+    				.where(">", "decode(\"r\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate", "-0.1");
 
     			client.commit(j,
     				(c, d) -> {
@@ -208,6 +209,7 @@ public class SemantiClientTest {
 					});
     		},
     		(c, err) -> {
+    			Utils.warn(err.error());
 				fail(String.format("code: %s, error: %s", c, err.error()));
     		});
 	}
