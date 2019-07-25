@@ -139,28 +139,35 @@ class J {
     /**Post a request, using Ajax.
      * @param {JMessage} jreq
      * @param {function} onOk
-     * @param {function} onErr */
-	post (jreq, onOk, onErr) {
+     * @param {function} onErr
+     * @param {object} ajaxOpts */
+	post (jreq, onOk, onErr, ajaxOpts) {
 		if (jreq === undefined) {
 			console.error('jreq is null');
 			return;
 		}
 		if (jreq.port === undefined || jreq.port == '') {
 			// TODO docs...
-			console.error('Port is null - you probably created a requesting JMessage with "new [User/Query/...]Req()".\n',
+			console.error('Port is null - you probably created a requesting JMessage with "new [User|Query|...]Req()".\n',
 				'Creating a new request message can mainly throught one of 2 way:\n',
-				'Way 1: Using a html/vue helper, like those in jeasy-html.js/EasyModal.save().\n',
+				'Way 1: Using a jclient helper, like those in jeasy-html.js/EasyModal.save().\n',
 				'Way 2: Using a ssClient request API, e.g. ssClient.delete().',
 				'TODO docs...');
 			return;
 		}
 		var url = this.servUrl(jreq.port);
 
+    var async =  true;
+    if (ajaxOpts !== undefined && ajaxOpts !== null) {
+        async = ajaxOpts.async !== false;
+    }
+
 		$.ajax({type: 'POST',
 				// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
 				url: url,
 				contentType: "application/json; charset=utf-8",
 				crossDomain: true,
+        async: async,
 				//xhrFields: { withCredentials: true },
 				data: JSON.stringify(jreq),
 				success: function (resp) {
@@ -362,6 +369,15 @@ class SessionClient {
 	 */
 	commit(jmsg, onOk, onError) {
 		this.J.post(jmsg, onOk, onError);
+	}
+
+	/**Post the request message (JMessage with body of subclass of JBody) synchronously.
+	 * @param {JMessage} jmsg request message
+	 * @param {function} onOk
+	 * @param {function} onError
+	 */
+	commitSync(jmsg, onOk, onError) {
+		this.J.post(jmsg, onOk, onError, {async: false});
 	}
 
 	/**
