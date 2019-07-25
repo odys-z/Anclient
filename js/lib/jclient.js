@@ -12,11 +12,9 @@ import {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, D
  * */
 const aes = new AES();
 
-/**Jclient.js API
+/**Jclient.js core API
  * Java equivalent of
  * io.odysz.jclient.Clients;
- * io.odysz.jclient.SessionClient;
- * @class
  * @property cfg the configurations,<br>
  * cfg.connId,<br>
  * cfg.verbose,<br>
@@ -253,7 +251,9 @@ class J {
 
 export const _J = new J();
 
-/**Client with session logged in.*/
+/**Client with session logged in.
+ * Equivalent of java io.odysz.jclient.SessionClient;
+ */
 class SessionClient {
 	static get ssInfo() { return "ss-info"; }
 

@@ -1,6 +1,11 @@
 /**Json protocol helper to support jclient.
  * All JBody and JHelper static helpers are here. */
 class Protocol {
+  /**Globally set this client's options.
+   * @param {object} options<br>
+   * options.noNull no null value <br>
+   * options.noBoolean no boolean value<br>
+   */
 	static opts(options) {
 		if (options) {
 			if (options.noNull !== undefined)
