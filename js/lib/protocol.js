@@ -341,6 +341,10 @@ class QueryReq {
 		return this;
 	}
 
+	whereEq (lopr, ropr) {
+		this.whereCond("=", lopr, "'" + ropr + "'");
+	}
+
 	orderby (tabl, col, asc) {
 		if (this.orders === undefined)
 			this.orders = [];
