@@ -2023,6 +2023,8 @@ function EzModal() {
 };
 const EasyModal = new EzModal(J);
 
+/**EasyUI messager wrapper
+ */
 function EzMsger() {
 	this.init = function(code) {
 		if (code === undefined) {
@@ -2130,11 +2132,12 @@ function EzMsger() {
 		Object.assign(this.m, mf);
 	};
 
-	/**Message strings.
-	 * Use EzMsger.setM to setup application's message strings.
-	 * NO CHINESE HERE for m!
-	 * Replace m with your varialbe or call setM(msg-func) if you'd like to,
-	 * in ir-jeasy-engcost.js
+	/**Message Strings.
+	 * <p>Use EzMsger.setM to setup application's message strings.</p>
+     * <p>This is a support for coding convention: message string must put together.</p>
+	 * <p><b>NO CHINESE HERE for m!</b></p>
+	 * <p>Replace m with your varialbe or call setM(msg-func) if you'd like to,
+	 * in ir-jeasy-engcost.js</p>
 	 */
 	this.m = {
 		// NO CHINESE HERE !

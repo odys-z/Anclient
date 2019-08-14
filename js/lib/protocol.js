@@ -333,6 +333,11 @@ class QueryReq {
 		return this;
 	}
 
+    /**Add where clause condition
+     * @param {string} logic logic type
+     * @param {string} loper left operator
+     * @param {string} roper right operator
+     * @return {QueryReq} this */
 	whereCond (logic, loper, roper) {
 		if (Array.isArray(logic))
 			this.where = this.where.concat(logic);

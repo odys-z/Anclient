@@ -165,7 +165,7 @@ class J {
 				url: url,
 				contentType: "application/json; charset=utf-8",
 				crossDomain: true,
-        async: async,
+                async: async,
 				//xhrFields: { withCredentials: true },
 				data: JSON.stringify(jreq),
 				success: function (resp) {
@@ -396,15 +396,6 @@ class SessionClient {
 		var qryItem = new QueryReq(conn, maintbl, alias, pageInf);
 
 		var header = Protocol.formatHeader(this.ssInf);
-		// if (typeof act === 'object') {
-		// 	header.act = act;
-		// 	this.usrAct(act.func, act.cate, act.cmd, act.remarks);
-		// }
-		// else
-		// 	header.userAct({func: 'query',
-		// 				cmd: 'select',
-		// 				cate: 'r',
-		// 				remarks: 'session query.serv'});
 		if (typeof act === 'object') {
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}
