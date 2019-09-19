@@ -23,7 +23,7 @@ A {
 	line-height: 25px;
 	font-size: 19px;
 	font-weight: bold;
-	background: url('app-common/odysz.png') no-repeat 9px 14px;
+	background: url('odysz.png') no-repeat 9px 14px;
 }
 
 /* .l-topmenu-welcome {
@@ -54,7 +54,7 @@ A {
 .banner-text {
 	width: 358px;
 	height: 38px;
-	background: url('app-common/odysz.png') no-repeat;
+	background: url('odysz.png') no-repeat;
 	margin-left: 24px;
 	margin-top: 15px;
 	float: left;

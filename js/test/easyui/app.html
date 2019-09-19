@@ -75,6 +75,7 @@
 								ssClient.usrAct (node.id, node.text, node.url);
 								$('#sample-view').attr('src', node.url);
 								// $('#sample-view').get(0).contentWindow.ssClient = ssClient;
+								$('#sample-view').get(0).contentWindow.postMessage(ssClient, '*'); 
 							} catch (e) {console.error(e);}
 						});
 				}, EasyMsger.error);

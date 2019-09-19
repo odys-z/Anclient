@@ -1,4 +1,24 @@
-ssClient = parent.ssClient;
+// ssClient = parent.ssClient;
+
+window.addEventListener('message', event => {
+    // IMPORTANT: check the origin of the data!
+    // if (event.origin.startsWith('http://yoursite.com')) {
+    //     // The data was sent from your site.
+    //     // Data sent with postMessage is stored in event.data:
+    //     console.log(event.data);
+    // } else {
+    //     // The data was NOT sent from your site!
+    //     // Be careful! Do not use it. This else branch is
+    //     // here just for clarity, you usually shouldn't needed.
+    //     return;
+	// }
+	ssClient = event.data;
+	console.log('session client', ssClient, ssClient.userInf, ssClient.userReq);
+
+	ssClient = new jvue.SessionClient(ssClient.ssInf, ssClient.ssInf.iv);
+	EasyQueryForm.load('#irquery');
+	EasyGrid.pager('irpager', {query: 'irquery'});
+});
 
 var cmd = jeasy.u;
 var usrForm;
