@@ -22,7 +22,7 @@ const aes = new AES();
  * where defaultserv is the serv root, will be concated with port name for different poert.
  */
 class J {
-	/**@param {string} serv serv path root, e.g. 'http://localhost/semantic-jserv'
+	/**@param {string} serv serv path root, e.g. 'http://localhost/jsample'
 	 */
 	constructor (urlRoot) {
 	 	this.cfg = {
@@ -155,45 +155,45 @@ class J {
 		}
 		var url = this.servUrl(jreq.port);
 
-    var async =  true;
-    if (ajaxOpts !== undefined && ajaxOpts !== null) {
-        async = ajaxOpts.async !== false;
-    }
+		var async =  true;
+		if (ajaxOpts !== undefined && ajaxOpts !== null) {
+			async = ajaxOpts.async !== false;
+		}
 
 		$.ajax({type: 'POST',
-				// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
-				url: url,
-				contentType: "application/json; charset=utf-8",
-				crossDomain: true,
-                async: async,
-				//xhrFields: { withCredentials: true },
-				data: JSON.stringify(jreq),
-				success: function (resp) {
-					// response Content-Type = application/json;charset=UTF-8
-					// code != ok
-					if (resp.code !== Protocol.MsgCode.ok)
-						if (typeof onErr === "function")
-							onErr(resp.code, resp);
-						else console.error(resp);
-					// code == ok
-					else {
-						if (typeof onOk === "function")
-							onOk(resp);
-						else console.log(resp);
-					}
-				},
-				error: function (resp) {
-					if (typeof onErr === "function") {
-						console.error("ajax error:", url);
-						onErr(Protocol.MsgCode.exIo, resp);
-					}
-					else {
-						console.error("ajax error:", url);
-						console.error("req", jreq);
-						console.error("response", resp);
-					}
+			// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
+			url: url,
+			contentType: "application/json; charset=utf-8",
+			crossDomain: true,
+            async: async,
+			//xhrFields: { withCredentials: true },
+			data: JSON.stringify(jreq),
+			success: function (resp) {
+				// response Content-Type = application/json;charset=UTF-8
+				// code != ok
+				if (resp.code !== Protocol.MsgCode.ok)
+					if (typeof onErr === "function")
+						onErr(resp.code, resp);
+					else console.error(resp);
+				// code == ok
+				else {
+					if (typeof onOk === "function")
+						onOk(resp);
+					else console.log(resp);
 				}
-			});
+			},
+			error: function (resp) {
+				if (typeof onErr === "function") {
+					console.error("ajax error:", url);
+					onErr(Protocol.MsgCode.exIo, resp);
+				}
+				else {
+					console.error("ajax error:", url);
+					console.error("req", jreq);
+					console.error("response", resp);
+				}
+			}
+		});
 	}
 
 	// TODO moved to protocol.js?

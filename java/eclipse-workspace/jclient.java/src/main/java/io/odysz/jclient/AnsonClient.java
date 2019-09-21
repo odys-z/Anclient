@@ -17,6 +17,7 @@ import io.odysz.semantic.jprotocol.JProtocol.SCallback;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.InsertReq;
 import io.odysz.semantic.jserv.U.UpdateReq;
+import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
@@ -28,8 +29,8 @@ import static io.odysz.jsample.cheap.CheapCode.*;
  */
 public class AnsonClient {
 
-	private JSession ssInf;
-	public JSession ssInfo () { return ssInf; }
+	private SessionInf ssInf;
+	public SessionInf ssInfo () { return ssInf; }
 	
 	private ArrayList<String[]> urlparas;
 	private JHeader header;
@@ -37,7 +38,7 @@ public class AnsonClient {
 	/**Session login response from server.
 	 * @param sessionInfo
 	 */
-	AnsonClient(JSession sessionInfo) {
+	AnsonClient(SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 	}
 	
@@ -75,7 +76,7 @@ public class AnsonClient {
 		UpdateReq itm = UpdateReq.formatReq(conn, null, tbl, CRUD.U);
 		JMessage<? extends JBody> jmsg = userReq(tbl, Port.update, act, itm);
 
-		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
+		JHeader header = new JHeader(ssInf.ssid(), ssInf.uid());
 		if (act != null && act.length > 0)
 			header.act(act);
 		
@@ -89,7 +90,7 @@ public class AnsonClient {
 		InsertReq itm = InsertReq.formatReq(conn, null, tbl);
 		JMessage<? extends JBody> jmsg = userReq(tbl, Port.insert, act, itm);
 
-		JHeader header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
+		JHeader header = new JHeader(ssInf.ssid(), ssInf.uid());
 		if (act != null && act.length > 0)
 			header.act(act);
 		
@@ -115,7 +116,7 @@ public class AnsonClient {
 
 	public JHeader header() {
 		if (header == null)
-			header = new JHeader(ssInf.getString("ssid"), ssInf.getString("uid"));
+			header = new JHeader(ssInf.ssid(), ssInf.uid());
 		return header;
 	}
 	

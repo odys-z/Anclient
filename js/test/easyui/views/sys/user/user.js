@@ -16,8 +16,8 @@ window.addEventListener('message', event => {
 	console.log('session client', ssClient, ssClient.userInf, ssClient.userReq);
 
 	ssClient = new jvue.SessionClient(ssClient.ssInf, ssClient.ssInf.iv);
-	EasyQueryForm.load('#irquery');
-	EasyGrid.pager('irpager', {query: 'irquery'});
+	// EasyQueryForm.load('#irquery');
+	// EasyGrid.pager('irpager', {query: 'irquery'});
 });
 
 var cmd = jeasy.u;

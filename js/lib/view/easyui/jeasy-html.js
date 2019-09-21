@@ -1458,7 +1458,7 @@ function EzGrid (J) {
 	this.bindPage = function (gridId, json, total, opts, ezTreegrid) {
 
 		EasyHtml.ez('datagrid', gridId, json, opts);
-		//默认选中第一行
+		// select 1st row
 		if(opts.select || regex.isblank(opts.select))
 			$(gridId).datagrid("selectRow", 0);
 		EasyMsger.close();
@@ -1513,8 +1513,6 @@ function EzGrid (J) {
 		// }
 
 		EasyMsger.close();
-//		if (typeof opts.onload === "function")
-//			opts.onload ( json, total );
 	};
 
 	/** delete selected row.
