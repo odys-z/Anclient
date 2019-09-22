@@ -1,4 +1,6 @@
 // ssClient = parent.ssClient;
+
+console.log(window);
 // https://stackoverflow.com/questions/25098021/securityerror-blocked-a-frame-with-origin-from-accessing-a-cross-origin-frame
 window.addEventListener('message', event => {
     // IMPORTANT: check the origin of the data!
@@ -12,11 +14,11 @@ window.addEventListener('message', event => {
     //     // here just for clarity, you usually shouldn't needed.
     //     return;
 	// }
-	ssClient = event.data;
-	console.log('session client', ssClient, ssClient.userInf, ssClient.userReq);
+	var ssInf = event.data;
+	console.log('session client', JSON.stringify(event), ssInf);
 
-	ssClient = new jvue.SessionClient(ssClient.ssInf, ssClient.ssInf.iv);
-	// EasyQueryForm.load('#irquery');
+	ssClient = new jvue.SessionClient(ssInf, ssInf.iv);
+	EasyQueryForm.load('#irquery');
 	// EasyGrid.pager('irpager', {query: 'irquery'});
 });
 

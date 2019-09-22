@@ -74,8 +74,13 @@
 							try {
 								ssClient.usrAct (node.id, node.text, node.url);
 								$('#sample-view').attr('src', node.url);
+
+								// parent.ssClient can not work anymore from file system
 								// $('#sample-view').get(0).contentWindow.ssClient = ssClient;
-								$('#sample-view').get(0).contentWindow.postMessage(ssClient, '*'); 
+								// https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+								// $('#sample-view').get(0).contentWindow.postMessage(ssClient.ssInf, '*');
+								console.log(ssClient.ssInf);
+								document.getElementById('sample-view').contentWindow.postMessage(ssClient.ssInf, '*');
 							} catch (e) {console.error(e);}
 						});
 				}, EasyMsger.error);

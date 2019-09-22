@@ -51,18 +51,17 @@ public class AnsonClient {
 	 * @return formatted query object.
 	 * @throws Exception
 	 */
-	public AnsonMsg<AnQueryReq> query(String conn, String t, String alias,
+	public AnsonMsg<AnQueryReq> query(String conn, String alias,
 			int page, int size, String... funcId) throws SemanticException {
 
 		AnsonMsg<AnQueryReq> req = new AnsonMsg<AnQueryReq>(Port.query);
-		req.t = t;
 
 		JHeader header = new JHeader(ssInf.ssid(), ssInf.uid());
 		if (funcId != null && funcId.length > 0)
-			JHeader.usrAct(funcId[0], "query", t, "R");
+			JHeader.usrAct(funcId[0], "query", "R");
 		req.header(header);
 
-		AnQueryReq itm = AnQueryReq.formatReq(conn, req, t, alias);
+		AnQueryReq itm = AnQueryReq.formatReq(conn, req, alias);
 		req.body(itm);
 		itm.page(page, size);
 

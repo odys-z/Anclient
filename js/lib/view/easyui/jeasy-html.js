@@ -1584,8 +1584,10 @@ const EasyGrid = new EzGrid(J);
 ////////////////////////  Easy API for Basic CRUD   ////////////////////////////
 //
 function EzQueryForm(J) {
-	//bug easyui <input>  id ? success:faliure.
+	//bug easyui <input>  id ? success:failure.
 	this.load = function(formId) {
+		if (regex.isblank(formId))
+			return;
 		// 1. load ir-combobox
 		$(formId + " ["+ ir.combobox + "]").each(function(key, domval) {
 			EasyCbb.combobox(domval.id);
