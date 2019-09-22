@@ -1,26 +1,26 @@
 // ssClient = parent.ssClient;
 
-console.log(window);
-// https://stackoverflow.com/questions/25098021/securityerror-blocked-a-frame-with-origin-from-accessing-a-cross-origin-frame
-window.addEventListener('message', event => {
-    // IMPORTANT: check the origin of the data!
-    // if (event.origin.startsWith('http://yoursite.com')) {
-    //     // The data was sent from your site.
-    //     // Data sent with postMessage is stored in event.data:
-    //     console.log(event.data);
-    // } else {
-    //     // The data was NOT sent from your site!
-    //     // Be careful! Do not use it. This else branch is
-    //     // here just for clarity, you usually shouldn't needed.
-    //     return;
-	// }
-	var ssInf = event.data;
-	console.log('session client', JSON.stringify(event), ssInf);
-
-	ssClient = new jvue.SessionClient(ssInf, ssInf.iv);
-	EasyQueryForm.load('#irquery');
-	// EasyGrid.pager('irpager', {query: 'irquery'});
-});
+// console.log(window);
+// // https://stackoverflow.com/questions/25098021/securityerror-blocked-a-frame-with-origin-from-accessing-a-cross-origin-frame
+// window.addEventListener('message', event => {
+//     // IMPORTANT: check the origin of the data!
+//     // if (event.origin.startsWith('http://yoursite.com')) {
+//     //     // The data was sent from your site.
+//     //     // Data sent with postMessage is stored in event.data:
+//     //     console.log(event.data);
+//     // } else {
+//     //     // The data was NOT sent from your site!
+//     //     // Be careful! Do not use it. This else branch is
+//     //     // here just for clarity, you usually shouldn't needed.
+//     //     return;
+// 	// }
+// 	var ssInf = event.data;
+// 	console.log('session client', JSON.stringify(event), ssInf);
+//
+// 	ssClient = new jvue.SessionClient(ssInf, ssInf.iv);
+// 	EasyQueryForm.load('#irquery');
+// 	// EasyGrid.pager('irpager', {query: 'irquery'});
+// });
 
 var cmd = jeasy.u;
 var usrForm;

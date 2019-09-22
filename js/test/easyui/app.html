@@ -75,12 +75,32 @@
 								ssClient.usrAct (node.id, node.text, node.url);
 								$('#sample-view').attr('src', node.url);
 
+								// Design Memo
 								// parent.ssClient can not work anymore from file system
 								// $('#sample-view').get(0).contentWindow.ssClient = ssClient;
+								//
+								// but postMessage also has problem: message is been handled before iframe page loaed.
 								// https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
 								// $('#sample-view').get(0).contentWindow.postMessage(ssClient.ssInf, '*');
-								console.log(ssClient.ssInf);
-								document.getElementById('sample-view').contentWindow.postMessage(ssClient.ssInf, '*');
+								// document.getElementById('sample-view').contentWindow.postMessage(ssClient.ssInf, '*');
+								//
+								// Solution: Using Postmate to handle message
+								const handshake = new Postmate({
+									// container: document.getElementById('some-div'), // Element to inject frame into
+									container: 'sample-view'
+									url: 'http://child.com/page.html' // Page to load, must have postmate.js. This will also be the origin used for communication.
+									classListArray: ["myClass"] //Classes to add to the iframe via classList, useful for styling.
+								});
+
+								// When parent <-> child handshake is complete, data may be requested from the child
+								handshake.then(child => {
+									// Fetch the height property in child.html and set it to the iFrames height
+									child.get('height')
+										.then(height => child.frame.style.height = `${height}px`);
+
+									// Listen to a particular event from the child
+									child.on('some-event', data => console.log(data)); // Logs "Hello, World!"
+								});
 							} catch (e) {console.error(e);}
 						});
 				}, EasyMsger.error);
