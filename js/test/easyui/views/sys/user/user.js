@@ -22,6 +22,21 @@
 // 	// EasyGrid.pager('irpager', {query: 'irquery'});
 // });
 
+var handshake = new Postmate.Model({
+  // Serializable values
+  ssInf: "bar",
+  // Functions
+  height: () => document.height || document.body.offsetHeight,
+
+  load: (ssInf) => console.log(ssInf);
+  // Promises
+  // data: fetch(new Request('data.json'))
+});
+
+handshake.then(parent => {
+  parent.emit('dirty-notify', 'User.js');
+});
+
 var cmd = jeasy.u;
 var usrForm;
 var client;

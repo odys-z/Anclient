@@ -73,7 +73,7 @@
 							// $('iframe').get(0).contentWindow.ssClient = ssClient;
 							try {
 								ssClient.usrAct (node.id, node.text, node.url);
-								$('#sample-view').attr('src', node.url);
+								// $('#sample-view').attr('src', node.url);
 
 								// Design Memo
 								// parent.ssClient can not work anymore from file system
@@ -88,8 +88,10 @@
 								const handshake = new Postmate({
 									// container: document.getElementById('some-div'), // Element to inject frame into
 									container: 'sample-view'
-									url: 'http://child.com/page.html' // Page to load, must have postmate.js. This will also be the origin used for communication.
-									classListArray: ["myClass"] //Classes to add to the iframe via classList, useful for styling.
+									// url: 'http://child.com/page.html' // Page to load, must have postmate.js. This will also be the origin used for communication.
+									url: node.url,
+									classListArray: ["myClass"], //Classes to add to the iframe via classList, useful for styling.
+									model: {ssInf: ssClient.ssInf}
 								});
 
 								// When parent <-> child handshake is complete, data may be requested from the child
@@ -98,8 +100,10 @@
 									child.get('height')
 										.then(height => child.frame.style.height = `${height}px`);
 
+									child.load(JSON.stringify(ssClient.ssInf));
+
 									// Listen to a particular event from the child
-									child.on('some-event', data => console.log(data)); // Logs "Hello, World!"
+									child.on('dirty-notify', data => console.log(data)); // Logs "Hello, World!"
 								});
 							} catch (e) {console.error(e);}
 						});

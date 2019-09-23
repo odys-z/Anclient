@@ -98,8 +98,9 @@ const resolveValue = (model, property) => {
  * Composes an API to be used by the parent
  * @param {Object} info Information on the consumer
  */
-function ParentAPI () {
-  constructor (info) {
+function ParentAPI (info) {
+  // constructor (info)
+  {
     this.parent = info.parent
     this.frame = info.frame
     this.child = info.child
@@ -187,8 +188,9 @@ function ParentAPI () {
  * Composes an API to be used by the child
  * @param {Object} info Information on the consumer
  */
-function ChildAPI () {
-  constructor (info) {
+function ChildAPI (info) {
+  // constructor (info)
+  {
     this.model = info.model
     this.parent = info.parent
     this.parentOrigin = info.parentOrigin
@@ -246,8 +248,13 @@ function ChildAPI () {
   * The entry point of the Parent.
  * @type {Class}
  */
-function Postmate () {
-  static debug = false // eslint-disable-line no-undef
+function Postmate ({
+    // container = typeof container !== 'undefined' ? container : document.body, // eslint-disable-line no-use-before-define
+	container = container === undefined ? 'view' : container,
+    model,
+    url,
+    classListArray = [] }) {
+  static debug = true // eslint-disable-line no-undef
 
   // Internet Explorer craps itself
   static Promise = (() => {
@@ -263,22 +270,23 @@ function Postmate () {
    * @param {Object} object The element to inject the frame into, and the url
    * @return {Promise}
    */
-  constructor ({
-    // container = typeof container !== 'undefined' ? container : document.body, // eslint-disable-line no-use-before-define
-	container = container === undefined ? 'view' : container,
-    model,
-    url,
-    classListArray = [],
-  }) { // eslint-disable-line no-undef
-    this.parent = window
+  // constructor ({
+  //   // container = typeof container !== 'undefined' ? container : document.body, // eslint-disable-line no-use-before-define
+	// container = container === undefined ? 'view' : container,
+  //   model,
+  //   url,
+  //   classListArray = [],
+  // })
+  { // eslint-disable-line no-undef
+    this.parent = window;
     // this.frame = document.createElement('iframe')
 	this.frame = document.getElementById(container);
-    this.frame.classList.add.apply(this.frame.classList, classListArray)
+    this.frame.classList.add.apply(this.frame.classList, classListArray);
     // container.appendChild(this.frame)
-    this.child = this.frame.contentWindow || this.frame.contentDocument.parentWindow
-    this.model = model || {}
+    this.child = this.frame.contentWindow || this.frame.contentDocument.parentWindow;
+    this.model = model || {};
 
-    return this.sendHandshake(url)
+    return this.sendHandshake(url);
   }
 
   /**
@@ -287,12 +295,15 @@ function Postmate () {
    * @return {Promise}     Promise that resolves when the handshake is complete
    */
   sendHandshake (url) {
-    const childOrigin = resolveOrigin(url)
-    let attempt = 0
-    let responseInterval
+    const childOrigin = resolveOrigin(url);
+    let attempt = 0;
+    let responseInterval;
+
     return new Postmate.Promise((resolve, reject) => {
       const reply = (e) => {
-        if (!sanitize(e, childOrigin)) return false
+        if (!sanitize(e, childOrigin))
+			return false;
+
         if (e.data.postmate === 'handshake-reply') {
           clearInterval(responseInterval)
           if (process.env.NODE_ENV !== 'production') {
@@ -308,10 +319,14 @@ function Postmate () {
 
         // Might need to remove since parent might be receiving different messages
         // from different hosts
-        if (process.env.NODE_ENV !== 'production') {
-          log('Parent: Invalid handshake reply')
-        }
-        return reject('Failed handshake')
+        // if (process.env.NODE_ENV !== 'production') {
+        //   log('Parent: Invalid handshake reply')
+        // }
+
+		if (Postmate.debug)
+          log('Parent: Invalid handshake reply');
+
+        return reject('Failed handshake');
       }
 
       this.parent.addEventListener('message', reply, false)
@@ -355,13 +370,14 @@ function Postmate () {
  * The entry point of the Child
  * @type {Class}
  */
-Postmate.prototype.Model = function Model () {
+Postmate.prototype.Model = function Model (model) {
   /**
    * Initializes the child, model, parent, and responds to the Parents handshake
    * @param {Object} model Hash of values, functions, or promises
    * @return {Promise}       The Promise that resolves when the handshake has been received
    */
-  constructor (model) {
+  // constructor (model)
+  {
     this.child = window
     this.model = model
     this.parent = this.child.parent
