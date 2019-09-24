@@ -1,27 +1,13 @@
+const debug = true;
+
+// 2019.09.24
+// The parent.ssClient can not accessed from local file anymore
 // ssClient = parent.ssClient;
+// in html: <script src="../../../../../lib/view/easyui/postmate.js"
+// 					type="text/javascript" charset="utf-8"></script>
 
-// console.log(window);
-// // https://stackoverflow.com/questions/25098021/securityerror-blocked-a-frame-with-origin-from-accessing-a-cross-origin-frame
-// window.addEventListener('message', event => {
-//     // IMPORTANT: check the origin of the data!
-//     // if (event.origin.startsWith('http://yoursite.com')) {
-//     //     // The data was sent from your site.
-//     //     // Data sent with postMessage is stored in event.data:
-//     //     console.log(event.data);
-//     // } else {
-//     //     // The data was NOT sent from your site!
-//     //     // Be careful! Do not use it. This else branch is
-//     //     // here just for clarity, you usually shouldn't needed.
-//     //     return;
-// 	// }
-// 	var ssInf = event.data;
-// 	console.log('session client', JSON.stringify(event), ssInf);
-//
-// 	ssClient = new jvue.SessionClient(ssInf, ssInf.iv);
-// 	EasyQueryForm.load('#irquery');
-// 	// EasyGrid.pager('irpager', {query: 'irquery'});
-// });
-
+/** The function page roles.html is shown in the iframe of app.html,
+ * so use this to communicate with parent and initialize page. */
 var handshake = new Postmate.Model({
   // Serializable values
   ssInf: "bar",
@@ -29,17 +15,17 @@ var handshake = new Postmate.Model({
   height: () => document.height || document.body.offsetHeight,
 
   load: (ssInf) => {
-	  console.log('load():', ssInf)
-	  // Promises
-	  // data: fetch(new Request('data.json'))
+	  if (debug) console.log('load():', ssInf);
+
 	  ssClient = new jvue.SessionClient(ssInf, ssInf.iv);
 	  EasyQueryForm.load('#irquery');
+	  EasyGrid.pager('irpager', {query: 'irquery'});
 	}
 });
 
-handshake.then(parent => {
-  parent.emit('dirty-notify', 'User.js');
-});
+// handshake.then(parent => {
+//   parent.emit('dirty-notify', 'User.js');
+// });
 
 var cmd = jeasy.u;
 var usrForm;

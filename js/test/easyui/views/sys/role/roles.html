@@ -24,6 +24,7 @@
 	<script src="../../../app-common/jsampl-easyui.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../../../../../lib/view/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../../../../../lib/view/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../../../../lib/view/easyui/postmate.js" type="text/javascript" charset="utf-8"></script>
 	<script src="role.js" type="text/javascript" charset="utf-8"></script>
 </head>
 
@@ -113,10 +114,10 @@
 	</div>
 
 	<script>
-	window.onload = function () {
-		EasyQueryForm.load('#irquery');
-		EasyGrid.pager('irpager', {query: 'irquery'});
-	};
+	// window.onload = function () {
+	// 	EasyQueryForm.load('#irquery');
+	// 	EasyGrid.pager('irpager', {query: 'irquery'});
+	// };
 
 	function loadlist() {
 		EasyGrid.pager('irpager', {query: 'irquery'});

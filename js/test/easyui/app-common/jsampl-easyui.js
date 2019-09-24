@@ -17,14 +17,18 @@ const jconsts = {
 	 * 4+: additional debug information, etc.
 	 */
 	verbose: 5,
+
 	/** if your tomcat server.xml is configured like:
 	 * <Context docBase="jserv-sample" path="/jsample" reloadable="true"
 	 * 		source="org.eclipse.jst.j2ee.server:jserv-sample"/></Host>
 	 * you should get the engcosts/src/main/webapp/index.html
 	 */
 	serv: 'http://localhost:8080/jsample',
-	/** connection Id used by this client */
-	conn: 'local-sqlite',
+
+	/** default connection Id used by this client,
+	 * Must be one of web-app/WEB-INF/connects.xml/t/c/id */
+	conn: 'sys-sqlite',
+	
 	/**datas.xml/sk, sk for ir-combobox, ir-cbbtree shouldn't be here. */
 	sk: {
 		/**sk: system function menu dataset */
