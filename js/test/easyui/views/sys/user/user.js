@@ -28,9 +28,13 @@ var handshake = new Postmate.Model({
   // Functions
   height: () => document.height || document.body.offsetHeight,
 
-  load: (ssInf) => console.log(ssInf);
-  // Promises
-  // data: fetch(new Request('data.json'))
+  load: (ssInf) => {
+	  console.log('load():', ssInf)
+	  // Promises
+	  // data: fetch(new Request('data.json'))
+	  ssClient = new jvue.SessionClient(ssInf, ssInf.iv);
+	  EasyQueryForm.load('#irquery');
+	}
 });
 
 handshake.then(parent => {

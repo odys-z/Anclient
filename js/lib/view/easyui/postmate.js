@@ -1,12 +1,4 @@
 
-/**<p>Postmate message handler for EasuUI - another example shows that EasyUI is not
- * pefect for a fromwork for presetation layer</p>
- * Source modified from: https://github.com/dollarshaveclub/postmate
- * License: MIT
- *
- * @module jclient.js.easyui.component
- */
-
 /**
  * The type of messages our frames our sending
  * @type {String}
@@ -98,9 +90,8 @@ const resolveValue = (model, property) => {
  * Composes an API to be used by the parent
  * @param {Object} info Information on the consumer
  */
-function ParentAPI (info) {
-  // constructor (info)
-  {
+class ParentAPI {
+  constructor (info) {
     this.parent = info.parent
     this.frame = info.frame
     this.child = info.child
@@ -108,7 +99,7 @@ function ParentAPI (info) {
 
     this.events = {}
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (Promise.debug) {
       log('Parent: Registering API')
       log('Parent: Awaiting messages...')
     }
@@ -122,7 +113,7 @@ function ParentAPI (info) {
       const { data, name } = (((e || {}).data || {}).value || {})
 
       if (e.data.postmate === 'emit') {
-        if (process.env.NODE_ENV !== 'production') {
+        if (Promise.debug) {
           log(`Parent: Received event emission: ${name}`)
         }
         if (name in this.events) {
@@ -132,7 +123,7 @@ function ParentAPI (info) {
     }
 
     this.parent.addEventListener('message', this.listener, false)
-    if (process.env.NODE_ENV !== 'production') {
+    if (Promise.debug) {
       log('Parent: Awaiting event emissions from Child')
     }
   }
@@ -176,7 +167,7 @@ function ParentAPI (info) {
   }
 
   destroy () {
-    if (process.env.NODE_ENV !== 'production') {
+    if (Promise.debug) {
       log('Parent: Destroying Postmate instance')
     }
     window.removeEventListener('message', this.listener, false)
@@ -188,15 +179,14 @@ function ParentAPI (info) {
  * Composes an API to be used by the child
  * @param {Object} info Information on the consumer
  */
-function ChildAPI (info) {
-  // constructor (info)
-  {
+class ChildAPI {
+  constructor (info) {
     this.model = info.model
     this.parent = info.parent
     this.parentOrigin = info.parentOrigin
     this.child = info.child
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (Promise.debug) {
       log('Child: Registering API')
       log('Child: Awaiting messages...')
     }
@@ -204,7 +194,7 @@ function ChildAPI (info) {
     this.child.addEventListener('message', (e) => {
       if (!sanitize(e, this.parentOrigin)) return
 
-      if (process.env.NODE_ENV !== 'production') {
+      if (Promise.debug) {
         log('Child: Received request', e.data)
       }
 
@@ -230,7 +220,7 @@ function ChildAPI (info) {
   }
 
   emit (name, data) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (Promise.debug) {
       log(`Child: Emitting Event "${name}"`, data)
     }
     this.parent.postMessage({
@@ -248,13 +238,8 @@ function ChildAPI (info) {
   * The entry point of the Parent.
  * @type {Class}
  */
-function Postmate ({
-    // container = typeof container !== 'undefined' ? container : document.body, // eslint-disable-line no-use-before-define
-	container = container === undefined ? 'view' : container,
-    model,
-    url,
-    classListArray = [] }) {
-  static debug = true // eslint-disable-line no-undef
+class Postmate {
+  static debug = false; // eslint-disable-line no-undef
 
   // Internet Explorer craps itself
   static Promise = (() => {
@@ -270,23 +255,21 @@ function Postmate ({
    * @param {Object} object The element to inject the frame into, and the url
    * @return {Promise}
    */
-  // constructor ({
-  //   // container = typeof container !== 'undefined' ? container : document.body, // eslint-disable-line no-use-before-define
-	// container = container === undefined ? 'view' : container,
-  //   model,
-  //   url,
-  //   classListArray = [],
-  // })
-  { // eslint-disable-line no-undef
-    this.parent = window;
-    // this.frame = document.createElement('iframe')
-	this.frame = document.getElementById(container);
-    this.frame.classList.add.apply(this.frame.classList, classListArray);
+  constructor ({
+    // container = typeof container !== 'undefined' ? container : document.body, // eslint-disable-line no-use-before-define
+    container,
+    model,
+    url,
+    classListArray = [],
+  }) { // eslint-disable-line no-undef
+    this.parent = window
+    this.frame = document.querySelector('#' + container)
+    this.frame.classList.add.apply(this.frame.classList, classListArray)
     // container.appendChild(this.frame)
-    this.child = this.frame.contentWindow || this.frame.contentDocument.parentWindow;
-    this.model = model || {};
+    this.child = this.frame.contentWindow || this.frame.contentDocument.parentWindow
+    this.model = model || {}
 
-    return this.sendHandshake(url);
+    return this.sendHandshake(url)
   }
 
   /**
@@ -295,23 +278,20 @@ function Postmate ({
    * @return {Promise}     Promise that resolves when the handshake is complete
    */
   sendHandshake (url) {
-    const childOrigin = resolveOrigin(url);
-    let attempt = 0;
-    let responseInterval;
-
+    const childOrigin = resolveOrigin(url)
+    let attempt = 0
+    let responseInterval
     return new Postmate.Promise((resolve, reject) => {
       const reply = (e) => {
-        if (!sanitize(e, childOrigin))
-			return false;
-
+        if (!sanitize(e, childOrigin)) return false
         if (e.data.postmate === 'handshake-reply') {
           clearInterval(responseInterval)
-          if (process.env.NODE_ENV !== 'production') {
+          if (Promise.debug) {
             log('Parent: Received handshake reply from Child')
           }
           this.parent.removeEventListener('message', reply, false)
           this.childOrigin = e.origin
-          if (process.env.NODE_ENV !== 'production') {
+          if (Promise.debug) {
             log('Parent: Saving Child origin', this.childOrigin)
           }
           return resolve(new ParentAPI(this))
@@ -319,21 +299,17 @@ function Postmate ({
 
         // Might need to remove since parent might be receiving different messages
         // from different hosts
-        // if (process.env.NODE_ENV !== 'production') {
-        //   log('Parent: Invalid handshake reply')
-        // }
-
-		if (Postmate.debug)
-          log('Parent: Invalid handshake reply');
-
-        return reject('Failed handshake');
+        if (Promise.debug) {
+          log('Parent: Invalid handshake reply')
+        }
+        return reject('Failed handshake')
       }
 
       this.parent.addEventListener('message', reply, false)
 
       const doSend = () => {
         attempt++
-        if (process.env.NODE_ENV !== 'production') {
+        if (Promise.debug) {
           log(`Parent: Sending handshake attempt ${attempt}`, { childOrigin })
         }
         this.child.postMessage({
@@ -358,7 +334,7 @@ function Postmate ({
         this.frame.onload = loaded
       }
 
-      if (process.env.NODE_ENV !== 'production') {
+      if (Promise.debug) {
         log('Parent: Loading frame', { url })
       }
       this.frame.src = url
@@ -370,14 +346,13 @@ function Postmate ({
  * The entry point of the Child
  * @type {Class}
  */
-Postmate.prototype.Model = function Model (model) {
+Postmate.Model = class Model {
   /**
    * Initializes the child, model, parent, and responds to the Parents handshake
    * @param {Object} model Hash of values, functions, or promises
    * @return {Promise}       The Promise that resolves when the handshake has been received
    */
-  // constructor (model)
-  {
+  constructor (model) {
     this.child = window
     this.model = model
     this.parent = this.child.parent
@@ -395,11 +370,11 @@ Postmate.prototype.Model = function Model (model) {
           return
         }
         if (e.data.postmate === 'handshake') {
-          if (process.env.NODE_ENV !== 'production') {
+          if (Promise.debug) {
             log('Child: Received handshake from Parent')
           }
           this.child.removeEventListener('message', shake, false)
-          if (process.env.NODE_ENV !== 'production') {
+          if (Promise.debug) {
             log('Child: Sending handshake reply to Parent')
           }
           e.source.postMessage({
@@ -414,12 +389,12 @@ Postmate.prototype.Model = function Model (model) {
             Object.keys(defaults).forEach(key => {
               this.model[key] = defaults[key]
             })
-            if (process.env.NODE_ENV !== 'production') {
+            if (Promise.debug) {
               log('Child: Inherited and extended model from Parent')
             }
           }
 
-          if (process.env.NODE_ENV !== 'production') {
+          if (Promise.debug) {
             log('Child: Saving Parent origin', this.parentOrigin)
           }
           return resolve(new ChildAPI(this))

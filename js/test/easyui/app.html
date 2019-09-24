@@ -26,6 +26,7 @@
 	<script src="app-common/jsampl-easyui.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../../lib/view/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../../lib/view/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../lib/view/easyui/postmate.js" type="text/javascript" charset="utf-8"></script>
 </head>
 
 <body class="easyui-layout">
@@ -87,7 +88,7 @@
 								// Solution: Using Postmate to handle message
 								const handshake = new Postmate({
 									// container: document.getElementById('some-div'), // Element to inject frame into
-									container: 'sample-view'
+									container: 'sample-view',
 									// url: 'http://child.com/page.html' // Page to load, must have postmate.js. This will also be the origin used for communication.
 									url: node.url,
 									classListArray: ["myClass"], //Classes to add to the iframe via classList, useful for styling.
@@ -98,12 +99,12 @@
 								handshake.then(child => {
 									// Fetch the height property in child.html and set it to the iFrames height
 									child.get('height')
-										.then(height => child.frame.style.height = `${height}px`);
+										.then(height => {if (height) child.frame.style.height = `${height}px`});
 
-									child.load(JSON.stringify(ssClient.ssInf));
+									child.call('load', ssClient.ssInf);
 
 									// Listen to a particular event from the child
-									child.on('dirty-notify', data => console.log(data)); // Logs "Hello, World!"
+									child.on('dirty-notify', data => console.log('on dirty-notify', data)); // Logs "Hello, World!"
 								});
 							} catch (e) {console.error(e);}
 						});
