@@ -4,19 +4,23 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 
+import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
+import io.odysz.common.Utils;
+import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JMessage.MsgCode;
 import io.odysz.semantic.jprotocol.JMessage.Port;
+import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.SessionReq;
 import io.odysz.semantics.x.SemanticException;
 
 /**
- * @author ody
- *
+ * @author odys-z@github.com
+ * @param <T>
  */
 public class Clients<T extends JBody> {
 	public static final boolean console = true;
@@ -76,6 +80,40 @@ public class Clients<T extends JBody> {
   		return inst[0];
 	}
 
+	public static AnsonClient loginV11(String uid, String pswdPlain)
+			throws IOException, SemanticException, SQLException, GeneralSecurityException, AnsonException {
+		byte[] iv =   AESHelper.getRandom();
+		String iv64 = AESHelper.encode64(iv);
+		if (uid == null || pswdPlain == null)
+			throw new SemanticException("user id and password can not be null.");
+		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+		
+		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
+  		// AnsonMsg<? extends AnsonBody> reqv11 = new AnsonMsg<AnQueryReq>(Port.session);;
+		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
+
+		AnsonClient[] inst = new AnsonClient[1]; 
+
+		HttpServClient httpClient = new HttpServClient();
+		// String.format("%s/login.serv?t=login", servRt);
+		String url = servUrl(Port.session);
+		httpClient.postV11(url, reqv11, (code, msg) -> {
+					if (MsgCode.ok.eq(code)) {
+						// create a logged in client
+						inst[0] = new AnsonClient(msg);
+
+						if (Clients.console)
+							Utils.logi(msg.toString());
+					}
+					else 
+						throw new SemanticException("loging failed\ncode: %s\nerror: %s",
+								code, msg.error());
+				});
+  		if (inst[0] == null)
+  			throw new IOException("HttpServClient return null client.");
+  		return inst[0];
+	}
+	
 	/**Get a insecure client - for no session handling request.
 	 * @param uid
 	 * @param pswdPlain
