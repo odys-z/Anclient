@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import io.odysz.common.Utils;
+import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
@@ -48,6 +49,7 @@ public class AnsonClient {
 	}
 
 	/**Format a query request object, including all information for construct a "select" statement.
+	 * @param conn connection id
 	 * @param t main table, (sometimes function category), e.g. "e_areas"
 	 * @param alias from table alias, e.g. "a"
 	 * @param page -1 for no paging at server side.
@@ -56,7 +58,7 @@ public class AnsonClient {
 	 * @return formatted query object.
 	 * @throws Exception
 	 */
-	public AnsonMsg<AnQueryReq> query(String conn, String alias,
+	public AnsonMsg<AnQueryReq> query(String conn, String t, String alias,
 			int page, int size, String... funcId) throws SemanticException {
 
 		AnsonMsg<AnQueryReq> req = new AnsonMsg<AnQueryReq>(Port.query);
@@ -144,6 +146,7 @@ public class AnsonClient {
 		return this;
 	}
 
+	public void commit(AnsonMsg<? extends AnsonBody> req, SCallback onOk, SCallback onErr) {
 //	public void commit(JMessage<? extends JBody> req, SCallback onOk, SCallback... onErr)
 //			throws SemanticException, IOException, SQLException {
 //    	HttpServClient httpClient = new HttpServClient();
@@ -163,7 +166,7 @@ public class AnsonClient {
 //  						else Utils.warn("code: %s\nerror: %s", code, obj.get("error"));
 //  					}
 //  				});
-//	}
+	}
 
 	public void logout() { }
 
