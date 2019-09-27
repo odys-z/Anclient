@@ -8,13 +8,14 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JBody;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jprotocol.JMessage;
 import io.odysz.semantic.jprotocol.JMessage.MsgCode;
-import io.odysz.semantic.jprotocol.JMessage.Port;
 import io.odysz.semantic.jsession.AnSessionReq;
+import io.odysz.semantic.jsession.AnSessionResp;
 import io.odysz.semantic.jsession.SessionReq;
 import io.odysz.semantics.x.SemanticException;
 
@@ -95,19 +96,18 @@ public class Clients<T extends JBody> {
 		AnsonClient[] inst = new AnsonClient[1]; 
 
 		HttpServClient httpClient = new HttpServClient();
-		// String.format("%s/login.serv?t=login", servRt);
 		String url = servUrl(Port.session);
 		httpClient.postV11(url, reqv11, (code, msg) -> {
-					if (MsgCode.ok.eq(code)) {
+					if (AnsonMsg.MsgCode.ok == code) {
 						// create a logged in client
-						inst[0] = new AnsonClient(msg);
+						inst[0] = new AnsonClient(((AnSessionResp) msg).ssInf());
 
 						if (Clients.console)
 							Utils.logi(msg.toString());
 					}
-					else 
-						throw new SemanticException("loging failed\ncode: %s\nerror: %s",
-								code, msg.error());
+					else throw new SemanticException(
+							"loging failed\ncode: %s\nerror: %s",
+							code, msg.msg());
 				});
   		if (inst[0] == null)
   			throw new IOException("HttpServClient return null client.");

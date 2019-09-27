@@ -1,29 +1,19 @@
 package io.odysz.jclient;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
+import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
-import io.odysz.semantic.jprotocol.JBody;
-import io.odysz.semantic.jprotocol.JHeader;
-import io.odysz.semantic.jprotocol.JHelper;
-import io.odysz.semantic.jprotocol.JMessage;
-import io.odysz.semantic.jprotocol.JMessage.Port;
-import io.odysz.semantic.jprotocol.JProtocol.CRUD;
-import io.odysz.semantic.jprotocol.JProtocol.SCallback;
+import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantic.jserv.R.AnQueryReq;
-import io.odysz.semantic.jserv.U.InsertReq;
-import io.odysz.semantic.jserv.U.UpdateReq;
 import io.odysz.semantic.jsession.SessionInf;
-import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
-
-import static io.odysz.jsample.cheap.CheapCode.*;
 
 /**TODO rename as SessionClient
  * @author odys-z@github.com
@@ -35,7 +25,7 @@ public class AnsonClient {
 	public SessionInf ssInfo () { return ssInf; }
 	
 	private ArrayList<String[]> urlparas;
-	private JHeader header;
+	private AnsonHeader header;
 	
 	/**Session login response from server.
 	 * @param sessionInfo
@@ -63,9 +53,9 @@ public class AnsonClient {
 
 		AnsonMsg<AnQueryReq> req = new AnsonMsg<AnQueryReq>(Port.query);
 
-		JHeader header = new JHeader(ssInf.ssid(), ssInf.uid());
+		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
 		if (funcId != null && funcId.length > 0)
-			JHeader.usrAct(funcId[0], "query", "R", "test");
+			AnsonHeader.usrAct(funcId[0], "query", "R", "test");
 		req.header(header);
 
 		AnQueryReq itm = AnQueryReq.formatReq(conn, req, alias);
@@ -104,24 +94,23 @@ public class AnsonClient {
 //					.body(itm);
 //	}
 
-//	public <T extends JBody> JMessage<? extends JBody> userReq(String t, IPort port, String[] act, T req)
-//			throws SemanticException {
-//		if (ssInf == null)
-//			throw new SemanticException("SessionClient can not visit jserv without session information.");
-//
-//		JMessage<?> jmsg = new JMessage<T>(port);
-//		jmsg.t = t;
-//		
-//		header().act(act);
-//		jmsg.header(header);
-//		jmsg.body(req);
-//
-//		return jmsg;
-//	}
+	public <T extends AnsonBody> AnsonMsg<? extends AnsonBody> userReq(IPort port, String[] act, T req)
+			throws SemanticException {
+		if (ssInf == null)
+			throw new SemanticException("SessionClient can not visit jserv without session information.");
 
-	public JHeader header() {
+		AnsonMsg<?> jmsg = new AnsonMsg<T>(port);
+		
+		header().act(act);
+		jmsg.header(header);
+		jmsg.body(req);
+
+		return jmsg;
+	}
+
+	public AnsonHeader header() {
 		if (header == null)
-			header = new JHeader(ssInf.ssid(), ssInf.uid());
+			header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
 		return header;
 	}
 	
@@ -137,17 +126,16 @@ public class AnsonClient {
 	 * @return this object
 	 * @throws SQLException 
 	 */
-	public AnsonClient console(JMessage<? extends JBody> req) throws SQLException {
+	public AnsonClient console(AnsonMsg<? extends AnsonBody> req) throws SQLException {
 		if(Clients.console) {
 			try {
-				Utils.logi(req.toStringEx());
+				Utils.logi(req.toString());
 			} catch (Exception ex) { ex.printStackTrace(); }
 		}
 		return this;
 	}
 
-	public void commit(AnsonMsg<? extends AnsonBody> req, SCallback onOk, SCallback onErr) {
-//	public void commit(JMessage<? extends JBody> req, SCallback onOk, SCallback... onErr)
+	public void commit(AnsonMsg<? extends AnsonBody> req, SCallbackV11 onOk, SCallbackV11 onErr) {
 //			throws SemanticException, IOException, SQLException {
 //    	HttpServClient httpClient = new HttpServClient();
 //  		httpClient.post(Clients.servUrl(req.port()), req,

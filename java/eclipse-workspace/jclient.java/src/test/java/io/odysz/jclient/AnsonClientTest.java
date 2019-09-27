@@ -40,7 +40,7 @@ public class AnsonClientTest {
 				"Run -> Debug Configurations ... -> Junit [your test case name] -> Arguments");
    		pswd = System.getProperty("pswd");
    		if (pswd == null)
-			fail("\nTo test SemantiClient, you need configure a user and it's password at jsample server, then define @pswd like this to run test:\n" +
+			fail("\nTo test Jclient.java, you need to configure user 'admin' and it's password at jsample server, then define @pswd like this to run test:\n" +
 				"-Dpswd=*******");
 
     	Clients.init(jserv);
@@ -68,7 +68,7 @@ public class AnsonClientTest {
 
     	client.commit(req, (code, data) -> {
     		  	@SuppressWarnings("unchecked")
-				List<SResultset> rses = (List<SResultset>) data.get("rs");
+				List<SResultset> rses = (List<SResultset>) data.rs();
   				for (SResultset rs : rses) {
   					rs.printSomeData(true, 2, "uid", "uname", "role");
   					rs.beforeFirst();
@@ -87,7 +87,7 @@ public class AnsonClientTest {
   					}
   				}
     		}, (code, err) -> {
-  				fail(err.getString("error"));
+  				fail(err.msg());
   				client.logout();
     	});
     }

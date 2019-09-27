@@ -101,9 +101,10 @@ public class HttpServClient {
 		// Send post request
 		con.setDoOutput(true);
 
-		JHelper.writeAnsonReq(con.getOutputStream(), jreq);
+		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
+		jreq.toBlock(con.getOutputStream());
 
-		if (Clients.console) Utils.logi(url);;
+		if (Clients.console) Utils.logi(url);
 
 		int responseCode = con.getResponseCode();
 		if (responseCode == 200) {
@@ -111,13 +112,14 @@ public class HttpServClient {
 			if (con.getContentLengthLong() == 0)
 				throw new SemanticException("Error: server return null at %s ", url);
 
-			AnsonResp x = (AnsonResp) Anson.fromJson(con.getInputStream());
+			@SuppressWarnings("unchecked")
+			AnsonMsg<AnsonResp> x = (AnsonMsg<AnsonResp>) Anson.fromJson(con.getInputStream());
 			if (Clients.console) {
 				Utils.printCaller(false);
 				Utils.logi(x.toString());
 			}
 
-			onResponse.onCallback(String.valueOf(x.code()), x);
+			onResponse.onCallback(x.code(), x.body(0));
 		}
 		else {
 			Utils.warn("HTTP ERROR: code: %s", responseCode);
