@@ -1,18 +1,22 @@
 package io.odysz.jclient;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
 /**TODO rename as SessionClient
@@ -135,25 +139,24 @@ public class AnsonClient {
 		return this;
 	}
 
-	public void commit(AnsonMsg<? extends AnsonBody> req, SCallbackV11 onOk, SCallbackV11 onErr) {
-//			throws SemanticException, IOException, SQLException {
-//    	HttpServClient httpClient = new HttpServClient();
-//  		httpClient.post(Clients.servUrl(req.port()), req,
-//  				(code, obj) -> {
-//  					if(Clients.console) {
-//  						Utils.printCaller(false);
-//  						JHelper.logi(obj);
-//  					}
-//  					SemanticObject o = (SemanticObject) obj.get("data");
-//  					if (isOk(obj.code())) {
-//  						onOk.onCallback(code, o);
-//  					}
-//  					else {
-//  						if (onErr != null && onErr.length > 0 && onErr[0] != null)
-//  							onErr[0].onCallback(code, obj);
-//  						else Utils.warn("code: %s\nerror: %s", code, obj.get("error"));
-//  					}
-//  				});
+	public void commit(AnsonMsg<? extends AnsonBody> req, SCallbackV11 onOk, SCallbackV11... onErr)
+			throws SemanticException, IOException, SQLException, AnsonException {
+    	HttpServClient httpClient = new HttpServClient();
+  		httpClient.postV11(Clients.servUrl(req.port()), req,
+  				(code, obj) -> {
+  					if(Clients.console) {
+  						Utils.printCaller(false);
+  						Utils.logAnson(obj);
+  					}
+  					if (MsgCode.ok == code) {
+  						onOk.onCallback(code, obj);
+  					}
+  					else {
+  						if (onErr != null && onErr.length > 0 && onErr[0] != null)
+  							onErr[0].onCallback(code, obj);
+  						else Utils.warn("code: %s\nerror: %s", code, obj.msg());
+  					}
+  				});
 	}
 
 	public void logout() { }

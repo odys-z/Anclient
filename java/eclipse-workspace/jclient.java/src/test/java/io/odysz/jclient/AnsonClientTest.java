@@ -13,10 +13,15 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
+import io.odysz.jsample.protocol.Samport;
 import io.odysz.module.rs.SResultset;
+import io.odysz.semantic.ext.AnDatasetReq;
+import io.odysz.semantic.jprotocol.AnsonBody;
+import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jserv.R.AnQueryReq;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
 /**
@@ -76,8 +81,8 @@ public class AnsonClientTest {
   						String uid0 = rs.getString("uid");
   						assertEquals("admin", uid0);
   								
-//  						String roleId = rs.getString("role");
-//  						getMenu("admin", roleId);
+  						String roleId = rs.getString("role");
+  						getMenu("admin", roleId);
 //  						
 //  						// function/semantics tests
 //  						testUpload(client);
@@ -92,29 +97,29 @@ public class AnsonClientTest {
     	});
     }
 
-//	private void getMenu(String string, String roleId)
-//			throws SemanticException, IOException, SQLException {
-//		DatasetReq req = new DatasetReq(null, "jserv-sample");
-//
-//		String t = "menu";
-//		// JHeader header = new JHeader("menu", ssInf.getString("uid"));
-//		JHeader header = client.header();
-//		String[] act = JHeader.usrAct("SemanticClientTest", "init", t,
-//				"test jclient.java loading menu from menu.sample");
-//
-//		JMessage<? extends JBody> jmsg = client.userReq(t, Samport.menu, act, req);
-//		jmsg.header(header);
-//
-//		client.console(jmsg);
-//		
-//    	client.commit(jmsg, (code, data) -> {
-//    		@SuppressWarnings("unchecked")
-//			List<SemanticObject> rses = (List<SemanticObject>) data.get("menu");
-//  			for (SemanticObject rs : rses) {
-//  				rs.print(System.out);
-//  			}
-//    	});
-//	}
+	private void getMenu(String string, String roleId)
+			throws SemanticException, IOException, SQLException, AnsonException {
+		AnDatasetReq req = new AnDatasetReq(null, "jserv-sample");
+
+		String t = "menu";
+		// JHeader header = new JHeader("menu", ssInf.getString("uid"));
+		AnsonHeader header = client.header();
+		String[] act = AnsonHeader.usrAct("SemanticClientTest", "init", t,
+				"test jclient.java loading menu from menu.sample");
+
+		AnsonMsg<? extends AnsonBody> jmsg = client.userReq(Samport.menu, act, req);
+		jmsg.header(header);
+
+		client.console(jmsg);
+		
+    	client.commit(jmsg, (code, data) -> {
+    		@SuppressWarnings("unchecked")
+			List<SemanticObject> rses = (List<SemanticObject>) data.data("menu");
+  			for (SemanticObject rs : rses) {
+  				rs.print(System.out);
+  			}
+    	});
+	}
 
 //	static void testUpload(SessionClient client) throws SemanticException, IOException, SQLException {
 //		Path p = Paths.get(filename);
