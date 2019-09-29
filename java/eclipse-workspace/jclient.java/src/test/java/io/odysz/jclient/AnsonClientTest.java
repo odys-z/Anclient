@@ -99,7 +99,8 @@ public class AnsonClientTest {
 
 	private void getMenu(String string, String roleId)
 			throws SemanticException, IOException, SQLException, AnsonException {
-		AnDatasetReq req = new AnDatasetReq(null, "jserv-sample");
+		// AnDatasetReq req = new AnDatasetReq(null, "jserv-sample");
+		AnDatasetReq req = new AnDatasetReq(null, "sys-sqlite");
 
 		String t = "menu";
 		// JHeader header = new JHeader("menu", ssInf.getString("uid"));
