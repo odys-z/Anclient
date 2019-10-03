@@ -16,7 +16,6 @@ import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jsession.SessionInf;
-import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
 /**TODO rename as SessionClient
@@ -44,7 +43,7 @@ public class AnsonClient {
 
 	/**Format a query request object, including all information for construct a "select" statement.
 	 * @param conn connection id
-	 * @param t main table, (sometimes function category), e.g. "e_areas"
+	 * @param tbl main table, (sometimes function category), e.g. "e_areas"
 	 * @param alias from table alias, e.g. "a"
 	 * @param page -1 for no paging at server side.
 	 * @param size
@@ -52,21 +51,21 @@ public class AnsonClient {
 	 * @return formatted query object.
 	 * @throws Exception
 	 */
-	public AnsonMsg<AnQueryReq> query(String conn, String t, String alias,
+	public AnsonMsg<AnQueryReq> query(String conn, String tbl, String alias,
 			int page, int size, String... funcId) throws SemanticException {
 
-		AnsonMsg<AnQueryReq> req = new AnsonMsg<AnQueryReq>(Port.query);
+		AnsonMsg<AnQueryReq> msg = new AnsonMsg<AnQueryReq>(Port.query);
 
 		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
 		if (funcId != null && funcId.length > 0)
 			AnsonHeader.usrAct(funcId[0], "query", "R", "test");
-		req.header(header);
+		msg.header(header);
 
-		AnQueryReq itm = AnQueryReq.formatReq(conn, req, alias);
-		req.body(itm);
+		AnQueryReq itm = AnQueryReq.formatReq(conn, msg, tbl, alias);
+		msg.body(itm);
 		itm.page(page, size);
 
-		return req;
+		return msg;
 	}
 	
 //	@SuppressWarnings("unchecked")

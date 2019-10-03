@@ -14,14 +14,14 @@ import org.junit.jupiter.api.Test;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
 import io.odysz.jsample.protocol.Samport;
-import io.odysz.module.rs.SResultset;
+import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.ext.AnDatasetReq;
+import io.odysz.semantic.ext.AnDatasetResp;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jserv.R.AnQueryReq;
-import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
 /**
@@ -72,9 +72,8 @@ public class AnsonClientTest {
     		.where("=", "u.userId", "'admin'");
 
     	client.commit(req, (code, data) -> {
-    		  	@SuppressWarnings("unchecked")
-				List<SResultset> rses = (List<SResultset>) data.rs();
-  				for (SResultset rs : rses) {
+				List<AnResultset> rses = (List<AnResultset>) data.rs();
+  				for (AnResultset rs : rses) {
   					rs.printSomeData(true, 2, "uid", "uname", "role");
   					rs.beforeFirst();
   					while(rs.next()) {
@@ -114,11 +113,8 @@ public class AnsonClientTest {
 		client.console(jmsg);
 		
     	client.commit(jmsg, (code, data) -> {
-    		@SuppressWarnings("unchecked")
-			List<SemanticObject> rses = (List<SemanticObject>) data.data("menu");
-  			for (SemanticObject rs : rses) {
-  				rs.print(System.out);
-  			}
+			List<?> rses = ((AnDatasetResp)data).forest();
+			Utils.logi(rses);;
     	});
 	}
 
