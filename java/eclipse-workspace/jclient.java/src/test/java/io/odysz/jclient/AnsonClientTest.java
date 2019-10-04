@@ -102,7 +102,6 @@ public class AnsonClientTest {
 		AnDatasetReq req = new AnDatasetReq(null, "sys-sqlite");
 
 		String t = "menu";
-		// JHeader header = new JHeader("menu", ssInf.getString("uid"));
 		AnsonHeader header = client.header();
 		String[] act = AnsonHeader.usrAct("SemanticClientTest", "init", t,
 				"test jclient.java loading menu from menu.sample");
@@ -154,53 +153,53 @@ public class AnsonClientTest {
 //    		});
 //	}
 
-//	private void testReports(SessionClient client)
-//			throws SemanticException, IOException, SQLException {
-//		String orcl = "orcl.alarm-report";
-//
-//		// 1. generate a report
-//		InsertReq recs = InsertReq.formatReq(orcl, null, "b_reprecords")
-//				.cols(new String[] {"deviceId", "val"});
-//
-//		for (int i = 0; i < 20; i++) {
-//			ArrayList<Object[]> row = new ArrayList<Object[]> ();
-//			row.add(new String[] {"deviceId", String.format("d00%2s", i)});
-//			row.add(new Object[] {"val", new ExprPart(randomVal())});
-//			recs.valus(row);
-//		}
-//		
-//		JMessage<? extends JBody> jmsg = client.insert(orcl, "b_reports");
-//		InsertReq rept = ((InsertReq) jmsg.body(0));
-//		rept.cols(new String[] {"areaId", "ignored"} )
-//			.nv("areaId", "US")
-//			.nv("ignored", new ExprPart("0"))
-//			.post(recs);
-//
-//    	client.commit(jmsg,
-//    		// 2. read last 10 days'
-//    		(code, data) -> {
-//    			JMessage<QueryReq> j = client
-//    				.query(orcl, "b_reports", "r", -1, 0);
-//
-//    			j.body(0)
-//    				.j("b_reprecords", "rec", "r.repId = rec.repId")
-//    				// .where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)");
-//    				.where(">", "decode(\"r\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate", "-0.1");
-//
-//    			client.commit(j,
-//    				(c, d) -> {
-//						SResultset rs = (SResultset) d.rs(0);
-//							rs.printSomeData(false, 2, "recId");
-//					},
-//					(c, err) -> {
-//						fail(String.format("code: %s, error: %s", c, err.error()));
-//					});
-//    		},
-//    		(c, err) -> {
-//    			Utils.warn(err.error());
-//				fail(String.format("code: %s, error: %s", c, err.error()));
-//    		});
-//	}
+	private void testReports(SessionClient client)
+			throws SemanticException, IOException, SQLException {
+		String orcl = "orcl.alarm-report";
+
+		// 1. generate a report
+		InsertReq recs = InsertReq.formatReq(orcl, null, "b_reprecords")
+				.cols(new String[] {"deviceId", "val"});
+
+		for (int i = 0; i < 20; i++) {
+			ArrayList<Object[]> row = new ArrayList<Object[]> ();
+			row.add(new String[] {"deviceId", String.format("d00%2s", i)});
+			row.add(new Object[] {"val", new ExprPart(randomVal())});
+			recs.valus(row);
+		}
+		
+		JMessage<? extends JBody> jmsg = client.insert(orcl, "b_reports");
+		InsertReq rept = ((InsertReq) jmsg.body(0));
+		rept.cols(new String[] {"areaId", "ignored"} )
+			.nv("areaId", "US")
+			.nv("ignored", new ExprPart("0"))
+			.post(recs);
+
+    	client.commit(jmsg,
+    		// 2. read last 10 days'
+    		(code, data) -> {
+    			JMessage<QueryReq> j = client
+    				.query(orcl, "b_reports", "r", -1, 0);
+
+    			j.body(0)
+    				.j("b_reprecords", "rec", "r.repId = rec.repId")
+    				// .where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)");
+    				.where(">", "decode(\"r\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate", "-0.1");
+
+    			client.commit(j,
+    				(c, d) -> {
+						SResultset rs = (SResultset) d.rs(0);
+							rs.printSomeData(false, 2, "recId");
+					},
+					(c, err) -> {
+						fail(String.format("code: %s, error: %s", c, err.error()));
+					});
+    		},
+    		(c, err) -> {
+    			Utils.warn(err.error());
+				fail(String.format("code: %s, error: %s", c, err.error()));
+    		});
+	}
 
 	private static String randomVal() {
 		double r = Math.random() * 100;
