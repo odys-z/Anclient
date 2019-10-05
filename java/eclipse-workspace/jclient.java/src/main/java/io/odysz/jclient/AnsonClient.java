@@ -15,6 +15,7 @@ import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantic.jserv.R.AnQueryReq;
+import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 
@@ -82,20 +83,6 @@ public class AnsonClient {
 //		return (JMessage<UpdateReq>) jmsg.header(header) 
 //					.body(itm);
 //	}
-//
-//	@SuppressWarnings("unchecked")
-//	public JMessage<InsertReq> insert(String conn, String tbl, String... act)
-//			throws SemanticException {
-//		InsertReq itm = InsertReq.formatReq(conn, null, tbl);
-//		JMessage<? extends JBody> jmsg = userReq(tbl, Port.insert, act, itm);
-//
-//		JHeader header = new JHeader(ssInf.ssid(), ssInf.uid());
-//		if (act != null && act.length > 0)
-//			header.act(act);
-//		
-//		return (JMessage<InsertReq>) jmsg.header(header) 
-//					.body(itm);
-//	}
 
 	public <T extends AnsonBody> AnsonMsg<? extends AnsonBody> userReq(IPort port, String[] act, T req)
 			throws SemanticException {
@@ -109,6 +96,18 @@ public class AnsonClient {
 		jmsg.body(req);
 
 		return jmsg;
+	}
+
+	public AnsonMsg<?> insert(String conn, String tbl, String ... act) throws SemanticException {
+		AnInsertReq itm = AnInsertReq.formatInsertReq(conn, null, tbl);
+		AnsonMsg<? extends AnsonBody> jmsg = userReq(Port.insert, act, itm);
+
+		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
+		if (act != null && act.length > 0)
+			header.act(act);
+		
+		return jmsg.header(header) 
+					.body(itm);
 	}
 
 	public AnsonHeader header() {

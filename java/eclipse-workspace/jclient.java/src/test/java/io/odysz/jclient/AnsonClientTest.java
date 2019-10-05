@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +23,9 @@ import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jserv.R.AnQueryReq;
+import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.sql.parts.condition.ExprPart;
 
 /**
  * Unit test for simple App. 
@@ -86,8 +89,8 @@ public class AnsonClientTest {
 //  						// function/semantics tests
 //  						testUpload(client);
 //  						
-//  						// insert/load oracle reports
-//  						testReports(client);
+  						// insert/load oracle reports
+  						testReports(client);
   					}
   				}
     		}, (code, err) -> {
@@ -153,12 +156,12 @@ public class AnsonClientTest {
 //    		});
 //	}
 
-	private void testReports(SessionClient client)
-			throws SemanticException, IOException, SQLException {
+	private void testReports(AnsonClient client)
+			throws SemanticException, IOException, SQLException, AnsonException {
 		String orcl = "orcl.alarm-report";
 
 		// 1. generate a report
-		InsertReq recs = InsertReq.formatReq(orcl, null, "b_reprecords")
+		AnInsertReq recs = AnInsertReq.formatInsertReq(orcl, null, "b_reprecords")
 				.cols(new String[] {"deviceId", "val"});
 
 		for (int i = 0; i < 20; i++) {
@@ -168,8 +171,8 @@ public class AnsonClientTest {
 			recs.valus(row);
 		}
 		
-		JMessage<? extends JBody> jmsg = client.insert(orcl, "b_reports");
-		InsertReq rept = ((InsertReq) jmsg.body(0));
+		AnsonMsg<?> jmsg = client.insert(orcl, "b_reports");
+		AnInsertReq rept = ((AnInsertReq) jmsg.body(0));
 		rept.cols(new String[] {"areaId", "ignored"} )
 			.nv("areaId", "US")
 			.nv("ignored", new ExprPart("0"))
@@ -178,7 +181,7 @@ public class AnsonClientTest {
     	client.commit(jmsg,
     		// 2. read last 10 days'
     		(code, data) -> {
-    			JMessage<QueryReq> j = client
+    			AnsonMsg<AnQueryReq> j = client
     				.query(orcl, "b_reports", "r", -1, 0);
 
     			j.body(0)
@@ -188,16 +191,16 @@ public class AnsonClientTest {
 
     			client.commit(j,
     				(c, d) -> {
-						SResultset rs = (SResultset) d.rs(0);
+						AnResultset rs = (AnResultset) d.rs(0);
 							rs.printSomeData(false, 2, "recId");
 					},
 					(c, err) -> {
-						fail(String.format("code: %s, error: %s", c, err.error()));
+						fail(String.format("code: %s, error: %s", c, err.msg()));
 					});
     		},
     		(c, err) -> {
-    			Utils.warn(err.error());
-				fail(String.format("code: %s, error: %s", c, err.error()));
+    			Utils.warn(err.msg());
+				fail(String.format("code: %s, error: %s", c, err.msg()));
     		});
 	}
 
