@@ -28,7 +28,7 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 
 /**
- * Unit test for simple App. 
+ * Unit test for sample App. 
  */
 public class AnsonClientTest {
 	private static String jserv = null;
@@ -85,10 +85,10 @@ public class AnsonClientTest {
   								
   						String roleId = rs.getString("role");
   						getMenu("admin", roleId);
-//  						
-//  						// function/semantics tests
-//  						testUpload(client);
-//  						
+
+  						// function/semantics tests
+  						// testUpload(client);
+
   						// insert/load oracle reports
   						testReports(client);
   					}
