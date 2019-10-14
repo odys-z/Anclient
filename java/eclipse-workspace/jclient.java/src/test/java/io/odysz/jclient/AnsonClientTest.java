@@ -187,7 +187,15 @@ public class AnsonClientTest {
     			j.body(0)
     				.j("b_reprecords", "rec", "r.repId = rec.repId")
     				// .where(">", "r.stamp", "dateDiff(day, r.stamp, sysdate)");
-    				.where(">", "decode(\"r\".\"stamp\", null, sysdate, \"r\".\"stamp\") - sysdate", "-0.1");
+    				
+    				
+					// ISSUE 2019.10.14 [Antlr4 visitor doesn't throw exception when parsing failed]
+					// For a quoted full column name like "r"."stamp", in
+					// .where(">", "decode(\"r\".\"stamp\", null, sysdate, r.stamp) - sysdate", "-0.1")
+					// Antlr4.7.1/2 only report an error in console error output:
+					// line 1:7 no viable alternative at input 'decode("r"'
+					// This makes semantic-jserv won't report error until Oracle complain about sql error.
+    				.where(">", "decode(r.stamp, null, sysdate, r.stamp) - sysdate", "-0.1");
 
     			client.commit(j,
     				(c, d) -> {
