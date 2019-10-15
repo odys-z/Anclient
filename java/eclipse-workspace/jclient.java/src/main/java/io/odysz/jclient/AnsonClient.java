@@ -16,6 +16,7 @@ import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
+import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 
@@ -69,20 +70,20 @@ public class AnsonClient {
 		return msg;
 	}
 	
-//	@SuppressWarnings("unchecked")
-//	public JMessage<UpdateReq> update(String conn, String tbl, String... act)
-//			throws SemanticException {
-//
-//		UpdateReq itm = UpdateReq.formatReq(conn, null, tbl, CRUD.U);
-//		JMessage<? extends JBody> jmsg = userReq(tbl, Port.update, act, itm);
-//
-//		JHeader header = new JHeader(ssInf.ssid(), ssInf.uid());
-//		if (act != null && act.length > 0)
-//			header.act(act);
-//		
-//		return (JMessage<UpdateReq>) jmsg.header(header) 
-//					.body(itm);
-//	}
+	@SuppressWarnings("unchecked")
+	public AnsonMsg<AnUpdateReq> update(String conn, String tbl, String... act)
+			throws SemanticException {
+
+		AnUpdateReq itm = AnUpdateReq.formatUpdateReq(conn, null, tbl);
+		AnsonMsg<? extends AnsonBody> jmsg = userReq(Port.update, act, itm);
+
+		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
+		if (act != null && act.length > 0)
+			header.act(act);
+		
+		return (AnsonMsg<AnUpdateReq>) jmsg.header(header) 
+					;//.body(itm);
+	}
 
 	public <T extends AnsonBody> AnsonMsg<? extends AnsonBody> userReq(IPort port, String[] act, T req)
 			throws SemanticException {

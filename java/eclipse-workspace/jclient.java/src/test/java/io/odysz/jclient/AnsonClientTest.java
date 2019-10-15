@@ -4,6 +4,9 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,7 +15,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import io.odysz.anson.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.jsample.protocol.Samport;
 import io.odysz.module.rs.AnResultset;
@@ -24,6 +29,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
+import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.parts.condition.ExprPart;
 
@@ -87,10 +93,10 @@ public class AnsonClientTest {
   						getMenu("admin", roleId);
 
   						// function/semantics tests
-  						// testUpload(client);
+  						testUpload(client);
 
   						// insert/load oracle reports
-  						testReports(client);
+//  						testORCL_Reports(client);
   					}
   				}
     		}, (code, err) -> {
@@ -120,43 +126,47 @@ public class AnsonClientTest {
     	});
 	}
 
-//	static void testUpload(SessionClient client) throws SemanticException, IOException, SQLException {
-//		Path p = Paths.get(filename);
-//		byte[] f = Files.readAllBytes(p);
-//		String b64 = AESHelper.encode64(f);
-//
-//		JMessage<? extends JBody> jmsg = client.update(null, "a_users");
-//		UpdateReq upd = (UpdateReq) jmsg.body(0);
-//		upd.nv("nationId", "CN")
-//			.whereEq("userId", "admin")
-//			// .post(((UpdateReq) new UpdateReq(null, "a_attach")
-//			.post(UpdateReq.formatDelReq(null, null, "a_attaches", CRUD.D)
-//					.whereEq("busiTbl", "a_users")
-//					.whereEq("busiId", "admin")
-//					.post((InsertReq.formatReq(null, null, "a_attaches")
-//							.nv("attName", "'s Portrait")
-//							// The parent pk can't be resulved, we must provide the value.
-//							// See https://odys-z.github.io/notes/semantics/best-practices.html#fk-ins-cate
-//							.nv("busiId", "admin")
-//							.nv("busiTbl", "a_users")
-//							.nv("uri", b64))));
-//
-//		jmsg.header(client.header());
-//
-//		client.console(jmsg);
-//		
-//    	client.commit(jmsg,
-//    		(code, data) -> {
-//				if (MsgCode.ok.eq(code))
-//					Utils.logi(code);
-//				else Utils.warn(data.toString());
-//    		},
-//    		(c, err) -> {
-//				fail(String.format("code: %s, error: %s", c, err.error()));
-//    		});
-//	}
+	static void testUpload(AnsonClient client)
+			throws SemanticException, IOException, SQLException, AnsonException {
+		Path p = Paths.get(filename);
+		byte[] f = Files.readAllBytes(p);
+		String b64 = AESHelper.encode64(f);
 
-	private void testReports(AnsonClient client)
+		AnsonMsg<? extends AnsonBody> jmsg = client.update(null, "a_users");
+		AnUpdateReq upd = (AnUpdateReq) jmsg.body(0);
+		upd.nv("nationId", "CN")
+			.whereEq("userId", "admin")
+			// .post(((UpdateReq) new UpdateReq(null, "a_attach")
+			.post(AnUpdateReq.formatDelReq(null, null, "a_attaches")
+					.whereEq("busiTbl", "a_users")
+					.whereEq("busiId", "admin")
+					.post((AnInsertReq.formatInsertReq(null, null, "a_attaches")
+							.cols("attName", "busiId", "busiTbl", "uri")
+							.nv("attName", "'s Portrait")
+							// The parent pk can't be resulved, we must provide the value.
+							// See https://odys-z.github.io/notes/semantics/best-practices.html#fk-ins-cate
+							.nv("busiId", "admin")
+							.nv("busiTbl", "a_users")
+							.nv("uri", b64))));
+
+		jmsg.header(client.header());
+
+		client.console(jmsg);
+		
+    	client.commit(jmsg,
+    		(code, data) -> {
+    			// This line can not been tested without branch
+    			// branching v1.1
+				if (MsgCode.ok.eq(code.name()))
+					Utils.logi(code.name());
+				else Utils.warn(data.toString());
+    		},
+    		(c, err) -> {
+				fail(String.format("code: %s, error: %s", c, err.msg()));
+    		});
+	}
+
+	private void testORCL_Reports(AnsonClient client)
 			throws SemanticException, IOException, SQLException, AnsonException {
 		String orcl = "orcl.alarm-report";
 
