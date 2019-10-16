@@ -10,13 +10,13 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.common.Utils;
+import io.odysz.jclient.AnsonClient;
 import io.odysz.jclient.Clients;
-import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.cheapflow.CheapClient;
 import io.odysz.jsample.cheap.CheapCode;
-import io.odysz.module.rs.SResultset;
-import io.odysz.semantic.jprotocol.JHeader;
-import io.odysz.semantic.jserv.U.InsertReq;
+import io.odysz.module.rs.AnResultset;
+import io.odysz.semantic.jprotocol.AnsonHeader;
+import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.sworkflow.CheapEvent;
@@ -36,21 +36,21 @@ class CheapClientTest {
     	try {
     		Clients.init(jserv);
     		String pswd = System.getProperty("pswd");
-    		SessionClient ssc = Clients.login("admin", pswd);
+    		AnsonClient ssc = Clients.loginV11("admin", pswd);
     		
     		// create 3 task details
-    		InsertReq newTaskDetail1 = (InsertReq) InsertReq
-    				.formatReq(null, null, "task_details")
+    		AnInsertReq newTaskDetail1 = (AnInsertReq) AnInsertReq
+    				.formatInsertReq(null, null, "task_details")
     				.nv("remarks", "by java client 1")
-    				.post(InsertReq
-    						.formatReq(null, null, "task_details")
+    				.post(AnInsertReq
+    						.formatInsertReq(null, null, "task_details")
     						.nv("remarks", "by java client 2"))
-    				.post(InsertReq
-    						.formatReq(null, null, "task_details")
+    				.post(AnInsertReq
+    						.formatInsertReq(null, null, "task_details")
     						.nv("remarks", "by java client 3"));
 
     		CheapClient cheap = new CheapClient(ssc);
-    		String[] act = JHeader.usrAct("CheapClient Test", "start", "cheap",
+    		String[] act = AnsonHeader.usrAct("CheapClient Test", "start", "cheap",
 				"test jclient.java starting wf " + wfId);
 			cheap.start(wfId, "start", newTaskDetail1, act,
     			(c, dat) -> {
@@ -59,12 +59,12 @@ class CheapClientTest {
 						// concurrency 1: ask current rights
 						CheapEvent evt = new CheapEvent(dat);
 						cheap.rights(wfId, evt.taskId(), evt.currentNodeId(), "admin", (c0, dat0) -> {
-							Utils.logi("Rights:\n");
-							((SemanticObject)dat0).print(System.out);
+							Utils.logi("Rights:\n%s", dat0);
+							// ((SemanticObject)dat0).print(System.out);
 						});
 	
 						// concurrency 2: step the started task -> A
-						String[] atc = JHeader.usrAct("CheapClient Test", "step", "cheap",
+						String[] atc = AnsonHeader.usrAct("CheapClient Test", "step", "cheap",
 								"test t01.01 -> t01.02A ");
 						cheap.step(wfId, evt.taskId(), cmdA, atc, (c1, dt) -> {
 							assertEquals(CheapCode.ok, c1);
@@ -77,7 +77,7 @@ class CheapClientTest {
 							}
 						});
 	    			
-						atc = JHeader.usrAct("CheapClient Test", "step", "cheap",
+						atc = AnsonHeader.usrAct("CheapClient Test", "step", "cheap",
 								"test t01.01 -> t01.02B ");
 						cheap.step(wfId, evt.taskId(), cmdB, atc, (c1, dt) -> {
 							assertEquals(CheapCode.ok, c1);
@@ -93,8 +93,8 @@ class CheapClientTest {
 						// concurrency 3, load flow
 						cheap.loadFlow(wfId, evt.taskId(), act, (c1, dat1) -> {
 							Utils.printCaller(false);
-							SResultset insts = (SResultset) dat1.rs(0);
-							SResultset currt = (SResultset) dat1.rs(1);
+							AnResultset insts = (AnResultset) dat1.rs(0);
+							AnResultset currt = (AnResultset) dat1.rs(1);
 							Utils.logi((String) dat1.get("rs structure"));
 							insts.printSomeData(false, 5, "sort", "nodeName", "handleTxt", "isCurrent", "instId", "taskId");
 							currt.printSomeData(false, 5, "*");

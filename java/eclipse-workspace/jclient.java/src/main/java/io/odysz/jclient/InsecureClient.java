@@ -1,16 +1,15 @@
 package io.odysz.jclient;
 
-import io.odysz.semantics.SemanticObject;
+import io.odysz.semantic.jsession.SessionInf;
 
-public class InsecureClient extends SessionClient {
+public class InsecureClient extends AnsonClient {
 
 	InsecureClient(String servRt, String conn) {
 		super(robotSsInf());
 	}
 
-	private static SemanticObject robotSsInf() {
-		return new SemanticObject()
-				.put("uid", "robot"); // mac?
+	private static SessionInf robotSsInf() {
+		return new SessionInf("uid", "robot"); // mac?
 	}
 
 }

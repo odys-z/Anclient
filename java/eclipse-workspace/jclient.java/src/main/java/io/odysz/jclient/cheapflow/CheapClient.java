@@ -3,15 +3,16 @@ package io.odysz.jclient.cheapflow;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import io.odysz.jclient.SessionClient;
+import io.odysz.anson.x.AnsonException;
+import io.odysz.jclient.AnsonClient;
 import io.odysz.jsample.cheap.CheapReq;
 import io.odysz.jsample.protocol.Samport;
-import io.odysz.semantic.jprotocol.JBody;
-import io.odysz.semantic.jprotocol.JHeader;
-import io.odysz.semantic.jprotocol.JMessage;
-import io.odysz.semantic.jprotocol.JProtocol.SCallback;
-import io.odysz.semantic.jserv.U.UpdateReq;
-import io.odysz.semantics.SemanticObject;
+import io.odysz.semantic.jprotocol.AnsonBody;
+import io.odysz.semantic.jprotocol.AnsonHeader;
+import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
+import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.sworkflow.EnginDesign.Req;
 
@@ -23,24 +24,25 @@ public class CheapClient {
 	static final String cmdB = "t01.01.stepB";
 	static final String cmd3 = "t01.02.go03";
 
-	private SessionClient ssclient;
+	private AnsonClient ssclient;
 
-	public CheapClient(SessionClient ssclient) {
+	public CheapClient(AnsonClient ssclient) {
 		this.ssclient = ssclient;
 	}
 	
-	public void loadFlow(String wfId, String taskId, String[] act, SCallback onOk) throws SemanticException, SQLException, IOException {
+	public void loadFlow(String wfId, String taskId, String[] act, SCallbackV11 onOk)
+			throws SemanticException, SQLException, IOException, AnsonException {
 		CheapReq req = new CheapReq(null)
 				.loadFlow(wfId, taskId);
 
-		String t = Req.load.name();
+//		String t = Req.load.name();
 
-		JMessage<? extends JBody> jmsg = ssclient.userReq(t, Samport.cheapflow, act, req);
+		AnsonMsg<? extends AnsonBody> jmsg = ssclient.userReq(Samport.cheapflow, act, req);
 		jmsg.header(ssclient.header());
 
     	ssclient.commit(jmsg, (code, data) -> {
 //			SemanticObject e = (SemanticObject) data.get("evt");
-			onOk.onCallback("ok", data);
+			onOk.onCallback(MsgCode.ok, data);
     	});
 	}
 
@@ -55,8 +57,10 @@ public class CheapClient {
 	 * @throws SemanticException
 	 * @throws IOException
 	 * @throws SQLException
+	 * @throws AnsonException 
 	 */
-	public void start(String wfid, String instDescpt, UpdateReq posts, String[] act, SCallback onOk, SCallback onErr) throws SemanticException, IOException, SQLException {
+	public void start(String wfid, String instDescpt, AnUpdateReq posts, String[] act,
+			SCallbackV11 onOk, SCallbackV11 onErr) throws SemanticException, IOException, SQLException, AnsonException {
 		CheapReq req = new CheapReq(null)
 				.req(Req.start).wftype(wfid)
 				.nodeDesc(instDescpt)
@@ -65,21 +69,21 @@ public class CheapClient {
 				// .newChildInstRow().childInsert("remarks", "client detail - 02")
 				;
 
-		String t = Req.start.name();
+//		String t = Req.start.name();
 
 		// FIXME This is wrong, must using CheapReq!
 		// FIXME This is wrong, must using CheapReq!
 		// FIXME This is wrong, must using CheapReq!
 		// FIXME This is wrong, must using CheapReq!
-		JMessage<? extends JBody> jmsg = ssclient.userReq(t, Samport.cheapflow, act, req);
+		AnsonMsg<? extends AnsonBody> jmsg = ssclient.userReq(Samport.cheapflow, act, req);
 		jmsg.header(ssclient.header());
 
 		ssclient.console(jmsg);
 		
     	ssclient.commit(jmsg,
     		(code, data) -> {
-    			SemanticObject e = (SemanticObject) data.get("evt");
-    			onOk.onCallback("ok", e);
+    			// SemanticObject e = (SemanticObject) data.get("evt");
+    			onOk.onCallback(MsgCode.ok, data);
     		},
     		onErr);
 	}
@@ -94,9 +98,10 @@ public class CheapClient {
 	 * @throws SQLException
 	 * @throws SemanticException
 	 * @throws IOException
+	 * @throws AnsonException 
 	 */
-	public void step(String wfid, String taskId, String cmd, String[] act, SCallback onOk)
-			throws SQLException, SemanticException, IOException {
+	public void step(String wfid, String taskId, String cmd, String[] act, SCallbackV11 onOk)
+			throws SQLException, SemanticException, IOException, AnsonException {
 		CheapReq req = new CheapReq(null)
 				.wftype(wfid)
 				.req(Req.cmd)
@@ -104,31 +109,31 @@ public class CheapClient {
 				.taskId(taskId)
 				;
 
-		String t = Req.cmd.name();
+//		String t = Req.cmd.name();
 
-		JMessage<? extends JBody> jmsg = ssclient.userReq(t, Samport.cheapflow, act, req);
+		AnsonMsg<? extends AnsonBody> jmsg = ssclient.userReq(Samport.cheapflow, act, req);
 		jmsg.header(ssclient.header());
 
 		ssclient.console(jmsg);
 		
     	ssclient.commit(jmsg, (code, data) -> {
-			SemanticObject e = (SemanticObject) data.get("evt");
-			onOk.onCallback("ok", e);
+			// SemanticObject e = (SemanticObject) data.get("evt");
+			onOk.onCallback(MsgCode.ok, data);
     	});
 
 	}
 
-	public void rights(String wfid, String taskId, String currentNodeId, String usrId, SCallback onOk)
-			throws SQLException, SemanticException, IOException {
+	public void rights(String wfid, String taskId, String currentNodeId, String usrId, SCallbackV11 onOk)
+			throws SQLException, SemanticException, IOException, AnsonException {
 		CheapReq req = new CheapReq(null)
 				.cmdsRight(currentNodeId, usrId, taskId)
 				.wftype(wfid);
 
 		String t = Req.rights.name();
-		String[] act = JHeader.usrAct("", "read", t,
+		String[] act = AnsonHeader.usrAct("", "read", t,
 				"jclient.java querying rights " + wfId);
 
-		JMessage<? extends JBody> jmsg = ssclient.userReq(t, Samport.cheapflow, act, req);
+		AnsonMsg<? extends AnsonBody> jmsg = ssclient.userReq(Samport.cheapflow, act, req);
 		jmsg.header(ssclient.header());
 
 		ssclient.console(jmsg);

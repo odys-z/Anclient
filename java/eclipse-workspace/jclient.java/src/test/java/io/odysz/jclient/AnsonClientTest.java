@@ -26,7 +26,6 @@ import io.odysz.semantic.ext.AnDatasetResp;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
-import io.odysz.semantic.jprotocol.JHelper;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
@@ -64,7 +63,7 @@ public class AnsonClientTest {
     public void queryTest() throws IOException,
     		SemanticException, SQLException, GeneralSecurityException, AnsonException {
     	Utils.printCaller(false);
-    	JHelper.printCaller(false);
+//    	JHelper.printCaller(false);
 
     	String sys = "sys-sqlite";
     	
