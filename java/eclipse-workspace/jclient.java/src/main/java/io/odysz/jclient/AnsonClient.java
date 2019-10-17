@@ -39,9 +39,7 @@ public class AnsonClient {
 		this.ssInf = sessionInfo;
 	}
 	
-	public AnsonClient(AnsonResp msg) {
-		// TODO Auto-generated constructor stub
-	}
+//	public AnsonClient(AnsonResp msg) { }
 
 	/**Format a query request object, including all information for construct a "select" statement.
 	 * @param conn connection id
@@ -153,7 +151,7 @@ public class AnsonClient {
   					else {
   						if (onErr != null && onErr.length > 0 && onErr[0] != null)
   							onErr[0].onCallback(code, obj);
-  						else Utils.warn("code: %s\nerror: %s", code, obj.msg());
+  						else Utils.warn("code: %s\nerror: %s", code, ((AnsonResp)obj).msg());
   					}
   				});
 	}

@@ -112,10 +112,10 @@ class Protocol {
 {
 	Protocol.CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
-	Protocol.Port = {	heartbeat: "ping.serv", echo: "echo.serv", session: "login.serv",
-						query: "r.serv", update: "u.serv",
-						insert: "c.serv", delete: "d.serv",
-						dataset: "ds.serv", stree: "s-tree.serv" };
+	Protocol.Port = {	heartbeat: "ping.serv11", echo: "echo.serv11", session: "login.serv11",
+						query: "r.serv11", update: "u.serv11",
+						insert: "c.serv11", delete: "d.serv11",
+						dataset: "ds.serv11", stree: "s-tree.serv11" };
 
 	Protocol.MsgCode = {ok: "ok", exSession: "exSession", exSemantic: "exSemantic",
 						exIo: "exIo", exTransct: "exTransct", exDA: "exDA",
@@ -154,7 +154,8 @@ class Jregex  {
 
 class JMessage {
 	constructor (port, header, body) {
-		this.version = "1.0";
+		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
+		this.version = "1.1";
 		this.seq = Math.round(Math.random() * 1000);
 
 		// string options, like no-null: true for asking server replace null with ''.
@@ -192,6 +193,7 @@ class JMessage {
 
 class JHeader {
 	constructor (ssid, userId) {
+		this.type = "io.odysz.semantic.jprotocol.AnsonHeader";
 		this.ssid = ssid;
 		this.uid = userId;
 	}
@@ -210,6 +212,7 @@ class JHeader {
 
 class UserReq {
 	constructor (conn, tabl) {
+		this.type = "io.odysz.semantic.jserv.user.UserReq";
 		this.conn = conn;
 		this.tabl = tabl
 		this.data = {};
@@ -236,6 +239,7 @@ class UserReq {
 
 class SessionReq {
 	constructor (uid, token, iv) {
+		this.type = "io.odysz.semantic.jsession.AnSessionReq";
 		this.uid = uid;
 		this.token = token;
 		this.iv = iv;
@@ -260,6 +264,7 @@ class SessionReq {
 
 class QueryReq {
 	constructor (conn, tabl, alias, pageInf) {
+		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
 		this.conn = conn;
 		// this.query = query;
 		this.mtabl = tabl;
@@ -431,6 +436,7 @@ class UpdateReq {
 	 * If pk is null, use this object's where_() | whereEq() | whereCond().
 	 */
 	constructor (conn, tabl, pk) {
+		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.conn = conn;
 		this.mtabl = tabl;
 		this.nvs = [];
@@ -553,6 +559,7 @@ class DeleteReq extends UpdateReq {
 class InsertReq extends UpdateReq {
 	constructor (conn, tabl) {
 		super (conn, tabl);
+		this.type = "io.odysz.semantic.jserv.U.AnInsertReq";
 		this.a = Protocol.CRUD.c;
 	}
 
@@ -661,6 +668,7 @@ class DatasetCfg extends QueryReq {
 	 */
 	constructor (conn, sk, t, args, maintbl, alias) {
 		super(conn, Jregex.isblank(t) ? maintbl : sk, alias);
+		this.type = "io.odysz.semantic.jserv.ext.AnDatasetReq";
 
 		this.conn = conn;
 		this.sk = sk;

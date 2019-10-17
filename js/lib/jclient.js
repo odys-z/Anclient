@@ -116,7 +116,8 @@ class J {
 			 * port: "session"
 			 */
 			function(resp) {
-				var sessionClient = new SessionClient(resp.data, iv, true);
+				// var sessionClient = new SessionClient(resp.data, iv, true);
+				var sessionClient = new SessionClient(resp.body[0].ssInf, iv, true);
 				sessionClient.J = J;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
@@ -170,6 +171,10 @@ class J {
 			data: JSON.stringify(jreq),
 			success: function (resp) {
 				// response Content-Type = application/json;charset=UTF-8
+				if (typeof resp === 'string') {
+					// why?
+					resp = JSON.parse(resp);
+				}
 				// code != ok
 				if (resp.code !== Protocol.MsgCode.ok)
 					if (typeof onErr === "function")

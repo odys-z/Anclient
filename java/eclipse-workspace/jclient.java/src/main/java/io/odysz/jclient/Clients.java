@@ -9,6 +9,7 @@ import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
+import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
@@ -102,7 +103,7 @@ public class Clients {
 					}
 					else throw new SemanticException(
 							"loging failed\ncode: %s\nerror: %s",
-							code, msg.msg());
+							code, ((AnsonResp)msg).msg());
 				});
   		if (inst[0] == null)
   			throw new IOException("HttpServClient return null client.");

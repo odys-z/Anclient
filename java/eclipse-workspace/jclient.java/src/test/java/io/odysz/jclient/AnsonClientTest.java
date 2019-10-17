@@ -15,7 +15,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import io.odysz.anson.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
@@ -26,6 +25,7 @@ import io.odysz.semantic.ext.AnDatasetResp;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
@@ -95,7 +95,7 @@ public class AnsonClientTest {
   						testUpload(client);
 
   						// insert/load oracle reports
-//  						testORCL_Reports(client);
+  						testORCL_Reports(client);
   					}
   				}
     		}, (code, err) -> {
@@ -182,8 +182,17 @@ public class AnsonClientTest {
 		
 		AnsonMsg<?> jmsg = client.insert(orcl, "b_reports");
 		AnInsertReq rept = ((AnInsertReq) jmsg.body(0));
-		rept.cols(new String[] {"areaId", "ignored"} )
+		rept.cols(new String[] {"areaId", "stamp", "ignored"} )
 			.nv("areaId", "US")
+			// TODO requirements issue
+			// TODO all of three trying failed.
+			// TODO - how to add expression at client without semantext?
+			//        E.g. funcall can not serialized without semantext.
+			// TODO should this become a requirements issue?
+			// 1 .nv("stamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
+			// 2 .nv("stamp", Funcall.now())
+			// 3 .nv("stamp", String.format("to_date('%s', 'YYYY-MM-DD HH24:MI:SS')",
+			//		new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))))
 			.nv("ignored", new ExprPart("0"))
 			.post(recs);
 
