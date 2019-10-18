@@ -260,12 +260,10 @@ class Postmate {
     container,
     model,
     url,
-    classListArray = [],
-  }) { // eslint-disable-line no-undef
+    classListArray = [], }) {
     this.parent = window
     this.frame = document.querySelector('#' + container)
     this.frame.classList.add.apply(this.frame.classList, classListArray)
-    // container.appendChild(this.frame)
     this.child = this.frame.contentWindow || this.frame.contentDocument.parentWindow
     this.model = model || {}
 
