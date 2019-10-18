@@ -121,7 +121,8 @@ function jeasyAPI (J, log) {
 	/** get "total" from jclient response */
 	this.total = function (resp, rsIx) {
 		if (resp !== undefined && rsIx >= 0) {
-			return resp.data.total[rsIx];
+			// return resp.data.total[rsIx];
+			return resp.body[0].rs[rsIx].total;
 		}
 	};
 

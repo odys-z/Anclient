@@ -64,7 +64,8 @@
 				console.log(resp);
 				// menu: resp.data.menu;
 				EasyTree.bind('#irtree',	// id
-						resp.data.menu, 	// data,
+						// resp.data.menu, 	// v1.0 data,
+						resp.body[0].forest,// v1.1 data,
 						'tree',				// easyui tree
 						null,				// click callback
 						function(node) {	// onSelect - change user act when clicked (FIXME what about tabs?)

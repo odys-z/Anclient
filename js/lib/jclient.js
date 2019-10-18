@@ -27,7 +27,7 @@ class J {
 	constructor (urlRoot) {
 	 	this.cfg = {
 			connId: null,
-			verbose: true,
+			verbose: 5,
 			defaultServ: urlRoot,
 		}
 		// aes = new AES();
@@ -161,6 +161,7 @@ class J {
 			async = ajaxOpts.async !== false;
 		}
 
+		var self = this;
 		$.ajax({type: 'POST',
 			// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
 			url: url,
@@ -176,6 +177,10 @@ class J {
 					resp = JSON.parse(resp);
 				}
 				// code != ok
+				if (self.cfg.verbose >= 5){
+					console.debug(Protocol.MsgCode);
+				}
+
 				if (resp.code !== Protocol.MsgCode.ok)
 					if (typeof onErr === "function")
 						onErr(resp.code, resp);
@@ -202,55 +207,63 @@ class J {
 	}
 
 	// TODO moved to protocol.js?
-    /** Get the cols from jserv's rows (response from port returning SResultsets)
-     * @param {SemanticObject} resp
+    /** Get the cols from jserv's rows
+     * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
+     * @param {AnsonMsg<AnsonResp>} resp
      * @param {ix} the rs index
      * @return {array} array of column names */
 	respCols(resp, ix) {
 		if (ix === null || ix === undefined )
 			ix = 0;
 		return resp !== null && resp !== undefined && resp.code === "ok"
-			? resp.data.rs[ix][0] : [];
+			// ? resp.data.rs[ix][0] : [];
+			? resp.body[0].rs[0].columns : [];
 	}
 
-    /** Get the rows from jserv's rows (response from port returning SResultsets)
-     * @param {SemanticObject} resp
+    /** Get the rows from jserv's rows.
+     * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
+     * @param {AnsonMsg<AnsonResp>} resp
      * @param {ix} the rs index
      * @return {array} array of rows */
 	respRows(resp, ix) {
 		if (ix === null || ix === undefined )
 			ix = 0;
 		return resp !== null && resp !== undefined && resp.code === "ok"
-			? resp.data.rs[ix].slice(1) : [];
+			// ? resp.data.rs[ix].slice(1) : [];
+			? resp.body[0].rs[0].results : [];
 	}
 
     /** Get the objects from jserv's rows (response from port returning SResultsets)
-     * @param {SemanticObject} resp
-     * @param {ix} the rs index
+     * @param {AnsonMsg<AnsonResp>} resp
+     * @param {int} start start to splice
      * @param {int} len max length
      * @return {array} array of objects<br>
      * e.g [ [col1: cell1], ...] */
 	respObjs(resp, start, len) {
 		var cols = this.respCols(resp);
 
-		if (typeof start !== 'number')
-			start = 1;
 		// start from 0
-		else start++;
+		if (typeof start !== 'number')
+			start = 0;
+		// else start++;
 
 		if (typeof len !== 'number')
 			len = resp.data.rs[0].length - 1;
 		else
-			len = Math.min(len, resp.data.rs[0].length - start);
+			len = Math.min(len, resp.body[0].rs[0].results.length);
 
-		var objs = [];
-		for (var rx = start; rx < start + len; rx++) {
-			var obj = {};
-			for (var cx = 0; cx < cols.length; cx++)
-				obj[cols[cx]] = resp.data.rs[0][rx][cx];
-			objs.push(obj);
+		// var objs = [];
+		// for (var rx = start; rx < start + len; rx++) {
+		// 	var obj = {};
+		// 	for (var cx = 0; cx < cols.length; cx++)
+		// 		obj[cols[cx]] = resp.body[0].rs[0].results[rx][cx];
+		// 	objs.push(obj);
+		// }
+		// return objs;
+
+		if (resp.body[0].rs[0].results) {
+			return resp.body[0].rs[0].results.splice(start, len)
 		}
-		return objs;
 	}
 }
 

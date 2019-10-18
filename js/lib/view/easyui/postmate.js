@@ -275,7 +275,7 @@ class Postmate {
   /**
    * Begins the handshake strategy
    * @param  {String} url The URL to send a handshake request to
-   * @return {Promise}     Promise that resolves when the handshake is complete
+   * @return {Promise} Promise that resolves when the handshake is complete
    */
   sendHandshake (url) {
     const childOrigin = resolveOrigin(url)

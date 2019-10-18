@@ -28,7 +28,7 @@ const jconsts = {
 	/** default connection Id used by this client,
 	 * Must be one of web-app/WEB-INF/connects.xml/t/c/id */
 	conn: 'sys-sqlite',
-	
+
 	/**datas.xml/sk, sk for ir-combobox, ir-cbbtree shouldn't be here. */
 	sk: {
 		/**sk: system function menu dataset */
@@ -51,12 +51,12 @@ const jconsts = {
 
 const samports = {
 	/** see semantic.jserv/io.odysz.jsample.SysMenu */
-	menu: "menu.serv",
+	menu: "menu.serv11",
 	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
 	cheapflow: "cheapflow.sample",
 
 	/** views/Tool/project-toolBack-details.js */
-	tools: "tools.serv",
+	tools: "tools.serv11",
 }
 
 /** Workflow Id*/

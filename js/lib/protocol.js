@@ -376,7 +376,10 @@ class QueryReq {
 
 			}
 		}
-		else console.log('QueryReq#orderbys() - argument is not an array.', cols);
+		else if (cols) {
+			console.log('QueryReq#orderbys() - argument is not an array.', cols);
+		}
+		
 		return this;
 	}
 
@@ -668,7 +671,7 @@ class DatasetCfg extends QueryReq {
 	 */
 	constructor (conn, sk, t, args, maintbl, alias) {
 		super(conn, Jregex.isblank(t) ? maintbl : sk, alias);
-		this.type = "io.odysz.semantic.jserv.ext.AnDatasetReq";
+		this.type = "io.odysz.semantic.ext.AnDatasetReq";
 
 		this.conn = conn;
 		this.sk = sk;
