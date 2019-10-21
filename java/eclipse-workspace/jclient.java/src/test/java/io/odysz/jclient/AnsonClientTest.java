@@ -63,7 +63,6 @@ public class AnsonClientTest {
     public void queryTest() throws IOException,
     		SemanticException, SQLException, GeneralSecurityException, AnsonException {
     	Utils.printCaller(false);
-//    	JHelper.printCaller(false);
 
     	String sys = "sys-sqlite";
     	
