@@ -47,6 +47,8 @@
 			scrolling="auto" frameborder="0" style="width:100%;height:100%;"></iframe>
 	</div>
 	<script>
+		loadClient();
+
 		/* load menu<br>
 		 * Load menu from menu.sample (port = menu, dataset-sk = sk.menu)
 		 */
@@ -142,11 +144,11 @@
 
 			ssinf = $.cookie(ssk);
 			if (ssinf)
-				ssinf = JSON.parse(client.ssInf);
+				ssinf = JSON.parse(ssinf);
 			return ssinf;
 		}
 
-		$(function() {
+		function loadClient() {
 			// Local storage is more secure, enable this when only debugging online is needed.
 			var ssinf = loadSessionInf();
 			if (ssinf === undefined) {
@@ -155,7 +157,9 @@
 				return;
 			}
 
-			ssClient = new jvue.SessionClient(ssinf.ssInf, ssinf.iv);
+			// FIXME wrapper this aes call - in loadSessionInf()
+			ssinf.iv = jvue.aes.b64ToBytes(ssinf.iv);
+			ssClient = new jvue.SessionClient(ssinf, ssinf.iv);
 			var user = {};
 			loadUserInf(ssinf.uid, function(usr) {
 					Object.assign(user, usr);
@@ -164,7 +168,7 @@
 					ssClient.userInf = user;
 					jloadMenu();
 				});
-		});
+		}
 
 		function logout(loginPage) {
 			var header = jvue.Protocol.formatHeader(ssk);
