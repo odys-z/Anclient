@@ -302,7 +302,15 @@ class SessionClient {
 		if (ssInf) {
 			// logged in, create from credential
 			this.ssInf = ssInf;
-			this.ssInf.iv = aes.bytesToB64(iv);
+			// try tolerate easyUI trouble
+			if (typeof iv === 'string') {
+				// really not expected
+				;
+			}
+			else {
+				this.ssInf.iv = aes.bytesToB64(iv);
+			}
+			
 			if (!dontPersist) {
 				var infStr = JSON.stringify(this.ssInf);
 				localStorage.setItem(SessionClient.ssInfo, infStr);
