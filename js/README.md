@@ -16,6 +16,10 @@ This configuration is for building the jclient library, with presentation layer 
 
 ## quick start
 
+Check test/easui/login.html and test/easyui/app.html
+
+Also some vue client can be usable:
+
 Check test/vue/index.html and test/vue/home.html
 
 ## His Home page

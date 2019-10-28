@@ -98,7 +98,18 @@ function jeasyAPI (J, log) {
 	}
 
 	/** Get rows from jclient response for easyui datagrid, etc.
-	 * @param {object} resp jclient got response
+	 * @param {AnsonMsg} resp jclient got response
+	 <pre>body: Array(1)
+	 0: {type: "io.odysz.semantic.ext.AnDatasetResp", rs: Array(1), parent: "io.odysz.semantic.jprotocol.AnsonMsg", a: null, forest: null, …}
+	 length: 1
+	 __proto__: Array(0)
+	 code: "ok"
+	 header: null
+	 opts: null
+	 port: "dataset"
+	 seq: 0
+	 type: "io.odysz.semantic.jprotocol.AnsonMsg"
+	 vestion: "1.0"</pre>
 	 * @param {int} ixRs resultset index */
 	this.rows = function (resp, ixRs) {
 		if (resp) {
