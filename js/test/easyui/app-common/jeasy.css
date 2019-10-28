@@ -59,3 +59,12 @@ A {
 	margin-top: 15px;
 	float: left;
 	}
+
+.tip-text {
+	width: 90%;
+	height: 38px;
+	background-color: #ccc;
+	margin-left: 24px;
+	margin-top: 15px;
+	float: left;
+	}

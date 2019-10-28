@@ -915,7 +915,7 @@ function EzCbb (J) {
 
 		// get data, then bind easyui combotree
 		ssClient.commit(jmsg, function(resp) {
-			if (jconsts.verbose > 5) console.log(resp);
+			if (jconsts.verbose >= 5) console.log(resp);
 			var cbb = $(cbbId);
 			// var rows = resp.data;
 			var rows = jeasy.rows(resp);
@@ -999,10 +999,13 @@ function EzTree(J) {
 		ssClient.commit(jmsg, function(resp) {
 			console.log(resp);
 			var tree = $(treeId);
-			if (opts.all)
-				resp.data.unshift({text: ir.deflt._All_, id: ir.deflt._All_, value: ir.deflt._All_});
+			var rows = jeasy.rows(resp);
+			if (opts.all && Array.isArray(rows))
+				// resp.data.unshift({text: ir.deflt._All_, id: ir.deflt._All_, value: ir.deflt._All_});
+				rows.unshift({text: ir.deflt._All_, id: ir.deflt._All_, value: ir.deflt._All_});
 			tree.combotree({
-				data: resp.data,
+				// data: resp.data,
+				data: rows,
 				multiple: opts.multi !== undefined && opts.multi !== null && opts.multi === true,
 				onSelect: typeof opts.onselect === "function" ? opts.onselect : function(e) {
 					if (jeasy.log) console.log(e);
@@ -1059,13 +1062,12 @@ function EzTree(J) {
 		// get data, then bind easyui tree
 		// ssClient is created after logged in.
 		ssClient.commit(jmsg, function(resp) {
-			// resp.data.forEach(function (v, i) {
-			// 	v.checked = false;
-			// });
-			var data = resp.data;
+			// var data = resp.data;
+			var data = jeasy.rows(resp);
 			console.log(resp);
 			if($.isFunction(opts.filter)){
-				data = opts.filter(resp.data);
+				// data = opts.filter(resp.data);
+				data = opts.filter(jeasy.rows(resp));
 			}
 
 			EasyTree.bind(treeId,	// id
@@ -1402,7 +1404,8 @@ function EzGrid (J) {
 
 			EasyMsger.close();
 			EasyTree.bind(gridId,	// id
-					resp.data,		// forest,
+					// resp.data,		// forest,
+					resp.body[0].forest,		// forest,
 					'treegrid',
 					opts.onclick,
 					opts.onselect,

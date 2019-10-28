@@ -215,9 +215,16 @@ class J {
 	respCols(resp, ix) {
 		if (ix === null || ix === undefined )
 			ix = 0;
-		return resp !== null && resp !== undefined && resp.code === "ok"
-			// ? resp.data.rs[ix][0] : [];
-			? resp.body[0].rs[0].columns : [];
+		// colnames: {TEXT: [2, "text"], VALUE: [1, "value"]}
+		var colIx = resp !== null && resp !== undefined && resp.code === "ok"
+			? resp.body[0].rs[0].colnames : [];
+
+		var cols = new Array(colIx.length);
+		Object.keys(colIx).forEach(function (k, ix) {
+			// Design Memo: java Resultset index start from 1.
+			cols[colIx[k][0] - 1] = colIx[k][1];
+		})
+		return cols;
 	}
 
     /** Get the rows from jserv's rows.
@@ -248,7 +255,8 @@ class J {
 		// else start++;
 
 		if (typeof len !== 'number')
-			len = resp.data.rs[0].length - 1;
+			// len = resp.data.rs[0].length - 1;
+			len = resp.body[0].rs[0].results.length;
 		else
 			len = Math.min(len, resp.body[0].rs[0].results.length);
 
