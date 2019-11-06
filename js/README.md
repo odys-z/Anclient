@@ -25,3 +25,7 @@ Check test/vue/index.html and test/vue/home.html
 ## His Home page
 
 [It's here!](https://odys-z.github.io)
+
+## TODO
+
+Avoid publish testing resource file to npm.

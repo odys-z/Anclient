@@ -1,6 +1,6 @@
 {
-  "name": "jclient",
-  "version": "0.1.0",
+  "name": "anclient",
+  "version": "0.9.0",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main": "./test/vue/index.js",
   "directories": {
@@ -11,7 +11,7 @@
     "test": "echo \"Open file://test/index.html in a browser.\" && exit 1"
   },
   "keywords": [
-    "jclient",
+    "anclient",
     "semantic jserv"
   ],
   "author": "odys-z@github.com",
