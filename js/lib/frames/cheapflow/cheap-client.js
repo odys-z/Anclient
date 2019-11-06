@@ -2,7 +2,6 @@
 /* */
 
 // import $ from 'jquery';
-// import {Protocol, JMessage, JHeader, QueryReq, UserReq} from '../../protocol.js';
 import {CheapReq, chpEnumReq, CheapCode} from './cheap-req.js'
 
 class CheapClient {

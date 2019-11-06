@@ -53,7 +53,7 @@
 		 * Load menu from menu.sample (port = menu, dataset-sk = sk.menu)
 		 */
 		function jloadMenu() {
-			var req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			var req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as AnsonMsg body
 						jconsts.conn,		// connection id in connexts.xml
 						jconsts.sk.menu);	// sk in datast.xml
 
@@ -173,7 +173,7 @@
 		function logout(loginPage) {
 			var header = jvue.Protocol.formatHeader(ssk);
 			var body = {a:"logout"};
-			 var req = new jvue.JMessage(jvue.Protocol.Port.session, header, body);
+			 var req = new jvue.AnsonMsg(jvue.Protocol.Port.session, header, body);
 			J.post(req,function(){
 				localStorage.setItem(ssk, null);
 				window.location = loginPage;
