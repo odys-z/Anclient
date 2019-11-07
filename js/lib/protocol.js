@@ -1,5 +1,5 @@
 /**Json protocol helper to support jclient.
- * All JBody and JHelper static helpers are here. */
+ * All AnsonBody and JHelper static helpers are here. */
 class Protocol {
   /**Globally set this client's options.
    * @param {object} options<br>
@@ -26,20 +26,11 @@ class Protocol {
 	static formatSessionLogin (uid, tk64, iv64) {
 		var body = new SessionReq(uid, tk64, iv64);
 		body.a = 'login';
-		return new JMessage(Protocol.Port.session, null, body);
+		return new AnsonMsg(Protocol.Port.session, null, body);
 	}
-
-	/**Format a query request object, including all information for construct a "select" statement.
-	 * @param  {string} tabl  from table
-	 * @param  {string} alias
-	 * @return {object} fromatter to build request object
-	static formatQueryReq (tbl, alias) {
-		return new QueryReq(this, tbl, alias);
-	}
-	 */
 
 	static formatHeader (ssInf) {
-		return new JHeader(ssInf.ssid, ssInf.uid);
+		return new AnHeader(ssInf.ssid, ssInf.uid);
 	}
 
 	static rs2arr (rs) {
@@ -108,7 +99,7 @@ class Protocol {
 	}
 } ;
 
-/**Static methods of Protocol */
+/** Static methods of Protocol */
 {
 	Protocol.CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
@@ -152,7 +143,7 @@ class Jregex  {
 	}
 }
 
-class JMessage {
+class AnsonMsg {
 	constructor (port, header, body) {
 		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
 		this.version = "1.1";
@@ -191,7 +182,7 @@ class JMessage {
 	}
 }
 
-class JHeader {
+class AnHeader {
 	constructor (ssid, userId) {
 		this.type = "io.odysz.semantic.jprotocol.AnsonHeader";
 		this.ssid = ssid;
@@ -262,11 +253,13 @@ class SessionReq {
 	}
 }
 
+/**Java equivalent: io.odysz.semantic.jserv.R.AnQueryReq
+ * @class
+ */
 class QueryReq {
 	constructor (conn, tabl, alias, pageInf) {
 		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
 		this.conn = conn;
-		// this.query = query;
 		this.mtabl = tabl;
 		this.mAlias = alias;
 		this.exprs = [];
@@ -317,24 +310,23 @@ class QueryReq {
 	}
 
 	expr (exp, as) {
-		//this.exprs.push({expr: exp, as: as});
 		this.exprs.push([exp, as]);
 		return this;
 	}
 
 	exprss (exps) {
-		if (exps !== undefined && exps.length !== undefined)
-			for (var ix = 0; ix < exps.length; ix++)
+		if (exps !== undefined && exps.length !== undefined) {
+			for (var ix = 0; ix < exps.length; ix++) {
 				if (exps[ix].exp !== undefined)
 					this.expr(exps[ix].exp, exps[ix].as);
 				else if (exps[ix].length !== undefined)
 					this.expr(exps[ix][0], exps[ix][1]);
 				else {
-					console.error('Can not parse expr:');
-					console.error(exps[ix]);
-					console.error('Correct Format:')
-					console.error('[exp, as]');
+					console.error(`Can not parse expr [exp, as]: exprs[${ix}] = `,
+						exps[ix]);
 				}
+			}
+		}
 		return this;
 	}
 
@@ -379,7 +371,7 @@ class QueryReq {
 		else if (cols) {
 			console.log('QueryReq#orderbys() - argument is not an array.', cols);
 		}
-		
+
 		return this;
 	}
 
@@ -537,7 +529,7 @@ class UpdateReq {
 			return this;
 		}
 		else if (typeof pst.version === 'string' && typeof pst.seq === 'number')
-			console.warn('You pobably adding a JMessage as post operation? It should only be JBody(s).');
+			console.warn('You pobably adding a AnsonMsg as post operation? It should only be AnsonBody(s).');
 
 		if (this.postUpds === undefined) {
 			this.postUpds = [];
@@ -663,7 +655,7 @@ const stree_t = {
 class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
-	 * @param {stree_t} t function branch tag (JBody#a).
+	 * @param {stree_t} t function branch tag (AnsonBody#a).
 	 * Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query
 	 * @param {object} args arguments to be formatted to sql args.
 	 * @param {string} maintbl if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk.
@@ -731,4 +723,4 @@ class DatasetCfg extends QueryReq {
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Jregex, Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg, stree_t}
+export {Jregex, Protocol, AnsonMsg, AnHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg, stree_t}

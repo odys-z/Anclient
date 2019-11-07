@@ -36,12 +36,12 @@ const samports = {
 	cheapflow: "cheapflow.sample"
 }
 
-var J = jvue._J;
-J.init(jconsts.serv, jconsts.conn);
-window.J = J;
+var An = jvue.an;
+An.init(jconsts.serv, jconsts.conn);
+window.An = An;
 
 // otherwise jclient can't understand business defined ports.
-J.understandPorts(engports);
+An.understandPorts(engports);
 * *******************    project configure section end    *********************/
 
 //////////////////////////      Example Section     ////////////////////////////
@@ -63,7 +63,7 @@ function saveToolA() {
 	var jmsg = ssClient
 		// ssClient's current user action is handled by jeasy when loading menu
 		.usrCmd('save') // return ssClient itself
-		.userReq(conn, engports.tools, usrReq); // return the JMessage<UserReq> object
+		.userReq(conn, engports.tools, usrReq); // return the AnsonMsg<UserReq> object
 
 	// You should get sqls at server side (tools.serv) like this:
 	// delete from r_tools_borrows where borrowId = 'borrow-001'
@@ -83,18 +83,18 @@ function saveToolA() {
 var ssk = jvue.SessionClient.ssInfo;
 var ssClient;
 
-function jeasyAPI (J, log) {
+function jeasyAPI (An, log) {
 	{	// for shorter sentence
 		this.c = jvue.Protocol.CRUD.c;
 		this.r = jvue.Protocol.CRUD.r;
 		this.u = jvue.Protocol.CRUD.u;
 		this.d = jvue.Protocol.CRUD.d;
 
-		this.J = J;
+		this.An = An;
 		this.log = log === false ? false : true;
 		this.mainRows = {};
 
-		J.opts({noNull: true, noBoolean: false, doubleFormat: '.2f'});
+		An.opts({noNull: true, noBoolean: false, doubleFormat: '.2f'});
 	}
 
 	/** Get rows from jclient response for easyui datagrid, etc.
@@ -113,8 +113,8 @@ function jeasyAPI (J, log) {
 	 * @param {int} ixRs resultset index */
 	this.rows = function (resp, ixRs) {
 		if (resp) {
-			var cols = this.J.respCols(resp, ixRs);
-			var rows = this.J.respRows(resp, ixRs);
+			var cols = this.An.respCols(resp, ixRs);
+			var rows = this.An.respRows(resp, ixRs);
 			if (cols !== undefined && rows != undefined) {
 				var rows2 = [];
 				for (var rx = 0; rx < rows.length; rx++) {
@@ -175,7 +175,7 @@ function jeasyAPI (J, log) {
 		return -1;
 	};
 
-	/**create request JBody for adding post operation (no header etc.).
+	/**create request AnsonBody for adding post operation (no header etc.).
 	 * @param {string} crud jeasy.c | r | u | d
 	 * @param {Object} opts
 	 * t: main table<br>
@@ -191,7 +191,6 @@ function jeasyAPI (J, log) {
 			ins.a = crud;
 			if (Array.isArray(opts.cols)) {
 				ins.columns(opts.cols);
-				// ins.valus(opts.values);
 				ins.nvRows(opts.values);
 			}
 			else console.warn('WARN - inserting empty columns?', opts);
@@ -206,4 +205,4 @@ function jeasyAPI (J, log) {
 		}
 	}
 }
-const jeasy = new jeasyAPI(J);
+const jeasy = new jeasyAPI(An);

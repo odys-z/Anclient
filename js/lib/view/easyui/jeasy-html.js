@@ -900,8 +900,8 @@ function EzCbb (J) {
 
 		var sk = opts.cbb;
 
-		// request JMessage body
-		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
+		// request AnsonMsg body
+		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as AnsonMsg body
 					jconsts.conn,		// connection id in connexts.xml
 					sk);				// sk in dataset.xml
 		req.args(opts.sqlArgs);
@@ -980,8 +980,8 @@ function EzTree(J) {
 		if (sk === undefined || sk === null)
 			console.error(ir.cbbtree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd combobox is suppored (must have an sk from dataset.xml).");
 
-		// request JMessage body
-		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
+		// request AnsonMsg body
+		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as AnsonMsg body
 					jconsts.conn,		// connection id in connexts.xml
 					sk,					// sk in dataset.xml
 					'sqltree');			// ask for configured dataset as tree
@@ -1045,8 +1045,8 @@ function EzTree(J) {
 		if (sk === undefined || sk === null || sk === '')
 			console.error(ir.tree + " attr in " + treeId + " is undefined. In jeasy v1.0, only configurd semantic tree is suppored (must have an sk from dataset.xml).");
 
-		// request JMessage body
-		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
+		// request AnsonMsg body
+		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as AnsonMsg body
 					jconsts.conn,		// connection id in connexts.xml
 					sk,					// sk in datast.xml
 					'sqltree')	// TODO sk != undefined, delete and test
@@ -1123,7 +1123,7 @@ function EzTree(J) {
 		if (typeof sk === "undefined" || sk === null)
 			sk = tree.attr(_aSemantik);
 
-		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
+		var req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as AnsonMsg body
 					jconsts.conn,		// connection id in connexts.xml
 					sk);				// sk in datast.xml
 		var jmsg = ssClient.userReq(jconsts.conn, 'retree', jvue.Protocol.Port.stree, req, act);
@@ -1184,7 +1184,7 @@ function EzGrid (J) {
 		var req;
 		if (semantik !== undefined)
 			// dataset way
-			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as AnsonMsg body
 						jconsts.conn,	// connection id in connexts.xml
 						semantik);		// sk in datast.xml
 		else {
@@ -1267,7 +1267,7 @@ function EzGrid (J) {
 		var req;
 		if (semantik !== undefined) {
 			// dataset way
-			var q = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			var q = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as AnsonMsg body
 						jconsts.conn,	// connection id in connexts.xml
 						semantik)		// sk in datast.xml
 					.args(opts.sqlArgs);
@@ -1339,10 +1339,10 @@ function EzGrid (J) {
 		if (opts.t == undefined && opts.treegrid !== undefined) {
 			// dataset way
 
-			// req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			// req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as AnsonMsg body
 			// 			jconsts.conn,	// connection id in connexts.xml
 			// 			opts.sk);		// sk in datast.xml
-			req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
+			req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as AnsonMsg body
 						jconsts.conn,	// connection id in connexts.xml
 						opts.treegrid,	// sk in datast.xml
 						'sqltree')
@@ -1359,7 +1359,7 @@ function EzGrid (J) {
 				var maint = tbls[0].tabl;
 				var mainAlias = tbls[0].as;
 
-				var q = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as JMessage body
+				var q = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as AnsonMsg body
 							jconsts.conn,		// connection id in connexts.xml
 							opts.treegrid,      // sk in datast.xml
 							'',					// a()

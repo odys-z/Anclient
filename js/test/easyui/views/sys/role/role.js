@@ -93,7 +93,7 @@ function Role () {
 
 	/** save role's info */
 	this.save = function () {
-		// j: JMessage, body = UpdateReq
+		// j: AnsonMsg, body = UpdateReq
 		var j = EasyModal.save (null,			// default connId
 								this.cmd,		// c r u d
 								this.roleForm,	// modal dialog form id

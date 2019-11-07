@@ -60,7 +60,7 @@ function User () {
 	/** save user's informantion */
 	this.save = function() {
 		userId = $('#userId').val().trim();
-		// create a JMessage with an UpdateReq body
+		// create a AnsonMsg with an UpdateReq body
 		var q = EasyModal.save (null,		// default connId
 								cmd,		// jeasu.c | r | u | d
 								usrForm,	// modal dialog form id

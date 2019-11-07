@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import AES from './aes.js';
-import {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
+import {Protocol, AnsonMsg, AnHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
 
 /**The lower API of jclient/js
  * @module jclient/js/core
@@ -12,7 +12,7 @@ import {Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, D
  * */
 const aes = new AES();
 
-/**Jclient.js core API
+/**An client.js core API
  * Java equivalent of
  * io.odysz.jclient.Clients;
  * @property cfg the configurations,<br>
@@ -21,7 +21,7 @@ const aes = new AES();
  * cfg.defaultServ:<br>
  * where defaultserv is the serv root, will be concated with port name for different poert.
  */
-class J {
+class An {
 	/**@param {string} serv serv path root, e.g. 'http://localhost/jsample'
 	 */
 	constructor (urlRoot) {
@@ -65,7 +65,7 @@ class J {
     /** initialize with url and default connection id
      * @param {stirng} urlRoot root url
      * @param {string} connId connection Id
-     * @retun {J} this */
+     * @retun {An} this */
 	init (urlRoot, connId) {
 		this.cfg.cconnId = connId;
 		this.cfg.defaultServ = urlRoot;
@@ -76,7 +76,7 @@ class J {
      * As jclient defined the basice ports, more ports extension shoould been understood by the API lib.
      * This function must been callded to extned port's names.
      * @param {string} new Ports
-     * @return {J} this */
+     * @return {An} this */
 	understandPorts (newPorts) {
 		Object.assign(Protocol.Port, newPorts);
         return this;
@@ -100,14 +100,14 @@ class J {
 		// byte[] iv =   AESHelper.getRandom();
 		// String iv64 = AESHelper.encode64(iv);
 		// String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
-		console.log('J.login(' + usrId + ', ' + pswd + ', ...)');
+		console.log('An.login(' + usrId + ', ' + pswd + ', ...)');
 
 		var iv = aes.getIv128();
 		var c = aes.encrypt(usrId, pswd, iv);
 		// var qobj = formatLogin(logId, c, bytesToB64(iv));
 		var req = Protocol.formatSessionLogin(usrId, c, aes.bytesToB64(iv));
 
-		var J = this;
+		var An = this;
 
 		this.post(req,
 			/**@param {object} resp
@@ -118,7 +118,7 @@ class J {
 			function(resp) {
 				// var sessionClient = new SessionClient(resp.data, iv, true);
 				var sessionClient = new SessionClient(resp.body[0].ssInf, iv, true);
-				sessionClient.J = J;
+				sessionClient.An = An;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
 				else console.log(sessionClient);
@@ -136,7 +136,7 @@ class J {
 	}
 
     /**Post a request, using Ajax.
-     * @param {JMessage} jreq
+     * @param {AnsonMsg} jreq
      * @param {function} onOk
      * @param {function} onErr
      * @param {object} ajaxOpts */
@@ -147,7 +147,7 @@ class J {
 		}
 		if (jreq.port === undefined || jreq.port == '') {
 			// TODO docs...
-			console.error('Port is null - you probably created a requesting JMessage with "new [User|Query|...]Req()".\n',
+			console.error('Port is null - you probably created a requesting AnsonMsg with "new [User|Query|...]Req()".\n',
 				'Creating a new request message can mainly throught one of 2 way:\n',
 				'Way 1: Using a jclient helper, like those in jeasy-html.js/EasyModal.save().\n',
 				'Way 2: Using a ssClient request API, e.g. ssClient.delete().',
@@ -252,7 +252,6 @@ class J {
 		// start from 0
 		if (typeof start !== 'number')
 			start = 0;
-		// else start++;
 
 		if (typeof len !== 'number')
 			// len = resp.data.rs[0].length - 1;
@@ -260,22 +259,13 @@ class J {
 		else
 			len = Math.min(len, resp.body[0].rs[0].results.length);
 
-		// var objs = [];
-		// for (var rx = start; rx < start + len; rx++) {
-		// 	var obj = {};
-		// 	for (var cx = 0; cx < cols.length; cx++)
-		// 		obj[cols[cx]] = resp.body[0].rs[0].results[rx][cx];
-		// 	objs.push(obj);
-		// }
-		// return objs;
-
 		if (resp.body[0].rs[0].results) {
 			return resp.body[0].rs[0].results.splice(start, len)
 		}
 	}
 }
 
-export const _J = new J();
+export const an = new An();
 
 /**Client with session logged in.
  * Equivalent of java io.odysz.jclient.SessionClient;
@@ -318,7 +308,7 @@ class SessionClient {
 			else {
 				this.ssInf.iv = aes.bytesToB64(iv);
 			}
-			
+
 			if (!dontPersist) {
 				var infStr = JSON.stringify(this.ssInf);
 				localStorage.setItem(SessionClient.ssInfo, infStr);
@@ -335,7 +325,7 @@ class SessionClient {
 				console.error("Can't find credential in local storage. SessionClient creating failed.");
 		}
 
-		this.J = _J;
+		this.an = an;
 	}
 
 	get userInfo() { return this.ssInf; }
@@ -386,32 +376,32 @@ class SessionClient {
 				.md('iv_pswd', aes.bytesToB64(iv_new))
 				.md('oldpswd', oldPswd)
 				.md('iv_old', aes.bytesToB64(iv_old));
-		var jmsg = new JMessage(Protocol.Port.session, this.getHeader(), body);
+		var jmsg = new AnsonMsg(Protocol.Port.session, this.getHeader(), body);
 
 		if (opts === undefined) {
 			opts = {};
 		}
 
-		this.J.post(jmsg, opts.onok, opts.onerror);
+		this.an.post(jmsg, opts.onok, opts.onerror);
 		return this;
 	}
 
-	/**Post the request message (JMessage with body of subclass of JBody).
-	 * @param {JMessage} jmsg request message
+	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
+	 * @param {AnsonMsg} jmsg request message
 	 * @param {function} onOk
 	 * @param {function} onError
 	 */
 	commit(jmsg, onOk, onError) {
-		this.J.post(jmsg, onOk, onError);
+		this.an.post(jmsg, onOk, onError);
 	}
 
-	/**Post the request message (JMessage with body of subclass of JBody) synchronously.
-	 * @param {JMessage} jmsg request message
+	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
+	 * @param {AnsonMsg} jmsg request message
 	 * @param {function} onOk
 	 * @param {function} onError
 	 */
 	commitSync(jmsg, onOk, onError) {
-		this.J.post(jmsg, onOk, onError, {async: false});
+		this.an.post(jmsg, onOk, onError, {async: false});
 	}
 
 	/**
@@ -424,7 +414,7 @@ class SessionClient {
 	 * size: page size, default 20, -1 for no paging
 	 * @param {Object} act user's action for logging<br>
 	 * {func, cate, cmd, remarks};
-	 * @return {JMessage} the request message
+	 * @return {AnsonMsg} the request message
 	 */
 	query(conn, maintbl, alias, pageInf, act) {
 		var qryItem = new QueryReq(conn, maintbl, alias, pageInf);
@@ -442,7 +432,7 @@ class SessionClient {
 
 		var header = this.getHeader(act);
 
-		var jreq = new JMessage(Protocol.Port.query, header, qryItem);
+		var jreq = new AnsonMsg(Protocol.Port.query, header, qryItem);
 		return jreq;
 	}
 
@@ -511,19 +501,19 @@ class SessionClient {
 		return jmsg;
 	}
 
-	/**Create a user request JMessage.
+	/**Create a user request AnsonMsg.
 	 * @param {string} conn connection id
 	 * @param {string} port
 	 * @param {Protocol.UserReq} bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
 	 * @param {Object} act action, optional.
-	 * @return {JMessage<UserReq>} JMessage */
+	 * @return {AnsonMsg<AnUserReq>} AnsonMsg */
 	userReq(conn, port, bodyItem, act) {
 		var header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
 			header.userAct = act;
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}
-		return new JMessage(port, header, bodyItem);
+		return new AnsonMsg(port, header, bodyItem);
 	}
 
 	/**Set user's current action to be logged.
@@ -551,7 +541,7 @@ class SessionClient {
 	}
 
 	commit (jmsg, onOk, onErr) {
-		_J.post(jmsg, onOk, onErr);
+		an.post(jmsg, onOk, onErr);
 	}
 }
 
@@ -559,11 +549,11 @@ class SessionClient {
  * This is needed for some senarios like rigerstering new account.*/
 class Inseclient {
 	commit (jmsg, onOk, onErr) {
-		_J.post(jmsg, onOk, onErr);
+		an.post(jmsg, onOk, onErr);
 	}
 }
 
 export * from './protocol.js';
 export * from './frames/cheapflow/cheap-req.js';
 export * from './frames/cheapflow/cheap-client.js';
-export {J, SessionClient, Inseclient, aes};
+export {An, SessionClient, Inseclient, aes};
