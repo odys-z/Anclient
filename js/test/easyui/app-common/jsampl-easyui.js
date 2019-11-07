@@ -4,7 +4,7 @@
 // The following is the project adapter (common of engineering-costs).
 ////////////////////////////////////////////////////////////////////////////////
 /** project utils
- * @module eng-cost/app */
+ * @module jsample/easyui */
 const jconsts = {
 	/**Warning log level, the higher value, the more verbose.<br>
 	 * A coding convention of odys-z, nothing about the framework

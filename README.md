@@ -19,7 +19,8 @@ js client API depending on jquery.
 Of which the jclient/js/easyui can basically working, providing the semantic-jsample server running.
 
 ~~~
-    npm i anclient
+    # NOT WORKING
+    # npm i anclient
 ~~~
 
 Then open jclient/js/test/easyui/login.html.
@@ -29,4 +30,3 @@ Then open jclient/js/test/easyui/login.html.
 - jclient/java
 
 java client API.
-

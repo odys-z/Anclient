@@ -18,7 +18,8 @@ implemented with EasyUI.
 ## quick start
 
 ~~~
-    npm i anclient
+    # NOT WORKING
+    # npm i anclient
 ~~~
 
 Check test/easui/login.html and test/easyui/app.html
@@ -32,5 +33,7 @@ Check test/vue/index.html and test/vue/home.html
 [It's here!](https://odys-z.github.io)
 
 ## TODO
+
+TEST
 
 Avoid publish testing resource file to npm.

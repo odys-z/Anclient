@@ -13,7 +13,7 @@
    mode: v, // "production" | "development" | "none"
    devtool: 'source-map',
    // entry: {jvue: './lib/frames/vue/demo.frame.vue', jclient: './lib/jclient.js'},
-   entry: {jvue: './lib/view/vue/jcomponents.js', jclient: './lib/jclient.js'},
+   entry: {anvue: './lib/view/vue/jcomponents.js', anclient: './lib/anclient.js'},
 
    output: {
      filename: "[name]-" + version + ".min.js",
