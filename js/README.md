@@ -1,19 +1,7 @@
-Project for jclient.js.
+Project for anclient.js. Previously name jclient which is deprecated for package
+name conflicting.
 
 There are two version of webpack config.
-
-## webpack.test.config.js (Vue)
-
-This configuration is for building the test page: ./test/vue/index.js
-
-- demo page (Vue)
-
-./test/vue/index.html
-
-## webpack.config.js
-
-This configuration is for building the anclient library, with presentation layer
-implemented with EasyUI.
 
 ## quick start
 
@@ -33,6 +21,19 @@ Check test/vue/index.html and test/vue/home.html
 His plan to implement anclient.vue is adjusted recently. The vue version doesn't
 has a clear milestone until some newer plan detail added. Sorry...
 
+## webpack.test.config.js (Vue)
+
+This configuration is for building the test page: ./test/vue/index.js
+
+- demo page (Vue)
+
+./test/vue/index.html
+
+## webpack.config.js
+
+This configuration is for building the anclient library, with presentation layer
+implemented with EasyUI.
+
 ## His Home page
 
 [It's here!](https://odys-z.github.io)
@@ -40,5 +41,3 @@ has a clear milestone until some newer plan detail added. Sorry...
 ## TODO
 
 TEST
-
-Avoid publish testing resource file to npm.
