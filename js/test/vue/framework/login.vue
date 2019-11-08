@@ -11,7 +11,7 @@
 	</div>
 </template>
 <script>
-  import {J} from '../../../dist/jclient-SNAPSHOT.min.js';
+  import {J} from '../../../dist/anclient-SNAPSHOT.min.js';
 
   var $J;
   var ssClient;

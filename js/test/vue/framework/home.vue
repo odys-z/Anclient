@@ -22,7 +22,7 @@
   import Vue from 'vue/dist/vue.js'
   import VueRouter from 'vue-router';
 
-  import {_J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
+  import {_J, SessionClient, DatasetCfg} from '../../../dist/anclient-SNAPSHOT.min.js';
   import {SidebarMenu, FileUpload} from '../../../dist/jvue-SNAPSHOT.min.js'
   import {Samport} from './Samport.js'
 

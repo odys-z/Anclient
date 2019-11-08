@@ -3,7 +3,7 @@ import AES from './aes.js';
 import {Protocol, AnsonMsg, AnHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
 
 /**The lower API of jclient/js
- * @module jclient/js/core
+ * @module anclient/js/core
  * */
 
 /**
@@ -21,7 +21,7 @@ const aes = new AES();
  * cfg.defaultServ:<br>
  * where defaultserv is the serv root, will be concated with port name for different poert.
  */
-class An {
+class AnClient {
 	/**@param {string} serv serv path root, e.g. 'http://localhost/jsample'
 	 */
 	constructor (urlRoot) {
@@ -265,7 +265,7 @@ class An {
 	}
 }
 
-export const an = new An();
+export const an = new AnClient();
 
 /**Client with session logged in.
  * Equivalent of java io.odysz.jclient.SessionClient;
@@ -556,4 +556,4 @@ class Inseclient {
 export * from './protocol.js';
 export * from './frames/cheapflow/cheap-req.js';
 export * from './frames/cheapflow/cheap-client.js';
-export {An, SessionClient, Inseclient, aes};
+export {AnClient, SessionClient, Inseclient, aes};

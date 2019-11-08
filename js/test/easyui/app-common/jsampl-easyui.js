@@ -68,11 +68,11 @@ const workflowId = {
 	flow02: 't02',
 }
 
-var an = jvue.An;
+var an = jvue.an;
 an.init(jconsts.serv, jconsts.conn);
 window.an = an;
 
-// otherwise jclient can't understand business defined ports.
+// otherwise anclient can't understand business defined ports.
 an.understandPorts(samports);
 
 /** Login Utility.<br>

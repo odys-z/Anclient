@@ -83,18 +83,18 @@ function saveToolA() {
 var ssk = jvue.SessionClient.ssInfo;
 var ssClient;
 
-function jeasyAPI (An, log) {
+function jeasyAPI (an, log) {
 	{	// for shorter sentence
 		this.c = jvue.Protocol.CRUD.c;
 		this.r = jvue.Protocol.CRUD.r;
 		this.u = jvue.Protocol.CRUD.u;
 		this.d = jvue.Protocol.CRUD.d;
 
-		this.An = An;
+		this.an = an;
 		this.log = log === false ? false : true;
 		this.mainRows = {};
 
-		An.opts({noNull: true, noBoolean: false, doubleFormat: '.2f'});
+		an.opts({noNull: true, noBoolean: false, doubleFormat: '.2f'});
 	}
 
 	/** Get rows from jclient response for easyui datagrid, etc.
@@ -113,8 +113,8 @@ function jeasyAPI (An, log) {
 	 * @param {int} ixRs resultset index */
 	this.rows = function (resp, ixRs) {
 		if (resp) {
-			var cols = this.An.respCols(resp, ixRs);
-			var rows = this.An.respRows(resp, ixRs);
+			var cols = this.an.respCols(resp, ixRs);
+			var rows = this.an.respRows(resp, ixRs);
 			if (cols !== undefined && rows != undefined) {
 				var rows2 = [];
 				for (var rx = 0; rx < rows.length; rx++) {
@@ -205,4 +205,5 @@ function jeasyAPI (An, log) {
 		}
 	}
 }
-const jeasy = new jeasyAPI(An);
+/** API wrapper for EasyUI */
+const jeasy = new jeasyAPI(an);

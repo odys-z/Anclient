@@ -17,8 +17,8 @@
 
 <script>
   import Vue from 'vue/dist/vue.js'
-  // import {_J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
-  import {CheapReq, chpEnumReq} from   '../../../../dist/jclient-SNAPSHOT.min.js';
+  // import {_J, SessionClient, DatasetCfg} from '../../../dist/anclient-SNAPSHOT.min.js';
+  import {CheapReq, chpEnumReq} from   '../../../../dist/anclient-SNAPSHOT.min.js';
   import {Semantable} from '../../../../dist/jvue-SNAPSHOT.min.js'
 
   Vue.component('semantable', Semantable);

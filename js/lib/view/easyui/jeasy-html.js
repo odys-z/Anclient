@@ -4,8 +4,8 @@
  * <p>This module is a helper for handling html tag attribute string parsing.</p>
  * @module jclient.js.easyui.html */
 
-if (J === undefined)
-	console.error("You need initialize J - use <script>jeasy-api.js</script> first.");
+if (an === undefined)
+	console.error("You need initialize an (AnClient) - use <script>jeasy-api.js</script> first.");
 
 /**This port instance should arleady understand application's prots
  * - initialized in project's frame */
@@ -517,7 +517,7 @@ function Tag (debug) {
 const tag = new Tag(jeasy.log);
 
 /**[Internal API] Common handlers for ir attributes, like ir-t, ir-list etc.*/
-function EzHtml (J) {
+function EzHtml () {
 	/**Get attr value from tag-id */
 	this.ir = function (tagId, atr) {
 		// if (tagId.substring(0, 1) != "#")
@@ -879,9 +879,9 @@ function EzHtml (J) {
 		return $(regex.sharp_(tagId))[eztype](ezOpts);
 	};
 };
-const EasyHtml = new EzHtml(J);
+const EasyHtml = new EzHtml();
 
-function EzCbb (J) {
+function EzCbb () {
 	/**bind combobox
 	 * @param {string} cbbId combobox id
 	 * @param {Object} opts<br>
@@ -950,10 +950,10 @@ function EzCbb (J) {
 			return cbb.combobox('getValue');
 	};
 };
-const EasyCbb = new EzCbb(J);
+const EasyCbb = new EzCbb();
 
-function EzTree(J) {
-	this.J = J;
+function EzTree() {
+	// this.J = J;
 
 	this.log = true,
 	this.alertOnErr = true,
@@ -1132,9 +1132,9 @@ function EzTree(J) {
 		ssClient.commit(jmsg, onSuccess);
 	};
 };
-const EasyTree = new EzTree (J);
+const EasyTree = new EzTree ();
 
-function EzGrid (J) {
+function EzGrid () {
 	this.pageInfo = {};
 
 	/**This method is used to bind CRUD main list.
@@ -1338,10 +1338,6 @@ function EzGrid (J) {
 		var req;
 		if (opts.t == undefined && opts.treegrid !== undefined) {
 			// dataset way
-
-			// req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as AnsonMsg body
-			// 			jconsts.conn,	// connection id in connexts.xml
-			// 			opts.sk);		// sk in datast.xml
 			req = new jvue.DatasetCfg(	// s-tree.serv (SemanticTree) uses DatasetReq as AnsonMsg body
 						jconsts.conn,	// connection id in connexts.xml
 						opts.treegrid,	// sk in datast.xml
@@ -1351,7 +1347,6 @@ function EzGrid (J) {
 		}
 		else {
 			// try query.serv way
-			// var tbls = opts.t;
 			var tbls = tag.joins(opts.t, opts.joins);
 
 			if (tbls !== undefined) {
@@ -1582,11 +1577,11 @@ function EzGrid (J) {
 		);
 	};
 };
-const EasyGrid = new EzGrid(J);
+const EasyGrid = new EzGrid();
 
 ////////////////////////  Easy API for Basic CRUD   ////////////////////////////
 //
-function EzQueryForm(J) {
+function EzQueryForm() {
 	//bug easyui <input>  id ? success:failure.
 	this.load = function(formId) {
 		if (regex.isblank(formId))
@@ -1666,7 +1661,7 @@ function EzQueryForm(J) {
 		return conds;
 	}
 };
-const EasyQueryForm = new EzQueryForm(J);
+const EasyQueryForm = new EzQueryForm();
 
 function EzModal() {
 	/**add details */
@@ -2024,7 +2019,7 @@ function EzModal() {
 		}
 	}
 };
-const EasyModal = new EzModal(J);
+const EasyModal = new EzModal();
 
 /**EasyUI messager wrapper
  */
@@ -2165,6 +2160,6 @@ function EzMsger() {
 		function_rights: () => "You don't have the function rights."
 	};
 };
-const EasyMsger = new EzMsger(J);
+const EasyMsger = new EzMsger();
 // call message initializer
 jconsts.initMsg(EasyMsger);
