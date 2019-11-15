@@ -1,6 +1,6 @@
 # jclient
 
-semantic-jserv clients
+semantic-jserv clients (npm anclient)
 
 # Repository Structure
 
