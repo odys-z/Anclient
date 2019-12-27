@@ -17,16 +17,7 @@ c# client API runing on .net framework 4.0
 js client API depending on jquery.
 
 Of which the jclient/js/easyui can basically working, providing the semantic-jsample
-server is running.
-
-~~~
-    # NOT WORKING
-    # npm i anclient
-~~~
-
-Then open jclient/js/test/easyui/login.html.
-
-
+server is running. See it's [readme](.js/README.md) for quick start.
 
 - jclient/java
 

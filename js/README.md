@@ -6,13 +6,39 @@ There are two version of webpack config.
 ## quick start
 
 Anclient.js currently only has the EasyUI versiion can working. The client template
-is provided as a test suit. Check test/easui/login.html and test/easyui/app.html.
+is provided as a project template for client.
+
+To get kick started,
+
+1. [download ansample-easui template](https://github.com/odys-z/jclient/blob/master/js/test/ansample-easyui.zip)
+
+2. unpack and check server url.
+
+In <upacked-dir>/easyui/app-common/jsample-easyui.js/
+
+```
+    jconsts = {
+        ...
+        serv: 'http://localhost:8080/jsample',
+    }
+```
+where the url is the root path to your semantic.jserv server.
+
+3. open easyui/login.html.
+
+All configuration should working.
+
+For another more detailed doc, see
+[anclient for EasyUI quick start](https://odys-z.github.io/notes/jclient/quick-start.html#qickstart-jeasy)
+
+<hr>
+
+TODO: docs ...
 
 ~~~
     npm i anclient
 ~~~
 
-[anclient for EasyUI quick start](https://odys-z.github.io/notes/jclient/quick-start.html#qickstart-jeasy)
 
 Also some vue client can be used as example:
 
