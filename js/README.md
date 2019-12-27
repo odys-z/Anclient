@@ -30,17 +30,17 @@ All configuration should working.
 
 For another more detailed doc, see
 [anclient for EasyUI quick start](https://odys-z.github.io/notes/jclient/quick-start.html#qickstart-jeasy)
+and [troubleshootings](https://odys-z.github.io/notes/jclient/issue-trouble.html)
 
 <hr>
+
+Also some vue client can be used as example:
 
 TODO: docs ...
 
 ~~~
     npm i anclient
 ~~~
-
-
-Also some vue client can be used as example:
 
 Check test/vue/index.html and test/vue/home.html
 
@@ -63,7 +63,3 @@ implemented with EasyUI.
 ## His Home page
 
 [It's here!](https://odys-z.github.io)
-
-## TODO
-
-TEST
