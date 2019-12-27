@@ -13,20 +13,19 @@
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
 	-->
-	<script src="../3rd-lib/jquery-3.4.1.min.js"></script>
-	<script src="../3rd-lib/easyui-1.8.1/jquery.easyui.min.js"></script>
+	<script src="./opensources/jquery-3.4.1.min.js"></script>
+	<script src="./opensources/easyui-1.8.1/jquery.easyui.min.js"></script>
+	<script src="./opensources/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
 
-	<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui-1.8.1/themes/default/easyui.css">
-	<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui-1.8.1/themes/icon.css">
-
-	<script src="../3rd-lib/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="./opensources/easyui-1.8.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="./opensources/easyui-1.8.1/themes/icon.css">
 	<link rel="stylesheet" type="text/css" href="app-common/jeasy.css">
 
-	<script src="../../dist/anclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./lib/anclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="app-common/jsampl-easyui.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../lib/view/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../lib/view/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../lib/view/easyui/postmate.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./lib/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./lib/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./lib/easyui/postmate.js" type="text/javascript" charset="utf-8"></script>
 </head>
 
 <body class="easyui-layout">
@@ -173,8 +172,8 @@
 		function logout(loginPage) {
 			var header = jvue.Protocol.formatHeader(ssk);
 			var body = {a:"logout"};
-			 var req = new jvue.AnsonMsg(jvue.Protocol.Port.session, header, body);
-			A.post(req,function(){
+			var req = new jvue.AnsonMsg(jvue.Protocol.Port.session, header, body);
+			an.post(req,function(){
 				localStorage.setItem(ssk, null);
 				window.location = loginPage;
 			},function(){
@@ -184,5 +183,4 @@
 		}
 	</script>
 </body>
-
 </html>
