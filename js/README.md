@@ -5,7 +5,7 @@ There are two version of webpack config.
 
 ## quick start
 
-Anclient.js currently only has the EasyUI versiion can working. The client template
+Anclient.js currently only has the EasyUI version working. The client template
 is provided as a project template for client.
 
 To get kick started,
