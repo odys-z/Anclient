@@ -28,9 +28,7 @@ where the url is the root path to your semantic.jserv server.
 
 All configuration should working.
 
-For another more detailed doc, see
-[anclient for EasyUI quick start](https://odys-z.github.io/notes/jclient/quick-start.html#qickstart-jeasy)
-and [troubleshootings](https://odys-z.github.io/notes/jclient/issue-trouble.html)
+See also [troubleshootings](https://odys-z.github.io/notes/jclient/issue-trouble.html)
 
 <hr>
 
