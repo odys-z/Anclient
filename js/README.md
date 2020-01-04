@@ -3,7 +3,7 @@ name conflicting.
 
 There are two version of webpack config.
 
-## quick start
+## quick start (only [EasyUI](www.jeasyui.com) version currently)
 
 Anclient.js currently only has the EasyUI version working. The client template
 is provided as a project template for client.
