@@ -10,6 +10,7 @@ Welcome to Anclient's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   start
 
 
 Indices and tables
