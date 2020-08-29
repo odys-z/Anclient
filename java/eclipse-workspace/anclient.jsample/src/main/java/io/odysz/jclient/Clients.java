@@ -44,40 +44,7 @@ public class Clients {
 	 * @throws GeneralSecurityException  other error
 	 * @throws Exception, most likely the network failed
 	 */
-//	public static SessionClient login(String uid, String pswdPlain)
-//			throws IOException, SemanticException, SQLException, GeneralSecurityException {
-//		byte[] iv =   AESHelper.getRandom();
-//		String iv64 = AESHelper.encode64(iv);
-//		if (uid == null || pswdPlain == null)
-//			throw new SemanticException("user id and password can not be null.");
-//		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
-//		
-//		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
-//		JMessage<SessionReq> req = SessionReq.formatLogin(uid, tk64, iv64);
-//
-//		SessionClient[] inst = new SessionClient[1]; 
-//
-//		HttpServClient httpClient = new HttpServClient();
-//		// String.format("%s/login.serv?t=login", servRt);
-//		String url = servUrl(Port.session);
-//  		httpClient.post(url, req, (code, msg) -> {
-//					if (MsgCode.ok.eq(code)) {
-//						// create a logged in client
-//						inst[0] = new SessionClient(msg.data());
-//
-//						if (Clients.console)
-//							JHelper.logi(msg);
-//					}
-//					else 
-//						// Utils.warn("loging failed\ncode: %s\nmsg: %s", code, msg.getString("error"));
-//						throw new SemanticException("loging failed\ncode: %s\nerror: %s", code, msg.getString("error"));
-//				});
-//  		if (inst[0] == null)
-//  			throw new IOException("HttpServClient return null client.");
-//  		return inst[0];
-//	}
-
-	public static AnsonClient loginV11(String uid, String pswdPlain)
+	public static AnsonClient login(String uid, String pswdPlain)
 			throws IOException, SemanticException, SQLException, GeneralSecurityException, AnsonException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);

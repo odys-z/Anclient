@@ -12,6 +12,7 @@ Welcome to Anclient's documentation!
 
    starter/jsample
    starter/client
+   starter/framework
 
 
 Indices and tables

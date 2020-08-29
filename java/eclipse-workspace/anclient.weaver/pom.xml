@@ -1,13 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>io.github.odys-z</groupId>
-  <artifactId>anclient.jserv</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
-  <name>anclient.jserv</name>
-  <description>Anclient java version. A basic lib only depends on semantic.jserv</description>
-  <packaging>jar</packaging>
-
-  <url>https://odys-z.github.io/anclient</url>
+  <groupId>anclient.weaver</groupId>
+  <artifactId>anclient.weaver</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>anclient.weaver</name>
+  <description>Anclient java version for wordnet weaver</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,14 +40,15 @@
 	 -->
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
-	    <artifactId>semantic.jserv</artifactId>
-	    <version>1.1.0-SNAPSHOT</version>
+	    <artifactId>wordnet.weaver</artifactId>
+	    <version>0.0.1-SNAPSHOT</version>
 	</dependency>
 	
   </dependencies>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

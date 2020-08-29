@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Application Framework &mdash; Anclient Anclient documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
+        <link rel="prev" title="JS Quick Start" href="client.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Anclient
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="jsample.html">Jsample Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">JS Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Application Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#jsample-session-management">Jsample Session Management</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Anclient</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>Application Framework</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/starter/framework.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="application-framework">
+<h1>Application Framework<a class="headerlink" href="#application-framework" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="jsample-session-management">
+<h2>Jsample Session Management<a class="headerlink" href="#jsample-session-management" title="Permalink to this headline">¶</a></h2>
+<p>Jsample implementing session management based on Semantic.jserv, by providing a
+configuration of user class name in config.xml:</p>
+<div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;configs&gt;</span>
+  <span class="nt">&lt;t</span> <span class="na">id=</span><span class="s">&quot;default&quot;</span> <span class="na">pk=</span><span class="s">&quot;k&quot;</span> <span class="na">columns=</span><span class="s">&quot;k,v&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;c&gt;</span>
+      <span class="nt">&lt;k&gt;</span>class-IUser<span class="nt">&lt;/k&gt;</span>
+      <span class="nt">&lt;v&gt;</span>io.odysz.jsample.SampleUser<span class="nt">&lt;/v&gt;</span>
+    <span class="nt">&lt;/c&gt;</span>
+  <span class="nt">&lt;/t&gt;</span>
+<span class="nt">&lt;/configs&gt;</span>
+</pre></div>
+</div>
+<p>The <em>io.odysz.jsample.SampleUser</em> implementing <em>JUser</em> interface.</p>
+<p>Now the clinet can login to jsample session like this</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">new</span> <span class="nx">AnClient</span><span class="p">.</span><span class="nx">login</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;pswd&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="nx">sessionClient</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="nx">save</span><span class="p">(</span><span class="nx">sessionClient</span><span class="p">);</span>
+    <span class="p">});</span>
+</pre></div>
+</div>
+<p>or in java</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">io.odysz.jclient</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Unit test for sample App.</span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnsonClientTest</span> <span class="p">{</span>
+
+    <span class="kd">private</span> <span class="n">AnsonClient</span> <span class="n">client</span><span class="p">;</span>
+
+    <span class="nd">@BeforeAll</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">Utils</span><span class="p">.</span><span class="na">printCaller</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+        <span class="n">jserv</span> <span class="o">=</span> <span class="s">&quot;http://localhost:8080/doc-base&quot;</span>
+        <span class="n">pswd</span> <span class="o">=</span> <span class="p">...;</span>
+        <span class="n">Clients</span><span class="p">.</span><span class="na">init</span><span class="p">(</span><span class="n">jserv</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">queryTest</span><span class="p">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="p">,</span>
+            <span class="n">SemanticException</span><span class="p">,</span> <span class="n">SQLException</span><span class="p">,</span> <span class="n">GeneralSecurityException</span><span class="p">,</span> <span class="n">AnsonException</span> <span class="p">{</span>
+        <span class="n">String</span> <span class="n">sys</span> <span class="o">=</span> <span class="s">&quot;sys-sqlite&quot;</span><span class="p">;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">Clients</span><span class="p">.</span><span class="na">login</span><span class="p">(</span><span class="s">&quot;admin&quot;</span><span class="p">,</span> <span class="n">pswd</span><span class="p">);</span>
+        <span class="n">AnsonMsg</span><span class="o">&lt;</span><span class="n">AnQueryReq</span><span class="o">&gt;</span> <span class="n">req</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span>
+                <span class="s">&quot;a_users&quot;</span><span class="p">,</span> <span class="s">&quot;u&quot;</span><span class="p">,</span>
+                <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// don&#39;t paging</span>
+
+        <span class="n">req</span><span class="p">.</span><span class="na">body</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">expr</span><span class="p">(</span><span class="s">&quot;userName&quot;</span><span class="p">,</span> <span class="s">&quot;uname&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">expr</span><span class="p">(</span><span class="s">&quot;userId&quot;</span><span class="p">,</span> <span class="s">&quot;uid&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">expr</span><span class="p">(</span><span class="s">&quot;r.roleId&quot;</span><span class="p">,</span> <span class="s">&quot;role&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">j</span><span class="p">(</span><span class="s">&quot;a_roles&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">,</span> <span class="s">&quot;u.roleId = r.roleId&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="p">,</span> <span class="s">&quot;u.userId&quot;</span><span class="p">,</span> <span class="s">&quot;&#39;admin&#39;&quot;</span><span class="p">);</span>
+
+        <span class="n">client</span><span class="p">.</span><span class="na">commit</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">{</span>
+                <span class="n">List</span><span class="o">&lt;</span><span class="n">AnResultset</span><span class="o">&gt;</span> <span class="n">rses</span> <span class="o">=</span> <span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">AnResultset</span><span class="o">&gt;</span><span class="p">)</span> <span class="n">data</span><span class="p">.</span><span class="na">rs</span><span class="p">();</span>
+                  <span class="k">for</span> <span class="p">(</span><span class="n">AnResultset</span> <span class="n">rs</span> <span class="p">:</span> <span class="n">rses</span><span class="p">)</span> <span class="p">{</span>
+                      <span class="n">rs</span><span class="p">.</span><span class="na">printSomeData</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;uid&quot;</span><span class="p">,</span> <span class="s">&quot;uname&quot;</span><span class="p">,</span> <span class="s">&quot;role&quot;</span><span class="p">);</span>
+                      <span class="n">rs</span><span class="p">.</span><span class="na">beforeFirst</span><span class="p">();</span>
+                      <span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span> <span class="p">{</span>
+                          <span class="n">String</span> <span class="n">uid0</span> <span class="o">=</span> <span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;uid&quot;</span><span class="p">);</span>
+                          <span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;admin&quot;</span><span class="p">,</span> <span class="n">uid0</span><span class="p">);</span>
+
+                          <span class="n">String</span> <span class="n">roleId</span> <span class="o">=</span> <span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;role&quot;</span><span class="p">);</span>
+                          <span class="n">getMenu</span><span class="p">(</span><span class="s">&quot;admin&quot;</span><span class="p">,</span> <span class="n">roleId</span><span class="p">);</span>
+
+                          <span class="c1">// function/semantics tests</span>
+                          <span class="n">testUpload</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+
+                          <span class="c1">// insert/load oracle reports</span>
+                          <span class="n">testORCL_Reports</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+                      <span class="p">}</span>
+                  <span class="p">}</span>
+            <span class="p">},</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">{</span>
+                  <span class="n">fail</span><span class="p">(</span><span class="n">err</span><span class="p">.</span><span class="na">msg</span><span class="p">());</span>
+                  <span class="n">client</span><span class="p">.</span><span class="na">logout</span><span class="p">();</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="client.html" class="btn btn-neutral" title="JS Quick Start" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Odys Zhou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'Anclient',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

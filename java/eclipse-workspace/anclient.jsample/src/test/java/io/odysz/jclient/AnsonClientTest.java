@@ -66,7 +66,7 @@ public class AnsonClientTest {
 
     	String sys = "sys-sqlite";
     	
-    	client = Clients.loginV11("admin", pswd);
+    	client = Clients.login("admin", pswd);
     	AnsonMsg<AnQueryReq> req = client.query(sys,
     			"a_users", "u",
     			-1, -1); // don't paging

@@ -37,7 +37,7 @@ class CheapClientTest {
     	try {
     		Clients.init(jserv);
     		String pswd = System.getProperty("pswd");
-    		AnsonClient ssc = Clients.loginV11("admin", pswd);
+    		AnsonClient ssc = Clients.login("admin", pswd);
     		
     		// create 3 task details
     		AnInsertReq newTaskDetail1 = (AnInsertReq) AnInsertReq

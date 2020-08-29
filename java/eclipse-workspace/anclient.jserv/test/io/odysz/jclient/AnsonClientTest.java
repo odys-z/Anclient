@@ -54,7 +54,7 @@ public class AnsonClientTest {
 				"Run -> Debug Configurations ... -> Junit [your test case name] -> Arguments");
    		pswd = System.getProperty("pswd");
    		if (pswd == null)
-			fail("\nTo test Jclient.java, you need to configure user 'admin' and it's password at jsample server, then define @pswd like this to run test:\n" +
+			fail("\nTo test Anclient.java, you need to configure user 'admin' and it's password at jsample server, then define @pswd like this to run test:\n" +
 				"-Dpswd=*******");
 
     	Clients.init(jserv);
@@ -70,7 +70,7 @@ public class AnsonClientTest {
     	client = Clients.login("admin", pswd);
     	AnsonMsg<AnQueryReq> req = client.query(sys,
     			"a_users", "u",
-    			-1, -1); // don't paging
+    			-1, -1); // no paging
 
     	req.body(0)
     		.expr("userName", "uname")
