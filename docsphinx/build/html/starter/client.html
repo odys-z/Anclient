@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>JS Quick Start &mdash; Anclient Anclient documentation</title>
+  <title>About Anclient &mdash; Anclient Anclient documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
         <link rel="next" title="Application Framework" href="framework.html"/>
-        <link rel="prev" title="Jsample Quick Start" href="jsample.html"/> 
+        <link rel="prev" title="About JSample" href="jsample.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -84,8 +84,10 @@
             
                 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="jsample.html">Jsample Quick Start</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">JS Quick Start</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="jsample.html">About JSample</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jsample.html#jsample-quick-start">JSample Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">About Anclient</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#js-quick-start">JS Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#start-with-the-basic-api">Start with the basic API</a></li>
 </ul>
 </li>
@@ -120,7 +122,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>JS Quick Start</li>
+    <li>About Anclient</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -134,8 +136,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="js-quick-start">
-<h1>JS Quick Start<a class="headerlink" href="#js-quick-start" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="about-anclient">
+<h1>About Anclient<a class="headerlink" href="#about-anclient" title="Permalink to this headline">¶</a></h1>
+<p>Anclient is the client side API for semantic-jserv service like JSample, which
+including:</p>
+<ul class="simple">
+<li>anclient.java,</li>
+</ul>
+<p>the java client.</p>
+<ul class="simple">
+<li>anclient.js,</li>
+</ul>
+<p>the low level js client API for accessing service at jerver.sample.</p>
+<p>It’s for other presentation tier extension, such as HandsonTable, which is also
+been used in commercial project. All the clients are tested together with
+jserv.sample (All? Not True) and can be configured to a different jserv service.</p>
+<ul class="simple">
+<li>anclient.js.easui,</li>
+</ul>
+<p>the <a class="reference external" href="https://www.jeasyui.com/index.php">JQuery EasyUI</a> API lib that take care
+of communicating with semantic-*, binding UI widgets, based on anclient.js.</p>
+<p>The EasyUI version is implemented as a basic enterprise webapp’s client, including
+a role based function privilege management and a cheap workflow extension. It’s
+a good starting point for a commercial webapp.</p>
+<ul class="simple">
+<li>anclient.cs,</li>
+</ul>
+<p>the planned c# client.</p>
+<ul class="simple">
+<li>anclient.js.vue,</li>
+</ul>
+<p>the planned vue components can communicate with sematic-*, based on anclient.js.</p>
+<p>The sample project’s client side located in the anclient/test folder.</p>
+</div>
+<div class="section" id="js-quick-start">
+<span id="anclient-quickstart-js"></span><h1>JS Quick Start<a class="headerlink" href="#js-quick-start" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="start-with-the-basic-api">
 <h2>Start with the basic API<a class="headerlink" href="#start-with-the-basic-api" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
@@ -207,7 +242,7 @@
         <a href="framework.html" class="btn btn-neutral float-right" title="Application Framework" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="jsample.html" class="btn btn-neutral" title="Jsample Quick Start" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="jsample.html" class="btn btn-neutral" title="About JSample" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

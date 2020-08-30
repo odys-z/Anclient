@@ -1,3 +1,42 @@
+About Anclient
+==============
+
+Anclient is the client side API for semantic-jserv service like JSample, which
+including:
+
+* anclient.java,
+
+the java client.
+
+* anclient.js,
+
+the low level js client API for accessing service at jerver.sample.
+
+It's for other presentation tier extension, such as HandsonTable, which is also
+been used in commercial project. All the clients are tested together with
+jserv.sample (All? Not True) and can be configured to a different jserv service.
+
+* anclient.js.easui,
+
+the `JQuery EasyUI <https://www.jeasyui.com/index.php>`_ API lib that take care
+of communicating with semantic-\*, binding UI widgets, based on anclient.js.
+
+The EasyUI version is implemented as a basic enterprise webapp's client, including
+a role based function privilege management and a cheap workflow extension. It's
+a good starting point for a commercial webapp.
+
+* anclient.cs,
+
+the planned c# client.
+
+* anclient.js.vue,
+
+the planned vue components can communicate with sematic-\*, based on anclient.js.
+
+The sample project's client side located in the anclient/test folder.
+
+.. _anclient-quickstart-js:
+
 JS Quick Start
 ==============
 

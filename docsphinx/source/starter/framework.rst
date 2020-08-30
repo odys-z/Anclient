@@ -1,7 +1,9 @@
 Application Framework
 =====================
 
-Jsample Session Management
+The JSample project is a good example to start work with the framework.
+
+JSample Session Management
 --------------------------
 
 Jsample implementing session management based on Semantic.jserv, by providing a
