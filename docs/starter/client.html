@@ -32,9 +32,6 @@
   
 
   
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
         <link rel="next" title="Application Framework" href="framework.html"/>
         <link rel="prev" title="About JSample" href="jsample.html"/> 
@@ -86,7 +83,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="jsample.html">About JSample</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jsample.html#jsample-quick-start">JSample Quick Start</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">About Anclient</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">About Anclient</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#js-quick-start">JS Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#start-with-the-basic-api">Start with the basic API</a></li>
 </ul>
@@ -126,7 +123,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/starter/client.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/starter/client.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -148,7 +145,7 @@ including:</p>
 <li>anclient.js,</li>
 </ul>
 <p>the low level js client API for accessing service at jerver.sample.</p>
-<p>It’s for other presentation tier extension, such as HandsonTable, which is also
+<p>It&#8217;s for other presentation tier extension, such as HandsonTable, which is also
 been used in commercial project. All the clients are tested together with
 jserv.sample (All? Not True) and can be configured to a different jserv service.</p>
 <ul class="simple">
@@ -156,8 +153,8 @@ jserv.sample (All? Not True) and can be configured to a different jserv service.
 </ul>
 <p>the <a class="reference external" href="https://www.jeasyui.com/index.php">JQuery EasyUI</a> API lib that take care
 of communicating with semantic-*, binding UI widgets, based on anclient.js.</p>
-<p>The EasyUI version is implemented as a basic enterprise webapp’s client, including
-a role based function privilege management and a cheap workflow extension. It’s
+<p>The EasyUI version is implemented as a basic enterprise webapp&#8217;s client, including
+a role based function privilege management and a cheap workflow extension. It&#8217;s
 a good starting point for a commercial webapp.</p>
 <ul class="simple">
 <li>anclient.cs,</li>
@@ -167,7 +164,7 @@ a good starting point for a commercial webapp.</p>
 <li>anclient.js.vue,</li>
 </ul>
 <p>the planned vue components can communicate with sematic-*, based on anclient.js.</p>
-<p>The sample project’s client side located in the anclient/test folder.</p>
+<p>The sample project&#8217;s client side located in the anclient/test folder.</p>
 </div>
 <div class="section" id="js-quick-start">
 <span id="anclient-quickstart-js"></span><h1>JS Quick Start<a class="headerlink" href="#js-quick-start" title="Permalink to this headline">¶</a></h1>
@@ -176,19 +173,19 @@ a good starting point for a commercial webapp.</p>
 <ol class="arabic simple">
 <li>Deploy a web application of Semantic-jserv</li>
 </ol>
-<p>Say, <a class="reference internal" href="jsample.html#jsample-quick-start"><span class="std std-ref">jsample</span></a>.</p>
+<p>Say, <a class="reference internal" href="jsample.html#jsample-quick-start"><span>jsample</span></a>.</p>
 <ol class="arabic simple" start="2">
 <li>Install Anclient.</li>
 </ol>
-<p>It’s a npm package:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">npm</span> <span class="n">install</span> <span class="o">--</span><span class="n">save</span><span class="o">-</span><span class="n">dev</span> <span class="n">anclient</span>
+<p>It&#8217;s a npm package:</p>
+<div class="highlight-python"><div class="highlight"><pre>npm install --save-dev anclient
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
 <li>Create a client</li>
 </ol>
 <p>The client is based upon the plain js API.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// initialize a client of jsample</span>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="c1">// initialize a client of jsample</span>
 <span class="kd">var</span> <span class="nx">$J</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">$J</span><span class="p">();</span>
 <span class="nx">$J</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;http://127.0.0.1:8080/jsample&quot;</span><span class="p">);</span>
 
@@ -223,11 +220,11 @@ a good starting point for a commercial webapp.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>It’s doing 3 things:</p>
+<p>It&#8217;s doing 3 things:</p>
 <ol class="arabic simple">
 <li>create a client of jsample</li>
-<li>login with the user’s login name and password</li>
-<li>query the user’s basic information (role)</li>
+<li>login with the user&#8217;s login name and password</li>
+<li>query the user&#8217;s basic information (role)</li>
 </ol>
 </div>
 </div>
@@ -282,7 +279,7 @@ a good starting point for a commercial webapp.</p>
       <script type="text/javascript" src="../_static/jquery.js"></script>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

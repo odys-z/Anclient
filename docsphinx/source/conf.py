@@ -41,7 +41,7 @@ release = u'Anclient'
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
-    'sphinx.ext.githubpages',
+    # 'sphinx.ext.githubpages',
 
     'sphinx_rtd_theme',
 ]

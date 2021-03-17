@@ -21,7 +21,78 @@ for what JSample can do.
 JSample Quick Start
 ===================
 
-The process is tested using Eclipse and Tomcat.
+Start with binary release
+-------------------------
+
+1. download the latest archive from `release section <https://github.com/odys-z/semantic-jserv/releases>`_.
+
+The zip file is a working sample project source for quick start. Unzip it to local
+file system.
+
+2. import eclipse project
+
+In Eclipse::
+
+    File -> Import ... -> Existing Projects into Workspace
+
+Navigate to where the package extracted.
+
+3. create a servlet server with parameter "io.oz.root-key"
+
+Here is a sample contex.xml for Tomcat.
+
+.. code-block:: XML
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Context>
+        <WatchedResource>WEB-INF/web.xml</WatchedResource>
+        <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+        <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+    	<Parameter name="io.oz.root-key" value="0123456789ABCDEF" override="false"/>
+    </Context>
+..
+
+4. deploy to the servlet container server
+
+The sample project come with a sqlite3 db file and configured basice semantics.
+The project and deploy to tomcat with Eclipse, should reporting in console like:
+
+.. image:: imgs/01-eclipse-deploy.jpg
+    :width: 480px
+
+Visiting the login serv port::
+
+    http://<server>/<path e.g. jserv-sample>/login.serv11
+
+You will get some json data like this:
+
+.. code-block:: json
+
+    { "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+      "code": "exSemantic",
+      "opts": null,
+      "port": "session",
+      "header": null,
+      "vestion": "1.0",
+      "body": [ { "type": "io.odysz.semantic.jprotocol.AnsonResp",
+                  "rs": null,
+                  "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+                  "a": null,
+                  "conn": null,
+                  "m": "No envelope is available.",
+                  "map": null
+              } ],
+      "seq": 0
+    }
+..
+
+The service is reporting "No envelope is available" because the request with GET
+doesn't carry correct message. That means it's running correctly. the next step
+should be using a client to visit the service.
+
+Start from source
+-----------------
 
 1. Clone and Import Eclipse Project
 
@@ -92,15 +163,11 @@ Note: while handling requests, you may find some error message in console like::
 That's because of a warning message from `antlr4 <https://github.com/antlr/antlr4>`_
 upon which semantic-\* are heavily based. Till now we find is safe to ignore it.
 
-Now, using a browser visiting::
+Now, using a browser visiting e.g.::
 
-    http://localhost:8080/jsample/login.serv
+    http://localhost:8080/jserv-sample/login.serv11
 
-and should get some error message like this:
-
-.. raw:: html
-
-    <img src='https://odys-z.github.io/notes/semantics/jserv/imgs/001-jsample%20ok.png'/>
+and should get some error message like above.
 
 That's all! The sample service are running now. Next you should visit the service
 using one of the different version of Anclient. See the
