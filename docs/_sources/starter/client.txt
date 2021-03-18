@@ -100,4 +100,60 @@ It's doing 3 things:
 
 2. login with the user's login name and password
 
+The session is managed by Semantic.jserv and Anclient together. Each user's action
+will touch the time stamp at jserv's session information. If user stop action for
+a time (configured at server side), the session will expired
+
 3. query the user's basic information (role)
+
+The query is a simple SQL example. It's wrapped by upper widget binding layer to
+produce automatic data bindings.
+
+Example: x-visual
+-----------------
+
+Copy the released template project form the release section TODO.
+
+Anclient has multiple samples (in the future) sharing node's modules. You can also
+install those like this ::
+
+    -+- examples.js
+     |--- x-visual
+     |--- sampel-TODO
+
+To install dependencies::
+
+    cd examples.js
+    npm install jquery
+    npm install d3 earcut oboe
+    npm install anclient
+    npm install x-visual@0.3.81
+    npm install babel-plugin-syntax-jsx babel-preset-env --save-dev
+
+**Note:** This example depends on x-visual webgl1 branch, version 0.3.81.
+
+Install webpack for the sample project::
+
+    cd x-visual
+    npm init
+    npm install webpack webpack-cli --save-dev
+
+Then use webpack transpile the source::
+
+    npm run build
+
+or::
+
+    webpack
+
+There are many way to host the index.html page, e.g. start a python server in
+examples.js (index.html used 2 level parent path)::
+
+    python3 -m http.server 8080
+
+Then browse to::
+
+    http://localhost:8080/x-visual/bar-chart/
+
+This example also will visiting the jserv-sample data service.
+See :ref:`JSample quick start <jsample-quick-start>` for how to setup it.
