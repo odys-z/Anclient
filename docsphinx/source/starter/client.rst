@@ -112,7 +112,7 @@ produce automatic data bindings.
 Example: x-visual
 -----------------
 
-Copy the released template project form the `release section <https://github.com/odys-z/Anclient/releases/tag/An-example.js1.0>`_.
+Copy the released template project form the `release section <https://github.com/odys-z/Anclient/releases/>`_.
 
 Anclient has multiple samples (in the future) sharing node's modules. You can also
 install those like this ::
@@ -124,11 +124,15 @@ install those like this ::
 To install dependencies::
 
     cd examples.js
-    npm install jquery
-    npm install d3 earcut oboe
-    npm install anclient
-    npm install x-visual@0.3.81
-    npm install babel-plugin-syntax-jsx babel-preset-env --save-dev
+	npm install --save-dev
+
+If everything is OK, following dependencies should be installed::
+
+    babel-plugin-syntax-jsx babel-preset-env
+    jquery
+    d3 earcut oboe
+    anclient
+    x-visual@0.3.81
 
 **Note:** This example depends on x-visual webgl1 branch, version 0.3.81.
 
