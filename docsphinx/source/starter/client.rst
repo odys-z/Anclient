@@ -112,7 +112,7 @@ produce automatic data bindings.
 Example: x-visual
 -----------------
 
-Copy the released template project form the release section TODO.
+Copy the released template project form the `release section <https://github.com/odys-z/Anclient/releases/tag/An-example.js1.0>`_.
 
 Anclient has multiple samples (in the future) sharing node's modules. You can also
 install those like this ::

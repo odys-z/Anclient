@@ -20,15 +20,24 @@ export class App {
 	login() {
 		let that = this;
 	    this.an.login(
-	        "admin",             // user name
-	        "odys-z.github.io",  // password (won't sent on line - already set at server)
+	        "admin",  // user name
+	        "12356",  // password (won't sent on line - already set at server)
 	        // callback parameter is a session client initialized with session token
 	        // client.ssInf has session Id, token & user information got from server
-	        function(client){
+	        function (client) {
 	            that.ssClient = client;
 	            console.log(client.ssInf);
 	            that.query();
-	        });
+	        },
+			function (code, resp) {
+				if (code === an.Protocol.MsgCode.exIo)
+					alert('Network Failed!');
+				else if (resp.body[0])
+					// most likely MsgCode.exSession for password error
+					alert(resp.body[0].m);
+				else console.error(resp);
+			}
+		);
 	}
 
 	/** Create a query request and post back to server. */
