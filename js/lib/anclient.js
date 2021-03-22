@@ -206,7 +206,7 @@ class AnClient {
 		});
 	}
 
-	// TODO moved to protocol.js?
+	// TODO moved to semantic resultset?
     /** Get the cols from jserv's rows
      * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
      * @param {AnsonMsg<AnsonResp>} resp

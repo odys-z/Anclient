@@ -34,22 +34,23 @@ class Protocol {
 	}
 
 	static rs2arr (rs) {
-		var cols = [];
-		var rows = [];
-		rs.forEach((r, rx) => {
-			if (rx === 0) {
-				cols = r;
-			}
-			else {
-				rw = {};
-				r.forEach((c, cx) => {
-					rw[cols[cx]] = c;
-				})
-				rows.push(rw);
-			}
-		});
-
-		return rows;
+		return AnsonResp.rs2arr(rs);
+		// var cols = [];
+		// var rows = [];
+		// rs.forEach((r, rx) => {
+		// 	if (rx === 0) {
+		// 		cols = r;
+		// 	}
+		// 	else {
+		// 		rw = {};
+		// 		r.forEach((c, cx) => {
+		// 			rw[cols[cx]] = c;
+		// 		})
+		// 		rows.push(rw);
+		// 	}
+		// });
+		//
+		// return rows;
 	}
 
 	static nv2cell (nv) {
@@ -114,7 +115,7 @@ class Protocol {
 
 	Protocol.Notify = {changePswd: "changePswd", todos: "todos"};
 
-	Protocol.cfg  = {	ssInfo: "ss-k", };
+	Protocol.cfg  = { ssInfo: "ss-k", };
 
 	Protocol.Semantics = {
 		chkCntDel: 'checkSqlCountOnDel',
@@ -640,6 +641,63 @@ class InsertReq extends UpdateReq {
 		return this;
 	}
 }
+
+class AnsonResp {
+	// TODO
+	// TODO
+	constructor (response) {
+
+	}
+
+	/**Change rs object to array like [ {col1: val1, ...}, ... ]
+	 *
+	 * <b>Note</b> The column index and rows index shifted to starting at 0.
+	 *
+	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
+	 * @return {array} array like [ {col1: val1, ...}, ... ]
+	 */
+	static rs2arr (rs) {
+		let cols = [];
+		let rows = [];
+
+		if (typeof(rs.colnames) === 'object') {
+			// rs with column index
+			cols = new Array(rs.colnames.length);
+			for (var col in rs.colnames) {
+				// e.g. col = "VID": [ 1, "vid" ],
+				let cx = rs.colnames[col][0] - 1;
+				let cn = rs.colnames[col][1];
+				cols[cx] = cn;
+			}
+
+			rs.results.forEach((r, rx) => {
+				let rw = {};
+				r.forEach((c, cx) => {
+					rw[cols[cx]] = c;
+				});
+				rows.push(rw);
+			});
+		}
+		else {
+			// first line as column index
+			rs.forEach((r, rx) => {
+				if (rx === 0) {
+					cols = r;
+				}
+				else {
+					rw = {};
+					r.forEach((c, cx) => {
+						rw[cols[cx]] = c;
+					});
+					rows.push(rw);
+				}
+			});
+		}
+
+		return rows;
+	}
+}
+
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
 /** define t that can be understood by stree.serv */
 const stree_t = {
@@ -723,4 +781,6 @@ class DatasetCfg extends QueryReq {
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Jregex, Protocol, AnsonMsg, AnHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg, stree_t}
+export {Jregex, Protocol, AnsonMsg, AnHeader,
+	UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
+	AnsonResp, DatasetCfg, stree_t}

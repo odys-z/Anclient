@@ -6,40 +6,47 @@ import * as an from 'anclient'
  * @class
  */
 export default class Bars extends xv.XSys {
-    constructor(ecs, options) {
-        super(ecs);
-        this.ecs = ecs;
+	constructor(ecs, options) {
+		super(ecs);
+		this.ecs = ecs;
+		this.logcnt = 0;
+	}
 
-        this.logcnt = 0;
+	create(vectors) {
+		for (let i = 0; i < vectors.length; i++) {
+			let v = vectors[i];
+			let y = (v.amount - 95) * 2;
+			let h = y / 2;
+			this.ecs.createEntity({
+				id: v.vid,
+				Obj3: { geom: xv.XComponent.Obj3Type.BOX,
+						box: [20, y, 20],
+						transform: [ {translate: [i * 30 - 90, h, 0]} ]
+					},
+				Visual: {vtype: xv.AssetType.mesh,
+						 asset: v.person === 'A2' ? undefined : '../../assets/tex/rgb2x2.png'
+					 }
+			});
+		}
+		return this;
+	}
 
-        // create a cube with options
-        if (ecs) {
-            var cube = ecs.createEntity({
-                id: 'cube0',
-                Obj3: { geom: xv.XComponent.Obj3Type.BOX,
-                        box: [200, 120, 80] },    // geometry parameters, for BOX, it's bounding box
-                Visual: {vtype: xv.AssetType.mesh,
-                         asset: '../../assets/rgb2x2.png' }
-            });
-        }
-    }
+	update(tick, entities) {
+		if (this.logcnt < 2) {
+			this.logcnt += 1;
+			console.log('cube.update(): ', tick, entities)
+		}
 
-    update(tick, entities) {
-        if (this.logcnt < 2) {
-            this.logcnt += 1;
-            console.log('cube.update(): ', tick, entities)
-        }
-
-        for (const e of entities) {
-             if (e.flag > 0) {
-                // handling command like start an animation here
-                this.cmd = x.xview.cmds[0].cmd;
-            }
-            else this.cmd = undefined;
-        }
-    }
+		for (const e of entities) {
+			 if (e.flag > 0) {
+				// handling command like start an animation here
+				this.cmd = x.xview.cmds[0].cmd;
+			}
+			else this.cmd = undefined;
+		}
+	}
 }
 
 Bars.query = {
-    iffall: ['Visual']
+	iffall: ['Visual']
 };

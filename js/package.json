@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main-backup": "./test/vue/index.js",
   "main": "./lib/anclient.js",
@@ -9,7 +9,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Open file://test/index.html in a browser.\" && exit 1"
+    "test old way": "echo \"Open file://test/index.html in a browser.\" && exit 1",
+    "test": "webpack --config mocha.config.js && mocha dist/testBundle.js"
   },
   "keywords": [
     "anclient",
@@ -40,7 +41,12 @@
     "babel-plugin-syntax-jsx": "^6.18.0",
     "babel-plugin-transform-vue-jsx": "^3.7.0",
     "babel-preset-env": "^1.7.0",
+    "chai": "^4.3.4",
     "jquery": "^3.5.1",
-    "webpack": "^4.46.0"
+    "mocha": "^8.3.2",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^4.5.0",
+    "webpack-node-externals": "^2.5.2",
+    "webpack-shell-plugin": "^0.5.0"
   }
 }
