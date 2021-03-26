@@ -3,6 +3,7 @@
 import * as an from 'anclient'
 import * as xv from 'x-visual'
 import Bars from './bars'
+import {vec3conn, Jvector} from './jvector'
 
 /** Hollow XWorld Application.
  * add the user implemented system, Cube, into xworld, then show it.
@@ -21,13 +22,15 @@ export class App {
 		let that = this;
 		this.an.login(
 			"admin",  // user name
-			"123456", // password (won't sent on line - already set at server)
+			"123456", // password (won't be sent on line - already set at server)
 			// callback parameter is a session client initialized with session token
 			// client.ssInf has session Id, token & user information got from server
 			function (client) {
 				that.ssClient = client;
-				console.log(client.ssInf);
+				// console.log(client.ssInf);
 				that.query();
+
+				that.getVectors((resp) => { console.log(resp.vectors, resp.x, resp.y, resp.z); });
 			},
 			function (code, resp) {
 				if (code === an.Protocol.MsgCode.exIo)
@@ -40,20 +43,23 @@ export class App {
 		);
 	}
 
-	/** Create a query request and post back to server. */
+	/** Create a query request and post back to server.
+	 * This function show the general query sample - goes to the Protocol's query
+	 * port: "r.serv(11)".
+	 * */
 	query() {
 		let that = this;
-		let req = this.ssClient.query("raw-vec", "vector", "v", {page: 0, size: 20});
+		let req = this.ssClient.query(vec3conn, "vector", "v");
 		req.body[0]
 			.expr("vid").expr("val", "amount")
-			.expr("dim1", "person").expr("dim2", "year").expr("dim3", "age")
+			.expr("dim1", "agegrp").expr("dim2", "tex").expr("dim3", "indust")
 			.expr("dim4").expr("dim5").expr("dim6")
-			.whereCond("=", "vgroup", "'80-'");
+			.whereCond("=", "agegrp", "'80-'");
 
 		this.an.post(req,
 			// success callback. resp is a server message
 			function(resp) {
-				// console.log(resp);
+				console.log(resp);
 
 				let c = document.getElementById(that.canv);
 				const xworld = new xv.XWorld(c, window, {

@@ -24,7 +24,7 @@ export default class Bars extends xv.XSys {
 						transform: [ {translate: [i * 30 - 90, h, 0]} ]
 					},
 				Visual: {vtype: xv.AssetType.mesh,
-						 asset: v.person === 'A2' ? undefined : '../../assets/tex/rgb2x2.png'
+						 asset: v.tex === '3' ? undefined : '../../assets/tex/rgb2x2.png'
 					 }
 			});
 		}
