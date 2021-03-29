@@ -28,9 +28,10 @@ export class App {
 			function (client) {
 				that.ssClient = client;
 				// console.log(client.ssInf);
-				that.query();
+				// that.query();
 
-				that.getVectors((resp) => { console.log(resp.vectors, resp.x, resp.y, resp.z); });
+				let jvector = new Jvector(client);
+				jvector.getVectors((resp) => { console.log(resp.vectors, resp.x, resp.y, resp.z); });
 			},
 			function (code, resp) {
 				if (code === an.Protocol.MsgCode.exIo)

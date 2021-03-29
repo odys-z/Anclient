@@ -8,8 +8,7 @@ var version = "1.0.0";
 module.exports = {
     mode: v,
     devtool: 'source-map',
-    entry: { "bar-chart": './bar-chart/app.js',
-          },
+    entry: { "bar-chart": './bar-chart/app.js' },
 
     output: {
       filename: "[name].min.js",
@@ -26,7 +25,6 @@ module.exports = {
 
     module: {
       rules: [
-        // npm install babel-plugin-syntax-jsx babel-plugin-transform-vue-jsx babel-helper-vue-jsx-merge-props babel-preset-env --save-dev
         { test: /test\*.js$/, exclude: /node_modules/,
           use: [ 'style-loader',
                 'css-loader',

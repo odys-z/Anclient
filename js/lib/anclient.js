@@ -100,14 +100,15 @@ class AnClient {
 		// byte[] iv =   AESHelper.getRandom();
 		// String iv64 = AESHelper.encode64(iv);
 		// String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
-		console.log('An.login(' + usrId + ', ' + pswd + ', ...)');
+		
+		// console.log('An.login(' + usrId + ', ' + pswd + ', ...)');
 
-		var iv = aes.getIv128();
-		var c = aes.encrypt(usrId, pswd, iv);
+		let iv = aes.getIv128();
+		let c = aes.encrypt(usrId, pswd, iv);
 		// var qobj = formatLogin(logId, c, bytesToB64(iv));
-		var req = Protocol.formatSessionLogin(usrId, c, aes.bytesToB64(iv));
+		let req = Protocol.formatSessionLogin(usrId, c, aes.bytesToB64(iv));
 
-		var An = this;
+		let An = this;
 
 		this.post(req,
 			/**@param {object} resp
