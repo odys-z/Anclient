@@ -34,7 +34,7 @@ export default class Bars extends xv.XSys {
 	update(tick, entities) {
 		if (this.logcnt < 2) {
 			this.logcnt += 1;
-			console.log('cube.update(): ', tick, entities)
+			console.log('ECS Bars#update(): ', tick, entities)
 		}
 
 		for (const e of entities) {

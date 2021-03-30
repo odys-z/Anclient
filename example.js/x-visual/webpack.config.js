@@ -8,7 +8,8 @@ var version = "1.0.0";
 module.exports = {
     mode: v,
     devtool: 'source-map',
-    entry: { "bar-chart": './bar-chart/app.js' },
+    entry: { "bar-chart": './bar-chart/app.js',
+ 			 "cube-chart": './cube-chart/app.js'},
 
     output: {
       filename: "[name].min.js",

@@ -3,7 +3,7 @@
 import * as an from 'anclient'
 import * as xv from 'x-visual'
 import Bars from './bars'
-import {vec3conn, Jvector} from './jvector'
+import {vec3conn, Jvector} from '../lib/jvector'
 
 /** Hollow XWorld Application.
  * add the user implemented system, Cube, into xworld, then show it.
@@ -18,30 +18,43 @@ export class App {
 		this.ssClient = undefined;
 	}
 
-	login() {
+	load() {
 		let that = this;
-		this.an.login(
-			"admin",  // user name
-			"123456", // password (won't be sent on line - already set at server)
-			// callback parameter is a session client initialized with session token
-			// client.ssInf has session Id, token & user information got from server
-			function (client) {
-				that.ssClient = client;
-				// console.log(client.ssInf);
-				// that.query();
+		if (!this.loggedin) {
+			this.an.login(
+				"admin",  // user name
+				"123456", // password (won't be sent on line - already set at server)
+				// callback parameter is a session client initialized with session token
+				// client.ssInf has session Id, token & user information got from server
+				reload,
+				onError
+			);
+		}
+		else reload(this.ssClient);
 
-				let jvector = new Jvector(client);
-				jvector.getVectors((resp) => { console.log(resp.vectors, resp.x, resp.y, resp.z); });
-			},
-			function (code, resp) {
-				if (code === an.Protocol.MsgCode.exIo)
-					alert('Network Failed!');
-				else if (resp.body[0])
-					// most likely MsgCode.exSession for password error
-					alert(resp.body[0].m);
-				else console.error(resp);
-			}
-		);
+		function reload (client) {
+			that.ssClient = client;
+			that.loggedin = true;
+
+			// 1. bind simple bars
+			that.query();
+
+			// 2. load vectors from port vec3.serv
+			let jvector = new Jvector(client);
+			jvector.getVectors((resp) => {
+				console.log(jvector.vectorsOf(resp),
+							jvector.x(resp), jvector.y(resp), jvector.z(resp));
+			});
+		}
+
+		function onError (code, resp) {
+			if (code === an.Protocol.MsgCode.exIo)
+				alert('Network Failed!');
+			else if (resp.body[0])
+				// most likely MsgCode.exSession for password error
+				alert(resp.body[0].m);
+			else console.error(resp);
+		}
 	}
 
 	/** Create a query request and post back to server.
