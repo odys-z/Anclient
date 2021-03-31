@@ -58,12 +58,13 @@ insert into s_domain VALUES("own-3", "ownership", "own", "state",  "state owned"
 insert into s_domain VALUES("own-4", "ownership", "own", "private","personal owned");
 insert into s_domain VALUES("own-5", "ownership", "own", "joint",  "joint venture");
 
-insert into vector VALUES("v 001", "100", "80-", "0",  "GICS-151010", "B1", "C1", "D1", "own-1", "F1");
-insert into vector VALUES("v 002", "103", "80-", "3",  "GICS-151010", "B2", "C2", "D2", "own-2", "F2");
-insert into vector VALUES("v 003", "105", "80-", "5",  "GICS-151010", "B1", "C3", "D1", "own-3", "F1");
-insert into vector VALUES("v 004", "113", "80-", "13", "GICS-101010", "B1", "C3", "D2", "own-4", "F2");
-insert into vector VALUES("v 005", "111", "80-", "11", "GICS-151010", "B1", "C1", "D3", "own-1", "F1");
-insert into vector VALUES("v 006", "103", "80-", "3",  "GICS-101010", "B1", "C2", "D2", "own-2", "F2");
-insert into vector VALUES("v 007", "105", "80-", "5",  "GICS-151020", "B1", "C4", "D3", "own-3", "F1");
-insert into vector VALUES("v 008", "106", "80-", "6",  "GICS-151020", "B1", "C2", "D4", "own-4", "F2");
+insert into vector VALUES("v 001", "100", "80-", "0",  "GICS-15101010", "B1", "C1", "D1", "own-1", "F1");
+insert into vector VALUES("v 002", "103", "80-", "3",  "GICS-15101010", "B2", "C2", "D2", "own-2", "F2");
+insert into vector VALUES("v 003", "105", "80-", "5",  "GICS-15102020", "B1", "C3", "D1", "own-3", "F1");
+insert into vector VALUES("v 004", "113", "80-", "13", "GICS-15102010", "B1", "C3", "D2", "own-4", "F2");
+insert into vector VALUES("v 005", "111", "80-", "11", "GICS-15103020", "B1", "C1", "D3", "own-1", "F1");
+insert into vector VALUES("v 006", "103", "80-", "3",  "GICS-10101050", "B1", "C2", "D2", "own-2", "F2");
+insert into vector VALUES("v 007", "105", "80-", "5",  "GICS-15103010", "B1", "C4", "D3", "own-3", "F1");
+insert into vector VALUES("v 008", "106", "80-", "6",  "GICS-15103020", "B1", "C2", "D4", "own-4", "F2");
+insert into vector VALUES("v 009", "102", "80-", "2",  "GICS-15103020", "B1", "C2", "D2", "own-4", "F2");
 

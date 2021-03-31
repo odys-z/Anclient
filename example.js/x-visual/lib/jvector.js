@@ -42,7 +42,7 @@ class Jvector {
 	}
 
 	getVectors (onload) {
-		this.serv(vec_a.vec);
+		this.serv(vec_a.vec, onload);
 	}
 
 	/**Data type parser for vec3.serv
@@ -78,7 +78,7 @@ class Jvector {
 
 
 	getCubes (onload) {
-		this.serv(vec_a.cube);
+		this.serv(vec_a.cube, onload);
 	}
 	/**
 	 * @param {AnsonResp} respMsg

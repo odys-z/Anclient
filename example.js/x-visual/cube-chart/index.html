@@ -28,6 +28,7 @@
 
 	// {vectors, x, y, z}
 	app.load((data) => {
+		data = data.body[0];
 		console.log(data);
 		let cube = new Chart.CubeChart();
 		cube.start('canv', data);
