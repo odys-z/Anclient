@@ -39,8 +39,6 @@ public class AnsonClient {
 		this.ssInf = sessionInfo;
 	}
 	
-//	public AnsonClient(AnsonResp msg) { }
-
 	/**Format a query request object, including all information for construct a "select" statement.
 	 * @param conn connection id
 	 * @param tbl main table, (sometimes function category), e.g. "e_areas"
