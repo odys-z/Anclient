@@ -17,17 +17,24 @@ namespace anclient.src.jserv
 
         private string _name;
         private int _port;
+        private int session;
 
         Port(string url) {
 			this._name = url;
 			this._port = valof(url);
 		}
 
+        public Port(int port)
+        {
+            this._port = port;
+			this._name = nameof(port);
+        }
+
         public string name() { return _name; }
 
         public int port() { return _port; }
 
-        public int valof(string pname) {
+        static public int valof(string pname) {
 			return pname == "ping.serv11" ? IPort.heartbeat
 				: pname == "login.serv11" ? IPort.session
 				: pname == "r.serv11" ? IPort.query
@@ -41,14 +48,33 @@ namespace anclient.src.jserv
 				: pname == "dataset.serv11" ? IPort.dataset
 				: IPort.NA;
 		}
+        static public string nameof(int port) {
+			return port == IPort.heartbeat ? "ping.serv11"
+				: port == IPort.session ? "login.serv11"
+				: port == IPort.query ? "r.serv11"
+				: port == IPort.update ? "u.serv11" 
+				: port == IPort.insert ? "c.serv11" 
+				: port == IPort.delete ? "d.serv11"
+				: port == IPort.echo ? "echo.serv11"
+				: port == IPort.file ? "file.serv11"
+				: port == IPort.user ? "user.serv11"
+				: port == IPort.stree ? "stree.serv11" 
+				: port == IPort.dataset ? "dataset.serv11"
+				: "NA";
+		}
 
 	}
     /// <summary>
     /// Anson message type, with body of type T.
     /// </summary>
     /// <typeparam name="T">T must subclass of AnsonBody</typeparam>
-    class AnsonMsg<T> : Antson
+    public class AnsonMsg<T> : Antson
     {
+        public class MsgCode
+        {
+            public const int ok = 0;
+        }
+
         int seq;
         IPort port;
 
