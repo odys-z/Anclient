@@ -1,3 +1,4 @@
+using io.odysz.semantic.jprotocol;
 using Sharpen;
 
 namespace io.odysz.semantic.ext
@@ -23,28 +24,24 @@ namespace io.odysz.semantic.ext
 		/// <see cref="io.odysz.semantic.DA.DatasetCfg.TreeSemantics"/>
 		/// )
 		/// </summary>
-		protected internal io.odysz.semantic.DA.DatasetCfg.TreeSemantics stcs;
+		/// protected internal io.odysz.semantic.DA.DatasetCfg.TreeSemantics stcs;
 
-		internal string root;
+		internal string _root;
 
-		public virtual string root()
-		{
-			return root;
-		}
+		public virtual string root { get { return _root; } }
 
 		public AnDatasetReq()
 			: base(null, null)
 		{
 		}
 
-		public virtual io.odysz.semantic.ext.AnDatasetReq root(string rootId)
+		public virtual AnDatasetReq Root(string rootId)
 		{
-			this.root = rootId;
+			this._root = rootId;
 			return this;
 		}
 
-		public AnDatasetReq(io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonBody
-			> parent, string conn)
+		public AnDatasetReq(AnsonMsg<AnsonBody> parent, string conn)
 			: base(parent, conn)
 		{
 			a = "ds";

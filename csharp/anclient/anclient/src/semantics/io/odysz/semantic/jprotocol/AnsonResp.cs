@@ -4,7 +4,7 @@ namespace io.odysz.semantic.jprotocol
 {
 	/// <summary>Anson message response body</summary>
 	/// <author>odys-z@github.com</author>
-	public class AnsonResp : io.odysz.semantic.jprotocol.AnsonBody
+	public class AnsonResp : AnsonBody
 	{
 		protected internal string m;
 
@@ -18,14 +18,12 @@ namespace io.odysz.semantic.jprotocol
 		{
 		}
 
-		public AnsonResp(io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonResp
-			> parent)
+		public AnsonResp(AnsonMsg<AnsonMsg> parent)
 			: base(parent, null)
 		{
 		}
 
-		public AnsonResp(io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonResp
-			> parent, string txt)
+		public AnsonResp(AnsonMsg<AnsonMsg> parent, string txt)
 			: base(parent, null)
 		{
 			this.m = txt;

@@ -1,13 +1,13 @@
+using io.odysz.semantic.jprotocol;
 using Sharpen;
 
 namespace io.odysz.semantic.ext
 {
-	public class AnDatasetResp : io.odysz.semantic.jprotocol.AnsonResp
+	public class AnDatasetResp : AnsonResp
 	{
 		private System.Collections.Generic.IList<object> forest;
 
-		public AnDatasetResp(io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonResp
-			> parent, System.Collections.Generic.List<io.odysz.anson.Anson> forest)
+		public AnDatasetResp(AnsonMsg<AnsonResp> parent, System.Collections.Generic.List<io.odysz.anson.Anson> forest)
 			: base(parent)
 		{
 		}

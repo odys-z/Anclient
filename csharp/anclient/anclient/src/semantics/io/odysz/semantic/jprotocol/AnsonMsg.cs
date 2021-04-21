@@ -12,8 +12,8 @@ namespace io.odysz.semantic.jprotocol
 	/// which should been directly write into output stream.
 	/// </summary>
 	/// <author>odys-z@github.com</author>
-	public class AnsonMsg<T> : io.odysz.anson.Anson
-		where T : io.odysz.semantic.jprotocol.AnsonBody
+	public class AnsonMsg<T> : Anson
+		where T : AnsonBody
 	{
 		/// <summary>
 		/// Port is the conceptual equivalent to the SOAP port, the service methods' group.<br />

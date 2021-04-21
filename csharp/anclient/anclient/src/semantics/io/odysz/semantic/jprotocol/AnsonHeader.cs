@@ -6,7 +6,8 @@ namespace io.odysz.semantic.jprotocol
 	{
 		internal string uid;
 
-		internal string ssid;
+		// internal string ssid;
+		public string ssid { get; }
 
 		internal string iv64;
 
@@ -27,15 +28,11 @@ namespace io.odysz.semantic.jprotocol
 			return uid;
 		}
 
-		public virtual string ssid()
-		{
-			return ssid;
-		}
 
+		/*
 		/// <returns>js equivalent {md: ssinf.md, ssid: ssinf.ssid, uid: ssinf.uid, iv: ssinf.iv};
 		/// 	</returns>
-		public static io.odysz.semantic.jprotocol.AnsonHeader format(string uid, string ssid
-			)
+		public static io.odysz.semantic.jprotocol.AnsonHeader format(string uid, string ssid)
 		{
 			// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
 			return new io.odysz.semantic.jprotocol.AnsonHeader(ssid, uid);
@@ -47,8 +44,7 @@ namespace io.odysz.semantic.jprotocol
 			return this;
 		}
 
-		public static string[] usrAct(string funcId, string cmd, string cate, string remarks
-			)
+		public static string[] usrAct(string funcId, string cmd, string cate, string remarks)
 		{
 			return new string[] { funcId, cate, cmd, remarks };
 		}
@@ -62,10 +58,6 @@ namespace io.odysz.semantic.jprotocol
 				, iv64, usrAct == null ? null : java.util.Arrays.stream(usrAct).collect(java.util.stream.Collectors
 				.joining(", ", "[", "]")));
 		}
-		//	public static String[] usrAct(String funcId, String cmd, String cate, String remarks) {
-		//	}
-		//	public static AnsonMsg<? extends AnsonBody> userReq(String t, IPort p, String[] act, DatasetReq req) {
-		//		return new String[] {funcId, cate, cmd, remarks};
-		//	}
+		*/
 	}
 }
