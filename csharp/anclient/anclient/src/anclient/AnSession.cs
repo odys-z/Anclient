@@ -12,7 +12,7 @@ namespace anclient.src.anclient
     }
 
 
-    public class AnSessionResp : AnsonBody
-    {
-    }
+    //public class AnSessionResp : AnsonBody
+    //{
+    //}
 }
