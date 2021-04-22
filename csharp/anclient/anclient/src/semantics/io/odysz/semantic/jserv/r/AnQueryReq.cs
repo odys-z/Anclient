@@ -1,4 +1,6 @@
-using Sharpen;
+using anclient.src.jserv;
+using io.odysz.semantic.jprotocol;
+using System.Collections.Generic;
 
 namespace io.odysz.semantic.jserv.R
 {
@@ -8,7 +10,7 @@ namespace io.odysz.semantic.jserv.R
 	/// table, joins, conditions, groups, orders, etc.
 	/// </summary>
 	/// <author>odys-z@github.com</author>
-	public class AnQueryReq : io.odysz.semantic.jprotocol.AnsonBody
+	public class AnQueryReq : AnsonBody
 	{
 		/// <summary>Main table</summary>
 		internal string mtabl;
@@ -23,26 +25,26 @@ namespace io.odysz.semantic.jserv.R
 		/// cond-obj: {(main-table | alais.)left-col-val op (table-1 | alias2 .)right-col-val}
 		/// - op: '=' | '&lt;=' | '&gt;=' ...</pre>
 		/// </summary>
-		internal System.Collections.Generic.List<string[]> joins;
+		internal List<string[]> joins;
 
 		/// <summary>
 		/// exprs: [expr-obj],
 		/// expr-obj: {tabl: "b_articles/t_alais", alais: "recId", expr: "recId"}
 		/// </summary>
-		internal System.Collections.Generic.List<string[]> exprs;
+		internal List<string[]> exprs;
 
 		/// <summary>
 		/// where: [cond-obj], see
 		/// <see cref="joins"/>
 		/// for cond-obj.
 		/// </summary>
-		internal System.Collections.Generic.List<string[]> where;
+		internal List<string[]> where;
 
 		/// <summary>
 		/// orders: [order-obj],
 		/// - order-obj: {tabl: "b_articles", field: "pubDate", asc: "true"}
 		/// </summary>
-		internal System.Collections.Generic.List<string[]> orders;
+		internal List<string[]> orders;
 
 		/// <summary>
 		/// group: [group-obj]
@@ -56,26 +58,24 @@ namespace io.odysz.semantic.jserv.R
 
 		internal string[] limt;
 
-		internal System.Collections.Generic.List<string[]> havings;
+		internal List<string[]> havings;
 
-		public AnQueryReq(io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonBody
-			> parent, string conn)
-			: base(parent, conn)
+		public AnQueryReq(AnsonMsg<AnsonBody> parent, string conn) : base(parent, conn)
 		{
-			a = io.odysz.semantic.jprotocol.JProtocol.CRUD.R;
+			a = JProtocol.CRUD.R;
 		}
 
 		public AnQueryReq()
 			: base(null, null)
 		{
-			a = io.odysz.semantic.jprotocol.JProtocol.CRUD.R;
+			a = JProtocol.CRUD.R;
 		}
 
-		public AnQueryReq(io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonBody
+		public AnQueryReq(AnsonMsg<AnsonBody
 			> parent, string conn, string fromTbl, params string[] alias)
 			: base(parent, conn)
 		{
-			a = io.odysz.semantic.jprotocol.JProtocol.CRUD.R;
+			a = JProtocol.CRUD.R;
 			mtabl = fromTbl;
 			mAlias = alias == null || alias.Length == 0 ? null : alias[0];
 			this.page = -1;
@@ -117,7 +117,7 @@ namespace io.odysz.semantic.jserv.R
 			return j("R", with, @as, on);
 		}
 
-		public virtual io.odysz.semantic.jserv.R.AnQueryReq j(System.Collections.Generic.List
+		public virtual io.odysz.semantic.jserv.R.AnQueryReq j(List
 			<string[]> joins)
 		{
 			if (joins != null)
@@ -135,7 +135,7 @@ namespace io.odysz.semantic.jserv.R
 		{
 			if (joins == null)
 			{
-				joins = new System.Collections.Generic.List<string[]>();
+				joins = new List<string[]>();
 			}
 			string[] j = new string[io.odysz.transact.sql.Query.Ix.joinSize];
 			j[io.odysz.transact.sql.Query.Ix.joinTabl] = with;
@@ -156,7 +156,7 @@ namespace io.odysz.semantic.jserv.R
 		{
 			if (exprs == null)
 			{
-				exprs = new System.Collections.Generic.List<string[]>();
+				exprs = new List<string[]>();
 			}
 			string[] exp = new string[io.odysz.transact.sql.Query.Ix.exprSize];
 			exp[io.odysz.transact.sql.Query.Ix.exprExpr] = expr;
@@ -172,7 +172,7 @@ namespace io.odysz.semantic.jserv.R
 		{
 			if (where == null)
 			{
-				where = new System.Collections.Generic.List<string[]>();
+				where = new List<string[]>();
 			}
 			string[] predicate = new string[io.odysz.transact.sql.Query.Ix.predicateSize];
 			predicate[io.odysz.transact.sql.Query.Ix.predicateOper] = oper;
@@ -187,7 +187,7 @@ namespace io.odysz.semantic.jserv.R
 		{
 			if (orders == null)
 			{
-				orders = new System.Collections.Generic.List<string[]>();
+				orders = new List<string[]>();
 			}
 			orders.add(new string[] { col, Sharpen.Runtime.getStringValueOf(asc == null || asc
 				.Length == 0 ? "asc" : asc[0] ? "asc" : "desc") });
@@ -205,7 +205,7 @@ namespace io.odysz.semantic.jserv.R
 		/// <param name="from"></param>
 		/// <param name="as"></param>
 		/// <returns>query request</returns>
-		public static io.odysz.semantic.jserv.R.AnQueryReq formatReq(string conn, io.odysz.semantic.jprotocol.AnsonMsg
+		public static io.odysz.semantic.jserv.R.AnQueryReq formatReq(string conn, AnsonMsg
 			<io.odysz.semantic.jserv.R.AnQueryReq> parent, string from, params string[] @as)
 		{
 			io.odysz.semantic.jserv.R.AnQueryReq bdItem = new io.odysz.semantic.jserv.R.AnQueryReq
@@ -218,7 +218,7 @@ namespace io.odysz.semantic.jserv.R
 		{
 			if (where == null)
 			{
-				where = new System.Collections.Generic.List<string[]>();
+				where = new List<string[]>();
 			}
 			string[] predicate = new string[io.odysz.transact.sql.Query.Ix.predicateSize];
 			predicate[io.odysz.transact.sql.Query.Ix.predicateOper] = oper;

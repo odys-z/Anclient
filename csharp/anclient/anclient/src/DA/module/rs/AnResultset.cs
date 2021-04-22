@@ -1,4 +1,7 @@
-using Sharpen;
+using io.odysz.anson;
+using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace io.odysz.module.rs
 {
@@ -11,9 +14,9 @@ namespace io.odysz.module.rs
 	/// TODO This will be changed in the future (It's proved starting at 0 is more bug free).
 	/// </remarks>
 	/// <author>odys-z@github.com</author>
-	public class AnResultset : io.odysz.anson.Anson
+	public class AnResultset : Anson
 	{
-		private const bool debug = true;
+		// private const bool debug = true;
 
 		private int colCnt = 0;
 
@@ -22,8 +25,7 @@ namespace io.odysz.module.rs
 
 		private int rowCnt = 0;
 
-		private System.Collections.Generic.List<System.Collections.Generic.List<object>> 
-			results;
+		public DataSet ds { get; }
 
 		/// <summary>
 		/// col-index start at 1, map: [alais(upper-case), [col-index, db-col-name(in raw case)]<br />
@@ -36,36 +38,32 @@ namespace io.odysz.module.rs
 		/// colnames.put(coln.toUpperCase(), new Object[] {colnames.get(coln), coln});
 		/// </pre>
 		/// </summary>
-		private System.Collections.Generic.Dictionary<string, object[]> colnames;
-
-		private java.sql.ResultSet rs;
-
-		private java.sql.Connection conn;
-
-		private java.sql.Statement stmt;
+		private Dictionary<string, object[]> colnames;
 
 		/// <summary>For paged query, this the total row count</summary>
 		private int total = 0;
 
-		private System.Collections.Generic.Dictionary<java.lang.Class, string> stringFormats;
+		private Dictionary<Type, string> stringFormats;
 
 		/// <summary>for deserializing</summary>
 		public AnResultset()
 		{
-		}
+        }
 
 		/// <exception cref="java.sql.SQLException"/>
-		public AnResultset(java.sql.ResultSet rs)
+		public AnResultset(DataSet rs)
 		{
-			// TODO docs
-			ICRconstructor(rs);
+			// ICRconstructor(rs);
+			ds = rs;
 		}
 
+		/*
+		private List<List<object>> results;
+
 		/// <exception cref="java.sql.SQLException"/>
-		public AnResultset(java.sql.ResultSet rs, java.sql.Connection connection, java.sql.Statement
-			 statement)
+		public AnResultset(DataSet rs, SqlConnection connection, Statement statement)
 		{
-			this.rs = rs;
+			this._rs = rs;
 			conn = connection;
 			stmt = statement;
 			ICRconstructor(rs);
@@ -73,17 +71,16 @@ namespace io.odysz.module.rs
 		}
 
 		/// <exception cref="java.sql.SQLException"/>
-		public virtual void ICRconstructor(java.sql.ResultSet rs)
+		public virtual void ICRconstructor(DataSet rs)
 		{
-			results = new System.Collections.Generic.List<System.Collections.Generic.List<object
-				>>();
+			results = new List<List<object>>();
 			if (rs == null)
 			{
 				return;
 			}
 			java.sql.ResultSetMetaData rsMeta = rs.getMetaData();
 			colCnt = rsMeta.getColumnCount();
-			colnames = new System.Collections.Generic.Dictionary<string, object[]>();
+			colnames = new Dictionary<string, object[]>();
 			for (int i = colCnt; i >= 1; i--)
 			{
 				// 2017-11-25, in mysql testing, getColumnName returning original db name, rsMeta.getColumnLabel() returning alias.
@@ -91,7 +88,7 @@ namespace io.odysz.module.rs
 				string colName = rsMeta.getColumnLabel(i).ToUpper();
 				if (colnames.Contains(colName))
 				{
-					System.Console.Error.WriteLine("WARN: Duplicated col name found, only the last one's index reserved: "
+					Console.Error.WriteLine("WARN: Duplicated col name found, only the last one's index reserved: "
 						 + colName);
 				}
 				colnames[colName] = new object[] { i, rsMeta.getColumnLabel(i) };
@@ -101,7 +98,7 @@ namespace io.odysz.module.rs
 			while (rs.next())
 			{
 				rowCnt++;
-				System.Collections.Generic.List<object> row = new System.Collections.Generic.List
+				List<object> row = new List
 					<object>();
 				for (int j = 1; j <= colCnt; j++)
 				{
@@ -114,15 +111,15 @@ namespace io.odysz.module.rs
 		/// <exception cref="java.sql.SQLException"/>
 		public AnResultset(io.odysz.module.rs.AnResultset icrs)
 		{
-			results = new System.Collections.Generic.List<System.Collections.Generic.List<object
+			results = new List<List<object
 				>>();
 			if (icrs == null)
 			{
 				return;
 			}
-			System.Collections.Generic.Dictionary<string, object[]> src_colnames = icrs.getColnames
+			Dictionary<string, object[]> src_colnames = icrs.getColnames
 				();
-			colnames = new System.Collections.Generic.Dictionary<string, object[]>();
+			colnames = new Dictionary<string, object[]>();
 			foreach (string cname in src_colnames.Keys)
 			{
 				object[] v = src_colnames[cname];
@@ -134,7 +131,7 @@ namespace io.odysz.module.rs
 			while (icrs.next())
 			{
 				rowCnt++;
-				System.Collections.Generic.List<object> row = new System.Collections.Generic.List
+				List<object> row = new List
 					<object>();
 				for (int j = 1; j <= colCnt; j++)
 				{
@@ -154,12 +151,12 @@ namespace io.odysz.module.rs
 
 		/// <summary>Construct an empty set, used for appending rows.</summary>
 		/// <param name="colnames"/>
-		public AnResultset(System.Collections.Generic.Dictionary<string, int> colnames)
+		public AnResultset(Dictionary<string, int> colnames)
 		{
-			results = new System.Collections.Generic.List<System.Collections.Generic.List<object
+			results = new List<List<object
 				>>();
 			colCnt = colnames.Count;
-			this.colnames = new System.Collections.Generic.Dictionary<string, object[]>(colCnt
+			this.colnames = new Dictionary<string, object[]>(colCnt
 				);
 			foreach (string coln in colnames.Keys)
 			{
@@ -175,13 +172,13 @@ namespace io.odysz.module.rs
 		/// Cols are deep copied.
 		/// </remarks>
 		/// <param name="colnames"/>
-		public AnResultset(System.Collections.Generic.Dictionary<string, object[]> colnames
+		public AnResultset(Dictionary<string, object[]> colnames
 			, bool toUpperCase)
 		{
-			results = new System.Collections.Generic.List<System.Collections.Generic.List<object
+			results = new List<List<object
 				>>();
 			colCnt = colnames.Count;
-			this.colnames = new System.Collections.Generic.Dictionary<string, object[]>(colCnt
+			this.colnames = new Dictionary<string, object[]>(colCnt
 				);
 			foreach (string coln in colnames.Keys)
 			{
@@ -194,10 +191,10 @@ namespace io.odysz.module.rs
 		/// <summary>Append a new row - deep copy, set current row as the appended row.</summary>
 		/// <param name="row"/>
 		/// <returns>this</returns>
-		public virtual io.odysz.module.rs.AnResultset appendDeeply(System.Collections.Generic.List
+		public virtual io.odysz.module.rs.AnResultset appendDeeply(List
 			<object> row)
 		{
-			System.Collections.Generic.List<object> newRow = new System.Collections.Generic.List
+			List<object> newRow = new List
 				<object>(row.Count);
 			for (int j = 0; j < row.Count; j++)
 			{
@@ -206,7 +203,7 @@ namespace io.odysz.module.rs
 				{
 					v = row[j].ToString();
 				}
-				catch (System.Exception)
+				catch (Exception)
 				{
 				}
 				newRow.add(v);
@@ -217,7 +214,7 @@ namespace io.odysz.module.rs
 			return this;
 		}
 
-		public virtual io.odysz.module.rs.AnResultset append(System.Collections.Generic.List
+		public virtual io.odysz.module.rs.AnResultset append(List
 			<object> includingRow)
 		{
 			results.add(includingRow);
@@ -235,10 +232,10 @@ namespace io.odysz.module.rs
 			{
 				return;
 			}
-			results = new System.Collections.Generic.List<System.Collections.Generic.List<object
+			results = new List<List<object
 				>>(rows);
 			colCnt = cols;
-			colnames = new System.Collections.Generic.Dictionary<string, object[]>(cols);
+			colnames = new Dictionary<string, object[]>(cols);
 			for (int i = colCnt; i >= 1; i--)
 			{
 				string colName = (colPrefix == null || colPrefix.Length != 1) ? Sharpen.Runtime.getStringValueOf
@@ -250,7 +247,7 @@ namespace io.odysz.module.rs
 			for (int r = 0; r < rows; r++)
 			{
 				rowCnt++;
-				System.Collections.Generic.List<object> row = new System.Collections.Generic.List
+				List<object> row = new List
 					<object>(colCnt);
 				for (int j = 1; j <= colCnt; j++)
 				{
@@ -266,10 +263,10 @@ namespace io.odysz.module.rs
 			{
 				return;
 			}
-			results = new System.Collections.Generic.List<System.Collections.Generic.List<object
+			results = new List<List<object
 				>>(rows);
 			colCnt = colNames.Length;
-			this.colnames = new System.Collections.Generic.Dictionary<string, object[]>(colCnt
+			this.colnames = new Dictionary<string, object[]>(colCnt
 				);
 			for (int i = colCnt; i >= 1; i--)
 			{
@@ -282,7 +279,7 @@ namespace io.odysz.module.rs
 			for (int r = 0; r < rows; r++)
 			{
 				rowCnt++;
-				System.Collections.Generic.List<object> row = new System.Collections.Generic.List
+				List<object> row = new List
 					<object>(colCnt);
 				for (int j = 1; j <= colCnt; j++)
 				{
@@ -301,10 +298,10 @@ namespace io.odysz.module.rs
 
 		public AnResultset(string[] colNames)
 		{
-			results = new System.Collections.Generic.List<System.Collections.Generic.List<object
+			results = new List<List<object
 				>>(16);
 			colCnt = colNames.Length;
-			this.colnames = new System.Collections.Generic.Dictionary<string, object[]>(colCnt
+			this.colnames = new Dictionary<string, object[]>(colCnt
 				);
 			for (int i = colCnt; i >= 1; i--)
 			{
@@ -317,12 +314,12 @@ namespace io.odysz.module.rs
 			rowCnt = 0;
 		}
 
-		public AnResultset(System.Collections.Generic.List<string> colNames)
+		public AnResultset(List<string> colNames)
 		{
-			results = new System.Collections.Generic.List<System.Collections.Generic.List<object
+			results = new List<List<object
 				>>(16);
 			colCnt = colNames.Count;
-			this.colnames = new System.Collections.Generic.Dictionary<string, object[]>(colCnt
+			this.colnames = new Dictionary<string, object[]>(colCnt
 				);
 			for (int i = colCnt; i >= 1; i--)
 			{
@@ -336,7 +333,7 @@ namespace io.odysz.module.rs
 		}
 
 		/// <returns>column names</returns>
-		public virtual System.Collections.Generic.Dictionary<string, object[]> getColnames
+		public virtual Dictionary<string, object[]> getColnames
 			()
 		{
 			return colnames;
@@ -348,7 +345,7 @@ namespace io.odysz.module.rs
 				().ToUpper());
 		}
 
-		public virtual System.Collections.Generic.List<System.Collections.Generic.List<object
+		public virtual List<List<object
 			>> getRows()
 		{
 			return results;
@@ -420,7 +417,7 @@ namespace io.odysz.module.rs
 		{
 			if (stringFormats == null)
 			{
-				stringFormats = new System.Collections.Generic.Dictionary<java.lang.Class, string
+				stringFormats = new Dictionary<java.lang.Class, string
 					>();
 			}
 			stringFormats[clz] = format;
@@ -449,7 +446,7 @@ namespace io.odysz.module.rs
 						.ToString();
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message + " Empty Results?");
 			}
@@ -499,7 +496,7 @@ namespace io.odysz.module.rs
 				else
 				{
 					object obj = results[rowIdx - 1][colIndex - 1];
-					if (obj is System.DateTime)
+					if (obj is DateTime)
 					{
 						return sdf.format(obj);
 					}
@@ -510,7 +507,7 @@ namespace io.odysz.module.rs
 						.ToString();
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
@@ -586,20 +583,20 @@ namespace io.odysz.module.rs
 								return true;
 							}
 						}
-						catch (System.Exception)
+						catch (Exception)
 						{
 						}
 						//if (v.equals("0")) return false;
 						//if (v.equals("false")) return false;
 						return false;
 					}
-					catch (System.Exception)
+					catch (Exception)
 					{
 						return false;
 					}
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
@@ -629,7 +626,7 @@ namespace io.odysz.module.rs
 					return double.valueOf(results[rowIdx - 1][colIndex - 1].ToString());
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
@@ -655,7 +652,7 @@ namespace io.odysz.module.rs
 		}
 
 		/// <exception cref="java.sql.SQLException"/>
-		public virtual System.DateTime getDate(int index)
+		public virtual DateTime getDate(int index)
 		{
 			try
 			{
@@ -671,17 +668,17 @@ namespace io.odysz.module.rs
 				{
 					// Oracle Datetime, Mysql Date, datetime can safely cast to date.
 					// If your debugging arrived here, you may first check you database column type.
-					return (System.DateTime)results[rowIdx - 1][index - 1];
+					return (DateTime)results[rowIdx - 1][index - 1];
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
 		}
 
 		/// <exception cref="java.sql.SQLException"/>
-		public virtual System.DateTime getDate(string colName)
+		public virtual DateTime getDate(string colName)
 		{
 			return getDate((int)colnames[colName.ToUpper()][0]);
 		}
@@ -704,7 +701,7 @@ namespace io.odysz.module.rs
 					return int.Parse(results[rowIdx - 1][colIndex - 1].ToString());
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
@@ -740,7 +737,7 @@ namespace io.odysz.module.rs
 					return long.valueOf(results[rowIdx - 1][colIndex - 1].ToString());
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
@@ -781,7 +778,7 @@ namespace io.odysz.module.rs
 					return (java.sql.Blob)rs.getBlob(colIndex);
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
@@ -808,7 +805,7 @@ namespace io.odysz.module.rs
 					return results[rowIdx - 1][colIndex - 1];
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
@@ -959,7 +956,6 @@ namespace io.odysz.module.rs
 		/// </returns>
 		public virtual int getRowCount()
 		{
-			/**/
 			return rowCnt;
 		}
 
@@ -970,7 +966,7 @@ namespace io.odysz.module.rs
 
 		/// <summary>idx start at 0</summary>
 		/// <exception cref="java.sql.SQLException"/>
-		public virtual System.Collections.Generic.List<object> getRowAt(int idx)
+		public virtual Collections.Generic.List<object> getRowAt(int idx)
 		{
 			if (results == null || idx < 0 || idx >= results.Count)
 			{
@@ -1003,7 +999,7 @@ namespace io.odysz.module.rs
 					return this;
 				}
 			}
-			catch (System.Exception e)
+			catch (Exception e)
 			{
 				throw new java.sql.SQLException(e.Message);
 			}
@@ -1041,12 +1037,12 @@ namespace io.odysz.module.rs
 			return 0;
 		}
 
-		public virtual System.Collections.Generic.List<object> getRowCells()
+		public virtual Collections.Generic.List<object> getRowCells()
 		{
 			return results[rowIdx - 1];
 		}
 
-		/// <summary>Print ResutSet in System.out or System.err.</summary>
+		/// <summary>Print ResutSet in out or err.</summary>
 		/// <param name="err">weather output in "out" or "err"</param>
 		/// <param name="max">mas rows to print</param>
 		/// <param name="includeCols">include column of names.</param>
@@ -1064,21 +1060,21 @@ namespace io.odysz.module.rs
 						{
 							if (err)
 							{
-								System.Console.Error.Write("\t" + includeCols[ix]);
+								Console.Error.Write("\t" + includeCols[ix]);
 							}
 							else
 							{
-								System.Console.Out.Write("\t" + includeCols[ix]);
+								Console.Out.Write("\t" + includeCols[ix]);
 							}
 						}
 						// line feed
 						if (err)
 						{
-							System.Console.Error.WriteLine(string.Empty);
+							Console.Error.WriteLine(string.Empty);
 						}
 						else
 						{
-							System.Console.Out.WriteLine(string.Empty);
+							Console.Out.WriteLine(string.Empty);
 						}
 						beforeFirst();
 						while (next() && getRow() <= max)
@@ -1090,11 +1086,11 @@ namespace io.odysz.module.rs
 							// end line
 							if (err)
 							{
-								System.Console.Error.WriteLine(string.Empty);
+								Console.Error.WriteLine(string.Empty);
 							}
 							else
 							{
-								System.Console.Out.WriteLine(string.Empty);
+								Console.Out.WriteLine(string.Empty);
 							}
 						}
 					}
@@ -1110,17 +1106,17 @@ namespace io.odysz.module.rs
 							// end line
 							if (err)
 							{
-								System.Console.Error.WriteLine(string.Empty);
+								Console.Error.WriteLine(string.Empty);
 							}
 							else
 							{
-								System.Console.Out.WriteLine(string.Empty);
+								Console.Out.WriteLine(string.Empty);
 							}
 						}
 					}
 				}
 			}
-			catch (System.Exception)
+			catch (Exception)
 			{
 			}
 			return results == null ? 0 : results.Count;
@@ -1131,11 +1127,11 @@ namespace io.odysz.module.rs
 		{
 			if (err)
 			{
-				System.Console.Error.Write("\t" + getString(c));
+				Console.Error.Write("\t" + getString(c));
 			}
 			else
 			{
-				System.Console.Out.Write("\t" + getString(c));
+				Console.Out.Write("\t" + getString(c));
 			}
 		}
 
@@ -1144,11 +1140,11 @@ namespace io.odysz.module.rs
 		{
 			if (err)
 			{
-				System.Console.Error.Write(string.format("%s : %s  ", c, getString(c)));
+				Console.Error.Write(string.format("%s : %s  ", c, getString(c)));
 			}
 			else
 			{
-				System.Console.Out.Write(string.format("%s : %s  ", c, getString(c)));
+				Console.Out.Write(string.format("%s : %s  ", c, getString(c)));
 			}
 		}
 
@@ -1156,9 +1152,9 @@ namespace io.odysz.module.rs
 		{
 			for (int c = 0; c < colnames.Count; c++)
 			{
-				System.Console.Out.Write(string.format("%s : %s\t", c + 1, getColumnName(c + 1)));
+				Console.Out.Write(string.format("%s : %s\t", c + 1, getColumnName(c + 1)));
 			}
-			System.Console.Out.WriteLine(string.format("\nrow count: %d", results == null ? 0
+			Console.Out.WriteLine(string.format("\nrow count: %d", results == null ? 0
 				 : results.Count));
 		}
 
@@ -1235,9 +1231,9 @@ namespace io.odysz.module.rs
 		/// - expensive, especially with many non-integers.
 		/// </summary>
 		/// <returns/>
-		public virtual System.Collections.Generic.List<object> getRowsInt()
+		public virtual.List<object> getRowsInt()
 		{
-			foreach (System.Collections.ArrayList row in results)
+			foreach (Collections.ArrayList row in results)
 			{
 				for (int i = 0; i < sz; i++)
 				{
@@ -1245,12 +1241,12 @@ namespace io.odysz.module.rs
 					{
 						row.set(i, int.Parse((string)row[i]));
 					}
-					catch (System.Exception)
-					{
+					catch (Exception)
 					}
 				}
 			}
 			return results;
 		}
+		*/
 	}
 }
