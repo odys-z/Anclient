@@ -1,5 +1,3 @@
-using Sharpen;
-
 namespace io.odysz.semantic.jprotocol
 {
 	/// <summary>Client use this object to customize value types, etc.</summary>

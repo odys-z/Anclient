@@ -1,4 +1,6 @@
-using Sharpen;
+using io.odysz.semantics;
+using io.odysz.semantics.meta;
+using System;
 
 namespace io.odysz.semantic
 {
@@ -10,17 +12,18 @@ namespace io.odysz.semantic
 	/// instead.
 	/// </remarks>
 	/// <author>odys-z@github.com</author>
-	public class TestRobot : io.odysz.semantics.IUser
+	public class TestRobot : IUser
 	{
 		internal long touched;
+        private string _sessionId;
 
-		public virtual System.Collections.Generic.List<string> dbLog(System.Collections.Generic.List
+        public virtual System.Collections.Generic.List<string> dbLog(System.Collections.Generic.List
 			<string> sqls)
 		{
 			return null;
 		}
 
-		/// <exception cref="io.odysz.transact.x.TransException"/>
+		/// <exception cref="TransException"/>
 		public virtual bool login(object request)
 		{
 			return true;
@@ -28,12 +31,17 @@ namespace io.odysz.semantic
 
 		public virtual string sessionId()
 		{
-			return null;
+			return _sessionId;
 		}
+		public virtual IUser sessionId(string ssid)
+        {
+			_sessionId = ssid;
+			return this;
+        }
 
 		public virtual void touch()
 		{
-			touched = Sharpen.Runtime.currentTimeMillis();
+			touched = DateTime.Now.Ticks;
 		}
 
 		public virtual long touchedMs()
@@ -46,7 +54,7 @@ namespace io.odysz.semantic
 			return "jrobot";
 		}
 
-		public virtual io.odysz.semantics.SemanticObject logout()
+		public virtual SemanticObject logout()
 		{
 			return null;
 		}
@@ -56,7 +64,7 @@ namespace io.odysz.semantic
 		{
 		}
 
-		public virtual io.odysz.semantics.IUser logAct(string funcName, string funcId)
+		public virtual IUser logAct(string funcName, string funcId)
 		{
 			return this;
 		}
@@ -66,13 +74,13 @@ namespace io.odysz.semantic
 			return null;
 		}
 
-		public virtual io.odysz.semantics.IUser sessionKey(string skey)
+		public virtual IUser sessionKey(string skey)
 		{
 			return null;
 		}
 
-		/// <exception cref="io.odysz.transact.x.TransException"/>
-		public virtual io.odysz.semantics.IUser notify(object note)
+		/// <exception cref="TransException"/>
+		public virtual IUser notify(object note)
 		{
 			return null;
 		}
@@ -82,7 +90,7 @@ namespace io.odysz.semantic
 			return null;
 		}
 
-		public virtual io.odysz.semantics.meta.TableMeta meta()
+		public virtual TableMeta meta()
 		{
 			return null;
 		}

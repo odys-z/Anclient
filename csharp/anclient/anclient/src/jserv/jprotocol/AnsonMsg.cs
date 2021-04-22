@@ -1,5 +1,9 @@
+using anclient.src.anclient;
 using anclient.src.jserv;
 using io.odysz.anson;
+using System;
+using
+using System.Collections.Generic;
 
 namespace io.odysz.semantic.jprotocol
 {
@@ -27,64 +31,66 @@ namespace io.odysz.semantic.jprotocol
 		[System.Serializable]
 		public sealed class Port : IPort
 		{
-			public static readonly AnsonMsg<AnsonBody>.Port heartbeat = new 
-				AnsonMsg<AnsonBody>.Port("ping.serv11");
+			/// <summary>ping.serv11</summary>
+			public const int heartbeat = 0;
 
-			public static readonly AnsonMsg<AnsonBody>.Port session = new AnsonMsg<AnsonBody>.Port
-				("login.serv11");
+			/// <summary>login.serv11</summary>
+			public const int session = 1;
 
-			public static readonly AnsonMsg<AnsonBody>.Port query = new AnsonMsg<AnsonBody>.Port
-				("r.serv11");
+			/// <summary>r.serv11</summary>
+			public const int query = 2;
 
-			public static readonly AnsonMsg<AnsonBody>.Port update = new AnsonMsg<AnsonBody>.Port
-				("u.serv11");
+			/// <summary>u.serv11</summary>
+			public const int update = 3;
 
-			public static readonly AnsonMsg<AnsonBody>.Port insert = new AnsonMsg<AnsonBody>.Port
-				("c.serv11");
+			/// <summary>c.serv11</summary>
+			public const int insert = 4;
 
-			public static readonly AnsonMsg<AnsonBody>.Port delete = new AnsonMsg<AnsonBody>.Port
-				("d.serv11");
+			/// <summary>d.serv11</summary>
+			public const int delete = 5;
 
-			public static readonly AnsonMsg<AnsonBody>.Port echo = new AnsonMsg<AnsonBody>.Port
-				("echo.serv11");
+			/// <summary>echo.serv11</summary>
+			public const int echo = 6;
 
-			/// <summary>serv port for downloading json/xml file or uploading a file.<br /></summary>
-			/// <seealso>
-			/// 
-			/// <see cref="jserv.file.JFileServ"/>
-			/// .
-			/// </seealso>
-			public static readonly AnsonMsg<AnsonBody>.Port file = new AnsonMsg<AnsonBody>.Port
-				("file.serv11");
+			/// <summary>file.serv11:
+			/// serv port for downloading json/xml file or uploading a file.</summary> 
+            /// <seealso>
+            /// <see cref="jserv.file.JFileServ"/>
+            /// </seealso>
+			public const int file = 7;
 
-			/// <summary>Any user defined request using message body of subclass of JBody must use this port
-			/// 	</summary>
-			public static readonly AnsonMsg<AnsonBody>.Port user = new AnsonMsg<AnsonBody>.Port
-				("user.serv11");
+			/// <summary>user.serv11:
+			/// Any user defined request using message body of subclass of JBody must
+			/// use this port</summary>
+			public const int user = 8;
 
-			/// <summary>semantic tree of dataset extensions<br /></summary>
-			/// <seealso>
-			/// 
-			/// <see cref="ext.SemanticTree"/>
-			/// .
-			/// </seealso>
-			public static readonly AnsonMsg<AnsonBody>.Port stree = new AnsonMsg<AnsonBody>.Port
-				("s-tree.serv11");
+			/// <summary>s-tree.serv11:
+			/// semantic tree of dataset extensions</summary>
+            /// <seealso>
+            /// <see cref="ext.SemanticTree"/>
+            /// </seealso>
+			public const int stree = 9;
 
-			/// <summary>dataset extensions<br /></summary>
-			/// <seealso>
-			/// 
-			/// <see cref="ext.Dataset"/>
-			/// .
-			/// </seealso>
-			public static readonly AnsonMsg<AnsonBody>.Port dataset = new AnsonMsg<AnsonBody>.Port
-				("ds.serv11");
+            /// <summary>ds.serv11:
+			/// dataset extensions<br /></summary>
+            /// <seealso>
+            /// <see cref="ext.Dataset"/>
+            /// </seealso>
+			public const int dataset = 10;
 
-			static Port()
-			{
-				/*
-				JSONAnsonListener.registFactory(Sharpen.Runtime.getClassForType(typeof(IPort)),
-					@"TODO: Lambda Expression Ignored
+			public const int NA = -1;
+
+            private string _name;
+            private int _port;
+
+			/// <summary>
+			/// TODO Setup a register for extinding new port.
+			/// </summary>
+            static Port()
+            {
+                /*
+                JSONAnsonListener.registFactory(Sharpen.Runtime.getClassForType(typeof(IPort)),
+                    @"TODO: Lambda Expression Ignored
                     (s) -> {
                       try {
                         return defaultPortImpl.valof(s);
@@ -94,22 +100,22 @@ namespace io.odysz.semantic.jprotocol
                         return null;
                       }
                     }" );
-				*/
-			}
+                */
+            }
 
-			private string url { get; set; }
+		private string url { get; set; }
 
-            string IPort.url => throw new System.NotImplementedException();
+            string IPort.url => throw new NotImplementedException();
 
             Port(string url) {
-                this._name = url;
-                this._port = valof(url);
+                _name = url;
+                _port = valof(url);
             }
 
             public Port(int port)
             {
-                this._port = port;
-                this._name = nameof(port);
+                _port = port;
+                _name = nameof(port);
             }
 
             public string name() { return _name; }
@@ -118,58 +124,62 @@ namespace io.odysz.semantic.jprotocol
 
             static public int valof(string pname) {
                 return pname == "ping.serv11" ? Port.heartbeat
-                    : pname == "login.serv11" ? IPort.session
-                    : pname == "r.serv11" ? IPort.query
-                    : pname == "u.serv11" ? IPort.update
-                    : pname == "c.serv11" ? IPort.insert
-                    : pname == "d.serv11" ? IPort.delete
-                    : pname == "echo.serv11" ? IPort.echo
-                    : pname == "file.serv11" ? IPort.file
-                    : pname == "user.serv11" ? IPort.user
-                    : pname == "stree.serv11" ? IPort.stree
-                    : pname == "dataset.serv11" ? IPort.dataset
-                    : IPort.NA;
+                    : pname == "login.serv11" ? Port.session
+                    : pname == "r.serv11" ? Port.query
+                    : pname == "u.serv11" ? Port.update
+                    : pname == "c.serv11" ? Port.insert
+                    : pname == "d.serv11" ? Port.delete
+                    : pname == "echo.serv11" ? Port.echo
+                    : pname == "file.serv11" ? Port.file
+                    : pname == "user.serv11" ? Port.user
+                    : pname == "stree.serv11" ? Port.stree
+                    : pname == "dataset.serv11" ? Port.dataset
+                    : Port.NA;
             }
             static public string nameof(int port) {
-                return port == IPort.heartbeat ? "ping.serv11"
-                    : port == IPort.session ? "login.serv11"
-                    : port == IPort.query ? "r.serv11"
-                    : port == IPort.update ? "u.serv11" 
-                    : port == IPort.insert ? "c.serv11" 
-                    : port == IPort.delete ? "d.serv11"
-                    : port == IPort.echo ? "echo.serv11"
-                    : port == IPort.file ? "file.serv11"
-                    : port == IPort.user ? "user.serv11"
-                    : port == IPort.stree ? "stree.serv11" 
-                    : port == IPort.dataset ? "dataset.serv11"
+                return port == Port.heartbeat ? "ping.serv11"
+                    : port == Port.session ? "login.serv11"
+                    : port == Port.query ? "r.serv11"
+                    : port == Port.update ? "u.serv11" 
+                    : port == Port.insert ? "c.serv11" 
+                    : port == Port.delete ? "d.serv11"
+                    : port == Port.echo ? "echo.serv11"
+                    : port == Port.file ? "file.serv11"
+                    : port == Port.user ? "user.serv11"
+                    : port == Port.stree ? "stree.serv11" 
+                    : port == Port.dataset ? "dataset.serv11"
                     : "NA";
             }
             IPort IPort.valof(string pname)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
 
 		[System.Serializable]
 		public sealed class MsgCode
 		{
-			public static readonly AnsonMsg<T>.MsgCode ok = new AnsonMsg<T>.MsgCode();
+			public const int ok = 0;
 
-			public static readonly AnsonMsg<T>.MsgCode exSession = new AnsonMsg<T>.MsgCode();
+			public const int exSession = 1;
 
-			public static readonly AnsonMsg<T>.MsgCode exSemantic = new AnsonMsg<T>.MsgCode();
+			public const int exSemantic = 2;
 
-			public static readonly AnsonMsg<T>.MsgCode exIo = new AnsonMsg<T>.MsgCode();
+			public const int exIo = 3;
 
-			public static readonly AnsonMsg<T>.MsgCode exTransct = new AnsonMsg<T>.MsgCode();
+			public const int exTransct = 4;
 
-			public static readonly AnsonMsg<T>.MsgCode exDA = new AnsonMsg<T>.MsgCode();
+			public const int exDA = 5;
 
-			public static readonly AnsonMsg<T>.MsgCode exGeneral = new AnsonMsg<T>.MsgCode();
+			public const int exGeneral = 6;
 
-			public static readonly AnsonMsg<T>.MsgCode ext = new AnsonMsg<T>.MsgCode();
+			public const int ext = 7;
 
-			public bool eq(string code)
+            public MsgCode(int ok1)
+            {
+            }
+
+            public bool eq(string code)
 			{
 				if (code == null)
 				{
@@ -179,7 +189,12 @@ namespace io.odysz.semantic.jprotocol
 					.valueOf<AnsonMsg<AnsonBody>.MsgCode>(code);
 				return this == c;
 			}
-		}
+
+            private static MsgCode valueOf<T>(string code)
+            {
+                throw new NotImplementedException();
+            }
+        }
 
 		/// <summary>The default IPort implelemtation.</summary>
 		/// <remarks>
@@ -213,34 +228,21 @@ namespace io.odysz.semantic.jprotocol
 
 		private string version = "1.0";
 
-		internal int seq;
+		internal int seq { get; }
 
-		public virtual int seq()
-		{
-			return seq;
-		}
+		internal IPort port { get; set; }
 
-		internal IPort port;
+		private AnsonMsg<T>.MsgCode code { get; }
 
-		public virtual IPort port()
-		{
-			return port;
-		}
+		/// public virtual AnsonMsg<T>.MsgCode code() { return code; }
 
-		private AnsonMsg.MsgCode code;
-
-		public virtual AnsonMsg.MsgCode code()
-		{
-			return code;
-		}
-
-		/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-		public virtual void port(string pport)
+		/// <exception cref="SemanticException"/>
+		public virtual void portOf(string pport)
 		{
 			/// translate from string to enum
 			if (defaultPortImpl == null)
 			{
-				port = AnsonMsg.Port.echo.valof(pport);
+				port = new AnsonMsg<AnsonBody>.Port(Port.echo);
 			}
 			else
 			{
@@ -248,40 +250,39 @@ namespace io.odysz.semantic.jprotocol
 			}
 			if (port == null)
 			{
-				throw new io.odysz.semantics.x.SemanticException("Port can not be null. Not initialized? To use JMassage understand ports, call understandPorts(IPort) first."
-					);
+				throw new SemanticException(
+					"Port can not be null. Not initialized? To use JMassage understand ports, call understandPorts(IPort) first.");
 			}
 		}
 
 		public AnsonMsg()
 		{
-			seq = (int)(System.Math.random() * 1000);
+			seq = new Random().Next(1000);
 		}
 
 		public AnsonMsg(IPort port)
 		{
 			this.port = port;
-			seq = (int)(System.Math.random() * 1000);
+			seq = new Random().Next(1000));
 		}
 
 		/// <summary>Typically for response</summary>
 		/// <param name="p"></param>
 		/// <param name="code"/>
-		public AnsonMsg(IPort p, AnsonMsg.MsgCode
-			 code)
+		public AnsonMsg(IPort p, AnsonMsg<T>.MsgCode code)
 		{
 			this.port = p;
 			this.code = code;
 		}
 
-		protected internal System.Collections.Generic.IList<T> body;
+		protected internal IList<T> body;
 
-		public virtual T body(int i)
+		public virtual T BodyAt(int i)
 		{
-			return body[0];
+			return body.get(0);
 		}
 
-		public virtual System.Collections.Generic.IList<T> body()
+		public virtual IList<T> Body()
 		{
 			return body;
 		}
@@ -289,12 +290,11 @@ namespace io.odysz.semantic.jprotocol
 		/// <summary>Add a request body to the request list.</summary>
 		/// <param name="bodyItem"/>
 		/// <returns>new message object</returns>
-		public virtual AnsonMsg<T> body(AnsonBody
-			 bodyItem)
+		public virtual AnsonMsg<T> Body(AnsonBody bodyItem)
 		{
 			if (body == null)
 			{
-				body = new System.Collections.Generic.List<T>();
+				body = new List<T>();
 			}
 			body.add((T)bodyItem);
 			bodyItem.parent = this;
@@ -333,25 +333,21 @@ namespace io.odysz.semantic.jprotocol
 			return opts == null ? new JsonOpt() : opts;
 		}
 
-		public virtual AnsonMsg<T> body(System.Collections.Generic.IList
-			<T> bodyItems)
+		public virtual AnsonMsg<T> Body(IList<T> bodyItems)
 		{
 			this.body = bodyItems;
 			return this;
 		}
 
-		public static AnsonMsg<AnsonResp
-			> ok(IPort p, string txt)
+		public static AnsonMsg<T> Ok(IPort p, string txt)
 		{
-			AnsonResp bd = new AnsonResp
-				(txt);
-			return new AnsonMsg<AnsonResp
-				>(p, AnsonMsg.MsgCode.ok).body(bd);
+			AnsonResp bd = new AnsonResp(txt);
+			return new AnsonMsg<T>(p, new AnsonMsg<T>.MsgCode(MsgCode.ok)).Body(bd);
 		}
 
-		public static AnsonMsg<AnsonBody> ok(IPort p, AnsonResp resp)
+		public static AnsonMsg<T> ok(IPort p, T resp)
 		{
-			return new AnsonMsg<AnsonBody>(p, AnsonMsg.MsgCode.ok).body(resp);
+			return new AnsonMsg<T>(p, AnsonMsg<T>.MsgCode.ok).Body(resp);
 		}
 	}
 }

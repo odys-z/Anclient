@@ -8,7 +8,7 @@ namespace io.odysz.semantic.jprotocol
 
 		/// <summary>Equivalent of enum.valueOf(), except for subclass returning instance of jserv.Port.
 		/// 	</summary>
-		/// <exception cref="semantics.x.SemanticException"></exception>
+		/// <exception cref="SemanticException"></exception>
 		IPort valof(string pname);
 	}
 }

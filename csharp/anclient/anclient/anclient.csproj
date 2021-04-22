@@ -5,7 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="src\semantics\io\**" />
+    <EmbeddedResource Remove="src\semantics\io\**" />
+    <None Remove="src\semantics\io\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\semantics\" />
   </ItemGroup>
 
 </Project>
