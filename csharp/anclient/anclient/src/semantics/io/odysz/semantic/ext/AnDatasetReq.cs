@@ -1,11 +1,9 @@
 using io.odysz.semantic.jprotocol;
-using Sharpen;
 
 namespace io.odysz.semantic.ext
 {
-	public class AnDatasetReq : io.odysz.semantic.jserv.R.AnQueryReq
+	public class AnDatasetReq : jserv.R.AnQueryReq
 	{
-		internal string sk;
 
 		public string[] sqlArgs;
 
@@ -15,23 +13,20 @@ namespace io.odysz.semantic.ext
 		protected internal string smtcss;
 
 		/// <summary>
-		/// <see cref="io.odysz.semantic.DA.DatasetCfg.TreeSemantics"/>
+		/// <see cref="DA.DatasetCfg.TreeSemantics"/>
 		/// of tree from
 		/// <see cref="smtcss"/>
 		/// or set with
-		/// <see cref="treeSemtcs(io.odysz.semantic.DA.DatasetCfg.TreeSemantics)"/>
+		/// <see cref="treeSemtcs(DA.DatasetCfg.TreeSemantics)"/>
 		/// (
-		/// <see cref="io.odysz.semantic.DA.DatasetCfg.TreeSemantics"/>
+		/// <see cref="DA.DatasetCfg.TreeSemantics"/>
 		/// )
 		/// </summary>
-		/// protected internal io.odysz.semantic.DA.DatasetCfg.TreeSemantics stcs;
-
 		internal string _root;
 
 		public virtual string root { get { return _root; } }
 
-		public AnDatasetReq()
-			: base(null, null)
+		public AnDatasetReq() : base(null, null)
 		{
 		}
 
@@ -47,22 +42,18 @@ namespace io.odysz.semantic.ext
 			a = "ds";
 		}
 
-		public virtual string sk()
-		{
-			return sk;
-		}
+		internal string sk { get; set; }
+		// public virtual string sk() { return sk; }
 
-		public static io.odysz.semantic.ext.AnDatasetReq formatReq(string conn, io.odysz.semantic.jprotocol.AnsonMsg
-			<io.odysz.semantic.ext.AnDatasetReq> parent, string sk)
+		public static AnDatasetReq formatReq(string conn, AnsonMsg<AnsonBody> parent, string sk)
 		{
-			io.odysz.semantic.ext.AnDatasetReq bdItem = new io.odysz.semantic.ext.AnDatasetReq
-				(parent, conn);
+			AnDatasetReq bdItem = new AnDatasetReq(parent, conn);
 			bdItem.sk = sk;
 			return bdItem;
 		}
 
 		/// <returns>parsed semantics</returns>
-		public virtual io.odysz.semantic.DA.DatasetCfg.TreeSemantics getTreeSemantics()
+		public virtual TreeSemantics getTreeSemantics()
 		{
 			if (stcs != null)
 			{
