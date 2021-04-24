@@ -1,4 +1,5 @@
-using Sharpen;
+using io.odysz.semantics;
+using System.Collections.Generic;
 
 namespace io.odysz.semantic
 {
@@ -17,33 +18,32 @@ namespace io.odysz.semantic
 	/// .</p>
 	/// </remarks>
 	/// <author>odys-z@github.com</author>
-	public class DASemantext : io.odysz.semantics.ISemantext
+	public class DASemantext : ISemantext
 	{
-		private io.odysz.semantics.SemanticObject autoVals;
+		private SemanticObject autoVals;
 
 		private static io.odysz.transact.sql.Transcxt rawst;
 
 		/// <summary>Semantic Configurations</summary>
-		private System.Collections.Generic.Dictionary<string, io.odysz.semantic.DASemantics
+		private Dictionary<string, DASemantics
 			> ss;
 
-		private System.Collections.Generic.Dictionary<string, io.odysz.semantics.meta.TableMeta
+		private Dictionary<string, meta.TableMeta
 			> metas;
 
-		private io.odysz.semantics.IUser usr;
+		private IUser usr;
 
 		private string connId;
 
 		private string basePath;
 
-		private System.Collections.Generic.List<io.odysz.transact.sql.Statement.IPostOperat
-			> onOks;
+		/*
+		private List<io.odysz.transact.sql.Statement.IPostOperat> onOks;
 
-		private java.util.LinkedHashMap<string, io.odysz.transact.sql.Statement.IPostSelectOperat
-			> onSelecteds;
+		private java.util.LinkedHashMap<string, io.odysz.transact.sql.Statement.IPostSelectOperat> onSelecteds;
 
 		/// <summary>for generating sqlite auto seq</summary>
-		private static io.odysz.semantics.IUser sqliteDumyUser;
+		private static IUser sqliteDumyUser;
 
 		/// <summary>Initialize a context for semantics handling.</summary>
 		/// <remarks>
@@ -60,18 +60,16 @@ namespace io.odysz.semantic
 		/// </param>
 		/// <param name="usr"/>
 		/// <param name="rtPath">runtime root path</param>
-		/// <exception cref="io.odysz.semantics.x.SemanticException">metas is null</exception>
-		internal DASemantext(string connId, System.Collections.Generic.Dictionary<string, 
-			io.odysz.semantic.DASemantics> smtcfg, System.Collections.Generic.Dictionary<string
-			, io.odysz.semantics.meta.TableMeta> metas, io.odysz.semantics.IUser usr, string
-			 rtPath)
+		/// <exception cref="x.SemanticException">metas is null</exception>
+		internal DASemantext(string connId, Dictionary<string, DASemantics> smtcfg,
+			Dictionary<string , semantics.meta.TableMeta> metas, IUser usr, string rtPath)
 		{
 			basePath = rtPath;
 			this.connId = connId;
 			ss = smtcfg;
 			if (metas == null)
 			{
-				throw new io.odysz.semantics.x.SemanticException("DASemantext can not work without DB metas. connId: %s"
+				throw new x.SemanticException("DASemantext can not work without DB metas. connId: %s"
 					, connId);
 			}
 			this.metas = metas;
@@ -84,20 +82,20 @@ namespace io.odysz.semantic
 
 		/// <summary>When inserting, process data row with configured semantics, like auto-pk, fk-ins, etc..
 		/// 	</summary>
-		/// <exception cref="io.odysz.semantics.x.SemanticException"></exception>
-		/// <seealso cref="io.odysz.semantics.ISemantext.onInsert(io.odysz.transact.sql.Insert, string, System.Collections.Generic.IList{E})
+		/// <exception cref="x.SemanticException"></exception>
+		/// <seealso cref="ISemantext.onInsert(io.odysz.transact.sql.Insert, string, IList{E})
 		/// 	"/>
-		public virtual io.odysz.semantics.ISemantext onInsert(io.odysz.transact.sql.Insert
-			 insert, string tabl, System.Collections.Generic.IList<System.Collections.Generic.List
+		public virtual ISemantext onInsert(io.odysz.transact.sql.Insert
+			 insert, string tabl, IList<List
 			<object[]>> rows)
 		{
 			if (rows != null && ss != null)
 			{
 				// second round
-				foreach (System.Collections.Generic.List<object[]> row in rows)
+				foreach (List<object[]> row in rows)
 				{
-					System.Collections.Generic.IDictionary<string, int> cols = insert.getColumns();
-					io.odysz.semantic.DASemantics s = ss[tabl];
+					IDictionary<string, int> cols = insert.getColumns();
+					DASemantics s = ss[tabl];
 					if (s == null)
 					{
 						continue;
@@ -108,14 +106,14 @@ namespace io.odysz.semantic
 			return this;
 		}
 
-		/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-		public virtual io.odysz.semantics.ISemantext onUpdate(io.odysz.transact.sql.Update
-			 update, string tabl, System.Collections.Generic.List<object[]> nvs)
+		/// <exception cref="x.SemanticException"/>
+		public virtual ISemantext onUpdate(io.odysz.transact.sql.Update
+			 update, string tabl, List<object[]> nvs)
 		{
 			if (nvs != null && ss != null)
 			{
-				System.Collections.Generic.IDictionary<string, int> cols = update.getColumns();
-				io.odysz.semantic.DASemantics s = ss[tabl];
+				IDictionary<string, int> cols = update.getColumns();
+				DASemantics s = ss[tabl];
 				if (s != null)
 				{
 					s.onUpdate(this, update, nvs, cols, usr);
@@ -125,12 +123,12 @@ namespace io.odysz.semantic
 		}
 
 		/// <exception cref="io.odysz.transact.x.TransException"/>
-		public virtual io.odysz.semantics.ISemantext onDelete(io.odysz.transact.sql.Delete
+		public virtual ISemantext onDelete(io.odysz.transact.sql.Delete
 			 delete, string tabl, io.odysz.transact.sql.parts.condition.Condit whereCondt)
 		{
 			if (ss != null)
 			{
-				io.odysz.semantic.DASemantics s = ss[tabl];
+				DASemantics s = ss[tabl];
 				if (s != null)
 				{
 					s.onDelete(this, delete, whereCondt, usr);
@@ -140,19 +138,19 @@ namespace io.odysz.semantic
 		}
 
 		/// <exception cref="io.odysz.transact.x.TransException"/>
-		public virtual io.odysz.semantics.ISemantext onPost<_T0>(io.odysz.transact.sql.Statement
-			<_T0> stmt, string tabl, System.Collections.Generic.List<object[]> row, System.Collections.Generic.List
+		public virtual ISemantext onPost<_T0>(io.odysz.transact.sql.Statement
+			<_T0> stmt, string tabl, List<object[]> row, List
 			<string> sqls)
 			where _T0 : io.odysz.transact.sql.Statement<T>
 		{
 			if (row != null && ss != null)
 			{
-				System.Collections.Generic.IDictionary<string, int> cols = stmt.getColumns();
+				IDictionary<string, int> cols = stmt.getColumns();
 				if (cols == null)
 				{
 					return this;
 				}
-				io.odysz.semantic.DASemantics s = ss[tabl];
+				DASemantics s = ss[tabl];
 				if (s != null)
 				{
 					s.onPost(this, stmt, row, cols, usr, sqls);
@@ -161,14 +159,14 @@ namespace io.odysz.semantic
 			return this;
 		}
 
-		public virtual io.odysz.semantics.ISemantext insert(io.odysz.transact.sql.Insert 
-			insert, string tabl, params io.odysz.semantics.IUser[] usr)
+		public virtual ISemantext insert(io.odysz.transact.sql.Insert 
+			insert, string tabl, params IUser[] usr)
 		{
 			return clone(this, usr);
 		}
 
-		public virtual io.odysz.semantics.ISemantext update(io.odysz.transact.sql.Update 
-			update, string tabl, params io.odysz.semantics.IUser[] usr)
+		public virtual ISemantext update(io.odysz.transact.sql.Update 
+			update, string tabl, params IUser[] usr)
 		{
 			return clone(this, usr);
 		}
@@ -183,19 +181,19 @@ namespace io.odysz.semantic
 			return connId;
 		}
 
-		public virtual io.odysz.semantics.ISemantext connId(string conn)
+		public virtual ISemantext connId(string conn)
 		{
 			connId = conn;
 			return this;
 		}
 
-		public virtual io.odysz.semantics.ISemantext clone(io.odysz.semantics.IUser usr)
+		public virtual ISemantext clone(IUser usr)
 		{
 			try
 			{
 				return new io.odysz.semantic.DASemantext(connId, ss, metas, usr, basePath);
 			}
-			catch (io.odysz.semantics.x.SemanticException e)
+			catch (x.SemanticException e)
 			{
 				Sharpen.Runtime.printStackTrace(e);
 				return null;
@@ -203,8 +201,8 @@ namespace io.odysz.semantic
 		}
 
 		// meta is null? how could it be?
-		private io.odysz.semantics.ISemantext clone(io.odysz.semantic.DASemantext srctx, 
-			params io.odysz.semantics.IUser[] usr)
+		private ISemantext clone(io.odysz.semantic.DASemantext srctx, 
+			params IUser[] usr)
 		{
 			try
 			{
@@ -214,7 +212,7 @@ namespace io.odysz.semantic
 				// newInst.usr = usr != null && usr.length > 0 ? usr[0] : null;
 				return newInst;
 			}
-			catch (io.odysz.semantics.x.SemanticException e)
+			catch (x.SemanticException e)
 			{
 				Sharpen.Runtime.printStackTrace(e);
 				return null;
@@ -228,7 +226,7 @@ namespace io.odysz.semantic
 		/// <returns>RESULt resoLVED VALue in tabl.col, or null if not exists.</returns>
 		public virtual object resulvedVal(string tabl, string col)
 		{
-			return autoVals != null && autoVals.has(tabl) ? ((io.odysz.semantics.SemanticObject
+			return autoVals != null && autoVals.has(tabl) ? ((SemanticObject
 				)autoVals.get(tabl)).get(col) : null;
 		}
 
@@ -244,8 +242,8 @@ namespace io.odysz.semantic
 		/// 
 		/// <see cref="autoVals"/>
 		/// </returns>
-		/// <seealso cref="io.odysz.semantics.ISemantext.resulves()"/>
-		public virtual io.odysz.semantics.SemanticObject resulves()
+		/// <seealso cref="ISemantext.resulves()"/>
+		public virtual SemanticObject resulves()
 		{
 			return autoVals;
 		}
@@ -260,13 +258,13 @@ namespace io.odysz.semantic
 			string newv = genId(connId, tabl, col, null);
 			if (autoVals == null)
 			{
-				autoVals = new io.odysz.semantics.SemanticObject();
+				autoVals = new SemanticObject();
 			}
-			io.odysz.semantics.SemanticObject tabl_ids = (io.odysz.semantics.SemanticObject)autoVals
+			SemanticObject tabl_ids = (SemanticObject)autoVals
 				.get(tabl);
 			if (tabl_ids == null)
 			{
-				tabl_ids = new io.odysz.semantics.SemanticObject();
+				tabl_ids = new SemanticObject();
 				autoVals.put(tabl, tabl_ids);
 			}
 			tabl_ids.put(col, newv);
@@ -395,7 +393,7 @@ namespace io.odysz.semantic
 			Lock = getAutoseqLock(conn, target);
 			// 1. update ir_autoseq (seq) set seq = seq + 1 where sid = tabl.idf
 			// 2. select seq from ir_autoseq where sid = tabl.id
-			System.Collections.Generic.List<string> sqls = new System.Collections.Generic.List
+			List<string> sqls = new List
 				<string>();
 			sqls.add(string.format("update oz_autoseq set seq = seq + 1 where sid = '%s.%s'", 
 				target, idF));
@@ -432,13 +430,13 @@ namespace io.odysz.semantic
 			return io.odysz.common.Radix64.toString(rs.getInt("seq"));
 		}
 
-		private sealed class _IUser_345 : io.odysz.semantics.IUser
+		private sealed class _IUser_345 : IUser
 		{
 			public _IUser_345()
 			{
 			}
 
-			public io.odysz.semantics.meta.TableMeta meta()
+			public meta.TableMeta meta()
 			{
 				return null;
 			}
@@ -448,7 +446,7 @@ namespace io.odysz.semantic
 				return "sqlite-dumy";
 			}
 
-			public io.odysz.semantics.IUser logAct(string funcName, string funcId)
+			public IUser logAct(string funcName, string funcId)
 			{
 				return null;
 			}
@@ -458,18 +456,18 @@ namespace io.odysz.semantic
 				return null;
 			}
 
-			public io.odysz.semantics.IUser sessionKey(string skey)
+			public IUser sessionKey(string skey)
 			{
 				return null;
 			}
 
 			/// <exception cref="io.odysz.transact.x.TransException"/>
-			public io.odysz.semantics.IUser notify(object note)
+			public IUser notify(object note)
 			{
 				return null;
 			}
 
-			public System.Collections.Generic.IList<object> notifies()
+			public IList<object> notifies()
 			{
 				return null;
 			}
@@ -479,7 +477,7 @@ namespace io.odysz.semantic
 			();
 
 		/// <summary>[conn-id, [table, lock]]]</summary>
-		private static System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary
+		private static Dictionary<string, Dictionary
 			<string, java.util.concurrent.locks.Lock>> locks;
 
 		private static java.util.concurrent.locks.Lock getAutoseqLock(string conn, string
@@ -491,12 +489,12 @@ namespace io.odysz.semantic
 			{
 				if (locks == null)
 				{
-					locks = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary
+					locks = new Dictionary<string, Dictionary
 						<string, java.util.concurrent.locks.Lock>>();
 				}
 				if (!locks.Contains(conn))
 				{
-					locks[conn] = new System.Collections.Generic.Dictionary<string, java.util.concurrent.locks.Lock
+					locks[conn] = new Dictionary<string, java.util.concurrent.locks.Lock
 						>();
 				}
 				if (!locks[conn].Contains(tabl))
@@ -584,7 +582,7 @@ namespace io.odysz.semantic
 			autoVals = null;
 		}
 
-		public virtual io.odysz.semantics.meta.TableMeta colType(string tabl)
+		public virtual meta.TableMeta colType(string tabl)
 		{
 			return metas[tabl];
 		}
@@ -602,7 +600,7 @@ namespace io.odysz.semantic
 
 		/// <exception cref="io.odysz.transact.x.TransException"/>
 		/// <exception cref="java.sql.SQLException"/>
-		public virtual void onCommitted(io.odysz.semantics.ISemantext ctx)
+		public virtual void onCommitted(ISemantext ctx)
 		{
 			if (onOks != null)
 			{
@@ -614,13 +612,11 @@ namespace io.odysz.semantic
 			}
 		}
 
-		public virtual void addOnOkOperate(io.odysz.transact.sql.Statement.IPostOperat op
-			)
+		public virtual void addOnOkOperate(io.odysz.transact.sql.Statement.IPostOperat op)
 		{
 			if (onOks == null)
 			{
-				onOks = new System.Collections.Generic.List<io.odysz.transact.sql.Statement.IPostOperat
-					>();
+				onOks = new List<io.odysz.transact.sql.Statement.IPostOperat>();
 			}
 			onOks.add(op);
 		}
@@ -648,26 +644,24 @@ namespace io.odysz.semantic
 			}
 		}
 
-		public virtual void addOnSelectedHandler(string name, io.odysz.transact.sql.Statement.IPostSelectOperat
-			 op)
+		public virtual void addOnSelectedHandler(string name, IPostSelectOperat op)
 		{
 			if (onSelecteds == null)
 			{
-				onSelecteds = new java.util.LinkedHashMap<string, io.odysz.transact.sql.Statement.IPostSelectOperat
-					>();
+				onSelecteds = new java.util.LinkedHashMap<string, IPostSelectOperat>();
 			}
 			onSelecteds[name] = op;
 		}
 
-		public virtual io.odysz.transact.sql.parts.AbsPart composeVal(object v, string tabl
-			, string col)
+		public virtual io.odysz.transact.sql.parts.AbsPart composeVal(object v, string tabl , string col)
 		{
 			if (v is io.odysz.transact.sql.parts.AbsPart)
 			{
 				return (io.odysz.transact.sql.parts.AbsPart)v;
 			}
-			io.odysz.semantics.meta.TableMeta mt = colType(tabl);
+			meta.TableMeta mt = colType(tabl);
 			return io.odysz.transact.sql.Statement.composeVal(v, mt, col);
 		}
+		*/
 	}
 }

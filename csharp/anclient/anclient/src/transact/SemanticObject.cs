@@ -56,8 +56,7 @@ namespace io.odysz.semantics
 			return (SemanticObject)get("data");
 		}
 
-		public virtual SemanticObject data(SemanticObject
-			 data)
+		public virtual SemanticObject data(SemanticObject data)
 		{
 			return put("data", data);
 		}
@@ -87,8 +86,7 @@ namespace io.odysz.semantics
 			return (string)get("msg");
 		}
 
-		public virtual SemanticObject msg(string msg, params object[]
-			args)
+		public virtual SemanticObject msg(string msg, params object[] args)
 		{
 			if (args == null || args.Length == 0)
 			{
@@ -108,7 +106,7 @@ namespace io.odysz.semantics
 		/// <param name="resultset"/>
 		/// <param name="total"></param>
 		/// <returns>this</returns>
-		/// <exception cref="io.odysz.transact.x.TransException"/>
+		/// <exception cref="TransException"/>
 		public virtual SemanticObject rs(object resultset, int total)
 		{
 			add("total", total);
@@ -140,7 +138,7 @@ namespace io.odysz.semantics
 			return (int)obj;
 		}
 
-		/// <exception cref="io.odysz.transact.x.TransException"/>
+		/// <exception cref="TransException"/>
 		public virtual SemanticObject total(int rsIdx, int total)
 		{
 			// the total(int) returned -1
@@ -152,7 +150,7 @@ namespace io.odysz.semantics
 				get("total");
 			if (lst == null || lst.Count <= rsIdx)
 			{
-				throw new io.odysz.transact.x.TransException("No such index for rs; %s", rsIdx);
+				throw new TransException("No such index for rs; %s", rsIdx);
 			}
 			lst.Insert(rsIdx, total);
 			return this;
@@ -190,7 +188,7 @@ namespace io.odysz.semantics
 		/// <param name="prop"/>
 		/// <param name="elem"/>
 		/// <returns>this</returns>
-		/// <exception cref="io.odysz.transact.x.TransException"></exception>
+		/// <exception cref="TransException"></exception>
 		public virtual SemanticObject add(string prop, object elem)
 		{
 			if (props == null)
@@ -217,7 +215,7 @@ namespace io.odysz.semantics
 		/// <param name="prop"/>
 		/// <param name="ints"/>
 		/// <returns>this</returns>
-		/// <exception cref="io.odysz.transact.x.TransException"/>
+		/// <exception cref="TransException"/>
 		public virtual SemanticObject addInts(string prop, int[] ints)
 		{
 			foreach (int e in ints)

@@ -1,5 +1,3 @@
-using Sharpen;
-
 namespace io.odysz.transact.x
 {
 	[System.Serializable]
@@ -8,8 +6,9 @@ namespace io.odysz.transact.x
 		private const long serialVersionUID = 1L;
 
 		public TransException(string format, params object[] args)
-			: base(io.odysz.common.LangExt.isblank(format) ? null : args != null && args.Length
-				 > 0 ? string.format(format, args) : format)
+			: base(string.IsNullOrEmpty(format) ?  null
+				  : args != null && args.Length > 0 ?
+					string.Format(format, args) : format)
 		{
 		}
 	}

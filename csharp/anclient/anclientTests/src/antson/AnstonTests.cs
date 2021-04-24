@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using io.odysz.anson;
 
 namespace io.oz.anson.Tests
 {
@@ -16,11 +17,10 @@ namespace io.oz.anson.Tests
         [TestMethod()]
         public void AnstonTest()
         {
-            // Assert.Fail();
-            Antson a = new Antson();
+            Anson a = new Anson();
             string jsn = JsonConvert.SerializeObject(a);
             StringAssert.Contains(jsn, "{}");
-            Antson b = JsonConvert.DeserializeObject<Antson>(jsn);
+            Anson b = JsonConvert.DeserializeObject<Anson>(jsn);
             Console.WriteLine(b);
         }
     }
