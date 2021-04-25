@@ -1,8 +1,8 @@
-using Sharpen;
+using io.odysz.anson;
 
 namespace io.odysz.semantic.jprotocol
 {
-	public class AnsonHeader : io.odysz.anson.Anson
+	public class AnsonHeader : Anson
 	{
 		internal string uid;
 

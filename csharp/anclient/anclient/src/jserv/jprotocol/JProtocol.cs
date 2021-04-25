@@ -1,4 +1,3 @@
-using anclient.src.jserv;
 using io.odysz.semantics;
 
 namespace io.odysz.semantic.jprotocol

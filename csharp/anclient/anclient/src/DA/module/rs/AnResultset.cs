@@ -18,12 +18,12 @@ namespace io.odysz.module.rs
 	{
 		// private const bool debug = true;
 
-		private int colCnt = 0;
+		// private int colCnt = 0;
 
 		/// <summary>current row index, start at 1.</summary>
-		private int rowIdx = -1;
+		// private int rowIdx = -1;
 
-		private int rowCnt = 0;
+		// private int rowCnt = 0;
 
 		public DataSet ds { get; }
 
@@ -38,12 +38,9 @@ namespace io.odysz.module.rs
 		/// colnames.put(coln.toUpperCase(), new Object[] {colnames.get(coln), coln});
 		/// </pre>
 		/// </summary>
-		private Dictionary<string, object[]> colnames;
+		// private Dictionary<string, object[]> colnames;
 
-		/// <summary>For paged query, this the total row count</summary>
-		private int total = 0;
-
-		private Dictionary<Type, string> stringFormats;
+		// private Dictionary<Type, string> stringFormats;
 
 		/// <summary>for deserializing</summary>
 		public AnResultset()
@@ -55,6 +52,13 @@ namespace io.odysz.module.rs
 		{
 			// ICRconstructor(rs);
 			ds = rs;
+		}
+
+		/// <summary>For paged query, this the total row count</summary>
+		public virtual int total { get
+			{
+				return ds.Tables[0].Rows.Count;
+			}
 		}
 
 		/*
@@ -1213,17 +1217,6 @@ namespace io.odysz.module.rs
 			int colix = (int)colnames[field.ToUpper()][0];
 			// return results == null ? null : (String) results.get(rowix - 1).get(colix - 1);
 			return getString(colix);
-		}
-
-		public virtual int total()
-		{
-			return total < getRowCount() ? getRowCount() : total;
-		}
-
-		public virtual io.odysz.module.rs.AnResultset total(int total)
-		{
-			this.total = total;
-			return this;
 		}
 
 		/// <summary>

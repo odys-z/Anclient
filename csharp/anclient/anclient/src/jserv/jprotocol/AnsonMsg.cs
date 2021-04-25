@@ -1,8 +1,6 @@
-using anclient.src.anclient;
-using anclient.src.jserv;
 using io.odysz.anson;
+using io.odysz.semantics.x;
 using System;
-using
 using System.Collections.Generic;
 
 namespace io.odysz.semantic.jprotocol
@@ -28,7 +26,7 @@ namespace io.odysz.semantic.jprotocol
 		/// NOTE: java code shouldn't use switch-case block on enum. That cause problem with generated class.
 		/// </remarks>
 		/// <author>odys-z@github.com</author>
-		[System.Serializable]
+		[Serializable]
 		public sealed class Port : IPort
 		{
 			/// <summary>ping.serv11</summary>
@@ -156,7 +154,12 @@ namespace io.odysz.semantic.jprotocol
             }
         }
 
-		[System.Serializable]
+        public static explicit operator AnsonMsg<T>(AnsonMsg<AnsonBody> v)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Serializable]
 		public sealed class MsgCode
 		{
 			public const int ok = 0;
@@ -185,12 +188,11 @@ namespace io.odysz.semantic.jprotocol
 				{
 					return false;
 				}
-				AnsonMsg<T>.MsgCode c = AnsonMsg<T>.MsgCode
-					.valueOf<AnsonMsg<AnsonBody>.MsgCode>(code);
+				MsgCode c = valueOf(code);
 				return this == c;
 			}
 
-            private static MsgCode valueOf<T>(string code)
+            private static MsgCode valueOf(string code)
             {
                 throw new NotImplementedException();
             }
@@ -208,17 +210,12 @@ namespace io.odysz.semantic.jprotocol
 		/// <summary>
 		/// Set the default IPort implelemtation, which is used for parsing port name (string)
 		/// to IPort instance, like
-		/// <see cref="Port"/>
-		/// .<br />
-		/// Because {
-		/// <see cref="Port"/>
-		/// only defined limited ports, user must initialize JMessage with
-		/// <see cref="AnsonMsg{T}.understandPorts(IPort)"/>
-		/// .<br />
+		/// <see cref="Port"/>.
+		/// Because <see cref="Port"/> only defined limited ports, user must initialize JMessage with
+		/// <see cref="AnsonMsg{T}.understandPorts(IPort)"/>.
 		/// An example of how to use this is shown in jserv-sample/io.odysz.jsample.SysMenu.<br />
 		/// Also check how to implement IPort extending
-		/// <see cref="Port"/>
-		/// , see example of jserv-sample/io.odysz.jsample.protocol.Samport.
+		/// <see cref="Port"/>, see example of jserv-sample/io.odysz.jsample.protocol.Samport.
 		/// </summary>
 		/// <param name="p">extended Port</param>
 		public static void understandPorts(IPort p)
@@ -228,15 +225,12 @@ namespace io.odysz.semantic.jprotocol
 
 		private string version = "1.0";
 
-		internal int seq { get; }
+		internal int seq { get; set; }
 
 		internal IPort port { get; set; }
 
 		private AnsonMsg<T>.MsgCode code { get; }
 
-		/// public virtual AnsonMsg<T>.MsgCode code() { return code; }
-
-		/// <exception cref="SemanticException"/>
 		public virtual void portOf(string pport)
 		{
 			/// translate from string to enum
@@ -263,7 +257,7 @@ namespace io.odysz.semantic.jprotocol
 		public AnsonMsg(IPort port)
 		{
 			this.port = port;
-			seq = new Random().Next(1000));
+			seq = new Random().Next(1000);
 		}
 
 		/// <summary>Typically for response</summary>
@@ -271,7 +265,7 @@ namespace io.odysz.semantic.jprotocol
 		/// <param name="code"/>
 		public AnsonMsg(IPort p, AnsonMsg<T>.MsgCode code)
 		{
-			this.port = p;
+			port = p;
 			this.code = code;
 		}
 
@@ -279,7 +273,7 @@ namespace io.odysz.semantic.jprotocol
 
 		public virtual T BodyAt(int i)
 		{
-			return body.get(0);
+			return body[0];
 		}
 
 		public virtual IList<T> Body()
@@ -296,46 +290,24 @@ namespace io.odysz.semantic.jprotocol
 			{
 				body = new List<T>();
 			}
-			body.add((T)bodyItem);
+			body.Add((T)bodyItem);
 			bodyItem.parent = this;
 			return this;
 		}
 
 		public virtual AnsonMsg<T> incSeq()
 		{
-			seq++;
+			seq = seq + 1;
 			return this;
 		}
 
-		internal AnsonHeader header;
+		internal AnsonHeader header { get; set; }
 
-		public virtual AnsonHeader header()
-		{
-			return header;
-		}
-
-		public virtual AnsonMsg<T> header(AnsonHeader
-			 header)
-		{
-			this.header = header;
-			return this;
-		}
-
-		internal JsonOpt opts;
-
-		public virtual void opts(JsonOpt readOpts)
-		{
-			this.opts = readOpts;
-		}
-
-		public virtual JsonOpt opts()
-		{
-			return opts == null ? new JsonOpt() : opts;
-		}
+		internal JsonOpt opts { get; set; }
 
 		public virtual AnsonMsg<T> Body(IList<T> bodyItems)
 		{
-			this.body = bodyItems;
+			body = bodyItems;
 			return this;
 		}
 
@@ -347,7 +319,12 @@ namespace io.odysz.semantic.jprotocol
 
 		public static AnsonMsg<T> ok(IPort p, T resp)
 		{
-			return new AnsonMsg<T>(p, AnsonMsg<T>.MsgCode.ok).Body(resp);
+			return new AnsonMsg<T>(p, new MsgCode(MsgCode.ok)).Body(resp);
 		}
-	}
+
+        public static implicit operator AnsonMsg<AnsonBody>(AnsonMsg<T> v)
+        {
+			return v;
+        }
+    }
 }

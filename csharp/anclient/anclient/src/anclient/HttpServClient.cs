@@ -1,7 +1,8 @@
-﻿using anclient.src.jserv;
+﻿using io.odysz.semantic.jprotocol;
+using io.odysz.semantic.jsession;
 using System;
 
-namespace anclient.src.anclient
+namespace io.odysz.anclient
 {
     internal class HttpServClient
     {

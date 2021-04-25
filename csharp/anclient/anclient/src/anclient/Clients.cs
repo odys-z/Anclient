@@ -1,12 +1,13 @@
-﻿using anclient.src.jserv;
+﻿using io.odysz.anclient;
 using io.odysz.common;
 using io.odysz.semantic.jprotocol;
+using io.odysz.semantic.jsession;
 using io.odysz.semantics.x;
 using System;
 using System.IO;
-using static io.odysz.semantic.jprotocol.AnsonMsg<anclient.src.jserv.AnsonBody>;
+using static io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonBody>;
 
-namespace anclient.src.anclient
+namespace io.odysz.anclient
 {
     class Clients
     {
@@ -40,29 +41,29 @@ namespace anclient.src.anclient
 		public static AnsonClient login(String uid, String pswdPlain)
 		{
             byte[] iv = AESHelper.getRandom();
-            String iv64 = AESHelper.encode64(iv);
+            String iv64 = AESHelper.Encode64(iv);
             if (uid == null || pswdPlain == null)
                 throw new SemanticException("user id and password can not be null.");
-            String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+            String tk64 = AESHelper.Encrypt(uid, pswdPlain, iv);
 
             // formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
             // AnsonMsg<? extends AnsonBody> reqv11 = new AnsonMsg<AnQueryReq>(Port.session);;
-            AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
+            AnsonMsg<AnSessionReq> reqv11 = (AnsonMsg<AnSessionReq>) AnSessionReq.formatLogin(uid, tk64, iv64);
 
             AnsonClient[] inst = new AnsonClient[1];
 
             HttpServClient httpClient = new HttpServClient();
-            String url = servUrl(new Port(IPort.session));
+            String url = servUrl(new Port(Port.session));
             httpClient.post(url, reqv11, (code, msg) => {
                         if (AnsonMsg<AnsonBody>.MsgCode.ok == (int)code) {
                             // create a logged in client
                             inst[0] = new AnsonClient(((AnSessionResp) msg).ssInf);
 
-                            if (Clients.console)
-                                Utils.logi(msg.toString());
+                        if (Clients.console) // Utils.logi(msg.ToString());
+                            Console.WriteLine(msg.ToString());
                         }
                         else throw new SemanticException(
-                                "loging failed\ncode: %s\nerror: %s",
+                                "loging failed\ncode: {}\nerror: {}",
                                 code, ((AnsonResp) msg).msg());
             } );
             if (inst[0] == null)
@@ -70,14 +71,14 @@ namespace anclient.src.anclient
             return inst[0];
         }
 	
-	/**Helper for generate serv url (with configured server root and db connection ID).
-	 * @param port
-	 * @return url, e.g. http://localhost:8080/query.serv?conn=null
-	 */
-	static String servUrl(IPort port)
-    {
-        return String.Format("%s/%s?conn=%s", servRt, port.url(), conn);
-    }
+        /**Helper for generate serv url (with configured server root and db connection ID).
+         * @param port
+         * @return url, e.g. http://localhost:8080/query.serv?conn=null
+         */
+        static String servUrl(IPort port)
+        {
+            return String.Format("{0:S}/{1:S}?conn={2:S}", servRt, port.url, conn);
+        }
 
     }
 }

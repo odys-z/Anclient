@@ -1,24 +1,26 @@
-﻿using io.odysz.common;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace anclientTests.src.common
+namespace io.odysz.common.tests
 {
-    class AESHelperTests
+    [TestClass()]
+    public class AESHelperTests
     {
-		/// <summary>
-		/// </summary>
-		/// <param name="pB64">cipher in Base64</param>
-		/// <param name="ivB64">iv</param>
-		/// <returns>[cipher-base64, new-iv-base64]</returns>
-		public String[] Dencrypt(String pB64, String ivB64)
+        [TestMethod()]
+		public void Dencrypt()
 		{
 			try {
-				return AESHelper.dencrypt(pB64, decryptK, ivB64, encryptK);
+                string decryptK = "io.github.odys-z";
+                string encryptK = "0123456789ABCDEF";
+                string plain = "Plain Text";
+                string iv = AESHelper.Encode64(AESHelper.getRandom());
+                Assert.Equals(plain, AESHelper.Dencrypt(plain, decryptK, iv, encryptK));
 			} catch (Exception e) {
-                //e.PrintStackTrace();
+                Assert.Fail(e.Message);
             }
         }
 
+        /*
         public static void Main()
         {
             string original = "Here is some data to encrypt!";
@@ -40,5 +42,6 @@ namespace anclientTests.src.common
                 Console.WriteLine("Round Trip: {0}", roundtrip);
             }
         }
+        */
     }
 }

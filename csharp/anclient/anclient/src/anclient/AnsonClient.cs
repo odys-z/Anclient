@@ -1,6 +1,6 @@
-﻿using io.oz.semantics.jserv;
+﻿using io.odysz.semantic.jsession;
 
-namespace anclient.src.anclient
+namespace io.odysz.anclient
 {
     public class AnsonClient
     {
@@ -8,7 +8,7 @@ namespace anclient.src.anclient
 
         /// <summary>Session login response from server.</summary>
         /// <paramref name="sessionInfo"></paramref>
-        AnsonClient(SessionInf sessionInfo)
+        internal AnsonClient(SessionInf sessionInfo)
 		{
 			this.ssInf = sessionInfo;
 		}
