@@ -1,10 +1,10 @@
 ﻿using anclient.src.jserv;
 using io.odysz.common;
+using io.odysz.semantic.jprotocol;
+using io.odysz.semantics.x;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using static io.odysz.semantic.jprotocol.AnsonMsg<anclient.src.jserv.AnsonBody>;
 
 namespace anclient.src.anclient
 {
@@ -60,10 +60,10 @@ namespace anclient.src.anclient
 
                             if (Clients.console)
                                 Utils.logi(msg.toString());
-                }
-                                else throw new SemanticException(
-                                        "loging failed\ncode: %s\nerror: %s",
-                                        code, ((AnsonResp) msg).msg());
+                        }
+                        else throw new SemanticException(
+                                "loging failed\ncode: %s\nerror: %s",
+                                code, ((AnsonResp) msg).msg());
             } );
             if (inst[0] == null)
                 throw new IOException("HttpServClient return null client.");

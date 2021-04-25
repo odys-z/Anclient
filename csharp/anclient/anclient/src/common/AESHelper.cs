@@ -223,7 +223,7 @@ namespace io.odysz.common
         private static byte[] getUTF8Bytes(string input)
         {
             // return Sharpen.Runtime.getBytesForString(input);
-            return input.ToCharArray();
+            return (byte[])input.ToCharArray();
         }
 
         //		/// <summary>Converts UTF8 bytes to String</summary>
@@ -256,5 +256,5 @@ namespace io.odysz.common
         //			string enciphered = encrypt(plain, k, decode64(iv));
         //			return enciphered.Equals(cipher);
         //		}
-        //	}
     }
+}

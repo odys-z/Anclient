@@ -1,4 +1,4 @@
-﻿using anclient.src.jserv;
+﻿using io.odysz.semantic.jprotocol;
 using System;
 
 namespace anclient.src.anclient

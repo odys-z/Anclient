@@ -161,8 +161,7 @@ namespace io.odysz.semantics
 			return (string)get("error");
 		}
 
-		public virtual SemanticObject error(string error, params object
-			[] args)
+		public virtual SemanticObject error(string error, params object[] args)
 		{
 			if (args == null || args.Length == 0)
 			{
@@ -205,8 +204,8 @@ namespace io.odysz.semantics
 			}
 			else
 			{
-				throw new TransException("%s seams is not an array. elem %s can't been added"
-					, prop, elem);
+				throw new TransException("%s seams is not an array. elem %s can't been added",
+										prop, elem);
 			}
 			return this;
 		}
