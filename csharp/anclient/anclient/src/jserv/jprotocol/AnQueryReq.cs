@@ -60,7 +60,7 @@ namespace io.odysz.semantic.jserv.R
 
 		internal List<string[]> havings;
 
-		public AnQueryReq(AnsonMsg<AnsonBody> parent, string conn) : base(parent, conn)
+		public AnQueryReq(AnsonMsg parent, string conn) : base(parent, conn)
 		{
 			a = JProtocol.CRUD.R;
 		}
@@ -71,8 +71,7 @@ namespace io.odysz.semantic.jserv.R
 			a = JProtocol.CRUD.R;
 		}
 
-		public AnQueryReq(AnsonMsg<AnsonBody
-			> parent, string conn, string fromTbl, params string[] alias)
+		public AnQueryReq(AnsonMsg parent, string conn, string fromTbl, params string[] alias)
 			: base(parent, conn)
 		{
 			a = JProtocol.CRUD.R;
@@ -190,8 +189,7 @@ namespace io.odysz.semantic.jserv.R
 		/// <param name="from"></param>
 		/// <param name="as"></param>
 		/// <returns>query request</returns>
-		public static AnQueryReq formatReq(string conn, AnsonMsg
-			<AnQueryReq> parent, string from, params string[] @as)
+		public static AnQueryReq formatReq(string conn, AnsonMsg parent, string from, params string[] @as)
 		{
 			AnQueryReq bdItem = new AnQueryReq
 				(parent, conn, from, @as == null || @as.Length == 0 ? null : @as[0]);

@@ -6,7 +6,7 @@ namespace io.odysz.semantic.jsession
 	{
 		internal SessionInf ssInf { get; set; }
 
-		public AnSessionResp(AnsonMsg<AnsonBody> parent, string ssid, string uid, params string[] roleId)
+		public AnSessionResp(AnsonMsg parent, string ssid, string uid, params string[] roleId)
 			: base(parent)
 		{
 			ssInf = new SessionInf(ssid, uid, roleId == null || roleId
@@ -15,7 +15,7 @@ namespace io.odysz.semantic.jsession
 			//ssInf.uid = uid;
 		}
 
-		public AnSessionResp(AnsonMsg<AnsonBody> parent, SessionInf ssInf)
+		public AnSessionResp(AnsonMsg parent, SessionInf ssInf)
 			: base(parent)
 		{
 			// TODO built-in role?

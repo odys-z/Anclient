@@ -17,11 +17,11 @@ namespace io.odysz.semantic.jprotocol
 		{
 		}
 
-		public AnsonResp(AnsonMsg<AnsonBody> parent) : base(parent, null)
+		public AnsonResp(AnsonMsg parent) : base(parent, null)
 		{
 		}
 
-		public AnsonResp(AnsonMsg<AnsonBody> parent, string txt) : base(parent, null)
+		public AnsonResp(AnsonMsg parent, string txt) : base(parent, null)
 		{
 			this.m = txt;
 		}

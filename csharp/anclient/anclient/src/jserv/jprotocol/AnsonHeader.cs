@@ -12,6 +12,11 @@ namespace io.odysz.semantic.jprotocol
 		internal string iv64;
 
 		internal string[] usrAct;
+		public AnsonHeader UsrAct(string funcId, string cmd, string cate, string remarks = null)
+		{
+			usrAct = new string[] { funcId, cate, cmd, remarks };
+			return this;
+		}
 
 		public AnsonHeader(string ssid, string uid)
 		{
@@ -28,25 +33,19 @@ namespace io.odysz.semantic.jprotocol
 			return uid;
 		}
 
-
 		/*
 		/// <returns>js equivalent {md: ssinf.md, ssid: ssinf.ssid, uid: ssinf.uid, iv: ssinf.iv};
-		/// 	</returns>
-		public static io.odysz.semantic.jprotocol.AnsonHeader format(string uid, string ssid)
+		///	</returns>
+		public static AnsonHeader Format(string uid, string ssid)
 		{
-			// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
-			return new io.odysz.semantic.jprotocol.AnsonHeader(ssid, uid);
+			return new AnsonHeader(ssid, uid);
 		}
+		*/
 
-		public virtual io.odysz.semantic.jprotocol.AnsonHeader act(string[] act)
+		public virtual AnsonHeader act(string[] act)
 		{
 			usrAct = act;
 			return this;
-		}
-
-		public static string[] usrAct(string funcId, string cmd, string cate, string remarks)
-		{
-			return new string[] { funcId, cate, cmd, remarks };
 		}
 
 		/// <summary>For test.</summary>
@@ -54,10 +53,9 @@ namespace io.odysz.semantic.jprotocol
 		/// <seealso cref="object.ToString()"/>
 		public override string ToString()
 		{
-			return string.format("{ssid: %s, uid: %s, iv64: %s,\n\t\tuserAct: %s}", ssid, uid
-				, iv64, usrAct == null ? null : java.util.Arrays.stream(usrAct).collect(java.util.stream.Collectors
-				.joining(", ", "[", "]")));
+			return string.Format("{ssid: {0}, uid: {1}, iv64: {2},\n\t\tuserAct: {3}}",
+					ssid, uid, iv64,
+					usrAct == null ? "null" : "[" + string.Join(", ", usrAct)) + "]";
 		}
-		*/
 	}
 }

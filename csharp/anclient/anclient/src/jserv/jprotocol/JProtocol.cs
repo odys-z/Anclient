@@ -1,4 +1,5 @@
 using io.odysz.semantics;
+using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.semantic.jprotocol
 {
@@ -25,7 +26,7 @@ namespace io.odysz.semantic.jprotocol
 			/// <exception cref="java.sql.SQLException"/>
 			/// <exception cref="SemanticException"/>
 			/// <exception cref="AnException"/>
-			void onCallback(AnsonMsg<AnsonBody>.MsgCode msgCode, AnsonResp resp);
+			void onCallback(MsgCode msgCode, AnsonResp resp);
 		}
 
 		public static SemanticObject err(IPort
@@ -34,7 +35,7 @@ namespace io.odysz.semantic.jprotocol
 			SemanticObject obj = new SemanticObject();
 			obj.put("code", code);
 			obj.put("error", err);
-			obj.put("port", port.name());
+			obj.put("port", port.url);
 			return obj;
 		}
 
@@ -42,9 +43,9 @@ namespace io.odysz.semantic.jprotocol
 			 port, object data)
 		{
 			SemanticObject obj = new SemanticObject();
-			obj.put("code", AnsonMsg<AnsonBody>.MsgCode.ok.ToString());
+			obj.put("code", MsgCode.ok.ToString());
 			obj.put("data", data);
-			obj.put("port", port.name());
+			obj.put("port", port.url);
 			return obj;
 		}
 

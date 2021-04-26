@@ -1,6 +1,6 @@
 using io.odysz.semantic.jprotocol;
 using System.Collections.Generic;
-using static io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonBody>;
+using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.semantic.jsession
 {
@@ -19,7 +19,7 @@ namespace io.odysz.semantic.jsession
 
 		/// <summary>Session connection is ignored and controlled by server.</summary>
 		/// <param name="parent"/>
-		public AnSessionReq(AnsonMsg<AnsonBody> parent)
+		public AnSessionReq(AnsonMsg parent)
 			: base(parent, null)
 		{
 		}
@@ -56,20 +56,15 @@ namespace io.odysz.semantic.jsession
 			return this;
 		}
 
-		//public virtual string uid()
-		//{
-		//	return uid;
-		//}
-
 		/// <summary>Format login request message.</summary>
 		/// <param name="uid"/>
 		/// <param name="tk64"/>
 		/// <param name="iv64"/>
 		/// <returns>login request message</returns>
-		public static AnsonMsg<AnsonBody> formatLogin(string uid, string tk64, string iv64)
+		public static AnsonMsg formatLogin(string uid, string tk64, string iv64)
 		{
 			// AnSessionReq : AnsonBody
-			AnsonMsg<AnsonBody> jmsg = new AnsonMsg<AnsonBody>(new Port(Port.session));
+			AnsonMsg jmsg = new AnsonMsg(new Port(Port.session));
 			AnSessionReq itm = new AnSessionReq(jmsg);
 			itm.uid = uid;
 			itm.A("login");
@@ -78,11 +73,11 @@ namespace io.odysz.semantic.jsession
 			return jmsg;
 		}
 
-		private void setup(string uid, string tk64, string iv64)
+		private void setup(string logid, string tk64, string iv64)
 		{
-			this.uid = uid;
-			this.token = tk64;
-			this.iv = iv64;
+			uid = logid;
+			token = tk64;
+			iv = iv64;
 		}
 	}
 }

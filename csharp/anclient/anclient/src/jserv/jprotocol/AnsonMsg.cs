@@ -15,7 +15,7 @@ namespace io.odysz.semantic.jprotocol
 	/// which should been directly write into output stream.
 	/// </summary>
 	/// <author>odys-z@github.com</author>
-	public class AnsonMsg<T> : Anson where T : AnsonBody
+	public class AnsonMsg
 	{
 		/// <summary>
 		/// Port is the conceptual equivalent to the SOAP port, the service methods' group.<br />
@@ -78,7 +78,6 @@ namespace io.odysz.semantic.jprotocol
 
 			public const int NA = -1;
 
-            private string _name;
             private int _port;
 
 			/// <summary>
@@ -101,22 +100,20 @@ namespace io.odysz.semantic.jprotocol
                 */
             }
 
-		private string url { get; set; }
-
-            string IPort.url => throw new NotImplementedException();
+			public string url { get; private set; }
 
             Port(string url) {
-                _name = url;
+                this.url = url;
                 _port = valof(url);
             }
 
             public Port(int port)
             {
                 _port = port;
-                _name = nameof(port);
+                url = nameof(port);
             }
 
-            public string name() { return _name; }
+            // public string name() { return _name; }
 
             public int port() { return _port; }
 
@@ -148,16 +145,28 @@ namespace io.odysz.semantic.jprotocol
                     : port == Port.dataset ? "dataset.serv11"
                     : "NA";
             }
+
             IPort IPort.valof(string pname)
             {
-                throw new NotImplementedException();
+				return pname == "ping.serv11" ? new Port(IPort.heartbeat)
+					: pname == "login.serv11" ? new Port(IPort.session)
+					: pname == "r.serv11" ? new Port(IPort.query)
+					: pname == "u.serv11" ? new Port(IPort.update)
+					: pname == "c.serv11" ? new Port(IPort.insert)
+					: pname == "d.serv11" ? new Port(IPort.delete)
+					: pname == "echo.serv11" ? new Port(IPort.echo)
+					: pname == "file.serv11" ? new Port(IPort.file)
+					: pname == "user.serv11" ? new Port(IPort.user)
+					: pname == "s-tree.serv11" ? new Port(IPort.stree)
+					: pname == "ds.serv11" ? new Port(IPort.dataset)
+					: new Port(IPort.NA);
             }
         }
 
-        public static explicit operator AnsonMsg<T>(AnsonMsg<AnsonBody> v)
-        {
-            throw new NotImplementedException();
-        }
+        //public static explicit operator AnsonMsg(AnsonMsg v)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         [Serializable]
 		public sealed class MsgCode
@@ -178,8 +187,10 @@ namespace io.odysz.semantic.jprotocol
 
 			public const int ext = 7;
 
-            public MsgCode(int ok1)
+			internal int code { get; set; }
+            public MsgCode(int code)
             {
+				this.code = code;
             }
 
             public bool eq(string code)
@@ -188,13 +199,21 @@ namespace io.odysz.semantic.jprotocol
 				{
 					return false;
 				}
-				MsgCode c = valueOf(code);
-				return this == c;
+				int c = codeOf(code);
+				return this.code == c;
 			}
 
-            private static MsgCode valueOf(string code)
+            private static int codeOf(string name)
             {
-                throw new NotImplementedException();
+				name = name.ToLower();
+				return name == "ok" ? MsgCode.ok
+					: name == "exsession" ? MsgCode.exSession
+					: name == "exsemantic" ? MsgCode.exSemantic
+					: name == "exio" ? MsgCode.exIo
+					: name == "extransct" ? MsgCode.exTransct
+					: name == "exda" ? MsgCode.exDA
+					: name == "exgeneral" ? MsgCode.exGeneral
+					: MsgCode.ext;
             }
         }
 
@@ -229,14 +248,14 @@ namespace io.odysz.semantic.jprotocol
 
 		internal IPort port { get; set; }
 
-		private AnsonMsg<T>.MsgCode code { get; }
+		public MsgCode code { get; }
 
 		public virtual void portOf(string pport)
 		{
 			/// translate from string to enum
 			if (defaultPortImpl == null)
 			{
-				port = new AnsonMsg<AnsonBody>.Port(Port.echo);
+				port = new Port(Port.echo);
 			}
 			else
 			{
@@ -263,20 +282,20 @@ namespace io.odysz.semantic.jprotocol
 		/// <summary>Typically for response</summary>
 		/// <param name="p"></param>
 		/// <param name="code"/>
-		public AnsonMsg(IPort p, AnsonMsg<T>.MsgCode code)
+		public AnsonMsg(IPort p, MsgCode code)
 		{
 			port = p;
 			this.code = code;
 		}
 
-		protected internal IList<T> body;
+		protected internal IList<AnsonBody> body;
 
-		public virtual T BodyAt(int i)
+		public virtual AnsonBody BodyAt(int i)
 		{
 			return body[0];
 		}
 
-		public virtual IList<T> Body()
+		public virtual IList<AnsonBody> Body()
 		{
 			return body;
 		}
@@ -284,47 +303,48 @@ namespace io.odysz.semantic.jprotocol
 		/// <summary>Add a request body to the request list.</summary>
 		/// <param name="bodyItem"/>
 		/// <returns>new message object</returns>
-		public virtual AnsonMsg<T> Body(AnsonBody bodyItem)
+		public virtual AnsonMsg Body(AnsonBody bodyItem)
 		{
 			if (body == null)
 			{
-				body = new List<T>();
+				body = new List<AnsonBody>();
 			}
-			body.Add((T)bodyItem);
-			bodyItem.parent = this;
+			body.Add(bodyItem);
+			// bodyItem.parent = this;
+			bodyItem.Parent(this);
 			return this;
 		}
 
-		public virtual AnsonMsg<T> incSeq()
+		public virtual AnsonMsg incSeq()
 		{
 			seq = seq + 1;
 			return this;
 		}
 
 		internal AnsonHeader header { get; set; }
+		public AnsonMsg Header(AnsonHeader h)
+        {
+			header = h;
+			return this;
+        }
 
 		internal JsonOpt opts { get; set; }
 
-		public virtual AnsonMsg<T> Body(IList<T> bodyItems)
+		public virtual AnsonMsg Body(IList<AnsonBody> bodyItems)
 		{
 			body = bodyItems;
 			return this;
 		}
 
-		public static AnsonMsg<T> Ok(IPort p, string txt)
+		public static AnsonMsg Ok(IPort p, string txt)
 		{
 			AnsonResp bd = new AnsonResp(txt);
-			return new AnsonMsg<T>(p, new AnsonMsg<T>.MsgCode(MsgCode.ok)).Body(bd);
+			return new AnsonMsg(p, new MsgCode(MsgCode.ok)).Body(bd);
 		}
 
-		public static AnsonMsg<T> ok(IPort p, T resp)
+		public static AnsonMsg ok(IPort p, AnsonBody resp)
 		{
-			return new AnsonMsg<T>(p, new MsgCode(MsgCode.ok)).Body(resp);
+			return new AnsonMsg(p, new MsgCode(MsgCode.ok)).Body(resp);
 		}
-
-        public static implicit operator AnsonMsg<AnsonBody>(AnsonMsg<T> v)
-        {
-			return v;
-        }
     }
 }

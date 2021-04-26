@@ -5,9 +5,14 @@ namespace io.odysz.semantic.jprotocol
 		/// <summary>
 		/// @AnsonField(ref= AnsonField.enclosing)
 		/// </summary>
-		public AnsonMsg<AnsonBody> parent { get; set; }
+		public AnsonMsg parent { get; internal set; }
 
-		// protected String conn;
+		public AnsonBody Parent(AnsonMsg p)
+        {
+			parent = p;
+			return this;
+        }
+
 		public string conn { get; }
 
 		/// <summary>
@@ -26,7 +31,7 @@ namespace io.odysz.semantic.jprotocol
             return this;
         }
 
-        public AnsonBody(AnsonMsg<AnsonBody> parent, string conn)
+        public AnsonBody(AnsonMsg parent, string conn)
 		{
 			this.parent = parent;
 			this.conn = conn;

@@ -53,8 +53,7 @@ namespace io.odysz.semantic.jserv.U
 		/// <see cref="JProtocol.CRUD"/>.C R U D
 		/// </param>
 		/// <returns>a new update request</returns>
-		public static AnUpdateReq formatUpdateReq(string conn, 
-			AnsonMsg<AnsonBody> parent, string tabl)
+		public static AnUpdateReq FormatUpdateReq(string conn, AnsonMsg parent, string tabl)
 		{
 			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(parent, conn)
 				.A(JProtocol.CRUD.U))
@@ -67,7 +66,7 @@ namespace io.odysz.semantic.jserv.U
 		/// <param name="parent"/>
 		/// <param name="tabl"/>
 		/// <returns>a new deleting request</returns>
-		public static AnUpdateReq formatDelReq(string conn, AnsonMsg<AnsonBody> parent, string tabl)
+		public static AnUpdateReq formatDelReq(string conn, AnsonMsg parent, string tabl)
 		{
 			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(parent, conn)
 				.A(JProtocol.CRUD.D))
@@ -134,7 +133,7 @@ namespace io.odysz.semantic.jserv.U
 		/// </summary>
 		/// <param name="parent"/>
 		/// <param name="conn"/>
-		public AnUpdateReq(AnsonMsg<jprotocol.AnsonBody> parent, string conn)
+		public AnUpdateReq(AnsonMsg parent, string conn)
 			: base(parent, conn)
 		{
 		}

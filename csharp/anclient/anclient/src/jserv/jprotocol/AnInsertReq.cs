@@ -25,7 +25,7 @@ namespace io.odysz.semantic.jserv.U
 		/// </summary>
 		/// <param name="parent"/>
 		/// <param name="conn"/>
-		public AnInsertReq(AnsonMsg<AnsonBody> parent, string conn)
+		public AnInsertReq(AnsonMsg parent, string conn)
 			: base(parent, conn)
 		{
 			a = JProtocol.CRUD.C;
@@ -48,8 +48,7 @@ namespace io.odysz.semantic.jserv.U
 		/// .C R U D
 		/// </param>
 		/// <returns>a new update request</returns>
-		public static AnInsertReq formatInsertReq(string conn, 
-			AnsonMsg<AnInsertReq> parent, string tabl)
+		public static AnInsertReq formatInsertReq(string conn, AnsonMsg parent, string tabl)
 		{
 			AnInsertReq bdItem = (AnInsertReq) new AnInsertReq(parent, conn).A(JProtocol.CRUD.C);
 			bdItem.mtabl = tabl;

@@ -40,7 +40,7 @@ namespace io.odysz.semantic.ext
 			return this;
 		}
 
-		public AnDatasetReq(AnsonMsg<AnsonBody> parent, string conn)
+		public AnDatasetReq(AnsonMsg parent, string conn)
 			: base(parent, conn)
 		{
 			a = "ds";
@@ -49,7 +49,7 @@ namespace io.odysz.semantic.ext
 		internal string sk { get; set; }
 		// public virtual string sk() { return sk; }
 
-		public static AnDatasetReq formatReq(string conn, AnsonMsg<AnsonBody> parent, string sk)
+		public static AnDatasetReq formatReq(string conn, AnsonMsg parent, string sk)
 		{
 			AnDatasetReq bdItem = new AnDatasetReq(parent, conn);
 			bdItem.sk = sk;

@@ -56,7 +56,7 @@ namespace io.odysz.common
 
         /// <param name="plain">Base64</param>
         /// <param name="key">plain key string</param>
-        /// <param name="iv">Base64</param>
+        /// <param name="iv">Base64, length = 16</param>
         /// <returns>cipher-base64</returns>
         public static string Encrypt(string plain, string key, byte[] iv)
         {
