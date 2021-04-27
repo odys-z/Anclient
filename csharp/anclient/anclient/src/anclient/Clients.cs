@@ -3,7 +3,6 @@ using io.odysz.semantic.jprotocol;
 using io.odysz.semantic.jsession;
 using io.odysz.semantics.x;
 using System;
-using System.IO;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.anclient
@@ -65,9 +64,9 @@ namespace io.odysz.anclient
                                 "loging failed\ncode: {}\nerror: {}",
                                 code, ((AnsonResp) msg).msg());
             } );
-            if (inst[0] == null)
-                throw new IOException("HttpServClient return null client.");
-            return inst[0];
+            // if (inst[0] == null)
+            //    throw new IOException("HttpServClient return null client.");
+            return inst[0]; // FIXME 
         }
 	
         /**Helper for generate serv url (with configured server root and db connection ID).

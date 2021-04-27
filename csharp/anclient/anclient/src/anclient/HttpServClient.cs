@@ -1,6 +1,7 @@
 ﻿using io.odysz.semantic.jprotocol;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
@@ -23,14 +24,20 @@ namespace io.odysz.anclient
         {
             using (var client = new HttpClient())
             {
-                var jresponse = await client.PostAsync(
-                    url,
-                    new StringContent(JsonConvert.SerializeObject(req),
-                        Encoding.UTF8, "application/json"));
+                try
+                {
+                    StringContent payload = new StringContent(JsonConvert.SerializeObject(req),
+                                                Encoding.UTF8, "application/json");
+                    var jresponse = await client.PostAsync(url, payload);
 
-                string jresp = await jresponse.Content.ReadAsStringAsync();
-                AnsonMsg resp = (AnsonMsg)JsonConvert.DeserializeObject(jresp);
-                onResp(resp.code, resp);
+                    string jresp = await jresponse.Content.ReadAsStringAsync();
+                    AnsonMsg resp = (AnsonMsg)JsonConvert.DeserializeObject(jresp);
+                    onResp(resp.code, resp);
+                }
+                catch (Exception ex)
+                {
+                    throw new IOException(ex.Message);
+                }
             }
         }
     }

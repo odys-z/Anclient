@@ -19,7 +19,7 @@ class Protocol {
 
 	/**Format login request message.
 	 * @param {string} uid
-	 * @param {string} tk64
+	 * @param {string} tk64 password cypher
 	 * @param {string} iv64
 	 * @return login request message
 	 */
@@ -35,22 +35,6 @@ class Protocol {
 
 	static rs2arr (rs) {
 		return AnsonResp.rs2arr(rs);
-		// var cols = [];
-		// var rows = [];
-		// rs.forEach((r, rx) => {
-		// 	if (rx === 0) {
-		// 		cols = r;
-		// 	}
-		// 	else {
-		// 		rw = {};
-		// 		r.forEach((c, cx) => {
-		// 			rw[cols[cx]] = c;
-		// 		})
-		// 		rows.push(rw);
-		// 	}
-		// });
-		//
-		// return rows;
 	}
 
 	static nv2cell (nv) {

@@ -9,29 +9,26 @@
     <Compile Remove="src\jserv\file\**" />
     <Compile Remove="src\jserv\r\**" />
     <Compile Remove="src\jserv\u\**" />
-    <Compile Remove="src\semantics\io\**" />
     <Compile Remove="src\sharpen\**" />
     <EmbeddedResource Remove="src\jserv\echo\**" />
     <EmbeddedResource Remove="src\jserv\file\**" />
     <EmbeddedResource Remove="src\jserv\r\**" />
     <EmbeddedResource Remove="src\jserv\u\**" />
-    <EmbeddedResource Remove="src\semantics\io\**" />
     <EmbeddedResource Remove="src\sharpen\**" />
     <None Remove="src\jserv\echo\**" />
     <None Remove="src\jserv\file\**" />
     <None Remove="src\jserv\r\**" />
     <None Remove="src\jserv\u\**" />
-    <None Remove="src\semantics\io\**" />
     <None Remove="src\sharpen\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="src\DA\semantic\util\" />
-    <Folder Include="src\semantics\" />
   </ItemGroup>
 
 </Project>

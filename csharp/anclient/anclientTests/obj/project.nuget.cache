@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "2hM6uUu8pQLmGhM5osYrtYopi4ujxqUdimf8sWbdZegZC10dwI4QoHjRpT294AGX7+1UFzD2Kl1GGzLCHvC+uw==",
+  "dgSpecHash": "M5u/CrTP3apCWD+irAUBFj1qo/hQpWHIc+9Oyar5Uvcw+3YR3NOKYM565QemxhxWU8Hs6W+pylU47WBo3E3w8A==",
   "success": true,
   "projectFilePath": "C:\\Users\\Alice\\github\\anclient\\csharp\\anclient\\anclientTests\\anclientTests.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Alice\\.nuget\\packages\\antlr4.runtime.standard\\4.9.2\\antlr4.runtime.standard.4.9.2.nupkg.sha512",
     "C:\\Users\\Alice\\.nuget\\packages\\coverlet.collector\\1.3.0\\coverlet.collector.1.3.0.nupkg.sha512",
     "C:\\Users\\Alice\\.nuget\\packages\\microsoft.codecoverage\\16.7.1\\microsoft.codecoverage.16.7.1.nupkg.sha512",
     "C:\\Users\\Alice\\.nuget\\packages\\microsoft.net.test.sdk\\16.7.1\\microsoft.net.test.sdk.16.7.1.nupkg.sha512",

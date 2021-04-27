@@ -10,7 +10,7 @@ namespace io.odysz.anclient
     [TestClass()]
     public class ClientsTests
     {
-        private const string jserv = "https://192.168.0.201:8080/jsample";
+        private const string jserv = "http://192.168.0.201:8080/jserv-sample";
         private const string pswd = "123456bbbbbbbbbb";
         private const string uid = "admin";
         private static AnsonClient client;

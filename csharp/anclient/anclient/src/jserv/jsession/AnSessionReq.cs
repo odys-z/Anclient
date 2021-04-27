@@ -13,15 +13,17 @@ namespace io.odysz.semantic.jsession
 	/// <author>odys-z@github.com</author>
 	public class AnSessionReq : AnsonBody
 	{
+		string type;
 		public AnSessionReq() : base(null, null)
 		{
+			type = "io.odysz.semantic.jsession.AnSessionReq";
 		}
 
 		/// <summary>Session connection is ignored and controlled by server.</summary>
 		/// <param name="parent"/>
-		public AnSessionReq(AnsonMsg parent)
-			: base(parent, null)
+		public AnSessionReq(AnsonMsg parent) : base(parent, null)
 		{
+			type = "io.odysz.semantic.jsession.AnSessionReq";
 		}
 
 		internal string uid;
@@ -66,9 +68,9 @@ namespace io.odysz.semantic.jsession
 			// AnSessionReq : AnsonBody
 			AnsonMsg jmsg = new AnsonMsg(new Port(Port.session));
 			AnSessionReq itm = new AnSessionReq(jmsg);
-			itm.uid = uid;
-			itm.A("login");
 			itm.setup(uid, tk64, iv64);
+			itm.A("login");
+
 			jmsg.Body((AnsonBody)itm);
 			return jmsg;
 		}
