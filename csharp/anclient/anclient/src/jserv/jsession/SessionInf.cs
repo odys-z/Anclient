@@ -1,6 +1,6 @@
 ﻿using io.odysz.anson;
 
-namespace io.oz.semantics.jserv
+namespace io.odysz.semantic.jsession
 {
     public class SessionInf : Anson
     {

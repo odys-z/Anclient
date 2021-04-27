@@ -1,4 +1,4 @@
-using anclient.src.anclient;
+using io.odysz.semantics.x;
 using System.Collections.Generic;
 
 namespace io.odysz.semantic
@@ -631,7 +631,7 @@ namespace io.odysz.semantic
 		/// [table, DASeamtnics]<br />
 		/// This is not static because there are many connections
 		/// </summary>
-		private Dictionary<string, DASemantics> ss;
+		// private Dictionary<string, DASemantics> ss;
 
 		/// <summary>
 		/// Static transact context for DB accessing without semantics support.<br />
@@ -639,10 +639,10 @@ namespace io.odysz.semantic
 		/// </summary>
 		// private Transcxt basicTsx;
 
-		public virtual DASemantics get(string tabl)
-		{
-			return ss == null ? null : ss[tabl];
-		}
+		//public virtual DASemantics get(string tabl)
+		//{
+		//	return ss == null ? null : ss[tabl];
+		//}
 
 		// private List<DASemantics.SemanticHandler> handlers;
 

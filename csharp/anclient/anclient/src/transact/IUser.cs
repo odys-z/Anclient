@@ -1,4 +1,4 @@
-using Sharpen;
+using System.Collections.Generic;
 
 namespace io.odysz.semantics
 {
@@ -12,7 +12,7 @@ namespace io.odysz.semantics
 	/// <author>ody</author>
 	public interface IUser
 	{
-		meta.TableMeta meta();
+		// meta.TableMeta meta();
 
 		/// <summary>The sqls is committed to database, do something for logging.</summary>
 		/// <remarks>

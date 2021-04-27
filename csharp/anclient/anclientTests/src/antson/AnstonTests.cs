@@ -1,15 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-using io.oz.anson;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using io.odysz.anson;
 
-namespace io.oz.anson.Tests
+namespace io.odysz.anson.tests
 {
     [TestClass()]
     public class AnstonTests

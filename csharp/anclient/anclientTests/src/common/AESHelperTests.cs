@@ -1,43 +1,31 @@
-﻿using io.odysz.common;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace anclientTests.src.common
+namespace io.odysz.common.tests
 {
-    class AESHelperTests
+    [TestClass()]
+    public class AESHelperTests
     {
-		/// <summary>
-		/// </summary>
-		/// <param name="pB64">cipher in Base64</param>
-		/// <param name="ivB64">iv</param>
-		/// <returns>[cipher-base64, new-iv-base64]</returns>
-		public String[] Dencrypt(String pB64, String ivB64)
+        [TestMethod()]
+		public void Dencrypt()
 		{
 			try {
-				return AESHelper.dencrypt(pB64, decryptK, ivB64, encryptK);
-			} catch (Exception e) {
-                //e.PrintStackTrace();
+                string k1 = "0123456789ABCDEF";
+                string k2 = "io.github.odys-z";
+                string plain = "Plain Text";
+                byte[] iv64 = AESHelper.getRandom();
+                string iv = AESHelper.Encode64(iv64);
+                string cypher = AESHelper.Encrypt(plain, k1, iv64);
+                string[] cypherss = AESHelper.Dencrypt(cypher, k1, iv, k2);
+                Assert.AreEqual(plain, AESHelper.Decrypt(cypherss[0], k2, AESHelper.Decode64(cypherss[1])));
+
+                System.Diagnostics.Debug.WriteLine("Check this at server side:");
+                System.Diagnostics.Debug.WriteLine(string.Format("Cypher:\n{0}", cypherss[0]));
+                System.Diagnostics.Debug.WriteLine(string.Format("Key:\n{0},\nIV:\n{1}", k2, cypherss[1]));
+                System.Diagnostics.Debug.WriteLine(string.Format("Expacting:\n{0}", plain));
             }
-        }
-
-        public static void Main()
-        {
-            string original = "Here is some data to encrypt!";
-
-            // Create a new instance of the Aes
-            // class.  This generates a new key and initialization
-            // vector (IV).
-            using (Aes myAes = Aes.Create())
-            {
-
-                // Encrypt the string to an array of bytes.
-                byte[] encrypted = EncryptStringToBytes_Aes(original, myAes.Key, myAes.IV);
-
-                // Decrypt the bytes to a string.
-                string roundtrip = DecryptStringFromBytes_Aes(encrypted, myAes.Key, myAes.IV);
-
-                //Display the original data and the decrypted data.
-                Console.WriteLine("Original:   {0}", original);
-                Console.WriteLine("Round Trip: {0}", roundtrip);
+            catch (Exception e) {
+                Assert.Fail(e.Message);
             }
         }
     }

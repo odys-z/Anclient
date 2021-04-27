@@ -7,11 +7,11 @@ namespace io.odysz.semantic.ext
 	public class AnDatasetResp : AnsonResp
 	{
 
-        public AnDatasetResp(AnsonMsg<AnsonBody> parent, List<Anson> forest) : base(parent)
+        public AnDatasetResp(AnsonMsg parent, List<Anson> forest) : base(parent)
 		{
 		}
 
-		public AnDatasetResp(AnsonMsg<AnsonBody> parent) : base(parent)
+		public AnDatasetResp(AnsonMsg parent) : base(parent)
 		{
 		}
 
