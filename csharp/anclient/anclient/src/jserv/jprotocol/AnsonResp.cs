@@ -1,3 +1,4 @@
+using io.odysz.module.rs;
 using System.Collections.Generic;
 
 namespace io.odysz.semantic.jprotocol
@@ -16,11 +17,11 @@ namespace io.odysz.semantic.jprotocol
 		{
 		}
 
-		public AnsonResp(AnsonMsg<AnsonBody> parent) : base(parent, null)
+		public AnsonResp(AnsonMsg parent) : base(parent, null)
 		{
 		}
 
-		public AnsonResp(AnsonMsg<AnsonBody> parent, string txt) : base(parent, null)
+		public AnsonResp(AnsonMsg parent, string txt) : base(parent, null)
 		{
 			this.m = txt;
 		}
@@ -35,13 +36,13 @@ namespace io.odysz.semantic.jprotocol
 			return m;
 		}
 
-		public virtual AnsonResp rs(AnResultset rs)
+		public virtual AnsonResp Rs(AnResultset rs)
 		{
-			if (this._rs == null)
+			if (this.rs == null)
 			{
-				this._rs = new List<AnResultset>(1);
+				this.rs = new List<AnResultset>(1);
 			}
-			this._rs.add(rs);
+			this.rs.Add(rs);
 			return this;
 		}
 
@@ -50,39 +51,38 @@ namespace io.odysz.semantic.jprotocol
 		/// <param name="totalRows">total row count for a paged query (only a page of rows is actually in rs).
 		/// 	</param>
 		/// <returns>this</returns>
-		public virtual AnsonResp rs(AnResultset rs, int totalRows)
+		public virtual AnsonResp Rs(AnResultset rs, int totalRows)
 		{
-			if (this._rs == null)
+			if (rs == null)
 			{
-				this._rs = new List<AnResultset>();
+				this.rs = new List<AnResultset>();
 			}
-			this._rs.add(rs.total(totalRows));
+
+			// rs.total = totalRows;
+			this.rs.Add(rs);
 			return this;
 		}
 
-		public virtual AnsonBody rs(List<AnResultset> rsLst)
+		public virtual AnsonBody Rs(List<AnResultset> rsLst)
 		{
-			this._rs = rsLst;
+			rs = rsLst;
 			return this;
 		}
 
-		public virtual List<AnResultset> rs ()
+		// public virtual List<AnResultset> Rs () { return rs; }
+
+		public virtual AnResultset Rs(int ix)
 		{
-			return this._rs;
+			return rs == null ? null : rs[ix];
 		}
 
-		public virtual AnResultset rs(int ix)
+		public virtual AnsonResp Data(Dictionary<string, object> props)
 		{
-			return this._rs == null ? null : this._rs[ix];
-		}
-
-		public virtual AnsonResp data(Dictionary<string, object> props)
-		{
-			this.map = props;
+			map = props;
 			return this;
 		}
 
-		public virtual Dictionary<string, object> data()
+		public virtual Dictionary<string, object> Data()
 		{
 			return map;
 		}

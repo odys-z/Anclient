@@ -51,7 +51,7 @@ namespace io.odysz.semantic.jprotocol
 			public const int echo = 6;
 
 			/// <summary>file.serv11:
-			/// serv port for downloading json/xml file or uploading a file.</summary> 
+			/// serv port for downloading json/xml file or uploading a file.</summary>
 			/// <seealso>
 			/// <see cref="jserv.file.JFileServ"/>
 			/// </seealso>
@@ -83,9 +83,9 @@ namespace io.odysz.semantic.jprotocol
 			/// <summary>
 			/// TODO Setup a register for extinding new port.
 			/// </summary>
-			static Port()
-			{
-				/*
+            static Port()
+            {
+                /*
                 JSONAnsonListener.registFactory(Sharpen.Runtime.getClassForType(typeof(IPort)),
                     @"TODO: Lambda Expression Ignored
                     (s) -> {
@@ -196,7 +196,13 @@ namespace io.odysz.semantic.jprotocol
 				this.code = code;
 			}
 
-			public bool eq(string code)
+			internal int code { get; set; }
+            public MsgCode(int code)
+            {
+				this.code = code;
+            }
+
+            public bool eq(string code)
 			{
 				if (code == null)
 				{
@@ -218,7 +224,20 @@ namespace io.odysz.semantic.jprotocol
 					: name == "exgeneral" ? MsgCode.exGeneral
 					: MsgCode.ext;
 			}
-		}
+
+            private static int codeOf(string name)
+            {
+				name = name.ToLower();
+				return name == "ok" ? MsgCode.ok
+					: name == "exsession" ? MsgCode.exSession
+					: name == "exsemantic" ? MsgCode.exSemantic
+					: name == "exio" ? MsgCode.exIo
+					: name == "extransct" ? MsgCode.exTransct
+					: name == "exda" ? MsgCode.exDA
+					: name == "exgeneral" ? MsgCode.exGeneral
+					: MsgCode.ext;
+            }
+        }
 
 		/// <summary>The default IPort implelemtation.</summary>
 		/// <remarks>
@@ -349,5 +368,5 @@ namespace io.odysz.semantic.jprotocol
 		{
 			return new AnsonMsg(p, new MsgCode(MsgCode.ok)).Body(resp);
 		}
-	}
+    }
 }

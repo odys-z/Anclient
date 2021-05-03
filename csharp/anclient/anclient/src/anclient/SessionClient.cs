@@ -1,9 +1,6 @@
-﻿using io.oz.anson;
-using io.oz.semantics.jserv;
-using Newtonsoft.Json;
-using System;
+﻿using io.odysz.semantic.jsession;
 
-namespace io.oz.anclient.cs
+namespace io.odysz.anclient
 {
     public class SessionClient
     {

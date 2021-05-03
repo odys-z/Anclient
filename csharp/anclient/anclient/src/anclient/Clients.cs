@@ -1,29 +1,27 @@
-﻿using anclient.src.jserv;
+﻿using io.odysz.common;
 using io.odysz.semantic.jprotocol;
+using io.odysz.semantic.jsession;
+using io.odysz.semantics.x;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static io.odysz.semantic.jprotocol.AnsonMsg;
 
-namespace anclient.src.anclient
+namespace io.odysz.anclient
 {
-    class Clients
+    public class Clients
     {
 		public const bool console = true;
 
 		public static string servRt;
 
 		/// <summary> DB connection ID. same in connects.xml/t/C/id at server side.
-		/// </summary> 
-		private static String conn;
+		/// </summary>
+		private static string conn;
 
 
 		/// <summary>Initialize configuration.
 		/// </summary>
 		/// <param>servRoot</param>
-		public static void init(String servRoot)
+		public static void Init(string servRoot)
 		{
 			servRt = servRoot;
 			conn = null; // client can't control engine connect. configured in workflow-meta.xml
@@ -35,29 +33,31 @@ namespace anclient.src.anclient
 		/// <param name="pswdPlain">password in plain</param>
 		/// <return> null if failed, a SessionClient instance if login succeed.</return>
 		/// <throws> SQLException the request makes server generate wrong SQL.</throws>
-		/// @throws SemanticException Request can not parsed correctly 
+		/// @throws SemanticException Request can not parsed correctly
 		/// @throws GeneralSecurityException  other error
 		/// @throws Exception, most likely the network failed
-		public static AnsonClient login(String uid, String pswdPlain)
+		public static AnsonClient Login(string uid, string pswdPlain, Action<int, AnSessionResp> onlogin = null)
 		{
             byte[] iv = AESHelper.getRandom();
-            String iv64 = AESHelper.encode64(iv);
+            string iv64 = AESHelper.Encode64(iv);
             if (uid == null || pswdPlain == null)
                 throw new SemanticException("user id and password can not be null.");
-            String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+            string tk64 = AESHelper.Encrypt(uid, pswdPlain, iv);
 
             // formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
             // AnsonMsg<? extends AnsonBody> reqv11 = new AnsonMsg<AnQueryReq>(Port.session);;
-            AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
+            AnsonMsg reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
 
             AnsonClient[] inst = new AnsonClient[1];
 
             HttpServClient httpClient = new HttpServClient();
-            String url = servUrl(new Port(IPort.session));
-            httpClient.post(url, reqv11, (code, msg) => {
-                        if (AnsonMsg<AnsonBody>.MsgCode.ok == (int)code) {
-                            // create a logged in client
-                            inst[0] = new AnsonClient(((AnSessionResp) msg).ssInf);
+            string url = ServUrl(new Port(Port.session));
+            httpClient.Post(url, reqv11, (code, msg) => {
+                    if (MsgCode.ok == code.code) {
+                        // create a logged in client
+                        inst[0] = new AnsonClient(((AnSessionResp) msg.Body()[0]).ssInf);
+                        if (onlogin != null)
+                            onlogin(code.code, (AnSessionResp)msg.Body()[0]);
 
                             if (Clients.console)
                                 Utils.logi(msg.toString());
@@ -68,15 +68,15 @@ namespace anclient.src.anclient
             } );
             return inst[0];
         }
-	
-	/**Helper for generate serv url (with configured server root and db connection ID).
-	 * @param port
-	 * @return url, e.g. http://localhost:8080/query.serv?conn=null
-	 */
-	static String servUrl(IPort port)
-    {
-        return String.Format("%s/%s?conn=%s", servRt, port.url(), conn);
-    }
+
+        /**Helper for generate serv url (with configured server root and db connection ID).
+         * @param port
+         * @return url, e.g. http://localhost:8080/query.serv?conn=null
+         */
+        public static string ServUrl(IPort port)
+        {
+            return string.Format("{0:S}/{1:S}?conn={2:S}", servRt, port.url, conn);
+        }
 
     }
 }

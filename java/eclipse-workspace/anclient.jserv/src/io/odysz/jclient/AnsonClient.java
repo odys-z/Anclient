@@ -39,8 +39,6 @@ public class AnsonClient {
 		this.ssInf = sessionInfo;
 	}
 	
-//	public AnsonClient(AnsonResp msg) { }
-
 	/**Format a query request object, including all information for construct a "select" statement.
 	 * @param conn connection id
 	 * @param tbl main table, (sometimes function category), e.g. "e_areas"
@@ -58,6 +56,9 @@ public class AnsonClient {
 
 		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
 		if (funcId != null && funcId.length > 0)
+			// FIXME Bug? No test for DB log since Antson 1.0?
+			// FIXME Bug? No test for DB log since Antson 1.0?
+			// FIXME Bug? No test for DB log since Antson 1.0?
 			AnsonHeader.usrAct(funcId[0], "query", "R", "test");
 		msg.header(header);
 

@@ -1,4 +1,5 @@
-using Sharpen;
+using io.odysz.semantics;
+using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.semantic.jprotocol
 {
@@ -23,49 +24,47 @@ namespace io.odysz.semantic.jprotocol
 			/// <param name="resp">response message</param>
 			/// <exception cref="System.IO.IOException"/>
 			/// <exception cref="java.sql.SQLException"/>
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			/// <exception cref="io.odysz.anson.x.AnsonException"/>
-			void onCallback(io.odysz.semantic.jprotocol.AnsonMsg.MsgCode msgCode, io.odysz.semantic.jprotocol.AnsonResp
-				 resp);
+			/// <exception cref="SemanticException"/>
+			/// <exception cref="AnException"/>
+			void onCallback(MsgCode msgCode, AnsonResp resp);
 		}
 
-		public static io.odysz.semantics.SemanticObject err(io.odysz.semantic.jprotocol.IPort
+		public static SemanticObject err(IPort
 			 port, string code, string err)
 		{
-			io.odysz.semantics.SemanticObject obj = new io.odysz.semantics.SemanticObject();
+			SemanticObject obj = new SemanticObject();
 			obj.put("code", code);
 			obj.put("error", err);
-			obj.put("port", port.name());
+			obj.put("port", port.url);
 			return obj;
 		}
 
-		public static io.odysz.semantics.SemanticObject ok(io.odysz.semantic.jprotocol.IPort
+		public static SemanticObject ok(IPort
 			 port, object data)
 		{
-			io.odysz.semantics.SemanticObject obj = new io.odysz.semantics.SemanticObject();
-			obj.put("code", io.odysz.semantic.jprotocol.AnsonMsg.MsgCode.ok.ToString());
+			SemanticObject obj = new SemanticObject();
+			obj.put("code", MsgCode.ok.ToString());
 			obj.put("data", data);
-			obj.put("port", port.name());
+			obj.put("port", port.url);
 			return obj;
 		}
 
-		public static io.odysz.semantics.SemanticObject ok(io.odysz.semantic.jprotocol.IPort
+		public static SemanticObject ok(IPort
 			 port, string msg, params object[] msgArgs)
 		{
-			return ok(port, string.format(msg, msgArgs));
+			return ok(port, string.Format(msg, msgArgs));
 		}
 
 		//////////////////////// version 1.1 with support of Anson //////////////////////
-		public static io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonResp
-			> err(io.odysz.semantic.jprotocol.AnsonMsg.Port port, io.odysz.semantic.jprotocol.AnsonMsg.MsgCode
-			 code, string err)
-		{
-			io.odysz.semantic.jprotocol.AnsonResp obj = new io.odysz.semantic.jprotocol.AnsonResp
-				(err);
-			io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonResp> msg = 
-				new io.odysz.semantic.jprotocol.AnsonMsg<io.odysz.semantic.jprotocol.AnsonResp>(
-				port, code).body(obj);
-			return msg;
-		}
+		//public static AnsonMsg<AnsonResp> err(AnsonMsg<T>.Port port, AnsonMsg<T>.MsgCode code, string err)
+		//	where T : AnsonBody
+		//{
+		//	AnsonResp obj = new AnsonResp
+		//		(err);
+		//	AnsonMsg<AnsonResp> msg = 
+		//		new AnsonMsg<AnsonResp>(
+		//		port, code).body(obj);
+		//	return msg;
+		//}
 	}
 }

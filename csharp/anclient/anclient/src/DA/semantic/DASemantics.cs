@@ -1,4 +1,5 @@
-using Sharpen;
+using io.odysz.semantics.x;
+using System.Collections.Generic;
 
 namespace io.odysz.semantic
 {
@@ -65,7 +66,7 @@ namespace io.odysz.semantic
 	/// 2. Set the configured semantics as context of
 	/// <see cref="io.odysz.transact.sql.Statement{T}"/>
 	/// . See example in
-	/// <see cref="io.odysz.semantic.DASemantextTest"/>
+	/// <see cref="DASemantextTest"/>
 	/// . Then use Statement's subclass's
 	/// commit() method to generate SQLs
 	/// </p>
@@ -96,7 +97,7 @@ namespace io.odysz.semantic
 	/// <p>
 	/// But it do needs the application developers follow some design conventions. If
 	/// you need you own semantics implementation, implement the interface
-	/// <see cref="io.odysz.semantics.ISemantext"/>
+	/// <see cref=".ISemantext"/>
 	/// , or simply initialize
 	/// <see cref="io.odysz.transact.sql.Transcxt"/>
 	/// with null semantics, which will
@@ -183,7 +184,7 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShAutoK"/>
 			/// </summary>
-			public static readonly io.odysz.semantic.DASemantics.smtype autoInc = new io.odysz.semantic.DASemantics.smtype
+			public static readonly DASemantics.smtype autoInc = new DASemantics.smtype
 				();
 
 			/// <summary>
@@ -203,7 +204,7 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShFkOnIns"/>
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype fkIns = new io.odysz.semantic.DASemantics.smtype
+			public static readonly DASemantics.smtype fkIns = new DASemantics.smtype
 				();
 
 			/// <summary>
@@ -225,7 +226,7 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShFkInsCates"/>
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype fkCateIns = new io.odysz.semantic.DASemantics.smtype
+			public static readonly DASemantics.smtype fkCateIns = new DASemantics.smtype
 				();
 
 			/// <summary>
@@ -235,7 +236,7 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShFullpath"/>
 			/// </summary>
-			public static readonly io.odysz.semantic.DASemantics.smtype fullpath = new io.odysz.semantic.DASemantics.smtype
+			public static readonly DASemantics.smtype fullpath = new DASemantics.smtype
 				();
 
 			/// <summary>
@@ -243,7 +244,7 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShDefltVal"/>
 			/// </summary>
-			public static readonly io.odysz.semantic.DASemantics.smtype defltVal = new io.odysz.semantic.DASemantics.smtype
+			public static readonly DASemantics.smtype defltVal = new DASemantics.smtype
 				();
 
 			/// <summary>
@@ -265,8 +266,8 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShPCDelAll"/>
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype parentChildrenOnDel = 
-				new io.odysz.semantic.DASemantics.smtype();
+			public static readonly DASemantics.smtype parentChildrenOnDel = 
+				new DASemantics.smtype();
 
 			/// <summary>
 			/// "pc-del-tbl" | "pc-del-by-tbl" | "pc-tbl"<br />
@@ -291,8 +292,8 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShPCDelByTbl"/>
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype parentChildrenOnDelByTabl
-				 = new io.odysz.semantic.DASemantics.smtype();
+			public static readonly DASemantics.smtype parentChildrenOnDelByTabl
+				 = new DASemantics.smtype();
 
 			/// <summary>
 			/// "d-e" | "de-encrypt" | "dencrypt":<br />
@@ -301,8 +302,7 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShDencrypt"/>
 			/// </summary>
-			public static readonly io.odysz.semantic.DASemantics.smtype dencrypt = new io.odysz.semantic.DASemantics.smtype
-				();
+			public static readonly DASemantics.smtype dencrypt = new DASemantics.smtype ();
 
 			/// <summary>
 			/// xml/smtc = "o-t" | "oper-time" | "optime"<br />
@@ -310,8 +310,7 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShOperTime"/>
 			/// </summary>
-			public static readonly io.odysz.semantic.DASemantics.smtype opTime = new io.odysz.semantic.DASemantics.smtype
-				();
+			public static readonly DASemantics.smtype opTime = new DASemantics.smtype ();
 
 			/// <summary>
 			/// "ck-cnt-del" | "check-count-del" | "checksqlcountondel":<br />
@@ -337,8 +336,7 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShChkSqlCntDel"/>
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype checkSqlCountOnDel = 
-				new io.odysz.semantic.DASemantics.smtype();
+			public static readonly DASemantics.smtype checkSqlCountOnDel = new DASemantics.smtype();
 
 			/// <summary>
 			/// "ck-cnt-ins" | "check-count-ins" | "checksqlcountoninsert":<br />
@@ -357,8 +355,8 @@ namespace io.odysz.semantic
 			/// Handler:
 			/// <see cref="ShChkCntInst"/>
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype checkSqlCountOnInsert
-				 = new io.odysz.semantic.DASemantics.smtype();
+			public static readonly DASemantics.smtype checkSqlCountOnInsert
+				 = new DASemantics.smtype();
 
 			/// <summary>
 			/// "p-f" | "p-fk" | "post-fk"<br />
@@ -402,8 +400,7 @@ namespace io.odysz.semantic
 			/// <b>Handler:</b>
 			/// <see cref="ShPostFk"/>
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype postFk = new io.odysz.semantic.DASemantics.smtype
-				();
+			public static readonly DASemantics.smtype postFk = new DASemantics.smtype ();
 
 			/// <summary>
 			/// Attach Attachments to Attaching Table (saving file in file system)<br />
@@ -454,16 +451,14 @@ namespace io.odysz.semantic
 			/// CONSTRAINT a_attaches_PK PRIMARY KEY (attId)) ;
 			/// </pre>
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype extFile = new io.odysz.semantic.DASemantics.smtype
-				();
+			public static readonly DASemantics.smtype extFile = new DASemantics.smtype ();
 
 			/// <summary>
 			/// "cmp-col" | "compose-col" | "compse-column": compose a column from other
 			/// columns;<br />
 			/// TODO
 			/// </summary>
-			public static readonly io.odysz.semantic.DASemantics.smtype composingCol = new io.odysz.semantic.DASemantics.smtype
-				();
+			public static readonly DASemantics.smtype composingCol = new DASemantics.smtype ();
 
 			/// <summary>
 			/// TODO
@@ -486,16 +481,14 @@ namespace io.odysz.semantic
 			/// presented in sql, or, up stamp will be ignored if down stamp presented. (use
 			/// case of down stamp updating by synchronizer).<br />
 			/// </remarks>
-			public static readonly io.odysz.semantic.DASemantics.smtype stamp1MoreThanRefee = 
-				new io.odysz.semantic.DASemantics.smtype();
+			public static readonly DASemantics.smtype stamp1MoreThanRefee = new DASemantics.smtype();
 
 			/// <summary>
 			/// "clob" | "orclob": the column is a CLOB field, semantic-transact will
 			/// read/write separately in stream and get final results.<br />
 			/// Handler: TODO?
 			/// </summary>
-			public static readonly io.odysz.semantic.DASemantics.smtype orclob = new io.odysz.semantic.DASemantics.smtype
-				();
+			public static readonly DASemantics.smtype orclob = new DASemantics.smtype ();
 
 			/// <summary>Note: we don't use enum.valueOf(), because of fault / fuzzy tolerate.</summary>
 			/// <param name="type"/>
@@ -503,119 +496,118 @@ namespace io.odysz.semantic
 			/// 
 			/// <see cref="smtype"/>
 			/// </returns>
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			public static io.odysz.semantic.DASemantics.smtype parse(string type)
+			/// <exception cref=".x.SemanticException"/>
+			public static DASemantics.smtype parse(string type)
 			{
 				if (type == null)
 				{
-					throw new io.odysz.semantics.x.SemanticException("semantics is null");
+					throw new SemanticException("semantics is null");
 				}
 				type = type.ToLower().Trim();
 				if ("auto".Equals(type) || "pk".Equals(type) || "a-k".Equals(type) || "autopk".Equals
 					(type))
 				{
-					return io.odysz.semantic.DASemantics.smtype.autoInc;
+					return DASemantics.smtype.autoInc;
 				}
 				else
 				{
 					if ("fk".Equals(type) || "pkref".Equals(type) || "fk-ins".Equals(type))
 					{
-						return io.odysz.semantic.DASemantics.smtype.fkIns;
+						return DASemantics.smtype.fkIns;
 					}
 					else
 					{
 						if ("fk-ins-cate".Equals(type) || "f-i-c".Equals(type) || "fkc".Equals(type))
 						{
-							return io.odysz.semantic.DASemantics.smtype.fkCateIns;
+							return DASemantics.smtype.fkCateIns;
 						}
 						else
 						{
 							if ("fp".Equals(type) || "f-p".Equals(type) || "fullpath".Equals(type))
 							{
-								return io.odysz.semantic.DASemantics.smtype.fullpath;
+								return DASemantics.smtype.fullpath;
 							}
 							else
 							{
 								if ("dfltVal".Equals(type) || "d-v".Equals(type) || "dv".Equals(type))
 								{
-									return io.odysz.semantic.DASemantics.smtype.defltVal;
+									return DASemantics.smtype.defltVal;
 								}
 								else
 								{
 									if ("pc-del-all".Equals(type) || "parent-child-del-all".Equals(type) || "parentchildondel"
 										.Equals(type))
 									{
-										return io.odysz.semantic.DASemantics.smtype.parentChildrenOnDel;
+										return DASemantics.smtype.parentChildrenOnDel;
 									}
 									else
 									{
 										if ("pc-del-tbl".Equals(type) || "pc-del-by-tabl".Equals(type) || "pc-tbl".Equals
 											(type))
 										{
-											return io.odysz.semantic.DASemantics.smtype.parentChildrenOnDelByTabl;
+											return DASemantics.smtype.parentChildrenOnDelByTabl;
 										}
 										else
 										{
 											if ("d-e".Equals(type) || "de-encrypt".Equals(type) || "dencrypt".Equals(type))
 											{
-												return io.odysz.semantic.DASemantics.smtype.dencrypt;
+												return DASemantics.smtype.dencrypt;
 											}
 											else
 											{
 												if ("o-t".Equals(type) || "oper-time".Equals(type) || "optime".Equals(type))
 												{
-													return io.odysz.semantic.DASemantics.smtype.opTime;
+													return DASemantics.smtype.opTime;
 												}
 												else
 												{
 													if ("ck-cnt-del".Equals(type) || "check-count-del".Equals(type) || "checksqlcountondel"
 														.Equals(type))
 													{
-														return io.odysz.semantic.DASemantics.smtype.checkSqlCountOnDel;
+														return DASemantics.smtype.checkSqlCountOnDel;
 													}
 													else
 													{
 														if ("ck-cnt-ins".Equals(type) || "check-count-ins".Equals(type) || "checksqlcountoninsert"
 															.Equals(type))
 														{
-															return io.odysz.semantic.DASemantics.smtype.checkSqlCountOnInsert;
+															return DASemantics.smtype.checkSqlCountOnInsert;
 														}
 														else
 														{
 															if ("p-f".Equals(type) || "p-fk".Equals(type) || "post-fk".Equals(type))
 															{
-																return io.odysz.semantic.DASemantics.smtype.postFk;
+																return DASemantics.smtype.postFk;
 															}
 															else
 															{
 																if ("cmp-col".Equals(type) || "compose-col".Equals(type) || "compse-column".Equals
 																	(type) || "composingcol".Equals(type))
 																{
-																	return io.odysz.semantic.DASemantics.smtype.composingCol;
+																	return DASemantics.smtype.composingCol;
 																}
 																else
 																{
 																	if ("s-up1".Equals(type) || type.StartsWith("stamp1"))
 																	{
-																		return io.odysz.semantic.DASemantics.smtype.stamp1MoreThanRefee;
+																		return DASemantics.smtype.stamp1MoreThanRefee;
 																	}
 																	else
 																	{
 																		if ("clob".Equals(type) || "orclob".Equals(type))
 																		{
-																			return io.odysz.semantic.DASemantics.smtype.orclob;
+																			return DASemantics.smtype.orclob;
 																		}
 																		else
 																		{
 																			if ("ef".Equals(type) || "e-f".Equals(type) || "ext-file".Equals(type) || "xf".Equals
 																				(type) || "x-f".Equals(type))
 																			{
-																				return io.odysz.semantic.DASemantics.smtype.extFile;
+																				return DASemantics.smtype.extFile;
 																			}
 																			else
 																			{
-																				throw new io.odysz.semantics.x.SemanticException("semantics not known, type: " + 
-																					type);
+																				throw new SemanticException("semantics not known, type: " + type);
 																			}
 																		}
 																	}
@@ -639,22 +631,20 @@ namespace io.odysz.semantic
 		/// [table, DASeamtnics]<br />
 		/// This is not static because there are many connections
 		/// </summary>
-		private System.Collections.Generic.Dictionary<string, io.odysz.semantic.DASemantics
-			> ss;
+		// private Dictionary<string, DASemantics> ss;
 
 		/// <summary>
 		/// Static transact context for DB accessing without semantics support.<br />
 		/// Used to generate auto ID.
 		/// </summary>
-		private io.odysz.transact.sql.Transcxt basicTsx;
+		// private Transcxt basicTsx;
 
-		public virtual io.odysz.semantic.DASemantics get(string tabl)
-		{
-			return ss == null ? null : ss[tabl];
-		}
+		//public virtual DASemantics get(string tabl)
+		//{
+		//	return ss == null ? null : ss[tabl];
+		//}
 
-		private System.Collections.Generic.List<io.odysz.semantic.DASemantics.SemanticHandler
-			> handlers;
+		// private List<DASemantics.SemanticHandler> handlers;
 
 		private string tabl;
 
@@ -662,19 +652,18 @@ namespace io.odysz.semantic
 
 		public static bool verbose = false;
 
-		public DASemantics(io.odysz.transact.sql.Transcxt basicTx, string tabl, string recId
-			)
+		/*
+		public DASemantics(Transcxt basicTx, string tabl, string recId)
 		{
 			this.tabl = tabl;
 			this.pk = recId;
 			basicTsx = basicTx;
-			handlers = new System.Collections.Generic.List<io.odysz.semantic.DASemantics.SemanticHandler
-				>();
+			handlers = new List<DASemantics.SemanticHandler>();
 		}
 
-		/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+		/// <exception cref=".x.SemanticException"/>
 		/// <exception cref="java.sql.SQLException"/>
-		public virtual void addHandler(io.odysz.semantic.DASemantics.smtype semantic, string
+		public virtual void addHandler(DASemantics.smtype semantic, string
 			 tabl, string recId, string[] args)
 		{
 			checkParas(tabl, pk, args);
@@ -682,97 +671,97 @@ namespace io.odysz.semantic
 			{
 				return;
 			}
-			io.odysz.semantic.DASemantics.SemanticHandler handler = null;
-			if (io.odysz.semantic.DASemantics.smtype.fullpath == semantic)
+			DASemantics.SemanticHandler handler = null;
+			if (DASemantics.smtype.fullpath == semantic)
 			{
-				handler = new io.odysz.semantic.DASemantics.ShFullpath(basicTsx, tabl, recId, args
+				handler = new DASemantics.ShFullpath(basicTsx, tabl, recId, args
 					);
 			}
 			else
 			{
-				if (io.odysz.semantic.DASemantics.smtype.autoInc == semantic)
+				if (DASemantics.smtype.autoInc == semantic)
 				{
-					handler = new io.odysz.semantic.DASemantics.ShAutoK(basicTsx, tabl, recId, args);
+					handler = new DASemantics.ShAutoK(basicTsx, tabl, recId, args);
 				}
 				else
 				{
-					if (io.odysz.semantic.DASemantics.smtype.fkIns == semantic)
+					if (DASemantics.smtype.fkIns == semantic)
 					{
-						handler = new io.odysz.semantic.DASemantics.ShFkOnIns(basicTsx, tabl, recId, args
+						handler = new DASemantics.ShFkOnIns(basicTsx, tabl, recId, args
 							);
 					}
 					else
 					{
-						if (io.odysz.semantic.DASemantics.smtype.fkCateIns == semantic)
+						if (DASemantics.smtype.fkCateIns == semantic)
 						{
-							handler = new io.odysz.semantic.DASemantics.ShFkInsCates(basicTsx, tabl, recId, args
+							handler = new DASemantics.ShFkInsCates(basicTsx, tabl, recId, args
 								);
 						}
 						else
 						{
-							if (io.odysz.semantic.DASemantics.smtype.parentChildrenOnDel == semantic)
+							if (DASemantics.smtype.parentChildrenOnDel == semantic)
 							{
-								handler = new io.odysz.semantic.DASemantics.ShPCDelAll(basicTsx, tabl, recId, args
+								handler = new DASemantics.ShPCDelAll(basicTsx, tabl, recId, args
 									);
 							}
 							else
 							{
-								if (io.odysz.semantic.DASemantics.smtype.parentChildrenOnDelByTabl == semantic)
+								if (DASemantics.smtype.parentChildrenOnDelByTabl == semantic)
 								{
-									handler = new io.odysz.semantic.DASemantics.ShPCDelByCate(basicTsx, tabl, recId, 
+									handler = new DASemantics.ShPCDelByCate(basicTsx, tabl, recId, 
 										args);
 								}
 								else
 								{
-									if (io.odysz.semantic.DASemantics.smtype.defltVal == semantic)
+									if (DASemantics.smtype.defltVal == semantic)
 									{
-										handler = new io.odysz.semantic.DASemantics.ShDefltVal(basicTsx, tabl, recId, args
+										handler = new DASemantics.ShDefltVal(basicTsx, tabl, recId, args
 											);
 									}
 									else
 									{
-										if (io.odysz.semantic.DASemantics.smtype.dencrypt == semantic)
+										if (DASemantics.smtype.dencrypt == semantic)
 										{
-											handler = new io.odysz.semantic.DASemantics.ShDencrypt(basicTsx, tabl, recId, args
+											handler = new DASemantics.ShDencrypt(basicTsx, tabl, recId, args
 												);
 										}
 										else
 										{
-											if (io.odysz.semantic.DASemantics.smtype.opTime == semantic)
+											if (DASemantics.smtype.opTime == semantic)
 											{
-												handler = new io.odysz.semantic.DASemantics.ShOperTime(basicTsx, tabl, recId, args
+												handler = new DASemantics.ShOperTime(basicTsx, tabl, recId, args
 													);
 											}
 											else
 											{
-												if (io.odysz.semantic.DASemantics.smtype.checkSqlCountOnDel == semantic)
+												if (DASemantics.smtype.checkSqlCountOnDel == semantic)
 												{
-													handler = new io.odysz.semantic.DASemantics.ShChkCntDel(basicTsx, tabl, recId, args
+													handler = new DASemantics.ShChkCntDel(basicTsx, tabl, recId, args
 														);
 												}
 												else
 												{
-													if (io.odysz.semantic.DASemantics.smtype.checkSqlCountOnInsert == semantic)
+													if (DASemantics.smtype.checkSqlCountOnInsert == semantic)
 													{
-														handler = new io.odysz.semantic.DASemantics.ShChkPCInsert(basicTsx, tabl, recId, 
+														handler = new DASemantics.ShChkPCInsert(basicTsx, tabl, recId, 
 															args);
 													}
 													else
 													{
-														if (io.odysz.semantic.DASemantics.smtype.postFk == semantic)
+														if (DASemantics.smtype.postFk == semantic)
 														{
-															handler = new io.odysz.semantic.DASemantics.ShPostFk(basicTsx, tabl, recId, args);
+															handler = new DASemantics.ShPostFk(basicTsx, tabl, recId, args);
 														}
 														else
 														{
-															if (io.odysz.semantic.DASemantics.smtype.extFile == semantic)
+															if (DASemantics.smtype.extFile == semantic)
 															{
-																handler = new io.odysz.semantic.DASemantics.ShExtFile(basicTsx, tabl, recId, args
+																handler = new DASemantics.ShExtFile(basicTsx, tabl, recId, args
 																	);
 															}
 															else
 															{
-																throw new io.odysz.semantics.x.SemanticException("Unsuppported semantics: " + semantic
+																throw new .x.SemanticException("Unsuppported semantics: " + semantic
 																	);
 															}
 														}
@@ -794,14 +783,13 @@ namespace io.odysz.semantic
 			handlers.add(handler);
 		}
 
-		public virtual io.odysz.semantic.DASemantics.SemanticHandler handler(io.odysz.semantic.DASemantics.smtype
-			 sm)
+		public virtual DASemantics.SemanticHandler handler(DASemantics.smtype sm)
 		{
 			if (handlers == null)
 			{
 				return null;
 			}
-			foreach (io.odysz.semantic.DASemantics.SemanticHandler h in handlers)
+			foreach (DASemantics.SemanticHandler h in handlers)
 			{
 				if (h.@is(sm))
 				{
@@ -815,23 +803,23 @@ namespace io.odysz.semantic
 		/// <param name="tabl"/>
 		/// <param name="pk"/>
 		/// <param name="args"/>
-		/// <exception cref="io.odysz.semantics.x.SemanticException">sementic configuration not matching the target or lack of args.
+		/// <exception cref=".x.SemanticException">sementic configuration not matching the target or lack of args.
 		/// 	</exception>
 		private void checkParas(string tabl, string pk, string[] args)
 		{
 			if (tabl == null || pk == null || args == null || args.Length == 0)
 			{
-				throw new io.odysz.semantics.x.SemanticException(string.format("adding semantics with empty targets? %s %s %s"
+				throw new .x.SemanticException(string.format("adding semantics with empty targets? %s %s %s"
 					, tabl, pk, args));
 			}
 			if (this.tabl != null && !this.tabl.Equals(tabl))
 			{
-				throw new io.odysz.semantics.x.SemanticException(string.format("adding semantics for different target? %s vs. %s"
+				throw new .x.SemanticException(string.format("adding semantics for different target? %s vs. %s"
 					, this.tabl, tabl));
 			}
 			if (this.pk != null && !this.pk.Equals(pk))
 			{
-				throw new io.odysz.semantics.x.SemanticException(string.format("adding semantics for target of diferent id field? %s vs. %s"
+				throw new .x.SemanticException(string.format("adding semantics for target of diferent id field? %s vs. %s"
 					, this.pk, pk));
 			}
 		}
@@ -840,18 +828,17 @@ namespace io.odysz.semantic
 		/// <param name="tabl"/>
 		/// <param name="newSmtcs"/>
 		/// <returns>false no duplicating, true duplicated</returns>
-		/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-		private bool isDuplicate(string tabl, io.odysz.semantic.DASemantics.smtype newSmtcs
-			)
+		/// <exception cref=".x.SemanticException"/>
+		private bool isDuplicate(string tabl, DASemantics.smtype newSmtcs)
 		{
 			if (handlers == null)
 			{
 				return false;
 			}
-			foreach (io.odysz.semantic.DASemantics.SemanticHandler handler in handlers)
+			foreach (DASemantics.SemanticHandler handler in handlers)
 			{
-				if (handler.sm == newSmtcs && newSmtcs != io.odysz.semantic.DASemantics.smtype.fkIns
-					 && newSmtcs != io.odysz.semantic.DASemantics.smtype.postFk)
+				if (handler.sm == newSmtcs && newSmtcs != DASemantics.smtype.fkIns
+					 && newSmtcs != DASemantics.smtype.postFk)
 				{
 					io.odysz.common.Utils.warn("Found duplicate semantics: %s %s\n" + "Details: All semantics configuration is merged into 1 static copy. Each table in every connection can only have one instance of the same smtype."
 						, tabl, newSmtcs.ToString());
@@ -861,11 +848,11 @@ namespace io.odysz.semantic
 			return false;
 		}
 
-		public virtual bool has(io.odysz.semantic.DASemantics.smtype sm)
+		public virtual bool has(DASemantics.smtype sm)
 		{
 			if (handlers != null)
 			{
-				foreach (io.odysz.semantic.DASemantics.SemanticHandler handler in handlers)
+				foreach (DASemantics.SemanticHandler handler in handlers)
 				{
 					if (handler.sm == sm)
 					{
@@ -876,14 +863,14 @@ namespace io.odysz.semantic
 			return false;
 		}
 
-		/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-		public virtual void onInsert(io.odysz.semantics.ISemantext semantx, io.odysz.transact.sql.Insert
-			 statemt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-			<string, int> cols, io.odysz.semantics.IUser usr)
+		/// <exception cref=".x.SemanticException"/>
+		public virtual void onInsert(ISemantext semantx, io.odysz.transact.sql.Insert
+			 statemt, List<object[]> row, IDictionary
+			<string, int> cols, IUser usr)
 		{
 			if (handlers != null)
 			{
-				foreach (io.odysz.semantic.DASemantics.SemanticHandler handler in handlers)
+				foreach (DASemantics.SemanticHandler handler in handlers)
 				{
 					if (handler.insert)
 					{
@@ -893,14 +880,14 @@ namespace io.odysz.semantic
 			}
 		}
 
-		/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-		public virtual void onUpdate(io.odysz.semantics.ISemantext semantx, io.odysz.transact.sql.Update
-			 satemt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-			<string, int> cols, io.odysz.semantics.IUser usr)
+		/// <exception cref=".x.SemanticException"/>
+		public virtual void onUpdate(.ISemantext semantx, io.odysz.transact.sql.Update
+			 satemt, List<object[]> row, IDictionary
+			<string, int> cols, IUser usr)
 		{
 			if (handlers != null)
 			{
-				foreach (io.odysz.semantic.DASemantics.SemanticHandler handler in handlers)
+				foreach (DASemantics.SemanticHandler handler in handlers)
 				{
 					if (handler.update)
 					{
@@ -910,15 +897,15 @@ namespace io.odysz.semantic
 			}
 		}
 
-		/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-		public virtual void onDelete<_T0>(io.odysz.semantics.ISemantext semantx, io.odysz.transact.sql.Statement
-			<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit whereCondt, io.odysz.semantics.IUser
+		/// <exception cref=".x.SemanticException"/>
+		public virtual void onDelete<_T0>(.ISemantext semantx, io.odysz.transact.sql.Statement
+			<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit whereCondt, .IUser
 			 usr)
 			where _T0 : io.odysz.transact.sql.Statement<object>
 		{
 			if (handlers != null)
 			{
-				foreach (io.odysz.semantic.DASemantics.SemanticHandler handler in handlers)
+				foreach (DASemantics.SemanticHandler handler in handlers)
 				{
 					if (handler.delete)
 					{
@@ -928,16 +915,16 @@ namespace io.odysz.semantic
 			}
 		}
 
-		/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-		public virtual void onPost<_T0>(io.odysz.semantic.DASemantext sx, io.odysz.transact.sql.Statement
-			<_T0> stmt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-			<string, int> cols, io.odysz.semantics.IUser usr, System.Collections.Generic.List
+		/// <exception cref=".x.SemanticException"/>
+		public virtual void onPost<_T0>(DASemantext sx, io.odysz.transact.sql.Statement
+			<_T0> stmt, List<object[]> row, IDictionary
+			<string, int> cols, .IUser usr, List
 			<string> sqlBuf)
 			where _T0 : io.odysz.transact.sql.Statement<object>
 		{
 			if (handlers != null)
 			{
-				foreach (io.odysz.semantic.DASemantics.SemanticHandler handler in handlers)
+				foreach (DASemantics.SemanticHandler handler in handlers)
 				{
 					if (handler.post)
 					{
@@ -965,9 +952,9 @@ namespace io.odysz.semantic
 
 			protected internal io.odysz.transact.sql.Transcxt trxt;
 
-			protected internal io.odysz.semantic.DASemantics.smtype sm;
+			protected internal DASemantics.smtype sm;
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			internal SemanticHandler(io.odysz.transact.sql.Transcxt trxt, string semantic, string
 				 tabl, string pk, string[] args)
 			{
@@ -982,17 +969,17 @@ namespace io.odysz.semantic
 					(), target, pkField, io.odysz.common.LangExt.toString(args));
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal virtual void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insrt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			/// <exception cref=".x.SemanticException"/>
+			internal virtual void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insrt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal virtual void onUpdate(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Update
-				 updt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			/// <exception cref=".x.SemanticException"/>
+			internal virtual void onUpdate(.ISemantext stx, io.odysz.transact.sql.Update
+				 updt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 			}
 
@@ -1001,26 +988,26 @@ namespace io.odysz.semantic
 			/// <param name="stmt"/>
 			/// <param name="whereCondt">delete statement's condition.</param>
 			/// <param name="usr"/>
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			/// <exception cref="java.sql.SQLException"></exception>
-			internal virtual void onDelete<_T0>(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Statement
-				<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit whereCondt, io.odysz.semantics.IUser
+			internal virtual void onDelete<_T0>(.ISemantext stx, io.odysz.transact.sql.Statement
+				<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit whereCondt, .IUser
 				 usr)
 				where _T0 : io.odysz.transact.sql.Statement<object>
 			{
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal virtual void onPost<_T0>(io.odysz.semantic.DASemantext sm, io.odysz.transact.sql.Statement
-				<_T0> stmt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr, System.Collections.Generic.List
+			/// <exception cref=".x.SemanticException"/>
+			internal virtual void onPost<_T0>(DASemantext sm, io.odysz.transact.sql.Statement
+				<_T0> stmt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr, List
 				<string> sqlBuf)
 				where _T0 : io.odysz.transact.sql.Statement<object>
 			{
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal SemanticHandler(io.odysz.transact.sql.Transcxt trxt, io.odysz.semantic.DASemantics.smtype
+			/// <exception cref=".x.SemanticException"/>
+			internal SemanticHandler(io.odysz.transact.sql.Transcxt trxt, DASemantics.smtype
 				 sm, string tabl, string pk, string[] args)
 			{
 				this.trxt = trxt;
@@ -1050,8 +1037,8 @@ namespace io.odysz.semantic
 			/// <param name="row">row to expand</param>
 			/// <param name="cols">column index</param>
 			/// <returns>the row expanded</returns>
-			internal static System.Collections.Generic.List<object[]> expandRow(System.Collections.Generic.List
-				<object[]> row, System.Collections.Generic.IDictionary<string, int> cols)
+			internal static List<object[]> expandRow(List
+				<object[]> row, IDictionary<string, int> cols)
 			{
 				if (row == null || cols == null || row.Count >= cols.Count)
 				{
@@ -1072,7 +1059,7 @@ namespace io.odysz.semantic
 				return row;
 			}
 
-			public virtual bool @is(io.odysz.semantic.DASemantics.smtype sm)
+			public virtual bool @is(DASemantics.smtype sm)
 			{
 				return this.sm == sm;
 			}
@@ -1084,7 +1071,7 @@ namespace io.odysz.semantic
 		/// args 0: parent Id field, 1: sibling/sort field (optional), 2: fullpath field
 		/// </summary>
 		/// <author>odys-z@github.com</author>
-		internal class ShFullpath : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShFullpath : DASemantics.SemanticHandler
 		{
 			private static string faqPage = "https://odys-z.github.io/notes/semantics/best-practices.html#DA-concept-fullpath";
 
@@ -1096,10 +1083,10 @@ namespace io.odysz.semantic
 			/// see
 			/// <see cref="smtype.fullpath"/>
 			/// </param>
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			public ShFullpath(io.odysz.transact.sql.Transcxt trxt, string tabl, string recId, 
 				string[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.fullpath, tabl, recId, args)
+				: base(trxt, DASemantics.smtype.fullpath, tabl, recId, args)
 			{
 				insert = true;
 				update = true;
@@ -1116,10 +1103,10 @@ namespace io.odysz.semantic
 				}
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insert, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insert, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				string sibling;
 				try
@@ -1136,7 +1123,7 @@ namespace io.odysz.semantic
 				{
 					if (!cols.Contains(pkField) || row[cols[pkField]] == null)
 					{
-						throw new io.odysz.semantics.x.SemanticException("Fullpath configuration wrong: idField = %s,\nargs:%s,\ncols: %s"
+						throw new .x.SemanticException("Fullpath configuration wrong: idField = %s,\nargs:%s,\ncols: %s"
 							 + "\nSee %s ", pkField, io.odysz.common.LangExt.toString(args), io.odysz.common.LangExt
 							.toString(cols), faqPage);
 					}
@@ -1151,7 +1138,7 @@ namespace io.odysz.semantic
 					}
 					else
 					{
-						io.odysz.semantics.SemanticObject s = trxt.select(target, "_t0").col(args[2]).where
+						.SemanticObject s = trxt.select(target, "_t0").col(args[2]).where
 							("=", pkField, "'" + pid + "'").rs(stx);
 						io.odysz.module.rs.AnResultset rs = (io.odysz.module.rs.AnResultset)s.rs(0);
 						if (rs.beforeFirst().next())
@@ -1172,7 +1159,7 @@ namespace io.odysz.semantic
 					{
 						Sharpen.Runtime.printStackTrace(e);
 					}
-					throw new io.odysz.semantics.x.SemanticException(e.Message);
+					throw new .x.SemanticException(e.Message);
 				}
 				object[] nv;
 				if (cols.Contains(args[2]))
@@ -1191,10 +1178,10 @@ namespace io.odysz.semantic
 				}
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onUpdate(io.odysz.semantics.ISemantext sxt, io.odysz.transact.sql.Update
-				 updt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onUpdate(.ISemantext sxt, io.odysz.transact.sql.Update
+				 updt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				onInsert(sxt, null, row, cols, usr);
 			}
@@ -1206,28 +1193,28 @@ namespace io.odysz.semantic
 		/// </summary>
 		/// <seealso cref="smtype.autoInc"/>
 		/// <author>odys-z@github.com</author>
-		internal class ShAutoK : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShAutoK : DASemantics.SemanticHandler
 		{
 			/// <param name="trxt"/>
 			/// <param name="tabl"/>
 			/// <param name="pk"/>
 			/// <param name="args">0: auto field</param>
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			internal ShAutoK(io.odysz.transact.sql.Transcxt trxt, string tabl, string pk, string
 				[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.autoInc, tabl, pk, args)
+				: base(trxt, DASemantics.smtype.autoInc, tabl, pk, args)
 			{
 				if (args == null || args.Length == 0 || io.odysz.common.LangExt.isblank(args[0]))
 				{
-					throw new io.odysz.semantics.x.SemanticException("AUTO pk semantics configuration not correct. tabl = %s, pk = %s, args: %s"
+					throw new .x.SemanticException("AUTO pk semantics configuration not correct. tabl = %s, pk = %s, args: %s"
 						, tabl, pk, io.odysz.common.LangExt.toString(args));
 				}
 				insert = true;
 			}
 
-			internal override void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insrt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			internal override void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insrt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				object[] nv;
 				if (cols.Contains(args[0]) && cols[args[0]] < row.Count)
@@ -1260,19 +1247,19 @@ namespace io.odysz.semantic
 
 		/// <summary>Handle fk referencing resolving when inserting children.<br /></summary>
 		/// <seealso cref="smtype.fkIns"/>
-		internal class ShFkOnIns : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShFkOnIns : DASemantics.SemanticHandler
 		{
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			internal ShFkOnIns(io.odysz.transact.sql.Transcxt trxt, string tabl, string pk, string
 				[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.fkIns, tabl, pk, args)
+				: base(trxt, DASemantics.smtype.fkIns, tabl, pk, args)
 			{
 				insert = true;
 			}
 
-			internal override void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insrt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			internal override void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insrt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				object[] nv;
 				if (cols.Contains(args[0]) && cols[args[0]] < row.Count)
@@ -1324,23 +1311,23 @@ namespace io.odysz.semantic
 		/// <see cref="smtype.parentChildrenOnDel"/>
 		/// </summary>
 		/// <author>odys-z@github.com</author>
-		internal class ShPCDelAll : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShPCDelAll : DASemantics.SemanticHandler
 		{
 			protected internal string[][] argss;
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			public ShPCDelAll(io.odysz.transact.sql.Transcxt trxt, string tabl, string recId, 
 				string[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.parentChildrenOnDel, tabl, recId
+				: base(trxt, DASemantics.smtype.parentChildrenOnDel, tabl, recId
 					, args)
 			{
 				delete = true;
 				argss = split(args);
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onDelete<_T0>(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Statement
-				<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit condt, io.odysz.semantics.IUser
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onDelete<_T0>(.ISemantext stx, io.odysz.transact.sql.Statement
+				<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit condt, .IUser
 				 usr)
 			{
 				if (argss != null && argss.Length > 0)
@@ -1365,15 +1352,15 @@ namespace io.odysz.semantic
 			/// 
 			/// <see cref="io.odysz.transact.sql.Delete"/>
 			/// </returns>
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			protected internal virtual io.odysz.transact.sql.Delete delChild<_T0>(string[] args
 				, io.odysz.transact.sql.Statement<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit
-				 condt, io.odysz.semantics.IUser usr)
+				 condt, .IUser usr)
 				where _T0 : io.odysz.transact.sql.Statement<object>
 			{
 				if (condt == null)
 				{
-					throw new io.odysz.semantics.x.SemanticException("Parent table %s has a semantics triggering child table (%s) deletion, but the condition is null."
+					throw new .x.SemanticException("Parent table %s has a semantics triggering child table (%s) deletion, but the condition is null."
 						, target, args[1]);
 				}
 				try
@@ -1388,31 +1375,31 @@ namespace io.odysz.semantic
 				}
 				catch (io.odysz.transact.x.TransException e)
 				{
-					throw new io.odysz.semantics.x.SemanticException(e.Message);
+					throw new .x.SemanticException(e.Message);
 				}
 			}
 		}
 
-		internal class ShPCDelByCate : io.odysz.semantic.DASemantics.ShPCDelAll
+		internal class ShPCDelByCate : DASemantics.ShPCDelAll
 		{
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			public ShPCDelByCate(io.odysz.transact.sql.Transcxt trxt, string tabl, string recId
 				, string[] args)
 				: base(trxt, tabl, recId, args)
 			{
-				base.sm = io.odysz.semantic.DASemantics.smtype.parentChildrenOnDelByTabl;
+				base.sm = DASemantics.smtype.parentChildrenOnDelByTabl;
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			protected internal override io.odysz.transact.sql.Delete delChild<_T0>(string[] args
 				, io.odysz.transact.sql.Statement<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit
-				 condt, io.odysz.semantics.IUser usr)
+				 condt, .IUser usr)
 			{
 				return base.delChild(args, stmt, condt, usr).whereEq(args[3], target);
 			}
 		}
 
-		internal class ShFkInsCates : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShFkInsCates : DASemantics.SemanticHandler
 		{
 			protected internal string[][] argss;
 
@@ -1426,19 +1413,19 @@ namespace io.odysz.semantic
 
 			private int ixparentpk = 3;
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			public ShFkInsCates(io.odysz.transact.sql.Transcxt trxt, string tabl, string recId
 				, string[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.fkCateIns, tabl, recId, args)
+				: base(trxt, DASemantics.smtype.fkCateIns, tabl, recId, args)
 			{
 				argss = split(args);
 				insert = true;
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insrt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insrt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				foreach (string[] argus in argss)
 				{
@@ -1473,7 +1460,7 @@ namespace io.odysz.semantic
 					}
 					if (io.odysz.common.LangExt.isblank(bid, "''"))
 					{
-						throw new io.odysz.semantics.x.SemanticException("Semantics %s can't been handled without business record Id - resulving failed: %s.%s"
+						throw new .x.SemanticException("Semantics %s can't been handled without business record Id - resulving failed: %s.%s"
 							, sm.ToString(), argus[ixparentbl], argus[ixparentpk]);
 					}
 					object[] rowBid;
@@ -1524,23 +1511,23 @@ namespace io.odysz.semantic
 		/// e.g. pswd,123456 can set pwd = '123456'
 		/// </remarks>
 		/// <author>odys-z@github.com</author>
-		internal class ShDefltVal : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShDefltVal : DASemantics.SemanticHandler
 		{
 			internal static io.odysz.common.Regex regQuot = new io.odysz.common.Regex("^\\s*'.*'\\s*$"
 				);
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			internal ShDefltVal(io.odysz.transact.sql.Transcxt trxt, string tabl, string recId
 				, string[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.defltVal, tabl, recId, args)
+				: base(trxt, DASemantics.smtype.defltVal, tabl, recId, args)
 			{
 				insert = true;
 				args[1] = dequote(args[1]);
 			}
 
-			internal override void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insrt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			internal override void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insrt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				if (args.Length > 1 && args[1] != null)
 				{
@@ -1587,12 +1574,12 @@ namespace io.odysz.semantic
 		/// args 0: uploads, 1: uri, 2: busiTbl, 3: busiId, 4: client-name (optional)
 		/// </summary>
 		/// <author>odys-z@github.com</author>
-		internal class ShExtFile : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShExtFile : DASemantics.SemanticHandler
 		{
 			/// <summary>
 			/// Saving root.<br />
 			/// The path rooted from return of
-			/// <see cref="io.odysz.semantics.ISemantext.relativpath(string[])"/>
+			/// <see cref=".ISemantext.relativpath(string[])"/>
 			/// .
 			/// </summary>
 			internal const int ixRoot = 0;
@@ -1609,11 +1596,11 @@ namespace io.odysz.semantic
 
 			internal string rootpath = string.Empty;
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			/// <exception cref="java.sql.SQLException"/>
 			internal ShExtFile(io.odysz.transact.sql.Transcxt trxt, string tabl, string pk, string
 				[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.extFile, tabl, pk, args)
+				: base(trxt, DASemantics.smtype.extFile, tabl, pk, args)
 			{
 				delete = true;
 				insert = true;
@@ -1626,9 +1613,9 @@ namespace io.odysz.semantic
 				}
 			}
 
-			internal override void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insrt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			internal override void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insrt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				if (args.Length > 1 && args[1] != null)
 				{
@@ -1687,12 +1674,12 @@ namespace io.odysz.semantic
 			/// <p>Client should avoid updating an external file will handling business logics.</p>
 			/// <p><b>NOTE:</b><br />This can be changed in the future.</p>
 			/// </summary>
-			/// <seealso cref="SemanticHandler.onUpdate(io.odysz.semantics.ISemantext, io.odysz.transact.sql.Update, System.Collections.Generic.List{E}, System.Collections.Generic.IDictionary{K, V}, io.odysz.semantics.IUser)
+			/// <seealso cref="SemanticHandler.onUpdate(.ISemantext, io.odysz.transact.sql.Update, List{E}, IDictionary{K, V}, .IUser)
 			/// 	"/>
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onUpdate(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Update
-				 updt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onUpdate(.ISemantext stx, io.odysz.transact.sql.Update
+				 updt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				if (args.Length > 1 && args[1] != null)
 				{
@@ -1702,17 +1689,17 @@ namespace io.odysz.semantic
 						nv = row[cols[args[ixUri]]];
 						if (nv != null && nv[1] != null && nv[1] is string && ((string)nv[1]).Length > 0)
 						{
-							throw new io.odysz.semantics.x.SemanticException("Found the extFile value presented in %s, but updating is not supported by extFile. See:\n"
-								 + "https://odys-z.github.io/javadoc/semantic.DA/io/odysz/semantic/DASemantics.smtype.html#extFile\n"
+							throw new .x.SemanticException("Found the extFile value presented in %s, but updating is not supported by extFile. See:\n"
+								 + "https://odys-z.github.io/javadoc/semantic.DA/DASemantics.smtype.html#extFile\n"
 								 + "About Updating Handling", args[ixUri]);
 						}
 					}
 				}
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onDelete<_T0>(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Statement
-				<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit condt, io.odysz.semantics.IUser
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onDelete<_T0>(.ISemantext stx, io.odysz.transact.sql.Statement
+				<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit condt, .IUser
 				 usr)
 			{
 				io.odysz.module.rs.AnResultset rs;
@@ -1758,7 +1745,7 @@ namespace io.odysz.semantic
 				}
 				catch (io.odysz.transact.x.TransException e)
 				{
-					throw new io.odysz.semantics.x.SemanticException(e.Message);
+					throw new .x.SemanticException(e.Message);
 				}
 			}
 		}
@@ -1766,23 +1753,23 @@ namespace io.odysz.semantic
 		/// <summary>Check with sql before deleting<br /></summary>
 		/// <seealso cref="smtype.checkSqlCountOnDel"/>
 		/// <author>odys-z@github.com</author>
-		internal class ShChkCntDel : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShChkCntDel : DASemantics.SemanticHandler
 		{
 			private string[][] argss;
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			public ShChkCntDel(io.odysz.transact.sql.Transcxt trxt, string tabl, string recId
 				, string[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.checkSqlCountOnDel, tabl, recId
+				: base(trxt, DASemantics.smtype.checkSqlCountOnDel, tabl, recId
 					, args)
 			{
 				delete = true;
 				argss = split(args);
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onDelete<_T0>(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Statement
-				<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit condt, io.odysz.semantics.IUser
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onDelete<_T0>(.ISemantext stx, io.odysz.transact.sql.Statement
+				<_T0> stmt, io.odysz.transact.sql.parts.condition.Condit condt, .IUser
 				 usr)
 			{
 				if (argss != null && argss.Length > 0)
@@ -1797,12 +1784,12 @@ namespace io.odysz.semantic
 				}
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			private void chkCnt<_T0>(string[] args, io.odysz.transact.sql.Statement<_T0> stmt
 				, io.odysz.transact.sql.parts.condition.Condit condt)
 				where _T0 : io.odysz.transact.sql.Statement<object>
 			{
-				io.odysz.semantics.SemanticObject s;
+				.SemanticObject s;
 				try
 				{
 					io.odysz.transact.sql.Query slct = stmt.transc().select(target).col(args[0]).where
@@ -1815,39 +1802,39 @@ namespace io.odysz.semantic
 					rs.beforeFirst().next();
 					if (rs.getInt("cnt") > 0)
 					{
-						throw new io.odysz.semantics.x.SemanticException("%s.%s: %s %s", target, sm.ToString
-							(), args[1], rs.getInt("cnt")).ex(new io.odysz.semantics.SemanticObject().put("sm"
+						throw new .x.SemanticException("%s.%s: %s %s", target, sm.ToString
+							(), args[1], rs.getInt("cnt")).ex(new .SemanticObject().put("sm"
 							, sm.ToString()).put("tbl", target).put("childTbl", args[1]).put("cnt", rs.getInt
 							("cnt")));
 					}
 				}
 				catch (System.Exception e)
 				{
-					if (e is io.odysz.semantics.x.SemanticException)
+					if (e is .x.SemanticException)
 					{
-						throw (io.odysz.semantics.x.SemanticException)e;
+						throw (.x.SemanticException)e;
 					}
 					Sharpen.Runtime.printStackTrace(e);
-					throw new io.odysz.semantics.x.SemanticException(e.Message);
+					throw new .x.SemanticException(e.Message);
 				}
 			}
 		}
 
-		internal class ShChkPCInsert : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShChkPCInsert : DASemantics.SemanticHandler
 		{
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			public ShChkPCInsert(io.odysz.transact.sql.Transcxt trxt, string tabl, string recId
 				, string[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.checkSqlCountOnInsert, tabl, recId
+				: base(trxt, DASemantics.smtype.checkSqlCountOnInsert, tabl, recId
 					, args)
 			{
 				insert = true;
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insrt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insrt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 				if (args.Length > 1 && args[1] != null)
 				{
@@ -1870,36 +1857,36 @@ namespace io.odysz.semantic
 					string sql = string.format(args[args.Length - 1], nv);
 					try
 					{
-						io.odysz.module.rs.AnResultset rs = io.odysz.semantic.DA.Connects.select(stx.connId
-							(), sql, io.odysz.semantic.DA.Connects.flag_nothing);
+						io.odysz.module.rs.AnResultset rs = DA.Connects.select(stx.connId
+							(), sql, DA.Connects.flag_nothing);
 						rs.beforeFirst().next();
 						if (rs.getInt(1) > 0)
 						{
-							throw new io.odysz.semantics.x.SemanticException("Checking count on %s.%s (%s = %s ...) failed"
-								, target, pkField, args[0], nv[0]).ex(new io.odysz.semantics.SemanticObject().put
+							throw new .x.SemanticException("Checking count on %s.%s (%s = %s ...) failed"
+								, target, pkField, args[0], nv[0]).ex(new .SemanticObject().put
 								("sm", sm.ToString()).put("tbl", target).put("childTbl", args[0]).put("childField"
 								, nv[0]));
 						}
 					}
 					catch (java.sql.SQLException)
 					{
-						throw new io.odysz.semantics.x.SemanticException("Can't access db to check count on insertion, check sql configuration: %s"
+						throw new .x.SemanticException("Can't access db to check count on insertion, check sql configuration: %s"
 							, sql);
 					}
 				}
 			}
 		}
 
-		internal class ShDencrypt : io.odysz.semantic.DASemantics.SemanticHandler
+		internal class ShDencrypt : DASemantics.SemanticHandler
 		{
 			internal string colIv;
 
 			internal string colCipher;
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
+			/// <exception cref=".x.SemanticException"/>
 			internal ShDencrypt(io.odysz.transact.sql.Transcxt trxt, string tabl, string pk, 
 				string[] args)
-				: base(trxt, io.odysz.semantic.DASemantics.smtype.dencrypt, tabl, pk, args)
+				: base(trxt, DASemantics.smtype.dencrypt, tabl, pk, args)
 			{
 				insert = true;
 				update = true;
@@ -1907,12 +1894,13 @@ namespace io.odysz.semantic
 				colCipher = args[0];
 			}
 
-			/// <exception cref="io.odysz.semantics.x.SemanticException"/>
-			internal override void onInsert(io.odysz.semantics.ISemantext stx, io.odysz.transact.sql.Insert
-				 insrt, System.Collections.Generic.List<object[]> row, System.Collections.Generic.IDictionary
-				<string, int> cols, io.odysz.semantics.IUser usr)
+			/// <exception cref=".x.SemanticException"/>
+			internal override void onInsert(.ISemantext stx, io.odysz.transact.sql.Insert
+				 insrt, List<object[]> row, IDictionary
+				<string, int> cols, .IUser usr)
 			{
 			}
 		}
+		*/
 	}
 }

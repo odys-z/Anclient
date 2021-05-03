@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
-import io.odysz.jclient.AnsonClient;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.ext.AnDatasetReq;
 import io.odysz.semantic.ext.AnDatasetResp;

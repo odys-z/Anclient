@@ -1,14 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-using io.oz.anson;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace io.oz.anson.Tests
+namespace io.odysz.anson.tests
 {
     [TestClass()]
     public class AnstonTests
@@ -16,11 +11,10 @@ namespace io.oz.anson.Tests
         [TestMethod()]
         public void AnstonTest()
         {
-            // Assert.Fail();
-            Antson a = new Antson();
+            Anson a = new();
             string jsn = JsonConvert.SerializeObject(a);
             StringAssert.Contains(jsn, "{}");
-            Antson b = JsonConvert.DeserializeObject<Antson>(jsn);
+            Anson b = JsonConvert.DeserializeObject<Anson>(jsn);
             Console.WriteLine(b);
         }
     }

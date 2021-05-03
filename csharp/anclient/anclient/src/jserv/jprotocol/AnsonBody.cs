@@ -1,23 +1,37 @@
-using io.odysz.anson;
-
 namespace io.odysz.semantic.jprotocol
 {
-	public abstract class AnsonBody : Anson
+	public class AnsonBody
 	{
-		protected internal AnsonMsg<AnsonBody> parent;
+		/// <summary>
+		/// @AnsonField(ref= AnsonField.enclosing)
+		/// </summary>
+		public AnsonMsg parent { get; internal set; }
 
-		protected internal string conn { get; }
+		public AnsonBody Parent(AnsonMsg p)
+        {
+			parent = p;
+			return this;
+        }
 
-		/// <summary>Action: login | C | R | U | D | any serv extension</summary>
-		protected internal string a { get; set; }
+		public string conn { get; }
 
-		//public virtual AnsonBody a(string act)
-		//{
-		//	this.a = act;
-		//	return this;
-		//}
+		/// <summary>
+		/// Action: login | C | R | U | D | any serv extension
+		/// </summary>
+		protected string a { get; set; }
 
-		protected internal AnsonBody(AnsonMsg<AnsonBody> parent, string conn)
+        /// <summary>
+        /// @return Action: login | C | R | U | D | any serv extension
+        /// </summary>
+        // public string a() { return _a; }
+
+        public AnsonBody A(string act)
+        {
+            a = act;
+            return this;
+        }
+
+        public AnsonBody(AnsonMsg parent, string conn)
 		{
 			this.parent = parent;
 			this.conn = conn;
