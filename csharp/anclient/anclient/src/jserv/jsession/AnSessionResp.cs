@@ -4,7 +4,7 @@ namespace io.odysz.semantic.jsession
 {
 	public class AnSessionResp : AnsonResp
 	{
-		internal SessionInf ssInf { get; set; }
+		public SessionInf ssInf { get; protected set; }
 
 		public AnSessionResp(AnsonMsg parent, string ssid, string uid, params string[] roleId)
 			: base(parent)

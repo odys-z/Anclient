@@ -2,6 +2,7 @@
 using io.odysz.semantic.ext;
 using io.odysz.semantic.jprotocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections;
 using System.Collections.Generic;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
 
@@ -17,14 +18,19 @@ namespace io.odysz.anclient
 
         static ClientsTests()
         {
-            Clients.init(jserv);
+            Clients.Init(jserv);
             // client = Clients.login(uid, pswd); 
         }
 
         [TestMethod()]
         public void TestLogin()
         {
-            client = Clients.login(uid, pswd); 
+            Clients.Login(uid, pswd,
+                (code, resp) =>
+                {
+                    client = new AnsonClient(resp.ssInf);
+                    Assert.AreEqual(uid, resp.ssInf.uid);
+                });
         }
 
         public void TestMenu(string s, string roleId)
@@ -42,8 +48,8 @@ namespace io.odysz.anclient
             client.Console(jmsg);
             
             client.Commit(jmsg, (code, data) => {
-                    List<object> rses = (List<object>)((AnDatasetResp)data).Forest();
-                    Utils.logi(rses);;
+                    IList rses = (IList)((AnDatasetResp)data.Body()?[0]).Forest();
+                    Utils.Logi(rses);;
                 });
         }
     }

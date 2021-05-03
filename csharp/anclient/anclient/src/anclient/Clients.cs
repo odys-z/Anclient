@@ -21,7 +21,7 @@ namespace io.odysz.anclient
 		/// <summary>Initialize configuration.
 		/// </summary>
 		/// <param>servRoot</param>
-		public static void init(string servRoot)
+		public static void Init(string servRoot)
 		{
 			servRt = servRoot;
 			conn = null; // client can't control engine connect. configured in workflow-meta.xml
@@ -36,7 +36,7 @@ namespace io.odysz.anclient
 		/// @throws SemanticException Request can not parsed correctly 
 		/// @throws GeneralSecurityException  other error
 		/// @throws Exception, most likely the network failed
-		public static AnsonClient login(string uid, string pswdPlain)
+		public static AnsonClient Login(string uid, string pswdPlain, Action<int, AnSessionResp> onlogin = null)
 		{
             byte[] iv = AESHelper.getRandom();
             string iv64 = AESHelper.Encode64(iv);
@@ -51,29 +51,29 @@ namespace io.odysz.anclient
             AnsonClient[] inst = new AnsonClient[1];
 
             HttpServClient httpClient = new HttpServClient();
-            string url = servUrl(new Port(Port.session));
+            string url = ServUrl(new Port(Port.session));
             httpClient.Post(url, reqv11, (code, msg) => {
-                        if (MsgCode.ok == code.code) {
-                            // create a logged in client
-                            inst[0] = new AnsonClient(((AnSessionResp) msg).ssInf);
+                    if (MsgCode.ok == code.code) {
+                        // create a logged in client
+                        inst[0] = new AnsonClient(((AnSessionResp) msg.Body()[0]).ssInf);
+                        if (onlogin != null)
+                            onlogin(code.code, (AnSessionResp)msg.Body()[0]);
 
                         if (Clients.console) // Utils.logi(msg.ToString());
                             Console.WriteLine(msg.ToString());
-                        }
-                        else throw new SemanticException(
-                                "loging failed\ncode: {}\nerror: {}",
-                                code, ((AnsonResp) msg).msg());
+                    }
+                    else throw new SemanticException(
+                            "loging failed\ncode: {}\nerror: {}",
+                            code, ((AnsonResp) msg.Body()[0]).msg());
             } );
-            // if (inst[0] == null)
-            //    throw new IOException("HttpServClient return null client.");
-            return inst[0]; // FIXME 
+            return inst[0];
         }
 	
         /**Helper for generate serv url (with configured server root and db connection ID).
          * @param port
          * @return url, e.g. http://localhost:8080/query.serv?conn=null
          */
-        public static string servUrl(IPort port)
+        public static string ServUrl(IPort port)
         {
             return string.Format("{0:S}/{1:S}?conn={2:S}", servRt, port.url, conn);
         }

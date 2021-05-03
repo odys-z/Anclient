@@ -48,9 +48,9 @@
               "target": "Package",
               "version": "[4.9.2, )"
             },
-            "Newtonsoft.Json": {
+            "Antson.CSharp": {
               "target": "Package",
-              "version": "[13.0.1, )"
+              "version": "[0.9.3, )"
             }
           },
           "imports": [

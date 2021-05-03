@@ -19,7 +19,7 @@ namespace io.odysz.anclient
 
         /// <summary>Session login response from server.</summary>
         /// <paramref name="sessionInfo"></paramref>
-        internal AnsonClient(SessionInf sessionInfo)
+        public AnsonClient(SessionInf sessionInfo)
 		{
 			this.ssInf = sessionInfo;
 		}
@@ -126,10 +126,10 @@ namespace io.odysz.anclient
             return this;
         }
 
-        public void Commit(AnsonMsg req, Action<MsgCode, object> onOk, Action<MsgCode, object> onErr = null)
+        public void Commit(AnsonMsg req, Action<MsgCode, AnsonMsg> onOk, Action<MsgCode, AnsonMsg> onErr = null)
         {
             HttpServClient httpClient = new HttpServClient();
-            httpClient.Post(Clients.servUrl(req.port), req,
+            httpClient.Post(Clients.ServUrl(req.port), req,
                     (code, obj) => {
                         if (Clients.console)
                         {
@@ -144,11 +144,11 @@ namespace io.odysz.anclient
                             if (onErr != null)
                                 onErr(code, obj);
                             else System.Console.Error.WriteLine("code: {0}\nerror: {1}",
-                                code, ((AnsonResp)obj).msg());
+                                code, obj);
                         }
                     });
         }
 
-	    public void logout() { }
+	    public void Logout() { }
     }
 }

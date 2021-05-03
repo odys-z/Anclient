@@ -1,5 +1,5 @@
-﻿using io.odysz.semantic.jprotocol;
-using Newtonsoft.Json;
+﻿using io.odysz.anson;
+using io.odysz.semantic.jprotocol;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -20,18 +20,28 @@ namespace io.odysz.anclient
         /// <param name="url"></param>
         /// <param name="req"></param>
         /// <param name="onResp"></param>
-        internal async void Post(string url, AnsonMsg req, Action<MsgCode, object> onResp)
+        internal async void Post(string url, AnsonMsg req, Action<MsgCode, AnsonMsg> onResp)
         {
             using (var client = new HttpClient())
             {
                 try
                 {
+                    /*
                     StringContent payload = new StringContent(JsonConvert.SerializeObject(req),
-                                                Encoding.UTF8, "application/json");
+                                Encoding.UTF8, "application/json");
                     var jresponse = await client.PostAsync(url, payload);
 
                     string jresp = await jresponse.Content.ReadAsStringAsync();
                     AnsonMsg resp = (AnsonMsg)JsonConvert.DeserializeObject(jresp);
+                    onResp(resp.code, resp);
+                    */
+                    // what about http stream?
+                    MemoryStream s = new MemoryStream();
+                    req.ToBlock(s);
+                    StringContent payload = new StringContent(anson.Utils.ToString(s),
+                                                Encoding.UTF8, "application/json");
+                    var jresponse = await client.PostAsync(url, payload);
+                    AnsonMsg resp = (AnsonMsg)Anson.FromJson(jresponse.ToString());
                     onResp(resp.code, resp);
                 }
                 catch (Exception ex)
