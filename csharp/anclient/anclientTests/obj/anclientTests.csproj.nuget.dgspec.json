@@ -124,9 +124,9 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "Antson.CSharp": {
+            "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[0.9.3, )"
+              "version": "[13.0.1, )"
             }
           },
           "imports": [
