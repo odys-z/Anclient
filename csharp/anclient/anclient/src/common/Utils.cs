@@ -5,9 +5,11 @@ namespace io.odysz.anclient
 {
     internal class Utils
     {
-        internal static void logi(List<object> rses)
+        internal static void Logi(List<object> rses)
         {
-            throw new NotImplementedException();
+            foreach(object r in rses) {
+                Console.WriteLine(r.ToString());
+            }
         }
     }
 }

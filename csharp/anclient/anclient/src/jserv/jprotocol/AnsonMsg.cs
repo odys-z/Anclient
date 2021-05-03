@@ -196,23 +196,17 @@ namespace io.odysz.semantic.jprotocol
 				this.code = code;
 			}
 
-			internal int code { get; set; }
-            public MsgCode(int code)
-            {
-				this.code = code;
-            }
-
             public bool eq(string code)
 			{
 				if (code == null)
 				{
 					return false;
 				}
-				int c = codeOf(code);
+				int c = CodeOf(code);
 				return this.code == c;
 			}
 
-			private static int codeOf(string name)
+			private static int CodeOf(string name)
 			{
 				name = name.ToLower();
 				return name == "ok" ? MsgCode.ok
@@ -224,19 +218,6 @@ namespace io.odysz.semantic.jprotocol
 					: name == "exgeneral" ? MsgCode.exGeneral
 					: MsgCode.ext;
 			}
-
-            private static int codeOf(string name)
-            {
-				name = name.ToLower();
-				return name == "ok" ? MsgCode.ok
-					: name == "exsession" ? MsgCode.exSession
-					: name == "exsemantic" ? MsgCode.exSemantic
-					: name == "exio" ? MsgCode.exIo
-					: name == "extransct" ? MsgCode.exTransct
-					: name == "exda" ? MsgCode.exDA
-					: name == "exgeneral" ? MsgCode.exGeneral
-					: MsgCode.ext;
-            }
         }
 
 		/// <summary>The default IPort implelemtation.</summary>

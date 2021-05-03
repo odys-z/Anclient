@@ -60,11 +60,11 @@ namespace io.odysz.anclient
                             onlogin(code.code, (AnSessionResp)msg.Body()[0]);
 
                             if (Clients.console)
-                                Utils.logi(msg.toString());
+                                Console.WriteLine(msg.ToString());
                 }
                                 else throw new SemanticException(
                                         "loging failed\ncode: {0}\nerror: {1}",
-                                        code, ((AnsonResp) msg).msg());
+                                        code, ((AnSessionResp) msg.Body()[0]).msg());
             } );
             return inst[0];
         }
