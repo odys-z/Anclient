@@ -2,49 +2,59 @@
   "version": 3,
   "targets": {
     "net5.0": {
-      "Newtonsoft.Json/13.0.1": {
+      "Antlr4.Runtime.Standard/4.9.2": {
         "type": "package",
         "compile": {
-          "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+          "lib/netstandard2.0/Antlr4.Runtime.Standard.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+          "lib/netstandard2.0/Antlr4.Runtime.Standard.dll": {}
+        }
+      },
+      "Antson.CSharp/0.9.3": {
+        "type": "package",
+        "dependencies": {
+          "Antlr4.Runtime.Standard": "4.9.2"
+        },
+        "compile": {
+          "lib/net472/antson.csharp.dll": {}
+        },
+        "runtime": {
+          "lib/net472/antson.csharp.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "Newtonsoft.Json/13.0.1": {
-      "sha512": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A==",
+    "Antlr4.Runtime.Standard/4.9.2": {
+      "sha512": "NH/CZeP56ERa+1w7HqlQKXMVBlkNHOWrjF3holW5XgUdyDP36Mw0SynoNj6jD7UNqhxc+4YYfOWXajO3U1Q2dw==",
       "type": "package",
-      "path": "newtonsoft.json/13.0.1",
+      "path": "antlr4.runtime.standard/4.9.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "LICENSE.md",
-        "lib/net20/Newtonsoft.Json.dll",
-        "lib/net20/Newtonsoft.Json.xml",
-        "lib/net35/Newtonsoft.Json.dll",
-        "lib/net35/Newtonsoft.Json.xml",
-        "lib/net40/Newtonsoft.Json.dll",
-        "lib/net40/Newtonsoft.Json.xml",
-        "lib/net45/Newtonsoft.Json.dll",
-        "lib/net45/Newtonsoft.Json.xml",
-        "lib/netstandard1.0/Newtonsoft.Json.dll",
-        "lib/netstandard1.0/Newtonsoft.Json.xml",
-        "lib/netstandard1.3/Newtonsoft.Json.dll",
-        "lib/netstandard1.3/Newtonsoft.Json.xml",
-        "lib/netstandard2.0/Newtonsoft.Json.dll",
-        "lib/netstandard2.0/Newtonsoft.Json.xml",
-        "newtonsoft.json.13.0.1.nupkg.sha512",
-        "newtonsoft.json.nuspec",
-        "packageIcon.png"
+        "antlr4.runtime.standard.4.9.2.nupkg.sha512",
+        "antlr4.runtime.standard.nuspec",
+        "lib/netstandard2.0/Antlr4.Runtime.Standard.dll",
+        "lib/netstandard2.0/Antlr4.Runtime.Standard.xml"
+      ]
+    },
+    "Antson.CSharp/0.9.3": {
+      "sha512": "rcclGuhJsbnRSHynVhFyokrj2HxwoYgGhWqTgQ9KOSyLMWKm40Q2qHWgdnrQDukPMRPoELqvY3+ODM0LkGH/2A==",
+      "type": "package",
+      "path": "antson.csharp/0.9.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "antson.csharp.0.9.3.nupkg.sha512",
+        "antson.csharp.nuspec",
+        "lib/net472/antson.csharp.dll"
       ]
     }
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "Newtonsoft.Json >= 13.0.1"
+      "Antson.CSharp >= 0.9.3"
     ]
   },
   "packageFolders": {
@@ -91,9 +101,9 @@
       "net5.0": {
         "targetAlias": "net5.0",
         "dependencies": {
-          "Newtonsoft.Json": {
+          "Antson.CSharp": {
             "target": "Package",
-            "version": "[13.0.1, )"
+            "version": "[0.9.3, )"
           }
         },
         "imports": [
@@ -114,5 +124,17 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Antson.CSharp 0.9.3' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Antson.CSharp",
+      "targetGraphs": [
+        "net5.0"
+      ]
+    }
+  ]
 }
