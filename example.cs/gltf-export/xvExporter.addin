@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>xv gltf addin</Name>
+    <Assembly>xvExporter/gltf-export.dll</Assembly>
+    <AddInId>f7e7fd23-bd18-46fd-9ece-29db50f23420</AddInId>
+    <FullClassName>io.odysz.anclient.example.revit.ExApp</FullClassName>
+    <VendorId>odysz.github.io</VendorId>
+    <VendorDescription>Odys Zhou</VendorDescription>
+  </AddIn>
+</RevitAddIns>

@@ -4,23 +4,23 @@ using System.Reflection;
 using System.IO;
 using System.Windows.Media.Imaging;
 
-namespace io.odysz.anclient.example.cs
+namespace io.odysz.anclient.example.revit
 {
     /// <summary>
-    /// This application's main class. The class must be Public.
+    /// This exporter application's main class. The class must be Public.
     ///
     /// </summary>
     public class ExApp : IExternalApplication {
-        private static string icoPath = @"odysz.png";
+        private static string icoPath = @"xvExporter/assets/xv.png";
 
         public Result OnStartup(UIControlledApplication application) {
             // Add a new ribbon panel
-            RibbonPanel ribbonPanel = application.CreateRibbonPanel("Inforise Test");
+            RibbonPanel ribbonPanel = application.CreateRibbonPanel("GLTF Export");
 
             // Create a push button to trigger a command add it to the ribbon panel.
             string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
-            PushButtonData buttonData = new PushButtonData("cmdHelloWorld",
-               "Hello World", thisAssemblyPath, "io.odysz.hello.revit.lession6.ExCmds");
+            PushButtonData buttonData = new PushButtonData("cmdXp",
+               "x-visual...", thisAssemblyPath, "io.odysz.anclient.example.revit.ExCmds");
 
             PushButton pushButton = ribbonPanel.AddItem(buttonData) as PushButton;
 

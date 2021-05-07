@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Argyle.glTFRevitExport, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.0\lib\net40\Argyle.glTFRevitExport.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.0\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="RevitAPI">
       <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
@@ -54,5 +60,16 @@
     <Compile Include="src\Forms.cs" />
     <Compile Include="src\ExCmds.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\xv.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /y "$(ProjectDir)xvExporter.addin" "$(ALLUSERSPROFILE)/Autodesk/Revit/Addins/2017/"
+xcopy /y /i "$(ProjectDir)..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.0\assets\*" "$(ALLUSERSPROFILE)/Autodesk/Revit/Addins/2017/xvExporter/assets"
+xcopy /y /i "$(ProjectDir)..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.0\lib\*" "$(ALLUSERSPROFILE)/Autodesk/Revit/Addins/2017/xvExporter"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

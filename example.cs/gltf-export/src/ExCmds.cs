@@ -9,16 +9,23 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.Architecture;
+using GLTFRevitExport;
 
-namespace io.odysz.hello.revit.lession6
+namespace io.odysz.anclient.example.revit
 {
     /// <remarks>
-    /// The "Lession 6" external command. The class must be Public.
+    /// The exporter external command. The class must be Public.
     /// </remarks>
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
-    public class ExCmds : IExternalCommand
+    public class XvCmds : IExternalCommand
     {
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        {
+            GLTFExporter x = new();
+            return x.Excute(commandData, message, elements);
+        }
+        /*
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             //Get application and documnet objects
@@ -116,6 +123,7 @@ namespace io.odysz.hello.revit.lession6
             XYZ roomCenter = new XYZ(boundCenter.X, boundCenter.Y, locPt.Point.Z);
             return roomCenter;
         }
+        */
     }
 
 }
