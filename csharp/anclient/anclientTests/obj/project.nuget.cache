@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "SY4zuerW8MHtYQzFra4G4319qAo6WWlcY+yUMHdosg/Yc3F9t/ij54dftnL9TK7G/oULWVlu4ap32Iycct5M/w==",
+  "dgSpecHash": "zVayB2/I6eltvZg88LxSljBFsckOJquCBpJCVjm5U1rF/7SPC39v/b7jYNBxT70GOKdfrifOLY4qk7zlw9LMnQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Alice\\github\\anclient\\csharp\\anclient\\anclientTests\\anclientTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Alice\\.nuget\\packages\\antlr4.runtime.standard\\4.9.2\\antlr4.runtime.standard.4.9.2.nupkg.sha512",
-    "C:\\Users\\Alice\\.nuget\\packages\\antson.csharp\\0.9.9\\antson.csharp.0.9.9.nupkg.sha512",
+    "C:\\Users\\Alice\\.nuget\\packages\\antson.csharp\\0.9.10\\antson.csharp.0.9.10.nupkg.sha512",
     "C:\\Users\\Alice\\.nuget\\packages\\coverlet.collector\\1.3.0\\coverlet.collector.1.3.0.nupkg.sha512",
     "C:\\Users\\Alice\\.nuget\\packages\\microsoft.codecoverage\\16.7.1\\microsoft.codecoverage.16.7.1.nupkg.sha512",
     "C:\\Users\\Alice\\.nuget\\packages\\microsoft.csharp\\4.0.1\\microsoft.csharp.4.0.1.nupkg.sha512",
@@ -107,7 +107,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'Antson.CSharp 0.9.9' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
+      "message": "Package 'Antson.CSharp 0.9.10' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
       "libraryId": "Antson.CSharp",
       "targetGraphs": [
         "net5.0"

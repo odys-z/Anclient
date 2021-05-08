@@ -11,15 +11,17 @@
           "lib/netstandard2.0/Antlr4.Runtime.Standard.dll": {}
         }
       },
-      "Antson.CSharp/0.9.9": {
+      "Antson.CSharp/0.9.10": {
         "type": "package",
         "dependencies": {
           "Antlr4.Runtime.Standard": "4.9.2"
         },
         "compile": {
+          "lib/net40/Antlr4.Runtime.Standard.dll": {},
           "lib/net40/antson.csharp.dll": {}
         },
         "runtime": {
+          "lib/net40/Antlr4.Runtime.Standard.dll": {},
           "lib/net40/antson.csharp.dll": {}
         }
       },
@@ -1781,7 +1783,7 @@
         "framework": ".NETCoreApp,Version=v3.1",
         "dependencies": {
           "Antlr4.Runtime.Standard": "4.9.2",
-          "Antson.CSharp": "0.9.9"
+          "Antson.CSharp": "0.9.10"
         },
         "compile": {
           "bin/placeholder/anclient.dll": {}
@@ -1806,19 +1808,17 @@
         "lib/netstandard2.0/Antlr4.Runtime.Standard.xml"
       ]
     },
-    "Antson.CSharp/0.9.9": {
-      "sha512": "J0UmqgQePhL6mhEKlpjyeo+8N17rZ589zGGiCH4tPHwS5ncfS476Y/FW4rAi7S1+9UroLObslk3nWsZIvL3RLA==",
+    "Antson.CSharp/0.9.10": {
+      "sha512": "7w3ipB5711IPtsYF8LJUWrKqGoAUMQn9nvFzs09EZWU4nGmhRHoPJrZjVkhw4jzB/sWp6/MY4RGPkPIXkX+Z2A==",
       "type": "package",
-      "path": "antson.csharp/0.9.9",
+      "path": "antson.csharp/0.9.10",
       "files": [
         ".nupkg.metadata",
         "Properties/AssemblyInfo.cs",
-        "antson.csharp.0.9.9.nupkg.sha512",
+        "antson.csharp.0.9.10.nupkg.sha512",
         "antson.csharp.csproj",
         "antson.csharp.csproj.user",
         "antson.csharp.nuspec",
-        "bin/Debug/Antlr4.Runtime.Standard.dll",
-        "bin/Debug/Antlr4.Runtime.Standard.xml",
         "bin/Debug/System.Data.Common.dll",
         "bin/Debug/System.Diagnostics.StackTrace.dll",
         "bin/Debug/System.Diagnostics.Tracing.dll",
@@ -1833,6 +1833,9 @@
         "bin/Debug/System.Xml.XPath.XDocument.dll",
         "bin/Debug/antson.csharp.dll",
         "bin/Debug/antson.csharp.pdb",
+        "lib/net40/Antlr4.Runtime.Standard.dll",
+        "lib/net40/Antlr4.Runtime.Standard.xml",
+        "lib/net40/README.md",
         "lib/net40/antson.csharp.dll",
         "lib/net40/antson.csharp.pdb",
         "nuget.exe",
@@ -6341,7 +6344,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'Antson.CSharp 0.9.9' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
+      "message": "Package 'Antson.CSharp 0.9.10' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
       "libraryId": "Antson.CSharp",
       "targetGraphs": [
         "net5.0"

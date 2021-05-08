@@ -136,7 +136,7 @@
             },
             "Antson.CSharp": {
               "target": "Package",
-              "version": "[0.9.9, )"
+              "version": "[0.9.10, )"
             }
           },
           "imports": [
