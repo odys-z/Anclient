@@ -9,7 +9,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.Architecture;
-using GLTFRevitExport;
 
 namespace io.odysz.anclient.example.revit
 {
@@ -22,8 +21,11 @@ namespace io.odysz.anclient.example.revit
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            /*
             GLTFExporter x = new();
             return x.Excute(commandData, message, elements);
+            */
+            return new Result();
         }
         /*
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)

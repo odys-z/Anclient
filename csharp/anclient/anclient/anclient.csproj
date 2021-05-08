@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.2" />
-    <PackageReference Include="Antson.CSharp" Version="0.9.3" />
+    <PackageReference Include="Antson.CSharp" Version="0.9.10" />
   </ItemGroup>
 
   <ItemGroup>
