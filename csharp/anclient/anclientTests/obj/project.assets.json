@@ -11,16 +11,16 @@
           "lib/netstandard2.0/Antlr4.Runtime.Standard.dll": {}
         }
       },
-      "Antson.CSharp/0.9.3": {
+      "Antson.CSharp/0.9.9": {
         "type": "package",
         "dependencies": {
           "Antlr4.Runtime.Standard": "4.9.2"
         },
         "compile": {
-          "lib/net472/antson.csharp.dll": {}
+          "lib/net40/antson.csharp.dll": {}
         },
         "runtime": {
-          "lib/net472/antson.csharp.dll": {}
+          "lib/net40/antson.csharp.dll": {}
         }
       },
       "coverlet.collector/1.3.0": {
@@ -1778,10 +1778,10 @@
       },
       "anclient/1.0.0": {
         "type": "project",
-        "framework": ".NETCoreApp,Version=v5.0",
+        "framework": ".NETCoreApp,Version=v3.1",
         "dependencies": {
           "Antlr4.Runtime.Standard": "4.9.2",
-          "Antson.CSharp": "0.9.3"
+          "Antson.CSharp": "0.9.9"
         },
         "compile": {
           "bin/placeholder/anclient.dll": {}
@@ -1806,16 +1806,62 @@
         "lib/netstandard2.0/Antlr4.Runtime.Standard.xml"
       ]
     },
-    "Antson.CSharp/0.9.3": {
-      "sha512": "rcclGuhJsbnRSHynVhFyokrj2HxwoYgGhWqTgQ9KOSyLMWKm40Q2qHWgdnrQDukPMRPoELqvY3+ODM0LkGH/2A==",
+    "Antson.CSharp/0.9.9": {
+      "sha512": "J0UmqgQePhL6mhEKlpjyeo+8N17rZ589zGGiCH4tPHwS5ncfS476Y/FW4rAi7S1+9UroLObslk3nWsZIvL3RLA==",
       "type": "package",
-      "path": "antson.csharp/0.9.3",
+      "path": "antson.csharp/0.9.9",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
-        "antson.csharp.0.9.3.nupkg.sha512",
+        "Properties/AssemblyInfo.cs",
+        "antson.csharp.0.9.9.nupkg.sha512",
+        "antson.csharp.csproj",
+        "antson.csharp.csproj.user",
         "antson.csharp.nuspec",
-        "lib/net472/antson.csharp.dll"
+        "bin/Debug/Antlr4.Runtime.Standard.dll",
+        "bin/Debug/Antlr4.Runtime.Standard.xml",
+        "bin/Debug/System.Data.Common.dll",
+        "bin/Debug/System.Diagnostics.StackTrace.dll",
+        "bin/Debug/System.Diagnostics.Tracing.dll",
+        "bin/Debug/System.Globalization.Extensions.dll",
+        "bin/Debug/System.IO.Compression.dll",
+        "bin/Debug/System.Net.Http.dll",
+        "bin/Debug/System.Net.Sockets.dll",
+        "bin/Debug/System.Runtime.Serialization.Primitives.dll",
+        "bin/Debug/System.Security.Cryptography.Algorithms.dll",
+        "bin/Debug/System.Security.SecureString.dll",
+        "bin/Debug/System.Threading.Overlapped.dll",
+        "bin/Debug/System.Xml.XPath.XDocument.dll",
+        "bin/Debug/antson.csharp.dll",
+        "bin/Debug/antson.csharp.pdb",
+        "lib/net40/antson.csharp.dll",
+        "lib/net40/antson.csharp.pdb",
+        "nuget.exe",
+        "obj/Debug/.NETFramework,Version=v4.0.AssemblyAttributes.cs",
+        "obj/Debug/.NETFramework,Version=v4.7.1.AssemblyAttributes.cs",
+        "obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs",
+        "obj/Debug/DesignTimeResolveAssemblyReferences.cache",
+        "obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache",
+        "obj/Debug/antson.csharp.csproj.CopyComplete",
+        "obj/Debug/antson.csharp.csproj.CoreCompileInputs.cache",
+        "obj/Debug/antson.csharp.csproj.FileListAbsolute.txt",
+        "obj/Debug/antson.csharp.dll",
+        "obj/Debug/antson.csharp.pdb",
+        "packages.config",
+        "src/gen/antlr/JSONBaseListener.cs",
+        "src/gen/antlr/JSONLexer.cs",
+        "src/gen/antlr/JSONListener.cs",
+        "src/gen/antlr/JSONParser.cs",
+        "src/io.odysz/Anson.cs",
+        "src/io.odysz/AnsonException.cs",
+        "src/io.odysz/AnsonField.cs",
+        "src/io.odysz/AnsonFlags.cs",
+        "src/io.odysz/IJsonable.cs",
+        "src/io.odysz/JSONAnsonListener.cs",
+        "src/io.odysz/JsonOpt.cs",
+        "src/io.odysz/Utils.cs",
+        "test/io.odysz/AnsT_i.cs",
+        "test/io.odysz/AnsonResultset.cs",
+        "test/io.odysz/jprotocol.cs"
       ]
     },
     "coverlet.collector/1.3.0": {
@@ -6295,7 +6341,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'Antson.CSharp 0.9.3' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
+      "message": "Package 'Antson.CSharp 0.9.9' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
       "libraryId": "Antson.CSharp",
       "targetGraphs": [
         "net5.0"

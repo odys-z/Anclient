@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr4.Runtime.Standard, Version=4.9.2.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <HintPath>..\..\csharp\anclient\packages\Antson.CSharp.0.9.10\lib\net40\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
+    <Reference Include="antson.csharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\csharp\anclient\packages\Antson.CSharp.0.9.10\lib\net40\antson.csharp.dll</HintPath>
+    </Reference>
     <Reference Include="Argyle.glTFRevitExport, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.0\lib\net40\Argyle.glTFRevitExport.dll</HintPath>
     </Reference>
@@ -62,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="xvExporter.addin" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\xv.png" />
