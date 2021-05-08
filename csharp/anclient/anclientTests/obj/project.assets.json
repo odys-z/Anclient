@@ -1757,7 +1757,7 @@
       },
       "anclient/1.0.0": {
         "type": "project",
-        "framework": "Unsupported,Version=v0.0",
+        "framework": ".NETCoreApp,Version=v3.1",
         "compile": {
           "bin/placeholder/anclient.dll": {}
         },
@@ -6115,16 +6115,5 @@
         }
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Project anclient is not compatible with netcoreapp5.0 (.NETCoreApp,Version=v5.0). Project anclient supports: net50 (.NETFramework,Version=v5.0)",
-      "libraryId": "anclient",
-      "targetGraphs": [
-        ".NETCoreApp,Version=v5.0"
-      ]
-    }
-  ]
+  }
 }
