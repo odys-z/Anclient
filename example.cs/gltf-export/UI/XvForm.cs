@@ -122,8 +122,6 @@ namespace io.odysz.anclient.example.revit {
                 //  prompt += " | " + e.Name + "\n";
                 prompt += $"{e.Name} {e.ParametersMap}: {e.Id}, type {e.GetType()} : {e.GetTypeId()}, {e.IsHidden(view)}\r\n";
             }
-            // TaskDialog.Show("Revit", prompt);
-            txtFireAlarms.Text = prompt;
         }
 
         private void getWall() {
@@ -140,8 +138,6 @@ namespace io.odysz.anclient.example.revit {
             foreach (Element e in walls) {
                 prompt += " | " + e.Name + "\n";
             }
-            // TaskDialog.Show("Revit", prompt);
-            txtWall.Text = prompt;
         }
 
         private void getAllFamilies() {
@@ -155,14 +151,7 @@ namespace io.odysz.anclient.example.revit {
                     sb.AppendLine(String.Format("{0}, id: {5}, type: {1}, typeId: {2}, levelId: {3}, category: {4}",
                         el.Name, el.GetType(), el.GetTypeId(), el.LevelId, el.Category, el.Id));
                 }
-
-                // TaskDialog.Show("reavit", sb.ToString());
-                txtFamilies.Text = String.Format("BuiltInCategory.OST_Walls : {0}\n\n", BuiltInCategory.OST_Walls);
-                txtFamilies.Text += sb.ToString();
-
             } catch (Exception ex) {
-                // msg = ex.ToString();
-                txtFamilies.Text = ex.ToString();
             }
         }
 
@@ -220,6 +209,11 @@ namespace io.odysz.anclient.example.revit {
 
                 TaskDialog.Show("Revit", info);
             }
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }
