@@ -9,11 +9,11 @@ using System.Text;
 using System.Windows.Forms;
 using TextBox = Autodesk.Revit.UI.TextBox;
 
-namespace io.odysz.hello.revit.lession2 {
+namespace io.odysz.anclient.example.revit {
     public partial class XvForm : System.Windows.Forms.Form {
-        private UIDocument uidoc; // = commandData.Application.ActiveUIDocument;
-        private Document dbdoc;
-        private View view;
+        private readonly UIDocument uidoc; // = commandData.Application.ActiveUIDocument;
+        private readonly Document dbdoc;
+        private readonly Autodesk.Revit.DB.View view;
 
         public XvForm(Document dbdoc, UIDocument uidoc, Autodesk.Revit.DB.View uiview) {
             InitializeComponent();

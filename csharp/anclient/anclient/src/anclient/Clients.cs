@@ -36,7 +36,7 @@ namespace io.odysz.anclient
 		/// @throws SemanticException Request can not parsed correctly
 		/// @throws GeneralSecurityException  other error
 		/// @throws Exception, most likely the network failed
-		public static AnsonClient Login(string uid, string pswdPlain, Action<int, AnSessionResp> onlogin = null)
+		public static AnsonClient Login(string uid, string pswdPlain, Action<int, AnSessionResp> onlogin = null, Action<int, AnsonResp> onerror = null)
 		{
             byte[] iv = AESHelper.getRandom();
             string iv64 = AESHelper.Encode64(iv);
@@ -64,7 +64,7 @@ namespace io.odysz.anclient
                 }
                                 else throw new SemanticException(
                                         "loging failed\ncode: {0}\nerror: {1}",
-                                        code, ((AnSessionResp) msg.Body()[0]).msg());
+                                        code, ((AnSessionResp) msg.Body()[0]).Msg());
             } );
             return inst[0];
         }
@@ -73,9 +73,9 @@ namespace io.odysz.anclient
          * @param port
          * @return url, e.g. http://localhost:8080/query.serv?conn=null
          */
-        public static string ServUrl(IPort port)
+        public static string ServUrl(Port port)
         {
-            return string.Format("{0:S}/{1:S}?conn={2:S}", servRt, port.url, conn);
+            return string.Format("{0:S}/{1:S}?conn={2:S}", servRt, port.Url(), conn);
         }
 
     }

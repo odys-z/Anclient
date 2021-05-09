@@ -2,6 +2,7 @@ using io.odysz.anson;
 using io.odysz.semantics.x;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace io.odysz.semantic.jprotocol
 {
@@ -100,21 +101,19 @@ namespace io.odysz.semantic.jprotocol
                 */
 			}
 
-			public string url { get; private set; }
+			public string name { get; private set; }
 
-			Port(string url)
+			Port(string name)
 			{
-				this.url = url;
-				_port = valof(url);
+				this.name = name;
+                _port = valof(this.name);
 			}
 
 			public Port(int port)
 			{
 				_port = port;
-				url = nameof(port);
+				name = nameof(port);
 			}
-
-			// public string name() { return _name; }
 
 			public int port() { return _port; }
 
@@ -135,36 +134,59 @@ namespace io.odysz.semantic.jprotocol
 			}
 			static public string nameof(int port)
 			{
-				return port == Port.heartbeat ? "ping.serv11"
-					: port == Port.session ? "login.serv11"
-					: port == Port.query ? "r.serv11"
-					: port == Port.update ? "u.serv11"
-					: port == Port.insert ? "c.serv11"
-					: port == Port.delete ? "d.serv11"
-					: port == Port.echo ? "echo.serv11"
-					: port == Port.file ? "file.serv11"
-					: port == Port.user ? "user.serv11"
-					: port == Port.stree ? "stree.serv11"
-					: port == Port.dataset ? "dataset.serv11"
+				return port == Port.heartbeat ? "heartbeat"
+					: port == Port.session ? "session"
+					: port == Port.query ? "query"
+					: port == Port.update ? "update"
+					: port == Port.insert ? "insert"
+					: port == Port.delete ? "delete"
+					: port == Port.echo ? "echo"
+					: port == Port.file ? "file"
+					: port == Port.user ? "user"
+					: port == Port.stree ? "stree"
+					: port == Port.dataset ? "dataset"
 					: "NA";
 			}
 
 			IPort IPort.valof(string pname)
 			{
-				return pname == "ping.serv11" ? new Port(IPort.heartbeat)
-					: pname == "login.serv11" ? new Port(IPort.session)
-					: pname == "r.serv11" ? new Port(IPort.query)
-					: pname == "u.serv11" ? new Port(IPort.update)
-					: pname == "c.serv11" ? new Port(IPort.insert)
-					: pname == "d.serv11" ? new Port(IPort.delete)
-					: pname == "echo.serv11" ? new Port(IPort.echo)
-					: pname == "file.serv11" ? new Port(IPort.file)
-					: pname == "user.serv11" ? new Port(IPort.user)
-					: pname == "s-tree.serv11" ? new Port(IPort.stree)
-					: pname == "ds.serv11" ? new Port(IPort.dataset)
-					: new Port(IPort.NA);
+				throw new NotImplementedException("FIXME this translation shouldn't happen at client side.");
 			}
-		}
+			//{	// FIXME this translation shouldn't happen at client side
+			//	return pname == "ping.serv11" ? new Port(IPort.heartbeat)
+			//		: pname == "login.serv11" ? new Port(IPort.session)
+			//		: pname == "r.serv11" ? new Port(IPort.query)
+			//		: pname == "u.serv11" ? new Port(IPort.update)
+			//		: pname == "c.serv11" ? new Port(IPort.insert)
+			//		: pname == "d.serv11" ? new Port(IPort.delete)
+			//		: pname == "echo.serv11" ? new Port(IPort.echo)
+			//		: pname == "file.serv" ? new Port(IPort.file)
+			//		: pname == "user.serv11" ? new Port(IPort.user)
+			//		: pname == "s-tree.serv11" ? new Port(IPort.stree)
+			//		: pname == "ds.serv11" ? new Port(IPort.dataset)
+			//		: new Port(IPort.NA);
+			public string Url() {
+				return _port == heartbeat ? "ping.serv11"
+                    : _port == session ? "login.serv11"
+                    : _port == query ? "r.serv11"
+                    : _port == update ? "u.serv11"
+                    : _port == insert ? "c.serv11"
+                    : _port == delete ? "d.serv11"
+                    : _port == echo ? "echo.serv11"
+                    : _port == file ? "file.serv"
+                    : _port == user ? "user.serv11"
+                    : _port == stree ? "s-tree.serv11"
+                    : _port == dataset ? "ds.serv11"
+                    : "unknown.serv";
+        }
+
+
+            public IJsonable ToBlock(Stream stream, anson.JsonOpt opts = null)
+            {
+				Utils.WriteStr(stream, name, true);
+				return this;
+            }
+        }
 
 		//public static explicit operator AnsonMsg(AnsonMsg v)
 		//{
@@ -190,7 +212,7 @@ namespace io.odysz.semantic.jprotocol
 
 			public const int ext = 7;
 
-			internal int code { get; set; }
+			public int code { get; protected set; }
 			public MsgCode(int code)
 			{
 				this.code = code;
@@ -293,7 +315,7 @@ namespace io.odysz.semantic.jprotocol
 
 		protected internal IList<AnsonBody> body;
 
-		public virtual AnsonBody BodyAt(int i)
+		public virtual AnsonBody Body(int i)
 		{
 			return body[0];
 		}

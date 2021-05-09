@@ -1,4 +1,4 @@
-﻿namespace io.odysz.hello.revit.lession2 {
+﻿namespace io.odysz.anclient.example.revit {
     partial class XvForm {
         /// <summary>
         /// Required designer variable.

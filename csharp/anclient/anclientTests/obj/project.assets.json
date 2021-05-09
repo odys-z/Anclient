@@ -11,18 +11,16 @@
           "lib/netstandard2.0/Antlr4.Runtime.Standard.dll": {}
         }
       },
-      "Antson.CSharp/0.9.10": {
+      "Antson.CSharp/0.9.14": {
         "type": "package",
         "dependencies": {
           "Antlr4.Runtime.Standard": "4.9.2"
         },
         "compile": {
-          "lib/net40/Antlr4.Runtime.Standard.dll": {},
-          "lib/net40/antson.csharp.dll": {}
+          "lib/net40/Antlr4.Runtime.Standard.dll": {}
         },
         "runtime": {
-          "lib/net40/Antlr4.Runtime.Standard.dll": {},
-          "lib/net40/antson.csharp.dll": {}
+          "lib/net40/Antlr4.Runtime.Standard.dll": {}
         }
       },
       "coverlet.collector/1.3.0": {
@@ -1778,18 +1776,13 @@
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
       },
-      "anclient/1.0.0": {
+      "anclient.net/1.0.0": {
         "type": "project",
-        "framework": ".NETCoreApp,Version=v3.1",
-        "dependencies": {
-          "Antlr4.Runtime.Standard": "4.9.2",
-          "Antson.CSharp": "0.9.10"
-        },
         "compile": {
-          "bin/placeholder/anclient.dll": {}
+          "bin/placeholder/anclient.net.dll": {}
         },
         "runtime": {
-          "bin/placeholder/anclient.dll": {}
+          "bin/placeholder/anclient.net.dll": {}
         }
       }
     }
@@ -1808,14 +1801,14 @@
         "lib/netstandard2.0/Antlr4.Runtime.Standard.xml"
       ]
     },
-    "Antson.CSharp/0.9.10": {
-      "sha512": "7w3ipB5711IPtsYF8LJUWrKqGoAUMQn9nvFzs09EZWU4nGmhRHoPJrZjVkhw4jzB/sWp6/MY4RGPkPIXkX+Z2A==",
+    "Antson.CSharp/0.9.14": {
+      "sha512": "mYG3mw5YvTA9Wd9Y1QP9sMrc44A9ZpXw++mO1f6Tm3ffGJvHbvLDE6xIIihOtTyzQLqJGDPf1Dvj0/DPmG542Q==",
       "type": "package",
-      "path": "antson.csharp/0.9.10",
+      "path": "antson.csharp/0.9.14",
       "files": [
         ".nupkg.metadata",
         "Properties/AssemblyInfo.cs",
-        "antson.csharp.0.9.10.nupkg.sha512",
+        "antson.csharp.0.9.14.nupkg.sha512",
         "antson.csharp.csproj",
         "antson.csharp.csproj.user",
         "antson.csharp.nuspec",
@@ -1835,10 +1828,8 @@
         "bin/Debug/antson.csharp.pdb",
         "lib/net40/Antlr4.Runtime.Standard.dll",
         "lib/net40/Antlr4.Runtime.Standard.xml",
-        "lib/net40/README.md",
-        "lib/net40/antson.csharp.dll",
-        "lib/net40/antson.csharp.pdb",
         "nuget.exe",
+        "nuget.pack.bat",
         "obj/Debug/.NETFramework,Version=v4.0.AssemblyAttributes.cs",
         "obj/Debug/.NETFramework,Version=v4.7.1.AssemblyAttributes.cs",
         "obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs",
@@ -6234,19 +6225,20 @@
         "system.xml.xdocument.nuspec"
       ]
     },
-    "anclient/1.0.0": {
+    "anclient.net/1.0.0": {
       "type": "project",
-      "path": "../anclient/anclient.csproj",
-      "msbuildProject": "../anclient/anclient.csproj"
+      "path": "../anclient.net/anclient.net.csproj",
+      "msbuildProject": "../anclient.net/anclient.net.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net5.0": [
+      "Antson.CSharp >= 0.9.14",
       "MSTest.TestAdapter >= 2.1.1",
       "MSTest.TestFramework >= 2.1.1",
       "Microsoft.NET.Test.Sdk >= 16.7.1",
       "System.Data.SqlClient >= 4.8.2",
-      "anclient >= 1.0.0",
+      "anclient.net >= 1.0.0",
       "coverlet.collector >= 1.3.0"
     ]
   },
@@ -6275,7 +6267,6 @@
         "net5.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Users\\Alice\\OneDrive\\repo\\nuget": {},
         "https://api.nuget.org/v3/index.json": {}
       },
@@ -6283,8 +6274,8 @@
         "net5.0": {
           "targetAlias": ".NETCoreApp,Version=v5.0",
           "projectReferences": {
-            "C:\\Users\\Alice\\github\\anclient\\csharp\\anclient\\anclient\\anclient.csproj": {
-              "projectPath": "C:\\Users\\Alice\\github\\anclient\\csharp\\anclient\\anclient\\anclient.csproj"
+            "C:\\Users\\Alice\\github\\anclient\\csharp\\anclient\\anclient.net\\anclient.net.csproj": {
+              "projectPath": "C:\\Users\\Alice\\github\\anclient\\csharp\\anclient\\anclient.net\\anclient.net.csproj"
             }
           }
         }
@@ -6299,6 +6290,10 @@
       "net5.0": {
         "targetAlias": ".NETCoreApp,Version=v5.0",
         "dependencies": {
+          "Antson.CSharp": {
+            "target": "Package",
+            "version": "[0.9.14, )"
+          },
           "MSTest.TestAdapter": {
             "target": "Package",
             "version": "[2.1.1, )"
@@ -6344,7 +6339,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'Antson.CSharp 0.9.10' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
+      "message": "Package 'Antson.CSharp 0.9.14' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net5.0'. This package may not be fully compatible with your project.",
       "libraryId": "Antson.CSharp",
       "targetGraphs": [
         "net5.0"

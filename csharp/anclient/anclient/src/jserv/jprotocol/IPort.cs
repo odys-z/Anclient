@@ -1,6 +1,8 @@
+using io.odysz.anson;
+
 namespace io.odysz.semantic.jprotocol
 {
-	public interface IPort
+	public interface IPort : IJsonable
 	{
         const int NA = -1;       // error
         const int heartbeat = 0; // ("ping.serv11"),
@@ -22,7 +24,7 @@ namespace io.odysz.semantic.jprotocol
         /// <see cref="ext.Dataset" />
         const int dataset = 9; // ("ds.serv11");
 
-        string url { get; }
+        string name { get; }
 
 		/// <summary>Equivalent of enum.valueOf(), except for subclass returning instance of jserv.Port.
 		/// 	</summary>

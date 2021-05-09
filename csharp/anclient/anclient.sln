@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "anclientTests", "anclientTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gltf-export", "..\..\example.cs\gltf-export\gltf-export.csproj", "{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "anclient.net", "anclient.net\anclient.net.csproj", "{327AE5AA-030C-4782-80E3-C2951F12F93E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnclientTest.net", "AnclientTest.net\AnclientTest.net.csproj", "{BD7471B2-22EF-4601-AEC7-43899E367455}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Release|Any CPU.Build.0 = Release|Any CPU
+		{327AE5AA-030C-4782-80E3-C2951F12F93E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{327AE5AA-030C-4782-80E3-C2951F12F93E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{327AE5AA-030C-4782-80E3-C2951F12F93E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{327AE5AA-030C-4782-80E3-C2951F12F93E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD7471B2-22EF-4601-AEC7-43899E367455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD7471B2-22EF-4601-AEC7-43899E367455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD7471B2-22EF-4601-AEC7-43899E367455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD7471B2-22EF-4601-AEC7-43899E367455}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
