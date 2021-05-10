@@ -16,7 +16,7 @@ namespace io.odysz.semantic.jprotocol
 			return this;
         }
 
-		public string conn { get; }
+		public string conn { get; protected set; }
 
 		/// <summary>
 		/// Action: login | C | R | U | D | any serv extension

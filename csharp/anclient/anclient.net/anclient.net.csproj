@@ -38,7 +38,7 @@
       <HintPath>..\packages\Antlr4.Runtime.Standard.4.9.2\lib\netstandard2.0\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
     <Reference Include="antson.csharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Antson.CSharp.0.9.14\lib\antson.csharp.dll</HintPath>
+      <HintPath>..\packages\Antson.CSharp.0.9.20\lib\net471\antson.csharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,7 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\anclient\AnsonClient.cs" />
     <Compile Include="src\anclient\Clients.cs" />

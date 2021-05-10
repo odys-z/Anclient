@@ -3,6 +3,7 @@ using io.odysz.semantics.x;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace io.odysz.semantic.jprotocol
 {
@@ -103,7 +104,7 @@ namespace io.odysz.semantic.jprotocol
 
 			public string name { get; private set; }
 
-			Port(string name)
+			public Port(string name)
 			{
 				this.name = name;
                 _port = valof(this.name);
@@ -119,17 +120,17 @@ namespace io.odysz.semantic.jprotocol
 
 			static public int valof(string pname)
 			{
-				return pname == "ping.serv11" ? Port.heartbeat
-					: pname == "login.serv11" ? Port.session
-					: pname == "r.serv11" ? Port.query
-					: pname == "u.serv11" ? Port.update
-					: pname == "c.serv11" ? Port.insert
-					: pname == "d.serv11" ? Port.delete
-					: pname == "echo.serv11" ? Port.echo
-					: pname == "file.serv11" ? Port.file
-					: pname == "user.serv11" ? Port.user
-					: pname == "stree.serv11" ? Port.stree
-					: pname == "dataset.serv11" ? Port.dataset
+				return pname == "haartbeat" ? Port.heartbeat
+					: pname == "session" ? Port.session
+					: pname == "query" ? Port.query
+					: pname == "update" ? Port.update
+					: pname == "insert" ? Port.insert
+					: pname == "delete" ? Port.delete
+					: pname == "echo" ? Port.echo
+					: pname == "file" ? Port.file
+					: pname == "user" ? Port.user
+					: pname == "stree" || pname == "s-tree" ? Port.stree
+					: pname == "dataset" ? Port.dataset
 					: Port.NA;
 			}
 			static public string nameof(int port)
@@ -188,13 +189,8 @@ namespace io.odysz.semantic.jprotocol
             }
         }
 
-		//public static explicit operator AnsonMsg(AnsonMsg v)
-		//{
-		//    throw new NotImplementedException();
-		//}
-
 		[Serializable]
-		public class MsgCode
+		public class MsgCode : IJsonable
 		{
 			public const int ok = 0;
 
@@ -218,6 +214,9 @@ namespace io.odysz.semantic.jprotocol
 				this.code = code;
 			}
 
+			public MsgCode(string name) : this(CodeOf(name))
+			{ }
+
             public bool eq(string code)
 			{
 				if (code == null)
@@ -230,18 +229,37 @@ namespace io.odysz.semantic.jprotocol
 
 			private static int CodeOf(string name)
 			{
-				name = name.ToLower();
 				return name == "ok" ? MsgCode.ok
-					: name == "exsession" ? MsgCode.exSession
-					: name == "exsemantic" ? MsgCode.exSemantic
-					: name == "exio" ? MsgCode.exIo
-					: name == "extransct" ? MsgCode.exTransct
-					: name == "exda" ? MsgCode.exDA
-					: name == "exgeneral" ? MsgCode.exGeneral
+					: name == "exSession" ? MsgCode.exSession
+					: name == "exSemantic" ? MsgCode.exSemantic
+					: name == "exIo" ? MsgCode.exIo
+					: name == "exTransct" ? MsgCode.exTransct
+					: name == "exDA" ? MsgCode.exDA
+					: name == "exGeneral" ? MsgCode.exGeneral
 					: MsgCode.ext;
 			}
+
+			private string Name()
+            {
+				return code == MsgCode.ok ? "ok" 
+					: code == MsgCode.exSession ? "exSession"
+					: code == MsgCode.exSemantic ? "exSemantic" 
+					: code == MsgCode.exIo ? "exIo"
+					: code == MsgCode.exTransct ? "exTransct"
+					: code == MsgCode.exDA ? "exDA"
+					: code == MsgCode.exGeneral ? "exGeneral"
+					: "ext";
+
+            }
+
+            public IJsonable ToBlock(Stream stream, anson.JsonOpt opts = null)
+            {
+				Utils.WriteStr(stream, Name(), false);
+				return this;
+            }
         }
 
+		/// TODO we can simplify java field here
 		/// <summary>The default IPort implelemtation.</summary>
 		/// <remarks>
 		/// The default IPort implelemtation.
@@ -249,7 +267,7 @@ namespace io.odysz.semantic.jprotocol
 		/// <see cref="#Port"/>
 		/// .<br />
 		/// </remarks>
-		internal static IPort defaultPortImpl;
+		/// internal static IPort defaultPortImpl;
 
 		/// <summary>
 		/// Set the default IPort implelemtation, which is used for parsing port name (string)
@@ -262,30 +280,31 @@ namespace io.odysz.semantic.jprotocol
 		/// <see cref="Port"/>, see example of jserv-sample/io.odysz.jsample.protocol.Samport.
 		/// </summary>
 		/// <param name="p">extended Port</param>
-		public static void understandPorts(IPort p)
-		{
-			defaultPortImpl = p;
-		}
+		//public static void understandPorts(IPort p)
+		//{
+		//	defaultPortImpl = p;
+		//}
 
 		private string version = "1.0";
 
 		internal int seq { get; set; }
 
-		internal IPort port { get; set; }
+		internal Port port { get; set; }
 
-		public MsgCode code { get; }
+		public MsgCode code { get; private set; }
 
 		public virtual void portOf(string pport)
 		{
 			/// translate from string to enum
-			if (defaultPortImpl == null)
-			{
-				port = new Port(Port.echo);
-			}
-			else
-			{
-				port = defaultPortImpl.valof(pport);
-			}
+			//if (defaultPortImpl == null)
+			//{
+			//	port = new Port(Port.echo);
+			//}
+			//else
+			//{
+			//	port = new Port(pport);
+			//}
+			port = new Port(pport);
 			if (port == null)
 			{
 				throw new SemanticException(
@@ -298,9 +317,9 @@ namespace io.odysz.semantic.jprotocol
 			seq = new Random().Next(1000);
 		}
 
-		public AnsonMsg(IPort port)
+		public AnsonMsg(string port)
 		{
-			this.port = port;
+			this.port = new Port(port);
 			seq = new Random().Next(1000);
 		}
 
@@ -309,7 +328,7 @@ namespace io.odysz.semantic.jprotocol
 		/// <param name="code"/>
 		public AnsonMsg(IPort p, MsgCode code)
 		{
-			port = p;
+			port = (Port)p;
 			this.code = code;
 		}
 

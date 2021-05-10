@@ -3,9 +3,10 @@ using io.odysz.semantic.ext;
 using io.odysz.semantic.jprotocol;
 using io.odysz.semantic.jserv.U;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
 
@@ -15,8 +16,8 @@ namespace io.odysz.anclient
     public class ClientsTests
     {
         private const string jserv = "http://192.168.0.201:8080/jserv-sample";
-        private const string pswd = "123456bbbbbbbbbb"; // TODO needing 16/32 padding
-        private const string uid = "admin";
+        private const string pswd = "----------123456"; // TODO needing 16/32 padding
+        private const string uid =  "admin";
         private static AnsonClient client;
 
         static ClientsTests()
@@ -28,12 +29,24 @@ namespace io.odysz.anclient
         [TestMethod()]
         public async Task TestLogin()
         {
+            await Login();
+        }
+
+        internal async Task Login(Action<AnsonClient, AnsonResp> onLogin = null) {
+            bool succeed = false;
             await Clients.Login(uid, pswd,
                 (code, resp) =>
                 {
+                    succeed = true;
                     client = new AnsonClient(resp.ssInf);
                     Assert.AreEqual(uid, resp.ssInf.uid);
+                    Assert.IsNotNull(resp.ssInf.ssid);
+                    if (onLogin != null)
+                        onLogin(client, resp);
                 });
+            if (!succeed)
+                Assert.Fail("onOk not called.");
+            Assert.IsNotNull(client);
         }
 
         // [TestMethod()]
@@ -61,19 +74,25 @@ namespace io.odysz.anclient
         [TestMethod()]
         public async Task TestUpload()
         {
-            await Clients.Login(uid, pswd,
-                (code, resp) =>
+            CancellationTokenSource waker = new CancellationTokenSource();
+            await Login(
+                (client, resp) =>
                 {
-                    client = new AnsonClient(resp.ssInf);
-                    Assert.AreEqual(uid, resp.ssInf.uid);
-                    UploadTransaction(client, "Sun Yet-sen.jpg");
-                },
-                (code, resp) =>
-                {
-                    Assert.Fail(string.Format(@"code: {0}\nerror:\n{1}", code, resp.Msg()));
+                    UploadTransaction(waker, client, "Sun Yet-sen.jpg");
                 });
+            try
+            {
+                Task.Delay(3 * 60 * 1000, waker.Token).Wait();
+                Assert.Fail("Uploading timeout...");
+            }
+            catch (AggregateException ex)
+            {
+                // waked up
+                // we can access the file now
+            }
+            finally { waker.Dispose(); }
         }
-        static void UploadTransaction(AnsonClient client, string p)
+        static void UploadTransaction(CancellationTokenSource waker, AnsonClient client, string p)
         {
             // string p = Path.get(filename);
             byte[] f = File.ReadAllBytes(p);
@@ -105,6 +124,7 @@ namespace io.odysz.anclient
                     if (MsgCode.ok == code.code)
                         Utils.Logi(code.ToString());
                     else Utils.Warn(data.ToString());
+                    waker.Cancel();
                 },
                 (c, err) => {
                     Assert.Fail(message: string.Format(@"code: {0}, error: {1}", c, err.Msg()));

@@ -54,20 +54,30 @@ namespace io.odysz.common
             return new string[] { Encrypt(plain, encryptK, eiv), Encode64(eiv) };
 		}
 
+        // summery:
+        //    AES/CBC/NoPadding, as the same to java side (Apache default)
         /// <param name="plain">Base64</param>
         /// <param name="key">plain key string</param>
         /// <param name="iv">Base64, length = 16</param>
         /// <returns>cipher-base64</returns>
         public static string Encrypt(string plain, string key, byte[] iv)
         {
+            if (plain.Length != 16 || key.Length != 16)
+                throw new NotImplementedException("TODO length padding != 16");
+
             byte[] encrypted;
 
             // Create an Aes object
             // with the specified key and IV.
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(key);
+                aesAlg.Padding = PaddingMode.None;
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.BlockSize = 128;
+
+                aesAlg.Key = Encoding.ASCII.GetBytes(key);
                 aesAlg.IV = iv;
+                // PaddingMode p = aesAlg.Padding;
 
                 // Create an encryptor to perform the stream transform.
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);

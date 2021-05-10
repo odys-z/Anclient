@@ -26,8 +26,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(XvForm));
             this.label1 = new System.Windows.Forms.Label();
             this.btnExpt = new System.Windows.Forms.Button();
-            this.txtConn = new System.Windows.Forms.TextBox();
-            this.btnConn = new System.Windows.Forms.Button();
+            this.txtJson = new System.Windows.Forms.TextBox();
+            this.btnLogin = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.servUrl = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -62,25 +62,25 @@
             this.btnExpt.UseVisualStyleBackColor = true;
             this.btnExpt.Click += new System.EventHandler(this.btnExpt_Click);
             // 
-            // txtConn
+            // txtJson
             // 
-            this.txtConn.Location = new System.Drawing.Point(4, 68);
-            this.txtConn.Margin = new System.Windows.Forms.Padding(4);
-            this.txtConn.Multiline = true;
-            this.txtConn.Name = "txtConn";
-            this.txtConn.Size = new System.Drawing.Size(787, 58);
-            this.txtConn.TabIndex = 6;
+            this.txtJson.Location = new System.Drawing.Point(4, 68);
+            this.txtJson.Margin = new System.Windows.Forms.Padding(4);
+            this.txtJson.Multiline = true;
+            this.txtJson.Name = "txtJson";
+            this.txtJson.Size = new System.Drawing.Size(787, 120);
+            this.txtJson.TabIndex = 6;
             // 
-            // btnConn
+            // btnLogin
             // 
-            this.btnConn.Location = new System.Drawing.Point(691, 37);
-            this.btnConn.Margin = new System.Windows.Forms.Padding(4);
-            this.btnConn.Name = "btnConn";
-            this.btnConn.Size = new System.Drawing.Size(100, 29);
-            this.btnConn.TabIndex = 7;
-            this.btnConn.Text = "&connect";
-            this.btnConn.UseVisualStyleBackColor = true;
-            this.btnConn.Click += new System.EventHandler(this.btnConn_ClickAsync);
+            this.btnLogin.Location = new System.Drawing.Point(691, 37);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(100, 29);
+            this.btnLogin.TabIndex = 7;
+            this.btnLogin.Text = "&connect";
+            this.btnLogin.UseVisualStyleBackColor = true;
+            this.btnLogin.Click += new System.EventHandler(this.btnLogin_ClickAsync);
             // 
             // label3
             // 
@@ -99,12 +99,12 @@
             this.servUrl.Name = "servUrl";
             this.servUrl.Size = new System.Drawing.Size(601, 25);
             this.servUrl.TabIndex = 10;
-            this.servUrl.Text = "http://192.168.0.201:8080/jserv-sample/login.serv11";
+            this.servUrl.Text = "http://192.168.0.201:8080/jserv-sample/";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(7, 135);
+            this.label5.Location = new System.Drawing.Point(13, 202);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(127, 15);
@@ -113,7 +113,7 @@
             // 
             // btnGltf
             // 
-            this.btnGltf.Location = new System.Drawing.Point(142, 129);
+            this.btnGltf.Location = new System.Drawing.Point(148, 196);
             this.btnGltf.Margin = new System.Windows.Forms.Padding(4);
             this.btnGltf.Name = "btnGltf";
             this.btnGltf.Size = new System.Drawing.Size(135, 29);
@@ -142,11 +142,11 @@
             this.node,
             this.opaque,
             this.visible});
-            this.dataGridView1.Location = new System.Drawing.Point(4, 165);
+            this.dataGridView1.Location = new System.Drawing.Point(4, 232);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 27;
-            this.dataGridView1.Size = new System.Drawing.Size(787, 477);
+            this.dataGridView1.Size = new System.Drawing.Size(787, 410);
             this.dataGridView1.TabIndex = 12;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
@@ -185,8 +185,8 @@
             this.Controls.Add(this.servUrl);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.btnConn);
-            this.Controls.Add(this.txtConn);
+            this.Controls.Add(this.btnLogin);
+            this.Controls.Add(this.txtJson);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnExpt);
             this.Controls.Add(this.label1);
@@ -204,8 +204,8 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnExpt;
-        private System.Windows.Forms.TextBox txtConn;
-        private System.Windows.Forms.Button btnConn;
+        private System.Windows.Forms.TextBox txtJson;
+        private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox servUrl;
         private System.Windows.Forms.Label label5;

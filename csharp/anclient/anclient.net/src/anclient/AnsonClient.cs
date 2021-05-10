@@ -5,6 +5,7 @@ using io.odysz.semantic.jsession;
 using io.odysz.semantics.x;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.anclient
@@ -37,7 +38,7 @@ namespace io.odysz.anclient
 				int page, int size, string funcId = null) 
 		{
 
-			AnsonMsg msg = new AnsonMsg(new Port(Port.query));
+			AnsonMsg msg = new AnsonMsg((IPort)new Port(Port.query), null);
 
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
             if (funcId != null && funcId.Length > 0)
@@ -71,7 +72,7 @@ namespace io.odysz.anclient
             if (ssInf == null)
                 throw new SemanticException("SessionClient can not visit jserv without session information.");
 
-            AnsonMsg  jmsg = new AnsonMsg(port);
+            AnsonMsg  jmsg = new AnsonMsg(port, null);
 
             if (act != null)
                 Header().act(act);
@@ -126,27 +127,40 @@ namespace io.odysz.anclient
             return this;
         }
 
+        /// <summary>
+        /// Submit transaction requist to jserv. This method is synchronized - not returned until callbacks been called.
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="onOk"></param>
+        /// <param name="onErr"></param>
         public void Commit(AnsonMsg req, Action<MsgCode, AnsonMsg> onOk, Action<MsgCode, AnsonResp> onErr = null)
         {
+            #pragma warning disable CS4014
+            // Because this call is not awaited, execution of the current method continues before the call is completed
+            Commit_async(req, onOk, onErr);
+            #pragma warning restore CS4014
+        }
+        public async Task Commit_async(AnsonMsg req, Action<MsgCode, AnsonMsg> onOk, Action<MsgCode, AnsonResp> onErr = null)
+        {
             HttpServClient httpClient = new HttpServClient();
-            httpClient.Post(Clients.ServUrl((Port)req.port), req,
-                    (code, obj) => {
-                        if (Clients.console)
-                        {
-                            System.Console.Out.WriteLine(obj);
-                        }
-                        if (MsgCode.ok == code.code)
-                        {
-                            onOk(code, obj);
-                        }
-                        else
-                        {
-                            if (onErr != null)
-                                onErr(code, (AnsonResp)obj.Body(0));
-                            else System.Console.Error.WriteLine("code: {0}\nerror: {1}",
-                                code, obj);
-                        }
-                    });
+            AnsonMsg msg = await httpClient.Post(Clients.ServUrl((Port)req.port), req);
+            MsgCode code = msg.code;
+
+            if (Clients.console)
+            {
+                System.Console.Out.WriteLine(msg.ToString());
+            }
+            if (MsgCode.ok == code.code)
+            {
+                onOk(code, msg);
+            }
+            else
+            {
+                if (onErr != null)
+                    onErr(code, (AnsonResp)msg.Body(0));
+                else System.Console.Error.WriteLine("code: {0}\nerror: {1}",
+                    code, msg.ToString());
+            }
         }
 
 	    public void Logout() { }

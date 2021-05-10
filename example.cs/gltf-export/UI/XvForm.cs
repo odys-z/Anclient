@@ -155,8 +155,8 @@ namespace io.odysz.anclient.example.revit {
             }
         }
 
-        private void btnConn_ClickAsync(object sender, EventArgs e) {
-            string serv = "http://192.168.0.201:8080/ifire/echo.serv?t=echo&p1=x";
+        private void btnLogin_ClickAsync(object sender, EventArgs e) {
+            string serv = servUrl.Text + "/login.serv11?user=admin&pswd=";
             postConn(serv, null);
         }
 

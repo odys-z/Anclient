@@ -66,7 +66,7 @@ namespace io.odysz.semantic.jsession
 		public static AnsonMsg formatLogin(string uid, string tk64, string iv64)
 		{
 			// AnSessionReq : AnsonBody
-			AnsonMsg jmsg = new AnsonMsg(new Port(Port.session));
+			AnsonMsg jmsg = new AnsonMsg(new Port(Port.session), null);
 			AnSessionReq itm = new AnSessionReq(jmsg);
 			itm.setup(uid, tk64, iv64);
 			itm.A("login");
