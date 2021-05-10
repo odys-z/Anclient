@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31129.286
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "anclient.net", "anclient.net\anclient.net.csproj", "{327AE5AA-030C-4782-80E3-C2951F12F93E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antest.Anclient", "Antest.Anclient\Antest.Anclient.csproj", "{22809231-F206-486A-8F03-B9FA3E21C52F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gltf-export", "..\..\example.cs\gltf-export\gltf-export.csproj", "{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{22809231-F206-486A-8F03-B9FA3E21C52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22809231-F206-486A-8F03-B9FA3E21C52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22809231-F206-486A-8F03-B9FA3E21C52F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

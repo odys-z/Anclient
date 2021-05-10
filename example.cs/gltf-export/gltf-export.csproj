@@ -35,10 +35,10 @@
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="RevitAPI">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\inst\Revit 2017\RevitAPI.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPIUI">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\inst\Revit 2017\RevitAPIUI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,20 +53,33 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\App.cs" />
+    <Compile Include="src\ExCmds.cs" />
+    <Compile Include="UI\XvForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\XvForm.Designer.cs">
+      <DependentUpon>XvForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="xvExporter.addin" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UI\XvForm.resx">
+      <DependentUpon>XvForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y /i "$(ProjectDir)xvExporter.addin" "$(ALLUSERSPROFILE)/Autodesk/Revit/Addins/2017/"
+    <PostBuildEvent>copy  "F:\revit\works\git-repo\anclient\example.cs\gltf-export\xvExporter.addin" "C:\ProgramData\Autodesk\Revit\Addins\2017\"
 
 
-xcopy /y /i "$(ProjectDir)..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.0\assets\*" "$(ALLUSERSPROFILE)/Autodesk/Revit/Addins/2017/xvExporter/assets"
 
 
-xcopy /y /i "$(ProjectDir)..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.0\lib\*" "$(ALLUSERSPROFILE)/Autodesk/Revit/Addins/2017/xvExporter"
-</PostBuildEvent>
+xcopy /y /i gltf-export* "$(ALLUSERSPROFILE)/Autodesk/Revit/Addins/2017/xvExporter"
+
+xcopy /y /i "..\..\assets\xv.png" "C:\ProgramData\Autodesk\Revit\Addins\2017\xvExporter\assets\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
