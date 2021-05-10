@@ -13,7 +13,7 @@ namespace io.odysz.anclient.example.revit
     ///
     /// </summary>
     public class ExApp : IExternalApplication {
-        private static string icoPath = @"xvExporter/assets/xv.png";
+        private static string icoPath = @"assets/xv.png";
 
         public Result OnStartup(UIControlledApplication application) {
             // Add a new ribbon panel
@@ -22,7 +22,7 @@ namespace io.odysz.anclient.example.revit
             // Create a push button to trigger a command add it to the ribbon panel.
             string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
             PushButtonData buttonData = new PushButtonData("cmdXp",
-               "x-visual...", thisAssemblyPath, "io.odysz.anclient.example.revit.ExForm");
+               "x-visual...", thisAssemblyPath, "io.odysz.anclient.example.revit.XvForm");
 
             PushButton pushButton = ribbonPanel.AddItem(buttonData) as PushButton;
 

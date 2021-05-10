@@ -73,13 +73,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy  "F:\revit\works\git-repo\anclient\example.cs\gltf-export\xvExporter.addin" "C:\ProgramData\Autodesk\Revit\Addins\2017\"
-
-
-
-
-xcopy /y /i gltf-export* "$(ALLUSERSPROFILE)/Autodesk/Revit/Addins/2017/xvExporter"
-
-xcopy /y /i "..\..\assets\xv.png" "C:\ProgramData\Autodesk\Revit\Addins\2017\xvExporter\assets\"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
