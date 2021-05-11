@@ -115,6 +115,10 @@ namespace io.odysz.common
             // with the specified key and IV.
             using (Aes aesAlg = Aes.Create())
             {
+                aesAlg.Padding = PaddingMode.None;
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.BlockSize = 128;
+
                 aesAlg.Key = Encoding.UTF8.GetBytes(key);
                 aesAlg.IV = iv;
 

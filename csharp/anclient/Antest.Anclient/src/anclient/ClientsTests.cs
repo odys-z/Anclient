@@ -5,6 +5,7 @@ using io.odysz.semantic.jserv.U;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,6 @@ namespace io.odysz.anclient
         static ClientsTests()
         {
             Clients.Init(jserv);
-            // client = Clients.login(uid, pswd); 
         }
 
         [TestMethod()]
@@ -70,7 +70,6 @@ namespace io.odysz.anclient
                 });
         }
 
-
         [TestMethod()]
         public async Task TestUpload()
         {
@@ -81,14 +80,15 @@ namespace io.odysz.anclient
                     UploadTransaction(waker, client, "Sun Yet-sen.jpg");
                 });
             try
-            {
-                Task.Delay(3 * 60 * 1000, waker.Token).Wait();
+            {   // should waken by SessionCleint.Commit()
+                Task.Delay(60 * 1000, waker.Token).Wait();
                 Assert.Fail("Uploading timeout...");
             }
             catch (AggregateException ex)
             {
                 // waked up
                 // we can access the file now
+                Debug.WriteLine("waken");
             }
             finally { waker.Dispose(); }
         }
@@ -124,11 +124,11 @@ namespace io.odysz.anclient
                     if (MsgCode.ok == code.code)
                         Utils.Logi(code.ToString());
                     else Utils.Warn(data.ToString());
-                    waker.Cancel();
                 },
-                (c, err) => {
-                    Assert.Fail(message: string.Format(@"code: {0}, error: {1}", c, err.Msg()));
-                });
+                onErr: (c, err) => {
+                    Assert.Fail(string.Format(@"code: {0}, error: {1}", c, err.Msg()));
+                },
+                waker);
         }
     }
 }

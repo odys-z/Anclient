@@ -33,9 +33,9 @@ namespace io.odysz.anclient
                     req.ToBlock(s);
                     StringContent payload = new StringContent(anson.Utils.ToString(s),
                                                 Encoding.UTF8, "application/json");
-                    // var jresponse = await client.PostAsync(url, payload);
                     HttpResponseMessage jresponse = await client.PostAsync(url, payload);
                     AnsonMsg resp = (AnsonMsg)Anson.FromJson(await jresponse.Content.ReadAsStringAsync());
+
                     // onResp(resp.code, resp);
                     return resp;
                 }

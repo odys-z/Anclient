@@ -239,11 +239,11 @@ namespace io.odysz.semantic.jprotocol
 					: MsgCode.ext;
 			}
 
-			private string Name()
+			public string Name()
             {
-				return code == MsgCode.ok ? "ok" 
+				return code == MsgCode.ok ? "ok"
 					: code == MsgCode.exSession ? "exSession"
-					: code == MsgCode.exSemantic ? "exSemantic" 
+					: code == MsgCode.exSemantic ? "exSemantic"
 					: code == MsgCode.exIo ? "exIo"
 					: code == MsgCode.exTransct ? "exTransct"
 					: code == MsgCode.exDA ? "exDA"
@@ -289,7 +289,7 @@ namespace io.odysz.semantic.jprotocol
 
 		internal int seq { get; set; }
 
-		internal Port port { get; set; }
+		public Port port { get; private set; }
 
 		public MsgCode code { get; private set; }
 

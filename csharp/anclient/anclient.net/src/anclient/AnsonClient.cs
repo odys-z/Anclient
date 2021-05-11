@@ -5,6 +5,8 @@ using io.odysz.semantic.jsession;
 using io.odysz.semantics.x;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
 
@@ -120,9 +122,9 @@ namespace io.odysz.anclient
             if(Clients.console) {
                 try
                 {
-                    System.Console.Out.WriteLine(req.ToString());
+                    Debug.WriteLine(req.ToString());
                 }
-                catch (Exception ex) { System.Console.WriteLine(ex.ToString()); }
+                catch (Exception ex) { Debug.WriteLine(ex.ToString()); }
             }
             return this;
         }
@@ -133,12 +135,29 @@ namespace io.odysz.anclient
         /// <param name="req"></param>
         /// <param name="onOk"></param>
         /// <param name="onErr"></param>
-        public void Commit(AnsonMsg req, Action<MsgCode, AnsonMsg> onOk, Action<MsgCode, AnsonResp> onErr = null)
+        public void Commit(AnsonMsg req, Action<MsgCode, AnsonMsg> onOk,
+            Action<MsgCode, AnsonResp> onErr = null, CancellationTokenSource waker = null)
         {
-            #pragma warning disable CS4014
-            // Because this call is not awaited, execution of the current method continues before the call is completed
-            Commit_async(req, onOk, onErr);
-            #pragma warning restore CS4014
+            Task t = Task.Run( async delegate {
+                try
+                {
+                    HttpServClient httpClient = new HttpServClient();
+                    AnsonMsg msg = await httpClient.Post(Clients.ServUrl((Port)req.port), req);
+                    MsgCode code = msg.code;
+
+                    if (MsgCode.ok == code.code)
+                        onOk(code, msg);
+                    else
+                    {
+                        if (onErr != null)
+                            onErr(code, (AnsonResp)msg.Body(0));
+                        else Debug.WriteLine("Error: code: {0}\nerror: {1}",
+                            code, msg.ToString());
+                    }
+                }
+                catch (Exception _) { }
+                finally { if (waker != null) waker.Cancel(); }
+            } );
         }
         public async Task Commit_async(AnsonMsg req, Action<MsgCode, AnsonMsg> onOk, Action<MsgCode, AnsonResp> onErr = null)
         {
@@ -147,13 +166,10 @@ namespace io.odysz.anclient
             MsgCode code = msg.code;
 
             if (Clients.console)
-            {
                 System.Console.Out.WriteLine(msg.ToString());
-            }
+
             if (MsgCode.ok == code.code)
-            {
                 onOk(code, msg);
-            }
             else
             {
                 if (onErr != null)

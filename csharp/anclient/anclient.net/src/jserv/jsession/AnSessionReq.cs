@@ -28,12 +28,12 @@ namespace io.odysz.semantic.jsession
 
 		internal string uid;
 
-		internal string token { get; set; }
+		public string token { get; protected set; }
 
 		// session's DB access is controlled by server
 		// internal virtual string token() { return token; }
 
-		internal string iv { get; set; }
+		public string iv { get; protected set; }
 
 		// internal virtual string iv() { return iv; }
 
