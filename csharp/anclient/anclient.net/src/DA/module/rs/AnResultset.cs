@@ -1,5 +1,6 @@
 using io.odysz.anson;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 
@@ -25,7 +26,11 @@ namespace io.odysz.module.rs
 
 		// private int rowCnt = 0;
 
-		public DataSet ds { get; }
+
+    /// <summary>Ignored when serializing, and no such data from java
+    /// - it's type of Resultset</summary>
+    [AnsonField(ignoreTo = true)]
+    public DataTable rs { get; private set; }
 
 		/// <summary>
 		/// col-index start at 1, map: [alais(upper-case), [col-index, db-col-name(in raw case)]<br />
@@ -45,24 +50,28 @@ namespace io.odysz.module.rs
 		/// <summary>for deserializing</summary>
 		public AnResultset()
 		{
-        }
+		}
 
 		/// <exception cref="java.sql.SQLException"/>
-		public AnResultset(DataSet rs)
+		public AnResultset(DataTable rs)
 		{
-			// ICRconstructor(rs);
-			ds = rs;
+			this.rs = rs;
 		}
 
 		/// <summary>For paged query, this the total row count</summary>
-		public virtual int total { get
-			{
-				return ds.Tables[0].Rows.Count;
-			}
+		public virtual int total {
+			get => rs.Rows.Count;
+			private set { }
 		}
 
+    /// <summary>
+    /// Design Notes:
+    /// C# requires explicit list/array convertion, with element type checked. This is time consuming.
+    /// In Antson.cs 1.0, multi-dimensional list/array deserialization is bypassed this way, an IList with valType.
+    /// </summary>
+    [AnsonField(valType = "java.util.ArrayList")]
+    public IList results;
 		/*
-		private List<List<object>> results;
 
 		/// <exception cref="java.sql.SQLException"/>
 		public AnResultset(DataSet rs, SqlConnection connection, Statement statement)

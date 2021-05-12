@@ -155,8 +155,8 @@ namespace io.odysz.anclient.example.revit {
             }
         }
 
-        private void btnLogin_ClickAsync(object sender, EventArgs e) {
-            string serv = servUrl.Text + "/login.serv11?user=admin&pswd=";
+        private void onLogin(object sender, EventArgs e) {
+            string serv = txtUrl.Text + "/login.serv11";
             postConn(serv, null);
         }
 
@@ -196,7 +196,7 @@ namespace io.odysz.anclient.example.revit {
         /// Find a selected element.
         /// https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-C67BE1BC-50D6-403C-8458-61BEBADFC6CE-htm.html
         /// </summary>
-        private void btnSelected_Click(object sender, EventArgs e) {
+        private void onExportClick(object sender, EventArgs e) {
             ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
             if (0 == selectedIds.Count) {
                 // If no elements selected.
@@ -215,5 +215,6 @@ namespace io.odysz.anclient.example.revit {
         {
 
         }
+
     }
 }

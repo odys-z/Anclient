@@ -108,7 +108,7 @@ namespace io.odysz.anclient
                         .WhereEq("busiId", "admin")
                         .Post((AnInsertReq.formatInsertReq(null, null, "a_attaches")
                                 .Cols("attName", "busiId", "busiTbl", "uri")
-                                .Nv("attName", "'s Portrait")
+                                .Nv("attName", "-Anclient.cs Test")
                                 // The parent pk can't be resulved, we must provide the value.
                                 // See https://odys-z.github.io/notes/semantics/best-practices.html#fk-ins-cate
                                 .Nv("busiId", "admin")

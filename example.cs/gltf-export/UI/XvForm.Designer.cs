@@ -29,15 +29,16 @@
             this.txtJson = new System.Windows.Forms.TextBox();
             this.btnLogin = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.servUrl = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.btnGltf = new System.Windows.Forms.Button();
+            this.txtUrl = new System.Windows.Forms.TextBox();
+            this.btnExport = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.grdNodes = new System.Windows.Forms.DataGridView();
             this.node = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.opaque = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.visible = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtRegistry = new System.Windows.Forms.TextBox();
+            ((System.ComponentModel.ISupportInitialize)(this.grdNodes)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -53,102 +54,92 @@
             // 
             // btnExpt
             // 
-            this.btnExpt.Location = new System.Drawing.Point(271, 649);
+            this.btnExpt.Location = new System.Drawing.Point(271, 654);
             this.btnExpt.Margin = new System.Windows.Forms.Padding(4);
             this.btnExpt.Name = "btnExpt";
             this.btnExpt.Size = new System.Drawing.Size(100, 29);
-            this.btnExpt.TabIndex = 2;
+            this.btnExpt.TabIndex = 8;
             this.btnExpt.Text = "&Upload";
             this.btnExpt.UseVisualStyleBackColor = true;
             this.btnExpt.Click += new System.EventHandler(this.btnExpt_Click);
             // 
             // txtJson
             // 
-            this.txtJson.Location = new System.Drawing.Point(4, 68);
+            this.txtJson.Location = new System.Drawing.Point(4, 110);
             this.txtJson.Margin = new System.Windows.Forms.Padding(4);
             this.txtJson.Multiline = true;
             this.txtJson.Name = "txtJson";
-            this.txtJson.Size = new System.Drawing.Size(787, 120);
+            this.txtJson.Size = new System.Drawing.Size(787, 400);
             this.txtJson.TabIndex = 6;
             // 
             // btnLogin
             // 
-            this.btnLogin.Location = new System.Drawing.Point(691, 37);
+            this.btnLogin.Location = new System.Drawing.Point(658, 73);
             this.btnLogin.Margin = new System.Windows.Forms.Padding(4);
             this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(100, 29);
-            this.btnLogin.TabIndex = 7;
+            this.btnLogin.Size = new System.Drawing.Size(133, 29);
+            this.btnLogin.TabIndex = 5;
             this.btnLogin.Text = "&connect";
             this.btnLogin.UseVisualStyleBackColor = true;
-            this.btnLogin.Click += new System.EventHandler(this.btnLogin_ClickAsync);
+            this.btnLogin.Click += new System.EventHandler(this.onLogin);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(4, 44);
+            this.label3.Location = new System.Drawing.Point(1, 81);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(71, 15);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "Serv-URL";
+            this.label3.Size = new System.Drawing.Size(79, 15);
+            this.label3.TabIndex = 3;
+            this.label3.Text = "xv-server";
             // 
-            // servUrl
+            // txtUrl
             // 
-            this.servUrl.Location = new System.Drawing.Point(82, 40);
-            this.servUrl.Margin = new System.Windows.Forms.Padding(4);
-            this.servUrl.Name = "servUrl";
-            this.servUrl.Size = new System.Drawing.Size(601, 25);
-            this.servUrl.TabIndex = 10;
-            this.servUrl.Text = "http://192.168.0.201:8080/jserv-sample/";
+            this.txtUrl.Location = new System.Drawing.Point(79, 77);
+            this.txtUrl.Margin = new System.Windows.Forms.Padding(4);
+            this.txtUrl.Name = "txtUrl";
+            this.txtUrl.Size = new System.Drawing.Size(571, 25);
+            this.txtUrl.TabIndex = 4;
+            this.txtUrl.Text = "http://192.168.0.201:8080/jserv-sample/";
             // 
-            // label5
+            // btnExport
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(13, 202);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(127, 15);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "selected object";
-            // 
-            // btnGltf
-            // 
-            this.btnGltf.Location = new System.Drawing.Point(148, 196);
-            this.btnGltf.Margin = new System.Windows.Forms.Padding(4);
-            this.btnGltf.Name = "btnGltf";
-            this.btnGltf.Size = new System.Drawing.Size(135, 29);
-            this.btnGltf.TabIndex = 11;
-            this.btnGltf.Text = "&GLTF Preview";
-            this.btnGltf.UseVisualStyleBackColor = true;
-            this.btnGltf.Click += new System.EventHandler(this.btnSelected_Click);
+            this.btnExport.Location = new System.Drawing.Point(658, 38);
+            this.btnExport.Margin = new System.Windows.Forms.Padding(4);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(133, 29);
+            this.btnExport.TabIndex = 2;
+            this.btnExport.Text = "E&xport GLTF";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.onExportClick);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(445, 649);
+            this.button1.Location = new System.Drawing.Point(440, 654);
             this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(100, 29);
-            this.button1.TabIndex = 2;
+            this.button1.TabIndex = 9;
             this.button1.Text = "Up&date";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.btnExpt_Click);
             // 
-            // dataGridView1
+            // grdNodes
             // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.grdNodes.AllowUserToAddRows = false;
+            this.grdNodes.AllowUserToDeleteRows = false;
+            this.grdNodes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.grdNodes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.node,
             this.opaque,
             this.visible});
-            this.dataGridView1.Location = new System.Drawing.Point(4, 232);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 27;
-            this.dataGridView1.Size = new System.Drawing.Size(787, 410);
-            this.dataGridView1.TabIndex = 12;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            this.grdNodes.Location = new System.Drawing.Point(4, 517);
+            this.grdNodes.Name = "grdNodes";
+            this.grdNodes.RowHeadersWidth = 51;
+            this.grdNodes.RowTemplate.Height = 27;
+            this.grdNodes.Size = new System.Drawing.Size(787, 130);
+            this.grdNodes.TabIndex = 7;
+            this.grdNodes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // node
             // 
@@ -175,15 +166,34 @@
             this.visible.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.visible.Width = 80;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(1, 45);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(71, 15);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Registry";
+            // 
+            // txtRegistry
+            // 
+            this.txtRegistry.Location = new System.Drawing.Point(79, 42);
+            this.txtRegistry.Name = "txtRegistry";
+            this.txtRegistry.ReadOnly = true;
+            this.txtRegistry.Size = new System.Drawing.Size(571, 25);
+            this.txtRegistry.TabIndex = 1;
+            // 
             // XvForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(794, 691);
-            this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.btnGltf);
-            this.Controls.Add(this.servUrl);
-            this.Controls.Add(this.label5);
+            this.ClientSize = new System.Drawing.Size(794, 696);
+            this.Controls.Add(this.txtRegistry);
+            this.Controls.Add(this.grdNodes);
+            this.Controls.Add(this.btnExport);
+            this.Controls.Add(this.txtUrl);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.txtJson);
@@ -194,7 +204,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "XvForm";
             this.Text = "Device Settings";
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.grdNodes)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -207,13 +217,14 @@
         private System.Windows.Forms.TextBox txtJson;
         private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox servUrl;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Button btnGltf;
+        private System.Windows.Forms.TextBox txtUrl;
+        private System.Windows.Forms.Button btnExport;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView grdNodes;
         private System.Windows.Forms.DataGridViewTextBoxColumn node;
         private System.Windows.Forms.DataGridViewTextBoxColumn opaque;
         private System.Windows.Forms.DataGridViewCheckBoxColumn visible;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox txtRegistry;
     }
 }
