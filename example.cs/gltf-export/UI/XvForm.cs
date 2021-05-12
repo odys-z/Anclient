@@ -156,30 +156,26 @@ namespace io.odysz.anclient.example.revit {
         }
 
         private void onLogin(object sender, EventArgs e) {
-            string serv = txtUrl.Text + "/login.serv11";
-            postConn(serv, null);
+            if (client == null)
+            {
+                string serv = txtUrl.Text + "/login.serv11";
+                string uid = txtUser.Text;
+                postConn(serv, uid, pswd.Text);
+            }
         }
 
-        private static string s;
-        public static async void postConn(string url, TextBox txtbox) {
-            using (var client = new HttpClient()) {
+        private AnsonClient client;
 
-                try {
-                    StringContent content = getPostPayload();
-
-                    var responseTsk = await client.PostAsync(url, content);
-
-                    var responseString = await responseTsk.Content.ReadAsStringAsync();
-
-                    s = url + "\n" + responseString;
-                    if (txtbox != null)
-                        txtbox.ItemText = s;
-                    else Debug.WriteLine(s);
-                }catch (Exception ex) {
-                    Debug.WriteLine("ERROR ERROR ERROR ERROR ERROR ");
-                    Debug.WriteLine(ex.Message);
-                }
-            }
+        public async void postConn(string url, string uid, string pswd) {
+            await Clients.Login(uid, pswd,
+                (code, resp) =>
+                {
+                    client = new AnsonClient(resp.ssInf);
+                    txtRegistry.Text = string.Format("Token: {0}", client.ssInf.ssid);
+                },
+                (code, resp) => {
+                    TaskDialog.Show("xv BIM Importer", resp.Msg());
+                });
         }
 
         public static StringContent getPostPayload() {
@@ -200,14 +196,14 @@ namespace io.odysz.anclient.example.revit {
             ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
             if (0 == selectedIds.Count) {
                 // If no elements selected.
-                TaskDialog.Show("Revit", "You haven't selected any elements.");
+                TaskDialog.Show("Xport Gltf", "You haven't selected any elements.");
             } else {
                 String info = "Ids of selected elements in the document are: ";
                 foreach (ElementId id in selectedIds) {
                     info += "\n\t" + id.IntegerValue;
                 }
 
-                TaskDialog.Show("Revit", info);
+                txtJson.Text = info;
             }
         }
 

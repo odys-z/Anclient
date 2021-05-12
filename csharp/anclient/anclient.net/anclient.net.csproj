@@ -54,7 +54,6 @@
     <Compile Include="src\anclient\AnsonClient.cs" />
     <Compile Include="src\anclient\Clients.cs" />
     <Compile Include="src\anclient\HttpServClient.cs" />
-    <Compile Include="src\anclient\SessionClient.cs" />
     <Compile Include="src\common\AESHelper.cs" />
     <Compile Include="src\common\Radix64.cs" />
     <Compile Include="src\common\Utils.cs" />
