@@ -34,7 +34,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.btnLogin = new System.Windows.Forms.Button();
-            this.btnUpdate = new System.Windows.Forms.Button();
             this.btnUpload = new System.Windows.Forms.Button();
             this.txtFile = new System.Windows.Forms.TextBox();
             this.lbAttachId = new System.Windows.Forms.Label();
@@ -42,7 +41,7 @@
             // 
             // pswd
             // 
-            this.pswd.Location = new System.Drawing.Point(203, 40);
+            this.pswd.Location = new System.Drawing.Point(198, 56);
             this.pswd.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pswd.Name = "pswd";
             this.pswd.PasswordChar = '*';
@@ -52,7 +51,7 @@
             // 
             // txtUser
             // 
-            this.txtUser.Location = new System.Drawing.Point(87, 40);
+            this.txtUser.Location = new System.Drawing.Point(82, 56);
             this.txtUser.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtUser.Name = "txtUser";
             this.txtUser.Size = new System.Drawing.Size(109, 25);
@@ -61,16 +60,16 @@
             // 
             // txtRegistry
             // 
-            this.txtRegistry.Location = new System.Drawing.Point(395, 40);
+            this.txtRegistry.Location = new System.Drawing.Point(390, 56);
             this.txtRegistry.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtRegistry.Name = "txtRegistry";
             this.txtRegistry.ReadOnly = true;
-            this.txtRegistry.Size = new System.Drawing.Size(171, 25);
+            this.txtRegistry.Size = new System.Drawing.Size(141, 25);
             this.txtRegistry.TabIndex = 14;
             // 
             // btnExport
             // 
-            this.btnExport.Location = new System.Drawing.Point(688, 38);
+            this.btnExport.Location = new System.Drawing.Point(542, 112);
             this.btnExport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(111, 29);
@@ -81,7 +80,7 @@
             // 
             // txtUrl
             // 
-            this.txtUrl.Location = new System.Drawing.Point(87, 4);
+            this.txtUrl.Location = new System.Drawing.Point(82, 20);
             this.txtUrl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtUrl.Name = "txtUrl";
             this.txtUrl.Size = new System.Drawing.Size(571, 25);
@@ -91,7 +90,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(9, 44);
+            this.label4.Location = new System.Drawing.Point(4, 60);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(71, 15);
@@ -101,7 +100,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 8);
+            this.label3.Location = new System.Drawing.Point(4, 24);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(79, 15);
@@ -110,31 +109,21 @@
             // 
             // btnLogin
             // 
-            this.btnLogin.Location = new System.Drawing.Point(573, 38);
+            this.btnLogin.Location = new System.Drawing.Point(542, 54);
             this.btnLogin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(85, 29);
+            this.btnLogin.Size = new System.Drawing.Size(111, 29);
             this.btnLogin.TabIndex = 10;
             this.btnLogin.Text = "&connect";
             this.btnLogin.UseVisualStyleBackColor = true;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
-            // btnUpdate
-            // 
-            this.btnUpdate.Location = new System.Drawing.Point(423, 204);
-            this.btnUpdate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.btnUpdate.Name = "btnUpdate";
-            this.btnUpdate.Size = new System.Drawing.Size(100, 29);
-            this.btnUpdate.TabIndex = 17;
-            this.btnUpdate.Text = "Up&date";
-            this.btnUpdate.UseVisualStyleBackColor = true;
-            // 
             // btnUpload
             // 
-            this.btnUpload.Location = new System.Drawing.Point(253, 204);
+            this.btnUpload.Location = new System.Drawing.Point(542, 162);
             this.btnUpload.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnUpload.Name = "btnUpload";
-            this.btnUpload.Size = new System.Drawing.Size(100, 29);
+            this.btnUpload.Size = new System.Drawing.Size(111, 29);
             this.btnUpload.TabIndex = 18;
             this.btnUpload.Text = "&Upload";
             this.btnUpload.UseVisualStyleBackColor = true;
@@ -142,16 +131,16 @@
             // 
             // txtFile
             // 
-            this.txtFile.Location = new System.Drawing.Point(87, 100);
+            this.txtFile.Location = new System.Drawing.Point(82, 162);
             this.txtFile.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtFile.Name = "txtFile";
-            this.txtFile.Size = new System.Drawing.Size(571, 25);
+            this.txtFile.Size = new System.Drawing.Size(449, 25);
             this.txtFile.TabIndex = 19;
             // 
             // lbAttachId
             // 
             this.lbAttachId.AutoSize = true;
-            this.lbAttachId.Location = new System.Drawing.Point(84, 140);
+            this.lbAttachId.Location = new System.Drawing.Point(79, 202);
             this.lbAttachId.Name = "lbAttachId";
             this.lbAttachId.Size = new System.Drawing.Size(31, 15);
             this.lbAttachId.TabIndex = 20;
@@ -161,10 +150,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 252);
+            this.ClientSize = new System.Drawing.Size(672, 246);
             this.Controls.Add(this.lbAttachId);
             this.Controls.Add(this.txtFile);
-            this.Controls.Add(this.btnUpdate);
             this.Controls.Add(this.btnUpload);
             this.Controls.Add(this.pswd);
             this.Controls.Add(this.txtUser);
@@ -176,7 +164,7 @@
             this.Controls.Add(this.btnLogin);
             this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "XvForm";
-            this.Text = "Form1";
+            this.Text = "Anclient.cs File Upload Example";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -192,7 +180,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnLogin;
-        private System.Windows.Forms.Button btnUpdate;
         private System.Windows.Forms.Button btnUpload;
         private System.Windows.Forms.TextBox txtFile;
         private System.Windows.Forms.Label lbAttachId;
