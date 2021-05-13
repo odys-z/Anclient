@@ -13,10 +13,7 @@ namespace file.upload
         private string uid;
         private List<string> currentFiles;
 
-        public XvForm()
-        {
-            InitializeComponent();
-        }
+        public XvForm() => InitializeComponent();
 
         private async void btnLogin_Click(object sender, EventArgs e)
         {
@@ -49,7 +46,7 @@ namespace file.upload
                     string directory = Path.GetDirectoryName(filename) + "\\";
                     string gltf = Path.GetFileName(filename);
                     string glb = Path.GetFileNameWithoutExtension(gltf) + ".bin";
-                    txtFile.Text = filename + ", " + glb;
+                    txtFile.Text = filename + " -> " + glb;
                     currentFiles = new List<string> { filename, Path.Combine(directory, glb) };
                 }
                 else

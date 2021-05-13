@@ -26,6 +26,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(XvForm));
             this.pswd = new System.Windows.Forms.TextBox();
             this.txtUser = new System.Windows.Forms.TextBox();
             this.txtRegistry = new System.Windows.Forms.TextBox();
@@ -37,6 +38,7 @@
             this.btnUpload = new System.Windows.Forms.Button();
             this.txtFile = new System.Windows.Forms.TextBox();
             this.lbAttachId = new System.Windows.Forms.Label();
+            this.notes = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // pswd
@@ -69,8 +71,8 @@
             // 
             // btnExport
             // 
-            this.btnExport.Location = new System.Drawing.Point(542, 112);
-            this.btnExport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnExport.Location = new System.Drawing.Point(542, 180);
+            this.btnExport.Margin = new System.Windows.Forms.Padding(4);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(111, 29);
             this.btnExport.TabIndex = 16;
@@ -81,7 +83,7 @@
             // txtUrl
             // 
             this.txtUrl.Location = new System.Drawing.Point(82, 20);
-            this.txtUrl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtUrl.Margin = new System.Windows.Forms.Padding(4);
             this.txtUrl.Name = "txtUrl";
             this.txtUrl.Size = new System.Drawing.Size(571, 25);
             this.txtUrl.TabIndex = 9;
@@ -110,7 +112,7 @@
             // btnLogin
             // 
             this.btnLogin.Location = new System.Drawing.Point(542, 54);
-            this.btnLogin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(4);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(111, 29);
             this.btnLogin.TabIndex = 10;
@@ -120,8 +122,8 @@
             // 
             // btnUpload
             // 
-            this.btnUpload.Location = new System.Drawing.Point(542, 162);
-            this.btnUpload.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnUpload.Location = new System.Drawing.Point(542, 230);
+            this.btnUpload.Margin = new System.Windows.Forms.Padding(4);
             this.btnUpload.Name = "btnUpload";
             this.btnUpload.Size = new System.Drawing.Size(111, 29);
             this.btnUpload.TabIndex = 18;
@@ -131,8 +133,8 @@
             // 
             // txtFile
             // 
-            this.txtFile.Location = new System.Drawing.Point(82, 162);
-            this.txtFile.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFile.Location = new System.Drawing.Point(82, 230);
+            this.txtFile.Margin = new System.Windows.Forms.Padding(4);
             this.txtFile.Name = "txtFile";
             this.txtFile.Size = new System.Drawing.Size(449, 25);
             this.txtFile.TabIndex = 19;
@@ -140,17 +142,27 @@
             // lbAttachId
             // 
             this.lbAttachId.AutoSize = true;
-            this.lbAttachId.Location = new System.Drawing.Point(79, 202);
+            this.lbAttachId.Location = new System.Drawing.Point(79, 270);
             this.lbAttachId.Name = "lbAttachId";
             this.lbAttachId.Size = new System.Drawing.Size(31, 15);
             this.lbAttachId.TabIndex = 20;
             this.lbAttachId.Text = "...";
             // 
+            // notes
+            // 
+            this.notes.AutoSize = true;
+            this.notes.Location = new System.Drawing.Point(48, 105);
+            this.notes.Name = "notes";
+            this.notes.Size = new System.Drawing.Size(487, 75);
+            this.notes.TabIndex = 21;
+            this.notes.Text = resources.GetString("notes.Text");
+            // 
             // XvForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(672, 246);
+            this.ClientSize = new System.Drawing.Size(672, 302);
+            this.Controls.Add(this.notes);
             this.Controls.Add(this.lbAttachId);
             this.Controls.Add(this.txtFile);
             this.Controls.Add(this.btnUpload);
@@ -162,7 +174,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnLogin);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "XvForm";
             this.Text = "Anclient.cs File Upload Example";
             this.ResumeLayout(false);
@@ -183,6 +195,7 @@
         private System.Windows.Forms.Button btnUpload;
         private System.Windows.Forms.TextBox txtFile;
         private System.Windows.Forms.Label lbAttachId;
+        private System.Windows.Forms.Label notes;
     }
 }
 

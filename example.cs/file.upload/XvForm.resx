@@ -117,4 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="notes.Text" xml:space="preserve">
+    <value>Note:
+All text file is loaded as binary and converted int base64, 
+and saved at server side as utf-8 encoding text.
+So make sure all text file are saved as utf-8 format. This 
+not the default in Windows notpad.</value>
+  </data>
 </root>
