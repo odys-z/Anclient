@@ -5,6 +5,9 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.UI.Events;
+using glTFRevitExport;
+using Newtonsoft.Json;
 
 namespace io.odysz.anclient.example.revit
 {
@@ -13,16 +16,21 @@ namespace io.odysz.anclient.example.revit
     ///
     /// </summary>
     public class ExApp : IExternalApplication {
-        private static string icoPath = @"assets/xv.png";
+        private static string icoPath = @"assets\ir.png";
+        public static bool commandSwitch = false;
+        public static UIDocument uidoc = null;
+        public static System.Windows.Forms.TextBox txtGltf = null;
+        private UIControlledApplication app;
 
         public Result OnStartup(UIControlledApplication application) {
+            this.app = application;
             // Add a new ribbon panel
             RibbonPanel ribbonPanel = application.CreateRibbonPanel("Import x-visual");
 
             // Create a push button to trigger a command add it to the ribbon panel.
             string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
             PushButtonData buttonData = new PushButtonData("cmdXp",
-               "x-visual...", thisAssemblyPath, "io.odysz.anclient.example.revit.XvForm");
+               "x-visual...", thisAssemblyPath, "io.odysz.anclient.example.revit.ShowForm");
 
             PushButton pushButton = ribbonPanel.AddItem(buttonData) as PushButton;
 
@@ -32,11 +40,27 @@ namespace io.odysz.anclient.example.revit
 
             // b) large bitmap
             Uri uriImage = new Uri(Path.GetDirectoryName(thisAssemblyPath) + @"\" + icoPath);
-
             BitmapImage largeImage = new BitmapImage(uriImage);
             pushButton.LargeImage = largeImage;
 
+
+            // correct way: https://www.revitapidocs.com/2015/e233027b-ba8c-0bd1-37b7-93a066efa5a3.htm
+            application.Idling += new EventHandler<IdlingEventArgs>(idleExport);
+
             return Result.Succeeded;
+        }
+
+        private void idleExport(object sender, IdlingEventArgs e)
+        {
+            if (commandSwitch)
+            {
+                commandSwitch = false;
+                Command cmd = new Command();
+                cmd.Execute(uidoc);
+                glTF glTF = cmd.resultGltf;
+                txtGltf.Text += "nodes...\n";
+                txtGltf.Text += JsonConvert.SerializeObject(glTF, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            }
         }
 
         public Result OnShutdown(UIControlledApplication application) {
