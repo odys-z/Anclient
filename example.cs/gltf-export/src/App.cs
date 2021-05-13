@@ -50,6 +50,11 @@ namespace io.odysz.anclient.example.revit
             return Result.Succeeded;
         }
 
+        /// <summary>
+        /// Export (using CustomerExport) in idel events.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void idleExport(object sender, IdlingEventArgs e)
         {
             if (commandSwitch)
@@ -60,6 +65,7 @@ namespace io.odysz.anclient.example.revit
                 glTF glTF = cmd.resultGltf;
                 txtGltf.Text += "nodes...\n";
                 txtGltf.Text += JsonConvert.SerializeObject(glTF, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                currentFiles = cmd.localGltf;
             }
         }
 
