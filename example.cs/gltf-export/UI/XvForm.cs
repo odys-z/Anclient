@@ -196,20 +196,18 @@ namespace io.odysz.anclient.example.revit {
             ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
             if (0 == selectedIds.Count) {
                 // If no elements selected.
-                TaskDialog.Show("Xport Gltf", "You haven't selected any elements.");
+                TaskDialog.Show("X-visual BIM Import", "You haven't selected any elements.");
             } else {
-                String info = "Ids of selected elements in the document are: ";
+                string info = "Ids of selected elements in the document are: ";
                 foreach (ElementId id in selectedIds) {
                     info += "\n\t" + id.IntegerValue;
                 }
 
                 txtJson.Text = info;
+
+                XvCmds cmd = new XvCmds();
+                cmd.ExportViewCmd(dbdoc);
             }
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
         }
 
     }

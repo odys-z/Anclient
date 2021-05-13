@@ -39,6 +39,7 @@
             this.txtRegistry = new System.Windows.Forms.TextBox();
             this.txtUser = new System.Windows.Forms.TextBox();
             this.pswd = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.grdNodes)).BeginInit();
             this.SuspendLayout();
             // 
@@ -94,10 +95,10 @@
             // 
             // btnExport
             // 
-            this.btnExport.Location = new System.Drawing.Point(658, 51);
+            this.btnExport.Location = new System.Drawing.Point(680, 51);
             this.btnExport.Margin = new System.Windows.Forms.Padding(4);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(133, 29);
+            this.btnExport.Size = new System.Drawing.Size(111, 29);
             this.btnExport.TabIndex = 7;
             this.btnExport.Text = "E&xport GLTF";
             this.btnExport.UseVisualStyleBackColor = true;
@@ -129,7 +130,6 @@
             this.grdNodes.RowTemplate.Height = 27;
             this.grdNodes.Size = new System.Drawing.Size(787, 153);
             this.grdNodes.TabIndex = 10;
-            this.grdNodes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // node
             // 
@@ -190,6 +190,17 @@
             this.pswd.Size = new System.Drawing.Size(186, 25);
             this.pswd.TabIndex = 5;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(680, 17);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(111, 29);
+            this.button1.TabIndex = 7;
+            this.button1.Text = "E&xport IFC";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.onExportClick);
+            // 
             // XvForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -200,6 +211,7 @@
             this.Controls.Add(this.txtUser);
             this.Controls.Add(this.txtRegistry);
             this.Controls.Add(this.grdNodes);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnExport);
             this.Controls.Add(this.txtUrl);
             this.Controls.Add(this.label4);
@@ -234,5 +246,6 @@
         private System.Windows.Forms.TextBox txtRegistry;
         private System.Windows.Forms.TextBox txtUser;
         private System.Windows.Forms.TextBox pswd;
+        private System.Windows.Forms.Button button1;
     }
 }

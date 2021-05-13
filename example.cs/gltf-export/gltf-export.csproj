@@ -37,7 +37,7 @@
       <HintPath>..\..\csharp\anclient\packages\Antson.CSharp.0.9.24\lib\net471\antson.csharp.dll</HintPath>
     </Reference>
     <Reference Include="glTFRevitExport, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.5\lib\net471\glTFRevitExport.dll</HintPath>
+      <HintPath>..\..\csharp\anclient\packages\GltfExport.RevitPlugin.0.1.7\lib\net471\glTFRevitExport.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\csharp\anclient\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
