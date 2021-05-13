@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antest.Anclient", "Antest.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gltf-export", "..\..\example.cs\gltf-export\gltf-export.csproj", "{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "file.upload", "..\..\example.cs\file.upload\file.upload.csproj", "{3FCB85B3-ED08-4496-9711-07CC6E5BAE35}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7E7FD23-BD18-46FD-9ECE-29DB50F23420}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FCB85B3-ED08-4496-9711-07CC6E5BAE35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FCB85B3-ED08-4496-9711-07CC6E5BAE35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FCB85B3-ED08-4496-9711-07CC6E5BAE35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FCB85B3-ED08-4496-9711-07CC6E5BAE35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

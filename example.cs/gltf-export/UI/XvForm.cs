@@ -1,25 +1,27 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
+using glTFRevitExport;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
-using System.Windows.Forms;
-using TextBox = Autodesk.Revit.UI.TextBox;
 
 namespace io.odysz.anclient.example.revit {
     public partial class XvForm : System.Windows.Forms.Form {
         private readonly UIDocument uidoc; // = commandData.Application.ActiveUIDocument;
         private readonly Document dbdoc;
-        private readonly Autodesk.Revit.DB.View view;
+        private readonly View view;
+        private readonly UIApplication uiApp;
 
-        public XvForm(Document dbdoc, UIDocument uidoc, Autodesk.Revit.DB.View uiview) {
+        public XvForm(Document dbdoc, UIDocument uidoc, View uiview) {
             InitializeComponent();
             this.dbdoc = dbdoc;
             this.uidoc = uidoc;
             view = uiview;
+            uiApp = uidoc.Application;
+            txtJson.Text = uidoc.Document.Title;
         }
 
         private Schema deviceSchema;
@@ -205,10 +207,47 @@ namespace io.odysz.anclient.example.revit {
 
                 txtJson.Text = info;
 
-                XvCmds cmd = new XvCmds();
-                cmd.ExportViewCmd(dbdoc);
+                Command cmd = new Command();
+                cmd.Execute(uidoc);
             }
         }
 
+        /// <summary>
+        /// Handling issue:
+        /// Autodesk.Revit.Exceptions.InternalException: Failed to register a managed object for the currently
+        /// active external application. 
+        /// A possible cause may be an inactive external application(not being invoked by Revit at present)
+        /// attempting to assess the Revit API from a modeless dialog or another outside thread.
+        /// See disscussion at
+        /// https://forums.autodesk.com/t5/revit-api-forum/revit-2015-exception-with-autodesk-revit-db-customexporter/td-p/4978936
+        /// So, when a form started in another thread, it can't execute export command like that in addin command.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void onExportClick2(object sender, EventArgs e)
+        {
+            ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
+            if (0 == selectedIds.Count)
+            {
+                // If no elements selected.
+                TaskDialog.Show("X-visual BIM Import", "You haven't selected any elements.");
+            }
+            else
+            {
+                string info = "Json nodes: ";
+                foreach (ElementId id in selectedIds)
+                {
+                    info += "\n\t" + id.IntegerValue;
+                }
+
+                txtJson.Text = info;
+
+                // Command can not executed here
+                // correct way: https://www.revitapidocs.com/2015/e233027b-ba8c-0bd1-37b7-93a066efa5a3.htm
+                ExApp.uidoc = uidoc;
+                ExApp.txtGltf = txtJson;
+                ExApp.commandSwitch = true;
+            }
+        }
     }
 }

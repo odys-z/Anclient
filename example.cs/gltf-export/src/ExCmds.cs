@@ -46,6 +46,7 @@ namespace io.odysz.anclient.example.revit
                 string filename = fileDialog.FileName;
                 string directory = Path.GetDirectoryName(filename) + "\\";
 
+                TaskDialog.Show(filename, directory);
                 ExportViewCmd(view, filename, directory);
             }
 

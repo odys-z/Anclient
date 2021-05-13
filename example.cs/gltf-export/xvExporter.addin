@@ -8,4 +8,13 @@
     <VendorId>odysz.github.io</VendorId>
     <VendorDescription>Odys Zhou</VendorDescription>
   </AddIn>
+  <AddIn Type="Command">
+    <Text>xv exp</Text>
+    <Description>X-visual gltf importer</Description>
+    <Assembly>xvExporter/gltf-export.dll</Assembly>
+    <FullClassName>io.odysz.anclient.example.revit.XvCmds</FullClassName>
+    <ClientId>38555A79-E66E-49B6-8278-191F17E931B2</ClientId>
+    <VendorId>_RTM</VendorId>
+    <VendorDescription>Ryan T. McCullough</VendorDescription>
+  </AddIn>
 </RevitAddIns>
