@@ -22,7 +22,7 @@ namespace io.odysz.common
 
         public static void Warn(string info)
         {
-            Console.Out.WriteLine(info);
+            Console.Error.WriteLine(info);
         }
     }
 }

@@ -86,5 +86,10 @@ namespace io.odysz.semantic.jprotocol
 		{
 			return map;
 		}
+
+		public object Map(string k)
+        {
+			return map?[k];
+        }
 	}
 }

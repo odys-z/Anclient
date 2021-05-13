@@ -118,7 +118,12 @@ namespace io.odysz.semantics
 			return ((List<object>)get("rs"))[i];
 		}
 
-		public virtual int total(int i)
+        public object Get(string v)
+        {
+			return props?[v];
+        }
+
+        public virtual int total(int i)
 		{
 			if (get("total") == null)
 			{
