@@ -8,6 +8,10 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI.Events;
 using glTFRevitExport;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using io.odysz.semantics;
+using io.odysz.semantic.jprotocol;
+using System.Windows.Forms;
 
 namespace io.odysz.anclient.example.revit
 {
@@ -21,6 +25,7 @@ namespace io.odysz.anclient.example.revit
         public static UIDocument uidoc = null;
         public static System.Windows.Forms.TextBox txtGltf = null;
         private UIControlledApplication app;
+        private List<string> currentFiles;
 
         public Result OnStartup(UIControlledApplication application) {
             this.app = application;
@@ -65,7 +70,7 @@ namespace io.odysz.anclient.example.revit
                 glTF glTF = cmd.resultGltf;
                 txtGltf.Text += "nodes...\n";
                 txtGltf.Text += JsonConvert.SerializeObject(glTF, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                currentFiles = cmd.localGltf;
+                currentFiles = Core.Gltfilenames(cmd.filename);
             }
         }
 
@@ -94,6 +99,8 @@ namespace io.odysz.anclient.example.revit
             f.Show();
             return Result.Succeeded;
         }
+
     }
+
 
 }

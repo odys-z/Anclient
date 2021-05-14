@@ -24,7 +24,7 @@
         /// </summary>
         private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(XvForm));
-            this.btnExpt = new System.Windows.Forms.Button();
+            this.btnUpload = new System.Windows.Forms.Button();
             this.txtJson = new System.Windows.Forms.TextBox();
             this.btnLogin = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -42,21 +42,21 @@
             ((System.ComponentModel.ISupportInitialize)(this.grdNodes)).BeginInit();
             this.SuspendLayout();
             // 
-            // btnExpt
+            // btnUpload
             // 
-            this.btnExpt.Location = new System.Drawing.Point(346, 504);
-            this.btnExpt.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.btnExpt.Name = "btnExpt";
-            this.btnExpt.Size = new System.Drawing.Size(100, 29);
-            this.btnExpt.TabIndex = 11;
-            this.btnExpt.Text = "&Upload";
-            this.btnExpt.UseVisualStyleBackColor = true;
-            this.btnExpt.Click += new System.EventHandler(this.btnExpt_Click);
+            this.btnUpload.Location = new System.Drawing.Point(346, 504);
+            this.btnUpload.Margin = new System.Windows.Forms.Padding(4);
+            this.btnUpload.Name = "btnUpload";
+            this.btnUpload.Size = new System.Drawing.Size(100, 29);
+            this.btnUpload.TabIndex = 11;
+            this.btnUpload.Text = "&Upload";
+            this.btnUpload.UseVisualStyleBackColor = true;
+            this.btnUpload.Click += new System.EventHandler(this.btnUpload_Click);
             // 
             // txtJson
             // 
             this.txtJson.Location = new System.Drawing.Point(4, 88);
-            this.txtJson.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtJson.Margin = new System.Windows.Forms.Padding(4);
             this.txtJson.Multiline = true;
             this.txtJson.Name = "txtJson";
             this.txtJson.Size = new System.Drawing.Size(787, 400);
@@ -65,7 +65,7 @@
             // btnLogin
             // 
             this.btnLogin.Location = new System.Drawing.Point(565, 51);
-            this.btnLogin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(4);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(85, 29);
             this.btnLogin.TabIndex = 2;
@@ -86,7 +86,7 @@
             // txtUrl
             // 
             this.txtUrl.Location = new System.Drawing.Point(79, 18);
-            this.txtUrl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtUrl.Margin = new System.Windows.Forms.Padding(4);
             this.txtUrl.Name = "txtUrl";
             this.txtUrl.Size = new System.Drawing.Size(571, 25);
             this.txtUrl.TabIndex = 1;
@@ -95,7 +95,7 @@
             // btnExport
             // 
             this.btnExport.Location = new System.Drawing.Point(680, 51);
-            this.btnExport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnExport.Margin = new System.Windows.Forms.Padding(4);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(111, 29);
             this.btnExport.TabIndex = 7;
@@ -185,13 +185,13 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(680, 18);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(111, 29);
             this.button1.TabIndex = 7;
             this.button1.Text = "&Check IFC";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.onExportClick);
+            this.button1.Click += new System.EventHandler(this.onExportClick2);
             // 
             // XvForm
             // 
@@ -210,9 +210,9 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.txtJson);
-            this.Controls.Add(this.btnExpt);
+            this.Controls.Add(this.btnUpload);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "XvForm";
             this.Text = "X-visual BIM Import";
             ((System.ComponentModel.ISupportInitialize)(this.grdNodes)).EndInit();
@@ -222,7 +222,7 @@
         }
 
         #endregion
-        private System.Windows.Forms.Button btnExpt;
+        private System.Windows.Forms.Button btnUpload;
         private System.Windows.Forms.TextBox txtJson;
         private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Label label3;
