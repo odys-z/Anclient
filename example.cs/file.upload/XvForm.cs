@@ -1,5 +1,5 @@
 ﻿using io.odysz.anclient;
-using io.odysz.semantic.jprotocol;
+using io.odysz.anclient.example.revit;
 using io.odysz.semantics;
 using System;
 using System.Collections.Generic;
@@ -40,23 +40,9 @@ namespace file.upload
             DialogResult dialogResult = fd.ShowDialog();
             if (dialogResult == DialogResult.OK)
             {
-                string filename = fd.FileName;
-                if (".gltf" == Path.GetExtension(filename))
-                {
-                    string directory = Path.GetDirectoryName(filename) + "\\";
-                    string gltf = Path.GetFileName(filename);
-                    string glb = Path.GetFileNameWithoutExtension(gltf) + ".bin";
-                    txtFile.Text = filename + " -> " + glb;
-                    currentFiles = new List<string> { filename, Path.Combine(directory, glb) };
-                }
-                else
-                {
-                    txtFile.Text = filename;
-                    currentFiles = new List<string>() { filename };
-                }
+                currentFiles = Core.Gltfilenames(fd.FileName, txtFile);
             }
         }
-
 
         private void btnUpload_Click(object sender, EventArgs e)
         {
@@ -70,20 +56,16 @@ namespace file.upload
                     return;
                 }
 
-            // upload to a_attaches
-            if (client == null)
-                    MessageBox.Show("Please connect first.", "Uploat");
-            
-            else
-            {
-                client.AttachFiles(currentFiles, "a_users", uid, (c, d) => {
-                    SemanticObject resulved = (SemanticObject)((AnsonResp)d).Map("resulved");
+            Core.uploadUi(client, uid, currentFiles,
+                (resulved) =>
+                {
                     SemanticObject attId0 = (SemanticObject)resulved.Get("a_attaches"); // some Id losted when resulving
-                    lbAttachId.Invoke((MethodInvoker)delegate {
+                    lbAttachId.Invoke((MethodInvoker)delegate
+                    {
                         lbAttachId.Text = "last file recId: " + attId0.Get("attId");
                     });
                 });
-            }
         }
+
     }
 }
