@@ -215,11 +215,12 @@ namespace io.odysz.anclient
             foreach (string file in files)
             {
                 byte[] f = File.ReadAllBytes(file);
+                string fn = Path.GetFileName(file);
                 string b64 = AESHelper.Encode64(f);
                 del.Post(AnInsertReq
                     .formatInsertReq(null, null, "a_attaches")
                     .Cols("attName", "busiId", "busiTbl", "uri")
-                    .Nv("attName", "-" + recid)
+                    .Nv("attName", fn)
                     .Nv("busiId", recid)
                     .Nv("busiTbl", busiTbl)
                     .Nv("uri", b64));

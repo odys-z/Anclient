@@ -27,7 +27,8 @@ namespace io.odysz.anclient
 		public static void Init(string servRoot)
 		{
             // c# problem - must use the assembly name for consturcting object instance
-			JSONAnsonListener.setAssembly(Assembly.GetExecutingAssembly().GetName().Name);
+			// JSONAnsonListener.setAssembly(Assembly.GetExecutingAssembly().GetName().Name);
+			JSONAnsonListener.setAssembly("anclient.net");
 
 			servRt = servRoot;
 			conn = null; // client can't control engine connect. configured in workflow-meta.xml
