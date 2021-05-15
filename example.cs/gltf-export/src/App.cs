@@ -9,9 +9,6 @@ using Autodesk.Revit.UI.Events;
 using glTFRevitExport;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using io.odysz.semantics;
-using io.odysz.semantic.jprotocol;
-using System.Windows.Forms;
 
 namespace io.odysz.anclient.example.revit
 {
@@ -24,8 +21,9 @@ namespace io.odysz.anclient.example.revit
         public static bool commandSwitch = false;
         public static UIDocument uidoc = null;
         public static System.Windows.Forms.TextBox txtGltf = null;
+        public static List<string> currentFiles;
+
         private UIControlledApplication app;
-        private List<string> currentFiles;
 
         public Result OnStartup(UIControlledApplication application) {
             this.app = application;

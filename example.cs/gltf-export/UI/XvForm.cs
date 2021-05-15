@@ -1,21 +1,22 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Events;
-using glTFRevitExport;
+using io.odysz.semantics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Windows.Forms;
 
 namespace io.odysz.anclient.example.revit {
     public partial class XvForm : System.Windows.Forms.Form {
         private readonly UIDocument uidoc; // = commandData.Application.ActiveUIDocument;
         private readonly Document dbdoc;
-        private readonly View view;
+        private readonly Autodesk.Revit.DB.View view;
         private readonly UIApplication uiApp;
+        private AnsonClient client;
 
-        public XvForm(Document dbdoc, UIDocument uidoc, View uiview) {
+        public XvForm(Document dbdoc, UIDocument uidoc, Autodesk.Revit.DB.View uiview) {
             InitializeComponent();
             this.dbdoc = dbdoc;
             this.uidoc = uidoc;
@@ -24,29 +25,23 @@ namespace io.odysz.anclient.example.revit {
             txtJson.Text = uidoc.Document.Title;
         }
 
-        private Schema deviceSchema;
         private static Guid guid = new Guid("17760704-1971-1911-1010-197101234567");
 
-        private void onLogin(object sender, EventArgs e) {
-            if (client == null)
+        private async void onLogin(object sender, EventArgs e) {
+            string uid = txtUser.Text;
+            string pwd = pswd.Text;
+            if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(pwd) || uid.Length != 5 || pwd.Length != 6)
             {
-                string serv = txtUrl.Text + "/login.serv11";
-                string uid = txtUser.Text;
-                postConn(serv, uid, pswd.Text);
+                MessageBox.Show("user/password invalid!", "login");
+                return;
             }
-        }
 
-        private AnsonClient client;
-
-        public async void postConn(string url, string uid, string pswd) {
-            await Clients.Login(uid, pswd,
+            Clients.Init(txtUrl.Text);// + "/login.serv11");
+            await Clients.Login(uid, "----------" + pwd,
                 (code, resp) =>
                 {
                     client = new AnsonClient(resp.ssInf);
-                    txtRegistry.Text = string.Format("Token: {0}", client.ssInf.ssid);
-                },
-                (code, resp) => {
-                    TaskDialog.Show("xv BIM Importer", resp.Msg());
+                    txtRegistry.Text = client.ssInf.ssid;
                 });
         }
 
@@ -59,28 +54,6 @@ namespace io.odysz.anclient.example.revit {
             // return new StringContent(values.ToString(), Encoding.UTF8);
             return new StringContent("{}", Encoding.UTF8, "application/json");
         }
-
-        /// <summary>
-        /// Find a selected element.
-        /// https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2016/ENU/Revit-API/files/GUID-C67BE1BC-50D6-403C-8458-61BEBADFC6CE-htm.html
-        /// </summary>
-        //private void onExportClick(object sender, EventArgs e) {
-        //    ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
-        //    if (0 == selectedIds.Count) {
-        //        // If no elements selected.
-        //        TaskDialog.Show("X-visual BIM Import", "You haven't selected any elements.");
-        //    } else {
-        //        string info = "Ids of selected elements in the document are: ";
-        //        foreach (ElementId id in selectedIds) {
-        //            info += "\n\t" + id.IntegerValue;
-        //        }
-
-        //        txtJson.Text = info;
-
-        //        Command cmd = new Command();
-        //        cmd.Execute(uidoc);
-        //    }
-        //}
 
         /// <summary>
         /// Handling issue:
@@ -122,7 +95,23 @@ namespace io.odysz.anclient.example.revit {
 
         private void btnUpload_Click(object sender, EventArgs e)
         {
+            foreach (string fn in ExApp.currentFiles)
+                if (string.IsNullOrEmpty(fn) || !File.Exists(fn))
+                {
+                    MessageBox.Show("File not found: " + fn, "Upload");
+                    return;
+                }
 
+            string uid = client.ssInf.uid;
+            Core.uploadUi(client, uid, ExApp.currentFiles,
+                (resulved) =>
+                {
+                    SemanticObject attId0 = (SemanticObject)resulved.Get("a_attaches"); // some Id losted when resulving
+                    lbAttachId.Invoke((MethodInvoker)delegate
+                    {
+                        lbAttachId.Text = "last file recId: " + attId0.Get("attId");
+                    });
+                });
         }
     }
 }
