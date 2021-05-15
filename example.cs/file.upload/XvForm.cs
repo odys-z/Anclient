@@ -43,6 +43,10 @@ namespace file.upload
                 currentFiles = Core.Gltfilenames(fd.FileName, txtFile);
             }
         }
+        private void onGlb(object sender, EventArgs e)
+        {
+
+        }
 
         private void btnUpload_Click(object sender, EventArgs e)
         {
@@ -66,6 +70,5 @@ namespace file.upload
                     });
                 });
         }
-
     }
 }

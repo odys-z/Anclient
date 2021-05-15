@@ -39,6 +39,8 @@
             this.txtFile = new System.Windows.Forms.TextBox();
             this.lbAttachId = new System.Windows.Forms.Label();
             this.notes = new System.Windows.Forms.Label();
+            this.onGlb = new System.Windows.Forms.Button();
+            this.txtGltf = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // pswd
@@ -122,7 +124,7 @@
             // 
             // btnUpload
             // 
-            this.btnUpload.Location = new System.Drawing.Point(542, 230);
+            this.btnUpload.Location = new System.Drawing.Point(542, 254);
             this.btnUpload.Margin = new System.Windows.Forms.Padding(4);
             this.btnUpload.Name = "btnUpload";
             this.btnUpload.Size = new System.Drawing.Size(111, 29);
@@ -133,7 +135,7 @@
             // 
             // txtFile
             // 
-            this.txtFile.Location = new System.Drawing.Point(82, 230);
+            this.txtFile.Location = new System.Drawing.Point(82, 254);
             this.txtFile.Margin = new System.Windows.Forms.Padding(4);
             this.txtFile.Name = "txtFile";
             this.txtFile.Size = new System.Drawing.Size(449, 25);
@@ -142,7 +144,7 @@
             // lbAttachId
             // 
             this.lbAttachId.AutoSize = true;
-            this.lbAttachId.Location = new System.Drawing.Point(79, 270);
+            this.lbAttachId.Location = new System.Drawing.Point(79, 283);
             this.lbAttachId.Name = "lbAttachId";
             this.lbAttachId.Size = new System.Drawing.Size(31, 15);
             this.lbAttachId.TabIndex = 20;
@@ -157,14 +159,35 @@
             this.notes.TabIndex = 21;
             this.notes.Text = resources.GetString("notes.Text");
             // 
+            // onGlb
+            // 
+            this.onGlb.Location = new System.Drawing.Point(542, 217);
+            this.onGlb.Margin = new System.Windows.Forms.Padding(4);
+            this.onGlb.Name = "onGlb";
+            this.onGlb.Size = new System.Drawing.Size(111, 29);
+            this.onGlb.TabIndex = 18;
+            this.onGlb.Text = "Con&vert GLB";
+            this.onGlb.UseVisualStyleBackColor = true;
+            this.onGlb.Click += new System.EventHandler(this.onGlb);
+            // 
+            // txtGltf
+            // 
+            this.txtGltf.Location = new System.Drawing.Point(82, 217);
+            this.txtGltf.Margin = new System.Windows.Forms.Padding(4);
+            this.txtGltf.Name = "txtGltf";
+            this.txtGltf.Size = new System.Drawing.Size(449, 25);
+            this.txtGltf.TabIndex = 19;
+            // 
             // XvForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(672, 302);
+            this.ClientSize = new System.Drawing.Size(672, 328);
             this.Controls.Add(this.notes);
             this.Controls.Add(this.lbAttachId);
+            this.Controls.Add(this.txtGltf);
             this.Controls.Add(this.txtFile);
+            this.Controls.Add(this.onGlb);
             this.Controls.Add(this.btnUpload);
             this.Controls.Add(this.pswd);
             this.Controls.Add(this.txtUser);
@@ -196,6 +219,8 @@
         private System.Windows.Forms.TextBox txtFile;
         private System.Windows.Forms.Label lbAttachId;
         private System.Windows.Forms.Label notes;
+        private System.Windows.Forms.Button onGlb;
+        private System.Windows.Forms.TextBox txtGltf;
     }
 }
 
