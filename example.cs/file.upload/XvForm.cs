@@ -25,33 +25,59 @@ namespace file.upload
                 return;
             }
 
-            Clients.Init(txtUrl.Text);
-            await Clients.Login(uid, "----------" + pwd,
-                (code, resp) =>
-                {
-                    client = new AnsonClient(resp.ssInf);
-                    txtRegistry.Text = client.ssInf.ssid;
-                });
+            try
+            {
+                Clients.Init(txtUrl.Text);
+                await Clients.Login(uid, "----------" + pwd,
+                    (code, resp) =>
+                    {
+                        client = new AnsonClient(resp.ssInf);
+                        txtRegistry.Text = client.ssInf.ssid;
+                    });
+            }
+            catch (Exception x)
+            {
+                MessageBox.Show(x.Message, "Jserv Login Exception");
+            }
         }
-        private void btnExport_Click(object sender, EventArgs e)
+        private void onOpen(object sender, EventArgs e)
         {
             OpenFileDialog fd = new OpenFileDialog();
             fd.Filter = "GLTF(*.gltf,*.glb)|*.gltf;*.glb|All files (*.*)|*.*";
             DialogResult dialogResult = fd.ShowDialog();
             if (dialogResult == DialogResult.OK)
             {
-                currentFiles = Core.Gltfilenames(fd.FileName, txtFile);
+                currentFiles = Core.Gltfilenames(fd.FileName, txtGltf);
+                txtFile.Text = txtGltf.Text;
             }
         }
-        private void onGlb(object sender, EventArgs e)
-        {
 
+        private void onToGlb(object sender, EventArgs e)
+        {
+            if (currentFiles == null || string.IsNullOrEmpty(currentFiles[0]))
+            {
+                MessageBox.Show("Gltf file path is not correct!", "Converting GLB");
+            }
+            else
+            {
+                string pgltf = Path.Combine(currentFiles[0]);
+                try
+                {
+                    txtFile.Text = Core.ConvertGlb(pgltf);
+                    currentFiles.Clear();
+                    currentFiles.Add(txtFile.Text);
+                }
+                catch (Exception ex)
+                {
+                    txtFile.Text = ex.GetType().Name + ": " + ex.Message;
+                }
+            }
         }
 
-        private void btnUpload_Click(object sender, EventArgs e)
+       private void btnUpload_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtFile.Text))
-                btnExport_Click(null, null);
+                onOpen(null, null);
 
             foreach(string fn in currentFiles) 
                 if (string.IsNullOrEmpty(fn) || !File.Exists(fn))
@@ -60,7 +86,7 @@ namespace file.upload
                     return;
                 }
 
-            Core.uploadUi(client, uid, currentFiles,
+            Core.UploadUi(client, uid, currentFiles,
                 (resulved) =>
                 {
                     SemanticObject attId0 = (SemanticObject)resulved.Get("a_attaches"); // some Id losted when resulving

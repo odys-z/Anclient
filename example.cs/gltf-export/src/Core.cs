@@ -37,19 +37,32 @@ namespace io.odysz.anclient.example.revit
             return currentFiles;
         }
 
-        public static void uploadUi(AnsonClient client, string uid, List<string> currentFiles, Action<SemanticObject> onOk = null)
+       public static string ConvertGlb(string pgltf)
+        {
+            string ngltf = Path.GetFileNameWithoutExtension(pgltf);
+            string nglb = ngltf + ".glb";
+            string pglb = Path.GetDirectoryName(pgltf);
+            string fullpath = Path.Combine(pglb, nglb);
+
+            var mglb = SharpGLTF.Schema2.ModelRoot.Load(pgltf);
+            mglb.SaveGLB(fullpath);
+            return fullpath;
+        }
+
+        public static void UploadUi(AnsonClient client, string uid, List<string> fullpaths, Action<SemanticObject> onOk = null)
         {
             // upload to a_attaches
             if (client == null)
                 MessageBox.Show("Please connect first.", "Upload With UI");
             else
             {
-                client.AttachFiles(currentFiles, "a_users", uid, (c, d) => {
+                client.AttachFiles(fullpaths, "a_users", uid, (c, d) => {
                     SemanticObject resulved = (SemanticObject)((AnsonResp)d).Map("resulved");
                     if (onOk != null)
                         onOk(resulved);
                 });
             }
         }
+ 
     }
 }

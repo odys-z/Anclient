@@ -80,7 +80,7 @@
             this.btnExport.TabIndex = 16;
             this.btnExport.Text = "&Open File";
             this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            this.btnExport.Click += new System.EventHandler(this.onOpen);
             // 
             // txtUrl
             // 
@@ -168,7 +168,7 @@
             this.onGlb.TabIndex = 18;
             this.onGlb.Text = "Con&vert GLB";
             this.onGlb.UseVisualStyleBackColor = true;
-            this.onGlb.Click += new System.EventHandler(this.onGlb);
+            this.onGlb.Click += new System.EventHandler(this.onToGlb);
             // 
             // txtGltf
             // 
@@ -197,6 +197,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnLogin);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "XvForm";
             this.Text = "Anclient.cs File Upload Example";

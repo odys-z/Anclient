@@ -103,7 +103,7 @@ namespace io.odysz.anclient.example.revit {
                 }
 
             string uid = client.ssInf.uid;
-            Core.uploadUi(client, uid, ExApp.currentFiles,
+            Core.UploadUi(client, uid, ExApp.currentFiles,
                 (resulved) =>
                 {
                     SemanticObject attId0 = (SemanticObject)resulved.Get("a_attaches"); // some Id losted when resulving
