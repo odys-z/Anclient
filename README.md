@@ -1,6 +1,6 @@
-# jclient
+# About
 
-semantic-jserv clients (npm anclient)
+Clients of semantic-*. Including a Java and Javascript version. The C# version is in intensive development.
 
 # Repository Structure
 

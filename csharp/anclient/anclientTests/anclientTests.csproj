@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>.NETCoreApp,Version=v5.0</TargetFramework>
@@ -7,6 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="bin\**" />
+    <Compile Remove="res\**" />
+    <Compile Remove="src\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="res\**" />
+    <EmbeddedResource Remove="src\**" />
+    <None Remove="bin\**" />
+    <None Remove="res\**" />
+    <None Remove="src\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antson.CSharp" Version="0.9.14" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.1.1" />
     <PackageReference Include="MSTest.TestFramework" Version="2.1.1" />
@@ -15,7 +28,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\anclient\anclient.csproj" />
+    <ProjectReference Include="..\anclient.net\anclient.net.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y &quot;$(ProjectDir)res/Sun Yet-sen.jpg&quot; &quot;$(OutDir)&quot;&#xD;&#xA;" />
+  </Target>
 
 </Project>

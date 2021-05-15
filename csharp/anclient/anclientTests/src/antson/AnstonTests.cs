@@ -11,7 +11,7 @@ namespace io.odysz.anson.tests
         [TestMethod()]
         public void AnstonTest()
         {
-            Anson a = new Anson();
+            Anson a = new();
             string jsn = JsonConvert.SerializeObject(a);
             StringAssert.Contains(jsn, "{}");
             Anson b = JsonConvert.DeserializeObject<Anson>(jsn);
