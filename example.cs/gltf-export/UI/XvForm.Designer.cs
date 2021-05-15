@@ -40,6 +40,7 @@
             this.pswd = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.lbAttachId = new System.Windows.Forms.TextBox();
+            this.onlyGlb = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.grdNodes)).BeginInit();
             this.SuspendLayout();
             // 
@@ -152,7 +153,7 @@
             // txtRegistry
             // 
             this.txtRegistry.Location = new System.Drawing.Point(290, 43);
-            this.txtRegistry.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtRegistry.Margin = new System.Windows.Forms.Padding(2);
             this.txtRegistry.Name = "txtRegistry";
             this.txtRegistry.ReadOnly = true;
             this.txtRegistry.Size = new System.Drawing.Size(129, 21);
@@ -161,7 +162,7 @@
             // txtUser
             // 
             this.txtUser.Location = new System.Drawing.Point(59, 43);
-            this.txtUser.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtUser.Margin = new System.Windows.Forms.Padding(2);
             this.txtUser.Name = "txtUser";
             this.txtUser.Size = new System.Drawing.Size(83, 21);
             this.txtUser.TabIndex = 4;
@@ -170,7 +171,7 @@
             // pswd
             // 
             this.pswd.Location = new System.Drawing.Point(146, 43);
-            this.pswd.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pswd.Margin = new System.Windows.Forms.Padding(2);
             this.pswd.Name = "pswd";
             this.pswd.PasswordChar = '*';
             this.pswd.Size = new System.Drawing.Size(140, 21);
@@ -191,8 +192,20 @@
             this.lbAttachId.Location = new System.Drawing.Point(3, 403);
             this.lbAttachId.Name = "lbAttachId";
             this.lbAttachId.ReadOnly = true;
-            this.lbAttachId.Size = new System.Drawing.Size(485, 21);
+            this.lbAttachId.Size = new System.Drawing.Size(416, 21);
             this.lbAttachId.TabIndex = 12;
+            // 
+            // onlyGlb
+            // 
+            this.onlyGlb.AutoSize = true;
+            this.onlyGlb.Checked = true;
+            this.onlyGlb.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.onlyGlb.Location = new System.Drawing.Point(434, 407);
+            this.onlyGlb.Name = "onlyGlb";
+            this.onlyGlb.Size = new System.Drawing.Size(78, 16);
+            this.onlyGlb.TabIndex = 13;
+            this.onlyGlb.Text = "only .gl&b";
+            this.onlyGlb.UseVisualStyleBackColor = true;
             // 
             // XvForm
             // 
@@ -200,6 +213,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
             this.ClientSize = new System.Drawing.Size(596, 437);
+            this.Controls.Add(this.onlyGlb);
             this.Controls.Add(this.lbAttachId);
             this.Controls.Add(this.pswd);
             this.Controls.Add(this.txtUser);
@@ -239,5 +253,6 @@
         private System.Windows.Forms.TextBox pswd;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox lbAttachId;
+        private System.Windows.Forms.CheckBox onlyGlb;
     }
 }

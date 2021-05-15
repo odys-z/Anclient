@@ -102,6 +102,13 @@ namespace io.odysz.anclient.example.revit {
                     return;
                 }
 
+            if (onlyGlb.Checked)
+            {
+                string glb = Core.ConvertGlb(ExApp.currentFiles[0]);
+                ExApp.currentFiles.Clear();
+                ExApp.currentFiles.Add(glb);
+            }
+
             string uid = client.ssInf.uid;
             Core.UploadUi(client, uid, ExApp.currentFiles,
                 (resulved) =>
