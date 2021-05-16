@@ -41,8 +41,8 @@ namespace io.odysz.anclient
                 }
                 catch (Exception ex)
                 {
-                    throw new IOException(ex.Message);
                     Debug.WriteLine(ex.StackTrace);
+                    throw new IOException(ex.Message);
                 }
             }
         }
