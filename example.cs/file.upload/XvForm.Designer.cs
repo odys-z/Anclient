@@ -41,6 +41,7 @@
             this.notes = new System.Windows.Forms.Label();
             this.onGlb = new System.Windows.Forms.Button();
             this.txtGltf = new System.Windows.Forms.TextBox();
+            this.cbbBusic = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // pswd
@@ -50,7 +51,7 @@
             this.pswd.Name = "pswd";
             this.pswd.PasswordChar = '*';
             this.pswd.Size = new System.Drawing.Size(185, 25);
-            this.pswd.TabIndex = 13;
+            this.pswd.TabIndex = 4;
             this.pswd.Text = "123456";
             // 
             // txtUser
@@ -59,7 +60,7 @@
             this.txtUser.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtUser.Name = "txtUser";
             this.txtUser.Size = new System.Drawing.Size(109, 25);
-            this.txtUser.TabIndex = 12;
+            this.txtUser.TabIndex = 3;
             this.txtUser.Text = "admin";
             // 
             // txtRegistry
@@ -69,7 +70,7 @@
             this.txtRegistry.Name = "txtRegistry";
             this.txtRegistry.ReadOnly = true;
             this.txtRegistry.Size = new System.Drawing.Size(141, 25);
-            this.txtRegistry.TabIndex = 14;
+            this.txtRegistry.TabIndex = 5;
             // 
             // btnExport
             // 
@@ -77,7 +78,7 @@
             this.btnExport.Margin = new System.Windows.Forms.Padding(4);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(111, 29);
-            this.btnExport.TabIndex = 16;
+            this.btnExport.TabIndex = 8;
             this.btnExport.Text = "&Open File";
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.onOpen);
@@ -88,7 +89,7 @@
             this.txtUrl.Margin = new System.Windows.Forms.Padding(4);
             this.txtUrl.Name = "txtUrl";
             this.txtUrl.Size = new System.Drawing.Size(571, 25);
-            this.txtUrl.TabIndex = 9;
+            this.txtUrl.TabIndex = 1;
             this.txtUrl.Text = "http://192.168.0.201:8080/jserv-sample/";
             // 
             // label4
@@ -98,7 +99,7 @@
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(71, 15);
-            this.label4.TabIndex = 11;
+            this.label4.TabIndex = 2;
             this.label4.Text = "Registry";
             // 
             // label3
@@ -108,7 +109,7 @@
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(79, 15);
-            this.label3.TabIndex = 8;
+            this.label3.TabIndex = 0;
             this.label3.Text = "xv-server";
             // 
             // btnLogin
@@ -117,18 +118,18 @@
             this.btnLogin.Margin = new System.Windows.Forms.Padding(4);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(111, 29);
-            this.btnLogin.TabIndex = 10;
+            this.btnLogin.TabIndex = 6;
             this.btnLogin.Text = "&connect";
             this.btnLogin.UseVisualStyleBackColor = true;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
             // btnUpload
             // 
-            this.btnUpload.Location = new System.Drawing.Point(542, 254);
+            this.btnUpload.Location = new System.Drawing.Point(542, 250);
             this.btnUpload.Margin = new System.Windows.Forms.Padding(4);
             this.btnUpload.Name = "btnUpload";
             this.btnUpload.Size = new System.Drawing.Size(111, 29);
-            this.btnUpload.TabIndex = 18;
+            this.btnUpload.TabIndex = 13;
             this.btnUpload.Text = "&Upload";
             this.btnUpload.UseVisualStyleBackColor = true;
             this.btnUpload.Click += new System.EventHandler(this.btnUpload_Click);
@@ -138,8 +139,8 @@
             this.txtFile.Location = new System.Drawing.Point(82, 254);
             this.txtFile.Margin = new System.Windows.Forms.Padding(4);
             this.txtFile.Name = "txtFile";
-            this.txtFile.Size = new System.Drawing.Size(449, 25);
-            this.txtFile.TabIndex = 19;
+            this.txtFile.Size = new System.Drawing.Size(347, 25);
+            this.txtFile.TabIndex = 11;
             // 
             // lbAttachId
             // 
@@ -147,7 +148,7 @@
             this.lbAttachId.Location = new System.Drawing.Point(79, 283);
             this.lbAttachId.Name = "lbAttachId";
             this.lbAttachId.Size = new System.Drawing.Size(31, 15);
-            this.lbAttachId.TabIndex = 20;
+            this.lbAttachId.TabIndex = 14;
             this.lbAttachId.Text = "...";
             // 
             // notes
@@ -156,7 +157,7 @@
             this.notes.Location = new System.Drawing.Point(48, 105);
             this.notes.Name = "notes";
             this.notes.Size = new System.Drawing.Size(487, 75);
-            this.notes.TabIndex = 21;
+            this.notes.TabIndex = 7;
             this.notes.Text = resources.GetString("notes.Text");
             // 
             // onGlb
@@ -165,7 +166,7 @@
             this.onGlb.Margin = new System.Windows.Forms.Padding(4);
             this.onGlb.Name = "onGlb";
             this.onGlb.Size = new System.Drawing.Size(111, 29);
-            this.onGlb.TabIndex = 18;
+            this.onGlb.TabIndex = 10;
             this.onGlb.Text = "Con&vert GLB";
             this.onGlb.UseVisualStyleBackColor = true;
             this.onGlb.Click += new System.EventHandler(this.onToGlb);
@@ -176,13 +177,35 @@
             this.txtGltf.Margin = new System.Windows.Forms.Padding(4);
             this.txtGltf.Name = "txtGltf";
             this.txtGltf.Size = new System.Drawing.Size(449, 25);
-            this.txtGltf.TabIndex = 19;
+            this.txtGltf.TabIndex = 9;
+            // 
+            // cbbBusic
+            // 
+            this.cbbBusic.FormattingEnabled = true;
+            this.cbbBusic.Items.AddRange(new object[] {
+            "GL-BIM",
+            "city",
+            "building",
+            "structure",
+            "road",
+            "terrian",
+            "ocean",
+            "parts",
+            "CAD",
+            "FBX",
+            "weavfron-OBJ",
+            "3dmax"});
+            this.cbbBusic.Location = new System.Drawing.Point(436, 254);
+            this.cbbBusic.Name = "cbbBusic";
+            this.cbbBusic.Size = new System.Drawing.Size(95, 23);
+            this.cbbBusic.TabIndex = 12;
             // 
             // XvForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(672, 328);
+            this.Controls.Add(this.cbbBusic);
             this.Controls.Add(this.notes);
             this.Controls.Add(this.lbAttachId);
             this.Controls.Add(this.txtGltf);
@@ -222,6 +245,7 @@
         private System.Windows.Forms.Label notes;
         private System.Windows.Forms.Button onGlb;
         private System.Windows.Forms.TextBox txtGltf;
+        private System.Windows.Forms.ComboBox cbbBusic;
     }
 }
 

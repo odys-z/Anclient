@@ -49,14 +49,14 @@ namespace io.odysz.anclient.example.revit
             return fullpath;
         }
 
-        public static void UploadUi(AnsonClient client, string uid, List<string> fullpaths, Action<SemanticObject> onOk = null)
+        public static void UploadUi(AnsonClient client, string busic, string uid, List<string> fullpaths, Action<SemanticObject> onOk = null)
         {
             // upload to a_attaches
             if (client == null)
                 MessageBox.Show("Please connect first.", "Upload With UI");
             else
             {
-                client.AttachFiles(fullpaths, "a_users", uid, (c, d) => {
+                client.AttachFiles(fullpaths, busic??"a_users", uid, (c, d) => {
                     SemanticObject resulved = (SemanticObject)((AnsonResp)d).Map("resulved");
                     if (onOk != null)
                         onOk(resulved);
