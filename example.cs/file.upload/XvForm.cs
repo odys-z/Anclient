@@ -78,6 +78,8 @@ namespace file.upload
         {
             if (string.IsNullOrEmpty(txtFile.Text))
                 onOpen(null, null);
+            if (currentFiles == null)
+                return;
 
             foreach(string fn in currentFiles) 
                 if (string.IsNullOrEmpty(fn) || !File.Exists(fn))
@@ -86,7 +88,8 @@ namespace file.upload
                     return;
                 }
 
-            Core.UploadUi(client, uid, currentFiles,
+            string busic = cbbBusic.SelectedItem?.ToString();
+            Core.UploadUi(client, busic, uid, currentFiles,
                 (resulved) =>
                 {
                     SemanticObject attId0 = (SemanticObject)resulved.Get("a_attaches"); // some Id losted when resulving

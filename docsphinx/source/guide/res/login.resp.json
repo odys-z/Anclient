@@ -1,0 +1,24 @@
+{
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "code": "ok",
+  "opts": null,
+  "port": "session",
+  "header": null,
+  "body": [{
+    "type": "io.odysz.semantic.jsession.AnSessionResp",
+    "rs": null,
+    "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+    "a": null,
+    "conn": null,
+    "ssInf": {
+      "type": "io.odysz.semantic.jsession.SessionInf",
+      "uid": "admin",
+      "roleId": null,
+      "ssid": "003LJwh9"
+    },
+    "m": null,
+    "map": null
+  }],
+  "version": "1.0",
+  "seq": 0
+}

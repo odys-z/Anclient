@@ -1,0 +1,33 @@
+{
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "version": "1.1",
+  "seq": 335,
+  "opts": {},
+  "port": "query",
+  "header": {
+    "type": "io.odysz.semantic.jprotocol.AnsonHeader",
+    "ssid": "003LJwh9",
+    "uid": "admin",
+    "usrAct": ["query", "r", "select", "session query"]
+  },
+  "body": [{
+    "type": "io.odysz.semantic.jserv.R.AnQueryReq",
+    "conn": "raw-vec",
+    "mtabl": "vector",
+    "mAlias": "v",
+    "exprs": [
+      ["vid", null],
+      ["val", "amount"],
+      ["dim1", "agegrp"],
+      ["dim2", "tex"],
+      ["dim3", "indust"],
+      ["dim4", null],
+      ["dim5", null],
+      ["dim6", null]
+    ],
+    "joins": [],
+    "where": [
+      ["=", "agegrp", "'80-'"]
+    ]
+  }]
+}
