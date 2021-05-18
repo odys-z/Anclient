@@ -9,7 +9,7 @@ here sharing the same node's modules. See [the question answer](https://stackove
 # Documents
 
 Partly available [here](https://odys-z.github.io/Anclient/), currently only
-"queick start".
+"quick start".
 
 ## x-visual
 
