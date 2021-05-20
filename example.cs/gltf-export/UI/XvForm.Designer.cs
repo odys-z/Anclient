@@ -40,15 +40,15 @@
             this.pswd = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.lbAttachId = new System.Windows.Forms.TextBox();
-            this.onlyGlb = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.grdNodes)).BeginInit();
             this.SuspendLayout();
             // 
             // btnUpload
             // 
-            this.btnUpload.Location = new System.Drawing.Point(518, 403);
+            this.btnUpload.Location = new System.Drawing.Point(691, 504);
+            this.btnUpload.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnUpload.Name = "btnUpload";
-            this.btnUpload.Size = new System.Drawing.Size(75, 23);
+            this.btnUpload.Size = new System.Drawing.Size(100, 29);
             this.btnUpload.TabIndex = 11;
             this.btnUpload.Text = "&Upload";
             this.btnUpload.UseVisualStyleBackColor = true;
@@ -56,17 +56,19 @@
             // 
             // txtJson
             // 
-            this.txtJson.Location = new System.Drawing.Point(3, 70);
+            this.txtJson.Location = new System.Drawing.Point(4, 88);
+            this.txtJson.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtJson.Multiline = true;
             this.txtJson.Name = "txtJson";
-            this.txtJson.Size = new System.Drawing.Size(591, 321);
+            this.txtJson.Size = new System.Drawing.Size(787, 400);
             this.txtJson.TabIndex = 9;
             // 
             // btnLogin
             // 
-            this.btnLogin.Location = new System.Drawing.Point(424, 41);
+            this.btnLogin.Location = new System.Drawing.Point(565, 51);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(64, 23);
+            this.btnLogin.Size = new System.Drawing.Size(85, 29);
             this.btnLogin.TabIndex = 2;
             this.btnLogin.Text = "&connect";
             this.btnLogin.UseVisualStyleBackColor = true;
@@ -75,25 +77,28 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1, 17);
+            this.label3.Location = new System.Drawing.Point(1, 21);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(59, 12);
+            this.label3.Size = new System.Drawing.Size(79, 15);
             this.label3.TabIndex = 0;
             this.label3.Text = "xv-server";
             // 
             // txtUrl
             // 
-            this.txtUrl.Location = new System.Drawing.Point(59, 14);
+            this.txtUrl.Location = new System.Drawing.Point(79, 18);
+            this.txtUrl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtUrl.Name = "txtUrl";
-            this.txtUrl.Size = new System.Drawing.Size(429, 21);
+            this.txtUrl.Size = new System.Drawing.Size(571, 25);
             this.txtUrl.TabIndex = 1;
             this.txtUrl.Text = "http://192.168.0.201:8080/jserv-sample/";
             // 
             // btnExport
             // 
-            this.btnExport.Location = new System.Drawing.Point(510, 41);
+            this.btnExport.Location = new System.Drawing.Point(680, 51);
+            this.btnExport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(83, 23);
+            this.btnExport.Size = new System.Drawing.Size(111, 29);
             this.btnExport.TabIndex = 7;
             this.btnExport.Text = "E&xport GLTF";
             this.btnExport.UseVisualStyleBackColor = true;
@@ -108,12 +113,12 @@
             this.node,
             this.opaque,
             this.visible});
-            this.grdNodes.Location = new System.Drawing.Point(3, 393);
+            this.grdNodes.Location = new System.Drawing.Point(4, 491);
             this.grdNodes.Margin = new System.Windows.Forms.Padding(0);
             this.grdNodes.Name = "grdNodes";
             this.grdNodes.RowHeadersWidth = 51;
             this.grdNodes.RowTemplate.Height = 27;
-            this.grdNodes.Size = new System.Drawing.Size(590, 1);
+            this.grdNodes.Size = new System.Drawing.Size(787, 1);
             this.grdNodes.TabIndex = 10;
             // 
             // node
@@ -144,76 +149,67 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(1, 46);
+            this.label4.Location = new System.Drawing.Point(1, 58);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(53, 12);
+            this.label4.Size = new System.Drawing.Size(71, 15);
             this.label4.TabIndex = 3;
             this.label4.Text = "Registry";
             // 
             // txtRegistry
             // 
-            this.txtRegistry.Location = new System.Drawing.Point(290, 43);
-            this.txtRegistry.Margin = new System.Windows.Forms.Padding(2);
+            this.txtRegistry.Location = new System.Drawing.Point(387, 54);
+            this.txtRegistry.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtRegistry.Name = "txtRegistry";
             this.txtRegistry.ReadOnly = true;
-            this.txtRegistry.Size = new System.Drawing.Size(129, 21);
+            this.txtRegistry.Size = new System.Drawing.Size(171, 25);
             this.txtRegistry.TabIndex = 6;
             // 
             // txtUser
             // 
-            this.txtUser.Location = new System.Drawing.Point(59, 43);
-            this.txtUser.Margin = new System.Windows.Forms.Padding(2);
+            this.txtUser.Location = new System.Drawing.Point(79, 54);
+            this.txtUser.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtUser.Name = "txtUser";
-            this.txtUser.Size = new System.Drawing.Size(83, 21);
+            this.txtUser.Size = new System.Drawing.Size(109, 25);
             this.txtUser.TabIndex = 4;
             this.txtUser.Text = "admin";
             // 
             // pswd
             // 
-            this.pswd.Location = new System.Drawing.Point(146, 43);
-            this.pswd.Margin = new System.Windows.Forms.Padding(2);
+            this.pswd.Location = new System.Drawing.Point(195, 54);
+            this.pswd.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pswd.Name = "pswd";
             this.pswd.PasswordChar = '*';
-            this.pswd.Size = new System.Drawing.Size(140, 21);
+            this.pswd.Size = new System.Drawing.Size(185, 25);
             this.pswd.TabIndex = 5;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(510, 14);
+            this.button1.Location = new System.Drawing.Point(680, 18);
+            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(83, 23);
+            this.button1.Size = new System.Drawing.Size(111, 29);
             this.button1.TabIndex = 7;
             this.button1.Text = "&Check IFC";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
             this.button1.Click += new System.EventHandler(this.onExportClick2);
             // 
             // lbAttachId
             // 
-            this.lbAttachId.Location = new System.Drawing.Point(3, 403);
+            this.lbAttachId.Location = new System.Drawing.Point(4, 504);
+            this.lbAttachId.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.lbAttachId.Name = "lbAttachId";
             this.lbAttachId.ReadOnly = true;
-            this.lbAttachId.Size = new System.Drawing.Size(416, 21);
+            this.lbAttachId.Size = new System.Drawing.Size(646, 25);
             this.lbAttachId.TabIndex = 12;
-            // 
-            // onlyGlb
-            // 
-            this.onlyGlb.AutoSize = true;
-            this.onlyGlb.Checked = true;
-            this.onlyGlb.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.onlyGlb.Location = new System.Drawing.Point(434, 407);
-            this.onlyGlb.Name = "onlyGlb";
-            this.onlyGlb.Size = new System.Drawing.Size(78, 16);
-            this.onlyGlb.TabIndex = 13;
-            this.onlyGlb.Text = "only .gl&b";
-            this.onlyGlb.UseVisualStyleBackColor = true;
             // 
             // XvForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(596, 437);
-            this.Controls.Add(this.onlyGlb);
+            this.ClientSize = new System.Drawing.Size(795, 546);
             this.Controls.Add(this.lbAttachId);
             this.Controls.Add(this.pswd);
             this.Controls.Add(this.txtUser);
@@ -228,6 +224,7 @@
             this.Controls.Add(this.txtJson);
             this.Controls.Add(this.btnUpload);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "XvForm";
             this.Text = "X-visual BIM Import";
             ((System.ComponentModel.ISupportInitialize)(this.grdNodes)).EndInit();
@@ -253,6 +250,5 @@
         private System.Windows.Forms.TextBox pswd;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox lbAttachId;
-        private System.Windows.Forms.CheckBox onlyGlb;
     }
 }
