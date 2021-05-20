@@ -1,6 +1,7 @@
 {
   "questions": [
     {
+	  "qtype": "checkbox",
       "answers": [
         "Loch Ness Monster",
         "Centaur",
