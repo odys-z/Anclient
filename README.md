@@ -4,9 +4,9 @@ Clients of semantic-\*. Including a Java and Javascript version. The C# version 
 
 # Repository Structure
 
-This repository has multiple clients, all of which can work indpendently.
+This repository has multiple clients, all of which can work independently.
 
-With the protocol based on json, we are planning to implement the cliens:
+With the protocol based on json, we are planning to implement the clients:
 
 - Anclient/csharp
 
@@ -27,20 +27,22 @@ There are 4 projects in the solution:
 
 -- Antest.Ancleint
 
-	Anclient unit test project.
+    Anclient unit test project.
 
 -- gltf-export
 
     A [Revit](https://en.wikipedia.org/wiki/Autodesk_Revit) plugin using anclient.net
-    exprting gltf and communicate with semantic-\* server with Antson for protocol
+    exporting gltf and communicate with semantic-\* server with Antson for protocol
     packages handling.
 
     To run this example, user must have Revit installed. This example is running
-	on Revit 2017 and has no plan to upgrade.
+    on Revit 2017 and has no plan to upgrade.
 
 -- file.upload
 
-    The trying and testing project of gltf-export.
+    The trying and testing project of gltf-export, also used to test jserv-sample
+    project's file uploading function. Jserv-sample project source can be downloaded
+    [here](https://github.com/odys-z/semantic-jserv/releases).
 
 - Anclient/js
 
