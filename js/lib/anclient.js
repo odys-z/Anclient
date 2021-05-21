@@ -126,6 +126,15 @@ class AnClient {
 			onError);
 	}
 
+	loginWait(usrId, pswd) {
+		let me = this;
+		return new Promise((resolve, reject) => {
+			me.login(usrId, pswd,
+				(ssClient) => {resolve(ssClient);},
+				(err) => {reject(err);})
+		});
+	}
+
     /**Check Response form jserv
      * @param {any} resp
      */
@@ -203,6 +212,19 @@ class AnClient {
 					console.error("response", resp);
 				}
 			}
+		});
+	}
+
+    /**Async-await style posting a request, using Ajax.
+     * @param {AnsonMsg} jreq
+     * @param {object} [ajaxOpts] */
+	postWait(jreq, ajaxOpts = null) {
+		let me = this;
+		return new Promise((resolve, reject) => {
+			me.post(jreq,
+				resp => {resolve(resp);},
+				(c, err) => {reject({c, err});},
+				ajaxOpts)
 		});
 	}
 
