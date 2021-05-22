@@ -1,9 +1,9 @@
 import React from "react";
-import { CSSTransitionGroup } from "react-transition-group";
+import { TransitionGroup } from "react-transition-group";
 
 export default elem => {
     return (
-        <CSSTransitionGroup
+        <TransitionGroup
             transitionName="mainApp"
             transitionAppear={true}
             transitionEnterTimeout={500}
@@ -12,6 +12,6 @@ export default elem => {
             transitionLeaveTimeout={500}
         >
             {elem}
-        </CSSTransitionGroup>
+        </TransitionGroup>
     );
 };
