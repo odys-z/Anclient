@@ -16,27 +16,22 @@ import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 
 
 class Editor extends React.Component {
-	const useStyles = makeStyles((theme) => ({
-	  root: {
-	    width: '100%',
-	    maxWidth: 360,
-	    backgroundColor: theme.palette.background.paper,
-	  },
-	  nested: {
-	    paddingLeft: theme.spacing(4),
-	  },
-	}));
-	
-	const classes = useStyles();
+    const useStyles = makeStyles((theme) => ({
+      root: {
+        width: '100%',
+        maxWidth: 360,
+        backgroundColor: theme.palette.background.paper,
+      },
+      nested: {
+        paddingLeft: theme.spacing(4),
+      },
+    }));
+
+    const classes = useStyles();
 
     state = {
-        questions: null,
-        result: null,
-        questionsAnswers: [],
-        currentQuestionIndex: 0,
-
-        check0: false
-        check1: false
+        questions: [],
+        currrentqx: -1,
     };
 
   handleClick: () => {
@@ -45,14 +40,15 @@ class Editor extends React.Component {
 
   onChange(e) {
     console.log(e.target.value);
+    let qx = this.state.questions.currentqx;
+    let questions = this.state.questions.slice();
+    questions[qx] = e.target.value;
+    this.setState({questions});
   }
 
   onAdd(e) {
-  }
-
-  this.state = {
-    questions: [],
-	ixEditing: -1
+    this.state.question.push('');
+    this.setState({currentqx: ++this.state.currentqx});
   }
 
   return (
@@ -97,7 +93,7 @@ class Editor extends React.Component {
       <Collapse in={open} timeout="auto" unmountOnExit>
         <TextField
           id="outlined-secondary"
-          label="Outlined secondary"
+          label="Avialable Options"
           variant="outlined"
           color="secondary"
           multiline

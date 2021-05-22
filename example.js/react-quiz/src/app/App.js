@@ -27,7 +27,7 @@ class App extends React.Component {
         questionsAnswers: [],
         currentQuestionIndex: 0,
 
-        check0: false
+        check0: false,
         check1: false
     };
 
