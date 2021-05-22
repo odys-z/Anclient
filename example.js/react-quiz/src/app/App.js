@@ -25,7 +25,10 @@ class App extends React.Component {
         questions: null,
         result: null,
         questionsAnswers: [],
-        currentQuestionIndex: 0
+        currentQuestionIndex: 0,
+
+        check0: false
+        check1: false
     };
 
     componentDidUpdate(prevProps, prevState) {
