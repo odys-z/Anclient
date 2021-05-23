@@ -83,7 +83,7 @@ class Editor extends React.Component {
 			  <div key={this.state.questions[x][0]}>
 				<ListItem button qx={x} onClick={this.handleClick}>
 					<ListItemIcon><DraftsIcon /></ListItemIcon>
-					<ListItemText primary={this.state.questions[1]} />
+					<ListItemText primary={this.state.questions[x][1]} />
 				</ListItem>
 				<Collapse in={this.state.currentqx == x} timeout="auto" >
 					<List component="div" disablePadding>
