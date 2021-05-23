@@ -20,34 +20,19 @@ import TextField from '@material-ui/core/TextField';
 
 
 class Editor extends React.Component {
-    // useStyles = makeStyles((theme) => ({
-    //   root: {
-    //     width: '100%',
-    //     maxWidth: 360,
-    //     backgroundColor: theme.palette.background.paper,
-    //   },
-    //   nested: {
-    //     paddingLeft: theme.spacing(4),
-    //   },
-    // }));
-	//
-    // classes = this.useStyles();
 
 	classes = makeStyles({
 		root: {
 			width: '100%',
 			maxWidth: 360,
-			// backgroundColor: theme.palette.background.paper,
 		},
 		nested: {
-			// paddingLeft: theme.spacing(4),
 		},
 	});
 
     state = {
-        questions: [],
-        currrentqx: -1,
-		open: false,
+        questions: [['id0', 'q0', 'a b c d'], ['id1', 'q1', '1 2 3 4'], ['id2', 'q2', 'I II III IV']],
+        currentqx: -1,
     };
 
 	constructor(props) {
@@ -58,8 +43,11 @@ class Editor extends React.Component {
 		this.onAdd = this.onAdd.bind(this);
 	}
 
-	handleClick() {
-	  this.setState({open: !this.state.open});
+	handleClick(e) {
+	  // use currentTarget instead of target, see https://stackoverflow.com/a/10086501/7362888
+	  let qx = e.currentTarget.getAttribute('qx');
+	  console.log(qx);
+	  this.setState({currentqx: parseInt(qx)});
 	};
 
 	editQuestion(e) {
@@ -85,40 +73,49 @@ class Editor extends React.Component {
 		this.setState({currentqx: ++this.state.currentqx});
 	}
 
-	items() {
+	items(start, end = -1) {
+		if (!this.state.questions)
+			return;
+		if (end < 0)
+			end = this.state.questions.length - (end + 1);
+
 		return this.state.questions.map((q, x) => (
-			<ListItem key={x} button>
-				<ListItemIcon><DraftsIcon /></ListItemIcon>
-				<ListItemText primary={this.state.questions[0]} />
-				<Collapse in={this.state.open} timeout="auto" >
-					<TextField id={"qAnswer"} label="Answers"
-					  variant="outlined"
+			  <div key={this.state.questions[x][0]}>
+				<ListItem button qx={x} onClick={this.handleClick}>
+					<ListItemIcon><DraftsIcon /></ListItemIcon>
+					<ListItemText primary={this.state.questions[1]} />
+				</ListItem>
+				<Collapse in={this.state.currentqx == x} timeout="auto" >
+					<List component="div" disablePadding>
+					  <ListItem button className={ this.classes.nested }>
+					    <ListItemIcon><StarBorder /></ListItemIcon>
+					    <ListItemText primary="Option A" />
+					    <ListItemText primary="Option B" />
+					    <ListItemText primary="Option C" />
+					    <FormControlLabel
+					        control={<Checkbox checked={this.state.check0}
+					                           name="chk0" color="primary" />}
+					        label="Primary"/>
+					  </ListItem>
+					</List>
+
+					<TextField id="qtext" label="Question"
+					  variant="outlined" color="primary"
 					  multiline fullWidth={true}
-					  value={q[1]}/>
+					  onChange={this.editQuestion} />
+
+					<TextField id="answers" label="Answers"
+					  variant="outlined" color="secondary"
+					  multiline fullWidth={true}
+					  onChange={this.editAnswer} />
 				</Collapse>
-			</ListItem>));
+			  </div>
+			));
 	}
 
-    render () {
-    	return (
-		  <List
-			component="nav"
-			aria-labelledby="nested-list-subheader"
-			subheader={
-				<ListSubheader component="div" id="nested-list-subheader">
-				  Nested List Items
-				</ListSubheader>
-			}
-			className={ this.classes.root } >
-			<ListItem button>
-			<ListItemIcon><SendIcon /></ListItemIcon>
-			<ListItemText primary="Add New" onClick={this.onAdd} />
-			</ListItem>
-			<ListItem button>
-			<ListItemIcon><DraftsIcon /></ListItemIcon>
-			<ListItemText primary="Drafts" />
-			</ListItem>
-			{this.items()}
+	editem(qx) {
+		return
+		(<>
 			<ListItem button onClick={this.handleClick}>
 				<ListItemIcon><InboxIcon /></ListItemIcon>
 				<ListItemText primary="Inbox" />
@@ -148,8 +145,33 @@ class Editor extends React.Component {
 				  multiline fullWidth={true}
 				  onChange={this.editAnswer} />
 			</Collapse>
+		</>);
+	}
+
+	render() {
+		return (
+		  <List
+			component="nav"
+			aria-labelledby="nested-list-subheader"
+			subheader={
+				<ListSubheader component="div" id="nested-list-subheader">
+				  Nested List Items
+				</ListSubheader>
+			}
+			className={ this.classes.root } >
+			<ListItem button>
+				<ListItemIcon><SendIcon /></ListItemIcon>
+				<ListItemText primary="Add New" onClick={this.onAdd} />
+			</ListItem>
+			<ListItem button>
+				<ListItemIcon><DraftsIcon /></ListItemIcon>
+				<ListItemText primary="Drafts" />
+			</ListItem>
+			{this.items(0, this.state.currentqx)}
 		  </List>);
 	}
+			// {this.editem(this.state.currentqx)}
+			// {this.state.currentqx >= 0 ? this.items(this.state.currentqx + 1) : ''}
 }
 
 ReactDOM.render(<Editor />, document.querySelector('#editor'));
