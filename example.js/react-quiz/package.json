@@ -1,0 +1,29 @@
+{
+  "name": "react-quiz",
+  "version": "1.0.0",
+  "description": "Original source code copied from [jkanchelov / material-ui-quiz-app](https://github.com/jkanchelov/material-ui-quiz-app)",
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Odys zhou",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/odys-z/Anclient.git"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.2",
+    "@babel/preset-react": "^7.13.13",
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.5",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.37.1"
+  }
+}
