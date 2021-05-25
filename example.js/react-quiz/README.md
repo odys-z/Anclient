@@ -14,13 +14,3 @@ Or in parent folder,
 ```
    npm install --save-dev
 ```
-
-# Docker Memo
-
-For Docker Nginx.
-
-```
-    docker build -t react-quiz .
-    docker rm quiz
-    docker run --name quiz -dp 80:80 -t react-quiz
-```

@@ -5,7 +5,11 @@ There are two version of webpack config.
 
 ## quick start (only EasyUI version currently)
 
-Anclient.js currently only has the [EasyUI](www.jeasyui.com) version working. 
+*Note*:
+
+*This doc is old. A newer version using docker is coming ...*
+
+Anclient.js currently only has the [EasyUI](www.jeasyui.com) version working.
 The client template is provided as a project template for client.
 
 To get kick started,

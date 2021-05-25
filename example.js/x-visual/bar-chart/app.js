@@ -10,10 +10,10 @@ import {vec3conn, Jvector} from '../lib/jvector'
  * @class
  */
 export class App {
-	constructor(canv) {
+	constructor(canv, jserv = null) {
 		// initialize a client of jsample
 		this.an = an.an;
-		this.an.init("http://127.0.0.1:8080/jserv-sample");
+		this.an.init(jserv ? jserv : "http://127.0.0.1:8080/jserv-sample");
 		this.canv = canv;
 		this.ssClient = undefined;
 	}
@@ -52,7 +52,7 @@ export class App {
 				alert('Network Failed!');
 			else if (resp.body[0])
 				// most likely MsgCode.exSession for password error
-				alert(resp.body[0].m);
+				alert(code + ': ' + resp.body[0].m);
 			else console.error(resp);
 		}
 	}

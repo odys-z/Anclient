@@ -91,6 +91,27 @@ The service is reporting "No envelope is available" because the request with GET
 doesn't carry correct message. That means it's running correctly. the next step
 should be using a client to visit the service.
 
+.. attention:: Jserv is heavily depends on CORS data service. To avoid trouble,
+    it's recommended try an old version of Tomcat first, e.g. 7 or 8. And Configure
+    web.xml with this:
+
+.. code-block:: xml
+
+    <filter>
+      <filter-name>CorsFilter</filter-name>
+      <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+      <init-param>
+        <param-name>cors.allowed.origins</param-name>
+        <param-value>*</param-value>
+      </init-param>
+    </filter>
+    <filter-mapping>
+      <filter-name>CorsFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>
+..
+
+
 Start from source
 -----------------
 
