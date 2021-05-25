@@ -1,2 +1,4 @@
 node_modules
+dist
+!react-quiz/dist
 cn.com.inforise
