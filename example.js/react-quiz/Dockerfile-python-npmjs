@@ -1,4 +1,0 @@
-FROM nikolaik/python-nodejs:python3.9-nodejs16
-WORKDIR dist
-COPY dist dist
-CMD python -m http.server 8200
