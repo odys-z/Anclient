@@ -105,11 +105,11 @@ class Editor extends React.Component {
 		console.log(this.state.questions);
 	}
 
-	items(start, end = -1) {
+	items() {
 		if (!this.state.questions)
 			return;
-		if (end < 0)
-			end = this.state.questions.length - (end + 1);
+		// if (end < 0)
+		// 	end = this.state.questions.length - (end + 1);
 
 		return this.state.questions.map((q, x) => (
 			  <div key={this.state.questions[x][0]}>
@@ -135,7 +135,7 @@ class Editor extends React.Component {
 					  multiline fullWidth={true} value={this.state.questions[x][1]}
 					  onChange={this.editQuestion} />
 
-					<TextField id="answers" label="Answers"
+					<TextField id="answers" label="Answers (* correct)"
 					  variant="outlined" color="secondary"
 					  multiline fullWidth={true} value={this.state.questions[x][2]}
 					  onChange={this.editAnswer} />
@@ -182,7 +182,7 @@ class Editor extends React.Component {
 				  value={this.state.quizRemarks} />
 			</Collapse>
 
-			{this.items(0, this.state.currentqx)}
+			{this.items()}
 
 			<ListItem button>
 				<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>

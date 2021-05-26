@@ -1,4 +1,9 @@
-exampl.js/x-visual
-exampl.js/react-quiz
+node_modules
+
+example.js/x-visual/lib
+
+example.js/react-quiz/src
+example.js/react-quiz/weback.config.js
+
 example.cs
 !example.cs/file.upload/*.zip

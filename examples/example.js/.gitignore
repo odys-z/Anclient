@@ -1,4 +1,5 @@
 node_modules
 dist
-!react-quiz/dist
+# dist is copied to docker image
+# !react-quiz/dist
 cn.com.inforise
