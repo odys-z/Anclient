@@ -90,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="client.html">About Anclient</a></li>
 <li class="toctree-l1"><a class="reference internal" href="client.html#js-quick-start">JS Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="framework.html">Application Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/docker.html">Play with Docker</a></li>
 </ul>
 
             
@@ -212,6 +213,26 @@ The project and deploy to tomcat with Eclipse, should reporting in console like:
 <p>The service is reporting &#8220;No envelope is available&#8221; because the request with GET
 doesn&#8217;t carry correct message. That means it&#8217;s running correctly. the next step
 should be using a client to visit the service.</p>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">Jserv is heavily depends on CORS data service. To avoid trouble,
+it&#8217;s recommended try an old version of Tomcat first, e.g. 7 or 8. And Configure
+web.xml with this:</p>
+</div>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;filter&gt;</span>
+  <span class="nt">&lt;filter-name&gt;</span>CorsFilter<span class="nt">&lt;/filter-name&gt;</span>
+  <span class="nt">&lt;filter-class&gt;</span>org.apache.catalina.filters.CorsFilter<span class="nt">&lt;/filter-class&gt;</span>
+  <span class="nt">&lt;init-param&gt;</span>
+    <span class="nt">&lt;param-name&gt;</span>cors.allowed.origins<span class="nt">&lt;/param-name&gt;</span>
+    <span class="nt">&lt;param-value&gt;</span>*<span class="nt">&lt;/param-value&gt;</span>
+  <span class="nt">&lt;/init-param&gt;</span>
+<span class="nt">&lt;/filter&gt;</span>
+<span class="nt">&lt;filter-mapping&gt;</span>
+  <span class="nt">&lt;filter-name&gt;</span>CorsFilter<span class="nt">&lt;/filter-name&gt;</span>
+  <span class="nt">&lt;url-pattern&gt;</span>/*<span class="nt">&lt;/url-pattern&gt;</span>
+<span class="nt">&lt;/filter-mapping&gt;</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="start-from-source">
 <h2>Start from source<a class="headerlink" href="#start-from-source" title="Permalink to this headline">¶</a></h2>

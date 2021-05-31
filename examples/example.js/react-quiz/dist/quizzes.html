@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Quiz Manager</title>
+</head>
+
+<body>
+  <div id='login'>
+  	<input id='urlroot' value='http://127.0.0.1:8080/jserv-sample'/>
+  </div>
+  <hr>
+  <div id="quizlist"></div>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+	<ul><li>Powered by <a href='https://reactjs.org/'>React</a>
+		&amp; <a href='https://material-ui.com'>Material UI</a>
+	</li></ul>
+  <script src="quiz-0.1.0.min.js"></script>
+  <script>
+  	new Quizlist().bindQuizzes('quizlist');
+  </script>
+</body>
+</html>
