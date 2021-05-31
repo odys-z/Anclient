@@ -20,6 +20,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 
+import {Login} from './login'
+
 class Quizlist extends React.Component {
 	static getQx() {
 		return ++quid;
@@ -36,14 +38,14 @@ class Quizlist extends React.Component {
 	});
 
     state = {
-		logid: '',
+		userid: '',
 		pswd: '',
 		username: '',
         quizzes: [], // id, questions, answers, type, correct index
         currentqx: -1,
     };
 
-	constructor(props) {
+	constructor(props = {}) {
 		super(props);
 		this.state.quizzes = props.quizzes || [];
 
@@ -79,20 +81,18 @@ class Quizlist extends React.Component {
 			open: qx});
 	}
 
-	onLogin(e) {
+	onLogin(client) {
+		console.log('loading with client:', client);
 	}
 
-	onLogout(e) {
-		// an.logout();
-		this.setState({logid: ''});
-	}
+	onLogout(e) { this.setState({userid: ''}); }
 
 	items() {
 		if (!this.state.questions)
 			return;
 
 		return this.state.quezzes.map((q, x) => (
-		  <div key={`{this.state.logid}.{this.state.quezzes[x][0]}`}>
+		  <div key={`${this.state.userid}.${this.state.quezzes[x][0]}`}>
 			<ListItem button qx={x} onClick={this.onSelect} color='secondary'>
 				<ListItemIcon><Sms /></ListItemIcon>
 				<ListItemText primary={this.state.quezzes[x].title} />
@@ -109,19 +109,26 @@ class Quizlist extends React.Component {
 	}
 
 	render() {
-		return (
+		return (<>
+		  <Login onLoginOk={this.onLogin}/>
 		  <List component="nav"
 			aria-labelledby="nested-list-subheader"
 			subheader={
 				<ListSubheader component="div" id="quizzes-subheader">
-				  { `User: {this.username}` }
+				  { `User: ${this.state.username}` }
 				</ListSubheader>
 			}
 			className={ this.classes.root } >
 
 			{this.items()}
-		  </List>);
+		  </List>
+		</>);
+	}
+
+	bindQuizzes(elem) {
+	    ReactDOM.render(<Quizlist />, document.getElementById(elem));
 	}
 }
+
 
 export {Quizlist};
