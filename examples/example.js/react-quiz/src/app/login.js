@@ -1,19 +1,30 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
+// import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
 
 import * as an from 'anclient'
+
+
+const styles = (theme) => ({
+	root: {
+	    '& *': { margin: theme.spacing(1) },
+	    margin: '20px'
+	},
+});
+
 /**
  * Anclinet logging-in component
  * @class
  */
-export class Login extends React.Component {
-	classes = makeStyles((theme) => ({
-		root: {
-		    '& > *': { margin: theme.spacing(1) }
-		},
-	}));
+class LoginComponent extends React.Component {
+	// useStyles = makeStyles((theme) => ({
+	// 	root: {
+	// 	    '& > *': { margin: theme.spacing(1) }
+	// 	},
+	// }));
 
     state = {
 		loggedin: false,
@@ -76,13 +87,18 @@ export class Login extends React.Component {
 	}
 
 	render() {
-      return (<div>
+	  const classes = this.props;
+		// This <form> only to disable chrome warning:
+		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
+      return (<div className={classes.root}>
         <>
 			<TextField required id="jserv"
 					   label="Jserv URL" fullWidth={true}
 					   defaultValue="http://localhost:8080/jserv-sample/" />
 		</>
+		<form>
         <TextField required id="userid" label="Required"
+                    autoComplete="username"
                    defaultValue="User Id" />
         <TextField id="pswd" label="Password"
                     type="password"
@@ -92,6 +108,10 @@ export class Login extends React.Component {
                 onClick={this.onLogin} >Log in</Button>
         <Button variant="contained" color="primary"
                 onClick={this.onLogout} >Log out</Button>
+		</form>
       </div>);
     }
 }
+
+const Login = withStyles(styles)(LoginComponent);
+export {Login};
