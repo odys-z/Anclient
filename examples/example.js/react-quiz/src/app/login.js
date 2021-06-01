@@ -7,11 +7,10 @@ import FormControl from '@material-ui/core/FormControl';
 
 import * as an from 'anclient'
 
-
+// https://github.com/mui-org/material-ui/issues/15820
 const styles = (theme) => ({
 	root: {
-	    '& *': { margin: theme.spacing(1) },
-	    margin: '20px'
+	    '& *': { margin: theme.spacing(1) }
 	},
 });
 
