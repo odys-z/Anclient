@@ -39,7 +39,7 @@ class App extends React.Component {
         }, 0);
     }
 
-	/**Setup window events handlling for updating button postion.*/
+    /**Setup window events handlling for updating button postion.*/
     componentDidMount() {
         window.onorientationchange = () => this.updateButtonsPos();
         window.onresize = () => this.updateButtonsPos();
