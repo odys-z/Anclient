@@ -45,10 +45,18 @@ class LoginComponent extends React.Component {
 
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
+		this.alert = this.alert.bind(this);
 	}
+
+	alert();
 
 	onLogin() {
 		let that = this;
+		let uid = this.state.usrid;
+		let pwd = this.state.pswd;
+		if (!uid || !pwd)
+			this.alert(langstr.usrid_pswd_is_null);
+
 		if (!this.state.loggedin) {
 			this.an.login(
 				this.state.usrid,

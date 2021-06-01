@@ -1,0 +1,31 @@
+{
+  "name": "anclient-example.js",
+  "version": "1.0.0",
+  "description": "This file is only for install node_modules, avoiding npm ERR! code EINVALIDTAGNAME.",
+  "main": "",
+  "scripts": {
+    "test": "echo \"This is not a npm package\" && exit 1"
+  },
+  "author": "Odys Zhou",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "@babel/preset-react": "^7.13.13",
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
+    "anclient": "^0.9.4",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.6",
+    "jquery": "^3.6.0",
+    "postcss": "^8.3.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-svg-loader": "^3.0.3",
+    "react-transition-group": "^4.4.2",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.38.1"
+  },
+  "dependencies": {}
+}
