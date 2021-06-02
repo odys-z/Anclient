@@ -56,7 +56,7 @@ class LoginComponent extends React.Component {
 
 	onLogin() {
 		let that = this;
-		let uid = this.state.usrid;
+		let uid = this.state.userid;
 		let pwd = this.state.pswd;
 		if (!uid || !pwd) {
 			this.alert();
@@ -64,12 +64,7 @@ class LoginComponent extends React.Component {
 		}
 
 		if (!this.state.loggedin) {
-			this.an.login(
-				this.state.usrid,
-				this.state.pswd,
-				reload,
-				onError
-			);
+			this.an.login( uid, pwd, reload, onError );
 		}
 		else reload(this.ssClient);
 
@@ -96,7 +91,7 @@ class LoginComponent extends React.Component {
 	}
 
 	update(val) {
-		setState(val);
+		this.setState(val);
 	}
 
 	render() {
@@ -112,18 +107,19 @@ class LoginComponent extends React.Component {
 		<form>
         <TextField required id="userid" label="Required"
                     autoComplete="username"
-                   defaultValue="User Id" />
+                    defaultValue="User Id"
+                    onChange={event => this.setState({userid: event.target.value})} />
         <TextField id="pswd" label="Password"
                     type="password"
                     autoComplete="new-password"
-                    onChange={event => setState({pswd: event.target.value})} />
+                    onChange={event => this.setState({pswd: event.target.value})} />
         <Button variant="contained" color="primary"
                 onClick={this.onLogin} >Log in</Button>
         <Button variant="contained" color="primary"
                 onClick={this.onLogout} >Log out</Button>
 		</form>
-		<ConfirmDialog ok='はい' title='Info'
-				open={this.state.showAlert}
+		<ConfirmDialog ok='はい' title='Info' cancel={false}
+				open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
 				msg={this.state.alert} />
       </div>);
     }

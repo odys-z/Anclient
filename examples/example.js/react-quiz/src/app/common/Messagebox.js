@@ -19,13 +19,9 @@ export class ConfirmDialog extends React.Component {
 		this.handleClose = this.handleClose.bind(this);
 	}
 
-	// handleClickOpen() {
-	// 	this.setState({open: true});
-	// 	this.props.open = true;
-	// }
-
-	handleClose() {
+	handleClose(e) {
 		this.setState({closed: true});
+		this.props.onClose(e.currentTarget);
 	};
 
 	render () {
