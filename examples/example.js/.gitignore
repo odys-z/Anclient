@@ -1,4 +1,5 @@
 node_modules
 # dist is copied to docker image
 # !react-quiz/dist
+dist/*.min.js*
 cn.com.inforise

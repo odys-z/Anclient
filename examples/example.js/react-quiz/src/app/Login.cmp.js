@@ -1,6 +1,5 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-// import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
@@ -24,7 +23,7 @@ class LoginComponent extends React.Component {
     state = {
 		loggedin: false,
 		pswd: '',
-		userid: '',
+		userid: 'admin',
 
 		alert: '',
 		showAlert: false,
@@ -66,7 +65,9 @@ class LoginComponent extends React.Component {
 		if (!this.state.loggedin) {
 			this.an.login( uid, pwd, reload, onError );
 		}
-		else reload(this.ssClient);
+		else // what's happening here?
+			;
+			// reload(this.ssClient);
 
 		function reload (client) {
 			that.ssClient = client;
@@ -98,21 +99,21 @@ class LoginComponent extends React.Component {
 	  const classes = this.props;
 		// This <form> only to disable chrome warning:
 		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
-      return (<div className={classes.root}>
-        <>
+		return (<div className={classes.root}>
+		<>
 			<TextField required id="jserv"
 					   label="Jserv URL" fullWidth={true}
 					   defaultValue="http://localhost:8080/jserv-sample/" />
 		</>
 		<form>
-        <TextField required id="userid" label="Required"
-                    autoComplete="username"
-                    defaultValue="User Id"
-                    onChange={event => this.setState({userid: event.target.value})} />
+        <TextField required id="userid" label="User Id"
+                autoComplete="username"
+                defaultValue={this.state.userid}
+                onChange={event => this.setState({userid: event.target.value})} />
         <TextField id="pswd" label="Password"
-                    type="password"
-                    autoComplete="new-password"
-                    onChange={event => this.setState({pswd: event.target.value})} />
+                type="password"
+                autoComplete="new-password"
+                onChange={event => this.setState({pswd: event.target.value})} />
         <Button variant="contained" color="primary"
                 onClick={this.onLogin} >Log in</Button>
         <Button variant="contained" color="primary"

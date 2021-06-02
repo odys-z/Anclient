@@ -45,6 +45,10 @@ class Quizlist extends React.Component {
         currentqx: -1,
     };
 
+	ssInf = undefined;
+	ssClient = undefined;
+	an = undefined;
+
 	constructor(props = {}) {
 		super(props);
 		this.state.quizzes = props.quizzes || [];
@@ -82,7 +86,17 @@ class Quizlist extends React.Component {
 	}
 
 	onLogin(client) {
-		console.log('loading with client:', client);
+		// console.log('Quizlist: loading with client:', client);
+		this.ssClient = client;
+		this.ssInf = client.ssInf;
+		this.an = client.an;
+
+		this.loadQuizzes(client);
+	}
+
+	loadQuizzes(client) {
+		let req = client.query('', 'vector', 'v');
+		...
 	}
 
 	onLogout(e) { this.setState({userid: ''}); }
@@ -91,12 +105,12 @@ class Quizlist extends React.Component {
 		if (!this.state.questions)
 			return;
 
-		return this.state.quezzes.map((q, x) => (
+		return this.state.quezzes.map( (q, x) => (
 		  <div key={`${this.state.userid}.${this.state.quezzes[x][0]}`}>
 			<ListItem button qx={x} onClick={this.onSelect} color='secondary'>
 				<ListItemIcon><Sms /></ListItemIcon>
 				<ListItemText primary={this.state.quezzes[x].title} />
-				<ListItemText primary={ this.state.quizzes[x].createdate}/>
+				<ListItemText primary={this.state.quizzes[x].createdate}/>
 			</ListItem>
 			<Collapse in={this.state.currentqx == x} timeout="auto" >
 				<TextField id="qtitle" label="Remarks"

@@ -62,5 +62,3 @@ export class ConfirmDialog extends React.Component {
 		);
 	}
 }
-
-// ConfirmDialog.prototype.show = () => { setOpen(true); }
