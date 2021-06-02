@@ -20,7 +20,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 
-import {Login} from './login'
+import {Login} from './Login.cmp.js'
 
 class Quizlist extends React.Component {
 	static getQx() {

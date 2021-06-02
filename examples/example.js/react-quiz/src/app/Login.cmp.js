@@ -6,6 +6,8 @@ import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 
 import * as an from 'anclient'
+import {ConfirmDialog} from './common/Messagebox'
+import {L, Langstrs} from './utils/langstr'
 
 // https://github.com/mui-org/material-ui/issues/15820
 const styles = (theme) => ({
@@ -19,16 +21,13 @@ const styles = (theme) => ({
  * @class
  */
 class LoginComponent extends React.Component {
-	// useStyles = makeStyles((theme) => ({
-	// 	root: {
-	// 	    '& > *': { margin: theme.spacing(1) }
-	// 	},
-	// }));
-
     state = {
 		loggedin: false,
 		pswd: '',
 		userid: '',
+
+		alert: '',
+		showAlert: false,
     };
 
 	/**
@@ -48,14 +47,21 @@ class LoginComponent extends React.Component {
 		this.alert = this.alert.bind(this);
 	}
 
-	alert();
+	alert() {
+		this.setState({
+			alert: L('User Id or password is not correct.'),
+			showAlert: true,
+		});
+	}
 
 	onLogin() {
 		let that = this;
 		let uid = this.state.usrid;
 		let pwd = this.state.pswd;
-		if (!uid || !pwd)
-			this.alert(langstr.usrid_pswd_is_null);
+		if (!uid || !pwd) {
+			this.alert();
+			return;
+		}
 
 		if (!this.state.loggedin) {
 			this.an.login(
@@ -116,6 +122,9 @@ class LoginComponent extends React.Component {
         <Button variant="contained" color="primary"
                 onClick={this.onLogout} >Log out</Button>
 		</form>
+		<ConfirmDialog ok='はい' title='Info'
+				open={this.state.showAlert}
+				msg={this.state.alert} />
       </div>);
     }
 }
