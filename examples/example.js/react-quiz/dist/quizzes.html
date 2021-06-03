@@ -8,35 +8,34 @@
 
 <body>
   <div id="quizlist"></div>
-  <noscript>
-    You need to enable JavaScript to run this app.
-  </noscript>
-	<ul>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <hr>
+  <ul>
 	<li>Powered by <a href='https://reactjs.org/'>React</a>
-	&amp; <a href='https://material-ui.com'>Material UI</a>
+		&amp; <a href='https://material-ui.com'>Material UI</a>
 	</li>
 	<li>To start sample service:
 	<pre>
 	docker pull odysz/jserv-sample
 	docer run --name jserv -dp 8080:8080 --rm odysz/jserv-sample</pre>
 	Then use this to test the connecion:<br>
-		<a href='http://192.168.101.200:8080/jserv-sample/login.serv11'>
+	<a href='http://192.168.101.200:8080/jserv-sample/login.serv11'>
 		http://192.168.101.200:8080/jserv-sample/login.serv11</a>
-		<br>The sample service should return this json data:<pre>
+	<br>The sample service should return this json data:<pre>
 	{"type": "io.odysz.semantic.jprotocol.AnsonMsg",
 	 "code": "exSemantic", "opts": null, "port": "session",
 	 "header": null,
 	 "body": [{"type": "io.odysz.semantic.jprotocol.AnsonResp",
-	 		"rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null, "conn": null,
-			"m": "No envelope is avaliable.", "map": null
-		}],
+		"rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null, "conn": null,
+		"m": "No envelope is avaliable.", "map": null
+	 }],
 	 "version": "1.0", "seq": 0
 	}</pre>
 	</li>
-	</ul>
+  </ul>
   <script src="quiz-0.1.0.min.js"></script>
   <script>
-  	new Quizlist().bindQuizzes('quizlist');
+	new Quizlist().bindQuizzes('quizlist');
   </script>
 </body>
 </html>

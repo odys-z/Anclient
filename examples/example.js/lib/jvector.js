@@ -41,6 +41,23 @@ class Jvector {
 		return jreq;
 	}
 
+	/** Create a query request and post back to server.
+	 * This function show the general query sample - goes to the Protocol's query
+	 * port: "r.serv(11)".
+	 * @param {function} onOk on query ok callback, called with parameter of query responds
+	 * */
+	query(onOk) {
+		let that = this;
+		let req = this.client.query(vec3conn, "vector", "v");
+		req.body[0]
+			.expr("vid").expr("val", "amount")
+			.expr("dim1", "agegrp").expr("dim2", "tex").expr("dim3", "indust")
+			.expr("dim4").expr("dim5").expr("dim6")
+			.whereCond("=", "agegrp", "'80-'");
+
+		this.client.an.post(req, onOk);
+	}
+
 	getVectors (onload) {
 		this.serv(vec_a.vec, onload);
 	}
@@ -75,7 +92,6 @@ class Jvector {
 		// this.respObj = respMsg;
 		return Protocol.rs2arr(respMsg.body[0].rs[0]);
 	}
-
 
 	getCubes (onload) {
 		this.serv(vec_a.cube, onload);

@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
+import Box from '@material-ui/core/Box';
 
 import * as an from 'anclient'
 import {ConfirmDialog} from './common/Messagebox'
@@ -116,8 +117,10 @@ class LoginComponent extends React.Component {
                 onChange={event => this.setState({pswd: event.target.value})} />
         <Button variant="contained" color="primary"
                 onClick={this.onLogin} >Log in</Button>
+		<Box display="none">
         <Button variant="contained" color="primary"
                 onClick={this.onLogout} >Log out</Button>
+		</Box>
 		</form>
 		<ConfirmDialog ok='はい' title='Info' cancel={false}
 				open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }

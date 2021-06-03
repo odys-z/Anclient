@@ -20,12 +20,11 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 
+import {Jvector} from '../../../lib/jvector'
 import {Login} from './Login.cmp.js'
 
 class Quizlist extends React.Component {
-	static getQx() {
-		return ++quid;
-	}
+	static getQx() { return ++quid; }
 
 	classes = makeStyles({
 		root: {
@@ -59,6 +58,8 @@ class Quizlist extends React.Component {
 		this.onAdd = this.onAdd.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
+		this.reload = this.reload.bind(this);
+		this.alert = this.alert.bind(this);
 	}
 
 	onSelect(e) {
@@ -75,14 +76,6 @@ class Quizlist extends React.Component {
 	}
 
 	onAdd(e) {
-		let qx = Editor.getQx();
-		let quizzes = this.state.quizzes.splice(0);
-		let quiz = {id: 'TODO'};
-		questions.push(quiz);
-		this.setState({
-			quizzes,
-			currentqx: qx,
-			open: qx});
 	}
 
 	onLogin(client) {
@@ -90,26 +83,67 @@ class Quizlist extends React.Component {
 		this.ssClient = client;
 		this.ssInf = client.ssInf;
 		this.an = client.an;
-
-		this.loadQuizzes(client);
+		this.reload(client);
 	}
 
-	loadQuizzes(client) {
-		let req = client.query('', 'vector', 'v');
-		...
+	alert(resp) {
+		console.error(resp);
+	}
+
+	reload (client) {
+		let that = this;
+		let jvector = new Jvector(client);
+		jvector.query(onQuery);
+
+		/**bind simple bars
+		 * @param {jprotocol.AnsonResp} resp
+		 */
+		function onQuery(resp) {
+			console.log(resp);
+
+			resp = {
+				count: 2, owener: 'admin',
+				"quizzes": [
+					{ "qx": 0,
+					  "qtype": "multiple",
+					  "title": "Quiz A",
+					  "createdate": "1776-07-04",
+					  "questions": 12,
+					  "remarks": "Unicorn"
+					},
+					{ "qx": 1,
+					  "qtype": "single",
+					  "title": "Quiz B",
+					  "createdate": "1911-10-10",
+					  "questions": 5,
+					  "remarks": "Pegasus"
+					},
+				]
+			};
+			that.setState({quizzes: resp.quizzes});
+		}
+
+		function onError (code, resp) {
+			if (code === an.Protocol.MsgCode.exIo)
+				that.alert('Network Failed!');
+			else if (resp.body[0])
+				// most likely MsgCode.exSession for password error
+				that.alert(code + ': ' + resp.body[0].m);
+			else console.error(resp);
+		}
 	}
 
 	onLogout(e) { this.setState({userid: ''}); }
 
 	items() {
-		if (!this.state.questions)
+		if (!this.state.quizzes)
 			return;
 
-		return this.state.quezzes.map( (q, x) => (
-		  <div key={`${this.state.userid}.${this.state.quezzes[x][0]}`}>
+		return this.state.quizzes.map( (q, x) => (
+		  <div key={`${this.state.userid}.${this.state.quizzes[x]['qx']}`}>
 			<ListItem button qx={x} onClick={this.onSelect} color='secondary'>
 				<ListItemIcon><Sms /></ListItemIcon>
-				<ListItemText primary={this.state.quezzes[x].title} />
+				<ListItemText primary={this.state.quizzes[x].title} />
 				<ListItemText primary={this.state.quizzes[x].createdate}/>
 			</ListItem>
 			<Collapse in={this.state.currentqx == x} timeout="auto" >
@@ -143,6 +177,5 @@ class Quizlist extends React.Component {
 	    ReactDOM.render(<Quizlist />, document.getElementById(elem));
 	}
 }
-
 
 export {Quizlist};

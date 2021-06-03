@@ -3,7 +3,7 @@
 import * as an from 'anclient'
 import * as xv from 'x-visual'
 import Bars from './bars'
-import {vec3conn, Jvector} from '../lib/jvector'
+import {vec3conn, Jvector} from '../../lib/jvector'
 
 /** Hollow XWorld Application.
  * add the user implemented system, Cube, into xworld, then show it.
@@ -36,43 +36,17 @@ export class App {
 			that.ssClient = client;
 			that.loggedin = true;
 
+			let jvector = new Jvector(client);
 			// 1. bind simple bars
-			that.query();
+			jvector.query(onQuery);
 
 			// 2. load vectors from port vec3.serv
-			let jvector = new Jvector(client);
 			jvector.getVectors((resp) => {
 				console.log(jvector.vectorsOf(resp),
 							jvector.x(resp), jvector.y(resp), jvector.z(resp));
 			});
-		}
 
-		function onError (code, resp) {
-			if (code === an.Protocol.MsgCode.exIo)
-				alert('Network Failed!');
-			else if (resp.body[0])
-				// most likely MsgCode.exSession for password error
-				alert(code + ': ' + resp.body[0].m);
-			else console.error(resp);
-		}
-	}
-
-	/** Create a query request and post back to server.
-	 * This function show the general query sample - goes to the Protocol's query
-	 * port: "r.serv(11)".
-	 * */
-	query() {
-		let that = this;
-		let req = this.ssClient.query(vec3conn, "vector", "v");
-		req.body[0]
-			.expr("vid").expr("val", "amount")
-			.expr("dim1", "agegrp").expr("dim2", "tex").expr("dim3", "indust")
-			.expr("dim4").expr("dim5").expr("dim6")
-			.whereCond("=", "agegrp", "'80-'");
-
-		this.an.post(req,
-			// success callback. resp is a server message
-			function(resp) {
+			function onQuery(resp) {
 				console.log(resp);
 
 				let c = document.getElementById(that.canv);
@@ -85,6 +59,16 @@ export class App {
 					new Bars(ecs, {xscene: xworld.xscene})
 					.create(an.Protocol.rs2arr(resp.body[0].rs[0])));
 				xworld.startUpdate();
-			});
+			}
+		}
+
+		function onError (code, resp) {
+			if (code === an.Protocol.MsgCode.exIo)
+				alert('Network Failed!');
+			else if (resp.body[0])
+				// most likely MsgCode.exSession for password error
+				alert(code + ': ' + resp.body[0].m);
+			else console.error(resp);
+		}
 	}
 }

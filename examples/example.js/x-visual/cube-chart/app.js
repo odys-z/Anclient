@@ -2,7 +2,7 @@
  */
 import * as an from 'anclient'
 import * as xv from 'x-visual'
-import {vec3conn, Jvector} from '../lib/jvector'
+import {vec3conn, Jvector} from '../../lib/jvector'
 
 /** Hollow XWorld Application.
  * add the user implemented system, Cube, into xworld, then show it.
