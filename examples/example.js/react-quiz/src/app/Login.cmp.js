@@ -23,7 +23,7 @@ const styles = (theme) => ({
 class LoginComponent extends React.Component {
     state = {
 		loggedin: false,
-		pswd: '',
+		pswd: '123456',
 		userid: 'admin',
 
 		alert: '',
@@ -112,7 +112,7 @@ class LoginComponent extends React.Component {
                 defaultValue={this.state.userid}
                 onChange={event => this.setState({userid: event.target.value})} />
         <TextField id="pswd" label="Password"
-                type="password"
+                type="password" value='123456'
                 autoComplete="new-password"
                 onChange={event => this.setState({pswd: event.target.value})} />
         <Button variant="contained" color="primary"

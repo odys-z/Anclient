@@ -22,6 +22,7 @@ import TextField from '@material-ui/core/TextField';
 
 import {Jvector} from '../../../lib/jvector'
 import {Login} from './Login.cmp.js'
+import {QuizForm} from './Quiz.form.js'
 
 class Quizlist extends React.Component {
 	static getQx() { return ++quid; }
@@ -32,7 +33,8 @@ class Quizlist extends React.Component {
 			maxWidth: 360,
 		},
 		nested: {
-			'background-color': 'red'
+			minWidth: 24,
+			'background-color': 'azure'
 		},
 	});
 
@@ -53,22 +55,26 @@ class Quizlist extends React.Component {
 		this.state.quizzes = props.quizzes || [];
 
 		this.onSelect = this.onSelect.bind(this);
-		this.onDetails = this.onDetails.bind(this);
 		this.onFind = this.onFind.bind(this);
 		this.onAdd = this.onAdd.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
 		this.reload = this.reload.bind(this);
 		this.alert = this.alert.bind(this);
+
+		this.onEdit = this.onEdit.bind(this);
+		this.onFormOk = this.onFormOk.bind(this);
 	}
 
 	onSelect(e) {
-	  let qx = e.currentTarget.getAttribute('qx');
-	  this.setState({currentqx: parseInt(qx)});
+		e.stopPropagation();
+		let qx = e.currentTarget.getAttribute('qx');
+		qx = parseInt(qx);
+		this.setState({
+			currentqx: qx,
+			openx: undefined,
+		 	});
 	};
-
-	onDetails(e) {
-	}
 
 	onFind(e) {
 		let quizzes = [{id: "todo 2"}];
@@ -76,6 +82,20 @@ class Quizlist extends React.Component {
 	}
 
 	onAdd(e) {
+	}
+
+	onEdit(e) {
+		e.stopPropagation();
+		let qx = e.currentTarget.getAttribute('qx');
+		qx = parseInt(qx);
+		this.setState({
+			currentqx: qx,
+			openx: qx,
+		 	});
+	}
+
+	onFormOk(arg) {
+		console.log(arg);
 	}
 
 	onLogin(client) {
@@ -145,12 +165,16 @@ class Quizlist extends React.Component {
 				<ListItemIcon><Sms /></ListItemIcon>
 				<ListItemText primary={this.state.quizzes[x].title} />
 				<ListItemText primary={this.state.quizzes[x].createdate}/>
+				<ListItemIcon onClick={this.onEdit} qx={x}>
+					<DraftsIcon />
+					<ListItemText primary="Edit" />
+				</ListItemIcon>
 			</ListItem>
 			<Collapse in={this.state.currentqx == x} timeout="auto" >
 				<TextField id="qtitle" label="Remarks"
 				  variant="outlined" color="primary"
 				  multiline fullWidth={true} value={this.state.quizzes[x].remarks}
-				  onChange={this.onDetails} />
+				 />
 			</Collapse>
 		  </div>)
 		);
@@ -170,6 +194,7 @@ class Quizlist extends React.Component {
 
 			{this.items()}
 		  </List>
+		  <QuizForm open={this.state.openx >= 0} onOk={this.onFormOk} />
 		</>);
 	}
 

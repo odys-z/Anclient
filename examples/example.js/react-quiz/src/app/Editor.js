@@ -27,7 +27,7 @@ const Question = {
 	multiple: 1
 }
 
-class Editor extends React.Component {
+export class Editor extends React.Component {
 	static getQx() {
 		return ++quid;
 	}
@@ -200,4 +200,4 @@ class Editor extends React.Component {
 	}
 }
 
-ReactDOM.render(<Editor />, document.querySelector('#editor'));
+// ReactDOM.render(<Editor />, document.querySelector('#editor'));
