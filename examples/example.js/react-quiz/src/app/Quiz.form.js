@@ -8,18 +8,24 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+import {AnContext} from '../../../lib/an-react'
 import {Editor} from './Editor.js'
 
 export class QuizForm extends React.Component {
 	state = {
 		closed: false,
+		an: undefined,
 	};
+
+	componentDidMount() {
+		this.state.an = this.context.client ? this.context.client.an : undefined;
+	}
 
 	constructor (props) {
 		super(props);
 
-		// this.handleClickOpen = this.handleClickOpen.bind(this);
 		this.onOk = this.onOk.bind(this);
+		this.onSave = this.onSave.bind(this);
 		this.onCancel = this.onCancel.bind(this);
 	}
 
@@ -37,6 +43,10 @@ export class QuizForm extends React.Component {
 			this.props.onOk(e.currentTarget);
 	}
 
+	onSave(e) {
+		e.stopPropagation();
+	}
+
 	render () {
 		let props = this.props;
 		let open = props.open && !this.state.closed;
@@ -50,7 +60,7 @@ export class QuizForm extends React.Component {
 		return (
 			<Dialog
 				fullWidth={true}
-				maxWidth={'xl'}
+				maxWidth={'md'}
 				open={open}
 				onClose={this.handleClose}
 				aria-labelledby="alert-dialog-title"
@@ -75,3 +85,5 @@ export class QuizForm extends React.Component {
 		);
 	}
 }
+
+QuizForm.contextType = AnContext;

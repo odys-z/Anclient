@@ -20,6 +20,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 
+import {AnContext} from '../../../lib/an-react'
 import {Jvector} from '../../../lib/jvector'
 import {Login} from './Login.cmp.js'
 import {QuizForm} from './Quiz.form.js'
@@ -44,11 +45,12 @@ class Quizlist extends React.Component {
 		username: '',
         quizzes: [], // id, questions, answers, type, correct index
         currentqx: -1,
-    };
 
-	ssInf = undefined;
-	ssClient = undefined;
-	an = undefined;
+		// see https://reactjs.org/docs/context.html#caveats
+		client: {an: undefined},
+		ssInf: undefined,
+		ssClient: undefined,
+    };
 
 	constructor(props = {}) {
 		super(props);
@@ -100,10 +102,10 @@ class Quizlist extends React.Component {
 
 	onLogin(client) {
 		// console.log('Quizlist: loading with client:', client);
-		this.ssClient = client;
-		this.ssInf = client.ssInf;
-		this.an = client.an;
-		this.reload(client);
+		this.state.ssClient = client;
+		this.state.ssInf = client.ssInf;
+		this.state.client.an = client.an;
+		this.reload(client); // will reload quiz form
 	}
 
 	alert(resp) {
@@ -181,7 +183,7 @@ class Quizlist extends React.Component {
 	}
 
 	render() {
-		return (<>
+		return (<AnContext.Provider value={{client: this.state.client}}>
 		  <Login onLoginOk={this.onLogin}/>
 		  <List component="nav"
 			aria-labelledby="nested-list-subheader"
@@ -195,7 +197,7 @@ class Quizlist extends React.Component {
 			{this.items()}
 		  </List>
 		  <QuizForm open={this.state.openx >= 0} onOk={this.onFormOk} />
-		</>);
+		</AnContext.Provider>);
 	}
 
 	bindQuizzes(elem) {

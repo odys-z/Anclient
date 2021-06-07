@@ -15,7 +15,6 @@ export class ConfirmDialog extends React.Component {
 	constructor (props) {
 		super(props);
 
-		// this.handleClickOpen = this.handleClickOpen.bind(this);
 		this.handleClose = this.handleClose.bind(this);
 	}
 
