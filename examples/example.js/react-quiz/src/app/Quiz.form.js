@@ -8,21 +8,37 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import {AnContext} from '../../../lib/an-react'
+import {AnContext, JQuiz} from '../../../lib/an-react'
 import {Editor} from './Editor.js'
 
 export class QuizForm extends React.Component {
 	state = {
 		closed: false,
 		an: undefined,
+
+		creating: false, // creating a new record before saved (no id allocated)
+		quizId: undefined,
+		title: '',
 	};
 
 	componentDidMount() {
 		this.state.an = this.context.client ? this.context.client.an : undefined;
+
+		if (!this.state.create) {
+			let jquiz = new JQuizzes(client);
+			jquiz.query(onQuery);
+		}
+		else this.state.title = 'new question';
+
+		function onQuery() {
+		}
 	}
 
 	constructor (props) {
 		super(props);
+
+		this.state.creating = props.create;
+		this.state.quizId = props.quizId;
 
 		this.onOk = this.onOk.bind(this);
 		this.onSave = this.onSave.bind(this);
@@ -45,6 +61,19 @@ export class QuizForm extends React.Component {
 
 	onSave(e) {
 		e.stopPropagation();
+		if (this.state.creating) {
+			this.state.creating = false;
+			saveNew();
+		}
+		else updateQuiz();
+
+		function saveNew() {
+
+		}
+
+		function updateQuiz() {
+
+		}
 	}
 
 	render () {
@@ -69,7 +98,7 @@ export class QuizForm extends React.Component {
 				<DialogTitle id="alert-dialog-title">
 				  {title}</DialogTitle>
 				<DialogContent>
-				  <Editor />
+				  <Editor title={this.state.title} quizId={this.state.quizId}/>
 				</DialogContent>
 				<DialogActions>
 				  <Button onClick={this.onOk} color="primary">

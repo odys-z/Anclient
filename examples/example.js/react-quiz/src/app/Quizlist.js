@@ -20,7 +20,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 
-import {AnContext} from '../../../lib/an-react'
+import {AnContext, JQuizzes} from '../../../lib/an-react'
 import {Jvector} from '../../../lib/jvector'
 import {Login} from './Login.cmp.js'
 import {QuizForm} from './Quiz.form.js'
@@ -43,12 +43,13 @@ class Quizlist extends React.Component {
 		userid: '',
 		pswd: '',
 		username: '',
-        quizzes: [], // id, questions, answers, type, correct index
-        currentqx: -1,
+        quizzes: [],   // id, questions, answers, type, correct index
+        currentqx: -1, // currently expaneded
+		openx: -1,     // currently editing
 
 		// see https://reactjs.org/docs/context.html#caveats
-		client: {an: undefined},
-		ssInf: undefined,
+		client: { an: undefined },
+		ssInf:    undefined,
 		ssClient: undefined,
     };
 
@@ -114,8 +115,8 @@ class Quizlist extends React.Component {
 
 	reload (client) {
 		let that = this;
-		let jvector = new Jvector(client);
-		jvector.query(onQuery);
+		let jquizzes = new JQuizzes(client);
+		jquizzes.query(onQuery);
 
 		/**bind simple bars
 		 * @param {jprotocol.AnsonResp} resp
@@ -127,6 +128,7 @@ class Quizlist extends React.Component {
 				count: 2, owener: 'admin',
 				"quizzes": [
 					{ "qx": 0,
+					  "qid": "00001",
 					  "qtype": "multiple",
 					  "title": "Quiz A",
 					  "createdate": "1776-07-04",
@@ -134,6 +136,7 @@ class Quizlist extends React.Component {
 					  "remarks": "Unicorn"
 					},
 					{ "qx": 1,
+					  "qid": "00002",
 					  "qtype": "single",
 					  "title": "Quiz B",
 					  "createdate": "1911-10-10",
@@ -183,7 +186,10 @@ class Quizlist extends React.Component {
 	}
 
 	render() {
-		return (<AnContext.Provider value={{client: this.state.client}}>
+		let quizid = this.state.currentqx >= 0
+			? this.state.quizzes[this.state.currentqx].qid : undefined;
+
+		return (<AnContext.Provider value={{client: this.state.client, quizid}}>
 		  <Login onLoginOk={this.onLogin}/>
 		  <List component="nav"
 			aria-labelledby="nested-list-subheader"
