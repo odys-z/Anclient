@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import {AnContext} from '../../../lib/an-react';
+import {AnContext, quiz_a} from '../../../lib/an-react';
 import {JQuiz} from '../../../lib/an-quiz';
 import {Editor} from './Editor.js';
 
@@ -19,7 +19,6 @@ export class QuizForm extends React.Component {
 
 		creating: false, // creating a new record before saved (no id allocated)
 		quizId: undefined,
-		title: '',
 	};
 
 	componentDidMount() {
@@ -29,11 +28,10 @@ export class QuizForm extends React.Component {
 	constructor (props) {
 		super(props);
 
-		this.state.creating = props.create;
+		this.state.creating = props.creating;
 		this.state.quizId = props.quizId;
 
 		this.onOk = this.onOk.bind(this);
-		this.onSave = this.onSave.bind(this);
 		this.onCancel = this.onCancel.bind(this);
 	}
 
@@ -51,23 +49,6 @@ export class QuizForm extends React.Component {
 			this.props.onOk(e.currentTarget);
 	}
 
-	onSave(e) {
-		e.stopPropagation();
-		if (this.state.creating) {
-			this.state.creating = false;
-			saveNew();
-		}
-		else updateQuiz();
-
-		function saveNew() {
-
-		}
-
-		function updateQuiz() {
-
-		}
-	}
-
 	render () {
 		let props = this.props;
 		let open = props.open && !this.state.closed;
@@ -80,13 +61,6 @@ export class QuizForm extends React.Component {
 		let txtCancel = props.cancel === 'string' ? props.cancel : "Cancel";
 		let txtOk = props.ok || props.OK ? props.ok || props.OK : "OK";
 
-		if (!this.state.creating) {
-			this.state.title = 'loading...';
-			let jquiz = new JQuiz(client);
-			jquiz.quiz(this.state.quizId, loadQuiz);
-		}
-		else this.state.title = 'new question';
-
 		return (
 			<Dialog
 				fullWidth={true}
@@ -96,10 +70,11 @@ export class QuizForm extends React.Component {
 				aria-labelledby="alert-dialog-title"
 				aria-describedby="alert-dialog-description" >
 
-				<DialogTitle id="alert-dialog-title">
-				  {title}</DialogTitle>
+				<DialogTitle id="alert-dialog-title"></DialogTitle>
 				<DialogContent>
-				  <Editor title={this.state.title} quizId={this.state.quizId}
+				  <Editor title={title}
+				  		quizId={this.state.quizId}
+						creating={this.state.creating}
 						questions={this.state.questions} />
 				</DialogContent>
 				<DialogActions>
@@ -114,10 +89,6 @@ export class QuizForm extends React.Component {
 				</DialogActions>
 			</Dialog>
 		);
-
-		function loadQuiz(ansonResp) {
-			setState( {questions: JQuiz.toQuestions(ansonResp)} );
-		}
 	}
 }
 

@@ -3,12 +3,14 @@
 import {Protocol, UserReq, AnsonMsg} from "anclient"
 export const qconn = "quiz";
 
-export const examports = {
+const Quizports = {
 	quiz: 'quiz.serv'
 }
 
-const quiz_a = {
-	list: 'list',
+export const quiz_a = {
+	list: 'list',   // load quizzes
+	insert: 'insert', // create new quiz
+	update: 'update', // update quiz
 }
 
 export
@@ -17,7 +19,7 @@ class JQuiz {
 	/**@param {SessionClient} ssClient client created via login
 	 */
 	constructor (ssClient) {
-		ssClient.An.understandPorts(examports);
+		ssClient.An.understandPorts(Quizports);
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
 	}
@@ -63,6 +65,17 @@ class JQuiz {
 
 	list (conds, onload) {
 		this.serv(quiz_a.list, conds, onload);
+	}
+
+	insert(quiz) {
+		let that = this;
+		let qreq = this.client.insert(qconn, "quizzes", "q");
+		qreq.body[0]
+			.nv('title', quiz.title)
+			.nv('title', quiz.)
+			.whereCond("=", "q.qid", `'${qid}'`);
+
+		this.client.an.post(qreq, onOk);
 	}
 
 	static toQuestions(resp) {

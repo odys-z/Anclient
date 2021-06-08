@@ -20,6 +20,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 
+import {L} from './utils/langstr';
 import {AnContext} from '../../../lib/an-react';
 import {JQuiz} from '../../../lib/an-quiz';
 import {Jvector} from '../../../lib/jvector';
@@ -44,9 +45,10 @@ class Quizlist extends React.Component {
 		userid: '',
 		pswd: '',
 		username: '',
-        quizzes: [],   // id, questions, answers, type, correct index
-        currentqx: -1, // currently expaneded
-		openx: -1,     // currently editing
+        quizzes: [],      // id, questions, answers, type, correct index
+        currentqx: -1,    // currently expaneded
+		openx: -1,        // currently editing
+		creating: false,  // creating a new quiz
 
 		// see https://reactjs.org/docs/context.html#caveats
 		client: { an: undefined },
@@ -64,7 +66,7 @@ class Quizlist extends React.Component {
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
 		this.reload = this.reload.bind(this);
-		this.alert = this.alert.bind(this);
+		// this.alert = this.alert.bind(this);
 
 		this.onEdit = this.onEdit.bind(this);
 		this.onFormOk = this.onFormOk.bind(this);
@@ -86,6 +88,12 @@ class Quizlist extends React.Component {
 	}
 
 	onAdd(e) {
+		e.stopPropagation();
+		this.setState({
+			currentqx: -1,
+			openx: -1,
+			creating: true,
+		 	});
 	}
 
 	onEdit(e) {
@@ -95,11 +103,13 @@ class Quizlist extends React.Component {
 		this.setState({
 			currentqx: qx,
 			openx: qx,
+			creating: false,
 		 	});
 	}
 
 	onFormOk(arg) {
 		console.log(arg);
+		setState( { } );
 	}
 
 	onLogin(client) {
@@ -110,9 +120,9 @@ class Quizlist extends React.Component {
 		this.reload(client); // will reload quiz form
 	}
 
-	alert(resp) {
-		console.error(resp);
-	}
+	// alert(resp) {
+	// 	console.error(resp);
+	// }
 
 	reload (client) {
 		let that = this;
@@ -126,37 +136,28 @@ class Quizlist extends React.Component {
 			console.log(resp);
 
 			resp = {
-				count: 2, owener: 'admin',
+				count: 1, owener: 'admin',
 				"quizzes": [
 					{ "qx": 0,
-					  "qid": "00001",
-					  "qtype": "multiple",
+					  "qid": "--- ---",
 					  "title": "Quiz A",
 					  "createdate": "1776-07-04",
 					  "questions": 12,
 					  "remarks": "Unicorn"
-					},
-					{ "qx": 1,
-					  "qid": "00002",
-					  "qtype": "single",
-					  "title": "Quiz B",
-					  "createdate": "1911-10-10",
-					  "questions": 5,
-					  "remarks": "Pegasus"
 					},
 				]
 			};
 			that.setState({quizzes: resp.quizzes});
 		}
 
-		function onError (code, resp) {
-			if (code === an.Protocol.MsgCode.exIo)
-				that.alert('Network Failed!');
-			else if (resp.body[0])
-				// most likely MsgCode.exSession for password error
-				that.alert(code + ': ' + resp.body[0].m);
-			else console.error(resp);
-		}
+		// function onError (code, resp) {
+		// 	if (code === an.Protocol.MsgCode.exIo)
+		// 		that.alert('Network Failed!');
+		// 	else if (resp.body[0])
+		// 		// most likely MsgCode.exSession for password error
+		// 		that.alert(code + ': ' + resp.body[0].m);
+		// 	else console.error(resp);
+		// }
 	}
 
 	onLogout(e) { this.setState({userid: ''}); }
@@ -189,6 +190,8 @@ class Quizlist extends React.Component {
 	render() {
 		let quizid = this.state.currentqx >= 0
 			? this.state.quizzes[this.state.currentqx].qid : undefined;
+		let creating = this.state.creating;
+		this.state.creating = false;
 
 		return (<AnContext.Provider value={{client: this.state.client, quizid}}>
 		  <Login onLoginOk={this.onLogin}/>
@@ -203,7 +206,11 @@ class Quizlist extends React.Component {
 
 			{this.items()}
 		  </List>
-		  <QuizForm open={this.state.openx >= 0} onOk={this.onFormOk} />
+		  <ListItemIcon onClick={this.onAdd} ><Add />
+		  <ListItemText primary={L("Add")} /></ListItemIcon>
+		  <QuizForm open={this.state.openx >= 0 || creating}
+		  			creating={creating}
+		  			onOk={this.onFormOk} />
 		</AnContext.Provider>);
 	}
 

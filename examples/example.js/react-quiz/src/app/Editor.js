@@ -43,17 +43,31 @@ export class Editor extends React.Component {
 	});
 
     state = {
+		creating: false,
+
 		openHead: true,
+		quizId: undefined,
 		qtitle: '',
-		qremraks: '',
+		quizinfo: '',
         questions: [], // id(seq), question text, answers, type, correct index
         currentqx: -1,
 		autosave: true,
     };
 
+	alert(msg) {
+		this.setState({
+			alert: msg,
+			showAlert: true,
+		});
+	}
+
 	constructor(props) {
 		super(props);
 		this.state.questions = props.questions;
+		this.state.quizId = props.quizId;
+		this.state.qtitle = props.title;
+		this.state.quizinfo = props.quizinfo;
+		this.state.creating = props.creating;
 
 		this.handleClick = this.handleClick.bind(this);
 		this.editQuestion = this.editQuestion.bind(this);
@@ -104,7 +118,20 @@ export class Editor extends React.Component {
 	}
 
 	onSave(e) {
-		console.log(this.state.questions);
+		e.stopPropagation();
+		let that = this;
+
+		if (this.state.creating) {
+			JQuiz.insert(this.state, (resp) => {
+				that.state.creating = false;
+				that.alert("New quiz created!");
+			});
+		}
+		else {
+			JQuiz.update(this.state, (resp) => {
+				that.alert("Quiz saved!");
+			});
+		}
 	}
 
 	items() {
@@ -147,8 +174,16 @@ export class Editor extends React.Component {
 	}
 
 	render() {
+		if (!this.state.creating) {
+			this.state.title = 'loading...';
+			let jquiz = new JQuiz(client);
+			jquiz.quiz(this.state.quizId, loadQuiz);
+		}
+		else this.state.title = 'new question';
+
 		return (
-		  <List
+		  <>
+			<List
 			component="nav"
 			aria-labelledby="nested-list-subheader"
 			subheader={
@@ -176,29 +211,38 @@ export class Editor extends React.Component {
 				<TextField id="qtitle" label="Title"
 				  variant="outlined" color="primary"
 				  multiline fullWidth={true}
-				  value={this.state.quizTitle} />
+				  value={this.state.qtitle} />
 
-				<TextField id="qremarks" label="Remarks"
+				<TextField id="quizinfo" label="Remarks"
 				  variant="outlined" color="secondary"
 				  multiline fullWidth={true}
-				  value={this.state.quizRemarks} />
+				  value={this.state.quizinfo} />
 			</Collapse>
 
 			{this.items()}
 
 			<ListItem button>
 				<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
-				<ListItemText primary="Add New" onClick={this.onAdd} />
+				<ListItemText primary="New Question" onClick={this.onAdd} />
 
-			    <FormControlLabel
-			        control={<Checkbox checked={this.state.autosave}
-									   onClick={e => {this.setState({autosave:!this.state.autosave});} }
-									   name="autosave" color="secondary" />}
-			        label="Auto Save"/>
+			    // <FormControlLabel
+			    //     control={<Checkbox checked={this.state.autosave}
+				// 					   onClick={e => {this.setState({autosave:!this.state.autosave});} }
+				// 					   name="autosave" color="secondary" />}
+			    //     label="Auto Save"/>
 
 				<ListItemText primary="Save" onClick={this.onSave} color="secondary" />
 			</ListItem>
-		  </List>);
+			</List>
+			<ConfirmDialog ok='はい' title='Info' cancel={false}
+					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
+					msg={this.state.alert} />
+		  </>
+	    );
+
+		function loadQuiz(ansonResp) {
+			setState( {questions: JQuiz.toQuestions(ansonResp)} );
+		}
 	}
 }
 
