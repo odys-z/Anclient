@@ -1,24 +1,24 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import Add from '@material-ui/icons/Add';
-import DraftsIcon from '@material-ui/icons/Drafts';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import SendIcon from '@material-ui/icons/Send';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import StarBorder from '@material-ui/icons/StarBorder';
-import Sms from '@material-ui/icons/Sms';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import TextField from '@material-ui/core/TextField';
+	import ReactDOM from 'react-dom';
+	import { makeStyles } from '@material-ui/core/styles';
+	import ListSubheader from '@material-ui/core/ListSubheader';
+	import List from '@material-ui/core/List';
+	import ListItem from '@material-ui/core/ListItem';
+	import ListItemIcon from '@material-ui/core/ListItemIcon';
+	import ListItemText from '@material-ui/core/ListItemText';
+	import Collapse from '@material-ui/core/Collapse';
+	import Add from '@material-ui/icons/Add';
+	import DraftsIcon from '@material-ui/icons/Drafts';
+	import InboxIcon from '@material-ui/icons/MoveToInbox';
+	import SendIcon from '@material-ui/icons/Send';
+	import ExpandLess from '@material-ui/icons/ExpandLess';
+	import ExpandMore from '@material-ui/icons/ExpandMore';
+	import StarBorder from '@material-ui/icons/StarBorder';
+	import Sms from '@material-ui/icons/Sms';
+	import TextareaAutosize from '@material-ui/core/TextareaAutosize';
+	import FormControlLabel from '@material-ui/core/FormControlLabel';
+	import Checkbox from '@material-ui/core/Checkbox';
+	import TextField from '@material-ui/core/TextField';
 
 var quid = -1;
 
@@ -46,13 +46,15 @@ export class Editor extends React.Component {
 		openHead: true,
 		qtitle: '',
 		qremraks: '',
-        questions: [], // id, questions, answers, type, correct index
+        questions: [], // id(seq), question text, answers, type, correct index
         currentqx: -1,
 		autosave: true,
     };
 
 	constructor(props) {
 		super(props);
+		this.state.questions = props.questions;
+
 		this.handleClick = this.handleClick.bind(this);
 		this.editQuestion = this.editQuestion.bind(this);
 		this.editAnswer = this.editAnswer.bind(this);
@@ -88,11 +90,11 @@ export class Editor extends React.Component {
 		let qx = Editor.getQx();
 		let questions = this.state.questions.splice(0);
 		// let tp = e.currentTarget.children.filter((e, x) => e.name === 'qtype');
-		questions.push(['id'+ qx, 'Question ' + qx, 'A.\nB.\nC.\nD.', Question.single]);
+		questions.push(['id'+ qx, 'Question ' + qx, 'A. \nB. \nC. \nD. ', Question.single]);
 		this.setState({
 			questions,
 			currentqx: qx,
-			open: qx});
+			open: qx });
 	}
 
 	onCheckSingle(e) {
@@ -111,37 +113,37 @@ export class Editor extends React.Component {
 		// if (end < 0)
 		// 	end = this.state.questions.length - (end + 1);
 
-		return this.state.questions.map((q, x) => (
-			  <div key={this.state.questions[x][0]}>
-				<ListItem button qx={x} onClick={this.handleClick} color='secondary'>
-					<ListItemIcon><Sms /></ListItemIcon>
-					<ListItemText primary={this.state.questions[x][1]} />
-				</ListItem>
-				<Collapse in={this.state.currentqx == x} timeout="auto" >
-					<List component="div">
-					  <ListItem button className={ this.classes.nested }>
-					    <ListItemIcon><StarBorder /></ListItemIcon>
-					    <ListItemText primary="Option..." />
-					    <FormControlLabel
-					        control={<Checkbox checked={this.state.questions[x][3] === Question.single}
-											   onClick={this.onCheckSingle}
-					                           name="chk0" color="primary" />}
-					        label="Single Answer"/>
-					  </ListItem>
-					</List>
+		return this.state.questions.map( (q, x) => (
+		  <div key={this.state.questions[x][0]}>
+			<ListItem button qx={x} onClick={this.handleClick} color='secondary'>
+				<ListItemIcon><Sms /></ListItemIcon>
+				<ListItemText primary={this.state.questions[x][1]} />
+			</ListItem>
+			<Collapse in={this.state.currentqx == x} timeout="auto" >
+				<List component="div">
+				  <ListItem button className={ this.classes.nested }>
+				    <ListItemIcon><StarBorder /></ListItemIcon>
+				    <ListItemText primary="Option..." />
+				    <FormControlLabel
+				        control={<Checkbox checked={this.state.questions[x][3] === Question.single}
+										   onClick={this.onCheckSingle}
+				                           name="chk0" color="primary" />}
+				        label="Single Answer"/>
+				  </ListItem>
+				</List>
 
-					<TextField id="qtext" label="Question"
-					  variant="outlined" color="primary"
-					  multiline fullWidth={true} value={this.state.questions[x][1]}
-					  onChange={this.editQuestion} />
+				<TextField id="qtext" label="Question"
+				  variant="outlined" color="primary"
+				  multiline fullWidth={true} value={this.state.questions[x][1]}
+				  onChange={this.editQuestion} />
 
-					<TextField id="answers" label="Answers (* correct)"
-					  variant="outlined" color="secondary"
-					  multiline fullWidth={true} value={this.state.questions[x][2]}
-					  onChange={this.editAnswer} />
-				</Collapse>
-			  </div>
-			));
+				<TextField id="answers" label="Answers (* correct)"
+				  variant="outlined" color="secondary"
+				  multiline fullWidth={true} value={this.state.questions[x][2]}
+				  onChange={this.editAnswer} />
+			</Collapse>
+		  </div>
+		));
 	}
 
 	render() {
@@ -191,7 +193,7 @@ export class Editor extends React.Component {
 			    <FormControlLabel
 			        control={<Checkbox checked={this.state.autosave}
 									   onClick={e => {this.setState({autosave:!this.state.autosave});} }
-			                           name="autosave" color="secondary" />}
+									   name="autosave" color="secondary" />}
 			        label="Auto Save"/>
 
 				<ListItemText primary="Save" onClick={this.onSave} color="secondary" />

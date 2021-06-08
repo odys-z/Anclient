@@ -20,10 +20,11 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 
-import {AnContext, JQuizzes} from '../../../lib/an-react'
-import {Jvector} from '../../../lib/jvector'
-import {Login} from './Login.cmp.js'
-import {QuizForm} from './Quiz.form.js'
+import {AnContext} from '../../../lib/an-react';
+import {JQuiz} from '../../../lib/an-quiz';
+import {Jvector} from '../../../lib/jvector';
+import {Login} from './Login.cmp.js';
+import {QuizForm} from './Quiz.form.js';
 
 class Quizlist extends React.Component {
 	static getQx() { return ++quid; }
@@ -115,8 +116,8 @@ class Quizlist extends React.Component {
 
 	reload (client) {
 		let that = this;
-		let jquizzes = new JQuizzes(client);
-		jquizzes.query(onQuery);
+		let jquizzes = new JQuiz(client);
+		jquizzes.list({}, onQuery);
 
 		/**bind simple bars
 		 * @param {jprotocol.AnsonResp} resp

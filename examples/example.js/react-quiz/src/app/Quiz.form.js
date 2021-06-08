@@ -8,8 +8,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import {AnContext, JQuiz} from '../../../lib/an-react'
-import {Editor} from './Editor.js'
+import {AnContext} from '../../../lib/an-react';
+import {JQuiz} from '../../../lib/an-quiz';
+import {Editor} from './Editor.js';
 
 export class QuizForm extends React.Component {
 	state = {
@@ -23,15 +24,6 @@ export class QuizForm extends React.Component {
 
 	componentDidMount() {
 		this.state.an = this.context.client ? this.context.client.an : undefined;
-
-		if (!this.state.create) {
-			let jquiz = new JQuizzes(client);
-			jquiz.query(onQuery);
-		}
-		else this.state.title = 'new question';
-
-		function onQuery() {
-		}
 	}
 
 	constructor (props) {
@@ -80,11 +72,20 @@ export class QuizForm extends React.Component {
 		let props = this.props;
 		let open = props.open && !this.state.closed;
 		this.state.closed = false;
+		if (!open) return (<></>);
+
 		let title = props.title ? props.title : '';
 		let msg = props.msg;
 		let displayCancel = props.cancel === false ? 'none' : 'block';
 		let txtCancel = props.cancel === 'string' ? props.cancel : "Cancel";
 		let txtOk = props.ok || props.OK ? props.ok || props.OK : "OK";
+
+		if (!this.state.creating) {
+			this.state.title = 'loading...';
+			let jquiz = new JQuiz(client);
+			jquiz.quiz(this.state.quizId, loadQuiz);
+		}
+		else this.state.title = 'new question';
 
 		return (
 			<Dialog
@@ -98,7 +99,8 @@ export class QuizForm extends React.Component {
 				<DialogTitle id="alert-dialog-title">
 				  {title}</DialogTitle>
 				<DialogContent>
-				  <Editor title={this.state.title} quizId={this.state.quizId}/>
+				  <Editor title={this.state.title} quizId={this.state.quizId}
+						questions={this.state.questions} />
 				</DialogContent>
 				<DialogActions>
 				  <Button onClick={this.onOk} color="primary">
@@ -112,6 +114,10 @@ export class QuizForm extends React.Component {
 				</DialogActions>
 			</Dialog>
 		);
+
+		function loadQuiz(ansonResp) {
+			setState( {questions: JQuiz.toQuestions(ansonResp)} );
+		}
 	}
 }
 

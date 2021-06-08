@@ -33,14 +33,14 @@ class LoginComponent extends React.Component {
 	/**
 	 * initialize a instance of Anclient visition jserv service.
 	 * @param {object} props
-	 * @param {string} props.jserv="http://127.0.0.1:8080/jserv-sample"); url to service root.
+	 * @param {string} props.jserv="http://127.0.0.1:8080/jserv-quiz"); url to service root.
 	 * @constructor
 	 */
 	constructor(props) {
 		super(props);
 
 		this.an = an.an;
-		this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-sample");
+		this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-quiz");
 
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
@@ -104,7 +104,7 @@ class LoginComponent extends React.Component {
 		<>
 			<TextField required id="jserv"
 					   label="Jserv URL" fullWidth={true}
-					   defaultValue="http://localhost:8080/jserv-sample/" />
+					   defaultValue="http://localhost:8080/jserv-quiz/" />
 		</>
 		<form>
         <TextField required id="userid" label="User Id"
