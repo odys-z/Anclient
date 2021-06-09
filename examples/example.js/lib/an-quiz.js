@@ -8,9 +8,28 @@ const Quizports = {
 }
 
 export const quiz_a = {
-	list: 'list',   // load quizzes
+	list: 'list',     // load quizzes
 	insert: 'insert', // create new quiz
 	update: 'update', // update quiz
+}
+
+export
+/**<pre>
+	public class QuizProtocol {
+		public static String questions = "questions";
+		public static String qtitle = "qtitle";
+		public static String quizinfo = "quizinfo";
+		public static String qowner = "qowner";
+		public static String dcreate = "dcreate";
+	}</pre>
+ */
+const QuizProtocol = {
+	quizId: "quizId",
+	questions: "questions",
+	qtitle: "qtitle",
+	quizinfo: "quizinfo",
+	qowner: "qowner",
+	dcreate: "dcreate",
 }
 
 export
@@ -24,7 +43,7 @@ class JQuiz {
 		this.ssInf = ssClient.ssInf;
 	}
 
-	serv (a, conds = {}, onload) {
+	serv (a, conds = {}, onLoad) {
 		let req = new UserReq(qconn)
 			.a(a); // this is a reading request
 
@@ -35,36 +54,39 @@ class JQuiz {
 
 		// for logging user action at server side.
 		this.client.usrAct({
-			func: a,
+			func: 'read',
 			cmd: a,
-			cate: a,
+			cate: Protocol.CRUD.r,
 			remarks: 'quiz.serv' });
 
 		var jreq = new AnsonMsg(Protocol.Port.quiz, header, req);
 
-		this.client.An.post(jreq, onload);
+		this.client.An.post(jreq, onLoad);
 		return jreq;
 	}
 
 	/** Create a query request and post back to server.
 	 * This function show the general query sample - goes to the Protocol's query
 	 * port: "r.serv(11)".
-	 * @param {string} qid quiz id
-	 * @param {function} onOk on query ok callback, called with parameter of query responds
+	 * @param {string} quizId quiz id
+	 * @param {function} onLoad on query ok callback, called with parameter of query responds
 	 * */
-	quiz(qid, onOk) {
+	quiz(quizId, onLoad) {
 		let that = this;
+		/*
 		let qreq = this.client.query(qconn, "quizzes", "q");
 		qreq.body[0]
 			.j('questions', 't', 't.quizid = q.qid')
 			.l('s_domain', 'd', 'd.did = q.subject')
 			.whereCond("=", "q.qid", `'${qid}'`);
-
-		this.client.an.post(qreq, onOk);
+		*/
+		let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad);
+		return this;
 	}
 
-	list (conds, onload) {
-		this.serv(quiz_a.list, conds, onload);
+	list (conds, onLoad) {
+		let jreq = this.serv(quiz_a.list, conds, onload);
+		return this;
 	}
 
 	insert(quiz, onOk) {
@@ -72,31 +94,33 @@ class JQuiz {
 		let date = new Date();
 		this.client.usrAct('quiz', quiz_a.insert, Protocol.CRUD.c, quiz.qtitle);
 
-		let req = this.client.userReq(qconn, Quizports.quiz,
-			new UserReq(qconn, "quizzes", { props: {
-				title: quiz.qtitle,
-				quizinfo: quiz.quizinfo,
-				qowner: this.client.ssInf.uid,
-				dcreate: `${date.toISOString()}`,
-				questions: quiz.questions
-			} } ).a(quiz_a.insert) );
+		let props = {}
+		props[QuizProtocol.qtitle] = quiz.qtitle;
+		props[QuizProtocol.qowner] = this.client.ssInf.uid;
+		props[QuizProtocol.dcreate] = `${date.toISOString()}`;
+		props[QuizProtocol.quizinfo] = quiz.quizinfo;
+		props[QuizProtocol.questions] = quiz.questions;
 
-		this.client.an.post(req, onOk, (c, e) => { console.log(c, e); })
+		let req = this.client.userReq(qconn, Quizports.quiz,
+			new UserReq( qconn, "quizzes", { props } ).a(quiz_a.insert) );
+
+		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
 	}
 
 	update(quiz, onOk) {
 		let that = this;
 		this.client.usrAct('quiz', quiz_a.update, Protocol.CRUD.u, quiz.qtitle);
 
-		let req = this.client.userReq(qconn, Quizports.quiz,
-			new UserReq(qconn, "quizzes", {
-				quizId: quiz.quizId,
-				title: quiz.qtitle,
-				quizinfo: quiz.quizinfo,
-				questions: quiz.questions
-			} ).a(quiz_a.update) );
+		let props = {}
+		props[QuizProtocol.quizId] = quiz.quizId;
+		props[QuizProtocol.qtitle] = quiz.qtitle;
+		props[QuizProtocol.quizinfo] = quiz.quizinfo;
+		props[QuizProtocol.questions] = quiz.questions;
 
-		this.client.an.post(req, onOk, (c, e) => { console.log(c, e); })
+		let req = this.client.userReq(qconn, Quizports.quiz,
+			new UserReq(qconn, "quizzes", { props }).a(quiz_a.update) );
+
+		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
 	}
 
 	static parseResp(resp) {
@@ -111,8 +135,10 @@ class JQuiz {
 				   }],
 			"version": "1.0", "seq": 0}
 		*/
-		let quizId = 'quizId';
-		let title = 'title';
-		return {quizId, title, questions: 0};
+		let data = resp.body[0].data.props;
+		let quizId = data[QuizProtocol.quisId];
+		let title = data[QuizProtocol.qtitle];
+		let questions = data[QuizProtocol.questions]
+		return {quizId, title, questions};
 	}
 }
