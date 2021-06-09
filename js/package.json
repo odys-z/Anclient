@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.5",
+  "version": "0.9.9",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main-backup": "./test/vue/index.js",
   "main": "./lib/anclient.js",
@@ -10,6 +10,7 @@
   },
   "scripts": {
     "test old way": "echo \"Open file://test/index.html in a browser.\" && exit 1",
+	"build": "webpack",
     "test": "webpack --config mocha.config.js && mocha dist/testBundle.js"
   },
   "keywords": [

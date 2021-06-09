@@ -51,9 +51,11 @@ class Quizlist extends React.Component {
 		creating: false,  // creating a new quiz
 
 		// see https://reactjs.org/docs/context.html#caveats
-		client: { an: undefined },
-		ssInf:    undefined,
-		ssClient: undefined,
+		// client: {
+		// 	an: undefined,
+		// 	ssInf: undefined
+		// },
+		anClient: undefined,
     };
 
 	constructor(props = {}) {
@@ -109,14 +111,15 @@ class Quizlist extends React.Component {
 
 	onFormOk(arg) {
 		console.log(arg);
-		setState( { } );
+		this.setState( { } );
 	}
 
 	onLogin(client) {
 		// console.log('Quizlist: loading with client:', client);
-		this.state.ssClient = client;
-		this.state.ssInf = client.ssInf;
-		this.state.client.an = client.an;
+		// this.state.ssClient = client;
+		// this.state.ssInf = client.ssInf;
+		// this.state.client.an = client.an;
+		this.setState({anClient: client});
 		this.reload(client); // will reload quiz form
 	}
 
@@ -188,12 +191,12 @@ class Quizlist extends React.Component {
 	}
 
 	render() {
-		let quizid = this.state.currentqx >= 0
+		let quizId = this.state.currentqx >= 0
 			? this.state.quizzes[this.state.currentqx].qid : undefined;
 		let creating = this.state.creating;
 		this.state.creating = false;
 
-		return (<AnContext.Provider value={{client: this.state.client, quizid}}>
+		return (<AnContext.Provider value={{anClient: this.state.anClient, quizId}}>
 		  <Login onLoginOk={this.onLogin}/>
 		  <List component="nav"
 			aria-labelledby="nested-list-subheader"

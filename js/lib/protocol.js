@@ -165,6 +165,13 @@ class AnsonMsg {
 		if (this.body !== undefined && this.body.length > 0)
 			return this.body[0].post(pst);
 	}
+
+	static rsArr(resp, rx = 0) {
+		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length > 0) {
+			return AnsonResp.rsArr(resp.body, rx);
+		}
+		return [];
+	}
 }
 
 class AnHeader {
@@ -187,11 +194,11 @@ class AnHeader {
 }
 
 class UserReq {
-	constructor (conn, tabl) {
+	constructor (conn, tabl, data = {}) {
 		this.type = "io.odysz.semantic.jserv.user.UserReq";
 		this.conn = conn;
 		this.tabl = tabl
-		this.data = {};
+		this.data = data;
 	}
 
 	get(prop) {
@@ -627,10 +634,11 @@ class InsertReq extends UpdateReq {
 }
 
 class AnsonResp {
-	// TODO
-	// TODO
 	constructor (response) {
+	}
 
+	static rsArr(respBody, rx = 0) {
+		return AnsonResp.rs2arr(respBody[0].rs[rx]);
 	}
 
 	/**Change rs object to array like [ {col1: val1, ...}, ... ]

@@ -4,5 +4,6 @@ import React from 'react';
 
 export const AnContext = React.createContext(
 	// Anclient
-	{an: undefined}
+	{an: undefined,
+	 ssInf: undefined}
 );

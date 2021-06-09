@@ -552,6 +552,8 @@ class SessionClient {
 		return this;
 	}
 
+	userAct(f, c, m, r) { this.usract(f, c, m, r); }
+
 	/**Set user's current action to be logged.
 	 * @param {string} cmd user's command, e.g. 'save'
 	 * @return {SessionClient} this */

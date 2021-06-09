@@ -89,11 +89,11 @@ function User () {
 			// 1. delete is post updating user
 			q.post(del).nv("pswd", "123456");
 
-				client.commit(q,
-					function(resp) {
-						// You can fire saved event at client side here.
-						EasyMsger.ok(EasyMsger.m.saved);
-					}, EasyMsger.error);
+			client.commit(q,
+				function(resp) {
+					// You can fire saved event at client side here.
+					EasyMsger.ok(EasyMsger.m.saved);
+				}, EasyMsger.error);
 			});
 		}
 		else {

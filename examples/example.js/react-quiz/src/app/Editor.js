@@ -20,6 +20,12 @@ import React from 'react';
 	import Checkbox from '@material-ui/core/Checkbox';
 	import TextField from '@material-ui/core/TextField';
 
+	import {AnsonMsg} from 'anclient';
+	import {L} from './utils/langstr';
+	import {JQuiz} from '../../../lib/an-quiz';
+	import {AnContext} from '../../../lib/an-react';
+	import {ConfirmDialog} from './common/Messagebox'
+
 var quid = -1;
 
 const Question = {
@@ -47,11 +53,14 @@ export class Editor extends React.Component {
 
 		openHead: true,
 		quizId: undefined,
-		qtitle: '',
+		qtitle: 'New Quiz',
 		quizinfo: '',
         questions: [], // id(seq), question text, answers, type, correct index
         currentqx: -1,
 		autosave: true,
+
+		showAlert: false,
+		alert: '',
     };
 
 	alert(msg) {
@@ -63,11 +72,10 @@ export class Editor extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state.questions = props.questions;
 		this.state.quizId = props.quizId;
 		this.state.qtitle = props.title;
 		this.state.quizinfo = props.quizinfo;
-		this.state.creating = props.creating;
+		// this.state.creating = props.creating;
 
 		this.handleClick = this.handleClick.bind(this);
 		this.editQuestion = this.editQuestion.bind(this);
@@ -85,7 +93,6 @@ export class Editor extends React.Component {
 	};
 
 	editQuestion(e) {
-		console.log(e.target.value);
 		let qx = this.state.currentqx;
 		let questions = this.state.questions.slice();
 		questions[qx][1] = e.target.value;
@@ -93,7 +100,6 @@ export class Editor extends React.Component {
 	}
 
 	editAnswer(e) {
-		console.log(e.target.value);
 		let qx = this.state.currentqx;
 		let questions = this.state.questions.slice();
 		questions[qx][2] = e.target.value;
@@ -121,15 +127,22 @@ export class Editor extends React.Component {
 		e.stopPropagation();
 		let that = this;
 
-		if (this.state.creating) {
-			JQuiz.insert(this.state, (resp) => {
-				that.state.creating = false;
-				that.alert("New quiz created!");
+		if (!this.jquiz) {
+			let ctx = this.context;
+			this.jquiz = new JQuiz(ctx.anClient);
+		}
+
+		if (!this.state.quizId) {
+			this.jquiz.insert(this.state, (resp) => {
+				let {quizId, title} = JQuiz.parseResp(resp);
+				that.state.quizId = quizId;
+				that.alert("New quiz created!\nQuiz: " + title);
 			});
 		}
 		else {
-			JQuiz.update(this.state, (resp) => {
-				that.alert("Quiz saved!");
+			this.jquiz.update(this.state, (resp) => {
+				let {questions} = JQuiz.parseResp(resp);
+				that.alert("Quiz saved! Questions: " + questions);
 			});
 		}
 	}
@@ -174,12 +187,17 @@ export class Editor extends React.Component {
 	}
 
 	render() {
-		if (!this.state.creating) {
-			this.state.title = 'loading...';
-			let jquiz = new JQuiz(client);
-			jquiz.quiz(this.state.quizId, loadQuiz);
+		let ctx = this.context;
+		let title = this.state.qtitle;
+		if (ctx.quizId) {
+			title = 'loading...';
+			if (!this.jquiz)
+				this.jquiz = new JQuiz(ctx.anClient);
+			this.jquiz.quiz(this.state.quizId, loadQuiz);
 		}
-		else this.state.title = 'new question';
+		else title = title ? title : 'New Quiz';
+
+		let that = this;
 
 		return (
 		  <>
@@ -188,15 +206,16 @@ export class Editor extends React.Component {
 			aria-labelledby="nested-list-subheader"
 			subheader={
 				<ListSubheader component="div" id="nested-list-subheader">
-				  Nested List Items
+				  {L('Quiz: ') + title}
 				</ListSubheader>
 			}
 			className={ this.classes.root } >
 			<ListItem button onClick={e => this.setState({openHead: !this.state.openHead})}>
 				<ListItemIcon><SendIcon /></ListItemIcon>
-				<ListItemText primary="Quiz Head" />
+				<ListItemText primary={L('Editing Quiz')} />
 			</ListItem>
 			<Collapse in={this.state.openHead} timeout="auto" >
+			{/*
 				<List component="div">
 				  <ListItem button className={ this.classes.nested }>
 				    <ListItemIcon><StarBorder /></ListItemIcon>
@@ -207,16 +226,19 @@ export class Editor extends React.Component {
 				        label="Check Each Answer"/>
 				  </ListItem>
 				</List>
+			*/}
 
-				<TextField id="qtitle" label="Title"
+				<TextField id="qtitle" label={L("Title")}
 				  variant="outlined" color="primary"
 				  multiline fullWidth={true}
-				  value={this.state.qtitle} />
+				  onBlur={e => this.setState({qtitle: e.currentTarget.value})}
+				  defaultValue={title} />
 
-				<TextField id="quizinfo" label="Remarks"
+				<TextField id="quizinfo" label={L("Quiz Description")}
 				  variant="outlined" color="secondary"
 				  multiline fullWidth={true}
-				  value={this.state.quizinfo} />
+				  onBlur={e => this.state.quizinfo = e.currentTarget.value}
+				  defaultValue={this.state.quizinfo} />
 			</Collapse>
 
 			{this.items()}
@@ -224,13 +246,13 @@ export class Editor extends React.Component {
 			<ListItem button>
 				<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
 				<ListItemText primary="New Question" onClick={this.onAdd} />
-
-			    // <FormControlLabel
+				{
+				// <FormControlLabel
 			    //     control={<Checkbox checked={this.state.autosave}
 				// 					   onClick={e => {this.setState({autosave:!this.state.autosave});} }
 				// 					   name="autosave" color="secondary" />}
 			    //     label="Auto Save"/>
-
+				}
 				<ListItemText primary="Save" onClick={this.onSave} color="secondary" />
 			</ListItem>
 			</List>
@@ -241,9 +263,9 @@ export class Editor extends React.Component {
 	    );
 
 		function loadQuiz(ansonResp) {
-			setState( {questions: JQuiz.toQuestions(ansonResp)} );
+			that.setState(st => {st.questions = AnsonMsg.rsArr(ansonResp);} );
 		}
 	}
 }
 
-// ReactDOM.render(<Editor />, document.querySelector('#editor'));
+Editor.contextType = AnContext;

@@ -5,7 +5,7 @@ import chai from 'chai'
 import { expect, assert } from 'chai'
 
 // import {Affine} from '../../lib/xmath/affine'
-import {Protocol, AnsonResp} from '../../lib/protocol.js'
+import {Protocol, AnsonMsg, AnsonResp} from '../../lib/protocol.js'
 
 
 describe('case: [Protocol] data converter', () => {
@@ -76,6 +76,12 @@ describe('case: [Protocol] data converter', () => {
 		r0 = rs[1]
         assert.equal('v 002', r0.vid, "5.1 ---");
         assert.equal('103', r0.amount, "5.2 ---");
+
+		let arr = AnsonResp.rsArr(resp.body, 0);
+        assert.equal(8, arr.length, "6 ---");
+
+		arr = AnsonMsg.rsArr(resp, 0);
+        assert.equal(8, arr.length, "7 ---");
     });
 
 });
