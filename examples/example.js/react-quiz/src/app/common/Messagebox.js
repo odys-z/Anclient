@@ -23,15 +23,28 @@ export class ConfirmDialog extends React.Component {
 		this.props.onClose(e.currentTarget);
 	};
 
+	textLines(msg) {
+		let lines = msg.split('\n')
+
+		return lines.map( (l, x) => (
+		  <DialogContentText id="alert-dialog-description" key={x}>
+		    {l}
+		  </DialogContentText>
+		));
+	}
+
 	render () {
 		let props = this.props;
 		let open = props.open && !this.state.closed;
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
-		let msg = props.msg;
+		this.state.title = title;
 		let displayCancel = props.cancel === false ? 'none' : 'block';
 		let txtCancel = props.cancel === 'string' ? props.cancel : "Cancel";
 		let txtOk = props.ok || props.OK ? props.ok || props.OK : "OK";
+
+		// let msg = props.msg;
+		let txtLines = this.textLines(props.msg);
 
 		return (
 			<Dialog
@@ -43,9 +56,7 @@ export class ConfirmDialog extends React.Component {
 				<DialogTitle id="alert-dialog-title">
 				  {title}</DialogTitle>
 				<DialogContent>
-				  <DialogContentText id="alert-dialog-description">
-				    Content: {msg}
-				  </DialogContentText>
+					{txtLines}
 				</DialogContent>
 				<DialogActions>
 				  <Button onClick={this.handleClose} color="primary">

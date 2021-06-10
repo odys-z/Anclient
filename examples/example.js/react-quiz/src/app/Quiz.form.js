@@ -47,7 +47,7 @@ export class QuizForm extends React.Component {
 		e.stopPropagation();
 		this.setState({closed: true});
 		if (typeof this.props.onOk === 'function')
-			this.props.onOk(e.currentTarget);
+			this.props.onOk({quizId: this.state.quizId});
 	}
 
 	render () {
@@ -55,6 +55,10 @@ export class QuizForm extends React.Component {
 		let open = props.open && !this.state.closed;
 		this.state.closed = false;
 		if (!open) return (<></>);
+
+		let quizId = this.state.quizId
+		if (!quizId)
+			this.state.quizId = quizId = props.quizId;
 
 		let title = props.title ? props.title : '';
 		let msg = props.msg;
@@ -74,7 +78,7 @@ export class QuizForm extends React.Component {
 				<DialogTitle id="alert-dialog-title"></DialogTitle>
 				<DialogContent>
 				  <Editor title={title}
-				  		quizId={this.state.quizId}
+				  		quizId={quizId}
 						creating={this.state.creating}
 						questions={this.state.questions} />
 				</DialogContent>

@@ -4,7 +4,9 @@
   "description": "This file is only for install node_modules, avoiding npm ERR! code EINVALIDTAGNAME.",
   "main": "",
   "scripts": {
-    "test": "echo \"This is not a npm package\" && exit 1"
+    "build": "echo \"cd react-quiz, webpack\"",
+    "test-echo": "echo \"This is not a npm package\" && exit 1",
+    "test": "webpack --config mocha.config.js && mocha --require @babel/registry dist/testBundle.js"
   },
   "author": "Odys Zhou",
   "license": "MIT",
@@ -15,7 +17,7 @@
     "@babel/preset-react": "^7.13.13",
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
-    "anclient": "^0.9.9",
+    "anclient": "^0.9.10",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.2.6",
     "jquery": "^3.6.0",
@@ -25,7 +27,8 @@
     "react-svg-loader": "^3.0.3",
     "react-transition-group": "^4.4.2",
     "style-loader": "^2.0.0",
-    "webpack": "^5.38.1"
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2"
   },
   "dependencies": {}
 }

@@ -1,6 +1,9 @@
 /** TODO move this the anclient.js
  */
-import {Protocol, UserReq, AnsonMsg} from "anclient"
+import {
+	Protocol, UserReq, AnsonMsg
+} from "anclient"
+
 export const qconn = "quiz";
 
 const Quizports = {
@@ -8,6 +11,7 @@ const Quizports = {
 }
 
 export const quiz_a = {
+	quiz: 'quiz',     //
 	list: 'list',     // load quizzes
 	insert: 'insert', // create new quiz
 	update: 'update', // update quiz
@@ -85,7 +89,7 @@ class JQuiz {
 	}
 
 	list (conds, onLoad) {
-		let jreq = this.serv(quiz_a.list, conds, onload);
+		let jreq = this.serv(quiz_a.list, conds, onLoad);
 		return this;
 	}
 
@@ -102,7 +106,7 @@ class JQuiz {
 		props[QuizProtocol.questions] = quiz.questions;
 
 		let req = this.client.userReq(qconn, Quizports.quiz,
-			new UserReq( qconn, "quizzes", { props } ).a(quiz_a.insert) );
+			new UserReq( qconn, "quizzes", props ).a(quiz_a.insert) );
 
 		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
 	}
@@ -118,7 +122,7 @@ class JQuiz {
 		props[QuizProtocol.questions] = quiz.questions;
 
 		let req = this.client.userReq(qconn, Quizports.quiz,
-			new UserReq(qconn, "quizzes", { props }).a(quiz_a.update) );
+			new UserReq(qconn, "quizzes", props).a(quiz_a.update) );
 
 		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
 	}
@@ -136,7 +140,7 @@ class JQuiz {
 			"version": "1.0", "seq": 0}
 		*/
 		let data = resp.body[0].data.props;
-		let quizId = data[QuizProtocol.quisId];
+		let quizId = data[QuizProtocol.quizId];
 		let title = data[QuizProtocol.qtitle];
 		let questions = data[QuizProtocol.questions]
 		return {quizId, title, questions};

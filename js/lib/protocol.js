@@ -198,15 +198,20 @@ class UserReq {
 		this.type = "io.odysz.semantic.jserv.user.UserReq";
 		this.conn = conn;
 		this.tabl = tabl
-		this.data = data;
+		this.data = {props: data};
 	}
 
 	get(prop) {
-		return this.data[prop];
+		return this.data.props ? this.data.props[prop] : undefined;
 	}
 
+	/** set data (SemanticObject)'s map
+	 * @param {string} prop name
+	 * @param {object} v value
+	 * @return {UserReq} this
+	 */
 	set(prop, v) {
-		this.data[prop] = v;
+		this.data.props[prop] = v;
 		return this;
 	}
 

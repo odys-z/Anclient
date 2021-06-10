@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import AES from './aes.js';
-import {Protocol, AnsonMsg, AnHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg} from './protocol.js';
+import {
+	Protocol, AnsonMsg, AnHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg
+} from './protocol.js';
 
 /**The lower API of jclient/js
  * @module anclient/js/core

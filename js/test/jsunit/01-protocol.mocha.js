@@ -5,10 +5,23 @@ import chai from 'chai'
 import { expect, assert } from 'chai'
 
 // import {Affine} from '../../lib/xmath/affine'
-import {Protocol, AnsonMsg, AnsonResp} from '../../lib/protocol.js'
+import {Protocol, AnsonMsg, UserReq, AnsonResp} from '../../lib/protocol.js'
 
 
 describe('case: [Protocol] data converter', () => {
+    it('UserReq handling', () => {
+		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
+			.set('quizId', '000001');
+
+        assert.equal(ur.conn, 'con-1', "0.1 ---");
+        assert.equal(ur.tabl, 'quizzes', "0.2 ---");
+        assert.equal(ur.get('quizId'), '000001', "1 ---");
+        assert.equal(ur.get('title'), 'user-req', "2 ---");
+
+		// must keep consists as js/cs/java all denpends on this structure
+        assert.equal(ur.data.props['title'], 'user-req', "3 ---");
+        assert.equal(ur.data.props.quizId, '000001', "4 ---");
+	} );
 
     it('AnsonResp response handling', () => {
         assert.isTrue(typeof(Protocol.rs2arr) === 'function', "1 ---");
@@ -64,10 +77,6 @@ describe('case: [Protocol] data converter', () => {
 		}
 
 		let anResp = new AnsonResp(resp);
-		// FIXME to be tested
-        // assert.equal(8, anResp.rowCnt, "3 ---");
-        // assert.equal(8, anResp.results.length, "4 ---");
-
 		let rs = AnsonResp.rs2arr(resp.body[0].rs[0]);
         assert.equal(8, rs.length, "4 ---");
 		let r0 = rs[0]

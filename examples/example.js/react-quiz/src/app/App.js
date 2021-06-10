@@ -11,12 +11,8 @@ import { withStyles, MuiThemeProvider } from "@material-ui/core/styles";
 import logo from "../assets/logo.svg";
 import theme from "./styles/theme";
 import styles from "./app-style";
-// import questionsFactory from "./models/factories/get-questions-factory";
-// import submitFactory from "./models/factories/submit-questions-factory";
 
 import CircularLoading from "./components/CircularLoading";
-
-// import getQuestions from "./models/services/questions/local/get-questions";
 
 class App extends React.Component {
     lastTimeButtonClicked = new Date().getTime();

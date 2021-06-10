@@ -1,5 +1,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
+import Collapse from '@material-ui/core/Collapse';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
@@ -72,7 +73,7 @@ class LoginComponent extends React.Component {
 
 		function reload (client) {
 			that.ssClient = client;
-			that.loggedin = true;
+			that.state.loggedin = true;
 			if (typeof that.props.onLoginOk === 'function')
 				that.props.onLoginOk(client);
 			else console.log(client);
@@ -106,22 +107,22 @@ class LoginComponent extends React.Component {
 					   label="Jserv URL" fullWidth={true}
 					   defaultValue="http://localhost:8080/jserv-quiz/" />
 		</>
-		<form>
-        <TextField required id="userid" label="User Id"
-                autoComplete="username"
-                defaultValue={this.state.userid}
-                onChange={event => this.setState({userid: event.target.value})} />
-        <TextField id="pswd" label="Password"
-                type="password" value='123456'
-                autoComplete="new-password"
-                onChange={event => this.setState({pswd: event.target.value})} />
-        <Button variant="contained" color="primary"
-                onClick={this.onLogin} >Log in</Button>
-		<Box display="none">
-        <Button variant="contained" color="primary"
-                onClick={this.onLogout} >Log out</Button>
-		</Box>
-		</form>
+		<Collapse in={!this.state.loggedin} timeout="auto" >
+	        <TextField required id="userid" label="User Id"
+	                autoComplete="username"
+	                defaultValue={this.state.userid}
+	                onChange={event => this.setState({userid: event.target.value})} />
+	        <TextField id="pswd" label="Password"
+	                type="password" value='123456'
+	                autoComplete="new-password"
+	                onChange={event => this.setState({pswd: event.target.value})} />
+	        <Button variant="contained" color="primary"
+	                onClick={this.onLogin} >Log in</Button>
+			<Box display="none">
+	        <Button variant="contained" color="primary"
+	                onClick={this.onLogout} >Log out</Button>
+			</Box>
+		</Collapse>
 		<ConfirmDialog ok='はい' title='Info' cancel={false}
 				open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
 				msg={this.state.alert} />

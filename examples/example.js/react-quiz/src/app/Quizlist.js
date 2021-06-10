@@ -23,6 +23,7 @@ import TextField from '@material-ui/core/TextField';
 import {L} from './utils/langstr';
 import {AnContext} from '../../../lib/an-react';
 import {JQuiz} from '../../../lib/an-quiz';
+import {QuizResp} from '../../../lib/protocol.quiz.js';
 import {Jvector} from '../../../lib/jvector';
 import {Login} from './Login.cmp.js';
 import {QuizForm} from './Quiz.form.js';
@@ -51,10 +52,6 @@ class Quizlist extends React.Component {
 		creating: false,  // creating a new quiz
 
 		// see https://reactjs.org/docs/context.html#caveats
-		// client: {
-		// 	an: undefined,
-		// 	ssInf: undefined
-		// },
 		anClient: undefined,
     };
 
@@ -68,7 +65,6 @@ class Quizlist extends React.Component {
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
 		this.reload = this.reload.bind(this);
-		// this.alert = this.alert.bind(this);
 
 		this.onEdit = this.onEdit.bind(this);
 		this.onFormOk = this.onFormOk.bind(this);
@@ -109,58 +105,31 @@ class Quizlist extends React.Component {
 		 	});
 	}
 
-	onFormOk(arg) {
-		console.log(arg);
-		this.setState( { } );
+	onFormOk(quizId) {
+		this.state.openx = -1;
+		this.reload();
 	}
 
 	onLogin(client) {
-		// console.log('Quizlist: loading with client:', client);
-		// this.state.ssClient = client;
-		// this.state.ssInf = client.ssInf;
-		// this.state.client.an = client.an;
+		this.jquiz = new JQuiz(client);
+
 		this.setState({anClient: client});
-		this.reload(client); // will reload quiz form
+		this.reload();
 	}
 
-	// alert(resp) {
-	// 	console.error(resp);
-	// }
-
-	reload (client) {
+	reload () {
 		let that = this;
-		let jquizzes = new JQuiz(client);
-		jquizzes.list({}, onQuery);
+		this.jquiz.list({}, onQuery);
 
 		/**bind simple bars
 		 * @param {jprotocol.AnsonResp} resp
 		 */
 		function onQuery(resp) {
-			console.log(resp);
-
-			resp = {
-				count: 1, owener: 'admin',
-				"quizzes": [
-					{ "qx": 0,
-					  "qid": "--- ---",
-					  "title": "Quiz A",
-					  "createdate": "1776-07-04",
-					  "questions": 12,
-					  "remarks": "Unicorn"
-					},
-				]
-			};
-			that.setState({quizzes: resp.quizzes});
+			if (resp) {
+				let anquiz = new QuizResp(resp.body);
+				that.setState({quizzes: anquiz.quizzes()});
+			}
 		}
-
-		// function onError (code, resp) {
-		// 	if (code === an.Protocol.MsgCode.exIo)
-		// 		that.alert('Network Failed!');
-		// 	else if (resp.body[0])
-		// 		// most likely MsgCode.exSession for password error
-		// 		that.alert(code + ': ' + resp.body[0].m);
-		// 	else console.error(resp);
-		// }
 	}
 
 	onLogout(e) { this.setState({userid: ''}); }
@@ -170,11 +139,11 @@ class Quizlist extends React.Component {
 			return;
 
 		return this.state.quizzes.map( (q, x) => (
-		  <div key={`${this.state.userid}.${this.state.quizzes[x]['qx']}`}>
+		  <div key={`${this.state.userid}.${this.state.quizzes[x].qid}`}>
 			<ListItem button qx={x} onClick={this.onSelect} color='secondary'>
 				<ListItemIcon><Sms /></ListItemIcon>
 				<ListItemText primary={this.state.quizzes[x].title} />
-				<ListItemText primary={this.state.quizzes[x].createdate}/>
+				<ListItemText primary={this.state.quizzes[x].optime}/>
 				<ListItemIcon onClick={this.onEdit} qx={x}>
 					<DraftsIcon />
 					<ListItemText primary="Edit" />
@@ -197,7 +166,7 @@ class Quizlist extends React.Component {
 		this.state.creating = false;
 
 		return (<AnContext.Provider value={{anClient: this.state.anClient, quizId}}>
-		  <Login onLoginOk={this.onLogin}/>
+		  <Login onLoginOk={this.onLogin} />
 		  <List component="nav"
 			aria-labelledby="nested-list-subheader"
 			subheader={
@@ -212,7 +181,7 @@ class Quizlist extends React.Component {
 		  <ListItemIcon onClick={this.onAdd} ><Add />
 		  <ListItemText primary={L("Add")} /></ListItemIcon>
 		  <QuizForm open={this.state.openx >= 0 || creating}
-		  			creating={creating}
+		  			creating={creating} quizId={quizId}
 		  			onOk={this.onFormOk} />
 		</AnContext.Provider>);
 	}

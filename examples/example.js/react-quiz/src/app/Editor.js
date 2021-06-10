@@ -20,8 +20,9 @@ import React from 'react';
 	import Checkbox from '@material-ui/core/Checkbox';
 	import TextField from '@material-ui/core/TextField';
 
-	import {AnsonMsg} from 'anclient';
+import {AnsonMsg} from 'anclient';
 	import {L} from './utils/langstr';
+	import {QuizResp} from '../../../lib/protocol.quiz.js';
 	import {JQuiz} from '../../../lib/an-quiz';
 	import {AnContext} from '../../../lib/an-react';
 	import {ConfirmDialog} from './common/Messagebox'
@@ -72,6 +73,7 @@ export class Editor extends React.Component {
 
 	constructor(props) {
 		super(props);
+
 		this.state.quizId = props.quizId;
 		this.state.qtitle = props.title;
 		this.state.quizinfo = props.quizinfo;
@@ -191,6 +193,7 @@ export class Editor extends React.Component {
 		let title = this.state.qtitle;
 		if (ctx.quizId) {
 			title = 'loading...';
+
 			if (!this.jquiz)
 				this.jquiz = new JQuiz(ctx.anClient);
 			this.jquiz.quiz(this.state.quizId, loadQuiz);
@@ -263,7 +266,15 @@ export class Editor extends React.Component {
 	    );
 
 		function loadQuiz(ansonResp) {
-			that.setState(st => {st.questions = AnsonMsg.rsArr(ansonResp);} );
+			that.setState(st => {
+				console.log(ansonResp);
+				let qresp = new QuizResp(ansonResp.body);
+				let {title, quizId, quizinfo, questions} = qresp.questions();
+				st.questions = questions;
+				st.qtitle = title;
+				st.quizinfo = quizinfo;
+				st.currentqx = -1;
+			} );
 		}
 	}
 }

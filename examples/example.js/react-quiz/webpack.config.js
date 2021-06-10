@@ -30,7 +30,7 @@ module.exports = {
         {   test: /\.js$/,
             loader: 'babel-loader',
             exclude: /node_modules/,
-            query: {
+            options: {
               presets: ['@babel/preset-react', '@babel/preset-env'] }
     	},
         {   test: /\.css$/,
