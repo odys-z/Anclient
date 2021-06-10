@@ -1,5 +1,27 @@
 import { AnsonResp } from '../../../js/lib/protocol.js';
 
+export class QuizReq {
+	constructor () {}
+
+	/** {@link Quiz} use a simple array for question array. This is error prone
+	 * to implement protocol. This method helps convert it to array of n-v pairs.
+	 */
+	static questionToNvs (quests, cols =
+		["qid", "question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
+
+		let qs = [];
+		if (quests)
+			quests.forEach( (q, x) => {
+				let qlen = Object.keys(q).length;
+				let row = new Array(Math.min(qlen, cols.length));
+				for (let i = 0; i < cols.length && i < qlen; i++)
+					row[i] = [cols[i], q[cols[i][1]]];
+				qs.push(row);
+			} );
+		return qs;
+	}
+}
+
 export class QuizResp extends AnsonResp {
 	constructor (body) {
 		let respObj = body.length ? body[0] : body;
@@ -43,8 +65,8 @@ export class QuizResp extends AnsonResp {
 		this.quizzes();
 		let {title, qid, quizinfo} = this.qz && this.qz.length ? this.qz[0] : {};
 		let questions = QuizResp.toArrByOrder(
-            [ "QID", "QORDER", "QTYPE", "SHORTDESC", "QUESTION", "ANSWER", "HINTS", "EXTRA", "ADDITIONAL"],
-			this.questions.results, this.questions.colnames);
+            [ "QID", "QUESTION", "ANSWERS", "QTYPE", "ANSWER", "QORDER", "SHORTDESC", "HINTS", "EXTRA"],
+			this.qs.results, this.qs.colnames);
 		return {title, quizId: qid, quizinfo, questions};
 	}
 

@@ -10,8 +10,8 @@
   },
   "scripts": {
     "test old way": "echo \"Open file://test/index.html in a browser.\" && exit 1",
-	"build": "webpack",
-    "test": "webpack --config mocha.config.js && mocha dist/testBundle.js"
+    "build": "webpack-cli",
+    "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js"
   },
   "keywords": [
     "anclient",

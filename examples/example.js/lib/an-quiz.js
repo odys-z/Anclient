@@ -4,6 +4,8 @@ import {
 	Protocol, UserReq, AnsonMsg
 } from "anclient"
 
+import {QuizReq} from './protocol.quiz.js';
+
 export const qconn = "quiz";
 
 const Quizports = {
@@ -15,6 +17,11 @@ export const quiz_a = {
 	list: 'list',     // load quizzes
 	insert: 'insert', // create new quiz
 	update: 'update', // update quiz
+}
+
+export const QuestionType = {
+	single: "1",
+	multiple: "x"
 }
 
 export
@@ -103,7 +110,7 @@ class JQuiz {
 		props[QuizProtocol.qowner] = this.client.ssInf.uid;
 		props[QuizProtocol.dcreate] = `${date.toISOString()}`;
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		props[QuizProtocol.questions] = quiz.questions;
+		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
 		let req = this.client.userReq(qconn, Quizports.quiz,
 			new UserReq( qconn, "quizzes", props ).a(quiz_a.insert) );
@@ -119,7 +126,7 @@ class JQuiz {
 		props[QuizProtocol.quizId] = quiz.quizId;
 		props[QuizProtocol.qtitle] = quiz.qtitle;
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		props[QuizProtocol.questions] = quiz.questions;
+		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
 		let req = this.client.userReq(qconn, Quizports.quiz,
 			new UserReq(qconn, "quizzes", props).a(quiz_a.update) );
@@ -127,6 +134,25 @@ class JQuiz {
 		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
 	}
 
+	/**
+	 * @return {object} return {qtype, correct};
+	 */
+	static figureAnswers(ans) {
+		if (!ans) return "";
+
+		let correct = [];
+		let anss = ans.split("\n");
+		anss.forEach( (a, x) => {
+			if (a.trim().startWith("*"))
+				correct.push(String(x))
+		});
+		return {qtype: correct.length <= 1 ? QuestionType.single : QuestionType.multiple,
+				correct: correct.join(',')};
+	}
+
+	/**
+	 * @return {object} return {quizId, title, questions};
+	 */
 	static parseResp(resp) {
 		/* {
 		   "type": "io.odysz.semantic.jprotocol.AnsonMsg",

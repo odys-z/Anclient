@@ -1,6 +1,6 @@
 import { expect, assert } from 'chai'
 import {Protocol, AnsonMsg, AnsonResp} from '../../lib/protocol.js'
-import {QuizResp} from '../../../examples/example.js/lib/protocol.quiz.js'
+import {QuizResp, QuizReq} from '../../../examples/example.js/lib/protocol.quiz.js'
 
 const jsonResp = {
 "body": [ {
@@ -152,5 +152,22 @@ describe('case: [Protocol.AnReact] quiz converter', () => {
         assert.equal(quizinfo, "ddddddddddddddd", "3 ---");
 
 		assert.equal(questions.length, 0, "4 ---");
+	});
+
+	it('[Quiz.questions] Convert simple array to [[n, v], ...]', () => {
+		let quests = [[ "id0", "Question 0", "A. \nB. \nC. \nD. ", "1", "0" ]];
+		let nvs = QuizReq.questionToNvs(quests);
+
+        assert.equal(nvs.length, 1, "1 ---");
+        assert.equal(nvs[0].length, 5, "2 ---");
+        assert.equal(nvs[0][0].length, 2, "3 ---");
+        assert.equal(nvs[0][0][0], "qid", "4 ---");
+        assert.equal(nvs[0][0][1], "id0", "5 ---");
+        assert.equal(nvs[0][1][0], "question", "6 ---");
+        assert.equal(nvs[0][1][1], "Question 0", "7 ---");
+        assert.equal(nvs[0][2][0], "answers", "6 ---");
+        assert.equal(nvs[0][2][1], "A. \nB. \nC. \nD. ", "7 ---");
+        assert.equal(nvs[0][4][0], "answer", "8 ---");
+        assert.equal(nvs[0][4][1], "0", "9 ---");
 	});
 })

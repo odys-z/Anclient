@@ -23,16 +23,11 @@ import React from 'react';
 import {AnsonMsg} from 'anclient';
 	import {L} from './utils/langstr';
 	import {QuizResp} from '../../../lib/protocol.quiz.js';
-	import {JQuiz} from '../../../lib/an-quiz';
+	import {QuestionType, JQuiz} from '../../../lib/an-quiz';
 	import {AnContext} from '../../../lib/an-react';
 	import {ConfirmDialog} from './common/Messagebox'
 
 var quid = -1;
-
-const Question = {
-	single: 0,
-	multiple: 1
-}
 
 export class Editor extends React.Component {
 	static getQx() {
@@ -50,13 +45,14 @@ export class Editor extends React.Component {
 	});
 
     state = {
+		dirty: false,
 		creating: false,
 
 		openHead: true,
 		quizId: undefined,
 		qtitle: 'New Quiz',
 		quizinfo: '',
-        questions: [], // id(seq), question text, answers, type, correct index
+        questions: [], // qid(seq), question text, answers, type, correct index
         currentqx: -1,
 		autosave: true,
 
@@ -75,8 +71,8 @@ export class Editor extends React.Component {
 		super(props);
 
 		this.state.quizId = props.quizId;
-		this.state.qtitle = props.title;
-		this.state.quizinfo = props.quizinfo;
+		// this.state.qtitle = props.title;
+		// this.state.quizinfo = props.quizinfo;
 		// this.state.creating = props.creating;
 
 		this.handleClick = this.handleClick.bind(this);
@@ -90,7 +86,7 @@ export class Editor extends React.Component {
 	handleClick(e) {
 	  // use currentTarget instead of target, see https://stackoverflow.com/a/10086501/7362888
 	  let qx = e.currentTarget.getAttribute('qx');
-	  console.log(qx);
+	  // console.log(qx);
 	  this.setState({currentqx: parseInt(qx)});
 	};
 
@@ -98,31 +94,40 @@ export class Editor extends React.Component {
 		let qx = this.state.currentqx;
 		let questions = this.state.questions.slice();
 		questions[qx][1] = e.target.value;
-		this.setState({questions});
+		this.setState({questions, dirty: true});
 	}
 
 	editAnswer(e) {
 		let qx = this.state.currentqx;
 		let questions = this.state.questions.slice();
-		questions[qx][2] = e.target.value;
-		this.setState({questions});
+		let {qtype, correct} = this.jquiz.figureAnswers(e.target.value);
+		questions[qx][3] = qtype;
+		questions[qx][4] = correct;
+		this.setState({questions, dirty: true});
 	}
 
 	onAdd(e) {
 		let qx = Editor.getQx();
 		let questions = this.state.questions.splice(0);
-		// let tp = e.currentTarget.children.filter((e, x) => e.name === 'qtype');
-		questions.push(['id'+ qx, 'Question ' + qx, 'A. \nB. \nC. \nD. ', Question.single]);
+		questions.push({
+			id: 'id'+ qx,
+			question: 'Question ' + qx,
+			answers: 'A. \nB. \nC. \nD. ',
+			qtype: QuestionType.single,
+			answer: "0"
+		});
+
 		this.setState({
+			dirty: true,
 			questions,
 			currentqx: qx,
 			open: qx });
 	}
 
 	onCheckSingle(e) {
-		let questions = this.state.questions;
-		questions[this.state.currentqx][3] = e.target.checked ? Question.single : Question.multiple;
-		this.setState({questions});
+	// 	let questions = this.state.questions;
+	// 	questions[this.state.currentqx][3] = e.target.checked ? QuestionType.single : QuestionType.multiple;
+	// 	this.setState({questions, dirty: true});
 	}
 
 	onSave(e) {
@@ -156,10 +161,10 @@ export class Editor extends React.Component {
 		// 	end = this.state.questions.length - (end + 1);
 
 		return this.state.questions.map( (q, x) => (
-		  <div key={this.state.questions[x][0]}>
+		  <div key={this.state.questions[x].qid}>
 			<ListItem button qx={x} onClick={this.handleClick} color='secondary'>
 				<ListItemIcon><Sms /></ListItemIcon>
-				<ListItemText primary={this.state.questions[x][1]} />
+				<ListItemText primary={this.state.questions[x].question} />
 			</ListItem>
 			<Collapse in={this.state.currentqx == x} timeout="auto" >
 				<List component="div">
@@ -167,7 +172,7 @@ export class Editor extends React.Component {
 				    <ListItemIcon><StarBorder /></ListItemIcon>
 				    <ListItemText primary="Option..." />
 				    <FormControlLabel
-				        control={<Checkbox checked={this.state.questions[x][3] === Question.single}
+				        control={<Checkbox checked={this.state.questions[x].qtype === QuestionType.single}
 										   onClick={this.onCheckSingle}
 				                           name="chk0" color="primary" />}
 				        label="Single Answer"/>
@@ -176,12 +181,12 @@ export class Editor extends React.Component {
 
 				<TextField id="qtext" label="Question"
 				  variant="outlined" color="primary"
-				  multiline fullWidth={true} value={this.state.questions[x][1]}
+				  multiline fullWidth={true} value={this.state.questions[x].questions}
 				  onChange={this.editQuestion} />
 
 				<TextField id="answers" label="Answers (* correct)"
 				  variant="outlined" color="secondary"
-				  multiline fullWidth={true} value={this.state.questions[x][2]}
+				  multiline fullWidth={true} value={this.state.questions[x].answers}
 				  onChange={this.editAnswer} />
 			</Collapse>
 		  </div>
@@ -191,7 +196,7 @@ export class Editor extends React.Component {
 	render() {
 		let ctx = this.context;
 		let title = this.state.qtitle;
-		if (ctx.quizId) {
+		if (ctx.quizId && !this.state.dirty) {
 			title = 'loading...';
 
 			if (!this.jquiz)
@@ -274,6 +279,7 @@ export class Editor extends React.Component {
 				st.qtitle = title;
 				st.quizinfo = quizinfo;
 				st.currentqx = -1;
+				st.dirty = false;
 			} );
 		}
 	}
