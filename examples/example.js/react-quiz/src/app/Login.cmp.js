@@ -43,9 +43,10 @@ class LoginComponent extends React.Component {
 		this.an = an.an;
 		this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-quiz");
 
+		this.alert = this.alert.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
-		this.alert = this.alert.bind(this);
+		this.onServUrl = this.onServUrl.bind(this);
 	}
 
 	alert() {
@@ -53,6 +54,12 @@ class LoginComponent extends React.Component {
 			alert: L('User Id or password is not correct.'),
 			showAlert: true,
 		});
+	}
+
+	onServUrl(e) {
+		e.stopPropagation();
+		let jserv = e.currentTarget.value;
+		this.setState({jserv})
 	}
 
 	onLogin() {
@@ -65,6 +72,10 @@ class LoginComponent extends React.Component {
 		}
 
 		if (!this.state.loggedin) {
+			if (this.state.jserv) {
+				console.log(this.state.jserv);
+				this.an.init(this.state.jserv);
+			}
 			this.an.login( uid, pwd, reload, onError );
 		}
 		else // what's happening here?
@@ -103,7 +114,7 @@ class LoginComponent extends React.Component {
 		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
 		return (<div className={classes.root}>
 		<>
-			<TextField required id="jserv"
+			<TextField required id="jserv" onBlur={this.onServUrl}
 					   label="Jserv URL" fullWidth={true}
 					   defaultValue="http://localhost:8080/jserv-quiz/" />
 		</>
