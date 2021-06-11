@@ -15,7 +15,7 @@ export class QuizReq {
 				let qlen = Object.keys(q).length;
 				let row = new Array(Math.min(qlen, cols.length));
 				for (let i = 0; i < cols.length && i < qlen; i++)
-					row[i] = [cols[i], q[cols[i][1]]];
+					row[i] = [cols[i], q[cols[i]]];
 				qs.push(row);
 			} );
 		return qs;

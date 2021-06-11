@@ -16,12 +16,13 @@
 	</li>
 	<li>To start sample service:
 	<pre>
-	docker pull odysz/jserv-sample
-	docer run --name jserv -dp 8080:8080 --rm odysz/jserv-sample</pre>
+	docker pull odysz/jserv-quiz
+	docer run --name jserv -dp 8080:8080 odysz/jserv-quiz</pre>
+	<p><b>Note: don't use --rm, currently we haven't yet mounted volume to persist sqlite DB.</b></p>
 	Then use this to test the connecion:<br>
 	<a href='http://localhost:8080/jserv-quiz/login.serv11'>
 		http://locahost:8080/jserv-quiz/login.serv11</a>
-	<br>The sample service should return this json data:<pre>
+	<br>The an-quiz service should return this json data:<pre>
 	{"type": "io.odysz.semantic.jprotocol.AnsonMsg",
 	 "code": "exSemantic", "opts": null, "port": "session",
 	 "header": null,

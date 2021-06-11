@@ -71,10 +71,6 @@ export class Editor extends React.Component {
 		super(props);
 
 		this.state.quizId = props.quizId;
-		// this.state.qtitle = props.title;
-		// this.state.quizinfo = props.quizinfo;
-		// this.state.creating = props.creating;
-
 		this.handleClick = this.handleClick.bind(this);
 		this.editQuestion = this.editQuestion.bind(this);
 		this.editAnswer = this.editAnswer.bind(this);
@@ -110,7 +106,7 @@ export class Editor extends React.Component {
 		let qx = Editor.getQx();
 		let questions = this.state.questions.splice(0);
 		questions.push({
-			id: 'id'+ qx,
+			qid: qx, // drop by server semantics
 			question: 'Question ' + qx,
 			answers: 'A. \nB. \nC. \nD. ',
 			qtype: QuestionType.single,
@@ -125,9 +121,6 @@ export class Editor extends React.Component {
 	}
 
 	onCheckSingle(e) {
-	// 	let questions = this.state.questions;
-	// 	questions[this.state.currentqx][3] = e.target.checked ? QuestionType.single : QuestionType.multiple;
-	// 	this.setState({questions, dirty: true});
 	}
 
 	onSave(e) {
@@ -157,8 +150,6 @@ export class Editor extends React.Component {
 	items() {
 		if (!this.state.questions)
 			return;
-		// if (end < 0)
-		// 	end = this.state.questions.length - (end + 1);
 
 		return this.state.questions.map( (q, x) => (
 		  <div key={this.state.questions[x].qid}>
@@ -223,19 +214,6 @@ export class Editor extends React.Component {
 				<ListItemText primary={L('Editing Quiz')} />
 			</ListItem>
 			<Collapse in={this.state.openHead} timeout="auto" >
-			{/*
-				<List component="div">
-				  <ListItem button className={ this.classes.nested }>
-				    <ListItemIcon><StarBorder /></ListItemIcon>
-				    <ListItemText primary="TODO Options ..." />
-				    <FormControlLabel
-				        control={<Checkbox checked={this.state.check0}
-				                           name="qtype" color="primary" />}
-				        label="Check Each Answer"/>
-				  </ListItem>
-				</List>
-			*/}
-
 				<TextField id="qtitle" label={L("Title")}
 				  variant="outlined" color="primary"
 				  multiline fullWidth={true}
@@ -254,13 +232,6 @@ export class Editor extends React.Component {
 			<ListItem button>
 				<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
 				<ListItemText primary="New Question" onClick={this.onAdd} />
-				{
-				// <FormControlLabel
-			    //     control={<Checkbox checked={this.state.autosave}
-				// 					   onClick={e => {this.setState({autosave:!this.state.autosave});} }
-				// 					   name="autosave" color="secondary" />}
-			    //     label="Auto Save"/>
-				}
 				<ListItemText primary="Save" onClick={this.onSave} color="secondary" />
 			</ListItem>
 			</List>
