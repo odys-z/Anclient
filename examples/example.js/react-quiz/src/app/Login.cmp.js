@@ -117,6 +117,10 @@ class LoginComponent extends React.Component {
 			<TextField required id="jserv" onBlur={this.onServUrl}
 					   label="Jserv URL" fullWidth={true}
 					   defaultValue="http://localhost:8080/jserv-quiz/" />
+			<Box display={this.state.lggedin ? "flex" : "none"}>
+	        <Button variant="contained" color="primary"
+	                onClick={this.onLogout} >Log out</Button>
+			</Box>
 		</>
 		<Collapse in={!this.state.loggedin} timeout="auto" >
 	        <TextField required id="userid" label="User Id"
@@ -129,10 +133,6 @@ class LoginComponent extends React.Component {
 	                onChange={event => this.setState({pswd: event.target.value})} />
 	        <Button variant="contained" color="primary"
 	                onClick={this.onLogin} >Log in</Button>
-			<Box display="none">
-	        <Button variant="contained" color="primary"
-	                onClick={this.onLogout} >Log out</Button>
-			</Box>
 		</Collapse>
 		<ConfirmDialog ok='はい' title='Info' cancel={false}
 				open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
