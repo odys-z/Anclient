@@ -34,7 +34,7 @@ class LoginComponent extends React.Component {
 	/**
 	 * initialize a instance of Anclient visition jserv service.
 	 * @param {object} props
-	 * @param {string} props.jserv="http://127.0.0.1:8080/jserv-quiz"); url to service root.
+	 * @param {string} props.jserv e.g. "http://127.0.0.1:8080/jserv-quiz"); url to service root.
 	 * @constructor
 	 */
 	constructor(props) {
@@ -42,12 +42,12 @@ class LoginComponent extends React.Component {
 
 		this.props
 		this.an = an.an;
-		this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-quiz");
+		// this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-quiz");
 
 		this.alert = this.alert.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
-		this.onServUrl = this.onServUrl.bind(this);
+		// this.onServUrl = this.onServUrl.bind(this);
 	}
 
 	alert() {
@@ -57,11 +57,11 @@ class LoginComponent extends React.Component {
 		});
 	}
 
-	onServUrl(e) {
-		e.stopPropagation();
-		let jserv = e.currentTarget.value;
-		this.setState({jserv})
-	}
+	// onServUrl(e) {
+	// 	e.stopPropagation();
+	// 	let jserv = e.currentTarget.value;
+	// 	this.setState({jserv})
+	// }
 
 	onLogin() {
 		let that = this;
@@ -73,9 +73,11 @@ class LoginComponent extends React.Component {
 		}
 
 		if (!this.state.loggedin) {
-			if (this.state.jserv) {
+			// if (this.state.jserv) {
+				// this.state.jserv = this.refs.jserv.getValue();
+				this.state.jserv = this.inputRef.value;
 				this.an.init(this.state.jserv);
-			}
+			// }
 			this.an.login( uid, pwd, reload, onError );
 		}
 
@@ -114,9 +116,9 @@ class LoginComponent extends React.Component {
 		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
 		return (<div className={classes.root}>
 		<div style={{display: 'flex'}}>
-			<TextField required id="jserv" onBlur={this.onServUrl}
+			<TextField required id="jserv" inputRef={ref => { this.inputRef = ref; }}
 					   label="Jserv URL" fullWidth={true}
-					   defaultValue="http://localhost:8080/jserv-quiz/" />
+					   defaultValue="http://221.236.26.29:8081/jserv-quiz/" />
 			<Box display={this.state.loggedin ? "flex" : "none"}>
 				<Button variant="contained" color="primary" style={{'whiteSpace': 'nowrap'}}
 						onClick={this.onLogout} >Log out</Button>

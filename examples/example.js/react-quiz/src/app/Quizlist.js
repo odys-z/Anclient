@@ -174,7 +174,7 @@ class Quizlist extends React.Component {
 				aria-labelledby="nested-list-subheader"
 				subheader={
 					<ListSubheader component="div" id="quizzes-subheader">
-					  { `User: ${this.state.username}` }
+					  { `User: ${this.state.anClient ? this.state.anClient.ssInf.uid : ''}` }
 					</ListSubheader>
 				}
 				className={ this.classes.root } >
