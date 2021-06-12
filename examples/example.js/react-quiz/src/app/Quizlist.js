@@ -7,13 +7,14 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
+import Box from '@material-ui/core/Box';
 import Add from '@material-ui/icons/Add';
 import DraftsIcon from '@material-ui/icons/Drafts';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import SendIcon from '@material-ui/icons/Send';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import StarBorder from '@material-ui/icons/StarBorder';
+// import ExpandLess from '@material-ui/icons/ExpandLess';
+// import ExpandMore from '@material-ui/icons/ExpandMore';
+// import StarBorder from '@material-ui/icons/StarBorder';
 import Sms from '@material-ui/icons/Sms';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -166,20 +167,25 @@ class Quizlist extends React.Component {
 		this.state.creating = false;
 
 		return (<AnContext.Provider value={{anClient: this.state.anClient, quizId}}>
-		  <Login onLoginOk={this.onLogin} />
-		  <List component="nav"
-			aria-labelledby="nested-list-subheader"
-			subheader={
-				<ListSubheader component="div" id="quizzes-subheader">
-				  { `User: ${this.state.username}` }
-				</ListSubheader>
-			}
-			className={ this.classes.root } >
+		  <Login onLoginOk={this.onLogin}
+		  		 onLogout={() => {this.setState({anClient: undefined})} } />
+		  <Box display={this.state.anClient ? "block" : "none"} >
+			<List component="nav"
+				aria-labelledby="nested-list-subheader"
+				subheader={
+					<ListSubheader component="div" id="quizzes-subheader">
+					  { `User: ${this.state.username}` }
+					</ListSubheader>
+				}
+				className={ this.classes.root } >
 
-			{this.items()}
-		  </List>
-		  <ListItemIcon onClick={this.onAdd} ><Add />
-		  <ListItemText primary={L("Add")} /></ListItemIcon>
+				{this.items()}
+			</List>
+			<div>
+				<ListItemIcon onClick={this.onAdd} ><Add />
+				<ListItemText primary={L("Add")} /></ListItemIcon>
+			</div>
+		  </Box>
 		  <QuizForm open={this.state.openx >= 0 || creating}
 		  			creating={creating} quizId={quizId}
 		  			onOk={this.onFormOk} />

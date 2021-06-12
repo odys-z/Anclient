@@ -40,6 +40,7 @@ class LoginComponent extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.props
 		this.an = an.an;
 		this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-quiz");
 
@@ -73,21 +74,17 @@ class LoginComponent extends React.Component {
 
 		if (!this.state.loggedin) {
 			if (this.state.jserv) {
-				console.log(this.state.jserv);
 				this.an.init(this.state.jserv);
 			}
 			this.an.login( uid, pwd, reload, onError );
 		}
-		else // what's happening here?
-			;
-			// reload(this.ssClient);
 
 		function reload (client) {
 			that.ssClient = client;
-			that.state.loggedin = true;
 			if (typeof that.props.onLoginOk === 'function')
 				that.props.onLoginOk(client);
-			else console.log(client);
+			else console.log('login succeed but client ignored: ', client);
+			that.setState( {loggedin: true} );
 		}
 
 		function onError (code, resp) {
@@ -102,6 +99,9 @@ class LoginComponent extends React.Component {
 	}
 
 	onLogout() {
+		this.setState({ loggedin: false });
+		if (typeof this.props.onLogout === 'function')
+			this.props.onLogout();
 	}
 
 	update(val) {
@@ -113,15 +113,15 @@ class LoginComponent extends React.Component {
 		// This <form> only to disable chrome warning:
 		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
 		return (<div className={classes.root}>
-		<>
+		<div style={{display: 'flex'}}>
 			<TextField required id="jserv" onBlur={this.onServUrl}
 					   label="Jserv URL" fullWidth={true}
 					   defaultValue="http://localhost:8080/jserv-quiz/" />
-			<Box display={this.state.lggedin ? "flex" : "none"}>
-	        <Button variant="contained" color="primary"
-	                onClick={this.onLogout} >Log out</Button>
+			<Box display={this.state.loggedin ? "flex" : "none"}>
+				<Button variant="contained" color="primary" style={{'whiteSpace': 'nowrap'}}
+						onClick={this.onLogout} >Log out</Button>
 			</Box>
-		</>
+		</div>
 		<Collapse in={!this.state.loggedin} timeout="auto" >
 	        <TextField required id="userid" label="User Id"
 	                autoComplete="username"
