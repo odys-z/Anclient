@@ -67,6 +67,10 @@ export class QuizResp extends AnsonResp {
 		let questions = QuizResp.toArrByOrder(
             [ "QID", "QUESTION", "ANSWERS", "QTYPE", "ANSWER", "QORDER", "SHORTDESC", "HINTS", "EXTRA"],
 			this.qs.results, this.qs.colnames);
+		if (questions)
+			questions.forEach( (q, x) => {
+				q.answers = q.answers ? q.answers.split("\\n") : [];
+			} );
 		return {title, quizId: qid, quizinfo, questions};
 	}
 

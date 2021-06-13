@@ -246,7 +246,7 @@ export class Editor extends React.Component {
 				console.log(ansonResp);
 				let qresp = new QuizResp(ansonResp.body);
 				let {title, quizId, quizinfo, questions} = qresp.questions();
-				st.questions = questions;
+				st.questions = questions ?  questions.join('\n') : '';
 				st.qtitle = title;
 				st.quizinfo = quizinfo;
 				st.currentqx = -1;

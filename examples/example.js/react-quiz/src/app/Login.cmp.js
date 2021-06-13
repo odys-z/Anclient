@@ -118,7 +118,7 @@ class LoginComponent extends React.Component {
 		<div style={{display: 'flex'}}>
 			<TextField required id="jserv" inputRef={ref => { this.inputRef = ref; }}
 					   label="Jserv URL" fullWidth={true}
-					   defaultValue="http://221.236.26.29:8081/jserv-quiz/" />
+					   defaultValue="http://localhost:8080/jserv-quiz/" />
 			<Box display={this.state.loggedin ? "flex" : "none"}>
 				<Button variant="contained" color="primary" style={{'whiteSpace': 'nowrap'}}
 						onClick={this.onLogout} >Log out</Button>
