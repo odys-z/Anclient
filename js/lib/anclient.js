@@ -149,7 +149,7 @@ class AnClient {
     /**Post a request, using Ajax.
      * @param {AnsonMsg} jreq
      * @param {function} onOk
-     * @param {function} onErr
+     * @param {function} onErr function (MsgCode, AnsonResp?)
      * @param {object} ajaxOpts */
 	post (jreq, onOk, onErr, ajaxOpts) {
 		if (jreq === undefined) {
@@ -187,6 +187,8 @@ class AnClient {
 					// why?
 					resp = JSON.parse(resp);
 				}
+				resp = new AnsonResp(resp.port, resp.header, resp.body);
+
 				// code != ok
 				if (self.cfg.verbose >= 5){
 					console.debug(Protocol.MsgCode);

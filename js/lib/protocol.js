@@ -130,31 +130,46 @@ class Jregex  {
 
 class AnsonMsg {
 	constructor (port, header, body) {
+		if (typeof port === 'object') {
+			header = port.header;
+			body = port.body;
+			if (body && body[0].type === 'io.odysz.semantic.jprotocol.AnsonResp')
+				body = new AnsonResp(body[0]);
+			else; // TODO let's extend this for AnsonReq.
+			this.code = port.code;
+			this.version = port.version ? port.version : "0.9";
+			this.seq = port.seq;
+			port = port.port;
+		}
+
 		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
-		this.version = "1.1";
-		this.seq = Math.round(Math.random() * 1000);
+		// this.version = "0.9";
+		if (!this.seq)
+			this.seq = Math.round(Math.random() * 1000);
 
 		// string options, like no-null: true for asking server replace null with ''.
 		this.opts = Protocol.valOptions;
 
 		/**Protocol.Port property name, use this name to get port url */
 		this.port = port; // for robustness?
-		var prts = Protocol.Port;
-		var msg = this;
-		Object.getOwnPropertyNames(prts).forEach(function(val, idx, array) {
-			if (prts[val] === port) {
-				// console.log(val + ' -> ' + obj[val]);
-				msg.port = val;
-				return false;
-			}
-		});
+		// let prts = Protocol.Port;
+		// let msg = this;
+		// console.log(Protocol.Port, Object.getOwnPropertyNames(prts), port);
+		// Object.getOwnPropertyNames(prts).forEach(function(val, idx, array) {
+		// 	if (prts[val] === port) {
+		// 		console.log(val + ' -> ' + obj[val]);
+		// 		msg.port = val;
+		// 		return false;
+		// 	}
+		// });
 
 		if (header)
 			this.header = header;
 		else this.header = {};
 
 		this.body = [];
-		// this.body.push(body.parentMsg(this));
+		if (body)
+			body.parent = this.type;
 		this.body.push(body);
 	}
 
@@ -164,6 +179,10 @@ class AnsonMsg {
 	post(pst) {
 		if (this.body !== undefined && this.body.length > 0)
 			return this.body[0].post(pst);
+	}
+
+	Body(ix = 0) {
+		return this.body ? this.body[ix] : undefined;
 	}
 
 	static rsArr(resp, rx = 0) {
@@ -190,6 +209,15 @@ class AnHeader {
 		this.usrAct.push(act.cate);
 		this.usrAct.push(act.cmd);
 		this.usrAct.push(act.remarks);
+	}
+}
+
+class AnsonBody {
+	constructor(body = {}) {
+		this.a = body.a
+		this.parent = body.parent;
+		this.conn = body.conn;
+		this.type = body.type;
 	}
 }
 
@@ -638,8 +666,16 @@ class InsertReq extends UpdateReq {
 	}
 }
 
-class AnsonResp {
-	constructor (response) {
+class AnsonResp extends AnsonBody {
+	constructor (respbody) {
+		super(respbody);
+		this.m = respbody.m;
+		this.map = respbody.map;
+		this.rs = respbody.rs;
+	}
+
+	msg() {
+		return this.m;
 	}
 
 	static rsArr(respBody, rx = 0) {

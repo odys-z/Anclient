@@ -239,8 +239,8 @@ describe('case: [Protocol.AnReact] quiz converter', () => {
 		assert.equal(questions[0].qorder, null, "6 ---");
 		assert.equal(questions[0].qtype, "1", "7 ---");
 		assert.equal(questions[0].question, "Question 0", "8 ---");
-		assert.equal(questions[0].answers.length, 4, "9 ---");
-		assert.equal(questions[0].answers[0], "A. ", "10 ---");
+		assert.equal(questions[0].answers.length, 15, "9 --- it's string length of " + questions[0].answers);
+		assert.equal(questions[0].answers.split('\n').length, 4, "10  --- answers: " + questions[0].answers.split('\n'));
 		assert.equal(questions[0].answer, "0", "11 ---");
 	});
 })
