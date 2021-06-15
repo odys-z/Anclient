@@ -54,7 +54,7 @@ class JQuiz {
 		this.ssInf = ssClient.ssInf;
 	}
 
-	serv (a, conds = {}, onLoad) {
+	serv (a, conds = {}, onLoad, errCtx) {
 		let req = new UserReq(qconn)
 			.a(a); // this is a reading request
 
@@ -72,7 +72,14 @@ class JQuiz {
 
 		var jreq = new AnsonMsg(Protocol.Port.quiz, header, req);
 
-		this.client.An.post(jreq, onLoad);
+		this.client.An.post(jreq, onLoad, (c, resp) => {
+			if (errCtx) {
+				errCtx.hasError = true;
+				errCtx.code = c;
+				errCtx.msg = resp.msg();
+			}
+			else console.error(c, resp);
+		});
 		return jreq;
 	}
 
@@ -82,7 +89,7 @@ class JQuiz {
 	 * @param {string} quizId quiz id
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
 	 * */
-	quiz(quizId, onLoad) {
+	quiz(quizId, onLoad, errCtx) {
 		let that = this;
 		/*
 		let qreq = this.client.query(qconn, "quizzes", "q");
@@ -91,12 +98,12 @@ class JQuiz {
 			.l('s_domain', 'd', 'd.did = q.subject')
 			.whereCond("=", "q.qid", `'${qid}'`);
 		*/
-		let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad);
+		let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
 		return this;
 	}
 
-	list (conds, onLoad) {
-		let jreq = this.serv(quiz_a.list, conds, onLoad);
+	list (conds, onLoad, errCtx) {
+		let jreq = this.serv(quiz_a.list, conds, onLoad, errCtx);
 		return this;
 	}
 
@@ -115,7 +122,14 @@ class JQuiz {
 		let req = this.client.userReq(qconn, Quizports.quiz,
 			new UserReq( qconn, "quizzes", props ).a(quiz_a.insert) );
 
-		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
+		this.client.an.post(req, onOk, (c, e) => {
+			if (errCtx) {
+				errCtx.hasError = true;
+				errCtx.code = c;
+				errCtx.msg = resp.msg();
+			}
+			else console.error(c, resp);
+		});
 	}
 
 	update(quiz, onOk) {
@@ -131,7 +145,14 @@ class JQuiz {
 		let req = this.client.userReq(qconn, Quizports.quiz,
 			new UserReq(qconn, "quizzes", props).a(quiz_a.update) );
 
-		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
+		this.client.an.post(req, onOk, (c, resp) => {
+			if (errCtx) {
+				errCtx.hasError = true;
+				errCtx.code = c;
+				errCtx.msg = resp.msg();
+			}
+			else console.error(c, resp);
+		});
 	}
 
 	/**

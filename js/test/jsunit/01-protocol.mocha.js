@@ -4,8 +4,8 @@
 import chai from 'chai'
 import { expect, assert } from 'chai'
 
-// import {Affine} from '../../lib/xmath/affine'
 import {Protocol, AnsonMsg, UserReq, AnsonResp} from '../../lib/protocol.js'
+import {SessionClient} from '../../lib/anclient.js'
 
 
 const resp = {
@@ -70,6 +70,22 @@ const respErr = {
 	"version": "1.0", "seq": 0
 }
 
+const respSession = {
+	"type": "io.odysz.semantic.jprotocol.AnsonMsg",
+	"code": "ok", "opts": null, "port": "session",
+	"header": null,
+	"body": [ {
+		"type": "io.odysz.semantic.jsession.AnSessionResp",
+		"rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+		"a": null, "conn": null,
+		"ssInf": { "type": "io.odysz.semantic.jsession.SessionInf",
+				   "uid": "admin", "roleId": null, "ssid": "001eysTj"
+			      },
+		"m": null, "map": null
+	} ],
+	"version": "1.0", "seq": 0
+};
+
 describe('case: [Protocol] data converter', () => {
     it('UserReq handling', () => {
 		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
@@ -94,6 +110,20 @@ describe('case: [Protocol] data converter', () => {
 		rp = new AnsonMsg(respErr);
 		assert.equal(rp.code, 'exSession', "4 ---");
 		assert.equal(rp.Body().msg(), 'session info is missing or timeout', "5 ---");
+	} );
+
+    it('SessionResp response instancing', () => {
+		let rp = new AnsonMsg(respSession);
+        assert.equal(rp.code, 'ok', "1 ---");
+        assert.equal(rp.port, 'session', "2 ---");
+        assert.equal(rp.Body().ssInf.type, "io.odysz.semantic.jsession.SessionInf", "3 ---");
+        assert.equal(rp.Body().ssInf.uid, "admin", "4 ---");
+        assert.equal(rp.Body().ssInf.ssid, "001eysTj", "5 ---");
+
+		let sessionClient = new SessionClient(rp.Body().ssInf, ['iv....'], true);
+		let ssi = sessionClient.userInfo;
+        assert.equal(ssi.uid, "admin", "6 ---");
+        assert.equal(ssi.ssid, "001eysTj", "7 ---");
 	} );
 
     it('AnsonResp response handling', () => {

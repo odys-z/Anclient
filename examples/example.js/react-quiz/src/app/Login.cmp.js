@@ -7,8 +7,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Box from '@material-ui/core/Box';
 
 import * as an from 'anclient'
-import {ConfirmDialog} from './common/Messagebox'
-import {L, Langstrs} from './utils/langstr'
+import {ConfirmDialog} from '../../../lib/widgets/Messagebox'
+import {L, Langstrs} from '../../../lib/utils/langstr'
 
 // https://github.com/mui-org/material-ui/issues/15820
 const styles = (theme) => ({

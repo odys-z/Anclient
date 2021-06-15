@@ -1,7 +1,8 @@
+
 import $ from 'jquery';
 import AES from './aes.js';
 import {
-	Protocol, AnsonMsg, AnHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg
+	Protocol, AnsonMsg, AnHeader, AnsonResp, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg
 } from './protocol.js';
 
 /**The lower API of jclient/js
@@ -118,8 +119,8 @@ class AnClient {
 			 * port: "session"
 			 */
 			function(resp) {
-				// var sessionClient = new SessionClient(resp.data, iv, true);
-				var sessionClient = new SessionClient(resp.body[0].ssInf, iv, true);
+				// var sessionClient = new SessionClient(resp.body[0].ssInf, iv, true);
+				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
 				sessionClient.An = An;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
@@ -187,7 +188,7 @@ class AnClient {
 					// why?
 					resp = JSON.parse(resp);
 				}
-				resp = new AnsonResp(resp.port, resp.header, resp.body);
+				resp = new AnsonMsg(resp);
 
 				// code != ok
 				if (self.cfg.verbose >= 5){
@@ -208,6 +209,7 @@ class AnClient {
 			error: function (resp) {
 				if (typeof onErr === "function") {
 					console.error("ajax error:", url);
+					resp = new AnsonMsg(resp.port, resp.header, resp.body);
 					onErr(Protocol.MsgCode.exIo, resp);
 				}
 				else {

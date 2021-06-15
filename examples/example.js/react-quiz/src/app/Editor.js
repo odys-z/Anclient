@@ -21,11 +21,11 @@ import React from 'react';
 	import TextField from '@material-ui/core/TextField';
 
 import {AnsonMsg} from 'anclient';
-	import {L} from './utils/langstr';
+	import {L} from '../../../lib/utils/langstr';
 	import {QuizResp} from '../../../lib/protocol.quiz.js';
 	import {QuestionType, JQuiz} from '../../../lib/an-quiz';
 	import {AnContext} from '../../../lib/an-react';
-	import {ConfirmDialog} from './common/Messagebox'
+	import {ConfirmDialog} from '../../../lib/widgets/Messagebox'
 
 var quid = -1;
 
@@ -188,13 +188,13 @@ export class Editor extends React.Component {
 		let ctx = this.context;
 		let title = this.state.qtitle;
 		if (ctx.quizId && !this.state.dirty) {
-			title = 'loading...';
+			title = L('loading...');
 
 			if (!this.jquiz)
 				this.jquiz = new JQuiz(ctx.anClient);
-			this.jquiz.quiz(this.state.quizId, loadQuiz);
+			this.jquiz.quiz(this.state.quizId, loadQuiz, ctx);
 		}
-		else title = title ? title : 'New Quiz';
+		else title = title ? title : L('New Quiz');
 
 		let that = this;
 
@@ -235,22 +235,21 @@ export class Editor extends React.Component {
 				<ListItemText primary="Save" onClick={this.onSave} color="secondary" />
 			</ListItem>
 			</List>
-			<ConfirmDialog ok='はい' title='Info' cancel={false}
+			<ConfirmDialog ok={L('はい')} title={L('Info')} cancel={false}
 					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
 					msg={this.state.alert} />
 		  </>
 	    );
 
 		function loadQuiz(ansonResp) {
-			that.setState(st => {
-				console.log(ansonResp);
-				let qresp = new QuizResp(ansonResp.body);
-				let {title, quizId, quizinfo, questions} = qresp.questions();
-				st.questions = questions ?  questions.join('\n') : '';
-				st.qtitle = title;
-				st.quizinfo = quizinfo;
-				st.currentqx = -1;
-				st.dirty = false;
+			let qresp = new QuizResp(ansonResp.body);
+			let {title, quizId, quizinfo, questions} = qresp.questions();
+			that.setState( {
+				questions: questions, // ?  questions.join('\n') : '';
+				qtitle: title,
+				quizinfo: quizinfo,
+				currentqx: -1,
+				dirty: true, // stop reloading
 			} );
 		}
 	}

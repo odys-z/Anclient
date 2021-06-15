@@ -24,9 +24,10 @@ class Protocol {
 	 * @return login request message
 	 */
 	static formatSessionLogin (uid, tk64, iv64) {
-		var body = new SessionReq(uid, tk64, iv64);
+		let body = new SessionReq(uid, tk64, iv64);
 		body.a = 'login';
-		return new AnsonMsg(Protocol.Port.session, null, body);
+		// return new AnsonMsg(Protocol.Port.session, null, body);
+		return new AnsonMsg({type: ""});Protocol.Port.session, null, body);
 	}
 
 	static formatHeader (ssInf) {
@@ -129,18 +130,24 @@ class Jregex  {
 }
 
 class AnsonMsg {
-	constructor (port, header, body) {
-		if (typeof port === 'object') {
-			header = port.header;
-			body = port.body;
-			if (body && body[0].type === 'io.odysz.semantic.jprotocol.AnsonResp')
-				body = new AnsonResp(body[0]);
-			else; // TODO let's extend this for AnsonReq.
-			this.code = port.code;
-			this.version = port.version ? port.version : "0.9";
-			this.seq = port.seq;
-			port = port.port;
+	constructor (json) {
+		if (typeof json !== 'object')
+			throw new Error("AnClient is upgraded.");
+
+		let header = json.header;
+		let body = json.body;
+		if (body && body[0].type === 'io.odysz.semantic.jprotocol.AnsonResp')
+			body = new AnsonResp(body[0]);
+		else if (body && body[0].type === 'io.odysz.semantic.jsession.AnSessionResp')
+			body = new AnSessionResp(body[0]);
+		else {
+			console.error("TODO: " + body[0].type);
 		}
+
+		this.code = json.code;
+		this.version = json.version ? json.version : "0.9";
+		this.seq = json.seq;
+		this.port = port.port;
 
 		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
 		// this.version = "0.9";
@@ -151,7 +158,6 @@ class AnsonMsg {
 		this.opts = Protocol.valOptions;
 
 		/**Protocol.Port property name, use this name to get port url */
-		this.port = port; // for robustness?
 		// let prts = Protocol.Port;
 		// let msg = this;
 		// console.log(Protocol.Port, Object.getOwnPropertyNames(prts), port);
@@ -221,6 +227,71 @@ class AnsonBody {
 	}
 }
 
+class AnsonResp extends AnsonBody {
+	constructor (respbody) {
+		super(respbody);
+		this.m = respbody.m;
+		this.map = respbody.map;
+		this.rs = respbody.rs;
+	}
+
+	msg() {
+		return this.m;
+	}
+
+	static rsArr(respBody, rx = 0) {
+		return AnsonResp.rs2arr(respBody[0].rs[rx]);
+	}
+
+	/**Change rs object to array like [ {col1: val1, ...}, ... ]
+	 *
+	 * <b>Note</b> The column index and rows index shifted to starting at 0.
+	 *
+	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
+	 * @return {array} array like [ {col1: val1, ...}, ... ]
+	 */
+	static rs2arr (rs) {
+		let cols = [];
+		let rows = [];
+
+		if (typeof(rs.colnames) === 'object') {
+			// rs with column index
+			cols = new Array(rs.colnames.length);
+			for (var col in rs.colnames) {
+				// e.g. col = "VID": [ 1, "vid" ],
+				let cx = rs.colnames[col][0] - 1;
+				let cn = rs.colnames[col][1];
+				cols[cx] = cn;
+			}
+
+			rs.results.forEach((r, rx) => {
+				let rw = {};
+				r.forEach((c, cx) => {
+					rw[cols[cx]] = c;
+				});
+				rows.push(rw);
+			});
+		}
+		else {
+			// first line as column index
+			rs.forEach((r, rx) => {
+				if (rx === 0) {
+					cols = r;
+				}
+				else {
+					rw = {};
+					r.forEach((c, cx) => {
+						rw[cols[cx]] = c;
+					});
+					rows.push(rw);
+				}
+			});
+		}
+
+		return rows;
+	}
+}
+
 class UserReq {
 	constructor (conn, tabl, data = {}) {
 		this.type = "io.odysz.semantic.jserv.user.UserReq";
@@ -275,6 +346,13 @@ class SessionReq {
 			this.mds = {};
 		this.mds[k] = v;
 		return this;
+	}
+}
+
+class AnSessionResp extends AnsonResp {
+	constructor(ssResp) {
+		super(ssResp);
+		this.ssInf = ssResp.ssInf;
 	}
 }
 
@@ -663,71 +741,6 @@ class InsertReq extends UpdateReq {
 			}
 		}
 		return this;
-	}
-}
-
-class AnsonResp extends AnsonBody {
-	constructor (respbody) {
-		super(respbody);
-		this.m = respbody.m;
-		this.map = respbody.map;
-		this.rs = respbody.rs;
-	}
-
-	msg() {
-		return this.m;
-	}
-
-	static rsArr(respBody, rx = 0) {
-		return AnsonResp.rs2arr(respBody[0].rs[rx]);
-	}
-
-	/**Change rs object to array like [ {col1: val1, ...}, ... ]
-	 *
-	 * <b>Note</b> The column index and rows index shifted to starting at 0.
-	 *
-	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
-	 * @return {array} array like [ {col1: val1, ...}, ... ]
-	 */
-	static rs2arr (rs) {
-		let cols = [];
-		let rows = [];
-
-		if (typeof(rs.colnames) === 'object') {
-			// rs with column index
-			cols = new Array(rs.colnames.length);
-			for (var col in rs.colnames) {
-				// e.g. col = "VID": [ 1, "vid" ],
-				let cx = rs.colnames[col][0] - 1;
-				let cn = rs.colnames[col][1];
-				cols[cx] = cn;
-			}
-
-			rs.results.forEach((r, rx) => {
-				let rw = {};
-				r.forEach((c, cx) => {
-					rw[cols[cx]] = c;
-				});
-				rows.push(rw);
-			});
-		}
-		else {
-			// first line as column index
-			rs.forEach((r, rx) => {
-				if (rx === 0) {
-					cols = r;
-				}
-				else {
-					rw = {};
-					r.forEach((c, cx) => {
-						rw[cols[cx]] = c;
-					});
-					rows.push(rw);
-				}
-			});
-		}
-
-		return rows;
 	}
 }
 

@@ -12,16 +12,13 @@ import Add from '@material-ui/icons/Add';
 import DraftsIcon from '@material-ui/icons/Drafts';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import SendIcon from '@material-ui/icons/Send';
-// import ExpandLess from '@material-ui/icons/ExpandLess';
-// import ExpandMore from '@material-ui/icons/ExpandMore';
-// import StarBorder from '@material-ui/icons/StarBorder';
 import Sms from '@material-ui/icons/Sms';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 
-import {L} from './utils/langstr';
+import {L} from '../../../lib/utils/langstr';
 import {AnContext} from '../../../lib/an-react';
 import {JQuiz} from '../../../lib/an-quiz';
 import {QuizResp} from '../../../lib/protocol.quiz.js';
@@ -54,6 +51,7 @@ class Quizlist extends React.Component {
 
 		// see https://reactjs.org/docs/context.html#caveats
 		anClient: undefined,
+		errors: {},
     };
 
 	constructor(props = {}) {
@@ -166,7 +164,8 @@ class Quizlist extends React.Component {
 		let creating = this.state.creating;
 		this.state.creating = false;
 
-		return (<AnContext.Provider value={{anClient: this.state.anClient, quizId}}>
+		return (
+		<AnContext.Provider value={{anClient: this.state.anClient, quizId}}>
 		  <Login onLoginOk={this.onLogin}
 		  		 onLogout={() => {this.setState({anClient: undefined})} } />
 		  <Box display={this.state.anClient ? "block" : "none"} >
@@ -187,8 +186,9 @@ class Quizlist extends React.Component {
 			</div>
 		  </Box>
 		  <QuizForm open={this.state.openx >= 0 || creating}
-		  			creating={creating} quizId={quizId}
-		  			onOk={this.onFormOk} />
+					creating={creating} quizId={quizId}
+					onOk={this.onFormOk} />
+		  {this.state.errors.hasError && <AnError error={this.state.errors}/>}
 		</AnContext.Provider>);
 	}
 

@@ -69,7 +69,8 @@ export class QuizResp extends AnsonResp {
 			this.qs.results, this.qs.colnames);
 		if (questions)
 			questions.forEach( (q, x) => {
-				q.answers = q.answers ? q.answers.split("\\n") : [];
+				// replaceAll is not available for test
+				q.answers = q.answers ? q.answers.split('\\n').join('\n') : '';
 			} );
 		return {title, quizId: qid, quizinfo, questions};
 	}
