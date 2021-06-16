@@ -1,11 +1,14 @@
 /**Json protocol helper to support jclient.
  * All AnsonBody and JHelper static helpers are here. */
 class Protocol {
-  /**Globally set this client's options.
-   * @param {object} options<br>
-   * options.noNull no null value <br>
-   * options.noBoolean no boolean value<br>
-   */
+	/**Globally set this client's options.
+	 * @param {object} options<br>
+	 * options.noNull no null value <br>
+	 * options.noBoolean no boolean value<br>
+	 * options.valOptions<br>
+	 * options.verbose logging verbose level
+	 * @return {Protocol} static Protocol class
+	 */
 	static opts(options) {
 		if (options) {
 			if (options.noNull !== undefined)
@@ -14,7 +17,11 @@ class Protocol {
 				Protocol.valOptions.noBoolean = options.noBoolean === true || options.noBoolean === 'true';
 
 			Protocol.valOptions = Object.assign(Protocol.valOptions, options);
+
+			// TODO we are planning extending verbose level requested by client.
+			Protocol.verbose = options.verbose >= 0 ? options.verbose : 5;
 		}
+		return Protocol;
 	}
 
 	/**Format login request message.
@@ -24,10 +31,14 @@ class Protocol {
 	 * @return login request message
 	 */
 	static formatSessionLogin (uid, tk64, iv64) {
-		let body = new SessionReq(uid, tk64, iv64);
-		body.a = 'login';
-		// return new AnsonMsg(Protocol.Port.session, null, body);
-		return new AnsonMsg({type: ""});Protocol.Port.session, null, body);
+		let login = new AnsonMsg({
+			type: 'io.odysz.semantic.jprotocol.AnsonMsg',
+			port: 'session', //Protocol.Port.session,
+			body: [{type: 'io.odysz.semantic.jsession.AnSessionReq',
+					uid, token: tk64, iv: iv64}]
+		});
+		login.Body().A('login');
+		return login;
 	}
 
 	static formatHeader (ssInf) {
@@ -135,21 +146,26 @@ class AnsonMsg {
 			throw new Error("AnClient is upgraded.");
 
 		let header = json.header;
-		let body = json.body;
-		if (body && body[0].type === 'io.odysz.semantic.jprotocol.AnsonResp')
-			body = new AnsonResp(body[0]);
-		else if (body && body[0].type === 'io.odysz.semantic.jsession.AnSessionResp')
-			body = new AnSessionResp(body[0]);
+		let [body] = json.body ? json.body : [{}];
+		if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
+			body = new AnsonResp(body);
+		else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
+			body = new AnSessionResp(body);
+		else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
+			body = new AnSessionReq(body.uid, body.token, body.iv);
 		else {
-			console.error("TODO: " + body[0].type);
+			if (Protocol.verbose >= 5)
+				console.warn("Using json object directly as body. Type : " + body.type);
 		}
+
+		// FIXME type must be the first key of evry json object.
+		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
 
 		this.code = json.code;
 		this.version = json.version ? json.version : "0.9";
 		this.seq = json.seq;
-		this.port = port.port;
+		this.port = json.port;
 
-		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
 		// this.version = "0.9";
 		if (!this.seq)
 			this.seq = Math.round(Math.random() * 1000);
@@ -220,11 +236,21 @@ class AnHeader {
 
 class AnsonBody {
 	constructor(body = {}) {
+		this.type = body.type;
 		this.a = body.a
 		this.parent = body.parent;
 		this.conn = body.conn;
-		this.type = body.type;
 	}
+
+	/**set a.<br>
+	 * a() can only been called once.
+	 * @param {string} a
+	 * @return {SessionReq} this */
+	A(a) {
+		this.a = a;
+		return this;
+	}
+
 }
 
 class AnsonResp extends AnsonBody {
@@ -318,14 +344,15 @@ class UserReq {
 	 * a() can only been called once.
 	 * @param {string} a
 	 * @return {UserReq} this */
-	a(a) {
+	A(a) {
 		this.a = a;
 		return this;
 	}
 }
 
-class SessionReq {
+class AnSessionReq extends AnsonBody {
 	constructor (uid, token, iv) {
+		super();
 		this.type = "io.odysz.semantic.jsession.AnSessionReq";
 		this.uid = uid;
 		this.token = token;
@@ -336,9 +363,8 @@ class SessionReq {
 	 * a() can only been called once.
 	 * @param {string} a
 	 * @return {SessionReq} this */
-	a(a) {
-		this.a = a;
-		return this;
+	A(a) {
+		return super.A(a);
 	}
 
 	md(k, v) {
@@ -828,5 +854,5 @@ class DatasetCfg extends QueryReq {
 
 ///////////////// END //////////////////////////////////////////////////////////
 export {Jregex, Protocol, AnsonMsg, AnHeader,
-	UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
+	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
 	AnsonResp, DatasetCfg, stree_t}

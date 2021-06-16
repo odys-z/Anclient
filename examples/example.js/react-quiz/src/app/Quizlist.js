@@ -1,30 +1,30 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import Box from '@material-ui/core/Box';
-import Add from '@material-ui/icons/Add';
-import DraftsIcon from '@material-ui/icons/Drafts';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import SendIcon from '@material-ui/icons/Send';
-import Sms from '@material-ui/icons/Sms';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import TextField from '@material-ui/core/TextField';
+	import ReactDOM from 'react-dom';
+	import { makeStyles } from '@material-ui/core/styles';
+	import ListSubheader from '@material-ui/core/ListSubheader';
+	import List from '@material-ui/core/List';
+	import ListItem from '@material-ui/core/ListItem';
+	import ListItemIcon from '@material-ui/core/ListItemIcon';
+	import ListItemText from '@material-ui/core/ListItemText';
+	import Collapse from '@material-ui/core/Collapse';
+	import Box from '@material-ui/core/Box';
+	import Add from '@material-ui/icons/Add';
+	import DraftsIcon from '@material-ui/icons/Drafts';
+	import InboxIcon from '@material-ui/icons/MoveToInbox';
+	import SendIcon from '@material-ui/icons/Send';
+	import Sms from '@material-ui/icons/Sms';
+	import TextareaAutosize from '@material-ui/core/TextareaAutosize';
+	import FormControlLabel from '@material-ui/core/FormControlLabel';
+	import Checkbox from '@material-ui/core/Checkbox';
+	import TextField from '@material-ui/core/TextField';
 
 import {L} from '../../../lib/utils/langstr';
-import {AnContext} from '../../../lib/an-react';
-import {JQuiz} from '../../../lib/an-quiz';
-import {QuizResp} from '../../../lib/protocol.quiz.js';
-import {Jvector} from '../../../lib/jvector';
-import {Login} from './Login.cmp.js';
-import {QuizForm} from './Quiz.form.js';
+	import {AnContext, AnError} from '../../../lib/an-react';
+	import {JQuiz} from '../../../lib/an-quiz';
+	import {QuizResp} from '../../../lib/protocol.quiz.js';
+	import {Jvector} from '../../../lib/jvector';
+	import {Login} from './Login.cmp.js';
+	import {QuizForm} from './Quiz.form.js';
 
 class Quizlist extends React.Component {
 	static getQx() { return ++quid; }
@@ -51,7 +51,9 @@ class Quizlist extends React.Component {
 
 		// see https://reactjs.org/docs/context.html#caveats
 		anClient: undefined,
-		errors: {},
+
+		hasError: false,
+		errors: { },
     };
 
 	constructor(props = {}) {
@@ -67,6 +69,17 @@ class Quizlist extends React.Component {
 
 		this.onEdit = this.onEdit.bind(this);
 		this.onFormOk = this.onFormOk.bind(this);
+
+		this.onError = this.onError.bind(this);
+		this.onErrorClose = this.onErrorClose.bind(this);
+	}
+
+	onError(has) {
+		that.setState( {hasError: has} );
+	}
+
+	onErrorClose() {
+		this.setState( {hasError: false} );
 	}
 
 	onSelect(e) {
@@ -164,8 +177,17 @@ class Quizlist extends React.Component {
 		let creating = this.state.creating;
 		this.state.creating = false;
 
+		// TODO ody: usually App should be the error handler
+		let errHandler = this.state.errors;
+		errHandler.onError = function() { let that = this; return (has) => {that.setState({hasError: has})}; }.bind(this)();
+
 		return (
-		<AnContext.Provider value={{anClient: this.state.anClient, quizId}}>
+		<AnContext.Provider value={{
+				anClient: this.state.anClient,
+				hasError: this.state.hasError,
+				// TODO ody: usually App should be the error handler
+				errHandler,
+				quizId }} >
 		  <Login onLoginOk={this.onLogin}
 		  		 onLogout={() => {this.setState({anClient: undefined})} } />
 		  <Box display={this.state.anClient ? "block" : "none"} >
@@ -188,7 +210,7 @@ class Quizlist extends React.Component {
 		  <QuizForm open={this.state.openx >= 0 || creating}
 					creating={creating} quizId={quizId}
 					onOk={this.onFormOk} />
-		  {this.state.errors.hasError && <AnError error={this.state.errors}/>}
+		  {this.state.hasError && <AnError error={this.state.errors} onClose={this.onErrorClose} />}
 		</AnContext.Provider>);
 	}
 

@@ -86,7 +86,7 @@ const respSession = {
 	"version": "1.0", "seq": 0
 };
 
-describe('case: [Protocol] data converter', () => {
+describe('case: [Protocol]', () => {
     it('UserReq handling', () => {
 		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
 			.set('quizId', '000001');
@@ -111,6 +111,15 @@ describe('case: [Protocol] data converter', () => {
 		assert.equal(rp.code, 'exSession', "4 ---");
 		assert.equal(rp.Body().msg(), 'session info is missing or timeout', "5 ---");
 	} );
+
+    it('SessionReq formating / instantiation', () => {
+		let ssReq = Protocol.formatSessionLogin('user 1', 'passweord cipher', 'iv64 ... ...');
+        assert.equal(ssReq.code, null, "1 ---");
+        assert.equal(ssReq.port, 'session', "2 ---");
+        assert.equal(ssReq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "3 ---");
+        assert.equal(ssReq.Body().type, "io.odysz.semantic.jsession.AnSessionReq", "4 ---");
+        assert.equal(ssReq.Body().uid, "user 1", "5 ---");
+	});
 
     it('SessionResp response instancing', () => {
 		let rp = new AnsonMsg(respSession);

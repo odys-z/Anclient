@@ -47,16 +47,18 @@ export
 /** Helper handling protocol / data type of quiz.serv */
 class JQuiz {
 	/**@param {SessionClient} ssClient client created via login
+	 * @param {AnContext.errors} errCtx error handler's context.
 	 */
-	constructor (ssClient) {
-		ssClient.An.understandPorts(Quizports);
+	constructor (ssClient, errCtx) {
+		ssClient.an.understandPorts(Quizports);
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
+		this.err = errCtx;
 	}
 
 	serv (a, conds = {}, onLoad, errCtx) {
 		let req = new UserReq(qconn)
-			.a(a); // this is a reading request
+			.A(a); // this is a reading request
 
 		for (let k in conds)
 			req.set(k, conds[k]);
@@ -70,9 +72,13 @@ class JQuiz {
 			cate: Protocol.CRUD.r,
 			remarks: 'quiz.serv' });
 
-		var jreq = new AnsonMsg(Protocol.Port.quiz, header, req);
+		var jreq = new AnsonMsg({
+					port: Protocol.Port.quiz,
+					header,
+					body: [req]
+				});
 
-		this.client.An.post(jreq, onLoad, (c, resp) => {
+		this.client.an.post(jreq, onLoad, (c, resp) => {
 			if (errCtx) {
 				errCtx.hasError = true;
 				errCtx.code = c;
@@ -120,13 +126,13 @@ class JQuiz {
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
 		let req = this.client.userReq(qconn, Quizports.quiz,
-			new UserReq( qconn, "quizzes", props ).a(quiz_a.insert) );
+			new UserReq( qconn, "quizzes", props ).A(quiz_a.insert) );
 
-		this.client.an.post(req, onOk, (c, e) => {
-			if (errCtx) {
-				errCtx.hasError = true;
-				errCtx.code = c;
-				errCtx.msg = resp.msg();
+		this.client.an.post(req, onOk, (c, resp) => {
+			if (that.err) {
+				that.err.code = c;
+				that.err.msg = resp.Body().msg();
+				that.err.onError(true);
 			}
 			else console.error(c, resp);
 		});
@@ -143,13 +149,13 @@ class JQuiz {
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
 		let req = this.client.userReq(qconn, Quizports.quiz,
-			new UserReq(qconn, "quizzes", props).a(quiz_a.update) );
+			new UserReq(qconn, "quizzes", props).A(quiz_a.update) );
 
 		this.client.an.post(req, onOk, (c, resp) => {
-			if (errCtx) {
-				errCtx.hasError = true;
-				errCtx.code = c;
-				errCtx.msg = resp.msg();
+			if (that.err) {
+				that.err.code = c;
+				that.err.msg = resp.Body().msg();
+				that.err.onError(true);
 			}
 			else console.error(c, resp);
 		});

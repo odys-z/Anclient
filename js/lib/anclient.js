@@ -2,7 +2,9 @@
 import $ from 'jquery';
 import AES from './aes.js';
 import {
-	Protocol, AnsonMsg, AnHeader, AnsonResp, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg
+	Protocol, AnsonMsg, AnHeader, AnsonResp,
+	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
+	DatasetCfg
 } from './protocol.js';
 
 /**The lower API of jclient/js
@@ -20,7 +22,6 @@ const aes = new AES();
  * io.odysz.jclient.Clients;
  * @property cfg the configurations,<br>
  * cfg.connId,<br>
- * cfg.verbose,<br>
  * cfg.defaultServ:<br>
  * where defaultserv is the serv root, will be concated with port name for different poert.
  */
@@ -30,7 +31,6 @@ class AnClient {
 	constructor (urlRoot) {
 	 	this.cfg = {
 			connId: null,
-			verbose: 5,
 			defaultServ: urlRoot,
 		}
 		// aes = new AES();
@@ -100,12 +100,6 @@ class AnClient {
      * @param {function} on failed
      */
 	login (usrId, pswd, onLogin, onError) {
-		// byte[] iv =   AESHelper.getRandom();
-		// String iv64 = AESHelper.encode64(iv);
-		// String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
-
-		// console.log('An.login(' + usrId + ', ' + pswd + ', ...)');
-
 		let iv = aes.getIv128();
 		let cpwd = aes.encrypt(usrId, pswd, iv);
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
@@ -121,7 +115,7 @@ class AnClient {
 			function(resp) {
 				// var sessionClient = new SessionClient(resp.body[0].ssInf, iv, true);
 				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
-				sessionClient.An = An;
+				sessionClient.an = An;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
 				else console.log(sessionClient);
@@ -191,7 +185,7 @@ class AnClient {
 				resp = new AnsonMsg(resp);
 
 				// code != ok
-				if (self.cfg.verbose >= 5){
+				if (Protocol.verbose >= 5){
 					console.debug(Protocol.MsgCode);
 				}
 
@@ -209,7 +203,11 @@ class AnClient {
 			error: function (resp) {
 				if (typeof onErr === "function") {
 					console.error("ajax error:", url);
-					resp = new AnsonMsg(resp.port, resp.header, resp.body);
+					resp = new AnsonMsg({
+						port: resp.port,
+						header: resp.header,
+						body: [resp.body]
+					});
 					onErr(Protocol.MsgCode.exIo, resp);
 				}
 				else {
@@ -397,14 +395,17 @@ class SessionClient {
 		var newPswd = aes.encrypt(newPswd, key, iv_new);
 		var oldPswd = aes.encrypt(oldPswd, key, iv_old);
 
-		var body = new SessionReq(usrId,
+		var body = new AnSessionReq(usrId,
 			tk, aes.bytesToB64(iv_tok)) //  tk and iv_tok shouldn't bee used
-				.a('pswd')
+				.A('pswd')
 				.md('pswd', newPswd)
 				.md('iv_pswd', aes.bytesToB64(iv_new))
 				.md('oldpswd', oldPswd)
 				.md('iv_old', aes.bytesToB64(iv_old));
-		var jmsg = new AnsonMsg(Protocol.Port.session, this.getHeader(), body);
+		var jmsg = new AnsonMsg({
+					port: Protocol.Port.session,
+					header: this.getHeader(),
+					body: [body] });
 
 		if (opts === undefined) {
 			opts = {};
@@ -460,7 +461,11 @@ class SessionClient {
 
 		var header = this.getHeader(act);
 
-		var jreq = new AnsonMsg(Protocol.Port.query, header, qryItem);
+		var jreq = new AnsonMsg({
+					port: Protocol.Port.query,
+					header,
+					body: qryItem
+				});
 		return jreq;
 	}
 
@@ -541,7 +546,7 @@ class SessionClient {
 			header.userAct = act;
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}
-		return new AnsonMsg(port, header, bodyItem);
+		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
 
 	/**Set user's current action to be logged.

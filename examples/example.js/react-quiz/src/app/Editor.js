@@ -60,13 +60,6 @@ export class Editor extends React.Component {
 		alert: '',
     };
 
-	alert(msg) {
-		this.setState({
-			alert: msg,
-			showAlert: true,
-		});
-	}
-
 	constructor(props) {
 		super(props);
 
@@ -77,6 +70,13 @@ export class Editor extends React.Component {
 		this.onAdd = this.onAdd.bind(this);
 		this.onSave = this.onSave.bind(this);
 		this.onCheckSingle = this.onCheckSingle.bind(this);
+	}
+
+	alert(msg) {
+		this.setState({
+			alert: msg,
+			showAlert: true,
+		});
 	}
 
 	handleClick(e) {
@@ -129,7 +129,7 @@ export class Editor extends React.Component {
 
 		if (!this.jquiz) {
 			let ctx = this.context;
-			this.jquiz = new JQuiz(ctx.anClient);
+			this.jquiz = new JQuiz(ctx.anClient, ctx.errHandler);
 		}
 
 		if (!this.state.quizId) {
@@ -191,7 +191,7 @@ export class Editor extends React.Component {
 			title = L('loading...');
 
 			if (!this.jquiz)
-				this.jquiz = new JQuiz(ctx.anClient);
+				this.jquiz = new JQuiz(ctx.anClient, ctx.errHandler);
 			this.jquiz.quiz(this.state.quizId, loadQuiz, ctx);
 		}
 		else title = title ? title : L('New Quiz');
