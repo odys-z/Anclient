@@ -7,8 +7,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Box from '@material-ui/core/Box';
 
 import * as an from 'anclient'
-import {ConfirmDialog} from './common/Messagebox'
-import {L, Langstrs} from './utils/langstr'
+import {ConfirmDialog} from '../../../lib/widgets/Messagebox'
+import {L, Langstrs} from '../../../lib/utils/langstr'
 
 // https://github.com/mui-org/material-ui/issues/15820
 const styles = (theme) => ({
@@ -34,19 +34,20 @@ class LoginComponent extends React.Component {
 	/**
 	 * initialize a instance of Anclient visition jserv service.
 	 * @param {object} props
-	 * @param {string} props.jserv="http://127.0.0.1:8080/jserv-quiz"); url to service root.
+	 * @param {string} props.jserv e.g. "http://127.0.0.1:8080/jserv-quiz"); url to service root.
 	 * @constructor
 	 */
 	constructor(props) {
 		super(props);
 
+		this.props
 		this.an = an.an;
-		this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-quiz");
+		// this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-quiz");
 
 		this.alert = this.alert.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
-		this.onServUrl = this.onServUrl.bind(this);
+		// this.onServUrl = this.onServUrl.bind(this);
 	}
 
 	alert() {
@@ -56,11 +57,11 @@ class LoginComponent extends React.Component {
 		});
 	}
 
-	onServUrl(e) {
-		e.stopPropagation();
-		let jserv = e.currentTarget.value;
-		this.setState({jserv})
-	}
+	// onServUrl(e) {
+	// 	e.stopPropagation();
+	// 	let jserv = e.currentTarget.value;
+	// 	this.setState({jserv})
+	// }
 
 	onLogin() {
 		let that = this;
@@ -72,22 +73,20 @@ class LoginComponent extends React.Component {
 		}
 
 		if (!this.state.loggedin) {
-			if (this.state.jserv) {
-				console.log(this.state.jserv);
+			// if (this.state.jserv) {
+				// this.state.jserv = this.refs.jserv.getValue();
+				this.state.jserv = this.inputRef.value;
 				this.an.init(this.state.jserv);
-			}
+			// }
 			this.an.login( uid, pwd, reload, onError );
 		}
-		else // what's happening here?
-			;
-			// reload(this.ssClient);
 
 		function reload (client) {
 			that.ssClient = client;
-			that.state.loggedin = true;
 			if (typeof that.props.onLoginOk === 'function')
 				that.props.onLoginOk(client);
-			else console.log(client);
+			else console.log('login succeed but client ignored: ', client);
+			that.setState( {loggedin: true} );
 		}
 
 		function onError (code, resp) {
@@ -102,6 +101,9 @@ class LoginComponent extends React.Component {
 	}
 
 	onLogout() {
+		this.setState({ loggedin: false });
+		if (typeof this.props.onLogout === 'function')
+			this.props.onLogout();
 	}
 
 	update(val) {
@@ -113,11 +115,15 @@ class LoginComponent extends React.Component {
 		// This <form> only to disable chrome warning:
 		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
 		return (<div className={classes.root}>
-		<>
-			<TextField required id="jserv" onBlur={this.onServUrl}
+		<div style={{display: 'flex'}}>
+			<TextField required id="jserv" inputRef={ref => { this.inputRef = ref; }}
 					   label="Jserv URL" fullWidth={true}
 					   defaultValue="http://localhost:8080/jserv-quiz/" />
-		</>
+			<Box display={this.state.loggedin ? "flex" : "none"}>
+				<Button variant="contained" color="primary" style={{'whiteSpace': 'nowrap'}}
+						onClick={this.onLogout} >Log out</Button>
+			</Box>
+		</div>
 		<Collapse in={!this.state.loggedin} timeout="auto" >
 	        <TextField required id="userid" label="User Id"
 	                autoComplete="username"
@@ -129,10 +135,6 @@ class LoginComponent extends React.Component {
 	                onChange={event => this.setState({pswd: event.target.value})} />
 	        <Button variant="contained" color="primary"
 	                onClick={this.onLogin} >Log in</Button>
-			<Box display="none">
-	        <Button variant="contained" color="primary"
-	                onClick={this.onLogout} >Log out</Button>
-			</Box>
 		</Collapse>
 		<ConfirmDialog ok='はい' title='Info' cancel={false}
 				open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }

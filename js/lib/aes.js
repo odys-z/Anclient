@@ -1,6 +1,6 @@
 /* ricomoo aes wrapper
  * Design notes:
- * AES is just only one of crypto algorithms, so we need make this pluginized so 
+ * AES is just only one of crypto algorithms, so we need make this pluginized so
  * can be overriden by user.
  */
 import AESLib from './opensources/ricmoo-aes-2.js';
@@ -9,7 +9,7 @@ import AESLib from './opensources/ricmoo-aes-2.js';
  * The dependee class is ported from github/ricomoo, the original soruce file doesn't have any license declarations.
  * @module jclient/js/aes */
 
-/**AES class 
+/**AES class
  * @class
  * @property {AESLib} aesLib the ricomoo/aes
  * @protpery {function} encrypt
@@ -17,8 +17,10 @@ import AESLib from './opensources/ricmoo-aes-2.js';
  */
 export default function AES () {
 	var verbose = false;
-	var aesLib = new AESLib(window);
+	let hook = {}
+	var aesLib = new AESLib(hook);
 	// aesLib(window);
+	let aesjs = hook.aesjs;
 
 	/**get byte[] of random 128bits iv
 	 * @return {byte[]} iv
@@ -51,13 +53,20 @@ export default function AES () {
 	}
 
 	this.bytesToB64 = function (byteArr) {
-		return btoa(String.fromCharCode.apply(null, byteArr));
+		if (typeof btoa == 'function')
+			return btoa(String.fromCharCode.apply(null, byteArr));
+		else // should only happens in testing
+			return Buffer.from(byteArr, 'binary').toString('base64')
 	}
 
 	this.b64ToBytes = function (b64Str) {
-		return new Uint8Array(atob(b64Str).split("").map(function(c) {
-			return c.charCodeAt(0);
-		}));
+		return new Uint8Array(
+			(typeof atob === 'function' ? atob(b64Str)
+				: Buffer.from(b64Str, 'base64').toString('binary')
+			).split("").map(function(c) {
+					return c.charCodeAt(0);
+			})
+		);
 	}
 
 	this.decrypt = function (cipherB64, key, iv) {
@@ -113,7 +122,7 @@ export default function AES () {
 
 /**
  * @constructor
- * Test JS AES 
+ * Test JS AES
  * @class*/
 export function testAES() {
 	var aes = new AES();

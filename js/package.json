@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.11",
+  "version": "0.9.22",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main-backup": "./test/vue/index.js",
   "main": "./lib/anclient.js",
@@ -9,9 +9,9 @@
     "test": "test"
   },
   "scripts": {
-    "test old way": "echo \"Open file://test/index.html in a browser.\" && exit 1",
     "build": "webpack-cli",
-    "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js"
+    "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
+    "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
   "keywords": [
     "anclient",
@@ -20,22 +20,22 @@
   "author": "odys-z@github.com",
   "license": "Apache-2.0",
   "dependencies": {
-    "@babel/core": "^7.11.6",
-    "babel-loader": "^8.1.0",
+    "@babel/core": "^7.14.6",
+    "babel-loader": "^8.2.2",
     "css-loader": "^2.1.1",
     "eslint": "^5.16.0",
-    "jsdoc": "^3.6.5",
-    "lodash": "^4.17.13",
+    "jsdoc": "^3.6.7",
+    "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^0.5.0",
     "node-sass": "^4.14.1",
     "postcss-loader": "^3.0.0",
     "sass-loader": "^7.3.1",
     "style-loader": "^0.23.1",
     "tar": "^4.4.13",
-    "vue": "^2.6.12",
-    "vue-loader": "^15.9.3",
-    "vue-router": "^3.4.3",
-    "vue-template-compiler": "^2.6.12"
+    "vue": "^2.6.14",
+    "vue-loader": "^15.9.7",
+    "vue-router": "^3.5.1",
+    "vue-template-compiler": "^2.6.14"
   },
   "devDependencies": {
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
@@ -43,10 +43,10 @@
     "babel-plugin-transform-vue-jsx": "^3.7.0",
     "babel-preset-env": "^1.7.0",
     "chai": "^4.3.4",
-    "jquery": "^3.5.1",
-    "mocha": "^8.3.2",
+    "jquery": "^3.6.0",
+    "mocha": "^8.4.0",
     "webpack": "^4.46.0",
-    "webpack-cli": "^4.5.0",
+    "webpack-cli": "^4.7.2",
     "webpack-node-externals": "^2.5.2",
     "webpack-shell-plugin": "^0.5.0"
   }

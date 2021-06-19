@@ -28,7 +28,7 @@ class CheapClient {
 	loadFlow (wfId, opts) {
 		// this.cmdArgs = [wfId, taskId];
 		var cheapReq = new CheapReq(wfId)
-						.a(this.cheapReq.load)
+						.A(this.cheapReq.load)
 						.taskId(opts.taskId);
 		var jmsg = this.jclient.userReq(this.connId, engports.cheapflow, cheapReq);
 		this.jclient.commit(jmsg, opts.onok, function (c, d) {
@@ -54,7 +54,7 @@ class CheapClient {
 		}
 
 		var cheapReq = new CheapReq(wfId)
-						.a(this.cheapReq.nodeCmds)
+						.A(this.cheapReq.nodeCmds)
 						.nodeId(opts.nodeId)
 						.usrId(opts.usrId)
 						.taskId(opts.taskId); // optional - not used
@@ -75,7 +75,7 @@ class CheapClient {
 	 * @return {CheapClient} this
 	 */
 	start (cheapReq, opts) {
-		cheapReq.a(this.cheapReq.start)	// this.cheapReq is the req enum
+		cheapReq.A(this.cheapReq.start)	// this.cheapReq is the req enum
 				.taskId(opts.taskId)
 		var jmsg = this.jclient.userReq(this.connId, engports.cheapflow, cheapReq);
 		this.jclient.commit(jmsg, opts.onok, function (c, d) {
@@ -90,14 +90,14 @@ class CheapClient {
 	}
 
 	step (cheapBody, opts) {
-		cheapBody.a(this.cheapReq.cmd);
+		cheapBody.A(this.cheapReq.cmd);
 		var jmsg = this.jclient.userReq(this.connId, engports.cheapflow, cheapBody);
 		this.jclient.commit(jmsg, opts.onok, opts.onerror);
 	}
 
 	rights (wfid, taskId, currentNodeId, usrId, opts) {
 		var req = new CheapReq(this.jclient, this.cheaport)
-						.a(this.cheapReq.load)
+						.A(this.cheapReq.load)
 						.arg('wfId', wfid)
 						.arg('taskId', taskId)
 						.arg('currentNode', currentNodeId)

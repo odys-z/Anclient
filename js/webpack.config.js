@@ -7,12 +7,13 @@
  const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
  var v = 'development';
- var version = "0.9.5";
+ var version = "0.9.6";
 
  module.exports = {
    mode: v, // "production" | "development" | "none"
    devtool: 'source-map',
-   entry: {anvue: './lib/view/vue/jcomponents.js', anclient: './lib/anclient.js'},
+   entry: { // anvue: './lib/view/vue/jcomponents.js',
+   			anclient: './lib/anclient.js'},
 
    output: {
      filename: "[name]-" + version + ".min.js",
@@ -37,12 +38,12 @@
  		{test: /\.css$/,
 		 use: [ 'style-loader',
 				'css-loader',
-				'postcss-loader',
+				// 'postcss-loader',
 			  ] },
  		{test: /\.scss$/,
  		 use: [ 'vue-style-loader',
  				'css-loader',
- 				'postcss-loader',
+ 				// 'postcss-loader',
  				'sass-loader'
  		 	  ]},
  		{test: /\.vue$/, loader: ["vue-loader"] },

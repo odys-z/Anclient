@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import {L} from './utils/langstr';
+import {L} from '../../../lib/utils/langstr';
 import {AnContext, quiz_a} from '../../../lib/an-react';
 import {JQuiz} from '../../../lib/an-quiz';
 import {Editor} from './Editor.js';

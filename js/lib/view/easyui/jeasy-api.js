@@ -54,7 +54,7 @@ function saveToolA() {
 
 	var usrReq = new jvue.UserReq(conn, "r_tools_borrows") // req.tabl
 						// turn back tools - or any function branch tag handled by tools.serv
-						.a("A")
+						.A("A")
 
 						// or reaplace these 2 set() with data(dat)
 						.set('borrowId', 'borrow-001')

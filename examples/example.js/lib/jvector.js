@@ -25,7 +25,7 @@ class Jvector {
 
 	serv (a, onload) {
 		let reqVec3 = new UserReq(vec3conn)
-			.a(a); // this is a reading request
+			.A(a); // this is a reading request
 
 		let header = Protocol.formatHeader(this.ssInf);
 
@@ -35,7 +35,11 @@ class Jvector {
 						cate: 'r',
 						remarks: 'session query'});
 
-		var jreq = new AnsonMsg(Protocol.Port.vec3, header, reqVec3);
+		var jreq = new AnsonMsg({
+					port: Protocol.Port.vec3,
+					header,
+					body: [reqVec3]
+				});
 
 		this.client.An.post(jreq, onload);
 		return jreq;

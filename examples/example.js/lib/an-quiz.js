@@ -47,16 +47,18 @@ export
 /** Helper handling protocol / data type of quiz.serv */
 class JQuiz {
 	/**@param {SessionClient} ssClient client created via login
+	 * @param {AnContext.errors} errCtx error handler's context.
 	 */
-	constructor (ssClient) {
-		ssClient.An.understandPorts(Quizports);
+	constructor (ssClient, errCtx) {
+		ssClient.an.understandPorts(Quizports);
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
+		this.err = errCtx;
 	}
 
-	serv (a, conds = {}, onLoad) {
+	serv (a, conds = {}, onLoad, errCtx) {
 		let req = new UserReq(qconn)
-			.a(a); // this is a reading request
+			.A(a); // this is a reading request
 
 		for (let k in conds)
 			req.set(k, conds[k]);
@@ -70,9 +72,20 @@ class JQuiz {
 			cate: Protocol.CRUD.r,
 			remarks: 'quiz.serv' });
 
-		var jreq = new AnsonMsg(Protocol.Port.quiz, header, req);
+		var jreq = new AnsonMsg({
+					port: Protocol.Port.quiz,
+					header,
+					body: [req]
+				});
 
-		this.client.An.post(jreq, onLoad);
+		this.client.an.post(jreq, onLoad, (c, resp) => {
+			if (errCtx) {
+				errCtx.hasError = true;
+				errCtx.code = c;
+				errCtx.msg = resp.msg();
+			}
+			else console.error(c, resp);
+		});
 		return jreq;
 	}
 
@@ -82,7 +95,7 @@ class JQuiz {
 	 * @param {string} quizId quiz id
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
 	 * */
-	quiz(quizId, onLoad) {
+	quiz(quizId, onLoad, errCtx) {
 		let that = this;
 		/*
 		let qreq = this.client.query(qconn, "quizzes", "q");
@@ -91,12 +104,12 @@ class JQuiz {
 			.l('s_domain', 'd', 'd.did = q.subject')
 			.whereCond("=", "q.qid", `'${qid}'`);
 		*/
-		let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad);
+		let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
 		return this;
 	}
 
-	list (conds, onLoad) {
-		let jreq = this.serv(quiz_a.list, conds, onLoad);
+	list (conds, onLoad, errCtx) {
+		let jreq = this.serv(quiz_a.list, conds, onLoad, errCtx);
 		return this;
 	}
 
@@ -113,9 +126,16 @@ class JQuiz {
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
 		let req = this.client.userReq(qconn, Quizports.quiz,
-			new UserReq( qconn, "quizzes", props ).a(quiz_a.insert) );
+			new UserReq( qconn, "quizzes", props ).A(quiz_a.insert) );
 
-		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
+		this.client.an.post(req, onOk, (c, resp) => {
+			if (that.err) {
+				that.err.code = c;
+				that.err.msg = resp.Body().msg();
+				that.err.onError(true);
+			}
+			else console.error(c, resp);
+		});
 	}
 
 	update(quiz, onOk) {
@@ -129,9 +149,16 @@ class JQuiz {
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
 		let req = this.client.userReq(qconn, Quizports.quiz,
-			new UserReq(qconn, "quizzes", props).a(quiz_a.update) );
+			new UserReq(qconn, "quizzes", props).A(quiz_a.update) );
 
-		this.client.an.post(req, onOk, (c, e) => { console.error(c, e); })
+		this.client.an.post(req, onOk, (c, resp) => {
+			if (that.err) {
+				that.err.code = c;
+				that.err.msg = resp.Body().msg();
+				that.err.onError(true);
+			}
+			else console.error(c, resp);
+		});
 	}
 
 	/**
