@@ -179,7 +179,10 @@ class Quizlist extends React.Component {
 
 		// TODO ody: usually App should be the error handler
 		let errHandler = this.state.errors;
-		errHandler.onError = function() { let that = this; return (has) => {that.setState({hasError: has})}; }.bind(this)();
+		errHandler.onError = function() {
+			let that = this;
+			return (has) => { that.setState({hasError: has}); };
+		}.bind(this)();
 
 		return (
 		<AnContext.Provider value={{

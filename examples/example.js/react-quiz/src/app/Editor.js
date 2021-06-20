@@ -82,7 +82,6 @@ export class Editor extends React.Component {
 	handleClick(e) {
 	  // use currentTarget instead of target, see https://stackoverflow.com/a/10086501/7362888
 	  let qx = e.currentTarget.getAttribute('qx');
-	  // console.log(qx);
 	  this.setState({currentqx: parseInt(qx)});
 	};
 

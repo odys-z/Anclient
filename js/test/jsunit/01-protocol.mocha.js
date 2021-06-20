@@ -99,10 +99,25 @@ describe('case: [Protocol/AnsonMsg]', () => {
 		assert.equal(Protocol.Port['echo'], "echo.serv11");
 		assert.equal(Protocol.Port['test1'], "test.serv");
 		assert.equal(Protocol.Port['test2'], "hello.serv");
+
 	});
 });
 
 describe('case: [Protocol/AnsonMsg]', () => {
+    it('Ajax error handling', () => {
+		debugger
+		let json = { "readyState":0, "status":0, "statusText":"error" };
+
+		json.code = Protocol.MsgCode.exIo,
+		json.body = [ {
+				type: 'io.odysz.semantic.jprotocol.AnsonResp',
+				m: 'Ajax: network failed!'
+			} ];
+		let rp = new AnsonMsg( json );
+        assert.equal(rp.code, 'exIo', "- 1 -");
+		assert.equal(rp.Body().msg(), 'Ajax: network failed!', "- 2 -");
+	});
+
     it('UserReq handling', () => {
 		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
 			.A('query')

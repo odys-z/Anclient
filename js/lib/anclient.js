@@ -202,14 +202,25 @@ class AnClient {
 				}
 			},
 			error: function (resp) {
+				// JSON.stringify(resp):
+				// {"readyState":0,"status":0,"statusText":"error"};
 				if (typeof onErr === "function") {
-					console.error("ajax error:", url);
-					resp = new AnsonMsg({
-						port: resp.port,
-						header: resp.header,
-						body: [resp.body]
-					});
-					onErr(Protocol.MsgCode.exIo, resp);
+					if (resp.statusText === 'error') {
+						resp.code = Protocol.MsgCode.exIo;
+						resp.body = [ {
+								type: 'io.odysz.semantic.jprotocol.AnsonResp',
+								m: 'Ajax: network failed!'
+							} ];
+						onErr(Protocol.MsgCode.exIo, new AnsonMsg(resp));
+					}
+					else {
+						resp = new AnsonMsg({
+							port: resp.port,
+							header: resp.header,
+							body: [resp.body]
+						});
+						onErr(Protocol.MsgCode.exIo, resp);
+					}
 				}
 				else {
 					console.error("ajax error:", url);

@@ -24,7 +24,7 @@ export class ConfirmDialog extends React.Component {
 	};
 
 	textLines(msg) {
-		let lines = msg.split('\n')
+		let lines = msg ? msg.split('\n') : [];
 
 		return lines.map( (l, x) => (
 		  <DialogContentText id="alert-dialog-description" key={x}>
