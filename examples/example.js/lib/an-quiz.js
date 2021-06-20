@@ -72,8 +72,9 @@ class JQuiz {
 			cate: Protocol.CRUD.r,
 			remarks: 'quiz.serv' });
 
+		let port = 'quiz';
 		var jreq = new AnsonMsg({
-					port: Protocol.Port.quiz,
+					port,
 					header,
 					body: [req]
 				});
@@ -82,11 +83,11 @@ class JQuiz {
 			if (errCtx) {
 				errCtx.hasError = true;
 				errCtx.code = c;
-				errCtx.msg = resp.msg();
+				errCtx.msg = resp.Body().msg();
 			}
 			else console.error(c, resp);
 		});
-		return jreq;
+		return this;
 	}
 
 	/** Create a query request and post back to server.
@@ -104,13 +105,13 @@ class JQuiz {
 			.l('s_domain', 'd', 'd.did = q.subject')
 			.whereCond("=", "q.qid", `'${qid}'`);
 		*/
-		let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
-		return this;
+		// let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
+		// return this;
+		return this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
 	}
 
 	list (conds, onLoad, errCtx) {
-		let jreq = this.serv(quiz_a.list, conds, onLoad, errCtx);
-		return this;
+		return this.serv(quiz_a.list, conds, onLoad, errCtx);
 	}
 
 	insert(quiz, onOk) {

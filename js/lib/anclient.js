@@ -81,7 +81,8 @@ class AnClient {
      * @param {string} new Ports
      * @return {An} this */
 	understandPorts (newPorts) {
-		Object.assign(Protocol.Port, newPorts);
+		// Object.assign(Protocol.Port, newPorts);
+		Protocol.extend(newPorts);
         return this;
 	}
 

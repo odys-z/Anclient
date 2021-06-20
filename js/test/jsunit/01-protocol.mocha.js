@@ -5,7 +5,7 @@ import chai from 'chai'
 import { expect, assert } from 'chai'
 
 import {Protocol, AnsonMsg, UserReq, AnsonResp} from '../../lib/protocol.js'
-import {SessionClient} from '../../lib/anclient.js'
+import {AnClient, SessionClient} from '../../lib/anclient.js'
 
 
 const resp = {
@@ -86,19 +86,54 @@ const respSession = {
 	"version": "1.0", "seq": 0
 };
 
-describe('case: [Protocol]', () => {
+const TestPorts = {
+	test1: "test.serv",
+	test2: "hello.serv"
+};
+
+describe('case: [Protocol/AnsonMsg]', () => {
+    it('UserReq handling', () => {
+		let an = new AnClient();
+		an.understandPorts(TestPorts);
+
+		assert.equal(Protocol.Port['echo'], "echo.serv11");
+		assert.equal(Protocol.Port['test1'], "test.serv");
+		assert.equal(Protocol.Port['test2'], "hello.serv");
+	});
+});
+
+describe('case: [Protocol/AnsonMsg]', () => {
     it('UserReq handling', () => {
 		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
+			.A('query')
 			.set('quizId', '000001');
 
         assert.equal(ur.conn, 'con-1', "1 ---");
         assert.equal(ur.tabl, 'quizzes', "2 ---");
-        assert.equal(ur.get('quizId'), '000001', "3 ---");
-        assert.equal(ur.get('title'), 'user-req', "4 ---");
+        assert.equal(ur.a, 'query', "3 ---");
+
+        assert.equal(ur.get('quizId'), '000001', "4 ---");
+        assert.equal(ur.get('title'), 'user-req', "5 ---");
 
 		// must keep consists as js/cs/java all denpends on this structure
-		assert.equal(ur.data.props['title'], 'user-req', "5 ---");
-		assert.equal(ur.data.props.quizId, '000001', "6 ---");
+		assert.equal(ur.data.props['title'], 'user-req', "6 ---");
+		assert.equal(ur.data.props.quizId, '000001', "7 ---");
+
+		let port = 'test1';
+		let jreq = new AnsonMsg({
+					port,
+					header: null,
+					body: [ur]
+				});
+
+        assert.equal(jreq.port, 'test1', "8 ---");
+        assert.equal(jreq.port, 'test1', "8 ---");
+
+		let an = new AnClient();
+		an.init("localhost", "conn-1");
+		an.understandPorts(TestPorts);
+
+		assert.equal(an.servUrl(port), "localhost/test.serv", "- 11 -");
 	} );
 
     it('AnsonResp response instancing', () => {
