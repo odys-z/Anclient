@@ -56,6 +56,8 @@ class JQuiz {
 		this.err = errCtx;
 	}
 
+	static get port() { return 'quiz'; }
+
 	serv (a, conds = {}, onLoad, errCtx) {
 		let req = new UserReq(qconn)
 			.A(a); // this is a reading request
@@ -72,9 +74,8 @@ class JQuiz {
 			cate: Protocol.CRUD.r,
 			remarks: 'quiz.serv' });
 
-		let port = 'quiz';
 		var jreq = new AnsonMsg({
-					port,
+					port: JQuiz.port,
 					header,
 					body: [req]
 				});
@@ -98,15 +99,6 @@ class JQuiz {
 	 * */
 	quiz(quizId, onLoad, errCtx) {
 		let that = this;
-		/*
-		let qreq = this.client.query(qconn, "quizzes", "q");
-		qreq.body[0]
-			.j('questions', 't', 't.quizid = q.qid')
-			.l('s_domain', 'd', 'd.did = q.subject')
-			.whereCond("=", "q.qid", `'${qid}'`);
-		*/
-		// let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
-		// return this;
 		return this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
 	}
 
@@ -126,7 +118,7 @@ class JQuiz {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		let req = this.client.userReq(qconn, Quizports.quiz,
+		let req = this.client.userReq(qconn, JQuiz.port,
 			new UserReq( qconn, "quizzes", props ).A(quiz_a.insert) );
 
 		this.client.an.post(req, onOk, (c, resp) => {
@@ -149,7 +141,7 @@ class JQuiz {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		let req = this.client.userReq(qconn, Quizports.quiz,
+		let req = this.client.userReq(qconn, JQuiz.port,
 			new UserReq(qconn, "quizzes", props).A(quiz_a.update) );
 
 		this.client.an.post(req, onOk, (c, resp) => {

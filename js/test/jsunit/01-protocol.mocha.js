@@ -91,8 +91,8 @@ const TestPorts = {
 	test2: "hello.serv"
 };
 
-describe('case: [Protocol/AnsonMsg]', () => {
-    it('UserReq handling', () => {
+describe('case: [Protocol.Port]', () => {
+    it('extending port', () => {
 		let an = new AnClient();
 		an.understandPorts(TestPorts);
 
@@ -141,7 +141,6 @@ describe('case: [Protocol/AnsonMsg]', () => {
 					body: [ur]
 				});
 
-        assert.equal(jreq.port, 'test1', "8 ---");
         assert.equal(jreq.port, 'test1', "8 ---");
 
 		let an = new AnClient();
