@@ -93,11 +93,13 @@ class LoginComponent extends React.Component {
 		}
 
 		function onError (code, resp) {
-			if (typeof that.context.errHandler === 'object')
-				that.context.errHandler.onError(code, {
-					code,
-					msg: resp.Body().msg()
-				} );
+			if (typeof that.context.errHandler === 'object') {
+				let errCtx = that.context.errHandler;
+				errCtx.hasError = true;
+				errCtx.code = code;
+				errCtx.msg = resp.Body().msg();
+				errCtx.onError(true); // FIXME but Editor doesn't use this, bug?
+			}
 			else if (code === an.Protocol.MsgCode.exIo)
 				console.error('Network Failed!');
 			else if (resp.body[0])

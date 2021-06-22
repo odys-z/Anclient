@@ -5,3 +5,4 @@ node_modules
 */dist/*.min.js*
 cn.com.inforise
 *.private.html
+*.private.json
