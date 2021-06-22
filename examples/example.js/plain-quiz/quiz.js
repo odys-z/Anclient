@@ -1,6 +1,6 @@
 /* Anclient initialization */
-var an = jvue.an.init("http://localhost:8080/jserv-quiz/");
-console.log(an);
+// var an = jvue.an.init("http://localhost:8080/jserv-quiz/");
+// console.log(an);
 
 /*
   Quick quiz bootstrap extension

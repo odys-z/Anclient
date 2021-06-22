@@ -95,8 +95,8 @@ function render(quiz_opts) {
       $quiz.carousel('next');
       $indicators.addClass('show');
 
-      $(".active .quiz-button.btn").each(function(){
-        console.log(this.getBoundingClientRect())
+      $(".active .quiz-button.btn").each( function() {
+        // console.log(this.getBoundingClientRect())
         $(this).css("margin-left", function(){
           return ((250 - this.getBoundingClientRect().width) *0.5) + "px"
         })
@@ -170,10 +170,6 @@ function render(quiz_opts) {
         .html(answer)
         .appendTo($answers);
 
-      // This question is correct if it's
-      // index is the correct index
-      var correct = (question.correct.index === answer_index);
-
       // default opts for both outcomes
       var opts = {
         allowOutsideClick : false,
@@ -182,6 +178,11 @@ function render(quiz_opts) {
         html : true,
         confirmButtonColor: "#0096D2"
       };
+
+		/*
+      // This question is correct if it's
+      // index is the correct index
+      var correct = (question.correct.index === answer_index);
 
       // set options for correct/incorrect
       // answer dialogue
@@ -212,13 +213,15 @@ function render(quiz_opts) {
           type: "error"
         });
       }
+	  */
 
       if (last_question) {
-        opts.confirmButtonText = "See your results";
+        opts.confirmButtonText = "Let's finish it!";
       }
 
       // bind click event to answer button,
       // using specified sweet alert options
+	  /*
       ans_btn.on('click', function() {
 
         function next() {
@@ -261,12 +264,45 @@ function render(quiz_opts) {
         $('.sweet-overlay').on('click', next);
 
       });
+	  */
+      ans_btn.on('click', function() {
+          $quiz.carousel('next');
+
+          // if we've reached the final question
+          // set the results text
+          if (last_question) {
+            $results_title.html(resultsText(state));
+            $results_ratio.text( "Thank you for your paticipating!" );
+            // $twitter_link.attr('href', tweet(state, quiz_opts));
+            // $facebook_link.attr('href', facebook(state, quiz_opts));
+            $twitter_link.attr('href', acadynamo(state, quiz_opts));
+            $indicators.removeClass('show');
+            // indicate the question number
+            $indicators.find('li')
+              .removeClass('dark')
+              .eq(0)
+              .addClass('dark');
+          } else {
+            // indicate the question number
+            $indicators.find('li')
+              .removeClass('dark')
+              .eq(question_index+1)
+              .addClass('dark');
+          }
+          // unbind event handler
+          // $('.sweet-overlay').off('click', next);
+
+        // advance to next question on OK click or
+        // click of overlay
+        // swal(opts, next);
+        // $('.sweet-overlay').on('click', next);
+
+      });
 
     });
 
 
   });
-
 
   // final results slide
   var $results_slide = $("<div>")
@@ -288,7 +324,7 @@ function render(quiz_opts) {
 
   var $social = $("<div>")
     .attr('class', 'results-social')
-    .html('<div id = "social-text">Did you like the quiz? Share your results with your friends, so they can give it a shot!</div>')
+    .html('<div id = "social-text">Did you like the quiz? You can follow us!</div>')
     .appendTo($results_slide);
 
   var $twitter_link = $('<a>')
@@ -301,10 +337,12 @@ function render(quiz_opts) {
 
   $("<button>")
     .attr('class', 'quiz-button btn')
-    .text("Try again?")
+    .text("Submit?")
     .click(function() {
-      state.correct = 0;
-      $quiz.carousel(0);
+      // state.correct = 0;
+      // $quiz.carousel(0);
+	  let that = this;
+	  saveQuiz(state, () => {that.innerText = 'Saved!'});
     })
     .appendTo($restart_button);
 
@@ -319,11 +357,18 @@ function render(quiz_opts) {
 
 }
 
+function saveQuiz(state, onOk) {
+	console.error(state);
+	onOk();
+}
+
 function resultsText(state) {
 
+  console.log(state);
   var ratio = state.correct / state.total;
   var text;
 
+  /*
   switch (true) {
     case (ratio === 1):
       text = "Wow&mdash;perfect score!";
@@ -344,28 +389,12 @@ function resultsText(state) {
       text = "Yikes, none correct. Well, maybe it was rigged?";
       break;
   }
-  return text;
+  */
+  return "Quiz Finished!";
 }
 
-function tweet(state, opts) {
-
-  var body = (
-    "I got " + state.correct +
-    " out of " + state.total +
-    " on @taxpolicycenter’s \"" + opts.title +
-    "\" quiz. Test your knowledge here: " + opts.url
-  );
-
-  return (
-    "http://twitter.com/intent/tweet?text=" +
-    encodeURIComponent(body)
-  );
-
+function acadynamo() {
+	return "http://www.inforise.com.cn/www-res/activities/docs/";
 }
-
-function facebook(state, opts) {
-  return "https://www.facebook.com/sharer/sharer.php?u=" + opts.url;
-}
-
 
 })(jQuery);
