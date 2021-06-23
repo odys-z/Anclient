@@ -88,16 +88,17 @@ export class Editor extends React.Component {
 	editQuestion(e) {
 		let qx = this.state.currentqx;
 		let questions = this.state.questions.slice();
-		questions[qx][1] = e.target.value;
+		questions[qx].question = e.target.value;
 		this.setState({questions, dirty: true});
 	}
 
 	editAnswer(e) {
 		let qx = this.state.currentqx;
 		let questions = this.state.questions.slice();
-		let {qtype, correct} = this.jquiz.figureAnswers(e.target.value);
-		questions[qx][3] = qtype;
-		questions[qx][4] = correct;
+		let {qtype, correct} = JQuiz.figureAnswers(e.target.value);
+		questions[qx].qtype = qtype;
+		questions[qx].answer = correct;
+		questions[qx].answers = e.currentTarget.value;
 		this.setState({questions, dirty: true});
 	}
 

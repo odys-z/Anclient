@@ -17,6 +17,8 @@ export const quiz_a = {
 	list: 'list',     // load quizzes
 	insert: 'insert', // create new quiz
 	update: 'update', // update quiz
+
+	poll: 'poll',     // submit poll results
 }
 
 export const QuestionType = {
@@ -41,6 +43,9 @@ const QuizProtocol = {
 	quizinfo: "quizinfo",
 	qowner: "qowner",
 	dcreate: "dcreate",
+
+	poll: "poll",
+	pollUser: "pollUser",
 }
 
 export
@@ -163,7 +168,7 @@ class JQuiz {
 		let correct = [];
 		let anss = ans.split("\n");
 		anss.forEach( (a, x) => {
-			if (a.trim().startWith("*"))
+			if (a.trim().startsWith("\*"))
 				correct.push(String(x))
 		});
 		return {qtype: correct.length <= 1 ? QuestionType.single : QuestionType.multiple,

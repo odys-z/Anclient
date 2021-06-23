@@ -2,23 +2,60 @@
   Quick quiz bootstrap extension
 */
 
+/* Anclient initialization */
+const QuizProtocol = {
+	quizId: "quizId",
+	questions: "questions",
+	qtitle: "qtitle",
+	quizinfo: "quizinfo",
+	qowner: "qowner",
+	dcreate: "dcreate",
+
+	poll: "poll",
+	pollUser: "pollUser",
+}
+
+const Quizports = {
+	quiz: 'quiz.serv'
+}
+
+const quiz_a = {
+	quiz: 'quiz',     //
+	list: 'list',     // load quizzes
+	insert: 'insert', // create new quiz
+	update: 'update', // update quiz
+
+	poll: 'poll',     // submit poll results
+}
+const an = anreact.an; //.init("http://localhost:8080/jserv-quiz/");
+console.log(an);
+an.understandPorts(Quizports);
+
 ;(function($) {
 
 // keep track of number of quizes added to page
-var quiz_count = 0;
+let quiz_count = 0;
 
-var that;
-// add jQuery selection method to create
-// quiz structure from question json file
-// "filename" can be path to question json
-// or javascript object
+let that;
+/** add jQuery selection method to create
+ * quiz structure from question json file
+ * @param {string} serv root url to quiz.serv?a=json
+ * @param {string} quizId quiz id
+ */
 $.fn.quiz = function(serv, quizId) {
   if (!serv && !quizId)
-	// render.bind(this);
 	that = this;
   else if (typeof quizId === "string") {
     // $.getJSON(filename, render.bind(this));
-	$.getJSON(`${serv}?qid=${quizId}`, render.bind(that), (e,c)=>{console.log(e,c)});
+	an.init(serv);
+	$.getJSON(`${serv}/${Quizports.quiz}?qid=${quizId}`,
+		render.bind(that)
+	).fail(
+		(e, c) => {
+			console.log(e, c);
+			alert("Network Error: " + serv);
+		}
+	);
   } else {
     // render.call(this, filename);
 	console.error("why here?")
@@ -28,18 +65,13 @@ $.fn.quiz = function(serv, quizId) {
 // create html structure for quiz
 // using loaded questions json
 function render(quiz_opts) {
-
-
-  // list of questions to insert into quiz
+  if (quiz_opts.type === "io.odysz.semantic.jprotocol.AnsonMsg") {
+  	quiz_opts = quiz_opts.body[0];
+  }
   let questions = quiz_opts.questions;
 
-  if (quiz_opts.type === "io.odysz.semantic.jprotocol.AnsonMsg")
-  	questions = quiz_opts.body[0].questions
-
-  // keep track of the state of correct
-  // answers to the quiz so far
   let state = {
-    correct : 0,
+	poll: {},
     total : questions.length
   };
 
@@ -54,16 +86,10 @@ function render(quiz_opts) {
 
   let height = $quiz.height();
 
-
-  /*
-    Add carousel indicators
-  */
-
-
   /*
     Slides container div
   */
-  var $slides = $("<div>")
+  let $slides = $("<div>")
     .attr("class", "carousel-inner")
     .attr("role", "listbox")
     .appendTo($quiz);
@@ -71,7 +97,7 @@ function render(quiz_opts) {
   /*
     Create title slide
   */
-  var $title_slide = $("<div>")
+  let $title_slide = $("<div>")
     .attr("class", "item active")
     .attr("height", height + "px")
     .appendTo($slides);
@@ -81,11 +107,11 @@ function render(quiz_opts) {
     .attr('class', 'quiz-title')
     .appendTo($title_slide);
 
-  var $start_button = $("<div>")
+  let $start_button = $("<div>")
     .attr("class", "quiz-answers")
     .appendTo($title_slide);
 
-  var $indicators = $('<ol>')
+  let $indicators = $('<ol>')
     .attr('class', 'progress-circles')
 
   $("<button>")
@@ -118,15 +144,16 @@ function render(quiz_opts) {
   */
   $.each(questions, function(question_index, question) {
 
-    var last_question = (question_index + 1 === state.total);
+	let $answers;
+    let last_question = (question_index + 1 === state.total);
 
     //bootstrap carousel
     {
-      var $item = $("<div>")
+      let $item = $("<div>")
         .attr("class", "item")
         .attr("height", height + "px")
         .appendTo($slides);
-      var $img_div;
+      let $img_div;
       if (question.image) {
         $img_div = $('<div>')
           .attr('class', 'question-image')
@@ -145,7 +172,7 @@ function render(quiz_opts) {
         .html(question.prompt || '[Question Contents]')
         .appendTo($item);
 
-      var $answers = $("<div>")
+      $answers = $("<div>")
         .attr("class", "quiz-answers")
         .appendTo($item);
 
@@ -161,17 +188,18 @@ function render(quiz_opts) {
 		question.answers = ans1 && ans1.length > (ans2 || []).length ?
 			ans1 : ans2 || []
 	}
+
     $.each(question.answers, function(answer_index, answer) {
 
       // create an answer button div
       // and add to the answer container
-      var ans_btn = $("<div>")
+      let ans_btn = $("<div>")
         .attr('class', 'quiz-button btn')
         .html(answer)
         .appendTo($answers);
 
       // default opts for both outcomes
-      var opts = {
+      let opts = {
         allowOutsideClick : false,
         allowEscapeKey : false,
         confirmButtonText: "Next Question",
@@ -179,103 +207,22 @@ function render(quiz_opts) {
         confirmButtonColor: "#0096D2"
       };
 
-		/*
-      // This question is correct if it's
-      // index is the correct index
-      var correct = (question.correct.index === answer_index);
-
-      // set options for correct/incorrect
-      // answer dialogue
-      if (correct) {
-        opts = $.extend(opts, {
-          title: "Nice!",
-          text: "Well done" + (
-            question.correct.text ?
-            ("<div class=\"correct-text\">" +
-              question.correct.text +
-              "</div>"
-            ) : ""),
-          type: "success"
-        });
-      } else {
-        opts = $.extend(opts, {
-          title: "Drat",
-          text: (
-            "Nope, not quite right!<br/><br/>" +
-            "The correct answer was \"" +
-            question.answers[question.correct.index] + "\"." + (
-            question.correct.text ?
-            ("<div class=\"correct-text\">" +
-              question.correct.text +
-              "</div>"
-            ) : "")
-            ),
-          type: "error"
-        });
-      }
-	  */
-
       if (last_question) {
         opts.confirmButtonText = "Let's finish it!";
       }
 
-      // bind click event to answer button,
-      // using specified sweet alert options
-	  /*
       ans_btn.on('click', function() {
+		  state.poll[question.qid] = answer_index;
 
-        function next() {
-          // if correct answer is selected,
-          // keep track in total
-          if (correct) state.correct++;
           $quiz.carousel('next');
 
           // if we've reached the final question
           // set the results text
-          if (last_question) {
-            $results_title.html(resultsText(state));
-            $results_ratio.text(
-              "You got " +
-              Math.round(100*(state.correct/state.total)) +
-              "% of the questions correct!"
-            );
-            $twitter_link.attr('href', tweet(state, quiz_opts));
-            $facebook_link.attr('href', facebook(state, quiz_opts));
-            $indicators.removeClass('show');
-            // indicate the question number
-            $indicators.find('li')
-              .removeClass('dark')
-              .eq(0)
-              .addClass('dark');
-          } else {
-            // indicate the question number
-            $indicators.find('li')
-              .removeClass('dark')
-              .eq(question_index+1)
-              .addClass('dark');
-          }
-          // unbind event handler
-          $('.sweet-overlay').off('click', next);
-        }
-
-        // advance to next question on OK click or
-        // click of overlay
-        swal(opts, next);
-        $('.sweet-overlay').on('click', next);
-
-      });
-	  */
-      ans_btn.on('click', function() {
-          $quiz.carousel('next');
-
-          // if we've reached the final question
-          // set the results text
-          if (last_question) {
+          if (last_question || questions.length === 0) {
             $results_title.html(resultsText(state));
             $results_ratio.text( "Thank you for your paticipating!" );
-            // $twitter_link.attr('href', tweet(state, quiz_opts));
-            // $facebook_link.attr('href', facebook(state, quiz_opts));
-            $twitter_link.attr('href', acadynamo(state, quiz_opts));
+            $acadynamo_link.attr('href', acadynamo(state, quiz_opts));
+            $acadynamo_link.attr('href', githubrepo(state, quiz_opts));
             $indicators.removeClass('show');
             // indicate the question number
             $indicators.find('li')
@@ -289,60 +236,50 @@ function render(quiz_opts) {
               .eq(question_index+1)
               .addClass('dark');
           }
-          // unbind event handler
-          // $('.sweet-overlay').off('click', next);
-
-        // advance to next question on OK click or
-        // click of overlay
-        // swal(opts, next);
-        // $('.sweet-overlay').on('click', next);
-
       });
-
     });
-
-
   });
 
   // final results slide
-  var $results_slide = $("<div>")
+  let $results_slide = $("<div>")
     .attr("class", "item")
     .attr("height", height + "px")
     .appendTo($slides);
 
-  var $results_title = $('<h1>')
+  let $results_title = $('<h1>')
     .attr('class', 'quiz-title')
     .appendTo($results_slide);
 
-  var $results_ratio = $('<div>')
+  let $results_ratio = $('<div>')
     .attr('class', 'results-ratio')
     .appendTo($results_slide);
 
-  var $restart_button = $("<div>")
+  let $restart_button = $("<div>")
     .attr("class", "quiz-answers")
     .appendTo($results_slide);
 
-  var $social = $("<div>")
+  let $social = $("<div>")
     .attr('class', 'results-social')
     .html('<div id = "social-text">Did you like the quiz? You can follow us!</div>')
     .appendTo($results_slide);
 
-  var $twitter_link = $('<a>')
-    .html('<span class="social social-twitter follow-tw"></span>')
+  let $acadynamo_link = $('<a>')
+    // .html('<span class="social social-twitter follow-tw"></span>')
+    .html('<span class="social social-twitter follow-cdfls"></span>')
     .appendTo($social);
 
-  var $facebook_link = $('<a>')
-    .html('<span class="social social-facebook follow-fb"></span>')
+  let $github_link = $('<a>')
+    .html('<span class="social social-facebook follow-github"></span>')
     .appendTo($social);
 
   $("<button>")
     .attr('class', 'quiz-button btn')
     .text("Submit?")
     .click(function() {
-      // state.correct = 0;
-      // $quiz.carousel(0);
 	  let that = this;
-	  saveQuiz(state, () => {that.innerText = 'Saved!'});
+	  saveQuiz(state, () => {
+		that.innerText = 'Saved!';
+		that.disabled = true; });
     })
     .appendTo($restart_button);
 
@@ -358,43 +295,52 @@ function render(quiz_opts) {
 }
 
 function saveQuiz(state, onOk) {
-	console.error(state);
-	onOk();
+	let props = {}
+	let poll = formatArr(state.poll);
+	props[QuizProtocol.pollUser] = state.user || '';
+	props[QuizProtocol.qtitle] = state.title;
+	props[QuizProtocol.poll] = poll;
+	props[QuizProtocol.quizId] = state.quizId;
+
+	let req = an.restReq('quiz',
+		new anreact.UserReq(null, "quizzes", props).A(quiz_a.poll) );
+
+	an.post(req, (resp) => {
+		let opts = {
+			allowOutsideClick : false,
+			allowEscapeKey : false,
+			confirmButtonText: "OK!",
+			html : true,
+			title: "Info",
+			text: resp.Body().m,
+			confirmButtonColor: "#0096D2"
+		};
+		swal(opts);
+		if (typeof onOk === 'function')
+			onOk();
+	})
+
+	function formatArr(obj) {
+		let arr = [];
+		for (let k in obj) {
+			arr.push([k, String(obj[k])]);
+		}
+		return arr;
+	}
 }
 
 function resultsText(state) {
-
   console.log(state);
-  var ratio = state.correct / state.total;
-  var text;
-
-  /*
-  switch (true) {
-    case (ratio === 1):
-      text = "Wow&mdash;perfect score!";
-      break;
-    case (ratio > 0.9):
-      text = "Awesome job, you got most of them right.";
-      break;
-    case (ratio > 0.60):
-      text = "Pretty good, we'll say that's a pass.";
-      break;
-    case (ratio > 0.5):
-      text = "Well, at least you got half of them right&hellip;";
-      break;
-    case (ratio < 0.5 && ratio !== 0):
-      text = "Looks like this was a tough one, better luck next time.";
-      break;
-    case (ratio === 0):
-      text = "Yikes, none correct. Well, maybe it was rigged?";
-      break;
-  }
-  */
+  let ratio = state.correct / state.total;
+  let text;
   return "Quiz Finished!";
 }
 
 function acadynamo() {
-	return "http://www.inforise.com.cn/www-res/activities/docs/";
+	return "https://github.com/REDY-a/ERA";
 }
 
+function githubrepo() {
+	return "https://github.com/Georgezhang23/ERA";
+}
 })(jQuery);

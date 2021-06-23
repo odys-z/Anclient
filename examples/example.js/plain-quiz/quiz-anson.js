@@ -18,7 +18,11 @@ $.fn.quiz = function(serv, quizId) {
 	that = this;
   else if (typeof quizId === "string") {
     // $.getJSON(filename, render.bind(this));
-	$.getJSON(`${serv}?qid=${quizId}`, render.bind(that), (e,c)=>{console.log(e,c)});
+	$.getJSON(`${serv}/${Quizports.quiz}?qid=${quizId}`,
+		render.bind(that),
+		(e,c)=>{
+			console.log(e,c)
+		});
   } else {
     // render.call(this, filename);
 	console.error("why here?")

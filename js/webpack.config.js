@@ -21,7 +21,7 @@
      path: path.resolve(__dirname, 'dist'),
      publicPath: "./dist/",
 
-     library: 'jvue',
+     library: 'anreact',
      libraryTarget: 'umd'
    },
 

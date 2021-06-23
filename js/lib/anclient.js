@@ -133,6 +133,15 @@ class AnClient {
 		});
 	}
 
+	/**Create a user request AnsonMsg for no-ssession request (on connId can be specified).
+	 * @param {string} port
+	 * @param {Protocol.UserReq} bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
+	 * @return {AnsonMsg<AnUserReq>} AnsonMsg */
+	restReq(port, bodyItem) {
+		let header = Protocol.formatHeader({});
+		return new AnsonMsg({ port, header, body: [bodyItem] });
+	}
+
     /**Check Response form jserv
      * @param {any} resp
      */
@@ -205,11 +214,11 @@ class AnClient {
 				// JSON.stringify(resp):
 				// {"readyState":0,"status":0,"statusText":"error"};
 				if (typeof onErr === "function") {
-					if (resp.statusText === 'error') {
+					if (resp.statusText) {
 						resp.code = Protocol.MsgCode.exIo;
 						resp.body = [ {
 								type: 'io.odysz.semantic.jprotocol.AnsonResp',
-								m: 'Ajax: network failed!'
+								m: 'Network failed: ' + resp.statusText
 							} ];
 						onErr(Protocol.MsgCode.exIo, new AnsonMsg(resp));
 					}
@@ -217,7 +226,8 @@ class AnClient {
 						resp = new AnsonMsg({
 							port: resp.port,
 							header: resp.header,
-							body: [resp.body]
+							body: [ { type: 'io.odysz.semantic.jprotocol.AnsonResp',
+									  m: 'Ajax: network failed: ' + resp.status } ]
 						});
 						onErr(Protocol.MsgCode.exIo, resp);
 					}
@@ -553,7 +563,7 @@ class SessionClient {
 	 * @param {Object} act action, optional.
 	 * @return {AnsonMsg<AnUserReq>} AnsonMsg */
 	userReq(conn, port, bodyItem, act) {
-		var header = Protocol.formatHeader(this.ssInf);
+		let header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
 			header.userAct = act;
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
