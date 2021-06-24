@@ -25,12 +25,26 @@ html, body {
   float: left;
   clear: both;
 }
+.multi-answer.btn {
+  text-align: left;
+  float: left;
+  clear: both;
+}
 
 .sweet-alert button {
  border-radius: 0;
     text-transform: uppercase;
     font-weight: 400;
 }
+
+.quiz-check.btn {
+  margin: 4px;
+  margin-right: 20px;
+  background-color: #edd;
+  border-radius: 0;
+  width: 20px;
+}
+
 .quiz-button.btn {
   margin-top: 10px;
   background-color: #ddd;

@@ -53,7 +53,7 @@ class Quizlist extends React.Component {
 
 		pollPath: 'plain-quiz',
 		pollPage: 'poll-anson.html',
-		pollJson: 'serv.private.json', // you should use serv.github.json
+		pollJson: 'private.json', // you should use github.json
 		pollServ: 'localhost',
 
 		// see https://reactjs.org/docs/context.html#caveats
@@ -126,7 +126,13 @@ class Quizlist extends React.Component {
 	}
 
 	onQrCode(e) {
-		this.setState({showqr: !this.state.showqr});
+		e.stopPropagation();
+		let qx = e.currentTarget.getAttribute('qx');
+		qx = parseInt(qx);
+		if (this.state.showqr === qx)
+			this.setState({showqr: -1});
+		else
+			this.setState({showqr: qx});
 	}
 
 	onFormOk(quizId) {
@@ -179,20 +185,20 @@ class Quizlist extends React.Component {
 					<ListItemText primary={L("Share")} />
 				</ListItemIcon>
 			</ListItem>
-			<Collapse in={this.state.showqr} name="qr" timeout="auto" >
-				<QrSharing open={this.state.showqr} qr={
-					{	origin: window.location.origin,
-						path: this.state.pollPath,
-						page: this.state.pollPage,
-						json: this.state.pollJson,
-						serv: this.state.servId,
-						quiz: this.state.quizzes[x].qid
-					}	} />
+			<Collapse in={this.state.showqr === x} name="qr" timeout="auto" >
+				<QrSharing open={this.state.showqr} imgId={q.qid}
+					qr={ {origin: window.location.origin,
+							path: this.state.pollPath,
+							page: this.state.pollPage,
+							json: this.state.pollJson,
+							serv: this.state.pollServ,
+							quiz: this.state.quizzes[x].qid
+					}} />
 			</Collapse>
-			<Collapse in={this.state.currentqx == x} timeout="auto" >
-				<TextField id="qtitle" label="Remarks"
-				  variant="outlined" color="primary"
-				  multiline fullWidth={true} value={this.state.quizzes[x].remarks}
+			<Collapse in={this.state.currentqx === x} timeout="auto" >
+				<TextField  id={'qz-' + x} label="Remarks"
+							variant="outlined" color="primary"
+							multiline fullWidth={true} value={this.state.quizzes[x].quizinfo}
 				 />
 			</Collapse>
 		  </div>)

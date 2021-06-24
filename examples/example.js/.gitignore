@@ -4,5 +4,5 @@ node_modules
 # !react-quiz/dist
 */dist/*.min.js*
 cn.com.inforise
-*.private.html
-*.private.json
+*private.html
+*private.json

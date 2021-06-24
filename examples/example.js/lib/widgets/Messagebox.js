@@ -1,5 +1,6 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+// import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from "@material-ui/core/styles";
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import Dialog from '@material-ui/core/Dialog';
@@ -83,21 +84,37 @@ export class ConfirmDialog extends React.Component {
 	}
 }
 
-export class QrSharing extends React.Component {
+
+const styles = theme => ({
+  root: {
+	backgroundColor: "mint-cream",
+	textAlign: "center",
+	"&:hover": {
+		backgroundColor: "linen"
+	}
+  }
+});
+
+// class ClassComponent extends React.Component {
+//   state = {
+//     searchNodes: ""
+//   };
+//
+//   render() {
+//     const { classes } = this.props;
+//     return (
+//       <div className={classes.root}>Hello!</div>
+//     );
+//   }
+// }
+//
+// const ClassComp = withStyles(styles, { withTheme: true })(ClassComponent);
+// export {ClassComp};
+
+class _QrSharing extends React.Component {
 	state = {
 		closed: false,
 	};
-
-	classes = makeStyles({
-		root: {
-			maxWidth: 345,
-		},
-		media: {
-			height: 140,
-			"text-align": "center"
-		},
-	});
-
 	constructor (props = {}) {
 		super(props);
 		this.handleClose = this.handleClose.bind(this);
@@ -107,13 +124,47 @@ export class QrSharing extends React.Component {
 
 	url() {
 		let qr = this.props.qr;
-		let url = `${qr.origin}/${qr.path}/${qr.page}?json=${qr.json}&serv=${qr.serv || 'localhost'}&quiz=${qr.quiz}`;
-		console.log(url);
+		let url = `${qr.origin}/${qr.path}/${qr.page}?`;
+		url += qr.json ? `json=${qr.json}` : '';
+		url += qr.serv ? `&serv=${qr.serv}` : '';
+		url += qr.quiz ? `&quiz=${qr.quiz}` : '';
 		return url;
 	}
 
 	onCopy() {
-		navigator.clipboard.writeText(this.url());
+		// navigator.clipboard.writeText(this.url());
+		let txt = this.url();
+		copyToClipboard(txt)
+		    .then(() => console.log(txt))
+		    .catch(() => console.error('error copying: ', txt));
+
+		/** return a promise
+		 * @param {string} textToCopy text to be copied
+		 * https://stackoverflow.com/a/65996386/7362888
+		 */
+		function copyToClipboard(textToCopy) {
+			// navigator clipboard api needs a secure context (https)
+			if (navigator.clipboard && window.isSecureContext) {
+			    // navigator clipboard api method'
+			    return navigator.clipboard.writeText(textToCopy);
+			} else {
+			    // text area method
+			    let textArea = document.createElement("textarea");
+			    textArea.value = textToCopy;
+			    // make the textarea out of viewport
+			    textArea.style.position = "fixed";
+			    textArea.style.left = "-999999px";
+			    textArea.style.top = "-999999px";
+			    document.body.appendChild(textArea);
+			    textArea.focus();
+			    textArea.select();
+			    return new Promise((res, rej) => {
+			        // here the magic happens
+			        document.execCommand('copy') ? res() : rej();
+			        textArea.remove();
+			    });
+			}
+		}
 	}
 
 	handleClose(e) {
@@ -131,8 +182,7 @@ export class QrSharing extends React.Component {
 		this.state.title = title;
 		let txtOk = props.ok || props.OK ? props.ok || props.OK : "OK";
 
-		// let qrcode = new QRCode("qrcode");
-		// qrcode.makeCode("..");
+    	const { classes } = this.props;
 
 		var opts = {
 		  errorCorrectionLevel: 'H',
@@ -147,17 +197,18 @@ export class QrSharing extends React.Component {
 
 		let urlTxt = this.url();
 		this.state.url = urlTxt;
+		let imgId = this.props.imgId;
 		QRCode.toDataURL(urlTxt, opts, function (err, url) {
 		  if (err) throw err
-		  let img = document.getElementById('qrcode')
+		  let img = document.getElementById('qrcode ' + imgId)
 		  if(img) img.src = url
 		})
 
 		return (
-			<Card className={this.classes.root}>
+			<Card className={classes.root}>
 			  <CardActionArea>
-				<CardMedia className={this.classes.media} >
-					<img id='qrcode'/>
+				<CardMedia className={classes.media} >
+					<img id={'qrcode ' + this.props.imgId}/>
 				</CardMedia>
 			    <CardContent onClick={this.onCopy}>
 			      <Typography gutterBottom variant="h5" component="h2">
@@ -184,3 +235,6 @@ export class QrSharing extends React.Component {
 		);
 	}
 }
+
+const QrSharing = withStyles(styles)(_QrSharing);
+export {QrSharing};

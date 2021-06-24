@@ -152,6 +152,8 @@ function render(quiz_opts) {
 
 	let $answers;
     let last_question = (question_index + 1 === state.total);
+	let qtype = question.qtype || QuestionType.single;
+	// let qtype = question.qtype || QuestionType.multiple;
 
     //bootstrap carousel
     {
@@ -195,56 +197,79 @@ function render(quiz_opts) {
 			ans1 : ans2 || []
 	}
 
-    $.each(question.answers, function(answer_index, answer) {
-		// create an answer button div
-		// and add to the answer container
-		let ans_btn = $("<div>")
-			.attr('class', 'quiz-button btn')
-			.html(answer)
-			.appendTo($answers);
+    $.each(question.answers, function(ansix, answer) {
+		let ans_btn = qtype === QuestionType.single ?
+					singleAnswer(question, ansix, answer) :
+					multiAnswers(question, ansix, answer);
+		ans_btn.appendTo($answers);
 
-		// default opts for both outcomes
-		let opts = {
-			allowOutsideClick : false,
-			allowEscapeKey : false,
-			confirmButtonText: "Next Question",
-			html : true,
-			confirmButtonColor: "#0096D2"
-		};
+		if (qtype === QuestionType.single)
+			ans_btn.on('click', function() {
+				let qid = this.getAttribute('qid');
+				let aid = this.getAttribute('aid');
+				state.poll[qid] = {};
+				state.poll[qid][aid] = true;
 
-		if (last_question) {
-			opts.confirmButtonText = "Let's finish it!";
+				onNext(last_question || questions.length === 0);
+			});
+		else {
+			// multiple checkbox
+			ans_btn.on('click', function(e, x) {
+				let qid = this.getAttribute('qid');
+				let aid = this.getAttribute('aid');
+
+				console.log($('#' + this.id + ' input:checked').length, qid, aid);
+				let checked = $('#' + this.id + ' input:checked').length > 0;
+				if (!state.poll[qid])
+					state.poll[qid] = {};
+				state.poll[qid][aid] = checked;
+			});
 		}
+    });
+	if (qtype !== QuestionType.single) {
+		btn_next = singleAnswer(questions, -1, "Next")
+				.on('click', function(e) {
+					// Object.assign(state.poll[question.qid] || {}, {ansix: e.target.checked});
+					onNext(last_question || questions.length === 0);
+				}).appendTo($answers);
+	}
 
-		if (question.qtype === QuestionType.single)
-		  ans_btn.on('click', function() {
-			state.poll[question.qid] = answer_index;
+	function onNext(islast) {
+		$quiz.carousel('next');
 
-			$quiz.carousel('next');
-
-			// if we've reached the final question
-			// set the results text
-			if (last_question || questions.length === 0) {
+		// if we've reached the final question
+		// set the results text
+		if (islast) {
 			$results_title.html(resultsText(state));
 			$results_ratio.text( "Thank you for your paticipating!" );
 			$acadynamo_link.attr('href', acadynamo(state, quiz_opts));
-			$acadynamo_link.attr('href', githubrepo(state, quiz_opts));
+			$github_link.attr('href', githubrepo(state, quiz_opts));
 			$indicators.removeClass('show');
 			// indicate the question number
 			$indicators.find('li')
-			  .removeClass('dark')
-			  .eq(0)
-			  .addClass('dark');
-			} else {
+				.removeClass('dark')
+				.eq(0)
+				.addClass('dark');
+		} else {
 			// indicate the question number
 			$indicators.find('li')
-			  .removeClass('dark')
-			  .eq(question_index+1)
-			  .addClass('dark');
-			}
-		  });
-		else ; // multiple checkbox
-    });
+				.removeClass('dark')
+				.eq(question_index+1)
+				.addClass('dark');
+		}
+
+		function acadynamo() {
+			return "https://github.com/REDY-a/ERA";
+		}
+
+		function githubrepo() {
+			return "https://github.com/Georgezhang23/ERA";
+		}
+
+		function resultsText(state) {
+			return "Quiz Finished!";
+		}
+	}
   });
 
   // final results slide
@@ -301,6 +326,37 @@ function render(quiz_opts) {
 
 }
 
+function multiAnswers(question, ansix, answer) {
+	let flin = $('<div/>')
+		.attr('id', `${question.qid}-${ansix}`)
+		.attr('qid', question.qid)
+		.attr('aid', ansix)
+		.attr('class', 'col-md-12 form-group form-inline btn')
+		// .appendTo($answers);
+
+	let ans_btn = $('<label />')
+		.html(answer)
+		.attr('class', 'col-md-10 form-label quiz-button multi-answer btn ')
+		.appendTo(flin);
+
+	ans_btn.prepend($('<input/>')
+		.attr('class', 'col-md-2 quiz-check btn')
+		.attr({ type: 'checkbox', id: `${question.qid}-${ansix}`}));
+
+	return flin;
+}
+
+function singleAnswer(question, ansix, answer) {
+	let ans_btn = $("<div>")
+		.attr('id', `${question.qid}-${ansix}`)
+		.attr('qid', question.qid)
+		.attr('aid', ansix)
+		.attr('class', 'quiz-button btn')
+		.html(answer)
+
+	return ans_btn;
+}
+
 function saveQuiz(state, onOk) {
 	let props = {}
 	let poll = formatArr(state.poll);
@@ -327,27 +383,20 @@ function saveQuiz(state, onOk) {
 			onOk();
 	})
 
+ 	/**
+	 * @param {object} obj {00002: {2, true, 3, true}}
+	 * @return {array} [] ['00002', '2,3']] 0: question id, 1: resutls
+	 */
 	function formatArr(obj) {
 		let arr = [];
-		for (let k in obj) {
-			arr.push([k, String(obj[k])]);
+		for (let qid in obj) {
+			reslts = [];
+			for (let aid in obj[qid])
+				reslts.push(aid);
+			arr.push([qid, reslts.join(',')]);
 		}
 		return arr;
 	}
 }
 
-function resultsText(state) {
-  console.log(state);
-  let ratio = state.correct / state.total;
-  let text;
-  return "Quiz Finished!";
-}
-
-function acadynamo() {
-	return "https://github.com/REDY-a/ERA";
-}
-
-function githubrepo() {
-	return "https://github.com/Georgezhang23/ERA";
-}
 })(jQuery);

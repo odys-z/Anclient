@@ -70,6 +70,8 @@ export class Editor extends React.Component {
 		this.onAdd = this.onAdd.bind(this);
 		this.onSave = this.onSave.bind(this);
 		this.onCheckSingle = this.onCheckSingle.bind(this);
+
+		// this.onChangeVal = this.onChangeVal.bind(this);
 	}
 
 	alert(msg) {
@@ -102,6 +104,10 @@ export class Editor extends React.Component {
 		this.setState({questions, dirty: true});
 	}
 
+	// onChangeVal(comp, value) {
+	// 	this.setValue({value:value});
+	// }
+
 	onAdd(e) {
 		let qx = Editor.getQx();
 		let questions = this.state.questions.splice(0);
@@ -121,6 +127,10 @@ export class Editor extends React.Component {
 	}
 
 	onCheckSingle(e) {
+		let qx = this.state.currentqx;
+		let qtype = this.state.questions[qx].qtype === QuestionType.single ? QuestionType.multiple : QuestionType.single;
+		this.state.questions[qx].qtype = qtype;
+		this.setState({autosave: !this.state.autosave});
 	}
 
 	onSave(e) {
@@ -129,7 +139,8 @@ export class Editor extends React.Component {
 
 		if (!this.jquiz) {
 			let ctx = this.context;
-			this.jquiz = new JQuiz(ctx.anClient, ctx.errHandler);
+			if (ctx && ctx.anClient)
+				this.jquiz = new JQuiz(ctx.anClient, ctx.errHandler);
 		}
 
 		if (!this.state.quizId) {
@@ -190,8 +201,11 @@ export class Editor extends React.Component {
 		if (ctx.quizId && !this.state.dirty) {
 			title = L('loading...');
 
-			if (!this.jquiz)
+			if (!this.jquiz
+				&& ctx && ctx.anClient) // This happends when cancel and loggout. We need understand react more deeply.
 				this.jquiz = new JQuiz(ctx.anClient, ctx.errHandler);
+			if (!this.jquiz)
+					return ( <>Quiz Quited!</> ); // something wrong!
 			this.jquiz.quiz(this.state.quizId, loadQuiz, ctx);
 		}
 		else title = title ? title : L('New Quiz');
@@ -217,14 +231,14 @@ export class Editor extends React.Component {
 				<TextField id="qtitle" label={L("Title")}
 				  variant="outlined" color="primary"
 				  multiline fullWidth={true}
-				  onBlur={e => this.setState({qtitle: e.currentTarget.value})}
-				  defaultValue={title} />
+				  onChange={e => this.setState({qtitle: e.currentTarget.value})}
+				  value={title} />
 
 				<TextField id="quizinfo" label={L("Quiz Description")}
 				  variant="outlined" color="secondary"
 				  multiline fullWidth={true}
-				  onBlur={e => this.state.quizinfo = e.currentTarget.value}
-				  defaultValue={this.state.quizinfo} />
+				  onChange={e => this.setState({quizinfo: e.currentTarget.value})}
+				  value={this.state.quizinfo} />
 			</Collapse>
 
 			{this.items()}

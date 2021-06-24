@@ -17,7 +17,7 @@
 	<li>To start sample service:
 	<pre>
 	docker pull odysz/jserv-quiz
-	docer run --name jserv -dp 8080:8080 odysz/jserv-quiz</pre>
+	docker run --name jserv -dp 8080:8080 odysz/jserv-quiz</pre>
 	<p><b>Note: don't use --rm, currently we haven't yet mounted volume to persist sqlite DB.</b></p>
 	Then use this to test the connecion:<br>
 	<a href='http://localhost:8080/jserv-quiz/login.serv11'>
@@ -33,7 +33,6 @@
 	 "version": "1.0", "seq": 0
 	}</pre>
 	</li>
-	<li><a href='../../plain-quiz/sample.html'>quiz preview</a></li>
   </ul>
   <script src="quiz-0.1.0.min.js"></script>
   <script>
