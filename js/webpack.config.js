@@ -7,7 +7,7 @@
  const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
  var v = 'development';
- var version = "0.9.6";
+ var version = "0.9.27";
 
  module.exports = {
    mode: v, // "production" | "development" | "none"
@@ -21,7 +21,7 @@
      path: path.resolve(__dirname, 'dist'),
      publicPath: "./dist/",
 
-     library: 'jvue',
+     library: 'anreact',
      libraryTarget: 'umd'
    },
 

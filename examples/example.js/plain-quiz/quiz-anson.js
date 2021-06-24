@@ -2,21 +2,30 @@
   Quick quiz bootstrap extension
 */
 
-
 ;(function($) {
 
 // keep track of number of quizes added to page
 var quiz_count = 0;
 
+var that;
 // add jQuery selection method to create
 // quiz structure from question json file
 // "filename" can be path to question json
 // or javascript object
-$.fn.quiz = function(filename) {
-  if (typeof filename === "string") {
-    $.getJSON(filename, render.bind(this));
+$.fn.quiz = function(serv, quizId) {
+  if (!serv && !quizId)
+	// render.bind(this);
+	that = this;
+  else if (typeof quizId === "string") {
+    // $.getJSON(filename, render.bind(this));
+	$.getJSON(`${serv}/${Quizports.quiz}?qid=${quizId}`,
+		render.bind(that),
+		(e,c)=>{
+			console.log(e,c)
+		});
   } else {
-    render.call(this, filename);
+    // render.call(this, filename);
+	console.error("why here?")
   }
 };
 
@@ -26,25 +35,28 @@ function render(quiz_opts) {
 
 
   // list of questions to insert into quiz
-  var questions = quiz_opts.questions;
+  let questions = quiz_opts.questions;
+
+  if (quiz_opts.type === "io.odysz.semantic.jprotocol.AnsonMsg")
+  	questions = quiz_opts.body[0].questions
 
   // keep track of the state of correct
   // answers to the quiz so far
-  var state = {
+  let state = {
     correct : 0,
     total : questions.length
   };
 
-  var $quiz = $(this)
+  let $quiz = $(this)
     .attr("class", "carousel slide")
     .attr("data-ride", "carousel");
 
   // unique ID for container to refer to in carousel
-  var name = $quiz.attr("id") || "urban_quiz_" + (++quiz_count);
+  let name = $quiz.attr("id") || "urban_quiz_" + (++quiz_count);
 
   $quiz.attr('id', name);
 
-  var height = $quiz.height();
+  let height = $quiz.height();
 
 
   /*
@@ -134,7 +146,7 @@ function render(quiz_opts) {
       }
       $("<div>")
         .attr("class", "quiz-question")
-        .html(question.prompt)
+        .html(question.prompt || '[Question Contents]')
         .appendTo($item);
 
       var $answers = $("<div>")
@@ -147,6 +159,12 @@ function render(quiz_opts) {
 
     // for each possible answer to the question
     // add a button with a click event
+	if (typeof question.answers === 'string') {
+		let ans1 = question.answers.split('\\n');
+		let ans2 = question.answers.split('\n');
+		question.answers = ans1 && ans1.length > (ans2 || []).length ?
+			ans1 : ans2 || []
+	}
     $.each(question.answers, function(answer_index, answer) {
 
       // create an answer button div
@@ -331,9 +349,7 @@ function resultsText(state) {
       break;
   }
   return text;
-
 }
-
 
 function tweet(state, opts) {
 

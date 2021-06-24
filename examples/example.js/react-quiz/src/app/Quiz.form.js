@@ -30,7 +30,7 @@ export class QuizForm extends React.Component {
 		super(props);
 
 		this.state.creating = props.creating;
-		this.state.quizId = props.quizId;
+		// this.state.quizId = props.quizId;
 
 		this.onOk = this.onOk.bind(this);
 		this.onCancel = this.onCancel.bind(this);
@@ -56,9 +56,9 @@ export class QuizForm extends React.Component {
 		this.state.closed = false;
 		if (!open) return (<></>);
 
-		let quizId = this.state.quizId
+		let quizId = this.props.quizId
 		if (!quizId)
-			this.state.quizId = quizId = props.quizId;
+			this.state.quizId = quizId;
 
 		let title = props.title ? props.title : '';
 		let msg = props.msg;

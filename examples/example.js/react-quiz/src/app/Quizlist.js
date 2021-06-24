@@ -17,6 +17,7 @@ import React from 'react';
 	import FormControlLabel from '@material-ui/core/FormControlLabel';
 	import Checkbox from '@material-ui/core/Checkbox';
 	import TextField from '@material-ui/core/TextField';
+	import ShareIcon from '@material-ui/icons/Share';
 
 import {L} from '../../../lib/utils/langstr';
 	import {AnContext, AnError} from '../../../lib/an-react';
@@ -25,6 +26,7 @@ import {L} from '../../../lib/utils/langstr';
 	import {Jvector} from '../../../lib/jvector';
 	import {Login} from './Login.cmp.js';
 	import {QuizForm} from './Quiz.form.js';
+	import {QrSharing} from '../../../lib/widgets/Messagebox'
 
 class Quizlist extends React.Component {
 	static getQx() { return ++quid; }
@@ -49,6 +51,11 @@ class Quizlist extends React.Component {
 		openx: -1,        // currently editing
 		creating: false,  // creating a new quiz
 
+		pollPath: 'plain-quiz',
+		pollPage: 'poll-anson.html',
+		pollJson: 'private.json', // you should use github.json
+		pollServ: 'localhost',
+
 		// see https://reactjs.org/docs/context.html#caveats
 		anClient: undefined,
 
@@ -68,6 +75,7 @@ class Quizlist extends React.Component {
 		this.reload = this.reload.bind(this);
 
 		this.onEdit = this.onEdit.bind(this);
+		this.onQrCode = this.onQrCode.bind(this);
 		this.onFormOk = this.onFormOk.bind(this);
 
 		this.onError = this.onError.bind(this);
@@ -114,7 +122,17 @@ class Quizlist extends React.Component {
 			currentqx: qx,
 			openx: qx,
 			creating: false,
-		 	});
+		});
+	}
+
+	onQrCode(e) {
+		e.stopPropagation();
+		let qx = e.currentTarget.getAttribute('qx');
+		qx = parseInt(qx);
+		if (this.state.showqr === qx)
+			this.setState({showqr: -1});
+		else
+			this.setState({showqr: qx});
 	}
 
 	onFormOk(quizId) {
@@ -139,7 +157,9 @@ class Quizlist extends React.Component {
 		function onQuery(resp) {
 			if (resp) {
 				let anquiz = new QuizResp(resp.body);
-				that.setState({quizzes: anquiz.quizzes()});
+				that.setState({
+					quizzes: anquiz.quizzes(),
+				});
 			}
 		}
 	}
@@ -158,13 +178,27 @@ class Quizlist extends React.Component {
 				<ListItemText primary={this.state.quizzes[x].optime}/>
 				<ListItemIcon onClick={this.onEdit} qx={x}>
 					<DraftsIcon />
-					<ListItemText primary="Edit" />
+					<ListItemText primary={L("Edit")} />
+				</ListItemIcon>
+				<ListItemIcon onClick={this.onQrCode} qx={x}>
+					<ShareIcon />
+					<ListItemText primary={L("Share")} />
 				</ListItemIcon>
 			</ListItem>
-			<Collapse in={this.state.currentqx == x} timeout="auto" >
-				<TextField id="qtitle" label="Remarks"
-				  variant="outlined" color="primary"
-				  multiline fullWidth={true} value={this.state.quizzes[x].remarks}
+			<Collapse in={this.state.showqr === x} name="qr" timeout="auto" >
+				<QrSharing open={this.state.showqr} imgId={q.qid}
+					qr={ {origin: window.location.origin,
+							path: this.state.pollPath,
+							page: this.state.pollPage,
+							json: this.state.pollJson,
+							serv: this.state.pollServ,
+							quiz: this.state.quizzes[x].qid
+					}} />
+			</Collapse>
+			<Collapse in={this.state.currentqx === x} timeout="auto" >
+				<TextField  id={'qz-' + x} label="Remarks"
+							variant="outlined" color="primary"
+							multiline fullWidth={true} value={this.state.quizzes[x].quizinfo}
 				 />
 			</Collapse>
 		  </div>)
@@ -179,7 +213,10 @@ class Quizlist extends React.Component {
 
 		// TODO ody: usually App should be the error handler
 		let errHandler = this.state.errors;
-		errHandler.onError = function() { let that = this; return (has) => {that.setState({hasError: has})}; }.bind(this)();
+		errHandler.onError = function() {
+			let that = this;
+			return (has) => { that.setState({hasError: has}); };
+		}.bind(this)();
 
 		return (
 		<AnContext.Provider value={{

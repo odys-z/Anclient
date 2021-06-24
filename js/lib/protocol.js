@@ -119,6 +119,10 @@ class Protocol {
 	};
 
 	Protocol.valOptions = {};
+
+	Protocol.extend = function(newPorts) {
+		Object.assign(Protocol.Port, newPorts);
+	}
 }
 
 /** Regex helper */

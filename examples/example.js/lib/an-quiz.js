@@ -17,6 +17,8 @@ export const quiz_a = {
 	list: 'list',     // load quizzes
 	insert: 'insert', // create new quiz
 	update: 'update', // update quiz
+
+	poll: 'poll',     // submit poll results
 }
 
 export const QuestionType = {
@@ -41,6 +43,9 @@ const QuizProtocol = {
 	quizinfo: "quizinfo",
 	qowner: "qowner",
 	dcreate: "dcreate",
+
+	poll: "poll",
+	pollUser: "pollUser",
 }
 
 export
@@ -55,6 +60,8 @@ class JQuiz {
 		this.ssInf = ssClient.ssInf;
 		this.err = errCtx;
 	}
+
+	static get port() { return 'quiz'; }
 
 	serv (a, conds = {}, onLoad, errCtx) {
 		let req = new UserReq(qconn)
@@ -73,7 +80,7 @@ class JQuiz {
 			remarks: 'quiz.serv' });
 
 		var jreq = new AnsonMsg({
-					port: Protocol.Port.quiz,
+					port: JQuiz.port,
 					header,
 					body: [req]
 				});
@@ -82,11 +89,11 @@ class JQuiz {
 			if (errCtx) {
 				errCtx.hasError = true;
 				errCtx.code = c;
-				errCtx.msg = resp.msg();
+				errCtx.msg = resp.Body().msg();
 			}
 			else console.error(c, resp);
 		});
-		return jreq;
+		return this;
 	}
 
 	/** Create a query request and post back to server.
@@ -97,20 +104,11 @@ class JQuiz {
 	 * */
 	quiz(quizId, onLoad, errCtx) {
 		let that = this;
-		/*
-		let qreq = this.client.query(qconn, "quizzes", "q");
-		qreq.body[0]
-			.j('questions', 't', 't.quizid = q.qid')
-			.l('s_domain', 'd', 'd.did = q.subject')
-			.whereCond("=", "q.qid", `'${qid}'`);
-		*/
-		let jreq = this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
-		return this;
+		return this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
 	}
 
 	list (conds, onLoad, errCtx) {
-		let jreq = this.serv(quiz_a.list, conds, onLoad, errCtx);
-		return this;
+		return this.serv(quiz_a.list, conds, onLoad, errCtx);
 	}
 
 	insert(quiz, onOk) {
@@ -125,7 +123,7 @@ class JQuiz {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		let req = this.client.userReq(qconn, Quizports.quiz,
+		let req = this.client.userReq(qconn, JQuiz.port,
 			new UserReq( qconn, "quizzes", props ).A(quiz_a.insert) );
 
 		this.client.an.post(req, onOk, (c, resp) => {
@@ -148,7 +146,7 @@ class JQuiz {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		let req = this.client.userReq(qconn, Quizports.quiz,
+		let req = this.client.userReq(qconn, JQuiz.port,
 			new UserReq(qconn, "quizzes", props).A(quiz_a.update) );
 
 		this.client.an.post(req, onOk, (c, resp) => {
@@ -170,7 +168,7 @@ class JQuiz {
 		let correct = [];
 		let anss = ans.split("\n");
 		anss.forEach( (a, x) => {
-			if (a.trim().startWith("*"))
+			if (a.trim().startsWith("\*"))
 				correct.push(String(x))
 		});
 		return {qtype: correct.length <= 1 ? QuestionType.single : QuestionType.multiple,
