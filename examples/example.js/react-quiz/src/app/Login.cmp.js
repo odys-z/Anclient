@@ -53,18 +53,19 @@ class LoginComponent extends React.Component {
 		this.ctx = this.context; // FIXME have to?
 	}
 
+	componentDidMount() {
+		// try figure out serv root
+		// if (this.ctx.urlpara && this.ctx.urlpara.serv) {
+		// 	let json = `${window.origin}/plain-quiz/para`
+		// }
+
+	}
 	alert() {
 		this.setState({
 			alert: L('User Id or password is not correct.'),
 			showAlert: true,
 		});
 	}
-
-	// onServUrl(e) {
-	// 	e.stopPropagation();
-	// 	let jserv = e.currentTarget.value;
-	// 	this.setState({jserv})
-	// }
 
 	onLogin() {
 		let that = this;
@@ -119,7 +120,7 @@ class LoginComponent extends React.Component {
 	}
 
 	render() {
-		const classes = this.props;
+		const {classes} = this.props;
 		// This <form> only to disable chrome warning:
 		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
 		return (<div className={classes.root}>

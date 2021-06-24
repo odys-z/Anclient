@@ -95,26 +95,11 @@ const styles = theme => ({
   }
 });
 
-// class ClassComponent extends React.Component {
-//   state = {
-//     searchNodes: ""
-//   };
-//
-//   render() {
-//     const { classes } = this.props;
-//     return (
-//       <div className={classes.root}>Hello!</div>
-//     );
-//   }
-// }
-//
-// const ClassComp = withStyles(styles, { withTheme: true })(ClassComponent);
-// export {ClassComp};
-
 class _QrSharing extends React.Component {
 	state = {
 		closed: false,
 	};
+	
 	constructor (props = {}) {
 		super(props);
 		this.handleClose = this.handleClose.bind(this);
@@ -139,19 +124,18 @@ class _QrSharing extends React.Component {
 		    .catch(() => console.error('error copying: ', txt));
 
 		/** return a promise
+		 *
+		 *  memo: navigator clipboard api needs a secure context (https)
 		 * @param {string} textToCopy text to be copied
 		 * https://stackoverflow.com/a/65996386/7362888
 		 */
 		function copyToClipboard(textToCopy) {
-			// navigator clipboard api needs a secure context (https)
 			if (navigator.clipboard && window.isSecureContext) {
-			    // navigator clipboard api method'
 			    return navigator.clipboard.writeText(textToCopy);
 			} else {
-			    // text area method
 			    let textArea = document.createElement("textarea");
 			    textArea.value = textToCopy;
-			    // make the textarea out of viewport
+
 			    textArea.style.position = "fixed";
 			    textArea.style.left = "-999999px";
 			    textArea.style.top = "-999999px";
@@ -159,7 +143,6 @@ class _QrSharing extends React.Component {
 			    textArea.focus();
 			    textArea.select();
 			    return new Promise((res, rej) => {
-			        // here the magic happens
 			        document.execCommand('copy') ? res() : rej();
 			        textArea.remove();
 			    });
@@ -219,18 +202,6 @@ class _QrSharing extends React.Component {
 			      </Typography>
 			    </CardContent>
 			  </CardActionArea>
-			    {/*
-			      image="/static/images/cards/contemplative-reptile.jpg"
-			      title="Contemplative Reptile"
-			  <CardActions>
-			    <Button size="small" color="primary">
-			      Share
-			    </Button>
-			    <Button size="small" color="primary">
-			      Learn More
-			    </Button>
-			  </CardActions>
-				*/}
 			</Card>
 		);
 	}
