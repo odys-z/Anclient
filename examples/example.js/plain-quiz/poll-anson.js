@@ -27,6 +27,12 @@ const quiz_a = {
 
 	poll: 'poll',     // submit poll results
 }
+
+const QuestionType = {
+	single: "1",
+	multiple: "x"
+}
+
 const an = anreact.an; //.init("http://localhost:8080/jserv-quiz/");
 console.log(an);
 an.understandPorts(Quizports);
@@ -190,53 +196,54 @@ function render(quiz_opts) {
 	}
 
     $.each(question.answers, function(answer_index, answer) {
+		// create an answer button div
+		// and add to the answer container
+		let ans_btn = $("<div>")
+			.attr('class', 'quiz-button btn')
+			.html(answer)
+			.appendTo($answers);
 
-      // create an answer button div
-      // and add to the answer container
-      let ans_btn = $("<div>")
-        .attr('class', 'quiz-button btn')
-        .html(answer)
-        .appendTo($answers);
+		// default opts for both outcomes
+		let opts = {
+			allowOutsideClick : false,
+			allowEscapeKey : false,
+			confirmButtonText: "Next Question",
+			html : true,
+			confirmButtonColor: "#0096D2"
+		};
 
-      // default opts for both outcomes
-      let opts = {
-        allowOutsideClick : false,
-        allowEscapeKey : false,
-        confirmButtonText: "Next Question",
-        html : true,
-        confirmButtonColor: "#0096D2"
-      };
+		if (last_question) {
+			opts.confirmButtonText = "Let's finish it!";
+		}
 
-      if (last_question) {
-        opts.confirmButtonText = "Let's finish it!";
-      }
+		if (question.qtype === QuestionType.single)
+		  ans_btn.on('click', function() {
+			state.poll[question.qid] = answer_index;
 
-      ans_btn.on('click', function() {
-		  state.poll[question.qid] = answer_index;
+			$quiz.carousel('next');
 
-          $quiz.carousel('next');
-
-          // if we've reached the final question
-          // set the results text
-          if (last_question || questions.length === 0) {
-            $results_title.html(resultsText(state));
-            $results_ratio.text( "Thank you for your paticipating!" );
-            $acadynamo_link.attr('href', acadynamo(state, quiz_opts));
-            $acadynamo_link.attr('href', githubrepo(state, quiz_opts));
-            $indicators.removeClass('show');
-            // indicate the question number
-            $indicators.find('li')
-              .removeClass('dark')
-              .eq(0)
-              .addClass('dark');
-          } else {
-            // indicate the question number
-            $indicators.find('li')
-              .removeClass('dark')
-              .eq(question_index+1)
-              .addClass('dark');
-          }
-      });
+			// if we've reached the final question
+			// set the results text
+			if (last_question || questions.length === 0) {
+			$results_title.html(resultsText(state));
+			$results_ratio.text( "Thank you for your paticipating!" );
+			$acadynamo_link.attr('href', acadynamo(state, quiz_opts));
+			$acadynamo_link.attr('href', githubrepo(state, quiz_opts));
+			$indicators.removeClass('show');
+			// indicate the question number
+			$indicators.find('li')
+			  .removeClass('dark')
+			  .eq(0)
+			  .addClass('dark');
+			} else {
+			// indicate the question number
+			$indicators.find('li')
+			  .removeClass('dark')
+			  .eq(question_index+1)
+			  .addClass('dark');
+			}
+		  });
+		else ; // multiple checkbox
     });
   });
 

@@ -53,7 +53,7 @@ class Quizlist extends React.Component {
 
 		pollPath: 'plain-quiz',
 		pollPage: 'poll-anson.html',
-		pollJson: 'serv.private.json',
+		pollJson: 'serv.private.json', // you should use serv.github.json
 		pollServ: 'localhost',
 
 		// see https://reactjs.org/docs/context.html#caveats

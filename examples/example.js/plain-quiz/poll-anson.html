@@ -39,7 +39,6 @@
 		let qid = searchParams.get('quiz');
 		let json = searchParams.get('json');
 
-		// $.getJSON("serv.private.json", // you should use serv.github.json
 		$.getJSON(json,
 			(servs) => {
 				$('#quiz').quiz(servs[serv], qid);
