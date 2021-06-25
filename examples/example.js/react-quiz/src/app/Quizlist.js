@@ -51,10 +51,11 @@ class Quizlist extends React.Component {
 		openx: -1,        // currently editing
 		creating: false,  // creating a new quiz
 
+		// TODO have this configured by user
 		pollPath: 'plain-quiz',
 		pollPage: 'poll-anson.html',
 		pollJson: 'private.json', // you should use github.json
-		pollServ: 'localhost',
+		pollServ: 'host',
 
 		// see https://reactjs.org/docs/context.html#caveats
 		anClient: undefined,

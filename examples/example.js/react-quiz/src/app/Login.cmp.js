@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 import React from 'react';
 	import { withStyles } from '@material-ui/core/styles';
 	import Collapse from '@material-ui/core/Collapse';
@@ -48,18 +50,24 @@ class LoginComponent extends React.Component {
 		this.alert = this.alert.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
-		// this.onServUrl = this.onServUrl.bind(this);
 
 		this.ctx = this.context; // FIXME have to?
 	}
 
 	componentDidMount() {
 		// try figure out serv root
-		// if (this.ctx.urlpara && this.ctx.urlpara.serv) {
-		// 	let json = `${window.origin}/plain-quiz/para`
-		// }
-
+		let json = `${window.origin}/plain-quiz/private.json`
+		let that = this;
+		$.getJSON(json,
+			(servs) => {
+				this.inputRef.value = servs.host;
+				that.setState({jserv: servs.host});
+			}
+		).fail(
+			(e) => { console.warn("Failed geting ", json, e); }
+		)
 	}
+
 	alert() {
 		this.setState({
 			alert: L('User Id or password is not correct.'),

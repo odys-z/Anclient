@@ -59,6 +59,7 @@ $.fn.quiz = function(serv, quizId) {
 	).fail(
 		(e, c) => {
 			console.log(e, c);
+			$('div').html(e.responseText); //.appendTo(this);
 			alert("Network Error: " + serv);
 		}
 	);

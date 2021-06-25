@@ -1,5 +1,4 @@
 import React from 'react';
-// import { makeStyles } from '@material-ui/core/styles';
 import { withStyles } from "@material-ui/core/styles";
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
@@ -17,6 +16,8 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 
 import QRCode from 'qrcode'
+
+import {L, copyToClipboard} from '../utils/langstr';
 
 export class ConfirmDialog extends React.Component {
 	state = {
@@ -99,7 +100,7 @@ class _QrSharing extends React.Component {
 	state = {
 		closed: false,
 	};
-	
+
 	constructor (props = {}) {
 		super(props);
 		this.handleClose = this.handleClose.bind(this);
@@ -123,31 +124,7 @@ class _QrSharing extends React.Component {
 		    .then(() => console.log(txt))
 		    .catch(() => console.error('error copying: ', txt));
 
-		/** return a promise
-		 *
-		 *  memo: navigator clipboard api needs a secure context (https)
-		 * @param {string} textToCopy text to be copied
-		 * https://stackoverflow.com/a/65996386/7362888
-		 */
-		function copyToClipboard(textToCopy) {
-			if (navigator.clipboard && window.isSecureContext) {
-			    return navigator.clipboard.writeText(textToCopy);
-			} else {
-			    let textArea = document.createElement("textarea");
-			    textArea.value = textToCopy;
 
-			    textArea.style.position = "fixed";
-			    textArea.style.left = "-999999px";
-			    textArea.style.top = "-999999px";
-			    document.body.appendChild(textArea);
-			    textArea.focus();
-			    textArea.select();
-			    return new Promise((res, rej) => {
-			        document.execCommand('copy') ? res() : rej();
-			        textArea.remove();
-			    });
-			}
-		}
 	}
 
 	handleClose(e) {
@@ -160,7 +137,6 @@ class _QrSharing extends React.Component {
 		let props = this.props;
 		let open = props.open && !this.state.closed;
 		this.state.closed = false;
-		// if (!open) return <></>;
 		let title = props.title ? props.title : '';
 		this.state.title = title;
 		let txtOk = props.ok || props.OK ? props.ok || props.OK : "OK";
@@ -168,23 +144,23 @@ class _QrSharing extends React.Component {
     	const { classes } = this.props;
 
 		var opts = {
-		  errorCorrectionLevel: 'H',
-		  type: 'image/jpeg',
-		  quality: 0.3,
-		  margin: 1,
-		  color: {
-		    dark:"#010599FF",
-		    light:"#FFBF60FF"
-		  }
+			errorCorrectionLevel: 'H',
+			type: 'image/jpeg',
+			quality: 0.3,
+			margin: 1,
+			color: {
+				dark:"#010599FF",
+				light:"#FFBF60FF"
+			}
 		}
 
 		let urlTxt = this.url();
 		this.state.url = urlTxt;
 		let imgId = this.props.imgId;
 		QRCode.toDataURL(urlTxt, opts, function (err, url) {
-		  if (err) throw err
-		  let img = document.getElementById('qrcode ' + imgId)
-		  if(img) img.src = url
+			if (err) throw err
+			let img = document.getElementById('qrcode ' + imgId)
+			if(img) img.src = url
 		})
 
 		return (
