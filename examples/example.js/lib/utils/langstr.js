@@ -51,3 +51,29 @@ export function L(t, o) {
 		return t;
 	}
 }
+
+/** return a promise
+ *
+ *  memo: navigator clipboard api needs a secure context (https)
+ * @param {string} textToCopy text to be copied
+ * https://stackoverflow.com/a/65996386/7362888
+ */
+export function copyToClipboard(textToCopy) {
+	if (navigator.clipboard && window.isSecureContext) {
+	    return navigator.clipboard.writeText(textToCopy);
+	} else {
+	    let textArea = document.createElement("textarea");
+	    textArea.value = textToCopy;
+
+	    textArea.style.position = "fixed";
+	    textArea.style.left = "-999999px";
+	    textArea.style.top = "-999999px";
+	    document.body.appendChild(textArea);
+	    textArea.focus();
+	    textArea.select();
+	    return new Promise((res, rej) => {
+	        document.execCommand('copy') ? res() : rej();
+	        textArea.remove();
+	    });
+	}
+}

@@ -7,7 +7,8 @@ import {ConfirmDialog} from './widgets/Messagebox'
 
 export const AnContext = React.createContext(
 	//	Anclient
-	{	an: undefined,
+	{	serv: 'http://localhost:8080/jserv-quiz',
+		an: undefined,
 		ssInf: undefined,
 
 		// error handling pattern like

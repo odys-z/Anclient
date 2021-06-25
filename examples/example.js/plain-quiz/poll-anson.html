@@ -44,10 +44,10 @@
 			(servs) => {
 				$('#quiz').quiz(servs[serv], qid);
 			},
-			(e, m) => {
-				console.log(e, m);
-			}
-		)
+		).fail( (e, m) => {
+			console.error(e, m);
+			$('#quiz').html(e.responseText)
+		});
     });
   </script>
 </body>

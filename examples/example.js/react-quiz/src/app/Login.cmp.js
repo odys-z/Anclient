@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 import React from 'react';
 	import { withStyles } from '@material-ui/core/styles';
 	import Collapse from '@material-ui/core/Collapse';
@@ -48,9 +50,22 @@ class LoginComponent extends React.Component {
 		this.alert = this.alert.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
-		// this.onServUrl = this.onServUrl.bind(this);
 
 		this.ctx = this.context; // FIXME have to?
+	}
+
+	componentDidMount() {
+		// try figure out serv root
+		let json = `${window.origin}/plain-quiz/private.json`
+		let that = this;
+		$.getJSON(json,
+			(servs) => {
+				this.inputRef.value = servs.host;
+				that.setState({jserv: servs.host});
+			}
+		).fail(
+			(e) => { console.warn("Failed geting ", json, e); }
+		)
 	}
 
 	alert() {
@@ -59,12 +74,6 @@ class LoginComponent extends React.Component {
 			showAlert: true,
 		});
 	}
-
-	// onServUrl(e) {
-	// 	e.stopPropagation();
-	// 	let jserv = e.currentTarget.value;
-	// 	this.setState({jserv})
-	// }
 
 	onLogin() {
 		let that = this;
@@ -119,7 +128,7 @@ class LoginComponent extends React.Component {
 	}
 
 	render() {
-		const classes = this.props;
+		const {classes} = this.props;
 		// This <form> only to disable chrome warning:
 		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
 		return (<div className={classes.root}>
