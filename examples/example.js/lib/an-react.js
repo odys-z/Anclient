@@ -5,22 +5,27 @@ import React from 'react';
 import {L} from './utils/langstr';
 import {ConfirmDialog} from './widgets/Messagebox'
 
-export const AnContext = React.createContext(
+export const AnContext = React.createContext({
 	//	Anclient
-	{	pageOrigin: '*', // web server host where this page from
-		serv: { id: 'locahost',
-				url: 'http://localhost:8080/jserv-quiz'},
-		an: undefined,
-		ssInf: undefined,
+	an: undefined,
+	ssInf: undefined,
 
-		// error handling pattern like
-		// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
-		error: {
-			onError: undefined,
-			msg: undefined
-		},
+	servId: 'host',
+	servs: { host: 'http://localhost:8080/jserv-quiz' },
+
+	// error handling pattern like
+	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
+	error: {
+		onError: undefined,
+		msg: undefined
+	},
+
+	setServ: function(servId, json) {
+		let me = AnContext;
+		me.servs = Object.assign(me.servs, json);
+		me.servId = servId ? servId : 'host';
 	}
-);
+});
 
 export class AnError extends React.Component {
 	props = undefined;

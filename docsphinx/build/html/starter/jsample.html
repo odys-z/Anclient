@@ -32,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
         <link rel="next" title="About Anclient" href="client.html"/>
         <link rel="prev" title="Welcome to Anclient’s documentation!" href="../index.html"/> 
@@ -81,7 +84,7 @@
             
                 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">About JSample</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">About JSample</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#jsample-quick-start">JSample Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#start-with-binary-release">Start with binary release</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#start-from-source">Start from source</a></li>
@@ -125,7 +128,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/starter/jsample.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/starter/jsample.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -139,10 +142,10 @@
 <h1>About JSample<a class="headerlink" href="#about-jsample" title="Permalink to this headline">¶</a></h1>
 <p>The JSample is an example project showing how to use the semantic-jserv API to
 implement data service.</p>
-<p>Before flowing steps in the Anclient&#8217;s quick start tutorial, you need to setup the
+<p>Before flowing steps in the Anclient’s quick start tutorial, you need to setup the
 sever. The 2 parts must work together though they can be deployed separately.</p>
 <p>JSample is the semantic-* server side sample project, implemented ports like:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">menu</span> <span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">serv</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">menu</span> <span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">serv</span><span class="p">)</span>
 <span class="n">tools</span>
 <span class="o">...</span>
 </pre></div>
@@ -163,15 +166,15 @@ file system.</p>
 <li>import eclipse project</li>
 </ol>
 <p>In Eclipse:</p>
-<div class="highlight-python"><div class="highlight"><pre>File -&gt; Import ... -&gt; Existing Projects into Workspace
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">File</span> <span class="o">-&gt;</span> <span class="n">Import</span> <span class="o">...</span> <span class="o">-&gt;</span> <span class="n">Existing</span> <span class="n">Projects</span> <span class="n">into</span> <span class="n">Workspace</span>
 </pre></div>
 </div>
 <p>Navigate to where the package extracted.</p>
 <ol class="arabic simple" start="3">
-<li>create a servlet server with parameter &#8220;io.oz.root-key&#8221;</li>
+<li>create a servlet server with parameter “io.oz.root-key”</li>
 </ol>
 <p>Here is a sample contex.xml for Tomcat.</p>
-<div class="highlight-XML"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="nt">&lt;Context&gt;</span>
     <span class="nt">&lt;WatchedResource&gt;</span>WEB-INF/web.xml<span class="nt">&lt;/WatchedResource&gt;</span>
     <span class="nt">&lt;WatchedResource&gt;</span>WEB-INF/tomcat-web.xml<span class="nt">&lt;/WatchedResource&gt;</span>
@@ -188,11 +191,11 @@ file system.</p>
 The project and deploy to tomcat with Eclipse, should reporting in console like:</p>
 <a class="reference internal image-reference" href="../_images/01-eclipse-deploy.jpg"><img alt="../_images/01-eclipse-deploy.jpg" src="../_images/01-eclipse-deploy.jpg" style="width: 480px;" /></a>
 <p>Visiting the login serv port:</p>
-<div class="highlight-python"><div class="highlight"><pre>http://&lt;server&gt;/&lt;path e.g. jserv-sample&gt;/login.serv11
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//&lt;</span><span class="n">server</span><span class="o">&gt;/&lt;</span><span class="n">path</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">jserv</span><span class="o">-</span><span class="n">sample</span><span class="o">&gt;/</span><span class="n">login</span><span class="o">.</span><span class="n">serv11</span>
 </pre></div>
 </div>
 <p>You will get some json data like this:</p>
-<div class="highlight-json"><div class="highlight"><pre><span class="p">{</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;io.odysz.semantic.jprotocol.AnsonMsg&quot;</span><span class="p">,</span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;io.odysz.semantic.jprotocol.AnsonMsg&quot;</span><span class="p">,</span>
   <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;exSemantic&quot;</span><span class="p">,</span>
   <span class="nt">&quot;opts&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
   <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="s2">&quot;session&quot;</span><span class="p">,</span>
@@ -210,16 +213,16 @@ The project and deploy to tomcat with Eclipse, should reporting in console like:
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The service is reporting &#8220;No envelope is available&#8221; because the request with GET
-doesn&#8217;t carry correct message. That means it&#8217;s running correctly. the next step
+<p>The service is reporting “No envelope is available” because the request with GET
+doesn’t carry correct message. That means it’s running correctly. the next step
 should be using a client to visit the service.</p>
 <div class="admonition attention">
 <p class="first admonition-title">Attention</p>
 <p class="last">Jserv is heavily depends on CORS data service. To avoid trouble,
-it&#8217;s recommended try an old version of Tomcat first, e.g. 7 or 8. And Configure
+it’s recommended try an old version of Tomcat first, e.g. 7 or 8. And Configure
 web.xml with this:</p>
 </div>
-<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;filter&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;filter&gt;</span>
   <span class="nt">&lt;filter-name&gt;</span>CorsFilter<span class="nt">&lt;/filter-name&gt;</span>
   <span class="nt">&lt;filter-class&gt;</span>org.apache.catalina.filters.CorsFilter<span class="nt">&lt;/filter-class&gt;</span>
   <span class="nt">&lt;init-param&gt;</span>
@@ -242,31 +245,31 @@ web.xml with this:</p>
 <p>You can clone and import the project from here:
 <a class="reference external" href="https://github.com/odys-z/semantic-jserv">semantic-jserv repository</a>.</p>
 <p>The repository contains 2 Eclipse project, the semantic-jserv server library and
-the sample web application&#8217;s sample project, jserv-sample, showing how to use the
+the sample web application’s sample project, jserv-sample, showing how to use the
 library.</p>
-<p>Just import the sample project located in folder &#8220;jserv-sample&#8221;.</p>
+<p>Just import the sample project located in folder “jserv-sample”.</p>
 <ol class="arabic simple" start="2">
 <li>Check JDBC Connections</li>
 </ol>
 <p>JSample using a sqlite3 db file as the default datasource for test. The provided
 project has some ready to run configurations.</p>
-<p>For the first time beginner, it&#8217;s nothing to do here. More datasource configuration
+<p>For the first time beginner, it’s nothing to do here. More datasource configuration
 based on JDBC (both connection pool and driver manager mode) can be found in
 semantic-DA documents.</p>
-<p>It&#8217;s recommended have a look at the JDBC connection file, located in:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">src</span><span class="o">/</span><span class="n">main</span><span class="o">/</span><span class="n">webapp</span><span class="o">/</span><span class="n">WEB</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">connects</span><span class="o">.</span><span class="n">xml</span>
+<p>It’s recommended have a look at the JDBC connection file, located in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">src</span><span class="o">/</span><span class="n">main</span><span class="o">/</span><span class="n">webapp</span><span class="o">/</span><span class="n">WEB</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">connects</span><span class="o">.</span><span class="n">xml</span>
 </pre></div>
 </div>
 <p>3.Update Maven Dependencies</p>
-<p>Right click the imported project, then &#8220;Maven -&gt; Update Project...&#8221;.</p>
+<p>Right click the imported project, then “Maven -&gt; Update Project…”.</p>
 <p>Wait for the project refreshed. Now the project should be ready to be deployed.</p>
 <ol class="arabic simple" start="4">
 <li>Deploy the Web Application</li>
 </ol>
 <p>In this step, you need to check the url path, which will be used to configure
-the client. The tomcat server.xml in Eclipse&#8217;s server configuration section may
+the client. The tomcat server.xml in Eclipse’s server configuration section may
 look like this:</p>
-<div class="highlight-XML"><div class="highlight"><pre><span class="nt">&lt;Server&gt;</span>
+<div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;Server&gt;</span>
   <span class="nt">&lt;Service&gt;</span>
     <span class="nt">&lt;Engine&gt;</span>
       ...
@@ -280,30 +283,30 @@ look like this:</p>
 </pre></div>
 </div>
 <p>If everything goes ok, the console should showing message like this:</p>
-<div class="highlight-python"><div class="highlight"><pre>JSingleton initializing...
-INFO - JDBC initialized using inet (mysql) as default connection.
-config file : .../.metadata/.plugins/org.eclipse.wst.server.core/tmp1/wtpwebapps/jserv-sample/WEB-INF/config.xml
-Loading Semantics:
-    .../.metadata/.plugins/org.eclipse.wst.server.core/tmp1/wtpwebapps/jserv-sample/WEB-INF/semantics.xml
-show tables
-show columns from a_attaches
-show columns from ...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">JSingleton</span> <span class="n">initializing</span><span class="o">...</span>
+<span class="n">INFO</span> <span class="o">-</span> <span class="n">JDBC</span> <span class="n">initialized</span> <span class="n">using</span> <span class="n">inet</span> <span class="p">(</span><span class="n">mysql</span><span class="p">)</span> <span class="k">as</span> <span class="n">default</span> <span class="n">connection</span><span class="o">.</span>
+<span class="n">config</span> <span class="n">file</span> <span class="p">:</span> <span class="o">.../.</span><span class="n">metadata</span><span class="o">/.</span><span class="n">plugins</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">eclipse</span><span class="o">.</span><span class="n">wst</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">core</span><span class="o">/</span><span class="n">tmp1</span><span class="o">/</span><span class="n">wtpwebapps</span><span class="o">/</span><span class="n">jserv</span><span class="o">-</span><span class="n">sample</span><span class="o">/</span><span class="n">WEB</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">Loading</span> <span class="n">Semantics</span><span class="p">:</span>
+    <span class="o">.../.</span><span class="n">metadata</span><span class="o">/.</span><span class="n">plugins</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">eclipse</span><span class="o">.</span><span class="n">wst</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">core</span><span class="o">/</span><span class="n">tmp1</span><span class="o">/</span><span class="n">wtpwebapps</span><span class="o">/</span><span class="n">jserv</span><span class="o">-</span><span class="n">sample</span><span class="o">/</span><span class="n">WEB</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">semantics</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">show</span> <span class="n">tables</span>
+<span class="n">show</span> <span class="n">columns</span> <span class="kn">from</span> <span class="nn">a_attaches</span>
+<span class="n">show</span> <span class="n">columns</span> <span class="kn">from</span> <span class="nn">...</span>
 </pre></div>
 </div>
 <p>Note: while handling requests, you may find some error message in console like:</p>
-<div class="highlight-python"><div class="highlight"><pre>line 1:19 mismatched input &#39;&lt;EOF&gt;&#39; expecting &#39;.&#39;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">line</span> <span class="mi">1</span><span class="p">:</span><span class="mi">19</span> <span class="n">mismatched</span> <span class="nb">input</span> <span class="s1">&#39;&lt;EOF&gt;&#39;</span> <span class="n">expecting</span> <span class="s1">&#39;.&#39;</span>
 </pre></div>
 </div>
-<p>That&#8217;s because of a warning message from <a class="reference external" href="https://github.com/antlr/antlr4">antlr4</a>
+<p>That’s because of a warning message from <a class="reference external" href="https://github.com/antlr/antlr4">antlr4</a>
 upon which semantic-* are heavily based. Till now we find is safe to ignore it.</p>
 <p>Now, using a browser visiting e.g.:</p>
-<div class="highlight-python"><div class="highlight"><pre>http://localhost:8080/jserv-sample/login.serv11
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="n">jserv</span><span class="o">-</span><span class="n">sample</span><span class="o">/</span><span class="n">login</span><span class="o">.</span><span class="n">serv11</span>
 </pre></div>
 </div>
 <p>and should get some error message like above.</p>
-<p>That&#8217;s all! The sample service are running now. Next you should visit the service
+<p>That’s all! The sample service are running now. Next you should visit the service
 using one of the different version of Anclient. See the
-<a class="reference internal" href="client.html#anclient-quickstart-js"><span>js client quick start</span></a> and the java client (TODO doc).</p>
+<a class="reference internal" href="client.html#anclient-quickstart-js"><span class="std std-ref">js client quick start</span></a> and the java client (TODO doc).</p>
 </div>
 </div>
 
@@ -357,7 +360,7 @@ using one of the different version of Anclient. See the
       <script type="text/javascript" src="../_static/jquery.js"></script>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
 
   
 

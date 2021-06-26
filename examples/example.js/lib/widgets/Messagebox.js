@@ -95,7 +95,7 @@ const styles = theme => ({
   }
 });
 
-class _QrSharing extends React.Component {
+class QrSharingComp extends React.Component {
 	state = {
 		closed: false,
 	};
@@ -110,9 +110,8 @@ class _QrSharing extends React.Component {
 	url() {
 		let qr = this.props.qr;
 		let url = `${qr.origin}/${qr.path}/${qr.page}?`;
-		url += qr.json ? `json=${qr.json}` : '';
-		url += qr.serv ? `&serv=${qr.serv}` : '';
-		url += qr.quiz ? `&quiz=${qr.quiz}` : '';
+		url += qr.serv ? `serv=${qr.serv}` : '&serv=';
+		url += qr.quiz ? `&quiz=${qr.quiz}` : '&quiz=';
 		return url;
 	}
 
@@ -122,8 +121,6 @@ class _QrSharing extends React.Component {
 		copyToClipboard(txt)
 		    .then(() => console.log(txt))
 		    .catch(() => console.error('error copying: ', txt));
-
-
 	}
 
 	handleClose(e) {
@@ -182,5 +179,5 @@ class _QrSharing extends React.Component {
 	}
 }
 
-const QrSharing = withStyles(styles)(_QrSharing);
-export {QrSharing};
+const QrSharing = withStyles(styles)(QrSharingComp);
+export {QrSharing, QrSharingComp};

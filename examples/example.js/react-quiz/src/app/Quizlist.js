@@ -1,6 +1,7 @@
+import $ from 'jquery';
 import React from 'react';
 	import ReactDOM from 'react-dom';
-	import { makeStyles } from '@material-ui/core/styles';
+	import { withStyles } from "@material-ui/core/styles";
 	import ListSubheader from '@material-ui/core/ListSubheader';
 	import List from '@material-ui/core/List';
 	import ListItem from '@material-ui/core/ListItem';
@@ -28,19 +29,20 @@ import {L} from '../../../lib/utils/langstr';
 	import {QuizForm} from './Quiz.form.js';
 	import {QrSharing} from '../../../lib/widgets/Messagebox'
 
-class Quizlist extends React.Component {
-	static getQx() { return ++quid; }
 
-	classes = makeStyles({
-		root: {
-			width: '100%',
-			maxWidth: 360,
-		},
-		nested: {
-			minWidth: 24,
-			'background-color': 'azure'
-		},
-	});
+const styles = theme => ({
+	root: {
+		width: '100%',
+		// maxWidth: '800px',
+	},
+	nested: {
+		minWidth: 24,
+		'background-color': 'azure'
+	},
+});
+
+class QuizlistComp extends React.Component {
+	static getQx() { return ++quid; }
 
     state = {
 		userid: '',
@@ -83,6 +85,32 @@ class Quizlist extends React.Component {
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 	}
+
+	// TODO this is acctually an App function
+	// configServ(ctx) {
+	// 	let that = this;
+	// 	$.ajax({
+	// 			dataType: "json",
+	// 			url: 'private.json',
+	// 		} )
+	// 	.done(loadServ)
+	// 	.fail( (e) => {
+	// 		console.warn("Failed on getting ", json, e);
+	// 		if (ctx.jsons.length >= 2) {
+	// 			$.ajax({
+	// 					dataType: "json",
+	// 					url: 'github.json',
+	// 				} )
+	// 			.done(loadServ);
+	// 		}
+	// 	});
+	//
+	// 	function loadServ(servs = {}) {
+	// 		let servId = that.context.servId;
+	// 		that.inputRef.value = servs[servId];
+	// 		that.setState({jserv: servs[servId]});
+	// 	}
+	// }
 
 	onError(has) {
 		that.setState( {hasError: has} );
@@ -220,18 +248,21 @@ class Quizlist extends React.Component {
 			return (has) => { that.setState({hasError: has}); };
 		}.bind(this)();
 
+    	const { classes } = this.props;
+
 		return (
 		<AnContext.Provider value={{
 				pageOrigin: window.origin,
-				servId: this.state.servId,
+				servId: this.props.servId,
+				servs: this.props.servs,
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
 				// TODO ody: usually App should be the error handler
 				errHandler,
 				quizId }} >
 		  <Login onLoginOk={this.onLogin}
-		  		 servJsons={['plain-quiz/private.json', 'plain-quiz/github.json']}
-		  		 onLogout={() => {this.setState({anClient: undefined})} } />
+				 servJsons={['plain-quiz/private.json', 'plain-quiz/github.json']}
+				 onLogout={() => {this.setState({anClient: undefined})} } />
 		  <Box display={this.state.anClient ? "block" : "none"} >
 			<List component="nav"
 				aria-labelledby="nested-list-subheader"
@@ -240,14 +271,13 @@ class Quizlist extends React.Component {
 					  { `User: ${this.state.anClient ? this.state.anClient.ssInf.uid : ''}` }
 					</ListSubheader>
 				}
-				className={ this.classes.root } >
+				className={ classes.root } >
 
 				{this.items()}
 			</List>
-			<div>
-				<ListItemIcon onClick={this.onAdd} ><Add />
-				<ListItemText primary={L("Add")} /></ListItemIcon>
-			</div>
+			<ListItemIcon onClick={this.onAdd} >
+				<Add /><ListItemText primary={L("Add")} />
+			</ListItemIcon>
 		  </Box>
 		  <QuizForm open={this.state.openx >= 0 || creating}
 					creating={creating} quizId={quizId}
@@ -256,14 +286,34 @@ class Quizlist extends React.Component {
 		</AnContext.Provider>);
 	}
 
-	bindQuizzes(elem, servId = 'host') {
-		this.state.servid = servId;
+	/**For test, have elem = undefined
+	 * @param {string} elem html element id
+	 * @param {string} serv serv id
+	 */
+	static bindQuizzes(elem, serv = 'host') {
+		// this.state.servId = serv;
 		if (typeof elem === 'string') {
-			elem = document.getElementById(elem);
-	    	ReactDOM.render(<Quizlist />, elem);
+			$.ajax({
+				dataType: "json",
+				url: 'private.json',
+			})
+			.done(onJsonServ)
+			.fail(
+				$.ajax({
+					dataType: "json",
+					url: 'github.json',
+				})
+				.done(onJsonServ)
+				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
+			)
 		}
-		return this;
+
+		function onJsonServ(json) {
+			let dom = document.getElementById(elem);
+		   	ReactDOM.render(<Quizlist servs={json} servId={serv}/>, dom);
+		}
 	}
 }
 
-export {Quizlist};
+const Quizlist = withStyles(styles)(QuizlistComp);
+export { Quizlist, QuizlistComp };

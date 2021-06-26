@@ -49,6 +49,7 @@ class LoginComp extends React.Component {
 		this.alert = this.alert.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
+		this.configServ = this.configServ.bind(this);
 	}
 
 	/** try figure out serv root
@@ -57,39 +58,47 @@ class LoginComp extends React.Component {
 	 * where serv-id = this.context.servId || host
 	 */
 	componentDidMount() {
-		if (!this.context.servJsons || this.context.servJsons.length < 1) {
-			// TODO we can use error handler here
-			this.context.jsons = ['plain-quiz/private.json', 'plain-quiz/github.json'];
-		}
-		LoginComp.configServ(this.context);
+		// if (!this.context.servJsons || this.context.servJsons.length < 1) {
+		// 	this.context.jsons = ['private.json', 'github.json'];
+		// }
+		this.configServ(this.context);
+		// this.setState({ jserv: serv[servId] })
 		return this;
 	}
 
-	static configServ(ctx) {
-		let json = `${ctx.pageOrigin}/${ctx.jsons[0]}`;
-		$.ajax({
-				dataType: "json",
-				url: json,
-			} )
-		.done(loadServ)
-		.fail( (e) => {
-			console.warn("Failed on getting ", json, e);
-			if (ctx.jsons.length >= 2) {
-				json = `${ctx.pageOrigin}/${ctx.jsons[1]}`;
-				$.ajax({
-						dataType: "json",
-						url: json,
-					} )
-				.done(loadServ);
-			}
-		});
-
-		function loadServ(servs = {}) {
-			let servId = that.context.servId;
-			that.inputRef.value = servs[servId];
-			that.setState({jserv: servs[servId]});
-		}
+	configServ(ctx) {
+		let servId = ctx.servId;
+		this.inputRef.value = ctx.servs[servId];
+		this.state.jserv = ctx.servs[servId];
 	}
+	// configServ(ctx) {
+	// 	let that = this;
+	// 	// let json = `${ctx.pageOrigin}/${ctx.jsons[0]}`;
+	// 	let json = ctx.jsons[0];
+	// 	$.ajax({
+	// 			dataType: "json",
+	// 			url: json,
+	// 		} )
+	// 	.done(loadServ)
+	// 	.fail( (e) => {
+	// 		console.warn("Failed on getting ", json, e);
+	// 		if (ctx.jsons.length >= 2) {
+	// 			// json = `${ctx.pageOrigin}/${ctx.jsons[1]}`;
+	// 			json = ctx.jsons[1];
+	// 			$.ajax({
+	// 					dataType: "json",
+	// 					url: json,
+	// 				} )
+	// 			.done(loadServ);
+	// 		}
+	// 	});
+	//
+	// 	function loadServ(servs = {}) {
+	// 		let servId = that.context.servId;
+	// 		that.inputRef.value = servs[servId];
+	// 		that.setState({jserv: servs[servId]});
+	// 	}
+	// }
 
 	alert() {
 		this.setState({
@@ -151,7 +160,7 @@ class LoginComp extends React.Component {
 	}
 
 	render() {
-		const {classes} = this.props;
+		const { classes } = this.props;
 		// This <form> only to disable chrome warning:
 		// [DOM] Password forms should have (optionally hidden) username fields for accessibility...
 		return (<div className={classes.root}>

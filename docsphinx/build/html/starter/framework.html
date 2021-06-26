@@ -32,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
         <link rel="next" title="Play with Docker" href="../guide/docker.html"/>
         <link rel="prev" title="About Anclient" href="client.html"/> 
@@ -85,8 +88,13 @@
 <li class="toctree-l1"><a class="reference internal" href="jsample.html#jsample-quick-start">JSample Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="client.html">About Anclient</a></li>
 <li class="toctree-l1"><a class="reference internal" href="client.html#js-quick-start">JS Quick Start</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Application Framework</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Application Framework</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#jsample-session-management">JSample Session Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jserv-resolving-rules">JServ resolving rules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#resolving-process">Resolving Process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#when-to-setup">When to setup</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../guide/docker.html">Play with Docker</a></li>
@@ -124,7 +132,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/starter/framework.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/starter/framework.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -141,7 +149,7 @@
 <h2>JSample Session Management<a class="headerlink" href="#jsample-session-management" title="Permalink to this headline">¶</a></h2>
 <p>Jsample implementing session management based on Semantic.jserv, by providing a
 configuration of user class name in config.xml:</p>
-<div class="highlight-XML"><div class="highlight"><pre><span class="nt">&lt;configs&gt;</span>
+<div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;configs&gt;</span>
   <span class="nt">&lt;t</span> <span class="na">id=</span><span class="s">&quot;default&quot;</span> <span class="na">pk=</span><span class="s">&quot;k&quot;</span> <span class="na">columns=</span><span class="s">&quot;k,v&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;c&gt;</span>
       <span class="nt">&lt;k&gt;</span>class-IUser<span class="nt">&lt;/k&gt;</span>
@@ -153,72 +161,141 @@ configuration of user class name in config.xml:</p>
 </div>
 <p>The <em>io.odysz.jsample.SampleUser</em> implementing <em>JUser</em> interface.</p>
 <p>Now the clinet can login to jsample session like this</p>
-<div class="highlight-javascript"><div class="highlight"><pre><span class="k">new</span> <span class="nx">AnClient</span><span class="p">.</span><span class="nx">login</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;pswd&#39;</span><span class="p">,</span>
-    <span class="p">(</span><span class="nx">sessionClient</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">new</span> <span class="nx">AnClient</span><span class="p">.</span><span class="nx">login</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;pswd&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="nx">sessionClient</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
         <span class="nx">save</span><span class="p">(</span><span class="nx">sessionClient</span><span class="p">);</span>
     <span class="p">});</span>
 </pre></div>
 </div>
 <p>or in java</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="kn">package</span> <span class="nn">io.odysz.jclient</span><span class="o">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">io.odysz.jclient</span><span class="p">;</span>
 
 <span class="cm">/**</span>
 <span class="cm"> * Unit test for sample App.</span>
 <span class="cm"> */</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnsonClientTest</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnsonClientTest</span> <span class="p">{</span>
 
-    <span class="kd">private</span> <span class="n">AnsonClient</span> <span class="n">client</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">AnsonClient</span> <span class="n">client</span><span class="p">;</span>
 
     <span class="nd">@BeforeAll</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">Utils</span><span class="o">.</span><span class="na">printCaller</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">Utils</span><span class="p">.</span><span class="na">printCaller</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
         <span class="n">jserv</span> <span class="o">=</span> <span class="s">&quot;http://localhost:8080/doc-base&quot;</span>
-        <span class="n">pswd</span> <span class="o">=</span> <span class="o">...;</span>
-        <span class="n">Clients</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="n">jserv</span><span class="o">);</span>
-    <span class="o">}</span>
+        <span class="n">pswd</span> <span class="o">=</span> <span class="p">...;</span>
+        <span class="n">Clients</span><span class="p">.</span><span class="na">init</span><span class="p">(</span><span class="n">jserv</span><span class="p">);</span>
+    <span class="p">}</span>
 
     <span class="nd">@Test</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">queryTest</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span>
-            <span class="n">SemanticException</span><span class="o">,</span> <span class="n">SQLException</span><span class="o">,</span> <span class="n">GeneralSecurityException</span><span class="o">,</span> <span class="n">AnsonException</span> <span class="o">{</span>
-        <span class="n">String</span> <span class="n">sys</span> <span class="o">=</span> <span class="s">&quot;sys-sqlite&quot;</span><span class="o">;</span>
-        <span class="n">client</span> <span class="o">=</span> <span class="n">Clients</span><span class="o">.</span><span class="na">login</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">,</span> <span class="n">pswd</span><span class="o">);</span>
-        <span class="n">AnsonMsg</span><span class="o">&lt;</span><span class="n">AnQueryReq</span><span class="o">&gt;</span> <span class="n">req</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">sys</span><span class="o">,</span>
-                <span class="s">&quot;a_users&quot;</span><span class="o">,</span> <span class="s">&quot;u&quot;</span><span class="o">,</span>
-                <span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">);</span> <span class="c1">// don&#39;t paging</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">queryTest</span><span class="p">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="p">,</span>
+            <span class="n">SemanticException</span><span class="p">,</span> <span class="n">SQLException</span><span class="p">,</span> <span class="n">GeneralSecurityException</span><span class="p">,</span> <span class="n">AnsonException</span> <span class="p">{</span>
+        <span class="n">String</span> <span class="n">sys</span> <span class="o">=</span> <span class="s">&quot;sys-sqlite&quot;</span><span class="p">;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">Clients</span><span class="p">.</span><span class="na">login</span><span class="p">(</span><span class="s">&quot;admin&quot;</span><span class="p">,</span> <span class="n">pswd</span><span class="p">);</span>
+        <span class="n">AnsonMsg</span><span class="o">&lt;</span><span class="n">AnQueryReq</span><span class="o">&gt;</span> <span class="n">req</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span>
+                <span class="s">&quot;a_users&quot;</span><span class="p">,</span> <span class="s">&quot;u&quot;</span><span class="p">,</span>
+                <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// don&#39;t paging</span>
 
-        <span class="n">req</span><span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">expr</span><span class="o">(</span><span class="s">&quot;userName&quot;</span><span class="o">,</span> <span class="s">&quot;uname&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">expr</span><span class="o">(</span><span class="s">&quot;userId&quot;</span><span class="o">,</span> <span class="s">&quot;uid&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">expr</span><span class="o">(</span><span class="s">&quot;r.roleId&quot;</span><span class="o">,</span> <span class="s">&quot;role&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">j</span><span class="o">(</span><span class="s">&quot;a_roles&quot;</span><span class="o">,</span> <span class="s">&quot;r&quot;</span><span class="o">,</span> <span class="s">&quot;u.roleId = r.roleId&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">where</span><span class="o">(</span><span class="s">&quot;=&quot;</span><span class="o">,</span> <span class="s">&quot;u.userId&quot;</span><span class="o">,</span> <span class="s">&quot;&#39;admin&#39;&quot;</span><span class="o">);</span>
+        <span class="n">req</span><span class="p">.</span><span class="na">body</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">expr</span><span class="p">(</span><span class="s">&quot;userName&quot;</span><span class="p">,</span> <span class="s">&quot;uname&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">expr</span><span class="p">(</span><span class="s">&quot;userId&quot;</span><span class="p">,</span> <span class="s">&quot;uid&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">expr</span><span class="p">(</span><span class="s">&quot;r.roleId&quot;</span><span class="p">,</span> <span class="s">&quot;role&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">j</span><span class="p">(</span><span class="s">&quot;a_roles&quot;</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">,</span> <span class="s">&quot;u.roleId = r.roleId&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="na">where</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="p">,</span> <span class="s">&quot;u.userId&quot;</span><span class="p">,</span> <span class="s">&quot;&#39;admin&#39;&quot;</span><span class="p">);</span>
 
-        <span class="n">client</span><span class="o">.</span><span class="na">commit</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="o">(</span><span class="n">code</span><span class="o">,</span> <span class="n">data</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">{</span>
-                <span class="n">List</span><span class="o">&lt;</span><span class="n">AnResultset</span><span class="o">&gt;</span> <span class="n">rses</span> <span class="o">=</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">AnResultset</span><span class="o">&gt;)</span> <span class="n">data</span><span class="o">.</span><span class="na">rs</span><span class="o">();</span>
-                  <span class="k">for</span> <span class="o">(</span><span class="n">AnResultset</span> <span class="n">rs</span> <span class="o">:</span> <span class="n">rses</span><span class="o">)</span> <span class="o">{</span>
-                      <span class="n">rs</span><span class="o">.</span><span class="na">printSomeData</span><span class="o">(</span><span class="kc">true</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="s">&quot;uid&quot;</span><span class="o">,</span> <span class="s">&quot;uname&quot;</span><span class="o">,</span> <span class="s">&quot;role&quot;</span><span class="o">);</span>
-                      <span class="n">rs</span><span class="o">.</span><span class="na">beforeFirst</span><span class="o">();</span>
-                      <span class="k">while</span><span class="o">(</span><span class="n">rs</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
-                          <span class="n">String</span> <span class="n">uid0</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">&quot;uid&quot;</span><span class="o">);</span>
-                          <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">,</span> <span class="n">uid0</span><span class="o">);</span>
+        <span class="n">client</span><span class="p">.</span><span class="na">commit</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">{</span>
+                <span class="n">List</span><span class="o">&lt;</span><span class="n">AnResultset</span><span class="o">&gt;</span> <span class="n">rses</span> <span class="o">=</span> <span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">AnResultset</span><span class="o">&gt;</span><span class="p">)</span> <span class="n">data</span><span class="p">.</span><span class="na">rs</span><span class="p">();</span>
+                  <span class="k">for</span> <span class="p">(</span><span class="n">AnResultset</span> <span class="n">rs</span> <span class="p">:</span> <span class="n">rses</span><span class="p">)</span> <span class="p">{</span>
+                      <span class="n">rs</span><span class="p">.</span><span class="na">printSomeData</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;uid&quot;</span><span class="p">,</span> <span class="s">&quot;uname&quot;</span><span class="p">,</span> <span class="s">&quot;role&quot;</span><span class="p">);</span>
+                      <span class="n">rs</span><span class="p">.</span><span class="na">beforeFirst</span><span class="p">();</span>
+                      <span class="k">while</span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span> <span class="p">{</span>
+                          <span class="n">String</span> <span class="n">uid0</span> <span class="o">=</span> <span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;uid&quot;</span><span class="p">);</span>
+                          <span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;admin&quot;</span><span class="p">,</span> <span class="n">uid0</span><span class="p">);</span>
 
-                          <span class="n">String</span> <span class="n">roleId</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">&quot;role&quot;</span><span class="o">);</span>
-                          <span class="n">getMenu</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">,</span> <span class="n">roleId</span><span class="o">);</span>
+                          <span class="n">String</span> <span class="n">roleId</span> <span class="o">=</span> <span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;role&quot;</span><span class="p">);</span>
+                          <span class="n">getMenu</span><span class="p">(</span><span class="s">&quot;admin&quot;</span><span class="p">,</span> <span class="n">roleId</span><span class="p">);</span>
 
                           <span class="c1">// function/semantics tests</span>
-                          <span class="n">testUpload</span><span class="o">(</span><span class="n">client</span><span class="o">);</span>
+                          <span class="n">testUpload</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
 
                           <span class="c1">// insert/load oracle reports</span>
-                          <span class="n">testORCL_Reports</span><span class="o">(</span><span class="n">client</span><span class="o">);</span>
-                      <span class="o">}</span>
-                  <span class="o">}</span>
-            <span class="o">},</span> <span class="o">(</span><span class="n">code</span><span class="o">,</span> <span class="n">err</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">{</span>
-                  <span class="n">fail</span><span class="o">(</span><span class="n">err</span><span class="o">.</span><span class="na">msg</span><span class="o">());</span>
-                  <span class="n">client</span><span class="o">.</span><span class="na">logout</span><span class="o">();</span>
-        <span class="o">});</span>
-    <span class="o">}</span>
-<span class="o">}</span>
+                          <span class="n">testORCL_Reports</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+                      <span class="p">}</span>
+                  <span class="p">}</span>
+            <span class="p">},</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">{</span>
+                  <span class="n">fail</span><span class="p">(</span><span class="n">err</span><span class="p">.</span><span class="na">msg</span><span class="p">());</span>
+                  <span class="n">client</span><span class="p">.</span><span class="na">logout</span><span class="p">();</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="jserv-resolving-rules">
+<h2>JServ resolving rules<a class="headerlink" href="#jserv-resolving-rules" title="Permalink to this headline">¶</a></h2>
+<p>Jserv is the json data service used by Anclient. It’s an SOA architect and can be
+connected by Anclient with flexibility.</p>
+<div class="section" id="resolving-process">
+<h3>Resolving Process<a class="headerlink" href="#resolving-process" title="Permalink to this headline">¶</a></h3>
+<p>Since v 0.9.27, Anclient for React using the context, called AnContext, as a
+singleton and implement these rules to resolve / find the jserv address.</p>
+<ol class="arabic simple">
+<li>Ask</li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span><span class="o">/</span><span class="n">app</span><span class="o">-</span><span class="n">path</span><span class="o">/</span><span class="n">privat</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+<p>for configuration to find what the jserv url is.</p>
+<p>A jserv configuration object can be:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;localhost&quot;</span><span class="p">:</span> <span class="s2">&quot;http://localhost:8080/jserv-quiz&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;host-1&quot;</span><span class="p">:</span> <span class="s2">&quot;http://host-1.com:8080/jserv-quiz&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li>If there are errors getting this json data, AnContext will try</li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span><span class="o">/</span><span class="n">app</span><span class="o">-</span><span class="n">path</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">.</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li>The jserv address are managed by AnContext.</li>
+</ol>
+<p>4. When an Anclient supported (React) page is loaded, the page will set a url
+parameter, serv to AnClient.servId. This is used as the default jserv location.
+If there is no such parameter, Anclient will use “host” as the default value.</p>
+<p>5. Ancontext are provided by React application as the type of root context. Nested
+components will use it like a singleton.</p>
+</div>
+<div class="section" id="when-to-setup">
+<h3>When to setup<a class="headerlink" href="#when-to-setup" title="Permalink to this headline">¶</a></h3>
+<p>It’s the deploying process setting what jserv id and ur to be used. Take
+<em>jserv-quiz/react-quiz</em> for example, the jserv id is generated when user create
+the “<em>Share</em>” link, included in the target url as parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">serv</span><span class="o">=</span><span class="s1">&#39;host-1&#39;</span>
+</pre></div>
+</div>
+<p>This will be passed in plain-quiz/poll-anson.html as parameter to initialize the
+React applicaion:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">searchParams</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">URLSearchParams</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">)</span>
+<span class="kd">let</span> <span class="nx">serv</span> <span class="o">=</span> <span class="nx">searchParams</span> <span class="o">?</span> <span class="nx">searchParams</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;serv&#39;</span><span class="p">)</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">;</span>
+<span class="nx">Quizlist</span><span class="p">.</span><span class="nx">bindQuizzes</span><span class="p">(</span><span class="s1">&#39;quizlist&#39;</span><span class="p">,</span> <span class="nx">serv</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Where the <em>quizlist</em> is the id of &lt;div/&gt; for React root component.</p>
+<p>If the parameter doesn’t been found, AnContext will use <em>undefined</em> as id which
+will have AnContext use ‘<em>host</em>’ as default jserv id.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>There are two different serv-id in</p>
+<p><em>react-quiz/quizlist.html?serv=…</em></p>
+<p>and</p>
+<p><em>plain-quiz/poll-anson.html?serv=…</em>.</p>
+<p>The first serv-id specify where Quizlist root component should save it’s data;
+the latter is specified by user while composing quizs and generated in share
+link, which will have target poll save data to there.</p>
+<p class="last">We can’t figure out what’s the scenario a polling page doesn’t use the quiz
+composer’s data service as both share the same quizzes data.</p>
+</div>
 </div>
 </div>
 </div>
@@ -273,7 +350,7 @@ configuration of user class name in config.xml:</p>
       <script type="text/javascript" src="../_static/jquery.js"></script>
       <script type="text/javascript" src="../_static/underscore.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
 
   
 

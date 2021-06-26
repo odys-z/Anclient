@@ -32,22 +32,25 @@
     <div id="quiz"></div>
   </div>
   <script>
-    $(function() {
-    	$('#quiz').quiz(); // bind
+	$(function() {
+		$('#quiz').quiz(); // bind
 
 		let searchParams = new URLSearchParams(window.location.search)
 		let serv = searchParams.get('serv');
 		let qid = searchParams.get('quiz');
-		let json = searchParams.get('json');
 
-		$.getJSON(json,
-			(servs) => {
-				$('#quiz').quiz(servs[serv], qid);
-			},
-		).fail( (e, m) => {
-			console.error(e, m);
-			$('#quiz').html(e.responseText)
+		$.getJSON('private.json', bind)
+		.fail( (e, m) => {
+			$.getJSON('github.json', bind)
+			.fail( (e, m) => {
+				console.error(e, m);
+				$('#quiz').html(e.responseText)
+			});
 		});
+
+		function bind(servs) {
+			$('#quiz').quiz(servs[serv], qid);
+		}
     });
   </script>
 </body>
