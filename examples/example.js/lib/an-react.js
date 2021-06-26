@@ -7,7 +7,9 @@ import {ConfirmDialog} from './widgets/Messagebox'
 
 export const AnContext = React.createContext(
 	//	Anclient
-	{	serv: 'http://localhost:8080/jserv-quiz',
+	{	pageOrigin: '*', // web server host where this page from
+		serv: { id: 'locahost',
+				url: 'http://localhost:8080/jserv-quiz'},
 		an: undefined,
 		ssInf: undefined,
 

@@ -10,7 +10,7 @@
   },
   "scripts": {
     "cp": "cp dist/anclient*.js* ../examples/example.js/common-pkgs/",
-    "build": "webpack-cli",
+    "build": "webpack-cli && cp dist/anclient*.js* ../examples/example.js/common-pkgs/",
     "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
     "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },

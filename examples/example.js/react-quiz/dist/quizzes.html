@@ -36,7 +36,9 @@
   </ul>
   <script src="quiz-0.1.0.min.js"></script>
   <script>
-	new Quizlist().bindQuizzes('quizlist');
+	let searchParams = new URLSearchParams(window.location.search)
+	let serv = searchParams ? undefined : searchParams.get('serv');
+	new Quizlist().bindQuizzes('quizlist', serv);
   </script>
 </body>
 </html>

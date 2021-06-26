@@ -24,7 +24,7 @@ const styles = (theme) => ({
  * Anclinet logging-in component
  * @class
  */
-class LoginComponent extends React.Component {
+class LoginComp extends React.Component {
     state = {
 		loggedin: false,
 		pswd: '123456',
@@ -45,27 +45,50 @@ class LoginComponent extends React.Component {
 
 		this.props = props;
 		this.an = an.an;
-		// this.an.init(props.jserv ? props.jserv : "http://127.0.0.1:8080/jserv-quiz");
 
 		this.alert = this.alert.bind(this);
 		this.onLogout = this.onLogout.bind(this);
 		this.onLogin = this.onLogin.bind(this);
-
-		this.ctx = this.context; // FIXME have to?
 	}
 
+	/** try figure out serv root
+	 * First try ./plain-quiz/private.json/<serv-id>,
+	 * then  ./plain-quiz/github.json/<serv-id>,
+	 * where serv-id = this.context.servId || host
+	 */
 	componentDidMount() {
-		// try figure out serv root
-		let json = `${window.origin}/plain-quiz/private.json`
-		let that = this;
-		$.getJSON(json,
-			(servs) => {
-				this.inputRef.value = servs.host;
-				that.setState({jserv: servs.host});
+		if (!this.context.servJsons || this.context.servJsons.length < 1) {
+			// TODO we can use error handler here
+			this.context.jsons = ['plain-quiz/private.json', 'plain-quiz/github.json'];
+		}
+		LoginComp.configServ(this.context);
+		return this;
+	}
+
+	static configServ(ctx) {
+		let json = `${ctx.pageOrigin}/${ctx.jsons[0]}`;
+		$.ajax({
+				dataType: "json",
+				url: json,
+			} )
+		.done(loadServ)
+		.fail( (e) => {
+			console.warn("Failed on getting ", json, e);
+			if (ctx.jsons.length >= 2) {
+				json = `${ctx.pageOrigin}/${ctx.jsons[1]}`;
+				$.ajax({
+						dataType: "json",
+						url: json,
+					} )
+				.done(loadServ);
 			}
-		).fail(
-			(e) => { console.warn("Failed geting ", json, e); }
-		)
+		});
+
+		function loadServ(servs = {}) {
+			let servId = that.context.servId;
+			that.inputRef.value = servs[servId];
+			that.setState({jserv: servs[servId]});
+		}
 	}
 
 	alert() {
@@ -164,7 +187,7 @@ class LoginComponent extends React.Component {
     }
 }
 
-LoginComponent.contextType = AnContext;
+LoginComp.contextType = AnContext;
 
-const Login = withStyles(styles)(LoginComponent);
-export {Login};
+const Login = withStyles(styles)(LoginComp);
+export { Login, LoginComp };

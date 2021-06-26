@@ -57,6 +57,7 @@ class Quizlist extends React.Component {
 		pollJson: 'private.json', // you should use github.json
 		pollServ: 'host',
 
+		servId: 'host',
 		// see https://reactjs.org/docs/context.html#caveats
 		anClient: undefined,
 
@@ -200,7 +201,7 @@ class Quizlist extends React.Component {
 				<TextField  id={'qz-' + x} label="Remarks"
 							variant="outlined" color="primary"
 							multiline fullWidth={true} value={this.state.quizzes[x].quizinfo}
-				 />
+				/>
 			</Collapse>
 		  </div>)
 		);
@@ -221,12 +222,15 @@ class Quizlist extends React.Component {
 
 		return (
 		<AnContext.Provider value={{
+				pageOrigin: window.origin,
+				servId: this.state.servId,
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
 				// TODO ody: usually App should be the error handler
 				errHandler,
 				quizId }} >
 		  <Login onLoginOk={this.onLogin}
+		  		 servJsons={['plain-quiz/private.json', 'plain-quiz/github.json']}
 		  		 onLogout={() => {this.setState({anClient: undefined})} } />
 		  <Box display={this.state.anClient ? "block" : "none"} >
 			<List component="nav"
@@ -252,8 +256,13 @@ class Quizlist extends React.Component {
 		</AnContext.Provider>);
 	}
 
-	bindQuizzes(elem) {
-	    ReactDOM.render(<Quizlist />, document.getElementById(elem));
+	bindQuizzes(elem, servId = 'host') {
+		this.state.servid = servId;
+		if (typeof elem === 'string') {
+			elem = document.getElementById(elem);
+	    	ReactDOM.render(<Quizlist />, elem);
+		}
+		return this;
 	}
 }
 

@@ -85,7 +85,6 @@ export class ConfirmDialog extends React.Component {
 	}
 }
 
-
 const styles = theme => ({
   root: {
 	backgroundColor: "mint-cream",

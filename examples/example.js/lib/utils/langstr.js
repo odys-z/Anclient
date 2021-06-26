@@ -65,9 +65,10 @@ export function copyToClipboard(textToCopy) {
 	    let textArea = document.createElement("textarea");
 	    textArea.value = textToCopy;
 
-	    textArea.style.position = "fixed";
-	    textArea.style.left = "-999999px";
-	    textArea.style.top = "-999999px";
+	    // textArea.style.position = "fixed";
+	    // textArea.style.left = "-999999px";
+	    // textArea.style.top = "-999999px";
+		textArea.style.display = "none";
 	    document.body.appendChild(textArea);
 	    textArea.focus();
 	    textArea.select();
