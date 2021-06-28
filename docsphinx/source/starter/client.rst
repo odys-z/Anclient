@@ -109,8 +109,8 @@ a time (configured at server side), the session will expired
 The query is a simple SQL example. It's wrapped by upper widget binding layer to
 produce automatic data bindings.
 
-Example: x-visual
------------------
+Example: xvisual
+----------------
 
 Copy the released template project form the `release section <https://github.com/odys-z/Anclient/releases/>`_.
 
@@ -118,7 +118,7 @@ Anclient has multiple samples (in the future) sharing node's modules. You can al
 install those like this ::
 
     -+- examples.js
-     |--- x-visual
+     |--- xvisual
      |--- sampel-TODO
 
 To install dependencies::
@@ -138,7 +138,7 @@ If everything is OK, following dependencies should be installed::
 
 Install webpack for the sample project::
 
-    cd x-visual
+    cd xvisual
     npm init
     npm install webpack webpack-cli --save-dev
 
@@ -157,7 +157,7 @@ examples.js (index.html used 2 level parent path)::
 
 Then browse to::
 
-    http://localhost:8080/x-visual/bar-chart/
+    http://localhost:8080/xvisual/bar-chart/
 
 This example also will visiting the jserv-sample data service.
 See :ref:`JSample quick start <jsample-quick-start>` for how to setup it.
@@ -167,7 +167,7 @@ connection id = "raw-vec". The database has a table named vector, with some data
 
 .. image:: imgs/02-vectors.jpg
 
-The example/x-visual/app.js created the Anclient querying data from jseer-sample:
+The example/xvisual/app.js created the Anclient querying data from jseer-sample:
 
 .. code-block:: javascript
 
@@ -183,7 +183,7 @@ The example/x-visual/app.js created the Anclient querying data from jseer-sample
     });
 ..
 
-The examples/x-visual/bars.js will creating cubes with size of vector values. The
+The examples/xvisual/bars.js will creating cubes with size of vector values. The
 geometry parameters of bars are bound with vector data:
 
 .. code-block:: javascript
