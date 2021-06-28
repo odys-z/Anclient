@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Bar Chart</title>
+</head>
+<body>
+	<p>2021.5.18 not working yet?</p>
+   <canvas id="canv" width="1920px" height="960px"></canvas>
+<script type="text/javascript" src="cn.com.inforise/cube.js"></script>
+<script type='text/javascript' src='../dist/cube-chart.min.js'></script>
+<script>
+	/**
+	fetch('cn.com.inforise/bar.json',{
+			method: 'GET',
+			mode: 'cors',
+			referrer: 'no-referrer'
+		} ).then(response =>
+			response.json()
+		).then(data => {
+			console.log(data);
+			let cube = new Chart.CubeChart();
+				cube.start("canv",data);
+		} );
+	*/
+	var app = new App('canv',
+			  'http://127.0.0.1:8080/jserv-sample');
+
+	// {vectors, x, y, z}
+	app.load((data) => {
+		data = data.body[0];
+		console.log(data);
+		let cube = new Chart.CubeChart();
+		cube.start('canv', data);
+	});
+
+</script>
+</body>
+</html>
