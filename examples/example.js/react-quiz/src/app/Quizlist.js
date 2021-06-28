@@ -33,11 +33,10 @@ import {L} from '../../../lib/utils/langstr';
 const styles = theme => ({
 	root: {
 		width: '100%',
-		// maxWidth: '800px',
 	},
 	nested: {
 		minWidth: 24,
-		'background-color': 'azure'
+		backgroundColor: 'azure'
 	},
 });
 
