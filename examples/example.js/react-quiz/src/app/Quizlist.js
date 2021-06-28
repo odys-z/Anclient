@@ -44,7 +44,7 @@ const styles = theme => ({
 class QuizlistComp extends React.Component {
 	static getQx() { return ++quid; }
 
-    state = {
+	state = {
 		userid: '',
 		pswd: '',
 		username: '',
@@ -64,12 +64,15 @@ class QuizlistComp extends React.Component {
 		anClient: undefined,
 
 		hasError: false,
-		errors: { },
+		errHandler: { },
     };
 
 	constructor(props = {}) {
 		super(props);
 		this.state.quizzes = props.quizzes || [];
+
+		// initialize target poll using what jserv this page use, let use change it later
+		this.state.pollServ = props.servId || 'host';
 
 		this.onSelect = this.onSelect.bind(this);
 		this.onFind = this.onFind.bind(this);
@@ -84,33 +87,15 @@ class QuizlistComp extends React.Component {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-	}
 
-	// TODO this is acctually an App function
-	// configServ(ctx) {
-	// 	let that = this;
-	// 	$.ajax({
-	// 			dataType: "json",
-	// 			url: 'private.json',
-	// 		} )
-	// 	.done(loadServ)
-	// 	.fail( (e) => {
-	// 		console.warn("Failed on getting ", json, e);
-	// 		if (ctx.jsons.length >= 2) {
-	// 			$.ajax({
-	// 					dataType: "json",
-	// 					url: 'github.json',
-	// 				} )
-	// 			.done(loadServ);
-	// 		}
-	// 	});
-	//
-	// 	function loadServ(servs = {}) {
-	// 		let servId = that.context.servId;
-	// 		that.inputRef.value = servs[servId];
-	// 		that.setState({jserv: servs[servId]});
-	// 	}
-	// }
+		// TODO ody: usually App should be the error handler
+		this.state.errHandler.onError = function() {
+			let that = this;
+			return (has) => {
+				that.setState({hasError: has});
+			};
+		}.bind(this)();
+	}
 
 	onError(has) {
 		that.setState( {hasError: has} );
@@ -171,7 +156,7 @@ class QuizlistComp extends React.Component {
 	}
 
 	onLogin(client) {
-		this.jquiz = new JQuiz(client);
+		this.jquiz = new JQuiz(client, this.state.errHandler);
 
 		this.setState({anClient: client});
 		this.reload();
@@ -241,13 +226,6 @@ class QuizlistComp extends React.Component {
 		let creating = this.state.creating;
 		this.state.creating = false;
 
-		// TODO ody: usually App should be the error handler
-		let errHandler = this.state.errors;
-		errHandler.onError = function() {
-			let that = this;
-			return (has) => { that.setState({hasError: has}); };
-		}.bind(this)();
-
     	const { classes } = this.props;
 
 		return (
@@ -258,7 +236,7 @@ class QuizlistComp extends React.Component {
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
 				// TODO ody: usually App should be the error handler
-				errHandler,
+				errHandler: this.state.errHandler,
 				quizId }} >
 		  <Login onLoginOk={this.onLogin}
 				 servJsons={['plain-quiz/private.json', 'plain-quiz/github.json']}
@@ -282,11 +260,16 @@ class QuizlistComp extends React.Component {
 		  <QuizForm open={this.state.openx >= 0 || creating}
 					creating={creating} quizId={quizId}
 					onOk={this.onFormOk} />
-		  {this.state.hasError && <AnError error={this.state.errors} onClose={this.onErrorClose} />}
+		  {this.state.hasError && <AnError onClose={this.onErrorClose} />}
 		</AnContext.Provider>);
 	}
 
-	/**For test, have elem = undefined
+	/**Try figure out serv root.
+	 * First try ./plain-quiz/private.json/<serv-id>,
+	 * then  ./plain-quiz/github.json/<serv-id>,
+	 * where serv-id = this.context.servId || host
+	 *
+	 * For test, have elem = undefined
 	 * @param {string} elem html element id
 	 * @param {string} serv serv id
 	 */

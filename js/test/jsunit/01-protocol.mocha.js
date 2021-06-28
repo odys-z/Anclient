@@ -91,6 +91,39 @@ const TestPorts = {
 	test2: "hello.serv"
 };
 
+const ajaxError = {
+	"readyState":4,
+	"responseText": `{
+		"type": "io.odysz.semantic.jprotocol.AnsonMsg",
+		"code": "ok",
+		"opts": null,
+		"port": "quiz.serv", "header": null,
+		"body": [{
+			"type": "io.odysz.jquiz.QuizResp",
+			"rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+			"a": null, "conn": null,
+			"data": {
+				"type": "io.odysz.semantics.SemanticObject",
+				"props": {
+					"rs": [{
+						"type": "io.odysz.module.rs.AnResultset", "stringFormats": null, "total": 1, "rowCnt": 1, "colCnt": 15,
+						"colnames": {
+							"DCREATE": [8, "dcreate"], "EXTRA": [10, "extra"], "REMARKS": [15, "remarks"], "OPER": [2, "oper"],
+							"QID": [1, "qid"], "OPTIME": [4, "optime"], "PARENT": [13, "parent"], "QOWNER": [7, "qowner"],
+							"LABEL": [14, "label"], "SUBJECT": [9, "subject"], "QUIZINFO": [6, "quizinfo"],
+							"TITLE": [3, "title"], "TAG": [12, "tag"], "DID": [11, "did"], "TAGS": [5, "tags"] },
+						"rowIdx": 0,
+						"results": [["000001", "admin", "a", "2021-06-27 03:17:27", null, "d \"escape error here\"", "admin", "2021-06-27T03:17:27.663Z", null, null, null, null, null, null, null]]
+					}],
+					"total": [1]
+			}},
+			"m": "list loaded", "map": null
+			}], "version": "1.0", "seq": 0
+	}`,
+	"status":200,
+	"statusText":"parsererror"
+}
+
 describe('case: [Protocol.Port]', () => {
     it('extending port', () => {
 		let an = new AnClient();
@@ -104,8 +137,8 @@ describe('case: [Protocol.Port]', () => {
 });
 
 describe('case: [Protocol/AnsonMsg]', () => {
-    it('Ajax error handling', () => {
-		debugger
+    it('Ajax error handling 1', () => {
+		// TODO where this is used? let's remove it
 		let json = { "readyState":0, "status":0, "statusText":"error" };
 
 		json.code = Protocol.MsgCode.exIo,
@@ -114,8 +147,21 @@ describe('case: [Protocol/AnsonMsg]', () => {
 				m: 'Ajax: network failed!'
 			} ];
 		let rp = new AnsonMsg( json );
-        assert.equal(rp.code, 'exIo', "- 1 -");
-		assert.equal(rp.Body().msg(), 'Ajax: network failed!', "- 2 -");
+        assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- 1 -");
+        assert.equal(rp.code, 'exIo', "- 2 -");
+		assert.equal(rp.Body().type, 'io.odysz.semantic.jprotocol.AnsonResp', "- 3 -");
+		assert.equal(rp.Body().msg(), 'Ajax: network failed!', "- 4 -");
+	});
+
+    it('Ajax error handling 2', () => {
+		// TODO let's use this replace above tested funtion
+		let rp = AnClient.fromAjaxError(ajaxError);
+        assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- A -");
+        assert.equal(rp.code, 'exIo', "- B -");
+		assert.equal(rp.Body().type, 'io.odysz.semantic.jprotocol.AnsonResp', "- C -");
+		assert.equal(rp.Body().msg(), 'Ajax: parsererror', "- D -");
+		assert.equal(rp.Body().ajax.statusText, ajaxError.statusText, "- E -");
+		assert.equal(rp.Body().ajax.responseText, ajaxError.responseText, "- F -");
 	});
 
     it('UserReq handling', () => {

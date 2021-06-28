@@ -223,12 +223,14 @@ class AnClient {
 						onErr(Protocol.MsgCode.exIo, new AnsonMsg(resp));
 					}
 					else {
-						resp = new AnsonMsg({
-							port: resp.port,
-							header: resp.header,
-							body: [ { type: 'io.odysz.semantic.jprotocol.AnsonResp',
-									  m: 'Ajax: network failed: ' + resp.status } ]
-						});
+						if (resp.code || resp.port || !resp.status)
+							resp = new AnsonMsg({
+								port: resp.port,
+								header: resp.header,
+								body: [ { type: 'io.odysz.semantic.jprotocol.AnsonResp',
+										  m: 'Ajax: network failed: ' + resp.status } ]
+							});
+						else resp = fromAjaxError(resp);
 						onErr(Protocol.MsgCode.exIo, resp);
 					}
 				}
@@ -310,6 +312,27 @@ class AnClient {
 		if (resp.body[0].rs[0].results) {
 			return resp.body[0].rs[0].results.splice(start, len)
 		}
+	}
+
+	/// helpers
+	/** Try change ajax error object to AnsonMsg<AnsonResp>
+	 * @param {object} ajaxResp
+	 * @return {AnsonMsg<AnsonResp>}
+	 */
+	static fromAjaxError(ajaxResp) {
+		let json = {};
+		json.code = Protocol.MsgCode.exIo;
+		json.body = [ {
+				type: 'io.odysz.semantic.jprotocol.AnsonResp',
+				m: 'Ajax: ' + ajaxResp.statusText,
+			} ];
+		json.ajax = {
+			responseText: ajaxResp.responseText,
+			statusText: ajaxResp.statusText,
+			status: ajaxResp.status,
+			readyState: ajaxResp.readyState
+		};
+		return new AnsonMsg( json );
 	}
 }
 

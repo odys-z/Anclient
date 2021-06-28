@@ -177,17 +177,9 @@ class AnsonMsg {
 		// string options, like no-null: true for asking server replace null with ''.
 		this.opts = Protocol.valOptions;
 
-		/**Protocol.Port property name, use this name to get port url */
-		// let prts = Protocol.Port;
-		// let msg = this;
-		// console.log(Protocol.Port, Object.getOwnPropertyNames(prts), port);
-		// Object.getOwnPropertyNames(prts).forEach(function(val, idx, array) {
-		// 	if (prts[val] === port) {
-		// 		console.log(val + ' -> ' + obj[val]);
-		// 		msg.port = val;
-		// 		return false;
-		// 	}
-		// });
+		// moc the ajax error
+		if (json.ajax)
+			body.ajax = json.ajax;
 
 		if (header)
 			this.header = header;

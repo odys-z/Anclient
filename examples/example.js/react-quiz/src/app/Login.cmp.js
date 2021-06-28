@@ -52,17 +52,8 @@ class LoginComp extends React.Component {
 		this.configServ = this.configServ.bind(this);
 	}
 
-	/** try figure out serv root
-	 * First try ./plain-quiz/private.json/<serv-id>,
-	 * then  ./plain-quiz/github.json/<serv-id>,
-	 * where serv-id = this.context.servId || host
-	 */
 	componentDidMount() {
-		// if (!this.context.servJsons || this.context.servJsons.length < 1) {
-		// 	this.context.jsons = ['private.json', 'github.json'];
-		// }
 		this.configServ(this.context);
-		// this.setState({ jserv: serv[servId] })
 		return this;
 	}
 
@@ -71,34 +62,6 @@ class LoginComp extends React.Component {
 		this.inputRef.value = ctx.servs[servId];
 		this.state.jserv = ctx.servs[servId];
 	}
-	// configServ(ctx) {
-	// 	let that = this;
-	// 	// let json = `${ctx.pageOrigin}/${ctx.jsons[0]}`;
-	// 	let json = ctx.jsons[0];
-	// 	$.ajax({
-	// 			dataType: "json",
-	// 			url: json,
-	// 		} )
-	// 	.done(loadServ)
-	// 	.fail( (e) => {
-	// 		console.warn("Failed on getting ", json, e);
-	// 		if (ctx.jsons.length >= 2) {
-	// 			// json = `${ctx.pageOrigin}/${ctx.jsons[1]}`;
-	// 			json = ctx.jsons[1];
-	// 			$.ajax({
-	// 					dataType: "json",
-	// 					url: json,
-	// 				} )
-	// 			.done(loadServ);
-	// 		}
-	// 	});
-	//
-	// 	function loadServ(servs = {}) {
-	// 		let servId = that.context.servId;
-	// 		that.inputRef.value = servs[servId];
-	// 		that.setState({jserv: servs[servId]});
-	// 	}
-	// }
 
 	alert() {
 		this.setState({

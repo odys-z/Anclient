@@ -208,7 +208,7 @@ export class Editor extends React.Component {
 					return ( <>Quiz Quited!</> ); // something wrong!
 			this.jquiz.quiz(this.state.quizId, loadQuiz, ctx);
 		}
-		else title = title ? title : L('New Quiz');
+		// else title = title ? title : L('New Quiz');
 
 		let that = this;
 

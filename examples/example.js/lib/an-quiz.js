@@ -52,18 +52,18 @@ export
 /** Helper handling protocol / data type of quiz.serv */
 class JQuiz {
 	/**@param {SessionClient} ssClient client created via login
-	 * @param {AnContext.errors} errCtx error handler's context.
+	 * @param {object} errHandler, AnContext.error, the app error handler
 	 */
-	constructor (ssClient, errCtx) {
+	constructor (ssClient, errHandler) {
 		ssClient.an.understandPorts(Quizports);
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
-		this.err = errCtx;
+		this.err = errHandler;
 	}
 
 	static get port() { return 'quiz'; }
 
-	serv (a, conds = {}, onLoad, errCtx) {
+	serv (a, conds = {}, onLoad, errHandler) {
 		let req = new UserReq(qconn)
 			.A(a); // this is a reading request
 
@@ -74,7 +74,7 @@ class JQuiz {
 
 		// for logging user action at server side.
 		this.client.usrAct({
-			func: 'read',
+			func: 'quiz',
 			cmd: a,
 			cate: Protocol.CRUD.r,
 			remarks: 'quiz.serv' });
@@ -86,10 +86,11 @@ class JQuiz {
 				});
 
 		this.client.an.post(jreq, onLoad, (c, resp) => {
-			if (errCtx) {
-				errCtx.hasError = true;
-				errCtx.code = c;
-				errCtx.msg = resp.Body().msg();
+			if (errHandler) {
+				errHandler.hasError = true;
+				errHandler.code = c;
+				errHandler.msg = resp.Body().msg();
+				errHandler.onError(true);
 			}
 			else console.error(c, resp);
 		});
@@ -102,13 +103,13 @@ class JQuiz {
 	 * @param {string} quizId quiz id
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
 	 * */
-	quiz(quizId, onLoad, errCtx) {
+	quiz(quizId, onLoad, errHandler) {
 		let that = this;
-		return this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
+		return this.serv(quiz_a.quiz, {quizId}, onLoad, errHandler);
 	}
 
-	list (conds, onLoad, errCtx) {
-		return this.serv(quiz_a.list, conds, onLoad, errCtx);
+	list (conds, onLoad) {
+		return this.serv(quiz_a.list, conds, onLoad, this.err);
 	}
 
 	insert(quiz, onOk) {

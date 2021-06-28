@@ -10,8 +10,11 @@ export const AnContext = React.createContext({
 	an: undefined,
 	ssInf: undefined,
 
+	pageOrigin: '.',
 	servId: 'host',
 	servs: { host: 'http://localhost:8080/jserv-quiz' },
+
+	quizId: undefined,
 
 	// error handling pattern like
 	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
@@ -19,6 +22,7 @@ export const AnContext = React.createContext({
 		onError: undefined,
 		msg: undefined
 	},
+	hasError: false,
 
 	setServ: function(servId, json) {
 		let me = AnContext;
@@ -40,7 +44,7 @@ export class AnError extends React.Component {
 	}
 
 	render() {
-		let ctx = this.context;
+		let ctx = this.context;// .errors;
 		return (
 			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
 					open={!!ctx.hasError} onClose={this.state.props.onClose}
