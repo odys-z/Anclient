@@ -1,5 +1,5 @@
 {
-  "name": "anclient-example.js",
+  "name": "anclient-examples.js",
   "version": "1.0.0",
   "description": "This file is only for install node_modules, avoiding npm ERR! code EINVALIDTAGNAME.",
   "main": "",
@@ -24,6 +24,7 @@
     "babel-loader": "^8.2.2",
     "chai": "^4.3.4",
     "css-loader": "^5.2.6",
+    "earcut": "^2.2.2",
     "exports-loader": "^3.0.0",
     "jquery": "^3.6.0",
     "jsdom": "^16.6.0",
@@ -38,5 +39,7 @@
     "webpack": "^5.39.1",
     "webpack-cli": "^4.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "x-visual": "^0.3.86"
+  }
 }

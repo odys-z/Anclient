@@ -1,0 +1,16 @@
+{
+  "name": "anclient.xv",
+  "version": "0.1.0",
+  "description": "X-visual data layer example based on Anclient",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+	"build": "webpack"
+  },
+  "author": "Odys Zhou",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^5.26.3",
+    "webpack-cli": "^4.5.0"
+  }
+}

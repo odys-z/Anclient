@@ -19,7 +19,7 @@ Go
 
 ```
 	http://localhost/react-quiz/editor.html
-	http://localhost/x-visual/bar-chart/docker.html
+	http://localhost/xvisual/bar-chart/docker.html
 ```
 
 - Pull from Docker Hub:
@@ -36,6 +36,6 @@ here sharing the same node's modules. See [the question answer](https://stackove
 Partly available [here](https://odys-z.github.io/Anclient/), currently only
 "quick start".
 
-## x-visual
+## xvisual
 
 Integrating [x-visual](https://github.com/odys-z/x-visual) with Anclient.js
