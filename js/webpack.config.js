@@ -1,5 +1,3 @@
-/**TODO We should separate this file into two files, one for basic semantics config,
- * one for the vue layer. */
  var path = require('path')
  var webpack = require('webpack')
 
@@ -12,7 +10,7 @@
  module.exports = {
    mode: v, // "production" | "development" | "none"
    devtool: 'source-map',
-   entry: { // anvue: './lib/view/vue/jcomponents.js',
+   entry: { anreact: './lib/view/react/an-react.js',
    			anclient: './lib/anclient.js'},
 
    output: {

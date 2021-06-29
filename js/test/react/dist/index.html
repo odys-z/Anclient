@@ -2,8 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Quiz Manager</title>
+  <title>AnClient for react test</title>
 </head>
 
 <body>
@@ -41,11 +40,11 @@
         &amp; <a href='https://material-ui.com'>Material UI</a>
     </li>
   </ul>
-  <script src="dist/app-1.0.0.min.js"></script>
+  <script src="app-1.0.0.min.js"></script>
   <script>
 	let searchParams = new URLSearchParams(window.location.search)
-	let serv = searchParams ? searchParams.get('serv') : undefined;
-	Quizlist.bindQuizzes('quizlist', serv);
+	let servId = searchParams ? searchParams.get('serv') : undefined;
+	App.bindApp('app', servId);
   </script>
 </body>
 </html>

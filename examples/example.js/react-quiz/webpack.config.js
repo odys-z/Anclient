@@ -2,12 +2,12 @@ var path = require('path')
 var webpack = require('webpack')
 
 var v = 'development';// "production" | "development" | "none"
-var version = "0.1.0";
+var version = "1.0.0";
 
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: { 'app': './src/app/App.js',
+	entry: { // 'app': './src/app/App.js',
 			 'quiz': './src/app/Quizlist.js',
 			 'editor': './src/app/Editor.js' },
 

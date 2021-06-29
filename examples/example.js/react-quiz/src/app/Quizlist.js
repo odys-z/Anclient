@@ -263,9 +263,9 @@ class QuizlistComp extends React.Component {
 		</AnContext.Provider>);
 	}
 
-	/**Try figure out serv root.
-	 * First try ./plain-quiz/private.json/<serv-id>,
-	 * then  ./plain-quiz/github.json/<serv-id>,
+	/**Try figure out serv root, then bind to html tag.
+	 * First try ./private.json/<serv-id>,
+	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
 	 *
 	 * For test, have elem = undefined

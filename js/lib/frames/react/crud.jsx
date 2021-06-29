@@ -1,10 +1,14 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import { AnContext, AnError } from '../../lib/frames/react/an-react.jsx'
+import { AnContext, AnError } from './an-react.jsx'
 
-const style = (theme) => {
-
-}
+const styles = (theme) => ( {
+	root: {
+		"& :hover": {
+			backgroundColor: '#777'
+		}
+	}
+} );
 
 class CrudComp extends React.Component {
 
@@ -16,30 +20,30 @@ CrudComp.contextType = AnContext;
 
 class HomeComp extends CrudComp {
 	render() {
-		return (<>Base CrudComp Page</>);
+		return (<>Home</>);
 	}
 }
 const Home = withStyles(styles)(HomeComp);
 
 class DomainComp extends CrudComp {
 	render() {
-		return (<>Base CrudComp Page</>);
+		return (<>Domain</>);
 	}
 }
 const Domain = withStyles(styles)(DomainComp);
 
-class RoleComp extends CrudComp {
+class RolesComp extends CrudComp {
 	render() {
-		return (<>Base CrudComp Page</>);
+		return (<>Roles</>);
 	}
 }
-const Role = withStyles(styles)(RoleComp);
+const Roles = withStyles(styles)(RolesComp);
 
 class UserInfoComp extends CrudComp {
 	render() {
-		return (<>Base CrudComp Page</>);
+		return (<>User Info</>);
 	}
 }
 const UserInfo = withStyles(styles)(UserInfoComp);
 
-export { CrudComp, Home, HomeComp, Domain, DomainComp, Role, RoleComp, UserInfo, UserInfoComp }
+export { CrudComp, Home, HomeComp, Domain, DomainComp, Roles, RolesComp, UserInfo, UserInfoComp }
