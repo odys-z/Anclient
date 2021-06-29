@@ -257,7 +257,7 @@ class SysComp extends React.Component {
 				})}
 			>
 				<div className={classes.drawerHeader} />
-				<Typography paragraph>CRUD</Typography>
+				<Typography paragraph>CrudComp</Typography>
 				<div className="content">
 					{route()}
 					{/*
