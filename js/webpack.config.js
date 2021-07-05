@@ -33,6 +33,12 @@
 		// npm install babel-plugin-syntax-jsx babel-plugin-transform-vue-jsx babel-helper-vue-jsx-merge-props babel-preset-env --save-dev
 		{test: /\.js$/, exclude: /node_modules/, loader: "babel-loader",
 			options: { plugins: ['transform-vue-jsx'] }},
+		{   test: /\.jsx$/,
+			loader: 'babel-loader',
+			exclude: /node_modules/,
+			options: {
+			  presets: ['@babel/preset-react', '@babel/preset-env'] }
+		},
  		{test: /\.css$/,
 		 use: [ 'style-loader',
 				'css-loader',

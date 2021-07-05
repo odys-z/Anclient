@@ -9,10 +9,10 @@ import React from 'react';
 	import FormControl from '@material-ui/core/FormControl';
 	import Box from '@material-ui/core/Box';
 
-import * as an from 'anclient'
-	import {AnContext} from '../../../lib/an-react';
-	import {ConfirmDialog, Error} from '../../../lib/widgets/Messagebox'
-	import {L, Langstrs} from '../../../lib/utils/langstr'
+import {an} from '../../anclient.js'
+	import {AnContext} from './an-react.jsx';
+	import {ConfirmDialog, Error} from './widgets/messagebox.jsx'
+	import {L, Langstrs} from './utils/langstr.js'
 
 const styles = (theme) => ({
 	root: {
@@ -51,18 +51,11 @@ class LoginComp extends React.Component {
 		this.alert = this.alert.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.onLogin = this.onLogin.bind(this);
-		// this.configServ = this.configServ.bind(this);
 	}
 
-	componentDidMount() {
-		this.configServ(this.context);
-		return this;
-	}
-
-	// configServ(ctx) {
-	// 	let servId = ctx.servId;
-	// 	this.inputRef.value = ctx.servs[servId];
-	// 	this.state.jserv = ctx.servs[servId];
+	// componentDidMount() {
+	// 	this.configServ(this.context);
+	// 	return this;
 	// }
 
 	alert() {
@@ -79,15 +72,16 @@ class LoginComp extends React.Component {
 		let that = this;
 		let uid = this.state.userid;
 		let pwd = this.state.pswd;
+		let _an = an;
 		if (!uid || !pwd) {
 			this.alert();
 			return;
 		}
 
 		if (!this.state.loggedin) {
-			this.state.jserv = this.inputRef.value;
-			this.an.init(this.state.jserv);
-			this.an.login( uid, pwd, reload, onError );
+			this.state.jserv = this.props[this.props.servId];
+			an.init(this.state.jserv);
+			an.login( uid, pwd, reload, onError );
 		}
 
 		function reload (client) {
@@ -109,9 +103,10 @@ class LoginComp extends React.Component {
 				errCtx.hasError = true;
 				errCtx.code = code;
 				errCtx.msg = resp.Body().msg();
-				errCtx.onError(true); // FIXME but Editor doesn't use this, bug?
+				if (typeof errCtx.onError === 'function')
+					errCtx.onError(true);
 			}
-			else if (code === an.Protocol.MsgCode.exIo)
+			else if (code === _an.Protocol.MsgCode.exIo)
 				console.error('Network Failed!');
 			else if (resp.body[0])
 				console.error(code + ': ' + resp.body[0].m);
@@ -131,52 +126,29 @@ class LoginComp extends React.Component {
 
 	render() {
 		const { classes } = this.props;
-		/*
-		return (<div className={classes.root}>
-			<div style={{display: 'flex'}}>
-				<TextField required id="jserv" inputRef={ref => { this.inputRef = ref; }}
-						   label="Jserv URL" fullWidth={true}
-						   defaultValue="http://localhost:8080/jserv-quiz/" />
-				<Box display={this.state.loggedin ? "flex" : "none"}>
-					<Button variant="contained" color="primary" style={{'whiteSpace': 'nowrap'}}
-							onClick={this.onLogout} >Log out</Button>
-				</Box>
-			</div>
-			<Collapse in={!this.state.loggedin} timeout="auto" >
-				<TextField
-					required id="userid" label="User Id"
-					autoComplete="username"
-					defaultValue={this.state.userid}
-					onChange={event => this.setState({userid: event.target.value})} />
-				<TextField
-					id="pswd" label="Password"
-					type="password" value='123456'
-					autoComplete="new-password"
-					onChange={event => this.setState({pswd: event.target.value})} />
-				<Button
-					variant="contained"
-					color="primary"
-					onClick={this.onLogin} >Log in</Button>
-			</Collapse>
-			<ConfirmDialog ok='はい' title='Info' cancel={false}
-					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
-					msg={this.state.alert} />
-		</div>);
-		*/
-		return (<div className={classes.root}>
-			<Box display={this.state.loggedin ? "flex" : "none"}>
-				<Button variant="contained" color="primary" style={{'whiteSpace': 'nowrap'}}
-						onClick={this.onLogin} >{L('Login')}</Button>
+		return ( <AnContext.Provider value={{
+						pageOrigin: window ? window.origin : "localhost",
+						servId: this.props.servId,
+						servs: this.props.servs,
+						hasError: false,
+						errHandler: this.state.errHandler }} >
+		<div className={classes.root}>
+			<Box display={!this.state.show ? "flex" : "none"}>
+				<Button variant="contained" color="primary"
+						style={{'whiteSpace': 'nowrap'}}
+						onClick={() => { this.setState({show: !this.state.show}) } } >
+					{this.state.show ? L('Cancel') : L('Login')}
+				</Button>
 			</Box>
-			<Collapse in={!this.state.loggedin} timeout="auto" >
+			<Collapse in={this.state.show} timeout="auto" >
 				<TextField
-					required id="userid" label="User Id"
+					required id="userid" label={L("User Id")}
 					autoComplete="username"
 					defaultValue={this.state.userid}
 					onChange={event => this.setState({userid: event.target.value})} />
 				<TextField
-					id="pswd" label="Password"
-					type="password" value='123456'
+					id="pswd" label={L("Password")}
+					type="password" value={this.state.pswd}
 					autoComplete="new-password"
 					onChange={event => this.setState({pswd: event.target.value})} />
 				<Button
@@ -187,11 +159,12 @@ class LoginComp extends React.Component {
 			<ConfirmDialog ok={L('OK')} title={L('Info')} cancel={false}
 					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
 					msg={this.state.alert} />
-		</div>);
+		</div>
+		</AnContext.Provider> );
     }
 
 	static bindHtml(elem, opt) {
-		let opt = Object.assign(
+		opt = Object.assign(
 			{servId: 'host', parent: undefined, home: 'index.html'},
 			opt);
 
@@ -213,17 +186,7 @@ class LoginComp extends React.Component {
 
 		function onJsonServ(json) {
 			let dom = document.getElementById(elem);
-		   	ReactDOM.render(
-				<AnContext.Provider value={{
-					pageOrigin: window.origin,
-					servId: this.props.servId,
-					servs: this.props.servs,
-					hasError: this.state.hasError,
-					errHandler: this.state.errHandler }} >
-					<Login servs={json} servId={serv} iparent={opt.parent} ihome={opt.home} />
-					{this.state.hasError && <AnError onClose={this.onErrorClose} />}
-				</>,
-				dom);
+			ReactDOM.render(<Login servs={json} servId={opt.servId} iparent={opt.parent} ihome={opt.home} />, dom);
 		}
 	}
 }
