@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>AnClient for react test</title>
+</head>
+
+<body>
+  <iframe>
+	<div id="login"></div>
+	<script>
+		let searchParams = new URLSearchParams(window.location.search)
+		let servId = searchParams ? searchParams.get('serv') : undefined;
+		test.Login.bindHtml('login', {servId, parent, home: 'index.html'});
+	</script>
+  </iframe>
+  <hr>
+  <h3>Portal Page</h3>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <script src="test-1.0.0.min.js"></script>
+</body>
+</html>

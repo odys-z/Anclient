@@ -23,10 +23,10 @@
      libraryTarget: 'umd'
    },
 
-   plugins: [
-     new VueLoaderPlugin(),
-     new MiniCssExtractPlugin({ filename: "vue-sidebar-menu.css" })
-   ],
+   // plugins: [
+   //   new VueLoaderPlugin(),
+   //   new MiniCssExtractPlugin({ filename: "vue-sidebar-menu.css" })
+   // ],
 
    module: {
  	rules: [
@@ -37,14 +37,14 @@
 		 use: [ 'style-loader',
 				'css-loader',
 				// 'postcss-loader',
-			  ] },
- 		{test: /\.scss$/,
- 		 use: [ 'vue-style-loader',
- 				'css-loader',
- 				// 'postcss-loader',
- 				'sass-loader'
- 		 	  ]},
- 		{test: /\.vue$/, loader: ["vue-loader"] },
+			  ] }
+ 		// {test: /\.scss$/,
+ 		//  use: [ 'vue-style-loader',
+ 		// 		'css-loader',
+ 		// 		// 'postcss-loader',
+ 		// 		'sass-loader'
+ 		//  	  ]},
+ 		// {test: /\.vue$/, loader: ["vue-loader"] },
 	],
   }, // module
 }

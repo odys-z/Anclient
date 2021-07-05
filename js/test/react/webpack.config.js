@@ -7,14 +7,12 @@ var version = "1.0.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: { 'app': './app.jsx' },
+	entry: { 'test': './app.jsx' },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
-
 	  path: path.resolve(__dirname, 'dist'),
-	  // publicPath: "./dist/",
-
+	  library: 'test',
 	  libraryTarget: 'umd'
 	},
 
@@ -26,7 +24,7 @@ module.exports = {
 
 	module: {
 		rules: [
-		{   test: /\.jsx$/, 
+		{   test: /\.jsx$/,
 			loader: 'babel-loader',
 			exclude: /node_modules/,
 			options: {

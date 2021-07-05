@@ -22,7 +22,7 @@ class App extends React.Component {
 	 * @param {string} elem html element id
 	 * @param {string} serv serv id
 	 */
-	static bindApp(elem, serv = 'host') {
+	static bindHtml(elem, serv = 'host') {
 		// this.state.servId = serv;
 		if (typeof elem === 'string') {
 			$.ajax({

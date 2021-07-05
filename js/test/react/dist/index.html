@@ -23,8 +23,8 @@
     <li><p>Troubleshootings</p>
     <p><b>Note: don't use --rm, currently we haven't yet mounted volume to persist sqlite DB.</b></p>
     This is userful to test the data service connecion:<br>
-    <a href='http://localhost:8080/jserv-quiz/login.serv11'>
-        http://locahost:8080/jserv-quiz/login.serv11</a>
+    <a href='http://localhost:8080/jserv-sample/login.serv11'>
+        http://locahost:8080/jserv-sample/login.serv11</a>
     <br>The an-quiz service should return this json data:<pre>
     {"type": "io.odysz.semantic.jprotocol.AnsonMsg",
      "code": "exSemantic", "opts": null, "port": "session",
@@ -36,15 +36,12 @@
      "version": "1.0", "seq": 0
     }</pre>
     </li>
-    <li>This application is powered by <a href='https://reactjs.org/'>React</a>
-        &amp; <a href='https://material-ui.com'>Material UI</a>
-    </li>
   </ul>
-  <script src="app-1.0.0.min.js"></script>
+  <script src="test-1.0.0.min.js"></script>
   <script>
 	let searchParams = new URLSearchParams(window.location.search)
 	let servId = searchParams ? searchParams.get('serv') : undefined;
-	App.bindApp('app', servId);
+	test.App.bindHtml('app', servId);
   </script>
 </body>
 </html>
