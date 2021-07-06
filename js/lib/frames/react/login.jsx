@@ -11,7 +11,7 @@ import React from 'react';
 
 import {an} from '../../anclient.js'
 	import {Protocol} from '../../protocol.js'
-	import {AnContext} from './an-react.jsx';
+	import {AnContext} from './reactext.jsx';
 	import {ConfirmDialog, Error} from './widgets/messagebox.jsx'
 	import {L, Langstrs} from './utils/langstr.js'
 
