@@ -1,27 +1,38 @@
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Sys } from '../../lib/frames/react/sys.jsx';
+import { Login } from '../../lib/frames/react/login.jsx';
 
-/** The application main, context singleton and error handler */
-class App extends React.Component {
+/** The application main, context singleton and error handler, but only for login
+ * used in iframe (no origin change). */
+class LoginApp extends React.Component {
+	state = {
+		anClient: undefined,
+		hasError: false,
+	};
+
 	constructor(props) {
 		super(props);
 	}
 
-	onError() {
-
+	onError(msg) {
 	}
 
 	render() {
 		return (
 			<AnContext.Provider value={{
-				error: {onError}
+				pageOrigin: window ? window.origin : 'localhost',
+				servId: this.props.servId,
+				servs: this.props.servs,
+				anClient: this.state.anClient,
+				hasError: this.state.hasError,
+				error: {onError, msg: ''},
 			}} >
-				<Sys />
+				<Login />
 			</AnContext.Provider>
 		);
 	}
+
 
 	/**Try figure out serv root, then bind to html tag.
 	 * First try ./private.json/<serv-id>,
@@ -52,9 +63,9 @@ class App extends React.Component {
 
 		function onJsonServ(json) {
 			let dom = document.getElementById(elem);
-		   	ReactDOM.render(<Sys servs={json} servId={serv}/>, dom);
+		   	ReactDOM.render(<Login servs={json} servId={serv}/>, dom);
 		}
 	}
 }
 
-export {App};
+export {LoginApp};

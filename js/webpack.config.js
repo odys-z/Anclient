@@ -10,7 +10,7 @@
  module.exports = {
    mode: v, // "production" | "development" | "none"
    devtool: 'source-map',
-   entry: { anreact: './lib/view/react/an-react.js',
+   entry: { anreact: './lib/view/react/anreact-comps.js',
    			anclient: './lib/anclient.js'},
 
    output: {

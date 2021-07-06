@@ -42,6 +42,7 @@ const _comps = {
 	'/sys/domain': Domain,
 	'/sys/roles': Roles,
 	'/sys/userinfo': UserInfo,
+	'/sys/error': Error,
 }
 
 const drawerWidth = 240;
@@ -243,7 +244,8 @@ class SysComp extends React.Component {
 	route() {
 		return [{path: '/home', params: {}},
 				{path: '/sys/domain', params: {}},
-				{path: '/sys/roles', params: {}}]
+				{path: '/sys/roles', params: {}},
+				{path: '/sys/error', params: {}}]
 		.map( (c, x) =>
 			(<Route exact path={c.path} key={x} component={_comps[c.path]} {...c.params}/>)
 		);

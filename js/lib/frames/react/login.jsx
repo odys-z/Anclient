@@ -10,6 +10,7 @@ import React from 'react';
 	import Box from '@material-ui/core/Box';
 
 import {an} from '../../anclient.js'
+	import {Protocol} from '../../protocol.js'
 	import {AnContext} from './an-react.jsx';
 	import {ConfirmDialog, Error} from './widgets/messagebox.jsx'
 	import {L, Langstrs} from './utils/langstr.js'
@@ -70,9 +71,10 @@ class LoginComp extends React.Component {
 
 	onLogin() {
 		let that = this;
+		console.log(that.context);
 		let uid = this.state.userid;
 		let pwd = this.state.pswd;
-		let _an = an;
+		// let _an = an;
 		if (!uid || !pwd) {
 			this.alert();
 			return;
@@ -98,6 +100,7 @@ class LoginComp extends React.Component {
 		}
 
 		function onError (code, resp) {
+			console.log(an);
 			if (typeof that.context.errHandler === 'object') {
 				let errCtx = that.context.errHandler;
 				errCtx.hasError = true;
@@ -106,7 +109,7 @@ class LoginComp extends React.Component {
 				if (typeof errCtx.onError === 'function')
 					errCtx.onError(true);
 			}
-			else if (code === _an.Protocol.MsgCode.exIo)
+			else if (code === Protocol.MsgCode.exIo)
 				console.error('Network Failed!');
 			else if (resp.body[0])
 				console.error(code + ': ' + resp.body[0].m);

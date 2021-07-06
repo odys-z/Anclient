@@ -12,7 +12,7 @@ export const AnContext = React.createContext({
 
 	pageOrigin: '.',
 	servId: 'host',
-	servs: { host: 'http://localhost:8080/jserv-quiz' },
+	servs: { host: 'http://localhost:8080/jserv-sample' },
 
 	quizId: undefined,
 
