@@ -123,7 +123,7 @@ const styles = theme => ({
  */
 class SysComp extends React.Component {
 	state = {
-		window: undefined
+		window: undefined,
 		sysName: 'Anreact Sample',
 		sysMenu: {
 			funcId: 'sys',
@@ -258,6 +258,7 @@ class SysComp extends React.Component {
 	render() {
     	const { classes } = this.props;
 		let open = this.state.showMenu;
+		console.log(this.state);
 
 		return (
 		  <div className={classes.root}>
