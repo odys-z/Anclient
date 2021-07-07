@@ -1,4 +1,4 @@
 {
-	"localhost": "http://localhost:8080/jserv-quiz",
-	"host": "http://localhost:8080/jserv-quiz"
+	"localhost": "http://localhost:8080/jserv-sample",
+	"host": "http://localhost:8080/jserv-sample"
 }

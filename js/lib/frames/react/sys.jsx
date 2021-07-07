@@ -4,6 +4,8 @@ import clsx from 'clsx';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Button from '@material-ui/core/Button';
+import DialogActions from '@material-ui/core/DialogActions';
 import Divider from '@material-ui/core/Divider';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -121,7 +123,8 @@ const styles = theme => ({
  */
 class SysComp extends React.Component {
 	state = {
-		sysName: 'Anclient',
+		window: undefined
+		sysName: 'Anreact Sample',
 		sysMenu: {
 			funcId: 'sys',
 			funcName: 'Anclient Lv-0',
@@ -167,6 +170,7 @@ class SysComp extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state.sysName = props.sys || props.sysName || props.name;
+		this.state.window = props.window;
 
 		this.showMenu = this.showMenu.bind(this);
 		this.hideMenu = this.hideMenu.bind(this);
@@ -273,7 +277,18 @@ class SysComp extends React.Component {
 				>
 				<Menu />
 				</IconButton>
-				<Typography variant="h6" noWrap>Anclient</Typography>
+				<Typography variant="h6" noWrap>{this.state.sysName}</Typography>
+
+				<DialogActions>
+				  <Button onClick={this.toLogout} color="primary">
+						{L('Logout')}
+				  </Button>
+				  <Box display={displayCancel}>
+					<Button onClick={this.toChangePswd} color="primary" autoFocus>
+						{L('Password')}
+					</Button>
+				  </Box>
+				</DialogActions>
 			</Toolbar>
 			</AppBar>
 			<Router><React.Fragment><Drawer
@@ -286,7 +301,6 @@ class SysComp extends React.Component {
 			<div className={classes.drawerHeader}>
 				<IconButton onClick={this.hideMenu}>
 					<ListItemText>{this.state.sysName}</ListItemText>
-					{/*theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />*/}
 					{classes.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 				</IconButton>
 			</div>

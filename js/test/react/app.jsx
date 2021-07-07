@@ -29,30 +29,17 @@ class App extends React.Component {
 	 * where serv-id = this.context.servId || host
 	 *
 	 * For test, have elem = undefined
-	 * @param {string} elem html element id
-	 * @param {string} serv serv id
+	 * @param {string} elem html element id, null for test
+	 * @param {object} [opts={}] serv id
+	 * @param {string} [opts.serv='host'] serv id
+	 * @param {string} [opts.iportal='portal.html'] page showed after logout
 	 */
-	static bindHtml(elem, serv = 'host') {
-		// this.state.servId = serv;
-		if (typeof elem === 'string') {
-			$.ajax({
-				dataType: "json",
-				url: 'private.json',
-			})
-			.done(onJsonServ)
-			.fail(
-				$.ajax({
-					dataType: "json",
-					url: 'github.json',
-				})
-				.done(onJsonServ)
-				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
-			)
-		}
+	static bindHtml(elem, opts = {}) {
+		AnReact.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(json) {
+		function onJsonServ(elem, json) {
 			let dom = document.getElementById(elem);
-		   	ReactDOM.render(<Sys servs={json} servId={serv}/>, dom);
+			ReactDOM.render(<Sys servs={json} servId={opts.serv} iportal={opts.portal} window={Window}/>, dom);
 		}
 	}
 }

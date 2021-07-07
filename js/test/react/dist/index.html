@@ -41,7 +41,7 @@
   <script>
 	let searchParams = new URLSearchParams(window.location.search)
 	let servId = searchParams ? searchParams.get('serv') : undefined;
-	test.App.bindHtml('app', servId);
+	test.App.bindHtml('app', {servId, Window, portal: 'portal.html'});
   </script>
 </body>
 </html>

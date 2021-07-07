@@ -81,8 +81,7 @@ class LoginComp extends React.Component {
 		}
 
 		if (!this.state.loggedin) {
-			this.state.jserv = this.props[this.props.servId];
-			an.init(this.state.jserv);
+			an.init(this.context.jserv);
 			an.login( uid, pwd, reload, onError );
 		}
 
@@ -91,9 +90,10 @@ class LoginComp extends React.Component {
 			that.setState( {loggedin: true} );
 			if (typeof that.props.onLoginOk === 'function')
 				that.props.onLoginOk(client);
-			else if (that.props.iparent) {
-				that.props.iparent.location = `${that.props.ihome}?serv=${that.props.servId}`;
-				that.props.iparent.ssInf = client.ssInf;
+			else if (that.context.iparent) {
+				that.context.iparent.location = client.ssInf.home ?
+							client.ssInf.home : `${that.context.ihome}?serv=${that.context.servId}`;
+				that.context.ssInf = client.ssInf;
 			}
 			else
 				console.log('login succeed but results be ignored: ', client);
@@ -101,13 +101,13 @@ class LoginComp extends React.Component {
 
 		function onError (code, resp) {
 			console.log(an);
-			if (typeof that.context.errHandler === 'object') {
-				let errCtx = that.context.errHandler;
+			if (typeof that.context.error === 'object') {
+				let errCtx = that.context.error;
 				errCtx.hasError = true;
 				errCtx.code = code;
 				errCtx.msg = resp.Body().msg();
 				if (typeof errCtx.onError === 'function')
-					errCtx.onError(true);
+					errCtx.onError(code, resp.Body());
 			}
 			else if (code === Protocol.MsgCode.exIo)
 				console.error('Network Failed!');
@@ -129,12 +129,13 @@ class LoginComp extends React.Component {
 
 	render() {
 		const { classes } = this.props;
-		return ( <AnContext.Provider value={{
-						pageOrigin: window ? window.origin : "localhost",
-						servId: this.props.servId,
-						servs: this.props.servs,
-						hasError: false,
-						errHandler: this.state.errHandler }} >
+		// return ( <AnContext.Provider value={{
+		// 				pageOrigin: window ? window.origin : "localhost",
+		// 				servId: this.props.servId,
+		// 				servs: this.props.servs,
+		// 				hasError: false,
+		// 				errHandler: this.state.errHandler }} >
+		return (
 		<div className={classes.root}>
 			<Box display={!this.state.show ? "flex" : "none"}>
 				<Button variant="contained" color="primary"
@@ -163,35 +164,36 @@ class LoginComp extends React.Component {
 					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
 					msg={this.state.alert} />
 		</div>
-		</AnContext.Provider> );
+		// </AnContext.Provider> );
+		);
     }
 
-	static bindHtml(elem, opt) {
-		opt = Object.assign(
-			{servId: 'host', parent: undefined, home: 'index.html'},
-			opt);
-
-		if (typeof elem === 'string') {
-			$.ajax({
-				dataType: "json",
-				url: 'private.json',
-			})
-			.done(onJsonServ)
-			.fail(
-				$.ajax({
-					dataType: "json",
-					url: 'github.json',
-				})
-				.done(onJsonServ)
-				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
-			)
-		}
-
-		function onJsonServ(json) {
-			let dom = document.getElementById(elem);
-			ReactDOM.render(<Login servs={json} servId={opt.servId} iparent={opt.parent} ihome={opt.home} />, dom);
-		}
-	}
+	// static bindHtml(elem, opt) {
+	// 	opt = Object.assign(
+	// 		{servId: 'host', parent: undefined, home: 'index.html'},
+	// 		opt);
+	//
+	// 	if (typeof elem === 'string') {
+	// 		$.ajax({
+	// 			dataType: "json",
+	// 			url: 'private.json',
+	// 		})
+	// 		.done(onJsonServ)
+	// 		.fail(
+	// 			$.ajax({
+	// 				dataType: "json",
+	// 				url: 'github.json',
+	// 			})
+	// 			.done(onJsonServ)
+	// 			.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
+	// 		)
+	// 	}
+	//
+	// 	function onJsonServ(json) {
+	// 		let dom = document.getElementById(elem);
+	// 		ReactDOM.render(<Login servs={json} servId={opt.servId} iparent={opt.parent} ihome={opt.home} />, dom);
+	// 	}
+	// }
 }
 
 LoginComp.contextType = AnContext;

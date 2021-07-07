@@ -19,7 +19,20 @@ import QRCode from 'qrcode'
 
 import {L, copyToClipboard} from '../utils/langstr';
 
-export class ConfirmDialog extends React.Component {
+const styles = theme => ({
+  root: {
+	backgroundColor: "mint-cream",
+	textAlign: "center",
+	"&:hover": {
+		backgroundColor: "linen"
+	}
+  },
+  centerbox: {
+	  "justify-content": "center"
+  }
+});
+
+class ConfirmDialogComp extends React.Component {
 	state = {
 		closed: false,
 	};
@@ -55,12 +68,14 @@ export class ConfirmDialog extends React.Component {
 		let txtCancel = props.cancel === 'string' ? props.cancel : "Cancel";
 		let txtOk = props.ok || props.OK ? props.ok || props.OK : "OK";
 
-		// let msg = props.msg;
 		let txtLines = this.textLines(props.msg);
 
+		const { classes } = this.props;
+
 		return (
-			<Dialog
+			<Dialog className={classes.root}
 				open={open}
+				fullScreen={!!this.props.fullScreen}
 				onClose={this.handleClose}
 				aria-labelledby="alert-dialog-title"
 				aria-describedby="alert-dialog-description" >
@@ -84,16 +99,18 @@ export class ConfirmDialog extends React.Component {
 		);
 	}
 }
+const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
+export {ConfirmDialog, ConfirmDialogComp};
 
-const styles = theme => ({
-  root: {
-	backgroundColor: "mint-cream",
-	textAlign: "center",
-	"&:hover": {
-		backgroundColor: "linen"
-	}
-  }
-});
+// const styles = theme => ({
+//   root: {
+// 	backgroundColor: "mint-cream",
+// 	textAlign: "center",
+// 	"&:hover": {
+// 		backgroundColor: "linen"
+// 	}
+//   }
+// });
 
 class QrSharingComp extends React.Component {
 	state = {
@@ -165,7 +182,7 @@ class QrSharingComp extends React.Component {
 				<CardMedia className={classes.media} >
 					<img id={'qrcode ' + this.props.imgId}/>
 				</CardMedia>
-			    <CardContent onClick={this.onCopy}>
+			    <CardContent onClick={this.onCopy} className={classes.centerbox}>
 			      <Typography gutterBottom variant="h5" component="h2">
 			        Click to Copy:
 			      </Typography>
