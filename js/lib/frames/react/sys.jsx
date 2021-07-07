@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import Divider from '@material-ui/core/Divider';
@@ -25,6 +26,12 @@ import { MemoryRouter as Router } from 'react-router';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import {Route} from 'react-router-dom'
+
+// import {SessionClient} from '../../anclient.js'
+	import {Protocol} from '../../protocol.js'
+	import {AnContext} from './reactext.jsx';
+	import {ConfirmDialog} from './widgets/messagebox.jsx'
+	import {L, Langstrs} from './utils/langstr.js'
 
 import {
 	Home, Domain, Roles, UserInfo
@@ -123,7 +130,7 @@ const styles = theme => ({
  */
 class SysComp extends React.Component {
 	state = {
-		window: undefined
+		window: undefined,
 		sysName: 'Anreact Sample',
 		sysMenu: {
 			funcId: 'sys',
@@ -177,12 +184,22 @@ class SysComp extends React.Component {
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.menuItems = this.menuItems.bind(this);
 
+		this.toLogout = this.toLogout.bind(this);
+		this.toChangePswd = this.toChangePswd.bind(this);
+		/*
 		this.state.errHandler.onError = function() {
 			let that = this;
 			return (has) => {
 				that.setState({hasError: has});
 			};
 		}.bind(this)();
+		*/
+		// this.context.error.onError = function() {
+		// 	let that = this;
+		// 	return (has) => {
+		// 		that.setState({hasError: has});
+		// 	};
+		// }.bind(this)();
 	}
 
 	showMenu() {
@@ -192,6 +209,10 @@ class SysComp extends React.Component {
 	hideMenu() {
 		this.setState({showMenu: false});
 	}
+
+	toLogout() { }
+
+	toChangePswd() { }
 
 	toExpandItem(e) {
 		e.stopPropagation();
@@ -283,7 +304,7 @@ class SysComp extends React.Component {
 				  <Button onClick={this.toLogout} color="primary">
 						{L('Logout')}
 				  </Button>
-				  <Box display={displayCancel}>
+				  <Box display={this.state.loggedin}>
 					<Button onClick={this.toChangePswd} color="primary" autoFocus>
 						{L('Password')}
 					</Button>
@@ -322,8 +343,8 @@ class SysComp extends React.Component {
 			</main></Router>
 		  </div>);
 	}
-
 }
+SysComp.contextType = AnContext;
 
 const Sys = withStyles(styles)(SysComp);
 export { Sys, SysComp };

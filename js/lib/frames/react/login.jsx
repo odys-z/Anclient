@@ -12,7 +12,7 @@ import React from 'react';
 import {an} from '../../anclient.js'
 	import {Protocol} from '../../protocol.js'
 	import {AnContext} from './reactext.jsx';
-	import {ConfirmDialog, Error} from './widgets/messagebox.jsx'
+	import {ConfirmDialog} from './widgets/messagebox.jsx'
 	import {L, Langstrs} from './utils/langstr.js'
 
 const styles = (theme) => ({
@@ -91,9 +91,9 @@ class LoginComp extends React.Component {
 			if (typeof that.props.onLoginOk === 'function')
 				that.props.onLoginOk(client);
 			else if (that.context.iparent) {
+				that.context.ssInf = client.ssInf;
 				that.context.iparent.location = client.ssInf.home ?
 							client.ssInf.home : `${that.context.ihome}?serv=${that.context.servId}`;
-				that.context.ssInf = client.ssInf;
 			}
 			else
 				console.log('login succeed but results be ignored: ', client);
@@ -167,33 +167,6 @@ class LoginComp extends React.Component {
 		// </AnContext.Provider> );
 		);
     }
-
-	// static bindHtml(elem, opt) {
-	// 	opt = Object.assign(
-	// 		{servId: 'host', parent: undefined, home: 'index.html'},
-	// 		opt);
-	//
-	// 	if (typeof elem === 'string') {
-	// 		$.ajax({
-	// 			dataType: "json",
-	// 			url: 'private.json',
-	// 		})
-	// 		.done(onJsonServ)
-	// 		.fail(
-	// 			$.ajax({
-	// 				dataType: "json",
-	// 				url: 'github.json',
-	// 			})
-	// 			.done(onJsonServ)
-	// 			.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
-	// 		)
-	// 	}
-	//
-	// 	function onJsonServ(json) {
-	// 		let dom = document.getElementById(elem);
-	// 		ReactDOM.render(<Login servs={json} servId={opt.servId} iparent={opt.parent} ihome={opt.home} />, dom);
-	// 	}
-	// }
 }
 
 LoginComp.contextType = AnContext;

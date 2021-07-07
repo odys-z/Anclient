@@ -114,7 +114,6 @@ class AnClient {
 			 * port: "session"
 			 */
 			function(resp) {
-				// var sessionClient = new SessionClient(resp.body[0].ssInf, iv, true);
 				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
 				sessionClient.an = An;
 				if (typeof onLogin === "function")
@@ -363,9 +362,9 @@ class SessionClient {
 	 * to the system background home page.</p>
 	 * <p>How should this pattern can be improved is open for discussion.
 	 * If your are interested in this subject, leave any comments in wiki page please.</p>
-	 * @param {object} ssInf login response form server: {ssid, uid}
-	 * @param {byte[]} iv iv used for cipher when login.
-	 * @param {boolean} dontPersist don't save into local storage.
+	 * @param {object} [ssInf] login response form server: {ssid, uid}, if null, will try restore window.for localStorage
+	 * @param {byte[]} [iv] iv used for cipher when login.
+	 * @param {boolean} [dontPersist=false] don't save into local storage.
 	 */
 	constructor (ssInf, iv, dontPersist) {
 		if (ssInf) {
@@ -387,13 +386,17 @@ class SessionClient {
 		}
 		else {
 			// jumped, create from local storage
-			var sstr = localStorage.getItem(SessionClient.ssInfo);
-			if (sstr) {
-				this.ssInf = JSON.parse(sstr);
-				this.ssInf.iv = aes.b64ToBytes(this.ssInf.iv);
-			}
-			else
-				console.error("Can't find credential in local storage. SessionClient creating failed.");
+			if (window && localStorage) {
+				var sstr = localStorage.getItem(SessionClient.ssInfo);
+				// What about refesh if removed this?
+				// localStorage.setItem(SessionClient.ssInfo, '');
+				if (sstr) {
+					this.ssInf = JSON.parse(sstr);
+					this.ssInf.iv = aes.b64ToBytes(this.ssInf.iv);
+				}
+				else
+					console.error("Can't find credential in local storage. SessionClient creating failed.");
+			} // else must be a test
 		}
 
 		this.an = an;
