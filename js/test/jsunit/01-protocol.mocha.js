@@ -124,7 +124,7 @@ const ajaxError = {
 	"statusText":"parsererror"
 }
 
-describe('case: [Protocol.Port]', () => {
+describe('case: [01.1 Protocol.Port]', () => {
     it('extending port', () => {
 		let an = new AnClient();
 		an.understandPorts(TestPorts);
@@ -136,7 +136,7 @@ describe('case: [Protocol.Port]', () => {
 	});
 });
 
-describe('case: [Protocol/AnsonMsg]', () => {
+describe('case: [01.1 Protocol/AnsonMsg]', () => {
     it('Ajax error handling 1', () => {
 		// TODO where this is used? let's remove it
 		let json = { "readyState":0, "status":0, "statusText":"error" };

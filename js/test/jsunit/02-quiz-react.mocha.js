@@ -201,7 +201,7 @@ const resp1Question = {
 	"seq": 0
 }
 
-describe('case: [Protocol.AnReact] quiz converter', () => {
+describe('case: [03 Protocol.AnReact] quiz converter', () => {
 
 	it('[Quiz] Convert AnsonResp to quizzes', () => {
 		let quizResp = new QuizResp(jsonResp.body[0]);

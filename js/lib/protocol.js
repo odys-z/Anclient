@@ -160,6 +160,8 @@ class AnsonMsg {
 			body = new AnSessionReq(body.uid, body.token, body.iv);
 		else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 			body = new UserReq(json.port, header, [body]);
+		else if (body.type === "io.odysz.semantic.ext.AnDatasetReq")
+			body = new DatasetCfg(...);
 		else {
 			// if (Protocol.verbose >= 5)
 			// 	console.warn("Using json object directly as body. Type : " + body.type);
@@ -787,15 +789,20 @@ const stree_t = {
 	query: ''};
 
 class DatasetCfg extends QueryReq {
-	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
-	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
-	 * @param {stree_t} t function branch tag (AnsonBody#a).
+	/**
+	 * @param {object} opts parameter objects
+	 * @param {string} opts.conn JDBC connection id, configured at server/WEB-INF/connects.xml
+	 * @param {string} opts.sk semantic key configured in WEB-INF/dataset.xml
+	 * @param {stree_t} opts.t function branch tag (AnsonBody#a).
 	 * Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query
-	 * @param {object} args arguments to be formatted to sql args.
-	 * @param {string} maintbl if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk.
-	 * @param {string} alias if t is null or undefined, use this to replace alias in super (QueryReq).
+	 * @param {object} opts.args arguments to be formatted to sql args.
+	 * @param {string} opts.maintbl if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk.
+	 * @param {string} opts.alias if t is null or undefined, use this to replace alias in super (QueryReq).
 	 */
-	constructor (conn, sk, t, args, maintbl, alias) {
+	constructor (opts = {}) {
+		// constructor (conn, sk, t, args, maintbl, alias) {
+		let {conn, sk, t, args, maintbl, alias} = opts;
+
 		super(conn, Jregex.isblank(t) ? maintbl : sk, alias);
 		this.type = "io.odysz.semantic.ext.AnDatasetReq";
 
@@ -819,7 +826,7 @@ class DatasetCfg extends QueryReq {
 
 	_t(ask) {
 		if (typeof sk === 'string' && sk.length > 0 && ask !== stree_t.sqltree) {
-			console.warn('DatasetReq.a is ignored for sk is defined.', sk);
+			console.warn('DatasetCfg.a is ignored for sk is defined.', sk);
 			this.a = stree_t.sqltree;
 		}
 		else {
@@ -847,6 +854,7 @@ class DatasetCfg extends QueryReq {
 	}
 
 	/** Check is t can be undertood by s-tree.serv
+	 * TODO why not ask server for stree_t?
 	 * @param {string} t*/
 	checkt(t) {
 		// if (t !== stree_t.sqltree && t !== stree_t.retree && t !== stree_t.reforest) {

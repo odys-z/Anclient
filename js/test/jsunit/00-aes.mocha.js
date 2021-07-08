@@ -2,7 +2,7 @@ import chai from 'chai';
 import { expect, assert } from 'chai';
 import AES from '../../lib/aes.js';
 
-describe('case: [AES]', () => {
+describe('case: [00.1 AES]', () => {
     it('[AES] De-encrypt', () => {
 		let aes = new AES();
 
