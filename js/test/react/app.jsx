@@ -57,8 +57,8 @@ class App extends React.Component {
 					this.props.iwindow.location = this.state.iportal;
 			},
 			(c, e) => {
-				console.warn('Logou failed', c, e)
 				// something wrong
+				console.warn('Logou failed', c, e)
 				if (this.state.anClient)
         			localStorage.setItem(SessionClient.ssInfo, null);
 				if (this.props.iwindow)

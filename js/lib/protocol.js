@@ -156,9 +156,10 @@ class AnsonMsg {
 			body = new AnsonResp(body);
 		else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
 			body = new AnSessionResp(body);
-		else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq') {
+		else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 			body = new AnSessionReq(body.uid, body.token, body.iv);
-		}
+		else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
+			body = new UserReq(json.port, header, [body]);
 		else {
 			// if (Protocol.verbose >= 5)
 			// 	console.warn("Using json object directly as body. Type : " + body.type);
@@ -166,7 +167,7 @@ class AnsonMsg {
 			// server can't handle body without type
 			throw new Error("Using json object directly as body. Type not handled : " + body.type);
 		}
-		
+
 		if (a) body.A(a);
 
 		// FIXME type must be the first key of evry json object.
