@@ -53,6 +53,17 @@ class MyInfoComp extends React.Component {
 		return (
 			<DialogContentText id="myinfo-txt" >
 				{ssInf ? ssInf.userName : 'User Info'}
+				<TextField id="qtitle" label={L("Title")}
+				  variant="outlined" color="primary"
+				  multiline fullWidth={true}
+				  onChange={e => this.setState({qtitle: e.currentTarget.value})}
+				  value={title} />
+
+				<TextField id="quizinfo" label={L("Quiz Description")}
+				  variant="outlined" color="secondary"
+				  multiline fullWidth={true}
+				  onChange={e => this.setState({quizinfo: e.currentTarget.value})}
+				  value={this.state.quizinfo} />
 			</DialogContentText>
 		);
 	}
