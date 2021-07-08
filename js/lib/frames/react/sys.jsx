@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import clsx from 'clsx';
+import Grid from '@material-ui/core/Grid';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -27,10 +28,11 @@ import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import {Route} from 'react-router-dom'
 
-// import {SessionClient} from '../../anclient.js'
-	import {Protocol} from '../../protocol.js'
+import {Protocol} from '../../protocol.js'
 	import {AnContext} from './reactext.jsx';
 	import {ConfirmDialog} from './widgets/messagebox.jsx'
+	import {MyIcon} from './widgets/my-icon.jsx'
+	import {MyInfo} from './widgets/my-info.jsx'
 	import {L, Langstrs} from './utils/langstr.js'
 
 import {
@@ -66,6 +68,13 @@ const styles = theme => ({
 		easing: theme.transitions.easing.sharp,
 		duration: theme.transitions.duration.leavingScreen,
 		}),
+	},
+	loginfo: {
+		textAlign: 'end',
+		color: 'wheat',
+		"& :hover": {
+			backgroundColor: 'Indigo'
+		}
 	},
 	appBarShift: {
 		width: `calc(100% - ${drawerWidth}px)`,
@@ -176,7 +185,7 @@ class SysComp extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state.sysName = props.sys || props.sysName || props.name;
+		this.state.sysName = props.sys || props.sysName || props.name || this.state.sysName;
 		this.state.window = props.window;
 
 		this.showMenu = this.showMenu.bind(this);
@@ -185,21 +194,6 @@ class SysComp extends React.Component {
 		this.menuItems = this.menuItems.bind(this);
 
 		this.toLogout = this.toLogout.bind(this);
-		this.toChangePswd = this.toChangePswd.bind(this);
-		/*
-		this.state.errHandler.onError = function() {
-			let that = this;
-			return (has) => {
-				that.setState({hasError: has});
-			};
-		}.bind(this)();
-		*/
-		// this.context.error.onError = function() {
-		// 	let that = this;
-		// 	return (has) => {
-		// 		that.setState({hasError: has});
-		// 	};
-		// }.bind(this)();
 	}
 
 	showMenu() {
@@ -210,9 +204,10 @@ class SysComp extends React.Component {
 		this.setState({showMenu: false});
 	}
 
-	toLogout() { }
-
-	toChangePswd() { }
+	toLogout() {
+		// Notify children?
+		this.setState({ showLogout: true });
+	}
 
 	toExpandItem(e) {
 		e.stopPropagation();
@@ -280,6 +275,8 @@ class SysComp extends React.Component {
     	const { classes } = this.props;
 		let open = this.state.showMenu;
 
+		console.log(this.state.sysName, L('Logout'));
+
 		return (
 		  <div className={classes.root}>
 			<AppBar
@@ -289,27 +286,32 @@ class SysComp extends React.Component {
 				})}
 			>
 			<Toolbar>
-				<IconButton
-					color="inherit"
-					aria-label="open drawer"
-					onClick={this.showMenu}
-					edge="start"
-					className={clsx(classes.menuButton, open && classes.hide)}
-				>
-				<Menu />
-				</IconButton>
-				<Typography variant="h6" noWrap>{this.state.sysName}</Typography>
+				<Grid container spacing={1} >
+				<Grid item sm={5}>
+				<Box flexWrap="nowrap" display="flex" >
+					<IconButton
+						color="inherit"
+						aria-label="open drawer"
+						onClick={this.showMenu}
+						edge="start"
+						autoFocus
+						className={clsx(classes.menuButton, open && classes.hide)}
+					>
+					<Menu />
+					</IconButton>
+					<Typography variant="h5" noWrap >{this.state.sysName}</Typography>
+				</Box>
+				</Grid>
 
-				<DialogActions>
-				  <Button onClick={this.toLogout} color="primary">
-						{L('Logout')}
-				  </Button>
-				  <Box display={this.state.loggedin}>
-					<Button onClick={this.toChangePswd} color="primary" autoFocus>
-						{L('Password')}
-					</Button>
-				  </Box>
-				</DialogActions>
+				<Grid item sm={7}>
+					<DialogActions className={classes.loginfo} >
+						<MyIcon onClick={() => this.setState({ showMine: true })} />
+						<Button onClick={this.toLogout}  color='inherit' >
+							{L('Logout')}
+						</Button>
+					</DialogActions>
+				</Grid>
+				</Grid>
 			</Toolbar>
 			</AppBar>
 			<Router><React.Fragment><Drawer
@@ -341,6 +343,11 @@ class SysComp extends React.Component {
 					{this.route()}
 				</div>
 			</main></Router>
+
+			{this.state.showMine && <MyInfo onClose={() => this.setState({ showMine: false })} />}
+			{this.state.showLogout && <ConfirmDialog ok={L('Sure')} title={L('Info')} // cancel={false}
+					open={this.state.showLogout} onOk={() => this.props.onLogout() }
+					msg={L('Logging out?')} />}
 		  </div>);
 	}
 }

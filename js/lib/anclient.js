@@ -106,6 +106,7 @@ class AnClient {
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
 
 		let An = this;
+		let servRoot = an.cfg.defaultServ;
 
 		this.post(req,
 			/**@param {object} resp
@@ -114,6 +115,8 @@ class AnClient {
 			 * port: "session"
 			 */
 			function(resp) {
+				let ssInf = resp.Body().ssInf;
+				ssInf.servRoot = servRoot;
 				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
 				sessionClient.an = An;
 				if (typeof onLogin === "function")
@@ -385,21 +388,37 @@ class SessionClient {
 			}
 		}
 		else {
-			// jumped, create from local storage
-			if (window && localStorage) {
-				var sstr = localStorage.getItem(SessionClient.ssInfo);
-				// What about refesh if removed this?
-				// localStorage.setItem(SessionClient.ssInfo, '');
-				if (sstr) {
-					this.ssInf = JSON.parse(sstr);
-					this.ssInf.iv = aes.b64ToBytes(this.ssInf.iv);
-				}
-				else
-					console.error("Can't find credential in local storage. SessionClient creating failed.");
-			} // else must be a test
+			this.ssInf = SessionClient.loadStorage();
 		}
 
 		this.an = an;
+	}
+
+	static loadStorage() {
+		// jumped, create from local storage
+		let ssInf;
+		if (window && localStorage) {
+			var sstr = localStorage.getItem(SessionClient.ssInfo);
+			// What about refesh if removed this?
+			// localStorage.setItem(SessionClient.ssInfo, '');
+			if (sstr) {
+				ssInf = JSON.parse(sstr);
+				ssInf.iv = aes.b64ToBytes(ssInf.iv);
+				an.init(ssInf.servRoot);
+			}
+			else
+				console.error("Can't find credential in local storage. SessionClient deserializing failed.");
+		} // else must be a test
+		return ssInf;
+	}
+
+	static persistorage(ssInf) {
+		if (window && localStorage) {
+			var sstr = JSON.stringify(ssInf);
+			localStorage.setItem(SessionClient.ssInfo, sstr);
+		}
+		else
+			console.error("Can't find credential in local storage. SessionClient persisting failed.");
 	}
 
 	get userInfo() { return this.ssInf; }
@@ -468,8 +487,8 @@ class SessionClient {
 	 * @param {function} onOk
 	 * @param {function} onError
 	 */
-	commit(jmsg, onOk, onError) {
-		this.an.post(jmsg, onOk, onError);
+	commit (jmsg, onOk, onErr) {
+		an.post(jmsg, onOk, onErr);
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
@@ -504,7 +523,7 @@ class SessionClient {
 			act = { func: 'query',
 					cmd: 'select',
 					cate: 'r',
-					remarks: 'session query'};
+					remarks: ''};
 		}
 
 		var header = this.getHeader(act);
@@ -611,6 +630,7 @@ class SessionClient {
 		return this;
 	}
 
+	/** For name errata? */
 	userAct(f, c, m, r) { this.usract(f, c, m, r); }
 
 	/**Set user's current action to be logged.
@@ -623,8 +643,20 @@ class SessionClient {
 		return this;
 	}
 
-	commit (jmsg, onOk, onErr) {
-		an.post(jmsg, onOk, onErr);
+	logout(onOk, onError) {
+		let header = Protocol.formatHeader(this.ssInf);
+		let body = {type: "io.odysz.semantic.jsession.AnSessionReq", a: "logout"};
+		let req = new AnsonMsg({port: 'session', header, body: [body]});
+		// req.Body().A("logout");
+		an.post(req, function(c, r) {
+        	localStorage.setItem(SessionClient.ssInfo, null);
+			if (typeof onOk === 'function')
+				onOk(c, r);
+		}, function(c, e) {
+        	localStorage.setItem(SessionClient.ssInfo, null);
+			if (typeof onError === 'function')
+				onError(c, e);
+		});
 	}
 }
 

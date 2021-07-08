@@ -9,7 +9,7 @@ import React from 'react';
 	import FormControl from '@material-ui/core/FormControl';
 	import Box from '@material-ui/core/Box';
 
-import {an} from '../../anclient.js'
+import {an, SessionClient} from '../../anclient.js'
 	import {Protocol} from '../../protocol.js'
 	import {AnContext} from './reactext.jsx';
 	import {ConfirmDialog} from './widgets/messagebox.jsx'
@@ -92,6 +92,7 @@ class LoginComp extends React.Component {
 				that.props.onLoginOk(client);
 			else if (that.context.iparent) {
 				that.context.ssInf = client.ssInf;
+				SessionClient.persistorage(client.ssInf);
 				that.context.iparent.location = client.ssInf.home ?
 							client.ssInf.home : `${that.context.ihome}?serv=${that.context.servId}`;
 			}
@@ -129,14 +130,7 @@ class LoginComp extends React.Component {
 
 	render() {
 		const { classes } = this.props;
-		// return ( <AnContext.Provider value={{
-		// 				pageOrigin: window ? window.origin : "localhost",
-		// 				servId: this.props.servId,
-		// 				servs: this.props.servs,
-		// 				hasError: false,
-		// 				errHandler: this.state.errHandler }} >
-		return (
-		<div className={classes.root}>
+		return (<div className={classes.root}>
 			<Box display={!this.state.show ? "flex" : "none"}>
 				<Button variant="contained" color="primary"
 						style={{'whiteSpace': 'nowrap'}}
@@ -163,12 +157,9 @@ class LoginComp extends React.Component {
 			<ConfirmDialog ok={L('OK')} title={L('Info')} cancel={false}
 					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
 					msg={this.state.alert} />
-		</div>
-		// </AnContext.Provider> );
-		);
+		</div>);
     }
 }
-
 LoginComp.contextType = AnContext;
 
 const Login = withStyles(styles)(LoginComp);

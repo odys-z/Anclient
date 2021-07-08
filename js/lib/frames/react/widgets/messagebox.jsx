@@ -39,11 +39,22 @@ class ConfirmDialogComp extends React.Component {
 
 	constructor (props = {}) {
 		super(props);
-		this.handleClose = this.handleClose.bind(this);
+		this.toCancel = this.toCancel.bind(this);
+		this.toOk = this.toOk.bind(this);
 	}
 
-	handleClose(e) {
+	toOk(e) {
 		this.setState({closed: true});
+		if (typeof this.props.onOk === 'function')
+			this.props.onOk(e.currentTarget);
+		if (typeof this.props.onClose === 'function')
+			this.props.onClose(e.currentTarget);
+	}
+
+	toCancel(e) {
+		this.setState({closed: true});
+		if (typeof this.props.onCancel === 'function')
+			this.props.onCancel(e.currentTarget);
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose(e.currentTarget);
 	};
@@ -86,11 +97,11 @@ class ConfirmDialogComp extends React.Component {
 					{txtLines}
 				</DialogContent>
 				<DialogActions>
-				  <Button onClick={this.handleClose} color="primary">
+				  <Button onClick={this.toOk} color="primary">
 						{txtOk}
 				  </Button>
 				  <Box display={displayCancel}>
-					<Button onClick={this.handleClose} color="primary" autoFocus>
+					<Button onClick={this.toCancel} color="primary" autoFocus>
 						{txtCancel}
 					</Button>
 				  </Box>
@@ -102,16 +113,7 @@ class ConfirmDialogComp extends React.Component {
 const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
 export {ConfirmDialog, ConfirmDialogComp};
 
-// const styles = theme => ({
-//   root: {
-// 	backgroundColor: "mint-cream",
-// 	textAlign: "center",
-// 	"&:hover": {
-// 		backgroundColor: "linen"
-// 	}
-//   }
-// });
-
+////////////////////////////////////////////////////////////////////////////////
 class QrSharingComp extends React.Component {
 	state = {
 		closed: false,

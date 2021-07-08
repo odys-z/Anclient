@@ -22,11 +22,12 @@ class App extends React.Component {
 		super(props);
 
 		this.state.iportal = this.props.iportal;
-		// load anclient from localStorage
+		// design: will load anclient from localStorage
 		this.state.anClient = new SessionClient();
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.logout = this.logout.bind(this);
 	}
 
 	componentDidMount () {
@@ -43,29 +44,36 @@ class App extends React.Component {
 	onErrorClose() {
 		if (this.state.nextAction === 're-login') {
 			this.state.nextAction = undefined;
-			if (this.props.iwindow)
-				this.props.iwindow.location = this.state.iportal;
+			this.logout();
 		}
 	}
 
+	/** For navigate to portal page */
+	logout() {
+		// leaving
+		this.state.anClient.logout(() => {
+			if (this.props.iwindow)
+				this.props.iwindow.location = this.state.iportal;
+		});
+		this.state.anClient = undefined;
+	}
+
 	render() {
-		debugger
-		return (
-			<AnContext.Provider value={{
-				pageOrigin: window ? window.origin : 'localhost',
-				servId: this.state.servId,
-				servs: this.props.servs,
-				jserv: this.state.jserv,
-				anClient: this.state.anClient,
-				hasError: this.state.hasError,
-				iparent: this.props.iparent,
-				iportal: this.props.iportal || 'portal.html',
-				error: {onError: this.onError, msg: this.state.err},
-			}} >
-				<Sys />
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
-			</AnContext.Provider>
-		);
+	  return (
+		<AnContext.Provider value={{
+			pageOrigin: window ? window.origin : 'localhost',
+			servId: this.state.servId,
+			servs: this.props.servs,
+			jserv: this.state.jserv,
+			anClient: this.state.anClient,
+			hasError: this.state.hasError,
+			iparent: this.props.iparent,
+			iportal: this.props.iportal || 'portal.html',
+			error: {onError: this.onError, msg: this.state.err},
+		}} >
+			<Sys onLogout={this.logout}/>
+			{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+		</AnContext.Provider>);
 	}
 
 	/**Try figure out serv root, then bind to html tag.
