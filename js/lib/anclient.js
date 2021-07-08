@@ -647,7 +647,7 @@ class SessionClient {
 		let header = Protocol.formatHeader(this.ssInf);
 		let body = {type: "io.odysz.semantic.jsession.AnSessionReq", a: "logout"};
 		let req = new AnsonMsg({port: 'session', header, body: [body]});
-		// req.Body().A("logout");
+		
 		an.post(req, function(c, r) {
         	localStorage.setItem(SessionClient.ssInfo, null);
 			if (typeof onOk === 'function')

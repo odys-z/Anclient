@@ -51,10 +51,19 @@ class App extends React.Component {
 	/** For navigate to portal page */
 	logout() {
 		// leaving
-		this.state.anClient.logout(() => {
-			if (this.props.iwindow)
-				this.props.iwindow.location = this.state.iportal;
-		});
+		this.state.anClient.logout(
+			() => {
+				if (this.props.iwindow)
+					this.props.iwindow.location = this.state.iportal;
+			},
+			(c, e) => {
+				console.warn('Logou failed', c, e)
+				// something wrong
+				if (this.state.anClient)
+        			localStorage.setItem(SessionClient.ssInfo, null);
+				if (this.props.iwindow)
+					this.props.iwindow.location = this.state.iportal;
+			});
 		this.state.anClient = undefined;
 	}
 
