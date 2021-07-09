@@ -7,6 +7,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import TextField from '@material-ui/core/TextField';
 
 // import Card from '@material-ui/core/Card';
 // import CardActionArea from '@material-ui/core/CardActionArea';
@@ -18,6 +19,8 @@ import Typography from '@material-ui/core/Typography';
 // import QRCode from 'qrcode'
 
 import {L} from '../utils/langstr';
+	import {AnContext} from '../reactext.jsx';
+	import {AnTabs} from './tabs.jsx';
 
 const styles = theme => ({
   root: {
@@ -49,21 +52,20 @@ class MyInfoComp extends React.Component {
 			this.props.onClose(e.currentTarget);
 	};
 
-	textInfo(ssInf) {
+	textInfo() {
+		let ssInf = this.context.anClient.ssInf;
 		return (
-			<DialogContentText id="myinfo-txt" >
+			<DialogContentText id="myinfo-txt" component={'span'} spacing={1} >
 				{ssInf ? ssInf.userName : 'User Info'}
-				<TextField id="qtitle" label={L("Title")}
-				  variant="outlined" color="primary"
-				  multiline fullWidth={true}
+				<TextField id="qtitle" label={L('User Name')}
+				  variant="outlined" color="primary" disabled
 				  onChange={e => this.setState({qtitle: e.currentTarget.value})}
-				  value={title} />
+				  value={ssInf.userName || ''} />
 
-				<TextField id="quizinfo" label={L("Quiz Description")}
-				  variant="outlined" color="secondary"
-				  multiline fullWidth={true}
+				<TextField id="quizinfo" label={L("Role")}
+				  variant="outlined" color="secondary" disabled
 				  onChange={e => this.setState({quizinfo: e.currentTarget.value})}
-				  value={this.state.quizinfo} />
+				  value={ssInf.roleName || ''} />
 			</DialogContentText>
 		);
 	}
@@ -74,7 +76,7 @@ class MyInfoComp extends React.Component {
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
 
-		let txtLines = this.textInfo(this.context.ssInf);
+		let txtLines = this.textInfo();
 
 		const { classes } = this.props;
 
@@ -86,6 +88,9 @@ class MyInfoComp extends React.Component {
 
 				<DialogTitle id="myinfo-title">{title}</DialogTitle>
 				<DialogContent> {txtLines} </DialogContent>
+				<DialogContent>
+					<AnTabs />
+				</DialogContent>
 				<DialogActions>
 					<Button onClick={this.handleClose} color="inherit">
 						{L('Save')}
@@ -98,5 +103,7 @@ class MyInfoComp extends React.Component {
 		);
 	}
 }
+MyInfoComp.contextType = AnContext;
+
 const MyInfo = withStyles(styles)(MyInfoComp);
 export {MyInfo, MyInfoComp};

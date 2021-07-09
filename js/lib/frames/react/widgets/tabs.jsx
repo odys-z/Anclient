@@ -1,12 +1,15 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from "@material-ui/core/styles";
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
-const styles = (theme) => {
+import {L} from '../utils/langstr';
+	import {AnContext} from '../reactext.jsx';
+
+const styles = (theme) => ({
   root: {
 	flexGrow: 1,
 	backgroundColor: theme.palette.background.paper,
@@ -16,28 +19,24 @@ const styles = (theme) => {
 	  backgroundColor: '#55f'
 	}
   },
-};
+});
 
-class TabPanel() extends React.Component {
+class TabPanel extends React.Component {
+	state = {}
+
 	constructor (props) {
-		let { children, px, pid, ...args } = props;
-
-		this.setState( {
-			children,
-			px,
-			pid,
-			params: args } );
+		super(props);
 	}
 
 	render () {
 	  return (
-		<div hidden={this.pid !== this.px}
-			id={`p-${this.state.pid}`}
-			{...this.state.params}
+		<div hidden={this.props.pid !== this.props.px}
+			id={`p-${this.props.pid}`}
+			{...this.props.args}
 		>
-			{this.state.px === this.state.pid && (
+			{this.props.px === this.props.pid && (
 			<Box p={3}>
-			  <Typography>{children}</Typography>
+			  <Typography>{this.props.children}</Typography>
 			</Box>
 			)}
 		</div>
@@ -45,68 +44,53 @@ class TabPanel() extends React.Component {
 	}
 }
 
-export class TabsComp extends React.Component {
+class TabsComp extends React.Component {
 	state = {
-		ix: 0;
-		index: -1;
+		px: 0, // panel index
 	};
 
 	constructor (props = {}) {
 		super(props);
+		this.dynatabs = [
+			{label: L('Basic')},
+			{label: L('Contact'), },
+			{label: L('Security')},
+		]
+
+		this.handleChange = this.handleChange.bind(this);
 	}
 
-	handleChange (e, v) => {
+	handleChange (e, v) {
 		e.stopPropagation();
-		this.setState({ index: v });
+		this.setState({ px: v });
 	};
-
-	labels() {
-		return
-		this.dynatabs.map( (e, x) => {
-			<Tab value={'d-' + x} label={e.label} className={classes.tab} />
-		});
-	}
-
-	panels() {
-		return
-		this.dynatabs.map( (e, x) => {
-			<TabPanel px={this.state.index} pid={'d-' + x} >
-				{e.label}
-			<TabPanel>
-		});
-	}
 
 	render() {
 		const {classes} = this.props;
 	  	return (
 		<div className={classes.root}>
 		  <AppBar position="static">
-			<Tabs value={this.state.index}
-				  onChange={handleChange} >
-			  <Tab value="1"
-				label="New Arrivals in the Longest Text of Nonfiction"
-				className={classes.tab}
-			  />
-			  <Tab value="2" label="Item Two" className={classes.tab} />
-			  <Tab value="3" label="Item Three" className={classes.tab} />
-			  {labels}
+			<Tabs value={this.state.px}
+				  onChange={this.handleChange} >
+			  <Tab value={0} label={L('Basic')} className={classes.tab} />
+			  <Tab value={1} label={L('System')} className={classes.tab} />
+			  <Tab value={2} label={L('Private')}  className={classes.tab} />
 			</Tabs>
 		  </AppBar>
-		  <TabPanel px={value} pid="1">
+		  <TabPanel px={this.state.px} pid={0} children={''} >
 			Item One
 		  </TabPanel>
-		  <TabPanel px={value} pid="2" >
+		  <TabPanel px={this.state.px} pid={1} children={''} >
 			Item Two222
 		  </TabPanel>
-		  <TabPanel px={value} pid="3">
+		  <TabPanel px={this.state.px} pid={2} children={''} >
 			Item Three
 		  </TabPanel>
-		  {panels}
 		</div>
 		);
 	}
 }
 TabsComp.contextType = AnContext;
 
-const Tabs = withStyles(styles)(TabsComp);
-export {Tabs, TabsComp};
+const AnTabs = withStyles(styles)(TabsComp);
+export {AnTabs, TabsComp};

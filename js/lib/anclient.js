@@ -4,7 +4,7 @@ import AES from './aes.js';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
-	DatasetCfg
+	DatasetReq
 } from './protocol.js';
 
 /**The lower API of jclient/js
@@ -647,7 +647,7 @@ class SessionClient {
 		let header = Protocol.formatHeader(this.ssInf);
 		let body = {type: "io.odysz.semantic.jsession.AnSessionReq", a: "logout"};
 		let req = new AnsonMsg({port: 'session', header, body: [body]});
-		
+
 		an.post(req, function(c, r) {
         	localStorage.setItem(SessionClient.ssInfo, null);
 			if (typeof onOk === 'function')
