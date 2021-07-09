@@ -160,8 +160,22 @@ class AnsonMsg {
 			body = new AnSessionReq(body.uid, body.token, body.iv);
 		else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 			body = new UserReq(json.port, header, [body]);
-		else if (body.type === "io.odysz.semantic.ext.AnDatasetReq")
-			body = new DatasetCfg(...);
+		else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
+			// if (!json.dataset) {
+			// 	console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs provide dataset config info (dataset) in arg.",
+			// 			"For example, see https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/03-jsample.mocha.js");
+			// 	throw new Error("json.dataset is empty.");
+			// }
+			// let ds = typeof json.dataset === 'function' ? json.dataset() : json.dataset;
+			// body = new DatasetReq(json.dataset);
+
+			// body are provided by user
+			if (!body.sk) {
+				console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs providing DatasetReq as body.",
+						"For example, see https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/03-jsample.mocha.js");
+				throw new Error("DatasetReq.sk is essential but empty.");
+			}
+		}
 		else {
 			// if (Protocol.verbose >= 5)
 			// 	console.warn("Using json object directly as body. Type : " + body.type);
@@ -788,29 +802,30 @@ const stree_t = {
 	/** Query with client provided QueryReq object, and format the result into tree. */
 	query: ''};
 
-class DatasetCfg extends QueryReq {
+class DatasetReq extends QueryReq {
 	/**
 	 * @param {object} opts parameter objects
 	 * @param {string} opts.conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} opts.sk semantic key configured in WEB-INF/dataset.xml
-	 * @param {stree_t} opts.t function branch tag (AnsonBody#a).
+	 * @param {stree_t} opts.t also opts.a, function branch tag (AnsonBody.a).
 	 * Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query
-	 * @param {object} opts.args arguments to be formatted to sql args.
 	 * @param {string} opts.maintbl if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk.
 	 * @param {string} opts.alias if t is null or undefined, use this to replace alias in super (QueryReq).
+	 * @param {object} opts.pageInf {page, size} page index and page size.
+	 * @param {{n, v}} ...opts more arguments for sql args.
 	 */
 	constructor (opts = {}) {
-		// constructor (conn, sk, t, args, maintbl, alias) {
-		let {conn, sk, t, args, maintbl, alias} = opts;
+		let {conn, sk, t, a, mtabl, mAlias, pageInf, ...args} = opts;
 
-		super(conn, Jregex.isblank(t) ? maintbl : sk, alias);
+		super(conn, Jregex.isblank(t) ? mtabl : sk, mAlias);
 		this.type = "io.odysz.semantic.ext.AnDatasetReq";
 
 		this.conn = conn;
 		this.sk = sk;
-		this.sqlArgs = args;
+		this.sqlArgs = args.args;
 
-		this._t(t);
+		t = t || a;
+		this.T(t);
 		this.checkt(t);
 	}
 
@@ -824,15 +839,20 @@ class DatasetCfg extends QueryReq {
 		return this;
 	}
 
-	_t(ask) {
+	T(ask) {
 		if (typeof sk === 'string' && sk.length > 0 && ask !== stree_t.sqltree) {
-			console.warn('DatasetCfg.a is ignored for sk is defined.', sk);
+			console.warn('DatasetReq.a is ignored for sk is defined.', sk);
 			this.a = stree_t.sqltree;
 		}
 		else {
 			this.a = ask;
 			this.checkt(ask);
 		}
+		return this;
+	}
+
+	A(a) {
+		return this.T(a);
 	}
 
 	args(args) {
@@ -840,11 +860,8 @@ class DatasetCfg extends QueryReq {
 			this.sqlArgs = [];
 		}
 
-		if (typeof args === 'string') {
-			this.sqlArgs = this.sqlArgs.concat([args]);
-		}
-		else if (Array.isArray(args)) {
-			this.sqlArgs = args;
+		if (typeof args === 'string' || Array.isArray(args)) {
+			this.sqlArgs = this.sqlArgs.concat(args);
 		}
 		else {
 			console.error('sql args is not an arry: ', args);
@@ -854,17 +871,20 @@ class DatasetCfg extends QueryReq {
 	}
 
 	/** Check is t can be undertood by s-tree.serv
-	 * TODO why not ask server for stree_t?
+	 * TODO why not asking server for stree_t?
 	 * @param {string} t*/
 	checkt(t) {
 		// if (t !== stree_t.sqltree && t !== stree_t.retree && t !== stree_t.reforest) {
 		if (t !== undefined && !stree_t.hasOwnProperty(t)) {
-			console.warn("DatasetCfg.t won't been understood by server:", t, "Should be one of", stree_t);
+			console.warn(
+				"DatasetReq.t won't be understood by server:", t, "Should be one of",
+				Object.keys(stree_t));
 		}
+		return this;
 	}
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
 export {Jregex, Protocol, AnsonMsg, AnHeader,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
-	AnsonResp, DatasetCfg, stree_t}
+	AnsonResp, DatasetReq, stree_t}

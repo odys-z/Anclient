@@ -180,7 +180,6 @@ describe('case: [01.1 Protocol/AnsonMsg]', () => {
 		assert.equal(ur.data.props['title'], 'user-req', "6 ---");
 		assert.equal(ur.data.props.quizId, '000001', "7 ---");
 
-		debugger
 		let port = 'test1';
 		let jreq = new AnsonMsg({
 					port,
