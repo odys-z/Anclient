@@ -1,12 +1,12 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, DatasetReq } from '../../lib/protocol.js'
 
-const dsResp = {
+const dsTestResp = {
 	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",
 	"code": "ok", "opts": null,
 	"port": "dataset", "header": null,
 	"vestion": "1.0",
-	"body": [{"type": "io.odysz.semantic.ext.test.AnDatasetResp",
+	"body": [{"type": "io.odysz.semantic.ext.AnDatasetResp",
 			  "rs": [{  "type": "io.odysz.anson.AnsonResultset",
 			  			"stringFormats": null, "total": 0, "rowCnt": 2, "colCnt": 2,
 						"colnames": {"1": [1, "1"], "2": [2, "2"]},
@@ -54,7 +54,7 @@ describe('case: [03.1 Jsample.menu]', () => {
 	});
 
 	it('Convert AnsonResp to menu', () => {
-		let rp = new AnsonMsg(dsResp);
+		let rp = new AnsonMsg(dsTestResp);
 		assert.equal(rp.code, 'ok', "1 ---");
 		assert.equal(rp.port, 'dataset', "2 ---");
 
