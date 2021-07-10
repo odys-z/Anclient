@@ -32,7 +32,7 @@ const jconsts = {
 	/**datas.xml/sk, sk for ir-combobox, ir-cbbtree shouldn't be here. */
 	sk: {
 		/**sk: system function menu dataset */
-		menu: 'sys.menu.ez-test',
+		menu: 'sys.menu.jsample',
 	},
 
 	/**Application Message Strings, the callback function called when jeasy-html.js is loaded.<br>

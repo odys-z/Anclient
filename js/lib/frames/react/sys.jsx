@@ -196,6 +196,10 @@ class SysComp extends React.Component {
 		this.toLogout = this.toLogout.bind(this);
 	}
 
+	componentDidMount() {
+		this.context.anClient
+	}
+
 	showMenu() {
 		this.setState({showMenu: true});
 	}

@@ -161,14 +161,6 @@ class AnsonMsg {
 		else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 			body = new UserReq(json.port, header, [body]);
 		else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
-			// if (!json.dataset) {
-			// 	console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs provide dataset config info (dataset) in arg.",
-			// 			"For example, see https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/03-jsample.mocha.js");
-			// 	throw new Error("json.dataset is empty.");
-			// }
-			// let ds = typeof json.dataset === 'function' ? json.dataset() : json.dataset;
-			// body = new DatasetReq(json.dataset);
-
 			// body are provided by user
 			if (!body.sk) {
 				console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs providing DatasetReq as body.",
@@ -176,6 +168,8 @@ class AnsonMsg {
 				throw new Error("DatasetReq.sk is essential but empty.");
 			}
 		}
+		else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
+			body = new AnDatasetResp(body);
 		else {
 			// if (Protocol.verbose >= 5)
 			// 	console.warn("Using json object directly as body. Type : " + body.type);
@@ -399,6 +393,16 @@ class AnSessionResp extends AnsonResp {
 	constructor(ssResp) {
 		super(ssResp);
 		this.ssInf = ssResp.ssInf;
+	}
+}
+
+class AnDatasetResp extends AnsonResp {
+	constructor(dsResp) {
+		super(dsResp);
+	}
+
+	rs(rx) {
+		return 
 	}
 }
 

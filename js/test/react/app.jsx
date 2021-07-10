@@ -5,7 +5,8 @@ import ReactDOM from 'react-dom';
 import {SessionClient} from '../../lib/anclient.js'
 	import {L, Langstrs} from '../../lib/frames/react/utils/langstr.js'
 	import { Sys } from '../../lib/frames/react/sys.jsx';
-	import { AnReact, AnContext, AnError } from '../../lib/frames/react/reactext.jsx'
+	import { AnContext, AnError } from '../../lib/frames/react/reactext.jsx'
+	import { AnReact } from '../../lib/frames/react/anreact.jsx'
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {

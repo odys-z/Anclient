@@ -1,6 +1,24 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, DatasetReq } from '../../lib/protocol.js'
 
+const dsTestResp = {
+	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",
+	"code": "ok", "opts": null,
+	"port": "dataset", "header": null,
+	"vestion": "1.0",
+	"body": [{"type": "io.odysz.semantic.ext.AnDatasetResp",
+			  "rs": [{  "type": "io.odysz.anson.AnsonResultset",
+			  			"stringFormats": null, "total": 0, "rowCnt": 2, "colCnt": 2,
+						"colnames": {"1": [1, "1"], "2": [2, "2"]},
+						"rowIdx": 0,
+						"results": [["0, 1", "0, 2"], ["1, 1", "1, 2"]]
+					}],
+			  "parent": "io.odysz.semantic.jprotocol.test.AnsonMsg",
+			  "a": null,
+			  "forest": null, "conn": null, "m": "", "map": null
+	}], "seq": 0
+}
+
 describe('case: [03.1 Jsample.menu]', () => {
 
 	it('Convert to menu.serv requests', () => {
@@ -36,5 +54,10 @@ describe('case: [03.1 Jsample.menu]', () => {
 	});
 
 	it('Convert AnsonResp to menu', () => {
+		let rp = new AnsonMsg(dsTestResp);
+		assert.equal(rp.code, 'ok', "1 ---");
+		assert.equal(rp.port, 'dataset', "2 ---");
+
+		assert.equal(rp.Body().rs(0).type, "io.odysz.anson.AnsonResultset", "3 ---");
 	});
 })
