@@ -55,42 +55,42 @@ export class AnError extends React.Component {
 AnError.contextType = AnContext;
 
 
-/** React helpers for AnClient */
-export class AnReact {
-
-	/**Try figure out serv root, then bind to html tag.
-	 * First try ./private.json/<serv-id>,
-	 * then  ./github.json/<serv-id>,
-	 * where serv-id = this.context.servId || host
-	 *
-	 * For test, have elem = undefined
-	 * @param {string} elem html element id, null for test
-	 * @param {object} opts serv id
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {function} onJsonServ function to render React Dom, i. e.
-	 * <pre>(elem, json) => {
-			let dom = document.getElementById(elem);
-			ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
-	}</pre>
-	 */
-	static bindDom(elem, opts, onJsonServ) {
-		// this.state.servId = serv;
-		if (opts.serv) opts.serv = 'host';
-
-		if (typeof elem === 'string') {
-			$.ajax({
-				dataType: "json",
-				url: 'private.json',
-			})
-			.done((json) => onJsonServ(elem, json))
-			.fail(
-				$.ajax({
-					dataType: "json",
-					url: 'github.json',
-				})
-				.done((json) => onJsonServ(elem, json))
-				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
-			)
-		}
-	}
-}
+// /** React helpers for AnClient */
+// export class AnReact {
+//
+// 	/**Try figure out serv root, then bind to html tag.
+// 	 * First try ./private.json/<serv-id>,
+// 	 * then  ./github.json/<serv-id>,
+// 	 * where serv-id = this.context.servId || host
+// 	 *
+// 	 * For test, have elem = undefined
+// 	 * @param {string} elem html element id, null for test
+// 	 * @param {object} opts serv id
+// 	 * @param {string} [opts.serv='host'] serv id
+// 	 * @param {function} onJsonServ function to render React Dom, i. e.
+// 	 * <pre>(elem, json) => {
+// 			let dom = document.getElementById(elem);
+// 			ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
+// 	}</pre>
+// 	 */
+// 	static bindDom(elem, opts, onJsonServ) {
+// 		// this.state.servId = serv;
+// 		if (opts.serv) opts.serv = 'host';
+//
+// 		if (typeof elem === 'string') {
+// 			$.ajax({
+// 				dataType: "json",
+// 				url: 'private.json',
+// 			})
+// 			.done((json) => onJsonServ(elem, json))
+// 			.fail(
+// 				$.ajax({
+// 					dataType: "json",
+// 					url: 'github.json',
+// 				})
+// 				.done((json) => onJsonServ(elem, json))
+// 				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
+// 			)
+// 		}
+// 	}
+// }
