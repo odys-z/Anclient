@@ -14,9 +14,9 @@ var config = {
   },
   target: 'node',
   externals: [nodeExternals()],
-  node: {
-    fs: 'empty'
-  },
+  // node: {
+  //   fs: 'empty'
+  // },
 
 
   plugins: [ ]

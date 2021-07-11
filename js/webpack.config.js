@@ -1,8 +1,8 @@
  var path = require('path')
  var webpack = require('webpack')
 
- const VueLoaderPlugin = require('vue-loader/lib/plugin')
- const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+ // const VueLoaderPlugin = require('vue-loader/lib/plugin')
+ // const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
  var v = 'development';
  var version = "0.9.27";
@@ -23,11 +23,6 @@
      libraryTarget: 'umd'
    },
 
-   // plugins: [
-   //   new VueLoaderPlugin(),
-   //   new MiniCssExtractPlugin({ filename: "vue-sidebar-menu.css" })
-   // ],
-
    module: {
  	rules: [
 		// npm install babel-plugin-syntax-jsx babel-plugin-transform-vue-jsx babel-helper-vue-jsx-merge-props babel-preset-env --save-dev
@@ -42,15 +37,7 @@
  		{test: /\.css$/,
 		 use: [ 'style-loader',
 				'css-loader',
-				// 'postcss-loader',
 			  ] }
- 		// {test: /\.scss$/,
- 		//  use: [ 'vue-style-loader',
- 		// 		'css-loader',
- 		// 		// 'postcss-loader',
- 		// 		'sass-loader'
- 		//  	  ]},
- 		// {test: /\.vue$/, loader: ["vue-loader"] },
 	],
   }, // module
 }

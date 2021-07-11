@@ -175,8 +175,8 @@ class SysComp extends React.Component {
 		showMenu: false,
 		expandings: new Set(),
 
-		hasError: false,
-		errHandler: { },
+		// hasError: false,
+		// errHandler: { },
 	};
 
 	constructor(props) {
@@ -194,7 +194,10 @@ class SysComp extends React.Component {
 
 	componentDidMount() {
 		// load menu
-		this.context.anReact.loadMenu(this.context.anClient.ssInf);
+		this.context.anReact.loadMenu( this.context.anClient.ssInf,
+			(dsResp) => {
+
+			}, this.context.error);
 	}
 
 	showMenu() {

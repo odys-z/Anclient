@@ -43,11 +43,7 @@
     "react-transition-group": "^4.4.2",
     "sass-loader": "^7.3.1",
     "style-loader": "^0.23.1",
-    "tar": "^4.4.13",
-    "vue": "^2.6.14",
-    "vue-loader": "^15.9.7",
-    "vue-router": "^3.5.2",
-    "vue-template-compiler": "^2.6.14"
+    "tar": "^4.4.13"
   },
   "devDependencies": {
     "babel-helper-vue-jsx-merge-props": "^2.0.3",

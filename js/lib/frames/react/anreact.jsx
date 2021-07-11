@@ -2,22 +2,25 @@ import $ from 'jquery';
 import React from 'react';
 
 import { L } from './utils/langstr';
-import { Protocol, DatasetReq } from '../../protocol.js';
+import { stree_t, Protocol, DatasetReq } from '../../protocol.js';
 
-/** React helpers of AnClient */
+/** React helpers of AnClient
+ * AnReact uses AnContext to expose session error. So it's helpful using AnReact
+ * in an An-React application (which handle error in top level).
+ */
 export class AnReact {
 	/**@param {SessionClient} ssClient client created via login
-	 * @param {object} errHandler, AnContext.error, the app error handler
+	 * @param {object} errCtx, AnContext.error, the app error handler
 	 */
-	constructor (ssClient, errHandler) {
+	constructor (ssClient, errCtx) {
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
-		this.err = errHandler;
+		this.err = errCtx;
 	}
 
 	static get port() { return 'quiz'; }
 
-	serv (a, conds = {}, onLoad, errHandler) {
+	serv (a, conds = {}, onLoad, errCtx) {
 		let req = new UserReq(qconn)
 			.A(a); // this is a reading request
 
@@ -40,11 +43,11 @@ export class AnReact {
 				});
 
 		this.client.an.post(jreq, onLoad, (c, resp) => {
-			if (errHandler) {
-				errHandler.hasError = true;
-				errHandler.code = c;
-				errHandler.msg = resp.Body().msg();
-				errHandler.onError(true);
+			if (errCtx) {
+				errCtx.hasError = true;
+				errCtx.code = c;
+				errCtx.msg = resp.Body().msg();
+				errCtx.onError(true);
 			}
 			else console.error(c, resp);
 		});
@@ -57,9 +60,9 @@ export class AnReact {
 	 * @param {string} quizId quiz id
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
 	 * */
-	quiz(quizId, onLoad, errHandler) {
+	quiz(quizId, onLoad, errCtx) {
 		let that = this;
-		return this.serv(quiz_a.quiz, {quizId}, onLoad, errHandler);
+		return this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
 	}
 
 	list (conds, onLoad) {
@@ -161,18 +164,31 @@ export class AnReactExt extends AnReact {
 	}
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
-	 * @param{SessionInf} ssinf
+	 * @param {SessionInf} ssinf
+	 * @param {function} ssinf
+	 * @param {AnContext} errCtx
+	 * @return {AnReactExt} this
 	 */
-	loadMenu(ssinf, onOk) {
+	loadMenu(ssinf, onLoad, errCtx) {
 		const sk = 'sys.menu.jsample';
-		const pmenu = 'menu.serv';
+		const pmenu = 'menu';
 
 		let reqbody = new DatasetReq({
 				sk,
 				sqlArgs: [ssinf.uid]
 			})
-			.A('any-thing');
-		let jmsg = this.client.userReq(undefined, Protocol.Port.menu, reqbody);
+			.A(stree_t.query);
+		let jreq = this.client.userReq(undefined, pmenu, reqbody);
+
+		this.client.an.post(jreq, onLoad, (c, resp) => {
+			if (errCtx) {
+				errCtx.hasError = true;
+				errCtx.code = c;
+				errCtx.msg = resp.Body().msg();
+				errCtx.onError(true);
+			}
+			else console.error(c, resp);
+		});
 		return this;
 	}
 
