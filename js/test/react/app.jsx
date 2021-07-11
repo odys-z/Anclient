@@ -5,11 +5,13 @@ import ReactDOM from 'react-dom';
 import {SessionClient} from '../../lib/anclient.js'
 	import { Protocol } from '../../lib/protocol.js'
 	import {L, Langstrs} from '../../lib/frames/react/utils/langstr.js'
-	import { Sys } from '../../lib/frames/react/sys.jsx';
+	import { Sys, SysComp } from '../../lib/frames/react/sys.jsx';
 	import { AnContext, AnError } from '../../lib/frames/react/reactext.jsx'
 	import { AnReactExt } from '../../lib/frames/react/anreact.jsx'
 
+// tests extents
 import { samports } from '../jsample.js'
+import { Domain } from './views/domain'
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -40,6 +42,8 @@ class App extends React.Component {
 		this.state.anClient = new SessionClient();
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts(samports);
+
+		SysComp.extendLinks( [{'views/sys/domain/domain.html': Domain}] );
 	}
 
 	componentDidMount () {
@@ -51,7 +55,10 @@ class App extends React.Component {
 		}
 	}
 
-	onError() { }
+	onError(c, r) {
+		console.error(c, r);
+		this.setState({hasError: !!c, nextAction: 're-login'});
+	}
 
 	onErrorClose() {
 		if (this.state.nextAction === 're-login') {

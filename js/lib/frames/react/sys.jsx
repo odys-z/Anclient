@@ -36,8 +36,9 @@ import {Protocol} from '../../protocol.js'
 	import {L, Langstrs} from './utils/langstr.js'
 
 import {
-	Home, Domain, Roles, UserInfo
+	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow
 } from './crud.jsx'
+
 
 const _icons = {
 	'expand': <ExpandMore />,
@@ -50,9 +51,12 @@ const _icons = {
 
 const _comps = {
 	'/home': Home,
-	'/sys/domain': Domain,
-	'/sys/roles': Roles,
-	'/sys/userinfo': UserInfo,
+	'views/sys/domain/domain.html': Domain,
+	'views/sys/role/roles.html': Roles,
+	'views/sys/org/orgs.html': Orgs,
+	'views/sys/org/users.html': Users,
+	'views/sys/workflow/workflows.html': CheapFlow,
+	'views/sys/user/users-1.1.html': Users,
 	'/sys/error': Error,
 }
 
@@ -146,7 +150,7 @@ class SysComp extends React.Component {
 			funcName: 'Anclient Lv-0',
 			url: '/',
 			css: {icon: "menu-lv0"},
-			flag: '0',
+			flags: '0',
 			fullpath: 'sys',
 			parentId: undefined,
 			sibling: 0,
@@ -155,7 +159,7 @@ class SysComp extends React.Component {
 					funcName: 'Domain Settings',
 					url: '/sys/domain',
 					css: {icon: "menu-lv1"},
-					flag: '0',
+					flags: '0',
 					fullpath: 'sys.0 domain',
 					parentId: 'sys',
 					sibling: 0
@@ -164,7 +168,7 @@ class SysComp extends React.Component {
 					funcName: 'Sysem Roles',
 					url: '/sys/roles',
 					css: {icon: "menu-lv1"},
-					flag: '0',
+					flags: '0',
 					fullpath: 'sys.1 roles',
 					parentId: 'sys',
 					sibling: 0
@@ -172,12 +176,49 @@ class SysComp extends React.Component {
 			]
 		},
 
+		cruds: [{'/home': Home}],
+		paths: [{path: '/home', params: {}}],
+
 		showMenu: false,
 		expandings: new Set(),
-
-		// hasError: false,
-		// errHandler: { },
 	};
+
+	static extendLinks(links) {
+		links.forEach( (l, x) => {
+			_comps[l.path] = l.comp;
+		});
+	}
+
+	/**
+	 * Parse lagacy json format.
+	 * @return {object} {funcId, id, funcName, url, css, flags, parentId, sort, sibling, children}
+	 */
+	static parseMenus(json = []) {
+		let paths = []; // {'/home': Home}
+		let menu = parse(json);
+		return { menu, paths };
+
+		function parse(json) {
+			if (Array.isArray(json))
+				return json.map( (jn) => { return parse(jn); } );
+			else {
+				// this is just a lagacy of EasyUI, will be deprecated
+				let {funcId, id, funcName, text, url, css, flags, parentId, sort, sibling, children}
+					= json.node;
+
+				sibling = sibling || sort;
+				funcId = funcId || id;
+				funcName = funcName || text;
+
+				paths.push({path: url, params: {flags, css}})
+
+				if (children)
+					children = parse(children);
+
+				return {funcId, funcName, url, css, flags, parentId, sibling, children};
+			}
+		}
+	}
 
 	constructor(props) {
 		super(props);
@@ -194,18 +235,21 @@ class SysComp extends React.Component {
 
 	componentDidMount() {
 		// load menu
+		let that = this;
 		this.context.anReact.loadMenu( this.context.anClient.ssInf,
 			(dsResp) => {
-
-			}, this.context.error);
+				let {menu, paths} = SysComp.parseMenus(dsResp.Body().forest);
+				that.state.sysMenu = menu;
+				that.state.cruds = paths;
+			}, this.context.error );
 	}
 
 	showMenu() {
-		this.setState({showMenu: true});
+		this.setState({ showMenu: true });
 	}
 
 	hideMenu() {
-		this.setState({showMenu: false});
+		this.setState({ showMenu: false });
 	}
 
 	toLogout() {
@@ -229,50 +273,65 @@ class SysComp extends React.Component {
 	 * @param {object} classes
 	 */
 	menuItems(classes) {
-		let m = this.state.sysMenu;
-		let open = this.state.expandings.has(m.funcId);
+		let that = this;
 
-		return (<>
-		<ListItem button onClick={this.toExpandItem} iid={m.funcId}>
-			<ListItemIcon>{icon(m.css)}</ListItemIcon>
-			<ListItemText primary={m.funcName} />
-			{ open ? icon('expand') : icon('collapse') }
-		</ListItem>
-		{m.children && m.children.length > 0 ?
-			(<Collapse in={open} timeout="auto" unmountOnExit>
-				<List component="div" disablePadding>
-					{subMenus(m.children)}
-				</List>
-			</Collapse>) : ''
+		let m = this.state.sysMenu;
+		let expandItem = this.toExpandItem;
+		let mtree = buildMenu(m, classes);
+		return mtree;
+
+		function buildMenu(menu) {
+			if (Array.isArray(menu)) {
+				return menu.map( (i, x) => {
+						return buildMenu(i);
+					} );
+			}
+			else {
+				let open = that.state.expandings.has(menu.funcId);
+				if ( menu.children && menu.children.length > 0 )
+				  return (
+				  <div key={menu.funcId}>
+					<ListItem button onClick={expandItem} iid={menu.funcId}>
+						<ListItemIcon>{icon(menu.css)}</ListItemIcon>
+						<ListItemText primary={menu.funcName} />
+						{ open ? icon('expand') : icon('collapse') }
+					</ListItem>
+					<Collapse in={open} timeout="auto" unmountOnExit>
+						<List component="div" disablePadding>
+							{buildMenu(menu.children)}
+						</List>
+					</Collapse>
+				  </div>);
+				else
+				  return (
+					<div key={menu.funcId}>
+						<Link component={RouterLink} to={menu.url}>
+							<ListItem button className={classes.nested}>
+							<ListItemIcon>{icon(menu.css.icon)}</ListItemIcon>
+							<ListItemText primary={menu.funcName} />
+							</ListItem>
+						</Link>
+					</div>);
+			}
 		}
-		</>);
 
 		function icon(icon) {
 			// shall we use theme here?
 			return _icons[icon || 'deflt'];
 		}
-
-		function subMenus(mitems) {
-			return mitems.map( (func, x) =>
-			(<div key={`${func.funcId}}`}>
-				<Link component={RouterLink} to={func.url}>
-					<ListItem button className={classes.nested}>
-					<ListItemIcon>{icon(func.css.icon)}</ListItemIcon>
-					<ListItemText primary={func.funcName} />
-					</ListItem>
-				</Link>
-			</div>) );
-		}
 	}
 
 	route() {
-		return [{path: '/home', params: {}},
-				{path: '/sys/domain', params: {}},
-				{path: '/sys/roles', params: {}},
-				{path: '/sys/error', params: {}}]
-		.map( (c, x) =>
-			(<Route exact path={c.path} key={x} component={_comps[c.path]} {...c.params}/>)
-		);
+		// return [{path: '/home', params: {}},
+		// 		{path: 'views/sys/domain/domain.html', params: {}},
+		// 		{path: 'views/sys/role/roles.html', params: {}},
+		// 		{path: 'views/sys/org/orgs.html', params: {}},
+		// 		{path: 'views/sys/user/users.html', params: {}},
+		// 		{path: '/sys/error', params: {}}]
+		return this.state.cruds
+			.map( (c, x) =>
+				(<Route exact path={c.path} key={x} component={_comps[c.path]} {...c.params}/>)
+			);
 	}
 
 	render() {
@@ -319,22 +378,22 @@ class SysComp extends React.Component {
 			</Toolbar>
 			</AppBar>
 			<Router><React.Fragment><Drawer
-				className={classes.drawer}
-				variant="persistent"
-				anchor="left"
-				open={open}
-				classes={{paper: classes.drawerPaper}}
-			>
-			<div className={classes.drawerHeader}>
-				<IconButton onClick={this.hideMenu}>
-					<ListItemText>{this.state.sysName}</ListItemText>
-					{classes.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-				</IconButton>
-			</div>
-			<Divider />
-			<List>
-				{this.menuItems(classes)}
-			</List>
+					className={classes.drawer}
+					variant="persistent"
+					anchor="left"
+					open={open}
+					classes={{paper: classes.drawerPaper}}
+				>
+				<div className={classes.drawerHeader}>
+					<IconButton onClick={this.hideMenu}>
+						<ListItemText>{this.state.sysName}</ListItemText>
+						{classes.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+					</IconButton>
+				</div>
+				<Divider />
+				<List>
+					{this.menuItems(classes)}
+				</List>
 			</Drawer></React.Fragment>
 			<main onClick={this.hideMenu}
 				className={clsx(classes.content, {

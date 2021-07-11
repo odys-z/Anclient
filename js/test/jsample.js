@@ -1,8 +1,7 @@
 ////////////////////     jsample application common      ///////////////////////
 
 /** project utils
- * @deprecated replacedd by test/jsample.js
- * @module jsample/easyui */
+ * @module anclient/jsample */
 const anconsts = {
 	/**Warning log level, the higher value, the more verbose.<br>
 	 * A coding convention of odys-z, nothing about the framework

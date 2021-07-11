@@ -1,5 +1,6 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, DatasetReq } from '../../lib/protocol.js'
+import { SysComp } from '../../lib/frames/react/sys.jsx'
 
 const dsTestResp = {
 	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",
@@ -21,7 +22,7 @@ const dsTestResp = {
 	}], "seq": 0
 }
 
-/** response for sk: sys.menu.jsample */
+/** response for sk: sys.menu.jsample, without css and flags */
 const dsMenu = {
 	"type": "io.odysz.semantic.jprotocol.AnsonMsg",
 	"code": "ok", "opts": null,
@@ -35,7 +36,12 @@ const dsMenu = {
 			"node": {
 				"children": [
 				  {	"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-					"node": {"fullpath": "1 sys.1 domain", "id": "sys-domain", "text": "Domain Settings", "sort": "1", "parentId": "sys", "url": "views/sys/domain/domain.html"},
+					"node": { "fullpath": "1 sys.1 domain",
+							  "id": "sys-domain",
+							  "text": "Domain Settings",
+							  "sort": "1",
+							  "parentId": "sys",
+							  "url": "views/sys/domain/domain.html" },
 					"parent": "Domain Settings", "id": "sys"},
 				  {	"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
 					"node": {"fullpath": "1 sys.2 role", "id": "sys-role", "text": "Role Manage", "sort": "2", "parentId": "sys", "url": "views/sys/role/roles.html"},
@@ -113,5 +119,19 @@ describe('case: [03.1 Jsample.menu]', () => {
 		assert.equal(forest[0].node.children[0].node.id, 'sys-domain', "sys/domain ---");
 		assert.equal(forest[1].id, '', "why ???");
 		assert.equal(forest[1].node.id, 'sys-1.1', "sys 1.1 ???");
+	});
+
+	it("Parse Menu's lagacy format", () => {
+		let msg = new AnsonMsg(dsMenu);
+		let forest = msg.Body().forest;
+		forest = SysComp.parseMenus(forest);
+
+		assert.equal(msg.Body().type, "io.odysz.semantic.ext.AnDatasetResp", "1 ---");
+		assert.equal(forest.length, 2, "2 ---");
+		assert.equal(forest[0].node, undefined, "node ---");
+		assert.equal(forest[0].id, undefined, "id ---");
+		assert.equal(forest[0].funcId, 'sys', "sys ---");
+		assert.equal(forest[0].children.node, undefined, "sys/node ---");
+		assert.equal(forest[0].children[0].funcId, 'sys-domain', "sys/domain ---");
 	});
 });
