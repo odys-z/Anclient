@@ -4,6 +4,7 @@
 // The following is the project adapter (common of engineering-costs).
 ////////////////////////////////////////////////////////////////////////////////
 /** project utils
+ * @deprecated replacedd by test/jsample.js
  * @module jsample/easyui */
 const jconsts = {
 	/**Warning log level, the higher value, the more verbose.<br>

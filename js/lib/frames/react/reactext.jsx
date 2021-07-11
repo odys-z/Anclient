@@ -13,7 +13,7 @@ export const AnContext = React.createContext({
 	servId: 'host',
 	servs: { host: 'http://localhost:8080/jserv-sample' },
 
-	quizId: undefined,
+	anReact: undefined,
 
 	// error handling pattern like
 	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4

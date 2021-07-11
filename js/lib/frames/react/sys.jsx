@@ -172,10 +172,6 @@ class SysComp extends React.Component {
 			]
 		},
 
-		userid: '',
-		pswd: '',
-		username: '',
-
 		showMenu: false,
 		expandings: new Set(),
 
@@ -197,7 +193,8 @@ class SysComp extends React.Component {
 	}
 
 	componentDidMount() {
-		this.context.anClient
+		// load menu
+		this.context.anReact.loadMenu(this.context.anClient.ssInf);
 	}
 
 	showMenu() {

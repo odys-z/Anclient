@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import React from 'react';
 
-import {L} from './utils/langstr';
+import { L } from './utils/langstr';
+import { Protocol, DatasetReq } from '../../protocol.js';
 
 /** React helpers of AnClient */
 export class AnReact {
@@ -9,7 +10,6 @@ export class AnReact {
 	 * @param {object} errHandler, AnContext.error, the app error handler
 	 */
 	constructor (ssClient, errHandler) {
-		ssClient.an.understandPorts(Quizports);
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
 		this.err = errHandler;
@@ -149,4 +149,31 @@ export class AnReact {
 			)
 		}
 	}
+}
+
+/**Ectending AnReact with dataset & sys-menu, the same of layers extinding of jsample.
+ * @class
+ */
+export class AnReactExt extends AnReact {
+	extendPorts(ports) {
+		this.client.an.understandPorts(ports);
+		return this;
+	}
+
+	/** Load jsample menu. (using DatasetReq & menu.serv)
+	 * @param{SessionInf} ssinf
+	 */
+	loadMenu(ssinf, onOk) {
+		const sk = 'sys.menu.jsample';
+		const pmenu = 'menu.serv';
+
+		let reqbody = new DatasetReq({
+				sk,
+				sqlArgs: [ssinf.uid]
+			})
+			.A('any-thing');
+		let jmsg = this.client.userReq(undefined, Protocol.Port.menu, reqbody);
+		return this;
+	}
+
 }
