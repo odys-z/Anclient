@@ -197,7 +197,7 @@ class SysComp extends React.Component {
 	}
 
 	componentDidMount() {
-		this.context.anClient
+		// Should we check session here in case no backend service accessing (which makes session verification)?
 	}
 
 	showMenu() {
