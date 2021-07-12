@@ -51,12 +51,12 @@ const _icons = {
 
 const _comps = {
 	'/home': Home,
-	'views/sys/domain/domain.html': Domain,
-	'views/sys/role/roles.html': Roles,
-	'views/sys/org/orgs.html': Orgs,
-	'views/sys/org/users.html': Users,
-	'views/sys/workflow/workflows.html': CheapFlow,
-	'views/sys/user/users-1.1.html': Users,
+	'/views/sys/domain/domain.html': Domain,
+	'/views/sys/role/roles.html': Roles,
+	'/views/sys/org/orgs.html': Orgs,
+	'/views/sys/org/users.html': Users,
+	'/views/sys/workflow/workflows.html': CheapFlow,
+	'/views/sys/user/users-1.1.html': Users,
 	'/sys/error': Error,
 }
 
@@ -210,6 +210,7 @@ class SysComp extends React.Component {
 				funcId = funcId || id;
 				funcName = funcName || text;
 
+				if (! url.startsWith('/')) url = '/' + url;
 				paths.push({path: url, params: {flags, css}})
 
 				if (children)
@@ -323,10 +324,10 @@ class SysComp extends React.Component {
 
 	route() {
 		// return [{path: '/home', params: {}},
-		// 		{path: 'views/sys/domain/domain.html', params: {}},
-		// 		{path: 'views/sys/role/roles.html', params: {}},
-		// 		{path: 'views/sys/org/orgs.html', params: {}},
-		// 		{path: 'views/sys/user/users.html', params: {}},
+		// 		{path: '/views/sys/domain/domain.html', params: {}},
+		// 		{path: '/views/sys/role/roles.html', params: {}},
+		// 		{path: '/views/sys/org/orgs.html', params: {}},
+		// 		{path: '/views/sys/user/users.html', params: {}},
 		// 		{path: '/sys/error', params: {}}]
 		return this.state.cruds
 			.map( (c, x) =>

@@ -43,7 +43,7 @@ class App extends React.Component {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts(samports);
 
-		SysComp.extendLinks( [{'views/sys/domain/domain.html': Domain}] );
+		SysComp.extendLinks( [{path: '/views/sys/domain/domain.html', comp: Domain}] );
 	}
 
 	componentDidMount () {
