@@ -124,14 +124,16 @@ describe('case: [03.1 Jsample.menu]', () => {
 	it("Parse Menu's lagacy format", () => {
 		let msg = new AnsonMsg(dsMenu);
 		let forest = msg.Body().forest;
-		forest = SysComp.parseMenus(forest);
+		debugger
+		let {menu, paths} = SysComp.parseMenus(forest);
 
-		assert.equal(msg.Body().type, "io.odysz.semantic.ext.AnDatasetResp", "1 ---");
-		assert.equal(forest.length, 2, "2 ---");
-		assert.equal(forest[0].node, undefined, "node ---");
-		assert.equal(forest[0].id, undefined, "id ---");
-		assert.equal(forest[0].funcId, 'sys', "sys ---");
-		assert.equal(forest[0].children.node, undefined, "sys/node ---");
-		assert.equal(forest[0].children[0].funcId, 'sys-domain', "sys/domain ---");
+		assert.equal(menu.Body, undefined, "1 ---");
+		assert.equal(menu.length, 2, "2 ---");
+		assert.equal(paths.length, 8, "2 ---");
+		assert.equal(menu[0].node, undefined, "node ---");
+		assert.equal(menu[0].id, undefined, "id ---");
+		assert.equal(menu[0].funcId, 'sys', "sys ---");
+		assert.equal(menu[0].children.node, undefined, "sys/node ---");
+		assert.equal(menu[0].children[0].funcId, 'sys-domain', "sys/domain ---");
 	});
 });
