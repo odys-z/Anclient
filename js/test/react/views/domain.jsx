@@ -22,7 +22,7 @@ class DomainComp extends CrudComp {
 	}
 
 	render() {
-    	const { classes } = this.props;
+		const { classes } = this.props;
 		return (<div className={classes.root}>Domain of Jsample</div>);
 	}
 }
