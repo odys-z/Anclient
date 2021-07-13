@@ -45,9 +45,7 @@ class App extends React.Component {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts(samports);
 
-	}
-
-	componentWillMount () {
+		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
 			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
@@ -55,6 +53,7 @@ class App extends React.Component {
 				err: L('Creating session failed! Please re-login.')});
 		}
 
+		// extending CRUD pages
 		SysComp.extendLinks( [
 			{path: '/views/sys/domain/domain.html', comp: Domain},
 			{path: '/views/sys/role/roles.html', comp: Roles},

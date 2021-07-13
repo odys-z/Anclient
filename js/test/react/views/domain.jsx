@@ -5,7 +5,7 @@ import { TextField } from '@material-ui/core';
 
 import { CrudComp } from '../../../lib/frames/react/crud'
 import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-import { AnTable } from '../../../lib/frames/react/widgets/table.jsx'
+import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
 import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
 
 const styles = (theme) => ( {
@@ -26,15 +26,14 @@ class DomainComp extends CrudComp {
 	}
 
 	render() {
-		let args = [];
+		let args = {};
 		const { classes } = this.props;
 		return ( <>
 			<AnQueryForm >
 				<TextField />
 			</AnQueryForm>
-			<AnTable className={classes.root}
+			<AnTablist className={classes.root}
 				t={'query'}
-				args
 			/>
 		</>);
 	}

@@ -124,7 +124,6 @@ describe('case: [03.1 Jsample.menu]', () => {
 	it("Parse Menu's lagacy format", () => {
 		let msg = new AnsonMsg(dsMenu);
 		let forest = msg.Body().forest;
-		debugger
 		let {menu, paths} = SysComp.parseMenus(forest);
 
 		assert.equal(menu.Body, undefined, "1 ---");

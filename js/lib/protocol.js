@@ -288,7 +288,9 @@ class AnsonResp extends AnsonBody {
 	 * <b>Note</b> The column index and rows index shifted to starting at 0.
 	 *
 	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
-	 * @return {array} array like [ {col1: val1, ...}, ... ]
+	 * @return {object} {cols, rows}
+	 * cols: array like [ col1, col2, ... ]; <br>
+	 * rows: array like [ {col1: val1, ...}, ... ]
 	 */
 	static rs2arr (rs) {
 		let cols = [];
@@ -328,7 +330,7 @@ class AnsonResp extends AnsonBody {
 			});
 		}
 
-		return rows;
+		return {cols, rows};
 	}
 }
 

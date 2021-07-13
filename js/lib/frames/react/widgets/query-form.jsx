@@ -2,8 +2,9 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { Collapse, Box, TextField, Switch, Paper } from '@material-ui/core';
 
-import {L} from '../utils/langstr';
-	import {AnContext} from '../reactext.jsx';
+import { L } from '../utils/langstr';
+	import { AnContext } from '../reactext.jsx';
+	import { CrudComp } from '../crud'
 
 const styles = (theme) => ( {
 	root: {
@@ -36,14 +37,19 @@ class AnQueryFormComp extends CrudComp {
 
 	constructor(props) {
 		super(props);
+
+		this.handleChange = this.handleChange.bind(this);
+	}
+
+	handleChange(e) {
 	}
 
 	render() {
-		let {checked} = this.state;
-		let {classes} = this.props;
+		let { checked } = this.state;
+		let { classes } = this.props;
 		return (
 		<div className={classes.root}>
-			<Switch checked={checked} onChange={handleChange} />
+			<Switch checked={checked} onChange={this.handleChange} />
 			<Collapse in={checked}>
 				<Paper elevation={4} className={classes.paper}>
 					<svg className={classes.svg}>
@@ -56,5 +62,5 @@ class AnQueryFormComp extends CrudComp {
 }
 AnQueryFormComp.contextType = AnContext;
 
-const AnQueryForm = withStyles(styles)(AnQueryFormyComp);
+const AnQueryForm = withStyles(styles)(AnQueryFormComp);
 export {AnQueryForm, AnQueryFormComp }
