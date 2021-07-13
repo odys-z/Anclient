@@ -23,13 +23,33 @@ class DomainComp extends CrudComp {
 
 	constructor(props) {
 		super(props);
+
+		this.toSearch = this.toSearch.bind(this);
+		this.toClearForm = this.toClearForm.bind(this);
+	}
+
+	toSearch(e, query) {
+		console.log('Text', query.condTxt);
+		console.log('Item value', query.condCbb);
+	}
+
+	toClearForm(e) {
+
 	}
 
 	render() {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<AnQueryForm >
+			<AnQueryForm onSearch={this.toSearch} onClear={this.toClearForm}
+				conds={[
+					{ type: 'text', val: '', text: 'No', label: 'text condition (dynamic)'},
+					{ type: 'cbb', val: '', options: [
+						{n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
+					  label: 'auto complecte (dynamic)'},
+				]}
+				query={(q) => { return {condTxt: q.state.conds[0].val, condCbb: q.state.conds[1].val }} }
+				>
 				<TextField />
 			</AnQueryForm>
 			<AnTablist className={classes.root}

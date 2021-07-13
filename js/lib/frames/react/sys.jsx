@@ -339,8 +339,6 @@ class SysComp extends React.Component {
     	const { classes } = this.props;
 		let open = this.state.showMenu;
 
-		console.log(this.state.sysName, L('Logout'));
-
 		return (
 		  <div className={classes.root}>
 			<AppBar

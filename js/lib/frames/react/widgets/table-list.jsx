@@ -195,7 +195,7 @@ class AnTablistComp extends CrudComp {
 				count={-1}
 				rowsPerPage={20}
 				page={this.state.page}
-				onChangePage = {this.handleChangePage} // (event, newPage)
+				onPageChange = {this.handleChangePage} // (event, newPage)
 			/>
 		</Paper>);
 	}
