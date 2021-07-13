@@ -32,12 +32,26 @@ class DomainComp extends CrudComp {
 }
 const Domain = withStyles(styles)(DomainComp);
 
+class OrgsComp extends CrudComp {
+	render() {
+		return (<>Orgs</>);
+	}
+}
+const Orgs = withStyles(styles)(OrgsComp);
+
 class RolesComp extends CrudComp {
 	render() {
 		return (<>Roles</>);
 	}
 }
 const Roles = withStyles(styles)(RolesComp);
+
+class UsersComp extends CrudComp {
+	render() {
+		return (<>Users</>);
+	}
+}
+const Users = withStyles(styles)(UsersComp);
 
 class UserInfoComp extends CrudComp {
 	render() {
@@ -46,4 +60,20 @@ class UserInfoComp extends CrudComp {
 }
 const UserInfo = withStyles(styles)(UserInfoComp);
 
-export { CrudComp, Home, HomeComp, Domain, DomainComp, Roles, RolesComp, UserInfo, UserInfoComp }
+class CheapFlowComp extends CrudComp {
+	render() {
+		return (<>User Info</>);
+	}
+}
+const CheapFlow = withStyles(styles)(CheapFlowComp);
+
+export {
+	CrudComp,
+	Home, HomeComp,
+	Domain, DomainComp,
+	Roles, RolesComp,
+	Users, UsersComp,
+	UserInfo, UserInfoComp,
+	Orgs, OrgsComp,
+	CheapFlow, CheapFlowComp,
+}

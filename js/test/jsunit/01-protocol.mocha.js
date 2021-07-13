@@ -230,23 +230,32 @@ describe('case: [01.1 Protocol/AnsonMsg]', () => {
         assert.equal(ssi.ssid, "001eysTj", "7 ---");
 	} );
 
-    it('AnsonResp response handling', () => {
+    it('AnsonResp {colnames, results} => [{n, v}, ...] ', () => {
         assert.isTrue(typeof(Protocol.rs2arr) === 'function', "1 ---");
 
-		let rs = AnsonResp.rs2arr(resp.body[0].rs[0]);
-        assert.equal(8, rs.length, "2 ---");
-		let r0 = rs[0]
+		let { rows } = AnsonResp.rs2arr(resp.body[0].rs[0]);
+        assert.equal(8, rows.length, "2 ---");
+		let r0 = rows[0]
         assert.equal('v 001', r0.vid, "3 ---");
         assert.equal('100', r0.amount, "4 ---");
-		r0 = rs[1]
+		r0 = rows[1]
         assert.equal('v 002', r0.vid, "5 ---");
         assert.equal('103', r0.amount, "6 ---");
 
-		let arr = AnsonResp.rsArr(resp.body, 0);
-        assert.equal(8, arr.length, "7 ---");
+		rows = AnsonResp.rsArr(resp.body, 0).rows;
+        assert.equal(8, rows.length, "7 ---");
 
-		arr = AnsonMsg.rsArr(resp, 0);
-        assert.equal(8, arr.length, "8 ---");
+		rows = AnsonMsg.rsArr(resp, 0).rows;
+        assert.equal(8, rows.length, "8 ---");
     });
 
+    it('AnsonResp [{NAME: [x, Name]}] => [{Name, x}, ...] ', () => {
+
+		let { cols } = AnsonResp.rs2arr(resp.body[0].rs[0]);
+
+		console.log(cols);
+        assert.equal(8, cols.length, "2 ---");
+        assert.equal('vid', cols[0], "0 ---");
+        assert.equal('dim6', cols[7], "7 ---");
+	});
 });

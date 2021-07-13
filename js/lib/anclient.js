@@ -492,6 +492,7 @@ class SessionClient {
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
+	 * onOk, onError will be called after request finished.
 	 * @param {AnsonMsg} jmsg request message
 	 * @param {function} onOk
 	 * @param {function} onError

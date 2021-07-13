@@ -288,7 +288,9 @@ class AnsonResp extends AnsonBody {
 	 * <b>Note</b> The column index and rows index shifted to starting at 0.
 	 *
 	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
-	 * @return {array} array like [ {col1: val1, ...}, ... ]
+	 * @return {object} {cols, rows}
+	 * cols: array like [ col1, col2, ... ]; <br>
+	 * rows: array like [ {col1: val1, ...}, ... ]
 	 */
 	static rs2arr (rs) {
 		let cols = [];
@@ -328,7 +330,7 @@ class AnsonResp extends AnsonBody {
 			});
 		}
 
-		return rows;
+		return {cols, rows};
 	}
 }
 
@@ -397,12 +399,13 @@ class AnSessionResp extends AnsonResp {
 }
 
 class AnDatasetResp extends AnsonResp {
-	constructor(dsResp) {
-		super(dsResp);
+	constructor(dsJson) {
+		super(dsJson);
+		this.forest = dsJson.forest;
 	}
 
 	rs(rx) {
-		return 
+		return
 	}
 }
 
@@ -804,7 +807,7 @@ const stree_t = {
 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
 	reforest: 'reforest',
 	/** Query with client provided QueryReq object, and format the result into tree. */
-	query: ''};
+	query: 'query'};
 
 class DatasetReq extends QueryReq {
 	/**
@@ -881,7 +884,7 @@ class DatasetReq extends QueryReq {
 		// if (t !== stree_t.sqltree && t !== stree_t.retree && t !== stree_t.reforest) {
 		if (t !== undefined && !stree_t.hasOwnProperty(t)) {
 			console.warn(
-				"DatasetReq.t won't be understood by server:", t, "Should be one of",
+				"DatasetReq.t won't be understood by server:", t, "\n 't (a)' should be one of Protocol.stree_t's key.",
 				Object.keys(stree_t));
 		}
 		return this;
