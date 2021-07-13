@@ -11,7 +11,9 @@ import {SessionClient} from '../../lib/anclient.js'
 
 // tests extents
 import { samports } from '../jsample.js'
-import { Domain } from './views/domain'
+	import { Domain } from './views/domain'
+	import { Roles } from './views/roles'
+	import { Users } from './views/users'
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -43,16 +45,21 @@ class App extends React.Component {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts(samports);
 
-		SysComp.extendLinks( [{path: '/views/sys/domain/domain.html', comp: Domain}] );
 	}
 
-	componentDidMount () {
+	componentWillMount () {
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
-			this.setState({
+			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
 				err: L('Creating session failed! Please re-login.')});
 		}
+
+		SysComp.extendLinks( [
+			{path: '/views/sys/domain/domain.html', comp: Domain},
+			{path: '/views/sys/role/roles.html', comp: Roles},
+			{path: '/views/sys/org/users.html', comp: Users}
+		] );
 	}
 
 	onError(c, r) {
