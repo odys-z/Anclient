@@ -173,12 +173,39 @@ export class AnReactExt extends AnReact {
 		const sk = 'sys.menu.jsample';
 		const pmenu = 'menu';
 
+		// let reqbody = new DatasetReq({
+		// 		sk,
+		// 		sqlArgs: [ssinf.uid]
+		// 	})
+		// 	.A(stree_t.query);
+		// let jreq = this.client.userReq(undefined, pmenu, reqbody);
+		//
+		// this.client.an.post(jreq, onLoad, (c, resp) => {
+		// 	if (errCtx) {
+		// 		errCtx.hasError = true;
+		// 		errCtx.code = c;
+		// 		errCtx.msg = resp.Body().msg();
+		// 		errCtx.onError(true);
+		// 	}
+		// 	else console.error(c, resp);
+		// });
+		// return this;
+		return this.dataset(
+			{ssinf, port: pmenu, sk, sqlArgs: [ssinf.uid]},
+			onLoad, errCtx);
+	}
+
+	dataset(ds, onLoad, errCtx) {
+		let {ssinf, port, sk, sqlArgs} = ds;
+		sqlArgs = sqlArgs || [];
+		port = port || 'dataset';
+
 		let reqbody = new DatasetReq({
 				sk,
-				sqlArgs: [ssinf.uid]
+				sqlArgs
 			})
 			.A(stree_t.query);
-		let jreq = this.client.userReq(undefined, pmenu, reqbody);
+		let jreq = this.client.userReq(undefined, port, reqbody);
 
 		this.client.an.post(jreq, onLoad, (c, resp) => {
 			if (errCtx) {
@@ -192,4 +219,7 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
+	static parseCbbOptions(rs) {
+		
+	}
 }

@@ -332,6 +332,44 @@ class AnsonResp extends AnsonBody {
 
 		return {cols, rows};
 	}
+
+	/**Provide nv, convert results to AnReact combobox options (for binding).
+	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
+	 * @param {object} nv e.g. {n: 'domainName', v: 'domainId'}.
+	 * @return {object} {cols, rows}
+	 * cols: array like [ col1, col2, ... ]; <br>
+	 * rows: array like [ {col1: val1, ...}, ... ], <br>
+	 * e.g. if [results: {'01', 'fname'}], return [{n: 'fname', v: '01'}, ...]
+	 */
+	static rs2nvs(rs, nv) {
+		let cols = [];
+		let rows = [];
+		let ncol = -1, vcol = -1;
+
+		if (typeof(rs.colnames) === 'object') {
+			// rs with column index
+			cols = new Array(rs.colnames.length);
+			for (var col in rs.colnames) {
+				// e.g. col = "VID": [ 1, "vid" ],
+				let cx = rs.colnames[col][0] - 1;
+				let cn = rs.colnames[col][1];
+				cols[cx] = cn;
+
+				if (cn === nv.n)
+					ncol = cx;
+				else if (cn === nv.v)
+					vcol = cx;
+			}
+
+			rs.results.forEach((r, rx) => {
+				rows.push({n: r[ncol], v: r[vcol]});
+			});
+		}
+		else {
+			throw new Error( 'TODO: first line as column index' );
+		}
+		return {cols, rows};
+	}
 }
 
 class UserReq {
@@ -404,9 +442,10 @@ class AnDatasetResp extends AnsonResp {
 		this.forest = dsJson.forest;
 	}
 
-	rs(rx) {
-		return
+	Rs(rx = 0) {
+		return this.rs[rx];
 	}
+
 }
 
 /**Java equivalent: io.odysz.semantic.jserv.R.AnQueryReq
