@@ -190,6 +190,7 @@ class AnTablePagination extends React.Component {
 				page={this.state.page}
 				onRowsPerPageChange = {this.handleChangeRowsPerPage}
 				onChangePage = {this.handleChangePage} 
+
 			/>
 		)
 	}
