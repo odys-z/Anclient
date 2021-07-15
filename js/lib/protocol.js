@@ -281,6 +281,10 @@ class AnsonResp extends AnsonBody {
 		return this.m;
 	}
 
+	Rs(rx = 0) {
+		return this.rs && this.rs.length > rx ? this.rs[rx] : undefined;
+	}
+
 	static rsArr(respBody, rx = 0) {
 		return AnsonResp.rs2arr(respBody[0].rs[rx]);
 	}

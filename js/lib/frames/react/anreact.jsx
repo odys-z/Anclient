@@ -2,7 +2,8 @@ import $ from 'jquery';
 import React from 'react';
 
 import { L } from './utils/langstr';
-import { stree_t, Protocol, DatasetReq } from '../../protocol.js';
+	import { AnConst } from './utils/consts';
+	import { stree_t, Protocol, DatasetReq, AnsonResp } from '../../protocol.js';
 
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact
@@ -163,40 +164,31 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
+	bindTablist(req, comp, errCtx) {
+		this.client.commit(req, (qrsp) => {
+			let {rows} = AnsonResp.rs2arr( qrsp.Body().Rs() );
+			comp.setState({rows});
+		}, errCtx.onError );
+	}
+
 	/** Load jsample menu. (using DatasetReq & menu.serv)
-	 * @param {SessionInf} ssinf
-	 * @param {function} ssinf
+	 * @param {SessionInf} ssInf
+	 * @param {function} ssInf
 	 * @param {AnContext} errCtx
 	 * @return {AnReactExt} this
 	 */
-	loadMenu(ssinf, onLoad, errCtx) {
+	loadMenu(onLoad, errCtx) {
 		const sk = 'sys.menu.jsample';
 		const pmenu = 'menu';
 
-		// let reqbody = new DatasetReq({
-		// 		sk,
-		// 		sqlArgs: [ssinf.uid]
-		// 	})
-		// 	.A(stree_t.query);
-		// let jreq = this.client.userReq(undefined, pmenu, reqbody);
-		//
-		// this.client.an.post(jreq, onLoad, (c, resp) => {
-		// 	if (errCtx) {
-		// 		errCtx.hasError = true;
-		// 		errCtx.code = c;
-		// 		errCtx.msg = resp.Body().msg();
-		// 		errCtx.onError(true);
-		// 	}
-		// 	else console.error(c, resp);
-		// });
-		// return this;
 		return this.dataset(
-			{ssinf, port: pmenu, sk, sqlArgs: [ssinf.uid]},
+			{port: pmenu, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
 			onLoad, errCtx);
 	}
 
 	dataset(ds, onLoad, errCtx) {
-		let {ssinf, port, sk, sqlArgs} = ds;
+		let ssInf = this.client.ssInf;
+		let {port, sk, sqlArgs} = ds;
 		sqlArgs = sqlArgs || [];
 		port = port || 'dataset';
 
@@ -219,47 +211,31 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
-	// static parseCbbOptions(rs) { }
-
-	/** Bind dataset to component's state.conds, the [nv] array that is suitable
-	 * for React AutoComplete options).
+	/**Bind dataset to combobox options (comp.state.condCbb).
+	 * Option object is defined by opts.nv.
+	 *
+	 * <p> See DomainComp.componentDidMount() for example. </p>
+	 *
 	 * @param {object} opts options
-	 * @param {SessionInf} session info
 	 * @param {string} opts.sk semantic key (dataset id)
-	 * @param {string} port port name (not service pattern)
-	 * @param {array} sqlArgs arg value for sql configured at serverside
-	 * @return {AnReactExt} this
-	ds2cbbOptions(opts, comp) {
-		// something like this:
-		let that = comp;
-		let {ssInf, sk, port, sqlArgs, error} = opts
-		this.context.anReact.dataset( { ssinf, port, sk, sqlArgs },
-			(dsResp) => {
-				let {menu, paths} = SysComp.parseMenus(dsResp.Body().forest);
-				that.state.conds = menu;
-			}, error );
-		return this;
-	}
-	 */
-
-	/** Bind queried data to component.state.list, the 2d array, in [{nv}, ...], ...],
-	 * which is suitable for AnTablist binding.
-	 * @param {object} opts options
-	 * @param {SessionInf} session info
-	 * @param {string} opts.sk semantic key (dataset id)
-	 * @param {string} port port name (not service pattern)
-	 * @param {array} sqlArgs arg value for sql configured at serverside
+	 * @param {object} opts.nv option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * @param {boolean} opts.onAll no 'ALL' otion item
+	 * @param {React.Component} the component of which the state need to be updated
+	 * @param {AnContext.error} error handling context
 	 * @return {AnReactExt} this
 	 */
-	ds2cbbOptions(opts, comp) {
-		// something like this:
-		let that = comp;
-		let {ssInf, sk, port, sqlArgs, error} = opts
-		this.context.anReact.dataset( { ssinf, port, sk, sqlArgs },
+	ds2cbbOptions(opts, comp, errCtx) {
+		let {sk, nv, noAll} = opts;
+		this.dataset( {
+				ssInf: this.client.ssInf,
+				sk },
 			(dsResp) => {
-				let {menu, paths} = SysComp.parseMenus(dsResp.Body().forest);
-				that.state.conds = menu;
-			}, error );
+				let {rows} = AnsonResp.rs2nvs( dsResp.Body().Rs(), nv );
+				if (!noAll)
+					rows.unshift(AnConst.cbbAllItem);
+				comp.state.condCbb.options = rows;
+				comp.setState({});
+			}, errCtx );
 		return this;
 	}
 }

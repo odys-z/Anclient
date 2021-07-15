@@ -5,6 +5,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
 import { L } from '../utils/langstr';
+	import { AnConst } from '../utils/consts';
 	import { AnContext } from '../reactext.jsx';
 	import { CrudComp } from '../crud'
 
@@ -32,14 +33,13 @@ const styles = (theme) => ( {
 } );
 
 class AnQueryFormComp extends CrudComp {
-	static cbbAllItem = {n: `-- ${L('ALL')} --`, v: 0}
 
 	state = {
 		checked: true,
 		conds: [ // example
 			{ type: 'text', val: '', text: 'No', label: 'text condition'},
-			{ type: 'cbb', val: AnQueryForm.cbbAllItem,
-			  options: [AnQueryForm.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
+			{ type: 'cbb', val: AnConst.cbbAllItem,
+			  options: [AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 			  label: 'auto complecte'},
 		]
 	};
@@ -49,7 +49,6 @@ class AnQueryFormComp extends CrudComp {
 
 		this.handleChange = this.handleChange.bind(this);
 		this.onTxtChange = this.onTxtChange.bind(this);
-		// this.onCbbChange = this.onCbbChange.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 		this.toClear = this.toClear.bind(this);
 
@@ -139,6 +138,10 @@ class AnQueryFormComp extends CrudComp {
 			</Collapse>
 		</div>);
 
+		/** Render query form controls
+		 * @param{array} [conds] conditions
+		 * @return {<Autocomplete>} (auto complete) combobox
+		 */
 		function conditions(conds = []) {
 			return conds.map( (cond, x) => {
 				if (cond.type === 'cbb') {

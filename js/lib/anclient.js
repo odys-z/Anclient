@@ -531,9 +531,9 @@ class SessionClient {
 		var header = this.getHeader(act);
 
 		var jreq = new AnsonMsg({
-					port: Protocol.Port.query,
+					port: 'query', //Protocol.Port.query,
 					header,
-					body: qryItem
+					body: [qryItem]
 				});
 		return jreq;
 	}

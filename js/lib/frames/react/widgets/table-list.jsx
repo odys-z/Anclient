@@ -85,17 +85,17 @@ class AnTablistComp extends React.Component {
 
 	/**
 	 *
-	 * @param {array} columns table columns
+	 * @param {array} [columns] table columns
 	 * @returns [<TableCell>,...]
 	 */
-	th(columns) {
+	th(columns = []) {
 
 		return columns.filter( v => v.hide !== true).map( colObj => <TableCell>{colObj.text || colObj.field}</TableCell>)
 
 
 	}
 
-	tr(rows, colums) {
+	tr(rows = [], colums = []) {
 		//console.log(rows);
 
 		return rows.map(row => this.renderRow(row,colums))
@@ -156,6 +156,28 @@ class AnTablistComp extends React.Component {
 	}
 }
 //AnTablistComp.contextType = AnContext;
+
+/**
+ * props:
+ * 	{array} columns must need
+ * 	{array}  rows  must need
+ * 	{string} pk must need
+ * 	{boolean} checkbox
+ * 	{function} updateSelectd
+ * 	{array} selected
+ */
+class AnTableGroupComp extends AnTablistComp {
+
+	state = {
+		selected: []
+	}
+
+	constructor(props){
+		super(props)
+	}
+}
+const AnTablGroup = withStyles(styles)(AnTableGroupComp);
+
 class AnTablePagination extends React.Component {
 	state = {
 		page: 0,
@@ -195,5 +217,6 @@ class AnTablePagination extends React.Component {
 		)
 	}
 }
+
 const AnTablist = withStyles(styles)(AnTablistComp);
-export { AnTablist, AnTablistComp, AnTablePagination }
+export { AnTablist, AnTablistComp, AnTablGroup, AnTableGroupComp, AnTablePagination }
