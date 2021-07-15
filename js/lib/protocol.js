@@ -158,6 +158,8 @@ class AnsonMsg {
 			body = new AnSessionResp(body);
 		else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 			body = new AnSessionReq(body.uid, body.token, body.iv);
+		else if (body.type = "io.odysz.semantic.jserv.R.AnQueryReq")
+			body = new QueryReq(body.conn, body.mtabl, body.mAlias);
 		else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 			body = new UserReq(json.port, header, [body]);
 		else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
@@ -372,8 +374,9 @@ class AnsonResp extends AnsonBody {
 	}
 }
 
-class UserReq {
+class UserReq extends AnsonBody {
 	constructor (conn, tabl, data = {}) {
+		super();
 		this.type = "io.odysz.semantic.jserv.user.UserReq";
 		this.conn = conn;
 		this.tabl = tabl
@@ -414,7 +417,6 @@ class AnSessionReq extends AnsonBody {
 	}
 
 	/**set a.<br>
-	 * a() can only been called once.
 	 * @param {string} a
 	 * @return {SessionReq} this */
 	A(a) {
@@ -451,8 +453,9 @@ class AnDatasetResp extends AnsonResp {
 /**Java equivalent: io.odysz.semantic.jserv.R.AnQueryReq
  * @class
  */
-class QueryReq {
+class QueryReq extends AnsonBody {
 	constructor (conn, tabl, alias, pageInf) {
+		super();
 		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
 		this.conn = conn;
 		this.mtabl = tabl;
@@ -463,6 +466,13 @@ class QueryReq {
 
 		if (pageInf)
 			this.page(pageInf.size, pageInf.page);
+	}
+
+	/**set a.<br>
+	 * @param {string} a
+	 * @return {QueryReq} this */
+	A(a) {
+		return super.A(a);
 	}
 
 	page (size, idx) {
@@ -618,7 +628,7 @@ class QueryReq {
 	}
 }
 
-class UpdateReq {
+class UpdateReq extends AnsonBody {
 	/**Create an update / insert request.
 	 * @param {string} conn connection id
 	 * @param {string} tabl table
@@ -626,6 +636,7 @@ class UpdateReq {
 	 * If pk is null, use this object's where_() | whereEq() | whereCond().
 	 */
 	constructor (conn, tabl, pk) {
+		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.conn = conn;
 		this.mtabl = tabl;

@@ -219,7 +219,47 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
-	static parseCbbOptions(rs) {
-		
+	// static parseCbbOptions(rs) { }
+
+	/** Bind dataset to component's state.conds, the [nv] array that is suitable
+	 * for React AutoComplete options).
+	 * @param {object} opts options
+	 * @param {SessionInf} session info
+	 * @param {string} opts.sk semantic key (dataset id)
+	 * @param {string} port port name (not service pattern)
+	 * @param {array} sqlArgs arg value for sql configured at serverside
+	 * @return {AnReactExt} this
+	ds2cbbOptions(opts, comp) {
+		// something like this:
+		let that = comp;
+		let {ssInf, sk, port, sqlArgs, error} = opts
+		this.context.anReact.dataset( { ssinf, port, sk, sqlArgs },
+			(dsResp) => {
+				let {menu, paths} = SysComp.parseMenus(dsResp.Body().forest);
+				that.state.conds = menu;
+			}, error );
+		return this;
+	}
+	 */
+
+	/** Bind queried data to component.state.list, the 2d array, in [{nv}, ...], ...],
+	 * which is suitable for AnTablist binding.
+	 * @param {object} opts options
+	 * @param {SessionInf} session info
+	 * @param {string} opts.sk semantic key (dataset id)
+	 * @param {string} port port name (not service pattern)
+	 * @param {array} sqlArgs arg value for sql configured at serverside
+	 * @return {AnReactExt} this
+	 */
+	ds2cbbOptions(opts, comp) {
+		// something like this:
+		let that = comp;
+		let {ssInf, sk, port, sqlArgs, error} = opts
+		this.context.anReact.dataset( { ssinf, port, sk, sqlArgs },
+			(dsResp) => {
+				let {menu, paths} = SysComp.parseMenus(dsResp.Body().forest);
+				that.state.conds = menu;
+			}, error );
+		return this;
 	}
 }
