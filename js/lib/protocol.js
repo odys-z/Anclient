@@ -158,7 +158,7 @@ class AnsonMsg {
 			body = new AnSessionResp(body);
 		else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 			body = new AnSessionReq(body.uid, body.token, body.iv);
-		else if (body.type = "io.odysz.semantic.jserv.R.AnQueryReq")
+		else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
 			body = new QueryReq(body.conn, body.mtabl, body.mAlias);
 		else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 			body = new UserReq(json.port, header, [body]);

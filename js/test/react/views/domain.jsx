@@ -45,12 +45,11 @@ class DomainComp extends CrudComp {
 				that.state.condCbb.options = rows;
 				that.setState({});
 			}, this.context.error );
-
 	}
 
 	toSearch(e, query) {
 		console.log(query);
-		
+
 	}
 
 	render() {
