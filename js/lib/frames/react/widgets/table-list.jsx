@@ -90,7 +90,7 @@ class AnTablistComp extends React.Component {
 	 */
 	th(columns = []) {
 
-		return columns.filter( v => v.hide !== true).map( colObj => <TableCell>{colObj.text || colObj.field}</TableCell>)
+		return columns.filter( v => v.hide !== true).map( (colObj,index) => <TableCell key={index}>{colObj.text || colObj.field}</TableCell>)
 
 
 	}
@@ -112,7 +112,7 @@ class AnTablistComp extends React.Component {
 					/>
 			</TableCell>)
 			}
-			{columns.filter( v => v.hide !== true).map( colObj => <TableCell>{row[colObj.field]}</TableCell>)}
+			{columns.filter( v => v.hide !== true).map( (colObj,index) => <TableCell key={index}>{row[colObj.field]}</TableCell>)}
 		</TableRow>)
 	}
 
@@ -131,7 +131,7 @@ class AnTablistComp extends React.Component {
 			<TableContainer>
 			<Table style={{width:"100%"}} aria-label="simple table">
 			  <TableHead>
-				<TableRow key="head">
+				<TableRow>
 					{
 						this.props.checkbox && ( <TableCell padding="checkbox" ><Checkbox
 						indeterminate={this.state.selected.length > 0 && this.state.selected.length < this.props.rows.length}
@@ -141,13 +141,10 @@ class AnTablistComp extends React.Component {
 						onChange={this.handleSelectAllClick}/></TableCell>)
 					}
 					{this.th(this.props.columns)}
-
 				</TableRow>
 			  </TableHead>
 			  <TableBody>
-				{
-				this.tr(this.props.rows, this.props.columns)
-				}
+			  {this.tr(this.props.rows, this.props.columns)}
 			  </TableBody>
 			</Table>
 			</TableContainer>)
