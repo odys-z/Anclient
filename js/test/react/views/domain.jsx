@@ -22,10 +22,14 @@ const styles = (theme) => ( {
 class DomainComp extends CrudComp {
 	state = {
 		condTxt : { type: 'text', val: '', text: 'No', label: 'text'},
-		condCbb : { type: 'autocbb', val: AnConst.cbbAllItem,
+		condCbb : { type: 'autocbb',
+					sk: 'lvl1.domain.jsample', nv: {n: 'domainName', v: 'domainId'},
+					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 					label: 'cbb'},
-		condAuto: { type: 'cbb', val: AnConst.cbbAllItem,
+		condAuto: { type: 'cbb', // sk: 'lvl2.domain.jsample',
+					nv: {n: 'domainName', v: 'domainId'},
+					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem ],
 					label: 'autocbb'},
 		pageInf : { page: 0, size: 20 },
@@ -35,17 +39,6 @@ class DomainComp extends CrudComp {
 		super(props);
 
 		this.toSearch = this.toSearch.bind(this);
-	}
-
-	componentDidMount() {
-		let that = this;
-
-		this.context.anReact.ds2cbbOptions({
-				sk: 'lvl1.domain.jsample',
-				nv: {n: 'domainName', v: 'domainId'}
-			},
-			this,
-			this.context.error);
 	}
 
 	toSearch(e, query) {

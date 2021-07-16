@@ -285,6 +285,10 @@ class AnsonResp extends AnsonBody {
 		return this.rs && this.rs.length > rx ? this.rs[rx] : undefined;
 	}
 
+	static hasColumn(rs, colname) {
+		return rs && rs.colnames && colname && colname.toUpperCase() in rs.colnames;
+	}
+
 	static rsArr(respBody, rx = 0) {
 		return AnsonResp.rs2arr(respBody[0].rs[rx]);
 	}

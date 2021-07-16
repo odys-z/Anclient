@@ -36,11 +36,14 @@ class AnQueryFormComp extends CrudComp {
 
 	state = {
 		checked: true,
-		conds: [ // example
+		conds: [
+			/* example
 			{ type: 'text', val: '', text: 'No', label: 'text condition'},
-			{ type: 'cbb', val: AnConst.cbbAllItem,
+			{ type: 'autocbb', sk: 'lvl1.domain.jsample',
+			  val: AnConst.cbbAllItem,
 			  options: [AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 			  label: 'auto complecte'},
+			 */
 		]
 	};
 
@@ -59,6 +62,22 @@ class AnQueryFormComp extends CrudComp {
 
 		if (typeof props.query === 'function')
 			this.query = () => {return props.query(this);};
+	}
+
+	componentDidMount() {
+
+		if (!this.context || !this.context.anReact)
+			throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
+		this.state.conds.forEach( (cond, cx) => {
+			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb'))
+				this.context.anReact.ds2cbbOptions({
+						sk: cond.sk,
+						// user uses this, e.g. name and value to access data
+						nv: cond.nv,
+						cond
+					},
+					this.context.error, this);
+		});
 	}
 
 	handleChange( e ) {

@@ -1,12 +1,15 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import { TextField } from '@material-ui/core';
 
-import { AnConst } from '../../../lib/frames/react/utils/consts';
-import { CrudComp } from '../../../lib/frames/react/crud'
-import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
-import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
+import { L } from '../../../lib/frames/react/utils/langstr';
+	import { QueryReq } from '../../../lib/protocol';
+	import { AnConst } from '../../../lib/frames/react/utils/consts';
+	import { CrudComp } from '../../../lib/frames/react/crud'
+	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
+	import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
+	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
 
 const styles = (theme) => ( {
 	root: {
@@ -20,12 +23,13 @@ class UsersComp extends CrudComp {
 	state = {
 		qName: {type: 'text', val: '', text: 'No', label: 'User Name'},
 		qRole: {type: 'cbb', val: AnConst.cbbAllItem,
-				options: [ {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
+				sk: 'roles', nv: {n: 'text', v: 'value'},
+				options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 				label: 'Role'},
 
-		th: [{	text: L('User Name'), checked: true, color: 'primary', className: 'bold' },
-			 {	text: L('uid'), hide: true, color: 'primary' },
-			 {	text: L('Role'), color: 'primary' }]
+		th: [{	text: L('User Name'), field: 'userName', checked: true, color: 'primary', className: 'bold' },
+			 {	text: L('uid'), field: 'userId', hide: true, color: 'primary' },
+			 {	text: L('Role'), field: 'roleName', color: 'primary' }]
 	};
 
 	constructor(props) {
@@ -34,32 +38,17 @@ class UsersComp extends CrudComp {
 		this.toSearch = this.toSearch.bind(this);
 	}
 
-	componentDidMount() {
-		this.context.anReact.ds2cbbOptions(
-			{ ssInf: this.context.anClient.ssInf,
-			  sk: 'roles',
-			  comp: this,
-			  error: this.context.error
-			});
-	}
-
 	toSearch(e, q) {
-		let qr = new QueryReq(null, 'a_users', 'u')
-			.A('query')
-			.expr("userName").expr("orgName", "nation").expr("roleName")
-			.j("a_roles", "r", "r.roleId=u.roleId").j("a_orgs", "o", "o.orgId=r.orgId")
+		let qr = this.context.anClient.query(null, 'a_users', 'u');
+		qr.Body().j('a_roles', 'r', 'r.roleId = u.roleId')
 
-		if (q.roleId)
-			qr.where('=', 'r.roleId', `'${q.roleId}'`);
+		if (q.roleId && q.roleId.v)
+			// = where('=', 'r.roleId', `'${q.roleId}'`);
+			qr.Body().whereEq('u.roleId', `${q.roleId.v}`); // don't user "''" with whereEq()
 		if (q.name)
-			qr.where('%', 'r.roleId', `'${q.name}'`);
+			qr.Body().whereCond('%', 'u.userName', `'${q.name}'`);
 
-		this.context.anReact.query2table(
-			{	ssInf: this.context.anClient.ssInf,
-				query: qr,
-				comp: this,
-				error: this.context.error
-		});
+		this.context.anReact.bindTablist(qr, this, this.context.error);
 	}
 
 	render() {
@@ -72,7 +61,8 @@ class UsersComp extends CrudComp {
 				<TextField />
 			</AnQueryForm>
 			<AnTablist className={classes.root}
-				th={ this.state.th }
+				columns={ this.state.th }
+				rows={ this.state.rows }
 			/>
 		</div>);
 	}
