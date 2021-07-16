@@ -250,6 +250,8 @@ describe('case: [01.3 Protocol/AnsonResp]', () => {
 
     it('AnsonResp response instancing', () => {
 		let rp = new AnsonMsg(resp);
+		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'person'), true, "0 000");
+		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'age'), true, "0 000");
         assert.equal(rp.code, 'ok', "1 ---");
         assert.equal(rp.port, 'query', "2 ---");
         assert.equal(rp.Body().msg(), null, "3 ---");

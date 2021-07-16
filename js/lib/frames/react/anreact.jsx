@@ -218,23 +218,33 @@ export class AnReactExt extends AnReact {
 	 *
 	 * @param {object} opts options
 	 * @param {string} opts.sk semantic key (dataset id)
-	 * @param {object} opts.nv option's name and value, e.g. {n: 'domainName', v: 'domainId'}
-	 * @param {boolean} opts.onAll no 'ALL' otion item
-	 * @param {React.Component} the component of which the state need to be updated
-	 * @param {AnContext.error} error handling context
+	 * @param {object} opts.cond the component's state.conds[#] of which the options need to be updated
+	 * @param {object} [opts.nv={n: 'name', v: 'value'}] option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * @param {boolean} [opts.onAll] no 'ALL' otion item
+	 * @param {AnContext.error} errCtx error handling context
+	 * @param {React.Component} [compont] the component needs to be updated on ok, if provided
 	 * @return {AnReactExt} this
 	 */
-	ds2cbbOptions(opts, comp, errCtx) {
-		let {sk, nv, noAll} = opts;
+	ds2cbbOptions(opts, errCtx, compont) {
+		let {sk, nv, cond, noAll} = opts;
+		nv = nv || {n: 'name', v: 'value'};
+
 		this.dataset( {
 				ssInf: this.client.ssInf,
 				sk },
 			(dsResp) => {
-				let {rows} = AnsonResp.rs2nvs( dsResp.Body().Rs(), nv );
+				let rs = dsResp.Body().Rs();
+				if (nv.n === 'name' && !AnsonResp.hasColumn(rs, 'name'))
+					console.warn("Can't find data in rs for option label. column: 'name'.",
+						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
+
+				let {rows} = AnsonResp.rs2nvs( rs, nv );
 				if (!noAll)
 					rows.unshift(AnConst.cbbAllItem);
-				comp.state.condCbb.options = rows;
-				comp.setState({});
+				cond.options = rows;
+
+				if (compont)
+					compont.setState({});
 			}, errCtx );
 		return this;
 	}
