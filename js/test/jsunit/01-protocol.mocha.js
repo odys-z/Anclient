@@ -4,7 +4,7 @@
 import chai from 'chai'
 import { expect, assert } from 'chai'
 
-import {Protocol, AnsonMsg, UserReq, AnsonResp} from '../../lib/protocol.js'
+import {Protocol, AnsonMsg, QueryReq, UserReq, AnsonResp} from '../../lib/protocol.js'
 import {AnClient, SessionClient} from '../../lib/anclient.js'
 
 
@@ -136,45 +136,68 @@ describe('case: [01.1 Protocol.Port]', () => {
 	});
 });
 
-describe('case: [01.1 Protocol/AnsonMsg]', () => {
-    it('Ajax error handling 1', () => {
-		// TODO where this is used? let's remove it
-		let json = { "readyState":0, "status":0, "statusText":"error" };
+describe('case: [01.2 Protocol/AnsonReq]', () => {
 
-		json.code = Protocol.MsgCode.exIo,
-		json.body = [ {
-				type: 'io.odysz.semantic.jprotocol.AnsonResp',
-				m: 'Ajax: network failed!'
-			} ];
-		let rp = new AnsonMsg( json );
-        assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- 1 -");
-        assert.equal(rp.code, 'exIo', "- 2 -");
-		assert.equal(rp.Body().type, 'io.odysz.semantic.jprotocol.AnsonResp', "- 3 -");
-		assert.equal(rp.Body().msg(), 'Ajax: network failed!', "- 4 -");
+    it('SessionReq formating / instantiation', () => {
+		let ssReq = Protocol.formatSessionLogin('user 1', 'passweord cipher', 'iv64 ... ...');
+        assert.equal(ssReq.code, null, "1 ---");
+        assert.equal(ssReq.port, 'session', "2 ---");
+        assert.equal(ssReq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "3 ---");
+        assert.equal(ssReq.Body().type, "io.odysz.semantic.jsession.AnSessionReq", "4 ---");
+        assert.equal(ssReq.Body().uid, "user 1", "5 ---");
 	});
 
-    it('Ajax error handling 2', () => {
-		// TODO let's use this replace above tested funtion
-		let rp = AnClient.fromAjaxError(ajaxError);
-        assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- A -");
-        assert.equal(rp.code, 'exIo', "- B -");
-		assert.equal(rp.Body().type, 'io.odysz.semantic.jprotocol.AnsonResp', "- C -");
-		assert.equal(rp.Body().msg(), 'Ajax: parsererror', "- D -");
-		assert.equal(rp.Body().ajax.statusText, ajaxError.statusText, "- E -");
-		assert.equal(rp.Body().ajax.responseText, ajaxError.responseText, "- F -");
-	});
+	it('QueryReq', () => {
+		let qr = new QueryReq('con-1', 'a_users', 'u')
+			.A('query')
+			.expr("vid").expr("val", "amount")
+			.expr("dim1", "agegrp").expr("dim2", "tex").expr("dim3", "indust")
+			.expr("dim4").expr("dim5").expr("dim6")
+			.whereCond("=", "agegrp", "'80-'");
 
-    it('UserReq handling', () => {
+		assert.equal(qr.conn, 'con-1', "1 ---");
+		assert.equal(qr.mtabl, 'a_users', "2 ---");
+		assert.equal(qr.mAlias, 'u', "2.1--");
+		assert.equal(qr.a, 'query', "3 ---");
+
+		assert.equal(qr.exprs.length, 8, "4 ---");
+		assert.equal(qr.exprs[0].length, 2, "5 ---");
+		assert.equal(qr.exprs[0][0], 'vid', "6 ---");
+		assert.equal(qr.exprs[0][1], undefined, "6 undefined");
+		assert.equal(qr.exprs[2].length, 2, "5 1--");
+		assert.equal(qr.exprs[2][0], 'dim1', "6 2--");
+		assert.equal(qr.exprs[2][1], 'agegrp', "6 3--");
+		assert.equal(qr.where[0].length, 3, "7 1--");
+		assert.equal(qr.where[0][0], '=', "8 2--");
+		assert.equal(qr.where[0][1], 'agegrp', "9 3--");
+
+		let port = 'query';
+		let jreq = new AnsonMsg({
+					port,
+					header: null,
+					body: [qr]
+				});
+
+        assert.equal(jreq.port, 'query', "10 ---");
+
+		let an = new AnClient();
+		an.init("localhost", "conn-1");
+		an.understandPorts(TestPorts);
+
+		assert.equal(an.servUrl(port), "localhost/r.serv11", "- 11 -");
+	} );
+
+    it('UserReq', () => {
 		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
 			.A('query')
 			.set('quizId', '000001');
 
-        assert.equal(ur.conn, 'con-1', "1 ---");
-        assert.equal(ur.tabl, 'quizzes', "2 ---");
-        assert.equal(ur.a, 'query', "3 ---");
+		assert.equal(ur.conn, 'con-1', "1 ---");
+		assert.equal(ur.tabl, 'quizzes', "2 ---");
+		assert.equal(ur.a, 'query', "3 ---");
 
-        assert.equal(ur.get('quizId'), '000001', "4 ---");
-        assert.equal(ur.get('title'), 'user-req', "5 ---");
+		assert.equal(ur.get('quizId'), '000001', "4 ---");
+		assert.equal(ur.get('title'), 'user-req', "5 ---");
 
 		// must keep consists as js/cs/java all denpends on this structure
 		assert.equal(ur.data.props['title'], 'user-req', "6 ---");
@@ -193,11 +216,42 @@ describe('case: [01.1 Protocol/AnsonMsg]', () => {
 		an.init("localhost", "conn-1");
 		an.understandPorts(TestPorts);
 
-		assert.equal(an.servUrl(port), "localhost/test.serv", "- 11 -");
+		assert.equal(an.servUrl(port), "localhost/test.serv", "11 ==");
 	} );
+});
+
+describe('case: [01.3 Protocol/AnsonResp]', () => {
+    it('Ajax error handling 1', () => {
+		// TODO where this is used? let's remove it
+		let json = { "readyState":0, "status":0, "statusText":"error" };
+
+		json.code = Protocol.MsgCode.exIo,
+		json.body = [ {
+				type: 'io.odysz.semantic.jprotocol.AnsonResp',
+				m: 'Ajax: network failed!'
+			} ];
+		let rp = new AnsonMsg( json );
+		assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- 1 -");
+		assert.equal(rp.code, 'exIo', "- 2 -");
+		assert.equal(rp.Body().type, 'io.odysz.semantic.jprotocol.AnsonResp', "- 3 -");
+		assert.equal(rp.Body().msg(), 'Ajax: network failed!', "- 4 -");
+	});
+
+    it('Ajax error handling 2', () => {
+		// TODO let's use this replace above tested funtion
+		let rp = AnClient.fromAjaxError(ajaxError);
+        assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- A -");
+        assert.equal(rp.code, 'exIo', "- B -");
+		assert.equal(rp.Body().type, 'io.odysz.semantic.jprotocol.AnsonResp', "- C -");
+		assert.equal(rp.Body().msg(), 'Ajax: parsererror', "- D -");
+		assert.equal(rp.Body().ajax.statusText, ajaxError.statusText, "- E -");
+		assert.equal(rp.Body().ajax.responseText, ajaxError.responseText, "- F -");
+	});
 
     it('AnsonResp response instancing', () => {
 		let rp = new AnsonMsg(resp);
+		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'person'), true, "0 000");
+		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'age'), true, "0 000");
         assert.equal(rp.code, 'ok', "1 ---");
         assert.equal(rp.port, 'query', "2 ---");
         assert.equal(rp.Body().msg(), null, "3 ---");
@@ -206,15 +260,6 @@ describe('case: [01.1 Protocol/AnsonMsg]', () => {
 		assert.equal(rp.code, 'exSession', "4 ---");
 		assert.equal(rp.Body().msg(), 'session info is missing or timeout', "5 ---");
 	} );
-
-    it('SessionReq formating / instantiation', () => {
-		let ssReq = Protocol.formatSessionLogin('user 1', 'passweord cipher', 'iv64 ... ...');
-        assert.equal(ssReq.code, null, "1 ---");
-        assert.equal(ssReq.port, 'session', "2 ---");
-        assert.equal(ssReq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "3 ---");
-        assert.equal(ssReq.Body().type, "io.odysz.semantic.jsession.AnSessionReq", "4 ---");
-        assert.equal(ssReq.Body().uid, "user 1", "5 ---");
-	});
 
     it('SessionResp response instancing', () => {
 		let rp = new AnsonMsg(respSession);
@@ -230,23 +275,32 @@ describe('case: [01.1 Protocol/AnsonMsg]', () => {
         assert.equal(ssi.ssid, "001eysTj", "7 ---");
 	} );
 
-    it('AnsonResp response handling', () => {
-        assert.isTrue(typeof(Protocol.rs2arr) === 'function', "1 ---");
+	it('AnsonResp {colnames, results} => [{n, v}, ...] ', () => {
+		assert.isTrue(typeof(Protocol.rs2arr) === 'function', "1 ---");
 
-		let rs = AnsonResp.rs2arr(resp.body[0].rs[0]);
-        assert.equal(8, rs.length, "2 ---");
-		let r0 = rs[0]
-        assert.equal('v 001', r0.vid, "3 ---");
-        assert.equal('100', r0.amount, "4 ---");
-		r0 = rs[1]
-        assert.equal('v 002', r0.vid, "5 ---");
-        assert.equal('103', r0.amount, "6 ---");
+		let { rows } = AnsonResp.rs2arr(resp.body[0].rs[0]);
+		assert.equal(8, rows.length, "2 ---");
+		let r0 = rows[0]
+		assert.equal('v 001', r0.vid, "3 ---");
+		assert.equal('100', r0.amount, "4 ---");
+		r0 = rows[1]
+		assert.equal('v 002', r0.vid, "5 ---");
+		assert.equal('103', r0.amount, "6 ---");
 
-		let arr = AnsonResp.rsArr(resp.body, 0);
-        assert.equal(8, arr.length, "7 ---");
+		rows = AnsonResp.rsArr(resp.body, 0).rows;
+		assert.equal(8, rows.length, "7 ---");
 
-		arr = AnsonMsg.rsArr(resp, 0);
-        assert.equal(8, arr.length, "8 ---");
+		rows = AnsonMsg.rsArr(resp, 0).rows;
+        assert.equal(8, rows.length, "8 ---");
     });
 
+    it('AnsonResp [{NAME: [x, Name]}] => [{Name, x}, ...] ', () => {
+
+		let { cols } = AnsonResp.rs2arr(resp.body[0].rs[0]);
+
+		// console.log(cols);
+        assert.equal(8, cols.length, "2 ---");
+        assert.equal('vid', cols[0], "0 ---");
+        assert.equal('dim6', cols[7], "7 ---");
+	});
 });

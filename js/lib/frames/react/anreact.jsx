@@ -1,70 +1,74 @@
 import $ from 'jquery';
 import React from 'react';
 
-import {L} from './utils/langstr';
+import { L } from './utils/langstr';
+	import { AnConst } from './utils/consts';
+	import { stree_t, Protocol, DatasetReq, AnsonResp } from '../../protocol.js';
 
-/** React helpers of AnClient */
+/** React helpers of AnClient
+ * AnReact uses AnContext to expose session error. So it's helpful using AnReact
+ * in an An-React application (which handle error in top level).
+ */
 export class AnReact {
 	/**@param {SessionClient} ssClient client created via login
-	 * @param {object} errHandler, AnContext.error, the app error handler
+	 * @param {object} errCtx, AnContext.error, the app error handler
 	 */
-	constructor (ssClient, errHandler) {
-		ssClient.an.understandPorts(Quizports);
+	constructor (ssClient, errCtx) {
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
-		this.err = errHandler;
+		this.err = errCtx;
 	}
 
 	static get port() { return 'quiz'; }
 
-	serv (a, conds = {}, onLoad, errHandler) {
-		let req = new UserReq(qconn)
-			.A(a); // this is a reading request
-
-		for (let k in conds)
-			req.set(k, conds[k]);
-
-		let header = Protocol.formatHeader(this.ssInf);
-
-		// for logging user action at server side.
-		this.client.usrAct({
-			func: 'quiz',
-			cmd: a,
-			cate: Protocol.CRUD.r,
-			remarks: 'quiz.serv' });
-
-		var jreq = new AnsonMsg({
-					port: JQuiz.port,
-					header,
-					body: [req]
-				});
-
-		this.client.an.post(jreq, onLoad, (c, resp) => {
-			if (errHandler) {
-				errHandler.hasError = true;
-				errHandler.code = c;
-				errHandler.msg = resp.Body().msg();
-				errHandler.onError(true);
-			}
-			else console.error(c, resp);
-		});
-		return this;
-	}
+	// serv (a, conds = {}, onLoad, errCtx) {
+	// 	let req = new UserReq(qconn)
+	// 		.A(a); // this is a reading request
+	//
+	// 	for (let k in conds)
+	// 		req.set(k, conds[k]);
+	//
+	// 	let header = Protocol.formatHeader(this.ssInf);
+	//
+	// 	// for logging user action at server side.
+	// 	this.client.usrAct({
+	// 		func: 'quiz',
+	// 		cmd: a,
+	// 		cate: Protocol.CRUD.r,
+	// 		remarks: 'quiz.serv' });
+	//
+	// 	var jreq = new AnsonMsg({
+	// 				port: JQuiz.port,
+	// 				header,
+	// 				body: [req]
+	// 			});
+	//
+	// 	this.client.an.post(jreq, onLoad, (c, resp) => {
+	// 		if (errCtx) {
+	// 			errCtx.hasError = true;
+	// 			errCtx.code = c;
+	// 			errCtx.msg = resp.Body().msg();
+	// 			errCtx.onError(true);
+	// 		}
+	// 		else console.error(c, resp);
+	// 	});
+	// 	return this;
+	// }
 
 	/** Create a query request and post back to server.
 	 * This function show the general query sample - goes to the Protocol's query
 	 * port: "r.serv(11)".
 	 * @param {string} quizId quiz id
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
-	 * */
-	quiz(quizId, onLoad, errHandler) {
+	quiz(quizId, onLoad, errCtx) {
 		let that = this;
-		return this.serv(quiz_a.quiz, {quizId}, onLoad, errHandler);
+		return this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
 	}
 
 	list (conds, onLoad) {
 		return this.serv(quiz_a.list, conds, onLoad, this.err);
 	}
+	 * */
 
 	insert(quiz, onOk) {
 		let that = this;
@@ -148,5 +152,100 @@ export class AnReact {
 				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
 			)
 		}
+	}
+}
+
+/**Ectending AnReact with dataset & sys-menu, the same of layers extinding of jsample.
+ * @class
+ */
+export class AnReactExt extends AnReact {
+	extendPorts(ports) {
+		this.client.an.understandPorts(ports);
+		return this;
+	}
+
+	bindTablist(req, comp, errCtx) {
+		this.client.commit(req, (qrsp) => {
+			let {rows} = AnsonResp.rs2arr( qrsp.Body().Rs() );
+			comp.setState({rows});
+		}, errCtx.onError );
+	}
+
+	/** Load jsample menu. (using DatasetReq & menu.serv)
+	 * @param {SessionInf} ssInf
+	 * @param {function} ssInf
+	 * @param {AnContext} errCtx
+	 * @return {AnReactExt} this
+	 */
+	loadMenu(onLoad, errCtx) {
+		const sk = 'sys.menu.jsample';
+		const pmenu = 'menu';
+
+		return this.dataset(
+			{port: pmenu, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
+			onLoad, errCtx);
+	}
+
+	dataset(ds, onLoad, errCtx) {
+		let ssInf = this.client.ssInf;
+		let {port, sk, sqlArgs} = ds;
+		sqlArgs = sqlArgs || [];
+		port = port || 'dataset';
+
+		let reqbody = new DatasetReq({
+				sk,
+				sqlArgs
+			})
+			.A(stree_t.query);
+		let jreq = this.client.userReq(undefined, port, reqbody);
+
+		this.client.an.post(jreq, onLoad, (c, resp) => {
+			if (errCtx) {
+				errCtx.hasError = true;
+				errCtx.code = c;
+				errCtx.msg = resp.Body().msg();
+				errCtx.onError(true);
+			}
+			else console.error(c, resp);
+		});
+		return this;
+	}
+
+	/**Bind dataset to combobox options (comp.state.condCbb).
+	 * Option object is defined by opts.nv.
+	 *
+	 * <p> See DomainComp.componentDidMount() for example. </p>
+	 *
+	 * @param {object} opts options
+	 * @param {string} opts.sk semantic key (dataset id)
+	 * @param {object} opts.cond the component's state.conds[#] of which the options need to be updated
+	 * @param {object} [opts.nv={n: 'name', v: 'value'}] option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * @param {boolean} [opts.onAll] no 'ALL' otion item
+	 * @param {AnContext.error} errCtx error handling context
+	 * @param {React.Component} [compont] the component needs to be updated on ok, if provided
+	 * @return {AnReactExt} this
+	 */
+	ds2cbbOptions(opts, errCtx, compont) {
+		let {sk, nv, cond, noAll} = opts;
+		nv = nv || {n: 'name', v: 'value'};
+
+		this.dataset( {
+				ssInf: this.client.ssInf,
+				sk },
+			(dsResp) => {
+				let rs = dsResp.Body().Rs();
+				if (nv.n === 'name' && !AnsonResp.hasColumn(rs, 'name'))
+					console.warn("Can't find data in rs for option label. column: 'name'.",
+						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
+
+				let {rows} = AnsonResp.rs2nvs( rs, nv );
+				if (!noAll)
+					rows.unshift(AnConst.cbbAllItem);
+				cond.options = rows;
+
+				if (compont)
+					compont.setState({});
+			}, errCtx );
+		return this;
 	}
 }

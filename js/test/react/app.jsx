@@ -3,18 +3,29 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {SessionClient} from '../../lib/anclient.js'
+	import { Protocol } from '../../lib/protocol.js'
 	import {L, Langstrs} from '../../lib/frames/react/utils/langstr.js'
-	import { Sys } from '../../lib/frames/react/sys.jsx';
+	import { Sys, SysComp } from '../../lib/frames/react/sys.jsx';
 	import { AnContext, AnError } from '../../lib/frames/react/reactext.jsx'
-	import { AnReact } from '../../lib/frames/react/anreact.jsx'
+	import { AnReactExt } from '../../lib/frames/react/anreact.jsx'
+
+// tests extents
+import { samports } from '../jsample.js'
+	import { Domain } from './views/domain'
+	import { Roles } from './views/roles'
+	import { Orgs } from './views/orgs'
+	import { Users } from './views/users'
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
 	state = {
-		anClient: undefined,
+		anClient: undefined, // SessionClient
+		anReact: undefined,  // helper for React
 		hasError: false,
 		iportal: 'portal.html',
 		nextAction: undefined, // e.g. re-login
+
+		error: undefined,
 	};
 
 	/**Restor session from window.localStorage
@@ -22,25 +33,40 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.state.samports = Object.assign(Protocol.Port, samports);
 		this.state.iportal = this.props.iportal;
-		// design: will load anclient from localStorage
-		this.state.anClient = new SessionClient();
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.logout = this.logout.bind(this);
-	}
 
-	componentDidMount () {
+		// design: will load anclient from localStorage
+		this.state.error = {onError: this.onError, msg: ''};
+		this.state.anClient = new SessionClient();
+		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
+								.extendPorts(samports);
+
+		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
-			this.setState({
+			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
 				err: L('Creating session failed! Please re-login.')});
 		}
+
+		// extending CRUD pages
+		SysComp.extendLinks( [
+			{path: '/views/sys/domain/domain.html', comp: Domain},
+			{path: '/views/sys/role/roles.html', comp: Roles},
+			{path: '/views/sys/org/orgs.html', comp: Orgs},
+			{path: '/views/sys/user/users.html', comp: Users}
+		] );
 	}
 
-	onError() { }
+	onError(c, r) {
+		console.error(c, r);
+		this.setState({hasError: !!c, nextAction: 're-login'});
+	}
 
 	onErrorClose() {
 		if (this.state.nextAction === 're-login') {
@@ -71,6 +97,8 @@ class App extends React.Component {
 	render() {
 	  return (
 		<AnContext.Provider value={{
+			samports: this.state.samports, // FXIME or Protocol?
+			anReact: this.state.anReact,
 			pageOrigin: window ? window.origin : 'localhost',
 			servId: this.state.servId,
 			servs: this.props.servs,
@@ -79,7 +107,7 @@ class App extends React.Component {
 			hasError: this.state.hasError,
 			iparent: this.props.iparent,
 			iportal: this.props.iportal || 'portal.html',
-			error: {onError: this.onError, msg: this.state.err},
+			error: this.state.error,
 		}} >
 			<Sys onLogout={this.logout}/>
 			{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
@@ -99,7 +127,7 @@ class App extends React.Component {
 	 */
 	static bindHtml(elem, opts = {}) {
 		let portal = opts.portal ? opts.portal : 'portal.html';
-		AnReact.bindDom(elem, opts, onJsonServ);
+		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, json) {
 			let dom = document.getElementById(elem);

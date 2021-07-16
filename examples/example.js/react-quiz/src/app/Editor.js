@@ -212,17 +212,15 @@ export class Editor extends React.Component {
 
 		let that = this;
 
-		return (
-		  <>
-			<List
-			component="nav"
-			aria-labelledby="nested-list-subheader"
-			subheader={
-				<ListSubheader component="div" id="nested-list-subheader">
-				  {L('Quiz: ') + title}
-				</ListSubheader>
-			}
-			className={ this.classes.root } >
+		return ( <>
+			<List component="nav"
+				aria-labelledby="nested-list-subheader"
+				subheader={
+					<ListSubheader component="div" id="nested-list-subheader">
+					  {L('Quiz: ') + title}
+					</ListSubheader>
+				}
+				className={ this.classes.root } >
 			<ListItem button onClick={e => this.setState({openHead: !this.state.openHead})}>
 				<ListItemIcon><SendIcon /></ListItemIcon>
 				<ListItemText primary={L('Editing Quiz')} />

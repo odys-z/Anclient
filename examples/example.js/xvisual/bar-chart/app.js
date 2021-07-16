@@ -57,7 +57,7 @@ export class App {
 
 				xworld.addSystem('hello', // any group name as you like
 					new Bars(ecs, {xscene: xworld.xscene})
-					.create(an.Protocol.rs2arr(resp.body[0].rs[0])));
+					.create(an.Protocol.rs2arr(resp.body[0].rs[0])).rows);
 				xworld.startUpdate();
 			}
 		}

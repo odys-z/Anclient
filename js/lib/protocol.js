@@ -158,6 +158,8 @@ class AnsonMsg {
 			body = new AnSessionResp(body);
 		else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 			body = new AnSessionReq(body.uid, body.token, body.iv);
+		else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
+			body = new QueryReq(body.conn, body.mtabl, body.mAlias);
 		else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 			body = new UserReq(json.port, header, [body]);
 		else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
@@ -279,6 +281,14 @@ class AnsonResp extends AnsonBody {
 		return this.m;
 	}
 
+	Rs(rx = 0) {
+		return this.rs && this.rs.length > rx ? this.rs[rx] : undefined;
+	}
+
+	static hasColumn(rs, colname) {
+		return rs && rs.colnames && colname && colname.toUpperCase() in rs.colnames;
+	}
+
 	static rsArr(respBody, rx = 0) {
 		return AnsonResp.rs2arr(respBody[0].rs[rx]);
 	}
@@ -288,7 +298,9 @@ class AnsonResp extends AnsonBody {
 	 * <b>Note</b> The column index and rows index shifted to starting at 0.
 	 *
 	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
-	 * @return {array} array like [ {col1: val1, ...}, ... ]
+	 * @return {object} {cols, rows}
+	 * cols: array like [ col1, col2, ... ]; <br>
+	 * rows: array like [ {col1: val1, ...}, ... ]
 	 */
 	static rs2arr (rs) {
 		let cols = [];
@@ -328,12 +340,51 @@ class AnsonResp extends AnsonBody {
 			});
 		}
 
-		return rows;
+		return {cols, rows};
+	}
+
+	/**Provide nv, convert results to AnReact combobox options (for binding).
+	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
+	 * @param {object} nv e.g. {n: 'domainName', v: 'domainId'}.
+	 * @return {object} {cols, rows}
+	 * cols: array like [ col1, col2, ... ]; <br>
+	 * rows: array like [ {col1: val1, ...}, ... ], <br>
+	 * e.g. if [results: {'01', 'fname'}], return [{n: 'fname', v: '01'}, ...]
+	 */
+	static rs2nvs(rs, nv) {
+		let cols = [];
+		let rows = [];
+		let ncol = -1, vcol = -1;
+
+		if (typeof(rs.colnames) === 'object') {
+			// rs with column index
+			cols = new Array(rs.colnames.length);
+			for (var col in rs.colnames) {
+				// e.g. col = "VID": [ 1, "vid" ],
+				let cx = rs.colnames[col][0] - 1;
+				let cn = rs.colnames[col][1];
+				cols[cx] = cn;
+
+				if (cn === nv.n)
+					ncol = cx;
+				else if (cn === nv.v)
+					vcol = cx;
+			}
+
+			rs.results.forEach((r, rx) => {
+				rows.push({n: r[ncol], v: r[vcol]});
+			});
+		}
+		else {
+			throw new Error( 'TODO: first line as column index' );
+		}
+		return {cols, rows};
 	}
 }
 
-class UserReq {
+class UserReq extends AnsonBody {
 	constructor (conn, tabl, data = {}) {
+		super();
 		this.type = "io.odysz.semantic.jserv.user.UserReq";
 		this.conn = conn;
 		this.tabl = tabl
@@ -374,7 +425,6 @@ class AnSessionReq extends AnsonBody {
 	}
 
 	/**set a.<br>
-	 * a() can only been called once.
 	 * @param {string} a
 	 * @return {SessionReq} this */
 	A(a) {
@@ -397,20 +447,23 @@ class AnSessionResp extends AnsonResp {
 }
 
 class AnDatasetResp extends AnsonResp {
-	constructor(dsResp) {
-		super(dsResp);
+	constructor(dsJson) {
+		super(dsJson);
+		this.forest = dsJson.forest;
 	}
 
-	rs(rx) {
-		return 
+	Rs(rx = 0) {
+		return this.rs[rx];
 	}
+
 }
 
 /**Java equivalent: io.odysz.semantic.jserv.R.AnQueryReq
  * @class
  */
-class QueryReq {
+class QueryReq extends AnsonBody {
 	constructor (conn, tabl, alias, pageInf) {
+		super();
 		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
 		this.conn = conn;
 		this.mtabl = tabl;
@@ -421,6 +474,13 @@ class QueryReq {
 
 		if (pageInf)
 			this.page(pageInf.size, pageInf.page);
+	}
+
+	/**set a.<br>
+	 * @param {string} a
+	 * @return {QueryReq} this */
+	A(a) {
+		return super.A(a);
 	}
 
 	page (size, idx) {
@@ -576,7 +636,7 @@ class QueryReq {
 	}
 }
 
-class UpdateReq {
+class UpdateReq extends AnsonBody {
 	/**Create an update / insert request.
 	 * @param {string} conn connection id
 	 * @param {string} tabl table
@@ -584,6 +644,7 @@ class UpdateReq {
 	 * If pk is null, use this object's where_() | whereEq() | whereCond().
 	 */
 	constructor (conn, tabl, pk) {
+		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.conn = conn;
 		this.mtabl = tabl;
@@ -804,7 +865,7 @@ const stree_t = {
 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
 	reforest: 'reforest',
 	/** Query with client provided QueryReq object, and format the result into tree. */
-	query: ''};
+	query: 'query'};
 
 class DatasetReq extends QueryReq {
 	/**
@@ -881,7 +942,7 @@ class DatasetReq extends QueryReq {
 		// if (t !== stree_t.sqltree && t !== stree_t.retree && t !== stree_t.reforest) {
 		if (t !== undefined && !stree_t.hasOwnProperty(t)) {
 			console.warn(
-				"DatasetReq.t won't be understood by server:", t, "Should be one of",
+				"DatasetReq.t won't be understood by server:", t, "\n 't (a)' should be one of Protocol.stree_t's key.",
 				Object.keys(stree_t));
 		}
 		return this;

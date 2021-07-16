@@ -21,7 +21,7 @@ export const Langstrs = {
 	},
 }
 
-const arg = /{\s*(.+)\s*\}/g;
+const argex = /{(\s*(\w|\d)*\s*)}/g;
 
 /**var L = require('language');
  * or import L from Langstr;
@@ -33,21 +33,28 @@ const arg = /{\s*(.+)\s*\}/g;
  */
 export function L(t, o) {
 	// map t first
-	if (! t in Langstrs.s[Langstrs.lang])
+	if (! (t in Langstrs.s[Langstrs.lang]) )
 		if (Langstrs.lang !== 'en')
-			Langstrs.s[t] = t;
+			Langstrs.s[Langstrs.lang][t] = t;
 		else
-			Langstrs.s.add(t);
+			Langstrs.s[Langstrs.lang].add(t);
 	else t = Langstrs.lang === 'en' ?
 		 t : Langstrs.s[Langstrs.lang][t];
 
-	// get parameterized string
 	if (o)
-		replaceArg(t, o);
+		return replaceArg(t, o);
 	else
 		return t;
 
 	function replaceArg(t, args) {
+		// let m = argex.exec(t);
+		if (t)
+			t = t.replace(argex,
+				function(match, argname) {
+					return typeof args[argname] != 'undefined'
+						? args[argname]
+						: match ;
+				});
 		return t;
 	}
 }

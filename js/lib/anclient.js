@@ -166,9 +166,10 @@ class AnClient {
 		if (jreq.port === undefined || jreq.port == '') {
 			// TODO docs...
 			console.error('Port is null - you probably created a requesting AnsonMsg with "new [User|Query|...]Req()".\n',
-				'Creating a new request message can mainly throught one of 2 way:\n',
-				'Way 1: Using a jclient helper, like those in jeasy-html.js/EasyModal.save().\n',
+				'Creating a new request message can mainly throught one of 2 ways:\n',
+				'Way 1: Using a jclient helper, like those in jeasy-html.js/EasyModal.save() - deprecated.\n',
 				'Way 2: Using a ssClient request API, e.g. ssClient.delete().',
+				'For examples, see AnClient/js/test/react/* and AnClient/examples/examples.js/**.',
 				'TODO docs...');
 			return;
 		}
@@ -492,6 +493,7 @@ class SessionClient {
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
+	 * onOk, onError will be called after request finished.
 	 * @param {AnsonMsg} jmsg request message
 	 * @param {function} onOk
 	 * @param {function} onError
@@ -529,9 +531,9 @@ class SessionClient {
 		var header = this.getHeader(act);
 
 		var jreq = new AnsonMsg({
-					port: Protocol.Port.query,
+					port: 'query', //Protocol.Port.query,
 					header,
-					body: qryItem
+					body: [qryItem]
 				});
 		return jreq;
 	}

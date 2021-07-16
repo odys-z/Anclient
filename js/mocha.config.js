@@ -14,12 +14,23 @@ var config = {
   },
   target: 'node',
   externals: [nodeExternals()],
-  node: {
-    fs: 'empty'
-  },
+  // node: {
+  //   fs: 'empty'
+  // },
 
 
-  plugins: [ ]
+  plugins: [ ],
+
+  module: {
+	rules: [
+		{   test: /\.jsx$/,
+			loader: 'babel-loader',
+			exclude: /node_modules/,
+			options: {
+			  presets: ['@babel/preset-react', '@babel/preset-env'] }
+		},
+	]
+  }
 };
 
 
