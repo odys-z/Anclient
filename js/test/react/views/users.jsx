@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+
+import { AnConst } from '../../../lib/frames/react/utils/consts';
 import { CrudComp } from '../../../lib/frames/react/crud'
 import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-
 import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
 import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
 
@@ -18,7 +19,7 @@ const styles = (theme) => ( {
 class UsersComp extends CrudComp {
 	state = {
 		qName: {type: 'text', val: '', text: 'No', label: 'User Name'},
-		qRole: {type: 'cbb', val: AnQueryForm.cbbAllItem,
+		qRole: {type: 'cbb', val: AnConst.cbbAllItem,
 				options: [ {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 				label: 'Role'},
 

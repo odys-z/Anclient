@@ -237,7 +237,7 @@ class SysComp extends React.Component {
 	componentDidMount() {
 		// load menu
 		let that = this;
-		this.context.anReact.loadMenu( this.context.anClient.ssInf,
+		this.context.anReact.loadMenu(
 			(dsResp) => {
 				let {menu, paths} = SysComp.parseMenus(dsResp.Body().forest);
 				that.state.sysMenu = menu;

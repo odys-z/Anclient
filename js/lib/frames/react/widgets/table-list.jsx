@@ -85,17 +85,17 @@ class AnTablistComp extends React.Component {
 
 	/**
 	 *
-	 * @param {array} columns table columns
+	 * @param {array} [columns] table columns
 	 * @returns [<TableCell>,...]
 	 */
-	th(columns) {
+	th(columns = []) {
 
 		return columns.filter( v => v.hide !== true).map( colObj => <TableCell>{colObj.text || colObj.field}</TableCell>)
 
 
 	}
 
-	tr(rows, colums) {
+	tr(rows = [], colums = []) {
 		//console.log(rows);
 
 		return rows.map(row => this.renderRow(row,colums))
@@ -164,47 +164,27 @@ function wrapTablePagination(WrappedComponent) {
 		}
 	}
 }
-/*
-class AnTablePagination extends React.Component {
-	/*
+
+/**
+ * props:
+ * 	{array} columns must need
+ * 	{array}  rows  must need
+ * 	{string} pk must need
+ * 	{boolean} checkbox
+ * 	{function} updateSelectd
+ * 	{array} selected
+ */
+class AnTableGroupComp extends AnTablistComp {
+
 	state = {
-		page: 0,
-		count: 10,
-		rowsPerPage:5
+		selected: []
 	}
+
 	constructor(props){
-		super(props);
-		this.handleChangePage =  this.handleChangePage.bind(this);
-		this.handleChangeRowsPerPage =  this.handleChangeRowsPerPage.bind(this);
+		super(props)
 	}
-	handleChangePage(event, newPage) {
-		this.setState({page: newPage});
-		//todo server page  newPage query
-	}
-	handleChangeRowsPerPage = (event) => {
-
-		let rowsPerPage = parseInt(event.target.value, 10);
-		this.setState({rowsPerPage:rowsPerPage});
-		this.setState({page:0})
-		//todo server page  reload
-	  };*
-	render(){
-
-		return(
-
-			<TablePagination
-				//rowsPerPageOptions={[5, 20, 50]}
-				//component="div"
-				//count={this.state.count}
-				//rowsPerPage={this.rowsPerPage}
-				//page={this.state.page}
-				//onRowsPerPageChange = {this.handleChangeRowsPerPage}
-				//onChangePage = {this.handleChangePage}
-				{...this.props}
-
-			/>
-		)
-	}
-}*/
+}
+const AnTablGroup = withStyles(styles)(AnTableGroupComp);
 const AnTablist = withStyles(styles)(AnTablistComp);
-export { AnTablist, AnTablistComp, wrapTablePagination}
+export { AnTablist, AnTablistComp, AnTablGroup, AnTableGroupComp,wrapTablePagination }
+
