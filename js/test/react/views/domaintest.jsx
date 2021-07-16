@@ -3,14 +3,12 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { TextField } from '@material-ui/core';
 
-import { L } from '../../../lib/frames/react/utils/langstr';
 import { CrudComp } from '../../../lib/frames/react/crud'
 import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-import { AnTablist,wrapTablePagination } from '../../../lib/frames/react/widgets/table-list.jsx'
+import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
 import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
 import { AnsonResp } from '../../../lib/protocol';
-import TablePagination from '@material-ui/core/TablePagination';
-const AnTablePagination = wrapTablePagination(TablePagination);
+import { L } from '../../../lib/frames/react/utils/langstr';
 const styles = (theme) => ( {
 	root: {
 		"& :hover": {
@@ -19,35 +17,16 @@ const styles = (theme) => ( {
 	}
 } );
 
-class RolesComp extends CrudComp {
-
+class DomainComp extends CrudComp {
 	state = {
-		rowsPerPageOptions:[5, 10, 25],
-		page: 0,
-		count: 10,
-		rowsPerPage:5
+
 	};
-	handleChangePage(event, newPage) {
-		//this.setState({page: newPage});
-		this.requestNewPage(newPage)
-	}
-	requestNewPage(newPage){
+	
 
-	}
-	handleChangeRowsPerPage = (event) => {
 
-		let rowsPerPage = parseInt(event.target.value, 10);
-		this.requestPage(rowsPerPage);
-		//this.setState({rowsPerPage:rowsPerPage});
-		//this.setState({page:0})
-	  };
-	requestPage(page){
-
-	}
 	constructor(props) {
 		super(props);
-		this.handleChangePage =  this.handleChangePage.bind(this);
-		this.handleChangeRowsPerPage =  this.handleChangeRowsPerPage.bind(this);
+
 		const resp = {
 			"type": "io.odysz.semantic.jprotocol.AnsonMsg",
 			"code": "ok",
@@ -96,8 +75,9 @@ class RolesComp extends CrudComp {
 		const {cols, rows} = AnsonResp.rs2arr(resp.body[0].rs[0]);
 		this.state.columns = cols;
 		this.state.rows = rows;
-	}
 
+	}
+	
 	render() {
 		let args = {};
 		const { classes } = this.props;
@@ -107,30 +87,20 @@ class RolesComp extends CrudComp {
 			</AnQueryForm>
 			<AnTablist className={classes.root} checkbox= {true} pk= "vid"
 				columns = {[{ text: L('vid'), hide:true,field:"vid", color: 'primary', className: 'bold' },
-				{ text: L('VALUE'), color: 'primary',field:"amount"},
-				{ text: L('Identity'), color: 'primary',field:"person" },
-				{ text: L('Year'), color: 'primary',field:"year" },
-				{ text: L('Age'), color: 'primary', field:"age"},
-				{ text: L('AAA'), color: 'primary',field:"dim4" },
-				{ text: L('BBB'), color: 'primary',field:"dim5" },
-				{ text: L('CCC'), color: 'primary',field:"dim6" }
+				{ text: L('amount'), color: 'primary',field:"amount"},
+				{ text: L('person'), color: 'primary',field:"person" },
+				{ text: L('year'), color: 'primary',field:"year" },
+				{ text: L('age'), color: 'primary', field:"age"},
+				{ text: L('dim4'), color: 'primary',field:"dim4" },
+				{ text: L('dim5'), color: 'primary',field:"dim5" },
+				{ text: L('dim6'), color: 'primary',field:"dim6" }
 			]}
 			rows = {this.state.rows}
-			/>
-			<AnTablePagination 
-				count = {this.state.count}
-				onPageChange={this.handleChangePage} 
-				onRowsPerPageChange={this.handleChangeRowsPerPage}
-				page={this.state.page}
-				rowsPerPage={this.state.rowsPerPage}
-				component="div"
-				rowsPerPageOptions={this.state.rowsPerPageOptions}
-				
 			/>
 		</>);
 	}
 }
-RolesComp.contextType = AnContext;
+DomainComp.contextType = AnContext;
 
-const Roles = withStyles(styles)(RolesComp);
-export { Roles, RolesComp }
+const Domain = withStyles(styles)(DomainComp);
+export { Domain, DomainComp }

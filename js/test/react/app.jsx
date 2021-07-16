@@ -13,6 +13,7 @@ import {SessionClient} from '../../lib/anclient.js'
 import { samports } from '../jsample.js'
 	import { Domain } from './views/domain'
 	import { Roles } from './views/roles'
+	import { Orgs } from './views/orgs'
 	import { Users } from './views/users'
 
 /** The application main, context singleton and error handler */
@@ -57,7 +58,8 @@ class App extends React.Component {
 		SysComp.extendLinks( [
 			{path: '/views/sys/domain/domain.html', comp: Domain},
 			{path: '/views/sys/role/roles.html', comp: Roles},
-			{path: '/views/sys/org/users.html', comp: Users}
+			{path: '/views/sys/org/orgs.html', comp: Orgs},
+			{path: '/views/sys/user/users.html', comp: Users}
 		] );
 	}
 

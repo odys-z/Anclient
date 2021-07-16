@@ -5,6 +5,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
 import { L } from '../utils/langstr';
+	import { AnConst } from '../utils/consts';
 	import { AnContext } from '../reactext.jsx';
 	import { CrudComp } from '../crud'
 
@@ -32,13 +33,17 @@ const styles = (theme) => ( {
 } );
 
 class AnQueryFormComp extends CrudComp {
+
 	state = {
 		checked: true,
 		conds: [
+			/* example
 			{ type: 'text', val: '', text: 'No', label: 'text condition'},
-			{ type: 'cbb', val: '', options: [
-				{n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
+			{ type: 'autocbb', sk: 'lvl1.domain.jsample',
+			  val: AnConst.cbbAllItem,
+			  options: [AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 			  label: 'auto complecte'},
+			 */
 		]
 	};
 
@@ -47,7 +52,6 @@ class AnQueryFormComp extends CrudComp {
 
 		this.handleChange = this.handleChange.bind(this);
 		this.onTxtChange = this.onTxtChange.bind(this);
-		this.onCbbChange = this.onCbbChange.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 		this.toClear = this.toClear.bind(this);
 
@@ -60,14 +64,33 @@ class AnQueryFormComp extends CrudComp {
 			this.query = () => {return props.query(this);};
 	}
 
+	componentDidMount() {
+
+		if (!this.context || !this.context.anReact)
+			throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
+		this.state.conds.forEach( (cond, cx) => {
+			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb'))
+				this.context.anReact.ds2cbbOptions({
+						sk: cond.sk,
+						// user uses this, e.g. name and value to access data
+						nv: cond.nv,
+						cond
+					},
+					this.context.error, this);
+		});
+	}
+
 	handleChange( e ) {
 		this.setState({checked: !this.state.checked})
 	}
 
 	query = () => {
 		console.warn('Subclass must override this function, query() - composing query conditions');
-		return [{txt: this.state.conds[0].val},
-				{cbb: this.state.conds[1].val} ];
+		return this.state.conds.map( (c, x) => {
+			let o = {}
+			o[c.type] = c.val;
+			return o;
+		});
 	}
 
 	onTxtChange( e ) {
@@ -77,21 +100,18 @@ class AnQueryFormComp extends CrudComp {
 		this.state.conds[qx].val = e.currentTarget.value;
 	}
 
-	onCbbChange( e, item ) {
-		e.stopPropagation()
-		let cbb = this.refcbb.current.getAttribute('name');
-		cbb = parseInt(cbb);
-		this.state.conds[cbb].val = item ? item.v : undefined;
-	}
-
 	onCbbRefChange( refcbb ) {
 		let _ref = refcbb;
+		let _that = this;
 		let _conds = this.state.conds;
+		_conds.ref = _ref;
 		return (e, item) => {
 			e.stopPropagation()
 			let cbb = _ref.current.getAttribute('name');
 			cbb = parseInt(cbb);
-			_conds[cbb].val = item ? item.v : undefined;
+			_conds[cbb].val = item ? item : AnQueryFormComp.allItem;
+
+			_that.setState({conds: _that.state.conds});
 		};
 	}
 
@@ -100,9 +120,13 @@ class AnQueryFormComp extends CrudComp {
 	}
 
 	toClear( e ) {
-		this.props.onClear(e);
+		if (this.state.conds) {
+			this.state.conds.forEach( (c, x) => {
+				c.val = c.options ? c.options[0] : '';
+			} );
+			this.setState({conds: this.state.conds});
+		}
 	}
-
 
 	render() {
 		let that = this;
@@ -114,22 +138,7 @@ class AnQueryFormComp extends CrudComp {
 			<Switch checked={checked} onChange={this.handleChange} />
 			<Collapse in={checked} direction="row" justify="space-between">
 				<Box className={classes.container} >
-					{/*
-					<TextField label={this.state.conds[0].label}
-						id={String(0)}
-						onChange={this.onTxtChange}/>
-					<Autocomplete
-						id={String(1)} name={String(1)} ref={this.refcbb}
-						onChange={ this.onCbbChange }
-						options={this.state.conds[1].options}
-						getOptionLabel={(it) => `${it.n} (${it.v})`}
-						filter={Autocomplete.caseInsensitiveFilter}
-						style={{ width: 300 }}
-						renderInput={(params) => <TextField {...params} label={this.state.conds[1].label} variant="outlined" />}
-					/>
-					*/
-					conditions(this.state.conds)
-					}
+					{ conditions(this.state.conds) }
 				</Box>
 				<Box className={classes.buttons} >
 					<Button variant="contained"
@@ -148,18 +157,44 @@ class AnQueryFormComp extends CrudComp {
 			</Collapse>
 		</div>);
 
+		/** Render query form controls
+		 * @param{array} [conds] conditions
+		 * @return {<Autocomplete>} (auto complete) combobox
+		 */
 		function conditions(conds = []) {
 			return conds.map( (cond, x) => {
 				if (cond.type === 'cbb') {
 					let refcbb = React.createRef();
+					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
 						id={String(x)} name={String(x)} ref={refcbb}
+						value={ v }
 						onChange={ that.onCbbRefChange(refcbb) }
-						options={that.state.conds[x].options}
-						getOptionLabel={(it) => it.n}
+						inputValue={ v.n }
+						onInputChange={ that.onCbbRefChange(refcbb) }
+
+						options={cond.options}
+						getOptionLabel={ (it) => it ? it.n || '' : '' }
+						getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
 						filter={Autocomplete.caseInsensitiveFilter}
 						style={{ width: 300 }}
-						renderInput={(params) => <TextField {...params} label={conds.label} variant="outlined" />}
+						renderInput={(params) => <TextField {...params} label={cond.label} variant="outlined" />}
+					/>);
+				}
+				else if (cond.type === 'autocbb') {
+					let refcbb = React.createRef();
+					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;
+					return (<Autocomplete key={'cbb' + x}
+						id={String(x)} name={String(x)} ref={refcbb}
+						value={ v }
+						onChange={ that.onCbbRefChange(refcbb) }
+
+						options={cond.options}
+						getOptionLabel={ (it) => it ? it.n || '' : '' }
+						getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
+						filter={Autocomplete.caseInsensitiveFilter}
+						style={{ width: 300 }}
+						renderInput={(params) => <TextField {...params} label={cond.label} variant="outlined" />}
 					/>);
 				}
 				else // if (cond.type === 'text')

@@ -1462,17 +1462,8 @@ function EzGrid () {
 		EasyMsger.close();
 		return;
 
-		// FIXME this not correct!
-		// FIXME this not correct!
-		// FIXME this not correct!
-
 		// var ezfunc = g[ezTreegrid];	// ezTreegrid = 'treegrid', 'datagrid', 'tree', ...
 		// ezfunc("loadData", json);	// now ezfunc is a function
-
-		// FIXME this not correct!
-		// FIXME this not correct!
-		// FIXME this not correct!
-		// FIXME this not correct!
 		if (ezTreegrid) {
 			g.treegrid(opts);
 			if (opts != undefined && opts.onCheckAll) {

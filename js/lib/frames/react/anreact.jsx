@@ -2,7 +2,8 @@ import $ from 'jquery';
 import React from 'react';
 
 import { L } from './utils/langstr';
-import { stree_t, Protocol, DatasetReq } from '../../protocol.js';
+	import { AnConst } from './utils/consts';
+	import { stree_t, Protocol, DatasetReq, AnsonResp } from '../../protocol.js';
 
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact
@@ -163,22 +164,40 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
+	bindTablist(req, comp, errCtx) {
+		this.client.commit(req, (qrsp) => {
+			let {rows} = AnsonResp.rs2arr( qrsp.Body().Rs() );
+			comp.setState({rows});
+		}, errCtx.onError );
+	}
+
 	/** Load jsample menu. (using DatasetReq & menu.serv)
-	 * @param {SessionInf} ssinf
-	 * @param {function} ssinf
+	 * @param {SessionInf} ssInf
+	 * @param {function} ssInf
 	 * @param {AnContext} errCtx
 	 * @return {AnReactExt} this
 	 */
-	loadMenu(ssinf, onLoad, errCtx) {
+	loadMenu(onLoad, errCtx) {
 		const sk = 'sys.menu.jsample';
 		const pmenu = 'menu';
 
+		return this.dataset(
+			{port: pmenu, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
+			onLoad, errCtx);
+	}
+
+	dataset(ds, onLoad, errCtx) {
+		let ssInf = this.client.ssInf;
+		let {port, sk, sqlArgs} = ds;
+		sqlArgs = sqlArgs || [];
+		port = port || 'dataset';
+
 		let reqbody = new DatasetReq({
 				sk,
-				sqlArgs: [ssinf.uid]
+				sqlArgs
 			})
 			.A(stree_t.query);
-		let jreq = this.client.userReq(undefined, pmenu, reqbody);
+		let jreq = this.client.userReq(undefined, port, reqbody);
 
 		this.client.an.post(jreq, onLoad, (c, resp) => {
 			if (errCtx) {
@@ -192,4 +211,41 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
+	/**Bind dataset to combobox options (comp.state.condCbb).
+	 * Option object is defined by opts.nv.
+	 *
+	 * <p> See DomainComp.componentDidMount() for example. </p>
+	 *
+	 * @param {object} opts options
+	 * @param {string} opts.sk semantic key (dataset id)
+	 * @param {object} opts.cond the component's state.conds[#] of which the options need to be updated
+	 * @param {object} [opts.nv={n: 'name', v: 'value'}] option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * @param {boolean} [opts.onAll] no 'ALL' otion item
+	 * @param {AnContext.error} errCtx error handling context
+	 * @param {React.Component} [compont] the component needs to be updated on ok, if provided
+	 * @return {AnReactExt} this
+	 */
+	ds2cbbOptions(opts, errCtx, compont) {
+		let {sk, nv, cond, noAll} = opts;
+		nv = nv || {n: 'name', v: 'value'};
+
+		this.dataset( {
+				ssInf: this.client.ssInf,
+				sk },
+			(dsResp) => {
+				let rs = dsResp.Body().Rs();
+				if (nv.n === 'name' && !AnsonResp.hasColumn(rs, 'name'))
+					console.warn("Can't find data in rs for option label. column: 'name'.",
+						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
+
+				let {rows} = AnsonResp.rs2nvs( rs, nv );
+				if (!noAll)
+					rows.unshift(AnConst.cbbAllItem);
+				cond.options = rows;
+
+				if (compont)
+					compont.setState({});
+			}, errCtx );
+		return this;
+	}
 }
