@@ -6,7 +6,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TablePagination from '@material-ui/core/TablePagination';
+//import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = (theme) => ( {
@@ -131,7 +131,7 @@ class AnTablistComp extends React.Component {
 			<TableContainer>
 			<Table style={{width:"100%"}} aria-label="simple table">
 			  <TableHead>
-				<TableRow>
+				<TableRow key="head">
 					{
 						this.props.checkbox && ( <TableCell padding="checkbox" ><Checkbox
 						indeterminate={this.state.selected.length > 0 && this.state.selected.length < this.props.rows.length}
@@ -156,6 +156,14 @@ class AnTablistComp extends React.Component {
 	}
 }
 //AnTablistComp.contextType = AnContext;
+function wrapTablePagination(WrappedComponent) {
+
+	  return class extends React.Component {
+		render() {
+		  return <WrappedComponent {...this.props} />;
+		}
+	}
+}
 
 /**
  * props:
@@ -177,46 +185,6 @@ class AnTableGroupComp extends AnTablistComp {
 	}
 }
 const AnTablGroup = withStyles(styles)(AnTableGroupComp);
-
-class AnTablePagination extends React.Component {
-	state = {
-		page: 0,
-		count: 10,
-		rowsPerPage:5
-	}
-	constructor(props){
-		super(props);
-		this.handleChangePage =  this.handleChangePage.bind(this);
-		this.handleChangeRowsPerPage =  this.handleChangeRowsPerPage.bind(this);
-	}
-	handleChangePage(event, newPage) {
-		this.setState({page: newPage});
-		//todo server page  newPage query
-	}
-	handleChangeRowsPerPage = (event) => {
-
-		let rowsPerPage = parseInt(event.target.value, 10);
-		this.setState({rowsPerPage:rowsPerPage});
-		this.setState({page:0})
-		//todo server page  reload
-	  };
-	render(){
-
-		return(
-
-			<TablePagination
-				rowsPerPageOptions={[5, 20, 50]}
-				component="div"
-				count={this.state.count}
-				rowsPerPage={this.rowsPerPage}
-				page={this.state.page}
-				onRowsPerPageChange = {this.handleChangeRowsPerPage}
-				onChangePage = {this.handleChangePage}
-
-			/>
-		)
-	}
-}
-
 const AnTablist = withStyles(styles)(AnTablistComp);
-export { AnTablist, AnTablistComp, AnTablGroup, AnTableGroupComp, AnTablePagination }
+export { AnTablist, AnTablistComp, AnTablGroup, AnTableGroupComp,wrapTablePagination }
+

@@ -4,12 +4,13 @@ import { withStyles } from "@material-ui/core/styles";
 import { TextField } from '@material-ui/core';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
-	import { CrudComp } from '../../../lib/frames/react/crud'
-	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-	import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
-	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
-	import { AnsonResp } from '../../../lib/protocol';
-
+import { CrudComp } from '../../../lib/frames/react/crud'
+import { AnContext, AnError } from '../../../lib/frames/react/reactext'
+import { AnTablist,wrapTablePagination } from '../../../lib/frames/react/widgets/table-list.jsx'
+import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
+import { AnsonResp } from '../../../lib/protocol';
+import TablePagination from '@material-ui/core/TablePagination';
+const AnTablePagination = wrapTablePagination(TablePagination);
 const styles = (theme) => ( {
 	root: {
 		"& :hover": {
@@ -21,12 +22,32 @@ const styles = (theme) => ( {
 class RolesComp extends CrudComp {
 
 	state = {
-
+		rowsPerPageOptions:[5, 10, 25],
+		page: 0,
+		count: 10,
+		rowsPerPage:5
 	};
+	handleChangePage(event, newPage) {
+		//this.setState({page: newPage});
+		this.requestNewPage(newPage)
+	}
+	requestNewPage(newPage){
 
+	}
+	handleChangeRowsPerPage = (event) => {
+
+		let rowsPerPage = parseInt(event.target.value, 10);
+		this.requestPage(rowsPerPage);
+		//this.setState({rowsPerPage:rowsPerPage});
+		//this.setState({page:0})
+	  };
+	requestPage(page){
+
+	}
 	constructor(props) {
 		super(props);
-
+		this.handleChangePage =  this.handleChangePage.bind(this);
+		this.handleChangeRowsPerPage =  this.handleChangeRowsPerPage.bind(this);
 		const resp = {
 			"type": "io.odysz.semantic.jprotocol.AnsonMsg",
 			"code": "ok",
@@ -95,6 +116,16 @@ class RolesComp extends CrudComp {
 				{ text: L('CCC'), color: 'primary',field:"dim6" }
 			]}
 			rows = {this.state.rows}
+			/>
+			<AnTablePagination 
+				count = {this.state.count}
+				onPageChange={this.handleChangePage} 
+				onRowsPerPageChange={this.handleChangeRowsPerPage}
+				page={this.state.page}
+				rowsPerPage={this.state.rowsPerPage}
+				component="div"
+				rowsPerPageOptions={this.state.rowsPerPageOptions}
+				
 			/>
 		</>);
 	}
