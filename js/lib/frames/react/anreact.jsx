@@ -166,7 +166,9 @@ export class AnReactExt extends AnReact {
 
 	bindTablist(req, comp, errCtx) {
 		this.client.commit(req, (qrsp) => {
-			let {rows} = AnsonResp.rs2arr( qrsp.Body().Rs() );
+			let rs = qrsp.Body().Rs();
+			let {rows} = AnsonResp.rs2arr( rs );
+			comp.state.pageInf.total = rs.total;
 			comp.setState({rows});
 		}, errCtx.onError );
 	}

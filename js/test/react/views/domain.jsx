@@ -25,20 +25,21 @@ class DomainComp extends CrudComp {
 		condCbb : { type: 'autocbb',
 					sk: 'lvl1.domain.jsample', nv: {n: 'domainName', v: 'domainId'},
 					val: AnConst.cbbAllItem,
-					options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
+					options: [ AnConst.cbbAllItem ],
 					label: 'cbb'},
 		condAuto: { type: 'cbb', // sk: 'lvl2.domain.jsample',
 					nv: {n: 'domainName', v: 'domainId'},
 					val: AnConst.cbbAllItem,
-					options: [ AnConst.cbbAllItem ],
+					options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 					label: 'autocbb'},
-		pageInf : { page: 0, size: 20 },
+		pageInf : { page: 0, size: 25, total: 0 },
 	};
 
 	constructor(props) {
 		super(props);
 
 		this.toSearch = this.toSearch.bind(this);
+		this.onPageInf = this.onPageInf.bind(this);
 	}
 
 	toSearch(e, query) {
@@ -56,6 +57,10 @@ class DomainComp extends CrudComp {
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 	}
 
+	onPageInf(page, size) {
+		this.setState({ pageInf: {page, size, total: this.state.pageInf.total} });
+	}
+
 	render() {
 		let args = {};
 		const { classes } = this.props;
@@ -67,16 +72,16 @@ class DomainComp extends CrudComp {
 					parent: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 					ignored: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				}} }
-			>
-				<TextField />
-			</AnQueryForm>
+			/>
 			<AnTablist className={classes.root}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
 					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
 					{ text: L('parent'), color: 'primary',field:"parentId" }
 				]}
-				rows = {this.state.rows}
+				rows={this.state.rows} pk='domainId'
+				pageInf={this.state.pageInf}
+				onPageInf={this.onPageInf}
 			/>
 			<Card>
 				<Typography variant="h6" gutterBottom>

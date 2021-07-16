@@ -6,11 +6,12 @@ import { TextField } from '@material-ui/core';
 import { L } from '../../../lib/frames/react/utils/langstr';
 import { CrudComp } from '../../../lib/frames/react/crud'
 import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-import { AnTablist,wrapTablePagination } from '../../../lib/frames/react/widgets/table-list.jsx'
+import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
 import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
 import { AnsonResp } from '../../../lib/protocol';
-import TablePagination from '@material-ui/core/TablePagination';
-const AnTablePagination = wrapTablePagination(TablePagination);
+// import TablePagination from '@material-ui/core/TablePagination';
+
+// const AnTablePagination = wrapTablePagination(TablePagination);
 const styles = (theme) => ( {
 	root: {
 		"& :hover": {
@@ -22,32 +23,13 @@ const styles = (theme) => ( {
 class RolesComp extends CrudComp {
 
 	state = {
-		rowsPerPageOptions:[5, 10, 25],
-		page: 0,
-		count: 10,
-		rowsPerPage:5
+		total: 0,
 	};
-	handleChangePage(event, newPage) {
-		//this.setState({page: newPage});
-		this.requestNewPage(newPage)
-	}
-	requestNewPage(newPage){
 
-	}
-	handleChangeRowsPerPage = (event) => {
-
-		let rowsPerPage = parseInt(event.target.value, 10);
-		this.requestPage(rowsPerPage);
-		//this.setState({rowsPerPage:rowsPerPage});
-		//this.setState({page:0})
-	  };
-	requestPage(page){
-
-	}
 	constructor(props) {
 		super(props);
-		this.handleChangePage =  this.handleChangePage.bind(this);
-		this.handleChangeRowsPerPage =  this.handleChangeRowsPerPage.bind(this);
+		this.handleChangePage = this.handleChangePage.bind(this);
+		this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
 		const resp = {
 			"type": "io.odysz.semantic.jprotocol.AnsonMsg",
 			"code": "ok",
@@ -102,33 +84,69 @@ class RolesComp extends CrudComp {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<AnQueryForm >
-				<TextField />
-			</AnQueryForm>
-			<AnTablist className={classes.root} checkbox= {true} pk= "vid"
-				columns = {[{ text: L('vid'), hide:true,field:"vid", color: 'primary', className: 'bold' },
-				{ text: L('VALUE'), color: 'primary',field:"amount"},
-				{ text: L('Identity'), color: 'primary',field:"person" },
-				{ text: L('Year'), color: 'primary',field:"year" },
-				{ text: L('Age'), color: 'primary', field:"age"},
-				{ text: L('AAA'), color: 'primary',field:"dim4" },
-				{ text: L('BBB'), color: 'primary',field:"dim5" },
-				{ text: L('CCC'), color: 'primary',field:"dim6" }
-			]}
-			rows = {this.state.rows}
+			<AnQueryForm onSearch={this.toSearch}
+				conds={[ this.state.condName, this.state.condOrg, this.state.condRole ]}
+				query={ (q) => { return {
+					uName: q.state.conds[0].val ? q.state.conds[0].val.v : undefined,
+					orgId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
+					roleId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
+				}} }
 			/>
-			<AnTablePagination 
-				count = {this.state.count}
-				onPageChange={this.handleChangePage} 
-				onRowsPerPageChange={this.handleChangeRowsPerPage}
-				page={this.state.page}
-				rowsPerPage={this.state.rowsPerPage}
-				component="div"
-				rowsPerPageOptions={this.state.rowsPerPageOptions}
-				
+			<AnTablist
+				className={classes.root} checkbox= {true} pk= "vid"
+				columns={[
+					{ text: L('vid'), hide:true,field:"vid", color: 'primary', className: 'bold' },
+					{ text: L('VALUE'), color: 'primary',field:"amount"},
+					{ text: L('Identity'), color: 'primary',field:"person" },
+					{ text: L('Year'), color: 'primary',field:"year" },
+					{ text: L('Age'), color: 'primary', field:"age"},
+					{ text: L('AAA'), color: 'primary',field:"dim4" },
+					{ text: L('BBB'), color: 'primary',field:"dim5" },
+					{ text: L('CCC'), color: 'primary',field:"dim6" }
+				]}
+				rows={this.state.rows}
+				total={this.state.totol}
 			/>
 		</>);
 	}
+
+	// render() {
+	// 	let args = {};
+	// 	const { classes } = this.props;
+	// 	return ( <>
+	// 		<AnQueryForm onSearch={this.toSearch}
+	// 			conds={[ this.state.condName, this.state.condOrg, this.state.condRole ]}
+	// 			query={ (q) => { return {
+	// 				uName: q.state.conds[0].val ? q.state.conds[0].val.v : undefined,
+	// 				orgId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
+	// 				roleId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
+	// 			}} }
+	// 		/>
+	// 		<AnTablist
+	// 			className={classes.root} checkbox= {true} pk= "vid"
+	// 			columns = {[
+	// 				{ text: L('vid'), hide:true,field:"vid", color: 'primary', className: 'bold' },
+	// 				{ text: L('VALUE'), color: 'primary',field:"amount"},
+	// 				{ text: L('Identity'), color: 'primary',field:"person" },
+	// 				{ text: L('Year'), color: 'primary',field:"year" },
+	// 				{ text: L('Age'), color: 'primary', field:"age"},
+	// 				{ text: L('AAA'), color: 'primary',field:"dim4" },
+	// 				{ text: L('BBB'), color: 'primary',field:"dim5" },
+	// 				{ text: L('CCC'), color: 'primary',field:"dim6" }
+	// 			]}
+	// 			rows = {this.state.rows}
+	// 		/>
+	// 		<AnTablePagination
+	// 			count = {this.state.count}
+	// 			onPageChange={this.handleChangePage}
+	// 			onRowsPerPageChange={this.handleChangeRowsPerPage}
+	// 			page={this.state.page}
+	// 			rowsPerPage={this.state.rowsPerPage}
+	// 			component="div"
+	// 			rowsPerPageOptions={this.state.rowsPerPageOptions}
+	// 		/>
+	// 	</>);
+	// }
 }
 RolesComp.contextType = AnContext;
 
