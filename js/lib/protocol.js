@@ -152,32 +152,36 @@ class AnsonMsg {
 		let header = json.header;
 		let [body] = json.body ? json.body : [{}];
 		let a = body.a;
-		if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
-			body = new AnsonResp(body);
-		else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
-			body = new AnSessionResp(body);
-		else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
-			body = new AnSessionReq(body.uid, body.token, body.iv);
-		else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
-			body = new QueryReq(body.conn, body.mtabl, body.mAlias);
-		else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
-			body = new UserReq(json.port, header, [body]);
-		else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
-			// body are provided by user
-			if (!body.sk) {
-				console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs providing DatasetReq as body.",
-						"For example, see https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/03-jsample.mocha.js");
-				throw new Error("DatasetReq.sk is essential but empty.");
-			}
-		}
-		else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
-			body = new AnDatasetResp(body);
-		else {
-			// if (Protocol.verbose >= 5)
-			// 	console.warn("Using json object directly as body. Type : " + body.type);
 
-			// server can't handle body without type
-			throw new Error("Using json object directly as body. Type not handled : " + body.type);
+		// initiating json to class
+		if (body.constructor.name === 'Object') {
+			if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
+			body = new AnsonResp(body);
+			else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
+				body = new AnSessionResp(body);
+			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
+				body = new AnSessionReq(body.uid, body.token, body.iv);
+			else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
+				body = new QueryReq(body.conn, body.mtabl, body.mAlias);
+			else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
+				body = new UserReq(json.port, header, [body]);
+			else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
+				// body are provided by user
+				if (!body.sk) {
+					console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs providing DatasetReq as body.",
+							"For example, see https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/03-jsample.mocha.js");
+					throw new Error("DatasetReq.sk is essential but empty.");
+				}
+			}
+			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
+				body = new AnDatasetResp(body);
+			else {
+				// if (Protocol.verbose >= 5)
+				// 	console.warn("Using json object directly as body. Type : " + body.type);
+
+				// server can't handle body without type
+				throw new Error("Using json object directly as body. Type not handled : " + body.type);
+			}
 		}
 
 		if (a) body.A(a);
@@ -473,7 +477,7 @@ class QueryReq extends AnsonBody {
 		this.where = [];
 
 		if (pageInf)
-			this.page(pageInf.size, pageInf.page);
+			this.Page(pageInf.size, pageInf.page);
 	}
 
 	/**set a.<br>
@@ -483,9 +487,9 @@ class QueryReq extends AnsonBody {
 		return super.A(a);
 	}
 
-	page (size, idx) {
+	Page (size, idx) {
 		this.page = idx;
-		this.pgSize = size;
+		this.pgsize = size;
 		return this;
 	}
 

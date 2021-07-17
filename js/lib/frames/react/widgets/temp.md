@@ -241,7 +241,9 @@ export default function GmailTreeView() {
 }
 
 # A
+
 https://codesandbox.io/s/bb1x9?file=/demo.js:0-5194
+
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import { alpha, makeStyles, withStyles } from '@material-ui/core/styles';
@@ -252,8 +254,7 @@ import Typography from "@material-ui/core/Typography";
 
 function MinusSquare(props) {
   return (
-    <SvgIcon fontSize="inherit" style={{ width: 34, height: 34 }} {...props}>
-      {/* tslint:disable-next-line: max-line-length */}
+    <SvgIcon fontSize="inherit" style={{ width: 34, height: 32 }} {...props}>
       <path d="M22.047 22.074v0 0-20.147 0h-20.12v0 20.147 0h20.12zM22.047 24h-20.12q-.803 0-1.365-.562t-.562-1.365v-20.147q0-.776.562-1.351t1.365-.575h20.147q.776 0 1.351.575t.575 1.351v20.147q0 .803-.575 1.365t-1.378.562v0zM17.873 11.023h-11.826q-.375 0-.669.281t-.294.682v0q0 .401.294 .682t.669.281h11.826q.375 0 .669-.281t.294-.682v0q0-.401-.294-.682t-.669-.281z" />
     </SvgIcon>
   );
@@ -261,8 +262,7 @@ function MinusSquare(props) {
 
 function PlusSquare(props) {
   return (
-    <SvgIcon fontSize="inherit" style={{ width: 34, height: 34 }} {...props}>
-      {/* tslint:disable-next-line: max-line-length */}
+    <SvgIcon fontSize="inherit" style={{ width: 34, height: 32 }} {...props}>
       <path d="M22.047 22.074v0 0-20.147 0h-20.12v0 20.147 0h20.12zM22.047 24h-20.12q-.803 0-1.365-.562t-.562-1.365v-20.147q0-.776.562-1.351t1.365-.575h20.147q.776 0 1.351.575t.575 1.351v20.147q0 .803-.575 1.365t-1.378.562v0zM17.873 12.977h-4.923v4.896q0 .401-.281.682t-.682.281v0q-.375 0-.669-.281t-.294-.682v-4.896h-4.923q-.401 0-.682-.294t-.281-.669v0q0-.401.281-.682t.682-.281h4.923v-4.896q0-.401.294-.682t.669-.281v0q.401 0 .682.281t.281.682v4.896h4.923q.401 0 .682.281t.281.682v0q0 .375-.281.669t-.682.294z" />
     </SvgIcon>
   );
@@ -270,8 +270,7 @@ function PlusSquare(props) {
 
 function CloseSquare(props) {
   return (
-    <SvgIcon className="close" fontSize="inherit" style={{ width: 34, height: 34 }} {...props}>
-      {/* tslint:disable-next-line: max-line-length */}
+    <SvgIcon className="close" fontSize="inherit" style={{ width: 34, height: 32 }} {...props}>
       <path d="M17.485 17.512q-.281.281-.682.281t-.696-.268l-4.12-4.147-4.12 4.147q-.294.268-.696.268t-.682-.281-.281-.682.294-.669l4.12-4.147-4.12-4.147q-.294-.268-.294-.669t.281-.682.682-.281.696 .268l4.12 4.147 4.12-4.147q.294-.268.696-.268t.682.281 .281.669-.294.682l-4.12 4.147 4.12 4.147q.294.268 .294.669t-.281.682zM22.047 22.074v0 0-20.147 0h-20.12v0 20.147 0h20.12zM22.047 24h-20.12q-.803 0-1.365-.562t-.562-1.365v-20.147q0-.776.562-1.351t1.365-.575h20.147q.776 0 1.351.575t.575 1.351v20.147q0 .803-.575 1.365t-1.378.562v0z" />
     </SvgIcon>
   );
@@ -283,22 +282,56 @@ const StyledTreeItem = withStyles((theme) => ({
     height: '34px',
     '& .close': {
       opacity: 0.3,
+      border: 'solid 1px red',
     },
   },
   group: {
     marginLeft: 7,
     paddingLeft: 18,
-    borderLeft: `1px solid ${alpha(theme.palette.text.primary, 0.4)}`,
+    borderLeft: `3px solid ${alpha(theme.palette.text.primary, 0.4)}`,
+  },
+  labelRoot: {
+    display: "flex",
+    alignItems: "center",
+    padding: theme.spacing(0., 0),
+    margin : theme.spacing(0., 0),
+    marginLeft: theme.spacing(1),
+  },
+  labelIcon: {
+    marginRight: theme.spacing(4)
+  },
+  labelText: {
+    fontWeight: "inherit",
+    width: '40px',
+    height: '32px',
+    flexGrow: 1
   },
   labelCell: {
     fontWeight: "inherit",
     flexGrow: 1,
+    height: '32px',
     borderLeft: 'solid 1px #57a',
+    width: '20px',
+    textAlign: 'center',
+    verticalAlign: 'middle',
+  },
+  content: {
+    borderTop: 'solid 1px silver',
+    color: theme.palette.text.secondary,
+    paddingRight: theme.spacing(0),
+    verticalAlign: 'middle',
+    alignItems: 'center',
+    alignContent: 'center',
+    fontWeight: theme.typography.fontWeightMedium,
+    "$expanded > &": {
+      fontWeight: theme.typography.fontWeightRegular
+    }
   },
 }))((props) => {  const {
   classes,
   labelText,
   labelIcon: LabelIcon,
+  labelCell,
   labelInfo,
   labelExtra,
   color,
@@ -307,7 +340,7 @@ const StyledTreeItem = withStyles((theme) => ({
 } = props;
 
 return (
-  <TreeItem
+  <TreeItem className={classes.content}
     label={
       <div className={classes.labelRoot}>
         <Typography variant="body2" className={classes.labelText}>
@@ -315,9 +348,7 @@ return (
         </Typography>
         <Typography
           variant="caption"
-          color="inherit"
-          className={classes.labelCell}
-        >
+          color="inherit" className={classes.labelCell} >
           {labelInfo} ddd
         </Typography>
         <Typography
@@ -350,7 +381,7 @@ const useStyles = makeStyles({
   root: {
     height: 264,
     flexGrow: 1,
-    maxWidth: 400,
+    // maxWidth: 400,
   },
 });
 
@@ -365,16 +396,17 @@ export default function CustomizedTreeView() {
       defaultExpandIcon={<PlusSquare />}
       defaultEndIcon={<CloseSquare />}
     >
-      <StyledTreeItem nodeId="1" label="Main">
-        <StyledTreeItem nodeId="2" label="Hello" />
-        <StyledTreeItem nodeId="3" label="Subtree with children">
+      <StyledTreeItem nodeId="1" labelText='MAIN HEAD'
+              labelInfo="AAAA" labelExtra='extra - ' >
+        <StyledTreeItem nodeId="2"  labelText='S HEAD' labelInfo="BBB" labelExtra='extra 11 ' />
+        <StyledTreeItem nodeId="3" label="Subtree with children" >
           <StyledTreeItem nodeId="6" label="Hello" />
           <StyledTreeItem nodeId="7" label="Sub-subtree with children">
             <StyledTreeItem nodeId="9" label="Child 1" />
             <StyledTreeItem nodeId="10" label="Child 2" />
             <StyledTreeItem nodeId="11" label="Child 3" />
           </StyledTreeItem>
-          <StyledTreeItem nodeId="8" labelText="Hellooooooo"
+          <StyledTreeItem nodeId="8" labelText="Hellooooooo with children"
               labelInfo="733AA"
               labelExtra="extra"
               color="#3c8039">

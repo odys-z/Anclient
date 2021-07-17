@@ -182,7 +182,7 @@ class AnClient {
 
 		var self = this;
 		$.ajax({type: 'POST',
-			// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgSize,
+			// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgsize,
 			url: url,
 			contentType: "application/json; charset=utf-8",
 			crossDomain: true,
@@ -260,11 +260,11 @@ class AnClient {
 	}
 
 	// TODO moved to semantic resultset?
-    /** Get the cols from jserv's rows
-     * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
-     * @param {AnsonMsg<AnsonResp>} resp
-     * @param {ix} the rs index
-     * @return {array} array of column names */
+	/** Get the cols from jserv's rows
+	 * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
+	 * @param {AnsonMsg<AnsonResp>} resp
+	 * @param {ix} the rs index
+	 * @return {array} array of column names */
 	respCols(resp, ix) {
 		if (ix === null || ix === undefined )
 			ix = 0;

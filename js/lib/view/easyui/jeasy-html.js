@@ -1252,7 +1252,7 @@ function EzGrid () {
 
 		// var semantik = $(gridId).attr(ir.sk);
 		var semantik = opts.sk;
-		// var pgSize = opts.pagesize;
+		// var pgsize = opts.pagesize;
 
 		// Remember some variabl for later calling onPage()
 		if (this.pageInfo[gridId] === undefined) {

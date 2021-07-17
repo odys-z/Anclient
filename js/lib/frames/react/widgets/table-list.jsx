@@ -9,6 +9,8 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
+import { AnContext, AnError } from '../reactext'
+
 const styles = (theme) => ( {
 	root: {
 	}
@@ -178,6 +180,9 @@ class AnTablistComp extends React.Component {
 	constructor(props){
 		super(props)
 
+		let {sizeOptions} = props;
+		if (sizeOptions)
+			this.state.sizeOptions = sizeOptions;
 		let {total, page, size} = props.pageInf;
 		this.state.total = total;
 		this.state.page = page;
@@ -194,7 +199,6 @@ class AnTablistComp extends React.Component {
 		this.th = this.th.bind(this);
 		this.tr = this.tr.bind(this);
 	}
-
 
 	isSelected(name) {
 		return this.state.selected.indexOf(name) !== -1;
@@ -248,7 +252,7 @@ class AnTablistComp extends React.Component {
 			this.props.onPageInf (this.state.page, this.state.size);
 	}
 
-	changeSize (event) {
+	changeSize (event, s) {
 		let size = parseInt(event.target.value, 10);
 		this.setState({size});
 		if (typeof this.props.onPageInf  === 'function')
@@ -323,14 +327,12 @@ class AnTablistComp extends React.Component {
 			onPageChange={this.changePage}
 			onRowsPerPageChange={this.changeSize}
 			page={this.state.page}
-			// size={this.state.size}
 			component="div"
-			sizeoptions={this.state.sizeOptions}
+			rowsPerPageOptions={this.state.sizeOptions}
 		/>
 		</>);
 	}
 }
-//AnTablistComp.contextType = AnContext;
 
 /**
  * props:

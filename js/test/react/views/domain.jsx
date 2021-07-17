@@ -43,8 +43,6 @@ class DomainComp extends CrudComp {
 	}
 
 	toSearch(e, query) {
-		console.log(query);
-
 		let pageInf = this.state.pageInf;
 		let queryReq = this.context.anClient.query(null, 'a_domain', 'd', pageInf)
 		if (query.parent && query.parent !== 0)
@@ -54,11 +52,20 @@ class DomainComp extends CrudComp {
 		if (query.ignored)
 			queryReq.Body().whereCond('<>', 'parentId', `'${query.ignored}'`);
 
+		this.state.queryReq = queryReq;
+
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 	}
 
 	onPageInf(page, size) {
-		this.setState({ pageInf: {page, size, total: this.state.pageInf.total} });
+		this.state.pageInf.size = size;
+		this.state.pageInf.page = page;
+		let query = this.state.queryReq;
+		if (query) {
+			query.Body().Page(size, page);
+			this.state.pageInf = {page, size, total: this.state.pageInf.total};
+			this.context.anReact.bindTablist(query, this, this.context.error);
+		}
 	}
 
 	render() {
@@ -68,7 +75,7 @@ class DomainComp extends CrudComp {
 			<AnQueryForm onSearch={this.toSearch}
 				conds={[ this.state.condTxt, this.state.condCbb, this.state.condAuto ]}
 				query={(q) => { return {
-					domain: q.state.conds[0].val ? q.state.conds[0].val.v : undefined,
+					domain: q.state.conds[0].val ? q.state.conds[0].val : undefined,
 					parent: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 					ignored: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				}} }
@@ -81,6 +88,7 @@ class DomainComp extends CrudComp {
 				]}
 				rows={this.state.rows} pk='domainId'
 				pageInf={this.state.pageInf}
+				sizeOptions={[5, 25, 50]}
 				onPageInf={this.onPageInf}
 			/>
 			<Card>

@@ -156,7 +156,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class AnTreegrid extends Component {
+class AnTreegridComp extends Component {
 
 	render() {
 		const classes = useStyles();
