@@ -10,24 +10,29 @@ describe('case: [00.2 Language]', () => {
 		Langstrs.s.ja = {'hello {name} from {frm}': '{name}は こんにちは, {frm}', 'OK': 'はい'};
 
 		assert.equal(L('hello'), 'hello', "1 ---");
-        assert.equal(L('OK'), 'OK', "2 ---");
+		assert.equal(L('OK'), 'OK', "2 ---");
 		s = L('world');
-        assert.equal(L('world'), 'world', "2 ---");
+		assert.equal(L('world'), 'world', "2 ---");
 
 		Langstrs.using('ja')
 		assert.equal(L('hello {name} from {frm}', {name: 'ody', frm: 'JA'}), 'odyは こんにちは, JA', "3 ---");
-        assert.equal(L('OK'), 'はい', "4 ---");
+		assert.equal(L('OK'), 'はい', "4 ---");
 		s = L('world');
-        assert.equal(L('world'), 'world', "5 ---");
+		assert.equal(L('world'), 'world', "5 ---");
 
 		Langstrs.using('zh')
 		assert.equal(L('hello {name} from {frm}', {name: 'ody', frm: 'TW'}), '你好 ody from TW', "6 ---");
-        assert.equal(L('OK'), '确定', "7 ---");
+		assert.equal(L('OK'), '确定', "7 ---");
 		s = L('world');
-        assert.equal(L('world'), 'world', "8 ---");
+		assert.equal(L('world'), 'world', "8 ---");
 
-        assert.isTrue(Langstrs.s.en.has('world'), "9 ---");
-        assert.equal(Langstrs.s.ja.world, 'world', "A ---");
-        assert.equal(Langstrs.s.zh.world, 'world', "B ---");
+		assert.isTrue(Langstrs.s.en.has('world'), "9 ---");
+		assert.equal(Langstrs.s.ja.world, undefined, "A ---");
+		assert.equal(Langstrs.s.zh.world, undefined, "B ---");
+
+		let totrans = Langstrs.report();
+		assert.equal(totrans.size, 2, "C ---");
+		assert.isTrue(totrans.has('hello'), "D ---");
+		assert.isTrue(totrans.has('world'), "E ---");
 	});
 });
