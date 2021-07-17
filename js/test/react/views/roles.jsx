@@ -92,20 +92,14 @@ class RolesComp extends CrudComp {
 					roleId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				}} }
 			/>
-			<AnTablist
-				className={classes.root} checkbox= {true} pk= "vid"
-				columns={[
-					{ text: L('vid'), hide:true,field:"vid", color: 'primary', className: 'bold' },
-					{ text: L('VALUE'), color: 'primary',field:"amount"},
-					{ text: L('Identity'), color: 'primary',field:"person" },
-					{ text: L('Year'), color: 'primary',field:"year" },
-					{ text: L('Age'), color: 'primary', field:"age"},
-					{ text: L('AAA'), color: 'primary',field:"dim4" },
-					{ text: L('BBB'), color: 'primary',field:"dim5" },
-					{ text: L('CCC'), color: 'primary',field:"dim6" }
-				]}
-				rows={this.state.rows}
-				total={this.state.totol}
+			<AnTablePagination
+				count = {this.state.count}
+				onPageChange={this.handleChangePage}
+				onRowsPerPageChange={this.handleChangeRowsPerPage}
+				page={this.state.page}
+				rowsPerPage={this.state.rowsPerPage}
+				component="div"
+				rowsPerPageOptions={this.state.rowsPerPageOptions}
 			/>
 		</>);
 	}

@@ -2,4 +2,3 @@ node_modules/
 compile-*
 **/dist/*
 !**/dist/*.html
-!**/dist/github.json
