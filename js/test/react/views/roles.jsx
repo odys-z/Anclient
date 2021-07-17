@@ -117,7 +117,7 @@ class RolesComp extends CrudComp {
 			]}
 			rows = {this.state.rows}
 			/>
-			<AnTablePagination 
+			<AnTablePagination
 				count = {this.state.count}
 				onPageChange={this.handleChangePage} 
 				onRowsPerPageChange={this.handleChangeRowsPerPage}
@@ -125,7 +125,7 @@ class RolesComp extends CrudComp {
 				rowsPerPage={this.state.rowsPerPage}
 				component="div"
 				rowsPerPageOptions={this.state.rowsPerPageOptions}
-				
+
 			/>
 		</>);
 	}
