@@ -4,13 +4,13 @@ import { withStyles } from "@material-ui/core/styles";
 import { TextField } from '@material-ui/core';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
-import { CrudComp } from '../../../lib/frames/react/crud'
-import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-import { AnTablist,wrapTablePagination } from '../../../lib/frames/react/widgets/table-list.jsx'
-import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
-import { AnsonResp } from '../../../lib/protocol';
-import TablePagination from '@material-ui/core/TablePagination';
-const AnTablePagination = wrapTablePagination(TablePagination);
+	import { AnConst } from '../../../lib/frames/react/utils/consts';
+	import { CrudComp } from '../../../lib/frames/react/crud'
+	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
+	import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
+	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
+	import { AnsonResp } from '../../../lib/protocol';
+
 const styles = (theme) => ( {
 	root: {
 		"& :hover": {
@@ -22,110 +22,77 @@ const styles = (theme) => ( {
 class RolesComp extends CrudComp {
 
 	state = {
-		rowsPerPageOptions:[5, 10, 25],
-		page: 0,
-		count: 10,
-		rowsPerPage:5
+		condName: { type: 'text', val: '', label: L('Role Name')},
+		condOrg : { type: 'cbb',
+					sk: 'org.all', nv: {n: 'text', v: 'value'},
+					val: AnConst.cbbAllItem,
+					options: [ AnConst.cbbAllItem ],
+					label: L('Organization') },
+		total: 0,
+		pageInf: { page: 0, size: 25, total: 0 },
 	};
-	handleChangePage(event, newPage) {
-		//this.setState({page: newPage});
-		this.requestNewPage(newPage)
-	}
-	requestNewPage(newPage){
 
-	}
-	handleChangeRowsPerPage = (event) => {
-
-		let rowsPerPage = parseInt(event.target.value, 10);
-		this.requestPage(rowsPerPage);
-		//this.setState({rowsPerPage:rowsPerPage});
-		//this.setState({page:0})
-	  };
-	requestPage(page){
-
-	}
 	constructor(props) {
 		super(props);
-		this.handleChangePage =  this.handleChangePage.bind(this);
-		this.handleChangeRowsPerPage =  this.handleChangeRowsPerPage.bind(this);
-		const resp = {
-			"type": "io.odysz.semantic.jprotocol.AnsonMsg",
-			"code": "ok",
-			"opts": null,
-			"port": "query",
-			"header": null,
-			"body": [ {
-				"type": "io.odysz.semantic.jprotocol.AnsonResp",
-				"rs": [ {
-					"type": "io.odysz.module.rs.AnResultset",
-					"stringFormats": null,
-					"total": 8,
-					"rowCnt": 8,
-					"colCnt": 8,
-					"colnames": {
-						"VID": [ 1, "vid" ],
-						"PERSON": [ 3, "person" ],
-						"YEAR": [ 4, "year" ],
-						"AMOUNT": [ 2, "amount" ],
-						"DIM4": [ 6, "dim4" ],
-						"DIM5": [ 7, "dim5" ],
-						"DIM6": [ 8, "dim6" ],
-						"AGE": [ 5, "age" ]
-					},
-					"rowIdx": 0,
-					"results": [
-							[ "v 001", "100", "A1", "B1", "C1", "D1", "E1", "F1" ],
-							[ "v 002", "103", "A1", "B2", "C2", "D2", "E2", "F2" ],
-							[ "v 003", "105", "A1", "B1", "C3", "D1", "E3", "F1" ],
-							[ "v 004", "113", "A2", "B1", "C3", "D2", "E4", "F2" ],
-							[ "v 005", "111", "A1", "B1", "C1", "D3", "E1", "F1" ],
-							[ "v 006", "103", "A2", "B1", "C2", "D2", "E2", "F2" ],
-							[ "v 007", "105", "A3", "B1", "C4", "D3", "E3", "F1" ],
-							[ "v 008", "106", "A3", "B1", "C2", "D4", "E4", "F2" ]
-						]
-				} ],
-				"parent": "io.odysz.semantic.jprotocol.AnsonMsg",
-				"a": null,
-				"conn": null,
-				"m": null,
-				"map": null
-			} ],
-			"version": "1.0",
-			"seq": 0
+
+		this.toSearch = this.toSearch.bind(this);
+		this.onPageInf = this.onPageInf.bind(this);
+	}
+
+	componentDidMount() {
+		this.toSearch();
+	}
+
+	toSearch(e, query) {
+		let pageInf = this.state.pageInf;
+		let queryReq = this.context.anClient.query(null, 'a_roles', 'r', pageInf)
+		let req = queryReq.Body()
+			.expr('orgName').expr('roleName').expr('roleId').expr('remarks')
+			.j('a_orgs', 'o', 'o.orgId=r.orgId')
+
+		if (query && query.orgId && query.orgId !== 0)
+			req.whereEq('r.orgId', `${query.orgId}`);
+		if (query && query.rName)
+			req.whereCond('%', 'roleName', `'${query.rName}'`);
+
+		this.state.queryReq = queryReq;
+
+		this.context.anReact.bindTablist(queryReq, this, this.context.error);
+	}
+
+	onPageInf(page, size) {
+		this.state.pageInf.size = size;
+		this.state.pageInf.page = page;
+		let query = this.state.queryReq;
+		if (query) {
+			query.Body().Page(size, page);
+			this.state.pageInf = {page, size, total: this.state.pageInf.total};
+			this.context.anReact.bindTablist(query, this, this.context.error);
 		}
-		const {cols, rows} = AnsonResp.rs2arr(resp.body[0].rs[0]);
-		this.state.columns = cols;
-		this.state.rows = rows;
 	}
 
 	render() {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<AnQueryForm >
-				<TextField />
-			</AnQueryForm>
-			<AnTablist className={classes.root} checkbox= {true} pk= "vid"
-				columns = {[{ text: L('vid'), hide:true,field:"vid", color: 'primary', className: 'bold' },
-				{ text: L('VALUE'), color: 'primary',field:"amount"},
-				{ text: L('Identity'), color: 'primary',field:"person" },
-				{ text: L('Year'), color: 'primary',field:"year" },
-				{ text: L('Age'), color: 'primary', field:"age"},
-				{ text: L('AAA'), color: 'primary',field:"dim4" },
-				{ text: L('BBB'), color: 'primary',field:"dim5" },
-				{ text: L('CCC'), color: 'primary',field:"dim6" }
-			]}
-			rows = {this.state.rows}
+			<AnQueryForm onSearch={this.toSearch}
+				conds={[ this.state.condName, this.state.condOrg ]}
+				query={ (q) => { return {
+					rName: q.state.conds[0].val ? q.state.conds[0].val : undefined,
+					orgId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
+				}} }
 			/>
-			<AnTablePagination 
-				count = {this.state.count}
-				onPageChange={this.handleChangePage} 
-				onRowsPerPageChange={this.handleChangeRowsPerPage}
-				page={this.state.page}
-				rowsPerPage={this.state.rowsPerPage}
-				component="div"
-				rowsPerPageOptions={this.state.rowsPerPageOptions}
-				
+			<AnTablist
+				className={classes.root} checkbox= {true} pk= "vid"
+				columns={[
+					{ text: L('roleId'), hide:true, field:"roleId" },
+					{ text: L('roleName'), color: 'primary', field:"roleName", className: 'bold'},
+					{ text: L('orgName'), color: 'primary',field:"orgName" },
+					{ text: L('remarks'), color: 'primary',field:"remarks" }
+				]}
+				rows={this.state.rows} pk='roleId'
+				pageInf={this.state.pageInf}
+				onPageInf={this.onPageInf}
 			/>
 		</>);
 	}

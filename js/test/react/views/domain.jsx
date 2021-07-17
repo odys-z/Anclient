@@ -25,25 +25,24 @@ class DomainComp extends CrudComp {
 		condCbb : { type: 'autocbb',
 					sk: 'lvl1.domain.jsample', nv: {n: 'domainName', v: 'domainId'},
 					val: AnConst.cbbAllItem,
-					options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
+					options: [ AnConst.cbbAllItem ],
 					label: 'cbb'},
 		condAuto: { type: 'cbb', // sk: 'lvl2.domain.jsample',
 					nv: {n: 'domainName', v: 'domainId'},
 					val: AnConst.cbbAllItem,
-					options: [ AnConst.cbbAllItem ],
+					options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 					label: 'autocbb'},
-		pageInf : { page: 0, size: 20 },
+		pageInf : { page: 0, size: 25, total: 0 },
 	};
 
 	constructor(props) {
 		super(props);
 
 		this.toSearch = this.toSearch.bind(this);
+		this.onPageInf = this.onPageInf.bind(this);
 	}
 
 	toSearch(e, query) {
-		console.log(query);
-
 		let pageInf = this.state.pageInf;
 		let queryReq = this.context.anClient.query(null, 'a_domain', 'd', pageInf)
 		if (query.parent && query.parent !== 0)
@@ -53,7 +52,20 @@ class DomainComp extends CrudComp {
 		if (query.ignored)
 			queryReq.Body().whereCond('<>', 'parentId', `'${query.ignored}'`);
 
+		this.state.queryReq = queryReq;
+
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
+	}
+
+	onPageInf(page, size) {
+		this.state.pageInf.size = size;
+		this.state.pageInf.page = page;
+		let query = this.state.queryReq;
+		if (query) {
+			query.Body().Page(size, page);
+			this.state.pageInf = {page, size, total: this.state.pageInf.total};
+			this.context.anReact.bindTablist(query, this, this.context.error);
+		}
 	}
 
 	render() {
@@ -63,20 +75,21 @@ class DomainComp extends CrudComp {
 			<AnQueryForm onSearch={this.toSearch}
 				conds={[ this.state.condTxt, this.state.condCbb, this.state.condAuto ]}
 				query={(q) => { return {
-					domain: q.state.conds[0].val ? q.state.conds[0].val.v : undefined,
+					domain: q.state.conds[0].val ? q.state.conds[0].val : undefined,
 					parent: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 					ignored: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				}} }
-			>
-				<TextField />
-			</AnQueryForm>
+			/>
 			<AnTablist className={classes.root}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
 					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
 					{ text: L('parent'), color: 'primary',field:"parentId" }
 				]}
-				rows = {this.state.rows}
+				rows={this.state.rows} pk='domainId'
+				pageInf={this.state.pageInf}
+				sizeOptions={[5, 25, 50]}
+				onPageInf={this.onPageInf}
 			/>
 			<Card>
 				<Typography variant="h6" gutterBottom>
