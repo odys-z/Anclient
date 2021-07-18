@@ -64,7 +64,7 @@ const UserInfo = withStyles(styles)(UserInfoComp);
 
 class CheapFlowComp extends CrudComp {
 	render() {
-		return (<>User Info</>);
+		return (<>Cheap Flow</>);
 	}
 }
 const CheapFlow = withStyles(styles)(CheapFlowComp);

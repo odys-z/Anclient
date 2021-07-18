@@ -16,6 +16,16 @@ const styles = (theme) => ( {
 		"& :hover": {
 			backgroundColor: '#777'
 		}
+	},
+	buttons: {
+		display: 'flex',
+		justifyContent: "flex-end",
+		'& > *': {
+			margin: theme.spacing(0.5),
+		}
+		"& :hover": {
+			backgroundColor: '#a98'
+		}
 	}
 } );
 
@@ -82,6 +92,26 @@ class RolesComp extends CrudComp {
 					orgId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 				}} }
 			/>
+			<Box className={classes.buttons} >
+				<Button variant="contained"
+					color="primary"
+					className={classes.button}
+					onClick={this.toAdd}
+					startIcon={<Add />}
+				>{L('Search')}</Button>
+				<Button variant="contained"
+					color="primary"
+					className={classes.button}
+					onClick={this.toDel}
+					startIcon={<Delete />}
+				>{L('Reset')}</Button>
+				<Button variant="contained"
+					color="primary"
+					className={classes.button}
+					onClick={this.toEdit}
+					startIcon={<Edit />}
+				>{L('Reset')}</Button>
+			</Box>
 			<AnTablist
 				className={classes.root} checkbox= {true} pk= "vid"
 				columns={[
