@@ -50,7 +50,7 @@ class OrgsComp extends CrudComp {
 			/>
 			<Card>
 				<Typography variant="h6" gutterBottom>
-					This page shows grouped table binding
+					This page shows tree data to table binding
 				</Typography>
 			</Card>
 		</>);
