@@ -29,7 +29,9 @@ class UsersComp extends CrudComp {
 
 		th: [{	text: L('User Name'), field: 'userName', checked: true, color: 'primary', className: 'bold' },
 			 {	text: L('uid'), field: 'userId', hide: true, color: 'primary' },
-			 {	text: L('Role'), field: 'roleName', color: 'primary' }]
+			 {	text: L('Role'), field: 'roleName', color: 'primary' }],
+			 
+		pageInf : { page: 0, size: 25, total: 0 },
 	};
 
 	constructor(props) {
@@ -39,7 +41,8 @@ class UsersComp extends CrudComp {
 	}
 
 	toSearch(e, q) {
-		let qr = this.context.anClient.query(null, 'a_users', 'u');
+		let pageInf = this.state.pageInf;
+		let qr = this.context.anClient.query(null, 'a_users', 'u', pageInf);
 		qr.Body().j('a_roles', 'r', 'r.roleId = u.roleId')
 
 		if (q.roleId && q.roleId.v)
@@ -63,6 +66,7 @@ class UsersComp extends CrudComp {
 			<AnTablist className={classes.root}
 				columns={ this.state.th }
 				rows={ this.state.rows }
+				pageInf={ this.state.pageInf }
 			/>
 		</div>);
 	}

@@ -21,151 +21,11 @@ const styles = (theme) => ( {
  * 	{array} columns must need
  * 	{array}  rows  must need
  * 	{string} pk must need
+ * 	{object} pageInf {page, size, total, sizeOptions}
  * 	{boolean} checkbox
  * 	{function} updateSelectd
  * 	{array} selected
-class AnTablistComp extends React.Component {
-
-	state = {
-		selected: []
-	}
-
-	constructor(props){
-		super(props)
-
-		this.isSelected = this.isSelected.bind(this);
-		this.toSelectAll = this.toSelectAll.bind(this);
-
-		this.th = this.th.bind(this);
-		this.tr = this.tr.bind(this);
-	}
-
-
-	isSelected(name) {
-		return this.state.selected.indexOf(name) !== -1;
-	}
-
-	handleClick(event, index) {
-		let selected = [...this.state.selected];
-		const selectedIndex = selected.indexOf(index);
-		let newSelected = [];
-
-		if (selectedIndex === -1) {
-			newSelected = newSelected.concat(selected, index);
-		  } else if (selectedIndex === 0) {
-			newSelected = newSelected.concat(selected.slice(1));
-		  } else if (selectedIndex === selected.length - 1) {
-			newSelected = newSelected.concat(selected.slice(0, -1));
-		  } else if (selectedIndex > 0) {
-			newSelected = newSelected.concat(
-			  selected.slice(0, selectedIndex),
-			  selected.slice(selectedIndex + 1),
-			);
-		  }
-		this.setState({selected:newSelected});
-		this.updateSelectd([...newSelected]);
-	};
-
-	toSelectAll = (event) => {
-		if (event.target.checked) {
-			let key = this.props.pk;
-		  const newSelecteds = this.props.rows.map((n) => n[key]);
-		  this.setState({selected:newSelecteds});
-		  this.updateSelectd([...newSelecteds]);
-		  return;
-		}
-		this.setState({selected:[]});
-		this.updateSelectd([]);
-	  };
-
-	  updateSelectd(arr){
-		if(typeof this.props.updateSelectd  === "function"){
-			this.props.updateSelectd(arr);
-		}
-	  }
-
-	/**
-	 *
-	 * @param {array} [columns] table columns
-	 * @returns [<TableCell>,...]
-	 * /
-	th(columns = []) {
-		return columns.filter( v => v.hide !== true)
-			.map( (colObj, index) =>
-				<TableCell key={index}>
-					{colObj.text || colObj.field}
-				</TableCell>);
-	}
-
-	tr(rows = [], colums = []) {
-		return rows.map(row => this.renderRow(row,colums))
-	}
-
-	renderRow(row,columns){
-		let key = this.props.pk;
-		let isItemSelected = this.isSelected(row[key]);
-		return (
-		  <TableRow key= {row[key]} hover
-				selected={isItemSelected}
-				onClick= {(event) => this.handleClick(event, row[key])}
-				role="checkbox" aria-checked={isItemSelected} >
-			{this.props.checkbox && (<TableCell component="th" scope="row" padding="checkbox">
-					<Checkbox
-						color="primary"
-						checked ={isItemSelected}
-					/>
-			</TableCell>)
-			}
-			{columns.filter( v => v.hide !== true)
-					.map( (colObj,index) =>
-						<TableCell key={index}>{row[colObj.field]}</TableCell>)}
-		  </TableRow>)
-	}
-
-	static getDerivedStateFromProps(props, state){
-		if(Array.isArray(props.selected)){
-			return {selected:[...props.selected]}
-		}
-
-		return null;
-	}
-
-	render() {
-		return (
-		  <TableContainer>
-			<Table style={{width:"100%"}} aria-label="simple table">
-			  <TableHead>
-				<TableRow>
-					{
-						this.props.checkbox && ( <TableCell padding="checkbox" ><Checkbox
-						indeterminate={this.state.selected.length > 0 && this.state.selected.length < this.props.rows.length}
-						checked={this.state.selected.length > 0 && this.state.selected.length === this.props.rows.length}
-						color="primary"
-						inputProps={{ 'aria-label': 'checkAll' }}
-						onChange={this.toSelectAll}/></TableCell>)
-					}
-					{this.th(this.props.columns)}
-				</TableRow>
-			  </TableHead>
-			  <TableBody>
-			  {this.tr(this.props.rows, this.props.columns)}
-			  </TableBody>
-			</Table>
-		  </TableContainer>);
-	}
-}
-//AnTablistComp.contextType = AnContext;
-
-function wrapTablePagination(WrappedComponent) {
-
-	  return class extends React.Component {
-		render() {
-		  return <WrappedComponent {...this.props} />;
-		}
-	}
-}
  */
-
 class AnTablistComp extends React.Component {
 
 	state = {
@@ -183,10 +43,11 @@ class AnTablistComp extends React.Component {
 		let {sizeOptions} = props;
 		if (sizeOptions)
 			this.state.sizeOptions = sizeOptions;
-		let {total, page, size} = props.pageInf;
-		this.state.total = total;
-		this.state.page = page;
-		this.state.size = size;
+
+		let {total, page, size} = props.pageInf || {};
+		this.state.total = total || -1;
+		this.state.page = page || 0;
+		this.state.size = size || 20;
 
 		this.isSelected = this.isSelected.bind(this);
 		this.toSelectAll = this.toSelectAll.bind(this);
@@ -322,7 +183,7 @@ class AnTablistComp extends React.Component {
 		</Table>
 		</TableContainer>
 		<TablePagination
-			count = {this.props.pageInf.total}
+			count = {this.props.pageInf ? this.props.pageInf.total || 0 : 0}
 			rowsPerPage={this.state.size}
 			onPageChange={this.changePage}
 			onRowsPerPageChange={this.changeSize}
@@ -334,25 +195,5 @@ class AnTablistComp extends React.Component {
 	}
 }
 
-/**
- * props:
- * 	{array} columns must need
- * 	{array}  rows  must need
- * 	{string} pk must need
- * 	{boolean} checkbox
- * 	{function} updateSelectd
- * 	{array} selected
- */
-class AnTableGroupComp extends AnTablistComp {
-
-	state = {
-		selected: []
-	}
-
-	constructor(props){
-		super(props)
-	}
-}
-const AnTablGroup = withStyles(styles)(AnTableGroupComp);
 const AnTablist = withStyles(styles)(AnTablistComp);
-export { AnTablist, AnTablistComp, AnTablGroup, AnTableGroupComp }
+export { AnTablist, AnTablistComp }
