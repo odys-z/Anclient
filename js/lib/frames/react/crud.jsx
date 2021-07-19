@@ -13,10 +13,31 @@ const styles = (theme) => ( {
 } );
 
 class CrudComp extends React.Component {
+	state = {
+	};
+	forms = new Set();
+
+	showForm(details) {
+		this.forms.add(details);
+	}
+
+	closeForm(details) {
+		this.forms.delete(details);
+	}
+
+	showForms() {
+		return this.forms.forEach((f) => {
+			return <div>fffffffffffff</div>;
+		});
+	}
 
 	render() {
 		return (<>Base CrudComp Page</>);
 	}
+}
+CrudComp.contextType = AnContext;
+
+class CrudFormComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 

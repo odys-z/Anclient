@@ -1,21 +1,42 @@
-
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import { TextField } from '@material-ui/core';
+import { TextField, Button, Grid } from '@material-ui/core';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
 	import { AnConst } from '../../../lib/frames/react/utils/consts';
+	import { JsampleIcons } from '../styles'
 	import { CrudComp } from '../../../lib/frames/react/crud'
 	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
 	import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
 	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
 	import { AnsonResp } from '../../../lib/protocol';
 
+	import { RoleDetails } from './role-details'
+
 const styles = (theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'
 		}
+	},
+	container: {
+		display: 'flex',
+		// width: '100%',
+		'& > *': {
+			margin: theme.spacing(0.5),
+		}
+	},
+	buttons: {
+		display: 'flex',
+		justifyContent: "flex-end",
+		'& > *': {
+			margin: theme.spacing(0.5),
+		}
+	},
+	button: {
+		height: '2.4em',
+		verticalAlign: 'middle',
+		margin: theme.spacing(1),
 	}
 } );
 
@@ -28,18 +49,30 @@ class RolesComp extends CrudComp {
 					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem ],
 					label: L('Organization') },
+
+		// active buttons
+		buttons: { add: true, edit: false, del: false},
+
 		total: 0,
 		pageInf: { page: 0, size: 25, total: 0 },
+		selectedRoleIds: [],
 	};
 
 	constructor(props) {
 		super(props);
+		// this.state.forms = super.forms; // js problem
 
 		this.toSearch = this.toSearch.bind(this);
 		this.onPageInf = this.onPageInf.bind(this);
+		this.onTableSelect = this.onTableSelect.bind(this);
+
+		this.toAdd = this.toAdd.bind(this);
+		this.toEdit = this.toEdit.bind(this);
+		this.toDel = this.toDel.bind(this);
 	}
 
 	componentDidMount() {
+
 		this.toSearch();
 	}
 
@@ -71,9 +104,37 @@ class RolesComp extends CrudComp {
 		}
 	}
 
+	onTableSelect(rowIds) {
+		this.setState( {
+			buttons: {
+				add: this.state.buttons.add,
+				edit: rowIds && rowIds.length === 1,
+				del: rowIds &&  rowIds.length >= 1,
+			},
+			selectedRoleIds: rowIds
+		} );
+	}
+
+	toDel(e, v) {
+	}
+
+	toAdd(e, v) {
+		showForm(<RoleDetails c
+			onOk={(c, r) => console.log(r)}
+			onClose={this.closeForm} />);
+	}
+
+	toEdit(e, v) {
+		super.showForm(<RoleDetails u key={this.forms.size}
+			roleId={this.state.selectedRoleIds[0]}
+			onOk={(c, r) => console.log(r)}
+			onClose={this.closeForm} />);
+	}
+
 	render() {
 		let args = {};
 		const { classes } = this.props;
+		let btn = this.state.buttons;
 		return ( <>
 			<AnQueryForm onSearch={this.toSearch}
 				conds={[ this.state.condName, this.state.condOrg ]}
@@ -82,6 +143,22 @@ class RolesComp extends CrudComp {
 					orgId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 				}} }
 			/>
+
+			<Grid container alignContent="flex-end" >
+				<Button variant="contained" disabled={!btn.add}
+					className={classes.button} onClick={this.toAdd}
+					startIcon={<JsampleIcons.Add />}
+				>{L('Add')}</Button>
+				<Button variant="contained" disabled={!btn.del}
+					className={classes.button} onClick={this.toDel}
+					startIcon={<JsampleIcons.Delete />}
+				>{L('Delete')}</Button>
+				<Button variant="contained" disabled={!btn.edit}
+					className={classes.button} onClick={this.toEdit}
+					startIcon={<JsampleIcons.Edit />}
+				>{L('Edit')}</Button>
+			</Grid>
+
 			<AnTablist
 				className={classes.root} checkbox= {true} pk= "vid"
 				columns={[
@@ -93,7 +170,11 @@ class RolesComp extends CrudComp {
 				rows={this.state.rows} pk='roleId'
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
+				onSelectChange={this.onTableSelect}
 			/>
+			{/*super.showForms()*/
+			 this.forms
+			}
 		</>);
 	}
 }
