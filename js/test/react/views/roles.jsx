@@ -69,6 +69,7 @@ class RolesComp extends CrudComp {
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
 		this.toDel = this.toDel.bind(this);
+		this.closeRoleForm = this.closeRoleForm.bind(this);
 	}
 
 	componentDidMount() {
@@ -119,16 +120,22 @@ class RolesComp extends CrudComp {
 	}
 
 	toAdd(e, v) {
-		showForm(<RoleDetails c
+		this.roleForm = (<RoleDetails c
+			roleId={this.state.selectedRoleIds[0]}
 			onOk={(c, r) => console.log(r)}
-			onClose={this.closeForm} />);
+			onClose={this.closeRoleForm} />);
 	}
 
 	toEdit(e, v) {
-		super.showForm(<RoleDetails u key={this.forms.size}
+		this.roleForm = (<RoleDetails u 
 			roleId={this.state.selectedRoleIds[0]}
 			onOk={(c, r) => console.log(r)}
-			onClose={this.closeForm} />);
+			onClose={this.closeRoleForm} />);
+	}
+
+	closeRoleForm() {
+		this.roleForm = undefined;
+		this.setState({});
 	}
 
 	render() {
@@ -172,9 +179,7 @@ class RolesComp extends CrudComp {
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
 			/>
-			{/*super.showForms()*/
-			 this.forms
-			}
+			{this.roleForm}
 		</>);
 	}
 }
