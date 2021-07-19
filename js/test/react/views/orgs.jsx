@@ -8,7 +8,7 @@ import { L } from '../../../lib/frames/react/utils/langstr';
 	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
 	import { CrudComp } from '../../../lib/frames/react/crud'
 	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-	import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
+	import { AnTreegrid } from '../../../lib/frames/react/widgets/treegrid.jsx'
 	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
 
 const styles = (theme) => ( {
@@ -40,7 +40,7 @@ class OrgsComp extends CrudComp {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<AnTablist className={classes.root}
+			<AnTreegrid className={classes.root}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
 					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
@@ -50,7 +50,7 @@ class OrgsComp extends CrudComp {
 			/>
 			<Card>
 				<Typography variant="h6" gutterBottom>
-					This page shows grouped table binding
+					This page shows tree data to table binding
 				</Typography>
 			</Card>
 		</>);

@@ -1250,9 +1250,7 @@ function EzGrid () {
 
 		opts = EasyHtml.opts(gridId, opts);
 
-		// var semantik = $(gridId).attr(ir.sk);
 		var semantik = opts.sk;
-		// var pgSize = opts.pagesize;
 
 		// Remember some variabl for later calling onPage()
 		if (this.pageInfo[gridId] === undefined) {

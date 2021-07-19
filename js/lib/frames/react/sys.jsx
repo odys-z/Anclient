@@ -17,10 +17,9 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-
 import IconButton from '@material-ui/core/IconButton';
 import {
-	Drafts, Inbox, Send, ExpandLess, ExpandMore, StarBorder, Sms, Menu
+	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu,
 } from '@material-ui/icons';
 
 import { MemoryRouter as Router } from 'react-router';
@@ -376,7 +375,8 @@ class SysComp extends React.Component {
 				</Grid>
 			</Toolbar>
 			</AppBar>
-			<Router><React.Fragment><Drawer
+			<Router>
+			  <React.Fragment><Drawer
 					className={classes.drawer}
 					variant="persistent"
 					anchor="left"
@@ -393,18 +393,19 @@ class SysComp extends React.Component {
 				<List>
 					{this.menuItems(classes)}
 				</List>
-			</Drawer></React.Fragment>
-			<main onClick={this.hideMenu}
+			  </Drawer></React.Fragment>
+			  <main onClick={this.hideMenu}
 				className={clsx(classes.content, {
 					[classes.contentShift]: open,
 				})}
-			>
+			  >
 				<div className={classes.drawerHeader} />
 				<Typography paragraph>CrudComp</Typography>
 				<div className="content">
 					{this.route()}
 				</div>
-			</main></Router>
+			  </main>
+			</Router>
 
 			{this.state.showMine && <MyInfo onClose={() => this.setState({ showMine: false })} />}
 			{this.state.showLogout && <ConfirmDialog ok={L('Sure')} title={L('Info')} // cancel={false}

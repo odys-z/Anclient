@@ -21,46 +21,45 @@ export class AnReact {
 
 	static get port() { return 'quiz'; }
 
-	serv (a, conds = {}, onLoad, errCtx) {
-		let req = new UserReq(qconn)
-			.A(a); // this is a reading request
-
-		for (let k in conds)
-			req.set(k, conds[k]);
-
-		let header = Protocol.formatHeader(this.ssInf);
-
-		// for logging user action at server side.
-		this.client.usrAct({
-			func: 'quiz',
-			cmd: a,
-			cate: Protocol.CRUD.r,
-			remarks: 'quiz.serv' });
-
-		var jreq = new AnsonMsg({
-					port: JQuiz.port,
-					header,
-					body: [req]
-				});
-
-		this.client.an.post(jreq, onLoad, (c, resp) => {
-			if (errCtx) {
-				errCtx.hasError = true;
-				errCtx.code = c;
-				errCtx.msg = resp.Body().msg();
-				errCtx.onError(true);
-			}
-			else console.error(c, resp);
-		});
-		return this;
-	}
+	// serv (a, conds = {}, onLoad, errCtx) {
+	// 	let req = new UserReq(qconn)
+	// 		.A(a); // this is a reading request
+	//
+	// 	for (let k in conds)
+	// 		req.set(k, conds[k]);
+	//
+	// 	let header = Protocol.formatHeader(this.ssInf);
+	//
+	// 	// for logging user action at server side.
+	// 	this.client.usrAct({
+	// 		func: 'quiz',
+	// 		cmd: a,
+	// 		cate: Protocol.CRUD.r,
+	// 		remarks: 'quiz.serv' });
+	//
+	// 	var jreq = new AnsonMsg({
+	// 				port: JQuiz.port,
+	// 				header,
+	// 				body: [req]
+	// 			});
+	//
+	// 	this.client.an.post(jreq, onLoad, (c, resp) => {
+	// 		if (errCtx) {
+	// 			errCtx.hasError = true;
+	// 			errCtx.code = c;
+	// 			errCtx.msg = resp.Body().msg();
+	// 			errCtx.onError(true);
+	// 		}
+	// 		else console.error(c, resp);
+	// 	});
+	// 	return this;
+	// }
 
 	/** Create a query request and post back to server.
 	 * This function show the general query sample - goes to the Protocol's query
 	 * port: "r.serv(11)".
 	 * @param {string} quizId quiz id
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
-	 * */
 	quiz(quizId, onLoad, errCtx) {
 		let that = this;
 		return this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
@@ -69,6 +68,7 @@ export class AnReact {
 	list (conds, onLoad) {
 		return this.serv(quiz_a.list, conds, onLoad, this.err);
 	}
+	 * */
 
 	insert(quiz, onOk) {
 		let that = this;
@@ -166,7 +166,9 @@ export class AnReactExt extends AnReact {
 
 	bindTablist(req, comp, errCtx) {
 		this.client.commit(req, (qrsp) => {
-			let {rows} = AnsonResp.rs2arr( qrsp.Body().Rs() );
+			let rs = qrsp.Body().Rs();
+			let {rows} = AnsonResp.rs2arr( rs );
+			comp.state.pageInf.total = rs.total;
 			comp.setState({rows});
 		}, errCtx.onError );
 	}

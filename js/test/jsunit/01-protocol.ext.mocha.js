@@ -46,7 +46,6 @@ describe('case: [01.2 Ext dataset]', () => {
 
 		assert.equal(rp.Body().type, "io.odysz.semantic.ext.AnDatasetResp", "1 ---");
 
-		debugger
 		let rs = rp.Body().Rs();
 		assert.equal(rs.type, "io.odysz.module.rs.AnResultset", "2 ---");
 		assert.equal(rs.total, 10, "3 ---");
