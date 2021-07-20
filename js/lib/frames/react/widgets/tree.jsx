@@ -2,19 +2,21 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import SvgIcon from '@material-ui/core/SvgIcon';
 import Grid from "@material-ui/core/Grid";
+import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
 import {
   Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
 } from "@material-ui/icons";
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
 
 export const AnTreeIcons = {
 	expand: <ExpandMore />,
 	collapse: <ExpandLess />,
-	"menu-lv0": <Send />,
-	"menu-lv1": <Drafts />,
-	"menu-leaf": <Sms />,
+	"menu-lv0": <Send color="primary" />,
+	"menu-lv1": <Drafts color="primary" />,
+	"menu-leaf": <Sms color="primary" />,
 	"-": <_Icon />,
 	"F": <FIcon />,
 	"|": <IIcon />,
@@ -250,47 +252,44 @@ class AnTreeComp extends React.Component {
 		let open = that.state.expandings.has(stree.nodeId);
 		if (stree.children && stree.children.length > 0)
 		  return (
-			<div key={stree.nodeId} className={classes.folder}>
-			  <div
+			<Box key={stree.nodeId} className={classes.folder}>
+			  <Box nid={stree.nodeId}
 				onClick={expandItem}
-				nid={stree.nodeId}
 				className={classes.folderHead}
 			  >
 				<Grid container spacing={0}>
-					<Grid item xs={2} >
-						{icon(stree.css.icon)}
-					</Grid>
-					<Grid item xs={9} >
-						<Typography noWrap>{stree.nodeName}</Typography>
+					<Grid item xs={11} >
+						{leadingIcons(stree.level)}
+						{ stree.css.icon && icon(stree.css.icon)}
+						{ that.props.checkbox &&
+							(<Checkbox color="primary" />)
+						}
+						{stree.nodeName}
 					</Grid>
 					<Grid item xs={1}>
 						{open ? icon("expand") : icon("collapse")}
 					</Grid>
 				</Grid>
-			  </div>
+			  </Box>
 			  <Collapse in={open} timeout="auto" unmountOnExit>
 				{treeItems(stree.children)}
 			  </Collapse>
-			</div> );
+			</Box> );
 		else
 		  return (
-			<Grid container
-			  key={stree.nodeId}
-			  className={classes.row}
-			>
-			  <Grid item xs={2} className={classes.rowHead} >
-				  <Typography noWrap >
+			<Grid container key={stree.nodeId} className={classes.row} >
+			  <Grid item xs={5} className={classes.treeItem}  >
+				<Box flexDirection="row">
+					{leadingIcons(stree.level)}
 					{ stree.css.icon && icon(stree.css.icon)}
-					{ that.props.checkbox && (
-						<Typography component="th" scope="row" padding="checkbox">
-							<Checkbox color="primary" checked ={false} />
-						</Typography>)
+					{ that.props.checkbox &&
+						(<Checkbox color="primary" />)
 					}
 					{stree.nodeName}
-				  </Typography>
+				</Box>
 			  </Grid>
-			  <Grid item xs={10} className={classes.treeItem} >
-				<Typography >{stree.nodeName}</Typography>
+			  <Grid item xs={7} className={classes.treeItem} >
+				<Typography >{stree.url}</Typography>
 			  </Grid>
 			</Grid>
 		  );
@@ -303,6 +302,13 @@ class AnTreeComp extends React.Component {
 
 	function align(css = {}) {
 		return css.align ? css.align : 'center';
+	}
+
+	function leadingIcons(count) {
+		let c = [];
+		for (let i = 0; i < count; i++)
+			c.push( <React.Fragment key={i}>{icon('.')}</React.Fragment> );
+		return c;
 	}
   }
 

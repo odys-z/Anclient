@@ -10,89 +10,6 @@ import { Typography } from "@material-ui/core";
 
 import { AnTreeIcons } from "./tree"
 
-/*
-const _icons = {
-	expand: <ExpandMore />,
-	collapse: <ExpandLess />,
-	"menu-lv0": <Send />,
-	"menu-lv1": <Drafts />,
-	"menu-leaf": <Sms />,
-	"-": <_Icon />,
-	"F": <FIcon />,
-	"|": <IIcon />,
-	"T": <TIcon />,
-	"L": <LIcon />,
-	"|-": <EIcon />,
-	"+": <XIcon color="primary" />,
-	".": <NIcon />,
-	deflt: <Inbox />
-};
-
-function NIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d=""/>
-	</SvgIcon>
-  );
-}
-
-function FIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M11.5 24 h1 v-11.5 h 11.5 v-1 h-12.5z M8 8 h8 v8 h-8z"/>
-	</SvgIcon>
-  );
-}
-
-function LIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M24 12.5 v-1 h-11.5 v-11.5 h-1 v12.5z"/>
-	</SvgIcon>
-  );
-}
-
-function _Icon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M 24 12.5 v-1 h-24 v1 h24z"/>
-	</SvgIcon>
-  );
-}
-
-function TIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M11.5 24 h1 v-11.5 h11.5 v-1 h-24 v1 h11.5z" />
-	</SvgIcon>
-  );
-}
-
-function IIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M11.5 24 h1 v-24 h-1 v24z" />
-	</SvgIcon>
-  );
-}
-
-function XIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M 19 3 H 5 c -1.11 0 -2 0.9 -2 2 v 14 c 0 1.1 0.89 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 5 c 0 -1.1 -0.9 -2 -2 -2 Z m -2 10 h -4 v 4 h -2 v -4 H 7 v -2 h 4 V 7 h 2 v 4 h 4 v 2 Z" />
-	</SvgIcon>
-  );
-}
-
-function EIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M11.5 24 h1 v-11.5 h11.5 v-1 h-11.5 v-11.5 h-1z" />
-	</SvgIcon>
-  );
-}
-*/
-
 const styles = (theme) => ({
   root: {
 	display: "flex",
@@ -277,7 +194,7 @@ class AnTreegridComp extends React.Component {
 				</Grid>
 			  </div>
 			  <Collapse in={open} timeout="auto" unmountOnExit>
-				{buildMenu(menu.children)}
+				{buildTreegrid(menu.children)}
 			  </Collapse>
 			</div>
 		  );

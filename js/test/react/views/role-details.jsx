@@ -133,7 +133,7 @@ class RoleDetailsComp extends React.Component {
 								}} />
 						</Grid>
 						<Grid item xs={12} className={classes.content} >
-							<AnTree id="functions" label={L('Role Functions')}
+							<AnTree id="functions" checkbox label={L('Role Functions')}
 								variant="outlined" color="primary"
 								checkbox tree={this.state.roleFuncs} />
 						</Grid>
