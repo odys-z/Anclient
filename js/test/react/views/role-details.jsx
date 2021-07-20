@@ -10,7 +10,8 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/Grid';
+import Box from "@material-ui/core/Box";
+import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
@@ -24,9 +25,11 @@ import { L } from '../../../lib/frames/react/utils/langstr';
 const styles = theme => ({
   dialogPaper: {
         minHeight: '80vh',
-        // maxHeight: '80vh',
   },
   root: {
+	  "& :hover": {
+		  backgroundColor: '#ecf'
+	  }
   },
   title: {
     backgroundColor: "linen",
@@ -36,13 +39,20 @@ const styles = theme => ({
   },
   left: {
     backgroundColor: "lightblue",
-    height: "4ch"
+    // height: "4ch"
   },
   right: {
-    height: "4ch"
+    // height: "4ch"
+  },
+  formLabel: {
+    width: '50%',
   },
   content: {
     height: "100%",
+  },
+  buttons: {
+    justifyContent: 'center',
+    verticalAlign: 'middle',
   },
   lower: {
     height: "15%"
@@ -101,7 +111,7 @@ class RoleDetailsComp extends React.Component {
 
 		return (
 			<Dialog className={classes.root} classes={{ paper: classes.dialogPaper }} open={true}
-				fullWidth maxWidth='lg'
+				fullWidth maxWidth='lg' disableEnforceFocus
 				onClose={this.handleClose} >
 
 				<DialogContent className={classes.content} >
@@ -109,28 +119,32 @@ class RoleDetailsComp extends React.Component {
 					  {this.state.dirty ? JsampleIcons.Star : ''}
 					  {title} - {this.state.crud === Protocol.CRUD.c ? L('new') : L('edit')}
 					</DialogTitle>
-					<Grid container >
+					<Grid container className={classes.content} direction="row" >
 						<Grid item xs={6} sm={12} className={classes.left} >
+							<Box flexDirection="row">
 							{!smallSize && <Typography className={classes.formLabel} >{L('Role Id')}</Typography>}
 							<TextField id="role-id"
 								label={smallSize ? L('Role Id') : undefined}
-								variant="outlined" color="primary"
+								variant="outlined" color="primary" margin="dense"
 								placeholder="role-0001"
 								value={this.state.roleId}
 								onChange={(e) => {
-									this.setState({logId: e.target.value, dirty: true});
+									this.setState({roleId: e.target.value, dirty: true});
 								}} />
+							</Box>
 						</Grid>
 						<Grid item xs={6} sm={12} className={classes.right} >
+							<Box flexDirection="row">
 							{!smallSize && <Typography className={classes.formLabel} >{L('Role Name')}</Typography>}
 							<TextField id="role-name"
 								label={smallSize ? L('Role Name') : undefined}
-								variant="outlined" color="primary"
+								variant="outlined" color="primary" margin="dense"
 								placeholder="Role Name"
-								value={this.state.roleName}
+								value={this.state.roleName || ''}
 								onChange={(e) => {
 									this.setState({roleName: e.target.value, dirty: true});
 								}} />
+							</Box>
 						</Grid>
 						<Grid item xs={12} className={classes.content} >
 							<AnTree id="functions" checkbox label={L('Role Functions')}
@@ -139,11 +153,11 @@ class RoleDetailsComp extends React.Component {
 						</Grid>
 					</Grid>
 				</DialogContent>
-				<DialogActions>
-				  <Button onClick={this.toSave} color="primary">
+				<DialogActions className={classes.buttons} >
+				  <Button onClick={this.toSave} variant="contained" color="primary">
 					{L('Save')}
 				  </Button>
-				  <Button onClick={this.toCancel} color="primary">
+				  <Button onClick={this.toCancel} variant="outlined" color="secondary">
 					{L('Cancel')}
 				  </Button>
 				</DialogActions>
