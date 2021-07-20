@@ -1,17 +1,17 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import { TextField, Button, Grid } from '@material-ui/core';
+import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
 	import { AnConst } from '../../../lib/frames/react/utils/consts';
-	import { JsampleIcons } from '../styles'
-	import { CrudComp } from '../../../lib/frames/react/crud'
-	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-	import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
-	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
+	import { JsampleIcons } from '../styles';
+	import { CrudComp } from '../../../lib/frames/react/crud';
+	import { AnContext, AnError } from '../../../lib/frames/react/reactext';
+	import { AnTablist } from '../../../lib/frames/react/widgets/table-list';
+	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form';
 	import { AnsonResp } from '../../../lib/protocol';
 
-	import { RoleDetails } from './role-details'
+	import { RoleDetails } from './role-details';
 
 const styles = (theme) => ( {
 	root: {
@@ -60,7 +60,6 @@ class RolesComp extends CrudComp {
 
 	constructor(props) {
 		super(props);
-		// this.state.forms = super.forms; // js problem
 
 		this.toSearch = this.toSearch.bind(this);
 		this.onPageInf = this.onPageInf.bind(this);
@@ -127,7 +126,7 @@ class RolesComp extends CrudComp {
 	}
 
 	toEdit(e, v) {
-		this.roleForm = (<RoleDetails u 
+		this.roleForm = (<RoleDetails u
 			roleId={this.state.selectedRoleIds[0]}
 			onOk={(c, r) => console.log(r)}
 			onClose={this.closeRoleForm} />);
@@ -180,6 +179,22 @@ class RolesComp extends CrudComp {
 				onSelectChange={this.onTableSelect}
 			/>
 			{this.roleForm}
+
+			<Card>
+				<Typography variant="h6" gutterBottom>
+					Tip:
+				</Typography>
+				<Typography variant="subtitle1" gutterBottom>
+					This page also shows how to response to media size by jsx component.
+					(TextFields are showing according to width)
+					<Link component="button" variant="body2"
+						href='https://codesandbox.io/s/class-with-width-e5pu4?file=/index.js'
+					> Sandbox Test 1 (configure theme to change breakpoints) </Link>
+					<Link component="button" variant="body2"
+						href='https://codesandbox.io/s/textfield-dynamic-label-979gc?file=/demo.js'
+					> Sandbox Test 2 (using width) </Link>
+				</Typography>
+			</Card>
 		</>);
 	}
 }

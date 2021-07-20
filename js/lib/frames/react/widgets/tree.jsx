@@ -6,12 +6,10 @@ import Collapse from "@material-ui/core/Collapse";
 import {
   Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
 } from "@material-ui/icons";
-import { Typography } from "@material-ui/core";
+import Checkbox from '@material-ui/core/Checkbox';
+import Typography from "@material-ui/core/Typography";
 
-import { AnTreeIcons } from "./tree"
-
-/*
-const _icons = {
+export const AnTreeIcons = {
 	expand: <ExpandMore />,
 	collapse: <ExpandLess />,
 	"menu-lv0": <Send />,
@@ -23,6 +21,7 @@ const _icons = {
 	"T": <TIcon />,
 	"L": <LIcon />,
 	"|-": <EIcon />,
+	"E": <EIcon />,
 	"+": <XIcon color="primary" />,
 	".": <NIcon />,
 	deflt: <Inbox />
@@ -91,7 +90,6 @@ function EIcon(props) {
 	</SvgIcon>
   );
 }
-*/
 
 const styles = (theme) => ({
   root: {
@@ -121,12 +119,12 @@ const styles = (theme) => ({
   }
 });
 
-class AnTreegridComp extends React.Component {
+class AnTreeComp extends React.Component {
   state = {
 	window: undefined,
-	treeData: {
-	  funcId: "sys",
-	  funcName: "Anclient Lv-0",
+	stree: {
+	  nodeId: "sys",
+	  nodeName: "Anclient Lv-0",
 	  level: 0,
 	  levelIcons: ['+'],
 	  expandIcon: 'F',
@@ -138,8 +136,8 @@ class AnTreegridComp extends React.Component {
 	  sibling: 0,
 	  children: [
 		{
-		  funcId: "domain",
-		  funcName: "Domain 1.1",
+		  nodeId: "domain",
+		  nodeName: "Domain 1.1",
 		  level: 1,
 		  levelIcons: ['|-', '-'],
 		  url: "/sys/domain",
@@ -150,8 +148,8 @@ class AnTreegridComp extends React.Component {
 		  sibling: 0
 		},
 		{
-		  funcId: "roles",
-		  funcName: "Sysem 1.2",
+		  nodeId: "roles",
+		  nodeName: "Sysem 1.2",
 		  level: 1,
 		  levelIcons: ['L', '+'],
 		  url: "/sys/roles",
@@ -163,8 +161,8 @@ class AnTreegridComp extends React.Component {
 
 		  children: [
 			{
-			  funcId: "domain",
-			  funcName: "Domain 2.1",
+			  nodeId: "domain",
+			  nodeName: "Domain 2.1",
 			  level: 2,
 			  levelIcons: ['.', '|-', '-'],
 			  url: "/sys/domain",
@@ -175,8 +173,8 @@ class AnTreegridComp extends React.Component {
 			  sibling: 0
 			},
 			{
-			  funcId: "roles",
-			  funcName: "Sysem 2.2",
+			  nodeId: "roles",
+			  nodeName: "Sysem 2.2",
 			  level: 2,
 			  levelIcons: ['.', 'L', '-'],
 			  url: "/sys/roles",
@@ -196,7 +194,6 @@ class AnTreegridComp extends React.Component {
 
   constructor(props) {
 	super(props);
-	debugger
 	this.state.sysName =
 	  props.sys || props.sysName || props.name || this.state.sysName;
 	this.state.window = props.window;
@@ -204,7 +201,7 @@ class AnTreegridComp extends React.Component {
 	this.showMenu = this.showMenu.bind(this);
 	this.hideMenu = this.hideMenu.bind(this);
 	this.toExpandItem = this.toExpandItem.bind(this);
-	this.menuItems = this.menuItems.bind(this);
+	this.buildTree = this.buildTree.bind(this);
 
 	this.toLogout = this.toLogout.bind(this);
   }
@@ -224,7 +221,7 @@ class AnTreegridComp extends React.Component {
 
   toExpandItem(e) {
 	e.stopPropagation();
-	let f = e.currentTarget.getAttribute("iid");
+	let f = e.currentTarget.getAttribute("nid");
 
 	let expandings = this.state.expandings;
 	if (expandings.has(f)) expandings.delete(f);
@@ -235,71 +232,65 @@ class AnTreegridComp extends React.Component {
   /**
    * @param {object} classes
    */
-  menuItems(classes) {
+  buildTree(classes) {
 	let that = this;
 
-	let m = this.state.treeData;
+	let m = this.state.stree;
 	let expandItem = this.toExpandItem;
-	let mtree = buildTreegrid( m, classes );
+	let mtree = treeItems(m, classes);
 	return mtree;
 
-	function buildTreegrid(menu) {
-	  if (Array.isArray(menu)) {
-		return menu.map((i, x) => {
-		  return buildTreegrid(i);
+	function treeItems(stree) {
+	  if (Array.isArray(stree)) {
+		return stree.map((i, x) => {
+		  return treeItems(i);
 		});
-	  } else {
-		let open = that.state.expandings.has(menu.funcId);
-		if (menu.children && menu.children.length > 0)
+	  }
+	  else {
+		let open = that.state.expandings.has(stree.nodeId);
+		if (stree.children && stree.children.length > 0)
 		  return (
-			<div key={menu.funcId} className={classes.folder}>
+			<div key={stree.nodeId} className={classes.folder}>
 			  <div
 				onClick={expandItem}
-				iid={menu.funcId}
+				nid={stree.nodeId}
 				className={classes.folderHead}
 			  >
 				<Grid container spacing={0}>
-				  <Grid container item xs={8} >
-						<Grid item xs={3} >
-						  {leadingIcons(menu.levelIcons, open, menu.expandIcon)}
-						  {icon(menu.css.icon)}
-						</Grid>
-						<Grid item xs={9} >
-						  <Typography noWrap>{menu.funcName}</Typography>
-						</Grid>
-				  </Grid>
-				  <Grid item xs={3} >
-					<Typography>{menu.url}</Typography>
-				  </Grid>
-				  <Grid item xs={1}>
-					{open ? icon("expand") : icon("collapse")}
-				  </Grid>
+					<Grid item xs={2} >
+						{icon(stree.css.icon)}
+					</Grid>
+					<Grid item xs={9} >
+						<Typography noWrap>{stree.nodeName}</Typography>
+					</Grid>
+					<Grid item xs={1}>
+						{open ? icon("expand") : icon("collapse")}
+					</Grid>
 				</Grid>
 			  </div>
 			  <Collapse in={open} timeout="auto" unmountOnExit>
-				{buildMenu(menu.children)}
+				{treeItems(stree.children)}
 			  </Collapse>
-			</div>
-		  );
+			</div> );
 		else
 		  return (
 			<Grid container
-			  key={menu.funcId}
-			  spacing={0}
+			  key={stree.nodeId}
 			  className={classes.row}
 			>
-			  <Grid item xs={4} className={classes.rowHead}>
-				  <Typography noWrap>
-					{leadingIcons(menu.levelIcons)}
-					{icon(menu.css.icon)}
-					{menu.funcName}
+			  <Grid item xs={2} className={classes.rowHead} >
+				  <Typography noWrap >
+					{ stree.css.icon && icon(stree.css.icon)}
+					{ that.props.checkbox && (
+						<Typography component="th" scope="row" padding="checkbox">
+							<Checkbox color="primary" checked ={false} />
+						</Typography>)
+					}
+					{stree.nodeName}
 				  </Typography>
 			  </Grid>
-			  <Grid item xs={4} className={classes.treeItem}>
-				<Typography noWrap align={align(menu.css.level)}>{menu.level}</Typography>
-			  </Grid>
-			  <Grid item xs={4} className={classes.treeItem}>
-				<Typography align={align(menu.css.url)}>{menu.url}</Typography>
+			  <Grid item xs={10} className={classes.treeItem} >
+				<Typography >{stree.nodeName}</Typography>
 			  </Grid>
 			</Grid>
 		  );
@@ -311,25 +302,16 @@ class AnTreegridComp extends React.Component {
 	}
 
 	function align(css = {}) {
-	  return css.align ? css.align : 'center';
-	}
-
-	function leadingIcons(icons, expand, expIcon) {
-	  return icons.map((v, x) => {
-		return x === icons.length - 1 && v === '+' && expand
-			? expIcon ? <React.Fragment key={x}>{icon(expIcon)}</React.Fragment>
-					  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
-			: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
-	  });
+		return css.align ? css.align : 'center';
 	}
   }
 
   render() {
 	const { classes } = this.props;
 
-	return <div className={classes.root}>{this.menuItems(classes)}</div>;
+	return <div className={classes.root}>{this.buildTree(classes)}</div>;
   }
 }
 
-const AnTreegrid = withStyles(styles)(AnTreegridComp);
-export { AnTreegrid, AnTreegridComp }
+const AnTree = withStyles(styles)(AnTreeComp);
+export { AnTree, AnTreeComp }
