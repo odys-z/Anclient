@@ -1,6 +1,6 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import { Collapse, Box, TextField, Switch, Button } from '@material-ui/core';
+import { Collapse, Grid, TextField, Switch, Button } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
@@ -18,7 +18,7 @@ const styles = (theme) => ( {
 	},
 	container: {
 		display: 'flex',
-		width: '100%',
+		// width: '100%',
 		'& > *': {
 			margin: theme.spacing(0.5),
 		}
@@ -29,6 +29,11 @@ const styles = (theme) => ( {
 		'& > *': {
 			margin: theme.spacing(0.5),
 		}
+	},
+	button: {
+		height: '2.4em',
+		verticalAlign: 'middle',
+		margin: theme.spacing(1),
 	}
 } );
 
@@ -116,7 +121,7 @@ class AnQueryFormComp extends CrudComp {
 		let _conds = this.state.conds;
 		_conds.ref = _ref;
 		return (e, item) => {
-			e.stopPropagation()
+			if (e) e.stopPropagation()
 			let cbb = _ref.current.getAttribute('name');
 			cbb = parseInt(cbb);
 			_conds[cbb].val = item ? item : AnQueryFormComp.allItem;
@@ -146,24 +151,26 @@ class AnQueryFormComp extends CrudComp {
 		return (
 		<div className={classes.root} >
 			<Switch checked={checked} onChange={this.handleChange} />
-			<Collapse in={checked} direction="row" justify="space-between">
-				<Box className={classes.container} >
-					{ conditions(this.state.conds) }
-				</Box>
-				<Box className={classes.buttons} >
-					<Button variant="contained"
-						color="primary"
-						className={classes.button}
-						onClick={this.toSearch}
-						startIcon={<Search />}
-					>{L('Search')}</Button>
-					<Button variant="contained"
-						color="primary"
-						className={classes.button}
-						onClick={this.toClear}
-						startIcon={<Replay />}
-					>{L('Reset')}</Button>
-				</Box>
+			<Collapse in={checked} direction="row"  >
+				<Grid container alignContent="flex-end" >
+					<Grid item className={classes.container} >
+						{ conditions(this.state.conds) }
+					</Grid>
+					<Grid item className={classes.buttons} >
+						<Button variant="contained"
+							color="primary"
+							className={classes.button}
+							onClick={this.toSearch}
+							startIcon={<Search />}
+						>{L('Search')}</Button>
+						<Button variant="contained"
+							color="primary"
+							className={classes.button}
+							onClick={this.toClear}
+							startIcon={<Replay />}
+						>{L('Reset')}</Button>
+					</Grid>
+				</Grid>
 			</Collapse>
 		</div>);
 
@@ -178,9 +185,9 @@ class AnQueryFormComp extends CrudComp {
 					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
 						id={String(x)} name={String(x)} ref={refcbb}
-						value={ v }
+						// value={ v }
 						onChange={ that.onCbbRefChange(refcbb) }
-						inputValue={ v.n }
+						// inputValue={ v ? v.v : '' }
 						onInputChange={ that.onCbbRefChange(refcbb) }
 
 						options={cond.options}
@@ -196,7 +203,7 @@ class AnQueryFormComp extends CrudComp {
 					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
 						id={String(x)} name={String(x)} ref={refcbb}
-						value={ v }
+						// value={ v }
 						onChange={ that.onCbbRefChange(refcbb) }
 
 						options={cond.options}

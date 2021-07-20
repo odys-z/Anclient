@@ -86,6 +86,7 @@ class AnTablistComp extends React.Component {
 			);
 		}
 		this.setState({ selected: newSelected });
+
 		this.updateSelectd([ ...newSelected ]);
 	};
 
@@ -102,9 +103,8 @@ class AnTablistComp extends React.Component {
 	};
 
 	updateSelectd (arr) {
-		if(typeof this.props.updateSelectd  === "function"){
-			this.props.updateSelectd(arr);
-		}
+		if (typeof this.props.onSelectChange === 'function')
+			this.props.onSelectChange(arr);
 	}
 
 	changePage(event, page) {
@@ -121,7 +121,7 @@ class AnTablistComp extends React.Component {
 	}
 
 	/**
-	 *
+	 * Render table head.
 	 * @param {array} [columns] table columns
 	 * @returns [<TableCell>,...]
 	 */

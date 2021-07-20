@@ -12,11 +12,21 @@ const styles = (theme) => ( {
 	}
 } );
 
+/**Common base class of function pages.
+ * To popup modal dialog, see
+ * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
+ */
 class CrudComp extends React.Component {
+	state = {
+	};
 
 	render() {
 		return (<>Base CrudComp Page</>);
 	}
+}
+CrudComp.contextType = AnContext;
+
+class CrudFormComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 

@@ -19,7 +19,7 @@ export class AnReact {
 		this.err = errCtx;
 	}
 
-	static get port() { return 'quiz'; }
+	// static get port() { return 'quiz'; }
 
 	// serv (a, conds = {}, onLoad, errCtx) {
 	// 	let req = new UserReq(qconn)
@@ -54,21 +54,6 @@ export class AnReact {
 	// 	});
 	// 	return this;
 	// }
-
-	/** Create a query request and post back to server.
-	 * This function show the general query sample - goes to the Protocol's query
-	 * port: "r.serv(11)".
-	 * @param {string} quizId quiz id
-	 * @param {function} onLoad on query ok callback, called with parameter of query responds
-	quiz(quizId, onLoad, errCtx) {
-		let that = this;
-		return this.serv(quiz_a.quiz, {quizId}, onLoad, errCtx);
-	}
-
-	list (conds, onLoad) {
-		return this.serv(quiz_a.list, conds, onLoad, this.err);
-	}
-	 * */
 
 	insert(quiz, onOk) {
 		let that = this;

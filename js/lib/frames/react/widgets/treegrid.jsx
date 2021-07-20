@@ -14,13 +14,13 @@ const _icons = {
 	"menu-lv0": <Send />,
 	"menu-lv1": <Drafts />,
 	"menu-leaf": <Sms />,
-  "-": <_Icon />,
-  "F": <FIcon />,
+	"-": <_Icon />,
+	"F": <FIcon />,
 	"|": <IIcon />,
 	"T": <TIcon />,
 	"L": <LIcon />,
 	"|-": <EIcon />,
-	"+": <XIcon />,
+	"+": <XIcon color="primary" />,
 	".": <NIcon />,
 	deflt: <Inbox />
 };
@@ -76,7 +76,7 @@ function IIcon(props) {
 function XIcon(props) {
   return (
 	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M 11 19 H 13 V 4 H 11 Z M 19 12 V 10 H 5 V 12 Z M 4 8 T 9 3 H 15 T 20 8 V 14 T 15 20 H 9 T 4 14 Z" />
+	  <path d="M 19 3 H 5 c -1.11 0 -2 0.9 -2 2 v 14 c 0 1.1 0.89 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 5 c 0 -1.1 -0.9 -2 -2 -2 Z m -2 10 h -4 v 4 h -2 v -4 H 7 v -2 h 4 V 7 h 2 v 4 h 4 v 2 Z" />
 	</SvgIcon>
   );
 }
