@@ -33,8 +33,6 @@ function NIcon(props) {
   );
 }
 
-
-
 const styles = (theme) => ({
   root: {
 	display: "flex",
@@ -43,7 +41,7 @@ const styles = (theme) => ({
   row: {
 	width: "100%",
 	"& :hover": {
-	  backgroundColor: "#ced"
+	  backgroundColor: "#bed"
 	}
   },
   rowHead: {},
@@ -208,7 +206,7 @@ class AnTreeComp extends React.Component {
 					<Typography>
 					  {leadingIcons(stree.level)}
 					  {stree.css.icon && icon(stree.css.icon)}
-					  <Checkbox color="primary" />
+					  <Checkbox color="primary" onClick={(e) => { e.stopPropagation(); }} />
 					  {stree.nodeName}
 					</Typography>
 				  </Grid>
@@ -229,7 +227,13 @@ class AnTreeComp extends React.Component {
 				<Typography >
 				  {leadingIcons(stree.level)}
 				  {stree.css.icon && icon(stree.css.icon)}
-				  {that.props.checkbox && <Checkbox color="primary" />}
+				  {that.props.checkbox
+					  && <Checkbox color="primary"
+						onClick={(e, v) => {
+							e.stopPropagation();
+							if (typeof that.props.onCheck === 'function')
+								that.props.onCheck(e, v);
+						}}/>}
 				  {stree.nodeName}
 				</Typography>
 			  </Grid>
