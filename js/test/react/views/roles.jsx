@@ -187,12 +187,18 @@ class RolesComp extends CrudComp {
 				<Typography variant="subtitle1" gutterBottom>
 					This page also shows how to response to media size by jsx component.
 					(TextFields are showing according to width)
-					<Link component="button" variant="body2"
-						href='https://codesandbox.io/s/class-with-width-e5pu4?file=/index.js'
-					> Sandbox Test 1 (configure theme to change breakpoints) </Link>
-					<Link component="button" variant="body2"
-						href='https://codesandbox.io/s/textfield-dynamic-label-979gc?file=/demo.js'
-					> Sandbox Test 2 (using width) </Link>
+				<Card>
+					<Link href='https://codesandbox.io/s/class-with-width-e5pu4?file=/index.js'
+					> Sandbox Test 1: configure theme to change breakpoints </Link>
+				</Card>
+				<Card>
+					<Link href='https://codesandbox.io/s/textfield-dynamic-label-979gc?file=/demo.js'
+					> Sandbox Test 2: using width </Link>
+				</Card>
+				<Card>
+					<Link href='https://codesandbox.io/s/modal-form-text-label-basics-v6okl'
+					> Sandbox Test 3: vertial align example </Link>
+				</Card>
 				</Typography>
 			</Card>
 		</>);
