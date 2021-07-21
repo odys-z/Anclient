@@ -198,6 +198,9 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
+	bindSTree(opts, errCtx, component) {
+	}
+
 	/**Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
