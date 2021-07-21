@@ -104,7 +104,17 @@ class AnQueryFormComp extends CrudComp {
 		qx = parseInt(qx);
 		this.state.conds[qx].val = e.currentTarget.value;
 	}
-
+	onDateChange(e,index){
+		e.stopPropagation();
+		//this.state.conds[index].val = e.currentTarget.value;
+		let arr = this.state.conds.map((obj,ix) => {
+			if(ix === index){
+				obj.val = e.currentTarget.value
+			}
+			return obj;
+		});
+		this.setState({conds:arr});
+	}
 	onCbbRefChange( refcbb ) {
 		let _ref = refcbb;
 		let _that = this;
@@ -203,6 +213,26 @@ class AnQueryFormComp extends CrudComp {
 						style={{ width: 300 }}
 						renderInput={(params) => <TextField {...params} label={cond.label} variant="outlined" />}
 					/>);
+				}
+				else if(cond.type === "date"){
+					//uncontrolled Components
+					//let refDate = React.createRef();
+					//uncontrolled Components to controlled component
+					let v = cond && cond.val ? cond.val : ''; 
+					let label = cond && cond.label ? cond.label : "date"
+					return (
+
+						<TextField key={x}
+							//ref={refDate}
+							value = {v}
+							label={label}
+							type="date"
+							style={{ width: 300 }}
+							onChange = {event => {that.onDateChange(event,x)}}
+							InputLabelProps={{
+							shrink: true
+							}}/>
+					)
 				}
 				else // if (cond.type === 'text')
 					return (<TextField label={cond.label} key={'text' + x}
