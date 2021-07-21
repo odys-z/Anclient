@@ -77,37 +77,47 @@ class RoleDetailsComp extends React.Component {
 		fields: {},
 	};
 
+	meta = [
+		{type: 'text', validator: 'len12', field: 'roleId', label: 'Role Name'},
+		{type: 'text', validator: 'len200', field: 'roleName', label: 'Role Name'}
+	];
+
 	constructor (props = {}) {
 		super(props);
 
 		this.state.crud = props.c ? Protocol.CRUD.c
 					: props.u ? Protocol.CRUD.u
 					: Protocol.CRUD.r;
+		this.state.roleId = props.roleId;
 
 		this.validate = this.validate.bind(this);
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
+
+
+		this.meta.forEach( (m, i) => {
+			this.state.fields[m.field] = {v: undefined, meta: i, label: m.label};
+		} );
 	}
 
 	componentDidMount() {
-		this.state.meta = [
-			{type: 'text', validator: 'len12', field: 'roleId', label: 'Role Name'},
-			{type: 'text', validator: 'len200', field: 'roleName', label: 'Role Name'}
-		];
 
 		let that = this;
 
 		if (this.state.crud !== Protocol.CRUD.c) {
 			// load
 			let queryReq = this.context.anClient.query(null, 'a_roles', 'r')
-			queryReq.Body().whereEq('roleId', this.state.fields.roleId.v);
+			queryReq.Body().whereEq('roleId', this.state.roleId);
+			this.context.anReact.bindSimpleForm({req: queryReq,
+				onOk: (resp) => {
+						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 
-			this.context.anReact.bindSimpleForm(queryReq, this,
-				(c, rsp) => {
-					let q = that.context.anClient.query(null, 'a_rolefunc', 'rf');
-					q.Body().whereEq('roleId', that.state.fields.roleId.v);
-					that.context.anReact.bindCheckTree(q, that, that.context.error);
+						let sk = 'trees.role_funcs';
+						let ds = {port: 'dataset', sk, sqlArgs: [this.state.roleId]},
+						// ... ...
+						that.context.anReact.stree({req: q}, that.context.error, that);
+					}
 				},
 				this.context.error);
 		}

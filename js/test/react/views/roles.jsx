@@ -120,15 +120,14 @@ class RolesComp extends CrudComp {
 
 	toAdd(e, v) {
 		this.roleForm = (<RoleDetails c
-			roleId={this.state.selectedRoleIds[0]}
-			onOk={(c, r) => console.log(r)}
+			onOk={(r) => console.log(r)}
 			onClose={this.closeRoleForm} />);
 	}
 
 	toEdit(e, v) {
 		this.roleForm = (<RoleDetails u
 			roleId={this.state.selectedRoleIds[0]}
-			onOk={(c, r) => console.log(r)}
+			onOk={(r) => console.log(r)}
 			onClose={this.closeRoleForm} />);
 	}
 

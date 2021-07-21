@@ -103,6 +103,36 @@ export class AnReact {
 		});
 	}
 
+	bindSimpleForm(qmsg, errCtx, compont) {
+		let onload = qmsg.onOk || qmsg.onLoad ||
+			// try figure the fields
+			function (r) {
+				if (compont) {
+					let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
+					if (rows && rows.length > 0)
+						console.error('Bind form with more than 1 records', r);
+
+					if (rows && rows.length == 1)
+						compont.setState({record: rows[0]});
+					else console.error('Can\'t bind empty row:', r);
+				}
+				else console.error('Can\'t hook back response:', r);
+			}
+		;
+
+		let {req} = qmsg;
+		this.client.an.post(req, onload, (c, resp) => {
+			if (errCtx) {
+				errCtx.hasError = true;
+				errCtx.code = c;
+				errCtx.msg = resp.Body().msg();
+				errCtx.onError(true);
+			}
+			else console.error(c, resp);
+		});
+		return this;
+	}
+
 	/**Try figure out serv root, then bind to html tag.
 	 * First try ./private.json/<serv-id>,
 	 * then  ./github.json/<serv-id>,
@@ -149,6 +179,7 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
+	// TODO move TO super class
 	bindTablist(req, comp, errCtx) {
 		this.client.commit(req, (qrsp) => {
 			let rs = qrsp.Body().Rs();
@@ -173,6 +204,12 @@ export class AnReactExt extends AnReact {
 			onLoad, errCtx);
 	}
 
+	/** Load jsample.serv dataset. (using DatasetReq or menu.serv)
+	 * @param {SessionInf} ds dataset info
+	 * @param {function} onLoad
+	 * @param {AnContext} errCtx
+	 * @return {AnReactExt} this
+	 */
 	dataset(ds, onLoad, errCtx) {
 		let ssInf = this.client.ssInf;
 		let {port, sk, sqlArgs} = ds;
@@ -198,7 +235,15 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
-	bindSTree(opts, errCtx, component) {
+	stree(opts, errCtx, component) {
+		let {onOk} = opts;
+
+		let onload = onOk || function (c, resp) {
+			if (compont)
+				compont.setState({stree: resp.Body().forest});
+		}
+
+		this.dataset(opts, onload, errCtx);
 	}
 
 	/**Bind dataset to combobox options (comp.state.condCbb).
