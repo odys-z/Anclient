@@ -80,27 +80,30 @@ export class AnReact {
 		});
 	}
 
-	update(quiz, onOk) {
-		let that = this;
-		this.client.usrAct('quiz', quiz_a.update, Protocol.CRUD.u, quiz.qtitle);
-
-		let props = {}
-		props[QuizProtocol.quizId] = quiz.quizId;
-		props[QuizProtocol.qtitle] = quiz.qtitle;
-		props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
-
-		let req = this.client.userReq(qconn, JQuiz.port,
-			new UserReq(qconn, "quizzes", props).A(quiz_a.update) );
-
-		this.client.an.post(req, onOk, (c, resp) => {
-			if (that.err) {
-				that.err.code = c;
-				that.err.msg = resp.Body().msg();
-				that.err.onError(true);
-			}
-			else console.error(c, resp);
-		});
+	// update(quiz, onOk) {
+	// 	let that = this;
+	// 	this.client.usrAct('quiz', quiz_a.update, Protocol.CRUD.u, quiz.qtitle);
+	//
+	// 	let props = {}
+	// 	props[QuizProtocol.quizId] = quiz.quizId;
+	// 	props[QuizProtocol.qtitle] = quiz.qtitle;
+	// 	props[QuizProtocol.quizinfo] = quiz.quizinfo;
+	// 	props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
+	//
+	// 	let req = this.client.userReq(qconn, JQuiz.port,
+	// 		new UserReq(qconn, "quizzes", props).A(quiz_a.update) );
+	//
+	// 	this.client.an.post(req, onOk, (c, resp) => {
+	// 		if (that.err) {
+	// 			that.err.code = c;
+	// 			that.err.msg = resp.Body().msg();
+	// 			that.err.onError(true);
+	// 		}
+	// 		else console.error(c, resp);
+	// 	});
+	// }
+	update(rec, onOk) {
+		throw new Error('don\'t use this - a stub for future extension');
 	}
 
 	bindSimpleForm(qmsg, errCtx, compont) {
@@ -205,14 +208,14 @@ export class AnReactExt extends AnReact {
 	}
 
 	/** Load jsample.serv dataset. (using DatasetReq or menu.serv)
-	 * @param {SessionInf} ds dataset info
-	 * @param {function} onLoad
+	 * @param {object} ds dataset info {port, sk, sqlArgs}
 	 * @param {AnContext} errCtx
+	 * @param {CrudComp} component
 	 * @return {AnReactExt} this
 	 */
 	dataset(ds, onLoad, errCtx) {
 		let ssInf = this.client.ssInf;
-		let {port, sk, sqlArgs} = ds;
+		let {port, sk, sqlArgs, t} = ds;
 		sqlArgs = sqlArgs || [];
 		port = port || 'dataset';
 
@@ -220,7 +223,7 @@ export class AnReactExt extends AnReact {
 				sk,
 				sqlArgs
 			})
-			.A(stree_t.query);
+			.A(t || stree_t.query);
 		let jreq = this.client.userReq(undefined, port, reqbody);
 
 		this.client.an.post(jreq, onLoad, (c, resp) => {
@@ -235,12 +238,25 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
+	/** Load jsample.serv dataset. (using DatasetReq or menu.serv).
+	 * If opts.onOk is provided, will try to bind stree like this:
+	 <pre>
+	let onload = onOk || function (c, resp) {
+		if (compont)
+			compont.setState({stree: resp.Body().forest});
+	}</pre>
+	 * @param {object} opts dataset info {sk, sqlArgs, onOk}
+	 * @param {AnContext} errCtx
+	 * @param {CrudComp} component
+	 * @return {AnReactExt} this
+	 */
 	stree(opts, errCtx, component) {
 		let {onOk} = opts;
+		opts.port = 'stree';
 
-		let onload = onOk || function (c, resp) {
-			if (compont)
-				compont.setState({stree: resp.Body().forest});
+		let onload = onOk || function (resp) {
+			if (component)
+				component.setState({forest: resp.Body().forest});
 		}
 
 		this.dataset(opts, onload, errCtx);

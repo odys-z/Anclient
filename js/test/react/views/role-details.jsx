@@ -15,7 +15,7 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
-	import { Protocol } from '../../../lib/protocol';
+	import { Protocol, stree_t } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/frames/react/utils/consts';
 	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
 	import { AnsonResp } from '../../../lib/protocol';
@@ -34,17 +34,18 @@ const styles = theme => ({
 	width: "100%",
 	color: "primary"
   },
-  left: {
-	height: "11ch",
-  },
-  right: {
-	height: "11ch",
-  },
+  centre: { alignItems: "center" },
+  lower: { height: "15%" },
+
+  left: { alignItems: "center" },
+  right: { alignItems: "center" },
+  largeText: { width: "100%" },
   rowBox: {
 	display: "flex",
 	flexDirection: "row",
 	alignItems: "center"
   },
+
   formLabel: {
 	width: "12ch",
 	textAlign: "right",
@@ -64,23 +65,22 @@ const styles = theme => ({
 	  width: "20ch"
 	}
   },
-  lower: {
-	height: "15%"
-  }
 });
+
 class RoleDetailsComp extends React.Component {
 	state = {
 		crud: Protocol.CRUD.r,
 		dirty: false,
 		closed: false,
 
-		fields: {},
+		fields: [
+			{type: 'text', validator: {len: 12}, field: 'roleId', label: 'Role Name'},
+			{type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name'},
+			{type: 'text', validator: {len: 500}, field: 'remarks', label: 'Remarks'}
+		],
+		record: {},
 	};
 
-	meta = [
-		{type: 'text', validator: 'len12', field: 'roleId', label: 'Role Name'},
-		{type: 'text', validator: 'len200', field: 'roleName', label: 'Role Name'}
-	];
 
 	constructor (props = {}) {
 		super(props);
@@ -94,15 +94,9 @@ class RoleDetailsComp extends React.Component {
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
-
-
-		this.meta.forEach( (m, i) => {
-			this.state.fields[m.field] = {v: undefined, meta: i, label: m.label};
-		} );
 	}
 
 	componentDidMount() {
-
 		let that = this;
 
 		if (this.state.crud !== Protocol.CRUD.c) {
@@ -112,11 +106,14 @@ class RoleDetailsComp extends React.Component {
 			this.context.anReact.bindSimpleForm({req: queryReq,
 				onOk: (resp) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
+						that.state.record = rows[0];
 
 						let sk = 'trees.role_funcs';
-						let ds = {port: 'dataset', sk, sqlArgs: [this.state.roleId]},
-						// ... ...
-						that.context.anReact.stree({req: q}, that.context.error, that);
+						let ds = {sk,
+							t: stree_t.sqltree, // load dataset reshape to tree
+							sqlArgs: [this.state.roleId]};
+
+						that.context.anReact.stree(ds, that.context.error, that);
 					}
 				},
 				this.context.error);
@@ -124,6 +121,8 @@ class RoleDetailsComp extends React.Component {
 	}
 
 	validate() {
+		let that = this;
+
 	    const invalid = { border: "2px solid red" };
 
 		let valid = true;
@@ -135,8 +134,19 @@ class RoleDetailsComp extends React.Component {
 	    }
 		return valid;
 
-		function validfield (f, valider) {
-			return valider(f.v);
+		function validField (f, valider) {
+			let v = that.state.record[f.field];
+
+			if (typeof valider === 'function')
+				return valider(v);
+			else if (f.validator) {
+				let vd = f.validator;
+				if(vd.notNull && (v === undefined || v.length === 0))
+					return false;
+				if (vd.len && v !== undefined && v.length > vd.len)
+					return false;
+				return true;
+			}
 		}
 	}
 
@@ -149,16 +159,34 @@ class RoleDetailsComp extends React.Component {
 		}
 
 		let client = this.context.anClient;
-		let u = this.state.c ? client.create()
-				: client.update();
-		u.Body().nv('roleName', this.fields.roleName.v)
-		// ...
 
-		this.context.anReact.commit(u, (resp) => {
-			this.state.crud = Protocol.CRUD.c;
+		let req;
+		let nvs = [];
+		// TODO add test
+		// data must keep consists with jquery serializeArray()
+		// https://api.jquery.com/serializearray/
+		nvs.push({name: 'remarks', value: this.state.record.remarks});
+		nvs.push({name: 'roleName', value: this.state.record.roleName});
+
+		if (this.state.crud === Protocol.CRUD.c) {
+			nvs.push({name: 'roleId', value: this.state.record.roleId});
+			req = client
+				.usrAct('roles', Protocol.CURD.c, 'save')
+				.insert(null, 'a_roles', nvs);
+		}
+		else {
+			req = client
+				.usrAct('roles', Protocol.CRUD.u, 'save')
+				.update(null, 'a_roles', this.state.fields[0].field, nvs);
+			req.Body().whereEq('roleId', this.state.record.roleId);
+		}
+
+		let that = this;
+		client.commit(req, (resp) => {
+			that.state.crud = Protocol.CRUD.u;
 			that.showOk(L('Role data saved!'));
-			if (typeof this.props.onOk === 'function')
-				this.props.onOk({code: resp.code, resp});
+			if (typeof that.props.onOk === 'function')
+				that.props.onOk({code: resp.code, resp});
 		}, this.context.error);
 	}
 
@@ -170,23 +198,27 @@ class RoleDetailsComp extends React.Component {
 
 	showOk(txt) {
 		let that = this;
-		this.ok = (<ConfirmDialog ok={L('OK')} title={L('Info')}
+		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
+					title={L('Info')}
 					cancel={false} msg={txt}
 					onClose={() => {that.ok === undefined} } />);
 
 		if (typeof this.props.onSave === 'function')
 			this.props.onSave({code: 'ok'});
+
+		that.setState({dirty: false});
 	}
 
 	render () {
 		const { classes, width } = this.props;
 		const smallSize = new Set(["xs", "sm"]).has(width);
 
-		let c = !!this.props.c;
+		let c = !!this.state.crud;
+		let rec = this.state.record;
 
-		let title = c ? L('Create User')
-					: this.props.u ? L('Edit User')
-					: L('User Info');
+		let title = c ? L('Create Role')
+					: this.state.crud === Protocol.CRUD.u ? L('Edit Role')
+					: L('Role Details');
 
 		return (<>
 		  <Dialog className={classes.root}
@@ -195,12 +227,12 @@ class RoleDetailsComp extends React.Component {
 			onClose={this.handleClose}
 		  >
 			<DialogContent className={classes.content}>
-			  <DialogTitle id="u-title">
+			  <DialogTitle id="u-title" color="primary" >
+				{title} - {c ? L("New") : L("Edit")}
 				{this.state.dirty ? <JsampleIcons.Star color="secondary"/> : ""}
-				{title} - {c ? L("new") : L("edit")}
 			  </DialogTitle>
 			  <Grid container className={classes.content} direction="row">
-				<Grid item className={classes.left}>
+				<Grid item sm={6} className={classes.left}>
 				  <Box className={classes.rowBox}>
 					{!smallSize && (
 					  <Typography className={classes.formLabel}>
@@ -208,17 +240,22 @@ class RoleDetailsComp extends React.Component {
 					  </Typography>
 					)}
 					<TextField id="roleId"
-					  label={smallSize ? L("Role Id") : undefined}
-					  variant="outlined" color="primary" margin="dense"
-					  value={this.state.roleId}
-					  inputProps={{ style: this.state.fields['roleId'].style }}
-					  onChange={(e) => {
-						this.setState({ roleId: e.target.value, dirty: true });
-					  }}
+						label={smallSize ? L("Role Id") : undefined}
+						disabled={c}
+						variant="outlined" color="primary" fullWidth
+						placeholder="Role ID" margin="dense"
+						value={rec[this.state.fields[0].field] || ""}
+						inputProps={{ style: this.state.fields[0].style }}
+						onChange={(e) => {
+							if (c)
+							this.setState({
+								record: Object.assign(rec, { roleId: e.target.value }),
+								dirty : true });
+						}}
 					/>
 				  </Box>
 				</Grid>
-				<Grid item className={classes.right} sx={{ maxWidth: 1200 }}>
+				<Grid item sm={6} className={classes.right} >
 				  <Box className={classes.rowBox}>
 					{!smallSize && (
 					  <Typography className={classes.formLabel} >
@@ -226,34 +263,59 @@ class RoleDetailsComp extends React.Component {
 					  </Typography>
 					)}
 					<TextField id="roleName" className={classes.formText}
-					  label={smallSize ? L("Role Name") : undefined}
-					  variant="outlined" color="primary" margin="dense"
-					  placeholder="Role Name" margin="dense"
-					  value={this.state.roleName || ""}
-					  inputProps={{ style: this.state.fields['roleName'].style }}
-					  onChange={(e) => {
-						this.setState({ roleName: e.target.value, dirty: true });
-					  }}
+						label={smallSize ? L("Role Name") : undefined}
+						variant="outlined" color="primary" fullWidth
+						placeholder="Role Name" margin="dense"
+						value={rec[this.state.fields[1].field] || ""}
+						inputProps={{ style: this.state.fields[1].style }}
+						onChange={(e) => {
+							this.setState({
+								record: Object.assign(rec, { roleName: e.target.value }),
+								dirty : true });
+						}}
 					/>
 				  </Box>
 				</Grid>
 			  </Grid>
+			  <Grid item sm={12} className={classes.formObject} >
+				  <Box className={classes.rowBox}>
+					{!smallSize && (
+					  <Typography className={classes.formLabel} >
+						{L("Remarks")}
+					  </Typography>
+					)}
+					<TextField id="remarks" className={classes.formText}
+						label={smallSize ? L("Remarks") : undefined}
+						variant="outlined" color="primary" fullWidth
+						placeholder="Remarks" margin="dense"
+						value={rec[this.state.fields[2].field] || ""}
+						inputProps={{ style: this.state.fields[2].style }}
+						onChange={(e) => {
+							this.setState({
+								record: Object.assign(rec, { remarks: e.target.value }),
+								dirty : true });
+						}}
+					/>
+				  </Box>
+			  </Grid>
 			  <Grid item xs={12} className={classes.formObject} >
-				  <AnTree checkbox onCheck={(e, v) => {this.setState({dirty: true})}}/>
+				  {this.state.forest && <AnTree checkbox
+					  forest={this.state.forest}
+					  onCheck={(e, v) => {this.setState({dirty: true})}} />}
 			  </Grid>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
 			  <Button onClick={this.toSave} variant="contained" color="primary">
-				{L("Save")}
+				{(c || this.state.crud === Protocol.CRUD.u) && L("Save")}
 			  </Button>
 			  <Button onClick={this.toCancel} variant="contained" color="primary">
-				{L("Cancel")}
+				{(c || this.state.crud === Protocol.CRUD.u) ? L('Close') : L("Cancel")}
 			  </Button>
 			</DialogActions>
 		  </Dialog>
 		  {this.ok}
 	  </>);
-  }
+	}
 }
 RoleDetailsComp.contextType = AnContext;
 

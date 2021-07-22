@@ -196,7 +196,7 @@ class RolesComp extends CrudComp {
 				</Card>
 				<Card>
 					<Link href='https://codesandbox.io/s/modal-form-text-label-basics-v6okl'
-					> Sandbox Test 3: vertial align example </Link>
+					> Sandbox Test 3: vertial middle align example </Link>
 				</Card>
 				</Typography>
 			</Card>

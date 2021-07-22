@@ -205,6 +205,11 @@ class AnClient {
 				if (resp.code !== Protocol.MsgCode.ok)
 					if (typeof onErr === "function")
 						onErr(resp.code, resp);
+					else if (onErr && typeof onErr.onError === "function"){
+						// a special case of AnContext.error
+						onErr.msg = resp.Body().msg();
+						onErr.onError(resp.code, resp);
+					}
 					else console.error(resp);
 				// code == ok
 				else {
@@ -216,14 +221,25 @@ class AnClient {
 			error: function (resp) {
 				// JSON.stringify(resp):
 				// {"readyState":0,"status":0,"statusText":"error"};
-				if (typeof onErr === "function") {
+
+				// if (onErr && typeof onErr.onError === "function") {
+				// 	onErr.msg = resp.Body().msg();
+				// 	onErr = onErr.onError;
+				// }
+
+				if (typeof onErr === "function" || onErr && typeof onErr.onError === 'function') {
 					if (resp.statusText) {
 						resp.code = Protocol.MsgCode.exIo;
 						resp.body = [ {
 								type: 'io.odysz.semantic.jprotocol.AnsonResp',
 								m: 'Network failed: ' + resp.statusText
 							} ];
-						onErr(Protocol.MsgCode.exIo, new AnsonMsg(resp));
+						let ansonResp = new AnsonMsg(resp);
+						if (typeof onErr.onError === 'function') {
+							onErr.msg = ansonResp.Body().msg();
+							onErr.onError(Protocol.MsgCode.exIo, ansonResp);
+						}
+						else onErr(Protocol.MsgCode.exIo, ansonResp);
 					}
 					else {
 						if (resp.code || resp.port || !resp.status)
@@ -234,6 +250,11 @@ class AnClient {
 										  m: 'Ajax: network failed: ' + resp.status } ]
 							});
 						else resp = fromAjaxError(resp);
+
+						if (typeof onErr.onError === 'function') {
+							onErr.msg = resp.Body().msg();
+							onErr.onError(Protocol.MsgCode.exIo, resp);
+						}
 						onErr(Protocol.MsgCode.exIo, resp);
 					}
 				}
@@ -540,18 +561,17 @@ class SessionClient {
 
 	update(conn, maintbl, pk, nvs) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
-			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
+			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
 
 		if (pk === undefined) {
-			console.error("To update a table, {pk, v} must presented.", pk);
-			return;
+			throw new Error("To update a table, {pk, v} must presented.", pk);
 		}
 
 		var upd = new UpdateReq(conn, maintbl, pk);
 		upd.a = Protocol.CRUD.u;
 		this.currentAct.cmd = 'update';
-		var jmsg = this.userReq(conn, Protocol.Port.update, upd, this.currentAct);
+		var jmsg = this.userReq(conn, 'update', upd, this.currentAct);
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
@@ -612,7 +632,7 @@ class SessionClient {
 	userReq(conn, port, bodyItem, act) {
 		let header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
-			header.userAct = act;
+			// header.userAct = act;
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}
 		return new AnsonMsg({ port, header, body: [bodyItem] });
