@@ -15,48 +15,56 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
-	import { Protocol } from '../../../lib/protocol';
+	import { Protocol, stree_t } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/frames/react/utils/consts';
 	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
 	import { AnsonResp } from '../../../lib/protocol';
 	import { JsampleIcons } from '../styles'
+	import { ConfirmDialog } from '../../../lib/frames/react/widgets/messagebox.jsx'
 	import { AnTree } from '../../../lib/frames/react/widgets/tree';
 
 const styles = theme => ({
   dialogPaper: {
-        minHeight: '80vh',
+	minHeight: "80vh"
   },
-  root: {
-	  "& :hover": {
-		  backgroundColor: '#ecf'
-	  }
-  },
+  root: {},
   title: {
-    backgroundColor: "linen",
-    height: "5ch",
-    width: "100%",
-	color: "primary",
+	backgroundColor: "linen",
+	height: "5ch",
+	width: "100%",
+	color: "primary"
   },
-  left: {
-    backgroundColor: "lightblue",
-    // height: "4ch"
+  centre: { alignItems: "center" },
+  lower: { height: "15%" },
+
+  left: { alignItems: "center" },
+  right: { alignItems: "center" },
+  largeText: { width: "100%" },
+  rowBox: {
+	display: "flex",
+	flexDirection: "row",
+	alignItems: "center"
   },
-  right: {
-    // height: "4ch"
-  },
+
   formLabel: {
-    width: '50%',
+	width: "12ch",
+	textAlign: "right",
+    paddingRight: theme.spacing(1),
+  },
+  formText: {
+	textAlign: "right",
+    paddingLeft: theme.spacing(1),
   },
   content: {
-    height: "100%",
+	height: "100%",
   },
   buttons: {
-    justifyContent: 'center',
-    verticalAlign: 'middle',
+	justifyContent: "center",
+	verticalAlign: "middle",
+	"& > button": {
+	  width: "20ch"
+	}
   },
-  lower: {
-    height: "15%"
-  }
 });
 
 class RoleDetailsComp extends React.Component {
@@ -64,27 +72,121 @@ class RoleDetailsComp extends React.Component {
 		crud: Protocol.CRUD.r,
 		dirty: false,
 		closed: false,
+
+		fields: [
+			{type: 'text', validator: {len: 12}, field: 'roleId', label: 'Role Name'},
+			{type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name'},
+			{type: 'text', validator: {len: 500}, field: 'remarks', label: 'Remarks'}
+		],
+		record: {},
 	};
+
 
 	constructor (props = {}) {
 		super(props);
+
+		this.state.crud = props.c ? Protocol.CRUD.c
+					: props.u ? Protocol.CRUD.u
+					: Protocol.CRUD.r;
+		this.state.roleId = props.roleId;
+
+		this.validate = this.validate.bind(this);
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
 	}
 
+	componentDidMount() {
+		let that = this;
+
+		if (this.state.crud !== Protocol.CRUD.c) {
+			// load
+			let queryReq = this.context.anClient.query(null, 'a_roles', 'r')
+			queryReq.Body().whereEq('roleId', this.state.roleId);
+			this.context.anReact.bindSimpleForm({req: queryReq,
+				onOk: (resp) => {
+						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
+						that.state.record = rows[0];
+
+						let sk = 'trees.role_funcs';
+						let ds = {sk,
+							t: stree_t.sqltree, // load dataset reshape to tree
+							sqlArgs: [this.state.roleId]};
+
+						that.context.anReact.stree(ds, that.context.error, that);
+					}
+				},
+				this.context.error);
+		}
+	}
+
+	validate() {
+		let that = this;
+
+	    const invalid = { border: "2px solid red" };
+
+		let valid = true;
+	    for(let fn in this.state.fields) {
+			let f = this.state.fields[fn];
+			f.valid = validField(f, {validator: (v) => !!v});
+			f.style = invalid;
+			valid &= f.valid;
+	    }
+		return valid;
+
+		function validField (f, valider) {
+			let v = that.state.record[f.field];
+
+			if (typeof valider === 'function')
+				return valider(v);
+			else if (f.validator) {
+				let vd = f.validator;
+				if(vd.notNull && (v === undefined || v.length === 0))
+					return false;
+				if (vd.len && v !== undefined && v.length > vd.len)
+					return false;
+				return true;
+			}
+		}
+	}
+
 	toSave(e) {
 		e.stopPropagation();
 
+		if (!this.validate()) {
+	    	this.setState({});
+			return;
+		}
+
 		let client = this.context.anClient;
-		let u = this.state.c ? client.create()
-				: client.update();
-		// ...
-		this.context.anReact.commit(u, (resp) => {
-			this.state.crud = Protocol.CRUD.c;
-			that.showOk(L('Saved!'));
-			if (typeof this.props.onOk === 'function')
-				this.props.onOk({code: resp.code, resp});
+
+		let req;
+		let nvs = [];
+		// TODO add test
+		// data must keep consists with jquery serializeArray()
+		// https://api.jquery.com/serializearray/
+		nvs.push({name: 'remarks', value: this.state.record.remarks});
+		nvs.push({name: 'roleName', value: this.state.record.roleName});
+
+		if (this.state.crud === Protocol.CRUD.c) {
+			nvs.push({name: 'roleId', value: this.state.record.roleId});
+			req = client
+				.usrAct('roles', Protocol.CURD.c, 'save')
+				.insert(null, 'a_roles', nvs);
+		}
+		else {
+			req = client
+				.usrAct('roles', Protocol.CRUD.u, 'save')
+				.update(null, 'a_roles', this.state.fields[0].field, nvs);
+			req.Body().whereEq('roleId', this.state.record.roleId);
+		}
+
+		let that = this;
+		client.commit(req, (resp) => {
+			that.state.crud = Protocol.CRUD.u;
+			that.showOk(L('Role data saved!'));
+			if (typeof that.props.onOk === 'function')
+				that.props.onOk({code: resp.code, resp});
 		}, this.context.error);
 	}
 
@@ -95,74 +197,124 @@ class RoleDetailsComp extends React.Component {
 	}
 
 	showOk(txt) {
-		if (typeof this.props.onClose === 'function')
-			this.props.onClose({code: 'cancel'});
+		let that = this;
+		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
+					title={L('Info')}
+					cancel={false} msg={txt}
+					onClose={() => {that.ok === undefined} } />);
+
+		if (typeof this.props.onSave === 'function')
+			this.props.onSave({code: 'ok'});
+
+		that.setState({dirty: false});
 	}
 
 	render () {
 		const { classes, width } = this.props;
 		const smallSize = new Set(["xs", "sm"]).has(width);
 
-		let c = !!this.props.c;
+		let c = !!this.state.crud;
+		let rec = this.state.record;
 
-		let title = c ? L('Create User')
-					: this.props.u ? L('Edit User')
-					: L('User Info');
+		let title = c ? L('Create Role')
+					: this.state.crud === Protocol.CRUD.u ? L('Edit Role')
+					: L('Role Details');
 
-		return (
-			<Dialog className={classes.root} classes={{ paper: classes.dialogPaper }} open={true}
-				fullWidth maxWidth='lg' disableEnforceFocus
-				onClose={this.handleClose} >
-
-				<DialogContent className={classes.content} >
-					<DialogTitle id="u-title" >
-					  {this.state.dirty ? JsampleIcons.Star : ''}
-					  {title} - {this.state.crud === Protocol.CRUD.c ? L('new') : L('edit')}
-					</DialogTitle>
-					<Grid container className={classes.content} direction="row" >
-						<Grid item xs={6} sm={12} className={classes.left} >
-							<Box flexDirection="row">
-							{!smallSize && <Typography className={classes.formLabel} >{L('Role Id')}</Typography>}
-							<TextField id="role-id"
-								label={smallSize ? L('Role Id') : undefined}
-								variant="outlined" color="primary" margin="dense"
-								placeholder="role-0001"
-								value={this.state.roleId}
-								onChange={(e) => {
-									this.setState({roleId: e.target.value, dirty: true});
-								}} />
-							</Box>
-						</Grid>
-						<Grid item xs={6} sm={12} className={classes.right} >
-							<Box flexDirection="row">
-							{!smallSize && <Typography className={classes.formLabel} >{L('Role Name')}</Typography>}
-							<TextField id="role-name"
-								label={smallSize ? L('Role Name') : undefined}
-								variant="outlined" color="primary" margin="dense"
-								placeholder="Role Name"
-								value={this.state.roleName || ''}
-								onChange={(e) => {
-									this.setState({roleName: e.target.value, dirty: true});
-								}} />
-							</Box>
-						</Grid>
-						<Grid item xs={12} className={classes.content} >
-							<AnTree id="functions" checkbox label={L('Role Functions')}
-								variant="outlined" color="primary"
-								checkbox tree={this.state.roleFuncs} />
-						</Grid>
-					</Grid>
-				</DialogContent>
-				<DialogActions className={classes.buttons} >
-				  <Button onClick={this.toSave} variant="contained" color="primary">
-					{L('Save')}
-				  </Button>
-				  <Button onClick={this.toCancel} variant="outlined" color="secondary">
-					{L('Cancel')}
-				  </Button>
-				</DialogActions>
-			</Dialog>
-		);
+		return (<>
+		  <Dialog className={classes.root}
+			classes={{ paper: classes.dialogPaper }}
+			open={true} fullWidth maxWidth="lg"
+			onClose={this.handleClose}
+		  >
+			<DialogContent className={classes.content}>
+			  <DialogTitle id="u-title" color="primary" >
+				{title} - {c ? L("New") : L("Edit")}
+				{this.state.dirty ? <JsampleIcons.Star color="secondary"/> : ""}
+			  </DialogTitle>
+			  <Grid container className={classes.content} direction="row">
+				<Grid item sm={6} className={classes.left}>
+				  <Box className={classes.rowBox}>
+					{!smallSize && (
+					  <Typography className={classes.formLabel}>
+						{L("Role Id")}
+					  </Typography>
+					)}
+					<TextField id="roleId"
+						label={smallSize ? L("Role Id") : undefined}
+						disabled={c}
+						variant="outlined" color="primary" fullWidth
+						placeholder="Role ID" margin="dense"
+						value={rec[this.state.fields[0].field] || ""}
+						inputProps={{ style: this.state.fields[0].style }}
+						onChange={(e) => {
+							if (c)
+							this.setState({
+								record: Object.assign(rec, { roleId: e.target.value }),
+								dirty : true });
+						}}
+					/>
+				  </Box>
+				</Grid>
+				<Grid item sm={6} className={classes.right} >
+				  <Box className={classes.rowBox}>
+					{!smallSize && (
+					  <Typography className={classes.formLabel} >
+						{L("Role Name")}
+					  </Typography>
+					)}
+					<TextField id="roleName" className={classes.formText}
+						label={smallSize ? L("Role Name") : undefined}
+						variant="outlined" color="primary" fullWidth
+						placeholder="Role Name" margin="dense"
+						value={rec[this.state.fields[1].field] || ""}
+						inputProps={{ style: this.state.fields[1].style }}
+						onChange={(e) => {
+							this.setState({
+								record: Object.assign(rec, { roleName: e.target.value }),
+								dirty : true });
+						}}
+					/>
+				  </Box>
+				</Grid>
+			  </Grid>
+			  <Grid item sm={12} className={classes.formObject} >
+				  <Box className={classes.rowBox}>
+					{!smallSize && (
+					  <Typography className={classes.formLabel} >
+						{L("Remarks")}
+					  </Typography>
+					)}
+					<TextField id="remarks" className={classes.formText}
+						label={smallSize ? L("Remarks") : undefined}
+						variant="outlined" color="primary" fullWidth
+						placeholder="Remarks" margin="dense"
+						value={rec[this.state.fields[2].field] || ""}
+						inputProps={{ style: this.state.fields[2].style }}
+						onChange={(e) => {
+							this.setState({
+								record: Object.assign(rec, { remarks: e.target.value }),
+								dirty : true });
+						}}
+					/>
+				  </Box>
+			  </Grid>
+			  <Grid item xs={12} className={classes.formObject} >
+				  {this.state.forest && <AnTree checkbox
+					  forest={this.state.forest}
+					  onCheck={(e, v) => {this.setState({dirty: true})}} />}
+			  </Grid>
+			</DialogContent>
+			<DialogActions className={classes.buttons}>
+			  <Button onClick={this.toSave} variant="contained" color="primary">
+				{(c || this.state.crud === Protocol.CRUD.u) && L("Save")}
+			  </Button>
+			  <Button onClick={this.toCancel} variant="contained" color="primary">
+				{(c || this.state.crud === Protocol.CRUD.u) ? L('Close') : L("Cancel")}
+			  </Button>
+			</DialogActions>
+		  </Dialog>
+		  {this.ok}
+	  </>);
 	}
 }
 RoleDetailsComp.contextType = AnContext;

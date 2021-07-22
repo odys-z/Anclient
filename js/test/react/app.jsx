@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { MuiThemeProvider } from "@material-ui/core/styles";
 
 import {SessionClient} from '../../lib/anclient.js'
 	import { Protocol } from '../../lib/protocol.js'
@@ -15,6 +16,7 @@ import { samports } from '../jsample.js'
 	import { Roles } from './views/roles'
 	import { Orgs } from './views/orgs'
 	import { Users } from './views/users'
+	import { JsampleTheme } from './styles'
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -96,22 +98,26 @@ class App extends React.Component {
 
 	render() {
 	  return (
-		<AnContext.Provider value={{
-			samports: this.state.samports, // FXIME or Protocol?
-			anReact: this.state.anReact,
-			pageOrigin: window ? window.origin : 'localhost',
-			servId: this.state.servId,
-			servs: this.props.servs,
-			jserv: this.state.jserv,
-			anClient: this.state.anClient,
-			hasError: this.state.hasError,
-			iparent: this.props.iparent,
-			iportal: this.props.iportal || 'portal.html',
-			error: this.state.error,
-		}} >
-			<Sys onLogout={this.logout}/>
-			{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
-		</AnContext.Provider>);
+		<MuiThemeProvider theme={JsampleTheme}>
+			<AnContext.Provider value={{
+				// FIXME we should use a better way
+				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
+				samports: this.state.samports, // FXIME or Protocol?
+				anReact: this.state.anReact,
+				pageOrigin: window ? window.origin : 'localhost',
+				servId: this.state.servId,
+				servs: this.props.servs,
+				jserv: this.state.jserv,
+				anClient: this.state.anClient,
+				hasError: this.state.hasError,
+				iparent: this.props.iparent,
+				iportal: this.props.iportal || 'portal.html',
+				error: this.state.error,
+			}} >
+				<Sys onLogout={this.logout}/>
+				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+			</AnContext.Provider>
+		</MuiThemeProvider>);
 	}
 
 	/**Try figure out serv root, then bind to html tag.

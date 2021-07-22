@@ -8,86 +8,7 @@ import {
 } from "@material-ui/icons";
 import { Typography } from "@material-ui/core";
 
-const _icons = {
-	expand: <ExpandMore />,
-	collapse: <ExpandLess />,
-	"menu-lv0": <Send />,
-	"menu-lv1": <Drafts />,
-	"menu-leaf": <Sms />,
-  "-": <_Icon />,
-  "F": <FIcon />,
-	"|": <IIcon />,
-	"T": <TIcon />,
-	"L": <LIcon />,
-	"|-": <EIcon />,
-	"+": <XIcon />,
-	".": <NIcon />,
-	deflt: <Inbox />
-};
-
-function NIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d=""/>
-	</SvgIcon>
-  );
-}
-
-function FIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M11.5 24 h1 v-11.5 h 11.5 v-1 h-12.5z M8 8 h8 v8 h-8z"/>
-	</SvgIcon>
-  );
-}
-
-function LIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M24 12.5 v-1 h-11.5 v-11.5 h-1 v12.5z"/>
-	</SvgIcon>
-  );
-}
-
-function _Icon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M 24 12.5 v-1 h-24 v1 h24z"/>
-	</SvgIcon>
-  );
-}
-
-function TIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M11.5 24 h1 v-11.5 h11.5 v-1 h-24 v1 h11.5z" />
-	</SvgIcon>
-  );
-}
-
-function IIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M11.5 24 h1 v-24 h-1 v24z" />
-	</SvgIcon>
-  );
-}
-
-function XIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M 11 19 H 13 V 4 H 11 Z M 19 12 V 10 H 5 V 12 Z M 4 8 T 9 3 H 15 T 20 8 V 14 T 15 20 H 9 T 4 14 Z" />
-	</SvgIcon>
-  );
-}
-
-function EIcon(props) {
-  return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
-	  <path d="M11.5 24 h1 v-11.5 h11.5 v-1 h-11.5 v-11.5 h-1z" />
-	</SvgIcon>
-  );
-}
+import { AnTreeIcons } from "./tree"
 
 const styles = (theme) => ({
   root: {
@@ -120,8 +41,7 @@ const styles = (theme) => ({
 class AnTreegridComp extends React.Component {
   state = {
 	window: undefined,
-	sysName: "Anreact Sample",
-	sysMenu: {
+	treeData: {
 	  funcId: "sys",
 	  funcName: "Anclient Lv-0",
 	  level: 0,
@@ -235,15 +155,15 @@ class AnTreegridComp extends React.Component {
   menuItems(classes) {
 	let that = this;
 
-	let m = this.state.sysMenu;
+	let m = this.state.treeData;
 	let expandItem = this.toExpandItem;
-	let mtree = buildMenu(m, classes);
+	let mtree = buildTreegrid( m, classes );
 	return mtree;
 
-	function buildMenu(menu) {
+	function buildTreegrid(menu) {
 	  if (Array.isArray(menu)) {
 		return menu.map((i, x) => {
-		  return buildMenu(i);
+		  return buildTreegrid(i);
 		});
 	  } else {
 		let open = that.state.expandings.has(menu.funcId);
@@ -274,7 +194,7 @@ class AnTreegridComp extends React.Component {
 				</Grid>
 			  </div>
 			  <Collapse in={open} timeout="auto" unmountOnExit>
-				{buildMenu(menu.children)}
+				{buildTreegrid(menu.children)}
 			  </Collapse>
 			</div>
 		  );
@@ -304,8 +224,7 @@ class AnTreegridComp extends React.Component {
 	}
 
 	function icon(icon) {
-	  // shall we use theme here?
-	  return _icons[icon || "deflt"];
+	  return AnTreeIcons[icon || "deflt"];
 	}
 
 	function align(css = {}) {
