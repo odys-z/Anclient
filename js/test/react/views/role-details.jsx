@@ -81,7 +81,6 @@ class RoleDetailsComp extends React.Component {
 		record: {},
 	};
 
-
 	constructor (props = {}) {
 		super(props);
 
@@ -126,12 +125,12 @@ class RoleDetailsComp extends React.Component {
 	    const invalid = { border: "2px solid red" };
 
 		let valid = true;
-	    for(let fn in this.state.fields) {
-			let f = this.state.fields[fn];
+	    this.state.fields.forEach( (f, x) => {
+			// let field = f.field;
 			f.valid = validField(f, {validator: (v) => !!v});
-			f.style = invalid;
+			f.style = f.valid ? undefined : invalid;
 			valid &= f.valid;
-	    }
+	    } );
 		return valid;
 
 		function validField (f, valider) {
@@ -162,24 +161,40 @@ class RoleDetailsComp extends React.Component {
 
 		let req;
 		let nvs = [];
-		// TODO add test
-		// data must keep consists with jquery serializeArray()
+
+		// 1. collect role-func
+		let rf = this.context.anReact.insTreeChecked(
+					this.state.forest,
+					{ check: 'checked',
+					  columns: ['roleId', 'funcId'],
+					  reshape: true  // middle nodes been corrected according to children
+					} );
+
+		// 2. collect record
+		// nvs data must keep consists with jquery serializeArray()
 		// https://api.jquery.com/serializearray/
 		nvs.push({name: 'remarks', value: this.state.record.remarks});
 		nvs.push({name: 'roleName', value: this.state.record.roleName});
 
+		// 3. request (with del if updating)
 		if (this.state.crud === Protocol.CRUD.c) {
 			nvs.push({name: 'roleId', value: this.state.record.roleId});
 			req = client
 				.usrAct('roles', Protocol.CURD.c, 'save')
-				.insert(null, 'a_roles', nvs);
+				.insert(null, 'a_roles', nvs)
+				.post(rf);
 		}
 		else {
+			let del_rf = new UpdateReq(null, 'a_role_func', 'roleId')
+							.whereEq('roleId', this.state.record['roleId']);
+
 			req = client
 				.usrAct('roles', Protocol.CRUD.u, 'save')
-				.update(null, 'a_roles', this.state.fields[0].field, nvs);
+				.update(null, 'a_roles', this.state.fields[0].field, nvs)
+				.post(del_rf.post(rf));
 			req.Body().whereEq('roleId', this.state.record.roleId);
 		}
+
 
 		let that = this;
 		client.commit(req, (resp) => {
