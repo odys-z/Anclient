@@ -1,20 +1,29 @@
-
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import { TextField } from '@material-ui/core';
+import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
 	import { AnConst } from '../../../lib/frames/react/utils/consts';
-	import { CrudComp } from '../../../lib/frames/react/crud'
-	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-	import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
-	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
+	import { JsampleIcons } from '../styles';
+	import { CrudComp } from '../../../lib/frames/react/crud';
+	import { AnContext, AnError } from '../../../lib/frames/react/reactext';
+	import { AnTablist } from '../../../lib/frames/react/widgets/table-list';
+	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form';
 	import { AnsonResp } from '../../../lib/protocol';
+
+	import { RoleDetails } from './role-details';
 
 const styles = (theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'
+		}
+	},
+	container: {
+		display: 'flex',
+		// width: '100%',
+		'& > *': {
+			margin: theme.spacing(0.5),
 		}
 	},
 	buttons: {
@@ -23,9 +32,11 @@ const styles = (theme) => ( {
 		'& > *': {
 			margin: theme.spacing(0.5),
 		}
-		"& :hover": {
-			backgroundColor: '#a98'
-		}
+	},
+	button: {
+		height: '2.4em',
+		verticalAlign: 'middle',
+		margin: theme.spacing(1),
 	}
 } );
 
@@ -38,8 +49,13 @@ class RolesComp extends CrudComp {
 					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem ],
 					label: L('Organization') },
+
+		// active buttons
+		buttons: { add: true, edit: false, del: false},
+
 		total: 0,
 		pageInf: { page: 0, size: 25, total: 0 },
+		selectedRoleIds: [],
 	};
 
 	constructor(props) {
@@ -47,9 +63,16 @@ class RolesComp extends CrudComp {
 
 		this.toSearch = this.toSearch.bind(this);
 		this.onPageInf = this.onPageInf.bind(this);
+		this.onTableSelect = this.onTableSelect.bind(this);
+
+		this.toAdd = this.toAdd.bind(this);
+		this.toEdit = this.toEdit.bind(this);
+		this.toDel = this.toDel.bind(this);
+		this.closeRoleForm = this.closeRoleForm.bind(this);
 	}
 
 	componentDidMount() {
+
 		this.toSearch();
 	}
 
@@ -81,9 +104,42 @@ class RolesComp extends CrudComp {
 		}
 	}
 
+	onTableSelect(rowIds) {
+		this.setState( {
+			buttons: {
+				add: this.state.buttons.add,
+				edit: rowIds && rowIds.length === 1,
+				del: rowIds &&  rowIds.length >= 1,
+			},
+			selectedRoleIds: rowIds
+		} );
+	}
+
+	toDel(e, v) {
+	}
+
+	toAdd(e, v) {
+		this.roleForm = (<RoleDetails c
+			onOk={(r) => console.log(r)}
+			onClose={this.closeRoleForm} />);
+	}
+
+	toEdit(e, v) {
+		this.roleForm = (<RoleDetails u
+			roleId={this.state.selectedRoleIds[0]}
+			onOk={(r) => console.log(r)}
+			onClose={this.closeRoleForm} />);
+	}
+
+	closeRoleForm() {
+		this.roleForm = undefined;
+		this.setState({});
+	}
+
 	render() {
 		let args = {};
 		const { classes } = this.props;
+		let btn = this.state.buttons;
 		return ( <>
 			<AnQueryForm onSearch={this.toSearch}
 				conds={[ this.state.condName, this.state.condOrg ]}
@@ -92,26 +148,22 @@ class RolesComp extends CrudComp {
 					orgId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 				}} }
 			/>
-			<Box className={classes.buttons} >
-				<Button variant="contained"
-					color="primary"
-					className={classes.button}
-					onClick={this.toAdd}
-					startIcon={<Add />}
-				>{L('Search')}</Button>
-				<Button variant="contained"
-					color="primary"
-					className={classes.button}
-					onClick={this.toDel}
-					startIcon={<Delete />}
-				>{L('Reset')}</Button>
-				<Button variant="contained"
-					color="primary"
-					className={classes.button}
-					onClick={this.toEdit}
-					startIcon={<Edit />}
-				>{L('Reset')}</Button>
-			</Box>
+
+			<Grid container alignContent="flex-end" >
+				<Button variant="contained" disabled={!btn.add}
+					className={classes.button} onClick={this.toAdd}
+					startIcon={<JsampleIcons.Add />}
+				>{L('Add')}</Button>
+				<Button variant="contained" disabled={!btn.del}
+					className={classes.button} onClick={this.toDel}
+					startIcon={<JsampleIcons.Delete />}
+				>{L('Delete')}</Button>
+				<Button variant="contained" disabled={!btn.edit}
+					className={classes.button} onClick={this.toEdit}
+					startIcon={<JsampleIcons.Edit />}
+				>{L('Edit')}</Button>
+			</Grid>
+
 			<AnTablist
 				className={classes.root} checkbox= {true} pk= "vid"
 				columns={[
@@ -123,7 +175,31 @@ class RolesComp extends CrudComp {
 				rows={this.state.rows} pk='roleId'
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
+				onSelectChange={this.onTableSelect}
 			/>
+			{this.roleForm}
+
+			<Card>
+				<Typography variant="h6" gutterBottom>
+					Tip:
+				</Typography>
+				<Typography variant="subtitle1" gutterBottom>
+					This page also shows how to response to media size by jsx component.
+					(TextFields are showing according to width)
+				<Card>
+					<Link href='https://codesandbox.io/s/class-with-width-e5pu4?file=/index.js'
+					> Sandbox Test 1: configure theme to change breakpoints </Link>
+				</Card>
+				<Card>
+					<Link href='https://codesandbox.io/s/textfield-dynamic-label-979gc?file=/demo.js'
+					> Sandbox Test 2: using width </Link>
+				</Card>
+				<Card>
+					<Link href='https://codesandbox.io/s/modal-form-text-label-basics-v6okl'
+					> Sandbox Test 3: vertial middle align example </Link>
+				</Card>
+				</Typography>
+			</Card>
 		</>);
 	}
 }

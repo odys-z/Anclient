@@ -1,4 +1,6 @@
+import React from "react";
 import { forwardRef } from 'react';
+import { createTheme } from "@material-ui/core/styles";
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -15,6 +17,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import StarBorder from '@material-ui/icons/StarBorder';
 
 export const JsampleIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -33,5 +36,29 @@ export const JsampleIcons = {
     Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
     SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
+    Star: forwardRef((props, ref) => <StarBorder {...props} ref={ref} />)
   };
+
+export const JsampleTheme = createTheme({
+	// for example
+    palette: {
+      primary: {
+        light: "#fff",
+        main: "rgb(23, 105, 170)",
+        dark: "#000"
+      },
+      secondary: {
+        main: "#f44336"
+      }
+    },
+    breakpoints: {
+      values: {
+        xs: 200,
+        sm: 600,
+        md: 960,
+        lg: 1280,
+        xl: 1920
+      }
+    }
+});

@@ -32,6 +32,7 @@ class DomainComp extends CrudComp {
 					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 					label: 'autocbb'},
+		condDate: {type: 'date', val: '', label: 'operTime'},
 		pageInf : { page: 0, size: 25, total: 0 },
 	};
 
@@ -51,6 +52,9 @@ class DomainComp extends CrudComp {
 			queryReq.Body().whereCond('%', 'domainName', `'${query.domain}'`);
 		if (query.ignored)
 			queryReq.Body().whereCond('<>', 'parentId', `'${query.ignored}'`);
+		/*
+		if(query.operTime)
+			queryReq.Body().whereCond('=', 'operTime', `'${query.operTime}'`);*/
 
 		this.state.queryReq = queryReq;
 
@@ -73,11 +77,12 @@ class DomainComp extends CrudComp {
 		const { classes } = this.props;
 		return ( <>
 			<AnQueryForm onSearch={this.toSearch}
-				conds={[ this.state.condTxt, this.state.condCbb, this.state.condAuto ]}
+				conds={[ this.state.condTxt, this.state.condCbb, this.state.condAuto,this.state.condDate]}
 				query={(q) => { return {
 					domain: q.state.conds[0].val ? q.state.conds[0].val : undefined,
 					parent: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 					ignored: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
+					operTime: q.state.conds[3].val ? q.state.conds[3].val : undefined
 				}} }
 			/>
 			<AnTablist className={classes.root}
@@ -129,3 +134,6 @@ DomainComp.contextType = AnContext;
 
 const Domain = withStyles(styles)(DomainComp);
 export { Domain, DomainComp }
+
+
+
