@@ -226,7 +226,7 @@ describe('case: [01.2 Protocol/AnsonReq]', () => {
 
 	});
 
-	it('InsertReq', () => {
+	it('InsertReq <UpdateReq.A(insert)>', () => {
 		let ir = new UpdateReq('con-1', 'quizzes', 'quizId')
 			.A('insert');
 
