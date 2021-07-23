@@ -252,6 +252,7 @@ describe('case: [01.2 Protocol/AnsonReq]', () => {
 
 		assert.equal(ir.nvss.length, 1, 'A ---');
 		assert.equal(ir.nvss[0].length, 2, 'B ---');
+		assert.equal(ir.mtabl, 'a_role_func', 'a_role_func ---');
 
 		jreq = new AnsonMsg({ port, header: null, body: [ir] });
 

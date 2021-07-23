@@ -81,7 +81,6 @@ class RoleDetailsComp extends React.Component {
 		record: {},
 	};
 
-
 	constructor (props = {}) {
 		super(props);
 
