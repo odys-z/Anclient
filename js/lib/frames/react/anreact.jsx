@@ -3,7 +3,7 @@ import React from 'react';
 
 import { L } from './utils/langstr';
 	import { AnConst } from './utils/consts';
-	import { stree_t, Protocol, DatasetReq, AnsonResp } from '../../protocol.js';
+	import { stree_t, Protocol, UpdateReq, InsertReq, DatasetReq, AnsonResp } from '../../protocol.js';
 
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact
@@ -145,27 +145,46 @@ export class AnReact {
 	 * @param {object} opts.reshape set middle tree node while traverse.
 	 * @return {InsertReq} subclass of AnsonBody
 	 */
-	insertTreeChecked (forest, opts) {
-		let ins = new InsertReq();
-		ins.a = Protocol.CRUD.c;
+	inserTreeChecked (forest, opts) {
+		let {table, columnMap, check, reshape} = opts;
 
-		let cols = [];
+		// FIXME shouldn't we map this at server side?
+		let dbCols = Object.keys(columnMap);
+
+		let ins = new InsertReq(null, table)
+			.A(Protocol.CRUD.c)
+			.columns(dbCols);
+
 		let rows = [];
 
 		forest.forEach( (tree, i) => {
-			rows.push(toNvRow(tree.node, opts.columns));
+			if (tree && tree.node && tree.node[check])
+				rows.push(toNvRow(tree.node, dbCols, columnMap));
 		});
 
-		ins.columns(cols);
 		ins.nvRows(rows);
 		return ins;
 
-		function toNvRow(node, columns) {
-			let row = [];
-			columns.forEach( (col, j) => {
-				
+		function toNvRow(node, dbcols, colMap) {
+			let r = [];
+			dbcols.forEach( (col, j) => {
+				let mapto = colMap[col];
+				if (node.hasOwnProperty(mapto))
+					// e.g. roleName: 'text'
+					r.push({name: col, value: node[mapto]});
+				else
+					// e.g. roleId: '0001'
+					r.push({name: col, value: mapto});
 			} );
+			return r;
 		}
+
+		// function toDbCols(columnMap) {
+		// 	let cols = [];
+		// 	for (let n in columnMap) {
+		// 		cols.push()
+		// 	}
+		// }
 	}
 
 	/**Try figure out serv root, then bind to html tag.
@@ -263,7 +282,7 @@ export class AnReactExt extends AnReact {
 				errCtx.hasError = true;
 				errCtx.code = c;
 				errCtx.msg = resp.Body().msg();
-				errCtx.onError(true);
+				errCtx.onError(c, resp);
 			}
 			else console.error(c, resp);
 		});

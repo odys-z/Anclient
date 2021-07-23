@@ -4,8 +4,8 @@
 import chai from 'chai'
 import { expect, assert } from 'chai'
 
-import {Protocol, AnsonMsg, QueryReq, UserReq, AnsonResp} from '../../lib/protocol.js'
-import {AnClient, SessionClient} from '../../lib/anclient.js'
+import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../lib/protocol.js';
+import {AnClient, SessionClient} from '../../lib/anclient.js';
 
 
 const resp = {
@@ -136,6 +136,9 @@ describe('case: [01.1 Protocol.Port]', () => {
 	});
 });
 
+	var localStorage = {
+		setItem: function () {},
+	}
 describe('case: [01.2 Protocol/AnsonReq]', () => {
 
     it('SessionReq formating / instantiation', () => {
@@ -218,6 +221,44 @@ describe('case: [01.2 Protocol/AnsonReq]', () => {
 
 		assert.equal(an.servUrl(port), "localhost/test.serv", "11 ==");
 	} );
+
+	it('UpdateReq', () => {
+
+	});
+
+	it('InsertReq <UpdateReq.A(insert)>', () => {
+		let ir = new UpdateReq('con-1', 'quizzes', 'quizId')
+			.A('insert');
+
+		assert.equal(ir.conn, 'con-1', "1 ---");
+		assert.equal(ir.mtabl, 'quizzes', "2 ---");
+		assert.equal(ir.a, 'insert', "3 ---");
+
+		let port = 'test1';
+		let jreq = new AnsonMsg({ port, header: null, body: [ir] });
+
+        assert.equal(jreq.port, 'test1', "8 ---");
+
+		let nvss = [ [{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f01'}],
+					 [{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f02'}],
+					];
+
+		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
+					  "uid": "admin", "roleId": null, "ssid": "001eysTj" };
+		ir = new SessionClient(ssInf, 'iv 3456789ABCDEF', {dontPersist: true})
+				.usrAct('func', 'cate', 'cmd', 'remarks')
+				.insert(null, 'a_role_func', nvss)
+				.Body();
+
+		assert.equal(ir.nvss.length, 1, 'A ---');
+		assert.equal(ir.nvss[0].length, 2, 'B ---');
+		assert.equal(ir.mtabl, 'a_role_func', 'a_role_func ---');
+
+		jreq = new AnsonMsg({ port, header: null, body: [ir] });
+
+        assert.equal(jreq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "C ---");
+        assert.equal(jreq.Body().type, "io.odysz.semantic.jserv.U.AnInsertReq", "D ---");
+	});
 });
 
 describe('case: [01.3 Protocol/AnsonResp]', () => {
@@ -298,7 +339,6 @@ describe('case: [01.3 Protocol/AnsonResp]', () => {
 
 		let { cols } = AnsonResp.rs2arr(resp.body[0].rs[0]);
 
-		// console.log(cols);
         assert.equal(8, cols.length, "2 ---");
         assert.equal('vid', cols[0], "0 ---");
         assert.equal('dim6', cols[7], "7 ---");

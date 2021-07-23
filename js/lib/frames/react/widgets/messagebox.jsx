@@ -23,9 +23,9 @@ const styles = theme => ({
   root: {
 	backgroundColor: "mint-cream",
 	textAlign: "center",
-	"&:hover": {
-		backgroundColor: "linen"
-	}
+	// "&:hover": {
+	// 	backgroundColor: "linen"
+	// }
   },
   centerbox: {
 	  "justify-content": "center"

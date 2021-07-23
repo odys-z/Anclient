@@ -15,7 +15,7 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
-	import { Protocol, stree_t } from '../../../lib/protocol';
+	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/frames/react/utils/consts';
 	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
 	import { AnsonResp } from '../../../lib/protocol';
@@ -78,6 +78,7 @@ class RoleDetailsComp extends React.Component {
 			{type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name'},
 			{type: 'text', validator: {len: 500}, field: 'remarks', label: 'Remarks'}
 		],
+		pk: undefined,
 		record: {},
 	};
 
@@ -87,7 +88,7 @@ class RoleDetailsComp extends React.Component {
 		this.state.crud = props.c ? Protocol.CRUD.c
 					: props.u ? Protocol.CRUD.u
 					: Protocol.CRUD.r;
-		this.state.roleId = props.roleId;
+		this.state.pk = props.roleId;
 
 		this.validate = this.validate.bind(this);
 		this.toSave = this.toSave.bind(this);
@@ -97,25 +98,30 @@ class RoleDetailsComp extends React.Component {
 
 	componentDidMount() {
 		let that = this;
+		let sk = 'trees.role_funcs';
+		let t = stree_t.sqltree; // loading dataset reshaped to tree
 
 		if (this.state.crud !== Protocol.CRUD.c) {
 			// load
 			let queryReq = this.context.anClient.query(null, 'a_roles', 'r')
-			queryReq.Body().whereEq('roleId', this.state.roleId);
+			queryReq.Body().whereEq('roleId', this.state.pk);
 			this.context.anReact.bindSimpleForm({req: queryReq,
 				onOk: (resp) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 						that.state.record = rows[0];
 
-						let sk = 'trees.role_funcs';
-						let ds = {sk,
-							t: stree_t.sqltree, // load dataset reshape to tree
-							sqlArgs: [this.state.roleId]};
+						let ds = {sk, t, sqlArgs: [this.state.pk]};
 
 						that.context.anReact.stree(ds, that.context.error, that);
 					}
 				},
 				this.context.error);
+		}
+		else {
+			// new, bind tree
+			let ds = {sk, t, sqlArgs: []};
+
+			this.context.anReact.stree(ds, this.context.error, this);
 		}
 	}
 
@@ -158,43 +164,55 @@ class RoleDetailsComp extends React.Component {
 		}
 
 		let client = this.context.anClient;
+		let rec = this.state.record;
+		let c = this.state.crud === Protocol.CRUD.c;
 
 		let req;
-		let nvs = [];
 
 		// 1. collect role-func
-		let rf = this.context.anReact.insTreeChecked(
+		// note 'nodeId' is not the same with DB as some fields are mapped in datase.xml
+		let columnMap = {
+			funcId: 'nodeId',
+			// roleId doesn't included in forest, the value been just appended
+			roleId: c ? rec.roleId : this.state.pk,
+		};
+
+		let rf = this.context.anReact.inserTreeChecked(
 					this.state.forest,
-					{ check: 'checked',
-					  columns: ['roleId', 'funcId'],
+					{ table: 'a_role_func',
+					  columnMap,
+					  check: 'checked',
 					  reshape: true  // middle nodes been corrected according to children
 					} );
 
 		// 2. collect record
 		// nvs data must keep consists with jquery serializeArray()
 		// https://api.jquery.com/serializearray/
-		nvs.push({name: 'remarks', value: this.state.record.remarks});
-		nvs.push({name: 'roleName', value: this.state.record.roleName});
+		let nvs = [];
+		nvs.push({name: 'remarks', value: rec.remarks});
+		nvs.push({name: 'roleName', value: rec.roleName});
+
+		nvs.push({name: 'orgId', value: '006'}) // TODO: got orgId from cbb?
 
 		// 3. request (with del if updating)
 		if (this.state.crud === Protocol.CRUD.c) {
-			nvs.push({name: 'roleId', value: this.state.record.roleId});
+			nvs.push({name: 'roleId', value: rec.roleId});
 			req = client
-				.usrAct('roles', Protocol.CURD.c, 'save')
-				.insert(null, 'a_roles', nvs)
-				.post(rf);
+				.usrAct('roles', Protocol.CRUD.c, 'save')
+				.insert(null, 'a_roles', nvs);
+			req.Body().post(rf);
 		}
 		else {
-			let del_rf = new UpdateReq(null, 'a_role_func', 'roleId')
-							.whereEq('roleId', this.state.record['roleId']);
+			let del_rf = new DeleteReq(null, 'a_role_func', 'roleId')
+							.whereEq('roleId', rec['roleId']);
 
 			req = client
 				.usrAct('roles', Protocol.CRUD.u, 'save')
-				.update(null, 'a_roles', this.state.fields[0].field, nvs)
+				.update(null, 'a_roles', this.state.fields[0].field, nvs);
+			req.Body()
+				.whereEq('roleId', rec.roleId)
 				.post(del_rf.post(rf));
-			req.Body().whereEq('roleId', this.state.record.roleId);
 		}
-
 
 		let that = this;
 		client.commit(req, (resp) => {
@@ -228,11 +246,12 @@ class RoleDetailsComp extends React.Component {
 		const { classes, width } = this.props;
 		const smallSize = new Set(["xs", "sm"]).has(width);
 
-		let c = !!this.state.crud;
+		let c = this.state.crud === Protocol.CRUD.c;
+		let u = this.state.crud === Protocol.CRUD.u;
 		let rec = this.state.record;
 
 		let title = c ? L('Create Role')
-					: this.state.crud === Protocol.CRUD.u ? L('Edit Role')
+					: u ? L('Edit Role')
 					: L('Role Details');
 
 		return (<>
@@ -243,7 +262,7 @@ class RoleDetailsComp extends React.Component {
 		  >
 			<DialogContent className={classes.content}>
 			  <DialogTitle id="u-title" color="primary" >
-				{title} - {c ? L("New") : L("Edit")}
+				{title} - {c ? L("New") : u ? L("Edit") : ''}
 				{this.state.dirty ? <JsampleIcons.Star color="secondary"/> : ""}
 			  </DialogTitle>
 			  <Grid container className={classes.content} direction="row">
@@ -256,7 +275,7 @@ class RoleDetailsComp extends React.Component {
 					)}
 					<TextField id="roleId"
 						label={smallSize ? L("Role Id") : undefined}
-						disabled={c}
+						disabled={!c}
 						variant="outlined" color="primary" fullWidth
 						placeholder="Role ID" margin="dense"
 						value={rec[this.state.fields[0].field] || ""}
@@ -321,10 +340,10 @@ class RoleDetailsComp extends React.Component {
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
 			  <Button onClick={this.toSave} variant="contained" color="primary">
-				{(c || this.state.crud === Protocol.CRUD.u) && L("Save")}
+				{(c || u) && L("Save")}
 			  </Button>
 			  <Button onClick={this.toCancel} variant="contained" color="primary">
-				{(c || this.state.crud === Protocol.CRUD.u) ? L('Close') : L("Cancel")}
+				{(c || u) ? L('Close') : L("Cancel")}
 			  </Button>
 			</DialogActions>
 		  </Dialog>

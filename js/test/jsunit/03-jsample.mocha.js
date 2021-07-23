@@ -84,7 +84,6 @@ describe('case: [03.1 Jsample.menu]', () => {
 			.A('query');
 		mr.args(['quizId', '000001']);
 
-		console.log(mr.t);
         assert.equal(mr.conn, 'con-1', "1 ---");
         assert.equal(mr.mtabl, 's_funcs', "2 ---");
         assert.equal(mr.a, 'query', "3.1 ---");
