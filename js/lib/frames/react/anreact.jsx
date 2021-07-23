@@ -136,6 +136,37 @@ export class AnReact {
 		return this;
 	}
 
+	/**Generate an insert request according to tree/forest checked items.
+	 * @param {object} forest of node, the forest / tree data, tree node: {id, node}
+	 * @param {object} opts options
+	 * @param {object} opts.check checking column name
+	 * @param {object} opts.columns, column's value to be inserted
+	 * @param {object} opts.rows, n-v rows to be inserted
+	 * @param {object} opts.reshape set middle tree node while traverse.
+	 * @return {InsertReq} subclass of AnsonBody
+	 */
+	insertTreeChecked (forest, opts) {
+		let ins = new InsertReq();
+		ins.a = Protocol.CRUD.c;
+
+		let cols = [];
+		let rows = [];
+
+		forest.forEach( (tree, i) => {
+			rows.push(toNvRow(tree.node, opts.columns));
+		});
+
+		ins.columns(cols);
+		ins.nvRows(rows);
+		return ins;
+
+		function toNvRow(node, columns) {
+			columns.forEach( (col, j) => {
+
+			} );
+		}
+	}
+
 	/**Try figure out serv root, then bind to html tag.
 	 * First try ./private.json/<serv-id>,
 	 * then  ./github.json/<serv-id>,
