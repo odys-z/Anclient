@@ -161,8 +161,9 @@ export class AnReact {
 		return ins;
 
 		function toNvRow(node, columns) {
+			let row = [];
 			columns.forEach( (col, j) => {
-
+				
 			} );
 		}
 	}
