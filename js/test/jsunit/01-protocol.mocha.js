@@ -4,8 +4,8 @@
 import chai from 'chai'
 import { expect, assert } from 'chai'
 
-import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../lib/protocol.js'
-import {AnClient, SessionClient} from '../../lib/anclient.js'
+import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../lib/protocol.js';
+import {AnClient, SessionClient} from '../../lib/anclient.js';
 
 
 const resp = {
@@ -339,7 +339,6 @@ describe('case: [01.3 Protocol/AnsonResp]', () => {
 
 		let { cols } = AnsonResp.rs2arr(resp.body[0].rs[0]);
 
-		// console.log(cols);
         assert.equal(8, cols.length, "2 ---");
         assert.equal('vid', cols[0], "0 ---");
         assert.equal('dim6', cols[7], "7 ---");

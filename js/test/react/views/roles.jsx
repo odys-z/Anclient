@@ -181,11 +181,27 @@ class RolesComp extends CrudComp {
 
 			<Card>
 				<Typography variant="h6" gutterBottom>
-					Tip:
+					AnClient Notes:
+				</Typography>
+				<Typography variant="subtitle1" gutterBottom>
+					The details form also shows how to collect relation records
+					with help of AnClient.
+				</Typography>
+				<Card>
+					see <Link href='https://github.com/odys-z/Anclient/blob/b3497e4a1bd10dc594953efb4641531d9bb34dc5/js/test/react/views/role-details.jsx'>
+					Jsample source: role-details.jsx</Link>
+					and <Link href='https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/02-anreact.mocha.js'>
+					Unit Test: 02 anreact / checkTree -> relation records</Link>
+				</Card>
+				<hr/>
+
+				<Typography variant="h6" gutterBottom>
+					Style Tips:
 				</Typography>
 				<Typography variant="subtitle1" gutterBottom>
 					This page also shows how to response to media size by jsx component.
 					(TextFields are showing according to width)
+				</Typography>
 				<Card>
 					<Link href='https://codesandbox.io/s/class-with-width-e5pu4?file=/index.js'
 					> Sandbox Test 1: configure theme to change breakpoints </Link>
@@ -198,7 +214,6 @@ class RolesComp extends CrudComp {
 					<Link href='https://codesandbox.io/s/modal-form-text-label-basics-v6okl'
 					> Sandbox Test 3: vertial middle align example </Link>
 				</Card>
-				</Typography>
 			</Card>
 		</>);
 	}
