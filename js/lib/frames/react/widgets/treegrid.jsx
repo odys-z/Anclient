@@ -113,7 +113,6 @@ class AnTreegridComp extends React.Component {
 
   constructor(props) {
 	super(props);
-	debugger
 	this.state.sysName =
 	  props.sys || props.sysName || props.name || this.state.sysName;
 	this.state.window = props.window;
