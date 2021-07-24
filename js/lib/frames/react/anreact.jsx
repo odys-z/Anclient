@@ -3,6 +3,7 @@ import React from 'react';
 
 import { L } from './utils/langstr';
 	import { AnConst } from './utils/consts';
+	import { toBool } from './utils/helpers';
 	import { stree_t, Protocol, UpdateReq, InsertReq, DatasetReq, AnsonResp } from '../../protocol.js';
 
 /** React helpers of AnClient
@@ -168,10 +169,11 @@ export class AnReact {
 		*/
 		function collectTree(forest, rows) {
 			forest.forEach( (tree, i) => {
-				if (tree && tree.node && tree.node[check]) {
-					rows.push(toNvRow(tree.node, dbCols, columnMap));
+				if (tree && tree.node) {
+					if ( toBool(tree.node[check]) )
+						rows.push(toNvRow(tree.node, dbCols, columnMap));
 					if (tree.node.children && tree.node.children.length > 0)
-						collectTree(tree.children, rows);
+						collectTree(tree.node.children, rows);
 				}
 			});
 		}

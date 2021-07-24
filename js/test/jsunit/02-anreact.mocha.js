@@ -30,7 +30,7 @@ const checkBoxForest = [
 		  { "type":"io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
 			"node":{"fullpath":"2 sys-1.1.4 user","checked":"0","text":"Uesr Manage","sort":"sys-uesr-1.1","nodeId":"sys-uesr-1.1","parentId":"sys-1.1"},"parent":"sys-uesr-1.1","level":1,"id":"Uesr Manage" }
 		],
-		"fullpath":"2 sys-1.1","checked":"0","text":"System v1.1","sort":"sys-1.1","nodeId":"sys-1.1","parentId":""
+		"fullpath":"2 sys-1.1","checked":true,"text":"System v1.1","sort":"sys-1.1","nodeId":"sys-1.1","parentId":""
 	},
 	"parent":"sys-1.1","level":0,"id":"System v1.1" }
 ];
@@ -165,7 +165,8 @@ const forest2 = [
     "level": 0,
     "id": "System v1.1"
   }
-]
+];
+
 describe('case: [02.0 anreact]', () => {
 	it('[protocol] checkTree -> relation records', () => {
 		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
@@ -239,7 +240,7 @@ describe('case: [02.0 anreact]', () => {
 		};
 
 		let rf = anReact.inserTreeChecked(
-					checkBoxForest,
+					forest2,
 					{ table: 'a_role_func',
 					  columnMap,
 					  check: 'checked',
