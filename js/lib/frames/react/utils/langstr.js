@@ -8,7 +8,7 @@
 export const Langstrs = {
 	s: {
 		'en': new Set(),
-		'ch': { },
+		'zh': { },
 		'ja': { },
 	},
 
@@ -19,6 +19,15 @@ export const Langstrs = {
 		if (! lang in Langstrs.s)
 			Langstrs.s[lang] = {};
 	},
+
+	report: function (lang = 'zh') {
+		let res = new Set();
+		Langstrs.s.en.forEach( (v) => {
+			if (!(v in Langstrs.s[lang]))
+				res.add(v);
+		} );
+		return res;
+	}
 }
 
 const argex = /{(\s*(\w|\d)*\s*)}/g;
@@ -35,9 +44,9 @@ export function L(t, o) {
 	// map t first
 	if (! (t in Langstrs.s[Langstrs.lang]) )
 		if (Langstrs.lang !== 'en')
-			Langstrs.s[Langstrs.lang][t] = t;
+			; // Langstrs.s[Langstrs.lang][t] = t;
 		else
-			Langstrs.s[Langstrs.lang].add(t);
+			Langstrs.s.en.add(t);
 	else t = Langstrs.lang === 'en' ?
 		 t : Langstrs.s[Langstrs.lang][t];
 

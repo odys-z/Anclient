@@ -248,8 +248,7 @@ export class AnReactExt extends AnReact {
 	}
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
-	 * @param {SessionInf} ssInf
-	 * @param {function} ssInf
+	 * @param {function} onLoad
 	 * @param {AnContext} errCtx
 	 * @return {AnReactExt} this
 	 */
