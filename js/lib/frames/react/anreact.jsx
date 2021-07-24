@@ -157,13 +157,24 @@ export class AnReact {
 
 		let rows = [];
 
-		forest.forEach( (tree, i) => {
-			if (tree && tree.node && tree.node[check])
-				rows.push(toNvRow(tree.node, dbCols, columnMap));
-		});
+		collectTree(forest, rows);
 
 		ins.nvRows(rows);
 		return ins;
+
+		/**Design Notes:
+		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
+		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
+		*/
+		function collectTree(forest, rows) {
+			forest.forEach( (tree, i) => {
+				if (tree && tree.node && tree.node[check]) {
+					rows.push(toNvRow(tree.node, dbCols, columnMap));
+					if (tree.node.children && tree.node.children.length > 0)
+						collectTree(tree.children, rows);
+				}
+			});
+		}
 
 		function toNvRow(node, dbcols, colMap) {
 			let r = [];
@@ -178,13 +189,6 @@ export class AnReact {
 			} );
 			return r;
 		}
-
-		// function toDbCols(columnMap) {
-		// 	let cols = [];
-		// 	for (let n in columnMap) {
-		// 		cols.push()
-		// 	}
-		// }
 	}
 
 	/**Try figure out serv root, then bind to html tag.
