@@ -589,7 +589,8 @@ class SessionClient {
 		var ins = new InsertReq(conn, maintbl);
 		// ins.a = Protocol.CRUD.c;
 		this.currentAct.cmd = 'insert';
-		var jmsg = this.userReq(conn, Protocol.Port.insert, ins, this.currentAct);
+		// var jmsg = this.userReq(conn, Protocol.Port.insert, ins, this.currentAct);
+		var jmsg = this.userReq(conn, 'insert', ins, this.currentAct);
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))

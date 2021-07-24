@@ -849,6 +849,10 @@ class InsertReq extends UpdateReq {
 		return this;
 	}
 
+	/**Design Notes:
+	 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
+	 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
+	*/
 	nvRows(rows) {
 		if (Array.isArray(rows)) {
 			for (var ix = 0; ix < rows.length && Array.isArray(rows[ix]); ix++) {
@@ -869,7 +873,8 @@ const stree_t = {
 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
 	reforest: 'reforest',
 	/** Query with client provided QueryReq object, and format the result into tree. */
-	query: 'query'};
+	query: 'query'
+};
 
 class DatasetReq extends QueryReq {
 	/**
@@ -881,17 +886,18 @@ class DatasetReq extends QueryReq {
 	 * @param {string} opts.maintbl if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk.
 	 * @param {string} opts.alias if t is null or undefined, use this to replace alias in super (QueryReq).
 	 * @param {object} opts.pageInf {page, size} page index and page size.
+	 * @param {array} opts.sqlArgs args for dataset definition, used by server to format sql.
 	 * @param {{n, v}} ...opts more arguments for sql args.
 	 */
 	constructor (opts = {}) {
-		let {conn, sk, t, a, mtabl, mAlias, pageInf, ...args} = opts;
+		let {conn, sk, t, a, mtabl, mAlias, pageInf, sqlArgs, ...args} = opts;
 
 		super(conn, Jregex.isblank(t) ? mtabl : sk, mAlias);
 		this.type = "io.odysz.semantic.ext.AnDatasetReq";
 
 		this.conn = conn;
 		this.sk = sk;
-		this.sqlArgs = args.args;
+		this.sqlArgs = sqlArgs;
 
 		t = t || a;
 		this.T(t);
@@ -924,6 +930,10 @@ class DatasetReq extends QueryReq {
 		return this.T(a);
 	}
 
+	SqlArgs(args) {
+		return this.args(args);
+	}
+
 	args(args) {
 		if (this.sqlArgs === undefined){
 			this.sqlArgs = [];
@@ -954,6 +964,8 @@ class DatasetReq extends QueryReq {
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Jregex, Protocol, AnsonMsg, AnHeader,
+export {
+	Jregex, Protocol, AnsonMsg, AnHeader,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
-	AnsonResp, DatasetReq, stree_t}
+	AnsonResp, DatasetReq, stree_t
+}

@@ -5,15 +5,12 @@ import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
 import {
-  Drafts,
-  Inbox,
-  Send,
-  ExpandLess,
-  ExpandMore,
-  Sms
+	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
 } from "@material-ui/icons";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
+
+import { toBool } from '../utils/helpers';
 
 export const AnTreeIcons = {
   expand: <ExpandMore style={{verticalAlign: 'middle'}} />,
@@ -253,12 +250,6 @@ class AnTreeComp extends React.Component {
 	  for (let i = 0; i < count; i++)
 		c.push(<React.Fragment key={i}>{icon(".")}</React.Fragment>);
 	  return c;
-	}
-
-	function toBool(str) {
-		return str
-			? str !== '0' && str !== ' ' || str.trim().toLowerCase() === 'true'
-			: false;
 	}
 
 	function itemLabel(n, l) {
