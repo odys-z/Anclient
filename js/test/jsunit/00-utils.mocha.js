@@ -25,22 +25,34 @@ describe('case: [00.1 string value]', () => {
 describe('case: [00.2 Language]', () => {
     it('translation', () => {
 		let s;
-		Langstrs.s.zh = {'hello {name} from {frm}': '你好 {name} from {frm}', 'OK': '确定'};
-		Langstrs.s.ja = {'hello {name} from {frm}': '{name}は こんにちは, {frm}', 'OK': 'はい'};
+		const t_hello = 'Hello {name} from {frm}';
+
+		Langstrs.s.zh[t_hello] = '你好 {name} from {frm}';
+		Langstrs.s.zh['OK'] = '确定';
+		Langstrs.s.ja[t_hello] = '{frm}の{name}は こんにちは!';
+		Langstrs.s.ja['OK'] = 'はい';
 
 		assert.equal(L('hello'), 'hello', "1 ---");
 		assert.equal(L('OK'), 'OK', "2 ---");
 		s = L('world');
 		assert.equal(L('world'), 'world', "2 ---");
+		assert.equal(L(t_hello, {name: 'Ody', frm: 'US'}), 'Hello Ody from US', "2.0 ---");
 
 		Langstrs.using('ja')
-		assert.equal(L('hello {name} from {frm}', {name: 'ody', frm: 'JA'}), 'odyは こんにちは, JA', "3 ---");
+		assert.equal(L(t_hello, {name: 'Ody', frm: 'JA'}), 'JAのOdyは こんにちは!', "3 ---");
+		assert.equal(L(t_hello, {name: 'Alice', frm: 'US'}), 'USのAliceは こんにちは!', "3.0 ---");
 		assert.equal(L('OK'), 'はい', "4 ---");
+
 		s = L('world');
 		assert.equal(L('world'), 'world', "5 ---");
 
+		s = L('Totally {count} role records will be deleted. Are you sure?',
+				{count: 3});
+		assert.equal(L('Totally {count} role records will be deleted. Are you sure?', {count: 3}),
+				'Totally 3 role records will be deleted. Are you sure?', "5.3 args with no translation");
+
 		Langstrs.using('zh')
-		assert.equal(L('hello {name} from {frm}', {name: 'ody', frm: 'TW'}), '你好 ody from TW', "6 ---");
+		assert.equal(L(t_hello, {name: 'ody', frm: 'TW'}), '你好 ody from TW', "6 ---");
 		assert.equal(L('OK'), '确定', "7 ---");
 		s = L('world');
 		assert.equal(L('world'), 'world', "8 ---");
@@ -51,7 +63,6 @@ describe('case: [00.2 Language]', () => {
 
 		let totrans = Langstrs.report();
 		console.log(totrans);
-		// assert.equal(totrans.size, 2, "C ---");
 		assert.isTrue(totrans.has('hello'), "D ---");
 		assert.isTrue(totrans.has('world'), "E ---");
 	});

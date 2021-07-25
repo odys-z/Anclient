@@ -699,7 +699,7 @@ class UpdateReq extends AnsonBody {
 		return this;
 	}
 
-	/**Wrapper of #wherecodn(), will take rop as consts and add "''".<br>
+	/**Wrapper of #whereCond(), will take rop as consts and add "''".<br>
 	 * whereCond(logic, lop, Jregex.quote(rop));
 	 * @param logic logic operator
 	 * @param lop left operand
@@ -715,6 +715,24 @@ class UpdateReq extends AnsonBody {
 	 * @return {UpdateReq} this */
 	whereEq (lcol, rconst) {
 		return this.where_("=", lcol, rconst);
+	}
+
+	/** A wrapper of where_("=", lcol, rconst)
+	 * @param {string} lcol left operand,
+	 * @param {arry} rconsts an array of right constants, will be quoted.
+	 * @return {UpdateReq} this */
+	whereIn (lcol, rconsts) {
+		let vals = null;
+		if ( Protocol.verbose >= 4
+			&& Array.isArray(rconsts) && rconsts.length === 0)
+			console.error('[4] Deleting empty ids?', mtabl, lcol);
+
+		else if (Array.isArray(rconsts))
+			rconsts.forEach( (v, i) =>{
+				vals = vals ? vals += ", " : '';
+				vals += `'${v}'`;
+			} );
+		return this.whereCond("in", lcol, vals);
 	}
 
 	/**limit clause.

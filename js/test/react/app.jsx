@@ -67,7 +67,8 @@ class App extends React.Component {
 
 	onError(c, r) {
 		console.error(c, r);
-		this.setState({hasError: !!c, nextAction: 're-login'});
+		// this.setState({hasError: !!c, nextAction: 're-login'});
+		this.setState({hasError: !!c, nextAction: 'ignore'});
 	}
 
 	onErrorClose() {
