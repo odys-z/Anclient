@@ -3,10 +3,12 @@ import { withStyles } from "@material-ui/core/styles";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { L } from '../../../lib/frames/react/utils/langstr';
+	import { Protocol } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/frames/react/utils/consts';
 	import { JsampleIcons } from '../styles';
 	import { CrudComp } from '../../../lib/frames/react/crud';
 	import { AnContext, AnError } from '../../../lib/frames/react/reactext';
+	import { ConfirmDialog } from '../../../lib/frames/react/widgets/messagebox.jsx'
 	import { AnTablist } from '../../../lib/frames/react/widgets/table-list';
 	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form';
 	import { AnsonResp } from '../../../lib/protocol';
@@ -72,7 +74,6 @@ class RolesComp extends CrudComp {
 	}
 
 	componentDidMount() {
-
 		this.toSearch();
 	}
 
@@ -91,6 +92,8 @@ class RolesComp extends CrudComp {
 		this.state.queryReq = queryReq;
 
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
+
+		this.state.selectedRoleIds.splice(0);
 	}
 
 	onPageInf(page, size) {
@@ -116,6 +119,29 @@ class RolesComp extends CrudComp {
 	}
 
 	toDel(e, v) {
+		let that = this;
+		let txt = L('Totally {count} role records will be deleted. Are you sure?',
+				{count: that.state.selectedRoleIds.length});
+		this.confirm =
+			(<ConfirmDialog open={true}
+				ok={L('OK')} cancel={true}
+				title={L('Info')} msg={txt}
+				onOk={ () => {
+						delRole(that.state.selectedRoleIds);
+				 	}
+				}
+				onClose={ () => {that.confirm === undefined} }
+			/>);
+
+		function delRole(roleIds) {
+			let req = that.context.anClient
+				.usrAct('roles', Protocol.CRUD.d, 'delete')
+				.deleteMulti(null, 'a_roles', 'roleId', roleIds);
+
+			that.context.anClient.commit(req, (resp) => {
+				that.toSearch();
+			}, that.context.error);
+		}
 	}
 
 	toAdd(e, v) {
@@ -178,6 +204,7 @@ class RolesComp extends CrudComp {
 				onSelectChange={this.onTableSelect}
 			/>
 			{this.roleForm}
+			{this.confirm}
 
 			<Card>
 				<Typography variant="h6" gutterBottom>
@@ -193,8 +220,19 @@ class RolesComp extends CrudComp {
 					and <Link href='https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/02-anreact.mocha.js'>
 					Unit Test: 02 anreact / checkTree -> relation records</Link>
 				</Card>
-				<hr/>
-
+				<Typography variant="h6" gutterBottom>
+					Semantic Checking:
+				</Typography>
+				<Typography variant="subtitle1" gutterBottom>
+					When deleting a role, jsample (the service) checked configured semantics:<pre>
+  					id  :	sys.03
+			  		smtc:	ck-cnt-del
+			  		tabl:	a_roles
+			  		pk  :	roleId
+			  		args:	roleId a_role_func roleId</pre>
+					See <Link href='https://github.com/odys-z/semantic-jserv/blob/master/jserv-sample/src/main/webapp/WEB-INF/semantics-sys.xml'>
+					jsample/semantics-sys.xml</Link>
+				</Typography>
 				<Typography variant="h6" gutterBottom>
 					Style Tips:
 				</Typography>

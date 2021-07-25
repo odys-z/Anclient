@@ -222,11 +222,6 @@ class AnClient {
 				// JSON.stringify(resp):
 				// {"readyState":0,"status":0,"statusText":"error"};
 
-				// if (onErr && typeof onErr.onError === "function") {
-				// 	onErr.msg = resp.Body().msg();
-				// 	onErr = onErr.onError;
-				// }
-
 				if (typeof onErr === "function" || onErr && typeof onErr.onError === 'function') {
 					if (resp.statusText) {
 						resp.code = Protocol.MsgCode.exIo;
@@ -613,13 +608,42 @@ class SessionClient {
 			return;
 		}
 
-		var upd = new UpdateReq(conn, maintbl, pk);
+		let upd = new UpdateReq(conn, maintbl, pk);
 		upd.a = Protocol.CRUD.d;
 		this.currentAct.cmd = 'delete';
 
-		var jmsg = this.userReq(conn,
-				// port = update, it's where the servlet handling this.
-				Protocol.Port.update,
+		let jmsg = this.userReq(conn,
+				'update', // Protocol.Port.update,
+				upd, this.currentAct);
+		return jmsg;
+	}
+
+	/**Use this to delete multiple records where pkn = pks[i]
+	 * @param {string} mtabl delete from the table
+	 * @param {string} pkn delete from the table
+	 * @param {array} pks delete from the table - pk values are automatically wrapped with ''.
+	 * @return {AnsonMsg<UpdateReq>} anson request
+	 */
+	deleteMulti(conn, mtabl, pkn, pks) {
+		/*
+		let pkvals = null;
+		if (Array.isArray(pks) && pks.length === 0)
+			console.error('deleting empty ids?', mtabl, pkn);
+		else if (Array.isArray(pks))
+			pks.forEach( (v, i) =>{
+				pkvals = pkvals ? pkvals += ", " : '';
+				pkvals += `'${v}'`;
+			} );
+			*/
+
+		let upd = new UpdateReq(undefined, mtabl)
+			// .whereCond('in', pkn, pkvals);
+			.whereIn(pkn, pks);
+		upd.a = Protocol.CRUD.d;
+		this.currentAct.cmd = 'delete';
+
+		var jmsg = this.userReq(undefined,
+				'update', // Protocol.Port.update,
 				upd, this.currentAct);
 		return jmsg;
 	}
@@ -684,7 +708,7 @@ class SessionClient {
 }
 
 /**Client without session information.
- * This is needed for some senarios like rigerstering new account.*/
+ * This is needed for some senarios like rigerstering new accounts.*/
 class Inseclient {
 	commit (jmsg, onOk, onErr) {
 		an.post(jmsg, onOk, onErr);

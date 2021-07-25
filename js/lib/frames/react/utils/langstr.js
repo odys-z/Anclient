@@ -4,7 +4,7 @@
  * use string template as resource key;
  * accept object as arguments
  * extending &amp; resolve un-mapped string template.
- */
+*/
 export const Langstrs = {
 	s: {
 		'en': new Set(),
@@ -41,29 +41,26 @@ const argex = /{(\s*(\w|\d)*\s*)}/g;
  * and https://stackoverflow.com/a/57882370/7362888
  */
 export function L(t, o) {
-	// map t first
 	if (! (t in Langstrs.s[Langstrs.lang]) )
-		if (Langstrs.lang !== 'en')
-			; // Langstrs.s[Langstrs.lang][t] = t;
-		else
 			Langstrs.s.en.add(t);
 	else t = Langstrs.lang === 'en' ?
 		 t : Langstrs.s[Langstrs.lang][t];
 
+	// console.log(t);
 	if (o)
 		return replaceArg(t, o);
 	else
 		return t;
 
 	function replaceArg(t, args) {
-		// let m = argex.exec(t);
-		if (t)
+		if (t) {
 			t = t.replace(argex,
 				function(match, argname) {
 					return typeof args[argname] != 'undefined'
 						? args[argname]
 						: match ;
 				});
+		}
 		return t;
 	}
 }
