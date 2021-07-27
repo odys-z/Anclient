@@ -7,9 +7,9 @@ var version = "1.0.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: { // 'app': './src/app/App.js',
-			 'quiz': './src/app/Quizlist.js',
-			 'editor': './src/app/Editor.js' },
+	entry: { 'quiz': './src/app/Quizlist.js',
+			 // 'editor': './src/app/Editor.js'
+		 },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
