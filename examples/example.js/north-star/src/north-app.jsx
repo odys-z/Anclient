@@ -56,16 +56,16 @@ class North extends React.Component {
 			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
-				err: L('Creating session failed! Please re-login.')});
+				msg: L('Setup session failed! Please re-login.')});
 		}
 
 		// extending CRUD pages
 		SysComp.extendLinks( [
-			{path: '/sys/domain/domain', comp: Domain},
-			{path: '/sys/role/roles', comp: Roles},
-			{path: '/sys/org/orgs', comp: Orgs},
-			{path: '/sys/user/users', comp: Users},
-			{path: '/north/indicators': comp: Indicatrees},
+			{path: '/sys/domain', comp: Domain},
+			{path: '/sys/roles', comp: Roles},
+			{path: '/sys/orgs', comp: Orgs},
+			{path: '/sys/users', comp: Users},
+			{path: '/north/indicators', comp: Indicatrees},
 		] );
 	}
 
@@ -108,7 +108,7 @@ class North extends React.Component {
 			<AnContext.Provider value={{
 				// FIXME we should use a better way
 				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
-				samports: this.state.samports, // FXIME or Protocol?
+				ports: this.state.ports,
 				anReact: this.state.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
@@ -143,7 +143,7 @@ class North extends React.Component {
 
 		function onJsonServ(elem, json) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<North servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
 	}
 }

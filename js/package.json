@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.27",
+  "version": "0.9.30",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main-backup": "./test/vue/index.js",
   "main": "./lib/anclient.js",

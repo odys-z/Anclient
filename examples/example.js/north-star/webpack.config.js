@@ -7,7 +7,7 @@ var version = "0.1.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: { 'north': './src/north.js' },
+	entry: { 'north': './src/north-app.js' },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",

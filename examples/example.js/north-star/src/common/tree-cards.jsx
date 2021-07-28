@@ -23,15 +23,15 @@ class Indicard extends CrudComp {
 
 }
 
-class IndicatreesComp extends CrudComp {
+class TreeCardsComp extends CrudComp {
 	state = {
 		indicators: [
 			{ id: '01', node: {text: 'AA'}, level: 0, sort: 0,
 			  children: [
-				{ id: '01.1', node: {text: 'AA.001', value: '1.1 B'}, level: 1, sort: 1},
+				{ id: '01.1', node: {text: 'AA.001', value: '1.1 B'}, level: 1, sort: 1 },
 			  ]
 			},
-			{ id: '02', node: {text: 'CC', value: 'C'}, level: 0, sort: 1},
+			{ id: '02', node: {text: 'CC', value: 'C'}, level: 0, sort: 1 },
 		]
 	};
 
@@ -39,6 +39,7 @@ class IndicatreesComp extends CrudComp {
 		super(props);
 
 		this.toSearch = this.toSearch.bind(this);
+		this.indicators = this.indicators.bind(this);
 	}
 
 	componentDidMount() {
@@ -46,6 +47,10 @@ class IndicatreesComp extends CrudComp {
 	}
 
 	toSearch(e, query) {
+	}
+
+	indicators(nodes) {
+		return ();
 	}
 
 	render() {
@@ -59,24 +64,25 @@ class IndicatreesComp extends CrudComp {
 					qType: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 				}} }
 			/>
-			<Indicatrees className={classes.root}
-				columns={[
-					{ text: L('Indicator Id'), hide:true, field:"indid" },
-					// { icons: ['edit', 'preview', 'collapse', 'add-child', 'up', 'down', 'delete'] }
-					// { text: L('Indicator Name'), color: 'primary', field:"roleName", className: 'bold'},
-					// { text: L('Options'), color: 'primary', field: 'details' },
-					{ subComponent: indicator, field:'', },
-				]}
-				rows = {this.state.rows}
-			/>
-			<Card>
-				<Typography variant="h6" gutterBottom>
-				</Typography>
-			</Card>
+			{this.indicators(this.state.indicators)}
+			// <Indicatrees className={classes.root}
+			// 	columns={[
+			// 		{ text: L('Indicator Id'), hide:true, field:"indid" },
+			// 		// { icons: ['edit', 'preview', 'collapse', 'add-child', 'up', 'down', 'delete'] }
+			// 		// { text: L('Indicator Name'), color: 'primary', field:"roleName", className: 'bold'},
+			// 		// { text: L('Options'), color: 'primary', field: 'details' },
+			// 		// { component: indicator, field: '', },
+			// 	]}
+			// 	rows = {this.state.rows}
+			// />
+			// <Card>
+			// 	<Typography variant="h6" gutterBottom>
+			// 	</Typography>
+			// </Card>
 		</>);
 	}
 }
-IndicatreesComp .contextType = AnContext;
+TreeCardsComp.contextType = AnContext;
 
-const Indicatrees = withStyles(styles)(IndicatreesComp );
-export { Indicatrees, IndicatreesComp  }
+const TreeCards = withStyles(styles)(TreeCardsComp);
+export { TreeCards, TreeCardsComp  }

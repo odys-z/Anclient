@@ -12,8 +12,8 @@
   <script src="north-0.1.0.min.js"></script>
   <script>
 	let searchParams = new URLSearchParams(window.location.search)
-	let serv = searchParams ? searchParams.get('serv') : undefined;
-	Quizlist.bindQuizzes('quizlist', serv);
+	let servId = searchParams ? searchParams.get('serv') : undefined;
+	north.North.bindHtml('app', {servId, Window, portal: 'portal.html'});
   </script>
 </body>
 </html>
