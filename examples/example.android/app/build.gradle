@@ -4,7 +4,7 @@ android {
     compileSdkVersion 30
     defaultConfig {
         applicationId "io.oz.wv1"
-        minSdkVersion 21
+        minSdkVersion 17
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
