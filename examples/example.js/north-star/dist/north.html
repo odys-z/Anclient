@@ -11,9 +11,9 @@
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <script src="north-0.1.0.min.js"></script>
   <script>
-	let searchParams = new URLSearchParams(window.location.search)
+	let searchParams = new URLSearchParams(window.location.search);
 	let serv = searchParams ? searchParams.get('serv') : undefined;
-	Quizlist.bindQuizzes('quizlist', serv);
+	north.North.bindDom('north', serv);
   </script>
 </body>
 </html>
