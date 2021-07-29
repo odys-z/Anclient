@@ -13,16 +13,16 @@ import { L } from '../../../lib/frames/react/utils/langstr';
 
 const styles = (theme) => ( {
 	root: {
-		"& :hover": {
-			backgroundColor: '#ecf'
-		}
+		// "& :hover": {
+		// 	backgroundColor: '#ecf'
+		// }
 	}
 } );
 
 class UsersComp extends CrudComp {
 	state = {
-		qName: {type: 'text', val: '', text: 'No', label: 'User Name'},
-		qRole: {type: 'cbb', val: AnConst.cbbAllItem,
+		condName: {type: 'text', val: '', text: 'No', label: 'User Name'},
+		condRole: {type: 'cbb', val: AnConst.cbbAllItem,
 				sk: 'roles', nv: {n: 'text', v: 'value'},
 				options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 				label: 'Role'},
@@ -30,7 +30,7 @@ class UsersComp extends CrudComp {
 		th: [{	text: L('User Name'), field: 'userName', checked: true, color: 'primary', className: 'bold' },
 			 {	text: L('uid'), field: 'userId', hide: true, color: 'primary' },
 			 {	text: L('Role'), field: 'roleName', color: 'primary' }],
-			 
+
 		pageInf : { page: 0, size: 25, total: 0 },
 	};
 
@@ -54,15 +54,49 @@ class UsersComp extends CrudComp {
 		this.context.anReact.bindTablist(qr, this, this.context.error);
 	}
 
+	toDel(e, v) {
+	}
+
+	toAdd(e, v) {
+		this.roleForm = (<UserDetails c
+			onOk={(r) => console.log(r)}
+			onClose={this.closeRoleForm} />);
+	}
+
+	toEdit(e, v) {
+		this.roleForm = (<UserDetails u
+			roleId={this.state.selectedRoleIds[0]}
+			onOk={(r) => console.log(r)}
+			onClose={this.closeRoleForm} />);
+	}
+
 	render() {
 		const { classes } = this.props;
 		return (<div className={classes.root}>Users of Jsample
+
 			<AnQueryForm onSearch={this.toSearch} onClear={this.toClearForm}
-				conds={[ this.state.qName, this.state.qRole ]}
-				query={(q) => { return {name: q.state.conds[0].val, roleId: q.state.conds[1].val }} }
-			>
-				<TextField />
-			</AnQueryForm>
+				conds={[ this.state.condName, this.state.condRole, this.state.condOrg]}
+				query={ (q) => { return {
+					name: q.state.conds[0].val ? q.state.conds[0].val : undefined,
+					roleId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
+				}} }
+			/>
+
+			<Grid container alignContent="flex-end" >
+				<Button variant="contained" disabled={!btn.add}
+					className={classes.button} onClick={this.toAdd}
+					startIcon={<JsampleIcons.Add />}
+				>{L('Add')}</Button>
+				<Button variant="contained" disabled={!btn.del}
+					className={classes.button} onClick={this.toDel}
+					startIcon={<JsampleIcons.Delete />}
+				>{L('Delete')}</Button>
+				<Button variant="contained" disabled={!btn.edit}
+					className={classes.button} onClick={this.toEdit}
+					startIcon={<JsampleIcons.Edit />}
+				>{L('Edit')}</Button>
+			</Grid>
+
 			<AnTablist className={classes.root}
 				columns={ this.state.th }
 				rows={ this.state.rows }
