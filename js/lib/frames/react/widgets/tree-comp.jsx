@@ -32,84 +32,20 @@ const styles = (theme) => ({
 	borderBottom: "1px solid #bcd",
 	borderTop: "1px solid #bcd"
   },
-  hide: {
-	display: "none"
-  },
+  // hide: {
+	// display: "none"
+  // },
   treeItem: {
 	padding: theme.spacing(1),
 	borderLeft: "1px solid #bcd",
   }
 });
 
-class AnTreegridComp extends React.Component {
+class AnTreeditorComp extends React.Component {
   state = {
 	window: undefined,
-	treeData: {
-	  funcId: "sys",
-	  funcName: "Anclient Lv-0",
-	  level: 0,
-	  levelIcons: ['+'],
-	  expandIcon: 'F',
-	  url: "/",
-	  css: { icon: "menu-lv0" },
-	  flags: "0",
-	  fullpath: "sys",
-	  parentId: undefined,
-	  sibling: 0,
-	  children: [
-		{
-		  funcId: "domain",
-		  funcName: "Domain 1.1",
-		  level: 1,
-		  levelIcons: ['|-', '-'],
-		  url: "/sys/domain",
-		  css: { icon: "menu-lv1", url: {align: 'left'} },
-		  flags: "0",
-		  fullpath: "sys.0 domain",
-		  parentId: "sys",
-		  sibling: 0
-		},
-		{
-		  funcId: "roles",
-		  funcName: "Sysem 1.2",
-		  level: 1,
-		  levelIcons: ['L', '+'],
-		  url: "/sys/roles",
-		  css: { icon: "menu-leaf", url: {align: 'left'} },
-		  flags: "0",
-		  fullpath: "sys.1 roles",
-		  parentId: "sys",
-		  sibling: 0,
-
-		  children: [
-			{
-			  funcId: "domain",
-			  funcName: "Domain 2.1",
-			  level: 2,
-			  levelIcons: ['.', '|-', '-'],
-			  url: "/sys/domain",
-			  css: { icon: "menu-lv1", url: {align: 'left'} },
-			  flags: "0",
-			  fullpath: "sys.0 domain",
-			  parentId: "sys",
-			  sibling: 0
-			},
-			{
-			  funcId: "roles",
-			  funcName: "Sysem 2.2",
-			  level: 2,
-			  levelIcons: ['.', 'L', '-'],
-			  url: "/sys/roles",
-			  css: { icon: "menu-leaf", url: {align: 'left'} },
-			  flags: "0",
-			  fullpath: "sys.1 roles",
-			  parentId: "sys",
-			  sibling: 0
-			}
-		  ]
-		}
-	  ]
-	},
+	// [{id, node: {text, css, url}, level, children}. ... ]
+	treeData: [ ],
 
 	expandings: new Set()
   };
@@ -238,5 +174,5 @@ class AnTreegridComp extends React.Component {
   }
 }
 
-const AnTreegrid = withStyles(styles)(AnTreegridComp);
-export { AnTreegrid, AnTreegridComp }
+const AnTreeditor = withStyles(styles)(AnTreeditorComp);
+export { AnTreeditor, AnTreeditorComp }

@@ -12,15 +12,17 @@ import {SessionClient} from '../../lib/anclient.js'
 
 // tests extents
 import { samports } from '../jsample.js'
-	import { Domain } from './views/domain'
+	import { Domain } from '../../../test/react/views/domain'
 	import { Roles } from './views/roles'
 	import { Orgs } from './views/orgs'
 	import { Users } from './views/users'
 	import { Indicatrees } from './views/indicatrees'
-	import { JsampleTheme } from './styles'
+	import { Northeme } from './styles'
 
-/** The application main, context singleton and error handler */
-class App extends React.Component {
+/** The application main.
+ * "North" stands for the guardian.
+ */
+class North extends React.Component {
 	state = {
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
@@ -59,11 +61,11 @@ class App extends React.Component {
 
 		// extending CRUD pages
 		SysComp.extendLinks( [
-			{path: '/views/sys/domain/domain.html', comp: Domain},
-			{path: '/views/sys/role/roles.html', comp: Roles},
-			{path: '/views/sys/org/orgs.html', comp: Orgs},
-			{path: '/views/sys/user/users.html', comp: Users},
-			{path: '/views/sys/workflow/workflows.html': comp: Indicatrees},
+			{path: '/sys/domain/domain', comp: Domain},
+			{path: '/sys/role/roles', comp: Roles},
+			{path: '/sys/org/orgs', comp: Orgs},
+			{path: '/sys/user/users', comp: Users},
+			{path: '/north/indicators': comp: Indicatrees},
 		] );
 	}
 
@@ -102,7 +104,7 @@ class App extends React.Component {
 
 	render() {
 	  return (
-		<MuiThemeProvider theme={JsampleTheme}>
+		<MuiThemeProvider theme={Northeme }>
 			<AnContext.Provider value={{
 				// FIXME we should use a better way
 				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
@@ -146,4 +148,4 @@ class App extends React.Component {
 	}
 }
 
-export {App};
+export {North};
