@@ -65,7 +65,7 @@ class North extends React.Component {
 			{path: '/sys/role/roles', comp: Roles},
 			{path: '/sys/org/orgs', comp: Orgs},
 			{path: '/sys/user/users', comp: Users},
-			{path: '/north/indicators': comp: Indicatrees},
+			{path: '/north/indicators', comp: Indicatrees},
 		] );
 	}
 
