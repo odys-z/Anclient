@@ -7,7 +7,7 @@ var version = "0.1.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: { 'north': './src/north-app.js' },
+	entry: { 'north': './src/north-app.jsx' },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
@@ -25,6 +25,12 @@ module.exports = {
 	},
 	module: {
 		rules: [
+		{   test: /\.jsx$/,
+			loader: 'babel-loader',
+			exclude: /node_modules/,
+			options: {
+			  presets: ['@babel/preset-react', '@babel/preset-env'] }
+		},
 		{   test: /\.js$/,
 			loader: 'babel-loader',
 			exclude: /node_modules/,

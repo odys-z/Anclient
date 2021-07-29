@@ -3,20 +3,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
-import {SessionClient} from '../../lib/anclient.js'
-	import { Protocol } from '../../lib/protocol.js'
-	import {L, Langstrs} from '../../lib/frames/react/utils/langstr.js'
-	import { Sys, SysComp } from '../../lib/frames/react/sys.jsx';
-	import { AnContext, AnError } from '../../lib/frames/react/reactext.jsx'
-	import { AnReactExt } from '../../lib/frames/react/anreact.jsx'
+import {
+	SessionClient, Protocol, L, Langstrs,
+	Sys, SysComp, AnContext, AnError, AnReactExt } from 'anclient'
 
 // tests extents
-import { samports } from '../jsample.js'
-	import { Domain } from '../../../test/react/views/domain'
-	import { Roles } from './views/roles'
-	import { Orgs } from './views/orgs'
-	import { Users } from './views/users'
-	import { Indicatrees } from './views/indicatrees'
+// import { northports } from '../north-port.js'
+	// import { Domain } from '../../../test/react/views/domain'
+	// import { Roles } from './views/roles'
+	// import { Orgs } from './views/orgs'
+	// import { Users } from './views/users'
+	// import { Indicatrees } from './views/indicatrees'
 	import { Northeme } from './styles'
 
 /** The application main.
@@ -24,6 +21,7 @@ import { samports } from '../jsample.js'
  */
 class North extends React.Component {
 	state = {
+		ports: Object.assign(Protocol.Port, {north: 'north.serv'}),
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
 		hasError: false,
@@ -38,7 +36,7 @@ class North extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state.samports = Object.assign(Protocol.Port, samports);
+		// this.state.ports = Object.assign(Protocol.Port, northports);
 		this.state.iportal = this.props.iportal;
 
 		this.onError = this.onError.bind(this);
@@ -104,7 +102,7 @@ class North extends React.Component {
 
 	render() {
 	  return (
-		<MuiThemeProvider theme={Northeme }>
+		<MuiThemeProvider theme={Northeme}>
 			<AnContext.Provider value={{
 				// FIXME we should use a better way
 				// https://reactjs.org/docs/legacy-context.html#how-to-use-context

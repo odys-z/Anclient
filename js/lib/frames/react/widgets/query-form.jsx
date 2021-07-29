@@ -218,7 +218,7 @@ class AnQueryFormComp extends CrudComp {
 					//uncontrolled Components
 					//let refDate = React.createRef();
 					//uncontrolled Components to controlled component
-					let v = cond && cond.val ? cond.val : ''; 
+					let v = cond && cond.val ? cond.val : '';
 					let label = cond && cond.label ? cond.label : "date"
 					return (
 

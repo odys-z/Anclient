@@ -14,7 +14,7 @@ const styles = (theme) => ( {
 } );
 
 class ErrorComp extends CrudComp {
-	const { classes } = this.props;
+	// const { classes } = this.props;
 
 	state = {
 		details: '',

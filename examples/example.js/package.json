@@ -19,8 +19,6 @@
     "@babel/preset-react": "^7.14.5",
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
-    "anclient": "^0.9.27",
-    "anclient.xv": "file:x-visual",
     "babel-loader": "^8.2.2",
     "chai": "^4.3.4",
     "css-loader": "^5.2.6",
@@ -40,6 +38,7 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
+    "anclient": "^0.9.32",
     "x-visual": "^0.3.86"
   }
 }
