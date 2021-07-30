@@ -136,9 +136,9 @@ describe('case: [01.1 Protocol.Port]', () => {
 	});
 });
 
-	var localStorage = {
-		setItem: function () {},
-	}
+const localStorage = {
+	setItem: function () {},
+}
 describe('case: [01.2 Protocol/AnsonReq]', () => {
 
     it('SessionReq formating / instantiation', () => {
