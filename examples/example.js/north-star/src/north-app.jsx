@@ -3,16 +3,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
-import {SessionClient, Protocol, L, Langstrs,
-	 Sys, SysComp, AnContext, AnError, AnReactExt } from 'anclient'
+import {
+	SessionClient, Protocol, L, Langstrs,
+	Sys, SysComp, AnContext, AnError, AnReactExt } from 'anclient';
 
 // tests extents
-import { samports } from '../jsample.js'
-	import { Domain } from '../../../test/react/views/domain'
-	import { Roles } from './views/roles'
-	import { Orgs } from './views/orgs'
-	import { Users } from './views/users'
-	import { Indicatrees } from './views/indicatrees'
+// import { northports } from '../north-port.js'
+	// import { Domain } from '../../../test/react/views/domain'
+	// import { Roles } from './views/roles'
+	// import { Orgs } from './views/orgs'
+	// import { Users } from './views/users'
+	// import { Indicatrees } from './views/indicatrees'
 	import { Northeme } from './styles'
 
 /** The application main.
@@ -20,6 +21,7 @@ import { samports } from '../jsample.js'
  */
 class NorthApp extends React.Component {
 	state = {
+		ports: Object.assign(Protocol.Port, {north: 'north.serv'}),
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
 		hasError: false,
@@ -34,7 +36,7 @@ class NorthApp extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state.samports = Object.assign(Protocol.Port, samports);
+		// this.state.ports = Object.assign(Protocol.Port, northports);
 		this.state.iportal = this.props.iportal;
 
 		this.onError = this.onError.bind(this);
@@ -52,15 +54,15 @@ class NorthApp extends React.Component {
 			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
-				err: L('Creating session failed! Please re-login.')});
+				msg: L('Setup session failed! Please re-login.')});
 		}
 
 		// extending CRUD pages
 		SysComp.extendLinks( [
-			{path: '/sys/domain/domain', comp: Domain},
-			{path: '/sys/role/roles', comp: Roles},
-			{path: '/sys/org/orgs', comp: Orgs},
-			{path: '/sys/user/users', comp: Users},
+			{path: '/sys/domain', comp: Domain},
+			{path: '/sys/roles', comp: Roles},
+			{path: '/sys/orgs', comp: Orgs},
+			{path: '/sys/users', comp: Users},
 			{path: '/north/indicators', comp: Indicatrees},
 		] );
 	}
@@ -100,11 +102,11 @@ class NorthApp extends React.Component {
 
 	render() {
 	  return (
-		<MuiThemeProvider theme={Northeme }>
+		<MuiThemeProvider theme={Northeme}>
 			<AnContext.Provider value={{
 				// FIXME we should use a better way
 				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
-				samports: this.state.samports, // FXIME or Protocol?
+				ports: this.state.ports,
 				anReact: this.state.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,

@@ -16,7 +16,6 @@ import { samports } from '../jsample.js'
 	import { Roles } from './views/roles'
 	import { Orgs } from './views/orgs'
 	import { Users } from './views/users'
-	import { Indicatrees } from './views/indicatrees'
 	import { JsampleTheme } from './styles'
 
 /** The application main, context singleton and error handler */
@@ -54,7 +53,8 @@ class App extends React.Component {
 			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
-				err: L('Creating session failed! Please re-login.')});
+				msg: L('Setup session failed! Please re-login.')
+			});
 		}
 
 		// extending CRUD pages
@@ -63,14 +63,14 @@ class App extends React.Component {
 			{path: '/views/sys/role/roles.html', comp: Roles},
 			{path: '/views/sys/org/orgs.html', comp: Orgs},
 			{path: '/views/sys/user/users.html', comp: Users},
-			{path: '/views/sys/workflow/workflows.html': comp: Indicatrees},
 		] );
 	}
 
 	onError(c, r) {
 		console.error(c, r);
 		// this.setState({hasError: !!c, nextAction: 're-login'});
-		this.setState({hasError: !!c,
+		this.setState({
+			hasError: !!c,
 			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
 	}
 
