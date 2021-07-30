@@ -13,7 +13,7 @@
   <script>
 	let searchParams = new URLSearchParams(window.location.search)
 	let servId = searchParams ? searchParams.get('serv') : undefined;
-	north.North.bindHtml('app', {servId, Window, portal: 'portal.html'});
+	NorthApp.bindHtml('north', {servId, Window, portal: 'login.html'});
   </script>
 </body>
 </html>

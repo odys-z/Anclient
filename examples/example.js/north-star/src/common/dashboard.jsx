@@ -3,13 +3,10 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import { L } from '../../../lib/frames/react/utils/langstr';
-	import { AnConst } from '../../../lib/frames/react/utils/consts';
-	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
-	import { CrudComp } from '../../../lib/frames/react/crud'
-	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
-	import { Indicatrees } from '../../../lib/frames/react/widgets/treegrid.jsx'
+import {
+	Protocol, AnsonResp, L,
+	AnConst, CrudComp, AnContext, AnError,
+	AnQueryForm } from 'anclient';
 
 const styles = (theme) => ( {
 	root: {
@@ -25,9 +22,11 @@ const styles = (theme) => ( {
 class Chart extends CrudComp {
 	state = {
 		vectors: []
-	}
+	};
 
-	return (<>Chart</>);
+	return () {
+		return (<>Chart</>);
+	}
 }
 
 class DashboardComp extends CrudComp {

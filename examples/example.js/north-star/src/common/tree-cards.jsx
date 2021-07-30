@@ -9,7 +9,6 @@ import { L } from '../../../lib/frames/react/utils/langstr';
 	import { CrudComp } from '../../../lib/frames/react/crud'
 	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
 	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
-	import { Indicatrees } from '../../../lib/frames/react/widgets/treegrid.jsx'
 
 const styles = (theme) => ( {
 	root: {
@@ -64,8 +63,7 @@ class TreeCardsComp extends CrudComp {
 					qType: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 				}} }
 			/>
-			{this.indicators(this.state.indicators)}
-			// <Indicatrees className={classes.root}
+			{this.indicators(this.state.indicators)
 			// 	columns={[
 			// 		{ text: L('Indicator Id'), hide:true, field:"indid" },
 			// 		// { icons: ['edit', 'preview', 'collapse', 'add-child', 'up', 'down', 'delete'] }
@@ -79,6 +77,7 @@ class TreeCardsComp extends CrudComp {
 			// 	<Typography variant="h6" gutterBottom>
 			// 	</Typography>
 			// </Card>
+			}
 		</>);
 	}
 }

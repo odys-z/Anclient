@@ -337,6 +337,7 @@ class SysComp extends React.Component {
 	render() {
     	const { classes } = this.props;
 		let open = this.state.showMenu;
+		console.log('here');
 
 		return (
 		  <div className={classes.root}>

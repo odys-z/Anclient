@@ -69,6 +69,10 @@ class LoginComp extends React.Component {
 	onErrorClose() {
 	}
 
+	/**
+	 * Login and go main page (sys.jsx). Target html page is first specified by
+	 * login.serv (SessionInf.home).
+	 */
 	onLogin() {
 		let that = this;
 		console.log(that.context);

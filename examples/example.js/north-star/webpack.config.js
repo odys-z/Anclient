@@ -18,11 +18,29 @@ module.exports = {
 	  libraryTarget: 'umd'
 	},
 
+    externals: {
+        // Use external version of React
+        "react": {
+            "commonjs": "react",
+            "commonjs2": "react",
+            "amd": "react",
+            "root": "React"
+        },
+        "react-dom": {
+            "commonjs": "react-dom",
+            "commonjs2": "react-dom",
+            "amd": "react-dom",
+            "root": "ReactDOM"
+        }
+    },
+
 	plugins: [ ],
 
 	resolve: {
-		extensions: ['*', '.js', '.jsx']
+		extensions: ['*', '.js', '.jsx'],
+		alias: { react: path.resolve('../node_modules/react') }
 	},
+
 	module: {
 		rules: [
 		{   test: /\.jsx$/,

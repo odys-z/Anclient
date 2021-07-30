@@ -4,17 +4,15 @@ import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
 import {
+	an, AnClient, AnReact,
 	SessionClient, Protocol, L, Langstrs,
-	Sys, SysComp, AnContext, AnError, AnReactExt } from 'anclient';
+	AnContext, AnError, AnReactExt,
+	Sys, SysComp, Domain, Roles, Orgs, Users
+} from 'anclient';
 
-// tests extents
-// import { northports } from '../north-port.js'
-	// import { Domain } from '../../../test/react/views/domain'
-	// import { Roles } from './views/roles'
-	// import { Orgs } from './views/orgs'
-	// import { Users } from './views/users'
-	// import { Indicatrees } from './views/indicatrees'
+import { NorthPorts } from './north-ports.js'
 	import { Northeme } from './styles'
+	import { Dashboard } from './common/dashboard'
 
 /** The application main.
  * "North" stands for the guardian.
@@ -47,7 +45,7 @@ class NorthApp extends React.Component {
 		this.state.error = {onError: this.onError, msg: ''};
 		this.state.anClient = new SessionClient();
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
-								.extendPorts(samports);
+								.extendPorts(NorthPorts);
 
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
@@ -63,7 +61,7 @@ class NorthApp extends React.Component {
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
-			{path: '/north/indicators', comp: Indicatrees},
+			{path: '/north/dashboard', comp: Dashboard},
 		] );
 	}
 
