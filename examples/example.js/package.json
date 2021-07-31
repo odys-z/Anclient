@@ -42,7 +42,7 @@
   "peerDependencies": {},
   "dependencies": {
     "@material-ui/styles": "^4.11.4",
-    "anclient": "^0.9.33",
+    "anclient": "^0.9.35",
     "x-visual": "^0.3.86"
   }
 }

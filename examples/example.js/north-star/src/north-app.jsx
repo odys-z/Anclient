@@ -124,7 +124,7 @@ class NorthApp extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<Sys onLogout={this.logout}/>
+				<SysComp onLogout={this.logout}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

@@ -336,15 +336,17 @@ class SysComp extends React.Component {
 
 	render() {
     	const { classes } = this.props;
+		let claz = Object.assign({}, classes);
+
 		let open = this.state.showMenu;
 		console.log('here');
 
 		return (
-		  <div className={classes.root}>
+		  <div className={claz.root}>
 			<AppBar
 				position="fixed"
-				className={clsx(classes.appBar, {
-					[classes.appBarShift]: open,
+				className={clsx(claz.appBar, {
+					[claz.appBarShift]: open,
 				})}
 			>
 			<Toolbar>
@@ -357,7 +359,7 @@ class SysComp extends React.Component {
 						onClick={this.showMenu}
 						edge="start"
 						autoFocus
-						className={clsx(classes.menuButton, open && classes.hide)}
+						className={clsx(claz.menuButton, open && claz.hide)}
 					>
 					<Menu />
 					</IconButton>
@@ -366,7 +368,7 @@ class SysComp extends React.Component {
 				</Grid>
 
 				<Grid item sm={7}>
-					<DialogActions className={classes.loginfo} >
+					<DialogActions className={claz.loginfo} >
 						<MyIcon onClick={() => this.setState({ showMine: true })} />
 						<Button onClick={this.toLogout}  color='inherit' >
 							{L('Logout')}
@@ -378,29 +380,29 @@ class SysComp extends React.Component {
 			</AppBar>
 			<Router>
 			  <React.Fragment><Drawer
-					className={classes.drawer}
+					className={claz.drawer}
 					variant="persistent"
 					anchor="left"
 					open={open}
-					classes={{paper: classes.drawerPaper}}
+					classes={{paper: claz.drawerPaper}}
 				>
-				<div className={classes.drawerHeader}>
+				<div className={claz.drawerHeader}>
 					<IconButton onClick={this.hideMenu}>
 						<ListItemText>{this.state.sysName}</ListItemText>
-						{classes.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+						{claz.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 					</IconButton>
 				</div>
 				<Divider />
 				<List>
-					{this.menuItems(classes)}
+					{this.menuItems(claz)}
 				</List>
 			  </Drawer></React.Fragment>
 			  <main onClick={this.hideMenu}
-				className={clsx(classes.content, {
-					[classes.contentShift]: open,
+				className={clsx(claz.content, {
+					[claz.contentShift]: open,
 				})}
 			  >
-				<div className={classes.drawerHeader} />
+				<div className={claz.drawerHeader} />
 				<div className="content">
 					{this.route()}
 				</div>

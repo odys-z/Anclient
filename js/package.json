@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.33",
+  "version": "0.9.35",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main": "./dist/anreact-1.0.0.min.js",
   "directories": {
@@ -37,9 +37,6 @@
     "postcss-loader": "^3.0.0",
     "qrcode": "^1.4.4",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
     "sass-loader": "^7.3.1",
     "style-loader": "^0.23.1",
     "tar": "^4.4.15"
