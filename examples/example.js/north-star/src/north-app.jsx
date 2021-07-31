@@ -34,6 +34,14 @@ class NorthApp extends React.Component {
 	constructor(props) {
 		super(props);
 
+		// https://reactjs.org/warnings/invalid-hook-call-warning.html#duplicate-react
+		require('react-dom');
+		window.React2 = require('react');
+		// console.log(window.React1 === window.React2);
+		if (window.React1 !== window.React2)
+			console.error('Duplicate React reference. See',
+			'https://reactjs.org/warnings/invalid-hook-call-warning.html#duplicate-react');
+
 		// this.state.ports = Object.assign(Protocol.Port, northports);
 		this.state.iportal = this.props.iportal;
 
