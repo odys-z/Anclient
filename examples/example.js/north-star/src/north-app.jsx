@@ -29,7 +29,7 @@ class NorthApp extends React.Component {
 		error: undefined,
 	};
 
-	/**Restor session from window.localStorage
+	/**Restore session from window.localStorage
 	 */
 	constructor(props) {
 		super(props);
