@@ -5,7 +5,7 @@ This branch is used only for issue tracking, will be deleted in the future.
 With webpack transpiled package, both via NPM and minified js, referencing component
 will reporting error:
 
-'''
+```
     anreact-1.0.0.min.js:90874 Uncaught Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
     1. You might have mismatching versions of React and the renderer (such as React DOM)
     2. You might be breaking the Rules of Hooks
@@ -190,7 +190,7 @@ will reporting error:
     bindDom @ anreact-1.0.0.min.js:30365
     bindHtml @ north-app.jsx:147
     (anonymous) @ north.html:16
-'''
+```
 
 Where AppBar is exported from Material UI, SysComp, extending React.Component,
 from Anclient.js lib.
