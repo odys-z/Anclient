@@ -13,7 +13,6 @@ module.exports = {
 	output: {
 	  filename: "[name]-" + version + ".min.js",
 	  path: path.resolve(__dirname, 'dist'),
-	  library: 'test',
 	  libraryTarget: 'umd'
 	},
 

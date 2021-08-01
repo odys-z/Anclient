@@ -54,10 +54,12 @@ class AnClient {
 		var ulr;
 		if (Protocol.Port[port] !== undefined)
 			ulr = this.cfg.defaultServ + '/'
-				+ Protocol.Port[port]; // + '?conn=' + this.cfg.connId;
-		else
-			ulr = this.cfg.defaultServ + '/'
-				+ port; // + '?conn=' + this.cfg.connId;
+				+ Protocol.Port[port];
+		else {
+			ulr = `${this.cfg.defaultServ}/${port}`;
+			console.error("The url for the named port is probably not resolved. Call Anclient.understandPorts() or AnReactExt.extendPorts().",
+					"prot: ", prot, "url": ulr);
+		}
 
 		if (this.cfg.connId)
 			ulr += '?conn=' + this.cfg.connId;

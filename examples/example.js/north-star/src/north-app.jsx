@@ -15,8 +15,8 @@ import { Users } from './react-app/views/users'
 */
 import {
 	an, AnClient, SessionClient, Protocol, L, Langstrs,
-	AnContext, AnError,
-	Sys, SysComp
+	AnContext, AnError, AnReactExt,
+	Sys, SysComp, Domain, Roles, Orgs, Users
 } from 'anclient';
 
 import { NorthPorts } from './north-ports.js'
@@ -28,7 +28,11 @@ import { NorthPorts } from './north-ports.js'
  */
 class NorthApp extends React.Component {
 	state = {
-		ports: Object.assign(Protocol.Port, {north: 'north.serv'}),
+		ports: Object.assign(Protocol.Port, {
+			north: 'north.serv',
+			menu: "menu.serv",
+		}),
+
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
 		hasError: false,
@@ -51,7 +55,7 @@ class NorthApp extends React.Component {
 			console.error("Add this line to node_moduls/react-dom/index.js :",
 			"window.React1 = require('react');");
 		else if (window.React1 !== window.React2)
-			console.error("Duplicate React reference. See",
+			console.warn("Duplicate React reference. See",
 			"https://reactjs.org/warnings/invalid-hook-call-warning.html#duplicate-react");
 
 		// this.state.ports = Object.assign(Protocol.Port, northports);
