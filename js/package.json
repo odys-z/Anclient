@@ -2,7 +2,7 @@
   "name": "anclient",
   "version": "0.9.36",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
-  "main": "./dist/anclient-1.0.0.min.js",
+  "main": "./lib/an-components.js",
   "directories": {
     "lib": "lib",
     "test": "test"
