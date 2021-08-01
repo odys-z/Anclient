@@ -1,6 +1,6 @@
 
 import $ from 'jquery';
-import {Protocol, AnsonMsg, AnHeader, QueryReq, UserReq} from '../../protocol.js';
+import {Protocol, AnsonMsg, AnHeader, QueryReq, UserReq} from '../protocol';
 
 /**See semantic.workflow/io.odysz.sworkflow.EnginDesign.Req */
 const chpEnumReq = {

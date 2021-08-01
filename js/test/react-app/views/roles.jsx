@@ -2,15 +2,15 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { L } from '../../../lib/frames/react/utils/langstr';
+import { L } from '../../../lib/utils/langstr';
 	import { Protocol } from '../../../lib/protocol';
-	import { AnConst } from '../../../lib/frames/react/utils/consts';
+	import { AnConst } from '../../../lib/utils/consts';
 	import { JsampleIcons } from '../styles';
-	import { CrudComp } from '../../../lib/frames/react/crud';
-	import { AnContext, AnError } from '../../../lib/frames/react/reactext';
-	import { ConfirmDialog } from '../../../lib/frames/react/widgets/messagebox.jsx'
-	import { AnTablist } from '../../../lib/frames/react/widgets/table-list';
-	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form';
+	import { CrudComp } from '../../../lib/react/crud';
+	import { AnContext, AnError } from '../../../lib/react/reactext';
+	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
+	import { AnTablist } from '../../../lib/react/widgets/table-list';
+	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
 	import { AnsonResp } from '../../../lib/protocol';
 
 	import { RoleDetails } from './role-details';

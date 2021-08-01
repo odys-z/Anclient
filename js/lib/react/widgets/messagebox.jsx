@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 
 import QRCode from 'qrcode'
 
-import {L, copyToClipboard} from '../utils/langstr';
+import {L, copyToClipboard} from '../../utils/langstr';
 
 const styles = theme => ({
   root: {

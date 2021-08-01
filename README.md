@@ -18,16 +18,31 @@ The Visual Studio solution is
     csharp/anclient/anclient.sln
 ```
 
-There are 4 projects in the solution:
+There are 3 clients in the solution:
 
--- anclient.net
+- csharp
 
-    The c# version of anclient, for .netframework 4.7.1. The project name is also
-    the assembly name can be referenced with C# reflection.
+The c# version of anclient. 
+    
+- java
 
--- Antest.Ancleint
+Java client (not for Android yet)
 
-    Anclient unit test project.
+- js
+
+js client API depending on jquery. The test project is using React.
+
+# Examples
+
+- example.js
+
+    Examples using Anclient.js.
+    
+ -- North Star
+ 
+    Example using Anclient + React. (No npm package avialable, see branch issue-13991 readme)
+
+- example.cs
 
 -- gltf-export
 
@@ -43,19 +58,7 @@ There are 4 projects in the solution:
     The trying and testing project of gltf-export, also used to test jserv-sample
     project's file uploading function. Jserv-sample project source can be downloaded
     [here](https://github.com/odys-z/semantic-jserv/releases).
-
-- Anclient/js
-
-
-js client API depending on jquery.
-
-Of which the jclient/js/easyui can basically working, providing the semantic-jsample
-server is running. See it's [readme](./js/README.md) for quick start.
-
-- Anclient/java
-
-Java client API.
-
+    
 # Document
 
 [Anclient Documents](https://odys-z.github.io/Anclient)

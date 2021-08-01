@@ -3,12 +3,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
-import {
-	an, AnClient, AnReact,
-	SessionClient, Protocol, L, Langstrs,
-	AnContext, AnError, AnReactExt,
-	Sys, SysComp, Domain, Roles, Orgs, Users
-} from 'anclient';
+import { an, AnClient, SessionClient, Protocol, L, Langstrs } from 'anclient';
+import { AnContext, AnError } from './anreact/reactext'
+import { AnReactExt } from './anreact/anreact'
+import { Sys, SysComp } from './anreact/sys'
+import { Domain } from './react-app/views/domain'
+import { Roles } from './react-app/views/roles'
+import { Orgs } from './react-app/views/orgs'
+import { Users } from './react-app/views/users'
 
 import { NorthPorts } from './north-ports.js'
 	import { Northeme } from './styles'
@@ -29,7 +31,7 @@ class NorthApp extends React.Component {
 		error: undefined,
 	};
 
-	/**Restor session from window.localStorage
+	/**Restore session from window.localStorage
 	 */
 	constructor(props) {
 		super(props);
@@ -38,9 +40,12 @@ class NorthApp extends React.Component {
 		require('react-dom');
 		window.React2 = require('react');
 		// console.log(window.React1 === window.React2);
-		if (window.React1 !== window.React2)
-			console.error('Duplicate React reference. See',
-			'https://reactjs.org/warnings/invalid-hook-call-warning.html#duplicate-react');
+		if (!window.React1)
+			console.error("Add this line to node_moduls/react-dom/index.js :",
+			"window.React1 = require('react');");
+		else if (window.React1 !== window.React2)
+			console.error("Duplicate React reference. See",
+			"https://reactjs.org/warnings/invalid-hook-call-warning.html#duplicate-react");
 
 		// this.state.ports = Object.assign(Protocol.Port, northports);
 		this.state.iportal = this.props.iportal;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 
-import { L } from '../../../lib/frames/react/utils/langstr';
+import { L } from '../utils/langstr';
 import { AnContext, AnError } from './reactext.jsx'
 
 const styles = (theme) => ( {

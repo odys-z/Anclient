@@ -3,11 +3,11 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { TextField } from '@material-ui/core';
 
-import { L } from '../../../lib/frames/react/utils/langstr';
-import { CrudComp } from '../../../lib/frames/react/crud'
-import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-import { AnTablist } from '../../../lib/frames/react/widgets/table-list.jsx'
-import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
+import { L } from '../../../lib/utils/langstr';
+import { CrudComp } from '../../../lib/react/crud'
+import { AnContext, AnError } from '../../../lib/react/reactext'
+import { AnTablist } from '../../../lib/react/widgets/table-list.jsx'
+import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
 import { AnsonResp } from '../../../lib/protocol';
 // import TablePagination from '@material-ui/core/TablePagination';
 

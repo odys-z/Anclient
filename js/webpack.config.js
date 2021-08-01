@@ -8,8 +8,7 @@
  module.exports = {
     mode: v, // "production" | "development" | "none"
     devtool: 'source-map',
-    entry: {anreact: './lib/view/react/jcomponents.js',
-    		anclient: './lib/anclient.js'},
+    entry: { anclient: './lib/anclient.js' },
     // entry: ['./lib/view/react/jcomponents.js',
 	// 		'./lib/anclient.js'],
 
@@ -23,6 +22,11 @@
       libraryTarget: 'umd'
     },
 
+	externals: {
+	  'react': 'react', // Case matters here
+	  'react-dom' : 'reactDOM' // Case matters here
+	},
+
 	plugins: [
 		// new BundleAnalyzerPlugin()
 	],
@@ -33,12 +37,12 @@
 
 	module: {
 	  rules: [
-		{ test: /\.jsx$/,
-		  loader: 'babel-loader',
-		  exclude: /node_modules/,
-		  options: {
-		    presets: ['@babel/preset-react', '@babel/preset-env'] }
-		},
+		// { test: /\.jsx$/,
+		//   loader: 'babel-loader',
+		//   exclude: /node_modules/,
+		//   options: {
+		//     presets: ['@babel/preset-react', '@babel/preset-env'] }
+		// },
 		{ test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" },
  		{ test: /\.css$/,
 		  use: [ 'style-loader',

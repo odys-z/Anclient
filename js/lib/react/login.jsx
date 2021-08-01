@@ -9,11 +9,11 @@ import React from 'react';
 	import FormControl from '@material-ui/core/FormControl';
 	import Box from '@material-ui/core/Box';
 
-import {an, SessionClient} from '../../anclient.js'
-	import {Protocol} from '../../protocol.js'
+import {an, SessionClient} from '..//anclient.js'
+	import {Protocol} from '../protocol'
 	import {AnContext} from './reactext.jsx';
 	import {ConfirmDialog} from './widgets/messagebox.jsx'
-	import {L, Langstrs} from './utils/langstr.js'
+	import {L, Langstrs} from '../utils/langstr.js'
 
 const styles = (theme) => ({
 	root: {
