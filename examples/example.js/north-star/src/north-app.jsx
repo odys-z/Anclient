@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
+/*
 import { an, AnClient, SessionClient, Protocol, L, Langstrs } from 'anclient';
 import { AnContext, AnError } from './anreact/reactext'
 import { AnReactExt } from './anreact/anreact'
@@ -11,6 +12,12 @@ import { Domain } from './react-app/views/domain'
 import { Roles } from './react-app/views/roles'
 import { Orgs } from './react-app/views/orgs'
 import { Users } from './react-app/views/users'
+*/
+import {
+	an, AnClient, SessionClient, Protocol, L, Langstrs,
+	AnContext, AnError,
+	Sys, SysComp
+} from 'anclient';
 
 import { NorthPorts } from './north-ports.js'
 	import { Northeme } from './styles'
