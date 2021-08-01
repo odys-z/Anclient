@@ -1,43 +1,54 @@
  var path = require('path')
  var webpack = require('webpack')
-
- // const VueLoaderPlugin = require('vue-loader/lib/plugin')
- // const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
  var v = 'development';
- var version = "0.9.27";
+ var version = "1.0.0";
 
  module.exports = {
-   mode: v, // "production" | "development" | "none"
-   devtool: 'source-map',
-   entry: { anreact: './lib/view/react/jcomponents.js',
-   			anclient: './lib/anclient.js'},
+    mode: v, // "production" | "development" | "none"
+    devtool: 'source-map',
+    // entry: { anclient: './lib/anclient.js' },
+    entry: { anclient: './lib/an-components.js' },
+	// 		'./lib/anclient.js'],
 
-   output: {
-     filename: "[name]-" + version + ".min.js",
+    output: {
+      filename: "[name]-" + version + ".min.js",
 
-     path: path.resolve(__dirname, 'dist'),
-     publicPath: "./dist/",
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: "./dist/",
 
-     library: 'anreact',
-     libraryTarget: 'umd'
-   },
+      library: 'anclient',
+      libraryTarget: 'umd'
+    },
 
-   module: {
- 	rules: [
-		// npm install babel-plugin-syntax-jsx babel-plugin-transform-vue-jsx babel-helper-vue-jsx-merge-props babel-preset-env --save-dev
-		{test: /\.js$/, exclude: /node_modules/, loader: "babel-loader",
-			options: { plugins: ['transform-vue-jsx'] }},
-		{   test: /\.jsx$/,
-			loader: 'babel-loader',
-			exclude: /node_modules/,
-			options: {
-			  presets: ['@babel/preset-react', '@babel/preset-env'] }
+	externals: {
+	  'react': 'react',
+	  'react-dom' : 'reactDOM',
+	  "@material-ui/core": "MaterialUI"
+	},
+
+	plugins: [
+		// new BundleAnalyzerPlugin()
+	],
+
+	resolve: {
+		extensions: ['*', '.js', '.jsx']
+	},
+
+	module: {
+	  rules: [
+		{ test: /\.jsx$/,
+		  loader: 'babel-loader',
+		  exclude: /node_modules/,
+		  options: {
+		    presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
- 		{test: /\.css$/,
-		 use: [ 'style-loader',
+		{ test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" },
+ 		{ test: /\.css$/,
+		  use: [ 'style-loader',
 				'css-loader',
 			  ] }
-	],
-  }, // module
+	  ],
+	}, // module
 }

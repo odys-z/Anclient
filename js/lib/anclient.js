@@ -418,7 +418,7 @@ class SessionClient {
 			var sstr = localStorage.getItem(SessionClient.ssInfo);
 			// What about refesh if removed this?
 			// localStorage.setItem(SessionClient.ssInfo, '');
-			if (sstr) {
+			if (sstr && sstr !== '' && sstr !== 'null') {
 				ssInf = JSON.parse(sstr);
 				ssInf.iv = aes.b64ToBytes(ssInf.iv);
 				an.init(ssInf.servRoot);
@@ -716,6 +716,9 @@ class Inseclient {
 }
 
 export * from './protocol.js';
-export * from './frames/cheapflow/cheap-req.js';
-export * from './frames/cheapflow/cheap-client.js';
+export * from './cheapflow/cheap-req.js';
+export * from './cheapflow/cheap-client.js';
+export * from './utils/consts.js';
+export * from './utils/langstr.js';
+export * from './utils/helpers.js';
 export {AnClient, SessionClient, Inseclient, aes};

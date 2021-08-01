@@ -1,8 +1,8 @@
 import chai from 'chai';
 import { expect, assert } from 'chai';
 
-import { L, Langstrs } from '../../lib/frames/react/utils/langstr';
-import { toBool } from '../../lib/frames/react/utils/helpers';
+import { L, Langstrs } from '../../lib/utils/langstr';
+import { toBool } from '../../lib/utils/helpers';
 
 describe('case: [00.1 string value]', () => {
     it('toBool', () => {
