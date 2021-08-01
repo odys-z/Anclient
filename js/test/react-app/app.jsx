@@ -5,10 +5,10 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 
 import {SessionClient} from '../../lib/anclient.js'
 	import { Protocol } from '../../lib/protocol.js'
-	import {L, Langstrs} from '../../lib/frames/react/utils/langstr.js'
-	import { Sys, SysComp } from '../../lib/frames/react/sys.jsx';
-	import { AnContext, AnError } from '../../lib/frames/react/reactext.jsx'
-	import { AnReactExt } from '../../lib/frames/react/anreact.jsx'
+	import {L, Langstrs} from '../../lib/utils/langstr.js'
+	import { Sys, SysComp } from '../../lib/react/sys.jsx';
+	import { AnContext, AnError } from '../../lib/react/reactext.jsx'
+	import { AnReactExt } from '../../lib/react/anreact.jsx'
 
 // tests extents
 import { samports } from '../jsample.js'

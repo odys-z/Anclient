@@ -3,10 +3,10 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import {
-	Protocol, AnsonResp, L,
-	AnConst, CrudComp, AnContext, AnError,
-	AnQueryForm } from 'anclient';
+import { an, AnClient, SessionClient, Protocol, L, Langstrs } from 'anclient';
+import { AnContext, AnError } from '../anreact/reactext'
+import { CrudComp } from '../anreact/crud'
+import { AnReactExt } from '../anreact/anreact'
 
 const styles = (theme) => ( {
 	root: {
@@ -24,7 +24,11 @@ class Chart extends CrudComp {
 		vectors: []
 	};
 
-	return () {
+	constructor(props) {
+		super(props);
+	}
+
+	render () {
 		return (<>Chart</>);
 	}
 }

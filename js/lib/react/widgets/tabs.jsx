@@ -6,7 +6,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
-import {L} from '../utils/langstr';
+import {L} from '../../utils/langstr';
 	import {AnContext} from '../reactext.jsx';
 
 const styles = (theme) => ({

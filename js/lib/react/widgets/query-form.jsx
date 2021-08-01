@@ -4,8 +4,8 @@ import { Collapse, Grid, TextField, Switch, Button } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { L } from '../utils/langstr';
-	import { AnConst } from '../utils/consts';
+import { L } from '../../utils/langstr';
+	import { AnConst } from '../../utils/consts';
 	import { AnContext } from '../reactext.jsx';
 	import { CrudComp } from '../crud'
 

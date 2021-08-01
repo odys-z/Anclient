@@ -1,6 +1,6 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, DatasetReq } from '../../lib/protocol.js'
-import { SysComp } from '../../lib/frames/react/sys.jsx'
+import { SysComp } from '../../lib/react/sys.jsx'
 
 const dsTestResp = {
 	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",

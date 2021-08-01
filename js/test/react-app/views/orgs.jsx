@@ -3,13 +3,13 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import { L } from '../../../lib/frames/react/utils/langstr';
-	import { AnConst } from '../../../lib/frames/react/utils/consts';
+import { L } from '../../../lib/utils/langstr';
+	import { AnConst } from '../../../lib/utils/consts';
 	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
-	import { CrudComp } from '../../../lib/frames/react/crud'
-	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
-	import { AnTreegrid } from '../../../lib/frames/react/widgets/treegrid.jsx'
-	import { AnQueryForm } from '../../../lib/frames/react/widgets/query-form.jsx'
+	import { CrudComp } from '../../../lib/react/crud'
+	import { AnContext, AnError } from '../../../lib/react/reactext'
+	import { AnTreegrid } from '../../../lib/react/widgets/treegrid.jsx'
+	import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
 
 const styles = (theme) => ( {
 	root: {

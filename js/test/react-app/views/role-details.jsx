@@ -14,14 +14,14 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { L } from '../../../lib/frames/react/utils/langstr';
+import { L } from '../../../lib/utils/langstr';
 	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../../lib/protocol';
-	import { AnConst } from '../../../lib/frames/react/utils/consts';
-	import { AnContext, AnError } from '../../../lib/frames/react/reactext'
+	import { AnConst } from '../../../lib/utils/consts';
+	import { AnContext, AnError } from '../../../lib/react/reactext'
 	import { AnsonResp } from '../../../lib/protocol';
 	import { JsampleIcons } from '../styles'
-	import { ConfirmDialog } from '../../../lib/frames/react/widgets/messagebox.jsx'
-	import { AnTree } from '../../../lib/frames/react/widgets/tree';
+	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
+	import { AnTree } from '../../../lib/react/widgets/tree';
 
 const styles = theme => ({
   dialogPaper: {
@@ -67,15 +67,15 @@ const styles = theme => ({
   },
 });
 
-class UserDetailsComp extends React.Component {
+class RoleDetailsComp extends React.Component {
 	state = {
 		crud: Protocol.CRUD.r,
 		dirty: false,
 		closed: false,
 
 		fields: [
-			{type: 'text', validator: {len: 12}, field: 'userId', label: 'User Name'},
-			{type: 'text', validator: {len: 200}, field: 'userName', label: 'User Name'},
+			{type: 'text', validator: {len: 12}, field: 'roleId', label: 'Role Name'},
+			{type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name'},
 			{type: 'text', validator: {len: 500}, field: 'remarks', label: 'Remarks'}
 		],
 		pk: undefined,
@@ -88,7 +88,7 @@ class UserDetailsComp extends React.Component {
 		this.state.crud = props.c ? Protocol.CRUD.c
 					: props.u ? Protocol.CRUD.u
 					: Protocol.CRUD.r;
-		this.state.pk = props.userId;
+		this.state.pk = props.roleId;
 
 		this.validate = this.validate.bind(this);
 		this.toSave = this.toSave.bind(this);
@@ -98,13 +98,13 @@ class UserDetailsComp extends React.Component {
 
 	componentDidMount() {
 		let that = this;
-		let sk = 'trees.user_funcs';
+		let sk = 'trees.role_funcs';
 		let t = stree_t.sqltree; // loading dataset reshaped to tree
 
 		if (this.state.crud !== Protocol.CRUD.c) {
 			// load
-			let queryReq = this.context.anClient.query(null, 'a_users', 'r')
-			queryReq.Body().whereEq('userId', this.state.pk);
+			let queryReq = this.context.anClient.query(null, 'a_roles', 'r')
+			queryReq.Body().whereEq('roleId', this.state.pk);
 			this.context.anReact.bindSimpleForm({req: queryReq,
 				onOk: (resp) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
@@ -169,36 +169,55 @@ class UserDetailsComp extends React.Component {
 
 		let req;
 
-		// 1. collect record
+		// 1. collect role-func
+		// note 'nodeId' is not the same with DB as some fields are mapped in datase.xml
+		let columnMap = {
+			funcId: 'nodeId',
+			// roleId doesn't included in forest, the value been just appended
+			roleId: c ? rec.roleId : this.state.pk,
+		};
+
+		let rf = this.context.anReact.inserTreeChecked(
+					this.state.forest,
+					{ table: 'a_role_func',
+					  columnMap,
+					  check: 'checked',
+					  reshape: true  // middle nodes been corrected according to children
+					} );
+
+		// 2. collect record
 		// nvs data must keep consists with jquery serializeArray()
 		// https://api.jquery.com/serializearray/
 		let nvs = [];
 		nvs.push({name: 'remarks', value: rec.remarks});
-		nvs.push({name: 'userName', value: rec.userName});
-		nvs.push({name: 'birthday', value: rec.birthday});
-		nvs.push({name: 'pswd', value: rec.pswd});
-		nvs.push({name: 'orgId', value: rec.orgId});
-		nvs.push({name: 'roleId', value: rec.roleId});
+		nvs.push({name: 'roleName', value: rec.roleName});
 
-		// 2. request insert / update
+		nvs.push({name: 'orgId', value: '006'}) // TODO: got orgId from cbb?
+
+		// 3. request (with del if updating)
 		if (this.state.crud === Protocol.CRUD.c) {
-			nvs.push({name: 'userId', value: rec.userId});
+			nvs.push({name: 'roleId', value: rec.roleId});
 			req = client
-				.usrAct('users', Protocol.CRUD.c, 'save')
-				.insert(null, 'a_users', nvs);
+				.usrAct('roles', Protocol.CRUD.c, 'save')
+				.insert(null, 'a_roles', nvs);
+			req.Body().post(rf);
 		}
 		else {
+			let del_rf = new DeleteReq(null, 'a_role_func', 'roleId')
+							.whereEq('roleId', rec['roleId']);
+
 			req = client
-				.usrAct('users', Protocol.CRUD.u, 'save')
-				.update(null, 'a_users', this.state.fields[0].field, nvs);
+				.usrAct('roles', Protocol.CRUD.u, 'save')
+				.update(null, 'a_roles', this.state.fields[0].field, nvs);
 			req.Body()
-				.whereEq('userId', rec.userId);
+				.whereEq('roleId', rec.roleId)
+				.post(del_rf.post(rf));
 		}
 
 		let that = this;
 		client.commit(req, (resp) => {
 			that.state.crud = Protocol.CRUD.u;
-			that.showOk(L('User data saved!'));
+			that.showOk(L('Role data saved!'));
 			if (typeof that.props.onOk === 'function')
 				that.props.onOk({code: resp.code, resp});
 		}, this.context.error);
@@ -231,9 +250,9 @@ class UserDetailsComp extends React.Component {
 		let u = this.state.crud === Protocol.CRUD.u;
 		let rec = this.state.record;
 
-		let title = c ? L('Create User')
-					: u ? L('Edit User')
-					: L('User Details');
+		let title = c ? L('Create Role')
+					: u ? L('Edit Role')
+					: L('Role Details');
 
 		return (<>
 		  <Dialog className={classes.root}
@@ -251,20 +270,20 @@ class UserDetailsComp extends React.Component {
 				  <Box className={classes.rowBox}>
 					{!smallSize && (
 					  <Typography className={classes.formLabel}>
-						{L("User Id")}
+						{L("Role Id")}
 					  </Typography>
 					)}
-					<TextField id="userId"
-						label={smallSize ? L("User Id") : undefined}
+					<TextField id="roleId"
+						label={smallSize ? L("Role Id") : undefined}
 						disabled={!c}
 						variant="outlined" color="primary" fullWidth
-						placeholder="User ID" margin="dense"
+						placeholder="Role ID" margin="dense"
 						value={rec[this.state.fields[0].field] || ""}
 						inputProps={{ style: this.state.fields[0].style }}
 						onChange={(e) => {
 							if (c)
 							this.setState({
-								record: Object.assign(rec, { userId: e.target.value }),
+								record: Object.assign(rec, { roleId: e.target.value }),
 								dirty : true });
 						}}
 					/>
@@ -274,18 +293,18 @@ class UserDetailsComp extends React.Component {
 				  <Box className={classes.rowBox}>
 					{!smallSize && (
 					  <Typography className={classes.formLabel} >
-						{L("User Name")}
+						{L("Role Name")}
 					  </Typography>
 					)}
-					<TextField id="userName" className={classes.formText}
-						label={smallSize ? L("User Name") : undefined}
+					<TextField id="roleName" className={classes.formText}
+						label={smallSize ? L("Role Name") : undefined}
 						variant="outlined" color="primary" fullWidth
-						placeholder="User Name" margin="dense"
+						placeholder="Role Name" margin="dense"
 						value={rec[this.state.fields[1].field] || ""}
 						inputProps={{ style: this.state.fields[1].style }}
 						onChange={(e) => {
 							this.setState({
-								record: Object.assign(rec, { userName: e.target.value }),
+								record: Object.assign(rec, { roleName: e.target.value }),
 								dirty : true });
 						}}
 					/>
@@ -332,11 +351,11 @@ class UserDetailsComp extends React.Component {
 	  </>);
 	}
 }
-UserDetailsComp.contextType = AnContext;
+RoleDetailsComp.contextType = AnContext;
 
-UserDetailsComp.propTypes = {
+RoleDetailsComp.propTypes = {
 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
 };
 
-const UserDetails = withWidth()(withStyles(styles)(UserDetailsComp));
-export { UserDetails, UserDetailsComp };
+const RoleDetails = withWidth()(withStyles(styles)(RoleDetailsComp));
+export { RoleDetails, RoleDetailsComp };

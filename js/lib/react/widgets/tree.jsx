@@ -10,7 +10,7 @@ import {
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { toBool } from '../utils/helpers';
+import { toBool } from '../../utils/helpers';
 
 export const AnTreeIcons = {
   expand: <ExpandMore style={{verticalAlign: 'middle'}} />,

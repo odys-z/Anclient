@@ -18,7 +18,7 @@ import Typography from '@material-ui/core/Typography';
 
 // import QRCode from 'qrcode'
 
-import {L} from '../utils/langstr';
+import {L} from '../../utils/langstr';
 	import {AnContext} from '../reactext.jsx';
 	import {AnTabs} from './tabs.jsx';
 

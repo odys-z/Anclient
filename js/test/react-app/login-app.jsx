@@ -1,9 +1,9 @@
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Login } from '../../lib/frames/react/login.jsx';
-import { AnContext, AnError } from '../../lib/frames/react/reactext.jsx'
-import { AnReact } from '../../lib/frames/react/anreact.jsx'
+import { Login } from '../../lib/react/login.jsx';
+import { AnContext, AnError } from '../../lib/react/reactext.jsx'
+import { AnReact } from '../../lib/react/anreact.jsx'
 
 const styles = (theme) => ({
 	root: {

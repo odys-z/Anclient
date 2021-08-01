@@ -7,38 +7,21 @@ var version = "0.1.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: { 'north': './src/north-app.jsx' },
+	entry: {'north': './src/north-app.jsx',
+			'login': './src/login-app.jsx' },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
-
 	  path: path.resolve(__dirname, 'dist'),
-	  publicPath: "./dist/",
-
+	  library: 'test',
 	  libraryTarget: 'umd'
 	},
-
-    // externals: {
-    //     // Use external version of React
-    //     "react": {
-    //         "commonjs": "react",
-    //         "commonjs2": "react",
-    //         "amd": "react",
-    //         "root": "React"
-    //     },
-    //     "react-dom": {
-    //         "commonjs": "react-dom",
-    //         "commonjs2": "react-dom",
-    //         "amd": "react-dom",
-    //         "root": "ReactDOM"
-    //     }
-    // },
 
 	plugins: [ ],
 
 	resolve: {
-		extensions: ['*', '.js', '.jsx'],
-		// alias: { react: path.resolve('../node_modules/react') }
+		extensions: ['*', '.js', '.jsx']
+		// , alias: { react: path.resolve(__dirname, '../../../js/node_modules/react/') }
 	},
 
 	module: {
@@ -49,16 +32,12 @@ module.exports = {
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
-		{   test: /\.js$/,
-			loader: 'babel-loader',
-			exclude: /node_modules/,
-			options: {
-			  presets: ['@babel/preset-react', '@babel/preset-env'] }
-		},
 		{   test: /\.css$/,
+			exclude: /node_modules/,
 			use: ["style-loader", "css-loader"]
 		},
 		{   test: /\.svg$/,
+			exclude: /node_modules/,
 			use: [  { loader: "babel-loader" },
 					{ loader: "react-svg-loader" } ]
 		} ]
