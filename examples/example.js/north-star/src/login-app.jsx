@@ -1,9 +1,11 @@
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AnContext, AnError } from './anreact/reactext';
-import { AnReact } from './anreact/anreact';
-import { Login, LoginComp } from './anreact/login';
+// import { AnContext, AnError } from './anreact/reactext';
+// import { AnReact } from './anreact/anreact';
+// import { Login, LoginComp } from './anreact/login';
+
+import { AnContext, AnError, AnReact, Login, LoginComp } from 'anclient';
 
 const styles = (theme) => ({
 	root: {
