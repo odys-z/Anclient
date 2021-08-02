@@ -44,7 +44,9 @@ class HistgramComp extends React.Component {
 
 			let x = d3
 				.scaleLinear()
-				.domain([0, 1000])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+				// .domain([0, 1000])
+				// can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+				.domain([0, d3.max(data, function(d) { return +d.price; })])
 				.range([0, width]);
 			let y = d3.scaleLinear()
 				.range([height, 0]);
@@ -54,6 +56,7 @@ class HistgramComp extends React.Component {
 				.domain(x.domain())  // then the domain of the graphic
 				.thresholds(x.ticks(8)); // then the numbers of bins
 			let bins = histogram(data);
+			console.log('bins', bins);
 			y.domain([0, d3.max(bins, function(d) { return d.length; })]);
 
 			let node = document.createElement('div');
@@ -68,8 +71,7 @@ class HistgramComp extends React.Component {
 				  .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 			svg.append('g')
-				  // .attr("transform", `translate(${margin.left}, ${height})`)
-				  .attr("transform", "translate(0," + height + ")")
+				  .attr("transform", `translate(0, ${height})`)
 				.call(d3.axisBottom(x));
 
 			svg.append("g")
@@ -87,9 +89,15 @@ class HistgramComp extends React.Component {
 				.transition() // and apply changes to all of them
 				.duration(1000)
 				  .attr("x", 1)
-				  .attr("transform", function(d) { console.log(d, `translate(${x(d.x0)}, ${y(d.length)})`); return `translate(${x(d.x0)}, ${y(d.length)})`; })
-				  .attr("width", function(d) { console.log(d, `x(d.x1) - x(d.x0) -1`); return x(d.x1) - x(d.x0) -1 ; })
-				  .attr("height", function(d) { console.log(d, `height - y(d.length)`); return height - y(d.length); })
+				  .attr("transform", function(d) {
+					  console.log(d, `translate(${x(d.x0)}, ${y(d.length)})`);
+					  return `translate(${x(d.x0)}, ${y(d.length)})`; })
+				  .attr("width", function(d) {
+					  // console.log(d, `x(d.x1) - x(d.x0) -1`);
+					  return x(d.x1) - x(d.x0) -1 ; })
+				  .attr("height", function(d) {
+					  // console.log(d, `height - y(d.length)`);
+					  return height - y(d.length); })
 				  .style("fill", "#69b3a2")
 
 			u.exit()
