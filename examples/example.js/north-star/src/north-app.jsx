@@ -3,25 +3,27 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
-import { an, AnClient, SessionClient, Protocol, L, Langstrs } from 'anclient';
-import { AnContext, AnError } from './anreact/reactext'
-import { AnReactExt } from './anreact/anreact'
-import { Sys, SysComp } from './anreact/sys'
-import { Domain } from './react-app/views/domain'
-import { Roles } from './react-app/views/roles'
-import { Orgs } from './react-app/views/orgs'
-import { Users } from './react-app/views/users'
+import {
+	an, AnClient, SessionClient, Protocol, L, Langstrs,
+	AnContext, AnError, AnReactExt,
+	Sys, SysComp, Domain, Roles, Orgs, Users
+} from 'anclient';
 
 import { NorthPorts } from './north-ports.js'
 	import { Northeme } from './styles'
 	import { Dashboard } from './common/dashboard'
+	import { MyStudents } from './views/my-students'
 
 /** The application main.
  * "North" stands for the guardian.
  */
 class NorthApp extends React.Component {
 	state = {
-		ports: Object.assign(Protocol.Port, {north: 'north.serv'}),
+		ports: Object.assign(Protocol.Port, {
+			north: 'north.serv',
+			menu: "menu.serv",
+		}),
+
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
 		hasError: false,
@@ -44,7 +46,7 @@ class NorthApp extends React.Component {
 			console.error("Add this line to node_moduls/react-dom/index.js :",
 			"window.React1 = require('react');");
 		else if (window.React1 !== window.React2)
-			console.error("Duplicate React reference. See",
+			console.warn("Duplicate React reference. See",
 			"https://reactjs.org/warnings/invalid-hook-call-warning.html#duplicate-react");
 
 		// this.state.ports = Object.assign(Protocol.Port, northports);
@@ -74,7 +76,9 @@ class NorthApp extends React.Component {
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
-			{path: '/north/dashboard', comp: Dashboard},
+
+			{path: '/n/dashboard', comp: Dashboard},
+			{path: '/n/my-students', comp: MyStudents},
 		] );
 	}
 
@@ -129,7 +133,7 @@ class NorthApp extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<SysComp onLogout={this.logout}/>
+				<Sys menu='sys.menu.jserv-north' onLogout={this.logout}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

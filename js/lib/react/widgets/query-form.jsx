@@ -73,7 +73,8 @@ class AnQueryFormComp extends CrudComp {
 
 		if (!this.context || !this.context.anReact)
 			throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
-		this.state.conds.forEach( (cond, cx) => {
+		this.state.conds.filter((c, x ) => !!c)
+		  .forEach( (cond, cx) => {
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb'))
 				this.context.anReact.ds2cbbOptions({
 						sk: cond.sk,
@@ -179,7 +180,9 @@ class AnQueryFormComp extends CrudComp {
 		 * @return {<Autocomplete>} (auto complete) combobox
 		 */
 		function conditions(conds = []) {
-			return conds.map( (cond, x) => {
+		  return conds
+			.filter((c, x ) => !!c)
+			.map( (cond, x) => {
 				if (cond.type === 'cbb') {
 					let refcbb = React.createRef();
 					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;

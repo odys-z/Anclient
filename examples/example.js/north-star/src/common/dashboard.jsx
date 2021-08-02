@@ -3,10 +3,10 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import { an, AnClient, SessionClient, Protocol, L, Langstrs } from 'anclient';
-import { AnContext, AnError } from '../anreact/reactext'
-import { CrudComp } from '../anreact/crud'
-import { AnReactExt } from '../anreact/anreact'
+import {
+    an, AnClient, SessionClient, Protocol, L, Langstrs,
+    AnContext, AnError, CrudComp, AnReactExt
+} from 'anclient';
 
 const styles = (theme) => ( {
 	root: {
@@ -18,7 +18,6 @@ const styles = (theme) => ( {
 
 /**
  * https://react-d3-library.github.io/
- */
 class Chart extends CrudComp {
 	state = {
 		vectors: []
@@ -32,6 +31,7 @@ class Chart extends CrudComp {
 		return (<>Chart</>);
 	}
 }
+ */
 
 class DashboardComp extends CrudComp {
 	state = {
@@ -68,7 +68,7 @@ class DashboardComp extends CrudComp {
 		</>);
 	}
 }
-DashboardComp .contextType = AnContext;
+DashboardComp.contextType = AnContext;
 
 const Dashboard = withStyles(styles)(DashboardComp);
 export { Dashboard, DashboardComp  }

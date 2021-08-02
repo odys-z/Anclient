@@ -3,6 +3,7 @@
 	npm test
  */
 
+const window = {}
 
 context = require.context('./jsunit', true, /\.mocha\.js$/);
 

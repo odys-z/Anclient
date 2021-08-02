@@ -13,7 +13,8 @@ Welcome to Anclient's documentation!
    starter/jsample
    starter/client
    starter/framework
-   guide/docker.rst
+   guide/docker
+   dev/index
 
 
 Indices and tables

@@ -1,6 +1,6 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, DatasetReq } from '../../lib/protocol.js'
-import { SysComp } from '../../lib/react/sys.jsx'
+import {parseMenus} from '../../lib/utils/helpers.js'
 
 const dsTestResp = {
 	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",
@@ -121,7 +121,7 @@ describe('case: [03.1 Jsample.menu]', () => {
 	it("Parse Menu's lagacy format", () => {
 		let msg = new AnsonMsg(dsMenu);
 		let forest = msg.Body().forest;
-		let {menu, paths} = SysComp.parseMenus(forest);
+		let {menu, paths} = parseMenus(forest);
 
 		assert.equal(menu.Body, undefined, "1 ---");
 		assert.equal(menu.length, 2, "2 ---");
