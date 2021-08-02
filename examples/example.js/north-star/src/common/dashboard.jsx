@@ -8,30 +8,15 @@ import {
     AnContext, AnError, CrudComp, AnReactExt
 } from 'anclient';
 
+import { Histgram } from '../d3charts/histgram'
+
 const styles = (theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'
 		}
-	}
+	},
 } );
-
-/**
- * https://react-d3-library.github.io/
-class Chart extends CrudComp {
-	state = {
-		vectors: []
-	};
-
-	constructor(props) {
-		super(props);
-	}
-
-	render () {
-		return (<>Chart</>);
-	}
-}
- */
 
 class DashboardComp extends CrudComp {
 	state = {
@@ -62,8 +47,7 @@ class DashboardComp extends CrudComp {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<Chart className={classes.chart}
-				vectors = {this.state.charts[0]}
+			<Histgram vectors = {this.state.charts[0]}
 			/>
 		</>);
 	}
