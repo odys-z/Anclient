@@ -250,12 +250,14 @@ export class AnReactExt extends AnReact {
 	}
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
+	 * @param {string} sk menu sk (semantics key, see dataset.xml), e.g. 'sys.menu.jsample'
 	 * @param {function} onLoad
 	 * @param {AnContext} errCtx
 	 * @return {AnReactExt} this
 	 */
-	loadMenu(onLoad, errCtx) {
-		const sk = 'sys.menu.jsample';
+	loadMenu(sk, onLoad, errCtx) {
+		if (!sk)
+			throw new Error("Arg 'sk' is null - AnReact requires a dataset semantics for system menu.");
 		const pmenu = 'menu';
 
 		return this.dataset(

@@ -144,6 +144,7 @@ class SysComp extends React.Component {
 	state = {
 		window: undefined,
 		sysName: 'Anreact Sample',
+		skMenu: undefined, // e.g. 'sys.menu.jserv-sample';
 		sysMenu: {
 			funcId: 'sys',
 			funcName: 'Anclient Lv-0',
@@ -223,6 +224,7 @@ class SysComp extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state.sysName = props.sys || props.sysName || props.name || this.state.sysName;
+		this.state.skMenu = props.menu;
 		this.state.window = props.window;
 
 		this.showMenu = this.showMenu.bind(this);
@@ -237,6 +239,7 @@ class SysComp extends React.Component {
 		// load menu
 		let that = this;
 		this.context.anReact.loadMenu(
+			this.state.skMenu,
 			(dsResp) => {
 				let {menu, paths} = SysComp.parseMenus(dsResp.Body().forest);
 				that.state.sysMenu = menu;

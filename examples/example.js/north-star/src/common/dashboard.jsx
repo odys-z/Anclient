@@ -3,10 +3,10 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import { an, AnClient, SessionClient, Protocol, L, Langstrs } from 'anclient';
-import { AnContext, AnError } from '../anreact/reactext'
-import { CrudComp } from '../anreact/crud'
-import { AnReactExt } from '../anreact/anreact'
+import {
+    an, AnClient, SessionClient, Protocol, L, Langstrs,
+    AnContext, AnError, CrudComp, AnReactExt
+} from 'anclient';
 
 const styles = (theme) => ( {
 	root: {

@@ -3,16 +3,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
-/*
-import { an, AnClient, SessionClient, Protocol, L, Langstrs } from 'anclient';
-import { AnContext, AnError } from './anreact/reactext'
-import { AnReactExt } from './anreact/anreact'
-import { Sys, SysComp } from './anreact/sys'
-import { Domain } from './react-app/views/domain'
-import { Roles } from './react-app/views/roles'
-import { Orgs } from './react-app/views/orgs'
-import { Users } from './react-app/views/users'
-*/
 import {
 	an, AnClient, SessionClient, Protocol, L, Langstrs,
 	AnContext, AnError, AnReactExt,
@@ -85,7 +75,9 @@ class NorthApp extends React.Component {
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
-			{path: '/north/dashboard', comp: Dashboard},
+
+			{path: '/n/dashboard', comp: Dashboard},
+			{path: '/n/my-students', comp: MyStrudents},
 		] );
 	}
 
@@ -140,7 +132,7 @@ class NorthApp extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<SysComp onLogout={this.logout}/>
+				<Sys menu='sys.menu.jserv-north' onLogout={this.logout}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
