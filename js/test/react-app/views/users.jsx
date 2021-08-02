@@ -1,15 +1,19 @@
-
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import { TextField } from '@material-ui/core';
+import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { L } from '../../../lib/utils/langstr';
-	import { QueryReq } from '../../../lib/protocol';
+	import { Protocol } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/utils/consts';
-	import { CrudComp } from '../../../lib/react/crud'
-	import { AnContext, AnError } from '../../../lib/react/reactext'
-	import { AnTablist } from '../../../lib/react/widgets/table-list.jsx'
-	import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
+	import { JsampleIcons } from '../styles';
+	import { CrudComp } from '../../../lib/react/crud';
+	import { AnContext, AnError } from '../../../lib/react/reactext';
+	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
+	import { AnTablist } from '../../../lib/react/widgets/table-list';
+	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
+	import { AnsonResp } from '../../../lib/protocol';
+
+	import { UserDetails } from './user-details';
 
 const styles = (theme) => ( {
 	root: {
@@ -27,6 +31,8 @@ class UsersComp extends CrudComp {
 				options: [ AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
 				label: 'Role'},
 
+		buttons: { add: true, edit: false, del: false},
+
 		th: [{	text: L('User Name'), field: 'userName', checked: true, color: 'primary', className: 'bold' },
 			 {	text: L('uid'), field: 'userId', hide: true, color: 'primary' },
 			 {	text: L('Role'), field: 'roleName', color: 'primary' }],
@@ -38,6 +44,7 @@ class UsersComp extends CrudComp {
 		super(props);
 
 		this.toSearch = this.toSearch.bind(this);
+		this.onTableSelect = this.onTableSelect.bind(this);
 	}
 
 	toSearch(e, q) {
@@ -52,6 +59,18 @@ class UsersComp extends CrudComp {
 			qr.Body().whereCond('%', 'u.userName', `'${q.name}'`);
 
 		this.context.anReact.bindTablist(qr, this, this.context.error);
+	}
+
+
+	onTableSelect(rowIds) {
+		this.setState( {
+			buttons: {
+				add: this.state.buttons.add,
+				edit: rowIds && rowIds.length === 1,
+				del: rowIds &&  rowIds.length >= 1,
+			},
+			selectedRoleIds: rowIds
+		} );
 	}
 
 	toDel(e, v) {
@@ -72,6 +91,8 @@ class UsersComp extends CrudComp {
 
 	render() {
 		const { classes } = this.props;
+		let btn = this.state.buttons;
+
 		return (<div className={classes.root}>Users of Jsample
 
 			<AnQueryForm onSearch={this.toSearch} onClear={this.toClearForm}
@@ -101,6 +122,7 @@ class UsersComp extends CrudComp {
 				columns={ this.state.th }
 				rows={ this.state.rows }
 				pageInf={ this.state.pageInf }
+				onSelectChange={this.onTableSelect}
 			/>
 		</div>);
 	}
