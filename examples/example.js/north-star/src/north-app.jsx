@@ -12,6 +12,7 @@ import {
 import { NorthPorts } from './north-ports.js'
 	import { Northeme } from './styles'
 	import { Dashboard } from './common/dashboard'
+	import { MyStudents } from './views/my-students'
 
 /** The application main.
  * "North" stands for the guardian.
@@ -77,7 +78,7 @@ class NorthApp extends React.Component {
 			{path: '/sys/users', comp: Users},
 
 			{path: '/n/dashboard', comp: Dashboard},
-			{path: '/n/my-students', comp: MyStrudents},
+			{path: '/n/my-students', comp: MyStudents},
 		] );
 	}
 

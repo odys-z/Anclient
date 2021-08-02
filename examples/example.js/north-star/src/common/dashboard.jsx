@@ -68,7 +68,7 @@ class DashboardComp extends CrudComp {
 		</>);
 	}
 }
-DashboardComp .contextType = AnContext;
+DashboardComp.contextType = AnContext;
 
 const Dashboard = withStyles(styles)(DashboardComp);
 export { Dashboard, DashboardComp  }
