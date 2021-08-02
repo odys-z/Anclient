@@ -32,7 +32,8 @@ import {Protocol} from '../protocol'
 	import {ConfirmDialog} from './widgets/messagebox.jsx'
 	import {MyIcon} from './widgets/my-icon.jsx'
 	import {MyInfo} from './widgets/my-info.jsx'
-	import {L, Langstrs} from '../utils/langstr.js'
+	import {L, Langstrs} from '../utils/langstr'
+	import {parseMenus} from '../utils/helpers'
 
 import {
 	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow
@@ -189,38 +190,6 @@ class SysComp extends React.Component {
 		});
 	}
 
-	/**
-	 * Parse lagacy json format.
-	 * @return {object} {funcId, id, funcName, url, css, flags, parentId, sort, sibling, children}
-	 */
-	static parseMenus(json = []) {
-		let paths = []; // {'/home': Home}
-		let menu = parse(json);
-		return { menu, paths };
-
-		function parse(json) {
-			if (Array.isArray(json))
-				return json.map( (jn) => { return parse(jn); } );
-			else {
-				// this is just a lagacy of EasyUI, will be deprecated
-				let {funcId, id, funcName, text, url, css, flags, parentId, sort, sibling, children}
-					= json.node;
-
-				sibling = sibling || sort;
-				funcId = funcId || id;
-				funcName = funcName || text;
-
-				if (! url.startsWith('/')) url = '/' + url;
-				paths.push({path: url, params: {flags, css}})
-
-				if (children)
-					children = parse(children);
-
-				return {funcId, funcName, url, css, flags, parentId, sibling, children};
-			}
-		}
-	}
-
 	constructor(props) {
 		super(props);
 		this.state.sysName = props.sys || props.sysName || props.name || this.state.sysName;
@@ -241,7 +210,7 @@ class SysComp extends React.Component {
 		this.context.anReact.loadMenu(
 			this.state.skMenu,
 			(dsResp) => {
-				let {menu, paths} = SysComp.parseMenus(dsResp.Body().forest);
+				let {menu, paths} = parseMenus(dsResp.Body().forest);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
 			}, this.context.error );
