@@ -18,7 +18,6 @@ const styles = (theme) => ( {
 
 /**
  * https://react-d3-library.github.io/
- */
 class Chart extends CrudComp {
 	state = {
 		vectors: []
@@ -32,6 +31,7 @@ class Chart extends CrudComp {
 		return (<>Chart</>);
 	}
 }
+ */
 
 class DashboardComp extends CrudComp {
 	state = {
