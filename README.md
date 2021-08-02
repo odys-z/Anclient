@@ -1,3 +1,4 @@
+
 # About
 
 Clients of semantic-\*. Including a Java and Javascript version. The C# version is in intensive development.
@@ -22,8 +23,8 @@ There are 3 clients in the solution:
 
 - csharp
 
-The c# version of anclient. 
-    
+The c# version of anclient.
+
 - java
 
 Java client (not for Android yet)
@@ -37,9 +38,9 @@ js client API depending on jquery. The test project is using React.
 - example.js
 
     Examples using Anclient.js.
-    
+
  -- North Star
- 
+
     Example using Anclient + React. (No npm package avialable, see branch issue-13991 readme)
 
 - example.cs
@@ -58,7 +59,7 @@ js client API depending on jquery. The test project is using React.
     The trying and testing project of gltf-export, also used to test jserv-sample
     project's file uploading function. Jserv-sample project source can be downloaded
     [here](https://github.com/odys-z/semantic-jserv/releases).
-    
+
 # Document
 
 [Anclient Documents](https://odys-z.github.io/Anclient)

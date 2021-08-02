@@ -39,3 +39,21 @@ Partly available [here](https://odys-z.github.io/Anclient/), currently only
 ## xvisual
 
 Integrating [x-visual](https://github.com/odys-z/x-visual) with Anclient.js
+
+# Troubleshootings
+
+- Invalid Hook Call Warning
+
+For error description, see branch issue-13991, and [here](https://reactjs.org/warnings/invalid-hook-call-warning.html).
+
+NOTES: handling error of using duplicated React:
+
+    1. have package's main to the main source entry, not minified js - and
+    don't exclude 'node_modules' form loader test rule in depending project;
+    2. have anclient package using external react, react-dom, material-ui/core;
+    3. have depending project install everything;
+    4. don't resolve depending project's react to source package
+       - although it's always work for eliminate the error;
+    5. install anclient package via npm, not linking locally
+
+    Good luck!

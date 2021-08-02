@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.36",
+  "version": "0.9.37",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main": "./lib/an-components.js",
   "directories": {
@@ -44,16 +44,16 @@
     "babel-plugin-transform-vue-jsx": "^3.7.0",
     "babel-preset-env": "^1.7.0",
     "chai": "^4.3.4",
+    "d3": "^7.0.0",
     "jquery": "^3.6.0",
     "mocha": "^8.4.0",
     "react": "^17.0.2",
+    "react-d3-library": "^1.1.8",
     "react-dom": "^17.0.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-svg-loader": "^3.0.3",
-    "resolutions": {
-      "css-what": "3.4.2"
-    },
+
     "sass-loader": "^7.3.1",
     "style-loader": "^0.23.1",
     "webpack": "^5.47.1",
