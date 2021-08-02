@@ -344,6 +344,7 @@ class SysComp extends React.Component {
 		let open = this.state.showMenu;
 		console.log('here');
 
+		// if (!window) return '';
 		return (
 		  <div className={claz.root}>
 			<AppBar
