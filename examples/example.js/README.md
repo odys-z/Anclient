@@ -40,6 +40,8 @@ Partly available [here](https://odys-z.github.io/Anclient/), currently only
 
 Integrating [x-visual](https://github.com/odys-z/x-visual) with Anclient.js
 
+##
+
 # Troubleshootings
 
 - Invalid Hook Call Warning
@@ -57,3 +59,5 @@ NOTES: handling error of using duplicated React:
     5. install anclient package via npm, not linking locally
 
     Good luck!
+
+More details: [Dev Docs](https://odys-z.github.io/Anclient/dev/issues.html#react-issue-13991-invalid-hood-call)

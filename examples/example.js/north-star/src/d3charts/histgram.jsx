@@ -1,9 +1,20 @@
 import React from 'react';
-import d3 from 'd3';
-import rd3 from 'react-d3-library';
-const RD3Component = rd3.Component;
+import { withStyles } from "@material-ui/core/styles";
+import PropTypes from 'prop-types';
 
-class Histgram extends React.component {
+import * as d3 from 'd3';
+
+import {
+    an, AnClient, SessionClient, Protocol, L, Langstrs,
+    AnContext, AnError, CrudComp, AnReactExt
+} from 'anclient';
+
+const styles = (theme) => ( {
+	root: {
+	}
+} );
+
+class HistgramComp extends React.Component {
 	state = {
 		d3: '',
 	}
@@ -11,38 +22,104 @@ class Histgram extends React.component {
 	constructor(props) {
 		super(props);
 
+		this.initTest = this.initTest.bind(this);
+	}
+
+	initTest() {
 		// in case testing
 		if (document) {
-			let data = [ 5.1, 1, 4.9, 2, 8.6, 3, 6.2, 4, 5.1, 5, 7.1];
-			let bins = d3.bin().thresholds(40)(data);
+			let data = [{ "price": "75.0" }, { "price": "104.0" }, { "price": "369.0" }, { "price": "300.0" },
+    					{ "price": "92.0" }, { "price": "64.0" }, { "price": "265.0" }, { "price": "35.0" },
+    					{ "price": "287.0" }, { "price": "69.0" }, { "price": "52.0" }, { "price": "23.0" },
+    					{ "price": "287.0" }, { "price": "87.0" }, { "price": "114.0" }, { "price": "114.0" },
+    					{ "price": "98.0" }, { "price": "137.0" }, { "price": "87.0" }, { "price": "90.0" },
+    					{ "price": "63.0" }, { "price": "69.0" }, { "price": "80.0" }, { "price": "113.0" },
+					    { "price": "58.0" }, { "price": "115.0" }, { "price": "30.0" }, { "price": "35.0" },
+					    { "price": "92.0" }, { "price": "460.0" }, { "price": "74.0" }, { "price": "72.0" },
+					    { "price": "63.0" }];
 
-			let node = document.createElement('div');
+			let margin = {top: 10, right: 30, bottom: 30, left: 40},
+				width = 460 - margin.left - margin.right,
+				height = 400 - margin.top - margin.bottom;
+
+			let x = d3
+				.scaleLinear()
+				// .domain([0, 1000])
+				// can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+				.domain([0, d3.max(data, function(d) { return +d.price; })])
+				.range([0, width]);
+			let y = d3.scaleLinear()
+				.range([height, 0]);
+			let histogram = d3
+				.histogram()
+				.value(function(d) { return d.price; })   // I need to give the vector of value
+				.domain(x.domain())  // then the domain of the graphic
+				.thresholds(x.ticks(8)); // then the numbers of bins
+			let bins = histogram(data);
+			console.log('bins', bins);
+			y.domain([0, d3.max(bins, function(d) { return d.length; })]);
+
+			// let node = document.createElement('div');
+			// this.state.d3 = node;
+
+			let svg = d3
+				// .select(node)
+				.select('#node')
+				.append("svg")
+				  .attr("width", width + margin.left + margin.right)
+				  .attr("height", height + margin.top + margin.bottom)
+				.append("g")
+				  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
 			this.state.d3 = node;
-			this.state.svg = d3
-					.select(node)
-					.append(svg)
-						.attr("width", 100)
-						.attr("height", 100);
+
 			svg.append('g')
-					.attr("fill", "#eef")
-				.selectAll("rect")
+				  .attr("transform", `translate(0, ${height})`)
+				.call(d3.axisBottom(x));
+
+			svg.append("g")
+				.transition()
+				.duration(1000)
+				.call(d3.axisLeft(y));
+
+			let u = svg.selectAll("rect")
 				.data(bins)
-				.join("rect")
-					.attr("x", d => x(d.x0) + 1)
-					.attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
-					.attr("y", d => y(d.length))
-					.attr("height", d => y(0) - y(d.length));;
+
+			// Manage the existing bars and eventually the new ones:
+			u.enter()
+				.append("rect") // Add a new rect for each new elements
+				.merge(u) // get the already existing elements as well
+				.transition() // and apply changes to all of them
+				.duration(1000)
+				  .attr("x", 1)
+				  .attr("transform", function(d) {
+					  console.log(d);
+					  return `translate(${x(d.x0)}, ${y(d.length)})`; })
+				  .attr("width", function(d) {
+					  return x(d.x1) - x(d.x0) -1 ; })
+				  .attr("height", function(d) {
+					  return height - y(d.length); })
+				  .style("fill", "#69b3a2")
+
+			u.exit()
+				.remove()
+
+			this.setState( {svg} );
 		}
 	}
 
-	componentDidMount: function() {
-		// this.setState({d3: node});
-	},
+	componentDidMount() {
+		this.initTest();
+	}
 
-	render () {
+	render() {
+	  let {classes} = this.props;
 	  return (
-		<div>
-			<RD3Component data={this.state.d3} />
+		<div id='node'>
 		</div>);
 	}
 }
+HistgramComp.contextType = AnContext;
+
+const Histgram = withStyles(styles)(HistgramComp);
+export { Histgram, HistgramComp }
