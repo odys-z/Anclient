@@ -5,14 +5,18 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 
 import {
 	an, AnClient, SessionClient, Protocol, L, Langstrs,
-	AnContext, AnError, AnReactExt,
-	Sys, SysComp, Domain, Roles, Orgs, Users
+	AnContext, AnError, AnReactExt, Sys, SysComp
 } from 'anclient';
 
-import { NorthPorts } from './north-ports.js'
-	import { Northeme } from './styles'
-	import { Dashboard } from './common/dashboard'
-	import { MyStudents } from './views/my-students'
+import { Domain } from './test-app/views/domain';
+import { Roles } from './test-app/views/roles';
+import { Orgs } from './test-app/views/orgs';
+import { Users } from './test-app/views/users';
+
+import { NorthPorts } from './north-ports.js';
+	import { Northeme } from './styles';
+	import { Dashboard } from './common/dashboard';
+	import { MyStudents } from './views/my-students';
 
 /** The application main.
  * "North" stands for the guardian.
@@ -133,7 +137,7 @@ class NorthApp extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<Sys menu='sys.menu.jserv-north' onLogout={this.logout}/>
+				<Sys menu='sys.menu.north' onLogout={this.logout}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
