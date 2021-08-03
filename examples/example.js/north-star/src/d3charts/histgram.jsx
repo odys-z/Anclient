@@ -1,8 +1,8 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import PropTypes from 'prop-types';
+
 import * as d3 from 'd3';
-import rd3 from 'react-d3-library';
-const RD3Component = rd3.Component;
 
 import {
     an, AnClient, SessionClient, Protocol, L, Langstrs,
@@ -59,16 +59,19 @@ class HistgramComp extends React.Component {
 			console.log('bins', bins);
 			y.domain([0, d3.max(bins, function(d) { return d.length; })]);
 
-			let node = document.createElement('div');
-			this.state.d3 = node;
+			// let node = document.createElement('div');
+			// this.state.d3 = node;
 
 			let svg = d3
-				.select(node)
+				// .select(node)
+				.select('#node')
 				.append("svg")
 				  .attr("width", width + margin.left + margin.right)
 				  .attr("height", height + margin.top + margin.bottom)
 				.append("g")
 				  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+			this.state.d3 = node;
 
 			svg.append('g')
 				  .attr("transform", `translate(0, ${height})`)
@@ -90,13 +93,11 @@ class HistgramComp extends React.Component {
 				.duration(1000)
 				  .attr("x", 1)
 				  .attr("transform", function(d) {
-					  console.log(d, `translate(${x(d.x0)}, ${y(d.length)})`);
+					  console.log(d);
 					  return `translate(${x(d.x0)}, ${y(d.length)})`; })
 				  .attr("width", function(d) {
-					  // console.log(d, `x(d.x1) - x(d.x0) -1`);
 					  return x(d.x1) - x(d.x0) -1 ; })
 				  .attr("height", function(d) {
-					  // console.log(d, `height - y(d.length)`);
 					  return height - y(d.length); })
 				  .style("fill", "#69b3a2")
 
@@ -115,8 +116,7 @@ class HistgramComp extends React.Component {
 	render() {
 	  let {classes} = this.props;
 	  return (
-		<div>
-			<RD3Component data={this.state.d3} className={classes.root} />
+		<div id='node'>
 		</div>);
 	}
 }
