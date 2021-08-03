@@ -15,7 +15,7 @@ import { Users } from './test-app/views/users';
 
 import { NorthPorts } from './north-ports.js';
 	import { Northeme } from './styles';
-	import { Dashboard } from './common/dashboard';
+	import { Dashboard } from './viewes/dashboard';
 	import { MyStudents } from './views/my-students';
 
 /** The application main.
@@ -80,6 +80,7 @@ class NorthApp extends React.Component {
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
+			{path: '/n/indicators', comp: Indicators},
 
 			{path: '/n/dashboard', comp: Dashboard},
 			{path: '/n/my-students', comp: MyStudents},
