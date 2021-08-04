@@ -201,7 +201,7 @@ const resp1Question = {
 	"seq": 0
 }
 
-describe('case: [04 Protocol.AnReact] quiz converter', () => {
+describe('case: [04 Protocol.QuizResp] new QuizResp()', () => {
 
 	it('4.1 [Quiz] Convert AnsonResp to quizzes', () => {
 		let quizResp = new QuizResp(jsonResp.body[0]);
@@ -214,7 +214,22 @@ describe('case: [04 Protocol.AnReact] quiz converter', () => {
 		assert.equal(quizzes[3].title, "zzzzzzzz", "4 ---");
 	});
 
-	it('4.1 [Quiz.questions: no question] Convert AnsonResp to questions', () => {
+	it('4.2 [Quiz] Create QuizResp with new AnsonMsg()', () => {
+		Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
+			return new QuizResp(jsonBd);
+		});
+
+		let quizResp = new AnsonMsg(jsonResp);
+		let quizzes = quizResp.Body().quizzes();
+
+		// ['QID', 'QOWNER', 'QTITLE', 'TAGS', 'QUESTIONS', 'OPER', 'OPERTIME']
+		assert.equal(quizzes.length, 7, "1 ---");
+		assert.equal(quizzes[0].qid, "000004", "2 ---");
+		assert.equal(quizzes[6].qid, "00000A", "3 ---");
+		assert.equal(quizzes[3].title, "zzzzzzzz", "4 ---");
+	});
+
+	it('4.3 [Quiz.questions: no question] Convert AnsonResp to questions with new QuizResp()', () => {
 		let quiz = new QuizResp(jsonNochild.body[0]);
 		let { title, quizinfo, quizId, questions } = quiz.questions();
 
@@ -225,7 +240,7 @@ describe('case: [04 Protocol.AnReact] quiz converter', () => {
 		assert.equal(questions.length, 0, "4 ---");
 	});
 
-	it('4.1 [Quiz.questions: 1 question] Convert AnsonResp to questions', () => {
+	it('4.4 [Quiz.questions: 1 question] Convert AnsonResp to questions with new QuizResp()', () => {
 		let quiz = new QuizResp(resp1Question.body[0]);
 		let { title, quizinfo, quizId, questions } = quiz.questions();
 
@@ -243,4 +258,4 @@ describe('case: [04 Protocol.AnReact] quiz converter', () => {
 		assert.equal(questions[0].answers.split('\n').length, 4, "10  --- answers: " + questions[0].answers.split('\n'));
 		assert.equal(questions[0].answer, "0", "11 ---");
 	});
-})
+});

@@ -15,7 +15,8 @@ import { Users } from './test-app/views/users';
 
 import { NorthPorts } from './north-ports.js';
 	import { Northeme } from './styles';
-	import { Dashboard } from './viewes/dashboard';
+	import { Dashboard } from './views/dashboard';
+	import { Indicators } from './views/indicators';
 	import { MyStudents } from './views/my-students';
 
 /** The application main.

@@ -7,16 +7,14 @@ var version = "1.0.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: { 'quiz': './src/app/Quizlist.js',
-			 // 'editor': './src/app/Editor.js'
-		 },
+	entry: { 'quiz': './src/app/Quizlist.js' },
+
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
 
 	  path: path.resolve(__dirname, 'dist'),
 	  publicPath: "./dist/",
-
 	  libraryTarget: 'umd'
 	},
 
@@ -25,11 +23,11 @@ module.exports = {
 	resolve: {
 		extensions: ['*', '.js', '.jsx']
 	},
+
 	module: {
 		rules: [
-		{   test: /\.js$/,
+		{   test: /\.jsx?$/,
 			loader: 'babel-loader',
-			exclude: /node_modules/,
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},

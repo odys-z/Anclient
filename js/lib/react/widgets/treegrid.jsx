@@ -116,20 +116,19 @@ class AnTreegridComp extends React.Component {
 
   constructor(props) {
 	super(props);
-	this.state.sysName =
-	  props.sys || props.sysName || props.name || this.state.sysName;
+	// this.state.sysName = props.sys || props.sysName || props.name || this.state.sysName;
 	this.state.window = props.window;
 
 	this.toExpandItem = this.toExpandItem.bind(this);
 	this.treeNodes = this.treeNodes.bind(this);
 
-	this.toLogout = this.toLogout.bind(this);
+	// this.toLogout = this.toLogout.bind(this);
   }
 
-  toLogout() {
-	// Notify children?
-	this.setState({ showLogout: true });
-  }
+  // toLogout() {
+	// // Notify children?
+	// this.setState({ showLogout: true });
+  // }
 
   toExpandItem(e) {
 	e.stopPropagation();

@@ -65,6 +65,12 @@ CrudComp.propTypes = {
 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
 };
 
+const CrudCompW = withWidth(CrudComp);
+
+// class CrudFormComp extends React.Component {
+// }
+// CrudComp.contextType = AnContext;
+
 class HomeComp extends CrudComp {
 	render() {
 		return (<>Home</>);
@@ -115,7 +121,7 @@ class CheapFlowComp extends CrudComp {
 const CheapFlow = withStyles(styles)(CheapFlowComp);
 
 export {
-	CrudComp,
+	CrudComp, CrudCompW,
 	Home, HomeComp,
 	Domain, DomainComp,
 	Roles, RolesComp,
