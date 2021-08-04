@@ -16,7 +16,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 import { L, Protocol, AnsonResp,
-	AnConst, AnContext, AnError, CrudComp,
+	AnConst, AnContext, AnError, CrudCompW,
 	AnTablist, AnQueryForm, ConfirmDialog, AnTree
 } from 'anclient';
 

@@ -5,7 +5,7 @@ import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/co
 
 
 import { L, Protocol, AnsonResp,
-	AnConst, AnContext, AnError, CrudComp,
+	AnConst, AnContext, AnError, CrudCompW,
 	AnTablist, AnQueryForm, ConfirmDialog, AnTree
 } from 'anclient';
 
