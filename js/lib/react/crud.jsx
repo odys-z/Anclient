@@ -16,6 +16,7 @@ const styles = (theme) => ( {
  * To popup modal dialog, see
  * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
  */
+class CrudComp extends React.Component {
 	state = {
 		isXs: false;
 		isSm: false;
