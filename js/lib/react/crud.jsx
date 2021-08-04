@@ -18,11 +18,11 @@ const styles = (theme) => ( {
  */
 class CrudComp extends React.Component {
 	state = {
-		isXs: false;
-		isSm: false;
-		isMd: false;
-		isLg: false;
-		isXl: false;
+		isXs: false,
+		isSm: false,
+		isMd: false,
+		isLg: false,
+		isXl: false
 	};
 
 	constructor(props) {

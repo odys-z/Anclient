@@ -25,7 +25,9 @@ var config = {
 	rules: [
 		{   test: /\.jsx$/,
 			loader: 'babel-loader',
-			exclude: /node_modules/,
+			// yes this is needed as testing example.js/lib/protocol.quiz.js
+			// which in tur using ../examples/example.js/node_modules/anclient/lib/react/crud.jsx
+			// exclude: /node_modules/,
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
