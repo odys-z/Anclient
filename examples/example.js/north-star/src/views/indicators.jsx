@@ -23,7 +23,7 @@ class IndicatorsComp extends CrudComp {
 	}
 
 	render () {
-		return (<>MyStudents</>);
+		return (<TreeCards />);
 	}
 }
 IndicatorsComp.contextType = AnContext;
