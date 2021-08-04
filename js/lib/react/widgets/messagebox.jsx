@@ -97,11 +97,11 @@ class ConfirmDialogComp extends React.Component {
 					{txtLines}
 				</DialogContent>
 				<DialogActions>
-				  <Button onClick={this.toOk} color="primary">
+				  <Button onClick={this.toOk} color="primary" autoFocus={displayCancel === 'none'} >
 						{txtOk}
 				  </Button>
 				  <Box display={displayCancel}>
-					<Button onClick={this.toCancel} color="primary" autoFocus>
+					<Button onClick={this.toCancel} color="primary" autoFocus >
 						{txtCancel}
 					</Button>
 				  </Box>
