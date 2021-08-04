@@ -1,12 +1,13 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { L } from '../../../lib/utils/langstr';
 	import { Protocol } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/utils/consts';
 	import { JsampleIcons } from '../styles';
-	import { CrudComp } from '../../../lib/react/crud';
+	import { CrudCompW } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
 	import { AnTablist } from '../../../lib/react/widgets/table-list';
@@ -23,7 +24,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class UsersComp extends CrudComp {
+class UsersComp extends CrudCompW {
 	state = {
 		condName: {type: 'text', val: '', text: 'No', label: 'User Name'},
 		condRole: {type: 'cbb', val: AnConst.cbbAllItem,
@@ -129,5 +130,5 @@ class UsersComp extends CrudComp {
 }
 UsersComp.contextType = AnContext;
 
-const Users = withStyles(styles)(UsersComp);
+const Users = withWidth()(withStyles(styles)(UsersComp));
 export { Users, UsersComp }

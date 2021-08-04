@@ -1,5 +1,7 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
+import PropTypes from "prop-types";
 
 import { L } from '../utils/langstr';
 import { AnContext, AnError } from './reactext.jsx'
@@ -17,8 +19,7 @@ const styles = (theme) => ( {
  * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
  */
 class CrudComp extends React.Component {
-	state = {
-	};
+	state = {};
 
 	render() {
 		return (<>Base CrudComp Page</>);
@@ -26,9 +27,56 @@ class CrudComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 
-class CrudFormComp extends React.Component {
+/**
+ * <pre>CrudCompW.prototype.media = {
+    isXs: false,
+    isSm: false,
+    isMd: false,
+    isLg: false,
+    isXl: false,
+   };</pre>
+ * So this can be used like super.media
+ */
+class CrudCompW extends React.Component {
+	constructor(props) {
+		super(props);
+
+		let {width} = props;
+		let media = {};
+
+		if (width === 'lg') {
+			media.isLg = true;
+			media.isMd = true;
+			media.isSm = true;
+			media.isXs = true;
+		}
+		else if (width === 'xl') {
+			media.isXl = true;
+			media.isLg = true;
+			media.isMd = true;
+			media.isSm = true;
+			media.isXs = true;
+		}
+		else if (width === 'sm') {
+			media.isSm = true;
+			media.isXs = true;
+		}
+		else if (width === 'xs')
+			media.isXs = true;
+		else {
+			media.isMd = true;
+			media.isSm = true;
+			media.isXs = true;
+		}
+
+		CrudCompW.prototype.media = media;
+	}
 }
-CrudComp.contextType = AnContext;
+CrudCompW.contextType = AnContext;
+
+CrudCompW.propTypes = {
+	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
+};
 
 class HomeComp extends CrudComp {
 	render() {
@@ -80,7 +128,7 @@ class CheapFlowComp extends CrudComp {
 const CheapFlow = withStyles(styles)(CheapFlowComp);
 
 export {
-	CrudComp,
+	CrudComp, CrudCompW,
 	Home, HomeComp,
 	Domain, DomainComp,
 	Roles, RolesComp,

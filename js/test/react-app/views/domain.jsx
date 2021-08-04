@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
 import { L } from '../../../lib/utils/langstr';
 	import { AnConst } from '../../../lib/utils/consts';
 	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
-	import { CrudComp } from '../../../lib/react/crud'
+	import { CrudCompW } from '../../../lib/react/crud'
 	import { AnContext, AnError } from '../../../lib/react/reactext'
 	import { AnTablist } from '../../../lib/react/widgets/table-list.jsx'
 	import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
@@ -19,7 +20,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class DomainComp extends CrudComp {
+class DomainComp extends CrudCompW {
 	state = {
 		condTxt : { type: 'text', val: '', text: 'No', label: 'text'},
 		condCbb : { type: 'autocbb',
@@ -132,8 +133,5 @@ class DomainComp extends CrudComp {
 }
 DomainComp.contextType = AnContext;
 
-const Domain = withStyles(styles)(DomainComp);
+const Domain = withWidth()(withStyles(styles)(DomainComp));
 export { Domain, DomainComp }
-
-
-

@@ -1,14 +1,11 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import { Card, TextField, Typography } from '@material-ui/core';
+import { Card, TextField, Button, Typography } from '@material-ui/core';
 
-import { L } from '../../../lib/utils/langstr';
-	import { AnConst } from '../../../lib/utils/consts';
-	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
-	import { CrudComp } from '../../../lib/react/crud'
-	import { AnContext, AnError } from '../../../lib/react/reactext'
-	import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
+import { L, AnConst Protocol, AnsonResp,
+	CrudComp, AnContext, AnError, AnQueryForm
+} from 'anclient'
 
 
 const styles = (theme) => ({
@@ -211,9 +208,6 @@ class TreeCardsComp extends CrudComp {
 					{open ? icon("expand") : icon("collapse")}
 					{editable &&
 						<Button onClick={this.toAddChild} color="primary" >
-							{L('Append Child')}
-						</Button>
-						<Button onClick={this.toAddChild} color="primary" >
 							{L('Delete All')}
 						</Button>
 					}
@@ -222,24 +216,23 @@ class TreeCardsComp extends CrudComp {
 			  </div>
 			  <Collapse in={open} timeout="auto" unmountOnExit>
 				{buildTreegrid(menu.children)}
+				{editable &&
+					<Button onClick={this.toAddChild} color="primary" >
+						{L('Append Child')}
+					</Button>
+				}
 			  </Collapse>
 			</div>
 		  );
 		}
 		else
 		  return (
-			<TreeCard key={menu.funcId} ind={menu} upDown={this.toUpdown} />
+			<TreeCard key={menu.funcId} card={menu} delete={this.toDelCard} upDown={this.toUpdown} />
 			/*
-			<Grid container
-			  key={menu.funcId}
-			  spacing={0}
-			  className={classes.row}
-			>
+			<Grid container key={menu.funcId} spacing={0} className={classes.row} >
 			  <Grid item xs={4} className={classes.rowHead}>
 				  <Typography noWrap>
-					{leadingIcons(menu.levelIcons)}
-					{icon(menu.css.icon)}
-					{menu.funcName}
+					{leadingIcons(menu.levelIcons)} {icon(menu.css.icon)} {menu.funcName}
 				  </Typography>
 			  </Grid>
 			  <Grid item xs={4} className={classes.treeItem}>
@@ -279,7 +272,11 @@ class TreeCardsComp extends CrudComp {
   render() {
 	const { classes } = this.props;
 
-	return <div className={classes.root}>{this.treeNodes(classes)}</div>;
+	return (
+		<div className={classes.root}>
+			{this.treeNodes(classes)}
+			{this.context.isSm && <Button >{L('Save')}</Button>}
+		</div>);
   }
 }
 TreeCardsComp.contextType = AnContext;

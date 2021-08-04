@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
 import { L } from '../../../lib/utils/langstr';
 	import { AnConst } from '../../../lib/utils/consts';
 	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
-	import { CrudComp } from '../../../lib/react/crud'
+	import { CrudCompW } from '../../../lib/react/crud'
 	import { AnContext, AnError } from '../../../lib/react/reactext'
 	import { AnTreegrid } from '../../../lib/react/widgets/treegrid.jsx'
 	import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
@@ -19,7 +20,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class OrgsComp extends CrudComp {
+class OrgsComp extends CrudCompW {
 	state = {
 	};
 
@@ -58,5 +59,5 @@ class OrgsComp extends CrudComp {
 }
 OrgsComp.contextType = AnContext;
 
-const Orgs = withStyles(styles)(OrgsComp);
+const Orgs = withWidth()(withStyles(styles)(OrgsComp));
 export { Orgs, OrgsComp }

@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
 import { L, Protocol, AnsonResp,
-	AnConst, AnContext, AnError, CrudComp,
+	AnConst, AnContext, AnError, CrudCompW,
 	AnTablist, AnQueryForm, AnTreegrid
 } from 'anclient';
 
@@ -16,7 +17,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class OrgsComp extends CrudComp {
+class OrgsComp extends CrudCompW {
 	state = {
 	};
 
@@ -55,5 +56,5 @@ class OrgsComp extends CrudComp {
 }
 OrgsComp.contextType = AnContext;
 
-const Orgs = withStyles(styles)(OrgsComp);
+const Orgs = withWidth()(withStyles(styles)(OrgsComp));
 export { Orgs, OrgsComp }

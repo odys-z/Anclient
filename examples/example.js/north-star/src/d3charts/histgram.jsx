@@ -59,11 +59,7 @@ class HistgramComp extends React.Component {
 			console.log('bins', bins);
 			y.domain([0, d3.max(bins, function(d) { return d.length; })]);
 
-			// let node = document.createElement('div');
-			// this.state.d3 = node;
-
 			let svg = d3
-				// .select(node)
 				.select('#node')
 				.append("svg")
 				  .attr("width", width + margin.left + margin.right)
