@@ -80,6 +80,7 @@ class NorthApp extends React.Component {
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
+			{path: '/n/indicators', comp: Indicators},
 
 			{path: '/n/dashboard', comp: Dashboard},
 			{path: '/n/my-students', comp: MyStudents},
