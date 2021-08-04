@@ -20,6 +20,7 @@
     # start web server
     docker pull odysz/anclient-examples
     docker run --name anclient -dp 80:80 odysz/anclient-examples</pre>
+	URL Sample: http://192.168.0.201/react-quiz/quizzes.html
     </li>
     <li><p>Troubleshootings</p>
     <p><b>Note: don't use --rm, currently we haven't yet mounted volume to persist sqlite DB.</b></p>
@@ -41,7 +42,7 @@
         &amp; <a href='https://material-ui.com'>Material UI</a>
     </li>
   </ul>
-  <script src="quiz-0.1.0.min.js"></script>
+  <script src="quiz-1.0.0.min.js"></script>
   <script>
 	let searchParams = new URLSearchParams(window.location.search)
 	let serv = searchParams ? searchParams.get('serv') : undefined;

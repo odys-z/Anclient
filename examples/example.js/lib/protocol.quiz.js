@@ -1,7 +1,8 @@
-import { AnsonResp } from '../../../js/lib/protocol.js';
+// import { AnsonResp } from '../../../js/lib/protocol.js';
+import { Protocol, AnsonResp } from 'anclient';
 
 export class QuizReq {
-	constructor () {}
+	constructor () { }
 
 	/** {@link Quiz} use a simple array for question array. This is error prone
 	 * to implement protocol. This method helps convert it to array of n-v pairs.
@@ -95,3 +96,7 @@ export class QuizResp extends AnsonResp {
 		else return [];
 	}
 }
+
+Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
+	return new QuizResp(jsonBd);
+});

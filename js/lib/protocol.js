@@ -120,8 +120,22 @@ class Protocol {
 
 	Protocol.valOptions = {};
 
+	/**Extend new ports
+	 * @function
+	 * @param {object} newPorts
+	 */
 	Protocol.extend = function(newPorts) {
 		Object.assign(Protocol.Port, newPorts);
+	};
+
+	Protocol.ansonTypes = {};
+	/**Extend new protocol - register new body type creater.
+	 * @function
+	 * @param {string} type body type
+	 * @param {function} bodyConstructor AnsonBody constructor
+	 */
+	Protocol.registerBody = function(type, bodyConstructor) {
+		Protocol.ansonTypes[type] = bodyConstructor;
 	}
 }
 
@@ -156,7 +170,7 @@ class AnsonMsg {
 		// initiating json to class
 		if (body.constructor.name === 'Object') {
 			if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
-			body = new AnsonResp(body);
+				body = new AnsonResp(body);
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
 				body = new AnSessionResp(body);
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
@@ -175,12 +189,17 @@ class AnsonMsg {
 			}
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
 				body = new AnDatasetResp(body);
+			else if (body.type in Protocol.ansonTypes)
+				// TODO FIXME what happens if the other known types are all handled like this?
+				body = Protocol.ansonTypes[body.type](body);
 			else {
 				// if (Protocol.verbose >= 5)
 				// 	console.warn("Using json object directly as body. Type : " + body.type);
 
 				// server can't handle body without type
-				throw new Error("Using json object directly as body. Type not handled : " + body.type);
+				throw new Error("Error: Using json object directly as body. To extend protocol, register a new Protocol like this:"
+					+ "\nProtocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => { return new QuizResp(jsonBd); });"
+					+ "\nType not handled : " + body.type );
 			}
 		}
 

@@ -272,8 +272,9 @@ class QuizlistComp extends React.Component {
 	 * @param {string} elem html element id
 	 * @param {string} serv serv id
 	 */
-	static bindQuizzes(elem, serv = 'host') {
-		// this.state.servId = serv;
+	static bindQuizzes(elem, serv) {
+		if (!serv) serv = 'host';
+
 		if (typeof elem === 'string') {
 			$.ajax({
 				dataType: "json",

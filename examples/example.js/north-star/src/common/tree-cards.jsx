@@ -84,4 +84,4 @@ class TreeCardsComp extends CrudComp {
 TreeCardsComp.contextType = AnContext;
 
 const TreeCards = withStyles(styles)(TreeCardsComp);
-export { TreeCards, TreeCardsComp  }
+export { TreeCards, TreeCardsComp }

@@ -10,9 +10,9 @@ import React from 'react';
 	import Box from '@material-ui/core/Box';
 
 import * as an from 'anclient'
-	import {AnContext} from '../../../lib/an-react';
-	import {ConfirmDialog} from '../../../lib/widgets/Messagebox'
-	import {L, Langstrs} from '../../../lib/utils/langstr'
+	// import {AnContext} from '../../../lib/an-react';
+	// import {ConfirmDialog} from '../../../lib/widgets/Messagebox'
+	// import {L, Langstrs} from '../../../lib/utils/langstr'
 
 // https://github.com/mui-org/material-ui/issues/15820
 const styles = (theme) => ({
@@ -60,7 +60,10 @@ class LoginComp extends React.Component {
 
 	configServ(ctx) {
 		let servId = ctx.servId;
-		this.inputRef.value = ctx.servs[servId];
+		let pth = ctx.servs[servId];
+		if (!pth)
+			console.error('Can not resolve jserv path. "servId" is invalid: ', servId);
+		this.inputRef.value = pth;
 		this.state.jserv = ctx.servs[servId];
 	}
 
@@ -150,14 +153,14 @@ class LoginComp extends React.Component {
 					color="primary"
 					onClick={this.onLogin} >Log in</Button>
 			</Collapse>
-			<ConfirmDialog ok='はい' title='Info' cancel={false}
+			<an.ConfirmDialog ok='はい' title='Info' cancel={false}
 					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
 					msg={this.state.alert} />
 		</div>);
     }
 }
 
-LoginComp.contextType = AnContext;
+LoginComp.contextType = an.AnContext;
 
 const Login = withStyles(styles)(LoginComp);
 export { Login, LoginComp };

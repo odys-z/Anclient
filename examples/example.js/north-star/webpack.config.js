@@ -12,7 +12,9 @@ module.exports = {
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
+
 	  path: path.resolve(__dirname, 'dist'),
+	  
 	  libraryTarget: 'umd'
 	},
 
@@ -24,7 +26,7 @@ module.exports = {
 
 	module: {
 		rules: [
-		{   test: /\.jsx$/,
+		{   test: /\.jsx?$/,
 			loader: 'babel-loader',
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
