@@ -16,9 +16,43 @@ const styles = (theme) => ( {
  * To popup modal dialog, see
  * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
  */
-class CrudComp extends React.Component {
 	state = {
+		isXs: false;
+		isSm: false;
+		isMd: false;
+		isLg: false;
+		isXl: false;
 	};
+
+	constructor(props) {
+		super(props);
+
+		let {width} = props;
+		if (width === 'lg') {
+			this.state.isLg = true;
+			this.state.isMd = true;
+			this.state.isSm = true;
+			this.state.isXs = true;
+		}
+		else if (width === 'xl') {
+			this.state.isXl = true;
+			this.state.isLg = true;
+			this.state.isMd = true;
+			this.state.isSm = true;
+			this.state.isXs = true;
+		}
+		else if (width === 'sm') {
+			this.state.isSm = true;
+			this.state.isXs = true;
+		}
+		else if (width === 'xs')
+			this.state.isXs = true;
+		else {
+			this.stae.isMd = true;
+			this.state.isSm = true;
+			this.state.isXs = true;
+		}
+	}
 
 	render() {
 		return (<>Base CrudComp Page</>);
@@ -26,9 +60,9 @@ class CrudComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 
-class CrudFormComp extends React.Component {
-}
-CrudComp.contextType = AnContext;
+CrudComp.propTypes = {
+	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
+};
 
 class HomeComp extends CrudComp {
 	render() {
