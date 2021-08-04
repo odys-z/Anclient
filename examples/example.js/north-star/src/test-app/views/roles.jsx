@@ -1,5 +1,6 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 
@@ -39,7 +40,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class RolesComp extends CrudComp {
+class RolesComp extends CrudCompW {
 
 	state = {
 		condName: { type: 'text', val: '', label: L('Role Name')},
@@ -255,5 +256,5 @@ class RolesComp extends CrudComp {
 }
 RolesComp.contextType = AnContext;
 
-const Roles = withStyles(styles)(RolesComp);
+const Roles = withWidth()(withStyles(styles)(RolesComp));
 export { Roles, RolesComp }

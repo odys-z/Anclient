@@ -1,5 +1,6 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 
@@ -20,7 +21,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class UsersComp extends CrudComp {
+class UsersComp extends CrudCompW {
 	state = {
 		condName: {type: 'text', val: '', text: 'No', label: 'User Name'},
 		condRole: {type: 'cbb', val: AnConst.cbbAllItem,
@@ -126,5 +127,5 @@ class UsersComp extends CrudComp {
 }
 UsersComp.contextType = AnContext;
 
-const Users = withStyles(styles)(UsersComp);
+const Users = withWidth()(withStyles(styles)(UsersComp));
 export { Users, UsersComp }
