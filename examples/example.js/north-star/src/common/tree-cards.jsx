@@ -42,8 +42,38 @@ const styles = (theme) => ({
   }
 });
 
-class Indicard extends CrudComp {
+class TreeCard extends CrudComp {
+	state = {
+		node: {}
+	}
 
+	newCard = undefined;
+
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		<Grid container
+		  key={menu.funcId}
+		  spacing={0}
+		  className={classes.row}
+		>
+		  <Grid item xs={4} className={classes.rowHead}>
+			  <Typography noWrap>
+				{leadingIcons(menu.levelIcons)}
+				{icon(menu.css.icon)}
+				{menu.funcName}
+			  </Typography>
+		  </Grid>
+		  <Grid item xs={4} className={classes.treeItem}>
+			<Typography noWrap align={align(menu.css.level)}>{menu.level}</Typography>
+		  </Grid>
+		  <Grid item xs={4} className={classes.treeItem}>
+			<Typography align={align(menu.css.url)}>{menu.url}</Typography>
+		  </Grid>
+		</Grid>
+	}
 }
 
 class TreeCardsComp extends CrudComp {
@@ -184,7 +214,7 @@ class TreeCardsComp extends CrudComp {
 							{L('Append Child')}
 						</Button>
 						<Button onClick={this.toAddChild} color="primary" >
-							{L('Append Child')}
+							{L('Delete All')}
 						</Button>
 					}
 				  </Grid>
@@ -198,7 +228,7 @@ class TreeCardsComp extends CrudComp {
 		}
 		else
 		  return (
-			<Indicator key={menu.funcId} ind={menu}/>
+			<TreeCard key={menu.funcId} ind={menu} upDown={this.toUpdown} />
 			/*
 			<Grid container
 			  key={menu.funcId}
