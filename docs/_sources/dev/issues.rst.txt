@@ -224,3 +224,5 @@ In histgram.jsx:
     import "core-js/stable";
     import "regenerator-runtime/runtime";
 ..
+
+This 2 steps should solve the problem.
