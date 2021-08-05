@@ -170,6 +170,8 @@ class TreeCardDetailsComp extends CrudCompW {
 	}
 
 	getField(f, rec) {
+		let small = super.media.isSm;
+
 		if (f.type === 'enum' || f.type === 'cbb') {
 			let that = this;
 			return (<DatasetCombo options={[
@@ -183,7 +185,6 @@ class TreeCardDetailsComp extends CrudCompW {
 			/>);
 		}
 		else return (
-			let small = super.media.isSm;
 			<TextField id={f.field} key={f.field}
 				type={f.type}
 				label={small ? L(f.label) : undefined}
