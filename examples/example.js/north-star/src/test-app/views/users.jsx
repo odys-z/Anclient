@@ -41,7 +41,11 @@ class UsersComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
+		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
+
+		this.toAdd = this.toAdd.bind(this);
+		this.toEdit = this.toEdit.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
 	}
 
@@ -58,7 +62,6 @@ class UsersComp extends CrudCompW {
 
 		this.context.anReact.bindTablist(qr, this, this.context.error);
 	}
-
 
 	onTableSelect(rowIds) {
 		this.setState( {
@@ -77,14 +80,19 @@ class UsersComp extends CrudCompW {
 	toAdd(e, v) {
 		this.roleForm = (<UserDetails c
 			onOk={(r) => console.log(r)}
-			onClose={this.closeRoleForm} />);
+			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
 		this.roleForm = (<UserDetails u
 			roleId={this.state.selectedRoleIds[0]}
 			onOk={(r) => console.log(r)}
-			onClose={this.closeRoleForm} />);
+			onClose={this.closeDetails} />);
+	}
+
+	closeDetails() {
+		this.roleForm = undefined;
+		this.setState({});
 	}
 
 	render() {
@@ -122,6 +130,7 @@ class UsersComp extends CrudCompW {
 				pageInf={ this.state.pageInf }
 				onSelectChange={this.onTableSelect}
 			/>
+			{this.roleForm}
 		</div>);
 	}
 }

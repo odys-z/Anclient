@@ -13,19 +13,84 @@ import Typography from "@material-ui/core/Typography";
 import { toBool } from '../../utils/helpers';
 
 export const AnTreeIcons = {
-  expand: <ExpandMore style={{verticalAlign: 'middle'}} />,
-  collapse: <ExpandLess style={{verticalAlign: 'middle'}} />,
-  "menu-lv0": <Send color="primary" style={{verticalAlign: 'middle'}} />,
-  "menu-lv1": <Drafts color="primary" style={{verticalAlign: 'middle'}} />,
-  "menu-leaf": <Sms color="primary" style={{verticalAlign: 'middle'}} />,
-  ".": <NIcon />,
-  deflt: <Inbox color="primary" style={{verticalAlign: 'middle'}} />
+	expand: <ExpandMore style={{verticalAlign: 'middle'}} />,
+	collapse: <ExpandLess style={{verticalAlign: 'middle'}} />,
+	"menu-lv0": <Send color="primary" style={{verticalAlign: 'middle'}} />,
+	"menu-lv1": <Drafts color="primary" style={{verticalAlign: 'middle'}} />,
+	"menu-leaf": <Sms color="primary" style={{verticalAlign: 'middle'}} />,
+	deflt: <Inbox color="primary" style={{verticalAlign: 'middle'}} />,
+
+	"-": <_Icon color="primary" style={{verticalAlign: 'middle'}} />,
+	"F": <FIcon color="primary" style={{verticalAlign: 'middle'}} />,
+	"|": <IIcon color="primary" style={{verticalAlign: 'middle'}} />,
+	"T": <TIcon color="primary" style={{verticalAlign: 'middle'}} />,
+	"L": <LIcon color="primary" style={{verticalAlign: 'middle'}} />,
+	"|-": <EIcon color="primary" style={{verticalAlign: 'middle'}} />,
+	"E": <EIcon color="primary" style={{verticalAlign: 'middle'}} />,
+	"+": <XIcon color="primary" style={{verticalAlign: 'middle'}} />,
+	".": <NIcon color="primary" style={{verticalAlign: 'middle'}} />,
 };
 
 function NIcon(props) {
   return (
 	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
 	  <path d="" />
+	</SvgIcon>
+  );
+}
+
+function FIcon(props) {
+  return (
+	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	  <path d="M11.5 24 h1 v-11.5 h 11.5 v-1 h-12.5z M8 8 h8 v8 h-8z"/>
+	</SvgIcon>
+  );
+}
+
+function LIcon(props) {
+  return (
+	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	  <path d="M24 12.5 v-1 h-11.5 v-11.5 h-1 v12.5z"/>
+	</SvgIcon>
+  );
+}
+
+function _Icon(props) {
+  return (
+	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	  <path d="M 24 12.5 v-1 h-24 v1 h24z"/>
+	</SvgIcon>
+  );
+}
+
+function TIcon(props) {
+  return (
+	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	  <path d="M11.5 24 h1 v-11.5 h11.5 v-1 h-24 v1 h11.5z" />
+	</SvgIcon>
+  );
+}
+
+function IIcon(props) {
+  return (
+	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	  <path d="M11.5 24 h1 v-24 h-1 v24z" />
+	</SvgIcon>
+  );
+}
+
+function XIcon(props) {
+  return (
+	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	  <path d="M 19 3 H 5 c -1.11 0 -2 0.9 -2 2 v 14 c 0 1.1 0.89 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 5 c 0 -1.1 -0.9 -2 -2 -2 Z m -2 10 h -4 v 4 h -2 v -4 H 7 v -2 h 4 V 7 h 2 v 4 h 4 v 2 Z" />
+	</SvgIcon>
+  );
+}
+
+function EIcon(props) {
+  return (
+	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	  <path d="M11.5 24 h1 v-11.5 h11.5 v-1 h-11.5 v-11.5 h-1z" />
 	</SvgIcon>
   );
 }
@@ -69,73 +134,7 @@ const styles = (theme) => ({
 
 class AnTreeComp extends React.Component {
   state = {
-	// window: undefined,
-	// stree: {
-	//   nodeId: "sys",
-	//   text: "Anclient Lv-0",
-	//   level: 0,
-	//   levelIcons: ["+"],
-	//   expandIcon: "F",
-	//   url: "/",
-	//   css: { icon: "menu-lv0" },
-	//   flags: "0",
-	//   fullpath: "sys",
-	//   parentId: undefined,
-	//   sibling: 0,
-	//   children: [
-	// 	{
-	// 	  nodeId: "domain",
-	// 	  text: "Domain 1.1",
-	// 	  level: 1,
-	// 	  levelIcons: ["|-", "-"],
-	// 	  url: "/sys/domain",
-	// 	  css: { icon: "menu-lv1", url: { align: "left" } },
-	// 	  flags: "0",
-	// 	  fullpath: "sys.0 domain",
-	// 	  parentId: "sys",
-	// 	  sibling: 0
-	// 	},
-	// 	{
-	// 	  nodeId: "roles",
-	// 	  text: "Sysem 1.2",
-	// 	  level: 1,
-	// 	  levelIcons: ["L", "+"],
-	// 	  url: "/sys/roles",
-	// 	  css: { icon: "menu-leaf", url: { align: "left" } },
-	// 	  flags: "0",
-	// 	  fullpath: "sys.1 roles",
-	// 	  parentId: "sys",
-	// 	  sibling: 0,
-	//
-	// 	  children: [
-	// 		{
-	// 		  nodeId: "domain",
-	// 		  text: "Domain 2.1",
-	// 		  level: 2,
-	// 		  levelIcons: [".", "|-", "-"],
-	// 		  url: "/sys/domain",
-	// 		  css: { icon: "menu-lv1", url: { align: "left" } },
-	// 		  flags: "0",
-	// 		  fullpath: "sys.0 domain",
-	// 		  parentId: "sys",
-	// 		  sibling: 0
-	// 		},
-	// 		{
-	// 		  nodeId: "roles",
-	// 		  text: "Sysem 2.2",
-	// 		  level: 2,
-	// 		  levelIcons: [".", "L", "-"],
-	// 		  url: "/sys/roles",
-	// 		  css: { icon: "menu-leaf", url: { align: "left" } },
-	// 		  flags: "0",
-	// 		  fullpath: "sys.1 roles",
-	// 		  parentId: "sys",
-	// 		  sibling: 0
-	// 		}
-	// 	  ]
-	// 	}
-	//   ]
-	// },
+	// [{id, node, level}], where node is {checked text, css, children}
 	forest: [],
 
 	expandings: new Set()

@@ -192,3 +192,37 @@ In NorthApp, react & react-dom are installed locally. Then Anclient can be impor
         Sys, SysComp, Domain, Roles, Orgs, Users
     } from 'anclient';
 ..
+
+ReferenceError: regeneratorRuntime is not defined
+-------------------------------------------------
+
+About the error
+_______________
+
+When handling D3 with Babel 8.2.2 or later, the async functions requiring
+`regenerator runtime <https://babeljs.io/docs/en/babel-plugin-transform-regenerator>`_.
+
+There are similar reports like `here <https://stackoverflow.com/questions/53558916/babel-7-referenceerror-regeneratorruntime-is-not-defined>`_.
+
+Solution
+________
+
+Follow `the answer <https://stackoverflow.com/a/54490329>`_.
+
+install core-js & regenerator-runtime
+
+.. code-block:: bash
+
+    npm install --save core-js
+    npm install --save regenerator-runtime
+..
+
+In histgram.jsx:
+
+.. code-block:: javascript
+
+    import "core-js/stable";
+    import "regenerator-runtime/runtime";
+..
+
+This 2 steps should solve the problem.
