@@ -188,7 +188,6 @@ class TreeCardDetailsComp extends CrudCompW {
 			<TextField id={f.field} key={f.field}
 				type={f.type}
 				label={small ? L(f.label) : undefined}
-				disabled={!c}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={rec[f.field] === undefined ? '' : rec[f.field]}
