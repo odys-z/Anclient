@@ -183,6 +183,7 @@ class TreeCardDetailsComp extends CrudCompW {
 			/>);
 		}
 		else return (
+			let small = super.media.isSm;
 			<TextField id={f.field} key={f.field}
 				type={f.type}
 				label={small ? L(f.label) : undefined}
