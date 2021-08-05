@@ -22,6 +22,7 @@ import { L, toBool,
 } from 'anclient'
 
 import { StarIcons } from '../styles';
+import { DatasetCombo } from './dataset-combo';
 
 const styles = (theme) => ({
   root: {
