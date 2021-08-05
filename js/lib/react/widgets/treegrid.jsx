@@ -121,14 +121,7 @@ class AnTreegridComp extends React.Component {
 
 	this.toExpandItem = this.toExpandItem.bind(this);
 	this.treeNodes = this.treeNodes.bind(this);
-
-	// this.toLogout = this.toLogout.bind(this);
   }
-
-  // toLogout() {
-	// // Notify children?
-	// this.setState({ showLogout: true });
-  // }
 
   toExpandItem(e) {
 	e.stopPropagation();

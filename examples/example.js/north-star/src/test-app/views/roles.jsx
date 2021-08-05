@@ -61,6 +61,7 @@ class RolesComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
+		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 		this.onPageInf = this.onPageInf.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
@@ -68,7 +69,6 @@ class RolesComp extends CrudCompW {
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
 		this.toDel = this.toDel.bind(this);
-		this.closeRoleForm = this.closeRoleForm.bind(this);
 	}
 
 	componentDidMount() {
@@ -145,17 +145,17 @@ class RolesComp extends CrudCompW {
 	toAdd(e, v) {
 		this.roleForm = (<RoleDetails c
 			onOk={(r) => console.log(r)}
-			onClose={this.closeRoleForm} />);
+			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
 		this.roleForm = (<RoleDetails u
 			roleId={this.state.selectedRoleIds[0]}
 			onOk={(r) => console.log(r)}
-			onClose={this.closeRoleForm} />);
+			onClose={this.closeDetails} />);
 	}
 
-	closeRoleForm() {
+	closeDetails() {
 		this.roleForm = undefined;
 		this.setState({});
 	}

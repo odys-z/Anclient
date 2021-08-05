@@ -43,7 +43,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class RolesComp extends CrudCompw {
+class RolesComp extends CrudCompW {
 
 	state = {
 		condName: { type: 'text', val: '', label: L('Role Name')},
@@ -64,6 +64,7 @@ class RolesComp extends CrudCompw {
 	constructor(props) {
 		super(props);
 
+		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 		this.onPageInf = this.onPageInf.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
@@ -71,7 +72,6 @@ class RolesComp extends CrudCompw {
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
 		this.toDel = this.toDel.bind(this);
-		this.closeRoleForm = this.closeRoleForm.bind(this);
 	}
 
 	componentDidMount() {
@@ -148,17 +148,17 @@ class RolesComp extends CrudCompw {
 	toAdd(e, v) {
 		this.roleForm = (<RoleDetails c
 			onOk={(r) => console.log(r)}
-			onClose={this.closeRoleForm} />);
+			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
 		this.roleForm = (<RoleDetails u
 			roleId={this.state.selectedRoleIds[0]}
 			onOk={(r) => console.log(r)}
-			onClose={this.closeRoleForm} />);
+			onClose={this.closeDetails} />);
 	}
 
-	closeRoleForm() {
+	closeDetails() {
 		this.roleForm = undefined;
 		this.setState({});
 	}

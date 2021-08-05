@@ -1,4 +1,6 @@
-// import { AnsonResp } from '../../../js/lib/protocol.js';
+/** DON'T DELETE ! Use this line to test
+import { Protocol, AnsonResp } from '../../../js/lib/protocol.js';
+*/
 import { Protocol, AnsonResp } from 'anclient';
 
 export class QuizReq {

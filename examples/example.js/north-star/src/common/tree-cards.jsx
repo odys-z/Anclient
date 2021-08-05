@@ -1,12 +1,14 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import { Card, TextField, Button, Typography } from '@material-ui/core';
+import withWidth from "@material-ui/core/withWidth";
+import { Grid, Card, Collapse, TextField, Button, Typography } from '@material-ui/core';
 
-import { L, AnConst Protocol, AnsonResp,
-	CrudComp, AnContext, AnError, AnQueryForm
+import { L, AnConst, Protocol, AnsonResp,
+	CrudComp, AnContext, AnError, AnQueryForm, AnTreeIcons
 } from 'anclient'
 
+import { TreeCardDetails } from './treecard-details';
 
 const styles = (theme) => ({
   root: {
@@ -39,45 +41,73 @@ const styles = (theme) => ({
   }
 });
 
-class TreeCard extends CrudComp {
+class TreeCardComp extends CrudComp {
 	state = {
-		node: {}
+		node: {},
 	}
 
 	newCard = undefined;
 
 	constructor(props) {
 		super(props);
+
+		this.state.node = props.node;
+
+		// this.toAddChild = this.toAddChild.bind(this);
 	}
 
 	render() {
+		let n = this.state.node;
+		let { classes, width } = this.props;
+		return (
 		<Grid container
-		  key={menu.funcId}
+		  key={n.id}
 		  spacing={0}
 		  className={classes.row}
 		>
 		  <Grid item xs={4} className={classes.rowHead}>
 			  <Typography noWrap>
-				{leadingIcons(menu.levelIcons)}
-				{icon(menu.css.icon)}
-				{menu.funcName}
+				{leadingIcons(n.levelIcons)}
+				{icon(n.css.icon)}
+				{n.funcName}
 			  </Typography>
 		  </Grid>
 		  <Grid item xs={4} className={classes.treeItem}>
-			<Typography noWrap align={align(menu.css.level)}>{menu.level}</Typography>
+			<Typography noWrap align={align(n.css.level)}>{n.level}</Typography>
 		  </Grid>
 		  <Grid item xs={4} className={classes.treeItem}>
-			<Typography align={align(menu.css.url)}>{menu.url}</Typography>
+			<Typography align={align(n.css.url)}>{n.url}</Typography>
 		  </Grid>
-		</Grid>
+		</Grid>);
+
+		function icon(icon) {
+		  return AnTreeIcons[icon || "deflt"];
+		}
+
+		function align(css = {}) {
+		  return css.align ? css.align : 'center';
+		}
+
+		function leadingIcons(icons, expand, expIcon) {
+		  return icons.map((v, x) => {
+			return x === icons.length && v === '+' && expand
+				? expIcon ? <React.Fragment key={x}>{icon(expIcon)}</React.Fragment>
+						  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
+				: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
+		  });
+		}
 	}
 }
+TreeCardComp.contextType = AnContext;
+
+const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
+export { TreeCard, TreeCardComp }
 
 class TreeCardsComp extends CrudComp {
   state = {
 	window: undefined,
 	treeData: {
-	  funcId: "sys",
+	  id: "sys",
 	  funcName: "Anclient Lv-0",
 	  level: 0,
 	  levelIcons: ['+'],
@@ -90,7 +120,7 @@ class TreeCardsComp extends CrudComp {
 	  sibling: 0,
 	  children: [
 		{
-		  funcId: "domain",
+		  id: "domain",
 		  funcName: "Domain 1.1",
 		  level: 1,
 		  levelIcons: ['|-', '-'],
@@ -102,7 +132,7 @@ class TreeCardsComp extends CrudComp {
 		  sibling: 0
 		},
 		{
-		  funcId: "roles",
+		  id: "roles",
 		  funcName: "Sysem 1.2",
 		  level: 1,
 		  levelIcons: ['L', '+'],
@@ -115,7 +145,7 @@ class TreeCardsComp extends CrudComp {
 
 		  children: [
 			{
-			  funcId: "domain",
+			  id: "domain",
 			  funcName: "Domain 2.1",
 			  level: 2,
 			  levelIcons: ['.', '|-', '-'],
@@ -127,7 +157,7 @@ class TreeCardsComp extends CrudComp {
 			  sibling: 0
 			},
 			{
-			  funcId: "roles",
+			  id: "roles",
 			  funcName: "Sysem 2.2",
 			  level: 2,
 			  levelIcons: ['.', 'L', '-'],
@@ -150,21 +180,49 @@ class TreeCardsComp extends CrudComp {
 	super(props);
 	this.state.window = props.window;
 
+	this.closeDetails = this.closeDetails.bind(this);
+
 	this.toExpandItem = this.toExpandItem.bind(this);
 	this.treeNodes = this.treeNodes.bind(this);
-
-	this.toLogout = this.toLogout.bind(this);
+	this.toAddChild = this.toAddChild.bind(this);
+	this.toUpdown = this.toUpdown.bind(this);
+	this.toDelCard = this.toDelCard.bind(this);
   }
 
   toExpandItem(e) {
 	e.stopPropagation();
-	let f = e.currentTarget.getAttribute("iid");
+	let f = e.currentTarget.getAttribute("nid");
 
 	let expandings = this.state.expandings;
 	if (expandings.has(f)) expandings.delete(f);
 	else expandings.add(f);
 	this.setState({ expandings });
   }
+
+
+  toAddChild (e) {
+	e.stopPropagation();
+	let p = e.currentTarget.getAttribute("pid");
+
+	this.addForm = (
+		<TreeCardDetails
+			c mtabl='ind_emotion' pk={p}
+			onClose={this.closeDetails}
+		/> );
+	this.setState({});
+  }
+
+  toUpdown(e) {
+  }
+
+  toDelCard(e) {
+  }
+
+  closeDetails() {
+	this.addForm = undefined;
+	this.setState({});
+  }
+
 
   /**
    * @param {object} classes
@@ -177,59 +235,61 @@ class TreeCardsComp extends CrudComp {
 	let mtree = buildTreegrid( m, classes );
 	return mtree;
 
-	function buildTreegrid(menu) {
-	  if (Array.isArray(menu)) {
-		return menu.map((i, x) => {
+	function buildTreegrid(tnode) {
+	  if (Array.isArray(tnode)) {
+		return tnode.map((i, x) => {
 		  return buildTreegrid(i);
 		});
 	  } else {
-		let open = that.state.expandings.has(menu.funcId);
-		if (menu.children && menu.children.length > 0) {
+		let open = that.state.expandings.has(tnode.id);
+		if (tnode.children && tnode.children.length > 0) {
 		  let editable = true;  // TODO data record privilege
 		  return (
-			<div key={menu.funcId} className={classes.folder}>
+			<div key={tnode.id} className={classes.folder}>
 			  <div
 				onClick={expandItem}
-				iid={menu.funcId}
+				nid={tnode.id}
 				className={classes.folderHead}
 			  >
 				<Grid container spacing={0}>
 				  <Grid item xs={8} >
 					<Typography noWrap>
-					  {leadingIcons(menu.levelIcons, open, menu.expandIcon)}
-					  {icon(menu.css.icon)}
-					  {menu.funcName}
+					  {leadingIcons(tnode.levelIcons, open, tnode.expandIcon)}
+					  {icon(tnode.css.icon)}
+					  {tnode.funcName}
 					</Typography>
 				  </Grid>
 				  <Grid item xs={2} >
-					<Typography>{formatFolderDesc(menu)}</Typography>
+					<Typography>{formatFolderDesc(tnode)}</Typography>
 				  </Grid>
 				  <Grid item xs={2}>
 					{open ? icon("expand") : icon("collapse")}
 					{editable &&
-						<Button onClick={this.toAddChild} color="primary" >
+						<Button onClick={that.toAddChild} pid={tnode.id} color="primary" >
 							{L('Delete All')}
 						</Button>
 					}
 				  </Grid>
 				</Grid>
 			  </div>
-			  <Collapse in={open} timeout="auto" unmountOnExit>
-				{buildTreegrid(menu.children)}
-				{editable &&
-					<Button onClick={this.toAddChild} color="primary" >
-						{L('Append Child')}
-					</Button>
-				}
-			  </Collapse>
+			  {open &&
+				<Collapse in={open} timeout="auto" unmountOnExit>
+					{buildTreegrid(tnode.children)}
+					{editable &&
+						<Button onClick={that.toAddChild} color="primary" >
+							{L('Append Child')}
+						</Button>
+					}
+				</Collapse>
+			  }
 			</div>
 		  );
 		}
 		else
 		  return (
-			<TreeCard key={menu.funcId} card={menu} delete={this.toDelCard} upDown={this.toUpdown} />
+			<TreeCard key={tnode.id} node={tnode} delete={that.toDelCard} upDown={that.toUpdown} />
 			/*
-			<Grid container key={menu.funcId} spacing={0} className={classes.row} >
+			<Grid container key={menu.id} spacing={0} className={classes.row} >
 			  <Grid item xs={4} className={classes.rowHead}>
 				  <Typography noWrap>
 					{leadingIcons(menu.levelIcons)} {icon(menu.css.icon)} {menu.funcName}
@@ -255,13 +315,13 @@ class TreeCardsComp extends CrudComp {
 	  return css.align ? css.align : 'center';
 	}
 
-	function formatFolderDesc(menu) {
-		return L('children: {count}', {count: menu.children ? menu.children.length : 0});
+	function formatFolderDesc(tnode) {
+		return L('children: {count}', {count: tnode.children ? tnode.children.length : 0});
 	}
 
 	function leadingIcons(icons, expand, expIcon) {
 	  return icons.map((v, x) => {
-		return x === icons.length - 1 && v === '+' && expand
+		return x === icons.length && v === '+' && expand
 			? expIcon ? <React.Fragment key={x}>{icon(expIcon)}</React.Fragment>
 					  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
 			: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
@@ -275,11 +335,12 @@ class TreeCardsComp extends CrudComp {
 	return (
 		<div className={classes.root}>
 			{this.treeNodes(classes)}
+			{this.addForm}
 			{this.context.isSm && <Button >{L('Save')}</Button>}
 		</div>);
   }
 }
 TreeCardsComp.contextType = AnContext;
 
-const TreeCards = withStyles(styles)(TreeCardsComp);
+const TreeCards = withWidth()(withStyles(styles)(TreeCardsComp));
 export { TreeCards, TreeCardsComp }

@@ -98,8 +98,8 @@ class UserDetailsComp extends React.Component {
 
 	componentDidMount() {
 		let that = this;
-		let sk = 'trees.user_funcs';
-		let t = stree_t.sqltree; // loading dataset reshaped to tree
+		// let sk = 'trees.user_funcs';
+		// let t = stree_t.sqltree; // loading dataset reshaped to tree
 
 		if (this.state.crud !== Protocol.CRUD.c) {
 			// load
@@ -110,19 +110,20 @@ class UserDetailsComp extends React.Component {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 						that.state.record = rows[0];
 
-						let ds = {sk, t, sqlArgs: [this.state.pk]};
+						// let ds = {sk, t, sqlArgs: [this.state.pk]};
 
-						that.context.anReact.stree(ds, that.context.error, that);
+						// that.context.anReact.stree(ds, that.context.error, that);
+						console.error('Let\'s bind role id here');
 					}
 				},
 				this.context.error);
 		}
-		else {
-			// new, bind tree
-			let ds = {sk, t, sqlArgs: []};
-
-			this.context.anReact.stree(ds, this.context.error, this);
-		}
+		// else {
+		// 	// new, bind tree
+		// 	let ds = {sk, t, sqlArgs: []};
+		//
+		// 	this.context.anReact.stree(ds, this.context.error, this);
+		// }
 	}
 
 	validate() {
