@@ -14,6 +14,7 @@ import Card from '@material-ui/core/Card';
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
+import Input from '@material-ui/core/Input';
 
 import { L, toBool,
 	AnConst, Protocol, AnsonResp,
@@ -63,16 +64,19 @@ class TreeCardDetailsComp extends CrudCompW {
 
 		mtabl: '',
 		// indId, indName, parent, sort, fullpath, css, weight, qtype, remarks, extra
+		// type: Material UI: Type of the input element. It should be a valid HTML5 input type. (extended with enum, select)
+		// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
 		fields: [
-			{type: 'text', validator: {len: 12},  field: 'parentId', label: 'Indicator Id', hide: 1},
-			{type: 'text', validator: {len: 200}, field: 'indName', label: 'User Name'},
-			{type: 'int',  validator: {min: 0},   field: 'sort', label: 'UI Sort'},
-			{type: 'float',validator: {min: 0.0}, field: 'weight', label: 'Default Weight'},
-			{type: 'enum', validator: {values: ['sing', 'mult', 'txt']}, field: 'qtype', label: 'Default Weight'},
-			{type: 'text', validator: {len: 500}, field: 'remarks', label: 'Remarks'}
+			{type: 'text', validator: {len: 12},  field: 'parentId', label: L('Indicator Id'), hide: 1},
+			{type: 'text', validator: {len: 200}, field: 'indName', label: L('Indicator')},
+			{type: 'float',validator: {min: 0.0}, field: 'weight', label: L('Default Weight')},
+			{type: 'enum', validator: undefined, values: [{n: 'single', v: 's'}, {n: 'multiple', v: 'm'}, {n: 'text', v: 't'}],
+			                                      field: 'qtype', label: L('Question Type')},
+			{type: 'number',validator:{min: 0},   field: 'sort', label: L('UI Sort')},
+			{type: 'text', validator: {len: 500}, field: 'remarks', label: L('Remarks')}
 		],
 		// hide pk means also not editable by user
-		pk: {type: 'text', validator: {len: 12},  field: 'indId', label: 'Indicator Id', hide: 1},
+		pk: {type: 'text', validator: {len: 12},  field: 'indId', label: L('Indicator Id'), hide: 1},
 		record: {},
 	};
 
@@ -88,6 +92,7 @@ class TreeCardDetailsComp extends CrudCompW {
 		this.state.parentId = props.pid;
 
 		this.formFields = this.formFields.bind(this);
+		this.getField = this.getField.bind(this);
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
@@ -164,13 +169,42 @@ class TreeCardDetailsComp extends CrudCompW {
 		that.setState({dirty: false});
 	}
 
+	getField(f, rec) {
+		if (f.type === 'enum' || f.type === 'cbb') {
+			let that = this;
+			return (<DatasetCombo options={[
+				{n: L('Single Opt'), v: 's'},
+				{n: L('Multiple'), v: 'm'},
+				{n: L('Text'), v: 't'} ]}
+				label={f.label}
+				onSelect={ (v) => {
+					rec[f.field] = v;
+					that.setState({dirty: true})}}
+			/>);
+		}
+		else return (
+			<TextField id={f.field} key={f.field}
+				type={f.type}
+				label={small ? L(f.label) : undefined}
+				disabled={!c}
+				variant='outlined' color='primary' fullWidth
+				placeholder={L(f.label)} margin='dense'
+				value={rec[f.field] === undefined ? '' : rec[f.field]}
+				inputProps={f.style ? { style: f.style } : undefined}
+				onChange={(e) => {
+					rec[f.field] = e.target.value;
+					this.setState({ dirty : true });
+				}}
+			/>);
+	}
+
 	formFields(rec, classes) {
 		let fs = [];
 		let c = this.state.crud === Protocol.CRUD.c;
 		const small = toBool(super.media.isMd);
 
 		this.state.fields.forEach( (f, i) => {
-		  if (!toBool(f.hide))
+		  if (!f.hide) {
 			fs.push(
 				<Grid item key={`${f.field}.${f.label}`} sm={6} className={classes.labelText}>
 				  <Box className={classes.rowBox}>
@@ -179,21 +213,10 @@ class TreeCardDetailsComp extends CrudCompW {
 						{L(f.label)}
 					  </Typography>
 					)}
-					<TextField id={f.field}
-						label={small ? L(f.label) : undefined}
-						disabled={!c}
-						variant='outlined' color='primary' fullWidth
-						placeholder={L(f.label)} margin='dense'
-						value={rec[f.field] === undefined ? '' : rec[f.field]}
-						inputProps={f.style ? { style: f.style } : undefined}
-						onChange={(e) => {
-							rec[f.field] = e.target.value;
-							this.setState({ dirty : true });
-						}}
-					/>
+					{this.getField(f, rec)}
 				  </Box>
-				</Grid>);
-		} );
+				</Grid> );
+		} } );
 		return fs;
 	}
 

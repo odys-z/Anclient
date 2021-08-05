@@ -5,6 +5,15 @@ import { L, Langstrs } from '../../lib/utils/langstr';
 import { toBool } from '../../lib/utils/helpers';
 
 describe('case: [00.1 string value]', () => {
+    it('Array', () => {
+		let arr = [1, 2, 3];
+		arr.swap(0, 1);
+		assert.equal(arr.length, 3);
+		assert.equal(arr[0], 2);
+		assert.equal(arr[1], 1);
+		assert.equal(arr[2], 3);
+	});
+
     it('toBool', () => {
 		assert.isTrue(toBool('1'), '1');
 		assert.isTrue(toBool('2'), '2');
