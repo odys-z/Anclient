@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.44",
+  "version": "0.9.45",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main": "./lib/an-components.js",
   "directories": {
