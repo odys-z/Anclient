@@ -265,6 +265,7 @@ class TreeCardsComp extends CrudComp {
 		<TreeCardDetails
 			c mtabl='ind_emotion' pk={p}
 			onClose={this.closeDetails}
+			onOk={this.closeDetails}
 		/> );
 	this.setState({});
   }

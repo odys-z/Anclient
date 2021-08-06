@@ -65,14 +65,19 @@ class DatasetCombo extends CrudComp {
 		let _cmb = this.state.combo;
 		_cmb.ref = _ref;
 		return (e, item) => {
-			if (e) e.stopPropagation()
+			if (e) e.stopPropagation();
 			// let cbb = _ref.current.getAttribute('name');
 			// cbb = parseInt(cbb);
 			// _cmb[cbb].val = item ? item : AnQueryFormComp.allItem;
 			// _that.setState({combo: _that.state.cmb});
+
+			console.log('onCbbRefChange()', _cmb);
 			_cmb.val = item ? item : AnConst.cbbAllItem;
 
 			_that.setState({combo: _cmb});
+
+			if (typeof _that.props.onSelect === 'function')
+				_that.props.onSelect(_cmb.val);
 		};
 	}
 
@@ -80,12 +85,13 @@ class DatasetCombo extends CrudComp {
 		let cmb = this.state.combo
 		let refcbb = React.createRef();
 		let v = cmb && cmb.val ? cmb.val : AnConst.cbbAllItem;
+		console.log('render()', cmb);
 		return (<Autocomplete
 			// key={sk + this.state.uid}
 			// id={String(x)} name={String(x)}
 			ref={refcbb}
 			onChange={ this.onCbbRefChange(refcbb) }
-			onInputChange={ this.onCbbRefChange(refcbb) }
+			// onInputChange={ this.onCbbRefChange(refcbb) }
 
 			options={cmb.options}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
