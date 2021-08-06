@@ -62,7 +62,7 @@ export class DatasetCombo extends CrudComp {
 			if (e) e.stopPropagation()
 			let cbb = _ref.current.getAttribute('name');
 			cbb = parseInt(cbb);
-			_cmb[cbb].val = item ? item : AnQueryFormComp.allItem;
+			_cmb[cbb].val = item ? item : AnConts.cbbAllItem;
 
 			_that.setState({combo: _that.state.cmb});
 		};
@@ -71,7 +71,7 @@ export class DatasetCombo extends CrudComp {
 	render() {
 		let cmb = this.state.combo
 		let refcbb = React.createRef();
-		let v = cmb && cmb.val ? cmb.val : AnQueryFormComp.cbbAllItem;
+		let v = cmb && cmb.val ? cmb.val : AnConts.cbbAllItem;
 		return (<Autocomplete
 			// key={sk + this.state.uid}
 			// id={String(x)} name={String(x)}

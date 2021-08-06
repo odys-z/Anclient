@@ -127,7 +127,7 @@ class AnQueryFormComp extends CrudComp {
 			if (e) e.stopPropagation()
 			let cbb = _ref.current.getAttribute('name');
 			cbb = parseInt(cbb);
-			_conds[cbb].val = item ? item : AnQueryFormComp.allItem;
+			_conds[cbb].val = item ? item : AnConts.cbbAllItem;
 
 			_that.setState({conds: _that.state.conds});
 		};
@@ -188,7 +188,7 @@ class AnQueryFormComp extends CrudComp {
 				if (cond.type === 'cbb') {
 					// TODO FIXME let's use cbb widget, <DatasetCombo />
 					let refcbb = React.createRef();
-					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;
+					let v = cond && cond.val ? cond.val : AnConts.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
 						id={String(x)} name={String(x)} ref={refcbb}
 						onChange={ that.onCbbRefChange(refcbb) }
@@ -204,7 +204,7 @@ class AnQueryFormComp extends CrudComp {
 				}
 				else if (cond.type === 'autocbb') {
 					let refcbb = React.createRef();
-					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;
+					let v = cond && cond.val ? cond.val : AnConts.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
 						id={String(x)} name={String(x)} ref={refcbb}
 						onChange={ that.onCbbRefChange(refcbb) }
