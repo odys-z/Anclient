@@ -68,16 +68,23 @@ class TreeCardDetailsComp extends CrudCompW {
 		// type: Material UI: Type of the input element. It should be a valid HTML5 input type. (extended with enum, select)
 		// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
 		fields: [
-			{type: 'text', validator: {len: 12},  field: 'parentId', label: L('Indicator Id'), hide: 1},
-			{type: 'text', validator: {len: 200}, field: 'indName', label: L('Indicator')},
-			{type: 'float',validator: {min: 0.0}, field: 'weight', label: L('Default Weight')},
-			{type: 'enum', validator: undefined, values: [{n: 'single', v: 's'}, {n: 'multiple', v: 'm'}, {n: 'text', v: 't'}],
-			                                      field: 'qtype', label: L('Question Type')},
-			{type: 'number',validator:{min: 0},   field: 'sort', label: L('UI Sort')},
-			{type: 'text', validator: {len: 500}, field: 'remarks', label: L('Remarks')}
+			{ type: 'text', field: 'parentId', label: L('Indicator Id'), hide: 1,
+			  validator: {len: 12} },
+			{ type: 'text', field: 'indName', label: L('Indicator'),
+			  validator: {len: 200, notNull: true} },
+			{ type: 'float', field: 'weight', label: L('Default Weight'),
+			  validator: {min: 0.0} },
+			{ type: 'enum', field: 'qtype', label: L('Question Type'),
+			  values: [{n: 'single', v: 's'}, {n: 'multiple', v: 'm'}, {n: 'text', v: 't'}],
+			  validator: {notNull: true} },
+			{ type: 'number',field: 'sort', label: L('UI Sort'),
+			  validator: undefined },
+			{ type: 'text', field: 'remarks', label: L('Remarks'),
+			  validator: {len: 500} }
 		],
 		// hide pk means also not editable by user
-		pk: {type: 'text', validator: {len: 12},  field: 'indId', label: L('Indicator Id'), hide: 1},
+		pk: { type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1,
+			  validator: {len: 12} },
 		record: {},
 	};
 
@@ -85,22 +92,57 @@ class TreeCardDetailsComp extends CrudCompW {
 		super(props);
 
 		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CURD.u;
-		this.mtabl = props.mtabl;
+		this.state.mtabl = props.mtabl;
 
 		if (this.state.crud !== Protocol.CRUD.c)
 			this.state.record[this.state.pk.field] = props.pk;
+		else
+			this.state.dirty = true;
 
 		this.state.parentId = props.pid;
 
 		this.formFields = this.formFields.bind(this);
 		this.getField = this.getField.bind(this);
+
+		this.validate = this.validate.bind(this);
 		this.toSave = this.toSave.bind(this);
+
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
 
-		console.log(super.media);
+		// console.log(super.media); => {isSm: true, isXs: true}
 	}
 
+	validate() {
+		let that = this;
+
+	    const invalid = { border: "2px solid red" };
+
+		let valid = true;
+	    this.state.fields.forEach( (f, x) => {
+			f.valid = validField(f, {validator: (v) => !!v});
+			f.style = f.valid ? undefined : invalid;
+			valid &= f.valid;
+	    } );
+		return valid;
+
+		function validField (f, valider) {
+			let v = that.state.record[f.field];
+
+			if (typeof valider === 'function')
+				return valider(v);
+			else if (f.validator) {
+				let vd = f.validator;
+				if(vd.notNull && (v === undefined || v.length === 0))
+					return false;
+				if (vd.len && v !== undefined && v.length > vd.len)
+					return false;
+				return true;
+			}
+			else // no validator
+				return true;
+		}
+	}
 	toSave(e) {
 		e.stopPropagation();
 
@@ -179,10 +221,11 @@ class TreeCardDetailsComp extends CrudCompW {
 				{n: L('Single Opt'), v: 's'},
 				{n: L('Multiple'), v: 'm'},
 				{n: L('Text'), v: 't'} ]}
-				label={f.label}
+				label={f.label} style={f.style}
 				onSelect={ (v) => {
-					rec[f.field] = v;
-					that.setState({dirty: true})}}
+					rec[f.field] = v.v;
+					that.setState({dirty: true});
+				}}
 			/>);
 		}
 		else return (

@@ -27,7 +27,7 @@ export const AnContext = React.createContext({
 		let me = AnContext;
 		me.servs = Object.assign(me.servs, json);
 		me.servId = servId ? servId : 'host';
-	}
+	},
 
 	uuid: function() {
 		return ++ _uid_;
