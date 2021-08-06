@@ -97,7 +97,6 @@ class DatasetCombo extends CrudComp {
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
 			filter={Autocomplete.caseInsensitiveFilter}
-			// style={{ width: 300 }}
 			renderInput={(params) => <TextField {...params} label={cmb.label} variant="outlined" />}
 		/>);
 	}

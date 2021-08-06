@@ -221,7 +221,7 @@ class TreeCardDetailsComp extends CrudCompW {
 				{n: L('Single Opt'), v: 's'},
 				{n: L('Multiple'), v: 'm'},
 				{n: L('Text'), v: 't'} ]}
-				label={f.label}
+				label={f.label} style={f.style}
 				onSelect={ (v) => {
 					rec[f.field] = v.v;
 					that.setState({dirty: true});
