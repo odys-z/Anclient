@@ -46,7 +46,7 @@ export class DatasetCombo extends CrudComp {
 					sk: this.props.sk,
 					// user uses this, e.g. name and value to access data
 					nv: this.props.nv,
-					this.state.combo
+					cond: this.state.combo
 				},
 				this.context.error, this);
 
