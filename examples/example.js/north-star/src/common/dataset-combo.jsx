@@ -3,9 +3,10 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Grid, Card, Collapse, TextField, Button, Typography } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import { L, AnConst, Protocol, AnsonResp,
-	CrudComp, AnContext, AnError, AnQueryForm, AnTreeIcons
+	CrudComp, AnContext, AnError, AnQueryForm, AnTreeIcons, AnQueryFormComp
 } from 'anclient'
 
 import { StarIcons } from '../styles';
@@ -46,7 +47,7 @@ export class DatasetCombo extends CrudComp {
 					sk: this.props.sk,
 					// user uses this, e.g. name and value to access data
 					nv: this.props.nv,
-					this.state.combo
+					cond: this.state.combo
 				},
 				this.context.error, this);
 
@@ -75,8 +76,8 @@ export class DatasetCombo extends CrudComp {
 			// key={sk + this.state.uid}
 			// id={String(x)} name={String(x)}
 			ref={refcbb}
-			onChange={ that.onCbbRefChange(refcbb) }
-			onInputChange={ that.onCbbRefChange(refcbb) }
+			onChange={ this.onCbbRefChange(refcbb) }
+			onInputChange={ this.onCbbRefChange(refcbb) }
 
 			options={cmb.options}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
