@@ -6,7 +6,7 @@ import { Grid, Card, Collapse, TextField, Button, Typography } from '@material-u
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import { L, AnConst, Protocol, AnsonResp,
-	CrudComp, AnContext, AnError, AnQueryForm, AnTreeIcons, AnQueryFormComp
+	 AnContext, AnError, CrudComp, AnQueryForm, AnTreeIcons, AnQueryFormComp
 } from 'anclient'
 
 import { StarIcons } from '../styles';
@@ -69,16 +69,17 @@ class DatasetCombo extends CrudComp {
 			// let cbb = _ref.current.getAttribute('name');
 			// cbb = parseInt(cbb);
 			// _cmb[cbb].val = item ? item : AnQueryFormComp.allItem;
-			_cmb.val = item ? item : AnQueryFormComp.allItem;
+			// _that.setState({combo: _that.state.cmb});
+			_cmb.val = item ? item : AnConst.cbbAllItem;
 
-			_that.setState({combo: _that.state.cmb});
+			_that.setState({combo: _cmb});
 		};
 	}
 
 	render() {
 		let cmb = this.state.combo
 		let refcbb = React.createRef();
-		let v = cmb && cmb.val ? cmb.val : AnQueryFormComp.cbbAllItem;
+		let v = cmb && cmb.val ? cmb.val : AnConst.cbbAllItem;
 		return (<Autocomplete
 			// key={sk + this.state.uid}
 			// id={String(x)} name={String(x)}
