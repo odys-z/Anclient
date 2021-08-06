@@ -20,7 +20,13 @@ const styles = (theme) => ({
   },
 });
 
-export class DatasetCombo extends CrudComp {
+export
+/**
+ * Combobox automatically bind dataset, using AnContext.anClient.
+ * Also can handling hard coded options.
+ * @class DatasetCombo
+ */
+class DatasetCombo extends CrudComp {
 	state = {
 		// sk: undefined,
 		combo: {val: undefined, options: []},
@@ -60,9 +66,10 @@ export class DatasetCombo extends CrudComp {
 		_cmb.ref = _ref;
 		return (e, item) => {
 			if (e) e.stopPropagation()
-			let cbb = _ref.current.getAttribute('name');
-			cbb = parseInt(cbb);
-			_cmb[cbb].val = item ? item : AnQueryFormComp.allItem;
+			// let cbb = _ref.current.getAttribute('name');
+			// cbb = parseInt(cbb);
+			// _cmb[cbb].val = item ? item : AnQueryFormComp.allItem;
+			_cmb.val = item ? item : AnQueryFormComp.allItem;
 
 			_that.setState({combo: _that.state.cmb});
 		};
@@ -83,7 +90,7 @@ export class DatasetCombo extends CrudComp {
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
 			filter={Autocomplete.caseInsensitiveFilter}
-			style={{ width: 300 }}
+			// style={{ width: 300 }}
 			renderInput={(params) => <TextField {...params} label={cmb.label} variant="outlined" />}
 		/>);
 	}
