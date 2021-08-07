@@ -49,16 +49,29 @@ const _icons = {
 	'deflt': <Inbox />,
 }
 
-const _comps = {
-	'/home': Home,
-	'/views/sys/domain/domain.html': Domain,
-	'/views/sys/role/roles.html': Roles,
-	'/views/sys/org/orgs.html': Orgs,
-	'/views/sys/org/users.html': Users,
-	'/views/sys/workflow/workflows.html': CheapFlow,
-	'/views/sys/user/users-1.1.html': Users,
-	'/sys/error': Error,
+export function uri(comp, uri) {
+	comp.prototype.uri = uri;
+	return comp;
 }
+/**
+ * Map of uri to UI components.
+ * CrudComp.Uri will wrapp the component with propterty "uri", which will be
+ * used as func-uri for determine conn-id in the future (v1.2?)
+ *
+ * If key-uri !== arg-uri, jserv won't find the correct connId
+ */
+const _comps = {
+}
+// const _comps = {
+// 	'/home': Home,
+// 	'/views/sys/domain/domain.html': Domain,
+// 	'/views/sys/role/roles.html': Roles,
+// 	'/views/sys/org/orgs.html': Orgs,
+// 	'/views/sys/org/users.html': Users,
+// 	'/views/sys/workflow/workflows.html': CheapFlow,
+// 	'/views/sys/user/users-1.1.html': Users,
+// 	'/sys/error': Error,
+// }
 
 const drawerWidth = 240;
 
@@ -186,7 +199,7 @@ class SysComp extends React.Component {
 
 	static extendLinks(links) {
 		links.forEach( (l, x) => {
-			_comps[l.path] = l.comp;
+			_comps[l.path] = uri(l.comp, l.path);
 		});
 	}
 
@@ -390,6 +403,17 @@ class SysComp extends React.Component {
 	}
 }
 SysComp.contextType = AnContext;
+
+SysComp.extendLinks([
+	{path: '/home', comp: Home},
+	{path: '/views/sys/domain/domain.html', comp: CrudDomain},
+	{path: '/views/sys/role/roles.html', comp: Roles},
+	{path: '/views/sys/org/orgs.html', comp: Orgs},
+	{path: '/views/sys/org/users.html', comp: Users},
+	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
+	{path: '/views/sys/user/users-1.1.html', comp: Users},
+	{path: '/sys/error', comp: Error}
+]);
 
 const Sys = withStyles(styles)(SysComp);
 export { Sys, SysComp };

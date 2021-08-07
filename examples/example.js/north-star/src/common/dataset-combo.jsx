@@ -66,12 +66,7 @@ class DatasetCombo extends CrudComp {
 		_cmb.ref = _ref;
 		return (e, item) => {
 			if (e) e.stopPropagation();
-			// let cbb = _ref.current.getAttribute('name');
-			// cbb = parseInt(cbb);
-			// _cmb[cbb].val = item ? item : AnQueryFormComp.allItem;
-			// _that.setState({combo: _that.state.cmb});
-
-			console.log('onCbbRefChange()', _cmb);
+			// console.log('onCbbRefChange()', _cmb);
 			_cmb.val = item ? item : AnConst.cbbAllItem;
 
 			_that.setState({combo: _cmb});
@@ -94,6 +89,7 @@ class DatasetCombo extends CrudComp {
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 
 			options={cmb.options}
+			style={this.props.style}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
 			filter={Autocomplete.caseInsensitiveFilter}
