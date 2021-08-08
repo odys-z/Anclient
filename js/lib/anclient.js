@@ -661,6 +661,7 @@ class SessionClient {
 	 * @return {AnsonMsg<AnUserReq>} AnsonMsg */
 	userReq(uri, port, bodyItem, act) {
 		let header = Protocol.formatHeader(this.ssInf);
+		bodyItem.uri = uri || bodyItem.uri;
 		if (typeof act === 'object') {
 			// header.userAct = act;
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);

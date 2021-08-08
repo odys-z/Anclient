@@ -27,6 +27,10 @@ class CrudComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 
+// CrudComp.propTypes = {
+// 	uri: PropTypes.string.isRequired
+// };
+
 /**
  * <pre>CrudCompW.prototype.media = {
     isXs: false,
@@ -75,7 +79,11 @@ class CrudCompW extends React.Component {
 CrudCompW.contextType = AnContext;
 
 CrudCompW.propTypes = {
-	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
+	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
+	/* TODO doc Design Notes:
+	 * Main CRUD page doesn't need this check. Those common used wigdets need this.
+	 * uri: PropTypes.string.isRequired
+	 */
 };
 
 class HomeComp extends CrudComp {

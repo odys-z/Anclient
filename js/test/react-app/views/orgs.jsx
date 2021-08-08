@@ -41,7 +41,8 @@ class OrgsComp extends CrudCompW {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<AnTreegrid className={classes.root}
+			<AnTreegrid uri={this.uri}
+				className={classes.root}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
 					{ text: L('Domain Name'), color: 'primary', field:"domainName"},

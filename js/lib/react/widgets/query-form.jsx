@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { Collapse, Grid, TextField, Switch, Button } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -77,6 +78,7 @@ class AnQueryFormComp extends CrudComp {
 		  .forEach( (cond, cx) => {
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb'))
 				this.context.anReact.ds2cbbOptions({
+						uri: this.props.uri,
 						sk: cond.sk,
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
@@ -246,6 +248,15 @@ class AnQueryFormComp extends CrudComp {
 	}
 }
 AnQueryFormComp.contextType = AnContext;
+
+AnQueryFormComp.propTypes = {
+	/* TODO: DOCS
+	 * Design Notes:
+	 * All common widgets need this check, but main CURD page's uri is been set
+	 * by SysComp.
+	 */
+	uri: PropTypes.string.isRequired
+};
 
 const AnQueryForm = withStyles(styles)(AnQueryFormComp);
 export { AnQueryForm, AnQueryFormComp }

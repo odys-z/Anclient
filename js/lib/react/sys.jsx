@@ -50,7 +50,10 @@ const _icons = {
 }
 
 export function uri(comp, uri) {
-	comp.prototype.uri = uri;
+	if (comp.Naked)
+		comp.Naked.prototype.uri = uri;
+	else
+		comp.prototype.uri = uri;
 	return comp;
 }
 /**
@@ -60,18 +63,7 @@ export function uri(comp, uri) {
  *
  * If key-uri !== arg-uri, jserv won't find the correct connId
  */
-const _comps = {
-}
-// const _comps = {
-// 	'/home': Home,
-// 	'/views/sys/domain/domain.html': Domain,
-// 	'/views/sys/role/roles.html': Roles,
-// 	'/views/sys/org/orgs.html': Orgs,
-// 	'/views/sys/org/users.html': Users,
-// 	'/views/sys/workflow/workflows.html': CheapFlow,
-// 	'/views/sys/user/users-1.1.html': Users,
-// 	'/sys/error': Error,
-// }
+const _comps = { }
 
 const drawerWidth = 240;
 
@@ -406,7 +398,7 @@ SysComp.contextType = AnContext;
 
 SysComp.extendLinks([
 	{path: '/home', comp: Home},
-	{path: '/views/sys/domain/domain.html', comp: CrudDomain},
+	{path: '/views/sys/domain/domain.html', comp: Domain},
 	{path: '/views/sys/role/roles.html', comp: Roles},
 	{path: '/views/sys/org/orgs.html', comp: Orgs},
 	{path: '/views/sys/org/users.html', comp: Users},

@@ -20,42 +20,6 @@ export class AnReact {
 		this.err = errCtx;
 	}
 
-	// static get port() { return 'quiz'; }
-
-	// serv (a, conds = {}, onLoad, errCtx) {
-	// 	let req = new UserReq(qconn)
-	// 		.A(a); // this is a reading request
-	//
-	// 	for (let k in conds)
-	// 		req.set(k, conds[k]);
-	//
-	// 	let header = Protocol.formatHeader(this.ssInf);
-	//
-	// 	// for logging user action at server side.
-	// 	this.client.usrAct({
-	// 		func: 'quiz',
-	// 		cmd: a,
-	// 		cate: Protocol.CRUD.r,
-	// 		remarks: 'quiz.serv' });
-	//
-	// 	var jreq = new AnsonMsg({
-	// 				port: JQuiz.port,
-	// 				header,
-	// 				body: [req]
-	// 			});
-	//
-	// 	this.client.an.post(jreq, onLoad, (c, resp) => {
-	// 		if (errCtx) {
-	// 			errCtx.hasError = true;
-	// 			errCtx.code = c;
-	// 			errCtx.msg = resp.Body().msg();
-	// 			errCtx.onError(true);
-	// 		}
-	// 		else console.error(c, resp);
-	// 	});
-	// 	return this;
-	// }
-
 	insert(quiz, onOk) {
 		let that = this;
 		let date = new Date();
@@ -68,8 +32,8 @@ export class AnReact {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		let req = this.client.userReq(qconn, JQuiz.port,
-			new UserReq( qconn, "quizzes", props ).A(quiz_a.insert) );
+		let req = this.client.userReq(quizUri, JQuiz.port,
+			new UserReq( quizUri, "quizzes", props ).A(quiz_a.insert) );
 
 		this.client.an.post(req, onOk, (c, resp) => {
 			if (that.err) {
@@ -81,28 +45,6 @@ export class AnReact {
 		});
 	}
 
-	// update(quiz, onOk) {
-	// 	let that = this;
-	// 	this.client.usrAct('quiz', quiz_a.update, Protocol.CRUD.u, quiz.qtitle);
-	//
-	// 	let props = {}
-	// 	props[QuizProtocol.quizId] = quiz.quizId;
-	// 	props[QuizProtocol.qtitle] = quiz.qtitle;
-	// 	props[QuizProtocol.quizinfo] = quiz.quizinfo;
-	// 	props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
-	//
-	// 	let req = this.client.userReq(qconn, JQuiz.port,
-	// 		new UserReq(qconn, "quizzes", props).A(quiz_a.update) );
-	//
-	// 	this.client.an.post(req, onOk, (c, resp) => {
-	// 		if (that.err) {
-	// 			that.err.code = c;
-	// 			that.err.msg = resp.Body().msg();
-	// 			that.err.onError(true);
-	// 		}
-	// 		else console.error(c, resp);
-	// 	});
-	// }
 	update(rec, onOk) {
 		throw new Error('don\'t use this - a stub for future extension');
 	}
@@ -273,7 +215,7 @@ export class AnReactExt extends AnReact {
 	 */
 	dataset(ds, onLoad, errCtx) {
 		let ssInf = this.client.ssInf;
-		let {port, sk, sqlArgs, t} = ds;
+		let {port, uri, sk, sqlArgs, t} = ds;
 		sqlArgs = sqlArgs || [];
 		port = port || 'dataset';
 
@@ -282,7 +224,7 @@ export class AnReactExt extends AnReact {
 				sqlArgs
 			})
 			.A(t || stree_t.query);
-		let jreq = this.client.userReq(undefined, port, reqbody);
+		let jreq = this.client.userReq(uri, port, reqbody);
 
 		this.client.an.post(jreq, onLoad, (c, resp) => {
 			if (errCtx) {
@@ -335,10 +277,11 @@ export class AnReactExt extends AnReact {
 	 * @return {AnReactExt} this
 	 */
 	ds2cbbOptions(opts, errCtx, compont) {
-		let {sk, nv, cond, noAll} = opts;
+		let {uri, sk, nv, cond, noAll} = opts;
 		nv = nv || {n: 'name', v: 'value'};
 
 		this.dataset( {
+				uri,
 				ssInf: this.client.ssInf,
 				sk },
 			(dsResp) => {
