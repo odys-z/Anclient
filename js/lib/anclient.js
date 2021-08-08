@@ -30,7 +30,7 @@ class AnClient {
 	 */
 	constructor (urlRoot) {
 	 	this.cfg = {
-			connId: null,
+			// connId: null, // FIXME deprecated
 			defaultServ: urlRoot,
 		}
 		// aes = new AES();
@@ -61,17 +61,20 @@ class AnClient {
 					"prot: ", prot, "url", ulr);
 		}
 
-		if (this.cfg.connId)
-			ulr += '?conn=' + this.cfg.connId;
+		// if (this.cfg.connId)
+		// 	ulr += '?conn=' + this.cfg.connId;
 
 		return ulr;
 	}
 
     /** initialize with url and default connection id
      * @param {stirng} urlRoot root url
-     * @param {string} connId connection Id
+     * @param {string} connId @deprecated connection Id
      * @retun {An} this */
 	init (urlRoot, connId) {
+		if (!!connId)
+			throw Error("Since jserv 1.3.0, conn-id nolonger can be controled by client.");
+
 		this.cfg.cconnId = connId;
 		this.cfg.defaultServ = urlRoot;
         return this;
@@ -522,7 +525,7 @@ class SessionClient {
 
 	/**
 	 * create a query message.
-	 * @param {string} conn connection id
+	 * @param {string} uri component uri
 	 * @param {string} maintbl target table
 	 * @param {string} alias target table alias
 	 * @param {Object} pageInf<br>
@@ -532,8 +535,8 @@ class SessionClient {
 	 * {func, cate, cmd, remarks};
 	 * @return {AnsonMsg} the request message
 	 */
-	query(conn, maintbl, alias, pageInf, act) {
-		var qryItem = new QueryReq(conn, maintbl, alias, pageInf);
+	query(uri, maintbl, alias, pageInf, act) {
+		var qryItem = new QueryReq(uri, maintbl, alias, pageInf);
 
 		var header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
@@ -556,7 +559,7 @@ class SessionClient {
 		return jreq;
 	}
 
-	update(conn, maintbl, pk, nvs) {
+	update(uri, maintbl, pk, nvs) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -565,10 +568,10 @@ class SessionClient {
 			throw new Error("To update a table, {pk, v} must presented.", pk);
 		}
 
-		var upd = new UpdateReq(conn, maintbl, pk);
+		var upd = new UpdateReq(uri, maintbl, pk);
 		upd.a = Protocol.CRUD.u;
 		this.currentAct.cmd = 'update';
-		var jmsg = this.userReq(conn, 'update', upd, this.currentAct);
+		var jmsg = this.userReq(uri, 'update', upd, this.currentAct);
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
@@ -578,16 +581,16 @@ class SessionClient {
 		return jmsg;
 	}
 
-	insert(conn, maintbl, nvs) {
+	insert(uri, maintbl, nvs) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
 
-		var ins = new InsertReq(conn, maintbl);
+		var ins = new InsertReq(uri, maintbl);
 		// ins.a = Protocol.CRUD.c;
 		this.currentAct.cmd = 'insert';
-		// var jmsg = this.userReq(conn, Protocol.Port.insert, ins, this.currentAct);
-		var jmsg = this.userReq(conn, 'insert', ins, this.currentAct);
+		// var jmsg = this.userReq(uri, Protocol.Port.insert, ins, this.currentAct);
+		var jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
@@ -597,7 +600,7 @@ class SessionClient {
 		return jmsg;
 	}
 
-	delete(conn, maintbl, pk) {
+	delete(uri, maintbl, pk) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -610,11 +613,11 @@ class SessionClient {
 			return;
 		}
 
-		let upd = new UpdateReq(conn, maintbl, pk);
+		let upd = new UpdateReq(uri, maintbl, pk);
 		upd.a = Protocol.CRUD.d;
 		this.currentAct.cmd = 'delete';
 
-		let jmsg = this.userReq(conn,
+		let jmsg = this.userReq(uri,
 				'update', // Protocol.Port.update,
 				upd, this.currentAct);
 		return jmsg;
@@ -626,7 +629,7 @@ class SessionClient {
 	 * @param {array} pks delete from the table - pk values are automatically wrapped with ''.
 	 * @return {AnsonMsg<UpdateReq>} anson request
 	 */
-	deleteMulti(conn, mtabl, pkn, pks) {
+	deleteMulti(uri, mtabl, pkn, pks) {
 		/*
 		let pkvals = null;
 		if (Array.isArray(pks) && pks.length === 0)
@@ -651,12 +654,12 @@ class SessionClient {
 	}
 
 	/**Create a user request AnsonMsg.
-	 * @param {string} conn connection id
+	 * @param {string} uri component uri
 	 * @param {string} port
-	 * @param {Protocol.UserReq} bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
+	 * @param {Protocol.UserReq} bodyItem request body, created by like: new jvue.UserReq(uri, tabl).
 	 * @param {Object} act action, optional.
 	 * @return {AnsonMsg<AnUserReq>} AnsonMsg */
-	userReq(conn, port, bodyItem, act) {
+	userReq(uri, port, bodyItem, act) {
 		let header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
 			// header.userAct = act;

@@ -30,7 +30,6 @@ class DatasetCombo extends CrudComp {
 	state = {
 		// sk: undefined,
 		combo: {val: undefined, options: []},
-
 	}
 
 	constructor(props) {
