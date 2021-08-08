@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
 import {
@@ -20,15 +21,18 @@ class IndicatorsComp extends CrudComp {
 		students: []
 	};
 
+	// NOTE jserv 1.2 will use this to determine connId
+	uri = "";
+
 	constructor(props) {
 		super(props);
 	}
 
 	render () {
-		return (<TreeCards />);
+		return (<TreeCards uri={this.uri}/>);
 	}
 }
 IndicatorsComp.contextType = AnContext;
 
-const Indicators = withStyles(styles)(IndicatorsComp);
+const Indicators = withWidth()(withStyles(styles)(IndicatorsComp));
 export { Indicators, IndicatorsComp }

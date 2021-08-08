@@ -91,6 +91,8 @@ class TreeCardDetailsComp extends CrudCompW {
 	constructor (props = {}) {
 		super(props);
 
+		this.funcId = props.funcId || 'TreeCardDetails'
+
 		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CURD.u;
 		this.state.mtabl = props.mtabl;
 
@@ -143,6 +145,7 @@ class TreeCardDetailsComp extends CrudCompW {
 				return true;
 		}
 	}
+
 	toSave(e) {
 		e.stopPropagation();
 
@@ -162,9 +165,6 @@ class TreeCardDetailsComp extends CrudCompW {
 		// https://api.jquery.com/serializearray/
 		let nvs = [];
 		this.state.fields.forEach( (f, x) => {
-			// e.g.
-			// nvs.push({name: 'remarks', value: rec.remarks});
-			// nvs.push({name: 'roleName', value: rec.roleName});
 			nvs.push({name: f.field, value: rec[f.field]});
 		} );
 
@@ -173,12 +173,12 @@ class TreeCardDetailsComp extends CrudCompW {
 		if (this.state.crud === Protocol.CRUD.c) {
 			nvs.push({name: pk.field, value: rec[pk.field]});
 			req = client
-				.usrAct(uiName, Protocol.CRUD.c, 'new card')
+				.usrAct(this.funcId, Protocol.CRUD.c, 'new card')
 				.insert(null, this.state.mtabl, nvs);
 		}
 		else {
 			req = client
-				.usrAct(uiName, Protocol.CRUD.u, 'edit card')
+				.usrAct(this.funcId, Protocol.CRUD.u, 'edit card')
 				.update(null, this.state.mtabl, pk.field, nvs);
 			req.Body()
 				.whereEq(pk.field, rec[pk.field]);

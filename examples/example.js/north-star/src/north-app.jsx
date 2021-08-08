@@ -4,8 +4,9 @@ import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
 import {
-	an, AnClient, SessionClient, Protocol, L, Langstrs,
-	AnContext, AnError, AnReactExt, Sys, SysComp
+	L, Langstrs,
+	an, AnClient, SessionClient, Protocol,
+	uri, AnContext, AnError, AnReactExt, Sys, SysComp
 } from 'anclient';
 
 import { Domain } from './test-app/views/domain';
