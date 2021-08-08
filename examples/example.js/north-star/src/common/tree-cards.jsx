@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { Grid, Card, Collapse, TextField, Button, Typography } from '@material-ui/core';
 
 import { L, AnConst, Protocol, AnsonResp,
-	CrudComp, AnContext, AnError, AnQueryForm, AnTreeIcons
+	CrudComp, CrudCompW, AnContext, AnError, AnQueryForm, AnTreeIcons
 } from 'anclient'
 
 import { StarIcons } from '../styles';
@@ -160,7 +160,7 @@ TreeCardComp.contextType = AnContext;
 const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
 export { TreeCard, TreeCardComp }
 
-class TreeCardsComp extends CrudComp {
+class TreeCardsComp extends CrudCompW {
   state = {
 	window: undefined,
 	treeData: {
@@ -256,13 +256,12 @@ class TreeCardsComp extends CrudComp {
 	this.setState({ expandings });
   }
 
-
   toAddChild (e) {
 	e.stopPropagation();
 	let p = e.currentTarget.getAttribute("pid");
 
 	this.addForm = (
-		<TreeCardDetails
+		<TreeCardDetails uri={this.props.uri}
 			c mtabl='ind_emotion' pk={p}
 			onClose={this.closeDetails}
 			onOk={this.closeDetails}

@@ -16,8 +16,8 @@ import Typography from '@material-ui/core/Typography';
 
 
 import { L, Protocol, AnsonResp,
-	AnConst, AnContext, AnError, CrudCompW,
-	AnTablist, AnQueryForm, ConfirmDialog, AnTree
+	AnConst, AnContext, AnError, DetailFormW,
+	AnTablist, AnQueryForm, ConfirmDialog, AnTree, stree_t
 } from 'anclient';
 
 import { StarIcons } from '../../styles';
@@ -66,7 +66,7 @@ const styles = theme => ({
   },
 });
 
-class RoleDetailsComp extends React.Component {
+class RoleDetailsComp extends DetailFormW {
 	state = {
 		crud: Protocol.CRUD.r,
 		dirty: false,

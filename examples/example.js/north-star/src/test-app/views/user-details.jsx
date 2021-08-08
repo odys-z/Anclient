@@ -15,7 +15,7 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
 import { L, Protocol, AnsonResp,
-	AnConst, AnContext, AnError, CrudCompW,
+	AnConst, AnContext, AnError, DetailFormW,
 	AnTablist, AnQueryForm, ConfirmDialog, AnTree
 } from 'anclient';
 
@@ -65,7 +65,7 @@ const styles = theme => ({
   },
 });
 
-class UserDetailsComp extends React.Component {
+class UserDetailsComp extends DetailFormW {
 	state = {
 		crud: Protocol.CRUD.r,
 		dirty: false,

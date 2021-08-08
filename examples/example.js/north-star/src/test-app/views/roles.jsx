@@ -165,7 +165,8 @@ class RolesComp extends CrudCompW {
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		return ( <>
-			<AnQueryForm onSearch={this.toSearch}
+			<AnQueryForm uri={this.uri} 
+				onSearch={this.toSearch}
 				conds={[ this.state.condName, this.state.condOrg ]}
 				query={ (q) => { return {
 					rName: q.state.conds[0].val ? q.state.conds[0].val : undefined,

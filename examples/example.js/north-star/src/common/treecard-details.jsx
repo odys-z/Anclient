@@ -18,7 +18,7 @@ import Input from '@material-ui/core/Input';
 
 import { L, toBool,
 	AnConst, Protocol, AnsonResp,
-	CrudCompW, AnContext, AnError, AnQueryForm, AnTreeIcons
+	DetailFormW, AnContext, AnError, AnQueryForm, AnTreeIcons
 } from 'anclient'
 
 import { StarIcons } from '../styles';
@@ -55,7 +55,9 @@ const styles = (theme) => ({
   }
 });
 
-class TreeCardDetailsComp extends CrudCompW {
+class TreeCardDetailsComp extends DetailFormW {
+	uri = undefined;
+
 	state = {
 		crud: undefined,
 		dirty: false,
@@ -100,6 +102,8 @@ class TreeCardDetailsComp extends CrudCompW {
 			this.state.record[this.state.pk.field] = props.pk;
 		else
 			this.state.dirty = true;
+
+		this.uri = this.props.uri;
 
 		this.state.parentId = props.pid;
 
@@ -174,12 +178,12 @@ class TreeCardDetailsComp extends CrudCompW {
 			nvs.push({name: pk.field, value: rec[pk.field]});
 			req = client
 				.usrAct(this.funcId, Protocol.CRUD.c, 'new card')
-				.insert(null, this.state.mtabl, nvs);
+				.insert(this.uri, this.state.mtabl, nvs);
 		}
 		else {
 			req = client
 				.usrAct(this.funcId, Protocol.CRUD.u, 'edit card')
-				.update(null, this.state.mtabl, pk.field, nvs);
+				.update(this.uri, this.state.mtabl, pk.field, nvs);
 			req.Body()
 				.whereEq(pk.field, rec[pk.field]);
 		}

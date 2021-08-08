@@ -146,13 +146,13 @@ class RolesComp extends CrudCompW {
 	}
 
 	toAdd(e, v) {
-		this.roleForm = (<RoleDetails c
+		this.roleForm = (<RoleDetails c uri={this.uri}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
-		this.roleForm = (<RoleDetails u
+		this.roleForm = (<RoleDetails u uri={this.uri}
 			roleId={this.state.selectedRoleIds[0]}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
@@ -168,7 +168,8 @@ class RolesComp extends CrudCompW {
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		return ( <>
-			<AnQueryForm onSearch={this.toSearch} uri={this.uri} 
+			<AnQueryForm uri={this.uri}
+				onSearch={this.toSearch}
 				conds={[ this.state.condName, this.state.condOrg ]}
 				query={ (q) => { return {
 					rName: q.state.conds[0].val ? q.state.conds[0].val : undefined,
