@@ -19,6 +19,9 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import StarBorder from '@material-ui/icons/StarBorder';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 
 export const StarIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -38,7 +41,11 @@ export const StarIcons = {
     SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
-    Star: forwardRef((props, ref) => <StarBorder {...props} ref={ref} />)
+
+	ListAdd: forwardRef((props, ref) => <PlaylistAddIcon {...props} ref={ref} />),
+    Star: forwardRef((props, ref) => <StarBorder {...props} ref={ref} />),
+	Up: forwardRef((props, ref) => <ArrowUpwardIcon  {...props} ref={ref} />),
+	Down: forwardRef((props, ref) => <ArrowDownwardIcon {...props} ref={ref} />)
   };
 
 export const Northeme  = createTheme({

@@ -104,7 +104,8 @@ class UsersComp extends CrudCompW {
 
 		return (<div className={classes.root}>Users of Jsample
 
-			<AnQueryForm onSearch={this.toSearch} onClear={this.toClearForm}
+			<AnQueryForm uri={this.uri}
+				onSearch={this.toSearch} onClear={this.toClearForm}
 				conds={[ this.state.condName, this.state.condRole, this.state.condOrg]}
 				query={ (q) => { return {
 					name: q.state.conds[0].val ? q.state.conds[0].val : undefined,

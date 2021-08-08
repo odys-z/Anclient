@@ -77,7 +77,8 @@ class DomainComp extends CrudCompW {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<AnQueryForm onSearch={this.toSearch}
+			<AnQueryForm uri={this.uri}
+				onSearch={this.toSearch}
 				conds={[ this.state.condTxt, this.state.condCbb, this.state.condAuto,this.state.condDate]}
 				query={(q) => { return {
 					domain: q.state.conds[0].val ? q.state.conds[0].val : undefined,

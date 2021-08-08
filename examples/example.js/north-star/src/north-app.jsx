@@ -4,8 +4,9 @@ import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
 import {
-	an, AnClient, SessionClient, Protocol, L, Langstrs,
-	AnContext, AnError, AnReactExt, Sys, SysComp
+	L, Langstrs,
+	an, AnClient, SessionClient, Protocol,
+	uri, AnContext, AnError, AnReactExt, Sys, SysComp
 } from 'anclient';
 
 import { Domain } from './test-app/views/domain';
@@ -139,7 +140,7 @@ class NorthApp extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<Sys menu='sys.menu.north' onLogout={this.logout}/>
+				<Sys menu='sys.menu.north' sys={L('North Star')} onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

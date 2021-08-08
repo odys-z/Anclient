@@ -27,8 +27,14 @@ export const AnContext = React.createContext({
 		let me = AnContext;
 		me.servs = Object.assign(me.servs, json);
 		me.servId = servId ? servId : 'host';
+	},
+
+	uuid: function() {
+		return ++ _uid_;
 	}
 });
+
+var _uid_ = 0;
 
 export class AnError extends React.Component {
 	props = undefined;

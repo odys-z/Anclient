@@ -14,6 +14,7 @@ import Card from '@material-ui/core/Card';
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
+import Input from '@material-ui/core/Input';
 
 import { L, toBool,
 	AnConst, Protocol, AnsonResp,
@@ -21,6 +22,7 @@ import { L, toBool,
 } from 'anclient'
 
 import { StarIcons } from '../styles';
+import { DatasetCombo } from './dataset-combo';
 
 const styles = (theme) => ({
   root: {
@@ -63,36 +65,85 @@ class TreeCardDetailsComp extends CrudCompW {
 
 		mtabl: '',
 		// indId, indName, parent, sort, fullpath, css, weight, qtype, remarks, extra
+		// type: Material UI: Type of the input element. It should be a valid HTML5 input type. (extended with enum, select)
+		// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
 		fields: [
-			{type: 'text', validator: {len: 12},  field: 'parentId', label: 'Indicator Id', hide: 1},
-			{type: 'text', validator: {len: 200}, field: 'indName', label: 'User Name'},
-			{type: 'int',  validator: {min: 0},   field: 'sort', label: 'UI Sort'},
-			{type: 'float',validator: {min: 0.0}, field: 'weight', label: 'Default Weight'},
-			{type: 'enum', validator: {values: ['sing', 'mult', 'txt']}, field: 'qtype', label: 'Default Weight'},
-			{type: 'text', validator: {len: 500}, field: 'remarks', label: 'Remarks'}
+			{ type: 'text', field: 'parentId', label: L('Indicator Id'), hide: 1,
+			  validator: {len: 12} },
+			{ type: 'text', field: 'indName', label: L('Indicator'),
+			  validator: {len: 200, notNull: true} },
+			{ type: 'float', field: 'weight', label: L('Default Weight'),
+			  validator: {min: 0.0} },
+			{ type: 'enum', field: 'qtype', label: L('Question Type'),
+			  values: [{n: 'single', v: 's'}, {n: 'multiple', v: 'm'}, {n: 'text', v: 't'}],
+			  validator: {notNull: true} },
+			{ type: 'number',field: 'sort', label: L('UI Sort'),
+			  validator: undefined },
+			{ type: 'text', field: 'remarks', label: L('Remarks'),
+			  validator: {len: 500} }
 		],
 		// hide pk means also not editable by user
-		pk: {type: 'text', validator: {len: 12},  field: 'indId', label: 'Indicator Id', hide: 1},
+		pk: { type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1,
+			  validator: {len: 12} },
 		record: {},
 	};
 
 	constructor (props = {}) {
 		super(props);
 
+		this.funcId = props.funcId || 'TreeCardDetails'
+
 		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CURD.u;
-		this.mtabl = props.mtabl;
+		this.state.mtabl = props.mtabl;
 
 		if (this.state.crud !== Protocol.CRUD.c)
 			this.state.record[this.state.pk.field] = props.pk;
+		else
+			this.state.dirty = true;
 
 		this.state.parentId = props.pid;
 
 		this.formFields = this.formFields.bind(this);
+		this.getField = this.getField.bind(this);
+
+		this.validate = this.validate.bind(this);
 		this.toSave = this.toSave.bind(this);
+
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
 
-		console.log(super.media);
+		// console.log(super.media); => {isSm: true, isXs: true}
+	}
+
+	validate() {
+		let that = this;
+
+	    const invalid = { border: "2px solid red" };
+
+		let valid = true;
+	    this.state.fields.forEach( (f, x) => {
+			f.valid = validField(f, {validator: (v) => !!v});
+			f.style = f.valid ? undefined : invalid;
+			valid &= f.valid;
+	    } );
+		return valid;
+
+		function validField (f, valider) {
+			let v = that.state.record[f.field];
+
+			if (typeof valider === 'function')
+				return valider(v);
+			else if (f.validator) {
+				let vd = f.validator;
+				if(vd.notNull && (v === undefined || v.length === 0))
+					return false;
+				if (vd.len && v !== undefined && v.length > vd.len)
+					return false;
+				return true;
+			}
+			else // no validator
+				return true;
+		}
 	}
 
 	toSave(e) {
@@ -114,9 +165,6 @@ class TreeCardDetailsComp extends CrudCompW {
 		// https://api.jquery.com/serializearray/
 		let nvs = [];
 		this.state.fields.forEach( (f, x) => {
-			// e.g.
-			// nvs.push({name: 'remarks', value: rec.remarks});
-			// nvs.push({name: 'roleName', value: rec.roleName});
 			nvs.push({name: f.field, value: rec[f.field]});
 		} );
 
@@ -125,12 +173,12 @@ class TreeCardDetailsComp extends CrudCompW {
 		if (this.state.crud === Protocol.CRUD.c) {
 			nvs.push({name: pk.field, value: rec[pk.field]});
 			req = client
-				.usrAct(uiName, Protocol.CRUD.c, 'new card')
+				.usrAct(this.funcId, Protocol.CRUD.c, 'new card')
 				.insert(null, this.state.mtabl, nvs);
 		}
 		else {
 			req = client
-				.usrAct(uiName, Protocol.CRUD.u, 'edit card')
+				.usrAct(this.funcId, Protocol.CRUD.u, 'edit card')
 				.update(null, this.state.mtabl, pk.field, nvs);
 			req.Body()
 				.whereEq(pk.field, rec[pk.field]);
@@ -164,13 +212,44 @@ class TreeCardDetailsComp extends CrudCompW {
 		that.setState({dirty: false});
 	}
 
+	getField(f, rec) {
+		let small = super.media.isSm;
+
+		if (f.type === 'enum' || f.type === 'cbb') {
+			let that = this;
+			return (<DatasetCombo options={[
+				{n: L('Single Opt'), v: 's'},
+				{n: L('Multiple'), v: 'm'},
+				{n: L('Text'), v: 't'} ]}
+				label={f.label} style={f.style}
+				onSelect={ (v) => {
+					rec[f.field] = v.v;
+					that.setState({dirty: true});
+				}}
+			/>);
+		}
+		else return (
+			<TextField id={f.field} key={f.field}
+				type={f.type}
+				label={small ? L(f.label) : undefined}
+				variant='outlined' color='primary' fullWidth
+				placeholder={L(f.label)} margin='dense'
+				value={rec[f.field] === undefined ? '' : rec[f.field]}
+				inputProps={f.style ? { style: f.style } : undefined}
+				onChange={(e) => {
+					rec[f.field] = e.target.value;
+					this.setState({ dirty : true });
+				}}
+			/>);
+	}
+
 	formFields(rec, classes) {
 		let fs = [];
 		let c = this.state.crud === Protocol.CRUD.c;
 		const small = toBool(super.media.isMd);
 
 		this.state.fields.forEach( (f, i) => {
-		  if (!toBool(f.hide))
+		  if (!f.hide) {
 			fs.push(
 				<Grid item key={`${f.field}.${f.label}`} sm={6} className={classes.labelText}>
 				  <Box className={classes.rowBox}>
@@ -179,21 +258,10 @@ class TreeCardDetailsComp extends CrudCompW {
 						{L(f.label)}
 					  </Typography>
 					)}
-					<TextField id={f.field}
-						label={small ? L(f.label) : undefined}
-						disabled={!c}
-						variant='outlined' color='primary' fullWidth
-						placeholder={L(f.label)} margin='dense'
-						value={rec[f.field] === undefined ? '' : rec[f.field]}
-						inputProps={f.style ? { style: f.style } : undefined}
-						onChange={(e) => {
-							rec[f.field] = e.target.value;
-							this.setState({ dirty : true });
-						}}
-					/>
+					{this.getField(f, rec)}
 				  </Box>
-				</Grid>);
-		} );
+				</Grid> );
+		} } );
 		return fs;
 	}
 

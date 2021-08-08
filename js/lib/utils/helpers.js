@@ -37,3 +37,11 @@ export function parseMenus(json = []) {
 		}
 	}
 }
+
+/**Usage: arr.swap(a, b);
+ * see https://stackoverflow.com/a/4011851/7362888
+ */
+Array.prototype.swap = function(a, b){
+    this[a] = this.splice(b, 1, this[a])[0];
+    return this;
+}
