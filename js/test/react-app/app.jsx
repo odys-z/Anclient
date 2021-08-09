@@ -11,7 +11,7 @@ import {SessionClient} from '../../lib/anclient.js'
 	import { AnReactExt } from '../../lib/react/anreact.jsx'
 
 // tests extents
-import { samports } from '../jsample.js'
+import { samports } from './jsample.js'
 	import { Domain } from './views/domain'
 	import { Roles } from './views/roles'
 	import { Orgs } from './views/orgs'
