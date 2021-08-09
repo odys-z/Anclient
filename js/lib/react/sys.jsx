@@ -157,7 +157,7 @@ class SysComp extends React.Component {
 		cruds: [{'/home': Home}],
 		paths: [{path: '/home', params: {}}],
 
-		menuName: 'Sys Menu',
+		menuTitle: 'Sys Menu',
 		showMenu: false,
 		expandings: new Set(),
 	};
@@ -174,7 +174,7 @@ class SysComp extends React.Component {
 
 		this.state.sysName = props.sys || props.sysName || props.name || this.state.sysName;
 		this.state.skMenu = props.menu;
-		this.state.menuName = props.menu || 'Sys Menu';
+		this.state.menuTitle = props.menuTitle || 'Sys Menu';
 
 		this.showMenu = this.showMenu.bind(this);
 		this.hideMenu = this.hideMenu.bind(this);
@@ -255,15 +255,15 @@ class SysComp extends React.Component {
 					</Collapse>
 				  </div>);
 				else
-				  return (
+				  return (menu && menu.funcId ?
 					<div key={menu.funcId}>
 						<Link component={RouterLink} to={menu.url}>
 							<ListItem button className={classes.nested}>
-							<ListItemIcon>{icon(menu.css.icon)}</ListItemIcon>
+							<ListItemIcon>{icon(menu.css)}</ListItemIcon>
 							<ListItemText primary={menu.funcName} />
 							</ListItem>
 						</Link>
-					</div>);
+					</div> : '');
 			}
 		}
 
@@ -339,7 +339,7 @@ class SysComp extends React.Component {
 				>
 				<div className={claz.drawerHeader}>
 					<IconButton onClick={this.hideMenu}>
-						<ListItemText>{this.state.menuName}</ListItemText>
+						<ListItemText>{this.state.menuTitle}</ListItemText>
 						{claz.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 					</IconButton>
 				</div>

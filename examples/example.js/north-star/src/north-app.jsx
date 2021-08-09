@@ -145,7 +145,7 @@ class NorthApp extends React.Component {
 				error: this.state.error,
 			}} >
 				<Sys menu='sys.menu.north'
-					sys={L('North Star')} menu={'Function Menu'}
+					sys={L('North Star')} menuTitle={'Function Menu'}
 					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
