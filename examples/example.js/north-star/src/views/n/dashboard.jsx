@@ -8,7 +8,7 @@ import {
     AnContext, AnError, CrudComp, AnReactExt
 } from 'anclient';
 
-import { Histgram } from '../d3charts/histgram'
+import { Histgram } from '../../d3charts/histgram'
 
 const styles = (theme) => ( {
 	root: {

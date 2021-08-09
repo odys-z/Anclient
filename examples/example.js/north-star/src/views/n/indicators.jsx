@@ -9,7 +9,7 @@ import {
     AnContext, AnError, CrudCompW, AnReactExt
 } from 'anclient';
 
-import { TreeCards } from '../common/tree-cards';
+import { TreeCards } from '../../common/tree-cards';
 
 const styles = (theme) => ( {
 	root: {
