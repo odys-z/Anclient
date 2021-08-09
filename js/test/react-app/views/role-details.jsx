@@ -14,22 +14,15 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-// import { L } from '../../../lib/utils/langstr';
-// 	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../../lib/protocol';
-// 	import { AnConst } from '../../../lib/utils/consts';
-// 	import { AnContext, AnError } from '../../../lib/react/reactext'
-// 	import { AnsonResp } from '../../../lib/protocol';
-// 	import { JsampleIcons } from '../styles'
-// 	import { DetailFormW } from '../../../lib/react/crud'
-// 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-// 	import { AnTree } from '../../../lib/react/widgets/tree';
-
-import { L, AnConst, AnContext, AnError,
-	Protocol, InsertReq, UpdateReq, DeleteReq, AnsonResp, stree_t,
-	DetailFormW, ConfirmDialog, AnTree
-} from 'anclient';
-
-import { JsampleIcons } from '../styles';
+import { L } from '../../../lib/utils/langstr';
+	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../../lib/protocol';
+	import { AnConst } from '../../../lib/utils/consts';
+	import { AnContext, AnError } from '../../../lib/react/reactext'
+	import { AnsonResp } from '../../../lib/protocol';
+	import { JsampleIcons } from '../styles'
+	import { DetailFormW } from '../../../lib/react/crud'
+	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
+	import { AnTree } from '../../../lib/react/widgets/tree';
 
 const styles = theme => ({
   dialogPaper: {

@@ -3,22 +3,15 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-// import { L } from '../../../lib/utils/langstr';
-// 	import { Protocol } from '../../../lib/protocol';
-// 	import { AnConst } from '../../../lib/utils/consts';
-// 	import { JsampleIcons } from '../styles';
-// 	import { CrudCompW } from '../../../lib/react/crud';
-// 	import { AnContext, AnError } from '../../../lib/react/reactext';
-// 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-// 	import { AnTablist } from '../../../lib/react/widgets/table-list';
-// 	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
-// 	import { AnsonResp } from '../../../lib/protocol';
-
-import { L, AnConst,
-	Protocol, AnsonResp,
-	CrudCompW, AnContext, AnError,
-	ConfirmDialog, AnTablist, AnQueryForm
-} from 'anclient';
+import { L } from '../../../lib/utils/langstr';
+	import { Protocol } from '../../../lib/protocol';
+	import { AnConst } from '../../../lib/utils/consts';
+	import { CrudCompW } from '../../../lib/react/crud';
+	import { AnContext, AnError } from '../../../lib/react/reactext';
+	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
+	import { AnTablist } from '../../../lib/react/widgets/table-list';
+	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
+	import { AnsonResp } from '../../../lib/protocol';
 
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';

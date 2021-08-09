@@ -4,19 +4,13 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-// import { L } from '../../../lib/utils/langstr';
-// 	import { AnConst } from '../../../lib/utils/consts';
-// 	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
-// 	import { CrudCompW } from '../../../lib/react/crud'
-// 	import { AnContext, AnError } from '../../../lib/react/reactext'
-// 	import { AnTablist } from '../../../lib/react/widgets/table-list.jsx'
-// 	import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
-
-import { L, AnConst,
-	Protocol, AnsonResp,
-	CrudCompW, AnContext, AnError,
-	AnTablist, AnQueryForm
-} from 'anclient';
+import { L } from '../../../lib/utils/langstr';
+	import { AnConst } from '../../../lib/utils/consts';
+	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
+	import { CrudCompW } from '../../../lib/react/crud'
+	import { AnContext, AnError } from '../../../lib/react/reactext'
+	import { AnTablist } from '../../../lib/react/widgets/table-list.jsx'
+	import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
 
 const styles = (theme) => ( {
 	root: {
