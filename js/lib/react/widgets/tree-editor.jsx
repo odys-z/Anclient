@@ -8,9 +8,9 @@ import { L, AnConst, Protocol, AnsonResp,
 	CrudComp, CrudCompW, AnContext, AnError, AnQueryForm, AnTreeIcons
 } from 'anclient'
 
-import { StarIcons } from '../styles';
+import { AnTreeIcons } from "./tree"
 
-import { TreeCardDetails } from './treecard-details';
+import { SimpleForm } from './treecard-details';
 
 const styles = (theme) => ({
   root: {
@@ -131,8 +131,8 @@ class TreeCardComp extends CrudComp {
 			<Typography align={align(n.css.url)}>{n.url}</Typography>
 		  </Grid>
 		  <Grid item xs={3} className={classes.treeItem}>
-			<StarIcons.Up onClick={this.toUp} />
-			<StarIcons.Down onClick={this.toDown} />
+			<AnTreeIcons.Up onClick={this.toUp} />
+			<AnTreeIcons.Down onClick={this.toDown} />
 		  </Grid>
 		</Grid>);
 
@@ -161,7 +161,6 @@ export { TreeCard, TreeCardComp }
 
 class TreeCardsComp extends CrudCompW {
   state = {
-	window: undefined,
 	treeData: {
 	  id: "sys",
 	  text: "Anclient Lv-0",
@@ -234,7 +233,6 @@ class TreeCardsComp extends CrudCompW {
 
   constructor(props) {
 	super(props);
-	this.state.window = props.window;
 
 	this.closeDetails = this.closeDetails.bind(this);
 
@@ -261,7 +259,7 @@ class TreeCardsComp extends CrudCompW {
 
 	this.addForm = (
 		<TreeCardDetails uri={this.props.uri}
-			c mtabl='ind_emotion' pk={p}
+			c mtabl={this.props.mtabl} pk={p}
 			onClose={this.closeDetails}
 			onOk={this.closeDetails}
 		/> );
@@ -329,11 +327,11 @@ class TreeCardsComp extends CrudCompW {
 					<Typography noWrap>
 					{editable && <>
 						<Button onClick={that.toAddChild} nid={tnode.id}
-							startIcon={<StarIcons.ListAdd />} color="primary" >
+							startIcon={<AnTreeIcons.ListAdd />} color="primary" >
 							{L('New')}
 						</Button>
 						<Button onClick={that.toDel} nid={tnode.id}
-							startIcon={<StarIcons.Delete />} color="primary" >
+							startIcon={<AnTreeIcons.Delete />} color="primary" >
 							{L('Delete')}
 						</Button>
 						</>

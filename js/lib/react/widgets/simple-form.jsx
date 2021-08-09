@@ -55,7 +55,7 @@ const styles = (theme) => ({
   }
 });
 
-class TreeCardDetailsComp extends DetailFormW {
+class SimpleFormComp extends DetailFormW {
 	uri = undefined;
 
 	state = {
@@ -313,7 +313,11 @@ class TreeCardDetailsComp extends DetailFormW {
 	  </>);
 	}
 }
-TreeCardDetailsComp.contextType = AnContext;
+SimpleFormComp.contextType = AnContext;
 
-const TreeCardDetails = withWidth()(withStyles(styles)(TreeCardDetailsComp));
-export { TreeCardDetails, TreeCardDetailsComp };
+SimpleFormComp.propTypes = {
+	mtabl: PropTypes.String.isRequired
+};
+
+const SimpleForm = withWidth()(withStyles(styles)(SimpleFormComp));
+export { SimpleForm, SimpleFormComp };
