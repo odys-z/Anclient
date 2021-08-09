@@ -9,16 +9,22 @@ import {
 	uri, AnContext, AnError, AnReactExt, Sys, SysComp
 } from 'anclient';
 
-import { Domain } from './test-app/views/domain';
-import { Roles } from './test-app/views/roles';
-import { Orgs } from './test-app/views/orgs';
-import { Users } from './test-app/views/users';
+// import { Domain } from './test-app/views/domain';
+// import { Roles } from './test-app/views/roles';
+// import { Orgs } from './test-app/views/orgs';
+// import { Users } from './test-app/views/users';
+import { Domain, Roles, Orgs, Users } from '@anclient/test-react';
 
 import { NorthPorts } from './north-ports.js';
 	import { Northeme } from './styles';
-	import { Dashboard } from './views/dashboard';
-	import { Indicators } from './views/indicators';
-	import { MyStudents } from './views/my-students';
+	import { Dashboard } from './views/n/dashboard';
+	import { Indicators } from './views/n/indicators';
+	import { Quizzes } from './views/n/quizzes';
+	import { Polls } from './views/n/polls';
+	import { MyStudents } from './views/n/my-students';
+
+	import { MyConnect } from './views/c/connect';
+	import { MyStatus } from './views/c/status';
 
 /** The application main.
  * "North" stands for the guardian.
@@ -140,7 +146,9 @@ class NorthApp extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<Sys menu='sys.menu.north' sys={L('North Star')} onLogout={this.logout} />
+				<Sys menu='sys.menu.north'
+					sys={L('North Star')} menuTitle={'Function Menu'}
+					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

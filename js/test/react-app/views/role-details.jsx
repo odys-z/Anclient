@@ -20,6 +20,7 @@ import { L } from '../../../lib/utils/langstr';
 	import { AnContext, AnError } from '../../../lib/react/reactext'
 	import { AnsonResp } from '../../../lib/protocol';
 	import { JsampleIcons } from '../styles'
+	import { DetailFormW } from '../../../lib/react/crud'
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
 	import { AnTree } from '../../../lib/react/widgets/tree';
 
@@ -67,7 +68,7 @@ const styles = theme => ({
   },
 });
 
-class RoleDetailsComp extends React.Component {
+class RoleDetailsComp extends DetailFormW {
 	state = {
 		crud: Protocol.CRUD.r,
 		dirty: false,
@@ -355,10 +356,10 @@ RoleDetailsComp.contextType = AnContext;
 
 // // TODO:
 // // TODO:
-// // TODO: move to CrudComp 
-RoleDetailsComp.propTypes = {
-	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
-};
+// // TODO: move to CrudComp
+// RoleDetailsComp.propTypes = {
+// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
+// };
 
 const RoleDetails = withWidth()(withStyles(styles)(RoleDetailsComp));
 export { RoleDetails, RoleDetailsComp };

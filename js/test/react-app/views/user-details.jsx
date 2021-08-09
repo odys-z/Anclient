@@ -19,9 +19,10 @@ import { L } from '../../../lib/utils/langstr';
 	import { AnConst } from '../../../lib/utils/consts';
 	import { AnContext, AnError } from '../../../lib/react/reactext'
 	import { AnsonResp } from '../../../lib/protocol';
-	import { JsampleIcons } from '../styles'
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
 	import { AnTree } from '../../../lib/react/widgets/tree';
+
+import { JsampleIcons } from '../styles';
 
 const styles = theme => ({
   dialogPaper: {

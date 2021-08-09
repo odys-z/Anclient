@@ -118,7 +118,9 @@ class App extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<Sys menu='sys.menu.jsample' onLogout={this.logout}/>
+				<Sys menu='sys.menu.jsample'
+					sys='AnReact' menuTitle='Sys Menu'
+					onLogout={this.logout}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

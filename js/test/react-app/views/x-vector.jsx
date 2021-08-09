@@ -3,13 +3,16 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import { TextField } from '@material-ui/core';
 
-import { L } from '../../../lib/utils/langstr';
-import { CrudComp } from '../../../lib/react/crud'
-import { AnContext, AnError } from '../../../lib/react/reactext'
-import { AnTablist } from '../../../lib/react/widgets/table-list.jsx'
-import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
-import { AnsonResp } from '../../../lib/protocol';
-// import TablePagination from '@material-ui/core/TablePagination';
+// import { L } from '../../../lib/utils/langstr';
+// import { CrudComp } from '../../../lib/react/crud'
+// import { AnContext, AnError } from '../../../lib/react/reactext'
+// import { AnTablist } from '../../../lib/react/widgets/table-list.jsx'
+// import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
+// import { AnsonResp } from '../../../lib/protocol';
+import { L, AnContext, AnError,
+	CrudComp, AnTablist, AnQueryForm,
+	AnsonResp
+} from 'anclient';
 
 // const AnTablePagination = wrapTablePagination(TablePagination);
 const styles = (theme) => ( {

@@ -6,33 +6,28 @@ import { Card, TextField, Typography } from '@material-ui/core';
 
 import {
     an, AnClient, SessionClient, Protocol, L, Langstrs,
-    AnContext, AnError, CrudComp, AnReactExt
+    AnContext, AnError, CrudCompW, AnReactExt
 } from 'anclient';
-
-import { TreeCards } from '../common/tree-cards';
 
 const styles = (theme) => ( {
 	root: {
 	}
 } );
 
-class IndicatorsComp extends CrudComp {
+class MyConnectComp extends CrudCompW {
 	state = {
-		students: []
+		my: []
 	};
-
-	// NOTE jserv 1.2 will use this to determine connId
-	uri = "";
 
 	constructor(props) {
 		super(props);
 	}
 
 	render () {
-		return (<TreeCards uri={this.uri}/>);
+		return (<>My Connections</>);
 	}
 }
-IndicatorsComp.contextType = AnContext;
+MyConnectComp.contextType = AnContext;
 
-const Indicators = withWidth()(withStyles(styles)(IndicatorsComp));
-export { Indicators, IndicatorsComp }
+const MyConnect = withWidth()(withStyles(styles)(MyConnectComp));
+export { MyConnect, MyConnectComp }

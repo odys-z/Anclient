@@ -6,7 +6,6 @@ import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/co
 import { L } from '../../../lib/utils/langstr';
 	import { Protocol } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/utils/consts';
-	import { JsampleIcons } from '../styles';
 	import { CrudCompW } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
@@ -14,7 +13,8 @@ import { L } from '../../../lib/utils/langstr';
 	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
 	import { AnsonResp } from '../../../lib/protocol';
 
-	import { RoleDetails } from './role-details';
+import { JsampleIcons } from '../styles';
+import { RoleDetails } from './role-details';
 
 const styles = (theme) => ( {
 	root: {
@@ -146,13 +146,13 @@ class RolesComp extends CrudCompW {
 	}
 
 	toAdd(e, v) {
-		this.roleForm = (<RoleDetails c
+		this.roleForm = (<RoleDetails c uri={this.uri}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
-		this.roleForm = (<RoleDetails u
+		this.roleForm = (<RoleDetails u uri={this.uri}
 			roleId={this.state.selectedRoleIds[0]}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
@@ -168,7 +168,8 @@ class RolesComp extends CrudCompW {
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		return ( <>
-			<AnQueryForm onSearch={this.toSearch} uri={this.uri} 
+			<AnQueryForm uri={this.uri}
+				onSearch={this.toSearch}
 				conds={[ this.state.condName, this.state.condOrg ]}
 				query={ (q) => { return {
 					rName: q.state.conds[0].val ? q.state.conds[0].val : undefined,

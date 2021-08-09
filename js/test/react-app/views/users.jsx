@@ -6,7 +6,6 @@ import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/co
 import { L } from '../../../lib/utils/langstr';
 	import { Protocol } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/utils/consts';
-	import { JsampleIcons } from '../styles';
 	import { CrudCompW } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
@@ -14,7 +13,8 @@ import { L } from '../../../lib/utils/langstr';
 	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
 	import { AnsonResp } from '../../../lib/protocol';
 
-	import { UserDetails } from './user-details';
+import { JsampleIcons } from '../styles';
+import { UserDetails } from './user-details';
 
 const styles = (theme) => ( {
 	root: {

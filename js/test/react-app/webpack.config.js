@@ -27,16 +27,13 @@ module.exports = {
 		rules: [
 		{   test: /\.jsx$/,
 			loader: 'babel-loader',
-			exclude: /node_modules/,
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
 		{   test: /\.css$/,
-			exclude: /node_modules/,
 			use: ["style-loader", "css-loader"]
 		},
 		{   test: /\.svg$/,
-			exclude: /node_modules/,
 			use: [  { loader: "babel-loader" },
 					{ loader: "react-svg-loader" } ]
 		} ]

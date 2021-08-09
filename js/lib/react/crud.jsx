@@ -46,6 +46,10 @@ class CrudCompW extends React.Component {
 		super(props);
 
 		let {width} = props;
+		CrudCompW.prototype.media = CrudCompW.setWidth(width);
+	}
+
+	static setWidth(width) {
 		let media = {};
 
 		if (width === 'lg') {
@@ -73,7 +77,7 @@ class CrudCompW extends React.Component {
 			media.isXs = true;
 		}
 
-		CrudCompW.prototype.media = media;
+		return media;
 	}
 }
 CrudCompW.contextType = AnContext;
@@ -135,8 +139,29 @@ class CheapFlowComp extends CrudComp {
 }
 const CheapFlow = withStyles(styles)(CheapFlowComp);
 
+
+class DetailFormW extends React.Component {
+	constructor(props) {
+		super(props);
+
+		let {width} = props;
+		let media = CrudCompW.setWidth(width);
+
+		DetailFormW.prototype.media = media;
+	}
+}
+DetailFormW.contextType = AnContext;
+
+DetailFormW.propTypes = {
+	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
+	/* TODO doc Design Notes:
+	 * Main CRUD page doesn't need this check. Those common used wigdets need this.
+	 */
+	uri: PropTypes.string.isRequired
+};
+
 export {
-	CrudComp, CrudCompW,
+	CrudComp, CrudCompW, DetailFormW,
 	Home, HomeComp,
 	Domain, DomainComp,
 	Roles, RolesComp,
