@@ -2,7 +2,7 @@ Issues & Handling
 =================
 
 React Issue #13991 - Invalid hood call
----------------------------------------
+--------------------------------------
 
 About the error
 _______________
@@ -191,6 +191,26 @@ In NorthApp, react & react-dom are installed locally. Then Anclient can be impor
         AnContext, AnError, AnReactExt,
         Sys, SysComp, Domain, Roles, Orgs, Users
     } from 'anclient';
+..
+
+Similar of React Issue #13991
+_____________________________
+
+A tried scenario:
+
+1. publish test/react-app as @anclient/test-react
+
+2. install anclient in test/react-app
+
+3. AnContext.anReact is undefined for <QueryForm /> in <Domain />
+
+.. code-bloc:: javascript
+
+    componentDidMount() {
+      if (!this.context || !this.context.anReact)
+        throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
+      ...
+    }
 ..
 
 ReferenceError: regeneratorRuntime is not defined
