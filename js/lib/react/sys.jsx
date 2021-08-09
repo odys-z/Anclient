@@ -151,40 +151,13 @@ class SysComp extends React.Component {
 		window: undefined,
 		sysName: 'Anreact Sample',
 		skMenu: undefined, // e.g. 'sys.menu.jserv-sample';
-		sysMenu: {
-			funcId: 'sys',
-			funcName: 'Anclient Lv-0',
-			url: '/',
-			css: {icon: "menu-lv0"},
-			flags: '0',
-			fullpath: 'sys',
-			parentId: undefined,
-			sibling: 0,
-			children: [
-				{	funcId: 'domain',
-					funcName: 'Domain Settings',
-					url: '/sys/domain',
-					css: {icon: "menu-lv1"},
-					flags: '0',
-					fullpath: 'sys.0 domain',
-					parentId: 'sys',
-					sibling: 0
-				},
-				{	funcId: 'roles',
-					funcName: 'Sysem Roles',
-					url: '/sys/roles',
-					css: {icon: "menu-lv1"},
-					flags: '0',
-					fullpath: 'sys.1 roles',
-					parentId: 'sys',
-					sibling: 0
-				},
-			]
-		},
+		// {funcId, funcName,url, css: {icon}, fullpath, parentId, sibling, children: [] }
+		sysMenu: { },
 
 		cruds: [{'/home': Home}],
 		paths: [{path: '/home', params: {}}],
 
+		menuName: 'Sys Menu',
 		showMenu: false,
 		expandings: new Set(),
 	};
@@ -197,9 +170,11 @@ class SysComp extends React.Component {
 
 	constructor(props) {
 		super(props);
+		this.state.window = props.window;
+
 		this.state.sysName = props.sys || props.sysName || props.name || this.state.sysName;
 		this.state.skMenu = props.menu;
-		this.state.window = props.window;
+		this.state.menuName = props.menu || 'Sys Menu';
 
 		this.showMenu = this.showMenu.bind(this);
 		this.hideMenu = this.hideMenu.bind(this);
@@ -316,9 +291,7 @@ class SysComp extends React.Component {
 		let claz = Object.assign({}, classes);
 
 		let open = this.state.showMenu;
-		console.log('here');
 
-		// if (!window) return '';
 		return (
 		  <div className={claz.root}>
 			<AppBar
@@ -366,7 +339,7 @@ class SysComp extends React.Component {
 				>
 				<div className={claz.drawerHeader}>
 					<IconButton onClick={this.hideMenu}>
-						<ListItemText>{this.state.sysName}</ListItemText>
+						<ListItemText>{this.state.menuName}</ListItemText>
 						{claz.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 					</IconButton>
 				</div>

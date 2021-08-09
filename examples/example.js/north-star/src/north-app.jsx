@@ -16,9 +16,13 @@ import { Users } from './test-app/views/users';
 
 import { NorthPorts } from './north-ports.js';
 	import { Northeme } from './styles';
-	import { Dashboard } from './views/dashboard';
-	import { Indicators } from './views/indicators';
-	import { MyStudents } from './views/my-students';
+	import { Dashboard } from './views/n/dashboard';
+	import { Indicators } from './views/n/indicators';
+	import { Quizzes } from './views/n/quizzes';
+	import { Polls } from './views/n/polls';
+
+	import { MyConnect } from './views/c/dashboard';
+	import { MyStatus } from './views/c/indicators';
 
 /** The application main.
  * "North" stands for the guardian.
@@ -140,7 +144,9 @@ class NorthApp extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<Sys menu='sys.menu.north' sys={L('North Star')} onLogout={this.logout} />
+				<Sys menu='sys.menu.north'
+					sys={L('North Star')} menu={'Function Menu'}
+					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
