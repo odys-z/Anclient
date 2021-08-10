@@ -49,6 +49,15 @@ export class AnReact {
 		throw new Error('don\'t use this - a stub for future extension');
 	}
 
+	bindTablist(req, comp, errCtx) {
+		this.client.commit(req, (qrsp) => {
+			let rs = qrsp.Body().Rs();
+			let {rows} = AnsonResp.rs2arr( rs );
+			comp.state.pageInf.total = rs.total;
+			comp.setState({rows});
+		}, errCtx.onError );
+	}
+
 	bindSimpleForm(qmsg, errCtx, compont) {
 		let onload = qmsg.onOk || qmsg.onLoad ||
 			// try figure the fields
@@ -181,16 +190,6 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
-	// TODO move TO super class
-	bindTablist(req, comp, errCtx) {
-		this.client.commit(req, (qrsp) => {
-			let rs = qrsp.Body().Rs();
-			let {rows} = AnsonResp.rs2arr( rs );
-			comp.state.pageInf.total = rs.total;
-			comp.setState({rows});
-		}, errCtx.onError );
-	}
-
 	/** Load jsample menu. (using DatasetReq & menu.serv)
 	 * @param {string} sk menu sk (semantics key, see dataset.xml), e.g. 'sys.menu.jsample'
 	 * @param {function} onLoad
@@ -246,13 +245,23 @@ export class AnReactExt extends AnReact {
 			compont.setState({stree: resp.Body().forest});
 	}</pre>
 	 * @param {object} opts dataset info {sk, sqlArgs, onOk}
+	 * @param {string} opts.sk
+	 * @param {string} opts.sqlArgs
+	 * @param {function} opts.onOk
 	 * @param {AnContext} errCtx
 	 * @param {CrudComp} component
 	 * @return {AnReactExt} this
 	 */
 	stree(opts, errCtx, component) {
-		let {onOk} = opts;
+		let {uri, onOk} = opts;
+
+		if (!uri)
+			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
+
 		opts.port = 'stree';
+
+		if (opts.sk && !opts.t)
+			opts.t = stree_t.sqltree;
 
 		let onload = onOk || function (resp) {
 			if (component)

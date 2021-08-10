@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>AnClient for react test</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <hr>
+  <ul>
+    <li>Quick Start:
+    <pre>
+    # start semantic-jserv data service
+    docker pull odysz/jserv-sample
+    docker run --name jserv -dp 8080:8080 odysz/jserv-sample
+
+    # start web server
+    docker pull odysz/anclient-test
+    docker run --name anclient -dp 80:80 odysz/anclient-test</pre>
+    </li>
+    <li><p>Troubleshootings</p>
+    <p><b>Note: don't use --rm, currently we haven't yet mounted volume to persist sqlite DB.</b></p>
+    This is userful to test the data service connecion:<br>
+    <a href='http://localhost:8080/jserv-sample/login.serv11'>
+        http://locahost:8080/jserv-sample/login.serv11</a>
+    <br>The an-quiz service should return this json data:<pre>
+    {"type": "io.odysz.semantic.jprotocol.AnsonMsg",
+     "code": "exSemantic", "opts": null, "port": "session",
+     "header": null,
+     "body": [{"type": "io.odysz.semantic.jprotocol.AnsonResp",
+        "rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null, "conn": null,
+        "m": "No envelope is avaliable.", "map": null
+     }],
+     "version": "1.0", "seq": 0
+    }</pre>
+    </li>
+  </ul>
+  <script src="AnHome-1.0.0.min.js"></script>
+  <script>
+	let searchParams = new URLSearchParams(window.location.search)
+	let servId = searchParams ? searchParams.get('serv') : undefined;
+	test.App.bindHtml('app', {servId, Window, portal: 'index.html'});
+  </script>
+</body>
+</html>

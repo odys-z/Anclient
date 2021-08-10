@@ -2,6 +2,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
+import PropTypes from "prop-types";
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -55,7 +56,7 @@ const styles = (theme) => ({
   }
 });
 
-class TreeCardDetailsComp extends DetailFormW {
+class SimpleFormComp extends DetailFormW {
 	uri = undefined;
 
 	state = {
@@ -97,6 +98,8 @@ class TreeCardDetailsComp extends DetailFormW {
 
 		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CURD.u;
 		this.state.mtabl = props.mtabl;
+		this.state.fields = props.fields;
+		this.state.pk = props.pk;
 
 		if (this.state.crud !== Protocol.CRUD.c)
 			this.state.record[this.state.pk.field] = props.pkval;
@@ -115,8 +118,6 @@ class TreeCardDetailsComp extends DetailFormW {
 
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
-
-		// console.log(super.media); => {isSm: true, isXs: true}
 	}
 
 	validate() {
@@ -313,7 +314,11 @@ class TreeCardDetailsComp extends DetailFormW {
 	  </>);
 	}
 }
-TreeCardDetailsComp.contextType = AnContext;
+SimpleFormComp.contextType = AnContext;
 
-const TreeCardDetails = withWidth()(withStyles(styles)(TreeCardDetailsComp));
-export { TreeCardDetails, TreeCardDetailsComp };
+SimpleFormComp.propTypes = {
+	mtabl: PropTypes.string.isRequired
+};
+
+const SimpleForm = withWidth()(withStyles(styles)(SimpleFormComp));
+export { SimpleForm, SimpleFormComp };
