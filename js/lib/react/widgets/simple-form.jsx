@@ -97,9 +97,11 @@ class SimpleFormComp extends DetailFormW {
 
 		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CURD.u;
 		this.state.mtabl = props.mtabl;
+		this.state.fields = props.fields;
+		this.state.pk = props.pk;
 
 		if (this.state.crud !== Protocol.CRUD.c)
-			this.state.record[this.state.pk.field] = props.pk;
+			this.state.record[this.state.pk.field] = props.pkval;
 		else
 			this.state.dirty = true;
 
@@ -115,8 +117,6 @@ class SimpleFormComp extends DetailFormW {
 
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
-
-		// console.log(super.media); => {isSm: true, isXs: true}
 	}
 
 	validate() {
@@ -316,7 +316,7 @@ class SimpleFormComp extends DetailFormW {
 SimpleFormComp.contextType = AnContext;
 
 SimpleFormComp.propTypes = {
-	mtabl: PropTypes.String.isRequired
+	mtabl: PropTypes.string.isRequired
 };
 
 const SimpleForm = withWidth()(withStyles(styles)(SimpleFormComp));

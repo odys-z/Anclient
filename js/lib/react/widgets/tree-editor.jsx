@@ -257,9 +257,10 @@ class TreeCardsComp extends CrudCompW {
 	e.stopPropagation();
 	let p = e.currentTarget.getAttribute("pid");
 
-	this.addForm = (
+	this.detailForm = (
 		<TreeCardDetails uri={this.props.uri}
-			c mtabl={this.props.mtabl} pk={p}
+			c mtabl={this.props.mtabl} pkval={p}
+			{...this.props} // fields, pk, etc.
 			onClose={this.closeDetails}
 			onOk={this.closeDetails}
 		/> );
@@ -270,7 +271,7 @@ class TreeCardsComp extends CrudCompW {
   }
 
   closeDetails() {
-	this.addForm = undefined;
+	this.detailForm = undefined;
 	this.setState({});
   }
 
@@ -385,12 +386,18 @@ class TreeCardsComp extends CrudCompW {
 	return (
 		<div className={classes.root}>
 			{this.treeNodes(classes)}
-			{this.addForm}
+			{this.detailForm}
 			{this.context.isSm && <Button >{L('Save')}</Button>}
 		</div>);
   }
 }
 TreeCardsComp.contextType = AnContext;
+
+SimpleFormComp.propTypes = {
+	mtabl: PropTypes.string.isRequired,
+	fields: PropTypes.array.isRequired,
+	pk: PropTypes.object.isRequired
+};
 
 const TreeCards = withWidth()(withStyles(styles)(TreeCardsComp));
 export { TreeCards, TreeCardsComp }

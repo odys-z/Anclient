@@ -99,7 +99,7 @@ class TreeCardDetailsComp extends DetailFormW {
 		this.state.mtabl = props.mtabl;
 
 		if (this.state.crud !== Protocol.CRUD.c)
-			this.state.record[this.state.pk.field] = props.pk;
+			this.state.record[this.state.pk.field] = props.pkval;
 		else
 			this.state.dirty = true;
 
