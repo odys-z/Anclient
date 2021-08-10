@@ -2,8 +2,7 @@ import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Login } from '../../lib/react/login.jsx';
-import { AnContext, AnError } from '../../lib/react/reactext.jsx'
-import { AnReact } from '../../lib/react/anreact.jsx'
+import { AnContext, AnError, AnReact, SessionClient } from 'anclient';
 
 const styles = (theme) => ({
 	root: {
@@ -28,6 +27,7 @@ class LoginApp extends React.Component {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.onLogin = this.onLogin.bind(this);
 	}
 
 	onError(c, r) {
@@ -39,20 +39,34 @@ class LoginApp extends React.Component {
 		// tested: parent.location = this.state.home
 	}
 
+	onLogin(client) {
+		// that.context.ssInf = client.ssInf;
+		SessionClient.persistorage(client.ssInf);
+		if (this.props.iparent) {
+			let mainpage = client.ssInf.home || this.props.ihome;
+			if (!mainpage)
+				console.error('Login succeed, but no home page be found.');
+			else {
+				this.props.iparent.location = `${mainpage}?serv=${this.state.servId}`;
+				this.setState({anClient: client});
+			}
+		}
+	}
+
 	render() {
 		return (
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				jserv: this.state.jserv,
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
-				iparent: this.props.iparent,
-				ihome: this.props.ihome || 'index.html',
+				// FIXME why Login.context.iparent == undefined?
+				// iparent: this.props.iparent,
+				// ihome: this.props.ihome || 'index.html',
 				error: {onError: this.onError, msg: this.state.err},
 			}} >
-				<Login />
+				<Login onLoginOk={this.onLogin}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} />}
 			</AnContext.Provider>
 		);
@@ -75,7 +89,8 @@ class LoginApp extends React.Component {
 
 		function onJsonServ(elem, json) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent} ihome={opts.home}/>, dom);
+			ReactDOM.render(
+				<LoginApp servs={json} servId={opts.serv} iparent={opts.parent} ihome={opts.home} />, dom);
 		}
 	}
 }

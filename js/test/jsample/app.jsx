@@ -3,20 +3,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
-import {SessionClient} from '../../lib/anclient.js'
-	import { Protocol } from '../../lib/protocol.js'
-	import {L, Langstrs} from '../../lib/utils/langstr.js'
-	import { Sys, SysComp } from '../../lib/react/sys.jsx';
-	import { AnContext, AnError } from '../../lib/react/reactext.jsx'
-	import { AnReactExt } from '../../lib/react/anreact.jsx'
+import { L, Langstrs,
+	Protocol, SessionClient,
+	Sys, SysComp,
+	AnContext, AnError, AnReactExt,
+	jsample
+} from 'anclient';
+const { Domain, Roles, Orgs, Users, JsampleTheme } = jsample;
 
-// tests extents
-import { samports } from './jsample.js'
-	import { Domain } from './views/domain'
-	import { Roles } from './views/roles'
-	import { Orgs } from './views/orgs'
-	import { Users } from './views/users'
-	import { JsampleTheme } from './styles'
+import { samports } from './jsample.js';
+
+import { Indicators } from './views/indicators';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -59,16 +56,18 @@ class App extends React.Component {
 
 		// extending CRUD pages
 		SysComp.extendLinks( [
-			{path: '/views/sys/domain/domain.html', comp: Domain},
-			{path: '/views/sys/role/roles.html', comp: Roles},
-			{path: '/views/sys/org/orgs.html', comp: Orgs},
-			{path: '/views/sys/user/users.html', comp: Users},
+			{path: '/sys/domain', comp: Domain},
+			{path: '/sys/roles', comp: Roles},
+			{path: '/sys/orgs', comp: Orgs},
+			{path: '/sys/users', comp: Users},
+			{path: '/xv/indicators', comp: Indicators}
 		] );
 	}
 
 	onError(c, r) {
 		console.error(c, r);
 		// this.setState({hasError: !!c, nextAction: 're-login'});
+		this.state.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
 			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
@@ -138,7 +137,7 @@ class App extends React.Component {
 	 * @param {string} [opts.iportal='portal.html'] page showed after logout
 	 */
 	static bindHtml(elem, opts = {}) {
-		let portal = opts.portal ? opts.portal : 'portal.html';
+		let portal = opts.portal ? opts.portal : 'index.html';
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, json) {

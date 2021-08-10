@@ -12,7 +12,7 @@
 	<script>
 		let searchParams = new URLSearchParams(window.location.search)
 		let servId = searchParams ? searchParams.get('serv') : undefined;
-		test.LoginApp.bindHtml('login', {servId, parent});
+		test.LoginApp.bindHtml('login', {servId, parent, home: 'main.html'});
 	</script>
 </body>
 </html>

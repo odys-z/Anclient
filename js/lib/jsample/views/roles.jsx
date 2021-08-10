@@ -80,7 +80,7 @@ class RolesComp extends CrudCompW {
 
 	toSearch(e, query) {
 		let pageInf = this.state.pageInf;
-		let queryReq = this.context.anClient.query(null, 'a_roles', 'r', pageInf)
+		let queryReq = this.context.anClient.query(this.uri, 'a_roles', 'r', pageInf)
 		let req = queryReq.Body()
 			.expr('orgName').expr('roleName').expr('roleId').expr('remarks')
 			.j('a_orgs', 'o', 'o.orgId=r.orgId')
@@ -137,7 +137,7 @@ class RolesComp extends CrudCompW {
 		function delRole(roleIds) {
 			let req = that.context.anClient
 				.usrAct('roles', Protocol.CRUD.d, 'delete')
-				.deleteMulti(null, 'a_roles', 'roleId', roleIds);
+				.deleteMulti(this.uri, 'a_roles', 'roleId', roleIds);
 
 			that.context.anClient.commit(req, (resp) => {
 				that.toSearch();

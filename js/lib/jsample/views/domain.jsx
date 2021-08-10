@@ -46,7 +46,7 @@ class DomainComp extends CrudCompW {
 
 	toSearch(e, query) {
 		let pageInf = this.state.pageInf;
-		let queryReq = this.context.anClient.query(null, 'a_domain', 'd', pageInf)
+		let queryReq = this.context.anClient.query(this.uri, 'a_domain', 'd', pageInf)
 		if (query.parent && query.parent !== 0)
 			queryReq.Body().whereCond('=', 'parentId', `'${query.parent}'`);
 		if (query.domain)

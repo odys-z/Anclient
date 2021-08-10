@@ -10,6 +10,8 @@ export const AnContext = React.createContext({
 	ssInf: undefined,
 
 	pageOrigin: '.',
+	iparent: {},    // usually the parent window of ifram
+	ihome: '',
 	servId: 'host',
 	servs: { host: 'http://localhost:8080/jserv-sample' },
 

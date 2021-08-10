@@ -104,7 +104,7 @@ class UserDetailsComp extends React.Component {
 
 		if (this.state.crud !== Protocol.CRUD.c) {
 			// load
-			let queryReq = this.context.anClient.query(null, 'a_users', 'r')
+			let queryReq = this.context.anClient.query(this.uri, 'a_users', 'r')
 			queryReq.Body().whereEq('userId', this.state.pk);
 			this.context.anReact.bindSimpleForm({req: queryReq,
 				onOk: (resp) => {

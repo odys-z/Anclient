@@ -104,7 +104,7 @@ class RoleDetailsComp extends DetailFormW {
 
 		if (this.state.crud !== Protocol.CRUD.c) {
 			// load
-			let queryReq = this.context.anClient.query(null, 'a_roles', 'r')
+			let queryReq = this.context.anClient.query(this.uri, 'a_roles', 'r')
 			queryReq.Body().whereEq('roleId', this.state.pk);
 			this.context.anReact.bindSimpleForm({req: queryReq,
 				onOk: (resp) => {
