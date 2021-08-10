@@ -4,6 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
 import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
 import Collapse from "@material-ui/core/Collapse";
 import {
   Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
@@ -13,12 +14,12 @@ import { Typography } from "@material-ui/core";
 // import { AnTreeIcons } from "./tree"
 // 	import { AnContext } from '../reactext.jsx';
 
-import { AnTreeIcons, AnContext, jsample } from 'anclient';
+import { L, AnTreeIcons, AnContext, CrudCompW, jsample } from 'anclient';
 const { JsampleIcons } = jsample;
 
 const styles = (theme) => ({
   root: {
-	display: "flex",
+	// display: "flex",
 	width: "100%",
   },
   row: {
@@ -38,9 +39,6 @@ const styles = (theme) => ({
 	borderBottom: "1px solid #bcd",
 	borderTop: "1px solid #bcd"
   },
-  // hide: {
-	// display: "none"
-  // },
   treeItem: {
 	padding: theme.spacing(1),
 	borderLeft: "1px solid #bcd",
@@ -57,19 +55,21 @@ class TreeCardComp extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state.node = props.node;
-
+		// this.state.tnode = props.tnode;
 		this.toUp = this.toUp.bind(this);
+		this.toDown = this.toDown.bind(this);
+		this.toTop = this.toTop.bind(this);
 		this.toDown = this.toDown.bind(this);
 	}
 
 	toUp(e) {
 		let p = this.props.parent;
-		let n = this.state.node;
-		let me = p.children.indexOf(n);
+		let n = this.props.tnode;
+		let children = p.node.children;
+		let me = children.indexOf(n);
 		let elder = me - 1;
 		if (elder >= 0)
-			p.children.swap(me, elder);
+			children.swap(me, elder);
 
 		if (typeof this.props.onUpdate === 'function')
 			this.props.onUpdate(n, p, me, elder);
@@ -77,10 +77,11 @@ class TreeCardComp extends React.Component {
 
 	toTop(e) {
 		let p = this.props.parent;
-		let n = this.state.node;
-		let me = p.children.indexOf(n);
+		let n = this.props.tnode;
+		let children = p.node.children;
+		let me = children.indexOf(n);
 		if (me > 0)
-			p.children.swap(me, 0);
+			children.swap(me, 0);
 
 		if (typeof this.props.onUpdate === 'function')
 			this.props.onUpdate(n, p, me, 0);
@@ -88,29 +89,31 @@ class TreeCardComp extends React.Component {
 
 	toDown(e) {
 		let p = this.props.parent;
-		let n = this.state.node;
-		let me = p.children.indexOf(n);
+		let n = this.props.tnode;
+		let children = p.node.children;
+		let me = children.indexOf(n);
 		let younger = me + 1;
-		if (younger < p.children.length)
-			p.children.swap(me, younger);
+		if (younger < children.length)
+			children.swap(me, younger);
 
 		if (typeof this.props.onUpdate === 'function')
 			this.props.onUpdate(n, p, me, younger);
 	}
 
-	toTop(e) {
+	toBottom(e) {
 		let p = this.props.parent;
-		let n = this.state.node;
-		let me = p.children.indexOf(n);
-		if (me < p.children.length - 1)
-			p.children.swap(me, p.children.length - 1);
+		let n = this.props.tnode;
+		let children = p.node.children;
+		let me = children.indexOf(n);
+		if (me < children.length - 1)
+			children.swap(me, children.length - 1);
 		if (typeof this.props.onUpdate === 'function')
-			this.props.onUpdate(n, p, me, p.children.length);
+			this.props.onUpdate(n, p, me, children.length);
 	}
 
 	render() {
-		let n = this.state.node;
-		n.css = n.css || {};
+		let n = this.props.tnode;
+		n.node.css = n.node.css || {};
 		let { classes, width } = this.props;
 		return (
 		<Grid container
@@ -121,15 +124,15 @@ class TreeCardComp extends React.Component {
 		  <Grid item xs={4} className={classes.rowHead}>
 			  <Typography noWrap>
 				{this.props.leadingIcons(n)}
-				{icon(n.css.icon)}
-				{n.text}
+				{icon(n.node.css.icon)}
+				{n.node.text}
 			  </Typography>
 		  </Grid>
 		  <Grid item xs={2} className={classes.treeItem}>
-			<Typography noWrap align={align(n.css.level)}>{n.level}</Typography>
+			<Typography noWrap align={align(n.node.css.level)}>{n.level}</Typography>
 		  </Grid>
 		  <Grid item xs={3} className={classes.treeItem}>
-			<Typography align={align(n.css.url)}>{n.url}</Typography>
+			<Typography align={align(n.node.css.url)}>{n.node.url}</Typography>
 		  </Grid>
 		  <Grid item xs={3} className={classes.treeItem}>
 			<JsampleIcons.Up onClick={this.toUp} />
@@ -147,9 +150,9 @@ class TreeCardComp extends React.Component {
 	}
 }
 TreeCardComp.contextType = AnContext;
-// TreeCardComp.propTypes = {
-// 	leadingIcons: PropTypes.func.isRequired
-// };
+TreeCardComp.propTypes = {
+	leadingIcons: PropTypes.func.isRequired
+};
 
 const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
 export { TreeCard, TreeCardComp }
@@ -177,6 +180,7 @@ class AnTreeditorComp extends React.Component {
 	}
 
 	componentDidMount() {
+		console.log(this.props.uri);
 		this.toSearch();
 	}
 
@@ -194,7 +198,7 @@ class AnTreeditorComp extends React.Component {
 
 	toExpandItem(e) {
 		e.stopPropagation();
-		let f = e.currentTarget.getAttribute("iid");
+		let f = e.currentTarget.getAttribute("nid");
 
 		let expandings = this.state.expandings;
 		if (expandings.has(f)) expandings.delete(f);
@@ -211,19 +215,19 @@ class AnTreeditorComp extends React.Component {
 							  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
 					: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
 			})
-			: new Array(treeItem.level + 1).map((v, x) => {
-				return x === icons.length - 1 && expand
-					? expIcon ? <React.Fragment key={x}>{icon(expIcon)}</React.Fragment>
-							  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
-					: <React.Fragment key={x}>{icon('.')}</React.Fragment>;
+			: new Array(treeItem.level + 1).fill(0).map((v, x) => {
+				return x === treeItem.level - 1 && expand
+					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
+					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
 			})
 	}
 
 	/**
 	 * @param {object} classes
 	 */
-	treeNodes(classes) {
+	treeNodes(classes, media) {
 		let that = this;
+		let isMd = media.isMd;
 
 		let m = this.state.forest;
 		let expandItem = this.toExpandItem;
@@ -238,8 +242,8 @@ class AnTreeditorComp extends React.Component {
 		  }
 		  else {
 			let open = that.state.expandings.has(tnode.id);
-			tnode.css = tnode.css || {};
-			if (tnode.children && tnode.children.length > 0) {
+			tnode.node.css = tnode.node.css || {};
+			if (tnode.node.children && tnode.node.children.length > 0) {
 			  let editable = true;  // TODO data record privilege
 			  return (
 				<div key={tnode.id} className={classes.folder}>
@@ -251,13 +255,13 @@ class AnTreeditorComp extends React.Component {
 					<Grid container spacing={0}>
 					  <Grid item xs={5} >
 						<Typography noWrap>
-						  {this.leadingIcons(tnode, open, tnode.expandIcon)}
-						  {icon(tnode.css.icon)}
-						  {tnode.text}
+						  {that.leadingIcons(tnode, open, tnode.expandIcon)}
+						  {icon(tnode.node.css.icon)}
+						  {tnode.node.text}
 						</Typography>
 					  </Grid>
 					  <Grid item xs={3} >
-						<Typography>{formatFolderDesc(tnode)}
+						<Typography>{formatFolderDesc(tnode, media)}
 							{open ? icon("expand") : icon("collapse")}
 						</Typography>
 					  </Grid>
@@ -266,11 +270,11 @@ class AnTreeditorComp extends React.Component {
 						{editable && <>
 							<Button onClick={that.toAddChild} nid={tnode.id}
 								startIcon={<JsampleIcons.ListAdd />} color="primary" >
-								{L('New')}
+								{isMd && L('New')}
 							</Button>
 							<Button onClick={that.toDel} nid={tnode.id}
 								startIcon={<JsampleIcons.Delete />} color="primary" >
-								{L('Delete')}
+								{isMd && L('Delete')}
 							</Button>
 							</>
 						}
@@ -280,7 +284,7 @@ class AnTreeditorComp extends React.Component {
 				  </div>
 				  {open &&
 					<Collapse in={open} timeout="auto" unmountOnExit>
-						{buildTreegrid(tnode.children, tnode)}
+						{buildTreegrid(tnode.node.children, tnode)}
 					</Collapse>
 				  }
 				</div>
@@ -288,7 +292,7 @@ class AnTreeditorComp extends React.Component {
 			}
 			else
 			  return (
-				<TreeCard key={tnode.id} node={tnode}
+				<TreeCard key={tnode.id} tnode={tnode}
 					parent={parent} leadingIcons={that.leadingIcons}
 					delete={that.toDelCard} onUpdate={that.onUpdate} />
 			  );
@@ -303,16 +307,26 @@ class AnTreeditorComp extends React.Component {
 			return css.align ? css.align : 'center';
 		}
 
+		function formatFolderDesc(tnode, media) {
+			let {text, children} = tnode.node;
+
+			if (children)
+				children = `[${media.isMd ? 'children' : ''} ${children.length}]`;
+			else chidlren = '';
+
+			return `${media.isXl ? text : ''} ${children}`;
+		}
 	}
 
 	render() {
-		console.log(this.uri);
-		const { classes } = this.props;
+		const { classes, width } = this.props;
 
-		return <div className={classes.root}>{this.treeNodes(classes)}</div>;
+		let media = CrudCompW.setWidth(width);
+
+		return <div className={classes.root}>{this.treeNodes(classes, media)}</div>;
 	}
 }
 AnTreeditorComp.contextType = AnContext;
 
-const AnTreeditor = withStyles(styles)(AnTreeditorComp);
+const AnTreeditor = withWidth()(withStyles(styles)(AnTreeditorComp));
 export { AnTreeditor, AnTreeditorComp }
