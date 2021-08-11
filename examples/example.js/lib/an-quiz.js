@@ -6,7 +6,7 @@ import {
 
 import {QuizReq} from './protocol.quiz.js';
 
-export const qconn = "quiz";
+export const quizUri = "/quiz";
 
 const Quizports = {
 	quiz: 'quiz.serv'
@@ -64,7 +64,7 @@ class JQuiz {
 	static get port() { return 'quiz'; }
 
 	serv (a, conds = {}, onLoad, errHandler) {
-		let req = new UserReq(qconn)
+		let req = new UserReq(quizUri)
 			.A(a); // this is a reading request
 
 		for (let k in conds)
@@ -124,8 +124,8 @@ class JQuiz {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		let req = this.client.userReq(qconn, JQuiz.port,
-			new UserReq( qconn, "quizzes", props ).A(quiz_a.insert) );
+		let req = this.client.userReq(quizUri, JQuiz.port,
+			new UserReq( quizUri, "quizzes", props ).A(quiz_a.insert) );
 
 		this.client.an.post(req, onOk, (c, resp) => {
 			if (that.err) {
@@ -147,8 +147,8 @@ class JQuiz {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		let req = this.client.userReq(qconn, JQuiz.port,
-			new UserReq(qconn, "quizzes", props).A(quiz_a.update) );
+		let req = this.client.userReq(quizUri, JQuiz.port,
+			new UserReq(quizUri, "quizzes", props).A(quiz_a.update) );
 
 		this.client.an.post(req, onOk, (c, resp) => {
 			if (that.err) {

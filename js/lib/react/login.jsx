@@ -85,7 +85,7 @@ class LoginComp extends React.Component {
 		}
 
 		if (!this.state.loggedin) {
-			an.init(this.context.jserv);
+			an.init(this.context.servs[this.context.servId || 'host']);
 			an.login( uid, pwd, reload, onError );
 		}
 
@@ -95,13 +95,15 @@ class LoginComp extends React.Component {
 			if (typeof that.props.onLoginOk === 'function')
 				that.props.onLoginOk(client);
 			else if (that.context.iparent) {
+				// FIXME this branch can't work for npm package anclient.
+				// FIXME but why?
 				that.context.ssInf = client.ssInf;
 				SessionClient.persistorage(client.ssInf);
 				that.context.iparent.location = client.ssInf.home ?
 							client.ssInf.home : `${that.context.ihome}?serv=${that.context.servId}`;
 			}
 			else
-				console.log('login succeed but results be ignored: ', client);
+				console.error('login succeed but results be ignored: ', client);
 		}
 
 		function onError (code, resp) {

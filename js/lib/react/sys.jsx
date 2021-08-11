@@ -49,16 +49,21 @@ const _icons = {
 	'deflt': <Inbox />,
 }
 
-const _comps = {
-	'/home': Home,
-	'/views/sys/domain/domain.html': Domain,
-	'/views/sys/role/roles.html': Roles,
-	'/views/sys/org/orgs.html': Orgs,
-	'/views/sys/org/users.html': Users,
-	'/views/sys/workflow/workflows.html': CheapFlow,
-	'/views/sys/user/users-1.1.html': Users,
-	'/sys/error': Error,
+export function uri(comp, uri) {
+	if (comp.Naked)
+		comp.Naked.prototype.uri = uri;
+	else
+		comp.prototype.uri = uri;
+	return comp;
 }
+/**
+ * Map of uri to UI components.
+ * CrudComp.Uri will wrapp the component with propterty "uri", which will be
+ * used as func-uri for determine conn-id in the future (v1.2?)
+ *
+ * If key-uri !== arg-uri, jserv won't find the correct connId
+ */
+const _comps = { }
 
 const drawerWidth = 240;
 
@@ -146,55 +151,30 @@ class SysComp extends React.Component {
 		window: undefined,
 		sysName: 'Anreact Sample',
 		skMenu: undefined, // e.g. 'sys.menu.jserv-sample';
-		sysMenu: {
-			funcId: 'sys',
-			funcName: 'Anclient Lv-0',
-			url: '/',
-			css: {icon: "menu-lv0"},
-			flags: '0',
-			fullpath: 'sys',
-			parentId: undefined,
-			sibling: 0,
-			children: [
-				{	funcId: 'domain',
-					funcName: 'Domain Settings',
-					url: '/sys/domain',
-					css: {icon: "menu-lv1"},
-					flags: '0',
-					fullpath: 'sys.0 domain',
-					parentId: 'sys',
-					sibling: 0
-				},
-				{	funcId: 'roles',
-					funcName: 'Sysem Roles',
-					url: '/sys/roles',
-					css: {icon: "menu-lv1"},
-					flags: '0',
-					fullpath: 'sys.1 roles',
-					parentId: 'sys',
-					sibling: 0
-				},
-			]
-		},
+		// {funcId, funcName,url, css: {icon}, fullpath, parentId, sibling, children: [] }
+		sysMenu: { },
 
 		cruds: [{'/home': Home}],
 		paths: [{path: '/home', params: {}}],
 
+		menuTitle: 'Sys Menu',
 		showMenu: false,
 		expandings: new Set(),
 	};
 
 	static extendLinks(links) {
 		links.forEach( (l, x) => {
-			_comps[l.path] = l.comp;
+			_comps[l.path] = uri(l.comp, l.path);
 		});
 	}
 
 	constructor(props) {
 		super(props);
+		this.state.window = props.window;
+
 		this.state.sysName = props.sys || props.sysName || props.name || this.state.sysName;
 		this.state.skMenu = props.menu;
-		this.state.window = props.window;
+		this.state.menuTitle = props.menuTitle || 'Sys Menu';
 
 		this.showMenu = this.showMenu.bind(this);
 		this.hideMenu = this.hideMenu.bind(this);
@@ -275,15 +255,15 @@ class SysComp extends React.Component {
 					</Collapse>
 				  </div>);
 				else
-				  return (
+				  return (menu && menu.funcId ?
 					<div key={menu.funcId}>
 						<Link component={RouterLink} to={menu.url}>
 							<ListItem button className={classes.nested}>
-							<ListItemIcon>{icon(menu.css.icon)}</ListItemIcon>
+							<ListItemIcon>{icon(menu.css)}</ListItemIcon>
 							<ListItemText primary={menu.funcName} />
 							</ListItem>
 						</Link>
-					</div>);
+					</div> : '');
 			}
 		}
 
@@ -311,9 +291,7 @@ class SysComp extends React.Component {
 		let claz = Object.assign({}, classes);
 
 		let open = this.state.showMenu;
-		console.log('here');
 
-		// if (!window) return '';
 		return (
 		  <div className={claz.root}>
 			<AppBar
@@ -361,7 +339,7 @@ class SysComp extends React.Component {
 				>
 				<div className={claz.drawerHeader}>
 					<IconButton onClick={this.hideMenu}>
-						<ListItemText>{this.state.sysName}</ListItemText>
+						<ListItemText>{this.state.menuTitle}</ListItemText>
 						{claz.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 					</IconButton>
 				</div>
@@ -390,6 +368,17 @@ class SysComp extends React.Component {
 	}
 }
 SysComp.contextType = AnContext;
+
+SysComp.extendLinks([
+	{path: '/home', comp: Home},
+	{path: '/views/sys/domain/domain.html', comp: Domain},
+	{path: '/views/sys/role/roles.html', comp: Roles},
+	{path: '/views/sys/org/orgs.html', comp: Orgs},
+	{path: '/views/sys/org/users.html', comp: Users},
+	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
+	{path: '/views/sys/user/users-1.1.html', comp: Users},
+	{path: '/sys/error', comp: Error}
+]);
 
 const Sys = withStyles(styles)(SysComp);
 export { Sys, SysComp };

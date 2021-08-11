@@ -3,6 +3,20 @@
 This folder includes multiple js client based sample projects. Can be used as
 templates for quick start.
 
+- north-star
+
+A sample project using jserv-quiz showing CRUD pages.
+
+- react-quiz
+
+Project showing a simple project can compose quizzes.
+
+- plain-quiz
+
+Plain jqury + bootstrap using anclient in plain js.
+
+These 3 example is planned stop upgrading since anclient v0.9.51.
+
 # start from Docker image
 
 - Build examples:

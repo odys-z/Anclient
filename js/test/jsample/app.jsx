@@ -3,39 +3,21 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 
-import {
-	L, Langstrs,
-	an, AnClient, SessionClient, Protocol,
-	uri, AnContext, AnError, AnReactExt, Sys, SysComp
+import { L, Langstrs,
+	Protocol, SessionClient,
+	Sys, SysComp,
+	AnContext, AnError, AnReactExt,
+	jsample
 } from 'anclient';
+const { Domain, Roles, Orgs, Users, JsampleTheme } = jsample;
 
-// import { Domain } from './test-app/views/domain';
-// import { Roles } from './test-app/views/roles';
-// import { Orgs } from './test-app/views/orgs';
-// import { Users } from './test-app/views/users';
-import { Domain, Roles, Orgs, Users } from '@anclient/test-react';
+import { samports } from './jsample.js';
 
-import { NorthPorts } from './north-ports.js';
-	import { Northeme } from './styles';
-	import { Dashboard } from './views/n/dashboard';
-	import { Indicators } from './views/n/indicators';
-	import { Quizzes } from './views/n/quizzes';
-	import { Polls } from './views/n/polls';
-	import { MyStudents } from './views/n/my-students';
+import { Indicators } from './views/indicators';
 
-	import { MyConnect } from './views/c/connect';
-	import { MyStatus } from './views/c/status';
-
-/** The application main.
- * "North" stands for the guardian.
- */
-class NorthApp extends React.Component {
+/** The application main, context singleton and error handler */
+class App extends React.Component {
 	state = {
-		ports: Object.assign(Protocol.Port, {
-			north: 'north.serv',
-			menu: "menu.serv",
-		}),
-
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
 		hasError: false,
@@ -50,18 +32,7 @@ class NorthApp extends React.Component {
 	constructor(props) {
 		super(props);
 
-		// https://reactjs.org/warnings/invalid-hook-call-warning.html#duplicate-react
-		require('react-dom');
-		window.React2 = require('react');
-		// console.log(window.React1 === window.React2);
-		if (!window.React1)
-			console.error("Add this line to node_moduls/react-dom/index.js :",
-			"window.React1 = require('react');");
-		else if (window.React1 !== window.React2)
-			console.warn("Duplicate React reference. See",
-			"https://reactjs.org/warnings/invalid-hook-call-warning.html#duplicate-react");
-
-		// this.state.ports = Object.assign(Protocol.Port, northports);
+		this.state.samports = Object.assign(Protocol.Port, samports);
 		this.state.iportal = this.props.iportal;
 
 		this.onError = this.onError.bind(this);
@@ -72,14 +43,15 @@ class NorthApp extends React.Component {
 		this.state.error = {onError: this.onError, msg: ''};
 		this.state.anClient = new SessionClient();
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
-								.extendPorts(NorthPorts);
+								.extendPorts(samports);
 
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
 			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
-				msg: L('Setup session failed! Please re-login.')});
+				msg: L('Setup session failed! Please re-login.')
+			});
 		}
 
 		// extending CRUD pages
@@ -88,17 +60,16 @@ class NorthApp extends React.Component {
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
-			{path: '/n/indicators', comp: Indicators},
-
-			{path: '/n/dashboard', comp: Dashboard},
-			{path: '/n/my-students', comp: MyStudents},
+			{path: '/xv/indicators', comp: Indicators}
 		] );
 	}
 
 	onError(c, r) {
 		console.error(c, r);
 		// this.setState({hasError: !!c, nextAction: 're-login'});
-		this.setState({hasError: !!c,
+		this.state.error.msg = r.Body().msg();
+		this.setState({
+			hasError: !!c,
 			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
 	}
 
@@ -130,11 +101,11 @@ class NorthApp extends React.Component {
 
 	render() {
 	  return (
-		<MuiThemeProvider theme={Northeme}>
+		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				// FIXME we should use a better way
 				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
-				ports: this.state.ports,
+				samports: this.state.samports, // FXIME or Protocol?
 				anReact: this.state.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
@@ -146,9 +117,9 @@ class NorthApp extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<Sys menu='sys.menu.north'
-					sys={L('North Star')} menuTitle={'Function Menu'}
-					onLogout={this.logout} />
+				<Sys menu='sys.menu.jsample'
+					sys='AnReact' menuTitle='Sys Menu'
+					onLogout={this.logout}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
@@ -166,14 +137,14 @@ class NorthApp extends React.Component {
 	 * @param {string} [opts.iportal='portal.html'] page showed after logout
 	 */
 	static bindHtml(elem, opts = {}) {
-		let portal = opts.portal ? opts.portal : 'portal.html';
+		let portal = opts.portal ? opts.portal : 'index.html';
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, json) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<NorthApp servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
 	}
 }
 
-export {NorthApp};
+export {App};

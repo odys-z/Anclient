@@ -27,6 +27,10 @@ class CrudComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 
+CrudComp.propTypes = {
+	uri: PropTypes.string.isRequired
+};
+
 /**
  * <pre>CrudCompW.prototype.media = {
     isXs: false,
@@ -35,13 +39,19 @@ CrudComp.contextType = AnContext;
     isLg: false,
     isXl: false,
    };</pre>
- * So this can be used like super.media
+ * So this can be used like:<pre>super.media</pre>
+ * FIXME looks like in chrome responsive device mode simulator, withWidth() can't
+ * get "width"?
  */
 class CrudCompW extends React.Component {
 	constructor(props) {
 		super(props);
 
 		let {width} = props;
+		CrudCompW.prototype.media = CrudCompW.setWidth(width);
+	}
+
+	static setWidth(width) {
 		let media = {};
 
 		if (width === 'lg') {
@@ -69,13 +79,17 @@ class CrudCompW extends React.Component {
 			media.isXs = true;
 		}
 
-		CrudCompW.prototype.media = media;
+		return media;
 	}
 }
 CrudCompW.contextType = AnContext;
 
 CrudCompW.propTypes = {
-	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
+	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
+	/* TODO doc Design Notes:
+	 * Main CRUD page doesn't need this check. Those common used wigdets need this.
+	 * uri: PropTypes.string.isRequired
+	 */
 };
 
 class HomeComp extends CrudComp {
@@ -127,8 +141,29 @@ class CheapFlowComp extends CrudComp {
 }
 const CheapFlow = withStyles(styles)(CheapFlowComp);
 
+
+class DetailFormW extends React.Component {
+	constructor(props) {
+		super(props);
+
+		let {width} = props;
+		let media = CrudCompW.setWidth(width);
+
+		DetailFormW.prototype.media = media;
+	}
+}
+DetailFormW.contextType = AnContext;
+
+DetailFormW.propTypes = {
+	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
+	/* TODO doc Design Notes:
+	 * Main CRUD page doesn't need this check. Those common used wigdets need this.
+	 */
+	uri: PropTypes.string.isRequired
+};
+
 export {
-	CrudComp, CrudCompW,
+	CrudComp, CrudCompW, DetailFormW,
 	Home, HomeComp,
 	Domain, DomainComp,
 	Roles, RolesComp,

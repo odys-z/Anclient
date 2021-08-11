@@ -1,7 +1,6 @@
 import React from "react";
 import { forwardRef } from 'react';
-// import { createTheme } from "@material-ui/core/styles";
-import createTheme from "@material-ui/core/styles/createTheme";
+import { createTheme, responsiveFontSizes } from "@material-ui/core/styles";
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -23,7 +22,7 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 
-export const StarIcons = {
+export const JsampleIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
     Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
@@ -40,15 +39,15 @@ export const StarIcons = {
     Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
     SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 
+    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 	ListAdd: forwardRef((props, ref) => <PlaylistAddIcon {...props} ref={ref} />),
     Star: forwardRef((props, ref) => <StarBorder {...props} ref={ref} />),
 	Up: forwardRef((props, ref) => <ArrowUpwardIcon  {...props} ref={ref} />),
 	Down: forwardRef((props, ref) => <ArrowDownwardIcon {...props} ref={ref} />)
   };
 
-export const Northeme  = createTheme({
+export const JsampleTheme = responsiveFontSizes(createTheme({
 	// for example
     palette: {
       primary: {
@@ -69,4 +68,14 @@ export const Northeme  = createTheme({
         xl: 1920
       }
     }
-});
+}));
+
+JsampleTheme.typography.body2 = {
+  fontSize: 16,
+  // '@media (min-width:600px)': {
+  //   fontSize: 18,
+  // },
+  // [JsampleTheme.breakpoints.up('lg')]: {
+  //   fontSize: 24,
+  // },
+};

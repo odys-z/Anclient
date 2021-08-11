@@ -10,6 +10,8 @@ export const AnContext = React.createContext({
 	ssInf: undefined,
 
 	pageOrigin: '.',
+	iparent: {},    // usually the parent window of ifram
+	ihome: '',
 	servId: 'host',
 	servs: { host: 'http://localhost:8080/jserv-sample' },
 
@@ -27,8 +29,14 @@ export const AnContext = React.createContext({
 		let me = AnContext;
 		me.servs = Object.assign(me.servs, json);
 		me.servId = servId ? servId : 'host';
+	},
+
+	uuid: function() {
+		return ++ _uid_;
 	}
 });
+
+var _uid_ = 0;
 
 export class AnError extends React.Component {
 	props = undefined;

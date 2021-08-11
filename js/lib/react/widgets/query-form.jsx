@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { Collapse, Grid, TextField, Switch, Button } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -77,6 +78,7 @@ class AnQueryFormComp extends CrudComp {
 		  .forEach( (cond, cx) => {
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb'))
 				this.context.anReact.ds2cbbOptions({
+						uri: this.props.uri,
 						sk: cond.sk,
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
@@ -105,6 +107,7 @@ class AnQueryFormComp extends CrudComp {
 		qx = parseInt(qx);
 		this.state.conds[qx].val = e.currentTarget.value;
 	}
+
 	onDateChange(e,index){
 		e.stopPropagation();
 		//this.state.conds[index].val = e.currentTarget.value;
@@ -116,6 +119,7 @@ class AnQueryFormComp extends CrudComp {
 		});
 		this.setState({conds:arr});
 	}
+
 	onCbbRefChange( refcbb ) {
 		let _ref = refcbb;
 		let _that = this;
@@ -125,7 +129,7 @@ class AnQueryFormComp extends CrudComp {
 			if (e) e.stopPropagation()
 			let cbb = _ref.current.getAttribute('name');
 			cbb = parseInt(cbb);
-			_conds[cbb].val = item ? item : AnQueryFormComp.allItem;
+			_conds[cbb].val = item ? item : AnConst.cbbAllItem;
 
 			_that.setState({conds: _that.state.conds});
 		};
@@ -184,13 +188,12 @@ class AnQueryFormComp extends CrudComp {
 			.filter((c, x ) => !!c)
 			.map( (cond, x) => {
 				if (cond.type === 'cbb') {
+					// TODO FIXME let's use cbb widget, <DatasetCombo />
 					let refcbb = React.createRef();
-					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;
+					let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
 						id={String(x)} name={String(x)} ref={refcbb}
-						// value={ v }
 						onChange={ that.onCbbRefChange(refcbb) }
-						// inputValue={ v ? v.v : '' }
 						onInputChange={ that.onCbbRefChange(refcbb) }
 
 						options={cond.options}
@@ -203,10 +206,9 @@ class AnQueryFormComp extends CrudComp {
 				}
 				else if (cond.type === 'autocbb') {
 					let refcbb = React.createRef();
-					let v = cond && cond.val ? cond.val : AnQueryFormComp.cbbAllItem;
+					let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
 						id={String(x)} name={String(x)} ref={refcbb}
-						// value={ v }
 						onChange={ that.onCbbRefChange(refcbb) }
 
 						options={cond.options}
@@ -246,6 +248,15 @@ class AnQueryFormComp extends CrudComp {
 	}
 }
 AnQueryFormComp.contextType = AnContext;
+
+AnQueryFormComp.propTypes = {
+	/* TODO: DOCS
+	 * Design Notes:
+	 * All common widgets need this check, but main CURD page's uri is been set
+	 * by SysComp.
+	 */
+	uri: PropTypes.string.isRequired
+};
 
 const AnQueryForm = withStyles(styles)(AnQueryFormComp);
 export { AnQueryForm, AnQueryFormComp }

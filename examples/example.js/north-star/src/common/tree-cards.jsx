@@ -5,8 +5,10 @@ import withWidth from "@material-ui/core/withWidth";
 import { Grid, Card, Collapse, TextField, Button, Typography } from '@material-ui/core';
 
 import { L, AnConst, Protocol, AnsonResp,
-	CrudComp, AnContext, AnError, AnQueryForm, AnTreeIcons
+	CrudComp, CrudCompW, AnContext, AnError, AnQueryForm, AnTreeIcons
 } from 'anclient'
+
+import { StarIcons } from '../styles';
 
 import { TreeCardDetails } from './treecard-details';
 
@@ -38,6 +40,10 @@ const styles = (theme) => ({
   treeItem: {
 	padding: theme.spacing(1),
 	borderLeft: "1px solid #bcd",
+  },
+  actions: {
+	textAlign: 'end',
+	verticalAlign: 'middle',
   }
 });
 
@@ -53,7 +59,53 @@ class TreeCardComp extends CrudComp {
 
 		this.state.node = props.node;
 
-		// this.toAddChild = this.toAddChild.bind(this);
+		this.toUp = this.toUp.bind(this);
+		this.toDown = this.toDown.bind(this);
+	}
+
+	toUp(e) {
+		let p = this.props.parent;
+		let n = this.state.node;
+		let me = p.children.indexOf(n);
+		let elder = me - 1;
+		if (elder >= 0)
+			p.children.swap(me, elder);
+
+		if (typeof this.props.onUpdate === 'function')
+			this.props.onUpdate(n, p, me, elder);
+	}
+
+	toTop(e) {
+		let p = this.props.parent;
+		let n = this.state.node;
+		let me = p.children.indexOf(n);
+		if (me > 0)
+			p.children.swap(me, 0);
+
+		if (typeof this.props.onUpdate === 'function')
+			this.props.onUpdate(n, p, me, 0);
+	}
+
+	toDown(e) {
+		let p = this.props.parent;
+		let n = this.state.node;
+		let me = p.children.indexOf(n);
+		let younger = me + 1;
+		if (younger < p.children.length)
+			p.children.swap(me, younger);
+
+		if (typeof this.props.onUpdate === 'function')
+			this.props.onUpdate(n, p, me, younger);
+	}
+
+	toTop(e) {
+		let p = this.props.parent;
+		let n = this.state.node;
+		let me = p.children.indexOf(n);
+		if (me < p.children.length - 1)
+			p.children.swap(me, p.children.length - 1);
+		if (typeof this.props.onUpdate === 'function')
+			this.props.onUpdate(n, p, me, p.children.length);
 	}
 
 	render() {
@@ -69,18 +121,22 @@ class TreeCardComp extends CrudComp {
 			  <Typography noWrap>
 				{leadingIcons(n.levelIcons)}
 				{icon(n.css.icon)}
-				{n.funcName}
+				{n.text}
 			  </Typography>
 		  </Grid>
-		  <Grid item xs={4} className={classes.treeItem}>
+		  <Grid item xs={2} className={classes.treeItem}>
 			<Typography noWrap align={align(n.css.level)}>{n.level}</Typography>
 		  </Grid>
-		  <Grid item xs={4} className={classes.treeItem}>
+		  <Grid item xs={3} className={classes.treeItem}>
 			<Typography align={align(n.css.url)}>{n.url}</Typography>
+		  </Grid>
+		  <Grid item xs={3} className={classes.treeItem}>
+			<StarIcons.Up onClick={this.toUp} />
+			<StarIcons.Down onClick={this.toDown} />
 		  </Grid>
 		</Grid>);
 
-		function icon(icon) {
+		function icon(icon, onClick) {
 		  return AnTreeIcons[icon || "deflt"];
 		}
 
@@ -103,12 +159,12 @@ TreeCardComp.contextType = AnContext;
 const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
 export { TreeCard, TreeCardComp }
 
-class TreeCardsComp extends CrudComp {
+class TreeCardsComp extends CrudCompW {
   state = {
 	window: undefined,
 	treeData: {
 	  id: "sys",
-	  funcName: "Anclient Lv-0",
+	  text: "Anclient Lv-0",
 	  level: 0,
 	  levelIcons: ['+'],
 	  expandIcon: 'F',
@@ -121,7 +177,7 @@ class TreeCardsComp extends CrudComp {
 	  children: [
 		{
 		  id: "domain",
-		  funcName: "Domain 1.1",
+		  text: "Domain 1.1",
 		  level: 1,
 		  levelIcons: ['|-', '-'],
 		  url: "/sys/domain",
@@ -133,7 +189,7 @@ class TreeCardsComp extends CrudComp {
 		},
 		{
 		  id: "roles",
-		  funcName: "Sysem 1.2",
+		  text: "Sysem 1.2",
 		  level: 1,
 		  levelIcons: ['L', '+'],
 		  url: "/sys/roles",
@@ -146,7 +202,7 @@ class TreeCardsComp extends CrudComp {
 		  children: [
 			{
 			  id: "domain",
-			  funcName: "Domain 2.1",
+			  text: "Domain 2.1",
 			  level: 2,
 			  levelIcons: ['.', '|-', '-'],
 			  url: "/sys/domain",
@@ -158,7 +214,7 @@ class TreeCardsComp extends CrudComp {
 			},
 			{
 			  id: "roles",
-			  funcName: "Sysem 2.2",
+			  text: "Sysem 2.2",
 			  level: 2,
 			  levelIcons: ['.', 'L', '-'],
 			  url: "/sys/roles",
@@ -185,8 +241,8 @@ class TreeCardsComp extends CrudComp {
 	this.toExpandItem = this.toExpandItem.bind(this);
 	this.treeNodes = this.treeNodes.bind(this);
 	this.toAddChild = this.toAddChild.bind(this);
-	this.toUpdown = this.toUpdown.bind(this);
 	this.toDelCard = this.toDelCard.bind(this);
+	this.onUpdate = this.onUpdate.bind(this);
   }
 
   toExpandItem(e) {
@@ -199,20 +255,17 @@ class TreeCardsComp extends CrudComp {
 	this.setState({ expandings });
   }
 
-
   toAddChild (e) {
 	e.stopPropagation();
 	let p = e.currentTarget.getAttribute("pid");
 
 	this.addForm = (
-		<TreeCardDetails
-			c mtabl='ind_emotion' pk={p}
+		<TreeCardDetails uri={this.props.uri}
+			c mtabl='ind_emotion' pkval={p}
 			onClose={this.closeDetails}
+			onOk={this.closeDetails}
 		/> );
 	this.setState({});
-  }
-
-  toUpdown(e) {
   }
 
   toDelCard(e) {
@@ -223,6 +276,14 @@ class TreeCardsComp extends CrudComp {
 	this.setState({});
   }
 
+  onUpdate(child, parent, cx, px) {
+	this.setState({dirty: true});
+	if (parent && parent.children)
+		parent.children.forEach( (c, x) => {
+			c.sibling = x;
+			c.fullpath = `${parent.fullpath}.${x} ${c.id}`;
+		} );
+  }
 
   /**
    * @param {object} classes
@@ -235,10 +296,10 @@ class TreeCardsComp extends CrudComp {
 	let mtree = buildTreegrid( m, classes );
 	return mtree;
 
-	function buildTreegrid(tnode) {
+	function buildTreegrid(tnode, parent) {
 	  if (Array.isArray(tnode)) {
 		return tnode.map((i, x) => {
-		  return buildTreegrid(i);
+		  return buildTreegrid(i, parent);
 		});
 	  } else {
 		let open = that.state.expandings.has(tnode.id);
@@ -252,34 +313,38 @@ class TreeCardsComp extends CrudComp {
 				className={classes.folderHead}
 			  >
 				<Grid container spacing={0}>
-				  <Grid item xs={8} >
+				  <Grid item xs={5} >
 					<Typography noWrap>
 					  {leadingIcons(tnode.levelIcons, open, tnode.expandIcon)}
 					  {icon(tnode.css.icon)}
-					  {tnode.funcName}
+					  {tnode.text}
 					</Typography>
 				  </Grid>
-				  <Grid item xs={2} >
-					<Typography>{formatFolderDesc(tnode)}</Typography>
+				  <Grid item xs={3} >
+					<Typography>{formatFolderDesc(tnode)}
+						{open ? icon("expand") : icon("collapse")}
+					</Typography>
 				  </Grid>
-				  <Grid item xs={2}>
-					{open ? icon("expand") : icon("collapse")}
-					{editable &&
-						<Button onClick={that.toAddChild} pid={tnode.id} color="primary" >
-							{L('Delete All')}
+				  <Grid item className={classes.actions}>
+					<Typography noWrap>
+					{editable && <>
+						<Button onClick={that.toAddChild} nid={tnode.id}
+							startIcon={<StarIcons.ListAdd />} color="primary" >
+							{L('New')}
 						</Button>
+						<Button onClick={that.toDel} nid={tnode.id}
+							startIcon={<StarIcons.Delete />} color="primary" >
+							{L('Delete')}
+						</Button>
+						</>
 					}
+					</Typography>
 				  </Grid>
 				</Grid>
 			  </div>
 			  {open &&
 				<Collapse in={open} timeout="auto" unmountOnExit>
-					{buildTreegrid(tnode.children)}
-					{editable &&
-						<Button onClick={that.toAddChild} color="primary" >
-							{L('Append Child')}
-						</Button>
-					}
+					{buildTreegrid(tnode.children, tnode)}
 				</Collapse>
 			  }
 			</div>
@@ -287,22 +352,9 @@ class TreeCardsComp extends CrudComp {
 		}
 		else
 		  return (
-			<TreeCard key={tnode.id} node={tnode} delete={that.toDelCard} upDown={that.toUpdown} />
-			/*
-			<Grid container key={menu.id} spacing={0} className={classes.row} >
-			  <Grid item xs={4} className={classes.rowHead}>
-				  <Typography noWrap>
-					{leadingIcons(menu.levelIcons)} {icon(menu.css.icon)} {menu.funcName}
-				  </Typography>
-			  </Grid>
-			  <Grid item xs={4} className={classes.treeItem}>
-				<Typography noWrap align={align(menu.css.level)}>{menu.level}</Typography>
-			  </Grid>
-			  <Grid item xs={4} className={classes.treeItem}>
-				<Typography align={align(menu.css.url)}>{menu.url}</Typography>
-			  </Grid>
-			</Grid>
-			*/
+			<TreeCard key={tnode.id} node={tnode}
+				parent={parent}
+				delete={that.toDelCard} onUpdate={that.onUpdate} />
 		  );
 	  }
 	}
