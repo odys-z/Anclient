@@ -27,8 +27,8 @@ class IndicatorsComp extends CrudCompW {
 	}
 
 	render () {
-		return (<AnTreeditor uri={this.uri}
-			sk='xv.indicators' mtabl='indicators'
+		return (<AnTreeditor sk='xv.indicators'
+			uri={this.uri} mtabl='indicators'
 			pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 			columns={[
 				{ type: 'text', field: 'indName', label: L('Indicator'),
@@ -38,7 +38,7 @@ class IndicatorsComp extends CrudCompW {
 				{ type: 'formatter', label: L('Question Type'), formatter: (rec) => { docodeQtype(rec.qtype || rec.vtype) } }
 			]}
 			fields={[
-				{ type: 'text', field: 'parentId', label: L('Indicator Id'), hide: 1,
+				{ type: 'text', field: 'parent', label: L('Indicator Id'), hide: 1,
 				  validator: {len: 12} },
 				{ type: 'text', field: 'indName', label: L('Indicator'),
 				  validator: {len: 200, notNull: true} },
@@ -52,6 +52,7 @@ class IndicatorsComp extends CrudCompW {
 				{ type: 'text', field: 'remarks', label: L('Remarks'),
 				  validator: {len: 500}, props: {sm: 12, lg: 6} }
 			]}
+			detailFormTitle={L('Indicator Details')}
 		/>);
 
 		function decodeQtype(t) {

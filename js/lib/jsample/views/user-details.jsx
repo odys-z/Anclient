@@ -175,10 +175,9 @@ class UserDetailsComp extends React.Component {
 		// nvs data must keep consists with jquery serializeArray()
 		// https://api.jquery.com/serializearray/
 		let nvs = [];
-		nvs.push({name: 'remarks', value: rec.remarks});
 		nvs.push({name: 'userName', value: rec.userName});
 		nvs.push({name: 'birthday', value: rec.birthday});
-		nvs.push({name: 'pswd', value: rec.pswd});
+		nvs.push({name: 'pswd', value: 'initial'});
 		nvs.push({name: 'orgId', value: rec.orgId});
 		nvs.push({name: 'roleId', value: rec.roleId});
 
@@ -187,12 +186,12 @@ class UserDetailsComp extends React.Component {
 			nvs.push({name: 'userId', value: rec.userId});
 			req = client
 				.usrAct('users', Protocol.CRUD.c, 'save')
-				.insert(null, 'a_users', nvs);
+				.insert(this.props.uri, 'a_users', nvs);
 		}
 		else {
 			req = client
 				.usrAct('users', Protocol.CRUD.u, 'save')
-				.update(null, 'a_users', this.state.fields[0].field, nvs);
+				.update(this.props.uri, 'a_users', this.state.fields[0].field, nvs);
 			req.Body()
 				.whereEq('userId', rec.userId);
 		}
@@ -337,6 +336,7 @@ class UserDetailsComp extends React.Component {
 UserDetailsComp.contextType = AnContext;
 
 UserDetailsComp.propTypes = {
+	uri: PropTypes.string.isRequired,
 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired
 };
 
