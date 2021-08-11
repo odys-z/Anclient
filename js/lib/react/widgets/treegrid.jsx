@@ -116,8 +116,7 @@ class AnTreegridComp extends React.Component {
 
   constructor(props) {
 	super(props);
-	// this.state.sysName = props.sys || props.sysName || props.name || this.state.sysName;
-	this.state.window = props.window;
+	// this.state.window = props.window;
 
 	this.toExpandItem = this.toExpandItem.bind(this);
 	this.treeNodes = this.treeNodes.bind(this);
@@ -215,8 +214,8 @@ class AnTreegridComp extends React.Component {
 
 	function leadingIcons(icons, expand, expIcon) {
 	  return icons.map((v, x) => {
-		return x === icons.length - 1 && v === '+' && expand
-			? expIcon ? <React.Fragment key={x}>{icon(expIcon)}</React.Fragment>
+		return x === icons.length - 1 && expand
+			? expIcon ? <React.Fragment key={x}>{icon(expIcon || '+')}</React.Fragment>
 					  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
 			: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
 	  });

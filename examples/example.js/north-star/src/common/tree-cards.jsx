@@ -50,7 +50,6 @@ const styles = (theme) => ({
 class TreeCardComp extends CrudComp {
 	state = {
 		node: {},
-		// parent: props.parent,
 	}
 
 	newCard = undefined;
@@ -262,7 +261,7 @@ class TreeCardsComp extends CrudCompW {
 
 	this.addForm = (
 		<TreeCardDetails uri={this.props.uri}
-			c mtabl='ind_emotion' pk={p}
+			c mtabl='ind_emotion' pkval={p}
 			onClose={this.closeDetails}
 			onOk={this.closeDetails}
 		/> );
