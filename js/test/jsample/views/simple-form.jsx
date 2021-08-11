@@ -19,11 +19,11 @@ import Input from '@material-ui/core/Input';
 
 import { L, toBool,
 	AnConst, Protocol, AnsonResp,
-	DetailFormW, AnContext, AnError, AnQueryForm, AnTreeIcons
+	DetailFormW, AnContext, AnError, AnQueryForm, AnTreeIcons, DatasetCombo
 } from 'anclient'
+const { JsampleIcons } = jsample;
 
-import { StarIcons } from '../styles';
-import { DatasetCombo } from './dataset-combo';
+const { StarIcons } = JsampleIcons;
 
 const styles = (theme) => ({
   root: {

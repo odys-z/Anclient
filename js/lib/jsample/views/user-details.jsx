@@ -106,7 +106,7 @@ class UserDetailsComp extends React.Component {
 			// load
 			let queryReq = this.context.anClient.query(this.uri, 'a_users', 'r')
 			queryReq.Body().whereEq('userId', this.state.pk);
-			this.context.anReact.bindSimpleForm({req: queryReq,
+			this.context.anReact.bindStateRec({req: queryReq,
 				onOk: (resp) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 						that.state.record = rows[0];
