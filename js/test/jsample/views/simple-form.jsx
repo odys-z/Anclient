@@ -19,11 +19,11 @@ import Input from '@material-ui/core/Input';
 
 import { L, toBool,
 	AnConst, Protocol, AnsonResp,
-	DetailFormW, AnContext, AnError, AnQueryForm, AnTreeIcons, DatasetCombo
+	DetailFormW, AnContext, AnError, AnQueryForm, AnTreeIcons,
+	DatasetCombo, ConfirmDialog,
+	jsample
 } from 'anclient'
 const { JsampleIcons } = jsample;
-
-const { StarIcons } = JsampleIcons;
 
 const styles = (theme) => ({
   root: {
@@ -100,6 +100,7 @@ class SimpleFormComp extends DetailFormW {
 		this.state.mtabl = props.mtabl;
 		this.state.fields = props.fields;
 		this.state.pk = props.pk;
+		this.state.pkval = props.pkval;
 
 		if (this.state.crud !== Protocol.CRUD.c)
 			this.state.record[this.state.pk.field] = props.pkval;
@@ -120,10 +121,28 @@ class SimpleFormComp extends DetailFormW {
 		this.showOk = this.showOk.bind(this);
 	}
 
-	validate() {
+	componentDidMount() {
 		let that = this;
 
-	    const invalid = { border: "2px solid red" };
+		if (this.state.crud !== Protocol.CRUD.c) {
+			// load the record
+			let queryReq = this.context.anClient.query(this.uri, this.props.mtabl, 'r')
+			queryReq.Body().whereEq(this.state.pk.field, this.state.pkval);
+			// FIXME but sometimes we have FK in record. Meta here?
+			this.context.anReact.bindStateRec({req: queryReq,
+				onOk: (resp) => {
+						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
+						that.setState({record: rows[0]});
+					}
+				},
+				this.context.error);
+		}
+	}
+
+	validate(invalidStyle) {
+		let that = this;
+
+	    const invalid = Object.assign(invalidStyle || {}, { border: "2px solid red" });
 
 		let valid = true;
 	    this.state.fields.forEach( (f, x) => {
@@ -154,7 +173,7 @@ class SimpleFormComp extends DetailFormW {
 	toSave(e) {
 		e.stopPropagation();
 
-		if (!this.validate()) {
+		if (!this.validate(this.props.invalidStyle)) {
 	    	this.setState({});
 			return;
 		}
@@ -178,7 +197,7 @@ class SimpleFormComp extends DetailFormW {
 		if (this.state.crud === Protocol.CRUD.c) {
 			nvs.push({name: pk.field, value: rec[pk.field]});
 			req = client
-				.usrAct(this.funcId, Protocol.CRUD.c, 'new card')
+				.usrAct(this.uri, Protocol.CRUD.c, this.props.title || 'new record')
 				.insert(this.uri, this.state.mtabl, nvs);
 		}
 		else {
@@ -222,10 +241,11 @@ class SimpleFormComp extends DetailFormW {
 
 		if (f.type === 'enum' || f.type === 'cbb') {
 			let that = this;
-			return (<DatasetCombo options={[
-				{n: L('Single Opt'), v: 's'},
-				{n: L('Multiple'), v: 'm'},
-				{n: L('Text'), v: 't'} ]}
+			return (<DatasetCombo uri={this.props.uri}
+				options={[
+					{n: L('Single Opt'), v: 's'},
+					{n: L('Multiple'), v: 'm'},
+					{n: L('Text'), v: 't'} ]}
 				label={f.label} style={f.style}
 				onSelect={ (v) => {
 					rec[f.field] = v.v;
@@ -295,7 +315,7 @@ class SimpleFormComp extends DetailFormW {
 			<DialogContent className={classes.content}>
 			  <DialogTitle id='u-title' color='primary' >
 				{title}
-				{this.state.dirty ? <StarIcons.Star color='secondary'/> : ''}
+				{this.state.dirty ? <JsampleIcons.Star color='secondary'/> : ''}
 			  </DialogTitle>
 			  <Grid container className={classes.content} direction='row'>
 				{this.formFields(rec, classes)}
@@ -317,6 +337,7 @@ class SimpleFormComp extends DetailFormW {
 SimpleFormComp.contextType = AnContext;
 
 SimpleFormComp.propTypes = {
+	uri: PropTypes.string.isRequired,
 	mtabl: PropTypes.string.isRequired
 };
 

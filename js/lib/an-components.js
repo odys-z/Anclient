@@ -23,6 +23,7 @@ export * from './utils/helpers.js';
 export * from './utils/langstr.js';
 
 export * from './react/widgets/messagebox.jsx';
+export * from './react/widgets/dataset-combo.jsx';
 export * from './react/widgets/my-icon.jsx';
 export * from './react/widgets/my-info.jsx';
 export * from './react/widgets/query-form.jsx';

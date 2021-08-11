@@ -17,6 +17,8 @@ import { Typography } from "@material-ui/core";
 import { L, AnTreeIcons, AnContext, CrudCompW, jsample } from 'anclient';
 const { JsampleIcons } = jsample;
 
+import { SimpleForm } from './simple-form';
+
 const styles = (theme) => ({
   root: {
 	// display: "flex",
@@ -173,6 +175,8 @@ class AnTreeditorComp extends React.Component {
 		this.state.window = props.window;
 
 		this.toExpandItem = this.toExpandItem.bind(this);
+		this.toAddChild = this.toAddChild.bind(this);
+
 		this.leadingIcons = this.leadingIcons.bind(this);
 		this.treeNodes = this.treeNodes.bind(this);
 
@@ -204,6 +208,44 @@ class AnTreeditorComp extends React.Component {
 		if (expandings.has(f)) expandings.delete(f);
 		else expandings.add(f);
 		this.setState({ expandings });
+	}
+
+	toAddChild (e) {
+		e.stopPropagation();
+		let that = this;
+
+		let me = e.currentTarget.getAttribute("me");
+
+		this.addForm = (
+			<SimpleForm c uri={this.props.uri}
+				mtabl={this.props.mtabl}
+				pk={this.props.pk} fields={this.props.fields}
+				pkval={undefined} parent={me}
+				title={this.props.detailFormTitle || 'Add Tree Node'}
+				onClose={() => {that.addForm = undefined; that.setState({}) }}
+				onOk={() => {that.addForm = undefined; }}
+			/> );
+		this.setState({});
+	}
+
+	toDel(e) { }
+
+	toEdit(e) {
+		e.stopPropagation();
+		let that = this;
+
+		let me = e.currentTarget.getAttribute("me");
+
+		this.addForm = (
+			<SimpleForm u uri={this.props.uri}
+				mtabl={this.props.mtabl}
+				pk={this.props.pk} fields={this.props.fields}
+				pkval={me.id} me={me}
+				title={this.props.detailFormTitle || 'Edit Tree Node'}
+				onClose={() => {that.addForm = undefined; that.setState({}) }}
+				onOk={() => {that.addForm = undefined; }}
+			/> );
+		this.setState({});
 	}
 
 	// TODO merge with treegrid
@@ -268,11 +310,11 @@ class AnTreeditorComp extends React.Component {
 					  <Grid item className={classes.actions}>
 						<Typography noWrap variant='body2' >
 						{editable && <>
-							<Button onClick={that.toAddChild} nid={tnode.id}
+							<Button onClick={that.toAddChild} me={tnode}
 								startIcon={<JsampleIcons.ListAdd />} color="primary" >
 								{isMd && L('New')}
 							</Button>
-							<Button onClick={that.toDel} nid={tnode.id}
+							<Button onClick={that.toDel} me={tnode}
 								startIcon={<JsampleIcons.Delete />} color="primary" >
 								{isMd && L('Delete')}
 							</Button>
@@ -323,10 +365,18 @@ class AnTreeditorComp extends React.Component {
 
 		let media = CrudCompW.setWidth(width);
 
-		return <div className={classes.root}>{this.treeNodes(classes, media)}</div>;
+		return <div className={classes.root}>
+			{this.treeNodes(classes, media)}
+			{this.addForm}
+		</div>;
 	}
 }
 AnTreeditorComp.contextType = AnContext;
+
+AnTreeditorComp.propTypes = {
+	uri: PropTypes.string.isRequired,
+	mtabl: PropTypes.string.isRequired
+};
 
 const AnTreeditor = withWidth()(withStyles(styles)(AnTreeditorComp));
 export { AnTreeditor, AnTreeditorComp }
