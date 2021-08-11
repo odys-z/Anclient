@@ -11,7 +11,5 @@
   ],
   "author": "Ody Zhou",
   "license": "Apache-2.0",
-  "dependencies": {
-    "anclient": "^0.9.61"
-  }
+  "dependencies": {}
 }

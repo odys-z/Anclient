@@ -122,17 +122,17 @@ class TreeCardComp extends React.Component {
 		  className={classes.row}
 		>
 		  <Grid item xs={4} className={classes.rowHead}>
-			  <Typography noWrap>
+			  <Typography noWrap variant='body2' >
 				{this.props.leadingIcons(n)}
 				{icon(n.node.css.icon)}
 				{n.node.text}
 			  </Typography>
 		  </Grid>
 		  <Grid item xs={2} className={classes.treeItem}>
-			<Typography noWrap align={align(n.node.css.level)}>{n.level}</Typography>
+			<Typography noWrap variant='body2' align={align(n.node.css.level)}>{n.level}</Typography>
 		  </Grid>
 		  <Grid item xs={3} className={classes.treeItem}>
-			<Typography align={align(n.node.css.url)}>{n.node.url}</Typography>
+			<Typography variant='body2' align={align(n.node.css.url)}>{n.node.url}</Typography>
 		  </Grid>
 		  <Grid item xs={3} className={classes.treeItem}>
 			<JsampleIcons.Up onClick={this.toUp} />
@@ -254,19 +254,19 @@ class AnTreeditorComp extends React.Component {
 				  >
 					<Grid container spacing={0}>
 					  <Grid item xs={5} >
-						<Typography noWrap>
+						<Typography noWrap variant='body2' >
 						  {that.leadingIcons(tnode, open, tnode.expandIcon)}
 						  {icon(tnode.node.css.icon)}
 						  {tnode.node.text}
 						</Typography>
 					  </Grid>
 					  <Grid item xs={3} >
-						<Typography>{formatFolderDesc(tnode, media)}
+						<Typography variant='body2' >{formatFolderDesc(tnode, media)}
 							{open ? icon("expand") : icon("collapse")}
 						</Typography>
 					  </Grid>
 					  <Grid item className={classes.actions}>
-						<Typography noWrap>
+						<Typography noWrap variant='body2' >
 						{editable && <>
 							<Button onClick={that.toAddChild} nid={tnode.id}
 								startIcon={<JsampleIcons.ListAdd />} color="primary" >

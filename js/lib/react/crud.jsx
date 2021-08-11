@@ -27,9 +27,9 @@ class CrudComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 
-// CrudComp.propTypes = {
-// 	uri: PropTypes.string.isRequired
-// };
+CrudComp.propTypes = {
+	uri: PropTypes.string.isRequired
+};
 
 /**
  * <pre>CrudCompW.prototype.media = {
@@ -39,7 +39,9 @@ CrudComp.contextType = AnContext;
     isLg: false,
     isXl: false,
    };</pre>
- * So this can be used like super.media
+ * So this can be used like:<pre>super.media</pre>
+ * FIXME looks like in chrome responsive device mode simulator, withWidth() can't
+ * get "width"?
  */
 class CrudCompW extends React.Component {
 	constructor(props) {

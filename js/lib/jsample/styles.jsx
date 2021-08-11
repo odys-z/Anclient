@@ -1,6 +1,6 @@
 import React from "react";
 import { forwardRef } from 'react';
-import { createTheme } from "@material-ui/core/styles";
+import { createTheme, responsiveFontSizes } from "@material-ui/core/styles";
 
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -47,7 +47,7 @@ export const JsampleIcons = {
 	Down: forwardRef((props, ref) => <ArrowDownwardIcon {...props} ref={ref} />)
   };
 
-export const JsampleTheme = createTheme({
+export const JsampleTheme = responsiveFontSizes(createTheme({
 	// for example
     palette: {
       primary: {
@@ -68,4 +68,14 @@ export const JsampleTheme = createTheme({
         xl: 1920
       }
     }
-});
+}));
+
+JsampleTheme.typography.body2 = {
+  fontSize: 16,
+  // '@media (min-width:600px)': {
+  //   fontSize: 18,
+  // },
+  // [JsampleTheme.breakpoints.up('lg')]: {
+  //   fontSize: 24,
+  // },
+};
