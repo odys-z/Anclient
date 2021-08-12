@@ -82,6 +82,7 @@ class UsersComp extends CrudCompW {
 
 	toAdd(e, v) {
 		this.roleForm = (<UserDetails c
+			uri={this.uri}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}

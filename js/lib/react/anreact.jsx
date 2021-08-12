@@ -58,22 +58,30 @@ export class AnReact {
 		}, errCtx.onError );
 	}
 
-	bindSimpleForm(qmsg, errCtx, compont) {
+	/**
+	 * Post a request, qmsg.req of AnsonMsg to jserv.
+	 * If suceed, call qmsg.onOk (onLoad) or set rs in respons to component's state.
+	 * This is a helper of simple form load & bind a record.
+	 * @param {object} qmsg
+	 * @param {AnContext.error} errCtx
+	 * @param {React.Component} compont
+	 * @return {AnReact} this
+	 * */
+	bindStateRec(qmsg, errCtx, compont) {
 		let onload = qmsg.onOk || qmsg.onLoad ||
-			// try figure the fields
+			// try figure out the fields
 			function (r) {
 				if (compont) {
 					let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 					if (rows && rows.length > 0)
 						console.error('Bind form with more than 1 records', r);
 
-					if (rows && rows.length == 1)
+					if (rows)
 						compont.setState({record: rows[0]});
 					else console.error('Can\'t bind empty row:', r);
 				}
-				else console.error('Can\'t hook back response:', r);
-			}
-		;
+				else console.error('Component shouldn\t be null. Can\'t hook back response:', r);
+			};
 
 		let {req} = qmsg;
 		this.client.an.post(req, onload, (c, resp) => {
@@ -287,6 +295,9 @@ export class AnReactExt extends AnReact {
 	 */
 	ds2cbbOptions(opts, errCtx, compont) {
 		let {uri, sk, nv, cond, noAll} = opts;
+		if (!uri)
+			throw Error('Since v0.9.50, uri is needed to access jserv.');
+
 		nv = nv || {n: 'name', v: 'value'};
 
 		this.dataset( {
