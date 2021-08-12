@@ -1,8 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Login } from '../../lib/react/login.jsx';
-import { AnContext, AnError, AnReact, SessionClient } from 'anclient';
+import { AnContext, AnError, AnReact, SessionClient, Login } from 'anclient';
 
 const styles = (theme) => ({
 	root: {
@@ -36,11 +35,9 @@ class LoginApp extends React.Component {
 	}
 
 	onErrorClose() {
-		// tested: parent.location = this.state.home
 	}
 
 	onLogin(client) {
-		// that.context.ssInf = client.ssInf;
 		SessionClient.persistorage(client.ssInf);
 		if (this.props.iparent) {
 			let mainpage = client.ssInf.home || this.props.ihome;

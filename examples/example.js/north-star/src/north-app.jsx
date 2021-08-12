@@ -6,14 +6,15 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import {
 	L, Langstrs,
 	an, AnClient, SessionClient, Protocol,
-	uri, AnContext, AnError, AnReactExt, Sys, SysComp
+	uri, AnContext, AnError, AnReactExt, Sys, SysComp,
+    jsample
 } from 'anclient';
 
 // import { Domain } from './test-app/views/domain';
 // import { Roles } from './test-app/views/roles';
 // import { Orgs } from './test-app/views/orgs';
 // import { Users } from './test-app/views/users';
-import { Domain, Roles, Orgs, Users } from '@anclient/test-react';
+const { Domain, Roles, Orgs, Users } = jsample;
 
 import { NorthPorts } from './north-ports.js';
 	import { Northeme } from './styles';

@@ -4,7 +4,7 @@ import { expect, assert } from 'chai';
 import { L, Langstrs } from '../../lib/utils/langstr';
 import { toBool } from '../../lib/utils/helpers';
 
-describe('case: [00.1 string value]', () => {
+describe('case: [00.1 Array patch]', () => {
     it('Array', () => {
 		let arr = [1, 2, 3];
 		arr.swap(0, 1);
