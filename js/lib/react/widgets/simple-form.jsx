@@ -99,20 +99,17 @@ class SimpleFormComp extends DetailFormW {
 
 		this.funcId = props.funcId || 'TreeCardDetails'
 
-		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CURD.u;
+		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CRUD.u;
 		this.state.mtabl = props.mtabl;
 		this.state.fields = props.fields;
+
 		this.state.pk = props.pk;
 		this.state.pkval = props.pkval;
 
-		if (this.state.crud !== Protocol.CRUD.c)
-			this.state.record[this.state.pk.field] = props.pkval;
-		else
-			this.state.dirty = true;
+		this.state.parent = props.parent;
+		this.state.parentId = props.parentId;
 
 		this.uri = this.props.uri;
-
-		this.state.parentId = props.pid;
 
 		this.formFields = this.formFields.bind(this);
 		this.getField = this.getField.bind(this);
@@ -128,6 +125,9 @@ class SimpleFormComp extends DetailFormW {
 		let that = this;
 
 		if (this.state.crud !== Protocol.CRUD.c) {
+			if (!this.state.pkval)
+				throw Error("The pkval property not been set correctly. Record can not be loaded.");
+
 			// load the record
 			let queryReq = this.context.anClient.query(this.uri, this.props.mtabl, 'r')
 			queryReq.Body().whereEq(this.state.pk.field, this.state.pkval);
@@ -135,6 +135,8 @@ class SimpleFormComp extends DetailFormW {
 			this.context.anReact.bindStateRec({req: queryReq,
 				onOk: (resp) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
+						if (!rows || rows.length !== 1)
+							console.error("Query reults not correct. One and only one row is needed.", row, queryReq)
 						that.setState({record: rows[0]});
 					}
 				},
@@ -164,7 +166,7 @@ class SimpleFormComp extends DetailFormW {
 				let vd = f.validator;
 				if(vd.notNull && (v === undefined || v.length === 0))
 					return false;
-				if (vd.len && v !== undefined && v.length > vd.len)
+				if (vd.len && v && v.length > vd.len)
 					return false;
 				return true;
 			}
@@ -191,9 +193,19 @@ class SimpleFormComp extends DetailFormW {
 		// nvs data must keep consists with jquery serializeArray()
 		// https://api.jquery.com/serializearray/
 		let nvs = [];
+		let parentId = this.state.parentId;
 		this.state.fields.forEach( (f, x) => {
+			if (f.field === this.state.parent.field) {
+				rec[f.field] = parentId;
+				parentId = undefined;
+			}
 			nvs.push({name: f.field, value: rec[f.field]});
 		} );
+
+		if (parentId)
+			nvs.push({name: this.state.parent.field, value: this.state.parentId});
+
+		console.log(nvs);
 
 		// 2. request (insert / update)
 		let pk = this.state.pk;
@@ -263,7 +275,7 @@ class SimpleFormComp extends DetailFormW {
 				label={isSm ? L(f.label) : undefined}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
-				value={rec[f.field] === undefined ? '' : rec[f.field]}
+				value={!rec || rec[f.field] === undefined ? '' : rec[f.field]}
 				inputProps={f.style ? { style: f.style } : undefined}
 				onChange={(e) => {
 					rec[f.field] = e.target.value;

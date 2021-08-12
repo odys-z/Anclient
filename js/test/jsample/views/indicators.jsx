@@ -28,6 +28,7 @@ class IndicatorsComp extends CrudCompW {
 		return (<AnTreeditor sk='xv.indicators'
 			uri={this.uri} mtabl='indicators'
 			pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
+			parent={{ type: 'text', field: 'parent', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 			columns={[
 				{ type: 'text', field: 'indName', label: L('Indicator'),
 				  validator: {len: 200, notNull: true}, cols: {sm: 3} },
@@ -45,13 +46,15 @@ class IndicatorsComp extends CrudCompW {
 				{ type: 'float', field: 'weight', label: L('Default Weight'),
 				  validator: {min: 0.0} },
 				{ type: 'enum', field: 'qtype', label: L('Question Type'),
-				  options: [{n: L('Single Option'), v: 's'}, {n: L('Multiple Option'), v: 'm'}, {n: L('Text'), v: 't'}, {n: L('5 Stars'), v: 'r5'}, {n: L('10 Stars'), n: 'r10'}],
+				  // If a node is the type of the first option, it means that node is middle (internal) node.
+				  options: [{n: L('[ Category ]'), v: 'cate'}, {n: L('Single Option'), v: 's'}, {n: L('Multiple Option'), v: 'm'}, {n: L('Text'), v: 't'}, {n: L('5 Stars'), v: 'r5'}, {n: L('10 Stars'), v: 'r10'}],
 				  validator: {notNull: true} },
 				{ type: 'number',field: 'sort', label: L('UI Sort'),
 				  validator: {notNull: true} },
 				{ type: 'text', field: 'remarks', label: L('Remarks'),
 				  validator: {len: 500}, props: {sm: 12, lg: 6} }
 			]}
+			isMidNode={n => n.qtype === 'cate' || !n.qtype}
 			detailFormTitle={L('Indicator Details')}
 		/>);
 

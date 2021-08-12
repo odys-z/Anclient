@@ -114,56 +114,38 @@ class TreeCardComp extends React.Component {
 	}
 
 	render() {
-		let n = this.props.tnode;
-		n.node.css = n.node.css || {};
+		let tnode = this.props.tnode;
+		let n = tnode.node;
+		n.css = n.css || {};
 		let { classes, width } = this.props;
-		// return (
-		// <Grid container
-		//   key={n.id}
-		//   spacing={0}
-		//   className={classes.row}
-		// >
-		//   <Grid item xs={4} className={classes.rowHead}>
-		// 	  <Typography noWrap variant='body2' >
-		// 		{this.props.leadingIcons(n)}
-		// 		{icon(n.node.css.icon)}
-		// 		{n.node.text}
-		// 	  </Typography>
-		//   </Grid>
-		//   <Grid item xs={2} className={classes.treeItem}>
-		// 	<Typography noWrap variant='body2' align={align(n.node.css.level)}>{n.level}</Typography>
-		//   </Grid>
-		//   <Grid item xs={3} className={classes.treeItem}>
-		// 	<Typography variant='body2' align={align(n.node.css.url)}>{n.node.url}</Typography>
-		//   </Grid>
-		//   <Grid item xs={3} className={classes.treeItem}>
-		// 	<JsampleIcons.Up onClick={this.toUp} />
-		// 	<JsampleIcons.Down onClick={this.toDown} />
-		//   </Grid>
-		// </Grid>);
 		return (
 		  <Grid container
-				key={n.id}
+				key={tnode.id}
 				spacing={0}
 				className={classes.row} >
 			{ this.props.columns.filter( v => v.hide !== true ).map( (col, cx) => {
-			  if (cx === '0') return (
-				<Grid item {...col.cols} className={classes.rowHead}>
+			  if (cx === 0) return (
+				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.rowHead}>
 					<Typography noWrap variant='body2' >
-						{this.props.leadingIcons(n)}
-						{icon(n.node.css.icon)}
-						{n.node.text}
+						{this.props.leadingIcons(tnode, false)}
+						{icon(n.css.icon)}
+						{n.text}
 					</Typography>
 				</Grid> );
 			  else if (col.type === 'actions') return (
-				<Grid item {...col.cols} className={classes.treeItem}>
+				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.treeItem}>
 					<JsampleIcons.Up onClick={this.toUp} />
 					<JsampleIcons.Down onClick={this.toDown} />
+					<Button onClick={this.props.toEdit}
+						me={tnode.id} parent={n.parentId}
+						startIcon={<JsampleIcons.Edit />} color="primary" >
+						{this.props.media.isMd && L('Edit')}
+					</Button>
 				</Grid> );
 			  else return (
-				<Grid item {...col.cols} className={classes.treeItem}>
-					<Typography noWrap variant='body2' align={align(n.node.css[col.field])}>
-						{n.node[col.field]}
+				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.treeItem}>
+					<Typography noWrap variant='body2' align={align(n.css[col.field])}>
+						{n.text}
 					</Typography>
 				</Grid> );
 			  } )
@@ -181,10 +163,12 @@ class TreeCardComp extends React.Component {
 }
 TreeCardComp.contextType = AnContext;
 TreeCardComp.propTypes = {
+	media: PropTypes.object.isRequired,
 	leadingIcons: PropTypes.func.isRequired,
 	tnode: PropTypes.object.isRequired,
 	parent: PropTypes.object.isRequired,
-	columns: PropTypes.array.isRequired
+	columns: PropTypes.array.isRequired,
+	toEdit: PropTypes.func.isRequired
 };
 
 const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
@@ -209,6 +193,7 @@ class AnTreeditorComp extends React.Component {
 		this.folderHead = this.folderHead.bind(this);
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.toAddChild = this.toAddChild.bind(this);
+		this.toEdit = this.toEdit.bind(this);
 
 		this.leadingIcons = this.leadingIcons.bind(this);
 		this.treeNodes = this.treeNodes.bind(this);
@@ -221,7 +206,7 @@ class AnTreeditorComp extends React.Component {
 		this.toSearch();
 	}
 
-	toSearch(e, query) {
+	toSearch() {
 		let { mtabl, columns, joins, wheres, s_tree } = this.props;
 		if (s_tree)
 			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
@@ -253,9 +238,9 @@ class AnTreeditorComp extends React.Component {
 			<SimpleForm c uri={this.props.uri}
 				mtabl={this.props.mtabl}
 				pk={this.props.pk} fields={this.props.fields}
-				pkval={undefined} parent={{pk: me.id, ...me.node}}
+				pkval={undefined} parent={this.props.parent} parentId={me}
 				title={this.props.detailFormTitle || 'Add Tree Node'}
-				onClose={() => {that.addForm = undefined; that.setState({}) }}
+				onClose={() => {that.addForm = undefined; that.toSearch({}) }}
 				onOk={() => {that.addForm = undefined; }}
 			/> );
 		this.setState({});
@@ -268,12 +253,13 @@ class AnTreeditorComp extends React.Component {
 		let that = this;
 
 		let me = e.currentTarget.getAttribute("me");
+		let parentId = e.currentTarget.getAttribute("parent");
 
 		this.addForm = (
 			<SimpleForm u uri={this.props.uri}
 				mtabl={this.props.mtabl}
 				pk={this.props.pk} fields={this.props.fields}
-				pkval={me.id} // me={me}
+				pkval={me} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
 				onClose={() => {that.addForm = undefined; that.setState({}) }}
 				onOk={() => {that.addForm = undefined; }}
@@ -321,41 +307,6 @@ class AnTreeditorComp extends React.Component {
 			if (tnode.node.children && tnode.node.children.length > 0) {
 			  return (
 				<div key={tnode.id} className={classes.folder}>
-				  {/*<div
-						onClick={expandItem}
-						nid={tnode.id}
-						className={classes.folderHead}
-					>
-					<Grid container spacing={0}>
-					  <Grid item xs={5} >
-						<Typography noWrap variant='body2' >
-						  {that.leadingIcons(tnode, open, tnode.expandIcon)}
-						  {icon(tnode.node.css.icon)}
-						  {tnode.node.text}
-						</Typography>
-					  </Grid>
-					  <Grid item xs={3} >
-						<Typography variant='body2' >{formatFolderDesc(tnode, media)}
-							{open ? icon("expand") : icon("collapse")}
-						</Typography>
-					  </Grid>
-					  <Grid item className={classes.actions}>
-						<Typography noWrap variant='body2' >
-						{editable && <>
-							<Button onClick={that.toAddChild} me={tnode}
-								startIcon={<JsampleIcons.ListAdd />} color="primary" >
-								{isMd && L('New')}
-							</Button>
-							<Button onClick={that.toDel} me={tnode}
-								startIcon={<JsampleIcons.Delete />} color="primary" >
-								{isMd && L('Delete')}
-							</Button>
-							</>
-						}
-						</Typography>
-					  </Grid>
-					</Grid>
-				  </div> */}
 				  { that.folderHead(that.props.columns, tnode, open, classes, media) }
 				  { open &&
 					<Collapse in={open} timeout="auto" unmountOnExit>
@@ -367,30 +318,15 @@ class AnTreeditorComp extends React.Component {
 			}
 			else
 			  return (
-				<TreeCard key={tnode.id} tnode={tnode} {...that.props}
-					parent={parent} leadingIcons={that.leadingIcons}
-					delete={that.toDelCard} onUpdate={that.onUpdate} />
+				<TreeCard key={tnode.id} tnode={tnode} media={media}
+					{...that.props}
+					toEdit={that.toEdit}
+					leadingIcons={that.leadingIcons}
+					delete={that.toDelCard}
+					onUpdate={that.onUpdate} />
 			  );
 		  }
 		}
-
-		// function icon(icon) {
-		// 	return AnTreeIcons[icon || "deflt"];
-		// }
-		//
-		// function align(css = {}) {
-		// 	return css.align ? css.align : 'center';
-		// }
-
-		// function formatFolderDesc(tnode, media) {
-		// 	let {text, children} = tnode.node;
-		//
-		// 	if (children)
-		// 		children = `[${media.isMd ? 'children' : ''} ${children.length}]`;
-		// 	else chidlren = '';
-		//
-		// 	return `${media.isXl ? text : ''} ${children}`;
-		// }
 	}
 
 	th(columns = [], classes, media) {
@@ -400,15 +336,17 @@ class AnTreeditorComp extends React.Component {
 					.map( (colObj, ix) =>
 						<Grid item key={ix} {...colObj.cols}>
 							{colObj.label || colObj.field}
-						</Grid >)
+						</Grid>)
 				}
 			</Grid>);
 	}
 
 	folderHead(columns=[], tnode, open, classes, media) {
+	  let n = tnode.node;
+	  n.css = n.css || {};
 	  return (
 		<div
-			onClick={this.expandItem}
+			onClick={this.toExpandItem}
 			nid={tnode.id}
 			className={classes.folderHead}
 		>
@@ -416,39 +354,41 @@ class AnTreeditorComp extends React.Component {
 			{columns.filter( v => v.hide != true).map( (col, ix) => {
 				if (ix == 0) // row head
 				  return (
-					<Grid item {...col.cols} >
+					<Grid item key={`${tnode.id}.${ix}`} {...col.cols} >
 						<Typography noWrap variant='body2' >
-						  {this.leadingIcons(tnode, open, tnode.expandIcon)}
-						  {icon(tnode.node.css.icon)}
-						  {tnode.node.text}
+						  {this.leadingIcons(tnode, open, n.expandIcon)}
+						  {icon(n.css.icon)}
+						  {n.text}
 						  {open ? icon("expand") : icon("collapse")}
 						</Typography>
 					</Grid>);
 				else if (col.type === 'actions')
 					return (
-					  <Grid item className={classes.actions}>
+					  <Grid item key={`${tnode.id}.${ix}`} className={classes.actions}>
 						<Typography noWrap variant='body2' >
-							<Button onClick={this.toDel} me={tnode}
+							<Button onClick={this.toDel} me={tnode.id}
 								startIcon={<JsampleIcons.Delete />} color="primary" >
 								{media.isMd && L('Delete')}
 							</Button>
-							{tnode.qtype === 'cate' && <Button onClick={this.toAddChild} me={tnode}
-								startIcon={<JsampleIcons.ListAdd />} color="primary" >
-								{media.isMd && L('New')}
+							{( this.props.isMidNode ? this.props.isMidNode(n) : true )
+							  && <Button onClick={this.toAddChild}
+									me={tnode.id} parent={n.parent}
+									startIcon={<JsampleIcons.ListAdd />} color="primary" >
+									{media.isMd && L('New')}
 							</Button>}
 						</Typography>
 					  </Grid>
 					);
 				else if (col.type === 'formatter')
 				  return (
-					<Grid item {...col.cols} >
+					<Grid item key={`${tnode.id}.${ix}`} {...col.cols} >
 						<Typography variant='body2' >
 						  {col.formatter(tnode, media)}
 						</Typography>
 					</Grid>);
 				else
 				  return (
-					<Grid item {...col.cols} >
+					<Grid item key={`${tnode.id}.${ix}`} {...col.cols} >
 						<Typography variant='body2' >
 						  {formatFolderDesc(tnode, media)}
 						</Typography>
@@ -499,6 +439,7 @@ AnTreeditorComp.propTypes = {
 	columns: PropTypes.array.isRequired,
 	fields: PropTypes.array.isRequired,
 	pk: PropTypes.object.isRequired,
+	isMidNode: PropTypes.func
 };
 
 const AnTreeditor = withWidth()(withStyles(styles)(AnTreeditorComp));
