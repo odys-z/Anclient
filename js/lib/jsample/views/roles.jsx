@@ -24,7 +24,6 @@ const styles = (theme) => ( {
 	},
 	container: {
 		display: 'flex',
-		// width: '100%',
 		'& > *': {
 			margin: theme.spacing(0.5),
 		}
@@ -83,7 +82,7 @@ class RolesComp extends CrudCompW {
 		let queryReq = this.context.anClient.query(this.uri, 'a_roles', 'r', pageInf)
 		let req = queryReq.Body()
 			.expr('orgName').expr('roleName').expr('roleId').expr('remarks')
-			.j('a_orgs', 'o', 'o.orgId=r.orgId')
+			.j('a_orgs', 'o', 'o.orgId=r.orgId');
 
 		if (query && query.orgId && query.orgId !== 0)
 			req.whereEq('r.orgId', `${query.orgId}`);

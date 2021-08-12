@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
 import {
     an, AnClient, SessionClient, Protocol, L, Langstrs,
-    AnContext, AnError, CrudComp, AnReactExt
+    AnContext, AnError, CrudCompW, AnReactExt
 } from 'anclient';
 
 const styles = (theme) => ( {
@@ -13,7 +14,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class MyStudentsComp extends CrudComp {
+class QuizzesComp extends CrudCompW {
 	state = {
 		students: []
 	};
@@ -23,10 +24,10 @@ class MyStudentsComp extends CrudComp {
 	}
 
 	render () {
-		return (<>Quizzes</>);
+		return (<>Quizz List</>);
 	}
 }
-MyStudentsComp.contextType = AnContext;
+QuizzesComp.contextType = AnContext;
 
-const MyStudents = withStyles(styles)(MyStudentsComp);
-export { MyStudents, MyStudentsComp  }
+const Quizzes = withWidth()(withStyles(styles)(QuizzesComp));
+export { Quizzes, QuizzesComp  }

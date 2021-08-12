@@ -119,12 +119,6 @@ class UserDetailsComp extends React.Component {
 				},
 				this.context.error);
 		}
-		// else {
-		// 	// new, bind tree
-		// 	let ds = {sk, t, sqlArgs: []};
-		//
-		// 	this.context.anReact.stree(ds, this.context.error, this);
-		// }
 	}
 
 	validate() {
