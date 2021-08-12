@@ -17,13 +17,16 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 
-import { L, toBool,
-	AnConst, Protocol, AnsonResp,
-	DetailFormW, AnContext, AnError, AnQueryForm, AnTreeIcons,
-	DatasetCombo, ConfirmDialog,
-	jsample
-} from 'anclient'
-const { JsampleIcons } = jsample;
+import { L } from '../../utils/langstr';
+	import { toBool } from '../../utils/helpers';
+	import { Protocol, AnsonResp } from '../../protocol';
+	import { AnConst } from '../../utils/consts';
+	import { AnContext } from '../reactext.jsx';
+	import { AnTreeIcons } from "./tree"
+	import { DetailFormW } from '../crud';
+	import { DatasetCombo } from './dataset-combo'
+	import { ConfirmDialog } from './messagebox';
+	import { JsampleIcons } from '../../jsample/styles';
 
 const styles = (theme) => ({
   root: {
@@ -71,7 +74,7 @@ class SimpleFormComp extends DetailFormW {
 		// type: Material UI: Type of the input element. It should be a valid HTML5 input type. (extended with enum, select)
 		// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
 		fields: [
-			{ type: 'text', field: 'parentId', label: L('Indicator Id'), hide: 1,
+			{ type: 'text', field: 'parent', label: L('Parent Indicator'), hide: 1,
 			  validator: {len: 12} },
 			{ type: 'text', field: 'indName', label: L('Indicator'),
 			  validator: {len: 200, notNull: true} },
@@ -237,15 +240,16 @@ class SimpleFormComp extends DetailFormW {
 	}
 
 	getField(f, rec) {
-		let small = super.media.isSm;
+		let {isSm} = super.media;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
 			let that = this;
 			return (<DatasetCombo uri={this.props.uri}
-				options={[
-					{n: L('Single Opt'), v: 's'},
-					{n: L('Multiple'), v: 'm'},
-					{n: L('Text'), v: 't'} ]}
+				// options={[
+				// 	{n: L('Single Opt'), v: 's'},
+				// 	{n: L('Multiple'), v: 'm'},
+				// 	{n: L('Text'), v: 't'} ]}
+				options={f.options}
 				label={f.label} style={f.style}
 				onSelect={ (v) => {
 					rec[f.field] = v.v;
@@ -256,7 +260,7 @@ class SimpleFormComp extends DetailFormW {
 		else return (
 			<TextField id={f.field} key={f.field}
 				type={f.type}
-				label={small ? L(f.label) : undefined}
+				label={isSm ? L(f.label) : undefined}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={rec[f.field] === undefined ? '' : rec[f.field]}
@@ -271,7 +275,7 @@ class SimpleFormComp extends DetailFormW {
 	formFields(rec, classes) {
 		let fs = [];
 		let c = this.state.crud === Protocol.CRUD.c;
-		const small = toBool(super.media.isMd);
+		const isSm = toBool(super.media.isMd);
 
 		this.state.fields.forEach( (f, i) => {
 		  if (!f.hide) {
@@ -280,7 +284,7 @@ class SimpleFormComp extends DetailFormW {
 					sm={f.props && f.props.sm ? f.props.sm : 6}
 					{...f.props} className={classes.labelText} >
 				  <Box className={classes.rowBox} >
-					{!small && (
+					{!isSm && (
 					  <Typography className={classes.formLabel} >
 						{L(f.label)}
 					  </Typography>
@@ -294,8 +298,6 @@ class SimpleFormComp extends DetailFormW {
 
 	render () {
 		const { classes, width } = this.props;
-		// const smallSize = new Set(['xs', 'sm']).has(width);
-		const smallSize = super.media.isSm;
 
 		let c = this.state.crud === Protocol.CRUD.c;
 		let u = this.state.crud === Protocol.CRUD.u;

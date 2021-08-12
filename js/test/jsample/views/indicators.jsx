@@ -6,11 +6,9 @@ import { Card, TextField, Typography } from '@material-ui/core';
 
 import { L, Langstrs,
     an, AnClient, SessionClient, Protocol,
-    AnContext, AnError, CrudCompW, AnReactExt
+    AnContext, AnError, CrudCompW, AnReactExt,
+	AnTreeditor
 } from 'anclient';
-
-// import { AnTreeditor } from '../../../lib/react/widgets/tree-editor';
-import { AnTreeditor } from './tree-editor';
 
 const styles = (theme) => ( {
 	root: {
@@ -32,10 +30,12 @@ class IndicatorsComp extends CrudCompW {
 			pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 			columns={[
 				{ type: 'text', field: 'indName', label: L('Indicator'),
-				  validator: {len: 200, notNull: true} },
+				  validator: {len: 200, notNull: true}, cols: {sm: 3} },
 				{ type: 'float', field: 'weight', label: L('Default Weight'),
-				  validator: {min: 0.0} },
-				{ type: 'formatter', label: L('Question Type'), formatter: (rec) => { docodeQtype(rec.qtype || rec.vtype) } }
+				  validator: {min: 0.0}, cols: {sm: 3}  },
+				{ type: 'formatter', label: L('Question Type'), cols: {sm: 3},
+				  formatter: (rec) => { decodeQtype(rec.qtype || rec.vtype) } },
+				{ type: 'actions', label: '', cols: 3}
 			]}
 			fields={[
 				{ type: 'text', field: 'parent', label: L('Indicator Id'), hide: 1,
@@ -45,10 +45,10 @@ class IndicatorsComp extends CrudCompW {
 				{ type: 'float', field: 'weight', label: L('Default Weight'),
 				  validator: {min: 0.0} },
 				{ type: 'enum', field: 'qtype', label: L('Question Type'),
-				  values: [{n: 'single', v: 's'}, {n: 'multiple', v: 'm'}, {n: 'text', v: 't'}],
+				  options: [{n: L('Single Option'), v: 's'}, {n: L('Multiple Option'), v: 'm'}, {n: L('Text'), v: 't'}, {n: L('5 Stars'), v: 'r5'}, {n: L('10 Stars'), n: 'r10'}],
 				  validator: {notNull: true} },
 				{ type: 'number',field: 'sort', label: L('UI Sort'),
-				  validator: undefined },
+				  validator: {notNull: true} },
 				{ type: 'text', field: 'remarks', label: L('Remarks'),
 				  validator: {len: 500}, props: {sm: 12, lg: 6} }
 			]}
@@ -59,9 +59,10 @@ class IndicatorsComp extends CrudCompW {
 			if (t === undefined) return L('Free Text');
 			t = t.toLowerCase();
 			return t === 's' ? L('Single Option')
-				: t === 'm' ? L('Multiple Option')
+				: t === 'm' ? L('Multiple Options')
 				: t === 'r10' ? L('10 Stars Ranking')
 				: t === 'r5' ? L('5 Stars Ranking')
+				: t === 'cate' ? L('Indicator Category')
 				: L('Free Text');
 		}
 	}
