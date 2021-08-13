@@ -104,10 +104,6 @@ export class Editor extends React.Component {
 		this.setState({questions, dirty: true});
 	}
 
-	// onChangeVal(comp, value) {
-	// 	this.setValue({value:value});
-	// }
-
 	onAdd(e) {
 		let qx = Editor.getQx();
 		let questions = this.state.questions.splice(0);

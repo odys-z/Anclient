@@ -257,8 +257,8 @@ class AnTreeditorComp extends React.Component {
 				pk={this.props.pk} fields={this.props.fields}
 				pkval={undefined} parent={this.props.parent} parentId={me}
 				title={this.props.detailFormTitle || 'Add Tree Node'}
-				onClose={() => {that.addForm = undefined;}}
-				onOk={() => {that.addForm = undefined; that.toSearch({}); }}
+				onClose={() => {that.addForm = undefined; that.setState({}); }}
+				onOk={() => {that.addForm = undefined; that.toSearch(); }}
 			/> );
 		this.setState({});
 	}
@@ -279,7 +279,7 @@ class AnTreeditorComp extends React.Component {
 				pkval={me} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
 				onClose={() => {that.addForm = undefined; that.setState({}) }}
-				onOk={() => {that.addForm = undefined; }}
+				onOk={() => {that.addForm = undefined; that.toSearch(); }}
 			/> );
 		this.setState({});
 	}
