@@ -26,7 +26,7 @@ class IndicatorsComp extends CrudCompW {
 
 	render () {
 		return (<AnTreeditor sk='xv.indicators'
-			uri={this.uri} mtabl='indicators'
+			uri={this.uri} mtabl='ind_emotion'
 			pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 			parent={{ type: 'text', field: 'parent', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 			columns={[
