@@ -39,7 +39,10 @@ const styles = (theme) => ({
   folderHead: {
 	padding: theme.spacing(1),
 	borderBottom: "1px solid #bcd",
-	borderTop: "1px solid #bcd"
+	borderTop: "1px solid #bcd",
+	"& :hover": {
+	  backgroundColor: "#ccc"
+	}
   },
   treeItem: {
 	padding: theme.spacing(1),
@@ -136,11 +139,25 @@ class TreeCardComp extends React.Component {
 				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.treeItem}>
 					<JsampleIcons.Up onClick={this.toUp} />
 					<JsampleIcons.Down onClick={this.toDown} />
-					<Button onClick={this.props.toEdit}
-						me={tnode.id} parent={n.parentId}
-						startIcon={<JsampleIcons.Edit />} color="primary" >
-						{this.props.media.isMd && L('Edit')}
-					</Button>
+					{this.props.media.isMd ?
+						<> <Button onClick={this.props.toEdit}
+								me={tnode.id} parent={n.parentId}
+								startIcon={<JsampleIcons.Edit />} color="primary" >
+								{L('Edit')}
+							</Button>
+							<Button onClick={this.props.toDel}
+								me={tnode.id} parent={n.parentId}
+								startIcon={<JsampleIcons.Delete />} color="secondary" >
+								{L('Delete')}
+							</Button>
+						</>
+						:
+						<> <JsampleIcons.Edit onClick={this.props.toEdit}
+								me={tnode.id} parent={n.parentId} color='primary' />
+							<JsampleIcons.Delete onClick={this.props.toDel}
+								me={tnode.id} parent={n.parentId} color='secondary' />
+						</>
+					}
 				</Grid> );
 			  else return (
 				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.treeItem}>
@@ -378,8 +395,13 @@ class AnTreeditorComp extends React.Component {
 					return (
 					  <Grid item key={`${tnode.id}.${ix}`} className={classes.actions}>
 						<Typography noWrap variant='body2' >
+							<Button onClick={this.props.toEdit}
+								me={tnode.id}
+								startIcon={<JsampleIcons.Edit />} color="primary" >
+								{media.isMd && L('Edit')}
+							</Button>
 							<Button onClick={this.toDel} me={tnode.id}
-								startIcon={<JsampleIcons.Delete />} color="primary" >
+								startIcon={<JsampleIcons.Delete />} color="secondary" >
 								{media.isMd && L('Delete')}
 							</Button>
 							{( this.props.isMidNode ? this.props.isMidNode(n) : true )
