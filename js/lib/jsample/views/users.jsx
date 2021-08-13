@@ -55,6 +55,7 @@ class UsersComp extends CrudCompW {
 	toSearch(e, q) {
 		let pageInf = this.state.pageInf;
 		let qr = this.context.anClient.query(this.uri, 'a_users', 'u', pageInf);
+		this.q = q;
 		qr.Body().j('a_roles', 'r', 'r.roleId = u.roleId')
 
 		if (q.roleId && q.roleId.v)
@@ -81,14 +82,16 @@ class UsersComp extends CrudCompW {
 	}
 
 	toAdd(e, v) {
+		let that = this;
 		this.roleForm = (<UserDetails c
 			uri={this.uri}
-			onOk={(r) => console.log(r)}
+			onOk={(r) => that.toSearch(null, this.q)}
 			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
 		this.roleForm = (<UserDetails u
+			uri={this.uri}
 			roleId={this.state.selectedRoleIds[0]}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);

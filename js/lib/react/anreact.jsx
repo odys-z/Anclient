@@ -176,15 +176,15 @@ export class AnReact {
 				dataType: "json",
 				url: 'private.json',
 			})
-			.done((json) => onJsonServ(elem, json))
-			.fail(
+			.done( (json) => onJsonServ(elem, json) )
+			.fail( (e) => {
 				$.ajax({
 					dataType: "json",
 					url: 'github.json',
 				})
 				.done((json) => onJsonServ(elem, json))
 				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
-			)
+			} )
 		}
 	}
 }

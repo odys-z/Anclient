@@ -261,7 +261,7 @@ class SimpleFormComp extends DetailFormW {
 				// 	{n: L('Single Opt'), v: 's'},
 				// 	{n: L('Multiple'), v: 'm'},
 				// 	{n: L('Text'), v: 't'} ]}
-				options={f.options}
+				options={f.options} val={rec[f.field]}
 				label={f.label} style={f.style}
 				onSelect={ (v) => {
 					rec[f.field] = v.v;
