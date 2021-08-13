@@ -60,7 +60,8 @@ class App extends React.Component {
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
-			{path: '/xv/indicators', comp: Indicators}
+			{path: '/xv/indicators', comp: Indicators},
+			{path: '/n/indicators', comp: Indicators}
 		] );
 	}
 
