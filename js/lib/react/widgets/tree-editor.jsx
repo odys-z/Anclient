@@ -302,9 +302,11 @@ class AnTreeditorComp extends React.Component {
 			});
 		  }
 		  else {
-			let open = that.state.expandings.has(tnode.id);
+			let open = that.state.expandings.has(tnode.id)
+					&& tnode.node.children && tnode.node.children.length > 0;
 			tnode.node.css = tnode.node.css || {};
-			if (tnode.node.children && tnode.node.children.length > 0) {
+			// if (tnode.node.children && tnode.node.children.length > 0) {
+			if (that.props.isMidNode(tnode.node)) {
 			  return (
 				<div key={tnode.id} className={classes.folder}>
 				  { that.folderHead(that.props.columns, tnode, open, classes, media) }
@@ -333,10 +335,20 @@ class AnTreeditorComp extends React.Component {
 		return (
 			<Grid container className={classes.th} >
 				{columns.filter( v => v.hide !== true)
-					.map( (colObj, ix) =>
-						<Grid item key={ix} {...colObj.cols}>
-							{colObj.label || colObj.field}
-						</Grid>)
+					.map( (col, ix) => {
+						if (col.type === 'actions') return (
+							<Grid item key={ix} {...col.cols}>
+								<Button onClick={this.toAddChild}
+									me={undefined} parent={undefined}
+									startIcon={<JsampleIcons.ListAdd />} color="primary" >
+									{media.isMd && L('New')}
+								</Button>
+							</Grid>);
+						else return (
+							<Grid item key={ix} {...col.cols}>
+								{col.label || col.field}
+							</Grid>);
+					} )
 				}
 			</Grid>);
 	}
@@ -403,7 +415,7 @@ class AnTreeditorComp extends React.Component {
 
 			if (children)
 				children = `[${media.isMd ? 'children' : ''} ${children.length}]`;
-			else chidlren = '';
+			else children = '';
 
 			return `${media.isXl ? text : ''} ${children}`;
 		}

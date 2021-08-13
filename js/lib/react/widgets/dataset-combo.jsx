@@ -29,6 +29,8 @@ class DatasetCombo extends React.Component {
 	state = {
 		// sk: undefined,
 		combo: {val: undefined, options: []},
+
+		selectedItem: undefined,
 	}
 
 	constructor(props) {
@@ -38,6 +40,8 @@ class DatasetCombo extends React.Component {
 		// this.state.nv = props.nv;
 		this.state.combo.options = props.options;
 		this.state.combo.label = props.label;
+		//this.state.selectedItem = this.findOption(props.options, props.val) || props.options[0];
+		this.state.initVal = props.val;
 
 		this.onCbbRefChange = this.onCbbRefChange.bind(this);
 	}
@@ -55,7 +59,10 @@ class DatasetCombo extends React.Component {
 					cond: this.state.combo
 				},
 				this.context.error, this);
-
+		// else if (this.state.combo.options && this.state.initVal != undefined) {
+		// 	let selectedItem = findOption(this.state.combo.options, this.state.initVal);
+		// 	this.setState(selectedItem);
+		// }
 	}
 
 	onCbbRefChange( refcbb ) {
@@ -66,9 +73,9 @@ class DatasetCombo extends React.Component {
 		return (e, item) => {
 			if (e) e.stopPropagation();
 			// console.log('onCbbRefChange()', _cmb);
-			_cmb.val = item ? item : AnConst.cbbAllItem;
+			selectedItem = item ? item : AnConst.cbbAllItem;
 
-			_that.setState({combo: _cmb});
+			_that.setState({selectedItem});
 
 			if (typeof _that.props.onSelect === 'function')
 				_that.props.onSelect(_cmb.val);
@@ -78,8 +85,18 @@ class DatasetCombo extends React.Component {
 	render() {
 		let cmb = this.state.combo
 		let refcbb = React.createRef();
-		let v = cmb && cmb.val ? cmb.val : AnConst.cbbAllItem;
-		console.log('render()', cmb);
+		/** Desgin Notes:
+		 * SimpleForm's first render triggered this constructor and componentDidMount() been called, first.
+		 * When it called render again when data been loaded in it's componentDidMount() (then render),
+		 * this constructor and componentDidMount() won't be called.
+		 * So here is necessary to check the initial selected value
+		 */
+		let selectedItem = this.state.selectedItem;
+		if (!selectedItem && this.props.val != undefined) {
+			selectedItem = findOption(this.state.combo.options, this.props.val);
+			this.state.selectedItem = selectedItem;
+		}
+		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
 		return (<Autocomplete
 			// key={sk + this.state.uid}
 			// id={String(x)} name={String(x)}
@@ -92,8 +109,17 @@ class DatasetCombo extends React.Component {
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
 			filter={Autocomplete.caseInsensitiveFilter}
-			renderInput={(params) => <TextField {...params} label={cmb.label} variant="outlined" />}
+			renderInput={(params) => <TextField {...params} label={v ? v.n : ''} variant="outlined" />}
 		/>);
+
+		function findOption (opts, v) {
+			if (opts && v !== undefined) {
+				for (let i = 0; i < opts.length; i++) {
+					if (opts[i].v === v || opts[i].v === v.v)
+						return opts[i];
+				}
+			}
+		}
 	}
 }
 DatasetCombo.contextType = AnContext;
