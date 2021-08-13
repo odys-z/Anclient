@@ -73,12 +73,12 @@ class DatasetCombo extends React.Component {
 		return (e, item) => {
 			if (e) e.stopPropagation();
 			// console.log('onCbbRefChange()', _cmb);
-			selectedItem = item ? item : AnConst.cbbAllItem;
-
-			_that.setState({selectedItem});
+			let selectedItem = item ? item : AnConst.cbbAllItem;
 
 			if (typeof _that.props.onSelect === 'function')
-				_that.props.onSelect(_cmb.val);
+				_that.props.onSelect(selectedItem);
+				
+			_that.setState({selectedItem});
 		};
 	}
 
