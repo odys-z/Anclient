@@ -47,7 +47,7 @@ class AnTablistComp extends React.Component {
 		let {total, page, size} = props.pageInf || {};
 		this.state.total = total || -1;
 		this.state.page = page || 0;
-		this.state.size = size || 20;
+		this.state.size = size || 25;
 
 		this.isSelected = this.isSelected.bind(this);
 		this.toSelectAll = this.toSelectAll.bind(this);

@@ -97,7 +97,7 @@ class SimpleFormComp extends DetailFormW {
 	constructor (props = {}) {
 		super(props);
 
-		this.funcId = props.funcId || 'TreeCardDetails'
+		this.funcId = props.funcId || 'SimpleForm';
 
 		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CRUD.u;
 		this.state.mtabl = props.mtabl;
