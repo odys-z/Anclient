@@ -143,6 +143,10 @@ const CheapFlow = withStyles(styles)(CheapFlowComp);
 
 
 class DetailFormW extends React.Component {
+	state = {
+		crud: Protoco.CRUD.r;
+	};
+
 	constructor(props) {
 		super(props);
 
@@ -150,6 +154,7 @@ class DetailFormW extends React.Component {
 		let media = CrudCompW.setWidth(width);
 
 		DetailFormW.prototype.media = media;
+		DetailFormW.prototype.state = this.state;
 	}
 }
 DetailFormW.contextType = AnContext;
