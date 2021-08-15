@@ -21,28 +21,29 @@ export class AnReact {
 	}
 
 	insert(quiz, onOk) {
-		let that = this;
-		let date = new Date();
-		this.client.usrAct('quiz', quiz_a.insert, Protocol.CRUD.c, quiz.qtitle);
-
-		let props = {}
-		props[QuizProtocol.qtitle] = quiz.qtitle;
-		props[QuizProtocol.qowner] = this.client.ssInf.uid;
-		props[QuizProtocol.dcreate] = `${date.toISOString()}`;
-		props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
-
-		let req = this.client.userReq(quizUri, JQuiz.port,
-			new UserReq( quizUri, "quizzes", props ).A(quiz_a.insert) );
-
-		this.client.an.post(req, onOk, (c, resp) => {
-			if (that.err) {
-				that.err.code = c;
-				that.err.msg = resp.Body().msg();
-				that.err.onError(true);
-			}
-			else console.error(c, resp);
-		});
+		throw new Error("Why here?");
+		// let that = this;
+		// let date = new Date();
+		// this.client.usrAct('quiz', quiz_a.insert, Protocol.CRUD.c, quiz.qtitle);
+		//
+		// let props = {}
+		// props[QuizProtocol.qtitle] = quiz.qtitle;
+		// props[QuizProtocol.qowner] = this.client.ssInf.uid;
+		// props[QuizProtocol.dcreate] = `${date.toISOString()}`;
+		// props[QuizProtocol.quizinfo] = quiz.quizinfo;
+		// props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
+		//
+		// let req = this.client.userReq(quizUri, JQuiz.port,
+		// 	new UserReq( quizUri, "quizzes", props ).A(quiz_a.insert) );
+		//
+		// this.client.an.post(req, onOk, (c, resp) => {
+		// 	if (that.err) {
+		// 		that.err.code = c;
+		// 		that.err.msg = resp.Body().msg();
+		// 		that.err.onError(true);
+		// 	}
+		// 	else console.error(c, resp);
+		// });
 	}
 
 	update(rec, onOk) {

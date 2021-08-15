@@ -57,7 +57,7 @@ class RolesComp extends CrudCompW {
 
 		total: 0,
 		pageInf: { page: 0, size: 25, total: 0 },
-		selectedRoleIds: [],
+		selectedRecIds: [],
 	};
 
 	constructor(props) {
@@ -93,7 +93,7 @@ class RolesComp extends CrudCompW {
 
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
-		this.state.selectedRoleIds.splice(0);
+		this.state.selectedRecIds.splice(0);
 	}
 
 	onPageInf(page, size) {
@@ -114,20 +114,20 @@ class RolesComp extends CrudCompW {
 				edit: rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,
 			},
-			selectedRoleIds: rowIds
+			selectedRecIds: rowIds
 		} );
 	}
 
 	toDel(e, v) {
 		let that = this;
 		let txt = L('Totally {count} role records will be deleted. Are you sure?',
-				{count: that.state.selectedRoleIds.length});
+				{count: that.state.selectedRecIds.length});
 		this.confirm =
 			(<ConfirmDialog open={true}
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
 				onOk={ () => {
-						delRole(that.state.selectedRoleIds);
+						delRole(that.state.selectedRecIds);
 				 	}
 				}
 				onClose={ () => {that.confirm === undefined} }
@@ -152,7 +152,7 @@ class RolesComp extends CrudCompW {
 
 	toEdit(e, v) {
 		this.roleForm = (<RoleDetails u uri={this.uri}
-			roleId={this.state.selectedRoleIds[0]}
+			roleId={this.state.selectedRecIds[0]}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}

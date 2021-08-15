@@ -14,6 +14,8 @@ const { Domain, Roles, Orgs, Users, JsampleTheme } = jsample;
 import { samports } from './jsample.js';
 
 import { Indicators } from './views/indicators';
+import { Quizzes } from './views/n/quizzes';
+import { Polls } from './views/n/polls';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -61,7 +63,9 @@ class App extends React.Component {
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
 			{path: '/xv/indicators', comp: Indicators},
-			{path: '/n/indicators', comp: Indicators}
+			{path: '/n/indicators', comp: Indicators},
+			{path: '/n/quizzes', comp: Quizzes },
+			{path: '/n/polls', comp: Polls }
 		] );
 	}
 

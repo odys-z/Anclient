@@ -587,9 +587,7 @@ class SessionClient {
 						"To setup user's action information, call ssClient.usrAct().");
 
 		var ins = new InsertReq(uri, maintbl);
-		// ins.a = Protocol.CRUD.c;
 		this.currentAct.cmd = 'insert';
-		// var jmsg = this.userReq(uri, Protocol.Port.insert, ins, this.currentAct);
 		var jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
 
 		if (nvs !== undefined) {

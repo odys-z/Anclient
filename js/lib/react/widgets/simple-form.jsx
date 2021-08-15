@@ -160,11 +160,14 @@ class SimpleFormComp extends DetailFormW {
 		function validField (f, valider) {
 			let v = that.state.record[f.field];
 
+			if (f.type === 'int')
+				if (! Number.isInteger(v)) return false;
+
 			if (typeof valider === 'function')
 				return valider(v);
 			else if (f.validator) {
 				let vd = f.validator;
-				if(vd.notNull && (v === undefined || v.length === 0))
+				if(vd.notNull && (v === undefined || v === null || v.length === 0))
 					return false;
 				if (vd.len && v && v.length > vd.len)
 					return false;
@@ -269,9 +272,13 @@ class SimpleFormComp extends DetailFormW {
 				}}
 			/>);
 		}
-		else return (
+		else{
+			let type = undefined;
+			if (f.type === 'float' || f.type === 'int')
+				type = 'number'
+			return (
 			<TextField id={f.field} key={f.field}
-				type={f.type}
+				type={type || f.type}
 				label={isSm ? L(f.label) : undefined}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
@@ -282,6 +289,7 @@ class SimpleFormComp extends DetailFormW {
 					this.setState({ dirty : true });
 				}}
 			/>);
+		}
 	}
 
 	formFields(rec, classes) {

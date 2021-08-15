@@ -201,6 +201,31 @@ const resp1Question = {
 	"seq": 0
 }
 
+const respInserted = {
+    "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+    "code": "ok",
+    "opts": null, "port": "quiz.serv", "header": null,
+    "body": [{"type": "io.odysz.jquiz.QuizResp", "rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null,
+              "data": {
+                "type": "io.odysz.semantics.SemanticObject",
+                "props": {"qtitle": null, "quizId": "000004", "questions": 1}
+              },
+              "m": "inserted", "map": null, "uri": null
+    }],
+    "version": "1.0", "seq": 0
+}
+
+const respUpdated = {
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "code": "ok", "opts": null, "port": "quiz.serv", "header": null,
+  "body": [{"type": "io.odysz.jquiz.QuizResp", "rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null,
+            "data": {"type": "io.odysz.semantics.SemanticObject",
+            "props": {"quizId": "000005", "questions": 1}},
+            "m": "updated", "map": null, "uri": null
+          }],
+  "version": "1.0", "seq": 0
+}
+
 describe('case: [04 Protocol.QuizResp] !! See example.js/lib/protocol.quiz.js line 1 ', () => {
 
 	it('4.1 [Quiz] Convert AnsonResp to quizzes', () => {
@@ -257,5 +282,26 @@ describe('case: [04 Protocol.QuizResp] !! See example.js/lib/protocol.quiz.js li
 		assert.equal(questions[0].answers.length, 15, "9 --- it's string length of " + questions[0].answers);
 		assert.equal(questions[0].answers.split('\n').length, 4, "10  --- answers: " + questions[0].answers.split('\n'));
 		assert.equal(questions[0].answer, "0", "11 ---");
+	});
+});
+
+describe('case: [04 Protocol.QuizResp] Update / Insert Results', () => {
+	it('4.A [Quiz] Inserted', () => {
+		debugger
+		let quizResp = new QuizResp(respInserted.body[0]);
+		let quizId = quizResp.getProp('quizId');
+
+		assert.equal(respInserted.code, 'ok', "4.A - 1");
+		assert.equal(quizId, '000004', "4.A - 2");
+	});
+
+	it('4.B [Quiz] updated', () => {
+		debugger
+		let quizResp = new QuizResp(respUpdated.body[0]);
+		let quizId = quizResp.getProp('quizId');
+
+		assert.equal(respUpdated.code, 'ok', "4.B - 1");
+		assert.equal(quizResp.msg(), 'updated', "4.B - 2");
+		assert.equal(quizId, '000005', "4.B - 3");
 	});
 });

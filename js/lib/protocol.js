@@ -304,8 +304,18 @@ class AnsonResp extends AnsonBody {
 		return this.m;
 	}
 
+	Code() {
+		return this.code;
+	}
+
 	Rs(rx = 0) {
 		return this.rs && this.rs.length > rx ? this.rs[rx] : undefined;
+	}
+
+	getProp(prop) {
+		if (this.data && this.data.props) {
+			return this.data.props[prop];
+		}
 	}
 
 	static hasColumn(rs, colname) {
