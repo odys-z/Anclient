@@ -22,9 +22,9 @@ class PollsComp extends CrudCompW {
 		students: [],
 		condQzName: { type: 'text', val: '', label: L('Role Name')},
 		condTag:  { type: 'text', val: '', label: L('Role Name')},
-		condOrg:  { type: 'cbb',
-					sk: 'my.students', nv: {n: 'text', v: 'value'},
-					sqlArg: [this.context.ssInf.userId],
+		condUser: { type: 'cbb',
+					sk: 'users.org-arg', nv: {n: 'text', v: 'value'},
+					sqlArg: [],
 					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem ],
 					label: L('Organization') },
@@ -40,6 +40,8 @@ class PollsComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
+		// this.state.condOrg.sqlArg = [this.context.anClient.ssInf.uid];
+
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 		this.onPageInf = this.onPageInf.bind(this);
@@ -51,15 +53,19 @@ class PollsComp extends CrudCompW {
 	}
 
 	componentDidMount() {
+		this.state.condUser.sqlArg = [this.context.anClient.ssInf.uid];
 		this.toSearch();
 	}
 
 	toSearch(e, query) {
 		let pageInf = this.state.pageInf;
-		let queryReq = this.context.anClient.query(this.uri, 'polls', 'q', pageInf)
+		let queryReq = this.context.anClient.query(this.uri, 'polls', 'p', pageInf)
 		let req = queryReq.Body()
-			.expr('pid').expr('pollName').expr('progress').expr('status').expr('pubTime')
-			.j('quizzes', 'qz', 'qz.qid=p.quizId');
+			.expr('pid').expr('title', 'pollName')
+			.expr('count(userId)', 'progress')
+			.expr('flag', 'status').expr('pubTime')
+			.j('quizzes', 'qz', 'qz.qid=p.quizId')
+			.groupby('qz.qid');
 
 		if (query && query.tag)
 			req.whereCond('%s', 'q.tags', `'${query.tag}'`);
@@ -154,6 +160,7 @@ class PollsComp extends CrudCompW {
 					tag:   q.state.conds[1].val ? q.state.conds[1].val : undefined,
 					orgId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				} } }
+				onDone={(query) => { this.toSearch(query); } }
 			/>
 
 			<Grid container alignContent="flex-end" >

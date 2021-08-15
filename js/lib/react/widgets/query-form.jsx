@@ -61,6 +61,8 @@ class AnQueryFormComp extends CrudComp {
 		this.toSearch = this.toSearch.bind(this);
 		this.toClear = this.toClear.bind(this);
 
+		this.onBound = this.onBound.bind(this);
+
 		this.refcbb = React.createRef();
 
 		if (props.conds)
@@ -76,16 +78,34 @@ class AnQueryFormComp extends CrudComp {
 			throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
 		this.state.conds.filter((c, x ) => !!c)
 		  .forEach( (cond, cx) => {
-			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb'))
+			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
+				cond.loading = true;
 				this.context.anReact.ds2cbbOptions({
 						uri: this.props.uri,
 						sk: cond.sk,
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
-						cond
+						sqlArg: cond.sqlArg,
+						cond,
+						done: this.onBound
 					},
 					this.context.error, this);
+			}
 		});
+	}
+
+	/** Check all binding tasks, if all are ok, fire onDone event.
+	 * Called by AnReact.ds2ds2cbbOptions, etc. Should call parent component's
+	 * onDone handler.
+	 * @param {object} cond the curreent condition
+	 */
+	onBound(cond) {
+		for (let i = 0; i < this.conds.length; i++) {
+			if (this.conds[i].loading)
+				return;
+		}
+		if (typeof this.props.onDone === 'function')
+			this.props.onDone(this.query());
 	}
 
 	handleChange( e ) {

@@ -289,17 +289,20 @@ export class AnReactExt extends AnReact {
 	 * @param {string} opts.sk semantic key (dataset id)
 	 * @param {object} opts.cond the component's state.conds[#] of which the options need to be updated
 	 * @param {object} [opts.nv={n: 'name', v: 'value'}] option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * @param {function} [opts.onDone] on done event's handler: function f(cond)
 	 * @param {boolean} [opts.onAll] no 'ALL' otion item
 	 * @param {AnContext.error} errCtx error handling context
 	 * @param {React.Component} [compont] the component needs to be updated on ok, if provided
 	 * @return {AnReactExt} this
 	 */
 	ds2cbbOptions(opts, errCtx, compont) {
-		let {uri, sk, nv, cond, noAll} = opts;
+		let {uri, sk, nv, cond, onDone, noAll} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
 		nv = nv || {n: 'name', v: 'value'};
+
+		cond.loading = true;
 
 		this.dataset( {
 				uri,
@@ -316,8 +319,13 @@ export class AnReactExt extends AnReact {
 					rows.unshift(AnConst.cbbAllItem);
 				cond.options = rows;
 
+				cond.loading = false;
+
 				if (compont)
 					compont.setState({});
+
+				if (onDone)
+					onDone(cond);
 			}, errCtx );
 		return this;
 	}
