@@ -296,7 +296,7 @@ export class AnReactExt extends AnReact {
 	 * @return {AnReactExt} this
 	 */
 	ds2cbbOptions(opts, errCtx, compont) {
-		let {uri, sk, nv, cond, onDone, noAll} = opts;
+		let {uri, sk, sqlArgs, nv, cond, onDone, noAll} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
@@ -306,6 +306,7 @@ export class AnReactExt extends AnReact {
 
 		this.dataset( {
 				uri,
+				sqlArgs,
 				ssInf: this.client.ssInf,
 				sk },
 			(dsResp) => {

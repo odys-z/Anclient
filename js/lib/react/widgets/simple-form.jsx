@@ -161,7 +161,7 @@ class SimpleFormComp extends DetailFormW {
 			let v = that.state.record[f.field];
 
 			if (f.type === 'int')
-				if (! Number.isInteger(v)) return false;
+				if (v === '' || ! Number.isInteger(Number(v))) return false;
 
 			if (typeof valider === 'function')
 				return valider(v);

@@ -65,6 +65,10 @@ class QuizEditorComp extends DetailFormW {
 	constructor(props) {
 		super(props);
 
+		this.state.crud = props.c ? Protocol.CRUD.c
+						: props.u ? Protocol.CURD.u
+						: Protocol.CRUD.r;
+
 		this.state.quizId = props.quizId;
 
 		this.handleClick = this.handleClick.bind(this);
@@ -82,6 +86,8 @@ class QuizEditorComp extends DetailFormW {
 		this.jquiz = new JQuiz(ctx.anClient, ctx.errHandler);
 		if (this.state.crud !== Protocol.CRUD.c)
 			this.jquiz.quiz(this.props.uri, this.state.quizId, this.loadQuiz, ctx);
+		else
+			this.jquiz.start(this.props.uri, this.loadQuiz, ctx);
 	}
 
 	loadQuiz(ansonResp) {

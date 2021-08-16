@@ -49,7 +49,7 @@ class IndicatorsComp extends CrudCompW {
 				  // If a node is the type of the first option, it means that node is middle (internal) node.
 				  options: [{n: L('[ Category ]'), v: 'cate'}, {n: L('Single Option'), v: 's'}, {n: L('Multiple Option'), v: 'm'}, {n: L('Text'), v: 't'}, {n: L('5 Stars'), v: 'r5'}, {n: L('10 Stars'), v: 'r10'}],
 				  validator: {notNull: true} },
-				{ type: 'number',field: 'sort', label: L('UI Sort'),
+				{ type: 'int',field: 'sort', label: L('UI Sort'),
 				  validator: {notNull: true} },
 				{ type: 'text', field: 'remarks', label: L('Remarks'),
 				  validator: {len: 500}, props: {sm: 12, lg: 6} }

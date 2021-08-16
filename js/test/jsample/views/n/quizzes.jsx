@@ -16,6 +16,11 @@ import { QuizForm } from './quiz-form';
 const styles = (theme) => ( {
 	root: {
 		margin: theme.spacing(1),
+	},
+	button: {
+		height: '2.4em',
+		verticalAlign: 'middle',
+		margin: theme.spacing(1),
 	}
 } );
 
@@ -24,7 +29,7 @@ class QuizzesComp extends CrudCompW {
 		quizzes: [],
 		pageInf: {page: 0, size: 25},
 		queryReq : undefined,
-		buttons: { add: true, edit: false, del: false},
+		buttons: { add: true, stop: false, del: false},
 
 		condTitl: { type: 'text', val: '', label: L('Title')},
 		condTags: { type: 'text', val: '', label: L('Tags')},
@@ -32,6 +37,8 @@ class QuizzesComp extends CrudCompW {
 
 		selectedRecIds: []
 	};
+
+	funcName = L('North - Quizzes');
 
 	constructor(props) {
 		super(props);
@@ -56,9 +63,10 @@ class QuizzesComp extends CrudCompW {
 		let pageInf = this.state.pageInf;
 		let queryReq = this.context.anClient.query(this.uri, 'quizzes', 'q', pageInf)
 		let req = queryReq.Body()
-			.expr('q.qid').expr('title').expr('tags').expr('dcreate').expr('sum(pId)', 'polls')
-			.j('polls', 'p', 'p.quizId=q.qId')
-			.groupby('q.qId');
+			.expr('q.qid').expr('title').expr('tags').expr('dcreate')
+			.expr('sum(ifnull(pId, 0))', 'polls')
+			.l('polls', 'p', 'p.quizId=q.qid')
+			.groupby('q.qid');
 
 		if (query && query.qTitl)
 			req.whereCond('%', 'q.title', `'${query.qTitl}'`);
@@ -89,7 +97,7 @@ class QuizzesComp extends CrudCompW {
 		this.setState( {
 			buttons: {
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.length === 1,
+				stop: rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,
 			},
 			selectedRecIds: rowIds
@@ -114,7 +122,7 @@ class QuizzesComp extends CrudCompW {
 		function del(ids) {
 			let req = that.context.anClient
 				.usrAct('n/quizzes', Protocol.CRUD.d, 'delete')
-				.deleteMulti(this.uri, 'quizzes', 'qId', ids);
+				.deleteMulti(this.uri, 'quizzes', 'qid', ids);
 
 			that.context.anClient.commit(req, (resp) => {
 				that.toSearch();
@@ -126,8 +134,9 @@ class QuizzesComp extends CrudCompW {
 		let that = this;
 
 		this.quizForm = (
-			<QuizForm crud={Protocol.CRUD.c} uri={this.uri}
+			<QuizForm c uri={this.uri}
 				quizId={undefined}
+				onCancel={this.closeDetails}
 				onOk={ () => {
 					that.closeDetails();
 					that.toSearch()
@@ -136,8 +145,9 @@ class QuizzesComp extends CrudCompW {
 
 	toEdit(e, v) {
 		let that = this;
-		this.quizForm = (<QuizForm uri={this.uri}
+		this.quizForm = (<QuizForm u uri={this.uri}
 			quizId={this.state.selectedRecIds[0]}
+			onCancel={this.closeDetails}
 			onOk={ () => {
 				that.closeDetails();
 				that.toSearch()
@@ -153,7 +163,7 @@ class QuizzesComp extends CrudCompW {
 		let args = {};
 		const { classes } = this.props;
 		let btn = this.state.buttons;
-		return ( <>
+		return ( <>{this.funcName}
 			<AnQueryForm uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
@@ -168,28 +178,28 @@ class QuizzesComp extends CrudCompW {
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAdd}
 					startIcon={<JsampleIcons.Add />}
-				>{L('Add')}</Button>
+				>{L('Start Quiz')}</Button>
+				<Button variant="contained" disabled={!btn.stop}
+					className={classes.button} onClick={this.toStop}
+					startIcon={<JsampleIcons.Edit />}
+				>{L('Edit Quiz')}</Button>
 				<Button variant="contained" disabled={!btn.del}
 					className={classes.button} onClick={this.toDel}
 					startIcon={<JsampleIcons.Delete />}
-				>{L('Delete')}</Button>
-				<Button variant="contained" disabled={!btn.edit}
-					className={classes.button} onClick={this.toEdit}
-					startIcon={<JsampleIcons.Edit />}
-				>{L('Edit')}</Button>
+				>{L('Delete Quiz')}</Button>
 			</Grid>
 
 			<AnTablist
-				className={classes.root} checkbox= {true} pk= "qId"
+				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
-					{ text: L('qId'), hide: 1, field:"qId" },
+					{ text: L('qid'), hide: 1, field:"qid" },
 					{ text: L('Titel'),        field: "title", color: 'primary', className: 'bold'},
 					{ text: L('Tags'),         field: "tags", color: 'primary' },
 					{ text: L('Subject'),      field: "subject", color: 'primary' },
 					{ text: L('Date Created'), field: "dcreate", color: 'primary', hide: 1 },
 					{ text: L('Polls'),        field: "polls", color: 'primary', hide: 1 }
 				]}
-				rows={this.state.rows} pk='qId'
+				rows={this.state.rows}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}

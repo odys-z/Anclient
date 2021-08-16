@@ -29,7 +29,7 @@ class QuizFormComp extends DetailFormW {
 	};
 
 	componentDidMount() {
-		this.state.an = this.context.client ? this.context.client.an : undefined;
+		// this.state.an = this.context.client ? this.context.client.an : undefined;
 	}
 
 	constructor (props) {
@@ -80,7 +80,7 @@ class QuizFormComp extends DetailFormW {
 
 				<DialogTitle id="alert-dialog-title"></DialogTitle>
 				<DialogContent>
-				  <QuizEditor uri={this.props.uri}
+				  <QuizEditor uri={this.props.uri} {...props}
 						title={title}
 						quizId={props.quizId}
 						creating={this.state.creating}

@@ -20,17 +20,17 @@ const styles = (theme) => ( {
 class PollsComp extends CrudCompW {
 	state = {
 		students: [],
-		condQzName: { type: 'text', val: '', label: L('Role Name')},
-		condTag:  { type: 'text', val: '', label: L('Role Name')},
+		condQzName: { type: 'text', val: '', label: L('Quiz Name') },
+		condTag:  { type: 'text', val: '', label: L('Quiz Tag') },
 		condUser: { type: 'cbb',
 					sk: 'users.org-arg', nv: {n: 'text', v: 'value'},
-					sqlArg: [],
+					sqlArgs: [],
 					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem ],
-					label: L('Organization') },
+					label: L('My Students') },
 
 		// active buttons
-		buttons: { add: true, edit: false, del: false},
+		// buttons: { add: true, edit: false, del: false},
 
 		total: 0,
 		pageInf: { page: 0, size: 25, total: 0 },
@@ -39,8 +39,6 @@ class PollsComp extends CrudCompW {
 
 	constructor(props) {
 		super(props);
-
-		// this.state.condOrg.sqlArg = [this.context.anClient.ssInf.uid];
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
@@ -53,19 +51,19 @@ class PollsComp extends CrudCompW {
 	}
 
 	componentDidMount() {
-		this.state.condUser.sqlArg = [this.context.anClient.ssInf.uid];
-		this.toSearch();
+		console.log(this.uri);
 	}
 
 	toSearch(e, query) {
 		let pageInf = this.state.pageInf;
 		let queryReq = this.context.anClient.query(this.uri, 'polls', 'p', pageInf)
 		let req = queryReq.Body()
-			.expr('pid').expr('title', 'pollName')
+			.expr('qz.qid', 'qid').expr('title', 'pollName')
 			.expr('count(userId)', 'progress')
 			.expr('flag', 'status').expr('pubTime')
 			.j('quizzes', 'qz', 'qz.qid=p.quizId')
-			.groupby('qz.qid');
+			.groupby('qz.qid')
+			.orderby('qz.pubTime', 'desc');
 
 		if (query && query.tag)
 			req.whereCond('%s', 'q.tags', `'${query.tag}'`);
@@ -151,6 +149,7 @@ class PollsComp extends CrudCompW {
 		let args = {};
 		const { classes } = this.props;
 		let btn = this.state.buttons;
+		this.state.condUser.sqlArgs = [this.context.anClient.userInfo.uid];
 		return ( <>
 			<AnQueryForm uri={this.uri}
 				onSearch={this.toSearch}
@@ -160,34 +159,19 @@ class PollsComp extends CrudCompW {
 					tag:   q.state.conds[1].val ? q.state.conds[1].val : undefined,
 					orgId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				} } }
-				onDone={(query) => { this.toSearch(query); } }
+				onDone={(query) => { this.toSearch(undefined, query); } }
 			/>
 
-			<Grid container alignContent="flex-end" >
-				<Button variant="contained" disabled={!btn.add}
-					className={classes.button} onClick={this.toAdd}
-					startIcon={<JsampleIcons.Add />}
-				>{L('Add')}</Button>
-				<Button variant="contained" disabled={!btn.del}
-					className={classes.button} onClick={this.toDel}
-					startIcon={<JsampleIcons.Delete />}
-				>{L('Delete')}</Button>
-				<Button variant="contained" disabled={!btn.edit}
-					className={classes.button} onClick={this.toEdit}
-					startIcon={<JsampleIcons.Edit />}
-				>{L('Edit')}</Button>
-			</Grid>
-
 			<AnTablist
-				className={classes.root} checkbox= {true} pk= "vid"
+				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
-					{ text: L('pid'), hide:true, field: "pid" },
+					{ text: L('quiz event'),field: "qid", hide:true },
 					{ text: L('Poll Name'), field: "pollName", color: 'primary', className: 'bold'},
 					{ text: L('Progress'), field: "progress", color: 'primary' },
 					{ text: L('Status'), field: "status", color: 'primary' },
 					{ text: L('Start'), field: "start", color: 'primary' }
 				]}
-				rows={this.state.rows} pk='pid'
+				rows={this.state.rows} pk='qid'
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}

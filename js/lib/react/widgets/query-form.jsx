@@ -85,9 +85,9 @@ class AnQueryFormComp extends CrudComp {
 						sk: cond.sk,
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
-						sqlArg: cond.sqlArg,
+						sqlArgs: cond.sqlArgs,
 						cond,
-						done: this.onBound
+						onDone: this.onBound
 					},
 					this.context.error, this);
 			}
@@ -100,10 +100,14 @@ class AnQueryFormComp extends CrudComp {
 	 * @param {object} cond the curreent condition
 	 */
 	onBound(cond) {
-		for (let i = 0; i < this.conds.length; i++) {
-			if (this.conds[i].loading)
-				return;
+		let conds = this.state.conds;
+		if (conds) {
+			for (let i = 0; i < conds.length; i++) {
+				if (conds[i] && conds[i].loading)
+					return;
+			}
 		}
+
 		if (typeof this.props.onDone === 'function')
 			this.props.onDone(this.query());
 	}
