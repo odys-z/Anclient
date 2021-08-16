@@ -66,7 +66,8 @@ class QuizzesComp extends CrudCompW {
 			.expr('q.qid').expr('title').expr('tags').expr('dcreate')
 			.expr('sum(ifnull(pId, 0))', 'polls')
 			.l('polls', 'p', 'p.quizId=q.qid')
-			.groupby('q.qid');
+			.groupby('q.qid')
+			.orderby('dcreate', 'desc');
 
 		if (query && query.qTitl)
 			req.whereCond('%', 'q.title', `'${query.qTitl}'`);

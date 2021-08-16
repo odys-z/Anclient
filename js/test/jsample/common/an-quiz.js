@@ -11,6 +11,7 @@ const Quizports = {
 }
 
 export const quiz_a = {
+	start: 'start',
 	quiz: 'quiz',     //
 	list: 'list',     // load quizzes
 	insert: 'insert', // create new quiz
@@ -88,16 +89,26 @@ class JQuiz {
 		return this;
 	}
 
+	/** Create a request and post back to server asking a new quiz.
+	 * port: quiz
+	 * @param { string } uri
+	 * @param {function} onLoad on query ok callback, called with parameter of query responds
+	 * @param {AnContext.error}
+	 * */
+	startQuiz(uri, onLoad, errCtx) {
+		return this.serv(uri, quiz_a.start, {}, onLoad, errCtx);
+	}
+
 	/** Create a query request and post back to server.
 	 * This function show the general query sample - goes to the Protocol's query
-	 * port: "r.serv(11)".
+	 * port: quiz
 	 * @param { string } uri
 	 * @param {string} quizId quiz id
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
 	 * @param {AnContext.error}
 	 * */
 	quiz(uri, quizId, onLoad, errCtx) {
-		let that = this;
+		// let that = this;
 		return this.serv(uri, quiz_a.quiz, {quizId}, onLoad, errCtx);
 	}
 
@@ -113,7 +124,7 @@ class JQuiz {
 
 	/**
 	 * @param {string} uri
-	 * @param {object} quiz {qtitle, questions, quizifno}
+	 * @param {object} quiz {qtitle, questions, quizifno, toClass}
 	 * @param {function} onOk
 	 * @param {AnContext.error} errCtx
 	 */
@@ -128,6 +139,8 @@ class JQuiz {
 		props[QuizProtocol.dcreate] = `${date.toISOString()}`;
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
+
+		props[QuizProtocol.pollUser] = quiz.pollUser;
 
 		let req = this.client.userReq(uri, JQuiz.port,
 			new UserReq( uri, "quizzes", props ).A(quiz_a.insert) );

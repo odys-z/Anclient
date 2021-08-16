@@ -9,7 +9,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { L, AnContext, DetailFormW } from 'anclient';
+import { L, AnContext, DetailFormW, DatasetCombo } from 'anclient';
 import { QuizEditor } from './quiz-editor';
 
 const styles = (theme) => ({
@@ -40,6 +40,7 @@ class QuizFormComp extends DetailFormW {
 
 		this.onOk = this.onOk.bind(this);
 		this.onCancel = this.onCancel.bind(this);
+		this.onDirty = this.onDirty.bind(this);
 	}
 
 	onCancel(e) {
@@ -85,10 +86,10 @@ class QuizFormComp extends DetailFormW {
 						quizId={props.quizId}
 						creating={this.state.creating}
 						questions={this.state.questions}
-						onDirty={this.state.onDirty} />
+						onDirty={this.onDirty} />
 				</DialogContent>
 				<DialogActions>
-				  <Button onClick={this.onOk} disabled={!this.state.dirty} color="primary">
+				  <Button onClick={this.onOk} disabled={this.state.dirty} color="primary">
 						{txtOk}
 				  </Button>
 				  <Box display={displayCancel}>

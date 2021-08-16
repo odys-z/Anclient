@@ -9,6 +9,7 @@ import React from 'react';
 	import ListItemText from '@material-ui/core/ListItemText';
 	import Collapse from '@material-ui/core/Collapse';
 	import Add from '@material-ui/icons/Add';
+	import Edit from '@material-ui/icons/Edit';
 	import DraftsIcon from '@material-ui/icons/Drafts';
 	import InboxIcon from '@material-ui/icons/MoveToInbox';
 	import SendIcon from '@material-ui/icons/Send';
@@ -71,7 +72,8 @@ class QuizEditorComp extends DetailFormW {
 
 		this.state.quizId = props.quizId;
 
-		this.handleClick = this.handleClick.bind(this);
+		this.handleClickQs = this.handleClickQs.bind(this);
+		this.toSetPollUsers = this.toSetPollUsers.bind(this);
 		this.editQuestion = this.editQuestion.bind(this);
 		this.editAnswer = this.editAnswer.bind(this);
 		this.onAdd = this.onAdd.bind(this);
@@ -87,7 +89,9 @@ class QuizEditorComp extends DetailFormW {
 		if (this.state.crud !== Protocol.CRUD.c)
 			this.jquiz.quiz(this.props.uri, this.state.quizId, this.loadQuiz, ctx);
 		else
-			this.jquiz.start(this.props.uri, this.loadQuiz, ctx);
+			this.jquiz.startQuiz(this.props.uri, this.loadQuiz, ctx);
+
+		this.toSetPollUsers();
 	}
 
 	loadQuiz(ansonResp) {
@@ -98,11 +102,23 @@ class QuizEditorComp extends DetailFormW {
 			qtitle: title,
 			quizinfo: quizinfo,
 			currentqx: -1,
-			dirty: false,
+			dirty: this.state.crud === Protocol.CRUD.c
 		} );
 
 		if (this.props.onDirty)
 			this.props.onDirty(true);
+	}
+
+	toSetPollUsers(e) {
+		e.stopPropagation();
+		let that = this;
+		this.jquiz.pollUsers({quizId: this.state.quizId, isNew: !!this.props.c},
+			resp => {
+				let users = resp.getProp('pollUsers');
+				that.setState({
+					pollUsersText: L('Target Users: {usrNum}', {usrNum: users.length}),
+					pollUsers: users});
+			});
 	}
 
 	alert(msg) {
@@ -112,7 +128,10 @@ class QuizEditorComp extends DetailFormW {
 		});
 	}
 
-	handleClick(e) {
+	/**on click question
+	 * param {Event} e
+	 */
+	handleClickQs(e) {
 	  // use currentTarget instead of target, see https://stackoverflow.com/a/10086501/7362888
 	  let qx = e.currentTarget.getAttribute('qx');
 	  this.setState({currentqx: parseInt(qx)});
@@ -201,7 +220,7 @@ class QuizEditorComp extends DetailFormW {
 
 		return this.state.questions.map( (q, x) => (
 		  <div key={this.state.questions[x].qid}>
-			<ListItem button qx={x} onClick={this.handleClick} color='secondary'>
+			<ListItem button qx={x} onClick={this.handleClickQs} color='secondary'>
 				<ListItemIcon><Sms /></ListItemIcon>
 				<ListItemText primary={this.state.questions[x].question} />
 			</ListItem>
@@ -251,6 +270,8 @@ class QuizEditorComp extends DetailFormW {
 			<ListItem button onClick={e => this.setState({openHead: !this.state.openHead})}>
 				<ListItemIcon><SendIcon /></ListItemIcon>
 				<ListItemText primary={L('Editing Quiz')} />
+				<ListItemIcon onClick={this.toSetPollUsers} ><Edit /></ListItemIcon>
+				<ListItemText primary={this.state.pollUsersText} onClick={this.toSetPollUsers} />
 			</ListItem>
 			<Collapse in={this.state.openHead} timeout="auto" >
 				<TextField id="qtitle" label={L("Title")}
