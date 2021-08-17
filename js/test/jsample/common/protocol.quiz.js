@@ -114,12 +114,21 @@ Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
 	return new QuizResp(jsonBd);
 });
 
+Protocol.registerBody('io.oz.ever.conn.c.CenterResp', (jsonBd) => {
+	return new CenterResp(jsonBd);
+});
+
+Protocol.registerBody('io.oz.ever.conn.n.NorthResp', (jsonBd) => {
+	return new NorthResp(jsonBd);
+});
+
 export const center_a = {
 	getClasses: "classes",
 	getStatus: "status",
 }
 
 export class CenterResp extends AnsonResp {
+
 	constructor (body) {
 		let respObj = body.length ? body[0] : body;
 		super(respObj);
@@ -145,6 +154,16 @@ export class CenterResp extends AnsonResp {
 		if (polls) {
 			cols = polls.length ? [] : polls.colnames;
 			rows = polls.length ? [] : polls.results;
+		}
+		return {cols, rows};
+	}
+
+	connects () {
+		let conns = this.data && this.data.props && this.data.props.connects;
+		let cols, rows;
+		if (conns) {
+			cols = conns.length ? [] : conns.colnames;
+			rows = conns.length ? [] : conns.results;
 		}
 		return {cols, rows};
 	}

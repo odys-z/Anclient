@@ -35,14 +35,14 @@ class MyStatusComp extends CrudCompW {
 		let reqBd = new UserReq();
 
 		let client = this.context.anClient;
-		let req = client.userReq(this.uri, JQuiz.port,
+		let req = client.userReq(this.uri, 'center',
 			new UserReq( this.uri, "center" ).A(center_a.getStatus) );
 		this.state.statusReq = req;
 
 		let that = this;
 		client.commit(req, (resp) => {
 			let centerResp = resp.Body()
-			that.setState({my: that.my()});
+			that.setState({my: centerResp.my()});
 		}, this.context.error);
 	}
 
@@ -64,7 +64,7 @@ class MyStatusComp extends CrudCompW {
 					]}
 					rows={this.state.rows}
 					onSelectChange={this.onTableSelect} />
-				{this.quizForm}
+					{this.pollForm}
 				</>
 			}
 		</>);

@@ -43,10 +43,6 @@ class JQuiz {
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
 		this.err = errHandler;
-
-		Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
-			return new QuizResp(jsonBd);
-		});
 	}
 
 	static get port() { return 'quiz'; }

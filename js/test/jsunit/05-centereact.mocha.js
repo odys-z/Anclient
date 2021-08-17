@@ -75,6 +75,6 @@ describe('case: [05 Protocol.CenterResp]', () => {
 		assert.equal(rows.length, 7, "1 ---");
 
 		let my = centerResp.my();
-		assert.equal(my.rows.length, 7, "2 ---");
+		assert.equal(my.polls.length, 7, "2 ---");
 	});
 });
