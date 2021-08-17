@@ -60,7 +60,7 @@ class PollsComp extends CrudCompW {
 		let req = queryReq.Body()
 			.expr('qz.qid', 'qid').expr('title', 'pollName')
 			.expr('count(userId)', 'progress')
-			.expr('flag', 'status').expr('pubTime')
+			.expr('state').expr('pubTime')
 			.j('quizzes', 'qz', 'qz.qid=p.quizId')
 			.groupby('qz.qid')
 			.orderby('qz.pubTime', 'desc');

@@ -1,4 +1,16 @@
 import { Protocol, AnsonResp } from 'anclient';
+// NOTE for test, user this:
+// import { Protocol, AnsonResp } from '../../../lib/protocol.js';
+
+export const quiz_a = {
+	start: 'start',
+	quiz: 'quiz',     //
+	list: 'list',     // load quizzes
+	insert: 'insert', // create new quiz
+	update: 'update', // update quiz
+
+	poll: 'poll',     // submit poll results
+}
 
 export class QuizReq {
 	constructor () { }
@@ -101,3 +113,48 @@ export class QuizResp extends AnsonResp {
 Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
 	return new QuizResp(jsonBd);
 });
+
+export const center_a = {
+	getClasses: "classes",
+	getStatus: "status",
+}
+
+export class CenterResp extends AnsonResp {
+	constructor (body) {
+		let respObj = body.length ? body[0] : body;
+		super(respObj);
+		this.data = respObj.data;
+		this.m = respObj.m;
+		this.map = respObj.map;
+  		this.port = respObj.serv;
+		this.seq = respObj.seq;
+
+		this.date = respObj.data;
+		// let polls = respObj.data && respObj.data.props && respObj.data.props.polls;
+		// if (polls) {
+		// 	this.cols = rs.length ? [] : rs.colnames;
+		// 	this.rows = rs.length ? [] : rs.results;
+		// }
+
+		// this.qs = respObj.data && respObj.data.props && respObj.data.props.questions || {};
+	}
+
+	polls () {
+		let polls = this.data && this.data.props && this.data.props.polls;
+		let cols, rows;
+		if (polls) {
+			cols = polls.length ? [] : polls.colnames;
+			rows = polls.length ? [] : polls.results;
+		}
+		return {cols, rows};
+	}
+
+	my () {
+		let { cols, rows } = this.polls();
+		let my = {tasks: rows.length, polls: rows};
+		let conns = this.connects();
+		// {col, rows} = conns;
+		my.connects = conns.rows;
+		return my;
+	}
+}

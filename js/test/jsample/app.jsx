@@ -11,7 +11,9 @@ import { L, Langstrs,
 } from 'anclient';
 const { Domain, Roles, Orgs, Users, JsampleTheme } = jsample;
 
-import { samports } from './jsample.js';
+// import { samports } from './jsample.js';
+
+import { StarPorts } from './common/port';
 
 import { Indicators } from './views/n/indicators';
 import { Quizzes } from './views/n/quizzes';
@@ -35,7 +37,8 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state.samports = Object.assign(Protocol.Port, samports);
+		// this.state.samports = Object.assign(Protocol.Port, samports);
+
 		this.state.iportal = this.props.iportal;
 
 		this.onError = this.onError.bind(this);
@@ -46,7 +49,7 @@ class App extends React.Component {
 		this.state.error = {onError: this.onError, msg: ''};
 		this.state.anClient = new SessionClient();
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
-								.extendPorts(samports);
+								.extendPorts(StarPorts);
 
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
@@ -112,7 +115,7 @@ class App extends React.Component {
 			<AnContext.Provider value={{
 				// FIXME we should use a better way
 				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
-				samports: this.state.samports, // FXIME or Protocol?
+				// samports: this.state.samports, // FXIME or Protocol?
 				anReact: this.state.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,

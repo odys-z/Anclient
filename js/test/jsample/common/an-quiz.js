@@ -6,20 +6,6 @@ import {
 
 import { QuizReq, QuizResp } from './protocol.quiz.js';
 
-const Quizports = {
-	quiz: 'quiz.serv'
-}
-
-export const quiz_a = {
-	start: 'start',
-	quiz: 'quiz',     //
-	list: 'list',     // load quizzes
-	insert: 'insert', // create new quiz
-	update: 'update', // update quiz
-
-	poll: 'poll',     // submit poll results
-}
-
 export const QuestionType = {
 	single: "1",
 	multiple: "x"
@@ -54,7 +40,6 @@ class JQuiz {
 	 * @param {object} errHandler, AnContext.error, the app error handler
 	 */
 	constructor (ssClient, errHandler) {
-		ssClient.an.understandPorts(Quizports);
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
 		this.err = errHandler;
@@ -140,12 +125,19 @@ class JQuiz {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		props[QuizProtocol.pollUser] = quiz.pollUser;
+		let pollIds = shrink(quiz.pollUsers);
+		console.log(pollIds);
+		props[QuizProtocol.pollUser] = pollIds;
 
 		let req = this.client.userReq(uri, JQuiz.port,
 			new UserReq( uri, "quizzes", props ).A(quiz_a.insert) );
 
 		this.client.commit(req, onOk, errCtx);
+
+		function shrink(arr) {
+			console.error(arr);
+			return arr;
+		}
 	}
 
 	/**

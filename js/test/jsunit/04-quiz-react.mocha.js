@@ -1,6 +1,7 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, AnsonResp } from '../../lib/protocol.js'
-import { QuizResp, QuizReq } from '../../../examples/example.js/lib/protocol.quiz.js'
+// import { QuizResp, QuizReq } from '../../../examples/example.js/lib/protocol.quiz.js'
+import { QuizResp, QuizReq } from '../jsample/common/protocol.quiz.js'
 
 const jsonResp = {
 "body": [{
@@ -287,7 +288,6 @@ describe('case: [04 Protocol.QuizResp] !! See example.js/lib/protocol.quiz.js li
 
 describe('case: [04 Protocol.QuizResp] Update / Insert Results', () => {
 	it('4.A [Quiz] Inserted', () => {
-		debugger
 		let quizResp = new QuizResp(respInserted.body[0]);
 		let quizId = quizResp.getProp('quizId');
 

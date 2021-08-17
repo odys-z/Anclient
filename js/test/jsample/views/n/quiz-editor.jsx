@@ -110,14 +110,23 @@ class QuizEditorComp extends DetailFormW {
 	}
 
 	toSetPollUsers(e) {
-		e.stopPropagation();
+		if (e && e.stopPropagation) e.stopPropagation();
+
 		let that = this;
 		this.jquiz.pollUsers({quizId: this.state.quizId, isNew: !!this.props.c},
 			resp => {
 				let users = resp.getProp('pollUsers');
+				let {cols, rows} = AnsonResp.rs2arr(users.results.rows);
+				console.log(cols, rows);
 				that.setState({
 					pollUsersText: L('Target Users: {usrNum}', {usrNum: users.length}),
-					pollUsers: users});
+					pollUsers: rows
+				});
+
+				that.pollUserForm = (<ConfirmDialog
+						ok={L('Ok')} title={L('Info: Server Response')} cancel={false}
+						open={true} onClose={() => {that.pollUserForm = undefined;} }
+						msg={rows} />);
 			});
 	}
 

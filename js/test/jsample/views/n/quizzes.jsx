@@ -55,6 +55,7 @@ class QuizzesComp extends CrudCompW {
 
 	componentDidMount() {
 		console.log(this.uri);
+		this.toSearch();
 	}
 
 	/** Deprecation jquiz.list() ?

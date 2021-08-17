@@ -34,15 +34,15 @@ const anconsts = {
 	},
 }
 
-const samports = {
-	/** see semantic.jserv/io.odysz.jsample.SysMenu */
-	menu: "menu.serv",
-	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
-	cheapflow: "cheapflow.sample",
-
-	/** views/Tool/project-toolBack-details.js */
-	tools: "tools.serv11",
-}
+// const samports = {
+// 	/** see semantic.jserv/io.odysz.jsample.SysMenu */
+// 	menu: "menu.serv",
+// 	/** see semantic.jserv/io.odysz.jsample.cheap.CheapServ */
+// 	cheapflow: "cheapflow.sample",
+//
+// 	/** views/Tool/project-toolBack-details.js */
+// 	tools: "tools.serv11",
+// }
 
 /** Workflow Id*/
 const workflowId = {
@@ -53,4 +53,5 @@ const workflowId = {
 	flow02: 't02',
 }
 
-export {anconsts, samports, workflowId};
+// export {anconsts, samports, workflowId};
+export {anconsts, workflowId};
