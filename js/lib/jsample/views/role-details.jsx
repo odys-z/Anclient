@@ -120,7 +120,8 @@ class RoleDetailsComp extends DetailFormW {
 		}
 		else {
 			// new, bind tree
-			let ds = {sk, t, sqlArgs: []};
+			let ds = {uri: this.props.uri,
+					  sk, t, sqlArgs: []};
 
 			this.context.anReact.stree(ds, this.context.error, this);
 		}

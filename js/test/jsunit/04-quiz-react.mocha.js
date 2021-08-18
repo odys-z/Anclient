@@ -305,3 +305,46 @@ describe('case: [04 Protocol.QuizResp] Update / Insert Results', () => {
 		assert.equal(quizId, '000005', "4.B - 3");
 	});
 });
+
+const respWithUsers = {
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "code": "ok", "opts": null, "port": "quiz.serv", "header": null,
+  "body": [{
+    "type": "io.odysz.jquiz.QuizResp", "rs": null,
+    "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null,
+    "data": {"type": "io.odysz.semantics.SemanticObject", "props": null},
+    "quizUsers": {
+      "type": "io.odysz.module.rs.AnResultset", "stringFormats": null,
+      "total": 2, "rowCnt": 2, "colCnt": 3,
+      "colnames": {"USERNAME": [3, "userName"], "CHECKED": [1, "checked"], "STUDENTS": [2, "students"]},
+      "rowIdx": 0,
+      "results": [[1, "alice", "Alice"], [1, "georgy", "Georgy"]]
+    },
+    "m": null, "map": null, "uri": null
+  }],
+  "version": "1.0", "seq": 0
+}
+
+describe('case: [04 Protocol.QuizResp] quiz users', () => {
+	it('4.X [Quiz] puiz users', () => {
+		Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
+			return new QuizResp(jsonBd);
+		});
+
+		let quizResp = new AnsonMsg(respWithUsers);
+		let u = quizResp.Body().quizUsers;
+
+		assert.equal(u.type, "io.odysz.module.rs.AnResultset", "4.X - type");
+		assert.equal(u.colnames.USERNAME.length, 2, "4.X - 2");
+		assert.equal(u.results.length, 2, "4.X - 2");
+		assert.equal(u.results[0][0], 1, "4.X - checked");
+		assert.equal(u.results[0][1], "alice", "4.X - userId");
+		assert.equal(u.results[0][2], "Alice", "4.X - user name");
+
+		// bugs must be guarded here
+		let ids = quizResp.Body().quizUserIds();
+		console.log(ids);
+		assert.equal(ids[0], 'alice', "4.x - alice");
+		assert.equal(ids[1], 'georgy', "4.x - george");
+	});
+});

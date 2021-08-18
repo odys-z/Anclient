@@ -9,7 +9,9 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnContext, AnError } from '../reactext'
+import { AnContext, AnError } from '../reactext';
+
+import { toBool } from '../../utils/helpers';
 
 const styles = (theme) => ( {
 	root: {
@@ -22,7 +24,7 @@ const styles = (theme) => ( {
  * 	{array}  rows  must need
  * 	{string} pk must need
  * 	{object} pageInf {page, size, total, sizeOptions}
- * 	{boolean} checkbox
+ * 	{boolean} checkbox  - if true, first field alwasy been treaded as checkbox
  * 	{function} updateSelectd
  * 	{array} selected
  */
@@ -35,6 +37,8 @@ class AnTablistComp extends React.Component {
 		total: 0,
 		page: 0,
 		size: 10,
+
+		selected: []
 	}
 
 	constructor(props){
@@ -126,7 +130,8 @@ class AnTablistComp extends React.Component {
 	 * @returns [<TableCell>,...]
 	 */
 	th(columns = []) {
-		return columns.filter( v => v.hide !== true)
+		return columns.filter( (v, x) => v.hide !== true
+							&& this.props.checkbox && x !== 0) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
 					{colObj.text || colObj.field}
@@ -136,11 +141,21 @@ class AnTablistComp extends React.Component {
 	tr(rows = [], columns = []) {
 		return rows.map(row => {
 			let key = this.props.pk;
+
+			if (this.props.checkbox && toBool(row.checked)) {
+				this.state.selected.push(row[key])
+				row.checked = 0; // later events don't need ths
+			}
 			let isItemSelected = this.isSelected(row[key]);
+
 			return (
 				<TableRow key= {row[this.props.pk]} hover
 					selected={isItemSelected}
-					onClick= {(event) => this.handleClick(event, row[key])}
+					onClick= { (event) => {
+						this.handleClick(event, row[key]);
+						// if (typeof this.props.onSelectChange === 'function')
+						// 	this.props.onSelectChange(this.state.selected);
+					} }
 					role="checkbox" aria-checked={isItemSelected}
 				>
 					{this.props.checkbox && (
@@ -151,8 +166,9 @@ class AnTablistComp extends React.Component {
 							/>
 						</TableCell>)
 					}
-					{columns.filter( v => v.hide !== true)
-							.map( (colObj,index) =>
+					{columns.filter( (v, x) => v.hide !== true
+									&& this.props.checkbox && x !== 0) // first columen as checkbox
+							.map( (colObj, index) =>
 								<TableCell key={index}>{row[colObj.field]}</TableCell>)}
 				</TableRow>)
 		});
@@ -182,7 +198,7 @@ class AnTablistComp extends React.Component {
 			</TableBody>
 		</Table>
 		</TableContainer>
-		<TablePagination
+		{!!this.props.paging && <TablePagination
 			count = {this.props.pageInf ? this.props.pageInf.total || 0 : 0}
 			rowsPerPage={this.state.size}
 			onPageChange={this.changePage}
@@ -190,7 +206,7 @@ class AnTablistComp extends React.Component {
 			page={this.state.page}
 			component="div"
 			rowsPerPageOptions={this.state.sizeOptions}
-		/>
+		/>}
 		</>);
 	}
 }

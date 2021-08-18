@@ -4,7 +4,7 @@ import {
 	Protocol, UserReq, AnsonMsg
 } from "anclient"
 
-import { QuizReq, QuizResp } from './protocol.quiz.js';
+import { quiz_a, QuizReq, QuizResp } from './protocol.quiz.js';
 
 export const QuestionType = {
 	single: "1",
@@ -30,7 +30,7 @@ const QuizProtocol = {
 	dcreate: "dcreate",
 
 	poll: "poll",
-	pollUser: "pollUser",
+	pollUsers: "pollUsers",
 }
 
 export
@@ -80,8 +80,21 @@ class JQuiz {
 		return this.serv(uri, quiz_a.start, {}, onLoad, errCtx);
 	}
 
+	/** Create a query request for loading quiz'z users.
+	 * port: quiz
+	 * @param {objects} opts
+	 * @param {string} opts.uri
+	 * @param {string} opts.quizId
+	 * @param {boolean} opts.isNew
+	 * @param {function} onLoad on query ok callback, called with parameter of query responds
+	 * @param {AnContext.error}
+	 * */
+	quizUsers(opts, onLoad, errCtx) {
+		let {uri, quizId, isNew} = opts;
+		return this.serv(uri, quiz_a.quizUsers, {quizId}, onLoad, errCtx);
+	}
+
 	/** Create a query request and post back to server.
-	 * This function show the general query sample - goes to the Protocol's query
 	 * port: quiz
 	 * @param { string } uri
 	 * @param {string} quizId quiz id
@@ -121,19 +134,19 @@ class JQuiz {
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
-		let pollIds = shrink(quiz.pollUsers);
-		console.log(pollIds);
-		props[QuizProtocol.pollUser] = pollIds;
+		// let pollIds = shrink(quiz.quizUsers);
+		// console.log(pollIds);
+		props[QuizProtocol.pollUsers] = quiz.quizUsers;
 
 		let req = this.client.userReq(uri, JQuiz.port,
 			new UserReq( uri, "quizzes", props ).A(quiz_a.insert) );
 
 		this.client.commit(req, onOk, errCtx);
 
-		function shrink(arr) {
-			console.error(arr);
-			return arr;
-		}
+		// function shrink(arr) {
+		// 	console.error(arr);
+		// 	return arr;
+		// }
 	}
 
 	/**

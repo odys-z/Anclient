@@ -1,6 +1,6 @@
-import { Protocol, AnsonResp } from 'anclient';
+// import { Protocol, AnsonResp } from 'anclient';
 // NOTE for test, user this:
-// import { Protocol, AnsonResp } from '../../../lib/protocol.js';
+import { Protocol, AnsonResp } from '../../../lib/protocol.js';
 
 export const quiz_a = {
 	start: 'start',
@@ -10,6 +10,7 @@ export const quiz_a = {
 	update: 'update', // update quiz
 
 	poll: 'poll',     // submit poll results
+	quizUsers: 'quizUsers', // load quiz's users
 }
 
 export class QuizReq {
@@ -44,11 +45,14 @@ export class QuizResp extends AnsonResp {
   		this.port = respObj.serv;
 		this.seq = respObj.seq;
 
+		this.quizId = respObj.quizId;
+
 		let rs = respObj.data && respObj.data.props && respObj.data.props.rs && respObj.data.props.rs[0];
 		if (rs) {
 			this.cols = rs.length ? [] : rs.colnames;
 			this.rows = rs.length ? [] : rs.results;
 		}
+		this.quizUsers = respObj.quizUsers;
 
 		this.qs = respObj.data && respObj.data.props && respObj.data.props.questions || {};
 	}
@@ -89,6 +93,13 @@ export class QuizResp extends AnsonResp {
 		return {title, quizId: qid, quizinfo, questions};
 	}
 
+	quizUserIds() {
+		let ids = [];
+		if (this.quizUsers)
+			this.quizUsers.results.forEach( (r, x) => ids.push(r[1]));  // this is bug!
+		return ids;
+	}
+
 	static toArrByOrder(colsOrder, rows, cols) {
 		if (rows && cols) {
 			let qzs = [];
@@ -113,6 +124,35 @@ export class QuizResp extends AnsonResp {
 Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
 	return new QuizResp(jsonBd);
 });
+
+/**
+ public static final String quizId = "quizId";
+ public static final String qtitle = "qtitle";
+ public static final String quizinfo = "quizinfo";
+ public static final String qowner = "qowner";
+ public static final String dcreate = "dcreate";
+ public static final String questions = "questions";
+
+ public static final String poll = "poll";
+ public static final String quizUsers = "quizUsers";
+
+ static class Qtype {
+ 	public static final String cate = "cate";
+ }
+
+ static class A {
+ 	public static final String start = "start";
+ 	public static final String quiz = "quiz";
+ 	public static final String list = "list";
+ 	public static final String insert = "insert";
+ 	public static final String update = "update";
+ 	public static final String poll = "poll";
+ 	public static final String quizUsers = "quizUsers";
+ }
+ */
+export const QuizProtocol = {
+	quizUsers: "quizUsers",
+}
 
 Protocol.registerBody('io.oz.ever.conn.c.CenterResp', (jsonBd) => {
 	return new CenterResp(jsonBd);

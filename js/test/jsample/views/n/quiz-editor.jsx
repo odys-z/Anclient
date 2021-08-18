@@ -21,10 +21,14 @@ import React from 'react';
 	import FormControlLabel from '@material-ui/core/FormControlLabel';
 	import Checkbox from '@material-ui/core/Checkbox';
 	import TextField from '@material-ui/core/TextField';
+	import Button from '@material-ui/core/Button';
 
-import { L, Protocol, AnContext, DetailFormW, AnsonMsg, ConfirmDialog } from 'anclient';
-import { QuizResp } from '../../common/protocol.quiz.js';
+import { L, Protocol, AnsonMsg, AnsonResp,
+	AnContext, DetailFormW, ConfirmDialog, DatasetCombo
+} from 'anclient';
+import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
+import { QuizUserForm } from './quiz-users';
 
 const QuestionType = {
 	single: 's',
@@ -80,23 +84,24 @@ class QuizEditorComp extends DetailFormW {
 		this.onSave = this.onSave.bind(this);
 		this.onCheckSingle = this.onCheckSingle.bind(this);
 
-		this.loadQuiz = this.loadQuiz.bind(this);
+		this.bindQuiz = this.bindQuiz.bind(this);
 	}
 
 	componentDidMount() {
 		let ctx = this.context;
 		this.jquiz = new JQuiz(ctx.anClient, ctx.errHandler);
 		if (this.state.crud !== Protocol.CRUD.c)
-			this.jquiz.quiz(this.props.uri, this.state.quizId, this.loadQuiz, ctx);
+			this.jquiz.quiz(this.props.uri, this.state.quizId, this.bindQuiz, ctx);
 		else
-			this.jquiz.startQuiz(this.props.uri, this.loadQuiz, ctx);
+			this.jquiz.startQuiz(this.props.uri, this.bindQuiz, ctx);
 
-		this.toSetPollUsers();
+		// this.toSetPollUsers();
 	}
 
-	loadQuiz(ansonResp) {
+	bindQuiz(ansonResp) {
 		let qresp = new QuizResp(ansonResp.body);
 		let {title, quizId, quizinfo, questions} = qresp.questions();
+		let quizUsers = qresp.quizUserIds();
 		this.setState( {
 			questions: questions, // ?  questions.join('\n') : '';
 			qtitle: title,
@@ -113,21 +118,20 @@ class QuizEditorComp extends DetailFormW {
 		if (e && e.stopPropagation) e.stopPropagation();
 
 		let that = this;
-		this.jquiz.pollUsers({quizId: this.state.quizId, isNew: !!this.props.c},
-			resp => {
-				let users = resp.getProp('pollUsers');
-				let {cols, rows} = AnsonResp.rs2arr(users.results.rows);
-				console.log(cols, rows);
-				that.setState({
-					pollUsersText: L('Target Users: {usrNum}', {usrNum: users.length}),
-					pollUsers: rows
-				});
-
-				that.pollUserForm = (<ConfirmDialog
-						ok={L('Ok')} title={L('Info: Server Response')} cancel={false}
-						open={true} onClose={() => {that.pollUserForm = undefined;} }
-						msg={rows} />);
-			});
+		this.quizUserForm = (
+			<QuizUserForm uri={this.props.uri} crud={this.state.crud}
+				jquiz={this.jquiz}
+				onSave={ ids => {
+					that.quizUserForm = undefined;
+					that.setState({quizUsers: ids});
+				} }
+				onClose={e => {
+					that.quizUserForm = undefined;
+					that.setState({});
+				}}
+			/>
+			);
+		this.setState({});
 	}
 
 	alert(msg) {
@@ -227,11 +231,12 @@ class QuizEditorComp extends DetailFormW {
 		if (!this.state.questions)
 			return;
 
+		let that = this;
 		return this.state.questions.map( (q, x) => (
-		  <div key={this.state.questions[x].qid}>
-			<ListItem button qx={x} onClick={this.handleClickQs} color='secondary'>
+		  <div key={x}>
+			<ListItem button key={x} qx={x} onClick={this.handleClickQs} color='secondary'>
 				<ListItemIcon><Sms /></ListItemIcon>
-				<ListItemText primary={this.state.questions[x].question} />
+				<ListItemText primary={q.question} />
 			</ListItem>
 			<Collapse in={this.state.currentqx == x} timeout="auto" >
 				<List component="div">
@@ -239,21 +244,34 @@ class QuizEditorComp extends DetailFormW {
 				    <ListItemIcon><StarBorder /></ListItemIcon>
 				    <ListItemText primary="Option..." />
 				    <FormControlLabel
-				        control={<Checkbox checked={this.state.questions[x].qtype === QuestionType.single}
-										   onClick={this.onCheckSingle}
-				                           name="chk0" color="primary" />}
-				        label="Single Answer"/>
+				        control={
+							// <Checkbox checked={this.state.questions[x].qtype === QuestionType.single}
+							// 			   onClick={this.onCheckSingle}
+				            //                name="chk0" color="primary" />
+								<DatasetCombo uri={this.props.uri}
+									options={[
+										{n: L('Single Opt'), v: 's'},
+										{n: L('Multiple'), v: 'm'},
+										{n: L('Text'), v: 't'} ]}
+									label={L('Question Type')}
+									onSelect={ (v) => {
+										// rec[f.field] = v.v;
+										that.state.questions[x].qtype = v.v;
+										that.setState({dirty: true});
+									}}
+								/> }
+				        label=""/>
 				  </ListItem>
 				</List>
 
 				<TextField id="qtext" label="Question"
 				  variant="outlined" color="primary"
-				  multiline fullWidth={true} value={this.state.questions[x].questions}
+				  multiline fullWidth={true} value={q.questions}
 				  onChange={this.editQuestion} />
 
 				<TextField id="answers" label="Answers (* correct)"
 				  variant="outlined" color="secondary"
-				  multiline fullWidth={true} value={this.state.questions[x].answers}
+				  multiline fullWidth={true} value={q.answers}
 				  onChange={this.editAnswer} />
 			</Collapse>
 		  </div>
@@ -267,6 +285,7 @@ class QuizEditorComp extends DetailFormW {
 
 		let that = this;
 
+		console.log(this.state.quizUsers);
 		return ( <>
 			<List component="nav"
 				aria-labelledby="nested-list-subheader"
@@ -276,40 +295,49 @@ class QuizEditorComp extends DetailFormW {
 					</ListSubheader>
 				}
 				className={ classes.root } >
-			<ListItem button onClick={e => this.setState({openHead: !this.state.openHead})}>
-				<ListItemIcon><SendIcon /></ListItemIcon>
-				<ListItemText primary={L('Editing Quiz')} />
-				<ListItemIcon onClick={this.toSetPollUsers} ><Edit /></ListItemIcon>
-				<ListItemText primary={this.state.pollUsersText} onClick={this.toSetPollUsers} />
-			</ListItem>
-			<Collapse in={this.state.openHead} timeout="auto" >
-				<TextField id="qtitle" label={L("Title")}
-				  variant="outlined" color="primary"
-				  multiline fullWidth={true}
-				  onChange={e => this.setState({qtitle: e.currentTarget.value})}
-				  value={title} />
+				<ListItem key='qzA' button onClick={e => this.setState({openHead: !this.state.openHead})}>
+					<ListItemIcon><SendIcon /></ListItemIcon>
+					<ListItemText primary={L('Editing Quiz')} />
+					{/* <ListItemIcon onClick={this.toSetPollUsers} ><Edit /></ListItemIcon>
+					<ListItemText primary={this.state.pollUsersText} onClick={this.toSetPollUsers} /> */}
+					<ListItemText primary={aboutPollUsers(this.state.quizUsers)} />
+					<Button variant="contained"
+						className={classes.button} onClick={this.toSetPollUsers}
+						endIcon={<Edit />}
+					>{L('Edit')}</Button>
+				</ListItem>
+				<Collapse in={this.state.openHead} timeout="auto" >
+					<TextField id="qtitle" label={L("Title")}
+					  variant="outlined" color="primary"
+					  multiline fullWidth={true}
+					  onChange={e => this.setState({qtitle: e.currentTarget.value})}
+					  value={title} />
 
-				<TextField id="quizinfo" label={L("Quiz Description")}
-				  variant="outlined" color="secondary"
-				  multiline fullWidth={true}
-				  onChange={e => this.setState({quizinfo: e.currentTarget.value})}
-				  value={this.state.quizinfo} />
-			</Collapse>
+					<TextField id="quizinfo" label={L("Quiz Description")}
+					  variant="outlined" color="secondary"
+					  multiline fullWidth={true}
+					  onChange={e => this.setState({quizinfo: e.currentTarget.value})}
+					  value={this.state.quizinfo} />
+				</Collapse>
 
-			{this.items(classes)}
+				{this.items(classes)}
 
-			<ListItem button>
-				<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
-				<ListItemText primary="New Question" onClick={this.onAdd} />
-				<ListItemText primary="Save" onClick={this.onSave} color="secondary" />
-			</ListItem>
+				<ListItem key="b" button>
+					<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
+					<ListItemText primary="New Question" onClick={this.onAdd} />
+					<ListItemText primary="Save" onClick={this.onSave} color="secondary" />
+				</ListItem>
 			</List>
 			<ConfirmDialog ok={L('Ok')} title={L('Info: Server Response')} cancel={false}
 					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
 					msg={this.state.alert} />
+			{this.quizUserForm}
 		  </>
 	    );
 
+		function aboutPollUsers(usrs = []) {
+			return L('Total polling users: {n}', {n: usrs.length});
+		}
 	}
 }
 QuizEditorComp.contextType = AnContext;

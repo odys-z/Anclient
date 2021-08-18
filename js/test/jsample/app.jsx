@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { MuiThemeProvider } from "@material-ui/core/styles";
+import Typography from '@material-ui/core/Typography';
+import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { L, Langstrs,
 	Protocol, SessionClient,
@@ -16,6 +17,7 @@ const { Domain, Roles, Orgs, Users, JsampleTheme } = jsample;
 import { StarPorts } from './common/port';
 
 import { Indicators } from './views/n/indicators';
+import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStatus } from './views/c/status';
@@ -110,6 +112,7 @@ class App extends React.Component {
 	}
 
 	render() {
+	  let that = this;
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
@@ -129,10 +132,19 @@ class App extends React.Component {
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
+					myInfo={myInfoPanels()}
 					onLogout={this.logout}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
+
+		function myInfoPanels() {
+			return [
+				{title: L('Basic'),      panel: <Typography>Name: {that.state.anClient.ssInf.userName}</Typography>},
+				{title: L('My Classes'), panel: <MyClassTree />},
+				{title: L('My Status'),  panel: <Typography>Fury!</Typography>}
+			  ];
+		}
 	}
 
 	/**Try figure out serv root, then bind to html tag.

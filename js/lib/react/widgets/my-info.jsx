@@ -89,7 +89,7 @@ class MyInfoComp extends React.Component {
 				<DialogTitle id="myinfo-title">{title}</DialogTitle>
 				<DialogContent> {txtLines} </DialogContent>
 				<DialogContent>
-					<AnTabs />
+					<AnTabs panels={this.props.panels} />
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={this.handleClose} color="inherit">

@@ -360,10 +360,13 @@ class SysComp extends React.Component {
 			  </main>
 			</Router>
 
-			{this.state.showMine && <MyInfo onClose={() => this.setState({ showMine: false })} />}
+			{this.state.showMine && <MyInfo
+				panels={this.props.myInfo}
+				onClose={() => this.setState({ showMine: false })} />}
 			{this.state.showLogout && <ConfirmDialog ok={L('Sure')} title={L('Info')} // cancel={false}
-					open={this.state.showLogout} onOk={() => this.props.onLogout() }
-					msg={L('Logging out?')} />}
+				open={this.state.showLogout}
+				onOk={() => this.props.onLogout() }
+				msg={L('Logging out?')} />}
 		  </div>);
 	}
 }
