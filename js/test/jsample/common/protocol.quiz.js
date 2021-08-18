@@ -20,7 +20,8 @@ export class QuizReq {
 	 * to implement protocol. This method helps convert it to array of n-v pairs.
 	 */
 	static questionToNvs (quests, cols =
-		["qid", "question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
+		// ["qid", "question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
+		["question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
 
 		let qs = [];
 		if (quests)
