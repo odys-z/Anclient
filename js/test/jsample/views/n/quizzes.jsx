@@ -64,9 +64,11 @@ class QuizzesComp extends CrudCompW {
 		let pageInf = this.state.pageInf;
 		let queryReq = this.context.anClient.query(this.uri, 'quizzes', 'q', pageInf)
 		let req = queryReq.Body()
-			.expr('q.qid').expr('title').expr('tags').expr('dcreate')
-			.expr('sum(ifnull(pId, 0))', 'polls')
+			.expr('q.qid').expr('q.title').expr('tags').expr('dcreate')
+			.expr('count(ifnull(pId, 0))', 'polls')
+			.expr('qsNum', 'questions')
 			.l('polls', 'p', 'p.quizId=q.qid')
+			.j('v_qscount', 'qc', 'qc.qid=q.qid')
 			.groupby('q.qid')
 			.orderby('dcreate', 'desc');
 
@@ -194,12 +196,13 @@ class QuizzesComp extends CrudCompW {
 			<AnTablist
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
-					{ text: L('qid'), hide: 1, field:"qid" },
+					{ text: L('qid'), hide: 1, field: "qid" },
 					{ text: L('Titel'),        field: "title", color: 'primary', className: 'bold'},
 					{ text: L('Tags'),         field: "tags", color: 'primary' },
 					{ text: L('Subject'),      field: "subject", color: 'primary' },
-					{ text: L('Date Created'), field: "dcreate", color: 'primary', hide: 1 },
-					{ text: L('Polls'),        field: "polls", color: 'primary', hide: 1 }
+					{ text: L('Date Created'), field: "dcreate", color: 'primary'},
+					{ text: L('Questions'),    field: "questions", color: 'primary'},
+					{ text: L('Polls'),        field: "polls", color: 'primary'}
 				]}
 				rows={this.state.rows}
 				pageInf={this.state.pageInf}

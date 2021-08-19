@@ -23,6 +23,13 @@ export class QuizReq {
 		// ["qid", "question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
 		["question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
 
+		/*
+		* NOTE 19 Aug 2021: If put return array of this fucntion into
+		* SemanticObject.data.props, the server side can't figure out 2D array in props
+		* map, which makes it print a lot of warning. So use checkQuestion();
+		*/
+		console.warn('This function is deprecated!');
+
 		let qs = [];
 		if (quests)
 			quests.forEach( (q, x) => {
@@ -33,6 +40,26 @@ export class QuizReq {
 				qs.push(row);
 			} );
 		return qs;
+	}
+
+	static questionCols = ["question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"];
+
+	static checkQuestions(arr) {
+		let qs = [];
+		if (arr)
+			arr.forEach( (ar, x) => qs.push(QuizReq.checkQuestion(ar, x)));
+		return qs;
+	}
+
+	static checkQuestion(ar, x) {
+		let q = {type: 'io.odysz.jquiz.JsonQuestion'};
+		if (x !== null && x !== undefined)
+			q.qid = "" + x;
+
+		for (let i = 0; i < QuizReq.questionCols.length; i++)
+			q[QuizReq.questionCols[i]] = ar[QuizReq.questionCols[i]];
+
+		return q;
 	}
 }
 
@@ -152,6 +179,15 @@ Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
  }
  */
 export const QuizProtocol = {
+
+	quizId: "quizId",
+	questions: "questions",
+	qtitle: "qtitle",
+	quizinfo: "quizinfo",
+	qowner: "qowner",
+	dcreate: "dcreate",
+
+	poll: "poll",
 	quizUsers: "quizUsers",
 }
 
@@ -191,11 +227,11 @@ export class CenterResp extends AnsonResp {
 
 	polls () {
 		let polls = this.data && this.data.props && this.data.props.polls;
-		let cols, rows;
-		if (polls) {
-			cols = polls.length ? [] : polls.colnames;
-			rows = polls.length ? [] : polls.results;
-		}
+		let {cols, rows} = AnsonResp.rs2arr(polls);
+		// if (polls) {
+		// 	cols = polls.length ? [] : polls.colnames;
+		// 	rows = polls.length ? [] : polls.results;
+		// }
 		return {cols, rows};
 	}
 
@@ -213,7 +249,6 @@ export class CenterResp extends AnsonResp {
 		let { cols, rows } = this.polls();
 		let my = {tasks: rows.length, polls: rows};
 		let conns = this.connects();
-		// {col, rows} = conns;
 		my.connects = conns.rows;
 		return my;
 	}

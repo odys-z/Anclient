@@ -11,22 +11,10 @@ const jsonResp = {
 			"polls": {
 				"colCnt": 15,
 				"colnames": {
-					"DCREATE": [8, "dcreate"],
-					"DID": [11, "did"],
-					"EXTRA": [10, "extra"],
-					"LABEL": [14, "label"],
-					"OPER": [2, "oper"],
-					"OPTIME": [4, "optime"],
-					"PARENT": [13, "parent"],
-					"QID": [1, "qid"],
-					"QOWNER": [7, "qowner"],
-					"QUIZINFO": [6, "quizinfo"],
-					"REMARKS": [15, "remarks"],
-					"SUBJECT": [9, "subject"],
-					"TAG": [12, "tag"],
-					"TAGS": [5, "tags"],
-					"TITLE": [3, "title"]
-				},
+					"DCREATE": [8, "dcreate"], "DID": [11, "did"], "EXTRA": [10, "extra"], "LABEL": [14, "label"],
+					"OPER": [2, "oper"], "OPTIME": [4, "optime"], "PARENT": [13, "parent"], "QID": [1, "qid"],
+					"QOWNER": [7, "qowner"], "QUIZINFO": [6, "quizinfo"], "REMARKS": [15, "remarks"], "SUBJECT": [9, "subject"],
+					"TAG": [12, "tag"], "TAGS": [5, "tags"], "TITLE": [3, "title"] },
 				"results": [
 					["000004", "admin", null, "2021-06-09 12:55:02", null, null, "admin", "2021-06-09T12:55:02.200Z", null, null, null, null, null, null, null],
 					["000005", "admin", null, "2021-06-10 01:50:43", null, null, "admin", "2021-06-10T01:50:42.847Z", null, null, null, null, null, null, null],
@@ -61,10 +49,44 @@ const jsonResp = {
   "version": "1.0"
 }
 
+const myStatusResp = {
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "code": "ok", "opts": null,
+  "port": "center.serv", "header": null,
+  "body": [ {
+      "type": "io.oz.ever.conn.c.CenterResp",
+      "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+      "rs": null, "a": null,
+      "data": {
+        "type": "io.odysz.semantics.SemanticObject",
+        "props": {
+          "connects": {
+            "type": "io.odysz.module.rs.AnResultset", "stringFormats": null,
+            "total": 0, "rowCnt": 0, "colCnt": 8,
+            "colnames": {
+              "TOID": [ 2, "toId" ], "OPTIME": [ 6, "optime" ], "EXTRA": [ 8, "extra" ],
+              "HELLO": [ 7, "hello" ], "STATE": [ 4, "state" ], "OPER": [ 5, "oper" ],
+              "FROMID": [ 3, "fromId" ], "CID": [ 1, "cid" ] }, "rowIdx": 0, "results": [] },
+          "polls": {
+            "type": "io.odysz.module.rs.AnResultset",
+            "stringFormats": null,
+            "total": 1,
+            "rowCnt": 1,
+            "colCnt": 5,
+            "colnames": {
+              "MSG": [ 5, "msg" ], "USERID": [ 3, "userId" ], "SUBJECT": [ 4, "subject" ],
+              "QID": [ 2, "qid" ], "CHECKED": [ 1, "checked" ] },
+            "rowIdx": 0,
+            "results": [ [ 1, "000007", "georgy", null, "{\"msg\": \"georgy\"}" ] ]
+          }
+        }
+      },
+      "m": null, "map": null, "uri": null
+    } ],
+  "version": "1.0", "seq": 0
+}
 describe('case: [05 Protocol.CenterResp]', () => {
-
 	it('5.1 [my-polls]', () => {
-
 		Protocol.registerBody('io.oz.ever.conn.CenterResp', (jsonBd) => {
 			return new CenterResp(jsonBd);
 		});
@@ -76,5 +98,17 @@ describe('case: [05 Protocol.CenterResp]', () => {
 
 		let my = centerResp.my();
 		assert.equal(my.polls.length, 7, "2 ---");
+	});
+
+	it('5.2 [my-status]', () => {
+		Protocol.registerBody('io.oz.ever.conn.c.CenterResp', (jsonBd) => {
+			return new CenterResp(jsonBd);
+		});
+
+		let status = new AnsonMsg(myStatusResp).Body();
+		let my = status.my();
+		assert.equal(my.tasks, 1, "1 ---");
+
+		assert.equal(my.polls[0].qid, "000007", "1 ---");
 	});
 });

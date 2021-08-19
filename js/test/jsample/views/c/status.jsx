@@ -6,7 +6,8 @@ import { Card, TextField, Typography } from '@material-ui/core';
 
 import {L, Langstrs, Protocol, UserReq,
     AnClient, SessionClient,
-    AnContext, AnError, CrudCompW, AnReactExt
+    AnContext, AnError, CrudCompW, AnReactExt,
+	AnTablist
 } from 'anclient';
 
 import { center_a, CenterResp } from '../../common/protocol.quiz.js';
@@ -24,6 +25,8 @@ class MyStatusComp extends CrudCompW {
 
 	constructor(props) {
 		super(props);
+
+		this.onSelectChange = this.onSelectChange.bind(this);
 	}
 
 	componentDidMount() {
@@ -36,7 +39,8 @@ class MyStatusComp extends CrudCompW {
 
 		let client = this.context.anClient;
 		let req = client.userReq(this.uri, 'center',
-			new UserReq( this.uri, "center" ).A(center_a.getStatus) );
+				new UserReq( this.uri, "center" )
+				.A(center_a.getStatus) );
 		this.state.statusReq = req;
 
 		let that = this;
@@ -46,28 +50,49 @@ class MyStatusComp extends CrudCompW {
 		}, this.context.error);
 	}
 
+	onSelectChange(opt) {
+		let {e, selectedIds, val} = opt;
+		if (selectedIds)
+		 	this.pollForm = (
+				<></>
+			);
+	}
+
 	render () {
-		let tasks = this.state.my.task && this.state.my.task.length;
+		let {classes} = this.props;
+		let tasks = this.state.my.tasks;
 		return (<>My Status
 			{tasks > 0 && <>
 				<Typography color='secondary' >
-					L(`Your have ${tasks} ${tasks > 1 ? 'quizzes' : 'quiz'} to finish.`, {tasks})
+					{L('Your have {tasks} {quiz} to finish.', {tasks, quiz: tasks > 1 ? 'quizzes' : 'quiz'})}
 				</Typography>
 				<AnTablist pk='qid'
 					className={classes.root}
 					columns={[
-						{ text: L('qid'), hide:true, field: "qid" },
-						{ text: L('Quiz Name'), field: "quizName", color: 'primary', className: 'bold'},
-						{ text: L('Progress'), field: "progress", color: 'primary' },
-						{ text: L('Questions'), field: "questions", color: 'primary' },
+						{ text: L('dump'), hide: true, field: "checked" },
+						{ text: L('qid'), hide: true, field: "qid" },
+
+						{ text: L('Quiz Name'), field: "title", color: 'primary', className: 'bold'},
+						// { text: L('Message'), field: "msg"},
+						{ text: L('Message'), field: "msg", formatter: showMsg },
+						{ text: L('Subject'), field: "subject"},
 						{ text: L('DDL'), field: "ddl", color: 'primary' }
 					]}
-					rows={this.state.rows}
+					rows={this.state.my.polls}
 					onSelectChange={this.onTableSelect} />
 					{this.pollForm}
 				</>
 			}
 		</>);
+
+		function showMsg( extra, rx ) {
+			let json = JSON.parse(extra);
+			return (
+			<Typography key={rx}>
+				{L('Msg from North:')}
+                {json.msg}
+			</Typography>);
+		}
 	}
 }
 MyStatusComp.contextType = AnContext;
