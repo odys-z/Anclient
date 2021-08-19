@@ -21,6 +21,7 @@ import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStatus } from './views/c/status';
+import { MyPolls } from './views/c/my-polls';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -72,7 +73,8 @@ class App extends React.Component {
 			{path: '/n/indicators', comp: Indicators},
 			{path: '/n/quizzes', comp: Quizzes },
 			{path: '/n/polls', comp: Polls },
-			{path: '/c/status', comp: MyStatus }
+			{path: '/c/status', comp: MyStatus },
+			{path: '/c/mypolls', comp: MyPolls }
 		] );
 	}
 
