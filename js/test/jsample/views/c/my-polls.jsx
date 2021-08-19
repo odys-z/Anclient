@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { Card, Button, Typography } from '@material-ui/core';
 
 import {
-    an, AnClient, SessionClient, Protocol, L, Langstrs,
+    AnClient, SessionClient, Protocol, L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt, AnTablist
 } from 'anclient';
 
@@ -29,13 +29,19 @@ class MyPollsComp extends CrudCompW {
 		this.takePoll = this.takePoll.bind(this);
 	}
 
+	componentDidMount() {
+		console.log(this.uri)
+	}
+
+
 	takePoll(e) {
 		if (e) e.stopPropagation();
 
 		let that = this;
-		this.pollForm = (<CarouselQuiz
-				toClose={() => {that.pollForm = undefined;}}
+		this.quizForm = (<CarouselQuiz uri={this.uri}
+				toClose={() => {that.quizForm = undefined;}}
 			/>);
+		this.setState({});
 	}
 
 	render () {
@@ -59,8 +65,8 @@ class MyPollsComp extends CrudCompW {
 					rows={this.state.rows}
 					onSelectChange={this.onTableSelect}
 				/>
-				{this.pollForm}
-				</> }
+			</>}
+			{this.quizForm}
 			</>);
 	}
 }

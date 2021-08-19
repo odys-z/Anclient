@@ -5,12 +5,13 @@
   "main": "login.jsx, app.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"build": "cd ../.. && webpack-cli && cd test/jsample && webpack-cli"
+    "build": "cd ../.. && webpack-cli && cd test/jsample && webpack-cli"
   },
   "keywords": [
     "AnClient"
   ],
   "author": "Ody Zhou",
   "license": "Apache-2.0",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {}
 }
