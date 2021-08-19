@@ -21,7 +21,7 @@ const styles = (theme) => ({
   }
 });
 
-class QuizCardComp extends React.Component {
+class CarouselCardComp extends React.Component {
 	state = {
 		closed: false,
 	}
@@ -32,31 +32,28 @@ class QuizCardComp extends React.Component {
 		this.goNext = this.goNext.bind();
 	}
 
-	goNext() {
-	}
-
 	render () {
 		let { classes } = this.props;
 		return (
 			<Card>
 			<Paper>
-			<Typography variant='h2' className={classes.root}>
-				{this.props.question}
-			</Typography>
+				<Typography variant='h2' className={classes.root}>
+					{this.props.question}
+				</Typography>
 			</Paper>
 			<Button onClick={this.props.goNext}>next</Button>
-			  { this.props.toFinish
-				&& <Button onClick={this.props.toFinish}>{L('Submit')}</Button>}
+			{ this.props.toFinish &&
+			  <Button onClick={this.props.toFinish}>{L('Submit')}</Button> }
 			</Card>
 		);
 	}
 }
-QuizCardComp.context = AnContext;
+CarouselCardComp.context = AnContext;
 
-QuizCardComp.propTypes = {
+CarouselCardComp.propTypes = {
 	goNext: PropTypes.func.isRequired,
 	goPrev: PropTypes.func.isRequired
 };
 
-const QuizCard = withWidth()(withStyles(styles)(QuizCardComp));
-export { QuizCard, QuizCardComp }
+const CarouselCard = withWidth()(withStyles(styles)(CarouselCardComp));
+export { CarouselCard, CarouselCardComp }

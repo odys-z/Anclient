@@ -53,7 +53,7 @@ class MyStatusComp extends CrudCompW {
 	onSelectChange(opt) {
 		let {e, selectedIds, val} = opt;
 		if (selectedIds)
-		 	this.pollForm = (
+		 	this.quizForm = (
 				<></>
 			);
 	}
@@ -73,14 +73,13 @@ class MyStatusComp extends CrudCompW {
 						{ text: L('qid'), hide: true, field: "qid" },
 
 						{ text: L('Quiz Name'), field: "title", color: 'primary', className: 'bold'},
-						// { text: L('Message'), field: "msg"},
 						{ text: L('Message'), field: "msg", formatter: showMsg },
 						{ text: L('Subject'), field: "subject"},
 						{ text: L('DDL'), field: "ddl", color: 'primary' }
 					]}
 					rows={this.state.my.polls}
 					onSelectChange={this.onTableSelect} />
-					{this.pollForm}
+					{this.quizForm}
 				</>
 			}
 		</>);
