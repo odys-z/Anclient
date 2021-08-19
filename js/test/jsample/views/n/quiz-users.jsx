@@ -86,8 +86,8 @@ class QuizUserFormComp extends CrudCompW {
 						className={classes.root} checkbox={true} paging={false}
 						columns={[
 							{ text: L(''), field:"checked" },  // first field as checkbox
-							{ text: L('userId'), hide: true, field:"userId" },
-							{ text: L('User Name'), color: 'primary', field:"userName", className: 'bold'},
+							{ text: L('userId'), hide: true, field: "userId" },
+							{ text: L('User Name'), color: 'primary', field: "userName", className: 'bold'},
 						]}
 						rows={this.state.rows} pk='userId'
 						onSelectChange={this.onTableSelect}

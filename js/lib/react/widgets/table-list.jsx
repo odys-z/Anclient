@@ -131,7 +131,7 @@ class AnTablistComp extends React.Component {
 	 */
 	th(columns = []) {
 		return columns.filter( (v, x) => v.hide !== true
-							&& this.props.checkbox && x !== 0) // first columen as checkbox
+							|| this.props.checkbox && x !== 0) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
 					{colObj.text || colObj.field}
@@ -153,8 +153,8 @@ class AnTablistComp extends React.Component {
 					selected={isItemSelected}
 					onClick= { (event) => {
 						this.handleClick(event, row[key]);
-						// if (typeof this.props.onSelectChange === 'function')
-						// 	this.props.onSelectChange(this.state.selected);
+						if (typeof this.props.onSelectChange === 'function')
+							this.props.onSelectChange(this.state.selected, row[key]);
 					} }
 					role="checkbox" aria-checked={isItemSelected}
 				>
@@ -167,9 +167,14 @@ class AnTablistComp extends React.Component {
 						</TableCell>)
 					}
 					{columns.filter( (v, x) => v.hide !== true
-									&& this.props.checkbox && x !== 0) // first columen as checkbox
-							.map( (colObj, index) =>
-								<TableCell key={index}>{row[colObj.field]}</TableCell>)}
+									|| this.props.checkbox && x !== 0) // first columen as checkbox
+							.map( (colObj, index) => {
+								if (colObj.field === undefined)
+									throw Error("Column field is required: " + JSON.stringify(colObj));
+								let v = row[colObj.field];
+								return colObj.formatter && colObj.formatter(v, index)
+										|| <TableCell key={index}>{v}</TableCell>;
+							} )}
 				</TableRow>)
 		});
 	}

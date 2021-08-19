@@ -194,10 +194,10 @@ class RolesComp extends CrudCompW {
 			<AnTablist
 				className={classes.root} checkbox={true}
 				columns={[
-					{ text: L('roleId'), hide:true, field:"roleId" },
-					{ text: L('roleName'), color: 'primary', field:"roleName", className: 'bold'},
-					{ text: L('orgName'), color: 'primary',field:"orgName" },
-					{ text: L('remarks'), color: 'primary',field:"remarks" }
+					{ text: L('roleId'),       field: "roleId", hide: true },
+					{ text: L('Role'),         field: "roleName",color: 'primary', className: 'bold'},
+					{ text: L('Organization'), field: "orgName", color: 'primary' },
+					{ text: L('Remarks'),      field: "remarks", color: 'primary' }
 				]}
 				rows={this.state.rows} pk='roleId'
 				pageInf={this.state.pageInf}

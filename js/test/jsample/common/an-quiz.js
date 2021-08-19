@@ -4,33 +4,11 @@ import {
 	Protocol, UserReq, AnsonMsg
 } from "anclient"
 
-import { quiz_a, QuizReq, QuizResp } from './protocol.quiz.js';
+import { quiz_a, QuizReq, QuizProtocol, QuizResp } from './protocol.quiz.js';
 
 export const QuestionType = {
 	single: "1",
 	multiple: "x"
-}
-
-export
-/**<pre>
-	public class QuizProtocol {
-		public static String questions = "questions";
-		public static String qtitle = "qtitle";
-		public static String quizinfo = "quizinfo";
-		public static String qowner = "qowner";
-		public static String dcreate = "dcreate";
-	}</pre>
- */
-const QuizProtocol = {
-	quizId: "quizId",
-	questions: "questions",
-	qtitle: "qtitle",
-	quizinfo: "quizinfo",
-	qowner: "qowner",
-	dcreate: "dcreate",
-
-	poll: "poll",
-	pollUsers: "pollUsers",
 }
 
 export
@@ -132,21 +110,14 @@ class JQuiz {
 		props[QuizProtocol.qowner] = this.client.ssInf.uid;
 		props[QuizProtocol.dcreate] = `${date.toISOString()}`;
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
+		props[QuizProtocol.questions] = QuizReq.checkQuestions(quiz.questions);
 
-		// let pollIds = shrink(quiz.quizUsers);
-		// console.log(pollIds);
-		props[QuizProtocol.pollUsers] = quiz.quizUsers;
+		props[QuizProtocol.quizUsers] = quiz.quizUsers;
 
 		let req = this.client.userReq(uri, JQuiz.port,
 			new UserReq( uri, "quizzes", props ).A(quiz_a.insert) );
 
 		this.client.commit(req, onOk, errCtx);
-
-		// function shrink(arr) {
-		// 	console.error(arr);
-		// 	return arr;
-		// }
 	}
 
 	/**

@@ -89,13 +89,11 @@ class QuizEditorComp extends DetailFormW {
 
 	componentDidMount() {
 		let ctx = this.context;
-		this.jquiz = new JQuiz(ctx.anClient, ctx.errHandler);
+		this.jquiz = new JQuiz(ctx.anClient, ctx.error);
 		if (this.state.crud !== Protocol.CRUD.c)
-			this.jquiz.quiz(this.props.uri, this.state.quizId, this.bindQuiz, ctx);
+			this.jquiz.quiz(this.props.uri, this.state.quizId, this.bindQuiz, ctx.error);
 		else
-			this.jquiz.startQuiz(this.props.uri, this.bindQuiz, ctx);
-
-		// this.toSetPollUsers();
+			this.jquiz.startQuiz(this.props.uri, this.bindQuiz, ctx.error);
 	}
 
 	bindQuiz(ansonResp) {
@@ -103,7 +101,7 @@ class QuizEditorComp extends DetailFormW {
 		let {title, quizId, quizinfo, questions} = qresp.questions();
 		let quizUsers = qresp.quizUserIds();
 		this.setState( {
-			questions: questions, // ?  questions.join('\n') : '';
+			questions: questions,
 			qtitle: title,
 			quizinfo: quizinfo,
 			currentqx: -1,
@@ -208,7 +206,7 @@ class QuizEditorComp extends DetailFormW {
 			this.jquiz.insert(this.props.uri, this.state, (resp) => {
 				let {quizId, title} = JQuiz.parseResp(resp);
 				that.state.quizId = quizId;
-				that.alert("New quiz created!\nQuiz Title:\n" + title);
+				that.alert("New quiz created!\nQuiz Title: " + title);
 
 				if (that.props.onDirty)
 					that.props.onDirty(true);
@@ -285,7 +283,6 @@ class QuizEditorComp extends DetailFormW {
 
 		let that = this;
 
-		console.log(this.state.quizUsers);
 		return ( <>
 			<List component="nav"
 				aria-labelledby="nested-list-subheader"

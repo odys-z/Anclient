@@ -3,6 +3,35 @@ import { Protocol, AnsonMsg, AnsonResp } from '../../lib/protocol.js'
 // import { QuizResp, QuizReq } from '../../../examples/example.js/lib/protocol.quiz.js'
 import { QuizResp, QuizReq } from '../jsample/common/protocol.quiz.js'
 
+const jsonQuestionsInReq = [
+    { "qid": 0, "question": "/sys/domain", "answers": "A. 1\nB. 5", "qtype": "s", "qorder": "1", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/sys/roles", "answers": "A\nB\nC", "qtype": "s", "qorder": "2", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/sys/orgs", "answers": "A\nB\nC", "qtype": "s", "qorder": "3", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/sys/users", "answers": "A\nB\nC", "qtype": "s", "qorder": "4", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/indicators", "answers": "A\nB\nC", "qtype": "s", "qorder": "5", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/dashboard", "answers": "A\nB\nC", "qtype": "s", "qorder": "1", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "Computer Science A", "answers": "A\nB\nC", "qtype": "n", "qorder": "1", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/c/status", "answers": "A\nB\nC", "qtype": "n", "qorder": "2", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/c/myconn", "answers": "A\nB\nC", "qtype": "n", "qorder": "3", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/c/mypolls", "answers": "A\nB\nC", "qtype": "n", "qorder": "4", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/quizzes", "answers": "A\nB\nC", "qtype": "s", "qorder": "2", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/polls", "answers": "A\nB\nC", "qtype": "s", "qorder": "2", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/my-students", "answers": "A\nB\nC", "qtype": "s", "qorder": "3", "shortDesc": null, "extra": null }
+];
+
+describe('case: [04 Protocol.JsonQuestion] serializing', () => {
+
+	it('4.-1 [QuizReq.checkQuestions]', () => {
+		let quests = QuizReq.checkQuestions(jsonQuestionsInReq);
+
+		assert.equal(quests.length, jsonQuestionsInReq.length, "-1.1 ---");
+		assert.equal(quests[0].type, "io.odysz.jquiz.JsonQuestion", "-1.2 ---");
+		assert.equal(quests[0].qid, "0", "-1.3 ---");
+		assert.equal(quests[0].question, "/sys/domain", "-1.4 ---");
+		assert.equal(quests[12].question, "/n/my-students", "-1.5 ---");
+	});
+});
+
 const jsonResp = {
 "body": [{
 	"a": null,
@@ -343,7 +372,6 @@ describe('case: [04 Protocol.QuizResp] quiz users', () => {
 
 		// bugs must be guarded here
 		let ids = quizResp.Body().quizUserIds();
-		console.log(ids);
 		assert.equal(ids[0], 'alice', "4.x - alice");
 		assert.equal(ids[1], 'georgy', "4.x - george");
 	});
