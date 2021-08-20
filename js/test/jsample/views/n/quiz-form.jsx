@@ -102,5 +102,6 @@ class QuizFormComp extends DetailFormW {
 		);
 	}
 }
+
 const QuizForm = withWidth()(withStyles(styles)(QuizFormComp));
 export { QuizForm, QuizFormComp };

@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography, Grid, Button } from '@material-ui/core';
 
 import {
-    an, AnClient, SessionClient, Protocol, L, Langstrs,
+    AnClient, SessionClient, Protocol, L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt, AnQueryForm, AnTablist, jsample
 } from 'anclient';
 
