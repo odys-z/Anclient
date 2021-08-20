@@ -38,7 +38,8 @@ class MyPollsComp extends CrudCompW {
 		if (e) e.stopPropagation();
 
 		let that = this;
-		this.quizForm = (<CarouselQuiz uri={this.uri}
+		this.quizForm = (
+            <CarouselQuiz uri={this.uri}
 				toClose={() => {that.quizForm = undefined;}}
 			/>);
 		this.setState({});
@@ -57,7 +58,7 @@ class MyPollsComp extends CrudCompW {
 					className={classes.root}
 					columns={[
 						{ text: L('qid'), hide:true, field: "qid" },
-						{ text: L('Quiz Name'), field: "quizName", color: 'primary', className: 'bold'},
+						{ text: L('Title'), field: "title", color: 'primary', className: 'bold'},
 						{ text: L('Progress'), field: "progress", color: 'primary' },
 						{ text: L('Questions'), field: "questions", color: 'primary' },
 						{ text: L('DDL'), field: "ddl", color: 'primary' }

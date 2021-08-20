@@ -29,7 +29,6 @@ class QuizFormComp extends DetailFormW {
 	};
 
 	componentDidMount() {
-		// this.state.an = this.context.client ? this.context.client.an : undefined;
 	}
 
 	constructor (props) {
