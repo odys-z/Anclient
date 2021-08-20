@@ -2,16 +2,9 @@
 // NOTE for test, user this:
 import { Protocol, AnsonResp } from '../../../lib/protocol.js';
 
-export const quiz_a = {
-	start: 'start',
-	quiz: 'quiz',     //
-	list: 'list',     // load quizzes
-	insert: 'insert', // create new quiz
-	update: 'update', // update quiz
-
-	poll: 'poll',     // submit poll results
-	quizUsers: 'quizUsers', // load quiz's users
-}
+/** North protocol is absencing coz "/n" module uses another way - deprecated
+const NorthProtocol {}
+*/
 
 export class QuizReq {
 	constructor () { }
@@ -149,10 +142,6 @@ export class QuizResp extends AnsonResp {
 	}
 }
 
-Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
-	return new QuizResp(jsonBd);
-});
-
 /**
  public static final String quizId = "quizId";
  public static final String qtitle = "qtitle";
@@ -179,7 +168,6 @@ Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
  }
  */
 export const QuizProtocol = {
-
 	quizId: "quizId",
 	questions: "questions",
 	qtitle: "qtitle",
@@ -189,19 +177,53 @@ export const QuizProtocol = {
 
 	poll: "poll",
 	quizUsers: "quizUsers",
+
+ 	A = {
+		start: 'start',
+		quiz: 'quiz',     //
+		list: 'list',     // load quizzes
+		insert: 'insert', // create new quiz
+		update: 'update', // update quiz
+
+		poll: 'poll',     // submit poll results
+		quizUsers: 'quizUsers', // load quiz's users
+	}
 }
 
-Protocol.registerBody('io.oz.ever.conn.c.CenterResp', (jsonBd) => {
-	return new CenterResp(jsonBd);
-});
+/**
+  public class CenterProtocol {
+	public static final String myClasses = "classes";
+	public static final String myConnects = "connects";
+	public static final String myPolls = "polls";
 
-Protocol.registerBody('io.oz.ever.conn.n.NorthResp', (jsonBd) => {
-	return new NorthResp(jsonBd);
-});
+	static class A {
+		public static final String getClasses = "classes";
+		public static final String getStatus = "status";
+	}
 
-export const center_a = {
-	getClasses: "classes",
-	getStatus: "status",
+	static class ConnectMsg {
+		public static final String hi = "hi";
+	}
+  }
+*/
+export const CenterProtocol = {
+	pollId: "pollId",
+
+	myClasses: "classes",
+	myConnects: "connects",
+	myPolls: "polls",
+	pollQuestions: "p-questions",
+
+
+	A = {
+		getClasses: "classes",
+		getStatus: "status",
+		loadPoll: "load-poll",
+	},
+
+	ConnectMsg: {
+		hi: "hi",
+	}
 }
 
 export class CenterResp extends AnsonResp {
@@ -253,3 +275,15 @@ export class CenterResp extends AnsonResp {
 		return my;
 	}
 }
+
+Protocol.registerBody('io.oz.ever.conn.n.NorthResp', (jsonBd) => {
+	return new NorthResp(jsonBd);
+});
+
+Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
+	return new QuizResp(jsonBd);
+});
+
+Protocol.registerBody('io.oz.ever.conn.c.CenterResp', (jsonBd) => {
+	return new CenterResp(jsonBd);
+});

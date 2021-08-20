@@ -4,7 +4,7 @@ import {
 	Protocol, UserReq, AnsonMsg
 } from "anclient"
 
-import { quiz_a, QuizReq, QuizProtocol, QuizResp } from './protocol.quiz.js';
+import { QuizReq, QuizProtocol, QuizResp } from './protocol.quiz.js';
 
 export const QuestionType = {
 	single: "1",
@@ -55,7 +55,7 @@ class JQuiz {
 	 * @param {AnContext.error}
 	 * */
 	startQuiz(uri, onLoad, errCtx) {
-		return this.serv(uri, quiz_a.start, {}, onLoad, errCtx);
+		return this.serv(uri, QuizProtocol.A.start, {}, onLoad, errCtx);
 	}
 
 	/** Create a query request for loading quiz'z users.
@@ -69,7 +69,7 @@ class JQuiz {
 	 * */
 	quizUsers(opts, onLoad, errCtx) {
 		let {uri, quizId, isNew} = opts;
-		return this.serv(uri, quiz_a.quizUsers, {quizId}, onLoad, errCtx);
+		return this.serv(uri, QuizProtocol.A.quizUsers, {quizId}, onLoad, errCtx);
 	}
 
 	/** Create a query request and post back to server.
@@ -81,7 +81,7 @@ class JQuiz {
 	 * */
 	quiz(uri, quizId, onLoad, errCtx) {
 		// let that = this;
-		return this.serv(uri, quiz_a.quiz, {quizId}, onLoad, errCtx);
+		return this.serv(uri, QuizProtocol.A.quiz, {quizId}, onLoad, errCtx);
 	}
 
 	/**@deprecated replaced by QuizzesComp.reload().
@@ -91,7 +91,7 @@ class JQuiz {
 	 * @param {AnContext.error}
 	 */
 	list (uri, conds, onLoad, errCtx) {
-		return this.serv(uri, quiz_a.list, conds, onLoad, errCtx);
+		return this.serv(uri, QuizProtocol.A.list, conds, onLoad, errCtx);
 	}
 
 	/**
@@ -103,7 +103,7 @@ class JQuiz {
 	insert(uri, quiz, onOk, errCtx) {
 		let that = this;
 		let date = new Date();
-		this.client.usrAct('quiz', quiz_a.insert, Protocol.CRUD.c, quiz.qtitle);
+		this.client.usrAct('quiz', QuizProtocol.A.insert, Protocol.CRUD.c, quiz.qtitle);
 
 		let props = {}
 		props[QuizProtocol.qtitle] = quiz.qtitle;
@@ -115,7 +115,7 @@ class JQuiz {
 		props[QuizProtocol.quizUsers] = quiz.quizUsers;
 
 		let req = this.client.userReq(uri, JQuiz.port,
-			new UserReq( uri, "quizzes", props ).A(quiz_a.insert) );
+			new UserReq( uri, "quizzes", props ).A(QuizProtocol.A.insert) );
 
 		this.client.commit(req, onOk, errCtx);
 	}
@@ -128,7 +128,7 @@ class JQuiz {
 	 */
 	update(uri, quiz, onOk, errCtx) {
 		let that = this;
-		this.client.usrAct('quiz', quiz_a.update, Protocol.CRUD.u, quiz.qtitle);
+		this.client.usrAct('quiz', QuizProtocol.A.update, Protocol.CRUD.u, quiz.qtitle);
 
 		let props = {}
 		props[QuizProtocol.quizId] = quiz.quizId;
@@ -137,7 +137,7 @@ class JQuiz {
 		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 
 		let req = this.client.userReq(uri, JQuiz.port,
-			new UserReq(uri, "quizzes", props).A(quiz_a.update) );
+			new UserReq(uri, "quizzes", props).A(QuizProtocol.A.update) );
 
 		this.client.commit(req, onOk, errCtx);
 	}

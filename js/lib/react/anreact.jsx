@@ -24,7 +24,7 @@ export class AnReact {
 		throw new Error("Why here?");
 		// let that = this;
 		// let date = new Date();
-		// this.client.usrAct('quiz', quiz_a.insert, Protocol.CRUD.c, quiz.qtitle);
+		// this.client.usrAct('quiz', QuizProtocol.A.insert, Protocol.CRUD.c, quiz.qtitle);
 		//
 		// let props = {}
 		// props[QuizProtocol.qtitle] = quiz.qtitle;
@@ -34,7 +34,7 @@ export class AnReact {
 		// props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 		//
 		// let req = this.client.userReq(quizUri, JQuiz.port,
-		// 	new UserReq( quizUri, "quizzes", props ).A(quiz_a.insert) );
+		// 	new UserReq( quizUri, "quizzes", props ).A(QuizProtocol.A.insert) );
 		//
 		// this.client.an.post(req, onOk, (c, resp) => {
 		// 	if (that.err) {

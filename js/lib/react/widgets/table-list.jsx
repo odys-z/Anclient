@@ -168,12 +168,14 @@ class AnTablistComp extends React.Component {
 					}
 					{columns.filter( (v, x) => v.hide !== true
 									|| this.props.checkbox && x !== 0) // first columen as checkbox
-							.map( (colObj, index) => {
+							.map( (colObj, x) => {
 								if (colObj.field === undefined)
 									throw Error("Column field is required: " + JSON.stringify(colObj));
 								let v = row[colObj.field];
-								return colObj.formatter && colObj.formatter(v, index)
-										|| <TableCell key={index}>{v}</TableCell>;
+								let cell = colObj.formatter && colObj.formatter(v, x, row);
+								if (cell)
+									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
+								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
 							} )}
 				</TableRow>)
 		});
