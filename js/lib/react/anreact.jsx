@@ -283,7 +283,12 @@ export class AnReactExt extends AnReact {
 	/**Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
-	 * <p> See DomainComp.componentDidMount() for example. </p>
+	 * <h6>About React Rendering Events</h6>
+	 * This method will update opts.cond.loading and clean.
+	 * When success, set loading false, clean true. this 2 flags are helper for
+	 * handling react rendering / data-loading events asynchronously. 
+	 *
+	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *
 	 * @param {object} opts options
 	 * @param {string} opts.sk semantic key (dataset id)
@@ -321,6 +326,7 @@ export class AnReactExt extends AnReact {
 				cond.options = rows;
 
 				cond.loading = false;
+				cond.clean = true;
 
 				if (compont)
 					compont.setState({});

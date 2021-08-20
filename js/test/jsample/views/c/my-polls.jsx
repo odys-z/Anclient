@@ -21,13 +21,13 @@ const styles = (theme) => ( {
 
 class MyPollsComp extends CrudCompW {
 	state = {
-		polls: [],
+		polls: {cols:[], rows: []},
 
 		condTitl: { type: 'text', val: '', label: L('Title') },
 		condTags: { type: 'text', val: '', label: L('Tags') },
 		condIssr: { type: 'cbb',  val: AnConst.cbbAllItem,
-					sk: 'center.my-polls.issuers', nv: {n: 'userName', v: 'uid'},
-					sqlArgs: ['kidId', 't-year'],
+					sk: 'center.my-polls.issuers', nv: {n: 'txt', v: 'val'},
+					sqlArgs: undefined, //['pollee-id', 'pollee-role', 'issuer-role'],
 					options: [ AnConst.cbbAllItem ],
 					label: L('Issuers') },
 
@@ -42,7 +42,10 @@ class MyPollsComp extends CrudCompW {
 	}
 
 	componentDidMount() {
-		console.log(this.uri)
+		console.log(this.uri, this.context.anClient.userInfo.uid);
+
+		this.state.condIssr.sqlArgs = [this.context.anClient.userInfo.uid, 'r03', 'r01'];
+		this.state.condIssr.clean = false;  // trigger AnQueryFormComp reloading
 
 		this.toSearch();
 	}
@@ -80,9 +83,11 @@ class MyPollsComp extends CrudCompW {
 
 	render () {
 		let { classes } = this.props;
-		let polls = this.state.polls;
+		let polls = this.state.polls && this.state.polls.rows;
+		let tasks = polls && polls.length;
 		return (<>
-			<AnQueryForm uri={this.uri}
+			{ this.state.condIssr.sqlArgs && // must load userId before reandering issuers cbb.
+			  <AnQueryForm uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTitl, this.state.condTags, this.state.condIssr ]}
 				query={ (q) => { return {
@@ -90,26 +95,25 @@ class MyPollsComp extends CrudCompW {
 					qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
 					qIssr: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				}} }
-			/>
+			/>}
 
-			<Button onClick={this.takePoll} >{L('Take Poll')}</Button>
-			{polls > 0 && <>
-				<Typography color='secondary' >
-					L(`Your have ${tasks} ${tasks > 1 ? 'quizzes' : 'quiz'} to finish.`, {tasks})
-				</Typography>
-				<AnTablist pk='pid'
-					className={classes.root}
-					columns={[
-						{ text: L('pid'), hide: true, field: "pid" },
-						{ text: L('Title'), field: "title", color: 'primary', className: 'bold'},
-						{ text: L('Progress'), field: "progress", color: 'primary' },
-						{ text: L('Questions'), field: "questions", color: 'primary' },
-						{ text: L('DDL'), field: "ddl", color: 'primary' }
-					]}
-					rows={this.state.rows}
-					onSelectChange={this.onTableSelect}
-				/>
-			</>}
+			<Button onClick={this.takePoll} disabled={this.state.selectedIds.length <= 0} >{L('Take Poll')}</Button>
+			<Typography color='secondary' >
+				{L('Your have {tasks} {quiz} to finish.', {tasks, quiz: tasks > 1 ? 'quizzes' : 'quiz'})}
+			</Typography>
+			<AnTablist pk='pid' checkbox
+				className={classes.root}
+				columns={[
+					{ text: L('chk'), hide: true, field: "checked" },
+					{ text: L('pid'), hide: true, field: "pid" },
+					{ text: L('Title'), field: "title", color: 'primary', className: 'bold'},
+					{ text: L('Progress'), field: "progress", color: 'primary' },
+					{ text: L('Questions'), field: "questions", color: 'primary' },
+					{ text: L('DDL'), field: "ddl", color: 'primary' }
+				]}
+				rows={polls}
+				onSelectChange={this.onTableSelect}
+			/>
 			{this.quizForm}
 			</>);
 	}

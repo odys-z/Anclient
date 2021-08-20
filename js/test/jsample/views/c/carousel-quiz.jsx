@@ -1,8 +1,9 @@
 import React from "react";
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
-import Dialog from '@material-ui/core/Dialog';
 import PropTypes from "prop-types";
+
+import Dialog from '@material-ui/core/Dialog';
 
 
 import Carousel from "react-elastic-carousel";
@@ -17,7 +18,7 @@ const styles = (theme) => ( {
 
 class CarouselQuizComp extends CrudCompW {
 	state = {
-		pollId: undefined
+		pollId: undefined,
 		quiz: {
 			quizId: undefined,
 			questions: []
@@ -29,8 +30,8 @@ class CarouselQuizComp extends CrudCompW {
 
 		this.state.pollId = this.props.pollId;
 
-		this.loadQuiz() = this.loadQuiz.bind(this);
-		this.toSubmit() = this.toSubmit.bind(this);
+		this.loadQuiz = this.loadQuiz.bind(this);
+		this.toSubmit = this.toSubmit.bind(this);
 	}
 
 	/*
@@ -94,7 +95,28 @@ class CarouselQuizComp extends CrudCompW {
 	}
 
 	render() {
+		return (
+		  <Dialog
+		    fullWidth={true}
+		    maxWidth={'md'}
+		    open={true}
+		  >
+			<Carousel>
+				{questionCard(this.state.quiz.questions, this.carousel)}
+			</Carousel>
+		  </Dialog> );
 
+		function questionCard(qs, carousel) {
+			return qs.map( (q, x) => {
+		        <QuizCard key={x}
+		            goPrev={() => carousel.slideNext()}
+		            goNext={() => carousel.slideNext()}
+		            question={q.question}
+		            toStart={x === 0 && this.props.toStart}
+		            toFinish={x === qs.length - 1 && this.props.toClose}
+		        />
+			});
+		}
 	}
 }
 CarouselQuizComp.context = AnContext;

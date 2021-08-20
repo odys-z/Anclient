@@ -56,6 +56,8 @@ class AnQueryFormComp extends CrudComp {
 	constructor(props) {
 		super(props);
 
+		this.bindConds = this.bindConds.bind(this);
+
 		this.handleChange = this.handleChange.bind(this);
 		this.onTxtChange = this.onTxtChange.bind(this);
 		this.toSearch = this.toSearch.bind(this);
@@ -73,12 +75,16 @@ class AnQueryFormComp extends CrudComp {
 	}
 
 	componentDidMount() {
+		this.bindConds();
+	}
 
+	bindConds() {
 		if (!this.context || !this.context.anReact)
 			throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
-		this.state.conds.filter((c, x ) => !!c)
+		this.state.conds.filter((c, x ) => !!c && !c.clean)
 		  .forEach( (cond, cx) => {
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
+				// reset by AnReact.ds2cbbOptions()
 				cond.loading = true;
 				this.context.anReact.ds2cbbOptions({
 						uri: this.props.uri,
@@ -173,6 +179,8 @@ class AnQueryFormComp extends CrudComp {
 	}
 
 	render() {
+		this.bindConds(); // this makes condition data can be updated by parent, e.g. rebind cbb.
+
 		let that = this;
 
 		let { checked } = this.state;

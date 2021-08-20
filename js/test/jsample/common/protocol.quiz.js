@@ -178,7 +178,7 @@ export const QuizProtocol = {
 	poll: "poll",
 	quizUsers: "quizUsers",
 
- 	A = {
+ 	A: {
 		start: 'start',
 		quiz: 'quiz',     //
 		list: 'list',     // load quizzes
@@ -195,10 +195,12 @@ export const QuizProtocol = {
 	public static final String myClasses = "classes";
 	public static final String myConnects = "connects";
 	public static final String myPolls = "polls";
+	public static final String pollQuestions = "questions";
 
 	static class A {
 		public static final String getClasses = "classes";
 		public static final String getStatus = "status";
+		public static final String myPolls = "mypolls";
 	}
 
 	static class ConnectMsg {
@@ -212,13 +214,13 @@ export const CenterProtocol = {
 	myClasses: "classes",
 	myConnects: "connects",
 	myPolls: "polls",
-	pollQuestions: "p-questions",
+	pollQuestions: "questions",
 
-
-	A = {
+	A: {
 		getClasses: "classes",
 		getStatus: "status",
 		loadPoll: "load-poll",
+		myPolls: "mypolls",
 	},
 
 	ConnectMsg: {
