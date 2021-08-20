@@ -102,10 +102,11 @@ class AnTablistComp extends React.Component {
 			const newSelecteds = this.props.rows.map((n) => n[key]);
 			this.setState({selected: newSelecteds});
 			this.updateSelectd([ ...newSelecteds ]);
-			return;
 		}
-		this.setState({ selected: [] });
-		this.updateSelectd([]);
+		else {
+			this.setState({ selected: [] });
+			this.updateSelectd([]);
+		}
 	};
 
 	updateSelectd (arr) {
@@ -142,21 +143,22 @@ class AnTablistComp extends React.Component {
 
 	tr(rows = [], columns = []) {
 		return rows.map(row => {
-			let key = row[this.props.pk && this.props.pk.field];
+			let pkv = typeof this.props.pk === 'string' ? row[this.props.pk]
+					: row[this.props.pk.field];
 
 			if (this.props.checkbox && toBool(row.checked)) {
-				this.state.selected.push(row[key])
+				this.state.selected.push(pkv)
 				row.checked = 0; // later events don't need ths
 			}
-			let isItemSelected = this.isSelected(row[key]);
+			let isItemSelected = this.isSelected(pkv);
 
 			return (
 				<TableRow key= {row[this.props.pk]} hover
 					selected={isItemSelected}
 					onClick= { (event) => {
-						this.handleClick(event, row[key]);
+						this.handleClick(event, pkv);
 						if (typeof this.props.onSelectChange === 'function')
-							this.props.onSelectChange(this.state.selected, row[key]);
+							this.props.onSelectChange(this.state.selected, pkv);
 					} }
 					role="checkbox" aria-checked={isItemSelected}
 				>

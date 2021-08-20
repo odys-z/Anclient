@@ -9,7 +9,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Carousel from "react-elastic-carousel";
 
 import { AnContext, CrudCompW } from "anclient";
-import { QuizCard } from "./quiz-card";
+import { CarouselCard } from "./carousel-quiz";
 
 const styles = (theme) => ( {
 	root: {

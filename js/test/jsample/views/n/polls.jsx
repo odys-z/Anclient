@@ -52,6 +52,7 @@ class PollsComp extends CrudCompW {
 
 	componentDidMount() {
 		console.log(this.uri);
+		debugger
 	}
 
 	toSearch(e, query) {
@@ -159,7 +160,7 @@ class PollsComp extends CrudCompW {
 					tag:   q.state.conds[1].val ? q.state.conds[1].val : undefined,
 					orgId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				} } }
-				onDone={(query) => { this.toSearch(undefined, query); } }
+				onDone={(query) => { console.log('onDone()'); this.toSearch(undefined, query); } }
 			/>
 
 			<AnTablist

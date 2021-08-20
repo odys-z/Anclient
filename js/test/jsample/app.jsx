@@ -40,8 +40,6 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 
-		// this.state.samports = Object.assign(Protocol.Port, samports);
-
 		this.state.iportal = this.props.iportal;
 
 		this.onError = this.onError.bind(this);
@@ -97,20 +95,33 @@ class App extends React.Component {
 	/** For navigate to portal page */
 	logout() {
 		// leaving
-		this.state.anClient.logout(
-			() => {
-				if (this.props.iwindow)
-					this.props.iwindow.location = this.state.iportal;
-			},
-			(c, e) => {
-				// something wrong
-				console.warn('Logou failed', c, e)
-				if (this.state.anClient)
-        			localStorage.setItem(SessionClient.ssInfo, null);
-				if (this.props.iwindow)
-					this.props.iwindow.location = this.state.iportal;
-			});
-		this.state.anClient = undefined;
+		try {
+			let that = this;
+			this.state.anClient.logout(
+				() => {
+					if (this.props.iwindow)
+						this.props.iwindow.location = this.state.iportal;
+				},
+				(c, e) => {
+					// something wrong
+					// console.warn('Logout failed', c, e)
+					cleanup (that);
+				});
+		}
+		catch(_) {
+			cleanup (that);
+		}
+		finally {
+			this.state.anClient = undefined;
+		}
+
+		function cleanup(app) {
+			debugger
+			if (app.state.anClient)
+				localStorage.setItem(SessionClient.ssInfo, null);
+			if (app.props.iwindow)
+				app.props.iwindow.location = app.state.iportal;
+		}
 	}
 
 	render() {

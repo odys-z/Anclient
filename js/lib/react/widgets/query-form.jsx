@@ -81,7 +81,7 @@ class AnQueryFormComp extends CrudComp {
 	bindConds() {
 		if (!this.context || !this.context.anReact)
 			throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
-		this.state.conds.filter((c, x ) => !!c && !c.clean)
+		this.state.conds.filter((c, x ) => !!c && !c.loading && !c.clean)
 		  .forEach( (cond, cx) => {
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
 				// reset by AnReact.ds2cbbOptions()
@@ -166,6 +166,13 @@ class AnQueryFormComp extends CrudComp {
 	}
 
 	toSearch( e ) {
+		/// conds.clean & cond.loading are used for guarding re-entry the query, e.g. when error occured
+		this.state.conds.forEach(
+			(c, x) => {
+				c.clean = false;
+				c.loading = false;
+			} );
+
 		this.props.onSearch(e, this.query());
 	}
 
