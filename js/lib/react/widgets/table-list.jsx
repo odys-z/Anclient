@@ -1,5 +1,7 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
+import PropTypes from "prop-types";
+
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -140,7 +142,7 @@ class AnTablistComp extends React.Component {
 
 	tr(rows = [], columns = []) {
 		return rows.map(row => {
-			let key = this.props.pk;
+			let key = row[this.props.pk && this.props.pk.field];
 
 			if (this.props.checkbox && toBool(row.checked)) {
 				this.state.selected.push(row[key])
@@ -168,12 +170,14 @@ class AnTablistComp extends React.Component {
 					}
 					{columns.filter( (v, x) => v.hide !== true
 									|| this.props.checkbox && x !== 0) // first columen as checkbox
-							.map( (colObj, index) => {
+							.map( (colObj, x) => {
 								if (colObj.field === undefined)
 									throw Error("Column field is required: " + JSON.stringify(colObj));
 								let v = row[colObj.field];
-								return colObj.formatter && colObj.formatter(v, index)
-										|| <TableCell key={index}>{v}</TableCell>;
+								let cell = colObj.formatter && colObj.formatter(v, x, row);
+								if (cell)
+									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
+								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
 							} )}
 				</TableRow>)
 		});
@@ -215,6 +219,9 @@ class AnTablistComp extends React.Component {
 		</>);
 	}
 }
+AnTablistComp.propTypes = {
+	pk: PropTypes.string.isRequired,
+};
 
 const AnTablist = withStyles(styles)(AnTablistComp);
 export { AnTablist, AnTablistComp }

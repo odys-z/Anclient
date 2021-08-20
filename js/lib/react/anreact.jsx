@@ -24,7 +24,7 @@ export class AnReact {
 		throw new Error("Why here?");
 		// let that = this;
 		// let date = new Date();
-		// this.client.usrAct('quiz', quiz_a.insert, Protocol.CRUD.c, quiz.qtitle);
+		// this.client.usrAct('quiz', QuizProtocol.A.insert, Protocol.CRUD.c, quiz.qtitle);
 		//
 		// let props = {}
 		// props[QuizProtocol.qtitle] = quiz.qtitle;
@@ -34,7 +34,7 @@ export class AnReact {
 		// props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
 		//
 		// let req = this.client.userReq(quizUri, JQuiz.port,
-		// 	new UserReq( quizUri, "quizzes", props ).A(quiz_a.insert) );
+		// 	new UserReq( quizUri, "quizzes", props ).A(QuizProtocol.A.insert) );
 		//
 		// this.client.an.post(req, onOk, (c, resp) => {
 		// 	if (that.err) {
@@ -283,7 +283,12 @@ export class AnReactExt extends AnReact {
 	/**Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
-	 * <p> See DomainComp.componentDidMount() for example. </p>
+	 * <h6>About React Rendering Events</h6>
+	 * This method will update opts.cond.loading and clean.
+	 * When success, set loading false, clean true. this 2 flags are helper for
+	 * handling react rendering / data-loading events asynchronously. 
+	 *
+	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *
 	 * @param {object} opts options
 	 * @param {string} opts.sk semantic key (dataset id)
@@ -321,6 +326,7 @@ export class AnReactExt extends AnReact {
 				cond.options = rows;
 
 				cond.loading = false;
+				cond.clean = true;
 
 				if (compont)
 					compont.setState({});
