@@ -5,10 +5,13 @@ import withWidth from "@material-ui/core/withWidth";
 import { Card, Button, Typography } from '@material-ui/core';
 
 import {
-    AnClient, SessionClient, Protocol, L, Langstrs,
-    AnContext, AnError, CrudCompW, AnReactExt, AnTablist
+	L, Langstrs, AnConst,
+    AnClient, SessionClient, Protocol, UserReq,
+    AnContext, AnError, CrudCompW, AnReactExt,
+	AnQueryForm, AnTablist
 } from 'anclient';
 
+import { center_a } from '../../common/protocol.quiz';
 import { CarouselQuiz } from './carousel-quiz';
 
 const styles = (theme) => ( {
@@ -18,27 +21,57 @@ const styles = (theme) => ( {
 
 class MyPollsComp extends CrudCompW {
 	state = {
-		my: {
-			polls: 0
-		}
+		polls: [],
+
+		condTitl: { type: 'text', val: '', label: L('Title') },
+		condTags: { type: 'text', val: '', label: L('Tags') },
+		condIssr: { type: 'cbb',  val: AnConst.cbbAllItem,
+					sk: 'center.my-polls.issuers', nv: {n: 'userName', v: 'uid'},
+					sqlArgs: ['kidId', 't-year'],
+					options: [ AnConst.cbbAllItem ],
+					label: L('Issuers') },
+
+		selectedIds: []
 	};
 
 	constructor(props) {
 		super(props);
 
+		this.toSearch = this.toSearch.bind(this);
 		this.takePoll = this.takePoll.bind(this);
 	}
 
 	componentDidMount() {
 		console.log(this.uri)
+
+		this.toSearch();
 	}
 
+	toSearch(e, query) {
+		let reqBd = new UserReq();
+
+		let client = this.context.anClient;
+		let req = client.userReq( this.uri, 'center',
+					new UserReq( this.uri, "center" )
+						.A(center_a.myPolls) );
+		this.state.req = req;
+
+		let that = this;
+		client.commit(req,
+			(resp) => {
+				let centerResp = resp.Body()
+				that.setState({polls: centerResp.polls()});
+				that.state.selectedIds.splice(0);
+			},
+			this.context.error);
+	}
 
 	takePoll(e) {
 		if (e) e.stopPropagation();
 
 		let that = this;
 		this.quizForm = (<CarouselQuiz uri={this.uri}
+				quiz={this.selectedIds[0]}
 				toClose={() => {that.quizForm = undefined;}}
 			/>);
 		this.setState({});
@@ -46,8 +79,18 @@ class MyPollsComp extends CrudCompW {
 
 	render () {
 		let { classes } = this.props;
-		let polls = this.state.my.polls;
-		return (<>Polls List
+		let polls = this.state.polls;
+		return (<>
+			<AnQueryForm uri={this.uri}
+				onSearch={this.toSearch}
+				conds={[ this.state.condTitl, this.state.condTags, this.state.condIssr ]}
+				query={ (q) => { return {
+					qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
+					qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
+					qIssr: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
+				}} }
+			/>
+
 			<Button onClick={this.takePoll} >{L('Take Poll')}</Button>
 			{polls > 0 && <>
 				<Typography color='secondary' >
@@ -56,7 +99,7 @@ class MyPollsComp extends CrudCompW {
 				<AnTablist pk='pid'
 					className={classes.root}
 					columns={[
-						{ text: L('qid'), hide:true, field: "qid" },
+						{ text: L('pid'), hide: true, field: "pid" },
 						{ text: L('Quiz Name'), field: "quizName", color: 'primary', className: 'bold'},
 						{ text: L('Progress'), field: "progress", color: 'primary' },
 						{ text: L('Questions'), field: "questions", color: 'primary' },

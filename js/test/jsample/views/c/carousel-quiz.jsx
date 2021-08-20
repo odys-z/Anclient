@@ -53,6 +53,7 @@ CarouselQuizComp.context = AnContext;
 
 CarouselQuizComp.propTypes = {
 	uri: PropTypes.string.isRequired,
+	quizId: PropTypes.string.isRequired,
 	toClose: PropTypes.func.isRequired
 };
 

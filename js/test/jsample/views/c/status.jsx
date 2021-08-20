@@ -4,7 +4,8 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import {L, Langstrs, Protocol, UserReq,
+import {L, Langstrs, AnConst,
+	Protocol, UserReq,
     AnClient, SessionClient,
     AnContext, AnError, CrudCompW, AnReactExt,
 	AnTablist
@@ -20,7 +21,8 @@ const styles = (theme) => ( {
 
 class MyStatusComp extends CrudCompW {
 	state = {
-		my: []
+		my: [],
+		selectedIds: []
 	};
 
 	constructor(props) {
@@ -41,13 +43,16 @@ class MyStatusComp extends CrudCompW {
 		let req = client.userReq(this.uri, 'center',
 				new UserReq( this.uri, "center" )
 				.A(center_a.getStatus) );
-		this.state.statusReq = req;
+		this.state.req = req;
 
 		let that = this;
-		client.commit(req, (resp) => {
-			let centerResp = resp.Body()
-			that.setState({my: centerResp.my()});
-		}, this.context.error);
+		client.commit(req,
+			(resp) => {
+				let centerResp = resp.Body()
+				that.setState({my: centerResp.my()});
+				that.state.selectedIds.splice(0);
+			},
+			this.context.error);
 	}
 
 	onSelectChange(opt) {
@@ -73,8 +78,7 @@ class MyStatusComp extends CrudCompW {
 						{ text: L('qid'), hide: true, field: "qid" },
 
 						{ text: L('Quiz Name'), field: "title", color: 'primary', className: 'bold'},
-						// { text: L('Message'), field: "msg"},
-						{ text: L('Message'), field: "msg", formatter: showMsg },
+						{ text: L('Message'), field: "extra", formatter: showMsg },
 						{ text: L('Subject'), field: "subject"},
 						{ text: L('DDL'), field: "ddl", color: 'primary' }
 					]}
@@ -85,13 +89,16 @@ class MyStatusComp extends CrudCompW {
 			}
 		</>);
 
-		function showMsg( extra, rx ) {
+		function showMsg( extra, rx, rec ) {
 			let json = JSON.parse(extra);
-			return (
-			<Typography key={rx}>
-				{L('Msg from North:')}
-                {json.msg}
-			</Typography>);
+			return ( <>
+				<Typography variant={'body2'} >
+					{L('Msg from North:')}
+				</Typography>
+				<Card key={rx}>
+	                {json.msg}
+				</Card>
+				</>);
 		}
 	}
 }
