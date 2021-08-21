@@ -40,7 +40,7 @@ class AnTablistComp extends React.Component {
 		page: 0,
 		size: 10,
 
-		selected: []
+		selected: new Set()
 	}
 
 	constructor(props){
@@ -67,51 +67,38 @@ class AnTablistComp extends React.Component {
 		this.tr = this.tr.bind(this);
 	}
 
-	isSelected(name) {
-		return this.state.selected.indexOf(name) !== -1;
+	isSelected(k) {
+		return this.state.selected.has(k);
 	}
 
-	handleClick(event, index) {
-		let selected = [...this.state.selected];
-		const selectedIndex = selected.indexOf(index);
-		let newSelected = [];
+	handleClick(event, newSelct) {
+		let selected = this.state.selected;
+		if (selected.has(newSelct)) {
+			selected.delete(newSelct);
+		}
+		else selected.add(newSelct);
 
-		if (selectedIndex === -1) {
-			newSelected = newSelected.concat(selected, index);
-		}
-		else if (selectedIndex === 0) {
-			newSelected = newSelected.concat(selected.slice(1));
-		}
-		else if (selectedIndex === selected.length - 1) {
-			newSelected = newSelected.concat(selected.slice(0, -1));
-		}
-		else if (selectedIndex > 0) {
-			newSelected = newSelected.concat(
-				selected.slice(0, selectedIndex),
-				selected.slice(selectedIndex + 1),
-			);
-		}
-		this.setState({ selected: newSelected });
-
-		this.updateSelectd([ ...newSelected ]);
+		this.setState({selected});
+		this.updateSelectd(selected);
 	};
 
 	toSelectAll (event) {
 		if (event.target.checked) {
 			let key = this.props.pk;
-			const newSelecteds = this.props.rows.map((n) => n[key]);
-			this.setState({selected: newSelecteds});
-			this.updateSelectd([ ...newSelecteds ]);
+			let selected = new Set();
+			this.props.rows.forEach((n) => selected.add(n[key]));
+			this.setState({selected});
+			this.updateSelectd([ ...selected ]);
 		}
 		else {
-			this.setState({ selected: [] });
+			this.setState({ selected: new Set() });
 			this.updateSelectd([]);
 		}
 	};
 
-	updateSelectd (arr) {
+	updateSelectd (set) {
 		if (typeof this.props.onSelectChange === 'function')
-			this.props.onSelectChange(arr);
+			this.props.onSelectChange([...set]);
 	}
 
 	changePage(event, page) {
@@ -147,7 +134,7 @@ class AnTablistComp extends React.Component {
 					: row[this.props.pk.field];
 
 			if (this.props.checkbox && toBool(row.checked)) {
-				this.state.selected.push(pkv)
+				this.state.selected.add(pkv)
 				row.checked = 0; // later events don't need ths
 			}
 			let isItemSelected = this.isSelected(pkv);
@@ -157,8 +144,8 @@ class AnTablistComp extends React.Component {
 					selected={isItemSelected}
 					onClick= { (event) => {
 						this.handleClick(event, pkv);
-						if (typeof this.props.onSelectChange === 'function')
-							this.props.onSelectChange(this.state.selected, pkv);
+						// if (typeof this.props.onSelectChange === 'function')
+						// 	this.props.onSelectChange(this.state.selected, pkv);
 					} }
 					role="checkbox" aria-checked={isItemSelected}
 				>
@@ -193,9 +180,9 @@ class AnTablistComp extends React.Component {
 				<TableRow>
 					{ this.props.checkbox &&
 						(<TableCell padding="checkbox" >
-						  <Checkbox
-							indeterminate={this.state.selected.length > 0 && this.state.selected.length < this.props.rows.length}
-							checked={this.state.selected.length > 0 && this.state.selected.length === this.props.rows.length}
+						  <Checkbox ref={ref => (this.checkAllBox = ref)}
+							indeterminate={this.state.selected.size > 0 && this.state.selected.size < this.props.rows.length}
+							checked={this.state.selected.size > 0 && this.state.selected.size === this.props.rows.length}
 							color="primary"
 							inputProps={{ 'aria-label': 'checkAll' }}
 							onChange={this.toSelectAll}/>

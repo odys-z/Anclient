@@ -30,14 +30,6 @@ import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
 import { QuizUserForm } from './quiz-users';
 
-const QuestionType = {
-	single: 's',
-	multiple: 'm',
-	text: 't',
-	rank5: 'r5',
-	rank10: 'r10'
-}
-
 var quid = -1;
 
 const styles = (theme) => ({
@@ -177,7 +169,7 @@ class QuizEditorComp extends DetailFormW {
 			qid: qx, // drop by server semantics
 			question: 'Question ' + qx,
 			answers: 'A. \nB. \nC. \nD. ',
-			qtype: QuestionType.single,
+			qtype: QuizProtocol.Qtype.single,
 			answer: "0"
 		});
 
@@ -193,7 +185,7 @@ class QuizEditorComp extends DetailFormW {
 
 	onCheckSingle(e) {
 		let qx = this.state.currentqx;
-		let qtype = this.state.questions[qx].qtype === QuestionType.single ? QuestionType.multiple : QuestionType.single;
+		let qtype = this.state.questions[qx].qtype === QuizProtocol.Qtype.single ? QuizProtocol.Qtype.multiple : QuizProtocol.Qtype.single;
 		this.state.questions[qx].qtype = qtype;
 		this.setState({autosave: !this.state.autosave});
 	}
@@ -241,24 +233,18 @@ class QuizEditorComp extends DetailFormW {
 				  <ListItem button className={ classes.nested }>
 				    <ListItemIcon><StarBorder /></ListItemIcon>
 				    <ListItemText primary="Option..." />
-				    <FormControlLabel
-				        control={
-							// <Checkbox checked={this.state.questions[x].qtype === QuestionType.single}
-							// 			   onClick={this.onCheckSingle}
-				            //                name="chk0" color="primary" />
-								<DatasetCombo uri={this.props.uri}
-									options={[
-										{n: L('Single Opt'), v: 's'},
-										{n: L('Multiple'), v: 'm'},
-										{n: L('Text'), v: 't'} ]}
-									label={L('Question Type')}
-									onSelect={ (v) => {
-										// rec[f.field] = v.v;
-										that.state.questions[x].qtype = v.v;
-										that.setState({dirty: true});
-									}}
-								/> }
-				        label=""/>
+							<DatasetCombo uri={this.props.uri}
+								options={[
+									{n: L('Single Opt'), v: 's'},
+									{n: L('Multiple'), v: 'm'},
+									{n: L('Text'), v: 't'} ]}
+								label={L('Question Type')}
+								onSelect={ (v) => {
+									// rec[f.field] = v.v;
+									that.state.questions[x].qtype = v.v;
+									that.setState({dirty: true});
+								}}
+							/>
 				  </ListItem>
 				</List>
 
@@ -333,7 +319,7 @@ class QuizEditorComp extends DetailFormW {
 	    );
 
 		function aboutPollUsers(usrs = []) {
-			return L('Total polling users: {n}', {n: usrs.length});
+			return L('Total polling users: {n}', {n: usrs.size || usrs.length || 0});
 		}
 	}
 }

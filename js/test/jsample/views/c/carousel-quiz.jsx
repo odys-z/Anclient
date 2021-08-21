@@ -3,19 +3,30 @@ import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-
 
 import Carousel from "react-elastic-carousel";
 
-import { AnContext, CrudCompW } from "anclient";
-import { CarouselCard } from "./carousel-quiz";
+import {
+	L, Langstrs, AnConst,
+    AnClient, Protocol, UserReq, DatasetReq,
+    AnContext, CrudCompW, AnReactExt
+} from 'anclient';
+
+import { CenterProtocol } from "../../common/protocol.quiz.js";
+import { CarouselCard } from "./carousel-card";
 
 const styles = (theme) => ( {
 	root: {
 	}
 } );
 
+/**Design Note:
+ * As this component load the record (the poll) by ittself, submitting is also
+ * handled here before quit.
+ */
 class CarouselQuizComp extends CrudCompW {
 	state = {
 		pollId: undefined,
@@ -34,40 +45,6 @@ class CarouselQuizComp extends CrudCompW {
 		this.toSubmit = this.toSubmit.bind(this);
 	}
 
-	/*
-	render() {
-	return (
-	  <Dialog
-	    fullWidth={true}
-	    maxWidth={'md'}
-	    open={true}
-	  >
-	    <Carousel ref={ref => (this.carousel = ref)}>
-	        <QuizCard
-	            goPrev={() => this.carousel.slideNext()}
-	            goNext={() => this.carousel.slideNext()}
-	            question={'Who am I?'}
-	        />
-	        <QuizCard
-	            goPrev={() => this.carousel.slideNext()}
-	            goNext={() => this.carousel.slideNext()}
-	            question={'Who are you?'}
-	        />
-	        <QuizCard
-	            goPrev={() => this.carousel.slideNext()}
-	            goNext={() => this.carousel.slideNext()}
-	            question={'Who is next?'}
-	        />
-	        <QuizCard
-	            goPrev={() => this.carousel.slideNext()}
-	            goNext={() => this.carousel.slideNext()}
-	            question={'How about close?'}
-	            toFinish={this.props.toClose}
-	        />
-	    </Carousel>
-	  </Dialog> );
-	}
-	*/
 	componentDidMount() {
 		console.log(this.props.uri)
 
@@ -78,7 +55,7 @@ class CarouselQuizComp extends CrudCompW {
 		let reqBd = new UserReq();
 
 		let client = this.context.anClient;
-		let req = client.userReq( this.uri, 'center',
+		let req = client.userReq( this.props.uri, 'center',
 					new UserReq( this.uri, "center" )
 						.A(CenterProtocol.A.loadPoll)
 					 	.set(CenterProtocol.pollId, this.state.pollId) );
@@ -88,13 +65,34 @@ class CarouselQuizComp extends CrudCompW {
 		client.commit(req,
 			(resp) => {
 				let centerResp = resp.Body()
-				that.setState({quiz: centerResp.quiz()});
-				that.state.selectedIds.splice(0);
+				that.setState({quiz: centerResp.carouselQuiz()});
 			},
 			this.context.error);
 	}
 
+	toSubmit(e) {
+		// save
+		let reqBd = new UserReq();
+
+		let client = this.context.anClient;
+		let req = client.userReq( this.props.uri, 'center',
+					new UserReq( this.uri, "center" )
+						.A(CenterProtocol.A.submitPoll)
+					 	.set(CenterProtocol.pollId, this.state.pollId)
+					 	.set(CenterProtocol.pollResults, this.state.quiz.questions));
+		this.state.req = req;
+
+		let that = this;
+		client.commit(req, (resp) => {
+			that.state.crud = Protocol.CRUD.u;
+			that.showOk(L('Quiz submitted!'));
+			if (typeof that.props.onOk === 'function')
+				that.props.onSubmit({pollId: this.state.pollId, resp});
+		}, this.context.error);
+	}
+
 	render() {
+		let props = this.props;
 		return (
 		  <Dialog
 		    fullWidth={true}
@@ -102,20 +100,31 @@ class CarouselQuizComp extends CrudCompW {
 		    open={true}
 		  >
 			<Carousel>
-				{questionCard(this.state.quiz.questions, this.carousel)}
+				{questionCard( {title: this.state.quiz.title},
+						this.state.quiz.questions, this.carousel)}
+				<CarouselCard key={this.state.quiz.questions.lenght || 0}
+					goPrev={() => carousel.slideNext()}
+					goNext={() => carousel.slideNext()}
+					quiz={{title: L('Thank you!')}}
+					question={L('Please submit!')}
+					toStart={props.goLink}
+					toCancel={props.onClose}
+					toSubmit={this.toSubmit}
+				/>
 			</Carousel>
-		  </Dialog> );
+		  </Dialog>
+		);
 
-		function questionCard(qs, carousel) {
-			return qs.map( (q, x) => {
-		        <QuizCard key={x}
-		            goPrev={() => carousel.slideNext()}
-		            goNext={() => carousel.slideNext()}
-		            question={q.question}
-		            toStart={x === 0 && this.props.toStart}
-		            toFinish={x === qs.length - 1 && this.props.toClose}
-		        />
-			});
+		function questionCard(qz, qs, carousel) {
+			return qs.map( (q, x) => (
+			  <CarouselCard key={x}
+				goPrev={() => carousel.slideNext()}
+				goNext={() => carousel.slideNext()}
+				quiz={qz}
+				question={q}
+				toCancel={x === 0 && props.onClose}
+			  />)
+			);
 		}
 	}
 }
@@ -124,7 +133,9 @@ CarouselQuizComp.context = AnContext;
 CarouselQuizComp.propTypes = {
 	uri: PropTypes.string.isRequired,
 	pollId: PropTypes.string.isRequired,
-	toClose: PropTypes.func.isRequired
+	onClose: PropTypes.func.isRequired,
+	onSubmit: PropTypes.func.isRequired,
+	goLink: PropTypes.func
 };
 
 const CarouselQuiz = withWidth()(withStyles(styles)(CarouselQuizComp));

@@ -187,7 +187,19 @@ export const QuizProtocol = {
 
 		poll: 'poll',     // submit poll results
 		quizUsers: 'quizUsers', // load quiz's users
+	},
+
+	Qtype: {
+		single: 's',
+		multiple: 'm',
+		text: 't',
+		num: 'n',
+		rank5: 'r5',
+		rank10: 'r10',
+		multiR5: 'mr5',
+		multiR10: 'mr10'
 	}
+
 }
 
 /**
@@ -215,12 +227,14 @@ export const CenterProtocol = {
 	myConnects: "connects",
 	myPolls: "polls",
 	pollQuestions: "questions",
+	pollResults: "poll-results",
 
 	A: {
 		getClasses: "classes",
 		getStatus: "status",
 		loadPoll: "load-poll",
 		myPolls: "mypolls",
+		submitPoll: "submit-poll"
 	},
 
 	ConnectMsg: {
@@ -239,7 +253,7 @@ export class CenterResp extends AnsonResp {
   		this.port = respObj.serv;
 		this.seq = respObj.seq;
 
-		this.date = respObj.data;
+		// this.data = respObj.data;
 		// let polls = respObj.data && respObj.data.props && respObj.data.props.polls;
 		// if (polls) {
 		// 	this.cols = rs.length ? [] : rs.colnames;
@@ -275,6 +289,14 @@ export class CenterResp extends AnsonResp {
 		let conns = this.connects();
 		my.connects = conns.rows;
 		return my;
+	}
+
+	carouselQuiz() {
+		let {rows, cols} = AnsonResp.rs2arr(this.data.props.polls);
+		let poll = rows[0];
+
+		let questions = AnsonResp.rs2arr(this.data.props.questions);
+		return { poll, questions: questions.rows };
 	}
 }
 

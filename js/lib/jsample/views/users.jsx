@@ -115,6 +115,7 @@ class UsersComp extends CrudCompW {
 					name: q.state.conds[0].val ? q.state.conds[0].val : undefined,
 					roleId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 				}} }
+				pk='userId'
 			/>
 
 			<Grid container alignContent="flex-end" >

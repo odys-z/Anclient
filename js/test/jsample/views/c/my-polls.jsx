@@ -38,6 +38,7 @@ class MyPollsComp extends CrudCompW {
 		super(props);
 
 		this.toSearch = this.toSearch.bind(this);
+		this.onSelect = this.onSelect.bind(this);
 		this.takePoll = this.takePoll.bind(this);
 	}
 
@@ -69,14 +70,20 @@ class MyPollsComp extends CrudCompW {
 			this.context.error);
 	}
 
+	onSelect(selectedIds, newIt) {
+		this.setState({selectedIds});
+	}
+
 	takePoll(e) {
 		if (e) e.stopPropagation();
 
 		let that = this;
 		this.quizForm = (
-            <CarouselQuiz uri={this.uri}
-				pollId={this.selectedIds[0]} // load by itself
-				toClose={() => {that.quizForm = undefined;}}
+			<CarouselQuiz uri={this.uri}
+				pollId={this.state.selectedIds[0]} // load by itself
+				// quiz are loaded by CarouselQuizComp, so committed by itself
+				onSubmit={() => {that.quizForm = undefined;}} // no thanks?
+				onClose={ () => {that.quizForm = undefined;}}
 			/>);
 		this.setState({});
 	}
@@ -97,10 +104,16 @@ class MyPollsComp extends CrudCompW {
 				}} }
 			/>}
 
-			<Button onClick={this.takePoll} disabled={this.state.selectedIds.length <= 0} >{L('Take Poll')}</Button>
 			<Typography color='secondary' >
-				{L('Your have {tasks} {quiz} to finish.', {tasks, quiz: tasks > 1 ? 'quizzes' : 'quiz'})}
+				{ tasks > 0 ? L('Your have {tasks} {quiz} to finish.',
+								{tasks, quiz: tasks > 1 ? 'quizzes' : 'quiz'})
+				  : ""}
 			</Typography>
+			<Button variant="contained" color='secondary'
+				onClick={this.takePoll}
+				disabled={this.state.selectedIds.length <= 0}
+			> {L('Take Poll')}
+			</Button>
 			<AnTablist pk='pid' checkbox
 				className={classes.root}
 				columns={[
@@ -112,7 +125,7 @@ class MyPollsComp extends CrudCompW {
 					{ text: L('DDL'), field: "ddl", color: 'primary' }
 				]}
 				rows={polls}
-				onSelectChange={this.onTableSelect}
+				onSelectChange={this.onSelect}
 			/>
 			{this.quizForm}
 			</>);

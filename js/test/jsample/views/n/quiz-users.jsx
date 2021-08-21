@@ -39,7 +39,7 @@ class QuizUserFormComp extends CrudCompW {
 		if (e) e.stopPropagation();
 
 		if (this.props.onClose)
-			this.props.onSave(this.state.selectedIds);
+			this.props.onSave([...this.state.selectedIds]);
 	}
 
 	toClose(e) {
