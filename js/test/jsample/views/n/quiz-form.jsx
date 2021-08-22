@@ -35,7 +35,6 @@ class QuizFormComp extends DetailFormW {
 		super(props);
 
 		this.state.creating = props.creating;
-		// this.state.quizId = props.quizId;
 
 		this.onOk = this.onOk.bind(this);
 		this.onCancel = this.onCancel.bind(this);
@@ -46,7 +45,6 @@ class QuizFormComp extends DetailFormW {
 		e.stopPropagation();
 		if (typeof this.props.onCancel === 'function')
 			this.props.onCancel(e.currentTarget);
-		// this.setState({closed: true});
 	};
 
 	onOk(e) {

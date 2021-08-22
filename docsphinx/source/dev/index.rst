@@ -6,4 +6,5 @@ For developers
    :maxdepth: 2
    :caption: Contents:
 
+   note
    issues

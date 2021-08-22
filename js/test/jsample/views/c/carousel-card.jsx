@@ -36,8 +36,8 @@ const styles = (theme) => ({
   },
   title: {
     textAlign: "center",
-	marginTop: 20,
-	marginBottom: 40
+    marginTop: 20,
+    marginBottom: 40
   },
   content: {
     height: 360
@@ -105,9 +105,9 @@ class CarouselCardComp extends React.Component {
 		if (qtype === QuizProtocol.Qtype.multiple)
 			return this.formatMultipleOptions(classes, question)
 		else if (qtype === QuizProtocol.Qtype.rank5)
-			return this.formatRank(classes, [5]);
+			return this.formatRank(classes, question, [5]);
 		else if (qtype === QuizProtocol.Qtype.rank10)
-			return this.formatRank(classes, [10]);
+			return this.formatRank(classes, question, [10]);
 		else if (qtype === QuizProtocol.Qtype.multiR5)
 			return this.formatMultiRanks(classes, question, 5);
 		else if (qtype === QuizProtocol.Qtype.multiR10)
@@ -143,10 +143,7 @@ class CarouselCardComp extends React.Component {
 					color='primary'
 					onClick={(e) => (s.has(x) && !!s.delete(x)) || s.add(x) }
 				>
-				  <Checkbox
-					checked={this.state.checkedA}
-					onChange={(e) => (s.has(x) && !!s.delete(x)) || s.add(x) }
-					value="checkedA" color="primary"
+				  <Checkbox value="" color="primary"
 				  />
 				  <Typography className={classes.optionTxt}
 					variant="body2">{txt}
@@ -163,11 +160,11 @@ class CarouselCardComp extends React.Component {
 			label={L('Please fill in a number!')}
 			variant='outlined'
 			inputProps={{style: {}} }
-			onChange={(e) => { this.setState({ dirty : true });}}
+			onChange={(e) => { question.answer = e.target.value; }}
 		/>);
 	}
 
-	formatRank(classes, r) {
+	formatRank(classes, question, r) {
 		let ranks;
 		if (typeof r === 'number')
 			ranks = [r];
@@ -178,7 +175,7 @@ class CarouselCardComp extends React.Component {
 			<Box component="fieldset" ml={9} mt={1} mb={1}
 				borderColor="transparent" >
 				<Rating name="size-large"
-					onChange={(e) => console.log(e.target.value)}
+					onChange={(e) => question.answer = e.target.value}
 					defaultValue={v / 2}
 					precision={0.5}
 					max={v}
@@ -206,7 +203,7 @@ class CarouselCardComp extends React.Component {
 					{v}
 				</Typography>
 				<Rating name="size-large"
-					onChange={(e) => console.log(e.target.value)}
+					onChange={(e) => question.answer = e.target.value}
 					defaultValue={rank / 2}
 					precision={0.5}
 					max={rank}

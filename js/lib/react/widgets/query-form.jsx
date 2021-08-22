@@ -12,14 +12,12 @@ import { L } from '../../utils/langstr';
 
 const styles = (theme) => ( {
 	root: {
-		// height: '1.5em,
 		"& :hover": {
 			backgroundColor: '#eef'
 		},
 	},
 	container: {
 		display: 'flex',
-		// width: '100%',
 		'& > *': {
 			margin: theme.spacing(0.5),
 		}

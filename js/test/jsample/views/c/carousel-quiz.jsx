@@ -100,7 +100,7 @@ class CarouselQuizComp extends CrudCompW {
 		    open={true}
 		  >
 			<Carousel>
-				{questionCard( {title: this.state.quiz.title},
+				{questionCards( {title: this.state.quiz.title},
 						this.state.quiz.questions, this.carousel)}
 				<CarouselSubmitCard key={this.state.quiz.questions.lenght || 0}
 					goPrev={() => carousel.slideNext()}
@@ -117,7 +117,7 @@ class CarouselQuizComp extends CrudCompW {
 		  </Dialog>
 		);
 
-		function questionCard(qz, qs, carousel) {
+		function questionCards(qz, qs, carousel) {
 			return qs.map( (q, x) => (
 			  <CarouselCard key={x}
 				goPrev={() => carousel.slideNext()}
