@@ -8,7 +8,7 @@ import {
 	L, Langstrs, AnConst,
     AnClient, SessionClient, Protocol, UserReq,
     AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablistLevleUp
+	AnQueryForm, AnTablistLevelUp
 } from 'anclient';
 
 import { CenterProtocol } from '../../common/protocol.quiz';
@@ -32,7 +32,7 @@ class MyPollsComp extends CrudCompW {
 					label: L('Issuers') },
 		condWait: { type: 'switch', val: true, label: L('Only Waiting') },
 
-		selectedIds: [],
+		selected: {Ids: new Set()},
 		waitingPollIds: new Set(),
 	};
 
@@ -40,7 +40,6 @@ class MyPollsComp extends CrudCompW {
 		super(props);
 
 		this.toSearch = this.toSearch.bind(this);
-		this.onSelect = this.onSelect.bind(this);
 		this.takePoll = this.takePoll.bind(this);
 	}
 
@@ -79,21 +78,14 @@ class MyPollsComp extends CrudCompW {
 				let centerResp = resp.Body()
 				let polls = centerResp.polls();
 				that.setState({polls});
-				that.state.selectedIds.splice(0);
+				that.state.selected.Ids.clear(0);
+
 				// reset flags
-				that.state.waitingPollIds = new Set();
-				console.log(polls);
-				if (polls)
-					polls.rows.forEach( (p, x) => {
-						if (p.wait === CenterProtocol.PollState.wait)
-							that.state.waitingPollIds.add(p.pid);
-					});
+				let myTaskIds = centerResp.myTaskIds();
+				console.log(myTaskIds);
+				that.state.waitingPollIds = myTaskIds;
 			},
 			this.context.error);
-	}
-
-	onSelect(selectedIds) {
-		this.setState({selectedIds});
 	}
 
 	takePoll(e) {
@@ -102,7 +94,7 @@ class MyPollsComp extends CrudCompW {
 		let that = this;
 		this.quizForm = (
 			<CarouselQuiz uri={this.uri}
-				pollId={this.state.selectedIds[0]} // load by itself
+				pollId={[...this.state.selected.Ids][0]} // load by itself
 				// quiz are loaded by CarouselQuizComp, so committed by itself
 				onSubmit={() => {that.quizForm = undefined;}} // no thanks?
 				onClose={ () => {that.quizForm = undefined;}}
@@ -113,7 +105,7 @@ class MyPollsComp extends CrudCompW {
 	render () {
 		let { classes } = this.props;
 		let polls = this.state.polls && this.state.polls.rows;
-		let tasks = polls && polls.length;
+		let tasks = this.state.waitingPollIds.size;
 		return (<>
 			{ this.state.condIssr.sqlArgs && // must load userId before reandering issuers cbb.
 			  <AnQueryForm uri={this.uri}
@@ -134,11 +126,12 @@ class MyPollsComp extends CrudCompW {
 			</Typography>
 			<Button variant="outlined" color='secondary'
 				onClick={this.takePoll}
-				disabled={this.state.selectedIds.length <= 0 && (
-						this.state.waitingPollIds.has(this.state.selectedIds[0]) ) }
+				disabled={this.state.selected.Ids.size <= 0 ||
+						!this.state.waitingPollIds.has([...this.state.selected.Ids][0] ) }
 			> {L('Take Poll')}
 			</Button>
-			<AnTablistLevleUp pk='pid' checkbox singleCheck
+			<AnTablistLevelUp pk='pid' checkbox singleCheck
+				selectedIds={this.state.selected}
 				className={classes.root}
 				columns={[
 					{ text: L('chk'), hide: true, field: "checked" },

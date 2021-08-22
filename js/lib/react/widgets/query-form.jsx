@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import { Collapse, Grid, TextField, Switch, Button } from '@material-ui/core';
+import { Collapse, Grid, TextField, Switch, Button, FormControlLabel } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
@@ -131,23 +131,41 @@ class AnQueryFormComp extends CrudComp {
 		});
 	}
 
-	onTxtChange( e ) {
+	onTxtChange( e, x ) {
 		e.stopPropagation()
-		let qx = e.currentTarget.id;
-		qx = parseInt(qx);
-		this.state.conds[qx].val = e.currentTarget.value;
+		// let qx = e.currentTarget.id;
+		// qx = parseInt(qx);
+		// this.state.conds[qx].val = e.currentTarget.value;
+		this.state.conds[x].val = e.currentTarget.value;
 	}
 
-	onDateChange(e,index){
+	onDateChange(e, ix) {
 		e.stopPropagation();
-		//this.state.conds[index].val = e.currentTarget.value;
-		let arr = this.state.conds.map((obj,ix) => {
-			if(ix === index){
-				obj.val = e.currentTarget.value
-			}
-			return obj;
-		});
-		this.setState({conds:arr});
+
+		// let arr = this.state.conds.map((obj, ix) => {
+		// 	if(ix === index){
+		// 		obj.val = e.currentTarget.value
+		// 	}
+		// 	return obj;
+		// });
+		// this.setState({conds: arr});
+
+		console.log(this.state.conds[ix], e.currentTarget.value);
+		let obj = this.state.conds[ix];
+		this.state.conds[ix].val = e.currentTarget.value;
+	}
+
+	onSwitchChange(e, x) {
+		e.stopPropagation();
+		// let arr = this.state.conds.map((obj, ix) => {
+		// 	if(ix === x){
+		// 		obj.val = e.currentTarget.value
+		// 	}
+		// 	return obj;
+		// });
+		// this.setState({conds: arr});
+
+		this.state.conds[x].val = e.currentTarget.checked;
 	}
 
 	onCbbRefChange( refcbb ) {
@@ -277,23 +295,25 @@ class AnQueryFormComp extends CrudComp {
 					let v = cond && cond.val ? cond.val : '';
 					let label = cond && cond.label ? cond.label : "date"
 					return (
-
-						<TextField key={x}
-							//ref={refDate}
-							value = {v}
-							label={label}
-							type="date"
-							style={{ width: 300 }}
-							onChange = {event => {that.onDateChange(event,x)}}
-							InputLabelProps={{
-							shrink: true
-							}}/>
+						<TextField key={x} value = {v} label={label}
+							type="date" style={{ width: 300 }}
+							onChange = {event => {that.onDateChange(event, x)}}
+							InputLabelProps={{ shrink: true }}/>
 					)
+				}
+				else if (cond.type === "switch") {
+					let v = cond && cond.val || false;
+					return (
+						<FormControlLabel key={'sch' + x}
+					        control={ <Switch key={x} checked={v} coloer='primary'
+										onChange = {e => {that.onSwitchChange(e, x)}} /> }
+							label={cond.label} />
+					);
 				}
 				else // if (cond.type === 'text')
 					return (<TextField label={cond.label} key={'text' + x}
 						id={String(x)}
-						onChange={that.onTxtChange}/>);
+						onChange={e => {that.onTxtChange(e, x)}}/>);
 			} );
 		}
 	}

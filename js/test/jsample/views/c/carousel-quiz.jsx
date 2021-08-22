@@ -16,7 +16,8 @@ import {
 } from 'anclient';
 
 import { CenterProtocol } from "../../common/protocol.quiz.js";
-import { CarouselCard } from "./carousel-card";
+import { JQuiz } from '../../common/an-quiz.js';
+import { CarouselCard, CarouselSubmitCard } from "./carousel-card";
 
 const styles = (theme) => ( {
 	root: {
@@ -33,7 +34,7 @@ class CarouselQuizComp extends CrudCompW {
 		quiz: {
 			quizId: undefined,
 			questions: []
-		}
+		},
 	};
 
 	constructor(props) {
@@ -72,23 +73,22 @@ class CarouselQuizComp extends CrudCompW {
 
 	toSubmit(e) {
 		// save
-		let reqBd = new UserReq();
-
-		let client = this.context.anClient;
-		let req = client.userReq( this.props.uri, 'center',
-					new UserReq( this.uri, "center" )
-						.A(CenterProtocol.A.submitPoll)
-					 	.set(CenterProtocol.pollId, this.state.pollId)
-					 	.set(CenterProtocol.pollResults, this.state.quiz.questions));
-		this.state.req = req;
-
 		let that = this;
-		client.commit(req, (resp) => {
-			that.state.crud = Protocol.CRUD.u;
-			that.showOk(L('Quiz submitted!'));
-			if (typeof that.props.onOk === 'function')
-				that.props.onSubmit({pollId: this.state.pollId, resp});
-		}, this.context.error);
+		if (!this.jquiz)
+			this.jquiz = new JQuiz(this.context.anClient, this.context.error);
+
+		this.jquiz.submitPoll(
+			this.props.uri,
+			{pollId: this.state.pollId, questions: this.state.quiz.questions},
+			() => {
+				that.state.crud = Protocol.CRUD.u;
+				that.setState({submitted: true});
+				that.loadQuiz();
+				// if (typeof that.props.onOk === 'function')
+				// 	that.props.onSubmit({pollId: that.state.pollId, resp});
+			},
+			this.context.error
+		);
 	}
 
 	render() {
@@ -102,14 +102,16 @@ class CarouselQuizComp extends CrudCompW {
 			<Carousel>
 				{questionCard( {title: this.state.quiz.title},
 						this.state.quiz.questions, this.carousel)}
-				<CarouselCard key={this.state.quiz.questions.lenght || 0}
+				<CarouselSubmitCard key={this.state.quiz.questions.lenght || 0}
 					goPrev={() => carousel.slideNext()}
 					goNext={() => carousel.slideNext()}
-					quiz={{title: L('Thank you!')}}
-					question={L('Please submit!')}
-					toStart={props.goLink}
+					title={L('Almost done!')}
+					question={{ question: L('Please submit!') }}
+					submittedText={L('Thank you!')}
 					toCancel={props.onClose}
+					toClose={props.onClose}
 					toSubmit={this.toSubmit}
+					submitted={this.state.submitted}
 				/>
 			</Carousel>
 		  </Dialog>

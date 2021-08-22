@@ -169,6 +169,7 @@ export class QuizResp extends AnsonResp {
  */
 export const QuizProtocol = {
 	quizId: "quizId",
+	templName: 'templ-id',
 	questions: "questions",
 	qtitle: "qtitle",
 	quizinfo: "quizinfo",
@@ -198,8 +199,9 @@ export const QuizProtocol = {
 		rank10: 'r10',
 		multiR5: 'mr5',
 		multiR10: 'mr10'
-	}
+	},
 
+	PollDetailType: 'io.odysz.jquiz.PollDetail',
 }
 
 /**
@@ -221,13 +223,17 @@ export const QuizProtocol = {
   }
 */
 export const CenterProtocol = {
+	// Prameter names
 	pollId: "pollId",
 
 	myClasses: "classes",
 	myConnects: "connects",
 	myPolls: "polls",
+	myTaskIds: "my-taskIds",
 	pollQuestions: "questions",
 	pollResults: "poll-results",
+	pollState: "poll-state",
+	pollIssuer: "poll-issuer",
 
 	A: {
 		getClasses: "classes",
@@ -239,6 +245,13 @@ export const CenterProtocol = {
 
 	ConnectMsg: {
 		hi: "hi",
+	},
+
+	PollState: {
+		wait: "wait",
+		done: "done",
+		polling: "ping",
+		stop: "stop",
 	}
 }
 
@@ -285,7 +298,8 @@ export class CenterResp extends AnsonResp {
 
 	my () {
 		let { cols, rows } = this.polls();
-		let my = {tasks: rows.length, polls: rows};
+		let myTaskIds = this.myTaskIds();
+		let my = {tasks: myTaskIds.size, polls: rows};
 		let conns = this.connects();
 		my.connects = conns.rows;
 		return my;
@@ -297,6 +311,16 @@ export class CenterResp extends AnsonResp {
 
 		let questions = AnsonResp.rs2arr(this.data.props.questions);
 		return { poll, questions: questions.rows };
+	}
+
+	myTaskIds() {
+		let {rows, cols} = AnsonResp.rs2arr(this.data.props[CenterProtocol.myTaskIds]);
+		let res = new Set();
+		if (rows)
+			rows.forEach( (r, x) => {
+				res.add(r[cols[0]])
+			} );
+		return res;
 	}
 }
 

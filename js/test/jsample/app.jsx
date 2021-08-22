@@ -21,7 +21,8 @@ import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStatus } from './views/c/status';
-import { MyPolls } from './views/c/my-polls';
+// import { MyPolls } from './views/c/my-polls';
+import { MyPolls } from './views/c/my-polls-selection-level-up';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -94,9 +95,9 @@ class App extends React.Component {
 
 	/** For navigate to portal page */
 	logout() {
+		let that = this;
 		// leaving
 		try {
-			let that = this;
 			this.state.anClient.logout(
 				() => {
 					if (this.props.iwindow)

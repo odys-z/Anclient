@@ -85,7 +85,7 @@ class QuizEditorComp extends DetailFormW {
 		if (this.state.crud !== Protocol.CRUD.c)
 			this.jquiz.quiz(this.props.uri, this.state.quizId, this.bindQuiz, ctx.error);
 		else
-			this.jquiz.startQuiz(this.props.uri, this.bindQuiz, ctx.error);
+			this.jquiz.startQuizA(this.props.uri, this.bindQuiz, ctx.error);
 	}
 
 	bindQuiz(ansonResp) {
@@ -94,7 +94,7 @@ class QuizEditorComp extends DetailFormW {
 		let quizUsers = qresp.quizUserIds();
 		this.setState( {
 			questions: questions,
-			qtitle: title,
+			qtitle: title || L('Emotion Poll (Type A)'),
 			quizinfo: quizinfo,
 			currentqx: -1,
 			dirty: this.state.crud === Protocol.CRUD.c

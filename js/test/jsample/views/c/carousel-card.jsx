@@ -25,13 +25,13 @@ import { QuizProtocol } from '../../common/protocol.quiz.js';
  */
 const styles = (theme) => ({
   root: {
-    height: 480,
-    minWidth: 360,
-    maxWidth: 600,
+    height: 460,
+    minWidth: 520,
+    maxWidth: 720,
     align: "center",
     itemAlign: "center",
     "& :hover": {
-      backgroundColor: "#ddf"
+      backgroundColor: "#ddd"
     }
   },
   title: {
@@ -40,7 +40,7 @@ const styles = (theme) => ({
 	marginBottom: 40
   },
   content: {
-    height: 400
+    height: 360
   },
   question: {
     fontSize: 18,
@@ -58,6 +58,13 @@ const styles = (theme) => ({
     textAlign: "center",
     border: "solid 0.2ch #cce"
   },
+  submitButton: {
+    margin: 12,
+    width: "92%",
+	height: 40,
+    textAlign: "center",
+    border: "solid 0.2ch #cce"
+  },
   ranks: {
     width: "80%",
     textAlign: "left"
@@ -70,7 +77,7 @@ const styles = (theme) => ({
     verticalAlign: "bottom",
     width: "99%",
     textAlign: "center",
-    marginTop: 50
+    marginTop: 20
     // border: "solid 1px grey"
   }
 });
@@ -211,7 +218,16 @@ class CarouselCardComp extends React.Component {
 	}
 
 	render () {
+		let that = this;
 		let { classes, question, quiz, toCancel, toSubmit } = this.props;
+		// if (toSubmit)
+		// 	toSubmit = function (e) {
+		// 		question.question = L('Thank you!');
+		// 		that.props.toSubmit(e);
+		// 		toSubmit = undefined;
+		// 		that.setState({});
+		// 	};
+
 		return (
 		  <Card key={"a"} className={classes.root}>
 			<Paper className={classes.content}>
@@ -221,15 +237,17 @@ class CarouselCardComp extends React.Component {
 				<Typography variant="subtitle2" className={classes.question}>
 					{question.question}
 				</Typography>
-				<Box className={classes.answers}>
-					{this.formatAnswer(question, classes)}
-				</Box>
+				{/* { toSubmit ?
+					<Button variant="contained" color="primary"
+						className={classes.button}
+						onClick={toSubmit}>{"Submit"}</Button> */}
+					<Box className={classes.answers}>
+						{this.formatAnswer(question, classes)}
+					</Box>
 			</Paper>
 			<Box className={classes.actions}>
 			{ toCancel &&
-				<Button color="primary" onClick={toCancel}>{"Cancel"}</Button> }
-			{ toSubmit &&
-				<Button color="secondary" onClick={toSubmit}>{"Submit"}</Button> }
+				<Button color="secondary" onClick={toCancel}>{"Cancel"}</Button> }
 			</Box>
 		  </Card>
 		);
@@ -244,3 +262,65 @@ CarouselCardComp.propTypes = {
 
 const CarouselCard = withWidth()(withStyles(styles)(CarouselCardComp));
 export { CarouselCard, CarouselCardComp }
+
+class CarouselSubmitCardComp extends React.Component {
+	render () {
+		let that = this;
+		let { classes, question,
+			title, submitted, submittedText,
+			toClose, toCancel, toSubmit } = this.props;
+		if (toSubmit)
+			toSubmit = function (e) {
+				question.question = L('Thank you!');
+				that.props.toSubmit(e);
+				toSubmit = undefined;
+				that.setState({});
+			};
+
+		return (
+		  <Card key={"a"} className={classes.root}>
+			<Paper className={classes.content}>
+				<Typography variant="h4" className={classes.title}>
+					{submitted ? submittedText : title || L('Final Check')}
+				</Typography>
+				{submitted ?
+					<>
+						<Typography variant="subtitle2" className={classes.title}>
+							{submittedText}
+						</Typography>
+						<Button color="primary" variant="contained"
+							className={classes.submitButton}
+							onClick={toClose}>{L('Close')}</Button>
+					</>
+					:
+					<>
+						<Typography variant="subtitle2" className={classes.title}>
+							{question.question}
+						</Typography>
+						<Button variant="contained" color="primary"
+							className={classes.submitButton}
+							onClick={toSubmit}>{"Submit"}</Button>
+					</>
+				}
+			</Paper>
+			<Box className={classes.actions}>
+			{ !submitted &&
+				<Button color="secondary" onClick={toCancel}>{L('Cancel')}</Button> }
+			</Box>
+		  </Card>
+		);
+	}
+}
+CarouselSubmitCardComp.context = AnContext;
+
+CarouselSubmitCardComp.propTypes = {
+	submitted: PropTypes.bool,
+	submittedText: PropTypes.string.isRequired,
+	goPrev: PropTypes.func.isRequired,
+	toClose: PropTypes.func.isRequired,
+	toSubmit: PropTypes.func.isRequired,
+	toCancel: PropTypes.func.isRequired
+};
+
+const CarouselSubmitCard = withWidth()(withStyles(styles)(CarouselSubmitCardComp));
+export { CarouselSubmitCard, CarouselSubmitCardComp }

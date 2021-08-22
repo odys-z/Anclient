@@ -4,7 +4,7 @@ import {
 	Protocol, UserReq, AnsonMsg
 } from "anclient"
 
-import { QuizReq, QuizProtocol, QuizResp } from './protocol.quiz.js';
+import { QuizReq, QuizProtocol, QuizResp, CenterProtocol } from './protocol.quiz.js';
 
 export const QuestionType = {
 	single: "1",
@@ -48,14 +48,53 @@ class JQuiz {
 		return this;
 	}
 
-	/** Create a request and post back to server asking a new quiz.
+	/** Create a request and post back to server asking a new quiz, loading ind_emotion type 'A'.
 	 * port: quiz
 	 * @param { string } uri
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
 	 * @param {AnContext.error}
 	 * */
-	startQuiz(uri, onLoad, errCtx) {
-		return this.serv(uri, QuizProtocol.A.start, {}, onLoad, errCtx);
+	startQuizA(uri, onLoad, errCtx) {
+		let opt = {};
+		opt[QuizProtocol.templName] = 'A';
+		return this.serv(uri, QuizProtocol.A.start, opt, onLoad, errCtx);
+	}
+
+	/**
+	 * @param {string} uri
+	 * @param {object} pollResult
+	 * @param {string} pollResult.pollId
+	 * @param {array} pollResult.questions [{quizId, qid, pollId, ansewer}, ... ]
+	 * @param {function} onLoad
+	 * @param {AnContext.error}
+	 * */
+	submitPoll(uri, pollResult, onLoad, errCtx) {
+		let reqBd = new UserReq();
+
+		let { questions, pollId } = pollResult;
+
+		let client = this.client;
+		let req = client.userReq( uri, 'center',
+					new UserReq( uri, "center" )
+						.A(CenterProtocol.A.submitPoll)
+					 	.set(CenterProtocol.pollId, pollId)
+					 	.set(CenterProtocol.pollResults, ques2PollDetail(questions) ));
+
+		let that = this;
+		client.commit(req, onLoad, errCtx);
+
+		function ques2PollDetail (qss) {
+			let details = [];
+			if (qss)
+				qss.forEach( (q, x) => {
+					let {qid, quizId, pollId, answer} = q;
+					details.push( {
+						type: QuizProtocol.PollDetailType,
+						questId: qid,
+						quizId, pollId, answer } )
+				} );
+			return details;
+		}
 	}
 
 	/** Create a query request for loading quiz'z users.
