@@ -33,8 +33,6 @@ const styles = (theme) => ( {
 class AnTablistComp extends React.Component {
 
 	state = {
-		selected: [],
-
 		sizeOptions:[10, 25, 50],
 		total: 0,
 		page: 0,
@@ -73,10 +71,16 @@ class AnTablistComp extends React.Component {
 
 	handleClick(event, newSelct) {
 		let selected = this.state.selected;
-		if (selected.has(newSelct)) {
-			selected.delete(newSelct);
+		if (this.props.singleCheck) {
+			selected.clear();
+			selected.add(newSelct);
 		}
-		else selected.add(newSelct);
+		else {
+			if (selected.has(newSelct)) {
+				selected.delete(newSelct);
+			}
+			else selected.add(newSelct);
+		}
 
 		this.setState({selected});
 		this.updateSelectd(selected);
