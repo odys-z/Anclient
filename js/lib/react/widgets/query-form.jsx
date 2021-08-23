@@ -222,13 +222,13 @@ class AnQueryFormComp extends CrudComp {
 							className={classes.button}
 							onClick={this.toSearch}
 							startIcon={<Search />}
-						>{this.props.buttonStyle === 'norm' && L('Search')}</Button>
+						>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Search')}</Button>
 						<Button variant="contained"
 							color="primary"
 							className={classes.button}
 							onClick={this.toClear}
 							startIcon={<Replay />}
-						>{this.props.buttonStyle === 'norm' && L('Reset')}</Button>
+						>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Reset')}</Button>
 					</Grid>
 				</Grid>
 			</Collapse>

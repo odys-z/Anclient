@@ -8,6 +8,7 @@ import React from 'react';
 	import ListItemIcon from '@material-ui/core/ListItemIcon';
 	import ListItemText from '@material-ui/core/ListItemText';
 	import Collapse from '@material-ui/core/Collapse';
+	import Grid from '@material-ui/core/Grid';
 	import Add from '@material-ui/icons/Add';
 	import Edit from '@material-ui/icons/Edit';
 	import DraftsIcon from '@material-ui/icons/Drafts';
@@ -36,6 +37,9 @@ var quid = -1;
 const styles = (theme) => ({
   root: {
     width: '100%',
+  },
+  quizText: {
+	  marging: theme.spacing(1)
   },
   qtype: {
   	width: 420,
@@ -149,12 +153,14 @@ class QuizEditorComp extends DetailFormW {
 
 	editQuestion(e) {
 		let qx = this.state.currentqx;
-		let questions = this.state.questions.slice();
-		questions[qx].question = e.target.value;
-		this.setState({questions, dirty: true});
+		// let questions = this.state.questions.slice();
+		// questions[qx].question = e.target.value;
+		// this.setState({questions, dirty: true});
 
-		if (this.props.onDirty)
-			this.props.onDirty(true);
+		// if (this.props.onDirty)
+		// 	this.props.onDirty(true);
+
+		this.state.questions[qx].question = e.target.value;
 	}
 
 	editAnswer(e) {
@@ -175,7 +181,7 @@ class QuizEditorComp extends DetailFormW {
 		questions.push({
 			qid: qx, // drop by server semantics
 			question: 'Question ' + qx,
-			answers: 'A. \nB. \nC. \nD. ',
+			answers: '*A. \nB. \nC. \nD. ',
 			qtype: QuizProtocol.Qtype.single,
 			answer: "0"
 		});
@@ -240,7 +246,6 @@ class QuizEditorComp extends DetailFormW {
 				  <ListItem button className={ classes.nested }>
 					<ListItemIcon><StarBorder /></ListItemIcon>
 					<ListItemText primary={L('Question Type')} />
-					{/* <TextField id="outlined-basic" label="Outlined" variant="outlined" className={classes.qtype} /> */}
 					<Box className={classes.qtype} >
 					<DatasetCombo uri={this.props.uri}
 						val={this.state.questions[x].qtype || 's'}
@@ -248,6 +253,9 @@ class QuizEditorComp extends DetailFormW {
 						label={L('Question Type')}
 						onSelect={ (v) => {
 							that.state.questions[x].qtype = v.v;
+							if ( ( v.v === QuizProtocol.Qtype.single || v.v === QuizProtocol.Qtype.multiple )
+								&& !that.state.questions[x].answers )
+								that.state.questions[x].answers = "*A. \nB. \nC. \nD.";
 							that.setState({dirty: true});
 						}}
 					/>
@@ -257,7 +265,7 @@ class QuizEditorComp extends DetailFormW {
 
 				<TextField id="qtext" label="Question"
 				  variant="outlined" color="primary"
-				  multiline fullWidth={true} value={q.questions}
+				  multiline fullWidth={true} value={q.question || q.title}
 				  onChange={this.editQuestion} />
 
 				<TextField id="answers" label="Answers (* correct)"
@@ -292,20 +300,41 @@ class QuizEditorComp extends DetailFormW {
 					<Button variant="contained"
 						className={classes.button} onClick={this.toSetPollUsers}
 						endIcon={<Edit />}
-					>{L('Edit')}</Button>
+					>{L('Change Target Users')}</Button>
 				</ListItem>
 				<Collapse in={this.state.openHead} timeout="auto" >
-					<TextField id="qtitle" label={L("Title")}
+
+					<Grid container>
+					<Grid item md={3} sm={6} className={classes.quizText} >
+					<TextField id="qtitle" label={L("Subject")}
 					  variant="outlined" color="primary"
-					  multiline fullWidth={true}
-					  onChange={e => this.setState({qtitle: e.currentTarget.value})}
+					  onChange={e => this.setState({subject: e.currentTarget.value})}
 					  value={title} />
 
+					</Grid>
+					<Grid item md={3} sm={6} className={classes.quizText} >
+					<TextField id="qtag" label={L("Tags")}
+					  variant="outlined" color="primary"
+					  onChange={e => this.setState({tags: e.currentTarget.value})}
+					  value={title} />
+
+					</Grid>
+					<Grid item md={5} sm={12} className={classes.quizText} >
+					<TextField id="qtitle" label={L("Title")}
+					  variant="outlined" color="primary"
+					  multiline
+					  onChange={e => this.setState({qtitle: e.currentTarget.value})}
+					  value={title} />
+					</Grid>
+
+					</Grid>
+					<Grid item md={12} className={classes.quizText} >
 					<TextField id="quizinfo" label={L("Quiz Description")}
 					  variant="outlined" color="secondary"
 					  multiline fullWidth={true}
 					  onChange={e => this.setState({quizinfo: e.currentTarget.value})}
 					  value={this.state.quizinfo} />
+					</Grid>
 				</Collapse>
 
 				{this.items(classes)}

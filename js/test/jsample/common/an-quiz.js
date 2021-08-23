@@ -6,10 +6,10 @@ import {
 
 import { QuizReq, QuizProtocol, QuizResp, CenterProtocol } from './protocol.quiz.js';
 
-export const QuestionType = {
-	single: "1",
-	multiple: "x"
-}
+// export const QuestionType = {
+// 	single: "1",
+// 	multiple: "x"
+// }
 
 export
 /** Helper handling protocol / data type of quiz.serv */
@@ -196,7 +196,7 @@ class JQuiz {
 			if (a.trim().startsWith("\*"))
 				correct.push(String(x))
 		});
-		return {qtype: correct.length <= 1 ? QuestionType.single : QuestionType.multiple,
+		return {qtype: correct.length == 1 ? QuizProtocol.Qtype.single : QuizProtocol.Qtype.multiple,
 				correct: correct.join(',')};
 	}
 
