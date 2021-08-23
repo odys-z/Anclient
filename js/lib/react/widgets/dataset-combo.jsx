@@ -77,7 +77,7 @@ class DatasetCombo extends React.Component {
 
 			if (typeof _that.props.onSelect === 'function')
 				_that.props.onSelect(selectedItem);
-				
+
 			_that.setState({selectedItem});
 		};
 	}
@@ -98,8 +98,6 @@ class DatasetCombo extends React.Component {
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
 		return (<Autocomplete
-			// key={sk + this.state.uid}
-			// id={String(x)} name={String(x)}
 			ref={refcbb}
 			onChange={ this.onCbbRefChange(refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }

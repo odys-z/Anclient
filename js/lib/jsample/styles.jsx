@@ -70,7 +70,11 @@ export const JsampleTheme = responsiveFontSizes(createTheme({
         lg: 1280,
         xl: 1920
       }
+    },
+    tip: {
+        color: '#0c0'
     }
+
 }));
 
 JsampleTheme.typography.body2 = {

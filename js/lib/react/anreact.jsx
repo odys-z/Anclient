@@ -20,42 +20,48 @@ export class AnReact {
 		this.err = errCtx;
 	}
 
-	insert(quiz, onOk) {
-		throw new Error("Why here?");
-		// let that = this;
-		// let date = new Date();
-		// this.client.usrAct('quiz', QuizProtocol.A.insert, Protocol.CRUD.c, quiz.qtitle);
-		//
-		// let props = {}
-		// props[QuizProtocol.qtitle] = quiz.qtitle;
-		// props[QuizProtocol.qowner] = this.client.ssInf.uid;
-		// props[QuizProtocol.dcreate] = `${date.toISOString()}`;
-		// props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		// props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
-		//
-		// let req = this.client.userReq(quizUri, JQuiz.port,
-		// 	new UserReq( quizUri, "quizzes", props ).A(QuizProtocol.A.insert) );
-		//
-		// this.client.an.post(req, onOk, (c, resp) => {
-		// 	if (that.err) {
-		// 		that.err.code = c;
-		// 		that.err.msg = resp.Body().msg();
-		// 		that.err.onError(true);
-		// 	}
-		// 	else console.error(c, resp);
-		// });
-	}
+	// insert(quiz, onOk) {
+	// 	throw new Error("Why here?");
+	// 	// let that = this;
+	// 	// let date = new Date();
+	// 	// this.client.usrAct('quiz', QuizProtocol.A.insert, Protocol.CRUD.c, quiz.qtitle);
+	// 	//
+	// 	// let props = {}
+	// 	// props[QuizProtocol.qtitle] = quiz.qtitle;
+	// 	// props[QuizProtocol.qowner] = this.client.ssInf.uid;
+	// 	// props[QuizProtocol.dcreate] = `${date.toISOString()}`;
+	// 	// props[QuizProtocol.quizinfo] = quiz.quizinfo;
+	// 	// props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
+	// 	//
+	// 	// let req = this.client.userReq(quizUri, JQuiz.port,
+	// 	// 	new UserReq( quizUri, "quizzes", props ).A(QuizProtocol.A.insert) );
+	// 	//
+	// 	// this.client.an.post(req, onOk, (c, resp) => {
+	// 	// 	if (that.err) {
+	// 	// 		that.err.code = c;
+	// 	// 		that.err.msg = resp.Body().msg();
+	// 	// 		that.err.onError(true);
+	// 	// 	}
+	// 	// 	else console.error(c, resp);
+	// 	// });
+	// }
 
-	update(rec, onOk) {
-		throw new Error('don\'t use this - a stub for future extension');
-	}
+	// update(rec, onOk) {
+	// 	throw new Error('don\'t use this - a stub for future extension');
+	// }
 
 	bindTablist(req, comp, errCtx) {
 		this.client.commit(req, (qrsp) => {
-			let rs = qrsp.Body().Rs();
-			let {rows} = AnsonResp.rs2arr( rs );
-			comp.state.pageInf.total = rs.total;
-			comp.setState({rows});
+			if (req.onLoad)
+				req.onLoad(qresp);
+			else if (req.onOk)
+				req.onLoad(qresp);
+			else {
+				let rs = qrsp.Body().Rs();
+				let {rows} = AnsonResp.rs2arr( rs );
+				comp.state.pageInf.total = rs.total;
+				comp.setState({rows});
+			}
 		}, errCtx.onError );
 	}
 
@@ -286,7 +292,7 @@ export class AnReactExt extends AnReact {
 	 * <h6>About React Rendering Events</h6>
 	 * This method will update opts.cond.loading and clean.
 	 * When success, set loading false, clean true. this 2 flags are helper for
-	 * handling react rendering / data-loading events asynchronously. 
+	 * handling react rendering / data-loading events asynchronously.
 	 *
 	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *

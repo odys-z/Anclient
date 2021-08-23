@@ -2,6 +2,8 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
+import PropTypes from "prop-types";
+
 import Button from "@material-ui/core/Button";
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -105,6 +107,10 @@ class QuizUserFormComp extends CrudCompW {
 	}
 }
 QuizUserFormComp.contextType = AnContext;
+
+QuizUserFormComp.propTypes = {
+	uri: PropTypes.string.isRequired,
+}
 
 const QuizUserForm = withWidth()(withStyles(styles)(QuizUserFormComp));
 export { QuizUserForm, QuizUserFormComp }

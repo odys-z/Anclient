@@ -222,13 +222,13 @@ class AnQueryFormComp extends CrudComp {
 							className={classes.button}
 							onClick={this.toSearch}
 							startIcon={<Search />}
-						>{L('Search')}</Button>
+						>{this.props.buttonStyle === 'norm' && L('Search')}</Button>
 						<Button variant="contained"
 							color="primary"
 							className={classes.button}
 							onClick={this.toClear}
 							startIcon={<Replay />}
-						>{L('Reset')}</Button>
+						>{this.props.buttonStyle === 'norm' && L('Reset')}</Button>
 					</Grid>
 				</Grid>
 			</Collapse>
@@ -321,10 +321,13 @@ AnQueryFormComp.contextType = AnContext;
 AnQueryFormComp.propTypes = {
 	/* TODO: DOCS
 	 * Design Notes:
-	 * All common widgets need this check, but main CURD page's uri is been set
+	 * All common widgets need this check, but main CRUD page's uri is been set
 	 * by SysComp.
 	 */
-	uri: PropTypes.string.isRequired
+	uri: PropTypes.string.isRequired,
+	conds: PropTypes.array.isRequired,
+	onSearch: PropTypes.func.isRequired,
+	buttonStyle: PropTypes.oneOf(["norm", "dense"])
 };
 
 const AnQueryForm = withStyles(styles)(AnQueryFormComp);

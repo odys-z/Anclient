@@ -1,6 +1,8 @@
-// import { Protocol, AnsonResp } from 'anclient';
 // NOTE for test, user this:
 import { Protocol, AnsonResp } from '../../../lib/protocol.js';
+import { L } from '../../../lib/utils/langstr.js';
+// import { Protocol, AnsonResp } from 'anclient';
+// import { L } from 'anclient';
 
 /** North protocol is absencing coz "/n" module uses another way - deprecated
 const NorthProtocol {}
@@ -165,6 +167,7 @@ export class QuizResp extends AnsonResp {
  	public static final String update = "update";
  	public static final String poll = "poll";
  	public static final String quizUsers = "quizUsers";
+	public static final String deleteq = "del";
  }
  */
 export const QuizProtocol = {
@@ -188,6 +191,7 @@ export const QuizProtocol = {
 
 		poll: 'poll',     // submit poll results
 		quizUsers: 'quizUsers', // load quiz's users
+		deleteq: "delq",
 	},
 
 	Qtype: {
@@ -198,7 +202,20 @@ export const QuizProtocol = {
 		rank5: 'r5',
 		rank10: 'r10',
 		multiR5: 'mr5',
-		multiR10: 'mr10'
+		multiR10: 'mr10',
+
+		options: () => {
+			return [
+				{n: L('Single Option'),  v: 's'},
+				{n: L('Multiple Check'), v: 'm'},
+				{n: L('Free Text'),      v: 't'},
+				{n: L('Number Only'),    v: 'n'},
+				{n: L('5 Stars'),        v: 'r5'},
+				{n: L('10 Stars'),       v: 'r10'},
+				{n: L('Multi-5 Stars'),  v: 'mr5'},
+				{n: L('Multi-10 Stars'), v: 'mr10'}
+			]
+		}
 	},
 
 	PollDetailType: 'io.odysz.jquiz.PollDetail',
@@ -305,6 +322,7 @@ export class CenterResp extends AnsonResp {
 		return my;
 	}
 
+	/**convert response's data.props.polls to quiz' questions */
 	carouselQuiz() {
 		let {rows, cols} = AnsonResp.rs2arr(this.data.props.polls);
 		let poll = rows[0];
@@ -313,6 +331,7 @@ export class CenterResp extends AnsonResp {
 		return { poll, questions: questions.rows };
 	}
 
+	/**convert response's data.props.myTaskIds to set */
 	myTaskIds() {
 		let {rows, cols} = AnsonResp.rs2arr(this.data.props[CenterProtocol.myTaskIds]);
 		let res = new Set();

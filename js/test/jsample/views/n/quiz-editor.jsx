@@ -22,6 +22,7 @@ import React from 'react';
 	import Checkbox from '@material-ui/core/Checkbox';
 	import TextField from '@material-ui/core/TextField';
 	import Button from '@material-ui/core/Button';
+	import Box from '@material-ui/core/Box';
 
 import { L, Protocol, AnsonMsg, AnsonResp,
 	AnContext, DetailFormW, ConfirmDialog, DatasetCombo
@@ -35,6 +36,10 @@ var quid = -1;
 const styles = (theme) => ({
   root: {
     width: '100%',
+  },
+  qtype: {
+  	width: 420,
+	minWidth: 360,
   }
 });
 
@@ -63,7 +68,7 @@ class QuizEditorComp extends DetailFormW {
 		super(props);
 
 		this.state.crud = props.c ? Protocol.CRUD.c
-						: props.u ? Protocol.CURD.u
+						: props.u ? Protocol.CRUD.u
 						: Protocol.CRUD.r;
 
 		this.state.quizId = props.quizId;
@@ -92,12 +97,14 @@ class QuizEditorComp extends DetailFormW {
 		let qresp = new QuizResp(ansonResp.body);
 		let {title, quizId, quizinfo, questions} = qresp.questions();
 		let quizUsers = qresp.quizUserIds();
+		console.log(quizUsers);
 		this.setState( {
 			questions: questions,
-			qtitle: title || L('Emotion Poll (Type A)'),
-			quizinfo: quizinfo,
+			qtitle:    title || L('Emotion Poll (Type A)'),
+			quizinfo,
+			quizUsers,
 			currentqx: -1,
-			dirty: this.state.crud === Protocol.CRUD.c
+			dirty:     this.state.crud === Protocol.CRUD.c
 		} );
 
 		if (this.props.onDirty)
@@ -231,20 +238,20 @@ class QuizEditorComp extends DetailFormW {
 			<Collapse in={this.state.currentqx == x} timeout="auto" >
 				<List component="div">
 				  <ListItem button className={ classes.nested }>
-				    <ListItemIcon><StarBorder /></ListItemIcon>
-				    <ListItemText primary="Option..." />
-							<DatasetCombo uri={this.props.uri}
-								options={[
-									{n: L('Single Opt'), v: 's'},
-									{n: L('Multiple'), v: 'm'},
-									{n: L('Text'), v: 't'} ]}
-								label={L('Question Type')}
-								onSelect={ (v) => {
-									// rec[f.field] = v.v;
-									that.state.questions[x].qtype = v.v;
-									that.setState({dirty: true});
-								}}
-							/>
+					<ListItemIcon><StarBorder /></ListItemIcon>
+					<ListItemText primary={L('Question Type')} />
+					{/* <TextField id="outlined-basic" label="Outlined" variant="outlined" className={classes.qtype} /> */}
+					<Box className={classes.qtype} >
+					<DatasetCombo uri={this.props.uri}
+						val={this.state.questions[x].qtype || 's'}
+						options={QuizProtocol.Qtype.options()}
+						label={L('Question Type')}
+						onSelect={ (v) => {
+							that.state.questions[x].qtype = v.v;
+							that.setState({dirty: true});
+						}}
+					/>
+					</Box>
 				  </ListItem>
 				</List>
 
@@ -281,8 +288,6 @@ class QuizEditorComp extends DetailFormW {
 				<ListItem key='qzA' button onClick={e => this.setState({openHead: !this.state.openHead})}>
 					<ListItemIcon><SendIcon /></ListItemIcon>
 					<ListItemText primary={L('Editing Quiz')} />
-					{/* <ListItemIcon onClick={this.toSetPollUsers} ><Edit /></ListItemIcon>
-					<ListItemText primary={this.state.pollUsersText} onClick={this.toSetPollUsers} /> */}
 					<ListItemText primary={aboutPollUsers(this.state.quizUsers)} />
 					<Button variant="contained"
 						className={classes.button} onClick={this.toSetPollUsers}

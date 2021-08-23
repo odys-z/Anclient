@@ -29,6 +29,7 @@ class QuizFormComp extends DetailFormW {
 	};
 
 	componentDidMount() {
+		console.log(this.props.uri);
 	}
 
 	constructor (props) {

@@ -5,12 +5,15 @@ import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography, Grid, Button } from '@material-ui/core';
 
 import {
-    AnClient, SessionClient, Protocol, L, Langstrs,
-    AnContext, AnError, CrudCompW, AnReactExt, AnQueryForm, AnTablist, jsample
+    L, Langstrs,
+    AnClient, SessionClient, Protocol, UserReq,
+    AnContext, AnError, CrudCompW, AnReactExt,
+	AnQueryForm, AnTablist, ConfirmDialog, jsample
 } from 'anclient';
 
 const { JsampleIcons } = jsample;
 
+import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { QuizForm } from './quiz-form';
 
 const styles = (theme) => ( {
@@ -51,6 +54,7 @@ class QuizzesComp extends CrudCompW {
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
 		this.toDel = this.toDel.bind(this);
+		this.del = this.del.bind(this);
 	}
 
 	componentDidMount() {
@@ -61,8 +65,21 @@ class QuizzesComp extends CrudCompW {
 	/** Deprecation jquiz.list() ?
 	 */
 	toSearch(e, query) {
+
 		let pageInf = this.state.pageInf;
-		let queryReq = this.context.anClient.query(this.uri, 'quizzes', 'q', pageInf)
+
+		let queryReq = QuizzesComp.buildReq(this.context.anClient, this.uri, query, pageInf);
+		this.state.queryReq = queryReq;
+
+		this.context.anReact.bindTablist(queryReq, this, this.context.error);
+
+		this.state.selectedRecIds.splice(0);
+	}
+
+	/** Both this & QuizUserStartComp use this function - let's change to server side later.
+	 */
+	static buildReq(client, uri, query, pageInf) {
+		let queryReq = client.query(uri, 'quizzes', 'q', pageInf)
 		let req = queryReq.Body()
 			.expr('q.qid').expr('q.title').expr('tags').expr('dcreate')
 			.expr('count(ifnull(pId, 0))', 'polls')
@@ -79,11 +96,7 @@ class QuizzesComp extends CrudCompW {
 		if (query && query.qdate)
 			req.whereCond('>=', 'q.dcreate', `'${query.qdate}'`);
 
-		this.state.queryReq = queryReq;
-
-		this.context.anReact.bindTablist(queryReq, this, this.context.error);
-
-		this.state.selectedRecIds.splice(0);
+		return queryReq;
 	}
 
 	onPageInf(page, size) {
@@ -116,22 +129,30 @@ class QuizzesComp extends CrudCompW {
 			(<ConfirmDialog open={true}
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
-				onOk={ () => {
-						del(that.state.selectedRecIds);
-				 	}
-				}
+				onOk={ () => { this.del(that.state.selectedRecIds[0]); } }
 				onClose={ () => {that.confirm === undefined} }
 			/>);
+	}
 
-		function del(ids) {
-			let req = that.context.anClient
-				.usrAct('n/quizzes', Protocol.CRUD.d, 'delete')
-				.deleteMulti(this.uri, 'quizzes', 'qid', ids);
+	del(qid) {
+		let client = this.context.anClient;
+		let req = client.userReq( this.uri, 'quiz',
+					new UserReq( this.uri, "quiz" )
+					.A(QuizProtocol.A.deleteq) );
 
-			that.context.anClient.commit(req, (resp) => {
-				that.toSearch();
-			}, that.context.error);
-		}
+		let reqBd = req.Body();
+		reqBd.set(QuizProtocol.quizId, qid);
+
+		let that = this;
+		client.commit(req,
+			(resp) => { that.confirm =
+				(<ConfirmDialog open={true}
+					ok={L('OK')} cancel={false}
+					title={L('Info')} msg={L('Quiz Deleted.')}
+					onOk={ () => { that.confirm = undefined; } }
+				/>);
+			},
+			this.context.error);
 	}
 
 	toAdd(e, v) {
@@ -178,13 +199,16 @@ class QuizzesComp extends CrudCompW {
 				}} }
 			/>
 
+			<Typography className={classes.tip} color='primary' >
+				Tip: A quiz is initialized from indicators configuraton.
+			</Typography>
 			<Grid container alignContent="flex-end" >
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAdd}
 					startIcon={<JsampleIcons.Add />}
 				>{L('Start Quiz')}</Button>
 				<Button variant="contained" disabled={!btn.stop}
-					className={classes.button} onClick={this.toStop}
+					className={classes.button} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Edit />}
 				>{L('Edit Quiz')}</Button>
 				<Button variant="contained" disabled={!btn.del}
@@ -196,13 +220,13 @@ class QuizzesComp extends CrudCompW {
 			<AnTablist
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
-					{ text: L('qid'), hide: 1, field: "qid" },
-					{ text: L('Titel'),        field: "title", color: 'primary', className: 'bold'},
-					{ text: L('Tags'),         field: "tags", color: 'primary' },
-					{ text: L('Subject'),      field: "subject", color: 'primary' },
-					{ text: L('Date Created'), field: "dcreate", color: 'primary'},
-					{ text: L('Questions'),    field: "questions", color: 'primary'},
-					{ text: L('Polls'),        field: "polls", color: 'primary'}
+					{ text: L('qid'), hide: 1,   field: "qid" },
+					{ text: L('Title'),          field: "title",     color: 'primary', className: 'bold' },
+					{ text: L('Tags'),           field: "tags",      color: 'primary' },
+					{ text: L('Subject'),        field: "subject",   color: 'primary' },
+					{ text: L('Date Created'),   field: "dcreate",   color: 'primary', formatter: d => d && d.substring(0, 10) },
+					{ text: L('Total Q'),field: "questions", color: 'primary' },
+					{ text: L('Polls'),          field: "polls",     color: 'primary' }
 				]}
 				rows={this.state.rows}
 				pageInf={this.state.pageInf}

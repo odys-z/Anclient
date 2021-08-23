@@ -187,7 +187,8 @@ describe('case: [05 Protocol.CenterResp]', () => {
 
 		let status = new AnsonMsg(myStatusResp).Body();
 		let my = status.my();
-		assert.equal(my.tasks, 1, "1 ---");
+		assert.equal(my.tasks, 0, "waiting polls returned by jserv");
+		assert.equal(my.polls.length, 1, "polls' list");
 
 		assert.equal(my.polls[0].qid, "000007", "1 ---");
 	});

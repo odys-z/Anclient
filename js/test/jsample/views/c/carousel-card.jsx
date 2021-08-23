@@ -171,7 +171,7 @@ class CarouselCardComp extends React.Component {
 		else
 			ranks = r;
 		return ranks.map( (v, x) => (
-		  <div className={classes.ranks} key={"r5-10" + v + "." + x} >
+		  <div className={classes.ranks} key={x} >
 			<Box component="fieldset" ml={9} mt={1} mb={1}
 				borderColor="transparent" >
 				<Rating name="size-large"
@@ -217,14 +217,6 @@ class CarouselCardComp extends React.Component {
 	render () {
 		let that = this;
 		let { classes, question, quiz, toCancel, toSubmit } = this.props;
-		// if (toSubmit)
-		// 	toSubmit = function (e) {
-		// 		question.question = L('Thank you!');
-		// 		that.props.toSubmit(e);
-		// 		toSubmit = undefined;
-		// 		that.setState({});
-		// 	};
-
 		return (
 		  <Card key={"a"} className={classes.root}>
 			<Paper className={classes.content}>
@@ -234,10 +226,6 @@ class CarouselCardComp extends React.Component {
 				<Typography variant="subtitle2" className={classes.question}>
 					{question.question}
 				</Typography>
-				{/* { toSubmit ?
-					<Button variant="contained" color="primary"
-						className={classes.button}
-						onClick={toSubmit}>{"Submit"}</Button> */}
 					<Box className={classes.answers}>
 						{this.formatAnswer(question, classes)}
 					</Box>

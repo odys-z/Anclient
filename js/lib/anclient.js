@@ -194,6 +194,7 @@ class AnClient {
             async: async,
 			//xhrFields: { withCredentials: true },
 			data: JSON.stringify(jreq),
+			timeout: jreq.timeout || 6000,
 			success: function (resp) {
 				// response Content-Type = application/json;charset=UTF-8
 				if (typeof resp === 'string') {

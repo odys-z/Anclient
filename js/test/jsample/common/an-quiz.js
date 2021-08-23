@@ -83,6 +83,9 @@ class JQuiz {
 		let that = this;
 		client.commit(req, onLoad, errCtx);
 
+		/** Convert quiz' questions to java PollDetail
+		 * @param {array} qss
+		 * @return {array} [PollDetail]*/
 		function ques2PollDetail (qss) {
 			let details = [];
 			if (qss)
@@ -159,7 +162,7 @@ class JQuiz {
 		this.client.commit(req, onOk, errCtx);
 	}
 
-	/**
+	/**Update a quiz (intanced indicators)
 	 * @param {string} uri
 	 * @param {object} quiz {qtitle, questions, quizifno}
 	 * @param {function} onOk

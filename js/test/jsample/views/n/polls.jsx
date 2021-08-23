@@ -28,11 +28,6 @@ class PollsComp extends CrudCompW {
 					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem ],
 					label: L('My Students') },
-
-		// active buttons
-		// buttons: { add: true, edit: false, del: false},
-
-		total: 0,
 		pageInf: { page: 0, size: 25, total: 0 },
 		selectedRecIds: [],
 	};
@@ -52,7 +47,6 @@ class PollsComp extends CrudCompW {
 
 	componentDidMount() {
 		console.log(this.uri);
-		debugger
 	}
 
 	toSearch(e, query) {

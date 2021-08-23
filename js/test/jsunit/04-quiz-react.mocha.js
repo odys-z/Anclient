@@ -3,6 +3,8 @@ import { Protocol, AnsonMsg, AnsonResp } from '../../lib/protocol.js'
 // import { QuizResp, QuizReq } from '../../../examples/example.js/lib/protocol.quiz.js'
 import { QuizResp, QuizReq } from '../jsample/common/protocol.quiz.js'
 
+var __TESTING__ = true;
+
 const jsonQuestionsInReq = [
     { "qid": 0, "question": "/sys/domain", "answers": "A. 1\nB. 5", "qtype": "s", "qorder": "1", "shortDesc": null, "extra": null },
     { "qid": 0, "question": "/sys/roles", "answers": "A\nB\nC", "qtype": "s", "qorder": "2", "shortDesc": null, "extra": null },
