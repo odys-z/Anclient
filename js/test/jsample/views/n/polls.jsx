@@ -50,8 +50,8 @@ class PollsComp extends CrudCompW {
 		this.onPageInf = this.onPageInf.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
 
-		this.toStart = this.toStart.bind(this);
-		this.toEdit = this.toEdit.bind(this);
+		// this.toStart = this.toStart.bind(this);
+		// this.toEdit = this.toEdit.bind(this);
 		this.toStop = this.toStop.bind(this);
 	}
 
@@ -64,12 +64,13 @@ class PollsComp extends CrudCompW {
 		let pageInf = this.state.pageInf;
 		let queryReq = this.context.anClient.query(this.uri, 'polls', 'p', pageInf)
 		let req = queryReq.Body()
-			.expr('qz.qid', 'qid').expr('title', 'pollName')
-			.expr('count(userId)', 'progress')
-			.expr('state').expr('pubTime')
+			.expr('max(pid)', 'pid')
+			.expr('qz.qid', 'qid').expr('title')
+			.expr('count(userId)', 'users')
+			.expr('state').expr('subject', 'subject')
 			.j('quizzes', 'qz', 'qz.qid=p.quizId')
-			.groupby('qz.qid')
-			.orderby('qz.pubTime', 'desc');
+			.groupby('qz.qid').groupby('p.state')
+			.orderby('qz.qid', 'desc');
 
 		if (query && query.tag)
 			req.whereCond('%s', 'q.tags', `'${query.tag}'`);
@@ -112,34 +113,37 @@ class PollsComp extends CrudCompW {
 		this.jquiz.pollsUsers(this.uri,
 			{pollIds: this.state.selectedRecIds},
 			( (users) => {
+				console.log(users);
 				let txt = L('Totally {count} polls, {users} users will be updated. Are you sure?',
 							{ count: that.state.selectedRecIds.length,
-							  users: that.state.selectedRecIds.length });
+							  users: users.Body().msg() });
 				that.confirm =
 					(<ConfirmDialog open={true}
 						ok={L('OK')} cancel={true}
 						title={L('Info')} msg={txt}
 						onOk={ () => {
-								that.jquiz.stopolls([...that.state.selectedRecIds]); // make sure it's an array
+								that.jquiz.stopolls(this.uri, [...that.state.selectedRecIds],
+									( rsp => { that.confirm = undefined; } )); // make sure it's an array
 						 	}
 						}
 						onClose={ () => {that.confirm === undefined} }
 					/>);
+				that.setState( {} );
 			}) );
 	}
 
-	toStart(e, v) {
-		this.roleForm = (<RoleDetails c uri={this.uri}
-			onOk={(r) => console.log(r)}
-			onClose={this.closeDetails} />);
-	}
+	// toStart(e, v) {
+	// 	this.roleForm = (<RoleDetails c uri={this.uri}
+	// 		onOk={(r) => console.log(r)}
+	// 		onClose={this.closeDetails} />);
+	// }
 
-	toEdit(e, v) {
-		this.roleForm = (<RoleDetails u uri={this.uri}
-			roleId={this.state.selectedRecIds[0]}
-			onOk={(r) => console.log(r)}
-			onClose={this.closeDetails} />);
-	}
+	// toEdit(e, v) {
+	// 	this.roleForm = (<RoleDetails u uri={this.uri}
+	// 		roleId={this.state.selectedRecIds[0]}
+	// 		onOk={(r) => console.log(r)}
+	// 		onClose={this.closeDetails} />);
+	// }
 
 	closeDetails() {
 		this.roleForm = undefined;
@@ -164,30 +168,31 @@ class PollsComp extends CrudCompW {
 			/>
 
 			<Grid container alignContent="flex-end" >
+				<Button variant="contained" disabled={!btn.stop}
+					className={classes.crudButton} onClick={this.toStop}
+					startIcon={<JsampleIcons.DetailPanel />}
+				>{L('Stop Poll')}</Button>
+				{/*
 				<Button variant="contained" disabled={!btn.start}
 					className={classes.crudButton} onClick={this.toStart}
 					startIcon={<JsampleIcons.Add />}
 				>{L('Start Poll')}</Button>
-				<Button variant="contained" disabled={!btn.stop}
-					className={classes.crudButton} onClick={this.toStop}
-					startIcon={<JsampleIcons.Edit />}
-				>{L('Stop Poll')}</Button>
 				<Button variant="contained" disabled={!btn.edit}
 					className={classes.crudButton} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Delete />}
-				>{L('Setup Users')}</Button>
+				>{L('Setup Users')}</Button>*/}
 			</Grid>
 
 			<AnTablist
-				className={classes.root} checkbox= {true} pk= "qid"
+				className={classes.root} checkbox= {true} pk= "pid"
 				columns={[
-					{ text: L('quiz event'),field: "qid", hide:true },
-					{ text: L('Poll Name'), field: "pollName", color: 'primary', className: 'bold'},
-					{ text: L('Progress'), field: "progress", color: 'primary' },
-					{ text: L('Status'), field: "status", color: 'primary' },
-					{ text: L('Start'), field: "start", color: 'primary' }
+					{ text: L('quiz event'),field: "pid",    hide:true },
+					{ text: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
+					{ text: L('Users' ),    field: "users",  color: 'primary' },
+					{ text: L('Status'),    field: "state",  color: 'primary' },
+					{ text: L('Subject'),   field: "subject",color: 'primary' }
 				]}
-				rows={this.state.rows} pk='qid'
+				rows={this.state.rows}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}

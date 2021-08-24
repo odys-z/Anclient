@@ -1,6 +1,8 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
+import PropTypes from "prop-types";
+
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import Dialog from '@material-ui/core/Dialog';
@@ -9,7 +11,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { L, AnContext, DetailFormW, DatasetCombo } from 'anclient';
+import { L, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from 'anclient';
+import { JQuiz } from '../../common/an-quiz.js';
 import { QuizEditor } from './quiz-editor';
 
 const styles = (theme) => ({
@@ -28,18 +31,24 @@ class QuizFormComp extends DetailFormW {
 		dirty: false,
 	};
 
-	componentDidMount() {
-		console.log(this.props.uri);
-	}
-
 	constructor (props) {
 		super(props);
+		this.editorHook = {state: undefined};
 
 		this.state.creating = props.creating;
 
-		this.onOk = this.onOk.bind(this);
+		this.toSave = this.toSave.bind(this);
 		this.onCancel = this.onCancel.bind(this);
 		this.onDirty = this.onDirty.bind(this);
+
+		this.toSave = this.toSave.bind(this);
+		this.alert = this.alert.bind(this);
+	}
+
+	componentDidMount() {
+		console.log(this.props.uri);
+		let ctx = this.context;
+		this.jquiz = new JQuiz(ctx.anClient, ctx.error);
 	}
 
 	onCancel(e) {
@@ -48,11 +57,44 @@ class QuizFormComp extends DetailFormW {
 			this.props.onCancel(e.currentTarget);
 	};
 
-	onOk(e) {
+	alert(msg) {
+		let that = this;
+		this.confirm = (
+			<ConfirmDialog title={L('Info')}
+				ok={L('Ok')} cancel={false}
+				onClose={() => {that.confirm = undefined;} }
+				msg={msg} />);
+	}
+
+	toSave(e) {
 		e.stopPropagation();
 		this.setState({closed: true});
-		if (typeof this.props.onOk === 'function')
-			this.props.onOk({quizId: this.state.quizId});
+		let state = this.editorHook.state;
+		let that = this;
+
+		if (!state.quizId) {
+			this.jquiz.insert(this.props.uri, state,
+				(resp) => {
+					let {quizId, title} = JQuiz.parseResp(resp);
+					state.quizId = quizId;
+					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
+
+					if (typeof that.props.onOk === 'function')
+						that.props.onOk({quizId: this.state.quizId});
+					that.setState({});
+				});
+		}
+		else {
+			this.jquiz.update(this.props.uri, state, (resp) => {
+				let {questions} = JQuiz.parseResp(resp);
+				that.alert(L("Quiz saved!\n\nQuestions number: {questions}", {questions}));
+
+				if (typeof that.props.onOk === 'function')
+					that.props.onOk({quizId: this.state.quizId});
+				that.setState({});
+			});
+		}
+
 	}
 
 	onDirty(dirty) {
@@ -66,7 +108,7 @@ class QuizFormComp extends DetailFormW {
 		let msg = props.msg;
 		let displayCancel = props.cancel === false ? 'none' : 'block';
 		let txtCancel = props.cancel === 'string' ? props.cancel : L('Close');
-		let txtOk = props.ok || props.OK ? props.ok || props.OK : L('OK');
+		let txtSave = L('Save');
 
 		return (
 			<Dialog
@@ -79,7 +121,7 @@ class QuizFormComp extends DetailFormW {
 
 				<DialogTitle id="alert-dialog-title"></DialogTitle>
 				<DialogContent>
-				  <QuizEditor uri={this.props.uri} {...props}
+				  <QuizEditor uri={this.props.uri} stateHook={this.editorHook} {...props}
 						title={title}
 						quizId={props.quizId}
 						creating={this.state.creating}
@@ -87,8 +129,8 @@ class QuizFormComp extends DetailFormW {
 						onDirty={this.onDirty} />
 				</DialogContent>
 				<DialogActions>
-				  <Button onClick={this.onOk} disabled={this.state.dirty} color="primary">
-						{txtOk}
+				  <Button onClick={this.toSave} color="primary">
+						{txtSave}
 				  </Button>
 				  <Box display={displayCancel}>
 					<Button onClick={this.onCancel} color="primary" autoFocus>

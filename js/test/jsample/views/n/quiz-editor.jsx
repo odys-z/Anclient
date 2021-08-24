@@ -2,6 +2,8 @@ import React from 'react';
 	import ReactDOM from 'react-dom';
 	import { withStyles } from '@material-ui/core/styles';
 	import withWidth from "@material-ui/core/withWidth";
+	import PropTypes from "prop-types";
+
 	import ListSubheader from '@material-ui/core/ListSubheader';
 	import List from '@material-ui/core/List';
 	import ListItem from '@material-ui/core/ListItem';
@@ -75,6 +77,9 @@ class QuizEditorComp extends DetailFormW {
 						: props.u ? Protocol.CRUD.u
 						: Protocol.CRUD.r;
 
+		props.stateHook.state = this.state;
+		this.setStateWithook = this.setStateWithook.bind(this);
+
 		this.state.quizId = props.quizId;
 
 		this.handleClickQs = this.handleClickQs.bind(this);
@@ -82,7 +87,6 @@ class QuizEditorComp extends DetailFormW {
 		this.editQuestion = this.editQuestion.bind(this);
 		this.editAnswer = this.editAnswer.bind(this);
 		this.onAdd = this.onAdd.bind(this);
-		this.onSave = this.onSave.bind(this);
 		this.onCheckSingle = this.onCheckSingle.bind(this);
 
 		this.bindQuiz = this.bindQuiz.bind(this);
@@ -97,12 +101,17 @@ class QuizEditorComp extends DetailFormW {
 			this.jquiz.startQuizA(this.props.uri, this.bindQuiz, ctx.error);
 	}
 
+	setStateWithook(obj) {
+		this.setState(obj);
+		this.props.stateHook.state = this.state;
+	}
+
 	bindQuiz(ansonResp) {
 		let qresp = new QuizResp(ansonResp.body);
 		let {title, quizId, quizinfo, questions} = qresp.questions();
 		let quizUsers = qresp.quizUserIds();
 		console.log(quizUsers);
-		this.setState( {
+		this.setStateWithook( {
 			questions: questions,
 			qtitle:    title || L('Emotion Poll (Type A)'),
 			quizinfo,
@@ -124,23 +133,23 @@ class QuizEditorComp extends DetailFormW {
 				jquiz={this.jquiz}
 				onSave={ ids => {
 					that.quizUserForm = undefined;
-					that.setState({quizUsers: ids});
+					that.setStateWithook({quizUsers: ids});
 				} }
 				onClose={e => {
 					that.quizUserForm = undefined;
-					that.setState({});
+					that.setStateWithook({});
 				}}
 			/>
 			);
-		this.setState({});
+		this.setStateWithook({});
 	}
 
-	alert(msg) {
-		this.setState({
-			alert: msg,
-			showAlert: true,
-		});
-	}
+	// alert(msg) {
+	// 	this.setState({
+	// 		alert: msg,
+	// 		showAlert: true,
+	// 	});
+	// }
 
 	/**on click question
 	 * param {Event} e
@@ -148,7 +157,7 @@ class QuizEditorComp extends DetailFormW {
 	handleClickQs(e) {
 	  // use currentTarget instead of target, see https://stackoverflow.com/a/10086501/7362888
 	  let qx = e.currentTarget.getAttribute('qx');
-	  this.setState({currentqx: parseInt(qx)});
+	  this.setStateWithook({currentqx: parseInt(qx)});
 	};
 
 	editQuestion(e) {
@@ -170,7 +179,7 @@ class QuizEditorComp extends DetailFormW {
 		questions[qx].qtype = qtype;
 		questions[qx].answer = correct;
 		questions[qx].answers = e.currentTarget.value;
-		this.setState({questions, dirty: true});
+		this.setStateWithook({questions, dirty: true});
 		if (this.props.onDirty)
 			this.props.onDirty(true);
 	}
@@ -186,7 +195,7 @@ class QuizEditorComp extends DetailFormW {
 			answer: "0"
 		});
 
-		this.setState({
+		this.setStateWithook({
 			dirty: true,
 			questions,
 			currentqx: qx,
@@ -200,35 +209,36 @@ class QuizEditorComp extends DetailFormW {
 		let qx = this.state.currentqx;
 		let qtype = this.state.questions[qx].qtype === QuizProtocol.Qtype.single ? QuizProtocol.Qtype.multiple : QuizProtocol.Qtype.single;
 		this.state.questions[qx].qtype = qtype;
-		this.setState({autosave: !this.state.autosave});
+		this.setStateWithook({autosave: !this.state.autosave});
 	}
 
-	onSave(e) {
-		e.stopPropagation();
-		let that = this;
-
-		if (!this.state.quizId) {
-			this.jquiz.insert(this.props.uri, this.state, (resp) => {
-				let {quizId, title} = JQuiz.parseResp(resp);
-				that.state.quizId = quizId;
-				that.alert("New quiz created!\nQuiz Title: " + title);
-
-				if (that.props.onDirty)
-					that.props.onDirty(true);
-			},
-			this.context.error);
-		}
-		else {
-			this.jquiz.update(this.props.uri, this.state, (resp) => {
-				let {questions} = JQuiz.parseResp(resp);
-				that.alert("Quiz saved! Questions: " + questions);
-
-				if (that.props.onDirty)
-					that.props.onDirty(true);
-			},
-			this.context.error);
-		}
-	}
+	// onSave(e) {
+	// 	e.stopPropagation();
+	// 	// this.props.onSave( this.state )
+	// 	let that = this;
+	//
+	// 	if (!this.state.quizId) {
+	// 		this.jquiz.insert(this.props.uri, this.state, (resp) => {
+	// 			let {quizId, title} = JQuiz.parseResp(resp);
+	// 			that.state.quizId = quizId;
+	// 			that.alert("New quiz created!\nQuiz Title: " + title);
+	//
+	// 			if (that.props.onDirty)
+	// 				that.props.onDirty(true);
+	// 		},
+	// 		this.context.error);
+	// 	}
+	// 	else {
+	// 		this.jquiz.update(this.props.uri, this.state, (resp) => {
+	// 			let {questions} = JQuiz.parseResp(resp);
+	// 			that.alert("Quiz saved! Questions: " + questions);
+	//
+	// 			if (that.props.onDirty)
+	// 				that.props.onDirty(true);
+	// 		},
+	// 		this.context.error);
+	// 	}
+	// }
 
 	items(classes) {
 		if (!this.state.questions)
@@ -256,7 +266,7 @@ class QuizEditorComp extends DetailFormW {
 							if ( ( v.v === QuizProtocol.Qtype.single || v.v === QuizProtocol.Qtype.multiple )
 								&& !that.state.questions[x].answers )
 								that.state.questions[x].answers = "*A. \nB. \nC. \nD.";
-							that.setState({dirty: true});
+							that.setStateWithook({dirty: true});
 						}}
 					/>
 					</Box>
@@ -293,7 +303,7 @@ class QuizEditorComp extends DetailFormW {
 					</ListSubheader>
 				}
 				className={ classes.root } >
-				<ListItem key='qzA' button onClick={e => this.setState({openHead: !this.state.openHead})}>
+				<ListItem key='qzA' button onClick={e => this.setStateWithook({openHead: !this.state.openHead})}>
 					<ListItemIcon><SendIcon /></ListItemIcon>
 					<ListItemText primary={L('Editing Quiz')} />
 					<ListItemText primary={aboutPollUsers(this.state.quizUsers)} />
@@ -312,21 +322,21 @@ class QuizEditorComp extends DetailFormW {
 					<TextField id="qtitle" label={L("Title")}
 					  variant="outlined" color="primary" fullWidth size="small"
 					  multiline
-					  onChange={e => this.setState({title: e.currentTarget.value})}
+					  onChange={e => this.setStateWithook({title: e.currentTarget.value})}
 					  value={title} />
 					</Grid>
 
 					<Grid item md={3} sm={6} className={classes.quizText} >
 					<TextField id="qsubj" label={L("Subject")}
 					  variant="outlined" color="primary" fullWidth size="small"
-					  onChange={e => this.setState({subject: e.currentTarget.value})}
+					  onChange={e => this.setStateWithook({subject: e.currentTarget.value})}
 					  value={this.state.subject} />
 					</Grid>
 
 					<Grid item md={3} sm={5} className={classes.quizText} >
 					<TextField id="qtag" label={L("Tags")}
 					  variant="outlined" color="primary" fullWidth size="small"
-					  onChange={e => this.setState({tags: e.currentTarget.value})}
+					  onChange={e => this.setStateWithook({tags: e.currentTarget.value})}
 					  value={this.state.tags} />
 					</Grid>
 
@@ -334,7 +344,7 @@ class QuizEditorComp extends DetailFormW {
 					<TextField id="quizinfo" label={L("Quiz Description")}
 					  variant="outlined" color="secondary"
 					  multiline fullWidth={true} size="small"
-					  onChange={e => this.setState({quizinfo: e.currentTarget.value})}
+					  onChange={e => this.setStateWithook({quizinfo: e.currentTarget.value})}
 					  value={this.state.quizinfo} />
 					</Grid>
 				  </Grid>
@@ -345,12 +355,12 @@ class QuizEditorComp extends DetailFormW {
 				<ListItem key="b" button>
 					<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
 					<ListItemText primary="New Question" onClick={this.onAdd} />
-					<ListItemText primary="Save" onClick={this.onSave} color="secondary" />
+					{/*<ListItemText primary="Save" onClick={this.onSave} color="secondary" />*/}
 				</ListItem>
 			</List>
-			<ConfirmDialog ok={L('Ok')} title={L('Info: Server Response')} cancel={false}
+			{/*<ConfirmDialog ok={L('Ok')} title={L('Info: Server Response')} cancel={false}
 					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
-					msg={this.state.alert} />
+					msg={this.state.alert} /> */}
 			{this.quizUserForm}
 		  </>
 	    );
@@ -361,6 +371,11 @@ class QuizEditorComp extends DetailFormW {
 	}
 }
 QuizEditorComp.contextType = AnContext;
+
+QuizEditorComp.propTypes = {
+	uri: PropTypes.string.isRequired,
+	stateHook: PropTypes.object
+}
 
 const QuizEditor = withWidth()(withStyles(styles)(QuizEditorComp));
 export { QuizEditor, QuizEditorComp }

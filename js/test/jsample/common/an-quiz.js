@@ -82,7 +82,7 @@ class JQuiz {
 					 	.set(CenterProtocol.pollResults, ques2PollDetail(questions) ));
 
 		let that = this;
-		client.commit(req, onLoad, errCtx);
+		client.commit(req, onLoad, errCtx || this.err);
 
 		/** Convert quiz' questions to java PollDetail
 		 * @param {array} qss
@@ -126,8 +126,8 @@ class JQuiz {
 	 * @param {function} onLoad
 	 * @param {AnContext.error}
 	 * */
-	pollsUsers(opts, onLoad, errCtx) {
-		let {uri, pollIds, states} = opts;
+	pollsUsers(uri, opts, onLoad, errCtx) {
+		let {pollIds, states} = opts;
 		// FIXME any better style?
 		let opt = {};
 		opt[QuizProtocol.pollIds] = pollIds;
@@ -181,7 +181,7 @@ class JQuiz {
 		let req = this.client.userReq(uri, JQuiz.port,
 			new UserReq( uri, "quizzes", props ).A(QuizProtocol.A.insert) );
 
-		this.client.commit(req, onOk, errCtx);
+		this.client.commit(req, onOk, errCtx || this.err);
 	}
 
 	/**Update a quiz (intanced indicators)
@@ -203,7 +203,7 @@ class JQuiz {
 		let req = this.client.userReq(uri, JQuiz.port,
 			new UserReq(uri, "quizzes", props).A(QuizProtocol.A.update) );
 
-		this.client.commit(req, onOk, errCtx);
+		this.client.commit(req, onOk, errCtx || this.err);
 	}
 
 	/**[Promiting Style]
@@ -216,7 +216,7 @@ class JQuiz {
 	stopolls(uri, pids, onOk, errCtx) {
 		let opt = {};
 		opt[QuizProtocol.pollIds] = pids;
-		return this.serv(uri, QuizProtocol.A.stopQuiz, opt, onOk, errCtx);
+		return this.serv(uri, QuizProtocol.A.stopolls, opt, onOk, errCtx);
 	}
 
 	/**

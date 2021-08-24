@@ -84,7 +84,7 @@ class DatasetCombo extends React.Component {
 
 	render() {
 		let cmb = this.state.combo
-		let refcbb = React.createRef();
+		let refcbb = React.createRef(); // FIXME why not this.refcbb?
 		/** Desgin Notes:
 		 * SimpleForm's first render triggered this constructor and componentDidMount() been called, first.
 		 * When it called render again when data been loaded in it's componentDidMount() (then render),

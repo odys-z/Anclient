@@ -149,7 +149,10 @@ class QuizzesComp extends CrudCompW {
 				(<ConfirmDialog open={true}
 					ok={L('OK')} cancel={false}
 					title={L('Info')} msg={L('Quiz Deleted.')}
-					onOk={ () => { that.confirm = undefined; } }
+					onOk={ () => {
+						that.confirm = undefined;
+						that.state.selectedRecIds.splice();
+					} }
 				/>);
 			},
 			this.context.error);
