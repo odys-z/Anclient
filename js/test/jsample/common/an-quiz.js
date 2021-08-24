@@ -48,7 +48,8 @@ class JQuiz {
 		return this;
 	}
 
-	/** Create a request and post back to server asking a new quiz, loading ind_emotion type 'A'.
+	/**[Promoting Style]
+	 * Create a request and post back to server asking a new quiz, loading ind_emotion type 'A'.
 	 * port: quiz
 	 * @param { string } uri
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
@@ -60,7 +61,7 @@ class JQuiz {
 		return this.serv(uri, QuizProtocol.A.start, opt, onLoad, errCtx);
 	}
 
-	/**
+	/**[Promiting Style - the optimized direction but parameters must reduced]
 	 * @param {string} uri
 	 * @param {object} pollResult
 	 * @param {string} pollResult.pollId
@@ -100,7 +101,8 @@ class JQuiz {
 		}
 	}
 
-	/** Create a query request for loading quiz'z users.
+	/**[Promiting Style]
+	 * Create a query request for loading quiz'z users.
 	 * port: quiz
 	 * @param {objects} opts
 	 * @param {string} opts.uri
@@ -114,7 +116,27 @@ class JQuiz {
 		return this.serv(uri, QuizProtocol.A.quizUsers, {quizId}, onLoad, errCtx);
 	}
 
-	/** Create a query request and post back to server.
+	/**[Promiting Style]
+	 * Get all poll users for pollIds, with state in states.
+	 * port: quiz
+	 * @param {objects} opts
+	 * @param {string} opts.uri
+	 * @param {array|set} opts.pollIds
+	 * @param {array|set} opts.states
+	 * @param {function} onLoad
+	 * @param {AnContext.error}
+	 * */
+	pollsUsers(opts, onLoad, errCtx) {
+		let {uri, pollIds, states} = opts;
+		// FIXME any better style?
+		let opt = {};
+		opt[QuizProtocol.pollIds] = pollIds;
+		opt[QuizProtocol.states] = states;
+		return this.serv(uri, QuizProtocol.A.pollsUsers, opt, onLoad, errCtx);
+	}
+
+	/**[Promiting Style]
+	 * Create a query request and post back to server.
 	 * port: quiz
 	 * @param { string } uri
 	 * @param {string} quizId quiz id
@@ -182,6 +204,19 @@ class JQuiz {
 			new UserReq(uri, "quizzes", props).A(QuizProtocol.A.update) );
 
 		this.client.commit(req, onOk, errCtx);
+	}
+
+	/**[Promiting Style]
+	 * Stop all polls .
+	 * @param {string} uri
+	 * @param {array} pids poll's ids
+	 * @param {function} onOk
+	 * @param {AnContext.error} errCtx
+	 */
+	stopolls(uri, pids, onOk, errCtx) {
+		let opt = {};
+		opt[QuizProtocol.pollIds] = pids;
+		return this.serv(uri, QuizProtocol.A.stopQuiz, opt, onOk, errCtx);
 	}
 
 	/**

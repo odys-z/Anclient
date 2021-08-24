@@ -39,7 +39,7 @@ const styles = (theme) => ({
     width: '100%',
   },
   quizText: {
-	  marging: theme.spacing(1)
+	  margin: theme.spacing(1)
   },
   qtype: {
   	width: 420,
@@ -304,37 +304,40 @@ class QuizEditorComp extends DetailFormW {
 				</ListItem>
 				<Collapse in={this.state.openHead} timeout="auto" >
 
-					<Grid container>
-					<Grid item md={3} sm={6} className={classes.quizText} >
-					<TextField id="qtitle" label={L("Subject")}
-					  variant="outlined" color="primary"
-					  onChange={e => this.setState({subject: e.currentTarget.value})}
-					  value={title} />
-
-					</Grid>
-					<Grid item md={3} sm={6} className={classes.quizText} >
-					<TextField id="qtag" label={L("Tags")}
-					  variant="outlined" color="primary"
-					  onChange={e => this.setState({tags: e.currentTarget.value})}
-					  value={title} />
-
-					</Grid>
-					<Grid item md={5} sm={12} className={classes.quizText} >
+				  <Grid container>
+					{/*FIXME performance issue: https://stackoverflow.com/a/66934465
+					  * Should break down into quiz simple for & question items.
+					  */}
+					<Grid item md={6} sm={12} className={classes.quizText} >
 					<TextField id="qtitle" label={L("Title")}
-					  variant="outlined" color="primary"
+					  variant="outlined" color="primary" fullWidth size="small"
 					  multiline
-					  onChange={e => this.setState({qtitle: e.currentTarget.value})}
+					  onChange={e => this.setState({title: e.currentTarget.value})}
 					  value={title} />
 					</Grid>
 
+					<Grid item md={3} sm={6} className={classes.quizText} >
+					<TextField id="qsubj" label={L("Subject")}
+					  variant="outlined" color="primary" fullWidth size="small"
+					  onChange={e => this.setState({subject: e.currentTarget.value})}
+					  value={this.state.subject} />
 					</Grid>
-					<Grid item md={12} className={classes.quizText} >
+
+					<Grid item md={3} sm={5} className={classes.quizText} >
+					<TextField id="qtag" label={L("Tags")}
+					  variant="outlined" color="primary" fullWidth size="small"
+					  onChange={e => this.setState({tags: e.currentTarget.value})}
+					  value={this.state.tags} />
+					</Grid>
+
+					<Grid item xs={12} xl={12} className={classes.quizText} >
 					<TextField id="quizinfo" label={L("Quiz Description")}
 					  variant="outlined" color="secondary"
-					  multiline fullWidth={true}
+					  multiline fullWidth={true} size="small"
 					  onChange={e => this.setState({quizinfo: e.currentTarget.value})}
 					  value={this.state.quizinfo} />
 					</Grid>
+				  </Grid>
 				</Collapse>
 
 				{this.items(classes)}

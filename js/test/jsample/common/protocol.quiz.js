@@ -145,30 +145,7 @@ export class QuizResp extends AnsonResp {
 }
 
 /**
- public static final String quizId = "quizId";
- public static final String qtitle = "qtitle";
- public static final String quizinfo = "quizinfo";
- public static final String qowner = "qowner";
- public static final String dcreate = "dcreate";
- public static final String questions = "questions";
-
- public static final String poll = "poll";
- public static final String quizUsers = "quizUsers";
-
- static class Qtype {
- 	public static final String cate = "cate";
- }
-
- static class A {
- 	public static final String start = "start";
- 	public static final String quiz = "quiz";
- 	public static final String list = "list";
- 	public static final String insert = "insert";
- 	public static final String update = "update";
- 	public static final String poll = "poll";
- 	public static final String quizUsers = "quizUsers";
-	public static final String deleteq = "del";
- }
+ * @see io.odysz.jquiz.QuizProtocol 
  */
 export const QuizProtocol = {
 	quizId: "quizId",
@@ -181,6 +158,8 @@ export const QuizProtocol = {
 
 	poll: "poll",
 	quizUsers: "quizUsers",
+	pollIds: "pids",
+	states: "states",
 
  	A: {
 		start: 'start',
@@ -188,6 +167,8 @@ export const QuizProtocol = {
 		list: 'list',     // load quizzes
 		insert: 'insert', // create new quiz
 		update: 'update', // update quiz
+		stopolls: 'stopolls', // stop all polls
+		pollsUsers: 'polls-users', // get all users of polls (pollIds, quizId, states)
 
 		poll: 'poll',     // submit poll results
 		quizUsers: 'quizUsers', // load quiz's users

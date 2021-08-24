@@ -7,14 +7,20 @@ import { Grid, Button, Card, TextField, Typography } from '@material-ui/core';
 import {
 	L, Langstrs, AnConst,
     AnClient, SessionClient, Protocol,
-    AnContext, AnError, CrudCompW, AnReactExt, AnQueryForm, AnTablist, jsample
+    AnContext, AnError, CrudCompW, AnReactExt,
+	ConfirmDialog, AnQueryForm, AnTablist, jsample
 } from 'anclient';
-
 const { JsampleIcons } = jsample;
+
+import { QuizProtocol } from '../../common/protocol.quiz.js';
+import { JQuiz } from '../../common/an-quiz.js';
 
 const styles = (theme) => ( {
 	root: {
-	}
+	},
+	crudButton: {
+		margin: 4,
+	},
 } );
 
 class PollsComp extends CrudCompW {
@@ -28,9 +34,13 @@ class PollsComp extends CrudCompW {
 					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem ],
 					label: L('My Students') },
+
 		pageInf: { page: 0, size: 25, total: 0 },
+		buttons: { start: true, stop: false, edit: false},
 		selectedRecIds: [],
 	};
+
+	jquiz = undefined;
 
 	constructor(props) {
 		super(props);
@@ -40,13 +50,14 @@ class PollsComp extends CrudCompW {
 		this.onPageInf = this.onPageInf.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
 
-		this.toAdd = this.toAdd.bind(this);
+		this.toStart = this.toStart.bind(this);
 		this.toEdit = this.toEdit.bind(this);
-		this.toDel = this.toDel.bind(this);
+		this.toStop = this.toStop.bind(this);
 	}
 
 	componentDidMount() {
 		console.log(this.uri);
+		this.jquiz = new JQuiz(this.context.anClient, this.context.error);
 	}
 
 	toSearch(e, query) {
@@ -88,41 +99,36 @@ class PollsComp extends CrudCompW {
 	onTableSelect(rowIds) {
 		this.setState( {
 			buttons: {
-				add: this.state.buttons.add,
+				start: this.state.buttons.start,
+				stop: rowIds &&  rowIds.length >= 1,
 				edit: rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
 			},
 			selectedRecIds: rowIds
 		} );
 	}
 
-	toDel(e, v) {
+	toStop(e, v) {
 		let that = this;
-		let txt = L('Totally {count} role records will be deleted. Are you sure?',
-				{count: that.state.selectedRecIds.length});
-		this.confirm =
-			(<ConfirmDialog open={true}
-				ok={L('OK')} cancel={true}
-				title={L('Info')} msg={txt}
-				onOk={ () => {
-						delRole(that.state.selectedRecIds);
-				 	}
-				}
-				onClose={ () => {that.confirm === undefined} }
-			/>);
-
-		function delRole(roleIds) {
-			let req = that.context.anClient
-				.usrAct('roles', Protocol.CRUD.d, 'delete')
-				.deleteMulti(this.uri, 'a_roles', 'roleId', roleIds);
-
-			that.context.anClient.commit(req, (resp) => {
-				that.toSearch();
-			}, that.context.error);
-		}
+		this.jquiz.pollsUsers(this.uri,
+			{pollIds: this.state.selectedRecIds},
+			( (users) => {
+				let txt = L('Totally {count} polls, {users} users will be updated. Are you sure?',
+							{ count: that.state.selectedRecIds.length,
+							  users: that.state.selectedRecIds.length });
+				that.confirm =
+					(<ConfirmDialog open={true}
+						ok={L('OK')} cancel={true}
+						title={L('Info')} msg={txt}
+						onOk={ () => {
+								that.jquiz.stopolls([...that.state.selectedRecIds]); // make sure it's an array
+						 	}
+						}
+						onClose={ () => {that.confirm === undefined} }
+					/>);
+			}) );
 	}
 
-	toAdd(e, v) {
+	toStart(e, v) {
 		this.roleForm = (<RoleDetails c uri={this.uri}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
@@ -156,6 +162,21 @@ class PollsComp extends CrudCompW {
 				} } }
 				onDone={(query) => { console.log('onDone()'); this.toSearch(undefined, query); } }
 			/>
+
+			<Grid container alignContent="flex-end" >
+				<Button variant="contained" disabled={!btn.start}
+					className={classes.crudButton} onClick={this.toStart}
+					startIcon={<JsampleIcons.Add />}
+				>{L('Start Poll')}</Button>
+				<Button variant="contained" disabled={!btn.stop}
+					className={classes.crudButton} onClick={this.toStop}
+					startIcon={<JsampleIcons.Edit />}
+				>{L('Stop Poll')}</Button>
+				<Button variant="contained" disabled={!btn.edit}
+					className={classes.crudButton} onClick={this.toEdit}
+					startIcon={<JsampleIcons.Delete />}
+				>{L('Setup Users')}</Button>
+			</Grid>
 
 			<AnTablist
 				className={classes.root} checkbox= {true} pk= "qid"
