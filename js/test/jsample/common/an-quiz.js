@@ -43,7 +43,7 @@ class JQuiz {
 
 		let reqMsg = this.client.userReq(uri, JQuiz.port, req);
 
-		this.client.commit(reqMsg, onLoad, errCtx);
+		this.client.commit(reqMsg, onLoad, errCtx || this.err);
 
 		return this;
 	}
