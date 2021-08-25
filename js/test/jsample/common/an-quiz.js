@@ -160,23 +160,32 @@ class JQuiz {
 
 	/**
 	 * @param {string} uri
-	 * @param {object} quiz {qtitle, questions, quizifno, toClass}
+	 * @param {object} hooked { quiz: {qtitle, tags, subject, quizinf}, questions, quizUsers }
 	 * @param {function} onOk
 	 * @param {AnContext.error} errCtx
 	 */
-	insert(uri, quiz, onOk, errCtx) {
+	insert(uri, hooked, onOk, errCtx) {
 		let that = this;
+		let {quiz, questions, quizUsers} = hooked;
 		let date = new Date();
-		this.client.usrAct('quiz', QuizProtocol.A.insert, Protocol.CRUD.c, quiz.qtitle);
+		this.client.usrAct('quiz', QuizProtocol.A.insert, Protocol.CRUD.c, quiz.title);
 
 		let props = {}
-		props[QuizProtocol.qtitle] = quiz.qtitle;
+		/* DESIGN NOTE
+		 * DESIGN NOTE
+		 * As quiz already carry the fields name, why have to define arg name in protocol?
+		 * E.g. quiz-editor already defined fields for <RecordForm />, which is used for table quizzes
+		 */
+		props[QuizProtocol.qtitle] = quiz.title;
+		props[QuizProtocol.quizinfo] = quiz.quizinfo;
+		props[QuizProtocol.subject] = quiz.subject;
+		props[QuizProtocol.tags] = quiz.tags;
+
 		props[QuizProtocol.qowner] = this.client.ssInf.uid;
 		props[QuizProtocol.dcreate] = `${date.toISOString()}`;
-		props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		props[QuizProtocol.questions] = QuizReq.checkQuestions(quiz.questions);
+		props[QuizProtocol.questions] = QuizReq.checkQuestions(questions);
 
-		props[QuizProtocol.quizUsers] = quiz.quizUsers;
+		props[QuizProtocol.quizUsers] = quizUsers || [];
 
 		let req = this.client.userReq(uri, JQuiz.port,
 			new UserReq( uri, "quizzes", props ).A(QuizProtocol.A.insert) );
@@ -190,15 +199,21 @@ class JQuiz {
 	 * @param {function} onOk
 	 * @param {AnContext.error} errCtx
 	 */
-	update(uri, quiz, onOk, errCtx) {
+	update(uri, hooked, onOk, errCtx) {
 		let that = this;
-		this.client.usrAct('quiz', QuizProtocol.A.update, Protocol.CRUD.u, quiz.qtitle);
+		let {quiz, questions, quizUsers} = hooked;
+		this.client.usrAct('quiz', QuizProtocol.A.update, Protocol.CRUD.u, quiz.title);
 
 		let props = {}
-		props[QuizProtocol.quizId] = quiz.quizId;
-		props[QuizProtocol.qtitle] = quiz.qtitle;
+		props[QuizProtocol.quizId] = quiz.qid;
+		props[QuizProtocol.qtitle] = quiz.title;
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
+		props[QuizProtocol.subject] = quiz.subject;
+		props[QuizProtocol.tags] = quiz.tags;
+
+		props[QuizProtocol.questions] = QuizReq.checkQuestions(questions, {pk: "quizId", pkval: quiz.qid});
+
+		props[QuizProtocol.quizUsers] = quizUsers || [];
 
 		let req = this.client.userReq(uri, JQuiz.port,
 			new UserReq(uri, "quizzes", props).A(QuizProtocol.A.update) );

@@ -364,7 +364,7 @@ class AnsonResp extends AnsonBody {
 					cols = r;
 				}
 				else {
-					rw = {};
+					let rw = {};
 					r.forEach((c, cx) => {
 						rw[cols[cx]] = c;
 					});

@@ -59,6 +59,9 @@ const styles = (theme) => ({
   }
 });
 
+/**Simple form is a dialog.
+ * Use record form for UI record layout.
+ */
 class SimpleFormComp extends DetailFormW {
 	uri = undefined;
 

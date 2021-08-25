@@ -32,6 +32,7 @@ export * from './react/widgets/table-list-selection-level-up.jsx';
 export * from './react/widgets/tabs.jsx';
 export * from './react/widgets/tree.jsx';
 export * from './react/widgets/treegrid.jsx';
+export * from './react/widgets/record-form.jsx';
 
 export * from './react/widgets/simple-form';
 export * from './react/widgets/tree-editor';

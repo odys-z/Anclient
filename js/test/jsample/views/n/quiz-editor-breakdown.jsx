@@ -11,6 +11,7 @@ import React from 'react';
 	import ListItemText from '@material-ui/core/ListItemText';
 	import Collapse from '@material-ui/core/Collapse';
 	import Grid from '@material-ui/core/Grid';
+	import Typography from '@material-ui/core/Typography';
 	import Add from '@material-ui/icons/Add';
 	import Edit from '@material-ui/icons/Edit';
 	import DraftsIcon from '@material-ui/icons/Drafts';
@@ -27,9 +28,9 @@ import React from 'react';
 	import Button from '@material-ui/core/Button';
 	import Box from '@material-ui/core/Box';
 
-import { L, Protocol, AnsonMsg, AnsonResp,
-	AnContext, DetailFormW, ConfirmDialog, DatasetCombo
-} from 'anclient';
+import { L,
+	Protocol,
+	AnContext, DetailFormW, DatasetCombo, RecordForm } from 'anclient';
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
 import { QuizUserForm } from './quiz-users';
@@ -60,15 +61,15 @@ class QuizEditorComp extends DetailFormW {
 
 		openHead: true,
 		quizId: undefined,
-		qtitle: 'New Quiz',
-		quizinfo: '',
+		quiz: { title: 'New Quiz',
+				quizinfo: '',
+				tags: '',
+				subject: '' },
 		questions: [], // qid(seq), question text, answers, type, correct index
 		currentqx: -1,
-		autosave: true,
-
-		showAlert: false,
-		alert: '',
     };
+
+	quizHook = { collect: undefined };
 
 	constructor(props) {
 		super(props);
@@ -77,8 +78,14 @@ class QuizEditorComp extends DetailFormW {
 						: props.u ? Protocol.CRUD.u
 						: Protocol.CRUD.r;
 
-		props.stateHook.state = this.state;
-		this.setStateWithook = this.setStateWithook.bind(this);
+		// We use this class wrapped with function. Can be changed if there is a better way like forwardRef.
+		props.stateHook.collect = function (me) {
+			let that = me;
+			return function(hookObj){
+				hookObj.questions = that.state.questions; // also supposed to change to using hook once each question been broken down
+				hookObj.quizUsers = that.state.quizUsers;
+				that.quizHook.collect && that.quizHook.collect(hookObj);
+			}; }(this);
 
 		this.state.quizId = props.quizId;
 
@@ -101,23 +108,32 @@ class QuizEditorComp extends DetailFormW {
 			this.jquiz.startQuizA(this.props.uri, this.bindQuiz, ctx.error);
 	}
 
-	setStateWithook(obj) {
-		this.setState(obj);
-		this.props.stateHook.state = this.state;
-	}
-
 	bindQuiz(ansonResp) {
+		// let qresp = new QuizResp(ansonResp.body);
+		// let {title, quizId, quizinfo, questions, subject, tags} = qresp.questions();
+		// let quizUsers = qresp.quizUserIds();
+		// console.log(quizUsers);
+		// this.setState( {
+		// 	questions: questions,
+		// 	quiz: { title:  title || L('Emotion Poll (Type A)'),
+		// 			subject, tags, quizinfo},
+		// 	quizUsers,
+		// 	currentqx: -1,
+		// 	dirty:   false
+		// } );
+
 		let qresp = new QuizResp(ansonResp.body);
-		let {title, quizId, quizinfo, questions} = qresp.questions();
+		let {quizId, quiz, questions} = qresp.quiz_questions();
 		let quizUsers = qresp.quizUserIds();
 		console.log(quizUsers);
-		this.setStateWithook( {
+		this.setState( {
 			questions: questions,
-			qtitle:    title || L('Emotion Poll (Type A)'),
-			quizinfo,
+			quiz,
+			// quiz: { title:  title || L('Emotion Poll (Type A)'),
+			// 		subject, tags, quizinfo},
 			quizUsers,
 			currentqx: -1,
-			dirty:     this.state.crud === Protocol.CRUD.c
+			dirty:   false
 		} );
 
 		if (this.props.onDirty)
@@ -133,15 +149,15 @@ class QuizEditorComp extends DetailFormW {
 				jquiz={this.jquiz}
 				onSave={ ids => {
 					that.quizUserForm = undefined;
-					that.setStateWithook({quizUsers: ids});
+					that.setState({quizUsers: ids});
 				} }
 				onClose={e => {
 					that.quizUserForm = undefined;
-					that.setStateWithook({});
+					that.setState({});
 				}}
 			/>
 			);
-		this.setStateWithook({});
+		this.setState({});
 	}
 
 	/**on click question
@@ -150,17 +166,11 @@ class QuizEditorComp extends DetailFormW {
 	handleClickQs(e) {
 	  // use currentTarget instead of target, see https://stackoverflow.com/a/10086501/7362888
 	  let qx = e.currentTarget.getAttribute('qx');
-	  this.setStateWithook({currentqx: parseInt(qx)});
+	  this.setState({currentqx: parseInt(qx)});
 	};
 
 	editQuestion(e) {
 		let qx = this.state.currentqx;
-		// let questions = this.state.questions.slice();
-		// questions[qx].question = e.target.value;
-		// this.setState({questions, dirty: true});
-
-		// if (this.props.onDirty)
-		// 	this.props.onDirty(true);
 
 		this.state.questions[qx].question = e.target.value;
 	}
@@ -172,7 +182,7 @@ class QuizEditorComp extends DetailFormW {
 		questions[qx].qtype = qtype;
 		questions[qx].answer = correct;
 		questions[qx].answers = e.currentTarget.value;
-		this.setStateWithook({questions, dirty: true});
+		this.setState({questions, dirty: true});
 		if (this.props.onDirty)
 			this.props.onDirty(true);
 	}
@@ -188,7 +198,7 @@ class QuizEditorComp extends DetailFormW {
 			answer: "0"
 		});
 
-		this.setStateWithook({
+		this.setState({
 			dirty: true,
 			questions,
 			currentqx: qx,
@@ -202,36 +212,8 @@ class QuizEditorComp extends DetailFormW {
 		let qx = this.state.currentqx;
 		let qtype = this.state.questions[qx].qtype === QuizProtocol.Qtype.single ? QuizProtocol.Qtype.multiple : QuizProtocol.Qtype.single;
 		this.state.questions[qx].qtype = qtype;
-		this.setStateWithook({autosave: !this.state.autosave});
+		this.setState({autosave: !this.state.autosave});
 	}
-
-	// onSave(e) {
-	// 	e.stopPropagation();
-	// 	// this.props.onSave( this.state )
-	// 	let that = this;
-	//
-	// 	if (!this.state.quizId) {
-	// 		this.jquiz.insert(this.props.uri, this.state, (resp) => {
-	// 			let {quizId, title} = JQuiz.parseResp(resp);
-	// 			that.state.quizId = quizId;
-	// 			that.alert("New quiz created!\nQuiz Title: " + title);
-	//
-	// 			if (that.props.onDirty)
-	// 				that.props.onDirty(true);
-	// 		},
-	// 		this.context.error);
-	// 	}
-	// 	else {
-	// 		this.jquiz.update(this.props.uri, this.state, (resp) => {
-	// 			let {questions} = JQuiz.parseResp(resp);
-	// 			that.alert("Quiz saved! Questions: " + questions);
-	//
-	// 			if (that.props.onDirty)
-	// 				that.props.onDirty(true);
-	// 		},
-	// 		this.context.error);
-	// 	}
-	// }
 
 	items(classes) {
 		if (!this.state.questions)
@@ -259,7 +241,7 @@ class QuizEditorComp extends DetailFormW {
 							if ( ( v.v === QuizProtocol.Qtype.single || v.v === QuizProtocol.Qtype.multiple )
 								&& !that.state.questions[x].answers )
 								that.state.questions[x].answers = "*A. \nB. \nC. \nD.";
-							that.setStateWithook({dirty: true});
+							that.setState({dirty: true});
 						}}
 					/>
 					</Box>
@@ -282,7 +264,7 @@ class QuizEditorComp extends DetailFormW {
 
 	render() {
 		let ctx = this.context;
-		let title = this.state.qtitle;
+		let title = this.state.quiz.title;
 		let { classes } = this.props;
 
 		let that = this;
@@ -296,10 +278,12 @@ class QuizEditorComp extends DetailFormW {
 					</ListSubheader>
 				}
 				className={ classes.root } >
-				<ListItem key='qzA' button onClick={e => this.setStateWithook({openHead: !this.state.openHead})}>
+				<ListItem key='qzA' button onClick={e => this.setState({openHead: !this.state.openHead})}>
 					<ListItemIcon><SendIcon /></ListItemIcon>
 					<ListItemText primary={L('Editing Quiz')} />
-					<ListItemText primary={aboutPollUsers(this.state.quizUsers)} />
+					<ListItemText >
+						{aboutPollUsers(this.state.quizUsers)}
+					</ListItemText>
 					<Button variant="contained"
 						className={classes.button} onClick={this.toSetPollUsers}
 						endIcon={<Edit />}
@@ -307,40 +291,16 @@ class QuizEditorComp extends DetailFormW {
 				</ListItem>
 				<Collapse in={this.state.openHead} timeout="auto" >
 
-				  <Grid container>
-					{/*FIXME performance issue: https://stackoverflow.com/a/66934465
-					  * Should break down into quiz simple for & question items.
-					  */}
-					<Grid item md={6} sm={12} className={classes.quizText} >
-					<TextField id="qtitle" label={L("Title")}
-					  variant="outlined" color="primary" fullWidth size="small"
-					  multiline
-					  onChange={e => this.setStateWithook({title: e.currentTarget.value})}
-					  value={title} />
-					</Grid>
+					<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
+						stateHook={this.quizHook}
+						fields={[ { field: 'qid', label: '', hide: true },
+								  { field: 'title', label: L('Title'), grid: {sm: 12, lg: 12} },
+								  { field: 'subject', label: L('Subject') },
+							      { field: 'tags', label: L('#Hashtag') },
+							      { field: 'quizinfo', label: L('Description'), grid: {sm: 12, lg: 12} }
+							]}
+						record={{qid: this.state.quizId, ... this.state.quiz }} />
 
-					<Grid item md={3} sm={6} className={classes.quizText} >
-					<TextField id="qsubj" label={L("Subject")}
-					  variant="outlined" color="primary" fullWidth size="small"
-					  onChange={e => this.setStateWithook({subject: e.currentTarget.value})}
-					  value={this.state.subject || ''} />
-					</Grid>
-
-					<Grid item md={3} sm={5} className={classes.quizText} >
-					<TextField id="qtag" label={L("Tags")}
-					  variant="outlined" color="primary" fullWidth size="small"
-					  onChange={e => this.setStateWithook({tags: e.currentTarget.value})}
-					  value={this.state.tags || ''} />
-					</Grid>
-
-					<Grid item xs={12} xl={12} className={classes.quizText} >
-					<TextField id="quizinfo" label={L("Quiz Description")}
-					  variant="outlined" color="secondary"
-					  multiline fullWidth={true} size="small"
-					  onChange={e => this.setStateWithook({quizinfo: e.currentTarget.value})}
-					  value={this.state.quizinfo} />
-					</Grid>
-				  </Grid>
 				</Collapse>
 
 				{this.items(classes)}
@@ -348,18 +308,17 @@ class QuizEditorComp extends DetailFormW {
 				<ListItem key="b" button>
 					<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
 					<ListItemText primary="New Question" onClick={this.onAdd} />
-					{/*<ListItemText primary="Save" onClick={this.onSave} color="secondary" />*/}
 				</ListItem>
 			</List>
-			{/*<ConfirmDialog ok={L('Ok')} title={L('Info: Server Response')} cancel={false}
-					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
-					msg={this.state.alert} /> */}
 			{this.quizUserForm}
 		  </>
 	    );
 
 		function aboutPollUsers(usrs = []) {
-			return L('Total polling users: {n}', {n: usrs.size || usrs.length || 0});
+			let usr = usrs && (usrs.length > 0 || usrs.size > 0);
+			return (<Typography color={ usr ? 'primary' : 'secondary'} >
+						{L('Total polling users: {n}', {n: usrs.size || usrs.length || 0})}
+					</Typography>);
 		}
 	}
 }

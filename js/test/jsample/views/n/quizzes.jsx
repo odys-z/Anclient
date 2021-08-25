@@ -8,7 +8,7 @@ import {
     L, Langstrs,
     AnClient, SessionClient, Protocol, UserReq,
     AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablist, ConfirmDialog, jsample
+	AnQueryForm, AnTablistLevelUp, ConfirmDialog, jsample
 } from 'anclient';
 
 const { JsampleIcons } = jsample;
@@ -38,7 +38,7 @@ class QuizzesComp extends CrudCompW {
 		condTags: { type: 'text', val: '', label: L('Tags')},
 		condDate: { type: 'date', val: '', label: L('Create Date')},
 
-		selectedRecIds: []
+		selected: {Ids: new Set()},
 	};
 
 	funcName = L('North - Quizzes');
@@ -48,6 +48,7 @@ class QuizzesComp extends CrudCompW {
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
+		this.refresh = this.refresh.bind(this);
 		this.onPageInf = this.onPageInf.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
 
@@ -73,7 +74,14 @@ class QuizzesComp extends CrudCompW {
 
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
-		this.state.selectedRecIds.splice(0);
+		this.state.selected.Ids.clear();
+	}
+
+	refresh() {
+		if (this.state.queryReq)
+			this.context.anReact.bindTablist(this.state.queryReq, this, this.context.error);
+
+		this.state.selected.Ids.clear();
 	}
 
 	/** Both this & QuizUserStartComp use this function - let's change to server side later.
@@ -81,7 +89,7 @@ class QuizzesComp extends CrudCompW {
 	static buildReq(client, uri, query, pageInf) {
 		let queryReq = client.query(uri, 'quizzes', 'q', pageInf)
 		let req = queryReq.Body()
-			.expr('q.qid').expr('q.title').expr('tags').expr('dcreate')
+			.expr('q.qid').expr('q.title').expr('tags').expr('q.subject').expr('dcreate')
 			.expr('count(ifnull(pId, 0))', 'polls')
 			.expr('qsNum', 'questions')
 			.l('polls', 'p', 'p.quizId=q.qid')
@@ -114,46 +122,50 @@ class QuizzesComp extends CrudCompW {
 		this.setState( {
 			buttons: {
 				add: this.state.buttons.add,
-				stop: rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
+				stop: rowIds && rowIds.size === 1,
+				del: rowIds &&  rowIds.size >= 1,
 			},
-			selectedRecIds: rowIds
+			// selected.Ids: rowIds
 		} );
 	}
 
 	toDel(e, v) {
 		let that = this;
 		let txt = L('Totally {count} records will be deleted. Are you sure?',
-				{count: that.state.selectedRecIds.length});
+				{count: that.state.selected.Ids.size});
 		this.confirm =
 			(<ConfirmDialog open={true}
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
-				onOk={ () => { this.del(that.state.selectedRecIds[0]); } }
+				onOk={ () => { this.del(that.state.selected.Ids); } }
 				onClose={ () => {that.confirm === undefined} }
 			/>);
 	}
 
-	del(qid) {
+	del(qids) {
 		let client = this.context.anClient;
 		let req = client.userReq( this.uri, 'quiz',
 					new UserReq( this.uri, "quiz" )
 					.A(QuizProtocol.A.deleteq) );
 
 		let reqBd = req.Body();
-		reqBd.set(QuizProtocol.quizId, qid);
+		reqBd.set(QuizProtocol.quizId, [...qids]);
 
 		let that = this;
 		client.commit(req,
-			(resp) => { that.confirm =
-				(<ConfirmDialog open={true}
-					ok={L('OK')} cancel={false}
-					title={L('Info')} msg={L('Quiz Deleted.')}
-					onOk={ () => {
-						that.confirm = undefined;
-						that.state.selectedRecIds.splice();
-					} }
-				/>);
+			(resp) => {
+				that.state.selected.Ids.clear();
+				that.confirm =
+					(<ConfirmDialog open={true}
+						ok={L('OK')} cancel={false}
+						title={L('Info')} msg={L('Quiz Deleted.')}
+						onOk={ () => {
+							that.confirm = undefined;
+							that.state.selected.Ids.clear();
+							that.refresh();
+						} }
+					/>);
+				this.refresh();
 			},
 			this.context.error);
 	}
@@ -167,19 +179,24 @@ class QuizzesComp extends CrudCompW {
 				onCancel={this.closeDetails}
 				onOk={ () => {
 					that.closeDetails();
-					that.toSearch()
+					that.refresh();
 				}} />);
 	}
 
 	toEdit(e, v) {
 		let that = this;
-		this.quizForm = (<QuizForm u uri={this.uri}
-			quizId={this.state.selectedRecIds[0]}
-			onCancel={this.closeDetails}
-			onOk={ () => {
-				that.closeDetails();
-				that.toSearch()
-			}} />);
+		let qid = this.state.selected.Ids;
+		if (qid.size === 0)
+			console.error("Something wrong!");
+		else {
+			this.quizForm = (<QuizForm u uri={this.uri}
+				quizId={[...qid][0]}
+				onCancel={this.closeDetails}
+				onOk={ () => {
+					that.closeDetails();
+					that.refresh()
+				}} />);
+		}
 	}
 
 	closeDetails() {
@@ -220,7 +237,8 @@ class QuizzesComp extends CrudCompW {
 				>{L('Delete Quiz')}</Button>
 			</Grid>
 
-			<AnTablist
+			<AnTablistLevelUp
+				selectedIds={this.state.selected}
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
 					{ text: L('qid'), hide: 1,   field: "qid" },

@@ -11,9 +11,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { L, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from 'anclient';
+import { L, Protocol, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from 'anclient';
 import { JQuiz } from '../../common/an-quiz.js';
-import { QuizEditor } from './quiz-editor';
+import { QuizEditor } from './quiz-editor-breakdown';
 
 const styles = (theme) => ({
   root: {
@@ -22,9 +22,6 @@ const styles = (theme) => ({
 
 class QuizFormComp extends DetailFormW {
 	state = {
-		closed: false,
-		an: undefined,
-
 		creating: false, // creating a new record before saved (no id allocated)
 		quizId: undefined,
 
@@ -35,7 +32,12 @@ class QuizFormComp extends DetailFormW {
 		super(props);
 		this.editorHook = {state: undefined};
 
-		this.state.creating = props.creating;
+		this.state.crud = props.c ? Protocol.CRUD.c
+						: props.u ? Protocol.CRUD.u
+						: Protocol.CRUD.r;
+		// this.state.creating = props.creating;
+		this.state.quizId = props.quizId
+		if (props.u && !props.quizId) throw new Error("Semantics Error!");
 
 		this.toSave = this.toSave.bind(this);
 		this.onCancel = this.onCancel.bind(this);
@@ -61,37 +63,35 @@ class QuizFormComp extends DetailFormW {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={false}
+				ok={L('Ok')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
+		this.setState({});
 	}
 
 	toSave(e) {
 		e.stopPropagation();
-		this.setState({closed: true});
-		let state = this.editorHook.state;
+		let state = {};
+		this.editorHook.collect && this.editorHook.collect(state);
 		let that = this;
 
-		if (!state.quizId) {
+		this.setState.quiz = state.quiz;
+		this.setState.questions = state.questions;
+
+		if ( that.state.crud === Protocol.CRUD.c ) {
 			this.jquiz.insert(this.props.uri, state,
 				(resp) => {
+					debugger// quizId can not be null
 					let {quizId, title} = JQuiz.parseResp(resp);
-					state.quizId = quizId;
+					that.state.crud = Protocol.CRUD.u;
+					this.state.quizId = quizId;
 					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
-
-					if (typeof that.props.onOk === 'function')
-						that.props.onOk({quizId: this.state.quizId});
-					that.setState({});
 				});
 		}
 		else {
 			this.jquiz.update(this.props.uri, state, (resp) => {
 				let {questions} = JQuiz.parseResp(resp);
 				that.alert(L("Quiz saved!\n\nQuestions number: {questions}", {questions}));
-
-				if (typeof that.props.onOk === 'function')
-					that.props.onOk({quizId: this.state.quizId});
-				that.setState({});
 			});
 		}
 
@@ -108,9 +108,9 @@ class QuizFormComp extends DetailFormW {
 		let msg = props.msg;
 		let displayCancel = props.cancel === false ? 'none' : 'block';
 		let txtCancel = props.cancel === 'string' ? props.cancel : L('Close');
-		let txtSave = L('Save');
+		let txtSave = L('Publish');
 
-		return (
+		return (<>
 			<Dialog
 				fullWidth={true}
 				maxWidth={'md'}
@@ -124,7 +124,7 @@ class QuizFormComp extends DetailFormW {
 				  <QuizEditor uri={this.props.uri} stateHook={this.editorHook} {...props}
 						title={title}
 						quizId={props.quizId}
-						creating={this.state.creating}
+						creating={this.state.crud === Protocol.CRUD.c}
 						questions={this.state.questions}
 						onDirty={this.onDirty} />
 				</DialogContent>
@@ -139,6 +139,8 @@ class QuizFormComp extends DetailFormW {
 				  </Box>
 				</DialogActions>
 			</Dialog>
+			{this.confirm}
+		  </>
 		);
 	}
 }

@@ -21,6 +21,8 @@ const styles = (theme) => ( {
 } );
 
 /**
+ * Use props.selectedIds for the buffering set to handle selection events.
+ *
  * props:
  * 	{array} columns must need
  * 	{array}  rows  must need
@@ -61,7 +63,6 @@ class AnTablistLevelUpComp extends React.Component {
 		this.changePage = this.changePage.bind(this);
 		this.changeSize = this.changeSize.bind(this);
 		this.handleClick = this.handleClick.bind(this);
-		// this.updateSelectd = this.updateSelectd.bind(this);
 
 		this.th = this.th.bind(this);
 		this.tr = this.tr.bind(this);
@@ -90,15 +91,24 @@ class AnTablistLevelUpComp extends React.Component {
 			}
 			else selected.add(newSelct);
 		}
+
+		if (this.props.onSelectChange)
+			this.props.onSelectChange(selected, newSelct);
 	};
 
 	toSelectAll (event) {
 		if (event.target.checked) {
 			let key = this.props.pk;
 			this.props.rows.forEach((n) => this.selected.add(n[key]));
+
+			if (this.props.onSelectChange)
+				this.props.onSelectChange(this.selected, this.selected);
 		}
 		else {
 			this.selected.clear();
+
+			if (this.props.onSelectChange)
+				this.props.onSelectChange(this.selected, []);
 		}
 	};
 

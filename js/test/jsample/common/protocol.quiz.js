@@ -37,7 +37,7 @@ export class QuizReq {
 		return qs;
 	}
 
-	static questionCols = ["question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"];
+	static questionCols = ["question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "extra"];
 
 	static checkQuestions(arr) {
 		let qs = [];
@@ -83,7 +83,7 @@ export class QuizResp extends AnsonResp {
 	/**
 	 * @return {array} [ {qid, owner, title, tags, quizinfo, oper, optime} ]
 	 */
-	quizzes() {
+	quizzes_deprecated() {
 		if (this.qz === undefined) {
 			// let cols = this.cols;
 
@@ -96,15 +96,17 @@ export class QuizResp extends AnsonResp {
 
 	/**
 	 * @return {object} {
-	 * title: quiz title
-	 * quizId:
-	 * quizinfo:
+	 * title: quiz title,
+	 * quizId,
+	 * quizinfo,
+	 * subject,
+	 * tags,
 	 * questions: [ {qid, qorder, qtype, shortdesc, question, answer, hints, extra, additional} ]
 	 * }
 	 */
-	questions() {
+	questions_deprecated() {
 		this.quizzes();
-		let {title, qid, quizinfo} = this.qz && this.qz.length ? this.qz[0] : {};
+		let {title, qid, quizinfo, tags, subject} = this.qz && this.qz.length ? this.qz[0] : {};
 		let questions = QuizResp.toArrByOrder(
             [ "QID", "QUESTION", "ANSWERS", "QTYPE", "ANSWER", "QORDER", "SHORTDESC", "HINTS", "EXTRA"],
 			this.qs.results, this.qs.colnames);
@@ -113,13 +115,33 @@ export class QuizResp extends AnsonResp {
 				// replaceAll is not available for test
 				q.answers = q.answers ? q.answers.split('\\n').join('\n') : '';
 			} );
-		return {title, quizId: qid, quizinfo, questions};
+		return {quizId: qid, title, subject, tags, quizinfo, questions};
+	}
+
+	quiz_questions() {
+		let {cols, rows} = AnsonResp.rs2arr(this.data.props.rs[0]);
+		let quiz = rows[0] || {title: L('New Quiz')};
+
+		// let questions = QuizResp.toArrByOrder(
+        //     [ "QID", "QUESTION", "SUBJECT", "ANSWERS", "QTYPE", "ANSWER", "QORDER", "QUIZINFO", "HINTS", "EXTRA"],
+		// 	this.qs.results, this.qs.colnames);
+		// if (questions)
+		// 	questions.forEach( (q, x) => {
+		// 		// replaceAll is not available for test
+		// 		q.answers = q.answers ? q.answers.split('\\n').join('\n') : '';
+		// 	} );
+		let questions = AnsonResp.rs2arr(this.data.props.questions);
+		questions = questions.rows;
+
+		return {quizId: quiz.qid, quiz, questions};
 	}
 
 	quizUserIds() {
 		let ids = [];
-		if (this.quizUsers)
-			this.quizUsers.results.forEach( (r, x) => ids.push(r[1]));  // this is bug!
+		// console.log (this.quizUsers, AnsonResp.rs2arr(this.quizUsers));
+		let {cols, rows} = AnsonResp.rs2arr(this.quizUsers);
+		if (rows)
+			rows.forEach( (r, x) => ids.push(r.userId));  // this is bug!
 		return ids;
 	}
 
@@ -145,13 +167,15 @@ export class QuizResp extends AnsonResp {
 }
 
 /**
- * @see io.odysz.jquiz.QuizProtocol 
+ * @see io.odysz.jquiz.QuizProtocol
  */
 export const QuizProtocol = {
 	quizId: "quizId",
 	templName: 'templ-id',
 	questions: "questions",
-	qtitle: "qtitle",
+	qtitle: "title",
+	subject: "subject",
+	tags: "tags",
 	quizinfo: "quizinfo",
 	qowner: "qowner",
 	dcreate: "dcreate",
