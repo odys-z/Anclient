@@ -77,14 +77,14 @@ class DatasetCombo extends React.Component {
 
 			if (typeof _that.props.onSelect === 'function')
 				_that.props.onSelect(selectedItem);
-				
+
 			_that.setState({selectedItem});
 		};
 	}
 
 	render() {
 		let cmb = this.state.combo
-		let refcbb = React.createRef();
+		let refcbb = React.createRef(); // FIXME why not this.refcbb?
 		/** Desgin Notes:
 		 * SimpleForm's first render triggered this constructor and componentDidMount() been called, first.
 		 * When it called render again when data been loaded in it's componentDidMount() (then render),
@@ -98,8 +98,6 @@ class DatasetCombo extends React.Component {
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
 		return (<Autocomplete
-			// key={sk + this.state.uid}
-			// id={String(x)} name={String(x)}
 			ref={refcbb}
 			onChange={ this.onCbbRefChange(refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }

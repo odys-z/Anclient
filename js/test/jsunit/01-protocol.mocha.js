@@ -190,7 +190,7 @@ describe('case: [01.2 Protocol/AnsonReq]', () => {
 		assert.equal(an.servUrl(port), "localhost/r.serv11", "- 11 -");
 	} );
 
-    it('UserReq', () => {
+	it('UserReq', () => {
 		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
 			.A('query')
 			.set('quizId', '000001');

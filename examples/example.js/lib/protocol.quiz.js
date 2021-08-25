@@ -36,8 +36,10 @@ export class QuizResp extends AnsonResp {
 		this.seq = respObj.seq;
 
 		let rs = respObj.data && respObj.data.props && respObj.data.props.rs && respObj.data.props.rs[0];
-		this.cols = rs.length ? [] : rs.colnames;
-		this.rows = rs.length ? [] : rs.results;
+		if (rs) {
+			this.cols = rs.length ? [] : rs.colnames;
+			this.rows = rs.length ? [] : rs.results;
+		}
 
 		this.qs = respObj.data && respObj.data.props && respObj.data.props.questions || {};
 	}

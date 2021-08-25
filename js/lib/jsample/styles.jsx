@@ -49,6 +49,9 @@ export const JsampleIcons = {
 
 export const JsampleTheme = responsiveFontSizes(createTheme({
 	// for example
+	root: {
+		spacing: 4,
+	},
     palette: {
       primary: {
         light: "#fff",
@@ -67,7 +70,11 @@ export const JsampleTheme = responsiveFontSizes(createTheme({
         lg: 1280,
         xl: 1920
       }
+    },
+    tip: {
+        color: '#0c0'
     }
+
 }));
 
 JsampleTheme.typography.body2 = {

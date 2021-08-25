@@ -28,12 +28,14 @@ export * from './react/widgets/my-icon.jsx';
 export * from './react/widgets/my-info.jsx';
 export * from './react/widgets/query-form.jsx';
 export * from './react/widgets/table-list.jsx';
+export * from './react/widgets/table-list-selection-level-up.jsx';
 export * from './react/widgets/tabs.jsx';
 export * from './react/widgets/tree.jsx';
 export * from './react/widgets/treegrid.jsx';
+export * from './react/widgets/record-form.jsx';
 
 export * from './react/widgets/simple-form';
-export * from './react/widgets/tree-editor'; 
+export * from './react/widgets/tree-editor';
 
 import { JsampleIcons, JsampleTheme } from './jsample/styles'
 import { Domain, DomainComp } from './jsample/views/domain'

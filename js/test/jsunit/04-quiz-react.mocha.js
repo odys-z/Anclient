@@ -1,6 +1,38 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, AnsonResp } from '../../lib/protocol.js'
-import { QuizResp, QuizReq } from '../../../examples/example.js/lib/protocol.quiz.js'
+// import { QuizResp, QuizReq } from '../../../examples/example.js/lib/protocol.quiz.js'
+import { QuizResp, QuizReq } from '../jsample/common/protocol.quiz.js'
+
+var __TESTING__ = true;
+
+const jsonQuestionsInReq = [
+    { "qid": 0, "question": "/sys/domain", "answers": "A. 1\nB. 5", "qtype": "s", "qorder": "1", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/sys/roles", "answers": "A\nB\nC", "qtype": "s", "qorder": "2", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/sys/orgs", "answers": "A\nB\nC", "qtype": "s", "qorder": "3", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/sys/users", "answers": "A\nB\nC", "qtype": "s", "qorder": "4", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/indicators", "answers": "A\nB\nC", "qtype": "s", "qorder": "5", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/dashboard", "answers": "A\nB\nC", "qtype": "s", "qorder": "1", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "Computer Science A", "answers": "A\nB\nC", "qtype": "n", "qorder": "1", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/c/status", "answers": "A\nB\nC", "qtype": "n", "qorder": "2", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/c/myconn", "answers": "A\nB\nC", "qtype": "n", "qorder": "3", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/c/mypolls", "answers": "A\nB\nC", "qtype": "n", "qorder": "4", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/quizzes", "answers": "A\nB\nC", "qtype": "s", "qorder": "2", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/polls", "answers": "A\nB\nC", "qtype": "s", "qorder": "2", "shortDesc": null, "extra": null },
+    { "qid": 0, "question": "/n/my-students", "answers": "A\nB\nC", "qtype": "s", "qorder": "3", "shortDesc": null, "extra": null }
+];
+
+describe('case: [04 Protocol.JsonQuestion] serializing', () => {
+
+	it('4.-1 [QuizReq.checkQuestions]', () => {
+		let quests = QuizReq.checkQuestions(jsonQuestionsInReq);
+
+		assert.equal(quests.length, jsonQuestionsInReq.length, "-1.1 ---");
+		assert.equal(quests[0].type, "io.odysz.jquiz.JsonQuestion", "-1.2 ---");
+		assert.equal(quests[0].qid, "0", "-1.3 ---");
+		assert.equal(quests[0].question, "/sys/domain", "-1.4 ---");
+		assert.equal(quests[12].question, "/n/my-students", "-1.5 ---");
+	});
+});
 
 const jsonResp = {
 "body": [{
@@ -201,6 +233,31 @@ const resp1Question = {
 	"seq": 0
 }
 
+const respInserted = {
+    "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+    "code": "ok",
+    "opts": null, "port": "quiz.serv", "header": null,
+    "body": [{"type": "io.odysz.jquiz.QuizResp", "rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null,
+              "data": {
+                "type": "io.odysz.semantics.SemanticObject",
+                "props": {"qtitle": null, "quizId": "000004", "questions": 1}
+              },
+              "m": "inserted", "map": null, "uri": null
+    }],
+    "version": "1.0", "seq": 0
+}
+
+const respUpdated = {
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "code": "ok", "opts": null, "port": "quiz.serv", "header": null,
+  "body": [{"type": "io.odysz.jquiz.QuizResp", "rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null,
+            "data": {"type": "io.odysz.semantics.SemanticObject",
+            "props": {"quizId": "000005", "questions": 1}},
+            "m": "updated", "map": null, "uri": null
+          }],
+  "version": "1.0", "seq": 0
+}
+
 describe('case: [04 Protocol.QuizResp] !! See example.js/lib/protocol.quiz.js line 1 ', () => {
 
 	it('4.1 [Quiz] Convert AnsonResp to quizzes', () => {
@@ -257,5 +314,67 @@ describe('case: [04 Protocol.QuizResp] !! See example.js/lib/protocol.quiz.js li
 		assert.equal(questions[0].answers.length, 15, "9 --- it's string length of " + questions[0].answers);
 		assert.equal(questions[0].answers.split('\n').length, 4, "10  --- answers: " + questions[0].answers.split('\n'));
 		assert.equal(questions[0].answer, "0", "11 ---");
+	});
+});
+
+describe('case: [04 Protocol.QuizResp] Update / Insert Results', () => {
+	it('4.A [Quiz] Inserted', () => {
+		let quizResp = new QuizResp(respInserted.body[0]);
+		let quizId = quizResp.getProp('quizId');
+
+		assert.equal(respInserted.code, 'ok', "4.A - 1");
+		assert.equal(quizId, '000004', "4.A - 2");
+	});
+
+	it('4.B [Quiz] updated', () => {
+		debugger
+		let quizResp = new QuizResp(respUpdated.body[0]);
+		let quizId = quizResp.getProp('quizId');
+
+		assert.equal(respUpdated.code, 'ok', "4.B - 1");
+		assert.equal(quizResp.msg(), 'updated', "4.B - 2");
+		assert.equal(quizId, '000005', "4.B - 3");
+	});
+});
+
+const respWithUsers = {
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "code": "ok", "opts": null, "port": "quiz.serv", "header": null,
+  "body": [{
+    "type": "io.odysz.jquiz.QuizResp", "rs": null,
+    "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null,
+    "data": {"type": "io.odysz.semantics.SemanticObject", "props": null},
+    "quizUsers": {
+      "type": "io.odysz.module.rs.AnResultset", "stringFormats": null,
+      "total": 2, "rowCnt": 2, "colCnt": 3,
+      "colnames": {"USERNAME": [3, "userName"], "CHECKED": [1, "checked"], "STUDENTS": [2, "students"]},
+      "rowIdx": 0,
+      "results": [[1, "alice", "Alice"], [1, "georgy", "Georgy"]]
+    },
+    "m": null, "map": null, "uri": null
+  }],
+  "version": "1.0", "seq": 0
+}
+
+describe('case: [04 Protocol.QuizResp] quiz users', () => {
+	it('4.X [Quiz] puiz users', () => {
+		Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
+			return new QuizResp(jsonBd);
+		});
+
+		let quizResp = new AnsonMsg(respWithUsers);
+		let u = quizResp.Body().quizUsers;
+
+		assert.equal(u.type, "io.odysz.module.rs.AnResultset", "4.X - type");
+		assert.equal(u.colnames.USERNAME.length, 2, "4.X - 2");
+		assert.equal(u.results.length, 2, "4.X - 2");
+		assert.equal(u.results[0][0], 1, "4.X - checked");
+		assert.equal(u.results[0][1], "alice", "4.X - userId");
+		assert.equal(u.results[0][2], "Alice", "4.X - user name");
+
+		// bugs must be guarded here
+		let ids = quizResp.Body().quizUserIds();
+		assert.equal(ids[0], 'alice', "4.x - alice");
+		assert.equal(ids[1], 'georgy', "4.x - george");
 	});
 });

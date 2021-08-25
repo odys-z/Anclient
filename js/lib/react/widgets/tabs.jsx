@@ -34,11 +34,9 @@ class TabPanel extends React.Component {
 			id={`p-${this.props.pid}`}
 			{...this.props.args}
 		>
-			{this.props.px === this.props.pid && (
 			<Box p={3}>
-			  <Typography>{this.props.children}</Typography>
+			  {this.props.children}
 			</Box>
-			)}
 		</div>
 	  );
 	}
@@ -47,6 +45,7 @@ class TabPanel extends React.Component {
 class TabsComp extends React.Component {
 	state = {
 		px: 0, // panel index
+		panels: [<div>Panels[0]</div>, <div>Panels[1]</div>, <div>Panels[2]</div>]
 	};
 
 	constructor (props = {}) {
@@ -65,29 +64,44 @@ class TabsComp extends React.Component {
 		this.setState({ px: v });
 	};
 
+
+
 	render() {
 		const {classes} = this.props;
-	  	return (
-		<div className={classes.root}>
-		  <AppBar position="static">
-			<Tabs value={this.state.px}
-				  onChange={this.handleChange} >
-			  <Tab value={0} label={L('Basic')} className={classes.tab} />
-			  <Tab value={1} label={L('System')} className={classes.tab} />
-			  <Tab value={2} label={L('Private')}  className={classes.tab} />
-			</Tabs>
-		  </AppBar>
-		  <TabPanel px={this.state.px} pid={0} children={''} >
-			Item One
-		  </TabPanel>
-		  <TabPanel px={this.state.px} pid={1} children={''} >
-			Item Two222
-		  </TabPanel>
-		  <TabPanel px={this.state.px} pid={2} children={''} >
-			Item Three
-		  </TabPanel>
-		</div>
-		);
+		let that = this;
+		if (this.props.panels) {
+			return (
+			<div className={classes.root}>
+			  <AppBar position="static">
+				<Tabs value={this.state.px}
+					  onChange={this.handleChange} >
+						{this.props.panels.filter(p => !!p.title).map( (p, x) => {
+				  			return (<Tab key={x} value={x} label={p.title} className={classes.tab} />);
+						})}
+				</Tabs>
+			  </AppBar>
+				{this.props.panels.filter(p => !!p.title).map( (p, x) => {
+					return (<TabPanel key={x} px={this.state.px} pid={x} children={p.panel} />);
+				} ) }
+			</div> );
+		}
+		else return demo(classes);
+
+		function demo(classes) {
+			return ( <div className={classes.root}>
+			  <AppBar position="static">
+				<Tabs value={that.state.px}
+					  onChange={that.handleChange} >
+				  <Tab value={0} label={L('panels[0].title')} className={classes.tab} />
+				  <Tab value={1} label={L('panels[1].title')} className={classes.tab} />
+				  <Tab value={2} label={L('panels[2].title')} className={classes.tab} />
+				</Tabs>
+			  </AppBar>
+				<TabPanel px={that.state.px} pid={0} children={that.state.panels[0]} />
+				<TabPanel px={that.state.px} pid={1} children={that.state.panels[1]} />
+				<TabPanel px={that.state.px} pid={2} children={that.state.panels[2]} />
+			</div> );
+		}
 	}
 }
 TabsComp.contextType = AnContext;

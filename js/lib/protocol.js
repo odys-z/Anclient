@@ -304,8 +304,18 @@ class AnsonResp extends AnsonBody {
 		return this.m;
 	}
 
+	Code() {
+		return this.code;
+	}
+
 	Rs(rx = 0) {
 		return this.rs && this.rs.length > rx ? this.rs[rx] : undefined;
+	}
+
+	getProp(prop) {
+		if (this.data && this.data.props) {
+			return this.data.props[prop];
+		}
 	}
 
 	static hasColumn(rs, colname) {
@@ -329,7 +339,7 @@ class AnsonResp extends AnsonBody {
 		let cols = [];
 		let rows = [];
 
-		if (typeof(rs.colnames) === 'object') {
+		if (rs && typeof(rs.colnames) === 'object') {
 			// rs with column index
 			cols = new Array(rs.colnames.length);
 			for (var col in rs.colnames) {
@@ -347,14 +357,14 @@ class AnsonResp extends AnsonBody {
 				rows.push(rw);
 			});
 		}
-		else {
+		else if (rs) {
 			// first line as column index
 			rs.forEach((r, rx) => {
 				if (rx === 0) {
 					cols = r;
 				}
 				else {
-					rw = {};
+					let rw = {};
 					r.forEach((c, cx) => {
 						rw[cols[cx]] = c;
 					});

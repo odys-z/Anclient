@@ -74,7 +74,7 @@ class UsersComp extends CrudCompW {
 				edit: rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,
 			},
-			selectedRoleIds: rowIds
+			selectedRecIds: rowIds
 		} );
 	}
 
@@ -92,7 +92,7 @@ class UsersComp extends CrudCompW {
 	toEdit(e, v) {
 		this.roleForm = (<UserDetails u
 			uri={this.uri}
-			roleId={this.state.selectedRoleIds[0]}
+			roleId={this.state.selectedRecIds[0]}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
@@ -115,6 +115,7 @@ class UsersComp extends CrudCompW {
 					name: q.state.conds[0].val ? q.state.conds[0].val : undefined,
 					roleId: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
 				}} }
+				pk='userId'
 			/>
 
 			<Grid container alignContent="flex-end" >

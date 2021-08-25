@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import { Collapse, Grid, TextField, Switch, Button } from '@material-ui/core';
+import { Collapse, Grid, TextField, Switch, Button, FormControlLabel } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
@@ -12,14 +12,12 @@ import { L } from '../../utils/langstr';
 
 const styles = (theme) => ( {
 	root: {
-		// height: '1.5em,
 		"& :hover": {
 			backgroundColor: '#eef'
 		},
 	},
 	container: {
 		display: 'flex',
-		// width: '100%',
 		'& > *': {
 			margin: theme.spacing(0.5),
 		}
@@ -56,10 +54,14 @@ class AnQueryFormComp extends CrudComp {
 	constructor(props) {
 		super(props);
 
+		this.bindConds = this.bindConds.bind(this);
+
 		this.handleChange = this.handleChange.bind(this);
 		this.onTxtChange = this.onTxtChange.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 		this.toClear = this.toClear.bind(this);
+
+		this.onBound = this.onBound.bind(this);
 
 		this.refcbb = React.createRef();
 
@@ -71,21 +73,47 @@ class AnQueryFormComp extends CrudComp {
 	}
 
 	componentDidMount() {
+		this.bindConds();
+	}
 
+	bindConds() {
 		if (!this.context || !this.context.anReact)
 			throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
-		this.state.conds.filter((c, x ) => !!c)
+		this.state.conds.filter((c, x ) => !!c && !c.loading && !c.clean)
 		  .forEach( (cond, cx) => {
-			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb'))
+			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
+				// reset by AnReact.ds2cbbOptions()
+				cond.loading = true;
 				this.context.anReact.ds2cbbOptions({
 						uri: this.props.uri,
 						sk: cond.sk,
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
-						cond
+						sqlArgs: cond.sqlArgs,
+						cond,
+						onDone: this.onBound
 					},
 					this.context.error, this);
+			}
 		});
+	}
+
+	/** Check all binding tasks, if all are ok, fire onDone event.
+	 * Called by AnReact.ds2ds2cbbOptions, etc. Should call parent component's
+	 * onDone handler.
+	 * @param {object} cond the curreent condition
+	 */
+	onBound(cond) {
+		let conds = this.state.conds;
+		if (conds) {
+			for (let i = 0; i < conds.length; i++) {
+				if (conds[i] && conds[i].loading)
+					return;
+			}
+		}
+
+		if (typeof this.props.onDone === 'function')
+			this.props.onDone(this.query());
 	}
 
 	handleChange( e ) {
@@ -101,23 +129,41 @@ class AnQueryFormComp extends CrudComp {
 		});
 	}
 
-	onTxtChange( e ) {
+	onTxtChange( e, x ) {
 		e.stopPropagation()
-		let qx = e.currentTarget.id;
-		qx = parseInt(qx);
-		this.state.conds[qx].val = e.currentTarget.value;
+		// let qx = e.currentTarget.id;
+		// qx = parseInt(qx);
+		// this.state.conds[qx].val = e.currentTarget.value;
+		this.state.conds[x].val = e.currentTarget.value;
 	}
 
-	onDateChange(e,index){
+	onDateChange(e, ix) {
 		e.stopPropagation();
-		//this.state.conds[index].val = e.currentTarget.value;
-		let arr = this.state.conds.map((obj,ix) => {
-			if(ix === index){
-				obj.val = e.currentTarget.value
-			}
-			return obj;
-		});
-		this.setState({conds:arr});
+
+		// let arr = this.state.conds.map((obj, ix) => {
+		// 	if(ix === index){
+		// 		obj.val = e.currentTarget.value
+		// 	}
+		// 	return obj;
+		// });
+		// this.setState({conds: arr});
+
+		console.log(this.state.conds[ix], e.currentTarget.value);
+		let obj = this.state.conds[ix];
+		this.state.conds[ix].val = e.currentTarget.value;
+	}
+
+	onSwitchChange(e, x) {
+		e.stopPropagation();
+		// let arr = this.state.conds.map((obj, ix) => {
+		// 	if(ix === x){
+		// 		obj.val = e.currentTarget.value
+		// 	}
+		// 	return obj;
+		// });
+		// this.setState({conds: arr});
+
+		this.state.conds[x].val = e.currentTarget.checked;
 	}
 
 	onCbbRefChange( refcbb ) {
@@ -136,6 +182,13 @@ class AnQueryFormComp extends CrudComp {
 	}
 
 	toSearch( e ) {
+		/// conds.clean & cond.loading are used for guarding re-entry the query, e.g. when error occured
+		this.state.conds.forEach(
+			(c, x) => {
+				c.clean = false;
+				c.loading = false;
+			} );
+
 		this.props.onSearch(e, this.query());
 	}
 
@@ -149,6 +202,8 @@ class AnQueryFormComp extends CrudComp {
 	}
 
 	render() {
+		this.bindConds(); // this makes condition data can be updated by parent, e.g. rebind cbb.
+
 		let that = this;
 
 		let { checked } = this.state;
@@ -167,13 +222,13 @@ class AnQueryFormComp extends CrudComp {
 							className={classes.button}
 							onClick={this.toSearch}
 							startIcon={<Search />}
-						>{L('Search')}</Button>
+						>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Search')}</Button>
 						<Button variant="contained"
 							color="primary"
 							className={classes.button}
 							onClick={this.toClear}
 							startIcon={<Replay />}
-						>{L('Reset')}</Button>
+						>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Reset')}</Button>
 					</Grid>
 				</Grid>
 			</Collapse>
@@ -238,23 +293,25 @@ class AnQueryFormComp extends CrudComp {
 					let v = cond && cond.val ? cond.val : '';
 					let label = cond && cond.label ? cond.label : "date"
 					return (
-
-						<TextField key={x}
-							//ref={refDate}
-							value = {v}
-							label={label}
-							type="date"
-							style={{ width: 300 }}
-							onChange = {event => {that.onDateChange(event,x)}}
-							InputLabelProps={{
-							shrink: true
-							}}/>
+						<TextField key={x} value = {v} label={label}
+							type="date" style={{ width: 300 }}
+							onChange = {event => {that.onDateChange(event, x)}}
+							InputLabelProps={{ shrink: true }}/>
 					)
+				}
+				else if (cond.type === "switch") {
+					let v = cond && cond.val || false;
+					return (
+						<FormControlLabel key={'sch' + x}
+					        control={ <Switch key={x} checked={v} coloer='primary'
+										onChange = {e => {that.onSwitchChange(e, x)}} /> }
+							label={cond.label} />
+					);
 				}
 				else // if (cond.type === 'text')
 					return (<TextField label={cond.label} key={'text' + x}
 						id={String(x)}
-						onChange={that.onTxtChange}/>);
+						onChange={e => {that.onTxtChange(e, x)}}/>);
 			} );
 		}
 	}
@@ -264,10 +321,13 @@ AnQueryFormComp.contextType = AnContext;
 AnQueryFormComp.propTypes = {
 	/* TODO: DOCS
 	 * Design Notes:
-	 * All common widgets need this check, but main CURD page's uri is been set
+	 * All common widgets need this check, but main CRUD page's uri is been set
 	 * by SysComp.
 	 */
-	uri: PropTypes.string.isRequired
+	uri: PropTypes.string.isRequired,
+	conds: PropTypes.array.isRequired,
+	onSearch: PropTypes.func.isRequired,
+	buttonStyle: PropTypes.oneOf(["norm", "dense"])
 };
 
 const AnQueryForm = withStyles(styles)(AnQueryFormComp);

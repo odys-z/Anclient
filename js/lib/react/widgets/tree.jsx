@@ -98,7 +98,8 @@ function EIcon(props) {
 const styles = (theme) => ({
   root: {
 	display: "flex",
-	flexDirection: 'column',
+	flexDirection: "column",
+	textAlign: "left",
 	width: "100%"
   },
   row: {
@@ -183,10 +184,9 @@ class AnTreeComp extends React.Component {
 		if (node.children && node.children.length > 0)
 		  return (
 			<Box key={id} className={classes.folder}>
-			  <Box
-				nid={id}
-				onClick={expandItem}
-				className={classes.folderHead}
+			  <Box  nid={id}
+					onClick={expandItem}
+					className={classes.folderHead}
 			  >
 				<Grid container spacing={0}>
 				  <Grid item xs={11}>
@@ -233,7 +233,7 @@ class AnTreeComp extends React.Component {
 				</Typography>
 			  </Grid>
 			  <Grid item xs={3} className={classes.treeItem} >
-				<Typography className={classes.treeLabel} >{itemLabel(node.url, level)}</Typography>
+				<Typography className={classes.treeLabel} >{itemLabel(node.label || node.text, level, node.css)}</Typography>
 			  </Grid>
 			</Grid>
 		  );
@@ -251,13 +251,14 @@ class AnTreeComp extends React.Component {
 	  return c;
 	}
 
-	function itemLabel(n, l) {
-		return `${l}`;
+	function itemLabel(txt, l, css) {
+		return txt;
 	}
   }
 
   render() {
 	const { classes } = this.props;
+	this.state.forest = this.props.forest;
 
 	return <div className={classes.root}>{this.buildTree(classes)}</div>;
   }
