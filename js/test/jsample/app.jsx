@@ -12,8 +12,6 @@ import { L, Langstrs,
 } from 'anclient';
 const { Domain, Roles, Orgs, Users, JsampleTheme } = jsample;
 
-// import { samports } from './jsample.js';
-
 import { StarPorts } from './common/port';
 
 import { Indicators } from './views/n/indicators';
@@ -21,8 +19,7 @@ import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStatus } from './views/c/status';
-// import { MyPolls } from './views/c/my-polls';
-import { MyPolls } from './views/c/my-polls-selection-level-up';
+import { MyPolls } from './views/c/my-polls';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {

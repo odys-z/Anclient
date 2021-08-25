@@ -28,7 +28,7 @@ export * from './react/widgets/my-icon.jsx';
 export * from './react/widgets/my-info.jsx';
 export * from './react/widgets/query-form.jsx';
 export * from './react/widgets/table-list.jsx';
-export * from './react/widgets/table-list-selection-level-up.jsx';
+export * from './react/widgets/table-list-lu.jsx';
 export * from './react/widgets/tabs.jsx';
 export * from './react/widgets/tree.jsx';
 export * from './react/widgets/treegrid.jsx';

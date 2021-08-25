@@ -65,6 +65,10 @@ class AnTablistComp extends React.Component {
 		this.tr = this.tr.bind(this);
 	}
 
+	componentDidMount() {
+		console.warn("AnTablist is deprecated. Use AnTablistLevelUp instead.");
+	}
+
 	isSelected(k) {
 		return this.state.selected.has(k);
 	}

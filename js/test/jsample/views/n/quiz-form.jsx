@@ -13,7 +13,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 import { L, Protocol, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from 'anclient';
 import { JQuiz } from '../../common/an-quiz.js';
-import { QuizEditor } from './quiz-editor-breakdown';
+import { QuizEditor } from './quiz-editor';
 
 const styles = (theme) => ({
   root: {
