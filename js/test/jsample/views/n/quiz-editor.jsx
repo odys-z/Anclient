@@ -109,28 +109,13 @@ class QuizEditorComp extends DetailFormW {
 	}
 
 	bindQuiz(ansonResp) {
-		// let qresp = new QuizResp(ansonResp.body);
-		// let {title, quizId, quizinfo, questions, subject, tags} = qresp.questions();
-		// let quizUsers = qresp.quizUserIds();
-		// console.log(quizUsers);
-		// this.setState( {
-		// 	questions: questions,
-		// 	quiz: { title:  title || L('Emotion Poll (Type A)'),
-		// 			subject, tags, quizinfo},
-		// 	quizUsers,
-		// 	currentqx: -1,
-		// 	dirty:   false
-		// } );
-
 		let qresp = new QuizResp(ansonResp.body);
 		let {quizId, quiz, questions} = qresp.quiz_questions();
 		let quizUsers = qresp.quizUserIds();
-		console.log(quizUsers);
+		// console.log(quizUsers);
 		this.setState( {
 			questions: questions,
 			quiz,
-			// quiz: { title:  title || L('Emotion Poll (Type A)'),
-			// 		subject, tags, quizinfo},
 			quizUsers,
 			currentqx: -1,
 			dirty:   false

@@ -83,16 +83,20 @@ class QuizFormComp extends DetailFormW {
 				(resp) => {
 					debugger// quizId can not be null
 					let {quizId, title} = JQuiz.parseResp(resp);
+					if (isNull(quizId))
+						console.error ("Something Wrong!");
+					Object.assign(this.state, state);
 					that.state.crud = Protocol.CRUD.u;
-					this.state.quizId = quizId;
 					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
 				});
 		}
 		else {
-			this.jquiz.update(this.props.uri, state, (resp) => {
-				let {questions} = JQuiz.parseResp(resp);
-				that.alert(L("Quiz saved!\n\nQuestions number: {questions}", {questions}));
-			});
+			this.jquiz.update(this.props.uri, state,
+				(resp) => {
+					let {questions} = JQuiz.parseResp(resp);
+					Object.assign(this.state, state);
+					that.alert(L("Quiz saved!\n\nQuestions number: {questions}", {questions}));
+				});
 		}
 
 	}
