@@ -4,10 +4,10 @@ import { expect, assert } from 'chai';
 import { L, Langstrs } from '../../lib/utils/langstr';
 import { toBool, isEmpty } from '../../lib/utils/helpers';
 
-describe('case: [0.0] helpers', () => {
-	it('[toBool, isEmpty]', () =>{
-		assert.equal(isEmpty(''), false, '0.1');
-		assert.equal(toBool(''), true, '0.3');
+describe('case: [0.0] utils', () => {
+	it('helpers: toBool, isEmpty', () =>{
+		assert.equal(isEmpty(''), true, '0.1');
+		assert.equal(toBool(''), false, '0.3');
 		assert.equal(isEmpty(), true, '0.4');
 		assert.equal(toBool(), false, '0.5');
 		assert.equal(isEmpty(undefined), true, '0.6');
@@ -24,10 +24,8 @@ describe('case: [0.0] helpers', () => {
 		assert.equal(toBool(true), true, '0.12');
 		assert.equal(toBool(false), false, '0.13');
 	} );
-} );
 
-describe('case: [00.1 Array patch]', () => {
-    it('Array', () => {
+    it('Array pathc', () => {
 		let arr = [1, 2, 3];
 		arr.swap(0, 1);
 		assert.equal(arr.length, 3);

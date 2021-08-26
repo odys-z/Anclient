@@ -11,7 +11,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { L, Protocol, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from 'anclient';
+import { L, isEmpty, Protocol, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from 'anclient';
 import { JQuiz } from '../../common/an-quiz.js';
 import { QuizEditor } from './quiz-editor';
 
@@ -81,9 +81,8 @@ class QuizFormComp extends DetailFormW {
 		if ( that.state.crud === Protocol.CRUD.c ) {
 			this.jquiz.insert(this.props.uri, state,
 				(resp) => {
-					debugger// quizId can not be null
 					let {quizId, title} = JQuiz.parseResp(resp);
-					if (isNull(quizId))
+					if (isEmpty(quizId))
 						console.error ("Something Wrong!");
 					Object.assign(this.state, state);
 					that.state.crud = Protocol.CRUD.u;

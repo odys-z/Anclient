@@ -82,9 +82,19 @@ class QuizEditorComp extends DetailFormW {
 		props.stateHook.collect = function (me) {
 			let that = me;
 			return function(hookObj){
+				/*
 				hookObj.questions = that.state.questions; // also supposed to change to using hook once each question been broken down
 				hookObj.quizUsers = that.state.quizUsers;
 				that.quizHook.collect && that.quizHook.collect(hookObj);
+				// FIXME Desgin Note: This is a special problem of our state hook.
+				// If RecordFormComp collected state to upper level, e.g. quiz been hooked to upper,
+				// what we should use to update broken down component, i.e. the RecordForm?
+				that.state.quiz = hookObj.quiz;
+				*/
+				that.quizHook.collect && that.quizHook.collect(that.state);
+				hookObj.questions = that.state.questions; // also supposed to change to using hook once each question been broken down
+				hookObj.quizUsers = that.state.quizUsers;
+				hookObj.quiz = that.state.quiz;
 			}; }(this);
 
 		this.state.quizId = props.quizId;
