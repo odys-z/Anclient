@@ -34,63 +34,63 @@ describe('case: [04 Protocol.JsonQuestion] serializing', () => {
 	});
 });
 
-const jsonResp = {
-"body": [{
-	"a": null,
-	"conn": null,
-	"data": {
-		"props": {
-			"rs": [{
-				"colCnt": 15,
-				"colnames": {
-					"DCREATE": [8, "dcreate"],
-					"DID": [11, "did"],
-					"EXTRA": [10, "extra"],
-					"LABEL": [14, "label"],
-					"OPER": [2, "oper"],
-					"OPTIME": [4, "optime"],
-					"PARENT": [13, "parent"],
-					"QID": [1, "qid"],
-					"QOWNER": [7, "qowner"],
-					"QUIZINFO": [6, "quizinfo"],
-					"REMARKS": [15, "remarks"],
-					"SUBJECT": [9, "subject"],
-					"TAG": [12, "tag"],
-					"TAGS": [5, "tags"],
-					"TITLE": [3, "title"]
-				},
-				"results": [
-					["000004", "admin", null, "2021-06-09 12:55:02", null, null, "admin", "2021-06-09T12:55:02.200Z", null, null, null, null, null, null, null],
-					["000005", "admin", null, "2021-06-10 01:50:43", null, null, "admin", "2021-06-10T01:50:42.847Z", null, null, null, null, null, null, null],
-					["000006", "admin", "", "2021-06-10 01:51:20", null, null, "admin", "2021-06-10T01:51:19.888Z", null, null, null, null, null, null, null],
-					["000007", "admin", "zzzzzzzz", "2021-06-10 02:03:46", null, "ddddddddddddddd", "admin", "2021-06-10T02:03:46.032Z", null, null, null, null, null, null, null],
-					["000008", "admin", "", "2021-06-10 02:19:39", null, null, "admin", "2021-06-10T02:19:39.062Z", null, null, null, null, null, null, null],
-					["000009", "admin", "", "2021-06-10 02:26:33", null, null, "admin", "2021-06-10T02:26:33.569Z", null, null, null, null, null, null, null],
-					["00000A", "admin", "", "2021-06-10 02:29:19", null, "tt", "admin", "2021-06-10T02:29:19.187Z", null, null, null, null, null, null, null]
-				],
-				"rowCnt": 7,
-				"rowIdx": 0,
-				"stringFormats": null,
-				"total": 7,
-				"type": "io.odysz.module.rs.AnResultset"
-			}],
-			"total": [7]
-		},
-		"type": "io.odysz.semantics.SemanticObject"
-	},
-	"m": "list loaded",
-	"map": null,
-	"parent": "io.odysz.semantic.jprotocol.AnsonMsg",
-	"rs": null,
-	"type": "io.odysz.jquiz.QuizResp"
-}],
-"code": "ok",
-"header": null,
-"opts": null,
-"port": "quiz.serv",
-"seq": 0,
-"type": "io.odysz.semantic.jprotocol.AnsonMsg",
-"version": "1.0" }
+// const jsonResp = {
+// "body": [{
+// 	"a": null,
+// 	"conn": null,
+// 	"data": {
+// 		"props": {
+// 			"rs": [{
+// 				"colCnt": 15,
+// 				"colnames": {
+// 					"DCREATE": [8, "dcreate"],
+// 					"DID": [11, "did"],
+// 					"EXTRA": [10, "extra"],
+// 					"LABEL": [14, "label"],
+// 					"OPER": [2, "oper"],
+// 					"OPTIME": [4, "optime"],
+// 					"PARENT": [13, "parent"],
+// 					"QID": [1, "qid"],
+// 					"QOWNER": [7, "qowner"],
+// 					"QUIZINFO": [6, "quizinfo"],
+// 					"REMARKS": [15, "remarks"],
+// 					"SUBJECT": [9, "subject"],
+// 					"TAG": [12, "tag"],
+// 					"TAGS": [5, "tags"],
+// 					"TITLE": [3, "title"]
+// 				},
+// 				"results": [
+// 					["000004", "admin", null, "2021-06-09 12:55:02", null, null, "admin", "2021-06-09T12:55:02.200Z", null, null, null, null, null, null, null],
+// 					["000005", "admin", null, "2021-06-10 01:50:43", null, null, "admin", "2021-06-10T01:50:42.847Z", null, null, null, null, null, null, null],
+// 					["000006", "admin", "", "2021-06-10 01:51:20", null, null, "admin", "2021-06-10T01:51:19.888Z", null, null, null, null, null, null, null],
+// 					["000007", "admin", "zzzzzzzz", "2021-06-10 02:03:46", null, "ddddddddddddddd", "admin", "2021-06-10T02:03:46.032Z", null, null, null, null, null, null, null],
+// 					["000008", "admin", "", "2021-06-10 02:19:39", null, null, "admin", "2021-06-10T02:19:39.062Z", null, null, null, null, null, null, null],
+// 					["000009", "admin", "", "2021-06-10 02:26:33", null, null, "admin", "2021-06-10T02:26:33.569Z", null, null, null, null, null, null, null],
+// 					["00000A", "admin", "", "2021-06-10 02:29:19", null, "tt", "admin", "2021-06-10T02:29:19.187Z", null, null, null, null, null, null, null]
+// 				],
+// 				"rowCnt": 7,
+// 				"rowIdx": 0,
+// 				"stringFormats": null,
+// 				"total": 7,
+// 				"type": "io.odysz.module.rs.AnResultset"
+// 			}],
+// 			"total": [7]
+// 		},
+// 		"type": "io.odysz.semantics.SemanticObject"
+// 	},
+// 	"m": "list loaded",
+// 	"map": null,
+// 	"parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+// 	"rs": null,
+// 	"type": "io.odysz.jquiz.QuizResp"
+// }],
+// "code": "ok",
+// "header": null,
+// "opts": null,
+// "port": "quiz.serv",
+// "seq": 0,
+// "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+// "version": "1.0" }
 
 const jsonNochild = {
 	"type": "io.odysz.semantic.jprotocol.AnsonMsg",
@@ -260,35 +260,36 @@ const respUpdated = {
 
 describe('case: [04 Protocol.QuizResp] !! See example.js/lib/protocol.quiz.js line 1 ', () => {
 
-	it('4.1 [Quiz] Convert AnsonResp to quizzes', () => {
-		let quizResp = new QuizResp(jsonResp.body[0]);
-		let quizzes = quizResp.quizzes();
+	// it('4.1 [Quiz] Convert AnsonResp to quizzes', () => {
+	// 	let quizResp = new QuizResp(jsonResp.body[0]);
+	// 	let quizzes = quizResp.quizzes();
+	//
+	// 	// ['QID', 'QOWNER', 'QTITLE', 'TAGS', 'QUESTIONS', 'OPER', 'OPERTIME']
+	// 	assert.equal(quizzes.length, 7, "1 ---");
+	// 	assert.equal(quizzes[0].qid, "000004", "2 ---");
+	// 	assert.equal(quizzes[6].qid, "00000A", "3 ---");
+	// 	assert.equal(quizzes[3].title, "zzzzzzzz", "4 ---");
+	// });
 
-		// ['QID', 'QOWNER', 'QTITLE', 'TAGS', 'QUESTIONS', 'OPER', 'OPERTIME']
-		assert.equal(quizzes.length, 7, "1 ---");
-		assert.equal(quizzes[0].qid, "000004", "2 ---");
-		assert.equal(quizzes[6].qid, "00000A", "3 ---");
-		assert.equal(quizzes[3].title, "zzzzzzzz", "4 ---");
-	});
+	// it('4.2 [Quiz] Create QuizResp with new AnsonMsg()', () => {
+	// 	Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
+	// 		return new QuizResp(jsonBd);
+	// 	});
+	//
+	// 	let quizResp = new AnsonMsg(jsonResp);
+	// 	let quizzes = quizResp.Body().quizzes();
+	//
+	// 	// ['QID', 'QOWNER', 'QTITLE', 'TAGS', 'QUESTIONS', 'OPER', 'OPERTIME']
+	// 	assert.equal(quizzes.length, 7, "1 ---");
+	// 	assert.equal(quizzes[0].qid, "000004", "2 ---");
+	// 	assert.equal(quizzes[6].qid, "00000A", "3 ---");
+	// 	assert.equal(quizzes[3].title, "zzzzzzzz", "4 ---");
+	// });
 
-	it('4.2 [Quiz] Create QuizResp with new AnsonMsg()', () => {
-		Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
-			return new QuizResp(jsonBd);
-		});
-
-		let quizResp = new AnsonMsg(jsonResp);
-		let quizzes = quizResp.Body().quizzes();
-
-		// ['QID', 'QOWNER', 'QTITLE', 'TAGS', 'QUESTIONS', 'OPER', 'OPERTIME']
-		assert.equal(quizzes.length, 7, "1 ---");
-		assert.equal(quizzes[0].qid, "000004", "2 ---");
-		assert.equal(quizzes[6].qid, "00000A", "3 ---");
-		assert.equal(quizzes[3].title, "zzzzzzzz", "4 ---");
-	});
-
-	it('4.3 [Quiz.questions: no question] Convert AnsonResp to questions with new QuizResp()', () => {
-		let quiz = new QuizResp(jsonNochild.body[0]);
-		let { title, quizinfo, quizId, questions } = quiz.questions();
+	it('4.3 [Quiz.quiz_questions: no question] Convert AnsonResp to questions with new QuizResp()', () => {
+		let quizresp = new QuizResp(jsonNochild.body[0]);
+		let { quiz, quizId, questions } = quizresp.quiz_questions();
+		let { title, quizinfo } = quiz;
 
 		assert.equal(title, "zzzzzzzz", "1 ---");
 		assert.equal(quizId, "000007", "2 ---");
@@ -298,8 +299,9 @@ describe('case: [04 Protocol.QuizResp] !! See example.js/lib/protocol.quiz.js li
 	});
 
 	it('4.4 [Quiz.questions: 1 question] Convert AnsonResp to questions with new QuizResp()', () => {
-		let quiz = new QuizResp(resp1Question.body[0]);
-		let { title, quizinfo, quizId, questions } = quiz.questions();
+		let quizresp = new QuizResp(resp1Question.body[0]);
+		let { quiz, quizId, questions } = quizresp.quiz_questions();
+		let { title, quizinfo } = quiz;
 
 		assert.equal(title, "New Quiz", "1 ---");
 		assert.equal(quizId, "000001", "2 ---");
@@ -311,8 +313,8 @@ describe('case: [04 Protocol.QuizResp] !! See example.js/lib/protocol.quiz.js li
 		assert.equal(questions[0].qorder, null, "6 ---");
 		assert.equal(questions[0].qtype, "1", "7 ---");
 		assert.equal(questions[0].question, "Question 0", "8 ---");
-		assert.equal(questions[0].answers.length, 15, "9 --- it's string length of " + questions[0].answers);
-		assert.equal(questions[0].answers.split('\n').length, 4, "10  --- answers: " + questions[0].answers.split('\n'));
+		assert.equal(questions[0].answers.length, 18, "9 --- it's string length of " + questions[0].answers);
+		assert.equal(questions[0].answers.split('\\n').length, 4, "10  --- answers: " + questions[0].answers.split('\n'));
 		assert.equal(questions[0].answer, "0", "11 ---");
 	});
 });
@@ -347,7 +349,7 @@ const respWithUsers = {
     "quizUsers": {
       "type": "io.odysz.module.rs.AnResultset", "stringFormats": null,
       "total": 2, "rowCnt": 2, "colCnt": 3,
-      "colnames": {"USERNAME": [3, "userName"], "CHECKED": [1, "checked"], "STUDENTS": [2, "students"]},
+      "colnames": {"USERNAME": [3, "userName"], "CHECKED": [1, "checked"], "USERID": [2, "userId"]},
       "rowIdx": 0,
       "results": [[1, "alice", "Alice"], [1, "georgy", "Georgy"]]
     },
@@ -374,7 +376,8 @@ describe('case: [04 Protocol.QuizResp] quiz users', () => {
 
 		// bugs must be guarded here
 		let ids = quizResp.Body().quizUserIds();
+		console.log(ids);
 		assert.equal(ids[0], 'alice', "4.x - alice");
 		assert.equal(ids[1], 'georgy', "4.x - george");
 	});
-});
+})	;

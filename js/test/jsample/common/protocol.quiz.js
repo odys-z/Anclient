@@ -138,10 +138,9 @@ export class QuizResp extends AnsonResp {
 
 	quizUserIds() {
 		let ids = [];
-		// console.log (this.quizUsers, AnsonResp.rs2arr(this.quizUsers));
 		let {cols, rows} = AnsonResp.rs2arr(this.quizUsers);
 		if (rows)
-			rows.forEach( (r, x) => ids.push(r.userId));  // this is bug!
+			rows.forEach( (r, x) => ids.push(r.userId));
 		return ids;
 	}
 
