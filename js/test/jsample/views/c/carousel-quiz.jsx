@@ -132,20 +132,21 @@ class CarouselQuizComp extends CrudCompW {
 			let cards = [];
 			if (qs) {
 				qs.forEach( (q, x) => {
+					let f = getOnchange(q);
 					cards.push(
 						<CarouselCard key={x}
 							goPrev={() => carousel.slideNext()}
 							goNext={() => carousel.slideNext()}
 							quiz={qz}
 							question={q}
-							onValueChanged={f(q)}
+							onValueChanged={f}
 							toCancel={x === 0 && props.onClose}
 						/>);
 				} );
 			}
 			return cards;
 
-			function f(q) {
+			function getOnchange(q) {
 				console.log(q.question);
 				let _q = q;
 				return (v) => console.log('onchange', _q.question, v)
