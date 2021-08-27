@@ -50,8 +50,6 @@ class PollsComp extends CrudCompW {
 		this.onPageInf = this.onPageInf.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
 
-		// this.toStart = this.toStart.bind(this);
-		// this.toEdit = this.toEdit.bind(this);
 		this.toStop = this.toStop.bind(this);
 	}
 
@@ -132,19 +130,6 @@ class PollsComp extends CrudCompW {
 			}) );
 	}
 
-	// toStart(e, v) {
-	// 	this.roleForm = (<RoleDetails c uri={this.uri}
-	// 		onOk={(r) => console.log(r)}
-	// 		onClose={this.closeDetails} />);
-	// }
-
-	// toEdit(e, v) {
-	// 	this.roleForm = (<RoleDetails u uri={this.uri}
-	// 		roleId={this.state.selectedRecIds[0]}
-	// 		onOk={(r) => console.log(r)}
-	// 		onClose={this.closeDetails} />);
-	// }
-
 	closeDetails() {
 		this.roleForm = undefined;
 		this.setState({});
@@ -164,7 +149,7 @@ class PollsComp extends CrudCompW {
 					tag:   q.state.conds[1].val ? q.state.conds[1].val : undefined,
 					orgId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				} } }
-				onDone={(query) => { console.log('onDone()'); this.toSearch(undefined, query); } }
+				onDone={(query) => { this.toSearch(undefined, query); } }
 			/>
 
 			<Grid container alignContent="flex-end" >

@@ -84,8 +84,6 @@ class CarouselQuizComp extends CrudCompW {
 				that.state.crud = Protocol.CRUD.u;
 				that.setState({submitted: true});
 				that.loadQuiz();
-				// if (typeof that.props.onOk === 'function')
-				// 	that.props.onSubmit({pollId: that.state.pollId, resp});
 			},
 			this.context.error
 		);
@@ -99,7 +97,7 @@ class CarouselQuizComp extends CrudCompW {
 		    maxWidth={'md'}
 		    open={true}
 		  >
-			<Carousel>
+			<Carousel ref={ref => (this.carousel = ref)}>
 				{questionCards( {title: this.state.quiz.title},
 						this.state.quiz.questions, this.carousel)}
 				<CarouselSubmitCard key={this.state.quiz.questions.lenght || 0}
@@ -117,16 +115,42 @@ class CarouselQuizComp extends CrudCompW {
 		  </Dialog>
 		);
 
+				// question={ (q.collect = (answer) => {q.answer = answer}) && q }
 		function questionCards(qz, qs, carousel) {
+			/*
 			return qs.map( (q, x) => (
 			  <CarouselCard key={x}
 				goPrev={() => carousel.slideNext()}
 				goNext={() => carousel.slideNext()}
 				quiz={qz}
 				question={q}
+				onValueChanged={function(q) { let _q = q; return (v) => console.log('onchange', _q.question, v) && (_q.answer = v)}(q)}
 				toCancel={x === 0 && props.onClose}
 			  />)
 			);
+			*/
+			let cards = [];
+			if (qs) {
+				qs.forEach( (q, x) => {
+					cards.push(
+						<CarouselCard key={x}
+							goPrev={() => carousel.slideNext()}
+							goNext={() => carousel.slideNext()}
+							quiz={qz}
+							question={q}
+							onValueChanged={f(q)}
+							toCancel={x === 0 && props.onClose}
+						/>);
+				} );
+			}
+			return cards;
+
+			function f(q) {
+				console.log(q.question);
+				let _q = q;
+				return (v) => console.log('onchange', _q.question, v)
+								&& (_q.answer = v);
+			}
 		}
 	}
 }

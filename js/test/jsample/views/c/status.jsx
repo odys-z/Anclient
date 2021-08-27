@@ -13,6 +13,7 @@ import {L, Langstrs, AnConst,
 
 import { CenterProtocol, CenterResp } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
+import { myMsgFromIssuer } from '../../common/mui-helpers';
 
 const styles = (theme) => ( {
 	root: {
@@ -78,7 +79,7 @@ class MyStatusComp extends CrudCompW {
 						{ text: L('qid'), hide: true, field: "qid" },
 
 						{ text: L('Quiz Name'), field: "title", color: 'primary', className: 'bold'},
-						{ text: L('Message'), field: "extra", formatter: showMsg },
+						{ text: L('Message'), field: "extra", formatter: myMsgFromIssuer },
 						{ text: L('Subject'), field: "subject"},
 						{ text: L('DDL'), field: "ddl", color: 'primary' }
 					]}
@@ -89,17 +90,6 @@ class MyStatusComp extends CrudCompW {
 			}
 		</>);
 
-		function showMsg( extra, rx, rec ) {
-			let json = JSON.parse(extra);
-			return ( <>
-				<Typography variant={'body2'} >
-					{L('Msg from North:')}
-				</Typography>
-				<Card key={rx}>
-	                {json.msg}
-				</Card>
-				</>);
-		}
 	}
 }
 MyStatusComp.contextType = AnContext;

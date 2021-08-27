@@ -28,6 +28,10 @@ class QuizFormComp extends DetailFormW {
 		dirty: false,
 	};
 
+	componentDidMount() {
+		console.log(this.props.uri);
+	}
+
 	constructor (props) {
 		super(props);
 		this.editorHook = {state: undefined};

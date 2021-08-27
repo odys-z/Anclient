@@ -55,7 +55,7 @@ class QuizEditorComp extends DetailFormW {
 		return ++quid;
 	}
 
-    state = {
+	state = {
 		dirty: false,
 		creating: false,
 
@@ -67,7 +67,7 @@ class QuizEditorComp extends DetailFormW {
 				subject: '' },
 		questions: [], // qid(seq), question text, answers, type, correct index
 		currentqx: -1,
-    };
+	};
 
 	quizHook = { collect: undefined };
 

@@ -126,7 +126,6 @@ class QuizzesComp extends CrudCompW {
 				stop: rowIds && rowIds.size === 1,
 				del: rowIds &&  rowIds.size >= 1,
 			},
-			// selected.Ids: rowIds
 		} );
 	}
 
