@@ -54,6 +54,18 @@ const styles = (theme) => ({
  * Why? A tech to handle performance problem and help data auto binding.
  * See performance issue: https://stackoverflow.com/a/66934465
  * User SimpleForm for UI dialog to auto load data.
+ * example:<pre>
+  &lt;RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
+    stateHook={this.quizHook}
+    fields={[
+      { field: 'qid', label: '', hide: true },
+      { field: 'title', label: L('Title'), grid: {sm: 12, lg: 12} },
+      { field: 'subject', label: L('Subject') },
+      { field: 'tags', label: L('#Hashtag') },
+      { field: 'quizinfo', label: L('Description'), grid: {sm: 12, lg: 12} }
+    ]}
+    record={{qid: this.state.quizId, ... this.state.quiz }}
+  /&gt;</pre>
  */
 class RecordFormComp extends DetailFormW {
 	state = {
@@ -132,7 +144,7 @@ class RecordFormComp extends DetailFormW {
 					}}
 				/>);
 		}
-		else{
+		else {
 			let type = 'text';
 			if (f.type === 'float' || f.type === 'int')
 				type = 'number'

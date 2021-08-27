@@ -97,6 +97,19 @@ class CarouselCardComp extends React.Component {
 		this.formatRank = this.formatRank.bind(this);
 		this.formatMultiRanks = this.formatMultiRanks.bind(this);
 		this.formatNumber = this.formatNumber.bind(this);
+
+		let { question, quiz } = this.props;
+		this.state = {quiz, question}
+
+		// props.stateHook.collect = function (me) {
+		// 	let that = me;
+		// 	return function(hookObj){
+		// 		hookObj['question'] = Object.assign(hookObj['question'] || {}, that.state.question);
+		// 	}; }(this);
+		props.stateHook.collect = function(hookObj) {
+			hookObj = Object.assign(hookObj || {}, this.state.question);
+			console.log(hookObj);
+		}.bind(this);
 	}
 
 	formatAnswer(question, classes) {
@@ -121,12 +134,18 @@ class CarouselCardComp extends React.Component {
 	formatSingleOptions(classes, question) {
 		let {answers} = question;
 		let ss = answers.split('\n');
+		let that = this;
 		if (ss)
 			return ss.map( (s, x) => (
 				<Button color='primary' key={`${question.qid} ${x}`}
 					className={classes.button}
 					variant="contained"
-					onClick={ e => question.answer = x } >
+					onClick={ e => {
+						question.answer = x;
+						that.setState({question});
+						that.props.onValueChanged(question);
+					} }
+				>
 					{s}
 				</Button>)
 			);
@@ -136,13 +155,17 @@ class CarouselCardComp extends React.Component {
 		let {answers} = question;
 		let ss = answers.split('\n');
 		if (ss) {
+			let that = this;
 			let s = new Set();
 			question.answer = s;
 			return ss.map( (txt, x) => (
 				<Button key={`${question.qid} ${x}`}
 					variant='outlined' className={classes.button}
 					color='primary'
-					onClick={(e) => (s.has(x) && !!s.delete(x)) || s.add(x) }
+					onClick={(e) => {
+						(s.has(x) && !!s.delete(x)) || s.add(x);
+						that.setState({question});
+					} }
 				>
 				  <Checkbox value="" color="primary"
 				  />
@@ -161,7 +184,10 @@ class CarouselCardComp extends React.Component {
 			label={L('Please fill in a number!')}
 			variant='outlined'
 			inputProps={{style: {}} }
-			onChange={(e) => { question.answer = e.target.value; }}
+			onChange={(e) => {
+				question.answer = e.target.value;
+				that.setState({question});
+			} }
 		/>);
 	}
 
@@ -178,15 +204,13 @@ class CarouselCardComp extends React.Component {
 				borderColor="transparent" >
 				<Rating name="size-large"
 					onChange={(e) => {
-						// FIXME not sure?
-						console.log(question.question);
-						question.answer = e.target.value;
-						that.setState(question);
+						that.state.question.answer = e.target.value;
+						that.setState({question});
 
-						that.props.onValueChanged(e.target.value)
-						that.props.goNext();
+						// that.props.goNext();
+						that.props.onValueChanged(that.state.question);
 					} }
-					value={console.log(question.question, question.answer) && question.answer === '' || question.answer === null ? v / 2 : question.answer}
+					value={question.answer === '' || question.answer === null ? v / 2 : Number(question.answer)}
 					defaultValue={v / 2}
 					precision={0.5}
 					max={v}
@@ -214,7 +238,10 @@ class CarouselCardComp extends React.Component {
 					{v}
 				</Typography>
 				<Rating name="size-large"
-					onChange={(e) => question.answer = e.target.value}
+					onChange={(e) => {
+						question.answer = e.target.value;
+						that.setState(question);
+					} }
 					defaultValue={rank / 2}
 					precision={0.5}
 					max={rank}
@@ -227,7 +254,8 @@ class CarouselCardComp extends React.Component {
 
 	render () {
 		let that = this;
-		let { classes, question, quiz, toCancel, toSubmit } = this.props;
+		let { classes, toCancel, toSubmit } = this.props;
+		let { question, quiz } = this.state;
 		return (
 		  <Card key={"a"} className={classes.root}>
 			<Paper className={classes.content}>
@@ -253,7 +281,9 @@ CarouselCardComp.context = AnContext;
 
 CarouselCardComp.propTypes = {
 	goNext: PropTypes.func.isRequired,
-	goPrev: PropTypes.func.isRequired
+	goPrev: PropTypes.func.isRequired,
+
+	stateHook: PropTypes.object.isRequired,
 };
 
 const CarouselCard = withWidth()(withStyles(styles)(CarouselCardComp));

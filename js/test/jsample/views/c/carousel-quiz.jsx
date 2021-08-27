@@ -37,6 +37,8 @@ class CarouselQuizComp extends CrudCompW {
 		},
 	};
 
+	quizHook = {quiz: [], collect: undefined};
+
 	constructor(props) {
 		super(props)
 
@@ -66,7 +68,9 @@ class CarouselQuizComp extends CrudCompW {
 		client.commit(req,
 			(resp) => {
 				let centerResp = resp.Body()
-				that.setState({quiz: centerResp.carouselQuiz()});
+				let quiz = centerResp.carouselQuiz();
+				that.quizHook.quiz = quiz;
+				that.setState({ quiz });
 			},
 			this.context.error);
 	}
@@ -76,6 +80,9 @@ class CarouselQuizComp extends CrudCompW {
 		let that = this;
 		if (!this.jquiz)
 			this.jquiz = new JQuiz(this.context.anClient, this.context.error);
+
+		// collect
+		this.quizHook.collect(this.state);
 
 		this.jquiz.submitPoll(
 			this.props.uri,
@@ -100,7 +107,7 @@ class CarouselQuizComp extends CrudCompW {
 			<Carousel ref={ref => (this.carousel = ref)}>
 				{questionCards( {title: this.state.quiz.title},
 						this.state.quiz.questions, this.carousel)}
-				<CarouselSubmitCard key={this.state.quiz.questions.lenght || 0}
+				<CarouselSubmitCard key={this.state.quiz.questions.length || -1}
 					goPrev={() => carousel.slideNext()}
 					goNext={() => carousel.slideNext()}
 					title={L('Almost done!')}
@@ -115,7 +122,6 @@ class CarouselQuizComp extends CrudCompW {
 		  </Dialog>
 		);
 
-				// question={ (q.collect = (answer) => {q.answer = answer}) && q }
 		function questionCards(qz, qs, carousel) {
 			/*
 			return qs.map( (q, x) => (
@@ -132,14 +138,14 @@ class CarouselQuizComp extends CrudCompW {
 			let cards = [];
 			if (qs) {
 				qs.forEach( (q, x) => {
-					let f = getOnchange(q);
 					cards.push(
 						<CarouselCard key={x}
-							goPrev={() => carousel.slideNext()}
-							goNext={() => carousel.slideNext()}
+							stateHook={q}
+							goPrev={() => carousel.slideNext() }
+							goNext={() => carousel.slideNext() }
 							quiz={qz}
 							question={q}
-							onValueChanged={f}
+							onValueChanged={() => onChange(x)}
 							toCancel={x === 0 && props.onClose}
 						/>);
 				} );
@@ -151,6 +157,11 @@ class CarouselQuizComp extends CrudCompW {
 				let _q = q;
 				return (v) => console.log('onchange', _q.question, v)
 								&& (_q.answer = v);
+			}
+			function onChange(q) {
+				// q.collect(q);
+				// console.log(q.answer);
+				console.log(q);
 			}
 		}
 	}
