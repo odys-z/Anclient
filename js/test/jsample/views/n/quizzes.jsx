@@ -32,7 +32,7 @@ class QuizzesComp extends CrudCompW {
 		quizzes: [],
 		pageInf: {page: 0, size: 25},
 		queryReq : undefined,
-		buttons: { add: true, stop: false, del: false},
+		buttons: { add: true, edit: false, del: false},
 
 		condTitl: { type: 'text', val: '', label: L('Title')},
 		condTags: { type: 'text', val: '', label: L('Tags')},
@@ -75,6 +75,7 @@ class QuizzesComp extends CrudCompW {
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
 		this.state.selected.Ids.clear();
+		this.setState( {buttons: {add: true, edit: false, delete: false} } );
 	}
 
 	refresh() {

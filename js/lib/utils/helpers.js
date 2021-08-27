@@ -6,6 +6,10 @@ export function toBool(str) {
 			? false : true;
 }
 
+export function isEmpty(str) {
+	return typeof str === 'undefined' || str === null || str === '';
+}
+
 /**
  * Parse lagacy json format.
  * @return {object} {funcId, id, funcName, url, css, flags, parentId, sort, sibling, children}

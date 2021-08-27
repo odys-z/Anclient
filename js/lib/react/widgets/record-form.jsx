@@ -80,11 +80,6 @@ class RecordFormComp extends DetailFormW {
 	componentDidMount() {
 	}
 
-	// setStateWithook(obj) {
-	// 	this.setState(obj);
-	// 	this.props.stateHook.state = this.state;
-	// }
-
 	validate(invalidStyle) {
 		if (!this.props.enableValidate)
 			return true;
