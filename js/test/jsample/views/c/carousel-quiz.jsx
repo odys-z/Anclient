@@ -147,7 +147,7 @@ class CarouselQuizComp extends CrudCompW {
 			return cards;
 
 			function getOnchange(q) {
-				console.log(q.question);
+				console.log("parent: question", q.question);
 				let _q = q;
 				return (v) => console.log('onchange', _q.question, v)
 								&& (_q.answer = v);

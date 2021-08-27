@@ -179,6 +179,7 @@ class CarouselCardComp extends React.Component {
 				<Rating name="size-large"
 					onChange={(e) => {
 						// FIXME not sure?
+						console.log(question.question);
 						question.answer = e.target.value;
 						that.setState(question);
 

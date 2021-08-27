@@ -139,6 +139,10 @@ class QuizEditorComp extends DetailFormW {
 		if (e && e.stopPropagation) e.stopPropagation();
 
 		let that = this;
+
+		// collect children's state - will be used in callback to update this component.
+		that.quizHook.collect && that.quizHook.collect(that.state);
+
 		this.quizUserForm = (
 			<QuizUserForm uri={this.props.uri} crud={this.state.crud}
 				jquiz={this.jquiz}
