@@ -26,7 +26,7 @@ import { QuizProtocol } from '../../common/protocol.quiz.js';
 const styles = (theme) => ({
   root: {
     height: 460,
-    minWidth: 520,
+    // minWidth: 520,
     maxWidth: 720,
     align: "center",
     itemAlign: "center",
@@ -85,6 +85,7 @@ const styles = (theme) => ({
 class CarouselCardComp extends React.Component {
 	state = {
 		closed: false,
+		question: {}
 	}
 
 	constructor(props) {
@@ -166,6 +167,7 @@ class CarouselCardComp extends React.Component {
 
 	formatRank(classes, question, r) {
 		let ranks;
+		let that = this;
 		if (typeof r === 'number')
 			ranks = [r];
 		else
@@ -175,7 +177,15 @@ class CarouselCardComp extends React.Component {
 			<Box component="fieldset" ml={9} mt={1} mb={1}
 				borderColor="transparent" >
 				<Rating name="size-large"
-					onChange={(e) => question.answer = e.target.value}
+					onChange={(e) => {
+						// FIXME not sure?
+						question.answer = e.target.value;
+						that.setState(question);
+
+						that.props.onValueChanged(e.target.value)
+						that.props.goNext();
+					} }
+					value={console.log(question.question, question.answer) && question.answer === '' || question.answer === null ? v / 2 : question.answer}
 					defaultValue={v / 2}
 					precision={0.5}
 					max={v}

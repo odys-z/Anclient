@@ -90,7 +90,9 @@ class App extends React.Component {
 		}
 	}
 
-	/** For navigate to portal page */
+	/** For navigate to portal page
+	 * FIXME this should be done in SysComp, while firing goLogoutPage() instead.
+	 * */
 	logout() {
 		let that = this;
 		// leaving
@@ -144,7 +146,7 @@ class App extends React.Component {
 				<Sys menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
 					myInfo={myInfoPanels()}
-					onLogout={this.logout}/>
+					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

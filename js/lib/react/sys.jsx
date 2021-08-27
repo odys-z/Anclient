@@ -205,8 +205,19 @@ class SysComp extends React.Component {
 	}
 
 	toLogout() {
-		// Notify children?
-		this.setState({ showLogout: true });
+		// Notify children? - not so simple for each target CrudComp needs to be notified.
+
+		let that = this;
+		this.confirmLogout =
+		<ConfirmDialog ok={L('Good Bye')} title={L('Info')} // cancel={false}
+			open={true}
+			onOk={() => {
+				that.confirmLogout = undefined;
+				that.props.onLogout();
+			}}
+			msg={L('Logging out?')} />
+			
+		this.setState({});
 	}
 
 	toExpandItem(e) {
@@ -363,10 +374,7 @@ class SysComp extends React.Component {
 			{this.state.showMine && <MyInfo
 				panels={this.props.myInfo}
 				onClose={() => this.setState({ showMine: false })} />}
-			{this.state.showLogout && <ConfirmDialog ok={L('Sure')} title={L('Info')} // cancel={false}
-				open={this.state.showLogout}
-				onOk={() => this.props.onLogout() }
-				msg={L('Logging out?')} />}
+			{this.confirmLogout}
 		  </div>);
 	}
 }

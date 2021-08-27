@@ -12,6 +12,7 @@ import {
 } from 'anclient';
 
 import { CenterProtocol } from '../../common/protocol.quiz';
+import { myMsgFromIssuer } from '../../common/mui-helpers';
 import { CarouselQuiz } from './carousel-quiz';
 
 const styles = (theme) => ( {
@@ -138,9 +139,9 @@ class MyPollsComp extends CrudCompW {
 					{ text: L('chk'), hide: true, field: "checked" },
 					{ text: L('pid'), hide: true, field: "pid" },
 					{ text: L('Title'), field: "title", color: 'primary', className: 'bold'},
-					{ text: L('Progress'), field: "progress", color: 'primary' },
+					{ text: L('Title'), field: "title", color: 'primary' },
 					{ text: L('Questions'), field: "questions", color: 'primary' },
-					{ text: L('DDL'), field: "ddl", color: 'primary' }
+					{ text: L('Message'), field: "extra", formatter: myMsgFromIssuer, color: 'primary' }
 				]}
 				rows={polls}
 				onSelectChange={this.onSelect}

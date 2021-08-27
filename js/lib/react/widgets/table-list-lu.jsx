@@ -131,8 +131,8 @@ class AnTablistLevelUpComp extends React.Component {
 	 * @returns [<TableCell>,...]
 	 */
 	th(columns = []) {
-		return columns.filter( (v, x) => !toBool(v.hide)
-							|| this.props.checkbox && x !== 0) // first columen as checkbox
+		return columns.filter( (v, x) => toBool(v.hide) ? false
+							: !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
 					{colObj.text || colObj.field}
@@ -166,8 +166,8 @@ class AnTablistLevelUpComp extends React.Component {
 							/>
 						</TableCell>)
 					}
-					{columns.filter( (v, x) => !toBool(v.hide)
-									|| this.props.checkbox && x !== 0) // first columen as checkbox
+					{columns.filter( (v, x) => toBool(v.hide) ? false
+									: !(this.props.checkbox && x === 0)) // first columen as checkbox
 							.map( (colObj, x) => {
 								if (colObj.field === undefined)
 									throw Error("Column field is required: " + JSON.stringify(colObj));
