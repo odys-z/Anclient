@@ -51,14 +51,17 @@ class JQuiz {
 	/**[Promoting Style]
 	 * Create a request and post back to server asking a new quiz, loading ind_emotion type 'A'.
 	 * port: quiz
-	 * @param { string } uri
+	 * @param { object } opt
+	 * @param { string } opt.uri
+	 * @param { string } opt.templ
 	 * @param {function} onLoad on query ok callback, called with parameter of query responds
 	 * @param {AnContext.error}
 	 * */
-	startQuizA(uri, onLoad, errCtx) {
-		let opt = {};
-		opt[QuizProtocol.templName] = 'A';
-		return this.serv(uri, QuizProtocol.A.start, opt, onLoad, errCtx);
+	startQuizA(opt, onLoad, errCtx) {
+		let {templ, uri} = opt;
+		let option = {};
+		option[QuizProtocol.templName] = templ || 'A'; // only 'A' or 'B'
+		return this.serv(uri, QuizProtocol.A.start, option, onLoad, errCtx);
 	}
 
 	/**[Promiting Style - the optimized direction but parameters must reduced]
@@ -92,11 +95,15 @@ class JQuiz {
 			if (qss)
 				qss.forEach( (q, x) => {
 					let {qid, quizId, pollId, answer} = q;
+					if (Array.isArray(answer))
+						answer = answer.join(',');
 					details.push( {
 						type: QuizProtocol.PollDetailType,
 						questId: qid,
 						quizId, pollId, answer } )
 				} );
+
+			console.log(details);
 			return details;
 		}
 	}
@@ -205,7 +212,7 @@ class JQuiz {
 		this.client.usrAct('quiz', QuizProtocol.A.update, Protocol.CRUD.u, quiz.title);
 
 		let props = {}
-		props[QuizProtocol.quizId] = quiz.qid;
+		props[QuizProtocol.quizId] = quiz.qid || quiz.quizId;
 		props[QuizProtocol.qtitle] = quiz.title;
 		props[QuizProtocol.quizinfo] = quiz.quizinfo;
 		props[QuizProtocol.subject] = quiz.subject;

@@ -28,10 +28,6 @@ class QuizFormComp extends DetailFormW {
 		dirty: false,
 	};
 
-	componentDidMount() {
-		console.log(this.props.uri);
-	}
-
 	constructor (props) {
 		super(props);
 		this.editorHook = {state: undefined};
@@ -88,6 +84,7 @@ class QuizFormComp extends DetailFormW {
 					let {quizId, title} = JQuiz.parseResp(resp);
 					if (isEmpty(quizId))
 						console.error ("Something Wrong!");
+					state.quiz.qid = quizId;
 					Object.assign(this.state, state);
 					that.state.crud = Protocol.CRUD.u;
 					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
@@ -128,7 +125,8 @@ class QuizFormComp extends DetailFormW {
 
 				<DialogTitle id="alert-dialog-title"></DialogTitle>
 				<DialogContent>
-				  <QuizEditor uri={this.props.uri} stateHook={this.editorHook} {...props}
+				  <QuizEditor uri={this.props.uri} templ={this.props.templ}
+						stateHook={this.editorHook} {...props}
 						title={title}
 						quizId={props.quizId}
 						creating={this.state.crud === Protocol.CRUD.c}

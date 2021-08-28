@@ -329,7 +329,6 @@ describe('case: [04 Protocol.QuizResp] Update / Insert Results', () => {
 	});
 
 	it('4.B [Quiz] updated', () => {
-		debugger
 		let quizResp = new QuizResp(respUpdated.body[0]);
 		let quizId = quizResp.getProp('quizId');
 

@@ -116,7 +116,6 @@ class App extends React.Component {
 		}
 
 		function cleanup(app) {
-			debugger
 			if (app.state.anClient)
 				localStorage.setItem(SessionClient.ssInfo, null);
 			if (app.props.iwindow)

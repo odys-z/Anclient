@@ -107,6 +107,8 @@ class QuizEditorComp extends DetailFormW {
 		this.onCheckSingle = this.onCheckSingle.bind(this);
 
 		this.bindQuiz = this.bindQuiz.bind(this);
+
+		this.setStateWithHook = this.setStateWithHook.bind(this);
 	}
 
 	componentDidMount() {
@@ -115,7 +117,8 @@ class QuizEditorComp extends DetailFormW {
 		if (this.state.crud !== Protocol.CRUD.c)
 			this.jquiz.quiz(this.props.uri, this.state.quizId, this.bindQuiz, ctx.error);
 		else
-			this.jquiz.startQuizA(this.props.uri, this.bindQuiz, ctx.error);
+			this.jquiz.startQuizA({uri: this.props.uri, templ: this.props.templ},
+						this.bindQuiz, ctx.error);
 	}
 
 	bindQuiz(ansonResp) {
@@ -165,13 +168,22 @@ class QuizEditorComp extends DetailFormW {
 	handleClickQs(e) {
 	  // use currentTarget instead of target, see https://stackoverflow.com/a/10086501/7362888
 	  let qx = e.currentTarget.getAttribute('qx');
-	  this.setState({currentqx: parseInt(qx)});
+	  this.setStateWithHook({currentqx: parseInt(qx)});
 	};
 
 	editQuestion(e) {
 		let qx = this.state.currentqx;
 
 		this.state.questions[qx].question = e.target.value;
+		this.setStateWithHook({dirty: true});
+		if (this.props.onDirty)
+			this.props.onDirty(true);
+	}
+
+	setStateWithHook(obj) {
+		this.quizHook.collect && this.quizHook.collect(this.state);
+		Object.assign(this.state, obj);
+		this.setState({});
 	}
 
 	editAnswer(e) {
@@ -181,7 +193,7 @@ class QuizEditorComp extends DetailFormW {
 		questions[qx].qtype = qtype;
 		questions[qx].answer = correct;
 		questions[qx].answers = e.currentTarget.value;
-		this.setState({questions, dirty: true});
+		this.setStateWithHook({questions, dirty: true});
 		if (this.props.onDirty)
 			this.props.onDirty(true);
 	}
@@ -240,7 +252,7 @@ class QuizEditorComp extends DetailFormW {
 							if ( ( v.v === QuizProtocol.Qtype.single || v.v === QuizProtocol.Qtype.multiple )
 								&& !that.state.questions[x].answers )
 								that.state.questions[x].answers = "*A. \nB. \nC. \nD.";
-							that.setState({dirty: true});
+							that.setStateWithHook({dirty: true});
 						}}
 					/>
 					</Box>

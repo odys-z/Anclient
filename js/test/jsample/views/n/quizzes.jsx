@@ -52,7 +52,10 @@ class QuizzesComp extends CrudCompW {
 		this.onPageInf = this.onPageInf.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
 
-		this.toAdd = this.toAdd.bind(this);
+		this.toAddB = this.toAddB.bind(this);
+		this.toAddA = this.toAddA.bind(this);
+		this.add = this.add.bind(this);
+
 		this.toEdit = this.toEdit.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.del = this.del.bind(this);
@@ -170,17 +173,22 @@ class QuizzesComp extends CrudCompW {
 			this.context.error);
 	}
 
-	toAdd(e, v) {
+	toAddB() {
+		this.add('B');
+	}
+
+	toAddA() {
+		this.add('A');
+	}
+
+	add(templ) {
 		let that = this;
 
 		this.quizForm = (
-			<QuizForm c uri={this.uri}
+			<QuizForm c uri={this.uri} templ={templ}
 				quizId={undefined}
-				onCancel={this.closeDetails}
-				onOk={ () => {
-					that.closeDetails();
-					that.refresh();
-				}} />);
+				onCancel={ this.closeDetails }
+				onOk={ this.closeDetails } />);
 	}
 
 	toEdit(e, v) {
@@ -201,7 +209,8 @@ class QuizzesComp extends CrudCompW {
 
 	closeDetails() {
 		this.quizForm = undefined;
-		this.setState({});
+		this.refresh();
+		// this.setState({});
 	}
 
 	render () {
@@ -224,9 +233,13 @@ class QuizzesComp extends CrudCompW {
 			</Typography>
 			<Grid container alignContent="flex-end" >
 				<Button variant="contained" disabled={!btn.add}
-					className={classes.button} onClick={this.toAdd}
+					className={classes.button} onClick={this.toAddA}
 					startIcon={<JsampleIcons.Add />}
-				>{L('Start Quiz')}</Button>
+				>{L('Start A Quiz')}</Button>
+				<Button variant="contained" disabled={!btn.add}
+					className={classes.button} onClick={this.toAddB}
+					startIcon={<JsampleIcons.Add />}
+				>{L('Start B Quiz')}</Button>
 				<Button variant="contained" disabled={!btn.stop}
 					className={classes.button} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Edit />}
