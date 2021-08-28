@@ -21,6 +21,8 @@ const styles = (theme) => ( {
 } );
 
 /**
+ * Use props.selectedIds for the buffering set to handle selection events.
+ *
  * props:
  * 	{array} columns must need
  * 	{array}  rows  must need
@@ -30,19 +32,21 @@ const styles = (theme) => ( {
  * 	{function} updateSelectd
  * 	{array} selected
  */
-class AnTablistComp extends React.Component {
+class AnTablistLevelUpComp extends React.Component {
 
 	state = {
 		sizeOptions:[10, 25, 50],
 		total: 0,
 		page: 0,
 		size: 10,
-
-		selected: new Set()
 	}
+
+	selected = undefined; // props.selected.Ids, the set
 
 	constructor(props){
 		super(props)
+
+		this.selected = this.props.selectedIds.Ids;
 
 		let {sizeOptions} = props;
 		if (sizeOptions)
@@ -59,25 +63,27 @@ class AnTablistComp extends React.Component {
 		this.changePage = this.changePage.bind(this);
 		this.changeSize = this.changeSize.bind(this);
 		this.handleClick = this.handleClick.bind(this);
-		this.updateSelectd = this.updateSelectd.bind(this);
 
 		this.th = this.th.bind(this);
 		this.tr = this.tr.bind(this);
 	}
 
 	componentDidMount() {
-		console.warn("AnTablist is deprecated. Use AnTablistLevelUp instead.");
 	}
 
 	isSelected(k) {
-		return this.state.selected.has(k);
+		return this.selected.has(k);
 	}
 
 	handleClick(event, newSelct) {
-		let selected = this.state.selected;
+		let selected = this.selected;
 		if (this.props.singleCheck) {
-			selected.clear();
-			selected.add(newSelct);
+			if (selected.has(newSelct))
+				selected.clear();
+			else {
+				selected.clear();
+				selected.add(newSelct);
+			}
 		}
 		else {
 			if (selected.has(newSelct)) {
@@ -86,28 +92,25 @@ class AnTablistComp extends React.Component {
 			else selected.add(newSelct);
 		}
 
-		this.setState({selected});
-		this.updateSelectd(selected);
+		if (this.props.onSelectChange)
+			this.props.onSelectChange(selected, newSelct);
 	};
 
 	toSelectAll (event) {
 		if (event.target.checked) {
 			let key = this.props.pk;
-			let selected = new Set();
-			this.props.rows.forEach((n) => selected.add(n[key]));
-			this.setState({selected});
-			this.updateSelectd([ ...selected ]);
+			this.props.rows.forEach((n) => this.selected.add(n[key]));
+
+			if (this.props.onSelectChange)
+				this.props.onSelectChange(this.selected, this.selected);
 		}
 		else {
-			this.setState({ selected: new Set() });
-			this.updateSelectd([]);
+			this.selected.clear();
+
+			if (this.props.onSelectChange)
+				this.props.onSelectChange(this.selected, []);
 		}
 	};
-
-	updateSelectd (set) {
-		if (typeof this.props.onSelectChange === 'function')
-			this.props.onSelectChange([...set]);
-	}
 
 	changePage(event, page) {
 		this.setState({page});
@@ -128,8 +131,8 @@ class AnTablistComp extends React.Component {
 	 * @returns [<TableCell>,...]
 	 */
 	th(columns = []) {
-		return columns.filter( (v, x) => !toBool(v.hide)
-							|| this.props.checkbox && x !== 0) // first columen as checkbox
+		return columns.filter( (v, x) => toBool(v.hide) ? false
+							: !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
 					{colObj.text || colObj.field}
@@ -142,7 +145,7 @@ class AnTablistComp extends React.Component {
 					: row[this.props.pk.field];
 
 			if (this.props.checkbox && toBool(row.checked)) {
-				this.state.selected.add(pkv)
+				this.selected.add(pkv)
 				row.checked = 0; // later events don't need ths
 			}
 			let isItemSelected = this.isSelected(pkv);
@@ -152,8 +155,6 @@ class AnTablistComp extends React.Component {
 					selected={isItemSelected}
 					onClick= { (event) => {
 						this.handleClick(event, pkv);
-						// if (typeof this.props.onSelectChange === 'function')
-						// 	this.props.onSelectChange(this.state.selected, pkv);
 					} }
 					role="checkbox" aria-checked={isItemSelected}
 				>
@@ -165,8 +166,8 @@ class AnTablistComp extends React.Component {
 							/>
 						</TableCell>)
 					}
-					{columns.filter( (v, x) => !toBool(v.hide)
-									|| this.props.checkbox && x !== 0) // first columen as checkbox
+					{columns.filter( (v, x) => toBool(v.hide) ? false
+									: !(this.props.checkbox && x === 0)) // first columen as checkbox
 							.map( (colObj, x) => {
 								if (colObj.field === undefined)
 									throw Error("Column field is required: " + JSON.stringify(colObj));
@@ -189,8 +190,8 @@ class AnTablistComp extends React.Component {
 					{ this.props.checkbox &&
 						(<TableCell padding="checkbox" >
 						  <Checkbox ref={ref => (this.checkAllBox = ref)}
-							indeterminate={this.state.selected.size > 0 && this.state.selected.size < this.props.rows.length}
-							checked={this.state.selected.size > 0 && this.state.selected.size === this.props.rows.length}
+							indeterminate={this.selected.size > 0 && this.selected.size < this.props.rows.length}
+							checked={this.selected.size > 0 && this.selected.size === this.props.rows.length}
 							color="primary"
 							inputProps={{ 'aria-label': 'checkAll' }}
 							onChange={this.toSelectAll}/>
@@ -216,9 +217,10 @@ class AnTablistComp extends React.Component {
 		</>);
 	}
 }
-AnTablistComp.propTypes = {
+AnTablistLevelUpComp.propTypes = {
 	pk: PropTypes.string.isRequired,
+	selectedIds: PropTypes.object.isRequired,
 };
 
-const AnTablist = withStyles(styles)(AnTablistComp);
-export { AnTablist, AnTablistComp }
+const AnTablistLevelUp = withStyles(styles)(AnTablistLevelUpComp);
+export { AnTablistLevelUp, AnTablistLevelUpComp }

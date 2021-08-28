@@ -20,41 +20,18 @@ export class AnReact {
 		this.err = errCtx;
 	}
 
-	insert(quiz, onOk) {
-		let that = this;
-		let date = new Date();
-		this.client.usrAct('quiz', quiz_a.insert, Protocol.CRUD.c, quiz.qtitle);
-
-		let props = {}
-		props[QuizProtocol.qtitle] = quiz.qtitle;
-		props[QuizProtocol.qowner] = this.client.ssInf.uid;
-		props[QuizProtocol.dcreate] = `${date.toISOString()}`;
-		props[QuizProtocol.quizinfo] = quiz.quizinfo;
-		props[QuizProtocol.questions] = QuizReq.questionToNvs(quiz.questions);
-
-		let req = this.client.userReq(quizUri, JQuiz.port,
-			new UserReq( quizUri, "quizzes", props ).A(quiz_a.insert) );
-
-		this.client.an.post(req, onOk, (c, resp) => {
-			if (that.err) {
-				that.err.code = c;
-				that.err.msg = resp.Body().msg();
-				that.err.onError(true);
-			}
-			else console.error(c, resp);
-		});
-	}
-
-	update(rec, onOk) {
-		throw new Error('don\'t use this - a stub for future extension');
-	}
-
 	bindTablist(req, comp, errCtx) {
 		this.client.commit(req, (qrsp) => {
-			let rs = qrsp.Body().Rs();
-			let {rows} = AnsonResp.rs2arr( rs );
-			comp.state.pageInf.total = rs.total;
-			comp.setState({rows});
+			if (req.onLoad)
+				req.onLoad(qresp);
+			else if (req.onOk)
+				req.onLoad(qresp);
+			else {
+				let rs = qrsp.Body().Rs();
+				let {rows} = AnsonResp.rs2arr( rs );
+				comp.state.pageInf.total = rs.total;
+				comp.setState({rows});
+			}
 		}, errCtx.onError );
 	}
 
@@ -282,26 +259,35 @@ export class AnReactExt extends AnReact {
 	/**Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
-	 * <p> See DomainComp.componentDidMount() for example. </p>
+	 * <h6>About React Rendering Events</h6>
+	 * This method will update opts.cond.loading and clean.
+	 * When success, set loading false, clean true. this 2 flags are helper for
+	 * handling react rendering / data-loading events asynchronously.
+	 *
+	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *
 	 * @param {object} opts options
 	 * @param {string} opts.sk semantic key (dataset id)
 	 * @param {object} opts.cond the component's state.conds[#] of which the options need to be updated
 	 * @param {object} [opts.nv={n: 'name', v: 'value'}] option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * @param {function} [opts.onDone] on done event's handler: function f(cond)
 	 * @param {boolean} [opts.onAll] no 'ALL' otion item
 	 * @param {AnContext.error} errCtx error handling context
 	 * @param {React.Component} [compont] the component needs to be updated on ok, if provided
 	 * @return {AnReactExt} this
 	 */
 	ds2cbbOptions(opts, errCtx, compont) {
-		let {uri, sk, nv, cond, noAll} = opts;
+		let {uri, sk, sqlArgs, nv, cond, onDone, noAll} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
 		nv = nv || {n: 'name', v: 'value'};
 
+		cond.loading = true;
+
 		this.dataset( {
 				uri,
+				sqlArgs,
 				ssInf: this.client.ssInf,
 				sk },
 			(dsResp) => {
@@ -315,8 +301,14 @@ export class AnReactExt extends AnReact {
 					rows.unshift(AnConst.cbbAllItem);
 				cond.options = rows;
 
+				cond.loading = false;
+				cond.clean = true;
+
 				if (compont)
 					compont.setState({});
+
+				if (onDone)
+					onDone(cond);
 			}, errCtx );
 		return this;
 	}

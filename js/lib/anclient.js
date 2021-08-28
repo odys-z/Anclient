@@ -58,7 +58,7 @@ class AnClient {
 		else {
 			ulr = `${this.cfg.defaultServ}/${port}`;
 			console.error("The url for the named port is probably not resolved. Call Anclient.understandPorts() or AnReactExt.extendPorts().",
-					"prot: ", prot, "url", ulr);
+					"prot: ", port, "url", ulr);
 		}
 
 		// if (this.cfg.connId)
@@ -194,6 +194,7 @@ class AnClient {
             async: async,
 			//xhrFields: { withCredentials: true },
 			data: JSON.stringify(jreq),
+			timeout: jreq.timeout || 18000,
 			success: function (resp) {
 				// response Content-Type = application/json;charset=UTF-8
 				if (typeof resp === 'string') {
@@ -587,9 +588,7 @@ class SessionClient {
 						"To setup user's action information, call ssClient.usrAct().");
 
 		var ins = new InsertReq(uri, maintbl);
-		// ins.a = Protocol.CRUD.c;
 		this.currentAct.cmd = 'insert';
-		// var jmsg = this.userReq(uri, Protocol.Port.insert, ins, this.currentAct);
 		var jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
 
 		if (nvs !== undefined) {

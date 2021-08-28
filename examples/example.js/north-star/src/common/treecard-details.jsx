@@ -95,7 +95,7 @@ class TreeCardDetailsComp extends DetailFormW {
 
 		this.funcId = props.funcId || 'TreeCardDetails'
 
-		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CURD.u;
+		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CRUD.u;
 		this.state.mtabl = props.mtabl;
 
 		if (this.state.crud !== Protocol.CRUD.c)

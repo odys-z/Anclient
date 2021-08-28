@@ -12,8 +12,9 @@ import {
 import { Typography } from "@material-ui/core";
 
 import { L } from '../../utils/langstr';
-	import { AnContext } from '../reactext.jsx';
-	import { AnTreeIcons } from "./tree"
+	import { toBool } from '../../utils/helpers';
+	import { AnContext } from '../reactext';
+	import { AnTreeIcons } from './tree'
 	import { CrudCompW, DetailFormW } from '../crud';
 	import { JsampleIcons } from '../../jsample/styles';
 
@@ -126,7 +127,7 @@ class TreeCardComp extends React.Component {
 				key={tnode.id}
 				spacing={0}
 				className={classes.row} >
-			{ this.props.columns.filter( v => v.hide !== true ).map( (col, cx) => {
+			{ this.props.columns.filter( v => !toBool(v.hide) ).map( (col, cx) => {
 			  if (cx === 0) return (
 				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.rowHead}>
 					<Typography noWrap variant='body2' >
@@ -257,8 +258,8 @@ class AnTreeditorComp extends React.Component {
 				pk={this.props.pk} fields={this.props.fields}
 				pkval={undefined} parent={this.props.parent} parentId={me}
 				title={this.props.detailFormTitle || 'Add Tree Node'}
-				onClose={() => {that.addForm = undefined;}}
-				onOk={() => {that.addForm = undefined; that.toSearch({}); }}
+				onClose={() => {that.addForm = undefined; that.setState({}); }}
+				onOk={() => {that.addForm = undefined; that.toSearch(); }}
 			/> );
 		this.setState({});
 	}
@@ -279,7 +280,7 @@ class AnTreeditorComp extends React.Component {
 				pkval={me} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
 				onClose={() => {that.addForm = undefined; that.setState({}) }}
-				onOk={() => {that.addForm = undefined; }}
+				onOk={() => {that.addForm = undefined; that.toSearch(); }}
 			/> );
 		this.setState({});
 	}
@@ -351,7 +352,7 @@ class AnTreeditorComp extends React.Component {
 	th(columns = [], classes, media) {
 		return (
 			<Grid container className={classes.th} >
-				{columns.filter( v => v.hide !== true)
+				{columns.filter( v => !toBool(v.hide))
 					.map( (col, ix) => {
 						if (col.type === 'actions') return (
 							<Grid item key={ix} {...col.cols}>
