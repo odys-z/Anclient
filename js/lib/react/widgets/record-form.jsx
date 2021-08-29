@@ -14,7 +14,7 @@ import Input from '@material-ui/core/Input';
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	import { AnConst } from '../../utils/consts';
-	import { DetailFormW } from '../crud';
+	import { CrudCompW, DetailFormW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
 	import { JsampleIcons } from '../../jsample/styles';
 
@@ -75,11 +75,12 @@ class RecordFormComp extends DetailFormW {
 	constructor (props = {}) {
 		super(props);
 
-		props.stateHook.collect = function (me) {
-			let that = me;
-			return function(hookObj){
-				hookObj[that.props.mtabl] = that.props.record;
-			}; }(this);
+		if (props.stateHook)
+			props.stateHook.collect = function (me) {
+				let that = me;
+				return function(hookObj){
+					hookObj[that.props.mtabl] = that.props.record;
+				}; }(this);
 
 		this.state.pkval = props.pkval;
 
@@ -130,7 +131,8 @@ class RecordFormComp extends DetailFormW {
 	}
 
 	getField(f, rec) {
-		let {isSm} = super.media;
+		let media = super.media;
+		let {isSm} = media;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
 			let that = this;
@@ -144,13 +146,20 @@ class RecordFormComp extends DetailFormW {
 					}}
 				/>);
 		}
+		else if (f.type === 'formatter' || f.formatter)
+			return (
+				<Grid item key={f.field} {...f.cols} >
+					<Typography variant='body2' >
+					  {f.formatter(rec)}
+					</Typography>
+				</Grid>);
 		else {
 			let type = 'text';
 			if (f.type === 'float' || f.type === 'int')
 				type = 'number'
 			return (
 			<TextField id={f.field} key={f.field}
-				type={f.type || type}
+				type={f.type || type} disabled={!!f.disabled}
 				label={isSm ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
@@ -189,19 +198,20 @@ class RecordFormComp extends DetailFormW {
 
 	render () {
 		const { classes, width } = this.props;
+		let media = CrudCompW.setWidth(width);
 
 		let rec = this.props.record;
 
 		return (
 			<Grid container className={classes.content} direction='row'>
-				{this.formFields(rec, classes)}
+				{this.formFields(rec, classes, media)}
 			</Grid> );
 	}
 }
 
 RecordFormComp.propTypes = {
-	uri: PropTypes.string.isRequired,  // because cbb binding needs data access
-	stateHook: PropTypes.object.isRequired,
+	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
+	stateHook: PropTypes.object,		// readonly is not required
 	dense: PropTypes.bool,
 	mtabl:  PropTypes.string.isRequired,
 	fields: PropTypes.array.isRequired,

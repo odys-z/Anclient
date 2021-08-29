@@ -414,7 +414,7 @@ class AnTreeditorComp extends React.Component {
 						</Typography>
 					  </Grid>
 					);
-				else if (col.type === 'formatter')
+				else if (col.type === 'formatter' || col.formatter)
 				  return (
 					<Grid item key={`${tnode.id}.${ix}`} {...col.cols} >
 						<Typography variant='body2' >
