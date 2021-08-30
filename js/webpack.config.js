@@ -33,7 +33,7 @@
 	],
 
 	resolve: {
-		extensions: ['*', '.js', '.jsx']
+		extensions: ['*', '.js', '.jsx', '.tsx']
 	},
 
 	module: {
@@ -43,11 +43,19 @@
 		  options: {
 		    presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
+		{ test: /\.tsx$/,
+		  loader : 'babel-loader',
+		  options: { presets: [
+				'@babel/preset-react',
+				'@babel/preset-typescript',
+				'@emotion/babel-preset-css-prop',
+				'@babel/preset-env' ] }
+		},
 		{ test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" },
  		{ test: /\.css$/,
 		  use: [ 'style-loader',
 				'css-loader',
 			  ] }
-	  ],
-	}, // module
+	  ]
+	}
 }

@@ -220,6 +220,48 @@ export const QuizProtocol = {
 				{n: L('Multi-5 Stars'),  v: 'mr5'},
 				{n: L('Multi-10 Stars'), v: 'mr10'}
 			]
+		},
+
+		agridContextMenu: () => {
+			return [
+				{ name: L('Single Option'),
+				  action: p => {
+					  p.node['qtype'] = 's';
+					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
+				} },
+				{ name: L('Multiple Check'),
+				  action: p => {
+					  p.node['qtype'] = 'm';
+					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
+				} },
+				{n: L('Free Text'),
+				  action: p => {
+					  p.node['qtype'] = 't';
+				} },
+				{n: L('Number Only'),
+				  action: p => {
+					  p.node['qtype'] = 'n';
+					  p.node['expectings'] = p.node['expectings'] || '0';
+				} },
+				{n: L('5 Stars'),
+				  action: p => {
+					  p.node['qtype'] = 'r5';
+				} },
+				{n: L('10 Stars'),
+				  action: p => {
+					  p.node['qtype'] = 'r10';
+				} },
+				{n: L('Multi-5 Stars'),
+				  action: p => {
+					  p.node['qtype'] = 'mr5';
+					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
+				} },
+				{n: L('Multi-10 Stars'),
+				  action: p => {
+					  p.node['qtype'] = 'mr10';
+					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
+				} },
+			]
 		}
 	},
 

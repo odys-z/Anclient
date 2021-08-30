@@ -14,7 +14,7 @@ import {
 const { JsampleIcons } = jsample;
 
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
-import { QuizForm } from './quiz-form';
+import { QuizForm } from './quiz-form-ag';
 
 const styles = (theme) => ( {
 	root: {

@@ -11,6 +11,8 @@
 
 export * from './anclient.js';
 
+export * from './patch/react-portal-overlay.tsx';
+
 export * from './react/reactext.jsx';
 export * from './react/anreact.jsx';
 export * from './react/error.jsx';
@@ -33,6 +35,7 @@ export * from './react/widgets/tabs.jsx';
 export * from './react/widgets/tree.jsx';
 export * from './react/widgets/treegrid.jsx';
 export * from './react/widgets/record-form.jsx';
+export * from './react/widgets/ag-gridsheet.jsx';
 
 export * from './react/widgets/simple-form';
 export * from './react/widgets/tree-editor';
