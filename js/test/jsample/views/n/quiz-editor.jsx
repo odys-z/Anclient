@@ -316,10 +316,11 @@ class QuizEditorComp extends DetailFormW {
 
 				{this.items(classes)}
 
+				{/*
 				<ListItem key="b" button>
-					{/*<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>*/}
+					<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
 					<ListItemText primary="New Question" onClick={this.onAdd} />
-				</ListItem>
+				</ListItem>*/}
 			</List>
 			{this.quizUserForm}
 		  </>
