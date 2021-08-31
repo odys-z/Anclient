@@ -66,7 +66,7 @@ class QuizzesComp extends CrudCompW {
 		this.toSearch();
 	}
 
-	/** Deprecation jquiz.list() ?
+	/**
 	 */
 	toSearch(e, query) {
 

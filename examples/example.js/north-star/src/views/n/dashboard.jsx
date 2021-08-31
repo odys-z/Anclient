@@ -8,7 +8,7 @@ import {
     AnContext, AnError, CrudComp, AnReactExt
 } from 'anclient';
 
-import { Histgram } from '../../d3charts/histgram'
+import { Histogram } from '../../d3charts/histogram'
 
 const styles = (theme) => ( {
 	root: {
@@ -47,7 +47,7 @@ class DashboardComp extends CrudComp {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<Histgram vectors = {this.state.charts[0]}
+			<Histogram vectors = {this.state.charts[0]}
 			/>
 		</>);
 	}

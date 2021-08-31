@@ -237,7 +237,7 @@ install core-js & regenerator-runtime
     npm install --save regenerator-runtime
 ..
 
-In histgram.jsx:
+In histogram.jsx:
 
 .. code-block:: javascript
 

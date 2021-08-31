@@ -9,7 +9,7 @@ import {
     AnContext, AnError, CrudCompW, AnReactExt
 } from 'anclient';
 
-import { Histgram } from '../../d3charts/histgram'
+import { Histogram } from '../../d3charts/histogram'
 
 const styles = (theme) => ( {
 	root: {
@@ -37,6 +37,8 @@ class DashboardComp extends CrudCompW {
 		this.toSearch = this.toSearch.bind(this);
 	}
 
+	histogramHook = {};
+
 	componentDidMount() {
 		let that = this;
 	}
@@ -48,7 +50,9 @@ class DashboardComp extends CrudCompW {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<Histgram vectors = {this.state.charts[0]}
+			<Histogram uri={this.uri}
+				stateHook={this.histogramHook}
+				vectors = {this.state.charts[0]}
 			/>
 		</>);
 	}
