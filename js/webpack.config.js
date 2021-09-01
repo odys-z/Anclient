@@ -8,9 +8,7 @@
  module.exports = {
     mode: v, // "production" | "development" | "none"
     devtool: 'source-map',
-    // entry: { anclient: './lib/anclient.js' },
     entry: { anclient: './lib/an-components.js' },
-	// 		'./lib/anclient.js'],
 
     output: {
       filename: "[name]-" + version + ".min.js",
@@ -29,7 +27,6 @@
 	},
 
 	plugins: [
-		// new BundleAnalyzerPlugin()
 	],
 
 	resolve: {

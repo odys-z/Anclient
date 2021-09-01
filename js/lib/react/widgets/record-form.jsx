@@ -204,13 +204,8 @@ class RecordFormComp extends DetailFormW {
 		let rec = this.props.record;
 
 		return (
-<<<<<<< HEAD
 			<Grid container className={classes.root} direction='row'>
 				{this.formFields(rec, classes)}
-=======
-			<Grid container className={classes.content} direction='row'>
-				{this.formFields(rec, classes, media)}
->>>>>>> master
 			</Grid> );
 	}
 }

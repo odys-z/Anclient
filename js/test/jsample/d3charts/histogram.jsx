@@ -12,7 +12,7 @@ import {
     AnContext, AnError, CrudComp, AnReactExt
 } from 'anclient';
 
-import { CenterProtocol, CenterResp } from '../common/protocol.quiz.js';
+import { NChartReq, NChartProtocol } from '../common/protocol.quiz.js';
 
 const styles = (theme) => ( { } );
 
@@ -31,15 +31,17 @@ class HistogramComp extends React.Component {
 		console.log(this.props.uri);
 		// this.initTest();
 
+		let that = this;
 		let client = this.context.anClient;
-		client.userReq(this.props.uri,
+		let req = client.userReq(this.props.uri, 'nchart',
 				new NChartReq( this.uri )
 				.A(NChartProtocol.A.happyHist) );
 
 		client.commit(req,
 			(resp) => {
 				let centerResp = resp.Body()
-				that.initHist(resp.histData(), 5);
+				let happiness = centerResp.happyHist().rows;
+				that.initHist(happiness, Math.min(happiness.length, 4));
 				// that.setState({});
 			});
 	}
@@ -71,7 +73,7 @@ class HistogramComp extends React.Component {
 			.range([height, 0]);
 		let histogram = d3
 			.histogram()
-			// .value(function(d) { return d.price; })   // I need to give the vector of value
+			// .value(function(d) { return +d.price; })
 			// .value(function(d) { return d })   // I need to give the vector of value
 			.domain(x.domain())  // then the domain of the graphic
 			.thresholds(x.ticks(8)); // then the numbers of bins
@@ -131,12 +133,13 @@ class HistogramComp extends React.Component {
 
 		let x = d3
 			.scaleLinear()
-			.domain([0, d3.max(data)])
+			.domain([0, d3.max(data, (d) => +d.happy)])
 			.range([0, width]);
 		let y = d3.scaleLinear()
 			.range([height, 0]);
 		let histogram = d3
 			.histogram()
+			.value(function(d) { return +d.happy; })
 			.domain(x.domain())  // then the domain of the graphic
 			.thresholds(x.ticks(bands)); // then the numbers of bins
 		let bins = histogram(data);

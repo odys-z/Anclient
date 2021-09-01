@@ -2,8 +2,7 @@
 // import { Protocol, AnsonResp, AnsonBody } from '../../../lib/protocol.js';
 // import { L } from '../../../lib/utils/langstr.js';
 // for jsample, use
-import { Protocol, AnsonResp, AnsonBody } from 'anclient';
-import { L } from 'anclient';
+import { L, Protocol, AnsonResp, AnsonBody } from 'anclient';
 
 export class QuizReq {
 	constructor () { }
@@ -391,19 +390,20 @@ export class NChartReq extends AnsonBody {
 		super();
 		this.type = "io.oz.ever.conn.n.NChartReq";
 		this.uri = uri;
-		this.port = "nchart";
 	}
 }
 
 export class NChartResp extends AnsonResp {
-	constructor (uri) {
-		super();
+	constructor (jsonBody) {
+		super(jsonBody);
 		this.type = "io.oz.ever.conn.n.NChartResp";
+		this.happy = jsonBody.happyhist[0];
 	}
 
-	histData() {
-		return this.hist;
+	happyHist() {
+		return AnsonResp.rs2arr(this.happy);
 	}
+
 }
 
 Protocol.registerBody('io.oz.ever.conn.n.NorthResp', (jsonBd) => {
