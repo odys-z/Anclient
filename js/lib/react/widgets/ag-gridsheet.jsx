@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
+import { AgGridReact } from 'ag-grid-react';
 import { Overlay } from '../../patch/react-portal-overlay';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -31,19 +31,23 @@ export class AgGridsheet extends React.Component {
 
 	coldefs = [];
 	defaultColDef = {
-		resizable: true, editable: true,
+		resizable: true,
+		editable: true,
 		singleClickEdit: true,
+		stopEditingWhenCellsLoseFocus: true,
 	};
+
+	editHandlers = {};
 
 	constructor(props) {
 		super(props);
 
-		props.stateHook.collect = function (me) {
-			let that = me;
-			return function(hookObj) {
-				hookObj.rows = that.state.rows;
-				hookObj.cols = that.coldefs;
-			}; }(this);
+		// props.stateHook.collect = function (me) {
+		// 	let that = me;
+		// 	return function(hookObj) {
+		// 		hookObj.rows = that.state.rows;
+		// 		hookObj.cols = that.coldefs;
+		// 	}; }(this);
 
 		let {resizable, editable, singleClickEdit} = props.defaultCol || {};
 		this.defaultColDef = Object.assign(
@@ -51,18 +55,37 @@ export class AgGridsheet extends React.Component {
 						{resizable, editable, singleClickEdit});
 
 		// columns = [{ field: 'id', label: '', hide: true }],
+		this.onEditStop = this.onEditStop.bind(this);
+		let that = this;
+
+		let coldefs = this.coldefs;
 		if (props.columns) {
-			props.columns.forEach( (c, x) => that.coldefs.push(
-				Object.assign(
-				  { headerName: '',
-					field: 'not-null',
-					width: 120,
-					suppressSizeToFit: true,
-					minWidth: 50,
-					maxWidth: 200 },
-				  c.thFormatter ? c.thFormatter () :
-				  { headerName: c.label, ...c}
-			) ) );
+			props.columns.forEach( (c, x) =>  {
+				let headerName = c.label;
+				delete c.label;
+
+				let anEditStop = c.anEditStop;
+				if (anEditStop) {
+					that.editHandlers[c.field] = anEditStop;
+					delete c.anEditStop;
+				}
+				let width = 120;
+				if (x === coldefs.length - 1)
+					width = undefined;
+				coldefs.push(
+					Object.assign(
+					  { headerName: '--',
+						field: '--',
+						suppressSizeToFit: true,
+						resizable: true,
+						editable: true,
+						singleClickEdit: true,
+						width,
+						minWidth: 50 },
+					  c.thFormatter ? c.thFormatter () :
+						{ headerName, ...c}
+					) )
+			} );
 		}
 
 	}
@@ -117,11 +140,14 @@ export class AgGridsheet extends React.Component {
 	/** Grid event API:
 	 * https://www.ag-grid.com/javascript-data-grid/grid-events/
 	 */
-	onEditStop = (p) => {
+	onEditStop (p) {
 		// { "indId": "", "indName": "", "command": "b" }
-		// console.log(p.data);
+		// console.log(p.data, p.value, p.data.qtype);
 		// if (p.data.command === 'close')
 		// 	that.setState({ open: false });
+
+		if (typeof this.editHandlers[p.colDef.field] === 'function')
+			this.editHandlers[p.colDef.field](p);
 	}
 
 	render () {
@@ -131,7 +157,7 @@ export class AgGridsheet extends React.Component {
 			columnDefs={this.coldefs}
 			defaultColDef={this.defaultColDef}
 			onCellEditingStopped={this.onEditStop}
-			getContextMenuItems={getContextMenuItems}
+			getContextMenuItems={this.getContextMenuItems}
 			rowData={this.props.rows} >
 		</AgGridReact> );
 	}
@@ -140,6 +166,11 @@ export class AgGridsheet extends React.Component {
 AgGridsheet.propTypes = {
 	columns: PropTypes.array.isRequired,
 	rows: PropTypes.array.isRequired,
-	stateHook: PropTypes.object.isRequired,
+	// stateHook: PropTypes.object.isRequired,
 	contextMenu: PropTypes.object
 };
+
+export function anMultiRowRenderer (param) {
+	if (param.value)
+		return `<p style="line-height: 1.2em" >${param.value.split('\n').join('<br/>')}</p>`;
+}

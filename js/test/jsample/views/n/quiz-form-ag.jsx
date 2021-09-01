@@ -8,19 +8,29 @@ import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Box';
 
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-// import { Overlay } from '../../patch/react-portal-overlay';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { L, isEmpty, Protocol, AnContext, DatasetCombo, ConfirmDialog,
-	jsample, Overlay, AgGridsheet } from 'anclient';
+import {
+	L, isEmpty, Protocol,
+	AnContext, DatasetCombo, ConfirmDialog, RecordForm,
+	jsample, Overlay, AgGridsheet, anMultiRowRenderer
+} from 'anclient';
 const { JsampleIcons } = jsample;
 
 import { JQuiz } from '../../common/an-quiz';
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 
+import { QuizUserForm } from './quiz-users';
+
 const styles = (theme) => ({
+	quizform: {
+		backgroundColor: '#fafafaee',
+	},
+	usersButton: {
+		marginRight: 120,
+	}
 });
 /**
  * For ag-grid practice, go
@@ -41,7 +51,7 @@ class QuizFormComp extends React.Component {
 
 	constructor (props) {
 		super(props);
-		this.gridHook = {state: undefined};
+		this.quizHook = {collect: undefined};
 
 		this.state.crud = props.c ? Protocol.CRUD.c
 						: props.u ? Protocol.CRUD.u
@@ -57,17 +67,48 @@ class QuizFormComp extends React.Component {
 		this.onDirty = this.onDirty.bind(this);
 
 		this.toSave = this.toSave.bind(this);
+		this.toSetPollUsers = this.toSetPollUsers.bind(this);
 		this.alert = this.alert.bind(this);
 	}
 
-	gridHook = {};
+	quizHook = {};
 	columns = [
-		{ field: 'qtype', label: 'Type' },
+		{ field: 'title', label: 'Title', wrapText: true,
+		  cellEditor: 'agLargeTextCellEditor',
+		  cellEditorParams: {cols: 40, rows: 5},
+		  cellRenderer: anMultiRowRenderer,
+		},
+		{ field: 'qtype', label: 'Type', width: 120,
+		  // cellEditor: QuizProtocol.Qtype.agSelector,
+		  cellEditor: 'agSelectCellEditor',
+		  cellEditorParams: {cols: 40, rows: 5},
+		  cellEditorParams: (p) => {
+				return { values: QuizProtocol.Qtype.options().map( v => v.n ) };
+			},
+		  cellRenderer: QuizProtocol.Qtype.agRenderer,
+		  anEditStop: e => {
+			let qtype = QuizProtocol.Qtype.encode(e.value);
+			e.data.qtype = qtype;
+			if (qtype === 'n')
+			 	if (isEmpty(e.data.answers))
+					e.data.answers = '10';
+				else if (!/^10\,?/.test(e.data.answers))
+					e.data.answers = '10,\n' + e.data.answers;
+		  }
+		},
 		{ field: 'qid', label: 'Type', hide: true },
-		{ field: 'quesiont', label: 'Question' },
-		{ field: 'answers', label: 'Options' },
-		{ field: 'weight', label: 'Weight' },
-		{ field: 'expectings', label: 'Options' },
+		{ field: 'answers', label: 'Options', width: 240, autoHeight: true,
+		  wrapText: true,
+		  cellEditor: 'agLargeTextCellEditor',
+		  cellEditorParams: {cols: 40, rows: 5},
+		  cellRenderer: anMultiRowRenderer,
+		},
+		{ field: 'weight', label: 'Weight', width: 90, editable: false },
+		{ field: 'expectings', label: 'Expected', width: 160 },
+		{ field: 'question', label: 'Question', wrapText: true, width: 500,
+		  cellEditor: 'agLargeTextCellEditor',
+		  cellEditorParams: {cols: 40, rows: 5},
+		  cellRenderer: anMultiRowRenderer },
 	];
 
 	componentDidMount() {
@@ -115,32 +156,53 @@ class QuizFormComp extends React.Component {
 		this.setState({});
 	}
 
-	toSave(e) {
-		e.stopPropagation();
-		let state = {};
-		this.gridook.collect && this.gridook.collect(state);
+	toSetPollUsers(e) {
+		if (e && e.stopPropagation) e.stopPropagation();
+
 		let that = this;
 
-		this.setState.quiz = state.quiz;
-		this.setState.questions = state.questions;
+		// collect children's state - will be used in callback to update this component.
+		// that.quizHook.collect && that.quizHook.collect(that.state);
+
+		this.quizUserForm = (
+			<QuizUserForm uri={this.props.uri} crud={this.state.crud}
+				jquiz={this.jquiz}
+				onSave={ ids => {
+					that.quizUserForm = undefined;
+					that.setState({quizUsers: ids});
+				} }
+				onClose={e => {
+					that.quizUserForm = undefined;
+					that.setState({});
+				}}
+			/> );
+		this.setState({});
+	}
+
+	toSave(e) {
+		e.stopPropagation();
+		let that = this;
+
+		debugger
+		this.quizHook.collect && this.quizHook.collect(this.state);
 
 		if ( that.state.crud === Protocol.CRUD.c ) {
-			this.jquiz.insert(this.props.uri, state,
+			this.jquiz.insert(this.props.uri, this.state,
 				(resp) => {
 					let {quizId, title} = JQuiz.parseResp(resp);
 					if (isEmpty(quizId))
 						console.error ("Something Wrong!");
-					state.quiz.qid = quizId;
-					Object.assign(this.state, state);
+					that.state.quiz.qid = quizId;
+					// Object.assign(this.state, state);
 					that.state.crud = Protocol.CRUD.u;
 					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
 				});
 		}
 		else {
-			this.jquiz.update(this.props.uri, state,
+			this.jquiz.update(this.props.uri, this.state,
 				(resp) => {
 					let {questions} = JQuiz.parseResp(resp);
-					Object.assign(this.state, state);
+					// Object.assign(this.state, state);
 					that.alert(L("Quiz saved!\n\nQuestions number: {questions}", {questions}));
 				});
 		}
@@ -160,6 +222,10 @@ class QuizFormComp extends React.Component {
 		let txtCancel = props.cancel === 'string' ? props.cancel : L('Close');
 		let txtSave = L('Publish');
 
+
+		let usrs = this.state.quizUsers;
+		usrs = usrs && (usrs.length > 0 || usrs.size > 0);
+
 		return (
 		  <Overlay open={true}
 			  	style={{
@@ -168,8 +234,16 @@ class QuizFormComp extends React.Component {
 					justifyContent: 'center'}}>
 
 			<div className="ag-theme-alpine" style={{height: "82%", width: "92%", margin: "auto", marginTop: 100}}>
+				<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz' className={classes.quizform}
+					stateHook={this.quizHook} dense
+					fields={[ { field: 'qid', label: '', hide: true },
+							  { field: 'title', label: L('Title'), grid: {sm: 6, md: 3} },
+						      { field: 'tags', label: L('#Hashtag'), grid: {sm: 5, md: 3} },
+						      { field: 'quizinfo', label: L('Description'), grid: {sm: 11, md: 6} }
+						]}
+					record={{qid: this.state.quizId, ... this.state.quiz }} />
+
 				<AgGridsheet
-						stateHook={this.gridHook}
 						rows={this.state.questions}
 						columns={this.columns}
 						contextMenu={{'Format Answers': {
@@ -181,27 +255,31 @@ class QuizFormComp extends React.Component {
 
 				<div style={{textAlign: 'center', background: '#f8f8f8'}}>
 					{aboutPollUsers(this.state.quizUsers)}
-					<Button variant="contained"
-						className={classes.button} onClick={this.toSetPollUsers}
+					<Button variant="outlined"
+						className={classes.usersButton}
+						color={ usrs ? 'primary' : 'secondary'}
+						onClick={this.toSetPollUsers}
 						endIcon={<JsampleIcons.Edit />}
-					>{L('Change Target Users')}</Button>
-					<Divider orientation="vertical" flexItem ml={30} />
-				  <Button onClick={this.toSave} color="primary">
+					>{L('Change')}
+					</Button>
+					<Button onClick={this.toSave} color="primary">
 						{txtSave}
-				  </Button>
-				  <Button display={displayCancel} onClick={this.onCancel} color="primary" autoFocus>
+					</Button>
+					<Button display={displayCancel} onClick={this.onCancel} color="primary" autoFocus>
 						{txtCancel}
-				  </Button>
+					</Button>
 				</div>
 			</div>
 			{this.confirm}
+			{this.quizUserForm}
 		  </Overlay> );
 
-		function aboutPollUsers(usrs = []) {
+		function aboutPollUsers(usrs = [], btn) {
 			let usr = usrs && (usrs.length > 0 || usrs.size > 0);
-			return (<Typography color={ usr ? 'primary' : 'secondary'} >
-						{L('Total polling users: {n}', {n: usrs.size || usrs.length || 0})}
-					</Typography>);
+			return (
+				<Typography color={ usr ? 'primary' : 'secondary'} >
+					{L('Total polling users: {n}', {n: usrs.size || usrs.length || 0})}
+				</Typography>);
 		}
 	}
 }

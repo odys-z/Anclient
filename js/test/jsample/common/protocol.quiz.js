@@ -36,7 +36,7 @@ export class QuizReq {
 		return qs;
 	}
 
-	static questionCols = ["question", "answers", "indId", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"];
+	static questionCols = ["question", "answers", "indId", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra", "title"];
 	static checkQuestions(arr) {
 		let qs = [];
 		if (arr)
@@ -206,6 +206,7 @@ export const QuizProtocol = {
 		multiR5: 'mr5',
 		multiR10: 'mr10',
 
+		/** for DatasetCombo */
 		options: () => {
 			return [
 				{n: L('Single Option'),  v: 's'},
@@ -217,6 +218,13 @@ export const QuizProtocol = {
 				{n: L('Multi-5 Stars'),  v: 'mr5'},
 				{n: L('Multi-10 Stars'), v: 'mr10'}
 			]
+		},
+
+		encode: (n) => {
+			let opts = QuizProtocol.Qtype.options();
+			for (let i = 0; i < opts.length; i++)
+				if (opts[i].n === n)
+					return opts[i].v;
 		},
 
 		agridContextMenu: () => {
@@ -259,7 +267,21 @@ export const QuizProtocol = {
 					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
 				} },
 			]
-		}
+		},
+
+		decode: (v) => {
+			let opts = QuizProtocol.Qtype.options();
+			for (let i = 0; i < opts.length; i++)
+				if (opts[i].v === v)
+					return opts[i].n
+			return v;
+		},
+
+		agRenderer: (p) => {
+			// return '**' + p.value + '**';
+			return QuizProtocol.Qtype.decode(p.value);
+		},
+
 	},
 
 	PollDetailType: 'io.odysz.jquiz.PollDetail',

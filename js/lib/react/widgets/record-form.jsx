@@ -22,6 +22,7 @@ const styles = (theme) => ({
   root: {
 	display: 'flex',
 	width: '100%',
+	backgroundColor: '#fafafaee'
   },
   row: {
 	width: '100%',
@@ -35,16 +36,16 @@ const styles = (theme) => ({
   folder: {
 	width: '100%'
   },
-  folderHead: {
-	padding: theme.spacing(1),
-	borderBottom: '1px solid #bcd',
-	borderTop: '1px solid #bcd'
-  },
   hide: {
 	display: 'none'
   },
   labelText: {
 	padding: theme.spacing(1),
+	borderLeft: '1px solid #bcd',
+  },
+  labelText_dense: {
+	paddingLeft: theme.spacing(1),
+	paddingRight: theme.spacing(1),
 	borderLeft: '1px solid #bcd',
   }
 });
@@ -131,9 +132,9 @@ class RecordFormComp extends DetailFormW {
 
 	getField(f, rec) {
 		let {isSm} = super.media;
+		let that = this;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
-			let that = this;
 			return (
 				<DatasetCombo uri={this.props.uri}
 					options={f.options} val={rec[f.field]}
@@ -151,7 +152,7 @@ class RecordFormComp extends DetailFormW {
 			return (
 			<TextField id={f.field} key={f.field}
 				type={f.type || type}
-				label={isSm ? L(f.label) : ''}
+				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={ /* console.log(rec, f.field, !rec || rec[f.field] === undefined ? '' : rec[f.field]) && */
@@ -173,7 +174,7 @@ class RecordFormComp extends DetailFormW {
 		  if (!f.hide) {
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
-					{...f.grid} className={classes.labelText} >
+					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
 				  <Box className={classes.rowBox} {...f.box} >
 					{!isSm && (
 					  <Typography className={classes.formLabel} >
@@ -193,7 +194,7 @@ class RecordFormComp extends DetailFormW {
 		let rec = this.props.record;
 
 		return (
-			<Grid container className={classes.content} direction='row'>
+			<Grid container className={classes.root} direction='row'>
 				{this.formFields(rec, classes)}
 			</Grid> );
 	}
