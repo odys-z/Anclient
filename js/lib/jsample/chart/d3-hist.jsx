@@ -44,7 +44,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class HistgramComp extends CrudComp {
+class HistogramComp extends CrudComp {
 
 	state = {
 		csv: [],

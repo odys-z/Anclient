@@ -1012,7 +1012,7 @@ class DatasetReq extends QueryReq {
 
 ///////////////// END //////////////////////////////////////////////////////////
 export {
-	Jregex, Protocol, AnsonMsg, AnHeader,
+	Jregex, Protocol, AnsonMsg, AnsonBody, AnHeader,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
 	AnsonResp, DatasetReq, stree_t
 }

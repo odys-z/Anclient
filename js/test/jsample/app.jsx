@@ -14,6 +14,7 @@ const { Domain, Roles, Orgs, Users, JsampleTheme } = jsample;
 
 import { StarPorts } from './common/port';
 
+import { Dashboard } from './views/n/dashboard';
 import { Indicators } from './views/n/indicators';
 import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
@@ -66,6 +67,7 @@ class App extends React.Component {
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
 			{path: '/xv/indicators', comp: Indicators},
+			{path: '/n/dashboard', comp: Dashboard},
 			{path: '/n/indicators', comp: Indicators},
 			{path: '/n/quizzes', comp: Quizzes },
 			{path: '/n/polls', comp: Polls },
