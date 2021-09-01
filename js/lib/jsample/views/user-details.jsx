@@ -14,6 +14,9 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
+import SvgIcon from "@material-ui/core/SvgIcon";
+import Avatar from '@material-ui/core/Avatar';
+
 import { L } from '../../../lib/utils/langstr';
 	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/utils/consts';
@@ -21,6 +24,7 @@ import { L } from '../../../lib/utils/langstr';
 	import { AnsonResp } from '../../../lib/protocol';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
 	import { AnTree } from '../../../lib/react/widgets/tree';
+	import { RecordForm } from '../../../lib/react/widgets/record-form';
 
 import { JsampleIcons } from '../styles';
 
@@ -336,3 +340,72 @@ UserDetailsComp.propTypes = {
 
 const UserDetails = withWidth()(withStyles(styles)(UserDetailsComp));
 export { UserDetails, UserDetailsComp };
+
+const avatarIcon = function AvIcon(props) {
+  return (
+	<SvgIcon style={{ width: 64, height: 64 }} fontSize="inherit" {...props}>
+		<g> <path d="M76.8,121.6C34.385,121.6,0,155.985,0,198.4V480h89.6V121.6H76.8z"/>
+			<path d="M435.2,121.6H128V480h384V198.4C512,155.985,477.615,121.6,435.2,121.6z M288,422.4c-67.05,0-121.6-54.55-121.6-121.6
+					S220.95,179.2,288,179.2s121.6,54.55,121.6,121.6S355.05,422.4,288,422.4z M435.2,224c-14.139,0-25.6-11.461-25.6-25.6
+					c0-14.139,11.461-25.6,25.6-25.6c14.139,0,25.6,11.461,25.6,25.6C460.8,212.539,449.339,224,435.2,224z"/>
+			<path d="M288,217.6c-45.876,0-83.2,37.324-83.2,83.2S242.124,384,288,384s83.2-37.324,83.2-83.2S333.876,217.6,288,217.6z"/>
+			<polygon points="320,32 192,32 166.4,83.2 345.6,83.2 "/>
+		</g>
+	</SvgIcon>
+  );
+}
+/** Simple session info card. Jsample use this to show user's personal info.
+ * As UserDetails handling data binding by itself, and quit with data persisted
+ * at jserv, this component is used to try the other way - no data persisting,
+ * but with data automated data loading and state hook.
+ */
+class SsInfCardComp extends React.Component {
+
+	state = {
+		record: { uid: undefined, roleId: undefined },
+	}
+
+	constructor (props) {
+		super(props);
+
+		let {uid, roleId} = props;
+		this.state.rec = {uid, roleId}
+	}
+
+	componentDidMount() {
+		console.log(this.props.uri);
+		let that = this;
+		// this senario is an illustrating of general query's necessity.
+		let req = this.context.anClient.query(this.props.uri, 'a_users', 'u')
+		req.Body()
+			.l("a_roles", "r", "r.roleId=u.roleId")
+			.l("a_orgs", "o", "o.orgId=u.orgId")
+			.whereEq('userId', this.props.ssInf.uid);
+		this.context.anReact.bindStateRec({uri: this.props.uri, req}, undefined, that);
+	}
+
+	render() {
+		return <RecordForm uri={this.props.uri} mtabl='a_users'
+			fields={ [
+				{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
+				{ field: 'userName', label: L('Name'),   grid: {sm: 6, lg: 4} },
+				{ field: 'roleName', label: L('Role'),   grid: {sm: 6, lg: 4} },
+				{ field: 'avatar',   label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // probably another component
+			] }
+			record={this.state.record} />
+
+		function loadAvatar() {
+			return avatarIcon({ color: "primary", viewBox: "0 0 512 512" });
+		}
+	}
+}
+SsInfCardComp.contextType = AnContext;
+
+SsInfCardComp.propTypes = {
+	uri: PropTypes.string.isRequired,
+	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
+	ssInf: PropTypes.object.isRequired,
+};
+
+const SsInfCard = withWidth()(withStyles(styles)(SsInfCardComp));
+export { SsInfCard, SsInfCardComp };

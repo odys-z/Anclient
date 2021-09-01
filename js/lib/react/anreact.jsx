@@ -47,17 +47,17 @@ export class AnReact {
 	bindStateRec(qmsg, errCtx, compont) {
 		let onload = qmsg.onOk || qmsg.onLoad ||
 			// try figure out the fields
-			function (r) {
+			function (resp) {
 				if (compont) {
 					let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
-					if (rows && rows.length > 0)
-						console.error('Bind form with more than 1 records', r);
+					if (rows && rows.length > 1)
+						console.error('Bind form with more than 1 records', resp);
 
 					if (rows)
 						compont.setState({record: rows[0]});
-					else console.error('Can\'t bind empty row:', r);
+					else console.error('Can\'t bind empty row:', resp);
 				}
-				else console.error('Component shouldn\t be null. Can\'t hook back response:', r);
+				else console.error('Component shouldn\t be null. Can\'t hook back response:', resp);
 			};
 
 		let {req} = qmsg;

@@ -10,7 +10,7 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
 	jsample
 } from 'anclient';
-const { Domain, Roles, Orgs, Users, JsampleTheme } = jsample;
+const { Domain, Roles, Orgs, Users, JsampleTheme, SsInfCard } = jsample;
 
 import { StarPorts } from './common/port';
 
@@ -146,17 +146,17 @@ class App extends React.Component {
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
-					myInfo={myInfoPanels()}
+					myInfo={myInfoPanels('/sys')}
 					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
-		function myInfoPanels() {
+		function myInfoPanels(uri) {
 			return [
-				{title: L('Basic'),      panel: <Typography>Name: {that.state.anClient.ssInf.userName}</Typography>},
-				{title: L('My Classes'), panel: <MyClassTree />},
-				{title: L('My Status'),  panel: <Typography>Fury!</Typography>}
+				{title: L('Basic'),      panel: <SsInfCard uri={uri} ssInf={that.state.anClient.ssInf} />},
+				// {title: L('My Classes'), panel: <MyClassTree />},
+				{title: L('My Status'),  panel: <Typography>Tasks cleared!</Typography>}
 			  ];
 		}
 	}

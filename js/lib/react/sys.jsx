@@ -216,7 +216,7 @@ class SysComp extends React.Component {
 				that.props.onLogout();
 			}}
 			msg={L('Logging out?')} />
-			
+
 		this.setState({});
 	}
 
@@ -285,12 +285,6 @@ class SysComp extends React.Component {
 	}
 
 	route() {
-		// return [{path: '/home', params: {}},
-		// 		{path: '/views/sys/domain/domain.html', params: {}},
-		// 		{path: '/views/sys/role/roles.html', params: {}},
-		// 		{path: '/views/sys/org/orgs.html', params: {}},
-		// 		{path: '/views/sys/user/users.html', params: {}},
-		// 		{path: '/sys/error', params: {}}]
 		return this.state.cruds
 			.map( (c, x) =>
 				(<Route exact path={c.path} key={x} component={_comps[c.path]} {...c.params}/>)

@@ -8,15 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
-
-// import Card from '@material-ui/core/Card';
-// import CardActionArea from '@material-ui/core/CardActionArea';
-// import CardActions from '@material-ui/core/CardActions';
-// import CardContent from '@material-ui/core/CardContent';
-// import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
-
-// import QRCode from 'qrcode'
 
 import {L} from '../../utils/langstr';
 	import {AnContext} from '../reactext.jsx';
@@ -37,7 +29,6 @@ const styles = theme => ({
 
 class MyInfoComp extends React.Component {
 	state = {
-		// closed: false,
 	};
 
 	constructor (props = {}) {
@@ -72,7 +63,6 @@ class MyInfoComp extends React.Component {
 
 	render () {
 		let props = this.props;
-		// let open = !this.state.closed;
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
 

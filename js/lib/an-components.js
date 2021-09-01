@@ -46,11 +46,11 @@ import { Orgs, OrgsComp } from './jsample/views/orgs'
 import { Roles, RolesComp } from './jsample/views/roles'
 import { RoleDetails, RoleDetailsComp } from './jsample/views/role-details'
 import { Users, UsersComp } from './jsample/views/users'
-import { UserDetails, UserDetailsComp } from './jsample/views/user-details'
+import { UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp } from './jsample/views/user-details'
 
 export const jsample = {
 	JsampleIcons, JsampleTheme,
 	Domain, DomainComp, Orgs, OrgsComp,
 	Roles, RolesComp, RoleDetails, RoleDetailsComp,
-	Users, UsersComp, UserDetails, UserDetailsComp
+	Users, UsersComp, UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp
 };
