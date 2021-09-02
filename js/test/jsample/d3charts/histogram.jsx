@@ -8,7 +8,8 @@ import PropTypes from 'prop-types';
 import * as d3 from 'd3';
 
 import {
-    an, AnClient, SessionClient, Protocol, L, Langstrs,
+	L, Langstrs,
+    AnClient, SessionClient, Protocol,
     AnContext, AnError, CrudComp, AnReactExt
 } from 'anclient';
 
@@ -127,9 +128,9 @@ class HistogramComp extends React.Component {
 	}
 
 	initHist( data, bands ) {
-		let margin = {top: 10, right: 30, bottom: 30, left: 40},
-			width = 460 - margin.left - margin.right,
-			height = 400 - margin.top - margin.bottom;
+		let margin = Object.assign({top: 10, right: 30, bottom: 30, left: 40}, this.props.margin);
+		let width = this.props.size.width - margin.left - margin.right;
+		let height = this.props.size.height - margin.top - margin.bottom;
 
 		let x = d3
 			.scaleLinear()
@@ -146,47 +147,65 @@ class HistogramComp extends React.Component {
 
 		y.domain([0, d3.max(bins, function(d) { return d.length; })]);
 
-		let svg = d3
-			.select('#node')
+
+		let svg = d3.select('#node')
 			.append("svg")
 			  .attr("width", width + margin.left + margin.right)
 			  .attr("height", height + margin.top + margin.bottom)
 			.append("g")
-			  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+			  .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
 		this.state.d3 = node;
 
 		svg.append('g')
 			  .attr("transform", `translate(0, ${height})`)
-			.call(d3.axisBottom(x));
+			.call(d3.axisBottom(x))
+			.append("text")
+				.attr("fill", "black") //set the fill here
+				.attr("font-size", "1.4em")
+				.attr("transform",`rotate(90) translate(-${height/2}, 40)`)
+                .text(L('Persons'));
 
 		svg.append("g")
 			.transition()
 			.duration(1000)
 			.call(d3.axisLeft(y));
 
-		let u = svg.selectAll("rect")
-			.data(bins)
+		svg.append("text")
+			  .attr("font-size", "0.8em")
+			  .attr("transform", `translate(${width/2 - 80}, ${height + 30})`)
+			  .text(L('Emotion Indicator'));
 
-		// Manage the existing bars and eventually the new ones:
-		u.enter()
-			.append("rect") // Add a new rect for each new elements
-			.merge(u) // get the already existing elements as well
-			.transition() // and apply changes to all of them
-			.duration(1000)
-			  .attr("x", 1)
-			  .attr("transform", function(d) {
-				  console.log(d);
-				  return `translate(${x(d.x0)}, ${y(d.length)})`; })
-			  .attr("width", function(d) {
-				  return x(d.x1) - x(d.x0) -1 ; })
-			  .attr("height", function(d) {
-				  return height - y(d.length); })
-			  .style("fill", "#69b3a2")
-			  .attr("onClick", (e, a, b, c) => console.log(e, a, b, c));
+		if (data && data.length > 0) {
+			let u = svg.selectAll("rect")
+				.data(bins)
 
-		u.exit()
-			.remove()
+			// Manage the existing bars and eventually the new ones:
+			u.enter()
+				.append("rect") // Add a new rect for each new elements
+				  .attr("onclick", (e, a, b, c) => console.log(e, a, b, c))
+				.merge(u) // get the already existing elements as well
+				.transition() // and apply changes to all of them
+				.duration(1000)
+				  .attr("x", 1)
+				  .attr("transform", function(d) {
+					  console.log(d);
+					  return `translate(${x(d.x0)}, ${y(d.length)})`; })
+				  .attr("width", function(d) {
+					  return x(d.x1) - x(d.x0) -1 ; })
+				  .attr("height", function(d) {
+					  return height - y(d.length); })
+				  .style("fill", "#69b3a2");
+
+			u.exit()
+				.remove()
+		}
+
+		svg.append("text")
+			  .attr("fill", "#77f7") //set the fill here
+			  .attr("font-size", "2.2em")
+			  .attr("transform", `translate(${width / 2 - 100}, 50)`)
+			  .text(L('Emotion Overview'));
 
 		this.setState( {svg} );
 	}
@@ -202,7 +221,9 @@ HistogramComp.contextType = AnContext;
 
 HistogramComp.propTypes = {
 	uri: PropTypes.string.isRequired,
-	stateHook: PropTypes.object
+	stateHook: PropTypes.object,
+	size: PropTypes.object.isRequired,
+	margin: PropTypes.object
 }
 
 const Histogram = withStyles(styles)(HistogramComp);

@@ -43,6 +43,9 @@ class DatasetCombo extends React.Component {
 		//this.state.selectedItem = this.findOption(props.options, props.val) || props.options[0];
 		this.state.initVal = props.val;
 
+		if (this.props.sk && !this.props.uri)
+			console.warn("DatasetCombo is configured as loading data with sk, but uri is undefined.")
+
 		this.onCbbRefChange = this.onCbbRefChange.bind(this);
 	}
 
@@ -50,7 +53,7 @@ class DatasetCombo extends React.Component {
 		if (!this.context || !this.context.anReact)
 			throw new Error('DatasetCombo can\'t bind controls without AnContext initialized with AnReact.');
 
-		if (this.state.sk )
+		if (this.props.sk )
 			this.context.anReact.ds2cbbOptions({
 					uri: this.props.uri,
 					sk: this.props.sk,
@@ -123,5 +126,5 @@ class DatasetCombo extends React.Component {
 DatasetCombo.contextType = AnContext;
 
 DatasetCombo.propTypes = {
-	uri: PropTypes.string.isRequired
+	uri: PropTypes.string
 };

@@ -7,14 +7,15 @@ import { Card, TextField, Typography, Grid, Button } from '@material-ui/core';
 import {
     L, Langstrs,
     AnClient, SessionClient, Protocol, UserReq,
-    AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablistLevelUp, ConfirmDialog, jsample
+    AnConst, AnContext, AnError, CrudCompW, AnReactExt,
+	AnQueryForm, AnTablistLevelUp, DatasetCombo, ConfirmDialog, jsample
 } from 'anclient';
 
 const { JsampleIcons } = jsample;
 
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
-import { QuizForm } from './quiz-form-ag';
+import { Quizsheet } from './quizsheet-ag';
+import { QuizForm } from './quiz-form';
 
 const styles = (theme) => ( {
 	root: {
@@ -32,7 +33,7 @@ class QuizzesComp extends CrudCompW {
 		quizzes: [],
 		pageInf: {page: 0, size: 25},
 		queryReq : undefined,
-		buttons: { add: true, edit: false, del: false},
+		buttons: { add: false, edit: false, del: false},
 
 		condTitl: { type: 'text', val: '', label: L('Title')},
 		condTags: { type: 'text', val: '', label: L('Tags')},
@@ -54,7 +55,6 @@ class QuizzesComp extends CrudCompW {
 
 		this.toAddB = this.toAddB.bind(this);
 		this.toAddA = this.toAddA.bind(this);
-		this.add = this.add.bind(this);
 
 		this.toEdit = this.toEdit.bind(this);
 		this.toDel = this.toDel.bind(this);
@@ -66,8 +66,6 @@ class QuizzesComp extends CrudCompW {
 		this.toSearch();
 	}
 
-	/**
-	 */
 	toSearch(e, query) {
 
 		let pageInf = this.state.pageInf;
@@ -78,7 +76,7 @@ class QuizzesComp extends CrudCompW {
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
 		this.state.selected.Ids.clear();
-		this.setState( {buttons: {add: true, edit: false, delete: false} } );
+		// this.setState( {buttons: {add: false, edit: false, delete: false} } );
 	}
 
 	refresh() {
@@ -173,19 +171,21 @@ class QuizzesComp extends CrudCompW {
 			this.context.error);
 	}
 
+	// worksheet
 	toAddB() {
-		this.add('B');
-	}
-
-	toAddA() {
-		this.add('A');
-	}
-
-	add(templ) {
 		let that = this;
-
 		this.quizForm = (
-			<QuizForm c uri={this.uri} templ={templ}
+			<Quizsheet c uri={this.uri} templ={this.state.templ}
+				quizId={undefined}
+				onCancel={ this.closeDetails }
+				onOk={ this.closeDetails } />);
+	}
+
+	// item collapse
+	toAddA() {
+		let that = this;
+		this.quizForm = (
+			<QuizForm c uri={this.uri} templ={this.state.templ}
 				quizId={undefined}
 				onCancel={ this.closeDetails }
 				onOk={ this.closeDetails } />);
@@ -197,7 +197,7 @@ class QuizzesComp extends CrudCompW {
 		if (qid.size === 0)
 			console.error("Something wrong!");
 		else {
-			this.quizForm = (<QuizForm u uri={this.uri}
+			this.quizForm = (<Quizsheet u uri={this.uri}
 				quizId={[...qid][0]}
 				onCancel={this.closeDetails}
 				onOk={ () => {
@@ -214,7 +214,7 @@ class QuizzesComp extends CrudCompW {
 	}
 
 	render () {
-		let args = {};
+		let that = this;
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		return ( <>{this.funcName}
@@ -232,22 +232,34 @@ class QuizzesComp extends CrudCompW {
 				Tip: A quiz is initialized from indicators configuraton.
 			</Typography>
 			<Grid container alignContent="flex-end" >
+
+				<DatasetCombo uri={this.uri}
+					sk='north.ind_cate'
+					label={L('Template')}
+					onSelect={ (v) => {
+						that.state.templ = v.v;
+						let buttons = that.state.buttons;
+						buttons.add = true;
+						that.setState({buttons});
+					} }
+				/>
+
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAddA}
-					startIcon={<JsampleIcons.Add />}
-				>{L('Start A Quiz')}</Button>
+					startIcon={<JsampleIcons.ItemCollapse />}
+				>{L('Start')}</Button>
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAddB}
-					startIcon={<JsampleIcons.Add />}
-				>{L('Start B Quiz')}</Button>
+					startIcon={<JsampleIcons.Worksheet />}
+				>{L('Start')}</Button>
 				<Button variant="contained" disabled={!btn.stop}
 					className={classes.button} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Edit />}
-				>{L('Edit Quiz')}</Button>
+				>{L('Edit')}</Button>
 				<Button variant="contained" disabled={!btn.del}
 					className={classes.button} onClick={this.toDel}
 					startIcon={<JsampleIcons.Delete />}
-				>{L('Delete Quiz')}</Button>
+				>{L('Delete')}</Button>
 			</Grid>
 
 			<AnTablistLevelUp
@@ -257,7 +269,6 @@ class QuizzesComp extends CrudCompW {
 					{ text: L('qid'), hide: 1,   field: "qid" },
 					{ text: L('Title'),          field: "title",     color: 'primary', className: 'bold' },
 					{ text: L('Tags'),           field: "tags",      color: 'primary' },
-					{ text: L('Subject'),        field: "subject",   color: 'primary' },
 					{ text: L('Date Created'),   field: "dcreate",   color: 'primary', formatter: d => d && d.substring(0, 10) },
 					{ text: L('Total Q'),field: "questions", color: 'primary' },
 					{ text: L('Polls'),          field: "polls",     color: 'primary' }

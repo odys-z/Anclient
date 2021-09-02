@@ -15,7 +15,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {
 	L, isEmpty, Protocol,
 	AnContext, DatasetCombo, ConfirmDialog, RecordForm,
-	jsample, Overlay, AgGridsheet, anMultiRowRenderer
+	jsample, Overlay, AnGridsheet, anMultiRowRenderer
 } from 'anclient';
 const { JsampleIcons } = jsample;
 
@@ -25,11 +25,13 @@ import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { QuizUserForm } from './quiz-users';
 
 const styles = (theme) => ({
-	quizform: {
-		backgroundColor: '#fafafaee',
+	formWrapper: {
+		// backgroundColor: '#fafafaee',
+		width: "92%",
+		margin: "auto",
 	},
 	usersButton: {
-		marginRight: 120,
+		marginRight: 80,
 	}
 });
 /**
@@ -38,7 +40,7 @@ const styles = (theme) => ({
  * For public results, go
  * https://ag-grid-react-hello-world-8lxdjj.stackblitz.io
  */
-class QuizFormComp extends React.Component {
+class QuizsheetComp extends React.Component {
 	state = {
 		creating: false, // creating a new record before saved (no id allocated)
 		quizId: undefined,
@@ -64,7 +66,7 @@ class QuizFormComp extends React.Component {
 
 		this.toSave = this.toSave.bind(this);
 		this.onCancel = this.onCancel.bind(this);
-		this.onDirty = this.onDirty.bind(this);
+		// this.onDirty = this.onDirty.bind(this);
 
 		this.toSave = this.toSave.bind(this);
 		this.toSetPollUsers = this.toSetPollUsers.bind(this);
@@ -72,6 +74,12 @@ class QuizFormComp extends React.Component {
 	}
 
 	quizHook = {};
+	setStateHooked(obj) {
+		this.quizHook.collect && this.quizHook.collect(this.state);
+		Object.assign(this.state, obj);
+		this.setState({});
+	}
+
 	columns = [
 		{ field: 'title', label: 'Title', wrapText: true,
 		  cellEditor: 'agLargeTextCellEditor',
@@ -105,7 +113,8 @@ class QuizFormComp extends React.Component {
 		},
 		{ field: 'weight', label: 'Weight', width: 90, editable: false },
 		{ field: 'expectings', label: 'Expected', width: 160 },
-		{ field: 'question', label: 'Question', wrapText: true, width: 500,
+		{ field: 'question', label: 'Question', width: 500, autoHeight: true,
+		  wrapText: true,
 		  cellEditor: 'agLargeTextCellEditor',
 		  cellEditorParams: {cols: 40, rows: 5},
 		  cellRenderer: anMultiRowRenderer },
@@ -136,8 +145,8 @@ class QuizFormComp extends React.Component {
 			dirty:   false
 		} );
 
-		if (this.props.onDirty)
-			this.props.onDirty(true);
+		// if (this.props.onDirty)
+		// 	this.props.onDirty(true);
 	}
 
 	onCancel(e) {
@@ -153,7 +162,7 @@ class QuizFormComp extends React.Component {
 				ok={L('Ok')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
-		this.setState({});
+		this.setStateHooked({});
 	}
 
 	toSetPollUsers(e) {
@@ -169,14 +178,14 @@ class QuizFormComp extends React.Component {
 				jquiz={this.jquiz}
 				onSave={ ids => {
 					that.quizUserForm = undefined;
-					that.setState({quizUsers: ids});
+					that.setStateHooked({quizUsers: ids});
 				} }
 				onClose={e => {
 					that.quizUserForm = undefined;
-					that.setState({});
+					that.setStateHooked({});
 				}}
 			/> );
-		this.setState({});
+		this.setStateHooked({});
 	}
 
 	toSave(e) {
@@ -193,7 +202,6 @@ class QuizFormComp extends React.Component {
 					if (isEmpty(quizId))
 						console.error ("Something Wrong!");
 					that.state.quiz.qid = quizId;
-					// Object.assign(this.state, state);
 					that.state.crud = Protocol.CRUD.u;
 					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
 				});
@@ -202,14 +210,9 @@ class QuizFormComp extends React.Component {
 			this.jquiz.update(this.props.uri, this.state,
 				(resp) => {
 					let {questions} = JQuiz.parseResp(resp);
-					// Object.assign(this.state, state);
 					that.alert(L("Quiz saved!\n\nQuestions number: {questions}", {questions}));
 				});
 		}
-	}
-
-	onDirty(dirty) {
-		this.setState({dirty});
 	}
 
 	render () {
@@ -230,20 +233,22 @@ class QuizFormComp extends React.Component {
 		  <Overlay open={true}
 			  	style={{
 					background: 'rgba(0, 0, 0, 0.3)',
-					alignItems: 'center',
+					alignItems: 'center', marginTop: 60,
 					justifyContent: 'center'}}>
 
-			<div className="ag-theme-alpine" style={{height: "82%", width: "92%", margin: "auto", marginTop: 100}}>
-				<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz' className={classes.quizform}
-					stateHook={this.quizHook} dense
+			<Box className={classes.formWrapper} >
+				<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
+					stateHook={this.quizHook}
 					fields={[ { field: 'qid', label: '', hide: true },
 							  { field: 'title', label: L('Title'), grid: {sm: 6, md: 3} },
 						      { field: 'tags', label: L('#Hashtag'), grid: {sm: 5, md: 3} },
 						      { field: 'quizinfo', label: L('Description'), grid: {sm: 11, md: 6} }
 						]}
-					record={{qid: this.state.quizId, ... this.state.quiz }} />
+					record={{qid: this.state.quizId, ... this.state.quiz }} dense />
+			</Box>
 
-				<AgGridsheet
+			<div className="ag-theme-alpine" style={{height: "76%", width: "92%", margin: "auto"}}>
+				<AnGridsheet
 						rows={this.state.questions}
 						columns={this.columns}
 						contextMenu={{'Format Answers': {
@@ -283,7 +288,7 @@ class QuizFormComp extends React.Component {
 		}
 	}
 }
-QuizFormComp.contextType = AnContext;
+QuizsheetComp.contextType = AnContext;
 
-const QuizForm = withStyles(styles)(QuizFormComp);
-export { QuizForm, QuizFormComp };
+const Quizsheet = withStyles(styles)(QuizsheetComp);
+export { Quizsheet, QuizsheetComp };

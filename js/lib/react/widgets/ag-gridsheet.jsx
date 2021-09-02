@@ -22,7 +22,7 @@ import { L } from '../../utils/langstr';
  *
  * Desgin Note: But is it possible handled by Semantic-DA?
  */
-export class AgGridsheet extends React.Component {
+export class AnGridsheet extends React.Component {
 	state = {
 		dirty: false,
 
@@ -163,7 +163,7 @@ export class AgGridsheet extends React.Component {
 	}
 }
 
-AgGridsheet.propTypes = {
+AnGridsheet.propTypes = {
 	columns: PropTypes.array.isRequired,
 	rows: PropTypes.array.isRequired,
 	// stateHook: PropTypes.object.isRequired,

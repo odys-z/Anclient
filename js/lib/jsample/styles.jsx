@@ -22,6 +22,9 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 
+import FormatLineSpacingIcon from '@material-ui/icons/FormatLineSpacing';
+import GridOnIcon from '@material-ui/icons/GridOn';
+
 export const JsampleIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -39,6 +42,9 @@ export const JsampleIcons = {
     Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
     SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+
+    ItemCollapse: forwardRef((props, ref) => <FormatLineSpacingIcon {...props} ref={ref} />),
+    Worksheet: forwardRef((props, ref) => <GridOnIcon {...props} ref={ref} />),
 
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 	ListAdd: forwardRef((props, ref) => <PlaylistAddIcon {...props} ref={ref} />),
@@ -79,10 +85,4 @@ export const JsampleTheme = responsiveFontSizes(createTheme({
 
 JsampleTheme.typography.body2 = {
   fontSize: 16,
-  // '@media (min-width:600px)': {
-  //   fontSize: 18,
-  // },
-  // [JsampleTheme.breakpoints.up('lg')]: {
-  //   fontSize: 24,
-  // },
 };
