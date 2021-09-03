@@ -75,8 +75,7 @@ class HistogramComp extends React.Component {
 		let histogram = d3
 			.histogram()
 			// .value(function(d) { return +d.price; })
-			// .value(function(d) { return d })   // I need to give the vector of value
-			.domain(x.domain())  // then the domain of the graphic
+			.domain(x.domain())
 			.thresholds(x.ticks(8)); // then the numbers of bins
 		let bins = histogram(data);
 
