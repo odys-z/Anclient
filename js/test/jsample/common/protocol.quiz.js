@@ -1,8 +1,8 @@
 // NOTE for unit test, use this:
-// import { Protocol, AnsonResp, AnsonBody } from '../../../lib/protocol.js';
-// import { L } from '../../../lib/utils/langstr.js';
+import { Protocol, AnsonResp, AnsonBody } from '../../../lib/protocol.js';
+import { L } from '../../../lib/utils/langstr.js';
 // for jsample, use
-import { L, Protocol, AnsonResp, AnsonBody } from 'anclient';
+// import { L, Protocol, AnsonResp, AnsonBody } from 'anclient';
 
 export class QuizReq {
 	constructor () { }
