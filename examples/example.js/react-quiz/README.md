@@ -1,3 +1,9 @@
+# About
+
+This example should be deprecated.
+
+But keep here for a while in case would be useful for pattern case analysising.
+
 # Acknowledgement
 
 Original source code copied from [jkanchelov / material-ui-quiz-app](https://github.com/jkanchelov/material-ui-quiz-app)
