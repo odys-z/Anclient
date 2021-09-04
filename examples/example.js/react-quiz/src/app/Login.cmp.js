@@ -10,9 +10,6 @@ import React from 'react';
 	import Box from '@material-ui/core/Box';
 
 import * as an from 'anclient'
-	// import {AnContext} from '../../../lib/an-react';
-	// import {ConfirmDialog} from '../../../lib/widgets/Messagebox'
-	// import {L, Langstrs} from '../../../lib/utils/langstr'
 
 // https://github.com/mui-org/material-ui/issues/15820
 const styles = (theme) => ({

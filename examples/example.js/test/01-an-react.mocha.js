@@ -3,7 +3,7 @@ import { expect, assert } from 'chai';
 import { AnContext } from '../lib/an-react';
 import { QuizlistComp } from '../react-quiz/src/app/Quizlist'
 import { LoginComp } from '../react-quiz/src/app/Login.cmp.js'
-import { QrSharingComp } from '../lib/widgets/Messagebox'
+import { QrSharingComp } from '../react-quiz/lib/widgets/Messagebox'
 
 describe('case: [anclient]', () => {
 	it('[jserv] jserv-id configure rules', () => {

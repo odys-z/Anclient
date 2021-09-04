@@ -25,7 +25,7 @@ import {AnsonMsg} from 'anclient';
 	import {QuizResp} from '../../../lib/protocol.quiz.js';
 	import {QuestionType, JQuiz} from '../../../lib/an-quiz';
 	import {AnContext} from '../../../lib/an-react';
-	import {ConfirmDialog} from '../../../lib/widgets/Messagebox'
+	import {ConfirmDialog} from '../../lib/widgets/Messagebox'
 
 var quid = -1;
 
