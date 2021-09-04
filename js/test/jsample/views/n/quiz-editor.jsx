@@ -108,7 +108,7 @@ class QuizEditorComp extends DetailFormW {
 
 		this.bindQuiz = this.bindQuiz.bind(this);
 
-		this.setStateWithHook = this.setStateWithHook.bind(this);
+		this.setStateHooked = this.setStateHooked.bind(this);
 	}
 
 	componentDidMount() {
@@ -168,19 +168,19 @@ class QuizEditorComp extends DetailFormW {
 	handleClickQs(e) {
 	  // use currentTarget instead of target, see https://stackoverflow.com/a/10086501/7362888
 	  let qx = e.currentTarget.getAttribute('qx');
-	  this.setStateWithHook({currentqx: parseInt(qx)});
+	  this.setStateHooked({currentqx: parseInt(qx)});
 	};
 
 	editQuestion(e) {
 		let qx = this.state.currentqx;
 
 		this.state.questions[qx].question = e.target.value;
-		this.setStateWithHook({dirty: true});
+		this.setStateHooked({dirty: true});
 		if (this.props.onDirty)
 			this.props.onDirty(true);
 	}
 
-	setStateWithHook(obj) {
+	setStateHooked(obj) {
 		this.quizHook.collect && this.quizHook.collect(this.state);
 		Object.assign(this.state, obj);
 		this.setState({});
@@ -193,7 +193,7 @@ class QuizEditorComp extends DetailFormW {
 		questions[qx].qtype = qtype;
 		questions[qx].answer = correct;
 		questions[qx].answers = e.currentTarget.value;
-		this.setStateWithHook({questions, dirty: true});
+		this.setStateHooked({questions, dirty: true});
 		if (this.props.onDirty)
 			this.props.onDirty(true);
 	}
@@ -252,7 +252,7 @@ class QuizEditorComp extends DetailFormW {
 							if ( ( v.v === QuizProtocol.Qtype.single || v.v === QuizProtocol.Qtype.multiple )
 								&& !that.state.questions[x].answers )
 								that.state.questions[x].answers = "*A. \nB. \nC. \nD.";
-							that.setStateWithHook({dirty: true});
+							that.setStateHooked({dirty: true});
 						}}
 					/>
 					</Box>
@@ -316,10 +316,11 @@ class QuizEditorComp extends DetailFormW {
 
 				{this.items(classes)}
 
+				{/*
 				<ListItem key="b" button>
 					<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
 					<ListItemText primary="New Question" onClick={this.onAdd} />
-				</ListItem>
+				</ListItem>*/}
 			</List>
 			{this.quizUserForm}
 		  </>

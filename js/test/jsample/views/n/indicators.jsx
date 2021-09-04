@@ -35,7 +35,7 @@ class IndicatorsComp extends CrudCompW {
 				{ type: 'float', field: 'weight', label: L('Default Weight'),
 				  validator: {min: 0.0}, cols: {sm: 3}  },
 				{ type: 'formatter', label: L('Question Type'), cols: {sm: 3},
-				  formatter: (rec) => { decodeQtype(rec.qtype || rec.vtype) } },
+				  formatter: (rec) => { readableQtype(rec.qtype || rec.vtype) } },
 				{ type: 'actions', label: '', cols: 3}
 			]}
 			fields={[
@@ -58,7 +58,7 @@ class IndicatorsComp extends CrudCompW {
 			detailFormTitle={L('Indicator Details')}
 		/>);
 
-		function decodeQtype(t) {
+		function readableQtype(t) {
 			if (t === undefined) return L('Free Text');
 			t = t.toLowerCase();
 			return t === 's' ? L('Single Option')

@@ -380,3 +380,83 @@ describe('case: [04 Protocol.QuizResp] quiz users', () => {
 		assert.equal(ids[1], 'georgy', "4.x - george");
 	});
 })	;
+
+/** Fix bug: indId for question got lost */
+const quizRespStartingQuestions = {
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "code": "ok", "opts": null, "port": "quiz.serv", "header": null,
+  "body": [
+    {
+      "type": "io.odysz.jquiz.QuizResp",
+      "rs": null,
+      "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+      "a": null,
+      "data": {
+        "type": "io.odysz.semantics.SemanticObject",
+        "props": {
+          "rs": [
+            { "type": "io.odysz.module.rs.AnResultset",
+              "stringFormats": null, "total": 0, "rowCnt": 0, "colCnt": 11,
+              "colnames": {
+                    "DCREATE": [ 9, "dcreate" ], "OPTIME": [ 4, "optime" ], "EXTRA": [ 11, "extra" ], "QOWNER": [ 7, "qowner" ],
+                    "SUBJECT": [ 8, "subject" ], "QUIZINFO": [ 6, "quizinfo" ], "TITLE": [ 2, "title" ], "OPER": [ 3, "oper" ],
+                    "PUBTIME": [ 10, "pubTime" ], "QID": [ 1, "qid" ], "TAGS": [ 5, "tags" ] },
+              "rowIdx": 0,
+              "results": []
+            }
+          ],
+          "total": [ 0 ],
+          "questions": {
+            "type": "io.odysz.module.rs.AnResultset",
+            "stringFormats": null, "total": 8, "rowCnt": 8, "colCnt": 9,
+            "colnames": {
+              "SHORTDESC": [ 8, "shortDesc" ], "INDID": [ 5, "indId" ], "EXTRA": [ 9, "extra" ], "QORDER": [ 7, "qorder" ],
+              "QTYPE": [ 6, "qtype" ], "QUIZID": [ 2, "quizId" ], "ANSWERS": [ 4, "answers" ], "QID": [ 1, "qid" ], "QUESTION": [ 3, "question" ]
+            },
+            "rowIdx": 0,
+            "results": [
+              [ 0, 0, "学习压力", "", "B01", "mr10", "1", "学习压力", null ],
+              [ 0, 0, "父母/家庭关系", "A. I am pretty sure\nB. Not sure\nC. Nop, I'm the priorety", "B02", "s", "1", "父母/家庭关系", null ],
+              [ 0, 0, "朋友/人际关系", "", "B03", "r5", "2", "朋友/人际关系", null ],
+              [ 0, 0, "考试测试", "", "B04", "r5", "3", "考试测试", null ],
+              [ 0, 0, "恋爱/异性", "", "B05", "r5", "4", "恋爱/异性", null ],
+              [ 0, 0, "追星/偶像", "A.Taliban\nB.ISIS\nYou name it", "B06", "mr5", "5", "追星/偶像", null ],
+              [ 0, 0, "学业", "", "B07", "n", "6", "学业", null ],
+              [ 0, 0, "天气", "", "B08", "r5", "7", "天气", null ]
+            ]
+          }
+        }
+      },
+      "quizUsers": null, "m": "quiz loaded", "map": null, "uri": null
+    }
+  ],
+  "version": "1.0",
+  "seq": 0
+}
+
+describe('case: [04 Protocol.QuizResp] indId can not be null', () => {
+	it('4.Y [Quiz] start with question indId', () => {
+		Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
+			return new QuizResp(jsonBd);
+		});
+
+		let quizResp = new AnsonMsg(quizRespStartingQuestions);
+		let u = quizResp.Body();
+
+		assert.equal(u.type, "io.odysz.jquiz.QuizResp", "4.Y - type");
+
+		let {quizId, quiz, questions} = u.quiz_questions();
+		assert.equal(quizId, undefined, "4.y - quizId");
+		assert.equal(quiz.title, 'New Quiz', "4.y - title");
+		assert.equal(questions.length, 8, "4.y - q len");
+		assert.equal(questions[0].qtype, "mr10", "4.y - qtype");
+		assert.equal(questions[0].indId, "B01", "4.y - indId");
+		assert.equal(questions[1].indId, "B02", "4.y - B2");
+		assert.equal(questions[2].indId, "B03", "4.y - B3");
+		assert.equal(questions[3].indId, "B04", "4.y - B4");
+		assert.equal(questions[4].indId, "B05", "4.y - B5");
+		assert.equal(questions[5].indId, "B06", "4.y - B6");
+		assert.equal(questions[6].indId, "B07", "4.y - B7");
+		assert.equal(questions[7].indId, "B08", "4.y - B8");
+	});
+})	;
