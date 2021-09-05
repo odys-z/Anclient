@@ -36,7 +36,7 @@ namespace io.odysz.semantic.ext
 
 		public virtual AnDatasetReq Root(string rootId)
 		{
-			this.root = rootId;
+			this.rootId = rootId;
 			return this;
 		}
 

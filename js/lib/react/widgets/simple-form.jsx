@@ -211,7 +211,7 @@ class SimpleFormComp extends DetailFormW {
 		if (parentId)
 			nvs.push({name: this.state.parent.field, value: this.state.parentId});
 
-		console.log(nvs);
+		// console.log(nvs);
 
 		// 2. request (insert / update)
 		let pk = this.state.pk;

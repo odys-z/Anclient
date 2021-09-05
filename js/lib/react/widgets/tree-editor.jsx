@@ -236,6 +236,7 @@ class AnTreeditorComp extends React.Component {
 		let {uri, sk} = this.props;
 		this.context.anReact.stree({uri, sk}, this.context.error, this);
 
+		this.addForm = undefined;
 		this.state.expandings.clear(0);
 	}
 
@@ -283,7 +284,23 @@ class AnTreeditorComp extends React.Component {
 				pkval={me} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
 				onClose={() => {that.addForm = undefined; that.setState({}) }}
-				onOk={() => {that.addForm = undefined; that.toSearch(); }}
+				onOk={() => {
+					// Reshape in case fullpath has been changed.
+					// DESIGN NOTE:
+					// Is this a good reason that widgets shouldn't connected with datat tier?
+					// Explaination:
+					// 1. A simple UI form don't understand this special post updating data process such as tree re-shaping.
+					// 2. As this tree is loaded via port "stree", why save items with general updating? Should this been wrapped together?
+					// If all widgets aren't good at handle data tier, will it be resonable has an independant module for this?
+
+					// close as data saved, search later in case re-shape failed. (shouldn't be a transaction?)
+
+					// that.addForm = undefined;
+					let {uri, sk} = this.props;
+					this.context.anReact.rebuildTree({uri, sk, rootId: me}, () => {
+						that.toSearch();
+					});
+				}}
 			/> );
 		this.setState({});
 	}

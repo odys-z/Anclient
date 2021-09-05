@@ -199,13 +199,14 @@ export class AnReactExt extends AnReact {
 	 */
 	dataset(ds, onLoad, errCtx) {
 		let ssInf = this.client.ssInf;
-		let {port, uri, sk, sqlArgs, t} = ds;
+		let {port, uri, sk, sqlArgs, t, rootId} = ds;
 		sqlArgs = sqlArgs || [];
 		port = port || 'dataset';
 
 		let reqbody = new DatasetReq({
 				sk,
-				sqlArgs
+				sqlArgs,
+				rootId
 			})
 			.A(t || stree_t.query);
 		let jreq = this.client.userReq(uri, port, reqbody);
@@ -254,6 +255,26 @@ export class AnReactExt extends AnReact {
 		}
 
 		this.dataset(opts, onload, errCtx);
+	}
+
+	rebuildTree(opts, onOk) {
+		let {uri, rootId, sk} = opts;
+		if (!uri)
+			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
+
+		if (!rootId)
+			console.log('Rebuild tree without rootId ?');
+
+		opts.port = 'stree';
+
+		if (opts.sk && !opts.t)
+			opts.t = stree_t.retree;
+
+		let onload = onOk || function (resp) {
+			console.log("Rebuilt successfully: ", resp);
+		}
+
+		this.dataset(opts, onload, super.err);
 	}
 
 	/**Bind dataset to combobox options (comp.state.condCbb).
