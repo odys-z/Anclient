@@ -162,9 +162,12 @@ class TreeCardComp extends React.Component {
 				</Grid> );
 			  else return (
 				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.treeItem}>
-					<Typography noWrap variant='body2' align={align(n.css[col.field])}>
-						{n.text}
-					</Typography>
+					{ typeof col.formatter === 'function'
+					  ? col.formatter(tnode, col)
+					  : <Typography noWrap variant='body2' align={align(n.css[col.field])}>
+							{n.text}
+						</Typography>
+					}
 				</Grid> );
 			  } )
 			}
@@ -233,6 +236,7 @@ class AnTreeditorComp extends React.Component {
 		let {uri, sk} = this.props;
 		this.context.anReact.stree({uri, sk}, this.context.error, this);
 
+		this.addForm = undefined;
 		this.state.expandings.clear(0);
 	}
 
@@ -280,7 +284,23 @@ class AnTreeditorComp extends React.Component {
 				pkval={me} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
 				onClose={() => {that.addForm = undefined; that.setState({}) }}
-				onOk={() => {that.addForm = undefined; that.toSearch(); }}
+				onOk={() => {
+					// Reshape in case fullpath has been changed.
+					// DESIGN NOTE:
+					// Is this a good reason that widgets shouldn't connected with datat tier?
+					// Explaination:
+					// 1. A simple UI form don't understand this special post updating data process such as tree re-shaping.
+					// 2. As this tree is loaded via port "stree", why save items with general updating? Should this been wrapped together?
+					// If all widgets aren't good at handle data tier, will it be resonable has an independant module for this?
+
+					// close as data saved, search later in case re-shape failed. (shouldn't be a transaction?)
+
+					// that.addForm = undefined;
+					let {uri, sk} = this.props;
+					this.context.anReact.rebuildTree({uri, sk, rootId: me}, () => {
+						that.toSearch();
+					});
+				}}
 			/> );
 		this.setState({});
 	}
@@ -303,10 +323,10 @@ class AnTreeditorComp extends React.Component {
 
 	/**
 	 * @param {object} classes
+	 * @param {media} media
 	 */
 	treeNodes(classes, media) {
 		let that = this;
-		// let isMd = media.isMd;
 
 		let m = this.state.forest;
 		let expandItem = this.toExpandItem;
@@ -323,7 +343,7 @@ class AnTreeditorComp extends React.Component {
 			let open = that.state.expandings.has(tnode.id)
 					&& tnode.node.children && tnode.node.children.length > 0;
 			tnode.node.css = tnode.node.css || {};
-			// if (tnode.node.children && tnode.node.children.length > 0) {
+
 			if (that.props.isMidNode(tnode.node)) {
 			  return (
 				<div key={tnode.id} className={classes.folder}>
@@ -339,7 +359,7 @@ class AnTreeditorComp extends React.Component {
 			else
 			  return (
 				<TreeCard key={tnode.id} tnode={tnode} media={media}
-					{...that.props}
+					{...that.props} parent={parent}
 					toEdit={that.toEdit}
 					leadingIcons={that.leadingIcons}
 					delete={that.toDelCard}
@@ -396,7 +416,7 @@ class AnTreeditorComp extends React.Component {
 					return (
 					  <Grid item key={`${tnode.id}.${ix}`} className={classes.actions}>
 						<Typography noWrap variant='body2' >
-							<Button onClick={this.props.toEdit}
+							<Button onClick={this.toEdit}
 								me={tnode.id}
 								startIcon={<JsampleIcons.Edit />} color="primary" >
 								{media.isMd && L('Edit')}
