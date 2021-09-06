@@ -6,7 +6,7 @@ COPY dist/ /usr/share/nginx/html/
 # (docker volume create)
 # docker build -t emr-web .
 #
-# check the private.json haven't been included in /usr/share/nginx/html/emr/
+# check the private.json didn't been included in /usr/share/nginx/html/emr/
 # docker run -p 8889:80 --name emr --rm -it 5ef /bin/sh
 # URL: http://192.168.0.201:8889
 #

@@ -50,7 +50,6 @@ class IndicatorsComp extends CrudCompW {
 				  validator: {min: 0.0} },
 				{ type: 'enum', field: 'qtype', label: L('Question Type'),
 				  // If a node is the type of the first option, it means that node is middle (internal) node.
-				  // options: [{n: L('[ Category ]'), v: 'cate'}, {n: L('Single Option'), v: 's'}, {n: L('Multiple Option'), v: 'm'}, {n: L('Text'), v: 't'}, {n: L('5 Stars'), v: 'r5'}, {n: L('10 Stars'), v: 'r10'}],
 				  options: [{n: L('[ Category ]'), v: 'cate'}, ...QuizProtocol.Qtype.options()],
 				  validator: {notNull: true} },
 				{ type: 'int',field: 'sort', label: L('UI Sort'),
