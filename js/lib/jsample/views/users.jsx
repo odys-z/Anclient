@@ -9,7 +9,7 @@ import { L } from '../../../lib/utils/langstr';
 	import { CrudCompW } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-	import { AnTablist } from '../../../lib/react/widgets/table-list';
+	import { AnTablistLevelUp } from '../../../lib/react/widgets/table-list-lu';
 	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
 	import { AnsonResp } from '../../../lib/protocol';
 
@@ -133,7 +133,7 @@ class UsersComp extends CrudCompW {
 				>{L('Edit')}</Button>
 			</Grid>
 
-			<AnTablist className={classes.root}
+			<AnTablistLevelUp className={classes.root}
 				pk='a_users'
 				columns={ this.state.th }
 				rows={ this.state.rows }
