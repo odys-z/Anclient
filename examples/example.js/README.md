@@ -7,6 +7,15 @@ templates for quick start.
 
 A sample project using jserv-quiz showing CRUD pages.
 
+This example has it's own web & server's docker images:
+
+~~~
+    odysz/emr-web
+	odysz/connect-polestar
+~~~
+
+The sqlite db file and bash scripts can be downloaded at the release section.
+
 - react-quiz
 
 Project showing a simple project can compose quizzes.

@@ -1,4 +1,5 @@
 dist/private.json
+dist/private
 
 # check the file dosn't exits:
 # start Alpine with -it
