@@ -219,6 +219,7 @@ class QuizzesComp extends CrudCompW {
 		let btn = this.state.buttons;
 		return ( <>{this.funcName}
 			<AnQueryForm uri={this.uri}
+				options={AnConst.cbbAllItem} style={{width: 320}}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
 				query={ (q) => { return {
