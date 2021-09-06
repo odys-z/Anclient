@@ -1,0 +1,17 @@
+{
+  "name": "anclient test app.js",
+  "version": "1.0.0",
+  "description": "This file is only used for install npm scripts.",
+  "main": "",
+  "scripts": {
+    "build": "cd ../.. && webpack-cli && cd test/jsample && webpack-cli",
+    "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
+    "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
+  },
+  "author": "Odys Zhou",
+  "license": "MIT",
+  "devDependencies": {
+  },
+  "dependencies": {
+  }
+}

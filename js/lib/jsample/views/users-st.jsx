@@ -70,6 +70,7 @@ class UsersComp extends CrudCompW {
 	onTableSelect(rowIds) {
 		this.setState( {
 			buttons: {
+				// is this als CRUD semantics?
 				add: this.state.buttons.add,
 				edit: rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,
@@ -133,13 +134,14 @@ class UsersComp extends CrudCompW {
 				>{L('Edit')}</Button>
 			</Grid>
 
-			<AnTablistLevelUp className={classes.root}
+			{/* <AnTablistLevelUp className={classes.root}
 				pk='a_users'
 				columns={ this.state.th }
 				rows={ this.state.rows }
 				pageInf={ this.state.pageInf }
 				onSelectChange={this.onTableSelect}
-			/>
+			/> */}
+			{userTier.list({className: classes.root, onSelectChange: this.onTableSelect})}
 			{this.roleForm}
 		</div>);
 	}
@@ -148,3 +150,27 @@ UsersComp.contextType = AnContext;
 
 const Users = withWidth()(withStyles(styles)(UsersComp));
 export { Users, UsersComp }
+
+class UsersSt {
+	const colums = [
+		{ text: L('User Name'), field: 'userName', checked: true  },
+		{ text: L('uid'), field: 'userId', hide: true },
+		{ text: L('Role'), field: 'roleName' } ];
+	const pageInf = {page: 0, size: 10};
+
+	/**Get the renderable component, the main list specified with semantics.
+	 * @param {object} props
+	 * @param {function} props.onSelectChange or handled by semantic tier?
+	 * @param {object} className
+	 */
+	list(rows, props) {
+		return (
+			<AnTablistLevelUp {...props}
+				pk='a_users'
+				columns={ this.columns }
+				rows={ rows }
+				pageInf={ this.pageInf }
+			/>
+		);
+	}
+}

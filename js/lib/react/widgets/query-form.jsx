@@ -183,7 +183,7 @@ class AnQueryFormComp extends CrudComp {
 
 	toSearch( e ) {
 		/// conds.clean & cond.loading are used for guarding re-entry the query, e.g. when error occured
-		this.state.conds.forEach(
+		this.state.conds.filter( (c) => !!c ).forEach(
 			(c, x) => {
 				c.clean = false;
 				c.loading = false;
