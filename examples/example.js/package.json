@@ -13,9 +13,9 @@
   "author": "Odys Zhou",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "^7.14.8",
-    "@babel/core": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
+    "@babel/cli": "^7.15.4",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.4",
     "@babel/preset-react": "^7.14.5",
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
@@ -26,23 +26,23 @@
     "exports-loader": "^3.0.0",
     "jquery": "^3.6.0",
     "jsdom": "^16.7.0",
-    "mocha": "^9.0.1",
+    "mocha": "^9.1.1",
     "postcss": "^8.3.6",
     "qrcode": "^1.4.4",
     "react-svg-loader": "^3.0.3",
     "style-loader": "^2.0.0",
-    "webpack": "^5.48.0",
-    "webpack-cli": "^4.7.2"
+    "webpack": "^5.52.0",
+    "webpack-cli": "^4.8.0"
   },
   "dependencies": {
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/styles": "^4.11.4",
     "anclient": "^0.9.69",
-    "core-js": "^3.16.0",
-    "d3": "^7.0.0",
+    "core-js": "^3.17.2",
+    "d3": "^7.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^5.3.0",
     "react-transition-group": "^4.4.2",
     "regenerator-runtime": "^0.13.9"
   }
