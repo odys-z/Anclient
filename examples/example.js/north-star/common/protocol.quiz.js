@@ -1,23 +1,20 @@
-// NOTE for unit test, user this:
-import { Protocol, AnsonResp } from '../../../lib/protocol.js';
-import { L } from '../../../lib/utils/langstr.js';
+// NOTE for unit test, use this:
+// import { Protocol, AnsonResp, AnsonBody } from '../../node_modules/anclient/lib/protocol.js';
+// import { L } from '../../node_modules/anclient/lib/utils/langstr.js';
 // for jsample, use
-// import { Protocol, AnsonResp } from 'anclient';
-// import { L } from 'anclient';
-
-/** North protocol is absencing coz "/n" module uses another way - deprecated
-const NorthProtocol {}
-*/
+import { L, Protocol, AnsonResp, AnsonBody } from 'anclient';
 
 export class QuizReq {
 	constructor () { }
 
 	/** {@link Quiz} use a simple array for question array. This is error prone
 	 * to implement protocol. This method helps convert it to array of n-v pairs.
+	 * DESIGN NOTE:
+	 * This check shouldn't happen if the pattern is optimized.
 	 */
 	static questionToNvs (quests, cols =
 		// ["qid", "question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
-		["question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
+		["question", "answers", "indId", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra"]) {
 
 		/*
 		* NOTE 19 Aug 2021: If put return array of this fucntion into
@@ -38,8 +35,7 @@ export class QuizReq {
 		return qs;
 	}
 
-	static questionCols = ["question", "answers", "qtype", "answer", "quizId", "qorder", "shortDesc", "extra"];
-
+	static questionCols = ["question", "answers", "indId", "qtype", "answer", "quizId", "qorder", "shortDesc", "hints", "extra", "title"];
 	static checkQuestions(arr) {
 		let qs = [];
 		if (arr)
@@ -209,6 +205,7 @@ export const QuizProtocol = {
 		multiR5: 'mr5',
 		multiR10: 'mr10',
 
+		/** for DatasetCombo */
 		options: () => {
 			return [
 				{n: L('Single Option'),  v: 's'},
@@ -220,7 +217,70 @@ export const QuizProtocol = {
 				{n: L('Multi-5 Stars'),  v: 'mr5'},
 				{n: L('Multi-10 Stars'), v: 'mr10'}
 			]
-		}
+		},
+
+		encode: (n) => {
+			let opts = QuizProtocol.Qtype.options();
+			for (let i = 0; i < opts.length; i++)
+				if (opts[i].n === n)
+					return opts[i].v;
+		},
+
+		agridContextMenu: () => {
+			return [
+				{ name: L('Single Option'),
+				  action: p => {
+					  p.node['qtype'] = 's';
+					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
+				} },
+				{ name: L('Multiple Check'),
+				  action: p => {
+					  p.node['qtype'] = 'm';
+					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
+				} },
+				{n: L('Free Text'),
+				  action: p => {
+					  p.node['qtype'] = 't';
+				} },
+				{n: L('Number Only'),
+				  action: p => {
+					  p.node['qtype'] = 'n';
+					  p.node['expectings'] = p.node['expectings'] || '0';
+				} },
+				{n: L('5 Stars'),
+				  action: p => {
+					  p.node['qtype'] = 'r5';
+				} },
+				{n: L('10 Stars'),
+				  action: p => {
+					  p.node['qtype'] = 'r10';
+				} },
+				{n: L('Multi-5 Stars'),
+				  action: p => {
+					  p.node['qtype'] = 'mr5';
+					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
+				} },
+				{n: L('Multi-10 Stars'),
+				  action: p => {
+					  p.node['qtype'] = 'mr10';
+					  p.node['expectings'] = p.node['expectings'] || 'A. \nB. \nC. \nD. ';
+				} },
+			]
+		},
+
+		decode: (v) => {
+			let opts = QuizProtocol.Qtype.options();
+			for (let i = 0; i < opts.length; i++)
+				if (opts[i].v === v)
+					return opts[i].n
+			return v;
+		},
+
+		agRenderer: (p) => {
+			// return '**' + p.value + '**';
+			return QuizProtocol.Qtype.decode(p.value);
+		},
+
 	},
 
 	PollDetailType: 'io.odysz.jquiz.PollDetail',
@@ -271,24 +331,11 @@ export class CenterResp extends AnsonResp {
 		this.map = respObj.map;
   		this.port = respObj.serv;
 		this.seq = respObj.seq;
-
-		// this.data = respObj.data;
-		// let polls = respObj.data && respObj.data.props && respObj.data.props.polls;
-		// if (polls) {
-		// 	this.cols = rs.length ? [] : rs.colnames;
-		// 	this.rows = rs.length ? [] : rs.results;
-		// }
-
-		// this.qs = respObj.data && respObj.data.props && respObj.data.props.questions || {};
 	}
 
 	polls () {
 		let polls = this.data && this.data.props && this.data.props.polls;
 		let {cols, rows} = AnsonResp.rs2arr(polls);
-		// if (polls) {
-		// 	cols = polls.length ? [] : polls.colnames;
-		// 	rows = polls.length ? [] : polls.results;
-		// }
 		return {cols, rows};
 	}
 
@@ -332,6 +379,33 @@ export class CenterResp extends AnsonResp {
 	}
 }
 
+export const NChartProtocol = {
+	A: {
+		happyHist: "happy-hist",
+	}
+}
+
+export class NChartReq extends AnsonBody {
+	constructor (uri) {
+		super();
+		this.type = "io.oz.ever.conn.n.NChartReq";
+		this.uri = uri;
+	}
+}
+
+export class NChartResp extends AnsonResp {
+	constructor (jsonBody) {
+		super(jsonBody);
+		this.type = "io.oz.ever.conn.n.NChartResp";
+		this.happy = jsonBody.happyhist[0];
+	}
+
+	happyHist() {
+		return AnsonResp.rs2arr(this.happy);
+	}
+
+}
+
 Protocol.registerBody('io.oz.ever.conn.n.NorthResp', (jsonBd) => {
 	return new NorthResp(jsonBd);
 });
@@ -342,4 +416,8 @@ Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
 
 Protocol.registerBody('io.oz.ever.conn.c.CenterResp', (jsonBd) => {
 	return new CenterResp(jsonBd);
+});
+
+Protocol.registerBody('io.oz.ever.conn.n.NChartResp', (jsonBd) => {
+	return new NChartResp(jsonBd);
 });

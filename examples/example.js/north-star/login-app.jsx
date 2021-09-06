@@ -70,7 +70,7 @@ class LoginApp extends React.Component {
 	}
 
 	/**Try figure out serv root, then bind to html tag.
-	 * First try ./private.json/<serv-id>,
+	 * First try ./private/host.json/<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
 	 *

@@ -1,7 +1,6 @@
 import { expect, assert } from 'chai'
-import { Protocol, AnsonMsg, AnsonResp } from '../../lib/protocol.js'
-// import { QuizResp, QuizReq } from '../../../examples/example.js/lib/protocol.quiz.js'
-import { QuizResp, QuizReq } from '../jsample/common/protocol.quiz.js'
+import { Protocol, AnsonMsg, AnsonResp } from '../node_modules/anclient/lib/protocol.js'
+import { QuizResp, QuizReq } from '../north-star/common/protocol.quiz.js'
 
 var __TESTING__ = true;
 

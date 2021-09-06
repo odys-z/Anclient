@@ -130,7 +130,7 @@ export class AnReact {
 	}
 
 	/**Try figure out serv root, then bind to html tag.
-	 * First try ./private.json/<serv-id>,
+	 * First try ./private/host.json<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
 	 *
@@ -151,7 +151,7 @@ export class AnReact {
 		if (typeof elem === 'string') {
 			$.ajax({
 				dataType: "json",
-				url: 'private.json',
+				url: 'private/host.json',
 			})
 			.done( (json) => onJsonServ(elem, json) )
 			.fail( (e) => {

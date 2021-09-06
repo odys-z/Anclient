@@ -2,7 +2,7 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Card, TextField, Typography } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
 
 import {
     an, AnClient, SessionClient, Protocol, L, Langstrs,
@@ -10,6 +10,7 @@ import {
 } from 'anclient';
 
 import { Histogram } from '../../d3charts/histogram'
+import { Heatgrid } from '../../d3charts/heat-grid'
 
 const styles = (theme) => ( {
 	root: {
@@ -21,14 +22,6 @@ const styles = (theme) => ( {
 
 class DashboardComp extends CrudCompW {
 	state = {
-		charts: [
-			{ id: '01', node: {text: 'AA'}, level: 0, sort: 0,
-			  children: [
-				{ id: '01.1', node: {text: 'AA.001', value: '1.1 B'}, level: 1, sort: 1},
-			  ]
-			},
-			{ id: '02', node: {text: 'CC', value: 'C'}, level: 0, sort: 1},
-		]
 	};
 
 	constructor(props) {
@@ -36,6 +29,8 @@ class DashboardComp extends CrudCompW {
 
 		this.toSearch = this.toSearch.bind(this);
 	}
+
+	histogramHook = {};
 
 	componentDidMount() {
 		let that = this;
@@ -47,10 +42,21 @@ class DashboardComp extends CrudCompW {
 	render() {
 		let args = {};
 		const { classes } = this.props;
-		return ( <>
-			<Histogram vectors = {this.state.charts[0]}
+		return (
+		  <Grid container>
+			<Grid item md={6} >
+			<Histogram uri={this.uri}
+				size={{width: 460, height: 400}}
+				stateHook={this.histogramHook}
 			/>
-		</>);
+			</Grid>
+			<Grid item md={6} >
+			<Heatgrid uri={this.uri}
+				size={{width: 460, height: 400}}
+				stateHook={this.histogramHook}
+			/>
+			</Grid>
+		</Grid>);
 	}
 }
 DashboardComp.contextType = AnContext;

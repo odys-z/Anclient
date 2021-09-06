@@ -75,6 +75,7 @@ class QuizFormComp extends DetailFormW {
 		this.editorHook.collect && this.editorHook.collect(state);
 		let that = this;
 
+		// this must be a bug - deprecated
 		this.setState.quiz = state.quiz;
 		this.setState.questions = state.questions;
 

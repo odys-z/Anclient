@@ -20,7 +20,7 @@ module.exports = {
 	plugins: [ ],
 
 	resolve: {
-		extensions: ['*', '.js', '.jsx']
+		extensions: ['*', '.js', '.jsx', '.tsx']
 	},
 
 	module: {
@@ -30,11 +30,19 @@ module.exports = {
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
+		{ test: /\.tsx$/,
+		  loader : 'babel-loader',
+		  options: { presets: [
+				'@babel/preset-react',
+				'@babel/preset-typescript',
+				'@emotion/babel-preset-css-prop',
+				'@babel/preset-env' ] }
+		},
 		{   test: /\.css$/,
-			use: ["style-loader", "css-loader"]
+			use : ["style-loader", "css-loader"]
 		},
 		{   test: /\.svg$/,
-			use: [  { loader: "babel-loader" },
+			use : [ { loader: "babel-loader" },
 					{ loader: "react-svg-loader" } ]
 		} ]
 	}
