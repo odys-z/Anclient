@@ -1,0 +1,6 @@
+# docker pull odysz/emr-web
+docker volume rm private.host
+docker volume create private.host
+sudo cp dist/private/host.json /var/lib/docker/volumes/private.host/_data
+
+docker run --mount source=private.host,target=/usr/share/nginx/html/private -p 8888:80 --name emr --rm -d odysz/emr-web

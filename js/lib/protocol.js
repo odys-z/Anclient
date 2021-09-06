@@ -937,7 +937,7 @@ class DatasetReq extends QueryReq {
 	 * @param {{n, v}} ...opts more arguments for sql args.
 	 */
 	constructor (opts = {}) {
-		let {uri, sk, t, a, mtabl, mAlias, pageInf, sqlArgs, ...args} = opts;
+		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
 
 		super(uri, Jregex.isblank(t) ? mtabl : sk, mAlias);
 		this.type = "io.odysz.semantic.ext.AnDatasetReq";
@@ -945,6 +945,7 @@ class DatasetReq extends QueryReq {
 		this.uri = uri;
 		this.sk = sk;
 		this.sqlArgs = sqlArgs;
+		this.rootId = rootId;
 
 		t = t || a;
 		this.T(t);

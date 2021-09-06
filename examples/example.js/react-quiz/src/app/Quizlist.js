@@ -27,7 +27,7 @@ import {L} from '../../../lib/utils/langstr';
 	import {Jvector} from '../../../lib/jvector';
 	import {Login} from './Login.cmp.js';
 	import {QuizForm} from './Quiz.form.js';
-	import {QrSharing} from '../../../lib/widgets/Messagebox'
+	import {QrSharing} from '../../lib/widgets/Messagebox'
 
 
 const styles = theme => ({

@@ -15,15 +15,24 @@ var config = {
 
   resolve: {
     fallback: { fs: false },
-	extensions: ['*', '.js', '.jsx']
+	extensions: ['*', '.js', '.jsx', '.tsx']
   },
   module: {
 	rules: [
-	{   test: /\.js$/,
+	  { test: /\.jsx?$/,
 		loader: 'babel-loader',
-		exclude: /node_modules/,
-		options: { presets: ['@babel/preset-react', '@babel/preset-env'] }
-	}
+		options: { presets: ['@babel/preset-react', '@babel/preset-env'] } },
+	  { test: /\.tsx$/,
+		loader : 'babel-loader',
+		options: { presets: [
+			'@babel/preset-react',
+			'@babel/preset-typescript',
+			'@emotion/babel-preset-css-prop',
+			'@babel/preset-env' ] }
+	  },
+ 	  { test: /\.css$/,
+		use: [ 'style-loader',
+				'css-loader', ] }
 	]
   }
 };
