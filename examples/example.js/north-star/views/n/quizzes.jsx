@@ -21,6 +21,9 @@ const styles = (theme) => ( {
 	root: {
 		margin: theme.spacing(1),
 	},
+	tip: {
+		margin: theme.spacing(1)
+	},
 	button: {
 		height: '2.4em',
 		verticalAlign: 'middle',
@@ -76,7 +79,6 @@ class QuizzesComp extends CrudCompW {
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
 		this.state.selected.Ids.clear();
-		// this.setState( {buttons: {add: false, edit: false, delete: false} } );
 	}
 
 	refresh() {
@@ -202,7 +204,6 @@ class QuizzesComp extends CrudCompW {
 				onCancel={this.closeDetails}
 				onOk={ () => {
 					that.closeDetails();
-					that.refresh()
 				}} />);
 		}
 	}
@@ -210,7 +211,6 @@ class QuizzesComp extends CrudCompW {
 	closeDetails() {
 		this.quizForm = undefined;
 		this.refresh();
-		// this.setState({});
 	}
 
 	render () {
@@ -219,7 +219,6 @@ class QuizzesComp extends CrudCompW {
 		let btn = this.state.buttons;
 		return ( <>{this.funcName}
 			<AnQueryForm uri={this.uri}
-				options={AnConst.cbbAllItem} style={{width: 320}}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
 				query={ (q) => { return {
@@ -236,7 +235,8 @@ class QuizzesComp extends CrudCompW {
 
 				<DatasetCombo uri={this.uri}
 					sk='north.ind_cate'
-					label={L('Template')}
+					label={L('Quiz Types')}
+					options={[AnConst.cbbAllItem]} style={{width: 200}}
 					onSelect={ (v) => {
 						that.state.templ = v.v;
 						let buttons = that.state.buttons;
