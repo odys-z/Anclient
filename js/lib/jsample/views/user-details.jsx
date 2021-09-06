@@ -102,6 +102,7 @@ class UserDetailsComp extends React.Component {
 	}
 
 	componentDidMount() {
+		console.log(this.props.uri);
 		let that = this;
 		// let sk = 'trees.user_funcs';
 		// let t = stree_t.sqltree; // loading dataset reshaped to tree

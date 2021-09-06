@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.79",
+  "version": "0.9.80",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main": "./lib/an-components.js",
   "directories": {
@@ -22,11 +22,8 @@
   "dependencies": {
     "@emotion/react": "^11.4.1",
     "acorn": "^8.4.1",
-    "ag-grid-community": "^26.0.0",
-    "ag-grid-react": "^26.0.0",
     "core-js": "^3.17.1",
     "emotion": "^11.0.0",
-    "qrcode": "^1.4.4",
     "react-elastic-carousel": "^0.11.5",
     "react-portal-overlay": "^1.1.0",
     "tar": "^4.4.19"

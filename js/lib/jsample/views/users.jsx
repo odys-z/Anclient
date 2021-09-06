@@ -134,6 +134,7 @@ class UsersComp extends CrudCompW {
 			</Grid>
 
 			<AnTablist className={classes.root}
+				pk='a_users'
 				columns={ this.state.th }
 				rows={ this.state.rows }
 				pageInf={ this.state.pageInf }
