@@ -118,6 +118,10 @@ class Protocol {
 		chkCntIns: 'checkSqlCountOnInsert',
 	};
 
+	Protocol.sk = {
+		// app will extending sk here.
+	}
+
 	Protocol.valOptions = {};
 
 	/**Extend new ports

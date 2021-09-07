@@ -46,6 +46,8 @@ class AnTablistLevelUpComp extends React.Component {
 	constructor(props){
 		super(props)
 
+		if (!props.selectedIds.Ids)
+			props.selectedIds.Ids = new Set();
 		this.selected = this.props.selectedIds.Ids;
 
 		let {sizeOptions} = props;

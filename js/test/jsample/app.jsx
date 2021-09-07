@@ -10,7 +10,8 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
 	jsample
 } from 'anclient';
-const { Domain, Roles, Orgs, Users, JsampleTheme, SsInfCard } = jsample;
+
+const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, SsInfCard } = jsample;
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -39,7 +40,15 @@ class App extends React.Component {
 		this.state.error = {onError: this.onError, msg: ''};
 		this.state.anClient = new SessionClient();
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
-								.extendPorts({menu: "menu.serv"});
+								.extendPorts({
+									menu: "menu.serv",
+									userstier: "users.tier"
+								});
+
+		// loaded from dataset.xml
+		Protocol.sk.xvec = 'x.cube.vec';
+		Protocol.sk.cbbOrg = 'org.all';
+		Protocol.sk.cbbRole = 'roles';
 
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
@@ -56,6 +65,7 @@ class App extends React.Component {
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},
+			{path: '/tier/users', comp: Userst},
 		] );
 	}
 

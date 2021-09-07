@@ -36,7 +36,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class AnQueryFormComp extends CrudComp {
+class AnQueryFormComp extends React.Component {
 
 	state = {
 		checked: true,
@@ -243,19 +243,6 @@ class AnQueryFormComp extends CrudComp {
 			.filter((c, x ) => !!c)
 			.map( (cond, x) => {
 				if (cond.type === 'cbb') {
-					/* TODO FIXME let's use cbb widget, <DatasetCombo />
-					sample usage (north/common/treecards-details):
-					(<DatasetCombo options={[
-						{n: L('Single Opt'), v: 's'},
-						{n: L('Multiple'), v: 'm'},
-						{n: L('Text'), v: 't'} ]}
-						label={f.label} style={f.style}
-						onSelect={ (v) => {
-							rec[f.field] = v.v;
-							that.setState({dirty: true});
-						}}
-					/>)
-					*/
 					let refcbb = React.createRef();
 					let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
@@ -263,7 +250,7 @@ class AnQueryFormComp extends CrudComp {
 						onChange={ that.onCbbRefChange(refcbb) }
 						onInputChange={ that.onCbbRefChange(refcbb) }
 
-						options={cond.options}
+						options={cond.options || [AnConst.cbbAllItem]}
 						getOptionLabel={ (it) => it ? it.n || '' : '' }
 						getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
 						filter={Autocomplete.caseInsensitiveFilter}
