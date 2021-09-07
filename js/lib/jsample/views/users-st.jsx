@@ -36,7 +36,7 @@ class UserstComp extends CrudCompW {
 	};
 
 	tier = undefined;
-	recHook = {collect: undefined};
+	formHook = {collect: undefined};
 
 	constructor(props) {
 		super(props);
@@ -56,7 +56,9 @@ class UserstComp extends CrudCompW {
 	}
 
 	toSearch(condts) {
-		this.tier.records( condts,
+		if (condts)
+			this.condts = condts;
+		this.tier.records( this.condts,
 			(cols, rows) => {
 				this.setState(rows);
 			} );
@@ -67,8 +69,8 @@ class UserstComp extends CrudCompW {
 			buttons: {
 				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
+				edit: rowIds && rowIds.size === 1,
+				del: rowIds &&  rowIds.size >= 1,
 			},
 			selectedRecIds: rowIds
 		} );
@@ -79,22 +81,29 @@ class UserstComp extends CrudCompW {
 
 	toAdd(e, v) {
 		let that = this;
-		this.roleForm = (<UserDetailst c
+		this.recForm = (<UserDetailst c
 			uri={this.uri}
-			onOk={(r) => that.toSearch(null, this.q)}
+			tier={this.tier}
+			stateHook=formHook;
+			onOk={(r) => {
+				that.recForm = undefined;
+				that.toSearch();
+			} }
 			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
-		this.roleForm = (<UserDetailst u
+		this.recForm = (<UserDetailst u
 			uri={this.uri}
-			roleId={this.state.selectedRecIds[0]}
-			onOk={(r) => console.log(r)}
+			onOk={(r) => {
+				that.recForm = undefined;
+				that.toSearch();
+			} }
 			onClose={this.closeDetails} />);
 	}
 
 	closeDetails() {
-		this.roleForm = undefined;
+		this.recForm = undefined;
 		this.setState({});
 	}
 
@@ -125,7 +134,7 @@ class UserstComp extends CrudCompW {
 
 			<AnTablistLevelUp pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
-				stateHook={this.recHook}
+				stateHook={this.formHook}
 				selectedIds={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
@@ -176,7 +185,7 @@ class UsersQuery extends React.Component {
 	}
 }
 UsersQuery.propTypes = {
-	// seems no tier is needed?
+	// no tier is needed?
 	uri: PropTypes.string.isRequired,
 	onQuery: PropTypes.func.isRequired
 }
@@ -236,9 +245,9 @@ class UsersTier {
 			new UserstReq( uri, props ).A(UserstReq.A.record) );
 	}
 
-	saveRecord(recHook) {
+	saveRecord(formHook) {
 		let rec = {};
-		recHook.collect(rec); // rec: {pk, userName, orgId, ...}
+		formHook.collect(rec); // rec: {pk, userName, orgId, ...}
 
 		let req = this.client.userReq(uri, 'center',
 			new UserstReq( uri, props )

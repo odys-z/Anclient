@@ -20,6 +20,7 @@ import Avatar from '@material-ui/core/Avatar';
 import { L } from '../../../lib/utils/langstr';
 	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../../lib/protocol';
 	import { AnConst } from '../../../lib/utils/consts';
+	import { DetailFormW } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext'
 	import { AnsonResp } from '../../../lib/protocol';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
@@ -72,7 +73,7 @@ const styles = theme => ({
   },
 });
 
-class UserDetailsComp extends React.Component {
+class UserDetailsComp extends DetailFormW {
 	state = {
 		crud: Protocol.CRUD.r,
 		dirty: false,

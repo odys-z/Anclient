@@ -141,7 +141,6 @@ class CheapFlowComp extends CrudComp {
 }
 const CheapFlow = withStyles(styles)(CheapFlowComp);
 
-
 class DetailFormW extends React.Component {
 	state = {
 	};

@@ -11,12 +11,17 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 
-import {
-	L, toBool,
-	AnConst, CrudCompW, DatasetCombo,
-	TRecordFormComp, TRelationTreeComp,
-	JsampleIcons,
-} from 'anclient';
+import { L } from '../../../lib/utils/langstr';
+	import { Protocol, UserReq } from '../../../lib/protocol';
+	import { AnConst } from '../../../lib/utils/consts';
+	import { DetailFormW } from '../../../lib/react/crud';
+	import { AnContext, AnError } from '../../../lib/react/reactext';
+	// import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
+	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
+	import { AnsonResp } from '../../../lib/protocol';
+	import { JsampleIcons } from '../styles';
+
+	import { UserstReq } from './users-st';
 
 const styles = (theme) => ({
   root: {
@@ -56,7 +61,7 @@ const styles = (theme) => ({
  * is not planned to supprt. See performance issue: https://stackoverflow.com/a/66934465
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  */
-class UserDetailstComp extends CrudCompW {
+class UserDetailstComp extends DetailFormW {
 	state = {
 	};
 
