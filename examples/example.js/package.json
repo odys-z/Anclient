@@ -5,7 +5,7 @@
   "main": "",
   "scripts": {
     "build": "echo \"cd react-quiz, webpack\"",
-    "test": "echo \"This is not working current\" && exit 1",
+    "test": "echo \"This is not working current\" && exit 1"
   },
   "author": "Odys Zhou",
   "license": "MIT",

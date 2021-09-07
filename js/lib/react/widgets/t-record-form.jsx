@@ -51,26 +51,20 @@ const styles = (theme) => ({
 });
 
 /**
- * Record form is a component for UI record layout, not data binding.
- * Why? A tech to handle performance problem and help data auto binding.
- * See performance issue: https://stackoverflow.com/a/66934465
- * Use SimpleForm for UI dialog to auto load data.
- * example:<pre>
-  &lt;RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
-    stateHook={this.quizHook}
-    fields={[
-      { field: 'qid', label: '', hide: true },
-      { field: 'title', label: L('Title'), grid: {sm: 12, lg: 12} },
-      { field: 'subject', label: L('Subject') },
-      { field: 'tags', label: L('#Hashtag') },
-      { field: 'quizinfo', label: L('Description'), grid: {sm: 12, lg: 12} }
-    ]}
-    record={{qid: this.state.quizId, ... this.state.quiz }}
-  /&gt;</pre>
+ * Tiered record component is designed for UI record layout, automaitcally bind data,
+ * resolving FK's auto-cbb. See performance issue: https://stackoverflow.com/a/66934465
+ * In case of child relation table, this component currently is not planned to supprt.
+ * <p>Usally a CRUD process needs to update multiple tables in one transaction,
+ * so this component leveled up state for saving. Is this a co-accident with React
+ * or is required by semantics?</p>
+ * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  */
-class RecordFormComp extends DetailFormW {
+export class TRecordFormComp extends React.Component {
 	state = {
 		dirty: false,
+		pk: undefined,
+		pkval: undefined,
+		record: {},
 	};
 
 	constructor (props = {}) {
@@ -80,7 +74,7 @@ class RecordFormComp extends DetailFormW {
 			props.stateHook.collect = function (me) {
 				let that = me;
 				return function(hookObj){
-					hookObj[that.props.mtabl] = that.props.record;
+					hookObj[that.props.mtabl] = that.state.record;
 				}; }(this);
 
 		this.state.pkval = props.pkval;
@@ -210,15 +204,14 @@ class RecordFormComp extends DetailFormW {
 	}
 }
 
-RecordFormComp.propTypes = {
+TRecordFormComp.propTypes = {
 	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
-	stateHook: PropTypes.object,		// readonly is not required
+	stateHook: PropTypes.object,		// for readonly this is not required
 	dense: PropTypes.bool,
-	mtabl:  PropTypes.string.isRequired,
-	fields: PropTypes.array.isRequired,
-	record: PropTypes.object.isRequired,
 	enableValidate: PropTypes.bool,
-};
 
-const RecordForm = withWidth()(withStyles(styles)(RecordFormComp));
-export { RecordForm, RecordFormComp };
+	// mtabl:  PropTypes.string.isRequired,
+	// fields: PropTypes.array.isRequired,
+	// record: PropTypes.object.isRequired,
+	tier: PropTypes.object.isRequired,
+};

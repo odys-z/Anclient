@@ -5,9 +5,10 @@ import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
 import {
-    L, Langstrs,
-    AnClient, SessionClient, Protocol,
-    AnContext, AnError, CrudCompW, AnReactExt
+	L, toBool,
+    AnClient, SessionClient, Protocol, UserReq, AnsonResp,
+    AnContext, AnError, CrudCompW, AnTablistLevelUp,
+	JsampleIcons,
 } from 'anclient';
 
 const styles = (theme) => ( {
@@ -17,7 +18,7 @@ const styles = (theme) => ( {
 
 class MyStudentsComp extends CrudCompW {
 	state = {
-		rows: [];
+		rows: [],
 		query: undefined,
 		buttons: {add: true, edit: false, del: false}
 	};
@@ -33,11 +34,25 @@ class MyStudentsComp extends CrudCompW {
 	}
 
 	componentDidMount() {
-		this.mystudentsTier.records(
-			this.state.query,
-			(rows) => {
+		console.log(this.uri);
+	}
+
+	toSearch(e, query) {
+		this.tier.records( this.state.query,
+			(cols, rows) => {
 				this.setState(rows);
 			} );
+	}
+
+	onTableSelect(rowIds) {
+		this.setState( {
+			pkval: [...rowIds][0],
+			buttons: {
+				add: this.state.buttons.add,
+				stop: rowIds && rowIds.size === 1,
+				del: rowIds &&  rowIds.size >= 1,
+			},
+		} );
 	}
 
 	toAdd(e) { }
@@ -45,11 +60,16 @@ class MyStudentsComp extends CrudCompW {
 	toEdit(e) {
 		let that = this;
 		let tier = this.mystudentsTier;
-		this.recForm = <RecordForm
-			record={tier.record()}
-			onSave={tier.saveRecord}
-			onClose={ e => that.recForm = undefined}
-		/>
+		this.recForm =
+			// Design Note: or just have data handled by RecordForm directly?
+			// But is this a good example to solve the css separating problem of query form?
+			<RecordForm
+				tier
+				pk={tier.pk} pkval={that.state.pkval}
+				record={tier.record()}
+				onSave={tier.saveRecord}
+				onClose={ e => that.recForm = undefined}
+			/>
 	}
 
 	toDel(e) { }
@@ -62,16 +82,17 @@ class MyStudentsComp extends CrudCompW {
 		this.state.condUser.sqlArgs = [this.context.anClient.userInfo.uid];
 		return (
 		  <>
-			<AnQueryForm uri={this.uri}
+			{/* <AnQueryForm uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ tier.condText, tier.condCbb, tier.condSwitch ]}
 				query={ (q) => { return {
-					qKName: q.state.conds[0].val ? q.state.conds[0].val : undefined,
-					qClass: q.state.conds[1].val ? q.state.conds[1].val : undefined,
-					qTasks: q.state.conds[2].val ? q.state.conds[2].val : false,
+					studentName: q.state.conds[0].val ? q.state.conds[0].val : undefined,
+					classId    : q.state.conds[1].val ? q.state.conds[1].val : undefined,
+					hasTasks   : q.state.conds[2].val ? q.state.conds[2].val : false,
 				} } }
 				onDone={(query) => { this.toSearch(undefined, query); } }
-			/>
+			/> */}
+			<MyStudentsQuery uri={this.uri} onQuery={this.toSearch} />
 
 			<Grid container >
 				<Button item variant="contained" disabled={!btn.add}
@@ -88,7 +109,7 @@ class MyStudentsComp extends CrudCompW {
 				>{L('Delete')}</Button>
 			</Grid>
 
-			<AnTablist pk={tier.pk}
+			<AnTablistLevelUp pk={tier.pk}
 				className={classes.root} checkbox={true}
 				columns={tier.columns()}
 				rows={tier.rows}
@@ -106,9 +127,53 @@ MyStudentsComp.contextType = AnContext;
 const MyStudents = withWidth()(withStyles(styles)(MyStudentsComp));
 export { MyStudents, MyStudentsComp  }
 
+class MyStudentsQuery extends AnQueryForm {
+	conds = [
+		{ name: 'teacher', type: 'text', val: '', label: L('Teacher') },
+		{ name: 'classId', type: 'cbb',  val: '', label: L('Class') },
+		{ name: 'studentName', type: 'text', val: '', label: L('Student') },
+		{ name: 'hasTasks', type: 'switch',  val: false, label: L('Undone Tasks:') },
+	];
+
+	constructor(props) {
+		super(props);
+		this.collect = this.collect.bind(this);
+	}
+
+	collect() {
+		return {
+			studentname: that.conds[0].val ? that.conds[0].val : undefined,
+			classid    : that.conds[1].val ? that.conds[1].val : undefined,
+			hasTasks   : that.conds[2].val ? that.conds[2].val : false };
+	}
+
+	/** Design Note:
+	 * Problem: This way bound the query form, so no way to expose visual effects modification?
+	 */
+	render () {
+		let that = this;
+		return (
+		<AnQueryForm {...props}
+			conds={this.conds}
+			query={ (q) => that.props.onQuery(that.collect()) }
+			onDone={() => { that.props.onQuery(that.collect()); } }
+		/> );
+	}
+}
+MyStudentsQuery.propTypes = {
+	uri: PropTypes.string.isRequired,
+	onQuery: PropTypes.func.isRequired
+}
+
 class MyStudentsTier {
 	port = 'center';
 	pk = 'kid';
+	client = undefined;
+
+	constructor(comp) {
+		this.client = comp.context.anClient;
+		this.errCtx = comp.context.error;
+	}
 
 	columns() {
 		return [
@@ -120,10 +185,22 @@ class MyStudentsTier {
 	}
 
 	records(conds, onLoad) {
-		let bd = client.userReq();
+		let client = this.client;
+		let that = this;
 
-		let req = this.client.userReq(uri, 'center',
-			new MyStudentsReq( uri, props ).A(MyStudentsReq.A.records) );
+		let req = client.userReq(uri, 'center',
+					new MyStudentsReq( uri, conds )
+					.A(MyStudentsReq.A.records) );
+
+		let reqBd = req.Body();
+		this.state.req = req;
+
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				onLoad(cols, rows);
+			},
+			this.error);
 	}
 
 	record() {
@@ -143,12 +220,27 @@ class MyStudentsTier {
 	}
 }
 
-class MyStudentsReq {
+class MyStudentsReq extends UserReq {
+	static type = 'io.oz.ever.conn.n.MyStudentsReq';
+	static __init__ = function () {
+		Protocol.registerBody(MyStudentsReq.type, (jsonBd) => {
+			return new MyStudentsReq(jsonBd);
+		});
+		return undefined;
+	}();
 
-	const A = {
+	static A = {
 		records: 'kids',
 		record: 'kid-rec',
 		update: 'kid-u',
 		insert: 'kid-c',
+	}
+
+	constructor (uri, opts) {
+		this.uri = uri;
+		this.teacher = opts.teacher;
+		this.classId = opts.classId;
+		this.studentName = opts.studentName;
+		this.hasTasks = opts.hasTasks;
 	}
 }
