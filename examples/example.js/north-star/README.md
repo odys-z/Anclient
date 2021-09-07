@@ -1,3 +1,11 @@
+# About
+
+A sample app that can be used for start up new app developement.
+
+v0.1:
+
+Only quizzes sheet & quiz polling can work smoothly.
+
 # quick start
 
 To deploy this on your server, make sure the server is docker enabled. Then
