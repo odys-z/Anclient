@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Issues &amp; Handling &mdash; Anclient Anclient documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
+        <link rel="up" title="For developers" href="index.html"/>
+        <link rel="prev" title="For developers" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Anclient
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../starter/jsample.html">About JSample</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../starter/jsample.html#jsample-quick-start">JSample Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../starter/client.html">About Anclient</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../starter/client.html#js-quick-start">JS Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../starter/framework.html">Application Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/docker.html">Play with Docker</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">For developers</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Issues &amp; Handling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#react-issue-13991-invalid-hood-call">React Issue #13991 - Invalid hood call</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#about-the-error">About the error</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cause-of-error">Cause of Error</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#solution">Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Anclient</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">For developers</a> &raquo;</li>
+      
+    <li>Issues &amp; Handling</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/dev/issues.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="issues-handling">
+<h1>Issues &amp; Handling<a class="headerlink" href="#issues-handling" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="react-issue-13991-invalid-hood-call">
+<h2>React Issue #13991 - Invalid hood call<a class="headerlink" href="#react-issue-13991-invalid-hood-call" title="Permalink to this headline">¶</a></h2>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">Since new example of North is verified. This issue is closed.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To test with test/jsample, use
+[ npm link anclient ]</p>
+</div>
+<div class="section" id="about-the-error">
+<h3>About the error<a class="headerlink" href="#about-the-error" title="Permalink to this headline">¶</a></h3>
+<p>With webpack transpiled package, both via NPM and minified js, referencing component
+will reporting error.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NorthApp</span>
+  <span class="o">|-&gt;</span> <span class="n">AnCliant</span> <span class="n">package</span>
+      <span class="o">|-&gt;</span> <span class="n">SysComp</span>
+      <span class="o">|</span>   <span class="o">|-&gt;</span> <span class="n">AppBar</span> <span class="p">(</span><span class="n">Material</span> <span class="n">UI</span> <span class="n">Function</span><span class="p">)</span>
+      <span class="o">|</span>   <span class="o">|-&gt;</span> <span class="n">WithStyles</span><span class="p">()</span>  <span class="p">(</span><span class="n">of</span> <span class="n">Material</span> <span class="n">UI</span><span class="p">)</span>
+      <span class="o">|-&gt;</span> <span class="n">Sys</span> <span class="p">(</span><span class="n">withStyle</span><span class="p">(</span><span class="n">SysComp</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Error report:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>anreact-1.0.0.min.js:90874 Uncaught Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+    at resolveDispatcher (anreact-1.0.0.min.js:90874)
+    at Object.useContext (anreact-1.0.0.min.js:90882)
+    at useTheme (anreact-1.0.0.min.js:25398)
+    at useStyles (anreact-1.0.0.min.js:25048)
+    at WithStyles (anreact-1.0.0.min.js:25487)
+    at renderWithHooks (react-dom.development.js:14985)
+    at updateForwardRef (react-dom.development.js:17044)
+    at beginWork (react-dom.development.js:19098)
+    at HTMLUnknownElement.callCallback (react-dom.development.js:3945)
+    at Object.invokeGuardedCallbackDev (react-dom.development.js:3994)
+resolveDispatcher @ anreact-1.0.0.min.js:90874
+useContext @ anreact-1.0.0.min.js:90882
+useTheme @ anreact-1.0.0.min.js:25398
+useStyles @ anreact-1.0.0.min.js:25048
+WithStyles @ anreact-1.0.0.min.js:25487
+renderWithHooks @ react-dom.development.js:14985
+updateForwardRef @ react-dom.development.js:17044
+beginWork @ react-dom.development.js:19098
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+beginWork$1 @ react-dom.development.js:23964
+performUnitOfWork @ react-dom.development.js:22776
+workLoopSync @ react-dom.development.js:22707
+renderRootSync @ react-dom.development.js:22670
+performSyncWorkOnRoot @ react-dom.development.js:22293
+scheduleUpdateOnFiber @ react-dom.development.js:21881
+updateContainer @ react-dom.development.js:25482
+(anonymous) @ react-dom.development.js:26021
+unbatchedUpdates @ react-dom.development.js:22431
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+onJsonServ @ north-app.jsx:151
+(anonymous) @ anreact-1.0.0.min.js:30369
+fire @ anreact-1.0.0.min.js:40192
+fireWith @ anreact-1.0.0.min.js:40322
+done @ anreact-1.0.0.min.js:46488
+(anonymous) @ anreact-1.0.0.min.js:46749
+load (async)
+send @ anreact-1.0.0.min.js:46768
+ajax @ anreact-1.0.0.min.js:46382
+bindDom @ anreact-1.0.0.min.js:30365
+bindHtml @ north-app.jsx:147
+(anonymous) @ north.html:16
+react-dom.development.js:20085 The above error occurred in the &lt;WithStyles(ForwardRef(AppBar))&gt; component:
+
+    at WithStyles (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:12451:571)
+    at div
+    at SysComp (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:13287:160)
+    at ThemeProvider (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:5419:24)
+    at NorthApp (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:69785:5)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ react-dom.development.js:20085
+update.callback @ react-dom.development.js:20118
+callCallback @ react-dom.development.js:12318
+commitUpdateQueue @ react-dom.development.js:12339
+commitLifeCycles @ react-dom.development.js:20736
+commitLayoutEffects @ react-dom.development.js:23426
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+commitRootImpl @ react-dom.development.js:23151
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+scheduleUpdateOnFiber @ react-dom.development.js:21881
+updateContainer @ react-dom.development.js:25482
+(anonymous) @ react-dom.development.js:26021
+unbatchedUpdates @ react-dom.development.js:22431
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+onJsonServ @ north-app.jsx:151
+(anonymous) @ anreact-1.0.0.min.js:30369
+fire @ anreact-1.0.0.min.js:40192
+fireWith @ anreact-1.0.0.min.js:40322
+done @ anreact-1.0.0.min.js:46488
+(anonymous) @ anreact-1.0.0.min.js:46749
+load (async)
+send @ anreact-1.0.0.min.js:46768
+ajax @ anreact-1.0.0.min.js:46382
+bindDom @ anreact-1.0.0.min.js:30365
+bindHtml @ north-app.jsx:147
+(anonymous) @ north.html:16
+react-dom.development.js:20085 The above error occurred in the &lt;WithStyles(ForwardRef(Drawer))&gt; component:
+
+    at WithStyles (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:12451:571)
+    at Router (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:22506:342)
+    at MemoryRouter (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:22513:344)
+    at div
+    at SysComp (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:13287:160)
+    at ThemeProvider (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:5419:24)
+    at NorthApp (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:69785:5)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ react-dom.development.js:20085
+update.callback @ react-dom.development.js:20118
+callCallback @ react-dom.development.js:12318
+commitUpdateQueue @ react-dom.development.js:12339
+commitLifeCycles @ react-dom.development.js:20736
+commitLayoutEffects @ react-dom.development.js:23426
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+commitRootImpl @ react-dom.development.js:23151
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+scheduleUpdateOnFiber @ react-dom.development.js:21881
+updateContainer @ react-dom.development.js:25482
+(anonymous) @ react-dom.development.js:26021
+unbatchedUpdates @ react-dom.development.js:22431
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+onJsonServ @ north-app.jsx:151
+(anonymous) @ anreact-1.0.0.min.js:30369
+fire @ anreact-1.0.0.min.js:40192
+fireWith @ anreact-1.0.0.min.js:40322
+done @ anreact-1.0.0.min.js:46488
+(anonymous) @ anreact-1.0.0.min.js:46749
+load (async)
+send @ anreact-1.0.0.min.js:46768
+ajax @ anreact-1.0.0.min.js:46382
+bindDom @ anreact-1.0.0.min.js:30365
+bindHtml @ north-app.jsx:147
+(anonymous) @ north.html:16
+anreact-1.0.0.min.js:90874 Uncaught Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+    at resolveDispatcher (anreact-1.0.0.min.js:90874)
+    at Object.useContext (anreact-1.0.0.min.js:90882)
+    at useTheme (anreact-1.0.0.min.js:25398)
+    at useStyles (anreact-1.0.0.min.js:25048)
+    at WithStyles (anreact-1.0.0.min.js:25487)
+    at renderWithHooks (react-dom.development.js:14985)
+    at updateForwardRef (react-dom.development.js:17044)
+    at beginWork (react-dom.development.js:19098)
+    at HTMLUnknownElement.callCallback (react-dom.development.js:3945)
+    at Object.invokeGuardedCallbackDev (react-dom.development.js:3994)
+resolveDispatcher @ anreact-1.0.0.min.js:90874
+useContext @ anreact-1.0.0.min.js:90882
+useTheme @ anreact-1.0.0.min.js:25398
+useStyles @ anreact-1.0.0.min.js:25048
+WithStyles @ anreact-1.0.0.min.js:25487
+renderWithHooks @ react-dom.development.js:14985
+updateForwardRef @ react-dom.development.js:17044
+beginWork @ react-dom.development.js:19098
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+beginWork$1 @ react-dom.development.js:23964
+performUnitOfWork @ react-dom.development.js:22776
+workLoopSync @ react-dom.development.js:22707
+renderRootSync @ react-dom.development.js:22670
+performSyncWorkOnRoot @ react-dom.development.js:22293
+scheduleUpdateOnFiber @ react-dom.development.js:21881
+updateContainer @ react-dom.development.js:25482
+(anonymous) @ react-dom.development.js:26021
+unbatchedUpdates @ react-dom.development.js:22431
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+onJsonServ @ north-app.jsx:151
+(anonymous) @ anreact-1.0.0.min.js:30369
+fire @ anreact-1.0.0.min.js:40192
+fireWith @ anreact-1.0.0.min.js:40322
+done @ anreact-1.0.0.min.js:46488
+(anonymous) @ anreact-1.0.0.min.js:46749
+load (async)
+send @ anreact-1.0.0.min.js:46768
+ajax @ anreact-1.0.0.min.js:46382
+bindDom @ anreact-1.0.0.min.js:30365
+bindHtml @ north-app.jsx:147
+(anonymous) @ north.html:16
+</pre></div>
+</div>
+<p>Where AppBar is exported from Material UI, SysComp, extending React.Component,
+from Anclient.js lib.</p>
+<p>The React document didn’t solve this problem, and redirected to issue 13991.
+Webpack also have similar issue report. See</p>
+<p>[Facebook issue 13991](<a class="reference external" href="https://github.com/facebook/react/issues/13991">https://github.com/facebook/react/issues/13991</a>)</p>
+<p>[Webpack issue 13868](<a class="reference external" href="https://github.com/webpack/webpack/issues/13868">https://github.com/webpack/webpack/issues/13868</a>)</p>
+</div>
+<div class="section" id="cause-of-error">
+<h3>Cause of Error<a class="headerlink" href="#cause-of-error" title="Permalink to this headline">¶</a></h3>
+<p>This error is suppressed by resolving react of NorthApp to Anclient’s node_modules/react.</p>
+<p>In example.js/north-star/webpack.config.js:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">alias</span><span class="o">:</span> <span class="p">{</span> <span class="nx">react</span><span class="o">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s1">&#39;../../../js/node_modules/react&#39;</span><span class="p">)</span> <span class="p">}</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>This can be explained as duplicated react libs been used.</p>
+</div>
+<div class="section" id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+<p>In Anclient, react, react-dom &amp; material-ui/core are transpiled as external by webpack, see webpack.config.js.</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">externals</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s1">&#39;react&#39;</span><span class="o">:</span> <span class="s1">&#39;react&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;react-dom&#39;</span> <span class="o">:</span> <span class="s1">&#39;reactDOM&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;@material-ui/core&quot;</span><span class="o">:</span> <span class="s2">&quot;MaterialUI&quot;</span>
+    <span class="p">},</span>
+
+    <span class="p">...</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In NorthApp, react &amp; react-dom are installed locally. Then Anclient can be imported like:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+    <span class="nx">an</span><span class="p">,</span> <span class="nx">AnClient</span><span class="p">,</span> <span class="nx">SessionClient</span><span class="p">,</span> <span class="nx">Protocol</span><span class="p">,</span>
+    <span class="nx">L</span><span class="p">,</span> <span class="nx">Langstrs</span><span class="p">,</span>
+    <span class="nx">AnContext</span><span class="p">,</span> <span class="nx">AnError</span><span class="p">,</span> <span class="nx">AnReactExt</span><span class="p">,</span>
+    <span class="nx">Sys</span><span class="p">,</span> <span class="nx">SysComp</span><span class="p">,</span> <span class="nx">Domain</span><span class="p">,</span> <span class="nx">Roles</span><span class="p">,</span> <span class="nx">Orgs</span><span class="p">,</span> <span class="nx">Users</span>
+<span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;anclient&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="For developers" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Odys Zhou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'Anclient',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
