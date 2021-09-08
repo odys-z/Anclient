@@ -17,14 +17,14 @@ import Typography from '@material-ui/core/Typography';
 import SvgIcon from "@material-ui/core/SvgIcon";
 import Avatar from '@material-ui/core/Avatar';
 
-import { L } from '../../../lib/utils/langstr';
-	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../../lib/protocol';
-	import { AnConst } from '../../../lib/utils/consts';
-	import { AnContext, AnError } from '../../../lib/react/reactext'
-	import { AnsonResp } from '../../../lib/protocol';
-	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-	import { AnTree } from '../../../lib/react/widgets/tree';
-	import { RecordForm } from '../../../lib/react/widgets/record-form';
+import { L } from '../../utils/langstr';
+	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../protocol';
+	import { DetailFormW } from '../../react/crud';
+	import { AnConst } from '../../utils/consts';
+	import { AnContext, AnError } from '../../react/reactext'
+	import { AnsonResp } from '../../protocol';
+	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
+	import { RecordForm } from '../../react/widgets/record-form';
 
 import { JsampleIcons } from '../styles';
 

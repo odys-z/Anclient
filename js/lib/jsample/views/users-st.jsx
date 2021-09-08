@@ -4,18 +4,20 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { L } from '../../../lib/utils/langstr';
-	import { Protocol, UserReq } from '../../../lib/protocol';
-	import { AnConst } from '../../../lib/utils/consts';
-	import { CrudCompW } from '../../../lib/react/crud';
-	import { AnContext, AnError } from '../../../lib/react/reactext';
-	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-	import { AnTablistLevelUp } from '../../../lib/react/widgets/table-list-lu';
-	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
-	import { AnsonResp } from '../../../lib/protocol';
+import { L } from '../../utils/langstr';
+	import { Protocol, UserReq } from '../../protocol';
+	import { AnConst } from '../../utils/consts';
+	import { CrudCompW } from '../../react/crud';
+	import { AnContext, AnError } from '../../react/reactext';
+	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
+	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
+	import { AnQueryForm } from '../../react/widgets/query-form';
+	import { AnsonResp } from '../../protocol';
 	import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details-st';
+
+const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
@@ -67,8 +69,8 @@ class UserstComp extends CrudCompW {
 			buttons: {
 				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
+				edit: rowIds && rowIds.size === 1,
+				del: rowIds &&  rowIds.size >= 1,
 			},
 			selectedRecIds: rowIds
 		} );
@@ -79,22 +81,24 @@ class UserstComp extends CrudCompW {
 
 	toAdd(e, v) {
 		let that = this;
-		this.roleForm = (<UserDetailst c
+		this.recForm = (<UserDetailst crud={CRUD.c}
 			uri={this.uri}
+			tier={this.tier}
 			onOk={(r) => that.toSearch(null, this.q)}
 			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
-		this.roleForm = (<UserDetailst u
+		this.recForm = (<UserDetailst crud={CRUD.u}
 			uri={this.uri}
-			roleId={this.state.selectedRecIds[0]}
+			tier={this.tier}
+			recId={this.state.selectedRecIds[0]}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
 
 	closeDetails() {
-		this.roleForm = undefined;
+		this.recForm = undefined;
 		this.setState({});
 	}
 
@@ -145,8 +149,10 @@ export { Userst, UserstComp }
 class UsersQuery extends React.Component {
 	conds = [
 		{ name: 'userName', type: 'text', val: '', label: L('Student') },
-		{ name: 'orgId',    type: 'cbb',  val: '', label: L('Class'), sk: Protocol.sk.cbbOrg },
-		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Class'), sk: Protocol.sk.cbbRole },
+		{ name: 'orgId',    type: 'cbb',  val: '', label: L('Class'),
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
+		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Class'),
+		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
 
 	constructor(props) {
@@ -216,7 +222,7 @@ class UsersTier {
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.records) );
 
-		let reqBd = req.Body();
+		// let reqBd = req.Body();
 
 		client.commit(req,
 			(resp) => {
@@ -227,22 +233,43 @@ class UsersTier {
 			this.errCtx);
 	}
 
-	record() {
+	record(conds, onLoad) {
 		if (!this.client) return;
+		let client = this.client;
+		let that = this;
 
-		let bd = this.client.userReq();
+		let req = client.userReq(this.uri, 'userstier',
+					new UserstReq( this.uri, conds )
+					.A(UserstReq.A.rec) );
 
-		let req = this.client.userReq(uri, 'center',
-			new UserstReq( uri, props ).A(UserstReq.A.record) );
+		// let reqBd = req.Body();
+
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rows = rows;
+				onLoad(cols, rows);
+			},
+			this.errCtx);
 	}
 
-	saveRecord(recHook) {
-		let rec = {};
-		recHook.collect(rec); // rec: {pk, userName, orgId, ...}
+	saveRec(opts, onOk) {
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+		let { uri, crud, record, relations } = opts;
 
-		let req = this.client.userReq(uri, 'center',
-			new UserstReq( uri, props )
-			.A(rec[this.pk] ? UserstReq.A.update : UserstReq.A.insert) );
+		let req = this.client.userReq(uri, 'userstier',
+			new UserstReq( uri, { record, relations } )
+			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
+
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rows = rows;
+				onOk(cols, rows);
+			},
+			this.errCtx);
 	}
 }
 
@@ -264,12 +291,32 @@ class UserstReq extends UserReq {
 		insert: 'a-c',
 	}
 
-	constructor (uri, conds) {
+	constructor (uri, args) {
 		super();
 		this.type = UserstReq.type;
 		this.uri = uri;
-		this.userId = conds.userId;
-		this.userName = conds.userName;
-		this.roleId = conds.roleId;
+		this.userId = args.userId;
+		this.userName = args.userName;
+		this.roleId = args.roleId;
+
+		this.record = args.record;
+		this.relations = args.relations;
+	}
+}
+
+class Relations /* extends Anson */ {
+
+	constructor() {
+		this.type = "io.odysz.semantic.tier.Relations";
+	}
+
+	collectRelations(rtabl, checkTree) {
+		if (!rtabl)
+			throw Error("Type Relations stands for all relation records of one parent table. Relations already exits.");
+
+		this.rtabl = rtabl;
+		// TODO ...
+		// TODO ...
+		return this;
 	}
 }

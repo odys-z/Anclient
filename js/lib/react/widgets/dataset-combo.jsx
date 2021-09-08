@@ -14,8 +14,9 @@ import { L } from '../../utils/langstr';
 
 const styles = (theme) => ({
   root: {
-	display: "flex",
-	width: "100%",
+	// display: "flex",
+	// width: "300",
+	// marginTop: theme.spacing(1),
   },
 });
 
@@ -58,7 +59,7 @@ class DatasetCombo extends React.Component {
 					uri: this.props.uri,
 					sk: this.props.sk,
 					// user uses this, e.g. name and value to access data
-					nv: this.props.nv,
+					nv: this.props.nv || {n: 'name', v: 'value'},
 					cond: this.state.combo
 				},
 				this.context.error, this);
@@ -104,7 +105,7 @@ class DatasetCombo extends React.Component {
 			ref={refcbb}
 			onChange={ this.onCbbRefChange(refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
-
+			fullWidth size='small'
 			options={cmb.options}
 			style={this.props.style}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }

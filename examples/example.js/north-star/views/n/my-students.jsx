@@ -67,7 +67,7 @@ class MyStudentsComp extends CrudCompW {
 				tier
 				pk={tier.pk} pkval={that.state.pkval}
 				record={tier.record()}
-				onSave={tier.saveRecord}
+				onSave={tier.saveRec}
 				onClose={ e => that.recForm = undefined}
 			/>
 	}
@@ -210,7 +210,7 @@ class MyStudentsTier {
 			new MyStudentsReq( uri, props ).A(MyStudentsReq.A.record) );
 	}
 
-	saveRecord(recHook) {
+	saveRec(recHook) {
 		let rec = {};
 		recHook.collect(rec); // rec: {pk, userName, orgId, ...}
 

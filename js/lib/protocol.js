@@ -165,7 +165,7 @@ class Jregex  {
 class AnsonMsg {
 	constructor (json) {
 		if (typeof json !== 'object')
-			throw new Error("AnClient is upgraded.");
+			throw new Error("AnClient is upgraded, takes only one arg, the json obj.");
 
 		let header = json.header;
 		let [body] = json.body ? json.body : [{}];
@@ -209,7 +209,6 @@ class AnsonMsg {
 
 		if (a) body.A(a);
 
-		// FIXME type must be the first key of evry json object.
 		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
 
 		this.code = json.code;

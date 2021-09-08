@@ -314,7 +314,7 @@ export class AnReactExt extends AnReact {
 			(dsResp) => {
 				let rs = dsResp.Body().Rs();
 				if (nv.n === 'name' && !AnsonResp.hasColumn(rs, 'name'))
-					console.warn("Can't find data in rs for option label. column: 'name'.",
+					console.error("Can't find data in rs for option label. column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
 
 				let {rows} = AnsonResp.rs2nvs( rs, nv );

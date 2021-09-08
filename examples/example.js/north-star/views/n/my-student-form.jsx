@@ -70,7 +70,7 @@ class MyStudentComp extends CrudCompW {
 		if (props.stateHook)
 			props.stateHook.collect = function (me) {
 				let that = me;
-				return function(hookObj){
+				return function(hookObj) {
 					hookObj[that.props.mtabl] = that.state.record;
 				}; }(this);
 
