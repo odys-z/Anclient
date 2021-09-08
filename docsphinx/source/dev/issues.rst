@@ -4,6 +4,13 @@ Issues & Handling
 React Issue #13991 - Invalid hood call
 ---------------------------------------
 
+.. attention:: Since new example of North is verified. This issue is closed.
+..
+
+.. note:: To test with test/jsample, use
+    [ npm link anclient ]
+..
+
 About the error
 _______________
 
@@ -21,7 +28,8 @@ will reporting error.
 
 Error report:
 
-```
+::
+
     anreact-1.0.0.min.js:90874 Uncaught Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
     1. You might have mismatching versions of React and the renderer (such as React DOM)
     2. You might be breaking the Rules of Hooks
@@ -206,7 +214,6 @@ Error report:
     bindDom @ anreact-1.0.0.min.js:30365
     bindHtml @ north-app.jsx:147
     (anonymous) @ north.html:16
-```
 
 Where AppBar is exported from Material UI, SysComp, extending React.Component,
 from Anclient.js lib.
@@ -233,7 +240,7 @@ In example.js/north-star/webpack.config.js:
 
 ..
 
-This can be explained as duplicated react been used.
+This can be explained as duplicated react libs been used.
 
 Solution
 ________

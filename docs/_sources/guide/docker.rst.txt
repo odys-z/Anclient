@@ -36,8 +36,8 @@ Copy and go the url, visiting
 
 ::
 
-    http://ip172-18-0-123-c2mc....direct.labs.play-with-docker.com/jserv-sample/menu.serv11
+    http://ip172-18-0-123-c2mc....direct.labs.play-with-docker.com/jserv-sample/menu.serv
 
-Ending with */jserv-sample/menu.serv11*.
+Ending with */jserv-sample/menu.serv*.
 
 .. image:: imgs/02-docker-labs-xv.png
