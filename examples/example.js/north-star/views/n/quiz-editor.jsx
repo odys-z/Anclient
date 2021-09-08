@@ -81,7 +81,7 @@ class QuizEditorComp extends DetailFormW {
 		// We use this class wrapped with function. Can be changed if there is a better way like forwardRef.
 		props.stateHook.collect = function (me) {
 			let that = me;
-			return function(hookObj){
+			return function(hookObj) {
 				/*
 				hookObj.questions = that.state.questions; // also supposed to change to using hook once each question been broken down
 				hookObj.quizUsers = that.state.quizUsers;

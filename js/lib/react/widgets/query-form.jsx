@@ -131,22 +131,11 @@ class AnQueryFormComp extends React.Component {
 
 	onTxtChange( e, x ) {
 		e.stopPropagation()
-		// let qx = e.currentTarget.id;
-		// qx = parseInt(qx);
-		// this.state.conds[qx].val = e.currentTarget.value;
 		this.state.conds[x].val = e.currentTarget.value;
 	}
 
 	onDateChange(e, ix) {
 		e.stopPropagation();
-
-		// let arr = this.state.conds.map((obj, ix) => {
-		// 	if(ix === index){
-		// 		obj.val = e.currentTarget.value
-		// 	}
-		// 	return obj;
-		// });
-		// this.setState({conds: arr});
 
 		console.log(this.state.conds[ix], e.currentTarget.value);
 		let obj = this.state.conds[ix];
@@ -155,14 +144,6 @@ class AnQueryFormComp extends React.Component {
 
 	onSwitchChange(e, x) {
 		e.stopPropagation();
-		// let arr = this.state.conds.map((obj, ix) => {
-		// 	if(ix === x){
-		// 		obj.val = e.currentTarget.value
-		// 	}
-		// 	return obj;
-		// });
-		// this.setState({conds: arr});
-
 		this.state.conds[x].val = e.currentTarget.checked;
 	}
 
@@ -182,7 +163,10 @@ class AnQueryFormComp extends React.Component {
 	}
 
 	toSearch( e ) {
-		/// conds.clean & cond.loading are used for guarding re-entry the query, e.g. when error occured
+		// conds.clean & cond.loading are used for guarding re-entry the query, e.g. when error occured
+		// // NOTE:
+		// This complicate design is still not working, due to mulitple asynchronouse callback.
+		// It's a good sign that query form need a special tier.
 		this.state.conds.filter( (c) => !!c ).forEach(
 			(c, x) => {
 				c.clean = false;
