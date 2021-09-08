@@ -66,10 +66,12 @@ class UserstComp extends CrudCompW {
 	 * @param {object} condts the query conditions collected from query form.
 	 */
 	toSearch(condts) {
+		let that = this;
 		this.q = condts || this.q;
 		this.tier.records( this.q,
 			(cols, rows) => {
-				this.setState(rows);
+				that.state.selected.Ids.clear();
+				that.setState(rows);
 			} );
 	}
 
@@ -94,7 +96,8 @@ class UserstComp extends CrudCompW {
 				onClose={() => {that.confirm = undefined;} }
 				msg={L('{cnt} records will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
 
-		this.setState({});
+		// that.state.selected.Ids.clear();
+		// this.setState({});
 	}
 
 	del() {
@@ -111,6 +114,9 @@ class UserstComp extends CrudCompW {
 							that.toSearch();
 						} }
 						msg={L('Deleting Succeed!')} />);
+				// that.state.selected.Ids.clear();
+				// that.setState({});
+				that.toSearch();
 			} );
 	}
 
@@ -124,11 +130,12 @@ class UserstComp extends CrudCompW {
 	}
 
 	toEdit(e, v) {
+		let that = this;
 		this.recForm = (<UserDetailst crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
 			recId={[...this.state.selected.Ids][0]}
-			onOk={(r) => console.log(r)}
+			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
 
@@ -260,8 +267,6 @@ class UsersTier {
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.records) );
 
-		// let reqBd = req.Body();
-
 		client.commit(req,
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
@@ -303,13 +308,12 @@ class UsersTier {
 
 		client.commit(req,
 			(resp) => {
-				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				that.rows = rows;
+				let bd = resp.Body();
 				if (crud === Protocol.CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval = resp.resulve(that.mtabl, that.pk);
-				onOk(cols, rows);
+					that.pkval = bd.resulve(that.mtabl, that.pk, record);
+				onOk(resp);
 			},
 			this.errCtx);
 	}

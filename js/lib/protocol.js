@@ -321,11 +321,15 @@ class AnsonResp extends AnsonBody {
 		}
 	}
 
-	resulve(tabl, col) {
-		console(tabl, col);
-		if (this.data && this.data.props) {
-			return this.data.props[tabl][col];
+	resulve(tabl, pk, clientRec) {
+		console.log(this);
+		// // NOTE:
+		// this depnends on the samantics of java code:
+		//    return ok(new AnsonResp().data(res.props()));
+		if (this.map && this.map.resulved) {
+			return this.map.resulved[tabl][pk];
 		}
+		else return clientRec[pk]; 
 	}
 
 	static hasColumn(rs, colname) {

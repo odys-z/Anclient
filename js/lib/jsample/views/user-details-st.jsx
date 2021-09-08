@@ -139,11 +139,11 @@ class UserDetailstComp extends DetailFormW {
 			  record: this.recHook.record,
 			  relations: this.relHook.relations }, // Array
 			resp => {
+				// NOTE should crud moved to tier, just like the pkval?
 				if (that.state.crud === Protocol.CRUD.c) {
 					that.state.crud = Protocol.CRUD.u;
-					console.log(resp.Body());
 				}
-				that.showConfirm(resp);
+				that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 			} );
 	}
 
@@ -153,13 +153,13 @@ class UserDetailstComp extends DetailFormW {
 			this.props.onClose({code: 'cancel'});
 	}
 
-	showConfirm(resp) {
+	showConfirm(msg) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('Ok')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
-				msg={resp.Body().msg()} />);
+				msg={msg} />);
 		this.setState({});
 	}
 
@@ -174,7 +174,7 @@ class UserDetailstComp extends DetailFormW {
 
 		let rec = this.state.record;
 
-		return (
+		return (<>
 		  <Dialog className={classes.root}
 			classes={{ paper: classes.dialogPaper }}
 			open={true} fullWidth maxWidth="lg"
@@ -204,7 +204,9 @@ class UserDetailstComp extends DetailFormW {
 				{(c || u) ? L("Close") : L("Cancel")}
 			  </Button>
 			</DialogActions>
-		  </Dialog>);
+		  </Dialog>
+		  {this.confirm}
+		</>);
 	}
 }
 
