@@ -321,6 +321,13 @@ class AnsonResp extends AnsonBody {
 		}
 	}
 
+	resulve(tabl, col) {
+		console(tabl, col);
+		if (this.data && this.data.props) {
+			return this.data.props[tabl][col];
+		}
+	}
+
 	static hasColumn(rs, colname) {
 		return rs && rs.colnames && colname && colname.toUpperCase() in rs.colnames;
 	}

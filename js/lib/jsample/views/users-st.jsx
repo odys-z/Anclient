@@ -43,6 +43,8 @@ class UserstComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
+		this.state.selected.Ids = new Set();
+
 		this.tier = new UsersTier(this);
 
 		this.closeDetails = this.closeDetails.bind(this);
@@ -51,20 +53,28 @@ class UserstComp extends CrudCompW {
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
+		this.toDel = this.toDel.bind(this);
+		this.del = this.del.bind(this);
 	}
 
 	componentDidMount() {
 		this.tier.setContext(this.context);
 	}
 
+	/** If condts is null, use the last condts to query.
+	 * on succeed: set state.rows.
+	 * @param {object} condts the query conditions collected from query form.
+	 */
 	toSearch(condts) {
-		this.tier.records( condts,
+		this.q = condts || this.q;
+		this.tier.records( this.q,
 			(cols, rows) => {
 				this.setState(rows);
 			} );
 	}
 
 	onTableSelect(rowIds) {
+		// this.state.selected.Ids = rowIds
 		this.setState( {
 			buttons: {
 				// is this als CRUD semantics?
@@ -72,11 +82,36 @@ class UserstComp extends CrudCompW {
 				edit: rowIds && rowIds.size === 1,
 				del: rowIds &&  rowIds.size >= 1,
 			},
-			selectedRecIds: rowIds
 		} );
 	}
 
 	toDel(e, v) {
+		let that = this;
+		this.confirm = (
+			<ConfirmDialog title={L('Info')}
+				ok={L('Ok')} cancel={true} open
+				onOk={ that.del }
+				onClose={() => {that.confirm = undefined;} }
+				msg={L('{cnt} records will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
+
+		this.setState({});
+	}
+
+	del() {
+		let that = this;
+		this.tier.del({
+				uri: this.uri,
+				ids: this.state.selected.Ids },
+			resp => {
+				that.confirm = (
+					<ConfirmDialog title={L('Info')}
+						ok={L('Ok')} cancel={false} open
+						onClose={() => {
+							that.confirm = undefined;
+							that.toSearch();
+						} }
+						msg={L('Deleting Succeed!')} />);
+			} );
 	}
 
 	toAdd(e, v) {
@@ -84,7 +119,7 @@ class UserstComp extends CrudCompW {
 		this.recForm = (<UserDetailst crud={CRUD.c}
 			uri={this.uri}
 			tier={this.tier}
-			onOk={(r) => that.toSearch(null, this.q)}
+			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
 
@@ -92,7 +127,7 @@ class UserstComp extends CrudCompW {
 		this.recForm = (<UserDetailst crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
-			recId={this.state.selectedRecIds[0]}
+			recId={[...this.state.selected.Ids][0]}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
@@ -138,6 +173,7 @@ class UserstComp extends CrudCompW {
 				onSelectChange={this.onTableSelect}
 			/>
 			{this.recForm}
+			{this.confirm}
 		</div>);
 	}
 }
@@ -189,11 +225,13 @@ UsersQuery.propTypes = {
 
 class UsersTier {
 	port = 'userstier';
+	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
 	client = undefined;
 	uri = undefined;
 	rows = [];
+	pkval = undefined;
 
 	constructor(comp) {
 		this.uri = comp.uri || comp.props.uri;
@@ -260,16 +298,39 @@ class UsersTier {
 		let { uri, crud, record, relations } = opts;
 
 		let req = this.client.userReq(uri, 'userstier',
-			new UserstReq( uri, { record, relations } )
+			new UserstReq( uri, { record, relations, pk: this.pkval } )
 			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
 		client.commit(req,
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
+				if (crud === Protocol.CRUD.c)
+					// NOTE:
+					// resulving auto-k is a typicall semantic processing, don't expose this to caller
+					that.pkval = resp.resulve(that.mtabl, that.pk);
 				onOk(cols, rows);
 			},
 			this.errCtx);
+	}
+
+	/**
+	 * @param {Set} ids record id
+	 * @param {function} onOk: function(AnsonResp);
+	 */
+	del(opts, onOk) {
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+		let { uri, ids } = opts;
+
+		if (ids && ids.size > 0) {
+			let req = this.client.userReq(uri, 'userstier',
+				new UserstReq( uri, { deletings: [...ids] } )
+				.A(UserstReq.A.del) );
+
+			client.commit(req, onOk, this.errCtx);
+		}
 	}
 }
 
@@ -289,6 +350,7 @@ class UserstReq extends UserReq {
 		rec: 'rec',
 		update: 'a-u',
 		insert: 'a-c',
+		del: 'a-d',
 	}
 
 	constructor (uri, args) {
@@ -301,6 +363,7 @@ class UserstReq extends UserReq {
 
 		this.record = args.record;
 		this.relations = args.relations;
+		this.deletings = args.deletings;
 	}
 }
 

@@ -124,6 +124,8 @@ class UserDetailstComp extends DetailFormW {
 	toSave(e) {
 		if (e) e.stopPropagation();
 
+		let that = this;
+
 		if (typeof this.recHook.collect === 'function')
 			this.recHook.collect(this.recHook);
 
@@ -133,16 +135,16 @@ class UserDetailstComp extends DetailFormW {
 		this.tier.saveRec(
 			{ uri: this.props.uri,
 			  crud: this.state.crud,
+			  pkval: this.props.tier.pkval,
 			  record: this.recHook.record,
 			  relations: this.relHook.relations }, // Array
 			resp => {
-				if (that.state.crud === Protocol.CRUD.c)
+				if (that.state.crud === Protocol.CRUD.c) {
 					that.state.crud = Protocol.CRUD.u;
-				this.showConfirm(resp);
+					console.log(resp.Body());
+				}
+				that.showConfirm(resp);
 			} );
-
-		// if (typeof this.props.onOk === 'function')
-		// 	this.props.onOk({code: 'ok'});
 	}
 
 	toCancel (e) {
@@ -157,7 +159,7 @@ class UserDetailstComp extends DetailFormW {
 			<ConfirmDialog title={L('Info')}
 				ok={L('Ok')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
-				msg={msg} />);
+				msg={resp.Body().msg()} />);
 		this.setState({});
 	}
 
