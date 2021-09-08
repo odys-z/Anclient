@@ -37,7 +37,7 @@
         <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
         <link rel="up" title="For developers" href="index.html"/>
-        <link rel="prev" title="For developers" href="index.html"/> 
+        <link rel="prev" title="Design Note" href="note.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -91,11 +91,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../starter/framework.html">Application Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../guide/docker.html">Play with Docker</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">For developers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="note.html">Design Note</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Issues &amp; Handling</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#react-issue-13991-invalid-hood-call">React Issue #13991 - Invalid hood call</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#about-the-error">About the error</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cause-of-error">Cause of Error</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#solution">Solution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#similar-of-react-issue-13991">Similar of React Issue #13991</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#referenceerror-regeneratorruntime-is-not-defined">ReferenceError: regeneratorRuntime is not defined</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">About the error</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Solution</a></li>
 </ul>
 </li>
 </ul>
@@ -174,198 +181,14 @@ will reporting error.</p>
 </pre></div>
 </div>
 <p>Error report:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>anreact-1.0.0.min.js:90874 Uncaught Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
-    at resolveDispatcher (anreact-1.0.0.min.js:90874)
-    at Object.useContext (anreact-1.0.0.min.js:90882)
-    at useTheme (anreact-1.0.0.min.js:25398)
-    at useStyles (anreact-1.0.0.min.js:25048)
-    at WithStyles (anreact-1.0.0.min.js:25487)
-    at renderWithHooks (react-dom.development.js:14985)
-    at updateForwardRef (react-dom.development.js:17044)
-    at beginWork (react-dom.development.js:19098)
-    at HTMLUnknownElement.callCallback (react-dom.development.js:3945)
-    at Object.invokeGuardedCallbackDev (react-dom.development.js:3994)
-resolveDispatcher @ anreact-1.0.0.min.js:90874
-useContext @ anreact-1.0.0.min.js:90882
-useTheme @ anreact-1.0.0.min.js:25398
-useStyles @ anreact-1.0.0.min.js:25048
-WithStyles @ anreact-1.0.0.min.js:25487
-renderWithHooks @ react-dom.development.js:14985
-updateForwardRef @ react-dom.development.js:17044
-beginWork @ react-dom.development.js:19098
-callCallback @ react-dom.development.js:3945
-invokeGuardedCallbackDev @ react-dom.development.js:3994
-invokeGuardedCallback @ react-dom.development.js:4056
-beginWork$1 @ react-dom.development.js:23964
-performUnitOfWork @ react-dom.development.js:22776
-workLoopSync @ react-dom.development.js:22707
-renderRootSync @ react-dom.development.js:22670
-performSyncWorkOnRoot @ react-dom.development.js:22293
-scheduleUpdateOnFiber @ react-dom.development.js:21881
-updateContainer @ react-dom.development.js:25482
-(anonymous) @ react-dom.development.js:26021
-unbatchedUpdates @ react-dom.development.js:22431
-legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
-render @ react-dom.development.js:26103
-onJsonServ @ north-app.jsx:151
-(anonymous) @ anreact-1.0.0.min.js:30369
-fire @ anreact-1.0.0.min.js:40192
-fireWith @ anreact-1.0.0.min.js:40322
-done @ anreact-1.0.0.min.js:46488
-(anonymous) @ anreact-1.0.0.min.js:46749
-load (async)
-send @ anreact-1.0.0.min.js:46768
-ajax @ anreact-1.0.0.min.js:46382
-bindDom @ anreact-1.0.0.min.js:30365
-bindHtml @ north-app.jsx:147
-(anonymous) @ north.html:16
-react-dom.development.js:20085 The above error occurred in the &lt;WithStyles(ForwardRef(AppBar))&gt; component:
-
-    at WithStyles (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:12451:571)
-    at div
-    at SysComp (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:13287:160)
-    at ThemeProvider (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:5419:24)
-    at NorthApp (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:69785:5)
-
-Consider adding an error boundary to your tree to customize error handling behavior.
-Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
-logCapturedError @ react-dom.development.js:20085
-update.callback @ react-dom.development.js:20118
-callCallback @ react-dom.development.js:12318
-commitUpdateQueue @ react-dom.development.js:12339
-commitLifeCycles @ react-dom.development.js:20736
-commitLayoutEffects @ react-dom.development.js:23426
-callCallback @ react-dom.development.js:3945
-invokeGuardedCallbackDev @ react-dom.development.js:3994
-invokeGuardedCallback @ react-dom.development.js:4056
-commitRootImpl @ react-dom.development.js:23151
-unstable_runWithPriority @ scheduler.development.js:468
-runWithPriority$1 @ react-dom.development.js:11276
-commitRoot @ react-dom.development.js:22990
-performSyncWorkOnRoot @ react-dom.development.js:22329
-scheduleUpdateOnFiber @ react-dom.development.js:21881
-updateContainer @ react-dom.development.js:25482
-(anonymous) @ react-dom.development.js:26021
-unbatchedUpdates @ react-dom.development.js:22431
-legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
-render @ react-dom.development.js:26103
-onJsonServ @ north-app.jsx:151
-(anonymous) @ anreact-1.0.0.min.js:30369
-fire @ anreact-1.0.0.min.js:40192
-fireWith @ anreact-1.0.0.min.js:40322
-done @ anreact-1.0.0.min.js:46488
-(anonymous) @ anreact-1.0.0.min.js:46749
-load (async)
-send @ anreact-1.0.0.min.js:46768
-ajax @ anreact-1.0.0.min.js:46382
-bindDom @ anreact-1.0.0.min.js:30365
-bindHtml @ north-app.jsx:147
-(anonymous) @ north.html:16
-react-dom.development.js:20085 The above error occurred in the &lt;WithStyles(ForwardRef(Drawer))&gt; component:
-
-    at WithStyles (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:12451:571)
-    at Router (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:22506:342)
-    at MemoryRouter (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:22513:344)
-    at div
-    at SysComp (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:13287:160)
-    at ThemeProvider (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:5419:24)
-    at NorthApp (http://192.168.0.201:8888/north-star/dist/north-0.1.0.min.js:69785:5)
-
-Consider adding an error boundary to your tree to customize error handling behavior.
-Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
-logCapturedError @ react-dom.development.js:20085
-update.callback @ react-dom.development.js:20118
-callCallback @ react-dom.development.js:12318
-commitUpdateQueue @ react-dom.development.js:12339
-commitLifeCycles @ react-dom.development.js:20736
-commitLayoutEffects @ react-dom.development.js:23426
-callCallback @ react-dom.development.js:3945
-invokeGuardedCallbackDev @ react-dom.development.js:3994
-invokeGuardedCallback @ react-dom.development.js:4056
-commitRootImpl @ react-dom.development.js:23151
-unstable_runWithPriority @ scheduler.development.js:468
-runWithPriority$1 @ react-dom.development.js:11276
-commitRoot @ react-dom.development.js:22990
-performSyncWorkOnRoot @ react-dom.development.js:22329
-scheduleUpdateOnFiber @ react-dom.development.js:21881
-updateContainer @ react-dom.development.js:25482
-(anonymous) @ react-dom.development.js:26021
-unbatchedUpdates @ react-dom.development.js:22431
-legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
-render @ react-dom.development.js:26103
-onJsonServ @ north-app.jsx:151
-(anonymous) @ anreact-1.0.0.min.js:30369
-fire @ anreact-1.0.0.min.js:40192
-fireWith @ anreact-1.0.0.min.js:40322
-done @ anreact-1.0.0.min.js:46488
-(anonymous) @ anreact-1.0.0.min.js:46749
-load (async)
-send @ anreact-1.0.0.min.js:46768
-ajax @ anreact-1.0.0.min.js:46382
-bindDom @ anreact-1.0.0.min.js:30365
-bindHtml @ north-app.jsx:147
-(anonymous) @ north.html:16
-anreact-1.0.0.min.js:90874 Uncaught Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
-    at resolveDispatcher (anreact-1.0.0.min.js:90874)
-    at Object.useContext (anreact-1.0.0.min.js:90882)
-    at useTheme (anreact-1.0.0.min.js:25398)
-    at useStyles (anreact-1.0.0.min.js:25048)
-    at WithStyles (anreact-1.0.0.min.js:25487)
-    at renderWithHooks (react-dom.development.js:14985)
-    at updateForwardRef (react-dom.development.js:17044)
-    at beginWork (react-dom.development.js:19098)
-    at HTMLUnknownElement.callCallback (react-dom.development.js:3945)
-    at Object.invokeGuardedCallbackDev (react-dom.development.js:3994)
-resolveDispatcher @ anreact-1.0.0.min.js:90874
-useContext @ anreact-1.0.0.min.js:90882
-useTheme @ anreact-1.0.0.min.js:25398
-useStyles @ anreact-1.0.0.min.js:25048
-WithStyles @ anreact-1.0.0.min.js:25487
-renderWithHooks @ react-dom.development.js:14985
-updateForwardRef @ react-dom.development.js:17044
-beginWork @ react-dom.development.js:19098
-callCallback @ react-dom.development.js:3945
-invokeGuardedCallbackDev @ react-dom.development.js:3994
-invokeGuardedCallback @ react-dom.development.js:4056
-beginWork$1 @ react-dom.development.js:23964
-performUnitOfWork @ react-dom.development.js:22776
-workLoopSync @ react-dom.development.js:22707
-renderRootSync @ react-dom.development.js:22670
-performSyncWorkOnRoot @ react-dom.development.js:22293
-scheduleUpdateOnFiber @ react-dom.development.js:21881
-updateContainer @ react-dom.development.js:25482
-(anonymous) @ react-dom.development.js:26021
-unbatchedUpdates @ react-dom.development.js:22431
-legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
-render @ react-dom.development.js:26103
-onJsonServ @ north-app.jsx:151
-(anonymous) @ anreact-1.0.0.min.js:30369
-fire @ anreact-1.0.0.min.js:40192
-fireWith @ anreact-1.0.0.min.js:40322
-done @ anreact-1.0.0.min.js:46488
-(anonymous) @ anreact-1.0.0.min.js:46749
-load (async)
-send @ anreact-1.0.0.min.js:46768
-ajax @ anreact-1.0.0.min.js:46382
-bindDom @ anreact-1.0.0.min.js:30365
-bindHtml @ north-app.jsx:147
-(anonymous) @ north.html:16
-</pre></div>
-</div>
+<a class="reference internal image-reference" href="../_images/00-react-hook-warning.png"><img alt="../_images/00-react-hook-warning.png" src="../_images/00-react-hook-warning.png" style="height: 400px;" /></a>
 <p>Where AppBar is exported from Material UI, SysComp, extending React.Component,
 from Anclient.js lib.</p>
 <p>The React document didn’t solve this problem, and redirected to issue 13991.
-Webpack also have similar issue report. See</p>
-<p>[Facebook issue 13991](<a class="reference external" href="https://github.com/facebook/react/issues/13991">https://github.com/facebook/react/issues/13991</a>)</p>
-<p>[Webpack issue 13868](<a class="reference external" href="https://github.com/webpack/webpack/issues/13868">https://github.com/webpack/webpack/issues/13868</a>)</p>
+Webpack also have similar issue report. See
+<a class="reference external" href="https://reactjs.org/link/error-boundaries">Rreact Document</a> and issues:</p>
+<p><a class="reference external" href="https://github.com/facebook/react/issues/13991">Facebook issue 13991</a> and</p>
+<p><a class="reference external" href="https://github.com/webpack/webpack/issues/13868">Webpack issue 13868</a></p>
 </div>
 <div class="section" id="cause-of-error">
 <h3>Cause of Error<a class="headerlink" href="#cause-of-error" title="Permalink to this headline">¶</a></h3>
@@ -403,6 +226,46 @@ Webpack also have similar issue report. See</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="similar-of-react-issue-13991">
+<h3>Similar of React Issue #13991<a class="headerlink" href="#similar-of-react-issue-13991" title="Permalink to this headline">¶</a></h3>
+<p>A tried scenario:</p>
+<ol class="arabic simple">
+<li>publish test/react-app as &#64;anclient/test-react</li>
+<li>install anclient in test/react-app</li>
+<li>AnContext.anReact is undefined for &lt;QueryForm /&gt; in &lt;Domain /&gt;</li>
+</ol>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">componentDidMount</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">||</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">anReact</span><span class="p">)</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;AnQueryFormComp can\&#39;t bind controls without AnContext initialized with AnReact.&#39;</span><span class="p">);</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="referenceerror-regeneratorruntime-is-not-defined">
+<h2>ReferenceError: regeneratorRuntime is not defined<a class="headerlink" href="#referenceerror-regeneratorruntime-is-not-defined" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>About the error<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>When handling D3 with Babel 8.2.2 or later, the async functions requiring
+<a class="reference external" href="https://babeljs.io/docs/en/babel-plugin-transform-regenerator">regenerator runtime</a>.</p>
+<p>There are similar reports like <a class="reference external" href="https://stackoverflow.com/questions/53558916/babel-7-referenceerror-regeneratorruntime-is-not-defined">here</a>.</p>
+</div>
+<div class="section" id="id2">
+<h3>Solution<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Follow <a class="reference external" href="https://stackoverflow.com/a/54490329">the answer</a>.</p>
+<p>install core-js &amp; regenerator-runtime</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm install --save core-js
+npm install --save regenerator-runtime
+</pre></div>
+</div>
+<p>In histogram.jsx:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="s2">&quot;core-js/stable&quot;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="s2">&quot;regenerator-runtime/runtime&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>These 2 steps should solve the problem.</p>
+</div>
 </div>
 </div>
 
@@ -414,7 +277,7 @@ Webpack also have similar issue report. See</p>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="index.html" class="btn btn-neutral" title="For developers" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="note.html" class="btn btn-neutral" title="Design Note" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

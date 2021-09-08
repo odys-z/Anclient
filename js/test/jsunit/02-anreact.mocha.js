@@ -3,8 +3,7 @@ import { expect, assert } from 'chai';
 
 import {Protocol, AnsonMsg, UpdateReq} from '../../lib/protocol';
 import {AnClient, SessionClient} from '../../lib/anclient';
-import {AnReact} from '../../lib/frames/react/anreact.jsx';
-import {AnContext} from '../../lib/frames/react/reactext.jsx';
+import {AnReact} from '../../lib/react/anreact.jsx';
 
 const checkBoxForest = [
   { "type":"io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
@@ -166,6 +165,11 @@ const forest2 = [
     "id": "System v1.1"
   }
 ];
+
+// for test, don't import Ancontext, which depends on "window"
+const AnContext = {
+	error: {}
+}
 
 describe('case: [02.0 anreact]', () => {
 	it('[protocol] checkTree -> relation records', () => {

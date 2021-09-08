@@ -25,7 +25,7 @@ import {AnsonMsg} from 'anclient';
 	import {QuizResp} from '../../../lib/protocol.quiz.js';
 	import {QuestionType, JQuiz} from '../../../lib/an-quiz';
 	import {AnContext} from '../../../lib/an-react';
-	import {ConfirmDialog} from '../../../lib/widgets/Messagebox'
+	import {ConfirmDialog} from '../../lib/widgets/Messagebox'
 
 var quid = -1;
 
@@ -103,10 +103,6 @@ export class Editor extends React.Component {
 		questions[qx].answers = e.currentTarget.value;
 		this.setState({questions, dirty: true});
 	}
-
-	// onChangeVal(comp, value) {
-	// 	this.setValue({value:value});
-	// }
 
 	onAdd(e) {
 		let qx = Editor.getQx();

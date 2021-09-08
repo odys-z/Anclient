@@ -1,10 +1,39 @@
 import chai from 'chai';
 import { expect, assert } from 'chai';
 
-import { L, Langstrs } from '../../lib/frames/react/utils/langstr';
-import { toBool } from '../../lib/frames/react/utils/helpers';
+import { L, Langstrs } from '../../lib/utils/langstr';
+import { toBool, isEmpty } from '../../lib/utils/helpers';
 
-describe('case: [00.1 string value]', () => {
+describe('case: [0.0] utils', () => {
+	it('helpers: toBool, isEmpty', () =>{
+		assert.equal(isEmpty(''), true, '0.1');
+		assert.equal(toBool(''), false, '0.3');
+		assert.equal(isEmpty(), true, '0.4');
+		assert.equal(toBool(), false, '0.5');
+		assert.equal(isEmpty(undefined), true, '0.6');
+		assert.equal(toBool(undefined), false, '0.7');
+		assert.equal(isEmpty(null), true, '0.6');
+		assert.equal(toBool(null), false, '0.7');
+		assert.equal(isEmpty(0), false, '0.6');
+		assert.equal(toBool(0), false, '0.7');
+
+		assert.equal(toBool(1), true, '0.8');
+		assert.equal(toBool('1'), true, '0.9');
+		assert.equal(toBool('true'), true, '0.10');
+		assert.equal(toBool('false'), false, '0.11');
+		assert.equal(toBool(true), true, '0.12');
+		assert.equal(toBool(false), false, '0.13');
+	} );
+
+    it('Array pathc', () => {
+		let arr = [1, 2, 3];
+		arr.swap(0, 1);
+		assert.equal(arr.length, 3);
+		assert.equal(arr[0], 2);
+		assert.equal(arr[1], 1);
+		assert.equal(arr[2], 3);
+	});
+
     it('toBool', () => {
 		assert.isTrue(toBool('1'), '1');
 		assert.isTrue(toBool('2'), '2');

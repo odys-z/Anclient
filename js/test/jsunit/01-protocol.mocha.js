@@ -46,7 +46,7 @@ const resp = {
         } ],
         "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
         "a": null,
-        "conn": null,
+        "uri": null,
         "m": null,
         "map": null
     } ],
@@ -63,7 +63,7 @@ const respErr = {
 		"rs": null,
 		"parent": "io.odysz.semantic.jprotocol.AnsonMsg",
 		"a": null,
-		"conn": null,
+		"uri": null,
 		"m": "session info is missing or timeout",
 		"map": null
 	}],
@@ -77,7 +77,7 @@ const respSession = {
 	"body": [ {
 		"type": "io.odysz.semantic.jsession.AnSessionResp",
 		"rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
-		"a": null, "conn": null,
+		"a": null, "uri": null,
 		"ssInf": { "type": "io.odysz.semantic.jsession.SessionInf",
 				   "uid": "admin", "roleId": null, "ssid": "001eysTj"
 			      },
@@ -101,7 +101,7 @@ const ajaxError = {
 		"body": [{
 			"type": "io.odysz.jquiz.QuizResp",
 			"rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
-			"a": null, "conn": null,
+			"a": null, "uri": null,
 			"data": {
 				"type": "io.odysz.semantics.SemanticObject",
 				"props": {
@@ -158,7 +158,7 @@ describe('case: [01.2 Protocol/AnsonReq]', () => {
 			.expr("dim4").expr("dim5").expr("dim6")
 			.whereCond("=", "agegrp", "'80-'");
 
-		assert.equal(qr.conn, 'con-1', "1 ---");
+		assert.equal(qr.uri, 'con-1', "1 ---");
 		assert.equal(qr.mtabl, 'a_users', "2 ---");
 		assert.equal(qr.mAlias, 'u', "2.1--");
 		assert.equal(qr.a, 'query', "3 ---");
@@ -184,18 +184,18 @@ describe('case: [01.2 Protocol/AnsonReq]', () => {
         assert.equal(jreq.port, 'query', "10 ---");
 
 		let an = new AnClient();
-		an.init("localhost", "conn-1");
+		an.init("localhost");
 		an.understandPorts(TestPorts);
 
 		assert.equal(an.servUrl(port), "localhost/r.serv11", "- 11 -");
 	} );
 
-    it('UserReq', () => {
+	it('UserReq', () => {
 		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
 			.A('query')
 			.set('quizId', '000001');
 
-		assert.equal(ur.conn, 'con-1', "1 ---");
+		assert.equal(ur.uri, 'con-1', "1 ---");
 		assert.equal(ur.tabl, 'quizzes', "2 ---");
 		assert.equal(ur.a, 'query', "3 ---");
 
@@ -216,7 +216,7 @@ describe('case: [01.2 Protocol/AnsonReq]', () => {
         assert.equal(jreq.port, 'test1', "8 ---");
 
 		let an = new AnClient();
-		an.init("localhost", "conn-1");
+		an.init("localhost");
 		an.understandPorts(TestPorts);
 
 		assert.equal(an.servUrl(port), "localhost/test.serv", "11 ==");
@@ -230,7 +230,7 @@ describe('case: [01.2 Protocol/AnsonReq]', () => {
 		let ir = new UpdateReq('con-1', 'quizzes', 'quizId')
 			.A('insert');
 
-		assert.equal(ir.conn, 'con-1', "1 ---");
+		assert.equal(ir.uri, 'con-1', "1 ---");
 		assert.equal(ir.mtabl, 'quizzes', "2 ---");
 		assert.equal(ir.a, 'insert', "3 ---");
 

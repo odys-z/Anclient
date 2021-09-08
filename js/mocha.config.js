@@ -21,14 +21,30 @@ var config = {
 
   plugins: [ ],
 
+  resolve: {
+	extensions: ['*', '.js', '.jsx', '.tsx']
+  },
+
   module: {
 	rules: [
-		{   test: /\.jsx$/,
+		{   test: /\.jsx?$/,
 			loader: 'babel-loader',
-			exclude: /node_modules/,
+			// exclude: /node_modules/,
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
+		{ test: /\.tsx$/,
+		  loader : 'babel-loader',
+		  options: { presets: [
+				'@babel/preset-react',
+				'@babel/preset-typescript',
+				'@emotion/babel-preset-css-prop',
+				'@babel/preset-env' ] }
+		},
+ 		{ test: /\.css$/,
+		  use: [ 'style-loader',
+				'css-loader',
+			  ] }
 	]
   }
 };

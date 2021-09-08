@@ -3,6 +3,29 @@
 This folder includes multiple js client based sample projects. Can be used as
 templates for quick start.
 
+- north-star
+
+A sample project using jserv-quiz showing CRUD pages.
+
+This example has it's own web & server's docker images:
+
+~~~
+    odysz/emr-web
+	odysz/connect-polestar
+~~~
+
+The sqlite db file and bash scripts can be downloaded at the release section.
+
+- react-quiz
+
+Project showing a simple project can compose quizzes.
+
+- plain-quiz
+
+Plain jqury + bootstrap using anclient in plain js.
+
+These 3 example is planned stop upgrading since anclient v0.9.51.
+
 # start from Docker image
 
 - Build examples:
@@ -39,3 +62,25 @@ Partly available [here](https://odys-z.github.io/Anclient/), currently only
 ## xvisual
 
 Integrating [x-visual](https://github.com/odys-z/x-visual) with Anclient.js
+
+##
+
+# Troubleshootings
+
+- Invalid Hook Call Warning
+
+For error description, see branch issue-13991, and [here](https://reactjs.org/warnings/invalid-hook-call-warning.html).
+
+NOTES: handling error of using duplicated React:
+
+    1. have package's main to the main source entry, not minified js - and
+    don't exclude 'node_modules' form loader test rule in depending project;
+    2. have anclient package using external react, react-dom, material-ui/core;
+    3. have depending project install everything;
+    4. don't resolve depending project's react to source package
+       - although it's always work for eliminate the error;
+    5. install anclient package via npm, not linking locally
+
+    Good luck!
+
+More details: [Dev Docs](https://odys-z.github.io/Anclient/dev/issues.html#react-issue-13991-invalid-hood-call)

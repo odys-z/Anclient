@@ -118,10 +118,28 @@ class Protocol {
 		chkCntIns: 'checkSqlCountOnInsert',
 	};
 
+	Protocol.sk = {
+		// app will extending sk here.
+	}
+
 	Protocol.valOptions = {};
 
+	/**Extend new ports
+	 * @function
+	 * @param {object} newPorts
+	 */
 	Protocol.extend = function(newPorts) {
 		Object.assign(Protocol.Port, newPorts);
+	};
+
+	Protocol.ansonTypes = {};
+	/**Extend new protocol - register new body type creater.
+	 * @function
+	 * @param {string} type body type
+	 * @param {function} bodyConstructor AnsonBody constructor
+	 */
+	Protocol.registerBody = function(type, bodyConstructor) {
+		Protocol.ansonTypes[type] = bodyConstructor;
 	}
 }
 
@@ -147,7 +165,7 @@ class Jregex  {
 class AnsonMsg {
 	constructor (json) {
 		if (typeof json !== 'object')
-			throw new Error("AnClient is upgraded.");
+			throw new Error("AnClient is upgraded, takes only one arg, the json obj.");
 
 		let header = json.header;
 		let [body] = json.body ? json.body : [{}];
@@ -156,13 +174,13 @@ class AnsonMsg {
 		// initiating json to class
 		if (body.constructor.name === 'Object') {
 			if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
-			body = new AnsonResp(body);
+				body = new AnsonResp(body);
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
 				body = new AnSessionResp(body);
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 				body = new AnSessionReq(body.uid, body.token, body.iv);
 			else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
-				body = new QueryReq(body.conn, body.mtabl, body.mAlias);
+				body = new QueryReq(body.uri, body.mtabl, body.mAlias);
 			else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 				body = new UserReq(json.port, header, [body]);
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
@@ -175,18 +193,22 @@ class AnsonMsg {
 			}
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
 				body = new AnDatasetResp(body);
+			else if (body.type in Protocol.ansonTypes)
+				// TODO FIXME what happens if the other known types are all handled like this?
+				body = Protocol.ansonTypes[body.type](body);
 			else {
 				// if (Protocol.verbose >= 5)
 				// 	console.warn("Using json object directly as body. Type : " + body.type);
 
 				// server can't handle body without type
-				throw new Error("Using json object directly as body. Type not handled : " + body.type);
+				throw new Error("Error: Using json object directly as body. To extend protocol, register a new Protocol like this:"
+					+ "\nProtocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => { return new QuizResp(jsonBd); });"
+					+ "\nType not handled : " + body.type );
 			}
 		}
 
 		if (a) body.A(a);
 
-		// FIXME type must be the first key of evry json object.
 		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
 
 		this.code = json.code;
@@ -259,7 +281,7 @@ class AnsonBody {
 		this.type = body.type;
 		this.a = body.a
 		this.parent = body.parent;
-		this.conn = body.conn;
+		this.uri = body.uri;
 	}
 
 	/**set a.<br>
@@ -285,8 +307,18 @@ class AnsonResp extends AnsonBody {
 		return this.m;
 	}
 
+	Code() {
+		return this.code;
+	}
+
 	Rs(rx = 0) {
 		return this.rs && this.rs.length > rx ? this.rs[rx] : undefined;
+	}
+
+	getProp(prop) {
+		if (this.data && this.data.props) {
+			return this.data.props[prop];
+		}
 	}
 
 	static hasColumn(rs, colname) {
@@ -310,7 +342,7 @@ class AnsonResp extends AnsonBody {
 		let cols = [];
 		let rows = [];
 
-		if (typeof(rs.colnames) === 'object') {
+		if (rs && typeof(rs.colnames) === 'object') {
 			// rs with column index
 			cols = new Array(rs.colnames.length);
 			for (var col in rs.colnames) {
@@ -328,14 +360,14 @@ class AnsonResp extends AnsonBody {
 				rows.push(rw);
 			});
 		}
-		else {
+		else if (rs) {
 			// first line as column index
 			rs.forEach((r, rx) => {
 				if (rx === 0) {
 					cols = r;
 				}
 				else {
-					rw = {};
+					let rw = {};
 					r.forEach((c, cx) => {
 						rw[cols[cx]] = c;
 					});
@@ -387,10 +419,10 @@ class AnsonResp extends AnsonBody {
 }
 
 class UserReq extends AnsonBody {
-	constructor (conn, tabl, data = {}) {
+	constructor (uri, tabl, data = {}) {
 		super();
 		this.type = "io.odysz.semantic.jserv.user.UserReq";
-		this.conn = conn;
+		this.uri = uri;
 		this.tabl = tabl
 		this.data = {props: data};
 	}
@@ -466,10 +498,10 @@ class AnDatasetResp extends AnsonResp {
  * @class
  */
 class QueryReq extends AnsonBody {
-	constructor (conn, tabl, alias, pageInf) {
+	constructor (uri, tabl, alias, pageInf) {
 		super();
 		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
-		this.conn = conn;
+		this.uri = uri;
 		this.mtabl = tabl;
 		this.mAlias = alias;
 		this.exprs = [];
@@ -642,15 +674,15 @@ class QueryReq extends AnsonBody {
 
 class UpdateReq extends AnsonBody {
 	/**Create an update / insert request.
-	 * @param {string} conn connection id
+	 * @param {string} uri component id
 	 * @param {string} tabl table
 	 * @param {object} pk {pk, v} conditions for pk.<br>
 	 * If pk is null, use this object's where_() | whereEq() | whereCond().
 	 */
-	constructor (conn, tabl, pk) {
+	constructor (uri, tabl, pk) {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
-		this.conn = conn;
+		this.uri = uri;
 		this.mtabl = tabl;
 		this.nvs = [];
 		this.where = [];
@@ -781,15 +813,15 @@ class UpdateReq extends AnsonBody {
 }
 
 class DeleteReq extends UpdateReq {
-	constructor (conn, tabl, pk) {
-		super (conn, tabl, pk);
+	constructor (uri, tabl, pk) {
+		super (uri, tabl, pk);
 		this.a = Protocol.CRUD.d;
 	}
 }
 
 class InsertReq extends UpdateReq {
-	constructor (conn, tabl) {
-		super (conn, tabl);
+	constructor (uri, tabl) {
+		super (uri, tabl);
 		this.type = "io.odysz.semantic.jserv.U.AnInsertReq";
 		this.a = Protocol.CRUD.c;
 	}
@@ -897,7 +929,7 @@ const stree_t = {
 class DatasetReq extends QueryReq {
 	/**
 	 * @param {object} opts parameter objects
-	 * @param {string} opts.conn JDBC connection id, configured at server/WEB-INF/connects.xml
+	 * @param {string} opts.uri component uri, connectiong mapping is configured at server/WEB-INF/connects.xml
 	 * @param {string} opts.sk semantic key configured in WEB-INF/dataset.xml
 	 * @param {stree_t} opts.t also opts.a, function branch tag (AnsonBody.a).
 	 * Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query
@@ -908,14 +940,15 @@ class DatasetReq extends QueryReq {
 	 * @param {{n, v}} ...opts more arguments for sql args.
 	 */
 	constructor (opts = {}) {
-		let {conn, sk, t, a, mtabl, mAlias, pageInf, sqlArgs, ...args} = opts;
+		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
 
-		super(conn, Jregex.isblank(t) ? mtabl : sk, mAlias);
+		super(uri, Jregex.isblank(t) ? mtabl : sk, mAlias);
 		this.type = "io.odysz.semantic.ext.AnDatasetReq";
 
-		this.conn = conn;
+		this.uri = uri;
 		this.sk = sk;
 		this.sqlArgs = sqlArgs;
+		this.rootId = rootId;
 
 		t = t || a;
 		this.T(t);
@@ -983,7 +1016,7 @@ class DatasetReq extends QueryReq {
 
 ///////////////// END //////////////////////////////////////////////////////////
 export {
-	Jregex, Protocol, AnsonMsg, AnHeader,
+	Jregex, Protocol, AnsonMsg, AnsonBody, AnHeader,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
 	AnsonResp, DatasetReq, stree_t
 }

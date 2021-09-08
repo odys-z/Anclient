@@ -1,6 +1,6 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, DatasetReq } from '../../lib/protocol.js'
-import { SysComp } from '../../lib/frames/react/sys.jsx'
+import {parseMenus} from '../../lib/utils/helpers.js'
 
 const dsTestResp = {
 	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",
@@ -18,7 +18,7 @@ const dsTestResp = {
 		}],
 		"parent": "io.odysz.semantic.jprotocol.test.AnsonMsg",
 		"a": null,
-		"forest": null, "conn": null, "m": "", "map": null
+		"forest": null, "uri": null, "m": "", "map": null
 	}], "seq": 0
 }
 
@@ -67,7 +67,7 @@ const dsMenu = {
 				  "parent": "Uesr Manage", "id": "sys-1.1"}],
 			"fullpath": "2 sys-1.1", "id": "sys-1.1", "text": "System v1.1", "sort": "2", "parentId": "", "url": ""},
 			"parent": "System v1.1", "id": ""}],
-		"conn": null, "m": null, "map": null
+		"uri": null, "m": null, "map": null
 	}],
 	"version": "1.0", "seq": 0
 }
@@ -76,7 +76,7 @@ describe('case: [03.1 Jsample.menu]', () => {
 
 	it('Convert to menu.serv requests', () => {
 		let datasetCfg = {
-				conn: 'con-1',
+				uri: 'con-1',
 				sk: 'menu',
 				mtabl: 's_funcs',
 				args: ['admin'] };
@@ -84,7 +84,7 @@ describe('case: [03.1 Jsample.menu]', () => {
 			.A('query');
 		mr.args(['000001']);// quuizId
 
-        assert.equal(mr.conn, 'con-1', "1 ---");
+        assert.equal(mr.uri, 'con-1', "1 ---");
         assert.equal(mr.mtabl, 's_funcs', "2 ---");
         assert.equal(mr.a, 'query', "3.1 ---");
         assert.equal(mr.sk, 'menu', "3.2 ---");
@@ -121,7 +121,7 @@ describe('case: [03.1 Jsample.menu]', () => {
 	it("Parse Menu's lagacy format", () => {
 		let msg = new AnsonMsg(dsMenu);
 		let forest = msg.Body().forest;
-		let {menu, paths} = SysComp.parseMenus(forest);
+		let {menu, paths} = parseMenus(forest);
 
 		assert.equal(menu.Body, undefined, "1 ---");
 		assert.equal(menu.length, 2, "2 ---");

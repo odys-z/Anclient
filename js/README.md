@@ -1,66 +1,34 @@
 Project for anclient.js. Previously name jclient which is deprecated for package
 name conflicting.
 
-There are two version of webpack config.
-
-## quick start (only EasyUI version currently)
-
-*Note*:
-
-*This doc is old. A newer version using docker is coming ...*
-
-Anclient.js currently only has the [EasyUI](www.jeasyui.com) version working.
-The client template is provided as a project template for client.
+## quick start (only ReactJS version currently)
 
 To get kick started,
 
-1. [download ansample-easui template](https://github.com/odys-z/jclient/blob/master/js/test/ansample-easyui.zip)
-
-2. unpack and check server url.
-
-In <upacked-dir>/easyui/app-common/jsample-easyui.js/
+1. In Anclient/js
 
 ```
-    jconsts = {
-        ...
-        serv: 'http://localhost:8080/jsample',
-    }
+    npm install
+    npm link
+    cd test/jsample
+    npm link anclient
+    npm run build
 ```
-where the url is the root path to your semantic.jserv server.
 
-3. open easyui/login.html.
+2. start the web server.
 
-All configuration should working.
+e.g.
 
-See also [troubleshootings](https://odys-z.github.io/notes/jclient/issue-trouble.html)
+```
+    cd dist
+    python3 -m http.server 8888
+```
 
-<hr>
+Open
 
-Also some vue client can be used as example:
+    http://localhost:8888
 
-TODO: docs ...
-
-~~~
-    npm i anclient
-~~~
-
-Check test/vue/index.html and test/vue/home.html
-
-His plan to implement anclient.vue is adjusted recently. The vue version doesn't
-has a clear milestone until some newer plan detail added. Sorry...
-
-## webpack.test.config.js (Vue)
-
-This configuration is for building the test page: ./test/vue/index.js
-
-- demo page (Vue)
-
-./test/vue/index.html
-
-## webpack.config.js
-
-This configuration is for building the anclient library, with presentation layer
-implemented with EasyUI.
+The jsapmple server side is needed to login. (Docker image avialable)
 
 ## His Home page
 

@@ -3,7 +3,8 @@
 	npm test
  */
 
-
+const window = {};
+const __TESTING__ = true;
 context = require.context('./jsunit', true, /\.mocha\.js$/);
 
 context.keys().forEach(context);
