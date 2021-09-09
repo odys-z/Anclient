@@ -269,7 +269,7 @@ class UsersTier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, 'userstier',
+		let req = client.userReq(this.uri, this.port,
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.records) );
 
@@ -287,7 +287,7 @@ class UsersTier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, 'userstier',
+		let req = client.userReq(this.uri, this.port,
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.rec) );
 
@@ -311,8 +311,7 @@ class UsersTier {
 		if (crud === Protocol.CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		let req = this.client.userReq(uri, 'userstier',
-			// new UserstReq( uri, { record, relations, pk: this.pkval } )
+		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
 			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
@@ -339,7 +338,7 @@ class UsersTier {
 		let { uri, ids } = opts;
 
 		if (ids && ids.size > 0) {
-			let req = this.client.userReq(uri, 'userstier',
+			let req = this.client.userReq(uri, this.port,
 				new UserstReq( uri, { deletings: [...ids] } )
 				.A(UserstReq.A.del) );
 
