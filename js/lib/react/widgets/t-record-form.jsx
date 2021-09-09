@@ -42,8 +42,13 @@ const styles = (theme) => ({
 });
 
 /**
- * Tiered record component is designed for UI record layout, automaitcally bind data,
- * resolving FK's auto-cbb. See performance issue: https://stackoverflow.com/a/66934465
+ * A Tiered record component is designed for UI record layout rendering, handling
+ * user action (change text, etc.) in a levle-up style. It's parent's responsibilty
+ * to load all binding data in sychronous.
+ * TRecordForm won't resolving FK's auto-cbb.
+ * But TRecordFormComp do has a state for local udpating, See performance issue:
+ * https://stackoverflow.com/a/66934465
+ *
  * In case of child relation table, this component currently is not planned to supprt.
  * <p>Usally a CRUD process needs to update multiple tables in one transaction,
  * so this component leveled up state for saving. Is this a co-accident with React
@@ -64,6 +69,7 @@ export class TRecordFormComp extends CrudCompW {
 		// for safety - props can be changed
 		this.state.record = Object.assign({}, props.record);
 
+		this.setStateHooked = this.setStateHooked.bind(this);
 		if (props.stateHook)
 			props.stateHook.collect = function (me) {
 				let that = me;
@@ -81,6 +87,21 @@ export class TRecordFormComp extends CrudCompW {
 	}
 
 	componentDidMount() {
+	}
+
+	/**
+	 * This component is designed to separate child component rendering using the
+	 * level-up state method, mainly for solving performance issue. But when parent
+	 * pushing down new data to be rendered, the version conflicts. So each time
+	 * this component update state, it also try hook up the state.
+	 * (Using props' data for rendering will loose local changes as parent can't
+	 * find out the changes)
+	 */
+	setStateHooked(obj) {
+		Object.assign(this.state, obj);
+		if (this.stateHook && this.stateHook.collect)
+			this.stateHook.collect(this.props.record);
+		this.setState({});
 	}
 
 	validate(invalidStyle) {
@@ -158,7 +179,7 @@ export class TRecordFormComp extends CrudCompW {
 				inputProps={f.style ? { style: f.style } : undefined}
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
-					this.setState({ dirty : true });
+					that.setStateWithHook({ dirty : true });
 				}}
 			/>);
 		}

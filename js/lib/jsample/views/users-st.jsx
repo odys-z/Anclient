@@ -38,7 +38,7 @@ class UserstComp extends CrudCompW {
 	};
 
 	tier = undefined;
-	recHook = {collect: undefined};
+	formHook = {collect: undefined};
 
 	constructor(props) {
 		super(props);
@@ -131,10 +131,12 @@ class UserstComp extends CrudCompW {
 
 	toEdit(e, v) {
 		let that = this;
+		let pkv = [...this.state.selected.Ids][0];
+		this.tier.pkval = pkv;
 		this.recForm = (<UserDetailst crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
-			recId={[...this.state.selected.Ids][0]}
+			recId={pkv}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
@@ -171,7 +173,7 @@ class UserstComp extends CrudCompW {
 
 			<AnTablistLevelUp pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
-				stateHook={this.recHook}
+				stateHook={this.formHook}
 				selectedIds={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
@@ -225,7 +227,7 @@ class UsersQuery extends React.Component {
 	}
 }
 UsersQuery.propTypes = {
-	// seems no tier is needed?
+	// no tier is needed?
 	uri: PropTypes.string.isRequired,
 	onQuery: PropTypes.func.isRequired
 }
@@ -284,8 +286,6 @@ class UsersTier {
 		let req = client.userReq(this.uri, 'userstier',
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.rec) );
-
-		// let reqBd = req.Body();
 
 		client.commit(req,
 			(resp) => {

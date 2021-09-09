@@ -72,7 +72,7 @@ const styles = theme => ({
   },
 });
 
-class UserDetailsComp extends React.Component {
+class UserDetailsComp extends DetailFormW {
 	state = {
 		crud: Protocol.CRUD.r,
 		dirty: false,

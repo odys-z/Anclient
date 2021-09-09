@@ -2,14 +2,15 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Card, TextField, Typography } from '@material-ui/core';
+import PropTypes from "prop-types";
 
 import {
 	L, toBool,
     AnClient, SessionClient, Protocol, UserReq, AnsonResp,
-    AnContext, AnError, CrudCompW, AnTablistLevelUp,
-	JsampleIcons,
+    AnContext, AnError, CrudCompW, AnTablistLevelUp, AnQueryForm,
+	jsample
 } from 'anclient';
+const { JsampleIcons } = jsample;
 
 const styles = (theme) => ( {
 	root: {
@@ -23,9 +24,14 @@ class MyStudentsComp extends CrudCompW {
 		buttons: {add: true, edit: false, del: false}
 	};
 
+	tier = undefind;
+	formHook = {collect: undefined};
+
 	constructor(props) {
 		super(props);
-		this.mystudentsTier = new MyStudentsTier(this);
+		this.tier = new MyStudentsTier(this);
+
+		this.collect = this.collect.bind(this);
 
 		this.toSearch = this.toSearch.bind(this);
 		this.toAdd = this.toAdd.bind(this);
@@ -35,6 +41,7 @@ class MyStudentsComp extends CrudCompW {
 
 	componentDidMount() {
 		console.log(this.uri);
+		this.tier.setContext(this.context);
 	}
 
 	toSearch(e, query) {
@@ -59,7 +66,7 @@ class MyStudentsComp extends CrudCompW {
 
 	toEdit(e) {
 		let that = this;
-		let tier = this.mystudentsTier;
+		let tier = this.tier;
 		this.recForm =
 			// Design Note: or just have data handled by RecordForm directly?
 			// But is this a good example to solve the css separating problem of query form?
@@ -76,7 +83,7 @@ class MyStudentsComp extends CrudCompW {
 
 	render() {
 		let args = {};
-		let tier = this.mystudentsTier;
+		let tier = this.tier;
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		this.state.condUser.sqlArgs = [this.context.anClient.userInfo.uid];
@@ -127,10 +134,11 @@ MyStudentsComp.contextType = AnContext;
 const MyStudents = withWidth()(withStyles(styles)(MyStudentsComp));
 export { MyStudents, MyStudentsComp  }
 
-class MyStudentsQuery extends AnQueryForm {
+class MyStudentsQuery extends React.Component {
 	conds = [
 		{ name: 'teacher', type: 'text', val: '', label: L('Teacher') },
-		{ name: 'classId', type: 'cbb',  val: '', label: L('Class') },
+		{ name: 'classId', type: 'cbb',  val: '', label: L('Class'),
+		  sk: 'Protocol.sk.cbbOrg', nv: {n: 'text', v: 'value'} },
 		{ name: 'studentName', type: 'text', val: '', label: L('Student') },
 		{ name: 'hasTasks', type: 'switch',  val: false, label: L('Undone Tasks:') },
 	];
@@ -143,7 +151,7 @@ class MyStudentsQuery extends AnQueryForm {
 	collect() {
 		return {
 			studentname: that.conds[0].val ? that.conds[0].val : undefined,
-			classid    : that.conds[1].val ? that.conds[1].val : undefined,
+			classid    : that.conds[1].val ? that.conds[1].val.v : undefined,
 			hasTasks   : that.conds[2].val ? that.conds[2].val : false };
 	}
 
@@ -153,9 +161,10 @@ class MyStudentsQuery extends AnQueryForm {
 	render () {
 		let that = this;
 		return (
-		<AnQueryForm {...props}
+		<AnQueryForm {...this.props}
 			conds={this.conds}
 			query={ (q) => that.props.onQuery(that.collect()) }
+			onSearch={this.props.onQuery}
 			onDone={() => { that.props.onQuery(that.collect()); } }
 		/> );
 	}

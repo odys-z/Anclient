@@ -273,7 +273,7 @@ export const QuizProtocol = {
 			for (let i = 0; i < opts.length; i++)
 				if (opts[i].v === v)
 					return opts[i].n
-			return v;
+			return v; // failed
 		},
 
 		agRenderer: (p) => {
