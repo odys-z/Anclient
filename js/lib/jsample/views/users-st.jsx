@@ -4,18 +4,20 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { L } from '../../../lib/utils/langstr';
-	import { Protocol, UserReq } from '../../../lib/protocol';
-	import { AnConst } from '../../../lib/utils/consts';
-	import { CrudCompW } from '../../../lib/react/crud';
-	import { AnContext, AnError } from '../../../lib/react/reactext';
-	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-	import { AnTablistLevelUp } from '../../../lib/react/widgets/table-list-lu';
-	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
-	import { AnsonResp } from '../../../lib/protocol';
+import { L } from '../../utils/langstr';
+	import { Protocol, UserReq } from '../../protocol';
+	import { AnConst } from '../../utils/consts';
+	import { CrudCompW } from '../../react/crud';
+	import { AnContext, AnError } from '../../react/reactext';
+	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
+	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
+	import { AnQueryForm } from '../../react/widgets/query-form';
+	import { AnsonResp } from '../../protocol';
 	import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details-st';
+
+const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
@@ -36,10 +38,12 @@ class UserstComp extends CrudCompW {
 	};
 
 	tier = undefined;
-	recHook = {collect: undefined};
+	formHook = {collect: undefined};
 
 	constructor(props) {
 		super(props);
+
+		this.state.selected.Ids = new Set();
 
 		this.tier = new UsersTier(this);
 
@@ -49,52 +53,99 @@ class UserstComp extends CrudCompW {
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
+		this.toDel = this.toDel.bind(this);
+		this.del = this.del.bind(this);
 	}
 
 	componentDidMount() {
 		this.tier.setContext(this.context);
 	}
 
+	/** If condts is null, use the last condts to query.
+	 * on succeed: set state.rows.
+	 * @param {object} condts the query conditions collected from query form.
+	 */
 	toSearch(condts) {
-		this.tier.records( condts,
+		let that = this;
+		this.q = condts || this.q;
+		this.tier.records( this.q,
 			(cols, rows) => {
-				this.setState(rows);
+				that.state.selected.Ids.clear();
+				that.setState(rows);
 			} );
 	}
 
 	onTableSelect(rowIds) {
+		// this.state.selected.Ids = rowIds
 		this.setState( {
 			buttons: {
 				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
+				edit: rowIds && rowIds.size === 1,
+				del: rowIds &&  rowIds.size >= 1,
 			},
-			selectedRecIds: rowIds
 		} );
 	}
 
 	toDel(e, v) {
+		let that = this;
+		this.confirm = (
+			<ConfirmDialog title={L('Info')}
+				ok={L('Ok')} cancel={true} open
+				onOk={ that.del }
+				onClose={() => {that.confirm = undefined;} }
+				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
+
+		// that.state.selected.Ids.clear();
+		// this.setState({});
+	}
+
+	del() {
+		let that = this;
+		this.tier.del({
+				uri: this.uri,
+				ids: this.state.selected.Ids },
+			resp => {
+				that.confirm = (
+					<ConfirmDialog title={L('Info')}
+						ok={L('Ok')} cancel={false} open
+						onClose={() => {
+							that.confirm = undefined;
+							that.toSearch();
+						} }
+						msg={L('Deleting Succeed!')} />);
+				// that.state.selected.Ids.clear();
+				// that.setState({});
+				that.toSearch();
+			} );
 	}
 
 	toAdd(e, v) {
 		let that = this;
-		this.roleForm = (<UserDetailst c
+		this.tier.pkval = undefined;
+		this.tier.rec = {};
+
+		this.recForm = (<UserDetailst crud={CRUD.c}
 			uri={this.uri}
-			onOk={(r) => that.toSearch(null, this.q)}
+			tier={this.tier}
+			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
-		this.roleForm = (<UserDetailst u
+		let that = this;
+		let pkv = [...this.state.selected.Ids][0];
+		this.tier.pkval = pkv;
+		this.recForm = (<UserDetailst crud={CRUD.u}
 			uri={this.uri}
-			roleId={this.state.selectedRecIds[0]}
-			onOk={(r) => console.log(r)}
+			tier={this.tier}
+			recId={pkv}
+			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
 
 	closeDetails() {
-		this.roleForm = undefined;
+		this.recForm = undefined;
 		this.setState({});
 	}
 
@@ -125,7 +176,7 @@ class UserstComp extends CrudCompW {
 
 			<AnTablistLevelUp pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
-				stateHook={this.recHook}
+				stateHook={this.formHook}
 				selectedIds={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
@@ -134,6 +185,7 @@ class UserstComp extends CrudCompW {
 				onSelectChange={this.onTableSelect}
 			/>
 			{this.recForm}
+			{this.confirm}
 		</div>);
 	}
 }
@@ -145,8 +197,10 @@ export { Userst, UserstComp }
 class UsersQuery extends React.Component {
 	conds = [
 		{ name: 'userName', type: 'text', val: '', label: L('Student') },
-		{ name: 'orgId',    type: 'cbb',  val: '', label: L('Class'), sk: Protocol.sk.cbbOrg },
-		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Class'), sk: Protocol.sk.cbbRole },
+		{ name: 'orgId',    type: 'cbb',  val: '', label: L('Class'),
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
+		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Class'),
+		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
 
 	constructor(props) {
@@ -176,18 +230,21 @@ class UsersQuery extends React.Component {
 	}
 }
 UsersQuery.propTypes = {
-	// seems no tier is needed?
+	// no tier is needed?
 	uri: PropTypes.string.isRequired,
 	onQuery: PropTypes.func.isRequired
 }
 
 class UsersTier {
 	port = 'userstier';
+	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
 	client = undefined;
 	uri = undefined;
 	rows = [];
+	pkval = undefined;
+	rec = {}; // for leveling up record form, also called record
 
 	constructor(comp) {
 		this.uri = comp.uri || comp.props.uri;
@@ -216,8 +273,6 @@ class UsersTier {
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.records) );
 
-		let reqBd = req.Body();
-
 		client.commit(req,
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
@@ -227,22 +282,73 @@ class UsersTier {
 			this.errCtx);
 	}
 
-	record() {
+	record(conds, onLoad) {
 		if (!this.client) return;
+		let client = this.client;
+		let that = this;
 
-		let bd = this.client.userReq();
+		let req = client.userReq(this.uri, 'userstier',
+					new UserstReq( this.uri, conds )
+					.A(UserstReq.A.rec) );
 
-		let req = this.client.userReq(uri, 'center',
-			new UserstReq( uri, props ).A(UserstReq.A.record) );
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				// that.rows = rows;
+				that.rec = rows && rows[0]; // in level-up, child form editing lost
+				onLoad(cols, rows);
+			},
+			this.errCtx);
 	}
 
-	saveRecord(recHook) {
-		let rec = {};
-		recHook.collect(rec); // rec: {pk, userName, orgId, ...}
+	saveRec(opts, onOk) {
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+		// let { uri, crud, record, relations } = opts;
+		let { uri, crud } = opts;
 
-		let req = this.client.userReq(uri, 'center',
-			new UserstReq( uri, props )
-			.A(rec[this.pk] ? UserstReq.A.update : UserstReq.A.insert) );
+		if (crud === Protocol.CRUD.u && !this.pkval)
+			throw Error("Can't update with null ID.");
+
+		let req = this.client.userReq(uri, 'userstier',
+			// new UserstReq( uri, { record, relations, pk: this.pkval } )
+			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
+			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
+
+		client.commit(req,
+			(resp) => {
+				let bd = resp.Body();
+				if (crud === Protocol.CRUD.c)
+					// NOTE:
+					// resulving auto-k is a typicall semantic processing, don't expose this to caller
+					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+				onOk(resp);
+			},
+			this.errCtx);
+	}
+
+	/**
+	 * @param {Set} ids record id
+	 * @param {function} onOk: function(AnsonResp);
+	 */
+	del(opts, onOk) {
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+		let { uri, ids } = opts;
+
+		if (ids && ids.size > 0) {
+			let req = this.client.userReq(uri, 'userstier',
+				new UserstReq( uri, { deletings: [...ids] } )
+				.A(UserstReq.A.del) );
+
+			client.commit(req, onOk, this.errCtx);
+		}
+	}
+
+	isReadonly(col) {
+		return col.field === this.pk && !!this.pkval;
 	}
 }
 
@@ -262,14 +368,40 @@ class UserstReq extends UserReq {
 		rec: 'rec',
 		update: 'a-u',
 		insert: 'a-c',
+		del: 'a-d',
 	}
 
-	constructor (uri, conds) {
+	constructor (uri, args) {
 		super();
 		this.type = UserstReq.type;
 		this.uri = uri;
-		this.userId = conds.userId;
-		this.userName = conds.userName;
-		this.roleId = conds.roleId;
+		this.userId = args.userId;
+		this.userName = args.userName;
+		this.roleId = args.roleId;
+
+		/// case u
+		this.pk = args.pk;
+		this.record = args.record;
+		this.relations = args.relations;
+
+		// case d
+		this.deletings = args.deletings;
+	}
+}
+
+class Relations /* extends Anson */ {
+
+	constructor() {
+		this.type = "io.odysz.semantic.tier.Relations";
+	}
+
+	collectRelations(rtabl, checkTree) {
+		if (!rtabl)
+			throw Error("Type Relations stands for all relation records of one parent table. Relations already exits.");
+
+		this.rtabl = rtabl;
+		// TODO ...
+		// TODO ...
+		return this;
 	}
 }

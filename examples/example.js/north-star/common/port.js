@@ -4,5 +4,6 @@ export const StarPorts = {
 	quiz: 'quiz.serv',
 	north: 'north.serv',
 	center: 'center.serv',
-	nchart: 'nchart.serv'
+	nchart: 'nchart.serv',
+	userstier: 'users.tier'
 }

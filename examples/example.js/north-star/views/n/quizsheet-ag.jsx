@@ -247,7 +247,7 @@ class QuizsheetComp extends React.Component {
 					record={{qid: this.state.quizId, ... this.state.quiz }} dense />
 			</Box>
 
-			<div className="ag-theme-alpine" style={{height: "76%", width: "92%", margin: "auto"}}>
+			<div className="ag-theme-alpine" style={{height: "74%", width: "92%", margin: "auto"}}>
 				<AnGridsheet
 						rows={this.state.questions}
 						columns={this.columns}
@@ -283,7 +283,7 @@ class QuizsheetComp extends React.Component {
 			let usr = usrs && (usrs.length > 0 || usrs.size > 0);
 			return (
 				<Typography color={ usr ? 'primary' : 'secondary'} >
-					{L('Total polling users: {n}', {n: usrs.size || usrs.length || 0})}
+					{L('Users: {n}', {n: usrs.size || usrs.length || 0})}
 				</Typography>);
 		}
 	}

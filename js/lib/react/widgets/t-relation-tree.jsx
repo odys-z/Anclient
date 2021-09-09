@@ -14,7 +14,7 @@ import Input from '@material-ui/core/Input';
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	import { AnConst } from '../../utils/consts';
-	import { CrudCompW, DetailFormW } from '../crud';
+	import { CrudCompW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
 	import { JsampleIcons } from '../../jsample/styles';
 
@@ -56,7 +56,7 @@ const styles = (theme) => ({
  *
  * See also {@link TRecordFormComp}
  */
-export class TRelationTreeComp extends React.Component {
+export class TRelationTreeComp extends CrudCompW {
 	state = {
 		dirty: false,
 		pk: undefined,
@@ -70,7 +70,7 @@ export class TRelationTreeComp extends React.Component {
 		if (props.stateHook)
 			props.stateHook.collect = function (me) {
 				let that = me;
-				return function(hookObj){
+				return function(hookObj) {
 					hookObj[that.props.mtabl] = that.state.record;
 				}; }(this);
 
@@ -168,7 +168,7 @@ export class TRelationTreeComp extends React.Component {
 
 	formFields(rec, classes) {
 		let fs = [];
-		const isSm = this.props.dense || toBool(super.media.isMd);
+		const isSm = this.props.dense || !toBool(super.media.isMd);
 
 		this.props.fields.forEach( (f, i) => {
 		  if (!f.hide) {
@@ -208,3 +208,7 @@ TRelationTreeComp .propTypes = {
 	dense: PropTypes.bool,
 	enableValidate: PropTypes.bool,
 };
+
+
+const TRelationTree = withWidth()(withStyles(styles)(TRelationTreeComp));
+export { TRelationTree }

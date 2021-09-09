@@ -36,19 +36,21 @@ const styles = (theme) => ( {
 	}
 } );
 
-class AnQueryFormComp extends CrudComp {
+/**
+ * Bind query conditions to React Components.
+ * conds example:
+  [ { type: 'text', val: '', text: 'No', label: 'text condition'},
+    { type: 'autocbb', sk: 'lvl1.domain.jsample',
+      val: AnConst.cbbAllItem,
+      options: [AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
+      label: 'auto complecte'},
+  ]
+ */
+class AnQueryFormComp extends React.Component {
 
 	state = {
 		checked: true,
-		conds: [
-			/* example
-			{ type: 'text', val: '', text: 'No', label: 'text condition'},
-			{ type: 'autocbb', sk: 'lvl1.domain.jsample',
-			  val: AnConst.cbbAllItem,
-			  options: [AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
-			  label: 'auto complecte'},
-			 */
-		]
+		conds: [ ]
 	};
 
 	constructor(props) {
@@ -131,22 +133,11 @@ class AnQueryFormComp extends CrudComp {
 
 	onTxtChange( e, x ) {
 		e.stopPropagation()
-		// let qx = e.currentTarget.id;
-		// qx = parseInt(qx);
-		// this.state.conds[qx].val = e.currentTarget.value;
 		this.state.conds[x].val = e.currentTarget.value;
 	}
 
 	onDateChange(e, ix) {
 		e.stopPropagation();
-
-		// let arr = this.state.conds.map((obj, ix) => {
-		// 	if(ix === index){
-		// 		obj.val = e.currentTarget.value
-		// 	}
-		// 	return obj;
-		// });
-		// this.setState({conds: arr});
 
 		console.log(this.state.conds[ix], e.currentTarget.value);
 		let obj = this.state.conds[ix];
@@ -155,14 +146,6 @@ class AnQueryFormComp extends CrudComp {
 
 	onSwitchChange(e, x) {
 		e.stopPropagation();
-		// let arr = this.state.conds.map((obj, ix) => {
-		// 	if(ix === x){
-		// 		obj.val = e.currentTarget.value
-		// 	}
-		// 	return obj;
-		// });
-		// this.setState({conds: arr});
-
 		this.state.conds[x].val = e.currentTarget.checked;
 	}
 
@@ -182,8 +165,11 @@ class AnQueryFormComp extends CrudComp {
 	}
 
 	toSearch( e ) {
-		/// conds.clean & cond.loading are used for guarding re-entry the query, e.g. when error occured
-		this.state.conds.forEach(
+		// conds.clean & cond.loading are used for guarding re-entry the query, e.g. when error occured
+		// // NOTE:
+		// This complicate design is still not working, due to mulitple asynchronouse callback.
+		// It's a good sign that query form need a special tier.
+		this.state.conds.filter( (c) => !!c ).forEach(
 			(c, x) => {
 				c.clean = false;
 				c.loading = false;
@@ -194,9 +180,11 @@ class AnQueryFormComp extends CrudComp {
 
 	toClear( e ) {
 		if (this.state.conds) {
-			this.state.conds.forEach( (c, x) => {
-				c.val = c.options ? c.options[0] : '';
-			} );
+			this.state.conds
+				.filter( c => !!c )
+				.forEach( (c, x) => {
+					c.val = c.options ? c.options[0] : '';
+				} );
 			this.setState({conds: this.state.conds});
 		}
 	}
@@ -243,19 +231,6 @@ class AnQueryFormComp extends CrudComp {
 			.filter((c, x ) => !!c)
 			.map( (cond, x) => {
 				if (cond.type === 'cbb') {
-					/* TODO FIXME let's use cbb widget, <DatasetCombo />
-					sample usage (north/common/treecards-details):
-					(<DatasetCombo options={[
-						{n: L('Single Opt'), v: 's'},
-						{n: L('Multiple'), v: 'm'},
-						{n: L('Text'), v: 't'} ]}
-						label={f.label} style={f.style}
-						onSelect={ (v) => {
-							rec[f.field] = v.v;
-							that.setState({dirty: true});
-						}}
-					/>)
-					*/
 					let refcbb = React.createRef();
 					let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
 					return (<Autocomplete key={'cbb' + x}
@@ -263,7 +238,7 @@ class AnQueryFormComp extends CrudComp {
 						onChange={ that.onCbbRefChange(refcbb) }
 						onInputChange={ that.onCbbRefChange(refcbb) }
 
-						options={cond.options}
+						options={cond.options || [AnConst.cbbAllItem]}
 						getOptionLabel={ (it) => it ? it.n || '' : '' }
 						getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
 						filter={Autocomplete.caseInsensitiveFilter}

@@ -10,18 +10,8 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
 	jsample
 } from 'anclient';
-const { Domain, Roles, Orgs, Userst, JsampleTheme, SsInfCard } = jsample;
 
-import { StarPorts } from './common/port';
-
-import { Dashboard } from './views/n/dashboard';
-import { Indicators } from './views/n/indicators';
-import { MyClassTree } from './views/n/my-classes';
-import { Quizzes } from './views/n/quizzes';
-import { Polls } from './views/n/polls';
-import { MyStudents } from './views/n/my-students';
-import { MyStatus } from './views/c/status';
-import { MyPolls } from './views/c/my-polls';
+const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, SsInfCard } = jsample;
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -50,7 +40,15 @@ class App extends React.Component {
 		this.state.error = {onError: this.onError, msg: ''};
 		this.state.anClient = new SessionClient();
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
-								.extendPorts(StarPorts);
+								.extendPorts({
+									menu: "menu.serv",
+									userstier: "users.tier"
+								});
+
+		// loaded from dataset.xml
+		Protocol.sk.xvec = 'x.cube.vec';
+		Protocol.sk.cbbOrg = 'org.all';
+		Protocol.sk.cbbRole = 'roles';
 
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
@@ -66,15 +64,8 @@ class App extends React.Component {
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
-			{path: '/sys/users', comp: Userst},
-			{path: '/xv/indicators', comp: Indicators},
-			{path: '/n/dashboard', comp: Dashboard},
-			{path: '/n/indicators', comp: Indicators},
-			{path: '/n/quizzes', comp: Quizzes },
-			{path: '/n/polls', comp: Polls },
-			{path: '/n/my-students', comp: MyStudents},
-			{path: '/c/status', comp: MyStatus },
-			{path: '/c/mypolls', comp: MyPolls }
+			{path: '/sys/users', comp: Users},
+			{path: '/tier/users', comp: Userst},
 		] );
 	}
 

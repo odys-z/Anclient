@@ -14,7 +14,7 @@ import Input from '@material-ui/core/Input';
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	import { AnConst } from '../../utils/consts';
-	import { CrudCompW, DetailFormW } from '../crud';
+	import { CrudCompW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
 	import { JsampleIcons } from '../../jsample/styles';
 
@@ -24,20 +24,11 @@ const styles = (theme) => ({
 	width: '100%',
 	backgroundColor: '#fafafaee'
   },
-  row: {
+  rowBox: {
 	width: '100%',
 	'& :hover': {
 	  backgroundColor: '#ced'
 	}
-  },
-  rowHead: {
-	padding: theme.spacing(1),
-  },
-  folder: {
-	width: '100%'
-  },
-  hide: {
-	display: 'none'
   },
   labelText: {
 	padding: theme.spacing(1),
@@ -51,15 +42,20 @@ const styles = (theme) => ({
 });
 
 /**
- * Tiered record component is designed for UI record layout, automaitcally bind data,
- * resolving FK's auto-cbb. See performance issue: https://stackoverflow.com/a/66934465
+ * A Tiered record component is designed for UI record layout rendering, handling
+ * user action (change text, etc.) in a levle-up style. It's parent's responsibilty
+ * to load all binding data in sychronous.
+ * TRecordForm won't resolving FK's auto-cbb.
+ * But TRecordFormComp do has a state for local udpating, See performance issue:
+ * https://stackoverflow.com/a/66934465
+ *
  * In case of child relation table, this component currently is not planned to supprt.
  * <p>Usally a CRUD process needs to update multiple tables in one transaction,
  * so this component leveled up state for saving. Is this a co-accident with React
  * or is required by semantics?</p>
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  */
-export class TRecordFormComp extends React.Component {
+export class TRecordFormComp extends CrudCompW {
 	state = {
 		dirty: false,
 		pk: undefined,
@@ -70,11 +66,16 @@ export class TRecordFormComp extends React.Component {
 	constructor (props = {}) {
 		super(props);
 
+		// for safety - props can be changed
+		this.state.record = Object.assign({}, props.record);
+
+		this.setStateHooked = this.setStateHooked.bind(this);
 		if (props.stateHook)
 			props.stateHook.collect = function (me) {
 				let that = me;
-				return function(hookObj){
-					hookObj[that.props.mtabl] = that.state.record;
+				return function(hookObj) {
+					// hookObj[that.props.mtabl] = that.state.record;
+					hookObj.record = that.state.record;
 				}; }(this);
 
 		this.state.pkval = props.pkval;
@@ -86,6 +87,21 @@ export class TRecordFormComp extends React.Component {
 	}
 
 	componentDidMount() {
+	}
+
+	/**
+	 * This component is designed to separate child component rendering using the
+	 * level-up state method, mainly for solving performance issue. But when parent
+	 * pushing down new data to be rendered, the version conflicts. So each time
+	 * this component update state, it also try hook up the state.
+	 * (Using props' data for rendering will loose local changes as parent can't
+	 * find out the changes)
+	 */
+	setStateHooked(obj) {
+		Object.assign(this.state, obj);
+		if (this.stateHook && this.stateHook.collect)
+			this.stateHook.collect(this.props.record);
+		this.setState({});
 	}
 
 	validate(invalidStyle) {
@@ -133,7 +149,8 @@ export class TRecordFormComp extends React.Component {
 		if (f.type === 'enum' || f.type === 'cbb') {
 			return (
 				<DatasetCombo uri={this.props.uri}
-					options={f.options} val={rec[f.field]}
+					sk={f.sk} nv={f.nv}
+					options={f.options || []} val={rec[f.field]}
 					label={f.label} style={f.style}
 					onSelect={ (v) => {
 						rec[f.field] = v.v;
@@ -151,19 +168,18 @@ export class TRecordFormComp extends React.Component {
 		else {
 			let type = 'text';
 			if (f.type === 'float' || f.type === 'int')
-				type = 'number'
+				type = 'number';
 			return (
 			<TextField id={f.field} key={f.field}
 				type={f.type || type} disabled={!!f.disabled}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
-				value={ /* console.log(rec, f.field, !rec || rec[f.field] === undefined ? '' : rec[f.field]) && */
-						(!rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field])}
+				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
 				inputProps={f.style ? { style: f.style } : undefined}
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
-					this.setState({ dirty : true });
+					that.setStateWithHook({ dirty : true });
 				}}
 			/>);
 		}
@@ -195,7 +211,7 @@ export class TRecordFormComp extends React.Component {
 		const { classes, width } = this.props;
 		let media = CrudCompW.setWidth(width);
 
-		let rec = this.props.record;
+		let rec = this.state.record;
 
 		return (
 			<Grid container className={classes.root} direction='row'>
@@ -215,3 +231,6 @@ TRecordFormComp.propTypes = {
 	// record: PropTypes.object.isRequired,
 	tier: PropTypes.object.isRequired,
 };
+
+const TRecordForm = withWidth()(withStyles(styles)(TRecordFormComp));
+export { TRecordForm }

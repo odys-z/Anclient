@@ -169,7 +169,7 @@ class PollsComp extends CrudCompW {
 			</Grid>
 
 			<AnTablist
-				className={classes.root} checkbox= {true} pk= "pid"
+				className={classes.root} checkbox={true} pk="pid"
 				columns={[
 					{ text: L('quiz event'),field: "pid",    hide:true },
 					{ text: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
