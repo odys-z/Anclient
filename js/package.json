@@ -1,10 +1,6 @@
 {
   "name": "anclient",
-<<<<<<< HEAD
   "version": "0.9.82",
-=======
-  "version": "0.9.81",
->>>>>>> temp-try
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main": "./lib/an-components.js",
   "directories": {
