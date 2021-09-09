@@ -17,7 +17,7 @@ import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext, AnError } from '../../react/reactext'
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
-	import { TRecordForm } from '../../react/widgets/t-record-form.jsx'
+	import { TRecordForm } from '../../react/widgets/t-record-form-lu.jsx'
 	import { TRelationTree } from '../../react/widgets/t-relation-tree.jsx'
 
 const styles = (theme) => ({
@@ -113,10 +113,11 @@ class UserDetailstComp extends DetailFormW {
 
 	componentDidMount() {
 		if (this.tier.pkval) {
+			let that = this;
 			let cond = {};
 			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows) => {
-				this.state.record = rows[0];
+			this.tier.record(cond, (cols, rows, fkOpts) => {
+				that.setState({record: rows[0]});
 			} );
 		}
 	}

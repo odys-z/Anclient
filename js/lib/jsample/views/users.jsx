@@ -3,15 +3,15 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { L } from '../../../lib/utils/langstr';
-	import { Protocol } from '../../../lib/protocol';
-	import { AnConst } from '../../../lib/utils/consts';
-	import { CrudCompW } from '../../../lib/react/crud';
-	import { AnContext, AnError } from '../../../lib/react/reactext';
-	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-	import { AnTablistLevelUp } from '../../../lib/react/widgets/table-list-lu';
-	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
-	import { AnsonResp } from '../../../lib/protocol';
+import { L } from '../../utils/langstr';
+	import { Protocol } from '../../protocol';
+	import { AnConst } from '../../utils/consts';
+	import { CrudCompW } from '../../react/crud';
+	import { AnContext, AnError } from '../../react/reactext';
+	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
+	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
+	import { AnQueryForm } from '../../react/widgets/query-form';
+	import { AnsonResp } from '../../protocol';
 
 import { JsampleIcons } from '../styles';
 import { UserDetails } from './user-details';
@@ -34,11 +34,12 @@ class UsersComp extends CrudCompW {
 
 		buttons: { add: true, edit: false, del: false},
 
-		th: [{	text: L('User Name'), field: 'userName', checked: true, color: 'primary', className: 'bold' },
-			 {	text: L('uid'), field: 'userId', hide: true, color: 'primary' },
-			 {	text: L('Role'), field: 'roleName', color: 'primary' }],
+		th: [ { text: L('User Name'), field: 'userName', checked: true, color: 'primary', className: 'bold' },
+			  { text: L('uid'), field: 'userId', hide: true, color: 'primary' },
+			  { text: L('Role'), field: 'roleName', color: 'primary' } ],
 
 		pageInf : { page: 0, size: 25, total: 0 },
+		selected: {Ids: new Set()},
 	};
 
 	constructor(props) {
@@ -68,17 +69,20 @@ class UsersComp extends CrudCompW {
 	}
 
 	onTableSelect(rowIds) {
+
+		this.state.selected.Ids = rowIds
+
 		this.setState( {
 			buttons: {
 				add: this.state.buttons.add,
 				edit: rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,
 			},
-			selectedRecIds: rowIds
 		} );
 	}
 
 	toDel(e, v) {
+		console.warn('This component is deprecated, use the tiered version instead.');
 	}
 
 	toAdd(e, v) {
@@ -92,7 +96,7 @@ class UsersComp extends CrudCompW {
 	toEdit(e, v) {
 		this.roleForm = (<UserDetails u
 			uri={this.uri}
-			roleId={this.state.selectedRecIds[0]}
+			roleId={[...this.state.selected.Ids][0]}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
@@ -134,9 +138,11 @@ class UsersComp extends CrudCompW {
 			</Grid>
 
 			<AnTablistLevelUp className={classes.root}
-				pk='a_users'
+				pk='userId'
 				columns={ this.state.th }
 				rows={ this.state.rows }
+				stateHook={this.formHook}
+				selectedIds={this.state.selected}
 				pageInf={ this.state.pageInf }
 				onSelectChange={this.onTableSelect}
 			/>

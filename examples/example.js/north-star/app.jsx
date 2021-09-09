@@ -10,7 +10,7 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
 	jsample
 } from 'anclient';
-const { Domain, Roles, Orgs, Users, JsampleTheme, SsInfCard } = jsample;
+const { Domain, Roles, Orgs, Userst, JsampleTheme, SsInfCard } = jsample;
 
 import { StarPorts } from './common/port';
 
@@ -66,7 +66,7 @@ class App extends React.Component {
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
-			{path: '/sys/users', comp: Users},
+			{path: '/sys/users', comp: Userst},
 			{path: '/xv/indicators', comp: Indicators},
 			{path: '/n/dashboard', comp: Dashboard},
 			{path: '/n/indicators', comp: Indicators},

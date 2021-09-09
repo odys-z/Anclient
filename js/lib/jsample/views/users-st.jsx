@@ -131,10 +131,12 @@ class UserstComp extends CrudCompW {
 
 	toEdit(e, v) {
 		let that = this;
+		let pkv = [...this.state.selected.Ids][0];
+		this.tier.pkval = pkv;
 		this.recForm = (<UserDetailst crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
-			recId={[...this.state.selected.Ids][0]}
+			recId={pkv}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
@@ -284,8 +286,6 @@ class UsersTier {
 		let req = client.userReq(this.uri, 'userstier',
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.rec) );
-
-		// let reqBd = req.Body();
 
 		client.commit(req,
 			(resp) => {

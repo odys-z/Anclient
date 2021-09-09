@@ -36,19 +36,21 @@ const styles = (theme) => ( {
 	}
 } );
 
+/**
+ * Bind query conditions to React Components.
+ * conds example:
+  [ { type: 'text', val: '', text: 'No', label: 'text condition'},
+    { type: 'autocbb', sk: 'lvl1.domain.jsample',
+      val: AnConst.cbbAllItem,
+      options: [AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
+      label: 'auto complecte'},
+  ]
+ */
 class AnQueryFormComp extends React.Component {
 
 	state = {
 		checked: true,
-		conds: [
-			/* example
-			{ type: 'text', val: '', text: 'No', label: 'text condition'},
-			{ type: 'autocbb', sk: 'lvl1.domain.jsample',
-			  val: AnConst.cbbAllItem,
-			  options: [AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
-			  label: 'auto complecte'},
-			 */
-		]
+		conds: [ ]
 	};
 
 	constructor(props) {
@@ -178,9 +180,11 @@ class AnQueryFormComp extends React.Component {
 
 	toClear( e ) {
 		if (this.state.conds) {
-			this.state.conds.forEach( (c, x) => {
-				c.val = c.options ? c.options[0] : '';
-			} );
+			this.state.conds
+				.filter( c => !!c )
+				.forEach( (c, x) => {
+					c.val = c.options ? c.options[0] : '';
+				} );
 			this.setState({conds: this.state.conds});
 		}
 	}

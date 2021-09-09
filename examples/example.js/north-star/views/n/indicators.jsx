@@ -2,7 +2,7 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Card, TextField, Typography } from '@material-ui/core';
+import { Card, Box, TextField, Typography } from '@material-ui/core';
 
 import { L, Langstrs,
     AnClient, SessionClient, Protocol,
@@ -38,7 +38,7 @@ class IndicatorsComp extends CrudCompW {
 				  validator: {min: 0.0}, cols: {sm: 3},
 				  formatter: (n, col) => n.node.weight},
 				{ type: 'formatter', label: L('Question Type'), cols: {sm: 3},
-				  formatter: (rec) => { return readableQtype(rec.node.qtype || rec.node.vtype) } },
+				  formatter: (rec) => { return readableQtype(rec.node.qtype || rec.node.vtype, true) } },
 				{ type: 'actions', label: '', cols: 3}
 			]}
 			fields={[
@@ -61,14 +61,17 @@ class IndicatorsComp extends CrudCompW {
 			detailFormTitle={L('Indicator Details')}
 		/>);
 
+		/**Change qtype to readable component
+		 * @param {string} t qtype
+		 * @return {string} decoded text
+		 */
 		function readableQtype(t) {
-			if (t === 'cate') return L('[Category]');
 			if (t)
 				t = t.toLowerCase();
-			return (
-				<Typography noWrap variant='body2'>
-					{QuizProtocol.Qtype.decode(t)}
-				</Typography>);
+			if (t === 'cate')
+				return L('[Category]');
+			else // can't pu Typography here because it's child of Typography
+				return QuizProtocol.Qtype.decode(t);
 		}
 	}
 }
