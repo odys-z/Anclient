@@ -94,7 +94,7 @@ class UserstComp extends CrudCompW {
 				ok={L('Ok')} cancel={true} open
 				onOk={ that.del }
 				onClose={() => {that.confirm = undefined;} }
-				msg={L('{cnt} records will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
+				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
 
 		// that.state.selected.Ids.clear();
 		// this.setState({});
