@@ -122,6 +122,9 @@ class UserstComp extends CrudCompW {
 
 	toAdd(e, v) {
 		let that = this;
+		this.tier.pkval = undefined;
+		this.tier.rec = {};
+
 		this.recForm = (<UserDetailst crud={CRUD.c}
 			uri={this.uri}
 			tier={this.tier}
@@ -241,6 +244,7 @@ class UsersTier {
 	uri = undefined;
 	rows = [];
 	pkval = undefined;
+	rec = {}; // for leveling up record form, also called record
 
 	constructor(comp) {
 		this.uri = comp.uri || comp.props.uri;
@@ -290,7 +294,8 @@ class UsersTier {
 		client.commit(req,
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				that.rows = rows;
+				// that.rows = rows;
+				that.rec = rows && rows[0]; // in level-up, child form editing lost
 				onLoad(cols, rows);
 			},
 			this.errCtx);
@@ -300,10 +305,15 @@ class UsersTier {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-		let { uri, crud, record, relations } = opts;
+		// let { uri, crud, record, relations } = opts;
+		let { uri, crud } = opts;
+
+		if (crud === Protocol.CRUD.u && !this.pkval)
+			throw Error("Can't update with null ID.");
 
 		let req = this.client.userReq(uri, 'userstier',
-			new UserstReq( uri, { record, relations, pk: this.pkval } )
+			// new UserstReq( uri, { record, relations, pk: this.pkval } )
+			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
 			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
 		client.commit(req,
@@ -312,7 +322,7 @@ class UsersTier {
 				if (crud === Protocol.CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval = bd.resulve(that.mtabl, that.pk, record);
+					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);
@@ -335,6 +345,10 @@ class UsersTier {
 
 			client.commit(req, onOk, this.errCtx);
 		}
+	}
+
+	isReadonly(col) {
+		return col.field === this.pk && !!this.pkval;
 	}
 }
 
@@ -365,8 +379,12 @@ class UserstReq extends UserReq {
 		this.userName = args.userName;
 		this.roleId = args.roleId;
 
+		/// case u
+		this.pk = args.pk;
 		this.record = args.record;
 		this.relations = args.relations;
+
+		// case d
 		this.deletings = args.deletings;
 	}
 }

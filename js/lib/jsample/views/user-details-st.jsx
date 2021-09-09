@@ -23,7 +23,8 @@ import { L } from '../../utils/langstr';
 const styles = (theme) => ({
   root: {
 	// display: 'flex',
-	width: '100%',
+	// width: '100%',
+	maxWidth: 720,
 	margin: 'auto',
 	backgroundColor: '#fafafaee'
   },
@@ -127,6 +128,7 @@ class UserDetailstComp extends DetailFormW {
 
 		let that = this;
 
+		// not used in level-up
 		if (typeof this.recHook.collect === 'function')
 			this.recHook.collect(this.recHook);
 
@@ -137,7 +139,7 @@ class UserDetailstComp extends DetailFormW {
 			{ uri: this.props.uri,
 			  crud: this.state.crud,
 			  pkval: this.props.tier.pkval,
-			  record: this.recHook.record,
+			  // record: this.recHook.record,
 			  relations: this.relHook.relations }, // Array
 			resp => {
 				// NOTE should crud moved to tier, just like the pkval?
@@ -188,8 +190,10 @@ class UserDetailstComp extends DetailFormW {
 				<TRecordForm uri={this.props.uri}
 					tier={this.tier}
 					fields={this.recfields}
-					record={this.state.record}
-					stateHook={this.recHook}/>
+					// record={this.state.record}
+					// record={this.tier.rec}
+					// stateHook={this.recHook}
+				/>
 				{/* <TRelationTree uri={this.props.uri}
 					tier={this.tier}
 					fields={this.relfields}

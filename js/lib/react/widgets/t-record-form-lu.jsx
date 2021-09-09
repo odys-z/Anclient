@@ -54,6 +54,9 @@ const styles = (theme) => ({
  * so this component leveled up state for saving. Is this a co-accident with React
  * or is required by semantics?</p>
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
+ *
+ * FIXME TODO
+ * FIXME TODO if this level-up way works, why not have tier as the common state/data manager?
  */
 export class TRecordFormComp extends CrudCompW {
 	state = {
@@ -66,72 +69,52 @@ export class TRecordFormComp extends CrudCompW {
 	constructor (props = {}) {
 		super(props);
 
-		// for safety - props can be changed
-		// this.state.record = Object.assign({}, props.record);
-		//
-		// this.setStateHooked = this.setStateHooked.bind(this);
-		// if (props.stateHook)
-		// 	props.stateHook.collect = function (me) {
-		// 		let that = me;
-		// 		return function(hookObj) {
-		// 			// hookObj[that.props.mtabl] = that.state.record;
-		// 			hookObj.record = that.state.record;
-		// 		}; }(this);
-
-		// this.state.pkval = props.pkval;
-
+		this.tier = props.tier;
 		this.formFields = this.formFields.bind(this);
 		this.getField = this.getField.bind(this);
-
-		this.validate = this.validate.bind(this);
 	}
 
 	componentDidMount() {
 	}
 
-	setProps(obj) {
-		Object.assign(this.props, obj);
-		this.setState({});
-	}
-
 	// TODO move to tier, because saving action happends there
 	// - where data validated and new way of (altering) rendering are done here
-	validate(invalidStyle) {
-		if (!this.props.enableValidate)
-			return true;
-
-		let that = this;
-
-	    const invalid = Object.assign(invalidStyle || {}, { border: "2px solid red" });
-
-		let valid = true;
-	    this.props.fields.forEach( (f, x) => {
-			f.valid = validField(f, { validator: (v) => !!v });
-			f.style = f.valid ? undefined : invalid;
-			valid &= f.valid;
-	    } );
-		return valid;
-
-		function validField (f, valider) {
-			let v = that.props.record[f.field];
-
-			if (f.type === 'int')
-				if (v === '' || ! Number.isInteger(Number(v))) return false;
-
-			if (typeof valider === 'function')
-				return valider(v);
-			else if (f.validator) {
-				let vd = f.validator;
-				if(vd.notNull && (v === undefined || v === null || v.length === 0))
-					return false;
-				if (vd.len && v && v.length > vd.len)
-					return false;
-				return true;
-			}
-			else // no validator
-				return true;
-		}
-	}
+	// validate(invalidStyle) {
+	// 	if (!this.props.enableValidate)
+	// 		return true;
+	//
+	// 	let that = this;
+	//
+	//     const invalid = Object.assign(invalidStyle || {}, { border: "2px solid red" });
+	//
+	// 	let valid = true;
+	//     this.props.fields.forEach( (f, x) => {
+	// 		f.valid = validField(f, { validator: (v) => !!v });
+	// 		f.style = f.valid ? undefined : invalid;
+	// 		valid &= f.valid;
+	//     } );
+	// 	return valid;
+	//
+	// 	function validField (f, valider) {
+	// 		let v = that.props.record[f.field];
+	//
+	// 		if (f.type === 'int')
+	// 			if (v === '' || ! Number.isInteger(Number(v))) return false;
+	//
+	// 		if (typeof valider === 'function')
+	// 			return valider(v);
+	// 		else if (f.validator) {
+	// 			let vd = f.validator;
+	// 			if(vd.notNull && (v === undefined || v === null || v.length === 0))
+	// 				return false;
+	// 			if (vd.len && v && v.length > vd.len)
+	// 				return false;
+	// 			return true;
+	// 		}
+	// 		else // no validator
+	// 			return true;
+	// 	}
+	// }
 
 	getField(f, rec) {
 		let media = super.media;
@@ -142,11 +125,12 @@ export class TRecordFormComp extends CrudCompW {
 			return (
 				<DatasetCombo uri={this.props.uri}
 					sk={f.sk} nv={f.nv}
+					disabled={!!f.disabled} readOnly={this.tier.isReadonly(f)}
 					options={f.options || []} val={rec[f.field]}
 					label={f.label} style={f.style}
 					onSelect={ (v) => {
 						rec[f.field] = v.v;
-						that.setProps({dirty: true});
+						that.setState({dirty: true});
 					}}
 				/>);
 		}
@@ -163,15 +147,16 @@ export class TRecordFormComp extends CrudCompW {
 				type = 'number';
 			return (
 			<TextField id={f.field} key={f.field}
-				type={f.type || type} disabled={!!f.disabled}
+				type={f.type || type}
+				disabled={!!f.disabled}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
-				inputProps={f.style ? { style: f.style } : undefined}
+				inputProps={{ style: f.style, readOnly: this.tier.isReadonly(f) } }
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
-					that.setProps({ dirty : true });
+					that.setState({dirty: true});
 				}}
 			/>);
 		}
@@ -203,7 +188,7 @@ export class TRecordFormComp extends CrudCompW {
 		const { classes, width } = this.props;
 		let media = CrudCompW.setWidth(width);
 
-		let rec = this.props.record;
+		let rec = this.tier.rec;
 
 		return (
 			<Grid container className={classes.root} direction='row'>
