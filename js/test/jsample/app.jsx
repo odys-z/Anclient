@@ -13,6 +13,9 @@ import { L, Langstrs,
 
 const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, SsInfCard } = jsample;
 
+// import { GPAsheet } from '../../../examples/example.js/north-star/views/n/gpa';
+import { GPAsheet } from './gpa';
+
 /** The application main, context singleton and error handler */
 class App extends React.Component {
 	state = {
@@ -42,7 +45,8 @@ class App extends React.Component {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts({
 									menu: "menu.serv",
-									userstier: "users.tier"
+									userstier: "users.tier",
+									gpatier: "gpa.tier",
 								});
 
 		// loaded from dataset.xml
@@ -60,8 +64,9 @@ class App extends React.Component {
 		}
 
 		// extending CRUD pages
+		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
-			{path: '/sys/domain', comp: Domain},
+			{path: '/sys/domain', comp: GPAsheet},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},

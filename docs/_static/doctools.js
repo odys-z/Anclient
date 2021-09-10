@@ -15,19 +15,6 @@
 $u = _.noConflict();
 
 /**
- * make the code below compatible with browsers without
- * an installed firebug like debugger
-if (!window.console || !console.firebug) {
-  var names = ["log", "debug", "info", "warn", "error", "assert", "dir",
-    "dirxml", "group", "groupEnd", "time", "timeEnd", "count", "trace",
-    "profile", "profileEnd"];
-  window.console = {};
-  for (var i = 0; i < names.length; ++i)
-    window.console[names[i]] = function() {};
-}
- */
-
-/**
  * small helper function to urldecode strings
  *
  * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent#Decoding_query_parameters_from_a_URL

@@ -177,5 +177,5 @@ export function anMultiRowRenderer (param) {
 
 export function AnIndicatorRenderer (param) {
 	if (param.value)
-		return `<p style="line-height: 1.2em" >${param.value.split('\n').join('<br/>')}</p>`;
+		return `<p style="line-height: 1.2em" >Indicators:<br/>${param.value.split('\n').join('<br/>')}</p>`;
 }

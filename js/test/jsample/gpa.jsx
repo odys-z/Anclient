@@ -13,41 +13,55 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 import {
-	L, isEmpty, Protocol,
-	AnContext, DatasetCombo, ConfirmDialog, RecordForm,
-	jsample, Overlay, AnGridsheet, AnIndicatorRenderer
+	L, isEmpty, Protocol, AnsonBody, AnsonResp,
+	AnContext, DatasetCombo, ConfirmDialog, CrudComp,
+	jsample, Overlay, AnGridsheet //, AnIndicatorRenderer
 } from 'anclient';
 const { JsampleIcons } = jsample;
 
+import { AnIndicatorRenderer } from '../../lib/react/widgets/ag-gridsheet';
+
 const styles = (theme) => ({
 	root: {
+		height: "calc(100vh - 16ch)"
 	},
 	actionButton: {
 	}
 });
 
 /**
+ * Bind gpa recodrs to sheet.
+ * First row is gpa average, not editable.
+ * input: tire.rows, kids. kids: [{id, name, average}].
+ *
  * For ag-grid practice, go
  * https://stackblitz.com/edit/ag-grid-react-hello-world-8lxdjj?file=index.js
  * For public results, go
  * https://ag-grid-react-hello-world-8lxdjj.stackblitz.io
  */
-class GPAsheetComp extends CrudCompW {
+class GPAsheetComp extends CrudComp {
 	state = {
 		dirty: false,
+		cols: [],
+		rows: [],
 	};
 
 	constructor (props) {
 		super(props);
 
 		this.tier = new GPATier(this);
+
+		this.bindSheet = this.bindSheet.bind(this);
+		this.toAdd = this.toAdd.bind(this);
+		this.alert = this.alert.bind(this);
+		this.toSave = this.toSave.bind(this);
 	}
 
 	componentDidMount() {
 		console.log(this.props.uri);
 
 		this.tier.setContext(this.context);
-		this.tier.records(this.bindSheet);
+		this.tier.records(null, this.bindSheet);
 	}
 
 	toAdd(e) {
@@ -55,22 +69,32 @@ class GPAsheetComp extends CrudCompW {
 	}
 
 	bindSheet(gpaResp) {
-		let resp = new GPAResp(gpResp.body);
-		let { kids, rows } = GPAResp.GPAs(resp);
+		// Why we have to handle data at both side?
+		// can date been specified by columens? - won't work is not generated
+		let resp = new GPAResp(gpaResp.Body());
+		let { kids, cols, rows } = GPAResp.GPAs(resp);
 
-		let cols = [
-			{ field: 'date', label: L('Date'), wrapText: false, editable: false },
-		];
+		console.log(kids, cols, rows);
+		// let cols = [
+		// 	{ field: 'date', label: L('Date'), wrapText: false, editable: false },
+		// ];
+		let ths = [{ field: 'gday', label: L('DATE'), width: 120, editable: false }];
 
-		kids.forEach( (k, x) => {
-			cols.push(
-				{ field: k.id, label: k.name, width: 120,
-				  cellEditor: 'anNumberEdit',
-				  cellEditorParams: {min: 0, max: 10},
-			 	  cellRenderer: AnIndicatorRenderer } );
-		});
+		let avrow = {gday: ' -- -- '}; // average row
+		kids.filter( k => !!k )
+			.forEach( (k, x) => {
+				ths.push( {
+					field: k.kid, label: k.userName, width: 120,
+					cellEditor: 'anNumberEdit',
+					cellEditorParams: {min: 0, max: 10},
+					cellRenderer: AnIndicatorRenderer } );
 
-		this.setState( { cols, rows, kids } );
+				avrow[k.kid] = k.avg;
+			});
+
+		rows.unshift(kids.rows);
+
+		this.setState( { cols: ths, rows, kids } );
 	}
 
 	alert(msg) {
@@ -87,7 +111,6 @@ class GPAsheetComp extends CrudCompW {
 		e.stopPropagation();
 		let that = this;
 
-		debugger
 		this.quizHook.collect && this.quizHook.collect(this.state);
 
 		if ( that.state.crud === Protocol.CRUD.c ) {
@@ -114,54 +137,47 @@ class GPAsheetComp extends CrudCompW {
 		let props = this.props;
 		let {classes} = props;
 
-		let title = props.title ? props.title : '';
-		let msg = props.msg;
-		let displayCancel = props.cancel === false ? 'none' : 'block';
-		let txtCancel = props.cancel === 'string' ? props.cancel : L('Close');
-		let txtSave = L('Publish');
-
-
-		let usrs = this.state.quizUsers;
-		usrs = usrs && (usrs.length > 0 || usrs.size > 0);
+		// let title = props.title ? props.title : '';
+		// let msg = props.msg;
+		// let displayCancel = props.cancel === false ? 'none' : 'block';
+		// let txtCancel = props.cancel === 'string' ? props.cancel : L('Close');
+		// let txtSave = L('Publish');
 
 		return (
-		  <><div className="ag-theme-alpine" style={{height: "100%", width: "100%", margin: "auto"}}>
+		  <Box className={classes.root}>
+			<div className="ag-theme-alpine" style={{height: "100%", width: "100%", margin: "auto"}}>
+			{this.state.cols && this.state.cols.length &&
 				<AnGridsheet
 					rows={this.state.rows}
-					columns={this.columns}
-					components={
+					columns={this.state.cols}
+					components={ {
 						anNumberEdit: AnNumericEdit
-					}
+					} }
 					contextMenu={{
 						name: L('Show Chart [TODO]'),
 						action: p => { console.log(p); }
 					}}
-				/>
+					rowEditable={AnRowEditableChecker}
+			/>}
 
 				<div style={{textAlign: 'center', background: '#f8f8f8'}}>
 					<Button variant="outlined"
 						className={classes.usersButton}
-						color={ usrs ? 'primary' : 'secondary'}
+						color='primary'
 						onClick={this.toAdd}
 						endIcon={<JsampleIcons.Add />}
 					>{L('Add Row')}
 					</Button>
-					<Button onClick={this.toSave} color="primary">
-						{txtSave}
-					</Button>
-					<Button display={displayCancel} onClick={this.onCancel} color="primary" autoFocus>
-						{txtCancel}
-					</Button>
 				</div>
 			</div>
 			{this.confirm}
-		  </>);
+		  </Box>);
 	}
 }
-QuizsheetComp.contextType = AnContext;
+GPAsheetComp.contextType = AnContext;
 
-const Quizsheet = withStyles(styles)(QuizsheetComp);
-export { Quizsheet, QuizsheetComp };
+const GPAsheet = withStyles(styles)(GPAsheetComp);
+export { GPAsheet, GPAsheetComp };
 
 class GPATier {
 	port = 'gpatier';
@@ -190,11 +206,11 @@ class GPATier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, this.port,
+		let req = client.userReq( this.uri, this.port,
 					new GPAReq( this.uri, conds )
-					.A(UserstReq.A.records) );
+					.A(GPAReq.A.gpas) );
 
-		client.commit(req, resp, this.errCtx);
+		client.commit(req, onLoad, this.errCtx);
 	}
 
 	insertRow() {
@@ -205,7 +221,7 @@ class GPATier {
 
 		let req = client.userReq(uri, this.port,
 						new GPAReq( uri, { gpa, date, kid } )
-						.A(GPAReq.A.gpa) );
+						.A(GPAReq.A.insert) );
 
 		client.commit(req, onOk, this.errCtx);
 	}
@@ -218,7 +234,7 @@ class GPATier {
 
 		let req = client.userReq(uri, this.port,
 						new GPAReq( uri, { gpa, date, kid } )
-						.A(GPAReq.A.gpa) );
+						.A(GPAReq.A.update) );
 
 		client.commit(req, onOk, this.errCtx);
 	}
@@ -235,27 +251,49 @@ class GPATier {
 
 		if (ids && ids.size > 0) {
 			let req = this.client.userReq(uri, this.port,
-				new UserstReq( uri, { deletings: [...ids] } )
-				.A(UserstReq.A.del) );
+				new GPAReq( uri, { deletings: [...ids] } )
+				.A(GPAReq.A.del) );
 
 			client.commit(req, onOk, this.errCtx);
 		}
 	}
 }
 
+class GPAResp extends AnsonResp {
+	static type = 'io.oz.ever.conn.n.gpa.GPAResp';
+
+	constructor(jsonbd) {
+		super(jsonbd);
+
+		this.gpas = jsonbd.gpas;
+		this.kids = jsonbd.kids;
+		this.cols = jsonbd.cols;
+	}
+
+	static GPAs(body) {
+		let gpas = AnsonResp.rs2arr(body.gpas);
+		let kids = AnsonResp.rs2arr(body.kids);
+		return {kids: kids.rows, cols: gpas.cols, rows: gpas.rows};
+	}
+}
+
 class GPAReq extends AnsonBody {
-	static type = 'io....GPAReq';
+	static type = 'io.oz.ever.conn.n.gpa.GPAReq';
 	static __init__ = function () {
 		// Design Note:
 		// can we use dynamic Protocol?
-		Protocol.registerBody(UserstReq.type, (jsonBd) => {
-			return new UserstReq(jsonBd);
+		Protocol.registerBody(GPAReq.type, (jsonBd) => {
+			return new GPAReq(jsonBd);
+		});
+		// because resp arrived before register triggered
+		Protocol.registerBody(GPAResp.type, (jsonBd) => {
+			return new GPAResp(jsonBd);
 		});
 		return undefined;
 	}();
 
 	static A = {
-		gpa: 'r/gpa',
+		gpas: 'r/gpas',
 		update: 'u',
 		insert: 'c',
 		del: 'd',
@@ -263,18 +301,8 @@ class GPAReq extends AnsonBody {
 
 	constructor(opts) {
 		super();
-	}
-}
 
-class GPAResp extends AnsonResp {
-	constructor() {
-		super();
-	}
-
-	static GPAs(body) {
-		let gpas = AnsonResp.rs2arr(body.gpas());
-		let kids = AnsonResp.rs2arr(body.kids());
-		return {kids: kids.rows, rows: gpas.rows};
+		this.type = GPAReq.type;
 	}
 }
 
@@ -364,4 +392,8 @@ class AnNumericEdit {
     const charStr = String.fromCharCode(charCode);
     return this.isCharNumeric(charStr);
   }
+}
+
+function AnRowEditableChecker(p) {
+	return p.row > 0;
 }

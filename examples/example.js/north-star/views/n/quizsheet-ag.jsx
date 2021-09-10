@@ -192,7 +192,6 @@ class QuizsheetComp extends React.Component {
 		e.stopPropagation();
 		let that = this;
 
-		debugger
 		this.quizHook.collect && this.quizHook.collect(this.state);
 
 		if ( that.state.crud === Protocol.CRUD.c ) {
