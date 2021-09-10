@@ -55,6 +55,9 @@ class GPAsheetComp extends CrudComp {
 		this.toAdd = this.toAdd.bind(this);
 		this.alert = this.alert.bind(this);
 		this.toSave = this.toSave.bind(this);
+
+		this.changeLastDay = this.changeLastDay.bind(this);
+		this.rowEditableChecker = this.rowEditableChecker.bind(this);
 	}
 
 	componentDidMount() {
@@ -65,35 +68,41 @@ class GPAsheetComp extends CrudComp {
 	}
 
 	toAdd(e) {
-		console.log(e);
+		let r = Object.assign({}, this.avrow);
+		r.gday = new Date().toISOString().substr(0, 10);
+
+		// using stat.rows all because data are handled at both client and server.
+		this.state.rows.push(r);
+
+		this.api.setRowData(this.state.rows);
 	}
 
 	bindSheet(gpaResp) {
 		// Why we have to handle data at both side?
-		// can date been specified by columens? - won't work is not generated
+		// can date been specified as columens? - won't work if not generated (for js)
 		let resp = new GPAResp(gpaResp.Body());
 		let { kids, cols, rows } = GPAResp.GPAs(resp);
 
-		console.log(kids, cols, rows);
-		// let cols = [
-		// 	{ field: 'date', label: L('Date'), wrapText: false, editable: false },
-		// ];
-		let ths = [{ field: 'gday', label: L('DATE'), width: 120, editable: false }];
+		let ths = [{ field: 'gday', label: L('DATE'), width: 120,
+					editable: this.rowEditableChecker,
+					onCellEditingStopped: this.changeLastDay }];
 
-		let avrow = {gday: ' -- -- '}; // average row
+		this.avrow = {gday: L('mean / median')}; // average row
 		kids.filter( k => !!k )
 			.forEach( (k, x) => {
 				ths.push( {
 					field: k.kid, label: k.userName, width: 120,
 					cellEditor: 'anNumberEdit',
+					editable: this.rowEditableChecker,
 					cellEditorParams: {min: 0, max: 10},
 					cellRenderer: AnIndicatorRenderer } );
 
-				avrow[k.kid] = k.avg;
+				this.avrow[k.kid] = k.avg;
 			});
 
-		rows.unshift(kids.rows);
+		rows.unshift(this.avrow);
 
+		// state.rows !== tier.rows
 		this.setState( { cols: ths, rows, kids } );
 	}
 
@@ -107,41 +116,29 @@ class GPAsheetComp extends CrudComp {
 		this.setState({});
 	}
 
+	changeLastDay(p) {
+		console.log(p);
+	}
+
+	rowEditableChecker(p) {
+		if (p.node.rowIndex > 0 &&
+			p.colDef.field === 'gday' && p.node.rowIndex === this.tier.rows.length - 1) // last gday
+			// last gday is editable
+			return true;
+		else
+			// first average not editable
+			return p.node.rowIndex > 0;
+	}
+
 	toSave(e) {
 		e.stopPropagation();
 		let that = this;
-
-		this.quizHook.collect && this.quizHook.collect(this.state);
-
-		if ( that.state.crud === Protocol.CRUD.c ) {
-			this.jquiz.insert(this.props.uri, this.state,
-				(resp) => {
-					let {quizId, title} = JQuiz.parseResp(resp);
-					if (isEmpty(quizId))
-						console.error ("Something Wrong!");
-					that.state.quiz.qid = quizId;
-					that.state.crud = Protocol.CRUD.u;
-					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
-				});
-		}
-		else {
-			this.jquiz.update(this.props.uri, this.state,
-				(resp) => {
-					let {questions} = JQuiz.parseResp(resp);
-					that.alert(L("Quiz saved!\n\nQuestions number: {questions}", {questions}));
-				});
-		}
 	}
 
 	render () {
+		let that = this;
 		let props = this.props;
 		let {classes} = props;
-
-		// let title = props.title ? props.title : '';
-		// let msg = props.msg;
-		// let displayCancel = props.cancel === false ? 'none' : 'block';
-		// let txtCancel = props.cancel === 'string' ? props.cancel : L('Close');
-		// let txtSave = L('Publish');
 
 		return (
 		  <Box className={classes.root}>
@@ -151,14 +148,19 @@ class GPAsheetComp extends CrudComp {
 					rows={this.state.rows}
 					columns={this.state.cols}
 					components={ {
-						anNumberEdit: AnNumericEdit
+						anNumberEdit: AnNumericEdit,
 					} }
-					contextMenu={{
+					defaultColDef={ {
+						editable: this.rowEditableChecker
+					} }
+					contextMenu={ {
 						name: L('Show Chart [TODO]'),
 						action: p => { console.log(p); }
-					}}
-					rowEditable={AnRowEditableChecker}
-			/>}
+					} }
+					onGridReady={
+						p => that.api = p.api
+					}
+				/>}
 
 				<div style={{textAlign: 'center', background: '#f8f8f8'}}>
 					<Button variant="outlined"
@@ -392,8 +394,4 @@ class AnNumericEdit {
     const charStr = String.fromCharCode(charCode);
     return this.isCharNumeric(charStr);
   }
-}
-
-function AnRowEditableChecker(p) {
-	return p.row > 0;
 }

@@ -49,7 +49,7 @@ export class AnGridsheet extends React.Component {
 		// 		hookObj.cols = that.coldefs;
 		// 	}; }(this);
 
-		let {resizable, editable, singleClickEdit} = props.defaultCol || {};
+		let {resizable, editable, singleClickEdit} = props.defaultColDef || {};
 		this.defaultColDef = Object.assign(
 						this.defaultColDef,
 						{resizable, editable, singleClickEdit});
@@ -155,9 +155,11 @@ export class AnGridsheet extends React.Component {
 		<AgGridReact
 			onCellClicked={this.onCellClicked}
 			columnDefs={this.coldefs}
+			components={this.props.components}
 			defaultColDef={this.defaultColDef}
 			onCellEditingStopped={this.onEditStop}
 			getContextMenuItems={this.getContextMenuItems}
+			onGridReady={this.props.onGridReady}
 			rowData={this.props.rows} >
 		</AgGridReact> );
 	}
@@ -176,6 +178,6 @@ export function anMultiRowRenderer (param) {
 }
 
 export function AnIndicatorRenderer (param) {
-	if (param.value)
-		return `<p style="line-height: 1.2em" >Indicators:<br/>${param.value.split('\n').join('<br/>')}</p>`;
+	if (param)
+		return `<p style="line-height: 1.2em" >[avg] : ${param.value}</p>`;
 }
