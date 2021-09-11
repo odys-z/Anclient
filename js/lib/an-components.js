@@ -58,5 +58,5 @@ export const jsample = {
 	Domain, DomainComp, Orgs, OrgsComp,
 	Roles, RolesComp, RoleDetails, RoleDetailsComp,
 	Users, UsersComp, UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp,
-	Userst, UserstComp, UserDetailst, UserDetailstComp
+	Userst, UserstComp, UserDetailst, UserDetailstComp, UsersQuery, UsersTier, UserstReq
 };

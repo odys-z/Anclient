@@ -235,7 +235,7 @@ UsersQuery.propTypes = {
 	onQuery: PropTypes.func.isRequired
 }
 
-class UsersTier {
+export class UsersTier {
 	port = 'userstier';
 	mtabl = 'a_users';
 	pk = 'userId';
@@ -351,7 +351,7 @@ class UsersTier {
 	}
 }
 
-class UserstReq extends UserReq {
+export class UserstReq extends UserReq {
 	static type = 'io.odysz.jsample.semantier.UserstReq';
 	static __init__ = function () {
 		// Design Note:
@@ -388,7 +388,7 @@ class UserstReq extends UserReq {
 	}
 }
 
-class Relations /* extends Anson */ {
+export class Relations /* extends Anson */ {
 
 	constructor() {
 		this.type = "io.odysz.semantic.tier.Relations";

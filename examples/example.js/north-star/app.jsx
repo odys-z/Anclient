@@ -52,6 +52,9 @@ class App extends React.Component {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts(StarPorts);
 
+		Protocol.sk.cbbOrg = 'org.all';
+		Protocol.sk.cbbRole = 'roles';
+
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
 			this.state = Object.assign(this.state, {

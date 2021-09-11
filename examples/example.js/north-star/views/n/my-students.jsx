@@ -4,6 +4,10 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
+
 import {
 	L, toBool,
     AnClient, SessionClient, Protocol, UserReq, AnsonResp,
@@ -21,17 +25,16 @@ class MyStudentsComp extends CrudCompW {
 	state = {
 		rows: [],
 		query: undefined,
-		buttons: {add: true, edit: false, del: false}
+
+		selected: {Ids: new Set()},
+		buttons: {add: true, edit: false, del: false},
 	};
 
 	tier = undefined;
-	formHook = {collect: undefined};
 
 	constructor(props) {
 		super(props);
 		this.tier = new MyStudentsTier(this);
-
-		this.collect = this.collect.bind(this);
 
 		this.toSearch = this.toSearch.bind(this);
 		this.toAdd = this.toAdd.bind(this);
@@ -86,7 +89,6 @@ class MyStudentsComp extends CrudCompW {
 		let tier = this.tier;
 		const { classes } = this.props;
 		let btn = this.state.buttons;
-		this.state.condUser.sqlArgs = [this.context.anClient.userInfo.uid];
 		return (
 		  <>
 			{/* <AnQueryForm uri={this.uri}
@@ -101,25 +103,26 @@ class MyStudentsComp extends CrudCompW {
 			/> */}
 			<MyStudentsQuery uri={this.uri} onQuery={this.toSearch} />
 
-			<Grid container >
-				<Button item variant="contained" disabled={!btn.add}
+			<Box>
+				<Button variant="contained" disabled={!btn.add}
 					className={classes.crudButton} onClick={this.toAdd}
 					startIcon={<JsampleIcons.DetailPanel />}
 				>{L('Add')}</Button>
-				<Button item variant="contained" disabled={!btn.edit}
+				<Button variant="contained" disabled={!btn.edit}
 					className={classes.crudButton} onClick={this.toEdit}
 					startIcon={<JsampleIcons.DetailPanel />}
 				>{L('Edit')}</Button>
-				<Button item variant="contained" disabled={!btn.del}
+				<Button variant="contained" disabled={!btn.del}
 					className={classes.crudButton} onClick={this.toDel}
 					startIcon={<JsampleIcons.DetailPanel />}
 				>{L('Delete')}</Button>
-			</Grid>
+			</Box>
 
 			<AnTablistLevelUp pk={tier.pk}
 				className={classes.root} checkbox={true}
 				columns={tier.columns()}
 				rows={tier.rows}
+				selectedIds={this.state.selected}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
@@ -138,7 +141,7 @@ class MyStudentsQuery extends React.Component {
 	conds = [
 		{ name: 'teacher', type: 'text', val: '', label: L('Teacher') },
 		{ name: 'classId', type: 'cbb',  val: '', label: L('Class'),
-		  sk: 'Protocol.sk.cbbOrg', nv: {n: 'text', v: 'value'} },
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
 		{ name: 'studentName', type: 'text', val: '', label: L('Student') },
 		{ name: 'hasTasks', type: 'switch',  val: false, label: L('Undone Tasks:') },
 	];
@@ -151,7 +154,7 @@ class MyStudentsQuery extends React.Component {
 	collect() {
 		return {
 			studentname: that.conds[0].val ? that.conds[0].val : undefined,
-			classid    : that.conds[1].val ? that.conds[1].val.v : undefined,
+			classId    : that.conds[1].val ? that.conds[1].val.v : undefined,
 			hasTasks   : that.conds[2].val ? that.conds[2].val : false };
 	}
 
@@ -174,82 +177,87 @@ MyStudentsQuery.propTypes = {
 	onQuery: PropTypes.func.isRequired
 }
 
-class MyStudentsTier {
-	port = 'center';
-	pk = 'kid';
-	client = undefined;
-
-	constructor(comp) {
-		this.client = comp.context.anClient;
-		this.errCtx = comp.context.error;
-	}
-
-	columns() {
-		return [
-			{ text: L('id'), field: "kid", hide: true },
-			{ text: L('Name'), field: "title" },
-			{ text: L('Class'), field: "users" },
-			{ text: L('Emotion'), field: "emotion" },
-			{ text: L('Polls'),  field: "polls" } ];
-	}
-
-	records(conds, onLoad) {
-		let client = this.client;
-		let that = this;
-
-		let req = client.userReq(uri, 'center',
-					new MyStudentsReq( uri, conds )
-					.A(MyStudentsReq.A.records) );
-
-		let reqBd = req.Body();
-		this.state.req = req;
-
-		client.commit(req,
-			(resp) => {
-				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				onLoad(cols, rows);
-			},
-			this.error);
-	}
-
-	record() {
-		let bd = client.userReq();
-
-		let req = this.client.userReq(uri, 'center',
-			new MyStudentsReq( uri, props ).A(MyStudentsReq.A.record) );
-	}
-
-	saveRec(recHook) {
-		let rec = {};
-		recHook.collect(rec); // rec: {pk, userName, orgId, ...}
-
-		let req = this.client.userReq(uri, 'center',
-			new MyStudentsReq( uri, props )
-			.A(rec[this.pk] ? MyStudentsReq.A.update : MyStudentsReq.A.insert) );
-	}
-}
-
-class MyStudentsReq extends UserReq {
-	static type = 'io.oz.ever.conn.n.MyStudentsReq';
-	static __init__ = function () {
-		Protocol.registerBody(MyStudentsReq.type, (jsonBd) => {
-			return new MyStudentsReq(jsonBd);
-		});
-		return undefined;
-	}();
-
-	static A = {
-		records: 'kids',
-		record: 'kid-rec',
-		update: 'kid-u',
-		insert: 'kid-c',
-	}
-
-	constructor (uri, opts) {
-		this.uri = uri;
-		this.teacher = opts.teacher;
-		this.classId = opts.classId;
-		this.studentName = opts.studentName;
-		this.hasTasks = opts.hasTasks;
-	}
-}
+// class MyStudentsTier {
+// 	port = 'center';
+// 	pk = 'kid';
+// 	client = undefined;
+// 	errCtx = undefined;
+//
+// 	constructor(comp) {
+// 		this.comp = comp;
+// 	}
+//
+// 	setContext(context) {
+// 		this.client = context.anClient;
+// 		this.errCtx = context.error;
+// 	}
+//
+// 	columns() {
+// 		return [
+// 			{ text: L('id'), field: "kid", hide: true },
+// 			{ text: L('Name'), field: "title" },
+// 			{ text: L('Class'), field: "users" },
+// 			{ text: L('Emotion'), field: "emotion" },
+// 			{ text: L('Polls'),  field: "polls" } ];
+// 	}
+//
+// 	records(conds, onLoad) {
+// 		let client = this.client;
+// 		let that = this;
+//
+// 		let req = client.userReq(uri, 'center',
+// 					new MyStudentsReq( uri, conds )
+// 					.A(MyStudentsReq.A.records) );
+//
+// 		let reqBd = req.Body();
+// 		this.state.req = req;
+//
+// 		client.commit(req,
+// 			(resp) => {
+// 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+// 				onLoad(cols, rows);
+// 			},
+// 			this.error);
+// 	}
+//
+// 	record() {
+// 		let bd = client.userReq();
+//
+// 		let req = this.client.userReq(uri, 'center',
+// 			new MyStudentsReq( uri, props ).A(MyStudentsReq.A.record) );
+// 	}
+//
+// 	saveRec(recHook) {
+// 		let rec = {};
+// 		recHook.collect(rec); // rec: {pk, userName, orgId, ...}
+//
+// 		let req = this.client.userReq(uri, 'center',
+// 			new MyStudentsReq( uri, props )
+// 			.A(rec[this.pk] ? MyStudentsReq.A.update : MyStudentsReq.A.insert) );
+// 	}
+// }
+//
+// class MyStudentsReq extends UserReq {
+// 	static type = 'io.oz.ever.conn.n.MyStudentsReq';
+// 	static __init__ = function () {
+// 		Protocol.registerBody(MyStudentsReq.type, (jsonBd) => {
+// 			return new MyStudentsReq(jsonBd);
+// 		});
+// 		return undefined;
+// 	}();
+//
+// 	static A = {
+// 		records: 'kids',
+// 		record: 'kid-rec',
+// 		update: 'kid-u',
+// 		insert: 'kid-c',
+// 	}
+//
+// 	constructor (uri, opts) {
+// 		this.uri = uri;
+// 		this.teacher = opts.teacher;
+// 		this.classId = opts.classId;
+// 		this.studentName = opts.studentName;
+// 		this.hasTasks = opts.hasTasks;
+// 	}
+// }
