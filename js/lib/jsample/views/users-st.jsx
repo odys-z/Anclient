@@ -368,6 +368,8 @@ export class UserstReq extends UserReq {
 		update: 'a-u',
 		insert: 'a-c',
 		del: 'a-d',
+
+		mykids: 'r/kids',
 	}
 
 	constructor (uri, args) {

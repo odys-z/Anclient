@@ -6,5 +6,6 @@ export const StarPorts = {
 	center: 'center.serv',
 	nchart: 'nchart.serv',
 	userstier: 'users.tier'
-	mystudentier: 'mykids.tier'
+	// mystudentier: 'mykids.tier'
+	mykidstier: "mykids.tier"
 }

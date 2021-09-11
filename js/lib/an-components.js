@@ -50,7 +50,7 @@ import { RoleDetails, RoleDetailsComp } from './jsample/views/role-details';
 
 import { Users, UsersComp } from './jsample/views/users';
 import { UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp } from './jsample/views/user-details';
-import { Userst, UserstComp } from './jsample/views/users-st';
+import { Userst, UserstComp, UsersTier, UserstReq } from './jsample/views/users-st';
 import { UserDetailst, UserDetailstComp } from './jsample/views/user-details-st';
 
 export const jsample = {
@@ -58,5 +58,5 @@ export const jsample = {
 	Domain, DomainComp, Orgs, OrgsComp,
 	Roles, RolesComp, RoleDetails, RoleDetailsComp,
 	Users, UsersComp, UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp,
-	Userst, UserstComp, UserDetailst, UserDetailstComp, UsersQuery, UsersTier, UserstReq
+	Userst, UserstComp, UserDetailst, UserDetailstComp, UsersTier, UserstReq
 };

@@ -48,6 +48,7 @@ class App extends React.Component {
 									menu: "menu.serv",
 									userstier: "users.tier",
 									gpatier: "gpa.tier",
+									mykidstier: "mykids.tier"
 								});
 
 		// loaded from dataset.xml
@@ -67,7 +68,7 @@ class App extends React.Component {
 		// extending CRUD pages
 		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
-			{path: '/sys/domain', comp: GPAsheet},
+			{path: '/sys/domain', comp: MyStudents},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Users},

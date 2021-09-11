@@ -14,7 +14,7 @@ import {
     AnContext, AnError, CrudCompW, AnTablistLevelUp, AnQueryForm,
 	jsample
 } from 'anclient';
-const { JsampleIcons } = jsample;
+const { JsampleIcons, UsersTier, UserstReq } = jsample;
 
 const styles = (theme) => ( {
 	root: {
@@ -34,7 +34,7 @@ class MyStudentsComp extends CrudCompW {
 
 	constructor(props) {
 		super(props);
-		this.tier = new MyStudentsTier(this);
+		this.tier = new MyKidsTier(this);
 
 		this.toSearch = this.toSearch.bind(this);
 		this.toAdd = this.toAdd.bind(this);
@@ -48,7 +48,7 @@ class MyStudentsComp extends CrudCompW {
 	}
 
 	toSearch(e, query) {
-		this.tier.records( this.state.query,
+		this.tier.mykids( this.state.query,
 			(cols, rows) => {
 				this.setState(rows);
 			} );
@@ -139,9 +139,8 @@ export { MyStudents, MyStudentsComp  }
 
 class MyStudentsQuery extends React.Component {
 	conds = [
-		{ name: 'teacher', type: 'text', val: '', label: L('Teacher') },
 		{ name: 'classId', type: 'cbb',  val: '', label: L('Class'),
-		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
+		  sk: Protocol.sk.cbbTeaching, nv: {n: 'text', v: 'value'} },
 		{ name: 'studentName', type: 'text', val: '', label: L('Student') },
 		{ name: 'hasTasks', type: 'switch',  val: false, label: L('Undone Tasks:') },
 	];
@@ -153,9 +152,9 @@ class MyStudentsQuery extends React.Component {
 
 	collect() {
 		return {
-			studentname: that.conds[0].val ? that.conds[0].val : undefined,
-			classId    : that.conds[1].val ? that.conds[1].val.v : undefined,
-			hasTasks   : that.conds[2].val ? that.conds[2].val : false };
+			studentname: this.conds[0].val ? that.conds[0].val : undefined,
+			classId    : this.conds[1].val ? that.conds[1].val.v: undefined,
+			hasTasks   : this.conds[2].val ? that.conds[2].val : false };
 	}
 
 	/** Design Note:
@@ -177,87 +176,33 @@ MyStudentsQuery.propTypes = {
 	onQuery: PropTypes.func.isRequired
 }
 
-// class MyStudentsTier {
-// 	port = 'center';
-// 	pk = 'kid';
-// 	client = undefined;
-// 	errCtx = undefined;
-//
-// 	constructor(comp) {
-// 		this.comp = comp;
-// 	}
-//
-// 	setContext(context) {
-// 		this.client = context.anClient;
-// 		this.errCtx = context.error;
-// 	}
-//
-// 	columns() {
-// 		return [
-// 			{ text: L('id'), field: "kid", hide: true },
-// 			{ text: L('Name'), field: "title" },
-// 			{ text: L('Class'), field: "users" },
-// 			{ text: L('Emotion'), field: "emotion" },
-// 			{ text: L('Polls'),  field: "polls" } ];
-// 	}
-//
-// 	records(conds, onLoad) {
-// 		let client = this.client;
-// 		let that = this;
-//
-// 		let req = client.userReq(uri, 'center',
-// 					new MyStudentsReq( uri, conds )
-// 					.A(MyStudentsReq.A.records) );
-//
-// 		let reqBd = req.Body();
-// 		this.state.req = req;
-//
-// 		client.commit(req,
-// 			(resp) => {
-// 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-// 				onLoad(cols, rows);
-// 			},
-// 			this.error);
-// 	}
-//
-// 	record() {
-// 		let bd = client.userReq();
-//
-// 		let req = this.client.userReq(uri, 'center',
-// 			new MyStudentsReq( uri, props ).A(MyStudentsReq.A.record) );
-// 	}
-//
-// 	saveRec(recHook) {
-// 		let rec = {};
-// 		recHook.collect(rec); // rec: {pk, userName, orgId, ...}
-//
-// 		let req = this.client.userReq(uri, 'center',
-// 			new MyStudentsReq( uri, props )
-// 			.A(rec[this.pk] ? MyStudentsReq.A.update : MyStudentsReq.A.insert) );
-// 	}
-// }
-//
-// class MyStudentsReq extends UserReq {
-// 	static type = 'io.oz.ever.conn.n.MyStudentsReq';
-// 	static __init__ = function () {
-// 		Protocol.registerBody(MyStudentsReq.type, (jsonBd) => {
-// 			return new MyStudentsReq(jsonBd);
-// 		});
-// 		return undefined;
-// 	}();
-//
-// 	static A = {
-// 		records: 'kids',
-// 		record: 'kid-rec',
-// 		update: 'kid-u',
-// 		insert: 'kid-c',
-// 	}
-//
-// 	constructor (uri, opts) {
-// 		this.uri = uri;
-// 		this.teacher = opts.teacher;
-// 		this.classId = opts.classId;
-// 		this.studentName = opts.studentName;
-// 		this.hasTasks = opts.hasTasks;
-// 	}
-// }
+class MyKidsTier extends UsersTier {
+
+	port = 'mykidstier';
+	mtabl = 'n_mykids';
+	// pk = 'userId';
+	// client = undefined;
+	// uri = undefined;
+	// rows = [];
+	// pkval = undefined;
+	// rec = {}; // for leveling up record form, also called record
+
+	mykids(conds, onLoad) {
+		if (!this.client) return;
+
+		let client = this.client;
+		let that = this;
+
+		let req = client.userReq(this.uri, this.port,
+					new UserstReq( this.uri, conds )
+					.A(UserstReq.A.mykids) );
+
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rows = rows;
+				onLoad(cols, rows);
+			},
+			this.errCtx);
+	}
+}
