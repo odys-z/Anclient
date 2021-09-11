@@ -24,7 +24,7 @@ class MyStudentsComp extends CrudCompW {
 		buttons: {add: true, edit: false, del: false}
 	};
 
-	tier = undefind;
+	tier = undefined;
 	formHook = {collect: undefined};
 
 	constructor(props) {
