@@ -103,7 +103,8 @@ class Protocol {
 	Protocol.Port = {	heartbeat: "ping.serv11", echo: "echo.serv11", session: "login.serv11",
 						query: "r.serv11", update: "u.serv11",
 						insert: "c.serv11", delete: "d.serv11",
-						dataset: "ds.serv11", stree: "s-tree.serv11" };
+						dataset: "ds.serv11", stree: "s-tree.serv11",
+					 	semantier: "ds.tier"};
 
 	Protocol.MsgCode = {ok: "ok", exSession: "exSession", exSemantic: "exSemantic",
 						exIo: "exIo", exTransct: "exTransct", exDA: "exDA",
@@ -193,6 +194,10 @@ class AnsonMsg {
 			}
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
 				body = new AnDatasetResp(body);
+			else if (body.type = "io.odysz.semantic.tier.DatasetierReq")
+				body = new DatasetierReq(body);
+			else if (body.type = "io.odysz.semantic.tier.DatasetierResp")
+				body = new DatasetierResp(body);
 			else if (body.type in Protocol.ansonTypes)
 				// TODO FIXME what happens if the other known types are all handled like this?
 				body = Protocol.ansonTypes[body.type](body);
@@ -329,7 +334,7 @@ class AnsonResp extends AnsonBody {
 		if (this.map && this.map.resulved) {
 			return this.map.resulved[tabl][pk];
 		}
-		else return clientRec[pk]; 
+		else return clientRec[pk];
 	}
 
 	static hasColumn(rs, colname) {
@@ -1025,9 +1030,28 @@ class DatasetReq extends QueryReq {
 	}
 }
 
+class DatasetierReq extends AnsonBody {
+
+	constructor(opts) {
+		super(opts);
+		this.type = "io.odysz.semantic.tier.DatasetierReq";
+	}
+
+	static A = {
+		sks: 'r/sks',
+	}
+}
+
+class DatasetierResp extends AnsonResp {
+	constructor(dsJson) {
+		super(dsJson);
+		this.type = "io.odysz.semantic.tier.DatasetierResp";
+	}
+}
+
 ///////////////// END //////////////////////////////////////////////////////////
 export {
 	Jregex, Protocol, AnsonMsg, AnsonBody, AnHeader,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
-	AnsonResp, DatasetReq, stree_t
+	AnsonResp, DatasetReq, stree_t, DatasetierReq
 }

@@ -52,8 +52,10 @@ class App extends React.Component {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts(StarPorts);
 
+		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
+		Protocol.sk.cbbMyClass = 'north.my-class';
 
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {

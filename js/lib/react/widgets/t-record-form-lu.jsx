@@ -77,44 +77,11 @@ export class TRecordFormComp extends CrudCompW {
 	componentDidMount() {
 	}
 
-	// TODO move to tier, because saving action happends there
-	// - where data validated and new way of (altering) rendering are done here
-	// validate(invalidStyle) {
-	// 	if (!this.props.enableValidate)
-	// 		return true;
-	//
-	// 	let that = this;
-	//
-	//     const invalid = Object.assign(invalidStyle || {}, { border: "2px solid red" });
-	//
-	// 	let valid = true;
-	//     this.props.fields.forEach( (f, x) => {
-	// 		f.valid = validField(f, { validator: (v) => !!v });
-	// 		f.style = f.valid ? undefined : invalid;
-	// 		valid &= f.valid;
-	//     } );
-	// 	return valid;
-	//
-	// 	function validField (f, valider) {
-	// 		let v = that.props.record[f.field];
-	//
-	// 		if (f.type === 'int')
-	// 			if (v === '' || ! Number.isInteger(Number(v))) return false;
-	//
-	// 		if (typeof valider === 'function')
-	// 			return valider(v);
-	// 		else if (f.validator) {
-	// 			let vd = f.validator;
-	// 			if(vd.notNull && (v === undefined || v === null || v.length === 0))
-	// 				return false;
-	// 			if (vd.len && v && v.length > vd.len)
-	// 				return false;
-	// 			return true;
-	// 		}
-	// 		else // no validator
-	// 			return true;
-	// 	}
-	// }
+	/** Should be called by form, because saving action happends there
+	 * - where data validated and new way of (altering) rendering are done here
+	 */
+	validate(invalidStyle) {
+	}
 
 	getField(f, rec) {
 		let media = super.media;
