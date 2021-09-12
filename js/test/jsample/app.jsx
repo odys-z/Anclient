@@ -7,11 +7,15 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { L, Langstrs,
 	Protocol, SessionClient,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt,
+	AnContext, AnError, AnReactExt, Semantier,
 	jsample
 } from 'anclient';
 
 const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, SsInfCard } = jsample;
+
+// import { GPAsheet } from '../../../examples/example.js/north-star/views/n/gpa';
+// import { GPAsheet } from './gpa';
+// import { MyStudents } from './my-students';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -39,16 +43,6 @@ class App extends React.Component {
 		// design: will load anclient from localStorage
 		this.state.error = {onError: this.onError, msg: ''};
 		this.state.anClient = new SessionClient();
-		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
-								.extendPorts({
-									menu: "menu.serv",
-									userstier: "users.tier"
-								});
-
-		// loaded from dataset.xml
-		Protocol.sk.xvec = 'x.cube.vec';
-		Protocol.sk.cbbOrg = 'org.all';
-		Protocol.sk.cbbRole = 'roles';
 
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
@@ -59,13 +53,33 @@ class App extends React.Component {
 			});
 		}
 
+		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
+								.extendPorts({
+									menu: "menu.serv",
+									datasetier: "dataset.tier",
+									userstier: "users.tier",
+									gpatier: "gpa.tier",
+									mykidstier: "mykids.tier"
+								});
+
+		// loaded from dataset.xml
+		this.state.anClient.getSks('semantier', (sks) => {Object.assign(Protocol.sk, sks)});
+		Protocol.sk.xvec = 'x.cube.vec';
+		Protocol.sk.cbbOrg = 'org.all';
+		Protocol.sk.cbbRole = 'roles';
+		Protocol.sk.cbbMyClass = 'north.my-class';
+
 		// extending CRUD pages
+		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
-			{path: '/sys/users', comp: Users},
+			// {path: '/sys/users', comp: Users},
+			{path: '/sys/users', comp: Userst},
 			{path: '/tier/users', comp: Userst},
+
+			// {path: '/n/my-students', comp: MyStudents},
 		] );
 	}
 

@@ -27,9 +27,9 @@ class CrudComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 
-CrudComp.propTypes = {
-	uri: PropTypes.string.isRequired
-};
+// CrudComp.propTypes = {
+// 	uri: PropTypes.string.isRequired
+// };
 
 /**
  * <pre>CrudCompW.prototype.media = {

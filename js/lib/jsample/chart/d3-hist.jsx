@@ -12,7 +12,6 @@ import { L } from '../../../lib/utils/langstr';
 	import { CrudComp } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-	import { AnQueryForm } from '../../../lib/react/widgets/query-form';
 	import { AnsonResp } from '../../../lib/protocol';
 
 	import { RoleDetails } from './role-details';

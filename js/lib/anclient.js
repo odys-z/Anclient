@@ -2,7 +2,7 @@
 import $ from 'jquery';
 import AES from './aes.js';
 import {
-	Protocol, AnsonMsg, AnHeader, AnsonResp,
+	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
 	DatasetReq
 } from './protocol.js';
@@ -622,6 +622,17 @@ class SessionClient {
 		return jmsg;
 	}
 
+	getSks(port, onLoad) {
+		let req = this.userReq(null, port,
+					new DatasetierReq( )
+					.A(DatasetierReq.A.sks) );
+
+		this.commit(req,
+			(resp) => {
+				onLoad(resp.Body().sks);
+			} );
+	}
+
 	/**Use this to delete multiple records where pkn = pks[i]
 	 * @param {string} mtabl delete from the table
 	 * @param {string} pkn delete from the table
@@ -710,6 +721,7 @@ class SessionClient {
 				onError(c, e);
 		});
 	}
+
 }
 
 /**Client without session information.
@@ -721,6 +733,7 @@ class Inseclient {
 }
 
 export * from './protocol.js';
+export * from './semantier.js';
 export * from './cheapflow/cheap-req.js';
 export * from './cheapflow/cheap-client.js';
 export * from './utils/consts.js';

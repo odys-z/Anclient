@@ -29,6 +29,7 @@ export * from './react/widgets/dataset-combo';
 export * from './react/widgets/my-icon';
 export * from './react/widgets/my-info';
 export * from './react/widgets/query-form';
+export * from './react/widgets/query-form-st';
 export * from './react/widgets/table-list';
 export * from './react/widgets/table-list-lu';
 export * from './react/widgets/tabs';
@@ -39,7 +40,7 @@ export * from './react/widgets/tree-editor';
 
 export * from './react/widgets/record-form';
 export * from './react/widgets/simple-form';
-export * from './react/widgets/t-record-form';
+export * from './react/widgets/t-record-form-lu';
 export * from './react/widgets/t-relation-tree';
 
 import { JsampleIcons, JsampleTheme } from './jsample/styles';
@@ -50,7 +51,7 @@ import { RoleDetails, RoleDetailsComp } from './jsample/views/role-details';
 
 import { Users, UsersComp } from './jsample/views/users';
 import { UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp } from './jsample/views/user-details';
-import { Userst, UserstComp } from './jsample/views/users-st';
+import { Userst, UserstComp, UsersTier, UserstReq } from './jsample/views/users-st';
 import { UserDetailst, UserDetailstComp } from './jsample/views/user-details-st';
 
 export const jsample = {
@@ -58,5 +59,5 @@ export const jsample = {
 	Domain, DomainComp, Orgs, OrgsComp,
 	Roles, RolesComp, RoleDetails, RoleDetailsComp,
 	Users, UsersComp, UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp,
-	Userst, UserstComp, UserDetailst, UserDetailstComp
+	Userst, UserstComp, UserDetailst, UserDetailstComp, UsersTier, UserstReq
 };

@@ -4,13 +4,13 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import { L } from '../../../lib/utils/langstr';
-	import { AnConst } from '../../../lib/utils/consts';
-	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
-	import { CrudCompW } from '../../../lib/react/crud'
-	import { AnContext, AnError } from '../../../lib/react/reactext'
-	import { AnTreegrid } from '../../../lib/react/widgets/treegrid.jsx'
-	import { AnQueryForm } from '../../../lib/react/widgets/query-form.jsx'
+import { L } from '../../utils/langstr';
+	import { AnConst } from '../../utils/consts';
+	import { Protocol, AnsonResp } from '../../protocol.js'
+	import { CrudCompW } from '../../react/crud'
+	import { AnContext, AnError } from '../../react/reactext'
+	import { AnTreegrid } from '../../react/widgets/treegrid.jsx'
+	import { AnQueryForm } from '../../react/widgets/query-form.jsx'
 
 const styles = (theme) => ( {
 	root: {

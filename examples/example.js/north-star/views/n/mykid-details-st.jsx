@@ -11,14 +11,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { L } from '../../utils/langstr';
-	import { Protocol } from '../../protocol';
-	import { DetailFormW } from '../../react/crud';
-	import { AnConst } from '../../utils/consts';
-	import { AnContext, AnError } from '../../react/reactext'
-	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
-	import { TRecordForm } from '../../react/widgets/t-record-form-lu.jsx'
-	import { TRelationTree } from '../../react/widgets/t-relation-tree.jsx'
+import { L, AnConst,
+	Protocol,
+	AnContext, AnError,
+	DetailFormW, ConfirmDialog,
+	TRecordForm } from 'anclient';
 
 const styles = (theme) => ({
   root: {
@@ -57,16 +54,13 @@ const styles = (theme) => ({
 /**
  * Tiered record form is a component for UI record layout, automaitcally bind data,
  * resolving FK's auto-cbb. As to child relation table, this component currently
- * is not planned to supprt. See performance issue: https://stackoverflow.com/a/66934465
- * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
+ * is not planned to supprt.
+ * <p>A kid always been saved as a "Dynamo"</p>
  */
-class UserDetailstComp extends DetailFormW {
+class KidDetailstComp extends DetailFormW {
 	state = {
 		record: {},
 	};
-
-	recHook = {record: undefined, relations: [], collect: undefined}
-	relHook = {record: undefined, relations: [], collect: undefined}
 
 	// NOTE
 	// DESGIN MEMO: user use this to customize the css & items to be visualized
@@ -74,12 +68,14 @@ class UserDetailstComp extends DetailFormW {
 	recfields = [
 		{ type: 'text', field: 'userId', label: L('Log ID'),
 		  validator: {len: 12, notNull: true} },
-		{ type: 'text', field: 'userName', label: L('User Name') },
+		{ type: 'text', field: 'userName', label: L('User Name'),
+		  validator: {len: 32, notNull: true} },
 		{ type: 'password', field: 'pswd', label: L('Password'),
-		  validator: {notNull: true} },
-		{ type: 'cbb', field: 'roleId', label: L('Role'),
+		  validator: {minlen: 6, notNull: true} },
+		{ type: 'cbb', field: 'orgId', label: L('Class'),
 		  grid: {md: 5}, style: {marginTop: "8px", width: 220 },
-		  sk: 'roles', nv: {n: 'text', v: 'value'} },  // only one role, multiple org
+		  sk: Protocol.sk.cbbMyClass, nv: {n: 'text', v: 'nid'},
+		  validator: {notNull: true} },
 	];
 
 	relfields = [
@@ -128,26 +124,19 @@ class UserDetailstComp extends DetailFormW {
 
 		let that = this;
 
-		// not used in level-up
-		if (typeof this.recHook.collect === 'function')
-			this.recHook.collect(this.recHook);
-
-		if (typeof this.relHook.collect === 'function')
-			this.relHook.collect(this.relHook);
-
-		this.tier.saveRec(
-			{ uri: this.props.uri,
-			  crud: this.state.crud,
-			  pkval: this.props.tier.pkval,
-			  // record: this.recHook.record,
-			  relations: this.relHook.relations }, // Array
-			resp => {
-				// NOTE should crud moved to tier, just like the pkval?
-				if (that.state.crud === Protocol.CRUD.c) {
-					that.state.crud = Protocol.CRUD.u;
-				}
-				that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
-			} );
+		if (this.tier.validate(this.tier.rec, this.recfields)) // field style updated
+			this.tier.saveRec(
+				{ uri: this.props.uri,
+				  crud: this.state.crud,
+				  pkval: this.props.tier.pkval }, // Array
+				resp => {
+					// NOTE should crud moved to tier, just like the pkval?
+					if (that.state.crud === Protocol.CRUD.c) {
+						that.state.crud = Protocol.CRUD.u;
+					}
+					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
+				} );
+		else this.setState({});
 	}
 
 	toCancel (e) {
@@ -171,9 +160,9 @@ class UserDetailstComp extends DetailFormW {
 
 		let c = this.state.crud === Protocol.CRUD.c;
 		let u = this.state.crud === Protocol.CRUD.u;
-		let title = c ? L('Create User')
-					  : u ? L('Edit User')
-					  : L('User Details');
+		let title = c ? L('Create Account')
+					  : u ? L('Edit Student')
+					  : L('Student Details');
 
 		let rec = this.state.record;
 
@@ -211,8 +200,9 @@ class UserDetailstComp extends DetailFormW {
 		</>);
 	}
 }
+KidDetailstComp.contextType = AnContext;
 
-UserDetailstComp.propTypes = {
+KidDetailstComp.propTypes = {
 	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
 	tier: PropTypes.object.isRequired,
 	crud: PropTypes.string.isRequired,
@@ -220,5 +210,5 @@ UserDetailstComp.propTypes = {
 	dense: PropTypes.bool
 };
 
-const UserDetailst = withWidth()(withStyles(styles)(UserDetailstComp));
-export { UserDetailst, UserDetailstComp };
+const KidDetailst = withWidth()(withStyles(styles)(KidDetailstComp));
+export { KidDetailst, KidDetailstComp };
