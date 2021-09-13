@@ -11,6 +11,7 @@ import {
 
 import { Histogram } from '../../d3charts/histogram'
 import { Heatgrid } from '../../d3charts/heat-grid'
+import { CorreloGPA } from '../../d3charts/correlo-gpa'
 
 const styles = (theme) => ( {
 	root: {
@@ -45,16 +46,22 @@ class DashboardComp extends CrudCompW {
 		return (
 		  <Grid container>
 			<Grid item md={6} >
-			<Histogram uri={this.uri}
-				size={{width: 460, height: 400}}
-				stateHook={this.histogramHook}
-			/>
+				<Histogram uri={this.uri}
+					size={{width: 460, height: 400}}
+					tier={this.emotionTier}
+				/>
 			</Grid>
 			<Grid item md={6} >
-			<Heatgrid uri={this.uri}
-				size={{width: 460, height: 400}}
-				stateHook={this.histogramHook}
-			/>
+				<Heatgrid uri={this.uri}
+					size={{width: 460, height: 400}}
+					tier={this.eventsTier}
+				/>
+			</Grid>
+			<Grid item md={6} >
+				<CorreloGPA uri={this.uri}
+					size={{width: 460, height: 400}}
+					tier={this.gpaTier}
+				/>
 			</Grid>
 		</Grid>);
 	}
