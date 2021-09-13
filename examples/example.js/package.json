@@ -5,7 +5,7 @@
   "main": "",
   "scripts": {
     "build": "echo \"cd react-quiz, webpack\"",
-    "test": "echo \"This is not working currently\""
+    "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
   "author": "Odys Zhou",
   "license": "MIT",
@@ -39,7 +39,7 @@
     "@material-ui/styles": "^4.11.4",
     "ag-grid-community": "^26.0.0",
     "ag-grid-react": "^26.0.0",
-    "anclient": "^0.9.84",
+    "anclient": "^0.9.86",
     "core-js": "^3.17.2",
     "d3": "^7.0.1",
     "react": "^17.0.2",
