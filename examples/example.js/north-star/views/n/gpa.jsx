@@ -52,10 +52,11 @@ class GPAsheetComp extends CrudComp {
 		this.bindSheet = this.bindSheet.bind(this);
 		this.toAdd = this.toAdd.bind(this);
 		this.alert = this.alert.bind(this);
-		this.toSave = this.toSave.bind(this);
+		// this.toSave = this.toSave.bind(this);
 
 		this.changeLastDay = this.changeLastDay.bind(this);
 		this.rowEditableChecker = this.rowEditableChecker.bind(this);
+		this.changeGPA = this.changeGPA.bind(this);
 	}
 
 	componentDidMount() {
@@ -91,6 +92,7 @@ class GPAsheetComp extends CrudComp {
 
 		// using stat.rows all because data are handled at both client and server.
 		this.state.rows.push(r);
+		this.state.addingNew = true;
 
 		this.api.setRowData(this.state.rows);
 
@@ -120,6 +122,7 @@ class GPAsheetComp extends CrudComp {
 					field: k.kid, label: k.userName, width: 120,
 					cellEditor: 'anNumberEdit',
 					editable: this.rowEditableChecker,
+					anEditStop: this.changeGPA,
 					cellEditorParams: {min: 0, max: 10},
 					cellRenderer: AnIndicatorRenderer } );
 
@@ -143,11 +146,9 @@ class GPAsheetComp extends CrudComp {
 	}
 
 	changeLastDay(p) {
-		console.log(p);
-
 		let rowIndex = this.state.rows.length - 1;
 		// last gday is always editable
-		if (p.node.rowIndex > 0 &&
+		if (this.state.addingNew && p.node.rowIndex > 0 &&
 			p.colDef.field === 'gday' && p.node.rowIndex === rowIndex) {
 
 			let that = this;
@@ -156,9 +157,22 @@ class GPAsheetComp extends CrudComp {
 					oldGday: p.oldValue,
 					gpaRow: p.data },
 				e => {
-					that.setState({})
+					that.setState({addingNew: false})
 				});
 		}
+	}
+
+	changeGPA(p) {
+		console.log(p);
+
+		let gday = p.data.gday;
+		let kid = p.colDef.field;
+
+		this.tier.updateCell( {
+					uri: this.uri,
+					gday, kid,
+					gpa: p.value },
+				e => { });
 	}
 
 	rowEditableChecker(p) {
@@ -169,11 +183,6 @@ class GPAsheetComp extends CrudComp {
 		else
 			// first average not editable
 			return p.node.rowIndex > 0;
-	}
-
-	toSave(e) {
-		e.stopPropagation();
-		let that = this;
 	}
 
 	render () {
@@ -266,7 +275,7 @@ class GPATier {
 		let { uri, gpaRow, oldGday } = opts;
 
 		let req = client.userReq(uri, this.port,
-						new GPAReq( {uri, gpaRow, gday: oldGday } )
+						new GPAReq( {uri, gpaRow, gday: oldGday} )
 						.A(GPAReq.A.updateRow) );
 
 		client.commit(req, onOk, this.errCtx);
@@ -276,10 +285,10 @@ class GPATier {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-		let { uri, date, kid, gpa } = opts;
+		let { uri, gday, kid, gpa } = opts;
 
 		let req = client.userReq(uri, this.port,
-						new GPAReq( uri, { gpa, date, kid } )
+						new GPAReq( {uri, gpa, gday, kid} )
 						.A(GPAReq.A.update) );
 
 		client.commit(req, onOk, this.errCtx);
@@ -354,6 +363,6 @@ class GPAReq extends AnsonBody {
 		this.gpaRow = opts.gpaRow;
 		this.kid = opts.kid;
 		this.gpa = opts.gpa;
-		this.dgay = opts.dgay;
+		this.gday = opts.gday;
 	}
 }
