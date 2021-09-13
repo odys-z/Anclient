@@ -20,6 +20,7 @@ import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStudents } from './views/n/my-students';
+import { GPAsheet } from './views/n/gpa';
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
 
@@ -78,6 +79,7 @@ class App extends React.Component {
 			{path: '/n/quizzes', comp: Quizzes },
 			{path: '/n/polls', comp: Polls },
 			{path: '/n/my-students', comp: MyStudents},
+			{path: '/n/gpas', comp: GPAsheet},
 			{path: '/c/status', comp: MyStatus },
 			{path: '/c/mypolls', comp: MyPolls }
 		] );
