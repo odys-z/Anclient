@@ -28,13 +28,17 @@ class DashboardComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
+		this.gpaTier = new GPAChartTier();
+
 		this.toSearch = this.toSearch.bind(this);
 	}
 
 	histogramHook = {};
 
 	componentDidMount() {
-		let that = this;
+		console.log(this.uri);
+
+		this.gpaTier.setContext(this);
 	}
 
 	toSearch(e, query) {
@@ -51,12 +55,12 @@ class DashboardComp extends CrudCompW {
 					tier={this.emotionTier}
 				/>
 			</Grid>
-			<Grid item md={6} >
+			{/* <Grid item md={6} >
 				<Heatgrid uri={this.uri}
 					size={{width: 460, height: 400}}
 					tier={this.eventsTier}
 				/>
-			</Grid>
+			</Grid> */}
 			<Grid item md={6} >
 				<CorreloGPA uri={this.uri}
 					size={{width: 460, height: 400}}

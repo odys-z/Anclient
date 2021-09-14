@@ -80,7 +80,15 @@ class CorreloGPAComp extends React.Component {
 		  .domain(myVars)
 		  .padding(0.0);
 		svg.append("g")
-		  .call(d3.axisLeft(y));
+		  .call(d3.axisLeft(y)
+			.tickSize(-width, 0)
+		);
+
+		svg.selectAll(".tick line")
+			.attr("fill", "#4047")
+			.attr("stroke-width", "1px")
+			.attr("opacity", "0.2")
+			;
 
 		// Build color scale
 		const myColor = d3.scaleLinear()
@@ -93,7 +101,7 @@ class CorreloGPAComp extends React.Component {
 
 		const tooltip = d3.select("#heat")
 			.append("div")
-			.style("opacity", 0.4)
+			.style("opacity", 0.)
 			.attr("class", "tooltip")
 			.style("position", "relative")
 			.style("background-color", "white")
@@ -131,7 +139,7 @@ class CorreloGPAComp extends React.Component {
 				console.log(d, d[0], x(d[0]));
 				return x(d[0]) + x.bandwidth() * 0.5; })
 			.attr("cy", function(d) { return y(d[1]) + y.bandwidth() * 0.5 })
-			.attr("r", (d) => x.bandwidth() * 0.5 * (+d[3] || 3) / maxg )
+			.attr("r", (d) => x.bandwidth() * 0.35 * (+d[3] || 3) / maxg )
 			.style("fill", function(d) { return myColor(d[2])} )
 		.on("mouseover", mouseover)
 		.on("mousemove", mousemove)
