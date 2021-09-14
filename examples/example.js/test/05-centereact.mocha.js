@@ -1,6 +1,7 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, AnsonResp } from '../node_modules/anclient/lib/protocol.js'
 import { CenterResp } from '../north-star/common/protocol.quiz.js'
+import { GPAResp, GPAReq } from '../north-star/views/n/gpa-tier'
 
 const jsonResp = {
   "body": [{
@@ -165,6 +166,63 @@ const myQuiz = {
     }
 }
 
+const gpaResp = {
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "code": "ok", "opts": null, "port": "gpa.tier",
+  "header": null,
+  "body": [
+    { "type": "io.oz.ever.conn.n.gpa.GPAResp",
+      "rs": null,
+      "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+      "a": null,
+      "gpas": {
+        "type": "io.odysz.module.rs.AnResultset",
+        "stringFormats": null,
+        "total": 0, "rowCnt": 3, "colCnt": 8,
+        "colnames": {
+          "FV": [ 4, "fv" ],
+          "VV": [ 8, "vv" ],
+          "GDAY": [ 1, "gday" ],
+          "ODY": [ 6, "ody" ],
+          "V": [ 7, "v" ],
+          "GEORGE": [ 5, "george" ],
+          "ALICE": [ 2, "alice" ],
+          "BECKY": [ 3, "becky" ]
+        },
+        "rowIdx": 0,
+        "results": [
+          [ "2021-09-13", "03", "0", "4", "0", "0", "0", "0" ],
+          [ "2021-09-14", "2", "0", "4", "0", "0", "0", "0" ],
+          [ "2021-09-15", "01", "03", "4", "03", "04", "05", "0" ] ]
+      },
+      "cols": { "fv": 4, "vv": 8, "gday": 1, "ody": 6, "v": 7, "alice": 2, "george": 5, "becky": 3 },
+      "m": null, "map": null, "uri": null,
+      "kids": {
+        "type": "io.odysz.module.rs.AnResultset",
+        "stringFormats": null,
+        "total": 7, "rowCnt": 7, "colCnt": 3,
+        "colnames": {
+          "AVG": [ 1, "avg" ],
+          "KID": [ 3, "kid" ],
+          "USERNAME": [ 2, "userName" ]
+        },
+        "rowIdx": 0,
+        "results": [
+          [ 2, "Alice", "alice" ],
+          [ 1, "Becky Du", "becky" ],
+          [ 4, "v", "fv" ],
+          [ 1, "George", "george" ],
+          [ 1.3333333333333333, "Ody", "ody" ],
+          [ 1.6666666666666667, "v", "v" ],
+          [ 0, "vc", "vv" ]
+        ]
+      }
+    }
+  ],
+  "version": "1.0",
+  "seq": 0
+}
+
 describe('case: [05 Protocol.CenterResp]', () => {
 	it('5.1 [my-polls]', () => {
 		Protocol.registerBody('io.oz.ever.conn.CenterResp', (jsonBd) => {
@@ -202,4 +260,22 @@ describe('case: [05 Protocol.CenterResp]', () => {
 		assert.equal(questions[0].question, "/sys/domain", "3 ---");
 		assert.equal(questions[0].question, "/sys/domain", "3 ---");
 	});
+
+});
+
+describe('case: [05 GPA Respons] AnsonMsg Instantiate', () => {
+    it('5.4 GPAResp', () => {
+
+		Protocol.registerBody('io.oz.ever.conn.n.gpa.GPAResp', (jsonBd) => {
+			return new GPAResp(jsonBd);
+		});
+
+		let resp = new AnsonMsg(gpaResp);
+		let rp = resp.Body();
+		let {cols, rows} = AnsonResp.rs2arr(rp.gpas);
+		assert.equal(cols.length, 8, "1 ---");
+		assert.equal(rows.length, 3, "2 ---");
+		assert.equal(rows[0].gday, '2021-09-13', "3 ---");
+		assert.equal(rows[2].gday, '2021-09-15', "4 ---");
+	} );
 });

@@ -12,6 +12,7 @@ import {
 import { Histogram } from '../../d3charts/histogram'
 import { Heatgrid } from '../../d3charts/heat-grid'
 import { CorreloGPA } from '../../d3charts/correlo-gpa'
+import { Chartier } from '../../d3charts/chartier'
 
 const styles = (theme) => ( {
 	root: {
@@ -28,13 +29,17 @@ class DashboardComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
+		this.gpaTier = new Chartier(this);
+
 		this.toSearch = this.toSearch.bind(this);
 	}
 
 	histogramHook = {};
 
 	componentDidMount() {
-		let that = this;
+		console.log(this.uri);
+
+		this.gpaTier.setContext(this);
 	}
 
 	toSearch(e, query) {
@@ -48,15 +53,15 @@ class DashboardComp extends CrudCompW {
 			<Grid item md={6} >
 				<Histogram uri={this.uri}
 					size={{width: 460, height: 400}}
-					tier={this.emotionTier}
+					tier={this.emotionTier} // TODO refactor
 				/>
 			</Grid>
-			<Grid item md={6} >
+			{/* <Grid item md={6} >
 				<Heatgrid uri={this.uri}
 					size={{width: 460, height: 400}}
 					tier={this.eventsTier}
 				/>
-			</Grid>
+			</Grid> */}
 			<Grid item md={6} >
 				<CorreloGPA uri={this.uri}
 					size={{width: 460, height: 400}}
