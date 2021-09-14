@@ -73,8 +73,7 @@ class App extends React.Component {
 		// extending CRUD pages
 		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
-			// {path: '/sys/domain', comp: Domain},
-			{path: '/sys/domain', comp: GPAsheet},
+			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Userst},
