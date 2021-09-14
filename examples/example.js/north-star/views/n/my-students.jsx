@@ -39,12 +39,9 @@ class MyStudentsComp extends UserstComp {
 
 	constructor(props) {
 		super(props);
-		// this.tier = new MyKidsTier(this);
 
-		// this.toSearch = this.toSearch.bind(this);
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
-		// this.toDel = this.toDel.bind(this);
 	}
 
 	// override works

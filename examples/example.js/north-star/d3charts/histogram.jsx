@@ -13,7 +13,7 @@ import {
     AnContext, AnError, CrudComp, AnReactExt
 } from 'anclient';
 
-import { NChartReq, NChartProtocol } from '../common/protocol.quiz.js';
+import { NChartReq } from './chartier';
 
 const styles = (theme) => ( { } );
 
@@ -36,7 +36,7 @@ class HistogramComp extends React.Component {
 		let client = this.context.anClient;
 		let req = client.userReq(this.props.uri, 'nchart',
 				new NChartReq( this.uri )
-				.A(NChartProtocol.A.happyHist) );
+				.A(NChartReq.A.happyHist) );
 
 		client.commit(req,
 			(resp) => {
@@ -163,7 +163,7 @@ class HistogramComp extends React.Component {
 				.attr("fill", "black") //set the fill here
 				.attr("font-size", "1.4em")
 				.attr("transform",`rotate(90) translate(-${height/2}, 40)`)
-                .text(L('Persons'));
+                .text(L('Kids'));
 
 		svg.append("g")
 			.transition()
