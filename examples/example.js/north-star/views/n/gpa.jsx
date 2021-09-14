@@ -19,6 +19,8 @@ import {
 } from 'anclient';
 const { JsampleIcons } = jsample;
 
+import { GPATier, GPAReq, GPAResp } from './gpa-tier'
+
 const styles = (theme) => ({
 	root: {
 		height: "calc(100vh - 12ch)"
@@ -52,10 +54,11 @@ class GPAsheetComp extends CrudComp {
 		this.bindSheet = this.bindSheet.bind(this);
 		this.toAdd = this.toAdd.bind(this);
 		this.alert = this.alert.bind(this);
-		this.toSave = this.toSave.bind(this);
+		// this.toSave = this.toSave.bind(this);
 
 		this.changeLastDay = this.changeLastDay.bind(this);
 		this.rowEditableChecker = this.rowEditableChecker.bind(this);
+		this.changeGPA = this.changeGPA.bind(this);
 	}
 
 	componentDidMount() {
@@ -91,6 +94,7 @@ class GPAsheetComp extends CrudComp {
 
 		// using stat.rows all because data are handled at both client and server.
 		this.state.rows.push(r);
+		this.state.addingNew = true;
 
 		this.api.setRowData(this.state.rows);
 
@@ -120,6 +124,7 @@ class GPAsheetComp extends CrudComp {
 					field: k.kid, label: k.userName, width: 120,
 					cellEditor: 'anNumberEdit',
 					editable: this.rowEditableChecker,
+					anEditStop: this.changeGPA,
 					cellEditorParams: {min: 0, max: 10},
 					cellRenderer: AnIndicatorRenderer } );
 
@@ -143,11 +148,9 @@ class GPAsheetComp extends CrudComp {
 	}
 
 	changeLastDay(p) {
-		console.log(p);
-
 		let rowIndex = this.state.rows.length - 1;
 		// last gday is always editable
-		if (p.node.rowIndex > 0 &&
+		if (this.state.addingNew && p.node.rowIndex > 0 &&
 			p.colDef.field === 'gday' && p.node.rowIndex === rowIndex) {
 
 			let that = this;
@@ -156,9 +159,22 @@ class GPAsheetComp extends CrudComp {
 					oldGday: p.oldValue,
 					gpaRow: p.data },
 				e => {
-					that.setState({})
+					that.setState({addingNew: false})
 				});
 		}
+	}
+
+	changeGPA(p) {
+		console.log(p);
+
+		let gday = p.data.gday;
+		let kid = p.colDef.field;
+
+		this.tier.updateCell( {
+					uri: this.uri,
+					gday, kid,
+					gpa: p.value },
+				e => { });
 	}
 
 	rowEditableChecker(p) {
@@ -169,11 +185,6 @@ class GPAsheetComp extends CrudComp {
 		else
 			// first average not editable
 			return p.node.rowIndex > 0;
-	}
-
-	toSave(e) {
-		e.stopPropagation();
-		let that = this;
 	}
 
 	render () {
@@ -224,136 +235,3 @@ GPAsheetComp.contextType = AnContext;
 
 const GPAsheet = withStyles(styles)(GPAsheetComp);
 export { GPAsheet, GPAsheetComp };
-
-class GPATier {
-	port = 'gpatier';
-	client = undefined;
-	uri = undefined;
-	kids = [
-		{name: 'Alice Zhou', id: 'alice'},
-		{name: 'George Zhang', id: 'george'},
-		{name: 'James Hu', id: 'james'},
-	];
-	rows = [{date: 'yyyy', alice: 3, george: 5, james: 5}];
-	ths_ = [];
-
-	constructor(comp) {
-		this.uri = comp.uri || comp.props.uri;
-	}
-
-	setContext(context) {
-		this.client = context.anClient;
-		this.errCtx = context.error;
-	}
-
-	records(conds, onLoad) {
-		if (!this.client) return;
-
-		let client = this.client;
-		let that = this;
-
-		let req = client.userReq( this.uri, this.port,
-					new GPAReq( this.uri, conds )
-					.A(GPAReq.A.gpas) );
-
-		client.commit(req, onLoad, this.errCtx);
-	}
-
-	updateRow(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
-		let { uri, gpaRow, oldGday } = opts;
-
-		let req = client.userReq(uri, this.port,
-						new GPAReq( {uri, gpaRow, gday: oldGday } )
-						.A(GPAReq.A.updateRow) );
-
-		client.commit(req, onOk, this.errCtx);
-	}
-
-	updateCell(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
-		let { uri, date, kid, gpa } = opts;
-
-		let req = client.userReq(uri, this.port,
-						new GPAReq( uri, { gpa, date, kid } )
-						.A(GPAReq.A.update) );
-
-		client.commit(req, onOk, this.errCtx);
-	}
-
-	/**
-	 * @param {Set} ids record id
-	 * @param {function} onOk: function(AnsonResp);
-	 */
-	del(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
-		let { uri, ids } = opts;
-
-		if (ids && ids.size > 0) {
-			let req = this.client.userReq(uri, this.port,
-				new GPAReq( uri, { deletings: [...ids] } )
-				.A(GPAReq.A.del) );
-
-			client.commit(req, onOk, this.errCtx);
-		}
-	}
-}
-
-class GPAResp extends AnsonResp {
-	static type = 'io.oz.ever.conn.n.gpa.GPAResp';
-
-	constructor(jsonbd) {
-		super(jsonbd);
-
-		this.gpas = jsonbd.gpas;
-		this.kids = jsonbd.kids;
-		this.cols = jsonbd.cols;
-	}
-
-	static GPAs(body) {
-		let gpas = AnsonResp.rs2arr(body.gpas);
-		let kids = AnsonResp.rs2arr(body.kids);
-		return {kids: kids.rows, cols: gpas.cols, rows: gpas.rows};
-	}
-}
-
-class GPAReq extends AnsonBody {
-	static type = 'io.oz.ever.conn.n.gpa.GPAReq';
-	static __init__ = function () {
-		// Design Note:
-		// can we use dynamic Protocol?
-		Protocol.registerBody(GPAReq.type, (jsonBd) => {
-			return new GPAReq(jsonBd);
-		});
-		// because resp arrived before register triggered
-		Protocol.registerBody(GPAResp.type, (jsonBd) => {
-			return new GPAResp(jsonBd);
-		});
-		return undefined;
-	}();
-
-	static A = {
-		gpas: 'r/gpas',
-		update: 'u',
-		updateRow: 'u/row',
-		insert: 'c',
-		del: 'd',
-	};
-
-	constructor(opts) {
-		super();
-
-		this.type = GPAReq.type;
-
-		this.gpaRow = opts.gpaRow;
-		this.kid = opts.kid;
-		this.gpa = opts.gpa;
-		this.dgay = opts.dgay;
-	}
-}

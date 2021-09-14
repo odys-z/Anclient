@@ -5,7 +5,7 @@
   "main": "",
   "scripts": {
     "build": "echo \"cd react-quiz, webpack\"",
-    "test": "echo \"This is not working currently\""
+    "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
   "author": "Odys Zhou",
   "license": "MIT",

@@ -194,9 +194,9 @@ class AnsonMsg {
 			}
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
 				body = new AnDatasetResp(body);
-			else if (body.type = "io.odysz.semantic.tier.DatasetierReq")
+			else if (body.type === "io.odysz.semantic.tier.DatasetierReq")
 				body = new DatasetierReq(body);
-			else if (body.type = "io.odysz.semantic.tier.DatasetierResp")
+			else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
 				body = new DatasetierResp(body);
 			else if (body.type in Protocol.ansonTypes)
 				// TODO FIXME what happens if the other known types are all handled like this?
@@ -368,17 +368,18 @@ class AnsonResp extends AnsonBody {
 				cols[cx] = cn;
 			}
 
-			rs.results.forEach((r, rx) => {
-				let rw = {};
-				r.forEach((c, cx) => {
-					rw[cols[cx]] = c;
+			rs.results.filter(r => !!r)
+				.forEach((r, rx) => {
+					let rw = {};
+					r.forEach((c, cx) => {
+						rw[cols[cx]] = c;
+					});
+					rows.push(rw);
 				});
-				rows.push(rw);
-			});
 		}
 		else if (rs) {
 			// first line as column index
-			rs.forEach((r, rx) => {
+			rs.filter( r=> !!r ).forEach((r, rx) => {
 				if (rx === 0) {
 					cols = r;
 				}

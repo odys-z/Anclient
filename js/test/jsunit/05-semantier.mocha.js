@@ -1,3 +1,9 @@
+
+import chai from 'chai'
+import { expect, assert } from 'chai'
+
+import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../lib/protocol.js';
+
 const dstier1 = {
 	"type": "io.odysz.semantic.jprotocol.AnsonMsg",
 	"code": "ok",
