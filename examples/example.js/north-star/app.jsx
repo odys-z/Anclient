@@ -20,6 +20,7 @@ import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStudents } from './views/n/my-students';
+import { GPAsheet } from './views/n/gpa';
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
 
@@ -52,6 +53,11 @@ class App extends React.Component {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts(StarPorts);
 
+		Protocol.sk.xvec = 'x.cube.vec';
+		Protocol.sk.cbbOrg = 'org.all';
+		Protocol.sk.cbbRole = 'roles';
+		Protocol.sk.cbbMyClass = 'north.my-class';
+
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
 			this.state = Object.assign(this.state, {
@@ -73,6 +79,7 @@ class App extends React.Component {
 			{path: '/n/quizzes', comp: Quizzes },
 			{path: '/n/polls', comp: Polls },
 			{path: '/n/my-students', comp: MyStudents},
+			{path: '/n/gpas', comp: GPAsheet},
 			{path: '/c/status', comp: MyStatus },
 			{path: '/c/mypolls', comp: MyPolls }
 		] );

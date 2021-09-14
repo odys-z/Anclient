@@ -6,12 +6,13 @@ import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/co
 
 import { L } from '../../utils/langstr';
 	import { Protocol, UserReq } from '../../protocol';
+	import { Semantier } from '../../semantier';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
 	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
-	import { AnQueryForm } from '../../react/widgets/query-form';
+	import { AnQueryst } from '../../react/widgets/query-form-st';
 	import { AnsonResp } from '../../protocol';
 	import { JsampleIcons } from '../styles';
 
@@ -45,7 +46,7 @@ class UserstComp extends CrudCompW {
 
 		this.state.selected.Ids = new Set();
 
-		this.tier = new UsersTier(this);
+		// this.tier = new UsersTier(this);
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
@@ -58,6 +59,13 @@ class UserstComp extends CrudCompW {
 	}
 
 	componentDidMount() {
+		if (!this.tier) {
+			this.getTier()
+		}
+	}
+
+	getTier = () => {
+		this.tier = new UsersTier(this);
 		this.tier.setContext(this.context);
 	}
 
@@ -66,6 +74,11 @@ class UserstComp extends CrudCompW {
 	 * @param {object} condts the query conditions collected from query form.
 	 */
 	toSearch(condts) {
+		// querst.onLoad (query.componentDidMount) event can even early than componentDidMount.
+		if (!this.tier) {
+			this.getTier();
+		}
+
 		let that = this;
 		this.q = condts || this.q;
 		this.tier.records( this.q,
@@ -152,7 +165,7 @@ class UserstComp extends CrudCompW {
 	render() {
 		const { classes } = this.props;
 		let btn = this.state.buttons;
-		let tier = this.tier || {};
+		let tier = this.tier;
 
 		return (<div className={classes.root}>
 			{this.props.funcName || this.props.title || 'Users of Jsample - semantically tiered'}
@@ -174,7 +187,7 @@ class UserstComp extends CrudCompW {
 				>{L('Edit')}</Button>
 			</Grid>
 
-			<AnTablistLevelUp pk={tier.pk}
+			{tier && <AnTablistLevelUp pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				stateHook={this.formHook}
 				selectedIds={this.state.selected}
@@ -183,7 +196,7 @@ class UserstComp extends CrudCompW {
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
-			/>
+			/>}
 			{this.recForm}
 			{this.confirm}
 		</div>);
@@ -199,7 +212,7 @@ class UsersQuery extends React.Component {
 		{ name: 'userName', type: 'text', val: '', label: L('Student') },
 		{ name: 'orgId',    type: 'cbb',  val: '', label: L('Class'),
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Class'),
+		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
 
@@ -221,11 +234,16 @@ class UsersQuery extends React.Component {
 	render () {
 		let that = this;
 		return (
-		<AnQueryForm {...this.props}
+		// <AnQuery {...this.props}
+		// 	conds={this.conds}
+		// 	query={ (q) => that.props.onQuery(that.collect()) }
+		// 	onSearch={this.props.onQuery}
+		// 	onDone={() => { that.props.onQuery(that.collect()); } }
+		// />
+		<AnQueryst {...this.props}
 			conds={this.conds}
-			query={ (q) => that.props.onQuery(that.collect()) }
-			onSearch={this.props.onQuery}
-			onDone={() => { that.props.onQuery(that.collect()); } }
+			onSearch={() => this.props.onQuery(that.collect()) }
+			onLoaded={() => that.props.onQuery(that.collect()) }
 		/> );
 	}
 }
@@ -235,8 +253,8 @@ UsersQuery.propTypes = {
 	onQuery: PropTypes.func.isRequired
 }
 
-class UsersTier {
-	port = 'userstier';
+export class UsersTier extends Semantier {
+	// port = 'userstier';
 	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
@@ -247,6 +265,7 @@ class UsersTier {
 	rec = {}; // for leveling up record form, also called record
 
 	constructor(comp) {
+		super(comp.port || 'userstier');
 		this.uri = comp.uri || comp.props.uri;
 	}
 
@@ -269,7 +288,7 @@ class UsersTier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, 'userstier',
+		let req = client.userReq(this.uri, this.port,
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.records) );
 
@@ -287,7 +306,7 @@ class UsersTier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, 'userstier',
+		let req = client.userReq(this.uri, this.port,
 					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.rec) );
 
@@ -311,8 +330,7 @@ class UsersTier {
 		if (crud === Protocol.CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		let req = this.client.userReq(uri, 'userstier',
-			// new UserstReq( uri, { record, relations, pk: this.pkval } )
+		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
 			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
@@ -339,7 +357,7 @@ class UsersTier {
 		let { uri, ids } = opts;
 
 		if (ids && ids.size > 0) {
-			let req = this.client.userReq(uri, 'userstier',
+			let req = this.client.userReq(uri, this.port,
 				new UserstReq( uri, { deletings: [...ids] } )
 				.A(UserstReq.A.del) );
 
@@ -352,7 +370,7 @@ class UsersTier {
 	}
 }
 
-class UserstReq extends UserReq {
+export class UserstReq extends UserReq {
 	static type = 'io.odysz.jsample.semantier.UserstReq';
 	static __init__ = function () {
 		// Design Note:
@@ -369,15 +387,17 @@ class UserstReq extends UserReq {
 		update: 'a-u',
 		insert: 'a-c',
 		del: 'a-d',
+
+		mykids: 'r/kids',
 	}
 
-	constructor (uri, args) {
+	constructor (uri, args = {}) {
 		super();
 		this.type = UserstReq.type;
 		this.uri = uri;
 		this.userId = args.userId;
 		this.userName = args.userName;
-		this.roleId = args.roleId;
+		this.orgId = args.orgId;
 
 		/// case u
 		this.pk = args.pk;
@@ -389,7 +409,7 @@ class UserstReq extends UserReq {
 	}
 }
 
-class Relations /* extends Anson */ {
+export class Relations /* extends Anson */ {
 
 	constructor() {
 		this.type = "io.odysz.semantic.tier.Relations";

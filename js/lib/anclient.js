@@ -2,7 +2,7 @@
 import $ from 'jquery';
 import AES from './aes.js';
 import {
-	Protocol, AnsonMsg, AnHeader, AnsonResp,
+	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
 	DatasetReq
 } from './protocol.js';
@@ -47,10 +47,6 @@ class AnClient {
 			return;
 		}
 
-		// Protocol can't visited when debugging, but working:
-		// console.log(Protocol.Port);
-		// console.log("Protocol.Port[" + port + "] : " + Protocol.Port[port]);
-
 		var ulr;
 		if (Protocol.Port[port] !== undefined)
 			ulr = this.cfg.defaultServ + '/'
@@ -60,9 +56,6 @@ class AnClient {
 			console.error("The url for the named port is probably not resolved. Call Anclient.understandPorts() or AnReactExt.extendPorts().",
 					"prot: ", port, "url", ulr);
 		}
-
-		// if (this.cfg.connId)
-		// 	ulr += '?conn=' + this.cfg.connId;
 
 		return ulr;
 	}
@@ -304,6 +297,7 @@ class AnClient {
 
     /** Get the rows from jserv's rows.
      * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
+	 * @deprecated
      * @param {AnsonMsg<AnsonResp>} resp
      * @param {ix} the rs index
      * @return {array} array of rows */
@@ -316,6 +310,7 @@ class AnClient {
 	}
 
     /** Get the objects from jserv's rows (response from port returning SResultsets)
+	 * @deprecated
      * @param {AnsonMsg<AnsonResp>} resp
      * @param {int} start start to splice
      * @param {int} len max length
@@ -622,6 +617,17 @@ class SessionClient {
 		return jmsg;
 	}
 
+	getSks(port, onLoad) {
+		let req = this.userReq(null, port,
+					new DatasetierReq( )
+					.A(DatasetierReq.A.sks) );
+
+		this.commit(req,
+			(resp) => {
+				onLoad(resp.Body().sks);
+			} );
+	}
+
 	/**Use this to delete multiple records where pkn = pks[i]
 	 * @param {string} mtabl delete from the table
 	 * @param {string} pkn delete from the table
@@ -710,6 +716,7 @@ class SessionClient {
 				onError(c, e);
 		});
 	}
+
 }
 
 /**Client without session information.
@@ -721,6 +728,7 @@ class Inseclient {
 }
 
 export * from './protocol.js';
+export * from './semantier.js';
 export * from './cheapflow/cheap-req.js';
 export * from './cheapflow/cheap-client.js';
 export * from './utils/consts.js';
