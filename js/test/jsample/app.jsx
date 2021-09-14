@@ -13,10 +13,7 @@ import { L, Langstrs,
 
 const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, SsInfCard } = jsample;
 
-// import { GPAsheet } from '../../../examples/example.js/north-star/views/n/gpa';
 // import { GPAsheet } from './gpa';
-// import { MyStudents } from './my-students';
-import { GPAsheet } from './gpa';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
