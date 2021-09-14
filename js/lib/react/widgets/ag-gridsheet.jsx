@@ -94,9 +94,11 @@ export class AnGridsheet extends React.Component {
 	 * user's menu items defined in props like:
 	 * {"qtype": {name: 'Format Answer', action}, ...}
 	 * where the value of 'qtype' is the ag-gride context menu item:
+	 * @deprecated context menu is a module of ag-grid enterprise.
 	 */
 	getContextMenuItems = (para) =>  {
 		// cellval = param.value;
+		debugger
 		let result = [
 			{ name: 'cell ' + params.value,
 			  action: function () { } },
