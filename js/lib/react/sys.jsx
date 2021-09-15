@@ -27,7 +27,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import {Route} from 'react-router-dom'
 
-import {Protocol} from '../protocol'
+import {Protocol} from '../../semantier/protocol'
 	import {AnContext} from './reactext.jsx';
 	import {ConfirmDialog} from './widgets/messagebox.jsx'
 	import {MyIcon} from './widgets/my-icon.jsx'

@@ -9,8 +9,8 @@ import React from 'react';
 	import FormControl from '@material-ui/core/FormControl';
 	import Box from '@material-ui/core/Box';
 
-import {an, SessionClient} from '..//anclient.js'
-	import {Protocol} from '../protocol'
+import {an, SessionClient} from '../../semantier/anclient.js'
+	import {Protocol} from '../../semantier/protocol'
 	import {AnContext} from './reactext.jsx';
 	import {ConfirmDialog} from './widgets/messagebox.jsx'
 	import {L, Langstrs} from '../utils/langstr.js'

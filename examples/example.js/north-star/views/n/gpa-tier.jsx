@@ -1,7 +1,7 @@
 
 // FOR TEST
 // import { Protocol, AnsonResp, AnsonBody } from '../../../node_modules/anclient/lib/protocol.js';
-import { Protocol, AnsonResp, AnsonBody } from 'anclient';
+import { Protocol, AnsonResp, AnsonBody } from '@anclient/semantier';
 
 export class GPATier {
 	port = 'gpatier';

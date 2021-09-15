@@ -1,6 +1,8 @@
 import { expect, assert } from 'chai'
-import { Protocol, AnsonMsg, AnsonResp } from '../node_modules/anclient/lib/protocol.js'
+// import { Protocol, AnsonMsg, AnsonResp } from '../node_modules/anclient/lib/protocol.js'
+import { Protocol, AnsonMsg, AnsonResp } from '@anclient/semantier';
 import { CenterResp } from '../north-star/common/protocol.quiz.js'
+
 import { GPAResp, GPAReq } from '../north-star/views/n/gpa-tier'
 
 const jsonResp = {

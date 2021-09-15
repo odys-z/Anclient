@@ -6,7 +6,7 @@ import { Card, TextField, Typography } from '@material-ui/core';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
-	import { Protocol, AnsonResp } from '../../protocol.js'
+	import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { CrudCompW } from '../../react/crud'
 	import { AnContext, AnError } from '../../react/reactext'
 	import { AnTreegrid } from '../../react/widgets/treegrid.jsx'

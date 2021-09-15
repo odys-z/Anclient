@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import { L } from '../../utils/langstr';
-	import { Protocol, AnsonResp } from '../../protocol';
+	import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext } from '../reactext.jsx';
 

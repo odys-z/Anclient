@@ -19,7 +19,7 @@ import Input from '@material-ui/core/Input';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
-	import { Protocol, AnsonResp } from '../../protocol';
+	import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext } from '../reactext.jsx';
 	import { AnTreeIcons } from "./tree"

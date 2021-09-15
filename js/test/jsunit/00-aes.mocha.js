@@ -1,6 +1,6 @@
 import chai from 'chai';
 import { expect, assert } from 'chai';
-import AES from '../../lib/aes.js';
+import AES from '../../semantier/aes.js';
 
 describe('case: [00.1 AES]', () => {
     it('[AES] De-encrypt', () => {

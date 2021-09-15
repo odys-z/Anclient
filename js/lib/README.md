@@ -1,7 +1,6 @@
-# About Jclient/js
+# About Anclient.js
 
-This is the anclient/js home page.
-
+Anclient.js/lib is built upon @anclient/semantier, the semantics protocol layer.
 
 ### TIP
 

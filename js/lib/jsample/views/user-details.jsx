@@ -12,7 +12,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
-	import { Protocol } from '../../protocol';
+	import { Protocol } from '../../../semantier/protocol';
 	import { DetailFormW } from '../../react/crud';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext, AnError } from '../../react/reactext';

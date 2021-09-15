@@ -5,10 +5,9 @@ import PropTypes from "prop-types";
 import { Button, Grid, Card, Typography } from '@material-ui/core';
 
 import { L } from '../../utils/langstr';
-	import { Protocol } from '../../protocol';
+	import { Protocol, AnsonResp } from '../../../semantier/protocol';
+	import { Semantier  } from '../../../semantier/semantier';
 	import { AnConst } from '../../utils/consts';
-	import { Semantier  } from '../../semantier';
-	import { AnsonResp } from '../../protocol';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'

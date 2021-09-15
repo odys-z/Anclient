@@ -2,7 +2,7 @@
 import chai from 'chai'
 import { expect, assert } from 'chai'
 
-import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../lib/protocol.js';
+import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../semantier/protocol.js';
 
 const respInsUser = {
   "type": "io.odysz.semantic.jprotocol.AnsonResp",

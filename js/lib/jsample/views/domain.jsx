@@ -6,7 +6,7 @@ import { Card, TextField, Typography } from '@material-ui/core';
 
 import { L } from '../../../lib/utils/langstr';
 	import { AnConst } from '../../../lib/utils/consts';
-	import { Protocol, AnsonResp } from '../../../lib/protocol.js'
+	import { Protocol, AnsonResp } from '../../../semantier/protocol.js'
 	import { CrudCompW } from '../../../lib/react/crud'
 	import { AnContext, AnError } from '../../../lib/react/reactext'
 	import { AnTablist } from '../../../lib/react/widgets/table-list.jsx'

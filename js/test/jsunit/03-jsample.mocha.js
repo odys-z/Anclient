@@ -1,5 +1,5 @@
 import { expect, assert } from 'chai'
-import { Protocol, AnsonMsg, DatasetReq } from '../../lib/protocol.js'
+import { Protocol, AnsonMsg, DatasetReq } from '../../semantier/protocol.js'
 import {parseMenus} from '../../lib/utils/helpers.js'
 
 const dsTestResp = {

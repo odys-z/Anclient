@@ -1,8 +1,8 @@
 import chai from 'chai';
 import { expect, assert } from 'chai';
 
-import {Protocol, AnsonMsg, UpdateReq} from '../../lib/protocol';
-import {AnClient, SessionClient} from '../../lib/anclient';
+import {Protocol, AnsonMsg, UpdateReq} from '../../semantier/protocol';
+import {AnClient, SessionClient} from '../../semantier/anclient';
 import {AnReact} from '../../lib/react/anreact.jsx';
 
 const checkBoxForest = [

@@ -5,15 +5,14 @@ import PropTypes from "prop-types";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { L } from '../../utils/langstr';
-	import { Protocol, UserReq } from '../../protocol';
-	import { Semantier } from '../../semantier';
+	import { Protocol, AnsonResp , UserReq } from '../../../semantier/protocol';
+	import { Semantier } from '../../../semantier/semantier';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
 	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
 	import { AnQueryst } from '../../react/widgets/query-form-st';
-	import { AnsonResp } from '../../protocol';
 	import { JsampleIcons } from '../styles';
 
 	import { UserDetailst } from './user-details';

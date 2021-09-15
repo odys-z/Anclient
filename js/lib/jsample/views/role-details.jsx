@@ -15,10 +15,9 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
 import { L } from '../../utils/langstr';
-	import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../protocol';
+	import { Protocol, AnsonResp, InsertReq, UpdateReq, DeleteReq, stree_t } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext, AnError } from '../../react/reactext'
-	import { AnsonResp } from '../../protocol';
 	import { JsampleIcons } from '../styles'
 	import { DetailFormW } from '../../react/crud'
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'

@@ -4,14 +4,13 @@ import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { L } from '../../utils/langstr';
-	import { Protocol } from '../../protocol';
+	import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
 	import { AnTablist } from '../../react/widgets/table-list';
 	import { AnQueryForm } from '../../react/widgets/query-form';
-	import { AnsonResp } from '../../protocol';
 
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';

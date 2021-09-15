@@ -4,8 +4,8 @@
 import chai from 'chai'
 import { expect, assert } from 'chai'
 
-import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../lib/protocol.js';
-import {AnClient, SessionClient} from '../../lib/anclient.js';
+import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../semantier/protocol.js';
+import {AnClient, SessionClient} from '../../semantier/anclient.js';
 
 
 const resp = {

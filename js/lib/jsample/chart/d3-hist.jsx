@@ -6,13 +6,13 @@ import rd3 from 'react-d3-library';
 const RD3Component = rd3.Component;
 
 import { L } from '../../../lib/utils/langstr';
-	import { Protocol } from '../../../lib/protocol';
+	import { Protocol } from '../../../semantier/protocol';
 	import { AnConst } from '../../../lib/utils/consts';
 	import { JsampleIcons } from '../styles';
 	import { CrudComp } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-	import { AnsonResp } from '../../../lib/protocol';
+	import { AnsonResp } from '../../../semantier/protocol';
 
 	import { RoleDetails } from './role-details';
 
