@@ -25,7 +25,7 @@ import { L } from '../../utils/langstr';
 
 const styles = theme => ({
   dialogPaper: {
-	minHeight: "80vh"
+	minHeight: "40vh"
   },
   root: {},
   title: {

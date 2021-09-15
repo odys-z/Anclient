@@ -202,9 +202,6 @@ class AnsonMsg {
 				// TODO FIXME what happens if the other known types are all handled like this?
 				body = Protocol.ansonTypes[body.type](body);
 			else {
-				// if (Protocol.verbose >= 5)
-				// 	console.warn("Using json object directly as body. Type : " + body.type);
-
 				// server can't handle body without type
 				throw new Error("Error: Using json object directly as body. To extend protocol, register a new Protocol like this:"
 					+ "\nProtocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => { return new QuizResp(jsonBd); });"
@@ -221,7 +218,6 @@ class AnsonMsg {
 		this.seq = json.seq;
 		this.port = json.port;
 
-		// this.version = "0.9";
 		if (!this.seq)
 			this.seq = Math.round(Math.random() * 1000);
 

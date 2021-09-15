@@ -22,8 +22,6 @@ import { L } from '../../utils/langstr';
 
 const styles = (theme) => ({
   root: {
-	// display: 'flex',
-	// width: '100%',
 	maxWidth: 720,
 	margin: 'auto',
 	backgroundColor: '#fafafaee'

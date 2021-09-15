@@ -1,4 +1,8 @@
 
+/**
+ * Base class of semantic tier
+ * @class
+ */
 export class Semantier {
 
 	constructor(port) {

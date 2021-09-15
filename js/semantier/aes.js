@@ -3,7 +3,7 @@
  * AES is just only one of crypto algorithms, so we need make this pluginized so
  * can be overriden by user.
  */
-import AESLib from './opensources/ricmoo-aes-2.js';
+import AESLib from './opensources/ricmoo-aes.js';
 
 /* The ricomoo AES Wrapper.
  * The dependee class is ported from github/ricomoo, the original soruce file doesn't have any license declarations.
