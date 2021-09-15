@@ -65,6 +65,8 @@ class UserDetailstComp extends DetailFormW {
 		record: {},
 	};
 
+	// deprecated:
+	// keep this relic for later optimization reference.
 	recHook = {record: undefined, relations: [], collect: undefined}
 	relHook = {record: undefined, relations: [], collect: undefined}
 
@@ -79,7 +81,8 @@ class UserDetailstComp extends DetailFormW {
 		  validator: {notNull: true} },
 		{ type: 'cbb', field: 'roleId', label: L('Role'),
 		  grid: {md: 5}, style: {marginTop: "8px", width: 220 },
-		  sk: 'roles', nv: {n: 'text', v: 'value'} },  // only one role, multiple org
+		  sk: 'roles', nv: {n: 'text', v: 'value'},
+		  validator: {notNull: true} },
 	];
 
 	relfields = [
@@ -135,19 +138,21 @@ class UserDetailstComp extends DetailFormW {
 		if (typeof this.relHook.collect === 'function')
 			this.relHook.collect(this.relHook);
 
-		this.tier.saveRec(
-			{ uri: this.props.uri,
-			  crud: this.state.crud,
-			  pkval: this.props.tier.pkval,
-			  // record: this.recHook.record,
-			  relations: this.relHook.relations }, // Array
-			resp => {
-				// NOTE should crud moved to tier, just like the pkval?
-				if (that.state.crud === Protocol.CRUD.c) {
-					that.state.crud = Protocol.CRUD.u;
-				}
-				that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
-			} );
+		if (this.tier.validate(this.recHook.record, this.recfields)) // field style updated
+			this.tier.saveRec(
+				{ uri: this.props.uri,
+				  crud: this.state.crud,
+				  pkval: this.props.tier.pkval,
+				  // record: this.recHook.record,
+				  relations: this.relHook.relations }, // Array
+				resp => {
+					// NOTE should crud moved to tier, just like the pkval?
+					if (that.state.crud === Protocol.CRUD.c) {
+						that.state.crud = Protocol.CRUD.u;
+					}
+					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
+				} );
+		else this.setState({});
 	}
 
 	toCancel (e) {

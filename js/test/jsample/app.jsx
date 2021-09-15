@@ -13,9 +13,7 @@ import { L, Langstrs,
 
 const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, SsInfCard } = jsample;
 
-// import { GPAsheet } from '../../../examples/example.js/north-star/views/n/gpa';
 // import { GPAsheet } from './gpa';
-// import { MyStudents } from './my-students';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -75,11 +73,8 @@ class App extends React.Component {
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
-			// {path: '/sys/users', comp: Users},
 			{path: '/sys/users', comp: Userst},
 			{path: '/tier/users', comp: Userst},
-
-			// {path: '/n/my-students', comp: MyStudents},
 		] );
 	}
 
