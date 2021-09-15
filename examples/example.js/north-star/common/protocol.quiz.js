@@ -379,33 +379,6 @@ export class CenterResp extends AnsonResp {
 	}
 }
 
-export const NChartProtocol = {
-	A: {
-		happyHist: "happy-hist",
-	}
-}
-
-export class NChartReq extends AnsonBody {
-	constructor (uri) {
-		super();
-		this.type = "io.oz.ever.conn.n.NChartReq";
-		this.uri = uri;
-	}
-}
-
-export class NChartResp extends AnsonResp {
-	constructor (jsonBody) {
-		super(jsonBody);
-		this.type = "io.oz.ever.conn.n.NChartResp";
-		this.happy = jsonBody.happyhist[0];
-	}
-
-	happyHist() {
-		return AnsonResp.rs2arr(this.happy);
-	}
-
-}
-
 Protocol.registerBody('io.oz.ever.conn.n.NorthResp', (jsonBd) => {
 	return new NorthResp(jsonBd);
 });
@@ -416,8 +389,4 @@ Protocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => {
 
 Protocol.registerBody('io.oz.ever.conn.c.CenterResp', (jsonBd) => {
 	return new CenterResp(jsonBd);
-});
-
-Protocol.registerBody('io.oz.ever.conn.n.NChartResp', (jsonBd) => {
-	return new NChartResp(jsonBd);
 });
