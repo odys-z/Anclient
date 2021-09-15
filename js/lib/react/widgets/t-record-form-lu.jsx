@@ -55,15 +55,13 @@ const styles = (theme) => ({
  * or is required by semantics?</p>
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  *
- * FIXME TODO
- * FIXME TODO if this level-up way works, why not have tier as the common state/data manager?
+ * NOTE: Desgin Memo
+ * Level-up way is working, having tier as the common state/data manager.
  */
 export class TRecordFormComp extends CrudCompW {
 	state = {
 		dirty: false,
 		pk: undefined,
-		// pkval: undefined,
-		// record: {},
 	};
 
 	constructor (props = {}) {
@@ -97,6 +95,7 @@ export class TRecordFormComp extends CrudCompW {
 					label={f.label} style={f.style}
 					onSelect={ (v) => {
 						rec[f.field] = v.v;
+						f.style = undefined;
 						that.setState({dirty: true});
 					}}
 				/>);
@@ -123,6 +122,7 @@ export class TRecordFormComp extends CrudCompW {
 				inputProps={{ style: f.style, readOnly: this.tier.isReadonly(f) } }
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
+					f.style = undefined;
 					that.setState({dirty: true});
 				}}
 			/>);
@@ -165,15 +165,9 @@ export class TRecordFormComp extends CrudCompW {
 }
 
 TRecordFormComp.propTypes = {
-	// uri: PropTypes.string.isRequired,	// because cbb binding needs data access
-	// stateHook: PropTypes.object,		// for readonly this is not required
+	tier: PropTypes.object.isRequired,
 	dense: PropTypes.bool,
 	enableValidate: PropTypes.bool,
-
-	// mtabl:  PropTypes.string.isRequired,
-	// fields: PropTypes.array.isRequired,
-	// record: PropTypes.object.isRequired,
-	tier: PropTypes.object.isRequired,
 };
 
 const TRecordForm = withWidth()(withStyles(styles)(TRecordFormComp));

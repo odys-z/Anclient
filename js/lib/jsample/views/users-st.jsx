@@ -16,7 +16,7 @@ import { L } from '../../utils/langstr';
 	import { AnsonResp } from '../../protocol';
 	import { JsampleIcons } from '../styles';
 
-import { UserDetailst } from './user-details-st';
+import { UserDetailst } from './user-details-st-nolu';
 
 const { CRUD } = Protocol;
 
@@ -39,7 +39,7 @@ class UserstComp extends CrudCompW {
 	};
 
 	tier = undefined;
-	formHook = {collect: undefined};
+	// formHook = {collect: undefined};
 
 	constructor(props) {
 		super(props);
@@ -189,7 +189,7 @@ class UserstComp extends CrudCompW {
 
 			{tier && <AnTablistLevelUp pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
-				stateHook={this.formHook}
+				// stateHook={this.formHook}
 				selectedIds={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
@@ -254,7 +254,6 @@ UsersQuery.propTypes = {
 }
 
 export class UsersTier extends Semantier {
-	// port = 'userstier';
 	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
@@ -324,7 +323,7 @@ export class UsersTier extends Semantier {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-		// let { uri, crud, record, relations } = opts;
+
 		let { uri, crud } = opts;
 
 		if (crud === Protocol.CRUD.u && !this.pkval)
@@ -384,9 +383,9 @@ export class UserstReq extends UserReq {
 	static A = {
 		records: 'records',
 		rec: 'rec',
-		update: 'a-u',
-		insert: 'a-c',
-		del: 'a-d',
+		update: 'u',
+		insert: 'c',
+		del: 'd',
 
 		mykids: 'r/kids',
 	}
