@@ -20,7 +20,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-/**
+/**@deprecated : will be changed to no-lu.
  * Use props.selectedIds for the buffering set to handle selection events.
  *
  * props:

@@ -40,7 +40,7 @@ export * from './react/widgets/tree-editor';
 
 export * from './react/widgets/record-form';
 export * from './react/widgets/simple-form';
-export * from './react/widgets/t-record-form-lu';
+export * from './react/widgets/t-record-form';
 export * from './react/widgets/t-relation-tree';
 
 import { JsampleIcons, JsampleTheme } from './jsample/styles';
@@ -49,15 +49,17 @@ import { Orgs, OrgsComp } from './jsample/views/orgs';
 import { Roles, RolesComp } from './jsample/views/roles';
 import { RoleDetails, RoleDetailsComp } from './jsample/views/role-details';
 
-import { Users, UsersComp } from './jsample/views/users';
-import { UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp } from './jsample/views/user-details';
-import { Userst, UserstComp, UsersTier, UserstReq } from './jsample/views/users-st';
-import { UserDetailst, UserDetailstComp } from './jsample/views/user-details-st';
+// import { Users, UsersComp } from './jsample/views/users';
+// import { UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp } from './jsample/views/user-details';
+import { Userst, UserstComp, UsersTier, UserstReq } from './jsample/views/users';
+import { UserDetailst, UserDetailstComp } from './jsample/views/user-details';
+import { SsInfCard, SsInfCardComp } from './jsample/views/my-info';
 
 export const jsample = {
 	JsampleIcons, JsampleTheme,
 	Domain, DomainComp, Orgs, OrgsComp,
 	Roles, RolesComp, RoleDetails, RoleDetailsComp,
-	Users, UsersComp, UserDetails, UserDetailsComp, SsInfCard, SsInfCardComp,
+	// Users, UsersComp, UserDetails, UserDetailsComp,
+	SsInfCard, SsInfCardComp,
 	Userst, UserstComp, UserDetailst, UserDetailstComp, UsersTier, UserstReq
 };

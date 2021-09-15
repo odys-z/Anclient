@@ -4,3 +4,4 @@ compile-*
 !**/.dockerignore
 !**/dist/*.html
 !**/dist/github.json
+!**/dist/*.ico
