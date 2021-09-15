@@ -205,54 +205,6 @@ class RolesComp extends CrudCompW {
 			/>
 			{this.roleForm}
 			{this.confirm}
-
-			<Card>
-				<Typography variant="h6" gutterBottom>
-					AnClient Notes:
-				</Typography>
-				<Typography variant="subtitle1" gutterBottom>
-					The details form also shows how to collect relation records
-					with help of AnClient.
-				</Typography>
-				<Card>
-					see <Link href='https://github.com/odys-z/Anclient/blob/b3497e4a1bd10dc594953efb4641531d9bb34dc5/js/test/react/views/role-details.jsx'>
-					Jsample source: role-details.jsx</Link>
-					and <Link href='https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/02-anreact.mocha.js'>
-					Unit Test: 02 anreact / checkTree -> relation records</Link>
-				</Card>
-				<Typography variant="h6" gutterBottom>
-					Semantic Checking:
-				</Typography>
-				<Typography variant="subtitle1" gutterBottom>
-					When deleting a role, jsample (the service) checked configured semantics:<pre>
-  					id  :	sys.03
-			  		smtc:	ck-cnt-del
-			  		tabl:	a_roles
-			  		pk  :	roleId
-			  		args:	roleId a_role_func roleId</pre>
-					See <Link href='https://github.com/odys-z/semantic-jserv/blob/master/jserv-sample/src/main/webapp/WEB-INF/semantics-sys.xml'>
-					jsample/semantics-sys.xml</Link>
-				</Typography>
-				<Typography variant="h6" gutterBottom>
-					Style Tips:
-				</Typography>
-				<Typography variant="subtitle1" gutterBottom>
-					This page also shows how to response to media size by jsx component.
-					(TextFields are showing according to width)
-				</Typography>
-				<Card>
-					<Link href='https://codesandbox.io/s/class-with-width-e5pu4?file=/index.js'
-					> Sandbox Test 1: configure theme to change breakpoints </Link>
-				</Card>
-				<Card>
-					<Link href='https://codesandbox.io/s/textfield-dynamic-label-979gc?file=/demo.js'
-					> Sandbox Test 2: using width </Link>
-				</Card>
-				<Card>
-					<Link href='https://codesandbox.io/s/modal-form-text-label-basics-v6okl'
-					> Sandbox Test 3: vertial middle align example </Link>
-				</Card>
-			</Card>
 		</>);
 	}
 }

@@ -25,7 +25,7 @@ import {
 import { MemoryRouter as Router } from 'react-router';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
-import {Route} from 'react-router-dom'
+import { Route } from 'react-router-dom'
 
 import {Protocol} from '../../semantier/protocol'
 	import {AnContext} from './reactext.jsx';
@@ -149,13 +149,14 @@ const styles = theme => ({
 class SysComp extends React.Component {
 	state = {
 		window: undefined,
+		welcome: true,
 		sysName: 'Anreact Sample',
 		skMenu: undefined, // e.g. 'sys.menu.jserv-sample';
 		// {funcId, funcName,url, css: {icon}, fullpath, parentId, sibling, children: [] }
 		sysMenu: { },
 
-		cruds: [{'/home': Home}],
-		paths: [{path: '/home', params: {}}],
+		cruds: [{'/': Home}],
+		paths: [],
 
 		menuTitle: 'Sys Menu',
 		showMenu: false,
@@ -269,7 +270,11 @@ class SysComp extends React.Component {
 				  return (menu && menu.funcId ?
 					<div key={menu.funcId}>
 						<Link component={RouterLink} to={menu.url}>
-							<ListItem button className={classes.nested}>
+							<ListItem button className={classes.nested} onClick={
+								e => {
+									if (that.state.welcome)
+										that.setState( {welcome: false} );
+								} } >
 							<ListItemIcon>{icon(menu.css)}</ListItemIcon>
 							<ListItemText primary={menu.funcName} />
 							</ListItem>
@@ -359,9 +364,13 @@ class SysComp extends React.Component {
 				})}
 			  >
 				<div className={claz.drawerHeader} />
-				<div className="content">
+				{this.state.welcome ?
+					<Typography>Welcome!
+						<Box variant='span'>Please click menu to start.</Box>
+					</Typography> :
+					<div className="content">
 					{this.route()}
-				</div>
+				</div>}
 			  </main>
 			</Router>
 

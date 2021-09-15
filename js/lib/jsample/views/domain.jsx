@@ -53,9 +53,6 @@ class DomainComp extends CrudCompW {
 			queryReq.Body().whereCond('%', 'domainName', `'${query.domain}'`);
 		if (query.ignored)
 			queryReq.Body().whereCond('<>', 'parentId', `'${query.ignored}'`);
-		/*
-		if(query.operTime)
-			queryReq.Body().whereCond('=', 'operTime', `'${query.operTime}'`);*/
 
 		this.state.queryReq = queryReq;
 
@@ -98,38 +95,7 @@ class DomainComp extends CrudCompW {
 				sizeOptions={[5, 25, 50]}
 				onPageInf={this.onPageInf}
 			/>
-			<Card>
-				<Typography variant="h6" gutterBottom>
-					This page shows:
-				</Typography>
-				<Typography variant="subtitle1" gutterBottom>
-					1. Combobox binding:
-				</Typography>
-				<Typography gutterBottom>
-					Query form uses dataset, sk='lvl1.domain.jsample' to mount Combobox;
-				</Typography>
-				<Typography gutterBottom>
-					Query form are configured with configuration data. Condition fields
-					are generated according to this.state.conds;
-				</Typography>
-				<Typography variant="subtitle1" gutterBottom>
-					2. AnQueryForm usage
-				</Typography>
-				<Typography gutterBottom>
-					Query condition is controlled by &lt;AnQueryForm [query]&gt;. Provide
-					a callback for iterating through user's interaction results.
-				</Typography>
-				<Typography variant="subtitle1" gutterBottom>
-					3. Use AnReactExt for list binding
-				</Typography>
-				<Typography gutterBottom>
-					DomainComp.toSearch() uses the query form results as conditions,
-					load list from port query.serv through API of AnContext.anClient,
-					which is an instance of SessionClient, then mount the list to the
-					main table.
-				</Typography>
-			</Card>
-		</>);
+		  </>);
 	}
 }
 DomainComp.contextType = AnContext;

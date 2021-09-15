@@ -38,14 +38,11 @@ class UserstComp extends CrudCompW {
 	};
 
 	tier = undefined;
-	// formHook = {collect: undefined};
 
 	constructor(props) {
 		super(props);
 
 		this.state.selected.Ids = new Set();
-
-		// this.tier = new UsersTier(this);
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);

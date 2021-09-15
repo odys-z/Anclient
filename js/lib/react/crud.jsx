@@ -94,7 +94,7 @@ CrudCompW.propTypes = {
 
 class HomeComp extends CrudComp {
 	render() {
-		return (<>Home</>);
+		return (<>Welcome to AnReact (Anclient JS)</>);
 	}
 }
 const Home = withStyles(styles)(HomeComp);

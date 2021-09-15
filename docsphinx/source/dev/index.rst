@@ -8,3 +8,4 @@ For developers
 
    note
    issues
+   mui-examples
