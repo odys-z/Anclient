@@ -9,10 +9,12 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import Close from '@material-ui/icons/Close';
 
 import {L} from '../../utils/langstr';
-	import {AnContext} from '../reactext.jsx';
-	import {AnTabs} from './tabs.jsx';
+	import { AnContext } from '../reactext';
+	import { AnTabs } from './tabs';
 
 const styles = theme => ({
   root: {
@@ -21,6 +23,11 @@ const styles = theme => ({
 	"&:hover": {
 		backgroundColor: "linen"
 	}
+  },
+  dialogTitle: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   centerbox: {
 	  "justify-content": "center"
@@ -64,7 +71,7 @@ class MyInfoComp extends React.Component {
 	render () {
 		let props = this.props;
 		this.state.closed = false;
-		let title = props.title ? props.title : '';
+		let title = props.title ? props.title : L('My Info');
 
 		let txtLines = this.textInfo();
 
@@ -76,18 +83,22 @@ class MyInfoComp extends React.Component {
 				fullScreen={!!this.props.fullScreen}
 				onClose={this.handleClose} >
 
-				<DialogTitle id="myinfo-title">{title}</DialogTitle>
-				<DialogContent> {txtLines} </DialogContent>
+				<DialogTitle id="myinfo-title" disableTypography className={classes.dialogTitle} >
+					{title}
+					<IconButton onClick={this.handleClose}>
+						<Close />
+					</IconButton>
+				</DialogTitle>
 				<DialogContent>
 					<AnTabs panels={this.props.panels} />
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={this.handleClose} color="inherit">
+					{/* <Button onClick={this.handleClose} color="inherit">
 						{L('Save')}
 					</Button>
 					<Button onClick={this.handleClose} color="inherit" autoFocus>
 						{L('Cancel')}
-					</Button>
+					</Button> */}
 				</DialogActions>
 			</Dialog>
 		);

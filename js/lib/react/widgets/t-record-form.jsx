@@ -111,6 +111,8 @@ export class TRecordFormComp extends CrudCompW {
 			let type = 'text';
 			if (f.type === 'float' || f.type === 'int')
 				type = 'number';
+			let readOnly = (typeof this.tier.isReadonly === 'function') ?
+							this.tier.isReadonly(f) : this.tier.isReadonly;
 			return (
 			<TextField id={f.field} key={f.field}
 				type={f.type || type}
@@ -119,7 +121,7 @@ export class TRecordFormComp extends CrudCompW {
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
-				inputProps={{ style: f.style, readOnly: this.tier.isReadonly(f) } }
+				inputProps={{ style: f.style, readOnly } }
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
 					f.style = undefined;

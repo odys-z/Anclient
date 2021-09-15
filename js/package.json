@@ -1,6 +1,6 @@
 {
   "name": "anclient",
-  "version": "0.9.87",
+  "version": "0.9.88",
   "description": "Webpack Project for jclient.js - js client of semantic.jserv.",
   "main": "./lib/an-components.js",
   "directories": {
@@ -32,7 +32,7 @@
     "tar": "^4.4.19"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.8",
+    "@babel/cli": "^7.15.4",
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@babel/preset-react": "^7.14.5",

@@ -5,6 +5,11 @@ export class Semantier {
 		this.port = port;
 	}
 
+	setContext(context) {
+		this.client = context.anClient;
+		this.errCtx = context.error;
+	}
+
 	validate(rec, fields, invalidStyle) {
 		if (this.disableValidate)
 			return true;

@@ -268,11 +268,6 @@ export class UsersTier extends Semantier {
 		this.uri = comp.uri || comp.props.uri;
 	}
 
-	setContext(context) {
-		this.client = context.anClient;
-		this.errCtx = context.error;
-	}
-
 	columns() {
 		return [
 			{ text: L('Log Id'), field: 'userId', checked: true },

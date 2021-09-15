@@ -11,7 +11,7 @@ import { L, Langstrs,
 	jsample
 } from 'anclient';
 
-const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, SsInfCard } = jsample;
+const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, MyInfCard } = jsample;
 
 // import { GPAsheet } from './gpa';
 
@@ -156,7 +156,7 @@ class App extends React.Component {
 
 		function myInfoPanels(uri) {
 			return [
-				{title: L('Basic'),      panel: <SsInfCard uri={uri} ssInf={that.state.anClient.ssInf} />},
+				{title: L('Basic'),      panel: <MyInfCard uri={uri} ssInf={that.state.anClient.ssInf} />},
 				// {title: L('My Classes'), panel: <MyClassTree />},
 				{title: L('My Status'),  panel: <Typography>Tasks cleared!</Typography>}
 			  ];
