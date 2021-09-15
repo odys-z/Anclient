@@ -6,6 +6,8 @@ import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Box from '@material-ui/core/Box';
+import Card from '@material-ui/core/Card';
+import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import Divider from '@material-ui/core/Divider';
@@ -19,7 +21,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import {
-	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu,
+	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School
 } from '@material-ui/icons';
 
 import { MemoryRouter as Router } from 'react-router';
@@ -129,6 +131,13 @@ const styles = theme => ({
 		duration: theme.transitions.duration.enteringScreen,
 		}),
 		marginLeft: 0,
+	},
+	welcome: {
+		padding: theme.spacing(2),
+		width: 340,
+		"& svg": {
+			margin: 24,
+		},
 	},
 });
 
@@ -365,9 +374,19 @@ class SysComp extends React.Component {
 			  >
 				<div className={claz.drawerHeader} />
 				{this.state.welcome ?
-					<Typography>Welcome!
-						<Box variant='span'>Please click menu to start.</Box>
-					</Typography> :
+					<Card >
+						<Typography gutterBottom variant='h4'>Welcome!</Typography>
+						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
+							<Menu color='primary'/>
+							<Box component='span' display='inline'>Please click menu to start.</Box>
+						</Paper>
+						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
+							<School color='primary'/>
+							<Box component='span' display='inline'>External Link:
+								<Link style={{ marginLeft: 4 }}  href="https://odys-z.github.io/Anclient" >AnReact Docs</Link>
+							</Box>
+						</Paper>
+					</Card> :
 					<div className="content">
 					{this.route()}
 				</div>}
