@@ -28,10 +28,10 @@ import { QuizProtocol } from '../../common/protocol.quiz.js';
  */
 const styles = (theme) => ({
   root: {
-    height: 460,
+    height: 560,
     // minWidth: 520,
     maxWidth: 720,
-    itemAlign: "center",
+	margin: "auto",
     "& :hover": {
       backgroundColor: "#ddd"
     }
@@ -42,7 +42,7 @@ const styles = (theme) => ({
     marginBottom: 40
   },
   content: {
-    height: 360
+    height: 480
   },
   question: {
     fontSize: 18,

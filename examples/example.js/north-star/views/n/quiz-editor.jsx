@@ -28,8 +28,8 @@ import React from 'react';
 	import Button from '@material-ui/core/Button';
 	import Box from '@material-ui/core/Box';
 
-import {
-	L, Protocol,
+import { Protocol } from '@anclient/semantier';
+import { L,
 	AnContext, DetailFormW, DatasetCombo, RecordForm } from 'anclient';
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';

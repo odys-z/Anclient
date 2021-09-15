@@ -4,9 +4,8 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
+import { Protocol, UserReq, SessionClient, AnClient } from '@anclient/semantier'
 import {L, Langstrs, AnConst,
-	Protocol, UserReq,
-    AnClient, SessionClient,
     AnContext, AnError, CrudCompW, AnReactExt,
 	AnTablist
 } from 'anclient';

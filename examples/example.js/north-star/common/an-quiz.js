@@ -2,7 +2,7 @@
  */
 import {
 	Protocol, UserReq, AnsonMsg
-} from "anclient"
+} from '@anclient/semantier';
 
 import { QuizReq, QuizProtocol, QuizResp, CenterProtocol } from './protocol.quiz.js';
 

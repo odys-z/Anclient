@@ -4,11 +4,10 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import {
-    L, Langstrs,
-    AnClient, SessionClient, Protocol,
+import { AnClient, SessionClient, Protocol, stree_t } from '@anclient/semantier';
+import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt,
-    AnTree, stree_t
+    AnTree
 } from 'anclient';
 
 const styles = (theme) => ( {

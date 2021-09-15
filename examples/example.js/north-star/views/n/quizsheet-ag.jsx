@@ -12,8 +12,8 @@ import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import {
-	L, isEmpty, Protocol,
+import { Protocol } from '@anclient/semantier';
+import { L, isEmpty,
 	AnContext, DatasetCombo, ConfirmDialog, RecordForm,
 	jsample, Overlay, AnGridsheet, anMultiRowRenderer
 } from 'anclient';
