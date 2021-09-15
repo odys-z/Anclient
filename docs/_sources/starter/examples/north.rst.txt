@@ -1,0 +1,16 @@
+Example: North Star
+===================
+
+*North star* is a sample project work with jserv ever-connect, which is provided
+as docker image (MIT).
+
+::
+
+    -+- north-star
+     |--- dist
+     |--- package.json
+     |--- Dockerfile
+     |--- ...
+
+User the package.json to install or Dockerfile to run as web server (for front
+pages).

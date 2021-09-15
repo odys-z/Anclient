@@ -10,10 +10,8 @@ Welcome to Anclient's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   starter/jsample
-   starter/client
-   starter/framework
-   guide/docker
+   starter/index
+   guide/index
    dev/index
 
 
