@@ -5,4 +5,5 @@ Guid (Tips)
    :maxdepth: 2
    :caption: Contents:
 
+   controls/index
    docker

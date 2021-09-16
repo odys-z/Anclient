@@ -6,6 +6,7 @@ For developers
    :maxdepth: 2
    :caption: Contents:
 
-   note
+   note-react
+   note-js-npm
    issues
    mui-examples
