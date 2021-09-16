@@ -29,13 +29,13 @@ import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import { Route } from 'react-router-dom'
 
-import {Protocol} from '../../semantier/protocol'
-	import {AnContext} from './reactext.jsx';
-	import {ConfirmDialog} from './widgets/messagebox.jsx'
-	import {MyIcon} from './widgets/my-icon.jsx'
-	import {MyInfo} from './widgets/my-info.jsx'
-	import {L, Langstrs} from '../utils/langstr'
-	import {parseMenus} from '../utils/helpers'
+import { Protocol } from '@anclient/semantier';
+	import { AnContext } from './reactext';
+	import { ConfirmDialog } from './widgets/messagebox'
+	import { MyIcon } from './widgets/my-icon'
+	import { MyInfo } from './widgets/my-info'
+	import { L, Langstrs } from '../utils/langstr'
+	import { parseMenus } from '../utils/helpers'
 
 import {
 	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow

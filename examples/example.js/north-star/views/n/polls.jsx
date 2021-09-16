@@ -9,7 +9,7 @@ import {
 	L, Langstrs, AnConst,
     AnContext, AnError, CrudCompW, AnReactExt,
 	ConfirmDialog, AnQueryForm, AnTablist, jsample
-} from 'anclient';
+} from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';

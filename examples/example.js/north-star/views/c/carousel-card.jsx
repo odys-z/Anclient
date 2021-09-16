@@ -18,7 +18,7 @@ import {
 	L, Langstrs, Protocol, UserReq,
     AnClient, SessionClient,
     AnContext, AnError, AnReactExt
-} from 'anclient';
+} from '@anclient/anreact';
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';
 

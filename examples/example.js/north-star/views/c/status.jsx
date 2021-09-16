@@ -8,7 +8,7 @@ import { Protocol, UserReq, SessionClient, AnClient } from '@anclient/semantier'
 import {L, Langstrs, AnConst,
     AnContext, AnError, CrudCompW, AnReactExt,
 	AnTablist
-} from 'anclient';
+} from '@anclient/anreact';
 
 import { CenterProtocol, CenterResp } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';

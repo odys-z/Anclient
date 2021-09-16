@@ -17,7 +17,7 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import { Protocol, SessionClient, AnClient, UserReq } from '@anclient/semantier'
 import { L, Langstrs, AnConst,
     AnContext, CrudCompW, AnReactExt
-} from 'anclient';
+} from '@anclient/anreact';
 
 import { CenterProtocol } from "../../common/protocol.quiz.js";
 import { JQuiz } from '../../common/an-quiz.js';

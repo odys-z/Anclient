@@ -15,7 +15,7 @@ import { AnClient, SessionClient, Protocol, AnsonResp } from '@anclient/semantie
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt,
     AnTablist
-} from 'anclient';
+} from '@anclient/anreact';
 
 const styles = (theme) => ( {
 	root: {

@@ -3,7 +3,7 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 
-import { L } from 'anclient';
+import { L } from '@anclient/anreact';
 
 /**
  * Formatting json string (can be parsed by JSON) into &gt;Typography/&lg;.

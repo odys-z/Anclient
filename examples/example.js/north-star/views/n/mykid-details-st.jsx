@@ -15,7 +15,7 @@ import { Protocol } from '@anclient/semantier';
 import { L, AnConst,
 	AnContext, AnError,
 	DetailFormW, ConfirmDialog,
-	TRecordForm } from 'anclient';
+	TRecordForm } from '@anclient/anreact';
 
 const styles = (theme) => ({
   root: {

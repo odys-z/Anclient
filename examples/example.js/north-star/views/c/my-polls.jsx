@@ -9,7 +9,7 @@ import {
 	L, Langstrs, AnConst,
     AnContext, AnError, CrudCompW, AnReactExt,
 	AnQueryForm, AnTablistLevelUp
-} from 'anclient';
+} from '@anclient/anreact';
 
 import { CenterProtocol } from '../../common/protocol.quiz';
 import { myMsgFromIssuer } from '../../common/mui-helpers';

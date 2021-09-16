@@ -29,8 +29,7 @@ import React from 'react';
 	import Box from '@material-ui/core/Box';
 
 import { Protocol } from '@anclient/semantier';
-import { L,
-	AnContext, DetailFormW, DatasetCombo, RecordForm } from 'anclient';
+import { L, AnContext, DetailFormW, DatasetCombo, RecordForm } from '@anclient/anreact';
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
 import { QuizUserForm } from './quiz-users';

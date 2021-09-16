@@ -11,8 +11,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
+import { Protocol } from '@anclient/semantier';
+
 import { L } from '../../utils/langstr';
-	import { Protocol } from '../../../semantier/protocol';
+	// import { Protocol } from '../../../semantier/protocol';
 	import { DetailFormW } from '../../react/crud';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext, AnError } from '../../react/reactext';

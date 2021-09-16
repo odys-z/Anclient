@@ -16,7 +16,7 @@ import { Protocol } from '@anclient/semantier';
 import { L, isEmpty,
 	AnContext, DatasetCombo, ConfirmDialog, RecordForm,
 	jsample, Overlay, AnGridsheet, anMultiRowRenderer
-} from 'anclient';
+} from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
 import { JQuiz } from '../../common/an-quiz';

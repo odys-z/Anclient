@@ -7,7 +7,7 @@ import { Card, TextField, Typography } from '@material-ui/core';
 import { Protocol, SessionClient, AnClient } from '@anclient/semantier'
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt
-} from 'anclient';
+} from '@anclient/anreact';
 
 const styles = (theme) => ( {
 	root: {

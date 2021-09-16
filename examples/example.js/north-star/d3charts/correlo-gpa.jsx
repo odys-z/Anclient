@@ -9,7 +9,7 @@ import {
 	L, Langstrs,
     AnClient, SessionClient, Protocol,
     AnContext, AnError, CrudComp, AnReactExt
-} from 'anclient';
+} from '@anclient/anreact';
 
 const styles = (theme) => ( { } );
 

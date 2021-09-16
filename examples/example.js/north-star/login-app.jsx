@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { SessionClient } from '@anclient/semantier'
-import { AnContext, AnError, AnReact, Login } from 'anclient';
+import { AnContext, AnError, AnReact, Login } from '@anclient/anreact';
 
 const styles = (theme) => ({
 	root: {

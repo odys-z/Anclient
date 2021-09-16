@@ -8,7 +8,7 @@ import { Protocol, SessionClient } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
 	AnContext, AnError, AnReactExt, jsample
-} from 'anclient';
+} from '@anclient/anreact';
 const { Domain, Roles, Orgs, Userst, JsampleTheme, MyInfCard } = jsample;
 
 import { StarPorts } from './common/port';

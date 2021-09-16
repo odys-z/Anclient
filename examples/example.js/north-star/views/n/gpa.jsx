@@ -16,7 +16,7 @@ import { Protocol, AnsonBody, AnsonResp } from '@anclient/semantier';
 import { L, isEmpty,
 	AnContext, DatasetCombo, ConfirmDialog, CrudComp,
 	jsample, Overlay, AnGridsheet, AnNumericEdit, AnIndicatorRenderer
-} from 'anclient';
+} from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
 import { GPATier, GPAReq, GPAResp } from './gpa-tier'

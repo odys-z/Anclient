@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import { AnClient, SessionClient, Protocol } from '@anclient/semantier';
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt
-} from 'anclient';
+} from '@anclient/anreact';
 
 import { Histogram } from '../../d3charts/histogram'
 import { Heatgrid } from '../../d3charts/heat-grid'

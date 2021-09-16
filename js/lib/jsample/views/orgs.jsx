@@ -4,9 +4,11 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
+import { Protocol, AnsonResp } from '@anclient/semantier';
+
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
-	import { Protocol, AnsonResp } from '../../../semantier/protocol';
+	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { CrudCompW } from '../../react/crud'
 	import { AnContext, AnError } from '../../react/reactext'
 	import { AnTreegrid } from '../../react/widgets/treegrid.jsx'

@@ -12,7 +12,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import { Protocol } from '@anclient/semantier';
-import { L, isEmpty, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from 'anclient';
+import { L, isEmpty, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from '@anclient/anreact';
 import { JQuiz } from '../../common/an-quiz.js';
 import { QuizEditor } from './quiz-editor';
 

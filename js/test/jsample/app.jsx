@@ -4,12 +4,12 @@ import ReactDOM from 'react-dom';
 import Typography from '@material-ui/core/Typography';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, Semantier } from 'anclient/semantier/anclient';
+import { Protocol, SessionClient, Semantier } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
 	Sys, SysComp, jsample
-} from 'anclient';
+} from '@anclient/anreact';
 
 const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, MyInfCard } = jsample;
 

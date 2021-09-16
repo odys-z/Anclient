@@ -3,7 +3,7 @@
 // import { L } from '../../node_modules/anclient/lib/utils/langstr.js';
 // for jsample, use
 import { Protocol, AnsonResp, AnsonBody } from '@anclient/semantier';
-import { L } from 'anclient';
+import { L } from '@anclient/anreact';
 
 export class QuizReq {
 	constructor () { }

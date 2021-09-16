@@ -1,10 +1,13 @@
 import $ from 'jquery';
 import React from 'react';
 
+import { stree_t, Protocol, UpdateReq, InsertReq, DatasetReq, AnsonResp
+} from '@anclient/semantier';
+
 import { L } from '../utils/langstr';
 	import { AnConst } from '../utils/consts';
 	import { toBool } from '../utils/helpers';
-	import { stree_t, Protocol, UpdateReq, InsertReq, DatasetReq, AnsonResp } from '../../semantier/protocol';
+	// import { stree_t, Protocol, UpdateReq, InsertReq, DatasetReq, AnsonResp } from '../../semantier/protocol';
 
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact

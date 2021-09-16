@@ -12,7 +12,7 @@ import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient
 import { L, toBool,
     AnContext, AnError, CrudCompW, AnTablistLevelUp, AnQueryst,
 	jsample
-} from 'anclient';
+} from '@anclient/anreact';
 const { JsampleIcons, UsersTier, UserstReq, UserstComp } = jsample;
 
 import { KidDetailst } from './mykid-details-st';

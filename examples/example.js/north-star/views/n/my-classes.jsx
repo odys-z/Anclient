@@ -8,7 +8,7 @@ import { AnClient, SessionClient, Protocol, stree_t } from '@anclient/semantier'
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt,
     AnTree
-} from 'anclient';
+} from '@anclient/anreact';
 
 const styles = (theme) => ( {
 	root: {
