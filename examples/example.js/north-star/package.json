@@ -1,11 +1,11 @@
 {
-  "name": "jsample",
+  "name": "@anclient/jsample-emr",
   "version": "1.0.0",
   "description": "Test project for Anclient.js",
   "main": "login.jsx, app.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo \"No way to link anclient and transpile both without publish - ReactJs hook problem.\""
+    "build": "cd .. && webpack-cli && cd north-star"
   },
   "keywords": [
     "AnClient"

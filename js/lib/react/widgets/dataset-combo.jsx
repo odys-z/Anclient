@@ -3,6 +3,8 @@ import React from 'react';
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
+// import clsx from 'clsx';
+// import withWidth from "@material-ui/core/withWidth";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
@@ -10,23 +12,25 @@ import { L } from '../../utils/langstr';
 	import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext } from '../reactext.jsx';
+	import { Semantier } from '../../../semantier/semantier';
 
 
-const styles = (theme) => ({
-  root: {
-	// display: "flex",
-	// width: "300",
-	// marginTop: theme.spacing(1),
-  },
-});
+const styles = (theme) => (Object.assign(
+	Semantier.invalidStyles, {
+		root: {
+			// display: "flex",
+			// width: "300",
+			// marginTop: theme.spacing(1),
+		},
+	} )
+);
 
-export
 /**
  * Combobox automatically bind dataset, using AnContext.anClient.
  * Also can handling hard coded options.
  * @class DatasetCombo
  */
-class DatasetCombo extends React.Component {
+class DatasetComboComp extends React.Component {
 	state = {
 		// sk: undefined,
 		combo: {val: undefined, options: []},
@@ -36,12 +40,8 @@ class DatasetCombo extends React.Component {
 
 	constructor(props) {
 		super(props);
-		// this.state.sk = props.sk;
-		// this.state.uid = this.context.uuid();
-		// this.state.nv = props.nv;
 		this.state.combo.options = props.options;
 		this.state.combo.label = props.label;
-		//this.state.selectedItem = this.findOption(props.options, props.val) || props.options[0];
 		this.state.initVal = props.val;
 
 		if (this.props.sk && !this.props.uri)
@@ -88,12 +88,16 @@ class DatasetCombo extends React.Component {
 
 	render() {
 		let cmb = this.state.combo
+		let { classes } = this.props;
+
 		let refcbb = React.createRef(); // FIXME why not this.refcbb?
+
 		/** Desgin Notes:
 		 * SimpleForm's first render triggered this constructor and componentDidMount() been called, first.
 		 * When it called render again when data been loaded in it's componentDidMount() (then render),
 		 * this constructor and componentDidMount() won't be called.
-		 * So here is necessary to check the initial selected value
+		 * So here is necessary to check the initial selected value.
+		 * This shouldn't be an issue in semantier pattern?
 		 */
 		let selectedItem = this.state.selectedItem;
 		if (!selectedItem && this.props.val != undefined) {
@@ -108,6 +112,7 @@ class DatasetCombo extends React.Component {
 			fullWidth size='small'
 			options={cmb.options}
 			style={this.props.style}
+			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
 			filter={Autocomplete.caseInsensitiveFilter}
@@ -124,8 +129,12 @@ class DatasetCombo extends React.Component {
 		}
 	}
 }
-DatasetCombo.contextType = AnContext;
+DatasetComboComp.contextType = AnContext;
 
-DatasetCombo.propTypes = {
+DatasetComboComp.propTypes = {
 	uri: PropTypes.string
 };
+
+
+const DatasetCombo = withWidth()(withStyles(styles)(DatasetComboComp));
+export { DatasetCombo, DatasetComboComp }

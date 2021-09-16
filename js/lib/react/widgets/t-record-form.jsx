@@ -17,29 +17,31 @@ import { L } from '../../utils/langstr';
 	import { CrudCompW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
 	import { JsampleIcons } from '../../jsample/styles';
+	import { Semantier } from '../../../semantier/semantier';
 
-const styles = (theme) => ({
-  root: {
-	display: 'flex',
-	width: '100%',
-	backgroundColor: '#fafafaee'
-  },
-  rowBox: {
-	width: '100%',
-	'& :hover': {
-	  backgroundColor: '#ced'
+const styles = (theme) => (Object.assign(
+	Semantier.invalidStyles,
+	{ root: {
+		display: 'flex',
+		width: '100%',
+		backgroundColor: '#fafafaee'
+	  },
+	  rowBox: {
+		width: '100%',
+		'& :hover': {
+		  backgroundColor: '#ced'
+		}
+	  },
+	  labelText: {
+		padding: theme.spacing(1),
+		borderLeft: '1px solid #bcd',
+	  },
+	  labelText_dense: {
+		paddingLeft: theme.spacing(1),
+		paddingRight: theme.spacing(1),
+		borderLeft: '1px solid #bcd' }
 	}
-  },
-  labelText: {
-	padding: theme.spacing(1),
-	borderLeft: '1px solid #bcd',
-  },
-  labelText_dense: {
-	paddingLeft: theme.spacing(1),
-	paddingRight: theme.spacing(1),
-	borderLeft: '1px solid #bcd',
-  }
-});
+) );
 
 /**
  * A Tiered record component is designed for UI record layout rendering, handling
@@ -77,11 +79,10 @@ export class TRecordFormComp extends CrudCompW {
 
 	/** Should be called by form, because saving action happends there
 	 * - where data validated and new way of (altering) rendering are done here
+	validate(invalidStyle) { }
 	 */
-	validate(invalidStyle) {
-	}
 
-	getField(f, rec) {
+	getField(f, rec, classes) {
 		let media = super.media;
 		let {isSm} = media;
 		let that = this;
@@ -92,7 +93,9 @@ export class TRecordFormComp extends CrudCompW {
 					sk={f.sk} nv={f.nv}
 					disabled={!!f.disabled} readOnly={this.tier.isReadonly(f)}
 					options={f.options || []} val={rec[f.field]}
-					label={f.label} style={f.style}
+					label={f.label}
+					style={f.defaultStyle || {width: 300}}
+					invalidStyle={f.style}
 					onSelect={ (v) => {
 						rec[f.field] = v.v;
 						f.style = undefined;
@@ -121,7 +124,8 @@ export class TRecordFormComp extends CrudCompW {
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
-				inputProps={{ style: f.style, readOnly } }
+				inputProps={{ readOnly } }
+				className={classes[f.style]}
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
 					f.style = undefined;
@@ -146,7 +150,7 @@ export class TRecordFormComp extends CrudCompW {
 						{L(f.label)}
 					  </Typography>
 					)}
-					{this.getField(f, rec)}
+					{this.getField(f, rec, classes)}
 				  </Box>
 				</Grid> );
 		} } );

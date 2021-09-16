@@ -268,8 +268,11 @@ export class UsersTier extends Semantier {
 		return [
 			{ text: L('Log Id'), field: 'userId', checked: true },
 			{ text: L('User Name'), field: 'userName' },
-			{ text: L('Organization'), field: 'orgName' },
-			{ text: L('Role'), field: 'roleName' } ];
+			{ text: L('Organization'), field: 'orgName',
+			  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
+			{ text: L('Role'), field: 'roleName',
+			  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
+			];
 	}
 
 	records(conds, onLoad) {

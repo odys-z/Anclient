@@ -618,7 +618,7 @@ class SessionClient {
 	}
 
 	getSks(port, onLoad) {
-		let req = this.userReq(null, port,
+		let req = this.userReq(null, 'datasetier',
 					new DatasetierReq( )
 					.A(DatasetierReq.A.sks) );
 

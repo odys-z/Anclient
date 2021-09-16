@@ -73,11 +73,11 @@ class UserDetailstComp extends DetailFormW {
 		{ type: 'password', field: 'pswd', label: L('Password'),
 		  validator: {notNull: true} },
 		{ type: 'cbb', field: 'roleId', label: L('Role'),
-		  grid: {md: 5}, style: {marginTop: "8px", width: 220 },
+		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} },
 		{ type: 'cbb', field: 'orgId', label: L('Organization'),
-		  grid: {md: 5}, style: {marginTop: "8px", width: 220 },
+		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} },
 	];

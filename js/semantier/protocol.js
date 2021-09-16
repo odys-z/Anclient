@@ -104,7 +104,7 @@ class Protocol {
 						query: "r.serv11", update: "u.serv11",
 						insert: "c.serv11", delete: "d.serv11",
 						dataset: "ds.serv11", stree: "s-tree.serv11",
-					 	semantier: "ds.tier"};
+					 	datasetier: "ds.tier"};
 
 	Protocol.MsgCode = {ok: "ok", exSession: "exSession", exSemantic: "exSemantic",
 						exIo: "exIo", exTransct: "exTransct", exDA: "exDA",

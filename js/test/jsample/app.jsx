@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import Typography from '@material-ui/core/Typography';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, Semantier } from '@anclient/semantier';
+import { Protocol, SessionClient, Semantier } from 'anclient/semantier/anclient';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
@@ -54,14 +54,13 @@ class App extends React.Component {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts({
 									menu: "menu.serv",
-									datasetier: "dataset.tier",
 									userstier: "users.tier",
 									gpatier: "gpa.tier",
 									mykidstier: "mykids.tier"
 								});
 
 		// loaded from dataset.xml
-		this.state.anClient.getSks('semantier', (sks) => {Object.assign(Protocol.sk, sks)});
+		this.state.anClient.getSks(null, (sks) => {Object.assign(Protocol.sk, sks)});
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
