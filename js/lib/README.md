@@ -1,6 +1,6 @@
-# About Anclient.js
+# ABOUT
 
-Anclient.js/lib is built upon @anclient/semantier, the semantics protocol layer.
+THIS FOLDER IS DEPRECATED.
 
 ### TIP
 
