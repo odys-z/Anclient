@@ -1,0 +1,6 @@
+*.zip
+!Anclient*.zip
+bin
+debug
+release
+.vs

@@ -1,2 +1,7 @@
 node_modules/
 compile-*
+**/dist/*
+!**/.dockerignore
+!**/dist/*.html
+!**/dist/github.json
+!**/dist/*.ico
