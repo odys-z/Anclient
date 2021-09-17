@@ -14,8 +14,9 @@ import { L } from '../../utils/langstr';
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
 	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
 	import { AnQueryForm } from '../../react/widgets/query-form';
-	import { AvatarIcon  } from '../../react/widgets/my-icon';
+	// import { AvatarIcon  } from '../../react/widgets/my-icon';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
+	import ImageUpload from '../../react/widgets/image-upload';
 	import { JsampleIcons } from '../styles';
 
 const styles = theme => ({
@@ -45,14 +46,6 @@ class MyInfCardComp extends React.Component {
 
 		if (!this.tier) this.getTier()
 
-		// // NOTE this senario is an illustrating of general query's necessity.
-		// let req = this.context.anClient.query(this.props.uri, 'a_users', 'u')
-		// req.Body()
-		// 	.l("a_roles", "r", "r.roleId=u.roleId")
-		// 	.l("a_orgs", "o", "o.orgId=u.orgId")
-		// 	.whereEq('userId', this.props.ssInf.uid);
-		// this.context.anReact.bindStateRec({uri: this.props.uri, req}, undefined, that);
-
 		this.tier.myInf({userId: this.props.ssInf.uid},
 						(cols, record) => that.setState({cols, record}) );
 	}
@@ -63,14 +56,6 @@ class MyInfCardComp extends React.Component {
 	}
 
 	render() {
-		// return <RecordForm uri={this.props.uri} mtabl='a_users'
-		// 	fields={ [
-		// 		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-		// 		{ field: 'userName', label: L('Name'),   grid: {sm: 6, lg: 4} },
-		// 		{ field: 'roleName', label: L('Role'),   grid: {sm: 6, lg: 4} },
-		// 		{ field: 'avatar',   label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // probably another component
-		// 	] }
-		// 	record={this.state.record} />
 		return (
 		  <>{this.tier
 			 && <TRecordForm uri={this.props.uri}
@@ -82,14 +67,6 @@ class MyInfCardComp extends React.Component {
 			</Button>
 		  </>
 		);
-
-		// function loadAvatar() {
-		// 	return AvatarIcon({ color: "primary", viewBox: "0 0 256 256",
-		// 		onClick: (e) => {
-		// 			console.log(e);
-		// 		}
-		//  	});
-		// }
 	}
 }
 MyInfCardComp.contextType = AnContext;
@@ -117,17 +94,22 @@ class MyInfTier extends Semantier {
 			{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
 			{ field: 'userName', label: L('Name'),   grid: {sm: 6, lg: 4} },
 			{ field: 'roleName', label: L('Role'),   grid: {sm: 6, lg: 4} },
-			{ field: 'avatar',   label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // probably another component
+			{ field: 'avatar',   label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
 		];
 
 		function loadAvatar() {
-			return AvatarIcon({
-				color: "primary",
-				width: 32, height: 32,
-				onClick: (e) => {
-					console.log(e);
-				}
-		 	});
+			// return AvatarIcon({
+			// 	color: "primary",
+			// 	width: 32, height: 32,
+			// 	onClick: (e) => {
+			// 		console.log(e);
+			// 	}
+		 	// });
+			return (
+				<ImageUpload
+					blankIcon={{color: "primary", width: 32, height: 32}}
+					src64={this.rec.img}
+				/>);
 		}
 	}
 
@@ -147,7 +129,6 @@ class MyInfTier extends Semantier {
 			.l("a_roles", "r", "r.roleId=u.roleId")
 			.l("a_orgs", "o", "o.orgId=u.orgId")
 			.whereEq('userId', userId);
-		// this.context.anReact.bindStateRec({uri: this.props.uri, req}, undefined, that);
 
 		client.commit(req,
 			(resp) => {

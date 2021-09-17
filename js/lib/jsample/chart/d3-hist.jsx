@@ -10,13 +10,11 @@ import { Protocol } from '@anclient/semantier';
 import { AnsonResp } from '@anclient/semantier';
 
 import { L } from '../../../lib/utils/langstr';
-	// import { Protocol } from '../../../semantier/protocol';
 	import { AnConst } from '../../../lib/utils/consts';
 	import { JsampleIcons } from '../styles';
 	import { CrudComp } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext';
 	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
-	// import { AnsonResp } from '../../../semantier/protocol';
 
 	import { RoleDetails } from './role-details';
 
