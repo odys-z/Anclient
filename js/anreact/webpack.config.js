@@ -1,6 +1,5 @@
  var path = require('path')
  var webpack = require('webpack')
- // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
  var v = 'development';
  var version = "1.0.0";
@@ -8,15 +7,15 @@
  module.exports = {
     mode: v, // "production" | "development" | "none"
     devtool: 'source-map',
-    entry: { anclient: './src/an-components.js' },
+    entry: { anreact: './src/an-components.js' },
 
     output: {
       filename: "[name]-" + version + ".min.js",
 
-      path: path.resolve(__dirname, 'dist'),
-      publicPath: "./dist/",
+      path: path.resolve(__dirname, '../dist'),
+      publicPath: "../dist/",
 
-      library: 'anclient',
+      library: 'an-react',
       libraryTarget: 'umd'
     },
 

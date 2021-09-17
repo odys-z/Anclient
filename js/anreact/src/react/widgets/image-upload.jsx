@@ -1,11 +1,10 @@
 
+import React from 'react';
 import Box from '@material-ui/core/Box';
 
-import { AvatarIcon  } from '../../react/widgets/my-icon';
+import { AvatarIcon  } from './my-icon';
 
-import fileClient from '../../file-utils';
-
-export class ImageUpload extends React.Component {
+export default class ImageUpload extends React.Component {
 	state = {
 		src: undefined,
 	}
@@ -86,11 +85,10 @@ export class ImageUpload extends React.Component {
 					src={ this.state.src }
 					style={{ width: 32, height: 32 }}
 					onclick={ this.onClick } /> :
-				{ AvatarIcon({
+				AvatarIcon({
 					color: this.state.invalid ? "secondary" : "primary",
 					width: 32, height: 32,
-					onClick: { this.onClick })
-				}
+					onClick: this.onClick })
 			}
 		</Box>);
 	}

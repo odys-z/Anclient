@@ -6,7 +6,6 @@ import { Button, Grid, Card, Typography } from '@material-ui/core';
 
 import { Protocol, AnsonResp } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
-	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { Semantier  } from '@anclient/semantier';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
@@ -14,7 +13,6 @@ import { L } from '../../utils/langstr';
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
 	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
 	import { AnQueryForm } from '../../react/widgets/query-form';
-	// import { AvatarIcon  } from '../../react/widgets/my-icon';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 	import ImageUpload from '../../react/widgets/image-upload';
 	import { JsampleIcons } from '../styles';
