@@ -1,0 +1,10 @@
+node_modules
+*-del
+# dist is copied to docker image
+# !react-quiz/dist
+*/dist/*.min.js*
+dist/*
+!dist/*.html
+**/private.html
+**/private.json
+private
