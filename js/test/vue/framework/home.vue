@@ -22,7 +22,7 @@
   import Vue from 'vue/dist/vue.js'
   import VueRouter from 'vue-router';
 
-  import {_J, SessionClient, DatasetCfg} from '../../../dist/jclient-SNAPSHOT.min.js';
+  import {_J, SessionClient, DatasetCfg} from '../../../dist/anclient-SNAPSHOT.min.js';
   import {SidebarMenu, FileUpload} from '../../../dist/jvue-SNAPSHOT.min.js'
   import {Samport} from './Samport.js'
 
@@ -47,7 +47,7 @@
   const Dashboard = { template: '<div>Dashboard Page</div>' }
   const TestUpload = { template: '<div>Test File Upload Page<file-upload/></div>' }
 
-  // Now JMessage can handle user defined ports, e.g. servlet "menu.serv"
+  // Now AnsonMsg can handle user defined ports, e.g. servlet "menu.serv"
   _J.understandPorts(Samport);
 
   const tempV4flowArgs = {wfId: 't01', taskId: '000001', port: Samport.cheapflow};

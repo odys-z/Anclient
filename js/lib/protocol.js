@@ -1,11 +1,14 @@
 /**Json protocol helper to support jclient.
- * All JBody and JHelper static helpers are here. */
+ * All AnsonBody and JHelper static helpers are here. */
 class Protocol {
-  /**Globally set this client's options.
-   * @param {object} options<br>
-   * options.noNull no null value <br>
-   * options.noBoolean no boolean value<br>
-   */
+	/**Globally set this client's options.
+	 * @param {object} options<br>
+	 * options.noNull no null value <br>
+	 * options.noBoolean no boolean value<br>
+	 * options.valOptions<br>
+	 * options.verbose logging verbose level
+	 * @return {Protocol} static Protocol class
+	 */
 	static opts(options) {
 		if (options) {
 			if (options.noNull !== undefined)
@@ -14,51 +17,36 @@ class Protocol {
 				Protocol.valOptions.noBoolean = options.noBoolean === true || options.noBoolean === 'true';
 
 			Protocol.valOptions = Object.assign(Protocol.valOptions, options);
+
+			// TODO we are planning extending verbose level requested by client.
+			Protocol.verbose = options.verbose >= 0 ? options.verbose : 5;
 		}
+		return Protocol;
 	}
 
 	/**Format login request message.
 	 * @param {string} uid
-	 * @param {string} tk64
+	 * @param {string} tk64 password cypher
 	 * @param {string} iv64
 	 * @return login request message
 	 */
 	static formatSessionLogin (uid, tk64, iv64) {
-		var body = new SessionReq(uid, tk64, iv64);
-		body.a = 'login';
-		return new JMessage(Protocol.Port.session, null, body);
+		let login = new AnsonMsg({
+			type: 'io.odysz.semantic.jprotocol.AnsonMsg',
+			port: 'session', //Protocol.Port.session,
+			body: [{type: 'io.odysz.semantic.jsession.AnSessionReq',
+					uid, token: tk64, iv: iv64}]
+		});
+		login.Body().A('login');
+		return login;
 	}
-
-	/**Format a query request object, including all information for construct a "select" statement.
-	 * @param  {string} tabl  from table
-	 * @param  {string} alias
-	 * @return {object} fromatter to build request object
-	static formatQueryReq (tbl, alias) {
-		return new QueryReq(this, tbl, alias);
-	}
-	 */
 
 	static formatHeader (ssInf) {
-		return new JHeader(ssInf.ssid, ssInf.uid);
+		return new AnHeader(ssInf.ssid, ssInf.uid);
 	}
 
 	static rs2arr (rs) {
-		var cols = [];
-		var rows = [];
-		rs.forEach((r, rx) => {
-			if (rx === 0) {
-				cols = r;
-			}
-			else {
-				rw = {};
-				r.forEach((c, cx) => {
-					rw[cols[cx]] = c;
-				})
-				rows.push(rw);
-			}
-		});
-
-		return rows;
+		return AnsonResp.rs2arr(rs);
 	}
 
 	static nv2cell (nv) {
@@ -108,7 +96,7 @@ class Protocol {
 	}
 } ;
 
-/**Static methods of Protocol */
+/** Static methods of Protocol */
 {
 	Protocol.CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
@@ -123,7 +111,7 @@ class Protocol {
 
 	Protocol.Notify = {changePswd: "changePswd", todos: "todos"};
 
-	Protocol.cfg  = {	ssInfo: "ss-k", };
+	Protocol.cfg  = { ssInfo: "ss-k", };
 
 	Protocol.Semantics = {
 		chkCntDel: 'checkSqlCountOnDel',
@@ -131,6 +119,10 @@ class Protocol {
 	};
 
 	Protocol.valOptions = {};
+
+	Protocol.extend = function(newPorts) {
+		Object.assign(Protocol.Port, newPorts);
+	}
 }
 
 /** Regex helper */
@@ -152,33 +144,50 @@ class Jregex  {
 	}
 }
 
-class JMessage {
-	constructor (port, header, body) {
+class AnsonMsg {
+	constructor (json) {
+		if (typeof json !== 'object')
+			throw new Error("AnClient is upgraded.");
+
+		let header = json.header;
+		let [body] = json.body ? json.body : [{}];
+		if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
+			body = new AnsonResp(body);
+		else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
+			body = new AnSessionResp(body);
+		else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
+			body = new AnSessionReq(body.uid, body.token, body.iv);
+		else {
+			if (Protocol.verbose >= 5)
+				console.warn("Using json object directly as body. Type : " + body.type);
+		}
+
+		// FIXME type must be the first key of evry json object.
 		this.type = "io.odysz.semantic.jprotocol.AnsonMsg";
-		this.version = "1.1";
-		this.seq = Math.round(Math.random() * 1000);
+
+		this.code = json.code;
+		this.version = json.version ? json.version : "0.9";
+		this.seq = json.seq;
+		this.port = json.port;
+
+		// this.version = "0.9";
+		if (!this.seq)
+			this.seq = Math.round(Math.random() * 1000);
 
 		// string options, like no-null: true for asking server replace null with ''.
 		this.opts = Protocol.valOptions;
 
-		/**Protocol.Port property name, use this name to get port url */
-		this.port = port; // for robustness?
-		var prts = Protocol.Port;
-		var msg = this;
-		Object.getOwnPropertyNames(prts).forEach(function(val, idx, array) {
-			if (prts[val] === port) {
-				// console.log(val + ' -> ' + obj[val]);
-				msg.port = val;
-				return false;
-			}
-		});
+		// moc the ajax error
+		if (json.ajax)
+			body.ajax = json.ajax;
 
 		if (header)
 			this.header = header;
 		else this.header = {};
 
 		this.body = [];
-		// this.body.push(body.parentMsg(this));
+		if (body)
+			body.parent = this.type;
 		this.body.push(body);
 	}
 
@@ -189,9 +198,20 @@ class JMessage {
 		if (this.body !== undefined && this.body.length > 0)
 			return this.body[0].post(pst);
 	}
+
+	Body(ix = 0) {
+		return this.body ? this.body[ix] : undefined;
+	}
+
+	static rsArr(resp, rx = 0) {
+		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length > 0) {
+			return AnsonResp.rsArr(resp.body, rx);
+		}
+		return [];
+	}
 }
 
-class JHeader {
+class AnHeader {
 	constructor (ssid, userId) {
 		this.type = "io.odysz.semantic.jprotocol.AnsonHeader";
 		this.ssid = ssid;
@@ -210,20 +230,109 @@ class JHeader {
 	}
 }
 
+class AnsonBody {
+	constructor(body = {}) {
+		this.type = body.type;
+		this.a = body.a
+		this.parent = body.parent;
+		this.conn = body.conn;
+	}
+
+	/**set a.<br>
+	 * a() can only been called once.
+	 * @param {string} a
+	 * @return {SessionReq} this */
+	A(a) {
+		this.a = a;
+		return this;
+	}
+
+}
+
+class AnsonResp extends AnsonBody {
+	constructor (respbody) {
+		super(respbody);
+		this.m = respbody.m;
+		this.map = respbody.map;
+		this.rs = respbody.rs;
+	}
+
+	msg() {
+		return this.m;
+	}
+
+	static rsArr(respBody, rx = 0) {
+		return AnsonResp.rs2arr(respBody[0].rs[rx]);
+	}
+
+	/**Change rs object to array like [ {col1: val1, ...}, ... ]
+	 *
+	 * <b>Note</b> The column index and rows index shifted to starting at 0.
+	 *
+	 * @param {object} rs assume the same fields of io.odysz.module.rs.AnResultset.
+	 * @return {array} array like [ {col1: val1, ...}, ... ]
+	 */
+	static rs2arr (rs) {
+		let cols = [];
+		let rows = [];
+
+		if (typeof(rs.colnames) === 'object') {
+			// rs with column index
+			cols = new Array(rs.colnames.length);
+			for (var col in rs.colnames) {
+				// e.g. col = "VID": [ 1, "vid" ],
+				let cx = rs.colnames[col][0] - 1;
+				let cn = rs.colnames[col][1];
+				cols[cx] = cn;
+			}
+
+			rs.results.forEach((r, rx) => {
+				let rw = {};
+				r.forEach((c, cx) => {
+					rw[cols[cx]] = c;
+				});
+				rows.push(rw);
+			});
+		}
+		else {
+			// first line as column index
+			rs.forEach((r, rx) => {
+				if (rx === 0) {
+					cols = r;
+				}
+				else {
+					rw = {};
+					r.forEach((c, cx) => {
+						rw[cols[cx]] = c;
+					});
+					rows.push(rw);
+				}
+			});
+		}
+
+		return rows;
+	}
+}
+
 class UserReq {
-	constructor (conn, tabl) {
+	constructor (conn, tabl, data = {}) {
 		this.type = "io.odysz.semantic.jserv.user.UserReq";
 		this.conn = conn;
 		this.tabl = tabl
-		this.data = {};
+		this.data = {props: data};
 	}
 
 	get(prop) {
-		return this.data[prop];
+		return this.data.props ? this.data.props[prop] : undefined;
 	}
 
+	/** set data (SemanticObject)'s map
+	 * @param {string} prop name
+	 * @param {object} v value
+	 * @return {UserReq} this
+	 */
 	set(prop, v) {
-		this.data[prop] = v;
+		this.data.props[prop] = v;
 		return this;
 	}
 
@@ -231,14 +340,15 @@ class UserReq {
 	 * a() can only been called once.
 	 * @param {string} a
 	 * @return {UserReq} this */
-	a(a) {
+	A(a) {
 		this.a = a;
 		return this;
 	}
 }
 
-class SessionReq {
+class AnSessionReq extends AnsonBody {
 	constructor (uid, token, iv) {
+		super();
 		this.type = "io.odysz.semantic.jsession.AnSessionReq";
 		this.uid = uid;
 		this.token = token;
@@ -249,9 +359,8 @@ class SessionReq {
 	 * a() can only been called once.
 	 * @param {string} a
 	 * @return {SessionReq} this */
-	a(a) {
-		this.a = a;
-		return this;
+	A(a) {
+		return super.A(a);
 	}
 
 	md(k, v) {
@@ -262,11 +371,20 @@ class SessionReq {
 	}
 }
 
+class AnSessionResp extends AnsonResp {
+	constructor(ssResp) {
+		super(ssResp);
+		this.ssInf = ssResp.ssInf;
+	}
+}
+
+/**Java equivalent: io.odysz.semantic.jserv.R.AnQueryReq
+ * @class
+ */
 class QueryReq {
 	constructor (conn, tabl, alias, pageInf) {
 		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
 		this.conn = conn;
-		// this.query = query;
 		this.mtabl = tabl;
 		this.mAlias = alias;
 		this.exprs = [];
@@ -317,24 +435,23 @@ class QueryReq {
 	}
 
 	expr (exp, as) {
-		//this.exprs.push({expr: exp, as: as});
 		this.exprs.push([exp, as]);
 		return this;
 	}
 
 	exprss (exps) {
-		if (exps !== undefined && exps.length !== undefined)
-			for (var ix = 0; ix < exps.length; ix++)
+		if (exps !== undefined && exps.length !== undefined) {
+			for (var ix = 0; ix < exps.length; ix++) {
 				if (exps[ix].exp !== undefined)
 					this.expr(exps[ix].exp, exps[ix].as);
 				else if (exps[ix].length !== undefined)
 					this.expr(exps[ix][0], exps[ix][1]);
 				else {
-					console.error('Can not parse expr:');
-					console.error(exps[ix]);
-					console.error('Correct Format:')
-					console.error('[exp, as]');
+					console.error(`Can not parse expr [exp, as]: exprs[${ix}] = `,
+						exps[ix]);
 				}
+			}
+		}
 		return this;
 	}
 
@@ -379,7 +496,7 @@ class QueryReq {
 		else if (cols) {
 			console.log('QueryReq#orderbys() - argument is not an array.', cols);
 		}
-		
+
 		return this;
 	}
 
@@ -537,7 +654,7 @@ class UpdateReq {
 			return this;
 		}
 		else if (typeof pst.version === 'string' && typeof pst.seq === 'number')
-			console.warn('You pobably adding a JMessage as post operation? It should only be JBody(s).');
+			console.warn('You pobably adding a AnsonMsg as post operation? It should only be AnsonBody(s).');
 
 		if (this.postUpds === undefined) {
 			this.postUpds = [];
@@ -648,6 +765,7 @@ class InsertReq extends UpdateReq {
 		return this;
 	}
 }
+
 ///////////////// io.odysz.semantic.ext ////////////////////////////////////////
 /** define t that can be understood by stree.serv */
 const stree_t = {
@@ -663,7 +781,7 @@ const stree_t = {
 class DatasetCfg extends QueryReq {
 	/**@param {string} conn JDBC connection id, configured at server/WEB-INF/connects.xml
 	 * @param {string} sk semantic key configured in WEB-INF/dataset.xml
-	 * @param {stree_t} t function branch tag (JBody#a).
+	 * @param {stree_t} t function branch tag (AnsonBody#a).
 	 * Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query
 	 * @param {object} args arguments to be formatted to sql args.
 	 * @param {string} maintbl if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk.
@@ -731,4 +849,6 @@ class DatasetCfg extends QueryReq {
 }
 
 ///////////////// END //////////////////////////////////////////////////////////
-export {Jregex, Protocol, JMessage, JHeader, UserReq, SessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq, DatasetCfg, stree_t}
+export {Jregex, Protocol, AnsonMsg, AnHeader,
+	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
+	AnsonResp, DatasetCfg, stree_t}

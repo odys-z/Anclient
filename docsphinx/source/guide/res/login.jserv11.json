@@ -1,0 +1,15 @@
+{
+  "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+  "version": "1.1",
+  "seq": 105,
+  "opts": {},
+  "port": "session",
+  "header": {},
+  "body": [{
+    "type": "io.odysz.semantic.jsession.AnSessionReq",
+    "uid": "admin",
+    "token": "KY2g/VfrW9pi01Lmr5pLnA==",
+    "iv": "HxQ8BSUzHB5GGDMOVBYoGA==",
+    "a": "login"
+  }]
+}

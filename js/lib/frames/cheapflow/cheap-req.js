@@ -1,6 +1,6 @@
 
 import $ from 'jquery';
-import {Protocol, JMessage, JHeader, QueryReq, UserReq} from '../../protocol.js';
+import {Protocol, AnsonMsg, AnHeader, QueryReq, UserReq} from '../../protocol.js';
 
 /**See semantic.workflow/io.odysz.sworkflow.EnginDesign.Req */
 const chpEnumReq = {
@@ -142,7 +142,7 @@ class CheapReq {
 			return this;
 		}
 		else if (typeof pst.version === 'string' && typeof pst.seq === 'number')
-			console.warn('You pobably adding a JMessage as post operation? It should only be JBody(s).');
+			console.warn('You pobably adding a AnsonMsg as post operation? It should only be AnsonBody(s).');
 
 		if (this.postUpds === undefined) {
 			this.postUpds = [];

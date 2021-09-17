@@ -1,7 +1,6 @@
 "use strict";
 
-export default
-function (root) {
+export default function (root) {
 
     function checkInt(value) {
         return (parseInt(value) === value);
@@ -802,5 +801,5 @@ function (root) {
     }*/
 
 
-        root.aesjs = aesjs;
+    root.aesjs = aesjs;
 }// )(this);

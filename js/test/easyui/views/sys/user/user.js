@@ -60,7 +60,7 @@ function User () {
 	/** save user's informantion */
 	this.save = function() {
 		userId = $('#userId').val().trim();
-		// create a JMessage with an UpdateReq body
+		// create a AnsonMsg with an UpdateReq body
 		var q = EasyModal.save (null,		// default connId
 								cmd,		// jeasu.c | r | u | d
 								usrForm,	// modal dialog form id
@@ -89,11 +89,11 @@ function User () {
 			// 1. delete is post updating user
 			q.post(del).nv("pswd", "123456");
 
-				client.commit(q,
-					function(resp) {
-						// You can fire saved event at client side here.
-						EasyMsger.ok(EasyMsger.m.saved);
-					}, EasyMsger.error);
+			client.commit(q,
+				function(resp) {
+					// You can fire saved event at client side here.
+					EasyMsger.ok(EasyMsger.m.saved);
+				}, EasyMsger.error);
 			});
 		}
 		else {

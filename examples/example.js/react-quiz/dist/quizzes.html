@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Quiz Manager</title>
+</head>
+
+<body>
+  <div id="quizlist"></div>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <hr>
+  <ul>
+    <li>Quick Start:
+    <pre>
+    # start semantic-jserv data service
+    docker pull odysz/jserv-quiz
+    docker run --name jserv -dp 8080:8080 odysz/jserv-quiz
+
+    # start web server
+    docker pull odysz/anclient-examples
+    docker run --name anclient -dp 80:80 odysz/anclient-examples</pre>
+    </li>
+    <li><p>Troubleshootings</p>
+    <p><b>Note: don't use --rm, currently we haven't yet mounted volume to persist sqlite DB.</b></p>
+    This is userful to test the data service connecion:<br>
+    <a href='http://localhost:8080/jserv-quiz/login.serv11'>
+        http://locahost:8080/jserv-quiz/login.serv11</a>
+    <br>The an-quiz service should return this json data:<pre>
+    {"type": "io.odysz.semantic.jprotocol.AnsonMsg",
+     "code": "exSemantic", "opts": null, "port": "session",
+     "header": null,
+     "body": [{"type": "io.odysz.semantic.jprotocol.AnsonResp",
+        "rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null, "conn": null,
+        "m": "No envelope is avaliable.", "map": null
+     }],
+     "version": "1.0", "seq": 0
+    }</pre>
+    </li>
+    <li>This application is powered by <a href='https://reactjs.org/'>React</a>
+        &amp; <a href='https://material-ui.com'>Material UI</a>
+    </li>
+  </ul>
+  <script src="quiz-0.1.0.min.js"></script>
+  <script>
+	let searchParams = new URLSearchParams(window.location.search)
+	let serv = searchParams ? searchParams.get('serv') : undefined;
+	Quizlist.bindQuizzes('quizlist', serv);
+  </script>
+</body>
+</html>

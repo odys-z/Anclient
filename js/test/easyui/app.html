@@ -13,20 +13,19 @@
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
 	-->
-	<script src="../3rd-lib/jquery-3.4.1.min.js"></script>
-	<script src="../3rd-lib/easyui-1.8.1/jquery.easyui.min.js"></script>
+	<script src="./opensources/jquery-3.4.1.min.js"></script>
+	<script src="./opensources/easyui-1.8.1/jquery.easyui.min.js"></script>
+	<script src="./opensources/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
 
-	<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui-1.8.1/themes/default/easyui.css">
-	<link rel="stylesheet" type="text/css" href="../3rd-lib/easyui-1.8.1/themes/icon.css">
-
-	<script src="../3rd-lib/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="./opensources/easyui-1.8.1/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="./opensources/easyui-1.8.1/themes/icon.css">
 	<link rel="stylesheet" type="text/css" href="app-common/jeasy.css">
 
-	<script src="../../dist/jclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./lib/anclient-SNAPSHOT.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="app-common/jsampl-easyui.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../lib/view/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../lib/view/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../lib/view/easyui/postmate.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./lib/easyui/jeasy-api.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./lib/easyui/jeasy-html.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./lib/easyui/postmate.js" type="text/javascript" charset="utf-8"></script>
 </head>
 
 <body class="easyui-layout">
@@ -53,7 +52,7 @@
 		 * Load menu from menu.sample (port = menu, dataset-sk = sk.menu)
 		 */
 		function jloadMenu() {
-			var req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as JMessage body
+			var req = new jvue.DatasetCfg(	// SysMenu.java (menu.sample) uses DatasetReq as AnsonMsg body
 						jconsts.conn,		// connection id in connexts.xml
 						jconsts.sk.menu);	// sk in datast.xml
 
@@ -71,7 +70,7 @@
 						'tree',				// easyui tree
 						null,				// click callback
 						function(node) {	// onSelect - change user act when clicked (FIXME what about tabs?)
-							console.log(node);
+							console.log(node.url, node);
 							// index.html window is not function pages' window
 							// https://stackoverflow.com/questions/4689145/pass-jquery-variables-between-iframe-and-parent
 							// $('iframe').get(0).contentWindow.ssClient = ssClient;
@@ -130,8 +129,8 @@
 				.whereCond("=", "u.userId", "'" + uid + "'");
 
 			// post request, handle response
-			J.post(req, function(resp) {
-				var users = J.respObjs(resp, 0, 1);
+			an.post(req, function(resp) {
+				var users = an.respObjs(resp, 0, 1);
 				onload(users[0]);
 			});
 		}
@@ -173,8 +172,8 @@
 		function logout(loginPage) {
 			var header = jvue.Protocol.formatHeader(ssk);
 			var body = {a:"logout"};
-			 var req = new jvue.JMessage(jvue.Protocol.Port.session, header, body);
-			J.post(req,function(){
+			var req = new jvue.AnsonMsg(jvue.Protocol.Port.session, header, body);
+			an.post(req,function(){
 				localStorage.setItem(ssk, null);
 				window.location = loginPage;
 			},function(){
@@ -184,5 +183,4 @@
 		}
 	</script>
 </body>
-
 </html>

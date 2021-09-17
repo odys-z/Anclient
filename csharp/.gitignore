@@ -1,0 +1,5 @@
+*.testlog
+.vs
+obj
+packages
+TestResults

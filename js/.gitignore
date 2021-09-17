@@ -5,3 +5,4 @@ compile-*
 !**/dist/*.html
 !**/dist/github.json
 !**/dist/*.ico
+!**/dist/github.json

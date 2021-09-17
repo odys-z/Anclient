@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>xv gltf addin</Name>
+    <Assembly>xvExporter/gltf-export.dll</Assembly>
+    <AddInId>f7e7fd23-bd18-46fd-9ece-29db50f23420</AddInId>
+    <FullClassName>io.odysz.anclient.example.revit.ExApp</FullClassName>
+    <VendorId>odysz.github.io</VendorId>
+    <VendorDescription>Odys Zhou</VendorDescription>
+  </AddIn>
+  <AddIn Type="Command">
+    <Text>xv exp</Text>
+    <Description>X-visual gltf importer</Description>
+    <Assembly>xvExporter/gltf-export.dll</Assembly>
+    <FullClassName>io.odysz.anclient.example.revit.XvCmds</FullClassName>
+    <ClientId>38555A79-E66E-49B6-8278-191F17E931B2</ClientId>
+    <VendorId>_RTM</VendorId>
+    <VendorDescription>Ryan T. McCullough</VendorDescription>
+  </AddIn>
+</RevitAddIns>

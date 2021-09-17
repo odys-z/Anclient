@@ -1,0 +1,125 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="895C66FF-52A6-CA3B-7143-E5DD1FE15D6B" name="s_domain">
+<createdBy>ody</createdBy>
+<createdTime>2021-03-25 03:36:17 UTC</createdTime>
+<comment><![CDATA[sqlite version:
+
+drop table if exists s_domain;
+CREATE TABLE s_domain (
+    did      TEXT PRIMARY KEY,
+    tag      TEXT,
+    parent   TEXT,
+    label    TEXT NOT NULL,
+    remarks  TEXT
+);
+
+
+-- GICS https://en.wikipedia.org/wiki/Global_Industry_Classification_Standard       
+insert into s_domain VALUES("GICS-10",       "GICS", null,          "Energy", "");
+insert into s_domain VALUES("GICS-1010",     "GICS", "GICS-10",     "Energy", "");
+insert into s_domain VALUES("GICS-101010",   "GICS", "GICS-1010",   "Energy Equipment & Services", "");
+insert into s_domain VALUES("GICS-10101010", "GICS", "GICS-101010", "Oil & Gas Drilling", "");
+insert into s_domain VALUES("GICS-10101020", "GICS", "GICS-101010", "Gas Equipment & Services", "");
+
+insert into s_domain VALUES("GICS-101020",   "GICS", "GICS-1010",   "Oil, Gas & Consumable Fuels", "");
+insert into s_domain VALUES("GICS-10102010", "GICS", "GICS-101020", "Integrated Oil & Gas", "");
+insert into s_domain VALUES("GICS-10102020", "GICS", "GICS-101020", "Oil & Gas Exploration & Production", "");
+insert into s_domain VALUES("GICS-10102030", "GICS", "GICS-101020", "Oil & Gas Refining & Marketing", "");
+insert into s_domain VALUES("GICS-10102040", "GICS", "GICS-101020", "Oil & Gas Strorage & Transportation", "");
+insert into s_domain VALUES("GICS-10102050", "GICS", "GICS-101020", "Oil & Gas Coal & Consumable Fuels", "");
+
+insert into s_domain VALUES("GICS-15",       "GICS", null,          "Materials", "");
+insert into s_domain VALUES("GICS-1510",     "GICS", "GICS-15",     "Materials", "");
+insert into s_domain VALUES("GICS-151010",   "GICS", "GICS-1510",   "Chemicals", "");
+insert into s_domain VALUES("GICS-15101010", "GICS", "GICS-151010", "Commodity Chemicals", "");
+insert into s_domain VALUES("GICS-15101020", "GICS", "GICS-151010", "Diversified Chemicals", "");
+insert into s_domain VALUES("GICS-15101030", "GICS", "GICS-151010", "Fertilizer & Agricultural Chemicals", "");
+insert into s_domain VALUES("GICS-15101040", "GICS", "GICS-151010", "Industrial Gases", "");
+insert into s_domain VALUES("GICS-15101050", "GICS", "GICS-151010", "Special Chemicals", "");
+
+insert into s_domain VALUES("GICS-151020",   "GICS", "GICS-1510",   "Construction Materials", "");
+insert into s_domain VALUES("GICS-15102010", "GICS", "GICS-151020", "Construction Materials", "");
+
+insert into s_domain VALUES("GICS-151030",   "GICS", "GICS-1510",   "Containers & Packaging", "");
+insert into s_domain VALUES("GICS-15103010", "GICS", "GICS-151030", "Metal & Glass Containers", "");
+insert into s_domain VALUES("GICS-15103020", "GICS", "GICS-151030", "Paper Packaging", "");
+
+]]></comment>
+<ownerDesignName>vectors</ownerDesignName>
+<ordsAlias>table_3</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="did" id="1D441A80-1605-F390-458B-18FB908E61A8">
+<createdBy>ody</createdBy>
+<createdTime>2021-03-25 03:38:03 UTC</createdTime>
+<ownerDesignName>vectors</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>12</dataTypeSize>
+<ownDataTypeParameters>12,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="tag" id="F3515436-C3DA-6EEB-CB62-EFE04B4AD844">
+<createdBy>ody</createdBy>
+<createdTime>2021-03-25 03:38:19 UTC</createdTime>
+<ownerDesignName>vectors</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>12</dataTypeSize>
+<ownDataTypeParameters>12,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="parent" id="EA37E02E-D10A-075C-6289-ABA224651E6C">
+<createdBy>ody</createdBy>
+<createdTime>2021-03-25 03:38:33 UTC</createdTime>
+<ownerDesignName>vectors</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>12</dataTypeSize>
+<ownDataTypeParameters>12,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="title" id="140AAA66-ECBD-863A-91E7-C1AC79ECB1DB">
+<createdBy>ody</createdBy>
+<createdTime>2021-03-25 03:38:56 UTC</createdTime>
+<ownerDesignName>vectors</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="remarks" id="AC8C2CBE-C284-9431-87BC-4AD1CABD95AD">
+<createdBy>ody</createdBy>
+<createdTime>2021-03-25 03:41:56 UTC</createdTime>
+<ownerDesignName>vectors</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT040</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="97C5A751-D547-6ADD-0293-89D52C51903B" name="domain_PK">
+<createdBy>ody</createdBy>
+<createdTime>2021-03-25 03:38:03 UTC</createdTime>
+<ownerDesignName>vectors</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1D441A80-1605-F390-458B-18FB908E61A8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

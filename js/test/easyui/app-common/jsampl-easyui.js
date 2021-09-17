@@ -4,7 +4,7 @@
 // The following is the project adapter (common of engineering-costs).
 ////////////////////////////////////////////////////////////////////////////////
 /** project utils
- * @module eng-cost/app */
+ * @module jsample/easyui */
 const jconsts = {
 	/**Warning log level, the higher value, the more verbose.<br>
 	 * A coding convention of odys-z, nothing about the framework
@@ -68,12 +68,12 @@ const workflowId = {
 	flow02: 't02',
 }
 
-var J = jvue._J;
-J.init(jconsts.serv, jconsts.conn);
-window.J = J;
+var an = jvue.an;
+an.init(jconsts.serv, jconsts.conn);
+window.an = an;
 
-// otherwise jclient can't understand business defined ports.
-J.understandPorts(samports);
+// otherwise anclient can't understand business defined ports.
+an.understandPorts(samports);
 
 /** Login Utility.<br>
  * requesting login.serv with login-obj: <br>
@@ -92,8 +92,7 @@ function login(logId, pswd, onLogin, home, onError) {
 
 	localStorage.setItem(ssk, null);
 	$.cookie(ssk, null, {path: "/", expires: 3000});
-	J.login(logId, pswd,
-			function(client) {
+	an.login(logId, pswd, function(client) {
 				ssClient = client;
 				if (typeof onLogin === "function") {
 					// store session info temperary locally - window url will be changed

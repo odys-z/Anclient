@@ -1,6 +1,6 @@
 # About Jclient/js
 
-This is the jclient/js home page.
+This is the anclient/js home page.
 
 
 ### TIP
