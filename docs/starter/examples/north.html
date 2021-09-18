@@ -177,8 +177,8 @@
             
   <div class="section" id="example-north-star">
 <h1>Example: North Star<a class="headerlink" href="#example-north-star" title="Permalink to this headline">¶</a></h1>
-<p><em>North star</em> is a sample project work with jserv ever-connect, which is provided
-as docker image (MIT).</p>
+<p><em>North star</em> is a sample project must work with a jserv serice, ever-connect,
+which is provided as a docker image (Github private repo, MIT).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-+-</span> <span class="n">north</span><span class="o">-</span><span class="n">star</span>
  <span class="o">|---</span> <span class="n">dist</span>
  <span class="o">|---</span> <span class="n">package</span><span class="o">.</span><span class="n">json</span>
@@ -186,20 +186,25 @@ as docker image (MIT).</p>
  <span class="o">|---</span> <span class="o">...</span>
 </pre></div>
 </div>
-<p>User the package.json to install or Dockerfile to run as web server (for front
-pages).</p>
+<p>Use the package.json to install packages or user Dockerfile to run as web server
+(for front pages web server).</p>
 <div class="section" id="start-docker-container">
 <h2>Start Docker Container<a class="headerlink" href="#start-docker-container" title="Permalink to this headline">¶</a></h2>
-<p>Image:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">odysz</span><span class="o">/</span><span class="n">emr</span><span class="o">-</span><span class="n">web</span>
+<p>Nort-star is actually running on two web server, provided with two docker images.</p>
+<p>If you are familiar with docker command, you can pull the two images:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">odysz</span><span class="o">/</span><span class="n">connects</span><span class="o">-</span><span class="n">polestar</span>
+<span class="n">odysz</span><span class="o">/</span><span class="n">emr</span><span class="o">-</span><span class="n">web</span>
 </pre></div>
 </div>
-<p>The transpile results located in dist folder.</p>
-<p>The emr-#.#.#.zip is helpful for docker scripts example.</p>
+<p>The emr-#.#.#.zip is helpful for docker scripts example, which can be downloaded
+from the release section. (Only tested on Ubuntu &amp; CentOS 7)</p>
 <ol class="arabic simple">
 <li><p>change /dist/private/host.json, replace your server IP like this:</p></li>
 </ol>
-<p>host: <a class="reference external" href="http://[your-server-ip]:8080/connects">http://[your-server-ip]:8080/connects</a></p>
+<p>host:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="p">[</span><span class="n">your</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">ip</span><span class="p">]:</span><span class="mi">8080</span><span class="o">/</span><span class="n">connects</span>
+</pre></div>
+</div>
 <ol class="arabic" start="2">
 <li><p>execute these two scripts command comes from the zip file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">docker</span><span class="o">-</span><span class="n">start</span>
@@ -207,14 +212,18 @@ pages).</p>
 </pre></div>
 </div>
 </li>
-<li><p>check both of your docker containers are runing:</p>
+</ol>
+<p>The jserv docker container also mounted a volume for persisting sqlite data file.
+You may need to input password to copy volume file into system directory.</p>
+<ol class="arabic" start="3">
+<li><p>check both of your docker containers are running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">ps</span>
 </pre></div>
 </div>
 </li>
 </ol>
-<p>Please note there are totally 2 containers runing, one for web pages, one for json
-data service.</p>
+<p>Please note that there are totally 2 containers running, one for web pages, one
+for json data service.</p>
 </div>
 </div>
 
