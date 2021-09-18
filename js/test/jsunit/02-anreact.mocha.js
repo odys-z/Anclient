@@ -3,7 +3,7 @@ import { expect, assert } from 'chai';
 
 import {Protocol, AnsonMsg, UpdateReq} from '../../semantier/protocol';
 import {AnClient, SessionClient} from '../../semantier/anclient';
-import {AnReact} from '../../lib/react/anreact.jsx';
+import {AnReact} from '../../anreact/src/react/anreact.jsx';
 
 const checkBoxForest = [
   { "type":"io.odysz.semantic.DA.DatasetCfg$AnTreeNode",

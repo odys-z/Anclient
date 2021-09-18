@@ -106,7 +106,7 @@ class MyInfTier extends Semantier {
 			return (
 				<ImageUpload
 					blankIcon={{color: "primary", width: 32, height: 32}}
-					src64={this.rec.img}
+					src64={this.rec && this.rec.img}
 				/>);
 		}
 	}

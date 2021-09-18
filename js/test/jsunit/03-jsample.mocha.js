@@ -1,6 +1,6 @@
 import { expect, assert } from 'chai'
 import { Protocol, AnsonMsg, DatasetReq } from '../../semantier/protocol.js'
-import {parseMenus} from '../../lib/utils/helpers.js'
+import { parseMenus } from '../../anreact/src/utils/helpers.js'
 
 const dsTestResp = {
 	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",

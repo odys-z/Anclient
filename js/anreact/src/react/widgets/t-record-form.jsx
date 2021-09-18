@@ -106,9 +106,10 @@ export class TRecordFormComp extends CrudCompW {
 		else if (f.type === 'formatter' || f.formatter)
 			return (
 				<Grid item key={f.field} {...f.cols} >
-					<Typography variant='body2' >
+					{/* <Typography variant='body2' >
 					  {f.formatter(rec)}
-					</Typography>
+					</Typography> */}
+					{f.formatter(rec)}
 				</Grid>);
 		else {
 			let type = 'text';

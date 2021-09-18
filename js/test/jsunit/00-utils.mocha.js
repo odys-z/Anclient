@@ -1,8 +1,8 @@
 import chai from 'chai';
 import { expect, assert } from 'chai';
 
-import { L, Langstrs } from '../../lib/utils/langstr';
-import { toBool, isEmpty } from '../../lib/utils/helpers';
+import { L, Langstrs } from '../../anreact/src/utils/langstr';
+import { toBool, isEmpty } from '../../anreact/src/utils/helpers';
 
 describe('case: [0.0] utils', () => {
 	it('helpers: toBool, isEmpty', () =>{

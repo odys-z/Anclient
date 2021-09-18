@@ -21,7 +21,9 @@ const styles = theme => ({
 	backgroundColor: "mint-cream",
 	textAlign: "center",
 	"&:hover": {
-		backgroundColor: "linen"
+		backgroundColor: {
+			opacity: 0.3
+		}
 	}
   },
   dialogTitle: {

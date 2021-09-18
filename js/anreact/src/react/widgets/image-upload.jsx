@@ -3,6 +3,7 @@ import React from 'react';
 import Box from '@material-ui/core/Box';
 
 import { AvatarIcon  } from './my-icon';
+import { gCamera } from './my-icon';
 
 export default class ImageUpload extends React.Component {
 	state = {
@@ -48,7 +49,7 @@ export default class ImageUpload extends React.Component {
 
 	toShowImage(e) {
 		let that = this;
-		let file = fileInput.files[0];
+		let file = this.fileInput.files[0];
 
 		let imageType = /image.*/;
 
@@ -74,22 +75,82 @@ export default class ImageUpload extends React.Component {
 
 	render() {
 
-		return (<Box >
-			<input type="file"
-				ref={(ref) => this.fileInput = ref}
-				style={{ display: 'none' }}
-				change={ this.toShowImage }
-			/>
-			{ this.state.src ? <div
-					ref={(ref) => this.imgPreview = ref}
-					src={ this.state.src }
-					style={{ width: 32, height: 32 }}
-					onclick={ this.onClick } /> :
-				AvatarIcon({
-					color: this.state.invalid ? "secondary" : "primary",
-					width: 32, height: 32,
-					onClick: this.onClick })
-			}
+		// return (<Box style={{height: 48}}>
+		// 	{ this.state.src ? <div
+		// 			ref={(ref) => this.imgPreview = ref}
+		// 			src={ this.state.src }
+		// 			style={{ position: "relative", left: 0, top: 0, width: 48, height: 48 }} /> :
+		// 		AvatarIcon({
+		// 			color: this.state.invalid ? "secondary" : "primary",
+		// 			position: "relative", left: 0, top: 0, width: 48, height: 48 })
+		// 	}
+		// 	<input type="file"
+		// 		ref={(ref) => this.fileInput = ref}
+		// 		style={{ opacity: 0, position: "relative", width: 48, left: -48, top: -30, height: 48 }}
+		// 		onClick={ this.toOpenFile }
+		// 		onChange={ this.toShowImage }
+		// 	/>
+		// </Box>);
+
+		// return (<Box style={{height: 48, border: "solid 1px red"}}>
+		// 	<img
+		// 			ref={(ref) => this.imgPreview = ref}
+		// 			src={ this.state.src }
+		// 			style={{ position: "relative", left: 0, top: 0, width: 48, height: 48 }} />
+		// 	{!this.state.src
+		// 	 && AvatarIcon({
+		// 			color: this.state.invalid ? "secondary" : "primary",
+		// 			position: "relative", left: -48, top: 0, width: 48, height: 48 })
+		// 	}
+		// 	<input type="file"
+		// 		ref={(ref) => this.fileInput = ref}
+		// 		style={{ opacity: 0.5, border: "solid 1px blue", position: "relative", left: -48 * 2, top: -30, width: 48 * 2, height: 48 }}
+		// 		onClick={ this.toOpenFile }
+		// 		onChange={ this.toShowImage }
+		// 	/>
+		// </Box>);
+
+		// return (<Box style={{height: 48, border: "solid 1px red"}}>
+		// 	<input type="file"
+		// 		ref={(ref) => this.fileInput = ref}
+		// 		style={{ opacity: 0.5, border: "solid 1px blue", position: "relative", left: 0, top: 0, width: "100%", height: "100%" }}
+		// 		onClick={ this.toOpenFile }
+		// 		onChange={ this.toShowImage }
+		// 	/>
+		// </Box>);
+
+		let viewBox = "0 0 512 512";
+		// let bg = `background-image:
+		// 		url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
+		// 		viewBox=${viewBox} width='64px' height='64px'>
+		// 		<g><path d=\'M76.8,121.6C34.385,121.6,0,155.985,0,198.4V480h89.6V121.6H76.8z'/></g></svg>
+		// 		\"); `
+		// 		+ "width: '100%'; height: '100%';"
+
+		// let dataimg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
+		// 		viewBox='${viewBox}' width='64px' height='64px'>
+		// 		<g><path d=\'M76.8,121.6C34.385,121.6,0,155.985,0,198.4V480h89.6V121.6H76.8z'/></g></svg>`
+
+		let dataimg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
+				viewBox='${viewBox}' width='64px' height='64px' fill='rgb(62 80 180)'>${gCamera}</svg>`
+
+		let bg = {
+			backgroundImage: `url(\"${dataimg}\")`,
+			width: "100%",
+			height: "100%",
+			position: "relative",
+			top: -52,
+			opacity: 0
+		}
+
+		return (
+		<Box style={{height: 48, border: "solid 1px #aaa2"}}>
+			<img src={dataimg} style={{ width: "auto", height: "100%" }}
+				ref={(ref) => this.imgPreview = ref} />
+			<input type='file' style={ bg }
+		 		ref={(ref) => this.fileInput = ref}
+		 		onChange={ this.toShowImage } />
 		</Box>);
+
 	}
 }
