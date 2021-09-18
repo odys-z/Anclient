@@ -47,17 +47,6 @@ export const gCamera = (`<g>
 		<polygon points="320,32 192,32 166.4,83.2 345.6,83.2 "/>
 	</g>`);
 
-// export const svgCamera = function (props = {}) {
-// 	let viewBox = props.viewBox || "-1 -1 511, 511";
-//
-// 	let { width, height, left, top, position } = props;
-// 	let style = Object.assign ({ viewBox, fill: 'rgb(62 80 180)',
-// 					  width: 63, height: 63,
-//  					  position: 'inherit', left: -1, top: 31},
-// 					{ width, height, top, left, position});
-// 	return (<svg style={style} >{gCamera}</svg>);
-// }
-
 class MyIconComp extends React.Component {
 	state = {
 		title: "Personal Settings",

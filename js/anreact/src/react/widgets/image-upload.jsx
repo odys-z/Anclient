@@ -57,68 +57,15 @@ export default class ImageUpload extends React.Component {
 			var reader = new FileReader();
 
 			reader.onload = function(e) {
-				// let img = new Image();
-				// img.src = reader.result;
-				// img.classList.add('preview');
-				// this.imgPreview.children = [img];
-
-				// this.imgPreview.appendChild(img);
-				// console.log(reader.result);
 				that.imgPreview.src = reader.result;
 			}
 			reader.readAsDataURL(file);
 		} else {
-			// fileDisplayArea.innerHTML = "File not supported!"
 			this.setState({invalid: true});
 		}
 	}
 
 	render() {
-
-		// return (<Box style={{height: 48}}>
-		// 	{ this.state.src ? <div
-		// 			ref={(ref) => this.imgPreview = ref}
-		// 			src={ this.state.src }
-		// 			style={{ position: "relative", left: 0, top: 0, width: 48, height: 48 }} /> :
-		// 		AvatarIcon({
-		// 			color: this.state.invalid ? "secondary" : "primary",
-		// 			position: "relative", left: 0, top: 0, width: 48, height: 48 })
-		// 	}
-		// 	<input type="file"
-		// 		ref={(ref) => this.fileInput = ref}
-		// 		style={{ opacity: 0, position: "relative", width: 48, left: -48, top: -30, height: 48 }}
-		// 		onClick={ this.toOpenFile }
-		// 		onChange={ this.toShowImage }
-		// 	/>
-		// </Box>);
-
-		// return (<box style={{height: 48, border: "solid 1px red"}}>
-		// 	<img
-		// 			ref={(ref) => this.imgpreview = ref}
-		// 			src={ this.state.src }
-		// 			style={{ position: "relative", left: 0, top: 0, width: 48, height: 48 }} />
-		// 	{!this.state.src
-		// 	 && avataricon({
-		// 			color: this.state.invalid ? "secondary" : "primary",
-		// 			position: "relative", left: -48, top: 0, width: 48, height: 48 })
-		// 	}
-		// 	<input type="file"
-		// 		ref={(ref) => this.fileinput = ref}
-		// 		style={{ opacity: 0.5, border: "solid 1px blue", position: "relative", left: -48 * 2, top: -30, width: 48 * 2, height: 48 }}
-		// 		onclick={ this.toopenfile }
-		// 		onchange={ this.toshowimage }
-		// 	/>
-		// </box>);
-
-		// return (<Box style={{height: 48, border: "solid 1px red"}}>
-		// 	<input type="file"
-		// 		ref={(ref) => this.fileInput = ref}
-		// 		style={{ opacity: 0.5, border: "solid 1px blue", position: "relative", left: 0, top: 0, width: "100%", height: "100%" }}
-		// 		onClick={ this.toOpenFile }
-		// 		onChange={ this.toShowImage }
-		// 	/>
-		// </Box>);
-
 		let viewBox = "0 0 512 512";
 
 		let dataimg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
