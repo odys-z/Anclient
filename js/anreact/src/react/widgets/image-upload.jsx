@@ -92,23 +92,23 @@ export default class ImageUpload extends React.Component {
 		// 	/>
 		// </Box>);
 
-		// return (<Box style={{height: 48, border: "solid 1px red"}}>
+		// return (<box style={{height: 48, border: "solid 1px red"}}>
 		// 	<img
-		// 			ref={(ref) => this.imgPreview = ref}
+		// 			ref={(ref) => this.imgpreview = ref}
 		// 			src={ this.state.src }
 		// 			style={{ position: "relative", left: 0, top: 0, width: 48, height: 48 }} />
 		// 	{!this.state.src
-		// 	 && AvatarIcon({
+		// 	 && avataricon({
 		// 			color: this.state.invalid ? "secondary" : "primary",
 		// 			position: "relative", left: -48, top: 0, width: 48, height: 48 })
 		// 	}
 		// 	<input type="file"
-		// 		ref={(ref) => this.fileInput = ref}
+		// 		ref={(ref) => this.fileinput = ref}
 		// 		style={{ opacity: 0.5, border: "solid 1px blue", position: "relative", left: -48 * 2, top: -30, width: 48 * 2, height: 48 }}
-		// 		onClick={ this.toOpenFile }
-		// 		onChange={ this.toShowImage }
+		// 		onclick={ this.toopenfile }
+		// 		onchange={ this.toshowimage }
 		// 	/>
-		// </Box>);
+		// </box>);
 
 		// return (<Box style={{height: 48, border: "solid 1px red"}}>
 		// 	<input type="file"
@@ -120,16 +120,6 @@ export default class ImageUpload extends React.Component {
 		// </Box>);
 
 		let viewBox = "0 0 512 512";
-		// let bg = `background-image:
-		// 		url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
-		// 		viewBox=${viewBox} width='64px' height='64px'>
-		// 		<g><path d=\'M76.8,121.6C34.385,121.6,0,155.985,0,198.4V480h89.6V121.6H76.8z'/></g></svg>
-		// 		\"); `
-		// 		+ "width: '100%'; height: '100%';"
-
-		// let dataimg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
-		// 		viewBox='${viewBox}' width='64px' height='64px'>
-		// 		<g><path d=\'M76.8,121.6C34.385,121.6,0,155.985,0,198.4V480h89.6V121.6H76.8z'/></g></svg>`
 
 		let dataimg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
 				viewBox='${viewBox}' width='64px' height='64px' fill='rgb(62 80 180)'>${gCamera}</svg>`
