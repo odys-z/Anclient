@@ -104,3 +104,32 @@ In example.js, users need to install::
     npm install @anclient/anreact @anclient/semantier
 
 This makes Protocol and React been shared between Anclient/js and application.
+
+Tips for test/jample trouble
+____________________________
+
+Additionally, if @anlient/semantier is installed in js/anreact/node_modules, the
+testing project, jsample won't work as Protocol.sk been populated by test/jsample/app.jsx.
+
+test/jsample will use different Protocol than @anclient/anreact.
+
+For @anclient/anreact, it will use::
+
+    js/anreact/node_modules/@anclient/semantier/protocol.js/Protocol
+
+For test/jsample, it will use (via npm link)::
+
+    js/semantier/protocol.js/Protocol
+
+This will leads to failed on binding DatasetCombos.
+
+**Solution**
+
+To avoid this, link from anreact to semantier.
+
+In js/anreact::
+
+    npm link @anclient/semantier
+
+.. note:: Load such things from server at runtime?
+..

@@ -17,9 +17,11 @@ const styles = theme => ({
   },
 });
 
+export const gCameraViewBox = "0 0 512 512";
+
 export const AvatarIcon = function (props = {}) {
   if (!props.viewBox)
-		props.viewBox = "0 0 512, 512";
+		props.viewBox = gCameraViewBox;
 
   let { width, height, left, top, position } = props;
   let style = Object.assign ({ width: 64, height: 64,

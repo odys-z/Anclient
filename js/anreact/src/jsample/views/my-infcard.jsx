@@ -36,6 +36,8 @@ class MyInfCardComp extends React.Component {
 
 		let {uid, roleId} = props;
 		this.state.rec = {uid, roleId}
+
+		this.toSave = this.toSave.bind(this);
 	}
 
 	componentDidMount() {
@@ -46,6 +48,10 @@ class MyInfCardComp extends React.Component {
 
 		this.tier.myInf({userId: this.props.ssInf.uid},
 						(cols, record) => that.setState({cols, record}) );
+	}
+
+	toSave() {
+
 	}
 
 	getTier = () => {
@@ -60,7 +66,7 @@ class MyInfCardComp extends React.Component {
 					tier={this.tier}
 					fields={this.tier.columns()}
 				/>}
-			<Button onClick={this.handleClose} color="inherit">
+			<Button onClick={this.toSave} color="primary" variant="outlined">
 				{L('Save')}
 			</Button>
 		  </>
@@ -91,7 +97,8 @@ class MyInfTier extends Semantier {
 		return [
 			{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
 			{ field: 'userName', label: L('Name'),   grid: {sm: 6, lg: 4} },
-			{ field: 'roleName', label: L('Role'),   grid: {sm: 6, lg: 4} },
+			{ field: 'roleId',   label: L('Role'),   grid: {sm: 6, lg: 4},
+			   type: 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 			{ field: 'avatar',   label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
 		];
 

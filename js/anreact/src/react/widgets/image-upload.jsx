@@ -2,8 +2,7 @@
 import React from 'react';
 import Box from '@material-ui/core/Box';
 
-import { AvatarIcon  } from './my-icon';
-import { gCamera } from './my-icon';
+import { AvatarIcon, gCamera, gCameraViewBox } from './my-icon';
 
 export default class ImageUpload extends React.Component {
 	state = {
@@ -66,10 +65,8 @@ export default class ImageUpload extends React.Component {
 	}
 
 	render() {
-		let viewBox = "0 0 512 512";
-
 		let dataimg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
-				viewBox='${viewBox}' width='64px' height='64px' fill='rgb(62 80 180)'>${gCamera}</svg>`
+				viewBox='${gCameraViewBox}' width='64px' height='64px' fill='rgb(62 80 180)'>${gCamera}</svg>`
 
 		let bg = {
 			backgroundImage: `url(\"${dataimg}\")`,

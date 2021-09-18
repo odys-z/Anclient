@@ -18,7 +18,6 @@
   "author": "Ody Zhou",
   "license": "MIT",
   "dependencies": {
-    "@anclient/semantier": "^0.9.1",
     "@emotion/react": "^11.4.1",
     "acorn": "^8.4.1",
     "ag-grid-community": "^26.0.0",

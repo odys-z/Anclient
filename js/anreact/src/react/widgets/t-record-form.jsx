@@ -91,7 +91,8 @@ export class TRecordFormComp extends CrudCompW {
 			return (
 				<DatasetCombo uri={this.props.uri}
 					sk={f.sk} nv={f.nv}
-					disabled={!!f.disabled} readOnly={this.tier.isReadonly(f)}
+					disabled={!!f.disabled}
+					readOnly={this.tier && this.tier.isReadonly && this.tier.isReadonly(f)}
 					options={f.options || []} val={rec[f.field]}
 					label={f.label}
 					style={f.defaultStyle || {width: 300}}

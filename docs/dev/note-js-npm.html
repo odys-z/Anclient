@@ -99,6 +99,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#how-is-anclient-aneact-evolved">How is &#64;anclient/aneact evolved</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#v0-9-92-protocol-instances">[v0.9.92] Protocol Instances</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#anclient-anreact-decision">&#64;anclient/anreact decision</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tips-for-test-jample-trouble">Tips for test/jample trouble</a></li>
 </ul>
 </li>
 </ul>
@@ -267,6 +268,31 @@ test/jsample, in both anreact &amp; semantier folder:</p>
 </pre></div>
 </div>
 <p>This makes Protocol and React been shared between Anclient/js and application.</p>
+</div>
+<div class="section" id="tips-for-test-jample-trouble">
+<h3>Tips for test/jample trouble<a class="headerlink" href="#tips-for-test-jample-trouble" title="Permalink to this headline">¶</a></h3>
+<p>Additionally, if &#64;anlient/semantier is installed in js/anreact/node_modules, the
+testing project, jsample won’t work as Protocol.sk been populated by test/jsample/app.jsx.</p>
+<p>test/jsample will use different Protocol than &#64;anclient/anreact.</p>
+<p>For &#64;anclient/anreact, it will use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">js</span><span class="o">/</span><span class="n">anreact</span><span class="o">/</span><span class="n">node_modules</span><span class="o">/</span><span class="nd">@anclient</span><span class="o">/</span><span class="n">semantier</span><span class="o">/</span><span class="n">protocol</span><span class="o">.</span><span class="n">js</span><span class="o">/</span><span class="n">Protocol</span>
+</pre></div>
+</div>
+<p>For test/jsample, it will use (via npm link):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">js</span><span class="o">/</span><span class="n">semantier</span><span class="o">/</span><span class="n">protocol</span><span class="o">.</span><span class="n">js</span><span class="o">/</span><span class="n">Protocol</span>
+</pre></div>
+</div>
+<p>This will leads to failed on binding DatasetCombos.</p>
+<p><strong>Solution</strong></p>
+<p>To avoid this, link from anreact to semantier.</p>
+<p>In js/anreact:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">npm</span> <span class="n">link</span> <span class="nd">@anclient</span><span class="o">/</span><span class="n">semantier</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Load such things from server at runtime?</p>
+</div>
 </div>
 </div>
 </div>
