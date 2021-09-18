@@ -1,8 +1,17 @@
 Hard learnt lessons: JS
 =======================
 
+.. _how-anreact-evolved:
+
+How is @anclient/aneact evolved
+-------------------------------
+
 [v0.9.92] Protocol Instances
------------------------------
+____________________________
+
+Solved: Example app can test protocol depending on @anclient/semantier.
+
+Problem: Protocol not shared between @anclient/semantier and example app.
 
 This structure can leads to Protocol referencing error, though it's a nice try to
 separate core parts for js unit test - without depending on document & window.
@@ -38,7 +47,60 @@ This structure results in the following node modules' tree in example.js::
               |--> semantier
                      |--> protocol.js : Protocol.sk
 
-This is using different instance.
+This results in using different instance.
 
-.. code-block:: javascript
-..
+@anclient/anreact decision
+__________________________
+
+Since @anclient/anreact v0.2.0, Anclient/js is using the following structure, for
+both test, shareing Protocol and avoid "invalid hook call".
+
+The basic idea of resolve "invalid hook call" is sharing React package for both
+@anclient/anreact & depending application.
+
+::
+
+    js
+    ├── anreact
+    │   ├── src
+    │   │   ├── an-components.js
+    │   │   ├── jsample
+    │   │   ├── patch
+    │   │   ├── react
+    │   │   └── utils
+    │   └── webpack.config.js
+    ├── semantier
+    │   ├── anclient.js
+    │   ├── package.json
+    │   ├── protocol.js
+    │   └── semantier.js
+    └── test
+        ├── all-jsunits.js
+        ├── jsample
+        │   ├── app.jsx
+        │   ├── dist
+        │   ├── login-app.jsx
+        │   ├── package.json
+        │   └── webpack.config.js
+        └── jsunit
+            ├── 00-aes.mocha.js
+            └── ...
+
+Both @anclient/anreact & @anclient/semantier are published separately. To transpile
+test/jsample, in both anreact & semantier folder::
+
+    npm link
+
+in test/jsample::
+
+    npm link @anclient/anreact
+    npm link @anclient/semantier
+
+(Because we need update lib frequently while testing and npm don't support SNAPSHOT)
+
+In example.js, users need to install::
+
+    npm install react react-dom react-router react-router-dom
+    npm install @anclient/anreact @anclient/semantier
+
+This makes Protocol and React been shared between Anclient/js and application.

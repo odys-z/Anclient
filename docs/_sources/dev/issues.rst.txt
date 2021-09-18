@@ -1,10 +1,26 @@
 Issues & Handling
 =================
 
-React Issue #13991 - Invalid hood call
+Invalid hook call
+-----------------
+
+To solve the "Invalid hook call" error and helping example tests, Anclient/js now
+break into 2 module, @anclient/semantier & @anclient/anreact.
+( :ref:`the next section<about-invalid-hook-call>` can be a good example shows
+how this issue is a big trouble)
+
+For details on structure used to meet independent unit test and test with local
+npm link, see :ref:`How is @anclient/aneact evolved<how-anreact-evolved>`.
+
+.. _about-invalid-hook-call:
+
+React Issue #13991 - Invalid hook call
 --------------------------------------
 
-.. attention:: Since new example of North is verified. This issue is closed.
+.. attention:: Since @anclient/react verified, this issue is closed.
+..
+
+.. attention:: [deprecated] Since new example of North is verified. This issue is closed.
 ..
 
 .. note:: To test with test/jsample, use

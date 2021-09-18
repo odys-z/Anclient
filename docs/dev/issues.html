@@ -97,7 +97,8 @@
 <li class="toctree-l2"><a class="reference internal" href="note-react.html">Design Note</a></li>
 <li class="toctree-l2"><a class="reference internal" href="note-js-npm.html">Hard learnt lessons: JS</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Issues &amp; Handling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#react-issue-13991-invalid-hood-call">React Issue #13991 - Invalid hood call</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#invalid-hook-call">Invalid hook call</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#react-issue-13991-invalid-hook-call">React Issue #13991 - Invalid hook call</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#about-the-error">About the error</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cause-of-error">Cause of Error</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#solution">Solution</a></li>
@@ -185,11 +186,24 @@
             
   <div class="section" id="issues-handling">
 <h1>Issues &amp; Handling<a class="headerlink" href="#issues-handling" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="react-issue-13991-invalid-hood-call">
-<h2>React Issue #13991 - Invalid hood call<a class="headerlink" href="#react-issue-13991-invalid-hood-call" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="invalid-hook-call">
+<h2>Invalid hook call<a class="headerlink" href="#invalid-hook-call" title="Permalink to this headline">¶</a></h2>
+<p>To solve the “Invalid hook call” error and helping example tests, Anclient/js now
+break into 2 module, &#64;anclient/semantier &amp; &#64;anclient/anreact.
+( <a class="reference internal" href="#about-invalid-hook-call"><span class="std std-ref">the next section</span></a> can be a good example shows
+how this issue is a big trouble)</p>
+<p>For details on structure used to meet independent unit test and test with local
+npm link, see <a class="reference internal" href="note-js-npm.html#how-anreact-evolved"><span class="std std-ref">How is &#64;anclient/aneact evolved</span></a>.</p>
+</div>
+<div class="section" id="react-issue-13991-invalid-hook-call">
+<span id="about-invalid-hook-call"></span><h2>React Issue #13991 - Invalid hook call<a class="headerlink" href="#react-issue-13991-invalid-hook-call" title="Permalink to this headline">¶</a></h2>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
-<p>Since new example of North is verified. This issue is closed.</p>
+<p>Since &#64;anclient/react verified, this issue is closed.</p>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>[deprecated] Since new example of North is verified. This issue is closed.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
