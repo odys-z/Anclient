@@ -700,14 +700,15 @@ class UpdateReq extends AnsonBody {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
+		this.a = Protocol.CRUD.u;
 		this.mtabl = tabl;
 		this.nvs = [];
 		this.where = [];
 		if (Array.isArray(pk))
-			this.where.push(pk);
+			this.where.push(['=', pk[0], `'${pk[1]}'`]);
 		else if (typeof pk === "object")
 		 	if (pk.pk !== undefined)
-				this.where.push([pk.pk, pk.v]);
+				this.where.push(['=', pk.pk, `'${pk.v}'`]);
 			else console.error("UpdateReq: Can't understand pk: ", pk);
 	}
 

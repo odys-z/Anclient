@@ -31,6 +31,9 @@ class ImageUploadComp extends React.Component {
 
 		this.toShowImage = this.toShowImage.bind(this);
 
+		// usually element in record form must know this
+		this.field = props.field;
+
 		if (this.props.src64 && !this.state.src64) {
 			this.state.src64 = this.props.src;
 		}
@@ -65,8 +68,9 @@ class ImageUploadComp extends React.Component {
 
 			reader.onload = function(e) {
 				that.imgPreview.src = reader.result;
-				if (that.props.tier && that.props.nv) {
-					that.props.tier.rec[that.props.nv.n] = uarr2Base64(reader.result);
+				if (that.props.tier && that.field.field) {
+					// that.props.tier.rec[that.field.field] = uarr2Base64(reader.result);
+					that.props.tier.rec[that.field.field] = reader.result;
 				}
 			}
 
@@ -77,8 +81,7 @@ class ImageUploadComp extends React.Component {
 	}
 
 	render() {
-		let dataimg = this.props.tier && this.props.tier.rec && this.props.nv && this.props.nv.n ?
-				this.props.nv.v :
+		let dataimg = this.state.src64 ? this.state.src64 :
 				// blank avatar
 				`data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
 				viewBox='${gCameraViewBox}' width='64px' height='64px' fill='rgb(62 80 180)'>${gCamera}</svg>`

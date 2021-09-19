@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Button, Grid, Card, Typography } from '@material-ui/core';
 
-import { Protocol, UpdateReq, AnsonResp } from '@anclient/semantier';
+import { Protocol, UpdateReq, InsertReq, AnsonResp } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 	import { Semantier  } from '@anclient/semantier';
 	import { AnConst } from '../../utils/consts';
@@ -128,6 +128,7 @@ class MyInfTier extends Semantier {
 	uri = undefined;
 	mtabl = 'a_users';
 	pk = 'userId';
+	imgProp = 'img';
 
 	constructor(opts) {
 		super('session');
@@ -135,20 +136,21 @@ class MyInfTier extends Semantier {
 	}
 
 	columns() {
+		let that = this;
 		return [
 			{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
 			{ field: 'userName', label: L('Name'),   grid: {sm: 6, lg: 4} },
 			{ field: 'roleId',   label: L('Role'),   grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 			  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-			{ field: 'avatar',   label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
+			{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
 		];
 
-		function loadAvatar() {
+		function loadAvatar(rec, field) {
 			return (
 				<ImageUpload
 					blankIcon={{color: "primary", width: 32, height: 32}}
-					tier={this}
-					src64={this.rec && this.rec.img}
+					tier={that} field={field}
+					src64={rec && field && rec[field.field]}
 				/>);
 		}
 	}
@@ -166,7 +168,8 @@ class MyInfTier extends Semantier {
 		// Is this senario is an illustrating of general query's necessity?
 		let req = client.query(this.uri, 'a_users', 'u')
 		req.Body()
-			.col('r.roleId').col('u.userId').col('userName').col('uri').col('a.attId')
+			.col('r.roleId').col('u.userId').col('userName')
+			.col('uri', this.imgProp).col('a.attId')
 			.l("a_attaches", "a", `a.busiTbl = 'a_users' and a.busiId = '${userId}'`)
 			.l("a_roles", "r", "r.roleId=u.roleId")
 			.l("a_orgs", "o", "o.orgId=u.orgId")
@@ -199,10 +202,15 @@ class MyInfTier extends Semantier {
 					.update(this.uri, this.mtabl,
 							{pk: this.pk, v: this.pkval},
 							{roleId, userName});
-		req.Body().post(new UpdateReq(this.uri, "a_attaches",
-								{pk: "attId", v: this.rec.attId} )
-							.A(Protocol.CRUD.u)
-							.nv('uri', this.rec.img64) );
+		if (this.rec[this.imgProp]) // updated by TRecordForm/ImageUpload
+			req.Body().post( crud === Protocol.CRUD.c || !this.rec.attId ?
+				new InsertReq(this.uri, "a_attaches")
+					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
+					.nv('uri', dataOfURL(this.rec[this.imgProp])) :
+				new UpdateReq(this.uri, "a_attaches",
+						{pk: "attId", v: this.rec.attId} )
+					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
+					.nv('uri', dataOfURL(this.rec[this.imgProp])) );
 
 		client.commit(req,
 			(resp) => {
@@ -214,5 +222,11 @@ class MyInfTier extends Semantier {
 				onOk(resp);
 			},
 			this.errCtx);
+
+		function dataOfURL(dataUrl) {
+			if (dataUrl && dataUrl.startsWith('data:'))
+				return dataUrl.substring( dataUrl.indexOf(',') + 1 );
+			else return dataUrl;
+		}
 	}
 }

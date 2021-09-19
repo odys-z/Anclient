@@ -102,7 +102,7 @@ export class TRecordFormComp extends CrudCompW {
 		else if (f.type === 'formatter' || f.formatter)
 			return (
 				// <Grid item key={f.field} {...f.grid} >
-					<>{f.formatter(rec)}</>
+					<>{f.formatter(rec, f)}</>
 				// </Grid>
 			);
 		else {
