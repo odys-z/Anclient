@@ -557,7 +557,7 @@ class SessionClient {
 
 	update(uri, maintbl, pk, nvs) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
-			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't be ignored.",
+			console.error("Anclient is designed to support user updating log natively. User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
 
 		if (pk === undefined) {
@@ -572,6 +572,8 @@ class SessionClient {
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
 				upd.nv(nvs);
+			else if (typeof nvs === 'object')
+				upd.record(nvs)
 			else console.error("updating nvs must be an array of name-value.", nvs)
 		}
 		return jmsg;
@@ -731,7 +733,4 @@ export * from './protocol.js';
 export * from './semantier.js';
 // export * from './cheapflow/cheap-req.js';
 // export * from './cheapflow/cheap-client.js';
-// export * from './utils/consts.js';
-// export * from './utils/langstr.js';
-// export * from './utils/helpers.js';
 export {AnClient, SessionClient, Inseclient, aes};

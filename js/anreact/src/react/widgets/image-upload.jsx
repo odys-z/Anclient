@@ -1,10 +1,24 @@
 
 import React from 'react';
+import { withStyles } from '@material-ui/core/styles';
+import withWidth from "@material-ui/core/withWidth";
+import PropTypes from "prop-types";
 import Box from '@material-ui/core/Box';
 
-import { AvatarIcon, gCamera, gCameraViewBox } from './my-icon';
+import { Semantier } from '@anclient/semantier';
 
-export default class ImageUpload extends React.Component {
+import { AvatarIcon, gCamera, gCameraViewBox } from './my-icon';
+import { uarr2Base64 } from '../../utils/file-utils';
+
+const styles = (theme) => (Object.assign(
+	Semantier.invalidStyles, {
+	imgUploadBox: {
+		height: 48,
+		border: "solid 1px #aaa2" }
+	}
+) );
+
+class ImageUploadComp extends React.Component {
 	state = {
 		src: undefined,
 	}
@@ -15,7 +29,6 @@ export default class ImageUpload extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.onClick = this.onClick.bind(this);
 		this.toShowImage = this.toShowImage.bind(this);
 
 		if (this.props.src64 && !this.state.src64) {
@@ -41,11 +54,6 @@ export default class ImageUpload extends React.Component {
 		}
 	}
 
-	onClick(e) {
-		console.log(e);
-		this.fileInput.click();
-	}
-
 	toShowImage(e) {
 		let that = this;
 		let file = this.fileInput.files[0];
@@ -57,7 +65,11 @@ export default class ImageUpload extends React.Component {
 
 			reader.onload = function(e) {
 				that.imgPreview.src = reader.result;
+				if (that.props.tier && that.props.nv) {
+					that.props.tier.rec[that.props.nv.n] = uarr2Base64(reader.result);
+				}
 			}
+
 			reader.readAsDataURL(file);
 		} else {
 			this.setState({invalid: true});
@@ -65,7 +77,10 @@ export default class ImageUpload extends React.Component {
 	}
 
 	render() {
-		let dataimg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
+		let dataimg = this.props.tier && this.props.tier.rec && this.props.nv && this.props.nv.n ?
+				this.props.nv.v :
+				// blank avatar
+				`data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
 				viewBox='${gCameraViewBox}' width='64px' height='64px' fill='rgb(62 80 180)'>${gCamera}</svg>`
 
 		let bg = {
@@ -77,14 +92,24 @@ export default class ImageUpload extends React.Component {
 			opacity: 0
 		}
 
+		let { classes } = this.props;
+
 		return (
-		<Box style={{height: 48, border: "solid 1px #aaa2"}}>
+		  //<Box style={{height: 48, border: "solid 1px #aaa2"}}>
+		  <Box className={ this.props.classBox || classes.imgUploadBox }>
 			<img src={dataimg} style={{ width: "auto", height: "100%" }}
 				ref={(ref) => this.imgPreview = ref} />
 			<input type='file' style={ bg }
-		 		ref={(ref) => this.fileInput = ref}
+		 		ref={ (ref) => this.fileInput = ref }
 		 		onChange={ this.toShowImage } />
-		</Box>);
-
+		  </Box>);
 	}
 }
+
+ImageUploadComp.propTypes = {
+	tier: PropTypes.object.isRequired,
+	nv: PropTypes.object, // the record field and value
+};
+
+const ImageUpload = withWidth()(withStyles(styles)(ImageUploadComp));
+export { ImageUpload, ImageUploadComp };

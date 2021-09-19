@@ -147,15 +147,20 @@ class App extends React.Component {
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
-					myInfo={myInfoPanels('/sys')}
+					myInfo={myInfoPanels}
 					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
-		function myInfoPanels(uri) {
+		/**Create MyInfCard.
+		 * To avoid create component before context avialable, this function need the caller' context as parameter.
+		 * @param {AnContext} anContext
+		 */
+		function myInfoPanels(anContext) {
 			return [
-				{title: L('Basic'),      panel: <MyInfCard uri={uri} ssInf={that.state.anClient.ssInf} />},
+				{title: L('Basic'),
+				  panel: <MyInfCard uri={'/sys'} anContext={anContext} ssInf={that.state.anClient.ssInf} />},
 				// {title: L('My Classes'), panel: <MyClassTree />},
 				{title: L('My Status'),  panel: <Typography>Tasks cleared!</Typography>}
 			  ];

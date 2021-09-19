@@ -395,7 +395,7 @@ class SysComp extends React.Component {
 			</Router>
 
 			{this.state.showMine && <MyInfo
-				panels={this.props.myInfo}
+				panels={typeof this.props.myInfo === 'function' ? this.props.myInfo(this.context) : this.props.myInfo}
 				onClose={() => this.setState({ showMine: false })} />}
 			{this.confirmLogout}
 		  </div>);

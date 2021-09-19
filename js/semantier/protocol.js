@@ -576,6 +576,10 @@ class QueryReq extends AnsonBody {
 		return this;
 	}
 
+	col (c, as) {
+		return this.expr(c, as);
+	}
+
 	exprss (exps) {
 		if (exps !== undefined && exps.length !== undefined) {
 			for (var ix = 0; ix < exps.length; ix++) {
@@ -710,7 +714,6 @@ class UpdateReq extends AnsonBody {
 	/** add n-v
 	 * @param {string} n
 	 * @param {object} v
-	 * TODO what about v is QueryReq ?
 	 * @return {UpdateReq} this
 	 */
 	nv (n, v) {
@@ -720,6 +723,18 @@ class UpdateReq extends AnsonBody {
 		else {
 			this.nvs.push([n, v]);
 		}
+		return this;
+	}
+
+	/** add n-v
+	 * @param {object} rec
+	 * @return {UpdateReq} this
+	 */
+	record(rec) {
+		if (rec)
+			for (let n in rec) {
+				this.nvs.push([n, rec[n]]);
+			}
 		return this;
 	}
 

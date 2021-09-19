@@ -11,7 +11,6 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Protocol, AnsonResp } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext } from '../reactext.jsx';
 	import { Semantier } from '@anclient/semantier';
@@ -20,9 +19,6 @@ import { L } from '../../utils/langstr';
 const styles = (theme) => (Object.assign(
 	Semantier.invalidStyles, {
 		root: {
-			// display: "flex",
-			// width: "300",
-			// marginTop: theme.spacing(1),
 		},
 	} )
 );
@@ -65,10 +61,6 @@ class DatasetComboComp extends React.Component {
 					cond: this.state.combo
 				},
 				this.context.error, this);
-		// else if (this.state.combo.options && this.state.initVal != undefined) {
-		// 	let selectedItem = findOption(this.state.combo.options, this.state.initVal);
-		// 	this.setState(selectedItem);
-		// }
 	}
 
 	onCbbRefChange( refcbb ) {
@@ -78,7 +70,6 @@ class DatasetComboComp extends React.Component {
 		_cmb.ref = _ref;
 		return (e, item) => {
 			if (e) e.stopPropagation();
-			// console.log('onCbbRefChange()', _cmb);
 			let selectedItem = item ? item : AnConst.cbbAllItem;
 
 			if (typeof _that.props.onSelect === 'function')
@@ -113,12 +104,12 @@ class DatasetComboComp extends React.Component {
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
 			options={cmb.options}
-			style={this.props.style}
+			style={ this.props.style }
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
-			getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
-			filter={Autocomplete.caseInsensitiveFilter}
-			renderInput={(params) => <TextField {...params} label={v ? v.n : ''} variant="outlined" />}
+			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
+			filter={ Autocomplete.caseInsensitiveFilter }
+			renderInput={ (params) => <TextField {...params} label={v ? v.n : ''} variant="outlined" /> }
 		/>);
 
 		function findOption (opts, v) {
@@ -136,7 +127,6 @@ DatasetComboComp.contextType = AnContext;
 DatasetComboComp.propTypes = {
 	uri: PropTypes.string
 };
-
 
 const DatasetCombo = withWidth()(withStyles(styles)(DatasetComboComp));
 export { DatasetCombo, DatasetComboComp }

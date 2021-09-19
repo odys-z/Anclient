@@ -7,7 +7,7 @@ export class Semantier {
 	static invalidStyles = {
 		ok: {},
 		anyErr : { border: "1px solid red" },
-		notNull: { border: "1px solid red", backgroundColor: '#ff9800b0' },
+		notNull: { backgroundColor: '#ff9800b0' },
 		maxLen : { border: "1px solid red" },
 		minLen : { border: "1px solid red" },
 	}
@@ -17,11 +17,17 @@ export class Semantier {
 	}
 
 	setContext(context) {
+		if (!context || !context.anClient)
+			console.error(this, "Setup semantic tier without React context?");
+
 		this.client = context.anClient;
 		this.errCtx = context.error;
 	}
 
 	validate(rec, fields) {
+		if (!rec) rec = this.rec;
+		if (!fields) fields = this.columns ? this.columns() : this.recFields;
+
 		if (this.disableValidate)
 			return true;
 

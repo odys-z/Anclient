@@ -15,7 +15,7 @@ import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../crud';
-	import { DatasetCombo } from './dataset-combo'
+	import { DatasetCombo } from './dataset-combo';
 	import { JsampleIcons } from '../../jsample/styles';
 	import { Semantier } from '@anclient/semantier';
 
@@ -77,11 +77,6 @@ export class TRecordFormComp extends CrudCompW {
 	componentDidMount() {
 	}
 
-	/** Should be called by form, because saving action happends there
-	 * - where data validated and new way of (altering) rendering are done here
-	validate(invalidStyle) { }
-	 */
-
 	getField(f, rec, classes) {
 		let media = super.media;
 		let {isSm} = media;
@@ -89,29 +84,27 @@ export class TRecordFormComp extends CrudCompW {
 
 		if (f.type === 'enum' || f.type === 'cbb') {
 			return (
-				<DatasetCombo uri={this.props.uri}
-					sk={f.sk} nv={f.nv}
-					disabled={!!f.disabled}
-					readOnly={this.tier && this.tier.isReadonly && this.tier.isReadonly(f)}
-					options={f.options || []} val={rec[f.field]}
-					label={f.label}
-					style={f.defaultStyle || {width: 300}}
-					invalidStyle={f.style}
+				<DatasetCombo uri={ this.props.uri }
+					sk={f.sk} nv={ f.nv }
+					disabled={ !!f.disabled }
+					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(f) }
+					options={ f.options || []} val={rec[f.field] }
+					label={ f.label }
+					style={ f.cbbStyle || {width: 200} }
+					invalidStyle={ f.style }
 					onSelect={ (v) => {
 						rec[f.field] = v.v;
 						f.style = undefined;
 						that.setState({dirty: true});
-					}}
+					} }
 				/>);
 		}
 		else if (f.type === 'formatter' || f.formatter)
 			return (
-				<Grid item key={f.field} {...f.cols} >
-					{/* <Typography variant='body2' >
-					  {f.formatter(rec)}
-					</Typography> */}
-					{f.formatter(rec)}
-				</Grid>);
+				// <Grid item key={f.field} {...f.grid} >
+					<>{f.formatter(rec)}</>
+				// </Grid>
+			);
 		else {
 			let type = 'text';
 			if (f.type === 'float' || f.type === 'int')
@@ -147,11 +140,11 @@ export class TRecordFormComp extends CrudCompW {
 				<Grid item key={`${f.field}.${i}`}
 					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
 				  <Box className={classes.rowBox} {...f.box} >
-					{!isSm && (
+					{!isSm && f.label &&
 					  <Typography className={classes.formLabel} >
 						{L(f.label)}
 					  </Typography>
-					)}
+					}
 					{this.getField(f, rec, classes)}
 				  </Box>
 				</Grid> );
