@@ -14,7 +14,7 @@ import { L } from '../../../lib/utils/langstr';
 	import { JsampleIcons } from '../styles';
 	import { CrudComp } from '../../../lib/react/crud';
 	import { AnContext, AnError } from '../../../lib/react/reactext';
-	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox.jsx'
+	import { ConfirmDialog } from '../../../lib/react/widgets/messagebox'
 
 	import { RoleDetails } from './role-details';
 

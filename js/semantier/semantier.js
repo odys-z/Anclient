@@ -47,7 +47,7 @@ export class Semantier {
 				if (v === '' || ! Number.isInteger(Number(v))) return false;
 
 			if (typeof f.validator === 'function')
-				return f.validator(v);
+				return f.validator(v, record, f);
 			else if (f.validator) {
 				let vd = f.validator;
 				if(vd.notNull && (v === undefined || v === null || v.length === 0))

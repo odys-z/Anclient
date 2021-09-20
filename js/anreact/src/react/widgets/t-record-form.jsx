@@ -112,9 +112,9 @@ export class TRecordFormComp extends CrudCompW {
 			let readOnly = (typeof this.tier.isReadonly === 'function') ?
 							this.tier.isReadonly(f) : this.tier.isReadonly;
 			return (
-			<TextField id={f.field} key={f.field}
+			<TextField key={f.field}
 				type={f.type || type}
-				disabled={!!f.disabled}
+				disabled={!!f.disabled} autoComplete={f.autocomplete}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'

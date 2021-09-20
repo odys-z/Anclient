@@ -22,7 +22,7 @@ import { L } from '../../utils/langstr';
 	import { AnContext, AnError } from '../../react/reactext'
 	import { JsampleIcons } from '../styles'
 	import { DetailFormW } from '../../react/crud'
-	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
+	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { AnTree } from '../../react/widgets/tree';
 
 const styles = theme => ({

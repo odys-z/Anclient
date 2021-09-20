@@ -10,7 +10,7 @@ import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
-	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
+	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { AnTablist } from '../../react/widgets/table-list';
 	import { AnQueryForm } from '../../react/widgets/query-form';
 

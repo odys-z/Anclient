@@ -31,7 +31,7 @@ class TabPanel extends React.Component {
 	render () {
 	  return (
 		<div hidden={this.props.pid !== this.props.px}
-			id={`p-${this.props.pid}`}
+			key={`p-${this.props.pid}`}
 			{...this.props.args}
 		>
 			<Box p={3}>
@@ -97,9 +97,9 @@ class TabsComp extends React.Component {
 				  <Tab value={2} label={L('panels[2].title')} className={classes.tab} />
 				</Tabs>
 			  </AppBar>
-				<TabPanel px={that.state.px} pid={0} children={that.state.panels[0]} />
-				<TabPanel px={that.state.px} pid={1} children={that.state.panels[1]} />
-				<TabPanel px={that.state.px} pid={2} children={that.state.panels[2]} />
+				<TabPanel px={that.state.px} pid={0} key={0} children={that.state.panels[0]} />
+				<TabPanel px={that.state.px} pid={1} key={1} children={that.state.panels[1]} />
+				<TabPanel px={that.state.px} pid={2} key={2} children={that.state.panels[2]} />
 			</div> );
 		}
 	}

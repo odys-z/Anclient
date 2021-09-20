@@ -44,7 +44,7 @@ class MyInfCardComp extends React.Component {
 	componentDidMount() {
 		console.log(this.props.uri);
 
-		// MyInfCard is created outside of context provider,
+		// TODO DOC: MyInfCard is created outside of context provider,
 		// see test/jsample/app.jsx: render().myInfoPanels(AnContext)
 		// Don't set this in constructor. This.context changed after it.
 		this.context = this.props.anContext || this.context;
@@ -123,7 +123,7 @@ MyInfCardComp.propTypes = {
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 export { MyInfCard, MyInfCardComp };
 
-class MyInfTier extends Semantier {
+export class MyInfTier extends Semantier {
 
 	uri = undefined;
 	mtabl = 'a_users';
@@ -206,9 +206,16 @@ class MyInfTier extends Semantier {
 		// about attached image:
 		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
 		if ( this.rec.attId )
+			// NOTE this is a design erro
+			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
+			//          2. delete saved attId file (trigged by semantic handler)
 			req.Body().post(
-				new DeleteReq(this.uri, "a_attaches",
-						{pk: "attId", v: this.rec.attId}) );
+					new DeleteReq(this.uri, "a_attaches",
+						{pk: "attId", v: this.rec.attId}) )
+				.post(
+					new DeleteReq(this.uri, "a_attaches")
+						.whereEq('busiId', this.rec[this.pk] || '')
+					 	.whereEq('busiTbl', this.mtabl));
 		if ( this.rec[this.imgProp] )
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")

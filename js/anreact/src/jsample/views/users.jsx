@@ -187,7 +187,6 @@ class UserstComp extends CrudCompW {
 
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
-				// stateHook={this.formHook}
 				selectedIds={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}

@@ -2,7 +2,7 @@ import $ from 'jquery';
 import React from 'react';
 
 import {L} from '../utils/langstr';
-import {ConfirmDialog} from './widgets/messagebox.jsx'
+import {ConfirmDialog} from './widgets/messagebox'
 
 export const AnContext = React.createContext({
 	//	Anclient
