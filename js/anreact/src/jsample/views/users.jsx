@@ -12,8 +12,8 @@ import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
-	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
-	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
+	import { ConfirmDialog } from '../../react/widgets/messagebox'
+	import { AnTablist } from '../../react/widgets/table-list';
 	import { AnQueryst } from '../../react/widgets/query-form-st';
 	import { JsampleIcons } from '../styles';
 
@@ -185,7 +185,7 @@ class UserstComp extends CrudCompW {
 				>{L('Edit')}</Button>
 			</Grid>
 
-			{tier && <AnTablistLevelUp pk={tier.pk}
+			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				// stateHook={this.formHook}
 				selectedIds={this.state.selected}

@@ -71,6 +71,7 @@ class AnTablistLevelUpComp extends React.Component {
 	}
 
 	componentDidMount() {
+		console.warn("AnTablistLevelUp is deprecated. Use AnTablist with Semantier instead.");
 	}
 
 	isSelected(k) {
