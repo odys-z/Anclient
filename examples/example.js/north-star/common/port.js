@@ -8,5 +8,7 @@ export const StarPorts = {
 	mykidstier: "mykids.tier",
 	gpatier: "gpa.tier",
 
+	docstier: "docs.tier",
+
 	nchart: 'nchart.tier',
 }

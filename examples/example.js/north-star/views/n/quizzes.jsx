@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography, Grid, Button } from '@material-ui/core';
 
-import { AnClient, SessionClient, Protocol, UserReq } from '@anclient/semantier';
+import { Protocol, UserReq } from '@anclient/semantier';
 import {
     L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
@@ -266,12 +266,12 @@ class QuizzesComp extends CrudCompW {
 				selectedIds={this.state.selected}
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
-					{ text: L('qid'), hide: 1,   field: "qid" },
-					{ text: L('Title'),          field: "title",     color: 'primary', className: 'bold' },
-					{ text: L('Tags'),           field: "tags",      color: 'primary' },
-					{ text: L('Date Created'),   field: "dcreate",   color: 'primary', formatter: d => d && d.substring(0, 10) },
-					{ text: L('Total Q'),field: "questions", color: 'primary' },
-					{ text: L('Polls'),          field: "polls",     color: 'primary' }
+					{ text: L('qid'), hide:1, field: "qid" },
+					{ text: L('Title'),       field: "title",    color: 'primary', className: 'bold' },
+					{ text: L('Tags'),        field: "tags",     color: 'primary' },
+					{ text: L('Date Created'),field: "dcreate",  color: 'primary', formatter: d => d && d.substring(0, 10) },
+					{ text: L('Total Q'),     field: "questions",color: 'primary' },
+					{ text: L('Polls'),       field: "polls",    color: 'primary' }
 				]}
 				rows={this.state.rows}
 				pageInf={this.state.pageInf}
