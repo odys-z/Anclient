@@ -8,10 +8,10 @@ import { Protocol, SessionClient, Semantier } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
-	Sys, SysComp, FileList, jsample
+	Sys, SysComp, jsample
 } from '@anclient/anreact';
 
-const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, MyInfCard } = jsample;
+const { Domain, Roles, Orgs, Users, Userst, JsampleTheme } = jsample;
 
 // import { GPAsheet } from './gpa';
 
@@ -159,9 +159,10 @@ class App extends React.Component {
 		 */
 		function myInfoPanels(anContext) {
 			return [
-				{title: L('Basic'),
-				  panel: <MyInfCard uri={'/sys'} anContext={anContext} ssInf={that.state.anClient.ssInf} />},
-				{title: L('My Files'),  panel: <FileList />}
+				{ title: L('Basic'),
+				  panel: <jsample.MyInfCard uri={'/sys/session'} anContext={anContext} ssInf={that.state.anClient.ssInf} /> },
+				{ title: L('Password'),
+				  panel: <jsample.MyPswd uri={'/sys/session'} anContext={anContext} ssInf={that.state.anClient.ssInf} /> }
 			  ];
 		}
 	}

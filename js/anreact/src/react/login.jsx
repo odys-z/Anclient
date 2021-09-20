@@ -14,7 +14,7 @@ import { Protocol } from '@anclient/semantier';
 import { an, SessionClient } from '@anclient/semantier';
 	// import {Protocol} from '../../semantier/protocol'
 	import {AnContext} from './reactext.jsx';
-	import {ConfirmDialog} from './widgets/messagebox.jsx'
+	import {ConfirmDialog} from './widgets/messagebox'
 	import {L, Langstrs} from '../utils/langstr.js'
 
 const styles = (theme) => ({

@@ -7,7 +7,6 @@ import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/co
 import { Protocol, AnsonResp , UserReq } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	// import { Protocol, AnsonResp , UserReq } from '../../../semantier/protocol';
 	import { Semantier } from '@anclient/semantier';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
@@ -87,7 +86,6 @@ class UserstComp extends CrudCompW {
 	}
 
 	onTableSelect(rowIds) {
-		// this.state.selected.Ids = rowIds
 		this.setState( {
 			buttons: {
 				// is this als CRUD semantics?
@@ -106,9 +104,6 @@ class UserstComp extends CrudCompW {
 				onOk={ that.del }
 				onClose={() => {that.confirm = undefined;} }
 				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
-
-		// that.state.selected.Ids.clear();
-		// this.setState({});
 	}
 
 	del() {
@@ -125,8 +120,6 @@ class UserstComp extends CrudCompW {
 							that.toSearch();
 						} }
 						msg={L('Deleting Succeed!')} />);
-				// that.state.selected.Ids.clear();
-				// that.setState({});
 				that.toSearch();
 			} );
 	}
@@ -187,7 +180,6 @@ class UserstComp extends CrudCompW {
 
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
-				// stateHook={this.formHook}
 				selectedIds={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
@@ -232,12 +224,6 @@ class UsersQuery extends React.Component {
 	render () {
 		let that = this;
 		return (
-		// <AnQuery {...this.props}
-		// 	conds={this.conds}
-		// 	query={ (q) => that.props.onQuery(that.collect()) }
-		// 	onSearch={this.props.onQuery}
-		// 	onDone={() => { that.props.onQuery(that.collect()); } }
-		// />
 		<AnQueryst {...this.props}
 			conds={this.conds}
 			onSearch={() => this.props.onQuery(that.collect()) }
@@ -309,7 +295,7 @@ export class UsersTier extends Semantier {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				// that.rows = rows;
-				that.rec = rows && rows[0]; // in level-up, child form editing lost
+				that.rec = rows && rows[0];
 				onLoad(cols, rows);
 			},
 			this.errCtx);

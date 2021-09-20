@@ -192,7 +192,6 @@ UserDetailstComp.propTypes = {
 	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
 	tier: PropTypes.object.isRequired,
 	crud: PropTypes.string.isRequired,
-	stateHook: PropTypes.object,		// not required for readonly mode
 	dense: PropTypes.bool
 };
 

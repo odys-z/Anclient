@@ -1,16 +1,3 @@
-// // let context = require.context('../../frames/react', true, /\.jsx$/);
-// let context = require.context('../../', true, /(\.jsx)|(anclient.js)|(protocol.js)|(aes.js)$/);
-//
-// context.keys().forEach(context);
-// module.exports = context;
-// // export {context};
-
-// function requireAll(r) { r.keys().forEach(r); }
-//
-// requireAll(require.context('../../', true, /(\.jsx)|(anclient.js)|(protocol.js)|(aes.js)$/));
-
-// export * from './anclient.js';
-
 export * from './utils/consts.js';
 export * from './utils/langstr.js';
 export * from './utils/helpers.js';
@@ -30,13 +17,14 @@ export * from './utils/langstr.js';
 
 export * from './react/widgets/messagebox';
 export * from './react/widgets/dataset-combo';
+export * from './react/widgets/image-upload';
+export * from './react/widgets/file-upload';
 export * from './react/widgets/my-icon';
 export * from './react/widgets/my-info';
 export * from './react/widgets/query-form';
 export * from './react/widgets/query-form-st';
 export * from './react/widgets/table-list';
 export * from './react/widgets/table-list-lu';
-export * from './react/widgets/file-list';
 export * from './react/widgets/tabs';
 export * from './react/widgets/tree';
 export * from './react/widgets/treegrid';
@@ -57,11 +45,13 @@ import { RoleDetails, RoleDetailsComp } from './jsample/views/role-details';
 import { Userst, UserstComp, UsersTier, UserstReq } from './jsample/views/users';
 import { UserDetailst, UserDetailstComp } from './jsample/views/user-details';
 import { MyInfCard, MyInfCardComp } from './jsample/views/my-infcard';
+import { MyPswd, MyPswdComp } from './jsample/views/my-pswdcard';
 
 export const jsample = {
 	JsampleIcons, JsampleTheme,
 	Domain, DomainComp, Orgs, OrgsComp,
 	Roles, RolesComp, RoleDetails, RoleDetailsComp,
 	MyInfCard, MyInfCardComp,
+	MyPswd, MyPswdComp,
 	Userst, UserstComp, UserDetailst, UserDetailstComp, UsersTier, UserstReq
 };

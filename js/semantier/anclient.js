@@ -488,7 +488,8 @@ class SessionClient {
 				.md('oldpswd', oldPswd)
 				.md('iv_old', aes.bytesToB64(iv_old));
 		var jmsg = new AnsonMsg({
-					port: Protocol.Port.session,
+					// port: Protocol.Port.session,
+					port: 'session',
 					header: this.getHeader(),
 					body: [body] });
 
@@ -496,7 +497,7 @@ class SessionClient {
 			opts = {};
 		}
 
-		this.an.post(jmsg, opts.onok, opts.onerror);
+		this.an.post(jmsg, opts.onOk, opts.onError);
 		return this;
 	}
 

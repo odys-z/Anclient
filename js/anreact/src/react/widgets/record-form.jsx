@@ -159,7 +159,7 @@ class RecordFormComp extends DetailFormW {
 			if (f.type === 'float' || f.type === 'int')
 				type = 'number'
 			return (
-			<TextField id={f.field} key={f.field}
+			<TextField key={f.field}
 				type={f.type || type} disabled={!!f.disabled}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
