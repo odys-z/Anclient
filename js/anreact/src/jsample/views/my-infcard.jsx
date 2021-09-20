@@ -4,8 +4,9 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Button, Grid, Card, Typography } from '@material-ui/core';
 
-import { Protocol, UpdateReq, InsertReq, AnsonResp } from '@anclient/semantier';
+import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
+	import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 	import { Semantier  } from '@anclient/semantier';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
@@ -169,7 +170,7 @@ class MyInfTier extends Semantier {
 		let req = client.query(this.uri, 'a_users', 'u')
 		req.Body()
 			.col('r.roleId').col('u.userId').col('userName')
-			.col('uri', this.imgProp).col('a.attId')
+			.col('extfile(uri)', this.imgProp).col('attName').col('mime').col('a.attId')
 			.l("a_attaches", "a", `a.busiTbl = 'a_users' and a.busiId = '${userId}'`)
 			.l("a_roles", "r", "r.roleId=u.roleId")
 			.l("a_orgs", "o", "o.orgId=u.orgId")
@@ -181,6 +182,7 @@ class MyInfTier extends Semantier {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
 				that.pkval = that.rec && that.rec[that.pk];
+				that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
 				onLoad(cols, rows && rows[0]);
 			},
 			this.errCtx);
@@ -202,15 +204,19 @@ class MyInfTier extends Semantier {
 					.update(this.uri, this.mtabl,
 							{pk: this.pk, v: this.pkval},
 							{roleId, userName});
-		if (this.rec[this.imgProp]) // updated by TRecordForm/ImageUpload
-			req.Body().post( crud === Protocol.CRUD.c || !this.rec.attId ?
+		// about attached image:
+		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
+		if ( this.rec.attId )
+			req.Body().post(
+				new DeleteReq(this.uri, "a_attaches",
+						{pk: "attId", v: this.rec.attId}) );
+		if ( this.rec[this.imgProp] )
+			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
-					.nv('uri', dataOfURL(this.rec[this.imgProp])) :
-				new UpdateReq(this.uri, "a_attaches",
-						{pk: "attId", v: this.rec.attId} )
-					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
-					.nv('uri', dataOfURL(this.rec[this.imgProp])) );
+					.nv('attName', this.rec.fileMeta.name)
+					.nv('mime', this.rec.fileMeta.mime)
+					.nv('uri', dataOfurl(this.rec[this.imgProp])) );
 
 		client.commit(req,
 			(resp) => {
@@ -222,11 +228,5 @@ class MyInfTier extends Semantier {
 				onOk(resp);
 			},
 			this.errCtx);
-
-		function dataOfURL(dataUrl) {
-			if (dataUrl && dataUrl.startsWith('data:'))
-				return dataUrl.substring( dataUrl.indexOf(',') + 1 );
-			else return dataUrl;
-		}
 	}
 }

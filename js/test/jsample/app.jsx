@@ -8,7 +8,7 @@ import { Protocol, SessionClient, Semantier } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
-	Sys, SysComp, jsample
+	Sys, SysComp, FileList, jsample
 } from '@anclient/anreact';
 
 const { Domain, Roles, Orgs, Users, Userst, JsampleTheme, MyInfCard } = jsample;
@@ -161,8 +161,7 @@ class App extends React.Component {
 			return [
 				{title: L('Basic'),
 				  panel: <MyInfCard uri={'/sys'} anContext={anContext} ssInf={that.state.anClient.ssInf} />},
-				// {title: L('My Classes'), panel: <MyClassTree />},
-				{title: L('My Status'),  panel: <Typography>Tasks cleared!</Typography>}
+				{title: L('My Files'),  panel: <FileList />}
 			  ];
 		}
 	}

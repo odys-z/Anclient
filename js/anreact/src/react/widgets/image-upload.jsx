@@ -8,7 +8,7 @@ import Box from '@material-ui/core/Box';
 import { Semantier } from '@anclient/semantier';
 
 import { AvatarIcon, gCamera, gCameraViewBox } from './my-icon';
-import { uarr2Base64 } from '../../utils/file-utils';
+import { uarr2Base64, mimeOf } from '../../utils/file-utils';
 
 const styles = (theme) => (Object.assign(
 	Semantier.invalidStyles, {
@@ -34,9 +34,9 @@ class ImageUploadComp extends React.Component {
 		// usually element in record form must know this
 		this.field = props.field;
 
-		if (this.props.src64 && !this.state.src64) {
-			this.state.src64 = this.props.src;
-		}
+		// if (this.props.src64 && !this.state.src64) {
+		// 	this.state.src64 = this.props.src;
+		// }
 	}
 
 	componentDidMount() {
@@ -69,8 +69,10 @@ class ImageUploadComp extends React.Component {
 			reader.onload = function(e) {
 				that.imgPreview.src = reader.result;
 				if (that.props.tier && that.field.field) {
-					// that.props.tier.rec[that.field.field] = uarr2Base64(reader.result);
 					that.props.tier.rec[that.field.field] = reader.result;
+					that.props.tier.rec.fileMeta = {
+						mime: mimeOf( reader.result ),
+						name: file.name};
 				}
 			}
 
@@ -81,7 +83,7 @@ class ImageUploadComp extends React.Component {
 	}
 
 	render() {
-		let dataimg = this.state.src64 ? this.state.src64 :
+		let dataimg = this.props.src64 ? this.props.src64 :
 				// blank avatar
 				`data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
 				viewBox='${gCameraViewBox}' width='64px' height='64px' fill='rgb(62 80 180)'>${gCamera}</svg>`

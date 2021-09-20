@@ -101,3 +101,19 @@ export function uarr2Base64 (u8Arr, mime) {
 	}
 	return btoa(result);
 }
+
+export function dataOfurl(dataUrl) {
+	if (dataUrl && dataUrl.startsWith('data:'))
+		return dataUrl.substring( dataUrl.indexOf(',') + 1 );
+	else return dataUrl;
+}
+
+export function mimeOf(dataUrl) {
+	if (dataUrl && dataUrl.startsWith('data:'))
+		return dataUrl.substring( 5, dataUrl.indexOf(',') );
+	else return undefined;
+}
+
+export function urlOfdata(mime, data) {
+	return ['data:' + mime, data].join(',');
+}
