@@ -172,4 +172,4 @@ TRecordFormComp.propTypes = {
 };
 
 const TRecordForm = withWidth()(withStyles(styles)(TRecordFormComp));
-export { TRecordForm }
+export { TRecordForm, TRecordFormComp }

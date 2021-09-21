@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp , UserReq } from '@anclient/semantier';
+import { Protocol, AnsonResp, DocsReq, Semantier } from '@anclient/semantier';
 import { L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
 	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample
@@ -19,6 +19,14 @@ const styles = (theme) => ( {
 	root: {
 	},
 	button: {
+	},
+ 	fileInput: {
+		border: "solid 1px #f777",
+		width: "100%",
+		height: "100%",
+		position: "relative",
+		top: -52,
+		opacity: 0
 	}
 } );
 
@@ -57,6 +65,8 @@ class DocsharesComp extends CrudCompW {
 		this.tier.setContext(this.context);
 	}
 
+	fileInput = undefined;
+
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
 	 * @param {object} condts the query conditions collected from query form.
@@ -77,13 +87,12 @@ class DocsharesComp extends CrudCompW {
 	}
 
 	onTableSelect(rowIds) {
-		// this.state.selected.Ids = rowIds
 		this.setState( {
 			buttons: {
-				// is this all CRUD semantics?
+				// NOTE: is this also CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.size === 1,
-				del: rowIds &&  rowIds.size >= 1,
+				edit: rowIds && rowIds.size === 1 && !('loading' in rowIds),
+				del:  rowIds && rowIds.size >= 1  && !('loading' in rowIds),
 			},
 		} );
 	}
@@ -117,15 +126,8 @@ class DocsharesComp extends CrudCompW {
 	}
 
 	toAdd(e, v) {
-		let that = this;
-		this.tier.pkval = undefined;
-		this.tier.rec = {};
-
-		this.recForm = (<UserDetailst crud={CRUD.c}
-			uri={this.uri}
-			tier={this.tier}
-			onOk={(r) => that.toSearch()}
-			onClose={this.closeDetails} />);
+		let files = this.fileInput.files;
+		this.tier.upload(files);
 	}
 
 	toEdit(e, v) {
@@ -153,13 +155,23 @@ class DocsharesComp extends CrudCompW {
 		return (<div className={classes.root}>
 			{this.props.funcName || this.props.title || 'Documents Sharing'}
 
-			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
+			<DocsQuery uri={this.uri} onQuery={this.toSearch} />
 
 			<Grid container alignContent="flex-end" >
-				<Button variant="contained" disabled={!btn.add}
-					className={classes.button} onClick={this.toAdd}
-					startIcon={<JsampleIcons.Add />}
-				>{L('Add')}</Button>
+				// <Button variant="contained" disabled={!btn.add}
+				// 	className={classes.button} onClick={this.toAdd}
+				// 	startIcon={<JsampleIcons.Add />}
+				// >{L('Add')}</Button>
+
+				<Box className={ this.props.classBox || classes.imgUploadBox }>
+					<Button variant="contained" disabled={!btn.add}
+						className={classes.button} onClick={}
+						startIcon={<JsampleIcons.Add />}
+					<input type='file' className={ classes.fileInput }
+				 		ref={ (ref) => this.fileInput = ref }
+				 		onChange={ this.toAdd } />
+				</Box>);
+
 				<Button variant="contained" disabled={!btn.edit}
 					className={classes.button} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Edit />}
@@ -185,7 +197,7 @@ class DocsharesComp extends CrudCompW {
 
 		function getMimeIcon(rec, f) {
 			console.log(rec[f.field]);
-			return (<>[Doc]</>);
+			return (<>[DocIcon]</>);
 		}
 	}
 }
@@ -228,8 +240,7 @@ class DocsQuery extends React.Component {
 		/> );
 	}
 }
-UsersQuery.propTypes = {
-	// no tier is needed?
+DocsQuery.propTypes = {
 	uri: PropTypes.string.isRequired,
 	onQuery: PropTypes.func.isRequired
 }
@@ -264,6 +275,33 @@ export class DocsTier extends Semantier {
 			);
 		else
 			return this._cols;
+	}
+
+	upload(files) {
+		if (!files) return;
+
+		let that = this;
+
+		files.forEach( (file, x) => {
+			let row = {
+				docId: 'loading',
+				uri  : content,
+				mime : mimeOf( reader.result ),
+				docName: file.name,
+				reader: new FileReader()
+			};
+			that.rows.push(row);
+
+			row.onLoad = function (e) {
+				row.uri = row.reader.result;
+				delete row.reader;
+				delete row.onLoad;
+				that.saveRec();
+				that.setState({});
+			}
+
+			row.reader.readAsDataURL(file);
+		});
 	}
 
 	records(conds, onLoad) {
@@ -303,27 +341,34 @@ export class DocsTier extends Semantier {
 			this.errCtx);
 	}
 
+	/**
+	 * @param {object} opts
+	 * @param {string} opts.uri
+	 * @param {object} opts.rec { docId, uri, mime, docName, size }
+	 * @param {function} onOk
+	 */
 	saveRec(opts, onOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
 
-		let { uri, crud } = opts;
+		let { uri, rec } = opts;
+		let {docId, docName, mime, size} = rec;
+		let crud = docId === 'loading' ? CRUD.c : CRUD.u;
 
-		if (crud === Protocol.CRUD.u && !this.pkval)
-			throw Error("Can't update with null ID.");
-
-		let req = this.client.userReq(uri, this.port,
-			new DocsReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
-			.A(crud === Protocol.CRUD.c ? DocsReq.A.insert : DocsReq.A.update) );
+		let req = this.client
+					.usrAct( this.uri, crud, "upload", "share docs" )
+					.update( this.uri, this.mtabl,
+							{pk: this.pk, v: rec[this.pk]},
+							rec );
 
 		client.commit(req,
 			(resp) => {
 				let bd = resp.Body();
-				if (crud === Protocol.CRUD.c)
+				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+					rec[that.pk] = bd.resulve(that.mtabl, that.pk, rec);
 				onOk(resp);
 			},
 			this.errCtx);
@@ -347,10 +392,6 @@ export class DocsTier extends Semantier {
 			client.commit(req, onOk, this.errCtx);
 		}
 	}
-
-	isReadonly(col) {
-		return col.field === this.pk && !!this.pkval;
-	}
 }
 
 export class DocsReq extends UserReq {
@@ -358,8 +399,8 @@ export class DocsReq extends UserReq {
 	static __init__ = function () {
 		// Design Note:
 		// can we use dynamic Protocol?
-		Protocol.registerBody(UserstReq.type, (jsonBd) => {
-			return new UserstReq(jsonBd);
+		Protocol.registerBody(DocsReq.type, (jsonBd) => {
+			return new DocsReq(jsonBd);
 		});
 		return undefined;
 	}();
@@ -376,7 +417,7 @@ export class DocsReq extends UserReq {
 
 	constructor (uri, args = {}) {
 		super();
-		this.type = UserstReq.type;
+		this.type = DocsReq.type;
 		this.uri = uri;
 		this.docId = args.docId;
 		this.docName = args.docName;

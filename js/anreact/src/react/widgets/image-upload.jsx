@@ -33,14 +33,9 @@ class ImageUploadComp extends React.Component {
 
 		// usually element in record form must know this
 		this.field = props.field;
-
-		// if (this.props.src64 && !this.state.src64) {
-		// 	this.state.src64 = this.props.src;
-		// }
 	}
 
 	componentDidMount() {
-
 		if (this.props.file) {
 			let freader = new FileReader();
 			freader.onload = function (e) {
