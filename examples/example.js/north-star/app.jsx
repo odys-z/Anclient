@@ -20,8 +20,11 @@ import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStudents } from './views/n/my-students';
 import { GPAsheet } from './views/n/gpa';
+import { Docshares } from './views/n/docshares';
+
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
+import { MyDocs } from './views/c/my-docs';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -79,8 +82,10 @@ class App extends React.Component {
 			{path: '/n/polls', comp: Polls },
 			{path: '/n/my-students', comp: MyStudents},
 			{path: '/n/gpas', comp: GPAsheet},
+			{path: '/n/docs', comp: Docshares},
 			{path: '/c/status', comp: MyStatus },
-			{path: '/c/mypolls', comp: MyPolls }
+			{path: '/c/mypolls', comp: MyPolls },
+			{path: '/n/mydocs', comp: MyDocs},
 		] );
 	}
 

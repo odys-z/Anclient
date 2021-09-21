@@ -11,6 +11,8 @@ import { L, Langstrs,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
+import { DocshareDetails } from './docshare-details';
+
 const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
@@ -20,7 +22,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class DoclistComp extends CrudCompW {
+class DocsharesComp extends CrudCompW {
 	state = {
 		buttons: { add: true, edit: false, del: false},
 		pageInf: { page: 0, size: 10, total: 0 },
@@ -78,7 +80,7 @@ class DoclistComp extends CrudCompW {
 		// this.state.selected.Ids = rowIds
 		this.setState( {
 			buttons: {
-				// is this als CRUD semantics?
+				// is this all CRUD semantics?
 				add: this.state.buttons.add,
 				edit: rowIds && rowIds.size === 1,
 				del: rowIds &&  rowIds.size >= 1,
@@ -130,7 +132,7 @@ class DoclistComp extends CrudCompW {
 		let that = this;
 		let pkv = [...this.state.selected.Ids][0];
 		this.tier.pkval = pkv;
-		this.recForm = (<UserDetailst crud={CRUD.u}
+		this.recForm = (<DocshareDetails crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
 			recId={pkv}
@@ -149,7 +151,7 @@ class DoclistComp extends CrudCompW {
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			{this.props.funcName || this.props.title || 'Users of Jsample - semantically tiered'}
+			{this.props.funcName || this.props.title || 'Documents Sharing'}
 
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
@@ -158,20 +160,20 @@ class DoclistComp extends CrudCompW {
 					className={classes.button} onClick={this.toAdd}
 					startIcon={<JsampleIcons.Add />}
 				>{L('Add')}</Button>
+				<Button variant="contained" disabled={!btn.edit}
+					className={classes.button} onClick={this.toEdit}
+					startIcon={<JsampleIcons.Edit />}
+				>{L('Share')}</Button>
 				<Button variant="contained" disabled={!btn.del}
 					className={classes.button} onClick={this.toDel}
 					startIcon={<JsampleIcons.Delete />}
 				>{L('Delete')}</Button>
-				<Button variant="contained" disabled={!btn.edit}
-					className={classes.button} onClick={this.toEdit}
-					startIcon={<JsampleIcons.Edit />}
-				>{L('Edit')}</Button>
 			</Grid>
 
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns()}
+				columns={tier.columns( {mime: {formatter: (rec, c) => getMimeIcon(v)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -180,12 +182,17 @@ class DoclistComp extends CrudCompW {
 			{this.recForm}
 			{this.confirm}
 		</div>);
+
+		function getMimeIcon(rec, f) {
+			console.log(rec[f.field]);
+			return (<>[Doc]</>);
+		}
 	}
 }
-DoclistComp.contextType = AnContext;
+DocsharesComp.contextType = AnContext;
 
-const Doclist = withWidth()(withStyles(styles)(DoclistComp));
-export { Doclist, DoclistComp }
+const Docshares = withWidth()(withStyles(styles)(DocsharesComp));
+export { Docshares, DocsharesComp }
 
 class DocsQuery extends React.Component {
 	conds = [
@@ -237,16 +244,26 @@ export class DocsTier extends Semantier {
 	pkval = undefined;
 	rec = {};
 
+	_cols = [
+		{ text: L(''), field: 'docId', checked: true },
+		{ text: L(''), field: 'mime' },
+		{ text: L('File Name'), field: 'docName' },
+		{ text: L('Shared With'), field: 'sharings' } ];
+
 	constructor(comp) {
 		super(comp.port || 'docstier');
 		this.uri = comp.uri || comp.props.uri;
 	}
 
-	columns() {
-		return [
-			{ text: L(''), field: 'docId', checked: true },
-			{ text: L('File Name'), field: 'docName' },
-		];
+	columns(modifier) {
+		if (modifier)
+			return this._cols.map( (c, x) =>
+				typeof modifier[c.field] === 'function' ?
+						{...c, ...modifier[c.field](c, x) } :
+						{...c, ...modifier[c.field]}
+			);
+		else
+			return this._cols;
 	}
 
 	records(conds, onLoad) {
@@ -275,7 +292,7 @@ export class DocsTier extends Semantier {
 
 		let req = client.userReq(this.uri, this.port,
 					new DocsReq( this.uri, conds )
-					.A(UserstReq.A.rec) );
+					.A(DocsReq.A.rec) );
 
 		client.commit(req,
 			(resp) => {
@@ -298,7 +315,7 @@ export class DocsTier extends Semantier {
 
 		let req = this.client.userReq(uri, this.port,
 			new DocsReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
-			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
+			.A(crud === Protocol.CRUD.c ? DocsReq.A.insert : DocsReq.A.update) );
 
 		client.commit(req,
 			(resp) => {
@@ -324,8 +341,8 @@ export class DocsTier extends Semantier {
 
 		if (ids && ids.size > 0) {
 			let req = this.client.userReq(uri, this.port,
-				new UserstReq( uri, { deletings: [...ids] } )
-				.A(UserstReq.A.del) );
+				new DocsReq( uri, { deletings: [...ids] } )
+				.A(DocsReq.A.del) );
 
 			client.commit(req, onOk, this.errCtx);
 		}

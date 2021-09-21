@@ -15,7 +15,7 @@ import { L, toBool,
 } from '@anclient/anreact';
 const { JsampleIcons, UsersTier, UserstReq, UserstComp } = jsample;
 
-import { KidDetailst } from './mykid-details-st';
+import { KidDetailst } from './mykid-details';
 
 const styles = (theme) => ( {
 	root: {
