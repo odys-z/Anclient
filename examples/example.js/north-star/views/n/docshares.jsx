@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp, DocsReq, Semantier } from '@anclient/semantier';
+import { Protocol, AnsonResp, UserReq, Semantier } from '@anclient/semantier';
 import { L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
 	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample
@@ -160,8 +160,9 @@ class DocsharesComp extends CrudCompW {
 			<Grid container alignContent="flex-end" >
 				<Box className={ this.props.classBox || classes.imgUploadBox }>
 					<Button variant="contained" disabled={!btn.add}
-						className={classes.button} onClick={}
+						className={classes.button}
 						startIcon={<JsampleIcons.Add />}
+					/>
 					<input type='file' className={ classes.fileInput }
 				 		ref={ (ref) => this.fileInput = ref }
 				 		onChange={ this.toAdd } />

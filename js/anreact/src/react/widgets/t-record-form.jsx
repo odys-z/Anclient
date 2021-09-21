@@ -60,7 +60,7 @@ const styles = (theme) => (Object.assign(
  * NOTE: Desgin Memo
  * Level-up way is working, having tier as the common state/data manager.
  */
-export class TRecordFormComp extends CrudCompW {
+class TRecordFormComp extends CrudCompW {
 	state = {
 		dirty: false,
 		pk: undefined,
@@ -172,4 +172,4 @@ TRecordFormComp.propTypes = {
 };
 
 const TRecordForm = withWidth()(withStyles(styles)(TRecordFormComp));
-export { TRecordForm }
+export { TRecordForm, TRecordFormComp }
