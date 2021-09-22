@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, UpdateReq, AnsonResp, Semantier, stree_t } from '@anclient/semantier';
+import { Protocol, UpdateReq, DeleteReq, AnsonResp, Semantier, stree_t } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
@@ -159,7 +159,7 @@ class RolesComp extends CrudCompW {
 	}
 
 	toEdit(e, v) {
-		tier.pkval = this.state.selectedRecIds[0];
+		this.tier.pkval = this.state.selectedRecIds[0];
 
 		this.roleForm = (<RoleDetails u uri={this.uri}
 			tier={this.tier}
@@ -222,9 +222,10 @@ export { Roles, RolesComp }
 class RoleTier extends Semantier {
 	mtabl = 'a_roles';
 	pk = 'roleId';
+	reltabl = 'a_role_func';
 	rel = {'a_role_func': {
-		relfk: 'roleId', // fk to main table
-		relcol: 'funcId',// checking col
+		fk: 'roleId', // fk to main table
+		col: 'funcId',// checking col
 		sk: 'trees.role_funcs' }};
 
 	client = undefined;
@@ -260,7 +261,29 @@ class RoleTier extends Semantier {
 	}
 
 	record(conds, onLoad) {
-		// stub for migrating to new way
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+
+		// let { roleId } = conds;
+		let pkval = conds[this.pk];
+
+		// NOTE
+		// Is this senario an illustration of general query is also necessity?
+		let req = client.query(this.uri, 'a_roles', 'r')
+		req.Body()
+			.col('roleId').col('roleName').col('remarks')
+			.whereEq(this.pk, pkval);
+
+		client.commit(req,
+			(resp) => {
+				// NOTE because of using general query, extra hanling is needed
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rec = rows && rows[0];
+				that.pkval = that.rec && that.rec[that.pk];
+				onLoad(cols, rows && rows[0]);
+			},
+			this.errCtx);
 	}
 
 	/** Save role form with relationships
@@ -286,11 +309,12 @@ class RoleTier extends Semantier {
 						new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
 						.record(this.rec, this.pk) );
 
+		let rel = this.rel[this.reltabl];
 		// collect relationships
 		let columnMap = {};
-		columnMap[this.relcol] = 'nodeId';
+		columnMap[rel.col] = 'nodeId';
 		// semantics handler will resulve fk when inserting
-		columnMap[this.relfk] = this.pkval ? this.pkval : null;
+		columnMap[rel.fk] = this.pkval ? this.pkval : null;
 
 		let insRels = this.anReact
 			.inserTreeChecked(
@@ -307,8 +331,8 @@ class RoleTier extends Semantier {
 		}
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
-			let del_rf = new DeleteReq(null, this.reltabl, this.relfk)
-							.whereEq(this.relfk, rec[this.pk]);
+			let del_rf = new DeleteReq(null, this.reltabl, rel.fk)
+							.whereEq(rel.fk, this.rec[this.pk]);
 
 			req.Body().post(del_rf.post(insRels));
 		}

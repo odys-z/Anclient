@@ -95,14 +95,14 @@ class UserDetailstComp extends DetailFormW {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
-			let that = this;
-			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
-				that.setState({record: rows[0]});
-			} );
-		}
+		// if (this.tier.pkval) {
+		// 	let that = this;
+		// 	let cond = {};
+		// 	cond[this.tier.pk] = this.tier.pkval;
+		// 	this.tier.record(cond, (cols, rows, fkOpts) => {
+		// 		that.setState({record: rows[0]});
+		// 	} );
+		// }
 	}
 
 	toSave(e) {

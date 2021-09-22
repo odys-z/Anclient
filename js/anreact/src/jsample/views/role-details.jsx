@@ -26,9 +26,17 @@ const { CRUD } = Protocol;
 
 const styles = theme => ({
   dialogPaper: {
-	minHeight: "40vh"
+	// minHeight: "76vh"
+	height: "100%"
   },
-  root: {},
+  root: {
+	marginTop: 60,
+	minHeight: "60vh",
+	maxHeight: "86vh",
+	maxWidth: "70vw",
+	minWidth: 600,
+	margin: "auto"
+  },
   title: {
 	backgroundColor: "linen",
 	height: "5ch",
@@ -96,12 +104,12 @@ class RoleDetailsComp extends DetailFormW {
 	toSave(e) {
 		e.stopPropagation();
 
-		// if (!this.tier.validate(undefined, this.tier.recfields)) {
 		if (!this.tier.validate()) {
 	    	this.setState({});
 		}
 		else
-			this.tier.saveRec({curd: this.state.crud});
+			this.tier.saveRec({curd: this.state.crud},
+				() => { this.showOk(L('Data Saved!')); });
 	}
 
 	toCancel (e) {
@@ -138,12 +146,13 @@ class RoleDetailsComp extends DetailFormW {
 			classes={{ paper: classes.dialogPaper }}
 			open={true} fullWidth maxWidth="lg"
 			onClose={this.handleClose}
+			scroll='paper'
 		  >
-			<DialogContent className={classes.content}>
-			  <DialogTitle id="u-title" color="primary" >
+			<DialogTitle id="u-title" color="primary" >
 				{title}
 				{this.state.dirty ? <JsampleIcons.Star color="secondary"/> : ""}
-			  </DialogTitle>
+			</DialogTitle>
+			<DialogContent className={classes.content}>
 				<TRecordForm uri={this.props.uri}
 					tier={this.tier}
 					mtabl='a_roles' pk='roleId'

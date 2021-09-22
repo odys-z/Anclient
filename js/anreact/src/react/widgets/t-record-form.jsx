@@ -75,6 +75,17 @@ class TRecordFormComp extends CrudCompW {
 	}
 
 	componentDidMount() {
+		if (this.tier.pkval &&
+			// in case rec already loaded by parent component
+			(!this.tier.rec || Object.keys(this.tier.rec).length == 0)) {
+			let that = this;
+			let cond = {};
+			cond[this.tier.pk] = this.tier.pkval;
+			this.tier.record(cond, (cols, rows, fkOpts) => {
+				// that.rec = rows && rows[0] ? rows[0] : {};
+				that.setState({});
+			} );
+		}
 	}
 
 	getField(f, rec, classes) {

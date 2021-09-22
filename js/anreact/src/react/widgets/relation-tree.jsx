@@ -75,18 +75,18 @@ export class AnRelationTreeComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
+		this.tier = this.props.tier;
+
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.buildTree = this.buildTree.bind(this);
 	}
 
 	componentDidMount() {
-		this.tier = this.props.tier;
-
 		let that = this;
 		this.tier.relations({
 			uri: this.props.uri,
 			reltabl: this.props.reltabl,
-			sqlArg: this.tier.pk,
+			sqlArg: this.tier.pkval,
 		},
 		(rels) => {
 			that.setState({});
