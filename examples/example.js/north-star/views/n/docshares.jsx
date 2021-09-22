@@ -262,17 +262,6 @@ export class DocsTier extends Semantier {
 		this.uri = comp.uri || comp.props.uri;
 	}
 
-	columns(modifier) {
-		if (modifier)
-			return this._cols.map( (c, x) =>
-				typeof modifier[c.field] === 'function' ?
-						{...c, ...modifier[c.field](c, x) } :
-						{...c, ...modifier[c.field]}
-			);
-		else
-			return this._cols;
-	}
-
 	upload(files) {
 		if (!files) return;
 

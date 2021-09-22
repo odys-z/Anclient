@@ -3,10 +3,9 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp } from '@anclient/semantier';
+import { Protocol, AnsonResp, Semantier, stree_t } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
@@ -75,6 +74,11 @@ class RolesComp extends CrudCompW {
 	}
 
 	componentDidMount() {
+		if (!this.tier) {
+			this.tier = new RoleTier(this);
+			this.tier.setContext(this.context);
+		}
+
 		this.toSearch();
 	}
 
@@ -147,13 +151,16 @@ class RolesComp extends CrudCompW {
 
 	toAdd(e, v) {
 		this.roleForm = (<RoleDetails c uri={this.uri}
+			tier={this.tier}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
 
 	toEdit(e, v) {
+		tier.pkval = this.state.selectedRecIds[0];
+
 		this.roleForm = (<RoleDetails u uri={this.uri}
-			roleId={this.state.selectedRecIds[0]}
+			tier={this.tier}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
@@ -192,19 +199,14 @@ class RolesComp extends CrudCompW {
 				>{L('Edit')}</Button>
 			</Grid>
 
-			<AnTablist
+			{this.tier && <AnTablist
 				className={classes.root} checkbox={true}
-				columns={[
-					{ text: L('roleId'),       field: "roleId", hide: true },
-					{ text: L('Role'),         field: "roleName",color: 'primary', className: 'bold'},
-					{ text: L('Organization'), field: "orgName", color: 'primary' },
-					{ text: L('Remarks'),      field: "remarks", color: 'primary' }
-				]}
+				columns={this.tier.columns()}
 				rows={this.state.rows} pk='roleId'
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
-			/>
+			/>}
 			{this.roleForm}
 			{this.confirm}
 		</>);
@@ -214,3 +216,130 @@ RolesComp.contextType = AnContext;
 
 const Roles = withWidth()(withStyles(styles)(RolesComp));
 export { Roles, RolesComp }
+
+class RoleTier extends Semantier {
+	mtabl = 'a_roles';
+	pk = 'roleId';
+	reltabl = 'a_role_func';
+	relfk = 'roleId';
+	relcol = 'funcId';
+
+	client = undefined;
+	uri = undefined;
+	pkval = undefined;
+	rows = [];
+	rec = {}; // for leveling up record form, also called record
+
+	checkbox = true;
+	rels = [];
+
+	_cols = [
+		{ text: L('roleId'),  field: "roleId", hide: true },
+		{ text: L('Role'),    field: "roleName",color: 'primary', className: 'bold'},
+		{ text: L('Remarks'), field: "remarks", color: 'primary' } ]
+
+	_fields = [
+		{type: 'text', validator: {len: 12},  field: 'roleId',   label: 'Role Name'},
+		{type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name'},
+		{type: 'text', validator: {len: 500}, field: 'remarks',  label: 'Remarks'}
+	];
+
+	constructor(comp) {
+		super(comp.port);
+		this.uri = comp.uri || comp.props.uri;
+	}
+
+	records(conds, onLoad) {
+		// stub for migrating to new way
+	}
+
+	record(conds, onLoad) {
+		// stub for migrating to new way
+	}
+
+	/** Save role form with relationships
+	 * */
+	saveRec(opts, onOk) {
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+
+		let { uri, crud } = opts;
+
+		if (crud === Protocol.CRUD.u && !this.pkval)
+			throw Error("Can't update with null ID.");
+
+		let req = this.client.userReq(uri, this.port,
+			new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
+			.A(crud === CRUD.c ? UserstReq.A.insert : UserstReq.A.update)
+			.record(this.rec, this.pk) );
+
+		// collect relationships
+		let columnMap = {};
+		columnMap[this.relcol] = 'nodeId';
+		// semantics handler will resulve fk when inserting
+		columnMap[this.relfk] = this.pkval ? this.pkval : null;
+
+		let insRels = this.context.anReact
+			.inserTreeChecked(
+				this.state.forest,
+				{ table: this.reltabl,
+				  columnMap,
+				  check: 'checked',
+				  // middle nodes been corrected according to children
+				  reshape: true }
+			);
+
+		if (!this.pkval) {
+			req.Body().post(rf);
+		}
+		else {
+			// e.g. delete from a_role_func where roleId = '003'
+			let del_rf = new DeleteReq(null, this.reltabl, this.relfk)
+							.whereEq(this.relfk, rec[this.pk]);
+
+			req.Body().post(del_rf.post(rf));
+		}
+
+		client.commit(req,
+			(resp) => {
+				let bd = resp.Body();
+				if (crud === Protocol.CRUD.c)
+					// NOTE:
+					// resulving auto-k is a typicall semantic processing, don't expose this to caller
+					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+				onOk(resp);
+			},
+			this.errCtx);
+	}
+
+	/**
+	 * @param {Set} ids record id
+	 * @param {function} onOk: function(AnsonResp);
+	 */
+	del(opts, onOk) {
+		// stub for migrating to new way
+	}
+
+	relations(opts, onOk) {
+		let that = this;
+
+		// typically relationships are tree data
+		let { mtabl, fk, sk, sqlArgs, sqlArg} = opts;
+		sqlArgs = sqlArgs || [sqlArg];
+
+		if (!sk)
+			throw Error('TODO ...');
+
+		let t = stree_t.sqltree;
+
+		let ds = {sk, t, sqlArgs: [this.state.pk]};
+
+		that.context.anReact.stree({ sk, t, sqlArgs,
+			onOk: (resp) => {
+				that.rels = resp.Body().forest;
+				onOk(resp);
+			}
+		}, this.errCtx);
+	}
+}

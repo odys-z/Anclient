@@ -14,7 +14,6 @@ import Button from '@material-ui/core/Button';
 import { Protocol } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	// import { Protocol } from '../../../semantier/protocol';
 	import { DetailFormW } from '../../react/crud';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext, AnError } from '../../react/reactext';
@@ -188,7 +187,7 @@ class UserDetailstComp extends DetailFormW {
 }
 
 UserDetailstComp.propTypes = {
-	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
+	uri: PropTypes.string.isRequired,
 	tier: PropTypes.object.isRequired,
 	crud: PropTypes.string.isRequired,
 	dense: PropTypes.bool

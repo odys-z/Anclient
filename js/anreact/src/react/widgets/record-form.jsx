@@ -211,8 +211,8 @@ class RecordFormComp extends DetailFormW {
 }
 
 RecordFormComp.propTypes = {
-	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
-	stateHook: PropTypes.object,		// readonly is not required
+	uri: PropTypes.string.isRequired,
+	stateHook: PropTypes.object,		// not required when in readonly
 	dense: PropTypes.bool,
 	mtabl:  PropTypes.string.isRequired,
 	fields: PropTypes.array.isRequired,

@@ -59,18 +59,28 @@ const styles = (theme) => ({
 export class AnRelationTreeComp extends CrudCompW {
 	state = {
 		dirty: false,
-		pk: undefined,
-		pkval: undefined,
-		record: {},
+		// record: {},
 	};
 
 	constructor(props) {
 		super(props);
-		// this.state.forest = props.forest || [];
+
+		this.tier = this.props.tier;
 
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.buildTree = this.buildTree.bind(this);
-	  }
+	}
+
+	componentDidMount() {
+		this.tier.relations({
+			mtabl: this.props.mtabl,
+			reltabl: this.props.reltabl,
+			pk: this.pk },
+			(rels) => {
+				that.setState({});
+			}
+		);
+	}
 
 	toExpandItem(e) {
 		e.stopPropagation();
@@ -90,7 +100,7 @@ export class AnRelationTreeComp extends CrudCompW {
 
 		let expandItem = this.toExpandItem;
 
-		return this.state.forest.map(
+		return this.tier.relations.map(
 			(tree, tx) => {return treeItems(tree);}
 		);
 		// return treeItems(this.state.forest[0] || {});
@@ -185,12 +195,15 @@ export class AnRelationTreeComp extends CrudCompW {
 		const { classes } = this.props;
 		this.state.forest = this.props.forest;
 
-		return <div className={classes.root}>{this.buildTree(classes)}</div>;
+		return (
+			<div className={classes.root}>
+				{this.state.rels && this.buildTree(classes)}
+			</div> );
 	}
 }
 
 AnRelationTreeComp.propTypes = {
-	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
+	uri: PropTypes.string.isRequired,
 	tier: PropTypes.object.isRequired,
 	dense: PropTypes.bool,
 };

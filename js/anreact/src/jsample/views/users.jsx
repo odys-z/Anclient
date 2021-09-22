@@ -346,9 +346,9 @@ export class UsersTier extends Semantier {
 		}
 	}
 
-	isReadonly(col) {
-		return col.field === this.pk && !!this.pkval;
-	}
+	// isReadonly(col) {
+	// 	return col.field === this.pk && !!this.pkval;
+	// }
 }
 
 export class UserstReq extends UserReq {

@@ -205,7 +205,7 @@ class DocshareDetailsComp extends DetailFormW {
 DocshareDetailsComp.contextType = AnContext;
 
 DocshareDetailsComp.propTypes = {
-	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
+	uri: PropTypes.string.isRequired,
 	tier: PropTypes.object.isRequired,
 	crud: PropTypes.string.isRequired,
 	stateHook: PropTypes.object,		// not required for readonly mode

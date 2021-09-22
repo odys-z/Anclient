@@ -729,12 +729,14 @@ class UpdateReq extends AnsonBody {
 
 	/** add n-v
 	 * @param {object} rec
+	 * @param {string} [ignorePk] pk name ignored
 	 * @return {UpdateReq} this
 	 */
-	record(rec) {
+	record(rec, ignorePk) {
 		if (rec)
 			for (let n in rec) {
-				this.nvs.push([n, rec[n]]);
+				if (ignorePk !== n)
+					this.nvs.push([n, rec[n]]);
 			}
 		return this;
 	}

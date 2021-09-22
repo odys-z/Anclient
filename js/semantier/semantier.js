@@ -12,6 +12,9 @@ export class Semantier {
 		minLen : { border: "1px solid red" },
 	}
 
+	_cols = undefined;
+	_fields = undefined;
+
 	constructor(port) {
 		this.port = port;
 	}
@@ -60,4 +63,42 @@ export class Semantier {
 				return 'ok';
 		}
 	}
+
+	/** Get list's column data specification
+	 * @param {object} modifier {field, function | object }
+	 * @param {object | function} modifier.field user provided modifier to change column's style etc.
+	 * callback function signature: (col, index) {} : return column's properties.
+	 */
+	columns(modifier) {
+		if (!this._cols)
+			throw Error("_cols are not provided by child tier.");
+
+		if (modifier)
+			return this._cols.map( (c, x) =>
+				typeof modifier[c.field] === 'function' ?
+						{...c, ...modifier[c.field](c, x) } :
+						{...c, ...modifier[c.field]}
+			);
+		else
+			return this._cols;
+	}
+
+	/** Get form fields data specification
+	 * @param {object} modifier {field, function | object }
+	 * @param {object | function} modifier.field see #columns().
+	 */
+	fields(modifier) {
+		if (!this._fields)
+			throw Error("_fields are not provided by child tier.");
+
+		if (modifier)
+			return this._fields.map( (c, x) =>
+				typeof modifier[c.field] === 'function' ?
+						{...c, ...modifier[c.field](c, x) } :
+						{...c, ...modifier[c.field]}
+			);
+		else
+			return this._fields;
+	}
+
 }

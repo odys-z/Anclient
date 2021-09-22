@@ -165,7 +165,7 @@ export class MyInfTier extends Semantier {
 		let that = this;
 
 		// NOTE
-		// Is this senario is an illustrating of general query's necessity?
+		// Is this senario an illustration of general query is also necessity?
 		let req = client.query(this.uri, 'a_users', 'u')
 		req.Body()
 			.col('r.roleId').col('u.userId').col('userName')
