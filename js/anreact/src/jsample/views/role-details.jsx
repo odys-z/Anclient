@@ -23,7 +23,8 @@ import { L } from '../../utils/langstr';
 	import { JsampleIcons } from '../styles'
 	import { DetailFormW } from '../../react/crud'
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnTree } from '../../react/widgets/tree';
+	// import { AnTree } from '../../react/widgets/tree';
+	import { AnRelationTree } from '../../react/widgets/relation-tree';
 
 const styles = theme => ({
   dialogPaper: {
@@ -336,9 +337,10 @@ class RoleDetailsComp extends DetailFormW {
 				  </Box>
 			  </Grid>
 			  <Grid item xs={12} className={classes.formObject} >
-				  {this.state.forest && <AnTree checkbox
+				  {/* {this.state.forest && <AnTree checkbox
 					  forest={this.state.forest}
-					  onCheck={(e, v) => {this.setState({dirty: true})}} />}
+					  onCheck={(e, v) => {this.setState({dirty: true})}} />} */}
+				  <AnRelationTree tier={roleTier} />
 			  </Grid>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>

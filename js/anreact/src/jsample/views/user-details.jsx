@@ -20,7 +20,6 @@ import { L } from '../../utils/langstr';
 	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
-	import { TRelationTree } from '../../react/widgets/t-relation-tree';
 
 const styles = (theme) => ({
   root: {

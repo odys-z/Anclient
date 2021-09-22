@@ -34,7 +34,7 @@ export * from './react/widgets/tree-editor';
 export * from './react/widgets/record-form';
 export * from './react/widgets/simple-form';
 export * from './react/widgets/t-record-form';
-export * from './react/widgets/t-relation-tree';
+export * from './react/widgets/relation-tree';
 
 import { JsampleIcons, JsampleTheme } from './jsample/styles';
 import { Domain, DomainComp } from './jsample/views/domain';

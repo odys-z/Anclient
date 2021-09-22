@@ -180,7 +180,7 @@ class KidDetailstComp extends DetailFormW {
 					tier={this.tier}
 					fields={this.recfields}
 				/>
-				{/* <TRelationTree uri={this.props.uri}
+				{/* <AnRelationTree uri={this.props.uri}
 					tier={this.tier}
 					fields={this.relfields}
 					stateHook={this.relHook}/> */}
