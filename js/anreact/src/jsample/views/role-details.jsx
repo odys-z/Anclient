@@ -83,122 +83,25 @@ class RoleDetailsComp extends DetailFormW {
 
 		this.tier = props.tier;
 
+		this.state.crud = props.c ? CRUD.c : props.u ? CRUD.u : undefined;
+
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
 	}
 
 	componentDidMount() {
-
-		// if (this.tier.pkval) {
-		// 	let that = this;
-		// 	this.tier.relations( {
-		// 			mtabl: 'a_roles',
-		// 			reltabl: 'a_role_func',
-		// 			fk: 'roleId',
-		// 			sk: 'trees.role_funcs',
-		// 			sqlArgs: this.tier.pkval,
-		// 		}, (forest) => {
-		// 			that.setState({forest});
-		// 		} );
-		// }
-
-		// let that = this;
-		// let sk = 'trees.role_funcs';
-		// let t = stree_t.sqltree; // loading dataset reshaped to tree
-		//
-		// if (this.state.crud !== CRUD.c) {
-		// 	// load
-		// 	let queryReq = this.context.anClient.query(this.uri, 'a_roles', 'r')
-		// 	queryReq.Body().whereEq('roleId', this.state.pk);
-		// 	this.context.anReact.bindStateRec({req: queryReq,
-		// 		onOk: (resp) => {
-		// 				let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
-		// 				that.state.record = rows[0];
-		//
-		// 				let ds = {sk, t, sqlArgs: [this.state.pk]};
-		//
-		// 				that.context.anReact.stree(ds, that.context.error, that);
-		// 			}
-		// 		},
-		// 		this.context.error);
-		// }
-		// else {
-		// 	// new, bind tree
-		// 	let ds = {uri: this.props.uri,
-		// 			  sk, t, sqlArgs: []};
-		//
-		// 	this.context.anReact.stree(ds, this.context.error, this);
-		// }
 	}
 
 	toSave(e) {
 		e.stopPropagation();
 
-		if (!this.validate()) {
+		// if (!this.tier.validate(undefined, this.tier.recfields)) {
+		if (!this.tier.validate()) {
 	    	this.setState({});
 		}
 		else
-			this.tier.saveRec();
-
-		// let client = this.context.anClient;
-		// let rec = this.state.record;
-		// let c = this.state.crud === CRUD.c;
-		//
-		// let req;
-		//
-		// // 1. collect role-func
-		// // note 'nodeId' is not the same with DB as some fields are mapped in datase.xml
-		// let columnMap = {
-		// 	funcId: 'nodeId',
-		// 	// roleId doesn't included in forest, the value be appended
-		// 	roleId: c ? rec.roleId : this.state.pk,
-		// };
-		//
-		// let rf = this.context.anReact.inserTreeChecked(
-		// 			this.state.forest,
-		// 			{ table: 'a_role_func',
-		// 			  columnMap,
-		// 			  check: 'checked',
-		// 			  reshape: true  // middle nodes been corrected according to children
-		// 			} );
-		//
-		// // 2. collect record
-		// // nvs data must keep consists with jquery serializeArray()
-		// // https://api.jquery.com/serializearray/
-		// let nvs = [];
-		// nvs.push({name: 'remarks', value: rec.remarks});
-		// nvs.push({name: 'roleName', value: rec.roleName});
-		//
-		// nvs.push({name: 'orgId', value: '006'}) // TODO: got orgId from cbb?
-		//
-		// // 3. request (with del if updating)
-		// if (this.state.crud === CRUD.c) {
-		// 	nvs.push({name: 'roleId', value: rec.roleId});
-		// 	req = client
-		// 		.usrAct('roles', CRUD.c, 'save')
-		// 		.insert(null, 'a_roles', nvs);
-		// 	req.Body().post(rf);
-		// }
-		// else {
-		// 	let del_rf = new DeleteReq(null, 'a_role_func', 'roleId')
-		// 					.whereEq('roleId', rec['roleId']);
-		//
-		// 	req = client
-		// 		.usrAct('roles', CRUD.u, 'save')
-		// 		.update(null, 'a_roles', this.state.fields[0].field, nvs);
-		// 	req.Body()
-		// 		.whereEq('roleId', rec.roleId)
-		// 		.post(del_rf.post(rf));
-		// }
-		//
-		// let that = this;
-		// client.commit(req, (resp) => {
-		// 	that.state.crud = CRUD.u;
-		// 	that.showOk(L('Role data saved!'));
-		// 	if (typeof that.props.onOk === 'function')
-		// 		that.props.onOk({code: resp.code, resp});
-		// }, this.context.error);
+			this.tier.saveRec({curd: this.state.crud});
 	}
 
 	toCancel (e) {
@@ -224,7 +127,7 @@ class RoleDetailsComp extends DetailFormW {
 		const { classes, width } = this.props;
 		const smallSize = new Set(["xs", "sm"]).has(width);
 
-		let crud = this.tier.crud;
+		let crud = this.state.crud;
 
 		let title = crud === CRUD.c ? L('Create Role')
 					: crud === CRUD.u ? L('Edit Role')
@@ -242,21 +145,21 @@ class RoleDetailsComp extends DetailFormW {
 				{this.state.dirty ? <JsampleIcons.Star color="secondary"/> : ""}
 			  </DialogTitle>
 				<TRecordForm uri={this.props.uri}
-					tier={this.props.tier}
+					tier={this.tier}
 					mtabl='a_roles' pk='roleId'
-					fields={this.props.tier.fields()}
+					fields={this.tier.fields()}
 				/>
 				<AnRelationTree uri={this.props.uri}
-					tier={this.props.tier}
-					mtabl='a_roles' reltabl='a_role_func' fk='roleId' relcol='funcId'
-					sk='trees.role_funcs'
+					tier={this.tier}
+					mtabl='a_roles (optional)' reltabl='a_role_func'
 					sqlArgs={[this.state.pkval]}
 				/>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
-			  <Button onClick={this.toSave} variant="contained" color="primary">
-				{crud && L("Save")}
-			  </Button>
+			  {crud &&
+				<Button onClick={this.toSave} variant="contained" color="primary">
+					{L("Save")}
+				</Button>}
 			  <Button onClick={this.toCancel} variant="contained" color="primary">
 				{crud ? L('Close') : L("Cancel")}
 			  </Button>
@@ -267,7 +170,6 @@ class RoleDetailsComp extends DetailFormW {
 	}
 }
 RoleDetailsComp.contextType = AnContext;
-
 
 const RoleDetails = withWidth()(withStyles(styles)(RoleDetailsComp));
 export { RoleDetails, RoleDetailsComp };

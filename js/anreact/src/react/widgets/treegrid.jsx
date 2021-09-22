@@ -8,7 +8,7 @@ import {
 } from "@material-ui/icons";
 import { Typography } from "@material-ui/core";
 
-import { AnTreeIcons } from "./tree"
+import { AnTreeIcons } from "./tree";
 
 const styles = (theme) => ({
   root: {

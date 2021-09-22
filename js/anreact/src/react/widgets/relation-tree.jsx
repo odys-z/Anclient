@@ -8,46 +8,55 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
-import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
+import Collapse from "@material-ui/core/Collapse";
+import Checkbox from "@material-ui/core/Checkbox";
+import Typography from "@material-ui/core/Typography";
+import SvgIcon from "@material-ui/core/SvgIcon";
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
-	import { JsampleIcons } from '../../jsample/styles';
+	import { AnTreeIcons } from "./tree";
 
 const styles = (theme) => ({
-	root: {
-	display: 'flex',
-	width: '100%',
-	backgroundColor: '#fafafaee'
-	},
-	row: {
-	width: '100%',
-	'& :hover': {
-	  backgroundColor: '#ced'
+  root: {
+	display: "flex",
+	flexDirection: "column",
+	textAlign: "left",
+	width: "100%"
+  },
+  row: {
+	width: "100%",
+	"& :hover": {
+	  backgroundColor: "#bed"
 	}
-	},
-	rowHead: {
-	padding: theme.spacing(1),
-	},
-	folder: {
-	width: '100%'
-	},
-	hide: {
-	display: 'none'
-	},
-	labelText: {
-	padding: theme.spacing(1),
-	borderLeft: '1px solid #bcd',
-	},
-	labelText_dense: {
-	paddingLeft: theme.spacing(1),
-	paddingRight: theme.spacing(1),
-	borderLeft: '1px solid #bcd',
-	}
+  },
+  rowHead: {},
+  folder: {
+	width: "100%"
+  },
+  folderHead: {
+	borderBottom: "1px solid #bcd",
+	borderTop: "1px solid #bcd",
+	margin: 0,
+	padding: 0,
+	lineHeight: '4ch',
+  },
+  hide: {
+	display: "none"
+  },
+  treeItem: {
+	verticalAlign: 'middle',
+	borderLeft: "1px solid #bcd",
+	lineHeight: '4ch',
+  },
+  treeLabel: {
+	textAlign: 'center',
+	paddingLeft: '8ch',
+  }
 });
 
 /**
@@ -59,7 +68,8 @@ const styles = (theme) => ({
 export class AnRelationTreeComp extends CrudCompW {
 	state = {
 		dirty: false,
-		// record: {},
+
+		expandings: new Set(),
 	};
 
 	constructor(props) {
@@ -72,14 +82,15 @@ export class AnRelationTreeComp extends CrudCompW {
 	}
 
 	componentDidMount() {
+		let that = this;
 		this.tier.relations({
-			mtabl: this.props.mtabl,
+			uri: this.props.uri,
 			reltabl: this.props.reltabl,
-			pk: this.pk },
-			(rels) => {
-				that.setState({});
-			}
-		);
+			sqlArg: this.tier.pk,
+		},
+		(rels) => {
+			that.setState({});
+		} );
 	}
 
 	toExpandItem(e) {
@@ -99,8 +110,9 @@ export class AnRelationTreeComp extends CrudCompW {
 		let that = this;
 
 		let expandItem = this.toExpandItem;
+		let checkbox = !this.props.disableCheckbox;
 
-		return this.tier.relations.map(
+		return this.state.forest.map(
 			(tree, tx) => {return treeItems(tree);}
 		);
 		// return treeItems(this.state.forest[0] || {});
@@ -126,13 +138,19 @@ export class AnRelationTreeComp extends CrudCompW {
 						<Typography>
 						  {leadingIcons(level)}
 						  {node.css && node.css.icon && icon(node.css.icon)}
-					  	  {that.props.checkbox
+					  	  {checkbox
 						   && <Checkbox color="primary" checked={toBool(node.checked)}
-							  onClick={(e) => {
+								onClick={e => e.stopPropagation()}
+								onChange={(e) => {
 								  e.stopPropagation();
 								  node.checked = !toBool(node.checked);
-								  if (typeof that.props.onCheck === 'function')
-									that.props.onCheck(e); }}/>
+								  // if (typeof that.props.onCheck === 'function')
+									// that.props.onCheck(e);
+
+									// checkAll(e.target.checked, node.children)
+									node.children.forEach( c => { c.node.checked = e.target.checked } );
+									that.setState({});
+								}}/>
 						  }
 						  {node.text}
 						</Typography>
@@ -154,13 +172,12 @@ export class AnRelationTreeComp extends CrudCompW {
 					<Typography >
 					  {leadingIcons(level)}
 					  {node.css && node.css.icon && icon(node.css.icon)}
-					  {that.props.checkbox
+					  {checkbox
 						  && <Checkbox color="primary" checked={toBool(node.checked)}
-							onClick={(e) => {
-								e.stopPropagation();
-								node.checked = !toBool(node.checked);
-								if (typeof that.props.onCheck === 'function')
-									that.props.onCheck(e); }}/>
+							onChange={(e) => {
+									node.checked = e.target.checked;
+									that.setState({});
+								}} />
 					  }
 					  {node.text}
 					</Typography>
@@ -187,17 +204,17 @@ export class AnRelationTreeComp extends CrudCompW {
 		}
 
 		function itemLabel(txt, l, css) {
-			return txt;
+			return '';
 		}
 	}
 
 	render() {
 		const { classes } = this.props;
-		this.state.forest = this.props.forest;
+		this.state.forest = this.tier.rels;
 
 		return (
 			<div className={classes.root}>
-				{this.state.rels && this.buildTree(classes)}
+				{this.state.forest && this.buildTree(classes)}
 			</div> );
 	}
 }

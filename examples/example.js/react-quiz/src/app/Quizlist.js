@@ -16,7 +16,6 @@ import React from 'react';
 	import Sms from '@material-ui/icons/Sms';
 	import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 	import FormControlLabel from '@material-ui/core/FormControlLabel';
-	import Checkbox from '@material-ui/core/Checkbox';
 	import TextField from '@material-ui/core/TextField';
 	import ShareIcon from '@material-ui/icons/Share';
 

@@ -72,7 +72,7 @@ class MyInfCardComp extends React.Component {
 
 		let that = this;
 
-		if (this.tier.validate(undefined, undefined))
+		if (this.tier.validate(undefined, this.tier.columns()))
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.state.crud,

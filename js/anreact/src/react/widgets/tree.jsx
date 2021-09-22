@@ -1,14 +1,14 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import SvgIcon from "@material-ui/core/SvgIcon";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
+import Checkbox from "@material-ui/core/Checkbox";
+import Typography from "@material-ui/core/Typography";
+import SvgIcon from "@material-ui/core/SvgIcon";
 import {
 	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
 } from "@material-ui/icons";
-import Checkbox from "@material-ui/core/Checkbox";
-import Typography from "@material-ui/core/Typography";
 
 import { toBool } from '../../utils/helpers';
 

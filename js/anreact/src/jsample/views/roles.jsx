@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp, Semantier, stree_t } from '@anclient/semantier';
+import { Protocol, UpdateReq, AnsonResp, Semantier, stree_t } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
@@ -15,6 +15,8 @@ import { L } from '../../utils/langstr';
 
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';
+
+const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
@@ -140,7 +142,7 @@ class RolesComp extends CrudCompW {
 
 		function delRole(roleIds) {
 			let req = that.context.anClient
-				.usrAct('roles', Protocol.CRUD.d, 'delete')
+				.usrAct('roles', CRUD.d, 'delete')
 				.deleteMulti(this.uri, 'a_roles', 'roleId', roleIds);
 
 			that.context.anClient.commit(req, (resp) => {
@@ -220,9 +222,10 @@ export { Roles, RolesComp }
 class RoleTier extends Semantier {
 	mtabl = 'a_roles';
 	pk = 'roleId';
-	reltabl = 'a_role_func';
-	relfk = 'roleId';
-	relcol = 'funcId';
+	rel = {'a_role_func': {
+		relfk: 'roleId', // fk to main table
+		relcol: 'funcId',// checking col
+		sk: 'trees.role_funcs' }};
 
 	client = undefined;
 	uri = undefined;
@@ -239,9 +242,12 @@ class RoleTier extends Semantier {
 		{ text: L('Remarks'), field: "remarks", color: 'primary' } ]
 
 	_fields = [
-		{type: 'text', validator: {len: 12},  field: 'roleId',   label: 'Role Name'},
-		{type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name'},
-		{type: 'text', validator: {len: 500}, field: 'remarks',  label: 'Remarks'}
+		{ type: 'text', validator: {len: 12},  field: 'roleId',   label: 'Role ID',
+		  validator: {notNull: true}},
+		{ type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name',
+		  validator: {notNull: true}},
+		{ type: 'text', validator: {len: 500}, field: 'remarks',  label: 'Remarks',
+		  validator: {notNull: true}, grid: {sm: 12, md: 12, lg: 12}}
 	];
 
 	constructor(comp) {
@@ -264,15 +270,21 @@ class RoleTier extends Semantier {
 		let client = this.client;
 		let that = this;
 
-		let { uri, crud } = opts;
+		let { crud } = opts;
+		let uri = this.uri;
 
-		if (crud === Protocol.CRUD.u && !this.pkval)
+		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		let req = this.client.userReq(uri, this.port,
-			new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
-			.A(crud === CRUD.c ? UserstReq.A.insert : UserstReq.A.update)
-			.record(this.rec, this.pk) );
+		let req;
+		if ( crud === CRUD.c )
+			req = this.client.userReq(uri, 'insert',
+						new InsertReq( uri, this.mtabl )
+						.record(this.rec, this.pk) );
+		else
+			req = this.client.userReq(uri, 'update',
+						new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
+						.record(this.rec, this.pk) );
 
 		// collect relationships
 		let columnMap = {};
@@ -280,9 +292,9 @@ class RoleTier extends Semantier {
 		// semantics handler will resulve fk when inserting
 		columnMap[this.relfk] = this.pkval ? this.pkval : null;
 
-		let insRels = this.context.anReact
+		let insRels = this.anReact
 			.inserTreeChecked(
-				this.state.forest,
+				this.rels,
 				{ table: this.reltabl,
 				  columnMap,
 				  check: 'checked',
@@ -291,20 +303,20 @@ class RoleTier extends Semantier {
 			);
 
 		if (!this.pkval) {
-			req.Body().post(rf);
+			req.Body().post(insRels);
 		}
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
 			let del_rf = new DeleteReq(null, this.reltabl, this.relfk)
 							.whereEq(this.relfk, rec[this.pk]);
 
-			req.Body().post(del_rf.post(rf));
+			req.Body().post(del_rf.post(insRels));
 		}
 
 		client.commit(req,
 			(resp) => {
 				let bd = resp.Body();
-				if (crud === Protocol.CRUD.c)
+				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
 					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
@@ -322,10 +334,15 @@ class RoleTier extends Semantier {
 	}
 
 	relations(opts, onOk) {
+		if (!this.anReact)
+			this.anReact = new AnReact();
+
 		let that = this;
 
 		// typically relationships are tree data
-		let { mtabl, fk, sk, sqlArgs, sqlArg} = opts;
+		let { uri, reltabl, sqlArgs, sqlArg } = opts;
+		let { sk, relfk, relcol } = this.rel[reltabl];
+
 		sqlArgs = sqlArgs || [sqlArg];
 
 		if (!sk)
@@ -333,9 +350,9 @@ class RoleTier extends Semantier {
 
 		let t = stree_t.sqltree;
 
-		let ds = {sk, t, sqlArgs: [this.state.pk]};
+		let ds = {uri, sk, t, sqlArgs};
 
-		that.context.anReact.stree({ sk, t, sqlArgs,
+		this.anReact.stree({ uri, sk, t, sqlArgs,
 			onOk: (resp) => {
 				that.rels = resp.Body().forest;
 				onOk(resp);

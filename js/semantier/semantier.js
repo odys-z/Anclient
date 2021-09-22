@@ -24,12 +24,14 @@ export class Semantier {
 			console.error(this, "Setup semantic tier without React context?");
 
 		this.client = context.anClient;
+		this.anReact = context.anReact;
 		this.errCtx = context.error;
 	}
 
 	validate(rec, fields) {
 		if (!rec) rec = this.rec;
-		if (!fields) fields = this.columns ? this.columns() : this.recFields;
+		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
+		if (!fields) fields = this._fields || this.fields();
 
 		if (this.disableValidate)
 			return true;
