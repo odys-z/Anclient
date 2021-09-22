@@ -66,11 +66,13 @@ export class AnRelationTreeComp extends CrudCompW {
 
 	constructor(props) {
 		super(props);
-		// this.state.forest = props.forest || [];
 
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.buildTree = this.buildTree.bind(this);
-	  }
+	}
+
+	componentDidMount() {
+	}
 
 	toExpandItem(e) {
 		e.stopPropagation();
