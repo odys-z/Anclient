@@ -82,8 +82,8 @@ class MyDocsComp extends CrudCompW {
 			buttons: {
 				// is this all CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.size === 1,
-				del: rowIds &&  rowIds.size >= 1,
+				edit: rowIds && rowIds.length === 1,
+				del: rowIds &&  rowIds.length >= 1,
 			},
 		} );
 	}

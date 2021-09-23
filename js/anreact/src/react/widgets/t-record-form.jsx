@@ -75,9 +75,11 @@ class TRecordFormComp extends CrudCompW {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval &&
-			// in case rec already loaded by parent component
-			(!this.tier.rec || Object.keys(this.tier.rec).length == 0)) {
+		if (this.tier.pkval) {
+			// in case rec is already loaded by parent component
+			if (this.tier.rec && Object.keys(this.tier.rec).length > 0)
+				console.warn("TRecordFormComp is supposed to load form data with pkval by itself.");
+
 			let that = this;
 			let cond = {};
 			cond[this.tier.pk] = this.tier.pkval;
@@ -123,9 +125,9 @@ class TRecordFormComp extends CrudCompW {
 			let readOnly = (typeof this.tier.isReadonly === 'function') ?
 							this.tier.isReadonly(f) : this.tier.isReadonly;
 			return (
-			<TextField key={f.field}
-				type={f.type || type}
-				disabled={!!f.disabled} autoComplete={f.autocomplete}
+			<TextField key={f.field} type={f.type || type}
+				disabled={!!f.disabled || !!f.readonly || !!f.readOnly}
+				autoComplete={f.autocomplete}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'

@@ -14,9 +14,13 @@ export class Semantier {
 
 	_cols = undefined;
 	_fields = undefined;
+	uri = undefined;
 
-	constructor(port) {
-		this.port = port;
+	constructor(props) {
+		if (!props || !props.uri)
+			throw Error("uri is required!");
+
+		this.uri = props.uri;
 	}
 
 	setContext(context) {
@@ -93,14 +97,26 @@ export class Semantier {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 
+		let that = this;
+
 		if (modifier)
-			return this._fields.map( (c, x) =>
-				typeof modifier[c.field] === 'function' ?
-						{...c, ...modifier[c.field](c, x) } :
-						{...c, ...modifier[c.field]}
-			);
+			return this._fields.map( (c, x) => {
+				let disabled = c.field === that.pk && that.pkval ? true : false;
+				return typeof modifier[c.field] === 'function' ?
+						{...c, ...modifier[c.field](c, x), disabled } :
+						{...c, ...modifier[c.field], disabled}
+			} );
 		else
-			return this._fields;
+			return this._fields.map( (c, x) => {
+				let disabled = c.field === that.pk && that.pkval ? true : false;
+				return {...c, disabled };
+			} );
 	}
 
+	resetFormSession() {
+		this.pkval = undefined;
+		this.rec = {};
+		this.rels = [];
+		this.crud = undefined;
+	}
 }

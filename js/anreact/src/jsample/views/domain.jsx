@@ -37,6 +37,8 @@ class DomainComp extends CrudCompW {
 					label: 'autocbb'},
 		condDate: {type: 'date', val: '', label: 'operTime'},
 		pageInf : { page: 0, size: 25, total: 0 },
+
+		selected: {Ids: new Set()},
 	};
 
 	constructor(props) {
@@ -94,6 +96,7 @@ class DomainComp extends CrudCompW {
 				]}
 				rows={this.state.rows} pk='domainId'
 				pageInf={this.state.pageInf}
+				selectedIds={this.state.selected}
 				sizeOptions={[5, 25, 50]}
 				onPageInf={this.onPageInf}
 			/>

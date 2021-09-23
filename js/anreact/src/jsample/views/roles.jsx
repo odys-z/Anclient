@@ -3,10 +3,12 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, UpdateReq, DeleteReq, AnsonResp, Semantier, stree_t } from '@anclient/semantier';
+import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp, Semantier, stree_t
+} from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
+	import { toBool } from '../../utils/helpers';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
@@ -59,7 +61,7 @@ class RolesComp extends CrudCompW {
 
 		total: 0,
 		pageInf: { page: 0, size: 25, total: 0 },
-		selectedRecIds: [],
+		selected: {Ids: new Set()},
 	};
 
 	constructor(props) {
@@ -84,23 +86,14 @@ class RolesComp extends CrudCompW {
 		this.toSearch();
 	}
 
-	toSearch(e, query) {
-		let pageInf = this.state.pageInf;
-		let queryReq = this.context.anClient.query(this.uri, 'a_roles', 'r', pageInf)
-		let req = queryReq.Body()
-			.expr('orgName').expr('roleName').expr('roleId').expr('remarks')
-			.j('a_orgs', 'o', 'o.orgId=r.orgId');
-
-		if (query && query.orgId && query.orgId !== 0)
-			req.whereEq('r.orgId', `${query.orgId}`);
-		if (query && query.rName)
-			req.whereCond('%', 'roleName', `'${query.rName}'`);
-
-		this.state.queryReq = queryReq;
-
-		this.context.anReact.bindTablist(queryReq, this, this.context.error);
-
-		this.state.selectedRecIds.splice(0);
+	toSearch(e, q) {
+		let that = this;
+		this.q = q || this.q;
+		this.tier.records( this.q,
+			(cols, rows) => {
+				that.state.selected.Ids.clear();
+				that.setState({rows});
+			} );
 	}
 
 	onPageInf(page, size) {
@@ -121,37 +114,37 @@ class RolesComp extends CrudCompW {
 				edit: rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,
 			},
-			selectedRecIds: rowIds
 		} );
 	}
 
 	toDel(e, v) {
 		let that = this;
 		let txt = L('Totally {count} role records will be deleted. Are you sure?',
-				{count: that.state.selectedRecIds.length});
+				{count: this.state.selected.Ids.size});
 		this.confirm =
 			(<ConfirmDialog open={true}
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
 				onOk={ () => {
-						delRole(that.state.selectedRecIds);
+						that.tier.del({ids: that.state.selected.Ids});
 				 	}
 				}
 				onClose={ () => {that.confirm === undefined} }
 			/>);
 
-		function delRole(roleIds) {
-			let req = that.context.anClient
-				.usrAct('roles', CRUD.d, 'delete')
-				.deleteMulti(this.uri, 'a_roles', 'roleId', roleIds);
-
-			that.context.anClient.commit(req, (resp) => {
-				that.toSearch();
-			}, that.context.error);
-		}
+		// function delRole(roleIds) {
+		// 	let req = that.context.anClient
+		// 		.usrAct('roles', CRUD.d, 'delete')
+		// 		.deleteMulti(this.uri, 'a_roles', 'roleId', [...roleIds]);
+		//
+		// 	that.context.anClient.commit(req, (resp) => {
+		// 		that.toSearch();
+		// 	}, that.context.error);
+		// }
 	}
 
 	toAdd(e, v) {
+		this.tier.resetFormSession();
 		this.roleForm = (<RoleDetails c uri={this.uri}
 			tier={this.tier}
 			onOk={(r) => console.log(r)}
@@ -159,7 +152,7 @@ class RolesComp extends CrudCompW {
 	}
 
 	toEdit(e, v) {
-		this.tier.pkval = this.state.selectedRecIds[0];
+		this.tier.pkval = [...this.state.selected.Ids][0];
 
 		this.roleForm = (<RoleDetails u uri={this.uri}
 			tier={this.tier}
@@ -205,6 +198,7 @@ class RolesComp extends CrudCompW {
 				className={classes.root} checkbox={true}
 				columns={this.tier.columns()}
 				rows={this.state.rows} pk='roleId'
+				selectedIds={this.state.selected}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
@@ -229,7 +223,7 @@ class RoleTier extends Semantier {
 		sk: 'trees.role_funcs' }};
 
 	client = undefined;
-	uri = undefined;
+	// uri = undefined;
 	pkval = undefined;
 	rows = [];
 	rec = {}; // for leveling up record form, also called record
@@ -244,20 +238,36 @@ class RoleTier extends Semantier {
 
 	_fields = [
 		{ type: 'text', validator: {len: 12},  field: 'roleId',   label: 'Role ID',
-		  validator: {notNull: true}},
+		  validator: {notNull: true} },
 		{ type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name',
-		  validator: {notNull: true}},
+		  validator: {notNull: true} },
 		{ type: 'text', validator: {len: 500}, field: 'remarks',  label: 'Remarks',
-		  validator: {notNull: true}, grid: {sm: 12, md: 12, lg: 12}}
+		  validator: {notNull: true} }
 	];
 
 	constructor(comp) {
-		super(comp.port);
-		this.uri = comp.uri || comp.props.uri;
+		super(comp);
+		// this.uri = comp.uri || comp.props.uri;
 	}
 
-	records(conds, onLoad) {
-		// stub for migrating to new way
+	records(conds = {}, onLoad) {
+		let { orgId, roleName, pageInf } = conds;
+		let queryReq = this.client.query(this.uri, this.mtabl, 'r', pageInf)
+		let req = queryReq.Body()
+			.expr('r.roleId').expr('roleName').expr('r.remarks').expr('orgName')
+			.l('a_orgs', 'o', 'o.orgId = r.orgId');
+
+		if (orgId && orgId !== 0)
+			req.whereEq('r.orgId', orgId);
+		if (roleName)
+			req.whereCond('%', 'roleName', `'${roleName}'`);
+
+		this.client.commit(queryReq,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				onLoad(cols, rows);
+			},
+			this.errCtx);
 	}
 
 	record(conds, onLoad) {
@@ -303,7 +313,8 @@ class RoleTier extends Semantier {
 		if ( crud === CRUD.c )
 			req = this.client.userReq(uri, 'insert',
 						new InsertReq( uri, this.mtabl )
-						.record(this.rec, this.pk) );
+						.columns(this._fields)
+						.record(this.rec) );
 		else
 			req = this.client.userReq(uri, 'update',
 						new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
@@ -313,8 +324,11 @@ class RoleTier extends Semantier {
 		// collect relationships
 		let columnMap = {};
 		columnMap[rel.col] = 'nodeId';
-		// semantics handler will resulve fk when inserting
-		columnMap[rel.fk] = this.pkval ? this.pkval : null;
+
+		// semantics handler will resulve fk when inserting only when master pk is auto-pk
+		columnMap[rel.fk] = this.pkval
+						? this.pkval			// when updating
+						: this.rec[this.pk];	// when creating
 
 		let insRels = this.anReact
 			.inserTreeChecked(
@@ -332,7 +346,7 @@ class RoleTier extends Semantier {
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
 			let del_rf = new DeleteReq(null, this.reltabl, rel.fk)
-							.whereEq(rel.fk, this.rec[this.pk]);
+							.whereEq(rel.fk, this.pkval);
 
 			req.Body().post(del_rf.post(insRels));
 		}
@@ -350,11 +364,23 @@ class RoleTier extends Semantier {
 	}
 
 	/**
-	 * @param {Set} ids record id
+	 * @param {object} opts
+	 * @param {string} [opts.uri] overriding local uri
+	 * @param {set} opts.ids record id
 	 * @param {function} onOk: function(AnsonResp);
 	 */
 	del(opts, onOk) {
-		// stub for migrating to new way
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+		let { uri, ids } = opts;
+
+		if (ids && ids.size > 0) {
+			let req = client
+				.usrAct('roles', CRUD.d, 'delete')
+				.deleteMulti(this.uri, 'a_roles', 'roleId', [...ids]);
+			client.commit(req, onOk, this.errCtx);
+		}
 	}
 
 	relations(opts, onOk) {

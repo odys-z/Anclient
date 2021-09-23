@@ -20,7 +20,8 @@ const checkBoxForest = [
 		  { "type":"io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
 			"node":{"fullpath":"1 sys.5 wf","checked":"0","text":"Workflow Settings","sort":"sys-wf","nodeId":"sys-wf","parentId":"sys"},"parent":"sys-wf","level":1,"id":"Workflow Settings"}
 		],
-		"fullpath":"1 sys","checked":true,"text":"System","sort":"sys","nodeId":"sys","parentId":""
+		"fullpath":"1 sys",
+		"checked":true,"text":"System","sort":"sys","nodeId":"sys","parentId":""
 	},
 	"parent":"sys","level":0,"id":"System" },
   { "type":"io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
@@ -29,7 +30,8 @@ const checkBoxForest = [
 		  { "type":"io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
 			"node":{"fullpath":"2 sys-1.1.4 user","checked":"0","text":"Uesr Manage","sort":"sys-uesr-1.1","nodeId":"sys-uesr-1.1","parentId":"sys-1.1"},"parent":"sys-uesr-1.1","level":1,"id":"Uesr Manage" }
 		],
-		"fullpath":"2 sys-1.1","checked":true,"text":"System v1.1","sort":"sys-1.1","nodeId":"sys-1.1","parentId":""
+		"fullpath":"2 sys-1.1",
+		"checked":true,"text":"System v1.1","sort":"sys-1.1","nodeId":"sys-1.1","parentId":""
 	},
 	"parent":"sys-1.1","level":0,"id":"System v1.1" }
 ];
@@ -60,43 +62,18 @@ const forest2 = [
     "node": {
         "children": [
           { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-            "node": {
-                "fullpath": "1 sys.1 domain",
-                "checked": true,
-                "text": "Domain Settings",
-                "sort": "sys-domain",
-                "nodeId": "sys-domain",
-                "parentId": "sys"
-            },
-            "parent": "sys-domain",
-            "level": 1,
-            "id": "Domain Settings"
+            "node": { "fullpath": "1 sys.1 domain",
+                "checked": true, "text": "Domain Settings", "sort": "sys-domain", "nodeId": "sys-domain", "parentId": "sys" },
+            "parent": "sys-domain", "level": 1, "id": "Domain Settings"
           },
           { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-            "node": {
-                "fullpath": "1 sys.2 role",
-                "checked": true,
-                "text": "Role Manage",
-                "sort": "sys-role",
-                "nodeId": "sys-role",
-                "parentId": "sys"
-            },
-            "parent": "sys-role",
-            "level": 1,
-            "id": "Role Manage"
+            "node": { "fullpath": "1 sys.2 role",
+                "checked": true, "text": "Role Manage", "sort": "sys-role", "nodeId": "sys-role", "parentId": "sys" },
+            "parent": "sys-role", "level": 1, "id": "Role Manage"
           },
           { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-            "node": {
-                "fullpath": "1 sys.3 org",
-                "checked": "0",
-                "text": "Orgnization Manage",
-                "sort": "sys-org",
-                "nodeId": "sys-org",
-                "parentId": "sys"
-            },
-            "parent": "sys-org",
-            "level": 1,
-            "id": "Orgnization Manage"
+            "node": { "fullpath": "1 sys.3 org", "checked": "0", "text": "Orgnization Manage", "sort": "sys-org", "nodeId": "sys-org", "parentId": "sys" },
+            "parent": "sys-org", "level": 1, "id": "Orgnization Manage"
           },
           { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
             "node": {
@@ -194,35 +171,16 @@ describe('case: [02.0 anreact]', () => {
 					  reshape: true  // middle nodes been corrected according to children
 					} );
 
-		// 2.
-		// collect record
-		// nvs data must keep consists with jquery serializeArray()
-		// https://api.jquery.com/serializearray/
-		// let nvs = [];
-		// nvs.push({name: 'remarks', value: this.state.record.remarks});
-		// nvs.push({name: 'roleName', value: this.state.record.roleName});
+		assert.equal(rf.nvss, undefined, 'internal node deselected as no leaf node checked');
 
-		// 3.
-		// request (with del if updating)
-		// if (this.state.crud === Protocol.CRUD.c) {
-		// 	nvs.push({name: 'roleId', value: this.state.record.roleId});
-		// 	req = client
-		// 		.usrAct('roles', Protocol.CRUD.c, 'save')
-		// 		.insert(null, 'a_roles', nvs)
-		// 		.Body()
-		// 		.post(rf);
-		// }
-		// else {
-		// 	let del_rf = new DeleteReq(null, 'a_role_func', 'roleId')
-		// 					.whereEq('roleId', this.state.record['roleId']);
-		//
-		// 	req = client
-		// 		.usrAct('roles', Protocol.CRUD.u, 'save')
-		// 		.update(null, 'a_roles', this.state.fields[0].field, nvs);
-		// 	req.Body()
-		// 		.whereEq('roleId', this.state.record.roleId)
-		// 		.post(del_rf.post(rf));
-		// }
+		checkBoxForest[0].node.children[0].node.checked = true; // reshaped
+		rf = anReact.inserTreeChecked(
+					checkBoxForest,
+					{ table: 'a_role_func',
+					  columnMap,
+					  check: 'checked',
+					  reshape: true  // middle nodes been corrected according to children
+					} );
 
 		// [ [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ],
 		//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ] ]
@@ -251,15 +209,15 @@ describe('case: [02.0 anreact]', () => {
 					  reshape: true  // middle nodes been corrected according to children
 					} );
 
-		// [ [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ],
-		//   [ [ 'funcId', 'sys-domain' ], [ 'roleId', 'r-001' ] ],
+		// [ [ [ 'funcId', 'sys-domain' ], [ 'roleId', 'r-001' ] ],
 		//   [ [ 'funcId', 'sys-role' ], [ 'roleId', 'r-001' ] ],
-		//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ] ]
-		assert.equal(rf.nvss.length, 4, 'records');
+		//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ]
+		//   [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ] ],
+		assert.equal(rf.nvss.length, 3, 'records');
 		assert.equal(rf.nvss[0].length, 2, '[ funcId, sys ]');
 		assert.equal(rf.nvss[0][0][0], 'funcId', '[ funcId, ... ]');
 		assert.equal(rf.nvss[1][0][0], 'funcId', '[ funcId, ... ]');
-		assert.equal(rf.nvss[1][0][1], 'sys-domain', '[ funcId, ... ]');
+		assert.equal(rf.nvss[1][0][1], 'sys-role', '[ funcId, ... ]');
 		assert.equal(rf.nvss[1][1][1], 'r-001', '[ ..., r-001 ]');
 	});
 });

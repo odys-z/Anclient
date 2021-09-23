@@ -108,7 +108,7 @@ class RoleDetailsComp extends DetailFormW {
 	    	this.setState({});
 		}
 		else
-			this.tier.saveRec({curd: this.state.crud},
+			this.tier.saveRec({crud: this.state.crud},
 				() => { this.showOk(L('Data Saved!')); });
 	}
 
@@ -156,7 +156,9 @@ class RoleDetailsComp extends DetailFormW {
 				<TRecordForm uri={this.props.uri}
 					tier={this.tier}
 					mtabl='a_roles' pk='roleId'
-					fields={this.tier.fields()}
+					fields={this.tier.fields({
+						remarks: {grid: {sm: 12, md: 12, lg: 12}}
+					})}
 				/>
 				<AnRelationTree uri={this.props.uri}
 					tier={this.tier}

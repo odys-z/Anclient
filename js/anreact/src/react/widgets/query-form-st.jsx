@@ -105,36 +105,9 @@ class AnQuerystComp extends React.Component {
 		});
 	}
 
-	/** Check all binding tasks, if all are ok, fire onDone event.
-	 * Called by AnReact.ds2ds2cbbOptions, etc. Should call parent component's
-	 * onDone handler.
-	 * @param {object} cond the curreent condition
-	 */
-	// onBound(cond) {
-	// 	let conds = this.state.conds;
-	// 	if (conds) {
-	// 		for (let i = 0; i < conds.length; i++) {
-	// 			if (conds[i] && conds[i].loading)
-	// 				return;
-	// 		}
-	// 	}
-	//
-	// 	if (typeof this.props.onDone === 'function')
-	// 		this.props.onDone(this.query());
-	// }
-
 	handleChange( e ) {
 		this.setState({checked: !this.state.checked})
 	}
-
-	// query = () => {
-	// 	console.warn('Subclass must override this function, query() - composing query conditions');
-	// 	return this.state.conds.map( (c, x) => {
-	// 		let o = {}
-	// 		o[c.type] = c.val;
-	// 		return o;
-	// 	});
-	// }
 
 	onTxtChange( e, x ) {
 		e.stopPropagation()

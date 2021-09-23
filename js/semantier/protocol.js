@@ -857,11 +857,23 @@ class InsertReq extends UpdateReq {
 		this.a = Protocol.CRUD.c;
 	}
 
+	/**
+	 * Add columns definition before setup nvs.
+	 * Scince @anclient/semantier 0.2, can handle tier's fields/columns
+	 * (with field property)
+	 * @param {array} cols
+	 */
 	columns (cols) {
 		if (this.cols === undefined)
 			this.cols = [];
 		if (Array.isArray(cols)){
-			this.cols = this.cols.concat(cols);
+			// this.cols = this.cols.concat(cols);
+			this.cols = this.cols.concat(cols.map(
+				(c, x) => typeof c === 'string'
+								? c
+								: c.field ? c.field
+								: c.name
+				));
 		}
 		else this.cols.push(cols);
 		return this;

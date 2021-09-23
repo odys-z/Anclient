@@ -38,13 +38,16 @@ class AnTablistComp extends React.Component {
 		page: 0,
 		size: 10,
 
-		selected: new Set()
+		selected: undefined
 	}
 
 	constructor(props){
 		super(props)
 
-		let {sizeOptions} = props;
+		let {sizeOptions, selectedIds} = props;
+		this.state.selected = selectedIds.Ids;
+		if (this.state.selected.constructor.name !== 'Set')
+			throw Error("selectedIds.Ids must be a set");
 		if (sizeOptions)
 			this.state.sizeOptions = sizeOptions;
 
@@ -52,6 +55,7 @@ class AnTablistComp extends React.Component {
 		this.state.total = total || -1;
 		this.state.page = page || 0;
 		this.state.size = size || 25;
+
 
 		this.isSelected = this.isSelected.bind(this);
 		this.toSelectAll = this.toSelectAll.bind(this);
@@ -85,7 +89,7 @@ class AnTablistComp extends React.Component {
 			else selected.add(newSelct);
 		}
 
-		this.setState({selected});
+		this.setState({});
 		this.updateSelectd(selected);
 	};
 
@@ -217,6 +221,7 @@ class AnTablistComp extends React.Component {
 }
 AnTablistComp.propTypes = {
 	pk: PropTypes.string.isRequired,
+	selectedIds: PropTypes.object.isRequired
 };
 
 const AnTablist = withStyles(styles)(AnTablistComp);

@@ -2,7 +2,7 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
-import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
+import { Box, TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { Protocol, AnsonResp, UserReq, Semantier } from '@anclient/semantier';
 import { L, Langstrs,
@@ -19,13 +19,22 @@ const styles = (theme) => ( {
 	root: {
 	},
 	button: {
+		height: 40,
+		width: 100,
+		padding: theme.spacing(1),
+		margin: theme.spacing(1),
+	},
+	imgUploadBox: {
+		width: 102,
+		height: 40,
+		marginRight: theme.spacing(2),
 	},
  	fileInput: {
-		border: "solid 1px #f777",
+		border: "solid 1px red",
 		width: "100%",
 		height: "100%",
 		position: "relative",
-		top: -52,
+		top: -48,
 		opacity: 0
 	}
 } );
@@ -91,8 +100,8 @@ class DocsharesComp extends CrudCompW {
 			buttons: {
 				// NOTE: is this also CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.size === 1 && !('loading' in rowIds),
-				del:  rowIds && rowIds.size >= 1  && !('loading' in rowIds),
+				edit: rowIds && rowIds.length === 1 && !('loading' in new Set(rowIds)),
+				del:  rowIds && rowIds.length >= 1  && !('loading' in new Set(rowIds)),
 			},
 		} );
 	}
@@ -162,12 +171,11 @@ class DocsharesComp extends CrudCompW {
 					<Button variant="contained" disabled={!btn.add}
 						className={classes.button}
 						startIcon={<JsampleIcons.Add />}
-					/>
+					>{L('File')}</Button>
 					<input type='file' className={ classes.fileInput }
 				 		ref={ (ref) => this.fileInput = ref }
 				 		onChange={ this.toAdd } />
-				</Box>);
-
+				</Box>
 				<Button variant="contained" disabled={!btn.edit}
 					className={classes.button} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Edit />}
@@ -242,6 +250,7 @@ DocsQuery.propTypes = {
 }
 
 export class DocsTier extends Semantier {
+	port = 'docstier';
 	mtabl = 'n_docs';
 	pk = 'docId';
 	checkbox = true;
@@ -258,8 +267,8 @@ export class DocsTier extends Semantier {
 		{ text: L('Shared With'), field: 'sharings' } ];
 
 	constructor(comp) {
-		super(comp.port || 'docstier');
-		this.uri = comp.uri || comp.props.uri;
+		super(comp);
+		// this.uri = comp.uri || comp.props.uri;
 	}
 
 	upload(files) {

@@ -110,24 +110,30 @@ export class AnReact {
 		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
 		*/
 		function collectTree(forest, rows) {
+			let cnt = 0;
 			forest.forEach( (tree, i) => {
 				if (tree && tree.node) {
-					let childCnt = 0;
 					if (tree.node.children && tree.node.children.length > 0) {
-						let childRows = collectTree(tree.node.children, rows);
-						childCnt = childRows ? childRows.length : 0;
+						let childCnt = collectTree(tree.node.children, rows);
 
 						if (childCnt > 0)
 							tree.node[check] = 1;
 						else
 							tree.node[check] = 0;
 					}
-					if ( toBool(tree.node[check]) )
+					if ( toBool(tree.node[check]) ) {
 						rows.push(toNvRow(tree.node, dbCols, columnMap));
+						cnt++;
+					}
 				}
 			});
+			return cnt;
 		}
 
+		/**convert to [name-value, ...] as a row, e.g.
+		 * [ { "name": "funcId", "value": "sys-domain" },
+		 *   { "name": "roleId", "value": "r003" } ]
+		 */
 		function toNvRow(node, dbcols, colMap) {
 			let r = [];
 			dbcols.forEach( (col, j) => {

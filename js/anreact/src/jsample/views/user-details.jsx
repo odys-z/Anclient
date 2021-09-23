@@ -66,21 +66,21 @@ class UserDetailstComp extends DetailFormW {
 	// NOTE
 	// DESGIN MEMO: Users use this to customize the css & items to be visualized.
 	// Actually field's type, validator should be semantics.
-	recfields = [
-		{ type: 'text', field: 'userId', label: L('Log ID'),
-		  validator: {len: 12, notNull: true} },
-		{ type: 'text', field: 'userName', label: L('User Name') },
-		{ type: 'password', field: 'pswd', label: L('Password'),
-		  validator: {notNull: true} },
-		{ type: 'cbb', field: 'roleId', label: L('Role'),
-		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
-		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} },
-		{ type: 'cbb', field: 'orgId', label: L('Organization'),
-		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
-		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} },
-	];
+	// recfields = [
+	// 	{ type: 'text', field: 'userId', label: L('Log ID'),
+	// 	  validator: {len: 12, notNull: true} },
+	// 	{ type: 'text', field: 'userName', label: L('User Name') },
+	// 	{ type: 'password', field: 'pswd', label: L('Password'),
+	// 	  validator: {notNull: true} },
+	// 	{ type: 'cbb', field: 'roleId', label: L('Role'),
+	// 	  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+	// 	  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
+	// 	  validator: {notNull: true} },
+	// 	{ type: 'cbb', field: 'orgId', label: L('Organization'),
+	// 	  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+	// 	  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
+	// 	  validator: {notNull: true} },
+	// ];
 
 	constructor (props = {}) {
 		super(props);
@@ -167,7 +167,7 @@ class UserDetailstComp extends DetailFormW {
 			  </DialogTitle>
 				<TRecordForm uri={this.props.uri}
 					tier={this.tier}
-					fields={this.recfields}
+					fields={this.tier.fields({ remarks: {grid: {sm: 12, md: 12, lg: 12}} })}
 				/>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
