@@ -1,6 +1,6 @@
-export * from './utils/consts.js';
-export * from './utils/langstr.js';
-export * from './utils/helpers.js';
+export * from './utils/consts';
+export * from './utils/langstr';
+export * from './utils/helpers';
 
 export * from './patch/react-portal-overlay.tsx';
 
@@ -10,10 +10,6 @@ export * from './react/error.jsx';
 export * from './react/login.jsx';
 export * from './react/sys.jsx';
 export * from './react/crud.jsx';
-
-export * from './utils/consts.js';
-export * from './utils/helpers.js';
-export * from './utils/langstr.js';
 
 export * from './react/widgets/messagebox';
 export * from './react/widgets/dataset-combo';
@@ -55,3 +51,8 @@ export const jsample = {
 	MyPswd, MyPswdComp,
 	Userst, UserstComp, UserDetailst, UserDetailstComp, UsersTier, UserstReq
 };
+
+import { uarr2Base64, dataOfurl, mimeOf, urlOfdata } from './utils/file-utils';
+export const utils = {
+	uarr2Base64, dataOfurl, mimeOf, urlOfdata
+}

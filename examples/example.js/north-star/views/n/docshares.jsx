@@ -4,12 +4,13 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Box, TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp, UserReq, Semantier } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier';
 import { L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample
+	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
+const { mimeOf, dataOfurl, urlOfdata } = utils;
 
 import { DocshareDetails } from './docshare-details';
 
@@ -135,8 +136,9 @@ class DocsharesComp extends CrudCompW {
 	}
 
 	toAdd(e, v) {
+		let that = this;
 		let files = this.fileInput.files;
-		this.tier.upload(files);
+		this.tier.upload(files, (e) => that.setState({}));
 	}
 
 	toEdit(e, v) {
@@ -189,7 +191,7 @@ class DocsharesComp extends CrudCompW {
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns( {mime: {formatter: (rec, c) => getMimeIcon(v)}} )}
+				columns={tier.columns( {mime: {formatter: (v, x, rec) => getMimeIcon(v)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -199,8 +201,8 @@ class DocsharesComp extends CrudCompW {
 			{this.confirm}
 		</div>);
 
-		function getMimeIcon(rec, f) {
-			console.log(rec[f.field]);
+		function getMimeIcon(v, rec) {
+			console.log(rec, v);
 			return (<>[DocIcon]</>);
 		}
 	}
@@ -255,7 +257,7 @@ export class DocsTier extends Semantier {
 	pk = 'docId';
 	checkbox = true;
 	client = undefined;
-	uri = undefined;
+	// uri = undefined;
 	rows = [];
 	pkval = undefined;
 	rec = {};
@@ -268,10 +270,9 @@ export class DocsTier extends Semantier {
 
 	constructor(comp) {
 		super(comp);
-		// this.uri = comp.uri || comp.props.uri;
 	}
 
-	upload(files) {
+	upload(files, onOk) {
 		if (!files) return;
 
 		let that = this;
@@ -279,19 +280,20 @@ export class DocsTier extends Semantier {
 		files.forEach( (file, x) => {
 			let row = {
 				docId: 'loading',
-				uri  : content,
-				mime : mimeOf( reader.result ),
+				// uri  : undefined,
+				mime : undefined,
 				docName: file.name,
 				reader: new FileReader()
 			};
 			that.rows.push(row);
 
-			row.onLoad = function (e) {
-				row.uri = row.reader.result;
-				delete row.reader;
-				delete row.onLoad;
-				that.saveRec();
-				that.setState({});
+			row.reader.onload = function (e) {
+				// FIXME how about stream mode?
+				// row.uri = row.reader.result;
+				let content = dataOfurl(row.reader.result)
+				row.mime = mimeOf( row.reader.result ),
+
+				that.saveRec({uri: content, rec: row}, onOk);
 			}
 
 			row.reader.readAsDataURL(file);
@@ -363,6 +365,8 @@ export class DocsTier extends Semantier {
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
 					rec[that.pk] = bd.resulve(that.mtabl, that.pk, rec);
+
+					console.log(rec); // safe for concurrent uploading?
 				onOk(resp);
 			},
 			this.errCtx);
@@ -388,8 +392,8 @@ export class DocsTier extends Semantier {
 	}
 }
 
-export class DocsReq extends UserReq {
-	static type = 'io.oz.ever.conn.n.docs.DocsReq';
+export class DocsReq extends AnsonBody {
+	static type = 'io.odysz.semantic.tier.docs.DocsReq';
 	static __init__ = function () {
 		// Design Note:
 		// can we use dynamic Protocol?
@@ -400,13 +404,12 @@ export class DocsReq extends UserReq {
 	}();
 
 	static A = {
-		records: 'records',
-		rec: 'rec',
-		update: 'u',
-		insert: 'c',
+		records: 'r/list',
+		rec: 'r/rec',
+		update: 'c',
 		del: 'd',
 
-		preview: 'r/preview',
+		//preview: 'r/preview',
 	}
 
 	constructor (uri, args = {}) {
