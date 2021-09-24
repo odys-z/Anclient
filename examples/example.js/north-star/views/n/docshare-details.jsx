@@ -102,7 +102,7 @@ class DocshareDetailsComp extends DetailFormW {
 
 		if (this.tier.validate(this.tier.rec, this.recfields)) // field style updated
 			this.tier.saveRec(
-				{ crud: this.state.crud,
+				{ crud: CRUD.u,
 				  disableForm: true },
 				resp => {
 					// NOTE should crud moved to tier, just like the pkval?

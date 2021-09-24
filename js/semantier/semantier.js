@@ -19,6 +19,7 @@ export class Semantier {
 	_cols = undefined;
 	_fields = undefined;
 	uri = undefined;
+	pkval = undefined;
 
 	constructor(props) {
 		if (!props || !props.uri)
@@ -234,12 +235,20 @@ export class Semantier {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-		let { uri, ids } = opts;
+		let { uri, ids, posts } = opts;
 
-		if (ids && ids.size > 0) {
+		if (ids && (ids.size > 0 || ids.length > 0)) {
 			let req = client
 				.usrAct(this.mtabl, CRUD.d, 'delete')
 				.deleteMulti(this.uri, this.mtabl, this.pk, [...ids]);
+
+			if (posts) {
+				let d = req.Body();
+				posts.forEach( (p, x) => {
+					d.post(p);
+				} );
+			}
+
 			client.commit(req, onOk, this.errCtx);
 		}
 	}

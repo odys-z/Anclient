@@ -138,7 +138,10 @@ class DocsharesComp extends CrudCompW {
 	toAdd(e, v) {
 		let that = this;
 		let files = this.fileInput.files;
-		this.tier.upload(files, (e) => that.setState({}));
+		this.tier.upload(files, (docId) => {
+			that.setState({});
+			that.toEdit(e, docId);
+		});
 	}
 
 	toEdit(e, v) {
@@ -290,6 +293,7 @@ export class DocsTier extends Semantier {
 		if (!files) return;
 
 		let that = this;
+		let client = this.client;
 
 		files.forEach( (file, x) => {
 			let row = {
@@ -303,13 +307,38 @@ export class DocsTier extends Semantier {
 
 			row.reader.onload = function (e) {
 				// FIXME how about stream mode?
-				// row.uri = row.reader.result;
-				row.mime = mimeOf( row.reader.result ),
-				row.uri = dataOfurl(row.reader.result)
+				row.mime = mimeOf( row.reader.result );
+				row.uri64 = dataOfurl( row.reader.result );
 				delete row.reader;
 				row.docId = undefined;
 
-				that.saveRec({rec: row}, onOk);
+				// file always uploaded as insertion, - delete first (even null Id)
+				// let req = that.client
+				// 	.usrAct(that.mtabl, CRUD.c, 'upload doc')
+				// 	.insert(that.uri, that.mtabl);
+				//
+				// that.client.commit(req,
+				// 	(resp) => {
+				// 		let docId = resp.Body().resulve(that.mtabl, that.pk, row);
+				// 		onOk && onOk(docId);
+				// 	}, that.errCtx);
+
+				let req = client
+					.userReq( that.uri, that.port,
+					new DocsReq( that.uri, { deletings: [that.pkval], ...row } )
+					.A( DocsReq.A.upload ) );
+
+				client.commit(req,
+					(resp) => {
+						let bd = resp.Body();
+						// NOTE:
+						// resulving auto-k is a typicall semantic processing, don't expose this to caller
+						row[that.pk] = bd.resulve(that.mtabl, that.pk, row);
+
+						console.log(row[that.pk]); // safe for concurrent uploading?
+						onOk(row[that.pk]);
+					},
+					that.errCtx);
 			}
 
 			row.reader.readAsDataURL(file);
@@ -355,51 +384,6 @@ export class DocsTier extends Semantier {
 	}
 
 	/**
-	 * @param {object} opts
-	 * @param {string} opts.uri
-	 * @param {object} opts.rec { docId, uri, mime, docName, size }
-	 * @param {function} onOk
-	 */
-	// saveRec(opts, onOk) {
-	// 	if (!this.client) return;
-	// 	let client = this.client;
-	// 	let that = this;
-	//
-	// 	let { crud } = opts;
-	// 	let uri = this.uri;
-	//
-	// 	if (crud === CRUD.u && !this.pkval)
-	// 		throw Error("Can't update with null ID.");
-	//
-	// 	let { rec } = opts;
-	// 	let {docId, docName, mime, size} = rec;
-	// 	let crud = docId === 'loading' || !docId ? CRUD.c : CRUD.u;
-	//
-	// 	rec.userId = client.userInfo.uid;
-	// 	let req = client
-	// 				.usrAct( this.uri, crud, "upload", "share docs" )
-	// 				.delete( this.uri, this.mtabl,
-	// 						{pk: this.pk, v: rec[this.pk]},
-	// 						rec );
-	// 	req.Body().post(new InsertReq( this.uri, this.mtabl )
-	// 				.columns(Object.keys(rec)) // FIXME make UpdateReq.rocord() more robust
-	// 				.record( rec ) );
-	//
-	// 	client.commit(req,
-	// 		(resp) => {
-	// 			let bd = resp.Body();
-	// 			if (crud === CRUD.c)
-	// 				// NOTE:
-	// 				// resulving auto-k is a typicall semantic processing, don't expose this to caller
-	// 				rec[that.pk] = bd.resulve(that.mtabl, that.pk, rec);
-	//
-	// 				console.log(rec); // safe for concurrent uploading?
-	// 			onOk(resp);
-	// 		},
-	// 		this.errCtx);
-	// }
-
-	/**
 	 * @param {Set} ids record id
 	 * @param {function} onOk: function(AnsonResp);
 	 */
@@ -407,9 +391,9 @@ export class DocsTier extends Semantier {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-		let { uri, ids } = opts;
+		let { uri, ids, posts } = opts;
 
-		if (ids && ids.size > 0) {
+		if (ids && (ids.size > 0 || ids.length > 0)) {
 			let req = this.client.userReq(uri, this.port,
 				new DocsReq( uri, { deletings: [...ids] } )
 				.A(DocsReq.A.del) );
@@ -433,7 +417,7 @@ export class DocsReq extends AnsonBody {
 	static A = {
 		records: 'r/list',
 		rec: 'r/rec',
-		update: 'c',
+		upload: 'c',
 		del: 'd',
 
 		//preview: 'r/preview',
@@ -442,14 +426,14 @@ export class DocsReq extends AnsonBody {
 	constructor (uri, args = {}) {
 		super();
 		this.type = DocsReq.type;
-		this.uri = uri;
+		// this.uri = uri;
 		this.docId = args.docId;
 		this.docName = args.docName;
-		this.doctype = args.doctype;
+		this.mime = args.mime;
+		this.uri64 = args.uri64;
 
 		/// case u
-		this.pk = args.pk;
-		this.record = args.record;
+		// this.pk = args.pk;
 
 		// case d
 		this.deletings = args.deletings;

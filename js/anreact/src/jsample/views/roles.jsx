@@ -198,7 +198,7 @@ class RolesComp extends CrudCompW {
 			{this.tier && <AnTablist
 				className={classes.root} checkbox={true}
 				columns={this.tier.columns()}
-				rows={this.state.rows} pk='roleId'
+				rows={this.state.rows} pk={this.tier.pk}
 				selectedIds={this.state.selected}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
@@ -224,7 +224,6 @@ class RoleTier extends Semantier {
 		sk: 'trees.role_funcs' }};
 
 	client = undefined;
-	// uri = undefined;
 	pkval = undefined;
 	rows = [];
 	rec = {}; // for leveling up record form, also called record
@@ -246,9 +245,13 @@ class RoleTier extends Semantier {
 		  validator: {notNull: true} }
 	];
 
+	/**
+	 * @param {React.Component} comp
+	 * @param {string} comp.uri the client function uri.
+	 * @constructor
+	 */
 	constructor(comp) {
 		super(comp);
-		// this.uri = comp.uri || comp.props.uri;
 	}
 
 	records(conds = {}, onLoad) {

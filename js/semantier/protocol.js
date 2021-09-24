@@ -876,7 +876,6 @@ class InsertReq extends UpdateReq {
 		if (this.cols === undefined)
 			this.cols = [];
 		if (Array.isArray(cols)){
-			// this.cols = this.cols.concat(cols);
 			this.cols = this.cols.concat(cols.map(
 				(c, x) => typeof c === 'string'
 								? c
