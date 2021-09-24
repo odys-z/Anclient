@@ -1,4 +1,6 @@
 
+import { stree_t } from './protocol';
+
 /**
  * Base class of semantic tier
  * @class
@@ -113,6 +115,32 @@ export class Semantier {
 			} );
 	}
 
+	relations(opts, onOk) {
+		if (!this.anReact)
+			this.anReact = new AnReact();
+
+		let that = this;
+
+		// typically relationships are tree data
+		let { uri, reltabl, sqlArgs, sqlArg } = opts;
+		let { sk, relfk, relcol } = this.rel[reltabl];
+
+		sqlArgs = sqlArgs || [sqlArg];
+
+		if (!sk)
+			throw Error('TODO ...');
+
+		let t = stree_t.sqltree;
+
+		let ds = {uri : this.uri, sk, t, sqlArgs};
+
+		this.anReact.stree({ uri: this.uri, sk, t, sqlArgs,
+			onOk: (resp) => {
+				that.rels = resp.Body().forest;
+				onOk(resp);
+			}
+		}, this.errCtx);
+	}
 	resetFormSession() {
 		this.pkval = undefined;
 		this.rec = {};
