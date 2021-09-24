@@ -37,7 +37,7 @@ class PollsComp extends CrudCompW {
 
 		pageInf: { page: 0, size: 25, total: 0 },
 		buttons: { start: true, stop: false, edit: false},
-		selectedRecIds: [],
+		selected: {Ids: new Set()},
 	};
 
 	jquiz = undefined;
@@ -81,7 +81,7 @@ class PollsComp extends CrudCompW {
 
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
-		this.state.selectedRecIds.splice(0);
+		this.state.selected.Ids.clear();
 	}
 
 	onPageInf(page, size) {
@@ -102,7 +102,6 @@ class PollsComp extends CrudCompW {
 				stop: rowIds &&  rowIds.length >= 1,
 				edit: rowIds && rowIds.length === 1,
 			},
-			selectedRecIds: rowIds
 		} );
 	}
 
@@ -180,6 +179,7 @@ class PollsComp extends CrudCompW {
 				rows={this.state.rows}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
+				selectedIds={this.state.selected}
 				onSelectChange={this.onTableSelect}
 			/>
 			{this.roleForm}

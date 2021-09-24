@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Box, TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier';
+import { Protocol, AnsonResp, InsertReq, AnsonBody, Semantier } from '@anclient/semantier';
 import { L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
 	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
@@ -143,18 +143,17 @@ class DocsharesComp extends CrudCompW {
 
 	toEdit(e, v) {
 		let that = this;
-		let pkv = [...this.state.selected.Ids][0];
-		this.tier.pkval = pkv;
-		this.recForm = (<DocshareDetails crud={CRUD.u}
+		this.tier.pkval = [...this.state.selected.Ids][0];
+		this.recForm = (<DocshareDetails u
 			uri={this.uri}
 			tier={this.tier}
-			recId={pkv}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
 
 	closeDetails() {
 		this.recForm = undefined;
+		this.tier.resetFormSession();
 		this.setState({});
 	}
 
@@ -191,7 +190,7 @@ class DocsharesComp extends CrudCompW {
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns( {mime: {formatter: (v, x, rec) => getMimeIcon(v)}} )}
+				columns={tier.columns( {mime: {formatter: (v, x, rec) => getMimeIcon(v, rec)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -202,7 +201,7 @@ class DocsharesComp extends CrudCompW {
 		</div>);
 
 		function getMimeIcon(v, rec) {
-			console.log(rec, v);
+			// console.log(rec, v);
 			return (<>[DocIcon]</>);
 		}
 	}
@@ -255,9 +254,15 @@ export class DocsTier extends Semantier {
 	port = 'docstier';
 	mtabl = 'n_docs';
 	pk = 'docId';
+
+	reltabl = 'n_doc_kid';
+	rel = {'n_doc_kid': {
+		fk: 'docId',  // fk to main table
+		col: 'userId',// checking col
+		sk: 'trees.doc_kid' }};
 	checkbox = true;
+
 	client = undefined;
-	// uri = undefined;
 	rows = [];
 	pkval = undefined;
 	rec = {};
@@ -267,6 +272,15 @@ export class DocsTier extends Semantier {
 		{ text: L(''), field: 'mime' },
 		{ text: L('File Name'), field: 'docName' },
 		{ text: L('Shared With'), field: 'sharings' } ];
+
+	_fields = [
+		{ type: 'text', field: 'docId',   label: 'Doc ID',
+		  disabled: true },
+		{ type: 'text', field: 'docName', label: 'File Name',
+		  disabled: true },
+		{ type: 'text', field: 'mime',    label: 'File Type',
+		  disabled: true, formatter: undefined }
+	];
 
 	constructor(comp) {
 		super(comp);
@@ -290,10 +304,12 @@ export class DocsTier extends Semantier {
 			row.reader.onload = function (e) {
 				// FIXME how about stream mode?
 				// row.uri = row.reader.result;
-				let content = dataOfurl(row.reader.result)
 				row.mime = mimeOf( row.reader.result ),
+				row.uri = dataOfurl(row.reader.result)
+				delete row.reader;
+				row.docId = undefined;
 
-				that.saveRec({uri: content, rec: row}, onOk);
+				that.saveRec({rec: row}, onOk);
 			}
 
 			row.reader.readAsDataURL(file);
@@ -314,6 +330,7 @@ export class DocsTier extends Semantier {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
+				that.resetFormSession();
 				onLoad(cols, rows);
 			},
 			this.errCtx);
@@ -343,34 +360,44 @@ export class DocsTier extends Semantier {
 	 * @param {object} opts.rec { docId, uri, mime, docName, size }
 	 * @param {function} onOk
 	 */
-	saveRec(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
-
-		let { uri, rec } = opts;
-		let {docId, docName, mime, size} = rec;
-		let crud = docId === 'loading' ? CRUD.c : CRUD.u;
-
-		let req = this.client
-					.usrAct( this.uri, crud, "upload", "share docs" )
-					.update( this.uri, this.mtabl,
-							{pk: this.pk, v: rec[this.pk]},
-							rec );
-
-		client.commit(req,
-			(resp) => {
-				let bd = resp.Body();
-				if (crud === CRUD.c)
-					// NOTE:
-					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					rec[that.pk] = bd.resulve(that.mtabl, that.pk, rec);
-
-					console.log(rec); // safe for concurrent uploading?
-				onOk(resp);
-			},
-			this.errCtx);
-	}
+	// saveRec(opts, onOk) {
+	// 	if (!this.client) return;
+	// 	let client = this.client;
+	// 	let that = this;
+	//
+	// 	let { crud } = opts;
+	// 	let uri = this.uri;
+	//
+	// 	if (crud === CRUD.u && !this.pkval)
+	// 		throw Error("Can't update with null ID.");
+	//
+	// 	let { rec } = opts;
+	// 	let {docId, docName, mime, size} = rec;
+	// 	let crud = docId === 'loading' || !docId ? CRUD.c : CRUD.u;
+	//
+	// 	rec.userId = client.userInfo.uid;
+	// 	let req = client
+	// 				.usrAct( this.uri, crud, "upload", "share docs" )
+	// 				.delete( this.uri, this.mtabl,
+	// 						{pk: this.pk, v: rec[this.pk]},
+	// 						rec );
+	// 	req.Body().post(new InsertReq( this.uri, this.mtabl )
+	// 				.columns(Object.keys(rec)) // FIXME make UpdateReq.rocord() more robust
+	// 				.record( rec ) );
+	//
+	// 	client.commit(req,
+	// 		(resp) => {
+	// 			let bd = resp.Body();
+	// 			if (crud === CRUD.c)
+	// 				// NOTE:
+	// 				// resulving auto-k is a typicall semantic processing, don't expose this to caller
+	// 				rec[that.pk] = bd.resulve(that.mtabl, that.pk, rec);
+	//
+	// 				console.log(rec); // safe for concurrent uploading?
+	// 			onOk(resp);
+	// 		},
+	// 		this.errCtx);
+	// }
 
 	/**
 	 * @param {Set} ids record id

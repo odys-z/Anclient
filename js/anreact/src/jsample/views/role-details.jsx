@@ -26,7 +26,6 @@ const { CRUD } = Protocol;
 
 const styles = theme => ({
   dialogPaper: {
-	// minHeight: "76vh"
 	height: "100%"
   },
   root: {
@@ -43,27 +42,27 @@ const styles = theme => ({
 	width: "100%",
 	color: "primary"
   },
-  centre: { alignItems: "center" },
-  lower: { height: "15%" },
+  // centre: { alignItems: "center" },
+  // lower: { height: "15%" },
 
-  left: { alignItems: "center" },
-  right: { alignItems: "center" },
-  largeText: { width: "100%" },
-  rowBox: {
-	display: "flex",
-	flexDirection: "row",
-	alignItems: "center"
-  },
+  // left: { alignItems: "center" },
+  // right: { alignItems: "center" },
+  // largeText: { width: "100%" },
+  // rowBox: {
+	// display: "flex",
+	// flexDirection: "row",
+	// alignItems: "center"
+  // },
 
-  formLabel: {
-	width: "12ch",
-	textAlign: "right",
-    paddingRight: theme.spacing(1),
-  },
-  formText: {
-	textAlign: "right",
-    paddingLeft: theme.spacing(1),
-  },
+  // formLabel: {
+	// width: "12ch",
+	// textAlign: "right",
+  //   paddingRight: theme.spacing(1),
+  // },
+  // formText: {
+	// textAlign: "right",
+  //   paddingLeft: theme.spacing(1),
+  // },
   content: {
 	height: "100%",
   },

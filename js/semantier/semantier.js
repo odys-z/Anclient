@@ -1,5 +1,7 @@
 
-import { stree_t } from './protocol';
+import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from './protocol';
+
+const { CRUD } = Protocol;
 
 /**
  * Base class of semantic tier
@@ -103,7 +105,7 @@ export class Semantier {
 
 		if (modifier)
 			return this._fields.map( (c, x) => {
-				let disabled = c.field === that.pk && that.pkval ? true : false;
+				let disabled = c.disabled || c.field === that.pk && that.pkval ? true : false;
 				return typeof modifier[c.field] === 'function' ?
 						{...c, ...modifier[c.field](c, x), disabled } :
 						{...c, ...modifier[c.field], disabled}
@@ -115,6 +117,7 @@ export class Semantier {
 			} );
 	}
 
+	/** Load relationships */
 	relations(opts, onOk) {
 		if (!this.anReact)
 			this.anReact = new AnReact();
@@ -141,6 +144,106 @@ export class Semantier {
 			}
 		}, this.errCtx);
 	}
+
+	/** save form with a relationship table */
+	saveRec(opts, onOk) {
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+
+		let { crud, disableForm, disableRelations } = opts;
+		let uri = this.uri;
+
+		if (crud === CRUD.u && !this.pkval)
+			throw Error("Can't update with null ID.");
+
+		let req;
+		if (!disableForm) {
+			if ( crud === CRUD.c )
+				req = this.client.userReq(uri, 'insert',
+							new InsertReq( uri, this.mtabl )
+							.columns(this._fields)
+							.record(this.rec) );
+			else
+				req = this.client.userReq(uri, 'update',
+							new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
+							.record(this.rec, this.pk) );
+		}
+
+		if (!disableRelations) {
+			let rel = this.rel[this.reltabl];
+			// collect relationships
+			let columnMap = {};
+			columnMap[rel.col] = 'nodeId';
+
+			// semantics handler will resulve fk when inserting only when master pk is auto-pk
+			columnMap[rel.fk] = this.pkval
+							? this.pkval			// when updating
+							: this.rec[this.pk];	// when creating
+
+			let insRels = this.anReact
+				.inserTreeChecked(
+					this.rels,
+					{ table: this.reltabl,
+					  columnMap,
+					  check: 'checked',
+					  // middle nodes been corrected according to children
+					  reshape: true }
+				);
+
+			if (!this.pkval) {
+				if (req)
+					req.Body().post(insRels);
+				else
+					req = this.client.userReq(uri, 'insert', insRels);
+			}
+			else {
+				// e.g. delete from a_role_func where roleId = '003'
+				let del_rf = new DeleteReq(null, this.reltabl, rel.fk)
+								.whereEq(rel.fk, this.pkval)
+								.post(insRels);
+
+				if (req)
+					req.Body().post(del_rf);
+				else
+					req = this.client.userReq(uri, 'update', del_rf);
+			}
+		}
+
+		if (req)
+			client.commit(req,
+				(resp) => {
+					let bd = resp.Body();
+					if (crud === CRUD.c)
+						// NOTE:
+						// resulving auto-k is a typicall semantic processing, don't expose this to caller
+						that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+					onOk(resp);
+				},
+				this.errCtx);
+		else console.warn("Nothing to save ?");
+	}
+
+	/**
+	 * @param {object} opts
+	 * @param {string} [opts.uri] overriding local uri
+	 * @param {set} opts.ids record id
+	 * @param {function} onOk: function(AnsonResp);
+	 */
+	del(opts, onOk) {
+		if (!this.client) return;
+		let client = this.client;
+		let that = this;
+		let { uri, ids } = opts;
+
+		if (ids && ids.size > 0) {
+			let req = client
+				.usrAct(this.mtabl, CRUD.d, 'delete')
+				.deleteMulti(this.uri, this.mtabl, this.pk, [...ids]);
+			client.commit(req, onOk, this.errCtx);
+		}
+	}
+
 	resetFormSession() {
 		this.pkval = undefined;
 		this.rec = {};
