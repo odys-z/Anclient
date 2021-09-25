@@ -58,7 +58,8 @@ export function L(t, o) {
 				function(match, argname) {
 					return typeof args[argname] != 'undefined'
 						? args[argname]
-						: match ;
+						: argname in args
+						? '--' : match ;
 				});
 		}
 		return t;

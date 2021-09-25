@@ -90,8 +90,10 @@ class UserstComp extends CrudCompW {
 			buttons: {
 				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.size === 1,
-				del: rowIds &&  rowIds.size >= 1,
+				// edit: rowIds && rowIds.size === 1,
+				// del: rowIds &&  rowIds.size >= 1,
+				edit: rowIds && rowIds.length === 1,
+				del: rowIds &&  rowIds.length >= 1,
 			},
 		} );
 	}
@@ -238,18 +240,37 @@ UsersQuery.propTypes = {
 }
 
 export class UsersTier extends Semantier {
+	port = 'userstier';
 	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
 	client = undefined;
-	uri = undefined;
+	// uri = undefined;
 	rows = [];
 	pkval = undefined;
 	rec = {}; // for leveling up record form, also called record
 
+
+	// TODO doc: samantier where disable pk field if pkval exists
+	_fields = [
+		{ type: 'text', field: 'userId', label: L('Log ID'),
+		  validator: {len: 12, notNull: true} },
+		{ type: 'text', field: 'userName', label: L('User Name') },
+		{ type: 'password', field: 'pswd', label: L('Password'),
+		  validator: {notNull: true} },
+		{ type: 'cbb', field: 'roleId', label: L('Role'),
+		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
+		  validator: {notNull: true} },
+		{ type: 'cbb', field: 'orgId', label: L('Organization'),
+		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
+		  validator: {notNull: true} },
+	];
+
 	constructor(comp) {
-		super(comp.port || 'userstier');
-		this.uri = comp.uri || comp.props.uri;
+		super(comp);
+		// this.uri = comp.uri || comp.props.uri;
 	}
 
 	columns() {
@@ -328,7 +349,9 @@ export class UsersTier extends Semantier {
 	}
 
 	/**
-	 * @param {Set} ids record id
+	 * @param {object} opts
+	 * @param {string} [opts.uri] overriding local uri
+	 * @param {set} opts.ids record id
 	 * @param {function} onOk: function(AnsonResp);
 	 */
 	del(opts, onOk) {
@@ -344,10 +367,6 @@ export class UsersTier extends Semantier {
 
 			client.commit(req, onOk, this.errCtx);
 		}
-	}
-
-	isReadonly(col) {
-		return col.field === this.pk && !!this.pkval;
 	}
 }
 
@@ -391,19 +410,19 @@ export class UserstReq extends UserReq {
 	}
 }
 
-export class Relations /* extends Anson */ {
-
-	constructor() {
-		this.type = "io.odysz.semantic.tier.Relations";
-	}
-
-	collectRelations(rtabl, checkTree) {
-		if (!rtabl)
-			throw Error("Type Relations stands for all relation records of one parent table. Relations already exits.");
-
-		this.rtabl = rtabl;
-		// TODO ...
-		// TODO ...
-		return this;
-	}
-}
+// export class Relations /* extends Anson */ {
+//
+// 	constructor() {
+// 		this.type = "io.odysz.semantic.tier.Relations";
+// 	}
+//
+// 	collectRelations(rtabl, checkTree) {
+// 		if (!rtabl)
+// 			throw Error("Type Relations stands for all relation records of one parent table. Relations already exits.");
+//
+// 		this.rtabl = rtabl;
+// 		// TODO ...
+// 		// TODO ...
+// 		return this;
+// 	}
+// }

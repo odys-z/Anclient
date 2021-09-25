@@ -324,12 +324,21 @@ class AnsonResp extends AnsonBody {
 
 	resulve(tabl, pk, clientRec) {
 		console.log(this);
-		// // NOTE:
+		// // NOTE: FIXME any better way?
 		// this depnends on the samantics of java code:
 		//    return ok(new AnsonResp().data(res.props()));
-		if (this.map && this.map.resulved) {
-			return this.map.resulved[tabl][pk];
-		}
+		let resulved;
+		if (this.map && this.map.resulved)
+			resulved = this.map.resulved;
+		else if (this.resulved)
+			resulved = this.resulved;
+
+		if (resulved)
+			return resulved.props
+					? resulved.props[tabl]
+						? resulved.props[tabl].props[pk]
+						: resulved.props[tabl][pk]
+					: undefined ;
 		else return clientRec[pk];
 	}
 
@@ -729,12 +738,14 @@ class UpdateReq extends AnsonBody {
 
 	/** add n-v
 	 * @param {object} rec
+	 * @param {string} [ignorePk] pk name ignored
 	 * @return {UpdateReq} this
 	 */
-	record(rec) {
+	record(rec, ignorePk) {
 		if (rec)
 			for (let n in rec) {
-				this.nvs.push([n, rec[n]]);
+				if (ignorePk !== n)
+					this.nvs.push([n, rec[n]]);
 			}
 		return this;
 	}
@@ -855,11 +866,22 @@ class InsertReq extends UpdateReq {
 		this.a = Protocol.CRUD.c;
 	}
 
+	/**
+	 * Add columns definition before setup nvs.
+	 * Scince @anclient/semantier 0.2, can handle tier's fields/columns
+	 * (with field property)
+	 * @param {array} cols
+	 */
 	columns (cols) {
 		if (this.cols === undefined)
 			this.cols = [];
 		if (Array.isArray(cols)){
-			this.cols = this.cols.concat(cols);
+			this.cols = this.cols.concat(cols.map(
+				(c, x) => typeof c === 'string'
+								? c
+								: c.field ? c.field
+								: c.name
+				));
 		}
 		else this.cols.push(cols);
 		return this;

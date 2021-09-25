@@ -22,6 +22,9 @@ export class AnReact {
 		this.err = errCtx;
 	}
 
+	/** @deprecated new tiered way don't need any more.
+	 * set component.state with request's respons.rs, or call req.onLoad.
+	 */
 	bindTablist(req, comp, errCtx) {
 		this.client.commit(req, (qrsp) => {
 			if (req.onLoad)
@@ -75,7 +78,8 @@ export class AnReact {
 		return this;
 	}
 
-	/**Generate an insert request according to tree/forest checked items.
+	/**TODO move this to a semantics handler, e.g. shFK.
+	 * Generate an insert request according to tree/forest checked items.
 	 * @param {object} forest of node, the forest / tree data, tree node: {id, node}
 	 * @param {object} opts options
 	 * @param {object} opts.check checking column name
@@ -106,16 +110,30 @@ export class AnReact {
 		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
 		*/
 		function collectTree(forest, rows) {
+			let cnt = 0;
 			forest.forEach( (tree, i) => {
 				if (tree && tree.node) {
-					if ( toBool(tree.node[check]) )
+					if (tree.node.children && tree.node.children.length > 0) {
+						let childCnt = collectTree(tree.node.children, rows);
+
+						if (childCnt > 0)
+							tree.node[check] = 1;
+						else
+							tree.node[check] = 0;
+					}
+					if ( toBool(tree.node[check]) ) {
 						rows.push(toNvRow(tree.node, dbCols, columnMap));
-					if (tree.node.children && tree.node.children.length > 0)
-						collectTree(tree.node.children, rows);
+						cnt++;
+					}
 				}
 			});
+			return cnt;
 		}
 
+		/**convert to [name-value, ...] as a row, e.g.
+		 * [ { "name": "funcId", "value": "sys-domain" },
+		 *   { "name": "roleId", "value": "r003" } ]
+		 */
 		function toNvRow(node, dbcols, colMap) {
 			let r = [];
 			dbcols.forEach( (col, j) => {

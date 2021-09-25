@@ -65,24 +65,24 @@ class KidDetailstComp extends DetailFormW {
 	// NOTE
 	// DESGIN MEMO: user use this to customize the css & items to be visualized
 	// actually fied's type, validator should be semantics.
-	recfields = [
-		{ type: 'text', field: 'userId', label: L('Log ID'),
-		  validator: {len: 12, notNull: true} },
-		{ type: 'text', field: 'userName', label: L('User Name'),
-		  validator: {len: 32, notNull: true} },
-		{ type: 'password', field: 'pswd', label: L('Password'),
-		  validator: {minlen: 6, notNull: true} },
-		{ type: 'cbb', field: 'orgId', label: L('Class'),
-		  grid: {md: 5}, style: {marginTop: "8px", width: 220 },
-		  sk: Protocol.sk.cbbMyClass, nv: {n: 'text', v: 'nid'},
-		  validator: {notNull: true} },
-	];
+	// recfields = [
+	// 	{ type: 'text', field: 'userId', label: L('Log ID'),
+	// 	  validator: {len: 12, notNull: true} },
+	// 	{ type: 'text', field: 'userName', label: L('User Name'),
+	// 	  validator: {len: 32, notNull: true} },
+	// 	{ type: 'password', field: 'pswd', label: L('Password'),
+	// 	  validator: {minlen: 6, notNull: true} },
+	// 	{ type: 'cbb', field: 'orgId', label: L('Class'),
+	// 	  grid: {md: 5}, style: {marginTop: "8px", width: 220 },
+	// 	  sk: Protocol.sk.cbbMyClass, nv: {n: 'text', v: 'nid'},
+	// 	  validator: {notNull: true} },
+	// ];
 
-	relfields = [
-		{ type: 'text', field: 'checked', label: L('checked') },
-		{ type: 'text', field: 'orgName', label: L('Organization') },
-		{ type: 'text', field: 'orgId',   label: L('orgId'), hide: 1 },  // only one role, multiple org ?
-	];
+	// relfields = [
+	// 	{ type: 'text', field: 'checked', label: L('checked') },
+	// 	{ type: 'text', field: 'orgName', label: L('Organization') },
+	// 	{ type: 'text', field: 'orgId',   label: L('orgId'), hide: 1 },  // only one role, multiple org ?
+	// ];
 
 	constructor (props = {}) {
 		super(props);
@@ -109,14 +109,14 @@ class KidDetailstComp extends DetailFormW {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
-			let that = this;
-			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
-				that.setState({record: rows[0]});
-			} );
-		}
+		// if (this.tier.pkval) {
+		// 	let that = this;
+		// 	let cond = {};
+		// 	cond[this.tier.pk] = this.tier.pkval;
+		// 	this.tier.record(cond, (cols, rows, fkOpts) => {
+		// 		that.setState({record: rows[0]});
+		// 	} );
+		// }
 	}
 
 	toSave(e) {
@@ -178,9 +178,9 @@ class KidDetailstComp extends DetailFormW {
 			  </DialogTitle>
 				<TRecordForm uri={this.props.uri}
 					tier={this.tier}
-					fields={this.recfields}
+					fields={this.tier.fields()}
 				/>
-				{/* <TRelationTree uri={this.props.uri}
+				{/* <AnRelationTree uri={this.props.uri}
 					tier={this.tier}
 					fields={this.relfields}
 					stateHook={this.relHook}/> */}
@@ -203,7 +203,7 @@ class KidDetailstComp extends DetailFormW {
 KidDetailstComp.contextType = AnContext;
 
 KidDetailstComp.propTypes = {
-	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
+	uri: PropTypes.string.isRequired,
 	tier: PropTypes.object.isRequired,
 	crud: PropTypes.string.isRequired,
 	stateHook: PropTypes.object,		// not required for readonly mode

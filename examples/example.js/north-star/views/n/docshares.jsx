@@ -2,14 +2,15 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
-import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
+import { Box, TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp, DocsReq, Semantier } from '@anclient/semantier';
+import { Protocol, AnsonResp, InsertReq, AnsonBody, Semantier } from '@anclient/semantier';
 import { L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample
+	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
+const { mimeOf, dataOfurl, urlOfdata } = utils;
 
 import { DocshareDetails } from './docshare-details';
 
@@ -19,13 +20,22 @@ const styles = (theme) => ( {
 	root: {
 	},
 	button: {
+		height: 40,
+		width: 100,
+		padding: theme.spacing(1),
+		margin: theme.spacing(1),
+	},
+	imgUploadBox: {
+		width: 102,
+		height: 40,
+		marginRight: theme.spacing(2),
 	},
  	fileInput: {
-		border: "solid 1px #f777",
+		border: "solid 1px red",
 		width: "100%",
 		height: "100%",
 		position: "relative",
-		top: -52,
+		top: -48,
 		opacity: 0
 	}
 } );
@@ -91,8 +101,8 @@ class DocsharesComp extends CrudCompW {
 			buttons: {
 				// NOTE: is this also CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.size === 1 && !('loading' in rowIds),
-				del:  rowIds && rowIds.size >= 1  && !('loading' in rowIds),
+				edit: rowIds && rowIds.length === 1 && !('loading' in new Set(rowIds)),
+				del:  rowIds && rowIds.length >= 1  && !('loading' in new Set(rowIds)),
 			},
 		} );
 	}
@@ -126,24 +136,27 @@ class DocsharesComp extends CrudCompW {
 	}
 
 	toAdd(e, v) {
+		let that = this;
 		let files = this.fileInput.files;
-		this.tier.upload(files);
+		this.tier.upload(files, (docId) => {
+			that.setState({});
+			that.toEdit(e, docId);
+		});
 	}
 
 	toEdit(e, v) {
 		let that = this;
-		let pkv = [...this.state.selected.Ids][0];
-		this.tier.pkval = pkv;
-		this.recForm = (<DocshareDetails crud={CRUD.u}
+		this.tier.pkval = [...this.state.selected.Ids][0];
+		this.recForm = (<DocshareDetails u
 			uri={this.uri}
 			tier={this.tier}
-			recId={pkv}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
 
 	closeDetails() {
 		this.recForm = undefined;
+		this.tier.resetFormSession();
 		this.setState({});
 	}
 
@@ -158,20 +171,15 @@ class DocsharesComp extends CrudCompW {
 			<DocsQuery uri={this.uri} onQuery={this.toSearch} />
 
 			<Grid container alignContent="flex-end" >
-				// <Button variant="contained" disabled={!btn.add}
-				// 	className={classes.button} onClick={this.toAdd}
-				// 	startIcon={<JsampleIcons.Add />}
-				// >{L('Add')}</Button>
-
 				<Box className={ this.props.classBox || classes.imgUploadBox }>
 					<Button variant="contained" disabled={!btn.add}
-						className={classes.button} onClick={}
+						className={classes.button}
 						startIcon={<JsampleIcons.Add />}
+					>{L('File')}</Button>
 					<input type='file' className={ classes.fileInput }
 				 		ref={ (ref) => this.fileInput = ref }
 				 		onChange={ this.toAdd } />
-				</Box>);
-
+				</Box>
 				<Button variant="contained" disabled={!btn.edit}
 					className={classes.button} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Edit />}
@@ -185,7 +193,7 @@ class DocsharesComp extends CrudCompW {
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns( {mime: {formatter: (rec, c) => getMimeIcon(v)}} )}
+				columns={tier.columns( {mime: {formatter: (v, x, rec) => getMimeIcon(v, rec)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -195,8 +203,8 @@ class DocsharesComp extends CrudCompW {
 			{this.confirm}
 		</div>);
 
-		function getMimeIcon(rec, f) {
-			console.log(rec[f.field]);
+		function getMimeIcon(v, rec) {
+			// console.log(rec, v);
 			return (<>[DocIcon]</>);
 		}
 	}
@@ -246,11 +254,18 @@ DocsQuery.propTypes = {
 }
 
 export class DocsTier extends Semantier {
+	port = 'docstier';
 	mtabl = 'n_docs';
 	pk = 'docId';
+
+	reltabl = 'n_doc_kid';
+	rel = {'n_doc_kid': {
+		fk: 'docId',  // fk to main table
+		col: 'userId',// checking col
+		sk: 'trees.doc_kid' }};
 	checkbox = true;
+
 	client = undefined;
-	uri = undefined;
 	rows = [];
 	pkval = undefined;
 	rec = {};
@@ -261,43 +276,69 @@ export class DocsTier extends Semantier {
 		{ text: L('File Name'), field: 'docName' },
 		{ text: L('Shared With'), field: 'sharings' } ];
 
+	_fields = [
+		{ type: 'text', field: 'docId',   label: 'Doc ID',
+		  disabled: true },
+		{ type: 'text', field: 'docName', label: 'File Name',
+		  disabled: true },
+		{ type: 'text', field: 'mime',    label: 'File Type',
+		  disabled: true, formatter: undefined }
+	];
+
 	constructor(comp) {
-		super(comp.port || 'docstier');
-		this.uri = comp.uri || comp.props.uri;
+		super(comp);
 	}
 
-	columns(modifier) {
-		if (modifier)
-			return this._cols.map( (c, x) =>
-				typeof modifier[c.field] === 'function' ?
-						{...c, ...modifier[c.field](c, x) } :
-						{...c, ...modifier[c.field]}
-			);
-		else
-			return this._cols;
-	}
-
-	upload(files) {
+	upload(files, onOk) {
 		if (!files) return;
 
 		let that = this;
+		let client = this.client;
 
 		files.forEach( (file, x) => {
 			let row = {
 				docId: 'loading',
-				uri  : content,
-				mime : mimeOf( reader.result ),
+				// uri  : undefined,
+				mime : undefined,
 				docName: file.name,
 				reader: new FileReader()
 			};
 			that.rows.push(row);
 
-			row.onLoad = function (e) {
-				row.uri = row.reader.result;
+			row.reader.onload = function (e) {
+				// FIXME how about stream mode?
+				row.mime = mimeOf( row.reader.result );
+				row.uri64 = dataOfurl( row.reader.result );
 				delete row.reader;
-				delete row.onLoad;
-				that.saveRec();
-				that.setState({});
+				row.docId = undefined;
+
+				// file always uploaded as insertion, - delete first (even null Id)
+				// let req = that.client
+				// 	.usrAct(that.mtabl, CRUD.c, 'upload doc')
+				// 	.insert(that.uri, that.mtabl);
+				//
+				// that.client.commit(req,
+				// 	(resp) => {
+				// 		let docId = resp.Body().resulve(that.mtabl, that.pk, row);
+				// 		onOk && onOk(docId);
+				// 	}, that.errCtx);
+
+				let req = client
+					.userReq( that.uri, that.port,
+					new DocsReq( that.uri, { deletings: [that.pkval], ...row } )
+					.A( DocsReq.A.upload ) );
+
+				client.commit(req,
+					(resp) => {
+						let bd = resp.Body();
+						// NOTE:
+						// resulving auto-k is a typicall semantic processing, don't expose this to caller
+						row[that.pk] = bd.resulve(that.mtabl, that.pk, row);
+
+						console.log(row[that.pk]); // safe for concurrent uploading?
+						onOk(row[that.pk]);
+					},
+					that.errCtx);
 			}
 
 			row.reader.readAsDataURL(file);
@@ -318,6 +359,7 @@ export class DocsTier extends Semantier {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
+				that.resetFormSession();
 				onLoad(cols, rows);
 			},
 			this.errCtx);
@@ -342,39 +384,6 @@ export class DocsTier extends Semantier {
 	}
 
 	/**
-	 * @param {object} opts
-	 * @param {string} opts.uri
-	 * @param {object} opts.rec { docId, uri, mime, docName, size }
-	 * @param {function} onOk
-	 */
-	saveRec(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
-
-		let { uri, rec } = opts;
-		let {docId, docName, mime, size} = rec;
-		let crud = docId === 'loading' ? CRUD.c : CRUD.u;
-
-		let req = this.client
-					.usrAct( this.uri, crud, "upload", "share docs" )
-					.update( this.uri, this.mtabl,
-							{pk: this.pk, v: rec[this.pk]},
-							rec );
-
-		client.commit(req,
-			(resp) => {
-				let bd = resp.Body();
-				if (crud === CRUD.c)
-					// NOTE:
-					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					rec[that.pk] = bd.resulve(that.mtabl, that.pk, rec);
-				onOk(resp);
-			},
-			this.errCtx);
-	}
-
-	/**
 	 * @param {Set} ids record id
 	 * @param {function} onOk: function(AnsonResp);
 	 */
@@ -382,9 +391,9 @@ export class DocsTier extends Semantier {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-		let { uri, ids } = opts;
+		let { uri, ids, posts } = opts;
 
-		if (ids && ids.size > 0) {
+		if (ids && (ids.size > 0 || ids.length > 0)) {
 			let req = this.client.userReq(uri, this.port,
 				new DocsReq( uri, { deletings: [...ids] } )
 				.A(DocsReq.A.del) );
@@ -394,8 +403,8 @@ export class DocsTier extends Semantier {
 	}
 }
 
-export class DocsReq extends UserReq {
-	static type = 'io.oz.ever.conn.n.docs.DocsReq';
+export class DocsReq extends AnsonBody {
+	static type = 'io.odysz.semantic.tier.docs.DocsReq';
 	static __init__ = function () {
 		// Design Note:
 		// can we use dynamic Protocol?
@@ -406,26 +415,25 @@ export class DocsReq extends UserReq {
 	}();
 
 	static A = {
-		records: 'records',
-		rec: 'rec',
-		update: 'u',
-		insert: 'c',
+		records: 'r/list',
+		rec: 'r/rec',
+		upload: 'c',
 		del: 'd',
 
-		preview: 'r/preview',
+		//preview: 'r/preview',
 	}
 
 	constructor (uri, args = {}) {
 		super();
 		this.type = DocsReq.type;
-		this.uri = uri;
+		// this.uri = uri;
 		this.docId = args.docId;
 		this.docName = args.docName;
-		this.doctype = args.doctype;
+		this.mime = args.mime;
+		this.uri64 = args.uri64;
 
 		/// case u
-		this.pk = args.pk;
-		this.record = args.record;
+		// this.pk = args.pk;
 
 		// case d
 		this.deletings = args.deletings;

@@ -14,13 +14,11 @@ import Button from '@material-ui/core/Button';
 import { Protocol } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	// import { Protocol } from '../../../semantier/protocol';
 	import { DetailFormW } from '../../react/crud';
 	import { AnConst } from '../../utils/consts';
 	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
-	import { TRelationTree } from '../../react/widgets/t-relation-tree';
 
 const styles = (theme) => ({
   root: {
@@ -68,21 +66,21 @@ class UserDetailstComp extends DetailFormW {
 	// NOTE
 	// DESGIN MEMO: Users use this to customize the css & items to be visualized.
 	// Actually field's type, validator should be semantics.
-	recfields = [
-		{ type: 'text', field: 'userId', label: L('Log ID'),
-		  validator: {len: 12, notNull: true} },
-		{ type: 'text', field: 'userName', label: L('User Name') },
-		{ type: 'password', field: 'pswd', label: L('Password'),
-		  validator: {notNull: true} },
-		{ type: 'cbb', field: 'roleId', label: L('Role'),
-		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
-		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} },
-		{ type: 'cbb', field: 'orgId', label: L('Organization'),
-		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
-		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} },
-	];
+	// recfields = [
+	// 	{ type: 'text', field: 'userId', label: L('Log ID'),
+	// 	  validator: {len: 12, notNull: true} },
+	// 	{ type: 'text', field: 'userName', label: L('User Name') },
+	// 	{ type: 'password', field: 'pswd', label: L('Password'),
+	// 	  validator: {notNull: true} },
+	// 	{ type: 'cbb', field: 'roleId', label: L('Role'),
+	// 	  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+	// 	  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
+	// 	  validator: {notNull: true} },
+	// 	{ type: 'cbb', field: 'orgId', label: L('Organization'),
+	// 	  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+	// 	  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
+	// 	  validator: {notNull: true} },
+	// ];
 
 	constructor (props = {}) {
 		super(props);
@@ -97,14 +95,14 @@ class UserDetailstComp extends DetailFormW {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
-			let that = this;
-			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
-				that.setState({record: rows[0]});
-			} );
-		}
+		// if (this.tier.pkval) {
+		// 	let that = this;
+		// 	let cond = {};
+		// 	cond[this.tier.pk] = this.tier.pkval;
+		// 	this.tier.record(cond, (cols, rows, fkOpts) => {
+		// 		that.setState({record: rows[0]});
+		// 	} );
+		// }
 	}
 
 	toSave(e) {
@@ -169,7 +167,7 @@ class UserDetailstComp extends DetailFormW {
 			  </DialogTitle>
 				<TRecordForm uri={this.props.uri}
 					tier={this.tier}
-					fields={this.recfields}
+					fields={this.tier.fields({ remarks: {grid: {sm: 12, md: 12, lg: 12}} })}
 				/>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
@@ -189,7 +187,7 @@ class UserDetailstComp extends DetailFormW {
 }
 
 UserDetailstComp.propTypes = {
-	uri: PropTypes.string.isRequired,	// because cbb binding needs data access
+	uri: PropTypes.string.isRequired,
 	tier: PropTypes.object.isRequired,
 	crud: PropTypes.string.isRequired,
 	dense: PropTypes.bool

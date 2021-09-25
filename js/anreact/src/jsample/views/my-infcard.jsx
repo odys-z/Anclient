@@ -46,15 +46,17 @@ class MyInfCardComp extends React.Component {
 
 		// TODO DOC: MyInfCard is created outside of context provider,
 		// see test/jsample/app.jsx: render().myInfoPanels(AnContext)
-		// Don't set this in constructor. This.context changed after it.
+		// Don't set this in constructor - this.context will be changed after constructing.
 		this.context = this.props.anContext || this.context;
 
 		let that = this;
 
 		if (!this.tier) this.getTier()
 
-		this.tier.myInf({userId: this.props.ssInf.uid},
-						(cols, record) => that.setState({cols, record}) );
+		this.tier.pkval = this.props.ssInf.uid;
+		this.setState({});
+		// this.tier.myInf({userId: this.props.ssInf.uid},
+		// 				(cols, record) => that.setState({cols, record}) );
 	}
 
 	showConfirm(msg) {
@@ -72,7 +74,7 @@ class MyInfCardComp extends React.Component {
 
 		let that = this;
 
-		if (this.tier.validate(undefined, undefined))
+		if (this.tier.validate(undefined, this.tier.columns()))
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.state.crud,
@@ -125,14 +127,15 @@ export { MyInfCard, MyInfCardComp };
 
 export class MyInfTier extends Semantier {
 
-	uri = undefined;
-	mtabl = 'a_users';
-	pk = 'userId';
+	// uri = undefined;
 	imgProp = 'img';
 
-	constructor(opts) {
-		super('session');
-		this.uri = opts.uri;
+	constructor(comp) {
+		super(comp);
+		// FIXME move to super class?
+		// this.uri = comp.uri;
+		this.mtabl = 'a_users';
+		this.pk = 'userId';
 	}
 
 	columns() {
@@ -155,7 +158,7 @@ export class MyInfTier extends Semantier {
 		}
 	}
 
-	myInf(conds, onLoad) {
+	record(conds, onLoad) {
 		let { userId } = conds;
 
 		let client = this.client;
@@ -165,7 +168,7 @@ export class MyInfTier extends Semantier {
 		let that = this;
 
 		// NOTE
-		// Is this senario is an illustrating of general query's necessity?
+		// Is this senario an illustration of general query is also necessity?
 		let req = client.query(this.uri, 'a_users', 'u')
 		req.Body()
 			.col('r.roleId').col('u.userId').col('userName')

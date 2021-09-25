@@ -10,7 +10,7 @@ import Box from '@material-ui/core/Box';
 
 import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier';
 import { L, toBool,
-    AnContext, AnError, CrudCompW, AnTablistLevelUp, AnQueryst,
+    AnContext, AnError, CrudCompW, AnTablist, AnQueryst,
 	jsample
 } from '@anclient/anreact';
 const { JsampleIcons, UsersTier, UserstReq, UserstComp } = jsample;
@@ -32,6 +32,8 @@ class MyStudentsComp extends UserstComp {
 
 		selected: {Ids: new Set()},
 		buttons: {add: true, edit: false, del: false},
+
+		selected: {Ids: new Set()}
 	};
 
 	tier = undefined;
@@ -98,7 +100,7 @@ class MyStudentsComp extends UserstComp {
 				>{L('Delete')}</Button>
 			</Box>
 
-			{tier && <AnTablistLevelUp pk={tier.pk}
+			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={true}
 				columns={tier.columns()}
 				rows={tier.rows}
@@ -157,22 +159,42 @@ MyStudentsQuery.propTypes = {
 
 class MyKidsTier extends UsersTier {
 
-	// port = 'mykidstier';
+	port = 'mykidstier';
 	mtabl = 'n_mykids';
 
+	_cols = [
+		{ text: L('Log ID'), field: 'userId', checked: true },
+		{ text: L('User Name'), field: 'userName' },
+		{ text: L('Class'), field: 'nebula' },
+		{ text: L('Todos'), field: 'todos' } ];
+
+	_fields = [
+		{ type: 'text', field: 'userId', label: L('Log ID'),
+		  validator: {len: 12, notNull: true} },
+		{ type: 'text', field: 'userName', label: L('User Name'),
+		  validator: {len: 32, notNull: true} },
+		{ type: 'password', field: 'pswd', label: L('Password'),
+		  validator: {minlen: 6, notNull: true} },
+		{ type: 'cbb', field: 'orgId', label: L('Class'),
+		  grid: {md: 5}, style: {marginTop: "8px", width: 220 },
+		  sk: Protocol.sk.cbbMyClass, nv: {n: 'text', v: 'nid'},
+		  validator: {notNull: true} },
+	];
+
 	constructor(comp) {
-		super(Object.assign(comp || {}, {port: 'mykidstier'}));
+		// super(Object.assign(comp || {}, {port: 'mykidstier'}));
+		super(comp);
 	}
 
-	columns() {
-		return [
-			{ text: L('Log ID'), field: 'userId', checked: true },
-			{ text: L('User Name'), field: 'userName' },
-			{ text: L('Class'), field: 'nebula' },
-			{ text: L('Todos'), field: 'todos' } ];
-	}
+	// columns() {
+	// 	return [
+	// 		{ text: L('Log ID'), field: 'userId', checked: true },
+	// 		{ text: L('User Name'), field: 'userName' },
+	// 		{ text: L('Class'), field: 'nebula' },
+	// 		{ text: L('Todos'), field: 'todos' } ];
+	// }
 
-	// mykids(conds, onLoad) {
+	// records(conds, onLoad) {
 	// 	if (!this.client) return;
 	//
 	// 	let client = this.client;
@@ -180,7 +202,7 @@ class MyKidsTier extends UsersTier {
 	//
 	// 	let req = client.userReq(this.uri, this.port,
 	// 				new UserstReq( this.uri, conds )
-	// 				.A(UserstReq.A.mykids) );
+	// 				.A(UserstReq.A.records) );
 	//
 	// 	client.commit(req,
 	// 		(resp) => {
