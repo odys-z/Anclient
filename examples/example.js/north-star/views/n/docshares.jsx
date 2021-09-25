@@ -12,19 +12,12 @@ import { L, Langstrs,
 const { JsampleIcons } = jsample;
 const { mimeOf, dataOfurl, urlOfdata } = utils;
 
+import { starTheme } from '../../common/star-theme';
 import { DocshareDetails } from './docshare-details';
 
 const { CRUD } = Protocol;
 
-const styles = (theme) => ( {
-	root: {
-	},
-	button: {
-		height: 40,
-		width: 100,
-		padding: theme.spacing(1),
-		margin: theme.spacing(1),
-	},
+export const docListyle = (theme) => {return {
 	imgUploadBox: {
 		width: 102,
 		height: 40,
@@ -38,7 +31,9 @@ const styles = (theme) => ( {
 		top: -48,
 		opacity: 0
 	}
-} );
+}; };
+
+const styles = (theme) => Object.assign(starTheme(theme), docListyle(theme));
 
 class DocsharesComp extends CrudCompW {
 	state = {
@@ -193,7 +188,7 @@ class DocsharesComp extends CrudCompW {
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns( {mime: {formatter: (v, x, rec) => getMimeIcon(v, rec)}} )}
+				columns={tier.columns( {mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -203,10 +198,6 @@ class DocsharesComp extends CrudCompW {
 			{this.confirm}
 		</div>);
 
-		function getMimeIcon(v, rec) {
-			// console.log(rec, v);
-			return (<>[DocIcon]</>);
-		}
 	}
 }
 DocsharesComp.contextType = AnContext;
@@ -214,13 +205,13 @@ DocsharesComp.contextType = AnContext;
 const Docshares = withWidth()(withStyles(styles)(DocsharesComp));
 export { Docshares, DocsharesComp }
 
-class DocsQuery extends React.Component {
+export class DocsQuery extends React.Component {
 	conds = [
 		{ name: 'docName', type: 'text', val: '', label: L('File Name') },
 		{ name: 'tag',     type: 'text', val: '', label: L('Tag') },
 		{ name: 'doctype', type: 'cbb',  val: '', label: L('Format'),
-		  options: [{text: 'Word', value: 'doc'}, {text: 'PDF', value: 'pdf'}],
-		  nv: {n: 'text', v: 'value'} },
+		  options: [{n: 'Office Word', v: 'doc'}, {n: 'Office Excel', v: 'xsl'},
+					{n: 'Office PPT', v: 'ppt'}, {n: 'PDF', v: 'pdf'}] },
 	];
 
 	constructor(props) {
@@ -313,16 +304,6 @@ export class DocsTier extends Semantier {
 				row.docId = undefined;
 
 				// file always uploaded as insertion, - delete first (even null Id)
-				// let req = that.client
-				// 	.usrAct(that.mtabl, CRUD.c, 'upload doc')
-				// 	.insert(that.uri, that.mtabl);
-				//
-				// that.client.commit(req,
-				// 	(resp) => {
-				// 		let docId = resp.Body().resulve(that.mtabl, that.pk, row);
-				// 		onOk && onOk(docId);
-				// 	}, that.errCtx);
-
 				let req = client
 					.userReq( that.uri, that.port,
 					new DocsReq( that.uri, { deletings: [that.pkval], ...row } )
@@ -401,6 +382,11 @@ export class DocsTier extends Semantier {
 			client.commit(req, onOk, this.errCtx);
 		}
 	}
+
+	static getMimeIcon(mime) {
+		return (<>[DocIcon]</>);
+	}
+
 }
 
 export class DocsReq extends AnsonBody {
@@ -426,14 +412,10 @@ export class DocsReq extends AnsonBody {
 	constructor (uri, args = {}) {
 		super();
 		this.type = DocsReq.type;
-		// this.uri = uri;
 		this.docId = args.docId;
 		this.docName = args.docName;
 		this.mime = args.mime;
 		this.uri64 = args.uri64;
-
-		/// case u
-		// this.pk = args.pk;
 
 		// case d
 		this.deletings = args.deletings;

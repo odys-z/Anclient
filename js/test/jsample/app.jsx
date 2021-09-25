@@ -13,8 +13,6 @@ import { L, Langstrs,
 
 const { Domain, Roles, Orgs, Users, Userst, JsampleTheme } = jsample;
 
-// import { GPAsheet } from './gpa';
-
 /** The application main, context singleton and error handler */
 class App extends React.Component {
 	state = {
@@ -160,9 +158,13 @@ class App extends React.Component {
 		function myInfoPanels(anContext) {
 			return [
 				{ title: L('Basic'),
-				  panel: <jsample.MyInfCard uri={'/sys/session'} anContext={anContext} ssInf={that.state.anClient.ssInf} /> },
+				  panel: <jsample.MyInfCard
+							uri={'/sys/session'} anContext={anContext}
+							ssInf={that.state.anClient.ssInf} /> },
 				{ title: L('Password'),
-				  panel: <jsample.MyPswd uri={'/sys/session'} anContext={anContext} ssInf={that.state.anClient.ssInf} /> }
+				  panel: <jsample.MyPswd
+							uri={'/sys/session'} anContext={anContext}
+							ssInf={that.state.anClient.ssInf} /> }
 			  ];
 		}
 	}

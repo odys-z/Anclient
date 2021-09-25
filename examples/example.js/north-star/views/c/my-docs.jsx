@@ -11,22 +11,18 @@ import { L, Langstrs,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-// import { PdvViewer } from './docshare-details';
+import { starTheme } from '../../common/star-theme';
+import { DocsTier, DocsQuery, docListyle } from '../n/docshares';
 
 const { CRUD } = Protocol;
 
-const styles = (theme) => ( {
-	root: {
-	},
-	button: {
-	}
-} );
+const styles = (theme) => Object.assign(starTheme(theme), docListyle(theme));
 
 class MyDocsComp extends CrudCompW {
 	state = {
-		buttons: { add: true, edit: false, del: false},
+		buttons: { add: true, edit: false, del: false },
 		pageInf: { page: 0, size: 10, total: 0 },
-		selected: {},
+		selected:{ Ids: new Set() },
 	};
 
 	tier = undefined;
@@ -53,7 +49,7 @@ class MyDocsComp extends CrudCompW {
 	}
 
 	getTier = () => {
-		this.tier = new DocsTier(this);
+		this.tier = new MyDocsTier(this);
 		this.tier.setContext(this.context);
 	}
 
@@ -62,7 +58,6 @@ class MyDocsComp extends CrudCompW {
 	 * @param {object} condts the query conditions collected from query form.
 	 */
 	toSearch(condts) {
-		// querst.onLoad (query.componentDidMount) event can even early than componentDidMount.
 		if (!this.tier) {
 			this.getTier();
 		}
@@ -77,7 +72,6 @@ class MyDocsComp extends CrudCompW {
 	}
 
 	onTableSelect(rowIds) {
-		// this.state.selected.Ids = rowIds
 		this.setState( {
 			buttons: {
 				// is this all CRUD semantics?
@@ -93,9 +87,11 @@ class MyDocsComp extends CrudCompW {
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('Ok')} cancel={true} open
+				msg={L( '{cnt} record(s) will be deleted, proceed?',
+						{cnt: this.state.selected.Ids.size} )}
 				onOk={ that.del }
-				onClose={() => {that.confirm = undefined;} }
-				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
+				onClose={() => { that.confirm = undefined; } }
+			/>);
 	}
 
 	del() {
@@ -151,15 +147,11 @@ class MyDocsComp extends CrudCompW {
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			{this.props.funcName || this.props.title || 'Documents Sharing'}
+			{this.props.funcName || this.props.title || 'Shared Documents'}
 
-			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
+			<DocsQuery uri={this.uri} onQuery={this.toSearch} />
 
 			<Grid container alignContent="flex-end" >
-				<Button variant="contained" disabled={!btn.add}
-					className={classes.button} onClick={this.toAdd}
-					startIcon={<JsampleIcons.Add />}
-				>{L('Add')}</Button>
 				<Button variant="contained" disabled={!btn.edit}
 					className={classes.button} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Edit />}
@@ -173,7 +165,8 @@ class MyDocsComp extends CrudCompW {
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns( {mime: {formatter: (rec, c) => getMimeIcon(v)}} )}
+				columns={tier.columns( {
+					mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -182,14 +175,19 @@ class MyDocsComp extends CrudCompW {
 			{this.recForm}
 			{this.confirm}
 		</div>);
-
-		function getMimeIcon(rec, f) {
-			console.log(rec[f.field]);
-			return (<>[Doc]</>);
-		}
 	}
 }
 MyDocsComp.contextType = AnContext;
 
 const MyDocs = withWidth()(withStyles(styles)(MyDocsComp));
 export { MyDocs, MyDocsComp }
+
+class MyDocsTier extends DocsTier {
+	constructor(comp) {
+		super(comp);
+	}
+
+	records() {
+
+	}
+}
