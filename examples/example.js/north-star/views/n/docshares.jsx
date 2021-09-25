@@ -402,14 +402,14 @@ export class DocsReq extends AnsonBody {
 
 	static A = {
 		records: 'r/list',
+		mydocs: 'r/my-docs',
 		rec: 'r/rec',
 		upload: 'c',
 		del: 'd',
-
 		//preview: 'r/preview',
 	}
 
-	constructor (uri, args = {}) {
+	constructor(uri, args = {}) {
 		super();
 		this.type = DocsReq.type;
 		this.docId = args.docId;

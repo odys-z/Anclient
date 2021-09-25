@@ -12,7 +12,7 @@ import { L, Langstrs,
 const { JsampleIcons } = jsample;
 
 import { starTheme } from '../../common/star-theme';
-import { DocsTier, DocsQuery, docListyle } from '../n/docshares';
+import { DocsTier, DocsQuery, DocsReq, docListyle } from '../n/docshares';
 
 const { CRUD } = Protocol;
 
@@ -187,7 +187,24 @@ class MyDocsTier extends DocsTier {
 		super(comp);
 	}
 
-	records() {
+	records(conds, onLoad) {
+		if (!this.client) return;
+
+		let client = this.client;
+		let that = this;
+
+		let req = client.userReq(this.uri, this.port,
+					new DocsReq( this.uri, conds )
+					.A(DocsReq.A.mydocs) );
+
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rows = rows;
+				that.resetFormSession();
+				onLoad(cols, rows);
+			},
+			this.errCtx);
 
 	}
 }
