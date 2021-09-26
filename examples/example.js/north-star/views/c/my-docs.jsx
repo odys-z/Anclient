@@ -7,16 +7,24 @@ import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/co
 import { Protocol, AnsonResp , UserReq } from '@anclient/semantier';
 import { L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample
+	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
+const { CRUD } = Protocol;
 
 import { starTheme } from '../../common/star-theme';
 import { DocsTier, DocsQuery, DocsReq, docListyle } from '../n/docshares';
+import { MyDocView } from './mydoc-view';
 
-const { CRUD } = Protocol;
-
-const styles = (theme) => Object.assign(starTheme(theme), docListyle(theme));
+const styles = (theme) => Object.assign(starTheme(theme),
+	Object.assign(docListyle(theme), {
+	button: {
+		height: 40,
+		width: 140,
+		padding: theme.spacing(1),
+		margin: theme.spacing(1),
+	}
+} ));
 
 class MyDocsComp extends CrudCompW {
 	state = {
@@ -35,11 +43,13 @@ class MyDocsComp extends CrudCompW {
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 
-		this.toAdd = this.toAdd.bind(this);
-		this.toEdit = this.toEdit.bind(this);
+		// this.toAdd = this.toAdd.bind(this);
+		// this.toEdit = this.toEdit.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
-		this.toDel = this.toDel.bind(this);
-		this.del = this.del.bind(this);
+		// this.toDel = this.toDel.bind(this);
+		// this.del = this.del.bind(this);
+		this.toView = this.toView.bind(this);
+		this.toDownload = this.toDownload.bind(this);
 	}
 
 	componentDidMount() {
@@ -76,59 +86,19 @@ class MyDocsComp extends CrudCompW {
 			buttons: {
 				// is this all CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.length === 1,
+				edit: rowIds && rowIds.length === 1 && this.tier.canView(rowIds[0]).view,
 				del: rowIds &&  rowIds.length >= 1,
 			},
 		} );
 	}
 
-	toDel(e, v) {
-		let that = this;
-		this.confirm = (
-			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={true} open
-				msg={L( '{cnt} record(s) will be deleted, proceed?',
-						{cnt: this.state.selected.Ids.size} )}
-				onOk={ that.del }
-				onClose={() => { that.confirm = undefined; } }
-			/>);
+	toDownload(e, v) {
 	}
 
-	del() {
-		let that = this;
-		this.tier.del({
-				uri: this.uri,
-				ids: this.state.selected.Ids },
-			resp => {
-				that.confirm = (
-					<ConfirmDialog title={L('Info')}
-						ok={L('Ok')} cancel={false} open
-						onClose={() => {
-							that.confirm = undefined;
-							that.toSearch();
-						} }
-						msg={L('Deleting Succeed!')} />);
-				that.toSearch();
-			} );
-	}
-
-	toAdd(e, v) {
-		let that = this;
-		this.tier.pkval = undefined;
-		this.tier.rec = {};
-
-		this.recForm = (<UserDetailst crud={CRUD.c}
-			uri={this.uri}
-			tier={this.tier}
-			onOk={(r) => that.toSearch()}
-			onClose={this.closeDetails} />);
-	}
-
-	toEdit(e, v) {
-		let that = this;
+	toView(e, v) {
 		let pkv = [...this.state.selected.Ids][0];
 		this.tier.pkval = pkv;
-		this.recForm = (<DocshareDetails crud={CRUD.u}
+		this.recForm = (<MyDocView crud={CRUD.r}
 			uri={this.uri}
 			tier={this.tier}
 			recId={pkv}
@@ -153,20 +123,20 @@ class MyDocsComp extends CrudCompW {
 
 			<Grid container alignContent="flex-end" >
 				<Button variant="contained" disabled={!btn.edit}
-					className={classes.button} onClick={this.toEdit}
+					className={classes.button} onClick={this.toView}
 					startIcon={<JsampleIcons.Edit />}
-				>{L('Share')}</Button>
+				>{L('Preview')}</Button>
 				<Button variant="contained" disabled={!btn.del}
-					className={classes.button} onClick={this.toDel}
-					startIcon={<JsampleIcons.Delete />}
-				>{L('Delete')}</Button>
+					className={classes.button} onClick={this.toDownload}
+					startIcon={<JsampleIcons.Export />}
+				>{L('Download')}</Button>
 			</Grid>
 
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
 				columns={tier.columns( {
-					mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec)}} )}
+					mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec, classes)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -182,10 +152,16 @@ MyDocsComp.contextType = AnContext;
 const MyDocs = withWidth()(withStyles(styles)(MyDocsComp));
 export { MyDocs, MyDocsComp }
 
-class MyDocsTier extends DocsTier {
+export class MyDocsTier extends DocsTier {
 	constructor(comp) {
 		super(comp);
 	}
+
+	_cols = [
+		{ text: L(''), field: 'docId', checked: true },
+		{ text: L(''), field: 'mime' },
+		{ text: L('File Name'), field: 'docName' },
+		{ text: L('Owner'), field: 'sharer' } ];
 
 	records(conds, onLoad) {
 		if (!this.client) return;
@@ -205,6 +181,23 @@ class MyDocsTier extends DocsTier {
 				onLoad(cols, rows);
 			},
 			this.errCtx);
+	}
 
+	canView(docId) {
+		// FIXME probably we need a better Tablist.onSelect handler
+		if (this.rows) {
+			const viewables = new Set(['.pdf', 'image']);
+			for (let i = 0; i < this.rows.length; i++)
+				if (this.rows[i].docId === docId) {
+					let typ = utils.regex.mime2type(this.rows[i].mime);
+					return {view: viewables.has(typ), ix: i};
+				}
+		}
+		return {view: false, ix: -1};
+	}
+
+	docData() {
+		// console.log(utils.urlOfdata(this.rec.mime, this.rec.uri64));
+		return utils.urlOfdata(this.rec.mime, this.rec.uri64);
 	}
 }

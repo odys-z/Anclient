@@ -10,7 +10,7 @@ import { L, Langstrs,
 	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
-const { mimeOf, dataOfurl, urlOfdata } = utils;
+const { mimeOf, dataOfurl, urlOfdata, regex } = utils;
 
 import { starTheme } from '../../common/star-theme';
 import { DocshareDetails } from './docshare-details';
@@ -22,6 +22,9 @@ export const docListyle = (theme) => {return {
 		width: 102,
 		height: 40,
 		marginRight: theme.spacing(2),
+	},
+	iconCell: {
+		height: 24,
 	},
  	fileInput: {
 		border: "solid 1px red",
@@ -134,7 +137,10 @@ class DocsharesComp extends CrudCompW {
 		let that = this;
 		let files = this.fileInput.files;
 		this.tier.upload(files, (docId) => {
-			that.setState({});
+			that.tier.pkval = docId; // FIXME NOTE where is the best place to do this?
+
+			this.state.selected.Ids.clear();
+			this.state.selected.Ids.add(docId);
 			that.toEdit(e, docId);
 		});
 	}
@@ -147,6 +153,7 @@ class DocsharesComp extends CrudCompW {
 			tier={this.tier}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
+		that.setState({});
 	}
 
 	closeDetails() {
@@ -188,7 +195,7 @@ class DocsharesComp extends CrudCompW {
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns( {mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec)}} )}
+				columns={tier.columns( {mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec, classes)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -383,8 +390,25 @@ export class DocsTier extends Semantier {
 		}
 	}
 
-	static getMimeIcon(mime) {
-		return (<>[DocIcon]</>);
+	/**
+	 * @param{string} mime
+	 * @param{object} rec
+	 * @param{object} classes
+	 * @param{string} iconpath
+	 * @return{React.fragment} <img/>
+	 */
+	static getMimeIcon(mime, rec, classes, iconpath) {
+		const known = { image: 'image.svg', '.txt': 'text.svg',
+						'.doc': 'docx.svg', '.docx': 'docx.svg',
+						'.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
+		const unknown = 'unknown.svg';
+		iconpath = iconpath || '/res-vol/icons';
+
+		let src = regex.mime2type(mime);
+		if (src) src = known[src];
+		else src = unknown
+
+		return (<img className={classes.iconCell} src={`${iconpath}/${src}`}></img>);
 	}
 
 }

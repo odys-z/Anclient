@@ -24,6 +24,22 @@ export const regex = {
 		return str;
 	},
 
+	/**Find doc type of mime
+	 * https://docs.w3cub.com/http/basics_of_http/mime_types/complete_list_of_mime_types
+	 * @param {string} mime
+	 * @return {string} .doc or undefined
+	 */
+	mime2type: function (mime) {
+		const treg = [/^image/g, /^text/g, /^application\/msword/g, /^application\/vnd.openxmlformats-officedocument.wordprocessingml.document/g,
+					  /^application\/pdf/g, /^application\/rtf/g, /^text\/plain/g ];
+		const types = ['image', '.txt', '.doc', 'docx', '.pdf', '.rtf', '.txt'];
+
+		for (let i = 0; i < treg.length; i++) {
+			if (treg[i].test(mime))
+				return types[i];
+		}
+	},
+
 	// /**split target with <i>separator</i> then get the the ith element
 	//  * @param {string} target
 	//  * @param {string} separator
