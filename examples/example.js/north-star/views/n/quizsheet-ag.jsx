@@ -136,7 +136,7 @@ class QuizsheetComp extends React.Component {
 		let qresp = new QuizResp(ansonResp.body);
 		let {quizId, quiz, questions} = qresp.quiz_questions();
 		let quizUsers = qresp.quizUserIds();
-		// console.log(quizUsers);
+
 		this.setState( {
 			questions: questions,
 			quiz,
@@ -144,9 +144,6 @@ class QuizsheetComp extends React.Component {
 			currentqx: -1,
 			dirty:   false
 		} );
-
-		// if (this.props.onDirty)
-		// 	this.props.onDirty(true);
 	}
 
 	onCancel(e) {
@@ -169,9 +166,6 @@ class QuizsheetComp extends React.Component {
 		if (e && e.stopPropagation) e.stopPropagation();
 
 		let that = this;
-
-		// collect children's state - will be used in callback to update this component.
-		// that.quizHook.collect && that.quizHook.collect(that.state);
 
 		this.quizUserForm = (
 			<QuizUserForm uri={this.props.uri} crud={this.state.crud}
@@ -229,8 +223,7 @@ class QuizsheetComp extends React.Component {
 		usrs = usrs && (usrs.length > 0 || usrs.size > 0);
 
 		return (
-		  <Overlay open={true}
-			  	style={{
+		  <Overlay open={true} style={{
 					background: 'rgba(0, 0, 0, 0.3)',
 					alignItems: 'center', marginTop: 60,
 					justifyContent: 'center'}}>

@@ -193,12 +193,17 @@ class App extends React.Component {
 	 */
 	static bindHtml(elem, opts = {}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
+		Langstrs.load('/res-vol/lang.json');
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, json) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
+	}
+
+	static reportTranslation() {
+		console.log(Langstrs.report());
 	}
 }
 
