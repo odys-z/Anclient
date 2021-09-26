@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 /**
  * A dynamic extending {string-key: parameterized-instance} translation mapper.
  * function:
@@ -13,6 +15,20 @@ export const Langstrs = {
 	},
 
 	lang: 'en',
+
+	load: function(url) {
+		$.ajax({
+			dataType: "json",
+			url,
+		})
+		.done( (json) => {
+			Object.assign(Langstrs.s, json);
+			Langstrs.using(json.using);
+		} )
+		.fail( (e) => {
+			console.error("Loading language resource failed. Url: " + url);
+		} )
+	},
 
 	using: function (lang = 'en') {
 		Langstrs.lang = lang;
