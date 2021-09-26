@@ -23,7 +23,7 @@ import { GPATier, GPAReq, GPAResp } from './gpa-tier'
 
 const styles = (theme) => ({
 	root: {
-		height: "calc(100vh - 12ch)"
+		height: "calc(100vh - 18ch)"
 	},
 	actionButton: {
 	}
