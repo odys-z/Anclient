@@ -324,12 +324,21 @@ class AnsonResp extends AnsonBody {
 
 	resulve(tabl, pk, clientRec) {
 		console.log(this);
-		// // NOTE:
+		// // NOTE: FIXME any better way?
 		// this depnends on the samantics of java code:
 		//    return ok(new AnsonResp().data(res.props()));
-		if (this.map && this.map.resulved) {
-			return this.map.resulved[tabl][pk];
-		}
+		let resulved;
+		if (this.map && this.map.resulved)
+			resulved = this.map.resulved;
+		else if (this.resulved)
+			resulved = this.resulved;
+
+		if (resulved)
+			return resulved.props
+					? resulved.props[tabl]
+						? resulved.props[tabl].props[pk]
+						: resulved.props[tabl][pk]
+					: undefined ;
 		else return clientRec[pk];
 	}
 
@@ -867,7 +876,6 @@ class InsertReq extends UpdateReq {
 		if (this.cols === undefined)
 			this.cols = [];
 		if (Array.isArray(cols)){
-			// this.cols = this.cols.concat(cols);
 			this.cols = this.cols.concat(cols.map(
 				(c, x) => typeof c === 'string'
 								? c

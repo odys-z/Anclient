@@ -4,8 +4,9 @@
 import chai from 'chai'
 import { expect, assert } from 'chai'
 
-import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp} from '../../semantier/protocol.js';
-import {AnClient, SessionClient} from '../../semantier/anclient.js';
+import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp } from '../../semantier/protocol.js';
+import { AnClient, SessionClient } from '../../semantier/anclient.js';
+const { CRUD } = Protocol;
 
 
 const resp = {
@@ -342,5 +343,64 @@ describe('case: [01.3 Protocol/AnsonResp]', () => {
         assert.equal(8, cols.length, "2 ---");
         assert.equal('vid', cols[0], "0 ---");
         assert.equal('dim6', cols[7], "7 ---");
+	});
+});
+
+/**
+  /u.serv11
+  delete from n_docs where docId = 'undefined'
+  insert into n_docs  (docId, mime, docName, uri, userId, optime, oper) values ('000008', 'image/jpeg;base64', 'test-5.jpg', 'shares/admin/000008 test-5.jpg', 'admin', datetime('now'), 'admin')
+ */
+const resulveInsertDocResp = {
+    "type": "io.odysz.semantic.jprotocol.AnsonMsg",
+    "code": "ok", "opts": null, "port": "update",
+    "header": null,
+    "body": [
+      { "type": "io.odysz.semantic.jprotocol.AnsonResp",
+        "rs": null,
+        "parent": "io.odysz.semantic.jprotocol.AnsonMsg",
+        "a": null, "m": null,
+        "map": {
+          "resulved": {
+            "type": "io.odysz.semantics.SemanticObject",
+            "props": {
+                "n_docs": {
+                    "type": "io.odysz.semantics.SemanticObject",
+                    "props": { "docId": "000008" }
+                }
+            }
+          },
+          "deleted": [ 0, 1 ]
+        },
+        "uri": null
+    } ],
+    "version": "1.0", "seq": 0
+}
+const insertDoc = {
+  "docId": null,
+  "mime": "image/jpeg;base64",
+  "docName": "test-5.jpg",
+  "uri": "/9j/4AAQSkZJR...",
+  "userId": "admin"
+}
+describe('case: [01.5 Protocol/AnsonResp]', () => {
+    it('Resulve post insertion <u.serv11>', () => {
+		let crud = CRUD.c;
+		let rec = insertDoc;
+		let that = {
+				pk: 'docId',
+				mtabl: 'n_docs' };
+
+		function saveDocCallback (resp, onOk) {
+			let bd = resp.Body();
+			if ( crud === CRUD.c )
+				rec[that.pk] = bd.resulve(that.mtabl, that.pk, rec);
+			onOk(resp, rec);
+		}
+
+		let rp = new AnsonMsg(resulveInsertDocResp);
+		saveDocCallback(rp, (resp, rec) => {
+			assert.equal('000008', rec.docId, 'docId ...');
+		});
 	});
 });

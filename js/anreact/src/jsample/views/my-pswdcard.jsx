@@ -55,9 +55,11 @@ class MyPswdComp extends React.Component {
 		this.context = this.props.anContext || this.context;
 		this.getTier();
 
-		let that = this;
-		this.tier.myInf({userId: this.props.ssInf.uid},
-						(cols, record) => that.setState({cols, record}) );
+		this.tier.pkval = this.props.ssInf.uid;
+		this.setState({});
+		// let that = this;
+		// this.tier.myInf({userId: this.props.ssInf.uid},
+		// 				(cols, record) => that.setState({cols, record}) );
 	}
 
 	getTier = () => {
@@ -88,7 +90,7 @@ class MyPswdComp extends React.Component {
 			{this.tier
 			 && <form><TRecordForm uri={this.props.uri}
 					tier={this.tier}
-					fields={this.tier.columns()}
+					fields={this.tier.fields()}
 				/></form>}
 			<Button onClick={this.changePswd} color="inherit">
 				{L('Save')}
@@ -105,16 +107,16 @@ export { MyPswd, MyPswdComp }
 
 class PswdTier extends MyInfTier {
 
-	uri = undefined;
+	// uri = undefined;
 
-	constructor(opts) {
-		super('session');
-		this.uri = opts.uri;
+	constructor(comp) {
+		super(comp);
+		//this.uri = comp.uri;
 	}
 
 	// NOTE
 	// must be a shared object. Sytle will be changed for validation. So can not directly returned by columns() in hard coded.
-	_cols = [
+	_fields = [
 		{ field: 'userId',   type: 'text',  label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
 		{ field: 'userName', type: 'text',  label: L('Name'),   grid: {sm: 6, lg: 4}, disabled: true },
 		{ field: 'pswd',  type: 'password', label: L('Old Password'), grid: {md: 6, lg: 4},
@@ -126,9 +128,9 @@ class PswdTier extends MyInfTier {
 		  autocomplete: "on",
 		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ];
 
-	columns() {
-		return this._cols;
-	}
+	// fields() {
+	// 	return this._cols;
+	// }
 
 	changePswd(opts, onOk) {
 		if (!this.client) return;

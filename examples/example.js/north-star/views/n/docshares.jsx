@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Box, TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier';
+import { Protocol, AnsonResp, InsertReq, AnsonBody, Semantier } from '@anclient/semantier';
 import { L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
 	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
@@ -49,6 +49,8 @@ class DocsharesComp extends CrudCompW {
 
 	tier = undefined;
 
+	fileInput = undefined;
+
 	constructor(props) {
 		super(props);
 
@@ -74,8 +76,6 @@ class DocsharesComp extends CrudCompW {
 		this.tier = new DocsTier(this);
 		this.tier.setContext(this.context);
 	}
-
-	fileInput = undefined;
 
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
@@ -138,23 +138,25 @@ class DocsharesComp extends CrudCompW {
 	toAdd(e, v) {
 		let that = this;
 		let files = this.fileInput.files;
-		this.tier.upload(files, (e) => that.setState({}));
+		this.tier.upload(files, (docId) => {
+			that.setState({});
+			that.toEdit(e, docId);
+		});
 	}
 
 	toEdit(e, v) {
 		let that = this;
-		let pkv = [...this.state.selected.Ids][0];
-		this.tier.pkval = pkv;
-		this.recForm = (<DocshareDetails crud={CRUD.u}
+		this.tier.pkval = [...this.state.selected.Ids][0];
+		this.recForm = (<DocshareDetails u
 			uri={this.uri}
 			tier={this.tier}
-			recId={pkv}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
 
 	closeDetails() {
 		this.recForm = undefined;
+		this.tier.resetFormSession();
 		this.setState({});
 	}
 
@@ -191,7 +193,7 @@ class DocsharesComp extends CrudCompW {
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns( {mime: {formatter: (v, x, rec) => getMimeIcon(v)}} )}
+				columns={tier.columns( {mime: {formatter: (v, x, rec) => getMimeIcon(v, rec)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -202,7 +204,7 @@ class DocsharesComp extends CrudCompW {
 		</div>);
 
 		function getMimeIcon(v, rec) {
-			console.log(rec, v);
+			// console.log(rec, v);
 			return (<>[DocIcon]</>);
 		}
 	}
@@ -255,9 +257,15 @@ export class DocsTier extends Semantier {
 	port = 'docstier';
 	mtabl = 'n_docs';
 	pk = 'docId';
+
+	reltabl = 'n_doc_kid';
+	rel = {'n_doc_kid': {
+		fk: 'docId',  // fk to main table
+		col: 'userId',// checking col
+		sk: 'trees.doc_kid' }};
 	checkbox = true;
+
 	client = undefined;
-	// uri = undefined;
 	rows = [];
 	pkval = undefined;
 	rec = {};
@@ -268,6 +276,15 @@ export class DocsTier extends Semantier {
 		{ text: L('File Name'), field: 'docName' },
 		{ text: L('Shared With'), field: 'sharings' } ];
 
+	_fields = [
+		{ type: 'text', field: 'docId',   label: 'Doc ID',
+		  disabled: true },
+		{ type: 'text', field: 'docName', label: 'File Name',
+		  disabled: true },
+		{ type: 'text', field: 'mime',    label: 'File Type',
+		  disabled: true, formatter: undefined }
+	];
+
 	constructor(comp) {
 		super(comp);
 	}
@@ -276,6 +293,7 @@ export class DocsTier extends Semantier {
 		if (!files) return;
 
 		let that = this;
+		let client = this.client;
 
 		files.forEach( (file, x) => {
 			let row = {
@@ -289,11 +307,38 @@ export class DocsTier extends Semantier {
 
 			row.reader.onload = function (e) {
 				// FIXME how about stream mode?
-				// row.uri = row.reader.result;
-				let content = dataOfurl(row.reader.result)
-				row.mime = mimeOf( row.reader.result ),
+				row.mime = mimeOf( row.reader.result );
+				row.uri64 = dataOfurl( row.reader.result );
+				delete row.reader;
+				row.docId = undefined;
 
-				that.saveRec({uri: content, rec: row}, onOk);
+				// file always uploaded as insertion, - delete first (even null Id)
+				// let req = that.client
+				// 	.usrAct(that.mtabl, CRUD.c, 'upload doc')
+				// 	.insert(that.uri, that.mtabl);
+				//
+				// that.client.commit(req,
+				// 	(resp) => {
+				// 		let docId = resp.Body().resulve(that.mtabl, that.pk, row);
+				// 		onOk && onOk(docId);
+				// 	}, that.errCtx);
+
+				let req = client
+					.userReq( that.uri, that.port,
+					new DocsReq( that.uri, { deletings: [that.pkval], ...row } )
+					.A( DocsReq.A.upload ) );
+
+				client.commit(req,
+					(resp) => {
+						let bd = resp.Body();
+						// NOTE:
+						// resulving auto-k is a typicall semantic processing, don't expose this to caller
+						row[that.pk] = bd.resulve(that.mtabl, that.pk, row);
+
+						console.log(row[that.pk]); // safe for concurrent uploading?
+						onOk(row[that.pk]);
+					},
+					that.errCtx);
 			}
 
 			row.reader.readAsDataURL(file);
@@ -314,6 +359,7 @@ export class DocsTier extends Semantier {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
+				that.resetFormSession();
 				onLoad(cols, rows);
 			},
 			this.errCtx);
@@ -338,41 +384,6 @@ export class DocsTier extends Semantier {
 	}
 
 	/**
-	 * @param {object} opts
-	 * @param {string} opts.uri
-	 * @param {object} opts.rec { docId, uri, mime, docName, size }
-	 * @param {function} onOk
-	 */
-	saveRec(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
-
-		let { uri, rec } = opts;
-		let {docId, docName, mime, size} = rec;
-		let crud = docId === 'loading' ? CRUD.c : CRUD.u;
-
-		let req = this.client
-					.usrAct( this.uri, crud, "upload", "share docs" )
-					.update( this.uri, this.mtabl,
-							{pk: this.pk, v: rec[this.pk]},
-							rec );
-
-		client.commit(req,
-			(resp) => {
-				let bd = resp.Body();
-				if (crud === CRUD.c)
-					// NOTE:
-					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					rec[that.pk] = bd.resulve(that.mtabl, that.pk, rec);
-
-					console.log(rec); // safe for concurrent uploading?
-				onOk(resp);
-			},
-			this.errCtx);
-	}
-
-	/**
 	 * @param {Set} ids record id
 	 * @param {function} onOk: function(AnsonResp);
 	 */
@@ -380,9 +391,9 @@ export class DocsTier extends Semantier {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-		let { uri, ids } = opts;
+		let { uri, ids, posts } = opts;
 
-		if (ids && ids.size > 0) {
+		if (ids && (ids.size > 0 || ids.length > 0)) {
 			let req = this.client.userReq(uri, this.port,
 				new DocsReq( uri, { deletings: [...ids] } )
 				.A(DocsReq.A.del) );
@@ -406,7 +417,7 @@ export class DocsReq extends AnsonBody {
 	static A = {
 		records: 'r/list',
 		rec: 'r/rec',
-		update: 'c',
+		upload: 'c',
 		del: 'd',
 
 		//preview: 'r/preview',
@@ -415,14 +426,14 @@ export class DocsReq extends AnsonBody {
 	constructor (uri, args = {}) {
 		super();
 		this.type = DocsReq.type;
-		this.uri = uri;
+		// this.uri = uri;
 		this.docId = args.docId;
 		this.docName = args.docName;
-		this.doctype = args.doctype;
+		this.mime = args.mime;
+		this.uri64 = args.uri64;
 
 		/// case u
-		this.pk = args.pk;
-		this.record = args.record;
+		// this.pk = args.pk;
 
 		// case d
 		this.deletings = args.deletings;
