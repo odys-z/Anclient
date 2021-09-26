@@ -232,7 +232,7 @@ class RoleTier extends Semantier {
 	rels = [];
 
 	_cols = [
-		{ text: L('roleId'),  field: "roleId", hide: true },
+		{ text: L('Role Id'),  field: "roleId", hide: true },
 		{ text: L('Role'),    field: "roleName",color: 'primary', className: 'bold'},
 		{ text: L('Remarks'), field: "remarks", color: 'primary' } ]
 
