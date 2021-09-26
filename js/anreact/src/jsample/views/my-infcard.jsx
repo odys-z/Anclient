@@ -142,7 +142,7 @@ export class MyInfTier extends Semantier {
 		let that = this;
 		return [
 			{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-			{ field: 'userName', label: L('Name'),   grid: {sm: 6, lg: 4} },
+			{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
 			{ field: 'roleId',   label: L('Role'),   grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 			  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 			{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
