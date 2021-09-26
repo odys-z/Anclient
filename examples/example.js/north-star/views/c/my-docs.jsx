@@ -31,6 +31,8 @@ class MyDocsComp extends CrudCompW {
 
 	tier = undefined;
 
+	fileInput = undefined;
+
 	constructor(props) {
 		super(props);
 
@@ -53,7 +55,7 @@ class MyDocsComp extends CrudCompW {
 	}
 
 	getTier = () => {
-		this.tier = new DocsTier(this);
+		this.tier = new MyDocsTier(this);
 		this.tier.setContext(this.context);
 	}
 
@@ -77,10 +79,8 @@ class MyDocsComp extends CrudCompW {
 	}
 
 	onTableSelect(rowIds) {
-		// this.state.selected.Ids = rowIds
 		this.setState( {
 			buttons: {
-				// is this all CRUD semantics?
 				add: this.state.buttons.add,
 				edit: rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,

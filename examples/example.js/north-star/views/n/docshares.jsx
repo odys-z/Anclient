@@ -49,6 +49,8 @@ class DocsharesComp extends CrudCompW {
 
 	tier = undefined;
 
+	fileInput = undefined;
+
 	constructor(props) {
 		super(props);
 
@@ -74,8 +76,6 @@ class DocsharesComp extends CrudCompW {
 		this.tier = new DocsTier(this);
 		this.tier.setContext(this.context);
 	}
-
-	fileInput = undefined;
 
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
