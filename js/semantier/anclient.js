@@ -632,24 +632,14 @@ class SessionClient {
 	}
 
 	/**Use this to delete multiple records where pkn = pks[i]
+	 * @param {string} uri
 	 * @param {string} mtabl delete from the table
 	 * @param {string} pkn delete from the table
 	 * @param {array} pks delete from the table - pk values are automatically wrapped with ''.
 	 * @return {AnsonMsg<UpdateReq>} anson request
 	 */
 	deleteMulti(uri, mtabl, pkn, pks) {
-		/*
-		let pkvals = null;
-		if (Array.isArray(pks) && pks.length === 0)
-			console.error('deleting empty ids?', mtabl, pkn);
-		else if (Array.isArray(pks))
-			pks.forEach( (v, i) =>{
-				pkvals = pkvals ? pkvals += ", " : '';
-				pkvals += `'${v}'`;
-			} );
-			*/
-
-		let upd = new UpdateReq(undefined, mtabl)
+		let upd = new UpdateReq(uri, mtabl)
 			// .whereCond('in', pkn, pkvals);
 			.whereIn(pkn, pks);
 		upd.a = Protocol.CRUD.d;

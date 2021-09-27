@@ -152,11 +152,12 @@ class RolesComp extends CrudCompW {
 	}
 
 	toEdit(e, v) {
+		let that = this;
 		this.tier.pkval = [...this.state.selected.Ids][0];
 
 		this.roleForm = (<RoleDetails u uri={this.uri}
 			tier={this.tier}
-			onOk={(r) => console.log(r)}
+			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}
 
@@ -197,7 +198,7 @@ class RolesComp extends CrudCompW {
 			{this.tier && <AnTablist
 				className={classes.root} checkbox={true}
 				columns={this.tier.columns()}
-				rows={this.state.rows} pk='roleId'
+				rows={this.state.rows} pk={this.tier.pk}
 				selectedIds={this.state.selected}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
@@ -223,7 +224,6 @@ class RoleTier extends Semantier {
 		sk: 'trees.role_funcs' }};
 
 	client = undefined;
-	// uri = undefined;
 	pkval = undefined;
 	rows = [];
 	rec = {}; // for leveling up record form, also called record
@@ -232,7 +232,7 @@ class RoleTier extends Semantier {
 	rels = [];
 
 	_cols = [
-		{ text: L('roleId'),  field: "roleId", hide: true },
+		{ text: L('Role Id'),  field: "roleId", hide: true },
 		{ text: L('Role'),    field: "roleName",color: 'primary', className: 'bold'},
 		{ text: L('Remarks'), field: "remarks", color: 'primary' } ]
 
@@ -245,9 +245,13 @@ class RoleTier extends Semantier {
 		  validator: {notNull: true} }
 	];
 
+	/**
+	 * @param {React.Component} comp
+	 * @param {string} comp.uri the client function uri.
+	 * @constructor
+	 */
 	constructor(comp) {
 		super(comp);
-		// this.uri = comp.uri || comp.props.uri;
 	}
 
 	records(conds = {}, onLoad) {
@@ -298,70 +302,70 @@ class RoleTier extends Semantier {
 
 	/** Save role form with relationships
 	 * */
-	saveRec(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
-
-		let { crud } = opts;
-		let uri = this.uri;
-
-		if (crud === CRUD.u && !this.pkval)
-			throw Error("Can't update with null ID.");
-
-		let req;
-		if ( crud === CRUD.c )
-			req = this.client.userReq(uri, 'insert',
-						new InsertReq( uri, this.mtabl )
-						.columns(this._fields)
-						.record(this.rec) );
-		else
-			req = this.client.userReq(uri, 'update',
-						new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
-						.record(this.rec, this.pk) );
-
-		let rel = this.rel[this.reltabl];
-		// collect relationships
-		let columnMap = {};
-		columnMap[rel.col] = 'nodeId';
-
-		// semantics handler will resulve fk when inserting only when master pk is auto-pk
-		columnMap[rel.fk] = this.pkval
-						? this.pkval			// when updating
-						: this.rec[this.pk];	// when creating
-
-		let insRels = this.anReact
-			.inserTreeChecked(
-				this.rels,
-				{ table: this.reltabl,
-				  columnMap,
-				  check: 'checked',
-				  // middle nodes been corrected according to children
-				  reshape: true }
-			);
-
-		if (!this.pkval) {
-			req.Body().post(insRels);
-		}
-		else {
-			// e.g. delete from a_role_func where roleId = '003'
-			let del_rf = new DeleteReq(null, this.reltabl, rel.fk)
-							.whereEq(rel.fk, this.pkval);
-
-			req.Body().post(del_rf.post(insRels));
-		}
-
-		client.commit(req,
-			(resp) => {
-				let bd = resp.Body();
-				if (crud === CRUD.c)
-					// NOTE:
-					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
-				onOk(resp);
-			},
-			this.errCtx);
-	}
+	// saveRec(opts, onOk) {
+	// 	if (!this.client) return;
+	// 	let client = this.client;
+	// 	let that = this;
+	//
+	// 	let { crud } = opts;
+	// 	let uri = this.uri;
+	//
+	// 	if (crud === CRUD.u && !this.pkval)
+	// 		throw Error("Can't update with null ID.");
+	//
+	// 	let req;
+	// 	if ( crud === CRUD.c )
+	// 		req = this.client.userReq(uri, 'insert',
+	// 					new InsertReq( uri, this.mtabl )
+	// 					.columns(this._fields)
+	// 					.record(this.rec) );
+	// 	else
+	// 		req = this.client.userReq(uri, 'update',
+	// 					new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
+	// 					.record(this.rec, this.pk) );
+	//
+	// 	let rel = this.rel[this.reltabl];
+	// 	// collect relationships
+	// 	let columnMap = {};
+	// 	columnMap[rel.col] = 'nodeId';
+	//
+	// 	// semantics handler will resulve fk when inserting only when master pk is auto-pk
+	// 	columnMap[rel.fk] = this.pkval
+	// 					? this.pkval			// when updating
+	// 					: this.rec[this.pk];	// when creating
+	//
+	// 	let insRels = this.anReact
+	// 		.inserTreeChecked(
+	// 			this.rels,
+	// 			{ table: this.reltabl,
+	// 			  columnMap,
+	// 			  check: 'checked',
+	// 			  // middle nodes been corrected according to children
+	// 			  reshape: true }
+	// 		);
+	//
+	// 	if (!this.pkval) {
+	// 		req.Body().post(insRels);
+	// 	}
+	// 	else {
+	// 		// e.g. delete from a_role_func where roleId = '003'
+	// 		let del_rf = new DeleteReq(null, this.reltabl, rel.fk)
+	// 						.whereEq(rel.fk, this.pkval);
+	//
+	// 		req.Body().post(del_rf.post(insRels));
+	// 	}
+	//
+	// 	client.commit(req,
+	// 		(resp) => {
+	// 			let bd = resp.Body();
+	// 			if (crud === CRUD.c)
+	// 				// NOTE:
+	// 				// resulving auto-k is a typicall semantic processing, don't expose this to caller
+	// 				that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+	// 			onOk(resp);
+	// 		},
+	// 		this.errCtx);
+	// }
 
 	/**
 	 * @param {object} opts
@@ -369,44 +373,44 @@ class RoleTier extends Semantier {
 	 * @param {set} opts.ids record id
 	 * @param {function} onOk: function(AnsonResp);
 	 */
-	del(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
-		let { uri, ids } = opts;
+	// del(opts, onOk) {
+	// 	if (!this.client) return;
+	// 	let client = this.client;
+	// 	let that = this;
+	// 	let { uri, ids } = opts;
+	//
+	// 	if (ids && ids.size > 0) {
+	// 		let req = client
+	// 			.usrAct(this.mtabl, CRUD.d, 'delete')
+	// 			.deleteMulti(this.uri, this.mtabl, this.pk, [...ids]);
+	// 		client.commit(req, onOk, this.errCtx);
+	// 	}
+	// }
 
-		if (ids && ids.size > 0) {
-			let req = client
-				.usrAct('roles', CRUD.d, 'delete')
-				.deleteMulti(this.uri, 'a_roles', 'roleId', [...ids]);
-			client.commit(req, onOk, this.errCtx);
-		}
-	}
-
-	relations(opts, onOk) {
-		if (!this.anReact)
-			this.anReact = new AnReact();
-
-		let that = this;
-
-		// typically relationships are tree data
-		let { uri, reltabl, sqlArgs, sqlArg } = opts;
-		let { sk, relfk, relcol } = this.rel[reltabl];
-
-		sqlArgs = sqlArgs || [sqlArg];
-
-		if (!sk)
-			throw Error('TODO ...');
-
-		let t = stree_t.sqltree;
-
-		let ds = {uri, sk, t, sqlArgs};
-
-		this.anReact.stree({ uri, sk, t, sqlArgs,
-			onOk: (resp) => {
-				that.rels = resp.Body().forest;
-				onOk(resp);
-			}
-		}, this.errCtx);
-	}
+	// relations(opts, onOk) {
+	// 	if (!this.anReact)
+	// 		this.anReact = new AnReact();
+	//
+	// 	let that = this;
+	//
+	// 	// typically relationships are tree data
+	// 	let { uri, reltabl, sqlArgs, sqlArg } = opts;
+	// 	let { sk, relfk, relcol } = this.rel[reltabl];
+	//
+	// 	sqlArgs = sqlArgs || [sqlArg];
+	//
+	// 	if (!sk)
+	// 		throw Error('TODO ...');
+	//
+	// 	let t = stree_t.sqltree;
+	//
+	// 	let ds = {uri, sk, t, sqlArgs};
+	//
+	// 	this.anReact.stree({ uri, sk, t, sqlArgs,
+	// 		onOk: (resp) => {
+	// 			that.rels = resp.Body().forest;
+	// 			onOk(resp);
+	// 		}
+	// 	}, this.errCtx);
+	// }
 }

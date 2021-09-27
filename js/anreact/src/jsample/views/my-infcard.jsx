@@ -46,15 +46,17 @@ class MyInfCardComp extends React.Component {
 
 		// TODO DOC: MyInfCard is created outside of context provider,
 		// see test/jsample/app.jsx: render().myInfoPanels(AnContext)
-		// Don't set this in constructor. This.context changed after it.
+		// Don't set this in constructor - this.context will be changed after constructing.
 		this.context = this.props.anContext || this.context;
 
 		let that = this;
 
 		if (!this.tier) this.getTier()
 
-		this.tier.myInf({userId: this.props.ssInf.uid},
-						(cols, record) => that.setState({cols, record}) );
+		this.tier.pkval = this.props.ssInf.uid;
+		this.setState({});
+		// this.tier.myInf({userId: this.props.ssInf.uid},
+		// 				(cols, record) => that.setState({cols, record}) );
 	}
 
 	showConfirm(msg) {
@@ -125,21 +127,22 @@ export { MyInfCard, MyInfCardComp };
 
 export class MyInfTier extends Semantier {
 
-	uri = undefined;
-	mtabl = 'a_users';
-	pk = 'userId';
+	// uri = undefined;
 	imgProp = 'img';
 
-	constructor(opts) {
-		super('session');
-		this.uri = opts.uri;
+	constructor(comp) {
+		super(comp);
+		// FIXME move to super class?
+		// this.uri = comp.uri;
+		this.mtabl = 'a_users';
+		this.pk = 'userId';
 	}
 
 	columns() {
 		let that = this;
 		return [
 			{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-			{ field: 'userName', label: L('Name'),   grid: {sm: 6, lg: 4} },
+			{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
 			{ field: 'roleId',   label: L('Role'),   grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 			  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 			{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
@@ -155,7 +158,7 @@ export class MyInfTier extends Semantier {
 		}
 	}
 
-	myInf(conds, onLoad) {
+	record(conds, onLoad) {
 		let { userId } = conds;
 
 		let client = this.client;

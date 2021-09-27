@@ -25,7 +25,7 @@ describe('case: [0.0] utils', () => {
 		assert.equal(toBool(false), false, '0.13');
 	} );
 
-    it('Array pathc', () => {
+	it('Array pathc', () => {
 		let arr = [1, 2, 3];
 		arr.swap(0, 1);
 		assert.equal(arr.length, 3);
@@ -34,7 +34,7 @@ describe('case: [0.0] utils', () => {
 		assert.equal(arr[2], 3);
 	});
 
-    it('toBool', () => {
+	it('toBool', () => {
 		assert.isTrue(toBool('1'), '1');
 		assert.isTrue(toBool('2'), '2');
 		assert.isTrue(toBool(1), '3');

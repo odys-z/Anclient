@@ -25,6 +25,7 @@ import { Docshares } from './views/n/docshares';
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
 import { MyDocs } from './views/c/my-docs';
+import { MyConnect } from './views/c/connect';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -85,13 +86,13 @@ class App extends React.Component {
 			{path: '/n/docs', comp: Docshares},
 			{path: '/c/status', comp: MyStatus },
 			{path: '/c/mypolls', comp: MyPolls },
-			{path: '/n/mydocs', comp: MyDocs},
+			{path: '/c/mydocs', comp: MyDocs},
+			{path: '/c/myconn', comp: MyConnect},
 		] );
 	}
 
 	onError(c, r) {
 		console.error(c, r);
-		// this.setState({hasError: !!c, nextAction: 're-login'});
 		this.state.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
@@ -159,17 +160,22 @@ class App extends React.Component {
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
-					myInfo={myInfoPanels('/sys')}
+					myInfo={myInfoPanels}
 					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
-		function myInfoPanels(uri) {
+		function myInfoPanels(anContext) {
 			return [
-				{title: L('Basic'),      panel: <MyInfCard uri={uri} ssInf={that.state.anClient.ssInf} />},
-				// {title: L('My Classes'), panel: <MyClassTree />},
-				{title: L('My Status'),  panel: <Typography>Tasks cleared!</Typography>}
+				{ title: L('Basic'),
+				  panel: <jsample.MyInfCard uri={'/sys/session'}
+				  					anContext={anContext}
+									ssInf={that.state.anClient.ssInf} /> },
+				{ title: L('Password'),
+				  panel: <jsample.MyPswd uri={'/sys/session'}
+				  					anContext={anContext}
+									ssInf={that.state.anClient.ssInf} /> }
 			  ];
 		}
 	}
@@ -187,12 +193,17 @@ class App extends React.Component {
 	 */
 	static bindHtml(elem, opts = {}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
+		Langstrs.load('/res-vol/lang.json');
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, json) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
+	}
+
+	static reportTranslation() {
+		console.log(Langstrs.report());
 	}
 }
 

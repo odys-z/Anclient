@@ -13,16 +13,18 @@ import {L, Langstrs, AnConst,
 import { CenterProtocol, CenterResp } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
 import { myMsgFromIssuer } from '../../common/mui-helpers';
+import { starTheme } from '../../common/star-theme';
 
-const styles = (theme) => ( {
-	root: {
-	}
-} );
+const { CRUD } = Protocol;
+
+const styles = (theme) => Object.assign(starTheme(theme), theme => {
+	root: {}
+});
 
 class MyStatusComp extends CrudCompW {
 	state = {
 		my: [],
-		selectedIds: []
+		selected: {Ids: new Set()}
 	};
 
 	constructor(props) {
@@ -50,17 +52,16 @@ class MyStatusComp extends CrudCompW {
 			(resp) => {
 				let centerResp = resp.Body()
 				that.setState({my: centerResp.my()});
-				that.state.selectedIds.splice(0);
+				that.state.selected.Ids.clear();
 			},
 			this.context.error);
 	}
 
 	onSelectChange(opt) {
-		let {e, selectedIds, val} = opt;
-		if (selectedIds)
-		 	this.quizForm = (
-				<></>
-			);
+		// if (selectedIds)
+		//  	this.quizForm = (
+		// 		<></>
+		// 	);
 	}
 
 	render () {
@@ -82,9 +83,9 @@ class MyStatusComp extends CrudCompW {
 						{ text: L('Subject'), field: "subject"},
 						{ text: L('DDL'), field: "ddl", color: 'primary' }
 					]}
+					selectedIds={this.state.selected}
 					rows={this.state.my.polls}
 					onSelectChange={this.onTableSelect} />
-					{this.quizForm}
 				</>
 			}
 		</>);

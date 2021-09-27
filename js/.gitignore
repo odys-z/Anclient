@@ -1,7 +1,6 @@
 node_modules/
 compile-*
-**/dist/*
-!**/.dockerignore
-!**/dist/*.html
-!**/dist/github.json
-!**/dist/*.ico
+**/dist/*.min.js
+**/dist/*.js.map
+**/dist/testBundle.js
+**/dist/private

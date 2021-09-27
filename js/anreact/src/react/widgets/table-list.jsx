@@ -94,16 +94,15 @@ class AnTablistComp extends React.Component {
 	};
 
 	toSelectAll (event) {
+		let ids = this.props.selectedIds.Ids;
 		if (event.target.checked) {
-			let key = this.props.pk;
-			let selected = new Set();
-			this.props.rows.forEach((n) => selected.add(n[key]));
-			this.setState({selected});
-			this.updateSelectd([ ...selected ]);
+			this.props.rows.forEach((r) => ids.add(r[this.props.pk]));
+			this.updateSelectd(ids);
 		}
 		else {
-			this.setState({ selected: new Set() });
-			this.updateSelectd([]);
+			ids.clear();
+			this.setState({});
+			this.updateSelectd(ids);
 		}
 	};
 
@@ -131,8 +130,15 @@ class AnTablistComp extends React.Component {
 	 * @returns [<TableCell>,...]
 	 */
 	th(columns = []) {
-		return columns.filter( (v, x) => !toBool(v.hide)
-							|| this.props.checkbox && x !== 0) // first columen as checkbox
+		// return columns.filter( (v, x) => !toBool(v.hide)
+		// 					|| this.props.checkbox && x !== 0) // first columen as checkbox
+		return columns.filter( (v, x) => toBool(v.hide) ? false
+							: !(this.props.checkbox && x === 0)) // first columen as checkbox
+			// .map( (colObj, index) =>
+			// 	<TableCell key={index}>
+			// 		{colObj.text || colObj.field}
+			// 	</TableCell>);
+
 			.map( (colObj, index) =>
 				<TableCell key={index}>
 					{colObj.text || colObj.field}

@@ -171,10 +171,11 @@ class TRecordFormComp extends CrudCompW {
 
 		let rec = this.tier.rec;
 
-		return (
+		return rec ?
 			<Grid container className={classes.root} direction='row'>
 				{this.formFields(rec, classes)}
-			</Grid> );
+			</Grid>
+			: <></>; // NOTE have to wait until parent loaded data
 	}
 }
 
