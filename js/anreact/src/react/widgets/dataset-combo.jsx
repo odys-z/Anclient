@@ -109,7 +109,10 @@ class DatasetComboComp extends React.Component {
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
 			filter={ Autocomplete.caseInsensitiveFilter }
-			renderInput={ (params) => <TextField {...params} label={v ? v.n : ''} variant="outlined" /> }
+			renderInput={
+				(params) => <TextField {...params}
+					label={this.props.showLable && v ? v.n : ''}
+					variant="outlined" /> }
 		/>);
 
 		function findOption (opts, v) {

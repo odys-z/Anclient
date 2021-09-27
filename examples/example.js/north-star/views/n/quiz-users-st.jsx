@@ -26,7 +26,6 @@ class QuizUserFormComp extends CrudCompW {
 	state = {
 		title: '',
 		rows: [],
-		// selected: {Ids: new Set()},
 		selected: {Ids: new Set()},
 	};
 
@@ -35,24 +34,7 @@ class QuizUserFormComp extends CrudCompW {
 		this.toSave = this.toSave.bind(this);
 		this.toClose = this.toClose.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
-	}
-
-	toSave(e) {
-		if (e) e.stopPropagation();
-
-		if (this.props.onClose)
-			this.props.onSave([...this.state.selected.Ids]);
-	}
-
-	toClose(e) {
-		if (e) e.stopPropagation();
-		if (this.props.onClose)
-			this.props.onClose();
-	}
-
-	onTableSelect(selectedIds) {
-		// this.setState({selectedIds});
-		// console.log(selectedIds);
+		this.toSearch = this.toSearch.bind(this);
 	}
 
 	componentDidMount() {
@@ -77,8 +59,26 @@ class QuizUserFormComp extends CrudCompW {
 			});
 	}
 
+	toSave(e) {
+		if (e) e.stopPropagation();
+
+		if (this.props.onClose)
+			this.props.onSave([...this.state.selected.Ids]);
+	}
+
+	toClose(e) {
+		if (e) e.stopPropagation();
+		if (this.props.onClose)
+			this.props.onClose();
+	}
+
+	onTableSelect(selectedIds) {
+		// this.setState({selectedIds});
+		// console.log(selectedIds);
+	}
+
 	render () {
-		let {classes} = this.props;
+		let { classes, tier } = this.props;
 		return (
 			<Dialog className={classes.root}
 				open={true}
@@ -88,18 +88,15 @@ class QuizUserFormComp extends CrudCompW {
 				<DialogTitle id="t-quizusers">{this.state.title}</DialogTitle>
 
 				<DialogContent>
-					<AnTablist
-						className={classes.root} checkbox={true} paging={false}
+					{this.tier && <AnTablist pk={tier.pk}
+						className={classes.root} checkbox={true}
+						columns={tier.columns()}
+						rows={this.state.rows}
 						selectedIds={this.state.selected}
-						columns={[
-							{ text: L(''), field:"checked" },  // first field as checkbox
-							{ text: L('userId'), hide: true, field: "userId" },
-							{ text: L('User Name'), color: 'primary', field: "userName", className: 'bold'},
-							{ text: L('My Message'), color: 'primary', field: "myMsg", editabl: true},
-						]}
-						rows={this.state.rows} pk='userId'
+						pageInf={this.state.pageInf}
+						onPageInf={this.onPageInf}
 						onSelectChange={this.onTableSelect}
-					/>
+					/>}
 				<DialogActions>
 					<Button onClick={this.toSave} color="inherit">
 						{L('OK')}
@@ -116,7 +113,18 @@ QuizUserFormComp.contextType = AnContext;
 
 QuizUserFormComp.propTypes = {
 	uri: PropTypes.string.isRequired,
+	tier: PropTypes.object.isRequired
 }
 
 const QuizUserForm = withWidth()(withStyles(styles)(QuizUserFormComp));
 export { QuizUserForm, QuizUserFormComp }
+
+class QuizUsersTier extends Semantier {
+
+	_cols = [
+		{ text: L(''), field:"checked" },  // first field as checkbox
+		{ text: L('userId'), hide: true, field: "userId" },
+		{ text: L('User Name'), color: 'primary', field: "userName", className: 'bold'},
+		{ text: L('My Message'), color: 'primary', field: "myMsg", editabl: true} ];
+
+}

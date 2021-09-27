@@ -268,20 +268,21 @@ export class UsersTier extends Semantier {
 		  validator: {notNull: true} },
 	];
 
+	_cols = [
+		{ text: L('Log Id'), field: 'userId', checked: true },
+		{ text: L('User Name'), field: 'userName' },
+		{ text: L('Organization'), field: 'orgName',
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
+		{ text: L('Role'), field: 'roleName',
+		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
+	];
+
 	constructor(comp) {
 		super(comp);
-		// this.uri = comp.uri || comp.props.uri;
 	}
 
 	columns() {
-		return [
-			{ text: L('Log Id'), field: 'userId', checked: true },
-			{ text: L('User Name'), field: 'userName' },
-			{ text: L('Organization'), field: 'orgName',
-			  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-			{ text: L('Role'), field: 'roleName',
-			  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
-			];
+		return this._cols;
 	}
 
 	records(conds, onLoad) {
@@ -399,6 +400,7 @@ export class UserstReq extends UserReq {
 		this.userName = args.userName;
 		this.orgId = args.orgId;
 		this.roleId = args.roleId;
+		this.hasTodos = args.hasTodos;
 
 		/// case u
 		this.pk = args.pk;
@@ -409,20 +411,3 @@ export class UserstReq extends UserReq {
 		this.deletings = args.deletings;
 	}
 }
-
-// export class Relations /* extends Anson */ {
-//
-// 	constructor() {
-// 		this.type = "io.odysz.semantic.tier.Relations";
-// 	}
-//
-// 	collectRelations(rtabl, checkTree) {
-// 		if (!rtabl)
-// 			throw Error("Type Relations stands for all relation records of one parent table. Relations already exits.");
-//
-// 		this.rtabl = rtabl;
-// 		// TODO ...
-// 		// TODO ...
-// 		return this;
-// 	}
-// }

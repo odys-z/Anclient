@@ -7,5 +7,11 @@ export function starTheme(theme) {
 		padding: theme.spacing(1),
 		margin: theme.spacing(1),
 	},
+	smalltip: {
+		fontSize: "0.3em",
+		padding: 0,
+		marging: 0,
+		color: "#006",
+	},
   };
 };

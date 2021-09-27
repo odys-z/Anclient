@@ -18,11 +18,12 @@ import { L, AnConst,
 	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree
 } from '@anclient/anreact';
 
+import { starTheme } from '../../common/star-theme';
 import { DocsTier } from './docshares';
 
 const { CRUD } = Protocol;
 
-const styles = (theme) => ({
+const DocshareStyle = (theme) => ({
 	dialogPaper: {
   	  height: "100%"
     },
@@ -49,14 +50,10 @@ const styles = (theme) => ({
       "& > button": {
         width: "20ch"
     },
-	smalltip: {
-		fontSize: "0.3em",
-		padding: 0,
-		marging: 0,
-		color: "#006",
-	}
   },
 });
+
+const styles = (theme) => Object.assign(starTheme(theme), DocshareStyle(theme));
 
 /**
  * Tiered record form is a component for UI record layout, automaitcally bind data,

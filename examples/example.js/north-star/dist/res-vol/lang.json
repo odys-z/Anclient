@@ -28,6 +28,7 @@
     "Save": "保存",
     "Close": "關閉",
     "Role ID": "角色ID",
-    "Data Saved!": "數據保存成功！"
+    "Data Saved!": "數據保存成功！",
+	"Publish": "發布"
   }
 }

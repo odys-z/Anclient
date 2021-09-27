@@ -79,9 +79,9 @@ export const JsampleTheme = responsiveFontSizes(createTheme({
         xl: 1920
       }
     },
-    tip: {
-        color: '#0c0'
-    }
+    // tip: {
+    //     color: '#0c0'
+    // }
 
 }));
 
