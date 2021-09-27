@@ -8,7 +8,7 @@ export function starTheme(theme) {
 		margin: theme.spacing(1),
 	},
 	smalltip: {
-		fontSize: "0.3em",
+		fontSize: "0.8em",
 		padding: 0,
 		marging: 0,
 		color: "#006",
