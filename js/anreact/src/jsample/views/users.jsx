@@ -102,7 +102,7 @@ class UserstComp extends CrudCompW {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={true} open
+				ok={L('OK')} cancel={true} open
 				onOk={ that.del }
 				onClose={() => {that.confirm = undefined;} }
 				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
@@ -116,7 +116,7 @@ class UserstComp extends CrudCompW {
 			resp => {
 				that.confirm = (
 					<ConfirmDialog title={L('Info')}
-						ok={L('Ok')} cancel={false} open
+						ok={L('OK')} cancel={false} open
 						onClose={() => {
 							that.confirm = undefined;
 							that.toSearch();
