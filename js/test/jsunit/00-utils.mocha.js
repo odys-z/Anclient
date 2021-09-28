@@ -91,7 +91,6 @@ describe('case: [00.2 Language]', () => {
 		assert.equal(Langstrs.s.zh.world, undefined, "B ---");
 
 		let totrans = Langstrs.report();
-		console.log(totrans);
 		assert.isTrue(totrans.has('hello'), "D ---");
 		assert.isTrue(totrans.has('world'), "E ---");
 	});
