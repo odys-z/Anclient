@@ -2,6 +2,7 @@
   "zh": {
 	"OK": "确定",
 	"info": "提示信息",
+    "Info": "提示信息",
 	"ALL": "全部",
     "Logout": "退出登录",
     "Domain ID": "Domain ID",
@@ -28,6 +29,6 @@
     "Close": "關閉",
     "Role ID": "角色ID",
     "Data Saved!": "數據保存成功！",
-    "Info": "提示信息"
+	"Publish": "發布"
   }
 }

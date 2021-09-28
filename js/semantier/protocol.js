@@ -323,7 +323,6 @@ class AnsonResp extends AnsonBody {
 	}
 
 	resulve(tabl, pk, clientRec) {
-		console.log(this);
 		// // NOTE: FIXME any better way?
 		// this depnends on the samantics of java code:
 		//    return ok(new AnsonResp().data(res.props()));

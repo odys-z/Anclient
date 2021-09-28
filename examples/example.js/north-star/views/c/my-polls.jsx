@@ -138,9 +138,8 @@ class MyPollsComp extends CrudCompW {
 				columns={[
 					{ text: L('chk'), hide: true, field: "checked" },
 					{ text: L('pid'), hide: true, field: "pid" },
-					{ text: L('Title'), field: "title", color: 'primary', className: 'bold'},
 					{ text: L('Title'), field: "title", color: 'primary' },
-					{ text: L('Questions'), field: "questions", color: 'primary' },
+					{ text: L('Tag/Subject'), field: "subject", color: 'primary' },
 					{ text: L('Message'), field: "extra", formatter: myMsgFromIssuer, color: 'primary' }
 				]}
 				rows={polls}

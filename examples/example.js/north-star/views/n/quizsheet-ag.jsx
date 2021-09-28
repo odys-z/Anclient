@@ -58,7 +58,7 @@ class QuizsheetComp extends React.Component {
 		this.state.crud = props.c ? Protocol.CRUD.c
 						: props.u ? Protocol.CRUD.u
 						: Protocol.CRUD.r;
-		// this.state.creating = props.creating;
+
 		this.state.quizId = props.quizId
 		if (props.u && !props.quizId) throw new Error("Semantics Error!");
 
@@ -66,7 +66,6 @@ class QuizsheetComp extends React.Component {
 
 		this.toSave = this.toSave.bind(this);
 		this.onCancel = this.onCancel.bind(this);
-		// this.onDirty = this.onDirty.bind(this);
 
 		this.toSave = this.toSave.bind(this);
 		this.toSetPollUsers = this.toSetPollUsers.bind(this);
@@ -81,7 +80,7 @@ class QuizsheetComp extends React.Component {
 	}
 
 	columns = [
-		{ field: 'title', label: 'Title', wrapText: true,
+		{ field: 'title', label: 'Title', wrapText: true, width: 180,
 		  cellEditor: 'agLargeTextCellEditor',
 		  cellEditorParams: {cols: 40, rows: 5},
 		  cellRenderer: anMultiRowRenderer,
@@ -105,14 +104,14 @@ class QuizsheetComp extends React.Component {
 		  }
 		},
 		{ field: 'qid', label: 'Type', hide: true },
-		{ field: 'answers', label: 'Options', width: 240, autoHeight: true,
+		{ field: 'answers', label: 'Options', width: 200, autoHeight: true,
 		  wrapText: true,
 		  cellEditor: 'agLargeTextCellEditor',
 		  cellEditorParams: {cols: 40, rows: 5},
 		  cellRenderer: anMultiRowRenderer,
 		},
-		{ field: 'weight', label: 'Weight', width: 90, editable: false },
-		{ field: 'expectings', label: 'Max Value', width: 140 },
+		{ field: 'weight', label: 'Weight', width: 80, editable: false },
+		{ field: 'expectings', label: 'Max Value', width: 120 },
 		{ field: 'question', label: 'Question', width: 500, autoHeight: true,
 		  wrapText: true,
 		  cellEditor: 'agLargeTextCellEditor',
@@ -156,7 +155,7 @@ class QuizsheetComp extends React.Component {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={false} open
+				ok={L('OK')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
 		this.setStateHooked({});
