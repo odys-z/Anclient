@@ -87,7 +87,11 @@ class LoginComp extends React.Component {
 		}
 
 		if (!this.state.loggedin) {
-			an.init(this.context.servs[this.context.servId || 'host']);
+			let serv = this.context.servId || 'host';
+			let hosturl = this.context.servs[serv];
+			console.log("login url & serv-id: ", hosturl, serv);
+			
+			an.init(hosturl);
 			an.login( uid, pwd, reload, onError );
 		}
 

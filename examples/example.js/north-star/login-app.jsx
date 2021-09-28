@@ -86,10 +86,10 @@ class LoginApp extends React.Component {
 	static bindHtml(elem, opts = {}) {
 		AnReact.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, json) {
+		function onJsonServ(elem, opts, json) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
-				<LoginApp servs={json} servId={opts.serv} iparent={opts.parent} ihome={opts.home} />, dom);
+				<LoginApp servs={json} servId={opts.servId} iparent={opts.parent} ihome={opts.home} />, dom);
 		}
 	}
 }

@@ -185,9 +185,9 @@ class App extends React.Component {
 		Langstrs.load('/res-vol/lang.json');
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, json) {
+		function onJsonServ(elem, opts, json) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<App servs={json} servId={opts.servId} iportal={portal} iwindow={window}/>, dom);
 		}
 	}
 

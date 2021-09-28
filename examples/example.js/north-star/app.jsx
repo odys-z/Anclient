@@ -189,14 +189,14 @@ class App extends React.Component {
 	 * @param {string} elem html element id, null for test
 	 * @param {object} [opts={}] serv id
 	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.iportal='portal.html'] page showed after logout
+	 * @param {string} [opts.iportal='index.html'] page showed after logout
 	 */
 	static bindHtml(elem, opts = {}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
 		Langstrs.load('/res-vol/lang.json');
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, json) {
+		function onJsonServ(elem, opts, json) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
