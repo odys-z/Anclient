@@ -187,7 +187,7 @@ class App extends React.Component {
 
 		function onJsonServ(elem, opts, json) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<App servs={json} servId={opts.servId} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
 	}
 

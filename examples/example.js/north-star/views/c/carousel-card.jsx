@@ -46,19 +46,28 @@ const styles = (theme) => ({
   },
   question: {
     fontSize: 18,
-    paddingBottom: 25
+    paddingBottom: 25,
+	textAlign: "justify"
   },
   answers: {
     spacing: theme.spacing(1),
-    width: "90%",
-    textAlign: "center"
+    width: "98%",
+    textAlign: "center",
+	height: "66%",
+	overflow: "auto",
     // border: "solid 1px green"
   },
   button: {
     margin: 3,
     width: "80%",
     textAlign: "center",
+	justifyContent: "start",
+	paddingLeft: 36,
     border: "solid 0.2ch #cce"
+  },
+  freetext: {
+    height: "100%",
+	width: "80%",
   },
   submitButton: {
     margin: 12,
@@ -80,7 +89,6 @@ const styles = (theme) => ({
     width: "99%",
     textAlign: "center",
     marginTop: 20
-    // border: "solid 1px grey"
   }
 });
 
@@ -104,6 +112,7 @@ class CarouselCardComp extends React.Component {
     this.formatRank = this.formatRank.bind(this);
     this.formatMultiRanks = this.formatMultiRanks.bind(this);
     this.formatNumber = this.formatNumber.bind(this);
+    this.formatFreetext = this.formatFreetext.bind(this);
 
     let { question, quiz } = this.props;
     this.state = { quiz: quiz.poll || quiz, question };
@@ -121,7 +130,25 @@ class CarouselCardComp extends React.Component {
     else if (qtype === "mr10")
       return this.formatMultiRanks(classes, question, 10);
     else if (qtype === "n") return this.formatNumber(classes, question);
+	else if (qtype === "t") return this.formatFreetext(classes, question);
     else return answers;
+  }
+
+  formatFreetext(classes, question) {
+    let { answers } = question;
+    let that = this;
+    return (
+        <TextField
+          color="primary"
+          key={question.qid}
+          className={classes.freetext}
+          variant="outlined" rows={12}
+          multiline defaultValue={answers}
+          onChange={ (e) => {
+            question.answer = e.target.value;
+            that.setState({});
+            that.props.onValueChanged(e.target.value); } }
+        />);
   }
 
   formatSingleOptions(classes, question) {
@@ -136,10 +163,10 @@ class CarouselCardComp extends React.Component {
           className={classes.button}
           variant="contained"
           onClick={(e) => {
-            this.state.question.answer = x;
-            this.setState({});
-            this.props.onValueChanged(x);
-            this.props.goNext();
+            that.state.question.answer = x;
+            that.setState({});
+            that.props.onValueChanged(x);
+            that.props.goNext();
           }}
         >
           {s}
@@ -162,7 +189,8 @@ class CarouselCardComp extends React.Component {
           color="primary"
           onClick={(e) => {
             (s.has(x) && !!s.delete(x)) || s.add(x);
-            that.setState({ question });
+            that.props.onValueChanged(s);
+            that.setState({ });
           }}
         >
           <Checkbox value="" color="primary" />
@@ -206,7 +234,6 @@ class CarouselCardComp extends React.Component {
             name={"r" + r + question.qid}
             value={this.state.answer}
             onChange={ (event, newValue) => {
-              // console.log(newValue);
               this.state.question.answer = newValue;
               this.setState({ answer: newValue });
               this.props.onValueChanged(newValue);
