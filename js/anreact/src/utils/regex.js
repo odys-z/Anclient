@@ -1,4 +1,7 @@
 
+/** npm install mime-types */
+import Mime from 'mime-types';
+
 /* test helper:
  * http://www.regular-expressions.info/javascriptexample.html
  */
@@ -24,21 +27,26 @@ export const regex = {
 		return str;
 	},
 
+	_regImage: /^image\//,
+
 	/**Find doc type of mime
 	 * https://docs.w3cub.com/http/basics_of_http/mime_types/complete_list_of_mime_types
 	 * @param {string} mime
 	 * @return {string} .doc or undefined
 	 */
 	mime2type: function (mime) {
-		const treg = [/^image/g, /^text/g, /^application\/msword/g, /^application\/vnd.openxmlformats-officedocument.wordprocessingml.document/g,
-					  /^application\/pdf/g, /^application\/rtf/g, /^text\/plain/g ];
-		const types = ['image', '.txt', '.doc', 'docx', '.pdf', '.rtf', '.txt'];
-
-		for (let i = 0; i < treg.length; i++) {
-			if (treg[i].test(mime))
-				return types[i];
-		}
+		if (regex._regImage.test(mime))
+			return 'image';
+		else return "." + (mime.startsWith('/') ?
+				Mime.extension(mime.substring(1)) :
+				Mime.extension(mime));
 	},
+
+	type2mime: function (doctype) {
+		return doctype.startsWith('.') ?
+			Mime.lookup(doctype) :
+			Mime.lookup('.' + doctype);
+	}
 
 	// /**split target with <i>separator</i> then get the the ith element
 	//  * @param {string} target

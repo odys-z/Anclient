@@ -3,6 +3,7 @@ import { expect, assert } from 'chai';
 
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
 import { toBool, isEmpty } from '../../anreact/src/utils/helpers';
+import { regex } from '../../anreact/src/utils/regex';
 
 describe('case: [0.0] utils', () => {
 	it('helpers: toBool, isEmpty', () =>{
@@ -50,6 +51,24 @@ describe('case: [0.0] utils', () => {
 		assert.isFalse(toBool('false'), 'F');
 	} );
 } );
+
+let { mime2type, type2mime } = regex;
+describe('case: [00.1 regex]', () => {
+    it('mime2type', () => {
+		assert.equal(mime2type('image/jpeg'), 'image', '00.1 jpeg');
+		assert.equal(mime2type('image/png'), 'image', '00.1 png');
+		assert.equal(mime2type('image/png;base64'), 'image', '00.1 image');
+		assert.equal(mime2type('image/svg+xml'), 'image', '00.1 svg');
+		assert.equal(mime2type('application/pdf'), '.pdf', '00.1 pdf');
+		assert.equal(mime2type('application/xml'), '.xml', '00.1 xml');
+	});
+
+    it('type2mime', () => {
+		assert.equal(type2mime('png'), 'image/png', '00.2 --png');
+		assert.equal(type2mime('.png'), 'image/png', '00.2 .png');
+		assert.equal(type2mime('pdf'), 'application/pdf', '00.2 --pdf');
+	});
+});
 
 describe('case: [00.2 Language]', () => {
     it('translation', () => {

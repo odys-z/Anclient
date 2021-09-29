@@ -1,10 +1,17 @@
- var path = require('path')
- var webpack = require('webpack')
+var path = require('path')
+var webpack = require('webpack')
 
- var v = 'development';
- var version = "1.0.0";
+// for mime-types, which depends on path, see #50
+// #50 https://github.com/jshttp/mime-types/issues/50#issuecomment-442916069
+// #60 https://github.com/jshttp/mime-types/issues/69
+// #77 https://github.com/jshttp/mime-types/issues/77
+// hack it?
+var nodeExternals = require('webpack-node-externals');
 
- module.exports = {
+var v = 'development';
+var version = "1.0.0";
+
+module.exports = {
     mode: v, // "production" | "development" | "none"
     devtool: 'source-map',
     entry: { anreact: './src/an-components.js' },
@@ -19,11 +26,12 @@
       libraryTarget: 'umd'
     },
 
-	externals: {
-	  'react': 'react',
-	  'react-dom' : 'reactDOM',
-	  "@material-ui/core": "MaterialUI"
-	},
+    externals: Object.assign(
+      nodeExternals(), {
+      'react': 'react',
+      'react-dom' : 'reactDOM',
+      "@material-ui/core": "MaterialUI",
+    }),
 
 	plugins: [
 	],
