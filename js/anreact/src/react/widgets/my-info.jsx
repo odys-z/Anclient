@@ -95,12 +95,6 @@ class MyInfoComp extends React.Component {
 					<AnTabs panels={this.props.panels} />
 				</DialogContent>
 				<DialogActions>
-					{/* <Button onClick={this.handleClose} color="inherit">
-						{L('Save')}
-					</Button>
-					<Button onClick={this.handleClose} color="inherit" autoFocus>
-						{L('Cancel')}
-					</Button> */}
 				</DialogActions>
 			</Dialog>
 		);

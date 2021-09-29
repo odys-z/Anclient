@@ -199,7 +199,8 @@ export class MyInfTier extends Semantier {
 
 		let crud = Protocol.CRUD.u;
 
-		let {roleId, userName} = this.rec;
+		let rec = this.rec;
+		let {roleId, userName} = rec;
 
 		let req = this.client
 					.usrAct(this.uri, Protocol.CRUD.u, "save", "save my info")
@@ -208,24 +209,24 @@ export class MyInfTier extends Semantier {
 							{roleId, userName});
 		// about attached image:
 		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
-		if ( this.rec.attId )
+		if ( rec.attId )
 			// NOTE this is a design erro
 			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
 			//          2. delete saved attId file (trigged by semantic handler)
 			req.Body().post(
 					new DeleteReq(this.uri, "a_attaches",
-						{pk: "attId", v: this.rec.attId}) )
+						{pk: "attId", v: rec.attId}) )
 				.post(
 					new DeleteReq(this.uri, "a_attaches")
-						.whereEq('busiId', this.rec[this.pk] || '')
+						.whereEq('busiId', rec[this.pk] || '')
 					 	.whereEq('busiTbl', this.mtabl));
-		if ( this.rec[this.imgProp] )
+		if ( rec[this.imgProp] )
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
-					.nv('attName', this.rec.fileMeta.name)
-					.nv('mime', this.rec.fileMeta.mime)
-					.nv('uri', dataOfurl(this.rec[this.imgProp])) );
+					.nv('attName', rec.fileMeta && rec.fileMeta.name)
+					.nv('mime', rec.fileMeta && rec.fileMeta.mime)
+					.nv('uri', dataOfurl(rec[this.imgProp])) );
 
 		client.commit(req,
 			(resp) => {

@@ -1,6 +1,6 @@
 
-/** npm install mime-types */
-import Mime from 'mime-types';
+/** npm install mime-types-no-nodejs */
+import Mime from 'mime-types-no-nodejs';
 
 /* test helper:
  * http://www.regular-expressions.info/javascriptexample.html
