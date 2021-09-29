@@ -10,7 +10,7 @@ import { L, Langstrs,
 	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
-const { mimeOf, type2mime, dataOfurl, urlOfdata, regex } = utils;
+const { mimeOf, dataOfurl, urlOfdata, regex } = utils;
 
 import { starTheme } from '../../common/star-theme';
 import { DocshareDetails } from './docshare-details';
@@ -214,9 +214,10 @@ export { Docshares, DocsharesComp }
 
 export class DocsQuery extends React.Component {
 	conds = [
+		// FIXME 'name' not used?
 		{ name: 'docName', type: 'text', val: '', label: L('File Name') },
 		{ name: 'tag',     type: 'text', val: '', label: L('Tag') },
-		{ name: 'docType', type: 'cbb',  val: '', label: L('Format'),
+		{ name: 'mime',    type: 'cbb',  val: '', label: L('Format'),
 		  options: [{n: 'Office Word', v: 'doc'},
 		  			{n: 'Office Excel', v: 'xsl'},
 					{n: 'Office PPT', v: 'ppt'},
@@ -233,7 +234,7 @@ export class DocsQuery extends React.Component {
 		return {
 			docName: this.conds[0].val ? this.conds[0].val : undefined,
 			tag    : this.conds[1].val ? this.conds[1].val : undefined,
-			docType: this.conds[2].val ? type2mime(this.conds[2].val.v) : undefined };
+			mime   : this.conds[2].val ? regex.type2mime(this.conds[2].val.v) : undefined };
 	}
 
 	/** Design Note:
@@ -272,8 +273,8 @@ export class DocsTier extends Semantier {
 	rec = {};
 
 	_cols = [
-		{ text: L(''), field: 'docId', checked: true },
-		{ text: L(''), field: 'mime' },
+		{ text: L('ID'), field: 'docId', checked: true },
+		{ text: L('Doc Type'), field: 'mime' },
 		{ text: L('File Name'), field: 'docName' },
 		{ text: L('Shared With'), field: 'sharings' } ];
 
@@ -402,8 +403,8 @@ export class DocsTier extends Semantier {
 	 */
 	static getMimeIcon(mime, rec, classes, iconpath) {
 		const known = { image: 'image.svg', '.txt': 'text.svg',
-						'.doc': 'docx.svg', '.docx': 'docx.svg',
-						'.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
+				'.doc': 'docx.svg', '.docx': 'docx.svg', '.zip': '7zip.svg',
+				'.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
 		const unknown = 'unknown.svg';
 		iconpath = iconpath || '/res-vol/icons';
 
@@ -441,7 +442,6 @@ export class DocsReq extends AnsonBody {
 		this.type = DocsReq.type;
 		this.docId = args.docId;
 		this.docName = args.docName;
-		this.docType = args.docType;
 		this.mime = args.mime;
 		this.uri64 = args.uri64;
 

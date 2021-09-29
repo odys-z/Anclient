@@ -61,12 +61,19 @@ describe('case: [00.1 regex]', () => {
 		assert.equal(mime2type('image/svg+xml'), 'image', '00.1 svg');
 		assert.equal(mime2type('application/pdf'), '.pdf', '00.1 pdf');
 		assert.equal(mime2type('application/xml'), '.xml', '00.1 xml');
+		assert.equal(mime2type(''), '', '00.1 ""');
+		assert.equal(mime2type(null), '', '00.1 null');
+		assert.equal(mime2type(undefined), '', '00.1 undefined');
 	});
 
     it('type2mime', () => {
 		assert.equal(type2mime('png'), 'image/png', '00.2 --png');
 		assert.equal(type2mime('.png'), 'image/png', '00.2 .png');
 		assert.equal(type2mime('pdf'), 'application/pdf', '00.2 --pdf');
+		assert.equal(type2mime('image'), 'image/', '00.2 --image');
+		assert.equal(type2mime(''), '', '00.2 --""');
+		assert.equal(type2mime(null), '', '00.2 --null');
+		assert.equal(type2mime(undefined), '', '00.2 --undefined');
 	});
 });
 
