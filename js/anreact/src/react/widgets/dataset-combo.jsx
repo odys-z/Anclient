@@ -35,6 +35,7 @@ class DatasetComboComp extends React.Component {
 
 		selectedItem: undefined,
 	}
+	refcbb = React.createRef();
 
 	constructor(props) {
 		super(props);
@@ -63,8 +64,8 @@ class DatasetComboComp extends React.Component {
 				this.context.error, this);
 	}
 
-	onCbbRefChange( refcbb ) {
-		let _ref = refcbb;
+	onCbbRefChange( ) {
+		let _ref = this.refcbb;
 		let _that = this;
 		let _cmb = this.state.combo;
 		_cmb.ref = _ref;
@@ -83,7 +84,7 @@ class DatasetComboComp extends React.Component {
 		let cmb = this.state.combo
 		let { classes } = this.props;
 
-		let refcbb = React.createRef(); // FIXME why not this.refcbb?
+		// let refcbb = React.createRef(); // FIXME why not this.refcbb?
 
 		/** Desgin Notes:
 		 * SimpleForm's first render triggered this constructor and componentDidMount() been called, first.
@@ -99,8 +100,10 @@ class DatasetComboComp extends React.Component {
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
 		return (<Autocomplete
-			ref={refcbb}
-			onChange={ this.onCbbRefChange(refcbb) }
+			ref={this.refcbb}
+			disabled={this.props.disabled || this.props.readonly || this.props.readOnly}
+			defaultValue={this.props.val}
+			onChange={ this.onCbbRefChange() }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
 			options={cmb.options}
@@ -128,7 +131,8 @@ class DatasetComboComp extends React.Component {
 DatasetComboComp.contextType = AnContext;
 
 DatasetComboComp.propTypes = {
-	uri: PropTypes.string
+	uri: PropTypes.string,
+	val: PropTypes.object, // TODO doc: e.g. {n: f.label, v: rec[f.field]}, see TRecordFormComp
 };
 
 const DatasetCombo = withWidth()(withStyles(styles)(DatasetComboComp));

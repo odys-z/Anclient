@@ -50,7 +50,7 @@ const styles = (theme) => ({
   }
 });
 
-/**
+/**@deprecated replaced by TRecordFormComp
  * Record form is a component for UI record layout, not data binding.
  * Why? A tech to handle performance problem and help data auto binding.
  * See performance issue: https://stackoverflow.com/a/66934465

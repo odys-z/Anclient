@@ -113,7 +113,7 @@ export class Semantier {
 			} );
 		else
 			return this._fields.map( (c, x) => {
-				let disabled = c.field === that.pk && that.pkval ? true : false;
+				let disabled = c.disabled || c.field === that.pk && that.pkval ? true : false;
 				return {...c, disabled };
 			} );
 	}

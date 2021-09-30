@@ -37,6 +37,8 @@ class MyDocsComp extends CrudCompW {
 
 	fileInput = undefined;
 
+	downloadLink = React.createRef();
+
 	constructor(props) {
 		super(props);
 
@@ -94,6 +96,20 @@ class MyDocsComp extends CrudCompW {
 	}
 
 	toDownload(e, v) {
+		let that = this;
+		let pkv = [...this.state.selected.Ids][0];
+		this.tier.pkval = pkv;
+
+		if (this.tier.pkval) {
+			let that = this;
+			let cond = {};
+			cond[this.tier.pk] = this.tier.pkval;
+			this.tier.record(cond, (cols, rows, fkOpts) => {
+				that.downloadLink.current.download = rows[0].docName;
+				that.downloadLink.current.href = utils.urlOfdata(rows[0].mime, rows[0].uri64);
+				that.downloadLink.current.click();
+			} );
+		}
 	}
 
 	toView(e, v) {
@@ -131,6 +147,7 @@ class MyDocsComp extends CrudCompW {
 					className={classes.button} onClick={this.toDownload}
 					startIcon={<JsampleIcons.Export />}
 				>{L('Download')}</Button>
+				<a ref={this.downloadLink} style={{display: "none"}}></a>
 			</Grid>
 
 			{tier && <AnTablist pk={tier.pk}

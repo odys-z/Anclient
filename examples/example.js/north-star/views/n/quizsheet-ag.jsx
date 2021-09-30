@@ -228,6 +228,7 @@ class QuizsheetComp extends React.Component {
 					justifyContent: 'center'}}>
 
 			<Box className={classes.formWrapper} >
+				{/*FIXME let's deprecate RecordForm */}
 				<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
 					stateHook={this.quizHook}
 					fields={[ { field: 'qid', label: '', hide: true },

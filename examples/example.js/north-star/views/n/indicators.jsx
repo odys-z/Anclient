@@ -64,11 +64,11 @@ class IndicatorsComp extends CrudCompW {
 			parent={{ type: 'text', field: 'parent', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 			columns={[
 				{ type: 'text', field: 'indName', label: L('Indicator'),
-				  validator: {len: 200, notNull: true}, cols: {sm: 3} },
+				  validator: {len: 200, notNull: true}, cols: {sm: 6} },
 				{ type: 'float', field: 'weight', label: L('Default Weight'),
-				  validator: {min: 0.0}, cols: {sm: 3},
+				  validator: {min: 0.0}, cols: {sm: 1},
 				  formatter: (n, col) => n.node.weight},
-				{ type: 'formatter', label: L('Question Type'), cols: {sm: 3},
+				{ type: 'formatter', label: L('Question Type'), cols: {sm: 2},
 				  formatter: (rec) => { return readableQtype(rec.node.qtype || rec.node.vtype, true) } },
 				{ type: 'actions', label: '', cols: 3}
 			]}

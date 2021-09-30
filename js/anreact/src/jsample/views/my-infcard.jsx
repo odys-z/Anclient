@@ -74,7 +74,7 @@ class MyInfCardComp extends React.Component {
 
 		let that = this;
 
-		if (this.tier.validate(undefined, this.tier.columns()))
+		if (this.tier.validate(undefined, this.tier.fields()))
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.state.crud,
@@ -103,7 +103,7 @@ class MyInfCardComp extends React.Component {
 		  <>{this.tier
 			 && <TRecordForm uri={this.props.uri}
 					tier={this.tier}
-					fields={this.tier.columns()}
+					fields={this.tier.fields()}
 				/>}
 			<Button onClick={this.toSave}
 				className={classes.actionButton} color="primary" variant="outlined">
@@ -136,27 +136,48 @@ export class MyInfTier extends Semantier {
 		// this.uri = comp.uri;
 		this.mtabl = 'a_users';
 		this.pk = 'userId';
+
+		this.loadAvatar = this.loadAvatar.bind(this);
 	}
 
-	columns() {
-		let that = this;
-		return [
-			{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-			{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
-			{ field: 'roleId',   label: L('Role'),   grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
-			  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-			{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
-		];
+	_fields = [
+		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
+		{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
+		{ field: 'roleId',   label: L('Role'), disabled: true,
+		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
+		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: this.loadAvatar }
+	];
 
-		function loadAvatar(rec, field) {
-			return (
-				<ImageUpload
-					blankIcon={{color: "primary", width: 32, height: 32}}
-					tier={that} field={field}
-					src64={rec && field && rec[field.field]}
-				/>);
-		}
+	loadAvatar(rec, field) {
+		return (
+			<ImageUpload
+				blankIcon={{color: "primary", width: 32, height: 32}}
+				tier={this} field={field}
+				src64={rec && field && rec[field.field]}
+			/>);
 	}
+
+	// columns() {
+	// 	let that = this;
+	// 	return [
+	// 		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
+	// 		{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
+	// 		{ field: 'roleId',   label: L('Role'), disabled: true,
+	// 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
+	// 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+	// 		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
+	// 	];
+	//
+	// 	function loadAvatar(rec, field) {
+	// 		return (
+	// 			<ImageUpload
+	// 				blankIcon={{color: "primary", width: 32, height: 32}}
+	// 				tier={that} field={field}
+	// 				src64={rec && field && rec[field.field]}
+	// 			/>);
+	// 	}
+	// }
 
 	record(conds, onLoad) {
 		let { userId } = conds;

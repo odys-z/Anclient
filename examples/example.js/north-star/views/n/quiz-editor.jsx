@@ -300,7 +300,7 @@ class QuizEditorComp extends DetailFormW {
 					>{L('Change Target Users')}</Button>
 				</ListItem>
 				<Collapse in={this.state.openHead} timeout="auto" >
-
+					{/*FIXME let's deprecate RecordForm */}
 					<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
 						stateHook={this.quizHook}
 						fields={[ { field: 'qid', label: '', hide: true },
@@ -310,16 +310,8 @@ class QuizEditorComp extends DetailFormW {
 							      { field: 'quizinfo', label: L('Description'), grid: {sm: 12, lg: 12} }
 							]}
 						record={{qid: this.state.quizId, ... this.state.quiz }} />
-
 				</Collapse>
-
 				{this.items(classes)}
-
-				{/*
-				<ListItem key="b" button>
-					<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
-					<ListItemText primary="New Question" onClick={this.onAdd} />
-				</ListItem>*/}
 			</List>
 			{this.quizUserForm}
 		  </>

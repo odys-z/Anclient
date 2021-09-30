@@ -34,8 +34,8 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
-    "@anclient/anreact": "^0.3.6",
-    "@anclient/semantier": "^0.9.9",
+    "@anclient/anreact": "^0.3.7",
+    "@anclient/semantier": "^0.9.10",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/styles": "^4.11.4",
