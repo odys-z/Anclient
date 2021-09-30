@@ -12,7 +12,7 @@ import { L } from '../../utils/langstr';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
+	// import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
 	import { AnQueryForm } from '../../react/widgets/query-form';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 	import { JsampleIcons } from '../styles';

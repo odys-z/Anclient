@@ -22,9 +22,6 @@ const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
-		// "& :hover": {
-		// 	backgroundColor: '#ecf'
-		// }
 	},
 	button: {
 		marginLeft: theme.spacing(1)
