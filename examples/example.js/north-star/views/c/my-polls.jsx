@@ -8,7 +8,7 @@ import { Protocol, UserReq, SessionClient, AnClient } from '@anclient/semantier'
 import {
 	L, Langstrs, AnConst,
     AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablistLevelUp
+	AnQueryForm, AnTablist
 } from '@anclient/anreact';
 
 import { CenterProtocol } from '../../common/protocol.quiz';
@@ -132,7 +132,7 @@ class MyPollsComp extends CrudCompW {
 						!this.state.waitingPollIds.has([...this.state.selected.Ids][0] ) }
 			> {L('Take Poll')}
 			</Button>
-			<AnTablistLevelUp pk='pid' checkbox singleCheck
+			<AnTablist pk='pid' checkbox singleCheck
 				selectedIds={this.state.selected}
 				className={classes.root}
 				columns={[

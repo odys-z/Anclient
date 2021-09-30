@@ -8,7 +8,7 @@ import { Protocol, UserReq } from '@anclient/semantier';
 import {
     L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablistLevelUp, DatasetCombo, ConfirmDialog, jsample
+	AnQueryForm, AnTablist, DatasetCombo, ConfirmDialog, jsample
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
@@ -20,9 +20,9 @@ const styles = (theme) => ( {
 	root: {
 		margin: theme.spacing(1),
 	},
-	tip: {
-		margin: theme.spacing(1)
-	},
+	// tip: {
+	// 	margin: theme.spacing(1)
+	// },
 	button: {
 		height: '2.4em',
 		verticalAlign: 'middle',
@@ -244,10 +244,10 @@ class QuizzesComp extends CrudCompW {
 					} }
 				/>
 
-				<Button variant="contained" disabled={!btn.add}
+				{/* <Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAddA}
 					startIcon={<JsampleIcons.ItemCollapse />}
-				>{L('Start')}</Button>
+				>{L('Start')}</Button> */}
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAddB}
 					startIcon={<JsampleIcons.Worksheet />}
@@ -262,7 +262,7 @@ class QuizzesComp extends CrudCompW {
 				>{L('Delete')}</Button>
 			</Grid>
 
-			<AnTablistLevelUp
+			<AnTablist
 				selectedIds={this.state.selected}
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
