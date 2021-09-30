@@ -63,7 +63,7 @@ class MyInfCardComp extends React.Component {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={false} open
+				ok={L('OK')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
 		this.setState({});
@@ -74,7 +74,7 @@ class MyInfCardComp extends React.Component {
 
 		let that = this;
 
-		if (this.tier.validate(undefined, this.tier.columns()))
+		if (this.tier.validate(undefined, this.tier.fields()))
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.state.crud,
@@ -103,7 +103,7 @@ class MyInfCardComp extends React.Component {
 		  <>{this.tier
 			 && <TRecordForm uri={this.props.uri}
 					tier={this.tier}
-					fields={this.tier.columns()}
+					fields={this.tier.fields()}
 				/>}
 			<Button onClick={this.toSave}
 				className={classes.actionButton} color="primary" variant="outlined">
@@ -136,27 +136,48 @@ export class MyInfTier extends Semantier {
 		// this.uri = comp.uri;
 		this.mtabl = 'a_users';
 		this.pk = 'userId';
+
+		this.loadAvatar = this.loadAvatar.bind(this);
 	}
 
-	columns() {
-		let that = this;
-		return [
-			{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-			{ field: 'userName', label: L('Name'),   grid: {sm: 6, lg: 4} },
-			{ field: 'roleId',   label: L('Role'),   grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
-			  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-			{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
-		];
+	_fields = [
+		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
+		{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
+		{ field: 'roleId',   label: L('Role'), disabled: true,
+		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
+		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: this.loadAvatar }
+	];
 
-		function loadAvatar(rec, field) {
-			return (
-				<ImageUpload
-					blankIcon={{color: "primary", width: 32, height: 32}}
-					tier={that} field={field}
-					src64={rec && field && rec[field.field]}
-				/>);
-		}
+	loadAvatar(rec, field) {
+		return (
+			<ImageUpload
+				blankIcon={{color: "primary", width: 32, height: 32}}
+				tier={this} field={field}
+				src64={rec && field && rec[field.field]}
+			/>);
 	}
+
+	// columns() {
+	// 	let that = this;
+	// 	return [
+	// 		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
+	// 		{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
+	// 		{ field: 'roleId',   label: L('Role'), disabled: true,
+	// 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
+	// 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+	// 		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
+	// 	];
+	//
+	// 	function loadAvatar(rec, field) {
+	// 		return (
+	// 			<ImageUpload
+	// 				blankIcon={{color: "primary", width: 32, height: 32}}
+	// 				tier={that} field={field}
+	// 				src64={rec && field && rec[field.field]}
+	// 			/>);
+	// 	}
+	// }
 
 	record(conds, onLoad) {
 		let { userId } = conds;
@@ -199,7 +220,8 @@ export class MyInfTier extends Semantier {
 
 		let crud = Protocol.CRUD.u;
 
-		let {roleId, userName} = this.rec;
+		let rec = this.rec;
+		let {roleId, userName} = rec;
 
 		let req = this.client
 					.usrAct(this.uri, Protocol.CRUD.u, "save", "save my info")
@@ -208,24 +230,24 @@ export class MyInfTier extends Semantier {
 							{roleId, userName});
 		// about attached image:
 		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
-		if ( this.rec.attId )
+		if ( rec.attId )
 			// NOTE this is a design erro
 			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
 			//          2. delete saved attId file (trigged by semantic handler)
 			req.Body().post(
 					new DeleteReq(this.uri, "a_attaches",
-						{pk: "attId", v: this.rec.attId}) )
+						{pk: "attId", v: rec.attId}) )
 				.post(
 					new DeleteReq(this.uri, "a_attaches")
-						.whereEq('busiId', this.rec[this.pk] || '')
+						.whereEq('busiId', rec[this.pk] || '')
 					 	.whereEq('busiTbl', this.mtabl));
-		if ( this.rec[this.imgProp] )
+		if ( rec[this.imgProp] )
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
-					.nv('attName', this.rec.fileMeta.name)
-					.nv('mime', this.rec.fileMeta.mime)
-					.nv('uri', dataOfurl(this.rec[this.imgProp])) );
+					.nv('attName', rec.fileMeta && rec.fileMeta.name)
+					.nv('mime', rec.fileMeta && rec.fileMeta.mime)
+					.nv('uri', dataOfurl(rec[this.imgProp])) );
 
 		client.commit(req,
 			(resp) => {

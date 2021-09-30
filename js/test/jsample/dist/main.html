@@ -12,8 +12,8 @@
   <script src="AnHome-1.0.0.min.js"></script>
   <script>
 	let searchParams = new URLSearchParams(window.location.search)
-	let servId = searchParams ? searchParams.get('serv') : undefined;
-	test.App.bindHtml('app', {servId, Window, portal: 'index.html'});
+	let serv = searchParams ? searchParams.get('serv') : undefined;
+	test.App.bindHtml('app', {serv, Window, portal: 'index.html'});
   </script>
 </body>
 </html>

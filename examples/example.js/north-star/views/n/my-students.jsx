@@ -134,7 +134,7 @@ class MyStudentsQuery extends React.Component {
 
 	collect() {
 		return {
-			orgId    : this.conds[0].val && this.conds[0].v ? this.conds[0].val.v: undefined,
+			orgId    : this.conds[0].val ? this.conds[0].val.v : undefined,
 			userName : this.conds[1].val ? this.conds[1].val : undefined,
 			hasTodos : this.conds[2].val ? this.conds[2].val : false };
 	}
@@ -186,30 +186,4 @@ class MyKidsTier extends UsersTier {
 		super(comp);
 	}
 
-	// columns() {
-	// 	return [
-	// 		{ text: L('Log ID'), field: 'userId', checked: true },
-	// 		{ text: L('User Name'), field: 'userName' },
-	// 		{ text: L('Class'), field: 'nebula' },
-	// 		{ text: L('Todos'), field: 'todos' } ];
-	// }
-
-	// records(conds, onLoad) {
-	// 	if (!this.client) return;
-	//
-	// 	let client = this.client;
-	// 	let that = this;
-	//
-	// 	let req = client.userReq(this.uri, this.port,
-	// 				new UserstReq( this.uri, conds )
-	// 				.A(UserstReq.A.records) );
-	//
-	// 	client.commit(req,
-	// 		(resp) => {
-	// 			let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-	// 			that.rows = rows;
-	// 			onLoad(cols, rows);
-	// 		},
-	// 		this.errCtx);
-	// }
 }

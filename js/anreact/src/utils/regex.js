@@ -1,4 +1,7 @@
 
+/** npm install mime-types-no-nodejs */
+import Mime from 'mime-types-no-nodejs';
+
 /* test helper:
  * http://www.regular-expressions.info/javascriptexample.html
  */
@@ -24,29 +27,35 @@ export const regex = {
 		return str;
 	},
 
-	// /**split target with <i>separator</i> then get the the ith element
-	//  * @param {string} target
-	//  * @param {string} separator
-	//  * @param {int} ith optinal.<br>If undefined, return all splitted array
-	//  * @return {Array|string} the ith element or all the array.
-	//  */
-	// split: function (target, separator, ith) {
-	// 	if (target === undefined) { return; }
-	//
-	// 	if (separator === undefined) {
-	// 		console.error('can not separate', separator, target);
-	// 		return;
-	// 	}
-	//
-	// 	target = target.trim();
-	//
-	// 	if (separator != ',') {
-	// 		console.error('Your separator not supported yet...', separator);
-	// 	}
-	//
-	// 	var ss = target.split(/\s*,\s*/);
-	//
-	// 	if (ith !== undefined) { return ss[ith]; }
-	// 	else { return ss; }
-	// },
+	_regImage: /^image\//,
+
+	/**Find preview type (not doc type) of mime
+	 * https://docs.w3cub.com/http/basics_of_http/mime_types/complete_list_of_mime_types
+	 * @param {string} mime
+	 * @return {string} .doc or undefined
+	 */
+	mime2type: function (mime) {
+		if (!mime)
+			return '';
+		else if (regex._regImage.test(mime))
+			return 'image';
+		else return "." + (mime.startsWith('/') ?
+				Mime.extension(mime.substring(1)) || '' :
+				Mime.extension(mime) || '');
+	},
+
+	/**Find most likly mime of preview type
+	 *
+	 * @param {string} prvtype
+	 * @return {string} mime, likely
+	 */
+	type2mime: function (doctype) {
+		if (doctype === 'image')
+			return 'image/'; // regex._regImage.source;
+		// else if (doctype.startsWith('.'))
+		// 	return Mime.lookup(doctype) || '';
+		else {
+			return Mime.lookup('x.' + doctype) || '';
+		}
+	}
 };

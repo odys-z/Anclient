@@ -13,8 +13,6 @@ import { L, Langstrs,
 
 const { Domain, Roles, Orgs, Users, Userst, JsampleTheme } = jsample;
 
-// import { GPAsheet } from './gpa';
-
 /** The application main, context singleton and error handler */
 class App extends React.Component {
 	state = {
@@ -160,9 +158,13 @@ class App extends React.Component {
 		function myInfoPanels(anContext) {
 			return [
 				{ title: L('Basic'),
-				  panel: <jsample.MyInfCard uri={'/sys/session'} anContext={anContext} ssInf={that.state.anClient.ssInf} /> },
+				  panel: <jsample.MyInfCard
+							uri={'/sys/session'} anContext={anContext}
+							ssInf={that.state.anClient.ssInf} /> },
 				{ title: L('Password'),
-				  panel: <jsample.MyPswd uri={'/sys/session'} anContext={anContext} ssInf={that.state.anClient.ssInf} /> }
+				  panel: <jsample.MyPswd
+							uri={'/sys/session'} anContext={anContext}
+							ssInf={that.state.anClient.ssInf} /> }
 			  ];
 		}
 	}
@@ -180,12 +182,17 @@ class App extends React.Component {
 	 */
 	static bindHtml(elem, opts = {}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
+		Langstrs.load('/res-vol/lang.json');
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, json) {
+		function onJsonServ(elem, opts, json) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
+	}
+
+	static reportTranslation() {
+		console.log(Langstrs.report());
 	}
 }
 

@@ -26,7 +26,8 @@ class QuizUserFormComp extends CrudCompW {
 	state = {
 		title: '',
 		rows: [],
-		selectedIds: [],
+		// selected: {Ids: new Set()},
+		selected: {Ids: new Set()},
 	};
 
 	constructor(props) {
@@ -40,7 +41,7 @@ class QuizUserFormComp extends CrudCompW {
 		if (e) e.stopPropagation();
 
 		if (this.props.onClose)
-			this.props.onSave([...this.state.selectedIds]);
+			this.props.onSave([...this.state.selected.Ids]);
 	}
 
 	toClose(e) {
@@ -50,8 +51,8 @@ class QuizUserFormComp extends CrudCompW {
 	}
 
 	onTableSelect(selectedIds) {
-		this.setState({selectedIds});
-		console.log(selectedIds);
+		// this.setState({selectedIds});
+		// console.log(selectedIds);
 	}
 
 	componentDidMount() {
@@ -89,6 +90,7 @@ class QuizUserFormComp extends CrudCompW {
 				<DialogContent>
 					<AnTablist
 						className={classes.root} checkbox={true} paging={false}
+						selectedIds={this.state.selected}
 						columns={[
 							{ text: L(''), field:"checked" },  // first field as checkbox
 							{ text: L('userId'), hide: true, field: "userId" },

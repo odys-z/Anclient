@@ -79,13 +79,13 @@ class LoginApp extends React.Component {
 	 * @param {string} elem html element id, null for test
 	 * @param {object} [opts={}] serv id
 	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.home='index.html'] system main page
+	 * @param {string} [opts.home='main.html'] system main page
 	 * @param {Window} [opts.parent=undefined] parent window if for redirecting target
 	 */
 	static bindHtml(elem, opts = {}) {
 		AnReact.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, json) {
+		function onJsonServ(elem, opts, json) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
 				<LoginApp servs={json} servId={opts.serv} iparent={opts.parent} ihome={opts.home} />, dom);

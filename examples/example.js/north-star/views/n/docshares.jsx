@@ -10,25 +10,21 @@ import { L, Langstrs,
 	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
-const { mimeOf, dataOfurl, urlOfdata } = utils;
+const { mimeOf, dataOfurl, urlOfdata, regex } = utils;
 
+import { starTheme } from '../../common/star-theme';
 import { DocshareDetails } from './docshare-details';
 
 const { CRUD } = Protocol;
 
-const styles = (theme) => ( {
-	root: {
-	},
-	button: {
-		height: 40,
-		width: 100,
-		padding: theme.spacing(1),
-		margin: theme.spacing(1),
-	},
+export const docListyle = (theme) => {return {
 	imgUploadBox: {
 		width: 102,
 		height: 40,
 		marginRight: theme.spacing(2),
+	},
+	iconCell: {
+		height: 24,
 	},
  	fileInput: {
 		border: "solid 1px red",
@@ -38,7 +34,9 @@ const styles = (theme) => ( {
 		top: -48,
 		opacity: 0
 	}
-} );
+}; };
+
+const styles = (theme) => Object.assign(starTheme(theme), docListyle(theme));
 
 class DocsharesComp extends CrudCompW {
 	state = {
@@ -48,6 +46,8 @@ class DocsharesComp extends CrudCompW {
 	};
 
 	tier = undefined;
+
+	fileInput = undefined;
 
 	constructor(props) {
 		super(props);
@@ -74,8 +74,6 @@ class DocsharesComp extends CrudCompW {
 		this.tier = new DocsTier(this);
 		this.tier.setContext(this.context);
 	}
-
-	fileInput = undefined;
 
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
@@ -111,7 +109,7 @@ class DocsharesComp extends CrudCompW {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={true} open
+				ok={L('OK')} cancel={true} open
 				onOk={ that.del }
 				onClose={() => {that.confirm = undefined;} }
 				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
@@ -125,7 +123,7 @@ class DocsharesComp extends CrudCompW {
 			resp => {
 				that.confirm = (
 					<ConfirmDialog title={L('Info')}
-						ok={L('Ok')} cancel={false} open
+						ok={L('OK')} cancel={false} open
 						onClose={() => {
 							that.confirm = undefined;
 							that.toSearch();
@@ -139,7 +137,10 @@ class DocsharesComp extends CrudCompW {
 		let that = this;
 		let files = this.fileInput.files;
 		this.tier.upload(files, (docId) => {
-			that.setState({});
+			that.tier.pkval = docId; // FIXME NOTE where is the best place to do this?
+
+			this.state.selected.Ids.clear();
+			this.state.selected.Ids.add(docId);
 			that.toEdit(e, docId);
 		});
 	}
@@ -152,6 +153,7 @@ class DocsharesComp extends CrudCompW {
 			tier={this.tier}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
+		that.setState({});
 	}
 
 	closeDetails() {
@@ -193,7 +195,7 @@ class DocsharesComp extends CrudCompW {
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selectedIds={this.state.selected}
-				columns={tier.columns( {mime: {formatter: (v, x, rec) => getMimeIcon(v, rec)}} )}
+				columns={tier.columns( {mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec, classes)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -203,10 +205,6 @@ class DocsharesComp extends CrudCompW {
 			{this.confirm}
 		</div>);
 
-		function getMimeIcon(v, rec) {
-			// console.log(rec, v);
-			return (<>[DocIcon]</>);
-		}
 	}
 }
 DocsharesComp.contextType = AnContext;
@@ -214,13 +212,17 @@ DocsharesComp.contextType = AnContext;
 const Docshares = withWidth()(withStyles(styles)(DocsharesComp));
 export { Docshares, DocsharesComp }
 
-class DocsQuery extends React.Component {
+export class DocsQuery extends React.Component {
 	conds = [
+		// FIXME 'name' not used?
 		{ name: 'docName', type: 'text', val: '', label: L('File Name') },
 		{ name: 'tag',     type: 'text', val: '', label: L('Tag') },
-		{ name: 'doctype', type: 'cbb',  val: '', label: L('Format'),
-		  options: [{text: 'Word', value: 'doc'}, {text: 'PDF', value: 'pdf'}],
-		  nv: {n: 'text', v: 'value'} },
+		{ name: 'mime',    type: 'cbb',  val: '', label: L('Format'),
+		  options: [{n: 'Office Word', v: 'doc'},
+		  			{n: 'Office Excel', v: 'xsl'},
+					{n: 'Office PPT', v: 'ppt'},
+					{n: 'PDF', v: 'pdf'},
+					{n: 'Image', v:'image'}] },
 	];
 
 	constructor(props) {
@@ -231,8 +233,8 @@ class DocsQuery extends React.Component {
 	collect() {
 		return {
 			docName: this.conds[0].val ? this.conds[0].val : undefined,
-			tag    : this.conds[1].val ? this.conds[1].val.v : undefined,
-			doctype: this.conds[2].val ? this.conds[2].val.v : undefined };
+			tag    : this.conds[1].val ? this.conds[1].val : undefined,
+			mime   : this.conds[2].val ? regex.type2mime(this.conds[2].val.v) : undefined };
 	}
 
 	/** Design Note:
@@ -271,8 +273,8 @@ export class DocsTier extends Semantier {
 	rec = {};
 
 	_cols = [
-		{ text: L(''), field: 'docId', checked: true },
-		{ text: L(''), field: 'mime' },
+		{ text: L('ID'), field: 'docId', checked: true },
+		{ text: L('Doc Type'), field: 'mime' },
 		{ text: L('File Name'), field: 'docName' },
 		{ text: L('Shared With'), field: 'sharings' } ];
 
@@ -313,16 +315,6 @@ export class DocsTier extends Semantier {
 				row.docId = undefined;
 
 				// file always uploaded as insertion, - delete first (even null Id)
-				// let req = that.client
-				// 	.usrAct(that.mtabl, CRUD.c, 'upload doc')
-				// 	.insert(that.uri, that.mtabl);
-				//
-				// that.client.commit(req,
-				// 	(resp) => {
-				// 		let docId = resp.Body().resulve(that.mtabl, that.pk, row);
-				// 		onOk && onOk(docId);
-				// 	}, that.errCtx);
-
 				let req = client
 					.userReq( that.uri, that.port,
 					new DocsReq( that.uri, { deletings: [that.pkval], ...row } )
@@ -401,6 +393,28 @@ export class DocsTier extends Semantier {
 			client.commit(req, onOk, this.errCtx);
 		}
 	}
+
+	/**
+	 * @param{string} mime
+	 * @param{object} rec
+	 * @param{object} classes
+	 * @param{string} iconpath
+	 * @return{React.fragment} <img/>
+	 */
+	static getMimeIcon(mime, rec, classes, iconpath) {
+		const known = { image: 'image.svg', '.txt': 'text.svg',
+				'.doc': 'docx.svg', '.docx': 'docx.svg', '.zip': '7zip.svg',
+				'.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
+		const unknown = 'unknown.svg';
+		iconpath = iconpath || '/res-vol/icons';
+
+		let src = regex.mime2type(mime);
+		if (src) src = known[src];
+		else src = unknown
+
+		return (<img className={classes.iconCell} src={`${iconpath}/${src}`}></img>);
+	}
+
 }
 
 export class DocsReq extends AnsonBody {
@@ -416,24 +430,20 @@ export class DocsReq extends AnsonBody {
 
 	static A = {
 		records: 'r/list',
+		mydocs: 'r/my-docs',
 		rec: 'r/rec',
 		upload: 'c',
 		del: 'd',
-
 		//preview: 'r/preview',
 	}
 
-	constructor (uri, args = {}) {
+	constructor(uri, args = {}) {
 		super();
 		this.type = DocsReq.type;
-		// this.uri = uri;
 		this.docId = args.docId;
 		this.docName = args.docName;
 		this.mime = args.mime;
 		this.uri64 = args.uri64;
-
-		/// case u
-		// this.pk = args.pk;
 
 		// case d
 		this.deletings = args.deletings;

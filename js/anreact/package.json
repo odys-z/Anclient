@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.2.6",
+  "version": "0.3.7",
   "description": "Anclient built on ReactJs.",
   "main": "./src/an-components.js",
   "directories": {
@@ -24,6 +24,7 @@
     "ag-grid-react": "^26.0.0",
     "core-js": "^3.17.1",
     "emotion": "^11.0.0",
+    "mime-types-no-nodejs": "^0.1.0",
     "qrcode": "^1.4.4",
     "react-elastic-carousel": "^0.11.5",
     "react-portal-overlay": "^1.1.0",

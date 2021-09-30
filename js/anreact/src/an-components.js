@@ -53,6 +53,8 @@ export const jsample = {
 };
 
 import { uarr2Base64, dataOfurl, mimeOf, urlOfdata } from './utils/file-utils';
+import { regex } from './utils/regex';
+
 export const utils = {
-	uarr2Base64, dataOfurl, mimeOf, urlOfdata
+	uarr2Base64, dataOfurl, mimeOf, urlOfdata, regex
 }

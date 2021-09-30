@@ -43,3 +43,7 @@ to run this example from source, it's needed to install React manually::
     npm install react react-dom react-router react-router-dom
     npm install @anclient/anreact @anclient/semantier
 ```
+
+# Issue
+
+1. emotion indicator root can not set as template ID (makes quiz sheet empty)

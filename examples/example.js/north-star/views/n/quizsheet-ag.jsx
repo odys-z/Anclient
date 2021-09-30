@@ -58,7 +58,7 @@ class QuizsheetComp extends React.Component {
 		this.state.crud = props.c ? Protocol.CRUD.c
 						: props.u ? Protocol.CRUD.u
 						: Protocol.CRUD.r;
-		// this.state.creating = props.creating;
+
 		this.state.quizId = props.quizId
 		if (props.u && !props.quizId) throw new Error("Semantics Error!");
 
@@ -66,7 +66,6 @@ class QuizsheetComp extends React.Component {
 
 		this.toSave = this.toSave.bind(this);
 		this.onCancel = this.onCancel.bind(this);
-		// this.onDirty = this.onDirty.bind(this);
 
 		this.toSave = this.toSave.bind(this);
 		this.toSetPollUsers = this.toSetPollUsers.bind(this);
@@ -81,7 +80,7 @@ class QuizsheetComp extends React.Component {
 	}
 
 	columns = [
-		{ field: 'title', label: 'Title', wrapText: true,
+		{ field: 'title', label: 'Title', wrapText: true, width: 180,
 		  cellEditor: 'agLargeTextCellEditor',
 		  cellEditorParams: {cols: 40, rows: 5},
 		  cellRenderer: anMultiRowRenderer,
@@ -105,14 +104,14 @@ class QuizsheetComp extends React.Component {
 		  }
 		},
 		{ field: 'qid', label: 'Type', hide: true },
-		{ field: 'answers', label: 'Options', width: 240, autoHeight: true,
+		{ field: 'answers', label: 'Options', width: 200, autoHeight: true,
 		  wrapText: true,
 		  cellEditor: 'agLargeTextCellEditor',
 		  cellEditorParams: {cols: 40, rows: 5},
 		  cellRenderer: anMultiRowRenderer,
 		},
-		{ field: 'weight', label: 'Weight', width: 90, editable: false },
-		{ field: 'expectings', label: 'Max Value', width: 140 },
+		{ field: 'weight', label: 'Weight', width: 80, editable: false },
+		{ field: 'expectings', label: 'Max Value', width: 120 },
 		{ field: 'question', label: 'Question', width: 500, autoHeight: true,
 		  wrapText: true,
 		  cellEditor: 'agLargeTextCellEditor',
@@ -136,7 +135,7 @@ class QuizsheetComp extends React.Component {
 		let qresp = new QuizResp(ansonResp.body);
 		let {quizId, quiz, questions} = qresp.quiz_questions();
 		let quizUsers = qresp.quizUserIds();
-		// console.log(quizUsers);
+
 		this.setState( {
 			questions: questions,
 			quiz,
@@ -144,9 +143,6 @@ class QuizsheetComp extends React.Component {
 			currentqx: -1,
 			dirty:   false
 		} );
-
-		// if (this.props.onDirty)
-		// 	this.props.onDirty(true);
 	}
 
 	onCancel(e) {
@@ -159,7 +155,7 @@ class QuizsheetComp extends React.Component {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={false} open
+				ok={L('OK')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
 		this.setStateHooked({});
@@ -169,9 +165,6 @@ class QuizsheetComp extends React.Component {
 		if (e && e.stopPropagation) e.stopPropagation();
 
 		let that = this;
-
-		// collect children's state - will be used in callback to update this component.
-		// that.quizHook.collect && that.quizHook.collect(that.state);
 
 		this.quizUserForm = (
 			<QuizUserForm uri={this.props.uri} crud={this.state.crud}
@@ -229,13 +222,13 @@ class QuizsheetComp extends React.Component {
 		usrs = usrs && (usrs.length > 0 || usrs.size > 0);
 
 		return (
-		  <Overlay open={true}
-			  	style={{
+		  <Overlay open={true} style={{
 					background: 'rgba(0, 0, 0, 0.3)',
 					alignItems: 'center', marginTop: 60,
 					justifyContent: 'center'}}>
 
 			<Box className={classes.formWrapper} >
+				{/*FIXME let's deprecate RecordForm */}
 				<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
 					stateHook={this.quizHook}
 					fields={[ { field: 'qid', label: '', hide: true },

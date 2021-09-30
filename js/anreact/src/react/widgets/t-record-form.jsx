@@ -101,7 +101,7 @@ class TRecordFormComp extends CrudCompW {
 					sk={f.sk} nv={ f.nv }
 					disabled={ !!f.disabled }
 					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(f) }
-					options={ f.options || []} val={rec[f.field] }
+					options={ f.options || []} val={{n: f.label, v:rec[f.field]} }
 					label={ f.label }
 					style={ f.cbbStyle || {width: 200} }
 					invalidStyle={ f.style }
