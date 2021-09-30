@@ -124,9 +124,9 @@ class QuizzesComp extends CrudCompW {
 	onTableSelect(rowIds) {
 		this.setState( {
 			buttons: {
-				add: this.state.buttons.add,
-				stop: rowIds && rowIds.size === 1,
-				del: rowIds &&  rowIds.size >= 1,
+				add : this.state.buttons.add,
+				stop: rowIds && rowIds.length === 1,
+				del : rowIds &&  rowIds.length >= 1,
 			},
 		} );
 	}
