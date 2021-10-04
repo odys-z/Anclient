@@ -112,6 +112,7 @@ class JQuiz {
 		return this.serv(quiz_a.list, conds, onLoad, this.err);
 	}
 
+	// should only used by react-quiz locally now
 	insert(quiz, onOk) {
 		let that = this;
 		let date = new Date();

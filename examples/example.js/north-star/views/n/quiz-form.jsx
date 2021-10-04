@@ -31,6 +31,9 @@ class QuizFormComp extends DetailFormW {
 
 	constructor (props) {
 		super(props);
+
+		console.error("Won't work! Quiz form & editor is deprecated (by QuizsheetComp)...");
+
 		this.editorHook = {state: undefined};
 
 		this.state.crud = props.c ? Protocol.CRUD.c
@@ -81,7 +84,7 @@ class QuizFormComp extends DetailFormW {
 		this.setState.questions = state.questions;
 
 		if ( that.state.crud === Protocol.CRUD.c ) {
-			this.jquiz.insert(this.props.uri, state,
+			this.jquiz.insertQuiz(this.props.uri, state,
 				(resp) => {
 					let {quizId, title} = JQuiz.parseResp(resp);
 					if (isEmpty(quizId))
