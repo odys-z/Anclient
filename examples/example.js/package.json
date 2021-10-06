@@ -44,6 +44,7 @@
     "core-js": "^3.17.2",
     "d3": "^7.0.1",
     "material-design-icons-iconfont": "^6.1.0",
+    "mime-types-no-nodejs": "^0.9.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-portal-overlay": "^1.1.0",
