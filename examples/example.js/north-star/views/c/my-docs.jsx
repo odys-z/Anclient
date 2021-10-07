@@ -125,6 +125,7 @@ class MyDocsComp extends CrudCompW {
 
 	closeDetails() {
 		this.recForm = undefined;
+		this.tier.resetFormSession();
 		this.setState({});
 	}
 
