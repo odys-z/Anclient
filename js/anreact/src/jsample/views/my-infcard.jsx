@@ -126,6 +126,7 @@ const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 export { MyInfCard, MyInfCardComp };
 
 export class MyInfTier extends Semantier {
+	rec = {};
 
 	// uri = undefined;
 	imgProp = 'img';
@@ -153,14 +154,14 @@ export class MyInfTier extends Semantier {
 	 * Format an image upload component.
 	 * @param {object} record for the form
 	 * @param {object} field difinetion, e.g. field of tier._fileds
-	 * @param {Semantier} tier
+	 * @param {Semantier} tier not necessarily this class's object - this method will be moved
 	 * @return {React.component} ImageUpload
 	 */
 	loadAvatar(rec, field, tier) {
 		return (
 			<ImageUpload
 				blankIcon={{color: "primary", width: 32, height: 32}}
-				tier={this} field={field}
+				tier={tier} field={field}
 				src64={rec && field && rec[field.field]}
 			/>);
 	}

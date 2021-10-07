@@ -1,5 +1,5 @@
-Formatters
-==========
+Formatters (AnReact)
+====================
 
 TRecordForm Formatter
 ---------------------
@@ -15,9 +15,13 @@ TRecordForm Formatter
 
 .. code-block:: javascript
 
-    function() {
-
-	}
+    /**
+     * @param {object} record
+     * @param {object} fields information
+	 * @param {Semantier} tier
+     * @return {React.Component}
+     */
+    function(record, field, tier);
 ..
 
 - example
@@ -27,7 +31,7 @@ TRecordForm Formatter
 	/**
 	 * Format an image upload component.
 	 * @param {object} record for the form
-	 * @param {object} field difinetion, e.g. field of tier._fileds
+	 * @param {object} field definition, e.g. a field of tier._fileds
 	 * @param {Semantier} tier
 	 * @return {React.component} ImageUpload
 	 */
@@ -35,7 +39,7 @@ TRecordForm Formatter
 		return (
 			<ImageUpload
 				blankIcon={{color: "primary", width: 32, height: 32}}
-				tier={this} field={field}
+				tier={tier} field={field}
 				src64={rec && field && rec[field.field]}
 			/>);
 	}

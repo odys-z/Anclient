@@ -78,9 +78,9 @@ class MyPswdComp extends React.Component {
 	}
 
 	changePswd(e) {
-		if (!this.tier.changePswd({uri: this.props.uri}, (resp) => {
-			that.showConfirm(L('Password changed successfully!'));
-		})) {
+		let that = this;
+		if (!this.tier.changePswd({uri: this.props.uri},
+			(resp) => { that.showConfirm(L('Password changed successfully!')); })) {
 			this.setState({});
 		}
 	}
@@ -108,6 +108,8 @@ export { MyPswd, MyPswdComp }
 class PswdTier extends MyInfTier {
 
 	// uri = undefined;
+	rec = undefined;
+	rows = undefined;
 
 	constructor(comp) {
 		super(comp);
@@ -120,17 +122,14 @@ class PswdTier extends MyInfTier {
 		{ field: 'userId',   type: 'text',  label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
 		{ field: 'userName', type: 'text',  label: L('Name'),   grid: {sm: 6, lg: 4}, disabled: true },
 		{ field: 'pswd',  type: 'password', label: L('Old Password'), grid: {md: 6, lg: 4},
-		  autocomplete: "on" },
+		  autocomplete: "on",
+		  validator: {notNull: true} },
 		{ field: 'pswd1', type: 'password', label: L('New Password'), grid: {md: 6, lg: 4},
 		  autocomplete: "on",
-		  validator: {len: 16, notNull: true} },
+		  validator: {notNull: true} },
 		{ field: 'pswd2', type: 'password', label: L('Confirm New'),  grid: {md: 6, lg: 4},
 		  autocomplete: "on",
 		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ];
-
-	// fields() {
-	// 	return this._cols;
-	// }
 
 	changePswd(opts, onOk) {
 		if (!this.client) return;

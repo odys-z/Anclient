@@ -286,7 +286,7 @@ class SysComp extends React.Component {
 										that.setState( {welcome: false} );
 								} } >
 							<ListItemIcon>{icon(menu.css)}</ListItemIcon>
-							<ListItemText primary={menu.funcName} />
+							<ListItemText primary={L(menu.funcName)} />
 							</ListItem>
 						</Link>
 					</div> : '');
@@ -410,7 +410,7 @@ SysComp.extendLinks([
 	{path: '/views/sys/org/orgs.html', comp: Orgs},
 	{path: '/views/sys/org/users.html', comp: Users},
 	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
-	{path: '/views/sys/user/users-1.1.html', comp: Users},
+	{path: '/v2/users-v2.0', comp: Users},
 	{path: '/sys/error', comp: Error}
 ]);
 

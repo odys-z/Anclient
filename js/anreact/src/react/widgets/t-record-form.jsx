@@ -113,10 +113,10 @@ class TRecordFormComp extends CrudCompW {
 				/>);
 		}
 		else if (f.type === 'formatter' || f.formatter) {
-			console.log(f.formatter, f.formatter.prototypel);
-			debugger
+			if (f.formatter.length != 3)
+				console.warn('TRecordFormComp need formatter with signature of f(record, field, tier).', f.formatter)
 			return (
-				<>{f.formatter(rec, f)}</>
+				<>{f.formatter(rec, f, this.props.tier)}</>
 			);
 		}
 		else {
