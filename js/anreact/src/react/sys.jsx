@@ -267,7 +267,7 @@ class SysComp extends React.Component {
 				  <div key={menu.funcId}>
 					<ListItem button onClick={expandItem} iid={menu.funcId}>
 						<ListItemIcon>{icon(menu.css)}</ListItemIcon>
-						<ListItemText primary={menu.funcName} />
+						<ListItemText primary={L(menu.funcName)} />
 						{ open ? icon('expand') : icon('collapse') }
 					</ListItem>
 					<Collapse in={open} timeout="auto" unmountOnExit>
@@ -334,7 +334,7 @@ class SysComp extends React.Component {
 					>
 					<Menu />
 					</IconButton>
-					<Typography variant="h5" noWrap >{this.state.sysName}</Typography>
+					<Typography variant="h5" noWrap >{L(this.state.sysName)}</Typography>
 				</Box>
 				</Grid>
 

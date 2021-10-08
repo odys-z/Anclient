@@ -159,7 +159,7 @@ class App extends React.Component {
 				error: this.state.error,
 			}} >
 				<Sys menu='sys.menu.jsample'
-					sys='AnReact' menuTitle='Sys Menu'
+					sys='ERI Alpha' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}

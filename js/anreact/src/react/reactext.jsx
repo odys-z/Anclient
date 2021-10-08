@@ -56,7 +56,7 @@ export class AnError extends React.Component {
 			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
 					open={!!ctx.hasError} onClose={this.state.props.onClose}
 					fullScreen={this.state.props.fullScreen}
-					msg={ctx.error.msg} />
+					msg={L(ctx.error.msg)} />
 		);
 	}
 }

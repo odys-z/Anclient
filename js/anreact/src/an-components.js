@@ -32,7 +32,7 @@ export * from './react/widgets/simple-form';
 export * from './react/widgets/t-record-form';
 export * from './react/widgets/relation-tree';
 
-import { JsampleIcons, JsampleTheme } from './jsample/styles';
+import { JsampleIcons, JsampleTheme, jstyles } from './jsample/styles';
 import { Domain, DomainComp } from './jsample/views/domain';
 import { Orgs, OrgsComp } from './jsample/views/orgs';
 import { Roles, RolesComp } from './jsample/views/roles';
@@ -44,7 +44,7 @@ import { MyInfCard, MyInfCardComp } from './jsample/views/my-infcard';
 import { MyPswd, MyPswdComp } from './jsample/views/my-pswdcard';
 
 export const jsample = {
-	JsampleIcons, JsampleTheme,
+	JsampleIcons, JsampleTheme, jstyles,
 	Domain, DomainComp, Orgs, OrgsComp,
 	Roles, RolesComp, RoleDetails, RoleDetailsComp,
 	MyInfCard, MyInfCardComp,

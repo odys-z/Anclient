@@ -168,7 +168,7 @@ class DocsharesComp extends CrudCompW {
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			{this.props.funcName || this.props.title || 'Documents Sharing'}
+			{L(this.props.funcName || this.props.title || 'Documents Sharing')}
 
 			<DocsQuery uri={this.uri} onQuery={this.toSearch} />
 
