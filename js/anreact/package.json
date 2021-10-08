@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "Anclient built on ReactJs.",
   "main": "./src/an-components.js",
   "directories": {
