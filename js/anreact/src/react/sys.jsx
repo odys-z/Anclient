@@ -383,14 +383,15 @@ class SysComp extends React.Component {
 						</Paper>
 						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
 							<School color='primary'/>
-							<Box component='span' display='inline'>External Link:
-								<Link style={{ marginLeft: 4 }}  href="https://odys-z.github.io/Anclient" >AnReact Docs</Link>
+							<Box component='span' display='inline'>Documents:
+								<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
+									{`${this.state.sysName} user menu`}</Link>
 							</Box>
 						</Paper>
 					</Card> :
 					<div className="content">
-					{this.route()}
-				</div>}
+						{this.route()}
+					</div>}
 			  </main>
 			</Router>
 
