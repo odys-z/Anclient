@@ -34,7 +34,7 @@ class MyPollsComp extends CrudCompW {
 					sqlArgs: undefined, //['pollee-id', 'pollee-role', 'issuer-role'],
 					options: [ AnConst.cbbAllItem ],
 					label: L('Issuers') },
-		condWait: { type: 'switch', val: true, label: L('Only Waiting') },
+		condWait: { type: 'switch', val: true, label: L('Has waitings') },
 
 		selected: {Ids: new Set()},
 		waitingPollIds: new Set(),

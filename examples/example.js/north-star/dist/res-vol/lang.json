@@ -1,11 +1,11 @@
 { "using": "zh",
   "zh": {
-	"OK": "确定",
-	"info": "提示信息",
+    "OK": "确定",
+    "info": "提示信息",
     "Info": "提示信息",
     "Error": "错误信息",
     "error": "错误",
-	"ALL": "全部",
+    "ALL": "全部",
     "Logout": "退出登录",
     "Domain ID": "码表 ID",
     "Domain Name": "码表项",
@@ -54,11 +54,15 @@
     "My Polls": "问卷任务",
     "My Docs": "共享文档",
 
-	"Weight": "权重",
-	"Question Type": "题型",
-	"Indicator": "指标项",
+    "Weight": "权重",
+    "Question Type": "题型",
+    "Indicator": "指标项",
 
-	"Documents Sharing": "分享我的文档",
-	"Shared Documents": "已共享文档"
+    "Documents Sharing": "分享我的文档",
+    "Shared Documents": "已共享文档",
+
+    "with polls to do": "有未完成问卷",
+    "Take Poll": "填写问卷",
+    "Has waitings": "有未完成问卷"
   }
 }

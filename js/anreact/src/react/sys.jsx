@@ -140,6 +140,9 @@ const styles = theme => ({
 			margin: 24,
 		},
 	},
+	cardText: {
+		fontSize: 18,
+	}
 });
 
 /**
@@ -207,7 +210,8 @@ class SysComp extends React.Component {
 			}, this.context.error );
 	}
 
-	showMenu() {
+	showMenu(e) {
+		if (e) e.stopPropagation();
 		this.setState({ showMenu: true });
 	}
 
@@ -377,15 +381,20 @@ class SysComp extends React.Component {
 				{this.state.welcome ?
 					<Card >
 						<Typography gutterBottom variant='h4'>Welcome!</Typography>
-						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
-							<Menu color='primary'/>
-							<Box component='span' display='inline'>Please click menu to start.</Box>
+						<Paper elevation={4} style={{ margin: 24 }}
+								className={classes.welcome}>
+								<IconButton onClick={this.showMenu} >
+									<Menu color='primary'/>
+									<Box component='span' display='inline' className={classes.cardText} >
+										Please click menu to start.
+									</Box>
+								</IconButton>
 						</Paper>
 						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
 							<School color='primary'/>
 							<Box component='span' display='inline'>Documents:
 								<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
-									{`${this.state.sysName} user menu`}</Link>
+									{`${this.state.sysName}`}</Link>
 							</Box>
 						</Paper>
 					</Card> :
