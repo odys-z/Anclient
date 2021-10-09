@@ -1,11 +1,12 @@
 
 # About
 
-Clients of semantic-\*. Including a Java and Javascript version. The C# version is in intensive development.
+Clients of semantic-\*. Including a Java and Javascript version. The C# version
+also verified.
 
 # Repository Structure
 
-This repository has multiple clients, all of which can work independently.
+This repository has multiple clients, it's planed all can work independently.
 
 With the protocol based on json, we are planning to implement the clients:
 
@@ -41,7 +42,7 @@ js client API depending on jquery. The test project is using React.
 
  -- North Star
 
-    Example using Anclient + React. (No npm package avialable, see branch issue-13991 readme)
+    Example using Anclient + React. 
 
 - example.cs
 
