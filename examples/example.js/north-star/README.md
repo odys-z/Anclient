@@ -43,7 +43,15 @@ to run this example from source, it's needed to install React manually::
     npm install react react-dom react-router react-router-dom
     npm install @anclient/anreact @anclient/semantier
 ```
+# Release Log
 
-# Issue
+- v0.5
 
-1. emotion indicator root can not set as template ID (makes quiz sheet empty)
+    docker image:
+
+```
+	odysz/connect-polestar:0.5
+	odysz/emr-web:0.5
+```
+
+Volume north.sqlite can be found in Polestar.
