@@ -3,13 +3,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { SessionClient } from '@anclient/semantier'
-import { AnContext, AnError, AnReact, Login } from '@anclient/anreact';
+import { L, Langstrs, AnContext, AnError, AnReact, Login, jsample } from '@anclient/anreact';
 
-const styles = (theme) => ({
-	root: {
+const styles = (theme) => (Object.assign(
+  jsample.styles(theme),
+  { root: {
 	    '& *': { margin: theme.spacing(1) }
-	},
-});
+	  },
+  })
+);
 
 /** The application main, context singleton and error handler, but only for login
  * used in iframe (no origin change). */
@@ -60,9 +62,6 @@ class LoginApp extends React.Component {
 				servs: this.props.servs,
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
-				// FIXME why Login.context.iparent == undefined?
-				// iparent: this.props.iparent,
-				// ihome: this.props.ihome || 'index.html',
 				error: {onError: this.onError, msg: this.state.err},
 			}} >
 				<Login onLoginOk={this.onLogin}/>
@@ -84,6 +83,7 @@ class LoginApp extends React.Component {
 	 * @param {Window} [opts.parent=undefined] parent window if for redirecting target
 	 */
 	static bindHtml(elem, opts = {}) {
+		Langstrs.load('/res-vol/lang.json');
 		AnReact.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, opts, json) {

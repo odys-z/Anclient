@@ -8,7 +8,7 @@ import { Protocol, UserReq } from '@anclient/semantier';
 import {
     L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablistLevelUp, DatasetCombo, ConfirmDialog, jsample
+	AnQueryForm, AnTablist, DatasetCombo, ConfirmDialog, jsample
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
@@ -124,9 +124,9 @@ class QuizzesComp extends CrudCompW {
 	onTableSelect(rowIds) {
 		this.setState( {
 			buttons: {
-				add: this.state.buttons.add,
-				stop: rowIds && rowIds.size === 1,
-				del: rowIds &&  rowIds.size >= 1,
+				add : this.state.buttons.add,
+				stop: rowIds && rowIds.length === 1,
+				del : rowIds &&  rowIds.length >= 1,
 			},
 		} );
 	}
@@ -262,7 +262,7 @@ class QuizzesComp extends CrudCompW {
 				>{L('Delete')}</Button>
 			</Grid>
 
-			<AnTablistLevelUp
+			<AnTablist
 				selectedIds={this.state.selected}
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[

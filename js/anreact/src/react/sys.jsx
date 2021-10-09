@@ -267,7 +267,7 @@ class SysComp extends React.Component {
 				  <div key={menu.funcId}>
 					<ListItem button onClick={expandItem} iid={menu.funcId}>
 						<ListItemIcon>{icon(menu.css)}</ListItemIcon>
-						<ListItemText primary={menu.funcName} />
+						<ListItemText primary={L(menu.funcName)} />
 						{ open ? icon('expand') : icon('collapse') }
 					</ListItem>
 					<Collapse in={open} timeout="auto" unmountOnExit>
@@ -286,7 +286,7 @@ class SysComp extends React.Component {
 										that.setState( {welcome: false} );
 								} } >
 							<ListItemIcon>{icon(menu.css)}</ListItemIcon>
-							<ListItemText primary={menu.funcName} />
+							<ListItemText primary={L(menu.funcName)} />
 							</ListItem>
 						</Link>
 					</div> : '');
@@ -334,7 +334,7 @@ class SysComp extends React.Component {
 					>
 					<Menu />
 					</IconButton>
-					<Typography variant="h5" noWrap >{this.state.sysName}</Typography>
+					<Typography variant="h5" noWrap >{L(this.state.sysName)}</Typography>
 				</Box>
 				</Grid>
 
@@ -383,14 +383,15 @@ class SysComp extends React.Component {
 						</Paper>
 						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
 							<School color='primary'/>
-							<Box component='span' display='inline'>External Link:
-								<Link style={{ marginLeft: 4 }}  href="https://odys-z.github.io/Anclient" >AnReact Docs</Link>
+							<Box component='span' display='inline'>Documents:
+								<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
+									{`${this.state.sysName} user menu`}</Link>
 							</Box>
 						</Paper>
 					</Card> :
 					<div className="content">
-					{this.route()}
-				</div>}
+						{this.route()}
+					</div>}
 			  </main>
 			</Router>
 
@@ -410,7 +411,7 @@ SysComp.extendLinks([
 	{path: '/views/sys/org/orgs.html', comp: Orgs},
 	{path: '/views/sys/org/users.html', comp: Users},
 	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
-	{path: '/views/sys/user/users-1.1.html', comp: Users},
+	{path: '/v2/users-v2.0', comp: Users},
 	{path: '/sys/error', comp: Error}
 ]);
 

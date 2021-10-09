@@ -126,6 +126,7 @@ const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 export { MyInfCard, MyInfCardComp };
 
 export class MyInfTier extends Semantier {
+	rec = {};
 
 	// uri = undefined;
 	imgProp = 'img';
@@ -149,35 +150,21 @@ export class MyInfTier extends Semantier {
 		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: this.loadAvatar }
 	];
 
-	loadAvatar(rec, field) {
+	/**
+	 * Format an image upload component.
+	 * @param {object} record for the form
+	 * @param {object} field difinetion, e.g. field of tier._fileds
+	 * @param {Semantier} tier not necessarily this class's object - this method will be moved
+	 * @return {React.component} ImageUpload
+	 */
+	loadAvatar(rec, field, tier) {
 		return (
 			<ImageUpload
 				blankIcon={{color: "primary", width: 32, height: 32}}
-				tier={this} field={field}
+				tier={tier} field={field}
 				src64={rec && field && rec[field.field]}
 			/>);
 	}
-
-	// columns() {
-	// 	let that = this;
-	// 	return [
-	// 		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-	// 		{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
-	// 		{ field: 'roleId',   label: L('Role'), disabled: true,
-	// 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
-	// 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-	// 		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: loadAvatar } // use loadAvatar for default
-	// 	];
-	//
-	// 	function loadAvatar(rec, field) {
-	// 		return (
-	// 			<ImageUpload
-	// 				blankIcon={{color: "primary", width: 32, height: 32}}
-	// 				tier={that} field={field}
-	// 				src64={rec && field && rec[field.field]}
-	// 			/>);
-	// 	}
-	// }
 
 	record(conds, onLoad) {
 		let { userId } = conds;

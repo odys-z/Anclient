@@ -125,6 +125,7 @@ class MyDocsComp extends CrudCompW {
 
 	closeDetails() {
 		this.recForm = undefined;
+		this.tier.resetFormSession();
 		this.setState({});
 	}
 
@@ -134,7 +135,7 @@ class MyDocsComp extends CrudCompW {
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			{this.props.funcName || this.props.title || 'Shared Documents'}
+			{L(this.props.funcName || this.props.title || 'Shared Documents')}
 
 			<DocsQuery uri={this.uri} onQuery={this.toSearch} />
 

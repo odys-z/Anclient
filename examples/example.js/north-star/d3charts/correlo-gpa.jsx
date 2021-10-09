@@ -102,7 +102,7 @@ class CorreloGPAComp extends React.Component {
 		// Build color scale
 		const myColor = d3.scaleLinear()
 		  .range(["red", "#69b3a2"])
-		  .domain([1, maxv])
+		  .domain([0, maxv])
 
 		const myBgColor = d3.scaleLinear()
 		  .range(["#770000aa", "#69b3a233"])
@@ -184,7 +184,7 @@ class CorreloGPAComp extends React.Component {
 		// const myVars = ["Alice", "Bob", "Coral", "Doracy", "Emilly", "Franchies", "George", "Helen", "Issac", "James"];
 		const myVars = data.map( d => d[1] );
 
-		// Build X scales and axis:
+		// Build x scales and axis:
 		const x = d3.scaleBand()
 		  .range([ 0, width ])
 		  .domain(myGroups)
@@ -193,7 +193,7 @@ class CorreloGPAComp extends React.Component {
 		  .attr("transform", `translate(0, ${height})`)
 		  .call(d3.axisBottom(x))
 
-		// Build X scales and axis:
+		// Build y scales and axis:
 		const y = d3.scaleBand()
 		  .range([ height, 0 ])
 		  .domain(myVars)
@@ -212,7 +212,7 @@ class CorreloGPAComp extends React.Component {
 		// Build color scale
 		const myColor = d3.scaleLinear()
 		  .range(["red", "#69b3a2"])
-		  .domain([1, maxv])
+		  .domain([0, maxv])
 
 		const myBgColor = d3.scaleLinear()
 		  .range(["#770000aa", "#69b3a233"])

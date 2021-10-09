@@ -87,8 +87,6 @@ class UserstComp extends CrudCompW {
 			buttons: {
 				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				// edit: rowIds && rowIds.size === 1,
-				// del: rowIds &&  rowIds.size >= 1,
 				edit: rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,
 			},
@@ -149,6 +147,7 @@ class UserstComp extends CrudCompW {
 
 	closeDetails() {
 		this.recForm = undefined;
+		this.tier.resetFormSession();
 		this.setState({});
 	}
 

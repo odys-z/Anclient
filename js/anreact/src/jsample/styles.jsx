@@ -79,12 +79,13 @@ export const JsampleTheme = responsiveFontSizes(createTheme({
         xl: 1920
       }
     },
-    // tip: {
-    //     color: '#0c0'
-    // }
-
 }));
 
 JsampleTheme.typography.body2 = {
   fontSize: 16,
 };
+
+export const jstyles = (theme) => ({
+	"field1": { width: 80 },
+	"field2": { width: 120 }
+});

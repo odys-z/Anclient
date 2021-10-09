@@ -163,6 +163,7 @@ class RolesComp extends CrudCompW {
 
 	closeDetails() {
 		this.roleForm = undefined;
+		this.tier.resetFormSession();
 		this.setState({});
 	}
 
