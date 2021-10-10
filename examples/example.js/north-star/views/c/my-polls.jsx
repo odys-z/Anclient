@@ -11,14 +11,17 @@ import {
 	AnQueryForm, AnTablist
 } from '@anclient/anreact';
 
+import { starTheme } from '../../common/star-theme';
 import { CenterProtocol } from '../../common/protocol.quiz';
 import { myMsgFromIssuer } from '../../common/mui-helpers';
 import { CarouselQuiz } from './carousel-quiz';
 
-const styles = (theme) => ( {
-	root: {
-	}
-} );
+const styles = (theme) => Object.assign(starTheme(theme),
+	(theme) => ( {
+		root: {
+		}
+	} )
+);
 
 /**
  * This component uses children's level upped state to collect question cards' data.
@@ -121,8 +124,8 @@ class MyPollsComp extends CrudCompW {
 				}} }
 			/>}
 
-			<Typography color='secondary' >
-				{ tasks > 0 ? L('Your have {tasks} {quiz} to finish.',
+			<Typography color='secondary' className={classes.smalltip}>
+				{ tasks > 0 ? L('Your have {tasks} {quiz} to complete.',
 								{tasks, quiz: tasks > 1 ? 'quizzes' : 'quiz'})
 				  : ""}
 			</Typography>

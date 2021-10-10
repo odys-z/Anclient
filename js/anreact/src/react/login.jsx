@@ -76,10 +76,9 @@ class LoginComp extends React.Component {
 	 */
 	onLogin() {
 		let that = this;
-		console.log(that.context);
+		// console.log(that.context);
 		let uid = this.state.userid;
 		let pwd = this.state.pswd;
-		// let _an = an;
 		if (!uid || !pwd) {
 			this.alert();
 			return;
@@ -140,6 +139,7 @@ class LoginComp extends React.Component {
 	}
 
 	render() {
+		let that = this;
 		const { classes } = this.props;
 		return (<div className={classes.root}>
 			<Box display={!this.state.show ? "flex" : "none"}>
@@ -151,6 +151,7 @@ class LoginComp extends React.Component {
 			</Box>
 			<Collapse in={this.state.show} timeout="auto" >
 				<TextField className={classes.field2}
+					autoFocus
 					required id="userid" label={L("User Id")}
 					autoComplete="username"
 					defaultValue={this.state.userid}
@@ -159,6 +160,7 @@ class LoginComp extends React.Component {
 					id="pswd" label={L("Password")}
 					type="password" value={this.state.pswd}
 					autoComplete="new-password"
+					onKeyUp={(e, v) => {if (e.code === "Enter") that.onLogin();} }
 					onChange={event => this.setState({pswd: event.target.value})} />
 				<Button className={classes.field2}
 					variant="contained"

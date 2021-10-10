@@ -57,12 +57,14 @@
     "Weight": "权重",
     "Question Type": "题型",
     "Indicator": "指标项",
+    "Todos": "任务项",
 
     "Documents Sharing": "分享我的文档",
     "Shared Documents": "已共享文档",
 
     "with polls to do": "有未完成问卷",
     "Take Poll": "填写问卷",
-    "Has waitings": "有未完成问卷"
+    "Has waitings": "有未完成问卷",
+	"Your have {tasks} {quiz} to complete.": "有{tasks}项未完成问卷."
   }
 }
