@@ -63,25 +63,6 @@ class UserDetailstComp extends DetailFormW {
 		record: {},
 	};
 
-	// NOTE
-	// DESGIN MEMO: Users use this to customize the css & items to be visualized.
-	// Actually field's type, validator should be semantics.
-	// recfields = [
-	// 	{ type: 'text', field: 'userId', label: L('Log ID'),
-	// 	  validator: {len: 12, notNull: true} },
-	// 	{ type: 'text', field: 'userName', label: L('User Name') },
-	// 	{ type: 'password', field: 'pswd', label: L('Password'),
-	// 	  validator: {notNull: true} },
-	// 	{ type: 'cbb', field: 'roleId', label: L('Role'),
-	// 	  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
-	// 	  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
-	// 	  validator: {notNull: true} },
-	// 	{ type: 'cbb', field: 'orgId', label: L('Organization'),
-	// 	  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
-	// 	  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
-	// 	  validator: {notNull: true} },
-	// ];
-
 	constructor (props = {}) {
 		super(props);
 
@@ -95,14 +76,6 @@ class UserDetailstComp extends DetailFormW {
 	}
 
 	componentDidMount() {
-		// if (this.tier.pkval) {
-		// 	let that = this;
-		// 	let cond = {};
-		// 	cond[this.tier.pk] = this.tier.pkval;
-		// 	this.tier.record(cond, (cols, rows, fkOpts) => {
-		// 		that.setState({record: rows[0]});
-		// 	} );
-		// }
 	}
 
 	toSave(e) {

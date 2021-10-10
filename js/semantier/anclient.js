@@ -473,9 +473,8 @@ class SessionClient {
 		var iv_new = aes.getIv128();
 		var iv_old = aes.getIv128();
 
-		// var tk = aes.encrypt(usrId, pswd, iv_tok);
 		var tk = this.ssInf.ssid;
-		var key = this.ssInf.ssid; // FIXME
+		var key = this.ssInf.ssid;
 
 		var newPswd = aes.encrypt(newPswd, key, iv_new);
 		var oldPswd = aes.encrypt(oldPswd, key, iv_old);
@@ -499,6 +498,18 @@ class SessionClient {
 
 		this.an.post(jmsg, opts.onOk, opts.onError);
 		return this;
+	}
+
+	/**Encrypt text with ssInf token - the client side for de-encrypt semantics
+	 * @param {string} plain plain text
+	 * @return {object} {cipher, iv}
+	 */
+	encryptoken(plain) {
+		let key = this.ssInf.ssid;
+		let iv = aes.getIv128();
+		let cipher = aes.encrypt(plain, key, iv);
+		iv = aes.bytesToB64(iv);
+		return {cipher, iv}
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
