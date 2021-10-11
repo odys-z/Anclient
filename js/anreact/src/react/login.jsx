@@ -12,12 +12,12 @@ import React from 'react';
 import { Protocol } from '@anclient/semantier';
 
 import { an, SessionClient } from '@anclient/semantier';
-	// import {Protocol} from '../../semantier/protocol'
 	import {AnContext} from './reactext.jsx';
 	import {ConfirmDialog} from './widgets/messagebox'
-	import {L, Langstrs} from '../utils/langstr.js'
+	import {L, Langstrs} from '../utils/langstr'
+	import {jstyles} from '../jsample/styles'
 
-const styles = (theme) => ({
+const styles = (theme) => Object.assign(jstyles(theme), {
 	root: {
 	    '& *': { margin: theme.spacing(1) }
 	},
@@ -30,6 +30,7 @@ const styles = (theme) => ({
 class LoginComp extends React.Component {
     state = {
 		loggedin: false,
+		show: true,  // show textarear or only "login"
 		pswd: '123456',
 		userid: 'admin',
 
@@ -56,10 +57,8 @@ class LoginComp extends React.Component {
 		this.onLogin = this.onLogin.bind(this);
 	}
 
-	// componentDidMount() {
-	// 	this.configServ(this.context);
-	// 	return this;
-	// }
+	componentDidMount() {
+	}
 
 	alert() {
 		this.setState({
@@ -77,10 +76,9 @@ class LoginComp extends React.Component {
 	 */
 	onLogin() {
 		let that = this;
-		console.log(that.context);
+		// console.log(that.context);
 		let uid = this.state.userid;
 		let pwd = this.state.pswd;
-		// let _an = an;
 		if (!uid || !pwd) {
 			this.alert();
 			return;
@@ -90,7 +88,7 @@ class LoginComp extends React.Component {
 			let serv = this.context.servId || 'host';
 			let hosturl = this.context.servs[serv];
 			console.log("login url & serv-id: ", hosturl, serv);
-			
+
 			an.init(hosturl);
 			an.login( uid, pwd, reload, onError );
 		}
@@ -141,6 +139,7 @@ class LoginComp extends React.Component {
 	}
 
 	render() {
+		let that = this;
 		const { classes } = this.props;
 		return (<div className={classes.root}>
 			<Box display={!this.state.show ? "flex" : "none"}>
@@ -151,17 +150,19 @@ class LoginComp extends React.Component {
 				</Button>
 			</Box>
 			<Collapse in={this.state.show} timeout="auto" >
-				<TextField
+				<TextField className={classes.field2}
+					autoFocus
 					required id="userid" label={L("User Id")}
 					autoComplete="username"
 					defaultValue={this.state.userid}
 					onChange={event => this.setState({userid: event.target.value})} />
-				<TextField
+				<TextField className={classes.field2}
 					id="pswd" label={L("Password")}
 					type="password" value={this.state.pswd}
 					autoComplete="new-password"
+					onKeyUp={(e, v) => {if (e.code === "Enter") that.onLogin();} }
 					onChange={event => this.setState({pswd: event.target.value})} />
-				<Button
+				<Button className={classes.field2}
 					variant="contained"
 					color="primary"
 					onClick={this.onLogin} >{L('Login')}</Button>

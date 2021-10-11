@@ -165,13 +165,13 @@ class JQuiz {
 		return this.serv(uri, QuizProtocol.A.list, conds, onLoad, errCtx);
 	}
 
-	/**
+	/**Insert a quiz (deprecated?)
 	 * @param {string} uri
 	 * @param {object} hooked { quiz: {qtitle, tags, subject, quizinf}, questions, quizUsers }
 	 * @param {function} onOk
 	 * @param {AnContext.error} errCtx
 	 */
-	insert(uri, hooked, onOk, errCtx) {
+	insertQuiz(uri, hooked, onOk, errCtx) {
 		let that = this;
 		let {quiz, questions, quizUsers} = hooked;
 		let date = new Date();

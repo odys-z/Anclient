@@ -27,8 +27,16 @@ const styles = theme => ({
 	// 	backgroundColor: "linen"
 	// }
   },
+  dialogTitle: {
+    backgroundColor: "#fafbff",
+    border: "solid 1px #f5f5ff",
+    textShadow: "4px 4px 7px #688a8a"
+  },
   centerbox: {
 	  "justify-content": "center"
+  },
+  dlgAct: {
+    borderTop: "solid 2px #f5f5ff",
   }
 });
 
@@ -64,7 +72,7 @@ class ConfirmDialogComp extends React.Component {
 
 		return lines.map( (l, x) => (
 		  <DialogContentText id="alert-dialog-description" key={x}>
-		    {l}
+		    {L(l)}
 		  </DialogContentText>
 		));
 	}
@@ -83,31 +91,36 @@ class ConfirmDialogComp extends React.Component {
 
 		const { classes } = this.props;
 
-		return (
+		let full = this.props.fullScreen || this.props.fullWidth;
+
+		// if (full)
+		  return (
 			<Dialog className={classes.root}
 				open={open}
-				fullScreen={!!this.props.fullScreen}
+				fullScreen={full}
+				fullWidth={!full}
+				maxWidth={!full ? 'xs' : undefined}
 				onClose={this.handleClose}
 				aria-labelledby="alert-dialog-title"
 				aria-describedby="alert-dialog-description" >
 
-				<DialogTitle id="alert-dialog-title">
-				  {title}</DialogTitle>
+				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle} >
+				  {L(title)}</DialogTitle>
 				<DialogContent>
 					{txtLines}
 				</DialogContent>
-				<DialogActions>
+				<DialogActions className={classes.dlgAct}>
 				  <Button onClick={this.toOk} color="primary" autoFocus={displayCancel === 'none'} >
-						{txtOk}
+						{L(txtOk)}
 				  </Button>
 				  <Box display={displayCancel}>
 					<Button onClick={this.toCancel} color="primary" autoFocus >
-						{txtCancel}
+						{L(txtCancel)}
 					</Button>
 				  </Box>
 				</DialogActions>
 			</Dialog>
-		);
+		  );
 	}
 }
 const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);

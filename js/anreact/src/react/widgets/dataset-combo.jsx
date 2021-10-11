@@ -99,19 +99,23 @@ class DatasetComboComp extends React.Component {
 			this.state.selectedItem = selectedItem;
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
-		return (<Autocomplete
+		// avoid set defaultValue before loaded
+		return (
+		  this.props.sk && !cmb.options ? <></> :
+		  <Autocomplete
 			ref={this.refcbb}
 			disabled={this.props.disabled || this.props.readonly || this.props.readOnly}
-			defaultValue={this.props.val}
+			// defaultValue={this.props.val}
+			value={v}
 			onChange={ this.onCbbRefChange() }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
 			options={cmb.options}
-			style={ this.props.style }
+			style={this.props.style}
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
-			filter={ Autocomplete.caseInsensitiveFilter }
+			filter={Autocomplete.caseInsensitiveFilter}
 			renderInput={
 				(params) => <TextField {...params}
 					label={this.props.showLable && v ? v.n : ''}
@@ -132,7 +136,7 @@ DatasetComboComp.contextType = AnContext;
 
 DatasetComboComp.propTypes = {
 	uri: PropTypes.string,
-	val: PropTypes.object, // TODO doc: e.g. {n: f.label, v: rec[f.field]}, see TRecordFormComp
+	val: PropTypes.object, // TODO doc: e.g. {n: f.field, v: rec[f.field]}, see TRecordFormComp
 };
 
 const DatasetCombo = withWidth()(withStyles(styles)(DatasetComboComp));

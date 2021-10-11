@@ -147,6 +147,7 @@ class UserstComp extends CrudCompW {
 
 	closeDetails() {
 		this.recForm = undefined;
+		this.tier.resetFormSession();
 		this.setState({});
 	}
 
@@ -327,6 +328,10 @@ export class UsersTier extends Semantier {
 
 		if (crud === Protocol.CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
+
+		let {cipher, iv} = this.client.encryptoken(this.rec.pswd);
+		this.rec.pswd = cipher;
+		this.rec.iv = iv;
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )

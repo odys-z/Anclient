@@ -42,27 +42,6 @@ const styles = theme => ({
 	width: "100%",
 	color: "primary"
   },
-  // centre: { alignItems: "center" },
-  // lower: { height: "15%" },
-
-  // left: { alignItems: "center" },
-  // right: { alignItems: "center" },
-  // largeText: { width: "100%" },
-  // rowBox: {
-	// display: "flex",
-	// flexDirection: "row",
-	// alignItems: "center"
-  // },
-
-  // formLabel: {
-	// width: "12ch",
-	// textAlign: "right",
-  //   paddingRight: theme.spacing(1),
-  // },
-  // formText: {
-	// textAlign: "right",
-  //   paddingLeft: theme.spacing(1),
-  // },
   content: {
 	height: "100%",
   },
@@ -106,9 +85,15 @@ class RoleDetailsComp extends DetailFormW {
 		if (!this.tier.validate()) {
 	    	this.setState({});
 		}
-		else
+		else {
+			let that = this;
 			this.tier.saveRec({crud: this.state.crud},
-				() => { this.showOk(L('Data Saved!')); });
+				() => {
+					if (that.state.crud === CRUD.c)
+						that.setState({ crud: CRUD.u} );
+					that.showOk(L('Data Saved!'));
+				});
+		}
 	}
 
 	toCancel (e) {

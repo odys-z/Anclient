@@ -188,7 +188,7 @@ class QuizsheetComp extends React.Component {
 		this.quizHook.collect && this.quizHook.collect(this.state);
 
 		if ( that.state.crud === Protocol.CRUD.c ) {
-			this.jquiz.insert(this.props.uri, this.state,
+			this.jquiz.insertQuiz(this.props.uri, this.state,
 				(resp) => {
 					let {quizId, title} = JQuiz.parseResp(resp);
 					if (isEmpty(quizId))

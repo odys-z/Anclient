@@ -65,7 +65,7 @@ class IndicatorsComp extends CrudCompW {
 			columns={[
 				{ type: 'text', field: 'indName', label: L('Indicator'),
 				  validator: {len: 200, notNull: true}, cols: {sm: 6} },
-				{ type: 'float', field: 'weight', label: L('Default Weight'),
+				{ type: 'float', field: 'weight', label: L('Weight'),
 				  validator: {min: 0.0}, cols: {sm: 1},
 				  formatter: (n, col) => n.node.weight},
 				{ type: 'formatter', label: L('Question Type'), cols: {sm: 2},

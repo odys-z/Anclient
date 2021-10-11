@@ -101,7 +101,7 @@ class TRecordFormComp extends CrudCompW {
 					sk={f.sk} nv={ f.nv }
 					disabled={ !!f.disabled }
 					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(f) }
-					options={ f.options || []} val={{n: f.label, v:rec[f.field]} }
+					options={ f.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ f.label }
 					style={ f.cbbStyle || {width: 200} }
 					invalidStyle={ f.style }
@@ -112,12 +112,13 @@ class TRecordFormComp extends CrudCompW {
 					} }
 				/>);
 		}
-		else if (f.type === 'formatter' || f.formatter)
+		else if (f.type === 'formatter' || f.formatter) {
+			if (f.formatter.length != 3)
+				console.warn('TRecordFormComp need formatter with signature of f(record, field, tier).', f.formatter)
 			return (
-				// <Grid item key={f.field} {...f.grid} >
-					<>{f.formatter(rec, f)}</>
-				// </Grid>
+				<>{f.formatter(rec, f, this.props.tier)}</>
 			);
+		}
 		else {
 			let type = 'text';
 			if (f.type === 'float' || f.type === 'int')
