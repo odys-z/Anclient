@@ -183,7 +183,7 @@ export class AnReact {
 					url: 'github.json',
 				})
 				.done((json) => onJsonServ(elem, opts, json))
-				fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
+				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
 			} )
 		}
 	}

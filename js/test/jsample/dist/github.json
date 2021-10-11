@@ -1,4 +1,5 @@
 {
 	"host": "http://localhost:8080/jserv-sample",
-	"docker": "http://localhost:8080/connects"
+	"docker": "http://localhost:8080/connects",
+	"sandbox": "http://localhost:8080/jserv-sandbox"
 }
