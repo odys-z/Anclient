@@ -124,7 +124,7 @@ class MyStudentsQuery extends React.Component {
 		{ name: 'classId', type: 'cbb',  val: '', label: L('Class'),
 		  sk: Protocol.sk.cbbMyClass, nv: {n: 'text', v: 'nid'}, validate: {notNull: true}},
 		{ name: 'studentName', type: 'text', val: '', label: L('Student') },
-		{ name: 'hasTasks', type: 'switch',  val: false, label: L('Tasks to do') },
+		{ name: 'hasTasks', type: 'switch',  val: false, label: L('with polls to do') },
 	];
 
 	constructor(props) {
