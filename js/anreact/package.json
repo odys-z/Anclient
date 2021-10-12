@@ -9,6 +9,7 @@
   },
   "scripts": {
     "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
+    "build": "webpack-cli",
     "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
   "keywords": [
@@ -50,6 +51,7 @@
     "postcss-loader": "^3.0.0",
     "react-svg-loader": "^3.0.3",
     "sass-loader": "^7.3.1",
-    "style-loader": "^0.23.1"
+    "style-loader": "^0.23.1",
+    "webpack-cli": "^4.9.0"
   }
 }
