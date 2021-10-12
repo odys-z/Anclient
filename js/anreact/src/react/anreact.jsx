@@ -174,7 +174,7 @@ export class AnReact {
 		if (typeof elem === 'string') {
 			$.ajax({
 				dataType: "json",
-				url: 'private/host.json',
+				url: opts.jsonUrl || 'private/host.json',
 			})
 			.done( (json) => onJsonServ(elem, opts, json) )
 			.fail( (e) => {

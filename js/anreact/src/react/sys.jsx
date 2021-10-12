@@ -53,10 +53,18 @@ const _icons = {
 }
 
 export function uri(comp, uri) {
+	// FIXME this function is unnecessary if moved URI to Semantier.
 	if (comp.Naked)
 		comp.Naked.prototype.uri = uri;
-	else
+
+	// for SysComp using Route: component={_comps[c.path]}
+	else if (comp.prototype)
 		comp.prototype.uri = uri;
+
+	// for direct component rendering, e.g. less-app/App#render()
+	else if (comp.type && comp.type.Naked)
+		comp.type.Naked.prototype.uri = uri;
+
 	return comp;
 }
 /**
@@ -421,7 +429,7 @@ SysComp.extendLinks([
 	{path: '/views/sys/org/users.html', comp: Users},
 	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
 	{path: '/v2/users-v2.0', comp: Users},
-	{path: '/sys/error', comp: Error}
+	{path: '/sys/error', comp: Error} // FIXME bug
 ]);
 
 const Sys = withStyles(styles)(SysComp);

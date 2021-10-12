@@ -731,6 +731,18 @@ class Inseclient extends SessionClient {
 	// }
 	userId = 'localhost';
 
+	/**
+	 * @param {object} opts
+	 * @param {string} opts.urlRoot 
+	 * @constructor
+	 */
+	constructor(opts) {
+		super({}, '', true);
+		this.ssInf = {}
+		this.an = an;
+		an.init(opts.urlRoot);
+	}
+
 	/**Get a header the jserv can verify successfully.
 	 * This method is not recommended used directly.
 	 * @param {Object} act user's action for logging<br>

@@ -30,7 +30,7 @@ export class Semantier {
 
 	setContext(context) {
 		if (!context || !context.anClient)
-			console.error(this, "Setup semantic tier without React context?");
+			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
 		this.client = context.anClient;
 		this.anReact = context.anReact;

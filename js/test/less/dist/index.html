@@ -14,7 +14,9 @@
   <script>
 	// let searchParams = new URLSearchParams(window.location.search)
 	// let serv = searchParams ? searchParams.get('serv') : undefined;
-	less.App.bindHtml('app', {serv: 'sandbox', Window, portal: 'index.html'});
+	less.App.bindHtml('app', {
+		jsonUrl: 'http://localhost:8889/github.json',
+		serv: 'sandbox', Window, portal: 'index.html'});
   </script>
 </body>
 </html>

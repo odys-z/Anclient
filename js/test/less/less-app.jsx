@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Typography from '@material-ui/core/Typography';
@@ -8,10 +7,10 @@ import { Protocol, Inseclient, Semantier } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
-	Sys, SysComp, jsample
+	uri, jsample
 } from '@anclient/anreact';
 
-const { Domain, Roles, Orgs, Users, Userst, JsampleTheme } = jsample;
+const { Userst, JsampleTheme } = jsample;
 
 /** The application main, context singleton and error handler */
 class App extends React.Component {
@@ -33,21 +32,26 @@ class App extends React.Component {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.logout = this.logout.bind(this);
+		// this.logout = this.logout.bind(this);
 
 		// design: will load anclient from localStorage
+		this.state.servId = this.props.servId;
+		this.state.servs = this.props.servs;
+		this.state.jserv = this.props.servs[this.state.servId];
+
+		this.state.inclient = new Inseclient({urlRoot: this.state.jserv});
+
 		this.state.error = {onError: this.onError, msg: ''};
-		this.state.inclient = new Inseclient();
 
 		this.state = Object.assign(this.state, {
 			nextAction: 're-login',
-			hasError: true,
+			hasError: false,
 			msg: undefined
 		});
 
 		this.state.anReact = new AnReactExt(this.state.inclient, this.state.error)
 								.extendPorts({
-									lessUsers: "users.insecure",
+									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
 								});
 
 		// loaded from dataset.xml
@@ -72,39 +76,6 @@ class App extends React.Component {
 		}
 	}
 
-	/** For navigate to portal page
-	 * FIXME this should be done in SysComp, while firing goLogoutPage() instead.
-	 * */
-	logout() {
-		let that = this;
-		// leaving
-		try {
-			this.state.anClient.logout(
-				() => {
-					if (this.props.iwindow)
-						this.props.iwindow.location = this.state.iportal;
-				},
-				(c, e) => {
-					// something wrong
-					// console.warn('Logout failed', c, e)
-					cleanup (that);
-				});
-		}
-		catch(_) {
-			cleanup (that);
-		}
-		finally {
-			this.state.anClient = undefined;
-		}
-
-		function cleanup(app) {
-			if (app.state.anClient)
-				localStorage.setItem(SessionClient.ssInfo, null);
-			if (app.props.iwindow)
-				app.props.iwindow.location = app.state.iportal;
-		}
-	}
-
 	render() {
 	  let that = this;
 	  return (
@@ -115,13 +86,13 @@ class App extends React.Component {
 				servId: this.state.servId,
 				servs: this.props.servs,
 				jserv: this.state.jserv,
-				inseclient: this.state.inseclient,
+				anClient: this.state.inclient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				<InsecurePage />
+				{uri(<Userst port='userstier'/>, '/less/users')}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
@@ -140,7 +111,7 @@ class App extends React.Component {
 	 */
 	static bindHtml(elem, opts = {}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
-		Langstrs.load('/res-vol/lang.json');
+		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, opts, json) {

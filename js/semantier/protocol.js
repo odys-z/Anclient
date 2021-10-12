@@ -145,23 +145,23 @@ class Protocol {
 }
 
 /** Regex helper */
-// class Jregex  {
-// 	/**Add single quotes to str, if not yet.
-// 	 * @param {string} str
-// 	 * @return {string} quoted */
-// 	static quote(str) {
-// 		if (str === undefined || str === null )
-// 			str = "''";
-// 		else if (typeof str === "string" && str.substring(0, 1) !== "'"
-// 			&& str.substring(0, 2) != "''")
-// 			return "'" + str + "'";
-// 	}
-//
-// 	static isblank(s) {
-// 		return s === undefined || s === null
-// 			|| (typeof s === 'string' && s.trim() === '');
-// 	}
-// }
+class Jregex  {
+	// /**Add single quotes to str, if not yet.
+	//  * @param {string} str
+	//  * @return {string} quoted */
+	// static quote(str) {
+	// 	if (str === undefined || str === null )
+	// 		str = "''";
+	// 	else if (typeof str === "string" && str.substring(0, 1) !== "'"
+	// 		&& str.substring(0, 2) != "''")
+	// 		return "'" + str + "'";
+	// }
+
+	static isblank(s) {
+		return s === undefined || s === null
+			|| (typeof s === 'string' && s.trim() === '');
+	}
+}
 
 class AnsonMsg {
 	constructor (json) {
