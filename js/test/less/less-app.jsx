@@ -94,6 +94,7 @@ class App extends React.Component {
 			}} >
 				{uri(<Userst port='userstier'/>, '/less/users')}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+				上記のすべて...<br/> {Date().toString()}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}
@@ -125,4 +126,4 @@ class App extends React.Component {
 	}
 }
 
-export {App};
+export { App };

@@ -22,6 +22,7 @@ const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
+		backgroundColor: '#eef'
 	},
 	button: {
 		marginLeft: theme.spacing(1)
