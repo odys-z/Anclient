@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Typography from '@material-ui/core/Typography';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, Semantier } from '@anclient/semantier';
+import { Protocol, Inseclient } from '@anclient/semantier';
 
-import { L, Langstrs,
+import { Langstrs,
 	AnContext, AnError, AnReactExt,
 	uri, jsample
 } from '@anclient/anreact';
