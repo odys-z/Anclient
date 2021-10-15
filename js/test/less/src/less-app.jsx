@@ -9,6 +9,8 @@ import { Langstrs,
 	uri, jsample
 } from '@anclient/anreact';
 
+import Welcome from './welcome';
+
 const { Userst, JsampleTheme } = jsample;
 
 /** The application main, context singleton and error handler */
@@ -92,6 +94,7 @@ class App extends React.Component {
 				error: this.state.error,
 			}} >
 				{uri(<Userst port='userstier'/>, '/less/users')}
+				{uri(<Welcome port='userstier'/>, '/less/users')}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

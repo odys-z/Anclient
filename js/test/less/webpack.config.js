@@ -7,7 +7,7 @@ var version = "1.0.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: {'AnHome': './less-app.jsx' },
+	entry: {'AnHome': './src/less-app.jsx' },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",

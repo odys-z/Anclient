@@ -11,7 +11,6 @@
   "author": "Odys Zhou",
   "license": "MIT",
   "devDependencies": {
-  },
-  "dependencies": {
+    "webpack": "^5.58.2"
   }
 }
