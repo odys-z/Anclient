@@ -120,7 +120,7 @@ export const enum Platform {
 	Linux,
 	Windows
 }
-export function PlatformToString(platform: Platform) {
+export function platformToString(platform: Platform) {
 	switch (platform) {
 		case Platform.Web: return 'Web';
 		case Platform.Mac: return 'Mac';

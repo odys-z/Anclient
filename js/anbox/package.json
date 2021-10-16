@@ -3,6 +3,7 @@
 	"displayName": "Anbox",
 	"description": "Anclient sandbox",
 	"version": "0.0.1",
+	"publisher": "ody-zhou",
 	"engines": {
 		"vscode": "^1.61.0"
 	},
@@ -17,15 +18,34 @@
 		"commands": [
 			{
 				"command": "anbox.load",
-				"title": "Load Anbox"
+				"title": "Load Anbox",
+				"category": "Anbox"
+			},
+			{
+				"command": "anbox.refresh",
+				"title": "Refresh Anbox",
+				"category": "Anbox"
+			},
+			{
+				"command": "anbox.restarServer",
+				"title": "Start Anbox",
+				"category": "Anbox"
+			}
+		],
+		"menus": {
+			"explorer/context": [ {
+				"when": "resourceLangId == html",
+				"command": "anbox.load",
+				"group": "navigation"
 			}
 		]
+    }
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
-		"compile": "webpack",
-		"watch": "webpack --watch",
-		"package": "webpack --mode production --devtool hidden-source-map",
+		"compile": "npx webpack",
+		"watch": "npx webpack --watch",
+		"package": "npx webpack --mode production --devtool hidden-source-map",
 		"compile-tests": "tsc -p . --outDir out",
 		"watch-tests": "tsc -p -w . --outDir out",
 		"pretest": "npm run compile-tests && npm run compile && npm run lint",
