@@ -94,7 +94,7 @@ class App extends React.Component {
 				error: this.state.error,
 			}} >
 				{uri(<Userst port='userstier'/>, '/less/users')}
-				{uri(<Welcome port='userstier'/>, '/less/users')}
+				{uri(<Welcome port='welcomeless'/>, '/less/welcome')}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

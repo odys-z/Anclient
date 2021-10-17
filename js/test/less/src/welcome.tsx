@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { withStyles } from '@material-ui/styles';
 import { withWidth } from '@material-ui/core';
 
-import { Semantier } from '@anclient/semantier';
+import { override, Semantier } from '@anclient/semantier';
 import { AnContext } from '@anclient/anreact';
 
 
@@ -14,7 +14,7 @@ const styles = (theme) => ( {
 	}
 });
 
-class WelcomeComp extends React.Component {
+class WelcomeComp extends React.Component<{uri: string}> {
 	tier: Semantier;
 
 	constructor(props) {
@@ -22,7 +22,7 @@ class WelcomeComp extends React.Component {
 	}
 
 	componentDidMount() {
-		this.tier = new WelcomeLess();
+		this.tier = new WelcomeTier({...this.props});
 	}
 
 	render() : ReactNode {
@@ -33,6 +33,21 @@ class WelcomeComp extends React.Component {
 
 class WelcomeLess extends Semantier {
 
+	@override(Semantier)
+	records(): void {
+
+	}
 }
 
 export default withWidth()(withStyles(styles)(WelcomeComp));
+
+class WelcomeTier extends Semantier {
+
+	/**
+	 * 
+	 * @param {uri: sring} props 
+	 */
+	constructor(props) {
+		super(props);
+	}
+}

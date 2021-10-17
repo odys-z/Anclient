@@ -4,6 +4,8 @@ import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from './protocol';
 const { CRUD } = Protocol;
 
 /**
+ * @type ErrorCtx = { msg: string, }
+ * 
  * Base class of semantic tier
  * @class
  */
@@ -21,6 +23,10 @@ export class Semantier {
 	uri = undefined;
 	pkval = undefined;
 
+	/**
+	 * 
+	 * @param {uri: string} props 
+	 */
 	constructor(props) {
 		if (!props || !props.uri)
 			throw Error("uri is required!");
@@ -28,6 +34,10 @@ export class Semantier {
 		this.uri = props.uri;
 	}
 
+	/**
+	 * 
+	 * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context 
+	 */
 	setContext(context) {
 		if (!context || !context.anClient)
 			console.error(this, "Setup semantic tier without React context (with anClient)?");
