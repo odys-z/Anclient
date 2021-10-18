@@ -1,9 +1,9 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+import { ReactNode } from 'react';
 import { withStyles } from '@material-ui/styles';
 import { withWidth } from '@material-ui/core';
 
-import { override, Semantier } from '@anclient/semantier';
-import { AnContext } from '@anclient/anreact';
+import { Semantier } from '@anclient/semantier';
 
 
 const styles = (theme) => ( {
@@ -27,13 +27,13 @@ class WelcomeComp extends React.Component<{uri: string}> {
 
 	render() : ReactNode {
 
-		return (<>Welcome Less</>);
+		return (<div>Welcome Less</div>);
 	}
 }
 
 class WelcomeLess extends Semantier {
 
-	@override(Semantier)
+	/// @override(Semantier)
 	records(): void {
 
 	}

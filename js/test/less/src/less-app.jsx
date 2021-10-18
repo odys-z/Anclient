@@ -16,7 +16,8 @@ const { Userst, JsampleTheme } = jsample;
 /** The application main, context singleton and error handler */
 class App extends React.Component {
 	state = {
-		inseclient: undefined, // SessionClient
+		/** {@link InsercureClient} */
+		inseclient: undefined,
 		anReact: undefined,  // helper for React
 		hasError: false,
 		iportal: 'portal.html',
@@ -93,10 +94,11 @@ class App extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				{uri(<Userst port='userstier'/>, '/less/users')}
+				{/* {uri(<Userst port='userstier'/>, '/less/users')} */}
+				<hr/>
 				{uri(<Welcome port='welcomeless'/>, '/less/welcome')}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
-				上記のすべて...<br/> {Date().toString()}
+				アプリ コンポーネントの内容は, 上記のすべて...<br/> {Date().toString()}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}
