@@ -96,7 +96,7 @@ class App extends React.Component {
 				{uri(<Userst port='userstier'/>, '/less/users')}
 				{uri(<Welcome port='welcomeless'/>, '/less/welcome')}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
-				上記のすべて...<br/> {Date().toString()}
+				上記のすべて... (VSCE)<br/> {Date().toString()}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}

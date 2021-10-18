@@ -40,6 +40,7 @@ const extensionConfig = {
       }
     ]
   },
+  watchOptions: { ignored: '**/node_modules/**' },
   devtool: 'nosources-source-map'
 };
 module.exports = [ extensionConfig ];

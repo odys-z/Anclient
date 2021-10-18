@@ -5,6 +5,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import path = require("path");
+
 const LANGUAGE_DEFAULT = 'en';
 
 let _isWindows = false;
@@ -253,11 +255,16 @@ export function isLittleEndian(): boolean {
 	return _isLittleEndian;
 }
 
-export function pythonCmd() {
-    let python = 'python1';
+/**
+ * 
+ * @param pypath user know the path without knowing os and python command?
+ * @returns fullpath command without PATH evironment involved
+ */
+export function pythonCmd(pypath: string) {
+    let python = 'python3';
 	switch (OS) {
 		case OperatingSystem.Windows:
 			python = 'py';
 	}
-	return python;
+	return path.join(pypath, python);
 }

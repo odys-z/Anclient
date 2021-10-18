@@ -2,9 +2,7 @@
 import * as vscode from 'vscode';
 import * as cp from "child_process";
 import * as path from 'path';
-import { pythonCmd } from './packages/platform';
-import * as fs from 'fs';
-import { Server } from 'http';
+import { pythonCmd } from './lib/platform';
 
 type Page = {
 	port: string,
@@ -16,7 +14,9 @@ type Page = {
 };
 
 type Serv = {
-	rootpath: string,
+	/**TODO: Only used when system python command not in path environment. */
+	pythonPath: string,
+	webroot: string,
 	starting: false,
 	webpackTerm: undefined
 };
@@ -43,8 +43,8 @@ export function activate(context: vscode.ExtensionContext) {
 			   __proto__:m }
 			 */
 			(uri, uris) => {
-				AnPagePanel.init(context);
-				AnPagePanel.currentPanel.load(context.extensionUri, uri);
+				AnPagePanel.init(context, uri)
+					.load(context.extensionUri, uri);
 			})
 	);
 
@@ -56,25 +56,20 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
-	// context.subscriptions.push(
-	// 	vscode.commands.registerCommand('anbox.restartServer', () => {
-	// 		const cmd = `pwd && ${pythonCmd()} anserv.py ${page.port} &`;
-	// 		console.log(cmd);
-	// 		new Promise<string>((resolve, reject) => {
-	// 			cp.exec(cmd, (err, out) => {
-	// 				if (err) {
-	// 					return reject(err);
-	// 				}
-	// 				return resolve(out);
-	// 			});
-	// 		});
-	// 	})
-	// );
-
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anbox.restartServer', () => {
 			if (AnPagePanel.currentPanel) {
 				AnPagePanel.currentPanel.startup();
+			}
+			else 
+				vscode.window.showInformationMessage('Sever only started when Anbox is loaded!');
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('anbox.shutdownServer', () => {
+			if (AnPagePanel.currentPanel) {
+				AnPagePanel.currentPanel.close();
 			}
 		})
 	);
@@ -85,11 +80,16 @@ export function activate(context: vscode.ExtensionContext) {
 			async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
 				console.log(`Got state: ${state}`);
 				// Reset the webview options so we use latest uri for `localResourceRoots`.
-				webviewPanel.webview.options = getWebviewOptions(context.extensionUri);
-				AnPagePanel.revive(webviewPanel, context.extensionUri);
+				webviewPanel.webview.options = getWebviewOpts(context.extensionUri);
+				AnPagePanel.revive(webviewPanel, undefined, context.extensionUri);
 			}
 		});
 	}
+}
+
+export function deactivate() {
+	if (AnPagePanel.currentPanel)
+		AnPagePanel.currentPanel.close();
 }
 
 /**
@@ -97,7 +97,7 @@ export function activate(context: vscode.ExtensionContext) {
  * @param extensionUri e.g. {scheme: 'file', authority: '', path: '/home/ody/anclient/js/anbox', query: '', fragment: '', …}
  * @returns 
  */
-function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
+function getWebviewOpts(extensionUri: vscode.Uri): vscode.WebviewOptions {
 	console.log(extensionUri);
 
 	// FIXME (by UX and Try).
@@ -127,22 +127,10 @@ function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
  * 
  */
 class AnPagePanel {
-	static init(context: vscode.ExtensionContext): void {
-		if (AnPagePanel.currentPanel) return;
-		const panel = vscode.window.createWebviewPanel(
-			AnPagePanel.viewType,
-			'Anbox',
-			vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
-			getWebviewOptions(context.extensionUri),
-		);
-
-		panel.webview.options = getWebviewOptions(context.extensionUri);
-		AnPagePanel.revive(panel, context.extensionUri);
-	}
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
-	public static currentPanel: AnPagePanel;
+	public static currentPanel: AnPagePanel | undefined;
 
 	public static readonly viewType = 'anbox';
 
@@ -150,26 +138,69 @@ class AnPagePanel {
 	private readonly _extensionUri: vscode.Uri;
 	private _disposables: vscode.Disposable[] = [];
 
+	/**
+	 * Html page information of which is loaded in this panel.
+	 */
 	page: Page = {
 		port: "8888",
 		host: "localhost",
 		html: "index.html",
-		style: `backgroundColor: '#ccc'`
+		style: `background-color: #ccc`
 	};
 
-	serv: Serv = {
-		rootpath: '',
-		starting: false,
-		webpackTerm: undefined
-	};
+	serv: Serv;
+
+	static init(context: vscode.ExtensionContext, htmlItem: vscode.Uri): AnPagePanel {
+		if (AnPagePanel.currentPanel)
+			return AnPagePanel.currentPanel;
+
+		function getDocumentWorkspaceFolder(): string {
+			// 1. find workspace root
+			// const fileName = vscode.window.activeTextEditor?.document.fileName;
+			const fileName = htmlItem.fsPath;
+			let ws = vscode.workspace.workspaceFolders;
+			if (!ws)
+				throw Error('Why workspaceFolder is null?');
+
+			// 2. guess the output folder
+			let outdirs = ['dist', 'out', 'build', 'publc', 'target', 'volume', 'res'];
+
+			let wr = ws.map((folder) => folder.uri.fsPath)
+				.filter((fsPath) => fileName?.startsWith(fsPath))[0];
+			
+			// e.g. .../anclient/js/test/less/dist;
+			wr = outdirs.filter((root) => fileName?.startsWith(path.join(wr, root)))
+						.map(root => path.join(wr, root))[0];
+			console.log('webroot:', wr);
+			return wr;
+		}
+
+		let serv :Serv = {
+					pythonPath: context.asAbsolutePath(path.join('packages', 'anserv.py')),
+					webroot: getDocumentWorkspaceFolder(),
+					starting: false,
+					webpackTerm: undefined };
+
+		const panel = vscode.window.createWebviewPanel(
+			AnPagePanel.viewType,
+			'Anbox',
+			vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
+		);
+
+		panel.webview.options = getWebviewOpts(context.extensionUri);
+		return AnPagePanel.revive(panel, serv, context.extensionUri);
+	}
 
 	/**
-	 * Deserialize?
+	 * Deserialize
 	 * @param panel 
+	 * @param serv 
 	 * @param extensionUri 
+	 * @returns current panel
 	 */
-	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-		AnPagePanel.currentPanel = new AnPagePanel(panel, extensionUri);
+	public static revive(panel: vscode.WebviewPanel, serv: Serv | undefined, extensionUri: vscode.Uri) {
+		AnPagePanel.currentPanel = new AnPagePanel(panel, serv, extensionUri);
+		return AnPagePanel.currentPanel;
 	}
 
 	/**
@@ -178,10 +209,10 @@ class AnPagePanel {
 	 * @returns 
 	 */
 	public async load(extensionUri: vscode.Uri, localhtml: vscode.Uri) {
-		let serv = this.getServ(localhtml);
+		let serv = this.getServ();
 		if (!serv.starting) {
 			try {
-				await AnPagePanel.currentPanel.startup();
+				await AnPagePanel.currentPanel!.startup();
 			}
 			catch (e) {
 				vscode.window.showInformationMessage( (<AnboxException>e).getMessage() );
@@ -198,41 +229,41 @@ class AnPagePanel {
 				AnPagePanel.viewType,
 				`Anbox - ${AnPagePanel.filename(localhtml)}`,
 				column || vscode.ViewColumn.One,
-				getWebviewOptions(extensionUri),
+				getWebviewOpts(extensionUri),
 			);
 
-			AnPagePanel.currentPanel = new AnPagePanel(panel, extensionUri);
+			AnPagePanel.currentPanel = new AnPagePanel(panel, serv, extensionUri);
 		}
 
-		// If we already have a panel, show it.
-		if (AnPagePanel.currentPanel) {
-			this.refresh();
-			AnPagePanel.currentPanel._panel.reveal(column);
-			return;
-		}
+		// show it.
+		this.refresh();
+		AnPagePanel.currentPanel._panel.reveal(column);
+	}
+
+	/**
+	 * Update some option of the serv info.
+	 * @param opt options to update
+	 */
+	getServ(opt = {}): Serv {
+		Object.assign(this.serv, opt);
+		return this.serv;
 	}
 
 	/**
 	 * Find root of localhtml, return the serv instance. 
-	 * @param html current html page uri
+	 * @param html 
 	 */
-	getServ(html: vscode.Uri): Serv {
-		throw new Error('Method not implemented.');
+	setPage(html: string) {
+		this.page.html = html;
 	}
 
 	/**
 	 * Startup server in possible server root dir.
 	 */
 	async startup() {
-		for (let d in this._panel.webview.options.localResourceRoots) {
-			if (fs.existsSync(d)) {
-				this.serv.rootpath = d; 
-				break;
-			}
-		};
-
-		const cmd = `cd ${this.serv.rootpath} && ${pythonCmd()} anserv.py ${this.page.port} &`;
+		const cmd = `${pythonCmd('')} ${this.serv.pythonPath} -b 0.0.0.0 -w ${this.serv.webroot} ${this.page.port} &`;
 		console.log(cmd);
+
 		new Promise<string>((resolve, reject) => {
 			cp.exec(cmd, (err, out) => {
 				if (err) {
@@ -243,35 +274,18 @@ class AnPagePanel {
 		});
 	}
 
-	// public static createOrShow(extensionUri: vscode.Uri, localhtml: vscode.Uri) {
-	// 	const column = vscode.window.activeTextEditor
-	// 		? vscode.window.activeTextEditor.viewColumn
-	// 		: undefined;
-
-	// 	// If we already have a panel, show it.
-	// 	if (AnPagePanel.currentPanel) {
-	// 		AnPagePanel.currentPanel._panel.reveal(column);
-	// 		return;
-	// 	}
-
-	// 	// Otherwise, create a new panel.
-	// 	const panel = vscode.window.createWebviewPanel(
-	// 		AnPagePanel.viewType,
-	// 		'Anbox',
-	// 		column || vscode.ViewColumn.One,
-	// 		getWebviewOptions(extensionUri),
-	// 	);
-
-	// 	AnPagePanel.currentPanel = new AnPagePanel(panel, extensionUri);
-	// }
-
-
-	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+	private constructor(panel: vscode.WebviewPanel, serv: Serv | undefined, extensionUri: vscode.Uri) {
 		this._panel = panel;
+		this.serv = serv || {
+			pythonPath: '',
+			webroot: '',
+			starting: false,
+			webpackTerm: undefined
+		};
 		this._extensionUri = extensionUri;
 
 		// Set the webview's initial html content
-		this.loadOnline(page);
+		this.loadOnline();
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programmatically
@@ -281,7 +295,7 @@ class AnPagePanel {
 		this._panel.onDidChangeViewState(
 			e => {
 				if (this._panel.visible) {
-					this.doRefresh();
+					this.refresh();
 				}
 			},
 			null,
@@ -302,12 +316,6 @@ class AnPagePanel {
 		);
 	}
 
-	public doRefactor() {
-		// Send a message to the webview webview.
-		// You can send any JSON serializable data.
-		this._panel.webview.postMessage({ command: 'refactor' });
-	}
-
 	public dispose() {
 		AnPagePanel.currentPanel = undefined;
 
@@ -322,14 +330,17 @@ class AnPagePanel {
 		}
 	}
 
-	private loadOnline(page: Page) {
+	/**
+	 * Load the page, where page info is {@link AnPagePanel.page}.
+	 */
+	private loadOnline() {
 		const webview = this._panel.webview;
-		this._panel.webview.html = this.getAnclientPage(page);
+		this._panel.webview.html = this.getAnclientPage(this.page);
 	}
 
 	refresh(): void {
 		this._panel.webview.html = "";
-		this._panel.webview.html = this.getAnclientPage(page);
+		this._panel.webview.html = this.getAnclientPage(this.page);
 	}
 
 	/**
@@ -348,8 +359,29 @@ class AnPagePanel {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		</head>
 		<body>
-			<p id="lines-of-code-counter">${page.html}</p>
-			<iframe src="${this.url(page)}" width="100%" height="720px" style="${page.style}" ></iframe>
+			<p id="lines-of-code-counter">${page.html}
+			<input type='button' value='refresh' onclick='console.log("xxx");
+				document.getElementById("i-anbox").src = document.getElementById("i-anbox").src
+			'
+			/>
+			</p>
+			<iframe id='i-anbox' src="${AnPagePanel.url(page)}" width="100%" height="720px" style="${page.style}" ></iframe>
+		</body>
+		</html>`;
+	}
+
+	close(): void {
+		this.page.html = '?_shut-down_=True';
+		let req = AnPagePanel.url(this.page);
+		console.log(req);
+		this._panel.webview.html = `<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		</head>
+		<body>
+			<iframe src="${req}" width="100%" height="720px" style="${this.page.style}" ></iframe>
 		</body>
 		</html>`;
 	}

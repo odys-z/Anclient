@@ -2,7 +2,7 @@
   "name": "anbox",
 	"displayName": "Anbox",
 	"description": "Anclient sandbox",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"publisher": "ody-zhou",
 	"engines": {
 		"vscode": "^1.61.0"
@@ -11,7 +11,8 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:anbox.load"
+        "onCommand:anbox.load",
+		"onCommand:anbox.restartServer"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -27,8 +28,13 @@
 				"category": "Anbox"
 			},
 			{
-				"command": "anbox.restarServer",
-				"title": "Start Anbox",
+				"command": "anbox.restartServer",
+				"title": "Start server",
+				"category": "Anbox"
+			},
+			{
+				"command": "anbox.shutdownServer",
+				"title": "Shutdown server",
 				"category": "Anbox"
 			}
 		],
