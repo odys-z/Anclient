@@ -15,8 +15,7 @@ const styles = (theme) => ( {
 } );
 
 /**Common base class of function pages.
- * To popup modal dialog, see
- * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
+ * @member uri: string
  */
 class CrudComp extends React.Component {
 	state = {};
@@ -27,11 +26,8 @@ class CrudComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 
-// CrudComp.propTypes = {
-// 	uri: PropTypes.string.isRequired
-// };
-
 /**
+ * @augments {React.Component<{uri: string}, media: {}>}
  * <pre>CrudCompW.prototype.media = {
     isXs: false,
     isSm: false,
@@ -141,6 +137,10 @@ class CheapFlowComp extends CrudComp {
 }
 const CheapFlow = withStyles(styles)(CheapFlowComp);
 
+/**
+ * To popup modal dialog, see
+ * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
+ */
 class DetailFormW extends React.Component {
 	state = {
 	};

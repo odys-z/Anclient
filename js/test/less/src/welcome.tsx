@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/styles';
 import { withWidth } from '@material-ui/core';
 
 import { Semantier } from '@anclient/semantier';
-
+import { CrudComp } from '@anclient/anreact';
 
 const styles = (theme) => ( {
 	root: {
@@ -14,15 +14,13 @@ const styles = (theme) => ( {
 	}
 });
 
-class WelcomeComp extends React.Component<{uri: string}> {
-	tier: Semantier;
-
-	constructor(props) {
-		super(props);
-	}
+class WelcomeComp extends CrudComp {
+	tier: WelcomeTier;
+	// uri: string;
+	// props: { uri?: string; };
 
 	componentDidMount() {
-		this.tier = new WelcomeTier({...this.props});
+		this.tier = new WelcomeTier({...this.props, uri: this.uri});
 	}
 
 	render() : ReactNode {
@@ -31,23 +29,20 @@ class WelcomeComp extends React.Component<{uri: string}> {
 	}
 }
 
-class WelcomeLess extends Semantier {
-
-	/// @override(Semantier)
-	records(): void {
-
-	}
-}
-
 export default withWidth()(withStyles(styles)(WelcomeComp));
 
 class WelcomeTier extends Semantier {
-
 	/**
 	 * 
 	 * @param {uri: sring} props 
 	 */
-	constructor(props) {
+	constructor(props: {uri: string}) {
 		super(props);
+	}
+
+	/// @override(Semantier)
+	records(): Array<Object> {
+		super.rows = [{eid: '01', ename: 'ABC', edate: '2021-10-10', extra: '100'}];
+		return super.rows;
 	}
 }

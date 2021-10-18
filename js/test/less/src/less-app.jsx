@@ -94,7 +94,7 @@ class App extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				{/* {uri(<Userst port='userstier'/>, '/less/users')} */}
+				{uri(<Userst port='userstier'/>, '/less/users')}
 				<hr/>
 				{uri(<Welcome port='welcomeless'/>, '/less/welcome')}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
