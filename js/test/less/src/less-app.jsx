@@ -34,9 +34,7 @@ class App extends React.Component {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-		// this.logout = this.logout.bind(this);
 
-		// design: will load anclient from localStorage
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
 		this.state.jserv = this.props.servs[this.state.servId];
@@ -94,10 +92,11 @@ class App extends React.Component {
 				iportal: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
-				{uri(<Userst port='userstier'/>, '/less/users')}
+				{<Userst port='userstier' uri={'/less/users'}/>}
 				<hr/>
-				{uri(<Welcome port='welcomeless'/>, '/less/welcome')}
+				{<Welcome port='welcomeless' uri={'/less/welcome'}/>}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+				<hr/>
 				アプリ コンポーネントの内容は, 上記のすべて...<br/> {Date().toString()}
 			</AnContext.Provider>
 		</MuiThemeProvider>);

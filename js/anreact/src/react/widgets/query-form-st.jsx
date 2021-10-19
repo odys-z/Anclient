@@ -265,7 +265,7 @@ AnQuerystComp.propTypes = {
 	/* TODO: DOCS
 	 * Design Notes:
 	 * All common widgets need this check, but main CRUD page's uri is been set
-	 * by SysComp.
+	 * by SysComp. Also check CrudComp's comments.
 	 */
 	uri: PropTypes.string.isRequired,
 	conds: PropTypes.array.isRequired,

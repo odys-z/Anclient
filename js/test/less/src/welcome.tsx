@@ -16,11 +16,13 @@ const styles = (theme) => ( {
 
 class WelcomeComp extends CrudComp {
 	tier: WelcomeTier;
-	// uri: string;
-	// props: { uri?: string; };
 
 	componentDidMount() {
-		this.tier = new WelcomeTier({...this.props, uri: this.uri});
+		// FIXME ignore vscode waring?
+		let uri = this.uri || super.uri;
+		console.log("super.uri", uri);
+
+		this.tier = new WelcomeTier({uri});
 	}
 
 	render() : ReactNode {
@@ -29,18 +31,22 @@ class WelcomeComp extends CrudComp {
 	}
 }
 
+// at least compiled results is working, wait for #8447 (https://github.com/mui-org/material-ui/issues/8447#issuecomment-519952099)
 export default withWidth()(withStyles(styles)(WelcomeComp));
 
 class WelcomeTier extends Semantier {
 	/**
 	 * 
-	 * @param {uri: sring} props 
+	 * @param props 
 	 */
 	constructor(props: {uri: string}) {
 		super(props);
+		console.log(super.uri);
 	}
 
-	/// @override(Semantier)
+	/**
+	 * @override(Semantier)
+	 */
 	records(): Array<Object> {
 		super.rows = [{eid: '01', ename: 'ABC', edate: '2021-10-10', extra: '100'}];
 		return super.rows;

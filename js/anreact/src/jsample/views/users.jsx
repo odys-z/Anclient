@@ -174,7 +174,7 @@ class UserstComp extends CrudCompW {
 
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
-			{this.client && this.client.ssInf && this.client.ssInf.ssid && // also works in session less mode
+			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode
 				<Grid container alignContent="flex-end" >
 					<Button variant="contained" disabled={!btn.add}
 						className={classes.button} onClick={this.toAdd}
@@ -245,7 +245,7 @@ class UsersQuery extends React.Component {
 }
 UsersQuery.propTypes = {
 	// no tier is needed?
-	uri: PropTypes.string.isRequired,
+	// uri: PropTypes.string.isRequired,
 	onQuery: PropTypes.func.isRequired
 }
 
@@ -254,7 +254,7 @@ export class UsersTier extends Semantier {
 	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
-	client = undefined;
+	// client = undefined;
 	// uri = undefined;
 	rows = [];
 	pkval = undefined;
