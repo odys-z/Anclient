@@ -1,4 +1,4 @@
-
+/**@module @anclient/semantier */
 import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from './protocol';
 
 const { CRUD } = Protocol;
@@ -24,7 +24,7 @@ export class Semantier {
 
 	/**
 	 *
-	 * @param {uri: TierProps} props
+	 * @param {uri: string} props
 	 */
 	constructor(props) {
 		if (!props || !props.uri)
