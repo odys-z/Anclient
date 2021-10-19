@@ -4,6 +4,10 @@
 	"description": "Anclient sandbox",
 	"version": "0.1.1",
 	"publisher": "ody-zhou",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/odys-z/Anclient/js/anbox"
+	},
 	"engines": {
 		"vscode": "^1.61.0"
 	},
