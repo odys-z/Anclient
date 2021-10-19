@@ -17,7 +17,7 @@ type Serv = {
 	/**TODO: Only used when system python command not in path environment. */
 	pythonPath: string,
 	webroot: string,
-	starting: false,
+	starting: boolean,
 	webpackTerm: undefined
 };
 
@@ -30,7 +30,10 @@ interface AnboxException {
  * @param context
  */
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Starting Anbox ...');
+	if (!AnPagePanel.log)
+		AnPagePanel.log = vscode.window.createOutputChannel("Anbox");
+	AnPagePanel.log.appendLine('Starting Anbox ...');
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anbox.load',
 			/* uri ~ uris[0] ( from explorer menu ):
@@ -43,8 +46,8 @@ export function activate(context: vscode.ExtensionContext) {
 			   __proto__:m }
 			 */
 			(uri, uris) => {
-				AnPagePanel.init(context, uri)
-					.load(context.extensionUri, uri);
+				AnPagePanel.init(context, uri);
+				AnPagePanel.currentPanel?.load(context.extensionUri, uri);
 			})
 	);
 
@@ -69,6 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anbox.shutdownServer', () => {
 			if (AnPagePanel.currentPanel) {
+				AnPagePanel.currentPanel.serv.starting = false;
 				AnPagePanel.currentPanel.close();
 			}
 		})
@@ -149,46 +153,60 @@ class AnPagePanel {
 	};
 
 	serv: Serv;
+	static log: vscode.OutputChannel;
 
-	static init(context: vscode.ExtensionContext, htmlItem: vscode.Uri): AnPagePanel {
+	static init(context: vscode.ExtensionContext, htmlItem: vscode.Uri | undefined) {
 		if (AnPagePanel.currentPanel)
 			return AnPagePanel.currentPanel;
 
-		function getDocumentWorkspaceFolder(): string {
-			// 1. find workspace root
-			// const fileName = vscode.window.activeTextEditor?.document.fileName;
-			const fileName = htmlItem.fsPath;
-			let ws = vscode.workspace.workspaceFolders;
-			if (!ws)
-				throw Error('Why workspaceFolder is null?');
+		// function getDocumentWorkspaceFolder(html: vscode.Uri): string {
+		// 	// 1. find workspace root
+		// 	const fileName = html.fsPath;
+		// 	let ws = vscode.workspace.workspaceFolders;
+		// 	if (!ws)
+		// 		throw Error('Why workspaceFolder is null?');
 
-			// 2. guess the output folder
-			let outdirs = ['dist', 'out', 'build', 'publc', 'target', 'volume', 'res'];
+		// 	// 2. guess the output folder
+		// 	let outdirs = ['dist', 'out', 'build', 'publc', 'target', 'volume', 'res'];
 
-			let wr = ws.map((folder) => folder.uri.fsPath)
-				.filter((fsPath) => fileName?.startsWith(fsPath))[0];
+		// 	let wr = ws.map((folder) => folder.uri.fsPath)
+		// 		.filter((fsPath) => fileName?.startsWith(fsPath))[0];
 			
-			// e.g. .../anclient/js/test/less/dist;
-			wr = outdirs.filter((root) => fileName?.startsWith(path.join(wr, root)))
-						.map(root => path.join(wr, root))[0];
-			console.log('webroot:', wr);
-			return wr;
+		// 	// e.g. .../anclient/js/test/less/dist;
+		// 	wr = outdirs.filter((root) => fileName?.startsWith(path.join(wr, root)))
+		// 				.map(root => path.join(wr, root))[0];
+		// 	console.log('webroot:', wr);
+		// 	return wr;
+		// }
+
+		if (!htmlItem) { // not actived from explorer, try current active doc
+			let f = vscode.window.activeTextEditor?.document.uri;
+			if (f?.fsPath && new Set([".html", ".htm"]).has(path.extname(f?.fsPath)))
+				htmlItem = vscode.window.activeTextEditor?.document.uri;
 		}
+		
+		if (!htmlItem) {
+			vscode.window.showInformationMessage('Anbox don\'t know which html page to load!');
+			return undefined;
+		}
+		else {
+			let serv :Serv = {
+						pythonPath: context.asAbsolutePath(path.join('packages', 'anserv.py')),
+						webroot: this.getWorkspaceWebFolder(htmlItem),
+						starting: false,
+						webpackTerm: undefined };
 
-		let serv :Serv = {
-					pythonPath: context.asAbsolutePath(path.join('packages', 'anserv.py')),
-					webroot: getDocumentWorkspaceFolder(),
-					starting: false,
-					webpackTerm: undefined };
+			AnPagePanel.log.appendLine('Loading ' + serv.webroot);
 
-		const panel = vscode.window.createWebviewPanel(
-			AnPagePanel.viewType,
-			'Anbox',
-			vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
-		);
+			const panel = vscode.window.createWebviewPanel(
+				AnPagePanel.viewType,
+				'Anbox',
+				vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
+			);
 
-		panel.webview.options = getWebviewOpts(context.extensionUri);
-		return AnPagePanel.revive(panel, serv, context.extensionUri);
+			panel.webview.options = getWebviewOpts(context.extensionUri);
+			return AnPagePanel.revive(panel, serv, context.extensionUri);
+		}
 	}
 
 	/**
@@ -199,7 +217,11 @@ class AnPagePanel {
 	 * @returns current panel
 	 */
 	public static revive(panel: vscode.WebviewPanel, serv: Serv | undefined, extensionUri: vscode.Uri) {
+
+		AnPagePanel.log.appendLine("Anbox webview revived.");
+
 		AnPagePanel.currentPanel = new AnPagePanel(panel, serv, extensionUri);
+		AnPagePanel.currentPanel.serv = serv!;
 		return AnPagePanel.currentPanel;
 	}
 
@@ -209,7 +231,14 @@ class AnPagePanel {
 	 * @returns 
 	 */
 	public async load(extensionUri: vscode.Uri, localhtml: vscode.Uri) {
-		let serv = this.getServ();
+		let serv = this.getServ(localhtml);
+
+		if (!serv.webroot) {
+			vscode.window.showErrorMessage('No html page found.');
+			AnPagePanel.log.appendLine('No html page found.');
+			return;
+		}
+
 		if (!serv.starting) {
 			try {
 				await AnPagePanel.currentPanel!.startup();
@@ -232,6 +261,7 @@ class AnPagePanel {
 				getWebviewOpts(extensionUri),
 			);
 
+			AnPagePanel.log.append("Open page " + AnPagePanel.filename(localhtml));
 			AnPagePanel.currentPanel = new AnPagePanel(panel, serv, extensionUri);
 		}
 
@@ -244,8 +274,9 @@ class AnPagePanel {
 	 * Update some option of the serv info.
 	 * @param opt options to update
 	 */
-	getServ(opt = {}): Serv {
-		Object.assign(this.serv, opt);
+	getServ(page?: vscode.Uri): Serv {
+		if (page)
+			this.serv.webroot = AnPagePanel.getWorkspaceWebFolder(page);
 		return this.serv;
 	}
 
@@ -262,13 +293,21 @@ class AnPagePanel {
 	 */
 	async startup() {
 		const cmd = `${pythonCmd('')} ${this.serv.pythonPath} -b 0.0.0.0 -w ${this.serv.webroot} ${this.page.port} &`;
-		console.log(cmd);
+
+		this.serv.starting = true;
+		AnPagePanel.log.appendLine(cmd);
+		vscode.window.showInformationMessage('Starting Anbox server at ' + this.serv.webroot);
 
 		new Promise<string>((resolve, reject) => {
 			cp.exec(cmd, (err, out) => {
 				if (err) {
+					this.serv.starting = false;
+					AnPagePanel.log.appendLine(err.message);
+					vscode.window.showInformationMessage('Starting Anbox server failed. ' + err.message);
 					return reject(err);
 				}
+				this.serv.starting = false; // test shows only server stopped can reach here
+				AnPagePanel.log.appendLine(out.toString());
 				return resolve(out);
 			});
 		});
@@ -341,6 +380,7 @@ class AnPagePanel {
 	refresh(): void {
 		this._panel.webview.html = "";
 		this._panel.webview.html = this.getAnclientPage(this.page);
+
 	}
 
 	/**
@@ -371,9 +411,13 @@ class AnPagePanel {
 	}
 
 	close(): void {
+		AnPagePanel.log.appendLine('Shuting down: ' + this.page.html);
+		vscode.window.showInformationMessage('Shuting down Anbox server. ' + this.page.html);
+
 		this.page.html = '?_shut-down_=True';
 		let req = AnPagePanel.url(this.page);
 		console.log(req);
+		this._panel.webview.html = '';
 		this._panel.webview.html = `<!DOCTYPE html>
 		<html lang="en">
 		<head>
@@ -394,5 +438,23 @@ class AnPagePanel {
 		return path.basename(uri.path);
 	}
 
+	static getWorkspaceWebFolder(html: vscode.Uri): string {
+		// 1. find workspace root
+		const fileName = html.fsPath;
+		let ws = vscode.workspace.workspaceFolders;
+		if (!ws)
+			throw Error('Why workspaceFolder is null?');
 
+		// 2. guess the output folder
+		let outdirs = ['dist', 'out', 'build', 'publc', 'target', 'volume', 'res'];
+
+		let wr = ws.map((folder) => folder.uri.fsPath)
+			.filter((fsPath) => fileName?.startsWith(fsPath))[0];
+		
+		// e.g. .../anclient/js/test/less/dist;
+		wr = outdirs.filter((root) => fileName?.startsWith(path.join(wr, root)))
+					.map(root => path.join(wr, root))[0];
+		console.log('webroot:', wr);
+		return wr;
+	}
 }
