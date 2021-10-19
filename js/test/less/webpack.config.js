@@ -9,10 +9,6 @@ module.exports = {
 	devtool: 'source-map',
 	entry: {'AnHome': './src/less-app.jsx' },
 
-	// watchOptions: {
-	// 	ignored: '**/node_modules/**',
-	//   },
-
 	output: {
 	  filename: "[name]-" + version + ".min.js",
 	  path: path.resolve(__dirname, 'dist'),
