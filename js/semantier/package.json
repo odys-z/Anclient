@@ -1,6 +1,6 @@
 {
   "name": "@anclient/semantier",
-  "version": "0.9.13",
+  "version": "0.9.17",
   "description": "The anclient's sub package depending on pure js object that can be used for js unit test.",
   "main": "./anclient.js",
   "directories": {
@@ -9,6 +9,13 @@
   },
   "scripts": {
     "test": "cd .. && npm test"
+  },
+  "types": {
+    "name": "@anclient/semantier",
+    "author": "ody-zhou",
+    "version": "3.0.0",
+    "main": "./anclient.js",
+    "types": "./ts/anclient.d.ts"
   },
   "keywords": [
     "anclient",

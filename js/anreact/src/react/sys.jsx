@@ -53,6 +53,7 @@ const _icons = {
 }
 
 export function uri(comp, uri) {
+	return comp;
 	// FIXME this function is unnecessary if moved URI to Semantier.
 	if (comp.Naked)
 		comp.Naked.prototype.uri = uri;
@@ -314,7 +315,8 @@ class SysComp extends React.Component {
 	route() {
 		return this.state.cruds
 			.map( (c, x) =>
-				(<Route exact path={c.path} key={x} component={_comps[c.path]} {...c.params}/>)
+				(<Route exact path={c.path} key={x} component={_comps[c.path]} params={c.params}/>)
+				// (<Route exact path={c.path} key={x} element={React.cloneElement(_comps[c.path] || Home, [{uri: c.path}, {...c.params}]) }/>)
 			);
 	}
 
