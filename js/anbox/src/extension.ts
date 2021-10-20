@@ -182,6 +182,7 @@ class AnPagePanel {
 				AnPagePanel.viewType,
 				'Anbox',
 				vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
+				{ retainContextWhenHidden: false }
 			);
 
 			panel.webview.options = getWebviewOpts(context.extensionUri);
