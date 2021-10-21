@@ -1,10 +1,9 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
 import { L } from '../utils/langstr';
-import { AnContext, AnError } from './reactext.jsx'
+import { AnContext, AnError } from './reactext.jsx';
 
 const styles = (theme) => ( {
 	root: {
@@ -15,11 +14,21 @@ const styles = (theme) => ( {
 } );
 
 /**Common base class of function pages.
- * To popup modal dialog, see
- * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
+ * About URI:
+ * 1. Every root CRUD must has a uri.
+ * 2. Uri is immediately bridged to Semantier.
+ * 3. All data accessing must provid the token.
+ * @member uri: string
  */
 class CrudComp extends React.Component {
 	state = {};
+
+	constructor(props) {
+		super(props);
+		this.uri = props.match && props.match.path || props.uri;
+		if (!this.uri) 
+			throw Error("Anreact CRUD component must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
+	}
 
 	render() {
 		return (<>Base CrudComp Page</>);
@@ -27,11 +36,8 @@ class CrudComp extends React.Component {
 }
 CrudComp.contextType = AnContext;
 
-// CrudComp.propTypes = {
-// 	uri: PropTypes.string.isRequired
-// };
-
 /**
+ * @augments {React.Component<{uri: string}, media: {}>}
  * <pre>CrudCompW.prototype.media = {
     isXs: false,
     isSm: false,
@@ -43,7 +49,9 @@ CrudComp.contextType = AnContext;
  * FIXME looks like in chrome responsive device mode simulator, withWidth() can't
  * get "width"?
  */
-class CrudCompW extends React.Component {
+class CrudCompW extends CrudComp {
+	// TODO tasks to refactor. why not ts?
+	// TODO CrudCompW now shouldn't be the base of form component, e.g. TRrecordForm.
 	constructor(props) {
 		super(props);
 
@@ -141,6 +149,10 @@ class CheapFlowComp extends CrudComp {
 }
 const CheapFlow = withStyles(styles)(CheapFlowComp);
 
+/**
+ * To popup modal dialog, see
+ * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
+ */
 class DetailFormW extends React.Component {
 	state = {
 	};
@@ -162,7 +174,7 @@ DetailFormW.propTypes = {
 	/* TODO doc Design Notes:
 	 * Main CRUD page doesn't need this check. Those common used wigdets need this.
 	 */
-	uri: PropTypes.string.isRequired
+	// uri: PropTypes.string.isRequired
 };
 
 export {

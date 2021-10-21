@@ -1,13 +1,12 @@
-
+/**@module @anclient/semantier */
 import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from './protocol';
 
 const { CRUD } = Protocol;
 
 /**
- * @type ErrorCtx = { msg: string, }
- * 
  * Base class of semantic tier
  * @class
+ * @type {rows: array, rec: object, pk: string, pkval: string, records: () => array}
  */
 export class Semantier {
 	static invalidStyles = {
@@ -24,8 +23,8 @@ export class Semantier {
 	pkval = undefined;
 
 	/**
-	 * 
-	 * @param {uri: string} props 
+	 *
+	 * @param {uri: string} props
 	 */
 	constructor(props) {
 		if (!props || !props.uri)
@@ -35,8 +34,8 @@ export class Semantier {
 	}
 
 	/**
-	 * 
-	 * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context 
+	 *
+	 * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context
 	 */
 	setContext(context) {
 		if (!context || !context.anClient)

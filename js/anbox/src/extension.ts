@@ -159,26 +159,6 @@ class AnPagePanel {
 		if (AnPagePanel.currentPanel)
 			return AnPagePanel.currentPanel;
 
-		// function getDocumentWorkspaceFolder(html: vscode.Uri): string {
-		// 	// 1. find workspace root
-		// 	const fileName = html.fsPath;
-		// 	let ws = vscode.workspace.workspaceFolders;
-		// 	if (!ws)
-		// 		throw Error('Why workspaceFolder is null?');
-
-		// 	// 2. guess the output folder
-		// 	let outdirs = ['dist', 'out', 'build', 'publc', 'target', 'volume', 'res'];
-
-		// 	let wr = ws.map((folder) => folder.uri.fsPath)
-		// 		.filter((fsPath) => fileName?.startsWith(fsPath))[0];
-			
-		// 	// e.g. .../anclient/js/test/less/dist;
-		// 	wr = outdirs.filter((root) => fileName?.startsWith(path.join(wr, root)))
-		// 				.map(root => path.join(wr, root))[0];
-		// 	console.log('webroot:', wr);
-		// 	return wr;
-		// }
-
 		if (!htmlItem) { // not actived from explorer, try current active doc
 			let f = vscode.window.activeTextEditor?.document.uri;
 			if (f?.fsPath && new Set([".html", ".htm"]).has(path.extname(f?.fsPath)))
@@ -202,6 +182,7 @@ class AnPagePanel {
 				AnPagePanel.viewType,
 				'Anbox',
 				vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
+				{ retainContextWhenHidden: false }
 			);
 
 			panel.webview.options = getWebviewOpts(context.extensionUri);

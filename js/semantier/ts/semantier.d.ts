@@ -1,17 +1,7 @@
-export const override = < Sup >( sup : { prototype : Sup } ) => <
-    Field extends keyof Sup ,
-    Proto extends { [ key in Field ] : Sup[ Field ] } ,
->(
-    proto : Proto ,
-    field : Field ,
-    descr : TypedPropertyDescriptor< Sup[ Field ] > ,
-)=> {}
-
 /**
- * @type ErrorCtx = { msg: string, }
- *
  * Base class of semantic tier
  * @class
+ * @type {rows: array, rec: object, pk: string, pkval: string, records: () => array}
  */
 export class Semantier {
     static invalidStyles: {
