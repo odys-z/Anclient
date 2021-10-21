@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.3.19",
+  "version": "0.3.21",
   "description": "Anclient built on ReactJs.",
   "main": "./src/an-components.js",
   "directories": {
@@ -34,8 +34,6 @@
     "emotion": "^11.0.0",
     "mime-types-no-nodejs": "^0.9.1",
     "qrcode": "^1.4.4",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
     "react-elastic-carousel": "^0.11.5",
     "tar": "^4.4.19"
   },
@@ -53,7 +51,6 @@
     "babel-plugin-syntax-jsx": "^6.18.0",
     "babel-preset-env": "^1.7.0",
     "css-loader": "^2.1.1",
-    "d3": "^7.0.1",
     "jquery": "^3.6.0",
     "jsdoc": "^3.6.7",
     "postcss-loader": "^3.0.0",

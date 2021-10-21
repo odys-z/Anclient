@@ -102,15 +102,15 @@ export default withWidth()(withStyles(styles)(WelcomeComp));
 
 type WelcomeRec = {
 	eid: string,
-	ename: string,
-	title: string, // card title
-	publisher: string,
+	ename: string, // card title
+	publisher?: string | undefined,
 	edate: string,
 	css: any,
 	extra: string
 };
 
 class WelcomeTier extends Semantier {
+	rows: WelcomeRec[];
 	/**
 	 * 
 	 * @param props 
@@ -128,9 +128,10 @@ class WelcomeTier extends Semantier {
 		return super.rows;
 	}
 
-	myNotifies<WelcomeRec>(): Array<WelcomeRec> {
+	myNotifies<WelcomeRec>() {
 
-		super.rows = [{eid: '01', ename: 'Action Required', css: {important: true}, edate: '2021-10-10', extra: '100'},
+		this.rows = [
+			{eid: '01', ename: 'Action Required', css: {important: true}, edate: '2021-10-10', extra: '100'},
 			{eid: '02', ename: 'Abc@E', publisher: 'Becky', css: {type: 'auto'}, edate: '2021-10-10', extra: '100'}];
 		return this.rows;
 	}

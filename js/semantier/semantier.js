@@ -17,10 +17,31 @@ export class Semantier {
 		minLen : { border: "1px solid red" },
 	}
 
-	_cols = undefined;
-	_fields = undefined;
-	uri = undefined;
+	/** list's columns */
+	_cols = [];
+
+	/** client function / CRUD identity */
+	uri = '';
+
+	/** maintable's record fields */
+	_fields = [];
+
+	/** optional main table's pk */
+	pk = '';
+
+	/** current crud */
+	crud = CRUD.r;
+
+	/** current list's data */
+	rows = [];
+
+	/** current record */
+	rec = {};
+	/** current pk value */
 	pkval = undefined;
+
+	/** current relations */
+	rels = [];
 
 	/**
 	 *
