@@ -2,7 +2,7 @@
 
 Anbox is a vs code extionsion for editing morden (webpack transpiled) pages. 
 
-![screenshot](res/00-anbox-0.1.0.png)
+![[screenshot](https://github.com/odys-z/Anclient/blob/master/js/anbox/res/00-anbox-0.1.0.png?raw=true)](res/00-anbox-0.1.0.png)
 
 ## install
 
