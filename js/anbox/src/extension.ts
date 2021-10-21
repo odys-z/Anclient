@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as cp from "child_process";
 import * as path from 'path';
 import { pythonCmd } from './lib/platform';
+import { ServHelper } from './webroot';
 
 type Page = {
 	port: string,
@@ -18,7 +19,6 @@ type Serv = {
 	pythonPath: string,
 	webroot: string,
 	starting: boolean,
-	webpackTerm: undefined
 };
 
 interface AnboxException {
@@ -72,7 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anbox.shutdownServer', () => {
 			if (AnPagePanel.currentPanel) {
-				AnPagePanel.currentPanel.serv.starting = false;
+				AnPagePanel.currentPanel.serv.starting(false);
 				AnPagePanel.currentPanel.close();
 			}
 		})
@@ -85,7 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
 				console.log(`Got state: ${state}`);
 				// Reset the webview options so we use latest uri for `localResourceRoots`.
 				webviewPanel.webview.options = getWebviewOpts(context.extensionUri);
-				AnPagePanel.revive(webviewPanel, undefined, context.extensionUri);
+				AnPagePanel.revive(webviewPanel, context.extensionUri);
 			}
 		});
 	}
@@ -97,25 +97,12 @@ export function deactivate() {
 }
 
 /**
- * Set loacal resource root - restrict the webview to only loading content from target project's directory.
- * @param extensionUri e.g. {scheme: 'file', authority: '', path: '/home/ody/anclient/js/anbox', query: '', fragment: '', …}
+ * @param extensionUri
  * @returns 
  */
 function getWebviewOpts(extensionUri: vscode.Uri): vscode.WebviewOptions {
-	console.log(extensionUri);
-
-	// FIXME (by UX and Try).
-	const dist = vscode.Uri.joinPath(extensionUri, 'dist');
-	const out = vscode.Uri.joinPath(extensionUri, 'out');
-	const build = vscode.Uri.joinPath(extensionUri, 'build');
-	const publc = vscode.Uri.joinPath(extensionUri, 'public');
-	const target = vscode.Uri.joinPath(extensionUri, 'target');
-	const volume = vscode.Uri.joinPath(extensionUri, 'volume');
-	const res = vscode.Uri.joinPath(extensionUri, 'res');
-
 	return {
 		enableScripts: true,
-		localResourceRoots: [dist, out, build, publc, target, volume, res]
 	};
 }
 
@@ -152,7 +139,10 @@ class AnPagePanel {
 		style: `background-color: #ccc`
 	};
 
-	serv: Serv;
+	// serv: Serv;
+	// @type ServHelper
+	serv: ServHelper;
+
 	static log: vscode.OutputChannel;
 
 	static init(context: vscode.ExtensionContext, htmlItem: vscode.Uri | undefined) {
@@ -170,13 +160,13 @@ class AnPagePanel {
 			return undefined;
 		}
 		else {
-			let serv :Serv = {
-						pythonPath: context.asAbsolutePath(path.join('packages', 'anserv.py')),
-						webroot: this.getWorkspaceWebFolder(htmlItem),
-						starting: false,
-						webpackTerm: undefined };
+			let serv = new ServHelper(context);
+				// pythonPath: context.asAbsolutePath(path.join('packages', 'anserv.py')),
+				// webroot: this.getWorkspaceWebFolder(htmlItem),
+				// port: undefined,
+				// starting: false }
 
-			AnPagePanel.log.appendLine('Loading ' + serv.webroot);
+			AnPagePanel.log.appendLine('web root: ' + serv.webroot);
 
 			const panel = vscode.window.createWebviewPanel(
 				AnPagePanel.viewType,
@@ -186,7 +176,7 @@ class AnPagePanel {
 			);
 
 			panel.webview.options = getWebviewOpts(context.extensionUri);
-			return AnPagePanel.revive(panel, serv, context.extensionUri);
+			return AnPagePanel.revive(panel, context.extensionUri);
 		}
 	}
 
@@ -197,12 +187,11 @@ class AnPagePanel {
 	 * @param extensionUri 
 	 * @returns current panel
 	 */
-	public static revive(panel: vscode.WebviewPanel, serv: Serv | undefined, extensionUri: vscode.Uri) {
+	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+
+		AnPagePanel.currentPanel = new AnPagePanel(panel, extensionUri);
 
 		AnPagePanel.log.appendLine("Anbox webview revived.");
-
-		AnPagePanel.currentPanel = new AnPagePanel(panel, serv, extensionUri);
-		AnPagePanel.currentPanel.serv = serv!;
 		return AnPagePanel.currentPanel;
 	}
 
@@ -254,12 +243,12 @@ class AnPagePanel {
 	/**
 	 * Update some option of the serv info.
 	 * @param opt options to update
-	 */
 	getServ(page?: vscode.Uri): Serv {
 		if (page)
 			this.serv.webroot = AnPagePanel.getWorkspaceWebFolder(page);
 		return this.serv;
 	}
+	 */
 
 	/**
 	 * Find root of localhtml, return the serv instance. 
@@ -273,35 +262,35 @@ class AnPagePanel {
 	 * Startup server in possible server root dir.
 	 */
 	async startup() {
-		const cmd = `${pythonCmd('')} ${this.serv.pythonPath} -b 0.0.0.0 -w ${this.serv.webroot} ${this.page.port} &`;
+		const cmd = `${pythonCmd('')} ${this.serv.pythonPath()} -b 0.0.0.0 -w ${this.serv.webroot} ${this.page.port} &`;
 
-		this.serv.starting = true;
+		this.serv.starting(true);
 		AnPagePanel.log.appendLine(cmd);
 		vscode.window.showInformationMessage('Starting Anbox server at ' + this.serv.webroot);
 
 		new Promise<string>((resolve, reject) => {
 			cp.exec(cmd, (err, out) => {
 				if (err) {
-					this.serv.starting = false;
+					this.serv.starting(false);
 					AnPagePanel.log.appendLine(err.message);
 					vscode.window.showInformationMessage('Starting Anbox server failed. ' + err.message);
 					return reject(err);
 				}
-				this.serv.starting = false; // test shows only server stopped can reach here
+				this.serv.starting(false); // test shows only server stopped can reach here
 				AnPagePanel.log.appendLine(out.toString());
 				return resolve(out);
 			});
 		});
 	}
 
-	private constructor(panel: vscode.WebviewPanel, serv: Serv | undefined, extensionUri: vscode.Uri) {
+	constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
 		this._panel = panel;
-		this.serv = serv || {
-			pythonPath: '',
-			webroot: '',
-			starting: false,
-			webpackTerm: undefined
-		};
+		// this.serv = serv || {
+		// 	pythonPath: '',
+		// 	webroot: '',
+		// 	starting: false,
+		// 	webpackTerm: undefined
+		// };
 		this._extensionUri = extensionUri;
 
 		// Set the webview's initial html content
@@ -336,6 +325,11 @@ class AnPagePanel {
 		);
 	}
 
+	/**Dispose Anbox panel not necessarily shutdown server  - can still debugging with js-debugger.
+	 * 
+	 * Anserv lives longer than debugger, which is longer than panel.
+	 * The only way to shutdown anserv is the shutdown command or quit vscode.
+	 */
 	public dispose() {
 		AnPagePanel.currentPanel = undefined;
 
@@ -361,7 +355,6 @@ class AnPagePanel {
 	refresh(): void {
 		this._panel.webview.html = "";
 		this._panel.webview.html = this.getAnclientPage(this.page);
-
 	}
 
 	/**
@@ -392,7 +385,7 @@ class AnPagePanel {
 	}
 
 	close(): void {
-		AnPagePanel.log.appendLine('Shuting down: ' + this.page.html);
+		AnPagePanel.log.appendLine('Shuting down: ' + this.serv?.serv.webroot);
 		vscode.window.showInformationMessage('Shuting down Anbox server. ' + this.page.html);
 
 		this.page.html = '?_shut-down_=True';
@@ -419,23 +412,23 @@ class AnPagePanel {
 		return path.basename(uri.path);
 	}
 
-	static getWorkspaceWebFolder(html: vscode.Uri): string {
-		// 1. find workspace root
-		const fileName = html.fsPath;
-		let ws = vscode.workspace.workspaceFolders;
-		if (!ws)
-			throw Error('Why workspaceFolder is null?');
+	// static getWorkspaceWebFolder(html: vscode.Uri): string {
+	// 	// 1. find workspace root
+	// 	const fileName = html.fsPath;
+	// 	let ws = vscode.workspace.workspaceFolders;
+	// 	if (!ws)
+	// 		throw Error('Why workspaceFolder is null?');
 
-		// 2. guess the output folder
-		let outdirs = ['dist', 'out', 'build', 'publc', 'target', 'volume', 'res'];
+	// 	// 2. guess the output folder
+	// 	let outdirs = ['dist', 'out', 'build', 'publc', 'target', 'volume', 'res'];
 
-		let wr = ws.map((folder) => folder.uri.fsPath)
-			.filter((fsPath) => fileName?.startsWith(fsPath))[0];
+	// 	let wr = ws.map((folder) => folder.uri.fsPath)
+	// 		.filter((fsPath) => fileName?.startsWith(fsPath))[0];
 		
-		// e.g. .../anclient/js/test/less/dist;
-		wr = outdirs.filter((root) => fileName?.startsWith(path.join(wr, root)))
-					.map(root => path.join(wr, root))[0];
-		console.log('webroot:', wr);
-		return wr;
-	}
+	// 	// e.g. .../anclient/js/test/less/dist;
+	// 	wr = outdirs.filter((root) => fileName?.startsWith(path.join(wr, root)))
+	// 				.map(root => path.join(wr, root))[0];
+	// 	console.log('webroot:', wr);
+	// 	return wr;
+	// }
 }

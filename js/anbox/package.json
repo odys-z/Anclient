@@ -2,7 +2,7 @@
   "name": "anbox",
   "displayName": "Anbox",
   "description": "Anclient sandbox",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "ody-zhou",
   "repository": {
     "type": "git",
