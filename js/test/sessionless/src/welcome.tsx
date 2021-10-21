@@ -77,7 +77,7 @@ class WelcomeComp extends CrudComp {
 		return events?.map( (e) =>
 		<Card key={e.eid} className={this.classes.card}>
 			<Typography gutterBottom variant='h4' className={this.classes.cardTitle}>
-				{e.title || e.ename}
+				{e.ename}
 			</Typography>
 			<Paper elevation={4} className={this.classes.cardText}>
 				<Box component='span' className={this.classes.cardText} >
