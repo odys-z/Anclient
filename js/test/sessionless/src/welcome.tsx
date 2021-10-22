@@ -25,6 +25,9 @@ const styles = (theme) => ( {
 	cartText: {
 		width: "86%",
 		margin: theme.spacing(1)
+	},
+	svgicn: {
+		verticalAlign: "middle",
 	}
 });
 
@@ -55,8 +58,8 @@ class WelcomeComp extends CrudComp {
 		let color = e.css?.important ? 'secondary' : 'primary'; 
 
 		return e.css?.type === 'auto'
-			? <jsample.JsampleIcons.Search color={color} />
-			: <jsample.JsampleIcons.Star color={color} />
+			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
+			: <jsample.JsampleIcons.Star color={color} className={this.classes.svgicn}/>
 			;
 	}
 
@@ -77,11 +80,11 @@ class WelcomeComp extends CrudComp {
 		return events?.map( (e) =>
 		<Card key={e.eid} className={this.classes.card}>
 			<Typography gutterBottom variant='h4' className={this.classes.cardTitle}>
-				{e.title || e.ename}
+				{e.ename}
 			</Typography>
 			<Paper elevation={4} className={this.classes.cardText}>
 				<Box component='span' className={this.classes.cardText} >
-					<span>By:<br/></span>
+					<span>From:<br/></span>
 					{this.icon(e)}
 					<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
 						{`${e.publisher || 'Anbox Robot'}`}</Link>
