@@ -135,7 +135,7 @@ class WelcomeTier extends Semantier {
 
 		this.rows = [
 			{eid: '01', ename: 'Action Required', css: {important: true}, edate: '2021-10-10', extra: '100'},
-			{eid: '02', ename: 'Abc@E', publisher: 'Becky', css: {type: 'auto'}, edate: '2021-10-10', extra: '100'}];
+			{eid: '02', ename: 'Abc@E', publisher: '👉 Try the style', css: {type: 'auto'}, edate: '2021-10-10', extra: '100'}];
 		return this.rows;
 	}
 }
