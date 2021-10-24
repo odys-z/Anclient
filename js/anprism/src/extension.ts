@@ -1,41 +1,21 @@
-/* eslint-disable curly */
 import * as vscode from 'vscode';
 import * as cp from "child_process";
 import * as path from 'path';
 import { pythonCmd } from './lib/platform';
-
-type Page = {
-	port: string,
-	host: string,
-
-	html: string,
-
-	style: string
-};
-
-type Serv = {
-	/**TODO: Only used when system python command not in path environment. */
-	pythonPath: string,
-	webroot: string,
-	starting: boolean,
-	webpackTerm: undefined
-};
-
-interface AnboxException {
-	getMessage(): string
-};
+import { Page, ServHelper } from './serv-helper';
+import { AnprismException } from './common';
 
 /**
- * Setup Anbox.
+ * Setup Anprism.
  * @param context
  */
 export function activate(context: vscode.ExtensionContext) {
 	if (!AnPagePanel.log)
-		AnPagePanel.log = vscode.window.createOutputChannel("Anbox");
-	AnPagePanel.log.appendLine('Starting Anbox ...');
+		AnPagePanel.log = vscode.window.createOutputChannel("Anprism");
+	AnPagePanel.log.appendLine('Starting Anprism ...');
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anbox.load',
+		vscode.commands.registerCommand('anprism.load',
 			/* uri ~ uris[0] ( from explorer menu ):
 			 { formatted:'file:///.../target-file',
 			   _fsPath:'/home/.../target-file',
@@ -47,32 +27,34 @@ export function activate(context: vscode.ExtensionContext) {
 			 */
 			(uri, uris) => {
 				AnPagePanel.init(context, uri);
-				AnPagePanel.currentPanel?.load(context.extensionUri, uri);
+				AnPagePanel.currentPanel?.load(context, uri);
 			})
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anbox.refresh', () => {
+		vscode.commands.registerCommand('anprism.refresh', () => {
 			if (AnPagePanel.currentPanel) {
-				AnPagePanel.currentPanel.refresh();
+				AnPagePanel.currentPanel.refresh(undefined);
 			}
 		})
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anbox.restartServer', () => {
+		vscode.commands.registerCommand('anprism.restartServer', () => {
 			if (AnPagePanel.currentPanel) {
 				AnPagePanel.currentPanel.startup();
 			}
 			else 
-				vscode.window.showInformationMessage('Sever only started when Anbox is loaded!');
+				vscode.window.showInformationMessage('Sever only started when Anprism is loaded!');
 		})
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anbox.shutdownServer', () => {
+		vscode.commands.registerCommand('anprism.shutdownServer', () => {
+			// FIXME bug: can't shutdown without a panel providing serv info.
+			// This hanppens when user closed Anprism panel and fire shutdown comand.
 			if (AnPagePanel.currentPanel) {
-				AnPagePanel.currentPanel.serv.starting = false;
+				AnPagePanel.currentPanel.serv.starting(false);
 				AnPagePanel.currentPanel.close();
 			}
 		})
@@ -85,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
 				console.log(`Got state: ${state}`);
 				// Reset the webview options so we use latest uri for `localResourceRoots`.
 				webviewPanel.webview.options = getWebviewOpts(context.extensionUri);
-				AnPagePanel.revive(webviewPanel, undefined, context.extensionUri);
+				AnPagePanel.revive(context, webviewPanel, undefined);
 			}
 		});
 	}
@@ -97,37 +79,27 @@ export function deactivate() {
 }
 
 /**
- * Set loacal resource root - restrict the webview to only loading content from target project's directory.
- * @param extensionUri e.g. {scheme: 'file', authority: '', path: '/home/ody/anclient/js/anbox', query: '', fragment: '', …}
+ * @deprecated
+ * @param extensionUri
  * @returns 
  */
 function getWebviewOpts(extensionUri: vscode.Uri): vscode.WebviewOptions {
-	console.log(extensionUri);
-
-	// FIXME (by UX and Try).
-	const dist = vscode.Uri.joinPath(extensionUri, 'dist');
-	const out = vscode.Uri.joinPath(extensionUri, 'out');
-	const build = vscode.Uri.joinPath(extensionUri, 'build');
-	const publc = vscode.Uri.joinPath(extensionUri, 'public');
-	const target = vscode.Uri.joinPath(extensionUri, 'target');
-	const volume = vscode.Uri.joinPath(extensionUri, 'volume');
-	const res = vscode.Uri.joinPath(extensionUri, 'res');
-
 	return {
 		enableScripts: true,
-		localResourceRoots: [dist, out, build, publc, target, volume, res]
 	};
 }
 
-/**
- * Anbox page view.
+/**FIXME
+ * Anprism page view.
  * @example
  * load -----[  stop   ]-+ start --+-- load html
  * load -----[ running ]-|---------|
  * restart ----close()---+         |
  * refresh --[  stop   ]-^         |
  * refresh --[ running ]-----------^
- * close ----------------- stop
+ * FIXME
+ * close ----[ running ]-- handle orphan serv to extension
+ * shutdown -------------- stop
  * 
  */
 class AnPagePanel {
@@ -136,7 +108,7 @@ class AnPagePanel {
 	 */
 	public static currentPanel: AnPagePanel | undefined;
 
-	public static readonly viewType = 'anbox';
+	public static readonly viewType = 'anprism';
 
 	private readonly _panel: vscode.WebviewPanel;
 	private readonly _extensionUri: vscode.Uri;
@@ -148,11 +120,15 @@ class AnPagePanel {
 	page: Page = {
 		port: "8888",
 		host: "localhost",
-		html: "index.html",
-		style: `background-color: #ccc`
+		html: vscode.Uri.file("index.html"),
+		style: `background-color: #ccc`,
+		reload: false
 	};
 
-	serv: Serv;
+	// serv: Serv;
+	// @type ServHelper
+	serv: ServHelper;
+
 	static log: vscode.OutputChannel;
 
 	static init(context: vscode.ExtensionContext, htmlItem: vscode.Uri | undefined) {
@@ -166,43 +142,54 @@ class AnPagePanel {
 		}
 		
 		if (!htmlItem) {
-			vscode.window.showInformationMessage('Anbox don\'t know which html page to load!');
+			vscode.window.showInformationMessage('Anprism don\'t know which html page to load!');
 			return undefined;
 		}
 		else {
-			let serv :Serv = {
-						pythonPath: context.asAbsolutePath(path.join('packages', 'anserv.py')),
-						webroot: this.getWorkspaceWebFolder(htmlItem),
-						starting: false,
-						webpackTerm: undefined };
+			let serv = new ServHelper(context).checkHtml(htmlItem);
 
-			AnPagePanel.log.appendLine('Loading ' + serv.webroot);
+			AnPagePanel.log.appendLine('web root: ' + serv.webrootPath());
 
 			const panel = vscode.window.createWebviewPanel(
 				AnPagePanel.viewType,
-				'Anbox',
+				'Anprism',
 				vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
+				{ retainContextWhenHidden: false }
 			);
 
 			panel.webview.options = getWebviewOpts(context.extensionUri);
-			return AnPagePanel.revive(panel, serv, context.extensionUri);
+			return AnPagePanel.revive(context, panel, serv);
 		}
 	}
 
 	/**
 	 * Deserialize
 	 * @param panel 
-	 * @param serv 
 	 * @param extensionUri 
+	 * @param serv 
 	 * @returns current panel
 	 */
-	public static revive(panel: vscode.WebviewPanel, serv: Serv | undefined, extensionUri: vscode.Uri) {
+	public static revive(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, serv: ServHelper | undefined) {
 
-		AnPagePanel.log.appendLine("Anbox webview revived.");
-
-		AnPagePanel.currentPanel = new AnPagePanel(panel, serv, extensionUri);
-		AnPagePanel.currentPanel.serv = serv!;
+		serv = serv || new ServHelper(context);
+		const p = new AnPagePanel(context, panel, serv);
+		p._panel.webview.onDidReceiveMessage(
+			(message) =>
+				p.handleWebviewMessage(message)
+			);
+		AnPagePanel.currentPanel = p;
+		AnPagePanel.log.appendLine("Anprism webview revived.");
 		return AnPagePanel.currentPanel;
+	}
+
+	handleWebviewMessage(message: any): any {
+		switch (message.command) {
+			case 'devtools-open':
+				vscode.commands.executeCommand(
+					'workbench.action.webview.openDeveloperTools'
+				);
+				return;
+		}
 	}
 
 	/**
@@ -210,21 +197,13 @@ class AnPagePanel {
 	 * @param extensionUri 
 	 * @returns 
 	 */
-	public async load(extensionUri: vscode.Uri, localhtml: vscode.Uri) {
-		let serv = this.getServ(localhtml);
-
-		if (!serv.webroot) {
-			vscode.window.showErrorMessage('No html page found.');
-			AnPagePanel.log.appendLine('No html page found.');
-			return;
-		}
-
-		if (!serv.starting) {
+	public async load(context: vscode.ExtensionContext, localhtml: vscode.Uri) {
+		if (!this.serv.isStarting()) {
 			try {
 				await AnPagePanel.currentPanel!.startup();
 			}
 			catch (e) {
-				vscode.window.showInformationMessage( (<AnboxException>e).getMessage() );
+				vscode.window.showInformationMessage( (<AnprismException>e).getMessage() || "" );
 			}
 		}
 
@@ -236,72 +215,64 @@ class AnPagePanel {
 		if (!AnPagePanel.currentPanel) {
 			const panel = vscode.window.createWebviewPanel(
 				AnPagePanel.viewType,
-				`Anbox - ${AnPagePanel.filename(localhtml)}`,
-				column || vscode.ViewColumn.One,
-				getWebviewOpts(extensionUri),
+				`Anprism - ${AnPagePanel.filename(localhtml)}`,
+				column || vscode.ViewColumn.One
 			);
 
 			AnPagePanel.log.append("Open page " + AnPagePanel.filename(localhtml));
-			AnPagePanel.currentPanel = new AnPagePanel(panel, serv, extensionUri);
+			AnPagePanel.currentPanel = new AnPagePanel(context, panel, this.serv);
 		}
 
 		// show it.
-		this.refresh();
+		try {
+			this.refresh(localhtml);
+		}
+		catch (e) {
+			if (e instanceof AnprismException)
+				vscode.window.showErrorMessage((e as AnprismException).getMessage());
+		}
 		AnPagePanel.currentPanel._panel.reveal(column);
-	}
-
-	/**
-	 * Update some option of the serv info.
-	 * @param opt options to update
-	 */
-	getServ(page?: vscode.Uri): Serv {
-		if (page)
-			this.serv.webroot = AnPagePanel.getWorkspaceWebFolder(page);
-		return this.serv;
 	}
 
 	/**
 	 * Find root of localhtml, return the serv instance. 
 	 * @param html 
-	 */
 	setPage(html: string) {
-		this.page.html = html;
+		this.page.html = vscode.Uri.file(html);
 	}
+	 */
 
 	/**
 	 * Startup server in possible server root dir.
 	 */
 	async startup() {
-		const cmd = `${pythonCmd('')} ${this.serv.pythonPath} -b 0.0.0.0 -w ${this.serv.webroot} ${this.page.port} &`;
+		const cmd = `${pythonCmd('')} ${this.serv.pythonPath()} -b 0.0.0.0 -w ${this.serv.webrootPath()} ${this.page.port} &`;
 
-		this.serv.starting = true;
+		this.serv.starting(true);
 		AnPagePanel.log.appendLine(cmd);
-		vscode.window.showInformationMessage('Starting Anbox server at ' + this.serv.webroot);
+		vscode.window.showInformationMessage('Starting Anprism server at ' + this.serv.webrootPath());
 
 		new Promise<string>((resolve, reject) => {
 			cp.exec(cmd, (err, out) => {
 				if (err) {
-					this.serv.starting = false;
+					this.serv.starting(false);
 					AnPagePanel.log.appendLine(err.message);
-					vscode.window.showInformationMessage('Starting Anbox server failed. ' + err.message);
+					vscode.window.showInformationMessage('Starting Anprism server failed. ' + err.message);
 					return reject(err);
 				}
-				this.serv.starting = false; // test shows only server stopped can reach here
+				this.serv.starting(false); // test shows only server stopped can reach here
 				AnPagePanel.log.appendLine(out.toString());
 				return resolve(out);
 			});
 		});
 	}
 
-	private constructor(panel: vscode.WebviewPanel, serv: Serv | undefined, extensionUri: vscode.Uri) {
+	constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, serv: ServHelper) {
+		// this.serv = new ServHelper(context);
+		this.serv = serv;
+
 		this._panel = panel;
-		this.serv = serv || {
-			pythonPath: '',
-			webroot: '',
-			starting: false,
-			webpackTerm: undefined
-		};
-		this._extensionUri = extensionUri;
+		this._extensionUri = context.extensionUri;
 
 		// Set the webview's initial html content
 		this.loadOnline();
@@ -310,14 +281,18 @@ class AnPagePanel {
 		// This happens when the user closes the panel or when the panel is closed programmatically
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-		// Update the content based on view changes
+		// Update the content based on view changes - how to watch webpack results?
 		this._panel.onDidChangeViewState(
 			e => {
-				if (this._panel.visible) {
-					this.refresh();
+				// Note: don't load every time the other editors changed - irritating when the page needs user actions.
+				if (this._panel.visible && this.page.reload) {
+					this.page.reload = false;
+					this.refresh(undefined);
 				}
+				else if (!this._panel.visible)
+					this.page.reload = true;
 			},
-			null,
+			this,
 			this._disposables
 		);
 
@@ -335,6 +310,11 @@ class AnPagePanel {
 		);
 	}
 
+	/**Dispose Anprism panel not necessarily shutdown server  - can still debugging with js-debugger.
+	 * 
+	 * Anserv lives longer than debugger, which is longer than panel.
+	 * The only way to shutdown anserv is the shutdown command or quit vscode.
+	 */
 	public dispose() {
 		AnPagePanel.currentPanel = undefined;
 
@@ -357,10 +337,11 @@ class AnPagePanel {
 		this._panel.webview.html = this.getAnclientPage(this.page);
 	}
 
-	refresh(): void {
+	refresh(newPage: vscode.Uri | undefined): void {
 		this._panel.webview.html = "";
+		this.page.html = newPage || this.page.html;
+		this.serv.checkHtml(this.page.html);
 		this._panel.webview.html = this.getAnclientPage(this.page);
-
 	}
 
 	/**
@@ -372,30 +353,35 @@ class AnPagePanel {
 	 * @returns 
 	 */
 	getAnclientPage(page: Page): string {
+		let url = this.serv.url(page);
 		return `<!DOCTYPE html>
 		<html lang="en">
 		<head>
 			<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<script type="text/javascript">var vscode = acquireVsCodeApi();</script
 		</head>
 		<body>
-			<p id="lines-of-code-counter">${page.html}
-			<input type='button' value='refresh' onclick='console.log("xxx");
-				document.getElementById("i-anbox").src = document.getElementById("i-anbox").src
-			'
+			<p id="lines-of-code-counter">${url}
+			<input type='button' value='refresh' onclick='console.log("refresh"); document.getElementById("i-anprism").src = document.getElementById("i-anprism").src'
+			/>
+			<input type='button' value='dev tool'
+				onclick='vscode.postMessage({ command: "devtools-open", text: "" });'
 			/>
 			</p>
-			<iframe id='i-anbox' src="${AnPagePanel.url(page)}" width="100%" height="720px" style="${page.style}" ></iframe>
+			<iframe id='i-anprism' src="${url}" width="100%" height="720px" style="${page.style}" ></iframe>
 		</body>
 		</html>`;
 	}
 
 	close(): void {
-		AnPagePanel.log.appendLine('Shuting down: ' + this.page.html);
-		vscode.window.showInformationMessage('Shuting down Anbox server. ' + this.page.html);
+		AnPagePanel.log.appendLine('Shuting down: ' + this.serv?.serv.webroot);
+		vscode.window.showInformationMessage('Shuting down Anprism server. ' + this.page.html);
 
-		this.page.html = '?_shut-down_=True';
-		let req = AnPagePanel.url(this.page);
+		// this.page.html = '?_shut-down_=True';
+		this.page.html = vscode.Uri.file('?_shut-down_=True');
+
+		let req = this.serv.url(this.page);
 		console.log(req);
 		this._panel.webview.html = '';
 		this._panel.webview.html = `<!DOCTYPE html>
@@ -410,31 +396,8 @@ class AnPagePanel {
 		</html>`;
 	}
 
-	public static url(page: Page): string {
-		return `http://${page.host}:${page.port}/${page.html}`;
-	}
-
 	public static filename(uri: vscode.Uri): string {
 		return path.basename(uri.path);
 	}
 
-	static getWorkspaceWebFolder(html: vscode.Uri): string {
-		// 1. find workspace root
-		const fileName = html.fsPath;
-		let ws = vscode.workspace.workspaceFolders;
-		if (!ws)
-			throw Error('Why workspaceFolder is null?');
-
-		// 2. guess the output folder
-		let outdirs = ['dist', 'out', 'build', 'publc', 'target', 'volume', 'res'];
-
-		let wr = ws.map((folder) => folder.uri.fsPath)
-			.filter((fsPath) => fileName?.startsWith(fsPath))[0];
-		
-		// e.g. .../anclient/js/test/less/dist;
-		wr = outdirs.filter((root) => fileName?.startsWith(path.join(wr, root)))
-					.map(root => path.join(wr, root))[0];
-		console.log('webroot:', wr);
-		return wr;
-	}
 }

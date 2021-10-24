@@ -9,3 +9,5 @@
     npm i tslint --save-dev
     npx tslint --init
 ```
+
+see [here](https://www.typescriptlang.org/download)

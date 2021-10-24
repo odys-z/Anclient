@@ -1,12 +1,13 @@
 {
-  "name": "anbox",
-  "displayName": "Anbox",
-  "description": "Anclient sandbox",
-  "version": "0.1.1",
+  "name": "anprism",
+  "displayName": "Anprism",
+  "description": "Anclient's js page sandbox",
+  "version": "0.2.0",
+  "icon": "res/anprism.png",
   "publisher": "ody-zhou",
   "repository": {
     "type": "git",
-    "url": "https://github.com/odys-z/Anclient/js/anbox"
+    "url": "https://github.com/odys-z/Anclient/tree/master/js/anprism"
   },
   "engines": {
     "vscode": "^1.61.0"
@@ -15,38 +16,38 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:anbox.load",
-    "onCommand:anbox.restartServer"
+    "onCommand:anprism.load",
+    "onCommand:anprism.restartServer"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "anbox.load",
-        "title": "Load Anbox",
-        "category": "Anbox"
+        "command": "anprism.load",
+        "title": "Load Anprism",
+        "category": "Anprism"
       },
       {
-        "command": "anbox.refresh",
-        "title": "Refresh Anbox",
-        "category": "Anbox"
+        "command": "anprism.refresh",
+        "title": "Refresh Anprism",
+        "category": "Anprism"
       },
       {
-        "command": "anbox.restartServer",
+        "command": "anprism.restartServer",
         "title": "Start server",
-        "category": "Anbox"
+        "category": "Anprism"
       },
       {
-        "command": "anbox.shutdownServer",
+        "command": "anprism.shutdownServer",
         "title": "Shutdown server",
-        "category": "Anbox"
+        "category": "Anprism"
       }
     ],
     "menus": {
       "explorer/context": [
         {
           "when": "resourceLangId == html",
-          "command": "anbox.load",
+          "command": "anprism.load",
           "group": "navigation"
         }
       ]
