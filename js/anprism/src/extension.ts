@@ -3,19 +3,19 @@ import * as cp from "child_process";
 import * as path from 'path';
 import { pythonCmd } from './lib/platform';
 import { Page, ServHelper } from './serv-helper';
-import { AnboxException } from './common';
+import { AnprismException } from './common';
 
 /**
- * Setup Anbox.
+ * Setup Anprism.
  * @param context
  */
 export function activate(context: vscode.ExtensionContext) {
 	if (!AnPagePanel.log)
-		AnPagePanel.log = vscode.window.createOutputChannel("Anbox");
-	AnPagePanel.log.appendLine('Starting Anbox ...');
+		AnPagePanel.log = vscode.window.createOutputChannel("Anprism");
+	AnPagePanel.log.appendLine('Starting Anprism ...');
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anbox.load',
+		vscode.commands.registerCommand('anprism.load',
 			/* uri ~ uris[0] ( from explorer menu ):
 			 { formatted:'file:///.../target-file',
 			   _fsPath:'/home/.../target-file',
@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anbox.refresh', () => {
+		vscode.commands.registerCommand('anprism.refresh', () => {
 			if (AnPagePanel.currentPanel) {
 				AnPagePanel.currentPanel.refresh(undefined);
 			}
@@ -40,19 +40,19 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anbox.restartServer', () => {
+		vscode.commands.registerCommand('anprism.restartServer', () => {
 			if (AnPagePanel.currentPanel) {
 				AnPagePanel.currentPanel.startup();
 			}
 			else 
-				vscode.window.showInformationMessage('Sever only started when Anbox is loaded!');
+				vscode.window.showInformationMessage('Sever only started when Anprism is loaded!');
 		})
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('anbox.shutdownServer', () => {
+		vscode.commands.registerCommand('anprism.shutdownServer', () => {
 			// FIXME bug: can't shutdown without a panel providing serv info.
-			// This hanppens when user closed Anbox panel and fire shutdown comand.
+			// This hanppens when user closed Anprism panel and fire shutdown comand.
 			if (AnPagePanel.currentPanel) {
 				AnPagePanel.currentPanel.serv.starting(false);
 				AnPagePanel.currentPanel.close();
@@ -90,7 +90,7 @@ function getWebviewOpts(extensionUri: vscode.Uri): vscode.WebviewOptions {
 }
 
 /**FIXME
- * Anbox page view.
+ * Anprism page view.
  * @example
  * load -----[  stop   ]-+ start --+-- load html
  * load -----[ running ]-|---------|
@@ -108,7 +108,7 @@ class AnPagePanel {
 	 */
 	public static currentPanel: AnPagePanel | undefined;
 
-	public static readonly viewType = 'anbox';
+	public static readonly viewType = 'anprism';
 
 	private readonly _panel: vscode.WebviewPanel;
 	private readonly _extensionUri: vscode.Uri;
@@ -141,7 +141,7 @@ class AnPagePanel {
 		}
 		
 		if (!htmlItem) {
-			vscode.window.showInformationMessage('Anbox don\'t know which html page to load!');
+			vscode.window.showInformationMessage('Anprism don\'t know which html page to load!');
 			return undefined;
 		}
 		else {
@@ -151,7 +151,7 @@ class AnPagePanel {
 
 			const panel = vscode.window.createWebviewPanel(
 				AnPagePanel.viewType,
-				'Anbox',
+				'Anprism',
 				vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
 				{ retainContextWhenHidden: false }
 			);
@@ -177,7 +177,7 @@ class AnPagePanel {
 				p.handleWebviewMessage(message)
 			);
 		AnPagePanel.currentPanel = p;
-		AnPagePanel.log.appendLine("Anbox webview revived.");
+		AnPagePanel.log.appendLine("Anprism webview revived.");
 		return AnPagePanel.currentPanel;
 	}
 
@@ -202,7 +202,7 @@ class AnPagePanel {
 				await AnPagePanel.currentPanel!.startup();
 			}
 			catch (e) {
-				vscode.window.showInformationMessage( (<AnboxException>e).getMessage() || "" );
+				vscode.window.showInformationMessage( (<AnprismException>e).getMessage() || "" );
 			}
 		}
 
@@ -214,7 +214,7 @@ class AnPagePanel {
 		if (!AnPagePanel.currentPanel) {
 			const panel = vscode.window.createWebviewPanel(
 				AnPagePanel.viewType,
-				`Anbox - ${AnPagePanel.filename(localhtml)}`,
+				`Anprism - ${AnPagePanel.filename(localhtml)}`,
 				column || vscode.ViewColumn.One
 			);
 
@@ -227,8 +227,8 @@ class AnPagePanel {
 			this.refresh(localhtml);
 		}
 		catch (e) {
-			if (e instanceof AnboxException)
-				vscode.window.showErrorMessage((e as AnboxException).getMessage());
+			if (e instanceof AnprismException)
+				vscode.window.showErrorMessage((e as AnprismException).getMessage());
 		}
 		AnPagePanel.currentPanel._panel.reveal(column);
 	}
@@ -249,14 +249,14 @@ class AnPagePanel {
 
 		this.serv.starting(true);
 		AnPagePanel.log.appendLine(cmd);
-		vscode.window.showInformationMessage('Starting Anbox server at ' + this.serv.webrootPath());
+		vscode.window.showInformationMessage('Starting Anprism server at ' + this.serv.webrootPath());
 
 		new Promise<string>((resolve, reject) => {
 			cp.exec(cmd, (err, out) => {
 				if (err) {
 					this.serv.starting(false);
 					AnPagePanel.log.appendLine(err.message);
-					vscode.window.showInformationMessage('Starting Anbox server failed. ' + err.message);
+					vscode.window.showInformationMessage('Starting Anprism server failed. ' + err.message);
 					return reject(err);
 				}
 				this.serv.starting(false); // test shows only server stopped can reach here
@@ -305,7 +305,7 @@ class AnPagePanel {
 		);
 	}
 
-	/**Dispose Anbox panel not necessarily shutdown server  - can still debugging with js-debugger.
+	/**Dispose Anprism panel not necessarily shutdown server  - can still debugging with js-debugger.
 	 * 
 	 * Anserv lives longer than debugger, which is longer than panel.
 	 * The only way to shutdown anserv is the shutdown command or quit vscode.
@@ -358,20 +358,20 @@ class AnPagePanel {
 		</head>
 		<body>
 			<p id="lines-of-code-counter">${url}
-			<input type='button' value='refresh' onclick='console.log("refresh"); document.getElementById("i-anbox").src = document.getElementById("i-anbox").src'
+			<input type='button' value='refresh' onclick='console.log("refresh"); document.getElementById("i-anprism").src = document.getElementById("i-anprism").src'
 			/>
 			<input type='button' value='dev tool'
 				onclick='vscode.postMessage({ command: "devtools-open", text: "" });'
 			/>
 			</p>
-			<iframe id='i-anbox' src="${url}" width="100%" height="720px" style="${page.style}" ></iframe>
+			<iframe id='i-anprism' src="${url}" width="100%" height="720px" style="${page.style}" ></iframe>
 		</body>
 		</html>`;
 	}
 
 	close(): void {
 		AnPagePanel.log.appendLine('Shuting down: ' + this.serv?.serv.webroot);
-		vscode.window.showInformationMessage('Shuting down Anbox server. ' + this.page.html);
+		vscode.window.showInformationMessage('Shuting down Anprism server. ' + this.page.html);
 
 		// this.page.html = '?_shut-down_=True';
 		this.page.html = vscode.Uri.file('?_shut-down_=True');

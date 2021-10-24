@@ -1,7 +1,7 @@
 
 import path = require('path');
 import * as vscode from 'vscode';
-import { AnboxException } from './common';
+import { AnprismException } from './common';
 
 type Serv = {
     pythonPath: string,
@@ -90,7 +90,7 @@ export class ServHelper {
      * Check is the html located in webroot. If yes, change it.
      * If webroot is still not set, update webroot with the workspace launch.json.
      * @param html 
-     * @throws AnboxException: page not found or not located in webroot
+     * @throws AnprismException: page not found or not located in webroot
      * @returns 
      */
 	public checkHtml(html: vscode.Uri): ServHelper {
@@ -100,7 +100,7 @@ export class ServHelper {
         else {
             const fullpath = html.fsPath;
             if (!fullpath?.startsWith(this.serv.webroot))
-                throw new AnboxException('page is not located in root folder: ' + html.fsPath);
+                throw new AnprismException('page is not located in root folder: ' + html.fsPath);
         }
         return this;
 	}
@@ -116,7 +116,7 @@ function getWorkspaceFolder(ofUri: vscode.Uri): string {
     const fileName = ofUri.fsPath;
     let ws = vscode.workspace.workspaceFolders;
     if (!ws)
-        throw new AnboxException('Why workspaceFolder is null?');
+        throw new AnprismException('Why workspaceFolder is null?');
 
     let wr = ws.map((folder) => folder.uri.fsPath)
         .filter((fsPath) => fileName?.startsWith(fsPath))[0];

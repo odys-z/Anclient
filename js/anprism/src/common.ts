@@ -1,7 +1,7 @@
-export class AnboxException extends Error {
+export class AnprismException extends Error {
 	constructor(message: string) {
 		super(message);
-		this.name = 'AnboxException';
+		this.name = 'AnprismException';
 	}
 
 	getMessage(): string {
