@@ -14,7 +14,7 @@
     "webpack": "^5.58.2"
   },
   "dependencies": {
-    "@anclient/semantier": "^0.9.15",
-    "prop-types": "^15.7.2"
+    "@anclient/anreact": "^0.3.17",
+    "@anclient/semantier": "^0.9.15"
   }
 }
