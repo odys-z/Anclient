@@ -98,7 +98,11 @@ class App extends React.Component {
 				<hr/>
 				{uri(<Welcome port='welcomeless'/>, '/less/welcome')}
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+<<<<<<< HEAD
 				アプリ コンポーネントの内容は, 上記のすべて...<br/> {Date().toString()}
+=======
+				上記のすべて... (VSCE)<br/> {Date().toString()}
+>>>>>>> 8a07aa50b4f7811c434ec117d61c15ee8a3b13f1
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}
