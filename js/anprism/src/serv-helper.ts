@@ -16,7 +16,9 @@ export type Page = {
 
 	html: vscode.Uri,
 
-	style: string
+	style: string,
+
+    reload: boolean // FIXME how to get webpack watch results?
 };
 
 export class ServHelper {
