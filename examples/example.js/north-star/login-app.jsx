@@ -83,7 +83,7 @@ class LoginApp extends React.Component {
 	 * @param {Window} [opts.parent=undefined] parent window if for redirecting target
 	 */
 	static bindHtml(elem, opts = {}) {
-		Langstrs.load('/res-vol/lang.json');
+		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReact.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, opts, json) {

@@ -1,11 +1,14 @@
 /** Copied from source of React-portal-overlay.
  *  Change for dependency error.
  *
- *  Use this for dialog showing components can not work with Material UI. 
+ *  Use this for dialog showing components can not work with Material UI.
  *
  *  https://github.com/madeleineostoja/react-portal-overlay
  *  License: MIT
  */
+ 
+ /// <reference types="@emotion/react/types/css-prop" />
+
 import { css } from '@emotion/react';
 import React, {
   CSSProperties,

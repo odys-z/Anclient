@@ -473,9 +473,8 @@ class SessionClient {
 		var iv_new = aes.getIv128();
 		var iv_old = aes.getIv128();
 
-		// var tk = aes.encrypt(usrId, pswd, iv_tok);
 		var tk = this.ssInf.ssid;
-		var key = this.ssInf.ssid; // FIXME
+		var key = this.ssInf.ssid;
 
 		var newPswd = aes.encrypt(newPswd, key, iv_new);
 		var oldPswd = aes.encrypt(oldPswd, key, iv_old);
@@ -499,6 +498,18 @@ class SessionClient {
 
 		this.an.post(jmsg, opts.onOk, opts.onError);
 		return this;
+	}
+
+	/**Encrypt text with ssInf token - the client side for de-encrypt semantics
+	 * @param {string} plain plain text
+	 * @return {object} {cipher, iv}
+	 */
+	encryptoken(plain) {
+		let key = this.ssInf.ssid;
+		let iv = aes.getIv128();
+		let cipher = aes.encrypt(plain, key, iv);
+		iv = aes.bytesToB64(iv);
+		return {cipher, iv}
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
@@ -533,9 +544,9 @@ class SessionClient {
 	 * @return {AnsonMsg} the request message
 	 */
 	query(uri, maintbl, alias, pageInf, act) {
-		var qryItem = new QueryReq(uri, maintbl, alias, pageInf);
+		let qryItem = new QueryReq(uri, maintbl, alias, pageInf);
 
-		var header = Protocol.formatHeader(this.ssInf);
+		// let header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}
@@ -546,9 +557,9 @@ class SessionClient {
 					remarks: ''};
 		}
 
-		var header = this.getHeader(act);
+		let header = this.getHeader(act);
 
-		var jreq = new AnsonMsg({
+		let jreq = new AnsonMsg({
 					port: 'query', //Protocol.Port.query,
 					header,
 					body: [qryItem]
@@ -714,9 +725,44 @@ class SessionClient {
 
 /**Client without session information.
  * This is needed for some senarios like rigerstering new accounts.*/
-class Inseclient {
-	commit (jmsg, onOk, onErr) {
-		an.post(jmsg, onOk, onErr);
+class Inseclient extends SessionClient {
+	// commit (jmsg, onOk, onErr) {
+	// 	an.post(jmsg, onOk, onErr);
+	// }
+	userId = 'localhost';
+
+	/**
+	 * @param {object} opts
+	 * @param {string} opts.urlRoot 
+	 * @constructor
+	 */
+	constructor(opts) {
+		super({}, '', true);
+		this.ssInf = {}
+		this.an = an;
+		an.init(opts.urlRoot);
+	}
+
+	/**Get a header the jserv can verify successfully.
+	 * This method is not recommended used directly.
+	 * @param {Object} act user's action for logging<br>
+	 * {func, cate, cmd, remarks};
+	 * @return the logged in header */
+	getHeader(act) {
+		var header = Protocol.formatHeader({ssid: undefined, uid: this.userId});
+
+		return new AnHeader(ssInf.ssid, ssInf.uid);
+		if (typeof act === 'object') {
+			header.userAct(act);
+		}
+		else {
+			header.userAct(
+				{func: 'insecure',
+				 cmd: 'unknown',
+				 cate: 'sessionless',
+				 remarks: 'sessionless header'} );
+		}
+		return header;
 	}
 }
 

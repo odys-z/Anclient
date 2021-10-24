@@ -1,4 +1,4 @@
-
+/**@module @anclient/semantier */
 import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from './protocol';
 
 const { CRUD } = Protocol;
@@ -6,6 +6,7 @@ const { CRUD } = Protocol;
 /**
  * Base class of semantic tier
  * @class
+ * @type {rows: array, rec: object, pk: string, pkval: string, records: () => array}
  */
 export class Semantier {
 	static invalidStyles = {
@@ -16,11 +17,36 @@ export class Semantier {
 		minLen : { border: "1px solid red" },
 	}
 
-	_cols = undefined;
-	_fields = undefined;
-	uri = undefined;
+	/** list's columns */
+	_cols = [];
+
+	/** client function / CRUD identity */
+	uri = '';
+
+	/** maintable's record fields */
+	_fields = [];
+
+	/** optional main table's pk */
+	pk = '';
+
+	/** current crud */
+	crud = CRUD.r;
+
+	/** current list's data */
+	rows = [];
+
+	/** current record */
+	rec = {};
+	/** current pk value */
 	pkval = undefined;
 
+	/** current relations */
+	rels = [];
+
+	/**
+	 *
+	 * @param {uri: string} props
+	 */
 	constructor(props) {
 		if (!props || !props.uri)
 			throw Error("uri is required!");
@@ -28,9 +54,13 @@ export class Semantier {
 		this.uri = props.uri;
 	}
 
+	/**
+	 *
+	 * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context
+	 */
 	setContext(context) {
 		if (!context || !context.anClient)
-			console.error(this, "Setup semantic tier without React context?");
+			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
 		this.client = context.anClient;
 		this.anReact = context.anReact;

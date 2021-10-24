@@ -22,6 +22,7 @@ const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
+		backgroundColor: '#eef'
 	},
 	button: {
 		marginLeft: theme.spacing(1)
@@ -61,6 +62,11 @@ class UserstComp extends CrudCompW {
 	getTier = () => {
 		this.tier = new UsersTier(this);
 		this.tier.setContext(this.context);
+
+		// FIXME for override port for sessionless mode
+		// Once the uri & port been moved to semnantier, this section should be removed
+		if (this.props.port)
+			this.tier.port = this.props.port;
 	}
 
 	/** If condts is null, use the last condts to query.
@@ -122,6 +128,8 @@ class UserstComp extends CrudCompW {
 	}
 
 	toAdd(e, v) {
+		if (e) e.stopPropagation();
+
 		let that = this;
 		this.tier.pkval = undefined;
 		this.tier.rec = {};
@@ -131,6 +139,11 @@ class UserstComp extends CrudCompW {
 			tier={this.tier}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
+
+		// NOTE:
+		// As e's propagation is stopped, parent page won't trigger updating,
+		// needing manually trigger re-rendering.
+		this.setState({});
 	}
 
 	toEdit(e, v) {
@@ -161,20 +174,21 @@ class UserstComp extends CrudCompW {
 
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
-			<Grid container alignContent="flex-end" >
-				<Button variant="contained" disabled={!btn.add}
-					className={classes.button} onClick={this.toAdd}
-					startIcon={<JsampleIcons.Add />}
-				>{L('Add')}</Button>
-				<Button variant="contained" disabled={!btn.del}
-					className={classes.button} onClick={this.toDel}
-					startIcon={<JsampleIcons.Delete />}
-				>{L('Delete')}</Button>
-				<Button variant="contained" disabled={!btn.edit}
-					className={classes.button} onClick={this.toEdit}
-					startIcon={<JsampleIcons.Edit />}
-				>{L('Edit')}</Button>
-			</Grid>
+			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode
+				<Grid container alignContent="flex-end" >
+					<Button variant="contained" disabled={!btn.add}
+						className={classes.button} onClick={this.toAdd}
+						startIcon={<JsampleIcons.Add />}
+					>{L('Add')}</Button>
+					<Button variant="contained" disabled={!btn.del}
+						className={classes.button} onClick={this.toDel}
+						startIcon={<JsampleIcons.Delete />}
+					>{L('Delete')}</Button>
+					<Button variant="contained" disabled={!btn.edit}
+						className={classes.button} onClick={this.toEdit}
+						startIcon={<JsampleIcons.Edit />}
+					>{L('Edit')}</Button>
+				</Grid>}
 
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
@@ -231,7 +245,7 @@ class UsersQuery extends React.Component {
 }
 UsersQuery.propTypes = {
 	// no tier is needed?
-	uri: PropTypes.string.isRequired,
+	// uri: PropTypes.string.isRequired,
 	onQuery: PropTypes.func.isRequired
 }
 
@@ -240,7 +254,7 @@ export class UsersTier extends Semantier {
 	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
-	client = undefined;
+	// client = undefined;
 	// uri = undefined;
 	rows = [];
 	pkval = undefined;
@@ -328,6 +342,10 @@ export class UsersTier extends Semantier {
 
 		if (crud === Protocol.CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
+
+		let {cipher, iv} = this.client.encryptoken(this.rec.pswd);
+		this.rec.pswd = cipher;
+		this.rec.iv = iv;
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )

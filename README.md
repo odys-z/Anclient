@@ -2,7 +2,7 @@
 # About
 
 Clients of semantic-\*. Including a Java and Javascript version. The C# version
-also verified.
+is also been verified.
 
 # Repository Structure
 
@@ -42,7 +42,7 @@ js client API depending on jquery. The test project is using React.
 
  -- North Star
 
-    Example using Anclient + React. 
+    Example using Anclient + React.
 
 - example.cs
 

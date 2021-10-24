@@ -53,10 +53,19 @@ const _icons = {
 }
 
 export function uri(comp, uri) {
+	return comp;
+	// FIXME this function is unnecessary if moved URI to Semantier.
 	if (comp.Naked)
 		comp.Naked.prototype.uri = uri;
-	else
+
+	// for SysComp using Route: component={_comps[c.path]}
+	else if (comp.prototype)
 		comp.prototype.uri = uri;
+
+	// for direct component rendering, e.g. less-app/App#render()
+	else if (comp.type && comp.type.Naked)
+		comp.type.Naked.prototype.uri = uri;
+
 	return comp;
 }
 /**
@@ -140,6 +149,9 @@ const styles = theme => ({
 			margin: 24,
 		},
 	},
+	cardText: {
+		fontSize: 18,
+	}
 });
 
 /**
@@ -207,7 +219,8 @@ class SysComp extends React.Component {
 			}, this.context.error );
 	}
 
-	showMenu() {
+	showMenu(e) {
+		if (e) e.stopPropagation();
 		this.setState({ showMenu: true });
 	}
 
@@ -302,7 +315,8 @@ class SysComp extends React.Component {
 	route() {
 		return this.state.cruds
 			.map( (c, x) =>
-				(<Route exact path={c.path} key={x} component={_comps[c.path]} {...c.params}/>)
+				(<Route exact path={c.path} key={x} component={_comps[c.path]} params={c.params}/>)
+				// (<Route exact path={c.path} key={x} element={React.cloneElement(_comps[c.path] || Home, [{uri: c.path}, {...c.params}]) }/>)
 			);
 	}
 
@@ -377,15 +391,20 @@ class SysComp extends React.Component {
 				{this.state.welcome ?
 					<Card >
 						<Typography gutterBottom variant='h4'>Welcome!</Typography>
-						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
-							<Menu color='primary'/>
-							<Box component='span' display='inline'>Please click menu to start.</Box>
+						<Paper elevation={4} style={{ margin: 24 }}
+								className={classes.welcome}>
+								<IconButton onClick={this.showMenu} >
+									<Menu color='primary'/>
+									<Box component='span' display='inline' className={classes.cardText} >
+										Please click menu to start.
+									</Box>
+								</IconButton>
 						</Paper>
 						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
 							<School color='primary'/>
 							<Box component='span' display='inline'>Documents:
 								<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
-									{`${this.state.sysName} user menu`}</Link>
+									{`${this.state.sysName}`}</Link>
 							</Box>
 						</Paper>
 					</Card> :
@@ -412,7 +431,7 @@ SysComp.extendLinks([
 	{path: '/views/sys/org/users.html', comp: Users},
 	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
 	{path: '/v2/users-v2.0', comp: Users},
-	{path: '/sys/error', comp: Error}
+	{path: '/sys/error', comp: Error} // FIXME bug
 ]);
 
 const Sys = withStyles(styles)(SysComp);
