@@ -6,7 +6,7 @@ import { withWidth } from '@material-ui/core';
 import { Semantier } from '@anclient/semantier';
 import { CrudComp } from '@anclient/anreact';
 
-const styles = (theme) => ( {
+const styles = (theme: { spacing: (arg0: number) => any; }) => ( {
 	root: {
 	},
 	button: {
@@ -15,7 +15,7 @@ const styles = (theme) => ( {
 });
 
 class WelcomeComp extends CrudComp {
-	tier: WelcomeTier;
+	tier: WelcomeTier | undefined;
 
 	componentDidMount() {
 		// FIXME ignore vscode waring?
