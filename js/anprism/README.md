@@ -1,3 +1,8 @@
+
+ [![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
+
+
+
 # About Anprism
 
 Anprism is a light weight helper for editing morden (webpack transpiled) web pages in vscode.
@@ -20,8 +25,9 @@ Or
 
 ```
     Ctr + Shift + p
+
+    Anprism: Load Anprism
 ```
 
-Anprism: Load Anprism
 
 **Enjoy!**
