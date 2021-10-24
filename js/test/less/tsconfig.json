@@ -1,9 +1,0 @@
-{
-	"compilerOptions": {
-		"jsx": "react",
-		"experimentalDecorators": true,
-		"esModuleInterop": true,                  
-	},
-    "javascript.implicitProjectConfig.experimentalDecorators": true,
-	"allowSyntheticDefaultImports": true
-}

@@ -1,13 +1,12 @@
-
+/**@module @anclient/semantier */
 import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from './protocol';
 
 const { CRUD } = Protocol;
 
 /**
- * @type ErrorCtx = { msg: string, }
- * 
  * Base class of semantic tier
  * @class
+ * @type {rows: array, rec: object, pk: string, pkval: string, records: () => array}
  */
 export class Semantier {
 	static invalidStyles = {
@@ -18,14 +17,35 @@ export class Semantier {
 		minLen : { border: "1px solid red" },
 	}
 
-	_cols = undefined;
-	_fields = undefined;
-	uri = undefined;
+	/** list's columns */
+	_cols = [];
+
+	/** client function / CRUD identity */
+	uri = '';
+
+	/** maintable's record fields */
+	_fields = [];
+
+	/** optional main table's pk */
+	pk = '';
+
+	/** current crud */
+	crud = CRUD.r;
+
+	/** current list's data */
+	rows = [];
+
+	/** current record */
+	rec = {};
+	/** current pk value */
 	pkval = undefined;
 
+	/** current relations */
+	rels = [];
+
 	/**
-	 * 
-	 * @param {uri: string} props 
+	 *
+	 * @param {uri: string} props
 	 */
 	constructor(props) {
 		if (!props || !props.uri)
@@ -35,8 +55,8 @@ export class Semantier {
 	}
 
 	/**
-	 * 
-	 * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context 
+	 *
+	 * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context
 	 */
 	setContext(context) {
 		if (!context || !context.anClient)

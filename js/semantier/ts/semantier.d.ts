@@ -1,17 +1,7 @@
-export const override = < Sup >( sup : { prototype : Sup } ) => <
-    Field extends keyof Sup ,
-    Proto extends { [ key in Field ] : Sup[ Field ] } ,
->(
-    proto : Proto ,
-    field : Field ,
-    descr : TypedPropertyDescriptor< Sup[ Field ] > ,
-)=> {}
-
 /**
- * @type ErrorCtx = { msg: string, }
- *
  * Base class of semantic tier
  * @class
+ * @type {rows: array, rec: object, pk: string, pkval: string, records: () => array}
  */
 export class Semantier {
     static invalidStyles: {
@@ -34,10 +24,24 @@ export class Semantier {
      * @param {uri: string} props
      */
     constructor(props: any);
-    _cols: any;
-    _fields: any;
-    uri: any;
+    /** list's columns */
+    _cols: any[];
+    /** client function / CRUD identity */
+    uri: string;
+    /** maintable's record fields */
+    _fields: any[];
+    /** optional main table's pk */
+    pk: string;
+    /** current crud */
+    crud: string;
+    /** current list's data */
+    rows: any[];
+    /** current record */
+    rec: {};
+    /** current pk value */
     pkval: any;
+    /** current relations */
+    rels: any[];
     /**
      *
      * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context
@@ -54,14 +58,14 @@ export class Semantier {
      */
     columns(modifier: {
         field: object | Function;
-    }): any;
+    }): any[];
     /** Get form fields data specification
      * @param {object} modifier {field, function | object }
      * @param {object | function} modifier.field see #columns().
      */
     fields(modifier: {
         field: object | Function;
-    }): any;
+    }): any[];
     /** Load relationships */
     relations(opts: any, onOk: any): void;
     /** save form with a relationship table */
@@ -77,7 +81,4 @@ export class Semantier {
         ids: any;
     }, onOk: Function): void;
     resetFormSession(): void;
-    rec: {};
-    rels: any[];
-    crud: any;
 }
