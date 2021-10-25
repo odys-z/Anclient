@@ -4,3 +4,4 @@ compile-*
 **/dist/*.js.map
 **/dist/testBundle.js
 **/dist/private
+*.vsix
