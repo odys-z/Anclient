@@ -1,12 +1,10 @@
 export const RoleDetails: React.ComponentType<(Pick<Pick<PropTypes.InferProps<{
     width: PropTypes.Validator<string>;
-    uri: PropTypes.Validator<string>;
-}>, "width" | "uri"> & import("@material-ui/core/styles").StyledComponentProps<"buttons" | "content" | "title" | "root" | "dialogPaper">, "uri" | keyof import("@material-ui/core/styles").StyledComponentProps<"buttons" | "content" | "title" | "root" | "dialogPaper">> | Pick<Pick<PropTypes.InferProps<{
+}>, "width"> & import("@material-ui/core/styles").StyledComponentProps<"buttons" | "content" | "title" | "root" | "dialogPaper">, keyof import("@material-ui/core/styles").StyledComponentProps<"buttons" | "content" | "title" | "root" | "dialogPaper">> | Pick<Pick<PropTypes.InferProps<{
     width: PropTypes.Validator<string>;
-    uri: PropTypes.Validator<string>;
-}>, "width" | "uri"> & import("@material-ui/core/styles").StyledComponentProps<"buttons" | "content" | "title" | "root" | "dialogPaper"> & {
+}>, "width"> & import("@material-ui/core/styles").StyledComponentProps<"buttons" | "content" | "title" | "root" | "dialogPaper"> & {
     children?: React.ReactNode;
-}, "children" | "uri" | keyof import("@material-ui/core/styles").StyledComponentProps<"buttons" | "content" | "title" | "root" | "dialogPaper">>) & import("@material-ui/core/withWidth").WithWidthProps>;
+}, "children" | keyof import("@material-ui/core/styles").StyledComponentProps<"buttons" | "content" | "title" | "root" | "dialogPaper">>) & import("@material-ui/core/withWidth").WithWidthProps>;
 export class RoleDetailsComp extends DetailFormW {
     constructor(props?: {});
     tier: any;

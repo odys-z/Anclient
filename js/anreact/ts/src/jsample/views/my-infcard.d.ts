@@ -1,4 +1,6 @@
-export class MyInfTier {
+declare const MyInfTier_base: any;
+export class MyInfTier extends MyInfTier_base {
+    [x: string]: any;
     constructor(comp: any);
     rec: {};
     imgProp: string;
@@ -113,3 +115,4 @@ export namespace MyInfCardComp {
 import PropTypes from "prop-types";
 import React from "react";
 import { AnContext } from "../../react/reactext";
+export {};

@@ -175,7 +175,7 @@ class AnTablistComp extends React.Component {
 						</TableCell>)
 					}
 					{columns.filter( (v, x) => !toBool(v.hide)
-									|| this.props.checkbox && x !== 0) // first columen as checkbox
+									&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
 							.map( (colObj, x) => {
 								if (colObj.field === undefined)
 									throw Error("Column field is required: " + JSON.stringify(colObj));

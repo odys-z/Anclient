@@ -181,6 +181,7 @@ class TRecordFormComp extends CrudCompW {
 }
 
 TRecordFormComp.propTypes = {
+	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
 	tier: PropTypes.object.isRequired,
 	dense: PropTypes.bool,
 	enableValidate: PropTypes.bool,

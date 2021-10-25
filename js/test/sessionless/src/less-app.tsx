@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient } from '@anclient/semantier';
+import { Protocol, AnsonMsg, Inseclient } from '@anclient/semantier';
 
 import { Langstrs,
 	AnContext, AnError, AnReactExt,
@@ -10,24 +10,44 @@ import { Langstrs,
 } from '@anclient/anreact';
 
 import Welcome from './welcome';
+import { prependOnceListener } from 'process';
 
 const { Userst, JsampleTheme } = jsample;
 
+type Props = {
+	servs: any;
+	servId: string;
+	iportal?: string;
+	iparent?: any; // parent of iframe
+	iwindow?: any; // window object
+}
+type State = {
+	servs?: any;
+	servId: string;
+	iportal?: string;
+	jserv: string;
+	hasError?: boolean;
+	nextAction?: string;
+}
 /** The application main, context singleton and error handler */
-class App extends React.Component {
+class App extends React.Component<Props, State> {
 	state = {
 		/** {@link InsercureClient} */
-		inseclient: undefined,
+		inclient: undefined,
 		anReact: undefined,  // helper for React
 		hasError: false,
 		iportal: 'portal.html',
 		nextAction: undefined, // e.g. re-login
 		error: undefined,
+
+		servs: undefined,
+		servId: '',
+		jserv: '',
 	};
 
 	/**Restore session from window.localStorage
 	 */
-	constructor(props) {
+	constructor(props: Props | Readonly<Props>) {
 		super(props);
 
 		this.state.iportal = this.props.iportal;
@@ -60,7 +80,7 @@ class App extends React.Component {
 		Protocol.sk.cbbRole = 'roles';
 	}
 
-	onError(c, r) {
+	onError(c: any, r ) {
 		console.error(c, r);
 		// this.setState({hasError: !!c, nextAction: 're-login'});
 		this.state.error.msg = r.Body().msg();
@@ -72,7 +92,7 @@ class App extends React.Component {
 	onErrorClose() {
 		if (this.state.nextAction === 're-login') {
 			this.state.nextAction = undefined;
-			this.logout();
+			// this.logout();
 		}
 	}
 
@@ -113,12 +133,12 @@ class App extends React.Component {
 	 * @param {string} [opts.serv='host'] serv id
 	 * @param {string} [opts.iportal='portal.html'] page showed after logout
 	 */
-	static bindHtml(elem, opts = {}) {
-		let portal = opts.portal ? opts.portal : 'index.html';
+	static bindHtml(elem, opts = {portal: undefined}) {
+		let portal = opts.portal ?? 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, opts, json) {
+		function onJsonServ(elem: string, opts: { serv: string; }, json: any) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

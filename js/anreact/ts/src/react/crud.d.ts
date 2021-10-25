@@ -1,9 +1,13 @@
 /**Common base class of function pages.
+ * About URI:
+ * 1. Every root CRUD must has a uri.
+ * 2. Uri is immediately bridged to Semantier.
+ * 3. All data accessing must provid the token.
  * @member uri: string
  */
 export class CrudComp extends React.Component<any, any, any> {
     constructor(props: any);
-    constructor(props: any, context: any);
+    uri: any;
 }
 export namespace CrudComp {
     export { AnContext as contextType };
@@ -51,7 +55,6 @@ export namespace DetailFormW {
     export namespace propTypes_1 {
         const width_1: PropTypes.Validator<string>;
         export { width_1 as width };
-        export const uri: PropTypes.Validator<string>;
     }
     export { propTypes_1 as propTypes };
 }
