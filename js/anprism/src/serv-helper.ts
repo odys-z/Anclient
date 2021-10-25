@@ -21,6 +21,7 @@ export type Page = {
     reload: boolean // FIXME how to get webpack watch results?
 };
 
+/**A server helper manage one server:port */
 export class ServHelper {
     serv: Serv;
     context: vscode.ExtensionContext;
@@ -53,7 +54,7 @@ export class ServHelper {
      * @param uri e.g. html path
      * @returns
      */
-	public webroot(uri: vscode.Uri): ServHelper {
+	public findRoot(uri: vscode.Uri): ServHelper {
 
         const wscfg = vscode.workspace.getConfiguration('launch', uri);
         const cfgs = wscfg?.get<any[]>("configurations");
@@ -82,11 +83,38 @@ export class ServHelper {
 	 * @param page
 	 * @returns
 	 */
-	public url(page: Page): string {
+	// public url(page: Page): {url: string, sub: string} {
+    //     let sub = path.relative(this.webrootPath(), page.html.fsPath);
+	// 	const url = `http://${page.host}:${page.port}/${sub}?n=${getNonce()}`;
+    //     console.log(url);
+    //     return {url, sub};
+
+    //     function getNonce() {
+    //         let text = '';
+    //         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    //         for (let i = 0; i < 32; i++) {
+    //             text += possible.charAt(Math.floor(Math.random() * possible.length));
+    //         }
+    //         return text;
+    //     }
+	// }
+	public url(page: Page): {url: string, sub: string} {
         let sub = path.relative(this.webrootPath(), page.html.fsPath);
-        // let path = page.html.fsPath.replaceAll(this.serv.webroot, '');
-		return `http://${page.host}:${page.port}/${sub}`;
+        let subfile = path.basename(sub, ".html");
+		const url = `http://${page.host}:${page.port}/${getNonce()}.html?nonce=${subfile}`;
+        console.log(url);
+        return {url, sub};
+
+        function getNonce() {
+            let text = '';
+            const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            for (let i = 0; i < 32; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return text;
+        }
 	}
+
 
     /**
      * Check is the html located in webroot. If yes, change it.
@@ -99,7 +127,7 @@ export class ServHelper {
      */
 	public checkHtml(html: vscode.Uri): ServHelper {
         if (!this.serv.webroot) {
-            this.webroot(html);
+            this.findRoot(html);
         }
         else {
             const fullpath = html.fsPath;
@@ -109,6 +137,11 @@ export class ServHelper {
         return this;
 	}
 
+    /**soft update serv info (webroot only updated when more meaningful) */
+	public update(serv: Serv | undefined) {
+        if (serv?.webroot?.length)
+            this.findRoot(vscode.Uri.file(serv.webroot));
+	}
 }
 
 /**
