@@ -270,6 +270,7 @@ AnQuerystComp.propTypes = {
 	uri: PropTypes.string.isRequired,
 	conds: PropTypes.array.isRequired,
 	onSearch: PropTypes.func.isRequired,
+	onLoaded: PropTypes.func,
 	buttonStyle: PropTypes.oneOf(["norm", "dense"])
 };
 

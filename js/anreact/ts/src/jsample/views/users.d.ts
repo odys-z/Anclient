@@ -1,10 +1,11 @@
-export class UsersTier {
+declare const UsersTier_base: any;
+export class UsersTier extends UsersTier_base {
+    [x: string]: any;
     constructor(comp: any);
     port: string;
     mtabl: string;
     pk: string;
     checkbox: boolean;
-    client: any;
     rows: any[];
     pkval: any;
     rec: {};
@@ -120,7 +121,9 @@ export class UsersTier {
         ids: any;
     }, onOk: Function): void;
 }
-export class UserstReq {
+declare const UserstReq_base: any;
+export class UserstReq extends UserstReq_base {
+    [x: string]: any;
     static type: string;
     static __init__: any;
     static A: {
@@ -193,3 +196,4 @@ export namespace UserstComp {
 import React from "react";
 import { CrudCompW } from "../../react/crud";
 import { AnContext } from "../../react/reactext";
+export {};

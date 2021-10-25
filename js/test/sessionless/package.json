@@ -12,9 +12,5 @@
   "license": "MIT",
   "devDependencies": {
     "webpack": "^5.58.2"
-  },
-  "dependencies": {
-    "@anclient/anreact": "^0.3.17",
-    "@anclient/semantier": "^0.9.15"
   }
 }

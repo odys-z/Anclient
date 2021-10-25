@@ -120,7 +120,7 @@ class WelcomeTier extends Semantier {
 	 */
 	constructor(props: {uri: string}) {
 		super(props);
-		console.log(super.uri);
+		console.log(this.uri);
 	}
 
 	/**
