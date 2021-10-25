@@ -49,7 +49,7 @@ export class ServHelper {
     /**
      * Findout webRoot of launch.json for the uri's workspace.
      * @param uri e.g. html path
-     * @returns 
+     * @returns
      */
 	public webroot(uri: vscode.Uri): ServHelper {
 
@@ -61,11 +61,11 @@ export class ServHelper {
                 console.log(cfgs[i]);
                 if (cfgs[i].type === "pwa-chrome") {
                     this.serv.webroot = this.resolvEnv(cfgs[i].webRoot, {workspaceFolder: getWorkspaceFolder(uri)});
-                    break;
+                    return this;
                 }
             }
-        };
-        return this;
+        }
+        throw new AnprismException("Can't setup webroot. Any pwa-chrome type in launch.json?");
 	}
 
     public resolvEnv(s: string, val: {workspaceFolder: string}): string {
@@ -77,8 +77,8 @@ export class ServHelper {
     }
 
     /**Change back the absolute path to relative url (remove the leading absolute path).
-	 * @param page 
-	 * @returns 
+	 * @param page
+	 * @returns
 	 */
 	public url(page: Page): string {
         let sub = path.relative(this.webrootPath(), page.html.fsPath);
@@ -89,9 +89,11 @@ export class ServHelper {
     /**
      * Check is the html located in webroot. If yes, change it.
      * If webroot is still not set, update webroot with the workspace launch.json.
-     * @param html 
-     * @throws AnprismException: page not found or not located in webroot
-     * @returns 
+     * @param html
+     * @throws AnprismException:
+     * 1. page not found or not located in webroot
+     * 2. no launching configuration for finding webroot
+     * @returns
      */
 	public checkHtml(html: vscode.Uri): ServHelper {
         if (!this.serv.webroot) {
@@ -109,8 +111,8 @@ export class ServHelper {
 
 /**
  * Find workspace root according to resouce uri.
- * @param ofUri 
- * @returns 
+ * @param ofUri
+ * @returns
  */
 function getWorkspaceFolder(ofUri: vscode.Uri): string {
     const fileName = ofUri.fsPath;
@@ -120,7 +122,6 @@ function getWorkspaceFolder(ofUri: vscode.Uri): string {
 
     let wr = ws.map((folder) => folder.uri.fsPath)
         .filter((fsPath) => fileName?.startsWith(fsPath))[0];
-    
+
     return wr;
 }
-

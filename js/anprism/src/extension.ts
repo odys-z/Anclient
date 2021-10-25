@@ -57,6 +57,9 @@ export function activate(context: vscode.ExtensionContext) {
 				AnPagePanel.currentPanel.serv.starting(false);
 				AnPagePanel.currentPanel.close();
 			}
+			else {
+				vscode.window.showInformationMessage('Currently Anprism server can only be shutdown via web page view!');
+			}
 		})
 	);
 
@@ -144,8 +147,9 @@ class AnPagePanel {
 			vscode.window.showInformationMessage('Anprism don\'t know which html page to load!');
 			return undefined;
 		}
-		else {
+		try {
 			let serv = new ServHelper(context).checkHtml(htmlItem);
+		
 
 			AnPagePanel.log.appendLine('web root: ' + serv.webrootPath());
 
@@ -158,6 +162,9 @@ class AnPagePanel {
 
 			panel.webview.options = getWebviewOpts(context.extensionUri);
 			return AnPagePanel.revive(context, panel, serv);
+		}
+		catch (e) {
+			vscode.window.showErrorMessage((e as AnprismException).getMessage());
 		}
 	}
 
@@ -232,14 +239,6 @@ class AnPagePanel {
 		}
 		AnPagePanel.currentPanel._panel.reveal(column);
 	}
-
-	/**
-	 * Find root of localhtml, return the serv instance. 
-	 * @param html 
-	setPage(html: string) {
-		this.page.html = vscode.Uri.file(html);
-	}
-	 */
 
 	/**
 	 * Startup server in possible server root dir.
@@ -371,12 +370,12 @@ class AnPagePanel {
 
 	close(): void {
 		AnPagePanel.log.appendLine('Shuting down: ' + this.serv?.serv.webroot);
-		vscode.window.showInformationMessage('Shuting down Anprism server. ' + this.page.html);
+		vscode.window.showInformationMessage('Shuting down Anprism server.');
 
 		// this.page.html = '?_shut-down_=True';
-		this.page.html = vscode.Uri.file('?_shut-down_=True');
+		// this.page.html = vscode.Uri.file('?_shut-down_=True');
 
-		let req = this.serv.url(this.page);
+		let req = this.serv.webrootPath() + '?_shut-down_=True';
 		console.log(req);
 		this._panel.webview.html = '';
 		this._panel.webview.html = `<!DOCTYPE html>
