@@ -10,8 +10,7 @@
   "scripts": {
     "build": "webpack-cli",
     "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
-    "test-backup": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js ",
-    "test": "webpack-cli --config mocha.config.js && mocha --require babel-core/register dist/testBundle.js "
+    "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
   "keywords": [
     "anclient",
