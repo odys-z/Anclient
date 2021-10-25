@@ -170,7 +170,7 @@ class UserstComp extends CrudCompW {
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			{this.props.funcName || this.props.title || 'Users of Jsample - semantically tiered'}
+			{this.props.funcName || this.props.title || 'Users of Jsample'}
 
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
@@ -279,7 +279,8 @@ export class UsersTier extends Semantier {
 	];
 
 	_cols = [
-		{ text: L('Log Id'), field: 'userId', checked: true },
+		{ text: L('check'), field: 'userId', checked: true },
+		{ text: L('Log Id'), field: 'userId' },
 		{ text: L('User Name'), field: 'userName' },
 		{ text: L('Organization'), field: 'orgName',
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
