@@ -7,13 +7,13 @@
 
 Anprism is a light weight helper for editing morden (webpack transpiled) web pages in vscode.
 
-![see readme for screenshot](res/00-anprism-0.2.0.png)
+![see repository/js/anprism/readme for screenshot](res/00-anprism-0.2.0.png)
 
 For live editing, there are other [similar (better) implementation](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server).
 
 Currently the difference is that Anprism uses Python for web server.
 
-Check [readme]()
+[Readme](https://github.com/odys-z/Anclient/tree/master/js/anprism)
 
 ## install
 
