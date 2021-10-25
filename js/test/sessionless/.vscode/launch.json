@@ -16,7 +16,7 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:8888",
-            "webRoot": "${workspaceFolder}/dist",
+            "webRoot": "${workspaceFolder}",
             "webpack-config": "webpack.config.js"
         }
     ]
