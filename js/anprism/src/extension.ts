@@ -124,7 +124,8 @@ class AnPagePanel {
 		port: "8888",
 		host: "localhost",
 		html: vscode.Uri.file("index.html"),
-		style: `background-color: #ccc`
+		style: `background-color: #ccc`,
+		reload: false
 	};
 
 	// serv: Serv;
@@ -279,14 +280,18 @@ class AnPagePanel {
 		// This happens when the user closes the panel or when the panel is closed programmatically
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-		// Update the content based on view changes
+		// Update the content based on view changes - how to watch webpack results?
 		this._panel.onDidChangeViewState(
 			e => {
-				if (this._panel.visible) {
+				// Note: don't load every time the other editors changed - irritating when the page needs user actions.
+				if (this._panel.visible && this.page.reload) {
+					this.page.reload = false;
 					this.refresh(undefined);
 				}
+				else if (!this._panel.visible)
+					this.page.reload = true;
 			},
-			null,
+			this,
 			this._disposables
 		);
 
