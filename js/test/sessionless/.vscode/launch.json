@@ -22,9 +22,9 @@
         {
             "type": "pwa-chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
+            "name": "Launch Chrome Anprism",
             "url": "http://localhost:8888",
-            "webRoot": "${workspaceFolder}/dist",
+            "webRoot": "${workspaceFolder}",
             "webpack-config": "webpack.config.js"
         }
     ]

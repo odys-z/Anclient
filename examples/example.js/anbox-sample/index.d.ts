@@ -1,2 +1,2 @@
-declare module '@anclient/semantier'
-declare module '@anclient/anreact'
+// declare module '@anclient/semantier'
+// declare module '@anclient/anreact'
