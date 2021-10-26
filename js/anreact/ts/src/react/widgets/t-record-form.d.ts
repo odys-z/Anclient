@@ -48,6 +48,7 @@ export class TRecordFormComp extends CrudCompW {
 }
 export namespace TRecordFormComp {
     namespace propTypes {
+        const width: PropTypes.Validator<string>;
         const tier: PropTypes.Validator<object>;
         const dense: PropTypes.Requireable<boolean>;
         const enableValidate: PropTypes.Requireable<boolean>;

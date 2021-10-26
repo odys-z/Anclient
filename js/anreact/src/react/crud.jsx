@@ -22,6 +22,7 @@ const styles = (theme) => ( {
  */
 class CrudComp extends React.Component {
 	state = {};
+	uri = undefined;
 
 	constructor(props) {
 		super(props);

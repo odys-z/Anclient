@@ -1,7 +1,5 @@
 /**
  * Base class of semantic tier
- * @class
- * @type {rows: array, rec: object, pk: string, pkval: string, records: () => array}
  */
 export class Semantier {
     static invalidStyles: {

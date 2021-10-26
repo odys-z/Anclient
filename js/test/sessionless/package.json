@@ -4,7 +4,7 @@
   "description": "Test for session less client - for sandbox examples.",
   "main": "",
   "scripts": {
-    "build": "cd ../../anreact && webpack-cli && cd ../test/less && webpack-cli",
+    "build": "cd ../../anreact && webpack-cli && cd ../test/sessionless && webpack-cli",
     "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
     "test": "cd .. && webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
@@ -12,9 +12,5 @@
   "license": "MIT",
   "devDependencies": {
     "webpack": "^5.58.2"
-  },
-  "dependencies": {
-    "@anclient/anreact": "^0.3.17",
-    "@anclient/semantier": "^0.9.15"
   }
 }
