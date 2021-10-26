@@ -1,13 +1,15 @@
-@anclient/semantier 
-[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
-+
-@anclient/anreact 
-[![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
-
 # About
- 
+
 Clients of semantic-\*. Including a Java and Javascript version. The C# version
 is also been verified.
+
+- Anclient.js
+
+@anclient/semantier
+[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
++
+@anclient/anreact
+[![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
 
 # Repository Structure
 
