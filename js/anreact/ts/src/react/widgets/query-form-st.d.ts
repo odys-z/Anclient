@@ -2,8 +2,9 @@ export const AnQueryst: React.ComponentType<Pick<PropTypes.InferProps<{
     uri: PropTypes.Validator<string>;
     conds: PropTypes.Validator<any[]>;
     onSearch: PropTypes.Validator<(...args: any[]) => any>;
+    onLoaded: PropTypes.Requireable<(...args: any[]) => any>;
     buttonStyle: PropTypes.Requireable<string>;
-}>, "uri" | "onSearch" | "conds" | "buttonStyle"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">>;
+}>, "uri" | "onSearch" | "conds" | "buttonStyle" | "onLoaded"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">>;
 /**
  * Bind query conditions to React Components.
  * conds example:
@@ -32,6 +33,7 @@ export namespace AnQuerystComp {
         const uri: PropTypes.Validator<string>;
         const conds: PropTypes.Validator<any[]>;
         const onSearch: PropTypes.Validator<(...args: any[]) => any>;
+        const onLoaded: PropTypes.Requireable<(...args: any[]) => any>;
         const buttonStyle: PropTypes.Requireable<string>;
     }
 }

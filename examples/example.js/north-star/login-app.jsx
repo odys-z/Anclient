@@ -45,7 +45,7 @@ class LoginApp extends React.Component {
 		if (this.props.iparent) {
 			let mainpage = client.ssInf.home || this.props.ihome;
 			if (!mainpage)
-				console.error('Login succeed, but no home page be found.');
+				console.error('Login succeed, but no home page is found.');
 			else {
 				this.props.iparent.location = `${mainpage}?serv=${this.state.servId}`;
 				this.setState({anClient: client});

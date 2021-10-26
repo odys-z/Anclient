@@ -29,9 +29,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import { Route } from 'react-router-dom'
 
-import { Protocol } from '@anclient/semantier';
-
-	import { AnContext } from './reactext';
+import { AnContext } from './reactext';
 	import { ConfirmDialog } from './widgets/messagebox';
 	import { MyIcon } from './widgets/my-icon';
 	import { MyInfo } from './widgets/my-info';
@@ -107,6 +105,9 @@ const styles = theme => ({
 	},
 	menuButton: {
 		marginRight: theme.spacing(2),
+	},
+	sysName: {
+		lineHeight: 2.2
 	},
 	hide: {
 		display: 'none',
@@ -383,7 +384,7 @@ class SysComp extends React.Component {
 					>
 					<Menu />
 					</IconButton>
-					<Typography variant="h5" noWrap >{L(this.state.sysName)}</Typography>
+					<Typography variant="h5" className={classes.sysName} noWrap >{L(this.state.sysName)}</Typography>
 				</Box>
 				</Grid>
 

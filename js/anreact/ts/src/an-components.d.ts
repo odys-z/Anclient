@@ -21,7 +21,6 @@ export * from "./react/widgets/tree";
 export * from "./react/widgets/treegrid";
 export * from "./react/widgets/ag-gridsheet";
 export * from "./react/widgets/tree-editor";
-export * from "./react/widgets/record-form";
 export * from "./react/widgets/simple-form";
 export * from "./react/widgets/t-record-form";
 export * from "./react/widgets/relation-tree";

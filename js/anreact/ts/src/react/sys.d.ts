@@ -1,5 +1,5 @@
 export function uri(comp: any, uri: any): any;
-export const Sys: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"hide" | "content" | "direction" | "root" | "appBar" | "loginfo" | "appBarShift" | "menuButton" | "drawer" | "drawerPaper" | "drawerHeader" | "contentShift" | "welcome" | "cardText">>;
+export const Sys: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"hide" | "content" | "direction" | "root" | "welcome" | "appBar" | "loginfo" | "appBarShift" | "menuButton" | "drawer" | "drawerPaper" | "drawerHeader" | "contentShift" | "welcomeHead" | "cardText">>;
 /**
  * <pre>a_functions
  funcId       |funcName           |url                               |css |flags |fullpath         |parentId |sibling |
@@ -25,6 +25,7 @@ export class SysComp extends React.Component<any, any, any> {
      */
     menuItems(classes: object): any;
     toLogout(): void;
+    welcomePaper(classes: any): any;
     confirmLogout: JSX.Element;
     route(): JSX.Element[];
 }
