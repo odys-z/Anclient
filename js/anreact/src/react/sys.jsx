@@ -149,6 +149,9 @@ const styles = theme => ({
 			margin: 24,
 		},
 	},
+	welcomeHead: {
+		padding: theme.spacing(1)
+	},
 	cardText: {
 		fontSize: 18,
 	}
@@ -205,6 +208,38 @@ class SysComp extends React.Component {
 		this.menuItems = this.menuItems.bind(this);
 
 		this.toLogout = this.toLogout.bind(this);
+
+		this.welcomePaper = this.welcomePaper.bind(this);
+	}
+
+	welcomePaper(classes) {
+		if (typeof this.props.welcome !== 'function') {
+			return (
+			  <Card >
+				<Typography gutterBottom variant='h4'
+							className={classes.welcomeHead}
+				> Welcome! </Typography>
+				<Paper elevation={4} style={{ margin: 24 }}
+						className={classes.welcome}>
+					<IconButton onClick={this.showMenu} >
+						<Menu color='primary'/>
+						<Box component='span' display='inline' className={classes.cardText} >
+							Please click menu to start.
+						</Box>
+					</IconButton>
+				</Paper>
+				<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
+					<School color='primary'/>
+					<Box component='span' display='inline'>Documents:
+						<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
+							{`${this.state.sysName}`}</Link>
+					</Box>
+				</Paper>
+			  </Card>);
+		}
+		else {
+			return this.props.welcome(classes, this.context, this);
+		}
 	}
 
 	componentDidMount() {
@@ -389,25 +424,7 @@ class SysComp extends React.Component {
 			  >
 				<div className={claz.drawerHeader} />
 				{this.state.welcome ?
-					<Card >
-						<Typography gutterBottom variant='h4'>Welcome!</Typography>
-						<Paper elevation={4} style={{ margin: 24 }}
-								className={classes.welcome}>
-								<IconButton onClick={this.showMenu} >
-									<Menu color='primary'/>
-									<Box component='span' display='inline' className={classes.cardText} >
-										Please click menu to start.
-									</Box>
-								</IconButton>
-						</Paper>
-						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
-							<School color='primary'/>
-							<Box component='span' display='inline'>Documents:
-								<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
-									{`${this.state.sysName}`}</Link>
-							</Box>
-						</Paper>
-					</Card> :
+					this.welcomePaper(classes, this) :
 					<div className="content">
 						{this.route()}
 					</div>}

@@ -1,7 +1,5 @@
-import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Typography from '@material-ui/core/Typography';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, SessionClient } from '@anclient/semantier'
@@ -9,13 +7,12 @@ import { L, Langstrs,
 	Sys, SysComp,
 	AnContext, AnError, AnReactExt, jsample
 } from '@anclient/anreact';
-const { Domain, Roles, Orgs, Userst, JsampleTheme, MyInfCard } = jsample;
+const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
 
 import { StarPorts } from './common/port';
 
 import { Dashboard } from './views/n/dashboard';
 import { Indicators } from './views/n/indicators';
-import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStudents } from './views/n/my-students';
