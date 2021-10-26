@@ -54,7 +54,6 @@ export function activate(context: vscode.ExtensionContext) {
 			// Note: can't shutdown without a panel providing serv info - panel must live longer.
 			// This hanppens when user closed Anprism panel and fire shutdown command.
 			if (AnPagePanel.currentPanel) {
-				AnPagePanel.currentPanel.serv.starting(false);
 				AnPagePanel.currentPanel.close();
 			}
 			else {
@@ -129,72 +128,8 @@ class AnPagePanel {
 		reload: false
 	};
 
-	// serv: Serv;
 	// @type ServHelper
 	serv: ServHelper;
-
-	/**
-	 * Init server for the html.
-	 * @param context 
-	 * @param htmlItem 
-	 * @returns 
-	 */
-	// private static init(context: vscode.ExtensionContext, htmlItem: vscode.Uri | undefined) {
-	// 	// if (AnPagePanel.currentPanel)
-	// 	// 	return AnPagePanel.currentPanel;
-
-	// 	if (!htmlItem) { // not actived from explorer, try current active doc
-	// 		let f = vscode.window.activeTextEditor?.document.uri;
-	// 		if (f?.fsPath && new Set([".html", ".htm"]).has(path.extname(f?.fsPath)))
-	// 			htmlItem = vscode.window.activeTextEditor?.document.uri;
-	// 	}
-		
-	// 	if (!htmlItem) {
-	// 		vscode.window.showInformationMessage('Anprism don\'t know which html page to load!');
-	// 		return undefined;
-	// 	}
-	// 	try {
-	// 		let serv = new ServHelper(context).checkHtml(htmlItem);
-		
-	// 		AnPagePanel.log.appendLine('web root: ' + serv.webrootPath());
-
-	// 		// const panel = vscode.window.createWebviewPanel(
-	// 		// 	AnPagePanel.viewType,
-	// 		// 	'Anprism',
-	// 		// 	vscode.window.activeTextEditor?.viewColumn || vscode.ViewColumn.One,
-	// 		// 	{ retainContextWhenHidden: false }
-	// 		// );
-
-	// 		// panel.webview.options = getWebviewOpts(context.extensionUri);
-	// 		// return AnPagePanel.revive(context, panel, serv);
-	// 	}
-	// 	catch (e) {
-	// 		vscode.window.showErrorMessage((e as AnprismException).getMessage());
-	// 	}
-	// }
-
-	/**
-	 * Deserialize
-	 * @param panel 
-	 * @param extensionUri 
-	 * @param serv 
-	 * @returns current panel
-	 */
-	// public static revive(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, serv: ServHelper | undefined) {
-
-	// 	if (!AnPagePanel.currentPanel) {
-	// 		serv = serv || new ServHelper(context);
-	// 		const p = new AnPagePanel(context, panel, serv);
-	// 		p._panel.webview.onDidReceiveMessage(
-	// 			(message) =>
-	// 				p.handleWebviewMessage(message)
-	// 			);
-	// 		AnPagePanel.currentPanel = p;
-	// 	}
-	// 	else AnPagePanel.currentPanel.serv.update(serv?.serv);
-	// 	AnPagePanel.log.appendLine("Anprism webview revived.");
-	// 	return AnPagePanel.currentPanel;
-	// }
 
 	handleWebviewMessage(message: any): any {
 		switch (message.command) {
@@ -274,9 +209,9 @@ class AnPagePanel {
 					vscode.window.showInformationMessage('Starting Anprism server failed. ' + err.message);
 					return reject(err);
 				}
-				this.serv.starting(false); // test shows only server stopped can reach here
+				this.serv.starting(false); // test shows only when server stopped can reach here
 				AnPagePanel.log.appendLine(out.toString());
-				if (!AnPagePanel.currentPanel)
+				if (AnPagePanel.currentPanel)
 					AnPagePanel.currentPanel!.refresh(undefined);
 				return resolve(out);
 			});
@@ -404,9 +339,12 @@ class AnPagePanel {
 		// this.page.html = '?_shut-down_=True';
 		// this.page.html = vscode.Uri.file('?_shut-down_=True');
 
-		let req = this.serv.webrootPath() + '?_shut-down_=True';
+		const req = `http://${this.page.host}:${this.page.port}?_shut-down_=True`;
 		console.log(req);
 		this._panel.webview.html = '';
+
+		// FIXME: Not always work. Send message to js?
+		this.serv.starting(false);
 		this._panel.webview.html = `<!DOCTYPE html>
 		<html lang="en">
 		<head>
