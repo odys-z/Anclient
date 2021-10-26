@@ -17,14 +17,14 @@
             "port": 9222,
             "request": "attach",
             "type": "pwa-chrome",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}/dist"
         },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Launch Chrome Anprism",
             "url": "http://localhost:8888",
-            "webRoot": "${workspaceFolder}",
+            "webRoot": "${workspaceFolder}/dist",
             "webpack-config": "webpack.config.js"
         }
     ]

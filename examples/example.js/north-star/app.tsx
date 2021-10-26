@@ -1,4 +1,3 @@
-/**@deprecated */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
@@ -25,23 +24,28 @@ import { MyPolls } from './views/c/my-polls';
 import { MyDocs } from './views/c/my-docs';
 import { MyConnect } from './views/c/connect';
 
-/**@deprecated
- * The application main, context singleton and error handler
- */
-class App extends React.Component {
+import { welcome } from './views/c-tsx/nwelcome';
+import { Northprops } from './views/c-tsx/north';
+
+/** The application main, context singleton and error handler */
+class App extends React.Component<Northprops, any> {
 	state = {
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
-		hasError: false,
-		iportal: 'portal.html',
-		nextAction: undefined, // e.g. re-login
 
+		iportal: 'portal.html',
+        jserv: undefined,
+        servs: {},
+        servId: '',
+
+		hasError: false,
+		nextAction: undefined, // e.g. re-login
 		error: undefined,
 	};
 
 	/**Restore session from window.localStorage
 	 */
-	constructor(props) {
+	constructor(props: Northprops) {
 		super(props);
 
 		this.state.iportal = this.props.iportal;
@@ -116,7 +120,7 @@ class App extends React.Component {
 			this.state.anClient.logout(
 				() => {
 					if (this.props.iwindow)
-						this.props.iwindow.location = this.state.iportal;
+						this.props.iwindow.location.href = this.state.iportal;
 				},
 				(c, e) => {
 					// something wrong
@@ -144,9 +148,6 @@ class App extends React.Component {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
-				// FIXME we should use a better way
-				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
-				// samports: this.state.samports, // FXIME or Protocol?
 				anReact: this.state.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
@@ -159,10 +160,10 @@ class App extends React.Component {
 				error: this.state.error,
 			}} >
 				<Sys menu='sys.menu.jsample'
-					sys='Emotion Regulation' menuTitle='Sys Menu'
+					sys='Emotion Regulation - TSX' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					hrefDoc={'docs/index.html'}
-					welcome={welcomePage}
+					welcome={welcome}
 					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
@@ -191,9 +192,9 @@ class App extends React.Component {
 	 * @param {string} elem html element id, null for test
 	 * @param {object} [opts={}] serv id
 	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.iportal='index.html'] page showed after logout
+	 * @param {string} [opts.portal='index.html'] page showed after logout
 	 */
-	static bindHtml(elem, opts = {}) {
+	static bindHtml(elem, opts = {portal: 'indexe.html'}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);

@@ -7,7 +7,7 @@ var version = "1.0.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: {'AnHome': './app.jsx',
+	entry: {'AnHome': './app.tsx',
 			'AnExt': './login-app.jsx' },
 
 	output: {

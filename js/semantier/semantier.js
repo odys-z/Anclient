@@ -4,6 +4,7 @@ const { CRUD } = Protocol;
 
 /**
  * Base class of semantic tier
+ * @class
  */
 export class Semantier {
 	static invalidStyles = {

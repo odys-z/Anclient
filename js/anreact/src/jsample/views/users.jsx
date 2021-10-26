@@ -161,7 +161,8 @@ class UserstComp extends CrudCompW {
 	closeDetails() {
 		this.recForm = undefined;
 		this.tier.resetFormSession();
-		this.setState({});
+		// this.setState({});
+		this.toSearch();
 	}
 
 	render() {

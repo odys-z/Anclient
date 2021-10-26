@@ -29,9 +29,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import { Route } from 'react-router-dom'
 
-import { Protocol } from '@anclient/semantier';
-
-	import { AnContext } from './reactext';
+import { AnContext } from './reactext';
 	import { ConfirmDialog } from './widgets/messagebox';
 	import { MyIcon } from './widgets/my-icon';
 	import { MyInfo } from './widgets/my-info';
@@ -108,6 +106,9 @@ const styles = theme => ({
 	menuButton: {
 		marginRight: theme.spacing(2),
 	},
+	sysName: {
+		lineHeight: 2.2
+	},
 	hide: {
 		display: 'none',
 	},
@@ -148,6 +149,9 @@ const styles = theme => ({
 		"& svg": {
 			margin: 24,
 		},
+	},
+	welcomeHead: {
+		padding: theme.spacing(1)
 	},
 	cardText: {
 		fontSize: 18,
@@ -205,6 +209,38 @@ class SysComp extends React.Component {
 		this.menuItems = this.menuItems.bind(this);
 
 		this.toLogout = this.toLogout.bind(this);
+
+		this.welcomePaper = this.welcomePaper.bind(this);
+	}
+
+	welcomePaper(classes) {
+		if (typeof this.props.welcome !== 'function') {
+			return (
+			  <Card >
+				<Typography gutterBottom variant='h4'
+							className={classes.welcomeHead}
+				> Welcome! </Typography>
+				<Paper elevation={4} style={{ margin: 24 }}
+						className={classes.welcome}>
+					<IconButton onClick={this.showMenu} >
+						<Menu color='primary'/>
+						<Box component='span' display='inline' className={classes.cardText} >
+							Please click menu to start.
+						</Box>
+					</IconButton>
+				</Paper>
+				<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
+					<School color='primary'/>
+					<Box component='span' display='inline'>Documents:
+						<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
+							{`${this.state.sysName}`}</Link>
+					</Box>
+				</Paper>
+			  </Card>);
+		}
+		else {
+			return this.props.welcome(classes, this.context, this);
+		}
 	}
 
 	componentDidMount() {
@@ -348,7 +384,7 @@ class SysComp extends React.Component {
 					>
 					<Menu />
 					</IconButton>
-					<Typography variant="h5" noWrap >{L(this.state.sysName)}</Typography>
+					<Typography variant="h5" className={classes.sysName} noWrap >{L(this.state.sysName)}</Typography>
 				</Box>
 				</Grid>
 
@@ -389,25 +425,7 @@ class SysComp extends React.Component {
 			  >
 				<div className={claz.drawerHeader} />
 				{this.state.welcome ?
-					<Card >
-						<Typography gutterBottom variant='h4'>Welcome!</Typography>
-						<Paper elevation={4} style={{ margin: 24 }}
-								className={classes.welcome}>
-								<IconButton onClick={this.showMenu} >
-									<Menu color='primary'/>
-									<Box component='span' display='inline' className={classes.cardText} >
-										Please click menu to start.
-									</Box>
-								</IconButton>
-						</Paper>
-						<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
-							<School color='primary'/>
-							<Box component='span' display='inline'>Documents:
-								<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
-									{`${this.state.sysName}`}</Link>
-							</Box>
-						</Paper>
-					</Card> :
+					this.welcomePaper(classes, this) :
 					<div className="content">
 						{this.route()}
 					</div>}

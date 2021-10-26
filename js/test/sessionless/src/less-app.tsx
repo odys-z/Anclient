@@ -6,7 +6,7 @@ import { Protocol, AnsonMsg, Inseclient } from '@anclient/semantier';
 
 import { Langstrs,
 	AnContext, AnError, AnReactExt,
-	uri, jsample
+	jsample
 } from '@anclient/anreact';
 
 import Welcome from './welcome';
