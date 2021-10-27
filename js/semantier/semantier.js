@@ -149,7 +149,10 @@ export class Semantier {
 	/** Load relationships */
 	relations(opts, onOk) {
 		if (!this.anReact)
-			this.anReact = new AnReact();
+			// this.anReact = new AnReact();
+			// bug checked out by types, and not tested!
+			// this line ?
+			throw Error ("AnReact here is needed!");
 
 		let that = this;
 
@@ -166,6 +169,7 @@ export class Semantier {
 
 		let ds = {uri : this.uri, sk, t, sqlArgs};
 
+		// FIXME bug stree is about React?
 		this.anReact.stree({ uri: this.uri, sk, t, sqlArgs,
 			onOk: (resp) => {
 				that.rels = resp.Body().forest;

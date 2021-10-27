@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Grid, Button, Theme, Link } from '@material-ui/core';
 
-import { Semantier, AnsonReq } from "@anclient/semantier";
+import { Semantier2, AnsonReq } from "@anclient/semantier";
 import {
 	L, AnConst,
     AnContext,
@@ -14,15 +14,17 @@ import { PollsProp } from '../../common/north';
 
 const { JsampleIcons } = jsample;
 
-// import { JQuiz } from '../../common/an-quiz.js';
-
-
 const styles = (theme: Theme) => (Object.assign(
-	Semantier.invalidStyles as any, {
+	Semantier2.invalidStyles as any, {
 	crudButton: {
 		margin: theme.spacing(1),
 	},
 } ));
+
+interface QueryCondt {
+	pollIds: Array<string>;
+	states: string;
+}
 
 class PollsComp extends React.Component<PollsProp, any, any> {
     uri: string;
@@ -49,6 +51,7 @@ class PollsComp extends React.Component<PollsProp, any, any> {
 
     confirm: JSX.Element;
     detailsForm: JSX.Element;
+	q: QueryCondt;
 
 	constructor(props) {
 		super(props);
@@ -67,6 +70,7 @@ class PollsComp extends React.Component<PollsProp, any, any> {
 		this.tier = new PollsTier(this).setContext(this.context);
 	}
 
+	/*
 	toSearch(e, query) {
 		let pageInf = this.state.pageInf;
 		let queryReq = this.context.anClient.query(this.uri, 'polls', 'p', pageInf)
@@ -91,6 +95,19 @@ class PollsComp extends React.Component<PollsProp, any, any> {
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
 		this.state.selected.ids.clear();
+	}
+	*/
+
+	toSearch(condts) {
+		if (this.tier) {
+			let that = this;
+			this.q = condts || this.q;
+			this.tier.records( this.q,
+				(cols, rows) => {
+					that.state.selected.ids.clear();
+					that.setState(rows);
+				}, undefined );
+		}
 	}
 
 	onPageInf(page, size) {
@@ -162,7 +179,7 @@ class PollsComp extends React.Component<PollsProp, any, any> {
 					tag:   q.state.conds[1].val ? q.state.conds[1].val : undefined,
 					orgId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				} } }
-				onDone={(query) => { this.toSearch(undefined, query); } }
+				onDone={(query) => { this.toSearch(query); } }
 			/>
 
 			<Grid container alignContent="flex-end" >
@@ -203,7 +220,7 @@ class PollDetailsForm extends React.Component<any, any, any> {
 
 }
 
-class PollsTier extends Semantier {
+class PollsTier extends Semantier2 {
     _cols = [
         { text: L('quiz event'),field: "pid",    hide:true },
         { text: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
@@ -225,20 +242,20 @@ class PollsTier extends Semantier {
      * @param errCtx 
      * @returns 
      */
-    records(opts: { pollIds: any; states: any; },
-            onLoad: () => {},
+    records(opts: QueryCondt,
+            onLoad: (cols: Array<{}>, rows: Array<{}>) => void,
             errCtx: typeof AnContext.error) {
 		let {pollIds, states} = opts;
 		let opt = {};
-		opt[PollsReq.pollIds] = pollIds;
-		opt[PollsReq.states] = states;
-		return this.serv(this.uri, PollsReq.A.pollsUsers, opt, onLoad, errCtx);
+		opt[NPollsReq.pollIds] = pollIds;
+		opt[NPollsReq.states] = states;
+		return this.serv(this.uri, NPollsReq.A.pollsUsers, opt, onLoad, errCtx);
 	}
 
 }
 
 /**The poll request message body */
-class PollsReq extends AnsonReq {
+class NPollsReq extends AnsonReq {
     /**
      * https://stackoverflow.com/questions/32494174/can-you-create-nested-classes-in-typescript
      */
@@ -253,4 +270,4 @@ class PollsReq extends AnsonReq {
     static states = "states";
 }
 
-export { Polls, PollsComp, PollsReq, PollsTier }
+export { Polls, PollsComp, NPollsReq, PollsTier }

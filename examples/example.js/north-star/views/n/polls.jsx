@@ -23,6 +23,9 @@ const styles = (theme) => ( {
 	},
 } );
 
+/**
+ * @deprecated
+ */
 class PollsComp extends CrudCompW {
 	state = {
 		students: [],

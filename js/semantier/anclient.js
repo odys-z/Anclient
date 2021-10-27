@@ -768,6 +768,7 @@ class Inseclient extends SessionClient {
 
 export * from './protocol.js';
 export * from './semantier.js';
+export * from './semantier-v2.ts';
 // export * from './cheapflow/cheap-req.js';
 // export * from './cheapflow/cheap-client.js';
 export {AnClient, SessionClient, Inseclient, aes};
