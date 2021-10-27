@@ -1,32 +1,32 @@
 
-import React from 'react';
+import React, { ReactEventHandler } from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Grid, Button, Card, TextField, Typography } from '@material-ui/core';
+import { Grid, Button, Theme, Link } from '@material-ui/core';
 
-import { AnClient, SessionClient, Protocol } from '@anclient/semantier';
+import { Semantier, AnsonReq } from "@anclient/semantier";
 import {
-	L, Langstrs, AnConst,
-    AnContext, AnError, CrudCompW, AnReactExt,
+	L, AnConst,
+    AnContext,
 	ConfirmDialog, AnQueryForm, AnTablist, jsample
 } from '@anclient/anreact';
+import { PollsProp } from '../../common/north';
+
 const { JsampleIcons } = jsample;
 
-import { QuizProtocol } from '../../common/protocol.quiz.js';
-import { JQuiz } from '../../common/an-quiz.js';
+// import { JQuiz } from '../../common/an-quiz.js';
 
-const styles = (theme) => ( {
-	root: {
-	},
+
+const styles = (theme: Theme) => (Object.assign(
+	Semantier.invalidStyles as any, {
 	crudButton: {
-		margin: 4,
+		margin: theme.spacing(1),
 	},
-} );
+} ));
 
-/**
- * @deprecated
- */
-class PollsComp extends CrudCompW {
+class PollsComp extends React.Component<PollsProp, any, any> {
+    uri: string;
+
 	state = {
 		students: [],
 		condQzName: { type: 'text', val: '', label: L('Quiz Name') },
@@ -38,12 +38,17 @@ class PollsComp extends CrudCompW {
 					options: [ AnConst.cbbAllItem ],
 					label: L('My Students') },
 
+        queryReq: undefined as typeof AnsonReq,
 		pageInf: { page: 0, size: 25, total: 0 },
 		buttons: { start: true, stop: false, edit: false},
-		selected: {Ids: new Set()},
+		selected: {ids: new Set<string>()},
 	};
 
-	jquiz = undefined;
+    context: typeof AnContext;
+    tier: PollsTier;
+
+    confirm: JSX.Element;
+    detailsForm: JSX.Element;
 
 	constructor(props) {
 		super(props);
@@ -58,7 +63,8 @@ class PollsComp extends CrudCompW {
 
 	componentDidMount() {
 		console.log(this.uri);
-		this.jquiz = new JQuiz(this.context.anClient, this.context.error);
+		// this.jquiz = new JQuiz(this.context.anClient, this.context.error);
+		this.tier = new PollsTier(this).setContext(this.context);
 	}
 
 	toSearch(e, query) {
@@ -84,7 +90,7 @@ class PollsComp extends CrudCompW {
 
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
-		this.state.selected.Ids.clear();
+		this.state.selected.ids.clear();
 	}
 
 	onPageInf(page, size) {
@@ -108,21 +114,27 @@ class PollsComp extends CrudCompW {
 		} );
 	}
 
-	toStop(e, v) {
+    toShowDetails(e: React.UIEvent): void {
+        this.detailsForm = (
+            <PollDetailsForm
+            />);
+    }
+    
+	toStop(e: React.UIEvent) {
 		let that = this;
-		this.jquiz.pollsUsers(this.uri,
-			{pollIds: this.state.selectedRecIds},
+		this.tier.pollsUsers(this.uri,
+			{pollIds: this.state.selected.ids},
 			( (users) => {
 				console.log(users);
 				let txt = L('Totally {count} polls, {users} users will be updated. Are you sure?',
-							{ count: that.state.selectedRecIds.length,
+							{ count: that.state.selected.ids.size,
 							  users: users.Body().msg() });
 				that.confirm =
 					(<ConfirmDialog open={true}
 						ok={L('OK')} cancel={true}
 						title={L('Info')} msg={txt}
 						onOk={ () => {
-								that.jquiz.stopolls(this.uri, [...that.state.selectedRecIds],
+								that.tier.stopolls(this.uri, Array.from(that.state.selected.ids),
 									( rsp => { that.confirm = undefined; } )); // make sure it's an array
 						 	}
 						}
@@ -133,12 +145,11 @@ class PollsComp extends CrudCompW {
 	}
 
 	closeDetails() {
-		this.roleForm = undefined;
+		this.detailsForm = undefined;
 		this.setState({});
 	}
 
 	render() {
-		let args = {};
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		this.state.condUser.sqlArgs = [this.context.anClient.userInfo.uid];
@@ -146,8 +157,8 @@ class PollsComp extends CrudCompW {
 			<AnQueryForm uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condQzName, this.state.condTag, this.state.condUser ]}
-				query={ (q) => { return {
-					qzName: q.state.conds[0].val ? q.state.conds[0].val : undefined,
+				query={ (q: typeof AnQueryForm) => { return {
+					qzName:q.state.conds[0].val ? q.state.conds[0].val : undefined,
 					tag:   q.state.conds[1].val ? q.state.conds[1].val : undefined,
 					orgId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
 				} } }
@@ -159,11 +170,11 @@ class PollsComp extends CrudCompW {
 					className={classes.crudButton} onClick={this.toStop}
 					startIcon={<JsampleIcons.DetailPanel />}
 				>{L('Stop Poll')}</Button>
-				{/*
 				<Button variant="contained" disabled={!btn.start}
-					className={classes.crudButton} onClick={this.toStart}
+					className={classes.crudButton} onClick={this.toShowDetails}
 					startIcon={<JsampleIcons.Add />}
-				>{L('Start Poll')}</Button>
+				>{L('Details')}</Button>
+				{/*
 				<Button variant="contained" disabled={!btn.edit}
 					className={classes.crudButton} onClick={this.toEdit}
 					startIcon={<JsampleIcons.Delete />}
@@ -171,21 +182,15 @@ class PollsComp extends CrudCompW {
 			</Grid>
 
 			<AnTablist
-				className={classes.root} checkbox={true} pk="pid"
-				columns={[
-					{ text: L('quiz event'),field: "pid",    hide:true },
-					{ text: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
-					{ text: L('Users' ),    field: "users",  color: 'primary' },
-					{ text: L('Status'),    field: "state",  color: 'primary' },
-					{ text: L('Subject'),   field: "subject",color: 'primary' }
-				]}
-				rows={this.state.rows}
+				className={classes.list} checkbox={true} pk="pid"
+				columns={this.tier.columns()}
+				rows={this.tier.rows}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
 				selectedIds={this.state.selected}
 				onSelectChange={this.onTableSelect}
 			/>
-			{this.roleForm}
+			{this.detailsForm}
 			{this.confirm}
 		</>);
 	}
@@ -193,4 +198,59 @@ class PollsComp extends CrudCompW {
 PollsComp.contextType = AnContext;
 
 const Polls = withWidth()(withStyles(styles)(PollsComp));
-export { Polls, PollsComp }
+
+class PollsTier extends Semantier {
+    _columns = [
+        { text: L('quiz event'),field: "pid",    hide:true },
+        { text: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
+        { text: L('Users' ),    field: "users",  color: 'primary' },
+        { text: L('Status'),    field: "state",  color: 'primary' },
+        { text: L('Subject'),   field: "subject",color: 'primary' }
+	];
+
+    constructor(comp: PollsComp) {
+        super(comp);
+    }
+
+	/**[Promiting Style]
+	 * Get all poll users for pollIds, with state in states.
+	 * port: quiz
+     * 
+     * @param opts 
+     * @param onLoad 
+     * @param errCtx 
+     * @returns 
+     */
+    records(opts: { pollIds: any; states: any; },
+            onLoad: () => {},
+            errCtx: typeof AnContext.error) {
+		let {pollIds, states} = opts;
+		let opt = {};
+		opt[PollsReq.pollIds] = pollIds;
+		opt[PollsReq.states] = states;
+		return this.serv(this.uri, PollsReq.A.pollsUsers, opt, onLoad, errCtx);
+	}
+
+}
+
+/**The poll request message body */
+class PollsReq extends AnsonReq {
+    /**
+     * https://stackoverflow.com/questions/32494174/can-you-create-nested-classes-in-typescript
+     */
+ 	static A = class {
+		static start = 'start';
+		static list = 'list';     // load quizzes
+		static stopolls = 'stopolls'; // stop all polls
+		static pollsUsers = 'polls-users'; // get all users of polls (pollIds, quizId, states)
+	}
+
+    static pollIds = "pids";
+    static states = "states";
+}
+
+class PollDetailsForm extends React.Component<any, any, any> {
+
+}
+
+export { Polls, PollsComp, PollsReq, PollsTier }

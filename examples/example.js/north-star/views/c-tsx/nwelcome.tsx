@@ -1,9 +1,8 @@
 import React from "react";
 import { AnContext, SysComp } from "@anclient/anreact";
 import { Semantier } from "@anclient/semantier";
-import { Card, Grid, Icon, Link, Paper, SvgIcon, Theme, Typography, withStyles, withWidth } from "@material-ui/core";
-
-type WelcomeProp = Readonly<{ classes: {board: any}; sys: typeof SysComp }>;
+import { Card, Grid, Link, Paper, SvgIcon, Theme, Typography, withStyles, withWidth } from "@material-ui/core";
+import { WelcomeProp } from "../../common/north";
 
 class WelcomeComp extends React.Component<WelcomeProp, any, any> {
     uri = '/n/home';
@@ -89,7 +88,7 @@ const styles = (theme: Theme) => (Object.assign(
         padding: theme.spacing(1),
         marginTop: 40,
         margin: "auto",
-        maxWidth: 600,
+        maxWidth: "76vw",
         minWidth: 200,
       },
 	  card: {
@@ -103,7 +102,7 @@ const styles = (theme: Theme) => (Object.assign(
         textAlign: 'center',
         fontSize: '1.2em',
         margin: theme.spacing(1),
-        borderBottom: '1px solid silver'
+        borderBottom: '2px solid lightgrey'
       },
 	  cardText: {
 		padding: theme.spacing(1),
