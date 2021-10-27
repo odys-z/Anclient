@@ -2,7 +2,7 @@
   "name": "anprism",
   "displayName": "Anprism",
   "description": "Anclient's js page sandbox",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "icon": "res/anprism.png",
   "publisher": "ody-zhou",
   "repository": {

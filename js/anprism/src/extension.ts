@@ -317,7 +317,7 @@ class AnPagePanel {
 		<head>
 			<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<script type="text/javascript">var vscode = acquireVsCodeApi();</script
+			<script type="text/javascript">var vscode = acquireVsCodeApi();</script>
 		</head>
 		<body>
 			<p id="lines-of-code-counter">${sub}
@@ -328,6 +328,9 @@ class AnPagePanel {
 			/>
 			</p>
 			<iframe id='i-anprism' src="${url}" width="100%" height="720px" style="${page.style}" ></iframe>
+			<script type="text/javascript">
+				console.log("iframe.src", document.getElementById("i-anprism").getAttribute("src"));
+			</script>
 		</body>
 		</html>`;
 	}
@@ -352,7 +355,10 @@ class AnPagePanel {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		</head>
 		<body>
-			<iframe src="${req}" width="100%" height="720px" style="${this.page.style}" ></iframe>
+			<iframe id="i-anprism" src="${req}" width="100%" height="720px" style="${this.page.style}" ></iframe>
+			<script type="text/javascript">
+				console.log("iframe.src", document.getElementById("i-anprism").getAttribute("src"));
+			</script>
 		</body>
 		</html>`;
 	}
