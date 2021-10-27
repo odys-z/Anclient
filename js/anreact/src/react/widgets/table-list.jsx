@@ -161,8 +161,6 @@ class AnTablistComp extends React.Component {
 					selected={isItemSelected}
 					onClick= { (event) => {
 						this.handleClick(event, pkv);
-						// if (typeof this.props.onSelectChange === 'function')
-						// 	this.props.onSelectChange(this.state.selected, pkv);
 					} }
 					role="checkbox" aria-checked={isItemSelected}
 				>
@@ -227,7 +225,8 @@ class AnTablistComp extends React.Component {
 }
 AnTablistComp.propTypes = {
 	pk: PropTypes.string.isRequired,
-	selectedIds: PropTypes.object.isRequired
+	selectedIds: PropTypes.object.isRequired,
+	onSelectChange: PropTypes.func
 };
 
 const AnTablist = withStyles(styles)(AnTablistComp);
