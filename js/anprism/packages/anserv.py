@@ -11,7 +11,7 @@ class AnHttpRequestHandler(SimpleHTTPRequestHandler):
         '''
         Thanks to https://stackoverflow.com/a/8930440/7362888
         '''
-        qs = parse_qs(urlparse(self.path).query);
+        qs = parse_qs(urlparse(self.path).query)
         self.shutdownFlag = qs.get('_shut-down_', [''])
 
         # replace nonce (getNonce()) with nonce arg

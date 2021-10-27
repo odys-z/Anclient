@@ -82,16 +82,6 @@ export function deactivate() {
 }
 
 /**
- * @param extensionUri
- * @returns 
-function getWebviewOpts(extensionUri: vscode.Uri): vscode.WebviewOptions {
-	return {
-		enableScripts: true,
-	};
-}
- */
-
-/**
  * Anprism page view.
  * @example
  * load -(create)--[  stop   ]-+ start --+-- load html
@@ -162,7 +152,7 @@ class AnPagePanel {
 			);
 			panel.webview.options = { enableScripts: true }
 
-			AnPagePanel.log.append("Open page " + AnPagePanel.filename(localhtml));
+			AnPagePanel.log.appendLine("Open page " + AnPagePanel.filename(localhtml));
 			p = new AnPagePanel(context, panel, new ServHelper(context).findRoot(localhtml));
 		}
 
@@ -209,10 +199,10 @@ class AnPagePanel {
 					vscode.window.showInformationMessage('Starting Anprism server failed. ' + err.message);
 					return reject(err);
 				}
-				this.serv.starting(false); // test shows only when server stopped can reach here
+				// this.serv.starting(false); // test shows only when server stopped can reach here
 				AnPagePanel.log.appendLine(out.toString());
-				if (AnPagePanel.currentPanel)
-					AnPagePanel.currentPanel!.refresh(undefined);
+				// if (AnPagePanel.currentPanel)
+				// 	AnPagePanel.currentPanel!.refresh(undefined);
 				return resolve(out);
 			});
 		});
