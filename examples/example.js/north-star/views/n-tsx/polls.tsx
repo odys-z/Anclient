@@ -26,8 +26,8 @@ const styles = (theme: Theme) => (Object.assign(
 } ));
 
 interface QueryCondt {
-	pollIds: Array<string>;
-	states: string;
+	pollIds?: Array<string>;
+	states?: string;
 }
 
 class PollsComp extends CrudCompW {
