@@ -30,7 +30,7 @@ module.exports = {
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
-		{ test: /\.tsx$/,
+		{ test: /\.tsx?$/,
 		  loader : 'babel-loader',
 		  options: { presets: [
 				'@babel/preset-react',

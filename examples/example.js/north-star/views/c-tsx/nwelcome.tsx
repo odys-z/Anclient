@@ -36,7 +36,7 @@ class WelcomeComp extends React.Component<WelcomeProp, any, any> {
 
     getCard(classes: WelcomeClasses, r: any, rx: number) {
         return (
-          <Grid item {...r.grid}>
+          <Grid item {...r.grid} key={rx}>
           <Card key={rx} className={classes.card}>
             <Typography className={classes.cardTitle} >{r.title}</Typography>
             {cardLink(classes, r.msg, r.link)}
