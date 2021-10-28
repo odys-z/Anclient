@@ -618,10 +618,10 @@ export class UpdateReq extends AnsonBody {
     /**Create an update / insert request.
      * @param uri component id
      * @param tabl table
-     * @param pk {pk, v} conditions for pk.<br>
+     * @param pkv {pk, v} conditions for pk.<br>
      * If pk is null, use this object's where_() | whereEq() | whereCond().
      */
-    constructor(uri: string, tabl: string, pk?: string) {
+    constructor(uri: string, tabl: string, pkv?: [string, string] | {pk: string, v: string}) {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
@@ -629,13 +629,13 @@ export class UpdateReq extends AnsonBody {
 		this.mtabl = tabl;
 		this.nvs = [];
 		this.where = [];
-		if (Array.isArray(pk))
-			this.where.push(['=', pk[0], `'${pk[1]}'`]);
-		else if (typeof pk === "object") {
-            let pk_ = pk as PkMeta;
+		if (Array.isArray(pkv))
+			this.where.push(['=', pkv[0], `'${pkv[1]}'`]);
+		else if (typeof pkv === "object") {
+            let pk_ = pkv as PkMeta;
 		 	if (pk_.pk !== undefined)
 				this.where.push(['=', pk_.pk, `'${pk_.v}'`]);
-			else console.error("UpdateReq: Can't understand pk: ", pk);
+			else console.error("UpdateReq: Can't understand pk: ", pkv);
         }
     }
 
@@ -652,7 +652,7 @@ export class UpdateReq extends AnsonBody {
      * @param v
      * @return this
      */
-    nv(n: string, v: string): UpdateReq {
+    nv(n: string | Array<string>, v: string): UpdateReq {
 		if (Array.isArray(n)) {
 			this.nvs = this.nvs.concat(Protocol.nvs2row(n));
 		}
@@ -780,7 +780,7 @@ export class UpdateReq extends AnsonBody {
 }
 
 export class DeleteReq extends UpdateReq {
-	constructor (uri: string, tabl: string, pk: string) {
+	constructor (uri: string, tabl: string, pk: [string, string] | { pk: string; v: string; }) {
 		super (uri, tabl, pk);
 		this.a = Protocol.CRUD.d;
 	}

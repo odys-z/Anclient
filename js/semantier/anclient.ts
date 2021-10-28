@@ -98,7 +98,7 @@ class AnClient {
      * @param {function} on failed
      */
 	login (usrId, pswd, onLogin, onError) {
-		let iv = aes.getIv128();
+		let iv = aes.getIv128() as unknown as Int8Array;
 		let cpwd = aes.encrypt(usrId, pswd, iv);
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
 
@@ -241,7 +241,7 @@ class AnClient {
 								body: [ { type: 'io.odysz.semantic.jprotocol.AnsonResp',
 										  m: 'Ajax: network failed: ' + resp.status } ]
 							});
-						else resp = fromAjaxError(resp);
+						else resp = AnClient.fromAjaxError(resp);
 
 						if (typeof onErr.onError === 'function') {
 							onErr.msg = resp.Body().msg();
@@ -586,7 +586,7 @@ class SessionClient {
 						"To setup user's action information, call ssClient.usrAct().");
 
 		if (pk === undefined) {
-			throw new Error("To update a table, {pk, v} must presented.", pk);
+			throw new Error("To update a table, {pk, v} must presented.");
 		}
 
 		var upd = new UpdateReq(uri, maintbl, pk);
@@ -596,7 +596,7 @@ class SessionClient {
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
-				upd.nv(nvs);
+				upd.nv(nvs, undefined);
 			else if (typeof nvs === 'object')
 				upd.record(nvs)
 			else console.error("updating nvs must be an array of name-value.", nvs)
@@ -615,7 +615,7 @@ class SessionClient {
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
-				ins.valus(nvs);
+				ins.valus(nvs, undefined);
 			else console.error("updating nvs must be an array of name-value.", nvs)
 		}
 		return jmsg;
