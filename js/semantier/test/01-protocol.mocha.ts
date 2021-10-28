@@ -4,7 +4,7 @@
 import chai from 'chai'
 import { expect, assert } from 'chai'
 
-import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp } from '../protocol-v2';
+import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp, AnResultset } from '../protocol-v2';
 import { AnClient, SessionClient, SessionInf } from '../anclient';
 const { CRUD } = Protocol;
 
@@ -294,7 +294,7 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
     it('AnsonResp response instancing', () => {
 		let rp = new AnsonMsg(resp);
 		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'person'), true, "0 000");
-		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'age'), true, "0 000");
+		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'age'), true, "0 001");
         assert.equal(rp.code, 'ok', "1 ---");
         assert.equal(rp.port, 'query', "2 ---");
         assert.equal(rp.Body().msg(), null, "3 ---");
@@ -319,27 +319,29 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 	} );
 
 	it('AnsonResp {colnames, results} => [{n, v}, ...] ', () => {
+		type Vec = {vid: string, amount: string};
+		
 		assert.isTrue(typeof(Protocol.rs2arr) === 'function', "1 ---");
 
-		let { rows } = AnsonResp.rs2arr(resp.body[0].rs[0]);
+		let { rows } = AnsonResp.rs2arr(resp.body[0].rs[0] as unknown as AnResultset);
 		assert.equal(8, rows.length, "2 ---");
-		let r0 = rows[0]
+		let r0 = rows[0] as Vec;
 		assert.equal('v 001', r0.vid, "3 ---");
 		assert.equal('100', r0.amount, "4 ---");
-		r0 = rows[1]
+		r0 = rows[1] as Vec
 		assert.equal('v 002', r0.vid, "5 ---");
 		assert.equal('103', r0.amount, "6 ---");
 
-		rows = AnsonResp.rsArr(resp.body, 0).rows;
+		rows = AnsonResp.rsArr((resp as unknown as AnsonMsg<AnsonResp>).body, 0).rows;
 		assert.equal(8, rows.length, "7 ---");
 
-		rows = AnsonMsg.rsArr(resp, 0).rows;
+		rows = AnsonMsg.rsArr((resp as unknown as AnsonMsg<AnsonResp>), 0).rows;
         assert.equal(8, rows.length, "8 ---");
     });
 
     it('AnsonResp [{NAME: [x, Name]}] => [{Name, x}, ...] ', () => {
 
-		let { cols } = AnsonResp.rs2arr(resp.body[0].rs[0]);
+		let { cols } = AnsonResp.rs2arr((resp.body[0] as unknown as AnsonResp).rs[0]);
 
         assert.equal(8, cols.length, "2 ---");
         assert.equal('vid', cols[0], "0 ---");

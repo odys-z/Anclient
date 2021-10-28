@@ -242,7 +242,7 @@ export class AnsonMsg<T extends AnsonBody> {
 
 
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
-		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length() > 0) {
+		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length > 0) {
 			return AnsonResp.rsArr(resp.body, rx);
 		}
 		return [];
@@ -928,11 +928,11 @@ export class InsertReq extends UpdateReq {
 }
 
 export class AnsonResp extends AnsonBody {
-    static hasColumn(rs: any, colname: any): boolean {
+    static hasColumn(rs: any, colname: string): boolean {
 		return rs && rs.colnames && colname && colname.toUpperCase() in rs.colnames;
 	}
 
-	static rsArr(respBody: Array<AnsonResp>, rx = 0): any {
+	static rsArr(respBody: Array<AnsonResp>, rx = 0): {cols: Array<{}>, rows: Array<{}>} {
 		return AnsonResp.rs2arr(respBody[0].rs[rx]);
 	}
 
@@ -945,7 +945,7 @@ export class AnsonResp extends AnsonBody {
      * cols: array like [ col1, col2, ... ]; <br>
      * rows: array like [ {col1: val1, ...}, ... ]
      */
-    static rs2arr(rs: AnResultset): object {
+    static rs2arr(rs: AnResultset): {cols: Array<{}>, rows: Array<{}>} {
 		let cols = [];
 		let rows = [];
 
@@ -1043,8 +1043,8 @@ export class AnsonResp extends AnsonBody {
     code: string;
     Code(): string { return this.code };
 
-    rs: AnResultset;
-    Rs(rx?: number): AnResultset { return this.rs; }
+    rs: AnResultset | Array<AnResultset>;
+    Rs(rx?: number): AnResultset { return this.rs.length ? this.rs[rx] : this.rs; }
 
     data: {props?: {}};
     getProp(prop: string): object { 
