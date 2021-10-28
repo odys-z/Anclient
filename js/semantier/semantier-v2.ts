@@ -20,21 +20,13 @@ export interface AnRecField {
  * Base class of semantic tier
  */
 export class Semantier2 {
-    static invalidStyles: {
-        ok: {};
-        anyErr: {
-            border: string;
-        };
-        notNull: {
-            backgroundColor: string;
-        };
-        maxLen: {
-            border: string;
-        };
-        minLen: {
-            border: string;
-        };
-    };
+    static invalidStyles = {
+        ok: {},
+        anyErr : { border: "1px solid red" },
+        notNull: { backgroundColor: '#ff9800b0' },
+        maxLen : { border: "1px solid red" },
+        minLen : { border: "1px solid red" },
+    }
 
     /**
      *
@@ -76,13 +68,14 @@ export class Semantier2 {
     /**
      * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context
      */
-    setContext(context): void {
+    setContext(context): Semantier2 {
 		if (!context || !context.anClient)
 			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
 		this.client = context.anClient;
 		this.anReact = context.anReact;
 		this.errCtx = context.error;
+		return this;
 	}
 
     client: any;

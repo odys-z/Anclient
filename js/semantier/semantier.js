@@ -63,6 +63,7 @@ export class Semantier {
 		this.client = context.anClient;
 		this.anReact = context.anReact;
 		this.errCtx = context.error;
+		return this;
 	}
 
 	validate(rec, fields) {

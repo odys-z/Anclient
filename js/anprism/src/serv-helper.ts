@@ -21,6 +21,7 @@ export type Page = {
     reload: boolean // FIXME how to get webpack watch results?
 };
 
+/**A server helper manage one server:port */
 export class ServHelper {
     serv: Serv;
     context: vscode.ExtensionContext;
@@ -51,9 +52,9 @@ export class ServHelper {
     /**
      * Findout webRoot of launch.json for the uri's workspace.
      * @param uri e.g. html path
-     * @returns 
+     * @returns
      */
-	public webroot(uri: vscode.Uri): ServHelper {
+	public findRoot(uri: vscode.Uri): ServHelper {
 
         const wscfg = vscode.workspace.getConfiguration('launch', uri);
         const cfgs = wscfg?.get<any[]>("configurations");
@@ -63,11 +64,11 @@ export class ServHelper {
                 console.log(cfgs[i]);
                 if (cfgs[i].type === "pwa-chrome") {
                     this.serv.webroot = this.resolvEnv(cfgs[i].webRoot, {workspaceFolder: getWorkspaceFolder(uri)});
-                    break;
+                    return this;
                 }
             }
-        };
-        return this;
+        }
+        throw new AnprismException("Can't setup webroot. Any pwa-chrome type in launch.json?");
 	}
 
     public resolvEnv(s: string, val: {workspaceFolder: string}): string {
@@ -79,25 +80,54 @@ export class ServHelper {
     }
 
     /**Change back the absolute path to relative url (remove the leading absolute path).
-	 * @param page 
-	 * @returns 
+	 * @param page
+	 * @returns
 	 */
-	public url(page: Page): string {
+	// public url(page: Page): {url: string, sub: string} {
+    //     let sub = path.relative(this.webrootPath(), page.html.fsPath);
+	// 	const url = `http://${page.host}:${page.port}/${sub}?n=${getNonce()}`;
+    //     console.log(url);
+    //     return {url, sub};
+
+    //     function getNonce() {
+    //         let text = '';
+    //         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    //         for (let i = 0; i < 32; i++) {
+    //             text += possible.charAt(Math.floor(Math.random() * possible.length));
+    //         }
+    //         return text;
+    //     }
+	// }
+	public url(page: Page): {url: string, sub: string} {
         let sub = path.relative(this.webrootPath(), page.html.fsPath);
-        // let path = page.html.fsPath.replaceAll(this.serv.webroot, '');
-		return `http://${page.host}:${page.port}/${sub}`;
+        let subfile = path.basename(sub, ".html");
+		const url = `http://${page.host}:${page.port}/${getNonce()}.html?nonce=${subfile}`;
+        console.log(url);
+        return {url, sub};
+
+        function getNonce() {
+            let text = '';
+            const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            for (let i = 0; i < 32; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return text;
+        }
 	}
+
 
     /**
      * Check is the html located in webroot. If yes, change it.
      * If webroot is still not set, update webroot with the workspace launch.json.
-     * @param html 
-     * @throws AnprismException: page not found or not located in webroot
-     * @returns 
+     * @param html
+     * @throws AnprismException:
+     * 1. page not found or not located in webroot
+     * 2. no launching configuration for finding webroot
+     * @returns
      */
 	public checkHtml(html: vscode.Uri): ServHelper {
         if (!this.serv.webroot) {
-            this.webroot(html);
+            this.findRoot(html);
         }
         else {
             const fullpath = html.fsPath;
@@ -107,12 +137,17 @@ export class ServHelper {
         return this;
 	}
 
+    /**soft update serv info (webroot only updated when more meaningful) */
+	public update(serv: Serv | undefined) {
+        if (serv?.webroot?.length)
+            this.findRoot(vscode.Uri.file(serv.webroot));
+	}
 }
 
 /**
  * Find workspace root according to resouce uri.
- * @param ofUri 
- * @returns 
+ * @param ofUri
+ * @returns
  */
 function getWorkspaceFolder(ofUri: vscode.Uri): string {
     const fileName = ofUri.fsPath;
@@ -122,7 +157,6 @@ function getWorkspaceFolder(ofUri: vscode.Uri): string {
 
     let wr = ws.map((folder) => folder.uri.fsPath)
         .filter((fsPath) => fileName?.startsWith(fsPath))[0];
-    
+
     return wr;
 }
-
