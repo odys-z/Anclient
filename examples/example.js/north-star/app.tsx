@@ -14,7 +14,6 @@ import { StarPorts } from './common/port';
 import { Dashboard } from './views/n/dashboard';
 import { Indicators } from './views/n/indicators';
 import { Quizzes } from './views/n/quizzes';
-// import { Polls } from './views/n/polls';
 import { Polls } from './views/n-tsx/polls';
 import { MyStudents } from './views/n/my-students';
 import { GPAsheet } from './views/n/gpa';
