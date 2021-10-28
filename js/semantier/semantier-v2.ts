@@ -1,4 +1,4 @@
-import { AnsonBody, DeleteReq, InsertReq, Protocol, stree_t, UpdateReq } from "./protocol";
+import { AnsonBody, DeleteReq, InsertReq, Protocol, stree_t, UpdateReq } from "./protocol-v2";
 const { CRUD } = Protocol;
 
 export interface AnlistCol {

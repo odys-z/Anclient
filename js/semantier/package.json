@@ -3,12 +3,10 @@
   "version": "0.9.19",
   "description": "The anclient's sub package depending on pure js object that can be used for js unit test.",
   "main": "./anclient.js",
-  "directories": {
-    "lib": "../lib",
-    "test": "../test"
-  },
+  "directories": {},
   "scripts": {
-    "test": "cd .. && npm test"
+    "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
+    "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
   "types": {
     "name": "@anclient/semantier",

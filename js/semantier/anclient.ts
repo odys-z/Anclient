@@ -1,15 +1,15 @@
 
+/**The lower API of jclient/js */
+
 import $ from 'jquery';
 import AES from './aes.js';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
-	DatasetReq
-} from './protocol';
-
-/**The lower API of jclient/js
- * @module anclient/js/core
- * */
+	DatasetReq,
+	LogAct,
+	AnsonBody
+} from './protocol-v2';
 
 /**
  * AES instance
@@ -26,9 +26,13 @@ const aes = new AES();
  * where defaultserv is the serv root, will be concated with port name for different poert.
  */
 class AnClient {
+	cfg: {
+		defaultServ: string;
+	};
+
 	/**@param {string} serv serv path root, e.g. 'http://localhost/jsample'
 	 */
-	constructor (urlRoot) {
+	constructor (urlRoot: string) {
 	 	this.cfg = {
 			// connId: null, // FIXME deprecated
 			defaultServ: urlRoot,
@@ -61,14 +65,9 @@ class AnClient {
 	}
 
     /** initialize with url and default connection id
-     * @param {stirng} urlRoot root url
-     * @param {string} connId @deprecated connection Id
+     * @param urlRoot root url
      * @retun {An} this */
-	init (urlRoot, connId) {
-		if (!!connId)
-			throw Error("Since jserv 1.3.0, conn-id nolonger can be controled by client.");
-
-		this.cfg.cconnId = connId;
+	init (urlRoot: string) {
 		this.cfg.defaultServ = urlRoot;
         return this;
 	}
@@ -103,7 +102,6 @@ class AnClient {
 		let cpwd = aes.encrypt(usrId, pswd, iv);
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
 
-		let An = this;
 		let servRoot = an.cfg.defaultServ;
 
 		this.post(req,
@@ -116,12 +114,12 @@ class AnClient {
 				let ssInf = resp.Body().ssInf;
 				ssInf.servRoot = servRoot;
 				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
-				sessionClient.an = An;
+				sessionClient.an = this;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
 				else console.log(sessionClient);
 			},
-			onError);
+			onError, {});
 	}
 
 	loginWait(usrId, pswd) {
@@ -277,10 +275,10 @@ class AnClient {
 	// TODO moved to semantic resultset?
 	/** Get the cols from jserv's rows
 	 * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
-	 * @param {AnsonMsg<AnsonResp>} resp
-	 * @param {ix} the rs index
-	 * @return {array} array of column names */
-	respCols(resp, ix) {
+	 * @param resp
+	 * @param rs index
+	 * @return column names */
+	respCols(resp: AnsonMsg<AnsonResp>, ix?: number): Array<string> {
 		if (ix === null || ix === undefined )
 			ix = 0;
 		// colnames: {TEXT: [2, "text"], VALUE: [1, "value"]}
@@ -340,7 +338,7 @@ class AnClient {
 	 * @return {AnsonMsg<AnsonResp>}
 	 */
 	static fromAjaxError(ajaxResp) {
-		let json = {};
+		let json;
 		json.code = Protocol.MsgCode.exIo;
 		json.body = [ {
 				type: 'io.odysz.semantic.jprotocol.AnsonResp',
@@ -356,12 +354,22 @@ class AnClient {
 	}
 }
 
-export const an = new AnClient();
+export const an = new AnClient(undefined);
+
+export type SessionInf = {
+	uid: string;
+	iv: string;
+	ssid: string;
+	usrName?: string
+}
 
 /**Client with session logged in.
  * Equivalent of java io.odysz.jclient.SessionClient;
  */
 class SessionClient {
+	an: AnClient;
+	ssInf: any;
+	currentAct: LogAct;
 	static get ssInfo() { return "ss-info"; }
 
 	/**Create SessionClient with credential information or load from localStorage.<br>
@@ -383,11 +391,11 @@ class SessionClient {
 	 * to the system background home page.</p>
 	 * <p>How should this pattern can be improved is open for discussion.
 	 * If your are interested in this subject, leave any comments in wiki page please.</p>
-	 * @param {object} [ssInf] login response form server: {ssid, uid}, if null, will try restore window.for localStorage
-	 * @param {byte[]} [iv] iv used for cipher when login.
-	 * @param {boolean} [dontPersist=false] don't save into local storage.
+	 * @param ssInf login response form server: {ssid, uid}, if null, will try restore window.for localStorage
+	 * @param iv iv used for cipher when login.
+	 * @param dontPersist don't save into local storage.
 	 */
-	constructor (ssInf, iv, dontPersist) {
+	constructor (ssInf: SessionInf, iv: Int8Array, dontPersist = false) {
 		if (ssInf) {
 			// logged in, create from credential
 			this.ssInf = ssInf;
@@ -413,7 +421,7 @@ class SessionClient {
 	}
 
 	static loadStorage() {
-		// jumped, create from local storage
+		// skipped, created from local storage instead
 		let ssInf;
 		if (window && localStorage) {
 			var sstr = localStorage.getItem(SessionClient.ssInfo);
@@ -452,7 +460,7 @@ class SessionClient {
 	 * @param {Object} act user's action for logging<br>
 	 * {func, cate, cmd, remarks};
 	 * @return the logged in header */
-	getHeader(act) {
+	getHeader(act: LogAct) {
 		var header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
 			header.userAct(act);
@@ -467,58 +475,63 @@ class SessionClient {
 		return header;
 	}
 
-	setPswd(oldPswd, newPswd, opts) {
-		var usrId = this.ssInf.uid;
-		var iv_tok = aes.getIv128();
-		var iv_new = aes.getIv128();
-		var iv_old = aes.getIv128();
+	SsInf(ssInf: SessionInf) {
+		throw new Error('Method not implemented.');
+	}
 
-		var tk = this.ssInf.ssid;
-		var key = this.ssInf.ssid;
+	setPswd(oldPswd: string, newPswd : string, opts) {
+		let usrId = this.ssInf.uid;
+		let iv_tok = aes.getIv128();
+		let iv_new = aes.getIv128();
+		let iv_old = aes.getIv128();
 
-		var newPswd = aes.encrypt(newPswd, key, iv_new);
-		var oldPswd = aes.encrypt(oldPswd, key, iv_old);
+		let tk = this.ssInf.ssid;
+		let key = this.ssInf.ssid;
 
-		var body = new AnSessionReq(usrId,
+		newPswd = aes.encrypt(newPswd, key, iv_new);
+		oldPswd = aes.encrypt(oldPswd, key, iv_old);
+
+		let body = new AnSessionReq(usrId,
 			tk, aes.bytesToB64(iv_tok)) //  tk and iv_tok shouldn't bee used
-				.A('pswd')
 				.md('pswd', newPswd)
 				.md('iv_pswd', aes.bytesToB64(iv_new))
 				.md('oldpswd', oldPswd)
-				.md('iv_old', aes.bytesToB64(iv_old));
-		var jmsg = new AnsonMsg({
+				.md('iv_old', aes.bytesToB64(iv_old))
+				.A<AnSessionReq>('pswd');
+
+		let jmsg = new AnsonMsg({
 					// port: Protocol.Port.session,
 					port: 'session',
-					header: this.getHeader(),
+					header: this.getHeader(undefined),
 					body: [body] });
 
 		if (opts === undefined) {
 			opts = {};
 		}
 
-		this.an.post(jmsg, opts.onOk, opts.onError);
+		this.an.post(jmsg, opts.onOk, opts.onError, undefined);
 		return this;
 	}
 
 	/**Encrypt text with ssInf token - the client side for de-encrypt semantics
-	 * @param {string} plain plain text
-	 * @return {object} {cipher, iv}
+	 * @param plain plain text
+	 * @return {cipher, iv: base64}
 	 */
-	encryptoken(plain) {
+	encryptoken(plain: string): {cipher: string, iv: string} {
 		let key = this.ssInf.ssid;
-		let iv = aes.getIv128();
-		let cipher = aes.encrypt(plain, key, iv);
-		iv = aes.bytesToB64(iv);
+		let iv_ = aes.getIv128();
+		let cipher = aes.encrypt(plain, key, iv_);
+		let iv = aes.bytesToB64(iv_);
 		return {cipher, iv}
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
-	 * @param {AnsonMsg} jmsg request message
-	 * @param {function} onOk
-	 * @param {function} onError
+	 * @param jmsg request message
+	 * @param onOk
+	 * @param onError
 	 */
-	commit (jmsg, onOk, onErr) {
-		an.post(jmsg, onOk, onErr);
+	commit (jmsg: AnsonMsg<any>, onOk: (resp: AnsonMsg<AnsonResp>) => void, onErr: ()=>void) {
+		an.post(jmsg, onOk, onErr, undefined);
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
@@ -633,13 +646,13 @@ class SessionClient {
 
 	getSks(port, onLoad) {
 		let req = this.userReq(null, 'datasetier',
-					new DatasetierReq( )
-					.A(DatasetierReq.A.sks) );
+					new DatasetierReq(undefined)
+					.A(DatasetierReq.A.sks), undefined );
 
 		this.commit(req,
 			(resp) => {
 				onLoad(resp.Body().sks);
-			} );
+			}, undefined );
 	}
 
 	/**Use this to delete multiple records where pkn = pks[i]
@@ -685,22 +698,22 @@ class SessionClient {
 	 * @param {string} remarks
 	 * @return {SessionClient} this */
 	usrAct(funcId, cate, cmd, remarks) {
-		if (this.currentAct === undefined)
-			this.currentAct = {};
+		// if (this.currentAct === undefined)
+		// 	this.currentAct = {};
 		Object.assign(this.currentAct,
 			{func: funcId, cate: cate, cmd: cmd, remarks: remarks});
 		return this;
 	}
 
 	/** For name errata? */
-	userAct(f, c, m, r) { this.usract(f, c, m, r); }
+	userAct(f, c, m, r) { this.usrAct(f, c, m, r); }
 
 	/**Set user's current action to be logged.
 	 * @param {string} cmd user's command, e.g. 'save'
 	 * @return {SessionClient} this */
 	usrCmd(cmd) {
-		if (this.currentAct === undefined)
-			this.currentAct = {};
+		// if (this.currentAct === undefined)
+		// 	this.currentAct = {};
 		this.currentAct.cmd = cmd;
 		return this;
 	}
@@ -718,7 +731,7 @@ class SessionClient {
         	localStorage.setItem(SessionClient.ssInfo, null);
 			if (typeof onError === 'function')
 				onError(c, e);
-		});
+		}, undefined);
 	}
 
 }
@@ -737,7 +750,7 @@ class Inseclient extends SessionClient {
 	 * @constructor
 	 */
 	constructor(opts) {
-		super({}, '', true);
+		super(undefined, undefined, true);
 		this.ssInf = {}
 		this.an = an;
 		an.init(opts.urlRoot);
@@ -751,24 +764,21 @@ class Inseclient extends SessionClient {
 	getHeader(act) {
 		var header = Protocol.formatHeader({ssid: undefined, uid: this.userId});
 
-		return new AnHeader(ssInf.ssid, ssInf.uid);
-		if (typeof act === 'object') {
-			header.userAct(act);
-		}
-		else {
-			header.userAct(
-				{func: 'insecure',
-				 cmd: 'unknown',
-				 cate: 'sessionless',
-				 remarks: 'sessionless header'} );
-		}
-		return header;
+		return new AnHeader(this.ssInf.ssid, this.ssInf.uid);
+		// if (typeof act === 'object') {
+		// 	header.userAct(act);
+		// }
+		// else {
+		// 	header.userAct(
+		// 		{func: 'insecure',
+		// 		 cmd: 'unknown',
+		// 		 cate: 'sessionless',
+		// 		 remarks: 'sessionless header'} );
+		// }
+		// return header;
 	}
 }
 
-export * from './protocol.js';
-export * from './semantier.js';
-export * from './semantier-v2.ts';
-// export * from './cheapflow/cheap-req.js';
-// export * from './cheapflow/cheap-client.js';
+export * from './protocol-v2';
+export * from './semantier-v2';
 export {AnClient, SessionClient, Inseclient, aes};
