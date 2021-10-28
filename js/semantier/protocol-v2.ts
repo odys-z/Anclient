@@ -1,3 +1,5 @@
+
+/**Json string options, like no-null: true for asking server replace null with ''.  */
 export interface JsonOptions {
     verbose: number;
     noNull: boolean | string;
@@ -227,6 +229,18 @@ export class Protocol {
 }
 
 export class AnsonMsg<T extends AnsonBody> {
+	type = "io.odysz.semantic.jprotocol.AnsonMsg";
+
+    code: string;
+    version: string;
+    seq: number;
+    port: string;
+	/**Json string options, like no-null: true for asking server replace null with ''.  */
+    opts: {};
+    header: AnHeader;
+    body: T[];
+
+
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
 		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length() > 0) {
 			return AnsonResp.rsArr(resp.body, rx);
@@ -239,6 +253,10 @@ export class AnsonMsg<T extends AnsonBody> {
 			throw new Error("AnClient is upgraded, takes only one arg, the json obj.");
 
 		let header = json.header;
+		if (header)
+			this.header = header;
+		else this.header = new AnHeader(undefined, undefined);
+
 		let [body] = json.body ? json.body : [{}];
 		let a = body.a;
 
@@ -251,7 +269,7 @@ export class AnsonMsg<T extends AnsonBody> {
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 				body = new AnSessionReq(body.uid, body.token, body.iv);
 			else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
-				body = new QueryReq(body.uri, body.mtabl, body.mAlias, {});
+				body = new QueryReq(body.uri, body.mtabl, body.mAlias, undefined);
 			else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 				body = new UserReq(json.port, header, [body]);
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
@@ -280,17 +298,29 @@ export class AnsonMsg<T extends AnsonBody> {
 					+ "\nProtocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => { return new QuizResp(jsonBd); });"
 					+ "\nType not handled : " + body.type );
 			}
-		}
-    }
 
-    type: string;
-    code: any;
-    version: any;
-    seq: any;
-    port: any;
-    opts: {};
-    header: AnHeader;
-    body: T[];
+			if (a) body.A(a);
+	
+			// moc the ajax error
+			if (json.ajax)
+				body.ajax = json.ajax;
+		}
+	
+		this.code = json.code;
+		this.version = json.version ? json.version : "1.0";
+		this.seq = json.seq;
+		this.port = json.port;
+	
+		if (!this.seq)
+			this.seq = Math.round(Math.random() * 1000);
+
+		this.opts = Protocol.valOptions;
+	
+		this.body = [];
+		if (body)
+			body.parent = this.type;
+		this.body.push(body);
+    }
 
     /** A short cut for body[0].post()
      * @param {AnsonBody} pst post sql request
@@ -300,17 +330,25 @@ export class AnsonMsg<T extends AnsonBody> {
 			return this.body[0].post(pst);
 	}
 
-    Body(ix?: number): any {
+    Body(ix = 0): T | undefined {
 		return this.body ? this.body[ix] : undefined;
 	}
 }
 
 export class AnsonBody {
+	msg(): any {
+		throw new Error('Method not implemented.');
+	}
+	ajax: any;
+	Rs(): any {
+		throw new Error('Method not implemented.');
+	}
+	ssInf: any;
 	post(pst: AnsonBody): AnsonBody {
 		throw new Error("AnsonBody is an abstract class.");
 	}
 
-    constructor(body?: {type: string, a: string, parent: AnsonMsg<any>, uri: string}) {
+    constructor(body?: {type: string, a: string, parent: string, uri: string}) {
 		this.type = body?.type;
 		this.a = body?.a
 		this.parent = body?.parent;
@@ -319,13 +357,13 @@ export class AnsonBody {
 
     type: string;
     a: string;
-    parent: AnsonMsg<AnsonBody>;
+    parent: string; // AnsonMsg<AnsonBody>;
     uri: string;
 
-    /**set a.<br>
+    /**set A tag a.<br>
      * a() can only been called once.
-     * @param {string} a
-     * @return {AnsonBody} this */
+     * @param a
+     * @return this */
     A<T extends AnsonBody>(a: string): T {
 		this.a = a;
 		return this as unknown as T;
@@ -333,7 +371,7 @@ export class AnsonBody {
 }
 
 export class AnHeader {
-    constructor(ssid: any, userId: any) {
+    constructor(ssid: string, userId: string) {
 		this.type = "io.odysz.semantic.jprotocol.AnsonHeader";
 		this.ssid = ssid;
 		this.uid = userId;
@@ -380,19 +418,10 @@ export class UserReq extends AnsonBody {
 	 * @param v value
 	 * @return this
 	 */
-	set(prop : string, v : object) : UserReq {
+	set(prop : string, v : object | string) : UserReq {
 		this.data.props[prop] = v;
 		return this;
 	}
-
-	// /**set a.<br>
-	//  * a() can only been called once.
-	//  * @param a
-	//  * @return this */
-	// A(a: string): UserReq {
-	// 	this.a = a;
-	// 	return this;
-	// }
 }
 
 export class AnSessionReq extends AnsonBody {
@@ -423,24 +452,23 @@ export class AnSessionReq extends AnsonBody {
  */
 export class QueryReq extends AnsonBody {
     mtabl: string;
-    // mtbl: string;
     mAlias: string;
 
-    exprs: string[][];
-    joins: string[][];
+    exprs: Array<string[]>;
+    joins: Array<string[]>;
     joinings: string[];
-    where: string[][];
-    orders: string[][];
+    where: Array<string[]>;
+    orders: Array<string[]>;
     groups: string[];
-    cond: any;
-    order: any;
-    groupings: any;
+    cond: Array<string[]>;
+    order: Array<string[]>;
+    groupings: Array<string[]>;
 
     page: number;
     pgsize: number;
     limt: string[];
 
-	constructor (uri, tabl, alias, pageInf) {
+	constructor (uri: string, tabl: string, alias: string, pageInf: PageInf) {
 		super();
 		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
 		this.uri = uri;
@@ -493,7 +521,7 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	public expr (exp: string, as: string) : QueryReq {
+	public expr (exp: string, as?: string) : QueryReq {
 		this.exprs.push([exp, as]);
 		return this;
 	}
@@ -618,10 +646,10 @@ export class UpdateReq extends AnsonBody {
     /**Create an update / insert request.
      * @param uri component id
      * @param tabl table
-     * @param pkv {pk, v} conditions for pk.<br>
+     * @param pkv conditions for pk.<br>
      * If pk is null, use this object's where_() | whereEq() | whereCond().
      */
-    constructor(uri: string, tabl: string, pkv?: [string, string] | {pk: string, v: string}) {
+    constructor(uri: string, tabl: string, pkv: string) {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
@@ -641,6 +669,7 @@ export class UpdateReq extends AnsonBody {
 
     mtabl: string;
     nvs: Array<[string, string]>;
+    nvss: Array<Array<[string, string]>>;
     where: any[][];
 
     limt: string;
@@ -780,7 +809,7 @@ export class UpdateReq extends AnsonBody {
 }
 
 export class DeleteReq extends UpdateReq {
-	constructor (uri: string, tabl: string, pk: [string, string] | { pk: string; v: string; }) {
+	constructor (uri: string, tabl: string, pk: string) {
 		super (uri, tabl, pk);
 		this.a = Protocol.CRUD.d;
 	}
@@ -792,7 +821,7 @@ export class InsertReq extends UpdateReq {
     nvss: any;
 
 	constructor (uri: string, tabl: string) {
-		super (uri, tabl);
+		super (uri, tabl, undefined);
 		this.a = Protocol.CRUD.c;
 	}
 

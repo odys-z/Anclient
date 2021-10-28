@@ -5,7 +5,7 @@ import chai from 'chai'
 import { expect, assert } from 'chai'
 
 import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp } from '../protocol-v2';
-import { AnClient, SessionClient } from '../anclient';
+import { AnClient, SessionClient, SessionInf } from '../anclient';
 const { CRUD } = Protocol;
 
 const resp = {
@@ -152,12 +152,12 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 	});
 
 	it('QueryReq', () => {
-		let qr = new QueryReq('con-1', 'a_users', 'u')
-			.A('query')
+		let qr = new QueryReq('con-1', 'a_users', 'u', undefined)
 			.expr("vid").expr("val", "amount")
 			.expr("dim1", "agegrp").expr("dim2", "tex").expr("dim3", "indust")
 			.expr("dim4").expr("dim5").expr("dim6")
-			.whereCond("=", "agegrp", "'80-'");
+			.whereCond("=", "agegrp", "'80-'")
+			.A<QueryReq>('query');
 
 		assert.equal(qr.uri, 'con-1', "1 ---");
 		assert.equal(qr.mtabl, 'a_users', "2 ---");
@@ -176,6 +176,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 		assert.equal(qr.where[0][1], 'agegrp', "9 3--");
 
 		let port = 'query';
+		debugger
 		let jreq = new AnsonMsg({
 					port,
 					header: null,
@@ -184,7 +185,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
         assert.equal(jreq.port, 'query', "10 ---");
 
-		let an = new AnClient();
+		let an = new AnClient(undefined);
 		an.init("localhost");
 		an.understandPorts(TestPorts);
 
@@ -193,7 +194,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
 	it('UserReq', () => {
 		let ur = new UserReq('con-1', 'quizzes', {title: 'user-req'})
-			.A('query')
+			.A<UserReq>('query')
 			.set('quizId', '000001');
 
 		assert.equal(ur.uri, 'con-1', "1 ---");
@@ -205,7 +206,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
 		// must keep consists as js/cs/java all denpends on this structure
 		assert.equal(ur.data.props['title'], 'user-req', "6 ---");
-		assert.equal(ur.data.props.quizId, '000001', "7 ---");
+		assert.equal(ur.data.props['quizId'], '000001', "7 ---");
 
 		let port = 'test1';
 		let jreq = new AnsonMsg({
@@ -216,7 +217,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
         assert.equal(jreq.port, 'test1', "8 ---");
 
-		let an = new AnClient();
+		let an = new AnClient(undefined);
 		an.init("localhost");
 		an.understandPorts(TestPorts);
 
@@ -229,7 +230,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
 	it('InsertReq <UpdateReq.A(insert)>', () => {
 		let ir = new UpdateReq('con-1', 'quizzes', 'quizId')
-			.A('insert');
+			.A<UpdateReq>('insert');
 
 		assert.equal(ir.uri, 'con-1', "1 ---");
 		assert.equal(ir.mtabl, 'quizzes', "2 ---");
@@ -244,9 +245,9 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 					 [{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f02'}],
 					];
 
-		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
+		let ssInf : SessionInf = { "type": "io.odysz.semantic.jsession.SessionInf",
 					  "uid": "admin", "roleId": null, "ssid": "001eysTj" };
-		ir = new SessionClient(ssInf, 'iv 3456789ABCDEF', {dontPersist: true})
+		ir = new SessionClient(ssInf, new TextEncoder().encode('iv 3456789ABCDEF'), true)
 				.usrAct('func', 'cate', 'cmd', 'remarks')
 				.insert(null, 'a_role_func', nvss)
 				.Body();
@@ -265,7 +266,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 describe('TS: [01.3 Protocol/AnsonResp]', () => {
     it('Ajax error handling 1', () => {
 		// TODO where this is used? let's remove it
-		let json = { "readyState":0, "status":0, "statusText":"error" };
+		let json: any = { "readyState": 0, "status": 0, "statusText": "error" };
 
 		json.code = Protocol.MsgCode.exIo,
 		json.body = [ {
@@ -311,7 +312,7 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
         assert.equal(rp.Body().ssInf.uid, "admin", "4 ---");
         assert.equal(rp.Body().ssInf.ssid, "001eysTj", "5 ---");
 
-		let sessionClient = new SessionClient(rp.Body().ssInf, ['iv....'], true);
+		let sessionClient = new SessionClient(rp.Body().ssInf, new TextEncoder().encode('iv....'), true);
 		let ssi = sessionClient.userInfo;
         assert.equal(ssi.uid, "admin", "6 ---");
         assert.equal(ssi.ssid, "001eysTj", "7 ---");

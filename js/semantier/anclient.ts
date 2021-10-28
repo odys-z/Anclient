@@ -11,6 +11,13 @@ import {
 	AnsonBody
 } from './protocol-v2';
 
+interface AjaxReport {
+	statusText: string;
+	responseText: string;
+	status: number;
+	readyState: number;
+}
+
 /**
  * AES instance
  * @type {AES}
@@ -98,7 +105,7 @@ class AnClient {
      * @param {function} on failed
      */
 	login (usrId, pswd, onLogin, onError) {
-		let iv = aes.getIv128() as unknown as Int8Array;
+		let iv = aes.getIv128() as unknown as Uint8Array;
 		let cpwd = aes.encrypt(usrId, pswd, iv);
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
 
@@ -226,7 +233,7 @@ class AnClient {
 								type: 'io.odysz.semantic.jprotocol.AnsonResp',
 								m: 'Network failed: ' + resp.statusText
 							} ];
-						let ansonResp = new AnsonMsg(resp);
+						let ansonResp = new AnsonMsg<AnsonResp>(resp);
 						if (typeof onErr.onError === 'function') {
 							onErr.msg = ansonResp.Body().msg();
 							onErr.onError(Protocol.MsgCode.exIo, ansonResp);
@@ -337,19 +344,19 @@ class AnClient {
 	 * @param {object} ajaxResp
 	 * @return {AnsonMsg<AnsonResp>}
 	 */
-	static fromAjaxError(ajaxResp) {
-		let json;
-		json.code = Protocol.MsgCode.exIo;
-		json.body = [ {
+	static fromAjaxError(ajaxResp: AjaxReport): AnsonMsg<AnsonResp> {
+		let json = {
+			code: Protocol.MsgCode.exIo,
+			body: [ {
 				type: 'io.odysz.semantic.jprotocol.AnsonResp',
 				m: 'Ajax: ' + ajaxResp.statusText,
-			} ];
-		json.ajax = {
-			responseText: ajaxResp.responseText,
-			statusText: ajaxResp.statusText,
-			status: ajaxResp.status,
-			readyState: ajaxResp.readyState
-		};
+			} ],
+			ajax: {
+				responseText: ajaxResp.responseText,
+				statusText: ajaxResp.statusText,
+				status: ajaxResp.status,
+				readyState: ajaxResp.readyState
+			} };
 		return new AnsonMsg( json );
 	}
 }
@@ -357,9 +364,11 @@ class AnClient {
 export const an = new AnClient(undefined);
 
 export type SessionInf = {
+	type: "io.odysz.semantic.jsession.SessionInf";
 	uid: string;
-	iv: string;
+	iv?: string;
 	ssid: string;
+	roleId?: string;
 	usrName?: string
 }
 
@@ -369,7 +378,12 @@ export type SessionInf = {
 class SessionClient {
 	an: AnClient;
 	ssInf: any;
-	currentAct: LogAct;
+	currentAct: LogAct = {
+		func: '',
+		cmd: '',
+		remarks: '',
+		cate: ''
+	};
 	static get ssInfo() { return "ss-info"; }
 
 	/**Create SessionClient with credential information or load from localStorage.<br>
@@ -395,7 +409,7 @@ class SessionClient {
 	 * @param iv iv used for cipher when login.
 	 * @param dontPersist don't save into local storage.
 	 */
-	constructor (ssInf: SessionInf, iv: Int8Array, dontPersist = false) {
+	constructor (ssInf: SessionInf, iv: Uint8Array, dontPersist = false) {
 		if (ssInf) {
 			// logged in, create from credential
 			this.ssInf = ssInf;
@@ -651,19 +665,19 @@ class SessionClient {
 
 		this.commit(req,
 			(resp) => {
-				onLoad(resp.Body().sks);
+				onLoad(resp.Body().getProp('sks'));
 			}, undefined );
 	}
 
 	/**Use this to delete multiple records where pkn = pks[i]
-	 * @param {string} uri
-	 * @param {string} mtabl delete from the table
-	 * @param {string} pkn delete from the table
-	 * @param {array} pks delete from the table - pk values are automatically wrapped with ''.
-	 * @return {AnsonMsg<UpdateReq>} anson request
+	 * @param uri
+	 * @param mtabl delete from the table
+	 * @param pkn delete from the table
+	 * @param pks delete from the table - pk values are automatically wrapped with ''.
+	 * @return anson request
 	 */
-	deleteMulti(uri, mtabl, pkn, pks) {
-		let upd = new UpdateReq(uri, mtabl)
+	deleteMulti(uri: string, mtabl: string, pkn: string, pks: Array<any>): AnsonMsg<UpdateReq> {
+		let upd = new UpdateReq(uri, mtabl, undefined)
 			// .whereCond('in', pkn, pkvals);
 			.whereIn(pkn, pks);
 		upd.a = Protocol.CRUD.d;
@@ -676,12 +690,12 @@ class SessionClient {
 	}
 
 	/**Create a user request AnsonMsg.
-	 * @param {string} uri component uri
-	 * @param {string} port
-	 * @param {Protocol.UserReq} bodyItem request body, created by like: new jvue.UserReq(uri, tabl).
-	 * @param {Object} act action, optional.
-	 * @return {AnsonMsg<AnUserReq>} AnsonMsg */
-	userReq(uri, port, bodyItem, act) {
+	 * @param uri component uri
+	 * @param port
+	 * @param bodyItem request body, created by like: new jvue.UserReq(uri, tabl).
+	 * @param act action, optional.
+	 * @return AnsonMsg */
+	userReq<T extends AnsonBody>(uri: string, port: string, bodyItem: T, act: LogAct): AnsonMsg<T> {
 		let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri = uri || bodyItem.uri;
 		if (typeof act === 'object') {
@@ -692,15 +706,15 @@ class SessionClient {
 	}
 
 	/**Set user's current action to be logged.
-	 * @param {string} funcId curent function id
-	 * @param {string} cate category flag
-	 * @param {string} cmd
-	 * @param {string} remarks
-	 * @return {SessionClient} this */
-	usrAct(funcId, cate, cmd, remarks) {
+	 * @param funcId curent function id
+	 * @param cate category flag
+	 * @param cmd
+	 * @param remarks
+	 * @return this */
+	usrAct(funcId: string, cate: string, cmd: string, remarks: string): SessionClient {
 		// if (this.currentAct === undefined)
 		// 	this.currentAct = {};
-		Object.assign(this.currentAct,
+		Object.assign({}, this.currentAct,
 			{func: funcId, cate: cate, cmd: cmd, remarks: remarks});
 		return this;
 	}

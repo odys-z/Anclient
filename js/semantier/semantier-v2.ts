@@ -1,3 +1,4 @@
+import { AnClient, SessionClient, Inseclient } from "./anclient";
 import { AnsonBody, DeleteReq, InsertReq, Protocol, stree_t, UpdateReq } from "./protocol-v2";
 const { CRUD } = Protocol;
 
@@ -14,6 +15,16 @@ export interface AnlistCol {
 export interface AnRecField {
     field: string,
     value: string,
+}
+
+/**
+ * Not the same as java Semantext.
+ * { client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx }
+ */
+export interface Semantext {
+	anClient: SessionClient | Inseclient;
+	anReact: object;
+	error: object;
 }
 
 /**
@@ -66,9 +77,9 @@ export class Semantier2 {
     rels: any[];
 
     /**
-     * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context
+     * @param context
      */
-    setContext(context): Semantier2 {
+    setContext(context: Semantext): Semantier2 {
 		if (!context || !context.anClient)
 			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
@@ -220,7 +231,7 @@ export class Semantier2 {
 							.record(this.rec) );
 			else
 				req = this.client.userReq(uri, 'update',
-							new UpdateReq( uri, this.mtabl, {pk: this.pk, v: this.pkval} )
+							new UpdateReq( uri, this.mtabl, this.pkval)
 							.record(this.rec, this.pk) );
 		}
 
