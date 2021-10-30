@@ -9,7 +9,7 @@ export interface JsonOptions {
 export type PageInf = { page: number, size: number };
 
 export type NameVal = {name: string, value: object};
-export type NV = {n: string, v: object};
+export type NV = {n: string, v: string | object};
 
 export interface LogAct {
     func   : string;
@@ -951,7 +951,6 @@ export class AnsonResp extends AnsonBody {
 
 		if (rs && typeof(rs.colnames) === 'object') {
 			// rs with column index
-            console.error("FIXME bug form js?");
 			cols = new Array(Object.keys(rs.colnames || {}).length);
 
 			for (var col in rs.colnames) {
@@ -999,7 +998,7 @@ export class AnsonResp extends AnsonBody {
      * rows: array like [ {col1: val1, ...}, ... ], <br>
      * e.g. if [results: {'01', 'fname'}], return [{n: 'fname', v: '01'}, ...]
      */
-    static rs2nvs(rs: AnResultset, nv: NV): {cols: Array<string>, rows: Array<{}>} {
+    static rs2nvs(rs: AnResultset, nv: NV): {cols: Array<string>, rows: Array<NV>} {
 		let cols = [];
 		let rows = [];
 		let ncol = -1, vcol = -1;
@@ -1080,10 +1079,18 @@ export class AnSessionResp extends AnsonResp {
 	}
 }
 
-export class AnDatasetResp extends AnsonResp {
-	forest: Array<{}>;
+export class AnTreeNode {
+	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
+	node : {id: string; children?: Array<any>};
+	id: string;
+	level: number;
+	parent: string;
+} 
 
-	constructor(dsJson: { forest: {}[]; }) {
+export class AnDatasetResp extends AnsonResp {
+	forest: Array<AnTreeNode>;
+
+	constructor(dsJson: { forest: AnTreeNode[]; }) {
 		super(dsJson);
 		this.forest = dsJson.forest;
 	}
@@ -1116,13 +1123,13 @@ export class DatasetReq extends QueryReq {
         a?: string;
         /**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
         mtabl: string;
-        mAlias: string;
+        mAlias?: string;
         /** {page, size} page index and page size. */
         pageInf?: PageInf;
         /** tree root id */
         rootId?: string;
         /** sql args */
-        sqlArgs: string[];
+        sqlArgs?: string[];
         /** {{n, v}} ...opts more arguments for sql args. */
         args?: object;
     } ) {

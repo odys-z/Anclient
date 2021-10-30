@@ -22,9 +22,9 @@ export interface AnRecField {
  * { client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx }
  */
 export interface Semantext {
-	anClient: SessionClient | Inseclient;
-	anReact: object;
-	error: object;
+    anClient: SessionClient | Inseclient;
+    anReact: object;
+    error: object;
 }
 
 /**
@@ -44,11 +44,11 @@ export class Semantier2 {
      * @param {uri: string} props
      */
     constructor(props: any) {
-		if (!props || !props.uri)
-			throw Error("uri is required!");
+        if (!props || !props.uri)
+            throw Error("uri is required!");
 
-		this.uri = props.uri;
-	}
+        this.uri = props.uri;
+    }
 
     /**main table name */
     mtabl: string;

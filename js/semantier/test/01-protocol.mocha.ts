@@ -1,8 +1,7 @@
 /**Test case of anclient/js/Protocol with mocha and chai.
  */
 
-import chai from 'chai'
-import { expect, assert } from 'chai'
+import { assert } from 'chai'
 
 import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp, AnResultset } from '../protocol-v2';
 import { AnClient, SessionClient, SessionInf } from '../anclient';

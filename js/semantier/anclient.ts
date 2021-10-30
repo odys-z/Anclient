@@ -2,7 +2,7 @@
 /**The lower API of jclient/js */
 
 import $ from 'jquery';
-import AES from './aes.js';
+import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
@@ -409,7 +409,7 @@ class SessionClient {
 	 * @param iv iv used for cipher when login.
 	 * @param dontPersist don't save into local storage.
 	 */
-	constructor (ssInf: SessionInf, iv: Uint8Array, dontPersist = false) {
+	constructor (ssInf: SessionInf, iv: string | Uint8Array, dontPersist = false) {
 		if (ssInf) {
 			// logged in, create from credential
 			this.ssInf = ssInf;
