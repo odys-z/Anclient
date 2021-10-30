@@ -27,13 +27,14 @@ export interface WelcomeProp extends Comprops {
     readonly sys: typeof SysComp
 };
 
-export interface PollsProp extends Comprops{
+export interface PollsProp extends Comprops {
     readonly classes: { 
         funcName?: string;
         crudButton: string, list: string }
 };
 
-export interface PollFormProp extends Comprops{
+/**PropType of Poll's Form. */
+export interface PollFormProp extends Comprops {
 	u?: boolean;
 	c?: boolean;
     readonly tier: any;
@@ -41,8 +42,16 @@ export interface PollFormProp extends Comprops{
     readonly width?: string;
     readonly classes: { root?: string; dialogPaper?: string; smalltip?: string;
         content?: string; buttons?: string; button?: string, card?: string };
-    onClose: (UIEvent) => void;
+    onClose: (event: React.UIEvent) => void;
 };
+
+/**Query condition item, used by AnQueryForm.
+ * TODO move to @anclient/anreact
+ */
+export interface QueryCondt {
+	pollIds?: Array<string>;
+	states?: string;
+}
 
 export class Anform extends React.Component<PollFormProp, any, any> {
 }
@@ -69,7 +78,7 @@ export class CrudCompW extends React.Component<any, any, any> {
 		CrudCompW.prototype.media = CrudCompW.setWidth(width);
 	}
 
-	static setWidth(width) {
+	static setWidth(width: string) {
 		let media;
 
 		if (width === 'lg') {

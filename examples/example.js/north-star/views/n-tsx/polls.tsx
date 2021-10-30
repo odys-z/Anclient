@@ -10,7 +10,7 @@ import {
     AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample
 } from '@anclient/anreact';
 
-import { PollsProp, CrudCompW } from '../../common/north';
+import { PollsProp, CrudCompW, QueryCondt } from '../../common/north';
 import { PollDetails } from './poll-details';
 
 const { JsampleIcons } = jsample;
@@ -24,11 +24,6 @@ const styles = (theme: Theme) => (Object.assign(
 		fontSize: "1.4em",
 	}
 } ));
-
-interface QueryCondt {
-	pollIds?: Array<string>;
-	states?: string;
-}
 
 class PollsComp extends CrudCompW {
     // uri: string;
@@ -131,7 +126,7 @@ class PollsComp extends CrudCompW {
 		// }
 	}
 
-	onTableSelect(rowIds) {
+	onTableSelect(rowIds: string[]) {
 		this.setState( {
 			buttons: {
 				start: this.state.buttons.start,
@@ -229,8 +224,11 @@ PollsComp.contextType = AnContext;
 const Polls = withWidth()(withStyles(styles)(PollsComp));
 
 class PollsTier extends Semantier2 {
+	/**{@link StarPorts.polls} */
+	port = 'npolls'; 
+
     _cols = [
-        { text: L('quiz event'),field: "pid",    hide:true },
+        { text: L('quiz event'),field: "pid",    hide: true },
         { text: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
         { text: L('Users' ),    field: "users",  color: 'primary' },
         { text: L('Status'),    field: "state",  color: 'primary' },
@@ -266,7 +264,7 @@ class PollsTier extends Semantier2 {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new NPollsReq( this.uri, opt )
+					new NPollsReq( this.uri, opts )
 					.A(NPollsReq.A.list) );
 
 		console.log(req);
@@ -297,7 +295,9 @@ class NPollsReq extends AnsonBody {
     static pollIds = "pids";
     static states = "states";
 
-	constructor(uri: string, condts: any) {
+	type = 'io.oz.ever.conn.n.poll.NPollsReq';
+
+	constructor(uri: string, condts: QueryCondt) {
 		super({});
 	}
 }
