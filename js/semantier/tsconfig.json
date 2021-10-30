@@ -7,5 +7,12 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "ts"
-  }
+  },
+  "exclude": [
+    "<node_internals>/**",
+    "dist/**",
+    "test/**",
+    "*.config.js",
+    "ts/**"
+  ]
 }
