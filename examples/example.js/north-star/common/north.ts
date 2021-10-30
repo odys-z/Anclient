@@ -3,6 +3,13 @@ import React from "react";
 import { AnContext, SysComp } from "@anclient/anreact";
 import { Semantier2 } from "@anclient/semantier";
 
+/**TODO move to @anclient/anreact */
+export interface FieldMeta {
+	field: string;
+	label?: string;
+	disabled?: boolean;
+}
+
 /** App North's props */
 export interface Northprops {
     iportal?: string;

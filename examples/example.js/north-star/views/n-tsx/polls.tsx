@@ -4,13 +4,13 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Grid, Button, Theme, Typography } from '@material-ui/core';
 
-import { Semantier2, AnsonBody, AnsonResp } from "@anclient/semantier";
+import { Semantier2, Protocol, AnsonMsg, AnsonBody, AnsonResp } from "@anclient/semantier";
 import {
 	L, AnConst,
     AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample
 } from '@anclient/anreact';
 
-import { PollsProp, CrudCompW, QueryCondt } from '../../common/north';
+import { PollsProp, CrudCompW, QueryCondt, FieldMeta } from '../../common/north';
 import { PollDetails } from './poll-details';
 
 const { JsampleIcons } = jsample;
@@ -110,7 +110,8 @@ class PollsComp extends CrudCompW {
 			this.tier.records( this.q,
 				(cols, rows) => {
 					that.state.selected.ids.clear();
-					that.setState(rows);
+					console.log(rows);
+					that.setState({});
 				}, undefined );
 		}
 	}
@@ -269,8 +270,8 @@ class PollsTier extends Semantier2 {
 
 		console.log(req);
 		client.commit(req,
-			(resp) => {
-				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+			(resp: AnsonMsg<NPollsResp>) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().polls);
 				that.rows = rows;
 				that.resetFormSession();
 				onLoad(cols, rows);
@@ -300,6 +301,26 @@ class NPollsReq extends AnsonBody {
 	constructor(uri: string, condts: QueryCondt) {
 		super({});
 	}
+
+	_fields = [
+		{field: 'title', label: L('Title')},
+		{field: 'tags',  label: L('#tag')},
+		{field: 'qid',  label: L('quiz ID')},
+	];
 }
+
+class NPollsResp extends AnsonResp {
+	type = "io.odysz.jquiz.NQuizResp";
+	polls: Array<{}>;
+
+	constructor(jsonBd) {
+		super(jsonBd);
+
+		this.polls = jsonBd.polls;
+	}
+}
+
+Protocol.registerBody('io.oz.ever.conn.n.poll.NPollsResp',
+	(jsonBd: any) => { return new NPollsResp(jsonBd); });
 
 export { Polls, PollsComp, NPollsReq, PollsTier }
