@@ -7,11 +7,11 @@ import { Grid, Button, Theme, Typography } from '@material-ui/core';
 import { Semantier2, AnsonBody, AnsonResp } from "@anclient/semantier";
 import {
 	L, AnConst,
-    AnContext, CrudCompW,
-	ConfirmDialog, AnQueryForm, AnTablist, jsample
+    AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample
 } from '@anclient/anreact';
 
-import { PollsProp } from '../../common/north';
+import { PollsProp, CrudCompW } from '../../common/north';
+import { PollDetails } from './poll-details';
 
 const { JsampleIcons } = jsample;
 
@@ -56,6 +56,7 @@ class PollsComp extends CrudCompW {
     confirm: JSX.Element;
     detailsForm: JSX.Element;
 	q: QueryCondt = {};
+	// uri: string;
 
 	constructor(props: PollsProp) {
 		// this.uri = props.match && props.match.path || props.uri;
@@ -72,7 +73,7 @@ class PollsComp extends CrudCompW {
 	}
 
 	componentDidMount() {
-		console.log(this.uri);
+		console.log('Polls TSX', this.uri);
 		// this.jquiz = new JQuiz(this.context.anClient, this.context.error);
 		this.tier = new PollsTier(this);
 		this.tier.setContext(this.context);
@@ -142,7 +143,9 @@ class PollsComp extends CrudCompW {
 
     toShowDetails(e: React.UIEvent): void {
         this.detailsForm = (
-            <PollDetailsForm
+            <PollDetails uri={this.uri}
+				tier={this.tier}
+				onClose={this.closeDetails}
             />);
     }
     
@@ -224,10 +227,6 @@ class PollsComp extends CrudCompW {
 PollsComp.contextType = AnContext;
 
 const Polls = withWidth()(withStyles(styles)(PollsComp));
-
-class PollDetailsForm extends React.Component<any, any, any> {
-
-}
 
 class PollsTier extends Semantier2 {
     _cols = [

@@ -20,7 +20,7 @@ module.exports = {
 	plugins: [ ],
 
 	resolve: {
-		extensions: ['*', '.js', '.jsx', '.tsx']
+		extensions: ['*', '.ts', '.js', '.jsx', '.tsx']
 	},
 
 	module: {

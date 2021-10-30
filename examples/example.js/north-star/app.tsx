@@ -95,6 +95,10 @@ class App extends React.Component<Northprops, any> {
 		] );
 	}
 
+	componentDidMount() {
+		console.log(this.state);
+	}
+
 	/**
 	 * 
 	 * @param c error code
