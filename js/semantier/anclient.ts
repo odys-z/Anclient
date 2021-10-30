@@ -696,6 +696,9 @@ class SessionClient {
 	 * @param act action, optional.
 	 * @return AnsonMsg */
 	userReq<T extends AnsonBody>(uri: string, port: string, bodyItem: T, act: LogAct): AnsonMsg<T> {
+		if (!port)
+			throw Error('AnsonMsg<UserReq> needs port explicitly specified.');
+			
 		let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri = uri || bodyItem.uri;
 		if (typeof act === 'object') {
