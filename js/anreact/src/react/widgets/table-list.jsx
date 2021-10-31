@@ -45,7 +45,7 @@ class AnTablistComp extends React.Component {
 		super(props)
 
 		let {sizeOptions, selectedIds} = props;
-		this.state.selected = selectedIds.Ids;
+		this.state.selected = selectedIds.Ids || selectedIds.ids;
 		if (this.state.selected.constructor.name !== 'Set')
 			throw Error("selectedIds.Ids must be a set");
 		if (sizeOptions)
@@ -94,7 +94,7 @@ class AnTablistComp extends React.Component {
 	};
 
 	toSelectAll (event) {
-		let ids = this.props.selectedIds.Ids;
+		let ids = this.props.selectedIds.Ids || this.props.selectedIds.ids;
 		if (event.target.checked) {
 			this.props.rows.forEach((r) => ids.add(r[this.props.pk]));
 			this.updateSelectd(ids);
