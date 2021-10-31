@@ -49,7 +49,7 @@ export interface AttachMeta {
 }
 
 export interface AnResultset {
-	length();
+	length() : number;
     results: any;
     // filter(arg0: (r: any) => boolean) : Array<{}>;
     rs: Array<{}>;
@@ -59,9 +59,9 @@ export interface AnResultset {
 /** Regex helper */
 class Jregex {
 	/**Add single quotes to str, if not yet.
-	 * @param {string} str
-	 * @return {string} quoted */
-	static quote(str) {
+	 * @param str
+	 * @return quoted */
+	static quote(str: string): string {
 		if (str === undefined || str === null )
 			str = "''";
 		else if (typeof str === "string" && str.substring(0, 1) !== "'"
@@ -69,7 +69,7 @@ class Jregex {
 			return "'" + str + "'";
 	}
 
-	static isblank(s) {
+	static isblank(s: any) : boolean {
 		return s === undefined || s === null
 			|| (typeof s === 'string' && s.trim() === '');
 	}
@@ -139,7 +139,7 @@ export class Protocol {
 	 * @param {boolean} options.verbose logging verbose level
 	 * @return {Protocol} static Protocol class
 	 */
-	static opts(options: JsonOptions) {
+	static opts(options: JsonOptions): Protocol {
 		if (options) {
 			if (options.noNull !== undefined)
 				Protocol.valOptions.noNull = options.noNull === true || options.noNull === 'true';
@@ -276,7 +276,7 @@ export class AnsonMsg<T extends AnsonBody> {
 				// body are provided by user
 				if (!body.sk) {
 					console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs providing DatasetReq as body.",
-							"For example, see https://github.com/odys-z/Anclient/blob/master/js/test/jsunit/03-jsample.mocha.js");
+							"For example, see https://github.com/odys-z/Anclient/blob/master/js/semantier/test/03-jsample.mocha.ts");
 					throw new Error("DatasetReq.sk is essential but empty.");
 				}
 			}

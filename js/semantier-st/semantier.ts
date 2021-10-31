@@ -1,5 +1,7 @@
-import { AnClient, SessionClient, Inseclient } from "./anclient";
-import { AnsonBody, DeleteReq, InsertReq, Protocol, stree_t, UpdateReq } from "./protocol-v2";
+import { SessionClient, Inseclient } from "./anclient";
+import { Protocol, stree_t,
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq
+} from "./protocol";
 const { CRUD } = Protocol;
 
 export interface AnlistCol {
@@ -15,7 +17,10 @@ export interface AnlistCol {
 export interface AnRecField {
     field: string,
     value: string,
+	style?: any;
 }
+
+export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
 
 /**
  * Not the same as java Semantext.
@@ -30,7 +35,7 @@ export interface Semantext {
 /**
  * Base class of semantic tier
  */
-export class Semantier2 {
+export class Semantier {
     static invalidStyles = {
         ok: {},
         anyErr : { border: "1px solid red" },
@@ -79,7 +84,7 @@ export class Semantier2 {
     /**
      * @param context
      */
-    setContext(context: Semantext): Semantier2 {
+    setContext(context: Semantext): Semantier {
 		if (!context || !context.anClient)
 			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
@@ -95,7 +100,7 @@ export class Semantier2 {
 
     disableValidate: any;
 
-    validate(rec: any, fields: any): boolean {
+    validate(rec: {}, fields: Array<AnRecField>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);
@@ -182,14 +187,16 @@ export class Semantier2 {
 	}
 
     /** Load relationships */
-    relations(opts: any, onOk: any): void {
+    relations(opts: { reltabl: string;
+			sqlArgs?: string[]; sqlArg?: string; } ,
+			onOk: OnCommitOk): void {
 		if (!this.anReact)
 			throw Error ("AnReact here is needed!");
 
 		let that = this;
 
 		// typically relationships are tree data
-		let { uri, reltabl, sqlArgs, sqlArg } = opts;
+		let { reltabl, sqlArgs, sqlArg } = opts;
 		let { sk, relfk, relcol } = this.rel[reltabl];
 
 		sqlArgs = sqlArgs || [sqlArg];
@@ -199,19 +206,19 @@ export class Semantier2 {
 
 		let t = stree_t.sqltree;
 
-		let ds = {uri : this.uri, sk, t, sqlArgs};
-
-		this.anReact.stree({ uri: this.uri, sk, t, sqlArgs,
-			onOk: (resp) => {
+		let ds = {uri : this.uri,
+			sk, t, sqlArgs,
+			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
 				that.rels = resp.Body().forest;
 				onOk(resp);
 			}
-		}, this.errCtx);
+		};
 
+		this.anReact.stree(ds, this.errCtx);
     }
 
     /** save form with a relationship table */
-    saveRec(opts: any, onOk: any): void {
+    saveRec(opts: any, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -277,7 +284,7 @@ export class Semantier2 {
 
 		if (req)
 			client.commit(req,
-				(resp) => {
+				(resp: AnsonMsg<any>) => {
 					let bd = resp.Body();
 					if (crud === CRUD.c)
 						// NOTE:
@@ -291,20 +298,17 @@ export class Semantier2 {
 
     /**
      * @param opts
-     * @param opts.uri? overriding local uri
      * @param opts.ids? record id: Set<string> | Array<string>;
      * @param opts.posts? post actions
-     * @param {function} onOk: function(AnsonResp);
+     * @param onOk: ;
      */
     del(opts: {
-        uri?: string;
         ids: Array<string>;
         posts: Array<AnsonBody>;
-    }, onOk: Function): void {
+    }, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;
-		let that = this;
-		let { uri, ids, posts } = opts;
+		let { ids, posts } = opts;
 
 		if (ids && ids.length > 0) {
 			let req = client

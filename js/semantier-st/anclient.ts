@@ -5,11 +5,9 @@ import $ from 'jquery';
 import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
-	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
-	DatasetReq,
-	LogAct,
-	AnsonBody
-} from './protocol-v2';
+	AnSessionReq, QueryReq, UpdateReq, InsertReq,
+	LogAct, AnsonBody, JsonOptions, UserReq
+} from './protocol';
 
 interface AjaxReport {
 	statusText: string;
@@ -19,8 +17,7 @@ interface AjaxReport {
 }
 
 /**
- * AES instance
- * @type {AES}
+ * AESLib instance
  * */
 const aes = new AES();
 
@@ -41,17 +38,15 @@ class AnClient {
 	 */
 	constructor (urlRoot: string) {
 	 	this.cfg = {
-			// connId: null, // FIXME deprecated
 			defaultServ: urlRoot,
 		}
-		// aes = new AES();
 	}
 
     /**Get port url of the port.
      * @param {string} port the port name
      * @return the url
      */
-	servUrl (port) {
+	servUrl (port: string) : string {
 		// This is a common error in jeasy frame
 		if (port === undefined || port === null) {
 			console.error("Port is null!");
@@ -73,8 +68,8 @@ class AnClient {
 
     /** initialize with url and default connection id
      * @param urlRoot root url
-     * @retun {An} this */
-	init (urlRoot: string) {
+     * @retun this */
+	init (urlRoot: string) : this {
 		this.cfg.defaultServ = urlRoot;
         return this;
 	}
@@ -82,29 +77,33 @@ class AnClient {
     /** Understand the prots' name of the calling app's.<br>
      * As jclient defined the basice ports, more ports extension shoould been understood by the API lib.
      * This function must been callded to extned port's names.
-     * @param {string} new Ports
-     * @return {An} this */
-	understandPorts (newPorts) {
+     * @param new Ports
+     * @return this */
+	understandPorts (newPorts: string) : this {
 		// Object.assign(Protocol.Port, newPorts);
 		Protocol.extend(newPorts);
         return this;
 	}
 
-	opts(options) {
+	opts(options : JsonOptions) : this {
 		Protocol.opts(options);
+		return this;
 	}
 
-	port(name) {
+	port(name: string) {
 		return Protocol.Port[name];
 	}
 
     /**Login to jserv
-     * @param {string} usrId
-     * @param {string} pswd
-     * @param {function} onLogin on login ok handler
-     * @param {function} on failed
+     * @param usrId
+     * @param pswd
+     * @param onLogin on login ok handler
+     * @param on failed
      */
-	login (usrId, pswd, onLogin, onError) {
+	login (usrId: string, pswd: string,
+		onLogin: { (ssClient: any): void; (arg0: SessionClient): void; },
+		onError: (/**The lower API of jclient/js */ err: any) => void): this {
+
 		let iv = aes.getIv128() as unknown as Uint8Array;
 		let cpwd = aes.encrypt(usrId, pswd, iv);
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
@@ -127,9 +126,10 @@ class AnClient {
 				else console.log(sessionClient);
 			},
 			onError, {});
+		return this;
 	}
 
-	loginWait(usrId, pswd) {
+	loginWait(usrId : string, pswd : string) {
 		let me = this;
 		return new Promise((resolve, reject) => {
 			me.login(usrId, pswd,
@@ -138,11 +138,11 @@ class AnClient {
 		});
 	}
 
-	/**Create a user request AnsonMsg for no-ssession request (on connId can be specified).
-	 * @param {string} port
-	 * @param {Protocol.UserReq} bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
-	 * @return {AnsonMsg<AnUserReq>} AnsonMsg */
-	restReq(port, bodyItem) {
+	/**Create a user request AnsonMsg for no-ssession request (no connId can be specified).
+	 * @param port
+	 * @param bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
+	 * @return AnsonMsg<T extends UserReq> */
+	restReq<T extends UserReq>(port: string, bodyItem: T): AnsonMsg<T> {
 		let header = Protocol.formatHeader({});
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
@@ -150,7 +150,7 @@ class AnClient {
     /**Check Response form jserv
      * @param {any} resp
      */
-	static checkResponse(resp) {
+	static checkResponse(resp: any) : false | "err_NA" {
 		if (typeof resp === "undefined" || resp === null || resp.length < 2)
 			return "err_NA";
 		else return false;
@@ -796,6 +796,6 @@ class Inseclient extends SessionClient {
 	}
 }
 
-export * from './protocol-v2';
-export * from './semantier-v2';
+export * from './protocol';
+export * from './semantier';
 export {AnClient, SessionClient, Inseclient, aes};
