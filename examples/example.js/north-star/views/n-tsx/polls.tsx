@@ -69,39 +69,10 @@ class PollsComp extends CrudCompW {
 
 	componentDidMount() {
 		console.log('Polls TSX', this.uri);
-		// this.jquiz = new JQuiz(this.context.anClient, this.context.error);
 		this.tier = new PollsTier(this);
 		this.tier.setContext(this.context);
 		this.toSearch();
 	}
-
-	/*
-	toSearch(e, query) {
-		let pageInf = this.state.pageInf;
-		let queryReq = this.context.anClient.query(this.uri, 'polls', 'p', pageInf)
-		let req = queryReq.Body()
-			.expr('max(pid)', 'pid')
-			.expr('qz.qid', 'qid').expr('title')
-			.expr('count(userId)', 'users')
-			.expr('state').expr('subject', 'subject')
-			.j('quizzes', 'qz', 'qz.qid=p.quizId')
-			.groupby('qz.qid').groupby('p.state')
-			.orderby('qz.qid', 'desc');
-
-		if (query && query.tag)
-			req.whereCond('%s', 'q.tags', `'${query.tag}'`);
-		if (query && query.qzName)
-			req.whereCond('%', 'quizName', `'${query.qzName}'`);
-		if (query && query.userId)
-			req.whereEq('userId', query.userId);
-
-		this.state.queryReq = queryReq;
-
-		this.context.anReact.bindTablist(queryReq, this, this.context.error);
-
-		this.state.selected.ids.clear();
-	}
-	*/
 
 	toSearch(condts?: QueryCondt) {
 		if (this.tier) {
@@ -195,7 +166,7 @@ class PollsComp extends CrudCompW {
 					className={classes.crudButton} onClick={this.toStop}
 					startIcon={<JsampleIcons.DetailPanel />}
 				>{L('Stop Poll')}</Button>
-				<Button variant="contained" disabled={!btn.start}
+				<Button variant="contained" disabled={!btn.stop}
 					className={classes.crudButton} onClick={this.toShowDetails}
 					startIcon={<JsampleIcons.Add />}
 				>{L('Details')}</Button>
