@@ -102,7 +102,7 @@ export class Protocol {
 		chkCntIns: 'checkSqlCountOnInsert',
 	};
 
-	static sk = {
+	static sk: any = {
 		// app will extending sk here.
 	}
 
@@ -348,7 +348,14 @@ export class AnsonBody {
 		throw new Error("AnsonBody is an abstract class.");
 	}
 
-    constructor(body?: {type: string, a: string, parent: string, uri: string}) {
+	/**
+	 * Create request object, a Semantic-jserv envolope object.
+	 * All user request should be a subclass of AnsonBody.
+	 * 
+	 * It's highly recommended the parameter is pressented when creating the object.
+	 * @param body json object
+	 */
+	constructor(body?: {type: string, a?: string, parent?: string, uri?: string}) {
 		this.type = body?.type;
 		this.a = body?.a
 		this.parent = body?.parent;
@@ -945,7 +952,7 @@ export class AnsonResp extends AnsonBody {
      * cols: array like [ col1, col2, ... ]; <br>
      * rows: array like [ {col1: val1, ...}, ... ]
      */
-    static rs2arr(rs: AnResultset): {cols: Array<{}>, rows: Array<{}>} {
+    static rs2arr(rs: AnResultset): {cols: Array<string>, rows: Array<{}>} {
 		let cols = [];
 		let rows = [];
 

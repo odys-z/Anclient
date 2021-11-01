@@ -1,49 +1,28 @@
 import { SessionClient, Inseclient } from "./anclient";
 import { Protocol, stree_t,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq
+	AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq
 } from "./protocol";
 const { CRUD } = Protocol;
 
-export interface ErrorCtx {
-	msg: undefined | string | Array<string>;
-	onError: (code: typeof Protocol.MsgCode, resp: AnsonResp) => void
-}
-
-export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-
 export interface AnlistColAttrs {
-    disabled?: boolean;
-	visible?: boolean;
-    checkbox?: boolean;
-    // formatter?: (col: AnlistCol) => string;
-    formatter?: (rec: {}) => string;
-    css?: {};
-    grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
-	box?: {};
+    disabled?: boolean,
+    checkbox?: boolean,
+    fomatter?: (col: AnlistCol) => string,
+    css?: {},
+    grid?: {sm?: number; md?: number; lg?: number},
 }
 
 export interface AnlistCol extends AnlistColAttrs{
-    field: string;
-    label: string;
-    /**input type / form type */
-    type?: string;
-    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: string | {};
-    options?: [];
-}
-
-/**E.g. form's combobox field declaration */
-export interface DatasetComboField extends AnlistCol {
-	nv: {n: string; v: string};
-	sk: string;
-	cbbStyle: {}; 
+    field: string,
+    label: string,
 }
 
 export type AnColModifier = ((col: AnlistCol, colIndx: number)=> AnlistColAttrs);
 
-/**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
-export interface QueryConditions {
-	[q: string]: any;
+export interface AnRecField {
+    field: string,
+    value: string,
+	style?: any;
 }
 
 /**Callback of CRUD.c/u/d */
@@ -129,7 +108,7 @@ export class Semantier {
 
     disableValidate: any;
 
-    validate(rec: {}, fields: Array<AnlistCol>): boolean {
+    validate(rec: {}, fields: Array<AnRecField>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);
@@ -189,7 +168,7 @@ export class Semantier {
      * @param {object} modifier {field, function | object }
      * @param {object | function} modifier.field see #columns().
      */
-	 fields (modifier?: {[x: string]: AnlistColAttrs | AnColModifier}): Array<AnlistCol> {
+	 fields (modifier?: {[x: string]: AnlistColAttrs | AnColModifier}): Array<AnlistColAttrs> {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 
@@ -239,12 +218,6 @@ export class Semantier {
 
 		this.anReact.stree(ds, this.errCtx);
     }
-
-    record( opts: QueryConditions, onLoad: OnLoadOk) : void {
-	}
-
-    records(opts: QueryConditions, onLoad: OnLoadOk) : void {
-	}
 
     /** save form with a relationship table */
     saveRec(opts: any, onOk: OnCommitOk): void {

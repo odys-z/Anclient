@@ -409,7 +409,7 @@ class SessionClient {
 	 * @param iv iv used for cipher when login.
 	 * @param dontPersist don't save into local storage.
 	 */
-	constructor (ssInf: SessionInf, iv: string | Uint8Array, dontPersist = false) {
+	constructor (ssInf?: SessionInf, iv?: string | Uint8Array, dontPersist = false) {
 		if (ssInf) {
 			// logged in, create from credential
 			this.ssInf = ssInf;

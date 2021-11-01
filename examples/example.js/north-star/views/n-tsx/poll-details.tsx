@@ -10,24 +10,25 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { Protocol, Semantier2 } from '@anclient/semantier';
-import { L, AnContext, ConfirmDialog, TRecordForm
+import { Protocol, Semantier } from '@anclient/semantier-st';
+import { L, AnContext, ConfirmDialog
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
-import { Anform, PollFormProp } from '../../common/north';
+import { Anform, FormProp } from '../../common/north';
+import { CardForm } from './card-form';
 
 const { CRUD } = Protocol;
 
 const styles = (theme: starTheme) => (Object.assign(
-	Semantier2.invalidStyles as any, {
-		root: {
-		},
-		card: {
-		},
-		smalltip: {
-		}
+	Semantier.invalidStyles as any, (theme: starTheme) => {
+		return ({
+			root: {},
+			card: {
+				margin: theme.spacing(2)
+			},
+		});
 	}
 ));
 
@@ -40,12 +41,12 @@ const styles = (theme: starTheme) => (Object.assign(
 class PollDetailsComp extends Anform {
 	state = {
 		record: {},
-		crud: undefined as string,
+		crud: Protocol.CRUD.r,
 	};
 	tier: PollsTier;
 	confirm: JSX.Element;
 
-	constructor (props : PollFormProp) {
+	constructor (props : FormProp) {
 		super(props);
 
 		this.state.crud = props.crud ? props.crud
@@ -65,7 +66,7 @@ class PollDetailsComp extends Anform {
 			let that = this;
 			let cond = {};
 			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
+			this.tier.record(cond, (_cols, rows) => {
 				that.setState({record: rows[0]});
 			} );
 		}
@@ -119,8 +120,6 @@ class PollDetailsComp extends Anform {
 
 		let title = L('Poll\'s Details');
 
-		let rec = this.state.record;
-
 		return (<>
 		  <Dialog className={classes.root}
 			classes={{ paper: classes.dialogPaper }}
@@ -134,17 +133,19 @@ class PollDetailsComp extends Anform {
 			  <Box className={classes.smalltip}>
 				  {L('Tip: Document can been replaced by uploading another file.')}
 			  </Box>
-			  <TRecordForm uri={this.props.uri}
+			  <CardForm uri={this.props.uri}
 				  tier={this.tier}
-				  mtabl='n_docs' pk='docId'
 				  fields={this.tier.fields({
-					  docId: {grid: {sm: 3, md: 2}},
+					  pid: {grid: {sm: 3, md: 2}},
 					  mime: {grid: {sm: 4, md: 3}} })}
 			  />
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
 				<Button onClick={this.toStop} variant="contained" color="primary">
 					{L("Stop")}
+				</Button>
+				<Button onClick={this.toCancel} variant="contained" color="primary">
+					{L("Close")}
 				</Button>
 			</DialogActions>
 		  </Dialog>

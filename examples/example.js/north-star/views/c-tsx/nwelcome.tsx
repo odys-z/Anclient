@@ -1,6 +1,6 @@
 import React from "react";
 import { AnContext, SysComp } from "@anclient/anreact";
-import { Semantier } from "@anclient/semantier";
+import { Semantier } from "@anclient/semantier-st";
 import { Card, Grid, Link, Paper, SvgIcon, Theme, Typography, withStyles, withWidth } from "@material-ui/core";
 import { WelcomeProp } from "../../common/north";
 
