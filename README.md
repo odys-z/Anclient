@@ -5,11 +5,17 @@ is also been verified.
 
 - Anclient.js
 
-@anclient/semantier
+@anclient/semantier:
 [![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
-+
-@anclient/anreact
+
+together with
+
+@anclient/anreact:
 [![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
+
+- VS Code extension
+
+Anprism: [![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
 
 # Repository Structure
 
