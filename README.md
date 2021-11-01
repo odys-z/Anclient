@@ -5,8 +5,10 @@ is also been verified.
 
 - Anclient.js
 
-@anclient/semantier:
-[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
+@anclient/semantier-st:
+[![npm](https://img.shields.io/npm/v/@anclient/semantier-st?logo=npm)](https://npmjs.org/package/@anclient/semantier-st)
+(sunsetting js version: @anclient/semantier
+[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier))
 
 together with
 
