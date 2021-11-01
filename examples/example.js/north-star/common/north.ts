@@ -43,6 +43,7 @@ export interface WelcomeProp extends Comprops {
 
 /**PropType of Poll's Form. */
 export interface FormProp extends Comprops {
+	readonly tier: Semantier;
 	/**Fields met for expanding by form, e.g. TRecordForm or CardForm. */
 	readonly fields?: Array<{}>;
 	readonly dense?: boolean;

@@ -8,8 +8,8 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistCol, DatasetComboField, Semantier } from '@anclient/semantier-st';
-import { L, toBool, DatasetCombo, TRecordForm } from '@anclient/anreact';
+import { AnColModifier, AnlistCol, AnlistColAttrs, DatasetComboField, Semantier } from '@anclient/semantier-st';
+import { L, toBool, DatasetCombo, TRecordFormComp } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { CrudCompW, FormProp } from '../../common/north';
@@ -41,10 +41,10 @@ const styles = (theme: starTheme) => (Object.assign(
 	}
 ) );
 
-/**
+/**TODO should extends TRecordForm after moved to TS.
+ * class CardFormComp extends TReacordForm<...> {
+*/
 class CardFormComp extends CrudCompW<CardFormProp> {
- */
-class CardFormComp extends TRecordForm {
 	state = {
 		dirty: false,
 		pk: undefined,
@@ -58,6 +58,7 @@ class CardFormComp extends TRecordForm {
 		this.tier = props.tier;
 		this.formFields = this.formFields.bind(this);
 		// this.getField = this.getField.bind(this);
+		// this.formatCard = this.formatCard.bind(this);
 	}
 
 	componentDidMount() {
@@ -77,7 +78,13 @@ class CardFormComp extends TRecordForm {
 	}
 
     /* Let's move this better version to TRecordForm
-	getField(f: AnlistCol, rec: { [x: string]: string; }, classes: { [x: string]: string; }) {
+	 * 
+	 * @param f 
+	 * @param rec 
+	 * @param classes 
+	 * @returns 
+	 */
+	getField(f: AnlistCol, rec: { [x: string]: any; }, classes: { [x: string]: string; }) {
 		let media = this.media;
 		let { isSm } = media;
 		let that = this;
@@ -125,14 +132,16 @@ class CardFormComp extends TRecordForm {
 				}}
 			/>);
 		}
-	} */
+	}
 
-	formFields(rec, classes, media) {
+	formFields(rec: {}, classes, media?: any) {
 		let fs = [];
 		const isSm = this.props.dense || toBool(media.isMd);
 
 		this.tier.fields().forEach( (f, i) => {
 		  if (!!f.visible) {
+			f.formatter = (rec: any) => (<>{rec[f.field]}</>);
+
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
 					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
@@ -149,17 +158,32 @@ class CardFormComp extends TRecordForm {
 		return fs;
 	}
 
+	/**
+	 * Create a formatter to compose a card for each record.
+	 * @param c column meta
+	 * @param x 
+	 * @returns 
+	formatCard = (c: AnlistCol, x: number) => {
+		const modifier: AnlistColAttrs = {};
+		modifier[c.field] = { 
+			formatter: (rec: any) => (<>
+				{rec[c.field]}
+			</>)
+		};
+		return modifier;
+	}
+	 */
+
 	render () {
 		const { classes, width } = this.props;
 		let media = CrudCompW.setWidth(width);
 
 		let rec = this.tier.rec;
 
-		return rec ?
-			<Grid container className={classes.root} direction='row'>
+		return !rec ? <></> // wait until parent loaded data
+		  : <Grid container className={classes.root} direction='row'>
 				{this.formFields(rec, classes, media)}
-			</Grid>
-			: <></>; // NOTE have to wait until parent loaded data
+			</Grid>;
 	}
 }
 
