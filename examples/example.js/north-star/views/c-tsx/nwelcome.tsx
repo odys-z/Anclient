@@ -1,6 +1,6 @@
 import React from "react";
 import { AnContext, SysComp } from "@anclient/anreact";
-import { Semantier } from "@anclient/semantier";
+import { Semantier } from "@anclient/semantier-st";
 import { Card, Paper, Typography, withStyles, withWidth } from "@material-ui/core";
 
 type Prop = Readonly<{ classes: typeof styles; sys: typeof SysComp }>;

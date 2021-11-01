@@ -45,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 				AnPagePanel.currentPanel.startup();
 			}
 			else 
-				vscode.window.showInformationMessage('Sever can only be started when Anprism panel is open!');
+				vscode.window.showInformationMessage('Sorry! Currently sever can only be started when Anprism loading a page!');
 		})
 	);
 
@@ -145,17 +145,26 @@ class AnPagePanel {
 
 		// no panel, must be the first tiem, create a new panel.
 		if (!p) {
-			const panel = vscode.window.createWebviewPanel(
-				AnPagePanel.viewType,
-				`Anprism - ${AnPagePanel.filename(localhtml)}`,
-				column || vscode.ViewColumn.One
-			);
-			panel.webview.options = { enableScripts: true }
+			try {
+				const panel = vscode.window.createWebviewPanel(
+					AnPagePanel.viewType,
+					`Anprism - ${AnPagePanel.filename(localhtml)}`,
+					column || vscode.ViewColumn.One
+				);
+				panel.webview.options = { enableScripts: true }
 
-			AnPagePanel.log.appendLine("Open page " + AnPagePanel.filename(localhtml));
-			p = new AnPagePanel(context, panel, new ServHelper(context).findRoot(localhtml));
+				AnPagePanel.log.appendLine("Open page " + AnPagePanel.filename(localhtml));
+				p = new AnPagePanel(context, panel, new ServHelper(context).findRoot(localhtml));
+			}
+			catch (e) {
+				if (e instanceof AnprismException) {
+					vscode.window.showErrorMessage((e as AnprismException).getMessage());
+					return;
+				}
+			}
 		}
 
+		p = p!; // A not neccessarily needed type checking
 		AnPagePanel.currentPanel = p;
 		p._panel.webview.onDidReceiveMessage(
 			(message) => AnPagePanel.currentPanel!.handleWebviewMessage(message)
