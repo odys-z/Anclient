@@ -37,10 +37,6 @@ The Visual Studio solution is
 
 There are 3 clients in the solution:
 
-- csharp
-
-The c# version of anclient.
-
 - java
 
 Java client (not for Android yet)
@@ -48,6 +44,8 @@ Java client (not for Android yet)
 - js
 
 js client API depending on jquery. The test project is using React.
+
+Check js/test & examples/example.js for running tests and examples.
 
 # Examples
 
