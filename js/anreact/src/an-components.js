@@ -20,7 +20,6 @@ export * from './react/widgets/my-info';
 export * from './react/widgets/query-form';
 export * from './react/widgets/query-form-st';
 export * from './react/widgets/table-list';
-export * from './react/widgets/table-list-lu';
 export * from './react/widgets/tabs';
 export * from './react/widgets/tree';
 export * from './react/widgets/treegrid';
