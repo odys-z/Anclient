@@ -45,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 				AnPagePanel.currentPanel.startup();
 			}
 			else 
-				vscode.window.showInformationMessage('Sever only started when Anprism is loaded!');
+				vscode.window.showInformationMessage('Sever can only be started when Anprism panel is open!');
 		})
 	);
 
