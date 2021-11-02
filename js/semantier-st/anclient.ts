@@ -8,6 +8,7 @@ import {
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
 	LogAct, AnsonBody, JsonOptions, UserReq
 } from './protocol';
+import { ErrorCtx, OnCommitErr, OnCommitOk } from './semantier';
 
 interface AjaxReport {
 	statusText: string;
@@ -102,7 +103,7 @@ class AnClient {
      */
 	login (usrId: string, pswd: string,
 		onLogin: { (ssClient: any): void; (arg0: SessionClient): void; },
-		onError: (/**The lower API of jclient/js */ err: any) => void): this {
+		onError: ErrorCtx): this {
 
 		let iv = aes.getIv128() as unknown as Uint8Array;
 		let cpwd = aes.encrypt(usrId, pswd, iv);
@@ -125,7 +126,7 @@ class AnClient {
 					onLogin(sessionClient);
 				else console.log(sessionClient);
 			},
-			onError, {});
+			onError);
 		return this;
 	}
 
@@ -157,11 +158,11 @@ class AnClient {
 	}
 
     /**Post a request, using Ajax.
-     * @param {AnsonMsg} jreq
-     * @param {function} onOk
-     * @param {function} onErr function (MsgCode, AnsonResp?)
-     * @param {object} ajaxOpts */
-	post (jreq, onOk, onErr, ajaxOpts) {
+     * @param jreq
+     * @param onOk
+     * @param onErr function (MsgCode, AnsonResp?)
+     * @param ajaxOpts */
+	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk, onErr: ErrorCtx, ajaxOpts? : {async?: boolean; timeout?: number}) {
 		if (jreq === undefined) {
 			console.error('jreq is null');
 			return;
@@ -192,8 +193,8 @@ class AnClient {
             async: async,
 			//xhrFields: { withCredentials: true },
 			data: JSON.stringify(jreq),
-			timeout: jreq.timeout || 18000,
-			success: function (resp) {
+			timeout: ajaxOpts.timeout || 18000,
+			success: function (resp: AnsonMsg<AnsonResp>) {
 				// response Content-Type = application/json;charset=UTF-8
 				if (typeof resp === 'string') {
 					// why?
@@ -207,9 +208,10 @@ class AnClient {
 				}
 
 				if (resp.code !== Protocol.MsgCode.ok)
-					if (typeof onErr === "function")
-						onErr(resp.code, resp);
-					else if (onErr && typeof onErr.onError === "function"){
+					// if (typeof onErr === "function")
+					// 	onErr(resp.code, resp);
+					// else
+					if (onErr && typeof onErr.onError === "function"){
 						// a special case of AnContext.error
 						onErr.msg = resp.Body().msg();
 						onErr.onError(resp.code, resp);
@@ -238,7 +240,8 @@ class AnClient {
 							onErr.msg = ansonResp.Body().msg();
 							onErr.onError(Protocol.MsgCode.exIo, ansonResp);
 						}
-						else onErr(Protocol.MsgCode.exIo, ansonResp);
+						else throw Error("In anreact for typescript, onErr must be an ErrorCtx.")
+						// else onErr(Protocol.MsgCode.exIo, ansonResp);
 					}
 					else {
 						if (resp.code || resp.port || !resp.status)
@@ -254,7 +257,8 @@ class AnClient {
 							onErr.msg = resp.Body().msg();
 							onErr.onError(Protocol.MsgCode.exIo, resp);
 						}
-						onErr(Protocol.MsgCode.exIo, resp);
+						else throw Error("In anreact for typescript, onErr must be an ErrorCtx.")
+						// onErr(Protocol.MsgCode.exIo, resp);
 					}
 				}
 				else {
@@ -274,7 +278,7 @@ class AnClient {
 		return new Promise((resolve, reject) => {
 			me.post(jreq,
 				resp => {resolve(resp);},
-				(c, err) => {reject({c, err});},
+				(c, err) => {reject({c, err});}, // TODO FIXME
 				ajaxOpts)
 		});
 	}
@@ -545,7 +549,7 @@ class SessionClient {
 	 * @param onError
 	 */
 	commit (jmsg: AnsonMsg<any>, onOk: (resp: AnsonMsg<AnsonResp>) => void, onErr: ()=>void) {
-		an.post(jmsg, onOk, onErr, undefined);
+		an.post(jmsg, onOk, {onError: onErr}, undefined);
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
