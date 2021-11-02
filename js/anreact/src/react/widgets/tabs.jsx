@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
 import {L} from '../../utils/langstr';
-	import {AnContext} from '../reactext.jsx';
+	import {AnContext} from '../reactext';
 
 const styles = (theme) => ({
   root: {

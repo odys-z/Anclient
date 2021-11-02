@@ -49,11 +49,11 @@ export interface AttachMeta {
 }
 
 export interface AnResultset {
-	length() : number;
-    // results: Array<any>;
-	total: number;
+	// length() : number;
+    results: any;
     // filter(arg0: (r: any) => boolean) : Array<{}>;
     rs: Array<{}>;
+	total: number;
     colnames: {};
 }
 
@@ -243,7 +243,7 @@ export class AnsonMsg<T extends AnsonBody> {
 
 
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
-		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length > 0) {
+		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.total > 0) {
 			return AnsonResp.rsArr(resp.body, rx);
 		}
 		return [];
@@ -1050,8 +1050,8 @@ export class AnsonResp extends AnsonBody {
     code: string;
     Code(): string { return this.code };
 
-    rs: AnResultset | Array<AnResultset>;
-    Rs(rx = 0): AnResultset { return this.rs.length ? this.rs[rx] : this.rs; }
+    rs: AnResultset; // | Array<AnResultset>;
+    Rs(rx = 0): AnResultset { return this.rs.total ? this.rs[rx] : this.rs; }
 
     data: {props?: {}};
     getProp(prop: string): object { 

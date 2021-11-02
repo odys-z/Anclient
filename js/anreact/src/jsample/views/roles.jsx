@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
 import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp, Semantier, stree_t
-} from '@anclient/semantier';
+} from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';

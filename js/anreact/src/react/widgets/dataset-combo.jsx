@@ -8,12 +8,12 @@ import withWidth from "@material-ui/core/withWidth";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-import { Protocol, AnsonResp } from '@anclient/semantier';
+import { Protocol, AnsonResp } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
-	import { AnContext } from '../reactext.jsx';
-	import { Semantier } from '@anclient/semantier';
+	import { AnContext } from '../reactext';
+	import { Semantier } from '@anclient/semantier-st';
 
 
 const styles = (theme) => (Object.assign(

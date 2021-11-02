@@ -9,10 +9,10 @@ import React from 'react';
 	import FormControl from '@material-ui/core/FormControl';
 	import Box from '@material-ui/core/Box';
 
-import { Protocol } from '@anclient/semantier';
+import { Protocol } from '@anclient/semantier-st';
 
-import { an, SessionClient } from '@anclient/semantier';
-	import {AnContext} from './reactext.jsx';
+import { an, SessionClient } from '@anclient/semantier-st';
+	import {AnContext} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
 	import {L, Langstrs} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'

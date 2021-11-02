@@ -11,7 +11,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 
-import { Protocol, AnsonResp } from '@anclient/semantier';
+import { Protocol, AnsonResp } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';

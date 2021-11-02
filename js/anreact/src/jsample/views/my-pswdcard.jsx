@@ -5,9 +5,9 @@ import PropTypes from "prop-types";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { Protocol, AnsonResp } from '@anclient/semantier';
+import { Protocol, AnsonResp } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
-	import { Semantier  } from '@anclient/semantier';
+	import { Semantier  } from '@anclient/semantier-st';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';

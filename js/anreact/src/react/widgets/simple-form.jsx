@@ -17,13 +17,13 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 
-import { Protocol, AnsonResp } from '@anclient/semantier';
+import { Protocol, AnsonResp } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
-	import { AnContext } from '../reactext.jsx';
+	import { AnContext } from '../reactext';
 	import { AnTreeIcons } from "./tree"
 	import { DetailFormW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'

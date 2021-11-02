@@ -4,10 +4,10 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp , UserReq } from '@anclient/semantier';
+import { Protocol, AnsonResp , UserReq } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { Semantier } from '@anclient/semantier';
+	import { Semantier } from '@anclient/semantier-st';
 	import { CrudComp, CrudCompW } from '../../react/crud';
 	import { AnContext } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'

@@ -4,12 +4,12 @@ export * from './utils/helpers';
 
 export * from './patch/react-portal-overlay';
 
-export * from './react/reactext.jsx';
-export * from './react/anreact.jsx';
-export * from './react/error.jsx';
-export * from './react/login.jsx';
-export * from './react/sys.jsx';
-export * from './react/crud.jsx';
+export * from './react/reactext';
+export * from './react/anreact';
+export * from './react/error';
+export * from './react/login';
+export * from './react/sys';
+export * from './react/crud';
 
 export * from './react/widgets/messagebox';
 export * from './react/widgets/dataset-combo';

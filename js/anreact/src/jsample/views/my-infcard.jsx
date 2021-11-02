@@ -4,10 +4,9 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Button, Grid, Card, Typography } from '@material-ui/core';
 
-import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp } from '@anclient/semantier';
+import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp, Semantier } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
 	import { dataOfurl, urlOfdata } from '../../utils/file-utils';
-	import { Semantier  } from '@anclient/semantier';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';

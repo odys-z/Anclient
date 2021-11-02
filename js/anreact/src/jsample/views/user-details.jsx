@@ -11,7 +11,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol } from '@anclient/semantier';
+import { Protocol } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { DetailFormW } from '../../react/crud';

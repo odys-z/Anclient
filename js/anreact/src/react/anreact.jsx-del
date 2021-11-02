@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
 
-import { stree_t, Protocol, UpdateReq, InsertReq, DatasetReq, AnsonResp } from '@anclient/semantier';
+import { stree_t, Protocol, UpdateReq, InsertReq, DatasetReq, AnsonResp } from '@anclient/semantier-st';
 
 import { L } from '../utils/langstr';
 	import { AnConst } from '../utils/consts';

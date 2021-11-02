@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SvgIcon from "@material-ui/core/SvgIcon";
 
-import { AnContext } from '../reactext.jsx';
+import { AnContext } from '../reactext';
 
 const styles = theme => ({
   root: {
