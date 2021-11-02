@@ -46,7 +46,7 @@ class AnTablistComp extends React.Component {
 
 		let {sizeOptions, selectedIds} = props;
 		this.state.selected = selectedIds.Ids || selectedIds.ids;
-		if (this.state.selected.constructor.name !== 'Set')
+		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selectedIds.Ids must be a set");
 		if (sizeOptions)
 			this.state.sizeOptions = sizeOptions;
@@ -134,14 +134,10 @@ class AnTablistComp extends React.Component {
 		// 					|| this.props.checkbox && x !== 0) // first columen as checkbox
 		return columns.filter( (v, x) => toBool(v.hide) ? false
 							: !(this.props.checkbox && x === 0)) // first columen as checkbox
-			// .map( (colObj, index) =>
-			// 	<TableCell key={index}>
-			// 		{colObj.text || colObj.field}
-			// 	</TableCell>);
-
 			.map( (colObj, index) =>
 				<TableCell key={index}>
-					{colObj.text || colObj.field}
+					{/* {colObj.text || colObj.field} */}
+					{colObj.label || colObj.text || colObj.field}
 				</TableCell>);
 	}
 

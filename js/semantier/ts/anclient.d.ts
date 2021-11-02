@@ -228,6 +228,6 @@ declare class Inseclient extends SessionClient {
      * @return the logged in header */
     getHeader(act: any): AnHeader;
 }
-export * from './protocol-v2';
-export * from './semantier-v2';
+export * from './protocol';
+export * from './semantier';
 export { AnClient, SessionClient, Inseclient, aes };

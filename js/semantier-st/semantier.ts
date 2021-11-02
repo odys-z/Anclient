@@ -4,23 +4,52 @@ import { Protocol, stree_t,
 } from "./protocol";
 const { CRUD } = Protocol;
 
-export interface AnlistCol {
-    field: string,
-    label: string,
-
-    disabled?: boolean,
-    checkbox?: boolean,
-    fomatter?: (col: AnlistCol) => string,
-    css: {grid: object},
+export interface ErrorCtx {
+	msg: undefined | string | Array<string>;
+	onError: (code: typeof Protocol.MsgCode, resp: AnsonResp) => void
 }
 
-export interface AnRecField {
-    field: string,
-    value: string,
-	style?: any;
+export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+export interface AnlistColAttrs {
+    disabled?: boolean;
+	visible?: boolean;
+    checkbox?: boolean;
+    // formatter?: (col: AnlistCol) => string;
+    formatter?: (rec: {}) => string;
+    css?: {};
+    grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
+	box?: {};
 }
 
+export interface AnlistCol extends AnlistColAttrs{
+    field: string;
+    label: string;
+    /**input type / form type */
+    type?: string;
+    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
+    style?: string | {};
+    options?: [];
+}
+
+/**E.g. form's combobox field declaration */
+export interface DatasetComboField extends AnlistCol {
+	nv: {n: string; v: string};
+	sk: string;
+	cbbStyle: {}; 
+}
+
+export type AnColModifier = ((col: AnlistCol, colIndx: number)=> AnlistColAttrs);
+
+/**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
+export interface QueryConditions {
+	[q: string]: any;
+}
+
+/**Callback of CRUD.c/u/d */
 export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
+/**Callback of CRUD.r */
+export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
 
 /**
  * Not the same as java Semantext.
@@ -100,15 +129,13 @@ export class Semantier {
 
     disableValidate: any;
 
-    validate(rec: {}, fields: Array<AnRecField>): boolean {
+    validate(rec: {}, fields: Array<AnlistCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);
 
 		if (this.disableValidate)
 			return true;
-
-		let that = this;
 
 		let valid = true;
 		fields.forEach( (f, x) => {
@@ -140,20 +167,18 @@ export class Semantier {
 
 
     /** Get list's column data specification
-     * @param {object} modifier {field, function | object }
-     * @param {object | function} modifier.field user provided modifier to change column's style etc.
+     * @param modifier {field, function | object }
+     * @param modifier.field user provided modifier to change column's style etc.
      * callback function signature: (col, index) {} : return column's properties.
      */
-    columns(modifier: {
-        field: object | Function;
-    }): Array<AnlistCol> {
+	 columns (modifier?: {[x: string]: AnlistColAttrs | AnColModifier}): Array<AnlistColAttrs> {
 		if (!this._cols)
 			throw Error("_cols are not provided by child tier.");
 
 		if (modifier)
 			return this._cols.map( (c, x) =>
 				typeof modifier[c.field] === 'function' ?
-						{...c, ...modifier[c.field](c, x) } :
+						{...c, ...(modifier[c.field] as AnColModifier)(c, x) } :
 						{...c, ...modifier[c.field]}
 			);
 		else
@@ -164,9 +189,7 @@ export class Semantier {
      * @param {object} modifier {field, function | object }
      * @param {object | function} modifier.field see #columns().
      */
-    fields(modifier: {
-        field: object | Function;
-    }): Array<AnRecField> {
+	 fields (modifier?: {[x: string]: AnlistColAttrs | AnColModifier}): Array<AnlistCol> {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 
@@ -176,7 +199,7 @@ export class Semantier {
 			return this._fields.map( (c, x) => {
 				let disabled = c.disabled || c.field === that.pk && that.pkval ? true : false;
 				return typeof modifier[c.field] === 'function' ?
-						{...c, ...modifier[c.field](c, x), disabled } :
+						{...c, ...(modifier[c.field] as AnColModifier)(c, x), disabled } :
 						{...c, ...modifier[c.field], disabled}
 			} );
 		else
@@ -216,6 +239,12 @@ export class Semantier {
 
 		this.anReact.stree(ds, this.errCtx);
     }
+
+    record( opts: QueryConditions, onLoad: OnLoadOk) : void {
+	}
+
+    records(opts: QueryConditions, onLoad: OnLoadOk) : void {
+	}
 
     /** save form with a relationship table */
     saveRec(opts: any, onOk: OnCommitOk): void {

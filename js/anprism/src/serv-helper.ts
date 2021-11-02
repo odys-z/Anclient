@@ -130,8 +130,9 @@ export class ServHelper {
             this.findRoot(html);
         }
         else {
-            const fullpath = html.fsPath;
-            if (!fullpath?.startsWith(this.serv.webroot))
+            // This is safer for Windows
+            const relative = path.relative(this.serv.webroot, html.fsPath);
+            if (!relative || relative.startsWith('..') || path.isAbsolute(relative))
                 throw new AnprismException('page is not located in root folder: ' + html.fsPath);
         }
         return this;

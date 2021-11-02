@@ -5,11 +5,19 @@ is also been verified.
 
 - Anclient.js
 
-@anclient/semantier
-[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
-+
-@anclient/anreact
+@anclient/semantier-st:
+[![npm](https://img.shields.io/npm/v/@anclient/semantier-st?logo=npm)](https://npmjs.org/package/@anclient/semantier-st)
+(sunsetting js version: @anclient/semantier
+[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier))
+
+together with
+
+@anclient/anreact:
 [![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
+
+- VS Code extension
+
+Anprism: [![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
 
 # Repository Structure
 
@@ -29,10 +37,6 @@ The Visual Studio solution is
 
 There are 3 clients in the solution:
 
-- csharp
-
-The c# version of anclient.
-
 - java
 
 Java client (not for Android yet)
@@ -40,6 +44,8 @@ Java client (not for Android yet)
 - js
 
 js client API depending on jquery. The test project is using React.
+
+Check js/test & examples/example.js for running tests and examples.
 
 # Examples
 

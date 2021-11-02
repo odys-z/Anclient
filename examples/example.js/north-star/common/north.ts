@@ -1,7 +1,8 @@
 
 import React from "react";
 import { AnContext, SysComp } from "@anclient/anreact";
-import { Semantier2 } from "@anclient/semantier";
+import { QueryConditions, Semantier } from "@anclient/semantier-st";
+import { Breakpoint } from "@material-ui/core/styles/createBreakpoints";
 
 /**TODO move to @anclient/anreact */
 export interface FieldMeta {
@@ -26,6 +27,12 @@ export interface Comprops {
 	uri: string;
     /**The matching url in React.Route */
 	match?: {path: string};
+
+	u?: boolean;
+	c?: boolean;
+    readonly tier: any;
+    readonly crud?: string;
+    readonly width?: Breakpoint;
 };
 
 // export type WelcomeProp = Readonly<{ classes: {board: any}; sys: typeof SysComp } extends Comprops>;
@@ -34,46 +41,43 @@ export interface WelcomeProp extends Comprops {
     readonly sys: typeof SysComp
 };
 
-export interface PollsProp extends Comprops {
-    readonly classes: { 
-        funcName?: string;
-        crudButton: string, list: string }
-};
-
 /**PropType of Poll's Form. */
-export interface PollFormProp extends Comprops {
-	u?: boolean;
-	c?: boolean;
-    readonly tier: any;
-    readonly crud?: string;
-    readonly width?: string;
-    readonly classes: { root?: string; dialogPaper?: string; smalltip?: string;
-        content?: string; buttons?: string; button?: string, card?: string };
-    onClose: (event: React.UIEvent) => void;
+export interface FormProp extends Comprops {
+	/**Fields met for expanding by form, e.g. TRecordForm or CardForm. */
+	readonly fields?: Array<{}>;
+	readonly dense?: boolean;
+    readonly classes: {
+		root?: string; dialogPaper?: string; smalltip?: string;
+        content?: string; buttons?: string;
+		button?: string, card?: string;
+		[x: string]: any
+	};
+    onClose?: (event: React.UIEvent) => void;
 };
 
-/**Query condition item, used by AnQueryForm.
- * TODO move to @anclient/anreact
- */
-export interface QueryCondt {
+/**Query condition item, used by AnQueryForm.  */
+export interface PollQueryCondt extends QueryConditions {
 	pollIds?: Array<string>;
 	states?: string;
 }
 
-export class Anform extends React.Component<PollFormProp, any, any> {
+export class Anform extends React.Component<FormProp, any, any> {
 }
 
 /**
  * Replacing @anclient/semantier/curd/CrudCompW
  */
-export class CrudCompW extends React.Component<any, any, any> {
-    media: {
+export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> {
+    public media: {
         isLg?: boolean;
         isMd?: boolean;
+		isSm?: boolean;
+		isXl?: boolean;
+		isXs?: boolean;
     };
-    uri: string;
+    public uri: string;
 
-	constructor(props) {
+	constructor(props: Readonly<T>) {
 		super(props);
 
 		this.uri = props.match && props.match.path || props.uri;

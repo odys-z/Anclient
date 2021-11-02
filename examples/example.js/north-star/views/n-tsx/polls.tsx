@@ -4,19 +4,30 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Grid, Button, Theme, Typography } from '@material-ui/core';
 
-import { Semantier2, Protocol, AnsonMsg, AnsonBody, AnsonResp } from "@anclient/semantier";
+import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
+	OnCommitOk, OnLoadOk, QueryConditions
+} from "@anclient/semantier-st";
+
 import {
 	L, AnConst,
     AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample
 } from '@anclient/anreact';
 
-import { PollsProp, CrudCompW, QueryCondt, FieldMeta } from '../../common/north';
+import { CrudCompW, Comprops } from '../../common/north';
 import { PollDetails } from './poll-details';
 
 const { JsampleIcons } = jsample;
 
+export interface PollsProp extends Comprops {
+    readonly classes: { 
+        funcName?: string;
+        crudButton: string;
+		list: string };
+};
+
+
 const styles = (theme: Theme) => (Object.assign(
-	Semantier2.invalidStyles as any, {
+	Semantier.invalidStyles as any, {
 	crudButton: {
 		margin: theme.spacing(1),
 	},
@@ -25,8 +36,7 @@ const styles = (theme: Theme) => (Object.assign(
 	}
 } ));
 
-class PollsComp extends CrudCompW {
-    // uri: string;
+class PollsComp extends CrudCompW<PollsProp> {
 
 	state = {
 		students: [],
@@ -50,11 +60,9 @@ class PollsComp extends CrudCompW {
 
     confirm: JSX.Element;
     detailsForm: JSX.Element;
-	q: QueryCondt = {};
-	// uri: string;
+	q: QueryConditions = {};
 
 	constructor(props: PollsProp) {
-		// this.uri = props.match && props.match.path || props.uri;
 		super(props);
 
 		this.closeDetails = this.closeDetails.bind(this);
@@ -71,19 +79,19 @@ class PollsComp extends CrudCompW {
 		console.log('Polls TSX', this.uri);
 		this.tier = new PollsTier(this);
 		this.tier.setContext(this.context);
-		this.toSearch();
+		// this.toSearch();
 	}
 
-	toSearch(condts?: QueryCondt) {
+	toSearch(condts?: QueryConditions) {
 		if (this.tier) {
 			let that = this;
 			this.q = condts || this.q;
 			this.tier.records( this.q,
-				(cols, rows) => {
+				(_cols, rows) => {
 					that.state.selected.ids.clear();
 					console.log(rows);
 					that.setState({});
-				}, undefined );
+				} );
 		}
 	}
 
@@ -179,7 +187,7 @@ class PollsComp extends CrudCompW {
 
 			{this.tier && <AnTablist
 				className={classes.list} checkbox={true} pk={this.tier.pk}
-				columns={this.tier.columns()}
+				columns={this.tier.columns(undefined)}
 				rows={this.tier.rows}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
@@ -195,22 +203,36 @@ PollsComp.contextType = AnContext;
 
 const Polls = withWidth()(withStyles(styles)(PollsComp));
 
-class PollsTier extends Semantier2 {
+class PollsTier extends Semantier {
 	/**{@link StarPorts.polls} */
 	port = 'npolls'; 
 
+	_fields = [
+		{field: 'title', label: L('Title')},
+		{field: 'tags',  label: L('#tag')},
+		{field: 'qid',  label: L('quiz ID')},
+	];
+
     _cols = [
-        { text: L('quiz event'),field: "pid",    hide: true },
-        { text: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
-        { text: L('Users' ),    field: "users",  color: 'primary' },
-        { text: L('Status'),    field: "state",  color: 'primary' },
-        { text: L('Subject'),   field: "subject",color: 'primary' }
+        { label: L('quiz event'),field: "pid",    hide: true, css: undefined },
+        { label: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
+        { label: L('Users'),    field: "users",  color: 'primary' },
+        { label: L('Status'),    field: "state",  color: 'primary' },
+        // { text: L('Subject'),   field: "subject",color: 'primary' }
 	];
 
 	pk = 'pid';
 
+	_query: QueryConditions;
+
     constructor(comp: PollsComp) {
         super(comp);
+
+		Protocol.registerBody(NPollsReq._type,
+			(jsonBd: any) => { return new NPollsReq(this.uri, this._query); });
+
+		Protocol.registerBody(NPollsResp._type,
+			(jsonBd: any) => { return new NPollsResp(jsonBd); });
     }
 
 	/**[Promiting Style]
@@ -222,14 +244,11 @@ class PollsTier extends Semantier2 {
      * @param errCtx 
      * @returns 
      */
-    records(opts: QueryCondt,
-            onLoad: (cols: Array<{}>, rows: Array<{}>) => void,
-            errCtx: typeof AnContext.error) {
+    records(opts: QueryConditions, onLoad: OnLoadOk) {
 		let {pollIds, states} = opts;
 		let opt = {};
 		opt[NPollsReq.pollIds] = pollIds;
 		opt[NPollsReq.states] = states;
-		// return this.serv(this.uri, NPollsReq.A.pollsUsers, opt, onLoad, errCtx);
 		if (!this.client) return;
 
 		let client = this.client;
@@ -267,22 +286,19 @@ class NPollsReq extends AnsonBody {
     static pollIds = "pids";
     static states = "states";
 
-	type = 'io.oz.ever.conn.n.poll.NPollsReq';
+	static _type = "io.oz.ever.conn.n.poll.NPollsReq";
 
-	constructor(uri: string, condts: QueryCondt) {
-		super({});
+	// type = 'io.oz.ever.conn.n.poll.NPollsReq';
+
+	constructor(uri: string, condts: QueryConditions) {
+		super({type: NPollsReq._type, uri});
 	}
 
-	_fields = [
-		{field: 'title', label: L('Title')},
-		{field: 'tags',  label: L('#tag')},
-		{field: 'qid',  label: L('quiz ID')},
-	];
 }
 
 class NPollsResp extends AnsonResp {
-	type = "io.odysz.jquiz.NQuizResp";
-	polls: Array<{}>;
+	static _type = "io.oz.ever.conn.n.poll.NPollsResp";
+	polls: AnResultset;
 
 	constructor(jsonBd) {
 		super(jsonBd);
@@ -290,8 +306,5 @@ class NPollsResp extends AnsonResp {
 		this.polls = jsonBd.polls;
 	}
 }
-
-Protocol.registerBody('io.oz.ever.conn.n.poll.NPollsResp',
-	(jsonBd: any) => { return new NPollsResp(jsonBd); });
 
 export { Polls, PollsComp, NPollsReq, PollsTier }
