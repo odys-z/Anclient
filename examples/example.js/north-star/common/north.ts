@@ -11,6 +11,8 @@ export interface FieldMeta {
 	disabled?: boolean;
 }
 
+export interface MediaMeta { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs: boolean; isXl?: boolean; }
+
 /** App North's props */
 export interface Northprops {
     iportal?: string;
@@ -87,11 +89,11 @@ export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> 
 
 
 		let {width} = props;
-		CrudCompW.prototype.media = CrudCompW.setWidth(width);
+		CrudCompW.prototype.media = CrudCompW.getMedia(width);
 	}
 
-	static setWidth(width: string) {
-		let media;
+	static getMedia(width: string) {
+		let media: MediaMeta;
 
 		if (width === 'lg') {
             media = {

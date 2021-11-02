@@ -14,7 +14,7 @@ import { L, toBool, DatasetCombo, TRecordFormComp } from '@anclient/anreact';
 import { starTheme } from '../../common/star-theme';
 import { CrudCompW, FormProp } from '../../common/north';
 
-interface CardFormProp extends FormProp {
+interface CardListProp extends FormProp {
 };
 
 const styles = (theme: starTheme) => (Object.assign(
@@ -44,7 +44,7 @@ const styles = (theme: starTheme) => (Object.assign(
 /**TODO should extends TRecordForm after moved to TS.
  * class CardFormComp extends TReacordForm<...> {
 */
-class CardFormComp extends CrudCompW<CardFormProp> {
+class CardListComp extends CrudCompW<CardListProp> {
 	state = {
 		dirty: false,
 		pk: undefined,
@@ -68,9 +68,10 @@ class CardFormComp extends CrudCompW<CardFormProp> {
 				console.warn("TRecordFormComp is supposed to load form data with pkval by itself.");
 
 			let that = this;
-			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (_cols, _rows) => {
+			// let cond = {};
+			// cond[this.tier.pk] = this.tier.pkval;
+			this.tier.record(undefined, // using this.tier.pkval,
+				(_cols, _rows) => {
 				// that.rec = rows && rows[0] ? rows[0] : {};
 				that.setState({});
 			} );
@@ -98,11 +99,11 @@ class CardFormComp extends CrudCompW<CardFormProp> {
 					readOnly={ !df && f.disabled }
 					options={ df.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ df.label }
-					style={ df.cbbStyle || {width: 200} }
-					invalidStyle={ df.style }
+					style={ df.css || {width: 200} }
+					invalidStyle={ df.css }
 					onSelect={ (v) => {
 						rec[df.field] = v.v;
-						df.style = undefined;
+						df.css = undefined;
 						that.setState({dirty: true});
 					} }
 				/>);
@@ -124,10 +125,10 @@ class CardFormComp extends CrudCompW<CardFormProp> {
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(tf.label)} margin='dense'
 				value={ !rec || (rec[tf.field] === undefined || rec[tf.field] === null) ? '' : rec[tf.field] }
-				className={classes[tf.style as string]}
+				className={classes[tf.css as string]}
 				onChange={(e) => {
 					rec[tf.field] = e.target.value;
-					tf.style = undefined;
+					tf.css = undefined;
 					that.setState({dirty: true});
 				}}
 			/>);
@@ -140,7 +141,7 @@ class CardFormComp extends CrudCompW<CardFormProp> {
 
 		this.tier.fields().forEach( (f, i) => {
 		  if (!!f.visible) {
-			f.formatter = (rec: any) => (<>{rec[f.field]}</>);
+			f.formatter = (rec: any) => (<>{rec[f.field]}</> as JSX.Element);
 
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
@@ -176,7 +177,7 @@ class CardFormComp extends CrudCompW<CardFormProp> {
 
 	render () {
 		const { classes, width } = this.props;
-		let media = CrudCompW.setWidth(width);
+		let media = CrudCompW.getMedia(width);
 
 		let rec = this.tier.rec;
 
@@ -194,5 +195,5 @@ class CardFormComp extends CrudCompW<CardFormProp> {
 // 	enableValidate: PropTypes.bool,
 // };
 
-const DefaultCardForm = withWidth()(withStyles(styles)(CardFormComp)); // FIXME only after anreact upgraded
-export { DefaultCardForm, CardFormComp }
+const DefaultCardList = withWidth()(withStyles(styles)(CardListComp));
+export { DefaultCardList, CardListComp }

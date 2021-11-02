@@ -50,7 +50,8 @@ export interface AttachMeta {
 
 export interface AnResultset {
 	length() : number;
-    results: any;
+    // results: Array<any>;
+    total: number;
     // filter(arg0: (r: any) => boolean) : Array<{}>;
     rs: Array<{}>;
     colnames: {};

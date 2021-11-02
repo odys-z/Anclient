@@ -5,8 +5,8 @@ import { Protocol, stree_t,
 const { CRUD } = Protocol;
 
 export interface ErrorCtx {
-	msg: undefined | string | Array<string>;
-	onError: (code: typeof Protocol.MsgCode, resp: AnsonResp) => void
+	msg?: undefined | string | Array<string>;
+	onError: (code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -50,6 +50,8 @@ export interface QueryConditions {
 export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
 /**Callback of CRUD.r */
 export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
+
+export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 
 /**
  * Not the same as java Semantext.
@@ -109,6 +111,8 @@ export class Semantier {
     reltabl: string;
     /** current relations */
     rels: any[];
+
+    lastCondit: QueryConditions;
 
     /**
      * @param context

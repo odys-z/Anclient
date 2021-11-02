@@ -17,7 +17,7 @@ import { L, AnContext, ConfirmDialog
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
 import { Anform, FormProp } from '../../common/north';
-import { DefaultCardForm } from './card-form';
+import { DefaultCardList } from './card-form';
 
 const { CRUD } = Protocol;
 
@@ -54,7 +54,7 @@ class PollDetailsComp extends Anform {
 				: props.u ? CRUD.u
 				: CRUD.r;
 
-		this.tier = props.tier;
+		this.tier = props.tier as PollsTier;
 
 		this.toCancel = this.toCancel.bind(this);
 		this.toStop = this.toStop.bind(this);
@@ -64,11 +64,10 @@ class PollDetailsComp extends Anform {
 	componentDidMount() {
 		if (this.tier.pkval) {
 			let that = this;
-			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (_cols, rows) => {
-				that.setState({record: rows[0]});
-			} );
+			this.tier.record(undefined, // use tier.pkval
+				(_cols, rows) => {
+					that.setState({record: rows[0]});
+				} );
 		}
 	}
 
@@ -76,34 +75,11 @@ class PollDetailsComp extends Anform {
 		if (e) e.stopPropagation();
 	}
 
-	// toSave(e: UIEvent) {
-	// 	if (e) e.stopPropagation();
-
-	// 	let that = this;
-
-	// 	if (this.tier.validate(this.tier.rec))
-	// 		this.tier.saveRec(
-	// 			{ crud: CRUD.u,
-	// 			  disableForm: true },
-	// 			resp => {
-	// 				// NOTE should crud moved to tier, just like the pkval?
-	// 				if (that.state.crud === Protocol.CRUD.c) {
-	// 					that.state.crud = Protocol.CRUD.u;
-	// 				}
-	// 				that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
-	// 			} );
-	// 	else this.setState({});
-	// }
-
 	toCancel (e: React.UIEvent) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose(e);
 	}
-
-	// handleClose (e: UIEvent, reason: "backdropClick" | "escapeKeyDown") {
-	// 	e.stopPropagation();
-	// }
 
 	showConfirm(msg: string) {
 		let that = this;
@@ -133,7 +109,7 @@ class PollDetailsComp extends Anform {
 			  <Box className={classes.smalltip}>
 				  {L('Tip: Document can been replaced by uploading another file.')}
 			  </Box>
-			  <DefaultCardForm uri={this.props.uri}
+			  <DefaultCardList uri={this.props.uri}
 				  tier={this.tier}
 				  fields={this.tier.fields({
 					  pid: {grid: {sm: 3, md: 2}},

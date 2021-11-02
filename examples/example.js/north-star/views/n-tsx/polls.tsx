@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { Grid, Button, Theme, Typography } from '@material-ui/core';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
-	OnCommitOk, OnLoadOk, QueryConditions
+	OnCommitOk, OnLoadOk, QueryConditions, AnlistCol
 } from "@anclient/semantier-st";
 
 import {
@@ -82,7 +82,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 		// this.toSearch();
 	}
 
-	toSearch(condts?: QueryConditions) {
+	toSearch(e: React.UIEvent, condts?: QueryConditions) {
 		if (this.tier) {
 			let that = this;
 			this.q = condts || this.q;
@@ -107,6 +107,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 	}
 
 	onTableSelect(rowIds: string[]) {
+		this.tier.selectedIds = rowIds;
 		this.setState( {
 			buttons: {
 				start: this.state.buttons.start,
@@ -117,6 +118,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 	}
 
     toShowDetails(e: React.UIEvent): void {
+		this.tier.pkval = this.tier.selectedIds?.length > 0 ? this.tier.selectedIds[0] : undefined;
         this.detailsForm = (
             <PollDetails uri={this.uri}
 				tier={this.tier}
@@ -205,7 +207,7 @@ const Polls = withWidth()(withStyles(styles)(PollsComp));
 
 class PollsTier extends Semantier {
 	/**{@link StarPorts.polls} */
-	port = 'npolls'; 
+	// port = 'npolls'; 
 
 	_fields = [
 		{field: 'title', label: L('Title')},
@@ -214,22 +216,23 @@ class PollsTier extends Semantier {
 	];
 
     _cols = [
-        { label: L('quiz event'),field: "pid",    hide: true, css: undefined },
-        { label: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
-        { label: L('Users'),    field: "users",  color: 'primary' },
-        { label: L('Status'),    field: "state",  color: 'primary' },
-        // { text: L('Subject'),   field: "subject",color: 'primary' }
-	];
+        { label: L('quiz event'),field: "pid",    visible: false },
+        { label: L('Quiz Name'), field: "title",  css: {color: 'primary'}, className: 'bold'},
+        { label: L('Users'),     field: "users",  css: {color: 'primary'} },
+        { label: L('Status'),    field: "state",  css: {color: 'primary'} },
+        // { label: L('Subject'),   field: "subject",style: {color: 'primary'} }
+	] as AnlistCol[];
 
 	pk = 'pid';
 
-	_query: QueryConditions;
+	/**selected records' ids, if possible */
+	selectedIds: string[];
 
     constructor(comp: PollsComp) {
         super(comp);
 
 		Protocol.registerBody(NPollsReq._type,
-			(jsonBd: any) => { return new NPollsReq(this.uri, this._query); });
+			(jsonBd: any) => { return new NPollsReq(this.uri, this.lastCondit); });
 
 		Protocol.registerBody(NPollsResp._type,
 			(jsonBd: any) => { return new NPollsResp(jsonBd); });
@@ -254,7 +257,7 @@ class PollsTier extends Semantier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, this.port,
+		let req = client.userReq(this.uri, 'npolls',
 					new NPollsReq( this.uri, opts )
 					.A(NPollsReq.A.list) );
 
@@ -269,6 +272,47 @@ class PollsTier extends Semantier {
 			this.errCtx);
 	}
 
+	/**
+	 * Load poll of pid (many cards, each for different user)
+	 * @param pkval poll id
+	 * @param onLoad
+	 * @returns 
+	 */
+    record(pkval: string, onLoad: OnLoadOk) {
+		if (!this.client) return;
+
+		pkval = pkval || this.pkval ;
+		if (!pkval) {
+			console.warn("Calling record() with empty pk.");
+			return;
+		}
+
+		// let opt = { };
+		// opt[NPollsReq.pid] = pkval;
+
+		let client = this.client;
+		let that = this;
+
+		let req = client.userReq(this.uri, 'npolls',
+					new NPollsReq( this.uri, {pid: pkval} )
+					.A(NPollsReq.A.pollCards) );
+
+		console.log(req);
+		client.commit(req,
+			(resp: AnsonMsg<NPollsResp>) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().polls);
+				that.rows = rows;
+				that.resetFormSession();
+				onLoad(cols, rows);
+			},
+			this.errCtx);
+	}
+
+
+}
+
+interface PollQueryConditions extends QueryConditions {
+	pid?: string;
 }
 
 /**The poll request message body */
@@ -277,21 +321,31 @@ class NPollsReq extends AnsonBody {
      * https://stackoverflow.com/questions/32494174/can-you-create-nested-classes-in-typescript
      */
  	static A = class {
-		static start = 'start';
-		static list = 'list';     // load quizzes
-		static stopolls = 'stopolls'; // stop all polls
-		static pollsUsers = 'polls-users'; // get all users of polls (pollIds, quizId, states)
+		// static start = 'start';
+		/** load poll list */
+		static list = 'list';     
+		/** load poll cards */
+		static pollCards = 'r/cards';
+		/** stop all polls */
+		static stopolls = 'stopolls';
+		/**get all users of polls (pollIds, quizId, states) */
+		static pollsUsers = 'polls-users';
 	}
 
+	/**Parameter name: poll ids*/
     static pollIds = "pids";
+	/**Parameter name: poll states*/
     static states = "states";
 
 	static _type = "io.oz.ever.conn.n.poll.NPollsReq";
 
-	// type = 'io.oz.ever.conn.n.poll.NPollsReq';
+	/**Poll Id */
+	pid: string;
 
-	constructor(uri: string, condts: QueryConditions) {
+	constructor(uri: string, condts: PollQueryConditions) {
 		super({type: NPollsReq._type, uri});
+
+		this.pid = condts.qid;
 	}
 
 }

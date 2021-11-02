@@ -84,7 +84,8 @@ class UserstComp extends CrudCompW {
 		this.tier.records( this.q,
 			(cols, rows) => {
 				that.state.selected.Ids.clear();
-				that.setState(rows);
+				// that.setState(rows);
+				that.setState({});
 			} );
 	}
 

@@ -1,11 +1,7 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import SvgIcon from '@material-ui/core/SvgIcon';
 import Grid from "@material-ui/core/Grid";
 import Collapse from "@material-ui/core/Collapse";
-import {
-  Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
-} from "@material-ui/icons";
 import { Typography } from "@material-ui/core";
 
 import { AnTreeIcons } from "./tree";
