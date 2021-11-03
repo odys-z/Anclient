@@ -10,14 +10,14 @@
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://localhost:8888",
-            "webRoot": "${workspaceFolder}/dist"
+            "webRoot": "${workspaceFolder}\\dist"
         },
         {
             "name": "Attach to Chrome",
             "port": 9222,
             "request": "attach",
             "type": "pwa-chrome",
-            "webRoot": "${workspaceFolder}/dist"
+            "webRoot": "${workspaceFolder}\\dist"
         },
         {
             "type": "pwa-chrome",
