@@ -1,7 +1,7 @@
 
 import React from "react";
 import { AnContext, SysComp } from "@anclient/anreact";
-import { QueryConditions, Semantier } from "@anclient/semantier-st";
+import { TierCol, AnlistColAttrs, Tierec, QueryConditions, Semantier } from "@anclient/semantier-st";
 import { Breakpoint } from "@material-ui/core/styles/createBreakpoints";
 
 /**TODO move to @anclient/anreact */
@@ -45,6 +45,10 @@ export interface WelcomeProp extends Comprops {
 export interface FormProp extends Comprops {
 	/**Fields met for expanding by form, e.g. TRecordForm or CardForm. */
 	readonly fields?: Array<{}>;
+
+	columns?: Array<AnlistColAttrs>;
+	rows?: Array<Tierec>;
+
 	readonly dense?: boolean;
     readonly classes: {
 		root?: string; dialogPaper?: string; smalltip?: string;
@@ -61,13 +65,15 @@ export interface PollQueryCondt extends QueryConditions {
 	states?: string;
 }
 
-export class Anform extends React.Component<FormProp, any, any> {
+export class Anform<T extends FormProp> extends React.Component<T, any, any> {
 }
 
 /**
  * Replacing @anclient/semantier/curd/CrudCompW
  */
 export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> {
+	state: any;
+
     public media: {
         isLg?: boolean;
         isMd?: boolean;
@@ -86,10 +92,10 @@ export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> 
 
 
 		let {width} = props;
-		CrudCompW.prototype.media = CrudCompW.setWidth(width);
+		CrudCompW.prototype.media = CrudCompW.getMedia(width);
 	}
 
-	static setWidth(width: string) {
+	static getMedia(width: string) {
 		let media;
 
 		if (width === 'lg') {
@@ -126,6 +132,11 @@ export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> 
 		}
 
 		return media;
+	}
+
+	/**A simple helper: Array.from(ids)[x]; */
+	getSelected(ids: Set<string>, x = 0): string {
+		return Array.from(ids)[x];
 	}
 }
 CrudCompW.contextType = AnContext;
