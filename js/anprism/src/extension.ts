@@ -149,7 +149,8 @@ class AnPagePanel {
 				const panel = vscode.window.createWebviewPanel(
 					AnPagePanel.viewType,
 					`Anprism - ${AnPagePanel.filename(localhtml)}`,
-					column || vscode.ViewColumn.One
+					column || vscode.ViewColumn.One,
+					{ enableScripts: true }
 				);
 				panel.webview.options = { enableScripts: true }
 
@@ -175,7 +176,8 @@ class AnPagePanel {
 				await p.startup();
 			}
 			catch (e) {
-				vscode.window.showInformationMessage( (<AnprismException>e).getMessage() || "" );
+				if (e instanceof AnprismException)
+					vscode.window.showInformationMessage( (<AnprismException>e).getMessage() || "" );
 			}
 		}
 
