@@ -54,7 +54,7 @@ const styles = (theme) => (Object.assign(
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  *
  * NOTE: Desgin Memo
- * Level-up way is working, having tier as the common state/data manager.
+ * Level-up way is NOT working! So having tier as the common state/data manager. 
  */
 class TRecordFormComp extends CrudCompW {
 	state = {

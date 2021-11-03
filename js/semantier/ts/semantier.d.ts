@@ -1,5 +1,6 @@
 /**
  * Base class of semantic tier
+ * @class
  */
 export class Semantier {
     static invalidStyles: {
@@ -31,7 +32,7 @@ export class Semantier {
     /** optional main table's pk */
     pk: string;
     /** current crud */
-    crud: string;
+    crud: any;
     /** current list's data */
     rows: any[];
     /** current record */
@@ -44,7 +45,7 @@ export class Semantier {
      *
      * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context
      */
-    setContext(context: any): void;
+    setContext(context: any): Semantier;
     client: any;
     anReact: any;
     errCtx: any;
