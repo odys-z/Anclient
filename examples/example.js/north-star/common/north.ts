@@ -135,7 +135,7 @@ export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> 
 	}
 
 	/**A simple helper: Array.from(ids)[x]; */
-	getSelected(ids: Set<string>, x = 0): string {
+	getByIx(ids: Set<string>, x = 0): string {
 		return Array.from(ids)[x];
 	}
 }
