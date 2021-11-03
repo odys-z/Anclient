@@ -1,5 +1,8 @@
 
-import { stree_t, Protocol, SessionClient, UpdateReq, InsertReq, DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx, OnLoadOk, DatasetOpts, AnsonMsg, OnCommitOk } from '@anclient/semantier-st';
+import { stree_t, Protocol, SessionClient, InsertReq,
+	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
+	DatasetOpts, AnsonMsg, OnCommitOk
+} from '@anclient/semantier-st';
 
 import { L } from '../utils/langstr';
 	import { AnConst } from '../utils/consts';
