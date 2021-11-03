@@ -7,17 +7,17 @@
 
 Anprism is a light weight helper for editing morden (webpack transpiled) web pages in vscode.
 
-![screenshot for repository](res/00-anprism-0.2.0.png)
+![screenshot (for Github)](res/00-anprism-0.2.0.png)
 
 For live editing, there are other [similar (better) implementation](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server).
 
 Currently the difference is that Anprism uses Python for web server.
 
-[Screenshot for Marketplace](https://github.com/odys-z/Anclient/tree/master/js/anprism)
+[Screenshot (for Marketplace)](https://github.com/odys-z/Anclient/tree/master/js/anprism)
 
-## install
+## Install
 
-In VS Code extension manager, search 'Anprism'.
+In VS Code extension manager (press Ctrl + Shift + x), search 'Anprism'.
 
 ## Quic Start
 
@@ -50,13 +50,33 @@ Or
     Anprism: Load Anprism
 ```
 
-Anprism will not transpile or call npm scripts. You need take care of your package manually, i. e. if you are using webpack, you need start the watch task by yourself. 
+Anprism will not transpile or call npm scripts. You need take care of your package manually, i. e. if you are using webpack, you need start the watch task by yourself.
 
 **Troubleshootings**
 
 - Nothing shown in panel
 
-The VS Code webview looks like heavily caching browsing history locally. For currrent version, please close the Anprism panel and re-load it if not worksing. Also, make sure the latest webpack output is been also loaded. 
+The VS Code webview looks like heavily caching browsing history locally. For currrent version, please close the Anprism panel and re-load it if not worksing. Also, make sure the latest webpack output is been also loaded.
+
+- Can't link to new html page
+
+Experiments shows that if user's js scripts setting window.top, like this:
+
+```
+    window.top.location = "new page url";
+```
+
+will vialate the VS Code's security policy, and nothing will happen. User have to manually load new pages (right click target page, again).
+
+- Browser cache not be updated
+
+Anprism's web viewer depends on VS Code's built-in Webview, which is heavily cached. This is frendly to end users but irretating to developers. Currently the author didn't find a good way to deal this. As a develper, you must know how to clear your recently modified code in Chrome Dev Tool.
+
+<p><img src='res/01-clear-cache.gif' style='width: 600px'/></p>
+
+- Windows: OSError: [WinError 10013]
+
+Anprism start a webservice on port 8888. Please check there is no other program using this, and try with firewall temperily being shut down. To shut down firewall, see [here](https://stackoverflow.com/a/58249355/7362888).
 
 **Anprism Log**
 
