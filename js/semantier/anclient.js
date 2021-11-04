@@ -5,7 +5,7 @@ import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
 	DatasetReq
-} from './protocol.js';
+} from './protocol';
 
 /**The lower API of jclient/js
  * @module anclient/js/core
@@ -669,6 +669,9 @@ class SessionClient {
 	 * @param {Object} act action, optional.
 	 * @return {AnsonMsg<AnUserReq>} AnsonMsg */
 	userReq(uri, port, bodyItem, act) {
+		if (!port)
+			throw Error('AnsonMsg<UserReq> needs port explicitly specified.');
+			
 		let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri = uri || bodyItem.uri;
 		if (typeof act === 'object') {
@@ -733,7 +736,7 @@ class Inseclient extends SessionClient {
 
 	/**
 	 * @param {object} opts
-	 * @param {string} opts.urlRoot 
+	 * @param {string} opts.urlRoot
 	 * @constructor
 	 */
 	constructor(opts) {

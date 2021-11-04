@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { withStyles } from '@material-ui/styles';
 import { Box, Card, IconButton, Link, Paper, Typography, withWidth } from '@material-ui/core';
 
-import { Semantier } from '@anclient/semantier';
+import { Semantier } from '@anclient/semantier-st';
 import { CrudComp, jsample } from '@anclient/anreact';
 
 const styles = (theme) => ( {
@@ -100,7 +100,7 @@ class WelcomeComp extends CrudComp {
 	}
 }
 
-// at least compiled results is working, wait for #8447 (https://github.com/mui-org/material-ui/issues/8447#issuecomment-519952099)
+// FIXME ignoring eslint report report error before anreact upgraded to TS.
 export default withWidth()(withStyles(styles)(WelcomeComp));
 
 type WelcomeRec = {
@@ -113,9 +113,7 @@ type WelcomeRec = {
 };
 
 class WelcomeTier extends Semantier {
-	rows: WelcomeRec[];
 	/**
-	 * 
 	 * @param props 
 	 */
 	constructor(props: {uri: string}) {
@@ -127,8 +125,8 @@ class WelcomeTier extends Semantier {
 	 * @override(Semantier)
 	 */
 	records<WelcomeRec>(): Array<WelcomeRec> {
-		super.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
-		return super.rows;
+		this.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
+		return this.rows;
 	}
 
 	myNotifies<WelcomeRec>() {

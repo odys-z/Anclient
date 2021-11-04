@@ -54,7 +54,7 @@ describe('case: [0.0] utils', () => {
 
 let { mime2type, type2mime } = regex;
 describe('case: [00.1 regex]', () => {
-    it('mime2type', () => {
+	it('mime2type', () => {
 		assert.equal(mime2type('image/jpeg'), 'image', '00.1 jpeg');
 		assert.equal(mime2type('image/png'), 'image', '00.1 png');
 		assert.equal(mime2type('image/png;base64'), 'image', '00.1 image');
@@ -78,7 +78,7 @@ describe('case: [00.1 regex]', () => {
 });
 
 describe('case: [00.2 Language]', () => {
-    it('translation', () => {
+	it('translation', () => {
 		let s;
 		const t_hello = 'Hello {name} from {frm}';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, AnsonMsg, Inseclient } from '@anclient/semantier';
+import { Protocol, Inseclient } from '@anclient/semantier-st';
 
 import { Langstrs,
 	AnContext, AnError, AnReactExt,
@@ -10,7 +10,6 @@ import { Langstrs,
 } from '@anclient/anreact';
 
 import Welcome from './welcome';
-import { prependOnceListener } from 'process';
 
 const { Userst, JsampleTheme } = jsample;
 
@@ -73,20 +72,14 @@ class App extends React.Component<Props, State> {
 								.extendPorts({
 									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
 								});
-
-		// loaded from dataset.xml
-		Protocol.sk.xvec = 'x.cube.vec';
-		Protocol.sk.cbbOrg = 'org.all';
-		Protocol.sk.cbbRole = 'roles';
 	}
 
 	onError(c: any, r ) {
 		console.error(c, r);
-		// this.setState({hasError: !!c, nextAction: 're-login'});
 		this.state.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
-			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
+			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
 	onErrorClose() {

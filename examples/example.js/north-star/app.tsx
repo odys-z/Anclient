@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient } from '@anclient/semantier'
+import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier-st'
 import { L, Langstrs,
 	Sys, SysComp,
 	AnContext, AnError, AnReactExt, jsample
@@ -14,7 +14,7 @@ import { StarPorts } from './common/port';
 import { Dashboard } from './views/n/dashboard';
 import { Indicators } from './views/n/indicators';
 import { Quizzes } from './views/n/quizzes';
-import { Polls } from './views/n/polls';
+import { Polls } from './views/n-tsx/polls';
 import { MyStudents } from './views/n/my-students';
 import { GPAsheet } from './views/n/gpa';
 import { Docshares } from './views/n/docshares';
@@ -25,7 +25,7 @@ import { MyDocs } from './views/c/my-docs';
 import { MyConnect } from './views/c/connect';
 
 import { welcome } from './views/c-tsx/nwelcome';
-import { Northprops } from './views/c-tsx/north';
+import { Northprops } from './common/north';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component<Northprops, any> {
@@ -60,13 +60,14 @@ class App extends React.Component<Northprops, any> {
 		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
 								.extendPorts(StarPorts);
 
-		Protocol.sk.xvec = 'x.cube.vec';
+		// Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 		Protocol.sk.cbbMyClass = 'north.my-class';
 
 		// singleton error handler
-		if (!this.state.anClient || !this.state.anClient.ssInf) {
+		if ( !this.state.anClient || !this.state.anClient.ssInf
+		  || !this.state.anClient || !this.state.anClient.ssInf) {
 			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
@@ -95,12 +96,21 @@ class App extends React.Component<Northprops, any> {
 		] );
 	}
 
-	onError(c, r) {
+	componentDidMount() {
+		console.log(this.state);
+	}
+
+	/**
+	 * 
+	 * @param c error code
+	 * @param r AnsonMessage<AnsonResp>
+	 */
+	onError(c: string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
 		this.state.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
-			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
+			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
 	onErrorClose() {

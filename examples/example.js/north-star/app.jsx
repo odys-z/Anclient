@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient } from '@anclient/semantier'
+import { Protocol, SessionClient } from '@anclient/semantier-st'
 import { L, Langstrs,
 	Sys, SysComp,
 	AnContext, AnError, AnReactExt, jsample
@@ -96,7 +96,7 @@ class App extends React.Component {
 		this.state.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
-			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
+			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
 	onErrorClose() {
