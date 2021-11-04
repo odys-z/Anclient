@@ -282,7 +282,7 @@ class SysComp extends React.Component<SysProps, any, any> {
 		let that = this;
 		this.confirmLogout =
 		<ConfirmDialog ok={L('Good Bye')} title={L('Info')} // cancel={false}
-			open={true}
+			// open={true}
 			onOk={() => {
 				that.confirmLogout = undefined;
 				that.props.onLogout();

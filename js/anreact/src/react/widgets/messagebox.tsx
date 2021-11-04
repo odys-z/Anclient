@@ -18,7 +18,6 @@ import QRCode from 'qrcode'
 
 import {L, copyToClipboard} from '../../utils/langstr';
 import { Comprops, CrudComp } from '../../an-components';
-import { CompareArrowsSharp } from '@material-ui/icons';
 
 const styles = theme => ({
   root: {
@@ -45,7 +44,7 @@ export interface DialogProps extends Comprops {
 	onCancel?: (sender: React.ReactNode) => void;
 	onClose?: () => void;
 	/**Open dialog */
-	open?: boolean;
+	// open?: boolean;
 	title?: string;
 	/**with cancel button label ("false" will disable button) */
 	cancel?: string | false;
@@ -70,7 +69,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 		this.toOk = this.toOk.bind(this);
 	}
 
-	toOk(e: MouseEvent<HTMLElement>) {
+	toOk(e: React.MouseEvent<HTMLElement>) {
 		this.setState({closed: true});
 		if (typeof this.props.onOk === 'function')
 			this.props.onOk(e.currentTarget);
@@ -98,7 +97,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 
 	render () {
 		let props = this.props;
-		let open = props.open && !this.state.closed;
+		// let open = props.open && !this.state.closed;
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
 		// this.state.title = title;
@@ -115,7 +114,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 		// if (full)
 		  return (
 			<Dialog className={classes.root}
-				open={open}
+				open={true}
 				fullScreen={full}
 				fullWidth={!full}
 				maxWidth={!full ? 'xs' : undefined}
@@ -183,7 +182,7 @@ class QrSharingComp extends CrudComp<DialogProps & { imgId: string; qr: {serv: s
 
 	render () {
 		let props = this.props;
-		let open = props.open && !this.state.closed;
+		// let open = props.open && !this.state.closed;
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
 		// this.state.title = title;

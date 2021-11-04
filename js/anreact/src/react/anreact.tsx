@@ -250,11 +250,9 @@ export class AnReactExt extends AnReact {
 		let port = ds.port ||'dataset';
 
 		let reqbody = new DatasetReq({
-				uri,
+				uri, port,
 				mtabl: undefined,
-				sk,
-				sqlArgs,
-				rootId
+				sk, sqlArgs, rootId
 			})
 			.TA(t || stree_t.query);
 		let jreq = this.client.userReq(uri, port, reqbody, undefined);
@@ -359,6 +357,7 @@ export class AnReactExt extends AnReact {
 		cond.loading = true;
 
 		this.dataset( {
+				port: 'dataset',
 				uri,
 				sqlArgs,
 				// ssInf: this.client.ssInf,
