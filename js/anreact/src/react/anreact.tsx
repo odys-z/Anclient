@@ -7,6 +7,7 @@ import { stree_t, Protocol, Tierec, TierCol,
 
 import { AnConst } from '../utils/consts';
 import { toBool } from '../utils/helpers';
+import { Comprops, CrudComp } from './crud';
 
 export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
 
@@ -283,7 +284,7 @@ export class AnReactExt extends AnReact {
 	 * @param component
 	 * @return this
 	 */
-	stree(opts: DatasetOpts, component: CrudComp<any>): void {
+	stree(opts: DatasetOpts, component: CrudComp<Comprops>): void {
 		let {uri, onOk} = opts;
 
 		if (!uri)

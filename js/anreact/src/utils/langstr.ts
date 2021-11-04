@@ -56,8 +56,12 @@ const argex = /{(\s*(\w|\d)*\s*)}/g;
  * var the_string = L('Welcome {name}', {name: 'Joe'});
  * see https://stackoverflow.com/a/30191493/7362888
  * and https://stackoverflow.com/a/57882370/7362888
+ * 
+ * @param t template
+ * @param o arg object
+ * @returns 
  */
-export function L(t, o) {
+export function L(t: string, o?: object) {
 	if (! (t in Langstrs.s[Langstrs.lang]) )
 			Langstrs.s.en.add(t);
 	else t = Langstrs.lang === 'en' ?
