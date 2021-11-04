@@ -2,7 +2,7 @@
 import { stree_t, Protocol, Tierec, TierCol,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	DatasetOpts, AnsonMsg, OnCommitOk
+	AnsonMsg, OnCommitOk
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
