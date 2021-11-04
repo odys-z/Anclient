@@ -1,11 +1,8 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import PropTypes from "prop-types";
 
-import { L } from '../utils/langstr';
 import { AnContext } from './reactext';
 
-export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
 export interface Comprops { }
 
 const styles = (theme) => ( {

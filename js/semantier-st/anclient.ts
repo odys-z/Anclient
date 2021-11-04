@@ -135,7 +135,7 @@ class AnClient {
 		return new Promise((resolve, reject) => {
 			me.login(usrId, pswd,
 				(ssClient) => {resolve(ssClient);},
-				(err) => {reject(err);})
+				{ onError: (err) => {reject(err);} })
 		});
 	}
 
@@ -278,7 +278,7 @@ class AnClient {
 		return new Promise((resolve, reject) => {
 			me.post(jreq,
 				resp => {resolve(resp);},
-				(c, err) => {reject({c, err});}, // TODO FIXME
+				{ onError: (c, err) => {reject({c, err});} },
 				ajaxOpts)
 		});
 	}
@@ -682,12 +682,11 @@ class SessionClient {
 	 */
 	deleteMulti(uri: string, mtabl: string, pkn: string, pks: Array<any>): AnsonMsg<UpdateReq> {
 		let upd = new UpdateReq(uri, mtabl, undefined)
-			// .whereCond('in', pkn, pkvals);
 			.whereIn(pkn, pks);
 		upd.a = Protocol.CRUD.d;
 		this.currentAct.cmd = 'delete';
 
-		var jmsg = this.userReq(undefined,
+		var jmsg = this.userReq(uri,
 				'update', // Protocol.Port.update,
 				upd, this.currentAct);
 		return jmsg;
@@ -739,22 +738,22 @@ class SessionClient {
 		return this;
 	}
 
-	logout(onOk, onError) {
+	logout(onOk: OnCommitOk, onError) {
 		let header = Protocol.formatHeader(this.ssInf);
 		let body = {type: "io.odysz.semantic.jsession.AnSessionReq", a: "logout"};
 		let req = new AnsonMsg({port: 'session', header, body: [body]});
 
-		an.post(req, function(c, r) {
+		an.post(req, function(r: AnsonMsg<AnsonResp>) {
         	localStorage.setItem(SessionClient.ssInfo, null);
 			if (typeof onOk === 'function')
-				onOk(c, r);
-		}, function(c, e) {
+				onOk(r);
+		},
+		{ onError: (c, e) => {
         	localStorage.setItem(SessionClient.ssInfo, null);
 			if (typeof onError === 'function')
 				onError(c, e);
-		}, undefined);
+		} });
 	}
-
 }
 
 /**Client without session information.

@@ -1,13 +1,28 @@
 
-import { stree_t, Protocol, SessionClient, InsertReq,
+import { stree_t, Protocol, Tierec, TierCol,
+	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
 	DatasetOpts, AnsonMsg, OnCommitOk
 } from '@anclient/semantier-st';
 
-import { L } from '../utils/langstr';
-	import { AnConst } from '../utils/consts';
-	import { toBool } from '../utils/helpers';
-import { CrudComp, CrudCompW } from './crud';
+import { AnConst } from '../utils/consts';
+import { toBool } from '../utils/helpers';
+
+export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
+
+/**JSX.Element like row formatter results */
+export interface AnRow {
+}
+
+/**(Form) field formatter
+ * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
+ */
+export type AnFieldFormatter = ((col: TierCol, colIndx: number)=> AnRow);
+
+/**TODO (list) row formatter
+ * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
+ */
+export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> JSX.Element);
 
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact
@@ -71,7 +86,7 @@ export class AnReact {
 			};
 
 		let {req} = qmsg;
-		this.client.an.post(req, onload, { onErr: (c, resp) => {
+		this.client.an.post(req, onload, { onError: (c, resp) => {
 			if (errCtx) {
 				errCtx.hasError = true;
 				errCtx.code = c;
@@ -228,29 +243,32 @@ export class AnReactExt extends AnReact {
 	 * @return this
 	 */
 	dataset(ds: DatasetOpts, onLoad: OnCommitOk, errCtx?: ErrorCtx): AnReactExt {
-		let ssInf = this.client.ssInf;
+		// let ssInf = this.client.ssInf;
 		let {uri, sk, sqlArgs, t, rootId} = ds;
 		sqlArgs = sqlArgs || [];
 		let port = ds.port ||'dataset';
 
 		let reqbody = new DatasetReq({
 				uri,
+				mtabl: undefined,
 				sk,
 				sqlArgs,
 				rootId
 			})
 			.TA(t || stree_t.query);
-		let jreq = this.client.userReq(uri, port, reqbody);
+		let jreq = this.client.userReq(uri, port, reqbody, undefined);
 
-		this.client.an.post(jreq, onLoad, (c, resp) => {
-			if (errCtx) {
-				// errCtx.hasError = true;
-				// errCtx.code = c;
-				errCtx.msg = resp.Body().msg();
-				errCtx.onError(c, resp);
-			}
-			else console.error(c, resp);
-		});
+		this.client.an.post(jreq, onLoad, this.errCtx
+		// 	(c, resp) => {
+		// 	if (errCtx) {
+		// 		// errCtx.hasError = true;
+		// 		// errCtx.code = c;
+		// 		errCtx.msg = resp.Body().msg();
+		// 		errCtx.onError(c, resp);
+		// 	}
+		// 	else console.error(c, resp);
+		// }
+		);
 		return this;
 	}
 
@@ -327,7 +345,9 @@ export class AnReactExt extends AnReact {
 	 * @param errCtx error handling context
 	 * @return {AnReactExt} this
 	 */
-	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs: string[]; nv: {n: string, v: string}; cond: any; onDone: OnCommitOk; noAll: boolean; },
+	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs: string[];
+				  nv: {n: string, v: string};
+				  cond: any; onDone: OnCommitOk; noAll: boolean; },
 		errCtx?: ErrorCtx) {
 		let {uri, sk, sqlArgs, nv, cond, onDone, noAll} = opts;
 		if (!uri)
@@ -356,8 +376,8 @@ export class AnReactExt extends AnReact {
 				cond.loading = false;
 				cond.clean = true;
 
-				if (compont)
-					compont.setState({});
+				// if (compont)
+				// 	compont.setState({});
 
 				if (onDone)
 					onDone(cond);

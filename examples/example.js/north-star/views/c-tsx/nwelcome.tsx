@@ -29,7 +29,7 @@ class WelcomeComp extends React.Component<WelcomeProp, any, any> {
 
     getCards(classes: WelcomeClasses) {
       return (
-        <Grid container >{this.tier.rows.map( (r, rx: number) => 
+        <Grid container >{this.tier.rows.map( (r, rx: number) =>
             this.getCard(classes, r, rx)
         )}</Grid>);
     }
@@ -43,7 +43,7 @@ class WelcomeComp extends React.Component<WelcomeProp, any, any> {
             <Typography className={classes.pusherText} >{avatar(r.pusher, r.css, {})}{r.pusher}</Typography>
           </Card>
           </Grid>);
-        
+
         function cardText(classes: WelcomeClasses, msg: string) {
             return msg?.split('\n').map( (ln, lx) => {
                 return <Typography key={lx} className={classes.cardText}>{ln}</Typography>
@@ -60,7 +60,7 @@ class WelcomeComp extends React.Component<WelcomeProp, any, any> {
     render() {
         const { classes } = this.props;
         const c = this.getCards(classes as WelcomeClasses);
-        return <Paper className={classes.board}>{c}</Paper>; 
+        return <Paper className={classes.board}>{c}</Paper>;
     }
 }
 WelcomeComp.contextType = AnContext;
@@ -77,9 +77,9 @@ interface CardCss {
     icon: string;
 }
 /**
- * 
- * @param theme 
- * @returns 
+ *
+ * @param theme
+ * @returns
  */
 const styles = (theme: Theme) => (Object.assign(
 	Semantier.invalidStyles as any,
@@ -158,10 +158,10 @@ export function welcome(sysComp: typeof SysComp, props: WelcomeProp) {
 
 /**
  * Create an svg avatar.
- * @param pusher 
- * @param css 
+ * @param pusher
+ * @param css
  * @param props how about fill attributes?
- * @returns 
+ * @returns
  */
 function avatar(pusher: string, css: CardCss, props: object): JSX.Element | void {
     if (css?.icon === 'Send')

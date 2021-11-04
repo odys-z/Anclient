@@ -68,7 +68,7 @@ export class ServHelper {
                 }
             }
         }
-        throw new AnprismException("Can't setup webroot. Any pwa-chrome type in launch.json?");
+        throw new AnprismException("Can't setup webroot. See readme for launch.json configuration.");
 	}
 
     public resolvEnv(s: string, val: {workspaceFolder: string}): string {
@@ -83,21 +83,6 @@ export class ServHelper {
 	 * @param page
 	 * @returns
 	 */
-	// public url(page: Page): {url: string, sub: string} {
-    //     let sub = path.relative(this.webrootPath(), page.html.fsPath);
-	// 	const url = `http://${page.host}:${page.port}/${sub}?n=${getNonce()}`;
-    //     console.log(url);
-    //     return {url, sub};
-
-    //     function getNonce() {
-    //         let text = '';
-    //         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //         for (let i = 0; i < 32; i++) {
-    //             text += possible.charAt(Math.floor(Math.random() * possible.length));
-    //         }
-    //         return text;
-    //     }
-	// }
 	public url(page: Page): {url: string, sub: string} {
         let sub = path.relative(this.webrootPath(), page.html.fsPath);
         let subfile = path.basename(sub, ".html");
