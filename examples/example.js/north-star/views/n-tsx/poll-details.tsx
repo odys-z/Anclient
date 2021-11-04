@@ -11,9 +11,8 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card/Card';
 
-import { AnlistColAttrs, Tierec, Protocol, Semantier } from '@anclient/semantier-st';
-import { L, AnContext, ConfirmDialog
-} from '@anclient/anreact';
+import { Tierec, Protocol, Semantier } from '@anclient/semantier-st';
+import { L, AnContext, ConfirmDialog } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
@@ -82,11 +81,12 @@ class PollDetailsComp extends Anform<CardsFormProp> {
 
 	componentDidMount() {
 		if (this.tier.pkval) {
-			let that = this;
-			this.tier.record(undefined, // use tier.pkval
-				(_cols, rows) => {
-					that.setState({record: rows[0]});
-				} );
+			// Only CardForm needing to load records
+			// let that = this;
+			// this.tier.record(undefined, // use tier.pkval
+			// 	(_cols, rows) => {
+			// 		that.setState({record: rows[0]});
+			// 	} );
 		}
 	}
 

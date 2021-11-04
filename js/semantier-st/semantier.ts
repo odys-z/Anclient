@@ -3,12 +3,19 @@ import { Protocol, stree_t,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq
 } from "./protocol";
 
-const { CRUD } = Protocol;
-
 // not working
 // https://stackoverflow.com/a/45257357/7362888
 // const codes = Object.keys(MsgCode);
 // type Protocode = typeof codes[number];
+const { CRUD } = Protocol;
+
+export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+/**<p>UI element formatter</p>
+ * E.g. TRecordForm will use this to format a field in form.
+ * User should override this to return UI element, e.g. JSX.Element for React render(). 
+ */
+export type AnElemFormatter = ((col: TierCol, colIndx: number)=> any);
 
 export interface ErrorCtx {
 	msg?: undefined | string | Array<string>;
@@ -16,8 +23,6 @@ export interface ErrorCtx {
 		/**MsgCode need to be re-defined */
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
-
-export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export interface AnlistColAttrs {
     disabled?: boolean;
@@ -188,14 +193,14 @@ export class Semantier {
      * @param modifier.field user provided modifier to change column's style etc.
      * callback function signature: (col, index) {} : return column's properties.
      */
-	 columns (modifier?: {[x: string]: AnlistColAttrs | AnFieldFormatter}): Array<AnlistColAttrs> {
+	 columns (modifier?: {[x: string]: AnlistColAttrs | AnElemFormatter}): Array<AnlistColAttrs> {
 		if (!this._cols)
 			throw Error("_cols are not provided by child tier.");
 
 		if (modifier)
 			return this._cols.map( (c, x) =>
 				typeof modifier[c.field] === 'function' ?
-						{...c, ...(modifier[c.field] as AnFieldFormatter)(c, x) } :
+						{...c, ...(modifier[c.field] as AnElemFormatter)(c, x) } :
 						{...c, ...modifier[c.field]}
 			);
 		else
@@ -206,7 +211,7 @@ export class Semantier {
      * @param {object} modifier {field, function | object }
      * @param {object | function} modifier.field see #columns().
      */
-	 fields (modifier?: {[x: string]: AnlistColAttrs | AnFieldFormatter}): Array<TierCol> {
+	 fields (modifier?: {[x: string]: AnlistColAttrs | AnElemFormatter}): Array<TierCol> {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 
@@ -216,7 +221,7 @@ export class Semantier {
 			return this._fields.map( (c, x) => {
 				let disabled = c.disabled || c.field === that.pk && that.pkval ? true : false;
 				return typeof modifier[c.field] === 'function' ?
-						{...c, ...(modifier[c.field] as AnFieldFormatter)(c, x), disabled } :
+						{...c, ...(modifier[c.field] as AnElemFormatter)(c, x), disabled } :
 						{...c, ...modifier[c.field], disabled}
 			} );
 		else

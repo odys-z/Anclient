@@ -15,6 +15,7 @@ import {
 
 import { CrudCompW, Comprops } from '../../common/north';
 import { PollDetails } from './poll-details';
+import { TabGuardComp } from 'ag-grid-community';
 
 const { JsampleIcons } = jsample;
 
@@ -22,7 +23,8 @@ export interface PollsProp extends Comprops {
     readonly classes: {
         funcName?: string;
         crudButton: string;
-		list: string };
+		list: string;
+		smalltip?: string; };
 };
 
 
@@ -33,6 +35,10 @@ const styles = (theme: Theme) => (Object.assign(
 	},
 	funcName: {
 		fontSize: "1.4em",
+	},
+	smalltip: {
+		fontSize: "0.8em",
+		color: "#21217d"
 	}
 } ));
 
@@ -176,7 +182,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 					className={classes.crudButton} onClick={this.toStop}
 					startIcon={<JsampleIcons.DetailPanel />}
 				>{L('Stop Poll')}</Button>
-				<Button variant="contained" disabled={!btn.stop}
+				<Button variant="contained" disabled={!btn.edit}
 					className={classes.crudButton} onClick={this.toShowDetails}
 					startIcon={<JsampleIcons.Add />}
 				>{L('Details')}</Button>
@@ -186,7 +192,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 					startIcon={<JsampleIcons.Delete />}
 				>{L('Setup Users')}</Button>*/}
 			</Grid>
-
+			<Typography className={classes.smalltip}>A quiz may have multiple records here.</Typography>
 			{this.tier && <AnTablist
 				className={classes.list} checkbox={true} pk={this.tier.pk}
 				columns={this.tier.columns(undefined)}
@@ -223,9 +229,7 @@ class PollsTier extends Semantier {
         // { label: L('Subject'),   field: "subject",style: {color: 'primary'} }
 	] as TierCol[];
 
-	pk = 'pid';
-
-	// poll: any;
+	pk = 'qid';
 
     constructor(comp: PollsComp) {
         super(comp);
@@ -289,14 +293,11 @@ class PollsTier extends Semantier {
 			return;
 		}
 
-		// let opt = { };
-		// opt[NPollsReq.pid] = pkval;
-
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, 'npolls',
-					new NPollsReq( this.uri, {pid: pkval} )
+		let req = client.userReq( this.uri, 'npolls',
+					new NPollsReq( this.uri, {quizId: pkval} )
 					.A(NPollsReq.A.pollCards) );
 
 		console.log(req);
@@ -309,12 +310,15 @@ class PollsTier extends Semantier {
 			},
 			this.errCtx);
 	}
-
-
 }
 
 interface PollQueryConditions extends QueryConditions {
-	pid?: string;
+	quizId?: string;
+	title?: string;
+	tag?: string;
+	userId?: string;
+	pollState?: 'done' | 'poll' | '' | undefined;
+	pollId?: string;
 }
 
 /**The poll request message body */
@@ -341,13 +345,13 @@ class NPollsReq extends AnsonBody {
 
 	static _type = "io.oz.ever.conn.n.poll.NPollsReq";
 
-	/**Poll Id */
-	pid: string;
+	/**quiz Id */
+	quizId: string;
 
 	constructor(uri: string, condts: PollQueryConditions) {
 		super({type: NPollsReq._type, uri});
 
-		this.pid = condts.qid;
+		this.quizId = condts.quizId;
 	}
 
 }
@@ -360,6 +364,10 @@ class NPollsResp extends AnsonResp {
 		super(jsonBd);
 
 		this.polls = jsonBd.polls;
+	}
+
+	Rs(rsx = 0) {
+		return this.polls;
 	}
 }
 
