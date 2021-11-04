@@ -79,7 +79,6 @@ class PollsComp extends CrudCompW<PollsProp> {
 		console.log('Polls TSX', this.uri);
 		this.tier = new PollsTier(this);
 		this.tier.setContext(this.context);
-		// this.toSearch();
 	}
 
 	toSearch(condts?: QueryConditions) {
@@ -117,6 +116,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 	}
 
     toShowDetails(e: React.UIEvent): void {
+		this.tier.pkval = this.getByIx(this.state.selected.ids, 0);
         this.detailsForm = (
             <PollDetails uri={this.uri}
 				tier={this.tier}
@@ -125,24 +125,25 @@ class PollsComp extends CrudCompW<PollsProp> {
     }
     
 	toStop(e: React.UIEvent) {
+		let ids = this.state.selected.ids;
 		let that = this;
 		this.tier.pollsUsers(this.uri,
-			{pollIds: this.state.selected.ids},
+			{pollIds: ids},
 			( (users) => {
 				console.log(users);
 				let txt = L('Totally {count} polls, {users} users will be updated. Are you sure?',
-							{ count: that.state.selected.ids.size,
+							{ count: ids.size,
 							  users: users.Body().msg() });
 				that.confirm =
 					(<ConfirmDialog open={true}
 						ok={L('OK')} cancel={true}
 						title={L('Info')} msg={txt}
 						onOk={ () => {
-								that.tier.stopolls(this.uri, Array.from(that.state.selected.ids),
+								that.tier.stopolls(this.uri, this.getByIx(ids),
 									( rsp => { that.confirm = undefined; } )); // make sure it's an array
 						 	}
 						}
-						onClose={ () => {that.confirm === undefined} }
+							onClose={ () => {that.confirm === undefined} }
 					/>);
 				that.setState( {} );
 			}) );
@@ -223,13 +224,15 @@ class PollsTier extends Semantier {
 
 	pk = 'pid';
 
-	_query: QueryConditions;
+	query: QueryConditions;
+
+	poll: any;
 
     constructor(comp: PollsComp) {
         super(comp);
 
 		Protocol.registerBody(NPollsReq._type,
-			(jsonBd: any) => { return new NPollsReq(this.uri, this._query); });
+			(jsonBd: any) => { return new NPollsReq(this.uri, this.query); });
 
 		Protocol.registerBody(NPollsResp._type,
 			(jsonBd: any) => { return new NPollsResp(jsonBd); });
@@ -261,7 +264,7 @@ class PollsTier extends Semantier {
 		console.log(req);
 		client.commit(req,
 			(resp: AnsonMsg<NPollsResp>) => {
-				let {cols, rows} = AnsonResp.rs2arr(resp.Body().polls);
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
 				that.resetFormSession();
 				onLoad(cols, rows);
