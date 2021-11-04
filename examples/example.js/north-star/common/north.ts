@@ -11,7 +11,11 @@ export interface FieldMeta {
 	disabled?: boolean;
 }
 
-export interface MediaMeta { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs: boolean; isXl?: boolean; }
+export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs: boolean; isXl?: boolean; }
+
+export interface AnMUIClasses {
+	[c: string]: string;
+}
 
 /** App North's props */
 export interface Northprops {

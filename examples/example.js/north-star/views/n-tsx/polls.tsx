@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { Grid, Button, Theme, Typography } from '@material-ui/core';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
-	OnCommitOk, OnLoadOk, QueryConditions, AnlistCol
+	OnCommitOk, OnLoadOk, QueryConditions, TierCol
 } from "@anclient/semantier-st";
 
 import {
@@ -106,7 +106,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 	}
 
 	onTableSelect(rowIds: string[]) {
-		this.tier.selectedIds = rowIds;
+		// this.state.selected.ids = rowIds;
 		this.setState( {
 			buttons: {
 				start: this.state.buttons.start,
@@ -221,11 +221,11 @@ class PollsTier extends Semantier {
         { label: L('Users'),     field: "users",  css: {color: 'primary'} },
         { label: L('Status'),    field: "state",  css: {color: 'primary'} },
         // { label: L('Subject'),   field: "subject",style: {color: 'primary'} }
-	] as AnlistCol[];
+	] as TierCol[];
 
 	pk = 'pid';
 
-	poll: any;
+	// poll: any;
 
     constructor(comp: PollsComp) {
         super(comp);
@@ -273,12 +273,15 @@ class PollsTier extends Semantier {
 
 	/**
 	 * Load poll of pid (many cards, each for different user)
-	 * @param pkval poll id
+	 * @param opts
+	 * @param opts.pkval poll id
 	 * @param onLoad
 	 * @returns
 	 */
-    record(pkval: string, onLoad: OnLoadOk) {
+    record(opts, onLoad: OnLoadOk) {
 		if (!this.client) return;
+
+		let pkval = opts;
 
 		pkval = pkval || this.pkval ;
 		if (!pkval) {

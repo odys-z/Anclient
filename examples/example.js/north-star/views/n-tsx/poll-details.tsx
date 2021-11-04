@@ -17,7 +17,7 @@ import { L, AnContext, ConfirmDialog
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
-import { Anform, FormProp } from '../../common/north';
+import { Anform, AnMUIClasses, FormProp, Media } from '../../common/north';
 import { CardsForm } from './card-form';
 
 const { CRUD } = Protocol;
@@ -127,13 +127,8 @@ class PollDetailsComp extends Anform<CardsFormProp> {
 			<DialogContent className={classes.content}>
 			  {/* <Box className={classes.smalltip}>
 				  {L('Tip: Document can been replaced by uploading another file.')}
-<<<<<<< HEAD
-			  </Box>
-			  <DefaultCardList uri={this.props.uri}
-=======
 			  </Box> */}
 			  <CardsForm uri={this.props.uri}
->>>>>>> master
 				  tier={this.tier}
 				  columns={this.tier.columns()}
 				  rows={this.tier.rows}

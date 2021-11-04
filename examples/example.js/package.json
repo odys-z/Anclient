@@ -33,7 +33,7 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
-    "@anclient/anreact": "^0.1.0",
+    "@anclient/anreact": "^0.3.24",
     "@anclient/semantier": "^0.9.20",
     "@anclient/semantier-st": "^0.9.23",
     "@emotion/babel-preset-css-prop": "^11.2.0",
