@@ -3,7 +3,7 @@ import { Protocol, stree_t,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq
 } from "./protocol";
 
-const { CRUD, MsgCode } = Protocol;
+const { CRUD } = Protocol;
 
 // not working
 // https://stackoverflow.com/a/45257357/7362888
@@ -11,10 +11,10 @@ const { CRUD, MsgCode } = Protocol;
 // type Protocode = typeof codes[number];
 
 export interface ErrorCtx {
-	msg: undefined | string | Array<string>;
+	msg?: undefined | string | Array<string>;
 	onError: (
 		/**MsgCode need to be re-defined */
-		code: string, resp: AnsonResp) => void
+		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -53,19 +53,6 @@ export interface TierComboField extends TierCol {
 	cbbStyle: {}; 
 }
 
-/**JSX.Element like row formatter results */
-export interface AnRow {
-}
-
-/**(Form) field formatter
- * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
- */
-export type AnFieldFormatter = ((col: TierCol, colIndx: number)=> AnRow);
-
-/**TODO (list) row formatter
- * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
- */
-export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> JSX.Element);
 
 /**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
 export interface QueryConditions {
@@ -76,6 +63,8 @@ export interface QueryConditions {
 export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
 /**Callback of CRUD.r */
 export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
+
+export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 
 /**
  * Not the same as java Semantext.
