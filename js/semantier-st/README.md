@@ -8,3 +8,15 @@
 
 Since v0.9.22, @anclient/semantier is deprecated, replaced by the typescript
 version, @anclient/semantier-st.
+
+# Memo
+
+- merge part of branches
+
+```
+    git diff master:js/semantier-st..tsx:js/semantier-st
+    git checkout master
+    git checkout --patch tsx semantier.ts
+```
+
+https://stackoverflow.com/a/11593308/7362888

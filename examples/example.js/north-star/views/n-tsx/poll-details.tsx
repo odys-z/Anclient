@@ -8,16 +8,17 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card/Card';
 
-import { Protocol, Semantier } from '@anclient/semantier-st';
+import { AnlistColAttrs, Tierec, Protocol, Semantier } from '@anclient/semantier-st';
 import { L, AnContext, ConfirmDialog
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
 import { Anform, FormProp } from '../../common/north';
-import { DefaultCardList } from './card-form';
+import { CardsForm } from './card-form';
 
 const { CRUD } = Protocol;
 
@@ -25,26 +26,44 @@ const styles = (theme: starTheme) => (Object.assign(
 	Semantier.invalidStyles as any, (theme: starTheme) => {
 		return ({
 			root: {},
+			cardGrid: {
+
+			},
 			card: {
 				margin: theme.spacing(2)
 			},
+			headCard: {
+
+			}
 		});
 	}
 ));
 
 /**
- * Tiered record form is a component for UI record layout, automaitcally bind data,
- * resolving FK's auto-cbb. As to child relation table, this component currently
- * is not planned to supprt.
- * <p>A kid always been saved as a "Dynamo"</p>
+ * Some parent controlled user actions, like SessionInf can be added here.
+ * This is a good example that a UI widget can be controlled via type checking.
  */
-class PollDetailsComp extends Anform {
+interface CardsFormProp extends FormProp {
+}
+
+/**
+ * Render multiple cards in a form - acctually using rows.
+ */
+class PollDetailsComp extends Anform<CardsFormProp> {
 	state = {
 		record: {},
 		crud: Protocol.CRUD.r,
 	};
 	tier: PollsTier;
-	confirm: JSX.Element;
+	confirm: typeof ConfirmDialog;
+
+	head(rec: Tierec, x: number, classes: AnMUIClasses, media: Media) {
+		return <Card key={x} className={classes.headCard}>{rec.Title}</Card>;
+	}
+
+	card(rec: Tierec, x: number, classes: AnMUIClasses, media: Media) {
+		return <Grid key={x} item className={classes.cardGrid} >{rec.Title}</Grid>;
+	}
 
 	constructor (props : FormProp) {
 		super(props);
@@ -106,14 +125,20 @@ class PollDetailsComp extends Anform {
 				{title}
 			</DialogTitle>
 			<DialogContent className={classes.content}>
-			  <Box className={classes.smalltip}>
+			  {/* <Box className={classes.smalltip}>
 				  {L('Tip: Document can been replaced by uploading another file.')}
+<<<<<<< HEAD
 			  </Box>
 			  <DefaultCardList uri={this.props.uri}
+=======
+			  </Box> */}
+			  <CardsForm uri={this.props.uri}
+>>>>>>> master
 				  tier={this.tier}
-				  fields={this.tier.fields({
-					  pid: {grid: {sm: 3, md: 2}},
-					  mime: {grid: {sm: 4, md: 3}} })}
+				  columns={this.tier.columns()}
+				  rows={this.tier.rows}
+				  headFormatter={this.head}
+				  CardsFormatter={this.card}
 			  />
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
@@ -130,17 +155,6 @@ class PollDetailsComp extends Anform {
 	}
 }
 PollDetailsComp.contextType = AnContext;
-
-/**using type check instead of runtime check
-PollDetailsComp.propTypes = {
-	uri: PropTypes.string.isRequired,
-	tier: PropTypes.object.isRequired,
-	crud: PropTypes.string,
-	c: PropTypes.bool,
-	u: PropTypes.bool,
-	dense: PropTypes.bool
-};
- */
 
 const PollDetails = withWidth()(withStyles(styles)(PollDetailsComp));
 export { PollDetails, PollDetailsComp };

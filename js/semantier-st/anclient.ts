@@ -682,12 +682,11 @@ class SessionClient {
 	 */
 	deleteMulti(uri: string, mtabl: string, pkn: string, pks: Array<any>): AnsonMsg<UpdateReq> {
 		let upd = new UpdateReq(uri, mtabl, undefined)
-			// .whereCond('in', pkn, pkvals);
 			.whereIn(pkn, pks);
 		upd.a = Protocol.CRUD.d;
 		this.currentAct.cmd = 'delete';
 
-		var jmsg = this.userReq(undefined,
+		var jmsg = this.userReq(uri,
 				'update', // Protocol.Port.update,
 				upd, this.currentAct);
 		return jmsg;
