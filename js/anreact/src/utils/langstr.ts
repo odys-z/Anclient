@@ -1,5 +1,6 @@
 import $ from 'jquery';
 
+export interface StrResource {[x: string]: string };
 /**
  * A dynamic extending {string-key: parameterized-instance} translation mapper.
  * function:
@@ -10,8 +11,8 @@ import $ from 'jquery';
 export const Langstrs = {
 	s: {
 		'en': new Set<string>(),
-		'zh': {} as {[k: string]: string },
-		'ja': {} as {[k: string]: string },
+		'zh': {} as StrResource,
+		'ja': {} as StrResource,
 	},
 
 	lang: 'en',
