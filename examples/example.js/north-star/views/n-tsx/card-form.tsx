@@ -9,15 +9,15 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card/Card';
 
-import { TierCol, AnRowFormatter, TierComboField, Semantier } from '@anclient/semantier-st';
+import { TierCol, TierComboField, Semantier, AnElemFormatter, Tierec } from '@anclient/semantier-st';
 import { L, toBool, DatasetCombo } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
-import { CrudCompW, FormProp } from '../../common/north';
+import { CrudCompW, FormProp, Media } from '../../common/north';
 
 export interface CardsFormProp extends FormProp {
-	headFormatter?: AnRowFormatter;
-	CardsFormatter?: AnRowFormatter;
+	headFormatter?: (rec: Tierec, cols: Array<any>, classes: {[c: string]: string}, media: Media) => JSX.Element;
+	CardsFormatter?: (rows: Array<Tierec>, classes: {[c: string]: string}, media: Media) => JSX.Element;
 };
 
 const styles = (theme: starTheme) => (Object.assign(
@@ -146,7 +146,7 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 
 		this.tier.fields().forEach( (f, i) => {
 		  if (!!f.visible) {
-			f.formatter = (rec: any) => (<>{rec[f.field]}</> as JSX.Element);
+			f.formatter = (rec, x) => (<>{rec[f.field]}</> as JSX.Element);
 
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
@@ -186,7 +186,7 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 
 
 		return <>
-			{this.props.headFormatter(this.tier.rec, 0, classes, media)}
+			{this.props.headFormatter(this.tier.rec, this.tier.columns(), classes, media)}
 		  : <Grid container className={classes.root} direction='row'>
 				{this.cards(classes, media)}
 			</Grid>
@@ -199,7 +199,8 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 	// }
 
 	cards(classes: {[x: string] : any}, media: Media): React.ReactNode {
-		return this.tier.rows?.map( (r, x) => this.props.CardsFormatter(r, x, classes, media) );
+		// return this.tier.rows?.map( (r, x) => this.props.CardsFormatter(r, x, classes, media) );
+		return this.props.CardsFormatter(this.tier.rows, x, classes, media) );
 	}
 }
 

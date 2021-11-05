@@ -12,10 +12,10 @@ const { CRUD } = Protocol;
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 /**<p>UI element formatter</p>
- * E.g. TRecordForm will use this to format a field in form.
+ * E.g. Tablist will use this to format a cell in list.
  * User should override this to return UI element, e.g. JSX.Element for React render(). 
  */
-export type AnElemFormatter = ((col: TierCol, colIndx: number)=> any);
+export type AnElemFormatter = ((col: TierCol, colIndx: number, classes?: {[c: string]: string}, media?: any)=> any);
 
 export interface ErrorCtx {
 	msg?: undefined | string | Array<string>;
@@ -29,7 +29,7 @@ export interface AnlistColAttrs {
 	visible?: boolean;
     checkbox?: boolean;
     // formatter?: (col: AnlistCol) => string;
-    formatter?: (rec: {}) => string;
+    formatter?: AnElemFormatter;
     css?: {};
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	box?: {};
