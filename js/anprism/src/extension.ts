@@ -115,7 +115,8 @@ class AnPagePanel {
 		host: "localhost",
 		html: vscode.Uri.file("index.html"),
 		style: `background-color: #ccc`,
-		reload: false
+		reload: false,
+		devtool: false
 	};
 
 	// @type ServHelper
@@ -125,8 +126,15 @@ class AnPagePanel {
 		switch (message.command) {
 			case 'devtools-open':
 				vscode.commands.executeCommand(
-					'workbench.action.webview.openDeveloperTools'
+					'workbench.action.webview.openDeveloperTools',
+
+					// not working! Looks like Live Preview also doesn't handling close command.
+					// https://github.dev/microsoft/vscode-livepreview
+					// BrowserPreview#handleWebviewMessage()
+					AnPagePanel.currentPanel?.page.devtool
 				);
+
+				AnPagePanel.currentPanel!.page.devtool = !AnPagePanel.currentPanel?.page.devtool;
 				return;
 		}
 	}
