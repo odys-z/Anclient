@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { withStyles } from "@material-ui/core/styles";
 
 import { AnContext } from './reactext';
+import { FormControlProps, StandardProps } from '@material-ui/core';
+import { Media } from './anreact';
 
-export interface Comprops { }
+export interface Comprops extends StandardProps<FormControlProps, string> {
+}
+
+// export interface DialogProps extends Comprops {
+// 	onClose: () => void;
+// 	onCancel: () => void;
+// }
 
 const styles = (theme) => ( {
 	root: {
