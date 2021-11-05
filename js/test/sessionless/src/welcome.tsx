@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { withStyles } from '@material-ui/styles';
 import { Box, Card, IconButton, Link, Paper, Typography, withWidth } from '@material-ui/core';
 
-import { Semantier } from '@anclient/semantier-st';
+import { Semantier, Comprops } from '@anclient/semantier-st';
 import { CrudComp, jsample } from '@anclient/anreact';
 
 const styles = (theme) => ( {
@@ -31,9 +31,10 @@ const styles = (theme) => ( {
 	}
 });
 
-class WelcomeComp extends CrudComp {
+class WelcomeComp extends CrudComp<Comprops>{
 	tier: WelcomeTier;
 	classes: any;
+	uri: any;
 
 	constructor(props: {classes: any, uri: string}) {
 		super(props);

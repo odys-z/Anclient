@@ -37,7 +37,7 @@ class AnClient {
 		defaultServ: string;
 	};
 
-	/**@param {string} serv serv path root, e.g. 'http://localhost/jsample'
+	/**@param urlRoot serv path root, e.g. 'http://localhost/jsample'
 	 */
 	constructor (urlRoot: string) {
 	 	this.cfg = {
@@ -46,7 +46,7 @@ class AnClient {
 	}
 
     /**Get port url of the port.
-     * @param {string} port the port name
+     * @param port the port name
      * @return the url
      */
 	servUrl (port: string) : string {

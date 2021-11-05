@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient } from '@anclient/semantier-st';
+import { Protocol, Inseclient, SessionClient } from '@anclient/semantier-st';
 
 import { Langstrs,
 	AnContext, AnError, AnReactExt,
@@ -59,6 +59,7 @@ class App extends React.Component<Props, State> {
 		this.state.jserv = this.props.servs[this.state.servId];
 
 		this.state.inclient = new Inseclient({urlRoot: this.state.jserv});
+		let ssclient = new SessionClient()
 
 		this.state.error = {onError: this.onError, msg: ''};
 

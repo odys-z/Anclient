@@ -44,7 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
 			if (AnPagePanel.currentPanel) {
 				AnPagePanel.currentPanel.startup();
 			}
-			else 
+			else
 				vscode.window.showInformationMessage('Sorry! Currently sever can only be started when Anprism loading a page!');
 		})
 	);
@@ -91,7 +91,7 @@ export function deactivate() {
  * refresh --------[  stop   ]-- show blank (error) page
  * close ----------[ running ]-- stop ------- dispose panel
  * shutdown -------------------- stop (panel lives longer than server)
- * 
+ *
  */
 class AnPagePanel {
 	static log: vscode.OutputChannel;
@@ -133,8 +133,8 @@ class AnPagePanel {
 
 	/**
 	 * Load a page, in current active column - creat panel if necessary.
-	 * @param extensionUri 
-	 * @returns 
+	 * @param extensionUri
+	 * @returns
 	 */
 	public static async load(context: vscode.ExtensionContext, localhtml: vscode.Uri) {
 		let p = AnPagePanel.currentPanel;
@@ -220,10 +220,10 @@ class AnPagePanel {
 	}
 
 	/**Can be used only once.
-	 * 
-	 * @param context 
-	 * @param panel 
-	 * @param serv 
+	 *
+	 * @param context
+	 * @param panel
+	 * @param serv
 	 */
 	constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, serv: ServHelper) {
 		// this.serv = new ServHelper(context);
@@ -269,7 +269,7 @@ class AnPagePanel {
 	}
 
 	/**Dispose Anprism panel not necessarily shutdown server  - can still debugging with js-debugger.
-	 * 
+	 *
 	 * Anserv lives longer than debugger, which is longer than panel.
 	 * The only way to shutdown anserv is the shutdown command or quit vscode.
 	 */
@@ -287,14 +287,6 @@ class AnPagePanel {
 		}
 	}
 
-	/**
-	 * Load the page, where page info is {@link AnPagePanel.page}.
-	private loadOnline() {
-		const webview = this._panel.webview;
-		this._panel.webview.html = this.getAnclientPage(this.page);
-	}
-	 */
-
 	refresh(newPage: vscode.Uri | undefined): void {
 		this._panel.webview.html = "";
 		this.page.html = newPage || this.page.html;
@@ -306,9 +298,9 @@ class AnPagePanel {
 	 * Load target page in iframe. See
 	 * vscode issue #70339:
 	 * https://github.com/microsoft/vscode/issues/70339
-	 * @param webview 
-	 * @param page 
-	 * @returns 
+	 * @param webview
+	 * @param page
+	 * @returns
 	 */
 	getAnclientPage(page: Page): string {
 		let {url, sub} = this.serv.url(page);
@@ -369,4 +361,3 @@ class AnPagePanel {
 	}
 
 }
-
