@@ -35,7 +35,6 @@ export interface Comprops {
     readonly width?: Breakpoint;
 };
 
-// export type WelcomeProp = Readonly<{ classes: {board: any}; sys: typeof SysComp } extends Comprops>;
 export interface WelcomeProp extends Comprops {
     readonly classes: { board: any }
     readonly sys: typeof SysComp
@@ -91,7 +90,7 @@ export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> 
 		super(props);
 
 		this.uri = props.match && props.match.path || props.uri;
-		if (!this.uri) 
+		if (!this.uri)
 			throw Error("Anreact CRUD component must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
 
 

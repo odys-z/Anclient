@@ -5,7 +5,18 @@ import { AnContext } from './reactext';
 import { FormControlProps, StandardProps } from '@material-ui/core';
 import { Media } from './anreact';
 
-export interface Comprops extends StandardProps<FormControlProps, string> {
+export interface Comprops extends StandardProps<any, string> {
+	/**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
+	uri: string;
+	/**The matching url in React.Route */
+	match?: {path: string};
+
+	/** CRUD */
+	urud = CRUD.r;
+	/** Semantier */
+	readonly tier: any;
+	readonly crud?: string;
+	readonly width?: Breakpoint;
 }
 
 // export interface DialogProps extends Comprops {
@@ -35,7 +46,7 @@ class CrudComp<T extends Comprops> extends React.Component<T> {
 	constructor(props) {
 		super(props);
 		this.uri = props.match && props.match.path || props.uri;
-		if (!this.uri) 
+		if (!this.uri)
 			throw Error("Anreact CRUD component must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
 	}
 

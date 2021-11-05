@@ -1,11 +1,9 @@
 import React, { MouseEventHandler } from 'react';
-import { ReactNode } from 'react';
 import { withStyles } from '@material-ui/styles';
 import { Box, Card, IconButton, Link, Paper, Typography, withWidth } from '@material-ui/core';
 
 import { Semantier } from '@anclient/semantier-st';
 import { Comprops, CrudComp, jsample } from '@anclient/anreact';
-import { DefaultComponentProps } from '@material-ui/core/OverridableComponent';
 
 const styles = (theme) => ( {
 	root: {
