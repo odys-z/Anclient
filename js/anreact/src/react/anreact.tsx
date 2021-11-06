@@ -1,8 +1,9 @@
 
+import $ from 'jquery';
 import { stree_t, Protocol, Tierec, TierCol,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	DatasetOpts, AnsonMsg, OnCommitOk
+	AnsonMsg, OnCommitOk, DatasetOpts
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
@@ -178,36 +179,42 @@ export class AnReact {
 	 * For test, have elem = undefined
 	 * @param {string} elem html element id, null for test
 	 * @param {object} opts {serv, home, parent window}
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.home='main.html'] system main page
-	 * @param {string} [opts.portal='index.html'] portal page
 	 * @param {function} onJsonServ function to render React Dom, i. e.
 	 * <pre>(elem, json) => {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
 	}</pre>
 	 */
-	// static bindDom(elem, opts = {}, onJsonServ) {
-	// 	// this.state.servId = serv;
-	// 	if (!opts.serv) opts.serv = 'host';
-	// 	if (!opts.home) opts.home = 'main.html';
+	static bindDom( elem: string, opts: {
+					/** not used */
+					portal?: string;
+					/** serv id */
+					serv?: string;
+					/** system main page */
+					home?: string;
+					/** path to json config file */
+					jsonUrl: string; },
+					onJsonServ: (elem: string, opts: object, json: object) => any) {
+		// this.state.servId = serv;
+		if (!opts.serv) opts.serv = 'host';
+		if (!opts.home) opts.home = 'main.html';
 
-	// 	if (typeof elem === 'string') {
-	// 		$.ajax({
-	// 			dataType: "json",
-	// 			url: opts.jsonUrl || 'private/host.json',
-	// 		})
-	// 		.done( (json) => onJsonServ(elem, opts, json) )
-	// 		.fail( (e) => {
-	// 			$.ajax({
-	// 				dataType: "json",
-	// 				url: 'github.json',
-	// 			})
-	// 			.done((json) => onJsonServ(elem, opts, json))
-	// 			.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
-	// 		} )
-	// 	}
-	// }
+		if (typeof elem === 'string') {
+			$.ajax({
+				dataType: "json",
+				url: opts.jsonUrl || 'private/host.json',
+			})
+			.done( (json) => onJsonServ(elem, opts, json) )
+			.fail( (e) => {
+				$.ajax({
+					dataType: "json",
+					url: 'github.json',
+				})
+				.done((json) => onJsonServ(elem, opts, json))
+				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
+			} )
+		}
+	}
 }
 
 /**Ectending AnReact with dataset & sys-menu, the same of layers extinding of jsample.
@@ -215,7 +222,7 @@ export class AnReact {
  */
 export class AnReactExt extends AnReact {
 
-	extendPorts(ports) {
+	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
 		return this;
 	}

@@ -20,17 +20,17 @@ module.exports = {
 	plugins: [ ],
 
 	resolve: {
-		extensions: ['*', '.js', '.jsx', '.tsx']
+		extensions: ['*', '.ts', '.js', '.tsx', '.jsx']
 	},
 
 	module: {
 		rules: [
-		{   test: /\.jsx$/,
+		{   test: /\.jsx?$/,
 			loader: 'babel-loader',
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
-		{ test: /\.tsx$/,
+		{ test: /\.tsx?$/,
 		  loader : 'babel-loader',
 		  options: { presets: [
 				'@babel/preset-react',

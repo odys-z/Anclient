@@ -1,11 +1,26 @@
-import React, { ComponentProps } from 'react';
+import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 
 import { AnContext } from './reactext';
-import { FormControlProps, StandardProps } from '@material-ui/core';
+import { StandardProps } from '@material-ui/core';
 import { Media } from './anreact';
+import { Protocol } from '@anclient/semantier-st/protocol';
+import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
+
+export interface ClassNames {[c: string]: string};
 
 export interface Comprops extends StandardProps<any, string> {
+	/**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
+	uri: string;
+	/**The matching url in React.Route */
+	match?: {path: string};
+
+	/** CRUD */
+	crud?: Protocol.CRUD;
+	/** Semantier */
+	classes?: ClassNames;
+	readonly tier: any;
+	readonly width?: Breakpoint;
 }
 
 // export interface DialogProps extends Comprops {
@@ -35,12 +50,12 @@ class CrudComp<T extends Comprops> extends React.Component<T> {
 	constructor(props) {
 		super(props);
 		this.uri = props.match && props.match.path || props.uri;
-		if (!this.uri) 
+		if (!this.uri)
 			throw Error("Anreact CRUD component must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
 	}
 
 	render() {
-		return (<>Base CrudComp Page</>);
+		return (<>CrudComp</>);
 	}
 }
 CrudComp.contextType = AnContext;
@@ -58,7 +73,7 @@ CrudComp.contextType = AnContext;
  * FIXME looks like in chrome responsive device mode simulator, withWidth() can't
  * get "width"?
  */
-class CrudCompW<T> extends CrudComp<T> {
+class CrudCompW<T extends Comprops> extends CrudComp<T> {
 	media: Media = {};
 
 	// TODO tasks to refactor. why not ts?
@@ -162,12 +177,12 @@ const CheapFlow = withStyles(styles)(CheapFlowComp);
  * To popup modal dialog, see
  * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
  */
-class DetailFormW<T extends Comprops> extends React.Component<T> {
+class DetailFormW<T extends Comprops> extends CrudComp<T> {
 	state = {
 	};
 	media: Media;
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 
 		let {width} = props;

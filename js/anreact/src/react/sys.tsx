@@ -37,7 +37,7 @@ import { AnContext } from './reactext';
 	import { parseMenus } from '../utils/helpers';
 
 import {
-	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow, Comprops 
+	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow, Comprops, ClassNames 
 } from './crud'
 import { ClassNameMap } from '@material-ui/styles';
 import { StandardProps } from '@material-ui/core';
@@ -45,7 +45,7 @@ import { StandardProps } from '@material-ui/core';
 export interface SysProps extends Comprops {
     /**Welcome page formatter */
     welcome?: (classes: ClassNameMap, context: typeof AnContext, comp: SysComp) => JSX.Element;
-    classes: {[x: string]: string};
+    // classes: {[x: string]: string};
     hrefDoc: string;
     onLogout: () => void;
     myInfo: JSX.Element | ((context: typeof AnContext) => JSX.Element);
@@ -308,7 +308,7 @@ class SysComp extends React.Component<SysProps, any, any> {
 	/**
 	 * @param {object} classes
 	 */
-	menuItems(classes: Classes) {
+	menuItems(classes: ClassNames) {
 		let that = this;
 
 		let m = this.state.sysMenu;

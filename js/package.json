@@ -24,6 +24,8 @@
     "tar": "^4.4.19"
   },
   "devDependencies": {
+    "@anclient/anreact": "^0.3.24",
+    "@anclient/semantier-st": "^0.9.27",
     "@babel/cli": "^7.15.4",
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",

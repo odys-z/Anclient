@@ -1,21 +1,19 @@
-// import $ from 'jquery';
 
 import React from 'react';
-	import ReactDOM from 'react-dom';
 	import { withStyles } from '@material-ui/core/styles';
 	import Collapse from '@material-ui/core/Collapse';
 	import Button from '@material-ui/core/Button';
 	import TextField from '@material-ui/core/TextField';
-	import FormControl from '@material-ui/core/FormControl';
 	import Box from '@material-ui/core/Box';
 
-import { Protocol } from '@anclient/semantier-st';
+import { AnClient, OnCommitOk, Protocol } from '@anclient/semantier-st';
 
 import { an, SessionClient } from '@anclient/semantier-st';
 	import {AnContext} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
 	import {L, Langstrs} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
+import { Comprops } from './crud';
 
 const styles = (theme) => Object.assign(jstyles(theme), {
 	root: {
@@ -23,11 +21,15 @@ const styles = (theme) => Object.assign(jstyles(theme), {
 	},
 });
 
+interface LoginProps extends Comprops {
+	onLogin: OnCommitOk;
+}
+
 /**
  * Anclinet logging-in component
  * @class
  */
-class LoginComp extends React.Component {
+class LoginComp extends React.Component<LoginProps> {
     state = {
 		loggedin: false,
 		show: true,  // show textarear or only "login"
@@ -40,17 +42,19 @@ class LoginComp extends React.Component {
 		errHandler: {}
     };
 
+	an: AnClient;
+	ssClient: SessionClient;
+
 	/**
 	 * initialize a instance of Anclient visition jserv service.
-	 * @param {object} props
-	 * @param {string} props.jserv e.g. "http://127.0.0.1:8080/jserv-quiz"); url to service root.
+	 * @param props
+	 * @param props.jserv e.g. "http://127.0.0.1:8080/jserv-quiz"); url to service root.
 	 * @constructor
 	 */
-	constructor(props) {
+	constructor(props: LoginProps) {
 		super(props);
 
-		this.props = props;
-		this.an = an.an;
+		this.an = an;
 
 		this.alert = this.alert.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -90,7 +94,7 @@ class LoginComp extends React.Component {
 			console.log("login url & serv-id: ", hosturl, serv);
 
 			an.init(hosturl);
-			an.login( uid, pwd, reload, onError );
+			an.login( uid, pwd, reload, {onError} );
 		}
 
 		function reload (client) {
@@ -160,7 +164,7 @@ class LoginComp extends React.Component {
 					id="pswd" label={L("Password")}
 					type="password" value={this.state.pswd}
 					autoComplete="new-password"
-					onKeyUp={(e, v) => {if (e.code === "Enter") that.onLogin();} }
+					onKeyUp={(e) => {if (e.code === "Enter") that.onLogin();} }
 					onChange={event => this.setState({pswd: event.target.value})} />
 				<Button className={classes.field2}
 					variant="contained"

@@ -1,3 +1,4 @@
+import { OnCommitOk, Tierec } from "@anclient/semantier-st/semantier";
 
 /**Json string options, like no-null: true for asking server replace null with ''.  */
 export interface JsonOptions {
@@ -49,11 +50,12 @@ export interface AttachMeta {
 }
 
 export interface AnResultset {
-	// length() : number;
-    results: any;
+	results: Array<Array<any>>;
+	length() : number;
+    // results: Array<any>;
+    total: number;
     // filter(arg0: (r: any) => boolean) : Array<{}>;
-    rs: Array<{}>;
-	total: number;
+    // rs: Array<{}>;
     colnames: {};
 }
 
@@ -79,7 +81,8 @@ class Jregex {
 /**Json protocol helper to support jclient.
  * All AnsonBody and JHelper static helpers are here. */
 export class Protocol {
-	static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
+	// static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
+
 	static Port = {	heartbeat: "ping.serv11",
 		echo: "echo.serv11", session: "login.serv11",
 		query: "r.serv11", update: "u.serv11",
@@ -111,7 +114,7 @@ export class Protocol {
 	 * @function
 	 * @param {object} newPorts
 	 */
-	static extend = function(newPorts: string) {
+	static extend = function(newPorts: {[p: string]: string}) {
 		Object.assign(Protocol.Port, newPorts);
 	};
 
@@ -229,6 +232,10 @@ export class Protocol {
 
 }
 
+export namespace Protocol {
+	export enum CRUD { c = 'I', r = 'R', u = 'U', d = 'D' };
+}
+
 export class AnsonMsg<T extends AnsonBody> {
 	type = "io.odysz.semantic.jprotocol.AnsonMsg";
 
@@ -243,7 +250,7 @@ export class AnsonMsg<T extends AnsonBody> {
 
 
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
-		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.total > 0) {
+		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length > 0) {
 			return AnsonResp.rsArr(resp.body, rx);
 		}
 		return [];
@@ -1050,8 +1057,8 @@ export class AnsonResp extends AnsonBody {
     code: string;
     Code(): string { return this.code };
 
-    rs: AnResultset; // | Array<AnResultset>;
-    Rs(rx = 0): AnResultset { return this.rs.total ? this.rs[rx] : this.rs; }
+    rs: AnResultset | Array<AnResultset>;
+    Rs(rx = 0): AnResultset { return this.rs.length ? this.rs[rx] : this.rs; }
 
     data: {props?: {}};
     getProp(prop: string): object { 
@@ -1108,39 +1115,44 @@ export class AnDatasetResp extends AnsonResp {
 	}
 }
 
+export interface DatasetOpts {
+	port: string;
+	/**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
+	uri: string;
+	/** semantic key configured in WEB-INF/dataset.xml */
+	sk: string;
+	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
+	t?: {
+		/** load dataset configured and format into tree with semantics defined by sk. */
+		sqltree: string;
+		/** Reformat the tree structure - reformat the 'fullpath', from the root */
+		retree: string;
+		/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+		reforest: string;
+		/** Query with client provided QueryReq object, and format the result into tree. */
+		query: string;
+	};
+	a?: string;
+	/**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
+	mtabl?: string;
+	mAlias?: string;
+	/** {page, size} page index and page size. */
+	pageInf?: PageInf;
+	/** tree root id */
+	rootId?: string;
+	/** sql args */
+	sqlArgs?: string[];
+	/** {{n, v}} ...opts more arguments for sql args. */
+	args?: object;
+
+	onOk?: OnCommitOk;
+};
+
 export class DatasetReq extends QueryReq {
     /**
      * @param opts this parameter should be refactored 
      */
-    constructor(opts?: {
-        /**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
-        uri: string;
-        /** semantic key configured in WEB-INF/dataset.xml */
-        sk: string;
-        /** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
-        t?: {
-            /** load dataset configured and format into tree with semantics defined by sk. */
-            sqltree: string;
-            /** Reformat the tree structure - reformat the 'fullpath', from the root */
-            retree: string;
-            /** Reformat the forest structure - reformat the 'fullpath', for the entire table */
-            reforest: string;
-            /** Query with client provided QueryReq object, and format the result into tree. */
-            query: string;
-        };
-        a?: string;
-        /**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
-        mtabl: string;
-        mAlias?: string;
-        /** {page, size} page index and page size. */
-        pageInf?: PageInf;
-        /** tree root id */
-        rootId?: string;
-        /** sql args */
-        sqlArgs?: string[];
-        /** {{n, v}} ...opts more arguments for sql args. */
-        args?: object;
-    } ) {
+    constructor(opts?: DatasetOpts ) {
 
 		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
 

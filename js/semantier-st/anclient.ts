@@ -8,7 +8,9 @@ import {
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
 	LogAct, AnsonBody, JsonOptions, UserReq
 } from './protocol';
-import { ErrorCtx, OnCommitErr, OnCommitOk } from './semantier';
+import { ErrorCtx, OnCommitOk } from './semantier';
+
+export interface AjaxOptions {async?: boolean; timeout?: number}
 
 interface AjaxReport {
 	statusText: string;
@@ -80,7 +82,7 @@ class AnClient {
      * This function must been callded to extned port's names.
      * @param new Ports
      * @return this */
-	understandPorts (newPorts: string) : this {
+	understandPorts (newPorts: { [p: string]: string; }) : this {
 		// Object.assign(Protocol.Port, newPorts);
 		Protocol.extend(newPorts);
         return this;
@@ -162,7 +164,7 @@ class AnClient {
      * @param onOk
      * @param onErr function (MsgCode, AnsonResp?)
      * @param ajaxOpts */
-	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk, onErr: ErrorCtx, ajaxOpts? : {async?: boolean; timeout?: number}) {
+	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
 		if (jreq === undefined) {
 			console.error('jreq is null');
 			return;
@@ -179,7 +181,7 @@ class AnClient {
 		}
 		var url = this.servUrl(jreq.port);
 
-		var async =  true;
+		var async = true;
 		if (ajaxOpts !== undefined && ajaxOpts !== null) {
 			async = ajaxOpts.async !== false;
 		}
@@ -191,9 +193,8 @@ class AnClient {
 			contentType: "application/json; charset=utf-8",
 			crossDomain: true,
             async: async,
-			//xhrFields: { withCredentials: true },
 			data: JSON.stringify(jreq),
-			timeout: ajaxOpts.timeout || 18000,
+			timeout: ajaxOpts?.timeout || 18000,
 			success: function (resp: AnsonMsg<AnsonResp>) {
 				// response Content-Type = application/json;charset=UTF-8
 				if (typeof resp === 'string') {
@@ -271,9 +272,9 @@ class AnClient {
 	}
 
     /**Async-await style posting a request, using Ajax.
-     * @param {AnsonMsg} jreq
-     * @param {object} [ajaxOpts] */
-	postWait(jreq, ajaxOpts = null) {
+     * @param jreq
+     * @param ajaxOpts */
+	postWait(jreq: AnsonMsg<AnsonBody>, ajaxOpts : AjaxOptions) {
 		let me = this;
 		return new Promise((resolve, reject) => {
 			me.post(jreq,

@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { SessionClient } from '@anclient/semantier';
+import { SessionClient } from '@anclient/semantier-st';
 import { AnContext, AnError, AnReact, Login } from '@anclient/anreact';
 
 const styles = (theme) => ({

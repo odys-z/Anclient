@@ -1,12 +1,14 @@
+import { Inseclient, SessionClient } from '@anclient/semantier-st/anclient';
 import React from 'react';
 
 import {L} from '../utils/langstr';
+import { AnReact } from './anreact';
 import { Comprops, CrudCompW } from './crud';
 import {ConfirmDialog} from './widgets/messagebox'
 
 export const AnContext = React.createContext({
 	/**	Anclient */
-	an: undefined,
+	// an: undefined,
     /**@type = SessionIfn */
 	ssInf: undefined,
 
@@ -14,10 +16,10 @@ export const AnContext = React.createContext({
 	iparent: {},    // usually the parent window of ifram
 	ihome: '',
 	servId: 'host',
-	// servs: { host: 'http://localhost:8080/jserv-sample' },
 	servs: { host: 'http://localhost:8080' },
 
-	anReact: undefined,
+	anClient: undefined as typeof SessionClient | Inseclient,
+	anReact: undefined as typeof AnReact,
 
 	// error handling pattern like
 	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
@@ -28,18 +30,12 @@ export const AnContext = React.createContext({
 	},
 	hasError: false,
 
-	// setServ: function(servId: string, json: {host: string, [key: string]: string}) {
-	// 	let me = AnContext;
-	// 	me.servs = Object.assign(me.servs, json);
-	// 	me.servId = servId ? servId : 'host';
-	// },
-
-	uuid: function() {
-		return ++ _uid_;
-	}
+	// uuid: function() : string {
+	// 	return (++ _uid_).toString();
+	// }
 });
 
-var _uid_ = 0;
+// var _uid_ = 0;
 
 export interface ErrorProps extends Comprops {
     onClose: () => void;
