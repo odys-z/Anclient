@@ -5,7 +5,7 @@ import { AnContext } from './reactext';
 import { FormControlProps, StandardProps } from '@material-ui/core';
 import { Media } from './anreact';
 
-export interface Comprops extends StandardProps<FormControlProps, string> {
+export interface Comprops extends StandardProps<any, string> {
 }
 
 // export interface DialogProps extends Comprops {

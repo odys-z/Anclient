@@ -40,6 +40,7 @@ import {
 	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow, Comprops 
 } from './crud'
 import { ClassNameMap } from '@material-ui/styles';
+import { StandardProps } from '@material-ui/core';
 
 export interface SysProps extends Comprops {
     /**Welcome page formatter */
@@ -307,7 +308,7 @@ class SysComp extends React.Component<SysProps, any, any> {
 	/**
 	 * @param {object} classes
 	 */
-	menuItems(classes) {
+	menuItems(classes: Classes) {
 		let that = this;
 
 		let m = this.state.sysMenu;
