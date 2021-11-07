@@ -151,7 +151,7 @@ export class Semantier {
 
     disableValidate: any;
 
-    validate(rec: {}, fields: Array<TierCol>): boolean {
+    validate(rec?: {}, fields?: Array<TierCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);

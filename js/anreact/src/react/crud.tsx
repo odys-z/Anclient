@@ -1,17 +1,17 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+// import { withStyles } from "@material-ui/core/styles";
+import { StandardProps, withStyles } from '@material-ui/core';
 
 import { AnContext } from './reactext';
-import { StandardProps } from '@material-ui/core';
 import { Media } from './anreact';
-import { Protocol } from '@anclient/semantier-st/protocol';
+import { Protocol } from '@anclient/semantier-st';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 export interface ClassNames {[c: string]: string};
 
 export interface Comprops extends StandardProps<any, string> {
 	/**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
-	uri: string;
+	readonly uri?: string;
 	/**The matching url in React.Route */
 	match?: {path: string};
 

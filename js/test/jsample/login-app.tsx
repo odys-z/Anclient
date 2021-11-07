@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import React from 'react';
+import { StandardProps } from '@material-ui/core';
 import ReactDOM from 'react-dom';
 import { SessionClient } from '@anclient/semantier-st';
 import { AnContext, AnError, AnReact, Login } from '@anclient/anreact';
@@ -10,20 +11,29 @@ const styles = (theme) => ({
 	},
 });
 
+interface LoginProps extends StandardProps<any, string> {
+};
+
 /** The application main, context singleton and error handler, but only for login
  * used in iframe (no origin change). */
-class LoginApp extends React.Component {
+class LoginApp extends React.Component<LoginProps> {
 	state = {
 		anClient: undefined,
 		hasError: false,
 		home: 'index.html',
+		servId: 'host',
 	};
+
+	servId: string;
+
+	/** jserv root url */
+	jserv: string;
 
 	constructor(props) {
 		super(props);
 
-		this.state.servId = props.servId ? props.servId : 'host';
-		this.state.jserv = props.servs ? props.servs[this.state.servId] : undefined,
+		this.servId = props.servId ? props.servId : 'host';
+		this.jserv = props.servs ? props.servs[this.servId] : undefined,
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -38,15 +48,15 @@ class LoginApp extends React.Component {
 	onErrorClose() {
 	}
 
-	onLogin(client) {
-		SessionClient.persistorage(client.ssInf);
+	onLogin(clientInf: { ssInf: { home: string; }; }) {
+		SessionClient.persistorage(clientInf.ssInf);
 		if (this.props.iparent) {
-			let mainpage = client.ssInf.home || this.props.ihome;
+			let mainpage = clientInf.ssInf.home || this.props.ihome;
 			if (!mainpage)
 				console.error('Login succeed, but no home page be found.');
 			else {
 				this.props.iparent.location = `${mainpage}?serv=${this.state.servId}`;
-				this.setState({anClient: client});
+				this.setState({anClient: clientInf});
 			}
 		}
 	}
@@ -55,14 +65,15 @@ class LoginApp extends React.Component {
 		return (
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
+				ssInf: undefined,   // not need
+				ihome: '',
+				anReact: undefined, // not neeed
 				servId: this.state.servId,
 				servs: this.props.servs,
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
-				// FIXME why Login.context.iparent == undefined?
-				// iparent: this.props.iparent,
-				// ihome: this.props.ihome || 'index.html',
-				error: {onError: this.onError, msg: this.state.err},
+				iparent: this.props.iparent,
+				error: {onError: this.onError},
 			}} >
 				<Login onLoginOk={this.onLogin}/>
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} />}

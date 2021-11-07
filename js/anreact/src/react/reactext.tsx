@@ -1,4 +1,4 @@
-import { Inseclient, SessionClient } from '@anclient/semantier-st/anclient';
+import { ErrorCtx, Inseclient, SessionClient } from '@anclient/semantier-st/anclient';
 import React from 'react';
 
 import {L} from '../utils/langstr';
@@ -14,8 +14,11 @@ export const AnContext = React.createContext({
 
 	pageOrigin: '.',
 	iparent: {},    // usually the parent window of ifram
-	ihome: '',
-	servId: 'host',
+	ihome: undefined as string,
+
+	/**default: host */
+	servId: undefined as string,
+
 	servs: { host: 'http://localhost:8080' },
 
 	anClient: undefined as typeof SessionClient | Inseclient,
@@ -27,7 +30,7 @@ export const AnContext = React.createContext({
         /**@function (code: string, AnsonMsg<AnsonResp>) => void */
 		onError: undefined,
 		msg: undefined
-	},
+	} as ErrorCtx,
 	hasError: false,
 
 	// uuid: function() : string {

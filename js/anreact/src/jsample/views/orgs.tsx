@@ -2,17 +2,16 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Card, TextField, Typography } from '@material-ui/core';
+import Card from '@material-ui/core/Card';
+import Typography from '@material-ui/core/Typography';
 
-import { Protocol, Ansonresp } from '@anclient/semantier-st';
+import { Protocol, AnsonResp } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { AnConst } from '../../utils/consts';
-	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
-	import { CrudCompW } from '../../react/crud'
+	import { Comprops, CrudCompW } from '../../react/crud'
 	import { AnContext, AnError } from '../../react/reactext'
-	import { AnTreegrid } from '../../react/widgets/treegrid.jsx'
-	import { AnQueryForm } from '../../react/widgets/query-form.jsx'
+	import { AnTreegrid } from '../../react/widgets/treegrid'
+	import { AnQueryForm } from '../../react/widgets/query-form'
 
 const styles = (theme) => ( {
 	root: {
@@ -22,7 +21,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class OrgsComp extends CrudCompW {
+class OrgsComp extends CrudCompW<Comprops> {
 	state = {
 	};
 

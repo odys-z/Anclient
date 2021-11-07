@@ -193,7 +193,7 @@ export class AnReact {
 					/** system main page */
 					home?: string;
 					/** path to json config file */
-					jsonUrl: string; },
+					jsonUrl?: string; },
 					onJsonServ: (elem: string, opts: object, json: object) => any) {
 		// this.state.servId = serv;
 		if (!opts.serv) opts.serv = 'host';

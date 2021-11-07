@@ -3,12 +3,12 @@ import { withStyles } from "@material-ui/core/styles";
 import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
-	import { Semantier  } from '@anclient/semantier-st';
+	import { Semantier, Tierec  } from '@anclient/semantier-st';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 
 import { MyInfTier } from './my-infcard';
-import { CrudCompW } from '../../react/crud';
+import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';
 
 const styles = theme => (Object.assign(
 	Semantier.invalidStyles, {
@@ -28,6 +28,9 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	}
 
 	selected = undefined; // props.selected.Ids, the set
+	tier: any;
+	confirm: JSX.Element;
+	static propTypes: {};
 
 
 	constructor(props){
@@ -121,7 +124,7 @@ class PswdTier extends MyInfTier {
 		  validator: {notNull: true} },
 		{ field: 'pswd2', type: 'password', label: L('Confirm New'),  grid: {md: 6, lg: 4},
 		  autocomplete: "on",
-		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ];
+		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ] as Array<any>;
 
 	changePswd(opts, onOk) {
 		if (!this.client) return;

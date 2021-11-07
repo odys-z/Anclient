@@ -10,7 +10,6 @@ import { Langstrs,
 } from '@anclient/anreact';
 
 import Welcome from './welcome';
-import { AnClient } from '@anclient/anreact/node_modules/@anclient/semantier-st/anclient';
 
 const { Userst, JsampleTheme } = jsample;
 
