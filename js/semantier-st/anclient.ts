@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset
 } from './protocol';
 import { ErrorCtx } from './semantier';
 
@@ -383,6 +383,9 @@ export type SessionInf = {
 class SessionClient {
 	an: AnClient;
 	ssInf: any;
+
+	errCtx = {onError: undefined, msg: undefined} as ErrorCtx;
+
 	currentAct: LogAct = {
 		func: '',
 		cmd: '',
@@ -547,10 +550,10 @@ class SessionClient {
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
 	 * @param jmsg request message
 	 * @param onOk
-	 * @param onError
+	 * @param errCtx error handler - should use default error handler
 	 */
-	commit (jmsg: AnsonMsg<any>, onOk: (resp: AnsonMsg<AnsonResp>) => void, onErr: ()=>void) {
-		an.post(jmsg, onOk, {onError: onErr}, undefined);
+	commit (jmsg: AnsonMsg<any>, onOk: OnCommitOk, errCtx?: ErrorCtx) {
+		an.post(jmsg, onOk, errCtx || this.errCtx, undefined);
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
@@ -663,14 +666,15 @@ class SessionClient {
 		return jmsg;
 	}
 
-	getSks(port, onLoad) {
+	getSks(onLoad: OnLoadOk) {
 		let req = this.userReq(null, 'datasetier',
 					new DatasetierReq(undefined)
 					.A(DatasetierReq.A.sks), undefined );
 
 		this.commit(req,
 			(resp) => {
-				onLoad(resp.Body().getProp('sks'));
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().getProp('sks') as AnResultset);
+				onLoad(cols, rows);
 			}, undefined );
 	}
 

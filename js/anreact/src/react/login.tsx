@@ -44,6 +44,8 @@ class LoginComp extends React.Component<LoginProps> {
 
 	an: AnClient;
 	ssClient: SessionClient;
+	confirm: JSX.Element;
+
 
 	/**
 	 * initialize a instance of Anclient visition jserv service.
@@ -65,10 +67,14 @@ class LoginComp extends React.Component<LoginProps> {
 	}
 
 	alert() {
-		this.setState({
-			alert: L('User Id or password is not correct.'),
-			showAlert: true,
-		});
+		let that = this;
+		// this.setState({
+		// 	alert: L('User Id or password is not correct.'),
+		// 	showAlert: true,
+		// });
+		this.confirm = <ConfirmDialog ok={L('OK')} title={L('Info')} cancel={false}
+					open={true} onClose={ () => { that.confirm = undefined; } }
+					msg={ L('User Id or password is not correct.') } />
 	}
 
 	onErrorClose() {
@@ -171,9 +177,7 @@ class LoginComp extends React.Component<LoginProps> {
 					color="primary"
 					onClick={this.onLogin} >{L('Login')}</Button>
 			</Collapse>
-			<ConfirmDialog ok={L('OK')} title={L('Info')} cancel={false}
-					open={this.state.showAlert} onClose={() => {this.state.showAlert = false;} }
-					msg={this.state.alert} />
+			{this.confirm}
 		</div>);
     }
 }

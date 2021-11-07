@@ -145,7 +145,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
 export {ConfirmDialog, ConfirmDialogComp};
 
-export interface ErrorProps extends Comprops {
+export interface ErrorProps extends DialogProps {
     onClose: () => void;
     fullScreen: boolean;
 }

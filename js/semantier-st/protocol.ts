@@ -1263,7 +1263,7 @@ export class DatasetierReq extends AnsonBody {
 	type = "io.odysz.semantic.tier.DatasetierReq";
 
     static A = {
-        sks: undefined as string
+        sks: 'r/sks'
     };
 
     constructor(opts: any) {

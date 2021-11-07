@@ -3,7 +3,7 @@ import React from 'react';
 import { StandardProps } from '@material-ui/core';
 import ReactDOM from 'react-dom';
 import { SessionClient } from '@anclient/semantier-st';
-import { AnContext, AnError, AnReact, Login } from '@anclient/anreact';
+import { AnContext, AnError, AnReact, L, Login } from '@anclient/anreact';
 
 const styles = (theme) => ({
 	root: {
@@ -28,6 +28,10 @@ class LoginApp extends React.Component<LoginProps> {
 
 	/** jserv root url */
 	jserv: string;
+	errCtx = {
+		msg: '',
+		onError: this.onError.bind(this),
+	};
 
 	constructor(props) {
 		super(props);
@@ -46,6 +50,7 @@ class LoginApp extends React.Component<LoginProps> {
 	}
 
 	onErrorClose() {
+		this.setState({hasError: false});
 	}
 
 	onLogin(clientInf: { ssInf: { home: string; }; }) {
@@ -73,10 +78,10 @@ class LoginApp extends React.Component<LoginProps> {
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
-				error: {onError: this.onError},
+				error: this.errCtx,
 			}} >
 				<Login onLoginOk={this.onLogin}/>
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} />}
+				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} title={L('Error')} msg={this.errCtx.msg} />}
 			</AnContext.Provider>
 		);
 	}

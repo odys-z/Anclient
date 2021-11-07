@@ -58,7 +58,7 @@ class App extends React.Component {
 								});
 
 		// loaded from dataset.xml
-		this.state.anClient.getSks(null, (sks) => {Object.assign(Protocol.sk, sks)});
+		this.state.anClient.getSks((sks) => {Object.assign(Protocol.sk, sks)});
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';

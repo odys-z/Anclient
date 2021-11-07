@@ -6,7 +6,8 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg } from '@anclient/semantier-s
 
 import { Langstrs,
 	AnContext, AnError, AnReactExt,
-	jsample
+	jsample,
+	L
 } from '@anclient/anreact';
 
 import Welcome from './welcome';
@@ -106,12 +107,14 @@ class App extends React.Component<Props, State> {
 				ihome: this.props.iportal || 'portal.html',
 				error: this.state.error,
 				ssInf: undefined,
-				// uuid: AnContext.uuid
 			}} >
 				{<Userst port='userstier' uri={'/less/users'}/>}
 				<hr/>
 				{<Welcome port='welcomeless' uri={'/less/welcome'}/>}
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} uri={"/login"} tier={undefined} />}
+				{this.state.hasError &&
+					<AnError onClose={this.onErrorClose} fullScreen={false}
+							uri={"/login"} tier={undefined}
+							title={L('Error')} msg={this.state.error.msg} />}
 				<hr/>
 				アプリ コンポーネントの内容は, 上記のすべて...<br/> {Date().toString()}
 			</AnContext.Provider>
