@@ -87,8 +87,8 @@ class App extends React.Component<Props, State> {
 	onErrorClose() {
 		if (this.state.nextAction === 're-login') {
 			this.state.nextAction = undefined;
-			this.setState({hasError: false});
 		}
+		this.setState({hasError: false});
 	}
 
 	render() {
