@@ -30,7 +30,7 @@ class LoginApp extends React.Component<LoginProps> {
 	jserv: string;
 	errCtx = {
 		msg: '',
-		onError: this.onError.bind(this),
+		onError: this.onError // .bind(this),
 	};
 
 	constructor(props) {

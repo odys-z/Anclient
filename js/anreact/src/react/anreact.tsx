@@ -3,7 +3,7 @@ import $ from 'jquery';
 import { stree_t, Protocol, Tierec, TierCol,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts
+	AnsonMsg, OnCommitOk, DatasetOpts, CRUD
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';

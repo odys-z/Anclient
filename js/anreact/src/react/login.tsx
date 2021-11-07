@@ -11,7 +11,7 @@ import { AnClient, OnCommitOk, Protocol } from '@anclient/semantier-st';
 import { an, SessionClient } from '@anclient/semantier-st';
 	import {AnContext} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
-	import {L, Langstrs} from '../utils/langstr'
+	import {L} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
 import { Comprops } from './crud';
 
@@ -117,7 +117,7 @@ class LoginComp extends React.Component<LoginProps> {
 							client.ssInf.home : `${that.context.ihome}?serv=${that.context.servId}`;
 			}
 			else
-				console.error('login succeed but results be ignored: ', client);
+				console.error('Logged in successfully but results be ignored: ', client);
 		}
 
 		function onError (code, resp) {

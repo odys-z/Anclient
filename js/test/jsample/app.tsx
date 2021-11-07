@@ -4,18 +4,24 @@ import ReactDOM from 'react-dom';
 import Typography from '@material-ui/core/Typography';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, Semantier } from '@anclient/semantier-st';
+import { Protocol, SessionClient, Semantier, ErrorCtx, SessionInf } from '@anclient/semantier-st';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
 	Sys, SysComp, jsample
 } from '@anclient/anreact';
+import { StandardProps } from '@material-ui/core';
 
-const { Domain, Roles, Orgs, Users, Userst, JsampleTheme } = jsample;
+const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
+
+interface Approps extends StandardProps<any, string> {
+	iwindow: Window;
+};
 
 /** The application main, context singleton and error handler */
-class App extends React.Component {
+class App extends React.Component<Approps> {
 	state = {
+		servId: 'host',
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
 		hasError: false,
@@ -24,6 +30,7 @@ class App extends React.Component {
 
 		error: undefined,
 	};
+	errCtx: ErrorCtx;
 
 	/**Restore session from window.localStorage
 	 */
@@ -81,7 +88,7 @@ class App extends React.Component {
 		this.state.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
-			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
+			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
 	onErrorClose() {
@@ -89,6 +96,7 @@ class App extends React.Component {
 			this.state.nextAction = undefined;
 			this.logout();
 		}
+		this.setState({hasError: false})
 	}
 
 	/** For navigate to portal page
@@ -129,6 +137,7 @@ class App extends React.Component {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
+				ssInf: undefined as SessionInf,
 				// FIXME we should use a better way
 				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
 				// samports: this.state.samports, // FXIME or Protocol?
@@ -136,18 +145,20 @@ class App extends React.Component {
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				jserv: this.state.jserv,
+				// jserv: this.state.jserv,
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
-				iportal: this.props.iportal || 'portal.html',
-				error: this.state.error,
+				ihome: this.props.iportal || 'portal.html',
+				error: this.errCtx,
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					onLogout={this.logout} />
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+				{this.state.hasError &&
+					<AnError onClose={this.onErrorClose} fullScreen={false}
+							title={L('Error')} msg={this.errCtx.msg as string} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
@@ -180,7 +191,7 @@ class App extends React.Component {
 	 * @param {string} [opts.serv='host'] serv id
 	 * @param {string} [opts.iportal='portal.html'] page showed after logout
 	 */
-	static bindHtml(elem, opts = {}) {
+	static bindHtml(elem, opts = {portal: 'index.html'}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
