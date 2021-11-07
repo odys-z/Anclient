@@ -13,7 +13,7 @@ export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 
 /**<p>UI element formatter</p>
  * E.g. TRecordForm will use this to format a field in form.
- * User should override this to return UI element, e.g. JSX.Element for React render(). 
+ * User should override this to return UI element, e.g. JSX.Element for React render().
  */
 export type AnElemFormatter = ((col: TierCol, colIndx: number)=> any);
 
