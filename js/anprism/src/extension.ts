@@ -26,7 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
 			   __proto__:m }
 			 */
 			(uri, uris) => {
-				// AnPagePanel.init(context, uri);
 				AnPagePanel.load(context, uri);
 			})
 	);
@@ -245,7 +244,9 @@ class AnPagePanel {
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programmatically
-		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+		this._panel.onDidDispose(
+			() => this.dispose(),
+			null, this._disposables);
 
 		// Update the content based on view changes - how to watch webpack results?
 		this._panel.onDidChangeViewState(
@@ -282,6 +283,10 @@ class AnPagePanel {
 	 * The only way to shutdown anserv is the shutdown command or quit vscode.
 	 */
 	public dispose() {
+
+		AnPagePanel.log.appendLine("Closing webserver: " + AnPagePanel.currentPanel?.serv.webrootPath);
+		AnPagePanel.currentPanel?.close(); // not working
+
 		AnPagePanel.currentPanel = undefined;
 
 		// Clean up our resources
