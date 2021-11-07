@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 			if (AnPagePanel.currentPanel) {
 				AnPagePanel.currentPanel.startup();
 			}
-			else 
+			else
 				vscode.window.showInformationMessage('Sorry! Currently sever can only be started when Anprism loading a page!');
 		})
 	);
@@ -60,19 +60,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		})
 	);
-
-	// why should revive a view without a sever?
-	// if (vscode.window.registerWebviewPanelSerializer) {
-	// 	// Make sure we register a serializer in activation event
-	// 	vscode.window.registerWebviewPanelSerializer(AnPagePanel.viewType, {
-	// 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-	// 			console.log(`Got state: ${state}`);
-	// 			// Reset the webview options so we use latest uri for `localResourceRoots`.
-	// 			webviewPanel.webview.options = getWebviewOpts(context.extensionUri);
-	// 			AnPagePanel.revive(context, webviewPanel, undefined);
-	// 		}
-	// 	});
-	// }
 }
 
 export function deactivate() {
@@ -90,7 +77,7 @@ export function deactivate() {
  * refresh --------[  stop   ]-- show blank (error) page
  * close ----------[ running ]-- stop ------- dispose panel
  * shutdown -------------------- stop (panel lives longer than server)
- * 
+ *
  */
 class AnPagePanel {
 	static log: vscode.OutputChannel;
@@ -140,8 +127,8 @@ class AnPagePanel {
 
 	/**
 	 * Load a page, in current active column - creat panel if necessary.
-	 * @param extensionUri 
-	 * @returns 
+	 * @param extensionUri
+	 * @returns
 	 */
 	public static async load(context: vscode.ExtensionContext, localhtml: vscode.Uri) {
 		let p = AnPagePanel.currentPanel;
@@ -227,10 +214,10 @@ class AnPagePanel {
 	}
 
 	/**Can be used only once.
-	 * 
-	 * @param context 
-	 * @param panel 
-	 * @param serv 
+	 *
+	 * @param context
+	 * @param panel
+	 * @param serv
 	 */
 	constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, serv: ServHelper) {
 		// this.serv = new ServHelper(context);
@@ -278,14 +265,14 @@ class AnPagePanel {
 	}
 
 	/**Dispose Anprism panel not necessarily shutdown server  - can still debugging with js-debugger.
-	 * 
+	 *
 	 * Anserv lives longer than debugger, which is longer than panel.
 	 * The only way to shutdown anserv is the shutdown command or quit vscode.
 	 */
 	public dispose() {
 
 		AnPagePanel.log.appendLine("Closing webserver: " + AnPagePanel.currentPanel?.serv.webrootPath);
-		AnPagePanel.currentPanel?.close(); // not working
+		AnPagePanel.currentPanel?.close(); // not working - windows also has "curl"
 
 		AnPagePanel.currentPanel = undefined;
 
@@ -319,9 +306,9 @@ class AnPagePanel {
 	 * Load target page in iframe. See
 	 * vscode issue #70339:
 	 * https://github.com/microsoft/vscode/issues/70339
-	 * @param webview 
-	 * @param page 
-	 * @returns 
+	 * @param webview
+	 * @param page
+	 * @returns
 	 */
 	getAnclientPage(page: Page): string {
 		let {url, sub} = this.serv.url(page);
@@ -382,4 +369,3 @@ class AnPagePanel {
 	}
 
 }
-
