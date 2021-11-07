@@ -61,7 +61,7 @@ const argex = /{(\s*(\w|\d)*\s*)}/g;
  * @param o arg object
  * @returns 
  */
-export function L(t: string, o?: object) {
+export function L(t: string, o?: object) : string {
 	if (! (t in Langstrs.s[Langstrs.lang]) )
 			Langstrs.s.en.add(t);
 	else t = Langstrs.lang === 'en' ?

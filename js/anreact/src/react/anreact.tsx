@@ -117,7 +117,7 @@ export class AnReact {
 		let dbCols = Object.keys(columnMap);
 
 		let ins = new InsertReq(null, table)
-			.A<InsertReq>(Protocol.CRUD.c)
+			.A<InsertReq>(CRUD.c)
 			.columns(dbCols);
 
 		let rows = [];
@@ -229,7 +229,7 @@ export class AnReactExt extends AnReact {
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
 	 * @param sk menu sk (semantics key, see dataset.xml), e.g. 'sys.menu.jsample'
-	 * @param uri 
+	 * @param uri
 	 * @param onLoad
 	 * @param errCtx
 	 * @return this
@@ -246,7 +246,7 @@ export class AnReactExt extends AnReact {
 
 	/** Load jsample.serv dataset. (using DatasetReq or menu.serv)
 	 * @param ds dataset info {port, sk, sqlArgs}
-	 * @param onLoad 
+	 * @param onLoad
 	 * @param errCtx
 	 * @return this
 	 */

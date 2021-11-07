@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Button, Grid, Card, Typography } from '@material-ui/core';
 
-import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp, Semantier } from '@anclient/semantier-st';
+import { Protocol, CRUD, UpdateReq, InsertReq, DeleteReq, AnsonResp, Semantier } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
 	import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 	import { AnConst } from '../../utils/consts';
@@ -81,8 +81,8 @@ class MyInfCardComp extends React.Component {
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
+					if (that.state.crud === CRUD.c) {
+						that.state.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 					if (typeof that.props.onSaved === 'function')
@@ -204,13 +204,13 @@ export class MyInfTier extends Semantier {
 
 		let { uri } = opts;
 
-		let crud = Protocol.CRUD.u;
+		let crud = CRUD.u;
 
 		let rec = this.rec;
 		let {roleId, userName} = rec;
 
 		let req = this.client
-					.usrAct(this.uri, Protocol.CRUD.u, "save", "save my info")
+					.usrAct(this.uri, CRUD.u, "save", "save my info")
 					.update(this.uri, this.mtabl,
 							{pk: this.pk, v: this.pkval},
 							{roleId, userName});
@@ -238,7 +238,7 @@ export class MyInfTier extends Semantier {
 		client.commit(req,
 			(resp) => {
 				let bd = resp.Body();
-				if (crud === Protocol.CRUD.c)
+				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
 					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);

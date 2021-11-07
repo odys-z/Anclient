@@ -64,7 +64,7 @@ class App extends React.Component {
 		Protocol.sk.cbbRole = 'roles';
 		Protocol.sk.cbbMyClass = 'north.my-class';
 
-		// extending CRUD pages
+		// extending pages
 		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
 			{path: '/sys/domain', comp: Domain},

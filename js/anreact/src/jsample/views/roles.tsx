@@ -18,8 +18,6 @@ import { L } from '../../utils/langstr';
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';
 
-const { CRUD } = Protocol;
-
 const styles = (theme) => ( {
 	root: {
 		"& :hover": {
@@ -131,16 +129,6 @@ class RolesComp extends CrudCompW {
 				}
 				onClose={ () => {that.confirm === undefined} }
 			/>);
-
-		// function delRole(roleIds) {
-		// 	let req = that.context.anClient
-		// 		.usrAct('roles', CRUD.d, 'delete')
-		// 		.deleteMulti(this.uri, 'a_roles', 'roleId', [...roleIds]);
-		//
-		// 	that.context.anClient.commit(req, (resp) => {
-		// 		that.toSearch();
-		// 	}, that.context.error);
-		// }
 	}
 
 	toAdd(e, v) {

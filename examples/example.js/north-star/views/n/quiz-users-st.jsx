@@ -11,7 +11,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { AnClient, SessionClient, Protocol, AnsonResp } from '@anclient/semantier';
+import { AnClient, SessionClient, Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt,
     AnTablist
@@ -42,7 +42,7 @@ class QuizUserFormComp extends CrudCompW {
 		this.props.jquiz.quizUsers(
 			{ uri: this.props.uri,
 			  quizId: this.props.quizId,
-			  isNew: this.props.crud === Protocol.CRUD.c
+			  isNew: this.props.crud === CRUD.c
 			},
 			resp => {
 				let users = resp.Body().quizUsers;

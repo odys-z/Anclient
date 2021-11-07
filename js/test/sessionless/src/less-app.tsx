@@ -87,7 +87,7 @@ class App extends React.Component<Props, State> {
 	onErrorClose() {
 		if (this.state.nextAction === 're-login') {
 			this.state.nextAction = undefined;
-			// this.logout();
+			this.setState({hasError: false});
 		}
 	}
 
@@ -100,14 +100,12 @@ class App extends React.Component<Props, State> {
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				// jserv: this.state.jserv,
 				anClient: this.state.inclient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
 				error: this.state.error,
 				ssInf: undefined,
-				// an: AnClient;
 				// uuid: AnContext.uuid
 			}} >
 				{<Userst port='userstier' uri={'/less/users'}/>}

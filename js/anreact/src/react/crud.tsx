@@ -1,11 +1,11 @@
 import React from 'react';
 // import { withStyles } from "@material-ui/core/styles";
 import { StandardProps, withStyles } from '@material-ui/core';
+import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
 import { Media } from './anreact';
-import { Protocol } from '@anclient/semantier-st';
-import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
+import { CRUD } from '@anclient/semantier-st';
 
 export interface ClassNames {[c: string]: string};
 
@@ -16,17 +16,12 @@ export interface Comprops extends StandardProps<any, string> {
 	match?: {path: string};
 
 	/** CRUD */
-	crud?: Protocol.CRUD;
+	crud?: CRUD;
 	/** Semantier */
 	classes?: ClassNames;
-	readonly tier: any;
+	readonly tier?: any;
 	readonly width?: Breakpoint;
 }
-
-// export interface DialogProps extends Comprops {
-// 	onClose: () => void;
-// 	onCancel: () => void;
-// }
 
 const styles = (theme) => ( {
 	root: {
@@ -82,11 +77,11 @@ class CrudCompW<T extends Comprops> extends CrudComp<T> {
 		super(props);
 
 		let {width} = props;
-		CrudCompW.prototype.media = CrudCompW.setWidth(width);
+		CrudCompW.prototype.media = CrudCompW.getMedia(width);
 	}
 
-	static setWidth(width: string) {
-		let media: Media;
+	static getMedia(width: string) {
+		let media = {} as Media;
 
 		if (width === 'lg') {
 			media.isLg = true;
@@ -114,6 +109,11 @@ class CrudCompW<T extends Comprops> extends CrudComp<T> {
 		}
 
 		return media;
+	}
+
+	/**A simple helper: Array.from(ids)[x]; */
+	getByIx(ids: Set<string>, x = 0): string {
+		return Array.from(ids)[x];
 	}
 }
 CrudCompW.contextType = AnContext;
@@ -177,7 +177,7 @@ const CheapFlow = withStyles(styles)(CheapFlowComp);
  * To popup modal dialog, see
  * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
  */
-class DetailFormW<T extends Comprops> extends CrudComp<T> {
+class DetailFormW<T extends Comprops> extends CrudCompW<T> {
 	state = {
 	};
 	media: Media;
@@ -186,21 +186,13 @@ class DetailFormW<T extends Comprops> extends CrudComp<T> {
 		super(props);
 
 		let {width} = props;
-		let media = CrudCompW.setWidth(width);
+		let media = CrudCompW.getMedia(width);
 
 		DetailFormW.prototype.media = media;
 		DetailFormW.prototype.state = this.state;
 	}
 }
 DetailFormW.contextType = AnContext;
-
-// DetailFormW.propTypes = {
-// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-// 	/* TODO doc Design Notes:
-// 	 * Main CRUD page doesn't need this check. Those common used wigdets need this.
-// 	 */
-// 	// uri: PropTypes.string.isRequired
-// };
 
 export {
 	CrudComp, CrudCompW, DetailFormW,

@@ -6,19 +6,17 @@ import PropTypes from "prop-types";
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol } from '@anclient/semantier-st';
+import { CRUD } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { DetailFormW } from '../../react/crud';
-	import { AnConst } from '../../utils/consts';
-	import { AnContext, AnError } from '../../react/reactext';
+	import { Comprops, DetailFormW } from '../../react/crud';
 	import { ConfirmDialog } from '../../react/widgets/messagebox';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
+import { ModalProps } from '@material-ui/core';
 
 const styles = (theme) => ({
   root: {
@@ -58,15 +56,19 @@ const styles = (theme) => ({
  * is not planned to supprt. See performance issue: https://stackoverflow.com/a/66934465
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  */
-class UserDetailstComp extends DetailFormW {
+class UserDetailstComp extends DetailFormW<Comprops> {
 	state = {
 		record: {},
 	};
+	crud: any;
+	tier: any;
+	confirm: JSX.Element;
+	handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
-	constructor (props = {}) {
+	constructor (props) {
 		super(props);
 
-		this.state.crud = props.crud;
+		this.crud = props.crud;
 
 		this.tier = props.tier;
 
@@ -86,19 +88,22 @@ class UserDetailstComp extends DetailFormW {
 		if (this.tier.validate(this.tier.rec, this.recfields))
 			this.tier.saveRec(
 				{ uri: this.props.uri,
-				  crud: this.state.crud,
+				  crud: this.crud,
 				  pkval: this.props.tier.pkval,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
+					if (that.crud === CRUD.c) {
+						that.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 					if (typeof that.props.onSaved === 'function')
 						that.props.onSaved(resp);
 				} );
 		else this.setState({});
+	}
+	recfields(rec: any, recfields: any) {
+		throw new Error('Method not implemented.');
 	}
 
 	toCancel (e) {
@@ -120,8 +125,8 @@ class UserDetailstComp extends DetailFormW {
 	render () {
 		const { tier, classes, width } = this.props;
 
-		let c = this.state.crud === Protocol.CRUD.c;
-		let u = this.state.crud === Protocol.CRUD.u;
+		let c = this.crud === CRUD.c;
+		let u = this.crud === CRUD.u;
 		let title = c ? L('Create User')
 					  : u ? L('Edit User')
 					  : L('User Details');
@@ -159,12 +164,6 @@ class UserDetailstComp extends DetailFormW {
 	}
 }
 
-UserDetailstComp.propTypes = {
-	uri: PropTypes.string.isRequired,
-	tier: PropTypes.object.isRequired,
-	crud: PropTypes.string.isRequired,
-	dense: PropTypes.bool
-};
 
 const UserDetailst = withWidth()(withStyles(styles)(UserDetailstComp));
 export { UserDetailst, UserDetailstComp };

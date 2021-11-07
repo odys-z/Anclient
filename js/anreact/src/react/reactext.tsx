@@ -1,10 +1,7 @@
 import { ErrorCtx, Inseclient, SessionClient } from '@anclient/semantier-st/anclient';
 import React from 'react';
 
-import {L} from '../utils/langstr';
 import { AnReact } from './anreact';
-import { Comprops, CrudCompW } from './crud';
-import {ConfirmDialog} from './widgets/messagebox'
 
 export const AnContext = React.createContext({
 	/**	Anclient */
@@ -40,32 +37,3 @@ export const AnContext = React.createContext({
 
 // var _uid_ = 0;
 
-export interface ErrorProps extends Comprops {
-    onClose: () => void;
-    fullScreen: boolean;
-}
-
-// export class AnError extends React.Component<ErrorProps> {
-export class AnError extends CrudCompW<ErrorProps> {
-	// props = undefined;
-    context: React.ContextType<typeof AnContext>
-
-	state = {
-	};
-
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-		let ctx = this.context;// .errors;
-        let p = this.props as ErrorProps;
-		return (
-			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
-					open={!!ctx.hasError} onClose={p.onClose}
-					fullScreen={p.fullScreen}
-					msg={L(ctx.error.msg)} />
-		);
-	}
-}
-AnError.contextType = AnContext;

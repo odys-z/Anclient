@@ -11,7 +11,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol } from '@anclient/semantier-st';
+import { Protocol, CRUD } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { DetailFormW } from '../../react/crud';
@@ -91,8 +91,8 @@ class UserDetailstComp extends DetailFormW {
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
+					if (that.state.crud === CRUD.c) {
+						that.state.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 					if (typeof that.props.onSaved === 'function')
@@ -120,8 +120,8 @@ class UserDetailstComp extends DetailFormW {
 	render () {
 		const { tier, classes, width } = this.props;
 
-		let c = this.state.crud === Protocol.CRUD.c;
-		let u = this.state.crud === Protocol.CRUD.u;
+		let c = this.state.crud === CRUD.c;
+		let u = this.state.crud === CRUD.u;
 		let title = c ? L('Create User')
 					  : u ? L('Edit User')
 					  : L('User Details');

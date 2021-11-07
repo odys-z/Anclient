@@ -6,9 +6,9 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk
 } from './protocol';
-import { ErrorCtx, OnCommitOk } from './semantier';
+import { ErrorCtx } from './semantier';
 
 export interface AjaxOptions {async?: boolean; timeout?: number}
 
@@ -432,7 +432,7 @@ class SessionClient {
 				localStorage.setItem(SessionClient.ssInfo, infStr);
 			}
 		}
-		else {
+		else if (!dontPersist) {
 			this.ssInf = SessionClient.loadStorage();
 		}
 
@@ -609,7 +609,7 @@ class SessionClient {
 		}
 
 		var upd = new UpdateReq(uri, maintbl, pk);
-		upd.a = Protocol.CRUD.u;
+		upd.a = CRUD.u;
 		this.currentAct.cmd = 'update';
 		var jmsg = this.userReq(uri, 'update', upd, this.currentAct);
 
@@ -654,7 +654,7 @@ class SessionClient {
 		}
 
 		let upd = new UpdateReq(uri, maintbl, pk);
-		upd.a = Protocol.CRUD.d;
+		upd.a = CRUD.d;
 		this.currentAct.cmd = 'delete';
 
 		let jmsg = this.userReq(uri,
@@ -684,7 +684,7 @@ class SessionClient {
 	deleteMulti(uri: string, mtabl: string, pkn: string, pks: Array<any>): AnsonMsg<UpdateReq> {
 		let upd = new UpdateReq(uri, mtabl, undefined)
 			.whereIn(pkn, pks);
-		upd.a = Protocol.CRUD.d;
+		upd.a = CRUD.d;
 		this.currentAct.cmd = 'delete';
 
 		var jmsg = this.userReq(uri,
@@ -702,7 +702,7 @@ class SessionClient {
 	userReq<T extends AnsonBody>(uri: string, port: string, bodyItem: T, act: LogAct): AnsonMsg<T> {
 		if (!port)
 			throw Error('AnsonMsg<UserReq> needs port explicitly specified.');
-			
+
 		let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri = uri || bodyItem.uri;
 		if (typeof act === 'object') {

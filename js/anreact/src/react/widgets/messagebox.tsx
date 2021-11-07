@@ -16,8 +16,9 @@ import Typography from '@material-ui/core/Typography';
 
 import QRCode from 'qrcode'
 
-import {L, copyToClipboard} from '../../utils/langstr';
-import { Comprops, CrudComp } from '../../an-components';
+import { L, copyToClipboard } from '../../utils/langstr';
+import { Comprops, CrudComp, CrudCompW } from '../crud';
+import { AnContext } from '../reactext';
 
 const styles = theme => ({
   root: {
@@ -45,7 +46,7 @@ export interface DialogProps extends Comprops {
 	onClose?: () => void;
 	/**Open dialog */
 	// open?: boolean;
-	title?: string;
+	title: string;
 	/**with cancel button label ("false" will disable button) */
 	cancel?: string | false;
 	ok?: string;
@@ -143,6 +144,35 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 }
 const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
 export {ConfirmDialog, ConfirmDialogComp};
+
+export interface ErrorProps extends Comprops {
+    onClose: () => void;
+    fullScreen: boolean;
+}
+
+export class AnError extends CrudCompW<ErrorProps> {
+	// props = undefined;
+	context: React.ContextType<typeof AnContext>
+
+	state = {
+	};
+
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		let ctx = this.context;// .errors;
+		let p = this.props as ErrorProps;
+		return (
+			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
+					open={!!ctx.hasError} onClose={p.onClose}
+					fullScreen={p.fullScreen}
+					msg={L(ctx.error.msg as string)} />
+		);
+	}
+}
+AnError.contextType = AnContext;
 
 ////////////////////////////////////////////////////////////////////////////////
 class QrSharingComp extends CrudComp<DialogProps & { imgId: string; qr: {serv: string; quiz: string; origin: string; path: string; page: string}}> {

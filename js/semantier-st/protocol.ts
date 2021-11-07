@@ -1,4 +1,9 @@
-import { OnCommitOk, Tierec } from "@anclient/semantier-st/semantier";
+/**Callback of CRUD.c/u/d */
+export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
+/**Callback of CRUD.r */
+export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
+
+export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 
 /**Json string options, like no-null: true for asking server replace null with ''.  */
 export interface JsonOptions {
@@ -159,10 +164,10 @@ export class Protocol {
 	}
 
     /**Format login request message.
-     * 
-     * @param uid 
+     *
+     * @param uid
      * @param tk64  password cypher
-     * @param iv64 
+     * @param iv64
      * @return login request message
      */
     static formatSessionLogin(uid: string, tk64: string, iv64: string): AnsonMsg<AnSessionReq> {
@@ -232,9 +237,7 @@ export class Protocol {
 
 }
 
-export namespace Protocol {
-	export enum CRUD { c = 'I', r = 'R', u = 'U', d = 'D' };
-}
+export enum CRUD { c = 'I', r = 'R', u = 'U', d = 'D' };
 
 export class AnsonMsg<T extends AnsonBody> {
 	type = "io.odysz.semantic.jprotocol.AnsonMsg";
@@ -308,22 +311,22 @@ export class AnsonMsg<T extends AnsonBody> {
 			}
 
 			if (a) body.A(a);
-	
+
 			// moc the ajax error
 			if (json.ajax)
 				body.ajax = json.ajax;
 		}
-	
+
 		this.code = json.code;
 		this.version = json.version ? json.version : "1.0";
 		this.seq = json.seq;
 		this.port = json.port;
-	
+
 		if (!this.seq)
 			this.seq = Math.round(Math.random() * 1000);
 
 		this.opts = Protocol.valOptions;
-	
+
 		this.body = [];
 		if (body)
 			body.parent = this.type;
@@ -359,7 +362,7 @@ export class AnsonBody {
 	/**
 	 * Create request object, a Semantic-jserv envolope object.
 	 * All user request should be a subclass of AnsonBody.
-	 * 
+	 *
 	 * It's highly recommended the parameter is pressented when creating the object.
 	 * @param body json object
 	 */
@@ -668,7 +671,7 @@ export class UpdateReq extends AnsonBody {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
-		this.a = Protocol.CRUD.u;
+		this.a = CRUD.u;
 		this.mtabl = tabl;
 		this.nvs = [];
 		this.where = [];
@@ -826,7 +829,7 @@ export class UpdateReq extends AnsonBody {
 export class DeleteReq extends UpdateReq {
 	constructor (uri: string, tabl: string, pk: string) {
 		super (uri, tabl, pk);
-		this.a = Protocol.CRUD.d;
+		this.a = CRUD.d;
 	}
 }
 
@@ -837,7 +840,7 @@ export class InsertReq extends UpdateReq {
 
 	constructor (uri: string, tabl: string) {
 		super (uri, tabl, undefined);
-		this.a = Protocol.CRUD.c;
+		this.a = CRUD.c;
 	}
 
 	/**
@@ -876,7 +879,7 @@ export class InsertReq extends UpdateReq {
 	 * @param exp the expression string like "3 * 2"
 	 * @return {InsertReq} this*/
 	nExpr(n : string, exp : any) {
-        console.error("Bug!!"); 
+        console.error("Bug!!");
 		return this.nv(n, exp);
 	}
 
@@ -1002,7 +1005,7 @@ export class AnsonResp extends AnsonBody {
 		}
 
 		return {cols, rows};
-	
+
     }
 
     /**Provide nv, convert results to AnReact combobox options (for binding).
@@ -1061,7 +1064,7 @@ export class AnsonResp extends AnsonBody {
     Rs(rx = 0): AnResultset { return this.rs.length ? this.rs[rx] : this.rs; }
 
     data: {props?: {}};
-    getProp(prop: string): object { 
+    getProp(prop: string): object {
 		if (this.data && this.data.props)
 			return this.data.props[prop];
     }
@@ -1100,7 +1103,7 @@ export class AnTreeNode {
 	id: string;
 	level: number;
 	parent: string;
-} 
+}
 
 export class AnDatasetResp extends AnsonResp {
 	forest: Array<AnTreeNode>;
@@ -1150,7 +1153,7 @@ export interface DatasetOpts {
 
 export class DatasetReq extends QueryReq {
     /**
-     * @param opts this parameter should be refactored 
+     * @param opts this parameter should be refactored
      */
     constructor(opts?: DatasetOpts ) {
 

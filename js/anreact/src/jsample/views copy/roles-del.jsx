@@ -3,10 +3,9 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext, AnError } from '../../react/reactext';
@@ -136,7 +135,7 @@ class RolesComp extends CrudCompW {
 
 		function delRole(roleIds) {
 			let req = that.context.anClient
-				.usrAct('roles', Protocol.CRUD.d, 'delete')
+				.usrAct('roles', CRUD.d, 'delete')
 				.deleteMulti(this.uri, 'a_roles', 'roleId', roleIds);
 
 			that.context.anClient.commit(req, (resp) => {
