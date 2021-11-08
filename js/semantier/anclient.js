@@ -656,7 +656,7 @@ class SessionClient {
 		upd.a = Protocol.CRUD.d;
 		this.currentAct.cmd = 'delete';
 
-		var jmsg = this.userReq(undefined,
+		var jmsg = this.userReq(uri,
 				'update', // Protocol.Port.update,
 				upd, this.currentAct);
 		return jmsg;

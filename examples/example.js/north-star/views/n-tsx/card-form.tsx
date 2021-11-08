@@ -7,14 +7,17 @@ import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
+import Card from '@material-ui/core/Card/Card';
 
-import { AnlistCol, DatasetComboField, Semantier } from '@anclient/semantier-st';
-import { L, toBool, DatasetCombo, TRecordForm } from '@anclient/anreact';
+import { TierCol, AnRowFormatter, TierComboField, Semantier } from '@anclient/semantier-st';
+import { L, toBool, DatasetCombo } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { CrudCompW, FormProp } from '../../common/north';
 
-interface CardFormProp extends FormProp {
+export interface CardsFormProp extends FormProp {
+	headFormatter?: AnRowFormatter;
+	CardsFormatter?: AnRowFormatter;
 };
 
 const styles = (theme: starTheme) => (Object.assign(
@@ -24,27 +27,30 @@ const styles = (theme: starTheme) => (Object.assign(
 		width: '100%',
 		backgroundColor: '#fafafaee'
 	  },
-	  rowBox: {
+	  paperHead: {
 		width: '100%',
 		'& :hover': {
 		  backgroundColor: '#ced'
 		}
 	  },
-	  labelText: {
-		padding: theme.spacing(1),
-		borderLeft: '1px solid #bcd',
-	  },
-	  labelText_dense: {
-		paddingLeft: theme.spacing(1),
-		paddingRight: theme.spacing(1),
-		borderLeft: '1px solid #bcd' }
+	//  labelText: {
+	// 	padding: theme.spacing(1),
+	// 	borderLeft: '1px solid #bcd',
+	//   },
+	//   labelText_dense: {
+	// 	paddingLeft: theme.spacing(1),
+	// 	paddingRight: theme.spacing(1),
+	// 	borderLeft: '1px solid #bcd' }
 	}
 ) );
 
 /**
-class CardFormComp extends CrudCompW<CardFormProp> {
+ * This class render rows as Grid cards, a generic class like Tablist.
+ * <h5>Required tiers:</h5>
+ * <p>1. using tier.rec as paper head</p>
+ * <p>2. using tier.rows as cards. All cards in Grid container.</p>
  */
-class CardFormComp extends TRecordForm {
+class CardsFormComp extends CrudCompW<CardsFormProp> {
 	state = {
 		dirty: false,
 		pk: undefined,
@@ -52,12 +58,12 @@ class CardFormComp extends TRecordForm {
 
     tier: Semantier;
 
-	constructor (props) {
+	constructor (props: CardsFormProp) {
 		super(props);
 
 		this.tier = props.tier;
 		this.formFields = this.formFields.bind(this);
-		// this.getField = this.getField.bind(this);
+		this.getField = this.getField.bind(this);
 	}
 
 	componentDidMount() {
@@ -76,14 +82,16 @@ class CardFormComp extends TRecordForm {
 		}
 	}
 
-    /* Let's move this better version to TRecordForm
-	getField(f: AnlistCol, rec: { [x: string]: string; }, classes: { [x: string]: string; }) {
+    /**
+	 * Let's move this better version to TRecordForm
+	 */
+	getField(f: TierCol, rec: { [x: string]: string; }, classes: { [x: string]: string; }) {
 		let media = this.media;
 		let { isSm } = media;
 		let that = this;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
-            const df = f as DatasetComboField;
+            const df = f as TierComboField;
 			return (
 				<DatasetCombo uri={ this.props.uri }
 					sk={df.sk} nv={ df.nv }
@@ -106,7 +114,7 @@ class CardFormComp extends TRecordForm {
 			);
 		}
 		else {
-            const tf = f as AnlistCol;
+            const tf = f as TierCol;
 			let type = 'text';
 			if (tf.type === 'float' || tf.type === 'int')
 				type = 'number';
@@ -125,9 +133,9 @@ class CardFormComp extends TRecordForm {
 				}}
 			/>);
 		}
-	} */
+	}
 
-	formFields(rec, classes, media) {
+	formFields(rec: {}, classes, media: Media) {
 		let fs = [];
 		const isSm = this.props.dense || toBool(media.isMd);
 
@@ -151,24 +159,26 @@ class CardFormComp extends TRecordForm {
 
 	render () {
 		const { classes, width } = this.props;
-		let media = CrudCompW.setWidth(width);
+		let media = CrudCompW.getMedia(width);
 
-		let rec = this.tier.rec;
 
-		return rec ?
-			<Grid container className={classes.root} direction='row'>
-				{this.formFields(rec, classes, media)}
+		return <>
+			{this.props.headFormatter(this.tier.rec, 0, classes, media)}
+			<Grid container>
+				{this.cards(classes, media)}
 			</Grid>
-			: <></>; // NOTE have to wait until parent loaded data
+		  </>;
+	}
+
+	// PaperHead(classes: {[x: string] : any}, media: Media): React.ReactNode {
+	// 	let pl = this.tier.rec;
+	// 	return <Card className={classes.paperHead}>{pl?.Title}</Card>
+	// }
+
+	cards(classes: {[x: string] : any}, media: Media): React.ReactNode {
+		return this.tier.rows?.map( (r, x) => this.props.CardsFormatter(r, x, classes, media) );
 	}
 }
 
-// CardFormComp.propTypes = {
-// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-// 	tier: PropTypes.object.isRequired,
-// 	dense: PropTypes.bool,
-// 	enableValidate: PropTypes.bool,
-// };
-
-const DefaultCardForm = withWidth()(withStyles(styles)(CardFormComp)); // FIXME only after anreact upgraded
-export { DefaultCardForm, CardFormComp }
+const CardsForm = withWidth()(withStyles(styles)(CardsFormComp)); // FIXME only after anreact upgraded
+export { CardsForm, CardsFormComp }

@@ -2,11 +2,19 @@ import { SessionClient, Inseclient } from "./anclient";
 import { Protocol, stree_t,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq
 } from "./protocol";
+
 const { CRUD } = Protocol;
 
+// not working
+// https://stackoverflow.com/a/45257357/7362888
+// const codes = Object.keys(MsgCode);
+// type Protocode = typeof codes[number];
+
 export interface ErrorCtx {
-	msg: undefined | string | Array<string>;
-	onError: (code: typeof Protocol.MsgCode, resp: AnsonResp) => void
+	msg?: undefined | string | Array<string>;
+	onError: (
+		/**MsgCode need to be re-defined */
+		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -22,7 +30,8 @@ export interface AnlistColAttrs {
 	box?: {};
 }
 
-export interface AnlistCol extends AnlistColAttrs{
+/**Meta data handled from tier (DB field) */
+export interface TierCol extends AnlistColAttrs{
     field: string;
     label: string;
     /**input type / form type */
@@ -32,14 +41,18 @@ export interface AnlistCol extends AnlistColAttrs{
     options?: [];
 }
 
+/**Record handled from tier */
+export interface Tierec {
+	[f: string]: string | object | undefined;
+}
+
 /**E.g. form's combobox field declaration */
-export interface DatasetComboField extends AnlistCol {
+export interface TierComboField extends TierCol {
 	nv: {n: string; v: string};
 	sk: string;
 	cbbStyle: {}; 
 }
 
-export type AnColModifier = ((col: AnlistCol, colIndx: number)=> AnlistColAttrs);
 
 /**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
 export interface QueryConditions {
@@ -50,6 +63,8 @@ export interface QueryConditions {
 export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
 /**Callback of CRUD.r */
 export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
+
+export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 
 /**
  * Not the same as java Semantext.
@@ -87,7 +102,7 @@ export class Semantier {
     /**main table name */
     mtabl: string;
     /** list's columns */
-    _cols: Array<AnlistCol>;
+    _cols: Array<TierCol>;
     /** client function / CRUD identity */
     uri: string;
     /** maintable's record fields */
@@ -97,11 +112,11 @@ export class Semantier {
     /** current crud */
     crud: string;
     /** current list's data */
-    rows: any[];
+    rows: Tierec[];
     /** current pk value */
     pkval: any;
     /** current record */
-    rec: {};
+    rec: Tierec;
 
     /** All sub table's relationships */
     rel: Array<any>;
@@ -129,7 +144,7 @@ export class Semantier {
 
     disableValidate: any;
 
-    validate(rec: {}, fields: Array<AnlistCol>): boolean {
+    validate(rec: {}, fields: Array<TierCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);
@@ -171,14 +186,14 @@ export class Semantier {
      * @param modifier.field user provided modifier to change column's style etc.
      * callback function signature: (col, index) {} : return column's properties.
      */
-	 columns (modifier?: {[x: string]: AnlistColAttrs | AnColModifier}): Array<AnlistColAttrs> {
+	 columns (modifier?: {[x: string]: AnlistColAttrs | AnFieldFormatter}): Array<AnlistColAttrs> {
 		if (!this._cols)
 			throw Error("_cols are not provided by child tier.");
 
 		if (modifier)
 			return this._cols.map( (c, x) =>
 				typeof modifier[c.field] === 'function' ?
-						{...c, ...(modifier[c.field] as AnColModifier)(c, x) } :
+						{...c, ...(modifier[c.field] as AnFieldFormatter)(c, x) } :
 						{...c, ...modifier[c.field]}
 			);
 		else
@@ -189,7 +204,7 @@ export class Semantier {
      * @param {object} modifier {field, function | object }
      * @param {object | function} modifier.field see #columns().
      */
-	 fields (modifier?: {[x: string]: AnlistColAttrs | AnColModifier}): Array<AnlistCol> {
+	 fields (modifier?: {[x: string]: AnlistColAttrs | AnFieldFormatter}): Array<TierCol> {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 
@@ -199,7 +214,7 @@ export class Semantier {
 			return this._fields.map( (c, x) => {
 				let disabled = c.disabled || c.field === that.pk && that.pkval ? true : false;
 				return typeof modifier[c.field] === 'function' ?
-						{...c, ...(modifier[c.field] as AnColModifier)(c, x), disabled } :
+						{...c, ...(modifier[c.field] as AnFieldFormatter)(c, x), disabled } :
 						{...c, ...modifier[c.field], disabled}
 			} );
 		else

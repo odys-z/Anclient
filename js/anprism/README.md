@@ -7,13 +7,13 @@
 
 Anprism is a light weight helper for editing morden (webpack transpiled) web pages in vscode.
 
-![screenshot for repository](res/00-anprism-0.2.0.png)
+![screenshot (for Github)](res/00-anprism-0.2.0.png)
 
 For live editing, there are other [similar (better) implementation](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server).
 
 Currently the difference is that Anprism uses Python for web server.
 
-[Screenshot](https://github.com/odys-z/Anclient/tree/master/js/anprism)
+[Screenshot (for Marketplace)](https://github.com/odys-z/Anclient/tree/master/js/anprism)
 
 ## Install
 
@@ -68,11 +68,13 @@ Experiments shows that if user's js scripts setting window.top, like this:
 
 will vialate the VS Code's security policy, and nothing will happen. User have to manually load new pages (right click target page, again).
 
-- Browser cache not be updated
+- Browser cache doesn't update
 
-Anprism's web viewer depends on VS Code's built-in Webview, which is heavily cached. This is frendly to end users but irretating to developers. Currently the author didn't find a good way to deal this. As a develper, you must know how to clear your recently modified code in Chrome Dev Tool.
+Anprism's web viewer depends on VS Code's built-in Webview, which is (look like) heavily cached. This is frendly to end users but irretating to developers. Currently the author didn't find a good way to deal this (please let him know the better way). As a develper, you must know how to clear cache for your recently modified code in Chrome Dev Tool.
 
 <p><img src='res/01-clear-cache.gif' style='width: 600px'/></p>
+
+[Image link for Marketplace](https://raw.githubusercontent.com/odys-z/Anclient/master/js/anprism/res/01-clear-cache.gif)
 
 - Windows: OSError: [WinError 10013]
 
