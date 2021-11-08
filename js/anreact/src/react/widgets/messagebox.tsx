@@ -10,19 +10,19 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 
 import QRCode from 'qrcode'
 
-import {L, copyToClipboard} from '../../utils/langstr';
+import { L, copyToClipboard } from '../../utils/langstr';
+import { Comprops, CrudComp, CrudCompW } from '../crud';
+import { AnContext } from '../reactext';
 
 const styles = theme => ({
   root: {
 	backgroundColor: "mint-cream",
-	textAlign: "center",
 	// "&:hover": {
 	// 	backgroundColor: "linen"
 	// }
@@ -40,23 +40,42 @@ const styles = theme => ({
   }
 });
 
-class ConfirmDialogComp extends React.Component {
+export interface DialogProps extends Comprops {
+	onOk?: (sender: React.ReactNode) => void;
+	onCancel?: (sender: React.ReactNode) => void;
+	onClose?: () => void;
+	/**Open dialog */
+	// open?: boolean;
+	title: string;
+	/**with cancel button label ("false" will disable button) */
+	cancel?: string | false;
+	ok?: string;
+	/**dialog message */
+	msg: string;
+
+	fullScreen?: boolean;
+	fullWidth?: boolean;
+}
+
+class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 	state = {
 		closed: false,
 	};
 
-	constructor (props = {}) {
+	handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
+
+	constructor (props) {
 		super(props);
 		this.toCancel = this.toCancel.bind(this);
 		this.toOk = this.toOk.bind(this);
 	}
 
-	toOk(e) {
+	toOk(e: React.MouseEvent<HTMLElement>) {
 		this.setState({closed: true});
 		if (typeof this.props.onOk === 'function')
 			this.props.onOk(e.currentTarget);
 		if (typeof this.props.onClose === 'function')
-			this.props.onClose(e.currentTarget);
+			this.props.onClose();
 	}
 
 	toCancel(e) {
@@ -64,28 +83,28 @@ class ConfirmDialogComp extends React.Component {
 		if (typeof this.props.onCancel === 'function')
 			this.props.onCancel(e.currentTarget);
 		if (typeof this.props.onClose === 'function')
-			this.props.onClose(e.currentTarget);
+			this.props.onClose();
 	};
 
 	textLines(msg) {
 		let lines = msg ? msg.split('\n') : [];
 
-		return lines.map( (l, x) => (
+		return lines.map( (lb, x) => (
 		  <DialogContentText id="alert-dialog-description" key={x}>
-		    {L(l)}
+		    {L(lb)}
 		  </DialogContentText>
 		));
 	}
 
 	render () {
 		let props = this.props;
-		let open = props.open && !this.state.closed;
+		// let open = props.open && !this.state.closed;
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
-		this.state.title = title;
+		// this.state.title = title;
 		let displayCancel = props.cancel === false ? 'none' : 'block';
-		let txtCancel = props.cancel === 'string' ? props.cancel : "Cancel";
-		let txtOk = props.ok || props.OK ? props.ok || props.OK : "OK";
+		let txtCancel = props.cancel || "Cancel";
+		let txtOk = props.ok || "OK";
 
 		let txtLines = this.textLines(props.msg);
 
@@ -96,7 +115,7 @@ class ConfirmDialogComp extends React.Component {
 		// if (full)
 		  return (
 			<Dialog className={classes.root}
-				open={open}
+				open={true}
 				fullScreen={full}
 				fullWidth={!full}
 				maxWidth={!full ? 'xs' : undefined}
@@ -126,10 +145,40 @@ class ConfirmDialogComp extends React.Component {
 const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
 export {ConfirmDialog, ConfirmDialogComp};
 
+export interface ErrorProps extends DialogProps {
+    onClose: () => void;
+    fullScreen: boolean;
+}
+
+export class AnError extends CrudCompW<ErrorProps> {
+	// props = undefined;
+	context: React.ContextType<typeof AnContext>
+
+	state = {
+	};
+
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		let ctx = this.context;// .errors;
+		let p = this.props as ErrorProps;
+		return (
+			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
+					open={!!ctx.hasError} onClose={p.onClose}
+					fullScreen={p.fullScreen}
+					msg={L(ctx.error.msg as string)} />
+		);
+	}
+}
+AnError.contextType = AnContext;
+
 ////////////////////////////////////////////////////////////////////////////////
-class QrSharingComp extends React.Component {
+class QrSharingComp extends CrudComp<DialogProps & { imgId: string; qr: {serv: string; quiz: string; origin: string; path: string; page: string}}> {
 	state = {
 		closed: false,
+		url: '',
 	};
 
 	constructor (props = {}) {
@@ -158,16 +207,16 @@ class QrSharingComp extends React.Component {
 	handleClose(e) {
 		this.setState({closed: true});
 		if (typeof this.props.onClose === 'function')
-			this.props.onClose(e.currentTarget);
+			this.props.onClose();
 	};
 
 	render () {
 		let props = this.props;
-		let open = props.open && !this.state.closed;
+		// let open = props.open && !this.state.closed;
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
-		this.state.title = title;
-		let txtOk = props.ok || props.OK ? props.ok || props.OK : "OK";
+		// this.state.title = title;
+		let txtOk = props.ok || "OK";
 
 		const { classes } = this.props;
 
@@ -187,7 +236,7 @@ class QrSharingComp extends React.Component {
 		let imgId = this.props.imgId;
 		QRCode.toDataURL(urlTxt, opts, function (err, url) {
 			if (err) throw err
-			let img = document.getElementById('qrcode ' + imgId)
+			let img = document.getElementById('qrcode ' + imgId) as HTMLImageElement;
 			if(img) img.src = url
 		})
 

@@ -3,7 +3,7 @@
 
 import { assert } from 'chai'
 
-import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp, AnResultset } from '../protocol-v2';
+import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp, AnResultset } from '../protocol';
 import { AnClient, SessionClient, SessionInf } from '../anclient';
 const { CRUD } = Protocol;
 
@@ -141,7 +141,6 @@ const localStorage = {
 describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
     it('SessionReq formating / instantiation', () => {
-		debugger
 		let ssReq = Protocol.formatSessionLogin('user 1', 'passweord cipher', 'iv64 ... ...');
         assert.equal(ssReq.code, null, "1 ---");
         assert.equal(ssReq.port, 'session', "2 ---");
@@ -175,7 +174,6 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 		assert.equal(qr.where[0][1], 'agegrp', "9 3--");
 
 		let port = 'query';
-		debugger
 		let jreq = new AnsonMsg({
 					port,
 					header: null,

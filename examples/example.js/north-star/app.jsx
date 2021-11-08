@@ -70,7 +70,7 @@ class App extends React.Component {
 			});
 		}
 
-		// extending CRUD pages
+		// extending pages
 		SysComp.extendLinks( [
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},

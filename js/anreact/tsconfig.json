@@ -9,5 +9,5 @@
     "jsx": "react",
     "esModuleInterop": true,
   },
-  "exclude": [ "dist", "ts/*", "**/*.tsx" ]
+  "exclude": [ "dist", "*.ts", "ts/*", "*.tsx" ]
 }

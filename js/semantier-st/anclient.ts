@@ -6,8 +6,11 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset, CRUD
 } from './protocol';
+import { ErrorCtx } from './semantier';
+
+export interface AjaxOptions {async?: boolean; timeout?: number}
 
 interface AjaxReport {
 	statusText: string;
@@ -79,7 +82,7 @@ class AnClient {
      * This function must been callded to extned port's names.
      * @param new Ports
      * @return this */
-	understandPorts (newPorts: string) : this {
+	understandPorts (newPorts: { [p: string]: string; }) : this {
 		// Object.assign(Protocol.Port, newPorts);
 		Protocol.extend(newPorts);
         return this;
@@ -102,7 +105,7 @@ class AnClient {
      */
 	login (usrId: string, pswd: string,
 		onLogin: { (ssClient: any): void; (arg0: SessionClient): void; },
-		onError: (/**The lower API of jclient/js */ err: any) => void): this {
+		onError: ErrorCtx): this {
 
 		let iv = aes.getIv128() as unknown as Uint8Array;
 		let cpwd = aes.encrypt(usrId, pswd, iv);
@@ -125,7 +128,7 @@ class AnClient {
 					onLogin(sessionClient);
 				else console.log(sessionClient);
 			},
-			onError, {});
+			onError);
 		return this;
 	}
 
@@ -134,7 +137,7 @@ class AnClient {
 		return new Promise((resolve, reject) => {
 			me.login(usrId, pswd,
 				(ssClient) => {resolve(ssClient);},
-				(err) => {reject(err);})
+				{ onError: (err) => {reject(err);} })
 		});
 	}
 
@@ -157,11 +160,15 @@ class AnClient {
 	}
 
     /**Post a request, using Ajax.
-     * @param {AnsonMsg} jreq
-     * @param {function} onOk
-     * @param {function} onErr function (MsgCode, AnsonResp?)
-     * @param {object} ajaxOpts */
-	post (jreq, onOk, onErr, ajaxOpts) {
+     * @param jreq
+     * @param onOk
+     * @param onErr must present. since 0.9.32, Anclient won't handle error anymore, and data accessing errors should be handled by App singleton.
+     * @param ajaxOpts */
+	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
+		if (!onErr || !onErr.onError) {
+			console.error("Since 0.9.32, this global error handler must present - error handling is supposed to be the app singleton's responsiblity.")
+		}
+
 		if (jreq === undefined) {
 			console.error('jreq is null');
 			return;
@@ -178,7 +185,7 @@ class AnClient {
 		}
 		var url = this.servUrl(jreq.port);
 
-		var async =  true;
+		var async = true;
 		if (ajaxOpts !== undefined && ajaxOpts !== null) {
 			async = ajaxOpts.async !== false;
 		}
@@ -190,10 +197,9 @@ class AnClient {
 			contentType: "application/json; charset=utf-8",
 			crossDomain: true,
             async: async,
-			//xhrFields: { withCredentials: true },
 			data: JSON.stringify(jreq),
-			timeout: jreq.timeout || 18000,
-			success: function (resp) {
+			timeout: ajaxOpts?.timeout || 18000,
+			success: function (resp: AnsonMsg<AnsonResp>) {
 				// response Content-Type = application/json;charset=UTF-8
 				if (typeof resp === 'string') {
 					// why?
@@ -207,9 +213,10 @@ class AnClient {
 				}
 
 				if (resp.code !== Protocol.MsgCode.ok)
-					if (typeof onErr === "function")
-						onErr(resp.code, resp);
-					else if (onErr && typeof onErr.onError === "function"){
+					// if (typeof onErr === "function")
+					// 	onErr(resp.code, resp);
+					// else
+					if (onErr && typeof onErr.onError === "function"){
 						// a special case of AnContext.error
 						onErr.msg = resp.Body().msg();
 						onErr.onError(resp.code, resp);
@@ -238,7 +245,8 @@ class AnClient {
 							onErr.msg = ansonResp.Body().msg();
 							onErr.onError(Protocol.MsgCode.exIo, ansonResp);
 						}
-						else onErr(Protocol.MsgCode.exIo, ansonResp);
+						else throw Error("In anreact for typescript, onErr must be an ErrorCtx.")
+						// else onErr(Protocol.MsgCode.exIo, ansonResp);
 					}
 					else {
 						if (resp.code || resp.port || !resp.status)
@@ -254,7 +262,8 @@ class AnClient {
 							onErr.msg = resp.Body().msg();
 							onErr.onError(Protocol.MsgCode.exIo, resp);
 						}
-						onErr(Protocol.MsgCode.exIo, resp);
+						else throw Error("In anreact for typescript, onErr must be an ErrorCtx.")
+						// onErr(Protocol.MsgCode.exIo, resp);
 					}
 				}
 				else {
@@ -267,14 +276,14 @@ class AnClient {
 	}
 
     /**Async-await style posting a request, using Ajax.
-     * @param {AnsonMsg} jreq
-     * @param {object} [ajaxOpts] */
-	postWait(jreq, ajaxOpts = null) {
+     * @param jreq
+     * @param ajaxOpts */
+	postWait(jreq: AnsonMsg<AnsonBody>, ajaxOpts : AjaxOptions) {
 		let me = this;
 		return new Promise((resolve, reject) => {
 			me.post(jreq,
 				resp => {resolve(resp);},
-				(c, err) => {reject({c, err});},
+				{ onError: (c, err) => {reject({c, err});} },
 				ajaxOpts)
 		});
 	}
@@ -378,6 +387,9 @@ export type SessionInf = {
 class SessionClient {
 	an: AnClient;
 	ssInf: any;
+
+	// errCtx = {onError: undefined, msg: undefined} as ErrorCtx;
+
 	currentAct: LogAct = {
 		func: '',
 		cmd: '',
@@ -427,7 +439,7 @@ class SessionClient {
 				localStorage.setItem(SessionClient.ssInfo, infStr);
 			}
 		}
-		else {
+		else if (!dontPersist) {
 			this.ssInf = SessionClient.loadStorage();
 		}
 
@@ -542,19 +554,19 @@ class SessionClient {
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
 	 * @param jmsg request message
 	 * @param onOk
-	 * @param onError
+	 * @param errCtx error handler of singleton. Since 0.9.32, this arg is required.
 	 */
-	commit (jmsg: AnsonMsg<any>, onOk: (resp: AnsonMsg<AnsonResp>) => void, onErr: ()=>void) {
-		an.post(jmsg, onOk, onErr, undefined);
+	commit (jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk, errCtx: ErrorCtx) {
+		an.post(jmsg, onOk, errCtx, undefined);
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
 	 * onOk, onError will be called after request finished.
-	 * @param {AnsonMsg} jmsg request message
-	 * @param {function} onOk
-	 * @param {function} onError
+	 * @param jmsg request message
+	 * @param onOk
+	 * @param onError
 	 */
-	commitSync(jmsg, onOk, onError) {
+	commitSync(jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk, onError: ErrorCtx) {
 		this.an.post(jmsg, onOk, onError, {async: false});
 	}
 
@@ -604,7 +616,7 @@ class SessionClient {
 		}
 
 		var upd = new UpdateReq(uri, maintbl, pk);
-		upd.a = Protocol.CRUD.u;
+		upd.a = CRUD.u;
 		this.currentAct.cmd = 'update';
 		var jmsg = this.userReq(uri, 'update', upd, this.currentAct);
 
@@ -649,7 +661,7 @@ class SessionClient {
 		}
 
 		let upd = new UpdateReq(uri, maintbl, pk);
-		upd.a = Protocol.CRUD.d;
+		upd.a = CRUD.d;
 		this.currentAct.cmd = 'delete';
 
 		let jmsg = this.userReq(uri,
@@ -658,15 +670,16 @@ class SessionClient {
 		return jmsg;
 	}
 
-	getSks(port, onLoad) {
+	getSks(onLoad: OnLoadOk, errCtx: ErrorCtx) {
 		let req = this.userReq(null, 'datasetier',
 					new DatasetierReq(undefined)
 					.A(DatasetierReq.A.sks), undefined );
 
 		this.commit(req,
 			(resp) => {
-				onLoad(resp.Body().getProp('sks'));
-			}, undefined );
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().getProp('sks') as AnResultset);
+				onLoad(cols, rows);
+			}, errCtx );
 	}
 
 	/**Use this to delete multiple records where pkn = pks[i]
@@ -679,7 +692,7 @@ class SessionClient {
 	deleteMulti(uri: string, mtabl: string, pkn: string, pks: Array<any>): AnsonMsg<UpdateReq> {
 		let upd = new UpdateReq(uri, mtabl, undefined)
 			.whereIn(pkn, pks);
-		upd.a = Protocol.CRUD.d;
+		upd.a = CRUD.d;
 		this.currentAct.cmd = 'delete';
 
 		var jmsg = this.userReq(uri,
@@ -697,7 +710,7 @@ class SessionClient {
 	userReq<T extends AnsonBody>(uri: string, port: string, bodyItem: T, act: LogAct): AnsonMsg<T> {
 		if (!port)
 			throw Error('AnsonMsg<UserReq> needs port explicitly specified.');
-			
+
 		let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri = uri || bodyItem.uri;
 		if (typeof act === 'object') {
@@ -734,22 +747,22 @@ class SessionClient {
 		return this;
 	}
 
-	logout(onOk, onError) {
+	logout(onOk: OnCommitOk, onError) {
 		let header = Protocol.formatHeader(this.ssInf);
 		let body = {type: "io.odysz.semantic.jsession.AnSessionReq", a: "logout"};
 		let req = new AnsonMsg({port: 'session', header, body: [body]});
 
-		an.post(req, function(c, r) {
+		an.post(req, function(r: AnsonMsg<AnsonResp>) {
         	localStorage.setItem(SessionClient.ssInfo, null);
 			if (typeof onOk === 'function')
-				onOk(c, r);
-		}, function(c, e) {
+				onOk(r);
+		},
+		{ onError: (c, e) => {
         	localStorage.setItem(SessionClient.ssInfo, null);
 			if (typeof onError === 'function')
 				onError(c, e);
-		}, undefined);
+		} });
 	}
-
 }
 
 /**Client without session information.

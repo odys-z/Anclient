@@ -17,13 +17,13 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 
-import { Protocol, AnsonResp } from '@anclient/semantier';
+import { Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
 	import { AnConst } from '../../utils/consts';
-	import { AnContext } from '../reactext.jsx';
+	import { AnContext } from '../reactext';
 	import { AnTreeIcons } from "./tree"
 	import { DetailFormW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
@@ -104,7 +104,7 @@ class SimpleFormComp extends DetailFormW {
 
 		this.funcId = props.funcId || 'SimpleForm';
 
-		this.state.crud = props.c ? Protocol.CRUD.c : Protocol.CRUD.u;
+		this.state.crud = props.c ? CRUD.c : CRUD.u;
 		this.state.mtabl = props.mtabl;
 		this.state.fields = props.fields;
 
@@ -129,7 +129,7 @@ class SimpleFormComp extends DetailFormW {
 	componentDidMount() {
 		let that = this;
 
-		if (this.state.crud !== Protocol.CRUD.c) {
+		if (this.state.crud !== CRUD.c) {
 			if (!this.state.pkval)
 				throw Error("The pkval property not been set correctly. Record can not be loaded.");
 
@@ -193,7 +193,7 @@ class SimpleFormComp extends DetailFormW {
 
 		let client = this.context.anClient;
 		let rec = this.state.record;
-		let c = this.state.crud === Protocol.CRUD.c;
+		let c = this.state.crud === CRUD.c;
 
 		let req;
 
@@ -217,15 +217,15 @@ class SimpleFormComp extends DetailFormW {
 
 		// 2. request (insert / update)
 		let pk = this.state.pk;
-		if (this.state.crud === Protocol.CRUD.c) {
+		if (this.state.crud === CRUD.c) {
 			nvs.push({name: pk.field, value: rec[pk.field]});
 			req = client
-				.usrAct(this.uri, Protocol.CRUD.c, this.props.title || 'new record')
+				.usrAct(this.uri, CRUD.c, this.props.title || 'new record')
 				.insert(this.uri, this.state.mtabl, nvs);
 		}
 		else {
 			req = client
-				.usrAct(this.funcId, Protocol.CRUD.u, 'edit card')
+				.usrAct(this.funcId, CRUD.u, 'edit card')
 				.update(this.uri, this.state.mtabl, pk.field, nvs);
 			req.Body()
 				.whereEq(pk.field, rec[pk.field]);
@@ -233,7 +233,7 @@ class SimpleFormComp extends DetailFormW {
 
 		let that = this;
 		client.commit(req, (resp) => {
-			that.state.crud = Protocol.CRUD.u;
+			that.state.crud = CRUD.u;
 			that.showOk(L('Card saved!'));
 			if (typeof that.props.onOk === 'function')
 				that.props.onOk({code: resp.code, resp});
@@ -299,7 +299,7 @@ class SimpleFormComp extends DetailFormW {
 
 	formFields(rec, classes) {
 		let fs = [];
-		let c = this.state.crud === Protocol.CRUD.c;
+		let c = this.state.crud === CRUD.c;
 		const isSm = toBool(super.media.isMd);
 
 		this.state.fields.forEach( (f, i) => {
@@ -324,8 +324,8 @@ class SimpleFormComp extends DetailFormW {
 	render () {
 		const { classes, width } = this.props;
 
-		let c = this.state.crud === Protocol.CRUD.c;
-		let u = this.state.crud === Protocol.CRUD.u;
+		let c = this.state.crud === CRUD.c;
+		let u = this.state.crud === CRUD.u;
 		let rec = this.state.record;
 
 		let title = this.state.title ? this.state.title

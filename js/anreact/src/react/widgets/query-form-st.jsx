@@ -7,7 +7,7 @@ import { Search, Replay } from '@material-ui/icons';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
-	import { AnContext } from '../reactext.jsx';
+	import { AnContext } from '../reactext';
 	import { CrudComp } from '../crud'
 
 const styles = (theme) => ( {

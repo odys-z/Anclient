@@ -1,23 +1,14 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
 
-import { Protocol, AnsonResp } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
-	import { Semantier  } from '@anclient/semantier';
-	import { AnConst } from '../../utils/consts';
-	import { CrudCompW } from '../../react/crud';
-	import { AnContext, AnError } from '../../react/reactext';
+	import { Semantier  } from '@anclient/semantier-st';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	// import { AnTablistLevelUp } from '../../react/widgets/table-list-lu';
-	import { AnQueryForm } from '../../react/widgets/query-form';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
-	import { JsampleIcons } from '../styles';
 
 import { MyInfTier } from './my-infcard';
+import { Comprops, DetailFormW } from '../../react/crud';
 
 const styles = theme => (Object.assign(
 	Semantier.invalidStyles, {
@@ -27,7 +18,7 @@ const styles = theme => (Object.assign(
 /**
  * Adding-only file list shared for every users.
  */
-class MyPswdComp extends React.Component {
+class MyPswdComp extends DetailFormW<Comprops> {
 
 	state = {
 		sizeOptions:[10, 25, 50],
@@ -37,6 +28,10 @@ class MyPswdComp extends React.Component {
 	}
 
 	selected = undefined; // props.selected.Ids, the set
+	tier: any;
+	confirm: JSX.Element;
+	static propTypes: {};
+
 
 	constructor(props){
 		super(props)
@@ -67,7 +62,7 @@ class MyPswdComp extends React.Component {
 		this.tier.setContext(this.context);
 	}
 
-	showConfirm(msg) {
+	showConfirm(msg: string | string[]) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
@@ -77,7 +72,7 @@ class MyPswdComp extends React.Component {
 		this.setState({});
 	}
 
-	changePswd(e) {
+	changePswd(e: React.MouseEvent<HTMLElement>) {
 		let that = this;
 		if (!this.tier.changePswd({uri: this.props.uri},
 			(resp) => { that.showConfirm(L('Password changed successfully!')); })) {
@@ -129,7 +124,7 @@ class PswdTier extends MyInfTier {
 		  validator: {notNull: true} },
 		{ field: 'pswd2', type: 'password', label: L('Confirm New'),  grid: {md: 6, lg: 4},
 		  autocomplete: "on",
-		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ];
+		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ] as Array<any>;
 
 	changePswd(opts, onOk) {
 		if (!this.client) return;

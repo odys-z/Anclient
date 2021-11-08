@@ -5,8 +5,10 @@ import React from 'react';
 	import { withStyles } from "@material-ui/core/styles";
 	import Button from '@material-ui/core/Button';
 
-import { CrudComp } from './crud';
+import { Comprops, CrudComp } from './crud';
 import { AnContext } from './reactext';
+import { TextField } from '@material-ui/core';
+import { L } from '../utils/langstr';
 
 const styles = (theme) => ( {
 	root: {
@@ -16,27 +18,29 @@ const styles = (theme) => ( {
 	}
 } );
 
-class ErrorComp extends CrudComp {
+class ErrorComp extends CrudComp<Comprops> {
 	// const { classes } = this.props;
 
 	state = {
 		details: '',
 		info: '',
 		desc: '',
+		msg: undefined,
+		sysName: '',
 	};
 
 	constructor(props) {
 		super(props);
 		this.state.sysName = props.sys || props.sysName || props.name;
 
-		this.onDetails = this.onDetails.bind(this);
+		// this.onDetails = this.onDetails.bind(this);
 	}
 
 	/** A simulation of error triggering (used for error handling test). */
 	toShowError() {
-		this.context.error.msg = this.state.errorMsg;
-		if (typeof this.context.error.onError === 'function');
-			this.context.error.onError(this.state.errorMsg);
+		this.context.error.msg = this.state.msg;
+		if (typeof this.context.error.onError === 'function')
+			this.context.error.onError(this.state.msg);
 	}
 
 	toSubmit() {

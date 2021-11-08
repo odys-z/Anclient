@@ -2,23 +2,20 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
-import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp , UserReq } from '@anclient/semantier';
+import { Protocol, CRUD, AnsonResp , UserReq } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { Semantier } from '@anclient/semantier';
-	import { AnConst } from '../../utils/consts';
+	import { Semantier } from '@anclient/semantier-st';
 	import { CrudCompW } from '../../react/crud';
-	import { AnContext, AnError } from '../../react/reactext';
+	import { AnContext } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { AnTablist } from '../../react/widgets/table-list';
 	import { AnQueryst } from '../../react/widgets/query-form-st';
 	import { JsampleIcons } from '../styles';
 
 	import { UserDetailst } from './user-details';
-
-const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
@@ -342,7 +339,7 @@ export class UsersTier extends Semantier {
 
 		let { uri, crud } = opts;
 
-		if (crud === Protocol.CRUD.u && !this.pkval)
+		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
 		let {cipher, iv} = this.client.encryptoken(this.rec.pswd);
@@ -351,12 +348,12 @@ export class UsersTier extends Semantier {
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
-			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
+			.A(crud === CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
 		client.commit(req,
 			(resp) => {
 				let bd = resp.Body();
-				if (crud === Protocol.CRUD.c)
+				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
 					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
