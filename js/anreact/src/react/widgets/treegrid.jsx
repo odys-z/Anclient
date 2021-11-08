@@ -2,7 +2,8 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Collapse from "@material-ui/core/Collapse";
-import { Typography } from "@material-ui/core";
+
+import Typography from "@material-ui/core/Typography";
 
 import { AnTreeIcons } from "./tree";
 
@@ -19,12 +20,16 @@ const styles = (theme) => ({
   },
   rowHead: {
 	padding: theme.spacing(1),
+	paddingTop: 0,
+	paddingBottom: 0,
   },
   folder: {
 	width: "100%"
   },
   folderHead: {
 	padding: theme.spacing(1),
+	paddingTop: 0,
+	paddingBottom: 0,
 	borderBottom: "1px solid #bcd",
 	borderTop: "1px solid #bcd"
   },
@@ -33,6 +38,8 @@ const styles = (theme) => ({
   },
   treeItem: {
 	padding: theme.spacing(1),
+	paddingTop: 0,
+	paddingBottom: 0,
 	borderLeft: "1px solid #bcd",
   }
 });

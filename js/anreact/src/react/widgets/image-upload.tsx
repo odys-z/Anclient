@@ -5,10 +5,11 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import Box from '@material-ui/core/Box';
 
-import { Semantier } from '@anclient/semantier';
+import { Semantier } from '@anclient/semantier-st';
 
-import { AvatarIcon, gCamera, gCameraViewBox } from './my-icon';
-import { uarr2Base64, mimeOf } from '../../utils/file-utils';
+import { gCamera, gCameraViewBox } from './my-icon';
+import { mimeOf } from '../../utils/file-utils';
+import { DetailFormW, Comprops } from '../crud';
 
 const styles = (theme) => (Object.assign(
 	Semantier.invalidStyles, {
@@ -18,7 +19,13 @@ const styles = (theme) => (Object.assign(
 	}
 ) );
 
-class ImageUploadComp extends React.Component {
+/**
+ */
+interface ImgFormProps extends Comprops {
+	blankIcon: object;
+}
+
+class ImageUploadComp extends DetailFormW<ImgFormProps> {
 	state = {
 		src: undefined,
 	}
@@ -26,7 +33,9 @@ class ImageUploadComp extends React.Component {
 	fileInput = undefined;
 	imgPreview = undefined;
 
-	constructor(props) {
+	field: any;
+
+	constructor(props: ImgFormProps) {
 		super(props);
 
 		this.toShowImage = this.toShowImage.bind(this);
@@ -37,18 +46,18 @@ class ImageUploadComp extends React.Component {
 
 	componentDidMount() {
 		if (this.props.file) {
-			let freader = new FileReader();
-			freader.onload = function (e) {
-				var b64 = fileclient.Uint8ToBase64(new Uint8Array(freader.result));
-				if (typeof onok === 'function') {
-					onok(fileclient.file, b64);
-				}
-			}
-			if (fileclient.file) {
-				freader.readAsArrayBuffer(fileclient.file);
-			}
+			// let freader = new FileReader();
+			// freader.onload = function (e) {
+			// 	var b64 = fileclient.Uint8ToBase64(new Uint8Array(freader.result));
+			// 	if (typeof onok === 'function') {
+			// 		onok(fileclient.file, b64);
+			// 	}
+			// }
+			// if (fileclient.file) {
+			// 	freader.readAsArrayBuffer(fileclient.file);
+			// }
 
-			this.state.src = this.props.src;
+			// this.state.src = this.props.src;
 		}
 	}
 
@@ -97,7 +106,7 @@ class ImageUploadComp extends React.Component {
 		return (
 		  //<Box style={{height: 48, border: "solid 1px #aaa2"}}>
 		  <Box className={ this.props.classBox || classes.imgUploadBox }>
-			<img src={dataimg} style={{ width: "auto", height: "100%" }}
+			<img src={dataimg} style={{ width: "auto", height: "100%", minHeight: 48 }}
 				ref={(ref) => this.imgPreview = ref} />
 			<input type='file' style={ bg }
 		 		ref={ (ref) => this.fileInput = ref }
@@ -106,10 +115,10 @@ class ImageUploadComp extends React.Component {
 	}
 }
 
-ImageUploadComp.propTypes = {
-	tier: PropTypes.object.isRequired,
-	nv: PropTypes.object, // the record field and value
-};
+// ImageUploadComp.propTypes = {
+// 	tier: PropTypes.object.isRequired,
+// 	nv: PropTypes.object, // the record field and value
+// };
 
 const ImageUpload = withWidth()(withStyles(styles)(ImageUploadComp));
 export { ImageUpload, ImageUploadComp };

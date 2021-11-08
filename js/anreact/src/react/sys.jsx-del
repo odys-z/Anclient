@@ -38,7 +38,7 @@ import { AnContext } from './reactext';
 
 import {
 	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow
-} from './crud.jsx'
+} from './crud'
 
 
 const _icons = {

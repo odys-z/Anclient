@@ -1,3 +1,9 @@
+/**Callback of CRUD.c/u/d */
+export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
+/**Callback of CRUD.r */
+export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
+
+export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 
 /**Json string options, like no-null: true for asking server replace null with ''.  */
 export interface JsonOptions {
@@ -49,11 +55,12 @@ export interface AttachMeta {
 }
 
 export interface AnResultset {
+	results: Array<Array<any>>;
 	length() : number;
     // results: Array<any>;
     total: number;
     // filter(arg0: (r: any) => boolean) : Array<{}>;
-    rs: Array<{}>;
+    // rs: Array<{}>;
     colnames: {};
 }
 
@@ -79,7 +86,8 @@ class Jregex {
 /**Json protocol helper to support jclient.
  * All AnsonBody and JHelper static helpers are here. */
 export class Protocol {
-	static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
+	// static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
+
 	static Port = {	heartbeat: "ping.serv11",
 		echo: "echo.serv11", session: "login.serv11",
 		query: "r.serv11", update: "u.serv11",
@@ -111,7 +119,7 @@ export class Protocol {
 	 * @function
 	 * @param {object} newPorts
 	 */
-	static extend = function(newPorts: string) {
+	static extend = function(newPorts: {[p: string]: string}) {
 		Object.assign(Protocol.Port, newPorts);
 	};
 
@@ -156,10 +164,10 @@ export class Protocol {
 	}
 
     /**Format login request message.
-     * 
-     * @param uid 
+     *
+     * @param uid
      * @param tk64  password cypher
-     * @param iv64 
+     * @param iv64
      * @return login request message
      */
     static formatSessionLogin(uid: string, tk64: string, iv64: string): AnsonMsg<AnSessionReq> {
@@ -229,6 +237,8 @@ export class Protocol {
 
 }
 
+export enum CRUD { c = 'I', r = 'R', u = 'U', d = 'D' };
+
 export class AnsonMsg<T extends AnsonBody> {
 	type = "io.odysz.semantic.jprotocol.AnsonMsg";
 
@@ -283,8 +293,11 @@ export class AnsonMsg<T extends AnsonBody> {
 			}
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
 				body = new AnDatasetResp(body);
-			else if (body.type === "io.odysz.semantic.tier.DatasetierReq")
-				body = new DatasetierReq(body);
+
+			// else if (body.type === "io.odysz.semantic.tier.DatasetierReq")
+			// 	body = new DatasetierReq(body);
+			// else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
+			// 	body = new DatasetierResp(body);
 
 			// FIXME never used?
 			// else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
@@ -301,22 +314,22 @@ export class AnsonMsg<T extends AnsonBody> {
 			}
 
 			if (a) body.A(a);
-	
+
 			// moc the ajax error
 			if (json.ajax)
 				body.ajax = json.ajax;
 		}
-	
+
 		this.code = json.code;
 		this.version = json.version ? json.version : "1.0";
 		this.seq = json.seq;
 		this.port = json.port;
-	
+
 		if (!this.seq)
 			this.seq = Math.round(Math.random() * 1000);
 
 		this.opts = Protocol.valOptions;
-	
+
 		this.body = [];
 		if (body)
 			body.parent = this.type;
@@ -352,7 +365,7 @@ export class AnsonBody {
 	/**
 	 * Create request object, a Semantic-jserv envolope object.
 	 * All user request should be a subclass of AnsonBody.
-	 * 
+	 *
 	 * It's highly recommended the parameter is pressented when creating the object.
 	 * @param body json object
 	 */
@@ -661,7 +674,7 @@ export class UpdateReq extends AnsonBody {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
-		this.a = Protocol.CRUD.u;
+		this.a = CRUD.u;
 		this.mtabl = tabl;
 		this.nvs = [];
 		this.where = [];
@@ -819,7 +832,7 @@ export class UpdateReq extends AnsonBody {
 export class DeleteReq extends UpdateReq {
 	constructor (uri: string, tabl: string, pk: string) {
 		super (uri, tabl, pk);
-		this.a = Protocol.CRUD.d;
+		this.a = CRUD.d;
 	}
 }
 
@@ -830,7 +843,7 @@ export class InsertReq extends UpdateReq {
 
 	constructor (uri: string, tabl: string) {
 		super (uri, tabl, undefined);
-		this.a = Protocol.CRUD.c;
+		this.a = CRUD.c;
 	}
 
 	/**
@@ -869,7 +882,7 @@ export class InsertReq extends UpdateReq {
 	 * @param exp the expression string like "3 * 2"
 	 * @return {InsertReq} this*/
 	nExpr(n : string, exp : any) {
-        console.error("Bug!!"); 
+        console.error("Bug!!");
 		return this.nv(n, exp);
 	}
 
@@ -995,7 +1008,7 @@ export class AnsonResp extends AnsonBody {
 		}
 
 		return {cols, rows};
-	
+
     }
 
     /**Provide nv, convert results to AnReact combobox options (for binding).
@@ -1054,7 +1067,7 @@ export class AnsonResp extends AnsonBody {
     Rs(rx = 0): AnResultset { return this.rs.length ? this.rs[rx] : this.rs; }
 
     data: {props?: {}};
-    getProp(prop: string): object { 
+    getProp(prop: string): object {
 		if (this.data && this.data.props)
 			return this.data.props[prop];
     }
@@ -1093,7 +1106,7 @@ export class AnTreeNode {
 	id: string;
 	level: number;
 	parent: string;
-} 
+}
 
 export class AnDatasetResp extends AnsonResp {
 	forest: Array<AnTreeNode>;
@@ -1108,39 +1121,44 @@ export class AnDatasetResp extends AnsonResp {
 	}
 }
 
+export interface DatasetOpts {
+	port: string;
+	/**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
+	uri: string;
+	/** semantic key configured in WEB-INF/dataset.xml */
+	sk: string;
+	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
+	t?: {
+		/** load dataset configured and format into tree with semantics defined by sk. */
+		sqltree: string;
+		/** Reformat the tree structure - reformat the 'fullpath', from the root */
+		retree: string;
+		/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+		reforest: string;
+		/** Query with client provided QueryReq object, and format the result into tree. */
+		query: string;
+	};
+	a?: string;
+	/**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
+	mtabl?: string;
+	mAlias?: string;
+	/** {page, size} page index and page size. */
+	pageInf?: PageInf;
+	/** tree root id */
+	rootId?: string;
+	/** sql args */
+	sqlArgs?: string[];
+	/** {{n, v}} ...opts more arguments for sql args. */
+	args?: object;
+
+	onOk?: OnCommitOk;
+};
+
 export class DatasetReq extends QueryReq {
     /**
-     * @param opts this parameter should be refactored 
+     * @param opts this parameter should be refactored
      */
-    constructor(opts?: {
-        /**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
-        uri: string;
-        /** semantic key configured in WEB-INF/dataset.xml */
-        sk: string;
-        /** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
-        t?: {
-            /** load dataset configured and format into tree with semantics defined by sk. */
-            sqltree: string;
-            /** Reformat the tree structure - reformat the 'fullpath', from the root */
-            retree: string;
-            /** Reformat the forest structure - reformat the 'fullpath', for the entire table */
-            reforest: string;
-            /** Query with client provided QueryReq object, and format the result into tree. */
-            query: string;
-        };
-        a?: string;
-        /**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
-        mtabl: string;
-        mAlias?: string;
-        /** {page, size} page index and page size. */
-        pageInf?: PageInf;
-        /** tree root id */
-        rootId?: string;
-        /** sql args */
-        sqlArgs?: string[];
-        /** {{n, v}} ...opts more arguments for sql args. */
-        args?: object;
-    } ) {
+    constructor(opts?: DatasetOpts ) {
 
 		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
 
@@ -1188,7 +1206,7 @@ export class DatasetReq extends QueryReq {
 			query: string;
 		}) {
 		if (typeof ask === 'string' && ask.length > 0 && ask !== stree_t.sqltree) {
-			console.warn('DatasetReq.a is ignored for sk is defined.', ask);
+			console.info('DatasetReq.a is ignored for sk is defined.', ask);
 			this.a = stree_t.sqltree;
 		}
 		else {
@@ -1245,14 +1263,25 @@ export const stree_t = {
 };
 
 export class DatasetierReq extends AnsonBody {
-	type = "io.odysz.semantic.tier.DatasetierReq";
+	static __type__ = "io.odysz.semantic.tier.DatasetierReq";
 
     static A = {
-        sks: undefined as string
+        sks: 'r/sks'
     };
 
     constructor(opts: any) {
 		super(opts);
-	    this.type = "io.odysz.semantic.tier.DatasetierReq";
+	    this.type = DatasetierReq.__type__;
     }
 }
+Protocol.registerBody(DatasetierReq.__type__, (json) => new DatasetierReq(json));
+
+export class DatasetierResp extends AnsonResp {
+	static __type__ = "io.odysz.semantic.tier.DatasetierResp";
+
+	constructor(dsJson) {
+		super(dsJson);
+		this.type = DatasetierResp.__type__;
+	}
+}
+Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json));

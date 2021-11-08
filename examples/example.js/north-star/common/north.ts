@@ -1,7 +1,7 @@
 
 import React from "react";
 import { AnContext, SysComp } from "@anclient/anreact";
-import { TierCol, AnlistColAttrs, Tierec, QueryConditions, Semantier } from "@anclient/semantier-st";
+import { AnlistColAttrs, Tierec, QueryConditions } from "@anclient/semantier-st";
 import { Breakpoint } from "@material-ui/core/styles/createBreakpoints";
 
 /**TODO move to @anclient/anreact */
@@ -41,7 +41,6 @@ export interface Comprops {
     readonly width?: Breakpoint;
 };
 
-// export type WelcomeProp = Readonly<{ classes: {board: any}; sys: typeof SysComp } extends Comprops>;
 export interface WelcomeProp extends Comprops {
     readonly classes: { board: any }
     readonly sys: typeof SysComp
@@ -58,9 +57,13 @@ export interface FormProp extends Comprops {
 
 	readonly dense?: boolean;
     readonly classes: {
-		root?: string; dialogPaper?: string; smalltip?: string;
-        content?: string; buttons?: string;
-		button?: string, card?: string;
+		root?: string;
+		dialogPaper?: string;
+		smalltip?: string;
+        content?: string;
+		buttons?: string;
+		button?: string,
+		card?: string;
 		[x: string]: any
 	};
     onClose?: (event: React.UIEvent) => void;

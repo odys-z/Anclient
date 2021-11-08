@@ -1,21 +1,16 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
-import { Button, Grid, Card, Typography } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
 
-import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp } from '@anclient/semantier';
+import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier, Tierec } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
 	import { dataOfurl, urlOfdata } from '../../utils/file-utils';
-	import { Semantier  } from '@anclient/semantier';
-	import { AnConst } from '../../utils/consts';
-	import { CrudCompW } from '../../react/crud';
-	import { AnContext, AnError } from '../../react/reactext';
-	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
-	import { AnQueryForm } from '../../react/widgets/query-form';
+	import { AnContext } from '../../react/reactext';
+	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 	import { ImageUpload } from '../../react/widgets/image-upload';
-	import { JsampleIcons } from '../styles';
+import { Comprops, DetailFormW } from '../../react/crud';
 
 const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
@@ -26,17 +21,16 @@ const styles = theme => ({
  * at jserv, this component is used to try the other way - no data persisting,
  * but with data automated data loading and state hook.
  */
-class MyInfCardComp extends React.Component {
+class MyInfCardComp extends DetailFormW<Comprops> {
 
 	state = { }
+	tier: MyInfTier;
+	confirm: JSX.Element;
 
 	constructor (props) {
 		super(props);
 
 		this.uri = this.props.uri;
-
-		let {uid, roleId} = props;
-		this.state.rec = {uid, roleId}
 
 		this.toSave = this.toSave.bind(this);
 	}
@@ -49,14 +43,13 @@ class MyInfCardComp extends React.Component {
 		// Don't set this in constructor - this.context will be changed after constructing.
 		this.context = this.props.anContext || this.context;
 
-		let that = this;
-
 		if (!this.tier) this.getTier()
 
 		this.tier.pkval = this.props.ssInf.uid;
+		let {uid, roleId} = this.props;
+		this.tier.rec = {uid, roleId}
+
 		this.setState({});
-		// this.tier.myInf({userId: this.props.ssInf.uid},
-		// 				(cols, record) => that.setState({cols, record}) );
 	}
 
 	showConfirm(msg) {
@@ -77,13 +70,13 @@ class MyInfCardComp extends React.Component {
 		if (this.tier.validate(undefined, this.tier.fields()))
 			this.tier.saveRec(
 				{ uri: this.props.uri,
-				  crud: this.state.crud,
+				  crud: this.tier.crud,
 				  pkval: this.tier.pkval,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
+					if (that.tier.crud === CRUD.c) {
+						that.tier.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 					if (typeof that.props.onSaved === 'function')
@@ -114,19 +107,19 @@ class MyInfCardComp extends React.Component {
 		);
 	}
 }
-MyInfCardComp.context = AnContext;
+MyInfCardComp.contextType = AnContext;
 
-MyInfCardComp.propTypes = {
-	uri: PropTypes.string.isRequired,
-	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-	ssInf: PropTypes.object.isRequired,
-};
+// MyInfCardComp.propTypes = {
+// 	uri: PropTypes.string.isRequired,
+// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
+// 	ssInf: PropTypes.object.isRequired,
+// };
 
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 export { MyInfCard, MyInfCardComp };
 
 export class MyInfTier extends Semantier {
-	rec = {};
+	rec = {} as Tierec;
 
 	// uri = undefined;
 	imgProp = 'img';
@@ -205,13 +198,13 @@ export class MyInfTier extends Semantier {
 
 		let { uri } = opts;
 
-		let crud = Protocol.CRUD.u;
+		let crud = CRUD.u;
 
 		let rec = this.rec;
 		let {roleId, userName} = rec;
 
 		let req = this.client
-					.usrAct(this.uri, Protocol.CRUD.u, "save", "save my info")
+					.usrAct(this.uri, CRUD.u, "save", "save my info")
 					.update(this.uri, this.mtabl,
 							{pk: this.pk, v: this.pkval},
 							{roleId, userName});
@@ -222,24 +215,25 @@ export class MyInfTier extends Semantier {
 			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
 			//          2. delete saved attId file (trigged by semantic handler)
 			req.Body().post(
-					new DeleteReq(this.uri, "a_attaches",
-						{pk: "attId", v: rec.attId}) )
+					new DeleteReq(this.uri, "a_attaches", rec.attId as string))
 				.post(
-					new DeleteReq(this.uri, "a_attaches")
-						.whereEq('busiId', rec[this.pk] || '')
+					new DeleteReq(this.uri, "a_attaches", undefined)
+						.whereEq('busiId', rec[this.pk] as string || '')
 					 	.whereEq('busiTbl', this.mtabl));
-		if ( rec[this.imgProp] )
+		if ( rec[this.imgProp] ) {
+			let {name, mime} = rec.fileMeta as {name: string, mime: string};
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
-					.nv('attName', rec.fileMeta && rec.fileMeta.name)
-					.nv('mime', rec.fileMeta && rec.fileMeta.mime)
+					.nv('attName', name)
+					.nv('mime', mime)
 					.nv('uri', dataOfurl(rec[this.imgProp])) );
+		}
 
 		client.commit(req,
 			(resp) => {
 				let bd = resp.Body();
-				if (crud === Protocol.CRUD.c)
+				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
 					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);

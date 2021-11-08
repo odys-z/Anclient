@@ -9,9 +9,5 @@
     "test": "cd .. && webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
   "author": "Odys Zhou",
-  "license": "MIT",
-  "devDependencies": {
-  },
-  "dependencies": {
-  }
+  "license": "MIT"
 }

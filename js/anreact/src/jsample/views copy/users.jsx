@@ -4,11 +4,11 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp , UserReq } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp , UserReq } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { Semantier } from '@anclient/semantier-st';
-	import { CrudComp, CrudCompW } from '../../react/crud';
+	import { CrudCompW } from '../../react/crud';
 	import { AnContext } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { AnTablist } from '../../react/widgets/table-list';
@@ -16,8 +16,6 @@ import { L } from '../../utils/langstr';
 	import { JsampleIcons } from '../styles';
 
 	import { UserDetailst } from './user-details';
-
-const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
@@ -28,32 +26,22 @@ const styles = (theme) => ( {
 	}
 } );
 
-type Idset = {
-    ids: Set<string>
-};
-
 class UserstComp extends CrudCompW {
 	state = {
 		buttons: { add: true, edit: false, del: false},
 		pageInf: { page: 0, size: 10, total: 0 },
+		selected: {},
 	};
 
-	selected: Idset;
-	tier: Semantier;
-    q: any[];
-	confirm: JSX.Element;
-	pageInf: any;
-	uri: any;
-	recForm: JSX.Element;
+	tier = undefined;
 
 	constructor(props) {
 		super(props);
 
-		this.selected.ids = new Set();
+		this.state.selected.Ids = new Set();
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
-		this.onPageInf = this.onPageInf.bind(this);
 
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
@@ -78,16 +66,11 @@ class UserstComp extends CrudCompW {
 			this.tier.port = this.props.port;
 	}
 
-	onPageInf (e) {
-		this.toSearch(undefined);
-	};
-
-
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
 	 * @param {object} condts the query conditions collected from query form.
 	 */
-	toSearch(condts?: any[]): void {
+	toSearch(condts) {
 		// querst.onLoad (query.componentDidMount) event can even early than componentDidMount.
 		if (!this.tier) {
 			this.getTier();
@@ -97,8 +80,9 @@ class UserstComp extends CrudCompW {
 		this.q = condts || this.q;
 		this.tier.records( this.q,
 			(cols, rows) => {
-				that.selected.ids.clear();
-				that.setState(rows);
+				that.state.selected.Ids.clear();
+				// that.setState(rows);
+				that.setState({});
 			} );
 	}
 
@@ -127,7 +111,7 @@ class UserstComp extends CrudCompW {
 		let that = this;
 		this.tier.del({
 				uri: this.uri,
-				ids: this.selected.ids },
+				ids: this.state.selected.Ids },
 			resp => {
 				that.confirm = (
 					<ConfirmDialog title={L('Info')}
@@ -175,23 +159,17 @@ class UserstComp extends CrudCompW {
 	closeDetails() {
 		this.recForm = undefined;
 		this.tier.resetFormSession();
-		this.setState({});
+		// this.setState({});
+		this.toSearch();
 	}
 
 	render() {
-		type NewType = {
-			classes: any;
-			title?: string;
-			funcName?: string;
-		};
-
-		const props = this.props as NewType;
-		const { funcName, title, classes } = props; 
+		const { classes } = this.props;
 		let btn = this.state.buttons;
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			{funcName || title || 'Users of Jsample'}
+			{this.props.funcName || this.props.title || 'Users of Jsample'}
 
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
@@ -213,7 +191,7 @@ class UserstComp extends CrudCompW {
 
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
-				selectedIds={this.selected}
+				selectedIds={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
 				pageInf={this.pageInf}
@@ -238,11 +216,6 @@ class UsersQuery extends React.Component {
 		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
-	static propTypes: {
-		// no tier is needed?
-		// uri: PropTypes.string.isRequired,
-		onQuery: PropTypes.Validator<(...args: any[]) => any>;
-	};
 
 	constructor(props) {
 		super(props);
@@ -270,7 +243,8 @@ class UsersQuery extends React.Component {
 	}
 }
 UsersQuery.propTypes = {
-	uri: PropTypes.string,
+	// no tier is needed?
+	// uri: PropTypes.string.isRequired,
 	onQuery: PropTypes.func.isRequired
 }
 
@@ -313,7 +287,7 @@ export class UsersTier extends Semantier {
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
 	];
 
-	constructor(comp: CrudComp) {
+	constructor(comp) {
 		super(comp);
 	}
 
@@ -366,22 +340,21 @@ export class UsersTier extends Semantier {
 
 		let { uri, crud } = opts;
 
-		if (crud === Protocol.CRUD.u && !this.pkval)
+		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		let pswdiv = this.rec as {pswd: string, iv: string};
-
-		let {cipher, iv} = this.client.encryptoken(pswdiv.pswd);
-		this.rec = {pswd: cipher, iv };
+		let {cipher, iv} = this.client.encryptoken(this.rec.pswd);
+		this.rec.pswd = cipher;
+		this.rec.iv = iv;
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
-			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
+			.A(crud === CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
 		client.commit(req,
 			(resp) => {
 				let bd = resp.Body();
-				if (crud === Protocol.CRUD.c)
+				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
 					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
@@ -412,21 +385,6 @@ export class UsersTier extends Semantier {
 	}
 }
 
-interface UserRec {
-	userId?: string,
-	userName?: string,
-	orgId?: string,
-	roleId?: string,
-	hasTodos?: string,
-
-	// meta (optional for arg)
-	pk?: string,
-
-	record?: any,
-	relations?: Array<any>,
-	deletings?: Array<string>
-};
-
 export class UserstReq extends UserReq {
 	static type = 'io.odysz.jsample.semantier.UserstReq';
 	static __init__ = function () {
@@ -448,7 +406,7 @@ export class UserstReq extends UserReq {
 		mykids: 'r/kids',
 	}
 
-	constructor (uri, args: UserRec | undefined) {
+	constructor (uri, args = {}) {
 		super();
 		this.type = UserstReq.type;
 		this.uri = uri;

@@ -1,43 +1,62 @@
-import $ from 'jquery';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Typography from '@material-ui/core/Typography';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, Semantier } from '@anclient/semantier';
+import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp, Inseclient
+} from '@anclient/semantier-st';
 
-import { L, Langstrs,
-	AnContext, AnError, AnReactExt,
-	Sys, SysComp, jsample
-} from '@anclient/anreact';
+import { L, Langstrs } from '../../anreact/src/utils/langstr';
+import { AnContext } from '../../anreact/src/react/reactext';
+import { AnReactExt } from '../../anreact/src/react/anreact';
+import { AnError } from '../../anreact/src/react/widgets/messagebox';
+import { Sys, SysComp } from '../../anreact/src/react/sys';
+import { Userst } from '../../anreact/src/jsample/views/users';
+import { Domain } from '../../anreact/src/jsample/views/domain';
+import { Roles } from '../../anreact/src/jsample/views/roles';
+import { Orgs } from '../../anreact/src/jsample/views/orgs';
 
-const { Domain, Roles, Orgs, Users, Userst, JsampleTheme } = jsample;
+import { StandardProps } from '@material-ui/core';
+import { JsampleTheme } from '../../anreact/src/jsample/styles';
+import { MyInfCard } from '../../anreact/src/jsample/views/my-infcard';
+import { MyPswd } from '../../anreact/src/jsample/views/my-pswdcard';
+
+
+interface Approps extends StandardProps<any, string> {
+	iwindow: Window;
+};
 
 /** The application main, context singleton and error handler */
-class App extends React.Component {
+class App extends React.Component<Approps> {
 	state = {
-		anClient: undefined, // SessionClient
+		servId: 'host',
+		anClient: undefined as SessionClient, // SessionClient
 		anReact: undefined,  // helper for React
 		hasError: false,
 		iportal: 'portal.html',
-		nextAction: undefined, // e.g. re-login
-
-		error: undefined,
+		// nextAction: undefined, // e.g. re-login
 	};
 
+	// FIXME in this pattern, no need to use an object for error handling - callback is enough
+	errCtx = {msg: undefined, onError: this.onError} as ErrorCtx;
+
+	errorMsgbox: JSX.Element;
+
 	/**Restore session from window.localStorage
+	 * 
+	 * @param props 
 	 */
-	constructor(props) {
+	constructor(props: Approps) {
 		super(props);
 
 		this.state.iportal = this.props.iportal;
 
-		this.onError = this.onError.bind(this);
+		// this.onError = this.onError.bind(this);
+		this.errCtx.onError = this.errCtx.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.logout = this.logout.bind(this);
 
 		// design: will load anclient from localStorage
-		this.state.error = {onError: this.onError, msg: ''};
 		this.state.anClient = new SessionClient();
 
 		// singleton error handler
@@ -49,7 +68,7 @@ class App extends React.Component {
 			});
 		}
 
-		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
+		this.state.anReact = new AnReactExt(this.state.anClient, this.errCtx)
 								.extendPorts({
 									menu: "menu.serv",
 									userstier: "users.tier",
@@ -58,13 +77,13 @@ class App extends React.Component {
 								});
 
 		// loaded from dataset.xml
-		this.state.anClient.getSks(null, (sks) => {Object.assign(Protocol.sk, sks)});
+		this.state.anClient.getSks((sks) => {Object.assign(Protocol.sk, sks)}, this.errCtx);
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 		Protocol.sk.cbbMyClass = 'north.my-class';
 
-		// extending CRUD pages
+		// extending pages
 		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
 			{path: '/sys/domain', comp: Domain},
@@ -75,20 +94,22 @@ class App extends React.Component {
 		] );
 	}
 
-	onError(c, r) {
+	onError(c: string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
-		// this.setState({hasError: !!c, nextAction: 're-login'});
-		this.state.error.msg = r.Body().msg();
-		this.setState({
-			hasError: !!c,
-			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
+
+		// this.setState({nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
+
+		this.errCtx.msg = r.Body().msg();
+		this.errorMsgbox = <AnError onClose={() => this.onErrorClose(c)} fullScreen={false}
+							title={L('Error')} msg={this.errCtx.msg as string} />
+		this.setState({});
 	}
 
-	onErrorClose() {
-		if (this.state.nextAction === 're-login') {
-			this.state.nextAction = undefined;
+	onErrorClose(code: string) {
+		if (code === Protocol.MsgCode.exSession) {
 			this.logout();
 		}
+		this.errorMsgbox = undefined;
 	}
 
 	/** For navigate to portal page
@@ -129,6 +150,7 @@ class App extends React.Component {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
+				ssInf: undefined as SessionInf,
 				// FIXME we should use a better way
 				// https://reactjs.org/docs/legacy-context.html#how-to-use-context
 				// samports: this.state.samports, // FXIME or Protocol?
@@ -136,33 +158,35 @@ class App extends React.Component {
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				jserv: this.state.jserv,
-				anClient: this.state.anClient,
+				anClient: this.state.anClient as typeof SessionClient | Inseclient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
-				iportal: this.props.iportal || 'portal.html',
-				error: this.state.error,
+				ihome: this.props.iportal || 'portal.html',
+				error: this.errCtx,
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					onLogout={this.logout} />
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+				{this.errorMsgbox}
+				{/* {this.state.hasError &&
+					<AnError onClose={this.onErrorClose} fullScreen={false}
+							title={L('Error')} msg={this.errCtx.msg as string} />} */}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
 		/**Create MyInfCard.
 		 * To avoid create component before context avialable, this function need the caller' context as parameter.
-		 * @param {AnContext} anContext
+		 * @param anContext
 		 */
-		function myInfoPanels(anContext) {
+		function myInfoPanels(anContext: typeof AnContext) {
 			return [
 				{ title: L('Basic'),
-				  panel: <jsample.MyInfCard
+				  panel: <MyInfCard
 							uri={'/sys/session'} anContext={anContext}
 							ssInf={that.state.anClient.ssInf} /> },
 				{ title: L('Password'),
-				  panel: <jsample.MyPswd
+				  panel: <MyPswd
 							uri={'/sys/session'} anContext={anContext}
 							ssInf={that.state.anClient.ssInf} /> }
 			  ];
@@ -180,7 +204,7 @@ class App extends React.Component {
 	 * @param {string} [opts.serv='host'] serv id
 	 * @param {string} [opts.iportal='portal.html'] page showed after logout
 	 */
-	static bindHtml(elem, opts = {}) {
+	static bindHtml(elem, opts = {portal: 'index.html'}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);

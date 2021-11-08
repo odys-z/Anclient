@@ -7,10 +7,10 @@ import Mime from 'mime-types-no-nodejs';
  */
 export const regex = {
 	/**Add # at start if none
-	 * @param {string} str
-	 * @param {string} defltStr default if  str is undefined or null
-	 * @return {string} "#str" */
-	sharp_: function (str, defltStr) {
+	 * @param str
+	 * @param defltStr default if  str is undefined or null
+	 * @return "#str" */
+	sharp_: function (str: string, defltStr: string): string {
 		if (str === undefined || str === null )
 			str = defltStr;
 		if (typeof str === "string" && str.substring(0, 1) !== '#')
@@ -19,9 +19,9 @@ export const regex = {
 	},
 
 	/**Add # at start if none
-	 * @param {string} str string with or without a starting '#'
-	 * @return {string} "str" without starting '#' */
-	desharp_: function (str) {
+	 * @param str string with or without a starting '#'
+	 * @return "str" without starting '#' */
+	desharp_: function (str: string): string {
 		if (typeof str === "string" && str.substring(0, 1) === '#')
 			return str.substring(1);
 		return str;
@@ -31,10 +31,10 @@ export const regex = {
 
 	/**Find preview type (not doc type) of mime
 	 * https://docs.w3cub.com/http/basics_of_http/mime_types/complete_list_of_mime_types
-	 * @param {string} mime
-	 * @return {string} .doc or undefined
+	 * @param mime
+	 * @return .doc or undefined
 	 */
-	mime2type: function (mime) {
+	mime2type: function (mime: string): string {
 		if (!mime)
 			return '';
 		else if (regex._regImage.test(mime))
@@ -46,14 +46,12 @@ export const regex = {
 
 	/**Find most likly mime of preview type
 	 *
-	 * @param {string} prvtype
-	 * @return {string} mime, likely
+	 * @param doctype
+	 * @return mime, likely
 	 */
-	type2mime: function (doctype) {
+	type2mime: function (doctype: string): string {
 		if (doctype === 'image')
-			return 'image/'; // regex._regImage.source;
-		// else if (doctype.startsWith('.'))
-		// 	return Mime.lookup(doctype) || '';
+			return 'image/';
 		else {
 			return Mime.lookup('x.' + doctype) || '';
 		}

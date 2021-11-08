@@ -28,7 +28,7 @@ export namespace CrudComp {
 export class CrudCompW extends React.Component<{
     uri: string;
 }, any, any> {
-    static setWidth(width: any): {
+    static getMedia(width: any): {
         isLg: boolean;
         isMd: boolean;
         isSm: boolean;

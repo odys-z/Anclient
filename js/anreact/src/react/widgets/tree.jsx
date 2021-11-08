@@ -21,19 +21,19 @@ export const AnTreeIcons = {
 	deflt: <Inbox color="primary" style={{verticalAlign: 'middle'}} />,
 
 	"-": <_Icon color="primary" style={{verticalAlign: 'middle'}} />,
-	"F": <FIcon color="primary" style={{verticalAlign: 'middle'}} />,
-	"|": <IIcon color="primary" style={{verticalAlign: 'middle'}} />,
-	"T": <TIcon color="primary" style={{verticalAlign: 'middle'}} />,
-	"L": <LIcon color="primary" style={{verticalAlign: 'middle'}} />,
-	"|-": <EIcon color="primary" style={{verticalAlign: 'middle'}} />,
-	"E": <EIcon color="primary" style={{verticalAlign: 'middle'}} />,
-	"+": <XIcon color="primary" style={{verticalAlign: 'middle'}} />,
-	".": <NIcon color="primary" style={{verticalAlign: 'middle'}} />,
+	"F": <FIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+	"|": <IIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+	"T": <TIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+	"L": <LIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+	"|-": <EIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+	"E": <EIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+	"+": <XIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+	".": <NIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
 };
 
 function NIcon(props) {
   return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	<SvgIcon fontSize="inherit" {...props}>
 	  <path d="" />
 	</SvgIcon>
   );
@@ -41,7 +41,7 @@ function NIcon(props) {
 
 function FIcon(props) {
   return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	<SvgIcon fontSize="inherit" {...props}>
 	  <path d="M11.5 24 h1 v-11.5 h 11.5 v-1 h-12.5z M8 8 h8 v8 h-8z"/>
 	</SvgIcon>
   );
@@ -49,7 +49,7 @@ function FIcon(props) {
 
 function LIcon(props) {
   return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	<SvgIcon fontSize="inherit" {...props}>
 	  <path d="M24 12.5 v-1 h-11.5 v-11.5 h-1 v12.5z"/>
 	</SvgIcon>
   );
@@ -57,7 +57,7 @@ function LIcon(props) {
 
 function _Icon(props) {
   return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	<SvgIcon fontSize="inherit" {...props}>
 	  <path d="M 24 12.5 v-1 h-24 v1 h24z"/>
 	</SvgIcon>
   );
@@ -65,15 +65,20 @@ function _Icon(props) {
 
 function TIcon(props) {
   return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	<SvgIcon fontSize="inherit" {...props}>
 	  <path d="M11.5 24 h1 v-11.5 h11.5 v-1 h-24 v1 h11.5z" />
 	</SvgIcon>
   );
 }
 
+/**
+ * icon shape: | 
+ * @param {*} props 
+ * @returns 
+ */
 function IIcon(props) {
   return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	<SvgIcon fontSize="inherit" {...props}>
 	  <path d="M11.5 24 h1 v-24 h-1 v24z" />
 	</SvgIcon>
   );
@@ -81,15 +86,20 @@ function IIcon(props) {
 
 function XIcon(props) {
   return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	<SvgIcon fontSize="inherit" {...props}>
 	  <path d="M 19 3 H 5 c -1.11 0 -2 0.9 -2 2 v 14 c 0 1.1 0.89 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 5 c 0 -1.1 -0.9 -2 -2 -2 Z m -2 10 h -4 v 4 h -2 v -4 H 7 v -2 h 4 V 7 h 2 v 4 h 4 v 2 Z" />
 	</SvgIcon>
   );
 }
 
+/**
+ * |-
+ * @param {*} props 
+ * @returns 
+ */
 function EIcon(props) {
   return (
-	<SvgIcon fontSize="inherit" style={{ width: 24, height: 24 }} {...props}>
+	<SvgIcon fontSize="inherit" {...props}>
 	  <path d="M11.5 24 h1 v-11.5 h11.5 v-1 h-11.5 v-11.5 h-1z" />
 	</SvgIcon>
   );
@@ -193,7 +203,7 @@ class AnTreeComp extends React.Component {
 					<Typography>
 					  {leadingIcons(level)}
 					  {node.css && node.css.icon && icon(node.css.icon)}
-				  	  {that.props.checkbox
+					  {that.props.checkbox
 					   && <Checkbox color="primary" checked={toBool(node.checked)}
 						  onClick={(e) => {
 							  e.stopPropagation();

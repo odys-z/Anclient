@@ -6,14 +6,17 @@ import PropTypes from "prop-types";
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol } from '@anclient/semantier-st';
+import { Protocol, CRUD } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { DetailFormW } from '../../react/crud';
+	import { AnConst } from '../../utils/consts';
+	import { AnContext, AnError } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 
@@ -58,13 +61,9 @@ const styles = (theme) => ({
 class UserDetailstComp extends DetailFormW {
 	state = {
 		record: {},
-        crud: undefined
 	};
 
-    tier: {fields: (opt: any) => object[]};
-    confirm: JSX.Element;
-
-	constructor (props: {tier: any, crud: string}) {
+	constructor (props = {}) {
 		super(props);
 
 		this.state.crud = props.crud;
@@ -92,8 +91,8 @@ class UserDetailstComp extends DetailFormW {
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
+					if (that.state.crud === CRUD.c) {
+						that.state.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 					if (typeof that.props.onSaved === 'function')
@@ -121,8 +120,8 @@ class UserDetailstComp extends DetailFormW {
 	render () {
 		const { tier, classes, width } = this.props;
 
-		let c = this.state.crud === Protocol.CRUD.c;
-		let u = this.state.crud === Protocol.CRUD.u;
+		let c = this.state.crud === CRUD.c;
+		let u = this.state.crud === CRUD.u;
 		let title = c ? L('Create User')
 					  : u ? L('Edit User')
 					  : L('User Details');
@@ -133,6 +132,7 @@ class UserDetailstComp extends DetailFormW {
 		  <Dialog className={classes.root}
 			classes={{ paper: classes.dialogPaper }}
 			open={true} fullWidth maxWidth="lg"
+			onClose={this.handleClose}
 		  >
 			<DialogContent className={classes.content}>
 			  <DialogTitle id="u-title" color="primary" >
@@ -160,7 +160,6 @@ class UserDetailstComp extends DetailFormW {
 }
 
 UserDetailstComp.propTypes = {
-    width: PropTypes.string,
 	uri: PropTypes.string.isRequired,
 	tier: PropTypes.object.isRequired,
 	crud: PropTypes.string.isRequired,

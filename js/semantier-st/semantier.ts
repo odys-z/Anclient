@@ -1,21 +1,15 @@
 import { SessionClient, Inseclient } from "./anclient";
-import { Protocol, stree_t,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq
+import { stree_t, CRUD,
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk
 } from "./protocol";
-
-// not working
-// https://stackoverflow.com/a/45257357/7362888
-// const codes = Object.keys(MsgCode);
-// type Protocode = typeof codes[number];
-const { CRUD } = Protocol;
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 /**<p>UI element formatter</p>
- * E.g. Tablist will use this to format a cell in list.
- * User should override this to return UI element, e.g. JSX.Element for React render(). 
+ * E.g. TRecordForm will use this to format a field in form.
+ * User should override this to return UI element, e.g. JSX.Element for React render().
  */
-export type AnElemFormatter = ((col: TierCol, colIndx: number, classes?: {[c: string]: string}, media?: any)=> any);
+export type AnElemFormatter = ((col: TierCol, colIndx: number)=> any);
 
 export interface ErrorCtx {
 	msg?: undefined | string | Array<string>;
@@ -35,7 +29,9 @@ export interface AnlistColAttrs {
 	box?: {};
 }
 
-/**Meta data handled from tier (DB field) */
+/**Meta data handled from tier (DB field).
+ * field and label properties are required.
+*/
 export interface TierCol extends AnlistColAttrs{
     field: string;
     label: string;
@@ -58,18 +54,10 @@ export interface TierComboField extends TierCol {
 	cbbStyle: {};
 }
 
-
 /**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
 export interface QueryConditions {
 	[q: string]: any;
 }
-
-/**Callback of CRUD.c/u/d */
-export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
-/**Callback of CRUD.r */
-export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
-
-export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 
 /**
  * Not the same as java Semantext.
@@ -151,7 +139,7 @@ export class Semantier {
 
     disableValidate: any;
 
-    validate(rec: {}, fields: Array<TierCol>): boolean {
+    validate(rec?: {}, fields?: Array<TierCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);

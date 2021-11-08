@@ -6,9 +6,9 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset, CRUD
 } from './protocol';
-import { ErrorCtx, OnCommitOk } from './semantier';
+import { ErrorCtx } from './semantier';
 
 export interface AjaxOptions {async?: boolean; timeout?: number}
 
@@ -82,7 +82,7 @@ class AnClient {
      * This function must been callded to extned port's names.
      * @param new Ports
      * @return this */
-	understandPorts (newPorts: string) : this {
+	understandPorts (newPorts: { [p: string]: string; }) : this {
 		// Object.assign(Protocol.Port, newPorts);
 		Protocol.extend(newPorts);
         return this;
@@ -162,9 +162,13 @@ class AnClient {
     /**Post a request, using Ajax.
      * @param jreq
      * @param onOk
-     * @param onErr function (MsgCode, AnsonResp?)
+     * @param onErr must present. since 0.9.32, Anclient won't handle error anymore, and data accessing errors should be handled by App singleton.
      * @param ajaxOpts */
 	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
+		if (!onErr || !onErr.onError) {
+			console.error("Since 0.9.32, this global error handler must present - error handling is supposed to be the app singleton's responsiblity.")
+		}
+
 		if (jreq === undefined) {
 			console.error('jreq is null');
 			return;
@@ -383,6 +387,9 @@ export type SessionInf = {
 class SessionClient {
 	an: AnClient;
 	ssInf: any;
+
+	// errCtx = {onError: undefined, msg: undefined} as ErrorCtx;
+
 	currentAct: LogAct = {
 		func: '',
 		cmd: '',
@@ -432,7 +439,7 @@ class SessionClient {
 				localStorage.setItem(SessionClient.ssInfo, infStr);
 			}
 		}
-		else {
+		else if (!dontPersist) {
 			this.ssInf = SessionClient.loadStorage();
 		}
 
@@ -547,19 +554,19 @@ class SessionClient {
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
 	 * @param jmsg request message
 	 * @param onOk
-	 * @param onError
+	 * @param errCtx error handler of singleton. Since 0.9.32, this arg is required.
 	 */
-	commit (jmsg: AnsonMsg<any>, onOk: (resp: AnsonMsg<AnsonResp>) => void, onErr: ()=>void) {
-		an.post(jmsg, onOk, {onError: onErr}, undefined);
+	commit (jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk, errCtx: ErrorCtx) {
+		an.post(jmsg, onOk, errCtx, undefined);
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
 	 * onOk, onError will be called after request finished.
-	 * @param {AnsonMsg} jmsg request message
-	 * @param {function} onOk
-	 * @param {function} onError
+	 * @param jmsg request message
+	 * @param onOk
+	 * @param onError
 	 */
-	commitSync(jmsg, onOk, onError) {
+	commitSync(jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk, onError: ErrorCtx) {
 		this.an.post(jmsg, onOk, onError, {async: false});
 	}
 
@@ -609,7 +616,7 @@ class SessionClient {
 		}
 
 		var upd = new UpdateReq(uri, maintbl, pk);
-		upd.a = Protocol.CRUD.u;
+		upd.a = CRUD.u;
 		this.currentAct.cmd = 'update';
 		var jmsg = this.userReq(uri, 'update', upd, this.currentAct);
 
@@ -654,7 +661,7 @@ class SessionClient {
 		}
 
 		let upd = new UpdateReq(uri, maintbl, pk);
-		upd.a = Protocol.CRUD.d;
+		upd.a = CRUD.d;
 		this.currentAct.cmd = 'delete';
 
 		let jmsg = this.userReq(uri,
@@ -663,15 +670,16 @@ class SessionClient {
 		return jmsg;
 	}
 
-	getSks(port, onLoad) {
+	getSks(onLoad: OnLoadOk, errCtx: ErrorCtx) {
 		let req = this.userReq(null, 'datasetier',
 					new DatasetierReq(undefined)
 					.A(DatasetierReq.A.sks), undefined );
 
 		this.commit(req,
 			(resp) => {
-				onLoad(resp.Body().getProp('sks'));
-			}, undefined );
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().getProp('sks') as AnResultset);
+				onLoad(cols, rows);
+			}, errCtx );
 	}
 
 	/**Use this to delete multiple records where pkn = pks[i]
@@ -684,7 +692,7 @@ class SessionClient {
 	deleteMulti(uri: string, mtabl: string, pkn: string, pks: Array<any>): AnsonMsg<UpdateReq> {
 		let upd = new UpdateReq(uri, mtabl, undefined)
 			.whereIn(pkn, pks);
-		upd.a = Protocol.CRUD.d;
+		upd.a = CRUD.d;
 		this.currentAct.cmd = 'delete';
 
 		var jmsg = this.userReq(uri,
@@ -702,7 +710,7 @@ class SessionClient {
 	userReq<T extends AnsonBody>(uri: string, port: string, bodyItem: T, act: LogAct): AnsonMsg<T> {
 		if (!port)
 			throw Error('AnsonMsg<UserReq> needs port explicitly specified.');
-			
+
 		let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri = uri || bodyItem.uri;
 		if (typeof act === 'object') {

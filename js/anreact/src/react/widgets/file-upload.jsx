@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import Box from '@material-ui/core/Box';
 
-import { Semantier } from '@anclient/semantier';
+import { Semantier } from '@anclient/semantier-st';
 
 import { AvatarIcon, gCamera, gCameraViewBox } from './my-icon';
 import { uarr2Base64, mimeOf } from '../../utils/file-utils';

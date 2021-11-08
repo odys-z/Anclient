@@ -2,11 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
+<<<<<<< HEAD
 import { Protocol, Inseclient, SessionClient } from '@anclient/semantier-st';
+=======
+import { Protocol, Inseclient, AnsonResp, AnsonMsg } from '@anclient/semantier-st';
+>>>>>>> master
 
 import { Langstrs,
 	AnContext, AnError, AnReactExt,
-	jsample
+	jsample,
+	L
 } from '@anclient/anreact';
 
 import Welcome from './welcome';
@@ -20,14 +25,15 @@ type Props = {
 	iparent?: any; // parent of iframe
 	iwindow?: any; // window object
 }
+
 type State = {
 	servs?: any;
 	servId: string;
 	iportal?: string;
-	jserv: string;
 	hasError?: boolean;
 	nextAction?: string;
 }
+
 /** The application main, context singleton and error handler */
 class App extends React.Component<Props, State> {
 	state = {
@@ -39,9 +45,10 @@ class App extends React.Component<Props, State> {
 		nextAction: undefined, // e.g. re-login
 		error: undefined,
 
+		/** json object specifying host's urls */
 		servs: undefined,
+		/** the serv id for picking url */
 		servId: '',
-		jserv: '',
 	};
 
 	/**Restore session from window.localStorage
@@ -56,10 +63,14 @@ class App extends React.Component<Props, State> {
 
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
-		this.state.jserv = this.props.servs[this.state.servId];
+		// this.state.jserv = this.props.servs[this.state.servId];
 
+<<<<<<< HEAD
 		this.state.inclient = new Inseclient({urlRoot: this.state.jserv});
 		let ssclient = new SessionClient()
+=======
+		this.state.inclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
+>>>>>>> master
 
 		this.state.error = {onError: this.onError, msg: ''};
 
@@ -75,7 +86,7 @@ class App extends React.Component<Props, State> {
 								});
 	}
 
-	onError(c: any, r ) {
+	onError(c: any, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r);
 		this.state.error.msg = r.Body().msg();
 		this.setState({
@@ -86,8 +97,8 @@ class App extends React.Component<Props, State> {
 	onErrorClose() {
 		if (this.state.nextAction === 're-login') {
 			this.state.nextAction = undefined;
-			// this.logout();
 		}
+		this.setState({hasError: false});
 	}
 
 	render() {
@@ -99,17 +110,20 @@ class App extends React.Component<Props, State> {
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				jserv: this.state.jserv,
 				anClient: this.state.inclient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
-				iportal: this.props.iportal || 'portal.html',
+				ihome: this.props.iportal || 'portal.html',
 				error: this.state.error,
+				ssInf: undefined,
 			}} >
 				{<Userst port='userstier' uri={'/less/users'}/>}
 				<hr/>
 				{<Welcome port='welcomeless' uri={'/less/welcome'}/>}
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+				{this.state.hasError &&
+					<AnError onClose={this.onErrorClose} fullScreen={false}
+							uri={"/login"} tier={undefined}
+							title={L('Error')} msg={this.state.error.msg} />}
 				<hr/>
 				アプリ コンポーネントの内容は, 上記のすべて...<br/> {Date().toString()}
 			</AnContext.Provider>
@@ -122,12 +136,10 @@ class App extends React.Component<Props, State> {
 	 * where serv-id = this.context.servId || host
 	 *
 	 * For test, have elem = undefined
-	 * @param {string} elem html element id, null for test
-	 * @param {object} [opts={}] serv id
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.iportal='portal.html'] page showed after logout
+	 * @param elem html element id, null for test
+	 * @param opts={} serv id
 	 */
-	static bindHtml(elem, opts = {portal: undefined}) {
+	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
 		let portal = opts.portal ?? 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);

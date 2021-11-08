@@ -1,10 +1,9 @@
-import React from 'react';
-import { ReactNode } from 'react';
+import React, { MouseEventHandler } from 'react';
 import { withStyles } from '@material-ui/styles';
 import { Box, Card, IconButton, Link, Paper, Typography, withWidth } from '@material-ui/core';
 
-import { Semantier, Comprops } from '@anclient/semantier-st';
-import { CrudComp, jsample } from '@anclient/anreact';
+import { Semantier } from '@anclient/semantier-st';
+import { Comprops, CrudComp, jsample } from '@anclient/anreact';
 
 const styles = (theme) => ( {
 	root: {
@@ -19,7 +18,7 @@ const styles = (theme) => ( {
 	cardTitle: {
 		color: "blue",
 		textShadow: "4px 4px 3px #688a8a",
-		textAlign: "center",
+		// textAlign: "center",
 		margin: theme.spacing(1)
 	},
 	cartText: {
@@ -36,7 +35,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 	classes: any;
 	uri: any;
 
-	constructor(props: {classes: any, uri: string}) {
+	constructor(props) {
 		super(props);
 
 		this.classes = props.classes;
@@ -46,8 +45,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 	}
 
 	componentDidMount() {
-		// FIXME ignore vscode warning?
-		let uri = this.uri || super.uri;
+		let uri = this.uri;
 		console.log("super.uri", uri);
 
 		this.tier = new WelcomeTier({uri});
@@ -56,7 +54,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 
 	icon(e: WelcomeRec) {
 		// return jsample.JsampleIcons[e.css?.icon || 'Star'] || jsample.JsampleIcons['Star']
-		let color = e.css?.important ? 'secondary' : 'primary'; 
+		let color = e.css?.important ? 'secondary' : 'primary';
 
 		return e.css?.type === 'auto'
 			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
@@ -68,7 +66,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 		return (
 			<Paper elevation={4} style={{ margin: 24 }}
 				className={this.classes.welcome}>
-				<IconButton onClick={this.showMenu} >
+				<IconButton onClick={this.props.showMenu} >
 					{this.icon(e)}
 					<Box component='span' display='inline' className={this.classes.cardText} >
 						Please click menu to start.
@@ -94,7 +92,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 		</Card>);
 	}
 
-	render() : ReactNode {
+	render() {
 		return (<div>Welcome Example - I bet you will love this!
 			{this.tier && this.cards(this.tier.myNotifies())}
 		</div>);
@@ -115,7 +113,7 @@ type WelcomeRec = {
 
 class WelcomeTier extends Semantier {
 	/**
-	 * @param props 
+	 * @param props
 	 */
 	constructor(props: {uri: string}) {
 		super(props);
