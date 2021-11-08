@@ -37,10 +37,11 @@ import { AnContext } from './reactext';
 	import { parseMenus } from '../utils/helpers';
 
 import {
-	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow, Comprops, ClassNames 
+	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, ClassNames, CrudComp, CrudCompW 
 } from './crud'
 import { ClassNameMap } from '@material-ui/styles';
-import { StandardProps } from '@material-ui/core';
+import { AnReactExt } from './anreact';
+import { AnDatasetResp, AnsonMsg, DatasetierResp } from '@anclient/semantier-st/protocol';
 
 export interface SysProps extends Comprops {
     /**Welcome page formatter */
@@ -60,9 +61,9 @@ const _icons = {
 	'deflt': <Inbox />,
 }
 
-export function uri(comp, uri) {
+export function uri(comp: CrudComp<Comprops>, uri: string) {
 	return comp;
-	// FIXME this function is unnecessary if moved URI to Semantier.
+	/* FIXME this function is unnecessary if moved URI to Semantier.
 	if (comp.Naked)
 		comp.Naked.prototype.uri = uri;
 
@@ -75,7 +76,9 @@ export function uri(comp, uri) {
 		comp.type.Naked.prototype.uri = uri;
 
 	return comp;
+	*/
 }
+
 /**
  * Map of uri to UI components.
  * CrudComp.Uri will wrapp the component with propterty "uri", which will be
@@ -182,7 +185,8 @@ const styles = theme => ({
  sys-uesr-1.1 |Uesr Manage        |views/sys/user/users-1.1.html     |    |1     |2 sys-1.1.4 user |sys-1.1  |4       |</pre>
  * @class SysComp
  */
-class SysComp extends React.Component<SysProps, any, any> {
+class SysComp extends CrudCompW<SysProps> {
+// class SysComp extends React.Component<SysProps, any, any> {
 	state = {
 		window: undefined,
 		welcome: true,
@@ -199,6 +203,8 @@ class SysComp extends React.Component<SysProps, any, any> {
 		expandings: new Set(),
         showMine: false,
 	};
+
+	anreact: AnReactExt;
 
     confirmLogout: any;
 
@@ -258,11 +264,14 @@ class SysComp extends React.Component<SysProps, any, any> {
 
 	componentDidMount() {
 		// load menu
+		this.anreact = this.context.anReact;
+
 		let that = this;
-		this.context.anReact.loadMenu(
+		this.anreact.loadMenu(
 			this.state.skMenu,
+			this.uri,
 			(dsResp) => {
-				let {menu, paths} = parseMenus(dsResp.Body().forest);
+				let {menu, paths} = parseMenus((dsResp as AnsonMsg<AnDatasetResp>).Body().forest);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
 			}, this.context.error );

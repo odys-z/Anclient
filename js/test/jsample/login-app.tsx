@@ -39,7 +39,7 @@ class LoginApp extends React.Component<LoginProps> {
 		this.servId = props.servId ? props.servId : 'host';
 		this.jserv = props.servs ? props.servs[this.servId] : undefined,
 
-		this.onError = this.onError.bind(this);
+		this.errCtx.onError = this.errCtx.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.onLogin = this.onLogin.bind(this);
 	}

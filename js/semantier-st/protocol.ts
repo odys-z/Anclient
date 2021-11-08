@@ -293,8 +293,11 @@ export class AnsonMsg<T extends AnsonBody> {
 			}
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
 				body = new AnDatasetResp(body);
-			else if (body.type === "io.odysz.semantic.tier.DatasetierReq")
-				body = new DatasetierReq(body);
+
+			// else if (body.type === "io.odysz.semantic.tier.DatasetierReq")
+			// 	body = new DatasetierReq(body);
+			// else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
+			// 	body = new DatasetierResp(body);
 
 			// FIXME never used?
 			// else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
@@ -1260,7 +1263,7 @@ export const stree_t = {
 };
 
 export class DatasetierReq extends AnsonBody {
-	type = "io.odysz.semantic.tier.DatasetierReq";
+	static __type__ = "io.odysz.semantic.tier.DatasetierReq";
 
     static A = {
         sks: 'r/sks'
@@ -1268,6 +1271,17 @@ export class DatasetierReq extends AnsonBody {
 
     constructor(opts: any) {
 		super(opts);
-	    this.type = "io.odysz.semantic.tier.DatasetierReq";
+	    this.type = DatasetierReq.__type__;
     }
 }
+Protocol.registerBody(DatasetierReq.__type__, (json) => new DatasetierReq(json));
+
+export class DatasetierResp extends AnsonResp {
+	static __type__ = "io.odysz.semantic.tier.DatasetierResp";
+
+	constructor(dsJson) {
+		super(dsJson);
+		this.type = DatasetierResp.__type__;
+	}
+}
+Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json));
