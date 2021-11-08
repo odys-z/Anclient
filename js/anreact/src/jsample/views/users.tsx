@@ -342,7 +342,7 @@ export class UsersTier extends Semantier {
 			this.errCtx);
 	}
 
-	saveRec(opts, onOk) {
+	saveRec(opts: { uri: string; crud: CRUD; pkval: string; }, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;

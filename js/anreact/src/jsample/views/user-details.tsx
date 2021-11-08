@@ -2,7 +2,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -16,7 +15,8 @@ import { L } from '../../utils/langstr';
 	import { Comprops, DetailFormW } from '../../react/crud';
 	import { ConfirmDialog } from '../../react/widgets/messagebox';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
-import { ModalProps } from '@material-ui/core';
+
+import { UsersTier } from './users';
 
 const styles = (theme) => ({
   root: {
@@ -61,11 +61,11 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 		record: {},
 	};
 	crud: any;
-	tier: any;
+	tier: UsersTier;
 	confirm: JSX.Element;
 	handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
-	constructor (props) {
+	constructor (props: Comprops) {
 		super(props);
 
 		this.crud = props.crud;
@@ -80,12 +80,12 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 	componentDidMount() {
 	}
 
-	toSave(e) {
+	toSave(e: React.MouseEvent<HTMLElement>) {
 		if (e) e.stopPropagation();
 
 		let that = this;
 
-		if (this.tier.validate(this.tier.rec, this.recfields))
+		if (this.tier.validate(this.tier.rec, this.tier.fields()))
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.crud,
@@ -102,9 +102,6 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 				} );
 		else this.setState({});
 	}
-	recfields(rec: any, recfields: any) {
-		throw new Error('Method not implemented.');
-	}
 
 	toCancel (e) {
 		e.stopPropagation();
@@ -117,7 +114,10 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('OK')} cancel={false} open
-				onClose={() => {that.confirm = undefined;} }
+				onClose={() => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
 				msg={msg} />);
 		this.setState({});
 	}
@@ -163,7 +163,6 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 		</>);
 	}
 }
-
 
 const UserDetailst = withWidth()(withStyles(styles)(UserDetailstComp));
 export { UserDetailst, UserDetailstComp };

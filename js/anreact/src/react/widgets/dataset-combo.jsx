@@ -3,17 +3,12 @@ import React from 'react';
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-// import clsx from 'clsx';
-// import withWidth from "@material-ui/core/withWidth";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-import { Protocol, AnsonResp } from '@anclient/semantier-st';
-
-import { L } from '../../utils/langstr';
-	import { AnConst } from '../../utils/consts';
-	import { AnContext } from '../reactext';
-	import { Semantier } from '@anclient/semantier-st';
+import { AnConst } from '../../utils/consts';
+import { AnContext } from '../reactext';
+import { Semantier } from '@anclient/semantier-st';
 
 
 const styles = (theme) => (Object.assign(
@@ -53,15 +48,18 @@ class DatasetComboComp extends React.Component {
 		if (!this.context || !this.context.anReact)
 			throw new Error('DatasetCombo can\'t bind controls without AnContext initialized with AnReact.');
 
-		if (this.props.sk )
+		if (this.props.sk ) {
+			let that = this;
 			this.context.anReact.ds2cbbOptions({
 					uri: this.props.uri,
 					sk: this.props.sk,
 					// user uses this, e.g. name and value to access data
 					nv: this.props.nv || {n: 'name', v: 'value'},
-					cond: this.state.combo
+					cond: this.state.combo,
+					onDone: () => that.setState({})
 				},
 				this.context.error, this);
+		}
 	}
 
 	onCbbRefChange( ) {
