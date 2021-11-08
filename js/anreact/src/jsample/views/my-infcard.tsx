@@ -10,7 +10,7 @@ import { L } from '../../utils/langstr';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 	import { ImageUpload } from '../../react/widgets/image-upload';
-import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';
+import { Comprops, DetailFormW } from '../../react/crud';
 
 const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
@@ -32,9 +32,6 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 
 		this.uri = this.props.uri;
 
-		let {uid, roleId} = props;
-		this.tier.rec = {uid, roleId}
-
 		this.toSave = this.toSave.bind(this);
 	}
 
@@ -49,6 +46,9 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 		if (!this.tier) this.getTier()
 
 		this.tier.pkval = this.props.ssInf.uid;
+		let {uid, roleId} = this.props;
+		this.tier.rec = {uid, roleId}
+
 		this.setState({});
 	}
 
@@ -215,19 +215,20 @@ export class MyInfTier extends Semantier {
 			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
 			//          2. delete saved attId file (trigged by semantic handler)
 			req.Body().post(
-					new DeleteReq(this.uri, "a_attaches",
-						{pk: "attId", v: rec.attId}) )
+					new DeleteReq(this.uri, "a_attaches", rec.attId as string))
 				.post(
-					new DeleteReq(this.uri, "a_attaches")
-						.whereEq('busiId', rec[this.pk] || '')
+					new DeleteReq(this.uri, "a_attaches", undefined)
+						.whereEq('busiId', rec[this.pk] as string || '')
 					 	.whereEq('busiTbl', this.mtabl));
-		if ( rec[this.imgProp] )
+		if ( rec[this.imgProp] ) {
+			let {name, mime} = rec.fileMeta as {name: string, mime: string};
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
-					.nv('attName', rec.fileMeta && rec.fileMeta.name)
-					.nv('mime', rec.fileMeta && rec.fileMeta.mime)
+					.nv('attName', name)
+					.nv('mime', mime)
 					.nv('uri', dataOfurl(rec[this.imgProp])) );
+		}
 
 		client.commit(req,
 			(resp) => {

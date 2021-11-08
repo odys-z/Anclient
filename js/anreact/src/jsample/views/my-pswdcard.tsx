@@ -3,12 +3,12 @@ import { withStyles } from "@material-ui/core/styles";
 import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
-	import { Semantier, Tierec  } from '@anclient/semantier-st';
+	import { Semantier  } from '@anclient/semantier-st';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 
 import { MyInfTier } from './my-infcard';
-import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';
+import { Comprops, DetailFormW } from '../../react/crud';
 
 const styles = theme => (Object.assign(
 	Semantier.invalidStyles, {
@@ -62,7 +62,7 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		this.tier.setContext(this.context);
 	}
 
-	showConfirm(msg) {
+	showConfirm(msg: string | string[]) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
@@ -72,7 +72,7 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		this.setState({});
 	}
 
-	changePswd(e) {
+	changePswd(e: React.MouseEvent<HTMLElement>) {
 		let that = this;
 		if (!this.tier.changePswd({uri: this.props.uri},
 			(resp) => { that.showConfirm(L('Password changed successfully!')); })) {

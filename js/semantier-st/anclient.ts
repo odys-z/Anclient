@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset, CRUD
 } from './protocol';
 import { ErrorCtx } from './semantier';
 
@@ -162,9 +162,13 @@ class AnClient {
     /**Post a request, using Ajax.
      * @param jreq
      * @param onOk
-     * @param onErr function (MsgCode, AnsonResp?)
+     * @param onErr must present. since 0.9.32, Anclient won't handle error anymore, and data accessing errors should be handled by App singleton.
      * @param ajaxOpts */
 	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
+		if (!onErr || !onErr.onError) {
+			console.error("Since 0.9.32, this global error handler must present - error handling is supposed to be the app singleton's responsiblity.")
+		}
+
 		if (jreq === undefined) {
 			console.error('jreq is null');
 			return;
@@ -384,7 +388,7 @@ class SessionClient {
 	an: AnClient;
 	ssInf: any;
 
-	errCtx = {onError: undefined, msg: undefined} as ErrorCtx;
+	// errCtx = {onError: undefined, msg: undefined} as ErrorCtx;
 
 	currentAct: LogAct = {
 		func: '',
@@ -550,19 +554,19 @@ class SessionClient {
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
 	 * @param jmsg request message
 	 * @param onOk
-	 * @param errCtx error handler - should use default error handler
+	 * @param errCtx error handler of singleton. Since 0.9.32, this arg is required.
 	 */
-	commit (jmsg: AnsonMsg<any>, onOk: OnCommitOk, errCtx?: ErrorCtx) {
-		an.post(jmsg, onOk, errCtx || this.errCtx, undefined);
+	commit (jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk, errCtx: ErrorCtx) {
+		an.post(jmsg, onOk, errCtx, undefined);
 	}
 
 	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
 	 * onOk, onError will be called after request finished.
-	 * @param {AnsonMsg} jmsg request message
-	 * @param {function} onOk
-	 * @param {function} onError
+	 * @param jmsg request message
+	 * @param onOk
+	 * @param onError
 	 */
-	commitSync(jmsg, onOk, onError) {
+	commitSync(jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk, onError: ErrorCtx) {
 		this.an.post(jmsg, onOk, onError, {async: false});
 	}
 
@@ -666,7 +670,7 @@ class SessionClient {
 		return jmsg;
 	}
 
-	getSks(onLoad: OnLoadOk) {
+	getSks(onLoad: OnLoadOk, errCtx: ErrorCtx) {
 		let req = this.userReq(null, 'datasetier',
 					new DatasetierReq(undefined)
 					.A(DatasetierReq.A.sks), undefined );
@@ -675,7 +679,7 @@ class SessionClient {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().getProp('sks') as AnResultset);
 				onLoad(cols, rows);
-			}, undefined );
+			}, errCtx );
 	}
 
 	/**Use this to delete multiple records where pkn = pks[i]

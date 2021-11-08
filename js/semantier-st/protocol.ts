@@ -1206,7 +1206,7 @@ export class DatasetReq extends QueryReq {
 			query: string;
 		}) {
 		if (typeof ask === 'string' && ask.length > 0 && ask !== stree_t.sqltree) {
-			console.warn('DatasetReq.a is ignored for sk is defined.', ask);
+			console.info('DatasetReq.a is ignored for sk is defined.', ask);
 			this.a = stree_t.sqltree;
 		}
 		else {

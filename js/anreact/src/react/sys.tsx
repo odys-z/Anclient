@@ -50,7 +50,7 @@ export interface SysProps extends Comprops {
     hrefDoc: string;
     onLogout: () => void;
     myInfo: JSX.Element | ((context: typeof AnContext) => JSX.Element);
-} 
+}
 
 const _icons = {
 	'expand': <ExpandMore />,
@@ -274,10 +274,10 @@ class SysComp extends CrudCompW<SysProps> {
 				let {menu, paths} = parseMenus((dsResp as AnsonMsg<AnDatasetResp>).Body().forest);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
-			}, this.context.error );
+			} );
 	}
 
-	showMenu(e) {
+	showMenu(e: React.MouseEvent<HTMLElement>) {
 		if (e) e.stopPropagation();
 		this.setState({ showMenu: true });
 	}
@@ -302,9 +302,9 @@ class SysComp extends CrudCompW<SysProps> {
 		this.setState({});
 	}
 
-	toExpandItem(e) {
+	toExpandItem(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
-		let f = e.currentTarget.getAttribute('iid');
+		let f = e.currentTarget.getAttribute('data-iid');
 
 		let expandings = this.state.expandings;
 		if (expandings.has(f))
@@ -336,8 +336,8 @@ class SysComp extends CrudCompW<SysProps> {
 				if ( menu.children && menu.children.length > 0 )
 				  return (
 				  <div key={menu.funcId}>
-					<ListItem button onClick={expandItem} key={menu.funcId}>
-						<ListItemIcon>{icon(menu.css)}</ListItemIcon>
+					<ListItem button onClick={expandItem} data-iid={menu.funcId}>
+						<ListItemIcon>{icon(menu.css?.icon)}</ListItemIcon>
 						<ListItemText primary={L(menu.funcName)} />
 						{ open ? icon('expand') : icon('collapse') }
 					</ListItem>
@@ -364,9 +364,9 @@ class SysComp extends CrudCompW<SysProps> {
 			}
 		}
 
-		function icon(icon) {
+		function icon(icon: string) {
 			// shall we use theme here?
-			return _icons[icon || 'deflt'];
+			return _icons[icon] || _icons['deflt'];
 		}
 	}
 

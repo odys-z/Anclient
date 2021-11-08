@@ -164,7 +164,7 @@ class TRecordFormComp extends CrudCompW {
 
 	render () {
 		const { classes, width } = this.props;
-		let media = CrudCompW.setWidth(width);
+		let media = CrudCompW.getMedia(width);
 
 		let rec = this.tier.rec;
 

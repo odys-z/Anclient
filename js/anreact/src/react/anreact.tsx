@@ -33,12 +33,11 @@ export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, med
 export class AnReact {
     client: SessionClient;
     ssInf: any;
-    // err: any;
 	errCtx: ErrorCtx;
 	/**@param {SessionClient} ssClient client created via login
 	 * @param {object} errCtx, AnContext.error, the app error handler
 	 */
-	constructor (ssClient, errCtx) {
+	constructor (ssClient: SessionClient, errCtx: ErrorCtx) {
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
 		this.errCtx = errCtx;
@@ -47,7 +46,7 @@ export class AnReact {
 	/** @deprecated new tiered way don't need any more.
 	 * set component.state with request's respons.rs, or call req.onLoad.
 	 */
-	bindTablist(req, comp, errCtx) {
+	bindTablist(req, comp: CrudComp<any>, errCtx: ErrorCtx) {
 		this.client.commit(req, (qrsp) => {
 			if (req.onLoad)
 				req.onLoad(qrsp);
@@ -56,10 +55,10 @@ export class AnReact {
 			else {
 				let rs = qrsp.Body().Rs();
 				let {rows} = AnsonResp.rs2arr( rs );
-				comp.state.pageInf.total = rs.total;
+				// comp.pageInf?.total! = rs.total;
 				comp.setState({rows});
 			}
-		}, errCtx.onError );
+		}, errCtx );
 	}
 
 	/**
@@ -88,15 +87,16 @@ export class AnReact {
 			};
 
 		let {req} = qmsg;
-		this.client.an.post(req, onload, { onError: (c, resp) => {
-			if (errCtx) {
-				errCtx.hasError = true;
-				errCtx.code = c;
-				errCtx.msg = resp.Body().msg();
-				errCtx.onError(true);
-			}
-			else console.error(c, resp) },
-		});
+		// this.client.an.post(req, onload, { onError: (c, resp) => {
+		// 	if (errCtx) {
+		// 		errCtx.hasError = true;
+		// 		errCtx.code = c;
+		// 		errCtx.msg = resp.Body().msg();
+		// 		errCtx.onError(true);
+		// 	}
+		// 	else console.error(c, resp) },
+		// });
+		this.client.an.post(req, onload, errCtx);
 		return this;
 	}
 
@@ -228,20 +228,20 @@ export class AnReactExt extends AnReact {
 	}
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
+	 * Since v0.9.32, AnReact(Ext) won't care error handling anymore.
 	 * @param sk menu sk (semantics key, see dataset.xml), e.g. 'sys.menu.jsample'
 	 * @param uri
 	 * @param onLoad
-	 * @param errCtx
 	 * @return this
 	 */
-	loadMenu(sk: string, uri: string, onLoad: OnCommitOk, errCtx?: ErrorCtx): AnReactExt {
+	loadMenu(sk: string, uri: string, onLoad: OnCommitOk): AnReactExt {
 		if (!sk)
 			throw new Error("Arg 'sk' is null - AnReact requires a dataset semantics for system menu.");
 		const pmenu = 'menu';
 
 		return this.dataset(
 			{port: pmenu, uri, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
-			onLoad, errCtx);
+			onLoad);
 	}
 
 	/** Load jsample.serv dataset. (using DatasetReq or menu.serv)
@@ -250,7 +250,7 @@ export class AnReactExt extends AnReact {
 	 * @param errCtx
 	 * @return this
 	 */
-	dataset(ds: DatasetOpts, onLoad: OnCommitOk, errCtx?: ErrorCtx): AnReactExt {
+	dataset(ds: DatasetOpts, onLoad: OnCommitOk): AnReactExt {
 		// let ssInf = this.client.ssInf;
 		let {uri, sk, sqlArgs, t, rootId} = ds;
 		sqlArgs = sqlArgs || [];
