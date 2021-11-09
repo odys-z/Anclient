@@ -1,7 +1,33 @@
-import { ErrorCtx, Inseclient, SessionClient } from '@anclient/semantier-st';
+import { ErrorCtx, Semantext, SessionClient, SessionInf } from '@anclient/semantier-st';
 import React from 'react';
 
 import { AnReact } from './anreact';
+
+export interface AnContextType extends Semantext {
+	/**	Anclient */
+	// an: undefined,
+    /**@type = SessionIfn */
+	ssInf: SessionInf,
+
+	pageOrigin: string,
+	iparent: any,    // usually the parent window of ifram
+	ihome: string,
+
+	/**default: host */
+	servId: string,
+
+	servs: { host: string; [h: string]: string },
+
+	// anClient: SessionClient,
+
+	/** Only nullable for Login */
+	// anReact: typeof AnReact,
+
+	// error handling pattern like
+	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
+	// error: ErrorCtx,
+	hasError: boolean,
+} 
 
 export const AnContext = React.createContext({
 	/**	Anclient */
@@ -18,8 +44,8 @@ export const AnContext = React.createContext({
 
 	servs: { host: 'http://localhost:8080' },
 
-	anClient: undefined as typeof SessionClient | Inseclient,
-	anReact: undefined as typeof AnReact,
+	anClient: undefined,
+	anReact: undefined,
 
 	// error handling pattern like
 	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
@@ -30,10 +56,12 @@ export const AnContext = React.createContext({
 	} as ErrorCtx,
 	hasError: false,
 
+	/** Only nullable for Login */
+	reactHelper: undefined as AnReact,
 	// uuid: function() : string {
 	// 	return (++ _uid_).toString();
 	// }
-});
+} as AnContextType);
 
 // var _uid_ = 0;
 

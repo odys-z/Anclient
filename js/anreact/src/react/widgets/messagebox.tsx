@@ -31,7 +31,7 @@ const styles = theme => ({
     backgroundColor: "#fafbff",
     border: "solid 1px #f5f5ff",
     textShadow: "4px 4px 7px #688a8a",
-	textAlign: "center",
+	// textAlign: "center", not answered? https://github.com/mui-org/material-ui/issues/12661
 	margin: "auto"
   },
   centerbox: {
@@ -125,7 +125,8 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				aria-labelledby="alert-dialog-title"
 				aria-describedby="alert-dialog-description" >
 
-				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle} >
+				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle}
+					style={{textAlign: "center"}}>
 				  {L(title)}
 				</DialogTitle>
 				<DialogContent>
@@ -149,29 +150,30 @@ const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
 export {ConfirmDialog, ConfirmDialogComp};
 
 export interface ErrorProps extends DialogProps {
+    msg: string;
     onClose: () => void;
-    fullScreen: boolean;
+    fullScreen?: boolean;
 }
 
 export class AnError extends CrudCompW<ErrorProps> {
 	// props = undefined;
-	context: React.ContextType<typeof AnContext>
+	// context: React.ContextType<typeof AnContext>
 
 	state = {
 	};
 
-	constructor(props) {
+	constructor(props: ErrorProps) {
 		super(props);
 	}
 
 	render() {
-		let ctx = this.context;// .errors;
-		let p = this.props as ErrorProps;
+		// let ctx = (this.context as typeof AnContext).error;
+		let p = this.props; // as ErrorProps;
 		return (
 			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
-					open={!!ctx.hasError} onClose={p.onClose}
+					open={true} onClose={p.onClose}
 					fullScreen={p.fullScreen}
-					msg={L(ctx.error.msg as string)} />
+					msg={L(p.msg)} />
 		);
 	}
 }

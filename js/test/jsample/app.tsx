@@ -8,7 +8,7 @@ import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp, Ins
 
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
 import { AnContext } from '../../anreact/src/react/reactext';
-import { AnReactExt } from '../../anreact/src/react/anreact';
+import { AnReact, AnReactExt } from '../../anreact/src/react/anreact';
 import { AnError } from '../../anreact/src/react/widgets/messagebox';
 import { Sys, SysComp } from '../../anreact/src/react/sys';
 import { Userst } from '../../anreact/src/jsample/views/users';
@@ -31,16 +31,15 @@ class App extends React.Component<Approps> {
 	state = {
 		servId: 'host',
 		anClient: undefined as SessionClient, // SessionClient
-		anReact: undefined,  // helper for React
+		anReact: undefined as AnReact,  // helper for React
 		hasError: false,
 		iportal: 'portal.html',
-		// nextAction: undefined, // e.g. re-login
 	};
 
 	// FIXME in this pattern, no need to use an object for error handling - callback is enough
 	errCtx = {msg: undefined, onError: this.onError} as ErrorCtx;
 
-	errorMsgbox: JSX.Element;
+	errorMsgbox: any; // JSX.Element;
 
 	/**Restore session from window.localStorage
 	 * 
@@ -158,7 +157,7 @@ class App extends React.Component<Approps> {
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				anClient: this.state.anClient as typeof SessionClient | Inseclient,
+				anClient: this.state.anClient, // as typeof SessionClient | Inseclient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',

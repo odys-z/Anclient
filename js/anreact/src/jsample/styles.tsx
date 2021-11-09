@@ -25,34 +25,33 @@ import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 
 import FormatLineSpacingIcon from '@material-ui/icons/FormatLineSpacing';
 import GridOnIcon from '@material-ui/icons/GridOn';
-import SvgIcon from '@material-ui/core/SvgIcon';
-import { SvgIconComponent } from "@material-ui/icons";
+import { DefaultComponentProps } from "@material-ui/core/OverridableComponent";
 
 export const JsampleIcons = {
-  Add   : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <AddBox {...props} ref={ref} />),
-  Check : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <Check {...props} ref={ref} />),
-  Clear : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <Clear {...props} ref={ref} />),
-  Delete: forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <DeleteOutline {...props} ref={ref} />),
-  Close : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <Close {...props} ref={ref} />),
-  Edit  : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <Edit {...props} ref={ref} />),
-  Export: forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <SaveAlt {...props} ref={ref} />),
-  Filter: forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <FilterList {...props} ref={ref} />),
-  FirstPage: forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <FirstPage {...props} ref={ref} />),
-  LastPage : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <LastPage {...props} ref={ref} />),
-  NextPage : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <ChevronRight {...props} ref={ref} />),
-  DetailPanel : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <ChevronRight {...props} ref={ref} />),
+  Add   : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <AddBox {...props} ref={ref} />),
+  Check : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <Check {...props} ref={ref} />),
+  Clear : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <Clear {...props} ref={ref} />),
+  Delete: forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <DeleteOutline {...props} ref={ref} />),
+  Close : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <Close {...props} ref={ref} />),
+  Edit  : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <Edit {...props} ref={ref} />),
+  Export: forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <SaveAlt {...props} ref={ref} />),
+  Filter: forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <FilterList {...props} ref={ref} />),
+  FirstPage: forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <FirstPage {...props} ref={ref} />),
+  LastPage : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <LastPage {...props} ref={ref} />),
+  NextPage : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <ChevronRight {...props} ref={ref} />),
+  DetailPanel : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <ChevronRight {...props} ref={ref} />),
   PreviousPage: forwardRef<SVGSVGElement>((props, ref) => <ChevronLeft {...props} ref={ref} />),
   ResetSearch : forwardRef<SVGSVGElement>((props, ref) => <Clear {...props} ref={ref} />),
-  ViewColumn  : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <ViewColumn {...props} ref={ref} />),
-  ItemCollapse: forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <FormatLineSpacingIcon {...props} ref={ref} />),
-  Search      : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <Search {...props} ref={ref} />),
-  SortArrow   : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <ArrowDownward {...props} ref={ref} />),
-  ThirdStateCheck: forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <Remove {...props} ref={ref} />),
-  Worksheet   : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <GridOnIcon {...props} ref={ref} />),
-  ListAdd : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <PlaylistAddIcon {...props} ref={ref} />),
-  Star    : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <StarBorder {...props} ref={ref} />),
-  Up      : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <ArrowUpwardIcon  {...props} ref={ref} />),
-  Down    : forwardRef<SVGSVGElement, {onClick?: any}>((props, ref) => <ArrowDownwardIcon {...props} ref={ref} />)
+  ViewColumn  : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <ViewColumn {...props} ref={ref} />),
+  ItemCollapse: forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <FormatLineSpacingIcon {...props} ref={ref} />),
+  Search      : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <Search {...props} ref={ref} />),
+  SortArrow   : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <ArrowDownward {...props} ref={ref} />),
+  ThirdStateCheck: forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <Remove {...props} ref={ref} />),
+  Worksheet   : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <GridOnIcon {...props} ref={ref} />),
+  ListAdd : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <PlaylistAddIcon {...props} ref={ref} />),
+  Star    : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <StarBorder {...props} ref={ref} />),
+  Up      : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <ArrowUpwardIcon  {...props} ref={ref} />),
+  Down    : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <ArrowDownwardIcon {...props} ref={ref} />)
 };
 
 export const JsampleTheme = responsiveFontSizes(createTheme({

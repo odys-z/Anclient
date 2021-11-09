@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { Semantier } from '@anclient/semantier-st';
@@ -63,7 +63,7 @@ class UserstComp extends CrudCompW<Comprops> {
 
 	getTier = () => {
 		this.tier = new UsersTier(this);
-		this.tier.setContext(this.context);
+		this.tier.setContext(this.context as Semantext);
 
 		// FIXME for override port for sessionless mode
 		// Once the uri & port been moved to semnantier, this section should be removed
