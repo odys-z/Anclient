@@ -9,15 +9,15 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card/Card';
 
-import { TierCol, AnRowFormatter, TierComboField, Semantier } from '@anclient/semantier-st';
+import { TierCol, TierComboField, Semantier, AnElemFormatter, Tierec } from '@anclient/semantier-st';
 import { L, toBool, DatasetCombo } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
-import { CrudCompW, FormProp } from '../../common/north';
+import { CrudCompW, FormProp, Media } from '../../common/north';
 
 export interface CardsFormProp extends FormProp {
-	headFormatter?: AnRowFormatter;
-	CardsFormatter?: AnRowFormatter;
+	headFormatter?: (rec: Tierec, cols: Array<any>, classes: {[c: string]: string}, media: Media) => JSX.Element;
+	CardsFormatter?: (rows: Array<Tierec>, classes: {[c: string]: string}, media: Media) => JSX.Element;
 };
 
 const styles = (theme: starTheme) => (Object.assign(
@@ -73,19 +73,24 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 				console.warn("TRecordFormComp is supposed to load form data with pkval by itself.");
 
 			let that = this;
-			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (_cols, _rows) => {
+			// let cond = {};
+			// cond[this.tier.pk] = this.tier.pkval;
+			this.tier.record(undefined, // using this.tier.pkval,
+				(_cols, _rows) => {
 				// that.rec = rows && rows[0] ? rows[0] : {};
 				that.setState({});
 			} );
 		}
 	}
 
-    /**
-	 * Let's move this better version to TRecordForm
+    /* Let's move this better version to TRecordForm
+	 *
+	 * @param f
+	 * @param rec
+	 * @param classes
+	 * @returns
 	 */
-	getField(f: TierCol, rec: { [x: string]: string; }, classes: { [x: string]: string; }) {
+	getField(f: TierCol, rec: { [x: string]: any; }, classes: { [x: string]: string; }) {
 		let media = this.media;
 		let { isSm } = media;
 		let that = this;
@@ -99,11 +104,11 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 					readOnly={ !df && f.disabled }
 					options={ df.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ df.label }
-					style={ df.cbbStyle || {width: 200} }
-					invalidStyle={ df.style }
+					style={ df.css || {width: 200} }
+					invalidStyle={ df.css }
 					onSelect={ (v) => {
 						rec[df.field] = v.v;
-						df.style = undefined;
+						df.css = undefined;
 						that.setState({dirty: true});
 					} }
 				/>);
@@ -125,10 +130,10 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(tf.label)} margin='dense'
 				value={ !rec || (rec[tf.field] === undefined || rec[tf.field] === null) ? '' : rec[tf.field] }
-				className={classes[tf.style as string]}
+				className={classes[tf.css as string]}
 				onChange={(e) => {
 					rec[tf.field] = e.target.value;
-					tf.style = undefined;
+					tf.css = undefined;
 					that.setState({dirty: true});
 				}}
 			/>);
@@ -141,6 +146,8 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 
 		this.tier.fields().forEach( (f, i) => {
 		  if (!!f.visible) {
+			f.formatter = (rec, x) => (<>{rec[f.field]}</> as JSX.Element);
+
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
 					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
@@ -157,14 +164,30 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 		return fs;
 	}
 
+	/**
+	 * Create a formatter to compose a card for each record.
+	 * @param c column meta
+	 * @param x
+	 * @returns
+	formatCard = (c: AnlistCol, x: number) => {
+		const modifier: AnlistColAttrs = {};
+		modifier[c.field] = {
+			formatter: (rec: any) => (<>
+				{rec[c.field]}
+			</>)
+		};
+		return modifier;
+	}
+	 */
+
 	render () {
 		const { classes, width } = this.props;
 		let media = CrudCompW.getMedia(width);
 
 
 		return <>
-			{this.props.headFormatter(this.tier.rec, 0, classes, media)}
-			<Grid container>
+			{this.props.headFormatter(this.tier.rec, this.tier.columns(), classes, media)}
+		  : <Grid container className={classes.root} direction='row'>
 				{this.cards(classes, media)}
 			</Grid>
 		  </>;
@@ -176,7 +199,8 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 	// }
 
 	cards(classes: {[x: string] : any}, media: Media): React.ReactNode {
-		return this.tier.rows?.map( (r, x) => this.props.CardsFormatter(r, x, classes, media) );
+		// return this.tier.rows?.map( (r, x) => this.props.CardsFormatter(r, x, classes, media) );
+		return this.props.CardsFormatter(this.tier.rows, x, classes, media) );
 	}
 }
 

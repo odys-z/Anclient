@@ -86,7 +86,7 @@ function IIcon(props) {
 
 function XIcon(props) {
   return (
-	<SvgIcon fontSize="inherit" {...props}>
+	<SvgIcon fontSize="inherit" {...props} viewBox="-6 -6 36 36">
 	  <path d="M 19 3 H 5 c -1.11 0 -2 0.9 -2 2 v 14 c 0 1.1 0.89 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 5 c 0 -1.1 -0.9 -2 -2 -2 Z m -2 10 h -4 v 4 h -2 v -4 H 7 v -2 h 4 V 7 h 2 v 4 h 4 v 2 Z" />
 	</SvgIcon>
   );

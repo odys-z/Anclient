@@ -11,4 +11,4 @@ export namespace MyIconComp {
     export { AnContext as contextType };
 }
 import React from "react";
-import { AnContext } from "../reactext.jsx";
+import { AnContext } from "../reactext";

@@ -1,26 +1,20 @@
-export const AnContext: React.Context<{
-    an: any;
+import { ErrorCtx, Inseclient, SessionClient } from '@anclient/semantier-st/anclient';
+import React from 'react';
+import { AnReact } from './anreact';
+export declare const AnContext: React.Context<{
+    /**	Anclient */
+    /**@type = SessionIfn */
     ssInf: any;
     pageOrigin: string;
     iparent: {};
     ihome: string;
+    /**default: host */
     servId: string;
     servs: {
         host: string;
     };
-    anReact: any;
-    error: {
-        onError: any;
-        msg: any;
-    };
+    anClient: Inseclient | typeof SessionClient;
+    anReact: typeof AnReact;
+    error: ErrorCtx;
     hasError: boolean;
-    setServ: (servId: any, json: any) => void;
-    uuid: () => number;
 }>;
-export class AnError extends React.Component<any, any, any> {
-    constructor(props: any);
-}
-export namespace AnError {
-    export { AnContext as contextType };
-}
-import React from "react";

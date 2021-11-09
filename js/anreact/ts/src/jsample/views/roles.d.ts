@@ -1,44 +1,70 @@
-export const Roles: React.ComponentType<(Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<"button" | "buttons" | "root" | "container">;
-}>, "uri"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">, "uri" | keyof import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<"button" | "buttons" | "root" | "container">;
-}> & {
-    children?: React.ReactNode;
-}, "children" | "uri"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">, "children" | "uri" | keyof import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<"button" | "buttons" | "root" | "container">;
-}>, "uri"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container"> & {
-    children?: React.ReactNode;
-}, "children" | "uri" | keyof import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<"button" | "buttons" | "root" | "container">;
-}> & {
-    children?: React.ReactNode;
-}, "children" | "uri"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container"> & {
-    children?: React.ReactNode;
-}, "children" | "uri" | keyof import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">>) & import("@material-ui/core").WithWidthProps>;
-export class RolesComp extends CrudCompW {
-    closeDetails(): void;
+import React from 'react';
+import { CrudCompW } from '../../react/crud';
+declare class RolesComp extends CrudCompW {
+    state: {
+        condName: {
+            type: string;
+            val: string;
+            label: string;
+        };
+        condOrg: {
+            type: string;
+            sk: string;
+            nv: {
+                n: string;
+                v: string;
+            };
+            val: {
+                n: string;
+                v: string;
+            };
+            options: {
+                n: string;
+                v: string;
+            }[];
+            label: string;
+        };
+        buttons: {
+            add: boolean;
+            edit: boolean;
+            del: boolean;
+        };
+        total: number;
+        pageInf: {
+            page: number;
+            size: number;
+            total: number;
+        };
+        selected: {
+            Ids: Set<unknown>;
+        };
+    };
+    constructor(props: any);
+    componentDidMount(): void;
     toSearch(e: any, q: any): void;
     onPageInf(page: any, size: any): void;
     onTableSelect(rowIds: any): void;
+    toDel(e: any, v: any): void;
     toAdd(e: any, v: any): void;
     toEdit(e: any, v: any): void;
-    toDel(e: any, v: any): void;
-    tier: any;
-    q: any;
-    confirm: JSX.Element;
-    roleForm: JSX.Element;
+    closeDetails(): void;
+    render(): JSX.Element;
 }
-export namespace RolesComp {
-    export { AnContext as contextType };
-}
-import React from "react";
-import { CrudCompW } from "../../react/crud";
-import { AnContext } from "../../react/reactext";
+declare const Roles: React.ComponentType<(Pick<Pick<import("@material-ui/types").ConsistentWith<{}, {
+    classes: import("@material-ui/styles").ClassNameMap<"button" | "buttons" | "root" | "container">;
+}>, never> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">, keyof import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{}, {
+    classes: import("@material-ui/styles").ClassNameMap<"button" | "buttons" | "root" | "container">;
+}> & {
+    children?: React.ReactNode;
+}, "children"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">, "children" | keyof import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{}, {
+    classes: import("@material-ui/styles").ClassNameMap<"button" | "buttons" | "root" | "container">;
+}>, never> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container"> & {
+    children?: React.ReactNode;
+}, "children" | keyof import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{}, {
+    classes: import("@material-ui/styles").ClassNameMap<"button" | "buttons" | "root" | "container">;
+}> & {
+    children?: React.ReactNode;
+}, "children"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container"> & {
+    children?: React.ReactNode;
+}, "children" | keyof import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">>) & import("@material-ui/core").WithWidthProps>;
+export { Roles, RolesComp };

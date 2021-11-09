@@ -1,15 +1,20 @@
 import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, ColMeta
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 /**<p>UI element formatter</p>
  * E.g. TRecordForm will use this to format a field in form.
- * User should override this to return UI element, e.g. JSX.Element for React render().
+ * Currently tiers also accept this as field modifier. (FIXME - to be optimized)
  */
-export type AnElemFormatter = ((col: TierCol, colIndx: number)=> any);
+export type AnElemFormatter = (
+	(	/**field definition */
+		col: TierCol,
+		/**column index or record for the row */
+		rec: number | Tierec
+	) => any );
 
 export interface ErrorCtx {
 	msg?: undefined | string | Array<string>;
@@ -23,7 +28,7 @@ export interface AnlistColAttrs {
 	visible?: boolean;
     checkbox?: boolean;
     // formatter?: (col: AnlistCol) => string;
-    formatter?: (rec: {}) => string;
+    formatter?: AnElemFormatter;
     css?: {};
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	box?: {};
@@ -32,9 +37,10 @@ export interface AnlistColAttrs {
 /**Meta data handled from tier (DB field).
  * field and label properties are required.
 */
-export interface TierCol extends AnlistColAttrs{
-    field: string;
+export interface TierCol extends AnlistColAttrs, ColMeta {
+    // field: string;
     label: string;
+
     /**input type / form type */
     type?: string;
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
@@ -69,6 +75,7 @@ export interface Semantext {
     error: object;
 }
 
+export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
 /**
  * Base class of semantic tier
  */
@@ -98,8 +105,8 @@ export class Semantier {
     _cols: Array<TierCol>;
     /** client function / CRUD identity */
     uri: string;
-    /** maintable's record fields */
-    _fields: any[];
+    /** Fields in details from, e.g. maintable's record fields */
+    _fields: TierCol[];
     /** optional main table's pk */
     pk: string;
     /** current crud */

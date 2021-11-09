@@ -7,24 +7,18 @@ import PropTypes from "prop-types";
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
-import Input from '@material-ui/core/Input';
 
-import { Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
+import { CRUD, AnsonResp } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
-	// import { Protocol, AnsonResp } from '../../../semantier/protocol';
-	import { AnConst } from '../../utils/consts';
 	import { AnContext } from '../reactext';
-	import { AnTreeIcons } from "./tree"
 	import { DetailFormW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
 	import { ConfirmDialog } from './messagebox';

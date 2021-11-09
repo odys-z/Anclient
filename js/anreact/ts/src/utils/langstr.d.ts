@@ -1,3 +1,24 @@
+export interface StrResource {
+    [x: string]: string;
+}
+/**
+ * A dynamic extending {string-key: parameterized-instance} translation mapper.
+ * function:
+ * use string template as resource key;
+ * accept object as arguments
+ * extending &amp; resolve un-mapped string template.
+*/
+export declare const Langstrs: {
+    s: {
+        en: Set<string>;
+        zh: StrResource;
+        ja: StrResource;
+    };
+    lang: string;
+    load: (url: any) => void;
+    using: (lang?: string) => void;
+    report: (lang?: string) => Set<unknown>;
+};
 /**var L = require('language');
  * or import L from Langstr;
  * Usage:
@@ -5,23 +26,16 @@
  * var the_string = L('Welcome {name}', {name: 'Joe'});
  * see https://stackoverflow.com/a/30191493/7362888
  * and https://stackoverflow.com/a/57882370/7362888
+ *
+ * @param t template
+ * @param o arg object
+ * @returns
  */
-export function L(t: any, o: any): any;
+export declare function L(t: string, o?: object): string;
 /** return a promise
  *
  *  memo: navigator clipboard api needs a secure context (https)
  * @param {string} textToCopy text to be copied
  * https://stackoverflow.com/a/65996386/7362888
  */
-export function copyToClipboard(textToCopy: string): Promise<any>;
-export namespace Langstrs {
-    namespace s {
-        const en: Set<any>;
-        const zh: {};
-        const ja: {};
-    }
-    const lang: string;
-    function load(url: any): void;
-    function using(lang?: string): void;
-    function report(lang?: string): Set<any>;
-}
+export declare function copyToClipboard(textToCopy: any): Promise<void>;

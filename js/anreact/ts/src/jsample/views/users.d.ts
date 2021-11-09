@@ -1,18 +1,61 @@
-declare const UsersTier_base: any;
-export class UsersTier extends UsersTier_base {
-    [x: string]: any;
-    constructor(comp: any);
+import React from 'react';
+import { CRUD, UserReq, QueryConditions, Tierec, TierCol, OnCommitOk } from '@anclient/semantier-st';
+import { Semantier } from '@anclient/semantier-st';
+import { Comprops, CrudCompW } from '../../react/crud';
+declare class UserstComp extends CrudCompW<Comprops> {
+    state: {
+        buttons: {
+            add: boolean;
+            edit: boolean;
+            del: boolean;
+        };
+        pageInf: {
+            page: number;
+            size: number;
+            total: number;
+        };
+        selected: {
+            ids: Set<string>;
+        };
+    };
+    tier: UsersTier;
+    q: QueryConditions;
+    confirm: JSX.Element;
+    recForm: JSX.Element;
+    pageInf: any;
+    onPageInf: any;
+    constructor(props: any);
+    componentDidMount(): void;
+    getTier: () => void;
+    /** If condts is null, use the last condts to query.
+     * on succeed: set state.rows.
+     * @param {object} condts the query conditions collected from query form.
+     */
+    toSearch(condts: any): void;
+    onTableSelect(rowIds: any): void;
+    toDel(e: React.MouseEvent<Element, MouseEvent>): void;
+    del(): void;
+    toAdd(e: React.MouseEvent<Element, MouseEvent>): void;
+    toEdit(e: React.MouseEvent<Element, MouseEvent>): void;
+    closeDetails(): void;
+    render(): JSX.Element;
+}
+declare const Userst: React.ComponentType<(Pick<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"button" | "root">, string | number | symbol> | Pick<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"button" | "root"> & {
+    children?: React.ReactNode;
+}, string | number | symbol>) & import("@material-ui/core").WithWidthProps>;
+export { Userst, UserstComp };
+export declare class UsersTier extends Semantier {
     port: string;
     mtabl: string;
     pk: string;
     checkbox: boolean;
     rows: any[];
     pkval: any;
-    rec: {};
+    rec: Tierec;
     _fields: ({
         type: string;
         field: string;
-        label: any;
+        label: string;
         validator: {
             len: number;
             notNull: boolean;
@@ -24,7 +67,7 @@ export class UsersTier extends UsersTier_base {
     } | {
         type: string;
         field: string;
-        label: any;
+        label: string;
         validator?: undefined;
         grid?: undefined;
         defaultStyle?: undefined;
@@ -33,7 +76,7 @@ export class UsersTier extends UsersTier_base {
     } | {
         type: string;
         field: string;
-        label: any;
+        label: string;
         validator: {
             notNull: boolean;
             len?: undefined;
@@ -45,7 +88,7 @@ export class UsersTier extends UsersTier_base {
     } | {
         type: string;
         field: string;
-        label: any;
+        label: string;
         grid: {
             md: number;
         };
@@ -63,68 +106,29 @@ export class UsersTier extends UsersTier_base {
             len?: undefined;
         };
     })[];
-    _cols: ({
-        text: any;
-        field: string;
-        checked: boolean;
-        sk?: undefined;
-        nv?: undefined;
-    } | {
-        text: any;
-        field: string;
-        checked?: undefined;
-        sk?: undefined;
-        nv?: undefined;
-    } | {
-        text: any;
-        field: string;
-        sk: any;
-        nv: {
-            n: string;
-            v: string;
-        };
-        checked?: undefined;
-    })[];
-    columns(): ({
-        text: any;
-        field: string;
-        checked: boolean;
-        sk?: undefined;
-        nv?: undefined;
-    } | {
-        text: any;
-        field: string;
-        checked?: undefined;
-        sk?: undefined;
-        nv?: undefined;
-    } | {
-        text: any;
-        field: string;
-        sk: any;
-        nv: {
-            n: string;
-            v: string;
-        };
-        checked?: undefined;
-    })[];
+    _cols: TierCol[];
+    constructor(comp: any);
+    columns(): TierCol[];
     records(conds: any, onLoad: any): void;
     record(conds: any, onLoad: any): void;
-    saveRec(opts: any, onOk: any): void;
+    saveRec(opts: {
+        uri: string;
+        crud: CRUD;
+        pkval: string;
+    }, onOk: OnCommitOk): void;
     /**
-     * @param {object} opts
-     * @param {string} [opts.uri] overriding local uri
-     * @param {set} opts.ids record id
-     * @param {function} onOk: function(AnsonResp);
+     * @param opts
+     * @param opts.uri overriding local uri
+     * @param opts.ids record id
+     * @param onOk function(AnsonResp);
      */
     del(opts: {
         uri?: string;
-        ids: any;
-    }, onOk: Function): void;
+        [p: string]: string | Set<string> | object;
+    }, onOk: OnCommitOk): void;
 }
-declare const UserstReq_base: any;
-export class UserstReq extends UserstReq_base {
-    [x: string]: any;
-    static type: string;
+export declare class UserstReq extends UserReq {
+    static __type__: string;
     static __init__: any;
     static A: {
         records: string;
@@ -134,9 +138,6 @@ export class UserstReq extends UserstReq_base {
         del: string;
         mykids: string;
     };
-    constructor(uri: any, args?: {});
-    type: string;
-    uri: any;
     userId: any;
     userName: any;
     orgId: any;
@@ -146,54 +147,15 @@ export class UserstReq extends UserstReq_base {
     record: any;
     relations: any;
     deletings: any;
+    constructor(uri: string, args: {
+        record?: Tierec;
+        relations?: any;
+        pk?: string;
+        deletings?: string[];
+        userId?: string;
+        userName?: string;
+        orgId?: string;
+        roleId?: string;
+        hasTodos?: string;
+    });
 }
-export const Userst: React.ComponentType<(Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<"button" | "root">;
-}>, "uri"> & import("@material-ui/core").StyledComponentProps<"button" | "root">, "uri" | keyof import("@material-ui/core").StyledComponentProps<"button" | "root">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<"button" | "root">;
-}> & {
-    children?: React.ReactNode;
-}, "children" | "uri"> & import("@material-ui/core").StyledComponentProps<"button" | "root">, "children" | "uri" | keyof import("@material-ui/core").StyledComponentProps<"button" | "root">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<"button" | "root">;
-}>, "uri"> & import("@material-ui/core").StyledComponentProps<"button" | "root"> & {
-    children?: React.ReactNode;
-}, "children" | "uri" | keyof import("@material-ui/core").StyledComponentProps<"button" | "root">> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<"button" | "root">;
-}> & {
-    children?: React.ReactNode;
-}, "children" | "uri"> & import("@material-ui/core").StyledComponentProps<"button" | "root"> & {
-    children?: React.ReactNode;
-}, "children" | "uri" | keyof import("@material-ui/core").StyledComponentProps<"button" | "root">>) & import("@material-ui/core").WithWidthProps>;
-export class UserstComp extends CrudCompW {
-    tier: any;
-    closeDetails(): void;
-    /** If condts is null, use the last condts to query.
-     * on succeed: set state.rows.
-     * @param {object} condts the query conditions collected from query form.
-     */
-    toSearch(condts: object): void;
-    toAdd(e: any, v: any): void;
-    toEdit(e: any, v: any): void;
-    onTableSelect(rowIds: any): void;
-    toDel(e: any, v: any): void;
-    del(): void;
-    getTier: () => void;
-    q: any;
-    confirm: JSX.Element;
-    recForm: JSX.Element;
-}
-export namespace UserstComp {
-    export { AnContext as contextType };
-}
-import React from "react";
-import { CrudCompW } from "../../react/crud";
-import { AnContext } from "../../react/reactext";
-export {};

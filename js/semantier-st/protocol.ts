@@ -41,7 +41,7 @@ export type Expr = {
 
 export interface ColMeta {
     field: string;
-    name: string;
+    name?: string;
 }
 
 export interface PkMeta {

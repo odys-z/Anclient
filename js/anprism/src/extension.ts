@@ -287,14 +287,6 @@ class AnPagePanel {
 		}
 	}
 
-	/**
-	 * Load the page, where page info is {@link AnPagePanel.page}.
-	private loadOnline() {
-		const webview = this._panel.webview;
-		this._panel.webview.html = this.getAnclientPage(this.page);
-	}
-	 */
-
 	refresh(newPage: vscode.Uri | undefined): void {
 		this._panel.webview.html = "";
 		this.page.html = newPage || this.page.html;
