@@ -146,13 +146,14 @@ const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
 export {ConfirmDialog, ConfirmDialogComp};
 
 export interface ErrorProps extends DialogProps {
+	msg: string;
     onClose: () => void;
-    fullScreen: boolean;
+    fullScreen?: boolean;
 }
 
 export class AnError extends CrudCompW<ErrorProps> {
 	// props = undefined;
-	context: React.ContextType<typeof AnContext>
+	// context: React.ContextType<typeof AnContext>
 
 	state = {
 	};
@@ -166,9 +167,9 @@ export class AnError extends CrudCompW<ErrorProps> {
 		let p = this.props as ErrorProps;
 		return (
 			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
-					open={!!ctx.hasError} onClose={p.onClose}
+					open={true} onClose={p.onClose}
 					fullScreen={p.fullScreen}
-					msg={L(ctx.error.msg as string)} />
+					msg={L(p.msg as string)} />
 		);
 	}
 }
