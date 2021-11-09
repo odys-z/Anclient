@@ -1,6 +1,6 @@
 {
   "name": "@anclient/semantier-st",
-  "version": "0.9.34",
+  "version": "0.9.36",
   "description": "The anclient's sub package depending on pure js object that can be used for js unit test.",
   "main": "./anclient.ts",
   "directories": {},

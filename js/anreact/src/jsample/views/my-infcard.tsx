@@ -8,7 +8,7 @@ import { L } from '../../utils/langstr';
 	import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 	import { AnContext } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { TRecordForm } from '../../react/widgets/t-record-form';
+	import { AnFormField, TRecordForm } from '../../react/widgets/t-record-form';
 	import { ImageUpload } from '../../react/widgets/image-upload';
 import { Comprops, DetailFormW } from '../../react/crud';
 
@@ -140,8 +140,8 @@ export class MyInfTier extends Semantier {
 		{ field: 'roleId',   label: L('Role'), disabled: true,
 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: this.loadAvatar }
-	];
+		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, fieldFormatter: this.loadAvatar }
+	] as AnFormField[];
 
 	/**
 	 * Format an image upload component.
@@ -195,8 +195,6 @@ export class MyInfTier extends Semantier {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-
-		let { uri } = opts;
 
 		let crud = CRUD.u;
 

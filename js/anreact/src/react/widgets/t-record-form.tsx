@@ -13,8 +13,8 @@ import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	import { ClassNames, Comprops, CrudCompW } from '../crud';
 	import { DatasetCombo, TierComboField } from './dataset-combo';
-	import { Semantier, Tierec } from '@anclient/semantier-st';
-import { Media } from '../anreact';
+	import { Semantier, TierCol, Tierec } from '@anclient/semantier-st';
+import { AnFieldFormatter, Media } from '../anreact';
 
 const styles = (theme) => (Object.assign(
 	Semantier.invalidStyles,
@@ -42,6 +42,10 @@ const styles = (theme) => (Object.assign(
 
 export interface RecordFormProps extends Comprops {
     enableValidate: boolean;
+};
+
+export interface AnFormField extends TierCol {
+	fieldFormatter?: AnFieldFormatter;
 };
 
 /**
@@ -117,11 +121,13 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				/>);
 		}
 		else if (f.type === 'formatter' || f.formatter) {
-			if (f.formatter.length != 3)
+			console.warn("This branch is deprecated.");
+			if (f.formatter.length != 2)
 				console.warn('TRecordFormComp need formatter with signature of f(record, field, tier).', f.formatter)
-			return (
-				<>{f.formatter(rec, f)}</>
-			);
+			return (<>{f.formatter(f, rec)}</>);
+		}
+		else if (f.type === 'formatter' || f.fieldFormatter) {
+			return (<>{f.fieldFormatter(rec, f)}</>);
 		}
 		else {
 			let type = 'text';
@@ -148,7 +154,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		}
 	}
 
-	formFields(rec, classes, media) {
+	formFields(rec: Tierec, classes: ClassNames, media: Media) {
 		let fs = [];
 		const isSm = this.props.dense || toBool(media.isMd);
 

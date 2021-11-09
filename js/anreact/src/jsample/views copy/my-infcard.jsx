@@ -2,19 +2,15 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
-import { Button, Grid, Card, Typography } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
 
-import { Protocol, CRUD, UpdateReq, InsertReq, DeleteReq, AnsonResp, Semantier } from '@anclient/semantier-st';
+import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
 	import { dataOfurl, urlOfdata } from '../../utils/file-utils';
-	import { AnConst } from '../../utils/consts';
-	import { CrudCompW } from '../../react/crud';
-	import { AnContext, AnError } from '../../react/reactext';
+	import { AnContext } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox.jsx'
-	import { AnQueryForm } from '../../react/widgets/query-form';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 	import { ImageUpload } from '../../react/widgets/image-upload';
-	import { JsampleIcons } from '../styles';
 
 const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
@@ -146,7 +142,7 @@ export class MyInfTier extends Semantier {
 		{ field: 'roleId',   label: L('Role'), disabled: true,
 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, formatter: this.loadAvatar }
+		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, fieldFormatter: this.loadAvatar }
 	];
 
 	/**

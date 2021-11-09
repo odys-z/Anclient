@@ -2,11 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-<<<<<<< HEAD
-import { Protocol, Inseclient, SessionClient } from '@anclient/semantier-st';
-=======
 import { Protocol, Inseclient, AnsonResp, AnsonMsg } from '@anclient/semantier-st';
->>>>>>> master
 
 import { Langstrs,
 	AnContext, AnError, AnReactExt,
@@ -65,12 +61,7 @@ class App extends React.Component<Props, State> {
 		this.state.servs = this.props.servs;
 		// this.state.jserv = this.props.servs[this.state.servId];
 
-<<<<<<< HEAD
-		this.state.inclient = new Inseclient({urlRoot: this.state.jserv});
-		let ssclient = new SessionClient()
-=======
 		this.state.inclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
->>>>>>> master
 
 		this.state.error = {onError: this.onError, msg: ''};
 

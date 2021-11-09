@@ -1,5 +1,16 @@
-export function uri(comp: any, uri: any): any;
-export const Sys: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"hide" | "content" | "direction" | "root" | "welcome" | "appBar" | "loginfo" | "appBarShift" | "menuButton" | "drawer" | "drawerPaper" | "drawerHeader" | "contentShift" | "welcomeHead" | "cardText">>;
+import React from 'react';
+import { AnContext } from './reactext';
+import { Comprops, ClassNames, CrudComp, CrudCompW } from './crud';
+import { ClassNameMap } from '@material-ui/styles';
+import { AnReactExt } from './anreact';
+export interface SysProps extends Comprops {
+    /**Welcome page formatter */
+    welcome?: (classes: ClassNameMap, context: typeof AnContext, comp: SysComp) => JSX.Element;
+    hrefDoc: string;
+    onLogout: () => void;
+    myInfo: JSX.Element | ((context: typeof AnContext) => JSX.Element);
+}
+export declare function uri(comp: CrudComp<Comprops>, uri: string): CrudComp<Comprops>;
 /**
  * <pre>a_functions
  funcId       |funcName           |url                               |css |flags |fullpath         |parentId |sibling |
@@ -14,23 +25,40 @@ export const Sys: React.ComponentType<Pick<any, string | number | symbol> & impo
  sys-uesr-1.1 |Uesr Manage        |views/sys/user/users-1.1.html     |    |1     |2 sys-1.1.4 user |sys-1.1  |4       |</pre>
  * @class SysComp
  */
-export class SysComp extends React.Component<any, any, any> {
+declare class SysComp extends CrudCompW<SysProps> {
+    state: {
+        window: any;
+        welcome: boolean;
+        sysName: string;
+        skMenu: any;
+        sysMenu: {};
+        cruds: {
+            path: string;
+            params: any;
+            comp: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/styles").StyledComponentProps<"root">>;
+        }[];
+        paths: any[];
+        menuTitle: string;
+        showMenu: boolean;
+        expandings: Set<unknown>;
+        showMine: boolean;
+    };
+    anreact: AnReactExt;
+    confirmLogout: any;
     static extendLinks(links: any): void;
     constructor(props: any);
-    showMenu(e: any): void;
+    welcomePaper(classes: any): JSX.Element;
+    componentDidMount(): void;
+    showMenu(e: React.MouseEvent<HTMLElement>): void;
     hideMenu(): void;
-    toExpandItem(e: any): void;
+    toLogout(): void;
+    toExpandItem(e: React.MouseEvent<HTMLElement>): void;
     /**
      * @param {object} classes
      */
-    menuItems(classes: object): any;
-    toLogout(): void;
-    welcomePaper(classes: any): any;
-    confirmLogout: JSX.Element;
+    menuItems(classes: ClassNames): any;
     route(): JSX.Element[];
+    render(): JSX.Element;
 }
-export namespace SysComp {
-    export { AnContext as contextType };
-}
-import React from "react";
-import { AnContext } from "./reactext";
+declare const Sys: React.ComponentType<Pick<SysProps, keyof SysProps> & import("@material-ui/styles").StyledComponentProps<"hide" | "content" | "direction" | "root" | "sysName" | "welcome" | "appBar" | "loginfo" | "appBarShift" | "menuButton" | "drawer" | "drawerPaper" | "drawerHeader" | "contentShift" | "welcomeHead" | "cardText">>;
+export { Sys, SysComp };

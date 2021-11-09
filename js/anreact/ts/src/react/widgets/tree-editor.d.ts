@@ -5,16 +5,16 @@ export const TreeCard: React.ComponentType<(Pick<Pick<PropTypes.InferProps<{
     parent: PropTypes.Validator<object>;
     columns: PropTypes.Validator<any[]>;
     toEdit: PropTypes.Validator<(...args: any[]) => any>;
-}>, "media" | "columns" | "parent" | "tnode" | "leadingIcons" | "toEdit"> & import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem">, "media" | "columns" | "parent" | "tnode" | "leadingIcons" | "toEdit" | keyof import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem">> | Pick<Pick<PropTypes.InferProps<{
+}>, "media" | "columns" | "parent" | "toEdit" | "tnode" | "leadingIcons"> & import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem">, "media" | "columns" | "parent" | "toEdit" | "tnode" | "leadingIcons" | keyof import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem">> | Pick<Pick<PropTypes.InferProps<{
     media: PropTypes.Validator<object>;
     leadingIcons: PropTypes.Validator<(...args: any[]) => any>;
     tnode: PropTypes.Validator<object>;
     parent: PropTypes.Validator<object>;
     columns: PropTypes.Validator<any[]>;
     toEdit: PropTypes.Validator<(...args: any[]) => any>;
-}>, "media" | "columns" | "parent" | "tnode" | "leadingIcons" | "toEdit"> & import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem"> & {
+}>, "media" | "columns" | "parent" | "toEdit" | "tnode" | "leadingIcons"> & import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem"> & {
     children?: React.ReactNode;
-}, "media" | "columns" | "children" | "parent" | "tnode" | "leadingIcons" | "toEdit" | keyof import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem">>) & import("@material-ui/core").WithWidthProps>;
+}, "media" | "columns" | "children" | "parent" | "toEdit" | "tnode" | "leadingIcons" | keyof import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem">>) & import("@material-ui/core").WithWidthProps>;
 export class TreeCardComp extends React.Component<any, any, any> {
     constructor(props: any);
     newCard: any;
@@ -41,16 +41,16 @@ export const AnTreeditor: React.ComponentType<(Pick<Pick<PropTypes.InferProps<{
     fields: PropTypes.Validator<any[]>;
     pk: PropTypes.Validator<object>;
     isMidNode: PropTypes.Requireable<(...args: any[]) => any>;
-}>, "columns" | "uri" | "pk" | "mtabl" | "fields" | "isMidNode"> & import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem">, "columns" | "uri" | "pk" | "mtabl" | "fields" | keyof import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem"> | "isMidNode"> | Pick<Pick<PropTypes.InferProps<{
+}>, "columns" | "uri" | "mtabl" | "fields" | "pk" | "isMidNode"> & import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem">, "columns" | "uri" | "mtabl" | "fields" | "pk" | keyof import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem"> | "isMidNode"> | Pick<Pick<PropTypes.InferProps<{
     uri: PropTypes.Validator<string>;
     mtabl: PropTypes.Validator<string>;
     columns: PropTypes.Validator<any[]>;
     fields: PropTypes.Validator<any[]>;
     pk: PropTypes.Validator<object>;
     isMidNode: PropTypes.Requireable<(...args: any[]) => any>;
-}>, "columns" | "uri" | "pk" | "mtabl" | "fields" | "isMidNode"> & import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem"> & {
+}>, "columns" | "uri" | "mtabl" | "fields" | "pk" | "isMidNode"> & import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem"> & {
     children?: React.ReactNode;
-}, "columns" | "children" | "uri" | "pk" | "mtabl" | "fields" | keyof import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem"> | "isMidNode">) & import("@material-ui/core").WithWidthProps>;
+}, "columns" | "children" | "uri" | "mtabl" | "fields" | "pk" | keyof import("@material-ui/core").StyledComponentProps<"row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem"> | "isMidNode">) & import("@material-ui/core").WithWidthProps>;
 export class AnTreeditorComp extends React.Component<any, any, any> {
     constructor(props: any);
     th(columns: any[], classes: any, media: any): JSX.Element;

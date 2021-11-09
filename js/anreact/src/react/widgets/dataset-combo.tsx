@@ -4,14 +4,15 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete, { AutocompleteClassKey } from '@material-ui/lab/Autocomplete';
+import { InvalidClassNames, Semantier } from '@anclient/semantier-st';
 
 import { AnConst } from '../../utils/consts';
 import { AnContext } from '../reactext';
-import { InvalidClassNames, Semantier, TierCol } from '@anclient/semantier-st';
 import { Comprops, CrudCompW } from '../crud';
+import { AnFormField } from '../../an-components';
 
 /**E.g. form's combobox field declaration */
-export interface TierComboField extends TierCol {
+export interface TierComboField extends AnFormField {
     className: undefined | "root" | InvalidClassNames | AutocompleteClassKey;
 	nv: {n: string; v: string};
 	sk: string;

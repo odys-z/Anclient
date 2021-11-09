@@ -9,7 +9,7 @@
  * See mime type index: https://www.iana.org/assignments/media-types/media-types.xhtml#image
  * @return {string} base64
  */
-export function uarr2Base64(u8Arr: any, mime?: string): string;
-export function dataOfurl(dataUrl: any): any;
-export function mimeOf(dataUrl: any): any;
-export function urlOfdata(mime: any, data: any): string;
+export declare function uarr2Base64(u8Arr: any, mime: any): string;
+export declare function dataOfurl(dataUrl: any): any;
+export declare function mimeOf(dataUrl: any): any;
+export declare function urlOfdata(mime: any, data: any): string;

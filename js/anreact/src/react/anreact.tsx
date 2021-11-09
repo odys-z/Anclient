@@ -8,23 +8,22 @@ import { stree_t, Protocol, Tierec, TierCol,
 
 import { AnConst } from '../utils/consts';
 import { toBool } from '../utils/helpers';
-import { Comprops, CrudComp } from './crud';
+import { ClassNames, Comprops, CrudComp } from './crud';
 
 export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
 
 /**JSX.Element like row formatter results */
-export interface AnRow {
-}
+export interface AnRow extends JSX.Element { }
 
 /**(Form) field formatter
  * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
  */
-export type AnFieldFormatter = ((col: TierCol, colIndx: number)=> AnRow);
+export type AnFieldFormatter = ((rec: Tierec, col: TierCol, classes?: ClassNames, media?: Media)=> JSX.Element);
 
 /**TODO (list) row formatter
  * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
  */
-export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> JSX.Element);
+export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> AnRow);
 
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact
@@ -305,7 +304,7 @@ export class AnReactExt extends AnReact {
 				component.setState({forest: resp.Body().forest});
 		}
 
-		this.dataset(opts, onload, this.errCtx);
+		this.dataset(opts, onload);
 	}
 
 	// errCtx(opts: DatasetOpts, onload: OnLoadOk | ((resp: AnsonMsg<AnDatasetResp>) => void), errCtx: any) {
@@ -329,7 +328,7 @@ export class AnReactExt extends AnReact {
 			console.log("Rebuilt successfully: ", resp);
 		}
 
-		this.dataset(opts, onload, this.errCtx);
+		this.dataset(opts, onload);
 	}
 
 	/**Bind dataset to combobox options (comp.state.condCbb).
@@ -353,8 +352,7 @@ export class AnReactExt extends AnReact {
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs: string[];
 				  nv: {n: string, v: string};
-				  cond: any; onDone: OnCommitOk; noAll: boolean; },
-		errCtx?: ErrorCtx) {
+				  cond: any; onDone: OnCommitOk; noAll: boolean; } ) {
 		let {uri, sk, sqlArgs, nv, cond, onDone, noAll} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
@@ -388,7 +386,7 @@ export class AnReactExt extends AnReact {
 
 				if (onDone)
 					onDone(cond);
-			}, errCtx );
+			} );
 		return this;
 	}
 }
