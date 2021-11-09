@@ -264,7 +264,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 
 	toExpandItem(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
-		let f = e.currentTarget.getAttribute("nid");
+		let f = e.currentTarget.getAttribute("data-nid");
 
 		let expandings = this.state.expandings;
 		if (expandings.has(f)) expandings.delete(f);
@@ -319,9 +319,10 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 
 					// that.addForm = undefined;
 					let {uri, sk} = this.props;
-					this.context.anReact.rebuildTree({uri, sk, rootId: me}, () => {
-						that.toSearch();
-					});
+					(this.context as unknown as AnContextType).anReact
+                        .rebuildTree({uri, sk, rootId: me}, () => {
+                            that.toSearch();
+                        });
 				}}
 			/> );
 		this.setState({});
@@ -341,6 +342,10 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
 			})
+        
+        function icon() {
+	        return AnTreeIcons[icon || "deflt"];
+        }
 	}
 
 	/**
@@ -398,7 +403,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 						if (col.type === 'actions') return (
 							<Grid item key={ix} {...col.cols}>
 								<Button onClick={this.toAddChild}
-									me={undefined} parent={undefined}
+									data-me={undefined} date-parent={undefined}
 									startIcon={<JsampleIcons.ListAdd />} color="primary" >
 									{media.isMd && L('New')}
 								</Button>
@@ -418,7 +423,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 	  return (
 		<div
 			onClick={this.toExpandItem}
-			nid={tnode.id}
+			data-nid={tnode.id}
 			className={classes.folderHead}
 		>
 		  <Grid container spacing={0} key={tnode.id} >
@@ -438,17 +443,17 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 					  <Grid item key={`${tnode.id}.${ix}`} className={classes.actions}>
 						<Typography noWrap variant='body2' >
 							<Button onClick={this.toEdit}
-								me={tnode.id}
+								data-me={tnode.id}
 								startIcon={<JsampleIcons.Edit />} color="primary" >
 								{media.isMd && L('Edit')}
 							</Button>
-							<Button onClick={this.toDel} me={tnode.id}
+							<Button onClick={this.toDel} data-me={tnode.id}
 								startIcon={<JsampleIcons.Delete />} color="secondary" >
 								{media.isMd && L('Delete')}
 							</Button>
 							{( this.props.isMidNode ? this.props.isMidNode(n) : true )
 							  && <Button onClick={this.toAddChild}
-									me={tnode.id} parent={n.parent}
+									data-me={tnode.id} data-parent={n.parent}
 									startIcon={<JsampleIcons.ListAdd />} color="primary" >
 									{media.isMd && L('New')}
 							</Button>}

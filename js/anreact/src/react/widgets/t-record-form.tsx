@@ -94,9 +94,6 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			} );
 		}
 	}
-    setState(arg0: {}) {
-        throw new Error('Method not implemented.');
-    }
 
 	getField(f: TierComboField, rec: Tierec, classes: ClassNames, media: Media) {
 		let {isSm} = media;
@@ -185,7 +182,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			<Grid container className={classes.root} direction='row'>
 				{this.formFields(rec, classes, media)}
 			</Grid>
-			: <></>; // NOTE have to wait until parent loaded data
+			: <></>; // have to wait until parent loaded data
 	}
 }
 

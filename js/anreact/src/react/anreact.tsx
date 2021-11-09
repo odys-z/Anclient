@@ -295,7 +295,7 @@ export class AnReactExt extends AnReact {
 		if (!uri)
 			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
 
-		opts.port = 'stree';
+		// opts.port = 'stree';
 
 		if (opts.sk && !opts.t)
 			opts.a = stree_t.sqltree;
@@ -308,10 +308,6 @@ export class AnReactExt extends AnReact {
 		this.dataset(opts, onload);
 	}
 
-	// errCtx(opts: DatasetOpts, onload: OnLoadOk | ((resp: AnsonMsg<AnDatasetResp>) => void), errCtx: any) {
-	// 	throw new Error('Method not implemented.');
-	// }
-
 	rebuildTree(opts, onOk) {
 		let {uri, rootId, sk} = opts;
 		if (!uri)
@@ -320,7 +316,7 @@ export class AnReactExt extends AnReact {
 		if (!rootId)
 			console.log('Rebuild tree without rootId ?');
 
-		// opts.port = 'stree';
+		opts.port = 'stree';
 
 		if (opts.sk && !opts.t)
 			opts.t = stree_t.retree;

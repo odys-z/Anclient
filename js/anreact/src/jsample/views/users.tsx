@@ -63,7 +63,7 @@ class UserstComp extends CrudCompW<Comprops> {
 
 	getTier = () => {
 		this.tier = new UsersTier(this);
-		this.tier.setContext(this.context as Semantext);
+		this.tier.setContext(this.context as any as Semantext);
 
 		// FIXME for override port for sessionless mode
 		// Once the uri & port been moved to semnantier, this section should be removed
@@ -214,10 +214,10 @@ export { Userst, UserstComp }
 
 class UsersQuery extends CrudCompW<Comprops> {
 	conds = [
-		{ name: 'userName', type: 'text', val: '', label: L('Student') },
-		{ name: 'orgId',    type: 'cbb',  val: '', label: L('Class'),
+		{ name: 'userName', type: 'text', val: undefined, label: L('Student') },
+		{ name: 'orgId',    type: 'cbb',  val: undefined, label: L('Class'),
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Role'),
+		{ name: 'roleId',   type: 'cbb',  val: undefined, label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
 
@@ -235,8 +235,9 @@ class UsersQuery extends CrudCompW<Comprops> {
 	collect() {
 		return {
 			userName: this.conds[0].val ? this.conds[0].val : undefined,
-			orgId   : this.conds[1].val ? this.conds[1].val.v : undefined,
-			roleId  : this.conds[2].val ? this.conds[2].val.v : undefined };
+			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
+			roleId   : (this.conds[2].val as {n: string, v: string}) ?.v };
+			// roleId  : (this.conds[2].val ? this.conds[2].val.v : undefined };
 	}
 
 	/** Design Note:
@@ -353,7 +354,7 @@ export class UsersTier extends Semantier {
 		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		let {cipher, iv} = this.client.encryptoken(this.rec.pswd);
+		let {cipher, iv} = this.client.encryptoken(this.rec.pswd as string);
 		this.rec.pswd = cipher;
 		this.rec.iv = iv;
 
