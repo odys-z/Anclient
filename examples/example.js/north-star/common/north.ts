@@ -11,6 +11,12 @@ export interface FieldMeta {
 	disabled?: boolean;
 }
 
+export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs: boolean; isXl?: boolean; }
+
+export interface AnMUIClasses {
+	[c: string]: string;
+}
+
 /** App North's props */
 export interface Northprops {
     iportal?: string;
@@ -42,6 +48,7 @@ export interface WelcomeProp extends Comprops {
 
 /**PropType of Poll's Form. */
 export interface FormProp extends Comprops {
+	readonly tier: Semantier;
 	/**Fields met for expanding by form, e.g. TRecordForm or CardForm. */
 	readonly fields?: Array<{}>;
 
@@ -99,7 +106,7 @@ export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> 
 	}
 
 	static getMedia(width: string) {
-		let media;
+		let media: Media;
 
 		if (width === 'lg') {
             media = {

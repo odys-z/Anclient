@@ -234,7 +234,7 @@ export class AnReactExt extends AnReact {
 			.A(t || stree_t.query);
 		let jreq = this.client.userReq(uri, port, reqbody);
 
-		this.client.an.post(jreq, onLoad, (c, resp) => {
+		this.client.an.post(jreq, onLoad, {onError: (c, resp) => {
 			if (errCtx) {
 				errCtx.hasError = true;
 				errCtx.code = c;
@@ -242,7 +242,7 @@ export class AnReactExt extends AnReact {
 				errCtx.onError(c, resp);
 			}
 			else console.error(c, resp);
-		});
+		} } );
 		return this;
 	}
 

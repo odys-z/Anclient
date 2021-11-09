@@ -97,6 +97,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 						that.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
+					that.tier.rec.pswd = undefined;
 					if (typeof that.props.onSaved === 'function')
 						that.props.onSaved(resp);
 				} );

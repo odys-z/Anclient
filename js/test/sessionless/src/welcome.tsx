@@ -30,16 +30,10 @@ const styles = (theme) => ( {
 	}
 });
 
-interface WelcomeProps extends Comprops {
-	uri: string;
-    /**document href */
-    hrefDoc?: string;
-	showMenu?: MouseEventHandler<HTMLButtonElement>;
-}
-
-class WelcomeComp extends CrudComp<WelcomeProps> {
+class WelcomeComp extends CrudComp<Comprops>{
 	tier: WelcomeTier;
 	classes: any;
+	uri: any;
 
 	constructor(props) {
 		super(props);
@@ -60,7 +54,7 @@ class WelcomeComp extends CrudComp<WelcomeProps> {
 
 	icon(e: WelcomeRec) {
 		// return jsample.JsampleIcons[e.css?.icon || 'Star'] || jsample.JsampleIcons['Star']
-		let color = e.css?.important ? 'secondary' : 'primary'; 
+		let color = e.css?.important ? 'secondary' : 'primary';
 
 		return e.css?.type === 'auto'
 			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
@@ -119,7 +113,7 @@ type WelcomeRec = {
 
 class WelcomeTier extends Semantier {
 	/**
-	 * @param props 
+	 * @param props
 	 */
 	constructor(props: {uri: string}) {
 		super(props);

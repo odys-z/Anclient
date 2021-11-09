@@ -23,7 +23,7 @@ export interface AnlistColAttrs {
 	visible?: boolean;
     checkbox?: boolean;
     // formatter?: (col: AnlistCol) => string;
-    formatter?: (rec: {}) => string;
+    formatter?: AnElemFormatter;
     css?: {};
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	box?: {};
