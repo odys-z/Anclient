@@ -10,7 +10,7 @@ import { L } from '../../utils/langstr';
 	import { Semantier } from '@anclient/semantier-st';
 	import { CrudCompW } from '../../react/crud';
 	import { AnContext } from '../../react/reactext';
-	import { ConfirmDialog } from '../../react/widgets/messagebox'
+	import { ConfirmDialog } from '../../react/widgets/messagebox';
 	import { AnTablist } from '../../react/widgets/table-list';
 	import { AnQueryst } from '../../react/widgets/query-form-st';
 	import { JsampleIcons } from '../styles';
@@ -28,7 +28,7 @@ const styles = (theme) => ( {
 
 class UserstComp extends CrudCompW {
 	state = {
-		buttons: { add: true, edit: false, del: false},
+		buttons: { add: true, edit: false, del: false },
 		pageInf: { page: 0, size: 10, total: 0 },
 		selected: {},
 	};
