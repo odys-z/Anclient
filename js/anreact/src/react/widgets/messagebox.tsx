@@ -30,7 +30,9 @@ const styles = theme => ({
   dialogTitle: {
     backgroundColor: "#fafbff",
     border: "solid 1px #f5f5ff",
-    textShadow: "4px 4px 7px #688a8a"
+    textShadow: "4px 4px 7px #688a8a",
+	// textAlign: "center", not answered? https://github.com/mui-org/material-ui/issues/12661
+	margin: "auto"
   },
   centerbox: {
 	  "justify-content": "center"
@@ -64,7 +66,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 
 	handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
-	constructor (props) {
+	constructor (props: DialogProps) {
 		super(props);
 		this.toCancel = this.toCancel.bind(this);
 		this.toOk = this.toOk.bind(this);
@@ -78,7 +80,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 			this.props.onClose();
 	}
 
-	toCancel(e) {
+	toCancel(e: React.MouseEvent<HTMLElement>) {
 		this.setState({closed: true});
 		if (typeof this.props.onCancel === 'function')
 			this.props.onCancel(e.currentTarget);
@@ -86,7 +88,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 			this.props.onClose();
 	};
 
-	textLines(msg) {
+	textLines(msg: string) {
 		let lines = msg ? msg.split('\n') : [];
 
 		return lines.map( (lb, x) => (
@@ -123,8 +125,10 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				aria-labelledby="alert-dialog-title"
 				aria-describedby="alert-dialog-description" >
 
-				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle} >
-				  {L(title)}</DialogTitle>
+				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle}
+					style={{textAlign: "center"}}>
+				  {L(title)}
+				</DialogTitle>
 				<DialogContent>
 					{txtLines}
 				</DialogContent>
@@ -146,7 +150,7 @@ const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
 export {ConfirmDialog, ConfirmDialogComp};
 
 export interface ErrorProps extends DialogProps {
-	msg: string;
+    msg: string;
     onClose: () => void;
     fullScreen?: boolean;
 }
@@ -158,18 +162,17 @@ export class AnError extends CrudCompW<ErrorProps> {
 	state = {
 	};
 
-	constructor(props) {
+	constructor(props: ErrorProps) {
 		super(props);
 	}
 
 	render() {
-		let ctx = this.context;// .errors;
-		let p = this.props as ErrorProps;
+		let p = this.props;
 		return (
 			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
 					open={true} onClose={p.onClose}
 					fullScreen={p.fullScreen}
-					msg={L(p.msg as string)} />
+					msg={L(p.msg)} />
 		);
 	}
 }

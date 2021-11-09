@@ -1122,7 +1122,8 @@ export class AnDatasetResp extends AnsonResp {
 }
 
 export interface DatasetOpts {
-	port: string;
+	/** API args should ignore this */
+	port?: string;
 	/**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
 	uri: string;
 	/** semantic key configured in WEB-INF/dataset.xml */

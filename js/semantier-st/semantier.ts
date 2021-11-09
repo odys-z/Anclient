@@ -70,9 +70,11 @@ export interface QueryConditions {
  * { client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx }
  */
 export interface Semantext {
-    anClient: SessionClient | Inseclient;
-    anReact: object;
-    error: object;
+    anClient: SessionClient;
+	/**FIXME rename as TSHelper:
+	 * Gloabal UI helper, e.g. AnReact */
+    anReact: any;
+    error: ErrorCtx;
 }
 
 export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
@@ -140,9 +142,9 @@ export class Semantier {
 		return this;
 	}
 
-    client: any;
+    client: SessionClient | Inseclient;
     anReact: any;
-    errCtx: any;
+    errCtx: ErrorCtx;
 
     disableValidate: any;
 

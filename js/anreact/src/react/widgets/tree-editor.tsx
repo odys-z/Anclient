@@ -1,24 +1,24 @@
 import React from "react";
+import CSS from 'csstype';
+
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Collapse from "@material-ui/core/Collapse";
-import {
-  Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
-} from "@material-ui/icons";
 import { Typography } from "@material-ui/core";
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
-	import { AnContext } from '../reactext';
+	import { AnContext, AnContextType } from '../reactext';
 	import { AnTreeIcons } from './tree'
-	import { CrudCompW, DetailFormW } from '../crud';
+	import { ClassNames, Comprops, CrudCompW, DetailFormW } from '../crud';
 	import { JsampleIcons } from '../../jsample/styles';
 
 import { SimpleForm } from './simple-form';
+import { AnReact, AnReactExt, Media } from "../anreact";
+import { PropTypes } from "@material-ui/core";
 
 const styles = (theme) => ({
   root: {
@@ -51,14 +51,22 @@ const styles = (theme) => ({
   }
 });
 
-class TreeCardComp extends React.Component {
+interface TreecardProps extends Comprops {
+
+};
+
+interface CssTreeItem extends CSS.Properties {
+    align: string
+}
+
+class TreeCardComp extends DetailFormW<TreecardProps> {
 	state = {
 		node: {},
 	}
 
 	newCard = undefined;
 
-	constructor(props) {
+	constructor(props: TreecardProps) {
 		super(props);
 
 		// this.state.tnode = props.tnode;
@@ -68,7 +76,7 @@ class TreeCardComp extends React.Component {
 		this.toDown = this.toDown.bind(this);
 	}
 
-	toUp(e) {
+	toUp(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
 		let children = p.node.children;
@@ -81,7 +89,7 @@ class TreeCardComp extends React.Component {
 			this.props.onUpdate(n, p, me, elder);
 	}
 
-	toTop(e) {
+	toTop(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
 		let children = p.node.children;
@@ -93,7 +101,7 @@ class TreeCardComp extends React.Component {
 			this.props.onUpdate(n, p, me, 0);
 	}
 
-	toDown(e) {
+	toDown(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
 		let children = p.node.children;
@@ -106,7 +114,7 @@ class TreeCardComp extends React.Component {
 			this.props.onUpdate(n, p, me, younger);
 	}
 
-	toBottom(e) {
+	toBottom(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
 		let children = p.node.children;
@@ -142,21 +150,21 @@ class TreeCardComp extends React.Component {
 					<JsampleIcons.Down onClick={this.toDown} />
 					{this.props.media.isMd ?
 						<> <Button onClick={this.props.toEdit}
-								me={tnode.id} parent={n.parentId}
+								data-me={tnode.id} data-parent={n.parentId}
 								startIcon={<JsampleIcons.Edit />} color="primary" >
 								{L('Edit')}
 							</Button>
 							<Button onClick={this.props.toDel}
-								me={tnode.id} parent={n.parentId}
+								data-me={tnode.id} data-parent={n.parentId}
 								startIcon={<JsampleIcons.Delete />} color="secondary" >
 								{L('Delete')}
 							</Button>
 						</>
 						:
 						<> <JsampleIcons.Edit onClick={this.props.toEdit}
-								me={tnode.id} parent={n.parentId} color='primary' />
+								data-me={tnode.id} data-parent={n.parentId} color='primary' />
 							<JsampleIcons.Delete onClick={this.props.toDel}
-								me={tnode.id} parent={n.parentId} color='secondary' />
+								data-me={tnode.id} data-parent={n.parentId} color='secondary' />
 						</>
 					}
 				</Grid> );
@@ -173,16 +181,18 @@ class TreeCardComp extends React.Component {
 			}
 		  </Grid> );
 
-		function icon(icon, onClick) {
-		  return AnTreeIcons[icon || "deflt"];
+		function icon(icon: string) {
+		  return AnTreeIcons[icon] || AnTreeIcons["deflt"];
 		}
 
-		function align(css = {}) {
-		  return css.align ? css.align : 'center';
+		function align(css: CssTreeItem): PropTypes.Alignment {
+		  return css.align ? css.align as PropTypes.Alignment : 'center';
 		}
 	}
 }
 TreeCardComp.contextType = AnContext;
+
+/*
 TreeCardComp.propTypes = {
 	media: PropTypes.object.isRequired,
 	leadingIcons: PropTypes.func.isRequired,
@@ -191,20 +201,29 @@ TreeCardComp.propTypes = {
 	columns: PropTypes.array.isRequired,
 	toEdit: PropTypes.func.isRequired
 };
+*/
 
 const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
 export { TreeCard, TreeCardComp }
 
-class AnTreeditorComp extends React.Component {
+class AnTreeditorComp extends DetailFormW<TreecardProps> {
 	state = {
 		// window: undefined,
 		// [{id, node: {text, css, url}, level, children}. ... ]
 		forest: [ ],
 
-		expandings: new Set()
+		expandings: new Set(),
+
+        sysName: '',
+        window: Window
 	};
 
-	constructor(props) {
+    anReact: AnReactExt;
+    addForm: JSX.Element;
+    toDelCard: any; // FIXME bug by type checking
+    onUpdate: any;  // FIXME bug by type checking
+
+	constructor(props: TreecardProps) {
 		super(props);
 		this.state.sysName =
 			props.sys || props.sysName || props.name || this.state.sysName;
@@ -220,10 +239,13 @@ class AnTreeditorComp extends React.Component {
 		this.treeNodes = this.treeNodes.bind(this);
 
 		this.toSearch = this.toSearch.bind(this);
+
 	}
 
 	componentDidMount() {
 		console.log(this.props.uri);
+                const ctx = this.context as unknown as AnContextType;
+                this.anReact = ctx.anReact;
 		this.toSearch();
 	}
 
@@ -232,15 +254,15 @@ class AnTreeditorComp extends React.Component {
 		if (s_tree)
 			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
 
-		let pageInf = this.state.pageInf;
+		// let pageInf = this.state.pageInf;
 		let {uri, sk} = this.props;
-		this.context.anReact.stree({uri, sk}, this.context.error, this);
+		this.anReact.stree({uri, sk}, this);
 
 		this.addForm = undefined;
-		this.state.expandings.clear(0);
+		this.state.expandings.clear();
 	}
 
-	toExpandItem(e) {
+	toExpandItem(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 		let f = e.currentTarget.getAttribute("nid");
 
@@ -250,11 +272,11 @@ class AnTreeditorComp extends React.Component {
 		this.setState({ expandings });
 	}
 
-	toAddChild (e) {
+	toAddChild (e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 		let that = this;
 
-		let me = e.currentTarget.getAttribute("me");
+		let me = e.currentTarget.getAttribute("data-me");
 
 		this.addForm = (
 			<SimpleForm c uri={this.props.uri}
@@ -268,14 +290,14 @@ class AnTreeditorComp extends React.Component {
 		this.setState({});
 	}
 
-	toDel(e) { }
+	toDel(e: React.MouseEvent<HTMLElement>) { }
 
-	toEdit(e) {
+	toEdit(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 		let that = this;
 
-		let me = e.currentTarget.getAttribute("me");
-		let parentId = e.currentTarget.getAttribute("parent");
+		let me = e.currentTarget.getAttribute("data-me");
+		let parentId = e.currentTarget.getAttribute("data-parent");
 
 		this.addForm = (
 			<SimpleForm u uri={this.props.uri}
@@ -325,11 +347,10 @@ class AnTreeditorComp extends React.Component {
 	 * @param {object} classes
 	 * @param {media} media
 	 */
-	treeNodes(classes, media) {
+	treeNodes(classes: ClassNames, media: Media) {
 		let that = this;
 
 		let m = this.state.forest;
-		let expandItem = this.toExpandItem;
 		let mtree = buildTreegrid( m, classes );
 		return mtree;
 
@@ -475,7 +496,7 @@ class AnTreeditorComp extends React.Component {
 	render() {
 		const { classes, width } = this.props;
 
-		let media = CrudCompW.setWidth(width);
+		let media = CrudCompW.getMedia(width);
 
 		return (
 			<div className={classes.root}>
@@ -488,6 +509,7 @@ class AnTreeditorComp extends React.Component {
 }
 AnTreeditorComp.contextType = AnContext;
 
+/*
 AnTreeditorComp.propTypes = {
 	uri: PropTypes.string.isRequired,
 	mtabl: PropTypes.string.isRequired,
@@ -496,6 +518,7 @@ AnTreeditorComp.propTypes = {
 	pk: PropTypes.object.isRequired,
 	isMidNode: PropTypes.func
 };
+*/
 
 const AnTreeditor = withWidth()(withStyles(styles)(AnTreeditorComp));
-export { AnTreeditor, AnTreeditorComp }
+export { AnTreeditor, AnTreeditorComp, TreecardProps }

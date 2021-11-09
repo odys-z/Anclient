@@ -1,6 +1,6 @@
 
 import $ from 'jquery';
-import { stree_t, Protocol, Tierec, TierCol,
+import { stree_t, Tierec, TierCol,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, CRUD
@@ -30,6 +30,7 @@ export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, med
  * in an An-React application (which handle error in top level).
  */
 export class AnReact {
+    
     client: SessionClient;
     ssInf: any;
 	errCtx: ErrorCtx;
@@ -319,7 +320,7 @@ export class AnReactExt extends AnReact {
 		if (!rootId)
 			console.log('Rebuild tree without rootId ?');
 
-		opts.port = 'stree';
+		// opts.port = 'stree';
 
 		if (opts.sk && !opts.t)
 			opts.t = stree_t.retree;

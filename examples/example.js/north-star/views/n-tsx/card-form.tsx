@@ -200,7 +200,7 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 
 	cards(classes: {[x: string] : any}, media: Media): React.ReactNode {
 		// return this.tier.rows?.map( (r, x) => this.props.CardsFormatter(r, x, classes, media) );
-		return this.props.CardsFormatter(this.tier.rows, x, classes, media) );
+		return this.props.CardsFormatter(this.tier.rows, classes, media);
 	}
 }
 

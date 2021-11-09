@@ -1,20 +1,18 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import PropTypes from "prop-types";
 
 import Typography from '@material-ui/core/Button';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
-import Divider from '@material-ui/core/Box';
 
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { Protocol, CRUD } from '@anclient/semantier-st';
+import { CRUD } from '@anclient/semantier-st';
 import { L, isEmpty,
-	AnContext, DatasetCombo, ConfirmDialog, RecordForm,
+	AnContext, ConfirmDialog, TRecordForm,
 	jsample, Overlay, AnGridsheet, anMultiRowRenderer
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
