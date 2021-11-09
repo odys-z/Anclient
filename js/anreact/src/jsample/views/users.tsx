@@ -212,7 +212,7 @@ UserstComp.contextType = AnContext;
 const Userst = withWidth()(withStyles(styles)(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends React.Component {
+class UsersQuery extends CrudCompW<Comprops> {
 	conds = [
 		{ name: 'userName', type: 'text', val: '', label: L('Student') },
 		{ name: 'orgId',    type: 'cbb',  val: '', label: L('Class'),
@@ -220,13 +220,14 @@ class UsersQuery extends React.Component {
 		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
+
 	static propTypes: {
 		// no tier is needed?
 		// uri: PropTypes.string.isRequired,
 		onQuery: PropTypes.Validator<(...args: any[]) => any>;
 	};
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 		this.collect = this.collect.bind(this);
 	}
@@ -284,7 +285,7 @@ export class UsersTier extends Semantier {
 		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} },
-	];
+	] as TierCol[];
 
 	_cols = [
 		{ label: L('check'), field: 'userId', checked: true },

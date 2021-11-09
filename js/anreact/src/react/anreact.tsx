@@ -1,6 +1,6 @@
 
 import $ from 'jquery';
-import { stree_t, Protocol, Tierec, TierCol,
+import { stree_t, Tierec, TierCol,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, CRUD

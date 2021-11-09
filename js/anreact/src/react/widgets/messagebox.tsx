@@ -30,7 +30,9 @@ const styles = theme => ({
   dialogTitle: {
     backgroundColor: "#fafbff",
     border: "solid 1px #f5f5ff",
-    textShadow: "4px 4px 7px #688a8a"
+    textShadow: "4px 4px 7px #688a8a",
+	textAlign: "center",
+	margin: "auto"
   },
   centerbox: {
 	  "justify-content": "center"
@@ -64,7 +66,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 
 	handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
-	constructor (props) {
+	constructor (props: DialogProps) {
 		super(props);
 		this.toCancel = this.toCancel.bind(this);
 		this.toOk = this.toOk.bind(this);
@@ -78,7 +80,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 			this.props.onClose();
 	}
 
-	toCancel(e) {
+	toCancel(e: React.MouseEvent<HTMLElement>) {
 		this.setState({closed: true});
 		if (typeof this.props.onCancel === 'function')
 			this.props.onCancel(e.currentTarget);
@@ -86,7 +88,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 			this.props.onClose();
 	};
 
-	textLines(msg) {
+	textLines(msg: string) {
 		let lines = msg ? msg.split('\n') : [];
 
 		return lines.map( (lb, x) => (
@@ -124,7 +126,8 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				aria-describedby="alert-dialog-description" >
 
 				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle} >
-				  {L(title)}</DialogTitle>
+				  {L(title)}
+				</DialogTitle>
 				<DialogContent>
 					{txtLines}
 				</DialogContent>
