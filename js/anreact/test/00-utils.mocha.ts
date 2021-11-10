@@ -1,5 +1,4 @@
-import chai from 'chai';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
 import { toBool, isEmpty } from '../../anreact/src/utils/helpers';

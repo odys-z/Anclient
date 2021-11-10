@@ -57,15 +57,20 @@ const argex = /{(\s*(\w|\d)*\s*)}/g;
  * see https://stackoverflow.com/a/30191493/7362888
  * and https://stackoverflow.com/a/57882370/7362888
  */
-export function L(t, o) {
+/**
+ * 
+ * @param t template
+ * @param vals optional: value args
+ * @returns 
+ */
+export function L(t: string, vals?: {[name: string]: string | number}) {
 	if (! (t in Langstrs.s[Langstrs.lang]) )
 			Langstrs.s.en.add(t);
 	else t = Langstrs.lang === 'en' ?
 		 t : Langstrs.s[Langstrs.lang][t];
 
-	// console.log(t);
-	if (o)
-		return replaceArg(t, o);
+	if (vals)
+		return replaceArg(t, vals);
 	else
 		return t;
 
@@ -86,19 +91,16 @@ export function L(t, o) {
 /** return a promise
  *
  *  memo: navigator clipboard api needs a secure context (https)
- * @param {string} textToCopy text to be copied
+ * @param textToCopy text to be copied
  * https://stackoverflow.com/a/65996386/7362888
  */
-export function copyToClipboard(textToCopy) {
+export function copyToClipboard(textToCopy: string) {
 	if (navigator.clipboard && window.isSecureContext) {
 	    return navigator.clipboard.writeText(textToCopy);
 	} else {
 	    let textArea = document.createElement("textarea");
 	    textArea.value = textToCopy;
 
-	    // textArea.style.position = "fixed";
-	    // textArea.style.left = "-999999px";
-	    // textArea.style.top = "-999999px";
 		textArea.style.display = "none";
 	    document.body.appendChild(textArea);
 	    textArea.focus();

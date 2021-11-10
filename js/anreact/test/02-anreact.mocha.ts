@@ -1,9 +1,7 @@
-import chai from 'chai';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 
-import {Protocol, AnsonMsg, UpdateReq} from '../../semantier/protocol';
-import {AnClient, SessionClient} from '../../semantier/anclient';
-import {AnReact} from '../../anreact/src/react/anreact.jsx';
+import {SessionClient, SessionInf} from '../../semantier-st/anclient';
+import {AnReact} from '../src/react/anreact';
 
 const checkBoxForest = [
   { "type":"io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
@@ -151,8 +149,9 @@ const AnContext = {
 describe('case: [02.0 anreact]', () => {
 	it('[protocol] checkTree -> relation records', () => {
 		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					  "uid": "admin", "roleId": null, "ssid": "001eysTj" };
-		let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', {dontPersist: true});
+					  "uid": "admin", "roleId": null, "ssid": "001eysTj"
+					} as SessionInf;
+		let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
 		let anReact = new AnReact(client, AnContext.error);
 
 		// 1.
@@ -173,7 +172,8 @@ describe('case: [02.0 anreact]', () => {
 
 		assert.equal(rf.nvss, undefined, 'internal node deselected as no leaf node checked');
 
-		checkBoxForest[0].node.children[0].node.checked = true; // reshaped
+		let n = checkBoxForest[0].node.children[0].node as unknown as {checked: boolean}; //.checked = true;
+		n.checked = true; // reshaped
 		rf = anReact.inserTreeChecked(
 					checkBoxForest,
 					{ table: 'a_role_func',
@@ -192,8 +192,9 @@ describe('case: [02.0 anreact]', () => {
 
 	it('[recursive] checkTree -> relation records', () => {
 		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					  "uid": "admin", "roleId": null, "ssid": "001eysTj" };
-		let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', {dontPersist: true});
+					  "uid": "admin", "roleId": null, "ssid": "001eysTj"
+					} as SessionInf;
+		let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
 		let anReact = new AnReact(client, AnContext.error);
 
 		let columnMap = {
