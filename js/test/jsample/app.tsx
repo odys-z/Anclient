@@ -96,8 +96,6 @@ class App extends React.Component<Approps> {
 	onError(c: string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
 
-		// this.setState({nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
-
 		this.errCtx.msg = r.Body().msg();
 		this.errorMsgbox = <AnError onClose={() => this.onErrorClose(c)} fullScreen={false}
 							title={L('Error')} msg={this.errCtx.msg as string} />

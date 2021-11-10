@@ -212,7 +212,7 @@ UserstComp.contextType = AnContext;
 const Userst = withWidth()(withStyles(styles)(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends CrudCompW<Comprops> {
+class UsersQuery extends CrudCompW<Comprops & {onQuery: () => boolean}> {
 	conds = [
 		{ name: 'userName', type: 'text', val: undefined, label: L('Student') },
 		{ name: 'orgId',    type: 'cbb',  val: undefined, label: L('Class'),
@@ -220,12 +220,6 @@ class UsersQuery extends CrudCompW<Comprops> {
 		{ name: 'roleId',   type: 'cbb',  val: undefined, label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
-
-	static propTypes: {
-		// no tier is needed?
-		// uri: PropTypes.string.isRequired,
-		onQuery: PropTypes.Validator<(...args: any[]) => any>;
-	};
 
 	constructor(props: Comprops) {
 		super(props);
@@ -252,11 +246,6 @@ class UsersQuery extends CrudCompW<Comprops> {
 			onLoaded={() => that.props.onQuery(that.collect()) }
 		/> );
 	}
-}
-UsersQuery.propTypes = {
-	// no tier is needed?
-	// uri: PropTypes.string.isRequired,
-	onQuery: PropTypes.func.isRequired
 }
 
 export class UsersTier extends Semantier {

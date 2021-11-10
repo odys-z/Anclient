@@ -11,15 +11,13 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card/Card';
 
-import { Tierec, Protocol, Semantier } from '@anclient/semantier-st';
+import { Tierec, Protocol, CRUD, Semantier } from '@anclient/semantier-st';
 import { L, AnContext, ConfirmDialog } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
 import { Anform, AnMUIClasses, FormProp, Media } from '../../common/north';
 import { CardsForm } from './card-form';
-
-const { CRUD } = Protocol;
 
 const styles = (theme: starTheme) => (Object.assign(
 	Semantier.invalidStyles as any, (theme: starTheme) => {
@@ -51,10 +49,10 @@ interface CardsFormProp extends FormProp {
 class PollDetailsComp extends Anform<CardsFormProp> {
 	state = {
 		record: {},
-		crud: Protocol.CRUD.r,
+		crud: CRUD.r,
 	};
 	tier: PollsTier;
-	confirm: typeof ConfirmDialog;
+	confirm: JSX.Element;
 
 	head(rec: Tierec, x: number, classes: AnMUIClasses, media: Media) {
 		return <Card key={x} className={classes.headCard}>{rec.Title}</Card>;

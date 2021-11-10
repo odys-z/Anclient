@@ -13,12 +13,13 @@ import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	import { AnContext, AnContextType } from '../reactext';
 	import { AnTreeIcons } from './tree'
-	import { ClassNames, Comprops, CrudCompW, DetailFormW } from '../crud';
+	import { Comprops, CrudCompW, DetailFormW } from '../crud';
 	import { JsampleIcons } from '../../jsample/styles';
 
 import { SimpleForm } from './simple-form';
-import { AnReact, AnReactExt, Media } from "../anreact";
+import { AnReactExt, ClassNames, Media } from "../anreact";
 import { PropTypes } from "@material-ui/core";
+import { CRUD } from "@anclient/semantier-st/protocol";
 
 const styles = (theme) => ({
   root: {
@@ -192,17 +193,6 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 }
 TreeCardComp.contextType = AnContext;
 
-/*
-TreeCardComp.propTypes = {
-	media: PropTypes.object.isRequired,
-	leadingIcons: PropTypes.func.isRequired,
-	tnode: PropTypes.object.isRequired,
-	parent: PropTypes.object.isRequired,
-	columns: PropTypes.array.isRequired,
-	toEdit: PropTypes.func.isRequired
-};
-*/
-
 const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
 export { TreeCard, TreeCardComp }
 
@@ -279,7 +269,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		let me = e.currentTarget.getAttribute("data-me");
 
 		this.addForm = (
-			<SimpleForm c uri={this.props.uri}
+			<SimpleForm crud={CRUD.c} uri={this.props.uri}
 				mtabl={this.props.mtabl}
 				pk={this.props.pk} fields={this.props.fields}
 				pkval={undefined} parent={this.props.parent} parentId={me}
@@ -300,7 +290,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		let parentId = e.currentTarget.getAttribute("data-parent");
 
 		this.addForm = (
-			<SimpleForm u uri={this.props.uri}
+			<SimpleForm crud={CRUD.u} uri={this.props.uri}
 				mtabl={this.props.mtabl}
 				pk={this.props.pk} fields={this.props.fields}
 				pkval={me} parent={this.props.parent} parentId={parentId}
@@ -343,8 +333,8 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
 			})
         
-        function icon() {
-	        return AnTreeIcons[icon || "deflt"];
+        function icon(iconame?: string) {
+	        return AnTreeIcons[iconame || "deflt"];
         }
 	}
 
@@ -492,10 +482,6 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		function icon(icon) {
 			return AnTreeIcons[icon || "deflt"];
 		}
-
-		function align(css = {}) {
-			return css.align ? css.align : 'center';
-		}
 	}
 
 	render() {
@@ -513,17 +499,6 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 	}
 }
 AnTreeditorComp.contextType = AnContext;
-
-/*
-AnTreeditorComp.propTypes = {
-	uri: PropTypes.string.isRequired,
-	mtabl: PropTypes.string.isRequired,
-	columns: PropTypes.array.isRequired,
-	fields: PropTypes.array.isRequired,
-	pk: PropTypes.object.isRequired,
-	isMidNode: PropTypes.func
-};
-*/
 
 const AnTreeditor = withWidth()(withStyles(styles)(AnTreeditorComp));
 export { AnTreeditor, AnTreeditorComp, TreecardProps }
