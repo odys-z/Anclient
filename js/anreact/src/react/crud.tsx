@@ -4,10 +4,8 @@ import { StandardProps, withStyles } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
-import { Media } from './anreact';
+import { Media, ClassNames } from './anreact';
 import { CRUD } from '@anclient/semantier-st';
-
-export interface ClassNames {[c: string]: string};
 
 export interface Comprops extends StandardProps<any, string> {
 	/**Component uri usually comes from function configuration (set by SysComp.extendLinks) */

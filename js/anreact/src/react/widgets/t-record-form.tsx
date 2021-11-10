@@ -10,10 +10,10 @@ import Typography from '@material-ui/core/Typography';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
-	import { ClassNames, Comprops, CrudCompW } from '../crud';
+	import { Comprops, CrudCompW } from '../crud';
 	import { DatasetCombo, TierComboField } from './dataset-combo';
-	import { Semantier, TierCol, Tierec } from '@anclient/semantier-st';
-import { AnFieldFormatter, Media } from '../anreact';
+	import { Semantier, Tierec } from '@anclient/semantier-st';
+import { ClassNames, Media } from '../anreact';
 
 const styles = (theme) => (Object.assign(
 	Semantier.invalidStyles,
@@ -43,9 +43,41 @@ export interface RecordFormProps extends Comprops {
     enableValidate: boolean;
 };
 
-export interface AnFormField extends TierCol {
-	fieldFormatter?: AnFieldFormatter;
-};
+// export interface AnFormField extends TierCol {
+//     funcId: string;
+//     crud: any;
+//     mtabl: string;
+//     fields: ({
+//         type: string; field: string; label: string; hide: number; validator: {
+//             len: number; notNull?: undefined; // that.rec = rows && rows[0] ? rows[0] : {};
+//             min?: undefined;
+//         }; values?: undefined; props?: undefined;
+//     } | {
+//         type: string; field: string; // in case rec is already loaded by parent component
+//         // in case rec is already loaded by parent component
+//         label: string; validator: { len: number; notNull: boolean; min?: undefined; }; hide?: undefined; values?: undefined; props?: undefined;
+//     } | {
+//         type: string; field: string; label: string; validator: {
+//             min: number; len?: undefined; notNull?: undefined; // that.rec = rows && rows[0] ? rows[0] : {};
+//         }; hide?: undefined; values?: undefined; props?: undefined;
+//     } | {
+//         type: string; field: string; label: string; values: { n: string; v: string; }[]; validator: {
+//             notNull: boolean; // that.rec = rows && rows[0] ? rows[0] : {};
+//             len?: undefined; min?: undefined;
+//         }; // that.rec = rows && rows[0] ? rows[0] : {};
+//         hide?: undefined; props?: undefined;
+//     } | {
+//         type: string; field: string; label: string; validator: {
+//             len: number; notNull?: undefined; // that.rec = rows && rows[0] ? rows[0] : {};
+//             min?: undefined;
+//         }; props: { sm: number; lg: number; }; hide?: undefined; values?: undefined;
+//     })[];
+//     pk: { type: string; field: string; label: string; hide: number; validator: { len: number; }; };
+//     pkval: any;
+//     parent: any;
+//     parentId: any;
+// 	fieldFormatter?: AnFieldFormatter;
+// };
 
 /**
  * A Tiered record component is designed for UI record layout rendering, handling
@@ -107,7 +139,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(f) }
 					options={ f.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ f.label }
-					style={ f.cbbStyle || {width: 200} }
+					style={ f.css || {width: 200} }
 					invalidStyle={ f.style }
 					onSelect={ (v) => {
 						rec[f.field] = v.v;

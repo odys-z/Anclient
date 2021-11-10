@@ -13,12 +13,14 @@ import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
 	import { AnContext, AnContextType } from '../reactext';
 	import { AnTreeIcons } from './tree'
-	import { ClassNames, Comprops, CrudCompW, DetailFormW } from '../crud';
+	import { Comprops, CrudCompW, DetailFormW } from '../crud';
 	import { JsampleIcons } from '../../jsample/styles';
 
 import { SimpleForm } from './simple-form';
-import { AnReact, AnReactExt, Media } from "../anreact";
+import { AnReact, AnReactExt, ClassNames, Media } from "../anreact";
 import { PropTypes } from "@material-ui/core";
+import { CRUD } from "@anclient/semantier-st/protocol";
+import { CSSProperties } from "@emotion/serialize";
 
 const styles = (theme) => ({
   root: {
@@ -279,7 +281,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		let me = e.currentTarget.getAttribute("data-me");
 
 		this.addForm = (
-			<SimpleForm c uri={this.props.uri}
+			<SimpleForm crud={CRUD.c} uri={this.props.uri}
 				mtabl={this.props.mtabl}
 				pk={this.props.pk} fields={this.props.fields}
 				pkval={undefined} parent={this.props.parent} parentId={me}
@@ -300,7 +302,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		let parentId = e.currentTarget.getAttribute("data-parent");
 
 		this.addForm = (
-			<SimpleForm u uri={this.props.uri}
+			<SimpleForm crud={CRUD.u} uri={this.props.uri}
 				mtabl={this.props.mtabl}
 				pk={this.props.pk} fields={this.props.fields}
 				pkval={me} parent={this.props.parent} parentId={parentId}
@@ -343,8 +345,8 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
 			})
         
-        function icon() {
-	        return AnTreeIcons[icon || "deflt"];
+        function icon(iconame?: string) {
+	        return AnTreeIcons[iconame || "deflt"];
         }
 	}
 
@@ -493,9 +495,9 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 			return AnTreeIcons[icon || "deflt"];
 		}
 
-		function align(css = {}) {
-			return css.align ? css.align : 'center';
-		}
+		// function align(css: CSSStyleDeclaration) {
+		// 	return css.align ? css.align : 'center';
+		// }
 	}
 
 	render() {

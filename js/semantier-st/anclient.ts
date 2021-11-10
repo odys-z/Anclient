@@ -582,7 +582,7 @@ class SessionClient {
 	 * {func, cate, cmd, remarks};
 	 * @return {AnsonMsg} the request message
 	 */
-	query(uri, maintbl, alias, pageInf, act) {
+	query(uri, maintbl, alias, pageInf?, act?) : AnsonMsg<QueryReq> {
 		let qryItem = new QueryReq(uri, maintbl, alias, pageInf);
 
 		// let header = Protocol.formatHeader(this.ssInf);
@@ -603,7 +603,7 @@ class SessionClient {
 					header,
 					body: [qryItem]
 				});
-		return jreq;
+		return jreq as AnsonMsg<QueryReq>;
 	}
 
 	update(uri, maintbl, pk, nvs) {
@@ -707,7 +707,7 @@ class SessionClient {
 	 * @param bodyItem request body, created by like: new jvue.UserReq(uri, tabl).
 	 * @param act action, optional.
 	 * @return AnsonMsg */
-	userReq<T extends AnsonBody>(uri: string, port: string, bodyItem: T, act: LogAct): AnsonMsg<T> {
+	userReq<T extends AnsonBody>(uri: string, port: string, bodyItem: T, act?: LogAct): AnsonMsg<T> {
 		if (!port)
 			throw Error('AnsonMsg<UserReq> needs port explicitly specified.');
 
@@ -726,7 +726,7 @@ class SessionClient {
 	 * @param cmd
 	 * @param remarks
 	 * @return this */
-	usrAct(funcId: string, cate: string, cmd: string, remarks: string): SessionClient {
+	usrAct(funcId: string, cate: string, cmd: string, remarks?: string): SessionClient {
 		// if (this.currentAct === undefined)
 		// 	this.currentAct = {};
 		Object.assign({}, this.currentAct,
