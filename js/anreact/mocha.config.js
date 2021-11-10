@@ -1,8 +1,7 @@
 /** Configuration for test with Mocha.
  * npm test
  */
-var webpack = require('webpack');
-var nodeExternals = require('webpack-node-externals');
+import * as webpack from 'webpack';
 
 var config = {
   mode: 'development',
@@ -11,21 +10,19 @@ var config = {
     filename: 'testBundle.js'
   },
   target: 'node',
-  externals: [nodeExternals()],
-
 
   plugins: [ ],
 
-  resolve: {
-	extensions: ['*', '.ts', 'tsx', 'jsx', '.js']
-  },
+	resolve: {
+		extensions: ['*', '.ts', '.js', '.tsx', '.jsx']
+	},
 
-  module: {
-	rules: [
-		{   test: /\.jsx?$/,
-			loader: 'babel-loader',
-			options: {
-			  presets: ['@babel/preset-react', '@babel/preset-env'] }
+	module: {
+	  rules: [
+		{ test: /\.jsx?$/,
+		  loader: 'babel-loader',
+		  options: {
+		    presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
 		{ test: /\.tsx?$/,
 		  loader : 'babel-loader',
@@ -34,10 +31,9 @@ var config = {
 				'@babel/preset-typescript',
 				'@emotion/babel-preset-css-prop',
 				'@babel/preset-env' ] }
-		}
-	]
-  }
+		},
+	] }
 };
 
-
-module.exports = config;
+// module.exports = config;
+export default config;

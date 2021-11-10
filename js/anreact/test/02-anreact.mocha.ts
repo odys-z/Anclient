@@ -148,6 +148,7 @@ const AnContext = {
 
 describe('case: [02.0 anreact]', () => {
 	it('[protocol] checkTree -> relation records', () => {
+		debugger
 		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
 					  "uid": "admin", "roleId": null, "ssid": "001eysTj"
 					} as SessionInf;
