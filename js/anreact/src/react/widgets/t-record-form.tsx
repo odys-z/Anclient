@@ -10,13 +10,13 @@ import Typography from '@material-ui/core/Typography';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
-	import { ClassNames, Comprops, CrudCompW } from '../crud';
+	import { Comprops, CrudCompW } from '../crud';
 	import { DatasetCombo, TierComboField } from './dataset-combo';
-	import { Semantier, TierCol, Tierec } from '@anclient/semantier-st';
-import { AnFieldFormatter, Media } from '../anreact';
+	import { Semantier, Tierec } from '@anclient/semantier-st';
+import { ClassNames, invalidStyles, Media } from '../anreact';
 
 const styles = (theme) => (Object.assign(
-	Semantier.invalidStyles,
+	invalidStyles,
 	{ root: {
 		display: 'flex',
 		width: '100%',
@@ -41,10 +41,6 @@ const styles = (theme) => (Object.assign(
 
 export interface RecordFormProps extends Comprops {
     enableValidate: boolean;
-};
-
-export interface AnFormField extends TierCol {
-	fieldFormatter?: AnFieldFormatter;
 };
 
 /**
@@ -107,7 +103,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(f) }
 					options={ f.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ f.label }
-					style={ f.cbbStyle || {width: 200} }
+					style={ f.css || {width: 200} }
 					invalidStyle={ f.style }
 					onSelect={ (v) => {
 						rec[f.field] = v.v;
@@ -123,7 +119,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			return (<>{f.formatter(f, rec)}</>);
 		}
 		else if (f.type === 'formatter' || f.fieldFormatter) {
-			return (<>{f.fieldFormatter(rec, f)}</>);
+			return (<>{f.fieldFormatter(rec, f, {classes, media})}</>);
 		}
 		else {
 			let type = 'text';
@@ -185,13 +181,6 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			: <></>; // have to wait until parent loaded data
 	}
 }
-
-// TRecordFormComp.propTypes = {
-// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-// 	tier: PropTypes.object.isRequired,
-// 	dense: PropTypes.bool,
-// 	enableValidate: PropTypes.bool,
-// };
 
 const TRecordForm = withWidth()(withStyles(styles)(TRecordFormComp));
 export { TRecordForm, TRecordFormComp }

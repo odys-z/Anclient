@@ -1,17 +1,17 @@
-var path = require('path')
-var webpack = require('webpack')
+import path from 'path';
+const __dirname = path.resolve();
 
 // for mime-types, which depends on path, see #50
 // #50 https://github.com/jshttp/mime-types/issues/50#issuecomment-442916069
 // #60 https://github.com/jshttp/mime-types/issues/69
 // #77 https://github.com/jshttp/mime-types/issues/77
 // hack it?
-var nodeExternals = require('webpack-node-externals');
+import nodeExternals from 'webpack-node-externals';
 
 var v = 'development';
 var version = "1.0.0";
 
-module.exports = {
+export default {
     mode: v, // "production" | "development" | "none"
     devtool: 'source-map',
     entry: { anreact: './src/an-components.ts' },

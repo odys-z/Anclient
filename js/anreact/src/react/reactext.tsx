@@ -4,9 +4,6 @@ import React from 'react';
 import { AnReact } from './anreact';
 
 export interface AnContextType extends Semantext {
-	/**	Anclient */
-	// an: undefined,
-    /**@type = SessionIfn */
 	ssInf: SessionInf,
 
 	pageOrigin: string,
@@ -18,14 +15,6 @@ export interface AnContextType extends Semantext {
 
 	servs: { host: string; [h: string]: string },
 
-	// anClient: SessionClient,
-
-	/** Only nullable for Login */
-	// anReact: typeof AnReact,
-
-	// error handling pattern like
-	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
-	// error: ErrorCtx,
 	hasError: boolean,
 } 
 
@@ -47,8 +36,6 @@ export const AnContext = React.createContext({
 	anClient: undefined,
 	anReact: undefined,
 
-	// error handling pattern like
-	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
 	error: {
         /**@function (code: string, AnsonMsg<AnsonResp>) => void */
 		onError: undefined,
@@ -58,10 +45,4 @@ export const AnContext = React.createContext({
 
 	/** Only nullable for Login */
 	reactHelper: undefined as AnReact,
-	// uuid: function() : string {
-	// 	return (++ _uid_).toString();
-	// }
 } as AnContextType);
-
-// var _uid_ = 0;
-
