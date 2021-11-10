@@ -1,3 +1,25 @@
+import React from 'react';
+import { StandardProps } from '@material-ui/core';
+import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
+import { Media } from './anreact';
+import { CRUD } from '@anclient/semantier-st';
+export interface ClassNames {
+    [c: string]: string;
+}
+export interface Comprops extends StandardProps<any, string> {
+    /**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
+    readonly uri?: string;
+    /**The matching url in React.Route */
+    match?: {
+        path: string;
+    };
+    /** CRUD */
+    crud?: CRUD;
+    /** Semantier */
+    classes?: ClassNames;
+    readonly tier?: any;
+    readonly width?: Breakpoint;
+}
 /**Common base class of function pages.
  * About URI:
  * 1. Every root CRUD must has a uri.
@@ -5,12 +27,11 @@
  * 3. All data accessing must provid the token.
  * @member uri: string
  */
-export class CrudComp extends React.Component<any, any, any> {
-    constructor(props: any);
+declare class CrudComp<T extends Comprops> extends React.Component<T> {
+    state: {};
     uri: any;
-}
-export namespace CrudComp {
-    export { AnContext as contextType };
+    constructor(props: any);
+    render(): JSX.Element;
 }
 /**
  * @augments {React.Component<{uri: string}, media: {}>}
@@ -25,60 +46,48 @@ export namespace CrudComp {
  * FIXME looks like in chrome responsive device mode simulator, withWidth() can't
  * get "width"?
  */
-export class CrudCompW extends React.Component<{
-    uri: string;
-}, any, any> {
-    static setWidth(width: any): {
-        isLg: boolean;
-        isMd: boolean;
-        isSm: boolean;
-        isXs: boolean;
-        isXl: boolean;
-    };
+declare class CrudCompW<T extends Comprops> extends CrudComp<T> {
+    media: Media;
     constructor(props: any);
+    static getMedia(width: string): Media;
+    /**A simple helper: Array.from(ids)[x]; */
+    getByIx(ids: Set<string>, x?: number): string;
 }
-export namespace CrudCompW {
-    export { AnContext as contextType };
-    export namespace propTypes {
-        const width: PropTypes.Validator<string>;
-    }
+declare class HomeComp extends CrudComp<Comprops> {
+    render(): JSX.Element;
 }
+declare const Home: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"root">>;
+declare class DomainComp extends CrudComp<Comprops> {
+    render(): JSX.Element;
+}
+declare const Domain: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"root">>;
+declare class OrgsComp extends CrudComp<Comprops> {
+    render(): JSX.Element;
+}
+declare const Orgs: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"root">>;
+declare class RolesComp extends CrudComp<Comprops> {
+    render(): JSX.Element;
+}
+declare const Roles: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"root">>;
+declare class UsersComp extends CrudComp<Comprops> {
+    render(): JSX.Element;
+}
+declare const Users: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"root">>;
+declare class UserInfoComp extends CrudComp<Comprops> {
+    render(): JSX.Element;
+}
+declare const UserInfo: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"root">>;
+declare class CheapFlowComp extends CrudComp<Comprops> {
+    render(): JSX.Element;
+}
+declare const CheapFlow: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"root">>;
 /**
  * To popup modal dialog, see
  * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
  */
-export class DetailFormW extends React.Component<any, any, any> {
-    constructor(props: any);
+declare class DetailFormW<T extends Comprops> extends CrudCompW<T> {
+    state: {};
+    media: Media;
+    constructor(props: Comprops);
 }
-export namespace DetailFormW {
-    export { AnContext as contextType };
-    export namespace propTypes_1 {
-        const width_1: PropTypes.Validator<string>;
-        export { width_1 as width };
-    }
-    export { propTypes_1 as propTypes };
-}
-export const Home: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
-export class HomeComp extends CrudComp {
-}
-export const Domain: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
-export class DomainComp extends CrudComp {
-}
-export const Roles: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
-export class RolesComp extends CrudComp {
-}
-export const Users: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
-export class UsersComp extends CrudComp {
-}
-export const UserInfo: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
-export class UserInfoComp extends CrudComp {
-}
-export const Orgs: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
-export class OrgsComp extends CrudComp {
-}
-export const CheapFlow: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
-export class CheapFlowComp extends CrudComp {
-}
-import React from "react";
-import { AnContext } from "./reactext.jsx";
-import PropTypes from "prop-types";
+export { CrudComp, CrudCompW, DetailFormW, Home, HomeComp, Domain, DomainComp, Roles, RolesComp, Users, UsersComp, UserInfo, UserInfoComp, Orgs, OrgsComp, CheapFlow, CheapFlowComp, };

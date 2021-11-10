@@ -33,13 +33,24 @@ import { AnContext } from './reactext';
 	import { ConfirmDialog } from './widgets/messagebox';
 	import { MyIcon } from './widgets/my-icon';
 	import { MyInfo } from './widgets/my-info';
-	import { L, Langstrs } from '../utils/langstr';
+	import { L } from '../utils/langstr';
 	import { parseMenus } from '../utils/helpers';
 
 import {
-	Home, Domain, Roles, UserInfo, Orgs, Users, CheapFlow
+	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, ClassNames, CrudComp, CrudCompW 
 } from './crud'
+import { ClassNameMap } from '@material-ui/styles';
+import { AnReactExt } from './anreact';
+import { AnDatasetResp, AnsonMsg, DatasetierResp } from '@anclient/semantier-st/protocol';
 
+export interface SysProps extends Comprops {
+    /**Welcome page formatter */
+    welcome?: (classes: ClassNameMap, context: typeof AnContext, comp: SysComp) => JSX.Element;
+    // classes: {[x: string]: string};
+    hrefDoc: string;
+    onLogout: () => void;
+    myInfo: JSX.Element | ((context: typeof AnContext) => JSX.Element);
+}
 
 const _icons = {
 	'expand': <ExpandMore />,
@@ -50,9 +61,9 @@ const _icons = {
 	'deflt': <Inbox />,
 }
 
-export function uri(comp, uri) {
+export function uri(comp: CrudComp<Comprops>, uri: string) {
 	return comp;
-	// FIXME this function is unnecessary if moved URI to Semantier.
+	/* FIXME this function is unnecessary if moved URI to Semantier.
 	if (comp.Naked)
 		comp.Naked.prototype.uri = uri;
 
@@ -65,7 +76,9 @@ export function uri(comp, uri) {
 		comp.type.Naked.prototype.uri = uri;
 
 	return comp;
+	*/
 }
+
 /**
  * Map of uri to UI components.
  * CrudComp.Uri will wrapp the component with propterty "uri", which will be
@@ -89,7 +102,7 @@ const styles = theme => ({
 		}),
 	},
 	loginfo: {
-		textAlign: 'end',
+		// TS ERROR: textAlign: 'end',
 		color: 'wheat',
 		"& :hover": {
 			backgroundColor: 'Indigo'
@@ -172,7 +185,8 @@ const styles = theme => ({
  sys-uesr-1.1 |Uesr Manage        |views/sys/user/users-1.1.html     |    |1     |2 sys-1.1.4 user |sys-1.1  |4       |</pre>
  * @class SysComp
  */
-class SysComp extends React.Component {
+class SysComp extends CrudCompW<SysProps> {
+// class SysComp extends React.Component<SysProps, any, any> {
 	state = {
 		window: undefined,
 		welcome: true,
@@ -181,13 +195,18 @@ class SysComp extends React.Component {
 		// {funcId, funcName,url, css: {icon}, fullpath, parentId, sibling, children: [] }
 		sysMenu: { },
 
-		cruds: [{'/': Home}],
+		cruds: [{path: '/', params: undefined, comp: Home}],
 		paths: [],
 
 		menuTitle: 'Sys Menu',
 		showMenu: false,
 		expandings: new Set(),
+        showMine: false,
 	};
+
+	anreact: AnReactExt;
+
+    confirmLogout: any;
 
 	static extendLinks(links) {
 		links.forEach( (l, x) => {
@@ -245,17 +264,20 @@ class SysComp extends React.Component {
 
 	componentDidMount() {
 		// load menu
+		this.anreact = this.context.anReact;
+
 		let that = this;
-		this.context.anReact.loadMenu(
+		this.anreact.loadMenu(
 			this.state.skMenu,
+			this.uri,
 			(dsResp) => {
-				let {menu, paths} = parseMenus(dsResp.Body().forest);
+				let {menu, paths} = parseMenus((dsResp as AnsonMsg<AnDatasetResp>).Body().forest);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
-			}, this.context.error );
+			} );
 	}
 
-	showMenu(e) {
+	showMenu(e: React.MouseEvent<HTMLElement>) {
 		if (e) e.stopPropagation();
 		this.setState({ showMenu: true });
 	}
@@ -270,7 +292,7 @@ class SysComp extends React.Component {
 		let that = this;
 		this.confirmLogout =
 		<ConfirmDialog ok={L('Good Bye')} title={L('Info')} // cancel={false}
-			open={true}
+			// open={true}
 			onOk={() => {
 				that.confirmLogout = undefined;
 				that.props.onLogout();
@@ -280,9 +302,9 @@ class SysComp extends React.Component {
 		this.setState({});
 	}
 
-	toExpandItem(e) {
+	toExpandItem(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
-		let f = e.currentTarget.getAttribute('iid');
+		let f = e.currentTarget.getAttribute('data-iid');
 
 		let expandings = this.state.expandings;
 		if (expandings.has(f))
@@ -295,12 +317,12 @@ class SysComp extends React.Component {
 	/**
 	 * @param {object} classes
 	 */
-	menuItems(classes) {
+	menuItems(classes: ClassNames) {
 		let that = this;
 
 		let m = this.state.sysMenu;
 		let expandItem = this.toExpandItem;
-		let mtree = buildMenu(m, classes);
+		let mtree = buildMenu(m);
 		return mtree;
 
 		function buildMenu(menu) {
@@ -314,8 +336,8 @@ class SysComp extends React.Component {
 				if ( menu.children && menu.children.length > 0 )
 				  return (
 				  <div key={menu.funcId}>
-					<ListItem button onClick={expandItem} iid={menu.funcId}>
-						<ListItemIcon>{icon(menu.css)}</ListItemIcon>
+					<ListItem button onClick={expandItem} data-iid={menu.funcId}>
+						<ListItemIcon>{icon(menu.css?.icon)}</ListItemIcon>
 						<ListItemText primary={L(menu.funcName)} />
 						{ open ? icon('expand') : icon('collapse') }
 					</ListItem>
@@ -342,9 +364,9 @@ class SysComp extends React.Component {
 			}
 		}
 
-		function icon(icon) {
+		function icon(icon: string) {
 			// shall we use theme here?
-			return _icons[icon || 'deflt'];
+			return _icons[icon] || _icons['deflt'];
 		}
 	}
 
@@ -425,7 +447,7 @@ class SysComp extends React.Component {
 			  >
 				<div className={claz.drawerHeader} />
 				{this.state.welcome ?
-					this.welcomePaper(classes, this) :
+					this.welcomePaper(classes) :
 					<div className="content">
 						{this.route()}
 					</div>}

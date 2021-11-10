@@ -4,11 +4,11 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp , UserReq } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { Semantier } from '@anclient/semantier-st';
-	import { CrudCompW } from '../../react/crud';
+	import { Comprops, CrudCompW } from '../../react/crud';
 	import { AnContext } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { AnTablist } from '../../react/widgets/table-list';
@@ -16,8 +16,6 @@ import { L } from '../../utils/langstr';
 	import { JsampleIcons } from '../styles';
 
 	import { UserDetailst } from './user-details';
-
-const { CRUD } = Protocol;
 
 const styles = (theme) => ( {
 	root: {
@@ -28,19 +26,24 @@ const styles = (theme) => ( {
 	}
 } );
 
-class UserstComp extends CrudCompW {
+class UserstComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
 		pageInf: { page: 0, size: 10, total: 0 },
-		selected: {},
+		selected: {ids: new Set<string>()},
 	};
 
-	tier = undefined;
+	tier = undefined as UsersTier;
+	q: QueryConditions;
+	confirm: JSX.Element;
+	recForm: JSX.Element;
+	pageInf: any;
+	onPageInf: any;
 
 	constructor(props) {
 		super(props);
 
-		this.state.selected.Ids = new Set();
+		this.state.selected.ids = new Set();
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
@@ -60,7 +63,7 @@ class UserstComp extends CrudCompW {
 
 	getTier = () => {
 		this.tier = new UsersTier(this);
-		this.tier.setContext(this.context);
+		this.tier.setContext(this.context as any as Semantext);
 
 		// FIXME for override port for sessionless mode
 		// Once the uri & port been moved to semnantier, this section should be removed
@@ -82,7 +85,7 @@ class UserstComp extends CrudCompW {
 		this.q = condts || this.q;
 		this.tier.records( this.q,
 			(cols, rows) => {
-				that.state.selected.Ids.clear();
+				that.state.selected.ids.clear();
 				that.setState(rows);
 			} );
 	}
@@ -98,35 +101,35 @@ class UserstComp extends CrudCompW {
 		} );
 	}
 
-	toDel(e, v) {
+	toDel(e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('OK')} cancel={true} open
 				onOk={ that.del }
 				onClose={() => {that.confirm = undefined;} }
-				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
+				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.ids.size})} />);
 	}
 
 	del() {
 		let that = this;
 		this.tier.del({
 				uri: this.uri,
-				ids: this.state.selected.Ids },
+				ids: this.state.selected.ids },
 			resp => {
 				that.confirm = (
 					<ConfirmDialog title={L('Info')}
 						ok={L('OK')} cancel={false} open
 						onClose={() => {
 							that.confirm = undefined;
-							that.toSearch();
+							that.toSearch(undefined);
 						} }
 						msg={L('Deleting Succeed!')} />);
-				that.toSearch();
+				that.toSearch(undefined);
 			} );
 	}
 
-	toAdd(e, v) {
+	toAdd(e: React.MouseEvent<Element, MouseEvent>) {
 		if (e) e.stopPropagation();
 
 		let that = this;
@@ -136,7 +139,7 @@ class UserstComp extends CrudCompW {
 		this.recForm = (<UserDetailst crud={CRUD.c}
 			uri={this.uri}
 			tier={this.tier}
-			onOk={(r) => that.toSearch()}
+			onOk={(r) => that.toSearch(undefined)}
 			onClose={this.closeDetails} />);
 
 		// NOTE:
@@ -145,23 +148,23 @@ class UserstComp extends CrudCompW {
 		this.setState({});
 	}
 
-	toEdit(e, v) {
+	toEdit(e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
-		let pkv = [...this.state.selected.Ids][0];
+		// let pkv = [...this.state.selected.ids][0];
+		let pkv = this.getByIx(this.state.selected.ids);
 		this.tier.pkval = pkv;
 		this.recForm = (<UserDetailst crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
 			recId={pkv}
-			onOk={(r) => that.toSearch()}
+			onOk={(r) => that.toSearch(undefined)}
 			onClose={this.closeDetails} />);
 	}
 
 	closeDetails() {
 		this.recForm = undefined;
 		this.tier.resetFormSession();
-		// this.setState({});
-		this.toSearch();
+		this.toSearch(undefined);
 	}
 
 	render() {
@@ -209,16 +212,22 @@ UserstComp.contextType = AnContext;
 const Userst = withWidth()(withStyles(styles)(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends React.Component {
+class UsersQuery extends CrudCompW<Comprops> {
 	conds = [
-		{ name: 'userName', type: 'text', val: '', label: L('Student') },
-		{ name: 'orgId',    type: 'cbb',  val: '', label: L('Class'),
+		{ name: 'userName', type: 'text', val: undefined, label: L('Student') },
+		{ name: 'orgId',    type: 'cbb',  val: undefined, label: L('Class'),
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ name: 'roleId',   type: 'cbb',  val: '', label: L('Role'),
+		{ name: 'roleId',   type: 'cbb',  val: undefined, label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
 
-	constructor(props) {
+	static propTypes: {
+		// no tier is needed?
+		// uri: PropTypes.string.isRequired,
+		onQuery: PropTypes.Validator<(...args: any[]) => any>;
+	};
+
+	constructor(props: Comprops) {
 		super(props);
 		this.collect = this.collect.bind(this);
 	}
@@ -226,8 +235,9 @@ class UsersQuery extends React.Component {
 	collect() {
 		return {
 			userName: this.conds[0].val ? this.conds[0].val : undefined,
-			orgId   : this.conds[1].val ? this.conds[1].val.v : undefined,
-			roleId  : this.conds[2].val ? this.conds[2].val.v : undefined };
+			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
+			roleId   : (this.conds[2].val as {n: string, v: string}) ?.v };
+			// roleId  : (this.conds[2].val ? this.conds[2].val.v : undefined };
 	}
 
 	/** Design Note:
@@ -258,7 +268,7 @@ export class UsersTier extends Semantier {
 	// uri = undefined;
 	rows = [];
 	pkval = undefined;
-	rec = {}; // for leveling up record form, also called record
+	rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
 
 
 	// TODO doc: samantier where disable pk field if pkval exists
@@ -276,17 +286,17 @@ export class UsersTier extends Semantier {
 		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} },
-	];
+	] as TierCol[];
 
 	_cols = [
-		{ text: L('check'), field: 'userId', checked: true },
-		{ text: L('Log Id'), field: 'userId' },
-		{ text: L('User Name'), field: 'userName' },
-		{ text: L('Organization'), field: 'orgName',
+		{ label: L('check'), field: 'userId', checked: true },
+		{ label: L('Log Id'), field: 'userId' },
+		{ label: L('User Name'), field: 'userName' },
+		{ label: L('Organization'), field: 'orgName',
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ text: L('Role'), field: 'roleName',
+		{ label: L('Role'), field: 'roleName',
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
-	];
+	] as Array<TierCol>;
 
 	constructor(comp) {
 		super(comp);
@@ -334,28 +344,28 @@ export class UsersTier extends Semantier {
 			this.errCtx);
 	}
 
-	saveRec(opts, onOk) {
+	saveRec(opts: { uri: string; crud: CRUD; pkval: string; }, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
 
 		let { uri, crud } = opts;
 
-		if (crud === Protocol.CRUD.u && !this.pkval)
+		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		let {cipher, iv} = this.client.encryptoken(this.rec.pswd);
+		let {cipher, iv} = this.client.encryptoken(this.rec.pswd as string);
 		this.rec.pswd = cipher;
 		this.rec.iv = iv;
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
-			.A(crud === Protocol.CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
+			.A(crud === CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
 		client.commit(req,
 			(resp) => {
 				let bd = resp.Body();
-				if (crud === Protocol.CRUD.c)
+				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
 					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
@@ -365,20 +375,21 @@ export class UsersTier extends Semantier {
 	}
 
 	/**
-	 * @param {object} opts
-	 * @param {string} [opts.uri] overriding local uri
-	 * @param {set} opts.ids record id
-	 * @param {function} onOk: function(AnsonResp);
+	 * @param opts
+	 * @param opts.uri overriding local uri
+	 * @param opts.ids record id
+	 * @param onOk function(AnsonResp);
 	 */
-	del(opts, onOk) {
+	del(opts: {uri?: string, [p: string]: string | Set<string> | object}, onOk: OnCommitOk) : void {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
-		let { uri, ids } = opts;
+		let { uri } = opts;
+		let ids = opts.ids as Set<string> ;
 
 		if (ids && ids.size > 0) {
 			let req = this.client.userReq(uri, this.port,
-				new UserstReq( uri, { deletings: [...ids] } )
+				new UserstReq( uri, { deletings: [...Array.from(ids)] } )
 				.A(UserstReq.A.del) );
 
 			client.commit(req, onOk, this.errCtx);
@@ -387,12 +398,12 @@ export class UsersTier extends Semantier {
 }
 
 export class UserstReq extends UserReq {
-	static type = 'io.odysz.jsample.semantier.UserstReq';
-	static __init__ = function () {
+	static __type__ = 'io.odysz.jsample.semantier.UserstReq';
+	static __init__ = function (uri) {
 		// Design Note:
 		// can we use dynamic Protocol?
-		Protocol.registerBody(UserstReq.type, (jsonBd) => {
-			return new UserstReq(jsonBd);
+		Protocol.registerBody(UserstReq.__type__, (jsonBd) => {
+			return new UserstReq(uri, jsonBd);
 		});
 		return undefined;
 	}();
@@ -406,10 +417,19 @@ export class UserstReq extends UserReq {
 
 		mykids: 'r/kids',
 	}
+	userId: any;
+	userName: any;
+	orgId: any;
+	roleId: any;
+	hasTodos: any;
+	pk: any;
+	record: any;
+	relations: any;
+	deletings: any;
 
-	constructor (uri, args = {}) {
-		super();
-		this.type = UserstReq.type;
+	constructor (uri: string, args: { record?: Tierec; relations?: any; pk?: string; deletings?: string[]; userId?: string; userName?: string; orgId?: string; roleId?: string; hasTodos?: string; }) {
+		super(uri, "a_users");
+		this.type = UserstReq.__type__;
 		this.uri = uri;
 		this.userId = args.userId;
 		this.userName = args.userName;

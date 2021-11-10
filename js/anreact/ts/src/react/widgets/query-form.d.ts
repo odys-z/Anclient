@@ -3,7 +3,7 @@ export const AnQueryForm: React.ComponentType<Pick<PropTypes.InferProps<{
     conds: PropTypes.Validator<any[]>;
     onSearch: PropTypes.Validator<(...args: any[]) => any>;
     buttonStyle: PropTypes.Requireable<string>;
-}>, "uri" | "onSearch" | "conds" | "buttonStyle"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">>;
+}>, "uri" | "conds" | "onSearch" | "buttonStyle"> & import("@material-ui/core").StyledComponentProps<"button" | "buttons" | "root" | "container">>;
 /**
  * Bind query conditions to React Components.
  * conds example:
@@ -44,4 +44,4 @@ export namespace AnQueryFormComp {
 }
 import PropTypes from "prop-types";
 import React from "react";
-import { AnContext } from "../reactext.jsx";
+import { AnContext } from "../reactext";

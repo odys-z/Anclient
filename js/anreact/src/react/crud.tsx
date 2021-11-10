@@ -1,9 +1,27 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+// import { withStyles } from "@material-ui/core/styles";
+import { StandardProps, withStyles } from '@material-ui/core';
+import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
+import { Media } from './anreact';
+import { CRUD } from '@anclient/semantier-st';
 
-export interface Comprops { }
+export interface ClassNames {[c: string]: string};
+
+export interface Comprops extends StandardProps<any, string> {
+	/**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
+	readonly uri?: string;
+	/**The matching url in React.Route */
+	match?: {path: string};
+
+	/** CRUD */
+	crud?: CRUD;
+	/** Semantier */
+	classes?: ClassNames;
+	readonly tier?: any;
+	readonly width?: Breakpoint;
+}
 
 const styles = (theme) => ( {
 	root: {
@@ -27,12 +45,12 @@ class CrudComp<T extends Comprops> extends React.Component<T> {
 	constructor(props) {
 		super(props);
 		this.uri = props.match && props.match.path || props.uri;
-		if (!this.uri) 
-			throw Error("Anreact CRUD component must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
+		if (!this.uri && props.match)
+			throw Error("Anreact CRUD main component (url route) must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
 	}
 
 	render() {
-		return (<>Base CrudComp Page</>);
+		return (<>CrudComp</>);
 	}
 }
 CrudComp.contextType = AnContext;
@@ -50,7 +68,7 @@ CrudComp.contextType = AnContext;
  * FIXME looks like in chrome responsive device mode simulator, withWidth() can't
  * get "width"?
  */
-class CrudCompW<T> extends CrudComp<T> {
+class CrudCompW<T extends Comprops> extends CrudComp<T> {
 	media: Media = {};
 
 	// TODO tasks to refactor. why not ts?
@@ -59,11 +77,11 @@ class CrudCompW<T> extends CrudComp<T> {
 		super(props);
 
 		let {width} = props;
-		CrudCompW.prototype.media = CrudCompW.setWidth(width);
+		CrudCompW.prototype.media = CrudCompW.getMedia(width);
 	}
 
-	static setWidth(width: string) {
-		let media: Media;
+	static getMedia(width: string) {
+		let media = {} as Media;
 
 		if (width === 'lg') {
 			media.isLg = true;
@@ -91,6 +109,11 @@ class CrudCompW<T> extends CrudComp<T> {
 		}
 
 		return media;
+	}
+
+	/**A simple helper: Array.from(ids)[x]; */
+	getByIx(ids: Set<string>, x = 0): string {
+		return Array.from(ids)[x];
 	}
 }
 CrudCompW.contextType = AnContext;
@@ -154,30 +177,22 @@ const CheapFlow = withStyles(styles)(CheapFlowComp);
  * To popup modal dialog, see
  * https://codesandbox.io/s/gracious-bogdan-z1xsd?file=/src/App.js
  */
-class DetailFormW<T extends Comprops> extends React.Component<T> {
+class DetailFormW<T extends Comprops> extends CrudCompW<T> {
 	state = {
 	};
 	media: Media;
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 
 		let {width} = props;
-		let media = CrudCompW.setWidth(width);
+		let media = CrudCompW.getMedia(width);
 
 		DetailFormW.prototype.media = media;
 		DetailFormW.prototype.state = this.state;
 	}
 }
 DetailFormW.contextType = AnContext;
-
-// DetailFormW.propTypes = {
-// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-// 	/* TODO doc Design Notes:
-// 	 * Main CRUD page doesn't need this check. Those common used wigdets need this.
-// 	 */
-// 	// uri: PropTypes.string.isRequired
-// };
 
 export {
 	CrudComp, CrudCompW, DetailFormW,

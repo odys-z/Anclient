@@ -1,42 +1,43 @@
 
-import { stree_t, Protocol, Tierec, TierCol,
+import $ from 'jquery';
+import { stree_t, Tierec, TierCol,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	DatasetOpts, AnsonMsg, OnCommitOk
+	AnsonMsg, OnCommitOk, DatasetOpts, CRUD
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
 import { toBool } from '../utils/helpers';
+import { ClassNames, Comprops, CrudComp } from './crud';
 
 export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
 
 /**JSX.Element like row formatter results */
-export interface AnRow {
-}
+export interface AnRow extends JSX.Element { }
 
 /**(Form) field formatter
  * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
  */
-export type AnFieldFormatter = ((col: TierCol, colIndx: number)=> AnRow);
+export type AnFieldFormatter = ((rec: Tierec, col: TierCol, classes?: ClassNames, media?: Media)=> JSX.Element);
 
 /**TODO (list) row formatter
  * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
  */
-export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> JSX.Element);
+export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> AnRow);
 
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact
  * in an An-React application (which handle error in top level).
  */
 export class AnReact {
+
     client: SessionClient;
     ssInf: any;
-    // err: any;
 	errCtx: ErrorCtx;
 	/**@param {SessionClient} ssClient client created via login
 	 * @param {object} errCtx, AnContext.error, the app error handler
 	 */
-	constructor (ssClient, errCtx) {
+	constructor (ssClient: SessionClient, errCtx: ErrorCtx) {
 		this.client = ssClient;
 		this.ssInf = ssClient.ssInf;
 		this.errCtx = errCtx;
@@ -45,7 +46,7 @@ export class AnReact {
 	/** @deprecated new tiered way don't need any more.
 	 * set component.state with request's respons.rs, or call req.onLoad.
 	 */
-	bindTablist(req, comp, errCtx) {
+	bindTablist(req, comp: CrudComp<any>, errCtx: ErrorCtx) {
 		this.client.commit(req, (qrsp) => {
 			if (req.onLoad)
 				req.onLoad(qrsp);
@@ -54,10 +55,10 @@ export class AnReact {
 			else {
 				let rs = qrsp.Body().Rs();
 				let {rows} = AnsonResp.rs2arr( rs );
-				comp.state.pageInf.total = rs.total;
+				// comp.pageInf?.total! = rs.total;
 				comp.setState({rows});
 			}
-		}, errCtx.onError );
+		}, errCtx );
 	}
 
 	/**
@@ -86,15 +87,16 @@ export class AnReact {
 			};
 
 		let {req} = qmsg;
-		this.client.an.post(req, onload, { onError: (c, resp) => {
-			if (errCtx) {
-				errCtx.hasError = true;
-				errCtx.code = c;
-				errCtx.msg = resp.Body().msg();
-				errCtx.onError(true);
-			}
-			else console.error(c, resp) },
-		});
+		// this.client.an.post(req, onload, { onError: (c, resp) => {
+		// 	if (errCtx) {
+		// 		errCtx.hasError = true;
+		// 		errCtx.code = c;
+		// 		errCtx.msg = resp.Body().msg();
+		// 		errCtx.onError(true);
+		// 	}
+		// 	else console.error(c, resp) },
+		// });
+		this.client.an.post(req, onload, errCtx);
 		return this;
 	}
 
@@ -115,7 +117,7 @@ export class AnReact {
 		let dbCols = Object.keys(columnMap);
 
 		let ins = new InsertReq(null, table)
-			.A<InsertReq>(Protocol.CRUD.c)
+			.A<InsertReq>(CRUD.c)
 			.columns(dbCols);
 
 		let rows = [];
@@ -177,36 +179,42 @@ export class AnReact {
 	 * For test, have elem = undefined
 	 * @param {string} elem html element id, null for test
 	 * @param {object} opts {serv, home, parent window}
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.home='main.html'] system main page
-	 * @param {string} [opts.portal='index.html'] portal page
 	 * @param {function} onJsonServ function to render React Dom, i. e.
 	 * <pre>(elem, json) => {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
 	}</pre>
 	 */
-	// static bindDom(elem, opts = {}, onJsonServ) {
-	// 	// this.state.servId = serv;
-	// 	if (!opts.serv) opts.serv = 'host';
-	// 	if (!opts.home) opts.home = 'main.html';
+	static bindDom( elem: string, opts: {
+					/** not used */
+					portal?: string;
+					/** serv id */
+					serv?: string;
+					/** system main page */
+					home?: string;
+					/** path to json config file */
+					jsonUrl?: string; },
+					onJsonServ: (elem: string, opts: object, json: object) => any) {
+		// this.state.servId = serv;
+		if (!opts.serv) opts.serv = 'host';
+		if (!opts.home) opts.home = 'main.html';
 
-	// 	if (typeof elem === 'string') {
-	// 		$.ajax({
-	// 			dataType: "json",
-	// 			url: opts.jsonUrl || 'private/host.json',
-	// 		})
-	// 		.done( (json) => onJsonServ(elem, opts, json) )
-	// 		.fail( (e) => {
-	// 			$.ajax({
-	// 				dataType: "json",
-	// 				url: 'github.json',
-	// 			})
-	// 			.done((json) => onJsonServ(elem, opts, json))
-	// 			.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
-	// 		} )
-	// 	}
-	// }
+		if (typeof elem === 'string') {
+			$.ajax({
+				dataType: "json",
+				url: opts.jsonUrl || 'private/host.json',
+			})
+			.done( (json) => onJsonServ(elem, opts, json) )
+			.fail( (e) => {
+				$.ajax({
+					dataType: "json",
+					url: 'github.json',
+				})
+				.done((json) => onJsonServ(elem, opts, json))
+				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
+			} )
+		}
+	}
 }
 
 /**Ectending AnReact with dataset & sys-menu, the same of layers extinding of jsample.
@@ -214,46 +222,44 @@ export class AnReact {
  */
 export class AnReactExt extends AnReact {
 
-	extendPorts(ports) {
+	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
 		return this;
 	}
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
+	 * Since v0.9.32, AnReact(Ext) won't care error handling anymore.
 	 * @param sk menu sk (semantics key, see dataset.xml), e.g. 'sys.menu.jsample'
-	 * @param uri 
+	 * @param uri
 	 * @param onLoad
-	 * @param errCtx
 	 * @return this
 	 */
-	loadMenu(sk: string, uri: string, onLoad: OnCommitOk, errCtx?: ErrorCtx): AnReactExt {
+	loadMenu(sk: string, uri: string, onLoad: OnCommitOk): AnReactExt {
 		if (!sk)
 			throw new Error("Arg 'sk' is null - AnReact requires a dataset semantics for system menu.");
 		const pmenu = 'menu';
 
 		return this.dataset(
 			{port: pmenu, uri, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
-			onLoad, errCtx);
+			onLoad);
 	}
 
 	/** Load jsample.serv dataset. (using DatasetReq or menu.serv)
 	 * @param ds dataset info {port, sk, sqlArgs}
-	 * @param onLoad 
+	 * @param onLoad
 	 * @param errCtx
 	 * @return this
 	 */
-	dataset(ds: DatasetOpts, onLoad: OnCommitOk, errCtx?: ErrorCtx): AnReactExt {
+	dataset(ds: DatasetOpts, onLoad: OnCommitOk): AnReactExt {
 		// let ssInf = this.client.ssInf;
 		let {uri, sk, sqlArgs, t, rootId} = ds;
 		sqlArgs = sqlArgs || [];
 		let port = ds.port ||'dataset';
 
 		let reqbody = new DatasetReq({
-				uri,
+				uri, port,
 				mtabl: undefined,
-				sk,
-				sqlArgs,
-				rootId
+				sk, sqlArgs, rootId
 			})
 			.TA(t || stree_t.query);
 		let jreq = this.client.userReq(uri, port, reqbody, undefined);
@@ -283,13 +289,13 @@ export class AnReactExt extends AnReact {
 	 * @param component
 	 * @return this
 	 */
-	stree(opts: DatasetOpts, component: CrudComp<any>): void {
+	stree(opts: DatasetOpts, component: CrudComp<Comprops>): void {
 		let {uri, onOk} = opts;
 
 		if (!uri)
 			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
 
-		opts.port = 'stree';
+		// opts.port = 'stree';
 
 		if (opts.sk && !opts.t)
 			opts.a = stree_t.sqltree;
@@ -299,12 +305,8 @@ export class AnReactExt extends AnReact {
 				component.setState({forest: resp.Body().forest});
 		}
 
-		this.dataset(opts, onload, this.errCtx);
+		this.dataset(opts, onload);
 	}
-
-	// errCtx(opts: DatasetOpts, onload: OnLoadOk | ((resp: AnsonMsg<AnDatasetResp>) => void), errCtx: any) {
-	// 	throw new Error('Method not implemented.');
-	// }
 
 	rebuildTree(opts, onOk) {
 		let {uri, rootId, sk} = opts;
@@ -323,7 +325,7 @@ export class AnReactExt extends AnReact {
 			console.log("Rebuilt successfully: ", resp);
 		}
 
-		this.dataset(opts, onload, this.errCtx);
+		this.dataset(opts, onload);
 	}
 
 	/**Bind dataset to combobox options (comp.state.condCbb).
@@ -347,8 +349,7 @@ export class AnReactExt extends AnReact {
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs: string[];
 				  nv: {n: string, v: string};
-				  cond: any; onDone: OnCommitOk; noAll: boolean; },
-		errCtx?: ErrorCtx) {
+				  cond: any; onDone: OnCommitOk; noAll: boolean; } ) {
 		let {uri, sk, sqlArgs, nv, cond, onDone, noAll} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
@@ -358,6 +359,7 @@ export class AnReactExt extends AnReact {
 		cond.loading = true;
 
 		this.dataset( {
+				port: 'dataset',
 				uri,
 				sqlArgs,
 				// ssInf: this.client.ssInf,
@@ -381,7 +383,7 @@ export class AnReactExt extends AnReact {
 
 				if (onDone)
 					onDone(cond);
-			}, errCtx );
+			} );
 		return this;
 	}
 }

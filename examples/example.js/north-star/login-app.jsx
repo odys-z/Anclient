@@ -38,6 +38,7 @@ class LoginApp extends React.Component {
 	}
 
 	onErrorClose() {
+		this.setState({hasError: false});
 	}
 
 	onLogin(client) {

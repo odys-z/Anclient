@@ -56,12 +56,16 @@ const argex = /{(\s*(\w|\d)*\s*)}/g;
  * var the_string = L('Welcome {name}', {name: 'Joe'});
  * see https://stackoverflow.com/a/30191493/7362888
  * and https://stackoverflow.com/a/57882370/7362888
+ *
+ * @param t template
+ * @param o arg object
+ * @returns
  */
 /**
- * 
+ *
  * @param t template
  * @param vals optional: value args
- * @returns 
+ * @returns
  */
 export function L(t: string, vals?: {[name: string]: string | number}) {
 	if (! (t in Langstrs.s[Langstrs.lang]) )

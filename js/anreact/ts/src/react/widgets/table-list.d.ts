@@ -1,7 +1,8 @@
 export const AnTablist: React.ComponentType<Pick<PropTypes.InferProps<{
     pk: PropTypes.Validator<string>;
     selectedIds: PropTypes.Validator<object>;
-}>, "selectedIds" | "pk"> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
+    onSelectChange: PropTypes.Requireable<(...args: any[]) => any>;
+}>, "pk" | "selectedIds" | "onSelectChange"> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
 /**
  * props:
  * 	{array} columns must need
@@ -33,6 +34,7 @@ export namespace AnTablistComp {
     namespace propTypes {
         const pk: PropTypes.Validator<string>;
         const selectedIds: PropTypes.Validator<object>;
+        const onSelectChange: PropTypes.Requireable<(...args: any[]) => any>;
     }
 }
 import PropTypes from "prop-types";

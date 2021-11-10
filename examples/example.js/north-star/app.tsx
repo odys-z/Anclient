@@ -75,7 +75,7 @@ class App extends React.Component<Northprops, any> {
 			});
 		}
 
-		// extending CRUD pages
+		// extending pages
 		SysComp.extendLinks( [
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
@@ -101,7 +101,7 @@ class App extends React.Component<Northprops, any> {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param c error code
 	 * @param r AnsonMessage<AnsonResp>
 	 */

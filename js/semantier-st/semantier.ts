@@ -1,14 +1,20 @@
 import { SessionClient, Inseclient } from "./anclient";
-import { Protocol, stree_t,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq
+import { stree_t, CRUD,
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, ColMeta
 } from "./protocol";
 
-const { CRUD } = Protocol;
+export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-// not working
-// https://stackoverflow.com/a/45257357/7362888
-// const codes = Object.keys(MsgCode);
-// type Protocode = typeof codes[number];
+/**<p>UI element formatter</p>
+ * E.g. TRecordForm will use this to format a field in form.
+ * Currently tiers also accept this as field modifier. (FIXME - to be optimized)
+ */
+export type AnElemFormatter = (
+	(	/**field definition */
+		col: TierCol,
+		/**column index or record for the row */
+		rec: number | Tierec
+	) => any );
 
 export interface ErrorCtx {
 	msg?: undefined | string | Array<string>;
@@ -17,23 +23,24 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
-export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-
 export interface AnlistColAttrs {
     disabled?: boolean;
 	visible?: boolean;
     checkbox?: boolean;
     // formatter?: (col: AnlistCol) => string;
-    formatter?: (rec: {}) => string;
+    formatter?: AnElemFormatter;
     css?: {};
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	box?: {};
 }
 
-/**Meta data handled from tier (DB field) */
-export interface TierCol extends AnlistColAttrs{
-    field: string;
+/**Meta data handled from tier (DB field).
+ * field and label properties are required.
+*/
+export interface TierCol extends AnlistColAttrs, ColMeta {
+    // field: string;
     label: string;
+
     /**input type / form type */
     type?: string;
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
@@ -50,32 +57,27 @@ export interface Tierec {
 export interface TierComboField extends TierCol {
 	nv: {n: string; v: string};
 	sk: string;
-	cbbStyle: {}; 
+	cbbStyle: {};
 }
-
 
 /**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
 export interface QueryConditions {
 	[q: string]: any;
 }
 
-/**Callback of CRUD.c/u/d */
-export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
-/**Callback of CRUD.r */
-export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
-
-export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
-
 /**
  * Not the same as java Semantext.
  * { client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx }
  */
 export interface Semantext {
-    anClient: SessionClient | Inseclient;
-    anReact: object;
-    error: object;
+    anClient: SessionClient;
+	/**FIXME rename as TSHelper:
+	 * Gloabal UI helper, e.g. AnReact */
+    anReact: any;
+    error: ErrorCtx;
 }
 
+export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
 /**
  * Base class of semantic tier
  */
@@ -105,8 +107,8 @@ export class Semantier {
     _cols: Array<TierCol>;
     /** client function / CRUD identity */
     uri: string;
-    /** maintable's record fields */
-    _fields: any[];
+    /** Fields in details from, e.g. maintable's record fields */
+    _fields: TierCol[];
     /** optional main table's pk */
     pk: string;
     /** current crud */
@@ -125,6 +127,8 @@ export class Semantier {
     /** current relations */
     rels: any[];
 
+    lastCondit: QueryConditions;
+
     /**
      * @param context
      */
@@ -138,13 +142,13 @@ export class Semantier {
 		return this;
 	}
 
-    client: any;
+    client: SessionClient | Inseclient;
     anReact: any;
-    errCtx: any;
+    errCtx: ErrorCtx;
 
     disableValidate: any;
 
-    validate(rec: {}, fields: Array<TierCol>): boolean {
+    validate(rec?: {}, fields?: Array<TierCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);
@@ -186,14 +190,14 @@ export class Semantier {
      * @param modifier.field user provided modifier to change column's style etc.
      * callback function signature: (col, index) {} : return column's properties.
      */
-	 columns (modifier?: {[x: string]: AnlistColAttrs | AnFieldFormatter}): Array<AnlistColAttrs> {
+	 columns (modifier?: {[x: string]: AnlistColAttrs | AnElemFormatter}): Array<AnlistColAttrs> {
 		if (!this._cols)
 			throw Error("_cols are not provided by child tier.");
 
 		if (modifier)
 			return this._cols.map( (c, x) =>
 				typeof modifier[c.field] === 'function' ?
-						{...c, ...(modifier[c.field] as AnFieldFormatter)(c, x) } :
+						{...c, ...(modifier[c.field] as AnElemFormatter)(c, x) } :
 						{...c, ...modifier[c.field]}
 			);
 		else
@@ -204,7 +208,7 @@ export class Semantier {
      * @param {object} modifier {field, function | object }
      * @param {object | function} modifier.field see #columns().
      */
-	 fields (modifier?: {[x: string]: AnlistColAttrs | AnFieldFormatter}): Array<TierCol> {
+	 fields (modifier?: {[x: string]: AnlistColAttrs | AnElemFormatter}): Array<TierCol> {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 
@@ -214,7 +218,7 @@ export class Semantier {
 			return this._fields.map( (c, x) => {
 				let disabled = c.disabled || c.field === that.pk && that.pkval ? true : false;
 				return typeof modifier[c.field] === 'function' ?
-						{...c, ...(modifier[c.field] as AnFieldFormatter)(c, x), disabled } :
+						{...c, ...(modifier[c.field] as AnElemFormatter)(c, x), disabled } :
 						{...c, ...modifier[c.field], disabled}
 			} );
 		else

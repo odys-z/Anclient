@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { Grid, Button, Theme, Typography } from '@material-ui/core';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
-	OnCommitOk, OnLoadOk, QueryConditions
+	OnCommitOk, OnLoadOk, QueryConditions, TierCol
 } from "@anclient/semantier-st";
 
 import {
@@ -15,14 +15,16 @@ import {
 
 import { CrudCompW, Comprops } from '../../common/north';
 import { PollDetails } from './poll-details';
+import { TabGuardComp } from 'ag-grid-community';
 
 const { JsampleIcons } = jsample;
 
 export interface PollsProp extends Comprops {
-    readonly classes: { 
+    readonly classes: {
         funcName?: string;
         crudButton: string;
-		list: string };
+		list: string;
+		smalltip?: string; };
 };
 
 
@@ -33,6 +35,10 @@ const styles = (theme: Theme) => (Object.assign(
 	},
 	funcName: {
 		fontSize: "1.4em",
+	},
+	smalltip: {
+		fontSize: "0.8em",
+		color: "#21217d"
 	}
 } ));
 
@@ -81,7 +87,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 		this.tier.setContext(this.context);
 	}
 
-	toSearch(condts?: QueryConditions) {
+	toSearch(e: React.UIEvent, condts?: QueryConditions) {
 		if (this.tier) {
 			let that = this;
 			this.q = condts || this.q;
@@ -106,6 +112,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 	}
 
 	onTableSelect(rowIds: string[]) {
+		// this.state.selected.ids = rowIds;
 		this.setState( {
 			buttons: {
 				start: this.state.buttons.start,
@@ -123,7 +130,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 				onClose={this.closeDetails}
             />);
     }
-    
+
 	toStop(e: React.UIEvent) {
 		let ids = this.state.selected.ids;
 		let that = this;
@@ -175,7 +182,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 					className={classes.crudButton} onClick={this.toStop}
 					startIcon={<JsampleIcons.DetailPanel />}
 				>{L('Stop Poll')}</Button>
-				<Button variant="contained" disabled={!btn.stop}
+				<Button variant="contained" disabled={!btn.edit}
 					className={classes.crudButton} onClick={this.toShowDetails}
 					startIcon={<JsampleIcons.Add />}
 				>{L('Details')}</Button>
@@ -185,7 +192,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 					startIcon={<JsampleIcons.Delete />}
 				>{L('Setup Users')}</Button>*/}
 			</Grid>
-
+			<Typography className={classes.smalltip}>A quiz may have multiple records here.</Typography>
 			{this.tier && <AnTablist
 				className={classes.list} checkbox={true} pk={this.tier.pk}
 				columns={this.tier.columns(undefined)}
@@ -206,7 +213,7 @@ const Polls = withWidth()(withStyles(styles)(PollsComp));
 
 class PollsTier extends Semantier {
 	/**{@link StarPorts.polls} */
-	port = 'npolls'; 
+	// port = 'npolls';
 
 	_fields = [
 		{field: 'title', label: L('Title')},
@@ -215,24 +222,20 @@ class PollsTier extends Semantier {
 	];
 
     _cols = [
-        { label: L('quiz event'),field: "pid",    hide: true, css: undefined },
-        { label: L('Quiz Name'), field: "title",  color: 'primary', className: 'bold'},
-        { label: L('Users'),    field: "users",  color: 'primary' },
-        { label: L('Status'),    field: "state",  color: 'primary' },
-        // { text: L('Subject'),   field: "subject",color: 'primary' }
-	];
+        { label: L('quiz event'),field: "pid",    visible: false },
+        { label: L('Quiz Name'), field: "title",  css: {color: 'primary'}, className: 'bold'},
+        { label: L('Users'),     field: "users",  css: {color: 'primary'} },
+        { label: L('Status'),    field: "state",  css: {color: 'primary'} },
+        // { label: L('Subject'),   field: "subject",style: {color: 'primary'} }
+	] as TierCol[];
 
-	pk = 'pid';
-
-	query: QueryConditions;
-
-	poll: any;
+	pk = 'qid';
 
     constructor(comp: PollsComp) {
         super(comp);
 
 		Protocol.registerBody(NPollsReq._type,
-			(jsonBd: any) => { return new NPollsReq(this.uri, this.query); });
+			(jsonBd: any) => { return new NPollsReq(this.uri, this.lastCondit); });
 
 		Protocol.registerBody(NPollsResp._type,
 			(jsonBd: any) => { return new NPollsResp(jsonBd); });
@@ -241,11 +244,11 @@ class PollsTier extends Semantier {
 	/**[Promiting Style]
 	 * Get all poll users for pollIds, with state in states.
 	 * port: quiz
-     * 
-     * @param opts 
-     * @param onLoad 
-     * @param errCtx 
-     * @returns 
+     *
+     * @param opts
+     * @param onLoad
+     * @param errCtx
+     * @returns
      */
     records(opts: QueryConditions, onLoad: OnLoadOk) {
 		let {pollIds, states} = opts;
@@ -257,7 +260,7 @@ class PollsTier extends Semantier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, this.port,
+		let req = client.userReq(this.uri, 'npolls',
 					new NPollsReq( this.uri, opts )
 					.A(NPollsReq.A.list) );
 
@@ -272,6 +275,50 @@ class PollsTier extends Semantier {
 			this.errCtx);
 	}
 
+	/**
+	 * Load poll of pid (many cards, each for different user)
+	 * @param opts
+	 * @param opts.pkval poll id
+	 * @param onLoad
+	 * @returns
+	 */
+    record(opts, onLoad: OnLoadOk) {
+		if (!this.client) return;
+
+		let pkval = opts;
+
+		pkval = pkval || this.pkval ;
+		if (!pkval) {
+			console.warn("Calling record() with empty pk.");
+			return;
+		}
+
+		let client = this.client;
+		let that = this;
+
+		let req = client.userReq( this.uri, 'npolls',
+					new NPollsReq( this.uri, {quizId: pkval} )
+					.A(NPollsReq.A.pollCards) );
+
+		console.log(req);
+		client.commit(req,
+			(resp: AnsonMsg<NPollsResp>) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().polls);
+				that.rows = rows;
+				that.resetFormSession();
+				onLoad(cols, rows);
+			},
+			this.errCtx);
+	}
+}
+
+interface PollQueryConditions extends QueryConditions {
+	quizId?: string;
+	title?: string;
+	tag?: string;
+	userId?: string;
+	pollState?: 'done' | 'poll' | '' | undefined;
+	pollId?: string;
 }
 
 /**The poll request message body */
@@ -280,21 +327,31 @@ class NPollsReq extends AnsonBody {
      * https://stackoverflow.com/questions/32494174/can-you-create-nested-classes-in-typescript
      */
  	static A = class {
-		static start = 'start';
-		static list = 'list';     // load quizzes
-		static stopolls = 'stopolls'; // stop all polls
-		static pollsUsers = 'polls-users'; // get all users of polls (pollIds, quizId, states)
+		// static start = 'start';
+		/** load poll list */
+		static list = 'list';
+		/** load poll cards */
+		static pollCards = 'r/cards';
+		/** stop all polls */
+		static stopolls = 'stopolls';
+		/**get all users of polls (pollIds, quizId, states) */
+		static pollsUsers = 'polls-users';
 	}
 
+	/**Parameter name: poll ids*/
     static pollIds = "pids";
+	/**Parameter name: poll states*/
     static states = "states";
 
 	static _type = "io.oz.ever.conn.n.poll.NPollsReq";
 
-	// type = 'io.oz.ever.conn.n.poll.NPollsReq';
+	/**quiz Id */
+	quizId: string;
 
-	constructor(uri: string, condts: QueryConditions) {
+	constructor(uri: string, condts: PollQueryConditions) {
 		super({type: NPollsReq._type, uri});
+
+		this.quizId = condts.quizId;
 	}
 
 }
@@ -307,6 +364,10 @@ class NPollsResp extends AnsonResp {
 		super(jsonBd);
 
 		this.polls = jsonBd.polls;
+	}
+
+	Rs(rsx = 0) {
+		return this.polls;
 	}
 }
 

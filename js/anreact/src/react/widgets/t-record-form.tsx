@@ -2,7 +2,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
 import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
@@ -11,9 +10,10 @@ import Typography from '@material-ui/core/Typography';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
-	import { CrudCompW } from '../crud';
-	import { DatasetCombo } from './dataset-combo';
-	import { Semantier } from '@anclient/semantier-st';
+	import { ClassNames, Comprops, CrudCompW } from '../crud';
+	import { DatasetCombo, TierComboField } from './dataset-combo';
+	import { Semantier, TierCol, Tierec } from '@anclient/semantier-st';
+import { AnFieldFormatter, Media } from '../anreact';
 
 const styles = (theme) => (Object.assign(
 	Semantier.invalidStyles,
@@ -39,6 +39,14 @@ const styles = (theme) => (Object.assign(
 	}
 ) );
 
+export interface RecordFormProps extends Comprops {
+    enableValidate: boolean;
+};
+
+export interface AnFormField extends TierCol {
+	fieldFormatter?: AnFieldFormatter;
+};
+
 /**
  * A Tiered record component is designed for UI record layout rendering, handling
  * user action (change text, etc.) in a levle-up style. It's parent's responsibilty
@@ -56,13 +64,14 @@ const styles = (theme) => (Object.assign(
  * NOTE: Desgin Memo
  * Level-up way is NOT working! So having tier as the common state/data manager.
  */
-class TRecordFormComp extends CrudCompW {
+class TRecordFormComp extends CrudCompW<RecordFormProps> {
 	state = {
 		dirty: false,
 		pk: undefined,
 	};
+    tier: any;
 
-	constructor (props = {}) {
+	constructor (props: RecordFormProps) {
 		super(props);
 
 		this.tier = props.tier;
@@ -86,8 +95,7 @@ class TRecordFormComp extends CrudCompW {
 		}
 	}
 
-	getField(f, rec, classes) {
-		let media = super.media;
+	getField(f: TierComboField, rec: Tierec, classes: ClassNames, media: Media) {
 		let {isSm} = media;
 		let that = this;
 
@@ -109,11 +117,13 @@ class TRecordFormComp extends CrudCompW {
 				/>);
 		}
 		else if (f.type === 'formatter' || f.formatter) {
-			if (f.formatter.length != 3)
+			console.warn("This branch is deprecated.");
+			if (f.formatter.length != 2)
 				console.warn('TRecordFormComp need formatter with signature of f(record, field, tier).', f.formatter)
-			return (
-				<>{f.formatter(rec, f, this.props.tier)}</>
-			);
+			return (<>{f.formatter(f, rec)}</>);
+		}
+		else if (f.type === 'formatter' || f.fieldFormatter) {
+			return (<>{f.fieldFormatter(rec, f)}</>);
 		}
 		else {
 			let type = 'text';
@@ -123,14 +133,14 @@ class TRecordFormComp extends CrudCompW {
 							this.tier.isReadonly(f) : this.tier.isReadonly;
 			return (
 			<TextField key={f.field} type={f.type || type}
-				disabled={!!f.disabled || !!f.readonly || !!f.readOnly}
-				autoComplete={f.autocomplete}
+				disabled={!!f.disabled}
+				// autoComplete={f.autocomplete}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
 				inputProps={{ readOnly } }
-				className={classes[f.style]}
+				className={classes[f.className]}
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
 					f.style = undefined;
@@ -140,9 +150,9 @@ class TRecordFormComp extends CrudCompW {
 		}
 	}
 
-	formFields(rec, classes) {
+	formFields(rec: Tierec, classes: ClassNames, media: Media) {
 		let fs = [];
-		const isSm = this.props.dense || toBool(super.media.isMd);
+		const isSm = this.props.dense || toBool(media.isMd);
 
 		this.props.fields.forEach( (f, i) => {
 		  if (!f.hide) {
@@ -155,7 +165,7 @@ class TRecordFormComp extends CrudCompW {
 						{L(f.label)}
 					  </Typography>
 					}
-					{this.getField(f, rec, classes)}
+					{this.getField(f, rec, classes, media)}
 				  </Box>
 				</Grid> );
 		} } );
@@ -164,24 +174,24 @@ class TRecordFormComp extends CrudCompW {
 
 	render () {
 		const { classes, width } = this.props;
-		let media = CrudCompW.setWidth(width);
+		let media = CrudCompW.getMedia(width);
 
 		let rec = this.tier.rec;
 
 		return rec ?
 			<Grid container className={classes.root} direction='row'>
-				{this.formFields(rec, classes)}
+				{this.formFields(rec, classes, media)}
 			</Grid>
-			: <></>; // NOTE have to wait until parent loaded data
+			: <></>; // have to wait until parent loaded data
 	}
 }
 
-TRecordFormComp.propTypes = {
-	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-	tier: PropTypes.object.isRequired,
-	dense: PropTypes.bool,
-	enableValidate: PropTypes.bool,
-};
+// TRecordFormComp.propTypes = {
+// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
+// 	tier: PropTypes.object.isRequired,
+// 	dense: PropTypes.bool,
+// 	enableValidate: PropTypes.bool,
+// };
 
 const TRecordForm = withWidth()(withStyles(styles)(TRecordFormComp));
 export { TRecordForm, TRecordFormComp }

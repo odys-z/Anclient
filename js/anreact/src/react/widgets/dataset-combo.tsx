@@ -1,20 +1,23 @@
 
 import React from 'react';
-import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-// import clsx from 'clsx';
-// import withWidth from "@material-ui/core/withWidth";
 import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete, { AutocompleteClassKey } from '@material-ui/lab/Autocomplete';
+import { InvalidClassNames, Semantier } from '@anclient/semantier-st';
 
-import { Protocol, AnsonResp } from '@anclient/semantier-st';
+import { AnConst } from '../../utils/consts';
+import { AnContext } from '../reactext';
+import { Comprops, CrudCompW } from '../crud';
+import { AnFormField } from '../../an-components';
 
-import { L } from '../../utils/langstr';
-	import { AnConst } from '../../utils/consts';
-	import { AnContext } from '../reactext';
-	import { Semantier } from '@anclient/semantier-st';
-
+/**E.g. form's combobox field declaration */
+export interface TierComboField extends AnFormField {
+    className: undefined | "root" | InvalidClassNames | AutocompleteClassKey;
+	nv: {n: string; v: string};
+	sk: string;
+	cbbStyle: {};
+}
 
 const styles = (theme) => (Object.assign(
 	Semantier.invalidStyles, {
@@ -28,10 +31,10 @@ const styles = (theme) => (Object.assign(
  * Also can handling hard coded options.
  * @class DatasetCombo
  */
-class DatasetComboComp extends React.Component {
+class DatasetComboComp extends CrudCompW<Comprops> {
 	state = {
 		// sk: undefined,
-		combo: {val: undefined, options: []},
+		combo: {label: undefined, val: undefined, initVal: undefined, ref: undefined, options: []},
 
 		selectedItem: undefined,
 	}
@@ -41,7 +44,7 @@ class DatasetComboComp extends React.Component {
 		super(props);
 		this.state.combo.options = props.options;
 		this.state.combo.label = props.label;
-		this.state.initVal = props.val;
+		this.state.combo.initVal = props.val;
 
 		if (this.props.sk && !this.props.uri)
 			console.warn("DatasetCombo is configured as loading data with sk, but uri is undefined.")
@@ -53,15 +56,18 @@ class DatasetComboComp extends React.Component {
 		if (!this.context || !this.context.anReact)
 			throw new Error('DatasetCombo can\'t bind controls without AnContext initialized with AnReact.');
 
-		if (this.props.sk )
+		if (this.props.sk ) {
+			let that = this;
 			this.context.anReact.ds2cbbOptions({
 					uri: this.props.uri,
 					sk: this.props.sk,
 					// user uses this, e.g. name and value to access data
 					nv: this.props.nv || {n: 'name', v: 'value'},
-					cond: this.state.combo
+					cond: this.state.combo,
+					onDone: () => that.setState({})
 				},
 				this.context.error, this);
+		}
 	}
 
 	onCbbRefChange( ) {
@@ -115,7 +121,7 @@ class DatasetComboComp extends React.Component {
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
-			filter={Autocomplete.caseInsensitiveFilter}
+			// filter={Autocomplete.caseInsensitiveFilter}
 			renderInput={
 				(params) => <TextField {...params}
 					label={this.props.showLable && v ? v.n : ''}
@@ -134,10 +140,10 @@ class DatasetComboComp extends React.Component {
 }
 DatasetComboComp.contextType = AnContext;
 
-DatasetComboComp.propTypes = {
-	uri: PropTypes.string,
-	val: PropTypes.object, // TODO doc: e.g. {n: f.field, v: rec[f.field]}, see TRecordFormComp
-};
+// DatasetComboComp.propTypes = {
+// 	uri: PropTypes.string,
+// 	val: PropTypes.object, // TODO doc: e.g. {n: f.field, v: rec[f.field]}, see TRecordFormComp
+// };
 
 const DatasetCombo = withWidth()(withStyles(styles)(DatasetComboComp));
 export { DatasetCombo, DatasetComboComp }

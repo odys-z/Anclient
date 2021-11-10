@@ -475,7 +475,7 @@ class AnTreeditorComp extends React.Component {
 	render() {
 		const { classes, width } = this.props;
 
-		let media = CrudCompW.setWidth(width);
+		let media = CrudCompW.getMedia(width);
 
 		return (
 			<div className={classes.root}>

@@ -1,22 +1,50 @@
+import { ErrorCtx, Semantext, SessionClient, SessionInf } from '@anclient/semantier-st';
 import React from 'react';
 
-import {L} from '../utils/langstr';
-import { Comprops, CrudCompW } from './crud';
-import {ConfirmDialog} from './widgets/messagebox'
+import { AnReact } from './anreact';
+
+export interface AnContextType extends Semantext {
+	/**	Anclient */
+	// an: undefined,
+    /**@type = SessionIfn */
+	ssInf: SessionInf,
+
+	pageOrigin: string,
+	iparent: any,    // usually the parent window of ifram
+	ihome: string,
+
+	/**default: host */
+	servId: string,
+
+	servs: { host: string; [h: string]: string },
+
+	// anClient: SessionClient,
+
+	/** Only nullable for Login */
+	// anReact: typeof AnReact,
+
+	// error handling pattern like
+	// https://medium.com/technofunnel/error-handling-in-react-hooks-e42ab91c48f4
+	// error: ErrorCtx,
+	hasError: boolean,
+} 
 
 export const AnContext = React.createContext({
 	/**	Anclient */
-	an: undefined,
+	// an: undefined,
     /**@type = SessionIfn */
 	ssInf: undefined,
 
 	pageOrigin: '.',
 	iparent: {},    // usually the parent window of ifram
-	ihome: '',
-	servId: 'host',
-	// servs: { host: 'http://localhost:8080/jserv-sample' },
+	ihome: undefined as string,
+
+	/**default: host */
+	servId: undefined as string,
+
 	servs: { host: 'http://localhost:8080' },
 
+	anClient: undefined,
 	anReact: undefined,
 
 	// error handling pattern like
@@ -25,48 +53,15 @@ export const AnContext = React.createContext({
         /**@function (code: string, AnsonMsg<AnsonResp>) => void */
 		onError: undefined,
 		msg: undefined
-	},
+	} as ErrorCtx,
 	hasError: false,
 
-	// setServ: function(servId: string, json: {host: string, [key: string]: string}) {
-	// 	let me = AnContext;
-	// 	me.servs = Object.assign(me.servs, json);
-	// 	me.servId = servId ? servId : 'host';
-	// },
+	/** Only nullable for Login */
+	reactHelper: undefined as AnReact,
+	// uuid: function() : string {
+	// 	return (++ _uid_).toString();
+	// }
+} as AnContextType);
 
-	uuid: function() {
-		return ++ _uid_;
-	}
-});
+// var _uid_ = 0;
 
-var _uid_ = 0;
-
-export interface ErrorProps extends Comprops {
-    onClose: () => void;
-    fullScreen: boolean;
-}
-
-// export class AnError extends React.Component<ErrorProps> {
-export class AnError extends CrudCompW<ErrorProps> {
-	// props = undefined;
-    context: React.ContextType<typeof AnContext>
-
-	state = {
-	};
-
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-		let ctx = this.context;// .errors;
-        let p = this.props as ErrorProps;
-		return (
-			<ConfirmDialog ok={L('OK')} title={L('Error')} cancel={false}
-					open={!!ctx.hasError} onClose={p.onClose}
-					fullScreen={p.fullScreen}
-					msg={L(ctx.error.msg)} />
-		);
-	}
-}
-AnError.contextType = AnContext;
