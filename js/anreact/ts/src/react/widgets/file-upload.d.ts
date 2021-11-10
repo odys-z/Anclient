@@ -1,10 +1,10 @@
 export const FileUpload: React.ComponentType<(Pick<Pick<PropTypes.InferProps<{
     tier: PropTypes.Validator<object>;
-}>, "tier"> & import("@material-ui/core/styles").StyledComponentProps<never>, keyof import("@material-ui/core/styles").StyledComponentProps<never> | "tier"> | Pick<Pick<PropTypes.InferProps<{
+}>, "tier"> & import("@material-ui/core/styles").StyledComponentProps<"ok" | "notNull" | "maxLen" | "anyErr" | "minLen" | "imgUploadBox">, "tier" | keyof import("@material-ui/core/styles").StyledComponentProps<"ok" | "notNull" | "maxLen" | "anyErr" | "minLen" | "imgUploadBox">> | Pick<Pick<PropTypes.InferProps<{
     tier: PropTypes.Validator<object>;
-}>, "tier"> & import("@material-ui/core/styles").StyledComponentProps<never> & {
+}>, "tier"> & import("@material-ui/core/styles").StyledComponentProps<"ok" | "notNull" | "maxLen" | "anyErr" | "minLen" | "imgUploadBox"> & {
     children?: React.ReactNode;
-}, "children" | keyof import("@material-ui/core/styles").StyledComponentProps<never> | "tier">) & import("@material-ui/core/withWidth").WithWidthProps>;
+}, "children" | "tier" | keyof import("@material-ui/core/styles").StyledComponentProps<"ok" | "notNull" | "maxLen" | "anyErr" | "minLen" | "imgUploadBox">>) & import("@material-ui/core/withWidth").WithWidthProps>;
 export class FileUploadComp extends React.Component<any, any, any> {
     constructor(props: any);
     fileInput: any;

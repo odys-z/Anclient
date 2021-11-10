@@ -1,20 +1,18 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import PropTypes from "prop-types";
 
 import Typography from '@material-ui/core/Button';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
-import Divider from '@material-ui/core/Box';
 
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { Protocol } from '@anclient/semantier';
+import { CRUD } from '@anclient/semantier-st';
 import { L, isEmpty,
-	AnContext, DatasetCombo, ConfirmDialog, RecordForm,
+	AnContext, ConfirmDialog, TRecordForm,
 	jsample, Overlay, AnGridsheet, anMultiRowRenderer
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
@@ -55,9 +53,9 @@ class QuizsheetComp extends React.Component {
 		super(props);
 		this.quizHook = {collect: undefined};
 
-		this.state.crud = props.c ? Protocol.CRUD.c
-						: props.u ? Protocol.CRUD.u
-						: Protocol.CRUD.r;
+		this.state.crud = props.c ? CRUD.c
+						: props.u ? CRUD.u
+						: CRUD.r;
 
 		this.state.quizId = props.quizId
 		if (props.u && !props.quizId) throw new Error("Semantics Error!");
@@ -124,7 +122,7 @@ class QuizsheetComp extends React.Component {
 		let ctx = this.context;
 		this.jquiz = new JQuiz(ctx.anClient, ctx.error);
 
-		if (this.state.crud !== Protocol.CRUD.c)
+		if (this.state.crud !== CRUD.c)
 			this.jquiz.quiz(this.props.uri, this.state.quizId, this.bindQuiz, ctx.error);
 		else
 			this.jquiz.startQuizA({uri: this.props.uri, templ: this.props.templ},
@@ -187,14 +185,14 @@ class QuizsheetComp extends React.Component {
 
 		this.quizHook.collect && this.quizHook.collect(this.state);
 
-		if ( that.state.crud === Protocol.CRUD.c ) {
+		if ( that.state.crud === CRUD.c ) {
 			this.jquiz.insertQuiz(this.props.uri, this.state,
 				(resp) => {
 					let {quizId, title} = JQuiz.parseResp(resp);
 					if (isEmpty(quizId))
 						console.error ("Something Wrong!");
 					that.state.quiz.qid = quizId;
-					that.state.crud = Protocol.CRUD.u;
+					that.state.crud = CRUD.u;
 					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
 				});
 		}

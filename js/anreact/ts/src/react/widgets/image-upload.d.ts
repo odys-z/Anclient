@@ -1,24 +1,23 @@
-export const ImageUpload: React.ComponentType<(Pick<Pick<PropTypes.InferProps<{
-    tier: PropTypes.Validator<object>;
-    nv: PropTypes.Requireable<object>;
-}>, "nv" | "tier"> & import("@material-ui/core/styles").StyledComponentProps<never>, "nv" | keyof import("@material-ui/core/styles").StyledComponentProps<never> | "tier"> | Pick<Pick<PropTypes.InferProps<{
-    tier: PropTypes.Validator<object>;
-    nv: PropTypes.Requireable<object>;
-}>, "nv" | "tier"> & import("@material-ui/core/styles").StyledComponentProps<never> & {
-    children?: React.ReactNode;
-}, "children" | "nv" | keyof import("@material-ui/core/styles").StyledComponentProps<never> | "tier">) & import("@material-ui/core/withWidth").WithWidthProps>;
-export class ImageUploadComp extends React.Component<any, any, any> {
-    constructor(props: any);
+import React from 'react';
+import { DetailFormW, Comprops } from '../crud';
+/**
+ */
+interface ImgFormProps extends Comprops {
+    blankIcon: object;
+}
+declare class ImageUploadComp extends DetailFormW<ImgFormProps> {
+    state: {
+        src: any;
+    };
     fileInput: any;
     imgPreview: any;
-    toShowImage(e: any): void;
     field: any;
+    constructor(props: ImgFormProps);
+    componentDidMount(): void;
+    toShowImage(e: any): void;
+    render(): JSX.Element;
 }
-export namespace ImageUploadComp {
-    namespace propTypes {
-        const tier: PropTypes.Validator<object>;
-        const nv: PropTypes.Requireable<object>;
-    }
-}
-import PropTypes from "prop-types";
-import React from "react";
+declare const ImageUpload: React.ComponentType<(Pick<Pick<ImgFormProps, keyof ImgFormProps> & import("@material-ui/core/styles").StyledComponentProps<"ok" | "notNull" | "maxLen" | "anyErr" | "minLen" | "imgUploadBox">, string | number | symbol> | Pick<Pick<ImgFormProps, keyof ImgFormProps> & import("@material-ui/core/styles").StyledComponentProps<"ok" | "notNull" | "maxLen" | "anyErr" | "minLen" | "imgUploadBox"> & {
+    children?: React.ReactNode;
+}, string | number | symbol>) & import("@material-ui/core/withWidth").WithWidthProps>;
+export { ImageUpload, ImageUploadComp };

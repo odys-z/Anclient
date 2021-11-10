@@ -1,7 +1,7 @@
 
 import React from "react";
 import { AnContext, SysComp } from "@anclient/anreact";
-import { TierCol, AnlistColAttrs, Tierec, QueryConditions, Semantier } from "@anclient/semantier-st";
+import { AnlistColAttrs, Tierec, QueryConditions } from "@anclient/semantier-st";
 import { Breakpoint } from "@material-ui/core/styles/createBreakpoints";
 
 /**TODO move to @anclient/anreact */
@@ -9,6 +9,12 @@ export interface FieldMeta {
 	field: string;
 	label?: string;
 	disabled?: boolean;
+}
+
+export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs: boolean; isXl?: boolean; }
+
+export interface AnMUIClasses {
+	[c: string]: string;
 }
 
 /** App North's props */
@@ -35,7 +41,6 @@ export interface Comprops {
     readonly width?: Breakpoint;
 };
 
-// export type WelcomeProp = Readonly<{ classes: {board: any}; sys: typeof SysComp } extends Comprops>;
 export interface WelcomeProp extends Comprops {
     readonly classes: { board: any }
     readonly sys: typeof SysComp
@@ -43,6 +48,7 @@ export interface WelcomeProp extends Comprops {
 
 /**PropType of Poll's Form. */
 export interface FormProp extends Comprops {
+	readonly tier: Semantier;
 	/**Fields met for expanding by form, e.g. TRecordForm or CardForm. */
 	readonly fields?: Array<{}>;
 
@@ -51,9 +57,13 @@ export interface FormProp extends Comprops {
 
 	readonly dense?: boolean;
     readonly classes: {
-		root?: string; dialogPaper?: string; smalltip?: string;
-        content?: string; buttons?: string;
-		button?: string, card?: string;
+		root?: string;
+		dialogPaper?: string;
+		smalltip?: string;
+        content?: string;
+		buttons?: string;
+		button?: string,
+		card?: string;
 		[x: string]: any
 	};
     onClose?: (event: React.UIEvent) => void;
@@ -87,7 +97,7 @@ export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> 
 		super(props);
 
 		this.uri = props.match && props.match.path || props.uri;
-		if (!this.uri) 
+		if (!this.uri)
 			throw Error("Anreact CRUD component must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
 
 
@@ -96,7 +106,7 @@ export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> 
 	}
 
 	static getMedia(width: string) {
-		let media;
+		let media: Media;
 
 		if (width === 'lg') {
             media = {

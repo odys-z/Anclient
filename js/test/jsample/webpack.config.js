@@ -7,8 +7,8 @@ var version = "1.0.0";
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: {'AnHome': './app.jsx',
-			'AnExt': './login-app.jsx' },
+	entry: {'AnHome': './app.tsx',
+			'AnExt': './login-app.tsx' },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
@@ -20,17 +20,17 @@ module.exports = {
 	plugins: [ ],
 
 	resolve: {
-		extensions: ['*', '.js', '.jsx', '.tsx']
+		extensions: ['*', '.ts', '.js', '.tsx', '.jsx']
 	},
 
 	module: {
 		rules: [
-		{   test: /\.jsx$/,
+		{   test: /\.jsx?$/,
 			loader: 'babel-loader',
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
-		{ test: /\.tsx$/,
+		{ test: /\.tsx?$/,
 		  loader : 'babel-loader',
 		  options: { presets: [
 				'@babel/preset-react',

@@ -8,7 +8,7 @@ var WebpackShellPlugin = require('webpack-shell-plugin');
 
 var config = {
   mode: 'development',
-  entry: './test/all-jsunits.js',
+  entry: './test/all-jsunits.ts',
   output: {
     filename: 'testBundle.js'
   },
@@ -18,7 +18,7 @@ var config = {
   plugins: [ ],
 
   resolve: {
-	extensions: ['*', '.js', '.jsx', '.tsx']
+	extensions: ['*', '.ts', '.js', '.tsx', '.jsx']
   },
 
   module: {

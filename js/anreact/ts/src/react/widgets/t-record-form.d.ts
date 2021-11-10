@@ -1,28 +1,11 @@
-export const TRecordForm: React.ComponentType<(Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<never>;
-}>, "uri"> & import("@material-ui/core/styles").StyledComponentProps<never>, "uri" | keyof import("@material-ui/core/styles").StyledComponentProps<never>> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<never>;
-}> & {
-    children?: React.ReactNode;
-}, "children" | "uri"> & import("@material-ui/core/styles").StyledComponentProps<never>, "children" | "uri" | keyof import("@material-ui/core/styles").StyledComponentProps<never>> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<never>;
-}>, "uri"> & import("@material-ui/core/styles").StyledComponentProps<never> & {
-    children?: React.ReactNode;
-}, "children" | "uri" | keyof import("@material-ui/core/styles").StyledComponentProps<never>> | Pick<Pick<import("@material-ui/types").ConsistentWith<{
-    uri: string;
-}, {
-    classes: import("@material-ui/styles").ClassNameMap<never>;
-}> & {
-    children?: React.ReactNode;
-}, "children" | "uri"> & import("@material-ui/core/styles").StyledComponentProps<never> & {
-    children?: React.ReactNode;
-}, "children" | "uri" | keyof import("@material-ui/core/styles").StyledComponentProps<never>>) & import("@material-ui/core/withWidth").WithWidthProps>;
+import React from 'react';
+import { ClassNames, Comprops, CrudCompW } from '../crud';
+import { TierComboField } from './dataset-combo';
+import { Tierec } from '@anclient/semantier-st';
+import { Media } from '../anreact';
+export interface RecordFormProps extends Comprops {
+    enableValidate: boolean;
+}
 /**
  * A Tiered record component is designed for UI record layout rendering, handling
  * user action (change text, etc.) in a levle-up style. It's parent's responsibilty
@@ -38,22 +21,22 @@ export const TRecordForm: React.ComponentType<(Pick<Pick<import("@material-ui/ty
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  *
  * NOTE: Desgin Memo
- * Level-up way is NOT working! So having tier as the common state/data manager. 
+ * Level-up way is NOT working! So having tier as the common state/data manager.
  */
-export class TRecordFormComp extends CrudCompW {
-    constructor(props?: {});
+declare class TRecordFormComp extends CrudCompW<RecordFormProps> {
+    state: {
+        dirty: boolean;
+        pk: any;
+    };
     tier: any;
-    formFields(rec: any, classes: any): any[];
-    getField(f: any, rec: any, classes: any): JSX.Element;
+    constructor(props: RecordFormProps);
+    componentDidMount(): void;
+    setState(arg0: {}): void;
+    getField(f: TierComboField, rec: Tierec, classes: ClassNames, media: Media): JSX.Element;
+    formFields(rec: any, classes: any, media: any): any[];
+    render(): JSX.Element;
 }
-export namespace TRecordFormComp {
-    namespace propTypes {
-        const width: PropTypes.Validator<string>;
-        const tier: PropTypes.Validator<object>;
-        const dense: PropTypes.Requireable<boolean>;
-        const enableValidate: PropTypes.Requireable<boolean>;
-    }
-}
-import React from "react";
-import { CrudCompW } from "../crud";
-import PropTypes from "prop-types";
+declare const TRecordForm: React.ComponentType<(Pick<Pick<RecordFormProps, keyof RecordFormProps> & import("@material-ui/core/styles").StyledComponentProps<"ok" | "notNull" | "maxLen" | "root" | "anyErr" | "minLen" | "rowBox" | "labelText" | "labelText_dense">, string | number | symbol> | Pick<Pick<RecordFormProps, keyof RecordFormProps> & import("@material-ui/core/styles").StyledComponentProps<"ok" | "notNull" | "maxLen" | "root" | "anyErr" | "minLen" | "rowBox" | "labelText" | "labelText_dense"> & {
+    children?: React.ReactNode;
+}, string | number | symbol>) & import("@material-ui/core/withWidth").WithWidthProps>;
+export { TRecordForm, TRecordFormComp };

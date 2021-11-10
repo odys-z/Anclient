@@ -1,7 +1,7 @@
 /** TODO move this the anclient.js
  */
 import {
-	Protocol, UserReq, AnsonMsg
+	Protocol, CRUD, UserReq, AnsonMsg
 } from "anclient"
 
 import {QuizReq} from './protocol.quiz.js';
@@ -76,7 +76,7 @@ class JQuiz {
 		this.client.usrAct({
 			func: 'quiz',
 			cmd: a,
-			cate: Protocol.CRUD.r,
+			cate: CRUD.r,
 			remarks: 'quiz.serv' });
 
 		var jreq = new AnsonMsg({
@@ -116,7 +116,7 @@ class JQuiz {
 	insert(quiz, onOk) {
 		let that = this;
 		let date = new Date();
-		this.client.usrAct('quiz', quiz_a.insert, Protocol.CRUD.c, quiz.qtitle);
+		this.client.usrAct('quiz', quiz_a.insert, CRUD.c, quiz.qtitle);
 
 		let props = {}
 		props[QuizProtocol.qtitle] = quiz.qtitle;
@@ -140,7 +140,7 @@ class JQuiz {
 
 	update(quiz, onOk) {
 		let that = this;
-		this.client.usrAct('quiz', quiz_a.update, Protocol.CRUD.u, quiz.qtitle);
+		this.client.usrAct('quiz', quiz_a.update, CRUD.u, quiz.qtitle);
 
 		let props = {}
 		props[QuizProtocol.quizId] = quiz.quizId;

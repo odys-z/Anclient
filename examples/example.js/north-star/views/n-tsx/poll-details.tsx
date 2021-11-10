@@ -11,13 +11,12 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card/Card';
 
-import { AnlistColAttrs, Tierec, Protocol, Semantier } from '@anclient/semantier-st';
-import { L, AnContext, ConfirmDialog
-} from '@anclient/anreact';
+import { Tierec, Protocol, Semantier } from '@anclient/semantier-st';
+import { L, AnContext, ConfirmDialog } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
-import { Anform, FormProp } from '../../common/north';
+import { Anform, AnMUIClasses, FormProp, Media } from '../../common/north';
 import { CardsForm } from './card-form';
 
 const { CRUD } = Protocol;
@@ -73,7 +72,7 @@ class PollDetailsComp extends Anform<CardsFormProp> {
 				: props.u ? CRUD.u
 				: CRUD.r;
 
-		this.tier = props.tier;
+		this.tier = props.tier as PollsTier;
 
 		this.toCancel = this.toCancel.bind(this);
 		this.toStop = this.toStop.bind(this);
@@ -82,12 +81,12 @@ class PollDetailsComp extends Anform<CardsFormProp> {
 
 	componentDidMount() {
 		if (this.tier.pkval) {
-			let that = this;
-			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (_cols, rows) => {
-				that.setState({record: rows[0]});
-			} );
+			// Only CardForm needing to load records
+			// let that = this;
+			// this.tier.record(undefined, // use tier.pkval
+			// 	(_cols, rows) => {
+			// 		that.setState({record: rows[0]});
+			// 	} );
 		}
 	}
 
@@ -95,34 +94,11 @@ class PollDetailsComp extends Anform<CardsFormProp> {
 		if (e) e.stopPropagation();
 	}
 
-	// toSave(e: UIEvent) {
-	// 	if (e) e.stopPropagation();
-
-	// 	let that = this;
-
-	// 	if (this.tier.validate(this.tier.rec))
-	// 		this.tier.saveRec(
-	// 			{ crud: CRUD.u,
-	// 			  disableForm: true },
-	// 			resp => {
-	// 				// NOTE should crud moved to tier, just like the pkval?
-	// 				if (that.state.crud === Protocol.CRUD.c) {
-	// 					that.state.crud = Protocol.CRUD.u;
-	// 				}
-	// 				that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
-	// 			} );
-	// 	else this.setState({});
-	// }
-
 	toCancel (e: React.UIEvent) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose(e);
 	}
-
-	// handleClose (e: UIEvent, reason: "backdropClick" | "escapeKeyDown") {
-	// 	e.stopPropagation();
-	// }
 
 	showConfirm(msg: string) {
 		let that = this;

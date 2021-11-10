@@ -1,13 +1,18 @@
-export const Error: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"root">>;
-export class ErrorComp extends CrudComp {
-    onDetails: any;
+import React from 'react';
+import { Comprops, CrudComp } from './crud';
+declare class ErrorComp extends CrudComp<Comprops> {
+    state: {
+        details: string;
+        info: string;
+        desc: string;
+        msg: any;
+        sysName: string;
+    };
+    constructor(props: any);
     /** A simulation of error triggering (used for error handling test). */
     toShowError(): void;
     toSubmit(): void;
+    render(): JSX.Element;
 }
-export namespace ErrorComp {
-    export { AnContext as contextType };
-}
-import React from "react";
-import { CrudComp } from "./crud";
-import { AnContext } from "./reactext";
+declare const Error: React.ComponentType<Pick<Comprops, keyof Comprops> & import("@material-ui/core").StyledComponentProps<"root">>;
+export { Error, ErrorComp };
