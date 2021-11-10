@@ -1,7 +1,25 @@
 Project for anclient.js. Previously name jclient which is deprecated for package
 name conflicting.
 
-## quick start (only ReactJS version currently)
+# About
+
+Anclient.js comes with two package, @anclient/anreact & @anclient/semantier.
+
+NOTE:
+
+@anclient/anreact versions greater than 0.3.25 is not working.
+
+Both need to be install separately.
+
+install:
+
+```
+    npm install @anclient/anreact @anclient/semantier
+```
+
+Both published with .d.ts file. Typescript modules are declared in index.d.ts.
+
+## quick start from source (only ReactJS version currently)
 
 To get kick started,
 

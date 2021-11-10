@@ -3,10 +3,10 @@
 class Protocol {
 	/**Globally set this client's options.
 	 * @param {object} options<br>
-	 * options.noNull no null value <br>
-	 * options.noBoolean no boolean value<br>
-	 * options.valOptions<br>
-	 * options.verbose logging verbose level
+	 * @param {boolean} options.noNull no null value <br>
+	 * @param {boolean} options.noBoolean no boolean value<br>
+	 * @param {object} options.valOptions<br>
+	 * @param {boolean} options.verbose logging verbose level
 	 * @return {Protocol} static Protocol class
 	 */
 	static opts(options) {
@@ -796,7 +796,9 @@ class UpdateReq extends AnsonBody {
 		let vals = null;
 		if ( Protocol.verbose >= 4
 			&& Array.isArray(rconsts) && rconsts.length === 0)
-			console.error('[4] Deleting empty ids?', mtabl, lcol);
+			// console.error('[4] Deleting empty ids?', mtabl, lcol);
+			// FIXME bug?
+			console.error('[4] Deleting empty ids?', this.mtabl, lcol);
 
 		else if (Array.isArray(rconsts))
 			rconsts.forEach( (v, i) =>{
@@ -1054,7 +1056,6 @@ class DatasetReq extends QueryReq {
 	 * TODO why not asking server for stree_t?
 	 * @param {string} t*/
 	checkt(t) {
-		// if (t !== stree_t.sqltree && t !== stree_t.retree && t !== stree_t.reforest) {
 		if (t !== undefined && !stree_t.hasOwnProperty(t)) {
 			console.warn(
 				"DatasetReq.t won't be understood by server:", t, "\n 't (a)' should be one of Protocol.stree_t's key.",
@@ -1076,16 +1077,16 @@ class DatasetierReq extends AnsonBody {
 	}
 }
 
-class DatasetierResp extends AnsonResp {
-	constructor(dsJson) {
-		super(dsJson);
-		this.type = "io.odysz.semantic.tier.DatasetierResp";
-	}
-}
+// class DatasetierResp extends AnsonResp {
+// 	constructor(dsJson) {
+// 		super(dsJson);
+// 		this.type = "io.odysz.semantic.tier.DatasetierResp";
+// 	}
+// }
 
 ///////////////// END //////////////////////////////////////////////////////////
 export {
-	Jregex, Protocol, AnsonMsg, AnsonBody, AnHeader,
+	Protocol, AnsonMsg, AnsonBody, AnHeader,
 	UserReq, AnSessionReq, QueryReq, UpdateReq, DeleteReq, InsertReq,
 	AnsonResp, DatasetReq, stree_t, DatasetierReq
 }

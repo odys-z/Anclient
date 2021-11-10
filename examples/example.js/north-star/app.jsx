@@ -1,21 +1,19 @@
-import $ from 'jquery';
+/**@deprecated */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Typography from '@material-ui/core/Typography';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient } from '@anclient/semantier'
+import { Protocol, SessionClient } from '@anclient/semantier-st'
 import { L, Langstrs,
 	Sys, SysComp,
 	AnContext, AnError, AnReactExt, jsample
 } from '@anclient/anreact';
-const { Domain, Roles, Orgs, Userst, JsampleTheme, MyInfCard } = jsample;
+const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
 
 import { StarPorts } from './common/port';
 
 import { Dashboard } from './views/n/dashboard';
 import { Indicators } from './views/n/indicators';
-import { MyClassTree } from './views/n/my-classes';
 import { Quizzes } from './views/n/quizzes';
 import { Polls } from './views/n/polls';
 import { MyStudents } from './views/n/my-students';
@@ -27,7 +25,9 @@ import { MyPolls } from './views/c/my-polls';
 import { MyDocs } from './views/c/my-docs';
 import { MyConnect } from './views/c/connect';
 
-/** The application main, context singleton and error handler */
+/**@deprecated
+ * The application main, context singleton and error handler
+ */
 class App extends React.Component {
 	state = {
 		anClient: undefined, // SessionClient
@@ -70,7 +70,7 @@ class App extends React.Component {
 			});
 		}
 
-		// extending CRUD pages
+		// extending pages
 		SysComp.extendLinks( [
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
@@ -96,7 +96,7 @@ class App extends React.Component {
 		this.state.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
-			nextAction: c === Protocol.exSession ? 're-login' : 'ignore'});
+			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
 	onErrorClose() {
@@ -162,6 +162,7 @@ class App extends React.Component {
 					sys='Emotion Regulation' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					hrefDoc={'docs/index.html'}
+					welcome={welcomePage}
 					onLogout={this.logout} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
 			</AnContext.Provider>
@@ -194,7 +195,7 @@ class App extends React.Component {
 	 */
 	static bindHtml(elem, opts = {}) {
 		let portal = opts.portal ? opts.portal : 'index.html';
-		Langstrs.load('/res-vol/lang.json');
+		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, opts, json) {

@@ -7,7 +7,7 @@ import { Search, Replay } from '@material-ui/icons';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
-	import { AnContext } from '../reactext.jsx';
+	import { AnContext } from '../reactext';
 	import { CrudComp } from '../crud'
 
 const styles = (theme) => ( {
@@ -265,11 +265,12 @@ AnQuerystComp.propTypes = {
 	/* TODO: DOCS
 	 * Design Notes:
 	 * All common widgets need this check, but main CRUD page's uri is been set
-	 * by SysComp.
+	 * by SysComp. Also check CrudComp's comments.
 	 */
 	uri: PropTypes.string.isRequired,
 	conds: PropTypes.array.isRequired,
 	onSearch: PropTypes.func.isRequired,
+	onLoaded: PropTypes.func,
 	buttonStyle: PropTypes.oneOf(["norm", "dense"])
 };
 

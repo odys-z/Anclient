@@ -104,7 +104,8 @@ class MyDocsComp extends CrudCompW {
 			let that = this;
 			let cond = {};
 			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
+			// this.tier.record(cond, (cols, rows, fkOpts) => {
+			this.tier.record(cond, (cols, rows) => {
 				that.downloadLink.current.download = rows[0].docName;
 				that.downloadLink.current.href = utils.urlOfdata(rows[0].mime, rows[0].uri64);
 				that.downloadLink.current.click();

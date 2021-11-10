@@ -1,4 +1,3 @@
-
 import { Protocol, InsertReq, UpdateReq, DeleteReq, stree_t } from './protocol';
 
 const { CRUD } = Protocol;
@@ -16,11 +15,36 @@ export class Semantier {
 		minLen : { border: "1px solid red" },
 	}
 
-	_cols = undefined;
-	_fields = undefined;
-	uri = undefined;
+	/** list's columns */
+	_cols = [];
+
+	/** client function / CRUD identity */
+	uri = '';
+
+	/** maintable's record fields */
+	_fields = [];
+
+	/** optional main table's pk */
+	pk = '';
+
+	/** current crud */
+	crud = CRUD.r;
+
+	/** current list's data */
+	rows = [];
+
+	/** current record */
+	rec = {};
+	/** current pk value */
 	pkval = undefined;
 
+	/** current relations */
+	rels = [];
+
+	/**
+	 *
+	 * @param {uri: string} props
+	 */
 	constructor(props) {
 		if (!props || !props.uri)
 			throw Error("uri is required!");
@@ -28,13 +52,18 @@ export class Semantier {
 		this.uri = props.uri;
 	}
 
+	/**
+	 *
+	 * @param {client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx } context
+	 */
 	setContext(context) {
 		if (!context || !context.anClient)
-			console.error(this, "Setup semantic tier without React context?");
+			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
 		this.client = context.anClient;
 		this.anReact = context.anReact;
 		this.errCtx = context.error;
+		return this;
 	}
 
 	validate(rec, fields) {
@@ -121,7 +150,10 @@ export class Semantier {
 	/** Load relationships */
 	relations(opts, onOk) {
 		if (!this.anReact)
-			this.anReact = new AnReact();
+			// this.anReact = new AnReact();
+			// bug checked out by types, and not tested!
+			// this line ?
+			throw Error ("AnReact here is needed!");
 
 		let that = this;
 
@@ -138,6 +170,7 @@ export class Semantier {
 
 		let ds = {uri : this.uri, sk, t, sqlArgs};
 
+		// FIXME bug stree is about React?
 		this.anReact.stree({ uri: this.uri, sk, t, sqlArgs,
 			onOk: (resp) => {
 				that.rels = resp.Body().forest;

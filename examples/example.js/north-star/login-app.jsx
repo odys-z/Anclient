@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -39,6 +38,7 @@ class LoginApp extends React.Component {
 	}
 
 	onErrorClose() {
+		this.setState({hasError: false});
 	}
 
 	onLogin(client) {
@@ -46,7 +46,7 @@ class LoginApp extends React.Component {
 		if (this.props.iparent) {
 			let mainpage = client.ssInf.home || this.props.ihome;
 			if (!mainpage)
-				console.error('Login succeed, but no home page be found.');
+				console.error('Login succeed, but no home page is found.');
 			else {
 				this.props.iparent.location = `${mainpage}?serv=${this.state.servId}`;
 				this.setState({anClient: client});
@@ -83,7 +83,7 @@ class LoginApp extends React.Component {
 	 * @param {Window} [opts.parent=undefined] parent window if for redirecting target
 	 */
 	static bindHtml(elem, opts = {}) {
-		Langstrs.load('/res-vol/lang.json');
+		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReact.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem, opts, json) {

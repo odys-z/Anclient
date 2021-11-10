@@ -45,8 +45,8 @@ class AnTablistComp extends React.Component {
 		super(props)
 
 		let {sizeOptions, selectedIds} = props;
-		this.state.selected = selectedIds.Ids;
-		if (this.state.selected.constructor.name !== 'Set')
+		this.state.selected = selectedIds.Ids || selectedIds.ids;
+		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selectedIds.Ids must be a set");
 		if (sizeOptions)
 			this.state.sizeOptions = sizeOptions;
@@ -94,7 +94,7 @@ class AnTablistComp extends React.Component {
 	};
 
 	toSelectAll (event) {
-		let ids = this.props.selectedIds.Ids;
+		let ids = this.props.selectedIds.Ids || this.props.selectedIds.ids;
 		if (event.target.checked) {
 			this.props.rows.forEach((r) => ids.add(r[this.props.pk]));
 			this.updateSelectd(ids);
@@ -134,14 +134,10 @@ class AnTablistComp extends React.Component {
 		// 					|| this.props.checkbox && x !== 0) // first columen as checkbox
 		return columns.filter( (v, x) => toBool(v.hide) ? false
 							: !(this.props.checkbox && x === 0)) // first columen as checkbox
-			// .map( (colObj, index) =>
-			// 	<TableCell key={index}>
-			// 		{colObj.text || colObj.field}
-			// 	</TableCell>);
-
 			.map( (colObj, index) =>
 				<TableCell key={index}>
-					{colObj.text || colObj.field}
+					{/* {colObj.text || colObj.field} */}
+					{colObj.label || colObj.text || colObj.field}
 				</TableCell>);
 	}
 
@@ -161,8 +157,6 @@ class AnTablistComp extends React.Component {
 					selected={isItemSelected}
 					onClick= { (event) => {
 						this.handleClick(event, pkv);
-						// if (typeof this.props.onSelectChange === 'function')
-						// 	this.props.onSelectChange(this.state.selected, pkv);
 					} }
 					role="checkbox" aria-checked={isItemSelected}
 				>
@@ -175,7 +169,7 @@ class AnTablistComp extends React.Component {
 						</TableCell>)
 					}
 					{columns.filter( (v, x) => !toBool(v.hide)
-									|| this.props.checkbox && x !== 0) // first columen as checkbox
+									&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
 							.map( (colObj, x) => {
 								if (colObj.field === undefined)
 									throw Error("Column field is required: " + JSON.stringify(colObj));
@@ -227,7 +221,8 @@ class AnTablistComp extends React.Component {
 }
 AnTablistComp.propTypes = {
 	pk: PropTypes.string.isRequired,
-	selectedIds: PropTypes.object.isRequired
+	selectedIds: PropTypes.object.isRequired,
+	onSelectChange: PropTypes.func
 };
 
 const AnTablist = withStyles(styles)(AnTablistComp);
