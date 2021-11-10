@@ -19,6 +19,13 @@ export type Page = {
 	style: string,
 
     reload: boolean // FIXME how to get webpack watch results?
+
+    /**not working!
+     * Looks like Live Preview also dosn't handling close command.
+     * https://github.dev/microsoft/vscode-livepreview
+     * BrowserPreview#handleWebviewMessage()
+     */
+	devtool: boolean;
 };
 
 /**A server helper manage one server:port */
