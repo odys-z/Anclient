@@ -115,7 +115,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			this.props.onPageInf (this.state.page, this.state.size);
 	}
 
-	changeSize (event, s) {
+	changeSize (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
 		let size = parseInt(event.target.value, 10);
 		this.setState({size});
 		if (typeof this.props.onPageInf  === 'function')
@@ -141,8 +141,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 
 	tr(rows = [], columns = []) {
 		return rows.map(row => {
-			let pkv = typeof this.props.pk === 'string' ? row[this.props.pk]
-					: row[this.props.pk.field];
+			let pkv = row[this.props.pk];
 
 			if (this.props.checkbox && toBool(row.checked)) {
 				this.state.selected.add(pkv)

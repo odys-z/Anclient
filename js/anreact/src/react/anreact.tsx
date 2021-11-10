@@ -19,7 +19,7 @@ export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: 
  * Component's visual options, e.g. options for field formatters.
  */
 export interface CompOpts {
-	calsses: ClassNames;
+	classes: ClassNames;
 	media: Media;
 }
 

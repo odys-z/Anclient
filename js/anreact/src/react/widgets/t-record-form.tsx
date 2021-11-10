@@ -13,10 +13,10 @@ import { L } from '../../utils/langstr';
 	import { Comprops, CrudCompW } from '../crud';
 	import { DatasetCombo, TierComboField } from './dataset-combo';
 	import { Semantier, Tierec } from '@anclient/semantier-st';
-import { ClassNames, Media } from '../anreact';
+import { ClassNames, invalidStyles, Media } from '../anreact';
 
 const styles = (theme) => (Object.assign(
-	Semantier.invalidStyles,
+	invalidStyles,
 	{ root: {
 		display: 'flex',
 		width: '100%',
@@ -155,7 +155,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			return (<>{f.formatter(f, rec)}</>);
 		}
 		else if (f.type === 'formatter' || f.fieldFormatter) {
-			return (<>{f.fieldFormatter(rec, f)}</>);
+			return (<>{f.fieldFormatter(rec, f, {classes, media})}</>);
 		}
 		else {
 			let type = 'text';

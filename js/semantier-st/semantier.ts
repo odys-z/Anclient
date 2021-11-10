@@ -29,7 +29,7 @@ export type AnFieldValidator = ((
  * F: field element type, e.g. JSX.Element
  * FO: options, e.g. {classes?: ClassNames, media?: Media}
  */
-export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, opts: FO) => F);
+export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, opts?: FO) => F);
 
 export type AnFieldValidation = {
 	[k in "notNull" | "minLen" | "len"]: number | string | object
@@ -60,7 +60,9 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     label: string;
 
     formatter?: AnElemFormatter;
-	fieldFormatter: AnFieldFormatter<F, FO>;
+    fieldFormatter?: AnFieldFormatter<F, FO>;
+
+    valid?: boolean;
 
     /**input type / form type, not db type */
     type?: string;
@@ -105,14 +107,6 @@ export interface Semantext {
  * Base class of semantic tier
  */
 export class Semantier {
-    static invalidStyles = {
-        ok: {},
-        anyErr : { border: "1px solid red" },
-        notNull: { backgroundColor: '#ff9800b0' },
-        maxLen : { border: "1px solid red" },
-        minLen : { border: "1px solid red" },
-    } as {[s in InvalidClassNames]: CSS.Properties<number | string>  }
-
     /**
      *
      * @param {uri: string} props
@@ -171,7 +165,7 @@ export class Semantier {
 
     disableValidate: any;
 
-    validate<F, FO>(rec?: {}, fields?: Array<AnlistColAttrs<F, FO>>): boolean {
+    validate(rec?: {}, fields?: Array<TierCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);

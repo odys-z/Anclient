@@ -156,7 +156,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 				onOk: (resp) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 						if (!rows || rows.length !== 1)
-							console.error("Query reults not correct. One and only one row is needed.", row, queryReq)
+							console.error("Query reults not correct. One and only one row is needed.", rows, queryReq)
 						that.setState({record: rows[0]});
 					}
 				},
@@ -173,11 +173,11 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 	    this.state.fields.forEach( (f, x) => {
 			f.valid = validField(f, {validator: (v) => !!v});
 			f.style = f.valid ? undefined : invalid;
-			valid &= f.valid;
+			valid &&= f.valid;
 	    } );
 		return valid;
 
-		function validField (f, valider) {
+		function validField (f, valider): boolean {
 			let v = that.state.record[f.field];
 
 			if (f.type === 'int')
@@ -275,8 +275,8 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		that.setState({dirty: false});
 	}
 
-	getField(f, rec) {
-		let {isSm} = super.media;
+	getField(f, rec, media) {
+		let {isSm} = media;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
 			let that = this;
@@ -313,24 +313,24 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		}
 	}
 
-	formFields(rec: Tierec, classes: ClassNames, media?: Media) {
+	formFields(rec: Tierec, opts?: {classes: ClassNames, media?: Media}) {
 		let fs = [];
 		let c = this.state.crud === CRUD.c;
-		const isSm = toBool(media?.isMd);
+		const isSm = toBool(opts?.media?.isMd);
 
 		this.state.fields.forEach( (f, i) => {
 		  if (f.visible === false) {
 			fs.push(
 				<Grid item key={`${f.field}.${f.label}`}
 					sm={f.grid?.sm ? f.grid.sm : 6}
-					{...f.grid} className={classes.labelText} >
-				  <Box className={classes.rowBox} >
+					{...f.grid} className={opts?.classes.labelText} >
+				  <Box className={opts?.classes.rowBox} >
 					{!isSm && (
-					  <Typography className={classes.formLabel} >
+					  <Typography className={opts?.classes.formLabel} >
 						{L(f.label)}
 					  </Typography>
 					)}
-					{this.getField(f, rec)}
+					{this.getField(f, rec, opts)}
 				  </Box>
 				</Grid> );
 		} } );
@@ -362,7 +362,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 				{this.state.dirty ? <JsampleIcons.Star color='secondary'/> : ''}
 			  </DialogTitle>
 			  <Grid container className={classes.content} direction='row'>
-				{this.formFields(rec, classes, media)}
+				{this.formFields(rec, {classes, media})}
 			  </Grid>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
