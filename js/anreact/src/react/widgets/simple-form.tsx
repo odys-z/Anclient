@@ -281,10 +281,6 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		if (f.type === 'enum' || f.type === 'cbb') {
 			let that = this;
 			return (<DatasetCombo uri={this.props.uri}
-				// options={[
-				// 	{n: L('Single Opt'), v: 's'},
-				// 	{n: L('Multiple'), v: 'm'},
-				// 	{n: L('Text'), v: 't'} ]}
 				options={f.options} val={rec[f.field]}
 				label={f.label} style={f.style}
 				onSelect={ (v) => {
@@ -379,11 +375,6 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 	}
 }
 SimpleFormComp.contextType = AnContext;
-
-// SimpleFormComp.propTypes = {
-// 	uri: PropTypes.string.isRequired,
-// 	mtabl: PropTypes.string.isRequired
-// };
 
 const SimpleForm = withWidth()(withStyles(styles)(SimpleFormComp));
 export { SimpleForm, SimpleFormComp };

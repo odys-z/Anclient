@@ -40,7 +40,7 @@ export interface AnRow extends JSX.Element { }
 //  */
 // export type AnFieldFormatter = ((rec: Tierec, col: TierCol, classes?: ClassNames, media?: Media) => JSX.Element);
 
-/**TODO (list) row formatter
+/**(list) row formatter
  * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
  */
 export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> AnRow);

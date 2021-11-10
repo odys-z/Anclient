@@ -17,10 +17,9 @@ import { L } from '../../utils/langstr';
 	import { JsampleIcons } from '../../jsample/styles';
 
 import { SimpleForm } from './simple-form';
-import { AnReact, AnReactExt, ClassNames, Media } from "../anreact";
+import { AnReactExt, ClassNames, Media } from "../anreact";
 import { PropTypes } from "@material-ui/core";
 import { CRUD } from "@anclient/semantier-st/protocol";
-import { CSSProperties } from "@emotion/serialize";
 
 const styles = (theme) => ({
   root: {
@@ -193,17 +192,6 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 	}
 }
 TreeCardComp.contextType = AnContext;
-
-/*
-TreeCardComp.propTypes = {
-	media: PropTypes.object.isRequired,
-	leadingIcons: PropTypes.func.isRequired,
-	tnode: PropTypes.object.isRequired,
-	parent: PropTypes.object.isRequired,
-	columns: PropTypes.array.isRequired,
-	toEdit: PropTypes.func.isRequired
-};
-*/
 
 const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
 export { TreeCard, TreeCardComp }
@@ -494,10 +482,6 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		function icon(icon) {
 			return AnTreeIcons[icon || "deflt"];
 		}
-
-		// function align(css: CSSStyleDeclaration) {
-		// 	return css.align ? css.align : 'center';
-		// }
 	}
 
 	render() {
@@ -515,17 +499,6 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 	}
 }
 AnTreeditorComp.contextType = AnContext;
-
-/*
-AnTreeditorComp.propTypes = {
-	uri: PropTypes.string.isRequired,
-	mtabl: PropTypes.string.isRequired,
-	columns: PropTypes.array.isRequired,
-	fields: PropTypes.array.isRequired,
-	pk: PropTypes.object.isRequired,
-	isMidNode: PropTypes.func
-};
-*/
 
 const AnTreeditor = withWidth()(withStyles(styles)(AnTreeditorComp));
 export { AnTreeditor, AnTreeditorComp, TreecardProps }

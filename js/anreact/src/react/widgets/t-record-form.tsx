@@ -43,42 +43,6 @@ export interface RecordFormProps extends Comprops {
     enableValidate: boolean;
 };
 
-// export interface AnFormField extends TierCol {
-//     funcId: string;
-//     crud: any;
-//     mtabl: string;
-//     fields: ({
-//         type: string; field: string; label: string; hide: number; validator: {
-//             len: number; notNull?: undefined; // that.rec = rows && rows[0] ? rows[0] : {};
-//             min?: undefined;
-//         }; values?: undefined; props?: undefined;
-//     } | {
-//         type: string; field: string; // in case rec is already loaded by parent component
-//         // in case rec is already loaded by parent component
-//         label: string; validator: { len: number; notNull: boolean; min?: undefined; }; hide?: undefined; values?: undefined; props?: undefined;
-//     } | {
-//         type: string; field: string; label: string; validator: {
-//             min: number; len?: undefined; notNull?: undefined; // that.rec = rows && rows[0] ? rows[0] : {};
-//         }; hide?: undefined; values?: undefined; props?: undefined;
-//     } | {
-//         type: string; field: string; label: string; values: { n: string; v: string; }[]; validator: {
-//             notNull: boolean; // that.rec = rows && rows[0] ? rows[0] : {};
-//             len?: undefined; min?: undefined;
-//         }; // that.rec = rows && rows[0] ? rows[0] : {};
-//         hide?: undefined; props?: undefined;
-//     } | {
-//         type: string; field: string; label: string; validator: {
-//             len: number; notNull?: undefined; // that.rec = rows && rows[0] ? rows[0] : {};
-//             min?: undefined;
-//         }; props: { sm: number; lg: number; }; hide?: undefined; values?: undefined;
-//     })[];
-//     pk: { type: string; field: string; label: string; hide: number; validator: { len: number; }; };
-//     pkval: any;
-//     parent: any;
-//     parentId: any;
-// 	fieldFormatter?: AnFieldFormatter;
-// };
-
 /**
  * A Tiered record component is designed for UI record layout rendering, handling
  * user action (change text, etc.) in a levle-up style. It's parent's responsibilty
@@ -217,13 +181,6 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			: <></>; // have to wait until parent loaded data
 	}
 }
-
-// TRecordFormComp.propTypes = {
-// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-// 	tier: PropTypes.object.isRequired,
-// 	dense: PropTypes.bool,
-// 	enableValidate: PropTypes.bool,
-// };
 
 const TRecordForm = withWidth()(withStyles(styles)(TRecordFormComp));
 export { TRecordForm, TRecordFormComp }

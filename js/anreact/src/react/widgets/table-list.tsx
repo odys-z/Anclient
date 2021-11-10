@@ -128,13 +128,10 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	 * @returns [<TableCell>,...]
 	 */
 	th(columns = []) {
-		// return columns.filter( (v, x) => !toBool(v.hide)
-		// 					|| this.props.checkbox && x !== 0) // first columen as checkbox
 		return columns.filter( (v, x) => toBool(v.hide) ? false
 							: !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
-					{/* {colObj.text || colObj.field} */}
 					{colObj.label || colObj.text || colObj.field}
 				</TableCell>);
 	}
