@@ -113,9 +113,9 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 					} }
 				/>);
 		}
-		else if (f.type === 'formatter' || f.formatter) {
+		else if (f.type === 'formatter' || f.fieldFormatter) {
 			return (
-				<>{f.formatter(rec)}</>
+				<>{f.fieldFormatter(rec)}</>
 			);
 		}
 		else {

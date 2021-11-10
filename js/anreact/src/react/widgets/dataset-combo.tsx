@@ -4,23 +4,27 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete, { AutocompleteClassKey } from '@material-ui/lab/Autocomplete';
-import { InvalidClassNames, Semantier } from '@anclient/semantier-st';
+import { AnlistColAttrs, InvalidClassNames } from '@anclient/semantier-st';
 
 import { AnConst } from '../../utils/consts';
-import { AnContext } from '../reactext';
+import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud';
-import { AnFormField } from '../../an-components';
+import { CSSProperties } from '@material-ui/styles';
+import { CompOpts, invalidStyles } from '../anreact';
 
 /**E.g. form's combobox field declaration */
-export interface TierComboField extends AnFormField {
+export interface TierComboField extends AnlistColAttrs<JSX.Element, CompOpts> {
+	type: string;
     className: undefined | "root" | InvalidClassNames | AutocompleteClassKey;
 	nv: {n: string; v: string};
 	sk: string;
-	cbbStyle: {};
+	// cbbStyle: {};
+
+    options?: [];
 }
 
 const styles = (theme) => (Object.assign(
-	Semantier.invalidStyles, {
+	invalidStyles, {
 		root: {
 		},
 	} )
@@ -53,12 +57,13 @@ class DatasetComboComp extends CrudCompW<Comprops> {
 	}
 
 	componentDidMount() {
-		if (!this.context || !this.context.anReact)
+		let ctx = this.context as unknown as AnContextType;
+		if (!ctx?.anReact)
 			throw new Error('DatasetCombo can\'t bind controls without AnContext initialized with AnReact.');
 
 		if (this.props.sk ) {
 			let that = this;
-			this.context.anReact.ds2cbbOptions({
+			ctx.anReact.ds2cbbOptions({
 					uri: this.props.uri,
 					sk: this.props.sk,
 					// user uses this, e.g. name and value to access data
@@ -66,7 +71,7 @@ class DatasetComboComp extends CrudCompW<Comprops> {
 					cond: this.state.combo,
 					onDone: () => that.setState({})
 				},
-				this.context.error, this);
+				ctx.error, this);
 		}
 	}
 
@@ -140,10 +145,6 @@ class DatasetComboComp extends CrudCompW<Comprops> {
 }
 DatasetComboComp.contextType = AnContext;
 
-// DatasetComboComp.propTypes = {
-// 	uri: PropTypes.string,
-// 	val: PropTypes.object, // TODO doc: e.g. {n: f.field, v: rec[f.field]}, see TRecordFormComp
-// };
-
+const testp = {} as CSSProperties
 const DatasetCombo = withWidth()(withStyles(styles)(DatasetComboComp));
 export { DatasetCombo, DatasetComboComp }

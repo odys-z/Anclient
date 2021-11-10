@@ -3,24 +3,44 @@ import $ from 'jquery';
 import { stree_t, Tierec, TierCol,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD
+	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
 import { toBool } from '../utils/helpers';
-import { ClassNames, Comprops, CrudComp } from './crud';
+import { Comprops, CrudComp } from './crud';
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
+
+export interface ClassNames {[c: string]: string};
 
 export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
+
+/**
+ * Component's visual options, e.g. options for field formatters.
+ */
+export interface CompOpts {
+	classes: ClassNames;
+	media: Media;
+}
+
+export const invalidStyles = {
+	ok: {},
+	anyErr : { border: "1px solid red" },
+	notNull: { backgroundColor: '#ff9800b0' },
+	maxLen : { border: "1px solid red" },
+	minLen : { border: "1px solid red" },
+} as {[n in InvalidClassNames]: CSSProperties};
+
 
 /**JSX.Element like row formatter results */
 export interface AnRow extends JSX.Element { }
 
-/**(Form) field formatter
- * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
- */
-export type AnFieldFormatter = ((rec: Tierec, col: TierCol, classes?: ClassNames, media?: Media)=> JSX.Element);
+// /**(Form) field formatter
+//  * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
+//  */
+// export type AnFieldFormatter = ((rec: Tierec, col: TierCol, classes?: ClassNames, media?: Media) => JSX.Element);
 
-/**TODO (list) row formatter
+/**(list) row formatter
  * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
  */
 export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> AnRow);
@@ -30,7 +50,7 @@ export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, med
  * in an An-React application (which handle error in top level).
  */
 export class AnReact {
-    
+
     client: SessionClient;
     ssInf: any;
 	errCtx: ErrorCtx;
@@ -46,18 +66,18 @@ export class AnReact {
 	/** @deprecated new tiered way don't need any more.
 	 * set component.state with request's respons.rs, or call req.onLoad.
 	 */
-	bindTablist(req, comp: CrudComp<any>, errCtx: ErrorCtx) {
+	bindTablist(req: AnsonMsg<AnsonBody>, comp: CrudComp<any>, errCtx: ErrorCtx) {
 		this.client.commit(req, (qrsp) => {
-			if (req.onLoad)
-				req.onLoad(qrsp);
-			else if (req.onOk)
-				req.onLoad(qrsp);
-			else {
+			// if (req.onLoad)
+			// 	req.onLoad(qrsp);
+			// else if (req.onOk)
+			// 	req.onLoad(qrsp);
+			// else {
 				let rs = qrsp.Body().Rs();
 				let {rows} = AnsonResp.rs2arr( rs );
 				// comp.pageInf?.total! = rs.total;
 				comp.setState({rows});
-			}
+			// }
 		}, errCtx );
 	}
 
@@ -70,10 +90,10 @@ export class AnReact {
 	 * @param {React.Component} compont
 	 * @return {AnReact} this
 	 * */
-	bindStateRec(qmsg, errCtx, compont) {
+	bindStateRec(qmsg: { onOk?: any; onLoad?: any; req?: any; }, errCtx: ErrorCtx, compont: { setState: (arg0: { record: {}; }) => void; }) {
 		let onload = qmsg.onOk || qmsg.onLoad ||
 			// try figure out the fields
-			function (resp) {
+			function (resp: { Body: () => { (): any; new(): any; Rs: { (): AnResultset; new(): any; }; }; }) {
 				if (compont) {
 					let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 					if (rows && rows.length > 1)
@@ -87,22 +107,13 @@ export class AnReact {
 			};
 
 		let {req} = qmsg;
-		// this.client.an.post(req, onload, { onError: (c, resp) => {
-		// 	if (errCtx) {
-		// 		errCtx.hasError = true;
-		// 		errCtx.code = c;
-		// 		errCtx.msg = resp.Body().msg();
-		// 		errCtx.onError(true);
-		// 	}
-		// 	else console.error(c, resp) },
-		// });
 		this.client.an.post(req, onload, errCtx);
 		return this;
 	}
 
 	/**TODO move this to a semantics handler, e.g. shFK.
 	 * Generate an insert request according to tree/forest checked items.
-	 * @param {object} forest of node, the forest / tree data, tree node: {id, node}
+	 * @param {object} forest forest of tree nodes, the forest / tree data, tree node: {id, node}
 	 * @param {object} opts options
 	 * @param {object} opts.check checking column name
 	 * @param {object} opts.columns, column's value to be inserted
@@ -110,7 +121,7 @@ export class AnReact {
 	 * @param {object} opts.reshape set middle tree node while traverse.
 	 * @return {InsertReq} subclass of AnsonBody
 	 */
-	inserTreeChecked (forest, opts) {
+	inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: any; check: string; reshape: boolean; }) {
 		let {table, columnMap, check, reshape} = opts;
 
 		// FIXME shouldn't we map this at server side?
@@ -131,9 +142,9 @@ export class AnReact {
 		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
 		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
 		*/
-		function collectTree(forest, rows) {
+		function collectTree(forest: AnTreeNode[], rows: Array<{name: string, value: string}[]>) {
 			let cnt = 0;
-			forest.forEach( (tree, i) => {
+			forest.forEach( (tree: AnTreeNode, _i: number) => {
 				if (tree && tree.node) {
 					if (tree.node.children && tree.node.children.length > 0) {
 						let childCnt = collectTree(tree.node.children, rows);
@@ -152,13 +163,16 @@ export class AnReact {
 			return cnt;
 		}
 
-		/**convert to [name-value, ...] as a row, e.g.
+		/**convert to [name-value, ...] as a row (Array<{name, value}>), e.g.
 		 * [ { "name": "funcId", "value": "sys-domain" },
 		 *   { "name": "roleId", "value": "r003" } ]
 		 */
-		function toNvRow(node, dbcols, colMap) {
+		function toNvRow(node: AnTreeNode["node"],
+				  dbcols: string[], colMap: { [x: string]: any; })
+				: Array<{name: string, value: string}> {
+
 			let r = [];
-			dbcols.forEach( (col, j) => {
+			dbcols.forEach( (col: string, j: number) => {
 				let mapto = colMap[col];
 				if (node.hasOwnProperty(mapto))
 					// e.g. roleName: 'text'
@@ -195,7 +209,7 @@ export class AnReact {
 					/** path to json config file */
 					jsonUrl?: string; },
 					onJsonServ: (elem: string, opts: object, json: object) => any) {
-		// this.state.servId = serv;
+
 		if (!opts.serv) opts.serv = 'host';
 		if (!opts.home) opts.home = 'main.html';
 
@@ -204,14 +218,14 @@ export class AnReact {
 				dataType: "json",
 				url: opts.jsonUrl || 'private/host.json',
 			})
-			.done( (json) => onJsonServ(elem, opts, json) )
-			.fail( (e) => {
+			.done( (json: object) => onJsonServ(elem, opts, json) )
+			.fail( (e: any) => {
 				$.ajax({
 					dataType: "json",
 					url: 'github.json',
 				})
-				.done((json) => onJsonServ(elem, opts, json))
-				.fail( (e) => { $(e.responseText).appendTo($('#' + elem)) } )
+				.done((json: object) => onJsonServ(elem, opts, json))
+				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )
 			} )
 		}
 	}
@@ -264,17 +278,7 @@ export class AnReactExt extends AnReact {
 			.TA(t || stree_t.query);
 		let jreq = this.client.userReq(uri, port, reqbody, undefined);
 
-		this.client.an.post(jreq, onLoad, this.errCtx
-		// 	(c, resp) => {
-		// 	if (errCtx) {
-		// 		// errCtx.hasError = true;
-		// 		// errCtx.code = c;
-		// 		errCtx.msg = resp.Body().msg();
-		// 		errCtx.onError(c, resp);
-		// 	}
-		// 	else console.error(c, resp);
-		// }
-		);
+		this.client.an.post(jreq, onLoad, this.errCtx);
 		return this;
 	}
 
@@ -295,8 +299,6 @@ export class AnReactExt extends AnReact {
 		if (!uri)
 			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
 
-		opts.port = 'stree';
-
 		if (opts.sk && !opts.t)
 			opts.a = stree_t.sqltree;
 
@@ -308,11 +310,7 @@ export class AnReactExt extends AnReact {
 		this.dataset(opts, onload);
 	}
 
-	// errCtx(opts: DatasetOpts, onload: OnLoadOk | ((resp: AnsonMsg<AnDatasetResp>) => void), errCtx: any) {
-	// 	throw new Error('Method not implemented.');
-	// }
-
-	rebuildTree(opts, onOk) {
+	rebuildTree(opts: DatasetOpts, onOk: (resp: any) => void) {
 		let {uri, rootId, sk} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
@@ -320,12 +318,14 @@ export class AnReactExt extends AnReact {
 		if (!rootId)
 			console.log('Rebuild tree without rootId ?');
 
-		// opts.port = 'stree';
+		opts.port = 'stree';
 
-		if (opts.sk && !opts.t)
+		if (opts.sk && !opts.t) {
+			console.error("Let's remove this lagacy of without type checking", opts.t, stree_t.retree);
 			opts.t = stree_t.retree;
+		}
 
-		let onload = onOk || function (resp) {
+		let onload = onOk || function (resp: any) {
 			console.log("Rebuilt successfully: ", resp);
 		}
 
@@ -381,9 +381,6 @@ export class AnReactExt extends AnReact {
 
 				cond.loading = false;
 				cond.clean = true;
-
-				// if (compont)
-				// 	compont.setState({});
 
 				if (onDone)
 					onDone(cond);

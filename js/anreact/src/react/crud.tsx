@@ -4,12 +4,10 @@ import { StandardProps, withStyles } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
-import { Media } from './anreact';
+import { Media, ClassNames } from './anreact';
 import { CRUD } from '@anclient/semantier-st';
 
-export interface ClassNames {[c: string]: string};
-
-export interface Comprops extends StandardProps<any, string> {
+interface Comprops extends StandardProps<any, string> {
 	/**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
 	readonly uri?: string;
 	/**The matching url in React.Route */
@@ -195,7 +193,8 @@ class DetailFormW<T extends Comprops> extends CrudCompW<T> {
 DetailFormW.contextType = AnContext;
 
 export {
-	CrudComp, CrudCompW, DetailFormW,
+	Comprops, CrudComp,
+	CrudCompW, DetailFormW,
 	Home, HomeComp,
 	Domain, DomainComp,
 	Roles, RolesComp,

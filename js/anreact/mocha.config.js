@@ -3,22 +3,21 @@
  */
 var webpack = require('webpack');
 var nodeExternals = require('webpack-node-externals');
-var WebpackShellPlugin = require('webpack-shell-plugin');
-
 
 var config = {
   mode: 'development',
-  entry: './test/all-jsunits.ts',
+  entry: './test/all-jsunits.js',
   output: {
     filename: 'testBundle.js'
   },
   target: 'node',
   externals: [nodeExternals()],
 
+
   plugins: [ ],
 
   resolve: {
-	extensions: ['*', '.ts', '.js', '.tsx', '.jsx']
+	extensions: ['*', '.ts', 'tsx', 'jsx', '.js']
   },
 
   module: {
@@ -28,20 +27,17 @@ var config = {
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
-		{ test: /\.tsx$/,
+		{ test: /\.tsx?$/,
 		  loader : 'babel-loader',
 		  options: { presets: [
 				'@babel/preset-react',
 				'@babel/preset-typescript',
 				'@emotion/babel-preset-css-prop',
 				'@babel/preset-env' ] }
-		},
- 		{ test: /\.css$/,
-		  use: [ 'style-loader',
-				'css-loader',
-			  ] }
+		}
 	]
   }
 };
+
 
 module.exports = config;
