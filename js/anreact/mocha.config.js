@@ -1,7 +1,7 @@
 /** Configuration for test with Mocha.
  * npm test
  */
-import * as webpack from 'webpack';
+// import * as webpack from 'webpack';
 
 var config = {
   mode: 'development',
@@ -35,5 +35,5 @@ var config = {
 	] }
 };
 
-// module.exports = config;
-export default config;
+module.exports = config;
+// export default config;

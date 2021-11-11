@@ -6,7 +6,7 @@ const __dirname = path.resolve();
 // #60 https://github.com/jshttp/mime-types/issues/69
 // #77 https://github.com/jshttp/mime-types/issues/77
 // hack it?
-import nodeExternals from 'webpack-node-externals';
+// import nodeExternals from 'webpack-node-externals';
 
 var v = 'development';
 var version = "1.0.0";
@@ -26,12 +26,13 @@ export default {
       libraryTarget: 'umd'
     },
 
-    externals: Object.assign(
-      nodeExternals(), {
+    // externals: Object.assign(
+    //   nodeExternals(), {
+    externals: {
       'react': 'react',
       'react-dom' : 'reactDOM',
       "@material-ui/core": "MaterialUI",
-    }),
+    },
 
 	plugins: [
 	],
