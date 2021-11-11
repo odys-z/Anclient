@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AnContext, SysComp } from "@anclient/anreact";
+import { AnContext, Comprops, SysComp } from "@anclient/anreact";
 import { AnlistColAttrs, Tierec, QueryConditions } from "@anclient/semantier-st";
 import { Breakpoint } from "@material-ui/core/styles/createBreakpoints";
 
@@ -21,25 +21,25 @@ export interface AnMUIClasses {
 export interface Northprops {
     iportal?: string;
     servId: string;
-    servs?: object;
+    servs?: {host?: string, [h: string]: string};
 
     iwindow?: typeof window;
     iparent?: typeof parent;
     ilocation?: string;
 }
 
-export interface Comprops {
-    /**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
-	uri: string;
-    /**The matching url in React.Route */
-	match?: {path: string};
+// export interface Comprops {
+//     /**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
+// 	uri: string;
+//     /**The matching url in React.Route */
+// 	match?: {path: string};
 
-	u?: boolean;
-	c?: boolean;
-    readonly tier: any;
-    readonly crud?: string;
-    readonly width?: Breakpoint;
-};
+// 	u?: boolean;
+// 	c?: boolean;
+//     readonly tier: any;
+//     readonly crud?: CRUD;
+//     readonly width?: Breakpoint;
+// };
 
 export interface WelcomeProp extends Comprops {
     readonly classes: { board: any }

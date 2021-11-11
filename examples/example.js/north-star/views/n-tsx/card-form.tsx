@@ -7,9 +7,8 @@ import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card/Card';
 
-import { TierCol, TierComboField, Semantier, AnElemFormatter, Tierec } from '@anclient/semantier-st';
+import { TierCol, TierComboField, Semantier, AnElemFormatter, Tierec, AnlistColAttrs } from '@anclient/semantier-st';
 import { L, toBool, DatasetCombo } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
@@ -90,7 +89,7 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 	 * @param classes
 	 * @returns
 	 */
-	getField(f: TierCol, rec: { [x: string]: any; }, classes: { [x: string]: string; }) {
+	getField(f: AnlistColAttrs, rec: { [x: string]: any; }, classes: { [x: string]: string; }) {
 		let media = this.media;
 		let { isSm } = media;
 		let that = this;
@@ -113,9 +112,9 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 					} }
 				/>);
 		}
-		else if (f.type === 'formatter' || f.formatter) {
+		else if (f.type === 'formatter' || f.fieldFormatter) {
 			return (
-				<>{f.formatter(rec)}</>
+				<>{f.fieldFormatter(rec)}</>
 			);
 		}
 		else {

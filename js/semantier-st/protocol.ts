@@ -39,7 +39,7 @@ export type Expr = {
     as: string
 }
 
-export interface ColMeta {
+export interface DbCol {
     field: string;
     name?: string;
 }
@@ -852,7 +852,7 @@ export class InsertReq extends UpdateReq {
 	 * (with field property)
 	 * @param cols
 	 */
-	columns (cols: Array<ColMeta | string> | ColMeta | string) {
+	columns (cols: Array<DbCol | string> | DbCol | string) {
 		if (this.cols === undefined)
 			this.cols = [];
 		if (Array.isArray(cols)){
@@ -921,7 +921,7 @@ export class InsertReq extends UpdateReq {
 		}
 		else if (typeof n_row === 'string'){
             console.error("shouldn't reach here in ts.");
-			this.columns(n_row as unknown as ColMeta);
+			this.columns(n_row as unknown as DbCol);
 			if (this.nvss.length == 0) {
 				this.nvss.push([[n_row, v]]);
 			}
@@ -1102,7 +1102,7 @@ export class AnSessionResp extends AnsonResp {
 
 export class AnTreeNode {
 	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	node : {id: string; children?: Array<any>};
+	node : {id: string; children?: Array<AnTreeNode>};
 	id: string;
 	level: number;
 	parent: string;

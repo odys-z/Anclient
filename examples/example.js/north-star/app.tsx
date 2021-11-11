@@ -134,7 +134,6 @@ class App extends React.Component<Northprops, any> {
 				},
 				(c, e) => {
 					// something wrong
-					// console.warn('Logout failed', c, e)
 					cleanup (that);
 				});
 		}
@@ -158,15 +157,15 @@ class App extends React.Component<Northprops, any> {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
+				ssInf: this.state.anClient.ssInf,
 				anReact: this.state.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				jserv: this.state.jserv,
 				anClient: this.state.anClient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
-				iportal: this.props.iportal || 'portal.html',
+				ihome: this.props.iportal || 'portal.html',
 				error: this.state.error,
 			}} >
 				<Sys menu='sys.menu.jsample'
@@ -175,7 +174,9 @@ class App extends React.Component<Northprops, any> {
 					hrefDoc={'docs/index.html'}
 					welcome={welcome}
 					onLogout={this.logout} />
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={false} />}
+				{this.state.hasError &&
+					<AnError onClose={this.onErrorClose} fullScreen={false}
+						msg={this.context.error.msg} title={L('Error')} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 

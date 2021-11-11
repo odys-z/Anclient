@@ -46,12 +46,13 @@ export interface DialogProps extends Comprops {
 	onOk?: (sender: React.ReactNode) => void;
 	onCancel?: (sender: React.ReactNode) => void;
 	onClose?: () => void;
-	/**Open dialog */
-	// open?: boolean;
+
 	title: string;
+
 	/**with cancel button label ("false" will disable button) */
 	cancel?: string | false;
 	ok?: string;
+
 	/**dialog message */
 	msg: string;
 

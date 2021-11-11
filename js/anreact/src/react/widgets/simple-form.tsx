@@ -2,7 +2,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -14,15 +13,16 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnsonResp } from '@anclient/semantier-st';
+import { AnlistColAttrs, AnsonResp, CRUD, TierCol, Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
-	import { AnContext } from '../reactext';
-	import { DetailFormW } from '../crud';
+	import { AnContext, AnContextType } from '../reactext';
+	import { Comprops, CrudCompW, DetailFormW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
 	import { ConfirmDialog } from './messagebox';
 	import { JsampleIcons } from '../../jsample/styles';
+	import { ClassNames, Media } from '../../react/anreact';
 
 const styles = (theme) => ({
   root: {
@@ -55,18 +55,34 @@ const styles = (theme) => ({
   }
 });
 
+interface SimpleFormProps extends Comprops {
+    funcId: string;
+    crud: CRUD;
+    fields: TierCol[];
+    pk: string;
+    pkval: any;
+    parent: JSX.Element;
+    parentId: string;
+	mtabl: string;
+}
+
 /**Simple form is a dialog.
  * Use record form for UI record layout.
  */
-class SimpleFormComp extends DetailFormW {
+class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 	uri = undefined;
 
 	state = {
 		crud: undefined,
 		dirty: false,
+		parent: undefined,
 		parentId: undefined,
+
 		nodeId: undefined,
 		node: undefined,
+
+        pk: undefined,
+        pkval: undefined,
 
 		mtabl: '',
 		// indId, indName, parent, sort, fullpath, css, weight, qtype, remarks, extra
@@ -85,22 +101,26 @@ class SimpleFormComp extends DetailFormW {
 			{ type: 'number',field: 'sort', label: L('UI Sort'),
 			  validator: undefined },
 			{ type: 'text', field: 'remarks', label: L('Remarks'),
-			  validator: {len: 500}, props: {sm: 12, lg: 6} }
-		],
+			  validator: {len: 500}, grid: {sm: 12, lg: 6} }
+		] as AnlistColAttrs<JSX.Element, {classes: ClassNames, media: Media}>[],
 		// hide pk means also not editable by user
-		pk: { type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1,
+		pkMeta: { type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1,
 			  validator: {len: 12} },
 		record: {},
 	};
 
-	constructor (props = {}) {
+    funcId: any;
+    ok: JSX.Element;
+
+    handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
+
+	constructor (props: SimpleFormProps) {
 		super(props);
 
 		this.funcId = props.funcId || 'SimpleForm';
 
-		this.state.crud = props.c ? CRUD.c : CRUD.u;
+		this.state.crud = props.crud;
 		this.state.mtabl = props.mtabl;
-		this.state.fields = props.fields;
 
 		this.state.pk = props.pk;
 		this.state.pkval = props.pkval;
@@ -128,18 +148,19 @@ class SimpleFormComp extends DetailFormW {
 				throw Error("The pkval property not been set correctly. Record can not be loaded.");
 
 			// load the record
-			let queryReq = this.context.anClient.query(this.uri, this.props.mtabl, 'r')
+			const ctx = this.context as unknown as AnContextType;
+			let queryReq = ctx.anClient.query(this.uri, this.props.mtabl, 'r')
 			queryReq.Body().whereEq(this.state.pk.field, this.state.pkval);
 			// FIXME but sometimes we have FK in record. Meta here?
-			this.context.anReact.bindStateRec({req: queryReq,
+			ctx.anReact.bindStateRec({req: queryReq,
 				onOk: (resp) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 						if (!rows || rows.length !== 1)
-							console.error("Query reults not correct. One and only one row is needed.", row, queryReq)
+							console.error("Query reults not correct. One and only one row is needed.", rows, queryReq)
 						that.setState({record: rows[0]});
 					}
 				},
-				this.context.error);
+				ctx.error);
 		}
 	}
 
@@ -152,11 +173,11 @@ class SimpleFormComp extends DetailFormW {
 	    this.state.fields.forEach( (f, x) => {
 			f.valid = validField(f, {validator: (v) => !!v});
 			f.style = f.valid ? undefined : invalid;
-			valid &= f.valid;
+			valid &&= f.valid;
 	    } );
 		return valid;
 
-		function validField (f, valider) {
+		function validField (f, valider): boolean {
 			let v = that.state.record[f.field];
 
 			if (f.type === 'int')
@@ -185,7 +206,8 @@ class SimpleFormComp extends DetailFormW {
 			return;
 		}
 
-		let client = this.context.anClient;
+		let ctx = this.context as unknown as AnContextType;
+		let client = ctx.anClient;
 		let rec = this.state.record;
 		let c = this.state.crud === CRUD.c;
 
@@ -231,7 +253,7 @@ class SimpleFormComp extends DetailFormW {
 			that.showOk(L('Card saved!'));
 			if (typeof that.props.onOk === 'function')
 				that.props.onOk({code: resp.code, resp});
-		}, this.context.error);
+		}, ctx.error);
 	}
 
 	toCancel (e) {
@@ -253,16 +275,12 @@ class SimpleFormComp extends DetailFormW {
 		that.setState({dirty: false});
 	}
 
-	getField(f, rec) {
-		let {isSm} = super.media;
+	getField(f, rec, media) {
+		let {isSm} = media;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
 			let that = this;
 			return (<DatasetCombo uri={this.props.uri}
-				// options={[
-				// 	{n: L('Single Opt'), v: 's'},
-				// 	{n: L('Multiple'), v: 'm'},
-				// 	{n: L('Text'), v: 't'} ]}
 				options={f.options} val={rec[f.field]}
 				label={f.label} style={f.style}
 				onSelect={ (v) => {
@@ -291,24 +309,24 @@ class SimpleFormComp extends DetailFormW {
 		}
 	}
 
-	formFields(rec, classes) {
+	formFields(rec: Tierec, opts?: {classes: ClassNames, media?: Media}) {
 		let fs = [];
 		let c = this.state.crud === CRUD.c;
-		const isSm = toBool(super.media.isMd);
+		const isSm = toBool(opts?.media?.isMd);
 
 		this.state.fields.forEach( (f, i) => {
-		  if (!f.hide) {
+		  if (f.visible === false) {
 			fs.push(
 				<Grid item key={`${f.field}.${f.label}`}
-					sm={f.props && f.props.sm ? f.props.sm : 6}
-					{...f.props} className={classes.labelText} >
-				  <Box className={classes.rowBox} >
+					sm={f.grid?.sm ? f.grid.sm : 6}
+					{...f.grid} className={opts?.classes.labelText} >
+				  <Box className={opts?.classes.rowBox} >
 					{!isSm && (
-					  <Typography className={classes.formLabel} >
+					  <Typography className={opts?.classes.formLabel} >
 						{L(f.label)}
 					  </Typography>
 					)}
-					{this.getField(f, rec)}
+					{this.getField(f, rec, opts)}
 				  </Box>
 				</Grid> );
 		} } );
@@ -321,8 +339,9 @@ class SimpleFormComp extends DetailFormW {
 		let c = this.state.crud === CRUD.c;
 		let u = this.state.crud === CRUD.u;
 		let rec = this.state.record;
+		let media = CrudCompW.getMedia(width);
 
-		let title = this.state.title ? this.state.title
+		let title = this.props.title ? this.props.title
 					: c ? L('Add Details')
 					: u ? L('Edit Details')
 					: L('Details');
@@ -339,7 +358,7 @@ class SimpleFormComp extends DetailFormW {
 				{this.state.dirty ? <JsampleIcons.Star color='secondary'/> : ''}
 			  </DialogTitle>
 			  <Grid container className={classes.content} direction='row'>
-				{this.formFields(rec, classes)}
+				{this.formFields(rec, {classes, media})}
 			  </Grid>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
@@ -356,11 +375,6 @@ class SimpleFormComp extends DetailFormW {
 	}
 }
 SimpleFormComp.contextType = AnContext;
-
-SimpleFormComp.propTypes = {
-	uri: PropTypes.string.isRequired,
-	mtabl: PropTypes.string.isRequired
-};
 
 const SimpleForm = withWidth()(withStyles(styles)(SimpleFormComp));
 export { SimpleForm, SimpleFormComp };

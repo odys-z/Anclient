@@ -1,6 +1,5 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
-import PropTypes from "prop-types";
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,26 +10,23 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnContext, AnError } from '../reactext';
-
 import { toBool } from '../../utils/helpers';
+import { Comprops, DetailFormW } from '../crud';
 
 const styles = (theme) => ( {
 	root: {
 	}
 } );
 
-/**
- * props:
- * 	{array} columns must need
- * 	{array}  rows  must need
- * 	{string} pk must need
- * 	{object} pageInf {page, size, total, sizeOptions}
- * 	{boolean} checkbox  - if true, first field alwasy been treaded as checkbox
- * 	{function} updateSelectd
- * 	{array} selected
+interface AnTablistProps extends Comprops {
+	pk: string;
+	selected: {ids: Set<string>};
+	onSelectChange: (ids: Array<string>) => void;
+}
+
+/**Table / list for records.
  */
-class AnTablistComp extends React.Component {
+class AnTablistComp extends DetailFormW<AnTablistProps> {
 
 	state = {
 		sizeOptions:[10, 25, 50],
@@ -41,11 +37,13 @@ class AnTablistComp extends React.Component {
 		selected: undefined
 	}
 
-	constructor(props){
+	checkAllBox: HTMLButtonElement;
+
+	constructor(props: AnTablistProps){
 		super(props)
 
-		let {sizeOptions, selectedIds} = props;
-		this.state.selected = selectedIds.Ids || selectedIds.ids;
+		let {sizeOptions, selected} = props;
+		this.state.selected = selected.ids;
 		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selectedIds.Ids must be a set");
 		if (sizeOptions)
@@ -72,11 +70,11 @@ class AnTablistComp extends React.Component {
 	componentDidMount() {
 	}
 
-	isSelected(k) {
+	isSelected(k: string) {
 		return this.state.selected.has(k);
 	}
 
-	handleClick(event, newSelct) {
+	handleClick(e: React.MouseEvent<HTMLElement>, newSelct: string) {
 		let selected = this.state.selected;
 		if (this.props.singleCheck) {
 			selected.clear();
@@ -93,9 +91,9 @@ class AnTablistComp extends React.Component {
 		this.updateSelectd(selected);
 	};
 
-	toSelectAll (event) {
+	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
 		let ids = this.props.selectedIds.Ids || this.props.selectedIds.ids;
-		if (event.target.checked) {
+		if (e.target.checked) {
 			this.props.rows.forEach((r) => ids.add(r[this.props.pk]));
 			this.updateSelectd(ids);
 		}
@@ -106,9 +104,9 @@ class AnTablistComp extends React.Component {
 		}
 	};
 
-	updateSelectd (set) {
+	updateSelectd (set: Set<string>) {
 		if (typeof this.props.onSelectChange === 'function')
-			this.props.onSelectChange([...set]);
+			this.props.onSelectChange(Array.from(set));
 	}
 
 	changePage(event, page) {
@@ -117,7 +115,7 @@ class AnTablistComp extends React.Component {
 			this.props.onPageInf (this.state.page, this.state.size);
 	}
 
-	changeSize (event, s) {
+	changeSize (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
 		let size = parseInt(event.target.value, 10);
 		this.setState({size});
 		if (typeof this.props.onPageInf  === 'function')
@@ -130,21 +128,17 @@ class AnTablistComp extends React.Component {
 	 * @returns [<TableCell>,...]
 	 */
 	th(columns = []) {
-		// return columns.filter( (v, x) => !toBool(v.hide)
-		// 					|| this.props.checkbox && x !== 0) // first columen as checkbox
 		return columns.filter( (v, x) => toBool(v.hide) ? false
 							: !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
-					{/* {colObj.text || colObj.field} */}
 					{colObj.label || colObj.text || colObj.field}
 				</TableCell>);
 	}
 
 	tr(rows = [], columns = []) {
 		return rows.map(row => {
-			let pkv = typeof this.props.pk === 'string' ? row[this.props.pk]
-					: row[this.props.pk.field];
+			let pkv = row[this.props.pk];
 
 			if (this.props.checkbox && toBool(row.checked)) {
 				this.state.selected.add(pkv)
@@ -219,11 +213,6 @@ class AnTablistComp extends React.Component {
 		</>);
 	}
 }
-AnTablistComp.propTypes = {
-	pk: PropTypes.string.isRequired,
-	selectedIds: PropTypes.object.isRequired,
-	onSelectChange: PropTypes.func
-};
 
 const AnTablist = withStyles(styles)(AnTablistComp);
-export { AnTablist, AnTablistComp }
+export { AnTablist, AnTablistComp, AnTablistProps }

@@ -1,6 +1,7 @@
+import * as CSS from 'csstype';
 import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, ColMeta
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, DbCol
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -9,12 +10,30 @@ export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
  * E.g. TRecordForm will use this to format a field in form.
  * Currently tiers also accept this as field modifier. (FIXME - to be optimized)
  */
-export type AnElemFormatter = (
-	(	/**field definition */
-		col: TierCol,
-		/**column index or record for the row */
-		rec: number | Tierec
-	) => any );
+export type AnElemFormatter = ( (
+	/**field definition */
+	col: DbCol,
+	/**column index or record for the row */
+	rec: number | Tierec
+) => any );
+
+export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
+
+export type AnFieldValidator = ((
+
+) => InvalidClassNames );
+
+/**(Form) field formatter
+ * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
+ *
+ * F: field element type, e.g. JSX.Element
+ * FO: options, e.g. {classes?: ClassNames, media?: Media}
+ */
+export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, opts?: FO) => F);
+
+export type AnFieldValidation = {
+	[k in "notNull" | "minLen" | "len"]: number | string | object
+ };
 
 export interface ErrorCtx {
 	msg?: undefined | string | Array<string>;
@@ -23,29 +42,36 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
-export interface AnlistColAttrs {
+export interface TierCol extends DbCol {
+	validator?: AnFieldValidator | AnFieldValidation;
+
     disabled?: boolean;
 	visible?: boolean;
     checkbox?: boolean;
-    // formatter?: (col: AnlistCol) => string;
-    formatter?: AnElemFormatter;
-    css?: {};
-    grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
-	box?: {};
 }
 
 /**Meta data handled from tier (DB field).
  * field and label properties are required.
+ * F: field type, e.g. JSX.Element;
+ * FO: options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
 */
-export interface TierCol extends AnlistColAttrs, ColMeta {
+export interface AnlistColAttrs<F, FO> extends TierCol {
     // field: string;
     label: string;
 
-    /**input type / form type */
+    formatter?: AnElemFormatter;
+    fieldFormatter?: AnFieldFormatter<F, FO>;
+
+    valid?: boolean;
+
+    /**input type / form type, not db type */
     type?: string;
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
     style?: string | {};
-    options?: [];
+
+    css?: CSSStyleDeclaration;
+    grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
+	box?: {};
 }
 
 /**Record handled from tier */
@@ -77,19 +103,10 @@ export interface Semantext {
     error: ErrorCtx;
 }
 
-export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
 /**
  * Base class of semantic tier
  */
 export class Semantier {
-    static invalidStyles = {
-        ok: {},
-        anyErr : { border: "1px solid red" },
-        notNull: { backgroundColor: '#ff9800b0' },
-        maxLen : { border: "1px solid red" },
-        minLen : { border: "1px solid red" },
-    }
-
     /**
      *
      * @param {uri: string} props
@@ -190,7 +207,7 @@ export class Semantier {
      * @param modifier.field user provided modifier to change column's style etc.
      * callback function signature: (col, index) {} : return column's properties.
      */
-	 columns (modifier?: {[x: string]: AnlistColAttrs | AnElemFormatter}): Array<AnlistColAttrs> {
+	 columns (modifier?: {[x: string]: AnElemFormatter}): Array<TierCol> {
 		if (!this._cols)
 			throw Error("_cols are not provided by child tier.");
 
@@ -208,7 +225,7 @@ export class Semantier {
      * @param {object} modifier {field, function | object }
      * @param {object | function} modifier.field see #columns().
      */
-	 fields (modifier?: {[x: string]: AnlistColAttrs | AnElemFormatter}): Array<TierCol> {
+	 fields (modifier?: {[x: string]: AnElemFormatter}): Array<TierCol> {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 

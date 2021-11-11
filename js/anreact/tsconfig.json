@@ -1,14 +1,21 @@
 {
   "include": ["."],
   "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "target": "es5",
     "outDir": "ts",
 
     "jsx": "react",
     "esModuleInterop": true,
   },
-  "exclude": [ "dist", "*.ts", "ts/*", "*.tsx" ]
+  "exclude": [
+    "<node_internals>/**",
+    "test/**",
+    "dist/**",
+    "*.config.js",
+    "ts/**"
+  ]
 }
