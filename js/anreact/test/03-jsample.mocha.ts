@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { AnsonMsg, DatasetReq, AnDatasetResp } from '../protocol'
-import { parseMenus } from '../../anreact/src/utils/helpers.js'
+import { AnsonMsg, DatasetReq, AnDatasetResp } from '../../semantier-st/protocol'
+import { parseMenus } from '../src/react/sys'
 
 const dsTestResp = {
 	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",
@@ -123,13 +123,13 @@ describe('case: [03.1 Jsample.menu]', () => {
 		let forest = msg.Body().forest;
 		let {menu, paths} = parseMenus(forest);
 
-		assert.equal(menu.Body, undefined, "1 ---");
+		// assert.equal(menu.Body, undefined, "1 ---");
 		assert.equal(menu.length, 2, "2 ---");
 		assert.equal(paths.length, 8, "2 ---");
-		assert.equal(menu[0].node, undefined, "node ---");
+		// assert.equal(menu[0].node, undefined, "node ---");
 		assert.equal(menu[0].id, undefined, "id ---");
 		assert.equal(menu[0].funcId, 'sys', "sys ---");
-		assert.equal(menu[0].children.node, undefined, "sys/node ---");
+		// assert.equal(menu[0].children.node, undefined, "sys/node ---");
 		assert.equal(menu[0].children[0].funcId, 'sys-domain', "sys/domain ---");
 	});
 });

@@ -1,13 +1,10 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
-import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp , UserReq } from '@anclient/semantier';
-import { L, Langstrs,
-    AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
+import { Protocol, AnsonResp } from '@anclient/semantier';
+import { L, AnContext, CrudCompW, AnTablist, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 const { CRUD } = Protocol;
@@ -217,7 +214,6 @@ export class MyDocsTier extends DocsTier {
 	}
 
 	docData() {
-		// console.log(utils.urlOfdata(this.rec.mime, this.rec.uri64));
 		return utils.urlOfdata(this.rec.mime, this.rec.uri64);
 	}
 }

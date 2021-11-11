@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { Ref } from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import Button from '@material-ui/core/Button';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SvgIcon from "@material-ui/core/SvgIcon";
 
-import { AnContext } from '../reactext';
+import { AnContext, AnContextType } from '../reactext';
+import { Comprops } from '../crud';
+import { SessionClient } from '@anclient/semantier-st/anclient';
 
 const styles = theme => ({
   root: {
 	color: "wheat",
 	// backgroundColor: "primary",
-	textAlign: "center",
+	// textAlign: "center",
 	"&: hover": {
 		color: "linen"
 	}
@@ -19,7 +21,14 @@ const styles = theme => ({
 
 export const gCameraViewBox = "0 0 512 512";
 
-export const AvatarIcon = function (props = {}) {
+export interface AvatarIconProps extends Comprops {
+	viewBox?: any;
+    onClick: (e?: React.MouseEvent<SVGSVGElement>) => void;
+    textInfo: (ssInf: SessionClient | undefined) => string;
+	ref?: Ref<SVGSVGElement>;
+}
+
+export const AvatarIcon = function (props: AvatarIconProps) {
   if (!props.viewBox)
 		props.viewBox = gCameraViewBox;
 
@@ -49,12 +58,12 @@ export const gCamera = (`<g>
 		<polygon points="320,32 192,32 166.4,83.2 345.6,83.2 "/>
 	</g>`);
 
-class MyIconComp extends React.Component {
+class MyIconComp extends React.Component<AvatarIconProps> {
 	state = {
 		title: "Personal Settings",
 	};
 
-	constructor (props = {}) {
+	constructor (props: AvatarIconProps) {
 		super(props);
 		this.onClick = this.onClick.bind(this);
 		this.textInfo = this.textInfo.bind(this);
@@ -71,7 +80,8 @@ class MyIconComp extends React.Component {
 	}
 
 	render () {
-		let txtInfo = this.textInfo(this.context.anClient.ssInf);
+		const ctx = this.context as unknown as AnContextType;
+		let txtInfo = this.textInfo(ctx.anClient.ssInf);
 
 		const { classes } = this.props;
 

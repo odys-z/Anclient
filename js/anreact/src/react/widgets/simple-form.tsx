@@ -102,7 +102,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			  validator: undefined },
 			{ type: 'text', field: 'remarks', label: L('Remarks'),
 			  validator: {len: 500}, grid: {sm: 12, lg: 6} }
-		] as AnlistColAttrs<JSX.Element, {classes: ClassNames, media: Media}>[],
+		] as AnlistColAttrs<JSX.Element, CompOpts>[],
 		// hide pk means also not editable by user
 		pkMeta: { type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1,
 			  validator: {len: 12} },

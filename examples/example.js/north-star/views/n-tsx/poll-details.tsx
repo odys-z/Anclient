@@ -11,8 +11,8 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card/Card';
 
-import { Tierec, Protocol, CRUD, Semantier } from '@anclient/semantier-st';
-import { L, AnContext, ConfirmDialog } from '@anclient/anreact';
+import { Tierec, CRUD } from '@anclient/semantier-st';
+import { L, AnContext, ConfirmDialog, invalidStyles } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
@@ -20,7 +20,7 @@ import { Anform, AnMUIClasses, FormProp, Media } from '../../common/north';
 import { CardsForm } from './card-form';
 
 const styles = (theme: starTheme) => (Object.assign(
-	Semantier.invalidStyles as any, (theme: starTheme) => {
+	invalidStyles, (theme: starTheme) => {
 		return ({
 			root: {},
 			cardGrid: {

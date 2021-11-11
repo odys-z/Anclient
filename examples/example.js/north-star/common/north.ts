@@ -1,21 +1,20 @@
 
 import React from "react";
-import { AnContext, Comprops, SysComp } from "@anclient/anreact";
-import { AnlistColAttrs, Tierec, QueryConditions } from "@anclient/semantier-st";
-import { Breakpoint } from "@material-ui/core/styles/createBreakpoints";
+import { AnContext, Comprops, Media, SysComp } from "@anclient/anreact";
+import { QueryConditions } from "@anclient/semantier-st/semantier";
 
 /**TODO move to @anclient/anreact */
-export interface FieldMeta {
-	field: string;
-	label?: string;
-	disabled?: boolean;
-}
+// export interface FieldMeta {
+// 	field: string;
+// 	label?: string;
+// 	disabled?: boolean;
+// }
 
-export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs: boolean; isXl?: boolean; }
+// export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs: boolean; isXl?: boolean; }
 
-export interface AnMUIClasses {
-	[c: string]: string;
-}
+// export interface AnMUIClasses {
+// 	[c: string]: string;
+// }
 
 /** App North's props */
 export interface Northprops {
@@ -26,6 +25,7 @@ export interface Northprops {
     iwindow?: typeof window;
     iparent?: typeof parent;
     ilocation?: string;
+	ihome?: string;
 }
 
 // export interface Comprops {
@@ -42,32 +42,32 @@ export interface Northprops {
 // };
 
 export interface WelcomeProp extends Comprops {
-    readonly classes: { board: any }
+    // readonly classes: { board: any }
     readonly sys: typeof SysComp
 };
 
 /**PropType of Poll's Form. */
-export interface FormProp extends Comprops {
-	readonly tier: Semantier;
-	/**Fields met for expanding by form, e.g. TRecordForm or CardForm. */
-	readonly fields?: Array<{}>;
+// export interface FormProp extends Comprops {
+// 	readonly tier: Semantier;
+// 	/**Fields met for expanding by form, e.g. TRecordForm or CardForm. */
+// 	readonly fields?: Array<{}>;
 
-	columns?: Array<AnlistColAttrs>;
-	rows?: Array<Tierec>;
+// 	columns?: Array<AnlistColAttrs>;
+// 	rows?: Array<Tierec>;
 
-	readonly dense?: boolean;
-    readonly classes: {
-		root?: string;
-		dialogPaper?: string;
-		smalltip?: string;
-        content?: string;
-		buttons?: string;
-		button?: string,
-		card?: string;
-		[x: string]: any
-	};
-    onClose?: (event: React.UIEvent) => void;
-};
+// 	readonly dense?: boolean;
+//     readonly classes: {
+// 		root?: string;
+// 		dialogPaper?: string;
+// 		smalltip?: string;
+//         content?: string;
+// 		buttons?: string;
+// 		button?: string,
+// 		card?: string;
+// 		[x: string]: any
+// 	};
+//     onClose?: (event: React.UIEvent) => void;
+// };
 
 /**Query condition item, used by AnQueryForm.  */
 export interface PollQueryCondt extends QueryConditions {
@@ -75,8 +75,8 @@ export interface PollQueryCondt extends QueryConditions {
 	states?: string;
 }
 
-export class Anform<T extends FormProp> extends React.Component<T, any, any> {
-}
+// export class Anform<T extends FormProp> extends React.Component<T, any, any> {
+// }
 
 /**
  * Replacing @anclient/semantier/curd/CrudCompW

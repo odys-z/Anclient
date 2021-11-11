@@ -1,22 +1,22 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp, Semantier, stree_t
+import { AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec
 } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
-	import { toBool } from '../../utils/helpers';
-	import { CrudCompW } from '../../react/crud';
-	import { AnContext, AnError } from '../../react/reactext';
+	import { Comprops, CrudCompW } from '../../react/crud';
+	import { AnContext, AnContextType } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { AnTablist } from '../../react/widgets/table-list';
 	import { AnQueryForm } from '../../react/widgets/query-form';
 
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';
+import { CompOpts } from '../../react/anreact';
 
 const styles = (theme) => ( {
 	root: {
@@ -44,7 +44,7 @@ const styles = (theme) => ( {
 	}
 } );
 
-class RolesComp extends CrudCompW {
+class RolesComp extends CrudCompW<Comprops> {
 
 	state = {
 		condName: { type: 'text', val: '', label: L('Role Name')},
@@ -58,9 +58,16 @@ class RolesComp extends CrudCompW {
 		buttons: { add: true, edit: false, del: false},
 
 		total: 0,
+		rows: [] as Tierec[],
 		pageInf: { page: 0, size: 25, total: 0 },
-		selected: {Ids: new Set()},
+		selected: {ids: new Set<string>()},
 	};
+	tier: any;
+	q: any;
+	confirm: JSX.Element;
+	roleForm: JSX.Element;
+	uri: any;
+	props: { classes: any; };
 
 	constructor(props) {
 		super(props);
@@ -81,7 +88,7 @@ class RolesComp extends CrudCompW {
 			this.tier.setContext(this.context);
 		}
 
-		this.toSearch();
+		this.toSearch(undefined, undefined);
 	}
 
 	toSearch(e, q) {
@@ -89,7 +96,7 @@ class RolesComp extends CrudCompW {
 		this.q = q || this.q;
 		this.tier.records( this.q,
 			(cols, rows) => {
-				that.state.selected.Ids.clear();
+				that.state.selected.ids.clear();
 				that.setState({rows});
 			} );
 	}
@@ -98,10 +105,13 @@ class RolesComp extends CrudCompW {
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
 		let query = this.state.queryReq;
+
+		const ctx = this.context as unknown as AnContextType;
+
 		if (query) {
 			query.Body().Page(size, page);
 			this.state.pageInf = {page, size, total: this.state.pageInf.total};
-			this.context.anReact.bindTablist(query, this, this.context.error);
+			ctx.anReact.bindTablist(query, this, ctx.error);
 		}
 	}
 
@@ -115,37 +125,37 @@ class RolesComp extends CrudCompW {
 		} );
 	}
 
-	toDel(e, v) {
+	toDel(e: React.MouseEvent<HTMLElement>) {
 		let that = this;
 		let txt = L('Totally {count} role records will be deleted. Are you sure?',
-				{count: this.state.selected.Ids.size});
+				{count: this.state.selected.ids.size});
 		this.confirm =
 			(<ConfirmDialog open={true}
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
 				onOk={ () => {
-						that.tier.del({ids: that.state.selected.Ids});
+						that.tier.del({ids: that.state.selected.ids});
 				 	}
 				}
 				onClose={ () => {that.confirm === undefined} }
 			/>);
 	}
 
-	toAdd(e, v) {
+	toAdd(e: React.MouseEvent<HTMLElement>) {
 		this.tier.resetFormSession();
-		this.roleForm = (<RoleDetails c uri={this.uri}
+		this.roleForm = (<RoleDetails crud={CRUD.c} uri={this.uri}
 			tier={this.tier}
 			onOk={(r) => console.log(r)}
 			onClose={this.closeDetails} />);
 	}
 
-	toEdit(e, v) {
+	toEdit(e: React.MouseEvent<HTMLElement>) {
 		let that = this;
-		this.tier.pkval = [...this.state.selected.Ids][0];
+		this.tier.pkval = this.getByIx(this.state.selected.ids, 0);
 
-		this.roleForm = (<RoleDetails u uri={this.uri}
+		this.roleForm = (<RoleDetails crud={CRUD.u} uri={this.uri}
 			tier={this.tier}
-			onOk={(r) => that.toSearch()}
+			onOk={(r) => that.toSearch(undefined, undefined)}
 			onClose={this.closeDetails} />);
 	}
 
@@ -188,7 +198,7 @@ class RolesComp extends CrudCompW {
 				className={classes.root} checkbox={true}
 				columns={this.tier.columns()}
 				rows={this.state.rows} pk={this.tier.pk}
-				selectedIds={this.state.selected}
+				selected={this.state.selected}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
@@ -226,13 +236,13 @@ class RoleTier extends Semantier {
 		{ text: L('Remarks'), field: "remarks", color: 'primary' } ]
 
 	_fields = [
-		{ type: 'text', validator: {len: 12},  field: 'roleId',   label: 'Role ID',
-		  validator: {notNull: true} },
-		{ type: 'text', validator: {len: 200}, field: 'roleName', label: 'Role Name',
-		  validator: {notNull: true} },
-		{ type: 'text', validator: {len: 500}, field: 'remarks',  label: 'Remarks',
-		  validator: {notNull: true} }
-	];
+		{ type: 'text', field: 'roleId',   label: 'Role ID',
+		  validator: {notNull: true, len: 12} },
+		{ type: 'text', field: 'roleName', label: 'Role Name',
+		  validator: {notNull: true, len: 200} },
+		{ type: 'text', field: 'remarks',  label: 'Remarks',
+		  validator: {notNull: true, len: 500} }
+	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
 	/**
 	 * @param {React.Component} comp
@@ -243,14 +253,14 @@ class RoleTier extends Semantier {
 		super(comp);
 	}
 
-	records(conds = {}, onLoad) {
+	records(conds: {orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad) {
 		let { orgId, roleName, pageInf } = conds;
 		let queryReq = this.client.query(this.uri, this.mtabl, 'r', pageInf)
 		let req = queryReq.Body()
 			.expr('r.roleId').expr('roleName').expr('r.remarks').expr('orgName')
 			.l('a_orgs', 'o', 'o.orgId = r.orgId');
 
-		if (orgId && orgId !== 0)
+		if (orgId)
 			req.whereEq('r.orgId', orgId);
 		if (roleName)
 			req.whereCond('%', 'roleName', `'${roleName}'`);
