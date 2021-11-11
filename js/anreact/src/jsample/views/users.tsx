@@ -1,7 +1,6 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 import { Button, Grid } from '@material-ui/core';
 
 import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext } from '@anclient/semantier-st';
@@ -195,7 +194,7 @@ class UserstComp extends CrudCompW<Comprops> {
 
 			{tier && <AnTablist pk={tier.pk}
 				className={classes.root} checkbox={tier.checkbox}
-				selectedIds={this.state.selected}
+				selected={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
 				pageInf={this.pageInf}
@@ -212,7 +211,7 @@ UserstComp.contextType = AnContext;
 const Userst = withWidth()(withStyles(styles)(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends CrudCompW<Comprops & {onQuery: () => boolean}> {
+class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {
 	conds = [
 		{ name: 'userName', type: 'text', val: undefined, label: L('Student') },
 		{ name: 'orgId',    type: 'cbb',  val: undefined, label: L('Class'),
@@ -231,7 +230,6 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: () => boolean}> {
 			userName: this.conds[0].val ? this.conds[0].val : undefined,
 			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
 			roleId   : (this.conds[2].val as {n: string, v: string}) ?.v };
-			// roleId  : (this.conds[2].val ? this.conds[2].val.v : undefined };
 	}
 
 	/** Design Note:
@@ -242,7 +240,7 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: () => boolean}> {
 		return (
 		<AnQueryst {...this.props}
 			conds={this.conds}
-			onSearch={() => this.props.onQuery(that.collect()) }
+			onSearch={() => that.props.onQuery(that.collect()) }
 			onLoaded={() => that.props.onQuery(that.collect()) }
 		/> );
 	}

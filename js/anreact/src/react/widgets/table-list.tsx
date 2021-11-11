@@ -45,7 +45,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		let {sizeOptions, selected} = props;
 		this.state.selected = selected.ids;
 		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
-			throw Error("selectedIds.Ids must be a set");
+			throw Error("selected.ids must be a set");
 		if (sizeOptions)
 			this.state.sizeOptions = sizeOptions;
 
