@@ -1,6 +1,6 @@
 import React from "react";
-import { AnContext, AnContextType, CrudCompW, invalidStyles, SysComp } from "@anclient/anreact";
-import { Semantier } from "@anclient/semantier-st";
+import { AnContext, AnContextType, ClassNames, CrudCompW, invalidStyles, SysComp } from "@anclient/anreact";
+import { Semantier, Tierec } from "@anclient/semantier-st";
 import { Card, Grid, Link, Paper, SvgIcon, Theme, Typography, withStyles, withWidth } from "@material-ui/core";
 import { WelcomeProp } from "../../common/north";
 
@@ -65,7 +65,7 @@ class WelcomeComp extends CrudCompW<WelcomeProp> {
 }
 WelcomeComp.contextType = AnContext;
 
-interface WelcomeClasses {
+interface WelcomeClasses extends ClassNames {
     board: string;
     card: string;
     cardTitle: string;
@@ -122,7 +122,8 @@ const WelcomePage = withWidth()(withStyles(styles)(WelcomeComp));
 export { WelcomePage , WelcomeComp }
 
 interface GridItem {xs?: number; md?: number; sm?: number; lg?: number; xl?: number};
-interface NoteRec {
+
+interface NoteRec extends Tierec {
     pusher: string;
     title: string;
     msg?: string;
