@@ -5,10 +5,8 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Replay from '@material-ui/icons/Replay';
 
-import { AnClient, SessionClient, Protocol } from '@anclient/semantier';
-import { L, Langstrs,
-    AnContext, AnError, CrudCompW, AnReactExt, ConfirmDialog,
-	AnTreeditor
+import { L, AnContext,
+	CrudCompW, ConfirmDialog, AnTreeditor
 } from '@anclient/anreact';
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';

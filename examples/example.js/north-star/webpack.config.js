@@ -8,7 +8,7 @@ module.exports = {
 	mode: v,
 	devtool: 'source-map',
 	entry: {'AnHome': './app.tsx',
-			'AnExt': './login-app.jsx' },
+			'AnExt': './login-app.tsx' },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",

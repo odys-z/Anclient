@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import React from 'react';
 import { StandardProps } from '@material-ui/core';
 import ReactDOM from 'react-dom';

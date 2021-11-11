@@ -21,7 +21,7 @@ export interface AnMUIClasses {
 export interface Northprops {
     iportal?: string;
     servId: string;
-    servs?: object;
+    servs?: {host?: string, [h: string]: string};
 
     iwindow?: typeof window;
     iparent?: typeof parent;
