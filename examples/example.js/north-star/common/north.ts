@@ -26,6 +26,7 @@ export interface Northprops {
     iwindow?: typeof window;
     iparent?: typeof parent;
     ilocation?: string;
+	ihome?: string;
 }
 
 // export interface Comprops {

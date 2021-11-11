@@ -118,6 +118,8 @@ class App extends React.Component<Northprops, any> {
 			this.state.nextAction = undefined;
 			this.logout();
 		}
+
+		this.setState({})
 	}
 
 	/** For navigate to portal page
@@ -176,7 +178,7 @@ class App extends React.Component<Northprops, any> {
 					onLogout={this.logout} />
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
-						msg={this.context.error.msg} title={L('Error')} />}
+						msg={this.state.error.msg} title={L('Error')} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 

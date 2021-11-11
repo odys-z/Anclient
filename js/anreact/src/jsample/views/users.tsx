@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext, AnlistColAttrs } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { Semantier } from '@anclient/semantier-st';
@@ -15,6 +15,8 @@ import { L } from '../../utils/langstr';
 	import { JsampleIcons } from '../styles';
 
 	import { UserDetailst } from './user-details';
+import { ClassNamesProps } from '@emotion/react';
+import { CompOpts } from '../../react/anreact';
 
 const styles = (theme) => ( {
 	root: {
@@ -273,7 +275,7 @@ export class UsersTier extends Semantier {
 		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} },
-	] as TierCol[];
+	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	_cols = [
 		{ label: L('check'), field: 'userId', checked: true },

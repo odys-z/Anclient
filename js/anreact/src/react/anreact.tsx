@@ -9,7 +9,7 @@ import { stree_t, Tierec, TierCol,
 import { AnConst } from '../utils/consts';
 import { toBool } from '../utils/helpers';
 import { Comprops, CrudComp } from './crud';
-import { CSSProperties } from '@material-ui/core/styles/withStyles';
+// import { CSSProperties } from '@material-ui/core/styles/withStyles';
 
 export interface ClassNames {[c: string]: string};
 
@@ -29,16 +29,11 @@ export const invalidStyles = {
 	notNull: { backgroundColor: '#ff9800b0' },
 	maxLen : { border: "1px solid red" },
 	minLen : { border: "1px solid red" },
-} as {[n in InvalidClassNames]: CSSProperties};
+} as {[n in InvalidClassNames]: React.CSSProperties};
 
 
 /**JSX.Element like row formatter results */
 export interface AnRow extends JSX.Element { }
-
-// /**(Form) field formatter
-//  * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
-//  */
-// export type AnFieldFormatter = ((rec: Tierec, col: TierCol, classes?: ClassNames, media?: Media) => JSX.Element);
 
 /**(list) row formatter
  * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
@@ -304,7 +299,7 @@ export class AnReactExt extends AnReact {
 
 		let onload = onOk || function (resp: AnsonMsg<AnDatasetResp>) {
 			if (component)
-				component.setState({forest: resp.Body().forest});
+				component.setState({forest: resp.Body().Rs()});
 		}
 
 		this.dataset(opts, onload);

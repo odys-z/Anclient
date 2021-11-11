@@ -29,19 +29,18 @@ import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import { Route } from 'react-router-dom'
 
-import { AnContext } from './reactext';
+import { AnContext, AnContextType } from './reactext';
 	import { ConfirmDialog } from './widgets/messagebox';
 	import { MyIcon } from './widgets/my-icon';
 	import { MyInfo } from './widgets/my-info';
 	import { L } from '../utils/langstr';
-	import { parseMenus } from '../utils/helpers';
 
 import {
-	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, ClassNames, CrudComp, CrudCompW 
+	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW 
 } from './crud'
 import { ClassNameMap } from '@material-ui/styles';
-import { AnReactExt } from './anreact';
-import { AnDatasetResp, AnsonMsg, DatasetierResp } from '@anclient/semantier-st/protocol';
+import { AnReactExt, ClassNames } from './anreact';
+import { AnDatasetResp, AnsonMsg } from '@anclient/semantier-st/protocol';
 
 export interface SysProps extends Comprops {
     /**Welcome page formatter */
@@ -171,6 +170,52 @@ const styles = theme => ({
 	}
 });
 
+export interface MenuItem {
+	funcId: string; id: string;
+	funcName: string; url: string;
+	css: React.CSSProperties;
+	flags: string;
+	parentId: string;
+	sort: number;
+	sibling: number;
+	children: undefined | MenuItem[]
+}
+
+/**
+ * Parse lagacy json format.
+ * @return {menu, paths} 
+ * */
+export function parseMenus(json = []): {
+	menu: Array<MenuItem>;
+	paths: Array<any>}
+{
+	let paths = []; // {'/home': Home}
+	let menu = parse(json);
+	return { menu, paths };
+
+	function parse(json) {
+		if (Array.isArray(json))
+			return json.map( (jn) => { return parse(jn); } );
+		else {
+			// this is just a lagacy of EasyUI, will be deprecated
+			let {funcId, id, funcName, text, url, css, flags, parentId, sort, sibling, children}
+				= json.node;
+
+			sibling = sibling || sort;
+			funcId = funcId || id;
+			funcName = funcName || text;
+
+			if (! url.startsWith('/')) url = '/' + url;
+			paths.push({path: url, params: {flags, css}})
+
+			if (children)
+				children = parse(children);
+
+			return {funcId, funcName, url, css, flags, parentId, sibling, children};
+		}
+	}
+}
+
 /**
  * <pre>a_functions
  funcId       |funcName           |url                               |css |flags |fullpath         |parentId |sibling |
@@ -232,7 +277,7 @@ class SysComp extends CrudCompW<SysProps> {
 		this.welcomePaper = this.welcomePaper.bind(this);
 	}
 
-	welcomePaper(classes) {
+	welcomePaper(classes: ClassNames) {
 		if (typeof this.props.welcome !== 'function') {
 			return (
 			  <Card >
@@ -263,8 +308,10 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	componentDidMount() {
+		const ctx = this.context as unknown as AnContextType;
+
 		// load menu
-		this.anreact = this.context.anReact;
+		this.anreact = ctx.anReact;
 
 		let that = this;
 		this.anreact.loadMenu(
@@ -296,7 +343,11 @@ class SysComp extends CrudCompW<SysProps> {
 			onOk={() => {
 				that.confirmLogout = undefined;
 				that.props.onLogout();
-			}}
+			} }
+			onCancel={ () => {
+				that.confirmLogout = undefined;
+				that.setState({});
+			} }
 			msg={L('Logging out?')} />
 
 		this.setState({});

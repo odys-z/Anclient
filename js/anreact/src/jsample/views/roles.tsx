@@ -1,9 +1,9 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, UpdateReq, InsertReq, DeleteReq, AnsonResp, Semantier, stree_t, CRUD, AnlistColAttrs, PageInf
+import { AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec
 } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
@@ -16,6 +16,7 @@ import { L } from '../../utils/langstr';
 
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';
+import { CompOpts } from '../../react/anreact';
 
 const styles = (theme) => ( {
 	root: {
@@ -57,6 +58,7 @@ class RolesComp extends CrudCompW<Comprops> {
 		buttons: { add: true, edit: false, del: false},
 
 		total: 0,
+		rows: [] as Tierec[],
 		pageInf: { page: 0, size: 25, total: 0 },
 		selected: {ids: new Set<string>()},
 	};
@@ -240,7 +242,7 @@ class RoleTier extends Semantier {
 		  validator: {notNull: true, len: 200} },
 		{ type: 'text', field: 'remarks',  label: 'Remarks',
 		  validator: {notNull: true, len: 500} }
-	] as Array<AnlistColAttrs<JSX.Element, any>>;
+	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
 	/**
 	 * @param {React.Component} comp

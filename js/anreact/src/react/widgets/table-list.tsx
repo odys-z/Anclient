@@ -10,6 +10,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
+import { Tierec } from '@anclient/semantier-st';
 import { toBool } from '../../utils/helpers';
 import { Comprops, DetailFormW } from '../crud';
 
@@ -21,6 +22,7 @@ const styles = (theme) => ( {
 interface AnTablistProps extends Comprops {
 	pk: string;
 	selected: {ids: Set<string>};
+	rows: Tierec[];
 	onSelectChange: (ids: Array<string>) => void;
 }
 
