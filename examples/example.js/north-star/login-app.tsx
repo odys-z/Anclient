@@ -84,6 +84,7 @@ class LoginApp extends React.Component<Northprops> {
 	 * First try ./private/host.json/<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
+	 * 
 	 *
 	 * For test, have elem = undefined
 	 * @param {string} elem html element id, null for test

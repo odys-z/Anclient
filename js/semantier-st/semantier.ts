@@ -83,7 +83,8 @@ export interface Tierec {
 export interface TierComboField extends TierCol {
 	nv: {n: string; v: string};
 	sk: string;
-	cbbStyle: {};
+	// cbbStyle: {};
+	options: Array<{n: string; v: string}>
 }
 
 /**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */

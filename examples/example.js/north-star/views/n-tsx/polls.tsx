@@ -10,7 +10,7 @@ import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
 
 import {
 	L, AnConst,
-    AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample
+    AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample, invalidStyles
 } from '@anclient/anreact';
 
 import { CrudCompW, Comprops } from '../../common/north';
@@ -29,7 +29,7 @@ export interface PollsProp extends Comprops {
 
 
 const styles = (theme: Theme) => (Object.assign(
-	Semantier.invalidStyles as any, {
+	invalidStyles, {
 	crudButton: {
 		margin: theme.spacing(1),
 	},

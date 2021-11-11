@@ -8,19 +8,18 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { TierCol, TierComboField, Semantier, AnElemFormatter, Tierec, AnlistColAttrs } from '@anclient/semantier-st';
-import { L, toBool, DatasetCombo } from '@anclient/anreact';
+import { TierComboField, Semantier, Tierec, AnlistColAttrs } from '@anclient/semantier-st';
+import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
-import { CrudCompW, FormProp, Media } from '../../common/north';
 
-export interface CardsFormProp extends FormProp {
+export interface CardsFormProp extends Comprops {
 	headFormatter?: (rec: Tierec, cols: Array<any>, classes: {[c: string]: string}, media: Media) => JSX.Element;
 	CardsFormatter?: (rows: Array<Tierec>, classes: {[c: string]: string}, media: Media) => JSX.Element;
 };
 
 const styles = (theme: starTheme) => (Object.assign(
-	Semantier.invalidStyles,
+	invalidStyles,
 	{ root: {
 		display: 'flex',
 		width: '100%',
@@ -89,50 +88,50 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 	 * @param classes
 	 * @returns
 	 */
-	getField(f: AnlistColAttrs, rec: { [x: string]: any; }, classes: { [x: string]: string; }) {
+	getField(f: AnlistColAttrs<JSX.Element, CompOpts>, rec: { [x: string]: any; }, classes: { [x: string]: string; }) {
 		let media = this.media;
 		let { isSm } = media;
 		let that = this;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
-            const df = f as TierComboField;
+            const df = f as unknown as TierComboField;
 			return (
 				<DatasetCombo uri={ this.props.uri }
 					sk={df.sk} nv={ df.nv }
 					disabled={ !!df.disabled }
 					readOnly={ !df && f.disabled }
 					options={ df.options || []} val={{n: undefined, v:rec[f.field]} }
-					label={ df.label }
-					style={ df.css || {width: 200} }
-					invalidStyle={ df.css }
+					label={ f.label }
+					style={ f.css || {width: 200} }
+					invalidStyle={ f.css }
 					onSelect={ (v) => {
 						rec[df.field] = v.v;
-						df.css = undefined;
+						f.css = undefined;
 						that.setState({dirty: true});
 					} }
 				/>);
 		}
 		else if (f.type === 'formatter' || f.fieldFormatter) {
 			return (
-				<>{f.fieldFormatter(rec)}</>
+				<>{f.fieldFormatter(rec, f)}</>
 			);
 		}
 		else {
-            const tf = f as TierCol;
+            // const tf = f as TierCol;
 			let type = 'text';
-			if (tf.type === 'float' || tf.type === 'int')
+			if (f.type === 'float' || f.type === 'int')
 				type = 'number';
 			return (
-			<TextField key={tf.field} type={tf.type || type}
-				disabled={!!tf.disabled}
-				label={isSm && !that.props.dense ? L(tf.label) : ''}
+			<TextField key={f.field} type={f.type || type}
+				disabled={!!f.disabled}
+				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
-				placeholder={L(tf.label)} margin='dense'
-				value={ !rec || (rec[tf.field] === undefined || rec[tf.field] === null) ? '' : rec[tf.field] }
-				className={classes[tf.css as string]}
+				placeholder={L(f.label)} margin='dense'
+				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
+				className={classes[f.style as string]}
 				onChange={(e) => {
-					rec[tf.field] = e.target.value;
-					tf.css = undefined;
+					rec[f.field] = e.target.value;
+					f.css = undefined;
 					that.setState({dirty: true});
 				}}
 			/>);
@@ -143,9 +142,9 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 		let fs = [];
 		const isSm = this.props.dense || toBool(media.isMd);
 
-		this.tier.fields().forEach( (f, i) => {
+		this.tier.fields().forEach( (f: AnlistColAttrs<JSX.Element, CompOpts>, i: Number) => {
 		  if (!!f.visible) {
-			f.formatter = (rec, x) => (<>{rec[f.field]}</> as JSX.Element);
+			f.fieldFormatter = (rec, x) => (<>{rec[f.field]}</> as JSX.Element);
 
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}

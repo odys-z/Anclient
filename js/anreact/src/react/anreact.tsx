@@ -1,6 +1,7 @@
 
 import $ from 'jquery';
-import { stree_t, Tierec, TierCol,
+
+import { stree_t, Tierec,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames
@@ -9,7 +10,7 @@ import { stree_t, Tierec, TierCol,
 import { AnConst } from '../utils/consts';
 import { toBool } from '../utils/helpers';
 import { Comprops, CrudComp } from './crud';
-// import { CSSProperties } from '@material-ui/core/styles/withStyles';
+import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
 
 export interface ClassNames {[c: string]: string};
 
@@ -29,7 +30,7 @@ export const invalidStyles = {
 	notNull: { backgroundColor: '#ff9800b0' },
 	maxLen : { border: "1px solid red" },
 	minLen : { border: "1px solid red" },
-} as {[n in InvalidClassNames]: React.CSSProperties};
+} as {[n in InvalidClassNames]: CSSProperties};
 
 
 /**JSX.Element like row formatter results */
