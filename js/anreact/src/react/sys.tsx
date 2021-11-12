@@ -29,7 +29,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import { Route } from 'react-router-dom'
 
-import { AnContext } from './reactext';
+import { AnContext, AnContextType } from './reactext';
 	import { ConfirmDialog } from './widgets/messagebox';
 	import { MyIcon } from './widgets/my-icon';
 	import { MyInfo } from './widgets/my-info';
@@ -263,8 +263,9 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	componentDidMount() {
+		const ctx = this.context as unknown as AnContextType;
 		// load menu
-		this.anreact = this.context.anReact;
+		this.anreact = ctx.anReact;
 
 		let that = this;
 		this.anreact.loadMenu(
