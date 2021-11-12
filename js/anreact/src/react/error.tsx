@@ -6,7 +6,7 @@ import React from 'react';
 	import Button from '@material-ui/core/Button';
 
 import { Comprops, CrudComp } from './crud';
-import { AnContext } from './reactext';
+import { AnContext, AnContextType } from './reactext';
 import { TextField } from '@material-ui/core';
 import { L } from '../utils/langstr';
 
@@ -37,10 +37,12 @@ class ErrorComp extends CrudComp<Comprops> {
 	}
 
 	/** A simulation of error triggering (used for error handling test). */
-	toShowError() {
-		this.context.error.msg = this.state.msg;
-		if (typeof this.context.error.onError === 'function')
-			this.context.error.onError(this.state.msg);
+	toShowDetails() {
+		const ctx = this.context as unknown as AnContextType;
+		ctx.error.msg = this.state.msg;
+		// if (typeof ctx.error.onError === 'function')
+		// 	ctx.error.onError(this.state.msg, undefined);
+		// TODO ...
 	}
 
 	toSubmit() {
@@ -55,7 +57,7 @@ class ErrorComp extends CrudComp<Comprops> {
 				multiline fullWidth={true}
 				onChange={e => this.setState({desc: e.currentTarget.value})}
 				value={this.state.desc} />
-			<Button onClick={this.toShowError} color="secondary">
+			<Button onClick={this.toShowDetails} color="secondary">
 				{L('Details')}
 			</Button>
 			<Button onClick={this.toSubmit} color="primary">

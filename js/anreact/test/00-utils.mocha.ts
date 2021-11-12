@@ -8,8 +8,8 @@ describe('case: [0.0] utils', () => {
 	it('helpers: toBool, isEmpty', () =>{
 		assert.equal(isEmpty(''), true, '0.1');
 		assert.equal(toBool(''), false, '0.3');
-		assert.equal(isEmpty(), true, '0.4');
-		assert.equal(toBool(), false, '0.5');
+		// assert.equal(isEmpty(), true, '0.4');
+		// assert.equal(toBool(), false, '0.5');
 		assert.equal(isEmpty(undefined), true, '0.6');
 		assert.equal(toBool(undefined), false, '0.7');
 		assert.equal(isEmpty(null), true, '0.6');

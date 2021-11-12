@@ -12,11 +12,10 @@ import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card/Card';
 
 import { Tierec, CRUD } from '@anclient/semantier-st';
-import { L, AnContext, ConfirmDialog, invalidStyles } from '@anclient/anreact';
+import { L, AnContext, ConfirmDialog, invalidStyles, Comprops, Media, ClassNames, DetailFormW } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
-import { Anform, AnMUIClasses, FormProp, Media } from '../../common/north';
 import { CardsForm } from './card-form';
 
 const styles = (theme: starTheme) => (Object.assign(
@@ -40,13 +39,13 @@ const styles = (theme: starTheme) => (Object.assign(
  * Some parent controlled user actions, like SessionInf can be added here.
  * This is a good example that a UI widget can be controlled via type checking.
  */
-interface CardsFormProp extends FormProp {
+interface CardsFormProp extends Comprops {
 }
 
 /**
  * Render multiple cards in a form - acctually using rows.
  */
-class PollDetailsComp extends Anform<CardsFormProp> {
+class PollDetailsComp extends DetailFormW<CardsFormProp> {
 	state = {
 		record: {},
 		crud: CRUD.r,
@@ -54,15 +53,15 @@ class PollDetailsComp extends Anform<CardsFormProp> {
 	tier: PollsTier;
 	confirm: JSX.Element;
 
-	head(rec: Tierec, x: number, classes: AnMUIClasses, media: Media) {
+	head(rec: Tierec, x: number, classes: ClassNames, media: Media) {
 		return <Card key={x} className={classes.headCard}>{rec.Title}</Card>;
 	}
 
-	card(rec: Tierec, x: number, classes: AnMUIClasses, media: Media) {
+	card(rec: Tierec, x: number, classes: ClassNames, media: Media) {
 		return <Grid key={x} item className={classes.cardGrid} >{rec.Title}</Grid>;
 	}
 
-	constructor (props : FormProp) {
+	constructor (props : CardsFormProp) {
 		super(props);
 
 		this.state.crud = props.crud ? props.crud

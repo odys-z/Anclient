@@ -86,7 +86,8 @@ export class AnReact {
 	 * @param {React.Component} compont
 	 * @return {AnReact} this
 	 * */
-	bindStateRec(qmsg: { onOk?: any; onLoad?: any; req?: any; }, errCtx: ErrorCtx, compont: { setState: (arg0: { record: {}; }) => void; }) {
+	bindStateRec( qmsg: { onOk?: any; onLoad?: any; req?: any; }, errCtx: ErrorCtx,
+				  compont: { setState: (arg0: { record: {}; }) => void; }) {
 		let onload = qmsg.onOk || qmsg.onLoad ||
 			// try figure out the fields
 			function (resp: { Body: () => { (): any; new(): any; Rs: { (): AnResultset; new(): any; }; }; }) {
@@ -347,10 +348,12 @@ export class AnReactExt extends AnReact {
 	 * @param errCtx error handling context
 	 * @return {AnReactExt} this
 	 */
-	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs: string[];
+	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
 				  nv: {n: string, v: string};
-				  cond: any; onDone: OnCommitOk; noAll: boolean; } ) {
-		let {uri, sk, sqlArgs, nv, cond, onDone, noAll} = opts;
+				  cond?: any; onDone: OnCommitOk;
+				  /**don't add "-- ALL --" item */
+				  noAllItem?: boolean; } ) {
+		let {uri, sk, sqlArgs, nv, cond, onDone, noAllItem} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
@@ -371,7 +374,7 @@ export class AnReactExt extends AnReact {
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
 
 				let {rows} = AnsonResp.rs2nvs( rs, nv );
-				if (!noAll)
+				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
 				cond.options = rows;
 
