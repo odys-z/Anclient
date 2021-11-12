@@ -23,14 +23,18 @@ export namespace AnRelationTreeComp {
 import { CrudCompW } from "../crud";
 import PropTypes from "prop-types";
 export const AnRelationTree: React.ComponentType<(Pick<Pick<PropTypes.InferProps<{
+    mtabl:PropTypes.Validator<string>; 
+    reltabl:PropTypes.Validator<string>; 
     uri: PropTypes.Validator<string>;
     tier: PropTypes.Validator<object>;
     dense: PropTypes.Requireable<boolean>;
-}>, "dense" | "uri" | "tier"> & import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel">, "dense" | "uri" | "tier" | keyof import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel">> | Pick<Pick<PropTypes.InferProps<{
+}>, "mtabl" | "reltabl" | "dense" | "uri" | "tier"> & import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel">, "dense" | "uri" | "tier" | keyof import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel">> | Pick<Pick<PropTypes.InferProps<{
+    mtabl:PropTypes.Validator<string>; 
+    reltabl:PropTypes.Validator<string>; 
     uri: PropTypes.Validator<string>;
     tier: PropTypes.Validator<object>;
     dense: PropTypes.Requireable<boolean>;
-}>, "dense" | "uri" | "tier"> & import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel"> & {
+}>, "mtabl" | "reltabl" | "dense" | "uri" | "tier"> & import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel"> & {
     children?: React.ReactNode;
-}, "children" | "dense" | "uri" | "tier" | keyof import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel">>) & import("@material-ui/core/withWidth").WithWidthProps>;
+}, "children" | "mtabl" | "reltabl" | "dense" | "uri" | "tier" | keyof import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel">>) & import("@material-ui/core/withWidth").WithWidthProps>;
 import React from "react";

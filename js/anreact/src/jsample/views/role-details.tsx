@@ -9,15 +9,13 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Grid from '@material-ui/core/Grid';
 
-import { Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
+import { CRUD, Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { AnConst } from '../../utils/consts';
-	import { AnContext, AnError } from '../../react/reactext'
+	import { AnContext, } from '../../react/reactext'
 	import { JsampleIcons } from '../styles'
-	import { DetailFormW } from '../../react/crud'
+	import { Comprops, DetailFormW } from '../../react/crud'
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { AnRelationTree } from '../../react/widgets/relation-tree';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
@@ -52,17 +50,21 @@ const styles = theme => ({
   },
 });
 
-class RoleDetailsComp extends DetailFormW {
+class RoleDetailsComp extends DetailFormW<Comprops> {
 	state = {
 		crud: CRUD.r,
 		dirty: false,
 		closed: false,
 
 		pk: undefined,
-		record: {},
+		pkval: '',
+		record: undefined as Tierec,
 	};
 
-	constructor (props = {}) {
+	tier: any;
+	ok: JSX.Element;
+
+	constructor (props: Comprops) {
 		super(props);
 
 		this.tier = props.tier;
@@ -72,10 +74,17 @@ class RoleDetailsComp extends DetailFormW {
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
+		this.handleClose = this.handleClose.bind(this);
 	}
 
 	componentDidMount() {
 	}
+
+	handleClose (event: {}, reason: "backdropClick" | "escapeKeyDown") {
+		this.ok = undefined;
+	};
+
+
 
 	toSave(e) {
 		e.stopPropagation();
@@ -144,7 +153,7 @@ class RoleDetailsComp extends DetailFormW {
 				/>
 				<AnRelationTree uri={this.props.uri}
 					tier={this.tier}
-					mtabl='a_roles (optional)' reltabl='a_role_func'
+					mtabl='a_roles' reltabl='a_role_func'
 					sqlArgs={[this.state.pkval]}
 				/>
 			</DialogContent>

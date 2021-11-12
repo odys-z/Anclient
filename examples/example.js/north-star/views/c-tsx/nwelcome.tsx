@@ -1,10 +1,10 @@
 import React from "react";
-import { AnContext, SysComp } from "@anclient/anreact";
-import { Semantier } from "@anclient/semantier-st";
+import { AnContext, AnContextType, ClassNames, CrudCompW, invalidStyles, SysComp } from "@anclient/anreact";
+import { Semantier, Tierec } from "@anclient/semantier-st";
 import { Card, Grid, Link, Paper, SvgIcon, Theme, Typography, withStyles, withWidth } from "@material-ui/core";
 import { WelcomeProp } from "../../common/north";
 
-class WelcomeComp extends React.Component<WelcomeProp, any, any> {
+class WelcomeComp extends CrudCompW<WelcomeProp> {
     uri = '/n/home';
 
     context: typeof AnContext;
@@ -24,7 +24,7 @@ class WelcomeComp extends React.Component<WelcomeProp, any, any> {
     }
 
     componentDidMount() {
-        this.tier.setContext(this.context);
+        this.tier.setContext(this.context as unknown as AnContextType);
     }
 
     getCards(classes: WelcomeClasses) {
@@ -65,7 +65,7 @@ class WelcomeComp extends React.Component<WelcomeProp, any, any> {
 }
 WelcomeComp.contextType = AnContext;
 
-interface WelcomeClasses {
+interface WelcomeClasses extends ClassNames {
     board: string;
     card: string;
     cardTitle: string;
@@ -82,7 +82,7 @@ interface CardCss {
  * @returns
  */
 const styles = (theme: Theme) => (Object.assign(
-	Semantier.invalidStyles as any,
+	invalidStyles,
     { board: {
 		backgroundColor: '#f7f9f1',
         padding: theme.spacing(1),
@@ -99,7 +99,7 @@ const styles = (theme: Theme) => (Object.assign(
 		backgroundColor: '#f1fffe',
 	  },
       cardTitle: {
-        textAlign: 'center',
+        // textAlign: 'center',
         fontSize: '1.2em',
         margin: theme.spacing(1),
         borderBottom: '2px solid lightgrey'
@@ -122,7 +122,8 @@ const WelcomePage = withWidth()(withStyles(styles)(WelcomeComp));
 export { WelcomePage , WelcomeComp }
 
 interface GridItem {xs?: number; md?: number; sm?: number; lg?: number; xl?: number};
-interface NoteRec {
+
+interface NoteRec extends Tierec {
     pusher: string;
     title: string;
     msg?: string;

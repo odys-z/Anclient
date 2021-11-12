@@ -4,16 +4,16 @@ import React from 'react';
 import { AnReact } from './anreact';
 
 export interface AnContextType extends Semantext {
-	ssInf: SessionInf,
+	ssInf?: SessionInf,
 
-	pageOrigin: string,
-	iparent: any,    // usually the parent window of ifram
-	ihome: string,
+	pageOrigin?: string,
+	iparent?: any,    // usually the parent window of ifram
+	ihome?: string,
 
 	/**default: host */
 	servId: string,
 
-	servs: { host: string; [h: string]: string },
+	servs: { host?: string; [h: string]: string },
 
 	hasError: boolean,
 } 

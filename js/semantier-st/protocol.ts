@@ -1,3 +1,4 @@
+import * as CSS from 'csstype';
 /**Callback of CRUD.c/u/d */
 export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
 /**Callback of CRUD.r */
@@ -1102,7 +1103,7 @@ export class AnSessionResp extends AnsonResp {
 
 export class AnTreeNode {
 	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	node : {id: string; children?: Array<AnTreeNode>};
+	node : { id: string; children?: Array<AnTreeNode>; css?: CSS.Properties; };
 	id: string;
 	level: number;
 	parent: string;

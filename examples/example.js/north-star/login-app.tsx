@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom';
 
 import { SessionClient } from '@anclient/semantier'
 import { L, Langstrs, AnContext, AnError, AnReact, Login, jsample } from '@anclient/anreact';
+import { Northprops } from './common/north';
 
 const styles = (theme) => (Object.assign(
-  jsample.styles(theme),
+  jsample.jstyles(theme),
   { root: {
 	    '& *': { margin: theme.spacing(1) }
 	  },
@@ -14,14 +15,19 @@ const styles = (theme) => (Object.assign(
 
 /** The application main, context singleton and error handler, but only for login
  * used in iframe (no origin change). */
-class LoginApp extends React.Component {
+class LoginApp extends React.Component<Northprops> {
 	state = {
 		anClient: undefined,
 		hasError: false,
 		home: 'index.html',
+
+		servId: undefined as string,
+		jserv: '',
+
+		err: undefined as string
 	};
 
-	constructor(props) {
+	constructor(props: Northprops) {
 		super(props);
 
 		this.state.servId = props.servId ? props.servId : 'host';
@@ -57,15 +63,19 @@ class LoginApp extends React.Component {
 	render() {
 		return (
 			<AnContext.Provider value={{
+				ssInf: undefined,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
 				anClient: this.state.anClient,
+				anReact: undefined,
+				iparent: parent,
+				ihome: undefined,
 				hasError: this.state.hasError,
 				error: {onError: this.onError, msg: this.state.err},
 			}} >
 				<Login onLoginOk={this.onLogin}/>
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} />}
+				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} msg={this.state.err} title={L('Error')} />}
 			</AnContext.Provider>
 		);
 	}
@@ -74,6 +84,7 @@ class LoginApp extends React.Component {
 	 * First try ./private/host.json/<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
+	 * 
 	 *
 	 * For test, have elem = undefined
 	 * @param {string} elem html element id, null for test

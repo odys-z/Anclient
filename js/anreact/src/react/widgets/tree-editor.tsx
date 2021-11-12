@@ -1,5 +1,4 @@
 import React from "react";
-import CSS from 'csstype';
 
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
@@ -17,9 +16,9 @@ import { L } from '../../utils/langstr';
 	import { JsampleIcons } from '../../jsample/styles';
 
 import { SimpleForm } from './simple-form';
-import { AnReactExt, ClassNames, Media } from "../anreact";
+import { AnReactExt, CompOpts } from "../anreact";
 import { PropTypes } from "@material-ui/core";
-import { CRUD } from "@anclient/semantier-st/protocol";
+import { CRUD, AnTreeNode } from "@anclient/semantier-st/protocol";
 
 const styles = (theme) => ({
   root: {
@@ -56,7 +55,7 @@ interface TreecardProps extends Comprops {
 
 };
 
-interface CssTreeItem extends CSS.Properties {
+interface CssTreeItem extends React.CSSProperties {
     align: string
 }
 
@@ -200,7 +199,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 	state = {
 		// window: undefined,
 		// [{id, node: {text, css, url}, level, children}. ... ]
-		forest: [ ],
+		forest: [] as AnTreeNode[],
 
 		expandings: new Set(),
 
@@ -240,7 +239,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 	}
 
 	toSearch() {
-		let { mtabl, columns, joins, wheres, s_tree } = this.props;
+		let { s_tree } = this.props;
 		if (s_tree)
 			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
 
@@ -342,20 +341,21 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 	 * @param {object} classes
 	 * @param {media} media
 	 */
-	treeNodes(classes: ClassNames, media: Media) {
+	treeNodes(compOts: CompOpts) {
+		let { classes, media } = compOts;
 		let that = this;
 
 		let m = this.state.forest;
-		let mtree = buildTreegrid( m, classes );
+		let mtree = buildTreegrid( m, undefined, compOts );
 		return mtree;
 
-		function buildTreegrid(tnode, parent) {
+		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts) {
 		  if (Array.isArray(tnode)) {
 			return tnode.map((i, x) => {
-			  return buildTreegrid(i, parent);
+			  return buildTreegrid(i, parent, compOts);
 			});
 		  }
-		  else {
+		  else if (tnode) {
 			let open = that.state.expandings.has(tnode.id)
 					&& tnode.node.children && tnode.node.children.length > 0;
 			tnode.node.css = tnode.node.css || {};
@@ -366,7 +366,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 				  { that.folderHead(that.props.columns, tnode, open, classes, media) }
 				  { open &&
 					<Collapse in={open} timeout="auto" unmountOnExit>
-						{buildTreegrid(tnode.node.children, tnode)}
+						{buildTreegrid(tnode.node.children, tnode, compOts)}
 					</Collapse>
 				  }
 				</div>
@@ -492,7 +492,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		return (
 			<div className={classes.root}>
 				{this.th(this.props.columns, classes, media)}
-				{this.treeNodes(classes, media)}
+				{this.treeNodes({classes, media})}
 				{this.addForm}
 			</div>
 		);
