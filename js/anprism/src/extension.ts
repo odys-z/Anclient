@@ -26,7 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
 			   __proto__:m }
 			 */
 			(uri, uris) => {
-				// AnPagePanel.init(context, uri);
 				AnPagePanel.load(context, uri);
 			})
 	);
@@ -61,19 +60,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		})
 	);
-
-	// why should revive a view without a sever?
-	// if (vscode.window.registerWebviewPanelSerializer) {
-	// 	// Make sure we register a serializer in activation event
-	// 	vscode.window.registerWebviewPanelSerializer(AnPagePanel.viewType, {
-	// 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-	// 			console.log(`Got state: ${state}`);
-	// 			// Reset the webview options so we use latest uri for `localResourceRoots`.
-	// 			webviewPanel.webview.options = getWebviewOpts(context.extensionUri);
-	// 			AnPagePanel.revive(context, webviewPanel, undefined);
-	// 		}
-	// 	});
-	// }
 }
 
 export function deactivate() {
@@ -245,7 +231,9 @@ class AnPagePanel {
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programmatically
-		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+		this._panel.onDidDispose(
+			() => this.dispose(),
+			null, this._disposables);
 
 		// Update the content based on view changes - how to watch webpack results?
 		this._panel.onDidChangeViewState(
@@ -282,6 +270,10 @@ class AnPagePanel {
 	 * The only way to shutdown anserv is the shutdown command or quit vscode.
 	 */
 	public dispose() {
+
+		AnPagePanel.log.appendLine("Closing webserver: " + AnPagePanel.currentPanel?.serv.webrootPath);
+		AnPagePanel.currentPanel?.close(); // not working - windows also has "curl"
+
 		AnPagePanel.currentPanel = undefined;
 
 		// Clean up our resources
