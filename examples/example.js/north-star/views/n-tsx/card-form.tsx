@@ -9,10 +9,15 @@ import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
 import { TierComboField, Semantier, Tierec, AnlistColAttrs } from '@anclient/semantier-st';
-import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts } from '@anclient/anreact';
+
+import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts, ClassNames } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 
+/**
+ * Some parent controlled user actions, like SessionInf can be added here.
+ * This is a good example that a UI widget can be controlled via type checking.
+ */
 export interface CardsFormProp extends Comprops {
 	headFormatter?: (rec: Tierec, cols: Array<any>, classes: {[c: string]: string}, media: Media) => JSX.Element;
 	CardsFormatter?: (rows: Array<Tierec>, classes: {[c: string]: string}, media: Media) => JSX.Element;
@@ -138,7 +143,7 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 		}
 	}
 
-	formFields(rec: {}, classes, media: Media) {
+	formFields(rec: {}, classes: ClassNames, media: Media) {
 		let fs = [];
 		const isSm = this.props.dense || toBool(media.isMd);
 
@@ -149,7 +154,8 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
 					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
-				  <Box className={classes.rowBox} {...f.box} >
+				  {/* <Box className={classes.rowBox} {...f.box} > */}
+				  <Box {...f.box} >
 					{!isSm && f.label &&
 					  <Typography className={classes.formLabel} >
 						{L(f.label)}
@@ -202,5 +208,5 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 	}
 }
 
-const CardsForm = withWidth()(withStyles(styles)(CardsFormComp)); // FIXME only after anreact upgraded
+const CardsForm = withStyles<any, any, CardsFormProp>(styles)(withWidth()(CardsFormComp));
 export { CardsForm, CardsFormComp }
