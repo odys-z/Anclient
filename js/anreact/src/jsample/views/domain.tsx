@@ -8,7 +8,6 @@ import { L } from '../../utils/langstr';
 	import { Comprops, CrudCompW } from '../../react/crud'
 	import { AnContext } from '../../react/reactext'
 	import { AnTablist } from '../../react/widgets/table-list'
-	import { AnQueryForm } from '../../react/widgets/query-form'
 import { QueryConditions } from '@anclient/semantier-st';
 
 const styles = (theme) => ( {
@@ -77,7 +76,7 @@ class DomainComp extends CrudCompW<Comprops> {
 		let args = {};
 		const { classes } = this.props;
 		return ( <>
-			<AnQueryForm uri={this.uri}
+			<AnQueryFormst uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTxt, this.state.condCbb, this.state.condAuto,this.state.condDate]}
 				query={(q) => { return {
@@ -104,5 +103,5 @@ class DomainComp extends CrudCompW<Comprops> {
 }
 DomainComp.contextType = AnContext;
 
-const Domain = withWidth()(withStyles(styles)(DomainComp));
+const Domain = withStyles<Comprops>(styles)(withWidth()(DomainComp));
 export { Domain, DomainComp }
