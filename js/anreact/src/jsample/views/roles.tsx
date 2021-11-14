@@ -12,7 +12,7 @@ import { L } from '../../utils/langstr';
 	import { AnContext, AnContextType } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { AnTablist } from '../../react/widgets/table-list';
-	import { AnQueryForm } from '../../react/widgets/query-form';
+	import { AnQueryFormst } from '../../react/widgets/query-form-st';
 
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';

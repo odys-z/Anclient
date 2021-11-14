@@ -226,9 +226,6 @@ class AnPagePanel {
 		this._panel = panel;
 		AnPagePanel._extensionUri = context.extensionUri;
 
-		// Set the webview's initial html content
-		// this.loadOnline();
-
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programmatically
 		this._panel.onDidDispose(
