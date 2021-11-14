@@ -9,15 +9,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card/Card';
 
 import { Tierec, CRUD } from '@anclient/semantier-st';
-import { L, AnContext, ConfirmDialog, invalidStyles } from '@anclient/anreact';
+import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Media, Comprops } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
-import { Anform, AnMUIClasses, FormProp, Media } from '../../common/north';
-import { CardsForm } from './card-form';
+import { CardsForm, CardsFormProp } from './card-form';
+import { Typography } from '@material-ui/core';
 
 const styles = (theme: starTheme) => (Object.assign(
 	invalidStyles, (theme: starTheme) => {
@@ -37,16 +36,9 @@ const styles = (theme: starTheme) => (Object.assign(
 ));
 
 /**
- * Some parent controlled user actions, like SessionInf can be added here.
- * This is a good example that a UI widget can be controlled via type checking.
- */
-interface CardsFormProp extends FormProp {
-}
-
-/**
  * Render multiple cards in a form - acctually using rows.
  */
-class PollDetailsComp extends Anform<CardsFormProp> {
+class PollDetailsComp extends DetailFormW<CardsFormProp> {
 	state = {
 		record: {},
 		crud: CRUD.r,
@@ -54,15 +46,15 @@ class PollDetailsComp extends Anform<CardsFormProp> {
 	tier: PollsTier;
 	confirm: JSX.Element;
 
-	head(rec: Tierec, x: number, classes: AnMUIClasses, media: Media) {
-		return <Card key={x} className={classes.headCard}>{rec.Title}</Card>;
+	head(rec: Tierec, x: number, classes: ClassNames, media: Media) {
+		return <Typography variant='subtitle1' key={x} className={classes.headCard}>{rec.Title}</Typography>;
 	}
 
-	card(rec: Tierec, x: number, classes: AnMUIClasses, media: Media) {
+	card(rec: Tierec, x: number, classes: ClassNames, media: Media) {
 		return <Grid key={x} item className={classes.cardGrid} >{rec.Title}</Grid>;
 	}
 
-	constructor (props : FormProp) {
+	constructor (props : CardsFormProp) {
 		super(props);
 
 		this.state.crud = props.crud ? props.crud
@@ -78,14 +70,18 @@ class PollDetailsComp extends Anform<CardsFormProp> {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
-			// Only CardForm needing to load records
-			// let that = this;
-			// this.tier.record(undefined, // use tier.pkval
-			// 	(_cols, rows) => {
-			// 		that.setState({record: rows[0]});
-			// 	} );
+		// Only CardForm needing to load records
+		// Poll details form is actually a list form
+		if (this.tier.pollId) {
+
 		}
+		// if (this.tier.pkval) {
+		// 	let that = this;
+		// 	this.tier.record(undefined, // use tier.pkval
+		// 		(_cols, rows) => {
+		// 			that.setState({record: rows[0]});
+		// 		} );
+		// }
 	}
 
 	toStop(e: UIEvent) {

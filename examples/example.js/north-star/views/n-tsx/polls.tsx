@@ -5,17 +5,15 @@ import withWidth from "@material-ui/core/withWidth";
 import { Grid, Button, Theme, Typography } from '@material-ui/core';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
-	OnCommitOk, OnLoadOk, QueryConditions, TierCol
+	OnLoadOk, QueryConditions, AnlistColAttrs
 } from "@anclient/semantier-st";
 
 import {
-	L, AnConst,
-    AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample, invalidStyles
+	L, AnConst, Comprops,
+    AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample, invalidStyles, CrudCompW, CompOpts
 } from '@anclient/anreact';
 
-import { CrudCompW, Comprops } from '../../common/north';
 import { PollDetails } from './poll-details';
-import { TabGuardComp } from 'ag-grid-community';
 
 const { JsampleIcons } = jsample;
 
@@ -61,7 +59,6 @@ class PollsComp extends CrudCompW<PollsProp> {
 		selected: {ids: new Set<string>()},
 	};
 
-    context: typeof AnContext;
     tier: PollsTier;
 
     confirm: JSX.Element;
@@ -209,7 +206,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 }
 PollsComp.contextType = AnContext;
 
-const Polls = withWidth()(withStyles(styles)(PollsComp));
+const Polls = withStyles<any, any, Comprops>(styles)(withWidth()(PollsComp));
 
 class PollsTier extends Semantier {
 	/**{@link StarPorts.polls} */
@@ -227,15 +224,19 @@ class PollsTier extends Semantier {
         { label: L('Users'),     field: "users",  css: {color: 'primary'} },
         { label: L('Status'),    field: "state",  css: {color: 'primary'} },
         // { label: L('Subject'),   field: "subject",style: {color: 'primary'} }
-	] as TierCol[];
+	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
+	/**quiz id */
 	pk = 'qid';
+
+	/** poll id (pkval of poll-details) */
+	pollId: string;
 
     constructor(comp: PollsComp) {
         super(comp);
 
 		Protocol.registerBody(NPollsReq._type,
-			(jsonBd: any) => { return new NPollsReq(this.uri, this.lastCondit); });
+			(jsonBd: {uri: string, condts: PollQueryConditions}) => { return new NPollsReq(jsonBd); });
 
 		Protocol.registerBody(NPollsResp._type,
 			(jsonBd: any) => { return new NPollsResp(jsonBd); });
@@ -348,10 +349,10 @@ class NPollsReq extends AnsonBody {
 	/**quiz Id */
 	quizId: string;
 
-	constructor(uri: string, condts: PollQueryConditions) {
-		super({type: NPollsReq._type, uri});
+	constructor(jso: {uri: string, condts: PollQueryConditions}) {
+		super({type: NPollsReq._type, uri: jso.uri});
 
-		this.quizId = condts.quizId;
+		this.quizId = jso.condts.quizId;
 	}
 
 }

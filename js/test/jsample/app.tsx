@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp, Inseclient
+import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp
 } from '@anclient/semantier-st';
 
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
@@ -39,7 +39,7 @@ class App extends React.Component<Approps> {
 	// FIXME in this pattern, no need to use an object for error handling - callback is enough
 	errCtx = {msg: undefined, onError: this.onError} as ErrorCtx;
 
-	errorMsgbox: any; // JSX.Element;
+	errorMsgbox: JSX.Element;
 
 	/**Restore session from window.localStorage
 	 * 
