@@ -1,5 +1,6 @@
 
 import path = require('path');
+import { URL } from 'url';
 import * as vscode from 'vscode';
 import { AnprismException } from './common';
 
@@ -7,16 +8,14 @@ type Serv = {
     pythonPath: string,
     webroot?: string, // initially unknown, before webroot() is called
     port?: string, // "?" for initially unknow - port in launch.json is part of url, but python need it
+    host: string,
     starting: boolean
 };
 
 export type Page = {
-	port: string,
-	host: string,
-
 	html: vscode.Uri,
 
-	style: string,
+	style?: string,
 
     reload: boolean // FIXME how to get webpack watch results?
 
@@ -70,7 +69,10 @@ export class ServHelper {
             for (let i = 0; i < cfgs.length; i++) {
                 console.log(cfgs[i]);
                 if (cfgs[i].type === "pwa-chrome") {
-                    this.serv.webroot = this.resolvEnv(cfgs[i].webRoot, {workspaceFolder: getWorkspaceFolder(uri)});
+                    this.serv.webroot = ServHelper.resolvEnv(cfgs[i].webRoot, {workspaceFolder: getWorkspaceFolder(uri)});
+                    let {port, host} = ServHelper.parseUrl(cfgs[i].url);
+                    this.serv.port = port;
+                    this.serv.host = host;
                     return this;
                 }
             }
@@ -78,22 +80,28 @@ export class ServHelper {
         throw new AnprismException("Can't setup webroot. See readme for launch.json configuration.");
 	}
 
-    public resolvEnv(s: string, val: {workspaceFolder: string}): string {
+    /**Replace template (s) with args (val). */
+    public static resolvEnv(s: string, val: {workspaceFolder: string}): string {
         return s.replace(/\${workspaceFolder}/g, val.workspaceFolder);
+    }
+
+    public static parseUrl(url: string, deflt = {port: '', host: 'localhost'}) {
+        const u = new URL(url);
+        return {port: u.port || deflt.port, host: u.host || deflt.host};
     }
 
     public webrootPath() :string {
         return this.serv.webroot || ".";
     }
 
-    /**Change back the absolute path to relative url (remove the leading absolute path).
+    /**Change the absolute path back to relative url (remove the leading absolute path).
 	 * @param page
-	 * @returns
+	 * @returns url: http://...; sub: base file name
 	 */
 	public url(page: Page): {url: string, sub: string} {
         let sub = path.relative(this.webrootPath(), page.html.fsPath);
         let subfile = path.basename(sub, ".html");
-		const url = `http://${page.host}:${page.port}/${getNonce()}.html?nonce=${subfile}`;
+		const url = `http://${this.serv.host}/${getNonce()}.html?nonce=${subfile}`;
         console.log(url);
         return {url, sub};
 
