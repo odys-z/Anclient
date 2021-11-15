@@ -7,6 +7,8 @@ SPHINXBUILD   = sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build
 
+PUBLISHDIR    = ../docs
+
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
@@ -15,12 +17,12 @@ help:
 # https://www.docslikecode.com/articles/github-pages-python-sphinx/
 # https://github.com/sphinx-doc/sphinx/issues/3382#issuecomment-470772316
 ghpage:
-	@rm -rf ../docs
+	@rm -rf $(PUBLISHDIR)
 	@rm -r $(BUILDDIR)
 	@mkdir $(BUILDDIR)
 	@make html
-	@cp -a $(BUILDDIR)/html/. ../docs
-	@touch ../docs/.nojekyll
+	@cp -a $(BUILDDIR)/html $(PUBLISHDIR)
+	@touch $(PUBLISHDIR)/.nojekyll
 
 .PHONY: help Makefile
 

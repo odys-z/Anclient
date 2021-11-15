@@ -7,9 +7,9 @@
         {
             "type": "pwa-chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8889",
-            "webRoot": "${workspaceFolder}/dist"
+            "name": "Open index.html",
+            "url": "http://localhost:8888",
+            "webRoot": "${workspaceFolder}\\build\\html"
         }
     ]
 }
