@@ -18,7 +18,6 @@ export interface TierComboField extends AnlistColAttrs<JSX.Element, CompOpts> {
     className: undefined | "root" | InvalidClassNames | AutocompleteClassKey;
 	nv: {n: string; v: string};
 	sk: string;
-	// cbbStyle: {};
 
     options?: [];
 }
@@ -44,7 +43,7 @@ class DatasetComboComp extends CrudCompW<Comprops> {
 	}
 	refcbb = React.createRef();
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 		this.state.combo.options = props.options;
 		this.state.combo.label = props.label;
@@ -145,6 +144,5 @@ class DatasetComboComp extends CrudCompW<Comprops> {
 }
 DatasetComboComp.contextType = AnContext;
 
-const testp = {} as CSSProperties
-const DatasetCombo = withWidth()(withStyles(styles)(DatasetComboComp));
+const DatasetCombo = withStyles<any, any, Comprops>(styles)(withWidth()(DatasetComboComp));
 export { DatasetCombo, DatasetComboComp }
