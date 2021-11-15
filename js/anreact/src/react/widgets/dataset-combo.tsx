@@ -9,7 +9,7 @@ import { AnlistColAttrs, InvalidClassNames } from '@anclient/semantier-st';
 import { AnConst } from '../../utils/consts';
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud';
-import { AnReact, AnReactExt, CompOpts, invalidStyles } from '../anreact';
+import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 
 export interface ComboItem {n: string, v: string};
