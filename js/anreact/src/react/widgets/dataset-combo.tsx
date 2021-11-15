@@ -160,9 +160,5 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 }
 DatasetComboComp.contextType = AnContext;
 
-<<<<<<< HEAD
-const DatasetCombo = withStyles<any, any, Comprops>(styles)(withWidth()(DatasetComboComp));
-=======
 const DatasetCombo = withStyles<any, any, ComboProps>(styles)(withWidth()(DatasetComboComp));
->>>>>>> tsx
 export { DatasetCombo, DatasetComboComp }
