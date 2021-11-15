@@ -182,5 +182,5 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 	}
 }
 
-const TRecordForm = withWidth()(withStyles(styles)(TRecordFormComp));
+const TRecordForm = withStyles<any, any, RecordFormProps>(styles)(withWidth()(TRecordFormComp));
 export { TRecordForm, TRecordFormComp }

@@ -10,7 +10,7 @@ import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
 
 import {
 	L, AnConst, Comprops,
-    AnContext, ConfirmDialog, AnQueryForm, AnTablist, jsample, invalidStyles, CrudCompW, CompOpts
+    AnContext, ConfirmDialog, AnTablist, AnQueryst, jsample, invalidStyles, CrudCompW, CompOpts
 } from '@anclient/anreact';
 
 import { PollDetails } from './poll-details';
@@ -164,15 +164,15 @@ class PollsComp extends CrudCompW<PollsProp> {
 		this.state.condUser.sqlArgs = [this.context.anClient.userInfo.uid];
 		return ( <>
 			<Typography className={classes.funcName} >{L('Polls Trending - TSX')}</Typography>
-			<AnQueryForm uri={this.uri}
+			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condQzName, this.state.condTag, this.state.condUser ]}
-				query={ (q: typeof AnQueryForm) => { return {
-					qzName:q.state.conds[0].val ? q.state.conds[0].val : undefined,
-					tag:   q.state.conds[1].val ? q.state.conds[1].val : undefined,
-					orgId: q.state.conds[2].val ? q.state.conds[2].val.v : undefined,
-				} } }
-				onDone={(query) => { this.toSearch(query); } }
+				// query={ (q: typeof AnQueryst) => { return {
+				// 	qzName:q.conds[0].val ? q.conds[0].val : undefined,
+				// 	tag:   q.conds[1].val ? q.conds[1].val : undefined,
+				// 	orgId: q.conds[2].val ? q.conds[2].val.v : undefined,
+				// } } }
+				onLoaded={this.toSearch}
 			/>
 			<Grid container alignContent="flex-end" >
 				<Button variant="contained" disabled={!btn.stop}
@@ -262,7 +262,7 @@ class PollsTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, 'npolls',
-					new NPollsReq( this.uri, opts )
+					new NPollsReq( {uri: this.uri, condts: opts} )
 					.A(NPollsReq.A.list) );
 
 		console.log(req);
@@ -298,7 +298,7 @@ class PollsTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq( this.uri, 'npolls',
-					new NPollsReq( this.uri, {quizId: pkval} )
+					new NPollsReq( {uri: this.uri, condts: {quizId: pkval}} )
 					.A(NPollsReq.A.pollCards) );
 
 		console.log(req);

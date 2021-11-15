@@ -1,6 +1,6 @@
 
 import React, { UIEvent } from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
 
 import Dialog from '@material-ui/core/Dialog';
@@ -10,35 +10,33 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { Tierec, CRUD } from '@anclient/semantier-st';
-import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Media, Comprops } from '@anclient/anreact';
+import { Tierec, CRUD, TierCol } from '@anclient/semantier-st';
+import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Media } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
-import { CardsForm, CardsFormProp } from './card-form';
+import { CardsForm, CardsFormProps } from './card-form';
 import { Typography } from '@material-ui/core';
 
 const styles = (theme: starTheme) => (Object.assign(
-	invalidStyles, (theme: starTheme) => {
-		return ({
-			root: {},
-			cardGrid: {
+	invalidStyles, {
+		root: {},
+		fromBody: {},
+		cardGrid: {
+		},
+		card: {
+			margin: theme.spacing(2)
+		},
+		headCard: {
 
-			},
-			card: {
-				margin: theme.spacing(2)
-			},
-			headCard: {
-
-			}
-		});
+		}
 	}
 ));
 
 /**
  * Render multiple cards in a form - acctually using rows.
  */
-class PollDetailsComp extends DetailFormW<CardsFormProp> {
+class PollDetailsComp extends DetailFormW<CardsFormProps> {
 	state = {
 		record: {},
 		crud: CRUD.r,
@@ -46,15 +44,15 @@ class PollDetailsComp extends DetailFormW<CardsFormProp> {
 	tier: PollsTier;
 	confirm: JSX.Element;
 
-	head(rec: Tierec, x: number, classes: ClassNames, media: Media) {
-		return <Typography variant='subtitle1' key={x} className={classes.headCard}>{rec.Title}</Typography>;
+	head(rec: Tierec, cols: Array<TierCol>, classes: ClassNames, media: Media) {
+		return <Typography variant='subtitle1' className={classes.headCard}>{rec.Title}</Typography>;
 	}
 
-	card(rec: Tierec, x: number, classes: ClassNames, media: Media) {
+	gridCard(rec: Tierec, x: number, classes: ClassNames, media: Media) {
 		return <Grid key={x} item className={classes.cardGrid} >{rec.Title}</Grid>;
 	}
 
-	constructor (props : CardsFormProp) {
+	constructor (props : CardsFormProps) {
 		super(props);
 
 		this.state.crud = props.crud ? props.crud
@@ -127,7 +125,7 @@ class PollDetailsComp extends DetailFormW<CardsFormProp> {
 				  columns={this.tier.columns()}
 				  rows={this.tier.rows}
 				  headFormatter={this.head}
-				  CardsFormatter={this.card}
+				  CardFormatter={this.gridCard}
 			  />
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
@@ -145,5 +143,5 @@ class PollDetailsComp extends DetailFormW<CardsFormProp> {
 }
 PollDetailsComp.contextType = AnContext;
 
-const PollDetails = withWidth()(withStyles(styles)(PollDetailsComp));
+const PollDetails = withStyles<any, any, CardsFormProps>(styles)(withWidth()(PollDetailsComp));
 export { PollDetails, PollDetailsComp };

@@ -3,19 +3,6 @@ import React from "react";
 import { AnContext, Comprops, Media, SysComp } from "@anclient/anreact";
 import { QueryConditions } from "@anclient/semantier-st/semantier";
 
-/**TODO move to @anclient/anreact */
-// export interface FieldMeta {
-// 	field: string;
-// 	label?: string;
-// 	disabled?: boolean;
-// }
-
-// export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs: boolean; isXl?: boolean; }
-
-// export interface AnMUIClasses {
-// 	[c: string]: string;
-// }
-
 /** App North's props */
 export interface Northprops {
     iportal?: string;
@@ -28,46 +15,9 @@ export interface Northprops {
 	ihome?: string;
 }
 
-// export interface Comprops {
-//     /**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
-// 	uri: string;
-//     /**The matching url in React.Route */
-// 	match?: {path: string};
-
-// 	u?: boolean;
-// 	c?: boolean;
-//     readonly tier: any;
-//     readonly crud?: CRUD;
-//     readonly width?: Breakpoint;
-// };
-
 export interface WelcomeProp extends Comprops {
-    // readonly classes: { board: any }
     readonly sys: typeof SysComp
 };
-
-/**PropType of Poll's Form. */
-// export interface FormProp extends Comprops {
-// 	readonly tier: Semantier;
-// 	/**Fields met for expanding by form, e.g. TRecordForm or CardForm. */
-// 	readonly fields?: Array<{}>;
-
-// 	columns?: Array<AnlistColAttrs>;
-// 	rows?: Array<Tierec>;
-
-// 	readonly dense?: boolean;
-//     readonly classes: {
-// 		root?: string;
-// 		dialogPaper?: string;
-// 		smalltip?: string;
-//         content?: string;
-// 		buttons?: string;
-// 		button?: string,
-// 		card?: string;
-// 		[x: string]: any
-// 	};
-//     onClose?: (event: React.UIEvent) => void;
-// };
 
 /**Query condition item, used by AnQueryForm.  */
 export interface PollQueryCondt extends QueryConditions {
@@ -84,13 +34,7 @@ export interface PollQueryCondt extends QueryConditions {
 export class CrudCompW<T extends Comprops> extends React.Component<T, any, any> {
 	state: any;
 
-    public media: {
-        isLg?: boolean;
-        isMd?: boolean;
-		isSm?: boolean;
-		isXl?: boolean;
-		isXs?: boolean;
-    };
+    public media: Media;
     public uri: string;
 
 	constructor(props: Readonly<T>) {
