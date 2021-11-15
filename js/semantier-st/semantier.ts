@@ -48,6 +48,9 @@ export interface TierCol extends DbCol {
     disabled?: boolean;
 	visible?: boolean;
     checkbox?: boolean;
+
+    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
+    style?: string | {};
 }
 
 /**Meta data handled from tier (DB field).
@@ -66,8 +69,6 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
 
     /**input type / form type, not db type */
     type?: string;
-    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: string | {};
 
     css?: CSSStyleDeclaration;
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
@@ -112,7 +113,7 @@ export class Semantier {
      *
      * @param {uri: string} props
      */
-    constructor(props: any) {
+    constructor(props: {uri: string, [opt: string]: object | string}) {
         if (!props || !props.uri)
             throw Error("uri is required!");
 
@@ -277,10 +278,10 @@ export class Semantier {
 		this.anReact.stree(ds, this.errCtx);
     }
 
-    record( opts: QueryConditions, onLoad: OnLoadOk) : void {
+    record( conds: QueryConditions, onLoad: OnLoadOk) : void {
 	}
 
-    records(opts: QueryConditions, onLoad: OnLoadOk) : void {
+    records(conds: QueryConditions, onLoad: OnLoadOk) : void {
 	}
 
     /** save form with a relationship table */

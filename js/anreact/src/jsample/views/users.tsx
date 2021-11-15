@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext, AnlistColAttrs } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext, AnlistColAttrs, TierComboField } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { Semantier } from '@anclient/semantier-st';
@@ -278,14 +278,14 @@ export class UsersTier extends Semantier {
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	_cols = [
-		{ label: L('check'), field: 'userId', checked: true },
+		{ label: L('check'), field: 'userId', checkbox: true },
 		{ label: L('Log Id'), field: 'userId' },
 		{ label: L('User Name'), field: 'userName' },
-		{ label: L('Organization'), field: 'orgName',
-		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ label: L('Role'), field: 'roleName',
-		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
-	] as Array<TierCol>;
+		{ label: L('Organization'), field: 'orgName' },
+		//   sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
+		{ label: L('Role'), field: 'roleName' },
+		//   sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
+	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	constructor(comp) {
 		super(comp);
