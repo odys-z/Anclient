@@ -36,6 +36,13 @@ const styles = (theme: starTheme) => (Object.assign(
 ));
 
 /**
+ * Some parent controlled user actions, like SessionInf can be added here.
+ * This is a good example that a UI widget can be controlled via type checking.
+ */
+interface CardsFormProp extends Comprops {
+}
+
+/**
  * Render multiple cards in a form - acctually using rows.
  */
 class PollDetailsComp extends DetailFormW<CardsFormProp> {

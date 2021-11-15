@@ -5,11 +5,11 @@ import withWidth from "@material-ui/core/withWidth";
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
-	import { Comprops, CrudCompW } from '../../react/crud'
-	import { AnContext } from '../../react/reactext'
+	import { Comprops, CrudComp, CrudCompW } from '../../react/crud'
+	import { AnContext, AnContextType } from '../../react/reactext'
 	import { AnTablist } from '../../react/widgets/table-list'
-	import { AnQueryForm } from '../../react/widgets/query-form'
 import { QueryConditions } from '@anclient/semantier-st';
+import { AnQueryst } from '../../react/widgets/query-form-st';
 
 const styles = (theme) => ( {
 	root: {
@@ -35,7 +35,7 @@ class DomainComp extends CrudCompW<Comprops> {
 		condDate: {type: 'date', val: '', label: 'operTime'},
 		pageInf : { page: 0, size: 25, total: 0 },
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 	};
 
 	queryReq: QueryConditions;
@@ -47,9 +47,11 @@ class DomainComp extends CrudCompW<Comprops> {
 		this.onPageInf = this.onPageInf.bind(this);
 	}
 
-	toSearch(e, query) {
+	toSearch(query) {
+		const ctx = this.context as unknown as AnContextType;
 		let pageInf = this.state.pageInf;
-		let queryReq = this.context.anClient.query(this.uri, 'a_domain', 'd', pageInf)
+
+		let queryReq = ctx.anClient.query(this.uri, 'a_domain', 'd', pageInf)
 		if (query.parent && query.parent !== 0)
 			queryReq.Body().whereCond('=', 'parentId', `'${query.parent}'`);
 		if (query.domain)
@@ -59,26 +61,30 @@ class DomainComp extends CrudCompW<Comprops> {
 
 		this.queryReq = queryReq;
 
-		this.context.anReact.bindTablist(queryReq, this, this.context.error);
+		ctx.anReact.bindTablist(queryReq, this, ctx.error);
 	}
 
 	onPageInf(page, size) {
+		const ctx = this.context as unknown as AnContextType;
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
 		let query = this.state.queryReq;
 		if (query) {
 			query.Body().Page(size, page);
 			this.state.pageInf = {page, size, total: this.state.pageInf.total};
-			this.context.anReact.bindTablist(query, this, this.context.error);
+			ctx.anReact.bindTablist(query, this, ctx.error);
 		}
 	}
 
 	render() {
 		let args = {};
-		const { classes } = this.props;
+		const { classes, width } = this.props;
+		let media = CrudCompW.getMedia(width);
+		console.log(classes, media);
 		return ( <>
-			<AnQueryForm uri={this.uri}
+			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
+				onLoaded={this.toSearch}
 				conds={[ this.state.condTxt, this.state.condCbb, this.state.condAuto,this.state.condDate]}
 				query={(q) => { return {
 					domain: q.state.conds[0].val ? q.state.conds[0].val : undefined,
@@ -95,7 +101,7 @@ class DomainComp extends CrudCompW<Comprops> {
 				]}
 				rows={this.state.rows} pk='domainId'
 				pageInf={this.state.pageInf}
-				selectedIds={this.state.selected}
+				selected={this.state.selected}
 				sizeOptions={[5, 25, 50]}
 				onPageInf={this.onPageInf}
 			/>
@@ -104,5 +110,6 @@ class DomainComp extends CrudCompW<Comprops> {
 }
 DomainComp.contextType = AnContext;
 
-const Domain = withWidth()(withStyles(styles)(DomainComp));
+// const Domain = withWidth()(withStyles(styles)(DomainComp));
+const Domain = withStyles<any, any, Comprops>(styles)(withWidth()(DomainComp));
 export { Domain, DomainComp }

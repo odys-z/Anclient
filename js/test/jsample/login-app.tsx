@@ -3,6 +3,7 @@ import { StandardProps } from '@material-ui/core';
 import ReactDOM from 'react-dom';
 import { SessionClient } from '@anclient/semantier-st';
 import { AnContext, AnError, AnReact, L, Login } from '@anclient/anreact';
+import { Comprops } from '../../anreact/src/react/crud';
 
 const styles = (theme) => ({
 	root: {
@@ -10,7 +11,9 @@ const styles = (theme) => ({
 	},
 });
 
-interface LoginProps extends StandardProps<any, string> {
+interface LoginProps extends Comprops {
+	servs: {[h: string]: string};
+	servId: string;
 };
 
 /** The application main, context singleton and error handler, but only for login
@@ -32,7 +35,7 @@ class LoginApp extends React.Component<LoginProps> {
 		onError: this.onError // .bind(this),
 	};
 
-	constructor(props) {
+	constructor(props: LoginProps) {
 		super(props);
 
 		this.servId = props.servId ? props.servId : 'host';
