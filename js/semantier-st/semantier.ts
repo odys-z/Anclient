@@ -1,7 +1,7 @@
 import * as CSS from 'csstype';
 import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, DbCol
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, DbCol, DbRelations, FKRelation, Stree
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -32,7 +32,9 @@ export type AnFieldValidator = ((
 export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, opts?: FO) => F);
 
 export type AnFieldValidation = {
-	[k in "notNull" | "minLen" | "len"]: number | string | object
+	notNull?: boolean | number,
+	minLen?: number | string,
+	len?: number | string,
  };
 
 export interface ErrorCtx {
@@ -43,14 +45,14 @@ export interface ErrorCtx {
 }
 
 export interface TierCol extends DbCol {
+    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
+    style?: string | {};
+
 	validator?: AnFieldValidator | AnFieldValidation;
 
     disabled?: boolean;
 	visible?: boolean;
     checkbox?: boolean;
-
-    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: string | {};
 }
 
 /**Meta data handled from tier (DB field).
@@ -86,6 +88,9 @@ export interface TierComboField extends TierCol {
 	sk: string;
 	// cbbStyle: {};
 	options: Array<{n: string; v: string}>
+}
+
+export interface Tierelations extends DbRelations {
 }
 
 /**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
@@ -140,7 +145,7 @@ export class Semantier {
     rec: Tierec;
 
     /** All sub table's relationships */
-    rel: Array<any>;
+    rel: Tierelations;
     /** currrent relation table */
     reltabl: string;
     /** current relations */
@@ -258,7 +263,8 @@ export class Semantier {
 
 		// typically relationships are tree data
 		let { reltabl, sqlArgs, sqlArg } = opts;
-		let { sk, relfk, relcol } = this.rel[reltabl];
+		let fkRel = this.rel[reltabl] as unknown as Stree;
+		let { sk, fk, fullpath } = fkRel;
 
 		sqlArgs = sqlArgs || [sqlArg];
 
@@ -310,13 +316,17 @@ export class Semantier {
 		}
 
 		if (!disableRelations) {
-			let rel = this.rel[this.reltabl];
+			let r = this.rel[this.reltabl];
+			if (r.stree || r.m2m)
+				throw Error('TODO ...');
+
+			let rel = r.fk;
 			// collect relationships
 			let columnMap = {};
 			columnMap[rel.col] = 'nodeId';
 
 			// semantics handler will resulve fk when inserting only when master pk is auto-pk
-			columnMap[rel.fk] = this.pkval
+			columnMap[rel.col] = this.pkval
 							? this.pkval			// when updating
 							: this.rec[this.pk];	// when creating
 
@@ -338,8 +348,8 @@ export class Semantier {
 			}
 			else {
 				// e.g. delete from a_role_func where roleId = '003'
-				let del_rf = new DeleteReq(null, this.reltabl, rel.fk)
-								.whereEq(rel.fk, this.pkval)
+				let del_rf = new DeleteReq(null, this.reltabl, rel.col)
+								.whereEq(rel.col, this.pkval)
 								.post(insRels);
 
 				if (req)
@@ -371,7 +381,7 @@ export class Semantier {
      */
     del(opts: {
         ids: Array<string>;
-        posts: Array<AnsonBody>;
+        posts?: Array<AnsonBody>;
     }, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;

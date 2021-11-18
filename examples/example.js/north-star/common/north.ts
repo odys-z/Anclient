@@ -25,9 +25,6 @@ export interface PollQueryCondt extends QueryConditions {
 	states?: string;
 }
 
-// export class Anform<T extends FormProp> extends React.Component<T, any, any> {
-// }
-
 /**
  * Replacing @anclient/semantier/curd/CrudCompW
  */

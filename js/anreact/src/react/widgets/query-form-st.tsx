@@ -276,9 +276,9 @@ AnQuerystComp.contextType = AnContext;
 interface QueryFormProps extends Comprops {
 	conds: QueryConditions,
 	/**User actions: search button clicked */
-	onSearch: (conds: QueryConditions) => void,
+	onSearch : (conds: QueryConditions) => void,
 	/**Bounding components successfully */
-	onLoaded: (conds: QueryConditions) => void,
+	onLoaded?: (conds: QueryConditions) => void,
 	/**@deprecated Render can get Mediat parameter and field can be defined by user data. */
 	buttonStyle?: "norm" | "dense"
 }

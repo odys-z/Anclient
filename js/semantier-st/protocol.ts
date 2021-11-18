@@ -45,6 +45,41 @@ export interface DbCol {
     name?: string;
 }
 
+/**fk: Foreign key
+ * Semantic tree defined in dataset.xml
+ * multi-multi (TODO)
+ * user defined (?)
+ * */
+export type SemanticType = 'fk' | 'stree' | 'm2m' | 'customer';
+
+export interface FKRelation {
+	/**chiled table pk */
+	pk: string,
+
+	/**Child foreign column */
+	col: string,
+}
+
+export interface Stree {
+	sk?: '',
+	pk: string,
+	fk: string,
+	sort: string,
+	fullpath: string,
+}
+
+/**Is this semantic-DA.Semantics? */
+export type Semantics = {
+	// [reltype in SemanticType]: FKRelation | Stree | any;
+	fk?: FKRelation,
+	stree?: Stree,
+	m2m?: any,
+}
+
+export interface DbRelations {
+    [tabl: string]: Semantics;
+}
+
 export interface PkMeta {
     v: any;
     pk: string;
