@@ -5,13 +5,12 @@ import withWidth from "@material-ui/core/withWidth";
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
-import { Protocol, AnsonResp } from '@anclient/semantier-st';
+import { Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { Comprops, CrudCompW } from '../../react/crud'
-	import { AnContext, AnError } from '../../react/reactext'
+	import { AnContext } from '../../react/reactext'
 	import { AnTreegrid } from '../../react/widgets/treegrid'
-	import { AnQueryForm } from '../../react/widgets/query-form'
 
 const styles = (theme) => ( {
 	root: {
@@ -23,6 +22,7 @@ const styles = (theme) => ( {
 
 class OrgsComp extends CrudCompW<Comprops> {
 	state = {
+		rows: [] as Tierec[],
 	};
 
 	constructor(props) {

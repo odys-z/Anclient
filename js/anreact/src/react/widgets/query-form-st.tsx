@@ -273,19 +273,6 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 }
 AnQuerystComp.contextType = AnContext;
 
-// AnQuerystComp.propTypes = {
-// 	/* TODO: DOCS
-// 	 * Design Notes:
-// 	 * All common widgets need this check, but main CRUD page's uri is been set
-// 	 * by SysComp. Also check CrudComp's comments.
-// 	 */
-// 	uri: PropTypes.string.isRequired,
-// 	conds: PropTypes.array.isRequired,
-// 	onSearch: PropTypes.func.isRequired,
-// 	onLoaded: PropTypes.func,
-// 	buttonStyle: PropTypes.oneOf(["norm", "dense"])
-// };
-
 interface QueryFormProps extends Comprops {
 	conds: QueryConditions,
 	/**User actions: search button clicked */
@@ -296,7 +283,5 @@ interface QueryFormProps extends Comprops {
 	buttonStyle?: "norm" | "dense"
 }
 
-// const AnQueryst = withWidth()(withStyles(styles)(AnQuerystComp));
-// const AnQueryst = withWidth()(AnQuerystyle);
 const AnQueryst = withStyles<any, any, QueryFormProps>(styles)(withWidth()(AnQuerystComp));
 export { AnQueryst, AnQuerystComp }
