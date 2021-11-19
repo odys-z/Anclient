@@ -1,26 +1,22 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
 
 import { Protocol } from '@anclient/semantier';
-import { L, AnConst,
-	AnContext, AnError,
-	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree, utils
+import { L, AnContext,
+	DetailFormW, ConfirmDialog, utils
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 import { docListyle } from '../n/docshares';
-import { MyDocsTier } from '../n/docshares';
 
 const { CRUD } = Protocol;
 const { regex } = utils;

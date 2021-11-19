@@ -40,11 +40,11 @@ class CrudComp<T extends Comprops> extends React.Component<T> {
 	state = {};
 	uri = undefined;
 
-	constructor(props) {
+	constructor(props: T) {
 		super(props);
 		this.uri = props.match && props.match.path || props.uri;
 		if (!this.uri && props.match)
-			throw Error("Anreact CRUD main component (url route) must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
+			throw Error("Anreact CRUD main components' (url route) must set with a URI path. (Component not created with SysComp & React Router 5.2 ? Or declared uri in subclass?)");
 	}
 
 	render() {

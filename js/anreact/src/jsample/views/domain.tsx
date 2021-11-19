@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 
 import { L } from '../../utils/langstr';
 	import { AnConst } from '../../utils/consts';
-	import { Comprops, CrudComp, CrudCompW } from '../../react/crud'
+	import { Comprops, CrudCompW } from '../../react/crud'
 	import { AnContext, AnContextType } from '../../react/reactext'
 	import { AnTablist } from '../../react/widgets/table-list'
 import { QueryConditions, Semantier } from '@anclient/semantier-st';
@@ -66,7 +66,7 @@ class DomainComp extends CrudCompW<Comprops> {
 
 	componentDidMount() {
 		this.tier = new DomainTier({uri: this.uri});
-		this.tier.setContext(this.context);
+		this.tier.setContext(this.context as unknown as AnContextType);
 	}
 
 	toSearch(query) {
@@ -114,6 +114,7 @@ class DomainComp extends CrudCompW<Comprops> {
 				// 	operTime: q.state.conds[3].val ? q.state.conds[3].val : undefined
 				// }} }
 			/>
+			{this.tier &&
 			<AnTablist className={classes.root}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
@@ -125,7 +126,7 @@ class DomainComp extends CrudCompW<Comprops> {
 				selected={this.state.selected}
 				sizeOptions={[5, 25, 50]}
 				onPageInf={this.onPageInf}
-			/>
+			/>}
 		  </>);
 	}
 }
