@@ -285,7 +285,7 @@ export class UsersTier extends Semantier {
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
 		{ label: L('Role'), field: 'roleName',
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
-	] as Array<TierCol>;
+	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
 	constructor(comp) {
 		super(comp);
