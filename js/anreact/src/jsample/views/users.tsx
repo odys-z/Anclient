@@ -281,11 +281,12 @@ export class UsersTier extends Semantier {
 		{ label: L('check'), field: 'userId', checkbox: true },
 		{ label: L('Log Id'), field: 'userId' },
 		{ label: L('User Name'), field: 'userName' },
-		{ label: L('Organization'), field: 'orgName' },
-		//   sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ label: L('Role'), field: 'roleName' },
-		//   sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
-	] as AnlistColAttrs<JSX.Element, CompOpts>[];
+
+		{ label: L('Organization'), field: 'orgName',
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
+		{ label: L('Role'), field: 'roleName',
+		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
+	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
 	constructor(comp) {
 		super(comp);
