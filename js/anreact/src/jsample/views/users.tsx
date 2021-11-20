@@ -15,7 +15,6 @@ import { L } from '../../utils/langstr';
 	import { JsampleIcons } from '../styles';
 
 	import { UserDetailst } from './user-details';
-import { ClassNamesProps } from '@emotion/react';
 import { CompOpts } from '../../react/anreact';
 
 const styles = (theme) => ( {
