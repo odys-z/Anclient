@@ -1,15 +1,12 @@
 import React from 'react';
-// import { withStyles } from "@material-ui/core/styles";
-import { StandardProps, withStyles } from '@material-ui/core';
+import { StandardProps, Theme, withStyles } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
 import { Media, ClassNames } from './anreact';
-import { CRUD } from '@anclient/semantier-st';
+import { CRUD, UIComponent } from '@anclient/semantier-st';
 
-interface Comprops extends StandardProps<any, string> {
-	/**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
-	readonly uri?: string;
+interface Comprops extends StandardProps<any, string>, UIComponent {
 	/**The matching url in React.Route */
 	match?: {path: string};
 
@@ -21,7 +18,7 @@ interface Comprops extends StandardProps<any, string> {
 	readonly width?: Breakpoint;
 }
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'
@@ -115,12 +112,6 @@ class CrudCompW<T extends Comprops> extends CrudComp<T> {
 	}
 }
 CrudCompW.contextType = AnContext;
-
-/*
-CrudCompW.propTypes = {
-	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-};
-*/
 
 class HomeComp extends CrudComp<Comprops> {
 	render() {

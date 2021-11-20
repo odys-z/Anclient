@@ -1,12 +1,12 @@
 import React from "react";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Collapse from "@material-ui/core/Collapse";
-import { Typography } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
@@ -17,12 +17,11 @@ import { L } from '../../utils/langstr';
 
 import { SimpleForm } from './simple-form';
 import { AnReactExt, CompOpts } from "../anreact";
-import { PropTypes } from "@material-ui/core";
-import { CRUD, AnTreeNode } from "@anclient/semantier-st/protocol";
+import { PropTypes, Theme } from "@material-ui/core";
+import { CRUD, AnTreeNode, AnlistColAttrs } from "@anclient/semantier-st";
 
-const styles = (theme) => ({
+const styles = (theme: Theme) => ({
   root: {
-	// display: "flex",
 	width: "100%",
   },
   row: {
@@ -48,6 +47,13 @@ const styles = (theme) => ({
   treeItem: {
 	padding: theme.spacing(1),
 	borderLeft: "1px solid #bcd",
+  },
+  th: {
+	  textAlign: 'center' as const,
+	  border: '1px solid red'
+  },
+  rowText: {
+	marginTop: theme.spacing(1),
   }
 });
 
@@ -129,16 +135,16 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 		let tnode = this.props.tnode;
 		let n = tnode.node;
 		n.css = n.css || {};
-		let { classes, width } = this.props;
+		let { classes } = this.props;
 		return (
 		  <Grid container
 				key={tnode.id}
 				spacing={0}
 				className={classes.row} >
-			{ this.props.columns.filter( v => !toBool(v.hide) ).map( (col, cx) => {
+			{ this.props.columns.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => !toBool(v.visible || true) ).map( (col, cx) => {
 			  if (cx === 0) return (
 				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.rowHead}>
-					<Typography noWrap variant='body2' >
+					<Typography noWrap >
 						{this.props.leadingIcons(tnode, false)}
 						{icon(n.css.icon)}
 						{n.text}
@@ -172,7 +178,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.treeItem}>
 					{ typeof col.formatter === 'function'
 					  ? col.formatter(tnode, col)
-					  : <Typography noWrap variant='body2' align={align(n.css[col.field])}>
+					  : <Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
 							{n.text}
 						</Typography>
 					}
@@ -192,7 +198,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 }
 TreeCardComp.contextType = AnContext;
 
-const TreeCard = withWidth()(withStyles(styles)(TreeCardComp));
+const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCardComp));
 export { TreeCard, TreeCardComp }
 
 class AnTreeditorComp extends DetailFormW<TreecardProps> {
@@ -500,5 +506,5 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 }
 AnTreeditorComp.contextType = AnContext;
 
-const AnTreeditor = withWidth()(withStyles(styles)(AnTreeditorComp));
+const AnTreeditor = withStyles<any, any, TreecardProps>(styles)(withWidth()(AnTreeditorComp));
 export { AnTreeditor, AnTreeditorComp, TreecardProps }

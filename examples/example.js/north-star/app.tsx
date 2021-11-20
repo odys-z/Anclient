@@ -119,7 +119,7 @@ class App extends React.Component<Northprops, any> {
 			this.logout();
 		}
 
-		this.setState({})
+		this.setState({hasError: false})
 	}
 
 	/** For navigate to portal page
@@ -186,12 +186,12 @@ class App extends React.Component<Northprops, any> {
 			return [
 				{ title: L('Basic'),
 				  panel: <jsample.MyInfCard uri={'/sys/session'}
-				  					anContext={anContext}
-									ssInf={that.state.anClient.ssInf} /> },
+								anContext={anContext}
+								ssInf={that.state.anClient.ssInf} /> },
 				{ title: L('Password'),
 				  panel: <jsample.MyPswd uri={'/sys/session'}
-				  					anContext={anContext}
-									ssInf={that.state.anClient.ssInf} /> }
+								anContext={anContext}
+								ssInf={that.state.anClient.ssInf} /> }
 			  ];
 		}
 	}
@@ -202,17 +202,15 @@ class App extends React.Component<Northprops, any> {
 	 * where serv-id = this.context.servId || host
 	 *
 	 * For test, have elem = undefined
-	 * @param {string} elem html element id, null for test
-	 * @param {object} [opts={}] serv id
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.portal='index.html'] page showed after logout
+	 * @param elem html element id, null for test
+	 * @param opts {serv: string, portal: string} default: {host, index.html}
 	 */
-	static bindHtml(elem, opts = {portal: 'indexe.html'}) {
+	static bindHtml(elem: string, opts = {portal: 'indexe.html'}): void {
 		let portal = opts.portal ? opts.portal : 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, opts, json) {
+		function onJsonServ(elem: string, opts: {serv: string, portal: string}, json: any) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

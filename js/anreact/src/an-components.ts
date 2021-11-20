@@ -17,7 +17,6 @@ export * from './react/widgets/image-upload';
 export * from './react/widgets/file-upload';
 export * from './react/widgets/my-icon';
 export * from './react/widgets/my-info';
-export * from './react/widgets/query-form';
 export * from './react/widgets/query-form-st';
 export * from './react/widgets/table-list';
 export * from './react/widgets/tabs';

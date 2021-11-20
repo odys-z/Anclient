@@ -110,6 +110,13 @@ export interface Semantext {
     error: ErrorCtx;
 }
 
+export interface UIComponent {
+	/**Component uri usually comes from function configuration (e.g. set by anreact SysComp.extendLinks).
+	 * uri is not always needed but Semantier enforce the check for it's needed to accesss server.
+	 */
+	readonly uri?: string;
+}
+
 /**
  * Base class of semantic tier
  */
@@ -118,7 +125,7 @@ export class Semantier {
      *
      * @param {uri: string} props
      */
-    constructor(props: {uri: string, [opt: string]: object | string}) {
+    constructor(props: UIComponent) {
         if (!props || !props.uri)
             throw Error("uri is required!");
 

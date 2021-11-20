@@ -1165,16 +1165,14 @@ export interface DatasetOpts {
 	/** semantic key configured in WEB-INF/dataset.xml */
 	sk: string;
 	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
-	t?: {
-		/** load dataset configured and format into tree with semantics defined by sk. */
-		sqltree: string;
+	t?: /** load dataset configured and format into tree with semantics defined by sk. */
+		"sqltree" |
 		/** Reformat the tree structure - reformat the 'fullpath', from the root */
-		retree: string;
+		"retree" |
 		/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
-		reforest: string;
+		"reforest" |
 		/** Query with client provided QueryReq object, and format the result into tree. */
-		query: string;
-	};
+		"query",
 	a?: string;
 	/**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
 	mtabl?: string;
@@ -1288,15 +1286,15 @@ export class DatasetReq extends QueryReq {
     }
 }
 
-export const stree_t = {
+export enum stree_t {
 	/** load dataset configured and format into tree with semantics defined by sk. */
-	sqltree: 'sqltree',
+	sqltree = 'sqltree',
 	/** Reformat the tree structure - reformat the 'fullpath', from the root */
-	retree: 'retree',
+	retree = 'retree',
 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
-	reforest: 'reforest',
+	reforest = 'reforest',
 	/** Query with client provided QueryReq object, and format the result into tree. */
-	query: 'query'
+	query = 'query'
 };
 
 export class DatasetierReq extends AnsonBody {

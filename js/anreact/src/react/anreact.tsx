@@ -294,15 +294,17 @@ export class AnReactExt extends AnReact {
 		let {uri, onOk} = opts;
 
 		if (!uri)
-			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
+			throw Error('Since v0.9.50, Anclient request needs function uri to find datasource.');
 
 		if (opts.sk && !opts.t)
 			opts.a = stree_t.sqltree;
 
 		let onload = onOk || function (resp: AnsonMsg<AnDatasetResp>) {
 			if (component)
-				component.setState({forest: resp.Body().Rs()});
+				component.setState({forest: resp.Body().forest});
 		}
+
+		opts.port = 'stree';
 
 		this.dataset(opts, onload);
 	}

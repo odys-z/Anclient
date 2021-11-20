@@ -1,8 +1,10 @@
 
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import {withStyles, Theme } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Grid, Button, Theme, Typography } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
 	OnLoadOk, QueryConditions, AnlistColAttrs
@@ -206,7 +208,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 }
 PollsComp.contextType = AnContext;
 
-const Polls = withStyles<any, any, Comprops>(styles)(withWidth()(PollsComp));
+const Polls = withStyles<any, any, PollsProp>(styles)(withWidth()(PollsComp));
 
 class PollsTier extends Semantier {
 	/**{@link StarPorts.polls} */
@@ -283,7 +285,7 @@ class PollsTier extends Semantier {
 	 * @param onLoad
 	 * @returns
 	 */
-    record(opts, onLoad: OnLoadOk) {
+    record(opts: {pkval: string}, onLoad: OnLoadOk) {
 		if (!this.client) return;
 
 		let pkval = opts;
