@@ -1,5 +1,5 @@
 
-import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier-st';
 
 export class GPATier extends Semantier {
 	port = 'gpatier';

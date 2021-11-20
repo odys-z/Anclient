@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient } from '@anclient/semantier';
+import { Protocol, Inseclient } from '@anclient/semantier-st';
 
 import { Langstrs,
 	AnContext, AnError, AnReactExt,
