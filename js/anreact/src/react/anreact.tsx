@@ -4,7 +4,7 @@ import $ from 'jquery';
 import { stree_t, Tierec,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames
+	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
@@ -32,6 +32,9 @@ export const invalidStyles = {
 	minLen : { border: "1px solid red" },
 } as {[n in InvalidClassNames]: CSSProperties};
 
+export function toReactStyles(styles: CSSStyleDeclaration): CSSProperties {
+	return styles as unknown as CSSProperties;
+}
 
 /**JSX.Element like row formatter results */
 export interface AnRow extends JSX.Element { }
@@ -232,6 +235,8 @@ export class AnReact {
  * @class
  */
 export class AnReactExt extends AnReact {
+	loading: boolean;
+	options: NV[];
 
 	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
@@ -351,17 +356,19 @@ export class AnReactExt extends AnReact {
 	 * @return {AnReactExt} this
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
-				  nv: {n: string, v: string};
-				  cond?: any; onDone: OnCommitOk;
+				  nv: NV;
+				  //cond?: {loading: boolean, options: NV[], clean: boolean};
+				  onDone: OnLoadOk;
 				  /**don't add "-- ALL --" item */
 				  noAllItem?: boolean; } ) {
-		let {uri, sk, sqlArgs, nv, cond, onDone, noAllItem} = opts;
+		let {uri, sk, sqlArgs, nv, onDone, noAllItem} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		cond.loading = true;
+		// cond.loading = true;
+		this.loading = true;
 
 		this.dataset( {
 				port: 'dataset',
@@ -375,16 +382,15 @@ export class AnReactExt extends AnReact {
 					console.error("Can't find data in rs for option label. column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
 
-				let {rows} = AnsonResp.rs2nvs( rs, nv );
+				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				cond.options = rows;
+				this.options = rows;
 
-				cond.loading = false;
-				cond.clean = true;
+				this.loading = false;
 
 				if (onDone)
-					onDone(cond);
+					onDone(cols, rows);
 			} );
 		return this;
 	}

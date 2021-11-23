@@ -583,7 +583,7 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	public col (c : string, as : string) : QueryReq {
+	public col (c : string, as? : string) : QueryReq {
 		return this.expr(c, as);
 	}
 

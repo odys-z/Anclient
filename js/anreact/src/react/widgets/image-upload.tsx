@@ -1,18 +1,17 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 import Box from '@material-ui/core/Box';
 
-import { Semantier } from '@anclient/semantier-st';
 
 import { gCamera, gCameraViewBox } from './my-icon';
 import { mimeOf } from '../../utils/file-utils';
 import { DetailFormW, Comprops } from '../crud';
+import { invalidStyles, toReactStyles } from '../anreact';
 
-const styles = (theme) => (Object.assign(
-	Semantier.invalidStyles, {
+const styles = (theme: Theme) => (Object.assign(
+	invalidStyles, {
 	imgUploadBox: {
 		height: 48,
 		border: "solid 1px #aaa2" }
@@ -99,7 +98,7 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 			position: "relative",
 			top: -52,
 			opacity: 0
-		}
+		} as React.CSSProperties;
 
 		let { classes } = this.props;
 
@@ -114,11 +113,6 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 		  </Box>);
 	}
 }
-
-// ImageUploadComp.propTypes = {
-// 	tier: PropTypes.object.isRequired,
-// 	nv: PropTypes.object, // the record field and value
-// };
 
 const ImageUpload = withWidth()(withStyles(styles)(ImageUploadComp));
 export { ImageUpload, ImageUploadComp };

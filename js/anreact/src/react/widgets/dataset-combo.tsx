@@ -45,7 +45,9 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	state = {
 		// sk: undefined,
 		// combo: {label: undefined, val: undefined, initVal: undefined, ref: undefined, options: []},
-		options: [] as Array<ComboItem>,
+		// options: [] as Array<ComboItem>,
+
+		combo: { options: undefined as Array<ComboItem>, loading: false},
 
 		selectedItem: undefined,
 	}
@@ -54,7 +56,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	constructor(props: ComboProps) {
 		super(props);
-		this.state.options = props.options;
+		this.state.combo.options = props.options;
 		// this.state.combo.label = props.label;
 		// this.state.combo.initVal = props.val;
 
@@ -78,7 +80,6 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 					// user uses this, e.g. name and value to access data
 					nv: this.props.nv || {n: 'name', v: 'value'},
 					// cond: this.state.condits, TODO: not used?
-					cond: 'TODO: not used?',
 					onDone: (options) => that.setState({options})
 				}
 				);
@@ -136,7 +137,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			onChange={ this.onCbbRefChange(this.refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
-			options={this.state.options}
+			options={this.state.combo.options}
 			style={this.props.style}
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }

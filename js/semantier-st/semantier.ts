@@ -1,4 +1,3 @@
-import * as CSS from 'csstype';
 import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, DbCol, DbRelations, FKRelation, Stree
@@ -143,7 +142,7 @@ export class Semantier {
     /** optional main table's pk */
     pk: string;
     /** current crud */
-    crud: string;
+    crud: CRUD;
     /** current list's data */
     rows: Tierec[];
     /** current pk value */
