@@ -209,7 +209,7 @@ class UserstComp extends CrudCompW<Comprops> {
 }
 UserstComp.contextType = AnContext;
 
-const Userst = withWidth()(withStyles(styles)(UserstComp));
+const Userst = withStyles<any, any, Comprops>(styles)(withWidth()(UserstComp));
 export { Userst, UserstComp }
 
 class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {

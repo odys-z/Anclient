@@ -27,7 +27,6 @@ export interface PollsProp extends Comprops {
 		smalltip?: string; };
 };
 
-
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
 	crudButton: {
@@ -288,7 +287,7 @@ class PollsTier extends Semantier {
     record(opts: {pkval: string}, onLoad: OnLoadOk) {
 		if (!this.client) return;
 
-		let pkval = opts;
+		let { pkval } = opts;
 
 		pkval = pkval || this.pkval ;
 		if (!pkval) {

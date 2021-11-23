@@ -2,17 +2,17 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Card, TextField, Typography, Grid, Button } from '@material-ui/core';
+import { Typography, Grid, Button } from '@material-ui/core';
 
-import { Protocol, UserReq } from '@anclient/semantier-st';
+import { UserReq } from '@anclient/semantier-st';
 import {
-    L, Langstrs,
-    AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablist, DatasetCombo, ConfirmDialog, jsample
+    L,
+    AnConst, AnContext, CrudCompW, AnQueryst,
+	AnTablist, DatasetCombo, ConfirmDialog, jsample
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
+import { QuizProtocol } from '../../common/protocol.quiz.js';
 import { Quizsheet } from './quizsheet-ag';
 import { QuizForm } from './quiz-form';
 
@@ -217,7 +217,7 @@ class QuizzesComp extends CrudCompW {
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		return ( <>{this.funcName}
-			<AnQueryForm uri={this.uri}
+			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
 				query={ (q) => { return {
