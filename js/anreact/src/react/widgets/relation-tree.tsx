@@ -1,31 +1,25 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
-import TextField from "@material-ui/core/TextField";
-import Input from '@material-ui/core/Input';
 import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
-import SvgIcon from "@material-ui/core/SvgIcon";
 
+import { Semantier, Tierec } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
-	import { toBool } from '../../utils/helpers';
-	import { AnConst } from '../../utils/consts';
-	import { CrudCompW } from '../crud';
-	import { DatasetCombo } from './dataset-combo'
-	import { AnTreeIcons } from "./tree";
+import { toBool } from '../../utils/helpers';
+import { Comprops, CrudCompW } from '../crud';
+import { AnTreeIcons } from "./tree";
 
 const styles = (theme) => ({
   root: {
 	display: "flex",
-	flexDirection: "column",
-	textAlign: "left",
+	flexDirection: "column" as const,
+	// textAlign: "left",
 	width: "100%"
   },
   row: {
@@ -54,10 +48,15 @@ const styles = (theme) => ({
 	lineHeight: '4ch',
   },
   treeLabel: {
-	textAlign: 'center',
+	textAlign: 'center' as const,
 	paddingLeft: '8ch',
   }
 });
+
+interface RelationTreeProps extends Comprops {
+	reltabl: string;
+	sk: string
+};
 
 /**
  * Tiered relationshp tree is a component for UI relation tree layout, automaitcally bind data,
@@ -65,12 +64,14 @@ const styles = (theme) => ({
  *
  * See also {@link AnRelationTreeComp}
  */
-export class AnRelationTreeComp extends CrudCompW {
+export class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	state = {
 		dirty: false,
 
 		expandings: new Set(),
 	};
+	tier: Semantier;
+	forest: Array<Tierec>;
 
 	constructor(props) {
 		super(props);
@@ -112,7 +113,7 @@ export class AnRelationTreeComp extends CrudCompW {
 		let expandItem = this.toExpandItem;
 		let checkbox = !this.props.disableCheckbox;
 
-		return this.state.forest.map(
+		return this.forest.map(
 			(tree, tx) => {return treeItems(tree);}
 		);
 		// return treeItems(this.state.forest[0] || {});
@@ -129,7 +130,7 @@ export class AnRelationTreeComp extends CrudCompW {
 			if (node.children && node.children.length > 0)
 			  return (
 				<Box key={id} className={classes.folder}>
-				  <Box  nid={id}
+				  <Box  id={id}
 						onClick={expandItem}
 						className={classes.folderHead}
 				  >
@@ -189,7 +190,7 @@ export class AnRelationTreeComp extends CrudCompW {
 				  </Grid>
 				</Grid>
 			  );
-			}
+		  }
 		}
 
 		function icon(icon) {
@@ -204,26 +205,24 @@ export class AnRelationTreeComp extends CrudCompW {
 		}
 
 		function itemLabel(txt, l, css) {
-			return '';
+			return L(txt);
 		}
 	}
 
 	render() {
 		const { classes } = this.props;
-		this.state.forest = this.tier.rels;
+		this.forest = this.tier.rels;
 
 		return (
 			<div className={classes.root}>
-				{this.state.forest && this.buildTree(classes)}
+				{this.forest && this.buildTree(classes)}
 			</div> );
 	}
 }
 
-AnRelationTreeComp.propTypes = {
-	uri: PropTypes.string.isRequired,
-	tier: PropTypes.object.isRequired,
-	dense: PropTypes.bool,
-};
+	// uri: PropTypes.string.isRequired,
+	// tier: PropTypes.object.isRequired,
+	// dense: PropTypes.bool,
 
-const AnRelationTree = withWidth()(withStyles(styles)(AnRelationTreeComp));
+const AnRelationTree = withStyles<any, any, RelationTreeProps>(styles)(withWidth()(AnRelationTreeComp));
 export { AnRelationTree }

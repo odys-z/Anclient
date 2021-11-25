@@ -45,7 +45,7 @@ export interface ErrorCtx {
 
 export interface TierCol extends DbCol {
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: string | {};
+    style?: string;
 
 	validator?: AnFieldValidator | AnFieldValidation;
 
@@ -235,10 +235,10 @@ export class Semantier {
     }
 
     /** Get form fields data specification
-     * @param {object} modifier {field, function | object }
-     * @param {object | function} modifier.field see #columns().
+     * @param modifier {field: AnElemFormatter | object }
+	 * e.g. for anreact, object can be {gird, box, ...}.
      */
-	 fields (modifier?: {[x: string]: AnElemFormatter}): Array<TierCol> {
+	 fields (modifier?: {[x: string]: AnElemFormatter | object}): Array<TierCol> {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 
@@ -259,7 +259,9 @@ export class Semantier {
 	}
 
     /** Load relationships */
-    relations(opts: { reltabl: string;
+    relations(opts: {
+			uri: string;
+			reltabl: string;
 			sqlArgs?: string[]; sqlArg?: string; } ,
 			onOk: OnCommitOk): void {
 		if (!this.anReact)
@@ -290,10 +292,10 @@ export class Semantier {
 		this.anReact.stree(ds, this.errCtx);
     }
 
-    record( conds: QueryConditions, onLoad: OnLoadOk) : void {
-	}
+    record( _conds: QueryConditions, onLoad: OnLoadOk) : void {
+    }
 
-    records(conds: QueryConditions, onLoad: OnLoadOk) : void {
+    records<T extends Tierec>(opts: QueryConditions, onLoad: OnLoadOk) : void {
 	}
 
     /** save form with a relationship table */

@@ -1,20 +1,22 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
-import { Button, Grid } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext, AnlistColAttrs, TierComboField, OnLoadOk } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk
+} from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { Semantier } from '@anclient/semantier-st';
-	import { Comprops, CrudCompW } from '../../react/crud';
-	import { AnContext } from '../../react/reactext';
-	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnTablist } from '../../react/widgets/table-list';
-	import { AnQueryst } from '../../react/widgets/query-form-st';
-	import { JsampleIcons } from '../styles';
+import { Semantier } from '@anclient/semantier-st';
+import { Comprops, CrudCompW } from '../../react/crud';
+import { AnContext } from '../../react/reactext';
+import { ConfirmDialog } from '../../react/widgets/messagebox'
+import { AnTablist } from '../../react/widgets/table-list';
+import { AnQueryst } from '../../react/widgets/query-form-st';
+import { JsampleIcons } from '../styles';
 
-	import { UserDetailst } from './user-details';
+import { UserDetailst } from './user-details';
 import { CompOpts } from '../../react/anreact';
 
 const styles = (theme) => ( {
@@ -150,7 +152,6 @@ class UserstComp extends CrudCompW<Comprops> {
 
 	toEdit(e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
-		// let pkv = [...this.state.selected.ids][0];
 		let pkv = this.getByIx(this.state.selected.ids);
 		this.tier.pkval = pkv;
 		this.recForm = (<UserDetailst crud={CRUD.u}
@@ -165,6 +166,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.recForm = undefined;
 		this.tier.resetFormSession();
 		this.toSearch(undefined);
+		this.onTableSelect([]);
 	}
 
 	render() {
@@ -293,7 +295,7 @@ export class UsersTier extends Semantier {
 		return this._cols;
 	}
 
-	records(conds, onLoad) {
+	records(conds: QueryConditions, onLoad: OnLoadOk) {
 		if (!this.client) return;
 
 		let client = this.client;

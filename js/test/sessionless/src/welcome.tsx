@@ -2,7 +2,7 @@ import React, { MouseEventHandler } from 'react';
 import { withStyles } from '@material-ui/styles';
 import { Box, Card, IconButton, Link, Paper, Typography, withWidth } from '@material-ui/core';
 
-import { Semantier } from '@anclient/semantier-st';
+import { Semantier, Tierec } from '@anclient/semantier-st';
 import { Comprops, CrudComp, jsample } from '@anclient/anreact';
 
 const styles = (theme) => ( {
@@ -18,7 +18,7 @@ const styles = (theme) => ( {
 	cardTitle: {
 		color: "blue",
 		textShadow: "4px 4px 3px #688a8a",
-		// textAlign: "center",
+		textAlign: "center" as const,
 		margin: theme.spacing(1)
 	},
 	cartText: {
@@ -102,7 +102,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 // FIXME ignoring eslint report report error before anreact upgraded to TS.
 export default withWidth()(withStyles(styles)(WelcomeComp));
 
-type WelcomeRec = {
+interface WelcomeRec extends Tierec {
 	eid: string,
 	ename: string, // card title
 	publisher?: string | undefined,
@@ -123,16 +123,15 @@ class WelcomeTier extends Semantier {
 	/**
 	 * @override(Semantier)
 	 */
-	records<WelcomeRec>(): Array<WelcomeRec> {
+	records<WelcomeRec>() {
 		this.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
-		return this.rows;
+		return this.rows as unknown as Array<WelcomeRec>; // FIXME shouldn't use "as unknown"
 	}
 
-	myNotifies<WelcomeRec>() {
-
+	myNotifies() {
 		this.rows = [
 			{eid: '01', ename: 'Action Required', css: {important: true}, edate: '2021-10-10', extra: '100'},
 			{eid: '02', ename: 'Abc@E', publisher: '👉 Try the style', css: {type: 'auto'}, edate: '2021-10-10', extra: '100'}];
-		return this.rows;
+		return this.rows as Array<WelcomeRec>;
 	}
 }

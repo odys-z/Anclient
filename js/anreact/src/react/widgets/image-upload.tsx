@@ -8,7 +8,7 @@ import Box from '@material-ui/core/Box';
 import { gCamera, gCameraViewBox } from './my-icon';
 import { mimeOf } from '../../utils/file-utils';
 import { DetailFormW, Comprops } from '../crud';
-import { invalidStyles, toReactStyles } from '../anreact';
+import { invalidStyles } from '../anreact';
 
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
@@ -57,6 +57,7 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 			// }
 
 			// this.state.src = this.props.src;
+
 		}
 	}
 

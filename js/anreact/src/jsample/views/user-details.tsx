@@ -9,10 +9,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { CRUD } from '@anclient/semantier-st';
+import { CRUD, TierCol } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { Comprops, DetailFormW } from '../../react/crud';
+	import { Comprops, CrudComp, CrudCompW, DetailFormW } from '../../react/crud';
 	import { ConfirmDialog } from '../../react/widgets/messagebox';
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 
@@ -65,6 +65,8 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 	confirm: JSX.Element;
 	handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
+	fields: TierCol[];
+
 	constructor (props: Comprops) {
 		super(props);
 
@@ -78,6 +80,9 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 	}
 
 	componentDidMount() {
+		// statically load fields - style wil be updated each time of validating.
+		this.fields = this.tier.fields( { remarks: {grid: {sm: 12, md: 12, lg: 12}} } );
+		this.setState({});
 	}
 
 	toSave(e: React.MouseEvent<HTMLElement>) {
@@ -85,7 +90,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 
 		let that = this;
 
-		if (this.tier.validate(this.tier.rec, this.tier.fields()))
+		if (this.tier.validate(this.tier.rec, this.fields))
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.crud,
@@ -124,7 +129,9 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 	}
 
 	render () {
-		const { tier, classes, width } = this.props;
+		const { classes, width } = this.props;
+
+		let media = CrudCompW.getMedia(width);
 
 		let c = this.crud === CRUD.c;
 		let u = this.crud === CRUD.u;
@@ -146,7 +153,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 			  </DialogTitle>
 				<TRecordForm uri={this.props.uri}
 					tier={this.tier}
-					fields={this.tier.fields({ remarks: {grid: {sm: 12, md: 12, lg: 12}} })}
+					fields={this.fields || []}
 				/>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>

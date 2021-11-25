@@ -3,6 +3,7 @@ import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
 import { Theme } from '@material-ui/core/styles';
+import clsx from  'clsx';
 
 import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
@@ -105,7 +106,8 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(f) }
 					options={ f.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ f.label }
-					style={ toReactStyles(f.css) || {width: 200} }
+					className={clsx(classes[f.className], classes[f.style])}
+					style={ toReactStyles(f.css) || { width: 200 } }
 					invalidStyle={ f.style }
 					onSelect={ (v) => {
 						rec[f.field] = v.v;
@@ -138,7 +140,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				placeholder={L(f.label)} margin='dense'
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
 				inputProps={{ readOnly } }
-				className={classes[f.className]}
+				className={clsx(classes[f.className], classes[f.style])}
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
 					f.style = undefined;

@@ -1,24 +1,22 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import { CRUD, Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { AnContext, } from '../../react/reactext'
-	import { JsampleIcons } from '../styles'
-	import { Comprops, DetailFormW } from '../../react/crud'
-	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnRelationTree } from '../../react/widgets/relation-tree';
-	import { TRecordForm } from '../../react/widgets/t-record-form';
+import { AnContext, } from '../../react/reactext'
+import { JsampleIcons } from '../styles'
+import { Comprops, DetailFormW } from '../../react/crud'
+import { ConfirmDialog } from '../../react/widgets/messagebox'
+import { AnRelationTree } from '../../react/widgets/relation-tree';
+import { TRecordForm } from '../../react/widgets/t-record-form';
 
 const styles = theme => ({
   dialogPaper: {
@@ -50,7 +48,13 @@ const styles = theme => ({
   },
 });
 
-class RoleDetailsComp extends DetailFormW<Comprops> {
+class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
+
+	/**sk role-func
+	 * Hard coded here since it's a business string for jsample app.
+	 */
+	static skRoleFunc = '';
+
 	state = {
 		crud: CRUD.r,
 		dirty: false,
@@ -152,7 +156,7 @@ class RoleDetailsComp extends DetailFormW<Comprops> {
 					})}
 				/>
 				<AnRelationTree uri={this.props.uri}
-					tier={this.tier}
+					tier={this.tier} sk={RoleDetailsComp.skRoleFunc}
 					mtabl='a_roles' reltabl='a_role_func'
 					sqlArgs={[this.state.pkval]}
 				/>
@@ -173,5 +177,5 @@ class RoleDetailsComp extends DetailFormW<Comprops> {
 }
 RoleDetailsComp.contextType = AnContext;
 
-const RoleDetails = withWidth()(withStyles(styles)(RoleDetailsComp));
+const RoleDetails = withStyles<any, any, Comprops>(styles)(withWidth()(RoleDetailsComp));
 export { RoleDetails, RoleDetailsComp };

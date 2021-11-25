@@ -66,7 +66,6 @@ class RolesComp extends CrudCompW<Comprops> {
 	q?: QueryConditions;
 	confirm: JSX.Element;
 	roleForm: JSX.Element;
-	// uri: string;
 	props: { classes: any; };
 
 	constructor(props: Comprops) {
@@ -101,7 +100,7 @@ class RolesComp extends CrudCompW<Comprops> {
 			} );
 	}
 
-	onPageInf(page, size) {
+	onPageInf(page: number, size: number) {
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
 
@@ -114,7 +113,7 @@ class RolesComp extends CrudCompW<Comprops> {
 		}
 	}
 
-	onTableSelect(rowIds) {
+	onTableSelect(rowIds: Array<string>) {
 		this.setState( {
 			buttons: {
 				add: this.state.buttons.add,
@@ -163,6 +162,7 @@ class RolesComp extends CrudCompW<Comprops> {
 		this.roleForm = undefined;
 		this.tier.resetFormSession();
 		this.setState({});
+		this.onTableSelect([]);
 	}
 
 	render() {
@@ -217,7 +217,8 @@ class RoleTier extends Semantier {
 	rel = {'a_role_func':
 		{ fk: {
 			pk: 'roleId',	 // fk to main table
-			col: 'funcId', } // checking col
+			col: 'funcId' }, // checking col
+		  sk: 'trees.role_func'
 		} as Semantics
 	};
 

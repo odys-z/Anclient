@@ -31,7 +31,7 @@ const styles = theme => ({
     backgroundColor: "#fafbff",
     border: "solid 1px #f5f5ff",
     textShadow: "4px 4px 7px #688a8a",
-	// textAlign: "center", not answered? https://github.com/mui-org/material-ui/issues/12661
+	textAlign: "center" as const, // not answered? https://github.com/mui-org/material-ui/issues/12661
 	margin: "auto"
   },
   centerbox: {
@@ -127,7 +127,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				aria-describedby="alert-dialog-description" >
 
 				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle}
-					style={{textAlign: "center"}}>
+					style={{/*textAlign: "center"*/}}>
 				  {L(title)}
 				</DialogTitle>
 				<DialogContent>

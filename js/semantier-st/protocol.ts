@@ -61,7 +61,7 @@ export interface FKRelation {
 }
 
 export interface Stree {
-	sk?: '',
+	sk: string,
 	pk: string,
 	fk: string,
 	sort: string,

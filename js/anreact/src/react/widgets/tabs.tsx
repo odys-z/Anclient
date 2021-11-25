@@ -1,17 +1,16 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from '@material-ui/core/withWidth';
+import { Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 
-import {L} from '../../utils/langstr';
-import {AnContext} from '../reactext';
-import { invalidStyles } from '../anreact';
+import { L } from '../../utils/langstr';
+import { AnContext } from '../reactext';
+import { invalidStyles, ClassNames } from '../anreact';
 import { Comprops, CrudCompW } from '../crud';
-import { Theme } from '@material-ui/core/styles';
-import { ClassNames } from '../../an-components';
 
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
@@ -33,6 +32,8 @@ interface TabPanelProps extends Comprops {
 
 class TabPanel extends CrudCompW<TabPanelProps> {
 	state = {}
+    title: string;
+    panel: ReactNode;
 
 	constructor (props: TabPanelProps) {
 		super(props);
@@ -52,7 +53,11 @@ class TabPanel extends CrudCompW<TabPanelProps> {
 	}
 }
 
-class TabsComp extends CrudCompW<TabPanelProps> {
+interface TabsProps extends Comprops {
+    panels: Array<TabPanel>;
+}
+
+class TabsComp extends CrudCompW<TabsProps> {
 	state = {
 		px: 0, // panel index
 		panels: [<div>Panels[0]</div>, <div>Panels[1]</div>, <div>Panels[2]</div>]
@@ -64,19 +69,17 @@ class TabsComp extends CrudCompW<TabPanelProps> {
 		super(props);
 		this.dynatabs = [
 			{label: L('Basic')},
-			{label: L('Contact'), },
+			{label: L('Contact')},
 			{label: L('Security')},
 		]
 
 		this.handleChange = this.handleChange.bind(this);
 	}
 
-	handleChange (e, v) {
+	handleChange (e: React.ChangeEvent<HTMLElement>, v: number) {
 		e.stopPropagation();
 		this.setState({ px: v });
 	};
-
-
 
 	render() {
 		const {classes} = this.props;
@@ -118,5 +121,5 @@ class TabsComp extends CrudCompW<TabPanelProps> {
 }
 TabsComp.contextType = AnContext;
 
-const AnTabs = withStyles<any, any, TabPanelProps>(styles)(withWidth()(TabsComp));
-export {AnTabs, TabsComp};
+const AnTabs = withStyles<any, any, TabsProps>(styles)(withWidth()(TabsComp));
+export {AnTabs, TabsComp, TabPanel, TabPanelProps};

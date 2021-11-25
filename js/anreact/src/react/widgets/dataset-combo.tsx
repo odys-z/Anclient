@@ -32,8 +32,7 @@ export interface ComboProps extends Comprops {
 
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
-		root: {
-		},
+		root: {}
 	} )
 );
 
@@ -48,10 +47,15 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		// combo: {label: undefined, val: undefined, initVal: undefined, ref: undefined, options: []},
 		// options: [] as Array<ComboItem>,
 
-		combo: { options: undefined as Array<ComboItem>, loading: false},
 
 		selectedItem: undefined,
-	}
+	};
+
+	combo = {
+		options: undefined as Array<ComboItem>,
+		loading: false,
+		// initVal: undefined
+	};
 
 	refcbb = React.createRef<HTMLDivElement>();
 	loading = false;
@@ -59,9 +63,9 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	constructor(props: ComboProps) {
 		super(props);
-		this.state.combo.options = props.options;
+		this.combo.options = props.options;
 		// this.state.combo.label = props.label;
-		// this.state.combo.initVal = props.val;
+		// this.combo.initVal = props.val;
 
 		if (this.props.sk && !this.props.uri)
 			console.warn("DatasetCombo is configured as loading data with sk, but uri is undefined.")
@@ -83,7 +87,10 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				// user uses this, e.g. name and value to access data
 				nv: this.props.nv || {n: 'name', v: 'value'},
 				// cond: this.state.condits, TODO: not used?
-				onDone: (options) => that.setState({options})
+				onDone: (cols, rows) => {
+					that.combo.options = rows as Array<ComboItem>;
+					that.setState({});
+				}
 			});
 		}
 	}
@@ -111,7 +118,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	render() {
 		// let cmb = this.state.combo
-		let { classes } = this.props;
+		let { classes, val } = this.props;
 
 		// let refcbb = React.createRef(); // FIXME why not this.refcbb?
 
@@ -124,7 +131,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		 */
 		let selectedItem = this.state.selectedItem;
 		if (!selectedItem && this.props.val != undefined) {
-			selectedItem = findOption(this.props.options, this.props.val);
+			selectedItem = findOption(this.combo.options || this.props.options, val);
 			this.state.selectedItem = selectedItem;
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
@@ -139,7 +146,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			onChange={ this.onCbbRefChange(this.refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
-			options={this.state.combo.options}
+			options={this.combo.options}
 			style={this.props.style}
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
@@ -195,7 +202,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		// cond.loading = true;
 		this.loading = true;
 
-		let ctx = this.context as AnContextType;
+		let ctx = this.context as unknown as AnContextType;
 		let an = ctx.anReact as AnReactExt;
 		an.dataset( { port: 'dataset', uri, sqlArgs, sk },
 			(dsResp: AnsonMsg<AnsonResp>) => {
