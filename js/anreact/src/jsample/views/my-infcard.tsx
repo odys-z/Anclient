@@ -3,14 +3,15 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 
-import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier, Tierec } from '@anclient/semantier-st';
+import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, OnCommitOk } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
 	import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 	import { AnContext } from '../../react/reactext';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnFormField, TRecordForm } from '../../react/widgets/t-record-form';
+	import { TRecordForm } from '../../react/widgets/t-record-form';
 	import { ImageUpload } from '../../react/widgets/image-upload';
 import { Comprops, DetailFormW } from '../../react/crud';
+import { CompOpts } from '../../an-components';
 
 const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
@@ -46,7 +47,7 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 		if (!this.tier) this.getTier()
 
 		this.tier.pkval = this.props.ssInf.uid;
-		let {uid, roleId} = this.props;
+		let {uid, roleId} = this.props.ssInf;
 		this.tier.rec = {uid, roleId}
 
 		this.setState({});
@@ -109,12 +110,6 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 }
 MyInfCardComp.contextType = AnContext;
 
-// MyInfCardComp.propTypes = {
-// 	uri: PropTypes.string.isRequired,
-// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-// 	ssInf: PropTypes.object.isRequired,
-// };
-
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 export { MyInfCard, MyInfCardComp };
 
@@ -141,7 +136,7 @@ export class MyInfTier extends Semantier {
 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, fieldFormatter: this.loadAvatar }
-	] as AnFormField[];
+	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	/**
 	 * Format an image upload component.
@@ -191,7 +186,7 @@ export class MyInfTier extends Semantier {
 			this.errCtx);
 	}
 
-	saveRec(opts, onOk) {
+	saveRec(opts: { uri: string; crud: CRUD; pkval: string; }, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;

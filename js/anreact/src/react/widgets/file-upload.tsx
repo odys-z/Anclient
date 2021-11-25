@@ -1,30 +1,32 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import Box from '@material-ui/core/Box';
 
-import { Semantier } from '@anclient/semantier-st';
+import { invalidStyles } from '../anreact';
+import { gCamera, gCameraViewBox } from './my-icon';
+import { mimeOf } from '../../utils/file-utils';
+import { Comprops, DetailFormW } from '../crud';
 
-import { AvatarIcon, gCamera, gCameraViewBox } from './my-icon';
-import { uarr2Base64, mimeOf } from '../../utils/file-utils';
-
-const styles = (theme) => (Object.assign(
-	Semantier.invalidStyles, {
+const styles = (theme: Theme) => (Object.assign(
+	invalidStyles, {
 	imgUploadBox: {
 		height: 48,
 		border: "solid 1px #aaa2" }
 	}
 ) );
 
-class FileUploadComp extends React.Component {
+class FileUploadComp extends DetailFormW<Comprops>  {
 	state = {
 		src: undefined,
 	}
 
 	fileInput = undefined;
 	imgPreview = undefined;
+	field: any;
+	static propTypes: { tier: PropTypes.Validator<object>; };
 
 	constructor(props) {
 		super(props);
@@ -42,18 +44,18 @@ class FileUploadComp extends React.Component {
 	componentDidMount() {
 
 		if (this.props.file) {
-			let freader = new FileReader();
-			freader.onload = function (e) {
-				var b64 = fileclient.Uint8ToBase64(new Uint8Array(freader.result));
-				if (typeof onok === 'function') {
-					onok(fileclient.file, b64);
-				}
-			}
-			if (fileclient.file) {
-				freader.readAsArrayBuffer(fileclient.file);
-			}
+			// let freader = new FileReader();
+			// freader.onload = function (e) {
+			// 	var b64 = fileclient.Uint8ToBase64(new Uint8Array(freader.result));
+			// 	if (typeof onok === 'function') {
+			// 		onok(fileclient.file, b64);
+			// 	}
+			// }
+			// if (fileclient.file) {
+			// 	freader.readAsArrayBuffer(fileclient.file);
+			// }
 
-			this.state.src = this.props.src;
+			// this.state.src = this.props.src;
 		}
 	}
 
@@ -95,7 +97,7 @@ class FileUploadComp extends React.Component {
 			position: "relative",
 			top: -52,
 			opacity: 0
-		}
+		} as React.CSSProperties;
 
 		let { classes } = this.props;
 

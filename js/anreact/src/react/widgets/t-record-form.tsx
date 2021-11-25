@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 
 import Grid from '@material-ui/core/Grid';
@@ -8,14 +8,14 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
+import { Tierec } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
-	import { toBool } from '../../utils/helpers';
-	import { Comprops, CrudCompW } from '../crud';
-	import { DatasetCombo, TierComboField } from './dataset-combo';
-	import { Semantier, Tierec } from '@anclient/semantier-st';
-import { ClassNames, invalidStyles, Media } from '../anreact';
+import { toBool } from '../../utils/helpers';
+import { Comprops, CrudCompW } from '../crud';
+import { DatasetCombo, TierComboField } from './dataset-combo';
+import { ClassNames, invalidStyles, Media, toReactStyles } from '../anreact';
 
-const styles = (theme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles,
 	{ root: {
 		display: 'flex',
@@ -40,7 +40,8 @@ const styles = (theme) => (Object.assign(
 ) );
 
 export interface RecordFormProps extends Comprops {
-    enableValidate: boolean;
+	/**Default: true */
+    enableValidate?: boolean;
 };
 
 /**
@@ -103,7 +104,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(f) }
 					options={ f.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ f.label }
-					style={ f.css || {width: 200} }
+					style={ toReactStyles(f.css) || {width: 200} }
 					invalidStyle={ f.style }
 					onSelect={ (v) => {
 						rec[f.field] = v.v;

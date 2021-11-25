@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import { AnClient, SessionClient, Protocol } from '@anclient/semantier';
+import { AnClient, SessionClient, Protocol } from '@anclient/semantier-st';
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt, AnQueryForm,
     AnTree, stree_t

@@ -4,7 +4,7 @@ import $ from 'jquery';
 import { stree_t, Tierec,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames
+	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
@@ -32,6 +32,9 @@ export const invalidStyles = {
 	minLen : { border: "1px solid red" },
 } as {[n in InvalidClassNames]: CSSProperties};
 
+export function toReactStyles(styles: CSSStyleDeclaration): CSSProperties {
+	return styles as unknown as CSSProperties;
+}
 
 /**JSX.Element like row formatter results */
 export interface AnRow extends JSX.Element { }
@@ -232,6 +235,8 @@ export class AnReact {
  * @class
  */
 export class AnReactExt extends AnReact {
+	loading: boolean;
+	options: NV[];
 
 	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
@@ -294,21 +299,23 @@ export class AnReactExt extends AnReact {
 		let {uri, onOk} = opts;
 
 		if (!uri)
-			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
+			throw Error('Since v0.9.50, Anclient request needs function uri to find datasource.');
 
 		if (opts.sk && !opts.t)
 			opts.a = stree_t.sqltree;
 
 		let onload = onOk || function (resp: AnsonMsg<AnDatasetResp>) {
 			if (component)
-				component.setState({forest: resp.Body().Rs()});
+				component.setState({forest: resp.Body().forest});
 		}
+
+		opts.port = 'stree';
 
 		this.dataset(opts, onload);
 	}
 
 	rebuildTree(opts: DatasetOpts, onOk: (resp: any) => void) {
-		let {uri, rootId, sk} = opts;
+		let {uri, rootId} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
 
@@ -339,27 +346,33 @@ export class AnReactExt extends AnReact {
 	 *
 	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *
+	 * @deprecated
+	 * TODO: all widgets should bind data by themselves, so this helper function shouldn't exits.
+	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed.
+	 * 
 	 * @param opts options
 	 * @param opts.sk semantic key (dataset id)
 	 * @param opts.cond the component's state.conds[#] of which the options need to be updated
 	 * @param opts.nv {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
-	 * @param opts.onDone on done event's handler: function f(cond)
+	 * @param opts.onLoad on done event's handler: function f(cond)
 	 * @param opts.onAll no 'ALL' otion item
 	 * @param errCtx error handling context
-	 * @return {AnReactExt} this
+	 * @return this
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
-				  nv: {n: string, v: string};
-				  cond?: any; onDone: OnCommitOk;
+				  nv: NV;
+				  cond: {loading: boolean, options: NV[], clean: boolean};
+				  onLoad?: OnLoadOk;
 				  /**don't add "-- ALL --" item */
-				  noAllItem?: boolean; } ) {
-		let {uri, sk, sqlArgs, nv, cond, onDone, noAllItem} = opts;
+				  noAllItem?: boolean; } ): AnReactExt {
+		let {uri, sk, sqlArgs, nv, cond, onLoad, noAllItem} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
 		nv = nv || {n: 'name', v: 'value'};
 
 		cond.loading = true;
+		// this.loading = true;
 
 		this.dataset( {
 				port: 'dataset',
@@ -373,16 +386,15 @@ export class AnReactExt extends AnReact {
 					console.error("Can't find data in rs for option label. column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
 
-				let {rows} = AnsonResp.rs2nvs( rs, nv );
+				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				cond.options = rows;
+				this.options = rows;
 
-				cond.loading = false;
-				cond.clean = true;
+				this.loading = false;
 
-				if (onDone)
-					onDone(cond);
+				if (onLoad)
+					onLoad(cols, rows);
 			} );
 		return this;
 	}

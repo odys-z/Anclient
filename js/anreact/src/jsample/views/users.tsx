@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext, AnlistColAttrs } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext, AnlistColAttrs, TierComboField, OnLoadOk } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { Semantier } from '@anclient/semantier-st';
@@ -15,7 +15,6 @@ import { L } from '../../utils/langstr';
 	import { JsampleIcons } from '../styles';
 
 	import { UserDetailst } from './user-details';
-import { ClassNamesProps } from '@emotion/react';
 import { CompOpts } from '../../react/anreact';
 
 const styles = (theme) => ( {
@@ -74,9 +73,9 @@ class UserstComp extends CrudCompW<Comprops> {
 
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
-	 * @param {object} condts the query conditions collected from query form.
+	 * @param condts the query conditions collected from query form.
 	 */
-	toSearch(condts) {
+	toSearch(condts: QueryConditions): void {
 		// querst.onLoad (query.componentDidMount) event can even early than componentDidMount.
 		if (!this.tier) {
 			this.getTier();
@@ -91,7 +90,7 @@ class UserstComp extends CrudCompW<Comprops> {
 			} );
 	}
 
-	onTableSelect(rowIds) {
+	onTableSelect(rowIds: Array<string>) {
 		this.setState( {
 			buttons: {
 				// is this als CRUD semantics?
@@ -210,7 +209,7 @@ class UserstComp extends CrudCompW<Comprops> {
 }
 UserstComp.contextType = AnContext;
 
-const Userst = withWidth()(withStyles(styles)(UserstComp));
+const Userst = withStyles<any, any, Comprops>(styles)(withWidth()(UserstComp));
 export { Userst, UserstComp }
 
 class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {
@@ -253,8 +252,6 @@ export class UsersTier extends Semantier {
 	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
-	// client = undefined;
-	// uri = undefined;
 	rows = [];
 	pkval = undefined;
 	rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
@@ -278,14 +275,15 @@ export class UsersTier extends Semantier {
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	_cols = [
-		{ label: L('check'), field: 'userId', checked: true },
+		{ label: L('check'), field: 'userId', checkbox: true },
 		{ label: L('Log Id'), field: 'userId' },
 		{ label: L('User Name'), field: 'userName' },
+
 		{ label: L('Organization'), field: 'orgName',
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
 		{ label: L('Role'), field: 'roleName',
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
-	] as Array<TierCol>;
+	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
 	constructor(comp) {
 		super(comp);
@@ -314,7 +312,7 @@ export class UsersTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds, onLoad) {
+	record(conds: QueryConditions, onLoad: OnLoadOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;

@@ -1,7 +1,6 @@
-import * as CSS from 'csstype';
 import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, DbCol
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, DbCol, DbRelations, FKRelation, Stree
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -32,7 +31,9 @@ export type AnFieldValidator = ((
 export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, opts?: FO) => F);
 
 export type AnFieldValidation = {
-	[k in "notNull" | "minLen" | "len"]: number | string | object
+	notNull?: boolean | number,
+	minLen?: number | string,
+	len?: number | string,
  };
 
 export interface ErrorCtx {
@@ -43,6 +44,9 @@ export interface ErrorCtx {
 }
 
 export interface TierCol extends DbCol {
+    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
+    style?: string | {};
+
 	validator?: AnFieldValidator | AnFieldValidation;
 
     disabled?: boolean;
@@ -66,8 +70,6 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
 
     /**input type / form type, not db type */
     type?: string;
-    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: string | {};
 
     css?: CSSStyleDeclaration;
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
@@ -87,6 +89,9 @@ export interface TierComboField extends TierCol {
 	options: Array<{n: string; v: string}>
 }
 
+export interface Tierelations extends DbRelations {
+}
+
 /**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
 export interface QueryConditions {
 	[q: string]: any;
@@ -104,6 +109,13 @@ export interface Semantext {
     error: ErrorCtx;
 }
 
+export interface UIComponent {
+	/**Component uri usually comes from function configuration (e.g. set by anreact SysComp.extendLinks).
+	 * uri is not always needed but Semantier enforce the check for it's needed to accesss server.
+	 */
+	readonly uri?: string;
+}
+
 /**
  * Base class of semantic tier
  */
@@ -112,7 +124,7 @@ export class Semantier {
      *
      * @param {uri: string} props
      */
-    constructor(props: any) {
+    constructor(props: UIComponent) {
         if (!props || !props.uri)
             throw Error("uri is required!");
 
@@ -130,7 +142,7 @@ export class Semantier {
     /** optional main table's pk */
     pk: string;
     /** current crud */
-    crud: string;
+    crud: CRUD;
     /** current list's data */
     rows: Tierec[];
     /** current pk value */
@@ -139,7 +151,7 @@ export class Semantier {
     rec: Tierec;
 
     /** All sub table's relationships */
-    rel: Array<any>;
+    rel: Tierelations;
     /** currrent relation table */
     reltabl: string;
     /** current relations */
@@ -257,7 +269,8 @@ export class Semantier {
 
 		// typically relationships are tree data
 		let { reltabl, sqlArgs, sqlArg } = opts;
-		let { sk, relfk, relcol } = this.rel[reltabl];
+		let fkRel = this.rel[reltabl] as unknown as Stree;
+		let { sk, fk, fullpath } = fkRel;
 
 		sqlArgs = sqlArgs || [sqlArg];
 
@@ -277,10 +290,10 @@ export class Semantier {
 		this.anReact.stree(ds, this.errCtx);
     }
 
-    record( opts: QueryConditions, onLoad: OnLoadOk) : void {
+    record( conds: QueryConditions, onLoad: OnLoadOk) : void {
 	}
 
-    records(opts: QueryConditions, onLoad: OnLoadOk) : void {
+    records(conds: QueryConditions, onLoad: OnLoadOk) : void {
 	}
 
     /** save form with a relationship table */
@@ -309,13 +322,17 @@ export class Semantier {
 		}
 
 		if (!disableRelations) {
-			let rel = this.rel[this.reltabl];
+			let r = this.rel[this.reltabl];
+			if (r.stree || r.m2m)
+				throw Error('TODO ...');
+
+			let rel = r.fk;
 			// collect relationships
 			let columnMap = {};
 			columnMap[rel.col] = 'nodeId';
 
 			// semantics handler will resulve fk when inserting only when master pk is auto-pk
-			columnMap[rel.fk] = this.pkval
+			columnMap[rel.col] = this.pkval
 							? this.pkval			// when updating
 							: this.rec[this.pk];	// when creating
 
@@ -337,8 +354,8 @@ export class Semantier {
 			}
 			else {
 				// e.g. delete from a_role_func where roleId = '003'
-				let del_rf = new DeleteReq(null, this.reltabl, rel.fk)
-								.whereEq(rel.fk, this.pkval)
+				let del_rf = new DeleteReq(null, this.reltabl, rel.col)
+								.whereEq(rel.col, this.pkval)
 								.post(insRels);
 
 				if (req)
@@ -370,7 +387,7 @@ export class Semantier {
      */
     del(opts: {
         ids: Array<string>;
-        posts: Array<AnsonBody>;
+        posts?: Array<AnsonBody>;
     }, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;

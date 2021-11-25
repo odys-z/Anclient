@@ -1,4 +1,4 @@
-import { Protocol, AnsonResp, AnsonBody } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonBody } from '@anclient/semantier-st';
 
 export class NChartReq extends AnsonBody {
 	static __init__ = function() {

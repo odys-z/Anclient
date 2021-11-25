@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import Dialog from '@material-ui/core/Dialog';
@@ -65,7 +65,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 		closed: false,
 	};
 
-	handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
+	// handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
 	constructor (props: DialogProps) {
 		super(props);
@@ -81,7 +81,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 			this.props.onClose();
 	}
 
-	toCancel(e: React.MouseEvent<HTMLElement>) {
+	toCancel(e: React.MouseEvent<HTMLElement>, reason?) {
 		this.setState({closed: true});
 		if (typeof this.props.onCancel === 'function')
 			this.props.onCancel(e.currentTarget);
@@ -122,7 +122,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				fullScreen={full}
 				fullWidth={!full}
 				maxWidth={!full ? 'xs' : undefined}
-				onClose={this.handleClose}
+				onClose={this.toCancel}
 				aria-labelledby="alert-dialog-title"
 				aria-describedby="alert-dialog-description" >
 
@@ -186,7 +186,7 @@ class QrSharingComp extends CrudComp<DialogProps & { imgId: string; qr: {serv: s
 		url: '',
 	};
 
-	constructor (props = {}) {
+	constructor (props: DialogProps & { imgId: string; qr: {serv: string; quiz: string; origin: string; path: string; page: string}}) {
 		super(props);
 		this.handleClose = this.handleClose.bind(this);
 		this.url = this.url.bind(this);

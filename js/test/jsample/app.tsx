@@ -82,11 +82,15 @@ class App extends React.Component<Approps> {
 								});
 
 		// loaded from dataset.xml
-		this.state.anClient.getSks((sks) => {Object.assign(Protocol.sk, sks)}, this.errCtx);
+		this.state.anClient.getSks((sks) => {
+			Object.assign(Protocol.sk, sks);
+			console.log(sks);
+		}, this.errCtx);
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 		Protocol.sk.cbbMyClass = 'north.my-class';
+		console.log(Protocol.sk);
 
 		// extending pages
 		// Each Component is added as the route, with uri = path

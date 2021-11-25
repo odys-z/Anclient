@@ -1,9 +1,9 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
-	import { Semantier  } from '@anclient/semantier-st';
+	import { invalidStyles } from '@anclient/anreact';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 
@@ -11,7 +11,7 @@ import { MyInfTier } from './my-infcard';
 import { Comprops, DetailFormW } from '../../react/crud';
 
 const styles = theme => (Object.assign(
-	Semantier.invalidStyles, {
+	invalidStyles, {
 	} )
 );
 
@@ -30,8 +30,6 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	selected = undefined; // props.selected.Ids, the set
 	tier: any;
 	confirm: JSX.Element;
-	static propTypes: {};
-
 
 	constructor(props){
 		super(props)
@@ -67,7 +65,10 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('OK')} cancel={false} open
-				onClose={() => {that.confirm = undefined;} }
+				onClose={() => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
 				msg={msg} />);
 		this.setState({});
 	}
@@ -86,6 +87,7 @@ class MyPswdComp extends DetailFormW<Comprops> {
 			 && <form><TRecordForm uri={this.props.uri}
 					tier={this.tier}
 					fields={this.tier.fields()}
+					enableValidate={true}
 				/></form>}
 			<Button onClick={this.changePswd} color="inherit">
 				{L('Save')}
@@ -94,10 +96,8 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		</> );
 	}
 }
-MyPswdComp.propTypes = {
-};
 
-const MyPswd = withStyles(styles)(MyPswdComp);
+const MyPswd = withStyles<any, any, Comprops>(styles)(MyPswdComp);
 export { MyPswd, MyPswdComp }
 
 class PswdTier extends MyInfTier {

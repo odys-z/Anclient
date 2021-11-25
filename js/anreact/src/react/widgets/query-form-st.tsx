@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { Theme, withStyles } from "@material-ui/core/styles";
 import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
@@ -7,13 +7,14 @@ import { Search, Replay } from '@material-ui/icons';
 import { QueryConditions } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { AnConst } from '../../utils/consts';
-	import { AnContext, AnContextType } from '../reactext';
-	import { Comprops, CrudCompW } from '../crud'
+import { AnConst } from '../../utils/consts';
+import { AnContext, AnContextType } from '../reactext';
+import { Comprops, CrudCompW } from '../crud'
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 import { ComboItem } from './dataset-combo';
+import { AnReactExt } from '../anreact';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#eef'
@@ -89,25 +90,32 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		// 	this.props.onLoaded();
 	}
 
+	/**TODO: all widgets should bind data by themselves, so this function shouldn't exits.
+	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed. 
+	 */
 	bindConds() {
 		// if (!this.context || !this.context.anReact)
 		// 	throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
 		const ctx = this.context as unknown as AnContextType;
+		const that = this;
 
 		this.conds.filter((c, x ) => !!c && !c.loading && !c.clean)
 		  .forEach( (cond, cx) => {
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
-				// reset by AnReact.ds2cbbOptions()
 				cond.loading = true;
-				ctx.anReact.ds2cbbOptions({
+				(ctx.anReact as AnReactExt).ds2cbbOptions({
 						uri: this.props.uri,
 						sk: cond.sk,
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
 						sqlArgs: cond.sqlArgs,
-						cond
-					},
-					ctx.error, this);
+						cond,
+						onLoad: (cols, rows) => {
+							cond.options = rows;
+							that.setState({});
+						}
+					});
+					// ctx.error, this);
 			}
 		});
 	}
@@ -273,30 +281,15 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 }
 AnQuerystComp.contextType = AnContext;
 
-// AnQuerystComp.propTypes = {
-// 	/* TODO: DOCS
-// 	 * Design Notes:
-// 	 * All common widgets need this check, but main CRUD page's uri is been set
-// 	 * by SysComp. Also check CrudComp's comments.
-// 	 */
-// 	uri: PropTypes.string.isRequired,
-// 	conds: PropTypes.array.isRequired,
-// 	onSearch: PropTypes.func.isRequired,
-// 	onLoaded: PropTypes.func,
-// 	buttonStyle: PropTypes.oneOf(["norm", "dense"])
-// };
-
 interface QueryFormProps extends Comprops {
 	conds: QueryConditions,
 	/**User actions: search button clicked */
-	onSearch: (conds: QueryConditions) => void,
+	onSearch : (conds: QueryConditions) => void,
 	/**Bounding components successfully */
-	onLoaded: (conds: QueryConditions) => void,
+	onLoaded?: (conds: QueryConditions) => void,
 	/**@deprecated Render can get Mediat parameter and field can be defined by user data. */
 	buttonStyle?: "norm" | "dense"
 }
 
-// const AnQueryst = withWidth()(withStyles(styles)(AnQuerystComp));
-// const AnQueryst = withWidth()(AnQuerystyle);
 const AnQueryst = withStyles<any, any, QueryFormProps>(styles)(withWidth()(AnQuerystComp));
 export { AnQueryst, AnQuerystComp }

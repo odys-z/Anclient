@@ -13,7 +13,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, AnsonResp, CRUD, TierCol, Tierec } from '@anclient/semantier-st';
+import { AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, TierCol, Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
@@ -22,7 +22,7 @@ import { L } from '../../utils/langstr';
 	import { DatasetCombo } from './dataset-combo'
 	import { ConfirmDialog } from './messagebox';
 	import { JsampleIcons } from '../../jsample/styles';
-	import { ClassNames, Media } from '../../react/anreact';
+	import { ClassNames, CompOpts, Media } from '../../react/anreact';
 
 const styles = (theme) => ({
   root: {
@@ -153,7 +153,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			queryReq.Body().whereEq(this.state.pk.field, this.state.pkval);
 			// FIXME but sometimes we have FK in record. Meta here?
 			ctx.anReact.bindStateRec({req: queryReq,
-				onOk: (resp) => {
+				onOk: (resp: AnsonMsg<AnsonResp>) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 						if (!rows || rows.length !== 1)
 							console.error("Query reults not correct. One and only one row is needed.", rows, queryReq)
@@ -315,7 +315,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		const isSm = toBool(opts?.media?.isMd);
 
 		this.state.fields.forEach( (f, i) => {
-		  if (f.visible === false) {
+		  if (f.visible === undefined || f.visible === false) {
 			fs.push(
 				<Grid item key={`${f.field}.${f.label}`}
 					sm={f.grid?.sm ? f.grid.sm : 6}

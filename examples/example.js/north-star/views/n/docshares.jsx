@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 import { Box, TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
 
-import { Protocol, AnsonResp, InsertReq, AnsonBody, Semantier } from '@anclient/semantier';
+import { Protocol, AnsonResp, InsertReq, AnsonBody, Semantier } from '@anclient/semantier-st';
 import { L, Langstrs,
     AnConst, AnContext, AnError, CrudCompW, AnReactExt,
 	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
