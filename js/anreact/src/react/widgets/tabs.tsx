@@ -1,5 +1,6 @@
 import React from 'react';
 import withStyles from "@material-ui/core/styles/withStyles";
+import withWidth from '@material-ui/core/withWidth';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -7,23 +8,31 @@ import Box from '@material-ui/core/Box';
 
 import {L} from '../../utils/langstr';
 import {AnContext} from '../reactext';
+import { invalidStyles } from '../anreact';
+import { Comprops, CrudCompW } from '../crud';
 
-const styles = (theme) => ({
-  root: {
-	flexGrow: 1,
-	backgroundColor: theme.palette.background.paper,
-  },
-  tab: {
-	'& :hover': {
-	  backgroundColor: '#55f'
-	}
-  },
-});
+const styles = (theme) => (Object.assign(
+	invalidStyles, {
+    root: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.paper,
+    },
+    tab: {
+        '& :hover': { backgroundColor: '#55f' }
+    }}
+));
 
-class TabPanel extends React.Component {
+interface TabPanelProps extends Comprops {
+    /** Panel id */
+    pid: number;
+    /** Current panel index (private member set by parent) */
+    px : number;
+};
+
+class TabPanel extends CrudCompW<TabPanelProps> {
 	state = {}
 
-	constructor (props) {
+	constructor (props: TabPanelProps) {
 		super(props);
 	}
 
@@ -41,13 +50,15 @@ class TabPanel extends React.Component {
 	}
 }
 
-class TabsComp extends React.Component {
+class TabsComp extends CrudCompW<TabPanelProps> {
 	state = {
 		px: 0, // panel index
 		panels: [<div>Panels[0]</div>, <div>Panels[1]</div>, <div>Panels[2]</div>]
 	};
 
-	constructor (props = {}) {
+    dynatabs: { label: any; }[];
+
+	constructor (props: TabPanelProps) {
 		super(props);
 		this.dynatabs = [
 			{label: L('Basic')},
@@ -105,5 +116,5 @@ class TabsComp extends React.Component {
 }
 TabsComp.contextType = AnContext;
 
-const AnTabs = withStyles(styles)(TabsComp);
+const AnTabs = withStyles<any, any, TabPanelProps>(styles)(withWidth()(TabsComp));
 export {AnTabs, TabsComp};
