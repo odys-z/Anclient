@@ -10,8 +10,10 @@ import {L} from '../../utils/langstr';
 import {AnContext} from '../reactext';
 import { invalidStyles } from '../anreact';
 import { Comprops, CrudCompW } from '../crud';
+import { Theme } from '@material-ui/core/styles';
+import { ClassNames } from '../../an-components';
 
-const styles = (theme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
     root: {
         flexGrow: 1,
@@ -56,7 +58,7 @@ class TabsComp extends CrudCompW<TabPanelProps> {
 		panels: [<div>Panels[0]</div>, <div>Panels[1]</div>, <div>Panels[2]</div>]
 	};
 
-    dynatabs: { label: any; }[];
+    dynatabs: { label: string; }[];
 
 	constructor (props: TabPanelProps) {
 		super(props);
@@ -97,7 +99,7 @@ class TabsComp extends CrudCompW<TabPanelProps> {
 		}
 		else return demo(classes);
 
-		function demo(classes) {
+		function demo(classes: ClassNames) {
 			return ( <div className={classes.root}>
 			  <AppBar position="static">
 				<Tabs value={that.state.px}

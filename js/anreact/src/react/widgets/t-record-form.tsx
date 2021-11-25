@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Theme, withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
+import { Theme } from '@material-ui/core/styles';
 
 import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
