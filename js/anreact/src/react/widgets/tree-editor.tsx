@@ -2,18 +2,17 @@ import React from "react";
 
 import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
-
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
 import { L } from '../../utils/langstr';
-	import { toBool } from '../../utils/helpers';
-	import { AnContext, AnContextType } from '../reactext';
-	import { AnTreeIcons } from './tree'
-	import { Comprops, CrudCompW, DetailFormW } from '../crud';
-	import { JsampleIcons } from '../../jsample/styles';
+import { toBool } from '../../utils/helpers';
+import { AnContext, AnContextType } from '../reactext';
+import { AnTreeIcons } from './tree'
+import { Comprops, CrudCompW, DetailFormW } from '../crud';
+import { JsampleIcons } from '../../jsample/styles';
 
 import { SimpleForm } from './simple-form';
 import { AnReactExt, CompOpts } from "../anreact";

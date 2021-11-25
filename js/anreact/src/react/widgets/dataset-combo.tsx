@@ -1,16 +1,17 @@
 
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { Theme, withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete, { AutocompleteClassKey } from '@material-ui/lab/Autocomplete';
-import { AnlistColAttrs, InvalidClassNames } from '@anclient/semantier-st';
+import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value
+} from '@material-ui/lab/useAutocomplete/useAutocomplete';
 
+import { AnlistColAttrs, AnsonMsg, AnsonResp, InvalidClassNames, NV, OnLoadOk } from '@anclient/semantier-st';
 import { AnConst } from '../../utils/consts';
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud';
 import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
-import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 
 export interface ComboItem {n: string, v: string};
 
@@ -29,7 +30,7 @@ export interface ComboProps extends Comprops {
 	options?: Array<ComboItem>;
 }
 
-const styles = (theme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
 		root: {
 		},
@@ -53,6 +54,8 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	}
 
 	refcbb = React.createRef<HTMLDivElement>();
+	loading = false;
+	items: NV[];
 
 	constructor(props: ComboProps) {
 		super(props);
@@ -74,15 +77,14 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 		if (this.props.sk ) {
 			let that = this;
-			anreact.ds2cbbOptions({
-					uri: this.props.uri,
-					sk: this.props.sk,
-					// user uses this, e.g. name and value to access data
-					nv: this.props.nv || {n: 'name', v: 'value'},
-					// cond: this.state.condits, TODO: not used?
-					onDone: (options) => that.setState({options})
-				}
-				);
+			this.ds2cbbOptions({
+				uri: this.props.uri,
+				sk: this.props.sk,
+				// user uses this, e.g. name and value to access data
+				nv: this.props.nv || {n: 'name', v: 'value'},
+				// cond: this.state.condits, TODO: not used?
+				onDone: (options) => that.setState({options})
+			});
 		}
 	}
 
@@ -158,8 +160,65 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			}
 		}
 	}
+
+	/**Bind dataset to combobox options (comp.state.condCbb).
+	 * Option object is defined by opts.nv.
+	 *
+	 * <h6>About React Rendering Events</h6>
+	 * This method will update opts.cond.loading and clean.
+	 * When success, set loading false, clean true. this 2 flags are helper for
+	 * handling react rendering / data-loading events asynchronously.
+	 *
+	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
+	 *
+	 * @param opts options
+	 * @param opts.sk semantic key (dataset id)
+	 * @param opts.cond the component's state.conds[#] of which the options need to be updated
+	 * @param opts.nv {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * @param opts.onDone on done event's handler: function f(cond)
+	 * @param opts.onAll no 'ALL' otion item
+	 * @param errCtx error handling context
+	 * @return this
+	 */
+	public ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
+						nv: NV;
+						//cond?: {loading: boolean, options: NV[], clean: boolean};
+						onDone: OnLoadOk;
+						/**don't add "-- ALL --" item */
+						noAllItem?: boolean; } ): DatasetComboComp {
+		let {uri, sk, sqlArgs, nv, onDone, noAllItem} = opts;
+		if (!uri)
+			throw Error('Since v0.9.50, uri is needed to access jserv.');
+
+		nv = nv || {n: 'name', v: 'value'};
+
+		// cond.loading = true;
+		this.loading = true;
+
+		let ctx = this.context as AnContextType;
+		let an = ctx.anReact as AnReactExt;
+		an.dataset( { port: 'dataset', uri, sqlArgs, sk },
+			(dsResp: AnsonMsg<AnsonResp>) => {
+				let rs = dsResp.Body().Rs();
+				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
+					console.error("Can't find data in rs for option label. column: 'name'.",
+						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
+
+				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
+				if (!noAllItem)
+					rows.unshift(AnConst.cbbAllItem);
+				this.items = rows;
+
+				this.loading = false;
+
+				if (onDone)
+					onDone(cols, rows);
+			} );
+		return this;
+	}
 }
 DatasetComboComp.contextType = AnContext;
 
 const DatasetCombo = withStyles<any, any, ComboProps>(styles)(withWidth()(DatasetComboComp));
 export { DatasetCombo, DatasetComboComp }
+

@@ -7,11 +7,12 @@ import { Search, Replay } from '@material-ui/icons';
 import { QueryConditions } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { AnConst } from '../../utils/consts';
-	import { AnContext, AnContextType } from '../reactext';
-	import { Comprops, CrudCompW } from '../crud'
+import { AnConst } from '../../utils/consts';
+import { AnContext, AnContextType } from '../reactext';
+import { Comprops, CrudCompW } from '../crud'
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 import { ComboItem } from './dataset-combo';
+import { AnReactExt } from '../anreact';
 
 const styles = (theme: Theme) => ( {
 	root: {
@@ -89,25 +90,32 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		// 	this.props.onLoaded();
 	}
 
+	/**TODO: all widgets should bind data by themselves, so this function shouldn't exits.
+	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed. 
+	 */
 	bindConds() {
 		// if (!this.context || !this.context.anReact)
 		// 	throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
 		const ctx = this.context as unknown as AnContextType;
+		const that = this;
 
 		this.conds.filter((c, x ) => !!c && !c.loading && !c.clean)
 		  .forEach( (cond, cx) => {
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
-				// reset by AnReact.ds2cbbOptions()
 				cond.loading = true;
-				ctx.anReact.ds2cbbOptions({
+				(ctx.anReact as AnReactExt).ds2cbbOptions({
 						uri: this.props.uri,
 						sk: cond.sk,
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
 						sqlArgs: cond.sqlArgs,
-						cond
-					},
-					ctx.error, this);
+						cond,
+						onLoad: (cols, rows) => {
+							cond.options = rows;
+							that.setState({});
+						}
+					});
+					// ctx.error, this);
 			}
 		});
 	}

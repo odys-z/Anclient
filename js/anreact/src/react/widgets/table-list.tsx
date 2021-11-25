@@ -216,5 +216,5 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	}
 }
 
-const AnTablist = withStyles(styles)(AnTablistComp);
+const AnTablist = withStyles<any, any, AnTablistProps>(styles)(AnTablistComp);
 export { AnTablist, AnTablistComp, AnTablistProps }

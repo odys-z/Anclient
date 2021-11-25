@@ -315,7 +315,7 @@ export class AnReactExt extends AnReact {
 	}
 
 	rebuildTree(opts: DatasetOpts, onOk: (resp: any) => void) {
-		let {uri, rootId, sk} = opts;
+		let {uri, rootId} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
 
@@ -346,29 +346,33 @@ export class AnReactExt extends AnReact {
 	 *
 	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *
+	 * @deprecated
+	 * TODO: all widgets should bind data by themselves, so this helper function shouldn't exits.
+	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed.
+	 * 
 	 * @param opts options
 	 * @param opts.sk semantic key (dataset id)
 	 * @param opts.cond the component's state.conds[#] of which the options need to be updated
 	 * @param opts.nv {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
-	 * @param opts.onDone on done event's handler: function f(cond)
+	 * @param opts.onLoad on done event's handler: function f(cond)
 	 * @param opts.onAll no 'ALL' otion item
 	 * @param errCtx error handling context
-	 * @return {AnReactExt} this
+	 * @return this
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
 				  nv: NV;
-				  //cond?: {loading: boolean, options: NV[], clean: boolean};
-				  onDone: OnLoadOk;
+				  cond: {loading: boolean, options: NV[], clean: boolean};
+				  onLoad?: OnLoadOk;
 				  /**don't add "-- ALL --" item */
-				  noAllItem?: boolean; } ) {
-		let {uri, sk, sqlArgs, nv, onDone, noAllItem} = opts;
+				  noAllItem?: boolean; } ): AnReactExt {
+		let {uri, sk, sqlArgs, nv, cond, onLoad, noAllItem} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		// cond.loading = true;
-		this.loading = true;
+		cond.loading = true;
+		// this.loading = true;
 
 		this.dataset( {
 				port: 'dataset',
@@ -389,8 +393,8 @@ export class AnReactExt extends AnReact {
 
 				this.loading = false;
 
-				if (onDone)
-					onDone(cols, rows);
+				if (onLoad)
+					onLoad(cols, rows);
 			} );
 		return this;
 	}

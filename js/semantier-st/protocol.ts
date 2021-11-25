@@ -316,7 +316,7 @@ export class AnsonMsg<T extends AnsonBody> {
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 				body = new AnSessionReq(body.uid, body.token, body.iv);
 			else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
-				body = new QueryReq(body.uri, body.mtabl, body.mAlias, undefined);
+				body = new QueryReq(body.uri, body.mtabl, body.mAlias);
 			else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 				body = new UserReq(json.port, header, [body]);
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
@@ -330,14 +330,10 @@ export class AnsonMsg<T extends AnsonBody> {
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
 				body = new AnDatasetResp(body);
 
-			// else if (body.type === "io.odysz.semantic.tier.DatasetierReq")
-			// 	body = new DatasetierReq(body);
-			// else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
-			// 	body = new DatasetierResp(body);
-
-			// FIXME never used?
-			// else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
-			// 	body = new DatasetierResp(body);
+			else if (body.type === DatasetierReq.__type__)
+				body = new DatasetierReq(body);
+			else if (body.type === DatasetierResp.__type__)
+				body = new DatasetierResp(body);
 
 			else if (body.type in Protocol.ansonTypes)
 				// TODO FIXME what happens if the other known types are all handled like this?
@@ -525,7 +521,7 @@ export class QueryReq extends AnsonBody {
     pgsize: number;
     limt: string[];
 
-	constructor (uri: string, tabl: string, alias: string, pageInf: PageInf) {
+	constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
 		super();
 		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
 		this.uri = uri;
@@ -1313,10 +1309,12 @@ Protocol.registerBody(DatasetierReq.__type__, (json) => new DatasetierReq(json))
 
 export class DatasetierResp extends AnsonResp {
 	static __type__ = "io.odysz.semantic.tier.DatasetierResp";
+	sks: string[];
 
-	constructor(dsJson) {
+	constructor(dsJson: any) {
 		super(dsJson);
 		this.type = DatasetierResp.__type__;
+		this.sks = dsJson.sks;
 	}
 }
 Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json));
