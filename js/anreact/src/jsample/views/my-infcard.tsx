@@ -172,7 +172,7 @@ export class MyInfTier extends Semantier {
 			.l("a_attaches", "a", `a.busiTbl = 'a_users' and a.busiId = '${userId}'`)
 			.l("a_roles", "r", "r.roleId=u.roleId")
 			.l("a_orgs", "o", "o.orgId=u.orgId")
-			.whereEq('userId', userId);
+			.whereEq('userId', userId as string);
 
 		client.commit(req,
 			(resp) => {

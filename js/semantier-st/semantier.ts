@@ -1,6 +1,8 @@
 import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, DbCol, DbRelations, FKRelation, Stree
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, 
+	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, 
+	DbCol, DbRelations, Stree, NV, PageInf
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -74,6 +76,8 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     css?: CSSStyleDeclaration;
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	box?: {};
+
+	val: any;  // FIXME: should we extends a editable type?  (check ag-grid)
 }
 
 /**Record handled from tier */
@@ -82,20 +86,34 @@ export interface Tierec {
 }
 
 /**E.g. form's combobox field declaration */
-export interface TierComboField extends TierCol {
-	nv: {n: string; v: string};
-	sk: string;
-	// cbbStyle: {};
-	options: Array<{n: string; v: string}>
+export interface TierComboField<F, FO> extends AnlistColAttrs<F, FO> {
+	uri: string;
+	sk : string;
+	nv?: NV;
+	options?: Array<NV>
+
+	loading?: boolean;
+	sqlArgs?: string[];
+	sqlArg? : string;
 }
 
 export interface Tierelations extends DbRelations {
 }
 
-/**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
+/**Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.  */
 export interface QueryConditions {
-	[q: string]: any;
+	pageInf?: PageInf;
+	[q: string]: string | number | object | boolean;
 }
+
+// export interface CbbCondition extends QueryConditions {
+// 	uri: string;
+// 	sk: string;
+// 	nv?: NV;
+// 	loading: boolean;
+// 	sqlArgs?: string[];
+// 	sqlArg?: string;
+// }
 
 /**
  * Not the same as java Semantext.

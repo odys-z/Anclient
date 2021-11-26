@@ -1,24 +1,26 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { Theme } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
-import { Button, Grid } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
-import { AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec, QueryConditions, Semantics, OnLoadOk
+import { AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec, QueryConditions, Semantics, OnLoadOk, UIComponent
 } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { AnConst } from '../../utils/consts';
-	import { Comprops, CrudCompW } from '../../react/crud';
-	import { AnContext, AnContextType } from '../../react/reactext';
-	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnTablist } from '../../react/widgets/table-list';
+import { AnConst } from '../../utils/consts';
+import { Comprops, CrudCompW } from '../../react/crud';
+import { AnContext, AnContextType } from '../../react/reactext';
+import { ConfirmDialog } from '../../react/widgets/messagebox'
+import { AnTablist } from '../../react/widgets/table-list';
 
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';
-import { CompOpts } from '../../react/anreact';
+import { ClassNames, CompOpts } from '../../react/anreact';
 import { AnQueryst } from '../../react/widgets/query-form-st';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'
@@ -47,10 +49,9 @@ const styles = (theme) => ( {
 class RolesComp extends CrudCompW<Comprops> {
 
 	state = {
-		condName: { type: 'text', val: '', label: L('Role Name')},
-		condOrg : { type: 'cbb',
+		condName: { type: 'text', field: 'roleName', val: '', label: L('Role Name')},
+		condOrg : { type: 'cbb',  field: 'orgId',    val: AnConst.cbbAllItem,
 					sk: 'org.all', nv: {n: 'text', v: 'value'},
-					val: AnConst.cbbAllItem,
 					options: [ AnConst.cbbAllItem ],
 					label: L('Organization') },
 
@@ -59,14 +60,15 @@ class RolesComp extends CrudCompW<Comprops> {
 
 		total: 0,
 		rows: [] as Tierec[],
-		pageInf: { page: 0, size: 25, total: 0 },
+		pageInf: { page: 0, size: 25, total: 0 } as PageInf,
 		selected: {ids: new Set<string>()},
 	};
+
 	tier: RoleTier;
 	q?: QueryConditions;
 	confirm: JSX.Element;
 	roleForm: JSX.Element;
-	props: { classes: any; };
+	props: { classes: ClassNames; };
 
 	constructor(props: Comprops) {
 		super(props);
@@ -90,27 +92,29 @@ class RolesComp extends CrudCompW<Comprops> {
 		this.toSearch(undefined);
 	}
 
-	toSearch(q?: QueryConditions) {
+	toSearch(q?: QueryConditions, pageInf?: PageInf) {
 		let that = this;
-		this.q = q || this.q;
+		this.q = q || this.q || {};
+		this.q.pageInf = pageInf;
 		this.tier.records( this.q,
-			(cols, rows) => {
+			(_cols, rows) => {
 				that.state.selected.ids.clear();
 				that.setState({rows});
 			} );
 	}
 
-	onPageInf(page: number, size: number) {
-		this.state.pageInf.size = size;
+	onPageInf(page: number, size?: number) {
+		this.state.pageInf.size = size || 0;
 		this.state.pageInf.page = page;
 
-		let query = this.q;
-		if (query) {
-			const ctx = this.context as unknown as AnContextType;
-			query.Body().Page(size, page);
-			this.state.pageInf = {page, size, total: this.state.pageInf.total};
-			ctx.anReact.bindTablist(query, this, ctx.error);
-		}
+		// let query = this.q;
+		// if (query) {
+		// 	const ctx = this.context as unknown as AnContextType;
+		// 	query.Body().Page(size, page);
+		// 	this.state.pageInf = {page, size, total: this.state.pageInf.total};
+		// 	ctx.anReact.bindTablist(query, this, ctx.error);
+		// }
+		this.toSearch(this.q, this.state.pageInf);
 	}
 
 	onTableSelect(rowIds: Array<string>) {
@@ -123,7 +127,7 @@ class RolesComp extends CrudCompW<Comprops> {
 		} );
 	}
 
-	toDel(e: React.MouseEvent<HTMLElement>) {
+	toDel(_e: React.MouseEvent<HTMLElement>) {
 		let that = this;
 		let txt = L('Totally {count} role records will be deleted. Are you sure?',
 				{count: this.state.selected.ids.size});
@@ -132,7 +136,7 @@ class RolesComp extends CrudCompW<Comprops> {
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
 				onOk={ () => {
-						that.tier.del({ids: Array.from(that.state.selected.ids)}, (resp) => {
+						that.tier.del({ids: Array.from(that.state.selected.ids)}, (_resp) => {
 						});
 				 	}
 				}
@@ -140,7 +144,7 @@ class RolesComp extends CrudCompW<Comprops> {
 			/>);
 	}
 
-	toAdd(e: React.MouseEvent<HTMLElement>) {
+	toAdd(_e: React.MouseEvent<HTMLElement>) {
 		this.tier.resetFormSession();
 		this.roleForm = (<RoleDetails crud={CRUD.c} uri={this.uri}
 			tier={this.tier}
@@ -148,13 +152,13 @@ class RolesComp extends CrudCompW<Comprops> {
 			onClose={this.closeDetails} />);
 	}
 
-	toEdit(e: React.MouseEvent<HTMLElement>) {
+	toEdit(_e: React.MouseEvent<HTMLElement>) {
 		let that = this;
 		this.tier.pkval = this.getByIx(this.state.selected.ids, 0);
 
 		this.roleForm = (<RoleDetails crud={CRUD.u} uri={this.uri}
 			tier={this.tier}
-			onOk={(r) => that.toSearch(that.q)}
+			onOk={(_r) => that.toSearch(that.q)}
 			onClose={this.closeDetails} />);
 	}
 
@@ -173,7 +177,7 @@ class RolesComp extends CrudCompW<Comprops> {
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				onLoaded={this.toSearch}
-				conds={[ this.state.condName, this.state.condOrg ]}
+				fields={[ this.state.condName, this.state.condOrg ]}
 			/>
 
 			<Grid container alignContent="flex-end" >
@@ -214,11 +218,15 @@ class RoleTier extends Semantier {
 	mtabl = 'a_roles';
 	pk = 'roleId';
 	reltabl = 'a_role_func';
+
+	/**sk: role-funcs
+	 * Hard coded here since it's a business string for jsample app.
+	 */
 	rel = {'a_role_func':
 		{ fk: {
 			pk: 'roleId',	 // fk to main table
 			col: 'funcId' }, // checking col
-		  sk: 'trees.role_func'
+		  sk: 'trees.role_funcs'
 		} as Semantics
 	};
 
@@ -245,11 +253,11 @@ class RoleTier extends Semantier {
 	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
 	/**
-	 * @param {React.Component} comp
+	 * @param comp
 	 * @param {string} comp.uri the client function uri.
 	 * @constructor
 	 */
-	constructor(comp) {
+	constructor(comp: UIComponent) {
 		super(comp);
 	}
 
@@ -273,7 +281,7 @@ class RoleTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds, onLoad) {
+	record(conds: QueryConditions, onLoad: OnLoadOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -294,7 +302,7 @@ class RoleTier extends Semantier {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
 				that.pkval = that.rec && that.rec[that.pk];
-				onLoad(cols, rows && rows[0]);
+				onLoad(cols, rows);
 			},
 			this.errCtx);
 	}

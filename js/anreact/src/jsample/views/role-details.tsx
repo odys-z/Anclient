@@ -50,11 +50,6 @@ const styles = theme => ({
 
 class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
 
-	/**sk role-func
-	 * Hard coded here since it's a business string for jsample app.
-	 */
-	static skRoleFunc = '';
-
 	state = {
 		crud: CRUD.r,
 		dirty: false,
@@ -73,7 +68,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
 
 		this.tier = props.tier;
 
-		this.state.crud = props.c ? CRUD.c : props.u ? CRUD.u : undefined;
+		this.state.crud = props.crud;
 
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
@@ -88,9 +83,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
 		this.ok = undefined;
 	};
 
-
-
-	toSave(e) {
+	toSave(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 
 		if (!this.tier.validate()) {
@@ -107,13 +100,13 @@ class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
 		}
 	}
 
-	toCancel (e) {
+	toCancel (e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose({code: 'cancel'});
 	}
 
-	showOk(txt) {
+	showOk(txt: string | string[]) {
 		let that = this;
 		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
 					title={L('Info')}
@@ -156,7 +149,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
 					})}
 				/>
 				<AnRelationTree uri={this.props.uri}
-					tier={this.tier} sk={RoleDetailsComp.skRoleFunc}
+					tier={this.tier} sk={undefined}
 					mtabl='a_roles' reltabl='a_role_func'
 					sqlArgs={[this.state.pkval]}
 				/>

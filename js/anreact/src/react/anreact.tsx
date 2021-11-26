@@ -361,7 +361,7 @@ export class AnReactExt extends AnReact {
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
 				  nv: NV;
-				  cond: {loading: boolean, options: NV[], clean: boolean};
+				  cond: CbbCondition;
 				  onLoad?: OnLoadOk;
 				  /**don't add "-- ALL --" item */
 				  noAllItem?: boolean; } ): AnReactExt {
@@ -372,7 +372,6 @@ export class AnReactExt extends AnReact {
 		nv = nv || {n: 'name', v: 'value'};
 
 		cond.loading = true;
-		// this.loading = true;
 
 		this.dataset( {
 				port: 'dataset',

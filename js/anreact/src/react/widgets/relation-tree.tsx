@@ -2,6 +2,7 @@
 import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
+import { Theme } from '@material-ui/core/styles';
 
 import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
@@ -14,8 +15,9 @@ import { L } from '../../utils/langstr';
 import { toBool } from '../../utils/helpers';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
+import { ClassNames } from '../anreact';
 
-const styles = (theme) => ({
+const styles = (theme: Theme) => ({
   root: {
 	display: "flex",
 	flexDirection: "column" as const,
@@ -64,7 +66,7 @@ interface RelationTreeProps extends Comprops {
  *
  * See also {@link AnRelationTreeComp}
  */
-export class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
+class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	state = {
 		dirty: false,
 
@@ -94,7 +96,7 @@ export class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		} );
 	}
 
-	toExpandItem(e) {
+	toExpandItem(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 		let f = e.currentTarget.getAttribute("nid");
 
@@ -105,9 +107,9 @@ export class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	}
 
 	/**
-	 * @param {object} classes
+	 * @param classes
 	 */
-	buildTree(classes) {
+	buildTree(classes: ClassNames) {
 		let that = this;
 
 		let expandItem = this.toExpandItem;
@@ -116,7 +118,6 @@ export class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		return this.forest.map(
 			(tree, tx) => {return treeItems(tree);}
 		);
-		// return treeItems(this.state.forest[0] || {});
 
 		function treeItems(stree) {
 		  if (Array.isArray(stree)) {
@@ -130,7 +131,7 @@ export class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			if (node.children && node.children.length > 0)
 			  return (
 				<Box key={id} className={classes.folder}>
-				  <Box  id={id}
+				  <Box  nid={id}
 						onClick={expandItem}
 						className={classes.folderHead}
 				  >
@@ -220,9 +221,5 @@ export class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	}
 }
 
-	// uri: PropTypes.string.isRequired,
-	// tier: PropTypes.object.isRequired,
-	// dense: PropTypes.bool,
-
 const AnRelationTree = withStyles<any, any, RelationTreeProps>(styles)(withWidth()(AnRelationTreeComp));
-export { AnRelationTree }
+export { AnRelationTree, AnRelationTreeComp, RelationTreeProps }

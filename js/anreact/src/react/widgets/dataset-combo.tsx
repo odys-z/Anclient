@@ -1,29 +1,30 @@
 
 import React from 'react';
-import { Theme, withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
+import { Theme } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import TextField from '@material-ui/core/TextField';
-import Autocomplete, { AutocompleteClassKey } from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value
 } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 
-import { AnlistColAttrs, AnsonMsg, AnsonResp, InvalidClassNames, NV, OnLoadOk } from '@anclient/semantier-st';
+import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField } from '@anclient/semantier-st';
 import { AnConst } from '../../utils/consts';
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud';
 import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
 
-export interface ComboItem {n: string, v: string};
+export interface ComboItem extends NV {};
 
 /**E.g. form's combobox field declaration */
-export interface TierComboField extends AnlistColAttrs<JSX.Element, CompOpts> {
-	type: string;
-    className: undefined | "root" | InvalidClassNames | AutocompleteClassKey;
-	nv: {n: string; v: string};
-	sk: string;
-
-    options?: Array<ComboItem>;
-}
+// export interface TierComboField extends AnlistColAttrs<JSX.Element, CompOpts> {
+// 	type: string;
+//     className: undefined | "root" | InvalidClassNames | AutocompleteClassKey;
+// 	nv: {n: string; v: string};
+// 	sk: string;
+//     options?: Array<ComboItem>;
+// }
+type ComboFieldType = TierComboField<JSX.Element, CompOpts>;
 
 export interface ComboProps extends Comprops {
 	/**Intial options (default values), will be replaced after data binding with field's options */

@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField
 } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
@@ -216,10 +216,10 @@ export { Userst, UserstComp }
 
 class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {
 	conds = [
-		{ name: 'userName', type: 'text', val: undefined, label: L('Student') },
-		{ name: 'orgId',    type: 'cbb',  val: undefined, label: L('Class'),
+		{ name: 'userName', field: '', type: 'text', val: undefined, label: L('Student') },
+		{ name: 'orgId',    field: '', type: 'cbb',  val: undefined, label: L('Class'),
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ name: 'roleId',   type: 'cbb',  val: undefined, label: L('Role'),
+		{ name: 'roleId',   field: '', type: 'cbb',  val: undefined, label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
 
@@ -242,7 +242,7 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {
 		let that = this;
 		return (
 		<AnQueryst {...this.props}
-			conds={this.conds}
+			fields={this.conds}
 			onSearch={() => that.props.onQuery(that.collect()) }
 			onLoaded={() => that.props.onQuery(that.collect()) }
 		/> );
@@ -267,13 +267,13 @@ export class UsersTier extends Semantier {
 		{ type: 'password', field: 'pswd', label: L('Password'),
 		  validator: {notNull: true} },
 		{ type: 'cbb', field: 'roleId', label: L('Role'),
-		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+		  grid: {md: 5}, // defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} },
+		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
 		{ type: 'cbb', field: 'orgId', label: L('Organization'),
-		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+		  grid: {md: 5}, // defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} },
+		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	_cols = [
@@ -302,7 +302,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds )
+					new UserstReq( this.uri, conds as UserstReqArgs )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
@@ -320,7 +320,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds )
+					new UserstReq( this.uri, conds as UserstReqArgs )
 					.A(UserstReq.A.rec) );
 
 		client.commit(req,
@@ -386,6 +386,8 @@ export class UsersTier extends Semantier {
 	}
 }
 
+type UserstReqArgs = { record?: Tierec; relations?: any; pk?: string; deletings?: string[]; userId?: string; userName?: string; orgId?: string; roleId?: string; hasTodos?: string; };
+
 export class UserstReq extends UserReq {
 	static __type__ = 'io.odysz.jsample.semantier.UserstReq';
 	static __init__ = function (uri) {
@@ -416,7 +418,7 @@ export class UserstReq extends UserReq {
 	relations: any;
 	deletings: any;
 
-	constructor (uri: string, args: { record?: Tierec; relations?: any; pk?: string; deletings?: string[]; userId?: string; userName?: string; orgId?: string; roleId?: string; hasTodos?: string; }) {
+	constructor (uri: string, args: UserstReqArgs) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
