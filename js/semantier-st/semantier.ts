@@ -65,6 +65,7 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     // field: string;
     label: string;
 
+    opts?: FO;
     formatter?: AnElemFormatter;
     fieldFormatter?: AnFieldFormatter<F, FO>;
 
