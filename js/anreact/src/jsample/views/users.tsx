@@ -1,20 +1,22 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
-import { Button, Grid } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, TierCol, OnCommitOk, Semantext, AnlistColAttrs, TierComboField } from '@anclient/semantier-st';
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField
+} from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { Semantier } from '@anclient/semantier-st';
-	import { Comprops, CrudCompW } from '../../react/crud';
-	import { AnContext } from '../../react/reactext';
-	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnTablist } from '../../react/widgets/table-list';
-	import { AnQueryst } from '../../react/widgets/query-form-st';
-	import { JsampleIcons } from '../styles';
+import { Semantier } from '@anclient/semantier-st';
+import { Comprops, CrudCompW } from '../../react/crud';
+import { AnContext } from '../../react/reactext';
+import { ConfirmDialog } from '../../react/widgets/messagebox'
+import { AnTablist } from '../../react/widgets/table-list';
+import { AnQueryst } from '../../react/widgets/query-form-st';
+import { JsampleIcons } from '../styles';
 
-	import { UserDetailst } from './user-details';
+import { UserDetailst } from './user-details';
 import { CompOpts } from '../../react/anreact';
 
 const styles = (theme) => ( {
@@ -73,9 +75,9 @@ class UserstComp extends CrudCompW<Comprops> {
 
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
-	 * @param {object} condts the query conditions collected from query form.
+	 * @param condts the query conditions collected from query form.
 	 */
-	toSearch(condts) {
+	toSearch(condts: QueryConditions): void {
 		// querst.onLoad (query.componentDidMount) event can even early than componentDidMount.
 		if (!this.tier) {
 			this.getTier();
@@ -90,7 +92,7 @@ class UserstComp extends CrudCompW<Comprops> {
 			} );
 	}
 
-	onTableSelect(rowIds) {
+	onTableSelect(rowIds: Array<string>) {
 		this.setState( {
 			buttons: {
 				// is this als CRUD semantics?
@@ -150,7 +152,6 @@ class UserstComp extends CrudCompW<Comprops> {
 
 	toEdit(e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
-		// let pkv = [...this.state.selected.ids][0];
 		let pkv = this.getByIx(this.state.selected.ids);
 		this.tier.pkval = pkv;
 		this.recForm = (<UserDetailst crud={CRUD.u}
@@ -165,6 +166,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.recForm = undefined;
 		this.tier.resetFormSession();
 		this.toSearch(undefined);
+		this.onTableSelect([]);
 	}
 
 	render() {
@@ -214,10 +216,10 @@ export { Userst, UserstComp }
 
 class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {
 	conds = [
-		{ name: 'userName', type: 'text', val: undefined, label: L('Student') },
-		{ name: 'orgId',    type: 'cbb',  val: undefined, label: L('Class'),
+		{ name: 'userName', field: '', type: 'text', val: undefined, label: L('Student') },
+		{ name: 'orgId',    field: '', type: 'cbb',  val: undefined, label: L('Class'),
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ name: 'roleId',   type: 'cbb',  val: undefined, label: L('Role'),
+		{ name: 'roleId',   field: '', type: 'cbb',  val: undefined, label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
 
@@ -240,7 +242,7 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {
 		let that = this;
 		return (
 		<AnQueryst {...this.props}
-			conds={this.conds}
+			fields={this.conds}
 			onSearch={() => that.props.onQuery(that.collect()) }
 			onLoaded={() => that.props.onQuery(that.collect()) }
 		/> );
@@ -252,8 +254,6 @@ export class UsersTier extends Semantier {
 	mtabl = 'a_users';
 	pk = 'userId';
 	checkbox = true;
-	// client = undefined;
-	// uri = undefined;
 	rows = [];
 	pkval = undefined;
 	rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
@@ -267,13 +267,13 @@ export class UsersTier extends Semantier {
 		{ type: 'password', field: 'pswd', label: L('Password'),
 		  validator: {notNull: true} },
 		{ type: 'cbb', field: 'roleId', label: L('Role'),
-		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+		  grid: {md: 5}, // defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} },
+		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
 		{ type: 'cbb', field: 'orgId', label: L('Organization'),
-		  grid: {md: 5}, defaultStyle: {marginTop: "8px", width: 220 },
+		  grid: {md: 5}, // defaultStyle: {marginTop: "8px", width: 220 },
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} },
+		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	_cols = [
@@ -295,14 +295,14 @@ export class UsersTier extends Semantier {
 		return this._cols;
 	}
 
-	records(conds, onLoad) {
+	records(conds: QueryConditions, onLoad: OnLoadOk) {
 		if (!this.client) return;
 
 		let client = this.client;
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds )
+					new UserstReq( this.uri, conds as UserstReqArgs )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
@@ -314,13 +314,13 @@ export class UsersTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds, onLoad) {
+	record(conds: QueryConditions, onLoad: OnLoadOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds )
+					new UserstReq( this.uri, conds as UserstReqArgs )
 					.A(UserstReq.A.rec) );
 
 		client.commit(req,
@@ -386,6 +386,8 @@ export class UsersTier extends Semantier {
 	}
 }
 
+type UserstReqArgs = { record?: Tierec; relations?: any; pk?: string; deletings?: string[]; userId?: string; userName?: string; orgId?: string; roleId?: string; hasTodos?: string; };
+
 export class UserstReq extends UserReq {
 	static __type__ = 'io.odysz.jsample.semantier.UserstReq';
 	static __init__ = function (uri) {
@@ -416,7 +418,7 @@ export class UserstReq extends UserReq {
 	relations: any;
 	deletings: any;
 
-	constructor (uri: string, args: { record?: Tierec; relations?: any; pk?: string; deletings?: string[]; userId?: string; userName?: string; orgId?: string; roleId?: string; hasTodos?: string; }) {
+	constructor (uri: string, args: UserstReqArgs) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;

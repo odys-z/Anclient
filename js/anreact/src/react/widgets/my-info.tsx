@@ -11,13 +11,14 @@ import Close from '@material-ui/icons/Close';
 
 import {L} from '../../utils/langstr';
 	import { AnContext, AnContextType } from '../reactext';
-	import { AnTabs } from './tabs';
+	import { AnTabs, TabPanel } from './tabs';
 import { Comprops, DetailFormW } from '../crud';
+import { DialogProps } from './messagebox';
 
 const styles = theme => ({
   root: {
 	backgroundColor: "mint-cream",
-	// textAlign: "center",
+	textAlign: "center" as const,
 	"&:hover": {
 		backgroundColor: {
 			opacity: 0.3
@@ -34,7 +35,11 @@ const styles = theme => ({
   }
 });
 
-class MyInfoComp extends DetailFormW<Comprops> {
+interface MyInfoProps extends DialogProps {
+	panels: Array<TabPanel>
+}
+
+class MyInfoComp extends DetailFormW<MyInfoProps> {
 	state = {
 		closed: false
 	};
@@ -48,7 +53,7 @@ class MyInfoComp extends DetailFormW<Comprops> {
 	handleClose(e) {
 		this.setState({closed: true});
 		if (typeof this.props.onClose === 'function')
-			this.props.onClose(e.currentTarget);
+			this.props.onClose();
 	};
 
 	textInfo() {
@@ -74,9 +79,6 @@ class MyInfoComp extends DetailFormW<Comprops> {
 		let props = this.props;
 		this.state.closed = false;
 		let title = props.title ? props.title : L('My Info');
-
-		let txtLines = this.textInfo();
-
 		const { classes } = this.props;
 
 		return (

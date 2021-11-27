@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset, CRUD
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset, CRUD, DatasetierResp
 } from './protocol';
 import { ErrorCtx } from './semantier';
 
@@ -676,9 +676,10 @@ class SessionClient {
 					.A(DatasetierReq.A.sks), undefined );
 
 		this.commit(req,
-			(resp) => {
-				let {cols, rows} = AnsonResp.rs2arr(resp.Body().getProp('sks') as AnResultset);
-				onLoad(cols, rows);
+			(resp: AnsonMsg<DatasetierResp>) => {
+				// let {cols, rows} = AnsonResp.rs2arr(resp.Body().sks);
+				let cols = resp.Body().sks;
+				onLoad(cols, []);
 			}, errCtx );
 	}
 
@@ -734,8 +735,9 @@ class SessionClient {
 		return this;
 	}
 
-	/** For name errata? */
-	userAct(f, c, m, r) { this.usrAct(f, c, m, r); }
+	/**@deprecated not good practice for vscode.
+	 * For name errata */
+	userAct(f: string, c: string, m: string, r: string) { this.usrAct(f, c, m, r); }
 
 	/**Set user's current action to be logged.
 	 * @param {string} cmd user's command, e.g. 'save'

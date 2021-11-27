@@ -1,7 +1,8 @@
-import * as CSS from 'csstype';
 import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, DbCol, DbRelations, FKRelation, Stree
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, 
+	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, 
+	DbCol, DbRelations, Stree, NV, PageInf
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -46,7 +47,7 @@ export interface ErrorCtx {
 
 export interface TierCol extends DbCol {
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: string | {};
+    style?: string;
 
 	validator?: AnFieldValidator | AnFieldValidation;
 
@@ -64,6 +65,7 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     // field: string;
     label: string;
 
+    opts?: FO;
     formatter?: AnElemFormatter;
     fieldFormatter?: AnFieldFormatter<F, FO>;
 
@@ -75,6 +77,8 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     css?: CSSStyleDeclaration;
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	box?: {};
+
+	val: any;  // FIXME: should we extends a editable type?  (check ag-grid)
 }
 
 /**Record handled from tier */
@@ -83,20 +87,34 @@ export interface Tierec {
 }
 
 /**E.g. form's combobox field declaration */
-export interface TierComboField extends TierCol {
-	nv: {n: string; v: string};
-	sk: string;
-	// cbbStyle: {};
-	options: Array<{n: string; v: string}>
+export interface TierComboField<F, FO> extends AnlistColAttrs<F, FO> {
+	uri: string;
+	sk : string;
+	nv?: NV;
+	options?: Array<NV>
+
+	loading?: boolean;
+	sqlArgs?: string[];
+	sqlArg? : string;
 }
 
 export interface Tierelations extends DbRelations {
 }
 
-/**Query condition item, used by AnQueryForm, saved by tier as last search conditions.  */
+/**Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.  */
 export interface QueryConditions {
-	[q: string]: any;
+	pageInf?: PageInf;
+	[q: string]: string | number | object | boolean;
 }
+
+// export interface CbbCondition extends QueryConditions {
+// 	uri: string;
+// 	sk: string;
+// 	nv?: NV;
+// 	loading: boolean;
+// 	sqlArgs?: string[];
+// 	sqlArg?: string;
+// }
 
 /**
  * Not the same as java Semantext.
@@ -143,7 +161,7 @@ export class Semantier {
     /** optional main table's pk */
     pk: string;
     /** current crud */
-    crud: string;
+    crud: CRUD;
     /** current list's data */
     rows: Tierec[];
     /** current pk value */
@@ -236,10 +254,10 @@ export class Semantier {
     }
 
     /** Get form fields data specification
-     * @param {object} modifier {field, function | object }
-     * @param {object | function} modifier.field see #columns().
+     * @param modifier {field: AnElemFormatter | object }
+	 * e.g. for anreact, object can be {gird, box, ...}.
      */
-	 fields (modifier?: {[x: string]: AnElemFormatter}): Array<TierCol> {
+	 fields (modifier?: {[x: string]: AnElemFormatter | object}): Array<TierCol> {
 		if (!this._fields)
 			throw Error("_fields are not provided by child tier.");
 
@@ -260,7 +278,9 @@ export class Semantier {
 	}
 
     /** Load relationships */
-    relations(opts: { reltabl: string;
+    relations(opts: {
+			uri: string;
+			reltabl: string;
 			sqlArgs?: string[]; sqlArg?: string; } ,
 			onOk: OnCommitOk): void {
 		if (!this.anReact)
@@ -291,10 +311,10 @@ export class Semantier {
 		this.anReact.stree(ds, this.errCtx);
     }
 
-    record( conds: QueryConditions, onLoad: OnLoadOk) : void {
-	}
+    record( _conds: QueryConditions, onLoad: OnLoadOk) : void {
+    }
 
-    records(conds: QueryConditions, onLoad: OnLoadOk) : void {
+    records<T extends Tierec>(opts: QueryConditions, onLoad: OnLoadOk) : void {
 	}
 
     /** save form with a relationship table */

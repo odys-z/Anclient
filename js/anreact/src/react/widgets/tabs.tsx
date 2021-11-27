@@ -1,30 +1,41 @@
-import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import React, { ReactNode } from 'react';
+import withStyles from "@material-ui/core/styles/withStyles";
+import withWidth from '@material-ui/core/withWidth';
+import { Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
-import {L} from '../../utils/langstr';
-	import {AnContext} from '../reactext';
+import { L } from '../../utils/langstr';
+import { AnContext } from '../reactext';
+import { invalidStyles, ClassNames } from '../anreact';
+import { Comprops, CrudCompW } from '../crud';
 
-const styles = (theme) => ({
-  root: {
-	flexGrow: 1,
-	backgroundColor: theme.palette.background.paper,
-  },
-  tab: {
-	'& :hover': {
-	  backgroundColor: '#55f'
-	}
-  },
-});
+const styles = (theme: Theme) => (Object.assign(
+	invalidStyles, {
+    root: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.paper,
+    },
+    tab: {
+        '& :hover': { backgroundColor: '#55f' }
+    }}
+));
 
-class TabPanel extends React.Component {
+interface TabPanelProps extends Comprops {
+    /** Panel id */
+    pid: number;
+    /** Current panel index (private member set by parent) */
+    px : number;
+};
+
+class TabPanel extends CrudCompW<TabPanelProps> {
 	state = {}
+    title: string;
+    panel: ReactNode;
 
-	constructor (props) {
+	constructor (props: TabPanelProps) {
 		super(props);
 	}
 
@@ -42,29 +53,33 @@ class TabPanel extends React.Component {
 	}
 }
 
-class TabsComp extends React.Component {
+interface TabsProps extends Comprops {
+    panels: Array<TabPanel>;
+}
+
+class TabsComp extends CrudCompW<TabsProps> {
 	state = {
 		px: 0, // panel index
 		panels: [<div>Panels[0]</div>, <div>Panels[1]</div>, <div>Panels[2]</div>]
 	};
 
-	constructor (props = {}) {
+    dynatabs: { label: string; }[];
+
+	constructor (props: TabPanelProps) {
 		super(props);
 		this.dynatabs = [
 			{label: L('Basic')},
-			{label: L('Contact'), },
+			{label: L('Contact')},
 			{label: L('Security')},
 		]
 
 		this.handleChange = this.handleChange.bind(this);
 	}
 
-	handleChange (e, v) {
+	handleChange (e: React.ChangeEvent<HTMLElement>, v: number) {
 		e.stopPropagation();
 		this.setState({ px: v });
 	};
-
-
 
 	render() {
 		const {classes} = this.props;
@@ -87,7 +102,7 @@ class TabsComp extends React.Component {
 		}
 		else return demo(classes);
 
-		function demo(classes) {
+		function demo(classes: ClassNames) {
 			return ( <div className={classes.root}>
 			  <AppBar position="static">
 				<Tabs value={that.state.px}
@@ -106,5 +121,5 @@ class TabsComp extends React.Component {
 }
 TabsComp.contextType = AnContext;
 
-const AnTabs = withStyles(styles)(TabsComp);
-export {AnTabs, TabsComp};
+const AnTabs = withStyles<any, any, TabsProps>(styles)(withWidth()(TabsComp));
+export {AnTabs, TabsComp, TabPanel, TabPanelProps};

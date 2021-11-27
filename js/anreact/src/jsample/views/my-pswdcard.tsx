@@ -30,8 +30,6 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	selected = undefined; // props.selected.Ids, the set
 	tier: any;
 	confirm: JSX.Element;
-	static propTypes: {};
-
 
 	constructor(props){
 		super(props)
@@ -67,7 +65,10 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('OK')} cancel={false} open
-				onClose={() => {that.confirm = undefined;} }
+				onClose={() => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
 				msg={msg} />);
 		this.setState({});
 	}
@@ -95,8 +96,6 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		</> );
 	}
 }
-MyPswdComp.propTypes = {
-};
 
 const MyPswd = withStyles<any, any, Comprops>(styles)(MyPswdComp);
 export { MyPswd, MyPswdComp }

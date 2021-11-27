@@ -1,21 +1,23 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
+import { Theme } from '@material-ui/core/styles';
+import clsx from  'clsx';
 
 import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
+import { AnlistColAttrs, TierComboField, Tierec } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
-	import { toBool } from '../../utils/helpers';
-	import { Comprops, CrudCompW } from '../crud';
-	import { DatasetCombo, TierComboField } from './dataset-combo';
-	import { Semantier, Tierec } from '@anclient/semantier-st';
-import { ClassNames, invalidStyles, Media } from '../anreact';
+import { toBool } from '../../utils/helpers';
+import { Comprops, CrudCompW } from '../crud';
+import { DatasetCombo } from './dataset-combo';
+import { ClassNames, CompOpts, invalidStyles, Media, toReactStyles } from '../anreact';
 
-const styles = (theme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles,
 	{ root: {
 		display: 'flex',
@@ -40,7 +42,8 @@ const styles = (theme) => (Object.assign(
 ) );
 
 export interface RecordFormProps extends Comprops {
-    enableValidate: boolean;
+	/**Default: true */
+    enableValidate?: boolean;
 };
 
 /**
@@ -91,23 +94,25 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		}
 	}
 
-	getField(f: TierComboField, rec: Tierec, classes: ClassNames, media: Media) {
+	getField(f: AnlistColAttrs<JSX.Element, CompOpts>, rec: Tierec, classes: ClassNames, media: Media) {
 		let {isSm} = media;
 		let that = this;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
+			let fcbb = f as TierComboField<JSX.Element, CompOpts>;
 			return (
 				<DatasetCombo uri={ this.props.uri }
-					sk={f.sk} nv={ f.nv }
-					disabled={ !!f.disabled }
-					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(f) }
-					options={ f.options || []} val={{n: undefined, v:rec[f.field]} }
-					label={ f.label }
-					style={ f.css || {width: 200} }
-					invalidStyle={ f.style }
+					sk={fcbb.sk} nv={ fcbb.nv }
+					disabled={ !!fcbb.disabled }
+					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(fcbb) }
+					options={ fcbb.options || []} val={{n: undefined, v:rec[fcbb.field]} }
+					label={ fcbb.label }
+					className={clsx(fcbb.opts?.classes, classes[fcbb.style])}
+					style={ toReactStyles(fcbb.css) || { width: 200 } }
+					invalidStyle={ fcbb.style }
 					onSelect={ (v) => {
-						rec[f.field] = v.v;
-						f.style = undefined;
+						rec[fcbb.field] = v.v;
+						fcbb.style = undefined;
 						that.setState({dirty: true});
 					} }
 				/>);
@@ -136,7 +141,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				placeholder={L(f.label)} margin='dense'
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
 				inputProps={{ readOnly } }
-				className={classes[f.className]}
+				className={clsx(f.opts?.classes, classes[f.style])}
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
 					f.style = undefined;
