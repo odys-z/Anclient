@@ -45,9 +45,9 @@ class PollsComp extends CrudCompW<PollsProp> {
 
 	state = {
 		students: [],
-		condQzName: { type: 'text', val: '', label: L('Quiz Name') },
-		condTag:  { type: 'text', val: '', label: L('Quiz Tag') },
-		condUser: { type: 'cbb',
+		condQzName: { type: 'text', field: '', val: '', label: L('Quiz Name') },
+		condTag:  { type: 'text', field: '', val: '', label: L('Quiz Tag') },
+		condUser: { type: 'cbb', field: '',
 					sk: 'users.org-arg', nv: {n: 'text', v: 'value'},
 					sqlArgs: [],
 					val: AnConst.cbbAllItem,
@@ -85,7 +85,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 		this.tier.setContext(this.context);
 	}
 
-	toSearch(e: React.UIEvent, condts?: QueryConditions) {
+	toSearch(condts?: QueryConditions) {
 		if (this.tier) {
 			let that = this;
 			this.q = condts || this.q;
@@ -167,7 +167,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 			<Typography className={classes.funcName} >{L('Polls Trending - TSX')}</Typography>
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
-				conds={[ this.state.condQzName, this.state.condTag, this.state.condUser ]}
+				fields={[ this.state.condQzName, this.state.condTag, this.state.condUser ]}
 				// query={ (q: typeof AnQueryst) => { return {
 				// 	qzName:q.conds[0].val ? q.conds[0].val : undefined,
 				// 	tag:   q.conds[1].val ? q.conds[1].val : undefined,
@@ -197,7 +197,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 				rows={this.tier.rows}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
-				selectedIds={this.state.selected}
+				selected={this.state.selected}
 				onSelectChange={this.onTableSelect}
 			/>}
 			{this.detailsForm}

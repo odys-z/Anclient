@@ -38,7 +38,7 @@ class MyPollsComp extends CrudCompW {
 					label: L('Issuers') },
 		condWait: { type: 'switch', val: true, label: L('Has waitings') },
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 		waitingPollIds: new Set(),
 	};
 
@@ -82,7 +82,7 @@ class MyPollsComp extends CrudCompW {
 				let centerResp = resp.Body()
 				let polls = centerResp.polls();
 				that.setState({polls});
-				that.state.selected.Ids.clear(0);
+				that.state.selected.ids.clear(0);
 
 				// reset flags
 				let myTaskIds = centerResp.myTaskIds();
@@ -98,7 +98,7 @@ class MyPollsComp extends CrudCompW {
 		let that = this;
 		this.quizForm = (
 			<CarouselQuiz uri={this.uri}
-				pollId={[...this.state.selected.Ids][0]} // load by itself
+				pollId={[...this.state.selected.ids][0]} // load by itself
 				// quiz are loaded by CarouselQuizComp, so committed by itself
 				onSubmit={() => {that.quizForm = undefined;}} // no thanks?
 				onClose={ () => {that.quizForm = undefined;}}
@@ -130,12 +130,12 @@ class MyPollsComp extends CrudCompW {
 			</Typography>
 			<Button variant="outlined" color='secondary'
 				onClick={this.takePoll}
-				disabled={this.state.selected.Ids.size <= 0 ||
-						!this.state.waitingPollIds.has([...this.state.selected.Ids][0] ) }
+				disabled={this.state.selected.ids.size <= 0 ||
+						!this.state.waitingPollIds.has([...this.state.selected.ids][0] ) }
 			> {L('Take Poll')}
 			</Button>
-			<AnTablist pk='pid' checkbox singleCheck
-				selectedIds={this.state.selected}
+			<AnTablist selected={this.state.selected}
+				pk='pid' checkbox singleCheck
 				className={classes.root}
 				columns={[
 					{ text: L('chk'), hide: true, field: "checked" },

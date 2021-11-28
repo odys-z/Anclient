@@ -4,7 +4,7 @@ import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { AnlistColAttrs, NV, QueryConditions, TierComboField } from '@anclient/semantier-st';
+import { AnlistColAttrs, NV, QueryConditions, TierCol, TierComboField } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
@@ -117,24 +117,26 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		});
 	}
 
-	handleChange( e ) {
+	handleChange( e: React.ChangeEvent<HTMLInputElement> ) {
 		this.setState({checked: !this.state.checked})
 	}
 
-	onTxtChange( e, x ) {
+	onTxtChange( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, x: number ) {
 		e.stopPropagation()
 		this.qFields[x].val = e.currentTarget.value;
+		this.setState({});
 	}
 
-	onDateChange(e, ix) {
+	onDateChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, ix: number) {
 		e.stopPropagation();
 
 		// console.log(this.conds[ix], e.currentTarget.value);
 		// let obj = this.conds[ix];
 		this.qFields[ix].val = e.currentTarget.value;
+		this.setState({});
 	}
 
-	onSwitchChange(e, x) {
+	onSwitchChange(e: React.ChangeEvent<HTMLInputElement>, x: number) {
 		e.stopPropagation();
 		this.qFields[x].val = e.currentTarget.checked;
 	}
@@ -159,16 +161,20 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		};
 	}
 
-	toSearch( e ) {
+	toSearch( _e ) {
 		let conds = query(this.qFields);
 		this.props.onSearch(conds);
 
-		function query(fields): QueryConditions {
-			return null;
+		function query(fields: AnlistColAttrs<JSX.Element, CompOpts>[]): QueryConditions {
+			conds = {};
+			fields?.forEach( (f, x) => {
+				conds[f.name || f.field] = f.type == 'cbb' || f.type == 'autocbb' ? f.val?.v : f.val;
+			} );
+			return conds;
 		}
 	}
 
-	toClear( e ) {
+	toClear( _e ) {
 		this.qFields
 			.filter( c => !!c )
 			.forEach( (c: ComboCondType, x) => {
@@ -218,7 +224,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		 */
 		function conditions(conds: AnlistColAttrs<JSX.Element, CompOpts>[]) {
 		  return conds
-			.filter((c, x ) => !!c)
+			.filter((c, _x ) => !!c)
 			.map( (cond: ComboCondType, x) => {
 				if (cond.type === 'cbb') {
 					let refcbb = React.createRef<HTMLDivElement>();
@@ -273,7 +279,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				}
 				else // if (cond.type === 'text')
 					return (<TextField label={cond.label} key={'text' + x}
-						id={String(x)}
+						id={String(x)} value={cond.val || ''}
 						onChange={e => {that.onTxtChange(e, x)}}/>);
 			} );
 		}

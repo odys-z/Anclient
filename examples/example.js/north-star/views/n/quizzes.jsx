@@ -41,7 +41,7 @@ class QuizzesComp extends CrudCompW {
 		condTags: { type: 'text', val: '', label: L('Tags')},
 		condDate: { type: 'date', val: '', label: L('Create Date')},
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 	};
 
 	funcName = L('North - Quizzes');
@@ -77,14 +77,14 @@ class QuizzesComp extends CrudCompW {
 
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
-		this.state.selected.Ids.clear();
+		this.state.selected.ids.clear();
 	}
 
 	refresh() {
 		if (this.state.queryReq)
 			this.context.anReact.bindTablist(this.state.queryReq, this, this.context.error);
 
-		this.state.selected.Ids.clear();
+		this.state.selected.ids.clear();
 	}
 
 	/** Both this & QuizUserStartComp use this function - let's change to server side later.
@@ -134,12 +134,12 @@ class QuizzesComp extends CrudCompW {
 	toDel(e, v) {
 		let that = this;
 		let txt = L('Totally {count} records will be deleted. Are you sure?',
-				{count: that.state.selected.Ids.size});
+				{count: that.state.selected.ids.size});
 		this.confirm =
 			(<ConfirmDialog open={true}
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
-				onOk={ () => { this.del(that.state.selected.Ids); } }
+				onOk={ () => { this.del(that.state.selected.ids); } }
 				onClose={ () => {that.confirm === undefined} }
 			/>);
 	}
@@ -156,14 +156,14 @@ class QuizzesComp extends CrudCompW {
 		let that = this;
 		client.commit(req,
 			(resp) => {
-				that.state.selected.Ids.clear();
+				that.state.selected.ids.clear();
 				that.confirm =
 					(<ConfirmDialog open={true}
 						ok={L('OK')} cancel={false}
 						title={L('Info')} msg={L('Quiz Deleted.')}
 						onOk={ () => {
 							that.confirm = undefined;
-							that.state.selected.Ids.clear();
+							that.state.selected.ids.clear();
 							that.refresh();
 						} }
 					/>);
@@ -194,7 +194,7 @@ class QuizzesComp extends CrudCompW {
 
 	toEdit(e, v) {
 		let that = this;
-		let qid = this.state.selected.Ids;
+		let qid = this.state.selected.ids;
 		if (qid.size === 0)
 			console.error("Something wrong!");
 		else {
@@ -262,8 +262,7 @@ class QuizzesComp extends CrudCompW {
 				>{L('Delete')}</Button>
 			</Grid>
 
-			<AnTablist
-				selectedIds={this.state.selected}
+			<AnTablist selected={this.state.selected}
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
 					{ text: L('qid'), hide:1, field: "qid" },

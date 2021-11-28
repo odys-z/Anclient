@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
 
 import Button from '@material-ui/core/Button';
@@ -376,5 +376,5 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 }
 SimpleFormComp.contextType = AnContext;
 
-const SimpleForm = withWidth()(withStyles(styles)(SimpleFormComp));
+const SimpleForm = withStyles<any, any, SimpleFormProps>(styles)(withWidth()(SimpleFormComp));
 export { SimpleForm, SimpleFormComp };

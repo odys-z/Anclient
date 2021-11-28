@@ -27,7 +27,7 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		size: 10,
 	}
 
-	selected = undefined; // props.selected.Ids, the set
+	// selected = undefined; // props.selected.Ids, the set
 	tier: any;
 	confirm: JSX.Element;
 

@@ -71,6 +71,9 @@ class App extends React.Component<Props, State> {
 			msg: undefined
 		});
 
+		Protocol.sk.cbbOrg = 'org.all';
+		Protocol.sk.cbbRole = 'roles';
+
 		this.state.anReact = new AnReactExt(this.state.inclient, this.state.error)
 								.extendPorts({
 									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less

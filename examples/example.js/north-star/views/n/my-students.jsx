@@ -30,10 +30,9 @@ class MyStudentsComp extends UserstComp {
 		rows: [],
 		query: undefined,
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 		buttons: {add: true, edit: false, del: false},
 
-		selected: {Ids: new Set()}
 	};
 
 	tier = undefined;
@@ -65,7 +64,7 @@ class MyStudentsComp extends UserstComp {
 
 	toEdit() {
 		let that = this;
-		let pkv = [...this.state.selected.Ids][0];
+		let pkv = [...this.state.selected.ids][0];
 		this.tier.pkval = pkv;
 		this.recForm = (<KidDetailst crud={Protocol.CRUD.u}
 			uri={this.uri}
@@ -100,11 +99,10 @@ class MyStudentsComp extends UserstComp {
 				>{L('Delete')}</Button>
 			</Box>
 
-			{tier && <AnTablist pk={tier.pk}
+			{tier && <AnTablist pk={tier.pk} selected={this.state.selected}
 				className={classes.root} checkbox={true}
 				columns={tier.columns()}
 				rows={tier.rows}
-				selectedIds={this.state.selected}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}

@@ -24,6 +24,7 @@ interface AnTablistProps extends Comprops {
 	selected: {ids: Set<string>};
 	rows: Tierec[];
 	onSelectChange: (ids: Array<string>) => void;
+	onPageChange?: (page: number) => void;
 }
 
 /**Table / list for records.
@@ -45,6 +46,8 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		super(props)
 
 		let {sizeOptions, selected} = props;
+		if (!selected || !selected.ids)
+			throw Error('Type safe checking: @anclient/react now using ref ids: Set<string> to save selected row ids. (props selectedIds renamed as selected)')
 		this.state.selected = selected.ids;
 		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selected.ids must be a set");

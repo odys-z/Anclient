@@ -24,7 +24,7 @@ const styles = (theme) => Object.assign(starTheme(theme), theme => {
 class MyStatusComp extends CrudCompW {
 	state = {
 		my: [],
-		selected: {Ids: new Set()}
+		selected: {ids: new Set()}
 	};
 
 	constructor(props) {
@@ -52,7 +52,7 @@ class MyStatusComp extends CrudCompW {
 			(resp) => {
 				let centerResp = resp.Body()
 				that.setState({my: centerResp.my()});
-				that.state.selected.Ids.clear();
+				that.state.selected.ids.clear();
 			},
 			this.context.error);
 	}
@@ -72,7 +72,7 @@ class MyStatusComp extends CrudCompW {
 				<Typography color='secondary' >
 					{L('Your have {tasks} {quiz} to finish.', {tasks, quiz: tasks > 1 ? 'quizzes' : 'quiz'})}
 				</Typography>
-				<AnTablist pk='qid'
+				<AnTablist pk='qid' selected={this.state.selected}
 					className={classes.root}
 					columns={[
 						{ text: L('dump'), hide: true, field: "checked" },
@@ -83,7 +83,6 @@ class MyStatusComp extends CrudCompW {
 						{ text: L('Subject'), field: "subject"},
 						{ text: L('DDL'), field: "ddl", color: 'primary' }
 					]}
-					selectedIds={this.state.selected}
 					rows={this.state.my.polls}
 					onSelectChange={this.onTableSelect} />
 				</>

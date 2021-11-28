@@ -42,7 +42,7 @@ class DocsharesComp extends CrudCompW {
 	state = {
 		buttons: { add: true, edit: false, del: false},
 		pageInf: { page: 0, size: 10, total: 0 },
-		selected: {},
+		selected: {ids: new Set()},
 	};
 
 	tier = undefined;
@@ -52,7 +52,7 @@ class DocsharesComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
-		this.state.selected.Ids = new Set();
+		this.state.selected.ids = new Set();
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
@@ -89,7 +89,7 @@ class DocsharesComp extends CrudCompW {
 		this.q = condts || this.q;
 		this.tier.records( this.q,
 			(cols, rows) => {
-				that.state.selected.Ids.clear();
+				that.state.selected.ids.clear();
 				that.setState(rows);
 			} );
 	}
@@ -112,14 +112,14 @@ class DocsharesComp extends CrudCompW {
 				ok={L('OK')} cancel={true} open
 				onOk={ that.del }
 				onClose={() => {that.confirm = undefined;} }
-				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.Ids.size})} />);
+				msg={L('{cnt} record(s) will be deleted, proceed?', {cnt: this.state.selected.ids.size})} />);
 	}
 
 	del() {
 		let that = this;
 		this.tier.del({
 				uri: this.uri,
-				ids: this.state.selected.Ids },
+				ids: this.state.selected.ids },
 			resp => {
 				that.confirm = (
 					<ConfirmDialog title={L('Info')}
@@ -139,15 +139,15 @@ class DocsharesComp extends CrudCompW {
 		this.tier.upload(files, (docId) => {
 			that.tier.pkval = docId; // FIXME NOTE where is the best place to do this?
 
-			this.state.selected.Ids.clear();
-			this.state.selected.Ids.add(docId);
+			this.state.selected.ids.clear();
+			this.state.selected.ids.add(docId);
 			that.toEdit(e, docId);
 		});
 	}
 
 	toEdit(e, v) {
 		let that = this;
-		this.tier.pkval = [...this.state.selected.Ids][0];
+		this.tier.pkval = [...this.state.selected.ids][0];
 		this.recForm = (<DocshareDetails u
 			uri={this.uri}
 			tier={this.tier}
@@ -192,9 +192,8 @@ class DocsharesComp extends CrudCompW {
 				>{L('Delete')}</Button>
 			</Grid>
 
-			{tier && <AnTablist pk={tier.pk}
+			{tier && <AnTablist pk={tier.pk} selected={this.state.selected}
 				className={classes.root} checkbox={tier.checkbox}
-				selectedIds={this.state.selected}
 				columns={tier.columns( {mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec, classes)}} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}

@@ -147,6 +147,12 @@ export class Protocol {
 		chkCntIns: 'checkSqlCountOnInsert',
 	};
 
+	/**Semantics key
+	 * For jsample, these is needed at least:
+	 * cbbOrg: 'org.all', cbbRole: 'roles'
+	 * For north:
+	 * cbbMyClass: 'north.my-class';
+	 */
 	static sk: any = {
 		// app will extending sk here.
 	}
