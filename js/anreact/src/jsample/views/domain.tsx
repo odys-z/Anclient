@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 
 import { L } from '../../utils/langstr';
-	import { AnConst } from '../../utils/consts';
-	import { Comprops, CrudCompW } from '../../react/crud'
-	import { AnContext, AnContextType } from '../../react/reactext'
-	import { AnTablist } from '../../react/widgets/table-list'
+import { AnConst } from '../../utils/consts';
+import { Comprops, CrudCompW } from '../../react/crud'
+import { AnContext, AnContextType } from '../../react/reactext'
+import { AnTablist } from '../../react/widgets/table-list'
 import { QueryConditions, Semantier } from '@anclient/semantier-st';
 import { AnQueryst } from '../../react/widgets/query-form-st';
 
@@ -37,20 +37,21 @@ class DomainComp extends CrudCompW<Comprops> {
 		*/
 		pageInf : { page: 0, size: 25, total: 0 },
 
-		selected: {ids: new Set()},
+		selected: {ids: new Set<string>()},
 	};
 
-	queryReq: QueryConditions;
+	q: QueryConditions;
 	tier: DomainTier;
 
 	conds = [
-		{ type: 'text', val: '', text: 'No', label: 'text'},
-		{ type: 'autocbb',
+		{ type: 'text', field: '', val: '', text: 'No', label: 'text'},
+		{ type: 'autocbb', field: '',
 		  sk: 'lvl1.domain.jsample', nv: {n: 'domainName', v: 'domainId'},
 		  val: AnConst.cbbAllItem,
 		  options: [ AnConst.cbbAllItem ],
 		  label: 'Encoded Items'},
-		{ type: 'cbb', // sk: 'lvl2.domain.jsample',
+		{ type: 'cbb', field: '',
+		  // sk: 'lvl2.domain.jsample',
 		  nv: {n: 'domainName', v: 'domainId'},
 		  val: AnConst.cbbAllItem,
 		  options: [ AnConst.cbbAllItem, {n: 'item', v: 1} ],
@@ -69,7 +70,7 @@ class DomainComp extends CrudCompW<Comprops> {
 		this.tier.setContext(this.context as unknown as AnContextType);
 	}
 
-	toSearch(query) {
+	toSearch(query? : QueryConditions) {
 		const ctx = this.context as unknown as AnContextType;
 		let pageInf = this.state.pageInf;
 
@@ -81,7 +82,7 @@ class DomainComp extends CrudCompW<Comprops> {
 		if (query.ignored)
 			queryReq.Body().whereCond('<>', 'parentId', `'${query.ignored}'`);
 
-		this.queryReq = queryReq;
+		this.q = query || this.q || {};
 
 		ctx.anReact.bindTablist(queryReq, this, ctx.error);
 	}
@@ -90,12 +91,13 @@ class DomainComp extends CrudCompW<Comprops> {
 		const ctx = this.context as unknown as AnContextType;
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
-		let query = this.queryReq;
-		if (query) {
-			query.Body().Page(size, page);
-			this.state.pageInf = {page, size, total: this.state.pageInf.total};
-			ctx.anReact.bindTablist(query, this, ctx.error);
-		}
+		// let query = this.queryReq;
+		// if (query) {
+		// 	query.Body().Page(size, page);
+		// 	this.state.pageInf = {page, size, total: this.state.pageInf.total};
+		// 	ctx.anReact.bindTablist(query, this, ctx.error);
+		// }
+		this.toSearch(undefined);
 	}
 
 	render() {
@@ -106,7 +108,7 @@ class DomainComp extends CrudCompW<Comprops> {
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				onLoaded={this.toSearch}
-				conds={this.conds}
+				fields={this.conds}
 				// query={(q) => { return {
 				// 	domain: q.state.conds[0].val ? q.state.conds[0].val : undefined,
 				// 	parent: q.state.conds[1].val ? q.state.conds[1].val.v : undefined,
@@ -124,6 +126,7 @@ class DomainComp extends CrudCompW<Comprops> {
 				rows={this.tier.rows} pk='domainId'
 				pageInf={this.state.pageInf}
 				selected={this.state.selected}
+				onSelectChange={undefined}
 				sizeOptions={[5, 25, 50]}
 				onPageInf={this.onPageInf}
 			/>}
