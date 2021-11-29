@@ -29,6 +29,9 @@ type ComboFieldType = TierComboField<JSX.Element, CompOpts>;
 export interface ComboProps extends Comprops {
 	/**Intial options (default values), will be replaced after data binding with field's options */
 	options?: Array<ComboItem>;
+	label?: string;
+	// style: CSSStyleDeclaration;
+	onSelect?: (it: NV) => void
 }
 
 const styles = (theme: Theme) => (Object.assign(
@@ -106,7 +109,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		let _that = this;
 		// let _cmb = this.state.combo;
 		// _cmb.ref = _ref;
-		return (e, item) => {
+		return (e, item: NV) => {
 			if (e) e.stopPropagation();
 			let selectedItem = item ? item : AnConst.cbbAllItem;
 

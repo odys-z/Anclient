@@ -27,7 +27,7 @@ class MyDocsComp extends CrudCompW {
 	state = {
 		buttons: { add: true, edit: false, del: false },
 		pageInf: { page: 0, size: 10, total: 0 },
-		selected:{ Ids: new Set() },
+		selected:{ ids: new Set() },
 	};
 
 	tier = undefined;
@@ -39,7 +39,7 @@ class MyDocsComp extends CrudCompW {
 	constructor(props) {
 		super(props);
 
-		this.state.selected.Ids = new Set();
+		this.state.selected.ids = new Set();
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
@@ -77,7 +77,7 @@ class MyDocsComp extends CrudCompW {
 		this.q = condts || this.q;
 		this.tier.records( this.q,
 			(cols, rows) => {
-				that.state.selected.Ids.clear();
+				that.state.selected.ids.clear();
 				that.setState(rows);
 			} );
 	}
@@ -94,7 +94,7 @@ class MyDocsComp extends CrudCompW {
 
 	toDownload(e, v) {
 		let that = this;
-		let pkv = [...this.state.selected.Ids][0];
+		let pkv = [...this.state.selected.ids][0];
 		this.tier.pkval = pkv;
 
 		if (this.tier.pkval) {
@@ -111,7 +111,7 @@ class MyDocsComp extends CrudCompW {
 	}
 
 	toView(e, v) {
-		let pkv = [...this.state.selected.Ids][0];
+		let pkv = [...this.state.selected.ids][0];
 		this.tier.pkval = pkv;
 		this.recForm = (<MyDocView crud={CRUD.r}
 			uri={this.uri}
@@ -149,9 +149,8 @@ class MyDocsComp extends CrudCompW {
 				<a ref={this.downloadLink} style={{display: "none"}}></a>
 			</Grid>
 
-			{tier && <AnTablist pk={tier.pk}
+			{tier && <AnTablist pk={tier.pk} selected={this.state.selected}
 				className={classes.root} checkbox={tier.checkbox}
-				selectedIds={this.state.selected}
 				columns={tier.columns( {
 					mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec, classes)}} )}
 				rows={tier.rows}

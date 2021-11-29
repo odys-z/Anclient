@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
 } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
@@ -18,8 +18,10 @@ import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
 import { CompOpts } from '../../react/anreact';
+import { toBool } from '@anclient/anreact/src/utils/helpers';
+import { Theme } from '@material-ui/core/styles';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 		backgroundColor: '#eef'
 	},
@@ -39,8 +41,8 @@ class UserstComp extends CrudCompW<Comprops> {
 	q: QueryConditions;
 	confirm: JSX.Element;
 	recForm: JSX.Element;
-	pageInf: any;
-	onPageInf: any;
+	pageInf: PageInf;
+	onPageInf: (page: number) => void;
 
 	constructor(props) {
 		super(props);
@@ -201,7 +203,7 @@ class UserstComp extends CrudCompW<Comprops> {
 				columns={tier.columns()}
 				rows={tier.rows}
 				pageInf={this.pageInf}
-				onPageInf={this.onPageInf}
+				onPageChange={this.onPageInf}
 				onSelectChange={this.onTableSelect}
 			/>}
 			{this.recForm}
@@ -214,12 +216,12 @@ UserstComp.contextType = AnContext;
 const Userst = withStyles<any, any, Comprops>(styles)(withWidth()(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {
+class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions) => void}> {
 	conds = [
-		{ name: 'userName', field: '', type: 'text', val: undefined, label: L('Student') },
-		{ name: 'orgId',    field: '', type: 'cbb',  val: undefined, label: L('Class'),
+		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student') },
+		{ name: 'orgId',    field: 'orgId', type: 'cbb',  val: undefined, label: L('Class'),
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ name: 'roleId',   field: '', type: 'cbb',  val: undefined, label: L('Role'),
+		{ name: 'roleId',   field: 'roleId', type: 'cbb',  val: undefined, label: L('Role'),
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 	];
 
@@ -232,7 +234,7 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: any) => void}> {
 		return {
 			userName: this.conds[0].val ? this.conds[0].val : undefined,
 			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
-			roleId   : (this.conds[2].val as {n: string, v: string}) ?.v };
+			roleId  : (this.conds[2].val as {n: string, v: string}) ?.v };
 	}
 
 	/** Design Note:
@@ -348,7 +350,7 @@ export class UsersTier extends Semantier {
 		this.rec.iv = iv;
 
 		let req = this.client.userReq(uri, this.port,
-			new UserstReq( uri, { record: this.rec, relations: this.relations, pk: this.pkval } )
+			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval } )
 			.A(crud === CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
 		client.commit(req,
@@ -361,6 +363,10 @@ export class UsersTier extends Semantier {
 				onOk(resp);
 			},
 			this.errCtx);
+	}
+
+	collectRelations(): DbRelations {
+		return {}; // user doesn't implys a relationship?
 	}
 
 	/**
@@ -386,7 +392,14 @@ export class UsersTier extends Semantier {
 	}
 }
 
-type UserstReqArgs = { record?: Tierec; relations?: any; pk?: string; deletings?: string[]; userId?: string; userName?: string; orgId?: string; roleId?: string; hasTodos?: string; };
+type UserstReqArgs = {
+	record?: Tierec;
+	pk?: string; relations?: DbRelations;
+	deletings?: string[];
+	userId?: string; userName?: string;
+	orgId?: string; roleId?: string;
+	hasTodos?: string;
+};
 
 export class UserstReq extends UserReq {
 	static __type__ = 'io.odysz.jsample.semantier.UserstReq';
@@ -408,15 +421,15 @@ export class UserstReq extends UserReq {
 
 		mykids: 'r/kids',
 	}
-	userId: any;
-	userName: any;
-	orgId: any;
-	roleId: any;
-	hasTodos: any;
-	pk: any;
-	record: any;
-	relations: any;
-	deletings: any;
+	userId: string;
+	userName: string;
+	orgId: string;
+	roleId: string;
+	hasTodos: boolean;
+	pk: string;
+	record: Tierec;
+	relations: DbRelations;
+	deletings: string[];
 
 	constructor (uri: string, args: UserstReqArgs) {
 		super(uri, "a_users");
@@ -426,7 +439,7 @@ export class UserstReq extends UserReq {
 		this.userName = args.userName;
 		this.orgId = args.orgId;
 		this.roleId = args.roleId;
-		this.hasTodos = args.hasTodos;
+		this.hasTodos = toBool(args.hasTodos);
 
 		/// case u
 		this.pk = args.pk;

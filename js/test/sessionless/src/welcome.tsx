@@ -1,11 +1,10 @@
-import React, { MouseEventHandler } from 'react';
-import { withStyles } from '@material-ui/styles';
-import { Box, Card, IconButton, Link, Paper, Typography, withWidth } from '@material-ui/core';
+import React from 'react';
+import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
 import { Semantier, Tierec } from '@anclient/semantier-st';
 import { Comprops, CrudComp, jsample } from '@anclient/anreact';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 	},
 	button: {
@@ -35,7 +34,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 	classes: any;
 	uri: any;
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 
 		this.classes = props.classes;
@@ -100,7 +99,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 }
 
 // FIXME ignoring eslint report report error before anreact upgraded to TS.
-export default withWidth()(withStyles(styles)(WelcomeComp));
+export default withStyles<any, any, Comprops>(styles)(withWidth()(WelcomeComp));
 
 interface WelcomeRec extends Tierec {
 	eid: string,

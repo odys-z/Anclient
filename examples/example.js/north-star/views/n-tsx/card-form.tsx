@@ -2,6 +2,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
+import clsx from  'clsx';
 
 import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
@@ -10,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { TierComboField, Semantier, Tierec, AnlistColAttrs, TierCol } from '@anclient/semantier-st';
 
-import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts, ClassNames } from '@anclient/anreact';
+import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts, ClassNames, toReactStyles } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 
@@ -92,7 +93,7 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 		let that = this;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
-            const df = f as unknown as TierComboField;
+            const df = f as unknown as TierComboField<JSX.Element, CompOpts>;
 			return (
 				<DatasetCombo uri={ this.props.uri }
 					sk={df.sk} nv={ df.nv }
@@ -100,7 +101,8 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 					readOnly={ !df && f.disabled }
 					options={ df.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ f.label }
-					style={ f.css || {width: 200} }
+					style={ toReactStyles(f.css) || {width: 200} }
+					className={ f.style }
 					invalidStyle={ f.css }
 					onSelect={ (v) => {
 						rec[df.field] = v.v;
@@ -203,3 +205,4 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 
 const CardsForm = withStyles<any, any, CardsFormProps>(styles)(withWidth()(CardsFormComp));
 export { CardsForm, CardsFormComp }
+
