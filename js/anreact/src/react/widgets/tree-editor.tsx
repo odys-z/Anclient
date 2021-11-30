@@ -7,17 +7,19 @@ import Button from "@material-ui/core/Button";
 import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
+import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, Tierec } from "@anclient/semantier-st";
+
 import { L } from '../../utils/langstr';
 import { toBool } from '../../utils/helpers';
 import { AnContext, AnContextType } from '../reactext';
 import { AnTreeIcons } from './tree'
-import { Comprops, CrudCompW, DetailFormW } from '../crud';
+import { CrudCompW, DetailFormW } from '../crud';
 import { JsampleIcons } from '../../jsample/styles';
 
 import { SimpleForm } from './simple-form';
-import { AnReactExt, CompOpts } from "../anreact";
+import { AnReactExt, ClassNames, CompOpts, Media } from "../anreact";
 import { PropTypes, Theme } from "@material-ui/core";
-import { CRUD, AnTreeNode, AnlistColAttrs } from "@anclient/semantier-st";
+import { AnTablistProps } from "@anclient/anreact/src/react/widgets/table-list";
 
 const styles = (theme: Theme) => ({
   root: {
@@ -47,6 +49,9 @@ const styles = (theme: Theme) => ({
 	padding: theme.spacing(1),
 	borderLeft: "1px solid #bcd",
   },
+  smallBtn: {
+	  minWidth: 24,
+  },
   th: {
 	  textAlign: 'center' as const,
 	  border: '1px solid red'
@@ -56,8 +61,9 @@ const styles = (theme: Theme) => ({
   }
 });
 
-interface TreecardProps extends Comprops {
-
+interface TreecardProps extends AnTablistProps {
+	/**Used as default rows - data is bound by TreeEditor itself. */
+	// rows : Tierec[];
 };
 
 interface CssTreeItem extends React.CSSProperties {
@@ -140,49 +146,51 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 				key={tnode.id}
 				spacing={0}
 				className={classes.row} >
-			{ this.props.columns.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => !toBool(v.visible || true) ).map( (col, cx) => {
-			  if (cx === 0) return (
-				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.rowHead}>
-					<Typography noWrap >
-						{this.props.leadingIcons(tnode, false)}
-						{icon(n.css.icon)}
-						{n.text}
-					</Typography>
-				</Grid> );
-			  else if (col.type === 'actions') return (
-				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.treeItem}>
-					<JsampleIcons.Up onClick={this.toUp} />
-					<JsampleIcons.Down onClick={this.toDown} />
-					{this.props.media.isMd ?
-						<> <Button onClick={this.props.toEdit}
-								data-me={tnode.id} data-parent={n.parentId}
-								startIcon={<JsampleIcons.Edit />} color="primary" >
-								{L('Edit')}
-							</Button>
-							<Button onClick={this.props.toDel}
-								data-me={tnode.id} data-parent={n.parentId}
-								startIcon={<JsampleIcons.Delete />} color="secondary" >
-								{L('Delete')}
-							</Button>
-						</>
-						:
-						<> <JsampleIcons.Edit onClick={this.props.toEdit}
-								data-me={tnode.id} data-parent={n.parentId} color='primary' />
-							<JsampleIcons.Delete onClick={this.props.toDel}
-								data-me={tnode.id} data-parent={n.parentId} color='secondary' />
-						</>
-					}
-				</Grid> );
-			  else return (
-				<Grid key={`${tnode.id}.${cx}`} item {...col.cols} className={classes.treeItem}>
-					{ typeof col.formatter === 'function'
-					  ? col.formatter(tnode, col)
-					  : <Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
-							{n.text}
-						</Typography>
-					}
-				</Grid> );
-			  } )
+			{ this.props.columns
+				.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible || true) )
+				.map( (col: AnlistColAttrs<JSX.Element, CompOpts>, cx: number) => {
+					if (cx === 0) return (
+						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
+							<Typography noWrap >
+								{this.props.leadingIcons(tnode, false)}
+								{icon(n.css.icon)}
+								{n.text}
+							</Typography>
+						</Grid> );
+					else if (col.type === 'actions') return (
+						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
+							<JsampleIcons.Up onClick={this.toUp} />
+							<JsampleIcons.Down onClick={this.toDown} />
+							{this.props.media.isMd ?
+								<> <Button onClick={this.props.toEdit}
+										data-me={tnode.id} data-parent={n.parentId}
+										startIcon={<JsampleIcons.Edit />} color="primary" >
+										{L('Edit')}
+									</Button>
+									<Button onClick={this.props.toDel}
+										data-me={tnode.id} data-parent={n.parentId}
+										startIcon={<JsampleIcons.Delete />} color="secondary" >
+										{L('Delete')}
+									</Button>
+								</>
+								:
+								<> <JsampleIcons.Edit onClick={this.props.toEdit} className={classes.smallBtn}
+										data-me={tnode.id} data-parent={n.parentId} color='primary' />
+									<JsampleIcons.Delete onClick={this.props.toDel} className={classes.smallBtn}
+										data-me={tnode.id} data-parent={n.parentId} color='secondary' />
+								</>
+							}
+						</Grid> );
+					else return (
+						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
+							{ typeof col.formatter === 'function'
+								? col.formatter(col, tnode)
+								: <Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
+									{n.text}
+								</Typography>
+							}
+						</Grid> );
+					} )
 			}
 		  </Grid> );
 
@@ -200,7 +208,19 @@ TreeCardComp.contextType = AnContext;
 const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCardComp));
 export { TreeCard, TreeCardComp }
 
-class AnTreeditorComp extends DetailFormW<TreecardProps> {
+interface AnTreeditorProps extends AnTablistProps {
+	columns: Array<AnTreegridCol>;
+}
+
+interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
+	/**
+	 * Overide AnTablistProps#formatter
+	 * Formatt a tree item cell/grid from col and node.
+	 */
+	formatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => UIComponent;
+}
+
+class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 	state = {
 		// window: undefined,
 		// [{id, node: {text, css, url}, level, children}. ... ]
@@ -233,13 +253,13 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		this.treeNodes = this.treeNodes.bind(this);
 
 		this.toSearch = this.toSearch.bind(this);
-
 	}
 
 	componentDidMount() {
 		console.log(this.props.uri);
-                const ctx = this.context as unknown as AnContextType;
-                this.anReact = ctx.anReact;
+
+		const ctx = this.context as unknown as AnContextType;
+		this.anReact = ctx.anReact;
 		this.toSearch();
 	}
 
@@ -248,9 +268,8 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		if (s_tree)
 			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
 
-		// let pageInf = this.state.pageInf;
-		let {uri, sk} = this.props;
-		this.anReact.stree({uri, sk}, this);
+		let { uri, sk } = this.props;
+		this.anReact.stree({ uri, sk }, this);
 
 		this.addForm = undefined;
 		this.state.expandings.clear();
@@ -305,13 +324,11 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 					// DESIGN NOTE:
 					// Is this a good reason that widgets shouldn't connected with datat tier?
 					// Explaination:
-					// 1. A simple UI form don't understand this special post updating data process such as tree re-shaping.
-					// 2. As this tree is loaded via port "stree", why save items with general updating? Should this been wrapped together?
-					// If all widgets aren't good at handle data tier, will it be resonable has an independant module for this?
+					// 1. A simple UI form doesn't understand this special post updating data processing such as tree re-shaping.
+					// 2. As the tree is loaded via port "stree", why saving items with general updating? Should this been wrapped into a component?
+					// If a general purpose widget can't be good at handling data tier, is it resonable has an independant module for a samntics process, e.g. tree reshaping?
 
 					// close as data saved, search later in case re-shape failed. (shouldn't be a transaction?)
-
-					// that.addForm = undefined;
 					let {uri, sk} = this.props;
 					(this.context as unknown as AnContextType).anReact
                         .rebuildTree({uri, sk, rootId: me}, () => {
@@ -354,7 +371,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		let mtree = buildTreegrid( m, undefined, compOts );
 		return mtree;
 
-		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts) {
+		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts: CompOpts) {
 		  if (Array.isArray(tnode)) {
 			return tnode.map((i, x) => {
 			  return buildTreegrid(i, parent, compOts);
@@ -390,13 +407,15 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 		}
 	}
 
-	th(columns = [], classes, media) {
+	th( columns: Array<AnTreegridCol> = [],
+		classes: ClassNames, media: Media) {
 		return (
 			<Grid container className={classes.th} >
-				{columns.filter( v => !toBool(v.hide))
-					.map( (col, ix) => {
+				{columns
+					.filter( v => toBool(v.visible, true))
+					.map( (col: AnTreegridCol, ix: number) => {
 						if (col.type === 'actions') return (
-							<Grid item key={ix} {...col.cols}>
+							<Grid item key={ix} {...col.grid}>
 								<Button onClick={this.toAddChild}
 									data-me={undefined} date-parent={undefined}
 									startIcon={<JsampleIcons.ListAdd />} color="primary" >
@@ -404,7 +423,7 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 								</Button>
 							</Grid>);
 						else return (
-							<Grid item key={ix} {...col.cols}>
+							<Grid item key={ix} {...col.grid}>
 								{col.label || col.field}
 							</Grid>);
 					} )
@@ -422,54 +441,56 @@ class AnTreeditorComp extends DetailFormW<TreecardProps> {
 			className={classes.folderHead}
 		>
 		  <Grid container spacing={0} key={tnode.id} >
-			{columns.filter( v => v.hide != true).map( (col, ix) => {
-				if (ix == 0) // row head
-				  return (
-					<Grid item key={`${tnode.id}.${ix}`} {...col.cols} >
-						<Typography noWrap variant='body2' >
-						  {this.leadingIcons(tnode, open, n.expandIcon)}
-						  {icon(n.css.icon)}
-						  {n.text}
-						  {open ? icon("expand") : icon("collapse")}
-						</Typography>
-					</Grid>);
-				else if (col.type === 'actions')
-					return (
-					  <Grid item key={`${tnode.id}.${ix}`} className={classes.actions}>
-						<Typography noWrap variant='body2' >
-							<Button onClick={this.toEdit}
-								data-me={tnode.id}
-								startIcon={<JsampleIcons.Edit />} color="primary" >
-								{media.isMd && L('Edit')}
-							</Button>
-							<Button onClick={this.toDel} data-me={tnode.id}
-								startIcon={<JsampleIcons.Delete />} color="secondary" >
-								{media.isMd && L('Delete')}
-							</Button>
-							{( this.props.isMidNode ? this.props.isMidNode(n) : true )
-							  && <Button onClick={this.toAddChild}
-									data-me={tnode.id} data-parent={n.parent}
-									startIcon={<JsampleIcons.ListAdd />} color="primary" >
-									{media.isMd && L('New')}
-							</Button>}
-						</Typography>
-					  </Grid>
-					);
-				else if (col.type === 'formatter' || col.formatter)
-				  return (
-					<Grid item key={`${tnode.id}.${ix}`} {...col.cols} >
-						<Typography variant='body2' >
-						  {col.formatter(tnode, media)}
-						</Typography>
-					</Grid>);
-				else
-				  return (
-					<Grid item key={`${tnode.id}.${ix}`} {...col.cols} >
-						<Typography variant='body2' >
-						  {formatFolderDesc(tnode, media)}
-						</Typography>
-					</Grid>);
-			}) }
+			{columns
+				.filter( v => v.hide != true)
+				.map( (col: AnTreegridCol, ix: number) => {
+					if (ix == 0) // row head
+					  return (
+						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+							<Typography noWrap variant='body2' >
+							{this.leadingIcons(tnode, open, n.expandIcon)}
+							{icon(n.css.icon)}
+							{n.text}
+							{open ? icon("expand") : icon("collapse")}
+							</Typography>
+						</Grid>);
+					else if (col.type === 'actions')
+					  return (
+						<Grid item key={`${tnode.id}.${ix}`} className={classes.actions}>
+							<Typography noWrap variant='body2' >
+								<Button onClick={this.toEdit}
+									data-me={tnode.id}
+									startIcon={<JsampleIcons.Edit />} color="primary" >
+									{media.isMd && L('Edit')}
+								</Button>
+								<Button onClick={this.toDel} data-me={tnode.id}
+									startIcon={<JsampleIcons.Delete />} color="secondary" >
+									{media.isMd && L('Delete')}
+								</Button>
+								{( this.props.isMidNode ? this.props.isMidNode(n) : true )
+								&& <Button onClick={this.toAddChild}
+										data-me={tnode.id} data-parent={n.parent}
+										startIcon={<JsampleIcons.ListAdd />} color="primary" >
+										{media.isMd && L('New')}
+								</Button>}
+							</Typography>
+						</Grid>
+						);
+					else if (col.type === 'formatter' || col.formatter)
+					  return (
+						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+							<Typography variant='body2' >
+							  {col.formatter(col, tnode, {classes, media})}
+							</Typography>
+						</Grid>);
+					else
+					  return (
+						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+							<Typography variant='body2' >
+							{formatFolderDesc(tnode, media)}
+							</Typography>
+						</Grid>);
+				}) }
 		  </Grid>
 		</div>
 		);

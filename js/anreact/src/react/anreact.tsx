@@ -4,7 +4,7 @@ import $ from 'jquery';
 import { stree_t, Tierec,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk
+	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk, QueryConditions
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
@@ -361,7 +361,7 @@ export class AnReactExt extends AnReact {
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
 				  nv: NV;
-				  cond: CbbCondition;
+				  cond: QueryConditions; // CbbCondition;
 				  onLoad?: OnLoadOk;
 				  /**don't add "-- ALL --" item */
 				  noAllItem?: boolean; } ): AnReactExt {

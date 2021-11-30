@@ -13,7 +13,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, TierCol, Tierec } from '@anclient/semantier-st';
+import { AnFieldValidation, AnFieldValidator, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, TierCol, Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
@@ -56,7 +56,7 @@ const styles = (theme) => ({
 });
 
 interface SimpleFormProps extends Comprops {
-    funcId: string;
+    // funcId: string;
     crud: CRUD;
     fields: TierCol[];
     pk: string;
@@ -171,13 +171,13 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 		let valid = true;
 	    this.state.fields.forEach( (f, x) => {
-			f.valid = validField(f, {validator: (v) => !!v});
+			f.valid = validField(f, v => !!v);
 			f.style = f.valid ? undefined : invalid;
 			valid &&= f.valid;
 	    } );
 		return valid;
 
-		function validField (f, valider): boolean {
+		function validField (f: AnlistColAttrs<JSX.Element, CompOpts>, valider: AnFieldValidation | ((v: any) => boolean)): boolean {
 			let v = that.state.record[f.field];
 
 			if (f.type === 'int')
@@ -186,7 +186,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			if (typeof valider === 'function')
 				return valider(v);
 			else if (f.validator) {
-				let vd = f.validator;
+				let vd = f.validator as AnFieldValidation;
 				if(vd.notNull && (v === undefined || v === null || v.length === 0))
 					return false;
 				if (vd.len && v && v.length > vd.len)
@@ -198,7 +198,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		}
 	}
 
-	toSave(e) {
+	toSave(e: React.MouseEvent<HTMLInputElement>) {
 		e.stopPropagation();
 
 		if (!this.validate(this.props.invalidStyle)) {
@@ -262,7 +262,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			this.props.onClose({code: 'cancel'});
 	}
 
-	showOk(txt) {
+	showOk(txt: string | string[]) {
 		let that = this;
 		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
 					title={L('Info')}

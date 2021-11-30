@@ -1,5 +1,5 @@
 import React from 'react';
-import { StandardProps, Theme, withStyles } from '@material-ui/core';
+import { Color, PropTypes, StandardProps, Theme, withStyles } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
@@ -12,6 +12,10 @@ interface Comprops extends StandardProps<any, string>, UIComponent {
 
 	/** CRUD */
 	crud?: CRUD;
+
+	/**MUI as default */
+	color?: PropTypes.Color;
+
 	/** Semantier */
 	classes?: ClassNames;
 	readonly tier?: any;
