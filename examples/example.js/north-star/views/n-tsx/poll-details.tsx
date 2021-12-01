@@ -9,6 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 
 import { Tierec, CRUD, TierCol } from '@anclient/semantier-st';
 import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Media } from '@anclient/anreact';
@@ -16,7 +17,6 @@ import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Me
 import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
 import { CardsForm, CardsFormProps } from './card-form';
-import { Typography } from '@material-ui/core';
 
 const styles = (theme: starTheme) => (Object.assign(
 	invalidStyles, {
