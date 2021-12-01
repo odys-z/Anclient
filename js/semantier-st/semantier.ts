@@ -66,8 +66,8 @@ export interface TierCol extends DbCol {
  * FO: options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
 */
 export interface AnlistColAttrs<F, FO> extends TierCol {
-    // field: string;
-    label: string;
+    /** Readable text (field name) */
+    label?: string;
 
     opts?: FO;
     formatter?: AnElemFormatter;

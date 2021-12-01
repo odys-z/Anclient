@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 import clsx from  'clsx';
 
@@ -13,8 +13,6 @@ import { TierComboField, Semantier, Tierec, AnlistColAttrs, TierCol } from '@anc
 
 import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts, ClassNames, toReactStyles } from '@anclient/anreact';
 
-import { starTheme } from '../../common/star-theme';
-
 /**
  * Some parent controlled user actions, like SessionInf can be added here.
  * headFormatter: the head's formatter
@@ -25,7 +23,7 @@ export interface CardsFormProps extends Comprops {
 	cardFormatter?: (rec: Tierec, rx: number, classes: ClassNames, media: Media) => JSX.Element;
 };
 
-const styles = (theme: starTheme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles,
 	{ root: {
 		display: 'flex',

@@ -2,6 +2,7 @@
 import React, { UIEvent } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
+import { Theme } from '@material-ui/core/styles';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -14,11 +15,10 @@ import Typography from '@material-ui/core/Typography';
 import { Tierec, CRUD, TierCol } from '@anclient/semantier-st';
 import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Media } from '@anclient/anreact';
 
-import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
 import { CardsForm, CardsFormProps } from './card-form';
 
-const styles = (theme: starTheme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
 		root: {},
 		fromBody: {},

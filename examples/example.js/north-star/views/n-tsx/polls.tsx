@@ -27,7 +27,7 @@ export interface PollsProp extends Comprops {
 		smalltip?: string; };
 };
 
-const styles = (theme: starTheme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
 	crudButton: {
 		margin: theme.spacing(1),
