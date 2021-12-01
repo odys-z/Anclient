@@ -9,12 +9,11 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-// import Carousel from "react-elastic-carousel";
 import MobileStepper from "@material-ui/core/MobileStepper";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 
-import { Protocol, SessionClient, AnClient, UserReq } from '@anclient/semantier'
+import { Protocol, SessionClient, AnClient, UserReq } from '@anclient/semantier-st'
 import { L, Langstrs, AnConst,
     AnContext, CrudCompW, AnReactExt
 } from '@anclient/anreact';

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { SessionClient } from '@anclient/semantier'
+import { SessionClient } from '@anclient/semantier-st'
 import { L, Langstrs, AnContext, AnError, AnReact, Login, jsample } from '@anclient/anreact';
 import { Northprops } from './common/north';
 

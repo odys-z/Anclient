@@ -12,7 +12,7 @@ import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { Protocol, AnsonBody, AnsonResp } from '@anclient/semantier';
+import { Protocol, AnsonBody, AnsonResp } from '@anclient/semantier-st';
 import { L, isEmpty,
 	AnContext, DatasetCombo, ConfirmDialog, CrudComp,
 	jsample, Overlay, AnGridsheet, AnNumericEdit, AnIndicatorRenderer

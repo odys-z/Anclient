@@ -101,7 +101,7 @@ const styles = theme => ({
 		}),
 	},
 	loginfo: {
-		// TS ERROR: textAlign: 'end',
+		textAlign: 'end' as const,
 		color: 'wheat',
 		"& :hover": {
 			backgroundColor: 'Indigo'

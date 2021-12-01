@@ -40,11 +40,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('anprism.restartServer', () => {
-			if (AnPagePanel.currentPanel) {
-				AnPagePanel.currentPanel.startup();
+			if (!AnPagePanel.serv0.starting) {
+				AnPagePanel.startup();
 			}
-			else
-				vscode.window.showInformationMessage('Sorry! Currently sever can only be started when Anprism loading a page!');
+			// else
+			// 	vscode.window.showInformationMessage('Sorry! Currently sever can only be started when Anprism loading a page!');
 		})
 	);
 
@@ -56,7 +56,8 @@ export function activate(context: vscode.ExtensionContext) {
 				AnPagePanel.currentPanel.close();
 			}
 			else {
-				vscode.window.showInformationMessage('Currently Anprism server can only be shutdown via web page view!');
+				// vscode.window.showInformationMessage('Currently Anprism server can only be shutdown via web page view!');
+				AnPagePanel.shutdown();
 			}
 		})
 	);
@@ -97,16 +98,16 @@ class AnPagePanel {
 	 * Html page information of which is loaded in this panel.
 	 */
 	page: Page = {
-		port: "8888",
-		host: "localhost",
+		// port: "8888",
+		// host: "localhost",
 		html: vscode.Uri.file("index.html"),
 		style: `background-color: #ccc`,
 		reload: false,
 		devtool: false
 	};
 
-	// @type ServHelper
-	serv: ServHelper;
+	/**jserv descriptor / helper */
+	static serv0: ServHelper;
 
 	handleWebviewMessage(message: any): any {
 		switch (message.command) {
@@ -159,15 +160,14 @@ class AnPagePanel {
 			}
 		}
 
-		p = p!; // A not neccessarily needed type checking
-		AnPagePanel.currentPanel = p;
-		p._panel.webview.onDidReceiveMessage(
+		AnPagePanel.currentPanel = p!;
+		AnPagePanel.currentPanel._panel.webview.onDidReceiveMessage(
 			(message) => AnPagePanel.currentPanel!.handleWebviewMessage(message)
 		);
 
-		if (!p.serv.isStarting()) {
+		if (!AnPagePanel.serv0.isStarting()) {
 			try {
-				await p.startup();
+				await AnPagePanel.startup();
 			}
 			catch (e) {
 				if (e instanceof AnprismException)
@@ -177,37 +177,60 @@ class AnPagePanel {
 
 		// show it.
 		try {
-			p.refresh(localhtml);
+			AnPagePanel.currentPanel.refresh(localhtml);
 		}
 		catch (e) {
 			if (e instanceof AnprismException)
 				vscode.window.showErrorMessage((e as AnprismException).getMessage());
 		}
-		p._panel.reveal(column);
+		AnPagePanel.currentPanel._panel.reveal(column);
 	}
 
 	/**
 	 * Startup server in possible server root dir.
 	 */
-	async startup() {
-		const cmd = `${pythonCmd('')} ${this.serv.pythonPath()} -b 0.0.0.0 -w ${this.serv.webrootPath()} ${this.page.port} &`;
+	static async startup() {
+		AnPagePanel.serv0.starting(true);
 
-		this.serv.starting(true);
+		const cmd = `${pythonCmd('')} ${AnPagePanel.serv0.pythonPath()} -b 0.0.0.0 -w ${AnPagePanel.serv0.webrootPath()} ${AnPagePanel.serv0.serv.port} &`;
+
 		AnPagePanel.log.appendLine(cmd);
-		vscode.window.showInformationMessage('Starting Anprism server at ' + this.serv.webrootPath());
+		vscode.window.showInformationMessage('Starting Anprism server at ' + AnPagePanel.serv0.webrootPath());
 
 		new Promise<string>((resolve, reject) => {
 			cp.exec(cmd, (err, out) => {
 				if (err) {
-					this.serv.starting(false);
+					AnPagePanel.serv0.starting(false);
 					AnPagePanel.log.appendLine(err.message);
 					vscode.window.showInformationMessage('Starting Anprism server failed. ' + err.message);
 					return reject(err);
 				}
-				// this.serv.starting(false); // test shows only when server stopped can reach here
 				AnPagePanel.log.appendLine(out.toString());
 				// if (AnPagePanel.currentPanel)
 				// 	AnPagePanel.currentPanel!.refresh(undefined);
+				return resolve(out);
+			});
+		});
+	}
+
+	static async shutdown() {
+
+		let {url, sub} = AnPagePanel.serv0.url({html: vscode.Uri.file('./index.html'), reload: false, devtool: false});
+
+		const cmd = `curl ${url}?_shut-down_=True &`;
+		AnPagePanel.log.appendLine(cmd);
+
+		vscode.window.showInformationMessage('Shutting down Anprism server at ' + AnPagePanel.serv0.webrootPath());
+
+		AnPagePanel.serv0.starting(false);
+		new Promise<string>( (resolve, reject) => {
+			cp.exec(cmd, (err, out) => {
+				if (err) {
+					AnPagePanel.log.appendLine(err.message);
+					vscode.window.showInformationMessage('Shutting down Anprism server failed. ' + err.message);
+					return reject(err);
+				}
+				AnPagePanel.log.appendLine(out.toString());
 				return resolve(out);
 			});
 		});
@@ -220,14 +243,10 @@ class AnPagePanel {
 	 * @param serv
 	 */
 	constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, serv: ServHelper) {
-		// this.serv = new ServHelper(context);
-		this.serv = serv;
+		AnPagePanel.serv0 = serv;
 
 		this._panel = panel;
 		AnPagePanel._extensionUri = context.extensionUri;
-
-		// Set the webview's initial html content
-		// this.loadOnline();
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programmatically
@@ -271,8 +290,8 @@ class AnPagePanel {
 	 */
 	public dispose() {
 
-		AnPagePanel.log.appendLine("Closing webserver: " + AnPagePanel.currentPanel?.serv.webrootPath);
-		AnPagePanel.currentPanel?.close(); // not working - windows also has "curl"
+		AnPagePanel.log.appendLine("Closing webserver: " + AnPagePanel.serv0.webrootPath());
+		// AnPagePanel.currentPanel?.close(); // not working - windows also has "curl"
 
 		AnPagePanel.currentPanel = undefined;
 
@@ -288,9 +307,9 @@ class AnPagePanel {
 	}
 
 	refresh(newPage: vscode.Uri | undefined): void {
-		this._panel.webview.html = "";
+		this._panel.webview.html = ""; // FIXME: not refreshed because of no reloading handled by webview - needs promise?
 		this.page.html = newPage || this.page.html;
-		this.serv.checkHtml(this.page.html);
+		AnPagePanel.serv0.checkHtml(this.page.html);
 		this._panel.webview.html = this.getAnclientPage(this.page);
 	}
 
@@ -303,7 +322,7 @@ class AnPagePanel {
 	 * @returns
 	 */
 	getAnclientPage(page: Page): string {
-		let {url, sub} = this.serv.url(page);
+		let {url, sub} = AnPagePanel.serv0.url(page);
 		AnPagePanel.log.appendLine(url);
 		return `<!DOCTYPE html>
 		<html lang="en">
@@ -329,18 +348,18 @@ class AnPagePanel {
 	}
 
 	close(): void {
-		AnPagePanel.log.appendLine('Shuting down: ' + this.serv?.serv.webroot);
+		AnPagePanel.log.appendLine('Shuting down: ' + AnPagePanel.serv0?.serv.webroot);
 		vscode.window.showInformationMessage('Shuting down Anprism server.');
 
 		// this.page.html = '?_shut-down_=True';
 		// this.page.html = vscode.Uri.file('?_shut-down_=True');
 
-		const req = `http://${this.page.host}:${this.page.port}?_shut-down_=True`;
+		const req = `http://${AnPagePanel.serv0.serv.host}?_shut-down_=True`;
 		console.log(req);
 		this._panel.webview.html = '';
 
 		// FIXME: Not always work. Send message to js?
-		this.serv.starting(false);
+		AnPagePanel.serv0.starting(false);
 		this._panel.webview.html = `<!DOCTYPE html>
 		<html lang="en">
 		<head>

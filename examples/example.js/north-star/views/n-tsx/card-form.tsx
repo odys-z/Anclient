@@ -8,14 +8,20 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { TierComboField, Semantier, Tierec, AnlistColAttrs } from '@anclient/semantier-st';
-import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts } from '@anclient/anreact';
+import { TierComboField, Semantier, Tierec, AnlistColAttrs, TierCol } from '@anclient/semantier-st';
+
+import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts, ClassNames } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
 
-export interface CardsFormProp extends Comprops {
-	headFormatter?: (rec: Tierec, cols: Array<any>, classes: {[c: string]: string}, media: Media) => JSX.Element;
-	CardsFormatter?: (rows: Array<Tierec>, classes: {[c: string]: string}, media: Media) => JSX.Element;
+/**
+ * Some parent controlled user actions, like SessionInf can be added here.
+ * headFormatter: the head's formatter
+ * cardFormatter: a grid card formatter, each card should be a Grid, for insert into a Grid container, the form body.
+ */
+export interface CardsFormProps extends Comprops {
+	headFormatter?: (rec: Tierec, cols: Array<TierCol>, classes: ClassNames, media: Media) => JSX.Element;
+	cardFormatter?: (rec: Tierec, rx: number, classes: ClassNames, media: Media) => JSX.Element;
 };
 
 const styles = (theme: starTheme) => (Object.assign(
@@ -31,14 +37,6 @@ const styles = (theme: starTheme) => (Object.assign(
 		  backgroundColor: '#ced'
 		}
 	  },
-	//  labelText: {
-	// 	padding: theme.spacing(1),
-	// 	borderLeft: '1px solid #bcd',
-	//   },
-	//   labelText_dense: {
-	// 	paddingLeft: theme.spacing(1),
-	// 	paddingRight: theme.spacing(1),
-	// 	borderLeft: '1px solid #bcd' }
 	}
 ) );
 
@@ -48,7 +46,7 @@ const styles = (theme: starTheme) => (Object.assign(
  * <p>1. using tier.rec as paper head</p>
  * <p>2. using tier.rows as cards. All cards in Grid container.</p>
  */
-class CardsFormComp extends CrudCompW<CardsFormProp> {
+class CardsFormComp extends CrudCompW<CardsFormProps> {
 	state = {
 		dirty: false,
 		pk: undefined,
@@ -56,7 +54,7 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 
     tier: Semantier;
 
-	constructor (props: CardsFormProp) {
+	constructor (props: CardsFormProps) {
 		super(props);
 
 		this.tier = props.tier;
@@ -138,7 +136,7 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 		}
 	}
 
-	formFields(rec: {}, classes, media: Media) {
+	formFields(rec: {}, classes: ClassNames, media: Media) {
 		let fs = [];
 		const isSm = this.props.dense || toBool(media.isMd);
 
@@ -149,7 +147,8 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
 					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
-				  <Box className={classes.rowBox} {...f.box} >
+				  {/* <Box className={classes.rowBox} {...f.box} > */}
+				  <Box {...f.box} >
 					{!isSm && f.label &&
 					  <Typography className={classes.formLabel} >
 						{L(f.label)}
@@ -202,5 +201,5 @@ class CardsFormComp extends CrudCompW<CardsFormProp> {
 	}
 }
 
-const CardsForm = withWidth()(withStyles(styles)(CardsFormComp)); // FIXME only after anreact upgraded
+const CardsForm = withStyles<any, any, CardsFormProps>(styles)(withWidth()(CardsFormComp));
 export { CardsForm, CardsFormComp }

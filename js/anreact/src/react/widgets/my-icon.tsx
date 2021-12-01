@@ -12,7 +12,7 @@ const styles = theme => ({
   root: {
 	color: "wheat",
 	// backgroundColor: "primary",
-	// textAlign: "center",
+	textAlign: "center" as const,
 	"&: hover": {
 		color: "linen"
 	}

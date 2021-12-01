@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp } from '@anclient/semantier';
+import { Protocol, AnsonResp } from '@anclient/semantier-st';
 import { L, AnContext, CrudCompW, AnTablist, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;

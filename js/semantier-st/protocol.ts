@@ -45,6 +45,41 @@ export interface DbCol {
     name?: string;
 }
 
+/**fk: Foreign key
+ * Semantic tree defined in dataset.xml
+ * multi-multi (TODO)
+ * user defined (?)
+ * */
+export type SemanticType = 'fk' | 'stree' | 'm2m' | 'customer';
+
+export interface FKRelation {
+	/**chiled table pk */
+	pk: string,
+
+	/**Child foreign column */
+	col: string,
+}
+
+export interface Stree {
+	sk: string,
+	pk: string,
+	fk: string,
+	sort: string,
+	fullpath: string,
+}
+
+/**Is this semantic-DA.Semantics? */
+export type Semantics = {
+	// [reltype in SemanticType]: FKRelation | Stree | any;
+	fk?: FKRelation,
+	stree?: Stree,
+	m2m?: any,
+}
+
+export interface DbRelations {
+    [tabl: string]: Semantics;
+}
+
 export interface PkMeta {
     v: any;
     pk: string;
@@ -281,7 +316,7 @@ export class AnsonMsg<T extends AnsonBody> {
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 				body = new AnSessionReq(body.uid, body.token, body.iv);
 			else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
-				body = new QueryReq(body.uri, body.mtabl, body.mAlias, undefined);
+				body = new QueryReq(body.uri, body.mtabl, body.mAlias);
 			else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 				body = new UserReq(json.port, header, [body]);
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
@@ -295,14 +330,10 @@ export class AnsonMsg<T extends AnsonBody> {
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
 				body = new AnDatasetResp(body);
 
-			// else if (body.type === "io.odysz.semantic.tier.DatasetierReq")
-			// 	body = new DatasetierReq(body);
-			// else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
-			// 	body = new DatasetierResp(body);
-
-			// FIXME never used?
-			// else if (body.type === "io.odysz.semantic.tier.DatasetierResp")
-			// 	body = new DatasetierResp(body);
+			else if (body.type === DatasetierReq.__type__)
+				body = new DatasetierReq(body);
+			else if (body.type === DatasetierResp.__type__)
+				body = new DatasetierResp(body);
 
 			else if (body.type in Protocol.ansonTypes)
 				// TODO FIXME what happens if the other known types are all handled like this?
@@ -490,7 +521,7 @@ export class QueryReq extends AnsonBody {
     pgsize: number;
     limt: string[];
 
-	constructor (uri: string, tabl: string, alias: string, pageInf: PageInf) {
+	constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
 		super();
 		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
 		this.uri = uri;
@@ -548,7 +579,7 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	public col (c : string, as : string) : QueryReq {
+	public col (c : string, as? : string) : QueryReq {
 		return this.expr(c, as);
 	}
 
@@ -1130,16 +1161,14 @@ export interface DatasetOpts {
 	/** semantic key configured in WEB-INF/dataset.xml */
 	sk: string;
 	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
-	t?: {
-		/** load dataset configured and format into tree with semantics defined by sk. */
-		sqltree: string;
+	t?: /** load dataset configured and format into tree with semantics defined by sk. */
+		"sqltree" |
 		/** Reformat the tree structure - reformat the 'fullpath', from the root */
-		retree: string;
+		"retree" |
 		/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
-		reforest: string;
+		"reforest" |
 		/** Query with client provided QueryReq object, and format the result into tree. */
-		query: string;
-	};
+		"query",
 	a?: string;
 	/**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
 	mtabl?: string;
@@ -1253,15 +1282,15 @@ export class DatasetReq extends QueryReq {
     }
 }
 
-export const stree_t = {
+export enum stree_t {
 	/** load dataset configured and format into tree with semantics defined by sk. */
-	sqltree: 'sqltree',
+	sqltree = 'sqltree',
 	/** Reformat the tree structure - reformat the 'fullpath', from the root */
-	retree: 'retree',
+	retree = 'retree',
 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
-	reforest: 'reforest',
+	reforest = 'reforest',
 	/** Query with client provided QueryReq object, and format the result into tree. */
-	query: 'query'
+	query = 'query'
 };
 
 export class DatasetierReq extends AnsonBody {
@@ -1280,10 +1309,12 @@ Protocol.registerBody(DatasetierReq.__type__, (json) => new DatasetierReq(json))
 
 export class DatasetierResp extends AnsonResp {
 	static __type__ = "io.odysz.semantic.tier.DatasetierResp";
+	sks: string[];
 
-	constructor(dsJson) {
+	constructor(dsJson: any) {
 		super(dsJson);
 		this.type = DatasetierResp.__type__;
+		this.sks = dsJson.sks;
 	}
 }
 Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json));

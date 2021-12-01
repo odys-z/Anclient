@@ -1,15 +1,12 @@
 import React from 'react';
-// import { withStyles } from "@material-ui/core/styles";
-import { StandardProps, withStyles } from '@material-ui/core';
+import { StandardProps, Theme, withStyles } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
 import { Media, ClassNames } from './anreact';
-import { CRUD } from '@anclient/semantier-st';
+import { CRUD, UIComponent } from '@anclient/semantier-st';
 
-interface Comprops extends StandardProps<any, string> {
-	/**Component uri usually comes from function configuration (set by SysComp.extendLinks) */
-	readonly uri?: string;
+interface Comprops extends StandardProps<any, string>, UIComponent {
 	/**The matching url in React.Route */
 	match?: {path: string};
 
@@ -21,7 +18,7 @@ interface Comprops extends StandardProps<any, string> {
 	readonly width?: Breakpoint;
 }
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'
@@ -40,11 +37,11 @@ class CrudComp<T extends Comprops> extends React.Component<T> {
 	state = {};
 	uri = undefined;
 
-	constructor(props) {
+	constructor(props: T) {
 		super(props);
 		this.uri = props.match && props.match.path || props.uri;
 		if (!this.uri && props.match)
-			throw Error("Anreact CRUD main component (url route) must set a URI path. (Component not created with SysComp & React Router 5.2 ?)");
+			throw Error("Anreact CRUD main components' (url route) must set with a URI path. (Component not created with SysComp & React Router 5.2 ? Or declared uri in subclass?)");
 	}
 
 	render() {
@@ -115,12 +112,6 @@ class CrudCompW<T extends Comprops> extends CrudComp<T> {
 	}
 }
 CrudCompW.contextType = AnContext;
-
-/*
-CrudCompW.propTypes = {
-	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-};
-*/
 
 class HomeComp extends CrudComp<Comprops> {
 	render() {

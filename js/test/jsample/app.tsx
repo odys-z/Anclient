@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp, Inseclient
+import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp
 } from '@anclient/semantier-st';
 
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
@@ -24,6 +24,8 @@ import { MyPswd } from '../../anreact/src/jsample/views/my-pswdcard';
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
+	servs: {[h: string]: string};
+	servId: string;
 };
 
 /** The application main, context singleton and error handler */
@@ -39,7 +41,7 @@ class App extends React.Component<Approps> {
 	// FIXME in this pattern, no need to use an object for error handling - callback is enough
 	errCtx = {msg: undefined, onError: this.onError} as ErrorCtx;
 
-	errorMsgbox: any; // JSX.Element;
+	errorMsgbox: JSX.Element;
 
 	/**Restore session from window.localStorage
 	 * 
@@ -57,6 +59,10 @@ class App extends React.Component<Approps> {
 
 		// design: will load anclient from localStorage
 		this.state.anClient = new SessionClient();
+
+		// in case jserv config changed since last login
+		if (props.servs)
+			this.state.anClient.an.init(props.servs[props.servId || 'host']);
 
 		// singleton error handler
 		if (!this.state.anClient || !this.state.anClient.ssInf) {
@@ -76,11 +82,15 @@ class App extends React.Component<Approps> {
 								});
 
 		// loaded from dataset.xml
-		this.state.anClient.getSks((sks) => {Object.assign(Protocol.sk, sks)}, this.errCtx);
+		this.state.anClient.getSks((sks) => {
+			Object.assign(Protocol.sk, sks);
+			console.log(sks);
+		}, this.errCtx);
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 		Protocol.sk.cbbMyClass = 'north.my-class';
+		console.log(Protocol.sk);
 
 		// extending pages
 		// Each Component is added as the route, with uri = path
@@ -107,6 +117,7 @@ class App extends React.Component<Approps> {
 			this.logout();
 		}
 		this.errorMsgbox = undefined;
+		this.setState({});
 	}
 
 	/** For navigate to portal page

@@ -2,13 +2,12 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Card, Button, Typography } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 
-import { Protocol, UserReq, SessionClient, AnClient } from '@anclient/semantier'
+import { UserReq } from '@anclient/semantier-st'
 import {
-	L, Langstrs, AnConst,
-    AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablist
+	L, AnConst,
+    AnContext, CrudCompW, AnQueryForm, AnTablist, AnQueryst
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
@@ -113,7 +112,7 @@ class MyPollsComp extends CrudCompW {
 		let tasks = this.state.waitingPollIds.size;
 		return (<>
 			{ this.state.condIssr.sqlArgs && // must load userId before reandering issuers cbb.
-			  <AnQueryForm uri={this.uri}
+			  <AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTitl, this.state.condTags, this.state.condIssr, this.state.condWait ]}
 				query={ (q) => { return {

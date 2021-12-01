@@ -3,14 +3,15 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 
-import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier, Tierec } from '@anclient/semantier-st';
+import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, OnCommitOk, OnLoadOk, QueryConditions } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
-	import { dataOfurl, urlOfdata } from '../../utils/file-utils';
-	import { AnContext } from '../../react/reactext';
-	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnFormField, TRecordForm } from '../../react/widgets/t-record-form';
-	import { ImageUpload } from '../../react/widgets/image-upload';
+import { dataOfurl, urlOfdata } from '../../utils/file-utils';
+import { AnContext, AnContextType } from '../../react/reactext';
+import { ConfirmDialog } from '../../react/widgets/messagebox'
+import { TRecordForm } from '../../react/widgets/t-record-form';
+import { ImageUpload } from '../../react/widgets/image-upload';
 import { Comprops, DetailFormW } from '../../react/crud';
+import { CompOpts } from '../../an-components';
 
 const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
@@ -46,7 +47,7 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 		if (!this.tier) this.getTier()
 
 		this.tier.pkval = this.props.ssInf.uid;
-		let {uid, roleId} = this.props;
+		let {uid, roleId} = this.props.ssInf;
 		this.tier.rec = {uid, roleId}
 
 		this.setState({});
@@ -87,7 +88,7 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 
 	getTier = () => {
 		this.tier = new MyInfTier(this);
-		this.tier.setContext(this.context);
+		this.tier.setContext(this.context as unknown as AnContextType);
 	}
 
 	render() {
@@ -108,12 +109,6 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 	}
 }
 MyInfCardComp.contextType = AnContext;
-
-// MyInfCardComp.propTypes = {
-// 	uri: PropTypes.string.isRequired,
-// 	width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
-// 	ssInf: PropTypes.object.isRequired,
-// };
 
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 export { MyInfCard, MyInfCardComp };
@@ -141,7 +136,7 @@ export class MyInfTier extends Semantier {
 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, fieldFormatter: this.loadAvatar }
-	] as AnFormField[];
+	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	/**
 	 * Format an image upload component.
@@ -159,12 +154,12 @@ export class MyInfTier extends Semantier {
 			/>);
 	}
 
-	record(conds, onLoad) {
+	record(conds: QueryConditions, onLoad: OnLoadOk) {
 		let { userId } = conds;
 
 		let client = this.client;
 		if (!client)
-			return;
+			return null;
 
 		let that = this;
 
@@ -177,7 +172,7 @@ export class MyInfTier extends Semantier {
 			.l("a_attaches", "a", `a.busiTbl = 'a_users' and a.busiId = '${userId}'`)
 			.l("a_roles", "r", "r.roleId=u.roleId")
 			.l("a_orgs", "o", "o.orgId=u.orgId")
-			.whereEq('userId', userId);
+			.whereEq('userId', userId as string);
 
 		client.commit(req,
 			(resp) => {
@@ -186,12 +181,12 @@ export class MyInfTier extends Semantier {
 				that.rec = rows && rows[0];
 				that.pkval = that.rec && that.rec[that.pk];
 				that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
-				onLoad(cols, rows && rows[0]);
+				onLoad(cols, rows);
 			},
 			this.errCtx);
 	}
 
-	saveRec(opts, onOk) {
+	saveRec(opts: { uri: string; crud: CRUD; pkval: string; }, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;

@@ -1,24 +1,22 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import { CRUD, Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { AnContext, } from '../../react/reactext'
-	import { JsampleIcons } from '../styles'
-	import { Comprops, DetailFormW } from '../../react/crud'
-	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { AnRelationTree } from '../../react/widgets/relation-tree';
-	import { TRecordForm } from '../../react/widgets/t-record-form';
+import { AnContext, } from '../../react/reactext'
+import { JsampleIcons } from '../styles'
+import { Comprops, DetailFormW } from '../../react/crud'
+import { ConfirmDialog } from '../../react/widgets/messagebox'
+import { AnRelationTree } from '../../react/widgets/relation-tree';
+import { TRecordForm } from '../../react/widgets/t-record-form';
 
 const styles = theme => ({
   dialogPaper: {
@@ -50,7 +48,8 @@ const styles = theme => ({
   },
 });
 
-class RoleDetailsComp extends DetailFormW<Comprops> {
+class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
+
 	state = {
 		crud: CRUD.r,
 		dirty: false,
@@ -69,7 +68,7 @@ class RoleDetailsComp extends DetailFormW<Comprops> {
 
 		this.tier = props.tier;
 
-		this.state.crud = props.c ? CRUD.c : props.u ? CRUD.u : undefined;
+		this.state.crud = props.crud;
 
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
@@ -84,9 +83,7 @@ class RoleDetailsComp extends DetailFormW<Comprops> {
 		this.ok = undefined;
 	};
 
-
-
-	toSave(e) {
+	toSave(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 
 		if (!this.tier.validate()) {
@@ -103,13 +100,13 @@ class RoleDetailsComp extends DetailFormW<Comprops> {
 		}
 	}
 
-	toCancel (e) {
+	toCancel (e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose({code: 'cancel'});
 	}
 
-	showOk(txt) {
+	showOk(txt: string | string[]) {
 		let that = this;
 		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
 					title={L('Info')}
@@ -152,7 +149,7 @@ class RoleDetailsComp extends DetailFormW<Comprops> {
 					})}
 				/>
 				<AnRelationTree uri={this.props.uri}
-					tier={this.tier}
+					tier={this.tier} sk={undefined}
 					mtabl='a_roles' reltabl='a_role_func'
 					sqlArgs={[this.state.pkval]}
 				/>
@@ -173,5 +170,5 @@ class RoleDetailsComp extends DetailFormW<Comprops> {
 }
 RoleDetailsComp.contextType = AnContext;
 
-const RoleDetails = withWidth()(withStyles(styles)(RoleDetailsComp));
+const RoleDetails = withStyles<any, any, Comprops>(styles)(withWidth()(RoleDetailsComp));
 export { RoleDetails, RoleDetailsComp };

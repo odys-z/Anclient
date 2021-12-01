@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier';
+import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier-st';
 import { L, toBool,
     AnContext, AnError, CrudCompW, AnTablist, AnQueryst,
 	jsample

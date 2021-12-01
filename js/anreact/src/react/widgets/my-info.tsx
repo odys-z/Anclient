@@ -10,13 +10,15 @@ import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 
 import {L} from '../../utils/langstr';
-	import { AnContext } from '../reactext';
-	import { AnTabs } from './tabs';
+	import { AnContext, AnContextType } from '../reactext';
+	import { AnTabs, TabPanel } from './tabs';
+import { Comprops, DetailFormW } from '../crud';
+import { DialogProps } from './messagebox';
 
 const styles = theme => ({
   root: {
 	backgroundColor: "mint-cream",
-	textAlign: "center",
+	textAlign: "center" as const,
 	"&:hover": {
 		backgroundColor: {
 			opacity: 0.3
@@ -33,11 +35,16 @@ const styles = theme => ({
   }
 });
 
-class MyInfoComp extends React.Component {
+interface MyInfoProps extends DialogProps {
+	panels: Array<TabPanel>
+}
+
+class MyInfoComp extends DetailFormW<MyInfoProps> {
 	state = {
+		closed: false
 	};
 
-	constructor (props = {}) {
+	constructor (props: Comprops) {
 		super(props);
 		this.handleClose = this.handleClose.bind(this);
 		this.textInfo = this.textInfo.bind(this);
@@ -46,13 +53,14 @@ class MyInfoComp extends React.Component {
 	handleClose(e) {
 		this.setState({closed: true});
 		if (typeof this.props.onClose === 'function')
-			this.props.onClose(e.currentTarget);
+			this.props.onClose();
 	};
 
 	textInfo() {
-		let ssInf = this.context.anClient.ssInf;
+		const ctx = this.context as unknown as AnContextType;
+		let ssInf = ctx.anClient.ssInf;
 		return (
-			<DialogContentText id="myinfo-txt" component={'span'} spacing={1} >
+			<DialogContentText id="myinfo-txt" component={'span'} >
 				{ssInf ? ssInf.userName : 'User Info'}
 				<TextField id="qtitle" label={L('User Name')}
 				  variant="outlined" color="primary" disabled
@@ -71,9 +79,6 @@ class MyInfoComp extends React.Component {
 		let props = this.props;
 		this.state.closed = false;
 		let title = props.title ? props.title : L('My Info');
-
-		let txtLines = this.textInfo();
-
 		const { classes } = this.props;
 
 		return (

@@ -9,7 +9,7 @@ import React from 'react';
 import { AnClient, OnCommitOk, Protocol } from '@anclient/semantier-st';
 
 import { an, SessionClient } from '@anclient/semantier-st';
-	import {AnContext} from './reactext';
+	import {AnContext, AnContextType} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
 	import {L} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
@@ -94,9 +94,11 @@ class LoginComp extends React.Component<LoginProps> {
 			return;
 		}
 
+		const ctx = this.context as unknown as AnContextType;
+
 		if (!this.state.loggedin) {
-			let serv = this.context.servId || 'host';
-			let hosturl = this.context.servs[serv];
+			let serv = ctx.servId || 'host';
+			let hosturl = ctx.servs[serv];
 			console.log("login url & serv-id: ", hosturl, serv);
 
 			an.init(hosturl);
@@ -108,13 +110,13 @@ class LoginComp extends React.Component<LoginProps> {
 			that.setState( {loggedin: true} );
 			if (typeof that.props.onLoginOk === 'function')
 				that.props.onLoginOk(client);
-			else if (that.context.iparent) {
+			else if (ctx.iparent) {
 				// FIXME this branch can't work for npm package anclient.
 				// FIXME but why?
-				that.context.ssInf = client.ssInf;
+				ctx.ssInf = client.ssInf;
 				SessionClient.persistorage(client.ssInf);
-				that.context.iparent.location = client.ssInf.home ?
-							client.ssInf.home : `${that.context.ihome}?serv=${that.context.servId}`;
+				ctx.iparent.location = client.ssInf.home ?
+							client.ssInf.home : `${ctx.ihome}?serv=${ctx.servId}`;
 			}
 			else
 				console.error('Logged in successfully but results be ignored: ', client);
@@ -122,10 +124,10 @@ class LoginComp extends React.Component<LoginProps> {
 
 		function onError (code, resp) {
 			console.log(an);
-			if (typeof that.context.error === 'object') {
-				let errCtx = that.context.error;
-				errCtx.hasError = true;
-				errCtx.code = code;
+			if (typeof ctx.error === 'object') {
+				let errCtx = ctx.error;
+				// errCtx.hasError = true;
+				// errCtx.code = code;
 				errCtx.msg = resp.Body().msg();
 				if (typeof errCtx.onError === 'function')
 					errCtx.onError(code, resp.Body());
