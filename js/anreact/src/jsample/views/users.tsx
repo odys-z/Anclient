@@ -4,7 +4,8 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec, OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
+import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
+	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
 } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
@@ -431,7 +432,7 @@ export class UserstReq extends UserReq {
 	relations: DbRelations;
 	deletings: string[];
 
-	constructor (uri: string, args: UserstReqArgs) {
+	constructor (uri: string, args: UserstReqArgs = {}) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;

@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec, QueryConditions, Semantics, OnLoadOk, UIComponent
+import { AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec, QueryConditions, Semantics, OnLoadOk, UIComponent, AnsonMsg
 } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
@@ -215,25 +215,10 @@ const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
 export { Roles, RolesComp }
 
 class RoleTier extends Semantier {
-	mtabl = 'a_roles';
-	pk = 'roleId';
-	reltabl = 'a_role_func';
-
-	/**sk: role-funcs
-	 * Hard coded here since it's a business string for jsample app.
-	 */
-	rel = {'a_role_func':
-		{ fk: {
-			pk: 'roleId',	 // fk to main table
-			col: 'funcId' }, // checking col
-		  sk: 'trees.role_funcs'
-		} as Semantics
-	};
-
-	client = undefined;
-	pkval = undefined;
-	rows = [];
-	rec = {}; // for leveling up record form, also called record
+	// client = undefined;
+	// pkval = undefined;
+	// rows = [];
+	// rec = {}; // for leveling up record form, also called record
 
 	checkbox = true;
 	rels = [];
@@ -259,6 +244,21 @@ class RoleTier extends Semantier {
 	 */
 	constructor(comp: UIComponent) {
 		super(comp);
+
+		this.mtabl = 'a_roles';
+		this.pk = 'roleId';
+		this.reltabl = 'a_role_func';
+
+		/**sk: role-funcs
+		 * Hard coded here since it's a business string for jsample app.
+		 */
+		this.rel = {'a_role_func':
+			{ fk: {
+				pk: 'roleId',	 // fk to main table
+				col: 'funcId' }, // checking col
+			sk: 'trees.role_funcs'
+			} as Semantics
+		};
 	}
 
 	records(conds = {} as {orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk) {
@@ -283,11 +283,11 @@ class RoleTier extends Semantier {
 
 	record(conds: QueryConditions, onLoad: OnLoadOk) {
 		if (!this.client) return;
+
 		let client = this.client;
 		let that = this;
 
-		// let { roleId } = conds;
-		let pkval = conds[this.pk];
+		let pkval = conds[this.pk] as string;
 
 		// NOTE
 		// Is this senario an illustration of general query is also necessity?
@@ -297,7 +297,7 @@ class RoleTier extends Semantier {
 			.whereEq(this.pk, pkval);
 
 		client.commit(req,
-			(resp) => {
+			(resp: AnsonMsg<AnsonResp>) => {
 				// NOTE because of using general query, extra hanling is needed
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];

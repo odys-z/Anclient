@@ -2,7 +2,7 @@ import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, 
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, 
-	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode
+	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, UserReq, PkMeta
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -22,7 +22,9 @@ export type AnElemFormatter = ( (
 export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
 
 export type AnFieldValidator = ((
-
+	val: any,
+	rec: Tierec,
+	fld: TierCol,
 ) => InvalidClassNames );
 
 /**(Form) field formatter
@@ -50,6 +52,9 @@ export interface ErrorCtx {
 }
 
 export interface TierCol extends DbCol {
+    /**input type / form type, not db type */
+    type?: string;
+
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
     style?: string;
 
@@ -74,9 +79,6 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     fieldFormatter?: AnFieldFormatter<F, FO>;
 
     valid?: boolean;
-
-    /**input type / form type, not db type */
-    type?: string;
 
     css?: CSSStyleDeclaration;
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
@@ -111,14 +113,8 @@ export interface QueryConditions {
 	[q: string]: string | number | object | boolean;
 }
 
-// export interface CbbCondition extends QueryConditions {
-// 	uri: string;
-// 	sk: string;
-// 	nv?: NV;
-// 	loading: boolean;
-// 	sqlArgs?: string[];
-// 	sqlArg?: string;
-// }
+
+
 
 /**
  * Not the same as java Semantext.
@@ -169,7 +165,7 @@ export class Semantier {
     /** current list's data */
     rows: Tierec[];
     /** current pk value */
-    pkval: any;
+    pkval: PkMeta = {pk: undefined, v: undefined};
     /** current record */
     rec: Tierec;
 
@@ -196,7 +192,7 @@ export class Semantier {
 	}
 
     client: SessionClient | Inseclient;
-    anReact: any;
+    anReact: any; // for anreact/AnReact. TODO rename as UIHelper 
     errCtx: ErrorCtx;
 
     disableValidate: any;
@@ -216,19 +212,19 @@ export class Semantier {
 		} );
 		return valid;
 
-		function validField (record, f) {
-			let v = record[f.field];
+		function validField (record: Tierec, f: TierCol): string {
+			let v = record[f.field] as string | number | Array<any> | object;
 
 			if (f.type === 'int')
-				if (v === '' || ! Number.isInteger(Number(v))) return false;
+				if (v === '' || ! Number.isInteger(Number(v))) return 'typerr';
 
 			if (typeof f.validator === 'function')
 				return f.validator(v, record, f);
 			else if (f.validator) {
 				let vd = f.validator;
-				if(vd.notNull && (v === undefined || v === null || v.length === 0))
+				if(vd.notNull && (v === undefined || v === null || (v as string | Array<any>).length === 0))
 					return 'notNull';
-				if (vd.len && v && v.length > vd.len)
+				else if (vd.len && v && (v as string | Array<any>).length > vd.len)
 					return 'maxLen';
 				return 'ok';
 			}
@@ -321,8 +317,13 @@ export class Semantier {
     records<T extends Tierec>(opts: QueryConditions, onLoad: OnLoadOk) : void {
 	}
 
-    /** save form with a relationship table */
-    saveRec(opts: any, onOk: OnCommitOk): void {
+    /** save form with a relationship table.
+	 * 
+	 * @param opts semantic options for saving a maintable record
+	 * @param onOk callback
+	 * @returns 
+	 */
+    saveRec(opts: {crud: CRUD; disableForm?: boolean; disableRelations?: boolean}, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -333,62 +334,27 @@ export class Semantier {
 		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		let req;
+		let req: AnsonMsg<AnsonBody>;
 		if (!disableForm) {
-			if ( crud === CRUD.c )
-				req = this.client.userReq(uri, 'insert',
+			console.log(crud, CRUD.c);
+			if ( crud === CRUD.c ) {
+				req = this.client.userReq<UpdateReq>(uri, 'insert',
 							new InsertReq( uri, this.mtabl )
 							.columns(this._fields)
 							.record(this.rec) );
-			else
-				req = this.client.userReq(uri, 'update',
-							new UpdateReq( uri, this.mtabl, this.pkval)
-							.record(this.rec, this.pk) );
-		}
-
-		if (!disableRelations) {
-			let r = this.rel[this.reltabl];
-			if (r.stree || r.m2m)
-				throw Error('TODO ...');
-
-			let rel = r.fk;
-			// collect relationships
-			let columnMap = {};
-			columnMap[rel.col] = 'nodeId';
-
-			// semantics handler will resulve fk when inserting only when master pk is auto-pk
-			columnMap[rel.col] = this.pkval
-							? this.pkval			// when updating
-							: this.rec[this.pk];	// when creating
-
-			let insRels = this.anReact
-				.inserTreeChecked(
-					this.rels,
-					{ table: this.reltabl,
-					  columnMap,
-					  check: 'checked',
-					  // middle nodes been corrected according to children
-					  reshape: true }
-				);
-
-			if (!this.pkval) {
-				if (req)
-					req.Body().post(insRels);
-				else
-					req = this.client.userReq(uri, 'insert', insRels);
 			}
 			else {
-				// e.g. delete from a_role_func where roleId = '003'
-				let del_rf = new DeleteReq(null, this.reltabl, rel.col)
-								.whereEq(rel.col, this.pkval)
-								.post(insRels);
-
-				if (req)
-					req.Body().post(del_rf);
-				else
-					req = this.client.userReq(uri, 'update', del_rf);
+				req = this.client.userReq<UpdateReq>(uri, 'update',
+							new UpdateReq( uri, this.mtabl, this.pkval.v)
+							.record(this.rec, this.pk) );
 			}
 		}
+
+		if (!disableRelations && !this.reltabl)
+			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
+
+		if (!disableRelations) 
+			req = this.formatRel<AnsonBody>(uri, req, this.rel[this.reltabl], this.pkval);
 
 		if (req)
 			client.commit(req,
@@ -438,7 +404,57 @@ export class Semantier {
 		this.pkval = undefined;
 		this.rec = {};
 		this.rels = [];
-		this.reltabl = undefined;
 		this.crud = undefined;
     }
+
+	/**
+	 * format relationship records - only fk supported 
+	 * @param uri 
+	 * @param req 
+	 * @param r 
+	 * @param parentpk pk: field name, val: record id
+	 * @returns req with post updating semantics
+	 */
+	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, r: Semantics, parentpk: PkMeta ) : AnsonMsg<T> {
+		if (r.stree || r.m2m)
+			throw Error('TODO ...');
+
+		let rel = r.fk;
+		// collect relationships
+		let columnMap = {};
+		columnMap[rel.col] = 'nodeId';
+
+		// semantics handler can only resulve fk at inserting when master pk is auto-pk
+		columnMap[parentpk.pk] = parentpk.v;
+
+		let insRels = this.anReact
+			.inserTreeChecked(
+				this.rels,
+				{ table: this.reltabl,
+					columnMap,
+					check: 'checked',
+					// middle nodes been corrected according to children
+					reshape: true }
+			);
+
+		if (!this.pkval) {
+			if (req)
+				req.Body().post(insRels);
+			else
+				req = this.client.userReq(uri, 'insert', insRels);
+		}
+		else {
+			// e.g. delete from a_role_func where roleId = '003'
+			let del_rf = new DeleteReq(null, this.reltabl, rel.col)
+							.whereEq(rel.col, parentpk.v)
+							.post(insRels);
+
+			if (req)
+				req.Body().post(del_rf);
+			else
+				req = this.client.userReq(uri, 'update', del_rf) as unknown as AnsonMsg<T>;
+		}
+		return req;
+	}
 }
+

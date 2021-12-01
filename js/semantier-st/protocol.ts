@@ -1,4 +1,6 @@
 import * as CSS from 'csstype';
+import { Tierec } from './semantier';
+
 /**Callback of CRUD.c/u/d */
 export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
 /**Callback of CRUD.r */
@@ -72,7 +74,9 @@ export interface Stree {
 export type Semantics = {
 	// [reltype in SemanticType]: FKRelation | Stree | any;
 	fk?: FKRelation,
+	/**smantic tree */
 	stree?: Stree,
+	/**Multiple to mulitple */
 	m2m?: any,
 }
 
@@ -727,7 +731,7 @@ export class UpdateReq extends AnsonBody {
     }
 
     mtabl: string;
-    nvs: Array<[string, string]>;
+    nvs: Array<[string, any]>;
     nvss: Array<Array<[string, string]>>;
     where: any[][];
 
@@ -755,7 +759,7 @@ export class UpdateReq extends AnsonBody {
      * @param ignorePk pk name ignored to upload
      * @return this
      */
-    record(rec: object, ignorePk?: string): UpdateReq {
+    record(rec: Tierec, ignorePk?: string): UpdateReq {
 	    if (rec)
 			for (let n in rec) {
 				if (ignorePk !== n)
