@@ -81,7 +81,7 @@ interface CardCss {
  * @param theme
  * @returns
  */
-const styles = (theme: Theme) => (Object.assign(
+const styles = (theme: starTheme) => (Object.assign(
 	invalidStyles,
     { board: {
 		backgroundColor: '#f7f9f1',

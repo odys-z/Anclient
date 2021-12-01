@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Theme } from '@material-ui/core/styles';
 import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
@@ -12,6 +11,7 @@ import { L, AnContext,
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';
 import { AnTreeNode } from '@anclient/semantier-st/protocol';
+import { Theme } from '@material-ui/core/styles';
 
 const styles = (theme: Theme) => ( {
 	button: {
