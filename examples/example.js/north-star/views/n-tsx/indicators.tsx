@@ -1,27 +1,38 @@
 
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { Theme } from '@material-ui/core/styles';
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Replay from '@material-ui/icons/Replay';
 
 import { L, AnContext,
-	CrudCompW, ConfirmDialog, AnTreeditor
+	CrudCompW, ConfirmDialog, AnTreeditor, Comprops
 } from '@anclient/anreact';
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';
+import { AnTreeNode } from '@anclient/semantier-st/protocol';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	button: {
 		margin: theme.spacing(2)
 	}
 } );
 
-class IndicatorsComp extends CrudCompW {
+interface IndicatorNode extends AnTreeNode {
+    weight: number | string;
+    qtype: string; // or 'm' | 'r5', ... ? An example where data semantics can help?
+    vtype: string;
+}
+
+class IndicatorsComp extends CrudCompW<Comprops> {
 	state = {
 		students: []
 	};
+
 	sk = 'xv.indicators';
+    confirm: JSX.Element;
+    del: any;
 
 	constructor(props) {
 		super(props);
@@ -56,19 +67,20 @@ class IndicatorsComp extends CrudCompW {
 			className={classes.button} onClick={this.reshape}
 			startIcon={<Replay />}
 		  >{L('Update')}</Button>
+			{/* pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }} */}
 		  <AnTreeditor sk={this.sk}
 			uri={this.uri} mtabl='ind_emotion'
-			pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
+			pk='indId'
 			parent={{ type: 'text', field: 'parent', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 			columns={[
 				{ type: 'text', field: 'indName', label: L('Indicator'),
-				  validator: {len: 200, notNull: true}, grid: {xs: 6, sm: 6} },
+				  validator: {len: 200, notNull: true}, grid: {sm: 6} },
 				{ type: 'float', field: 'weight', label: L('Weight'),
-				  validator: {min: 0.0}, grid: {xs: 3, sm: 1},
-				  formatter: (col, n) => n.node.weight},
-				{ type: 'formatter', label: L('Question Type'), grid: {xs: 2, sm: 2},
-				  formatter: (col, rec) => { return readableQtype(rec.node.qtype || rec.node.vtype, true) } },
-				{ type: 'actions', label: '', grid: {xs: 3, md: 3} }
+				  validator: {vrange: [0.0, undefined]}, grid: {sm: 1},
+				  formatter: (col, n: IndicatorNode) => n.node.weight},
+				{ type: 'formatter', field: 'qtype', label: L('Question Type'), grid: {sm: 2},
+				  formatter: (c, n: IndicatorNode) => { return readableQtype(n.node.qtype || n.node.vtype) } },
+				{ type: 'actions', field: '', label: '', grid: {md: 3} }
 			]}
 			fields={[
 				{ type: 'text', field: 'parent', label: 'parent', hide: 1 },
@@ -87,6 +99,7 @@ class IndicatorsComp extends CrudCompW {
 			]}
 			isMidNode={n => n.qtype === 'cate' || !n.qtype}
 			detailFormTitle={L('Indicator Details')}
+            onSelectChange={undefined}
 		  />
 		  {this.confirm}
 		</>);
@@ -107,5 +120,5 @@ class IndicatorsComp extends CrudCompW {
 }
 IndicatorsComp.contextType = AnContext;
 
-const Indicators = withWidth()(withStyles(styles)(IndicatorsComp));
+const Indicators = withStyles<any, any, Comprops>(styles)(withWidth()(IndicatorsComp));
 export { Indicators, IndicatorsComp }

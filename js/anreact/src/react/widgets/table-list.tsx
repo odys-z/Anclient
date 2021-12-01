@@ -1,5 +1,6 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
+import { Theme } from '@material-ui/core/styles';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -10,19 +11,28 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { Tierec } from '@anclient/semantier-st';
+import { AnlistColAttrs, Tierec } from '@anclient/semantier-st';
 import { toBool } from '../../utils/helpers';
 import { Comprops, DetailFormW } from '../crud';
+import { CompOpts } from '../anreact';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 	}
 } );
 
 interface AnTablistProps extends Comprops {
 	pk: string;
-	selected: {ids: Set<string>};
-	rows: Tierec[];
+	/**
+	 * Selected row ids - not used if no need to update data?
+	 */
+	selected?: {ids: Set<string>};
+
+	columns: Array<AnlistColAttrs<JSX.Element, CompOpts> & Comprops>;
+
+	/**In tier mode, data is supposed to be bound by widget itself. */
+	rows?: Tierec[];
+
 	onSelectChange: (ids: Array<string>) => void;
 	onPageChange?: (page: number) => void;
 }
@@ -132,12 +142,13 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	 * @param {array} [columns] table columns
 	 * @returns [<TableCell>,...]
 	 */
-	th(columns = []) {
-		return columns.filter( (v, x) => toBool(v.hide) ? false
-							: !(this.props.checkbox && x === 0)) // first columen as checkbox
+	th(columns: Array<AnlistColAttrs<JSX.Element, CompOpts>> = []) {
+		return columns
+			.filter( (v, x) => !toBool(v.visible) ? false
+						: !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
-					{colObj.label || colObj.text || colObj.field}
+					{colObj.label || colObj.field}
 				</TableCell>);
 	}
 

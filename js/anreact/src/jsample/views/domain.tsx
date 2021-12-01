@@ -2,6 +2,7 @@
 import React from 'react';
 import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
+import { Theme } from '@material-ui/core/styles';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
@@ -11,7 +12,7 @@ import { AnTablist } from '../../react/widgets/table-list'
 import { QueryConditions, Semantier } from '@anclient/semantier-st';
 import { AnQueryst } from '../../react/widgets/query-form-st';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'
@@ -119,9 +120,9 @@ class DomainComp extends CrudCompW<Comprops> {
 			{this.tier &&
 			<AnTablist className={classes.root}
 				columns={[
-					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
-					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
-					{ text: L('parent'), color: 'primary',field:"parentId" }
+					{ label: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
+					{ label: L('Domain Name'), color: 'primary', field:"domainName"},
+					{ label: L('parent'), color: 'primary',field:"parentId" }
 				]}
 				rows={this.tier.rows} pk='domainId'
 				pageInf={this.state.pageInf}

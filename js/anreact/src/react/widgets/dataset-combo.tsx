@@ -17,13 +17,6 @@ import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
 export interface ComboItem extends NV {};
 
 /**E.g. form's combobox field declaration */
-// export interface TierComboField extends AnlistColAttrs<JSX.Element, CompOpts> {
-// 	type: string;
-//     className: undefined | "root" | InvalidClassNames | AutocompleteClassKey;
-// 	nv: {n: string; v: string};
-// 	sk: string;
-//     options?: Array<ComboItem>;
-// }
 type ComboFieldType = TierComboField<JSX.Element, CompOpts>;
 
 export interface ComboProps extends Comprops {
@@ -139,9 +132,10 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			this.state.selectedItem = selectedItem;
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
-		// avoid set defaultValue before loaded
+		let opts = this.combo && this.combo.options || this.props.options; 
 		return (
-		  this.props.sk && !this.props.options ? <></> :
+		  // avoid set defaultValue before loaded
+		  opts ?
 		  <Autocomplete<ComboItem>
 			ref={this.refcbb}
 			disabled={this.props.disabled || this.props.readonly || this.props.readOnly}
@@ -150,17 +144,16 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			onChange={ this.onCbbRefChange(this.refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
-			options={this.combo.options}
+			options={opts}
 			style={this.props.style}
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
-			// filter={Autocomplete.caseInsensitiveFilter}
 			renderInput={
 				(params) => <TextField {...params}
 					label={this.props.showLable && v ? v.n : ''}
 					variant="outlined" /> }
-		/>);
+		  /> : <></>);
 
 		function findOption (opts, v) {
 			if (opts && v !== undefined) {

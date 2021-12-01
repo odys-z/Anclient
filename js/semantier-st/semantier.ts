@@ -2,7 +2,7 @@ import { SessionClient, Inseclient } from "./anclient";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, 
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, 
-	DbCol, DbRelations, Stree, NV, PageInf
+	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -15,8 +15,9 @@ export type AnElemFormatter = ( (
 	/**field definition */
 	col: DbCol,
 	/**column index or record for the row */
-	rec: number | Tierec
-) => any );
+	rec: number | Tierec | AnTreeNode,
+	opts?: object
+) => UIComponent );
 
 export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
 
@@ -35,7 +36,10 @@ export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, opts?: FO) => F
 export type AnFieldValidation = {
 	notNull?: boolean | number,
 	minLen?: number | string,
-	len?: number | string,
+	len?   : number | string,
+
+	vrange?: [number, number],
+	strs?  : string[],
  };
 
 export interface ErrorCtx {
@@ -78,7 +82,7 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	box?: {};
 
-	val: any;  // FIXME: should we extends a editable type?  (check ag-grid)
+	val?: any;  // FIXME: should we extends a editable type?  (check ag-grid)
 }
 
 /**Record handled from tier */
