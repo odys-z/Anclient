@@ -141,7 +141,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 							  users: users.Body().msg() });
 				that.confirm =
 					(<ConfirmDialog open={true}
-						ok={L('OK')} cancel={true}
+						ok={L('OK')} cancel={true} 
 						title={L('Info')} msg={txt}
 						onOk={ () => {
 								that.tier.stopolls(this.uri, this.getByIx(ids),

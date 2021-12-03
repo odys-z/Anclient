@@ -89,7 +89,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		this.tier.relations({
 			uri: this.props.uri,
 			reltabl: this.props.reltabl,
-			sqlArg: this.tier.pkval,
+			sqlArg: this.tier.pkval.v,
 		},
 		(rels) => {
 			that.setState({});
@@ -98,7 +98,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 	toExpandItem(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
-		let f = e.currentTarget.getAttribute("nid");
+		let f = e.currentTarget.getAttribute("data-nid");
 
 		let expandings = this.state.expandings;
 		if (expandings.has(f)) expandings.delete(f);
@@ -131,7 +131,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			if (node.children && node.children.length > 0)
 			  return (
 				<Box key={id} className={classes.folder}>
-				  <Box  nid={id}
+				  <Box  data-nid={id}
 						onClick={expandItem}
 						className={classes.folderHead}
 				  >

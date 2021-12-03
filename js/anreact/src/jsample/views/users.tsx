@@ -138,7 +138,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		if (e) e.stopPropagation();
 
 		let that = this;
-		this.tier.pkval = undefined;
+		this.tier.pkval.v = undefined;
 		this.tier.rec = {};
 
 		this.recForm = (<UserDetailst crud={CRUD.c}
@@ -156,7 +156,7 @@ class UserstComp extends CrudCompW<Comprops> {
 	toEdit(e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
 		let pkv = this.getByIx(this.state.selected.ids);
-		this.tier.pkval = pkv;
+		this.tier.pkval.v = pkv;
 		this.recForm = (<UserDetailst crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
@@ -254,12 +254,12 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 
 export class UsersTier extends Semantier {
 	port = 'userstier';
-	mtabl = 'a_users';
-	pk = 'userId';
+	// mtabl = 'a_users';
+	// pk = 'userId';
 	checkbox = true;
-	rows = [];
-	pkval = undefined;
-	rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
+	// rows = [];
+	// pkval = undefined;
+	// rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
 
 
 	// TODO doc: samantier where disable pk field if pkval exists
@@ -292,6 +292,14 @@ export class UsersTier extends Semantier {
 
 	constructor(comp) {
 		super(comp);
+
+		// this.port = 'userstier';
+		this.mtabl = 'a_users';
+		this.pk = 'userId';
+		this.checkbox = true;
+		this.rows = [];
+		// pkval = undefined;
+		// rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
 	}
 
 	columns() {
@@ -351,7 +359,7 @@ export class UsersTier extends Semantier {
 		this.rec.iv = iv;
 
 		let req = this.client.userReq(uri, this.port,
-			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval } )
+			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )
 			.A(crud === CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
 
 		client.commit(req,
@@ -360,7 +368,7 @@ export class UsersTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+					that.pkval.v = bd.resulve(that.mtabl, that.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);

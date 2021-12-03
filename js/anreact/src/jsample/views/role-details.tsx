@@ -17,6 +17,7 @@ import { Comprops, DetailFormW } from '../../react/crud'
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnRelationTree } from '../../react/widgets/relation-tree';
 import { TRecordForm } from '../../react/widgets/t-record-form';
+import { RoleTier } from './roles';
 
 const styles = theme => ({
   dialogPaper: {
@@ -60,7 +61,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
 		record: undefined as Tierec,
 	};
 
-	tier: any;
+	tier: RoleTier;
 	ok: JSX.Element;
 
 	constructor (props: Comprops) {

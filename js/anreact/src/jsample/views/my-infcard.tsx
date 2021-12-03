@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 
-import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, OnCommitOk, OnLoadOk, QueryConditions } from '@anclient/semantier-st';
+import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, OnCommitOk, OnLoadOk, QueryConditions, SessionInf, PkMeta } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
 import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 import { AnContext, AnContextType } from '../../react/reactext';
@@ -22,13 +22,13 @@ const styles = theme => ({
  * at jserv, this component is used to try the other way - no data persisting,
  * but with data automated data loading and state hook.
  */
-class MyInfCardComp extends DetailFormW<Comprops> {
+class MyInfCardComp extends DetailFormW<Comprops & {ssInf: SessionInf}> {
 
 	state = { }
 	tier: MyInfTier;
 	confirm: JSX.Element;
 
-	constructor (props) {
+	constructor (props: Comprops) {
 		super(props);
 
 		this.uri = this.props.uri;
@@ -46,7 +46,7 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 
 		if (!this.tier) this.getTier()
 
-		this.tier.pkval = this.props.ssInf.uid;
+		this.tier.pkval.v = this.props.ssInf.uid;
 		let {uid, roleId} = this.props.ssInf;
 		this.tier.rec = {uid, roleId}
 
@@ -179,14 +179,14 @@ export class MyInfTier extends Semantier {
 				// NOTE because of using general query, extra hanling is needed
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
-				that.pkval = that.rec && that.rec[that.pk];
+				that.pkval.v = that.rec && that.rec[that.pk];
 				that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
 				onLoad(cols, rows);
 			},
 			this.errCtx);
 	}
 
-	saveRec(opts: { uri: string; crud: CRUD; pkval: string; }, onOk: OnCommitOk) {
+	saveRec(opts: { uri: string; crud: CRUD; pkval: PkMeta; }, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -217,7 +217,7 @@ export class MyInfTier extends Semantier {
 			let {name, mime} = rec.fileMeta as {name: string, mime: string};
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
-					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
+					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v)
 					.nv('attName', name)
 					.nv('mime', mime)
 					.nv('uri', dataOfurl(rec[this.imgProp])) );
@@ -229,7 +229,7 @@ export class MyInfTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+					that.pkval.v = bd.resulve(that.mtabl, that.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);

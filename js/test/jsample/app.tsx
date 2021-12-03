@@ -8,7 +8,7 @@ import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp
 
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
 import { AnContext } from '../../anreact/src/react/reactext';
-import { AnReact, AnReactExt } from '../../anreact/src/react/anreact';
+import { AnReact, AnReactExt, AnreactAppOptions } from '../../anreact/src/react/anreact';
 import { AnError } from '../../anreact/src/react/widgets/messagebox';
 import { Sys, SysComp } from '../../anreact/src/react/sys';
 import { Userst } from '../../anreact/src/jsample/views/users';
@@ -207,17 +207,16 @@ class App extends React.Component<Approps> {
 	 * where serv-id = this.context.servId || host
 	 *
 	 * For test, have elem = undefined
-	 * @param {string} elem html element id, null for test
-	 * @param {object} [opts={}] serv id
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.iportal='portal.html'] page showed after logout
+	 * @param elem html element id, null for test
+	 * [opts.serv='host'] serv id
+	 * [opts.iportal='index.html'] page showed after logout
 	 */
-	static bindHtml(elem, opts = {portal: 'index.html'}) {
-		let portal = opts.portal ? opts.portal : 'index.html';
+	static bindHtml(elem: string, opts: {serv: string, portal?: string}) : void {
+		let portal = opts.portal || 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, opts, json) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: { [h: string]: string; }) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

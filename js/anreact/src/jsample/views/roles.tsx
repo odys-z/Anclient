@@ -154,7 +154,7 @@ class RolesComp extends CrudCompW<Comprops> {
 
 	toEdit(_e: React.MouseEvent<HTMLElement>) {
 		let that = this;
-		this.tier.pkval = this.getByIx(this.state.selected.ids, 0);
+		this.tier.pkval.v = this.getByIx(this.state.selected.ids, 0);
 
 		this.roleForm = (<RoleDetails crud={CRUD.u} uri={this.uri}
 			tier={this.tier}
@@ -212,7 +212,6 @@ class RolesComp extends CrudCompW<Comprops> {
 RolesComp.contextType = AnContext;
 
 const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
-export { Roles, RolesComp }
 
 class RoleTier extends Semantier {
 	// client = undefined;
@@ -301,9 +300,11 @@ class RoleTier extends Semantier {
 				// NOTE because of using general query, extra hanling is needed
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
-				that.pkval = that.rec && that.rec[that.pk];
+				that.pkval.v = that.rec && that.rec[that.pk];
 				onLoad(cols, rows);
 			},
 			this.errCtx);
 	}
 }
+
+export { Roles, RolesComp, RoleTier }

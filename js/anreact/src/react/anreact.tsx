@@ -194,21 +194,21 @@ export class AnReact {
 	 * @param {string} elem html element id, null for test
 	 * @param {object} opts {serv, home, parent window}
 	 * @param {function} onJsonServ function to render React Dom, i. e.
-	 * <pre>(elem, json) => {
-			let dom = document.getElementById(elem);
-			ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
-	}</pre>
+	 * @example
+	 * // see Anclient/js/test/jsample/login-app.tsx
+	 * (elem, json) => {
+	 * 	let dom = document.getElementById(elem);
+	 * 	ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
+	 * }
+	 * 
+	 * // see Anclient/js/test/jsample/app.tsx
+	 * function onJsonServ(elem: string, opts: AnreactAppOptions, json: { [h: string]: string; }) {
+	 * 	let dom = document.getElementById(elem);
+	 * 	ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+	 * } 
 	 */
-	static bindDom( elem: string, opts: {
-					/** not used */
-					portal?: string;
-					/** serv id */
-					serv?: string;
-					/** system main page */
-					home?: string;
-					/** path to json config file */
-					jsonUrl?: string; },
-					onJsonServ: (elem: string, opts: object, json: object) => any) {
+	static bindDom( elem: string, opts: AnreactAppOptions,
+				onJsonServ: (elem: string, opts: AnreactAppOptions, json: {}) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
 		if (!opts.home) opts.home = 'main.html';
@@ -216,7 +216,7 @@ export class AnReact {
 		if (typeof elem === 'string') {
 			$.ajax({
 				dataType: "json",
-				url: opts.jsonUrl || 'private/host.json',
+				url: opts.jsonPath || 'private/host.json',
 			})
 			.done( (json: object) => onJsonServ(elem, opts, json) )
 			.fail( (e: any) => {
@@ -230,6 +230,23 @@ export class AnReact {
 		}
 	}
 }
+
+export interface AnreactAppOptions {
+	/** serv id, default: host */
+	serv?: string;
+
+	/** system main page */
+	home?: string;
+
+	/** path to json config file for jserv root url, e.g. 'parivate/host.json' */
+	jsonPath?: string;
+
+	/** not used */
+	portal?: string;
+
+	/**parent window */
+	parent?: Window;
+};
 
 /**Ectending AnReact with dataset & sys-menu, the same of layers extinding of jsample.
  * @class
