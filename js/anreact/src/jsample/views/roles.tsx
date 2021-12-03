@@ -260,7 +260,7 @@ class RoleTier extends Semantier {
 		};
 	}
 
-	records(conds = {} as {orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk) {
+	records(conds = {} as {roleId?: string; orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk) {
 		let { orgId, roleName, pageInf } = conds;
 		let queryReq = this.client.query(this.uri, this.mtabl, 'r', pageInf)
 		let req = queryReq.Body()
@@ -286,14 +286,15 @@ class RoleTier extends Semantier {
 		let client = this.client;
 		let that = this;
 
-		let pkval = conds[this.pk] as string;
+		// temp id avoiding update my pk status
+		let roleId = conds[this.pk] as string;
 
 		// NOTE
 		// Is this senario an illustration of general query is also necessity?
 		let req = client.query(this.uri, 'a_roles', 'r')
 		req.Body()
 			.col('roleId').col('roleName').col('remarks')
-			.whereEq(this.pk, pkval);
+			.whereEq(this.pk, roleId);
 
 		client.commit(req,
 			(resp: AnsonMsg<AnsonResp>) => {

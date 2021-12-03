@@ -265,14 +265,14 @@ export class Semantier {
 
 		if (modifier)
 			return this._fields.map( (c, x) => {
-				let disabled = c.disabled || c.field === that.pk && that.pkval ? true : false;
+				let disabled = c.disabled || c.field === that.pk && that.pkval.v ? true : false;
 				return typeof modifier[c.field] === 'function' ?
 						{...c, ...(modifier[c.field] as AnElemFormatter)(c, x), disabled } :
 						{...c, ...modifier[c.field], disabled}
 			} );
 		else
 			return this._fields.map( (c, x) => {
-				let disabled = c.disabled || c.field === that.pk && that.pkval ? true : false;
+				let disabled = c.disabled || c.field === that.pk && that.pkval.v ? true : false;
 				return {...c, disabled };
 			} );
 	}
@@ -331,7 +331,7 @@ export class Semantier {
 		let { crud, disableForm, disableRelations } = opts;
 		let uri = this.uri;
 
-		if (crud === CRUD.u && !this.pkval)
+		if (crud === CRUD.u && !this.pkval.v)
 			throw Error("Can't update with null ID.");
 
 		let req: AnsonMsg<AnsonBody>;
@@ -363,7 +363,7 @@ export class Semantier {
 					if (crud === CRUD.c)
 						// NOTE:
 						// resulving auto-k is a typicall semantic processing, don't expose this to caller
-						that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+						that.pkval.v = bd.resulve(that.mtabl, that.pk, that.rec);
 					onOk(resp);
 				},
 				this.errCtx);
@@ -401,7 +401,7 @@ export class Semantier {
     }
 
     resetFormSession(): void {
-		this.pkval = undefined;
+		this.pkval.v = undefined;
 		this.rec = {};
 		this.rels = [];
 		this.crud = undefined;
@@ -409,6 +409,8 @@ export class Semantier {
 
 	/**
 	 * format relationship records - only fk supported 
+	 * 
+	 * TODO change to static
 	 * @param uri 
 	 * @param req 
 	 * @param r 
@@ -437,7 +439,7 @@ export class Semantier {
 					reshape: true }
 			);
 
-		if (!this.pkval) {
+		if (parentpk.v) {
 			if (req)
 				req.Body().post(insRels);
 			else

@@ -56,7 +56,7 @@ const styles = (theme) => ({
  * is not planned to supprt. See performance issue: https://stackoverflow.com/a/66934465
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  */
-class UserDetailstComp extends DetailFormW<Comprops> {
+class UserDetailstComp extends DetailFormW<Comprops & {tier: UsersTier}> {
 	state = {
 		record: {},
 	};
@@ -67,7 +67,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 
 	fields: TierCol[];
 
-	constructor (props: Comprops) {
+	constructor (props: Comprops & {tier: UsersTier}) {
 		super(props);
 
 		this.crud = props.crud;
@@ -94,7 +94,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.crud,
-				  pkval: this.props.tier.pkval,
+				  pkval: this.props.tier.pkval.v,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
@@ -139,7 +139,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 					  : u ? L('Edit User')
 					  : L('User Details');
 
-		let rec = this.state.record;
+		// let rec = this.state.record;
 
 		return (<>
 		  <Dialog className={classes.root}

@@ -79,7 +79,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
+		if (this.tier.pkval.v) {
 			// in case rec is already loaded by parent component
 			if (this.tier.rec && Object.keys(this.tier.rec).length > 0)
 				console.warn("TRecordFormComp is supposed to load form data with pkval by itself.");

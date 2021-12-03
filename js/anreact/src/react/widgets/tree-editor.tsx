@@ -315,8 +315,9 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		this.addForm = (
 			<SimpleForm crud={CRUD.u} uri={this.props.uri}
 				mtabl={this.props.mtabl}
-				pk={this.props.pk} fields={this.props.fields}
-				pkval={me} parent={this.props.parent} parentId={parentId}
+				// pk={this.props.pk}
+				fields={this.props.fields}
+				pkval={{pk: this.props.pk, v: me}} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
 				onClose={() => {that.addForm = undefined; that.setState({}) }}
 				onOk={() => {

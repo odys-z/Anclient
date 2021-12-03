@@ -17,18 +17,23 @@ const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
 });
 
+interface MyInfProps extends Comprops {
+	ssInf: SessionInf;
+};
+
 /** Simple session info card. Jsample use this to show user's personal info.
  * As UserDetails handling data binding by itself, and quit with data persisted
  * at jserv, this component is used to try the other way - no data persisting,
  * but with data automated data loading and state hook.
  */
-class MyInfCardComp extends DetailFormW<Comprops & {ssInf: SessionInf}> {
+class MyInfCardComp extends DetailFormW<MyInfProps> {
+// class MyInfCardComp extends DetailFormW<Comprops & {ssInf: SessionInf}> {
 
 	state = { }
 	tier: MyInfTier;
 	confirm: JSX.Element;
 
-	constructor (props: Comprops) {
+	constructor (props: MyInfProps) {
 		super(props);
 
 		this.uri = this.props.uri;
@@ -72,7 +77,7 @@ class MyInfCardComp extends DetailFormW<Comprops & {ssInf: SessionInf}> {
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.tier.crud,
-				  pkval: this.tier.pkval,
+				  pkval: this.tier.pkval.v,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
@@ -111,7 +116,6 @@ class MyInfCardComp extends DetailFormW<Comprops & {ssInf: SessionInf}> {
 MyInfCardComp.contextType = AnContext;
 
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
-export { MyInfCard, MyInfCardComp };
 
 export class MyInfTier extends Semantier {
 	rec = {} as Tierec;
@@ -186,7 +190,7 @@ export class MyInfTier extends Semantier {
 			this.errCtx);
 	}
 
-	saveRec(opts: { uri: string; crud: CRUD; pkval: PkMeta; }, onOk: OnCommitOk) {
+	saveRec(opts: { uri: string; crud: CRUD; pkval: string; }, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -199,7 +203,7 @@ export class MyInfTier extends Semantier {
 		let req = this.client
 					.usrAct(this.uri, CRUD.u, "save", "save my info")
 					.update(this.uri, this.mtabl,
-							{pk: this.pk, v: this.pkval},
+							{pk: this.pk, v: opts.pkval},
 							{roleId, userName});
 		// about attached image:
 		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
@@ -235,3 +239,5 @@ export class MyInfTier extends Semantier {
 			this.errCtx);
 	}
 }
+
+export { MyInfCard, MyInfCardComp, MyInfProps };

@@ -4,7 +4,7 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
 import { Media, ClassNames } from './anreact';
-import { CRUD, UIComponent } from '@anclient/semantier-st';
+import { CRUD, Semantier, UIComponent } from '@anclient/semantier-st';
 
 interface Comprops extends StandardProps<any, string>, UIComponent {
 	/**The matching url in React.Route */
@@ -18,7 +18,7 @@ interface Comprops extends StandardProps<any, string>, UIComponent {
 
 	/** Semantier */
 	classes?: ClassNames;
-	readonly tier?: any;
+	readonly tier?: Semantier;
 	readonly width?: Breakpoint;
 }
 

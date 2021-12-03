@@ -48,11 +48,8 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		this.context = this.props.anContext || this.context;
 		this.getTier();
 
-		this.tier.pkval = this.props.ssInf.uid;
+		this.tier.pkval.v = this.props.ssInf.uid;
 		this.setState({});
-		// let that = this;
-		// this.tier.myInf({userId: this.props.ssInf.uid},
-		// 				(cols, record) => that.setState({cols, record}) );
 	}
 
 	getTier = () => {
@@ -126,21 +123,21 @@ class PswdTier extends MyInfTier {
 		  autocomplete: "on",
 		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ] as Array<any>;
 
-	changePswd(opts, onOk) {
-		if (!this.client) return;
-		let client = this.client;
-		let that = this;
+	// changePswd(opts, onOk) {
+	// 	if (!this.client) return;
+	// 	// let client = this.client;
+	// 	// let that = this;
 
-		let { uri } = opts;
-		let { pswd, pswd1, pswd2 } = this.rec;
+	// 	// let { uri } = opts;
+	// 	let { pswd, pswd1, pswd2 } = this.rec;
 
-		if (this.validate()) {
-			this.client.setPswd(pswd, pswd1, {
-				onOk,
-				onError: this.errCtx
-			});
-			return true;
-		}
-		else return false;
-	}
+	// 	if (this.validate()) {
+	// 		this.client.setPswd(pswd, pswd1, {
+	// 			onOk,
+	// 			onError: this.errCtx
+	// 		});
+	// 		return true;
+	// 	}
+	// 	else return false;
+	// }
 }

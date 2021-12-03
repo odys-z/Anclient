@@ -84,6 +84,10 @@ export interface DbRelations {
     [tabl: string]: Semantics;
 }
 
+/**Issue: As pk fields is wrapped up at server side, should clients caring about the pk name?
+ * example of this:
+ * that.pkval.v = that.rec && that.rec[that.pk];
+*/
 export interface PkMeta {
     v: any;
     pk: string;

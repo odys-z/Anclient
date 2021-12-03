@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset, CRUD, DatasetierResp
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset, CRUD, DatasetierResp, PkMeta
 } from './protocol';
 import { ErrorCtx } from './semantier';
 
@@ -606,7 +606,7 @@ class SessionClient {
 		return jreq as AnsonMsg<QueryReq>;
 	}
 
-	update(uri, maintbl, pk, nvs) {
+	update(uri, maintbl, pk: PkMeta, nvs) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("Anclient is designed to support user updating log natively. User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -615,7 +615,7 @@ class SessionClient {
 			throw new Error("To update a table, {pk, v} must presented.");
 		}
 
-		var upd = new UpdateReq(uri, maintbl, pk);
+		var upd = new UpdateReq(uri, maintbl, pk.v);
 		upd.a = CRUD.u;
 		this.currentAct.cmd = 'update';
 		var jmsg = this.userReq(uri, 'update', upd, this.currentAct);

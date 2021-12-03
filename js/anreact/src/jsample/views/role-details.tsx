@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { CRUD, Tierec } from '@anclient/semantier-st';
+import { CRUD, PkMeta, Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 import { AnContext, } from '../../react/reactext'
@@ -49,7 +49,7 @@ const styles = theme => ({
   },
 });
 
-class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
+class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk: string }> {
 
 	state = {
 		crud: CRUD.r,
@@ -57,14 +57,14 @@ class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
 		closed: false,
 
 		pk: undefined,
-		pkval: '',
 		record: undefined as Tierec,
 	};
 
+	pkval: PkMeta = {pk: undefined, v: undefined};
 	tier: RoleTier;
 	ok: JSX.Element;
 
-	constructor (props: Comprops) {
+	constructor (props: Comprops & {tier: RoleTier} & { relsk: string }) {
 		super(props);
 
 		this.tier = props.tier;
@@ -152,7 +152,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & { relsk: string }> {
 				<AnRelationTree uri={this.props.uri}
 					tier={this.tier} sk={undefined}
 					mtabl='a_roles' reltabl='a_role_func'
-					sqlArgs={[this.state.pkval]}
+					sqlArgs={[this.pkval.v]}
 				/>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>

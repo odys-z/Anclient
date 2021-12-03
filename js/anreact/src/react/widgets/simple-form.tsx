@@ -13,7 +13,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnFieldValidation, AnFieldValidator, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, TierCol, Tierec } from '@anclient/semantier-st';
+import { AnFieldValidation, AnFieldValidator, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, PkMeta, TierCol, Tierec } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
@@ -59,8 +59,8 @@ interface SimpleFormProps extends Comprops {
     // funcId: string;
     crud: CRUD;
     fields: TierCol[];
-    pk: string;
-    pkval: any;
+    // pk: string;
+    pkval: PkMeta;
     parent: JSX.Element;
     parentId: string;
 	mtabl: string;
@@ -72,6 +72,8 @@ interface SimpleFormProps extends Comprops {
 class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 	uri = undefined;
 
+    pkval: PkMeta = { pk: undefined, v: undefined };
+
 	state = {
 		crud: undefined,
 		dirty: false,
@@ -82,7 +84,6 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		node: undefined,
 
         pk: undefined,
-        pkval: undefined,
 
 		mtabl: '',
 		// indId, indName, parent, sort, fullpath, css, weight, qtype, remarks, extra
@@ -123,7 +124,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		this.state.mtabl = props.mtabl;
 
 		this.state.pk = props.pk;
-		this.state.pkval = props.pkval;
+		this.pkval = props.pkval;
 
 		this.state.parent = props.parent;
 		this.state.parentId = props.parentId;
@@ -144,13 +145,13 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		let that = this;
 
 		if (this.state.crud !== CRUD.c) {
-			if (!this.state.pkval)
+			if (!this.pkval.v)
 				throw Error("The pkval property not been set correctly. Record can not be loaded.");
 
 			// load the record
 			const ctx = this.context as unknown as AnContextType;
 			let queryReq = ctx.anClient.query(this.uri, this.props.mtabl, 'r')
-			queryReq.Body().whereEq(this.state.pk.field, this.state.pkval);
+			queryReq.Body().whereEq(this.state.pk.field, this.pkval.v);
 			// FIXME but sometimes we have FK in record. Meta here?
 			ctx.anReact.bindStateRec({req: queryReq,
 				onOk: (resp: AnsonMsg<AnsonResp>) => {
