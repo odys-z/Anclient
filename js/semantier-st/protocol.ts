@@ -17,7 +17,8 @@ export interface JsonOptions {
 
 export type PageInf = { page: number, size: number };
 
-export type NameVal = {name: string, value: object};
+/**Lagecy from jquery & easui, replaced by NV - no need to collect form using JQuery in the future. */
+export type NameValue = {name: string, value: object};
 export type NV = {n: string, v: string | object};
 
 export interface LogAct {
@@ -55,11 +56,17 @@ export interface DbCol {
 export type SemanticType = 'fk' | 'stree' | 'm2m' | 'customer';
 
 export interface FKRelation {
+	/**table naem */
+	tabl: string;
+
 	/**chiled table pk */
 	pk: string,
 
 	/**Child foreign column */
 	col: string,
+
+	/**value for col - column-map's key for where to get the value */
+	relcolumn: string,
 }
 
 export interface Stree {
@@ -239,7 +246,7 @@ export class Protocol {
 		return AnsonResp.rs2arr(rs);
 	}
 
-	static nv2cell (nv: NameVal): [string, string] {
+	static nv2cell (nv: NameValue): [string, string] {
 		return [nv.name, nv.value as unknown as string];
 	}
 
@@ -256,7 +263,7 @@ export class Protocol {
      * @param {Array} [n-v, ...]
      * @return {Array} [n1, n2, ...]
      */
-    static nvs2cols(nvArr: Array<NameVal>): Array<string> {
+    static nvs2cols(nvArr: Array<NameValue>): Array<string> {
 		var cols = [];
 		if (nvArr) {
 			for (var ix = 0; ix < nvArr.length; ix++) {
@@ -961,7 +968,7 @@ export class InsertReq extends UpdateReq {
 			else {
 				// guess as a n-v array
 				if (this.cols === undefined)
-					this.columns(Protocol.nvs2cols(n_row as unknown as NameVal[]));
+					this.columns(Protocol.nvs2cols(n_row as unknown as NameValue[]));
 				this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
 			}
 		}
@@ -1245,7 +1252,12 @@ export class DatasetReq extends QueryReq {
 
     trSmtcs: any;
 
-	// FIXME this is not a typed way
+	/**Set t/a of message.
+	 * FIXME this is not a typed way
+	 * 
+	 * @param ask 
+	 * @returns 
+	 */
 	TA(ask: string | any[] | {
 			/** load dataset configured and format into tree with semantics defined by sk. */
 			sqltree: string;

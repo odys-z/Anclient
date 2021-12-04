@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 
 import Dialog from '@material-ui/core/Dialog';
@@ -12,13 +12,12 @@ import Button from '@material-ui/core/Button';
 import { CRUD, TierCol } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
-	import { Comprops, CrudComp, CrudCompW, DetailFormW } from '../../react/crud';
-	import { ConfirmDialog } from '../../react/widgets/messagebox';
-	import { TRecordForm } from '../../react/widgets/t-record-form';
-
+import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';
+import { ConfirmDialog } from '../../react/widgets/messagebox';
+import { TRecordForm } from '../../react/widgets/t-record-form';
 import { UsersTier } from './users';
 
-const styles = (theme) => ({
+const styles = (theme: Theme) => ({
   root: {
 	maxWidth: 720,
 	margin: 'auto',

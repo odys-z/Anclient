@@ -198,7 +198,7 @@ class UserstComp extends CrudCompW<Comprops> {
 					>{L('Edit')}</Button>
 				</Grid>}
 
-			{tier && <AnTablist pk={tier.pk}
+			{tier && <AnTablist pk={tier.pkval.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selected={this.state.selected}
 				columns={tier.columns()}
@@ -295,7 +295,7 @@ export class UsersTier extends Semantier {
 
 		// this.port = 'userstier';
 		this.mtabl = 'a_users';
-		this.pk = 'userId';
+		this.pkval.pk = 'userId';
 		this.checkbox = true;
 		this.rows = [];
 		// pkval = undefined;
@@ -368,7 +368,7 @@ export class UsersTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval.v = bd.resulve(that.mtabl, that.pk, that.rec);
+					that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);

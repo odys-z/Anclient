@@ -5,7 +5,9 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec, QueryConditions, Semantics, OnLoadOk, UIComponent, AnsonMsg
+import {
+	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
+	QueryConditions, Semantics, OnLoadOk, UIComponent, AnsonMsg
 } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
@@ -198,7 +200,7 @@ class RolesComp extends CrudCompW<Comprops> {
 			{this.tier && <AnTablist
 				className={classes.root} checkbox={true}
 				columns={this.tier.columns()}
-				rows={this.state.rows} pk={this.tier.pk}
+				rows={this.state.rows} pk={this.tier.pkval.pk}
 				selected={this.state.selected}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
@@ -214,11 +216,6 @@ RolesComp.contextType = AnContext;
 const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
 
 class RoleTier extends Semantier {
-	// client = undefined;
-	// pkval = undefined;
-	// rows = [];
-	// rec = {}; // for leveling up record form, also called record
-
 	checkbox = true;
 	rels = [];
 
@@ -245,7 +242,7 @@ class RoleTier extends Semantier {
 		super(comp);
 
 		this.mtabl = 'a_roles';
-		this.pk = 'roleId';
+		this.pkval.pk = 'roleId';
 		this.reltabl = 'a_role_func';
 
 		/**sk: role-funcs
@@ -287,21 +284,22 @@ class RoleTier extends Semantier {
 		let that = this;
 
 		// temp id avoiding update my pk status
-		let roleId = conds[this.pk] as string;
+		let roleId = conds[this.pkval.pk] as string;
 
 		// NOTE
 		// Is this senario an illustration of general query is also necessity?
 		let req = client.query(this.uri, 'a_roles', 'r')
 		req.Body()
 			.col('roleId').col('roleName').col('remarks')
-			.whereEq(this.pk, roleId);
+			.whereEq(this.pkval.pk, roleId);
 
 		client.commit(req,
 			(resp: AnsonMsg<AnsonResp>) => {
-				// NOTE because of using general query, extra hanling is needed
+				// Design Memo:
+				// because of using general query, extra hanling is needed: onLoad(cols, rows)
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
-				that.pkval.v = that.rec && that.rec[that.pk];
+				that.pkval.v = that.rec && that.rec[that.pkval.pk];
 				onLoad(cols, rows);
 			},
 			this.errCtx);

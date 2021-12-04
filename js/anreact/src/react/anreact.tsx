@@ -4,7 +4,7 @@ import $ from 'jquery';
 import { stree_t, Tierec,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk, QueryConditions
+	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk, QueryConditions, NameValue, Semantier
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
@@ -111,79 +111,79 @@ export class AnReact {
 		return this;
 	}
 
-	/**TODO move this to a semantics handler, e.g. shFK.
-	 * Generate an insert request according to tree/forest checked items.
-	 * @param {object} forest forest of tree nodes, the forest / tree data, tree node: {id, node}
-	 * @param {object} opts options
-	 * @param {object} opts.check checking column name
-	 * @param {object} opts.columns, column's value to be inserted
-	 * @param {object} opts.rows, n-v rows to be inserted
-	 * @param {object} opts.reshape set middle tree node while traverse.
-	 * @return {InsertReq} subclass of AnsonBody
-	 */
-	inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: any; check: string; reshape: boolean; }) {
-		let {table, columnMap, check, reshape} = opts;
+	// /**TODO move this to a semantics handler, e.g. shFK.
+	//  * Generate an insert request according to tree/forest checked items.
+	//  * @param {object} forest forest of tree nodes, the forest / tree data, tree node: {id, node}
+	//  * @param {object} opts options
+	//  * @param {object} opts.check checking column name
+	//  * @param {object} opts.columns, column's value to be inserted
+	//  * @param {object} opts.rows, n-v rows to be inserted
+	//  * @param {object} opts.reshape set middle tree node while traverse.
+	//  * @return {InsertReq} subclass of AnsonBody
+	//  */
+	// inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: any; check: string; reshape: boolean; }) {
+	// 	let {table, columnMap, check, reshape} = opts;
 
-		// FIXME shouldn't we map this at server side?
-		let dbCols = Object.keys(columnMap);
+	// 	// FIXME shouldn't we map this at server side?
+	// 	let dbCols = Object.keys(columnMap);
 
-		let ins = new InsertReq(null, table)
-			.A<InsertReq>(CRUD.c)
-			.columns(dbCols);
+	// 	let ins = new InsertReq(null, table)
+	// 		.A<InsertReq>(CRUD.c)
+	// 		.columns(dbCols);
 
-		let rows = [];
+	// 	let rows = [];
 
-		collectTree(forest, rows);
+	// 	collectTree(forest, rows);
 
-		ins.nvRows(rows);
-		return ins;
+	// 	ins.nvRows(rows);
+	// 	return ins;
 
-		/**Design Notes:
-		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
-		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
-		*/
-		function collectTree(forest: AnTreeNode[], rows: Array<{name: string, value: string}[]>) {
-			let cnt = 0;
-			forest.forEach( (tree: AnTreeNode, _i: number) => {
-				if (tree && tree.node) {
-					if (tree.node.children && tree.node.children.length > 0) {
-						let childCnt = collectTree(tree.node.children, rows);
+	// 	/**Design Notes:
+	// 	 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
+	// 	 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
+	// 	*/
+	// 	function collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>) {
+	// 		let cnt = 0;
+	// 		forest.forEach( (tree: AnTreeNode, _i: number) => {
+	// 			if (tree && tree.node) {
+	// 				if (tree.node.children && tree.node.children.length > 0) {
+	// 					let childCnt = collectTree(tree.node.children, rows);
 
-						if (childCnt > 0)
-							tree.node[check] = 1;
-						else
-							tree.node[check] = 0;
-					}
-					if ( toBool(tree.node[check]) ) {
-						rows.push(toNvRow(tree.node, dbCols, columnMap));
-						cnt++;
-					}
-				}
-			});
-			return cnt;
-		}
+	// 					if (childCnt > 0)
+	// 						tree.node[check] = 1;
+	// 					else
+	// 						tree.node[check] = 0;
+	// 				}
+	// 				if ( toBool(tree.node[check]) ) {
+	// 					rows.push(toNvRow(tree.node, dbCols, columnMap));
+	// 					cnt++;
+	// 				}
+	// 			}
+	// 		});
+	// 		return cnt;
+	// 	}
 
-		/**convert to [name-value, ...] as a row (Array<{name, value}>), e.g.
-		 * [ { "name": "funcId", "value": "sys-domain" },
-		 *   { "name": "roleId", "value": "r003" } ]
-		 */
-		function toNvRow(node: AnTreeNode["node"],
-				  dbcols: string[], colMap: { [x: string]: any; })
-				: Array<{name: string, value: string}> {
+	// 	/**convert to [name-value, ...] as a row (Array<{name, value}>), e.g.
+	// 	 * [ { "name": "funcId", "value": "sys-domain" },
+	// 	 *   { "name": "roleId", "value": "r003" } ]
+	// 	 */
+	// 	function toNvRow(node: AnTreeNode["node"],
+	// 			  dbcols: string[], colMap: { [x: string]: any; })
+	// 			: Array<NameValue> {
 
-			let r = [];
-			dbcols.forEach( (col: string, j: number) => {
-				let mapto = colMap[col];
-				if (node.hasOwnProperty(mapto))
-					// e.g. roleName: 'text'
-					r.push({name: col, value: node[mapto]});
-				else
-					// e.g. roleId: '0001'
-					r.push({name: col, value: mapto});
-			} );
-			return r;
-		}
-	}
+	// 		let r = [];
+	// 		dbcols.forEach( (col: string, j: number) => {
+	// 			let mapto = colMap[col];
+	// 			if (node.hasOwnProperty(mapto))
+	// 				// e.g. roleName: 'text'
+	// 				r.push({name: col, value: node[mapto]});
+	// 			else
+	// 				// e.g. roleId: '0001'
+	// 				r.push({name: col, value: mapto});
+	// 		} );
+	// 		return r;
+	// 	}
+	// }
 
 	/**Try figure out serv root, then bind to html tag.
 	 * First try ./private/host.json<serv-id>,
@@ -285,19 +285,20 @@ export class AnReactExt extends AnReact {
 	 */
 	dataset(ds: DatasetOpts, onLoad: OnCommitOk): AnReactExt {
 		// let ssInf = this.client.ssInf;
-		let {uri, sk, sqlArgs, t, rootId} = ds;
-		sqlArgs = sqlArgs || [];
-		let port = ds.port ||'dataset';
+	// 	let {uri, sk, sqlArgs, t, rootId} = ds;
+	// 	sqlArgs = sqlArgs || [];
+	// 	let port = ds.port ||'dataset';
 
-		let reqbody = new DatasetReq({
-				uri, port,
-				mtabl: undefined,
-				sk, sqlArgs, rootId
-			})
-			.TA(t || stree_t.query);
-		let jreq = this.client.userReq(uri, port, reqbody, undefined);
+	// 	let reqbody = new DatasetReq({
+	// 			uri, port,
+	// 			mtabl: undefined,
+	// 			sk, sqlArgs, rootId
+	// 		})
+	// 		.TA(t || stree_t.query);
+	// 	let jreq = this.client.userReq(uri, port, reqbody, undefined);
 
-		this.client.an.post(jreq, onLoad, this.errCtx);
+	// 	this.client.an.post(jreq, onLoad, this.errCtx);
+		Semantier.dataset(ds, this.client, onLoad, this.errCtx);
 		return this;
 	}
 
@@ -313,22 +314,23 @@ export class AnReactExt extends AnReact {
 	 * @return this
 	 */
 	stree(opts: DatasetOpts, component: CrudComp<Comprops>): void {
-		let {uri, onOk} = opts;
+		// let {uri, onOk} = opts;
+		let {onOk} = opts;
 
-		if (!uri)
-			throw Error('Since v0.9.50, Anclient request needs function uri to find datasource.');
+		// if (!uri)
+		// 	throw Error('Since v0.9.50, Anclient request needs function uri to find datasource.');
 
-		if (opts.sk && !opts.t)
-			opts.a = stree_t.sqltree;
+		// if (opts.sk && !opts.t)
+		// 	opts.a = stree_t.sqltree;
 
 		let onload = onOk || function (resp: AnsonMsg<AnDatasetResp>) {
 			if (component)
 				component.setState({forest: resp.Body().forest});
 		}
 
-		opts.port = 'stree';
+		// opts.port = 'stree';
 
-		this.dataset(opts, onload);
+		Semantier.stree(opts, this.client, onload, this.errCtx);
 	}
 
 	rebuildTree(opts: DatasetOpts, onOk: (resp: any) => void) {

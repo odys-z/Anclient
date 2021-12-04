@@ -10,7 +10,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, TierComboField, Tierec } from '@anclient/semantier-st';
+import { AnlistColAttrs, Semantier, TierComboField, Tierec } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
 import { toBool } from '../../utils/helpers';
 import { Comprops, CrudCompW } from '../crud';
@@ -68,7 +68,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		dirty: false,
 		pk: undefined,
 	};
-    tier: any;
+    tier: Semantier;
 
 	constructor (props: RecordFormProps) {
 		super(props);
@@ -86,9 +86,8 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 
 			let that = this;
 			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
-				// that.rec = rows && rows[0] ? rows[0] : {};
+			cond[this.tier.pkval.pk] = this.tier.pkval.v;
+			this.tier.record(cond, (_cols, _rows) => {
 				that.setState({});
 			} );
 		}

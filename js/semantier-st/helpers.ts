@@ -1,8 +1,5 @@
 
-import {} from './lang-ext';
-
-/**@deprecated moved to @anclient/semantier-st
- * 
+/**
  * Convert string to boolean
  * @example
   	it('toBool', () => {
@@ -44,10 +41,6 @@ export function toBool(str: string | number | boolean, undefinedNull?: boolean):
 			? false : true;
 }
 
-/**@deprecated moved to @anclient/semantier-st
- * @param str 
- * @returns 
- */
 export function isEmpty(str: string | number) : boolean {
 	return typeof str === 'undefined' || str === null || str === '';
-}
+} 

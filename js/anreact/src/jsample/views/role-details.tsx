@@ -92,7 +92,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 		}
 		else {
 			let that = this;
-			this.tier.saveRec({crud: this.state.crud},
+			this.tier.saveRec({crud: this.state.crud, reltabl: 'a_role_func'},
 				() => {
 					if (that.state.crud === CRUD.c)
 						that.setState({ crud: CRUD.u} );
@@ -112,7 +112,10 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
 					title={L('Info')}
 					cancel={false} msg={txt}
-					onClose={() => {that.ok === undefined} } />);
+					onClose={() => {
+						that.ok = undefined;
+						that.setState( {dirty: false} );
+					} } />);
 
 		if (typeof this.props.onSave === 'function')
 			this.props.onSave({code: 'ok'});
@@ -151,7 +154,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 				/>
 				<AnRelationTree uri={this.props.uri}
 					tier={this.tier} sk={undefined}
-					mtabl='a_roles' reltabl='a_role_func'
+					mtabl='a_roles' reltabl='a_role_func' relcolumn='nodeId'
 					sqlArgs={[this.pkval.v]}
 				/>
 			</DialogContent>

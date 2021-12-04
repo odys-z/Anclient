@@ -128,7 +128,7 @@ export class MyInfTier extends Semantier {
 		// FIXME move to super class?
 		// this.uri = comp.uri;
 		this.mtabl = 'a_users';
-		this.pk = 'userId';
+		this.pkval.pk = 'userId';
 
 		this.loadAvatar = this.loadAvatar.bind(this);
 	}
@@ -183,7 +183,7 @@ export class MyInfTier extends Semantier {
 				// NOTE because of using general query, extra hanling is needed
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
-				that.pkval.v = that.rec && that.rec[that.pk];
+				that.pkval.v = that.rec && that.rec[that.pkval.pk];
 				that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
 				onLoad(cols, rows);
 			},
@@ -203,7 +203,7 @@ export class MyInfTier extends Semantier {
 		let req = this.client
 					.usrAct(this.uri, CRUD.u, "save", "save my info")
 					.update(this.uri, this.mtabl,
-							{pk: this.pk, v: opts.pkval},
+							{pk: this.pkval.pk, v: opts.pkval},
 							{roleId, userName});
 		// about attached image:
 		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
@@ -215,7 +215,7 @@ export class MyInfTier extends Semantier {
 					new DeleteReq(this.uri, "a_attaches", rec.attId as string))
 				.post(
 					new DeleteReq(this.uri, "a_attaches", undefined)
-						.whereEq('busiId', rec[this.pk] as string || '')
+						.whereEq('busiId', rec[this.pkval.pk] as string || '')
 					 	.whereEq('busiTbl', this.mtabl));
 		if ( rec[this.imgProp] ) {
 			let {name, mime} = rec.fileMeta as {name: string, mime: string};
@@ -233,7 +233,7 @@ export class MyInfTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval.v = bd.resulve(that.mtabl, that.pk, that.rec);
+					that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);

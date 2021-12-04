@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { Theme, withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
@@ -12,7 +12,7 @@ import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext } from '../../react/reactext'
 import { AnTreegrid } from '../../react/widgets/treegrid'
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'

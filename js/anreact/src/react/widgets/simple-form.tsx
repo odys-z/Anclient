@@ -83,7 +83,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		nodeId: undefined,
 		node: undefined,
 
-        pk: undefined,
+        pk: undefined as PkMeta,
 
 		mtabl: '',
 		// indId, indName, parent, sort, fullpath, css, weight, qtype, remarks, extra
@@ -151,7 +151,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			// load the record
 			const ctx = this.context as unknown as AnContextType;
 			let queryReq = ctx.anClient.query(this.uri, this.props.mtabl, 'r')
-			queryReq.Body().whereEq(this.state.pk.field, this.pkval.v);
+			queryReq.Body().whereEq(this.state.pk.pk, this.pkval.v);
 			// FIXME but sometimes we have FK in record. Meta here?
 			ctx.anReact.bindStateRec({req: queryReq,
 				onOk: (resp: AnsonMsg<AnsonResp>) => {
@@ -233,9 +233,9 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		// console.log(nvs);
 
 		// 2. request (insert / update)
-		let pk = this.state.pk;
+		let pkv = this.state.pk;
 		if (this.state.crud === CRUD.c) {
-			nvs.push({name: pk.field, value: rec[pk.field]});
+			nvs.push({name: pkv.pk, value: rec[pkv.pk]});
 			req = client
 				.usrAct(this.uri, CRUD.c, this.props.title || 'new record')
 				.insert(this.uri, this.state.mtabl, nvs);
@@ -243,9 +243,9 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		else {
 			req = client
 				.usrAct(this.funcId, CRUD.u, 'edit card')
-				.update(this.uri, this.state.mtabl, pk.field, nvs);
+				.update(this.uri, this.state.mtabl, pkv, nvs);
 			req.Body()
-				.whereEq(pk.field, rec[pk.field]);
+				.whereEq(pkv.pk, rec[pkv.pk]);
 		}
 
 		let that = this;

@@ -1,8 +1,9 @@
-import { SessionClient, Inseclient } from "./anclient";
+import { SessionClient, Inseclient, AnClient } from "./anclient";
+import { toBool } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, 
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, 
-	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, UserReq, PkMeta
+	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, UserReq, PkMeta, NameValue, DatasetOpts, DatasetReq
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -113,9 +114,6 @@ export interface QueryConditions {
 	[q: string]: string | number | object | boolean;
 }
 
-
-
-
 /**
  * Not the same as java Semantext.
  * { client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx }
@@ -159,7 +157,8 @@ export class Semantier {
     /** Fields in details from, e.g. maintable's record fields */
     _fields: TierCol[];
     /** optional main table's pk */
-    pk: string;
+    // pk: string;
+
     /** current crud */
     crud: CRUD;
     /** current list's data */
@@ -170,10 +169,14 @@ export class Semantier {
     rec: Tierec;
 
     /** All sub table's relationships */
-    rel: Tierelations;
-    /** currrent relation table */
-    reltabl: string;
-    /** current relations */
+    relMeta: Tierelations;
+
+    /** currrent relation table - wrong */
+    // reltabl: string;
+
+    /** current relations - the last loaded relation of this.rel (problem?)
+	 * Looks like all relationship records are item of main tree. 
+	 */
     rels: any[];
 
     lastCondit: QueryConditions;
@@ -186,13 +189,22 @@ export class Semantier {
 			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
 		this.client = context.anClient;
-		this.anReact = context.anReact;
+		// this.anReact = context.anReact;
 		this.errCtx = context.error;
 		return this;
 	}
 
+	/**TODO check widgets right
+	 * 
+	 * @param field 
+	 * @returns 
+	 */
+	isReadonly(field: TierCol) {
+		return false;
+	}
+
     client: SessionClient | Inseclient;
-    anReact: any; // for anreact/AnReact. TODO rename as UIHelper 
+    // anReact: any; // for anreact/AnReact. TODO rename as UIHelper 
     errCtx: ErrorCtx;
 
     disableValidate: any;
@@ -253,7 +265,10 @@ export class Semantier {
 			return this._cols;
     }
 
-    /** Get form fields data specification
+    /**Get form fields data specification
+	 * 
+	 * Businsess semantics binding: If the loading with a record Id, the Id field will be disabled.
+	 * 
      * @param modifier {field: AnElemFormatter | object }
 	 * e.g. for anreact, object can be {gird, box, ...}.
      */
@@ -265,32 +280,33 @@ export class Semantier {
 
 		if (modifier)
 			return this._fields.map( (c, x) => {
-				let disabled = c.disabled || c.field === that.pk && that.pkval.v ? true : false;
+				let disabled = c.disabled || c.field === that.pkval.pk && that.pkval.v ? true : false;
 				return typeof modifier[c.field] === 'function' ?
 						{...c, ...(modifier[c.field] as AnElemFormatter)(c, x), disabled } :
 						{...c, ...modifier[c.field], disabled}
 			} );
 		else
-			return this._fields.map( (c, x) => {
-				let disabled = c.disabled || c.field === that.pk && that.pkval.v ? true : false;
+			return this._fields.map( (c) => {
+				let disabled = c.disabled || c.field === that.pkval.pk && that.pkval.v ? true : false;
 				return {...c, disabled };
 			} );
 	}
 
     /** Load relationships */
-    relations(opts: {
+    relations( client: SessionClient | Inseclient,
+		opts: {
 			uri: string;
 			reltabl: string;
 			sqlArgs?: string[]; sqlArg?: string; } ,
 			onOk: OnCommitOk): void {
-		if (!this.anReact)
-			throw Error ("AnReact here is needed!");
+		// if (!this.anReact)
+		// 	throw Error ("AnReact here is needed!");
 
 		let that = this;
 
 		// typically relationships are tree data
 		let { reltabl, sqlArgs, sqlArg } = opts;
-		let fkRel = this.rel[reltabl] as unknown as Stree;
+		let fkRel = this.relMeta[reltabl] as unknown as Stree;
 		let { sk, fk, fullpath } = fkRel;
 
 		sqlArgs = sqlArgs || [sqlArg];
@@ -302,18 +318,38 @@ export class Semantier {
 
 		let ds = {uri : this.uri,
 			sk, t, sqlArgs,
-			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
-				that.rels = resp.Body().forest;
-				onOk(resp);
-			}
+			// onOk: (resp: AnsonMsg<AnDatasetResp>) => {
+			// 	that.rels = resp.Body().forest;
+			// 	onOk(resp);
+			// }
 		};
 
-		this.anReact.stree(ds, this.errCtx);
+		// onOk = onOk || ( (resp: AnsonMsg<AnDatasetResp>) => {
+		// 		that.rels = resp.Body().forest;
+		// 		onOk(resp);
+		// 	} )
+
+		Semantier.stree(ds, client,
+				(resp: AnsonMsg<AnDatasetResp>) => {
+					that.rels[reltabl] = resp.Body().forest;
+					onOk(resp)
+				},
+			this.errCtx);
     }
 
-    record( _conds: QueryConditions, onLoad: OnLoadOk) : void {
+	/**
+	 * Load a jserv record.
+	 * @param conds 
+	 * @param onLoad 
+	 */
+    record(conds: QueryConditions, onLoad: OnLoadOk) : void {
     }
 
+	/** Load records of conditions.
+	 * 
+	 * @param opts 
+	 * @param onLoad 
+	 */
     records<T extends Tierec>(opts: QueryConditions, onLoad: OnLoadOk) : void {
 	}
 
@@ -323,12 +359,12 @@ export class Semantier {
 	 * @param onOk callback
 	 * @returns 
 	 */
-    saveRec(opts: {crud: CRUD; disableForm?: boolean; disableRelations?: boolean}, onOk: OnCommitOk): void {
+    saveRec(opts: {crud: CRUD; disableForm?: boolean; disableRelations?: boolean, reltabl?: string}, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
 
-		let { crud, disableForm, disableRelations } = opts;
+		let { crud, disableForm, disableRelations, reltabl } = opts;
 		let uri = this.uri;
 
 		if (crud === CRUD.u && !this.pkval.v)
@@ -346,15 +382,15 @@ export class Semantier {
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
 							new UpdateReq( uri, this.mtabl, this.pkval.v)
-							.record(this.rec, this.pk) );
+							.record(this.rec, this.pkval.pk) );
 			}
 		}
 
-		if (!disableRelations && !this.reltabl)
+		if (!disableRelations && !reltabl)
 			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
 
 		if (!disableRelations) 
-			req = this.formatRel<AnsonBody>(uri, req, this.rel[this.reltabl], this.pkval);
+			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl], this.pkval);
 
 		if (req)
 			client.commit(req,
@@ -363,7 +399,7 @@ export class Semantier {
 					if (crud === CRUD.c)
 						// NOTE:
 						// resulving auto-k is a typicall semantic processing, don't expose this to caller
-						that.pkval.v = bd.resulve(that.mtabl, that.pk, that.rec);
+						that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
 					onOk(resp);
 				},
 				this.errCtx);
@@ -387,7 +423,7 @@ export class Semantier {
 		if (ids && ids.length > 0) {
 			let req = client
 				.usrAct(this.mtabl, CRUD.d, 'delete')
-				.deleteMulti(this.uri, this.mtabl, this.pk, [...ids]);
+				.deleteMulti(this.uri, this.mtabl, this.pkval.pk, [...ids]);
 
 			if (posts) {
 				let d = req.Body();
@@ -413,41 +449,40 @@ export class Semantier {
 	 * TODO change to static
 	 * @param uri 
 	 * @param req 
-	 * @param r 
+	 * @param relation 
 	 * @param parentpk pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
-	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, r: Semantics, parentpk: PkMeta ) : AnsonMsg<T> {
-		if (r.stree || r.m2m)
+	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Semantics, parentpk: PkMeta ) : AnsonMsg<T> {
+		if (relation.stree || relation.m2m)
 			throw Error('TODO ...');
 
-		let rel = r.fk;
+		let rel = relation.fk;
 		// collect relationships
 		let columnMap = {};
-		columnMap[rel.col] = 'nodeId';
+		columnMap[rel.col] = rel.relcolumn; // columnMap[rel.col] = 'nodeId';
 
 		// semantics handler can only resulve fk at inserting when master pk is auto-pk
 		columnMap[parentpk.pk] = parentpk.v;
 
-		let insRels = this.anReact
-			.inserTreeChecked(
-				this.rels,
-				{ table: this.reltabl,
-					columnMap,
-					check: 'checked',
-					// middle nodes been corrected according to children
-					reshape: true }
-			);
+		let insRels = this.inserTreeChecked(
+				this.rels as AnTreeNode[],
+				{ table: rel.tabl,
+				  columnMap,
+				  check: 'checked',
+				  // middle nodes been corrected according to children
+				  reshape: true
+				} );
 
-		if (parentpk.v) {
+		if (!parentpk.v) {
 			if (req)
 				req.Body().post(insRels);
 			else
-				req = this.client.userReq(uri, 'insert', insRels);
+				req = this.client.userReq(uri, 'insert', insRels) as unknown as AnsonMsg<T>;
 		}
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
-			let del_rf = new DeleteReq(null, this.reltabl, rel.col)
+			let del_rf = new DeleteReq(null, rel.tabl, rel.col)
 							.whereEq(rel.col, parentpk.v)
 							.post(insRels);
 
@@ -457,6 +492,138 @@ export class Semantier {
 				req = this.client.userReq(uri, 'update', del_rf) as unknown as AnsonMsg<T>;
 		}
 		return req;
+	}
+
+	/**move this to a semantics handler, e.g. shFK ?
+	 * Generate an insert request according to tree/forest checked items.
+	 * @param forest forest of tree nodes, the forest / tree data, tree node: {id, node}
+	 * @param opts options 
+	 * - opts.table: relationship table name 
+	 * - opts.columnMap: column's value to be inserted
+	 * - opts.check: checking column name
+	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checed.
+	 * @return subclass of AnsonBody
+	 */
+	inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: {}; check: string; reshape: boolean; }): InsertReq {
+		let {table, columnMap, check, reshape} = opts;
+		reshape = reshape === undefined? true : reshape;
+
+		// FIXME shouldn't we map this at server side?
+		let dbCols = Object.keys(columnMap);
+
+		let ins = new InsertReq(null, table)
+			.A<InsertReq>(CRUD.c)
+			.columns(dbCols);
+
+		let rows = [];
+
+		collectTree(forest, rows);
+
+		ins.nvRows(rows);
+		return ins;
+
+		/**Design Notes:
+		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
+		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
+		*/
+		function collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>) {
+			let cnt = 0;
+			forest.forEach( (tree: AnTreeNode, _i: number) => {
+				if (tree && tree.node) {
+					if (tree.node.children && tree.node.children.length > 0) {
+						let childCnt = collectTree(tree.node.children, rows);
+
+						if (childCnt > 0 && reshape)
+							tree.node[check] = 1;
+						else if (childCnt === 0)
+							tree.node[check] = 0;
+					}
+					if ( toBool(tree.node[check]) ) {
+						rows.push(toNvRow(tree.node, dbCols, columnMap));
+						cnt++;
+					}
+				}
+			});
+			return cnt;
+		}
+
+		/**convert to [name-value, ...] as a row (Array<{name, value}>), e.g.
+		 * [ { "name": "funcId", "value": "sys-domain" },
+		 *   { "name": "roleId", "value": "r003" } ]
+		 * 
+		 * @param node   TreeNode from wich row will be collected
+		 * @param dbcols column names to be converted from node
+		 * @param colMap column's static value, e.g. { roleId: '00001' } 
+		 * @returns 
+		 */
+		function toNvRow(node: AnTreeNode["node"],
+				  dbcols: string[], colMap: { [x: string]: any; })
+				: Array<NameValue> {
+
+			let r = [];
+			dbcols.forEach( (col: string) => {
+				let mapto = colMap[col];
+				if (node.hasOwnProperty(mapto))
+					// e.g. roleName: 'text'
+					r.push({name: col, value: node[mapto]});
+				else
+					// e.g. roleId: '0001'
+					r.push({name: col, value: mapto});
+			} );
+			return r;
+		}
+	}
+
+	/**
+	 * Load dataset from jserv
+	 * 
+	 * @param ds 
+	 * @param client 
+	 * @param onLoad 
+	 * @param errCtx 
+	 */
+	static dataset(ds: DatasetOpts, client: SessionClient | Inseclient, onLoad: OnCommitOk, errCtx: ErrorCtx): void {
+		// let ssInf = this.client.ssInf;
+		let {uri, sk, sqlArgs, t, rootId} = ds;
+		sqlArgs = sqlArgs || [];
+		let port = ds.port ||'dataset';
+
+		let reqbody = new DatasetReq({
+				uri, port,
+				mtabl: undefined,
+				sk, sqlArgs, rootId
+			})
+			.TA(t || stree_t.query);
+		let jreq = client.userReq(uri, port, reqbody, undefined);
+
+		client.an.post(jreq, onLoad, errCtx);
+	}
+
+	/** Load jsample.serv dataset. (using DatasetReq or menu.serv).
+	 * If opts.onOk is provided, will try to bind stree like this:
+	 <pre>
+	let onload = onOk || function (c, resp) {
+		if (compont)
+			compont.setState({stree: resp.Body().forest});
+	}</pre>
+	 * 
+	 * @param opts dataset info {sk, sqlArgs, onOk}
+	 * @param client 
+	 * @param onLoad 
+	 * @param errCtx 
+	 */
+	static stree(opts: DatasetOpts, client: SessionClient | Inseclient, onLoad: OnCommitOk, errCtx: ErrorCtx): void {
+		let {uri} = opts;
+
+		if (!uri)
+			throw Error('Since v0.9.50, Anclient request needs function uri to find datasource.');
+
+		if (opts.sk && !opts.t)
+			opts.a = stree_t.sqltree;
+
+		opts.port = 'stree';
+
+		Semantier.dataset(opts, client, onLoad, errCtx);
 	}
 }
 
