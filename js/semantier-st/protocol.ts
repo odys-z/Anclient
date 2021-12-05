@@ -62,7 +62,7 @@ export interface FKRelation {
 	/**chiled table pk */
 	pk: string,
 
-	/**Child foreign column */
+	/**Child foreign column in DB table */
 	col: string,
 
 	/**value for col - column-map's key for where to get the value */

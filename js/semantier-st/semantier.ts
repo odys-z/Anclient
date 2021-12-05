@@ -379,7 +379,7 @@ export class Semantier {
 			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
 
 		if (!disableRelations) 
-			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl], this.pkval);
+			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl], crud === CRUD.c ? {pk: this.pkval.pk, v: rec??}: this.pkval);
 
 		if (req)
 			client.commit(req,
@@ -506,7 +506,7 @@ export class Semantier {
 
 		let rows = [];
 
-		collectTree(forest, rows);
+		collectTree(forest[table], rows);
 
 		ins.nvRows(rows);
 		return ins;
