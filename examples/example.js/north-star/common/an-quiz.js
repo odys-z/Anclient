@@ -1,15 +1,10 @@
 /** Legacy from Anclient/example.js/react-quiz
  */
 import {
-	Protocol, UserReq, AnsonMsg
-} from '@anclient/semantier';
+	Protocol, UserReq
+} from '@anclient/semantier-st';
 
-import { QuizReq, QuizProtocol, QuizResp, CenterProtocol } from './protocol.quiz.js';
-
-// export const QuestionType = {
-// 	single: "1",
-// 	multiple: "x"
-// }
+import { QuizReq, QuizProtocol, CenterProtocol } from './protocol.quiz.js';
 
 export
 /** Helper handling protocol / data type of quiz.serv */
@@ -126,6 +121,7 @@ class JQuiz {
 	/**[Promiting Style]
 	 * Get all poll users for pollIds, with state in states.
 	 * port: quiz
+	 * @deprecated only used by polls.jsx/PollsComp, replaced by polls.tsx/PollsComp
 	 * @param {objects} opts
 	 * @param {string} opts.uri
 	 * @param {array|set} opts.pollIds
@@ -135,7 +131,6 @@ class JQuiz {
 	 * */
 	pollsUsers(uri, opts, onLoad, errCtx) {
 		let {pollIds, states} = opts;
-		// FIXME any better style?
 		let opt = {};
 		opt[QuizProtocol.pollIds] = pollIds;
 		opt[QuizProtocol.states] = states;
@@ -165,13 +160,13 @@ class JQuiz {
 		return this.serv(uri, QuizProtocol.A.list, conds, onLoad, errCtx);
 	}
 
-	/**
+	/**Insert a quiz (deprecated?)
 	 * @param {string} uri
 	 * @param {object} hooked { quiz: {qtitle, tags, subject, quizinf}, questions, quizUsers }
 	 * @param {function} onOk
 	 * @param {AnContext.error} errCtx
 	 */
-	insert(uri, hooked, onOk, errCtx) {
+	insertQuiz(uri, hooked, onOk, errCtx) {
 		let that = this;
 		let {quiz, questions, quizUsers} = hooked;
 		let date = new Date();

@@ -1,0 +1,18 @@
+{
+  "include": ["."],
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "ts"
+  },
+  "exclude": [
+    "<node_internals>/**",
+    "dist/**",
+    "test/**",
+    "*.config.js",
+    "ts/**"
+  ]
+}

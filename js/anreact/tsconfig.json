@@ -1,0 +1,14 @@
+{
+  "include": ["."],
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "target": "es5",
+    "outDir": "ts",
+
+    "jsx": "react",
+    "esModuleInterop": true
+  },
+  "exclude": [ "dist", "*.ts", "ts/*", "*.tsx" ]
+}

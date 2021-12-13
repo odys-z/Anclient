@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import { Protocol, UserReq, SessionClient, AnClient } from '@anclient/semantier'
+import { Protocol, UserReq, SessionClient, AnClient } from '@anclient/semantier-st'
 import {L, Langstrs, AnConst,
     AnContext, AnError, CrudCompW, AnReactExt,
 	AnTablist
@@ -13,16 +13,18 @@ import {L, Langstrs, AnConst,
 import { CenterProtocol, CenterResp } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
 import { myMsgFromIssuer } from '../../common/mui-helpers';
+import { starTheme } from '../../common/star-theme';
 
-const styles = (theme) => ( {
-	root: {
-	}
-} );
+const { CRUD } = Protocol;
+
+const styles = (theme) => Object.assign(starTheme(theme), theme => {
+	root: {}
+});
 
 class MyStatusComp extends CrudCompW {
 	state = {
 		my: [],
-		selectedIds: []
+		selected: {ids: new Set()}
 	};
 
 	constructor(props) {
@@ -50,17 +52,16 @@ class MyStatusComp extends CrudCompW {
 			(resp) => {
 				let centerResp = resp.Body()
 				that.setState({my: centerResp.my()});
-				that.state.selectedIds.splice(0);
+				that.state.selected.ids.clear();
 			},
 			this.context.error);
 	}
 
 	onSelectChange(opt) {
-		let {e, selectedIds, val} = opt;
-		if (selectedIds)
-		 	this.quizForm = (
-				<></>
-			);
+		// if (selectedIds)
+		//  	this.quizForm = (
+		// 		<></>
+		// 	);
 	}
 
 	render () {
@@ -71,7 +72,7 @@ class MyStatusComp extends CrudCompW {
 				<Typography color='secondary' >
 					{L('Your have {tasks} {quiz} to finish.', {tasks, quiz: tasks > 1 ? 'quizzes' : 'quiz'})}
 				</Typography>
-				<AnTablist pk='qid'
+				<AnTablist pk='qid' selected={this.state.selected}
 					className={classes.root}
 					columns={[
 						{ text: L('dump'), hide: true, field: "checked" },
@@ -84,7 +85,6 @@ class MyStatusComp extends CrudCompW {
 					]}
 					rows={this.state.my.polls}
 					onSelectChange={this.onTableSelect} />
-					{this.quizForm}
 				</>
 			}
 		</>);

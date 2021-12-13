@@ -1,5 +1,4 @@
 import React from 'react';
-	import ReactDOM from 'react-dom';
 	import { withStyles } from '@material-ui/core/styles';
 	import withWidth from "@material-ui/core/withWidth";
 	import PropTypes from "prop-types";
@@ -10,26 +9,11 @@ import React from 'react';
 	import ListItemIcon from '@material-ui/core/ListItemIcon';
 	import ListItemText from '@material-ui/core/ListItemText';
 	import Collapse from '@material-ui/core/Collapse';
-	import Grid from '@material-ui/core/Grid';
-	import Typography from '@material-ui/core/Typography';
-	import Add from '@material-ui/icons/Add';
-	import Edit from '@material-ui/icons/Edit';
-	import DraftsIcon from '@material-ui/icons/Drafts';
-	import InboxIcon from '@material-ui/icons/MoveToInbox';
-	import SendIcon from '@material-ui/icons/Send';
-	import ExpandLess from '@material-ui/icons/ExpandLess';
-	import ExpandMore from '@material-ui/icons/ExpandMore';
-	import StarBorder from '@material-ui/icons/StarBorder';
-	import Sms from '@material-ui/icons/Sms';
-	import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-	import FormControlLabel from '@material-ui/core/FormControlLabel';
-	import Checkbox from '@material-ui/core/Checkbox';
-	import TextField from '@material-ui/core/TextField';
 	import Button from '@material-ui/core/Button';
 	import Box from '@material-ui/core/Box';
 
-import { Protocol } from '@anclient/semantier';
-import { L, AnContext, DetailFormW, DatasetCombo, RecordForm } from '@anclient/anreact';
+import { Protocol } from '@anclient/semantier-st';
+import { L, AnContext, DetailFormW, DatasetCombo, TRecordForm } from '@anclient/anreact';
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
 import { QuizUserForm } from './quiz-users';
@@ -300,7 +284,7 @@ class QuizEditorComp extends DetailFormW {
 					>{L('Change Target Users')}</Button>
 				</ListItem>
 				<Collapse in={this.state.openHead} timeout="auto" >
-
+					{/*FIXME let's deprecate RecordForm */}
 					<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
 						stateHook={this.quizHook}
 						fields={[ { field: 'qid', label: '', hide: true },
@@ -310,16 +294,8 @@ class QuizEditorComp extends DetailFormW {
 							      { field: 'quizinfo', label: L('Description'), grid: {sm: 12, lg: 12} }
 							]}
 						record={{qid: this.state.quizId, ... this.state.quiz }} />
-
 				</Collapse>
-
 				{this.items(classes)}
-
-				{/*
-				<ListItem key="b" button>
-					<ListItemIcon onClick={this.onAdd} ><Add /></ListItemIcon>
-					<ListItemText primary="New Question" onClick={this.onAdd} />
-				</ListItem>*/}
 			</List>
 			{this.quizUserForm}
 		  </>

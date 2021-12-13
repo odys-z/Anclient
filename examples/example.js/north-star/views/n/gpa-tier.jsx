@@ -1,23 +1,19 @@
 
-// FOR TEST
-// import { Protocol, AnsonResp, AnsonBody } from '../../../node_modules/anclient/lib/protocol.js';
-import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier-st';
 
 export class GPATier extends Semantier {
 	port = 'gpatier';
 	client = undefined;
-	// uri = undefined;
-	kids = [
-		{name: 'Alice Zhou', id: 'alice'},
-		{name: 'George Zhang', id: 'george'},
-		{name: 'James Hu', id: 'james'},
-	];
+	// kids = [
+	// 	{name: 'Alice Zhou', id: 'alice'},
+	// 	{name: 'George Zhang', id: 'george'},
+	// 	{name: 'James Hu', id: 'james'},
+	// ];
 	rows = [{date: 'yyyy', alice: 3, george: 5, james: 5}];
 	ths_ = [];
 
 	constructor(comp) {
 		super(comp);
-		// this.uri = comp.uri || comp.props.uri;
 	}
 
 	setContext(context) {

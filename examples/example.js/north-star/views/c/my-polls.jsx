@@ -1,24 +1,26 @@
 
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
-import { Card, Button, Typography } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 
-import { Protocol, UserReq, SessionClient, AnClient } from '@anclient/semantier'
+import { UserReq } from '@anclient/semantier-st'
 import {
-	L, Langstrs, AnConst,
-    AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablistLevelUp
+	L, AnConst,
+    AnContext, CrudCompW, AnTablist, AnQueryst
 } from '@anclient/anreact';
 
+import { starTheme } from '../../common/star-theme';
 import { CenterProtocol } from '../../common/protocol.quiz';
 import { myMsgFromIssuer } from '../../common/mui-helpers';
 import { CarouselQuiz } from './carousel-quiz';
 
-const styles = (theme) => ( {
-	root: {
-	}
-} );
+const styles = (theme) => Object.assign(starTheme(theme),
+	(theme) => ( {
+		root: {
+		}
+	} )
+);
 
 /**
  * This component uses children's level upped state to collect question cards' data.
@@ -34,9 +36,9 @@ class MyPollsComp extends CrudCompW {
 					sqlArgs: undefined, //['pollee-id', 'pollee-role', 'issuer-role'],
 					options: [ AnConst.cbbAllItem ],
 					label: L('Issuers') },
-		condWait: { type: 'switch', val: true, label: L('Only Waiting') },
+		condWait: { type: 'switch', val: true, label: L('Has waitings') },
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 		waitingPollIds: new Set(),
 	};
 
@@ -80,7 +82,7 @@ class MyPollsComp extends CrudCompW {
 				let centerResp = resp.Body()
 				let polls = centerResp.polls();
 				that.setState({polls});
-				that.state.selected.Ids.clear(0);
+				that.state.selected.ids.clear(0);
 
 				// reset flags
 				let myTaskIds = centerResp.myTaskIds();
@@ -96,7 +98,7 @@ class MyPollsComp extends CrudCompW {
 		let that = this;
 		this.quizForm = (
 			<CarouselQuiz uri={this.uri}
-				pollId={[...this.state.selected.Ids][0]} // load by itself
+				pollId={[...this.state.selected.ids][0]} // load by itself
 				// quiz are loaded by CarouselQuizComp, so committed by itself
 				onSubmit={() => {that.quizForm = undefined;}} // no thanks?
 				onClose={ () => {that.quizForm = undefined;}}
@@ -110,7 +112,7 @@ class MyPollsComp extends CrudCompW {
 		let tasks = this.state.waitingPollIds.size;
 		return (<>
 			{ this.state.condIssr.sqlArgs && // must load userId before reandering issuers cbb.
-			  <AnQueryForm uri={this.uri}
+			  <AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTitl, this.state.condTags, this.state.condIssr, this.state.condWait ]}
 				query={ (q) => { return {
@@ -121,26 +123,25 @@ class MyPollsComp extends CrudCompW {
 				}} }
 			/>}
 
-			<Typography color='secondary' >
-				{ tasks > 0 ? L('Your have {tasks} {quiz} to finish.',
+			<Typography color='secondary' className={classes.smalltip}>
+				{ tasks > 0 ? L('Your have {tasks} {quiz} to complete.',
 								{tasks, quiz: tasks > 1 ? 'quizzes' : 'quiz'})
 				  : ""}
 			</Typography>
 			<Button variant="outlined" color='secondary'
 				onClick={this.takePoll}
-				disabled={this.state.selected.Ids.size <= 0 ||
-						!this.state.waitingPollIds.has([...this.state.selected.Ids][0] ) }
+				disabled={this.state.selected.ids.size <= 0 ||
+						!this.state.waitingPollIds.has([...this.state.selected.ids][0] ) }
 			> {L('Take Poll')}
 			</Button>
-			<AnTablistLevelUp pk='pid' checkbox singleCheck
-				selectedIds={this.state.selected}
+			<AnTablist selected={this.state.selected}
+				pk='pid' checkbox singleCheck
 				className={classes.root}
 				columns={[
 					{ text: L('chk'), hide: true, field: "checked" },
 					{ text: L('pid'), hide: true, field: "pid" },
-					{ text: L('Title'), field: "title", color: 'primary', className: 'bold'},
 					{ text: L('Title'), field: "title", color: 'primary' },
-					{ text: L('Questions'), field: "questions", color: 'primary' },
+					{ text: L('Tag/Subject'), field: "subject", color: 'primary' },
 					{ text: L('Message'), field: "extra", formatter: myMsgFromIssuer, color: 'primary' }
 				]}
 				rows={polls}

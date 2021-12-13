@@ -11,7 +11,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { Protocol } from '@anclient/semantier';
+import { Protocol, CRUD } from '@anclient/semantier-st';
 import { L, isEmpty, AnContext, DetailFormW, DatasetCombo, ConfirmDialog } from '@anclient/anreact';
 import { JQuiz } from '../../common/an-quiz.js';
 import { QuizEditor } from './quiz-editor';
@@ -31,11 +31,14 @@ class QuizFormComp extends DetailFormW {
 
 	constructor (props) {
 		super(props);
+
+		console.error("Won't work! Quiz form & editor is deprecated (by QuizsheetComp)...");
+
 		this.editorHook = {state: undefined};
 
-		this.state.crud = props.c ? Protocol.CRUD.c
-						: props.u ? Protocol.CRUD.u
-						: Protocol.CRUD.r;
+		this.state.crud = props.c ? CRUD.c
+						: props.u ? CRUD.u
+						: CRUD.r;
 		// this.state.creating = props.creating;
 		this.state.quizId = props.quizId
 		if (props.u && !props.quizId) throw new Error("Semantics Error!");
@@ -64,7 +67,7 @@ class QuizFormComp extends DetailFormW {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={false} open
+				ok={L('OK')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
 		this.setState({});
@@ -80,15 +83,15 @@ class QuizFormComp extends DetailFormW {
 		this.setState.quiz = state.quiz;
 		this.setState.questions = state.questions;
 
-		if ( that.state.crud === Protocol.CRUD.c ) {
-			this.jquiz.insert(this.props.uri, state,
+		if ( that.state.crud === CRUD.c ) {
+			this.jquiz.insertQuiz(this.props.uri, state,
 				(resp) => {
 					let {quizId, title} = JQuiz.parseResp(resp);
 					if (isEmpty(quizId))
 						console.error ("Something Wrong!");
 					state.quiz.qid = quizId;
 					Object.assign(this.state, state);
-					that.state.crud = Protocol.CRUD.u;
+					that.state.crud = CRUD.u;
 					that.alert(L("New quiz created!\n\nQuiz Title: {title}", {title}));
 				});
 		}
@@ -131,7 +134,7 @@ class QuizFormComp extends DetailFormW {
 						stateHook={this.editorHook} {...props}
 						title={title}
 						quizId={props.quizId}
-						creating={this.state.crud === Protocol.CRUD.c}
+						creating={this.state.crud === CRUD.c}
 						questions={this.state.questions}
 						onDirty={this.onDirty} />
 				</DialogContent>

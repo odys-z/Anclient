@@ -8,34 +8,21 @@ including:
 
 the java client.
 
-* anclient.js,
+* @anclient/semantier,
 
-the low level js client API for accessing service at jerver.sample.
+Semantier is short for Semantics Tier, a low level js client API for accessing service
+providen by semantic-jserver.
 
-It's for other presentation tier extension, such as HandsonTable, which is also
-been used in commercial project. All the clients are tested together with
-jserv.sample (All? Not True) and can be configured to a different jserv service.
+Since 0.9.42, it's ported to Typescript, with types for better user experience with
+support of VS Code Intellisense. 
 
-* anclient.js.easui,
+* @anclient/anreact,
 
-the `JQuery EasyUI <https://www.jeasyui.com/index.php>`_ API lib that take care
-of communicating with semantic-\*, binding UI widgets, based on anclient.js.
-
-The EasyUI version is implemented as a basic enterprise webapp's client, including
-a role based function privilege management and a cheap workflow extension. It's
-a good starting point for a commercial webapp.
+A presentation tier package for accessing semantier API, built on Material UI + ReactJS.
 
 * anclient.cs,
 
 the planned c# client.
-
-* anclient.js.vue,
-
-the planned vue components can communicate with sematic-\*, based on anclient.js.
-
-The sample project's client side located in the anclient/test folder.
-
-.. _anclient-quickstart-js:
 
 JS Quick Start
 ==============
@@ -51,60 +38,9 @@ Say, :ref:`jsample<jsample-quick-start>`.
 
 It's a npm package::
 
-    npm install --save-dev anclient
+    npm install react react-dom
+    npm install @anclient/semantier @anclient/anreact
 
 3. Create a client
 
-The client is based upon the plain js API.
-
-.. code-block:: javascript
-
-    // initialize a client of jsample
-    var $J = new $J();
-    $J.init(null, "http://127.0.0.1:8080/jsample");
-
-    var ssClient;
-
-    function login() {
-        $J.login(
-            "admin", // user name
-            "",      // password (won't sent on line - already set at server)
-            // callback parameter is a session client initialized with session token
-            // client.ssInf has session Id, token & user information got from server
-            function(client){
-                ssClient = client;
-                console.log(ssClient.ssInf);
-                query();
-            });
-    }
-
-    /** Create a query request and post back to server. */
-    function query(conn) {
-        var req = ssClient.query(conn, "a_user", "u", {page: 0, size: 20});
-        req.body[0]
-            .expr("userName", "un").expr("userId", "uid").expr("roleName", "role")
-            .j("a_roles", "r", "u.roleId = r.roleId")
-            .whereCond("=", "u.userId", "'admin'");
-
-        $J.post(req,
-            // success callback. resp is a server message
-            function(resp) {
-                console.log(resp);
-            });
-    }
-..
-
-It's doing 3 things:
-
-1. create a client of jsample
-
-2. login with the user's login name and password
-
-The session is managed by Semantic.jserv and Anclient together. Each user's action
-will touch the time stamp at jserv's session information. If user stop action for
-a time (configured at server side), the session will expired
-
-3. query the user's basic information (role)
-
-The query is a simple SQL example. It's wrapped by upper widget binding layer to
-produce automatic data bindings.
+See Anclient/js/test/jsample/dist/main.html

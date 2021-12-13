@@ -2,7 +2,7 @@
 // import { Protocol, AnsonResp, AnsonBody } from '../../node_modules/anclient/lib/protocol.js';
 // import { L } from '../../node_modules/anclient/lib/utils/langstr.js';
 // for jsample, use
-import { Protocol, AnsonResp, AnsonBody } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonBody } from '@anclient/semantier-st';
 import { L } from '@anclient/anreact';
 
 export class QuizReq {

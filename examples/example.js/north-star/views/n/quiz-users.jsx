@@ -11,7 +11,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { AnClient, SessionClient, Protocol, AnsonResp } from '@anclient/semantier';
+import { AnClient, SessionClient, Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt,
     AnTablist
@@ -26,7 +26,7 @@ class QuizUserFormComp extends CrudCompW {
 	state = {
 		title: '',
 		rows: [],
-		selectedIds: [],
+		selected: {ids: new Set()},
 	};
 
 	constructor(props) {
@@ -40,7 +40,7 @@ class QuizUserFormComp extends CrudCompW {
 		if (e) e.stopPropagation();
 
 		if (this.props.onClose)
-			this.props.onSave([...this.state.selectedIds]);
+			this.props.onSave([...this.state.selected.ids]);
 	}
 
 	toClose(e) {
@@ -50,8 +50,6 @@ class QuizUserFormComp extends CrudCompW {
 	}
 
 	onTableSelect(selectedIds) {
-		this.setState({selectedIds});
-		console.log(selectedIds);
 	}
 
 	componentDidMount() {
@@ -59,7 +57,7 @@ class QuizUserFormComp extends CrudCompW {
 		this.props.jquiz.quizUsers(
 			{ uri: this.props.uri,
 			  quizId: this.props.quizId,
-			  isNew: this.props.crud === Protocol.CRUD.c
+			  isNew: this.props.crud === CRUD.c
 			},
 			resp => {
 				let users = resp.Body().quizUsers;
@@ -87,7 +85,7 @@ class QuizUserFormComp extends CrudCompW {
 				<DialogTitle id="t-quizusers">{this.state.title}</DialogTitle>
 
 				<DialogContent>
-					<AnTablist
+					<AnTablist selected={this.state.selected}
 						className={classes.root} checkbox={true} paging={false}
 						columns={[
 							{ text: L(''), field:"checked" },  // first field as checkbox

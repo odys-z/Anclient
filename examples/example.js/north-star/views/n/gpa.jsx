@@ -12,7 +12,7 @@ import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { Protocol, AnsonBody, AnsonResp } from '@anclient/semantier';
+import { Protocol, AnsonBody, AnsonResp } from '@anclient/semantier-st';
 import { L, isEmpty,
 	AnContext, DatasetCombo, ConfirmDialog, CrudComp,
 	jsample, Overlay, AnGridsheet, AnNumericEdit, AnIndicatorRenderer
@@ -23,7 +23,7 @@ import { GPATier, GPAReq, GPAResp } from './gpa-tier'
 
 const styles = (theme) => ({
 	root: {
-		height: "calc(100vh - 12ch)"
+		height: "calc(100vh - 18ch)"
 	},
 	actionButton: {
 	}
@@ -141,7 +141,7 @@ class GPAsheetComp extends CrudComp {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={false} open
+				ok={L('OK')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
 		this.setState({});

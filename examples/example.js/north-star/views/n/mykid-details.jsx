@@ -11,7 +11,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol } from '@anclient/semantier';
+import { Protocol } from '@anclient/semantier-st';
 import { L, AnConst,
 	AnContext, AnError,
 	DetailFormW, ConfirmDialog,
@@ -149,7 +149,7 @@ class KidDetailstComp extends DetailFormW {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={false} open
+				ok={L('OK')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
 		this.setState({});

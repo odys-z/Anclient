@@ -154,6 +154,7 @@ describe('case: [02.0 dataset + s-tree]', () => {
 					  "uid": "admin", "roleId": null, "ssid": "001eysTj"
 					} as SessionInf;
 		let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
+
 		let semantier = new Semantier({uri: 'test'});
 		semantier.rels = [{a_role_func: []}];
 

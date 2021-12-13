@@ -2,17 +2,17 @@
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Card, TextField, Typography, Grid, Button } from '@material-ui/core';
+import { Typography, Grid, Button } from '@material-ui/core';
 
-import { Protocol, UserReq } from '@anclient/semantier';
+import { UserReq } from '@anclient/semantier-st';
 import {
-    L, Langstrs,
-    AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryForm, AnTablistLevelUp, DatasetCombo, ConfirmDialog, jsample
+    L,
+    AnConst, AnContext, CrudCompW, AnQueryst,
+	AnTablist, DatasetCombo, ConfirmDialog, jsample
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
+import { QuizProtocol } from '../../common/protocol.quiz.js';
 import { Quizsheet } from './quizsheet-ag';
 import { QuizForm } from './quiz-form';
 
@@ -20,9 +20,9 @@ const styles = (theme) => ( {
 	root: {
 		margin: theme.spacing(1),
 	},
-	tip: {
-		margin: theme.spacing(1)
-	},
+	// tip: {
+	// 	margin: theme.spacing(1)
+	// },
 	button: {
 		height: '2.4em',
 		verticalAlign: 'middle',
@@ -41,7 +41,7 @@ class QuizzesComp extends CrudCompW {
 		condTags: { type: 'text', val: '', label: L('Tags')},
 		condDate: { type: 'date', val: '', label: L('Create Date')},
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 	};
 
 	funcName = L('North - Quizzes');
@@ -77,14 +77,14 @@ class QuizzesComp extends CrudCompW {
 
 		this.context.anReact.bindTablist(queryReq, this, this.context.error);
 
-		this.state.selected.Ids.clear();
+		this.state.selected.ids.clear();
 	}
 
 	refresh() {
 		if (this.state.queryReq)
 			this.context.anReact.bindTablist(this.state.queryReq, this, this.context.error);
 
-		this.state.selected.Ids.clear();
+		this.state.selected.ids.clear();
 	}
 
 	/** Both this & QuizUserStartComp use this function - let's change to server side later.
@@ -124,9 +124,9 @@ class QuizzesComp extends CrudCompW {
 	onTableSelect(rowIds) {
 		this.setState( {
 			buttons: {
-				add: this.state.buttons.add,
-				stop: rowIds && rowIds.size === 1,
-				del: rowIds &&  rowIds.size >= 1,
+				add : this.state.buttons.add,
+				stop: rowIds && rowIds.length === 1,
+				del : rowIds &&  rowIds.length >= 1,
 			},
 		} );
 	}
@@ -134,12 +134,12 @@ class QuizzesComp extends CrudCompW {
 	toDel(e, v) {
 		let that = this;
 		let txt = L('Totally {count} records will be deleted. Are you sure?',
-				{count: that.state.selected.Ids.size});
+				{count: that.state.selected.ids.size});
 		this.confirm =
 			(<ConfirmDialog open={true}
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
-				onOk={ () => { this.del(that.state.selected.Ids); } }
+				onOk={ () => { this.del(that.state.selected.ids); } }
 				onClose={ () => {that.confirm === undefined} }
 			/>);
 	}
@@ -156,14 +156,14 @@ class QuizzesComp extends CrudCompW {
 		let that = this;
 		client.commit(req,
 			(resp) => {
-				that.state.selected.Ids.clear();
+				that.state.selected.ids.clear();
 				that.confirm =
 					(<ConfirmDialog open={true}
 						ok={L('OK')} cancel={false}
 						title={L('Info')} msg={L('Quiz Deleted.')}
 						onOk={ () => {
 							that.confirm = undefined;
-							that.state.selected.Ids.clear();
+							that.state.selected.ids.clear();
 							that.refresh();
 						} }
 					/>);
@@ -194,7 +194,7 @@ class QuizzesComp extends CrudCompW {
 
 	toEdit(e, v) {
 		let that = this;
-		let qid = this.state.selected.Ids;
+		let qid = this.state.selected.ids;
 		if (qid.size === 0)
 			console.error("Something wrong!");
 		else {
@@ -217,7 +217,7 @@ class QuizzesComp extends CrudCompW {
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		return ( <>{this.funcName}
-			<AnQueryForm uri={this.uri}
+			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
 				query={ (q) => { return {
@@ -244,10 +244,10 @@ class QuizzesComp extends CrudCompW {
 					} }
 				/>
 
-				<Button variant="contained" disabled={!btn.add}
+				{/* <Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAddA}
 					startIcon={<JsampleIcons.ItemCollapse />}
-				>{L('Start')}</Button>
+				>{L('Start')}</Button> */}
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAddB}
 					startIcon={<JsampleIcons.Worksheet />}
@@ -262,8 +262,7 @@ class QuizzesComp extends CrudCompW {
 				>{L('Delete')}</Button>
 			</Grid>
 
-			<AnTablistLevelUp
-				selectedIds={this.state.selected}
+			<AnTablist selected={this.state.selected}
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
 					{ text: L('qid'), hide:1, field: "qid" },

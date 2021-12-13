@@ -12,17 +12,18 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { Protocol } from '@anclient/semantier';
+import { Protocol } from '@anclient/semantier-st';
 import { L, AnConst,
 	AnContext, AnError,
 	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree
 } from '@anclient/anreact';
 
+import { starTheme } from '../../common/star-theme';
 import { DocsTier } from './docshares';
 
 const { CRUD } = Protocol;
 
-const styles = (theme) => ({
+const DocshareStyle = (theme) => ({
 	dialogPaper: {
   	  height: "100%"
     },
@@ -49,14 +50,10 @@ const styles = (theme) => ({
       "& > button": {
         width: "20ch"
     },
-	smalltip: {
-		fontSize: "0.3em",
-		padding: 0,
-		marging: 0,
-		color: "#006",
-	}
   },
 });
+
+const styles = (theme) => Object.assign(starTheme(theme), DocshareStyle(theme));
 
 /**
  * Tiered record form is a component for UI record layout, automaitcally bind data,
@@ -124,7 +121,7 @@ class DocshareDetailsComp extends DetailFormW {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
-				ok={L('Ok')} cancel={false} open
+				ok={L('OK')} cancel={false} open
 				onClose={() => {that.confirm = undefined;} }
 				msg={msg} />);
 		this.setState({});

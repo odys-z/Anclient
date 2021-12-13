@@ -1,18 +1,10 @@
 import React from 'react';
 import PropTypes from "prop-types";
 
-import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
-
 import { AgGridReact } from 'ag-grid-react';
-import { Overlay } from '../../patch/react-portal-overlay';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-
-// import { L, isEmpty, Protocol, AnContext, DatasetCombo, ConfirmDialog } from 'anclient';
-// import { JQuiz } from '../../common/an-quiz.js';
-import { L } from '../../utils/langstr';
 
 /**Thin wrapper of ag-grid.
  * For ag-grid practice, go

@@ -1,19 +1,27 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.2.6",
+  "version": "0.3.54",
   "description": "Anclient built on ReactJs.",
-  "main": "./src/an-components.js",
+  "main": "./src/an-components.ts",
   "directories": {
     "src": "src",
     "test": "test"
   },
   "scripts": {
     "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
+    "build": "webpack-cli",
     "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
+  },
+  "types": {
+    "name": "@anclient/anreact",
+    "author": "ody-zhou",
+    "version": "3.0.0",
+    "main": "./src/an-components.js",
+    "types": "./ts/src/an-components.d.ts"
   },
   "keywords": [
     "anclient",
-    "react"
+    "semantics-* client"
   ],
   "author": "Ody Zhou",
   "license": "MIT",
@@ -24,10 +32,8 @@
     "ag-grid-react": "^26.0.0",
     "core-js": "^3.17.1",
     "emotion": "^11.0.0",
-    "qrcode": "^1.4.4",
-    "react-elastic-carousel": "^0.11.5",
-    "react-portal-overlay": "^1.1.0",
-    "tar": "^4.4.19"
+    "mime-types-no-nodejs": "^0.9.1",
+    "react-elastic-carousel": "^0.11.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.15.4",
@@ -36,19 +42,17 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.15.0",
     "@emotion/babel-preset-css-prop": "^11.2.0",
-    "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "babel-loader": "^8.2.2",
     "babel-plugin-syntax-jsx": "^6.18.0",
     "babel-preset-env": "^1.7.0",
     "css-loader": "^2.1.1",
-    "d3": "^7.0.1",
-    "jquery": "^3.6.0",
     "jsdoc": "^3.6.7",
     "postcss-loader": "^3.0.0",
-    "react-svg-loader": "^3.0.3",
+    "react-svg-loader": "^3.0.0",
     "sass-loader": "^7.3.1",
-    "style-loader": "^0.23.1"
+    "style-loader": "^0.23.1",
+    "webpack-cli": "^4.9.0"
   }
 }

@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier';
+import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier-st';
 import { L, toBool,
     AnContext, AnError, CrudCompW, AnTablist, AnQueryst,
 	jsample
@@ -30,10 +30,9 @@ class MyStudentsComp extends UserstComp {
 		rows: [],
 		query: undefined,
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 		buttons: {add: true, edit: false, del: false},
 
-		selected: {Ids: new Set()}
 	};
 
 	tier = undefined;
@@ -65,7 +64,7 @@ class MyStudentsComp extends UserstComp {
 
 	toEdit() {
 		let that = this;
-		let pkv = [...this.state.selected.Ids][0];
+		let pkv = [...this.state.selected.ids][0];
 		this.tier.pkval = pkv;
 		this.recForm = (<KidDetailst crud={Protocol.CRUD.u}
 			uri={this.uri}
@@ -100,11 +99,10 @@ class MyStudentsComp extends UserstComp {
 				>{L('Delete')}</Button>
 			</Box>
 
-			{tier && <AnTablist pk={tier.pk}
+			{tier && <AnTablist pk={tier.pk} selected={this.state.selected}
 				className={classes.root} checkbox={true}
 				columns={tier.columns()}
 				rows={tier.rows}
-				selectedIds={this.state.selected}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
@@ -124,7 +122,7 @@ class MyStudentsQuery extends React.Component {
 		{ name: 'classId', type: 'cbb',  val: '', label: L('Class'),
 		  sk: Protocol.sk.cbbMyClass, nv: {n: 'text', v: 'nid'}, validate: {notNull: true}},
 		{ name: 'studentName', type: 'text', val: '', label: L('Student') },
-		{ name: 'hasTasks', type: 'switch',  val: false, label: L('Tasks to do') },
+		{ name: 'hasTasks', type: 'switch',  val: false, label: L('with polls to do') },
 	];
 
 	constructor(props) {
@@ -134,7 +132,7 @@ class MyStudentsQuery extends React.Component {
 
 	collect() {
 		return {
-			orgId    : this.conds[0].val && this.conds[0].v ? this.conds[0].val.v: undefined,
+			orgId    : this.conds[0].val ? this.conds[0].val.v : undefined,
 			userName : this.conds[1].val ? this.conds[1].val : undefined,
 			hasTodos : this.conds[2].val ? this.conds[2].val : false };
 	}
@@ -186,30 +184,4 @@ class MyKidsTier extends UsersTier {
 		super(comp);
 	}
 
-	// columns() {
-	// 	return [
-	// 		{ text: L('Log ID'), field: 'userId', checked: true },
-	// 		{ text: L('User Name'), field: 'userName' },
-	// 		{ text: L('Class'), field: 'nebula' },
-	// 		{ text: L('Todos'), field: 'todos' } ];
-	// }
-
-	// records(conds, onLoad) {
-	// 	if (!this.client) return;
-	//
-	// 	let client = this.client;
-	// 	let that = this;
-	//
-	// 	let req = client.userReq(this.uri, this.port,
-	// 				new UserstReq( this.uri, conds )
-	// 				.A(UserstReq.A.records) );
-	//
-	// 	client.commit(req,
-	// 		(resp) => {
-	// 			let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-	// 			that.rows = rows;
-	// 			onLoad(cols, rows);
-	// 		},
-	// 		this.errCtx);
-	// }
 }

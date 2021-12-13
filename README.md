@@ -1,11 +1,27 @@
-
 # About
 
-Clients of semantic-\*. Including a Java and Javascript version. The C# version is in intensive development.
+Clients of semantic-\*. Including a Java and Javascript version. The C# version
+is also been verified.
+
+- Anclient.js
+
+@anclient/semantier-st:
+[![npm](https://img.shields.io/npm/v/@anclient/semantier-st?logo=npm)](https://npmjs.org/package/@anclient/semantier-st)
+(sunsetting js version: @anclient/semantier
+[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier))
+
+together with
+
+@anclient/anreact:
+[![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
+
+- VS Code extension
+
+Anprism: [![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
 
 # Repository Structure
 
-This repository has multiple clients, all of which can work independently.
+This repository has multiple clients, it's planed all can work independently.
 
 With the protocol based on json, we are planning to implement the clients:
 
@@ -21,10 +37,6 @@ The Visual Studio solution is
 
 There are 3 clients in the solution:
 
-- csharp
-
-The c# version of anclient.
-
 - java
 
 Java client (not for Android yet)
@@ -32,6 +44,8 @@ Java client (not for Android yet)
 - js
 
 js client API depending on jquery. The test project is using React.
+
+Check js/test & examples/example.js for running tests and examples.
 
 # Examples
 
@@ -41,7 +55,7 @@ js client API depending on jquery. The test project is using React.
 
  -- North Star
 
-    Example using Anclient + React. (No npm package avialable, see branch issue-13991 readme)
+    Example using Anclient + React.
 
 - example.cs
 
