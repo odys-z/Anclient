@@ -1,9 +1,7 @@
 
-import { DatasetierReq } from '@anclient/semantier-st/protocol';
-import { expect, assert } from 'chai'
-import { SessionClient, SessionInf } from '../anclient';
+import { assert } from 'chai'
 
-import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp, InsertReq} from '../protocol';
+import {AnsonMsg, InsertReq} from '../protocol';
 import { Semantier } from '../semantier';
 
 const dstier1 = {
@@ -285,7 +283,6 @@ const relationRoleFuncs = [
 	"id": "c01"
   }
 ];
-
 
 describe('case: [05.0 dataset + s-tree]', () => {
 	it('[protocol] checkTree -> relation records', () => {
