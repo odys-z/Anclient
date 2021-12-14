@@ -62,7 +62,7 @@ export interface FKRelation {
 	/**chiled table pk */
 	pk: string,
 
-	/**Child foreign column */
+	/**Child foreign column in DB table */
 	col: string,
 
 	/**value for col - column-map's key for where to get the value */
@@ -184,10 +184,10 @@ export class Protocol {
 
 	/**Extend new protocol - register new body type creater.
 	 * @function
-	 * @param {string} type body type
-	 * @param {function} bodyConstructor AnsonBody constructor
+	 * @param type body type
+	 * @param bodyConstructor AnsonBody constructor
 	 */
-	static registerBody = function(type, bodyConstructor) {
+	static registerBody = function(type: string, bodyConstructor: { (json: any): AnsonBody; } ) {
 		Protocol.ansonTypes[type] = bodyConstructor;
 	}
 
@@ -307,6 +307,7 @@ export class AnsonMsg<T extends AnsonBody> {
     opts: {};
     header: AnHeader;
     body: T[];
+	static __type__ = '';
 
 
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
@@ -316,7 +317,7 @@ export class AnsonMsg<T extends AnsonBody> {
 		return [];
 	}
 
-    constructor(json: any) {
+    constructor(json) {
 		if (typeof json !== 'object')
 			throw new Error("AnClient is upgraded, takes only one arg, the json obj.");
 
@@ -890,13 +891,16 @@ export class DeleteReq extends UpdateReq {
 }
 
 export class InsertReq extends UpdateReq {
-	type = "io.odysz.semantic.jserv.U.AnInsertReq";
+	static __type__ = "io.odysz.semantic.jserv.U.AnInsertReq";
+
+
     cols: Array<string>;
     nvss: any;
 
 	constructor (uri: string, tabl: string) {
 		super (uri, tabl, undefined);
 		this.a = CRUD.c;
+		this.type = InsertReq.__type__;
 	}
 
 	/**
@@ -926,15 +930,16 @@ export class InsertReq extends UpdateReq {
 	 * @param n
 	 * @param v
 	 * @return this*/
-	nv (n: string, v: string): InsertReq {
+	nv (n: string, v: string): this {
 		return this.valus(n, v);
 	}
 
 	/**Take exp as an expression
 	 * @param n
 	 * @param exp the expression string like "3 * 2"
-	 * @return {InsertReq} this*/
-	nExpr(n : string, exp : any) {
+	 * @return this
+	 **/
+	nExpr(n : string, exp : any): this {
         console.error("Bug!!");
 		return this.nv(n, exp);
 	}
@@ -949,7 +954,7 @@ export class InsertReq extends UpdateReq {
 	 * @param v value if n_row is name. Optional.
 	 * @return this
 	 */
-	valus (n_row : string | Array<string>, v : string) : InsertReq {
+	valus (n_row : string | Array<string>, v : string) : this {
 		if (this.nvss === undefined)
 			this.nvss = [];
 

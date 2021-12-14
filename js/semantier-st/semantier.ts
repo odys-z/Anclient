@@ -299,8 +299,6 @@ export class Semantier {
 			reltabl: string;
 			sqlArgs?: string[]; sqlArg?: string; } ,
 			onOk: OnCommitOk): void {
-		// if (!this.anReact)
-		// 	throw Error ("AnReact here is needed!");
 
 		let that = this;
 
@@ -318,16 +316,7 @@ export class Semantier {
 
 		let ds = {uri : this.uri,
 			sk, t, sqlArgs,
-			// onOk: (resp: AnsonMsg<AnDatasetResp>) => {
-			// 	that.rels = resp.Body().forest;
-			// 	onOk(resp);
-			// }
 		};
-
-		// onOk = onOk || ( (resp: AnsonMsg<AnDatasetResp>) => {
-		// 		that.rels = resp.Body().forest;
-		// 		onOk(resp);
-		// 	} )
 
 		Semantier.stree(ds, client,
 				(resp: AnsonMsg<AnDatasetResp>) => {
@@ -390,7 +379,8 @@ export class Semantier {
 			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
 
 		if (!disableRelations) 
-			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl], this.pkval);
+			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl],
+											crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
 
 		if (req)
 			client.commit(req,
@@ -517,7 +507,7 @@ export class Semantier {
 
 		let rows = [];
 
-		collectTree(forest, rows);
+		collectTree(forest[table], rows);
 
 		ins.nvRows(rows);
 		return ins;

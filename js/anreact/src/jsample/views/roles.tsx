@@ -217,7 +217,7 @@ const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
 
 class RoleTier extends Semantier {
 	checkbox = true;
-	rels = [];
+	// rels = [];
 
 	_cols = [
 		{ text: L('Role Id'),  field: "roleId", hide: true },
@@ -243,15 +243,17 @@ class RoleTier extends Semantier {
 
 		this.mtabl = 'a_roles';
 		this.pkval.pk = 'roleId';
-		this.reltabl = 'a_role_func';
+		// this.reltabl = 'a_role_func';
 
 		/**sk: role-funcs
 		 * Hard coded here since it's a business string for jsample app.
 		 */
-		this.rel = {'a_role_func':
+		this.relMeta = {'a_role_func':
 			{ fk: {
+				tabl: 'a_role_func',
 				pk: 'roleId',	 // fk to main table
-				col: 'funcId' }, // checking col
+				col: 'funcId', // checking col
+				relcolumn: 'nodeId' },// where is the data in UI 
 			sk: 'trees.role_funcs'
 			} as Semantics
 		};
