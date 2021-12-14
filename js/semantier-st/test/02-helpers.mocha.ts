@@ -1,4 +1,4 @@
-import { Semantier } from '@anclient/semantier-st/anclient';
+import { Semantier } from '../semantier';
 import { assert } from 'chai';
 
 import {ErrorCtx, SessionClient, SessionInf} from '../anclient';

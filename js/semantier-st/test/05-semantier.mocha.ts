@@ -1,9 +1,8 @@
 
-import { DatasetierReq } from '@anclient/semantier-st/protocol';
 import { expect, assert } from 'chai'
-import { SessionClient, SessionInf } from '../anclient';
+import { UpdateReq } from '../anclient';
 
-import {Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp, InsertReq} from '../protocol';
+import {Protocol, AnsonMsg, InsertReq} from '../protocol';
 import { Semantier } from '../semantier';
 
 const dstier1 = {
@@ -107,14 +106,13 @@ const relationRoleFuncs = [
 	"sort": "1",
 	"nodeId": "sys",
 	"parentId": ""
-	},
-	"parent": "",
-	"level": 0,
-	"id": "sys"
   },
-  {
-	"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-	"node": {
+  "parent": "",
+  "level": 0,
+  "id": "sys"
+},
+{ "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+  "node": {
 		"children": [
 			{
 				"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
@@ -207,14 +205,13 @@ const relationRoleFuncs = [
 		"sort": "2",
 		"nodeId": "n01",
 		"parentId": ""
-	},
-	"parent": "",
-	"level": 0,
-	"id": "n01"
   },
-  {
-	"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-	"node": {
+  "parent": "",
+  "level": 0,
+  "id": "n01"
+},
+{ "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+  "node": {
 		"children": [
 			{
 				"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
@@ -279,34 +276,53 @@ const relationRoleFuncs = [
 		"sort": "3",
 		"nodeId": "c01",
 		"parentId": ""
-	},
-	"parent": "",
-	"level": 0,
-	"id": "c01"
-  }
-];
+  },
+  "parent": "",
+  "level": 0,
+  "id": "c01"
+} ];
 
+Protocol.registerBody(InsertReq.__type__, (jsonBd) => {
+	return new InsertReq(jsonBd.uri, jsonBd.tabl);
+});
 
 describe('case: [05.0 dataset + s-tree]', () => {
-	it('[protocol] checkTree -> relation records', () => {
+	it('[semantics] checkTree -> relation records', () => {
 
+		console.log(Protocol.ansonTypes);
 		let semantier = new Semantier({uri: 'test'});
 		semantier.rels = relationRoleFuncs;
 
-		let req = new AnsonMsg<InsertReq>({})
+		let body = {type: InsertReq.__type__, uri: 'test-05'};
+		let req = new AnsonMsg<InsertReq>({body: [body]});
 
 		semantier.formatRel('test 05', req,
 					{fk: {tabl: 'a_role_func', pk: 'roleId', col: 'funcId', relcolumn: 'nodeId'}},
 					{pk: 'roleId', v: 'r00'});
 
-		let rf = req.Body();
-		console.log(rf);
+		let del = req.Body().postUpds[0] as UpdateReq;
 
-		assert.equal(rf.nvs.length, 2, 'records');
-		assert.equal(rf.nvs.length, 2, '[ funcId, sys ]');
-		assert.equal(rf.nvs[0][0], 'funcId', '[ funcId, ... ]');
-		assert.equal(rf.nvs[1][1], 'r00', '[ ..., r-001 ]');
-		assert.equal(rf.nvs[0][0], 'funcId', '[ funcId, ... ]');
-		assert.equal(rf.nvs[1][1], 'r00', '[ ..., r-001 ]');
+		let ins = del.postUpds[0] as InsertReq;
+		// console.log(ins);
+		let nvss = ins.nvss;
+		// console.log(nvss[0], nvss[1]);
+
+		assert.equal(del.type, 'io.odysz.semantic.jserv.U.AnUpdateReq', 'del');
+		assert.equal(del.a, 'D', 'del.a');
+
+		assert.equal(ins.type, 'io.odysz.semantic.jserv.U.AnInsertReq', 'ins');
+		assert.equal(ins.a, 'I', 'ins.a');
+
+		assert.equal(nvss.length, 6, 'nvss');
+		// [ [ 'funcId', 'sys-domain' ], [ 'roleId', 'r00' ] ] [ [ 'funcId', 'sys-role' ], [ 'roleId', 'r00' ] ]
+		assert.equal(nvss[0][0][0], 'funcId');
+		assert.equal(nvss[0][0][1], 'sys-domain');
+		assert.equal(nvss[0][1][0], 'roleId');
+		assert.equal(nvss[0][1][1], 'r00');
+
+		assert.equal(nvss[1][0][0], 'funcId');
+		assert.equal(nvss[1][0][1], 'sys-role');
+		assert.equal(nvss[1][1][0], 'roleId');
+		assert.equal(nvss[1][1][1], 'r00');
 	});
 });
