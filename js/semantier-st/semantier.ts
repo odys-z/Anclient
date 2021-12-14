@@ -450,10 +450,10 @@ export class Semantier {
 	 * @param uri 
 	 * @param req 
 	 * @param relation 
-	 * @param parentpk pk: field name, val: record id
+	 * @param parentpkv pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
-	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Semantics, parentpk: PkMeta ) : AnsonMsg<T> {
+	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Semantics, parentpkv: PkMeta ) : AnsonMsg<T> {
 		if (relation.stree || relation.m2m)
 			throw Error('TODO ...');
 
@@ -463,7 +463,7 @@ export class Semantier {
 		columnMap[rel.col] = rel.relcolumn; // columnMap[rel.col] = 'nodeId';
 
 		// semantics handler can only resulve fk at inserting when master pk is auto-pk
-		columnMap[parentpk.pk] = parentpk.v;
+		columnMap[parentpkv.pk] = parentpkv.v;
 
 		let insRels = this.inserTreeChecked(
 				this.rels as AnTreeNode[],
@@ -474,7 +474,7 @@ export class Semantier {
 				  reshape: true
 				} );
 
-		if (!parentpk.v) {
+		if (!parentpkv.v) {
 			if (req)
 				req.Body().post(insRels);
 			else
@@ -482,8 +482,8 @@ export class Semantier {
 		}
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
-			let del_rf = new DeleteReq(null, rel.tabl, rel.col)
-							.whereEq(rel.col, parentpk.v)
+			let del_rf = new DeleteReq(uri, rel.tabl, rel.col)
+							.whereEq(rel.col, parentpkv.v)
 							.post(insRels);
 
 			if (req)
