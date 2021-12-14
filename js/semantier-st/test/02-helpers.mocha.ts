@@ -2,7 +2,6 @@ import { Semantier } from '../semantier';
 import { assert } from 'chai';
 
 import {ErrorCtx, SessionClient, SessionInf} from '../anclient';
-// import {AnReact} from '../src/react/anreact';
 
 const checkBoxForest = [
   { "type":"io.odysz.semantic.DA.DatasetCfg$AnTreeNode",

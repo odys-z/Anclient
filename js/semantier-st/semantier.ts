@@ -507,7 +507,7 @@ export class Semantier {
 
 		let rows = [];
 
-		collectTree(forest[table], rows);
+		collectTree(forest, rows);
 
 		ins.nvRows(rows);
 		return ins;
