@@ -121,7 +121,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 	}
 
     toShowDetails(e: React.UIEvent): void {
-		this.tier.pkval = this.getByIx(this.state.selected.ids, 0);
+		this.tier.pkval.v = this.getByIx(this.state.selected.ids, 0);
         this.detailsForm = (
             <PollDetails uri={this.uri}
 				tier={this.tier}
@@ -289,7 +289,7 @@ class PollsTier extends Semantier {
 
 		let { pkval } = opts;
 
-		pkval = pkval || this.pkval ;
+		pkval = pkval || this.pkval.v ;
 		if (!pkval) {
 			console.warn("Calling record() with empty pk.");
 			return;

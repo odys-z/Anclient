@@ -17,3 +17,7 @@ export function starTheme(theme: Theme) {
 	},
   };
 };
+
+export interface StarTheme extends Theme {
+
+};

@@ -22,7 +22,8 @@ import { Docshares } from './views/n/docshares';
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
 import { MyDocs } from './views/c/my-docs';
-import { MyConnect } from './views/c/connect';
+import { PhotoGallery } from './views/c-tsx/photo-gallery';
+// import { MyConnect } from './views/c/connect';
 
 import { welcome } from './views/c-tsx/nwelcome';
 import { Northprops } from './common/north';
@@ -92,7 +93,8 @@ class App extends React.Component<Northprops, any> {
 			{path: '/c/status', comp: MyStatus },
 			{path: '/c/mypolls', comp: MyPolls },
 			{path: '/c/mydocs', comp: MyDocs},
-			{path: '/c/myconn', comp: MyConnect},
+			// {path: '/c/myconn', comp: MyConnect},
+			{path: '/c/myconn', comp: PhotoGallery },
 		] );
 	}
 
