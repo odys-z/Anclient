@@ -3,7 +3,7 @@ import { toBool } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, 
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, 
-	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, UserReq, PkMeta, NameValue, DatasetOpts, DatasetReq
+	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, UserReq, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -177,7 +177,7 @@ export class Semantier {
     /** current relations - the last loaded relation of this.rel (problem?)
 	 * Looks like all relationship records are item of main tree. 
 	 */
-    rels: any[];
+    rels: UIRelations = {};
 
     lastCondit: QueryConditions;
 
@@ -429,7 +429,7 @@ export class Semantier {
     resetFormSession(): void {
 		this.pkval.v = undefined;
 		this.rec = {};
-		this.rels = [];
+		this.rels = {};
 		this.crud = undefined;
     }
 
@@ -456,7 +456,7 @@ export class Semantier {
 		columnMap[parentpkv.pk] = parentpkv.v;
 
 		let insRels = this.inserTreeChecked(
-				this.rels as AnTreeNode[],
+				this.rels[rel.tabl] as AnTreeNode[],
 				{ table: rel.tabl,
 				  columnMap,
 				  check: 'checked',

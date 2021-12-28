@@ -91,6 +91,10 @@ export interface DbRelations {
     [tabl: string]: Semantics;
 }
 
+export interface UIRelations {
+    [tabl: string]: AnTreeNode[];
+}
+
 /**Issue: As pk fields is wrapped up at server side, should clients caring about the pk name?
  * example of this:
  * that.pkval.v = that.rec && that.rec[that.pk];
