@@ -1,0 +1,15 @@
+{
+  "name": "@anclient/example-album",
+  "version": "0.1.0",
+  "description": "photo gallery built on Anclient",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Anclient",
+    "example"
+  ],
+  "author": "Ody Zhou",
+  "license": "MIT"
+}
