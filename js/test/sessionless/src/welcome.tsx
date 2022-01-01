@@ -52,7 +52,6 @@ class WelcomeComp extends CrudComp<Comprops>{
 	}
 
 	icon(e: WelcomeRec) {
-		// return jsample.JsampleIcons[e.css?.icon || 'Star'] || jsample.JsampleIcons['Star']
 		let color = e.css?.important ? 'secondary' : 'primary';
 
 		return e.css?.type === 'auto'
@@ -98,7 +97,6 @@ class WelcomeComp extends CrudComp<Comprops>{
 	}
 }
 
-// FIXME ignoring eslint report report error before anreact upgraded to TS.
 export default withStyles<any, any, Comprops>(styles)(withWidth()(WelcomeComp));
 
 interface WelcomeRec extends Tierec {

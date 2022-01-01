@@ -11,6 +11,7 @@ import { AnConst } from '../utils/consts';
 import { toBool } from '../utils/helpers';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
+import { JsonServs } from '@anclient/anreact/src/react/reactext';
 
 export interface ClassNames {[c: string]: string};
 
@@ -134,7 +135,7 @@ export class AnReact {
 	 * } 
 	 */
 	static bindDom( elem: string, opts: AnreactAppOptions,
-				onJsonServ: (elem: string, opts: AnreactAppOptions, json: {}) => void) {
+				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
 		if (!opts.home) opts.home = 'main.html';
@@ -144,13 +145,13 @@ export class AnReact {
 				dataType: "json",
 				url: opts.jsonPath || 'private/host.json',
 			})
-			.done( (json: object) => onJsonServ(elem, opts, json) )
+			.done( (json: JsonServs) => onJsonServ(elem, opts, json) )
 			.fail( (e: any) => {
 				$.ajax({
 					dataType: "json",
 					url: 'github.json',
 				})
-				.done((json: object) => onJsonServ(elem, opts, json))
+				.done((json: JsonServs) => onJsonServ(elem, opts, json))
 				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )
 			} )
 		}
