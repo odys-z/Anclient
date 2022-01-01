@@ -11,6 +11,7 @@
   "author": "Odys Zhou",
   "license": "MIT",
   "devDependencies": {
+    "@types/react-dom": "^17.0.11",
     "webpack": "^5.58.2"
   }
 }

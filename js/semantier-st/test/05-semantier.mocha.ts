@@ -290,7 +290,7 @@ describe('case: [05.0 dataset + s-tree]', () => {
 
 		console.log(Protocol.ansonTypes);
 		let semantier = new Semantier({uri: 'test'});
-		semantier.rels = relationRoleFuncs;
+		semantier.rels = {a_role_func: relationRoleFuncs};
 
 		let body = {type: InsertReq.__type__, uri: 'test-05'};
 		let req = new AnsonMsg<InsertReq>({body: [body]});

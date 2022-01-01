@@ -46,7 +46,7 @@ export type AnFieldValidation = {
  };
 
 export interface ErrorCtx {
-	msg?: undefined | string | Array<string>;
+	msg: undefined | string;
 	onError: (
 		/**MsgCode need to be re-defined */
 		code: string, resp: AnsonMsg<AnsonResp>) => void
@@ -175,6 +175,7 @@ export class Semantier {
     // reltabl: string;
 
     /** current relations - the last loaded relation of this.rel (problem?)
+	 * 
 	 * Looks like all relationship records are item of main tree. 
 	 */
     rels: UIRelations = {};
