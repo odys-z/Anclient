@@ -1,46 +1,34 @@
 import React from 'react';
-import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
-import { Comprops, CrudComp, jsample } from '@anclient/anreact';
-import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
+import Gallery from '../react-photo-gallery/src/Gallery';
 
-const styles = (theme: Theme) => ( {
-	root: {
-	},
-	button: {
-		marginLeft: theme.spacing(1)
-	},
-	card: {
-		width: "28vw",
-		margin: theme.spacing(1)
-	},
-	cardTitle: {
-		color: "blue",
-		textShadow: "4px 4px 3px #688a8a",
-		textAlign: "center" as const,
-		margin: theme.spacing(1)
-	},
-	cartText: {
-		width: "86%",
-		margin: theme.spacing(1)
-	},
-	svgicn: {
-		verticalAlign: "middle",
-	}
-});
+import { Comprops, CrudComp } from '@anclient/anreact';
+import { GalleryTier, PhotoCollect } from './gallerytier-less';
+import { photos } from "./temp-photos";
+import { PhotoProps } from '../react-photo-gallery/src/Photo';
+
+export interface PhotoSlide<T extends {}> {
+    index: number
+    next: PhotoProps<T> | null
+    photo: PhotoProps<T>
+    previous: PhotoProps<T> | null
+}
 
 export default class GalleryView extends CrudComp<Comprops>{
 	tier: GalleryTier | undefined;
 	classes: any;
 	uri: any;
+	currentImx: number = -1;
+	showCarousel: boolean = false;
 
 	constructor(props: Comprops) {
 		super(props);
 
 		this.classes = props.classes;
 		this.uri = props.uri;
-		// this.cards = this.cards.bind(this);
-		this.icon = this.icon.bind(this);
+
+		this.openLightbox = this.openLightbox.bind(this);
+		this.closeLightbox = this.closeLightbox.bind(this);
 	}
 
 	componentDidMount() {
@@ -48,51 +36,40 @@ export default class GalleryView extends CrudComp<Comprops>{
 		console.log("super.uri", uri);
 
 		this.tier = new GalleryTier({uri});
-		this.setState({});
 	}
 
-	icon(e: PhotoRec) {
-		// return jsample.JsampleIcons[e.css?.icon || 'Star'] || jsample.JsampleIcons['Star']
-		let color = e.css?.important ? 'secondary' : 'primary';
-
-		return e.css?.type === 'auto'
-			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-			: <jsample.JsampleIcons.Star color={color} className={this.classes.svgicn}/>
-			;
+	openLightbox (event: React.MouseEvent, photo: PhotoSlide<{}>) {
+		this.currentImx = photo.index;
+		this.showCarousel = true;
 	}
 
-	paper(e: PhotoRec) {
-		return (
-			<Paper elevation={4} style={{ margin: 24 }}
-				className={this.classes.welcome}>
-				<IconButton onClick={this.props.showMenu} >
-					{this.icon(e)}
-					<Box component='span' display='inline' className={this.classes.cardText} >
-						Please click menu to start.
-					</Box>
-				</IconButton>
-			</Paper>);
-	}
-
-	// cards(events: Array<PhotoRec>) {
-	// 	return events?.map( (e) =>
-	// 	<Card key={e.eid} className={this.classes.card}>
-	// 		<Typography gutterBottom variant='h4' className={this.classes.cardTitle}>
-	// 			{e.ename}
-	// 		</Typography>
-	// 		<Paper elevation={4} className={this.classes.cardText}>
-	// 			<Box component='span' className={this.classes.cardText} >
-	// 				<span>From:<br/></span>
-	// 				{this.icon(e)}
-	// 				<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
-	// 					{`${e.publisher || 'Anbox Robot'}`}</Link>
-	// 			</Box>
-	// 		</Paper>
-	// 	</Card>);
-	// }
+	closeLightbox () {
+		this.currentImx = 0;
+		this.showCarousel = false;
+	};
 
 	gallery(collections: Array<PhotoCollect>) {
-
+	  
+		return (
+		  <div>
+			<Gallery photos={photos} onClick={this.openLightbox} />
+			{/* <ModalGateway>
+			  {this.showCarousel ? (
+				<Modal onClose={this.closeLightbox}>
+				  <Carousel
+					currentIndex={this.currentImx}
+					views={photos.map(x => ({
+					  ...x,
+					  srcset: x.src,
+					  caption: x.title || '',
+					  source: x.source || ''
+					}))}
+				  />
+				</Modal>
+			  ) : null}
+			</ModalGateway> */}
+		  </div>
+		);
 	}
 
 	render() {

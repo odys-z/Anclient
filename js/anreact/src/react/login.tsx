@@ -30,7 +30,7 @@ interface LoginProps extends Comprops {
  * @class
  */
 class LoginComp extends React.Component<LoginProps> {
-    state = {
+    config = {
 		loggedin: false,
 		show: true,  // show textarear or only "login"
 		pswd: '123456',
@@ -87,8 +87,8 @@ class LoginComp extends React.Component<LoginProps> {
 	onLogin() {
 		let that = this;
 		// console.log(that.context);
-		let uid = this.state.userid;
-		let pwd = this.state.pswd;
+		let uid = this.config.userid;
+		let pwd = this.config.pswd;
 		if (!uid || !pwd) {
 			this.alert();
 			return;
@@ -96,7 +96,7 @@ class LoginComp extends React.Component<LoginProps> {
 
 		const ctx = this.context as unknown as AnContextType;
 
-		if (!this.state.loggedin) {
+		if (!this.config.loggedin) {
 			let serv = ctx.servId || 'host';
 			let hosturl = ctx.servs[serv];
 			console.log("login url & serv-id: ", hosturl, serv);
@@ -154,23 +154,23 @@ class LoginComp extends React.Component<LoginProps> {
 		let that = this;
 		const { classes } = this.props;
 		return (<div className={classes.root}>
-			<Box display={!this.state.show ? "flex" : "none"}>
+			<Box display={!this.config.show ? "flex" : "none"}>
 				<Button variant="contained" color="primary"
 						style={{'whiteSpace': 'nowrap'}}
-						onClick={() => { this.setState({show: !this.state.show}) } } >
-					{this.state.show ? L('Cancel') : L('Login')}
+						onClick={() => { this.setState({show: !this.config.show}) } } >
+					{this.config.show ? L('Cancel') : L('Login')}
 				</Button>
 			</Box>
-			<Collapse in={this.state.show} timeout="auto" >
+			<Collapse in={this.config.show} timeout="auto" >
 				<TextField className={classes.field2}
 					autoFocus
 					required id="userid" label={L("User Id")}
 					autoComplete="username"
-					defaultValue={this.state.userid}
+					defaultValue={this.config.userid}
 					onChange={event => this.setState({userid: event.target.value})} />
 				<TextField className={classes.field2}
 					id="pswd" label={L("Password")}
-					type="password" value={this.state.pswd}
+					type="password" value={this.config.pswd}
 					autoComplete="new-password"
 					onKeyUp={(e) => {if (e.code === "Enter") that.onLogin();} }
 					onChange={event => this.setState({pswd: event.target.value})} />

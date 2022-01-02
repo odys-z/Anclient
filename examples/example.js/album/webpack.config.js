@@ -24,7 +24,7 @@ module.exports = {
 
 	module: {
 		rules: [
-		{   test: /\.jsx$/,
+		{   test: /\.jsx?$/,
 			loader: 'babel-loader',
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
@@ -44,5 +44,11 @@ module.exports = {
 			use : [ { loader: "babel-loader" },
 					{ loader: "react-svg-loader" } ]
 		} ]
-	}
+	},
+
+	// resolve: {
+	// 	alias: {
+	// 	  'react-photo-gallery': path.resolve(__dirname, './react-photo-gallery/src/Gallery'),
+	// 	}
+	// },
 }

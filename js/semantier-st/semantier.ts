@@ -46,7 +46,7 @@ export type AnFieldValidation = {
  };
 
 export interface ErrorCtx {
-	msg: undefined | string;
+	msg?: string;
 	onError: (
 		/**MsgCode need to be re-defined */
 		code: string, resp: AnsonMsg<AnsonResp>) => void
