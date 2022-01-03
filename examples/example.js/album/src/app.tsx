@@ -9,7 +9,6 @@ import { L, Langstrs,
 
 import GalleryView from './gallery-view';
 
-
 type AlbumProps = {
 	servs: JsonServs;
 	servId: string;
@@ -67,10 +66,9 @@ export default class App extends React.Component<AlbumProps, AlbumConfig> {
 
 		this.config = Object.assign(this.config, { });
 
-		// Protocol.sk.cbbOrg = 'org.all';
-		// Protocol.sk.cbbRole = 'roles';
+		Protocol.sk.cbbViewType = 'v-type';
 
-        // design note: exendPorts shall be a automized processing
+        // design note: exendPorts shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
                         .extendPorts({
                             /* see jserv-album/album, port name: album */
