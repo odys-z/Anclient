@@ -1,7 +1,7 @@
 var path = require('path')
 var webpack = require('webpack')
 
-var v = 'development';// "production" | "development" | "none"
+var v = 'development'; // "production" | "development" | "none"
 var version = "1.0.0";
 
 module.exports = {
@@ -45,10 +45,4 @@ module.exports = {
 					{ loader: "react-svg-loader" } ]
 		} ]
 	},
-
-	// resolve: {
-	// 	alias: {
-	// 	  'react-photo-gallery': path.resolve(__dirname, './react-photo-gallery/src/Gallery'),
-	// 	}
-	// },
 }

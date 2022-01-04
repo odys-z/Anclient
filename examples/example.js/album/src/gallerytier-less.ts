@@ -1,3 +1,4 @@
+import { Comprops, CrudComp } from '@anclient/anreact';
 import { Semantier, Tierec } from '@anclient/semantier-st';
 
 export interface PhotoRec extends Tierec {
@@ -10,11 +11,13 @@ export interface PhotoRec extends Tierec {
 };
 
 export class GalleryTier extends Semantier {
+	comp: CrudComp<Comprops>;
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string}) {
+	constructor(props: {uri: string, comp: CrudComp<Comprops>}, ) {
 		super(props);
+		this.comp = props.comp;
 		console.log(this.uri);
 	}
 

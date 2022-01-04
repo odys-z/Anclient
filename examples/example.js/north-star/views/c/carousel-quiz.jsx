@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -13,10 +12,8 @@ import MobileStepper from "@material-ui/core/MobileStepper";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 
-import { Protocol, SessionClient, AnClient, UserReq } from '@anclient/semantier-st'
-import { L, Langstrs, AnConst,
-    AnContext, CrudCompW, AnReactExt
-} from '@anclient/anreact';
+import { Protocol, UserReq } from '@anclient/semantier-st'
+import { L, AnContext, CrudCompW} from '@anclient/anreact';
 
 import { CenterProtocol } from "../../common/protocol.quiz.js";
 import { JQuiz } from '../../common/an-quiz.js';

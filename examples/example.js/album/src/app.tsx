@@ -24,7 +24,7 @@ type AlbumConfig = {
 }
 
 /** The application main, context singleton and error handler */
-export default class App extends React.Component<AlbumProps, AlbumConfig> {
+export class App extends React.Component<AlbumProps, AlbumConfig> {
     /** {@link InsercureClient} */
     inclient: Inseclient;
 
@@ -93,7 +93,7 @@ export default class App extends React.Component<AlbumProps, AlbumConfig> {
 	  return (
 		<AnContext.Provider value={{
 			anReact: this.anReact,
-			pageOrigin: window ? window.origin : 'localhost',
+			// pageOrigin: window ? window.origin : 'localhost',
 			servId: this.config.servId,
 			servs: this.props.servs,
 			anClient: this.inclient,
@@ -103,7 +103,7 @@ export default class App extends React.Component<AlbumProps, AlbumConfig> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
-			{<GalleryView port='welcomeless' uri={'/less/welcome'}/>}
+			{<GalleryView port='album' uri={'/local/album'}/>}
 			{this.config.hasError &&
 				<AnError onClose={this.onErrorClose} fullScreen={false}
 					uri={"/login"} tier={undefined}
