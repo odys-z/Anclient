@@ -94,7 +94,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 			<Carousel showArrows={true} >
 				{photos.map( (ph, x) => (
 				  <div key={x}>
-					<img src={ph.src}></img>
+					<img src={ph.src} loading="lazy"></img>
 					<p className="legend">{ph.src}</p>
 				  </div>)
 				)}
