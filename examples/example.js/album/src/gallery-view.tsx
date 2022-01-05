@@ -10,18 +10,6 @@ import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 import { photos } from "./temp-photos";
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
-const customStyles = {
-	content: {
-		// top: '50%',
-		// left: '50%',
-		height: '80%',
-		right: 'auto',
-		bottom: 'auto',
-		// marginRight: '-50%',
-		// transform: 'translate(-50%, -50%)',
-	},
-};
-
 export interface PhotoSlide<T extends {}> {
     index: number
     next: PhotoProps<T> | null
@@ -74,24 +62,25 @@ export default class GalleryView extends CrudCompW<Comprops>{
 			{this.showCarousel &&
 				<Modal isOpen={true}
 					onRequestClose={this.closeLightbox}
-					style={customStyles}
 					contentLabel="Example Modal" >
-				{this.photoCarousel(photos, this.currentImx)}
-			</Modal>}
-			<Gallery photos={collections[0].photos} onClick={this.openLightbox} />
+					{this.photoCarousel(photos, this.currentImx)}
+				</Modal>}
+			<Gallery photos={collections[0].photos} onClick={this.openLightbox}
+					limitNodeSearch={ (containerWidth: number) => {
+						if (containerWidth < 800)
+							return 4;
+						else
+							return 12;
+					} }
+			/>
 		  </div>
 		);
 	}
 
-	photoCarousel(photos: Array<any>, ix: number) : JSX.Element {
-		console.log(photos.map((ph, x) => (
-				  <div key={x}>
-					<img src={ph.src}></img>
-					<p className="legend">{ph.src}</p>
-				  </div>)
-		));
+	photoCarousel(photos: Array<any>, imgx: number) : JSX.Element {
+
 		return (
-			<Carousel showArrows={true} >
+			<Carousel showArrows={true} dynamicHeight={true} >
 				{photos.map( (ph, x) => (
 				  <div key={x}>
 					<img src={ph.src} loading="lazy"></img>
