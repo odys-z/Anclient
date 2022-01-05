@@ -78,7 +78,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 					contentLabel="Example Modal" >
 				{this.photoCarousel(photos, this.currentImx)}
 			</Modal>}
-			<Gallery photos={photos} onClick={this.openLightbox} />
+			<Gallery photos={collections[0].photos} onClick={this.openLightbox} />
 		  </div>
 		);
 	}
@@ -98,14 +98,6 @@ export default class GalleryView extends CrudCompW<Comprops>{
 					<p className="legend">{ph.src}</p>
 				  </div>)
 				)}
-				{/* <div key={0}>
-					<img src={photos[0].src}></img>
-					<p className="legend">{photos[0].src}</p>
-				</div>
-				<div key={1}>
-					<img src={photos[1].src}></img>
-					<p className="legend">{photos[1].src}</p>
-				</div> */}
 			</Carousel>
 		);
 	}
