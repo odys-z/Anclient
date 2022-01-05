@@ -10,17 +10,17 @@ import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 import { photos } from "./temp-photos";
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
-const customStyles = {
-	content: {
-		// top: '50%',
-		// left: '50%',
-		height: '80%',
-		right: 'auto',
-		bottom: 'auto',
-		// marginRight: '-50%',
-		// transform: 'translate(-50%, -50%)',
-	},
-};
+// const customStyles = {
+// 	content: {
+// 		// top: '50%',
+// 		// left: '50%',
+// 		height: '70%',
+// 		right: 'auto',
+// 		bottom: 'auto',
+// 		// marginRight: '-50%',
+// 		// transform: 'translate(-50%, -50%)',
+// 	},
+// };
 
 export interface PhotoSlide<T extends {}> {
     index: number
@@ -74,38 +74,31 @@ export default class GalleryView extends CrudCompW<Comprops>{
 			{this.showCarousel &&
 				<Modal isOpen={true}
 					onRequestClose={this.closeLightbox}
-					style={customStyles}
 					contentLabel="Example Modal" >
-				{this.photoCarousel(photos, this.currentImx)}
-			</Modal>}
-			<Gallery photos={photos} onClick={this.openLightbox} />
+					{this.photoCarousel(photos, this.currentImx)}
+				</Modal>}
+			<Gallery photos={photos} onClick={this.openLightbox}
+					limitNodeSearch={ (containerWidth: number) => {
+						if (containerWidth < 800)
+							return 4;
+						else
+							return 12;
+					} }
+			/>
 		  </div>
 		);
 	}
 
-	photoCarousel(photos: Array<any>, ix: number) : JSX.Element {
-		console.log(photos.map((ph, x) => (
-				  <div key={x}>
-					<img src={ph.src}></img>
-					<p className="legend">{ph.src}</p>
-				  </div>)
-		));
+	photoCarousel(photos: Array<any>, imgx: number) : JSX.Element {
+
 		return (
-			<Carousel showArrows={true} >
+			<Carousel showArrows={true} dynamicHeight={true} >
 				{photos.map( (ph, x) => (
-				  <div key={x}>
-					<img src={ph.src}></img>
+				  <div key={x} style={{height: "80vh"}}>
+					<img src={ph.src} ></img>
 					<p className="legend">{ph.src}</p>
 				  </div>)
 				)}
-				{/* <div key={0}>
-					<img src={photos[0].src}></img>
-					<p className="legend">{photos[0].src}</p>
-				</div>
-				<div key={1}>
-					<img src={photos[1].src}></img>
-					<p className="legend">{photos[1].src}</p>
-				</div> */}
 			</Carousel>
 		);
 	}
