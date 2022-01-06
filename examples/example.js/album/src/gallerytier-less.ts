@@ -1,5 +1,7 @@
 import { Comprops, CrudComp } from '@anclient/anreact';
 import { Semantier, Tierec } from '@anclient/semantier-st';
+import { PhotoProps } from '../react-photo-gallery/src/Photo';
+import { photos } from "./temp-photos";
 
 export interface PhotoRec extends Tierec {
 	eid: string,
@@ -7,7 +9,9 @@ export interface PhotoRec extends Tierec {
 	publisher?: string | undefined,
 	edate: string,
 	css: any,
-	extra: string
+	extra: string,
+
+	src: string,
 };
 
 export class GalleryTier extends Semantier {
@@ -28,7 +32,7 @@ export class GalleryTier extends Semantier {
 	 */
 	records<PhotoCollect>() {
 		let photo1 = {deviceId: '01', pid: '01', pname: 'Abc@D', pdate: '2021-10-10', owner: 'ody', exif: '100', uri: ''};
-		this.rows = [{title: 'test', photos: [photo1]}];
+		this.rows = [{title: 'test', photos}];
 		return this.rows as unknown as Array<PhotoCollect>;
 	}
 
@@ -47,5 +51,5 @@ export interface PhotoCollect extends Tierec {
 	hashtags: Array<string>;
 	shareby: string;
 	extlinks: any; // another table?
-	photos: Array<PhotoRec>;
+	photos: Array<PhotoProps<PhotoRec>>;
 }

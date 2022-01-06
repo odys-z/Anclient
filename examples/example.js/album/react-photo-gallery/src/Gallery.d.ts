@@ -58,5 +58,5 @@ export type PhotoClickHandler<CustomPhotoProps extends object = {}> = (
   photos: PhotoSlide<CustomPhotoProps>,
 ) => void
 
-export default class Gallery extends React.Component<GalleryProps<CustomPhotoProps>> {
+export default class Gallery<T> extends React.Component<GalleryProps<T>> {
 }

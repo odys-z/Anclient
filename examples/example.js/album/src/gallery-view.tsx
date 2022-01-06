@@ -7,7 +7,6 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import { Comprops, CrudCompW } from '@anclient/anreact';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
-import { photos } from "./temp-photos";
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
 export interface PhotoSlide<T extends {}> {
@@ -56,7 +55,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 	};
 
 	gallery(collections: Array<PhotoCollect>) {
-	  
+		let photos = collections[0].photos;
 		return (
 		  <div>
 			{this.showCarousel &&
@@ -65,7 +64,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
-			<Gallery photos={collections[0].photos} onClick={this.openLightbox}
+			<Gallery<PhotoRec> photos={photos} onClick={this.openLightbox}
 					limitNodeSearch={ (containerWidth: number) => {
 						if (containerWidth < 800)
 							return 4;
@@ -77,10 +76,9 @@ export default class GalleryView extends CrudCompW<Comprops>{
 		);
 	}
 
-	photoCarousel(photos: Array<any>, imgx: number) : JSX.Element {
-
+	photoCarousel(photos: Array<PhotoProps>, imgx: number) : JSX.Element {
 		return (
-			<Carousel showArrows={true} dynamicHeight={true} >
+			<Carousel showArrows={true} dynamicHeight={true} selectedItem={imgx} >
 				{photos.map( (ph, x) => (
 				  <div key={x}>
 					<img src={ph.src} loading="lazy"></img>
