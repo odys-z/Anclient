@@ -332,7 +332,7 @@ export class Semantier {
 	 * @param conds 
 	 * @param onLoad 
 	 */
-    record(conds: QueryConditions, onLoad: OnLoadOk) : void {
+    record<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) : void {
     }
 
 	/** Load records of conditions.
@@ -340,7 +340,7 @@ export class Semantier {
 	 * @param opts 
 	 * @param onLoad 
 	 */
-    records<T extends Tierec>(opts: QueryConditions, onLoad: OnLoadOk) : void {
+    records<T extends Tierec>(opts: QueryConditions, onLoad: OnLoadOk<T>) : void {
 	}
 
     /** save form with a relationship table.

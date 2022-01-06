@@ -3,8 +3,10 @@ import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
 export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
-/**Callback of CRUD.r */
-export type OnLoadOk = (cols: Array<string>, rows: Array<{}>) => void
+/**Callback of CRUD.r
+ * T is the record type
+ */
+export type OnLoadOk<T extends Tierec> = (cols: Array<string>, rows: Array<T>) => void
 
 export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Color, PropTypes, StandardProps, Theme, withStyles } from '@material-ui/core';
+import { PropTypes, StandardProps, Theme, withStyles } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
