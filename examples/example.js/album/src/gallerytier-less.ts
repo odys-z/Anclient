@@ -1,7 +1,6 @@
 import { Comprops, CrudComp } from '@anclient/anreact';
-import { AnsonBody, AnsonResp, OnLoadOk, QueryConditions, Semantier, Tierec, UserReq } from '@anclient/semantier-st';
+import { AnsonResp, OnLoadOk, QueryConditions, Semantier, Tierec, UserReq } from '@anclient/semantier-st';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
-import { photos } from "./temp-photos";
 
 export interface PhotoCollect extends Tierec {
 	title: string;

@@ -8,7 +8,6 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Comprops, CrudCompW } from '@anclient/anreact';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
-import { ThumbUpAltTwoTone } from '@material-ui/icons';
 
 export interface PhotoSlide<T extends {}> {
     index: number
@@ -23,8 +22,8 @@ export default class GalleryView extends CrudCompW<Comprops>{
 	uri: any;
 	currentImx: number = -1;
 	showCarousel: boolean = false;
-	album: PhotoCollect[];
-
+	album: PhotoCollect[] | undefined;
+	
 	constructor(props: Comprops) {
 		super(props);
 
