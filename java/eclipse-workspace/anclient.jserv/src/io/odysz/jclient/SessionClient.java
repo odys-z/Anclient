@@ -24,7 +24,7 @@ import io.odysz.semantics.x.SemanticException;
  * @author odys-z@github.com
  *
  */
-public class AnsonClient {
+public class SessionClient {
 
 	private SessionInf ssInf;
 	public SessionInf ssInfo () { return ssInf; }
@@ -35,7 +35,7 @@ public class AnsonClient {
 	/**Session login response from server.
 	 * @param sessionInfo
 	 */
-	AnsonClient(SessionInf sessionInfo) {
+	SessionClient(SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 	}
 	
@@ -116,7 +116,7 @@ public class AnsonClient {
 		return header;
 	}
 	
-	public AnsonClient urlPara(String pname, String pv) {
+	public SessionClient urlPara(String pname, String pv) {
 		if (urlparas == null)
 			urlparas = new ArrayList<String[]>();
 		urlparas.add(new String[] {pname, pv});
@@ -128,7 +128,7 @@ public class AnsonClient {
 	 * @return this object
 	 * @throws SQLException 
 	 */
-	public AnsonClient console(AnsonMsg<? extends AnsonBody> req) throws SQLException {
+	public SessionClient console(AnsonMsg<? extends AnsonBody> req) throws SQLException {
 		if(Clients.console) {
 			try {
 				Utils.logi(req.toString());
@@ -137,7 +137,9 @@ public class AnsonClient {
 		return this;
 	}
 
-	public void commit(AnsonMsg<? extends AnsonBody> req, SCallbackV11 onOk, SCallbackV11... onErr)
+	// public void commit(AnsonMsg<? extends AnsonBody> req, SCallbackV11 onOk, SCallbackV11... onErr)
+	@SuppressWarnings("unchecked")
+	public <R extends AnsonBody, A extends AnsonResp> void commit(AnsonMsg<R> req, SCallbackV11 onOk, SCallbackV11... onErr)
 			throws SemanticException, IOException, SQLException, AnsonException {
     	HttpServClient httpClient = new HttpServClient();
   		httpClient.post(Clients.servUrl(req.port()), req,
@@ -147,7 +149,7 @@ public class AnsonClient {
   						Utils.logAnson(obj);
   					}
   					if (MsgCode.ok == code) {
-  						onOk.onCallback(code, obj);
+  						onOk.onCallback(code, (A) obj);
   					}
   					else {
   						if (onErr != null && onErr.length > 0 && onErr[0] != null)

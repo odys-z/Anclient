@@ -40,7 +40,7 @@ public class AnsonClientTest {
 	private static String pswd = null;
 	private static String filename = "res/Sun_Yat-sen_2.jpg";
 	
-	private AnsonClient client;
+	private SessionClient client;
 
 	@BeforeAll
 	public static void init() {
@@ -59,7 +59,7 @@ public class AnsonClientTest {
     	Clients.init(jserv);
     }
 
-    @Test
+	@Test
     public void queryTest() throws IOException,
     		SemanticException, SQLException, GeneralSecurityException, AnsonException {
     	Utils.printCaller(false);
@@ -124,7 +124,7 @@ public class AnsonClientTest {
     	});
 	}
 
-	static void testUpload(AnsonClient client)
+	static void testUpload(SessionClient client)
 			throws SemanticException, IOException, SQLException, AnsonException {
 		Path p = Paths.get(filename);
 		byte[] f = Files.readAllBytes(p);
@@ -164,7 +164,7 @@ public class AnsonClientTest {
     		});
 	}
 
-	private void testORCL_Reports(AnsonClient client)
+	private void testORCL_Reports(SessionClient client)
 			throws SemanticException, IOException, SQLException, AnsonException {
 		String orcl = "orcl.alarm-report";
 
