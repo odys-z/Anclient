@@ -1,9 +1,9 @@
-import { SessionClient, Inseclient, AnClient } from "./anclient";
+import { SessionClient, Inseclient } from "./anclient";
 import { toBool } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, 
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, 
-	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, UserReq, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations
+	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;

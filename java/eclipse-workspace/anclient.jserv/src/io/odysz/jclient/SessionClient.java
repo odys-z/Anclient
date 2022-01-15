@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
+import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -84,12 +85,20 @@ public class SessionClient {
 					;//.body(itm);
 	}
 
-	public <T extends AnsonBody> AnsonMsg<? extends AnsonBody> userReq(IPort port, String[] act, T req)
+	/**Create a user type of message.
+	 * @param <T> body type
+	 * @param port
+	 * @param act not used for session less
+	 * @param req request body
+	 * @return Anson message
+	 * @throws SemanticException
+	 */
+	public <T extends AnsonBody> AnsonMsg<T> userReq(IPort port, String[] act, T req)
 			throws SemanticException {
 		if (ssInf == null)
 			throw new SemanticException("SessionClient can not visit jserv without session information.");
 
-		AnsonMsg<?> jmsg = new AnsonMsg<T>(port);
+		AnsonMsg<T> jmsg = new AnsonMsg<T>(port);
 		
 		header().act(act);
 		jmsg.header(header);
@@ -138,6 +147,18 @@ public class SessionClient {
 	}
 
 	// public void commit(AnsonMsg<? extends AnsonBody> req, SCallbackV11 onOk, SCallbackV11... onErr)
+	/**The {@link ErrorCtx} API pattern is better.
+	 * @see #commit(AnsonMsg, SCallbackV11, ErrorCtx)
+	 * @param <R> Request type
+	 * @param <A> Response type
+	 * @param req request
+	 * @param onOk on ok callback
+	 * @param onErr error context
+	 * @throws SemanticException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws AnsonException
+	 */
 	@SuppressWarnings("unchecked")
 	public <R extends AnsonBody, A extends AnsonResp> void commit(AnsonMsg<R> req, SCallbackV11 onOk, SCallbackV11... onErr)
 			throws SemanticException, IOException, SQLException, AnsonException {
@@ -155,6 +176,25 @@ public class SessionClient {
   						if (onErr != null && onErr.length > 0 && onErr[0] != null)
   							onErr[0].onCallback(code, obj);
   						else Utils.warn("code: %s\nerror: %s", code, ((AnsonResp)obj).msg());
+  					}
+  				});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <R extends AnsonBody, A extends AnsonResp> void commit(AnsonMsg<R> req, SCallbackV11 onOk, ErrorCtx err)
+			throws SemanticException, IOException, SQLException, AnsonException {
+    	HttpServClient httpClient = new HttpServClient();
+  		httpClient.post(Clients.servUrl(req.port()), req,
+  				(code, obj) -> {
+  					if(Clients.console) {
+  						Utils.printCaller(false);
+  						Utils.logAnson(obj);
+  					}
+  					if (MsgCode.ok == code) {
+  						onOk.onCallback(code, (A) obj);
+  					}
+  					else {
+  						err.onError(code, obj);
   					}
   				});
 	}
