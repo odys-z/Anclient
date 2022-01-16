@@ -11,6 +11,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.tier.AlbumReq;
+import io.oz.album.tier.AlbumReq.A;
 
 public class AlbumTier extends Semantier {
 
@@ -25,7 +26,8 @@ public class AlbumTier extends Semantier {
 
 	public void getCollect(String collectId, SCallbackV11 onOk) throws SemanticException, IOException, SQLException, AnsonException {
 		AlbumReq req = new AlbumReq(funcUri).collectId("c-001");
-		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(AlbumPort.album, null, req);
+		req.a(A.collect);
+		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq("test/collect", AlbumPort.album, req);
 		client.commit(q, onOk, errCtx);
 	}
 

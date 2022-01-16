@@ -14,6 +14,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
+import io.odysz.semantic.jprotocol.LogAct;
 import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
@@ -85,7 +86,8 @@ public class SessionClient {
 					;//.body(itm);
 	}
 
-	/**Create a user type of message.
+	/**@deprecated replaced by #usr
+	 * create a user type of message.
 	 * @param <T> body type
 	 * @param port
 	 * @param act not used for session less
@@ -105,6 +107,27 @@ public class SessionClient {
 		jmsg.body(req);
 
 		return jmsg;
+	}
+
+	/**
+	 * @param <T>
+	 * @param uri component uri
+	 * @param port
+	 * @param bodyItem request body, created by like: new jvue.UserReq(uri, tabl).
+	 * @param act action, optional.
+	 * @return AnsonMsg 
+	 * @throws AnsonException port is null
+	 */
+	public <T extends AnsonBody> AnsonMsg<T> userReq(String uri, IPort port, T bodyItem, LogAct... act) throws AnsonException {
+		if (port == null)
+			throw new AnsonException(0, "AnsonMsg<UserReq> needs port explicitly specified.");
+
+		// let header = Protocol.formatHeader(this.ssInf);
+		bodyItem.uri(uri);
+		if (act != null && act.length > 0)
+			header.act(act[0]); 
+
+		return new AnsonMsg<T>(port).header(header).body(bodyItem);
 	}
 
 	public AnsonMsg<?> insert(String conn, String tbl, String ... act) throws SemanticException {

@@ -12,10 +12,13 @@ import io.odysz.semantics.x.SemanticException;
  *
  */
 public interface ErrorCtx {
+
 	public default String msg () { return ""; };
 
 	public default void onError(MsgCode code, AnsonResp obj) throws SemanticException {
 		throw new SemanticException(obj.msg());
 	}
 
+	public default ErrorCtx setSignal(String signal) { return this; };
+	public default ErrorCtx notifySignal() { return this; };
 }

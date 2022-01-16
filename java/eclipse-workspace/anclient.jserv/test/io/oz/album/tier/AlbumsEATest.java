@@ -3,16 +3,19 @@ package io.oz.album.tier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import static com.ea.async.Async.await;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+
 import java.io.File;
 import java.sql.SQLException;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
-import org.vishag.async.AsyncSupplier;
 
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.InsecureClient;
 import io.odysz.jclient.tier.ErrorCtx;
+import io.odysz.jclient.tier.ErrorAwaitHandler;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantics.IUser;
@@ -33,7 +36,14 @@ import io.oz.album.AlbumTier;
  * @author ody
  *
  */
-class AlbumsTest {
+class AlbumsEATest {
+	public static class ErrorCtxHandler extends ErrorAwaitHandler {
+		@Override
+		public void onError(MsgCode code, AnsonResp obj) throws SemanticException {
+			fail(obj.msg());
+		}
+	}
+
 	static String jserv;
 
 	static IUser robot;
@@ -52,11 +62,7 @@ class AlbumsTest {
 			client = new InsecureClient(jserv);
 			local = new File("src/test/local").getAbsolutePath();
 			
-			errCtx = new ErrorCtx() {
-				public void onError(MsgCode c, AnsonResp rep) {
-					fail(rep.msg()); 
-				}
-			};
+			errCtx = new ErrorCtxHandler();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -83,48 +89,26 @@ class AlbumsTest {
 //		}
 //	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	void testDownload() throws SemanticException, TransException, SQLException {
-		Supplier<AlbumResp> albumResp = null;
+		AlbumResp resp = null;
 		try {
-			albumResp = AsyncSupplier
-					.getDefault()
-					.submitSupplier(
-						() -> getCollection("c-001")
-					);
+			resp = await( getCollection("c-001") );
+
+			Photo[] collect = resp.photos.get(0);
+			Photo ph1 = collect[0];
+			Photo ph2 = collect[1];
+			Photo ph3 = collect[2];
 		}
 		catch (Exception ex) {
 			fail(ex.getMessage());
 		}
-
-		AlbumResp resp = albumResp.get();
-		Photo[] collect = resp.photos.get(0);
-		Photo ph1 = collect[0];
-		Photo ph2 = collect[1];
-		Photo ph3 = collect[2];
-	
-		Supplier<String>[] resultSuppliers = null;
-		try {
-			resultSuppliers = AsyncSupplier.getDefault().submitSuppliers(
-				     () -> getDownloadResult(ph1, ph1.pname),
-				     () -> getDownloadResult(ph2, ph2.pname),
-				     () -> getDownloadResult(ph3, ph3.pname)
-				   );
-		}
-		catch (Exception ex) {
-			fail(ex.getMessage());
-		}
-
-		String a = resultSuppliers[0].get();
-		String b = resultSuppliers[1].get();
-		String c = resultSuppliers[2].get();
 	}
 
-	AlbumResp getCollection(String collectId) {
+	CompletableFuture<AlbumResp> getCollection(String collectId) {
 		AlbumResp[] buf = new AlbumResp[1];
 		String signal = "";
-		AlbumTier tier = new AlbumTier(client, errCtx);
+		AlbumTier tier = new AlbumTier(client, errCtx.setSignal(signal));
 		try {
 			/*
 			AnsonMsg<? extends AnsonBody> q = client.userReq(AlbumPort.album, null, req);
@@ -146,7 +130,7 @@ class AlbumsTest {
 			e.printStackTrace();
 		}
 
-		return buf[0];
+		return completedFuture(buf[0]);
 	}
 
 	String getDownloadResult(Photo photo, String filepath) {
