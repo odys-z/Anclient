@@ -10,13 +10,18 @@ import org.apache.commons.io.IOUtils;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
+import io.odysz.semantic.tier.docs.DocsReq;
 import io.oz.album.tier.FileRecord;
 
 public class StreamClient extends HttpServClient {
 
 	protected String url;
 
-	public String download(FileRecord rec, String localpath) throws IOException, AnsonException {
+	public StreamClient(String jserv) {
+		this.url = jserv;
+	}
+
+	public String download(DocsReq rec, String localpath) throws IOException, AnsonException {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 

@@ -19,6 +19,7 @@ import io.odysz.jclient.StreamClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -92,13 +93,16 @@ class AlbumsTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	void testDownload() throws SemanticException, TransException {
+	void testDownload() throws SemanticException, TransException, IOException {
 
 		AlbumResp resp = getCollection("c-001");
 		Photo[] collect = resp.photos.get(0);
 		Photo ph1 = collect[0];
+		FileUtils.delete(new File(ph1.pname));
 		Photo ph2 = collect[1];
+		FileUtils.delete(new File(ph2.pname));
 		Photo ph3 = collect[2];
+		FileUtils.delete(new File(ph3.pname));
 	
 		Supplier<String>[] resultSuppliers = null;
 		try {
@@ -138,7 +142,8 @@ class AlbumsTest {
 
 	String getDownloadResult(Photo photo, String filepath) {
 		try {
-			return new StreamClient().download(photo, filepath);
+			AlbumReq req = new AlbumReq().photo(photo);
+			return new StreamClient(jserv).download(req, filepath);
 		} catch (IOException | AnsonException e) {
 			e.printStackTrace();
 			return null;
