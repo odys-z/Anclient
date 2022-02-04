@@ -20,6 +20,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@anclient/semantier-st": "^0.9.58",
+    "@types/jquery": "^3.5.13",
     "mime-types-no-nodejs": "^0.9.1",
     "qrcode": "^1.4.4",
     "tar": "^4.4.19"
@@ -46,8 +47,8 @@
     "css-loader": "^2.1.1",
     "d3": "^7.0.1",
     "jquery": "^3.6.0",
-    "jsdoc": "^3.6.7",
-    "mocha": "^9.1.2",
+    "jsdoc": "^3.6.10",
+    "mocha": "^9.2.0",
     "postcss-loader": "^3.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
