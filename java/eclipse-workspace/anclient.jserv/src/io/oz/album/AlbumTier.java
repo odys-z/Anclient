@@ -1,17 +1,16 @@
 package io.oz.album;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.jclient.tier.Semantier;
 import io.odysz.semantic.jprotocol.AnsonMsg;
-import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
+import io.oz.album.tier.AlbumResp;
 
 public class AlbumTier extends Semantier {
 
@@ -24,11 +23,11 @@ public class AlbumTier extends Semantier {
 		this.errCtx = errCtx;
 	}
 
-	public void getCollect(String collectId, SCallbackV11 onOk) throws SemanticException, IOException, SQLException, AnsonException {
+	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
 		AlbumReq req = new AlbumReq(funcUri).collectId("c-001");
 		req.a(A.collect);
 		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq("test/collect", AlbumPort.album, req);
-		client.commit(q, onOk, errCtx);
+		return client.commit(q, errCtx);
 	}
 
 }

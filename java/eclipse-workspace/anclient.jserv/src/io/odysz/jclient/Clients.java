@@ -23,7 +23,8 @@ public class Clients {
 	public static final boolean console = true;
 
 	public static String servRt;
-	/** DB connection ID. same in connects.xml/t/C/id at server side. */
+	/**@deprecated
+	 * DB connection ID. same in connects.xml/t/C/id at server side. */
 	private static String conn;
 
 
@@ -82,6 +83,8 @@ public class Clients {
 	 * @return url, e.g. http://localhost:8080/query.serv?conn=null
 	 */
 	static String servUrl(IPort port) {
-		return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
+		return String.format("%s/%s?", servRt, port.url());
+		// Since version for semantier, this will return without conn id. 
+		// return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
 	}
 }

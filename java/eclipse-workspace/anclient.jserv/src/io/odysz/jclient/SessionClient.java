@@ -27,6 +27,8 @@ import io.odysz.semantics.x.SemanticException;
  *
  */
 public class SessionClient {
+	static boolean verbose;
+	public static void verbose(boolean v) { verbose = v;}
 
 	private SessionInf ssInf;
 	public SessionInf ssInfo () { return ssInf; }
@@ -169,8 +171,10 @@ public class SessionClient {
 		return this;
 	}
 
-	// public void commit(AnsonMsg<? extends AnsonBody> req, SCallbackV11 onOk, SCallbackV11... onErr)
-	/**The {@link ErrorCtx} API pattern is better.
+	/**@deprecated This is asynchronous API but works in synchronous.
+	 * @see {@link HttpServClient#post(String, AnsonMsg, SCallbackV11)}
+	 * <br>
+	 * The {@link ErrorCtx} API pattern is better.
 	 * @see #commit(AnsonMsg, SCallbackV11, ErrorCtx)
 	 * @param <R> Request type
 	 * @param <A> Response type
@@ -186,6 +190,11 @@ public class SessionClient {
 	public <R extends AnsonBody, A extends AnsonResp> void commit(AnsonMsg<R> req, SCallbackV11 onOk, SCallbackV11... onErr)
 			throws SemanticException, IOException, SQLException, AnsonException {
     	HttpServClient httpClient = new HttpServClient();
+
+    	if (verbose) {
+    		Utils.logi(Clients.servUrl(req.port()));
+    		Utils.logAnson(req);
+    	}
   		httpClient.post(Clients.servUrl(req.port()), req,
   				(code, obj) -> {
   					if(Clients.console) {
@@ -204,22 +213,29 @@ public class SessionClient {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <R extends AnsonBody, A extends AnsonResp> void commit(AnsonMsg<R> req, SCallbackV11 onOk, ErrorCtx err)
-			throws SemanticException, IOException, SQLException, AnsonException {
+	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, ErrorCtx err)
+			throws SemanticException, IOException, AnsonException {
     	HttpServClient httpClient = new HttpServClient();
-  		httpClient.post(Clients.servUrl(req.port()), req,
-  				(code, obj) -> {
-  					if(Clients.console) {
-  						Utils.printCaller(false);
-  						Utils.logAnson(obj);
-  					}
-  					if (MsgCode.ok == code) {
-  						onOk.onCallback(code, (A) obj);
-  					}
-  					else {
-  						err.onError(code, obj);
-  					}
-  				});
+    	if (verbose) {
+    		Utils.logi(Clients.servUrl(req.port()));
+    		Utils.logAnson(req);
+    	}
+  		AnsonMsg<AnsonResp> resp = httpClient.post(Clients.servUrl(req.port()), req);
+
+  		MsgCode code = resp.code();
+
+		if(Clients.console) {
+		  Utils.printCaller(false);
+		  Utils.logAnson(resp);
+		}
+
+		if (MsgCode.ok == code) {
+			return (A) resp.body(0);
+		}
+		else {
+			err.onError(code, resp.body(0));
+			return null;
+		}
 	}
 
 	public void logout() { }

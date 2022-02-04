@@ -1,17 +1,21 @@
 package io.oz.album.tier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
-import java.sql.SQLException;
+import java.io.IOException;
 import java.util.function.Supplier;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.vishag.async.AsyncSupplier;
 
+import io.odysz.anson.Anson;
+import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.InsecureClient;
+import io.odysz.jclient.SessionClient;
+import io.odysz.jclient.StreamClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
@@ -52,6 +56,9 @@ class AlbumsTest {
 			client = new InsecureClient(jserv);
 			local = new File("src/test/local").getAbsolutePath();
 			
+			SessionClient.verbose(true);
+			Anson.verbose(true);
+
 			errCtx = new ErrorCtx() {
 				public void onError(MsgCode c, AnsonResp rep) {
 					fail(rep.msg()); 
@@ -85,20 +92,9 @@ class AlbumsTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	void testDownload() throws SemanticException, TransException, SQLException {
-		Supplier<AlbumResp> albumResp = null;
-		try {
-			albumResp = AsyncSupplier
-					.getDefault()
-					.submitSupplier(
-						() -> getCollection("c-001")
-					);
-		}
-		catch (Exception ex) {
-			fail(ex.getMessage());
-		}
+	void testDownload() throws SemanticException, TransException {
 
-		AlbumResp resp = albumResp.get();
+		AlbumResp resp = getCollection("c-001");
 		Photo[] collect = resp.photos.get(0);
 		Photo ph1 = collect[0];
 		Photo ph2 = collect[1];
@@ -117,39 +113,35 @@ class AlbumsTest {
 		}
 
 		String a = resultSuppliers[0].get();
+		assertTrue(a.toLowerCase().contains(".jpg"));
+		assertTrue(FileUtils.sizeOf(new File(a)) > 5000);
+
 		String b = resultSuppliers[1].get();
+		assertTrue(b.toLowerCase().contains(".jpg"));
+		assertTrue(FileUtils.sizeOf(new File(b)) > 5000);
+
 		String c = resultSuppliers[2].get();
+		assertTrue(c.toLowerCase().contains(".jpg"));
+		assertTrue(FileUtils.sizeOf(new File(c)) > 5000);
 	}
 
 	AlbumResp getCollection(String collectId) {
-		AlbumResp[] buf = new AlbumResp[1];
-		String signal = "";
 		AlbumTier tier = new AlbumTier(client, errCtx);
 		try {
-			/*
-			AnsonMsg<? extends AnsonBody> q = client.userReq(AlbumPort.album, null, req);
-			client.commit(q, (MsgCode msgCode, AnsonResp resp) -> {
-				buf[0] = (AlbumResp) resp;
-			} );
-			*/
-			tier.getCollect(collectId, (MsgCode msgCode, AnsonResp resp) -> {
-				buf[0] = (AlbumResp) resp;
-				signal.notify();
-			});
-		} catch (Exception e) {
+			return tier.getCollect(collectId);
+		} catch (SemanticException | IOException | AnsonException e) {
 			e.printStackTrace();
+			fail(e.getMessage());
+			return null;
 		}
-
-		try {
-			signal.wait(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		return buf[0];
 	}
 
 	String getDownloadResult(Photo photo, String filepath) {
-		return new StreamClient<Photo>().download(photo, filepath);
+		try {
+			return new StreamClient().download(photo, filepath);
+		} catch (IOException | AnsonException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
