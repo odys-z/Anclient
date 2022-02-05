@@ -16,7 +16,6 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.InsecureClient;
 import io.odysz.jclient.SessionClient;
-import io.odysz.jclient.StreamClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
@@ -100,12 +99,9 @@ class AlbumsTest {
 		Photo ph1 = collect[0];
 		Photo ph2 = collect[1];
 		Photo ph3 = collect[2];
-		try {
-			FileUtils.delete(new File(ph1.pname));
-			FileUtils.delete(new File(ph2.pname));
-			FileUtils.delete(new File(ph3.pname));
-		}
-		catch (Exception ex) {}
+		try { FileUtils.delete(new File(ph1.pname)); } catch (Exception ex) {}
+		try { FileUtils.delete(new File(ph2.pname)); } catch (Exception ex) {}
+		try { FileUtils.delete(new File(ph3.pname)); } catch (Exception ex) {}
 	
 		Supplier<String>[] resultSuppliers = null;
 		try {
@@ -144,12 +140,12 @@ class AlbumsTest {
 	}
 
 	String getDownloadResult(Photo photo, String filepath) {
+		AlbumTier tier = new AlbumTier(client, errCtx);
 		try {
-			AlbumReq req = new AlbumReq().download(photo);
-			return new StreamClient(jserv).download(req, filepath);
-		} catch (IOException | AnsonException e) {
+			return tier.download(photo, filepath);
+		} catch (IOException | AnsonException | SemanticException e) {
 			e.printStackTrace();
-			return null;
+			return e.getMessage();
 		}
 	}
 }

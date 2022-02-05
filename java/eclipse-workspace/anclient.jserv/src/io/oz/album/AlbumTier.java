@@ -11,6 +11,7 @@ import io.odysz.semantics.x.SemanticException;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
+import io.oz.album.tier.Photo;
 
 public class AlbumTier extends Semantier {
 
@@ -28,6 +29,13 @@ public class AlbumTier extends Semantier {
 		req.a(A.collect);
 		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq("test/collect", AlbumPort.album, req);
 		return client.commit(q, errCtx);
+	}
+
+	public String download(Photo photo, String localpath)
+			throws SemanticException, AnsonException, IOException {
+		AlbumReq req = new AlbumReq().download(photo);
+		req.a(A.download);
+		return client.download(funcUri, AlbumPort.album, req, localpath);
 	}
 
 }

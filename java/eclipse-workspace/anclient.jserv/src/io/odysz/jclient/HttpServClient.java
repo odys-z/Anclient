@@ -1,18 +1,24 @@
 package io.odysz.jclient;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
+
+import org.apache.commons.io.IOUtils;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
-import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
+import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
 public class HttpServClient {
@@ -50,7 +56,7 @@ public class HttpServClient {
 		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
 		jreq.toBlock(con.getOutputStream());
 
-		if (Clients.console) Utils.logi(url);
+		if (Clients.verbose) Utils.logi(url);
 
 		int responseCode = con.getResponseCode();
 		if (responseCode == 200) {
@@ -60,7 +66,7 @@ public class HttpServClient {
 
 			@SuppressWarnings("unchecked")
 			AnsonMsg<AnsonResp> x = (AnsonMsg<AnsonResp>) Anson.fromJson(con.getInputStream());
-			if (Clients.console) {
+			if (Clients.verbose) {
 				Utils.printCaller(false);
 				Utils.logi(x.toString());
 			}
@@ -102,7 +108,7 @@ public class HttpServClient {
 		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
 		jreq.toBlock(con.getOutputStream());
 
-		if (Clients.console) Utils.logi(url);
+		if (Clients.verbose) Utils.logi(url);
 
 		int responseCode = con.getResponseCode();
 		if (responseCode == 200) {
@@ -112,7 +118,7 @@ public class HttpServClient {
 
 			@SuppressWarnings("unchecked")
 			AnsonMsg<AnsonResp> x = (AnsonMsg<AnsonResp>) Anson.fromJson(con.getInputStream());
-			if (Clients.console) {
+			if (Clients.verbose) {
 				Utils.printCaller(false);
 				Utils.logi(x.toString());
 			}
@@ -125,6 +131,48 @@ public class HttpServClient {
 			Utils.warn("HTTP ERROR: code: %s", responseCode);
 			throw new IOException("HTTP ERROR: code: " + responseCode + "\n" + url);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public String streamdown(String url, AnsonMsg<? extends DocsReq> jreq, String localpath) throws IOException, AnsonException, SemanticException {
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		//add reuqest header
+		con.setRequestMethod("POST");
+		con.setRequestProperty("User-Agent", USER_AGENT);
+		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		con.setRequestProperty("Content-Type", "text/plain"); 
+	    con.setRequestProperty("charset", "utf-8");
+
+		// Send post request
+		con.setDoOutput(true);
+
+		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
+		jreq.toBlock(con.getOutputStream());
+
+		if (Clients.verbose) Utils.logi(url);
+
+		InputStream ins = con.getInputStream();
+		FileOutputStream ofs = new FileOutputStream(localpath);  
+		IOUtils.copy(ins, ofs);
+		ofs.close();
+
+		AnsonMsg<AnsonResp> s = null;
+		try {
+			FileInputStream ifs = new FileInputStream(localpath);
+			s = (AnsonMsg<AnsonResp>) Anson.fromJson(ifs);
+		}
+		catch (Exception e) {
+			return localpath;
+		}
+		throw new SemanticException("Code: %s\nmsg: %s", s.code(), s.body(0).msg());
+	}
+	
+
+	public String streamup(String url, AnsonMsg<? extends DocsReq> req, String localpath) {
+		// TODO Auto-generated method stub
+		return localpath;
 	}
 
 }

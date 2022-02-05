@@ -13,6 +13,7 @@ import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
+import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
 /**
@@ -20,12 +21,13 @@ import io.odysz.semantics.x.SemanticException;
  * @param <T>
  */
 public class Clients {
-	public static final boolean console = true;
+	public static final boolean verbose = true;
 
 	public static String servRt;
 	/**@deprecated
-	 * DB connection ID. same in connects.xml/t/C/id at server side. */
+	 * DB connection ID. same in connects.xml/t/C/id at server side.
 	private static String conn;
+	 * */
 
 
 	/**Initialize configuration.
@@ -33,7 +35,7 @@ public class Clients {
 	 */
 	public static void init(String servRoot) {
 		servRt = servRoot;
-		conn = null; // client can't control engine connect. configured in workflow-meta.xml
+		// conn = null; // client can't control engine connect. configured in workflow-meta.xml
 	}
 	
 	/**Login and return a client instance (with session managed by jserv).
@@ -57,11 +59,12 @@ public class Clients {
   		// AnsonMsg<? extends AnsonBody> reqv11 = new AnsonMsg<AnQueryReq>(Port.session);;
 		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
 
-		SessionClient[] inst = new SessionClient[1]; 
 
 		HttpServClient httpClient = new HttpServClient();
 		String url = servUrl(Port.session);
-		httpClient.post(url, reqv11, (code, msg) -> {
+		/*
+			SessionClient[] inst = new SessionClient[1]; 
+			httpClient.post(url, reqv11, (code, msg) -> {
 					if (AnsonMsg.MsgCode.ok == code) {
 						// create a logged in client
 						inst[0] = new SessionClient(((AnSessionResp) msg).ssInf());
@@ -76,6 +79,18 @@ public class Clients {
   		if (inst[0] == null)
   			throw new IOException("HttpServClient return null client.");
   		return inst[0];
+  		*/
+
+		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
+		if (Clients.verbose)
+			Utils.logi(resp.toString());
+
+		if (AnsonMsg.MsgCode.ok == resp.code()) {
+			return new SessionClient(((AnSessionResp) resp.body(0)).ssInf());
+		}
+		else throw new SemanticException(
+				"loging failed\ncode: %s\nerror: %s",
+				resp.code(), ((AnsonResp)resp.body(0)).msg());
 	}
 	
 	/**Helper for generate serv url (with configured server root and db connection ID).
@@ -83,8 +98,21 @@ public class Clients {
 	 * @return url, e.g. http://localhost:8080/query.serv?conn=null
 	 */
 	static String servUrl(IPort port) {
-		return String.format("%s/%s?", servRt, port.url());
 		// Since version for semantier, this will return without conn id. 
 		// return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
+		return String.format("%s/%s", servRt, port.url());
 	}
+
+	public String download(IPort port, AnsonMsg<? extends DocsReq> req, String localpath) throws IOException, AnsonException, SemanticException {
+		String url = servUrl(port);
+		HttpServClient httpClient = new HttpServClient();
+		return httpClient.streamdown(url, req, localpath);
+	}
+
+	public String upload(IPort port, AnsonMsg<? extends DocsReq> req, String localpath) {
+		String url = servUrl(port);
+		HttpServClient httpClient = new HttpServClient();
+		return httpClient.streamup(url, req, localpath);
+	}
+
 }

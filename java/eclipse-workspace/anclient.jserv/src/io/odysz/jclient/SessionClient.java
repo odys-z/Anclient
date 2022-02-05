@@ -20,9 +20,10 @@ import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
-/**TODO rename as SessionClient
+/**AnClient.java with session managed.
  * @author odys-z@github.com
  *
  */
@@ -88,8 +89,8 @@ public class SessionClient {
 					;//.body(itm);
 	}
 
-	/**@deprecated replaced by #usr
-	 * create a user type of message.
+	/**<p>create a user type of message.</p>
+	 * @deprecated replaced by {@link #userReq(String, IPort, AnsonBody, LogAct...)}
 	 * @param <T> body type
 	 * @param port
 	 * @param act not used for session less
@@ -111,7 +112,7 @@ public class SessionClient {
 		return jmsg;
 	}
 
-	/**
+	/**Create a user request message.
 	 * @param <T>
 	 * @param uri component uri
 	 * @param port
@@ -144,6 +145,21 @@ public class SessionClient {
 					.body(itm);
 	}
 
+	public <T extends DocsReq> String download(String uri, IPort port, T body, String localpath, LogAct... act) throws AnsonException, SemanticException, IOException {
+		if (port == null)
+			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port explicitly specified.");
+
+		// let header = Protocol.formatHeader(this.ssInf);
+		body.uri(uri);
+		if (act != null && act.length > 0)
+			header.act(act[0]); 
+
+		AnsonMsg<T> msg = new AnsonMsg<T>(port).header(header).body(body);
+		if (Clients.verbose) Utils.logi(msg.toString());
+    	HttpServClient httpClient = new HttpServClient();
+  		return httpClient.streamdown(Clients.servUrl(port), msg, localpath);
+	}
+
 	public AnsonHeader header() {
 		if (header == null)
 			header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
@@ -163,7 +179,7 @@ public class SessionClient {
 	 * @throws SQLException 
 	 */
 	public SessionClient console(AnsonMsg<? extends AnsonBody> req) throws SQLException {
-		if(Clients.console) {
+		if(Clients.verbose) {
 			try {
 				Utils.logi(req.toString());
 			} catch (Exception ex) { ex.printStackTrace(); }
@@ -197,7 +213,7 @@ public class SessionClient {
     	}
   		httpClient.post(Clients.servUrl(req.port()), req,
   				(code, obj) -> {
-  					if(Clients.console) {
+  					if(Clients.verbose) {
   						Utils.printCaller(false);
   						Utils.logAnson(obj);
   					}
@@ -224,7 +240,7 @@ public class SessionClient {
 
   		MsgCode code = resp.code();
 
-		if(Clients.console) {
+		if(Clients.verbose) {
 		  Utils.printCaller(false);
 		  Utils.logAnson(resp);
 		}
