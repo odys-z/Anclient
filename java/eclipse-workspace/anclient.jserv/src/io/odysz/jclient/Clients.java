@@ -2,7 +2,6 @@ package io.odysz.jclient;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.sql.SQLException;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
@@ -42,13 +41,12 @@ public class Clients {
 	 * @param uid
 	 * @param pswdPlain
 	 * @return null if failed, a SessionClient instance if login succeed.
-	 * @throws SQLException the request makes server generate wrong SQL.
 	 * @throws SemanticException Request can not parsed correctly 
-	 * @throws GeneralSecurityException  other error
+	 * @throws GeneralSecurityException  encrypting password error
 	 * @throws Exception, most likely the network failed
 	 */
 	public static SessionClient login(String uid, String pswdPlain)
-			throws IOException, SemanticException, SQLException, GeneralSecurityException, AnsonException {
+			throws IOException, SemanticException, GeneralSecurityException, AnsonException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
 		if (uid == null || pswdPlain == null)
@@ -56,9 +54,7 @@ public class Clients {
 		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 		
 		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
-  		// AnsonMsg<? extends AnsonBody> reqv11 = new AnsonMsg<AnQueryReq>(Port.session);;
 		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
-
 
 		HttpServClient httpClient = new HttpServClient();
 		String url = servUrl(Port.session);
@@ -103,13 +99,15 @@ public class Clients {
 		return String.format("%s/%s", servRt, port.url());
 	}
 
-	public String download(IPort port, AnsonMsg<? extends DocsReq> req, String localpath) throws IOException, AnsonException, SemanticException {
+	public String download(IPort port, AnsonMsg<? extends DocsReq> req, String localpath)
+			throws IOException, AnsonException, SemanticException {
 		String url = servUrl(port);
 		HttpServClient httpClient = new HttpServClient();
 		return httpClient.streamdown(url, req, localpath);
 	}
 
-	public String upload(IPort port, AnsonMsg<? extends DocsReq> req, String localpath) {
+	public AnsonMsg<AnsonResp> upload(IPort port, AnsonMsg<? extends DocsReq> req, String localpath)
+			throws SemanticException, IOException, AnsonException {
 		String url = servUrl(port);
 		HttpServClient httpClient = new HttpServClient();
 		return httpClient.streamup(url, req, localpath);

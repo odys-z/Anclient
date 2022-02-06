@@ -4,11 +4,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
@@ -23,6 +25,8 @@ import io.odysz.semantics.x.SemanticException;
 
 public class HttpServClient {
 	protected static final String USER_AGENT = "JClient.java/1.0";
+
+	protected static Tika detector = new Tika();
 
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
@@ -134,7 +138,8 @@ public class HttpServClient {
 	}
 
 	@SuppressWarnings("unchecked")
-	public String streamdown(String url, AnsonMsg<? extends DocsReq> jreq, String localpath) throws IOException, AnsonException, SemanticException {
+	public String streamdown(String url, AnsonMsg<? extends DocsReq> jreq, String localpath)
+			throws IOException, AnsonException, SemanticException {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -159,20 +164,77 @@ public class HttpServClient {
 		ofs.close();
 
 		AnsonMsg<AnsonResp> s = null;
+		String type = null; 
 		try {
 			FileInputStream ifs = new FileInputStream(localpath);
-			s = (AnsonMsg<AnsonResp>) Anson.fromJson(ifs);
+			type = detector.detect(ifs);
+			ifs.close();
 		}
 		catch (Exception e) {
 			return localpath;
 		}
-		throw new SemanticException("Code: %s\nmsg: %s", s.code(), s.body(0).msg());
+
+		if (type.startsWith("text")) {
+			FileInputStream ifs = new FileInputStream(localpath);
+			try {
+				s = (AnsonMsg<AnsonResp>) Anson.fromJson(ifs);
+			}
+			catch (Exception e) {
+				return localpath;
+			}
+			finally { ifs.close(); }
+			throw new SemanticException("Code: %s\nmsg: %s", s.code(), s.body(0).msg());
+		}
+
+		return localpath;
 	}
 	
+	public AnsonMsg<AnsonResp> streamup(String url, AnsonMsg<? extends DocsReq> req, String localpath) throws IOException, AnsonException, SemanticException {
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-	public String streamup(String url, AnsonMsg<? extends DocsReq> req, String localpath) {
-		// TODO Auto-generated method stub
-		return localpath;
+		//add reuqest header
+		con.setRequestMethod("POST");
+		con.setRequestProperty("User-Agent", USER_AGENT);
+		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		con.setRequestProperty("Content-Type", "text/plain"); 
+	    con.setRequestProperty("charset", "utf-8");
+
+		// Send post request
+		con.setDoOutput(true);
+
+		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
+		OutputStream ups = con.getOutputStream();
+		req.toBlock(ups);
+
+		if (Clients.verbose) Utils.logi(url);
+
+		FileInputStream ifs = new FileInputStream(localpath);  
+		IOUtils.copy(ifs, ups);
+		ifs.close();
+
+		int repcode = con.getResponseCode();
+		if (repcode == 200) {
+
+			if (con.getContentLengthLong() == 0)
+				throw new SemanticException("Error: server return null at %s ", url);
+
+			@SuppressWarnings("unchecked")
+			AnsonMsg<AnsonResp> x = (AnsonMsg<AnsonResp>) Anson.fromJson(con.getInputStream());
+			if (Clients.verbose) {
+				Utils.printCaller(false);
+				Utils.logi(x.toString());
+			}
+
+			if (x.code() != MsgCode.ok)
+				throw new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body().toString());
+			return x;
+		}
+		else {
+			Utils.warn("HTTP ERROR: code: %s", repcode);
+			throw new IOException("HTTP ERROR: code: " + repcode + "\n" + url);
+		}
+
 	}
 
 }

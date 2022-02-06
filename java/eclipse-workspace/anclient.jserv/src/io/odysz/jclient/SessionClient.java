@@ -160,6 +160,21 @@ public class SessionClient {
   		return httpClient.streamdown(Clients.servUrl(port), msg, localpath);
 	}
 
+	public <T extends DocsReq> AnsonMsg<AnsonResp> upload(String uri, IPort port, T body, String localpath, LogAct... act) throws AnsonException, SemanticException, IOException {
+		if (port == null)
+			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port explicitly specified.");
+
+		// let header = Protocol.formatHeader(this.ssInf);
+		body.uri(uri);
+		if (act != null && act.length > 0)
+			header.act(act[0]); 
+
+		AnsonMsg<T> msg = new AnsonMsg<T>(port).header(header).body(body);
+		if (Clients.verbose) Utils.logi(msg.toString());
+    	HttpServClient httpClient = new HttpServClient();
+  		return httpClient.streamup(Clients.servUrl(port), msg, localpath);
+	}
+	
 	public AnsonHeader header() {
 		if (header == null)
 			header = new AnsonHeader(ssInf.ssid(), ssInf.uid());

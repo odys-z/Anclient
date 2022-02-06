@@ -7,6 +7,7 @@ import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.jclient.tier.Semantier;
 import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
@@ -36,6 +37,20 @@ public class AlbumTier extends Semantier {
 		AlbumReq req = new AlbumReq().download(photo);
 		req.a(A.download);
 		return client.download(funcUri, AlbumPort.album, req, localpath);
+	}
+
+	public AlbumResp insertPhoto(String collId, String localname) throws SemanticException, IOException, AnsonException {
+		AlbumReq req = new AlbumReq().createPhoto(collId, localname);
+		req.a(A.insertPhoto);
+		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq("test/collect", AlbumPort.album, req);
+		return client.commit(q, errCtx);
+	}
+
+	public String upload(String pid, String localpath) throws SemanticException, AnsonException, IOException {
+		AlbumReq req = new AlbumReq().photoId(pid);
+		req.a(A.download);
+		AnsonMsg<AnsonResp> resp = client.upload(funcUri, AlbumPort.album, req, localpath);
+		return (String) resp.body(0).data().get("pid");
 	}
 
 }
