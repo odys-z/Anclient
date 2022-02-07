@@ -106,11 +106,13 @@ public class Clients {
 		return httpClient.streamdown(url, req, localpath);
 	}
 
+	/*
 	public AnsonMsg<AnsonResp> upload(IPort port, AnsonMsg<? extends DocsReq> req, String localpath)
 			throws SemanticException, IOException, AnsonException {
 		String url = servUrl(port);
 		HttpServClient httpClient = new HttpServClient();
 		return httpClient.streamup(url, req, localpath);
 	}
+	*/
 
 }

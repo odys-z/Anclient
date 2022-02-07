@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
@@ -189,6 +188,7 @@ public class HttpServClient {
 		return localpath;
 	}
 	
+	/* Introduction stream field in Anson?
 	public AnsonMsg<AnsonResp> streamup(String url, AnsonMsg<? extends DocsReq> req, String localpath) throws IOException, AnsonException, SemanticException {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -205,13 +205,14 @@ public class HttpServClient {
 
 		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
 		OutputStream ups = con.getOutputStream();
-		req.toBlock(ups);
 
 		if (Clients.verbose) Utils.logi(url);
 
-		FileInputStream ifs = new FileInputStream(localpath);  
-		IOUtils.copy(ifs, ups);
-		ifs.close();
+		req.toBlockStream(ups);
+//		FileInputStream ifs = new FileInputStream(localpath);  
+//		req.toBlock(ups);
+//		IOUtils.copy(ifs, ups);
+//		ifs.close();
 
 		int repcode = con.getResponseCode();
 		if (repcode == 200) {
@@ -234,7 +235,7 @@ public class HttpServClient {
 			Utils.warn("HTTP ERROR: code: %s", repcode);
 			throw new IOException("HTTP ERROR: code: " + repcode + "\n" + url);
 		}
-
 	}
+	*/
 
 }

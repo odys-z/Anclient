@@ -136,7 +136,7 @@ class AnClient {
 		let me = this;
 		return new Promise((resolve, reject) => {
 			me.login(usrId, pswd,
-				(ssClient) => {resolve(ssClient);},
+				(ssClient: SessionClient) => {resolve(ssClient);},
 				{ onError: (err) => {reject(err);} })
 		});
 	}

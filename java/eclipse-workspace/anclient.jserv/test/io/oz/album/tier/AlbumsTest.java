@@ -1,8 +1,6 @@
 package io.oz.album.tier;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +19,7 @@ import io.odysz.jclient.InsecureClient;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.x.SemanticException;
@@ -140,16 +139,17 @@ class AlbumsTest {
 		}
 	}
 	
+	@Test
 	void testUpload() throws TransException, IOException, AnsonException, GeneralSecurityException {
 		String localFolder = "res";
 		String filename = "my.jpg";
 
-		SessionClient ssclient = Clients.login("ody", "ody-s.github.io");
+		SessionClient ssclient = Clients.login("ody", "123456");
 		AlbumTier tier = new AlbumTier(ssclient, errCtx);
-		AlbumResp resp = tier.insertPhoto("c-001", filename);
+		AlbumResp resp = tier.insertPhoto("c-001", FilenameUtils.concat(localFolder, filename), filename);
 
-		String pid = resp.photo.pid;
-		tier.upload(pid, FilenameUtils.concat(localFolder, filename));
+		assertEquals("c-001", resp.photo.collectId);
+		assertEquals(6, resp.photo.pid.length());
 	}
 	
 }

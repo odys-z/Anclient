@@ -75,10 +75,10 @@ public class SessionClient {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public AnsonMsg<AnUpdateReq> update(String conn, String tbl, String... act)
+	public AnsonMsg<AnUpdateReq> update(String furi, String tbl, String... act)
 			throws SemanticException {
 
-		AnUpdateReq itm = AnUpdateReq.formatUpdateReq(conn, null, tbl);
+		AnUpdateReq itm = AnUpdateReq.formatUpdateReq(furi, null, tbl);
 		AnsonMsg<? extends AnsonBody> jmsg = userReq(Port.update, act, itm);
 
 		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
@@ -160,6 +160,7 @@ public class SessionClient {
   		return httpClient.streamdown(Clients.servUrl(port), msg, localpath);
 	}
 
+	/*
 	public <T extends DocsReq> AnsonMsg<AnsonResp> upload(String uri, IPort port, T body, String localpath, LogAct... act) throws AnsonException, SemanticException, IOException {
 		if (port == null)
 			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port explicitly specified.");
@@ -174,6 +175,7 @@ public class SessionClient {
     	HttpServClient httpClient = new HttpServClient();
   		return httpClient.streamup(Clients.servUrl(port), msg, localpath);
 	}
+	*/
 	
 	public AnsonHeader header() {
 		if (header == null)
