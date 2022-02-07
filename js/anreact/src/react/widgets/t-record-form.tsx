@@ -12,7 +12,6 @@ import Typography from '@material-ui/core/Typography';
 
 import { AnlistColAttrs, Semantier, TierComboField, Tierec } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
-import { toBool } from '../../utils/helpers';
 import { Comprops, CrudCompW } from '../crud';
 import { DatasetCombo } from './dataset-combo';
 import { ClassNames, CompOpts, invalidStyles, Media, toReactStyles } from '../anreact';

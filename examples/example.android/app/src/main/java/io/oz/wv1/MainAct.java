@@ -9,7 +9,6 @@ public class MainAct extends AppCompatActivity {
 
 	private static final WvClient appView = new WvClient();
 
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.wv);
@@ -18,6 +17,6 @@ public class MainAct extends AppCompatActivity {
 		wv.setWebViewClient(appView);
 		WebSettings webSettings = wv.getSettings();
 		webSettings.setJavaScriptEnabled(true);
-		wv.loadUrl("http://192.168.0.201:8888/test/react/dist/login.html?serv=host");
+		wv.loadUrl("http://localhost:8888/test/react/dist/login.html?serv=host");
 	}
 }
