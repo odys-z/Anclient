@@ -29,7 +29,7 @@ public class HttpServClient {
 
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
-	 * See {@link SemantiClientTest} for a query example.<br>
+	 * See {@link AnsonClientTest} for a query example.<br>
 	 * IMPORTANT onResponse is called synchronized.
 	 * <p>
 	 * @deprecated Replaced by {@link #post(String, AnsonMsg)}.
@@ -84,7 +84,7 @@ public class HttpServClient {
 
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
-	 * See {@link SemantiClientTest} for a query example.<br>
+	 * See {@link AnsonClientTest} for a query example.<br>
 	 * IMPORTANT onResponse is called synchronized.
 	 * @param url
 	 * @param jreq

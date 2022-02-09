@@ -15,19 +15,14 @@ import io.odysz.semantic.jsession.AnSessionResp;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
-/**
+/**Anclient.jave raw api - jserv protocol handler
+ * 
  * @author Ody Zhou
- * @param <T>
  */
 public class Clients {
 	public static final boolean verbose = true;
 
 	public static String servRt;
-	/**@deprecated
-	 * DB connection ID. same in connects.xml/t/C/id at server side.
-	private static String conn;
-	 * */
-
 
 	/**Initialize configuration.
 	 * @param servRoot

@@ -205,10 +205,9 @@ public class SessionClient {
 	}
 
 	/**@deprecated This is asynchronous API but works in synchronous.
-	 * @see {@link HttpServClient#post(String, AnsonMsg, SCallbackV11)}
-	 * <br>
 	 * The {@link ErrorCtx} API pattern is better.
-	 * @see #commit(AnsonMsg, SCallbackV11, ErrorCtx)
+	 * @see HttpServClient#post(String, AnsonMsg, SCallbackV11)
+	 * @see #commit(AnsonMsg, ErrorCtx)
 	 * @param <R> Request type
 	 * @param <A> Response type
 	 * @param req request
