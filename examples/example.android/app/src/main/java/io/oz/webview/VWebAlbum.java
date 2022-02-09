@@ -1,12 +1,11 @@
-package io.oz.wv1;
+package io.oz.webview;
 
-import android.content.Intent;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class WvClient extends WebViewClient {
+public class VWebAlbum extends WebViewClient {
 	@Override
 	public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
 		/*

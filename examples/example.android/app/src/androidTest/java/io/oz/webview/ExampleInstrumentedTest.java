@@ -1,4 +1,4 @@
-package io.oz.wv1;
+package io.oz.webview;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

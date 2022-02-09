@@ -1,13 +1,14 @@
-package io.oz.wv1;
+package io.oz.webview;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
-public class MainAct extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
 
-	private static final WvClient appView = new WvClient();
+public class WebAlbumAct extends AppCompatActivity {
+
+	private static final VWebAlbum appView = new VWebAlbum();
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -17,6 +18,6 @@ public class MainAct extends AppCompatActivity {
 		wv.setWebViewClient(appView);
 		WebSettings webSettings = wv.getSettings();
 		webSettings.setJavaScriptEnabled(true);
-		wv.loadUrl("http://localhost:8888/test/react/dist/login.html?serv=host");
+		wv.loadUrl("http://10.0.0.245:8888/index.html?serv=host");
 	}
 }
