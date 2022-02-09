@@ -39,7 +39,7 @@
   </repositories>
 
   <scm>
-  	<connection>scm:git:git://github.com/odys-z/Anclientact.git</connection>
+  	<connection>scm:git:git://github.com/odys-z/Anclient.git</connection>
   	<developerConnection>scm:git:odys-z@github.com:odys-z/Anclient.git</developerConnection>
   	<url>https://github.com/odys-z/Anclient</url>
   	<tag>HEAD</tag>
@@ -79,9 +79,10 @@
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>semantic.jserv</artifactId>
-	    <version>1.3.3-SNAPSHOT</version>
+	    <version>[1.3.3-SNAPSHOT,)</version>
 	</dependency>
 
+	<!--
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>jserv-album</artifactId>
@@ -89,6 +90,7 @@
 	    <type>war</type>
 	    <scope>test</scope>
 	</dependency>
+	-->
 
 	<dependency>
 		<groupId>org.vishag</groupId>
