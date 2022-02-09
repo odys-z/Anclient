@@ -23,7 +23,7 @@ Anprism: [![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou
 
 - Anclient.java
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/Anclient/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/Anclient/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/Anclient/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/)
 
 # Repository Structure
 
