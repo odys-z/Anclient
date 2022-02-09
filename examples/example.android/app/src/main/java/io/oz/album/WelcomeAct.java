@@ -20,14 +20,51 @@ import com.vincent.filepicker.filter.entity.ImageFile;
 import com.vincent.filepicker.filter.entity.NormalFile;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
+import org.apache.commons.io_odysz.FilenameUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 
+import io.odysz.anson.x.AnsonException;
+import io.odysz.jclient.Clients;
+import io.odysz.jclient.SessionClient;
+import io.odysz.jclient.tier.ErrorCtx;
+import io.odysz.semantics.IUser;
+import io.odysz.semantics.x.SemanticException;
+import io.oz.album.client.AlbumTier;
+import io.oz.album.tier.AlbumResp;
 import io.oz.webview.R;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
+    String jserv;
+
+    IUser photoUser;
+    /** local working dir */
+    String local;
+
+    static SessionClient client;
+
+    static ErrorCtx errCtx;
+
+    AlbumTier tier;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        jserv = "http://localhost:8080/jserv-album";
+        Clients.init(jserv);
+
+        try {
+            client = Clients.login("ody", "123456");
+        } catch (SemanticException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        tier = new AlbumTier(client, errCtx);
+
         setContentView(R.layout.welcome);
     }
 
@@ -80,6 +117,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 //                        builder.append(path + "\n");
 //                    }
 //                    mTvResult.setText(builder.toString());
+                    tier.upload(list);
                 }
                 break;
             case Constant.REQUEST_CODE_PICK_VIDEO:

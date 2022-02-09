@@ -10,6 +10,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
+import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
 import io.odysz.semantic.tier.docs.DocsReq;
@@ -38,10 +39,11 @@ public class Clients {
 	 * @return null if failed, a SessionClient instance if login succeed.
 	 * @throws SemanticException Request can not parsed correctly 
 	 * @throws GeneralSecurityException  encrypting password error
+	 * @throws SsException 
 	 * @throws Exception, most likely the network failed
 	 */
 	public static SessionClient login(String uid, String pswdPlain)
-			throws IOException, SemanticException, GeneralSecurityException, AnsonException {
+			throws IOException, SemanticException, GeneralSecurityException, AnsonException, SsException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
 		if (uid == null || pswdPlain == null)
@@ -79,7 +81,7 @@ public class Clients {
 		if (AnsonMsg.MsgCode.ok == resp.code()) {
 			return new SessionClient(((AnSessionResp) resp.body(0)).ssInf());
 		}
-		else throw new SemanticException(
+		else throw new SsException(
 				"loging failed\ncode: %s\nerror: %s",
 				resp.code(), ((AnsonResp)resp.body(0)).msg());
 	}
