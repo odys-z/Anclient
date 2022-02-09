@@ -9,6 +9,7 @@ is also been verified.
 
 @anclient/semantier-st:
 [![npm](https://img.shields.io/npm/v/@anclient/semantier-st?logo=npm)](https://npmjs.org/package/@anclient/semantier-st)
+
 (sunsetting js version: @anclient/semantier
 [![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier))
 
@@ -17,12 +18,14 @@ together with
 @anclient/anreact:
 [![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
 
-- VS Code extension
+- Anprism
 
-Anprism: [![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
+VS Code extension:
+[![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
 
 - Anclient.java
 
+Anclient for Java:
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/Anclient/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/)
 
 # Repository Structure
