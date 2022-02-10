@@ -20,11 +20,7 @@ import com.vincent.filepicker.filter.entity.ImageFile;
 import com.vincent.filepicker.filter.entity.NormalFile;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
-import org.apache.commons.io_odysz.FilenameUtils;
-
-import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
@@ -33,8 +29,8 @@ import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.x.SemanticException;
+import io.oz.album.client.AlbumClientier;
 import io.oz.album.client.AlbumTier;
-import io.oz.album.tier.AlbumResp;
 import io.oz.webview.R;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
@@ -48,7 +44,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     static ErrorCtx errCtx;
 
-    AlbumTier tier;
+    AlbumClientier tier;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +59,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         } catch (Exception e) {
             e.printStackTrace();
         }
-        tier = new AlbumTier(client, errCtx);
+        tier = new AlbumClientier(client, errCtx);
 
         setContentView(R.layout.welcome);
     }
@@ -117,7 +113,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 //                        builder.append(path + "\n");
 //                    }
 //                    mTvResult.setText(builder.toString());
-                    tier.upload(list);
+                    try {
+                        tier.syncPhotos(list);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (AnsonException e) {
+                        e.printStackTrace();
+                    } catch (SemanticException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             case Constant.REQUEST_CODE_PICK_VIDEO:

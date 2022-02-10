@@ -2,21 +2,21 @@ package com.vincent.filepicker.filter.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 /**
  * Created by Vincent Woo
  * Date: 2016/10/10
  * Time: 17:32
  */
 
-public class BaseFile implements Parcelable {
+public class BaseFile implements Parcelable, IFileDescriptor {
     private long id;
     private String name;
     private String path;
-    private long size;   //byte
-    private String bucketId;  //Directory ID
+    private long size;          //byte
+    private String bucketId;    //Directory ID
     private String bucketName;  //Directory Name
-    private long date;  //Added Date
+    private long date;          //Added Date
     private boolean isSelected;
 
     @Override
@@ -110,9 +110,7 @@ public class BaseFile implements Parcelable {
     }
 
     @Override
-    public int describeContents() {
-        return 0;
-    }
+    public int describeContents() { return 0; }
 
     public static final Creator<BaseFile> CREATOR = new Creator<BaseFile>() {
         @Override
@@ -134,4 +132,26 @@ public class BaseFile implements Parcelable {
             return file;
         }
     };
+
+    String recId;
+    @Override
+    public String recId() {
+        return recId;
+    }
+
+    @Override
+    public String recId(String rid) {
+        this.recId = rid;
+        return this;
+    }
+
+    @Override
+    public String fullpath() {
+        return path;
+    }
+
+    @Override
+    public String clientname() {
+        return name;
+    }
 }

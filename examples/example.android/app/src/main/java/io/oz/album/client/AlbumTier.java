@@ -5,7 +5,6 @@ import com.vincent.filepicker.filter.entity.ImageFile;
 
 import org.apache.commons.io_odysz.FilenameUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,6 +14,7 @@ import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.jclient.tier.Semantier;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
@@ -47,9 +47,9 @@ public class AlbumTier extends Semantier {
 		return client.download(funcUri, AlbumPort.album, req, localpath);
 	}
 
-	public AlbumResp insertPhoto(String collId, String fullpath, String clientname) throws SemanticException, IOException, AnsonException {
+	public AlbumResp insertPhoto(String fullpath, String clientname) throws SemanticException, IOException, AnsonException {
 		AlbumReq req = new AlbumReq()
-				.createPhoto(collId, fullpath)
+				.createPhoto(null, fullpath)  // null collect-id: have sever figure out it
 				.photoName(clientname);
 		req.a(A.insertPhoto);
 
@@ -61,19 +61,17 @@ public class AlbumTier extends Semantier {
 		return client.commit(q, errCtx);
 	}
 
-	public void upload(ArrayList<? extends BaseFile> list) {
-	    for (BaseFile f : list) {
-			AlbumResp resp = insertCollect("c-001", FilenameUtils.concat(localFolder, filename), filename);
-			local = new File("src/test/local").getAbsolutePath();
+	public void uploadPhotos(ArrayList<? extends DocsResp> list) throws IOException, AnsonException, SemanticException {
+		AlbumReq req = new AlbumReq();
+	    for (DocsResp f : list) {
+	        req.createPhoto(f);
 		}
-	}
+		req.a(A.insertPhoto);
 
-	/*
-	public String upload(String pid, String localpath) throws SemanticException, AnsonException, IOException {
-		AlbumReq req = new AlbumReq().photoId(pid);
-		req.a(A.download);
-		AnsonMsg<AnsonResp> resp = client.upload(funcUri, AlbumPort.album, req, localpath);
-		return (String) resp.body(0).data().get("pid");
+		String[] act = AnsonHeader.usrAct("AlbumTest", "create photo", "c/photo", "test");
+		AnsonHeader header = client.header().act(act);
+		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq("test/collect", AlbumPort.album, req)
+				.header(header);
+		AlbumResp resp = client.commit(q, errCtx);
 	}
-	*/
 }
