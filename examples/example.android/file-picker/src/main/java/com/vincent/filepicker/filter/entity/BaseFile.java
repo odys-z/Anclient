@@ -140,7 +140,7 @@ public class BaseFile implements Parcelable, IFileDescriptor {
     }
 
     @Override
-    public String recId(String rid) {
+    public IFileDescriptor recId(String rid) {
         this.recId = rid;
         return this;
     }
