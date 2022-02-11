@@ -37,7 +37,7 @@ dependencies {
     implementation group: 'io.github.odys-z', name: 'anclient.java', version: '0.3.0-SNAPSHOT'
     implementation group: 'io.github.odys-z', name: 'album-lib', version: '0.1.0-SNAPSHOT'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
