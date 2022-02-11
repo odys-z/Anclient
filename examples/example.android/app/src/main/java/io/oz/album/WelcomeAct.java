@@ -5,10 +5,15 @@ import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.activity.AudioPickActivity;
@@ -24,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
@@ -44,13 +50,19 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     static ErrorCtx errCtx;
 
+    String clientUri;
     AlbumClientier tier;
+
+    /** Preference activity starter */
+    private ActivityResultLauncher<Intent> startPrefs;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        jserv = "http://localhost:8080/jserv-album";
-        Clients.init(jserv);
+        clientUri = getResources().getString(R.string.client_uri);
+        jserv = getResources().getString(R.string.jserv);
+        if (LangExt.isblank(jserv))
+            startPrefsAct();
+        else Clients.init(jserv);
 
         try {
             client = Clients.login("ody", "123456");
@@ -59,9 +71,27 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         } catch (Exception e) {
             e.printStackTrace();
         }
-        tier = new AlbumClientier(client, errCtx);
+        tier = new AlbumClientier(clientUri, client, errCtx);
 
         setContentView(R.layout.welcome);
+    }
+
+    private void startPrefsAct() {
+        if (startPrefs == null)
+            startPrefs = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Log.i(clientUri + "/jserv-root", data.getAction());
+                    }
+                    SharedPreferences sharedPreferences =
+                            PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+                    jserv = sharedPreferences.getString("key_gallery_name", "");
+                    Log.i(clientUri + "/jserv-root/name", jserv);
+                }
+        );
+        startPrefs.launch(new Intent(WelcomeAct.this, SettingsPrefActivity.class));
     }
 
     @Override

@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerListItemDecoration;
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.adapter.AudioPickAdapter;
@@ -32,6 +31,8 @@ import com.vincent.filepicker.filter.entity.Directory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.oz.fpick.R;
 
 /**
  * Created by Vincent Woo

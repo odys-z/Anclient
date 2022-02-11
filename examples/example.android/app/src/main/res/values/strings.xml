@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name" translatable="false">Acadynamo</string>
+    <string name="app_name" translatable="false">Family Album</string>
+    <string name="client_uri" translatable="false">album/album</string>
+
+    <string name="jserv_key" translatable="false">jserv.album</string>
+    <string name="jserv_default" translatable="false">http://192.168.0.1:8888</string>
+    <string name="jserv" translatable="false">http://192.168.0.1:8888</string>
+    <string name="jserv_title" translatable="false">Home Server IP</string>
 </resources>

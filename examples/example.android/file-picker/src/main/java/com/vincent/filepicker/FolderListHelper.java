@@ -18,6 +18,8 @@ import com.vincent.filepicker.filter.entity.Directory;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.oz.fpick.R;
+
 /**
  * Created by Vincent Woo
  * Date: 2018/2/27

@@ -22,6 +22,9 @@ import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Photo;
 
+/**
+ * @deprecated
+ */
 public class AlbumTier extends Semantier {
 
 	private SessionClient client;

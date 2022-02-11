@@ -3,13 +3,15 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import io.odysz.semantic.tier.docs.IFileDescriptor;
+
 /**
  * Created by Vincent Woo
  * Date: 2016/10/10
  * Time: 17:44
  */
 
-public class ImageFile extends BaseFile implements Parcelable {
+public class ImageFile extends BaseFile implements Parcelable, IFileDescriptor {
     private int orientation;   //0, 90, 180, 270
 
     public int getOrientation() {

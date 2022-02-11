@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerListItemDecoration;
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.NormalFilePickAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
@@ -27,6 +26,8 @@ import com.vincent.filepicker.filter.entity.NormalFile;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.oz.fpick.R;
 
 /**
  * Created by Vincent Woo

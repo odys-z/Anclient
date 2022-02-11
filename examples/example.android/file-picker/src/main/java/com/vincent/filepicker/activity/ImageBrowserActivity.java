@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import com.bm.library.PhotoView;
 import com.bumptech.glide.Glide;
 import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.filter.FileFilter;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
@@ -28,6 +27,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import io.oz.fpick.R;
 
 /**
  * Created by Vincent Woo
