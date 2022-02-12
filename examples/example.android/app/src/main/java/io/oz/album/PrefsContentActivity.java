@@ -1,33 +1,34 @@
 package io.oz.album;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
+import android.app.Application;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import io.oz.webview.R;
 
-public class SettingsPrefActivity extends PreferenceActivity {
-    private static final String TAG = SettingsPrefActivity.class.getSimpleName();
+/**
+ */
+public class PrefsContentActivity extends AppCompatActivity {
+    static final String TAG = PrefsContentActivity.class.getSimpleName();
+
+    public static String key_userid;
+    public static String key_pswd;
+    static String key_jserv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        key_jserv = getString(R.string.jserv_key);
+        key_userid = ""; // getString(R.string.userid_key);
+        key_pswd = ""; // getString(R.string.pswd_key);
 
         // load settings fragment
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MainPreferenceFragment()).commit();
@@ -39,8 +40,16 @@ public class SettingsPrefActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref);
 
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.jserv_key)));
+            bindPreferenceSummaryToValue(findPreference(key_jserv));
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private static void bindPreferenceSummaryToValue(Preference preference) {
@@ -62,7 +71,7 @@ public class SettingsPrefActivity extends PreferenceActivity {
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             String stringValue = newValue.toString();
 
-            if (preference.getKey().equals("jserv_key")) {
+            if (preference.getKey().equals(key_jserv)) {
                 // Log.i("jserv-root", stringValue);
                 preference.setSummary(stringValue);
             }

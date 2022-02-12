@@ -1,15 +1,34 @@
 <resources>
+    <style name="vw_FilePickerTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
 
-    <!-- ToolBar菜单弹出样式 -->
+        <!-- ToolBar Menu -->
+        <item name="actionOverflowMenuStyle">@style/vw_OverflowMenuStyle</item>
 
-    <!-- ToolBar菜单样式 -->
-    <style name="vw_ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <!-- 非溢出菜单字体颜色，想要修改溢出菜单内的字体颜色只能直接设置textColorPrimary但此选项会影响Title的颜色-->
-        <!--<item name="actionMenuTextColor">#FFFFFF</item>-->
-        <item name="android:textSize">16sp</item> <!-- 字体大小 -->
+        <!-- ToolBar Menu -->
+        <!--<item name="colorControlNormal">#FFFFFF</item>-->
+
+        <!--<item name="android:textColorPrimary">#FFFFFF</item>-->
+
+        <item name="android:listDivider">@drawable/vw_divider_rv</item>
     </style>
 
-    <!-- MaxHeightLayout属性 -->
+    <!-- ToolBar Popup -->
+    <style name="vw_OverflowMenuStyle" parent="@style/Widget.AppCompat.PopupMenu.Overflow">
+        <item name="overlapAnchor">false</item>
+        <item name="android:popupBackground">#000000</item>
+        <item name="android:dropDownVerticalOffset">4dp</item>
+        <item name="android:dropDownHorizontalOffset">0dp</item>
+    </style>
+
+    <!-- ToolBar Menu -->
+    <style name="vw_ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <declare-styleable name="MaxHeightLayout">
         <attr name="mhl_HeightRatio" format="reference|float" />
         <attr name="mhl_HeightDimen" format="reference|dimension" />
