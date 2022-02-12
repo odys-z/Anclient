@@ -1,3 +1,5 @@
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+
 # About
 
 Clients of semantic-\*. Including a Java and Javascript version. The C# version
@@ -5,19 +7,23 @@ is also been verified.
 
 - Anclient.js
 
-@anclient/semantier-st:
 [![npm](https://img.shields.io/npm/v/@anclient/semantier-st?logo=npm)](https://npmjs.org/package/@anclient/semantier-st)
-(sunsetting js version: @anclient/semantier
-[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier))
+@anclient/semantier-st
 
 together with
 
-@anclient/anreact:
 [![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
+@anclient/anreact
 
-- VS Code extension
+- Anprism
 
-Anprism: [![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
+[![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
+VS Code extension
+
+- Anclient.java
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/Anclient/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/)
+Anclient for Java
 
 # Repository Structure
 

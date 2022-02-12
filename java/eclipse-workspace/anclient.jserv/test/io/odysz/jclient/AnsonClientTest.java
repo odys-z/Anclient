@@ -1,7 +1,6 @@
 package io.odysz.jclient;
 
-import static org.junit.Assert.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
+import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.ext.AnDatasetReq;
 import io.odysz.semantic.ext.AnDatasetResp;
@@ -26,40 +25,46 @@ import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
+import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantics.x.SemanticException;
-import io.odysz.transact.sql.parts.condition.ExprPart;
 
 /**
  * Unit test for sample App. 
  */
 public class AnsonClientTest {
-	private static String jserv = null;
-	private static String pswd = null;
+	private static String jserv = "http://localhost:8080/jserv-album";
+	private static String pswd = "123456";
 	private static String filename = "res/Sun_Yat-sen_2.jpg";
 	
-	private AnsonClient client;
+	private SessionClient client;
+	private static ErrorCtx errCtx;
 
 	@BeforeAll
 	public static void init() {
 		Utils.printCaller(false);
-		jserv = System.getProperty("jserv");
-		if (jserv == null)
-			fail("\nTo test AnsonClient, you need start a jsample server and define @jserv like this to run test:\n" +
-				"-Djserv=http://localhost:8080/doc-base\n" +
-				"In Eclipse, it is defined in:\n" +
-				"Run -> Debug Configurations ... -> Junit [your test case name] -> Arguments");
-   		pswd = System.getProperty("pswd");
-   		if (pswd == null)
-			fail("\nTo test Anclient.java, you need to configure user 'admin' and it's password at jsample server, then define @pswd like this to run test:\n" +
-				"-Dpswd=*******");
+//		jserv = System.getProperty("jserv");
+//		if (jserv == null)
+//			fail("\nTo test AnsonClient, you need start a jsample server and define @jserv like this to run test:\n" +
+//				"-Djserv=http://localhost:8080/doc-base\n" +
+//				"In Eclipse, it is defined in:\n" +
+//				"Run -> Debug Configurations ... -> Junit [your test case name] -> Arguments");
+//   		pswd = System.getProperty("pswd");
+//   		if (pswd == null)
+//			fail("\nTo test Anclient.java, you need to configure user 'admin' and it's password at jsample server, then define @pswd like this to run test:\n" +
+//				"-Dpswd=*******");
 
     	Clients.init(jserv);
+    	errCtx = new ErrorCtx() {
+    		public void onError(MsgCode code, AnsonResp resp) throws SemanticException {
+    			fail(String.format("code: %s\nmsg: %s", resp.msg()));
+    		}
+    	};
     }
 
-    @Test
+	@Test
     public void queryTest() throws IOException,
     		SemanticException, SQLException, GeneralSecurityException, AnsonException {
     	Utils.printCaller(false);
@@ -67,18 +72,35 @@ public class AnsonClientTest {
     	String sys = "sys-sqlite";
     	
     	client = Clients.login("admin", pswd);
-    	AnsonMsg<AnQueryReq> req = client.query(sys,
+    	AnsonMsg<AnQueryReq> jreq = client.query(sys,
     			"a_users", "u",
     			-1, -1); // no paging
 
-    	req.body(0)
+    	jreq.body(0)
     		.expr("userName", "uname")
     		.expr("userId", "uid")
     		.expr("r.roleId", "role")
     		.j("a_roles", "r", "u.roleId = r.roleId")
     		.where("=", "u.userId", "'admin'");
 
-    	client.commit(req, (code, data) -> {
+    	AnsonResp resp = client.commit(jreq, errCtx);
+		List<AnResultset> rses = (List<AnResultset>) resp.rs();
+		for (AnResultset rs : rses) {
+			  rs.beforeFirst();
+			  while(rs.next()) {
+				  String uid0 = rs.getString("uid");
+				  assertEquals("admin", uid0);
+						  
+				  String roleId = rs.getString("role");
+				  getEcho("admin", roleId);
+
+				  // function/semantics tests
+				  testUpload(client);
+				  // insert/load oracle reports
+				  // testORCL_Reports(client);
+			  }
+		}
+    	/* client.commit(jreq, (code, data) -> {
 				List<AnResultset> rses = (List<AnResultset>) data.rs();
   				for (AnResultset rs : rses) {
   					rs.printSomeData(true, 2, "uid", "uname", "role");
@@ -94,51 +116,62 @@ public class AnsonClientTest {
   						testUpload(client);
 
   						// insert/load oracle reports
-  						testORCL_Reports(client);
+  						// testORCL_Reports(client);
   					}
   				}
     		}, (code, err) -> {
   				fail(err.msg());
   				client.logout();
-    	});
+    	}); */
     }
 
 	private void getEcho(String string, String roleId)
 			throws SemanticException, IOException, SQLException, AnsonException {
 		// AnDatasetReq req = new AnDatasetReq(null, "jserv-sample");
+		if (!jserv.contains("jserv-sample"))
+		{
+			Utils.warn("getEcho() can only work with jsample");
+			return;
+		}
 		AnDatasetReq req = new AnDatasetReq(null, "sys-sqlite");
 
 		String t = "menu";
-		AnsonHeader header = client.header();
 		String[] act = AnsonHeader.usrAct("SemanticClientTest", "init", t,
 				"test jclient.java loading menu from menu.sample");
+		AnsonHeader header = client.header().act(act);
 
-		AnsonMsg<? extends AnsonBody> jmsg = client.userReq(Port.echo, act, req);
+		// AnsonMsg<? extends AnsonBody> jmsg = client.userReq(Port.echo, act, req);
+		AnsonMsg<? extends AnsonBody> jmsg = client.<AnDatasetReq>userReq("test/echo", Port.echo, req);//, act);
 		jmsg.header(header);
 
-		client.console(jmsg);
+		// client.console(jmsg);
 		
+		AnsonResp resp = client.commit(jmsg, errCtx);
+		assertTrue(((AnDatasetResp)resp).forest().size() > 0);
+		/*
     	client.commit(jmsg, (code, data) -> {
 			List<?> rses = ((AnDatasetResp)data).forest();
 			Utils.logi(rses);;
     	});
+    	*/
 	}
 
-	static void testUpload(AnsonClient client)
+	static void testUpload(SessionClient client)
 			throws SemanticException, IOException, SQLException, AnsonException {
 		Path p = Paths.get(filename);
 		byte[] f = Files.readAllBytes(p);
 		String b64 = AESHelper.encode64(f);
 
-		AnsonMsg<? extends AnsonBody> jmsg = client.update(null, "a_users");
+		String furi = "test/Anclient";
+		AnsonMsg<? extends AnsonBody> jmsg = client.update(furi, "a_users");
 		AnUpdateReq upd = (AnUpdateReq) jmsg.body(0);
 		upd.nv("nationId", "CN")
 			.whereEq("userId", "admin")
 			// .post(((UpdateReq) new UpdateReq(null, "a_attach")
-			.post(AnUpdateReq.formatDelReq(null, null, "a_attaches")
+			.post(AnUpdateReq.formatDelReq(furi, null, "a_attaches")
 					.whereEq("busiTbl", "a_users")
 					.whereEq("busiId", "admin")
-					.post((AnInsertReq.formatInsertReq(null, null, "a_attaches")
+					.post((AnInsertReq.formatInsertReq(furi, null, "a_attaches")
 							.cols("attName", "busiId", "busiTbl", "uri")
 							.nv("attName", "'s Portrait")
 							// The parent pk can't be resulved, we must provide the value.
@@ -149,8 +182,11 @@ public class AnsonClientTest {
 
 		jmsg.header(client.header());
 
-		client.console(jmsg);
+		// client.console(jmsg);
 		
+		AnsonResp resp = client.commit(jmsg, errCtx);
+		assertEquals("", (String) resp.data().get("aid"));
+		/*
     	client.commit(jmsg,
     		(code, data) -> {
     			// This line can not been tested without branch
@@ -162,9 +198,11 @@ public class AnsonClientTest {
     		(c, err) -> {
 				fail(String.format("code: %s, error: %s", c, err.msg()));
     		});
+    	*/
 	}
 
-	private void testORCL_Reports(AnsonClient client)
+	/*
+	private void testORCL_Reports(SessionClient client)
 			throws SemanticException, IOException, SQLException, AnsonException {
 		String orcl = "orcl.alarm-report";
 
@@ -228,9 +266,10 @@ public class AnsonClientTest {
 				fail(String.format("code: %s, error: %s", c, err.msg()));
     		});
 	}
+	*/
 
-	private static String randomVal() {
-		double r = Math.random() * 100;
-		return String.valueOf(r);
-	}
+//	private static String randomVal() {
+//		double r = Math.random() * 100;
+//		return String.valueOf(r);
+//	}
 }

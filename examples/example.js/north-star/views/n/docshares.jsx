@@ -2,15 +2,13 @@ import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
-import { Box, TextField, Button, Grid, Card, Typography, Link } from '@material-ui/core';
+import { Box, Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp, InsertReq, AnsonBody, Semantier } from '@anclient/semantier-st';
-import { L, Langstrs,
-    AnConst, AnContext, AnError, CrudCompW, AnReactExt,
-	AnQueryst, AnTablist, DatasetCombo, ConfirmDialog, jsample, utils
+import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier-st';
+import { L, AnContext, CrudCompW, AnQueryst, AnTablist, ConfirmDialog, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
-const { mimeOf, dataOfurl, urlOfdata, regex } = utils;
+const { mimeOf, dataOfurl, regex } = utils;
 
 import { starTheme } from '../../common/star-theme';
 import { DocshareDetails } from './docshare-details';

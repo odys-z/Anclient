@@ -22,7 +22,7 @@ export class Semantier {
 	uri = '';
 
 	/** maintable's record fields */
-	_fields = [];
+	// _fields = [];
 
 	/** optional main table's pk */
 	pk = '';

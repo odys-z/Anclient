@@ -2,7 +2,6 @@ package io.odysz.jclient;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.sql.SQLException;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
@@ -11,41 +10,40 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
+import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
+import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
-/**
- * @author odys-z@github.com
- * @param <T>
+/**Anclient.jave raw api - jserv protocol handler
+ * 
+ * @author Ody Zhou
  */
 public class Clients {
-	public static final boolean console = true;
+	public static final boolean verbose = true;
 
 	public static String servRt;
-	/** DB connection ID. same in connects.xml/t/C/id at server side. */
-	private static String conn;
-
 
 	/**Initialize configuration.
 	 * @param servRoot
 	 */
 	public static void init(String servRoot) {
 		servRt = servRoot;
-		conn = null; // client can't control engine connect. configured in workflow-meta.xml
+		// conn = null; // client can't control engine connect. configured in workflow-meta.xml
 	}
 	
 	/**Login and return a client instance (with session managed by jserv).
 	 * @param uid
 	 * @param pswdPlain
 	 * @return null if failed, a SessionClient instance if login succeed.
-	 * @throws SQLException the request makes server generate wrong SQL.
 	 * @throws SemanticException Request can not parsed correctly 
-	 * @throws GeneralSecurityException  other error
+	 * @throws GeneralSecurityException  encrypting password error
+	 * @throws SsException 
 	 * @throws Exception, most likely the network failed
 	 */
-	public static AnsonClient login(String uid, String pswdPlain)
-			throws IOException, SemanticException, SQLException, GeneralSecurityException, AnsonException {
+	public static SessionClient login(String uid, String pswdPlain)
+			throws IOException, SemanticException, GeneralSecurityException, AnsonException, SsException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
 		if (uid == null || pswdPlain == null)
@@ -53,17 +51,16 @@ public class Clients {
 		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 		
 		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
-  		// AnsonMsg<? extends AnsonBody> reqv11 = new AnsonMsg<AnQueryReq>(Port.session);;
 		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
-
-		AnsonClient[] inst = new AnsonClient[1]; 
 
 		HttpServClient httpClient = new HttpServClient();
 		String url = servUrl(Port.session);
-		httpClient.post(url, reqv11, (code, msg) -> {
+		/*
+			SessionClient[] inst = new SessionClient[1]; 
+			httpClient.post(url, reqv11, (code, msg) -> {
 					if (AnsonMsg.MsgCode.ok == code) {
 						// create a logged in client
-						inst[0] = new AnsonClient(((AnSessionResp) msg).ssInf());
+						inst[0] = new SessionClient(((AnSessionResp) msg).ssInf());
 
 						if (Clients.console)
 							Utils.logi(msg.toString());
@@ -75,6 +72,18 @@ public class Clients {
   		if (inst[0] == null)
   			throw new IOException("HttpServClient return null client.");
   		return inst[0];
+  		*/
+
+		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
+		if (Clients.verbose)
+			Utils.logi(resp.toString());
+
+		if (AnsonMsg.MsgCode.ok == resp.code()) {
+			return new SessionClient(((AnSessionResp) resp.body(0)).ssInf());
+		}
+		else throw new SsException(
+				"loging failed\ncode: %s\nerror: %s",
+				resp.code(), ((AnsonResp)resp.body(0)).msg());
 	}
 	
 	/**Helper for generate serv url (with configured server root and db connection ID).
@@ -82,6 +91,25 @@ public class Clients {
 	 * @return url, e.g. http://localhost:8080/query.serv?conn=null
 	 */
 	static String servUrl(IPort port) {
-		return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
+		// Since version for semantier, this will return without conn id. 
+		// return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
+		return String.format("%s/%s", servRt, port.url());
 	}
+
+	public String download(IPort port, AnsonMsg<? extends DocsReq> req, String localpath)
+			throws IOException, AnsonException, SemanticException {
+		String url = servUrl(port);
+		HttpServClient httpClient = new HttpServClient();
+		return httpClient.streamdown(url, req, localpath);
+	}
+
+	/*
+	public AnsonMsg<AnsonResp> upload(IPort port, AnsonMsg<? extends DocsReq> req, String localpath)
+			throws SemanticException, IOException, AnsonException {
+		String url = servUrl(port);
+		HttpServClient httpClient = new HttpServClient();
+		return httpClient.streamup(url, req, localpath);
+	}
+	*/
+
 }

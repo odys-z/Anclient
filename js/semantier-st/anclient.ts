@@ -1,12 +1,12 @@
 
 /**The lower API of jclient/js */
 
-import $ from 'jquery';
+import * as $ from 'jquery';
 import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, AnResultset, CRUD, DatasetierResp, PkMeta
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta
 } from './protocol';
 import { ErrorCtx } from './semantier';
 
@@ -136,7 +136,7 @@ class AnClient {
 		let me = this;
 		return new Promise((resolve, reject) => {
 			me.login(usrId, pswd,
-				(ssClient) => {resolve(ssClient);},
+				(ssClient: SessionClient) => {resolve(ssClient);},
 				{ onError: (err) => {reject(err);} })
 		});
 	}
@@ -246,7 +246,6 @@ class AnClient {
 							onErr.onError(Protocol.MsgCode.exIo, ansonResp);
 						}
 						else throw Error("In anreact for typescript, onErr must be an ErrorCtx.")
-						// else onErr(Protocol.MsgCode.exIo, ansonResp);
 					}
 					else {
 						if (resp.code || resp.port || !resp.status)
@@ -263,7 +262,6 @@ class AnClient {
 							onErr.onError(Protocol.MsgCode.exIo, resp);
 						}
 						else throw Error("In anreact for typescript, onErr must be an ErrorCtx.")
-						// onErr(Protocol.MsgCode.exIo, resp);
 					}
 				}
 				else {
@@ -727,9 +725,7 @@ class SessionClient {
 	 * @param cmd
 	 * @param remarks
 	 * @return this */
-	usrAct(funcId: string, cate: string, cmd: string, remarks?: string): SessionClient {
-		// if (this.currentAct === undefined)
-		// 	this.currentAct = {};
+	usrAct(funcId: string, cate: string, cmd: string, remarks?: string): this {
 		Object.assign({}, this.currentAct,
 			{func: funcId, cate: cate, cmd: cmd, remarks: remarks});
 		return this;
@@ -737,19 +733,19 @@ class SessionClient {
 
 	/**@deprecated not good practice for vscode.
 	 * For name errata */
-	userAct(f: string, c: string, m: string, r: string) { this.usrAct(f, c, m, r); }
+	userAct(f: string, c: string, m: string, r: string) : this {
+		return this.usrAct(f, c, m, r);
+	}
 
 	/**Set user's current action to be logged.
-	 * @param {string} cmd user's command, e.g. 'save'
-	 * @return {SessionClient} this */
-	usrCmd(cmd) {
-		// if (this.currentAct === undefined)
-		// 	this.currentAct = {};
+	 * @param cmd user's command, e.g. 'save'
+	 * @return this */
+	usrCmd(cmd: string) : this {
 		this.currentAct.cmd = cmd;
 		return this;
 	}
 
-	logout(onOk: OnCommitOk, onError) {
+	logout(onOk: OnCommitOk, onError: ErrorCtx) {
 		let header = Protocol.formatHeader(this.ssInf);
 		let body = {type: "io.odysz.semantic.jsession.AnSessionReq", a: "logout"};
 		let req = new AnsonMsg({port: 'session', header, body: [body]});
@@ -761,8 +757,8 @@ class SessionClient {
 		},
 		{ onError: (c, e) => {
         	localStorage.setItem(SessionClient.ssInfo, null);
-			if (typeof onError === 'function')
-				onError(c, e);
+			// if (typeof onError === 'function')
+			// 	onError(c, e);
 		} });
 	}
 }
@@ -770,43 +766,30 @@ class SessionClient {
 /**Client without session information.
  * This is needed for some senarios like rigerstering new accounts.*/
 class Inseclient extends SessionClient {
-	// commit (jmsg, onOk, onErr) {
-	// 	an.post(jmsg, onOk, onErr);
-	// }
 	userId = 'localhost';
 
 	/**
-	 * @param {object} opts
-	 * @param {string} opts.urlRoot
+	 * @param opts
+	 * @param opts.urlRoot jserv root
 	 * @constructor
 	 */
-	constructor(opts) {
+	constructor(opts: { urlRoot: string; }) {
 		super(undefined, undefined, true);
 		this.ssInf = {}
 		this.an = an;
 		an.init(opts.urlRoot);
 	}
 
-	/**Get a header the jserv can verify successfully.
+	/**
+	 * Get a header the jserv can verify successfully.
 	 * This method is not recommended used directly.
 	 * @param {Object} act user's action for logging<br>
 	 * {func, cate, cmd, remarks};
 	 * @return the logged in header */
-	getHeader(act) {
+	getHeader(act: LogAct) {
 		var header = Protocol.formatHeader({ssid: undefined, uid: this.userId});
 
 		return new AnHeader(this.ssInf.ssid, this.ssInf.uid);
-		// if (typeof act === 'object') {
-		// 	header.userAct(act);
-		// }
-		// else {
-		// 	header.userAct(
-		// 		{func: 'insecure',
-		// 		 cmd: 'unknown',
-		// 		 cate: 'sessionless',
-		// 		 remarks: 'sessionless header'} );
-		// }
-		// return header;
 	}
 }
 
