@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import io.oz.fpick.R;
+
 /**
  * Created by Vincent Woo
  * Date: 2018/2/26

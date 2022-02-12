@@ -5,12 +5,21 @@ import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import com.vincent.filepicker.Constant;
+import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.activity.NormalFilePickActivity;
@@ -24,13 +33,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.client.AlbumClientier;
-import io.oz.album.client.AlbumTier;
 import io.oz.webview.R;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
@@ -44,24 +53,119 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     static ErrorCtx errCtx;
 
+    String clientUri;
     AlbumClientier tier;
 
+    /** Preference activity starter */
+    ActivityResultLauncher<Intent> prefActStarter;
+
+    ActivityResultLauncher<Intent> imgPickActStarter;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        clientUri = getResources().getString(R.string.client_uri);
+        // jserv = getResources().getString(R.string.jserv);
+        SharedPreferences sharedPref =
+                PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+        jserv = sharedPref.getString(PrefsContentActivity.key_jserv, "");
 
-        jserv = "http://localhost:8080/jserv-album";
-        Clients.init(jserv);
+        if (LangExt.isblank(jserv))
+            startPrefsAct();
+        else Clients.init(jserv);
 
+        setContentView(R.layout.welcome);
+
+        String uid = sharedPref.getString(PrefsContentActivity.key_userid, "");
+        String pswd = sharedPref.getString(PrefsContentActivity.key_pswd, "");
+        tier = login(jserv, uid, pswd);
+    }
+
+    AlbumClientier login(String jserv, String uid, String pswd) {
         try {
-            client = Clients.login("ody", "123456");
+            uid = "ody";
+            pswd = "123456";
+            client = Clients.login(uid, pswd);
         } catch (SemanticException e) {
-            e.printStackTrace();
+            showMsg(R.string.t_login_failed, uid, jserv);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        tier = new AlbumClientier(client, errCtx);
+        tier = new AlbumClientier(clientUri, client, errCtx);
+        return tier;
+    }
 
-        setContentView(R.layout.welcome);
+    /**
+     * Note: Keep this method - will be implemented with UI elements in the future?
+     * @param template
+     * @param args
+     */
+    void showMsg(int template, Object ... args) {
+        String msg = String.format(getString(template), args);
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.menu_settings) {
+            startPrefsAct();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    protected void startPrefsAct() {
+        if (prefActStarter == null)
+            prefActStarter = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Log.d("jserv-root", data.getAction());
+                    }
+                    SharedPreferences sharedPreferences =
+                            PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+                    String name = sharedPreferences.getString(PrefsContentActivity.key_jserv, "");
+                    Log.d(clientUri + "/jserv-uri", name);
+                });
+        prefActStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivity.class));
+    }
+
+    protected void startImagePicker() {
+        if (imgPickActStarter == null)
+            imgPickActStarter = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        if (client != null) {
+                            try {
+                                Intent data = result.getData();
+                                ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
+                                tier.syncPhotos(list);
+                            } catch (SemanticException | IOException | AnsonException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        else showMsg(R.string.msg_ignored_when_offline);
+                    }
+                });
+
+        //
+        Intent imgIntent = new Intent(this, ImagePickActivity.class);
+        imgIntent.putExtra(IS_NEED_CAMERA, true);
+        imgIntent.putExtra(Constant.MAX_NUMBER, 99);
+        imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
+        imgIntent.putExtra( Constant.Client_Status, client == null
+                ? Constant.Status_Offline : Constant.Status_loggedin );
+
+        imgPickActStarter.launch(imgIntent);
     }
 
     @Override
@@ -69,12 +173,17 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         int id = v.getId();
         switch (id) {
             case R.id.btn_pick_image:
+                startImagePicker();
+                break;
+                /*
                 Intent intent1 = new Intent(this, ImagePickActivity.class);
                 intent1.putExtra(IS_NEED_CAMERA, true);
-                intent1.putExtra(Constant.MAX_NUMBER, 9);
+                intent1.putExtra(Constant.MAX_NUMBER, 99);
                 intent1.putExtra ( IS_NEED_FOLDER_LIST, true );
+                intent1.putExtra( Constant.Client_Status, client == null
+                                ? Constant.Status_Offline : Constant.Status_loggedin );
                 startActivityForResult(intent1, Constant.REQUEST_CODE_PICK_IMAGE);
-                break;
+                */
             case R.id.btn_pick_video:
                 Intent intent2 = new Intent(this, VideoPickActivity.class);
                 intent2.putExtra(IS_NEED_CAMERA, true);
@@ -114,7 +223,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 //                    }
 //                    mTvResult.setText(builder.toString());
                     try {
-                        tier.syncPhotos(list);
+                        // shouldn't reach here
+                        if (client != null)
+                            tier.syncPhotos(list);
+                        else showMsg(R.string.msg_ignored_when_offline);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (AnsonException e) {

@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.ImagePickAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
@@ -30,7 +29,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.oz.fpick.R;
+
 /**
+ * Modified by Ody Zhou
+ * Date 2022/02/11
+ *
  * Created by Vincent Woo
  * Date: 2016/10/12
  * Time: 16:41
@@ -41,8 +45,11 @@ public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_IMAGE_PAGER = "IsNeedImagePager";
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
 
-    public static final int DEFAULT_MAX_NUMBER = 9;
+    public static final int DEFAULT_MAX_NUMBER = 99;
     public static final int COLUMN_NUMBER = 3;
+
+    private int clientStatus = Constant.Status_Offline;
+
     private int mMaxNumber;
     private int mCurrentNumber = 0;
     private RecyclerView mRecyclerView;
@@ -73,6 +80,9 @@ public class ImagePickActivity extends BaseActivity {
         isNeedCamera = getIntent().getBooleanExtra(IS_NEED_CAMERA, false);
         isNeedImagePager = getIntent().getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
         isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
+
+        clientStatus = getIntent().getIntExtra(Constant.Client_Status, Constant.Status_Offline);
+
         initView();
     }
 
@@ -123,14 +133,10 @@ public class ImagePickActivity extends BaseActivity {
             }
 
             @Override
-            public void onAudioStateChanged ( boolean state , ImageFile file,View animation ) {
-
-            }
+            public void onAudioStateChanged ( boolean state , ImageFile file,View animation ) { }
 
             @Override
-            public void onFileStateChanged ( boolean state , ImageFile file,View animation ) {
-
-            }
+            public void onFileStateChanged ( boolean state , ImageFile file,View animation ) { }
         } );
 
         rl_done = (RelativeLayout) findViewById(R.id.rl_done);
@@ -143,6 +149,10 @@ public class ImagePickActivity extends BaseActivity {
                 finish();
             }
         });
+        if (clientStatus != Constant.Status_loggedin)
+            rl_done.setVisibility(View.GONE);
+        else
+            rl_done.setVisibility(View.VISIBLE);
 
         tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
         ll_folder = (LinearLayout) findViewById(R.id.ll_folder);

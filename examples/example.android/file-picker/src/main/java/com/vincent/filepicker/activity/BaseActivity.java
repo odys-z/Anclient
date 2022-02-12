@@ -10,10 +10,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.vincent.filepicker.FolderListHelper;
-import com.vincent.filepicker.R;
 
 import java.util.List;
 
+import io.oz.fpick.R;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;

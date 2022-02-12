@@ -7,6 +7,12 @@ package com.vincent.filepicker;
  */
 
 public class Constant {
+    public static final String Client_Status = "client-status";
+    public static final int Status_Client = 1;
+    public static final int Status_Offline = 16;
+    public static final int Status_loggedin = 0;
+    public static final int Status_sessionless = 32;
+
     public static final String MAX_NUMBER = "MaxNumber";
 
     public static final int REQUEST_CODE_PICK_IMAGE = 0x100;

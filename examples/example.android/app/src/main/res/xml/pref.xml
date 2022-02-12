@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General">
+        <EditTextPreference
+            android:defaultValue="@string/jserv_default"
+            android:key="@string/jserv_key"
+            android:summary="@string/jserv"
+            android:title="@string/jserv_title" />
+    </PreferenceCategory>
+</PreferenceScreen>

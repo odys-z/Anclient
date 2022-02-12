@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name" translatable="false">Acadynamo</string>
+    <string name="app_name" translatable="false">Family Album</string>
+    <string name="client_uri" translatable="false">album/album</string>
+
+    <string name="menu_prefs" translatable="false">Settings</string>
+    <string name="menu_login" translatable="false">Login</string>
+    <string name="menu_help" translatable="false">Help</string>
+
+    <string name="jserv_key" translatable="false">jserv-key</string>
+    <string name="jserv_default" translatable="false">http://192.168.0.1:8888</string>
+    <string name="jserv" translatable="false">http://192.168.0.1:8888</string>
+    <string name="jserv_title" translatable="false">Home Server IP</string>
+
+    <string name="t_login_failed" translatable="false">Login into home server failed.\nUserId: %s\nService:%s</string>
+    <string name="msg_ignored_when_offline">Selection / files ignored - not logged in.</string>
 </resources>

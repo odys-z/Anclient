@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "io.oz.album"
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion 26
+        targetSdkVersion 31
         versionCode 1
         versionName "$app_ver"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -30,12 +31,18 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.appcompat:appcompat:$appcompat_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
-    implementation group: 'io.github.odys-z', name: 'anclient.java', version: '0.3.0-SNAPSHOT'
-    implementation group: 'io.github.odys-z', name: 'album-lib', version: '0.1.0-SNAPSHOT'
+    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'pub.devrel:easypermissions:3.0.0'
 
-    testImplementation 'junit:junit:4.12'
+    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: '0.4.0-SNAPSHOT') {
+        exclude group: "org.apache.tika", module: "tika-core"
+    }
+    implementation (group: 'io.github.odys-z', name: 'album-lib', version: '0.1.3-SNAPSHOT') {
+        exclude group: "org.apache.tika", module: "tika-core"
+    }
+
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 

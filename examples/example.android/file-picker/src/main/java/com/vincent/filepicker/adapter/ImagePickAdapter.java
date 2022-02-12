@@ -23,11 +23,7 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.ToastUtil;
-import com.vincent.filepicker.Util;
-import com.vincent.filepicker.activity.ImageBrowserActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
@@ -41,6 +37,8 @@ import static android.os.Environment.DIRECTORY_DCIM;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static com.vincent.filepicker.activity.ImageBrowserActivity.IMAGE_BROWSER_INIT_INDEX;
 import static com.vincent.filepicker.activity.ImageBrowserActivity.IMAGE_BROWSER_SELECTED_LIST;
+
+import io.oz.fpick.R;
 
 /**
  * Created by Vincent Woo
@@ -80,16 +78,6 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
         imagePickViewHolder.setIsRecyclable ( false );
         return imagePickViewHolder;
     }
-
-//    @Override
-//    public long getItemId ( int position ) {
-//        return position;
-//    }
-//
-//    @Override
-//    public int getItemViewType ( int position ) {
-//        return position;
-//    }
 
     @Override
     public void onBindViewHolder ( final ImagePickViewHolder holder , @SuppressLint("RecyclerView") final int position ) {
