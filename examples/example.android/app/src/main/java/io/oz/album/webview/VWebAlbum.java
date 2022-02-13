@@ -1,4 +1,4 @@
-package io.oz.webview;
+package io.oz.album.webview;
 
 import android.util.Log;
 import android.webkit.WebResourceRequest;

@@ -19,6 +19,10 @@ public interface ErrorCtx {
 		throw new SemanticException(obj.msg());
 	}
 
+	public default void onError(MsgCode code, String msg, Object ...args) throws SemanticException {
+		throw new SemanticException(msg, args);
+	}
+
 	public default ErrorCtx setSignal(String signal) { return this; };
 	public default ErrorCtx notifySignal() { return this; };
 }

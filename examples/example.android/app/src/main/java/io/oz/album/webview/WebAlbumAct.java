@@ -1,10 +1,11 @@
-package io.oz.webview;
+package io.oz.album.webview;
 
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-
 import androidx.appcompat.app.AppCompatActivity;
+
+import io.oz.R;
 
 public class WebAlbumAct extends AppCompatActivity {
 

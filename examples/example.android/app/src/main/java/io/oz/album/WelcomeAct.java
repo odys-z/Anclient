@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.activity.NormalFilePickActivity;
@@ -34,27 +33,14 @@ import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
-import io.odysz.jclient.Clients;
-import io.odysz.jclient.SessionClient;
-import io.odysz.jclient.tier.ErrorCtx;
-import io.odysz.semantics.IUser;
 import io.odysz.semantics.x.SemanticException;
-import io.oz.album.client.AlbumClientier;
-import io.oz.webview.R;
+import io.oz.AlbumApp;
+import io.oz.R;
+import io.oz.album.client.AlbumContext;
+import io.oz.album.client.PrefsContentActivity;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
-    String jserv;
-
-    IUser photoUser;
-    /** local working dir */
-    String local;
-
-    static SessionClient client;
-
-    static ErrorCtx errCtx;
-
-    String clientUri;
-    AlbumClientier tier;
+    AlbumContext singl;
 
     /** Preference activity starter */
     ActivityResultLauncher<Intent> prefActStarter;
@@ -64,35 +50,52 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        clientUri = getResources().getString(R.string.client_uri);
-        // jserv = getResources().getString(R.string.jserv);
-        SharedPreferences sharedPref =
-                PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
-        jserv = sharedPref.getString(PrefsContentActivity.key_jserv, "");
-
-        if (LangExt.isblank(jserv))
-            startPrefsAct();
-        else Clients.init(jserv);
-
+        singl = ((AlbumApp)getApplication()).singl;
         setContentView(R.layout.welcome);
 
-        String uid = sharedPref.getString(PrefsContentActivity.key_userid, "");
-        String pswd = sharedPref.getString(PrefsContentActivity.key_pswd, "");
-        tier = login(jserv, uid, pswd);
-    }
+        //
+        if (imgPickActStarter == null)
+            imgPickActStarter = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        if (singl.client != null) {
+                            try {
+                                Intent data = result.getData();
+                                if (data != null) {
+                                    ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
+                                    singl.tier.syncPhotos(list);
+                                }
+                            } catch (SemanticException | IOException | AnsonException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        else showMsg(R.string.msg_ignored_when_offline);
+                    }
+                });
 
-    AlbumClientier login(String jserv, String uid, String pswd) {
+        if (prefActStarter == null)
+            prefActStarter = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Log.d("jserv-root", data.getAction());
+                    }
+                    SharedPreferences sharedPreferences =
+                            PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+                    String name = sharedPreferences.getString(PrefsContentActivity.key_jserv, "");
+                    Log.d(singl.clientUri + "/jserv-uri", name);
+                });
+
         try {
-            uid = "ody";
-            pswd = "123456";
-            client = Clients.login(uid, pswd);
-        } catch (SemanticException e) {
-            showMsg(R.string.t_login_failed, uid, jserv);
+            singl.init(getResources(), PreferenceManager.getDefaultSharedPreferences(this));
+            if (LangExt.isblank(singl.jserv()))
+                // settings are cleared
+                startPrefsAct();
         } catch (Exception e) {
-            e.printStackTrace();
+            showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
         }
-        tier = new AlbumClientier(clientUri, client, errCtx);
-        return tier;
     }
 
     /**
@@ -122,47 +125,16 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     protected void startPrefsAct() {
-        if (prefActStarter == null)
-            prefActStarter = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        Intent data = result.getData();
-                        Log.d("jserv-root", data.getAction());
-                    }
-                    SharedPreferences sharedPreferences =
-                            PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
-                    String name = sharedPreferences.getString(PrefsContentActivity.key_jserv, "");
-                    Log.d(clientUri + "/jserv-uri", name);
-                });
         prefActStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivity.class));
     }
 
     protected void startImagePicker() {
-        if (imgPickActStarter == null)
-            imgPickActStarter = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        if (client != null) {
-                            try {
-                                Intent data = result.getData();
-                                ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
-                                tier.syncPhotos(list);
-                            } catch (SemanticException | IOException | AnsonException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        else showMsg(R.string.msg_ignored_when_offline);
-                    }
-                });
-
         //
         Intent imgIntent = new Intent(this, ImagePickActivity.class);
         imgIntent.putExtra(IS_NEED_CAMERA, true);
         imgIntent.putExtra(Constant.MAX_NUMBER, 99);
         imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
-        imgIntent.putExtra( Constant.Client_Status, client == null
+        imgIntent.putExtra( Constant.Client_Status, singl.client == null
                 ? Constant.Status_Offline : Constant.Status_loggedin );
 
         imgPickActStarter.launch(imgIntent);
@@ -224,8 +196,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 //                    mTvResult.setText(builder.toString());
                     try {
                         // shouldn't reach here
-                        if (client != null)
-                            tier.syncPhotos(list);
+                        if (singl.client != null)
+                            singl.tier.syncPhotos(list);
                         else showMsg(R.string.msg_ignored_when_offline);
                     } catch (IOException e) {
                         e.printStackTrace();

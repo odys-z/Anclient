@@ -274,7 +274,7 @@ debugAndroidTestCompileClasspath - Resolved configuration for compilation for va
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -297,8 +297,7 @@ debugAndroidTestCompileClasspath - Resolved configuration for compilation for va
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -434,7 +433,7 @@ debugAndroidTestCompileClasspath - Resolved configuration for compilation for va
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 +--- project :file-picker
 +--- androidx.annotation:annotation:{strictly 1.3.0} -> 1.3.0 (c)
@@ -616,7 +615,7 @@ debugCompileClasspath - Resolved configuration for compilation for variant: debu
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -639,8 +638,7 @@ debugCompileClasspath - Resolved configuration for compilation for variant: debu
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -776,15 +774,15 @@ debugCompileClasspath - Resolved configuration for compilation for variant: debu
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 +--- project :file-picker
 +--- androidx.appcompat:appcompat:{strictly 1.4.1} -> 1.4.1 (c)
 +--- androidx.constraintlayout:constraintlayout:{strictly 2.1.3} -> 2.1.3 (c)
 +--- androidx.preference:preference:{strictly 1.2.0} -> 1.2.0 (c)
 +--- pub.devrel:easypermissions:{strictly 3.0.0} -> 3.0.0 (c)
-+--- io.github.odys-z:anclient.java:{strictly 0.4.0-SNAPSHOT} -> 0.4.0-SNAPSHOT (c)
-+--- io.github.odys-z:album-lib:{strictly 0.1.2-SNAPSHOT} -> 0.1.2-SNAPSHOT (c)
++--- io.github.odys-z:anclient.java:{strictly 0.4.2-SNAPSHOT} -> 0.4.2-SNAPSHOT (c)
++--- io.github.odys-z:album-lib:{strictly 0.4.2-SNAPSHOT} -> 0.4.2-SNAPSHOT (c)
 +--- androidx.annotation:annotation:{strictly 1.3.0} -> 1.3.0 (c)
 +--- androidx.core:core:{strictly 1.7.0} -> 1.7.0 (c)
 +--- androidx.cursoradapter:cursoradapter:{strictly 1.0.0} -> 1.0.0 (c)
@@ -1114,7 +1112,7 @@ debugRuntimeClasspath - Resolved configuration for runtime for variant: debug
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -1137,8 +1135,7 @@ debugRuntimeClasspath - Resolved configuration for runtime for variant: debug
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -1276,7 +1273,7 @@ debugRuntimeClasspath - Resolved configuration for runtime for variant: debug
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 \--- project :file-picker
      +--- androidx.appcompat:appcompat:1.4.1 (*)
@@ -1475,7 +1472,7 @@ debugUnitTestCompileClasspath - Resolved configuration for compilation for varia
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -1498,8 +1495,7 @@ debugUnitTestCompileClasspath - Resolved configuration for compilation for varia
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -1635,7 +1631,7 @@ debugUnitTestCompileClasspath - Resolved configuration for compilation for varia
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 +--- project :file-picker
 +--- junit:junit:4.13.2
@@ -1644,8 +1640,8 @@ debugUnitTestCompileClasspath - Resolved configuration for compilation for varia
 +--- androidx.constraintlayout:constraintlayout:{strictly 2.1.3} -> 2.1.3 (c)
 +--- androidx.preference:preference:{strictly 1.2.0} -> 1.2.0 (c)
 +--- pub.devrel:easypermissions:{strictly 3.0.0} -> 3.0.0 (c)
-+--- io.github.odys-z:anclient.java:{strictly 0.4.0-SNAPSHOT} -> 0.4.0-SNAPSHOT (c)
-+--- io.github.odys-z:album-lib:{strictly 0.1.2-SNAPSHOT} -> 0.1.2-SNAPSHOT (c)
++--- io.github.odys-z:anclient.java:{strictly 0.4.2-SNAPSHOT} -> 0.4.2-SNAPSHOT (c)
++--- io.github.odys-z:album-lib:{strictly 0.4.2-SNAPSHOT} -> 0.4.2-SNAPSHOT (c)
 +--- junit:junit:{strictly 4.13.2} -> 4.13.2 (c)
 +--- androidx.annotation:annotation:{strictly 1.3.0} -> 1.3.0 (c)
 +--- androidx.core:core:{strictly 1.7.0} -> 1.7.0 (c)
@@ -1971,7 +1967,7 @@ debugUnitTestRuntimeClasspath - Resolved configuration for runtime for variant: 
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -1994,8 +1990,7 @@ debugUnitTestRuntimeClasspath - Resolved configuration for runtime for variant: 
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -2133,7 +2128,7 @@ debugUnitTestRuntimeClasspath - Resolved configuration for runtime for variant: 
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 \--- project :file-picker
      +--- androidx.appcompat:appcompat:1.4.1 (*)
@@ -2205,8 +2200,8 @@ implementation - Implementation only dependencies for 'main' sources. (n)
 +--- androidx.constraintlayout:constraintlayout:2.1.3 (n)
 +--- androidx.preference:preference:1.2.0 (n)
 +--- pub.devrel:easypermissions:3.0.0 (n)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT (n)
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT (n)
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT (n)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT (n)
 \--- project file-picker (n)
 
 lintChecks - Configuration to apply external lint check jar
@@ -2365,7 +2360,7 @@ releaseCompileClasspath - Resolved configuration for compilation for variant: re
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -2388,8 +2383,7 @@ releaseCompileClasspath - Resolved configuration for compilation for variant: re
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -2525,15 +2519,15 @@ releaseCompileClasspath - Resolved configuration for compilation for variant: re
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 +--- project :file-picker
 +--- androidx.appcompat:appcompat:{strictly 1.4.1} -> 1.4.1 (c)
 +--- androidx.constraintlayout:constraintlayout:{strictly 2.1.3} -> 2.1.3 (c)
 +--- androidx.preference:preference:{strictly 1.2.0} -> 1.2.0 (c)
 +--- pub.devrel:easypermissions:{strictly 3.0.0} -> 3.0.0 (c)
-+--- io.github.odys-z:anclient.java:{strictly 0.4.0-SNAPSHOT} -> 0.4.0-SNAPSHOT (c)
-+--- io.github.odys-z:album-lib:{strictly 0.1.2-SNAPSHOT} -> 0.1.2-SNAPSHOT (c)
++--- io.github.odys-z:anclient.java:{strictly 0.4.2-SNAPSHOT} -> 0.4.2-SNAPSHOT (c)
++--- io.github.odys-z:album-lib:{strictly 0.4.2-SNAPSHOT} -> 0.4.2-SNAPSHOT (c)
 +--- androidx.annotation:annotation:{strictly 1.3.0} -> 1.3.0 (c)
 +--- androidx.core:core:{strictly 1.7.0} -> 1.7.0 (c)
 +--- androidx.cursoradapter:cursoradapter:{strictly 1.0.0} -> 1.0.0 (c)
@@ -2863,7 +2857,7 @@ releaseRuntimeClasspath - Resolved configuration for runtime for variant: releas
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -2886,8 +2880,7 @@ releaseRuntimeClasspath - Resolved configuration for runtime for variant: releas
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -3025,7 +3018,7 @@ releaseRuntimeClasspath - Resolved configuration for runtime for variant: releas
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 \--- project :file-picker
      +--- androidx.appcompat:appcompat:1.4.1 (*)
@@ -3223,7 +3216,7 @@ releaseUnitTestCompileClasspath - Resolved configuration for compilation for var
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -3246,8 +3239,7 @@ releaseUnitTestCompileClasspath - Resolved configuration for compilation for var
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -3383,7 +3375,7 @@ releaseUnitTestCompileClasspath - Resolved configuration for compilation for var
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 +--- project :file-picker
 +--- project :app (*)
@@ -3391,8 +3383,8 @@ releaseUnitTestCompileClasspath - Resolved configuration for compilation for var
 +--- androidx.constraintlayout:constraintlayout:{strictly 2.1.3} -> 2.1.3 (c)
 +--- androidx.preference:preference:{strictly 1.2.0} -> 1.2.0 (c)
 +--- pub.devrel:easypermissions:{strictly 3.0.0} -> 3.0.0 (c)
-+--- io.github.odys-z:anclient.java:{strictly 0.4.0-SNAPSHOT} -> 0.4.0-SNAPSHOT (c)
-+--- io.github.odys-z:album-lib:{strictly 0.1.2-SNAPSHOT} -> 0.1.2-SNAPSHOT (c)
++--- io.github.odys-z:anclient.java:{strictly 0.4.2-SNAPSHOT} -> 0.4.2-SNAPSHOT (c)
++--- io.github.odys-z:album-lib:{strictly 0.4.2-SNAPSHOT} -> 0.4.2-SNAPSHOT (c)
 +--- junit:junit:4.13.2
 |    \--- org.hamcrest:hamcrest-core:1.3
 +--- junit:junit:{strictly 4.13.2} -> 4.13.2 (c)
@@ -3720,7 +3712,7 @@ releaseUnitTestRuntimeClasspath - Resolved configuration for runtime for variant
 |    +--- androidx.appcompat:appcompat:1.0.2 -> 1.4.1 (*)
 |    +--- androidx.core:core:1.0.1 -> 1.7.0 (*)
 |    \--- androidx.fragment:fragment:1.0.0 -> 1.3.6 (*)
-+--- io.github.odys-z:anclient.java:0.4.0-SNAPSHOT
++--- io.github.odys-z:anclient.java:0.4.2-SNAPSHOT
 |    +--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT
 |    |    +--- commons-io:commons-io:2.11.0
 |    |    +--- io.github.odys-z:semantics.transact:[1.2.1,) -> 1.2.2-SNAPSHOT
@@ -3743,8 +3735,7 @@ releaseUnitTestRuntimeClasspath - Resolved configuration for runtime for variant
 |    \--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0
 |         +--- org.slf4j:slf4j-api:1.7.35
 |         \--- commons-io:commons-io:2.11.0
-+--- io.github.odys-z:album-lib:0.1.2-SNAPSHOT
-|    +--- org.apache.tika:tika-core:[2.2.1,) -> 2.3.0 (*)
++--- io.github.odys-z:album-lib:0.4.2-SNAPSHOT
 |    +--- org.apache.tika:tika-parsers-standard-package:2.2.1
 |    |    +--- org.apache.tika:tika-parser-apple-module:2.2.1
 |    |    |    +--- org.apache.tika:tika-parser-zip-commons:2.2.1
@@ -3882,7 +3873,7 @@ releaseUnitTestRuntimeClasspath - Resolved configuration for runtime for variant
 |    |    +--- org.apache.tika:tika-parser-xmp-commons:2.2.1 (*)
 |    |    +--- org.gagravarr:vorbis-java-tika:0.8
 |    |    \--- org.gagravarr:vorbis-java-core:0.8
-|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.0-SNAPSHOT (*)
+|    +--- io.github.odys-z:anclient.java:[0.3.0-SNAPSHOT,) -> 0.4.2-SNAPSHOT (*)
 |    \--- io.github.odys-z:semantic.jserv:[1.3.3-SNAPSHOT,) -> 1.3.3-SNAPSHOT (*)
 \--- project :file-picker
      +--- androidx.appcompat:appcompat:1.4.1 (*)
