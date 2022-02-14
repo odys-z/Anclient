@@ -6,12 +6,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +23,9 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.ToastUtil;
+import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
@@ -65,6 +67,7 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
         isNeedImagePager = needImagePager;
     }
 
+    @NonNull
     @Override
     public ImagePickViewHolder onCreateViewHolder ( ViewGroup parent , int viewType ) {
         View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick , parent , false );
@@ -81,33 +84,33 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 
     @Override
     public void onBindViewHolder ( final ImagePickViewHolder holder , @SuppressLint("RecyclerView") final int position ) {
-        if ( isNeedCamera==true && position == 0 ) {
+        if ( isNeedCamera && position == 0 ) {
             holder.mIvCamera.setVisibility ( View.VISIBLE );
             holder.mIvThumbnail.setVisibility ( View.INVISIBLE );
             holder.mCbx.setVisibility ( View.GONE );
             holder.mShadow.setVisibility ( View.INVISIBLE );
-//            holder.itemView.setOnClickListener ( new View.OnClickListener ( ) {
-//                @Override
-//                public void onClick ( View v ) {
-//                    Intent intent = new Intent ( MediaStore.ACTION_IMAGE_CAPTURE );
-//                    String timeStamp = new SimpleDateFormat ( "yyyyMMdd_HHmmss" , Locale.ENGLISH ).format ( new Date ( ) );
-//                    File file = new File ( Environment.getExternalStoragePublicDirectory ( DIRECTORY_DCIM ).getAbsolutePath ( )
-//                            + "/IMG_" + timeStamp + ".jpg" );
-//                    mImagePath = file.getAbsolutePath ( );
-//
-//                    ContentValues contentValues = new ContentValues ( 1 );
-//                    contentValues.put ( MediaStore.Images.Media.DATA , mImagePath );
-//                    mImageUri = mContext.getContentResolver ( ).insert ( MediaStore.Images.Media.EXTERNAL_CONTENT_URI , contentValues );
-//
-//                    intent.putExtra ( MediaStore.EXTRA_OUTPUT , mImageUri );
-//                    if ( Util.detectIntent ( mContext , intent ) ) {
-//                        ( (Activity) mContext ).startActivityForResult ( intent , Constant.REQUEST_CODE_TAKE_IMAGE );
-//                    }
-//                    else {
-//                        ToastUtil.getInstance ( mContext ).showToast ( mContext.getString ( R.string.vw_no_photo_app ) );
-//                    }
-//                }
-//            } );
+            holder.itemView.setOnClickListener ( new View.OnClickListener ( ) {
+                @Override
+                public void onClick ( View v ) {
+                    Intent intent = new Intent ( MediaStore.ACTION_IMAGE_CAPTURE );
+                    String timeStamp = new SimpleDateFormat ( "yyyyMMdd_HHmmss" , Locale.ENGLISH ).format ( new Date ( ) );
+                    File file = new File ( Environment.getExternalStoragePublicDirectory ( DIRECTORY_DCIM ).getAbsolutePath ( )
+                            + "/IMG_" + timeStamp + ".jpg" );
+                    mImagePath = file.getAbsolutePath ( );
+
+                    ContentValues contentValues = new ContentValues ( 1 );
+                    contentValues.put ( MediaStore.Images.Media.DATA , mImagePath );
+                    mImageUri = mContext.getContentResolver ( ).insert ( MediaStore.Images.Media.EXTERNAL_CONTENT_URI , contentValues );
+
+                    intent.putExtra ( MediaStore.EXTRA_OUTPUT , mImageUri );
+                    if ( Util.detectIntent ( mContext , intent ) ) {
+                        ( (Activity) mContext ).startActivityForResult ( intent , Constant.REQUEST_CODE_TAKE_IMAGE );
+                    }
+                    else {
+                        ToastUtil.getInstance ( mContext ).showToast ( mContext.getString ( R.string.vw_no_photo_app ) );
+                    }
+                }
+            } );
         }
         else {
             holder.mIvCamera.setVisibility ( View.INVISIBLE );
@@ -161,7 +164,8 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 //                } );
 //            }
 //            else {
-                final int p = holder.getAdapterPosition ( );
+
+                // final int p = holder.getAdapterPosition ( );
 
                 holder.mIvThumbnail.setOnClickListener ( new View.OnClickListener ( ) {
                     @Override
@@ -180,7 +184,6 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
                             mList.get ( index ).setSelected ( false );
 
 //                                holder.animation.setAlpha ( 0f );
-
                         }
                         else {
                             holder.mShadow.setVisibility ( View.VISIBLE );
@@ -190,8 +193,6 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 //                                holder.animation.setAlpha ( 1f );
 //                                final Animation a = AnimationUtils.loadAnimation ( mContext , R.anim.rotate_animation );
 //                                holder.animation.startAnimation ( a );
-
-
                         }
 
                         if ( mListener != null ) {

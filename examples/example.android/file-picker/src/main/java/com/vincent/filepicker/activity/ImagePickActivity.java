@@ -30,6 +30,7 @@ import java.util.List;
 
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
+import io.oz.fpick.filter.FileFilterx;
 
 /**
  * Modified by Ody Zhou
@@ -231,22 +232,19 @@ public class ImagePickActivity extends BaseActivity {
     }
 
     private void loadData() {
-        FileFilter.getImages(this, new FilterResultCallback<ImageFile>() {
-            @Override
-            public void onResult(List<Directory<ImageFile>> directories) {
-                // Refresh folder list
-                if (isNeedFolderList) {
-                    ArrayList<Directory> list = new ArrayList<>();
-                    Directory all = new Directory();
-                    all.setName(getResources().getString(R.string.vw_all));
-                    list.add(all);
-                    list.addAll(directories);
-                    mFolderHelper.fillData(list);
-                }
-
-                mAll = directories;
-                refreshData(directories);
+        FileFilterx.getImages(this, directories -> {
+            // Refresh folder list
+            if (isNeedFolderList) {
+                ArrayList<Directory> list = new ArrayList<>();
+                Directory all = new Directory();
+                all.setName(getResources().getString(R.string.vw_all));
+                list.add(all);
+                list.addAll(directories);
+                mFolderHelper.fillData(list);
             }
+
+            mAll = directories;
+            refreshData(directories);
         });
     }
 
@@ -269,6 +267,7 @@ public class ImagePickActivity extends BaseActivity {
             }
         }
 
+        // So that's why max number is 9?
         for (ImageFile file : mSelectedList) {
             int index = list.indexOf(file);
             if (index != -1) {

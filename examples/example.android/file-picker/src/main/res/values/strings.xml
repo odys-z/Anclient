@@ -5,4 +5,5 @@
     <string name="vw_up_to_max">Already up to max</string>
     <string name="vw_no_audio_app">No audio App in this phone!</string>
     <string name="vw_all">All</string>
+    <string name="vw_no_photo_app">What ever says no phote app...</string>
 </resources>
