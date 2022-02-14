@@ -11,6 +11,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
+import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
@@ -24,9 +25,6 @@ import io.odysz.semantics.x.SemanticException;
 public class Clients {
 	@FunctionalInterface
 	public interface OnLogin { void ok(SessionClient client); }
-
-	@FunctionalInterface
-	public interface OnError { void err(MsgCode ok, String msg, String ... args ); }
 
 	public static boolean verbose = true;
 

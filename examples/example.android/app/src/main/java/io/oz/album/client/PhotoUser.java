@@ -3,7 +3,7 @@ package io.oz.album.client;
 import io.odysz.semantics.IUser;
 
 /**
- * Client User object is diffenret from IUser.
+ * Client User type, which is diffenret from IUser.
  */
 public class PhotoUser {
     public PhotoUser(String usrid) {

@@ -48,12 +48,28 @@ public class PrefsContentActivity extends AppCompatActivity {
         try {
             mono.login((tier) -> {
                 mono.tier = tier;
-                MainPreferenceFragment.summery.setSummary("Login successfully!");
+                updateSummery(MainPreferenceFragment.summery, "Login successfully!");
+            },
+            (c, t, args) -> {
+                updateSummery(MainPreferenceFragment.summery, String.format(t,
+                            args == null ? new String[]{"", ""} : args));
             });
         } catch (Exception e) {
             Log.e(mono.clientUri, e.getClass().getName() + e.getMessage());
-            MainPreferenceFragment.summery.setSummary("Login failed!\nDetails: " + e.getMessage());
+            updateSummery(MainPreferenceFragment.summery, "Login failed!\nDetails: " + e.getMessage());
         }
+    }
+
+    /**
+     * Set text into EditText's summery, running in ui thread.
+     * @param of of which summery to be updated
+     * @param s summery text
+     */
+    void updateSummery(Preference of, String s) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() { of.setSummary(s); }
+        } );
     }
 
     public static class MainPreferenceFragment extends PreferenceFragment {
@@ -79,9 +95,9 @@ public class PrefsContentActivity extends AppCompatActivity {
     }
 
     private static void bindPreferenceSummaryToValue(Preference preference) {
-        preference.setOnPreferenceChangeListener(prefsLisenter);
+        preference.setOnPreferenceChangeListener(prefsListener);
 
-        prefsLisenter.onPreferenceChange(preference,
+        prefsListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
@@ -91,7 +107,7 @@ public class PrefsContentActivity extends AppCompatActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static final Preference.OnPreferenceChangeListener prefsLisenter
+    private static final Preference.OnPreferenceChangeListener prefsListener
             = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {

@@ -7,22 +7,17 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.AESHelper;
-import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
-import io.odysz.jclient.HttpServClient;
 import io.odysz.jclient.SessionClient;
-import io.odysz.jclient.tier.ErrorAwaitHandler;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
-import io.odysz.semantic.jprotocol.AnsonResp;
-import io.odysz.semantic.jserv.x.SsException;
-import io.odysz.semantic.jsession.AnSessionReq;
-import io.odysz.semantic.jsession.AnSessionResp;
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.R;
 
 public class AlbumContext {
+    public enum ConnState { Online, Disconnected, LoginFailed };
+
     protected static final boolean verbose = true;
 
     public final String clientUri = "album.an";
@@ -49,7 +44,11 @@ public class AlbumContext {
 
     public PhotoUser photoUser;
 
+    ConnState state;
+    public ConnState state() { return state; }
+
     public AlbumContext() {
+        state = ConnState.Disconnected;
         photoUser = new PhotoUser(null);
     }
 
@@ -63,29 +62,31 @@ public class AlbumContext {
 
         Clients.init(jserv + "/" + jdocbase, verbose);
         jserv = sharedPref.getString(PrefsContentActivity.key_jserv, "");
-        login(jserv, uid, pswd, (AlbumClientier tier) -> {this.tier = tier;});
     }
 
-    AlbumContext login(String jserv, String uid, String pswd, TierCallback onOk) throws GeneralSecurityException, IOException, AnsonException, SemanticException {
+    AlbumContext login(String jserv, String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr) throws GeneralSecurityException, IOException, AnsonException, SemanticException {
         uid = "ody";
         pswd = "123456";
         Clients.loginAsync(uid, pswd,
         (client) -> {
             tier = new AlbumClientier(clientUri, client, errCtx);
-            onOk.ok(tier);
+            state = ConnState.Online;
+            if (onOk != null)
+                onOk.ok(tier);
         },
+        // Design Note: since error context don't have unified error message box,
+        // error context pattern is not applicable.
+        // errCtx.onError(c, r, (Object)v);
         (c, r, v) -> {
-            try {
-                errCtx.onError(c, r, (Object)v);
-            } catch (SemanticException e) {
-                e.printStackTrace();
-            }
-        });
+            state = ConnState.LoginFailed;
+            if (onErr != null)
+                onErr.err(c, r, v);
+        } );
         return this;
     }
 
-    public void login(TierCallback onOk) throws GeneralSecurityException, IOException, AnsonException, SemanticException {
-        login(jserv, photoUser.uid(), photoUser.pswd(), onOk);
+    public void login(TierCallback onOk, JProtocol.OnError onErr) throws GeneralSecurityException, IOException, AnsonException, SemanticException {
+        login(jserv, photoUser.uid(), photoUser.pswd(), onOk, onErr);
     }
 
     public void mustLogin(boolean b) {

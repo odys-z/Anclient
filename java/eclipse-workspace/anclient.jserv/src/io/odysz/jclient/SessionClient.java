@@ -95,7 +95,7 @@ public class SessionClient {
 	 * @param port
 	 * @param act not used for session less
 	 * @param req request body
-	 * @return Anson message
+	 * @return Anson message1.3.3-SNAPSHOT
 	 * @throws SemanticException
 	 */
 	public <T extends AnsonBody> AnsonMsg<T> userReq(IPort port, String[] act, T req)

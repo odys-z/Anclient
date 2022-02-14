@@ -22,8 +22,9 @@ import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
+@SuppressWarnings("deprecation")
 public class HttpServClient {
-	protected static final String USER_AGENT = "JClient.java/1.0";
+	protected static final String USER_AGENT = "Anclient.java/1.0";
 
 	protected static Tika detector = new Tika();
 

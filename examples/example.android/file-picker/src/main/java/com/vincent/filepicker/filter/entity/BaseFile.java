@@ -2,6 +2,13 @@ package com.vincent.filepicker.filter.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.file.PathUtils;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 /**
  * Created by Vincent Woo
@@ -152,6 +159,7 @@ public class BaseFile implements Parcelable, IFileDescriptor {
 
     @Override
     public String clientname() {
-        return name;
+        Path p = Paths.get(path);
+        return p.getFileName().toString();
     }
 }

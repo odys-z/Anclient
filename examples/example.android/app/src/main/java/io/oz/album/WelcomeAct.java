@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,8 +37,10 @@ import io.odysz.common.LangExt;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.client.AlbumClientier;
 import io.oz.album.client.AlbumContext;
 import io.oz.album.client.PrefsContentActivity;
+import io.oz.fpick.PickingMode;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
     AlbumContext singl;
@@ -59,16 +62,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        if (singl.client != null) {
-                            try {
-                                Intent data = result.getData();
-                                if (data != null) {
-                                    ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
-                                    singl.tier.syncPhotos(list);
-                                }
-                            } catch (SemanticException | IOException | AnsonException e) {
-                                e.printStackTrace();
-                            }
+                        if (singl.state() == AlbumContext.ConnState.Online) {
+                            onImagePicked(result);
                         }
                         else showMsg(R.string.msg_ignored_when_offline);
                     }
@@ -93,6 +88,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             if (LangExt.isblank(singl.jserv()))
                 // settings are cleared
                 startPrefsAct();
+            else singl.login(
+                (AlbumClientier tier) -> { },
+                (c, t, args) -> {
+                    showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
+                });
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
         }
@@ -100,12 +100,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     /**
      * Note: Keep this method - will be implemented with UI elements in the future?
-     * @param template
-     * @param args
+     * @param template string template, R.string.id
+     * @param args for String.format()
      */
     void showMsg(int template, Object ... args) {
-        String msg = String.format(getString(template), args);
-        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+        runOnUiThread(new Runnable() {
+            public void run() {
+                String msg = String.format(getString(template), args);
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+            }});
     }
 
     @Override
@@ -129,15 +132,33 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     protected void startImagePicker() {
-        //
         Intent imgIntent = new Intent(this, ImagePickActivity.class);
         imgIntent.putExtra(IS_NEED_CAMERA, true);
         imgIntent.putExtra(Constant.MAX_NUMBER, 99);
         imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
-        imgIntent.putExtra( Constant.Client_Status, singl.client == null
-                ? Constant.Status_Offline : Constant.Status_loggedin );
+        imgIntent.putExtra( Constant.PickingMode,
+                    singl.state() == AlbumContext.ConnState.Disconnected ?
+                    PickingMode.disabled : PickingMode.limit99 );
 
         imgPickActStarter.launch(imgIntent);
+    }
+
+    protected void onImagePicked(ActivityResult result) {
+        try {
+            Intent data = result.getData();
+            if (data != null) {
+                ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
+                singl.tier.asyncPhotos(list,
+                    (resp) -> {
+                        showMsg(R.string.t_synch_ok, list.size());
+                    },
+                    (c, r, args) -> {
+                        showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
+                    });
+            }
+        } catch (SemanticException | IOException | AnsonException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -147,15 +168,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             case R.id.btn_pick_image:
                 startImagePicker();
                 break;
-                /*
-                Intent intent1 = new Intent(this, ImagePickActivity.class);
-                intent1.putExtra(IS_NEED_CAMERA, true);
-                intent1.putExtra(Constant.MAX_NUMBER, 99);
-                intent1.putExtra ( IS_NEED_FOLDER_LIST, true );
-                intent1.putExtra( Constant.Client_Status, client == null
-                                ? Constant.Status_Offline : Constant.Status_loggedin );
-                startActivityForResult(intent1, Constant.REQUEST_CODE_PICK_IMAGE);
-                */
             case R.id.btn_pick_video:
                 Intent intent2 = new Intent(this, VideoPickActivity.class);
                 intent2.putExtra(IS_NEED_CAMERA, true);

@@ -24,4 +24,5 @@
     <string name="txt_prefs_title" translatable="false">Album Server Settings</string>
     <string name="txt_prefs_summery" translatable="false">Setup home server for synchronizing files.</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
+    <string name="t_synch_ok">%s files has been sychronized</string>
 </resources>

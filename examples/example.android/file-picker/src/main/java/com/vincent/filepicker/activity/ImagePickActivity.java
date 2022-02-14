@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,6 +28,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
 
 /**
@@ -48,7 +48,7 @@ public class ImagePickActivity extends BaseActivity {
     public static final int DEFAULT_MAX_NUMBER = 99;
     public static final int COLUMN_NUMBER = 3;
 
-    private int clientStatus = Constant.Status_Offline;
+    PickingMode pickmode = PickingMode.disabled;
 
     private int mMaxNumber;
     private int mCurrentNumber = 0;
@@ -76,25 +76,13 @@ public class ImagePickActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vw_activity_image_pick);
 
-        mMaxNumber = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
-        isNeedCamera = getIntent().getBooleanExtra(IS_NEED_CAMERA, false);
-        isNeedImagePager = getIntent().getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
-        isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
-
-        clientStatus = getIntent().getIntExtra(Constant.Client_Status, Constant.Status_Offline);
-
+        Intent intt = getIntent();
+        mMaxNumber = intt.getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
+        isNeedCamera = intt.getBooleanExtra(IS_NEED_CAMERA, false);
+        isNeedImagePager = intt.getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
+        isTakenAutoSelected = intt.getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
+        pickmode = (PickingMode) intt.getSerializableExtra(Constant.PickingMode);
         initView();
-    }
-
-    private void animateView (View ImageView ) {
-//        when (val drawable = view.drawable) {
-//            is AnimatedVectorDrawableCompat -> {
-//                drawable.start()
-//            }
-//            is AnimatedVectorDrawable -> {
-//                drawable.start()
-//            }
-
     }
 
     private void initView() {
@@ -110,7 +98,6 @@ public class ImagePickActivity extends BaseActivity {
 
         mAdapter.setOnSelectStateListener (new OnSelectStateListener<ImageFile>() {
 
-
             @Override
             public void OnSelectStateChanged (int position, boolean state , ImageFile file , View animation ) {
                 if (state) {
@@ -121,7 +108,6 @@ public class ImagePickActivity extends BaseActivity {
 
                     AnimationDrawable animationDrawable = (AnimationDrawable) animation.getBackground ();
                     Animation a= AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
-//                    animation.startAnimation ( animationDrawable );
                     animationDrawable.start ();
                 } else {
                     mSelectedList.remove(file);
@@ -149,10 +135,24 @@ public class ImagePickActivity extends BaseActivity {
                 finish();
             }
         });
-        if (clientStatus != Constant.Status_loggedin)
-            rl_done.setVisibility(View.GONE);
-        else
-            rl_done.setVisibility(View.VISIBLE);
+
+        switch (pickmode) {
+            case limit9:
+                mMaxNumber = 9;
+                rl_done.setVisibility(View.VISIBLE);
+                break;
+            case limit99:
+                mMaxNumber = 99;
+                rl_done.setVisibility(View.VISIBLE);
+                break;
+            case streamAsync:
+                mMaxNumber = 1;
+                rl_done.setVisibility(View.VISIBLE);
+                break;
+            default:
+                mMaxNumber = 0;
+                rl_done.setVisibility(View.GONE);
+        }
 
         tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
         ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
