@@ -8,28 +8,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <ImageView
-            android:id="@+id/iv_thumbnail"
+            android:id="@+id/xiv_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop" />
 
         <ImageView
-            android:id="@+id/iv_camera"
+            android:id="@+id/xiv_more_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:src="@drawable/vw_ic_camera"
+            android:src="@drawable/ic_action_name"
             android:visibility="invisible" />
 
         <View
-            android:id="@+id/shadow"
+            android:id="@+id/x_shadow"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/vw_ShadowItem"
             android:visibility="invisible" />
 
         <ImageView
-            android:id="@+id/cbx"
+            android:id="@+id/x_check"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

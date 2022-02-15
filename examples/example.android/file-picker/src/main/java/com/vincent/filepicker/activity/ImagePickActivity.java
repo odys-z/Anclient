@@ -17,10 +17,7 @@ import android.widget.TextView;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 import com.vincent.filepicker.adapter.FolderListAdapter;
-import com.vincent.filepicker.adapter.ImagePickAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
-import com.vincent.filepicker.filter.FileFilter;
-import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
@@ -30,6 +27,7 @@ import java.util.List;
 
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
+import io.oz.fpick.adapter.ImagePickAdapter;
 import io.oz.fpick.filter.FileFilterx;
 
 /**

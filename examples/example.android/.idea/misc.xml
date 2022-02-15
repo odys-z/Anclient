@@ -11,6 +11,9 @@
         <entry key="app/src/main/res/layout/wv.xml" value="0.15989583333333332" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.25" />
         <entry key="app/src/main/res/xml/pref.xml" value="0.1" />
+        <entry key="file-picker/src/main/res/drawable/background_circle.xml" value="0.162" />
+        <entry key="file-picker/src/main/res/drawable/ic_rectangle_93.xml" value="0.162" />
+        <entry key="file-picker/src/main/res/drawable/vw_bg_folder_list.xml" value="0.162" />
         <entry key="file-picker/src/main/res/drawable/vw_divider_rv.xml" value="0.185" />
         <entry key="file-picker/src/main/res/layout/activity_main.xml" value="0.14279606669516887" />
         <entry key="file-picker/src/main/res/layout/vw_layout_item_folder_list.xml" value="0.16772438803263826" />
