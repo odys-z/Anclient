@@ -1,12 +1,15 @@
 package io.oz.album.client;
 
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,8 +63,10 @@ public class PrefsContentActivity extends AppCompatActivity {
     }
 
     public void onRegisterDevice(View btn) {
-        if (prefFragment.btnRegist != null)
+        if (prefFragment.btnRegist != null) {
             prefFragment.cateHome.removePreference(prefFragment.btnRegist);
+        }
+        prefFragment.device.setEnabled(false);
     }
 
     /**
@@ -79,6 +84,7 @@ public class PrefsContentActivity extends AppCompatActivity {
     public static class MainPreferenceFragment extends PreferenceFragmentCompat {
         Preference summery;
         Preference homepref;
+        EditTextPreference device;
         Preference btnRegist;
         PreferenceCategory cateHome;
 
@@ -96,15 +102,23 @@ public class PrefsContentActivity extends AppCompatActivity {
 
             cateHome = (PreferenceCategory)findPreference(AlbumApp.keys.homeCate);
             btnRegist = findPreference(AlbumApp.keys.bt_regist);
+            device = findPreference(AlbumApp.keys.device);
+
+            EditTextPreference pswd = findPreference(AlbumApp.keys.pswd);
+            pswd.setOnBindEditTextListener(editText ->
+                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
             homepref = findPreference(AlbumApp.keys.home);
             if (! LangExt.isblank(singleton.photoUser.device)) {
                 homepref.setSummary(getString(R.string.devide_name, singleton.photoUser.device));
                 findPreference(AlbumApp.keys.device).setEnabled(false);
                 cateHome.removePreference(btnRegist);
+                device.setSummary(getString(R.string.devide_name, singleton.photoUser.device));
             }
-            else
+            else {
                 findPreference(AlbumApp.keys.device).setEnabled(true);
+                device.setSummary(R.string.txt_only_once);
+            }
             summery = findPreference(AlbumApp.keys.login_summery);
         }
     }

@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -50,6 +52,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     ActivityResultLauncher<Intent> imgPickActStarter;
 
+    TextView msgv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +72,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         singl.init(getResources(), PreferenceManager.getDefaultSharedPreferences(this));
 
         setContentView(R.layout.welcome);
+        msgv = (TextView) findViewById(R.id.tv_status);
 
         //
         if (imgPickActStarter == null)
@@ -119,7 +124,17 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         runOnUiThread(new Runnable() {
             public void run() {
                 String msg = String.format(getString(template), args);
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+                // not working:
+                // Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+                msgv.setText(msg);
+                msgv.setVisibility(View.VISIBLE);
+            }});
+    }
+
+    void clearMsg() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                msgv.setVisibility(View.GONE);
             }});
     }
 
@@ -140,10 +155,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     protected void startPrefsAct() {
+        clearMsg();
         prefActStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivity.class));
     }
 
     protected void startImagePicking() {
+        clearMsg();
+
         Intent imgIntent = new Intent(this, ImagePickActivity.class);
         imgIntent.putExtra(IS_NEED_CAMERA, true);
         imgIntent.putExtra(Constant.MAX_NUMBER, 99);
