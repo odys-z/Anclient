@@ -60,24 +60,6 @@ public class Clients {
 
 		HttpServClient httpClient = new HttpServClient();
 		String url = servUrl(Port.session);
-		/*
-			SessionClient[] inst = new SessionClient[1]; 
-			httpClient.post(url, reqv11, (code, msg) -> {
-					if (AnsonMsg.MsgCode.ok == code) {
-						// create a logged in client
-						inst[0] = new SessionClient(((AnSessionResp) msg).ssInf());
-
-						if (Clients.console)
-							Utils.logi(msg.toString());
-					}
-					else throw new SemanticException(
-							"loging failed\ncode: %s\nerror: %s",
-							code, ((AnsonResp)msg).msg());
-				});
-  		if (inst[0] == null)
-  			throw new IOException("HttpServClient return null client.");
-  		return inst[0];
-  		*/
 
 		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
 		if (Clients.verbose)
@@ -91,7 +73,7 @@ public class Clients {
 				resp.code(), ((AnsonResp)resp.body(0)).msg());
 	}
 	
-	public static void loginAsync(String uid, String pswdPlain, OnLogin onOk, OnError onErr) {
+	public static void loginAsync(String uid, String pswdPlain, OnLogin onOk, OnError onErr, String... mac) {
 		new Thread(new Runnable() {
 	        public void run() {
 	            // final Bitmap bitmap = processBitMap("image.png");
@@ -103,7 +85,7 @@ public class Clients {
 					String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 					
 					// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
-					AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
+					AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
 
 					HttpServClient httpClient = new HttpServClient();
 					String url = servUrl(Port.session);

@@ -3,20 +3,26 @@ package io.oz.album.client;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import io.odysz.anson.x.AnsonException;
+import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantics.x.SemanticException;
+import io.oz.AlbumApp;
 import io.oz.R;
 
 public class AlbumContext {
-    public enum ConnState { Online, Disconnected, LoginFailed };
+
+    public boolean needSetup() {
+        return LangExt.isblank(jserv, "/", ".", "http://", "https://")
+                || LangExt.isblank(photoUser.device, "/", ".")
+                || LangExt.isblank(photoUser.uid);
+    }
+
+    public enum ConnState { Online, Disconnected, LoginFailed }
 
     protected static final boolean verbose = true;
 
@@ -52,21 +58,25 @@ public class AlbumContext {
         photoUser = new PhotoUser(null);
     }
 
-    public void init(Resources resources, SharedPreferences sharedPref) throws GeneralSecurityException, IOException, AnsonException, SemanticException {
+    public void init(Resources resources, SharedPreferences sharedPref) {
         jdocbase = resources.getString(R.string.jserv_docbase);
 
-        String uid = sharedPref.getString(PrefsContentActivity.key_usrid, "");
-        String pswd = sharedPref.getString(PrefsContentActivity.key_pswd, "");
-        photoUser.uid = uid;
-        photoUser.pswd = pswd;
+        photoUser.uid = sharedPref.getString(AlbumApp.keys.usrid, "");
+        photoUser.pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
+        jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
+        photoUser.device = sharedPref.getString(AlbumApp.keys.device, "");
 
         Clients.init(jserv + "/" + jdocbase, verbose);
-        jserv = sharedPref.getString(PrefsContentActivity.key_jserv, "");
     }
 
-    AlbumContext login(String jserv, String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr) throws GeneralSecurityException, IOException, AnsonException, SemanticException {
-        uid = "ody";
-        pswd = "123456";
+    AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr) throws GeneralSecurityException {
+        // uid = "ody";
+        // pswd = "123456";
+        if (LangExt.isblank(photoUser.device, ".", "/"))
+            throw new GeneralSecurityException("Device Id is null.");
+
+        Clients.init(jserv + "/" + jdocbase, verbose);
+
         Clients.loginAsync(uid, pswd,
         (client) -> {
             tier = new AlbumClientier(clientUri, client, errCtx);
@@ -81,15 +91,13 @@ public class AlbumContext {
             state = ConnState.LoginFailed;
             if (onErr != null)
                 onErr.err(c, r, v);
-        } );
+        }, photoUser.device);
         return this;
     }
 
-    public void login(TierCallback onOk, JProtocol.OnError onErr) throws GeneralSecurityException, IOException, AnsonException, SemanticException {
-        login(jserv, photoUser.uid(), photoUser.pswd(), onOk, onErr);
-    }
-
-    public void mustLogin(boolean b) {
+    public void login(TierCallback onOk, JProtocol.OnError onErr)
+            throws GeneralSecurityException {
+        login(photoUser.uid(), photoUser.pswd(), onOk, onErr);
     }
 
     public AlbumContext jserv(String newVal) {

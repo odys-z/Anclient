@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/txt_prefs_title"
-        android:summary="@string/txt_prefs_summery"
-        android:id="@+id/id_login_summery"
+    <PreferenceCategory android:title="@string/txt_prefs_summery_home"
+        android:key="@string/key_home_cate"
+        android:id="@+id/pref_home_regist"
         >
+        <EditTextPreference
+            android:enabled="false"
+            android:defaultValue="home"
+            android:key="@string/key_home"
+            android:title="@string/home_title" />
+        <EditTextPreference
+            android:enabled="false"
+            android:defaultValue="Phone-1"
+            android:key="@string/key_device"
+            android:summary="@string/txt_only_once"
+            android:title="@string/devide_title" />
         <EditTextPreference
             android:defaultValue="@string/jserv_default"
             android:key="@string/jserv_key"
             android:summary="@string/jserv"
             android:title="@string/jserv_title" />
+        <Preference
+            android:key="@string/key_regist"
+            android:layout="@layout/bt_regist_device" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/txt_prefs_title"
+        android:id="@+id/id_login_summery"
+        >
         <EditTextPreference
             android:key="@string/userid_key"
             android:defaultValue=""

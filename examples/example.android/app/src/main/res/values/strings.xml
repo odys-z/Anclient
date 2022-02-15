@@ -5,24 +5,38 @@
     <string name="menu_login" translatable="false">Login</string>
     <string name="menu_help" translatable="false">Help</string>
 
+    <string name="key_home_cate" translatable="false">key-home-cate</string>
+    <string name="txt_prefs_summery_home">Home Registration</string>
+    <string name="devide_name">Device ID: %s</string>
+
+    <string name="key_home" translatable="false">home_key</string>
+    <string name="home_title" translatable="false">Home Name</string>
+
     <string name="jserv_key" translatable="false">jserv-key</string>
     <string name="jserv_default" translatable="false">http://192.168.0.1:8888</string>
     <string name="jserv" translatable="false">http://192.168.0.1:8888</string>
     <string name="jserv_docbase" translatable="false">jserv-album</string>
     <string name="jserv_title" translatable="false">Home Server IP</string>
 
+    <string name="key_regist" translatable="false">btn-register</string>
+    <string name="txt_regist">Save Device Name</string>
+
     <string name="t_login_failed" translatable="false">Login into home server failed.\nUserId: %s\nService:%s</string>
     <string name="msg_ignored_when_offline" translatable="false">Selection / files ignored - not logged in.</string>
     <string name="userid_key" translatable="false">my</string>
-    <string name="userid_summery" translatable="false">Name used for sub-folder, choose carefully!</string>
+    <string name="userid_summery" translatable="false">Name used for sub-folder (created at server)</string>
     <string name="userid_title" translatable="false">Login ID</string>
     <string name="pswd_key" translatable="false">pswd_key</string>
     <string name="pswd_title" translatable="false">Password</string>
     <string name="btn_login" translatable="false">bt_login</string>
-    <string name="txt_login" translatable="false">Login</string>
+    <string name="txt_login" translatable="false">User Login</string>
     <string name="summery_login" translatable="false">Login to upload files your own folder</string>
-    <string name="txt_prefs_title" translatable="false">Album Server Settings</string>
-    <string name="txt_prefs_summery" translatable="false">Setup home server for synchronizing files.</string>
+    <string name="txt_prefs_title" translatable="false">Album User Settings</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
-    <string name="t_synch_ok">%s files has been sychronized</string>
+    <string name="t_synch_ok">%s files has been synchronized</string>
+    <string name="txt_only_once">You can name a device only once.</string>
+    <string name="devide_title">Device Name</string>
+    <string name="key_device">key-device</string>
+    <string name="login_succeed">Login succeed.</string>
+
 </resources>

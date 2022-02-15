@@ -89,28 +89,28 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
             holder.mIvThumbnail.setVisibility ( View.INVISIBLE );
             holder.mCbx.setVisibility ( View.GONE );
             holder.mShadow.setVisibility ( View.INVISIBLE );
-            holder.itemView.setOnClickListener ( new View.OnClickListener ( ) {
-                @Override
-                public void onClick ( View v ) {
-                    Intent intent = new Intent ( MediaStore.ACTION_IMAGE_CAPTURE );
-                    String timeStamp = new SimpleDateFormat ( "yyyyMMdd_HHmmss" , Locale.ENGLISH ).format ( new Date ( ) );
-                    File file = new File ( Environment.getExternalStoragePublicDirectory ( DIRECTORY_DCIM ).getAbsolutePath ( )
-                            + "/IMG_" + timeStamp + ".jpg" );
-                    mImagePath = file.getAbsolutePath ( );
-
-                    ContentValues contentValues = new ContentValues ( 1 );
-                    contentValues.put ( MediaStore.Images.Media.DATA , mImagePath );
-                    mImageUri = mContext.getContentResolver ( ).insert ( MediaStore.Images.Media.EXTERNAL_CONTENT_URI , contentValues );
-
-                    intent.putExtra ( MediaStore.EXTRA_OUTPUT , mImageUri );
-                    if ( Util.detectIntent ( mContext , intent ) ) {
-                        ( (Activity) mContext ).startActivityForResult ( intent , Constant.REQUEST_CODE_TAKE_IMAGE );
-                    }
-                    else {
-                        ToastUtil.getInstance ( mContext ).showToast ( mContext.getString ( R.string.vw_no_photo_app ) );
-                    }
-                }
-            } );
+//            holder.itemView.setOnClickListener ( new View.OnClickListener ( ) {
+//                @Override
+//                public void onClick ( View v ) {
+//                    Intent intent = new Intent ( MediaStore.ACTION_IMAGE_CAPTURE );
+//                    String timeStamp = new SimpleDateFormat ( "yyyyMMdd_HHmmss" , Locale.ENGLISH ).format ( new Date ( ) );
+//                    File file = new File ( Environment.getExternalStoragePublicDirectory ( DIRECTORY_DCIM ).getAbsolutePath ( )
+//                            + "/IMG_" + timeStamp + ".jpg" );
+//                    mImagePath = file.getAbsolutePath ( );
+//
+//                    ContentValues contentValues = new ContentValues ( 1 );
+//                    contentValues.put ( MediaStore.Images.Media.DATA , mImagePath );
+//                    mImageUri = mContext.getContentResolver ( ).insert ( MediaStore.Images.Media.EXTERNAL_CONTENT_URI , contentValues );
+//
+//                    intent.putExtra ( MediaStore.EXTRA_OUTPUT , mImageUri );
+//                    if ( Util.detectIntent ( mContext , intent ) ) {
+//                        ( (Activity) mContext ).startActivityForResult ( intent , Constant.REQUEST_CODE_TAKE_IMAGE );
+//                    }
+//                    else {
+//                        ToastUtil.getInstance ( mContext ).showToast ( mContext.getString ( R.string.vw_no_photo_app ) );
+//                    }
+//                }
+//            } );
         }
         else {
             holder.mIvCamera.setVisibility ( View.INVISIBLE );

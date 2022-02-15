@@ -1,15 +1,19 @@
 package io.oz.album.client;
 
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.PreferenceManager;
 
+import io.odysz.common.LangExt;
 import io.oz.AlbumApp;
 import io.oz.R;
 
@@ -17,47 +21,47 @@ import io.oz.R;
  */
 public class PrefsContentActivity extends AppCompatActivity {
 
-    public static String key_jserv;
-    public static String key_usrid;
-    public static String key_pswd;
-
-    static AlbumContext mono;
+    static AlbumContext singleton;
 
     static String oldUid;
+    private MainPreferenceFragment prefFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (mono == null) {
-            mono = ((AlbumApp) getApplication()).singl;
+        if (singleton == null) {
+            singleton = AlbumApp.singl;
             oldUid = null;
         }
-        else oldUid = mono.photoUser.uid;
-
-       key_jserv = getString(R.string.jserv_key);
-       key_usrid = getString(R.string.userid_key);
-       key_pswd = getString(R.string.pswd_key);
+        else oldUid = singleton.photoUser.uid;
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // load settings fragment
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new MainPreferenceFragment()).commit();
-
+        prefFragment = new MainPreferenceFragment();
+        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, prefFragment).commit();
     }
+
     public void onLogin(View btn) {
         try {
-            mono.login((tier) -> {
-                mono.tier = tier;
-                updateSummery(MainPreferenceFragment.summery, "Login successfully!");
+            singleton.login((tier) -> {
+                singleton.tier = tier;
+                updateSummery(prefFragment.summery, getString(R.string.login_succeed));
+                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
             },
             (c, t, args) -> {
-                updateSummery(MainPreferenceFragment.summery, String.format(t,
+                updateSummery(prefFragment.summery, String.format(t,
                             args == null ? new String[]{"", ""} : args));
             });
         } catch (Exception e) {
-            Log.e(mono.clientUri, e.getClass().getName() + e.getMessage());
-            updateSummery(MainPreferenceFragment.summery, "Login failed!\nDetails: " + e.getMessage());
+            Log.e(singleton.clientUri, e.getClass().getName() + e.getMessage());
+            updateSummery(prefFragment.summery, "Login failed!\nDetails: " + e.getMessage());
         }
+    }
+
+    public void onRegisterDevice(View btn) {
+        if (prefFragment.btnRegist != null)
+            prefFragment.cateHome.removePreference(prefFragment.btnRegist);
     }
 
     /**
@@ -72,17 +76,36 @@ public class PrefsContentActivity extends AppCompatActivity {
         } );
     }
 
-    public static class MainPreferenceFragment extends PreferenceFragment {
-        static Preference summery;
+    public static class MainPreferenceFragment extends PreferenceFragmentCompat {
+        Preference summery;
+        Preference homepref;
+        Preference btnRegist;
+        PreferenceCategory cateHome;
 
         @Override
-        public void onCreate(final Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+//        public void onCreate(final Bundle savedInstanceState) {
+        public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+            // super.onCreatePreferences(savedInstanceState, rootKey);
             addPreferencesFromResource(R.xml.pref);
 
-            bindPreferenceSummaryToValue(findPreference(key_jserv));
+            bindPref2Val(findPreference(AlbumApp.keys.home));
+            bindPref2Val(findPreference(AlbumApp.keys.device));
+            bindPref2Val(findPreference(AlbumApp.keys.jserv));
+            bindPref2Val(findPreference(AlbumApp.keys.usrid));
+            bindPref2Val(findPreference(AlbumApp.keys.pswd));
 
-            summery = findPreference(getString(R.string.key_login_summery));
+            cateHome = (PreferenceCategory)findPreference(AlbumApp.keys.homeCate);
+            btnRegist = findPreference(AlbumApp.keys.bt_regist);
+
+            homepref = findPreference(AlbumApp.keys.home);
+            if (! LangExt.isblank(singleton.photoUser.device)) {
+                homepref.setSummary(getString(R.string.devide_name, singleton.photoUser.device));
+                findPreference(AlbumApp.keys.device).setEnabled(false);
+                cateHome.removePreference(btnRegist);
+            }
+            else
+                findPreference(AlbumApp.keys.device).setEnabled(true);
+            summery = findPreference(AlbumApp.keys.login_summery);
         }
     }
 
@@ -94,7 +117,7 @@ public class PrefsContentActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private static void bindPreferenceSummaryToValue(Preference preference) {
+    static void bindPref2Val(@NonNull Preference preference) {
         preference.setOnPreferenceChangeListener(prefsListener);
 
         prefsListener.onPreferenceChange(preference,
@@ -110,21 +133,21 @@ public class PrefsContentActivity extends AppCompatActivity {
     private static final Preference.OnPreferenceChangeListener prefsListener
             = new Preference.OnPreferenceChangeListener() {
         @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
+        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
             String stringValue = newValue.toString();
             String k = preference.getKey();
             preference.setSummary(stringValue);
-            if (k.equals(key_jserv)) {
-                mono.jserv(stringValue);
+            if (k.equals(AlbumApp.keys.jserv)) {
+                singleton.jserv(stringValue);
             }
-            else if (PrefsContentActivity.key_pswd.equals(k)) {
-                mono.photoUser.pswd = stringValue;
-                mono.mustLogin(true);
+            else if (AlbumApp.keys.pswd.equals(k)) {
+                singleton.photoUser.pswd = stringValue;
             }
-            else if (PrefsContentActivity.key_usrid.equals(k)) {
-                mono.photoUser.uid = stringValue;
-                if (PrefsContentActivity.oldUid == null || !PrefsContentActivity.oldUid.equals(stringValue))
-                    mono.mustLogin(true);
+            else if (AlbumApp.keys.usrid.equals(k)) {
+                singleton.photoUser.uid = stringValue;
+            }
+            else if (AlbumApp.keys.device.equals(k)) {
+                singleton.photoUser.device = stringValue;
             }
             return true;
         }

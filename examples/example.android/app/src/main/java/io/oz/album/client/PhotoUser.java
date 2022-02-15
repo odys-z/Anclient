@@ -10,8 +10,12 @@ public class PhotoUser {
         this.uid = usrid;
     }
 
+    String device;
+    public String device() { return device; }
+
     String uid;
     public String uid() { return uid; }
+
     String pswd;
     public String pswd() { return pswd; }
 }

@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
@@ -33,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.LangExt;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
@@ -53,7 +53,20 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        singl = ((AlbumApp)getApplication()).singl;
+
+        AlbumApp.keys.homeCate = getString(R.string.key_home_cate);
+        AlbumApp.keys.home = getString(R.string.key_home);
+        AlbumApp.keys.device = getString(R.string.key_device);
+        AlbumApp.keys.jserv = getString(R.string.jserv_key);
+        AlbumApp.keys.usrid = getString(R.string.userid_key);
+        AlbumApp.keys.pswd = getString(R.string.pswd_key);
+
+        AlbumApp.keys.login_summery = getString(R.string.key_login_summery);
+        AlbumApp.keys.bt_regist = getString(R.string.key_regist);
+
+        singl = AlbumApp.singl;
+        singl.init(getResources(), PreferenceManager.getDefaultSharedPreferences(this));
+
         setContentView(R.layout.welcome);
 
         //
@@ -79,13 +92,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     }
                     SharedPreferences sharedPreferences =
                             PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
-                    String name = sharedPreferences.getString(PrefsContentActivity.key_jserv, "");
+                    String name = sharedPreferences.getString(AlbumApp.keys.jserv, "");
                     Log.d(singl.clientUri + "/jserv-uri", name);
                 });
 
         try {
-            singl.init(getResources(), PreferenceManager.getDefaultSharedPreferences(this));
-            if (LangExt.isblank(singl.jserv()))
+            if (singl.needSetup())
                 // settings are cleared
                 startPrefsAct();
             else singl.login(
@@ -118,7 +130,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_settings) {
             startPrefsAct();
@@ -131,7 +143,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         prefActStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivity.class));
     }
 
-    protected void startImagePicker() {
+    protected void startImagePicking() {
         Intent imgIntent = new Intent(this, ImagePickActivity.class);
         imgIntent.putExtra(IS_NEED_CAMERA, true);
         imgIntent.putExtra(Constant.MAX_NUMBER, 99);
@@ -143,7 +155,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         imgPickActStarter.launch(imgIntent);
     }
 
-    protected void onImagePicked(ActivityResult result) {
+    protected void onImagePicked(@NonNull ActivityResult result) {
         try {
             Intent data = result.getData();
             if (data != null) {
@@ -162,11 +174,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(@NonNull View v) {
         int id = v.getId();
         switch (id) {
             case R.id.btn_pick_image:
-                startImagePicker();
+                startImagePicking();
                 break;
             case R.id.btn_pick_video:
                 Intent intent2 = new Intent(this, VideoPickActivity.class);
