@@ -14,7 +14,7 @@
             android:scaleType="centerCrop" />
 
         <ImageView
-            android:id="@+id/xiv_more_icon"
+            android:id="@+id/xiv_album_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -36,6 +36,23 @@
             android:layout_marginRight="5dp"
             android:layout_marginTop="5dp"
             android:src="@drawable/vw_selector_cbx" />
+
+        <ImageView
+            android:id="@+id/xiv_syncing_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/vw_ic_syncing" />
+        <ImageView
+            android:id="@+id/xiv_synced_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/vw_synced" />
     </RelativeLayout>
     <RelativeLayout
         android:alpha="0"

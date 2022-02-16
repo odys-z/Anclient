@@ -35,7 +35,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'pub.devrel:easypermissions:3.0.0'
 
-    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: '0.4.4-SNAPSHOT')
+//    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: '0.4.4-SNAPSHOT')
     implementation (group: 'io.github.odys-z', name: 'album-lib', version: '0.4.2-SNAPSHOT') {
         exclude group: "org.apache.tika", module: "tika-core"
         exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
@@ -45,5 +45,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
+    implementation project(':albumtier')
     implementation project(':file-picker')
 }

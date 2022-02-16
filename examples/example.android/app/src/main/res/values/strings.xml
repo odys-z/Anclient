@@ -16,7 +16,6 @@
     <string name="jserv_key" translatable="false">jserv-key</string>
     <string name="jserv_default" translatable="false">http://192.168.0.1:8888</string>
     <string name="jserv" translatable="false">http://192.168.0.1:8888</string>
-    <string name="jserv_docbase" translatable="false">jserv-album</string>
     <string name="jserv_title" translatable="false">Home Server IP</string>
 
     <string name="key_regist" translatable="false">btn-register</string>

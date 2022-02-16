@@ -1,4 +1,6 @@
-package io.oz.album.client;
+package io.oz.albumtier;
+
+import io.oz.album.client.AlbumClientier;
 
 @FunctionalInterface
 public interface TierCallback {

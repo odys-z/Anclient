@@ -1,9 +1,4 @@
-package io.oz.album.client;
-
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.ImageFile;
-
-import org.apache.commons.io_odysz.FilenameUtils;
+package io.oz.albumtier;
 
 import java.io.IOException;
 import java.util.ArrayList;

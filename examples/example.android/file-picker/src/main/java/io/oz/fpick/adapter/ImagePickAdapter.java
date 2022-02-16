@@ -2,10 +2,10 @@ package io.oz.fpick.adapter;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,19 +23,24 @@ import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.adapter.BaseAdapter;
+import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.util.ArrayList;
 
+import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.DocsResp;
+import io.oz.album.tier.AlbumResp;
+import io.oz.album.tier.Photo;
+import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
 
 /**
- * Modified by Ody Zhou
+ * Created by Ody Zhou
  * Date: 15 Feb. 2022
  *
- * Created by Vincent Woo
- * Date: 2016/10/13
- * Time: 16:07
+ * Credits to Vincent Woo
  */
 
 public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
@@ -46,12 +51,13 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
     public String mImagePath;
     public Uri mImageUri;
 
-    public ImagePickAdapter(Context ctx , boolean needCamera , boolean isNeedImagePager , int max ) {
-        this ( ctx , new ArrayList<ImageFile> ( ) , needCamera , isNeedImagePager , max );
+    public ImagePickAdapter(Context ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
+        this ( ctx, new ArrayList<ImageFile> ( ), needCamera , isNeedImagePager , max );
     }
 
-    public ImagePickAdapter(Context ctx , ArrayList<ImageFile> list , boolean needCamera , boolean needImagePager , int max ) {
+    public ImagePickAdapter(Context ctx, ArrayList<ImageFile> list, boolean needCamera, boolean needImagePager , int max ) {
         super ( ctx , list );
+        this.singleton = AlbumContext.getInstance();
         isNeedCamera = needCamera;
         mMaxNumber = max;
         isNeedImagePager = needImagePager;
@@ -59,7 +65,7 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 
     @NonNull
     @Override
-    public ImagePickViewHolder onCreateViewHolder ( ViewGroup parent , int viewType ) {
+    public ImagePickViewHolder onCreateViewHolder (@NonNull ViewGroup parent, int viewType ) {
         View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick , parent , false );
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
@@ -69,19 +75,46 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
         }
         ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
         imagePickViewHolder.setIsRecyclable ( false );
+
+        //
+        synchPage = new SyncingPage(0, 20);
+        startSynchQuery(synchPage);
+
         return imagePickViewHolder;
     }
 
+    void startSynchQuery(SyncingPage page) {
+        singleton.tier.asyncQuerySyncs(mList,
+            onSychnQueryRespons,
+            (c, r, args) -> {
+                Log.e(r, args[0]);
+            });
+    }
+
+    JProtocol.OnOk onSychnQueryRespons = (resp) -> {
+        Photo[] phts = ((AlbumResp) resp).photos(0);
+        for (int i = synchPage.start; i < synchPage.end; i++)
+            mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
+
+        notifyItemChanged(synchPage.start, synchPage.end);
+
+        if (mList.size() >= synchPage.end) {
+            synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
+            startSynchQuery(synchPage);
+        }
+    };
+
     @Override
-    public void onBindViewHolder ( final ImagePickViewHolder holder , @SuppressLint("RecyclerView") final int position ) {
+    public void onBindViewHolder ( final ImagePickViewHolder holder , final int position ) {
         if ( isNeedCamera && position == 0 ) {
-            holder.imgMore.setVisibility ( View.VISIBLE );
+            holder.icAlbum.setVisibility ( View.VISIBLE );
+            holder.icSynced.setVisibility ( View.INVISIBLE );
             holder.mIvThumbnail.setVisibility ( View.INVISIBLE );
             holder.mCbx.setVisibility ( View.GONE );
             holder.mShadow.setVisibility ( View.INVISIBLE );
         }
         else {
-            holder.imgMore.setVisibility ( View.INVISIBLE );
+            holder.icSynced.setVisibility ( View.INVISIBLE );
             holder.mIvThumbnail.setVisibility ( View.VISIBLE );
             holder.mCbx.setVisibility ( View.GONE );
 
@@ -98,61 +131,82 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
                     .load ( file.getPath ( ) )
                     .apply ( options.centerCrop ( ) )
                     .transition ( withCrossFade ( ) )
-//                    .transition(new DrawableTransitionOptions().crossFade(500))
                     .into ( holder.mIvThumbnail );
 
-            if ( file.isSelected ( ) ) {
+            if (file.synchFlag == BaseFile.Synchronizing) {
+                holder.mCbx.setSelected ( false );
+                holder.mShadow.setVisibility(View.GONE);
+                holder.icAlbum.setVisibility(View.GONE);
+                holder.icSyncing.setVisibility(View.VISIBLE);
+                holder.icSynced.setVisibility(View.GONE);
+            }
+            else if (file.synchFlag == BaseFile.Synchronized) {
+                holder.mCbx.setSelected(false);
+                holder.mShadow.setVisibility(View.GONE);
+                holder.icAlbum.setVisibility(View.VISIBLE);
+                holder.icSyncing.setVisibility(View.GONE);
+                holder.icSynced.setVisibility(View.VISIBLE);
+            }
+
+            else if ( file.isSelected ( ) ) {
+                // not synced but selected
                 holder.mCbx.setSelected ( true );
                 holder.mShadow.setVisibility ( View.VISIBLE );
+
+                holder.icAlbum.setVisibility(View.GONE);
+                holder.icSyncing.setVisibility(View.GONE);
+                holder.icSynced.setVisibility(View.GONE);
+
                 holder.animation.setVisibility ( View.VISIBLE );
                 holder.animation.setAlpha ( 1f );
                 AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
                 Animation a= AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
-//                    animation.startAnimation ( animationDrawable );
                 animationDrawable.start ();
             }
             else {
+                // not synced and not selected
                 holder.mCbx.setSelected ( false );
+                holder.icAlbum.setVisibility(View.GONE);
+                holder.icSyncing.setVisibility(View.GONE);
+                holder.icSynced.setVisibility(View.GONE);
+
                 holder.animation.setVisibility ( View.GONE );
                 holder.animation.setAlpha ( 0f );
                 holder.mShadow.setVisibility ( View.INVISIBLE );
             }
 
-                holder.mIvThumbnail.setOnClickListener ( new View.OnClickListener ( ) {
-                    @Override
-                    public void onClick ( View view ) {
-                        if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {
-                            ToastUtil.getInstance ( mContext ).showToast ( R.string.vw_up_to_max );
-                            return;
-                        }
+            holder.mIvThumbnail.setOnClickListener ((View view) -> {
+                int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
 
-                        int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
+                int sync = mList.get(index).synchFlag;
+                if ( sync == BaseFile.Synchronized || sync == BaseFile.Synchronizing)
+                    return;
 
-                        if ( holder.mCbx.isSelected ( ) ) {
-                            holder.mShadow.setVisibility ( View.GONE );
-                            holder.mCbx.setSelected ( false );
-                            mCurrentNumber--;
-                            mList.get ( index ).setSelected ( false );
-//                                holder.animation.setAlpha ( 0f );
-                        }
-                        else {
-                            holder.mShadow.setVisibility ( View.VISIBLE );
-                            holder.mCbx.setSelected ( true );
-                            mCurrentNumber++;
-                            mList.get ( index ).setSelected ( true );
-//                                holder.animation.setAlpha ( 1f );
-//                                final Animation a = AnimationUtils.loadAnimation ( mContext , R.anim.rotate_animation );
-//                                holder.animation.startAnimation ( a );
-                        }
+                if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {
+                    ToastUtil.getInstance ( mContext ).showToast ( R.string.vw_up_to_max );
+                    return;
+                }
 
-                        if ( mListener != null ) {
-                            mListener.OnSelectStateChanged ( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
-                        }
-                    }
-                } );
+                if ( holder.mCbx.isSelected ( ) ) {
+                    holder.mShadow.setVisibility ( View.GONE );
+                    holder.mCbx.setSelected ( false );
+                    mCurrentNumber--;
+                    mList.get ( index ).setSelected ( false );
+                }
+                else {
+                    holder.mShadow.setVisibility ( View.VISIBLE );
+                    holder.mCbx.setSelected ( true );
+                    mCurrentNumber++;
+                    mList.get ( index ).setSelected ( true );
+                }
 
-//            }
+                if ( mListener != null ) {
+                    mListener.OnSelectStateChanged ( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
+                }
+            });
+
         }
+
     }
 
     @Override
@@ -161,7 +215,9 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
     }
 
     class ImagePickViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView imgMore;
+        private final ImageView icAlbum;
+        private final ImageView icSynced;
+        private final ImageView icSyncing;
         private final ImageView mIvThumbnail;
         private final View mShadow;
         private final ImageView mCbx;
@@ -169,10 +225,13 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 
         public ImagePickViewHolder ( View itemView ) {
             super ( itemView );
-            imgMore = (ImageView) itemView.findViewById ( R.id.xiv_more_icon );
-            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.iv_thumbnail );
-            mShadow = itemView.findViewById ( R.id.shadow );
-            mCbx = (ImageView) itemView.findViewById ( R.id.cbx );
+            icAlbum = (ImageView) itemView.findViewById ( R.id.xiv_album_icon);
+            icSyncing = (ImageView) itemView.findViewById ( R.id.xiv_syncing_icon);
+            icSynced = (ImageView) itemView.findViewById ( R.id.xiv_synced_icon);
+
+            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
+            mShadow = itemView.findViewById ( R.id.x_shadow );
+            mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
             animation = itemView.findViewById ( R.id.animationSquare );
         }
     }

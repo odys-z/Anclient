@@ -11,9 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -40,8 +38,9 @@ import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.AlbumClientier;
-import io.oz.album.client.AlbumContext;
+import io.oz.albumtier.AlbumContext;
 import io.oz.album.client.PrefsContentActivity;
+import io.oz.albumtier.PrefKeys;
 import io.oz.fpick.PickingMode;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
@@ -58,6 +57,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        AlbumApp.keys = new PrefKeys();
         AlbumApp.keys.homeCate = getString(R.string.key_home_cate);
         AlbumApp.keys.home = getString(R.string.key_home);
         AlbumApp.keys.device = getString(R.string.key_device);
@@ -69,7 +69,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_regist = getString(R.string.key_regist);
 
         singl = AlbumApp.singl;
-        singl.init(getResources(), PreferenceManager.getDefaultSharedPreferences(this));
+        // singl.init(getResources(), PreferenceManager.getDefaultSharedPreferences(this));
+        singl.init(getResources(), AlbumApp.keys, PreferenceManager.getDefaultSharedPreferences(this));
 
         setContentView(R.layout.welcome);
         msgv = (TextView) findViewById(R.id.tv_status);
@@ -93,7 +94,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         Intent data = result.getData();
-                        Log.d("jserv-root", data.getAction());
+                        Log.d("jserv-root", data == null ? "null" : data.getAction());
                     }
                     SharedPreferences sharedPreferences =
                             PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
@@ -107,9 +108,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 startPrefsAct();
             else singl.login(
                 (AlbumClientier tier) -> { },
-                (c, t, args) -> {
-                    showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
-                });
+                (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
         }
@@ -121,21 +120,17 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      * @param args for String.format()
      */
     void showMsg(int template, Object ... args) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                String msg = String.format(getString(template), args);
-                // not working:
-                // Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
-                msgv.setText(msg);
-                msgv.setVisibility(View.VISIBLE);
-            }});
+        runOnUiThread( () -> {
+            String msg = String.format(getString(template), args);
+            // not working:
+            // Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
+            msgv.setText(msg);
+            msgv.setVisibility(View.VISIBLE);
+        });
     }
 
     void clearMsg() {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                msgv.setVisibility(View.GONE);
-            }});
+        runOnUiThread(() -> msgv.setVisibility(View.GONE));
     }
 
     @Override

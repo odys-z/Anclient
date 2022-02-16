@@ -3,20 +3,25 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.PathUtils;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.oz.album.tier.Photo;
+
 /**
+ * Modyfied by Ody Zhou
+ *
  * Created by Vincent Woo
  * Date: 2016/10/10
  * Time: 17:32
  */
 
 public class BaseFile implements Parcelable, IFileDescriptor {
+    public static int Synchronized = 1;
+    public static int SynchUnknown = 0;
+    public static int Synchronizing = -1;
+
     private long id;
     private String name;
     private String path;
@@ -25,6 +30,8 @@ public class BaseFile implements Parcelable, IFileDescriptor {
     private String bucketName;  //Directory Name
     private long date;          //Added Date
     private boolean isSelected;
+
+    public int synchFlag;
 
     @Override
     public boolean equals(Object o) {
@@ -161,5 +168,10 @@ public class BaseFile implements Parcelable, IFileDescriptor {
     public String clientname() {
         Path p = Paths.get(path);
         return p.getFileName().toString();
+    }
+
+    public BaseFile synchFlag(int syncFlag) {
+        this.synchFlag = syncFlag;
+        return this;
     }
 }

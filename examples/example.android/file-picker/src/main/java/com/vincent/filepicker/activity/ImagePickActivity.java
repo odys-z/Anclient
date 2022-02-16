@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.ImagePickAdapter;
@@ -81,6 +82,7 @@ public class ImagePickActivity extends BaseActivity {
         isNeedImagePager = intt.getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
         isTakenAutoSelected = intt.getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
         pickmode = (PickingMode) intt.getSerializableExtra(Constant.PickingMode);
+
         initView();
     }
 

@@ -5,7 +5,6 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +18,7 @@ import androidx.preference.PreferenceManager;
 import io.odysz.common.LangExt;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.albumtier.AlbumContext;
 
 /**
  */
@@ -36,7 +36,7 @@ public class PrefsContentActivity extends AppCompatActivity {
             singleton = AlbumApp.singl;
             oldUid = null;
         }
-        else oldUid = singleton.photoUser.uid;
+        else oldUid = singleton.photoUser.uid();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -50,7 +50,7 @@ public class PrefsContentActivity extends AppCompatActivity {
             singleton.login((tier) -> {
                 singleton.tier = tier;
                 updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
+                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device()));
             },
             (c, t, args) -> {
                 updateSummery(prefFragment.summery, String.format(t,
@@ -109,11 +109,12 @@ public class PrefsContentActivity extends AppCompatActivity {
                     editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
             homepref = findPreference(AlbumApp.keys.home);
-            if (! LangExt.isblank(singleton.photoUser.device)) {
-                homepref.setSummary(getString(R.string.devide_name, singleton.photoUser.device));
+            String devid = singleton.photoUser.device();
+            if (! LangExt.isblank(devid)) {
+                homepref.setSummary(getString(R.string.devide_name, devid));
                 findPreference(AlbumApp.keys.device).setEnabled(false);
                 cateHome.removePreference(btnRegist);
-                device.setSummary(getString(R.string.devide_name, singleton.photoUser.device));
+                device.setSummary(getString(R.string.devide_name, devid));
             }
             else {
                 findPreference(AlbumApp.keys.device).setEnabled(true);
@@ -155,13 +156,13 @@ public class PrefsContentActivity extends AppCompatActivity {
                 singleton.jserv(stringValue);
             }
             else if (AlbumApp.keys.pswd.equals(k)) {
-                singleton.photoUser.pswd = stringValue;
+                singleton.photoUser.pswd(stringValue);
             }
             else if (AlbumApp.keys.usrid.equals(k)) {
-                singleton.photoUser.uid = stringValue;
+                singleton.photoUser.uid(stringValue);
             }
             else if (AlbumApp.keys.device.equals(k)) {
-                singleton.photoUser.device = stringValue;
+                singleton.photoUser.device(stringValue);
             }
             return true;
         }

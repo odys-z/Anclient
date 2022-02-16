@@ -1,4 +1,4 @@
-package io.oz.album.client;
+package io.oz.albumtier;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -11,10 +11,22 @@ import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.oz.AlbumApp;
-import io.oz.R;
+import io.oz.album.AlbumPort;
+import io.oz.album.client.AlbumClientier;
 
 public class AlbumContext {
+    static final String jdocbase  = "jserv-album";
+    static AlbumContext instance;
+
+    static {
+        AnsonMsg.understandPorts(AlbumPort.album);
+    }
+
+    public static AlbumContext getInstance() {
+        if (instance == null)
+            instance = new AlbumContext();
+        return instance;
+    }
 
     public boolean needSetup() {
         return LangExt.isblank(jserv, "/", ".", "http://", "https://")
@@ -42,7 +54,7 @@ public class AlbumContext {
     };
 
     String jserv;
-    String jdocbase;
+
 
     public AlbumClientier tier;
 
@@ -58,13 +70,12 @@ public class AlbumContext {
         photoUser = new PhotoUser(null);
     }
 
-    public void init(Resources resources, SharedPreferences sharedPref) {
-        jdocbase = resources.getString(R.string.jserv_docbase);
+    public void init(Resources resources, PrefKeys prefkeys, SharedPreferences sharedPref) {
 
-        photoUser.uid = sharedPref.getString(AlbumApp.keys.usrid, "");
-        photoUser.pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
-        jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
-        photoUser.device = sharedPref.getString(AlbumApp.keys.device, "");
+        photoUser.uid = sharedPref.getString(prefkeys.usrid, "");
+        photoUser.pswd = sharedPref.getString(prefkeys.pswd, "");
+        jserv = sharedPref.getString(prefkeys.jserv, "");
+        photoUser.device = sharedPref.getString(prefkeys.device, "");
 
         Clients.init(jserv + "/" + jdocbase, verbose);
     }
