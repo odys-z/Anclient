@@ -1,21 +1,15 @@
 package io.oz.album.client;
 
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.preference.EditTextPreference;
-import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceManager;
 
-import io.odysz.common.LangExt;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.albumtier.AlbumContext;
@@ -27,7 +21,7 @@ public class PrefsContentActivity extends AppCompatActivity {
     static AlbumContext singleton;
 
     static String oldUid;
-    private MainPreferenceFragment prefFragment;
+    private AlbumPreferenceFragment prefFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +35,7 @@ public class PrefsContentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // load settings fragment
-        prefFragment = new MainPreferenceFragment();
+        prefFragment = new AlbumPreferenceFragment(this);
         getSupportFragmentManager().beginTransaction().replace(android.R.id.content, prefFragment).commit();
     }
 
@@ -75,56 +69,7 @@ public class PrefsContentActivity extends AppCompatActivity {
      * @param s summery text
      */
     void updateSummery(Preference of, String s) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() { of.setSummary(s); }
-        } );
-    }
-
-    public static class MainPreferenceFragment extends PreferenceFragmentCompat {
-        Preference summery;
-        Preference homepref;
-        EditTextPreference device;
-        Preference btnRegist;
-        PreferenceCategory cateHome;
-
-        @Override
-//        public void onCreate(final Bundle savedInstanceState) {
-        public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
-            // super.onCreatePreferences(savedInstanceState, rootKey);
-            addPreferencesFromResource(R.xml.pref);
-
-            bindPref2Val(findPreference(AlbumApp.keys.home));
-            bindPref2Val(findPreference(AlbumApp.keys.device));
-            bindPref2Val(findPreference(AlbumApp.keys.jserv));
-            bindPref2Val(findPreference(AlbumApp.keys.usrid));
-            bindPref2Val(findPreference(AlbumApp.keys.pswd));
-
-            cateHome = (PreferenceCategory)findPreference(AlbumApp.keys.homeCate);
-            btnRegist = findPreference(AlbumApp.keys.bt_regist);
-            device = findPreference(AlbumApp.keys.device);
-
-            EditTextPreference pswd = findPreference(AlbumApp.keys.pswd);
-            pswd.setOnBindEditTextListener(editText ->
-                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
-
-            homepref = findPreference(AlbumApp.keys.home);
-            String devid = singleton.photoUser.device();
-            if (! LangExt.isblank(devid)) {
-                homepref.setSummary(getString(R.string.devide_name, devid));
-                findPreference(AlbumApp.keys.device).setEnabled(false);
-                cateHome.removePreference(btnRegist);
-                device.setSummary(getString(R.string.devide_name, devid));
-            }
-            else {
-                findPreference(AlbumApp.keys.device).setEnabled(true);
-                device.setSummary(R.string.txt_only_once);
-            }
-            summery = findPreference(AlbumApp.keys.login_summery);
-        }
-
-        public void onLogin(View btn) {
-        }
+        runOnUiThread(() -> of.setSummary(s));
     }
 
     @Override

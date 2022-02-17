@@ -15,10 +15,10 @@
 
         <ImageView
             android:id="@+id/xiv_album_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_action_name"
+            android:src="@drawable/vw_ic_sync_cmd"
             android:visibility="invisible" />
 
         <View
@@ -39,20 +39,20 @@
 
         <ImageView
             android:id="@+id/xiv_syncing_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="0dp"
             android:src="@drawable/vw_ic_syncing" />
         <ImageView
             android:id="@+id/xiv_synced_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
-            android:src="@drawable/vw_synced" />
+            android:src="@drawable/vw_ic_synced" />
     </RelativeLayout>
     <RelativeLayout
         android:alpha="0"

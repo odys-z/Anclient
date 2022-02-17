@@ -20,7 +20,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/txt_prefs_title"
-        android:id="@+id/id_login_summery"
+        android:id="@+id/id_login_cate"
         >
         <EditTextPreference
             android:defaultValue="@string/jserv_default"

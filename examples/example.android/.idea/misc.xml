@@ -21,7 +21,8 @@
         <entry key="file-picker/src/main/res/layout/vw_activity_image_browser.xml" value="0.1" />
         <entry key="file-picker/src/main/res/layout/vw_activity_image_pick.xml" value="0.1115861479264643" />
         <entry key="file-picker/src/main/res/layout/vw_layout_item_folder_list.xml" value="0.16772438803263826" />
-        <entry key="file-picker/src/main/res/layout/vw_layout_item_image_pick.xml" value="0.1" />
+        <entry key="file-picker/src/main/res/layout/vw_layout_item_image_pick.xml" value="0.13" />
+        <entry key="file-picker/src/main/res/layout/vw_layout_item_normal_file_pick.xml" value="0.20735356990166737" />
         <entry key="file-picker/src/main/res/layout/vw_layout_item_video_pick.xml" value="0.1308251389482685" />
       </map>
     </option>

@@ -14,8 +14,10 @@ import com.vincent.filepicker.filter.entity.BaseFile;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.album.tier.AlbumResp;
@@ -78,16 +80,15 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     JProtocol.OnOk onSychnQueryRespons = (resp) -> {
         AlbumResp rsp = (AlbumResp) resp;
         if (synchPage.taskNo == rsp.syncing.taskNo && synchPage.end < mList.size()) {
-            Photo[] phts = rsp.photos(0);
+//            Photo[] phts = rsp.photos(0);
 //            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
 //                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
             // sequence order is guaranteed.
-            int px = 0;
-            for (int i = synchPage.start; i < synchPage.end && px < phts.length; i++) {
+            HashMap<String, Object> phts = rsp.syncPaths();
+            for (int i = synchPage.start; i < synchPage.end; i++) {
                 T f = mList.get(i);
-                if (f.fullpath().equals(phts[px].clientpath)) {
+                if (phts.keySet().contains(f.fullpath())) {
                     f.synchFlag = 1;
-                    px ++;
                 }
             }
 

@@ -119,7 +119,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             else if (file.synchFlag == BaseFile.Synchronized) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
-                holder.icAlbum.setVisibility(View.VISIBLE);
+                holder.icAlbum.setVisibility(View.INVISIBLE);
                 holder.icSyncing.setVisibility(View.GONE);
                 holder.icSynced.setVisibility(View.VISIBLE);
             }
@@ -136,8 +136,9 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.animation.setVisibility ( View.VISIBLE );
                 holder.animation.setAlpha ( 1f );
                 AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
-                Animation a= AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
+                Animation a = AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
                 animationDrawable.start ();
+                a.start();
             }
             else {
                 // not synced and not selected

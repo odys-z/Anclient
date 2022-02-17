@@ -36,7 +36,7 @@
     <string name="key_login_summery" translatable="false">key_login_msg</string>
     <string name="t_synch_ok">%s files has been synchronized</string>
     <string name="devide_title">Device Name</string>
-    <string name="key_device">key-device</string>
+    <string name="key_device" translatable="false">key-device</string>
     <string name="login_succeed">Login succeed.</string>
 
 </resources>

@@ -30,4 +30,5 @@ public class PrefKeys {
 
     /** button key in prefs screen for registering device */
     public String bt_regist;
+    public String bt_login;
 }
