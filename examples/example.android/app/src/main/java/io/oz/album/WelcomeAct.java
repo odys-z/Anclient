@@ -173,13 +173,16 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             Intent data = result.getData();
             if (data != null) {
                 ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
-                singl.tier.asyncPhotos(list,
-                    (resp) -> {
-                        showMsg(R.string.t_synch_ok, list.size());
-                    },
-                    (c, r, args) -> {
-                        showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
-                    });
+                if (singl.tier == null)
+                    showMsg(R.string.txt_please_login);
+                else
+                    singl.tier.asyncPhotos(list, singl.photoUser,
+                        (resp) -> {
+                            showMsg(R.string.t_synch_ok, list.size());
+                        },
+                        (c, r, args) -> {
+                            showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
+                        });
             }
         } catch (SemanticException | IOException | AnsonException e) {
             e.printStackTrace();
@@ -225,16 +228,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             case Constant.REQUEST_CODE_PICK_IMAGE:
                 if (resultCode == RESULT_OK) {
                     ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
-//                    StringBuilder builder = new StringBuilder();
-//                    for (ImageFile file : list) {
-//                        String path = file.getPath();
-//                        builder.append(path + "\n");
-//                    }
-//                    mTvResult.setText(builder.toString());
                     try {
                         // shouldn't reach here
                         if (singl.client != null)
-                            singl.tier.syncPhotos(list);
+                            singl.tier.syncPhotos(list, singl.photoUser);
                         else showMsg(R.string.msg_ignored_when_offline);
                     } catch (IOException e) {
                         e.printStackTrace();

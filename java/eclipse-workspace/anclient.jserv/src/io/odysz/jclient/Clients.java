@@ -41,13 +41,14 @@ public class Clients {
 	/**Login and return a client instance (with session managed by jserv).
 	 * @param uid
 	 * @param pswdPlain
+	 * @param mac 
 	 * @return null if failed, a SessionClient instance if login succeed.
 	 * @throws SemanticException Request can not parsed correctly 
 	 * @throws GeneralSecurityException  encrypting password error
 	 * @throws SsException 
 	 * @throws Exception, most likely the network failed
 	 */
-	public static SessionClient login(String uid, String pswdPlain)
+	public static SessionClient login(String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, GeneralSecurityException, AnsonException, SsException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
@@ -56,7 +57,7 @@ public class Clients {
 		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 		
 		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
-		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
+		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
 
 		HttpServClient httpClient = new HttpServClient();
 		String url = servUrl(Port.session);

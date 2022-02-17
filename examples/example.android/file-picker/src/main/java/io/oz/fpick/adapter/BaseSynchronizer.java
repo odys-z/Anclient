@@ -1,5 +1,6 @@
 package io.oz.fpick.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -23,23 +24,6 @@ import io.oz.album.tier.SyncingPage;
 import io.oz.albumtier.AlbumContext;
 
 public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
-//    public class SyncingPage {
-//        int taskNo = 0;
-//        public int start;
-//        public int end;
-//
-//        public SyncingPage(int begin, int afterLast) {
-//            start = begin;
-//            end = afterLast;
-//        }
-//
-//        public SyncingPage nextPage(int size) {
-//            start = end;
-//            end += size;
-//            return this;
-//        }
-//    }
-
     protected Context mContext;
     protected ArrayList<T> mList;
     protected OnSelectStateListener<T> mListener;
@@ -53,6 +37,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         mList = list;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void add(List<T> list) {
         mList.addAll(list);
         notifyDataSetChanged();
@@ -70,6 +55,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     public List<T> getDataSet() { return (List<T>) mList; }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void refresh(List<T> list) {
         mList.clear();
         mList.addAll(list);
@@ -85,7 +71,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         singleton.tier.asyncQuerySyncs(mList, page,
                 onSychnQueryRespons,
                 (c, r, args) -> {
-                    Log.e(singleton.clientUri, String.format(r + args[0]));
+                    Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
                 });
     }
 
@@ -93,8 +79,17 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         AlbumResp rsp = (AlbumResp) resp;
         if (synchPage.taskNo == rsp.syncing.taskNo && synchPage.end < mList.size()) {
             Photo[] phts = rsp.photos(0);
-            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
-                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
+//            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
+//                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
+            // sequence order is guaranteed.
+            int px = 0;
+            for (int i = synchPage.start; i < synchPage.end && px < phts.length; i++) {
+                T f = mList.get(i);
+                if (f.fullpath().equals(phts[px].clientpath)) {
+                    f.synchFlag = 1;
+                    px ++;
+                }
+            }
 
             upateIcons();
 
@@ -106,7 +101,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     };
 
     void upateIcons() {
-        ((Activity)mContext).runOnUiThread( () -> notifyItemChanged(synchPage.start, synchPage.end) );
+        ((Activity)mContext).runOnUiThread( () -> notifyDataSetChanged() );
     }
 
     public void setOnSelectStateListener(OnSelectStateListener<T> listener) {

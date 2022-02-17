@@ -77,10 +77,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
         imagePickViewHolder.setIsRecyclable ( false );
 
-        //
-//        synchPage = new SyncingPage(0, 20);
-//        startSynchQuery(synchPage);
-
         return imagePickViewHolder;
     }
 
@@ -121,7 +117,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.icSynced.setVisibility(View.GONE);
             }
             else if (file.synchFlag == BaseFile.Synchronized) {
-                holder.mCbx.setSelected(false);
+                holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.VISIBLE);
                 holder.icSyncing.setVisibility(View.GONE);

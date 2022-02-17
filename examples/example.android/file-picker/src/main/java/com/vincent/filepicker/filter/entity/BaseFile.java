@@ -31,7 +31,7 @@ public class BaseFile implements Parcelable, IFileDescriptor {
     private long date;          //Added Date
     private boolean isSelected;
 
-    public int synchFlag;
+    public int synchFlag = SynchUnknown;
 
     @Override
     public boolean equals(Object o) {

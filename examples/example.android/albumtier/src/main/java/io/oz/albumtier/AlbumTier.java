@@ -12,6 +12,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
+import io.oz.album.client.ClientPhotoUser;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
@@ -59,10 +60,10 @@ public class AlbumTier extends Semantier {
 		return client.commit(q, errCtx);
 	}
 
-	public void uploadPhotos(ArrayList<? extends DocsResp> list) throws IOException, AnsonException, SemanticException {
+	public void uploadPhotos(ArrayList<? extends DocsResp> list, ClientPhotoUser usr) throws IOException, AnsonException, SemanticException {
 		AlbumReq req = new AlbumReq();
 	    for (DocsResp f : list) {
-	        req.createPhoto(f);
+	        req.createPhoto(f, usr);
 		}
 		req.a(A.insertPhoto);
 

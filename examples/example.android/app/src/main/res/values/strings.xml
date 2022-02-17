@@ -30,6 +30,7 @@
     <string name="pswd_title" translatable="false">Password</string>
     <string name="btn_login" translatable="false">bt_login</string>
     <string name="txt_login" translatable="false">User Login</string>
+    <string name="txt_please_login" translatable="false">Please Login</string>
     <string name="summery_login" translatable="false">Login to upload files your own folder</string>
     <string name="txt_prefs_title" translatable="false">Album User Settings</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
