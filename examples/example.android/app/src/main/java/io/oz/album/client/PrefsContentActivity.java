@@ -122,6 +122,9 @@ public class PrefsContentActivity extends AppCompatActivity {
             }
             summery = findPreference(AlbumApp.keys.login_summery);
         }
+
+        public void onLogin(View btn) {
+        }
     }
 
     @Override

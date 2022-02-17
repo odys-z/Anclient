@@ -17,19 +17,13 @@ import io.oz.albumtier.AlbumContext;
  */
 
 public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
-    protected Context mContext;
-    protected ArrayList<T> mList;
-    protected OnSelectStateListener<T> mListener;
-
-    protected AlbumContext singleton;
-
     public class SyncingPage {
         public int start;
         public int end;
 
         public SyncingPage(int begin, int afterLast) {
-           start = begin;
-           end = afterLast;
+            start = begin;
+            end = afterLast;
         }
 
         public SyncingPage nextPage(int size) {
@@ -38,6 +32,13 @@ public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends
             return this;
         }
     }
+
+    protected Context mContext;
+    protected ArrayList<T> mList;
+    protected OnSelectStateListener<T> mListener;
+
+    protected AlbumContext singleton;
+
     protected SyncingPage synchPage;
 
     public BaseAdapter(Context ctx, ArrayList<T> list) {

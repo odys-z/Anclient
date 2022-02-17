@@ -2,6 +2,7 @@ package io.oz.fpick.adapter;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
@@ -43,7 +44,7 @@ import io.oz.fpick.R;
  * Credits to Vincent Woo
  */
 
-public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
+public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
     private boolean isNeedImagePager;
     private boolean isNeedCamera;
     private int mMaxNumber;
@@ -77,32 +78,11 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
         imagePickViewHolder.setIsRecyclable ( false );
 
         //
-        synchPage = new SyncingPage(0, 20);
-        startSynchQuery(synchPage);
+//        synchPage = new SyncingPage(0, 20);
+//        startSynchQuery(synchPage);
 
         return imagePickViewHolder;
     }
-
-    void startSynchQuery(SyncingPage page) {
-        singleton.tier.asyncQuerySyncs(mList,
-            onSychnQueryRespons,
-            (c, r, args) -> {
-                Log.e(r, args[0]);
-            });
-    }
-
-    JProtocol.OnOk onSychnQueryRespons = (resp) -> {
-        Photo[] phts = ((AlbumResp) resp).photos(0);
-        for (int i = synchPage.start; i < synchPage.end; i++)
-            mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
-
-        notifyItemChanged(synchPage.start, synchPage.end);
-
-        if (mList.size() >= synchPage.end) {
-            synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
-            startSynchQuery(synchPage);
-        }
-    };
 
     @Override
     public void onBindViewHolder ( final ImagePickViewHolder holder , final int position ) {
