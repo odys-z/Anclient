@@ -11,18 +11,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.entity.BaseFile;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.SyncingPage;
 import io.oz.album.tier.AlbumResp;
-import io.oz.album.tier.Photo;
-import io.oz.album.tier.SyncingPage;
 import io.oz.albumtier.AlbumContext;
 
 public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
@@ -65,7 +61,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
         synchPage = new SyncingPage(0, Math.min(20, mList.size()));
         synchPage.taskNo = nextRandomInt();
-        synchPage.device = singleton.photoUser.device();
+        synchPage.device = singleton.photoUser.device;
         startSynchQuery(synchPage);
     }
 
@@ -79,7 +75,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     JProtocol.OnOk onSychnQueryRespons = (resp) -> {
         AlbumResp rsp = (AlbumResp) resp;
-        if (synchPage.taskNo == rsp.syncing.taskNo && synchPage.end < mList.size()) {
+        if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
 //            Photo[] phts = rsp.photos(0);
 //            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
 //                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);

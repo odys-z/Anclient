@@ -29,9 +29,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     }
 
     @Override
-//        public void onCreate(final Bundle savedInstanceState) {
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
-        // super.onCreatePreferences(savedInstanceState, rootKey);
         addPreferencesFromResource(R.xml.pref);
 
         PrefsContentActivity.bindPref2Val(findPreference(AlbumApp.keys.home));
@@ -49,7 +47,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
         homepref = findPreference(AlbumApp.keys.home);
-        String devid = PrefsContentActivity.singleton.photoUser.device();
+        String devid = PrefsContentActivity.singleton.photoUser.device;
         if (!LangExt.isblank(devid)) {
             homepref.setSummary(getString(R.string.devide_name, devid));
             findPreference(AlbumApp.keys.device).setEnabled(false);

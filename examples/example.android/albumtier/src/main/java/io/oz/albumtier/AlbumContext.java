@@ -11,9 +11,9 @@ import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.jsession.SessionInf;
 import io.oz.album.AlbumPort;
 import io.oz.album.client.AlbumClientier;
-import io.oz.album.client.ClientPhotoUser;
 
 public class AlbumContext {
     static final String jdocbase  = "jserv-album";
@@ -21,6 +21,12 @@ public class AlbumContext {
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
+    }
+
+    private String pswd;
+    public AlbumContext pswd(String pswd) {
+        this.pswd = pswd;
+        return this;
     }
 
     public static AlbumContext getInstance() {
@@ -31,7 +37,7 @@ public class AlbumContext {
 
     public boolean needSetup() {
         return LangExt.isblank(jserv, "/", ".", "http://", "https://")
-                || LangExt.isblank(photoUser.device(), "/", ".")
+                || LangExt.isblank(photoUser.device, "/", ".")
                 || LangExt.isblank(photoUser.uid());
     }
 
@@ -61,7 +67,7 @@ public class AlbumContext {
 
     public SessionClient client;
 
-    public ClientPhotoUser photoUser;
+    public SessionInf photoUser;
 
     ConnState state;
     public ConnState state() { return state; }
@@ -73,9 +79,10 @@ public class AlbumContext {
     public void init(Resources resources, PrefKeys prefkeys, SharedPreferences sharedPref) {
 
         String uid = sharedPref.getString(prefkeys.usrid, "");
-        String pswd = sharedPref.getString(prefkeys.pswd, "");
         String device = sharedPref.getString(prefkeys.device, "");
-        photoUser = new ClientPhotoUser(uid, pswd, device);
+        photoUser = new SessionInf(null, uid);
+        photoUser.device = device;
+        pswd = sharedPref.getString(prefkeys.pswd, "");
         jserv = sharedPref.getString(prefkeys.jserv, "");
 
         Clients.init(jserv + "/" + jdocbase, verbose);
@@ -84,7 +91,7 @@ public class AlbumContext {
     AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr) throws GeneralSecurityException {
         // uid = "ody";
         // pswd = "123456";
-        if (LangExt.isblank(photoUser.device(), ".", "/"))
+        if (LangExt.isblank(photoUser.device, ".", "/"))
             throw new GeneralSecurityException("Device Id is null.");
 
         Clients.init(jserv + "/" + jdocbase, verbose);
@@ -103,13 +110,13 @@ public class AlbumContext {
             state = ConnState.LoginFailed;
             if (onErr != null)
                 onErr.err(c, r, v);
-        }, photoUser.device());
+        }, photoUser.device);
         return this;
     }
 
     public void login(TierCallback onOk, JProtocol.OnError onErr)
             throws GeneralSecurityException {
-        login(photoUser.uid(), photoUser.pswd(), onOk, onErr);
+        login(photoUser.uid(), pswd, onOk, onErr);
     }
 
     public AlbumContext jserv(String newVal) {

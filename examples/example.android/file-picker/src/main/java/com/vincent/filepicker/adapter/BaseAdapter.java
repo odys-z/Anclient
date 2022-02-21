@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.semantic.tier.docs.SyncingPage;
 import io.oz.albumtier.AlbumContext;
 
 /**
@@ -17,21 +18,21 @@ import io.oz.albumtier.AlbumContext;
  */
 
 public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
-    public class SyncingPage {
-        public int start;
-        public int end;
-
-        public SyncingPage(int begin, int afterLast) {
-            start = begin;
-            end = afterLast;
-        }
-
-        public SyncingPage nextPage(int size) {
-            start = end;
-            end += size;
-            return this;
-        }
-    }
+//    public class SyncingPage {
+//        public int start;
+//        public int end;
+//
+//        public SyncingPage(int begin, int afterLast) {
+//            start = begin;
+//            end = afterLast;
+//        }
+//
+//        public SyncingPage nextPage(int size) {
+//            start = end;
+//            end += size;
+//            return this;
+//        }
+//    }
 
     protected Context mContext;
     protected ArrayList<T> mList;

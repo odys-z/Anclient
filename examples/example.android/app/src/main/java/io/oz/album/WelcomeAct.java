@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
@@ -50,6 +52,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     ActivityResultLauncher<Intent> prefActStarter;
 
     ActivityResultLauncher<Intent> imgPickActStarter;
+
+    ActivityResultLauncher<Intent> vidPickActStarter;
 
     TextView msgv;
 
@@ -88,6 +92,18 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         else showMsg(R.string.msg_ignored_when_offline);
                     }
                 });
+
+        if (vidPickActStarter == null)
+            vidPickActStarter = registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                            if (singl.state() == AlbumContext.ConnState.Online) {
+                                onVideoPicked(result);
+                            }
+                            else showMsg(R.string.msg_ignored_when_offline);
+                        }
+                    });
 
         if (prefActStarter == null)
             prefActStarter = registerForActivityResult(
@@ -132,6 +148,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     void clearMsg() {
         runOnUiThread(() -> msgv.setVisibility(View.GONE));
+    }
+
+    void showProgress(int listIx, ArrayList<ImageFile> list, int blocks, DocsResp resp) {
+        runOnUiThread(() -> {
+            String msg = String.format(getString(R.string.msg_templ_progress),
+                    list.size(), listIx, resp.clientname(), resp.blockSeq() / blocks);
+            msgv.setText(msg);
+            msgv.setVisibility(View.VISIBLE);
+        });
     }
 
     @Override
@@ -190,6 +215,40 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    protected void startVideoPiking() {
+        clearMsg();
+
+        Intent imgIntent = new Intent(this, VideoPickActivity.class);
+        imgIntent.putExtra(IS_NEED_CAMERA, true);
+        imgIntent.putExtra(Constant.MAX_NUMBER, 99);
+        imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
+        imgIntent.putExtra( Constant.PickingMode,
+                singl.state() == AlbumContext.ConnState.Disconnected ?
+                        PickingMode.disabled : PickingMode.limit99 );
+
+        imgPickActStarter.launch(imgIntent);
+    }
+
+    protected void onVideoPicked(@NonNull ActivityResult result) {
+        Intent data = result.getData();
+        if (data != null) {
+            ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
+            if (singl.tier == null)
+                showMsg(R.string.txt_please_login);
+            else
+                singl.tier.asyncVideos(list, singl.photoUser,
+                        (lx, blocks, resp) -> {
+                            showProgress(lx, list, blocks, resp);
+                        },
+                        (resp) -> {
+                            showMsg(R.string.t_synch_ok, list.size());
+                        },
+                        (c, r, args) -> {
+                            showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
+                        });
+        }
+    }
+
     @Override
     public void onClick(@NonNull View v) {
         int id = v.getId();
@@ -198,11 +257,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 startImagePicking();
                 break;
             case R.id.btn_pick_video:
+                startVideoPiking();
+                /*
                 Intent intent2 = new Intent(this, VideoPickActivity.class);
                 intent2.putExtra(IS_NEED_CAMERA, true);
                 intent2.putExtra(Constant.MAX_NUMBER, 9);
                 intent2.putExtra ( IS_NEED_FOLDER_LIST, true );
                 startActivityForResult(intent2, Constant.REQUEST_CODE_PICK_VIDEO);
+                 */
                 break;
             case R.id.btn_pick_audio:
                 Intent intent3 = new Intent(this, AudioPickActivity.class);

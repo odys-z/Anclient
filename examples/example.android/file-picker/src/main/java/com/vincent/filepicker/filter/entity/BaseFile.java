@@ -3,9 +3,12 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
+import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.oz.album.tier.Photo;
 
@@ -165,13 +168,24 @@ public class BaseFile implements Parcelable, IFileDescriptor {
     }
 
     @Override
+    public IFileDescriptor fullpath(String clientpath) throws IOException {
+        path = clientpath;
+        return this;
+    }
+
+    @Override
     public String clientname() {
         Path p = Paths.get(path);
         return p.getFileName().toString();
     }
 
-    public BaseFile synchFlag(int syncFlag) {
-        this.synchFlag = syncFlag;
-        return this;
+    @Override
+    public String cdate() {
+        return DateFormat.format(new Date(date));
     }
+
+//    public BaseFile synchFlag(int syncFlag) {
+//        this.synchFlag = syncFlag;
+//        return this;
+//    }
 }

@@ -10,6 +10,7 @@ import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.albumtier.AlbumContext;
@@ -44,7 +45,7 @@ public class PrefsContentActivity extends AppCompatActivity {
             singleton.login((tier) -> {
                 singleton.tier = tier;
                 updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device()));
+                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
             },
             (c, t, args) -> {
                 updateSummery(prefFragment.summery, String.format(t,
@@ -104,13 +105,15 @@ public class PrefsContentActivity extends AppCompatActivity {
                 singleton.jserv(stringValue);
             }
             else if (AlbumApp.keys.pswd.equals(k)) {
-                singleton.photoUser.pswd(stringValue);
+                singleton.pswd(stringValue);
             }
             else if (AlbumApp.keys.usrid.equals(k)) {
-                singleton.photoUser.uid(stringValue);
+                String device = singleton.photoUser.device;
+                singleton.photoUser = new SessionInf(singleton.photoUser.ssid(), stringValue);
+                singleton.photoUser.device = device;
             }
             else if (AlbumApp.keys.device.equals(k)) {
-                singleton.photoUser.device(stringValue);
+                singleton.photoUser.device = stringValue;
             }
             return true;
         }
