@@ -259,11 +259,12 @@ public class VideoPickAdapter extends BaseAdapter<VideoFile, VideoPickAdapter.Vi
         private TextView mDuration;
         private RelativeLayout mDurationLayout;
         private RelativeLayout animation;
+
         public VideoPickViewHolder(View itemView) {
             super(itemView);
-            mIvCamera = (ImageView) itemView.findViewById(R.id.iv_camera);
+            mIvCamera = (ImageView) itemView.findViewById(R.id.xiv_album_icon);
             mIvThumbnail = (ImageView) itemView.findViewById(R.id.iv_thumbnail);
-            mShadow = itemView.findViewById(R.id.shadow);
+            mShadow = itemView.findViewById(R.id.x_shadow);
             mCbx = (ImageView) itemView.findViewById(R.id.cbx);
             mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
             animation = itemView.findViewById ( R.id.animationSquarevideo );

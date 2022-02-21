@@ -3,13 +3,15 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import io.odysz.semantic.tier.docs.IFileDescriptor;
+
 /**
  * Created by Vincent Woo
  * Date: 2016/10/11
  * Time: 15:23
  */
 
-public class VideoFile extends BaseFile implements Parcelable {
+public class VideoFile extends BaseFile implements Parcelable, IFileDescriptor {
     private long duration;
     private String thumbnail;
 

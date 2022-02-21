@@ -19,19 +19,24 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
-import com.vincent.filepicker.adapter.VideoPickAdapter;
-import com.vincent.filepicker.filter.FileFilter;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.Directory;
+import com.vincent.filepicker.filter.entity.ImageFile;
 import com.vincent.filepicker.filter.entity.VideoFile;
+
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.oz.fpick.R;
+import io.oz.fpick.adapter.VideoPickAdapter;
+import io.oz.fpick.filter.FileFilterx;
 
 /**
+ * Modified by Ody Zhou
+ * 20 Feb, 2022
+ *
  * Created by Vincent Woo
  * Date: 2016/10/21
  * Time: 14:02
@@ -100,26 +105,20 @@ public class VideoPickActivity extends BaseActivity {
 
                     AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground ( );
                     animationDrawable.start ();
-
                 } else {
                     mSelectedList.remove(file);
                     mCurrentNumber--;
                     animation.setAlpha ( 0f );
                     animation.setVisibility ( View.GONE );
-
                 }
                 tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
             }
 
             @Override
-            public void onAudioStateChanged ( boolean state , VideoFile file,View animation ) {
-
-            }
+            public void onAudioStateChanged ( boolean state, VideoFile file, View animation ) { }
 
             @Override
-            public void onFileStateChanged ( boolean state , VideoFile file,View animation ) {
-
-            }
+            public void onFileStateChanged ( boolean state, VideoFile file, View animation ) { }
         } );
 
         mProgressBar = (ProgressBar) findViewById(R.id.pb_video_pick);
@@ -196,7 +195,7 @@ public class VideoPickActivity extends BaseActivity {
     }
 
     private void loadData() {
-        FileFilter.getVideos(this, new FilterResultCallback<VideoFile>() {
+        FileFilterx.getVideos(this, new FilterResultCallback<VideoFile>() {
             @Override
             public void onResult(List<Directory<VideoFile>> directories) {
                 mProgressBar.setVisibility(View.GONE);

@@ -219,9 +219,9 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 
         public ImagePickViewHolder ( View itemView ) {
             super ( itemView );
-            mIvCamera = (ImageView) itemView.findViewById ( R.id.iv_camera );
+            mIvCamera = (ImageView) itemView.findViewById ( R.id.xiv_album_icon );
             mIvThumbnail = (ImageView) itemView.findViewById ( R.id.iv_thumbnail );
-            mShadow = itemView.findViewById ( R.id.shadow );
+            mShadow = itemView.findViewById ( R.id.x_shadow );
             mCbx = (ImageView) itemView.findViewById ( R.id.cbx );
             animation = itemView.findViewById ( R.id.animationSquare );
         }
