@@ -131,7 +131,8 @@ public class ImagePickActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.putParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE, mSelectedList);
+                /// intent.putParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE, mSelectedList);
+                intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
                 setResult(RESULT_OK, intent);
                 finish();
             }

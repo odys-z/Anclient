@@ -153,7 +153,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     void showProgress(int listIx, ArrayList<ImageFile> list, int blocks, DocsResp resp) {
         runOnUiThread(() -> {
             String msg = String.format(getString(R.string.msg_templ_progress),
-                    list.size(), listIx, resp.clientname(), resp.blockSeq() / blocks);
+                    list.size(), listIx, resp.clientname(), (float)(resp.blockSeq() + 1)/ blocks);
             msgv.setText(msg);
             msgv.setVisibility(View.VISIBLE);
         });
@@ -198,7 +198,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         try {
             Intent data = result.getData();
             if (data != null) {
-                ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
+                ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
                 else
@@ -226,13 +226,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 singl.state() == AlbumContext.ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99 );
 
-        imgPickActStarter.launch(imgIntent);
+        vidPickActStarter.launch(imgIntent);
     }
 
     protected void onVideoPicked(@NonNull ActivityResult result) {
         Intent data = result.getData();
         if (data != null) {
-            ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
+            ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
             if (singl.tier == null)
                 showMsg(R.string.txt_please_login);
             else
@@ -290,7 +290,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         switch (requestCode) {
             case Constant.REQUEST_CODE_PICK_IMAGE:
                 if (resultCode == RESULT_OK) {
-                    ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
+                    ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     try {
                         // shouldn't reach here
                         if (singl.client != null)
@@ -307,7 +307,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 break;
             case Constant.REQUEST_CODE_PICK_VIDEO:
                 if (resultCode == RESULT_OK) {
-                    ArrayList<VideoFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_VIDEO);
+                    ArrayList<VideoFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     StringBuilder builder = new StringBuilder();
                     for (VideoFile file : list) {
                         String path = file.getPath();
@@ -318,7 +318,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 break;
             case Constant.REQUEST_CODE_PICK_AUDIO:
                 if (resultCode == RESULT_OK) {
-                    ArrayList<AudioFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_AUDIO);
+                    ArrayList<AudioFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     StringBuilder builder = new StringBuilder();
                     for (AudioFile file : list) {
                         String path = file.getPath();

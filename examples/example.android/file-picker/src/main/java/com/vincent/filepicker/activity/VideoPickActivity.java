@@ -134,7 +134,8 @@ public class VideoPickActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.putParcelableArrayListExtra(Constant.RESULT_PICK_VIDEO, mSelectedList);
+                // intent.putParcelableArrayListExtra(Constant.RESULT_PICK_VIDEO, mSelectedList);
+                intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
                 setResult(RESULT_OK, intent);
                 finish();
             }

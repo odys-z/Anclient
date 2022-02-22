@@ -38,6 +38,6 @@
     <string name="devide_title">Device Name</string>
     <string name="key_device" translatable="false">key-device</string>
     <string name="login_succeed">Login succeed.</string>
-    <string name="msg_templ_progress">%d / %d %s\n%.0f%%</string>
+    <string name="msg_templ_progress">%d / %d %s\n%.1f%%</string>
 
 </resources>

@@ -204,8 +204,7 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
             mShadow = itemView.findViewById ( R.id.x_shadow );
             mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
-            animation = itemView.findViewById ( R.id.animationSquare );
-
+            animation = itemView.findViewById ( R.id.animationSquarevideo );
             mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
             mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
         }

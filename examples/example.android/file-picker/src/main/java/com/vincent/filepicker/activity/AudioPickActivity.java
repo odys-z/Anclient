@@ -127,7 +127,8 @@ public class AudioPickActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.putParcelableArrayListExtra(Constant.RESULT_PICK_AUDIO, mSelectedList);
+                // intent.putParcelableArrayListExtra(Constant.RESULT_PICK_AUDIO, mSelectedList);
+                intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
                 setResult(RESULT_OK, intent);
                 finish();
             }

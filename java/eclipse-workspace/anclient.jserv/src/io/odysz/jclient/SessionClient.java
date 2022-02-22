@@ -265,7 +265,7 @@ public class SessionClient {
 			return (A) resp.body(0);
 		}
 		else {
-			err.onError(code, resp.body(0));
+			err.onError(code, resp.body(0).msg());
 			return null;
 		}
 	}
