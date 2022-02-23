@@ -4,6 +4,11 @@ buildscript {
     repositories {
         google()
         jcenter()
+
+//        maven {
+//            name 'glide-snapshot'
+//            url 'https://oss.sonatype.org/content/repositories/snapshots'
+//        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.1.1'
@@ -18,13 +23,14 @@ allprojects {
         appcompat_version = "1.4.1"
         glide_version = "4.12+"
         bm_photoview_version = "1.4.1"
-        anclient_ver = "0.4.6-SNAPSHOT"
-        jserv_ver = "1.3.6-SNAPSHOT"
-        album_lib_ver = "0.4.6-SNAPSHOT"
+        anclient_ver = "0.4.7"
+        jserv_ver = "1.3.7"
+        album_lib_ver = "0.4.7"
     }
 
     repositories {
         mavenLocal()
+        mavenCentral()
         google()
         jcenter()
     }
