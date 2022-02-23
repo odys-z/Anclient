@@ -150,17 +150,13 @@ public class BaseFile implements Parcelable, IFileDescriptor {
         }
     };
 
-    String recId;
-    @Override
-    public String recId() {
-        return recId;
-    }
+    // String recId; @Override public String recId() { return recId; }
 
-    @Override
-    public IFileDescriptor recId(String rid) {
-        this.recId = rid;
-        return this;
-    }
+//    @Override
+//    public IFileDescriptor recId(String rid) {
+//        this.recId = rid;
+//        return this;
+//    }
 
     @Override
     public String fullpath() {

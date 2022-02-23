@@ -111,12 +111,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         Intent data = result.getData();
-                        Log.d("jserv-root", data == null ? "null" : data.getAction());
+
+                        SharedPreferences sharePrefs =
+                                PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+                        String name = sharePrefs.getString(AlbumApp.keys.usrid, "");
+                        String device = sharePrefs.getString(AlbumApp.keys.device, "");
+                        showMsg(R.string.msg_device_uid, name, device);
                     }
-                    SharedPreferences sharedPreferences =
-                            PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
-                    String name = sharedPreferences.getString(AlbumApp.keys.jserv, "");
-                    Log.d(singl.clientUri + "/jserv-uri", name);
                 });
 
         try {
@@ -207,7 +208,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             showMsg(R.string.t_synch_ok, list.size());
                         },
                         (c, r, args) -> {
-                            showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
+                            showMsg(R.string.msg_upload_failed, args);
                         });
             }
         } catch (SemanticException | IOException | AnsonException e) {
@@ -258,13 +259,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 break;
             case R.id.btn_pick_video:
                 startVideoPiking();
-                /*
-                Intent intent2 = new Intent(this, VideoPickActivity.class);
-                intent2.putExtra(IS_NEED_CAMERA, true);
-                intent2.putExtra(Constant.MAX_NUMBER, 9);
-                intent2.putExtra ( IS_NEED_FOLDER_LIST, true );
-                startActivityForResult(intent2, Constant.REQUEST_CODE_PICK_VIDEO);
-                 */
                 break;
             case R.id.btn_pick_audio:
                 Intent intent3 = new Intent(this, AudioPickActivity.class);

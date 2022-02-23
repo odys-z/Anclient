@@ -50,13 +50,9 @@ public class AlbumContext {
         String msg;
         AnsonMsg.MsgCode code;
         @Override
-        public void onError(AnsonMsg.MsgCode c, String msg, Object ... obj) {
+        public void onError(AnsonMsg.MsgCode c, String msg) {
             code = c;
-            try {
-                this.msg = String.format(msg, obj);
-            }catch (Exception e) {
-                this.msg = msg;
-            }
+            this.msg = msg;
         }
     };
 

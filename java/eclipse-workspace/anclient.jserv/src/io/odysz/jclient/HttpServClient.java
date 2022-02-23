@@ -128,7 +128,7 @@ public class HttpServClient {
 			}
 
 			if (x.code() != MsgCode.ok)
-				throw new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body().toString());
+				throw new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body(0).msg());
 			return x;
 		}
 		else {
