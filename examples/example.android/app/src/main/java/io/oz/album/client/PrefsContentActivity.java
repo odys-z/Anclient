@@ -10,9 +10,11 @@ import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 
 /**
@@ -30,8 +32,7 @@ public class PrefsContentActivity extends AppCompatActivity {
         if (singleton == null) {
             singleton = AlbumApp.singl;
             oldUid = null;
-        }
-        else oldUid = singleton.photoUser.uid();
+        } else oldUid = singleton.photoUser.uid();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -42,20 +43,34 @@ public class PrefsContentActivity extends AppCompatActivity {
 
     public void onLogin(View btn) {
         try {
-            singleton.login((tier) -> {
-                singleton.tier = tier;
-                updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
-            },
-            (c, t, args) -> {
-                updateSummery(prefFragment.summery, String.format(t,
-                            args == null ? new String[]{"", ""} : args));
-            });
+            singleton.login(
+                    (tier) -> {
+                        singleton.tier = tier;
+                        updateSummery(prefFragment.summery, getString(R.string.login_succeed));
+                        updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
+
+                        // load settings
+                        tier.getSettings(
+                                (resp) -> {
+                                    singleton.homeName = ((AlbumResp) resp).profils.home();
+                                    updateSummery(prefFragment.homepref, singleton.homeName);
+                                },
+                                showErrSummary);
+                    },
+                    showErrSummary);
         } catch (Exception e) {
             Log.e(singleton.clientUri, e.getClass().getName() + e.getMessage());
             updateSummery(prefFragment.summery, getString(R.string.msg_pref_login_failed, e.getClass().getName(), e.getMessage()));
         }
     }
+
+    /**
+     * common function for error handling
+     */
+    JProtocol.OnError showErrSummary = (c, t, args) -> {
+        updateSummery(prefFragment.summery, String.format(t,
+                (Object[]) (args == null ? new String[]{"", ""} : args)));
+    };
 
     public void onRegisterDevice(View btn) {
         if (prefFragment.btnRegist != null) {
@@ -66,8 +81,9 @@ public class PrefsContentActivity extends AppCompatActivity {
 
     /**
      * Set text into EditText's summery, running in ui thread.
+     *
      * @param of of which summery to be updated
-     * @param s summery text
+     * @param s  summery text
      */
     void updateSummery(Preference of, String s) {
         runOnUiThread(() -> of.setSummary(s));
@@ -80,36 +96,4 @@ public class PrefsContentActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-//    /**
-//     * A preference value change listener that updates the preference's summary
-//     * to reflect its new value.
-//     */
-//    private static final Preference.OnPreferenceChangeListener prefsListener
-//            = new Preference.OnPreferenceChangeListener() {
-//        @Override
-//        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
-//            String stringValue = newValue.toString();
-//            String k = preference.getKey();
-//            if (k.equals(AlbumApp.keys.jserv)) {
-//                singleton.jserv(stringValue);
-//                preference.setSummary(stringValue);
-//            }
-//            else if (AlbumApp.keys.pswd.equals(k)) {
-//                singleton.pswd(stringValue);
-//                preference.setSummary("");
-//            }
-//            else if (AlbumApp.keys.usrid.equals(k)) {
-//                String device = singleton.photoUser.device;
-//                singleton.photoUser = new SessionInf(singleton.photoUser.ssid(), stringValue);
-//                singleton.photoUser.device = device;
-//                preference.setSummary(stringValue);
-//            }
-//            else if (AlbumApp.keys.device.equals(k)) {
-//                singleton.photoUser.device = stringValue;
-//                preference.setSummary(stringValue);
-//            }
-//            return true;
-//        }
-//    };
 }
