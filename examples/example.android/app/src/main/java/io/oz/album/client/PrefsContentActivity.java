@@ -10,9 +10,11 @@ import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 
 /**
@@ -42,20 +44,32 @@ public class PrefsContentActivity extends AppCompatActivity {
 
     public void onLogin(View btn) {
         try {
-            singleton.login((tier) -> {
-                singleton.tier = tier;
-                updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
-            },
-            (c, t, args) -> {
-                updateSummery(prefFragment.summery, String.format(t,
-                            args == null ? new String[]{"", ""} : args));
-            });
+            singleton.login(
+                (tier) -> {
+                    singleton.tier = tier;
+                    updateSummery(prefFragment.summery, getString(R.string.login_succeed));
+                    updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
+
+                    // load settings
+                    tier.getSettings(
+                        (resp)->{
+                            singleton.homeName = ((AlbumResp)resp).profils.home();
+                            updateSummery(prefFragment.homepref, singleton.homeName);
+                        },
+                        showErrSummary );
+                },
+                showErrSummary);
         } catch (Exception e) {
             Log.e(singleton.clientUri, e.getClass().getName() + e.getMessage());
             updateSummery(prefFragment.summery, "Login failed!\nDetails: " + e.getMessage());
         }
     }
+
+    /** common function for error handling */
+    JProtocol.OnError showErrSummary = (c, t, args) -> {
+        updateSummery(prefFragment.summery, String.format(t,
+                (Object[]) (args == null ? new String[]{"", ""} : args)));
+    };
 
     public void onRegisterDevice(View btn) {
         if (prefFragment.btnRegist != null) {
@@ -115,6 +129,9 @@ public class PrefsContentActivity extends AppCompatActivity {
             else if (AlbumApp.keys.device.equals(k)) {
                 singleton.photoUser.device = stringValue;
             }
+//            else if (AlbumApp.keys.home.equals(k)) {
+//                singleton.homeName = stringValue;
+//            }
             return true;
         }
     };

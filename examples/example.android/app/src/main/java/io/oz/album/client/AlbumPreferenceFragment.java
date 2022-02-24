@@ -14,6 +14,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import io.odysz.common.LangExt;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.albumtier.AlbumContext;
 
 public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     Preference summery;
@@ -38,7 +39,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         PrefsContentActivity.bindPref2Val(findPreference(AlbumApp.keys.usrid));
         PrefsContentActivity.bindPref2Val(findPreference(AlbumApp.keys.pswd));
 
-        cateHome = (PreferenceCategory) findPreference(AlbumApp.keys.homeCate);
+        cateHome = findPreference(AlbumApp.keys.homeCate);
         btnRegist = findPreference(AlbumApp.keys.bt_regist);
         device = findPreference(AlbumApp.keys.device);
 
@@ -49,15 +50,18 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         homepref = findPreference(AlbumApp.keys.home);
         String devid = PrefsContentActivity.singleton.photoUser.device;
         if (!LangExt.isblank(devid)) {
-            homepref.setSummary(getString(R.string.devide_name, devid));
+            // homepref.setSummary(getString(R.string.devide_name, devid));
+            homepref.setSummary(AlbumContext.getInstance().homeName);
             findPreference(AlbumApp.keys.device).setEnabled(false);
             cateHome.removePreference(btnRegist);
             device.setSummary(getString(R.string.devide_name, devid));
-        } else {
+        }
+        else {
             findPreference(AlbumApp.keys.device).setEnabled(true);
             device.setSummary(R.string.txt_only_once);
         }
         summery = findPreference(AlbumApp.keys.login_summery);
+
 
 //        findPreference(AlbumApp.keys.bt_login).setOnPreferenceClickListener((prf) -> {
 //            try {

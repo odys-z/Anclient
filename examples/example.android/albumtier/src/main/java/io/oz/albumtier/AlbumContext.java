@@ -58,6 +58,7 @@ public class AlbumContext {
 
     String jserv;
 
+    public String homeName;
 
     public AlbumClientier tier;
 
