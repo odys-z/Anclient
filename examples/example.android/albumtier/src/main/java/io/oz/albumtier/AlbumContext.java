@@ -62,7 +62,7 @@ public class AlbumContext {
 
     public AlbumClientier tier;
 
-    public SessionClient client;
+    private SessionClient client;
 
     public SessionInf photoUser;
 
@@ -74,7 +74,7 @@ public class AlbumContext {
     }
 
     public void init(Resources resources, PrefKeys prefkeys, SharedPreferences sharedPref) {
-
+        homeName = sharedPref.getString(prefkeys.home, "");
         String uid = sharedPref.getString(prefkeys.usrid, "");
         String device = sharedPref.getString(prefkeys.device, "");
         photoUser = new SessionInf(null, uid);

@@ -1,5 +1,6 @@
 package io.oz.album.client;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -10,6 +11,7 @@ import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import io.odysz.anson.Anson;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
@@ -44,20 +46,27 @@ public class PrefsContentActivity extends AppCompatActivity {
     public void onLogin(View btn) {
         try {
             singleton.login(
-                    (tier) -> {
-                        singleton.tier = tier;
-                        updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                        updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
+                (tier) -> {
+                    singleton.tier = tier;
+                    updateSummery(prefFragment.summery, getString(R.string.login_succeed));
+                    updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
 
-                        // load settings
-                        tier.getSettings(
-                                (resp) -> {
-                                    singleton.homeName = ((AlbumResp) resp).profils.home();
-                                    updateSummery(prefFragment.homepref, singleton.homeName);
-                                },
-                                showErrSummary);
-                    },
-                    showErrSummary);
+                    // load settings
+                    Anson.verbose = true;
+                    tier.getSettings(
+                        (resp) -> {
+                            singleton.homeName = ((AlbumResp) resp).profils.home();
+                            updateSummery(prefFragment.homepref, singleton.homeName);
+
+                            SharedPreferences sharedPref =
+                                    PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString(AlbumApp.keys.home, singleton.homeName);
+                            editor.apply();
+                        },
+                        showErrSummary);
+                },
+                showErrSummary);
         } catch (Exception e) {
             Log.e(singleton.clientUri, e.getClass().getName() + e.getMessage());
             updateSummery(prefFragment.summery, getString(R.string.msg_pref_login_failed, e.getClass().getName(), e.getMessage()));

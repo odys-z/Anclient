@@ -35,7 +35,6 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'pub.devrel:easypermissions:3.0.0'
 
-//    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: '0.4.4-SNAPSHOT')
     implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver") {
         exclude group: "org.apache.tika", module: "tika-core"
         exclude group: "org.apache.tika", module: "tika-parsers-standard-package"

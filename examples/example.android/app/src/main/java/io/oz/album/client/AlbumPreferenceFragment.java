@@ -81,10 +81,8 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static final Preference.OnPreferenceChangeListener prefsListener
-            = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
+    private static final Preference.OnPreferenceChangeListener prefsListener =
+        (preference, newValue) -> {
             String stringValue = newValue.toString();
             String k = preference.getKey();
             if (k.equals(AlbumApp.keys.jserv)) {
@@ -106,6 +104,5 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 preference.setSummary(stringValue);
             }
             return true;
-        }
-    };
+        };
 }

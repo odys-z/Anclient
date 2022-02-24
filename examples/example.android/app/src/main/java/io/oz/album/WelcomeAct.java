@@ -125,7 +125,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-//                        Intent data = result.getData();
 
                         SharedPreferences sharePrefs =
                                 PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
@@ -344,7 +343,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (resultCode == RESULT_OK) {
                     ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     try {
-                        if (singl.client != null)
+                        if (singl.tier != null)
                             singl.tier.syncPhotos(list, singl.photoUser);
                         else showMsg(R.string.msg_ignored_when_offline);
                     } catch (IOException | AnsonException | SemanticException e) {

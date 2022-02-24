@@ -67,7 +67,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         synchPage = new SyncingPage(0, Math.min(20, mList.size()));
         synchPage.taskNo = nextRandomInt();
         synchPage.device = singleton.photoUser.device;
-        if (singleton.tier != null && singleton.client != null)
+        if (singleton.tier != null)
             startSynchQuery(synchPage);
     }
 
