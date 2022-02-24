@@ -11,7 +11,7 @@ import io.odysz.semantic.tier.docs.IFileDescriptor;
  * Time: 17:44
  */
 
-public class ImageFile extends BaseFile implements Parcelable, IFileDescriptor {
+public class ImageFile extends BaseFile implements Parcelable {
     private int orientation;   //0, 90, 180, 270
 
     public int getOrientation() {

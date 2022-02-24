@@ -45,11 +45,11 @@ import io.oz.fpick.R;
  */
 
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
-    private boolean isNeedImagePager;
-    private boolean isNeedCamera;
-    private int mMaxNumber;
-    private int mCurrentNumber = 0;
-    public String mImagePath;
+//    private boolean isNeedImagePager;
+//    private boolean isNeedCamera;
+//    private int mMaxNumber;
+//    private int mCurrentNumber = 0;
+    public String mFilepath;
     public Uri mImageUri;
 
     public ImagePickAdapter(Context ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
@@ -61,7 +61,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         this.singleton = AlbumContext.getInstance();
         isNeedCamera = needCamera;
         mMaxNumber = max;
-        isNeedImagePager = needImagePager;
+//        isNeedImagePager = needImagePager;
     }
 
     @NonNull

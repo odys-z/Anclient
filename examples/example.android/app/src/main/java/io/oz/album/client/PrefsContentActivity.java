@@ -19,7 +19,7 @@ import io.oz.albumtier.AlbumContext;
  */
 public class PrefsContentActivity extends AppCompatActivity {
 
-    static AlbumContext singleton;
+    static AlbumContext singleton = AlbumContext.getInstance();
 
     static String oldUid;
     private AlbumPreferenceFragment prefFragment;
@@ -53,7 +53,7 @@ public class PrefsContentActivity extends AppCompatActivity {
             });
         } catch (Exception e) {
             Log.e(singleton.clientUri, e.getClass().getName() + e.getMessage());
-            updateSummery(prefFragment.summery, "Login failed!\nDetails: " + e.getMessage());
+            updateSummery(prefFragment.summery, getString(R.string.msg_pref_login_failed, e.getClass().getName(), e.getMessage()));
         }
     }
 
@@ -81,41 +81,35 @@ public class PrefsContentActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    static void bindPref2Val(@NonNull Preference preference) {
-        preference.setOnPreferenceChangeListener(prefsListener);
-
-        prefsListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
-    }
-
-    /**
-     * A preference value change listener that updates the preference's summary
-     * to reflect its new value.
-     */
-    private static final Preference.OnPreferenceChangeListener prefsListener
-            = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
-            String stringValue = newValue.toString();
-            String k = preference.getKey();
-            preference.setSummary(stringValue);
-            if (k.equals(AlbumApp.keys.jserv)) {
-                singleton.jserv(stringValue);
-            }
-            else if (AlbumApp.keys.pswd.equals(k)) {
-                singleton.pswd(stringValue);
-            }
-            else if (AlbumApp.keys.usrid.equals(k)) {
-                String device = singleton.photoUser.device;
-                singleton.photoUser = new SessionInf(singleton.photoUser.ssid(), stringValue);
-                singleton.photoUser.device = device;
-            }
-            else if (AlbumApp.keys.device.equals(k)) {
-                singleton.photoUser.device = stringValue;
-            }
-            return true;
-        }
-    };
+//    /**
+//     * A preference value change listener that updates the preference's summary
+//     * to reflect its new value.
+//     */
+//    private static final Preference.OnPreferenceChangeListener prefsListener
+//            = new Preference.OnPreferenceChangeListener() {
+//        @Override
+//        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
+//            String stringValue = newValue.toString();
+//            String k = preference.getKey();
+//            if (k.equals(AlbumApp.keys.jserv)) {
+//                singleton.jserv(stringValue);
+//                preference.setSummary(stringValue);
+//            }
+//            else if (AlbumApp.keys.pswd.equals(k)) {
+//                singleton.pswd(stringValue);
+//                preference.setSummary("");
+//            }
+//            else if (AlbumApp.keys.usrid.equals(k)) {
+//                String device = singleton.photoUser.device;
+//                singleton.photoUser = new SessionInf(singleton.photoUser.ssid(), stringValue);
+//                singleton.photoUser.device = device;
+//                preference.setSummary(stringValue);
+//            }
+//            else if (AlbumApp.keys.device.equals(k)) {
+//                singleton.photoUser.device = stringValue;
+//                preference.setSummary(stringValue);
+//            }
+//            return true;
+//        }
+//    };
 }

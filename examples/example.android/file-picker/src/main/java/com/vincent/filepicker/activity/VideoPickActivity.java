@@ -21,7 +21,6 @@ import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.Directory;
-import com.vincent.filepicker.filter.entity.ImageFile;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
 
@@ -184,7 +183,7 @@ public class VideoPickActivity extends BaseActivity {
             case Constant.REQUEST_CODE_TAKE_VIDEO:
                 if (resultCode == RESULT_OK) {
                     Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    File file = new File(mAdapter.mVideoPath);
+                    File file = new File(mAdapter.mFilepath);
                     Uri contentUri = Uri.fromFile(file);
                     mediaScanIntent.setData(contentUri);
                     sendBroadcast(mediaScanIntent);
@@ -220,8 +219,8 @@ public class VideoPickActivity extends BaseActivity {
         boolean tryToFindTaken = isTakenAutoSelected;
 
         // if auto-select taken file is enabled, make sure requirements are met
-        if (tryToFindTaken && !TextUtils.isEmpty(mAdapter.mVideoPath)) {
-            File takenFile = new File(mAdapter.mVideoPath);
+        if (tryToFindTaken && !TextUtils.isEmpty(mAdapter.mFilepath)) {
+            File takenFile = new File(mAdapter.mFilepath);
             tryToFindTaken = !mAdapter.isUpToMax() && takenFile.exists(); // try to select taken file only if max isn't reached and the file exists
         }
 
@@ -246,7 +245,7 @@ public class VideoPickActivity extends BaseActivity {
 
     private boolean findAndAddTaken(List<VideoFile> list) {
         for (VideoFile videoFile : list) {
-            if (videoFile.getPath().equals(mAdapter.mVideoPath)) {
+            if (videoFile.getPath().equals(mAdapter.mFilepath)) {
                 mSelectedList.add(videoFile);
                 mCurrentNumber++;
                 mAdapter.setCurrentNumber(mCurrentNumber);

@@ -26,6 +26,7 @@ import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.activity.NormalFilePickActivity;
 import com.vincent.filepicker.activity.VideoPickActivity;
 import com.vincent.filepicker.filter.entity.AudioFile;
+import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 import com.vincent.filepicker.filter.entity.NormalFile;
 import com.vincent.filepicker.filter.entity.VideoFile;
@@ -54,6 +55,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     ActivityResultLauncher<Intent> imgPickActStarter;
 
     ActivityResultLauncher<Intent> vidPickActStarter;
+
+    ActivityResultLauncher<Intent> audPickActStarter;
 
     TextView msgv;
 
@@ -105,12 +108,24 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         }
                     });
 
+        if (audPickActStarter == null)
+            audPickActStarter = registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                            if (singl.state() == AlbumContext.ConnState.Online) {
+                                onImagePicked(result);
+                            }
+                            else showMsg(R.string.msg_ignored_when_offline);
+                        }
+                    });
+
         if (prefActStarter == null)
             prefActStarter = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        Intent data = result.getData();
+//                        Intent data = result.getData();
 
                         SharedPreferences sharePrefs =
                                 PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
@@ -151,7 +166,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         runOnUiThread(() -> msgv.setVisibility(View.GONE));
     }
 
-    void showProgress(int listIx, ArrayList<ImageFile> list, int blocks, DocsResp resp) {
+    void showProgress(int listIx, ArrayList<BaseFile> list, int blocks, DocsResp resp) {
         runOnUiThread(() -> {
             String msg = String.format(getString(R.string.msg_templ_progress),
                     list.size(), listIx, resp.clientname(), (float)(resp.blockSeq() + 1)/ blocks);
@@ -208,11 +223,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             showMsg(R.string.t_synch_ok, list.size());
                         },
                         (c, r, args) -> {
-                            showMsg(R.string.msg_upload_failed, args);
+                            showMsg(R.string.msg_upload_failed, (Object[]) args);
                         });
             }
         } catch (SemanticException | IOException | AnsonException e) {
             e.printStackTrace();
+            showMsg(R.string.msg_upload_failed, e.getClass().getName(), e.getMessage());
         }
     }
 
@@ -233,7 +249,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     protected void onVideoPicked(@NonNull ActivityResult result) {
         Intent data = result.getData();
         if (data != null) {
-            ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+            ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
             if (singl.tier == null)
                 showMsg(R.string.txt_please_login);
             else
@@ -250,6 +266,42 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    protected void startAudioPiking() {
+        clearMsg();
+
+        Intent imgIntent = new Intent(this, AudioPickActivity.class);
+        imgIntent.putExtra(IS_NEED_CAMERA, true);
+        imgIntent.putExtra(Constant.MAX_NUMBER, 99);
+        imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
+        imgIntent.putExtra( Constant.PickingMode,
+                singl.state() == AlbumContext.ConnState.Disconnected ?
+                        PickingMode.disabled : PickingMode.limit99 );
+
+        audPickActStarter.launch(imgIntent);
+    }
+
+//    protected void onAudioPicked(@NonNull ActivityResult result) {
+//        try {
+//        Intent data = result.getData();
+//        if (data != null) {
+//            ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+//            if (singl.tier == null)
+//                showMsg(R.string.txt_please_login);
+//            else
+//                singl.tier.asyncPhotos(list, singl.photoUser,
+//                        (resp) -> {
+//                            showMsg(R.string.t_synch_ok, list.size());
+//                        },
+//                        (c, r, args) -> {
+//                            showMsg(R.string.msg_upload_failed, args);
+//                        });
+//            }
+//        } catch (SemanticException | IOException | AnsonException e) {
+//            e.printStackTrace();
+//            showMsg(R.string.msg_upload_failed, e.getClass().getName(), e.getMessage());
+//        }
+//    }
+
     @Override
     public void onClick(@NonNull View v) {
         int id = v.getId();
@@ -261,12 +313,16 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 startVideoPiking();
                 break;
             case R.id.btn_pick_audio:
+                startAudioPiking();
+                /*
                 Intent intent3 = new Intent(this, AudioPickActivity.class);
                 intent3.putExtra(IS_NEED_RECORDER, true);
                 intent3.putExtra(Constant.MAX_NUMBER, 9);
                 intent3.putExtra ( IS_NEED_FOLDER_LIST, true );
                 startActivityForResult(intent3, Constant.REQUEST_CODE_PICK_AUDIO);
+                 */
                 break;
+                /*
             case R.id.btn_pick_file:
                 Intent intent4 = new Intent(this, NormalFilePickActivity.class);
                 intent4.putExtra(Constant.MAX_NUMBER, 9);
@@ -275,6 +331,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         new String[] {"xlsx", "xls", "doc", "dOcX", "ppt", ".pptx", "pdf"});
                 startActivityForResult(intent4, Constant.REQUEST_CODE_PICK_FILE);
                 break;
+                 */
         }
     }
 
@@ -283,23 +340,20 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case Constant.REQUEST_CODE_PICK_IMAGE:
+                // shouldn't reach here
                 if (resultCode == RESULT_OK) {
                     ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     try {
-                        // shouldn't reach here
                         if (singl.client != null)
                             singl.tier.syncPhotos(list, singl.photoUser);
                         else showMsg(R.string.msg_ignored_when_offline);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (AnsonException e) {
-                        e.printStackTrace();
-                    } catch (SemanticException e) {
+                    } catch (IOException | AnsonException | SemanticException e) {
                         e.printStackTrace();
                     }
                 }
                 break;
             case Constant.REQUEST_CODE_PICK_VIDEO:
+                // shouldn't reach here
                 if (resultCode == RESULT_OK) {
                     ArrayList<VideoFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     StringBuilder builder = new StringBuilder();
@@ -307,10 +361,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         String path = file.getPath();
                         builder.append(path + "\n");
                     }
-//                    mTvResult.setText(builder.toString());
                 }
                 break;
             case Constant.REQUEST_CODE_PICK_AUDIO:
+                // shouldn't reach here
                 if (resultCode == RESULT_OK) {
                     ArrayList<AudioFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     StringBuilder builder = new StringBuilder();
@@ -318,7 +372,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         String path = file.getPath();
                         builder.append(path + "\n");
                     }
-//                    mTvResult.setText(builder.toString());
                 }
                 break;
             case Constant.REQUEST_CODE_PICK_FILE:

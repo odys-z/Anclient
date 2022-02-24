@@ -22,6 +22,11 @@ import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 
 public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+
+    protected boolean isNeedCamera;
+    protected int mMaxNumber;
+    protected int mCurrentNumber = 0;
+
     protected Context mContext;
     protected ArrayList<T> mList;
     protected OnSelectStateListener<T> mListener;
@@ -62,7 +67,8 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         synchPage = new SyncingPage(0, Math.min(20, mList.size()));
         synchPage.taskNo = nextRandomInt();
         synchPage.device = singleton.photoUser.device;
-        startSynchQuery(synchPage);
+        if (singleton.tier != null && singleton.client != null)
+            startSynchQuery(synchPage);
     }
 
     void startSynchQuery(SyncingPage page) {

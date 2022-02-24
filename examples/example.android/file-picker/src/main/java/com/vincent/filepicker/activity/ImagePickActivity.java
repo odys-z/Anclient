@@ -25,7 +25,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.ImagePickAdapter;
@@ -199,7 +198,7 @@ public class ImagePickActivity extends BaseActivity {
             case Constant.REQUEST_CODE_TAKE_IMAGE:
                 if (resultCode == RESULT_OK) {
                     Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    File file = new File(mAdapter.mImagePath);
+                    File file = new File(mAdapter.mFilepath);
                     Uri contentUri = Uri.fromFile(file);
                     mediaScanIntent.setData(contentUri);
                     sendBroadcast(mediaScanIntent);
@@ -253,8 +252,8 @@ public class ImagePickActivity extends BaseActivity {
         boolean tryToFindTakenImage = isTakenAutoSelected;
 
         // if auto-select taken image is enabled, make sure requirements are met
-        if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mImagePath)) {
-            File takenImageFile = new File(mAdapter.mImagePath);
+        if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mFilepath)) {
+            File takenImageFile = new File(mAdapter.mFilepath);
             tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists(); // try to select taken image only if max isn't reached and the file exists
         }
 
@@ -280,7 +279,7 @@ public class ImagePickActivity extends BaseActivity {
 
     private boolean findAndAddTakenImage(List<ImageFile> list) {
         for (ImageFile imageFile : list) {
-            if (imageFile.getPath().equals(mAdapter.mImagePath)) {
+            if (imageFile.getPath().equals(mAdapter.mFilepath)) {
                 mSelectedList.add(imageFile);
                 mCurrentNumber++;
                 mAdapter.setCurrentNumber(mCurrentNumber);

@@ -1,17 +1,21 @@
 package io.oz.album.client;
 
+import static io.oz.album.client.PrefsContentActivity.singleton;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 import io.odysz.common.LangExt;
+import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
 
@@ -32,22 +36,23 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         addPreferencesFromResource(R.xml.pref);
 
-        PrefsContentActivity.bindPref2Val(findPreference(AlbumApp.keys.home));
-        PrefsContentActivity.bindPref2Val(findPreference(AlbumApp.keys.device));
-        PrefsContentActivity.bindPref2Val(findPreference(AlbumApp.keys.jserv));
-        PrefsContentActivity.bindPref2Val(findPreference(AlbumApp.keys.usrid));
-        PrefsContentActivity.bindPref2Val(findPreference(AlbumApp.keys.pswd));
+        bindPref2Val(findPreference(AlbumApp.keys.home));
+        bindPref2Val(findPreference(AlbumApp.keys.device));
+        bindPref2Val(findPreference(AlbumApp.keys.jserv));
+        bindPref2Val(findPreference(AlbumApp.keys.usrid));
+        bindPref2Val(findPreference(AlbumApp.keys.pswd));
 
         cateHome = (PreferenceCategory) findPreference(AlbumApp.keys.homeCate);
         btnRegist = findPreference(AlbumApp.keys.bt_regist);
         device = findPreference(AlbumApp.keys.device);
 
         EditTextPreference pswd = findPreference(AlbumApp.keys.pswd);
+        pswd.setSummary("");
         pswd.setOnBindEditTextListener(editText ->
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
         homepref = findPreference(AlbumApp.keys.home);
-        String devid = PrefsContentActivity.singleton.photoUser.device;
+        String devid = singleton.photoUser.device;
         if (!LangExt.isblank(devid)) {
             homepref.setSummary(getString(R.string.devide_name, devid));
             findPreference(AlbumApp.keys.device).setEnabled(false);
@@ -58,27 +63,46 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             device.setSummary(R.string.txt_only_once);
         }
         summery = findPreference(AlbumApp.keys.login_summery);
-
-//        findPreference(AlbumApp.keys.bt_login).setOnPreferenceClickListener((prf) -> {
-//            try {
-//                PrefsContentActivity.singleton.login((tier) -> {
-//                            PrefsContentActivity.singleton.tier = tier;
-//                            updateSummery(summery, getString(R.string.login_succeed));
-//                            updateSummery(homepref, getString(R.string.devide_name, PrefsContentActivity.singleton.photoUser.device()));
-//                        },
-//                        (c, t, args) -> {
-//                            updateSummery(summery, String.format(t,
-//                                    args == null ? new String[]{"", ""} : args));
-//                        });
-//            } catch (Exception e) {
-//                Log.e(PrefsContentActivity.singleton.clientUri, e.getClass().getName() + e.getMessage());
-//                updateSummery(summery, "Login failed!\nDetails: " + e.getMessage());
-//            }
-//            return true;
-//        });
     }
 
-//    void updateSummery(Preference of, String s) {
-//        ctx.runOnUiThread(() -> of.setSummary(s));
-//    }
+    static void bindPref2Val(@NonNull Preference preference) {
+        preference.setOnPreferenceChangeListener(prefsListener);
+
+        prefsListener.onPreferenceChange(preference,
+                PreferenceManager
+                        .getDefaultSharedPreferences(preference.getContext())
+                        .getString(preference.getKey(), ""));
+    }
+
+    /**
+     * A preference value change listener that updates the preference's summary
+     * to reflect its new value.
+     */
+    private static final Preference.OnPreferenceChangeListener prefsListener
+            = new Preference.OnPreferenceChangeListener() {
+        @Override
+        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
+            String stringValue = newValue.toString();
+            String k = preference.getKey();
+            if (k.equals(AlbumApp.keys.jserv)) {
+                singleton.jserv(stringValue);
+                preference.setSummary(stringValue);
+            }
+            else if (AlbumApp.keys.pswd.equals(k)) {
+                singleton.pswd(stringValue);
+                preference.setSummary("");
+            }
+            else if (AlbumApp.keys.usrid.equals(k)) {
+                String device = singleton.photoUser.device;
+                singleton.photoUser = new SessionInf(singleton.photoUser.ssid(), stringValue);
+                singleton.photoUser.device = device;
+                preference.setSummary(stringValue);
+            }
+            else if (AlbumApp.keys.device.equals(k)) {
+                singleton.photoUser.device = stringValue;
+                preference.setSummary(stringValue);
+            }
+            return true;
+        }
+    };
 }

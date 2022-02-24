@@ -39,10 +39,11 @@ import io.oz.fpick.R;
  */
 
 public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapter.VideoPickViewHolder> {
-    private boolean isNeedCamera;
-    private int mMaxNumber;
-    private int mCurrentNumber = 0;
-    public String mVideoPath;
+//    private boolean isNeedCamera;
+//    private int mMaxNumber;
+//    private int mCurrentNumber = 0;
+    public String mFilepath;
+
     public Uri mVideoUri;
 
     public VideoPickAdapter(Context ctx, boolean needCamera, int max ) {

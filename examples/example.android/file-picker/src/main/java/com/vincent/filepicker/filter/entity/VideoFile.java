@@ -11,7 +11,7 @@ import io.odysz.semantic.tier.docs.IFileDescriptor;
  * Time: 15:23
  */
 
-public class VideoFile extends BaseFile implements Parcelable, IFileDescriptor {
+public class VideoFile extends BaseFile implements Parcelable {
     private long duration;
     private String thumbnail;
 

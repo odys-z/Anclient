@@ -3,6 +3,8 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import io.odysz.semantic.tier.docs.IFileDescriptor;
+
 /**
  * Created by Vincent Woo
  * Date: 2016/10/11
