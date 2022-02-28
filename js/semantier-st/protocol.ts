@@ -1263,9 +1263,9 @@ export class DatasetReq extends QueryReq {
 
 	/**Set t/a of message.
 	 * FIXME this is not a typed way
-	 * 
-	 * @param ask 
-	 * @returns 
+	 *
+	 * @param ask
+	 * @returns
 	 */
 	TA(ask: string | any[] | {
 			/** load dataset configured and format into tree with semantics defined by sk. */

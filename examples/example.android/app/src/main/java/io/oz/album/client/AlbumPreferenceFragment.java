@@ -5,6 +5,7 @@ import static io.oz.album.client.PrefsContentActivity.singleton;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

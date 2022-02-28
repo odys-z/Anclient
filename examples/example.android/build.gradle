@@ -23,8 +23,8 @@ allprojects {
         appcompat_version = "1.4.1"
         glide_version = "4.12+"
         bm_photoview_version = "1.4.1"
-        anclient_ver = "0.4.7"
-        jserv_ver = "1.3.7"
+        anclient_ver = "0.4.8"
+        jserv_ver = "1.3.8"
         album_lib_ver = "0.4.9"
     }
 
