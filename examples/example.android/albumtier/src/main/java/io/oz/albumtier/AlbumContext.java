@@ -5,9 +5,9 @@ import android.content.res.Resources;
 
 import java.security.GeneralSecurityException;
 
+import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
-import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
@@ -16,11 +16,15 @@ import io.oz.album.AlbumPort;
 import io.oz.album.client.AlbumClientier;
 
 public class AlbumContext {
-    static final String jdocbase  = "jserv-album";
+    public static final String jdocbase  = "jserv-album";
+    public static final String albumHome = "dist/index.html";
+    public static final String synchPage = "dist/sync.html";
+
     static AlbumContext instance;
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
+        Anson.verbose = true;
     }
 
     private String pswd;
@@ -45,7 +49,7 @@ public class AlbumContext {
 
     protected static final boolean verbose = true;
 
-    public final String clientUri = "album.an";
+    public final String clientUri = "album.and";
     public final ErrorCtx errCtx = new ErrorCtx() {
         String msg;
         AnsonMsg.MsgCode code;
@@ -62,7 +66,7 @@ public class AlbumContext {
 
     public AlbumClientier tier;
 
-    private SessionClient client;
+    // private SessionClient client;
 
     public SessionInf photoUser;
 
@@ -88,18 +92,18 @@ public class AlbumContext {
     AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr) throws GeneralSecurityException {
         // uid = "ody";
         // pswd = "123456";
-        if (LangExt.isblank(photoUser.device, ".", "/"))
+        if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("Device Id is null.");
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 
         Clients.loginAsync(uid, pswd,
-        (client) -> {
-            tier = new AlbumClientier(clientUri, client, errCtx);
-            state = ConnState.Online;
-            if (onOk != null)
-                onOk.ok(tier);
-        },
+            (client) -> {
+                tier = new AlbumClientier(clientUri, client, errCtx);
+                state = ConnState.Online;
+                if (onOk != null)
+                    onOk.ok(tier);
+            },
         // Design Note: since error context don't have unified error message box,
         // error context pattern is not applicable.
         // errCtx.onError(c, r, (Object)v);

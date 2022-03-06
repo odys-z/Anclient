@@ -4,6 +4,7 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -144,6 +145,22 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.animation.setAlpha ( 0f );
                 holder.mShadow.setVisibility ( View.INVISIBLE );
             }
+
+            holder.mIvThumbnail.setOnLongClickListener((View view) -> {
+                int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
+                VideoFile f = mList.get(index);
+
+                MediaPlayer mp = new MediaPlayer();
+
+                try {
+                    mp.setDataSource(f.fullpath());
+                    mp.prepare();
+                    mp.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return true;
+            });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );

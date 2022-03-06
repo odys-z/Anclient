@@ -2,7 +2,6 @@
     <string name="app_name" translatable="false">Family Album</string>
 
     <string name="menu_prefs" translatable="false">Settings</string>
-    <string name="menu_login" translatable="false">Login</string>
     <string name="menu_help" translatable="false">Help</string>
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
@@ -43,5 +42,10 @@
     <string name="msg_upload_failed">Uploading failed.\n%s\n%s</string>
     <string name="msg_device_uid">Login as %s @ %s</string>
     <string name="msg_pref_login_failed">\"Login failed!\n%s %s\"</string>
+
+    <string name="url_help" translatable="false">https://odys-z.github.io/Anclient</string>
+    <string name="url_home" translatable="false">https://odys-z.github.io/Anclient</string>
+    <string name="url_album" translatable="false">http://%s/%s</string>
+    <string name="url_sync_report" translatable="false">http://%s/%s</string>
 
 </resources>

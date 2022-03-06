@@ -1,13 +1,14 @@
 package io.oz.album;
 
-import static com.vincent.filepicker.activity.AudioPickActivity.IS_NEED_RECORDER;
 import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
+
+import static io.oz.album.webview.WebAlbumAct.Act_Help;
+import static io.oz.album.webview.WebAlbumAct.Web_ActionName;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +24,6 @@ import androidx.preference.PreferenceManager;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.activity.NormalFilePickActivity;
 import com.vincent.filepicker.activity.VideoPickActivity;
 import com.vincent.filepicker.filter.entity.AudioFile;
 import com.vincent.filepicker.filter.entity.BaseFile;
@@ -35,12 +35,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.AlbumClientier;
+import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.album.client.PrefsContentActivity;
 import io.oz.albumtier.PrefKeys;
@@ -57,6 +57,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     ActivityResultLauncher<Intent> vidPickActStarter;
 
     ActivityResultLauncher<Intent> audPickActStarter;
+
+    ActivityResultLauncher<Intent> webActStarter;
 
     TextView msgv;
 
@@ -134,6 +136,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     }
                 });
 
+        if (webActStarter == null)
+            webActStarter = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> { });
+
         try {
             if (singl.needSetup())
                 // settings are cleared
@@ -185,6 +192,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         int id = item.getItemId();
         if (id == R.id.menu_settings) {
             startPrefsAct();
+            return true;
+        }
+        else if (id == R.id.menu_help) {
+            startWebAct(Act_Help);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -277,6 +288,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         PickingMode.disabled : PickingMode.limit99 );
 
         audPickActStarter.launch(imgIntent);
+    }
+
+    protected void startWebAct(int action) {
+        Intent intent = new Intent(this, WebAlbumAct.class);
+        intent.putExtra(Web_ActionName, action);
+        webActStarter.launch(intent);
     }
 
 //    protected void onAudioPicked(@NonNull ActivityResult result) {

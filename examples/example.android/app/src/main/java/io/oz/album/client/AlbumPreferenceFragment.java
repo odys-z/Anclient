@@ -104,6 +104,10 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 singleton.photoUser.device = stringValue;
                 preference.setSummary(stringValue);
             }
+            else if (AlbumApp.keys.home.equals(k)) {
+                singleton.homeName = stringValue;
+                preference.setSummary(stringValue);
+            }
             return true;
         };
 }
