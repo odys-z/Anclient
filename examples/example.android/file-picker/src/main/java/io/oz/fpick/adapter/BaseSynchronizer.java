@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.adapter.OnSelectStateListener;
@@ -27,6 +26,14 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     protected int mMaxNumber;
     protected int mCurrentNumber = 0;
 
+    public boolean isUpToMax () {
+        return mCurrentNumber >= mMaxNumber;
+    }
+
+    public void setCurrentNumber(int number) {
+        mCurrentNumber = number;
+    }
+
     protected Context mContext;
     protected ArrayList<T> mList;
     protected OnSelectStateListener<T> mListener;
@@ -36,6 +43,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     protected SyncingPage synchPage;
 
     public BaseSynchronizer(Context ctx, ArrayList<T> list) {
+        this.singleton = AlbumContext.getInstance();
         mContext = ctx;
         mList = list;
     }
@@ -94,7 +102,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
                 }
             }
 
-            upateIcons();
+            updateIcons();
 
             if (mList.size() >= synchPage.end) {
                 synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
@@ -103,7 +111,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
     };
 
-    void upateIcons() {
+    void updateIcons() {
         ((Activity)mContext).runOnUiThread( () -> notifyDataSetChanged() );
     }
 

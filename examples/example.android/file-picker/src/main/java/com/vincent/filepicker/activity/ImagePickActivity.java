@@ -107,7 +107,7 @@ public class ImagePickActivity extends BaseActivity {
                     animation.setVisibility ( View.VISIBLE );
 
                     AnimationDrawable animationDrawable = (AnimationDrawable) animation.getBackground ();
-                    Animation a= AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
+                    // Animation a = AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
                     animationDrawable.start ();
                 } else {
                     mSelectedList.remove(file);

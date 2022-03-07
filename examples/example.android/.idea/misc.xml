@@ -7,7 +7,14 @@
         <entry key="..\:/Users/Alice/github/anclient/examples/example.android/app/src/main/res/layout/welcome.xml" value="0.2" />
         <entry key="..\:/Users/Alice/github/anclient/examples/example.android/app/src/main/res/menu/menu_main.xml" value="0.264" />
         <entry key="..\:/Users/Alice/github/anclient/examples/example.android/app/src/main/res/xml/pref.xml" value="0.1" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/drawable/anim_rect.xml" value="0.193" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/drawable/animation_drawable.xml" value="0.173" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/drawable/ic_baseline_check_circle_24.xml" value="0.173" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/drawable/ic_rectangle_93.xml" value="0.2" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/drawable/ic_square_93.xml" value="0.26" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/drawable/ic_squre_93.xml" value="0.173" />
         <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/layout/vw_activity_audio_pick.xml" value="0.24864130434782608" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/layout/vw_activity_video_pick.xml" value="0.12386018237082067" />
         <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/layout/vw_layout_item_audio_pick.xml" value="0.24864130434782608" />
         <entry key="app/src/main/res/layout/bt_login.xml" value="0.20735356990166737" />
         <entry key="app/src/main/res/layout/bt_regist_device.xml" value="0.1" />

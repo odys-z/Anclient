@@ -17,10 +17,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.adapter.BaseAdapter;
@@ -58,7 +64,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
     public ImagePickAdapter(Context ctx, ArrayList<ImageFile> list, boolean needCamera, boolean needImagePager , int max ) {
         super ( ctx , list );
-        this.singleton = AlbumContext.getInstance();
         isNeedCamera = needCamera;
         mMaxNumber = max;
 //        isNeedImagePager = needImagePager;
@@ -102,12 +107,25 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 file = mList.get ( position );
             }
 
-            RequestOptions options = new RequestOptions ( );
+            // RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
                     .load ( file.getPath ( ) )
-                    .apply ( options.centerCrop ( ) )
+                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
+                            .centerCrop()
+                            .error(R.drawable.vw_ic_synced))
                     .transition ( withCrossFade ( ) )
+                    .listener(new RequestListener() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource) {
+                            return false;
+                        }
+                        @Override
+                        public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .into ( holder.mIvThumbnail );
+            // holder.mIvThumbnail.setImageURI(Uri.parse(file.getPath()));
 
             if (file.synchFlag == BaseFile.Synchronizing) {
                 holder.mCbx.setSelected ( false );
@@ -181,7 +199,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                     mListener.OnSelectStateChanged ( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
                 }
             });
-
         }
 
     }
@@ -211,13 +228,5 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
             animation = itemView.findViewById ( R.id.animationSquare );
         }
-    }
-
-    public boolean isUpToMax () {
-        return mCurrentNumber >= mMaxNumber;
-    }
-
-    public void setCurrentNumber ( int number ) {
-        mCurrentNumber = number;
     }
 }
