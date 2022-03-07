@@ -9,7 +9,6 @@ import java.net.URL;
 import java.sql.SQLException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.tika.Tika;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
@@ -26,7 +25,7 @@ import io.odysz.semantics.x.SemanticException;
 public class HttpServClient {
 	protected static final String USER_AGENT = "Anclient.java/1.0";
 
-	protected static Tika detector = new Tika();
+//	protected static Tika detector = new Tika();
 
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
@@ -166,15 +165,17 @@ public class HttpServClient {
 		AnsonMsg<AnsonResp> s = null;
 		String type = null; 
 		try {
-			FileInputStream ifs = new FileInputStream(localpath);
-			type = detector.detect(ifs);
-			ifs.close();
+			// FileInputStream ifs = new FileInputStream(localpath);
+			// type = detector.detect(ifs);
+			// ifs.close();
+			if (localpath.endsWith(".json"))
+				type = "json";
 		}
 		catch (Exception e) {
 			return localpath;
 		}
 
-		if (type.startsWith("text")) {
+		if (type.startsWith("json")) {
 			FileInputStream ifs = new FileInputStream(localpath);
 			try {
 				s = (AnsonMsg<AnsonResp>) Anson.fromJson(ifs);
