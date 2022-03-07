@@ -2,6 +2,7 @@ package io.oz.fpick.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
+import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
+import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.filter.entity.AudioFile;
 import com.vincent.filepicker.filter.entity.BaseFile;
+import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;
 
@@ -30,6 +33,11 @@ import io.oz.fpick.R;
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
     public AudioPickAdapter(Context ctx, ArrayList<AudioFile> list, int max) {
         super(ctx, list);
+        mMaxNumber = max;
+    }
+
+    public AudioPickAdapter(AudioPickActivity ctx, int max) {
+        super(ctx, new ArrayList<>());
         mMaxNumber = max;
     }
 
@@ -74,41 +82,57 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             holder.animation.setAlpha ( 1f );
             AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
 //            Animation a = AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
-            animationDrawable.start ();
+            animationDrawable.start();
         } else {
             holder.mCbx.setSelected(false);
             holder.animation.setVisibility ( View.INVISIBLE );
             holder.animation.setAlpha ( 0f );
         }
+
+        holder.itemView.setOnLongClickListener((View view) -> {
+            int index = isNeedCamera ? holder.getAbsoluteAdapterPosition() - 1 : holder.getAbsoluteAdapterPosition();
+            AudioFile f = mList.get(index);
+
+            MediaPlayer mp = new MediaPlayer();
+
+            try {
+                mp.setDataSource(f.fullpath());
+                mp.prepare();
+                mp.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return true;
+        });
+
         //change itemview to mCbx
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!v.isSelected() && isUpToMax()) {
-                    ToastUtil.getInstance(mContext).showToast(R.string.vw_up_to_max);
-                    return;
-                }
+        holder.itemView.setOnClickListener(v -> {
+            int index = holder.getAbsoluteAdapterPosition();
 
-                if (v.isSelected()) {
-                    holder.mCbx.setSelected(false);
-                    mCurrentNumber--;
-                } else {
-                    holder.mCbx.setSelected(true);
-                    mCurrentNumber++;
-                }
+            if (!v.isSelected() && isUpToMax()) {
+                ToastUtil.getInstance(mContext).showToast(R.string.vw_up_to_max);
+                return;
+            }
 
-                mList.get(holder.getAdapterPosition()).setSelected(holder.mCbx.isSelected());
+            if (holder.mCbx.isSelected()) {
+                holder.mCbx.setSelected(false);
+                mCurrentNumber--;
+                mList.get( index ).setSelected ( false );
+            } else {
+                holder.mCbx.setSelected(true);
+                mCurrentNumber++;
+                mList.get( index ).setSelected ( true );
+            }
 
-                if (mListener != null) {
-                    mListener.onAudioStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
-                }
+            if (mListener != null) {
+                mListener.onAudioStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
     }
 
     class AudioPickViewHolder extends RecyclerView.ViewHolder {
@@ -143,9 +167,4 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             animation = itemView.findViewById ( R.id.animationAudio );
         }
     }
-
-    public boolean isUpToMax () {
-        return mCurrentNumber >= mMaxNumber;
-    }
-
 }

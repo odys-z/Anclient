@@ -58,7 +58,7 @@
         android:alpha="0"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/animation_drawable"
+        android:background="@drawable/anim_square"
         android:id="@+id/animationSquare">
         <RelativeLayout
             android:layout_alignParentRight="true"

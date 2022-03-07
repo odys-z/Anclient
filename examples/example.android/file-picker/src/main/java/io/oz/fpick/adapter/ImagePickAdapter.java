@@ -64,7 +64,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
     public ImagePickAdapter(Context ctx, ArrayList<ImageFile> list, boolean needCamera, boolean needImagePager , int max ) {
         super ( ctx , list );
-        this.singleton = AlbumContext.getInstance();
         isNeedCamera = needCamera;
         mMaxNumber = max;
 //        isNeedImagePager = needImagePager;
@@ -229,13 +228,5 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
             animation = itemView.findViewById ( R.id.animationSquare );
         }
-    }
-
-    public boolean isUpToMax () {
-        return mCurrentNumber >= mMaxNumber;
-    }
-
-    public void setCurrentNumber ( int number ) {
-        mCurrentNumber = number;
     }
 }

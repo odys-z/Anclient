@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import io.oz.fpick.R;
 
 /**
+ * @deprecated
+ *
  * Created by Vincent Woo
  * Date: 2016/10/25
  * Time: 10:57

@@ -43,6 +43,8 @@ import static com.vincent.filepicker.activity.ImageBrowserActivity.IMAGE_BROWSER
 import io.oz.fpick.R;
 
 /**
+ * @deprecated
+ *
  * Created by Vincent Woo
  * Date: 2016/10/13
  * Time: 16:07

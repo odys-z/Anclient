@@ -20,7 +20,6 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerListItemDecoration;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.adapter.AudioPickAdapter;
 import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.FileFilter;
@@ -33,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.oz.fpick.R;
+import io.oz.fpick.adapter.AudioPickAdapter;
 
 /**
  * Created by Vincent Woo
@@ -92,20 +92,18 @@ public class AudioPickActivity extends BaseActivity {
 
         mAdapter.setOnSelectStateListener(new OnSelectStateListener<AudioFile>() {
             @Override
-            public void OnSelectStateChanged (int position, boolean state , AudioFile file , View animation ) {
-
-            }
+            public void OnSelectStateChanged (int position, boolean state , AudioFile file , View animation ) { }
 
             @Override
-            public void onAudioStateChanged ( boolean state , AudioFile file,View animation ) {
+            public void onAudioStateChanged ( boolean state, AudioFile file, View animation ) {
                 if (state) {
                     mSelectedList.add(file);
                     mCurrentNumber++;
                     animation.setAlpha ( 1f );
                     AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground ();
                     animationDrawable.start ();
-//                    Animation a = AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
-//                    animation.startAnimation ( a );
+                    Animation a = AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
+                    animation.startAnimation ( a );
                 } else {
                     animation.setAlpha ( 0f );
 
@@ -116,53 +114,40 @@ public class AudioPickActivity extends BaseActivity {
             }
 
             @Override
-            public void onFileStateChanged ( boolean state , AudioFile file,View animation ) {
-
-            }
+            public void onFileStateChanged ( boolean state , AudioFile file,View animation ) { }
 
         });
 
         rl_done = (RelativeLayout) findViewById(R.id.rl_done);
-        rl_done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                // intent.putParcelableArrayListExtra(Constant.RESULT_PICK_AUDIO, mSelectedList);
-                intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
+        rl_done.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            // intent.putParcelableArrayListExtra(Constant.RESULT_PICK_AUDIO, mSelectedList);
+            intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
+            setResult(RESULT_OK, intent);
+            finish();
         });
 
         tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
         ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
         if (isNeedFolderList) {
             ll_folder.setVisibility(View.VISIBLE);
-            ll_folder.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mFolderHelper.toggle(tb_pick);
-                }
-            });
+            ll_folder.setOnClickListener(v -> mFolderHelper.toggle(tb_pick));
             tv_folder = (TextView) findViewById(R.id.tv_folder);
             tv_folder.setText(getResources().getString(R.string.vw_all));
 
-            mFolderHelper.setFolderListListener(new FolderListAdapter.FolderListListener() {
-                @Override
-                public void onFolderListClick(Directory directory) {
-                    mFolderHelper.toggle(tb_pick);
-                    tv_folder.setText(directory.getName());
+            mFolderHelper.setFolderListListener(directory -> {
+                mFolderHelper.toggle(tb_pick);
+                tv_folder.setText(directory.getName());
 
-                    if (TextUtils.isEmpty(directory.getPath())) { //All
-                        refreshData(mAll);
-                    } else {
-                        for (Directory<AudioFile> dir : mAll) {
-                            if (dir.getPath().equals(directory.getPath())) {
-                                List<Directory<AudioFile>> list = new ArrayList<>();
-                                list.add(dir);
-                                refreshData(list);
-                                break;
-                            }
+                if (TextUtils.isEmpty(directory.getPath())) { //All
+                    refreshData(mAll);
+                } else {
+                    for (Directory<AudioFile> dir : mAll) {
+                        if (dir.getPath().equals(directory.getPath())) {
+                            List<Directory<AudioFile>> list = new ArrayList<>();
+                            list.add(dir);
+                            refreshData(list);
+                            break;
                         }
                     }
                 }
@@ -172,15 +157,12 @@ public class AudioPickActivity extends BaseActivity {
         if (isNeedRecorder) {
             rl_rec_aud = (RelativeLayout) findViewById(R.id.rl_rec_aud);
             rl_rec_aud.setVisibility(View.VISIBLE);
-            rl_rec_aud.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-                    if (Util.detectIntent(AudioPickActivity.this, intent)) {
-                        startActivityForResult(intent, Constant.REQUEST_CODE_TAKE_AUDIO);
-                    } else {
-                        ToastUtil.getInstance(AudioPickActivity.this).showToast(getString(R.string.vw_no_audio_app));
-                    }
+            rl_rec_aud.setOnClickListener(v -> {
+                Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+                if (Util.detectIntent(AudioPickActivity.this, intent)) {
+                    startActivityForResult(intent, Constant.REQUEST_CODE_TAKE_AUDIO);
+                } else {
+                    ToastUtil.getInstance(AudioPickActivity.this).showToast(getString(R.string.vw_no_audio_app));
                 }
             });
         }

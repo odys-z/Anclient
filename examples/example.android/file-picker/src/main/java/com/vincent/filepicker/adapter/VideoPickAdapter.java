@@ -33,11 +33,12 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 import io.oz.fpick.R;
 
 /**
+ * @deprecated
+ *
  * Created by Vincent Woo
  * Date: 2016/10/21
  * Time: 14:13
  */
-
 public class VideoPickAdapter extends BaseAdapter<VideoFile, VideoPickAdapter.VideoPickViewHolder> {
     private boolean isNeedCamera;
     private int mMaxNumber;

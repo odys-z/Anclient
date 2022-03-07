@@ -3,9 +3,11 @@ package io.oz.fpick.adapter;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +19,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
+import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.oz.albumtier.AlbumContext;
@@ -53,7 +58,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
 
     public VideoPickAdapter(Context ctx, ArrayList<VideoFile> list, boolean needCamera, int max ) {
         super ( ctx , list );
-        this.singleton = AlbumContext.getInstance();
         isNeedCamera = needCamera;
         mMaxNumber = max;
     }
@@ -117,7 +121,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.icSyncing.setVisibility(View.GONE);
                 holder.icSynced.setVisibility(View.VISIBLE);
             }
-
             else if ( file.isSelected ( ) ) {
                 // not synced but selected
                 holder.mCbx.setSelected ( true );
@@ -147,19 +150,26 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             }
 
             holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-                int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
-                VideoFile f = mList.get(index);
-
-                MediaPlayer mp = new MediaPlayer();
-
-                try {
-                    mp.setDataSource(f.fullpath());
-                    mp.prepare();
-                    mp.start();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri uri;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    File f = new File(file.getPath());
+                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
                 }
-                return true;
+                else {
+                    uri = Uri.parse("file://" + file.getPath());
+                }
+                // intent.setDataAndType(uri, "video/mp4");
+                intent.setDataAndType(uri, "video/*");
+                if (Util.detectIntent(mContext, intent)) {
+                    mContext.startActivity(intent);
+                }
+                else {
+                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_video_play_app));
+                }
+
+                return false;
             });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
@@ -192,8 +202,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 }
             });
 
+            holder.mDuration.setText(Util.getDurationString(file.getDuration()));
         }
-
     }
 
     @Override
