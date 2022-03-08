@@ -94,6 +94,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 //            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
 //                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
             // sequence order is guaranteed.
+
             HashMap<String, Object> phts = rsp.syncPaths();
             for (int i = synchPage.start; i < synchPage.end; i++) {
                 T f = mList.get(i);
@@ -102,7 +103,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
                 }
             }
 
-            updateIcons();
+            updateIcons(synchPage);
 
             if (mList.size() >= synchPage.end) {
                 synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
@@ -111,8 +112,10 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
     };
 
-    void updateIcons() {
-        ((Activity)mContext).runOnUiThread( () -> notifyDataSetChanged() );
+    void updateIcons(SyncingPage synchPage) {
+        ((Activity)mContext).runOnUiThread( () -> {
+            notifyItemRangeChanged(synchPage.start, synchPage.end);
+        });
     }
 
     public void setOnSelectStateListener(OnSelectStateListener<T> listener) {

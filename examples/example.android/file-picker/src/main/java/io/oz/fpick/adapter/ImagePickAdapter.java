@@ -51,10 +51,6 @@ import io.oz.fpick.R;
  */
 
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
-//    private boolean isNeedImagePager;
-//    private boolean isNeedCamera;
-//    private int mMaxNumber;
-//    private int mCurrentNumber = 0;
     public String mFilepath;
     public Uri mImageUri;
 
