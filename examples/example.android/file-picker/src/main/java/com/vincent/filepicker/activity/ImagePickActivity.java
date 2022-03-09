@@ -86,10 +86,10 @@ public class ImagePickActivity extends BaseActivity {
     }
 
     private void initView() {
-        tv_count = (TextView) findViewById(R.id.tv_count);
+        tv_count = findViewById(R.id.tv_count);
         tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_image_pick);
+        mRecyclerView = findViewById(R.id.rv_image_pick);
         final GridLayoutManager layoutManager = new GridLayoutManager(this, COLUMN_NUMBER);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
@@ -125,7 +125,7 @@ public class ImagePickActivity extends BaseActivity {
             public void onFileStateChanged ( boolean state , ImageFile file,View animation ) { }
         } );
 
-        rl_done = (RelativeLayout) findViewById(R.id.rl_done);
+        rl_done = findViewById(R.id.rl_done);
         rl_done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -291,11 +291,11 @@ public class ImagePickActivity extends BaseActivity {
         return false;    // taken image wasn't found
     }
 
-    private void refreshSelectedList(List<ImageFile> list) {
-        for (ImageFile file : list) {
-            if(file.isSelected() && !mSelectedList.contains(file)) {
-                mSelectedList.add(file);
-            }
-        }
-    }
+//    private void refreshSelectedList(List<ImageFile> list) {
+//        for (ImageFile file : list) {
+//            if(file.isSelected() && !mSelectedList.contains(file)) {
+//                mSelectedList.add(file);
+//            }
+//        }
+//    }
 }

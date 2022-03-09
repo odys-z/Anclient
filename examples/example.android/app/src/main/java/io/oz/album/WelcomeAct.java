@@ -79,11 +79,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
         singl = AlbumApp.singl;
-        // singl.init(getResources(), PreferenceManager.getDefaultSharedPreferences(this));
         singl.init(getResources(), AlbumApp.keys, PreferenceManager.getDefaultSharedPreferences(this));
 
         setContentView(R.layout.welcome);
-        msgv = (TextView) findViewById(R.id.tv_status);
+        msgv = findViewById(R.id.tv_status);
 
         //
         if (imgPickActStarter == null)

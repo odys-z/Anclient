@@ -77,6 +77,12 @@ public class AlbumContext {
         state = ConnState.Disconnected;
     }
 
+    /**
+     * Init with preferences. Not login yet.
+     * @param resources
+     * @param prefkeys
+     * @param sharedPref
+     */
     public void init(Resources resources, PrefKeys prefkeys, SharedPreferences sharedPref) {
         homeName = sharedPref.getString(prefkeys.home, "");
         String uid = sharedPref.getString(prefkeys.usrid, "");
@@ -89,9 +95,9 @@ public class AlbumContext {
         Clients.init(jserv + "/" + jdocbase, verbose);
     }
 
-    AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr) throws GeneralSecurityException {
-        // uid = "ody";
-        // pswd = "123456";
+    AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr)
+            throws GeneralSecurityException {
+
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("Device Id is null.");
 
@@ -100,12 +106,13 @@ public class AlbumContext {
         Clients.loginAsync(uid, pswd,
             (client) -> {
                 tier = new AlbumClientier(clientUri, client, errCtx);
+                client.openLink(onHeartbeat, onLinkBroken, 10000);
                 state = ConnState.Online;
                 if (onOk != null)
                     onOk.ok(tier);
             },
         // Design Note: since error context don't have unified error message box,
-        // error context pattern is not applicable.
+        // error context pattern of React is not applicable.
         // errCtx.onError(c, r, (Object)v);
         (c, r, v) -> {
             state = ConnState.LoginFailed;
@@ -119,6 +126,16 @@ public class AlbumContext {
             throws GeneralSecurityException {
         login(photoUser.uid(), pswd, onOk, onErr);
     }
+
+    JProtocol.OnOk onHeartbeat = ((resp) -> {
+        if (state == ConnState.Disconnected)
+            ; // how to notify?
+        state = ConnState.Online;
+    });
+
+    JProtocol.OnError onLinkBroken = ((c, r, args) -> {
+        state = ConnState.Disconnected;
+    });
 
     public AlbumContext jserv(String newVal) {
         jserv = newVal;
