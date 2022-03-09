@@ -15,10 +15,11 @@ import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.LogAct;
-import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
+import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
+import io.odysz.semantic.jsession.HeartBeat;
 import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
@@ -36,12 +37,58 @@ public class SessionClient {
 	
 	private ArrayList<String[]> urlparas;
 	private AnsonHeader header;
+
+	private boolean stoplink;
+	private String syncFlag;
+	private AnsonMsg<HeartBeat> beatReq;
 	
 	/**Session login response from server.
 	 * @param sessionInfo
 	 */
 	SessionClient(SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
+	}
+	
+	public SessionClient openLink(OnError onBroken, int... msInterv) {
+		// link
+		syncFlag = "link";
+		stoplink = true;
+		HeartBeat beat = new HeartBeat(null, ssInf.ssid(), ssInf.uid());
+		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
+		beatReq = new AnsonMsg<HeartBeat>(Port.heartbeat)
+				.header(header)
+				.body(beat);
+
+		new Thread(() -> {
+			while (!stoplink)
+				synchronized(syncFlag) {
+					try {
+						HttpServClient httpClient = new HttpServClient();
+						AnsonMsg<AnsonResp> resp = httpClient.post(Clients.servUrl(beatReq.port()), beatReq);
+						MsgCode code = resp.code();
+						if (MsgCode.ok != code)
+							throw new SemanticException("");
+						syncFlag.wait(msInterv == null || msInterv.length < 1 ? 60000 : msInterv[0]);
+					}
+					catch (InterruptedException e) { }
+					catch (SemanticException | AnsonException | IOException e) {
+						if (onBroken != null)
+							onBroken.err(MsgCode.exSession, "heart link broken");
+					}
+				}
+		}).start();
+		
+		return this;
+	}
+	
+	public SessionClient closeLink() {
+		stoplink = true;
+		if (syncFlag != null)
+			synchronized(syncFlag) {
+				syncFlag.notifyAll();
+				syncFlag = null;
+			}
+		return this;
 	}
 	
 	/**Format a query request object, including all information for construct a "select" statement.
@@ -61,9 +108,6 @@ public class SessionClient {
 
 		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
 		if (funcId != null && funcId.length > 0)
-			// FIXME Bug? No test for DB log since Antson 1.0?
-			// FIXME Bug? No test for DB log since Antson 1.0?
-			// FIXME Bug? No test for DB log since Antson 1.0?
 			AnsonHeader.usrAct(funcId[0], "query", "R", "test");
 		msg.header(header);
 
@@ -141,7 +185,7 @@ public class SessionClient {
 		if (act != null && act.length > 0)
 			header.act(act);
 		
-		return jmsg.header(header) 
+		return  jmsg.header(header) 
 					.body(itm);
 	}
 
@@ -204,7 +248,7 @@ public class SessionClient {
 		return this;
 	}
 
-	/**@deprecated This is asynchronous API but works in synchronous.
+	/**@deprecated This is an asynchronous API but works synchronously.
 	 * The {@link ErrorCtx} API pattern is better.
 	 * @see HttpServClient#post(String, AnsonMsg)
 	 * @see #commit(AnsonMsg, ErrorCtx)
@@ -217,7 +261,6 @@ public class SessionClient {
 	 * @throws IOException
 	 * @throws SQLException
 	 * @throws AnsonException
-	 */
 	@SuppressWarnings("unchecked")
 	public <R extends AnsonBody, A extends AnsonResp> void commit(AnsonMsg<R> req, SCallbackV11 onOk, SCallbackV11... onErr)
 			throws SemanticException, IOException, SQLException, AnsonException {
@@ -243,22 +286,35 @@ public class SessionClient {
   					}
   				});
 	}
+	 */
+	//
 
+	/**
+	 * Submit request.
+	 * @param <R>
+	 * @param <A>
+	 * @param req
+	 * @param err
+	 * @return response
+	 * @throws SemanticException
+	 * @throws IOException
+	 * @throws AnsonException
+	 */
 	@SuppressWarnings("unchecked")
 	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, ErrorCtx err)
 			throws SemanticException, IOException, AnsonException {
-    	HttpServClient httpClient = new HttpServClient();
     	if (verbose) {
     		Utils.logi(Clients.servUrl(req.port()));
     		Utils.logAnson(req);
     	}
+    	HttpServClient httpClient = new HttpServClient();
   		AnsonMsg<AnsonResp> resp = httpClient.post(Clients.servUrl(req.port()), req);
 
   		MsgCode code = resp.code();
 
 		if(Clients.verbose) {
-		  Utils.printCaller(false);
-		  Utils.logAnson(resp);
+			Utils.printCaller(false);
+			Utils.logAnson(resp);
 		}
 
 		if (MsgCode.ok == code) {
@@ -270,6 +326,8 @@ public class SessionClient {
 		}
 	}
 
-	public void logout() { }
+	public void logout() {
+		closeLink();
+	}
 
 }
