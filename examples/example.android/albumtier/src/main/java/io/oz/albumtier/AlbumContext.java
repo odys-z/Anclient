@@ -105,8 +105,10 @@ public class AlbumContext {
 
         Clients.loginAsync(uid, pswd,
             (client) -> {
+                client.closeLink();
+
                 tier = new AlbumClientier(clientUri, client, errCtx);
-                client.openLink(clientUri, onHeartbeat, onLinkBroken, 10000);
+                client.openLink(clientUri, onHeartbeat, onLinkBroken, 1000);
                 state = ConnState.Online;
                 if (onOk != null)
                     onOk.ok(tier);
