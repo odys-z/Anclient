@@ -54,7 +54,8 @@ public class SessionClient {
 	public SessionClient openLink(String clientUri, OnOk onLink, OnError onBroken, int... msInterv) {
 		// link
 		syncFlag = "link";
-		stoplink = true;
+		stoplink = false;
+
 		HeartBeat beat = new HeartBeat(null, clientUri, ssInf.ssid(), ssInf.uid());
 		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
 		beatReq = new AnsonMsg<HeartBeat>(Port.heartbeat)
