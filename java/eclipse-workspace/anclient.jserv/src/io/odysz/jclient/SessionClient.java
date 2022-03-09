@@ -16,6 +16,7 @@ import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.LogAct;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
+import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
@@ -41,6 +42,7 @@ public class SessionClient {
 	private boolean stoplink;
 	private String syncFlag;
 	private AnsonMsg<HeartBeat> beatReq;
+	private int msInterval;
 	
 	/**Session login response from server.
 	 * @param sessionInfo
@@ -49,33 +51,37 @@ public class SessionClient {
 		this.ssInf = sessionInfo;
 	}
 	
-	public SessionClient openLink(OnError onBroken, int... msInterv) {
+	public SessionClient openLink(String clientUri, OnOk onLink, OnError onBroken, int... msInterv) {
 		// link
 		syncFlag = "link";
 		stoplink = true;
-		HeartBeat beat = new HeartBeat(null, ssInf.ssid(), ssInf.uid());
+		HeartBeat beat = new HeartBeat(null, clientUri, ssInf.ssid(), ssInf.uid());
 		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
 		beatReq = new AnsonMsg<HeartBeat>(Port.heartbeat)
 				.header(header)
 				.body(beat);
+		
+		msInterval = msInterv == null || msInterv.length < 1 ? 60000 : msInterv[0];
 
 		new Thread(() -> {
 			while (!stoplink)
 				synchronized(syncFlag) {
-					try {
-						HttpServClient httpClient = new HttpServClient();
-						AnsonMsg<AnsonResp> resp = httpClient.post(Clients.servUrl(beatReq.port()), beatReq);
-						MsgCode code = resp.code();
-						if (MsgCode.ok != code)
-							throw new SemanticException("");
-						syncFlag.wait(msInterv == null || msInterv.length < 1 ? 60000 : msInterv[0]);
-					}
-					catch (InterruptedException e) { }
-					catch (SemanticException | AnsonException | IOException e) {
-						if (onBroken != null)
-							onBroken.err(MsgCode.exSession, "heart link broken");
-					}
+				try {
+					HttpServClient httpClient = new HttpServClient();
+					AnsonMsg<AnsonResp> resp = httpClient.post(Clients.servUrl(beatReq.port()), beatReq);
+					MsgCode code = resp.code();
+					if (MsgCode.ok != code)
+						throw new SemanticException("retry");
+					onLink.ok(resp.body(0));
+					syncFlag.wait(msInterval);
 				}
+				catch (InterruptedException e) { }
+				catch (SemanticException | AnsonException | IOException e) {
+					if (onBroken != null)
+						onBroken.err(MsgCode.exSession, "heart link broken");
+					try { syncFlag.wait(msInterval); }
+					catch (InterruptedException e1) { }
+				} }
 		}).start();
 		
 		return this;
