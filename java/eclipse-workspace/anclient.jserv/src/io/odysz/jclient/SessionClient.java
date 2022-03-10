@@ -65,6 +65,7 @@ public class SessionClient {
 		msInterval = msInterv == null || msInterv.length < 1 ? 60000 : msInterv[0];
 
 		new Thread(() -> {
+			int failed = 0;
 			while (!stoplink)
 				synchronized(syncFlag) {
 				try {
@@ -73,14 +74,16 @@ public class SessionClient {
 					MsgCode code = resp.code();
 					if (MsgCode.ok != code)
 						throw new SemanticException("retry");
+					failed = 0;
 					onLink.ok(resp.body(0));
 					syncFlag.wait(msInterval);
 				}
 				catch (InterruptedException e) { }
 				catch (SemanticException | AnsonException | IOException e) {
+					failed++;
 					if (onBroken != null)
 						onBroken.err(MsgCode.exSession, "heart link broken");
-					try { syncFlag.wait(msInterval); }
+					try { syncFlag.wait(msInterval * Math.min(failed, 20)); }
 					catch (InterruptedException e1) { }
 				} }
 		}).start();

@@ -4,8 +4,10 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -28,11 +31,13 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
+import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.adapter.BaseAdapter;
 import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.odysz.semantic.jprotocol.AnsonResp;
@@ -165,6 +170,29 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.animation.setAlpha ( 0f );
                 holder.mShadow.setVisibility ( View.INVISIBLE );
             }
+
+            holder.mIvThumbnail.setOnLongClickListener((View view) -> {
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                Uri uri;
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                    File f = new File(file.getPath());
+//                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
+//                }
+//                else {
+//                    uri = Uri.parse("file://" + file.getPath());
+//                }
+//                // intent.setDataAndType(uri, "video/mp4");
+//                intent.setDataAndType(uri, "image/*");
+//                if (Util.detectIntent(mContext, intent)) {
+//                    mContext.startActivity(intent);
+//                }
+//                else {
+//                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
+//                }
+//                return false;
+                return startMediaViewer(mContext, view, "image/*", file.getPath());
+            });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );

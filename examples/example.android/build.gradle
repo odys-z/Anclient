@@ -16,7 +16,7 @@ allprojects {
         appcompat_version = "1.4.1"
         glide_version = "4.12+"
         bm_photoview_version = "1.4.1"
-        anclient_ver = "0.4.11"
+        anclient_ver = "0.4.12"
         jserv_ver = "1.4.2"
         album_lib_ver = "0.4.14"
     }
