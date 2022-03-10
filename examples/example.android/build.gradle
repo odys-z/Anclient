@@ -11,14 +11,14 @@ buildscript {
 }
 
 allprojects {
-    ext{
+    ext {
         app_ver = "0.1.1"
         appcompat_version = "1.4.1"
         glide_version = "4.12+"
         bm_photoview_version = "1.4.1"
         anclient_ver = "0.4.12"
-        jserv_ver = "1.4.1"
-        album_lib_ver = "0.4.13"
+        jserv_ver = "1.4.3"
+        album_lib_ver = "0.4.15"
     }
 
     repositories {

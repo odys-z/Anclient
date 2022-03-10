@@ -3,13 +3,21 @@ package io.oz.fpick.adapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
+import android.view.View;
 
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.vincent.filepicker.ToastUtil;
+import com.vincent.filepicker.Util;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.entity.BaseFile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +27,7 @@ import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.SyncingPage;
 import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
+import io.oz.fpick.R;
 
 public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
@@ -126,5 +135,61 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     public static int nextRandomInt() {
         return RANDOM.nextInt(1024 * 1024);
     }
+
+    /**
+     * @param view the file view - not used currently
+     * @param dataType "video/*" or "image/*"
+     * @param path full path
+     * @return false
+     */
+    private boolean startMediaViewer(View view, String dataType, String path) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            File f = new File(path);
+            uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
+        }
+        else {
+            uri = Uri.parse("file://" + path);
+        }
+        intent.setDataAndType(uri, dataType);
+        if (Util.detectIntent(mContext, intent)) {
+            mContext.startActivity(intent);
+        }
+        else {
+            ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
+        }
+        return false;
+    }
+
+    /**
+     * @param ctx the context
+     * @param view the file view - not used currently
+     * @param dataType "video/*" or "image/*"
+     * @param path full path
+     * @return false
+     */
+    protected static boolean startMediaViewer(Context ctx, View view, String dataType, String path) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            File f = new File(path);
+            uri = FileProvider.getUriForFile(ctx, ctx.getApplicationContext().getPackageName() + ".provider", f);
+        }
+        else {
+            uri = Uri.parse("file://" + path);
+        }
+        intent.setDataAndType(uri, dataType);
+        if (Util.detectIntent(ctx, intent)) {
+            ctx.startActivity(intent);
+        }
+        else {
+            ToastUtil.getInstance(ctx).showToast(ctx.getString(R.string.vw_no_image_show_app));
+        }
+        return false;
+    }
+
 }
 

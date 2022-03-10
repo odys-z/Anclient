@@ -108,19 +108,19 @@ public class AlbumContext {
                 client.closeLink();
 
                 tier = new AlbumClientier(clientUri, client, errCtx);
-                client.openLink(clientUri, onHeartbeat, onLinkBroken, 1000);
+                client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min
                 state = ConnState.Online;
                 if (onOk != null)
                     onOk.ok(tier);
             },
-        // Design Note: since error context don't have unified error message box,
-        // error context pattern of React is not applicable.
-        // errCtx.onError(c, r, (Object)v);
-        (c, r, v) -> {
-            state = ConnState.LoginFailed;
-            if (onErr != null)
-                onErr.err(c, r, v);
-        }, photoUser.device);
+            // Design Note: since error context don't have unified error message box,
+            // error context pattern of React is not applicable.
+            // errCtx.onError(c, r, (Object)v);
+            (c, r, v) -> {
+                state = ConnState.LoginFailed;
+                if (onErr != null)
+                    onErr.err(c, r, v);
+            }, photoUser.device);
         return this;
     }
 

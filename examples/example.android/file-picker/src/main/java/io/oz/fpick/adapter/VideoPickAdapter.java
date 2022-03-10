@@ -150,26 +150,26 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             }
 
             holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri uri;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    File f = new File(file.getPath());
-                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
-                }
-                else {
-                    uri = Uri.parse("file://" + file.getPath());
-                }
-                // intent.setDataAndType(uri, "video/mp4");
-                intent.setDataAndType(uri, "video/*");
-                if (Util.detectIntent(mContext, intent)) {
-                    mContext.startActivity(intent);
-                }
-                else {
-                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_video_play_app));
-                }
-
-                return false;
+                return startMediaViewer(mContext, view, "video/*", file.getPath());
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                Uri uri;
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                    File f = new File(file.getPath());
+//                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
+//                }
+//                else {
+//                    uri = Uri.parse("file://" + file.getPath());
+//                }
+//                // intent.setDataAndType(uri, "video/mp4");
+//                intent.setDataAndType(uri, "video/*");
+//                if (Util.detectIntent(mContext, intent)) {
+//                    mContext.startActivity(intent);
+//                }
+//                else {
+//                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_video_play_app));
+//                }
+//                return false;
             });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
