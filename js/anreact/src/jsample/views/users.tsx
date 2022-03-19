@@ -306,7 +306,7 @@ export class UsersTier extends Semantier {
 		return this._cols;
 	}
 
-	records(conds: QueryConditions, onLoad: OnLoadOk) {
+	records(conds: QueryConditions, onLoad: OnLoadOk<any>) {
 		if (!this.client) return;
 
 		let client = this.client;
@@ -325,7 +325,7 @@ export class UsersTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk) {
+	record(conds: QueryConditions, onLoad: OnLoadOk<any>) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
