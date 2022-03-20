@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import io.odysz.anson.Anson;
+import io.odysz.common.LangExt;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
@@ -82,6 +83,10 @@ public class PrefsContentActivity extends AppCompatActivity {
     };
 
     public void onRegisterDevice(View btn) {
+        if (LangExt.isblank(prefFragment.device.getText())) {
+            prefFragment.device.setSummary(getString(R.string.msg_device_not_null));
+            return;
+        }
         if (prefFragment.btnRegist != null) {
             prefFragment.cateHome.removePreference(prefFragment.btnRegist);
         }

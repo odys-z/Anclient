@@ -41,10 +41,11 @@
     <string name="msg_templ_progress">%d / %d %s\n%.1f%%</string>
     <string name="msg_upload_failed">Uploading failed.\n%s\n%s</string>
     <string name="msg_device_uid">Login as %s @ %s</string>
+    <string name="msg_device_not_null">Device name can not be empty!</string>
     <string name="msg_pref_login_failed">\"Login failed!\n%s %s\"</string>
 
-    <string name="url_help" translatable="false">https://odys-z.github.io/Anclient</string>
-    <string name="url_home" translatable="false">https://odys-z.github.io/Anclient</string>
+    <string name="url_help" translatable="false">https://odys-z.github.io/products/album/android/help.html</string>
+    <string name="url_home" translatable="false">https://odys-z.github.io/products/album/index.html</string>
     <string name="url_album" translatable="false">http://%s/%s</string>
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
 
