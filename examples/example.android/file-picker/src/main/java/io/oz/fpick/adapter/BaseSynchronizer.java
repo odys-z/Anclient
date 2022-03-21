@@ -99,11 +99,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     JProtocol.OnOk onSychnQueryRespons = (resp) -> {
         AlbumResp rsp = (AlbumResp) resp;
         if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
-//            Photo[] phts = rsp.photos(0);
-//            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
-//                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
-            // sequence order is guaranteed.
-
             HashMap<String, Object> phts = rsp.syncPaths();
             for (int i = synchPage.start; i < synchPage.end; i++) {
                 T f = mList.get(i);
@@ -112,7 +107,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
                 }
             }
 
-            updateIcons(synchPage);
+            updateIcons(rsp.syncing());
 
             if (mList.size() >= synchPage.end) {
                 synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
@@ -134,33 +129,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     private static final Random RANDOM = new Random();
     public static int nextRandomInt() {
         return RANDOM.nextInt(1024 * 1024);
-    }
-
-    /**
-     * @param view the file view - not used currently
-     * @param dataType "video/*" or "image/*"
-     * @param path full path
-     * @return false
-     */
-    private boolean startMediaViewer(View view, String dataType, String path) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri uri;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            File f = new File(path);
-            uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
-        }
-        else {
-            uri = Uri.parse("file://" + path);
-        }
-        intent.setDataAndType(uri, dataType);
-        if (Util.detectIntent(mContext, intent)) {
-            mContext.startActivity(intent);
-        }
-        else {
-            ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
-        }
-        return false;
     }
 
     /**
@@ -190,6 +158,5 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
         return false;
     }
-
 }
 

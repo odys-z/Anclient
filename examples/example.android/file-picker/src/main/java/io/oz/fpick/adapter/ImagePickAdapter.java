@@ -2,13 +2,9 @@ package io.oz.fpick.adapter;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
-import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +16,6 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -31,21 +26,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
-import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.adapter.BaseAdapter;
 import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
-import java.io.File;
 import java.util.ArrayList;
 
-import io.odysz.semantic.jprotocol.AnsonResp;
-import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.DocsResp;
-import io.oz.album.tier.AlbumResp;
-import io.oz.album.tier.Photo;
-import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
 
 /**
@@ -67,7 +53,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         super ( ctx , list );
         isNeedCamera = needCamera;
         mMaxNumber = max;
-//        isNeedImagePager = needImagePager;
     }
 
     @NonNull
@@ -77,10 +62,10 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
             WindowManager wm = (WindowManager) mContext.getSystemService ( Context.WINDOW_SERVICE );
-            int width = wm.getDefaultDisplay ( ).getWidth ( );
+            int width = wm.getDefaultDisplay().getWidth();
             params.height = width / ImagePickActivity.COLUMN_NUMBER;
         }
-        ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
+        ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder( itemView );
         imagePickViewHolder.setIsRecyclable ( false );
 
         return imagePickViewHolder;
