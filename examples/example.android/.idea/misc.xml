@@ -16,6 +16,8 @@
         <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/layout/vw_activity_audio_pick.xml" value="0.24864130434782608" />
         <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/layout/vw_activity_video_pick.xml" value="0.12386018237082067" />
         <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/layout/vw_layout_item_audio_pick.xml" value="0.24864130434782608" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/layout/vw_layout_item_image_pick.xml" value="0.12386018237082067" />
+        <entry key="..\:/Users/Alice/github/anclient/examples/example.android/file-picker/src/main/res/layout/vw_layout_item_video_pick.xml" value="0.12386018237082067" />
         <entry key="app/src/main/res/layout/bt_login.xml" value="0.20735356990166737" />
         <entry key="app/src/main/res/layout/bt_regist_device.xml" value="0.1" />
         <entry key="app/src/main/res/layout/prefs.xml" value="0.1931097008159565" />

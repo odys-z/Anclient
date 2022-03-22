@@ -24,7 +24,7 @@ public class AlbumContext {
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
-        Anson.verbose = true;
+        Anson.verbose = false;
     }
 
     private String pswd;

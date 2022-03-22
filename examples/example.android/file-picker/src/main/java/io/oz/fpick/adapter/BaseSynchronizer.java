@@ -90,13 +90,13 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     void startSynchQuery(SyncingPage page) {
         singleton.tier.asyncQuerySyncs(mList, page,
-                onSychnQueryRespons,
+                onSyncQueryRespons,
                 (c, r, args) -> {
                     Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
                 });
     }
 
-    JProtocol.OnOk onSychnQueryRespons = (resp) -> {
+    JProtocol.OnOk onSyncQueryRespons = (resp) -> {
         AlbumResp rsp = (AlbumResp) resp;
         if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
             HashMap<String, Object> phts = rsp.syncPaths();
@@ -116,9 +116,9 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
     };
 
-    void updateIcons(SyncingPage synchPage) {
+    void updateIcons(SyncingPage syncPage) {
         ((Activity)mContext).runOnUiThread( () -> {
-            notifyItemRangeChanged(synchPage.start, synchPage.end);
+            notifyItemRangeChanged(syncPage.start, syncPage.end);
         });
     }
 

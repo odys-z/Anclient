@@ -126,15 +126,11 @@ public class ImagePickActivity extends BaseActivity {
         } );
 
         rl_done = findViewById(R.id.rl_done);
-        rl_done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                /// intent.putParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE, mSelectedList);
-                intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
+        rl_done.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
+            setResult(RESULT_OK, intent);
+            finish();
         });
 
         switch (pickmode) {
@@ -168,22 +164,19 @@ public class ImagePickActivity extends BaseActivity {
             tv_folder = (TextView) findViewById(R.id.tv_folder);
             tv_folder.setText(getResources().getString(R.string.vw_all));
 
-            mFolderHelper.setFolderListListener(new FolderListAdapter.FolderListListener() {
-                @Override
-                public void onFolderListClick(Directory directory) {
-                    mFolderHelper.toggle(tb_pick);
-                    tv_folder.setText(directory.getName());
+            mFolderHelper.setFolderListListener(directory -> {
+                mFolderHelper.toggle(tb_pick);
+                tv_folder.setText(directory.getName());
 
-                    if (TextUtils.isEmpty(directory.getPath())) { //All
-                        refreshData(mAll);
-                    } else {
-                        for (Directory<ImageFile> dir : mAll) {
-                            if (dir.getPath().equals(directory.getPath())) {
-                                List<Directory<ImageFile>> list = new ArrayList<>();
-                                list.add(dir);
-                                refreshData(list);
-                                break;
-                            }
+                if (TextUtils.isEmpty(directory.getPath())) { //All
+                    refreshData(mAll);
+                } else {
+                    for (Directory<ImageFile> dir : mAll) {
+                        if (dir.getPath().equals(directory.getPath())) {
+                            List<Directory<ImageFile>> list = new ArrayList<>();
+                            list.add(dir);
+                            refreshData(list);
+                            break;
                         }
                     }
                 }
@@ -290,12 +283,4 @@ public class ImagePickActivity extends BaseActivity {
         }
         return false;    // taken image wasn't found
     }
-
-//    private void refreshSelectedList(List<ImageFile> list) {
-//        for (ImageFile file : list) {
-//            if(file.isSelected() && !mSelectedList.contains(file)) {
-//                mSelectedList.add(file);
-//            }
-//        }
-//    }
 }

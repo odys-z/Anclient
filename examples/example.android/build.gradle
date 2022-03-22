@@ -18,7 +18,7 @@ allprojects {
         bm_photoview_version = "1.4.1"
         anclient_ver = "0.4.13"
         jserv_ver = "1.4.4"
-        album_lib_ver = "0.4.16"
+        album_lib_ver = "0.4.17"
     }
 
     repositories {
