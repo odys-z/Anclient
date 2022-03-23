@@ -1,21 +1,21 @@
 <resources>
-    <string name="app_name" translatable="false">Family Album</string>
+    <string name="app_name" translatable="false">Album Synchronizer</string>
 
     <string name="menu_prefs" translatable="false">Settings</string>
     <string name="menu_help" translatable="false">Help</string>
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
-    <string name="txt_prefs_summery_home">Home Registration</string>
+    <string name="txt_prefs_summery_home">Server Registration</string>
     <string name="devide_name">Device ID: %s</string>
     <string name="txt_only_once">You can name a device only once.</string>
 
     <string name="key_home" translatable="false">home_key</string>
-    <string name="home_title" translatable="false">Home Name</string>
+    <string name="home_title" translatable="false">Album Server Name</string>
 
     <string name="jserv_key" translatable="false">jserv-key</string>
     <string name="jserv_default" translatable="false">http://192.168.0.1:8888</string>
     <string name="jserv" translatable="false">http://192.168.0.1:8888</string>
-    <string name="jserv_title" translatable="false">Home Server IP</string>
+    <string name="jserv_title" translatable="false">Album Server IP</string>
 
     <string name="key_regist" translatable="false">btn-register</string>
     <string name="txt_regist">Save Device Name</string>

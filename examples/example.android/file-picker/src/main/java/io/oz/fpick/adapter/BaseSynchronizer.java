@@ -34,6 +34,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     protected boolean isNeedCamera;
     protected int mMaxNumber;
     protected int mCurrentNumber = 0;
+    private RecyclerView recyclerView;
 
     public boolean isUpToMax () {
         return mCurrentNumber >= mMaxNumber;
@@ -76,7 +77,9 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     public List<T> getDataSet() { return (List<T>) mList; }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void refresh(List<T> list) {
+    public void refresh(List<T> list, RecyclerView ... mRecyclerView) {
+        this.recyclerView = mRecyclerView == null ? null : mRecyclerView[0];
+
         mList.clear();
         mList.addAll(list);
         notifyDataSetChanged();

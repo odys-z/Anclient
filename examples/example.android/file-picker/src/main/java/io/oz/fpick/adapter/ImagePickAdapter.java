@@ -98,7 +98,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                     .load ( file.getPath ( ) )
                     .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
                             .centerCrop()
-                            .error(R.drawable.vw_ic_synced))
+                            .error(R.drawable.vw_ic_syncing))
                     .transition ( withCrossFade ( ) )
                     .listener(new RequestListener() {
                         @Override
@@ -156,28 +156,8 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.mShadow.setVisibility ( View.INVISIBLE );
             }
 
-            holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                Uri uri;
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                    File f = new File(file.getPath());
-//                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
-//                }
-//                else {
-//                    uri = Uri.parse("file://" + file.getPath());
-//                }
-//                // intent.setDataAndType(uri, "video/mp4");
-//                intent.setDataAndType(uri, "image/*");
-//                if (Util.detectIntent(mContext, intent)) {
-//                    mContext.startActivity(intent);
-//                }
-//                else {
-//                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
-//                }
-//                return false;
-                return startMediaViewer(mContext, view, "image/*", file.getPath());
-            });
+            holder.mIvThumbnail.setOnLongClickListener((View view)
+                  -> startMediaViewer(mContext, view, "image/*", file.getPath()));
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );

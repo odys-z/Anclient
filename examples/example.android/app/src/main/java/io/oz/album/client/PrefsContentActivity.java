@@ -53,7 +53,6 @@ public class PrefsContentActivity extends AppCompatActivity {
                     updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
 
                     // load settings
-                    Anson.verbose = true;
                     tier.getSettings(
                         (resp) -> {
                             singleton.homeName = ((AlbumResp) resp).profils.home();

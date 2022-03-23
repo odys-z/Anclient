@@ -8,15 +8,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
-import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.ImageFile;
@@ -267,7 +264,7 @@ public class ImagePickActivity extends BaseActivity {
                 list.get(index).setSelected(true);
             }
         }
-        mAdapter.refresh(list);
+        mAdapter.refresh(list, mRecyclerView);
     }
 
     private boolean findAndAddTakenImage(List<ImageFile> list) {

@@ -38,7 +38,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:src="@drawable/vw_ic_synced" />
+        android:src="@drawable/vw_ic_synced_video" />
 
     <LinearLayout
         android:layout_width="wrap_content"

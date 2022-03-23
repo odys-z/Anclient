@@ -1,5 +1,7 @@
 package io.oz.fpick.adapter;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.view.LayoutInflater;
@@ -10,8 +12,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.AudioPickActivity;
@@ -39,8 +49,8 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
     @Override
     public AudioPickViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.vw_layout_item_audio_pick, parent, false);
-        AudioPickViewHolder holder=new AudioPickViewHolder(itemView);
-        holder.setIsRecyclable ( false );
+        AudioPickViewHolder holder = new AudioPickViewHolder(itemView);
+        holder.setIsRecyclable ( true );
         return holder;
     }
 
