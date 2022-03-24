@@ -175,7 +175,9 @@ export interface AnreactAppOptions {
 	parent?: Window;
 };
 
-/**Ectending AnReact with dataset & sys-menu, the same of layers extinding of jsample.
+/**
+ * Extending AnReact with dataset & sys-menu - the same of tier extending of Jsample.
+ * 
  * @class
  */
 export class AnReactExt extends AnReact {
@@ -286,7 +288,7 @@ export class AnReactExt extends AnReact {
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
 				  nv: NV;
 				  cond: QueryConditions; // CbbCondition;
-				  onLoad?: OnLoadOk;
+				  onLoad?: OnLoadOk<Tierec>;
 				  /**don't add "-- ALL --" item */
 				  noAllItem?: boolean; } ): AnReactExt {
 		let {uri, sk, sqlArgs, nv, cond, onLoad, noAllItem} = opts;
