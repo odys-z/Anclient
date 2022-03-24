@@ -174,7 +174,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     void showProgress(int listIx, ArrayList<BaseFile> list, int blocks, DocsResp resp) {
         runOnUiThread(() -> {
             String msg = String.format(getString(R.string.msg_templ_progress),
-                    list.size(), listIx, resp.clientname(), (float)(resp.blockSeq() + 1)/ blocks);
+                    listIx, list.size(), resp.clientname(), (float) resp.blockSeq() / blocks * 100);
             msgv.setText(msg);
             msgv.setVisibility(View.VISIBLE);
         });

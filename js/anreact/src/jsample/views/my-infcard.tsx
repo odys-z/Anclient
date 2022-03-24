@@ -17,6 +17,12 @@ const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
 });
 
+interface MyInfRec extends Tierec {
+	mime: string,
+	attName: string,
+	attId: string
+}
+
 interface MyInfProps extends Comprops {
 	ssInf: SessionInf;
 };
@@ -53,7 +59,7 @@ class MyInfCardComp extends DetailFormW<MyInfProps> {
 
 		this.tier.pkval.v = this.props.ssInf.uid;
 		let {uid, roleId} = this.props.ssInf;
-		this.tier.rec = {uid, roleId}
+		this.tier.rec = {uid, roleId, mime: undefined, attName: undefined, attId: undefined};
 
 		this.setState({});
 	}
@@ -118,7 +124,7 @@ MyInfCardComp.contextType = AnContext;
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 
 export class MyInfTier extends Semantier {
-	rec = {} as Tierec;
+	rec = {} as MyInfRec; // Tierec & {mime: string, attName: string, attId: string};
 
 	// uri = undefined;
 	imgProp = 'img';
@@ -144,12 +150,12 @@ export class MyInfTier extends Semantier {
 
 	/**
 	 * Format an image upload component.
-	 * @param {object} record for the form
-	 * @param {object} field difinetion, e.g. field of tier._fileds
-	 * @param {Semantier} tier not necessarily this class's object - this method will be moved
+	 * @param record for the form
+	 * @param field difinetion, e.g. field of tier._fileds
+	 * @param tier not necessarily this class's object - this method will be moved
 	 * @return {React.component} ImageUpload
 	 */
-	loadAvatar(rec, field, tier) {
+	loadAvatar(rec: MyInfRec, field: {field: string}, tier: MyInfTier) {
 		return (
 			<ImageUpload
 				blankIcon={{color: "primary", width: 32, height: 32}}
@@ -158,7 +164,7 @@ export class MyInfTier extends Semantier {
 			/>);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk) {
+	record(conds: QueryConditions, onLoad: OnLoadOk<MyInfRec>) {
 		let { userId } = conds;
 
 		let client = this.client;
@@ -182,10 +188,10 @@ export class MyInfTier extends Semantier {
 			(resp) => {
 				// NOTE because of using general query, extra hanling is needed
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				that.rec = rows && rows[0];
+				that.rec = rows && rows[0] as MyInfRec;
 				that.pkval.v = that.rec && that.rec[that.pkval.pk];
 				that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
-				onLoad(cols, rows);
+				onLoad(cols, rows as Array<MyInfRec>);
 			},
 			this.errCtx);
 	}
@@ -218,13 +224,14 @@ export class MyInfTier extends Semantier {
 						.whereEq('busiId', rec[this.pkval.pk] as string || '')
 					 	.whereEq('busiTbl', this.mtabl));
 		if ( rec[this.imgProp] ) {
-			let {name, mime} = rec.fileMeta as {name: string, mime: string};
+			// let {name, mime} = rec.fileMeta as {name: string, mime: string};
+
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v)
-					.nv('attName', name)
-					.nv('mime', mime)
-					.nv('uri', dataOfurl(rec[this.imgProp])) );
+					.nv('attName', rec.attName)
+					.nv('mime', rec.mime)
+					.nv('uri', dataOfurl(rec[this.imgProp] as string)) );
 		}
 
 		client.commit(req,

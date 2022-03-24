@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,22 +56,25 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
 
         homepref = findPreference(AlbumApp.keys.home);
         String devid = singleton.photoUser.device;
+        EditTextPreference prefDev = findPreference(AlbumApp.keys.device);
         if (!LangExt.isblank(devid)) {
             // homepref.setSummary(getString(R.string.devide_name, devid));
             homepref.setSummary(AlbumContext.getInstance().homeName);
-            findPreference(AlbumApp.keys.device).setEnabled(false);
+            prefDev.setEnabled(false);
             cateHome.removePreference(btnRegist);
             device.setSummary(getString(R.string.devide_name, devid));
         }
         else {
-            findPreference(AlbumApp.keys.device).setEnabled(true);
+            prefDev.setEnabled(true);
             device.setSummary(R.string.txt_only_once);
         }
         summery = findPreference(AlbumApp.keys.login_summery);
     }
 
-    static void bindPref2Val(@NonNull Preference preference) {
+    static void bindPref2Val(@NonNull EditTextPreference preference) {
         preference.setOnPreferenceChangeListener(prefsListener);
+
+        preference.setOnBindEditTextListener(TextView::setSingleLine);
 
         prefsListener.onPreferenceChange(preference,
                 PreferenceManager
@@ -84,7 +88,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
      */
     private static final Preference.OnPreferenceChangeListener prefsListener =
         (preference, newValue) -> {
-            String stringValue = newValue.toString();
+            String stringValue = newValue.toString().trim();
             String k = preference.getKey();
             if (k.equals(AlbumApp.keys.jserv)) {
                 singleton.jserv(stringValue);

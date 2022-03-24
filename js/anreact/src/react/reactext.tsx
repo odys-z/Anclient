@@ -1,4 +1,4 @@
-import { ErrorCtx, Semantext, SessionClient, SessionInf } from '@anclient/semantier-st';
+import { ErrorCtx, Semantext, SessionInf } from '@anclient/semantier-st';
 import React from 'react';
 
 import { AnReact } from './anreact';
@@ -27,10 +27,7 @@ export interface AnContextType extends Semantext {
 } 
 
 export const AnContext = React.createContext({
-	/**	Anclient */
-	// an: undefined,
-    /**@type = SessionIfn */
-	ssInf: undefined,
+	ssInf: undefined as SessionInf,
 
 	pageOrigin: '.',
 	iparent: {},    // usually the parent window of ifram

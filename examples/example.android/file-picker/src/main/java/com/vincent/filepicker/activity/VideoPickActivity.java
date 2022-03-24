@@ -240,7 +240,7 @@ public class VideoPickActivity extends BaseActivity {
                 list.get(index).setSelected(true);
             }
         }
-        mAdapter.refresh(list);
+        mAdapter.refresh(list, mRecyclerView);
     }
 
     private boolean findAndAddTaken(List<VideoFile> list) {
