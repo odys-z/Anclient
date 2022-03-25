@@ -18,9 +18,13 @@ const styles = theme => ({
 });
 
 interface MyInfRec extends Tierec {
-	mime: string,
-	attName: string,
-	attId: string
+	userId: string,
+	roleId?: string,
+	userName: string,
+	img?: string,
+	mime?: string,
+	attName?: string,
+	attId?: string,
 }
 
 interface MyInfProps extends Comprops {
@@ -33,7 +37,6 @@ interface MyInfProps extends Comprops {
  * but with data automated data loading and state hook.
  */
 class MyInfCardComp extends DetailFormW<MyInfProps> {
-// class MyInfCardComp extends DetailFormW<Comprops & {ssInf: SessionInf}> {
 
 	state = { }
 	tier: MyInfTier;
@@ -59,7 +62,7 @@ class MyInfCardComp extends DetailFormW<MyInfProps> {
 
 		this.tier.pkval.v = this.props.ssInf.uid;
 		let {uid, roleId} = this.props.ssInf;
-		this.tier.rec = {uid, roleId, mime: undefined, attName: undefined, attId: undefined};
+		this.tier.rec = {userId: uid, roleId, userName: undefined};
 
 		this.setState({});
 	}
