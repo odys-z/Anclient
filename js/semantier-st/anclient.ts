@@ -8,7 +8,7 @@ import {
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
 	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta
 } from './protocol';
-import { ErrorCtx } from './semantier';
+import { ErrorCtx, Tierec } from './semantier';
 
 export interface AjaxOptions {async?: boolean; timeout?: number}
 
@@ -229,7 +229,7 @@ class AnClient {
 					else console.log(resp);
 				}
 			},
-			error: function (resp) {
+			error: function (resp: any) {
 				// JSON.stringify(resp):
 				// {"readyState":0,"status":0,"statusText":"error"};
 
@@ -668,7 +668,7 @@ class SessionClient {
 		return jmsg;
 	}
 
-	getSks(onLoad: OnLoadOk, errCtx: ErrorCtx) {
+	getSks<T extends Tierec>(onLoad: OnLoadOk<T>, errCtx: ErrorCtx) {
 		let req = this.userReq(null, 'datasetier',
 					new DatasetierReq(undefined)
 					.A(DatasetierReq.A.sks), undefined );

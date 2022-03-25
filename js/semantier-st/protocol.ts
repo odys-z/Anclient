@@ -890,7 +890,7 @@ export class UpdateReq extends AnsonBody {
 }
 
 export class DeleteReq extends UpdateReq {
-	constructor (uri: string, tabl: string, pk: string) {
+	constructor (uri: string, tabl: string, pk: string[] | PkMeta) {
 		super (uri, tabl, pk);
 		this.a = CRUD.d;
 	}

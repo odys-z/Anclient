@@ -473,7 +473,7 @@ export class Semantier {
 		}
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
-			let del_rf = new DeleteReq(uri, rel.tabl, rel.col)
+			let del_rf = new DeleteReq(uri, rel.tabl, [rel.pk, rel.col])
 							.whereEq(rel.col, parentpkv.v)
 							.post(insRels);
 
