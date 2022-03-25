@@ -12,15 +12,17 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.filter.entity.AudioFile;
 
-import java.io.File;
 import java.util.ArrayList;
 
+import io.oz.fpick.R;
+
 /**
+ * @deprecated
+ *
  * Created by Vincent Woo
  * Date: 2016/10/25
  * Time: 10:57

@@ -1,8 +1,8 @@
 import { SessionClient, Inseclient } from "./anclient";
 import { toBool } from "./helpers";
 import { stree_t, CRUD,
-	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp, 
-	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk, 
+	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
+	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
 	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations
 } from "./protocol";
 
@@ -175,8 +175,8 @@ export class Semantier {
     // reltabl: string;
 
     /** current relations - the last loaded relation of this.rel (problem?)
-	 * 
-	 * Looks like all relationship records are item of main tree. 
+	 *
+	 * Looks like all relationship records are item of main tree.
 	 */
     rels: UIRelations = {};
 
@@ -196,16 +196,16 @@ export class Semantier {
 	}
 
 	/**TODO check widgets right
-	 * 
-	 * @param field 
-	 * @returns 
+	 *
+	 * @param field
+	 * @returns
 	 */
 	isReadonly(field: TierCol) {
 		return false;
 	}
 
     client: SessionClient | Inseclient;
-    // anReact: any; // for anreact/AnReact. TODO rename as UIHelper 
+    // anReact: any; // for anreact/AnReact. TODO rename as UIHelper
     errCtx: ErrorCtx;
 
     disableValidate: any;
@@ -267,9 +267,9 @@ export class Semantier {
     }
 
     /**Get form fields data specification
-	 * 
+	 *
 	 * Businsess semantics binding: If the loading with a record Id, the Id field will be disabled.
-	 * 
+	 *
      * @param modifier {field: AnElemFormatter | object }
 	 * e.g. for anreact, object can be {gird, box, ...}.
      */
@@ -329,25 +329,25 @@ export class Semantier {
 
 	/**
 	 * Load a jserv record.
-	 * @param conds 
-	 * @param onLoad 
+	 * @param conds
+	 * @param onLoad
 	 */
-    record<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) : void {
+    record(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) : void {
     }
 
 	/** Load records of conditions.
-	 * 
-	 * @param opts 
-	 * @param onLoad 
+	 *
+	 * @param opts
+	 * @param onLoad
 	 */
-    records<T extends Tierec>(opts: QueryConditions, onLoad: OnLoadOk<T>) : void {
+    records(opts: QueryConditions, onLoad: OnLoadOk<Tierec>) : void {
 	}
 
     /** save form with a relationship table.
-	 * 
+	 *
 	 * @param opts semantic options for saving a maintable record
 	 * @param onOk callback
-	 * @returns 
+	 * @returns
 	 */
     saveRec(opts: {crud: CRUD; disableForm?: boolean; disableRelations?: boolean, reltabl?: string}, onOk: OnCommitOk): void {
 		if (!this.client) return;
@@ -371,7 +371,7 @@ export class Semantier {
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
-							new UpdateReq( uri, this.mtabl, this.pkval.v)
+							new UpdateReq( uri, this.mtabl, this.pkval)
 							.record(this.rec, this.pkval.pk) );
 			}
 		}
@@ -379,7 +379,7 @@ export class Semantier {
 		if (!disableRelations && !reltabl)
 			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
 
-		if (!disableRelations) 
+		if (!disableRelations)
 			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl],
 											crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
 
@@ -435,12 +435,12 @@ export class Semantier {
     }
 
 	/**
-	 * format relationship records - only fk supported 
-	 * 
+	 * format relationship records - only fk supported
+	 *
 	 * TODO change to static
-	 * @param uri 
-	 * @param req 
-	 * @param relation 
+	 * @param uri
+	 * @param req
+	 * @param relation
 	 * @param parentpkv pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
@@ -488,8 +488,8 @@ export class Semantier {
 	/**move this to a semantics handler, e.g. shFK ?
 	 * Generate an insert request according to tree/forest checked items.
 	 * @param forest forest of tree nodes, the forest / tree data, tree node: {id, node}
-	 * @param opts options 
-	 * - opts.table: relationship table name 
+	 * @param opts options
+	 * - opts.table: relationship table name
 	 * - opts.columnMap: column's value to be inserted
 	 * - opts.check: checking column name
 	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checed.
@@ -541,11 +541,11 @@ export class Semantier {
 		/**convert to [name-value, ...] as a row (Array<{name, value}>), e.g.
 		 * [ { "name": "funcId", "value": "sys-domain" },
 		 *   { "name": "roleId", "value": "r003" } ]
-		 * 
+		 *
 		 * @param node   TreeNode from wich row will be collected
 		 * @param dbcols column names to be converted from node
-		 * @param colMap column's static value, e.g. { roleId: '00001' } 
-		 * @returns 
+		 * @param colMap column's static value, e.g. { roleId: '00001' }
+		 * @returns
 		 */
 		function toNvRow(node: AnTreeNode["node"],
 				  dbcols: string[], colMap: { [x: string]: any; })
@@ -567,11 +567,11 @@ export class Semantier {
 
 	/**
 	 * Load dataset from jserv
-	 * 
-	 * @param ds 
-	 * @param client 
-	 * @param onLoad 
-	 * @param errCtx 
+	 *
+	 * @param ds
+	 * @param client
+	 * @param onLoad
+	 * @param errCtx
 	 */
 	static dataset(ds: DatasetOpts, client: SessionClient | Inseclient, onLoad: OnCommitOk, errCtx: ErrorCtx): void {
 		// let ssInf = this.client.ssInf;
@@ -597,11 +597,11 @@ export class Semantier {
 		if (compont)
 			compont.setState({stree: resp.Body().forest});
 	}</pre>
-	 * 
+	 *
 	 * @param opts dataset info {sk, sqlArgs, onOk}
-	 * @param client 
-	 * @param onLoad 
-	 * @param errCtx 
+	 * @param client
+	 * @param onLoad
+	 * @param errCtx
 	 */
 	static stree(opts: DatasetOpts, client: SessionClient | Inseclient, onLoad: OnCommitOk, errCtx: ErrorCtx): void {
 		let {uri} = opts;
@@ -617,4 +617,3 @@ export class Semantier {
 		Semantier.dataset(opts, client, onLoad, errCtx);
 	}
 }
-

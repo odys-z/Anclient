@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.VideoPickActivity;
@@ -29,16 +28,17 @@ import com.vincent.filepicker.filter.entity.VideoFile;
 import java.io.File;
 import java.util.ArrayList;
 
-import static android.os.Environment.DIRECTORY_DCIM;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-import static com.vincent.filepicker.Constant.REQUEST_CODE_TAKE_VIDEO;
+
+import io.oz.fpick.R;
 
 /**
+ * @deprecated
+ *
  * Created by Vincent Woo
  * Date: 2016/10/21
  * Time: 14:13
  */
-
 public class VideoPickAdapter extends BaseAdapter<VideoFile, VideoPickAdapter.VideoPickViewHolder> {
     private boolean isNeedCamera;
     private int mMaxNumber;
@@ -260,11 +260,12 @@ public class VideoPickAdapter extends BaseAdapter<VideoFile, VideoPickAdapter.Vi
         private TextView mDuration;
         private RelativeLayout mDurationLayout;
         private RelativeLayout animation;
+
         public VideoPickViewHolder(View itemView) {
             super(itemView);
-            mIvCamera = (ImageView) itemView.findViewById(R.id.iv_camera);
-            mIvThumbnail = (ImageView) itemView.findViewById(R.id.iv_thumbnail);
-            mShadow = itemView.findViewById(R.id.shadow);
+            mIvCamera = (ImageView) itemView.findViewById(R.id.xiv_album_icon);
+            mIvThumbnail = (ImageView) itemView.findViewById(R.id.xiv_thumbnail);
+            mShadow = itemView.findViewById(R.id.x_shadow);
             mCbx = (ImageView) itemView.findViewById(R.id.cbx);
             mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
             animation = itemView.findViewById ( R.id.animationSquarevideo );

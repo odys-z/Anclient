@@ -7,12 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.oz.fpick.R;
 
 /**
  * Created by Vincent Woo

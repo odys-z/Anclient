@@ -2,14 +2,29 @@ package com.vincent.filepicker.filter.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
+
+import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.oz.album.tier.Photo;
+
 /**
+ * Modyfied by Ody Zhou
+ *
  * Created by Vincent Woo
  * Date: 2016/10/10
  * Time: 17:32
  */
 
 public class BaseFile implements Parcelable, IFileDescriptor {
+    public static int Synchronized = 1;
+    public static int SynchUnknown = 0;
+    public static int Synchronizing = -1;
+
     private long id;
     private String name;
     private String path;
@@ -18,6 +33,8 @@ public class BaseFile implements Parcelable, IFileDescriptor {
     private String bucketName;  //Directory Name
     private long date;          //Added Date
     private boolean isSelected;
+
+    public int synchFlag = SynchUnknown;
 
     @Override
     public boolean equals(Object o) {
@@ -133,17 +150,13 @@ public class BaseFile implements Parcelable, IFileDescriptor {
         }
     };
 
-    String recId;
-    @Override
-    public String recId() {
-        return recId;
-    }
+    // String recId; @Override public String recId() { return recId; }
 
-    @Override
-    public IFileDescriptor recId(String rid) {
-        this.recId = rid;
-        return this;
-    }
+//    @Override
+//    public IFileDescriptor recId(String rid) {
+//        this.recId = rid;
+//        return this;
+//    }
 
     @Override
     public String fullpath() {
@@ -151,7 +164,24 @@ public class BaseFile implements Parcelable, IFileDescriptor {
     }
 
     @Override
-    public String clientname() {
-        return name;
+    public IFileDescriptor fullpath(String clientpath) throws IOException {
+        path = clientpath;
+        return this;
     }
+
+    @Override
+    public String clientname() {
+        Path p = Paths.get(path);
+        return p.getFileName().toString();
+    }
+
+    @Override
+    public String cdate() {
+        return DateFormat.format(new Date(date));
+    }
+
+//    public BaseFile synchFlag(int syncFlag) {
+//        this.synchFlag = syncFlag;
+//        return this;
+//    }
 }

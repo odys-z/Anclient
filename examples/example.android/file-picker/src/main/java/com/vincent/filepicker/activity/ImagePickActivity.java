@@ -8,21 +8,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
-import com.vincent.filepicker.R;
-import com.vincent.filepicker.adapter.FolderListAdapter;
-import com.vincent.filepicker.adapter.ImagePickAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
-import com.vincent.filepicker.filter.FileFilter;
-import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
@@ -30,7 +22,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.oz.fpick.PickingMode;
+import io.oz.fpick.R;
+import io.oz.fpick.adapter.ImagePickAdapter;
+import io.oz.fpick.filter.FileFilterx;
+
 /**
+ * Modified by Ody Zhou
+ * Date 2022/02/11
+ *
  * Created by Vincent Woo
  * Date: 2016/10/12
  * Time: 16:41
@@ -41,8 +41,11 @@ public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_IMAGE_PAGER = "IsNeedImagePager";
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
 
-    public static final int DEFAULT_MAX_NUMBER = 9;
+    public static final int DEFAULT_MAX_NUMBER = 99;
     public static final int COLUMN_NUMBER = 3;
+
+    PickingMode pickmode = PickingMode.disabled;
+
     private int mMaxNumber;
     private int mCurrentNumber = 0;
     private RecyclerView mRecyclerView;
@@ -69,29 +72,21 @@ public class ImagePickActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vw_activity_image_pick);
 
-        mMaxNumber = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
-        isNeedCamera = getIntent().getBooleanExtra(IS_NEED_CAMERA, false);
-        isNeedImagePager = getIntent().getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
-        isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
+        Intent intt = getIntent();
+        mMaxNumber = intt.getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
+        isNeedCamera = intt.getBooleanExtra(IS_NEED_CAMERA, false);
+        isNeedImagePager = intt.getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
+        isTakenAutoSelected = intt.getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
+        pickmode = (PickingMode) intt.getSerializableExtra(Constant.PickingMode);
+
         initView();
     }
 
-    private void animateView (View ImageView ) {
-//        when (val drawable = view.drawable) {
-//            is AnimatedVectorDrawableCompat -> {
-//                drawable.start()
-//            }
-//            is AnimatedVectorDrawable -> {
-//                drawable.start()
-//            }
-
-    }
-
     private void initView() {
-        tv_count = (TextView) findViewById(R.id.tv_count);
+        tv_count = findViewById(R.id.tv_count);
         tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_image_pick);
+        mRecyclerView = findViewById(R.id.rv_image_pick);
         final GridLayoutManager layoutManager = new GridLayoutManager(this, COLUMN_NUMBER);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
@@ -99,7 +94,6 @@ public class ImagePickActivity extends BaseActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnSelectStateListener (new OnSelectStateListener<ImageFile>() {
-
 
             @Override
             public void OnSelectStateChanged (int position, boolean state , ImageFile file , View animation ) {
@@ -110,8 +104,7 @@ public class ImagePickActivity extends BaseActivity {
                     animation.setVisibility ( View.VISIBLE );
 
                     AnimationDrawable animationDrawable = (AnimationDrawable) animation.getBackground ();
-                    Animation a= AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
-//                    animation.startAnimation ( animationDrawable );
+                    // Animation a = AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
                     animationDrawable.start ();
                 } else {
                     mSelectedList.remove(file);
@@ -123,26 +116,37 @@ public class ImagePickActivity extends BaseActivity {
             }
 
             @Override
-            public void onAudioStateChanged ( boolean state , ImageFile file,View animation ) {
-
-            }
+            public void onAudioStateChanged ( boolean state , ImageFile file,View animation ) { }
 
             @Override
-            public void onFileStateChanged ( boolean state , ImageFile file,View animation ) {
-
-            }
+            public void onFileStateChanged ( boolean state , ImageFile file,View animation ) { }
         } );
 
-        rl_done = (RelativeLayout) findViewById(R.id.rl_done);
-        rl_done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.putParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE, mSelectedList);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
+        rl_done = findViewById(R.id.rl_done);
+        rl_done.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
+            setResult(RESULT_OK, intent);
+            finish();
         });
+
+        switch (pickmode) {
+            case limit9:
+                mMaxNumber = 9;
+                rl_done.setVisibility(View.VISIBLE);
+                break;
+            case limit99:
+                mMaxNumber = 99;
+                rl_done.setVisibility(View.VISIBLE);
+                break;
+            case streamAsync:
+                mMaxNumber = 1;
+                rl_done.setVisibility(View.VISIBLE);
+                break;
+            default:
+                mMaxNumber = 0;
+                rl_done.setVisibility(View.GONE);
+        }
 
         tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
         ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
@@ -157,22 +161,19 @@ public class ImagePickActivity extends BaseActivity {
             tv_folder = (TextView) findViewById(R.id.tv_folder);
             tv_folder.setText(getResources().getString(R.string.vw_all));
 
-            mFolderHelper.setFolderListListener(new FolderListAdapter.FolderListListener() {
-                @Override
-                public void onFolderListClick(Directory directory) {
-                    mFolderHelper.toggle(tb_pick);
-                    tv_folder.setText(directory.getName());
+            mFolderHelper.setFolderListListener(directory -> {
+                mFolderHelper.toggle(tb_pick);
+                tv_folder.setText(directory.getName());
 
-                    if (TextUtils.isEmpty(directory.getPath())) { //All
-                        refreshData(mAll);
-                    } else {
-                        for (Directory<ImageFile> dir : mAll) {
-                            if (dir.getPath().equals(directory.getPath())) {
-                                List<Directory<ImageFile>> list = new ArrayList<>();
-                                list.add(dir);
-                                refreshData(list);
-                                break;
-                            }
+                if (TextUtils.isEmpty(directory.getPath())) { //All
+                    refreshData(mAll);
+                } else {
+                    for (Directory<ImageFile> dir : mAll) {
+                        if (dir.getPath().equals(directory.getPath())) {
+                            List<Directory<ImageFile>> list = new ArrayList<>();
+                            list.add(dir);
+                            refreshData(list);
+                            break;
                         }
                     }
                 }
@@ -187,7 +188,7 @@ public class ImagePickActivity extends BaseActivity {
             case Constant.REQUEST_CODE_TAKE_IMAGE:
                 if (resultCode == RESULT_OK) {
                     Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    File file = new File(mAdapter.mImagePath);
+                    File file = new File(mAdapter.mFilepath);
                     Uri contentUri = Uri.fromFile(file);
                     mediaScanIntent.setData(contentUri);
                     sendBroadcast(mediaScanIntent);
@@ -221,22 +222,19 @@ public class ImagePickActivity extends BaseActivity {
     }
 
     private void loadData() {
-        FileFilter.getImages(this, new FilterResultCallback<ImageFile>() {
-            @Override
-            public void onResult(List<Directory<ImageFile>> directories) {
-                // Refresh folder list
-                if (isNeedFolderList) {
-                    ArrayList<Directory> list = new ArrayList<>();
-                    Directory all = new Directory();
-                    all.setName(getResources().getString(R.string.vw_all));
-                    list.add(all);
-                    list.addAll(directories);
-                    mFolderHelper.fillData(list);
-                }
-
-                mAll = directories;
-                refreshData(directories);
+        FileFilterx.getImages(this, directories -> {
+            // Refresh folder list
+            if (isNeedFolderList) {
+                ArrayList<Directory> list = new ArrayList<>();
+                Directory all = new Directory();
+                all.setName(getResources().getString(R.string.vw_all));
+                list.add(all);
+                list.addAll(directories);
+                mFolderHelper.fillData(list);
             }
+
+            mAll = directories;
+            refreshData(directories);
         });
     }
 
@@ -244,8 +242,8 @@ public class ImagePickActivity extends BaseActivity {
         boolean tryToFindTakenImage = isTakenAutoSelected;
 
         // if auto-select taken image is enabled, make sure requirements are met
-        if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mImagePath)) {
-            File takenImageFile = new File(mAdapter.mImagePath);
+        if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mFilepath)) {
+            File takenImageFile = new File(mAdapter.mFilepath);
             tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists(); // try to select taken image only if max isn't reached and the file exists
         }
 
@@ -259,18 +257,19 @@ public class ImagePickActivity extends BaseActivity {
             }
         }
 
+        // So that's why max number is 9?
         for (ImageFile file : mSelectedList) {
             int index = list.indexOf(file);
             if (index != -1) {
                 list.get(index).setSelected(true);
             }
         }
-        mAdapter.refresh(list);
+        mAdapter.refresh(list, mRecyclerView);
     }
 
     private boolean findAndAddTakenImage(List<ImageFile> list) {
         for (ImageFile imageFile : list) {
-            if (imageFile.getPath().equals(mAdapter.mImagePath)) {
+            if (imageFile.getPath().equals(mAdapter.mFilepath)) {
                 mSelectedList.add(imageFile);
                 mCurrentNumber++;
                 mAdapter.setCurrentNumber(mCurrentNumber);
@@ -280,13 +279,5 @@ public class ImagePickActivity extends BaseActivity {
             }
         }
         return false;    // taken image wasn't found
-    }
-
-    private void refreshSelectedList(List<ImageFile> list) {
-        for (ImageFile file : list) {
-            if(file.isSelected() && !mSelectedList.contains(file)) {
-                mSelectedList.add(file);
-            }
-        }
     }
 }

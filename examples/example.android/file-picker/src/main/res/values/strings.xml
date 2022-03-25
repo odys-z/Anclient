@@ -1,0 +1,9 @@
+<resources>
+    <string name="vw_confirm">Done</string>
+    <string name="vw_no_video_play_app">No App exists for playing video!</string>
+    <string name="vw_rationale_storage">Need Reading Storage Permission for Picking Files</string>
+    <string name="vw_up_to_max">Already up to max</string>
+    <string name="vw_no_audio_app">No audio App in this phone!</string>
+    <string name="vw_no_image_show_app">No image App in this phone!</string>
+    <string name="vw_all">All</string>
+</resources>

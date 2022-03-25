@@ -25,7 +25,6 @@ type AlbumConfig = {
 
 /** The application main, context singleton and error handler */
 export class App extends React.Component<AlbumProps, AlbumConfig> {
-    /** {@link InsercureClient} */
     inclient: Inseclient;
 
 	anReact: AnReactExt;  // helper for React

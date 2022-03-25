@@ -6,12 +6,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +24,8 @@ import android.widget.RelativeLayout;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.R;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.activity.ImageBrowserActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
@@ -42,7 +40,11 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 import static com.vincent.filepicker.activity.ImageBrowserActivity.IMAGE_BROWSER_INIT_INDEX;
 import static com.vincent.filepicker.activity.ImageBrowserActivity.IMAGE_BROWSER_SELECTED_LIST;
 
+import io.oz.fpick.R;
+
 /**
+ * @deprecated
+ *
  * Created by Vincent Woo
  * Date: 2016/10/13
  * Time: 16:07
@@ -67,6 +69,7 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
         isNeedImagePager = needImagePager;
     }
 
+    @NonNull
     @Override
     public ImagePickViewHolder onCreateViewHolder ( ViewGroup parent , int viewType ) {
         View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick , parent , false );
@@ -81,19 +84,9 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
         return imagePickViewHolder;
     }
 
-//    @Override
-//    public long getItemId ( int position ) {
-//        return position;
-//    }
-//
-//    @Override
-//    public int getItemViewType ( int position ) {
-//        return position;
-//    }
-
     @Override
     public void onBindViewHolder ( final ImagePickViewHolder holder , @SuppressLint("RecyclerView") final int position ) {
-        if ( isNeedCamera==true && position == 0 ) {
+        if ( isNeedCamera && position == 0 ) {
             holder.mIvCamera.setVisibility ( View.VISIBLE );
             holder.mIvThumbnail.setVisibility ( View.INVISIBLE );
             holder.mCbx.setVisibility ( View.GONE );
@@ -173,7 +166,8 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 //                } );
 //            }
 //            else {
-                final int p = holder.getAdapterPosition ( );
+
+                // final int p = holder.getAdapterPosition ( );
 
                 holder.mIvThumbnail.setOnClickListener ( new View.OnClickListener ( ) {
                     @Override
@@ -192,7 +186,6 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
                             mList.get ( index ).setSelected ( false );
 
 //                                holder.animation.setAlpha ( 0f );
-
                         }
                         else {
                             holder.mShadow.setVisibility ( View.VISIBLE );
@@ -202,8 +195,6 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 //                                holder.animation.setAlpha ( 1f );
 //                                final Animation a = AnimationUtils.loadAnimation ( mContext , R.anim.rotate_animation );
 //                                holder.animation.startAnimation ( a );
-
-
                         }
 
                         if ( mListener != null ) {
@@ -230,9 +221,9 @@ public class ImagePickAdapter extends BaseAdapter<ImageFile, ImagePickAdapter.Im
 
         public ImagePickViewHolder ( View itemView ) {
             super ( itemView );
-            mIvCamera = (ImageView) itemView.findViewById ( R.id.iv_camera );
-            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.iv_thumbnail );
-            mShadow = itemView.findViewById ( R.id.shadow );
+            mIvCamera = (ImageView) itemView.findViewById ( R.id.xiv_album_icon );
+            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
+            mShadow = itemView.findViewById ( R.id.x_shadow );
             mCbx = (ImageView) itemView.findViewById ( R.id.cbx );
             animation = itemView.findViewById ( R.id.animationSquare );
         }

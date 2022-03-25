@@ -613,7 +613,7 @@ class SessionClient {
 			throw new Error("To update a table, {pk, v} must presented.");
 		}
 
-		var upd = new UpdateReq(uri, maintbl, pk.v);
+		var upd = new UpdateReq(uri, maintbl, pk);
 		upd.a = CRUD.u;
 		this.currentAct.cmd = 'update';
 		var jmsg = this.userReq(uri, 'update', upd, this.currentAct);

@@ -22,7 +22,7 @@ VS Code extension
 
 - Anclient.java
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/Anclient/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/)
 Anclient for Java
 
 # Repository Structure

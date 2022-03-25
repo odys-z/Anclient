@@ -305,7 +305,7 @@ export class UsersTier extends Semantier {
 		return this._cols;
 	}
 
-	records<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
+	records(conds: QueryConditions, onLoad: OnLoadOk<any>) {
 		if (!this.client) return;
 
 		let client = this.client;
@@ -324,7 +324,7 @@ export class UsersTier extends Semantier {
 			this.errCtx);
 	}
 
-	record<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
+	record(conds: QueryConditions, onLoad: OnLoadOk<any>) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;

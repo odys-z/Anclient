@@ -14,9 +14,16 @@
         app:layout_constraintTop_toTopOf="@id/activity_main">
 
         <TextView
-            android:id="@+id/tv_result"
+            android:visibility="invisible"
+            android:id="@+id/tv_status"
             android:layout_width="match_parent"
-            android:layout_height="60dp" />
+            android:layout_height="wrap_content" />
+
+        <WebView
+            android:id="@+id/wv_welcome"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -33,12 +40,22 @@
         app:layout_constraintHorizontal_bias="0.0"
         tools:context="com.vincent.filepickersample.MainActivity">
 
+        <!--
         <Button
             android:id="@+id/btn_pick_file"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="+ File"
+            tools:ignore="TouchTargetSizeCheck" />
+            -->
+
+        <Button
+            android:id="@+id/btn_pick_audio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:text="+ Audio"
             tools:ignore="TouchTargetSizeCheck" />
 
         <Button
@@ -47,14 +64,6 @@
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="+ Video"
-            tools:ignore="TouchTargetSizeCheck" />
-
-        <Button
-            android:id="@+id/btn_pick_audio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="+ Audio"
             tools:ignore="TouchTargetSizeCheck" />
 
         <Button

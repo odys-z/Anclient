@@ -6,16 +6,41 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.semantic.tier.docs.SyncingPage;
+import io.oz.albumtier.AlbumContext;
+
 /**
+ * Modified by Ody Zhou
+ *
  * Created by Vincent Woo
  * Date: 2016/10/14
  * Time: 15:42
  */
 
 public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+//    public class SyncingPage {
+//        public int start;
+//        public int end;
+//
+//        public SyncingPage(int begin, int afterLast) {
+//            start = begin;
+//            end = afterLast;
+//        }
+//
+//        public SyncingPage nextPage(int size) {
+//            start = end;
+//            end += size;
+//            return this;
+//        }
+//    }
+
     protected Context mContext;
     protected ArrayList<T> mList;
     protected OnSelectStateListener<T> mListener;
+
+    protected AlbumContext singleton;
+
+    protected SyncingPage synchPage;
 
     public BaseAdapter(Context ctx, ArrayList<T> list) {
         mContext = ctx;

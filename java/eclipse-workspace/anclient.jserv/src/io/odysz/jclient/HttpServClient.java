@@ -9,7 +9,6 @@ import java.net.URL;
 import java.sql.SQLException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.tika.Tika;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
@@ -23,9 +22,9 @@ import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
 public class HttpServClient {
-	protected static final String USER_AGENT = "JClient.java/1.0";
+	protected static final String USER_AGENT = "Anclient.java/1.0";
 
-	protected static Tika detector = new Tika();
+//	protected static Tika detector = new Tika();
 
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
@@ -127,7 +126,7 @@ public class HttpServClient {
 			}
 
 			if (x.code() != MsgCode.ok)
-				throw new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body().toString());
+				throw new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body(0).msg());
 			return x;
 		}
 		else {
@@ -165,15 +164,17 @@ public class HttpServClient {
 		AnsonMsg<AnsonResp> s = null;
 		String type = null; 
 		try {
-			FileInputStream ifs = new FileInputStream(localpath);
-			type = detector.detect(ifs);
-			ifs.close();
+			// FileInputStream ifs = new FileInputStream(localpath);
+			// type = detector.detect(ifs);
+			// ifs.close();
+			if (localpath.endsWith(".json"))
+				type = "json";
 		}
 		catch (Exception e) {
 			return localpath;
 		}
 
-		if (type.startsWith("text")) {
+		if (type != null && type.startsWith("json")) {
 			FileInputStream ifs = new FileInputStream(localpath);
 			try {
 				s = (AnsonMsg<AnsonResp>) Anson.fromJson(ifs);

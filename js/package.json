@@ -19,7 +19,6 @@
   "author": "odys-z@github.com",
   "license": "Apache-2.0",
   "dependencies": {
-    "@anclient/semantier-st": "^0.9.58",
     "@types/jquery": "^3.5.13",
     "mime-types-no-nodejs": "^0.9.1",
     "qrcode": "^1.4.4",
@@ -27,6 +26,7 @@
   },
   "devDependencies": {
     "@anclient/anreact": "^0.3.35",
+    "@anclient/semantier-st": "^0.9.60",
     "@babel/cli": "^7.15.4",
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",

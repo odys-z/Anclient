@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    compileSdk 30
+    compileSdk 31
 
     defaultConfig {
-        minSdk 21
-        targetSdk 30
+        minSdk 26
+        targetSdk 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -38,10 +38,18 @@ dependencies {
     implementation "com.github.bumptech.glide:annotations:$glide_version"
     annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
     implementation "com.bm.photoview:library:$bm_photoview_version"
+    implementation 'pub.devrel:easypermissions:3.0.0'
 
-    implementation group: 'io.github.odys-z', name: 'semantic.jserv', version: '1.3.3-SNAPSHOT'
+    implementation group: 'io.github.odys-z', name: 'semantic.jserv', version: "$jserv_ver"
+    implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver")
+//    {
+//        exclude group: "org.apache.tika", module: "tika-core"
+//        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
+//    }
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    implementation project(':albumtier')
 }

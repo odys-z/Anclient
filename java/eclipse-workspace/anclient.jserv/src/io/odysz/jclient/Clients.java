@@ -7,9 +7,11 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
+import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
@@ -21,28 +23,32 @@ import io.odysz.semantics.x.SemanticException;
  * @author Ody Zhou
  */
 public class Clients {
-	public static final boolean verbose = true;
+	@FunctionalInterface
+	public interface OnLogin { void ok(SessionClient client); }
+
+	public static boolean verbose = true;
 
 	public static String servRt;
 
 	/**Initialize configuration.
 	 * @param servRoot
 	 */
-	public static void init(String servRoot) {
+	public static void init(String servRoot, boolean ... enableVerbose) {
 		servRt = servRoot;
-		// conn = null; // client can't control engine connect. configured in workflow-meta.xml
+		verbose = enableVerbose != null && enableVerbose.length > 0 ? enableVerbose[0] == true : false;
 	}
 	
 	/**Login and return a client instance (with session managed by jserv).
 	 * @param uid
 	 * @param pswdPlain
+	 * @param mac  client device name
 	 * @return null if failed, a SessionClient instance if login succeed.
 	 * @throws SemanticException Request can not parsed correctly 
 	 * @throws GeneralSecurityException  encrypting password error
 	 * @throws SsException 
 	 * @throws Exception, most likely the network failed
 	 */
-	public static SessionClient login(String uid, String pswdPlain)
+	public static SessionClient login(String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, GeneralSecurityException, AnsonException, SsException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
@@ -51,28 +57,10 @@ public class Clients {
 		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 		
 		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
-		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
+		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
 
 		HttpServClient httpClient = new HttpServClient();
 		String url = servUrl(Port.session);
-		/*
-			SessionClient[] inst = new SessionClient[1]; 
-			httpClient.post(url, reqv11, (code, msg) -> {
-					if (AnsonMsg.MsgCode.ok == code) {
-						// create a logged in client
-						inst[0] = new SessionClient(((AnSessionResp) msg).ssInf());
-
-						if (Clients.console)
-							Utils.logi(msg.toString());
-					}
-					else throw new SemanticException(
-							"loging failed\ncode: %s\nerror: %s",
-							code, ((AnsonResp)msg).msg());
-				});
-  		if (inst[0] == null)
-  			throw new IOException("HttpServClient return null client.");
-  		return inst[0];
-  		*/
 
 		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
 		if (Clients.verbose)
@@ -84,6 +72,40 @@ public class Clients {
 		else throw new SsException(
 				"loging failed\ncode: %s\nerror: %s",
 				resp.code(), ((AnsonResp)resp.body(0)).msg());
+	}
+	
+	public static void loginAsync(String uid, String pswdPlain, OnLogin onOk, OnError onErr, String... mac) {
+		new Thread(new Runnable() {
+	        public void run() {
+	            // final Bitmap bitmap = processBitMap("image.png");
+				byte[] iv =   AESHelper.getRandom();
+				String iv64 = AESHelper.encode64(iv);
+				if (uid == null || pswdPlain == null)
+					onErr.err(MsgCode.exGeneral, "user id and password can not be null.");
+				try {
+					String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+					
+					// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
+					AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
+
+					HttpServClient httpClient = new HttpServClient();
+					String url = servUrl(Port.session);
+
+					AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
+					if (Clients.verbose)
+						Utils.logi(resp.toString());
+
+					if (AnsonMsg.MsgCode.ok == resp.code()) {
+						onOk.ok(new SessionClient(((AnSessionResp) resp.body(0)).ssInf()));
+					}
+					else 
+						onErr.err(resp.code(), "loging failed\ncode: %s\nerror: %s", resp.code().name(), ((AnsonResp)resp.body(0)).msg());	
+				} catch (SemanticException | IOException | AnsonException | GeneralSecurityException e) {
+					onErr.err(MsgCode.exIo, "Netwrok or server failed\nerror: %s %s", e.getClass().getName(), e.getMessage());	
+					e.printStackTrace();
+				}
+	        }
+	    }).start();
 	}
 	
 	/**Helper for generate serv url (with configured server root and db connection ID).

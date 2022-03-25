@@ -58,7 +58,7 @@ public class AnsonClientTest {
 
     	Clients.init(jserv);
     	errCtx = new ErrorCtx() {
-    		public void onError(MsgCode code, AnsonResp resp) throws SemanticException {
+    		public void onError(MsgCode code, AnsonResp resp) {
     			fail(String.format("code: %s\nmsg: %s", resp.msg()));
     		}
     	};

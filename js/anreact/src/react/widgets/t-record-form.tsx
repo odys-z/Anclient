@@ -10,7 +10,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, Semantier, TierComboField, Tierec } from '@anclient/semantier-st';
+import { AnlistColAttrs, Semantier, TierComboField, Tierec, toBool } from '@anclient/semantier-st';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { DatasetCombo } from './dataset-combo';
