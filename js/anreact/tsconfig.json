@@ -4,11 +4,12 @@
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "target": "es5",
+    "target": "es2015",
     "outDir": "ts",
 
     "jsx": "react",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "moduleResolution": "node"
   },
   "exclude": [ "dist", "*.ts", "ts/*", "*.tsx" ]
 }

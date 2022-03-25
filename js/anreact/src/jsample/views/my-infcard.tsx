@@ -72,7 +72,10 @@ class MyInfCardComp extends DetailFormW<MyInfProps> {
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('OK')} cancel={false} open
-				onClose={() => {that.confirm = undefined;} }
+				onClose={() => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
 				msg={msg} />);
 		this.setState({});
 	}
@@ -148,7 +151,7 @@ export class MyInfTier extends Semantier {
 		{ field: 'roleId',   label: L('Role'), disabled: true,
 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, fieldFormatter: this.loadAvatar }
+		{ field: this.imgProp, label: L('Avatar'), grid: {sm: 6, lg: 4}, fieldFormatter: this.loadAvatar }
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	/**
@@ -217,13 +220,12 @@ export class MyInfTier extends Semantier {
 		// about attached image:
 		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
 		if ( rec.attId )
-			// NOTE this is a design erro
+			// NOTE this is a design error
 			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
 			//          2. delete saved attId file (trigged by semantic handler)
-			req.Body().post(
-					new DeleteReq(this.uri, "a_attaches", rec.attId as string))
-				.post(
-					new DeleteReq(this.uri, "a_attaches", undefined)
+			req.Body()
+				.post( new DeleteReq(this.uri, "a_attaches", ["attId", rec.attId as string]))
+				.post( new DeleteReq(this.uri, "a_attaches", undefined)
 						.whereEq('busiId', rec[this.pkval.pk] as string || '')
 					 	.whereEq('busiTbl', this.mtabl));
 		if ( rec[this.imgProp] ) {
