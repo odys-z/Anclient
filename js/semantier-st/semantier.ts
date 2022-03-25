@@ -371,7 +371,7 @@ export class Semantier {
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
-							new UpdateReq( uri, this.mtabl, this.pkval.v)
+							new UpdateReq( uri, this.mtabl, this.pkval)
 							.record(this.rec, this.pkval.pk) );
 			}
 		}
