@@ -11,9 +11,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/albumtier" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/file-picker" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -3,9 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/example.android.iml" filepath="$PROJECT_DIR$/.idea/example.android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/albumtier/example.android.albumtier.iml" filepath="$PROJECT_DIR$/.idea/modules/albumtier/example.android.albumtier.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/example.android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/example.android.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/file-picker/example.android.file-picker.iml" filepath="$PROJECT_DIR$/.idea/modules/file-picker/example.android.file-picker.iml" />
     </modules>
   </component>
 </project>
