@@ -730,7 +730,7 @@ export class UpdateReq extends AnsonBody {
      * @param pkv conditions for pk.<br>
      * If pk is null, use this object's where_() | whereEq() | whereCond().
      */
-    constructor(uri: string, tabl: string, pkv: string) {
+    constructor(uri: string, tabl: string, pkv: string[] | PkMeta) {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
