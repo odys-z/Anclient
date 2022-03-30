@@ -154,7 +154,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\csharp\anclient\anclient.net\anclient.net.csproj">
+    <ProjectReference Include="..\..\..\csharp\anclient\anclient.net\anclient.net.csproj">
       <Project>{327ae5aa-030c-4782-80e3-c2951f12f93e}</Project>
       <Name>anclient.net</Name>
     </ProjectReference>

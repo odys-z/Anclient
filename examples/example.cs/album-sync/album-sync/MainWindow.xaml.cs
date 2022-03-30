@@ -25,7 +25,7 @@ namespace TreeViewFileExplorer
             Cursor = Cursors.Arrow;
         }
 
-        private void FileSystemObject_BeforeExplore(object sender, System.EventArgs e)
+        private void FileSystemObject_BeforeExplore(object sender, EventArgs e)
         {
             Cursor = Cursors.Wait;
         }

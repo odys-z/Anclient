@@ -6,21 +6,41 @@
         xmlns:local="clr-namespace:TreeViewFileExplorer"
         xmlns:classes="clr-namespace:TreeViewFileExplorer.ShellClasses"
         mc:Ignorable="d"
-        Title="TreeView File Explorer for Windows (by Michael Pendon)" Height="450" Width="800">
-    <TreeView Name="treeView" Margin="5">
-        <TreeView.ItemContainerStyle>
-            <Style TargetType="{x:Type TreeViewItem}">
-                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
-            </Style>
-        </TreeView.ItemContainerStyle>
-        <TreeView.Resources>
-            <HierarchicalDataTemplate DataType="{x:Type classes:FileSystemObjectInfo}" ItemsSource="{Binding Path=Children}">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="{Binding Path=ImageSource, UpdateSourceTrigger=PropertyChanged}" Margin="0,1,8,1"></Image>
-                    <TextBlock Text="{Binding Path=FileSystemInfo.Name}"></TextBlock>
+        Title="TreeView File Explorer for Windows (by Michael Pendon)" Height="800" Width="1280" Icon="res/ic_launcher.png" WindowState="Maximized">
+    <Grid>
+        <Grid.ColumnDefinitions >
+            <ColumnDefinition MinWidth="100" Width="400" />
+            <ColumnDefinition Width="2" />
+            <ColumnDefinition MinWidth="200" Width="*" />
+        </Grid.ColumnDefinitions>
+        <TreeView Name="treeView" Margin="5" Grid.Column="0">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type classes:FileSystemObjectInfo}" ItemsSource="{Binding Path=Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Path=ImageSource, UpdateSourceTrigger=PropertyChanged}" Margin="0,1,8,1"></Image>
+                        <CheckBox x:Name="selected" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding Path=FileSystemInfo.Name}"></TextBlock>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
+        <StackPanel Grid.Column="2" >
+            <ToolBar >
+              <Button x:Name="btUpload" Height="32" Cursor="ArrowCD" >
+                  <StackPanel Orientation="Horizontal" Width="110" >
+                      <Image Source="res\ic_launcher.png" />
+                      <TextBlock Margin="5">Synchronize</TextBlock>
                 </StackPanel>
-            </HierarchicalDataTemplate>
-        </TreeView.Resources>
-    </TreeView>
+              </Button>
+            </ToolBar>
+            <ListView />
+        </StackPanel>
+    </Grid>
 </Window>
