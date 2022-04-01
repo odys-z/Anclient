@@ -221,7 +221,7 @@ export class MyInfTier extends Semantier {
 			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
 			//          2. delete saved attId file (trigged by semantic handler)
 			req.Body().post(
-					new DeleteReq(this.uri, "a_attaches", rec.attId as string))
+					new DeleteReq(this.uri, "a_attaches", [this.pkval.pk, rec.attId]))
 				.post(
 					new DeleteReq(this.uri, "a_attaches", undefined)
 						.whereEq('busiId', rec[this.pkval.pk] as string || '')
