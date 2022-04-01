@@ -13,12 +13,7 @@ public interface ErrorCtx {
 
 	public default String msg () { return ""; };
 
-//	public default void onError(MsgCode code, AnsonResp obj) {
-//		// throw new SemanticException(obj.msg());
-//	}
-
 	public default void onError(MsgCode code, String msg) {
-		// throw new SemanticException(msg, args);
 	}
 
 	public default ErrorCtx setSignal(String signal) { return this; };

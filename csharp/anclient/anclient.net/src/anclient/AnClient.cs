@@ -4,13 +4,12 @@ using io.odysz.semantic.jprotocol;
 using io.odysz.semantic.jsession;
 using io.odysz.semantics.x;
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.anclient
 {
-    public class Clients
+    public class AnClient
     {
 		public const bool console = true;
 
@@ -19,7 +18,6 @@ namespace io.odysz.anclient
 		/// <summary> DB connection ID. same in connects.xml/t/C/id at server side.
 		/// </summary>
 		private static string conn;
-
 
 		/// <summary>Initialize configuration.
 		/// </summary>
@@ -43,7 +41,7 @@ namespace io.odysz.anclient
 		/// <throws>SemanticException Request can not parsed correctly</throws> 
 		/// <throws>GeneralSecurityException  other error</throws> 
 		/// <throws>Exception, most likely the network failed</throws> 
-		public static async Task<AnsonClient> Login(string uid, string pswdPlain, Action<int, AnSessionResp> onlogin = null, Action<int, AnsonResp> onerror = null)
+		public static async Task<SessionClient> Login(string uid, string pswdPlain, Action<int, AnSessionResp> onlogin = null, Action<int, AnsonResp> onerror = null)
 		{
             byte[] iv = AESHelper.getRandom();
             string iv64 = AESHelper.Encode64(iv);
@@ -59,17 +57,17 @@ namespace io.odysz.anclient
             string url = ServUrl(new Port(Port.session));
             HttpServClient httpClient = new HttpServClient();
 
-            AnsonClient[] inst = new AnsonClient[1];
+            SessionClient[] inst = new SessionClient[1];
             AnsonMsg msg = await httpClient.Post(url, reqv11);
             MsgCode code = msg.code;
 
             if (code != null && MsgCode.ok == code.code) {
                 // create a logged in client
-                inst[0] = new AnsonClient(((AnSessionResp) msg.Body()[0]).ssInf);
+                inst[0] = new SessionClient(((AnSessionResp) msg.Body()[0]).ssInf);
                 if (onlogin != null)
                     onlogin(code.code, (AnSessionResp)msg.Body()[0]);
 
-                if (Clients.console)
+                if (AnClient.console)
                     Console.WriteLine(msg.ToString());
             }
             else if (onerror != null)

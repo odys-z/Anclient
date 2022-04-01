@@ -32,16 +32,4 @@ public class Semantier {
 
     /** All sub table's relationships */
     Tierelations relMeta;
-
-    /** currrent relation table - wrong */
-    // reltabl: string;
-
-    /** current relations - the last loaded relation of this.rel (problem?)
-	 * 
-	 * Looks like all relationship records are item of main tree. 
-    UIRelations rels; //: = {};
-
-    QueryConditions lastCondit;
-	 */
-
 }

@@ -28,7 +28,6 @@ namespace io.odysz.common
             byte[] iv = new byte[16];
             try
             {
-                    
                 random.NextBytes(iv);
                 return iv;
             }

@@ -19,11 +19,11 @@ namespace io.odysz.anclient
         private const string jserv = "http://192.168.0.201:8080/jserv-sample";
         private const string pswd = "----------123456"; // TODO needing 16/32 padding
         private const string uid =  "admin";
-        private static AnsonClient client;
+        private static SessionClient client;
 
         static ClientsTests()
         {
-            Clients.Init(jserv);
+            AnClient.Init(jserv);
         }
 
         [TestMethod()]
@@ -32,13 +32,13 @@ namespace io.odysz.anclient
             await Login();
         }
 
-        internal async Task Login(Action<AnsonClient, AnsonResp> onLogin = null) {
+        internal async Task Login(Action<SessionClient, AnsonResp> onLogin = null) {
             bool succeed = false;
-            await Clients.Login(uid, pswd,
+            await AnClient.Login(uid, pswd,
                 (code, resp) =>
                 {
                     succeed = true;
-                    client = new AnsonClient(resp.ssInf);
+                    client = new SessionClient(resp.ssInf);
                     Assert.AreEqual(uid, resp.ssInf.uid);
                     Assert.IsNotNull(resp.ssInf.ssid);
                     if (onLogin != null)
@@ -92,7 +92,7 @@ namespace io.odysz.anclient
             }
             finally { waker.Dispose(); }
         }
-        static void UploadTransaction(CancellationTokenSource waker, AnsonClient client, string p)
+        static void UploadTransaction(CancellationTokenSource waker, SessionClient client, string p)
         {
             // string p = Path.get(filename);
             byte[] f = File.ReadAllBytes(p);

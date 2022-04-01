@@ -8,15 +8,19 @@ namespace io.odysz.semantics.x
 	{
 		public SemanticObject ex { get; set; }
 
-		public SemanticException(string format, params object[] args)
+		public SemanticException(string format, object[] args)
 			: base(format, args)
-		{
-		}
-		public SemanticException(string message, Exception innerException) : base(message, innerException)
-		{
-		}
+		{ }
 
-		//protected SemanticException(SerializationInfo info, StreamingContext context)
-		//	: base(info, context) { }
-	}
+        public SemanticException(string message, object arg = null)
+			: base(message, new object[] { arg })
+        { } 
+
+        public SemanticException(string format, object arg1, object arg2)
+			: base(format, new object[] {arg1, arg2}) 
+		{ }
+        public SemanticException(string format, object arg1, object arg2, object arg3, object arg4 = null)
+			: base(format, new object[] {arg1, arg2, arg3, arg4}) 
+		{ }
+    }
 }

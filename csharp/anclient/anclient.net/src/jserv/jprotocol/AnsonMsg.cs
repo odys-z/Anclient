@@ -3,7 +3,6 @@ using io.odysz.semantics.x;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 
 namespace io.odysz.semantic.jprotocol
 {
@@ -29,7 +28,7 @@ namespace io.odysz.semantic.jprotocol
 		/// </remarks>
 		/// <author>odys-z@github.com</author>
 		[Serializable]
-		public sealed class Port : IPort
+		public class Port : IPort
 		{
 			/// <summary>ping.serv11</summary>
 			public const int heartbeat = 0;
@@ -120,7 +119,7 @@ namespace io.odysz.semantic.jprotocol
 
 			static public int valof(string pname)
 			{
-				return pname == "haartbeat" ? Port.heartbeat
+				return pname == "heartbeat" ? Port.heartbeat
 					: pname == "session" ? Port.session
 					: pname == "query" ? Port.query
 					: pname == "update" ? Port.update
@@ -133,6 +132,7 @@ namespace io.odysz.semantic.jprotocol
 					: pname == "dataset" ? Port.dataset
 					: Port.NA;
 			}
+
 			static public string nameof(int port)
 			{
 				return port == Port.heartbeat ? "heartbeat"
@@ -153,20 +153,9 @@ namespace io.odysz.semantic.jprotocol
 			{
 				throw new NotImplementedException("FIXME this translation shouldn't happen at client side.");
 			}
-			//{	// FIXME this translation shouldn't happen at client side
-			//	return pname == "ping.serv11" ? new Port(IPort.heartbeat)
-			//		: pname == "login.serv11" ? new Port(IPort.session)
-			//		: pname == "r.serv11" ? new Port(IPort.query)
-			//		: pname == "u.serv11" ? new Port(IPort.update)
-			//		: pname == "c.serv11" ? new Port(IPort.insert)
-			//		: pname == "d.serv11" ? new Port(IPort.delete)
-			//		: pname == "echo.serv11" ? new Port(IPort.echo)
-			//		: pname == "file.serv" ? new Port(IPort.file)
-			//		: pname == "user.serv11" ? new Port(IPort.user)
-			//		: pname == "s-tree.serv11" ? new Port(IPort.stree)
-			//		: pname == "ds.serv11" ? new Port(IPort.dataset)
-			//		: new Port(IPort.NA);
-			public string Url() {
+
+			public string Url()
+			{
 				return _port == heartbeat ? "ping.serv11"
                     : _port == session ? "login.serv11"
                     : _port == query ? "r.serv11"
@@ -179,8 +168,7 @@ namespace io.odysz.semantic.jprotocol
                     : _port == stree ? "s-tree.serv11"
                     : _port == dataset ? "ds.serv11"
                     : "unknown.serv";
-        }
-
+			}
 
             public IJsonable ToBlock(Stream stream, anson.JsonOpt opts = null)
             {

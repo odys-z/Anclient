@@ -187,12 +187,12 @@ namespace io.odysz.semantic.jserv.R
 		/// <param name="conn"/>
 		/// <param name="parent"/>
 		/// <param name="from"></param>
-		/// <param name="as"></param>
+		/// <param name="asTabl"></param>
 		/// <returns>query request</returns>
-		public static AnQueryReq formatReq(string conn, AnsonMsg parent, string from, params string[] @as)
+		public static AnQueryReq formatReq(string conn, AnsonMsg parent, string from, params string[] asTabl)
 		{
 			AnQueryReq bdItem = new AnQueryReq
-				(parent, conn, from, @as == null || @as.Length == 0 ? null : @as[0]);
+				(parent, conn, from, asTabl == null || asTabl.Length == 0 ? null : asTabl[0]);
 			return bdItem;
 		}
 

@@ -20,6 +20,8 @@ import io.odysz.semantics.x.SemanticException;
 
 /**Anclient.jave raw api - jserv protocol handler
  * 
+ * <p>js equivalent: AnClient</p>
+ * 
  * @author Ody Zhou
  */
 public class Clients {
