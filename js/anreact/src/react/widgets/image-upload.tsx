@@ -75,7 +75,7 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 				if (that.props.tier && that.field.field) {
 					that.props.tier.rec[that.field.field] = reader.result;
 					that.props.tier.rec.fileMeta = {
-						mime: mimeOf( reader.result ),
+						mime: mimeOf( reader.result as string ),
 						name: file.name};
 				}
 			}
