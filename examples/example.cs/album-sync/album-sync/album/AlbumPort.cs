@@ -9,9 +9,7 @@ namespace io.oz.album {
 
 /**Sample project's prots extension
  * This enum replaced jserv {@link io.odysz.semantic.jprotocol.AnsonMsg.Port}. */
-public class AlbumPort : Port, IJsonable {
-	// public const string heartbeat = "ping.serv";
-	// public const string session = "login.serv11";
+public class AlbumPort : IPort {
 
 	/** users.less */
 	public const string userstier = "users.less";
@@ -20,21 +18,26 @@ public class AlbumPort : Port, IJsonable {
 	/** album.less */
 	public const string album = "album.less";
 
-	//public static AlbumPort() {
-	//	JSONAnsonListener.registFactory(AlbumPort.class,
-	//		(s) -> {
-	//			return AlbumPort.valueOf(s);
-	//		});
-	//}
+    class AlbumPortFactory : JsonableFactory
+    {
+        public IJsonable fromJson(string p) {
+            return new AlbumPort(p);
+        }
+    }
 
-	// private string url;
-	public AlbumPort(string v) : base(v) { }
-	public AlbumPort(int port) : base(port) { }
+    static AlbumPort()
+    {
+        JSONAnsonListener.registFactory(typeof(AlbumPort), new AlbumPortFactory());
+	}
+
+	public AlbumPort(int port) {
+            this.port = port;
+    }
 
 	// public string Url() { return url; }
 
-	static IPort valof(string pname) {override 
-        int p = Port.valof(pname);
+	static IPort valof(string pname) { 
+        int p = Port.valueof(pname);
         if (p >= 0) return new AlbumPort(p);
 		return AlbumPort.valueOf(pname);
 	}
@@ -42,7 +45,7 @@ public class AlbumPort : Port, IJsonable {
 	public override IJsonable toBlock(Stream stream, JsonOpt opts = null) {
 		stream.WriteByte((byte)'\"');
 		// stream.write(url.getBytes());
-		stream.Write(name().getBytes());
+		stream.Write(nameOf(port).getBytes());
 
 		stream.WriteByte((byte)'\"');
 		return this;

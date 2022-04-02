@@ -1,6 +1,8 @@
 ﻿using anclient.net.jserv.tier;
 using io.odysz.anclient;
 using io.odysz.semantic.jprotocol;
+using io.odysz.semantic.jsession;
+using io.odysz.semantic.tier.docs;
 using io.oz.album;
 using io.oz.album.tier;
 using System;
@@ -9,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
 using static io.oz.album.tier.AlbumReq;
 
@@ -36,7 +39,7 @@ namespace album_sync.album.tier
             this.clientUri = clientUri;
         }
 
-        public AlbumResp getCollect(String collectId) {
+        public AlbumResp getCollect(string collectId) {
             AlbumReq req = new AlbumReq(clientUri).CollectId("c-001");
             req.A(A.collect);
                 AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), null, req);
@@ -45,150 +48,143 @@ namespace album_sync.album.tier
 
         public AlbumClientier getSettings(OnOk onOk, OnError onErr)
         {
-            new Thread(new Runnable()
+            Task.Run(() =>
             {
-                public void run()
-                {
                     try
                     {
-                        String[] act = AnsonHeader.usrAct("album.java", "profile", "r/settings", "load profile");
-                        AnsonHeader header = client.header().act(act);
+                        AnsonHeader header = client.Header().UsrAct("album.java", "profile", "r/settings", "load profile");// act(act);
 
                         AlbumReq req = new AlbumReq(clientUri);
-                        req.a(A.getPrefs);
-                        AnsonMsg<AlbumReq> q = client.< AlbumReq > userReq(clientUri, AlbumPort.album, req)
-                                .header(header);
-                        AnsonResp resp = client.commit(q, errCtx);
+                        req.A(A.getPrefs);
+                        AnsonMsg q = client
+									.UserReq(new AlbumPort(AlbumPort.album), null, req)
+									.Header(header);
+
+                        AnsonResp resp = client.Commit(q, onOk, onErr);
                         onOk.ok(resp);
                     }
                     catch (Exception e)
                     {
                         onErr.err(MsgCode.exIo, "%s\n%s", e.GetType().Name, e.Message);
                     }
-                } } ).start();
+                } );
 
             return this;
 		}
 	
-        public AlbumClientier asyncVideos(List<? extends IFileDescriptor> videos, SessionInf user, OnProcess onProc, OnOk onOk, OnError onErr)
+        public AlbumClientier asyncVideos(List videos, SessionInf user, OnProcess onProc, OnOk onOk, OnError onErr)
         {
-            new Thread(new Runnable()
-            {
-                public void run()
+            Task.Run( () =>
             {
                 try
                 {
                     ArrayList reslts = syncVideos(videos, user, onProc);
                     DocsResp resp = new DocsResp();
-                    resp.data().put("results", reslts);
+                    resp.Data().Put("results", reslts);
                     onOk.ok(resp);
                 }
-                catch (IOException e)
+                catch (Exception e)
                 {
-                    onErr.err(MsgCode.exIo, clientUri, e.getClass().getName(), e.getMessage());
-                }
-                catch (AnsonException | SemanticException e) {
-            onErr.err(MsgCode.exGeneral, clientUri, e.getClass().getName(), e.getMessage());
-            }
-                } } ).start();
-        return this;
+                    onErr.err(MsgCode.exIo, clientUri, e.GetType().Name, e.Message);
+                } );
+            return this;
         }
 	
-	public List<DocsResp> syncVideos(List<? extends IFileDescriptor> videos, SessionInf user, OnProcess proc, ErrorCtx...onErr)
-{
-	ErrorCtx errHandler = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
+	public List syncVideos(List videos, SessionInf user, OnProcess proc, ErrorCtx onErr = null)
+    {
+        ErrorCtx errHandler = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
 
-	DocsResp resp = null;
-	try
-	{
-		String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-		AnsonHeader header = client.header().act(act);
+        DocsResp resp = null;
+        try
+        {
+            String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
+            AnsonHeader header = client.header().act(act);
 
-		List<DocsResp> reslts = new ArrayList<DocsResp>(videos.size());
+            List<DocsResp> reslts = new ArrayList<DocsResp>(videos.size());
 
-		for (int px = 0; px < videos.size(); px++)
-		{
+            for (int px = 0; px < videos.size(); px++)
+            {
 
-			IFileDescriptor p = videos.get(px);
-			DocsReq req = new DocsReq()
-					.blockStart(p, user);
+                IFileDescriptor p = videos.get(px);
+                DocsReq req = new DocsReq()
+                        .blockStart(p, user);
 
-			AnsonMsg<DocsReq> q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
-									.header(header);
+                AnsonMsg<DocsReq> q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
+                                        .header(header);
 
-			resp = client.commit(q, errHandler);
-			// String chainId = resp.chainId();
-			String pth = p.fullpath();
-			if (!pth.equals(resp.fullpath()))
-				Utils.warn("resp not reply with exactly the same path: %s", resp.fullpath());
+                resp = client.commit(q, errHandler);
+                // stringchainId = resp.chainId();
+                stringpth = p.fullpath();
+                if (!pth.equals(resp.fullpath()))
+                    Utils.warn("resp not reply with exactly the same path: %s", resp.fullpath());
 
-			int totalBlocks = (int)((Files.size(Paths.get(pth)) + 1) / blocksize);
-			if (proc != null) proc.proc(px, totalBlocks, resp);
+                int totalBlocks = (int)((Files.size(Paths.get(pth)) + 1) / blocksize);
+                if (proc != null) proc.proc(px, totalBlocks, resp);
 
-			int seq = 0;
-			FileInputStream ifs = new FileInputStream(new File(p.fullpath()));
-			try
-			{
-				String b64 = AESHelper.encode64(ifs, blocksize);
-				while (b64 != null)
-				{
-					req = new DocsReq().blockUp(seq, resp, b64, user);
-					// req.a(DocsReq.A.blockUp);
-					seq++;
+                int seq = 0;
+                FileInputStream ifs = new FileInputStream(new File(p.fullpath()));
+                try
+                {
+                    stringb64 = AESHelper.encode64(ifs, blocksize);
+                    while (b64 != null)
+                    {
+                        req = new DocsReq().blockUp(seq, resp, b64, user);
+                        // req.a(DocsReq.A.blockUp);
+                        seq++;
 
-					q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
-								.header(header);
+                        q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
+                                    .header(header);
 
-					resp = client.commit(q, errHandler);
-					if (proc != null) proc.proc(px, totalBlocks, resp);
+                        resp = client.commit(q, errHandler);
+                        if (proc != null) proc.proc(px, totalBlocks, resp);
 
-					b64 = AESHelper.encode64(ifs, blocksize);
-				}
-				req = new DocsReq().blockEnd(resp, user);
-				// req.a(DocsReq.A.blockEnd);
-				q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
-							.header(header);
-				resp = client.commit(q, errHandler);
-				if (proc != null) proc.proc(px, totalBlocks, resp);
-			}
-			catch (Exception ex)
-			{
-				Utils.warn(ex.getMessage());
+                        b64 = AESHelper.encode64(ifs, blocksize);
+                    }
+                    req = new DocsReq().blockEnd(resp, user);
+                    // req.a(DocsReq.A.blockEnd);
+                    q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
+                                .header(header);
+                    resp = client.commit(q, errHandler);
+                    if (proc != null) proc.proc(px, totalBlocks, resp);
+                }
+                catch (Exception ex)
+                {
+                    Utils.warn(ex.getMessage());
 
-				req = new DocsReq().blockAbort(resp, user);
-				req.a(DocsReq.A.blockAbort);
-				q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
-							.header(header);
-				resp = client.commit(q, errHandler);
-				if (proc != null) proc.proc(px, totalBlocks, resp);
+                    req = new DocsReq().blockAbort(resp, user);
+                    req.a(DocsReq.A.blockAbort);
+                    q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
+                                .header(header);
+                    resp = client.commit(q, errHandler);
+                    if (proc != null) proc.proc(px, totalBlocks, resp);
 
-				throw ex;
-			}
-			finally { ifs.close(); }
+                    throw ex;
+                }
+                finally { ifs.close(); }
 
-			reslts.add(resp);
-		}
+                reslts.add(resp);
+            }
 
-		return reslts;
+            return reslts;
+        }
+        catch (IOException e)
+        {
+            errHandler.onError(MsgCode.exIo, e.getClass().getName() + " " + e.getMessage());
+        }
+        catch (AnsonException | SemanticException e) {
+        errHandler.onError(MsgCode.exGeneral, e.getClass().getName() + " " + e.getMessage());
+    }
+    return null;
 	}
-	catch (IOException e)
-	{
-		errHandler.onError(MsgCode.exIo, e.getClass().getName() + " " + e.getMessage());
-	}
-	catch (AnsonException | SemanticException e) {
-	errHandler.onError(MsgCode.exGeneral, e.getClass().getName() + " " + e.getMessage());
-}
-return null;
-	}
 
-	public String download(Photo photo, String localpath)
+	public stringdownload(Photo photo, stringlocalpath)
 			throws SemanticException, AnsonException, IOException {
 		AlbumReq req = new AlbumReq(clientUri).download(photo);
 req.a(A.download);
 return client.download(clientUri, AlbumPort.album, req, localpath);
 	}
 
-	public AlbumResp insertPhoto(String collId, String fullpath, String clientname)
+	public AlbumResp insertPhoto(stringcollId, stringfullpath, stringclientname)
 			throws SemanticException, IOException, AnsonException {
 
 		AlbumReq req = new AlbumReq(clientUri)
@@ -239,7 +235,7 @@ return client.commit(q, errCtx);
 
 			resp = client.commit(q, new ErrorCtx() {
 					@Override
-					public void onError(MsgCode code, String msg)
+					public void onError(MsgCode code, stringmsg)
 			{
 				onErr.err(code, msg);
 			}
@@ -317,7 +313,7 @@ return reslts;
 						// @Override public void onError(MsgCode code, AnsonResp obj) { onErr.err(code, obj.msg()); }
 
 						@Override
-						public void onError(MsgCode code, String msg)
+						public void onError(MsgCode code, stringmsg)
 	{
 		onErr.err(code, msg);
 	}
@@ -341,7 +337,7 @@ catch (AnsonException | SemanticException e) {
 	 * @param onErr
 	 * @return response
 	 */
-	public AlbumResp selectPhotoRec(String docId, ErrorCtx...onErr)
+	public AlbumResp selectPhotoRec(stringdocId, ErrorCtx...onErr)
     {
         ErrorCtx errHandler = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
         String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
@@ -373,7 +369,7 @@ catch (AnsonException | SemanticException e) {
             return this;
         }
 
-        public DocsResp del(String device, String clientpath)
+        public DocsResp del(stringdevice, stringclientpath)
         {
             AlbumReq req = new AlbumReq().del(device, clientpath);
 
