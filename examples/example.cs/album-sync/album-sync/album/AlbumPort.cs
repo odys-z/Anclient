@@ -1,65 +1,72 @@
 using io.odysz.anson;
 using io.odysz.semantic.jprotocol;
-using System;
 using System.IO;
 using System.Text;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.oz.album {
 
-/**Sample project's prots extension
- * This enum replaced jserv {@link io.odysz.semantic.jprotocol.AnsonMsg.Port}. */
-public class AlbumPort : IPort {
+    /**Sample project's prots extension
+     * This enum replaced jserv {@link io.odysz.semantic.jprotocol.AnsonMsg.Port}. */
+    public class AlbumPort : IPort, IJsonable {
 
-	/** users.less */
-	public const string userstier = "users.less";
-	/** editor.less */
-	public const string editor = "editor.less";
-	/** album.less */
-	public const string album = "album.less";
+        /** users.less */
+        public const int userstier = 81;
+        /** editor.less */
+        public const int editor = 82;
+        /** album.less */
+        public const int album = 83;
 
-    class AlbumPortFactory : JsonableFactory
-    {
-        public IJsonable fromJson(string p) {
+        class AlbumPortFactory : JsonableFactory
+        {
+            public IJsonable fromJson(string p) {
+                return new AlbumPort(AlbumPort.valueOf(p));
+            }
+        }
+
+        static AlbumPort()
+        {
+            JSONAnsonListener.registFactory(typeof(AlbumPort), new AlbumPortFactory());
+        }
+
+        private int port;
+        public AlbumPort(int port) {
+            this.port = port;
+        }
+
+        //string url;
+        //public string Url() { return url; }
+
+        public string name { get { return nameof(port); } }
+
+        static IPort valof(string pname) { 
+            int p = valueOf(pname);
             return new AlbumPort(p);
         }
-    }
 
-    static AlbumPort()
-    {
-        JSONAnsonListener.registFactory(typeof(AlbumPort), new AlbumPortFactory());
-	}
+        public IJsonable ToBlock(Stream stream, JsonOpt opts = null) {
+            stream.WriteByte((byte)'\"');
+            byte[] byts = Encoding.ASCII.GetBytes(nameOf(port));
+            stream.Write(byts, 0, 1);
 
-	public AlbumPort(int port) {
-            this.port = port;
-    }
+            stream.WriteByte((byte)'\"');
+            return this;
+        }
 
-	// public string Url() { return url; }
+        public IJsonable toJson(StringBuilder buf) {
+            buf.Append('\"');
+            buf.Append(nameOf(port));
+            buf.Append('\"');
+            return this;
+        }
 
-	static IPort valof(string pname) { 
-        int p = Port.valueof(pname);
-        if (p >= 0) return new AlbumPort(p);
-		return AlbumPort.valueOf(pname);
-	}
+    //public IJsonable ToBlock(Stream stream, JsonOpt opts = null)
+    //{
+    //    Utils.WriteStr(stream, name, true);
+    //    return this;
+    //}
 
-	public override IJsonable toBlock(Stream stream, JsonOpt opts = null) {
-		stream.WriteByte((byte)'\"');
-		// stream.write(url.getBytes());
-		stream.Write(nameOf(port).getBytes());
-
-		stream.WriteByte((byte)'\"');
-		return this;
-	}
-
-	public override IJsonable toJson(StringBuilder buf) {
-		buf.Append('\"');
-		// buf.append(url);
-		buf.Append(nameOf(p));
-		buf.Append('\"');
-		return this;
-	}
-
-	static public AlbumPort valueOf(string pname)
+	static public int valueOf(string pname)
     {
         int p = pname == "heartbeat" ? Port.heartbeat
             : pname == "session" ? Port.session
@@ -73,7 +80,7 @@ public class AlbumPort : IPort {
             : pname == "stree" || pname == "s-tree" ? Port.stree
             : pname == "dataset" ? Port.dataset
             : Port.NA;
-		return new AlbumPort(p);
+        return p;
     }
 
     static public string nameOf(int port)

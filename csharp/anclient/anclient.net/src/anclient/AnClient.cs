@@ -9,6 +9,10 @@ using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.anclient
 {
+    public interface OnLogin {
+        void ok(SessionClient client);
+    }
+
     public class AnClient
     {
 		public const bool console = true;
@@ -41,7 +45,7 @@ namespace io.odysz.anclient
 		/// <throws>SemanticException Request can not parsed correctly</throws> 
 		/// <throws>GeneralSecurityException  other error</throws> 
 		/// <throws>Exception, most likely the network failed</throws> 
-		public static async Task<SessionClient> Login(string uid, string pswdPlain, Action<int, AnSessionResp> onlogin = null, Action<int, AnsonResp> onerror = null)
+		public static async Task<SessionClient> Login(string uid, string pswdPlain, OnLogin onlogin = null, OnError onerror = null)
 		{
             byte[] iv = AESHelper.getRandom();
             string iv64 = AESHelper.Encode64(iv);
@@ -65,7 +69,7 @@ namespace io.odysz.anclient
                 // create a logged in client
                 inst[0] = new SessionClient(((AnSessionResp) msg.Body()[0]).ssInf);
                 if (onlogin != null)
-                    onlogin(code.code, (AnSessionResp)msg.Body()[0]);
+                    onlogin.ok(new SessionClient(((AnSessionResp)msg.Body()[0]).ssInf));
 
                 if (AnClient.console)
                     Console.WriteLine(msg.ToString());
@@ -83,7 +87,7 @@ namespace io.odysz.anclient
         /// <return>url, e.g. http://localhost:8080/query.serv?conn=null </return> 
         public static string ServUrl(Port port)
         {
-            return string.Format("{0:S}/{1:S}?conn={2:S}", servRt, port.Url(), conn);
+            return string.Format("{0:S}/{1:S}?conn={2:S}", servRt, port.url(), conn);
         }
 
     }
