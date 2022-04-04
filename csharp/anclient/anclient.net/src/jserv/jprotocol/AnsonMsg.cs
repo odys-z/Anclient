@@ -134,7 +134,7 @@ namespace io.odysz.semantic.jprotocol
 					: "NA";
 			}
 
-            public string url()
+            public string Url()
 			{
 				return port == heartbeat ? "ping.serv"
                     : port == session ? "login.serv11"

@@ -34,5 +34,14 @@ namespace io.odysz.anclient
         {
             Console.Error.WriteLine(info);
         }
+        public static void Warn(string info, object arg1, object arg2 = null)
+        {
+            Console.Error.WriteLine(string.Format(info, arg1, arg2));
+        }
+
+        public static void Warn(string info, object arg1, object arg2, object arg3, object arg4 = null)
+        {
+            Console.Error.WriteLine(string.Format(info, arg1, arg2, arg3, arg4));
+        }
     }
 }

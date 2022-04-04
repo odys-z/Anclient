@@ -23,10 +23,19 @@ namespace io.odysz.semantic.jprotocol
 		/// </summary>
 		protected string a { get; set; }
 
-        /// <summary>
-        /// @return Action: login | C | R | U | D | any serv extension
-        /// </summary>
-        public string A() { return a; }
+		protected string uri;
+		public string Uri() { return uri; }
+		public AnsonBody Uri(string uri)
+		{
+			if (this.uri == null)
+				this.uri = uri;
+			return this;
+		}
+
+		/// <summary>
+		/// @return Action: login | C | R | U | D | any serv extension
+		/// </summary>
+		public string A() { return a; }
 
         public AnsonBody A(string act)
         {

@@ -1,11 +1,12 @@
 ﻿using io.odysz.anson;
+using io.odysz.semantic.jprotocol;
 using io.odysz.tier;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace io.oz.album.tier
 {
-    class AlbumResp : Anson
+    class AlbumResp : AnsonResp
     {
 		protected string albumId;
 		protected string ownerId;

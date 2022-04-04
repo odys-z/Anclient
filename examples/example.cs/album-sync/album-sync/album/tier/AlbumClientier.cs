@@ -1,18 +1,20 @@
 ﻿using anclient.net.jserv.tier;
 using io.odysz.anclient;
+using io.odysz.common;
 using io.odysz.semantic.jprotocol;
 using io.odysz.semantic.jsession;
 using io.odysz.semantic.tier.docs;
+using io.odysz.semantics.x;
+using io.odysz.tier;
 using io.oz.album;
 using io.oz.album.tier;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Documents;
+using TestAnson.net.semantics.io.odysz.x;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
+using static io.odysz.semantic.jprotocol.JProtocol;
 using static io.oz.album.tier.AlbumReq;
 
 namespace album_sync.album.tier
@@ -43,7 +45,7 @@ namespace album_sync.album.tier
             AlbumReq req = new AlbumReq(clientUri).CollectId("c-001");
             req.A(A.collect);
                 AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), null, req);
-                return client.Commit(q, errCtx);
+            return (AlbumResp) client.Commit(q, errCtx);
         }
 
         public AlbumClientier getSettings(OnOk onOk, OnError onErr)
@@ -52,7 +54,9 @@ namespace album_sync.album.tier
             {
                     try
                     {
-                        AnsonHeader header = client.Header().UsrAct("album.java", "profile", "r/settings", "load profile");// act(act);
+                        AnsonHeader header = client
+                            .Header()
+                            .UsrAct("album.c#", "profile", "r/settings", "load profile");
 
                         AlbumReq req = new AlbumReq(clientUri);
                         req.A(A.getPrefs);
@@ -60,307 +64,267 @@ namespace album_sync.album.tier
 									.UserReq(new AlbumPort(AlbumPort.album), null, req)
 									.Header(header);
 
-                        AnsonResp resp = client.Commit(q, onOk, onErr);
-                        onOk.ok(resp);
+                        client.CommitAsync(q, onOk, onErr);
+                        // onOk.ok(resp);
                     }
                     catch (Exception e)
                     {
-                        onErr.err(MsgCode.exIo, "%s\n%s", e.GetType().Name, e.Message);
+                        onErr.err(new MsgCode(MsgCode.exIo), string.Format("%s\n%s", e.GetType().Name, e.Message));
                     }
                 } );
 
             return this;
 		}
 	
-        public AlbumClientier asyncVideos(List videos, SessionInf user, OnProcess onProc, OnOk onOk, OnError onErr)
+        public AlbumClientier asyncVideos(IList<IFileDescriptor> videos, SessionInf user, OnProcess onProc, OnOk onOk, OnError onErr)
         {
             Task.Run( () =>
             {
                 try
                 {
-                    ArrayList reslts = syncVideos(videos, user, onProc);
+                    IList<DocsResp> reslts = syncVideos(videos, user, onProc);
                     DocsResp resp = new DocsResp();
-                    resp.Data().Put("results", reslts);
+                    resp.Data()["results"] = reslts;
                     onOk.ok(resp);
                 }
                 catch (Exception e)
                 {
-                    onErr.err(MsgCode.exIo, clientUri, e.GetType().Name, e.Message);
-                } );
+                    onErr.err(new MsgCode(MsgCode.exIo), clientUri, new string[] { e.GetType().Name, e.Message });
+                }
+            } );
             return this;
         }
 	
-	public List syncVideos(List videos, SessionInf user, OnProcess proc, ErrorCtx onErr = null)
-    {
-        ErrorCtx errHandler = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-
-        DocsResp resp = null;
-        try
+        public IList<DocsResp> syncVideos(IList<IFileDescriptor> videos, SessionInf user, OnProcess proc, ErrorCtx onErr = null)
         {
-            String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-            AnsonHeader header = client.header().act(act);
+            ErrorCtx errHandler = onErr == null ? errCtx : onErr;
 
-            List<DocsResp> reslts = new ArrayList<DocsResp>(videos.size());
-
-            for (int px = 0; px < videos.size(); px++)
+            DocsResp resp = null;
+            try
             {
+                AnsonHeader header = client.Header().act(new string[] { "album.c#", "synch", "c/photo", "multi synch" });
 
-                IFileDescriptor p = videos.get(px);
-                DocsReq req = new DocsReq()
-                        .blockStart(p, user);
+                IList<DocsResp> reslts = new List<DocsResp>(videos.Count);
 
-                AnsonMsg<DocsReq> q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
-                                        .header(header);
-
-                resp = client.commit(q, errHandler);
-                // stringchainId = resp.chainId();
-                stringpth = p.fullpath();
-                if (!pth.equals(resp.fullpath()))
-                    Utils.warn("resp not reply with exactly the same path: %s", resp.fullpath());
-
-                int totalBlocks = (int)((Files.size(Paths.get(pth)) + 1) / blocksize);
-                if (proc != null) proc.proc(px, totalBlocks, resp);
-
-                int seq = 0;
-                FileInputStream ifs = new FileInputStream(new File(p.fullpath()));
-                try
+                for (int px = 0; px < videos.Count; px++)
                 {
-                    stringb64 = AESHelper.encode64(ifs, blocksize);
-                    while (b64 != null)
+
+                    IFileDescriptor p = (IFileDescriptor)videos[px];
+                    DocsReq req = new DocsReq()
+                            .blockStart(p, user);
+
+                    AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                            .Header(header);
+
+                    resp = (DocsResp)client.Commit(q, errHandler);
+                    // stringchainId = resp.chainId();
+                    string pth = p.fullpath();
+                    if (pth != resp.Fullpath())
+                        Utils.Warn("resp not reply with exactly the same path: %s", resp.Fullpath());
+
+                    int totalBlocks = (int)((new FileInfo(pth).Length + 1) / blocksize);
+                    if (proc != null) proc.proc(px, totalBlocks, resp);
+
+                    int seq = 0;
+                    FileStream ifs = File.Create(p.fullpath());
+                    try
                     {
-                        req = new DocsReq().blockUp(seq, resp, b64, user);
-                        // req.a(DocsReq.A.blockUp);
-                        seq++;
+                        string b64 = AESHelper.Encode64(ifs, blocksize);
+                        while (b64 != null)
+                        {
+                            req = new DocsReq().blockUp(seq, resp, b64, user);
+                            // req.a(DocsReq.A.blockUp);
+                            seq++;
 
-                        q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
-                                    .header(header);
+                            q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                        .Header(header);
 
-                        resp = client.commit(q, errHandler);
+                            resp = (DocsResp)client.Commit(q, errHandler);
+                            if (proc != null) proc.proc(px, totalBlocks, resp);
+
+                            b64 = AESHelper.Encode64(ifs, blocksize);
+                        }
+                        req = new DocsReq().blockEnd(resp, user);
+                        // req.a(DocsReq.A.blockEnd);
+                        q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                    .Header(header);
+
+                        resp = (DocsResp)client.Commit(q, errHandler);
+                        if (proc != null) proc.proc(px, totalBlocks, resp);
+                    }
+                    catch (Exception ex)
+                    {
+                        Utils.Warn(ex.Message);
+
+                        req = new DocsReq().blockAbort(resp, user);
+                        req.A(DocsReq.A.blockAbort);
+                        q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                    .Header(header);
+                        resp = (DocsResp)client.Commit(q, errHandler);
                         if (proc != null) proc.proc(px, totalBlocks, resp);
 
-                        b64 = AESHelper.encode64(ifs, blocksize);
+                        throw ex;
                     }
-                    req = new DocsReq().blockEnd(resp, user);
-                    // req.a(DocsReq.A.blockEnd);
-                    q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
-                                .header(header);
-                    resp = client.commit(q, errHandler);
-                    if (proc != null) proc.proc(px, totalBlocks, resp);
+                    finally { ifs.Close(); }
+
+                    reslts.Add(resp);
                 }
-                catch (Exception ex)
-                {
-                    Utils.warn(ex.getMessage());
 
-                    req = new DocsReq().blockAbort(resp, user);
-                    req.a(DocsReq.A.blockAbort);
-                    q = client.< DocsReq > userReq(clientUri, AlbumPort.album, req)
-                                .header(header);
-                    resp = client.commit(q, errHandler);
-                    if (proc != null) proc.proc(px, totalBlocks, resp);
-
-                    throw ex;
-                }
-                finally { ifs.close(); }
-
-                reslts.add(resp);
+                return reslts;
             }
+            catch (Exception e)
+            {
+                errHandler.onError(new MsgCode(MsgCode.exIo), e.GetType().Name + " " + e.Message);
+            }
+            return null;
+        }
 
+        public string download(Photo photo, string localpath) {
+            AlbumReq req = new AlbumReq(clientUri).download(photo);
+            req.A(A.download);
+            return client.download(clientUri, new AlbumPort(AlbumPort.album), req, localpath);
+        }
+
+        public AlbumResp insertPhoto(string collId, string fullpath, string clientname) {
+
+            AlbumReq req = new AlbumReq(clientUri)
+                    .createPhoto(collId, fullpath)
+                    .photoName(clientname);
+            req.A(A.insertPhoto);
+
+            AnsonHeader header = client.Header().act("album.c#", "create", "c/photo", "create photo");
+            AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                        .Header(header);
+
+            return (AlbumResp)client.Commit(q, errCtx);
+        }
+
+        /**Asynchronously query synchronizing records.
+         * @param files
+         * @param page
+         * @param onOk
+         * @param onErr
+         * @return this
+         */
+        public AlbumClientier asyncQuerySyncs(IList<IFileDescriptor> files, SyncingPage page, OnOk onOk, OnError onErr)
+        {
+            Task.Run(() =>
+            {
+                DocsResp resp = null;
+                try
+                {
+                    AnsonHeader header = client.Header().act("album.c#", "query", "r/states", "query sync");
+
+                    List<DocsResp> reslts = new List<DocsResp>(files.Count);
+
+                    AlbumReq req = (AlbumReq)new AlbumReq().Syncing(page).A(A.selectSyncs);
+
+                    for (int i = page.start; i < page.end & i < files.Count; i++)
+                    {
+                        IFileDescriptor p = files[i];
+                        req.querySync(p);
+                    }
+
+                    AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                            .Header(header);
+
+
+                    resp = (DocsResp)client.Commit(q, errCtx);
+
+                    reslts.Add(resp);
+
+                    onOk.ok(resp);
+                }
+                catch (Exception e) {
+                    onErr.err(new MsgCode(MsgCode.exIo), clientUri, new string[] { e.GetType().Name, e.Message });
+                }
+            });
+            return this;
+        }
+
+        public List<AlbumResp> syncPhotos(List<IFileDescriptor> photos, SessionInf user) {
+            AnsonHeader header = client.Header().act("album.c#", "synch", "c/photo", "multi synch");
+
+            List<AlbumResp> reslts = new List<AlbumResp>(photos.Count);
+
+            foreach (IFileDescriptor p in photos)
+            {
+                AlbumReq req = new AlbumReq()
+                        .Device(user.device)
+                        .createPhoto(p, user);
+
+                AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                        .Header(header);
+
+                AlbumResp resp = (AlbumResp)client.Commit(q, errCtx);
+
+                reslts.Add(resp);
+            }
             return reslts;
         }
-        catch (IOException e)
-        {
-            errHandler.onError(MsgCode.exIo, e.getClass().getName() + " " + e.getMessage());
-        }
-        catch (AnsonException | SemanticException e) {
-        errHandler.onError(MsgCode.exGeneral, e.getClass().getName() + " " + e.getMessage());
-    }
-    return null;
-	}
-
-	public stringdownload(Photo photo, stringlocalpath)
-			throws SemanticException, AnsonException, IOException {
-		AlbumReq req = new AlbumReq(clientUri).download(photo);
-req.a(A.download);
-return client.download(clientUri, AlbumPort.album, req, localpath);
-	}
-
-	public AlbumResp insertPhoto(stringcollId, stringfullpath, stringclientname)
-			throws SemanticException, IOException, AnsonException {
-
-		AlbumReq req = new AlbumReq(clientUri)
-				.createPhoto(collId, fullpath)
-				.photoName(clientname);
-req.a(A.insertPhoto);
-
-String[] act = AnsonHeader.usrAct("album.java", "create", "c/photo", "create photo");
-AnsonHeader header = client.header().act(act);
-AnsonMsg<AlbumReq> q = client.< AlbumReq > userReq(clientUri, AlbumPort.album, req)
-							.header(header);
-
-return client.commit(q, errCtx);
-	}
 	
-	/**Asynchronously query synchronizing records.
-	 * @param files
-	 * @param page
-	 * @param onOk
-	 * @param onErr
-	 * @return this
-	 */
-	public AlbumClientier asyncQuerySyncs(List<? extends IFileDescriptor> files, SyncingPage page, OnOk onOk, OnError onErr)
-{
-	new Thread(new Runnable()
-	{
+        /**Asynchronously synchronize photos
+         * @param photos
+         * @param user
+         * @param onOk
+         * @param onErr
+         * @throws SemanticException
+         * @throws IOException
+         * @throws AnsonException
+         */
+        public void asyncPhotos(List<IFileDescriptor> photos, SessionInf user, OnOk onOk, OnError onErr) {
+            DocsResp resp = null;
+            try
+            {
+                AnsonHeader header = client.Header().act("album.c#", "synch", "c/photo", "multi synch");
 
-			public void run()
-	{
-		DocsResp resp = null;
-		try
-		{
-			String[] act = AnsonHeader.usrAct("album.java", "query", "r/states", "query sync");
-			AnsonHeader header = client.header().act(act);
+                List<DocsResp> reslts = new List<DocsResp>(photos.Count);
 
-			List<DocsResp> reslts = new ArrayList<DocsResp>(files.size());
+                foreach (IFileDescriptor p in photos) {
+                    AlbumReq req = new AlbumReq()
+                            .createPhoto(p, user);
 
-			AlbumReq req = (AlbumReq)new AlbumReq().syncing(page).a(A.selectSyncs);
+                    AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                            .Header(header);
 
-			for (int i = page.start; i < page.end & i < files.size(); i++)
-			{
-				IFileDescriptor p = files.get(i);
-				req.querySync(p);
-			}
-
-			AnsonMsg<AlbumReq> q = client.< AlbumReq > userReq(clientUri, AlbumPort.album, req)
-									.header(header);
-
-			resp = client.commit(q, new ErrorCtx() {
-					@Override
-					public void onError(MsgCode code, stringmsg)
-			{
-				onErr.err(code, msg);
-			}
-		});
-
-reslts.add(resp);
-onOk.ok(resp);
-			} catch (IOException e)
-{
-	onErr.err(MsgCode.exIo, clientUri, e.getClass().getName(), e.getMessage());
-}
-catch (AnsonException | SemanticException e) {
-	onErr.err(MsgCode.exGeneral, clientUri, e.getClass().getName(), e.getMessage());
-}
-} } ).start();
-return null;
-	}
-
-	public List<AlbumResp> syncPhotos(List<? extends IFileDescriptor> photos, SessionInf user)
-			throws SemanticException, IOException, AnsonException {
-		String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-AnsonHeader header = client.header().act(act);
-
-List<AlbumResp> reslts = new ArrayList<AlbumResp>(photos.size());
-
-for (IFileDescriptor p : photos)
-{
-	AlbumReq req = new AlbumReq()
-			.device(user.device)
-			.createPhoto(p, user);
-
-	AnsonMsg<AlbumReq> q = client.< AlbumReq > userReq(clientUri, AlbumPort.album, req)
-							.header(header);
-
-	AlbumResp resp = client.commit(q, errCtx);
-
-	reslts.add(resp);
-}
-return reslts;
-	}
-	
-	/**Asynchronously synchronize photos
-	 * @param photos
-	 * @param user
-	 * @param onOk
-	 * @param onErr
-	 * @throws SemanticException
-	 * @throws IOException
-	 * @throws AnsonException
-	 */
-	public void asyncPhotos(List<? extends IFileDescriptor> photos, SessionInf user, OnOk onOk, OnError onErr)
-			throws SemanticException, IOException, AnsonException {
-		new Thread(new Runnable()
-		{
-
-			public void run()
-{
-	DocsResp resp = null;
-	try
-	{
-		String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-		AnsonHeader header = client.header().act(act);
-
-		List<DocsResp> reslts = new ArrayList<DocsResp>(photos.size());
-
-		for (IFileDescriptor p : photos) {
-	AlbumReq req = new AlbumReq()
-			.createPhoto(p, user);
-	// req.a(A.insertPhoto);
-
-	AnsonMsg<AlbumReq> q = client.< AlbumReq > userReq(clientUri, AlbumPort.album, req)
-							.header(header);
-
-	resp = client.commit(q, new ErrorCtx() {
-						// @Override public void onError(MsgCode code, AnsonResp obj) { onErr.err(code, obj.msg()); }
-
-						@Override
-						public void onError(MsgCode code, stringmsg)
-	{
-		onErr.err(code, msg);
-	}
-});
-
-reslts.add(resp);
-onOk.ok(resp);
-				}
-			} catch (IOException e)
-{
-	onErr.err(MsgCode.exIo, clientUri, e.getClass().getName(), e.getMessage());
-}
-catch (AnsonException | SemanticException e) {
-	onErr.err(MsgCode.exGeneral, clientUri, e.getClass().getName(), e.getMessage());
-}
-} } ).start();
-	}
-
-	/**Get a photo record (this synchronous file base64 content)
-	 * @param docId
-	 * @param onErr
-	 * @return response
-	 */
-	public AlbumResp selectPhotoRec(stringdocId, ErrorCtx...onErr)
-    {
-        ErrorCtx errHandler = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-        String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-        AnsonHeader header = client.header().act(act);
-
-        AlbumReq req = new AlbumReq().selectPhoto(docId);
-        // req.a(A.rec);
-
-        AlbumResp resp = null;
-        try
-        {
-            AnsonMsg<AlbumReq> q = client.< AlbumReq > userReq(clientUri, AlbumPort.album, req)
-                                        .header(header);
-
-            resp = client.commit(q, errCtx);
+                    Task<AnsonResp> tresp = (Task<AnsonResp>)client.Commit_async(q, null, onErr);
+                    tresp.Wait();
+                    reslts.Add((DocsResp)tresp.Result);
+                }
+                onOk.ok(resp);
+            } catch (Exception e)
+            {
+                onErr.err(new MsgCode(MsgCode.exIo), string.Format("%s, %s", e.GetType().Name, e.Message));
+            }
         }
-        catch (AnsonException | SemanticException e) {
-            errHandler.onError(MsgCode.exSemantic, e.getMessage() + " " + e.getCause() == null ? "" : e.getCause().getMessage());
-        } catch (IOException e)
+
+        /**Get a photo record (this synchronous file base64 content)
+         * @param docId
+         * @param onErr
+         * @return response
+         */
+        public AlbumResp selectPhotoRec(string docId, ErrorCtx err = null)
         {
-            errHandler.onError(MsgCode.exIo, e.getMessage() + " " + e.getCause() == null ? "" : e.getCause().getMessage());
-        }
-        return resp;
+            ErrorCtx errHandler = err == null ? errCtx : err;
+            AnsonHeader header = client.Header().act("album.c#", "synch", "c/photo", "multi synch");
+
+            AlbumReq req = new AlbumReq().selectPhoto(docId);
+
+            AlbumResp resp = null;
+            try
+            {
+                AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                            .Header(header);
+
+                resp = (AlbumResp)client.Commit(q, errCtx);
+            }
+            catch (Exception e) {
+                if (e is AnsonException || e is SemanticException)
+                    errHandler.onError(new MsgCode(MsgCode.exSemantic), e.Message + " " + e.Source == null ? "" : e.Source.GetType().Name);
+                else
+                    errHandler.onError(new MsgCode(MsgCode.exIo), e.Message + " " + e.Source == null ? "" : e.Source.GetType().Name);
+            }
+            return resp;
         }
 
         public AlbumClientier blockSize(int size)
@@ -369,27 +333,27 @@ catch (AnsonException | SemanticException e) {
             return this;
         }
 
-        public DocsResp del(stringdevice, stringclientpath)
+        public DocsResp del(string device, string clientpath)
         {
             AlbumReq req = new AlbumReq().del(device, clientpath);
 
             DocsResp resp = null;
             try
             {
-                String[] act = AnsonHeader.usrAct("album.java", "del", "d/photo", "");
-                AnsonHeader header = client.header().act(act);
-                AnsonMsg<AlbumReq> q = client.< AlbumReq > userReq(clientUri, AlbumPort.album, req)
-                                            .header(header);
+                AnsonHeader header = client.Header().act("album.c#", "del", "d/photo", "");
+                AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                                            .Header(header);
 
-                resp = client.commit(q, errCtx);
+                resp = (DocsResp)client.Commit(q, errCtx);
             }
-            catch (AnsonException | SemanticException e) {
-            errCtx.onError(MsgCode.exSemantic, e.getMessage() + " " + e.getCause() == null ? "" : e.getCause().getMessage());
-        } catch (IOException e)
-        {
-            errCtx.onError(MsgCode.exIo, e.getMessage() + " " + e.getCause() == null ? "" : e.getCause().getMessage());
-        }
-        return resp;
+            catch (Exception e)
+            {
+                if ( e is AnsonException || e is SemanticException)
+                    errCtx.onError(new MsgCode(MsgCode.exSemantic), e.Message + " " + e.Source == null ? "" : e.Source.GetType().Name);
+                else
+                    errCtx.onError(new MsgCode(MsgCode.exIo), e.Message + " " + e.Source == null ? "" : e.Source.GetType().Name);
+            }
+            return resp;
         }
 
     }

@@ -1,16 +1,20 @@
 ﻿using io.odysz.anson;
 using io.odysz.semantic.jprotocol;
+using io.odysz.semantics.x;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace io.odysz.anclient
 {
-    internal class HttpServClient
+    public class HttpServClient
     {
+        protected const string USER_AGENT = "Anclient.c#/1.0";
+
         public HttpServClient()
         {
         }
@@ -45,5 +49,60 @@ namespace io.odysz.anclient
                 }
             }
         }
+		public string streamdown(string url, AnsonMsg jreq, string localpath) {
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebResponse con = (HttpWebResponse)req.GetResponse();
+            // Stream stream = con.GetResponseStream();
+
+            //add reuqest header
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            con.setRequestProperty("Content-Type", "text/plain"); 
+            con.setRequestProperty("charset", "utf-8");
+
+            // Send post request
+            con.setDoOutput(true);
+
+            // JHelper.writeAnsonReq(con.getOutputStream(), jreq);
+            jreq.ToBlock(con.getOutputStream());
+
+            if (AnClient.verbose) Utils.Logi(url);
+
+            Stream ins = con.GetResponseStream();
+            FileStream ofs = new FileStream(localpath, FileMode.OpenOrCreate);
+            ins.CopyTo(ofs);
+            ofs.Close();
+
+            AnsonMsg s = null;
+            string type = null; 
+            try {
+                // FileInputStream ifs = new FileInputStream(localpath);
+                // type = detector.detect(ifs);
+                // ifs.close();
+                if (localpath.EndsWith(".json"))
+                    type = "json";
+            }
+            catch (Exception e) {
+                return localpath;
+            }
+
+            if (type != null && type.StartsWith("json"))
+            {
+                FileStream ifs = new FileStream(localpath, FileMode.OpenOrCreate);
+                try
+                {
+                    s = (AnsonMsg)Anson.FromJson(ifs);
+                }
+                catch (Exception e)
+                {
+                    return localpath;
+                }
+                finally { ifs.Close(); }
+                throw new SemanticException("Code: %s\nmsg: %s", s.code, ((AnsonResp)s.Body(0)).Msg());
+            }
+
+            return localpath;
+	    }
     }
 }

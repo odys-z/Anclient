@@ -9,9 +9,9 @@ namespace io.odysz.semantic.jprotocol
 	{
 		protected internal string m;
 
-		protected internal List<AnResultset> rs;
+		protected List<AnResultset> rs;
 
-		protected internal Dictionary<string, object> map;
+		public Dictionary<string, object> map;
 
 		public AnsonResp() : base(null, null)
 		{

@@ -1,8 +1,10 @@
-﻿using io.odysz.common;
+﻿using anclient.net.jserv.tier;
+using io.odysz.common;
 using io.odysz.semantic.jprotocol;
 using io.odysz.semantic.jserv.R;
 using io.odysz.semantic.jserv.U;
 using io.odysz.semantic.jsession;
+using io.odysz.semantic.tier.docs;
 using io.odysz.semantics.x;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using TestAnson.net.semantics.io.odysz.x;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
+using static io.odysz.semantic.jprotocol.JProtocol;
 
 namespace io.odysz.anclient
 {
@@ -83,6 +87,11 @@ namespace io.odysz.anclient
             return jmsg.Header(header);
         }
 
+        public AnsonMsg UserReq(IPort port, AnsonBody req)
+        {
+            return UserReq(port, null, req);
+        }
+
         public AnsonMsg UserReq(IPort port, string[] act, AnsonBody req)
         {
             if (ssInf == null)
@@ -109,6 +118,26 @@ namespace io.odysz.anclient
 
             return jmsg.Header(header)
                         .Body(itm);
+        }
+
+        public string download(string uri, IPort port, DocsReq body, String localpath, string[] act = null)
+        {
+            if (port == null)
+                throw new AnsonException("AnsonMsg<DocsReq> needs port explicitly specified.");
+
+            // let header = Protocol.formatHeader(this.ssInf);
+            body.Uri(uri);
+            if (act != null && act.Length > 0)
+                header.act(act); 
+
+            AnsonMsg msg = new AnsonMsg(port.name)
+                            .Header(header)
+                            .Body(body);
+
+            if (AnClient.verbose) Utils.Logi(msg.ToString());
+
+            HttpServClient httpClient = new HttpServClient();
+            return httpClient.streamdown(AnClient.ServUrl(port), msg, localpath);
         }
 
         public AnsonHeader Header()
@@ -149,8 +178,7 @@ namespace io.odysz.anclient
         /// <param name="req"></param>
         /// <param name="onOk"></param>
         /// <param name="onErr"></param>
-        public void Commit(AnsonMsg req, Action<MsgCode, AnsonMsg> onOk,
-            Action<MsgCode, AnsonResp> onErr = null, CancellationTokenSource waker = null)
+        public void CommitAsync(AnsonMsg req, OnOk onOk, OnError onErr = null, CancellationTokenSource waker = null)
         {
             Task t = Task.Run( async delegate {
                 try
@@ -160,11 +188,11 @@ namespace io.odysz.anclient
                     MsgCode code = msg.code;
 
                     if (MsgCode.ok == code.code)
-                        onOk(code, msg);
+                        onOk.ok((AnsonResp)msg.Body(0));
                     else
                     {
                         if (onErr != null)
-                            onErr(code, (AnsonResp)msg.Body(0));
+                            onErr.err(code, ((AnsonResp)msg.Body(0)).Msg());
                         else Debug.WriteLine("Error: code: {0}\nerror: {1}",
                             code, msg.ToString());
                     }
@@ -173,7 +201,27 @@ namespace io.odysz.anclient
                 finally { if (waker != null) waker.Cancel(); }
             } );
         }
-        public async Task Commit_async(AnsonMsg req, Action<MsgCode, AnsonMsg> onOk, Action<MsgCode, AnsonResp> onErr = null)
+
+        public AnsonResp Commit(AnsonMsg req, ErrorCtx err = null)
+        {
+            HttpServClient httpClient = new HttpServClient();
+            Task<AnsonMsg> tmsg = httpClient.Post(AnClient.ServUrl((Port)req.port), req);
+            tmsg.Wait();
+            AnsonMsg msg = tmsg.Result;
+            MsgCode code = msg.code;
+
+            if (MsgCode.ok != code.code)
+            {
+                if (err != null)
+                    err.onError(code, ((AnsonResp)msg.Body(0)).Msg());
+                else Debug.WriteLine("Error: code: {0}\nerror: {1}",
+                    code, msg.ToString());
+            }
+
+            return (AnsonResp)msg.Body(0);
+        }
+
+        public async Task Commit_async(AnsonMsg req, OnOk onOk, OnError onErr = null)
         {
             HttpServClient httpClient = new HttpServClient();
             AnsonMsg msg = await httpClient.Post(AnClient.ServUrl((Port)req.port), req);
@@ -183,11 +231,11 @@ namespace io.odysz.anclient
                 System.Console.Out.WriteLine(msg.ToString());
 
             if (MsgCode.ok == code.code)
-                onOk(code, msg);
+                onOk.ok((AnsonResp)msg.Body(0));
             else
             {
                 if (onErr != null)
-                    onErr(code, (AnsonResp)msg.Body(0));
+                    onErr.err(code, ((AnsonResp)msg.Body(0)).Msg());
                 else System.Console.Error.WriteLine("code: {0}\nerror: {1}",
                     code, msg.ToString());
             }
@@ -205,7 +253,7 @@ namespace io.odysz.anclient
         /// <param name="busiTbl">business table to which file is attached, e.g. "a_users"</param>
         /// <param name="recid">business record Id to which file is owned, e.g. "admin"</param>
         public void AttachFiles(List<string> files, string busiTbl, string recid,
-            Action<MsgCode, AnsonResp> onOk = null, Action<MsgCode, AnsonResp> onErr = null)
+                                OnOk onOk, OnError onErr)
         {
             AnsonMsg jmsg = Delete(null, "a_attaches");
             AnUpdateReq del = (AnUpdateReq)jmsg.Body(0);
@@ -228,10 +276,10 @@ namespace io.odysz.anclient
 
             jmsg.Header(Header());
 
-            Console(jmsg);
-
+            // Console(jmsg);
+            /*
             Commit(jmsg,
-                (code, data) => {
+                (data) => {
                     if (MsgCode.ok == code.code)
                         if (onOk != null)
                             onOk(code, (AnsonResp)data.Body(0));
@@ -247,6 +295,8 @@ namespace io.odysz.anclient
                     else
                         Utils.Warn(string.Format(@"code: {0}, error: {1}", c, err.Msg()));
                 });
+            */
+            Commit_async(jmsg, onOk, onErr);
         }
     }
 }

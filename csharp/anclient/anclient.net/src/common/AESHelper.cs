@@ -156,7 +156,32 @@ namespace io.odysz.common
             return Convert.ToBase64String(bytes); 
         }
 
-        public static byte[] Decode64(string str)
+        /**
+         * @param ifs
+         * @param blockSize default 3 * 1024 * 1024;
+         * @return
+         * @throws IOException
+         */
+        public static string Encode64(Stream ifs, int blockSize) 
+        {
+            blockSize = blockSize > 0 ? blockSize : 3 * 1024 * 1024;
+
+            if ((blockSize % 12) != 0)
+                throw new IOException("Block size must be multple of 12.");
+
+
+            byte[] chunk = new byte[blockSize];
+            int pos = 0;
+
+            int len = ifs.Read(chunk, pos, blockSize);
+
+            if (len >= 0)
+                return Convert.ToBase64String(chunk);
+            else return null;
+        }
+
+
+    public static byte[] Decode64(string str)
         {
             return Convert.FromBase64String(str);
         }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TestAnson.net.semantics.io.odysz.x
 {
-	class AnsonException : TransException
+	public class AnsonException : TransException
 	{
 		public string ex { get; set; }
 

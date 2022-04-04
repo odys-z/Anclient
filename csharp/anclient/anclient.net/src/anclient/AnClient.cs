@@ -6,6 +6,7 @@ using io.odysz.semantics.x;
 using System;
 using System.Threading.Tasks;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
+using static io.odysz.semantic.jprotocol.JProtocol;
 
 namespace io.odysz.anclient
 {
@@ -15,13 +16,14 @@ namespace io.odysz.anclient
 
     public class AnClient
     {
+        public static bool verbose = false;
 		public const bool console = true;
 
 		public static string servRt;
 
-		/// <summary> DB connection ID. same in connects.xml/t/C/id at server side.
-		/// </summary>
-		private static string conn;
+        /// <summary> DB connection ID. same in connects.xml/t/C/id at server side.
+        /// </summary>
+        private static string conn;
 
 		/// <summary>Initialize configuration.
 		/// </summary>
@@ -45,7 +47,7 @@ namespace io.odysz.anclient
 		/// <throws>SemanticException Request can not parsed correctly</throws> 
 		/// <throws>GeneralSecurityException  other error</throws> 
 		/// <throws>Exception, most likely the network failed</throws> 
-		public static async Task<SessionClient> Login(string uid, string pswdPlain, OnLogin onlogin = null, OnError onerror = null)
+		public static async Task<SessionClient> Login(string uid, string pswdPlain, OnLogin onlogin = null, OnError err = null)
 		{
             byte[] iv = AESHelper.getRandom();
             string iv64 = AESHelper.Encode64(iv);
@@ -74,8 +76,8 @@ namespace io.odysz.anclient
                 if (AnClient.console)
                     Console.WriteLine(msg.ToString());
             }
-            else if (onerror != null)
-                onerror(code.code, (AnsonResp)msg.Body()[0]);
+            else if (err != null)
+                err.err(new MsgCode(code.code), ((AnsonResp)msg.Body(0)).Msg());
             else throw new SemanticException(
                     "loging failed\ncode: {0}\nerror: {1}",
                     code, ((AnsonResp) msg.Body()[0]).Msg());
@@ -85,9 +87,9 @@ namespace io.odysz.anclient
         /// <summary>Helper for generate serv url (with configured server root and db connection ID).</summary>
         /// <paramref name="port"></paramref>
         /// <return>url, e.g. http://localhost:8080/query.serv?conn=null </return> 
-        public static string ServUrl(Port port)
+        public static string ServUrl(IPort port)
         {
-            return string.Format("{0:S}/{1:S}?conn={2:S}", servRt, port.url(), conn);
+            return string.Format("{0:S}/{1:S}?", servRt, port.Url(), conn);
         }
 
     }

@@ -31,7 +31,7 @@ namespace io.odysz.semantic.jprotocol
             void proc(int listIndx, int totalBlocks, AnsonResp blockResp);
         }
 
-        public interface OnError { void err(MsgCode ok, string msg, string[] args = null ); }
+        public interface OnError { void err(MsgCode code, string msg, string[] args = null ); }
 
 
 		public interface SCallbackV11

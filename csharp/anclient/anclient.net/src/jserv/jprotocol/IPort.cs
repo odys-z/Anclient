@@ -27,6 +27,7 @@ namespace io.odysz.semantic.jprotocol
 
 	public interface IPort : IJsonable
 	{
+        string Url();
         string name { get; }
 
 		/// <summary>Equivalent of enum.valueOf(), except for subclass returning instance of jserv.Port.
