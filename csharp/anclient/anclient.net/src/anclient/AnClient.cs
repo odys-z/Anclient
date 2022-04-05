@@ -38,16 +38,20 @@ namespace io.odysz.anclient
 			conn = null; // client can't control engine connect. configured in workflow-meta.xml
 		}
 
-		/// <summary>Login and return a client instance (with session managed by jserv).
-		/// </summary>
-		/// <paramref name="uid"/>
-		/// <paramref name="pswdPlain">password in plain</param>
-		/// <return>null if failed, a SessionClient instance if login succeed.</return>
-		/// <throws>SQLException the request makes server generate wrong SQL.</throws>
-		/// <throws>SemanticException Request can not parsed correctly</throws> 
-		/// <throws>GeneralSecurityException  other error</throws> 
-		/// <throws>Exception, most likely the network failed</throws> 
-		public static async Task<SessionClient> Login(string uid, string pswdPlain, OnLogin onlogin = null, OnError err = null)
+        /// <summary>
+        /// Login and return a client instance (with session managed by jserv).
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <paramref name="pswdPlain">password in plain</param>
+        /// <param name="device"></param>
+        /// <param name="onlogin"></param>
+        /// <param name="err"></param>
+        /// <throws>SQLException the request makes server generate wrong SQL.</throws>
+        /// <throws>SemanticException Request can not parsed correctly</throws> 
+        /// <throws>GeneralSecurityException  other error</throws> 
+        /// <throws>Exception, most likely the network failed</throws> 
+        /// <return>null if failed, a SessionClient instance if login succeed.</return>
+		public static async Task<SessionClient> Login(string uid, string pswdPlain, string device = null, OnLogin onlogin = null, OnError err = null)
 		{
             byte[] iv = AESHelper.getRandom();
             string iv64 = AESHelper.Encode64(iv);
@@ -58,7 +62,7 @@ namespace io.odysz.anclient
 
             // formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
             // AnsonMsg<? extends AnsonBody> reqv11 = new AnsonMsg<AnQueryReq>(Port.session);;
-            AnsonMsg reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64);
+            AnsonMsg reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, device);
 
             string url = ServUrl(new Port(Port.session));
             HttpServClient httpClient = new HttpServClient();

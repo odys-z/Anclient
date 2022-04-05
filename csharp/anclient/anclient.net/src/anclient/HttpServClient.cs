@@ -55,17 +55,24 @@ namespace io.odysz.anclient
             // Stream stream = con.GetResponseStream();
 
             //add reuqest header
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            con.setRequestProperty("Content-Type", "text/plain"); 
-            con.setRequestProperty("charset", "utf-8");
+            req.Method = "POST"; //.setRequestMethod("POST");
+            req.UserAgent = USER_AGENT; // .setRequestProperty("User-Agent", USER_AGENT);
+            // req.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            req.Headers.Add("Accept-Language", "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3");
+            // con.setRequestProperty("Content-Type", "text/plain"); 
+            req.ContentType = "text/plain";
+            // con.setRequestProperty("charset", "utf-8");
+            req.TransferEncoding = "utf-8";
 
             // Send post request
-            con.setDoOutput(true);
+            // con.setDoOutput(true);
+            using (Stream stream = req.GetResponse().GetResponseStream())
+            {
+                jreq.ToBlock(stream);
+            }
 
             // JHelper.writeAnsonReq(con.getOutputStream(), jreq);
-            jreq.ToBlock(con.getOutputStream());
+            // jreq.ToBlock(con.getOutputStream());
 
             if (AnClient.verbose) Utils.Logi(url);
 

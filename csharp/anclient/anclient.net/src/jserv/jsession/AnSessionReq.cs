@@ -35,7 +35,7 @@ namespace io.odysz.semantic.jsession
 
 		public string iv { get; protected set; }
 
-		// internal virtual string iv() { return iv; }
+		public string deviceId { get; set; }
 
 		internal Dictionary<string, object> mds;
 
@@ -63,13 +63,15 @@ namespace io.odysz.semantic.jsession
 		/// <param name="tk64"/>
 		/// <param name="iv64"/>
 		/// <returns>login request message</returns>
-		public static AnsonMsg formatLogin(string uid, string tk64, string iv64)
+		public static AnsonMsg formatLogin(string uid, string tk64, string iv64, string device = null)
 		{
 			// AnSessionReq : AnsonBody
 			AnsonMsg jmsg = new AnsonMsg(new Port(Port.session), null);
 			AnSessionReq itm = new AnSessionReq(jmsg);
 			itm.setup(uid, tk64, iv64);
 			itm.A("login");
+
+			itm.deviceId = device;
 
 			jmsg.Body((AnsonBody)itm);
 			return jmsg;

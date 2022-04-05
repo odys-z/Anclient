@@ -1,4 +1,5 @@
 using io.odysz.anson;
+using io.odysz.anson.common;
 using io.odysz.semantic.jprotocol;
 using System.IO;
 using System.Text;
@@ -60,44 +61,47 @@ namespace io.oz.album {
             return this;
         }
 
-    //public IJsonable ToBlock(Stream stream, JsonOpt opts = null)
-    //{
-    //    Utils.WriteStr(stream, name, true);
-    //    return this;
-    //}
+	    static public int valueOf(string pname)
+        {
+            int p = pname == "heartbeat" ? Port.heartbeat
+                : pname == "session" ? Port.session
+                : pname == "query" ? Port.query
+                : pname == "update" ? Port.update
+                : pname == "insert" ? Port.insert
+                : pname == "delete" ? Port.delete
+                : pname == "echo" ? Port.echo
+                : pname == "file" ? Port.file
+                : pname == "user" ? Port.user
+                : pname == "stree" || pname == "s-tree" ? Port.stree
+                : pname == "dataset" ? Port.dataset
+                : pname == "album" ? album
+                : Port.NA;
+            return p;
+        }
 
-	static public int valueOf(string pname)
-    {
-        int p = pname == "heartbeat" ? Port.heartbeat
-            : pname == "session" ? Port.session
-            : pname == "query" ? Port.query
-            : pname == "update" ? Port.update
-            : pname == "insert" ? Port.insert
-            : pname == "delete" ? Port.delete
-            : pname == "echo" ? Port.echo
-            : pname == "file" ? Port.file
-            : pname == "user" ? Port.user
-            : pname == "stree" || pname == "s-tree" ? Port.stree
-            : pname == "dataset" ? Port.dataset
-            : Port.NA;
-        return p;
+        static public string nameOf(int port)
+        {
+            return port == Port.heartbeat ? "heartbeat"
+                : port == Port.session ? "session"
+                : port == Port.query ? "query"
+                : port == Port.update ? "update"
+                : port == Port.insert ? "insert"
+                : port == Port.delete ? "delete"
+                : port == Port.echo ? "echo"
+                : port == Port.file ? "file"
+                : port == Port.user ? "user"
+                : port == Port.stree ? "stree"
+                : port == Port.dataset ? "dataset"
+                : port == album ? "album"
+                : "";
+        }
+
+        public string Url()
+        {
+            string url = new Port(port).Url();
+            if (LangExt.isblank(url, ""))
+                return port == album ? "album.tier" : "";
+            return url;
+        }
     }
-
-    static public string nameOf(int port)
-    {
-        return port == Port.heartbeat ? "heartbeat"
-            : port == Port.session ? "session"
-            : port == Port.query ? "query"
-            : port == Port.update ? "update"
-            : port == Port.insert ? "insert"
-            : port == Port.delete ? "delete"
-            : port == Port.echo ? "echo"
-            : port == Port.file ? "file"
-            : port == Port.user ? "user"
-            : port == Port.stree ? "stree"
-            : port == Port.dataset ? "dataset"
-            : "NA";
-    }
-
-	}
 }

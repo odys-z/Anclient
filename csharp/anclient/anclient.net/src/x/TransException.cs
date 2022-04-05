@@ -9,5 +9,8 @@ namespace io.odysz.transact.x
 					string.Format(format, args) : format)
 		{
 		}
+		public TransException(string format, object arg1, object arg2 = null) : this(format, new object[] { arg1, arg2 })
+        {
+        }
 	}
 }

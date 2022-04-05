@@ -45,7 +45,7 @@ public class Clients {
 	/**Login and return a client instance (with session managed by jserv).
 	 * @param uid
 	 * @param pswdPlain
-	 * @param mac  client device name
+	 * @param mac  client device name - server can required this or not
 	 * @return null if failed, a SessionClient instance if login succeed.
 	 * @throws SemanticException Request can not parsed correctly 
 	 * @throws GeneralSecurityException  encrypting password error

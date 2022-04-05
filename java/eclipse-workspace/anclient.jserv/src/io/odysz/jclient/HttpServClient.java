@@ -30,8 +30,6 @@ import io.odysz.semantics.x.SemanticException;
 public class HttpServClient {
 	protected static final String USER_AGENT = "Anclient.java/1.0";
 
-//	protected static Tika detector = new Tika();
-
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
 	 * See {@link AnsonClientTest} for a query example.<br>

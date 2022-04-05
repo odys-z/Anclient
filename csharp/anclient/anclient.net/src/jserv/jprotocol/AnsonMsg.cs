@@ -147,7 +147,7 @@ namespace io.odysz.semantic.jprotocol
                     : port == user ? "user.serv11"
                     : port == stree ? "s-tree.serv11"
                     : port == dataset ? "ds.serv11"
-                    : "unknown.serv";
+                    : "";
 			}
 
             public IJsonable ToBlock(Stream stream, anson.JsonOpt opts = null)
