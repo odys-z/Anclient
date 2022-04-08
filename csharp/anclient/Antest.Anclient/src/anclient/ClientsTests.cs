@@ -6,7 +6,6 @@ using io.odysz.semantic.jserv.U;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +17,7 @@ namespace io.odysz.anclient
     [TestClass()]
     public class ClientsTests
     {
-        private const string jserv = "http://localhost:8080/jserv-album";
+        private const string jserv = "http://localhost:8080/jserv-sample";
         private const string pswd = "----------123456"; // TODO needing 16/32 padding
         private const string uid =  "admin";
         static SessionClient client;
@@ -110,7 +109,7 @@ namespace io.odysz.anclient
             {
                 // waked up
                 // we can access the file now
-                Debug.WriteLine("waken");
+                // Debug.WriteLine("waken");
             }
             finally { waker.Dispose(); }
         }
@@ -158,6 +157,8 @@ namespace io.odysz.anclient
                 // onErr: (c, err) => { Assert.Fail(string.Format(@"code: {0}, error: {1}", c, err.Msg())); },
                 // waker );
                 new OnUploadError() );
+
+            waker.Cancel();
         }
     }
 }
