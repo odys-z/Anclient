@@ -116,7 +116,7 @@ namespace io.odysz.anclient
 
         class OnUploadError : ErrorCtx
         {
-            public void err(MsgCode code, string msg, string[] args = null)
+            public override void onError(MsgCode code, string msg, string[] args = null)
             {
                 Assert.Fail(string.Format(@"code: {0}, error: {1}", code.Name(), msg));
             }
@@ -127,12 +127,12 @@ namespace io.odysz.anclient
             byte[] f = File.ReadAllBytes(p);
             string b64 = AESHelper.Encode64(f);
 
-            AnsonMsg jmsg = client.Update(null, "a_users");
+            AnsonMsg jmsg = client.Update(uri, "a_users");
             AnUpdateReq upd = (AnUpdateReq)jmsg.Body(0);
             upd.Nv("nationId", "CN")
                 .WhereEq("userId", "admin")
                 // .post(((UpdateReq) new UpdateReq(null, "a_attach")
-                .Post(AnUpdateReq.formatDelReq(null, null, "a_attaches")
+                .Post(AnUpdateReq.formatDelReq(null, "a_attaches")
                         .WhereEq("busiTbl", "a_users")
                         .WhereEq("busiId", "admin")
                         .Post((AnInsertReq.formatInsertReq(null, null, "a_attaches")

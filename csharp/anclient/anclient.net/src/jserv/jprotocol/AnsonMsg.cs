@@ -253,6 +253,9 @@ namespace io.odysz.semantic.jprotocol
 		//	defaultPortImpl = p;
 		//}
 
+
+		/// <summary>Jserv protocol version</summary>
+		///
 		string version = "1.0";
 
 		internal int seq { get; set; }
@@ -260,8 +263,6 @@ namespace io.odysz.semantic.jprotocol
 		public Port port { get; private set; }
 
 		public MsgCode code { get; private set; }
-
-
 
 		public AnsonMsg()
 		{
@@ -310,7 +311,7 @@ namespace io.odysz.semantic.jprotocol
 			return this;
 		}
 
-		public virtual AnsonMsg incSeq()
+		public virtual AnsonMsg IncSeq()
 		{
 			seq = seq + 1;
 			return this;

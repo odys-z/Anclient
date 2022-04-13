@@ -11,7 +11,7 @@ namespace io.odysz.semantic.jserv.file
 		internal string payload;
 
 		protected internal FileReq(AnsonMsg parent, string filename)
-			: base(parent, null)
+			: base(parent)
 		{
 			file = filename;
 		}

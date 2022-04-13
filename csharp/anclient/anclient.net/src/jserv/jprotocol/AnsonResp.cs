@@ -13,20 +13,20 @@ namespace io.odysz.semantic.jprotocol
 
 		public Dictionary<string, object> map;
 
-		public AnsonResp() : base(null, null)
+		public AnsonResp() : base(null)
 		{
 		}
 
-		public AnsonResp(AnsonMsg parent) : base(parent, null)
+		public AnsonResp(AnsonMsg parent) : base(parent)
 		{
 		}
 
-		public AnsonResp(AnsonMsg parent, string txt) : base(parent, null)
+		public AnsonResp(AnsonMsg parent, string txt) : base(parent)
 		{
 			this.m = txt;
 		}
 
-		public AnsonResp(string txt) : base(null, null)
+		public AnsonResp(string txt) : base(null)
 		{
 			this.m = txt;
 		}

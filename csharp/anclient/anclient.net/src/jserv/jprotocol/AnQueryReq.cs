@@ -60,19 +60,19 @@ namespace io.odysz.semantic.jserv.R
 
 		internal List<string[]> havings;
 
-		public AnQueryReq(AnsonMsg parent, string conn) : base(parent, conn)
+		public AnQueryReq(AnsonMsg parent) : base(parent)
 		{
 			a = JProtocol.CRUD.R;
 		}
 
 		public AnQueryReq()
-			: base(null, null)
+			: base(null)
 		{
 			a = JProtocol.CRUD.R;
 		}
 
-		public AnQueryReq(AnsonMsg parent, string conn, string fromTbl, params string[] alias)
-			: base(parent, conn)
+		public AnQueryReq(AnsonMsg parent, string fromTbl, params string[] alias)
+			: base(parent)
 		{
 			a = JProtocol.CRUD.R;
 			mtabl = fromTbl;

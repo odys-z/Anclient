@@ -42,7 +42,7 @@ namespace io.odysz.anclient
 		/// @param size
 		/// @param funcId current function ID
 		/// @return formatted query object.
-		public AnsonMsg query(string conn, string tbl, string alias,
+		public AnsonMsg query(string tbl, string alias,
 				int page, int size, string funcId = null) 
 		{
 
@@ -54,17 +54,17 @@ namespace io.odysz.anclient
 
             msg.Header(header);
 
-            AnQueryReq itm = AnQueryReq.formatReq(conn, msg, tbl, alias);
+            AnQueryReq itm = AnQueryReq.formatReq(uri, msg, tbl, alias);
             msg.Body(itm);
             itm.Page(page, size);
 
             return msg;
         }
 
-        public AnsonMsg Update(string conn, string tbl, string[] act = null)
+        public AnsonMsg Update(string tbl, string[] act = null)
         {
 
-            AnUpdateReq itm = AnUpdateReq.FormatUpdateReq(conn, null, tbl);
+            AnUpdateReq itm = AnUpdateReq.FormatUpdateReq(uri, null, tbl);
             AnsonMsg jmsg = UserReq(new Port(Port.update), act, itm);
 
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
@@ -75,9 +75,9 @@ namespace io.odysz.anclient
                         ;//.Body(itm);
         }
 
-        public AnsonMsg Delete(string conn, string tbl, string[] act = null)
+        public AnsonMsg Delete(string tbl, string[] act = null)
         {
-            AnUpdateReq itm = AnUpdateReq.formatDelReq(conn, null, tbl);
+            AnUpdateReq itm = AnUpdateReq.formatDelReq(uri, null, tbl);
             AnsonMsg jmsg = UserReq(new Port(Port.update), act, itm);
 
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
@@ -255,7 +255,7 @@ namespace io.odysz.anclient
         public void AttachFiles(List<string> files, string busiTbl, string recid,
                                 OnOk onOk, OnError onErr)
         {
-            AnsonMsg jmsg = Delete(null, "a_attaches");
+            AnsonMsg jmsg = Delete(uri, "a_attaches");
             AnUpdateReq del = (AnUpdateReq)jmsg.Body(0);
             del.WhereEq("busiTbl", busiTbl)
                 .WhereEq("busiId", recid);

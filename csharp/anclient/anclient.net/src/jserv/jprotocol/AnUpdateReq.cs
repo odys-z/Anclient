@@ -46,29 +46,29 @@ namespace io.odysz.semantic.jserv.U
 		//}
 
 		/// <summary>Format an update request.</summary>
-		/// <param name="conn"/>
+		/// <param name="uri"/>
 		/// <param name="parent"/>
 		/// <param name="tabl"/>
 		/// <param name="cmd">
 		/// <see cref="JProtocol.CRUD"/>.C R U D
 		/// </param>
 		/// <returns>a new update request</returns>
-		public static AnUpdateReq FormatUpdateReq(string conn, AnsonMsg parent, string tabl)
+		public static AnUpdateReq FormatUpdateReq(AnsonMsg parent, string tabl)
 		{
-			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(parent, conn)
+			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(parent)
 				.A(JProtocol.CRUD.U))
 				.Mtabl(tabl);
 			return bdItem;
 		}
 
 		/// <summary>Format a delete request.</summary>
-		/// <param name="conn"/>
+		/// <param name="uri"/>
 		/// <param name="parent"/>
 		/// <param name="tabl"/>
 		/// <returns>a new deleting request</returns>
-		public static AnUpdateReq formatDelReq(string conn, AnsonMsg parent, string tabl)
+		public static AnUpdateReq formatDelReq(AnsonMsg parent, string tabl)
 		{
-			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(parent, conn)
+			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(parent)
 				.A(JProtocol.CRUD.D))
 				.Mtabl(tabl);
 			return bdItem;
@@ -121,7 +121,7 @@ namespace io.odysz.semantic.jserv.U
 
 		internal List<object[]> attacheds;
 
-		public AnUpdateReq() : base(null, null)
+		public AnUpdateReq() : base(null)
 		{
 		}
 
@@ -133,8 +133,8 @@ namespace io.odysz.semantic.jserv.U
 		/// </summary>
 		/// <param name="parent"/>
 		/// <param name="conn"/>
-		public AnUpdateReq(AnsonMsg parent, string conn)
-			: base(parent, conn)
+		public AnUpdateReq(AnsonMsg parent)
+			: base(parent)
 		{
 		}
 

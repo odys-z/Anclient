@@ -428,6 +428,8 @@ export class AnsonBody {
 	 *
 	 * It's highly recommended the parameter is pressented when creating the object.
 	 * @param body json object
+	 * @param body.uri function uri.
+	 * @see {@link https://odys-z.github.io/Anclient/guide/func-uri.html#func-uri-datasource-mapping Anclient doc}
 	 */
 	constructor(body?: {type: string, a?: string, parent?: string, uri?: string}) {
 		this.type = body?.type;

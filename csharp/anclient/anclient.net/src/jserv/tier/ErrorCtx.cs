@@ -7,7 +7,7 @@ namespace anclient.net.jserv.tier
     {
         public string msg() { return ""; }
 
-        public void onError(MsgCode code, string msg)
+        virtual public void onError(MsgCode code, string msg, string[] args = null)
         {
         }
 
