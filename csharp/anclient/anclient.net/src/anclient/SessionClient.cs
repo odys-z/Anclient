@@ -35,17 +35,16 @@ namespace io.odysz.anclient
 
 		/// <summary>Format a query request object, including all information for
 		/// construct a "select" statement.</summary>
-		/// <paramref name="conn">connection id</paramref>
-		/// @param tbl main table, (sometimes function category), e.g. "e_areas"
-		/// @param alias from table alias, e.g. "a"
-		/// @param page -1 for no paging at server side.
-		/// @param size
-		/// @param funcId current function ID
-		/// @return formatted query object.
-		public AnsonMsg query(string tbl, string alias,
+        /// <param name="uri"></param>
+        /// <param name="tbl"></param>
+        /// <param name="alias">main table alias</param>
+        /// <param name="page">page, -1 for no paging at server side.</param>
+        /// <param name="size"></param>
+        /// <param name="funcId">current function ID</param>
+        /// <returns>formatted query object</returns>
+	    public AnsonMsg query(string uri, string tbl, string alias,
 				int page, int size, string funcId = null) 
 		{
-
 			AnsonMsg msg = new AnsonMsg((IPort)new Port(Port.query), null);
 
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
@@ -55,17 +54,17 @@ namespace io.odysz.anclient
             msg.Header(header);
 
             AnQueryReq itm = AnQueryReq.formatReq(uri, msg, tbl, alias);
-            msg.Body(itm);
+            msg.Body(itm, uri);
             itm.Page(page, size);
 
             return msg;
         }
 
-        public AnsonMsg Update(string tbl, string[] act = null)
+        public AnsonMsg Update(string uri, string tbl, string[] act = null)
         {
 
             AnUpdateReq itm = AnUpdateReq.FormatUpdateReq(uri, null, tbl);
-            AnsonMsg jmsg = UserReq(new Port(Port.update), act, itm);
+            AnsonMsg jmsg = UserReq(uri, new Port(Port.update), act, itm);
 
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
             if (act != null && act.Length > 0)
@@ -75,10 +74,10 @@ namespace io.odysz.anclient
                         ;//.Body(itm);
         }
 
-        public AnsonMsg Delete(string tbl, string[] act = null)
+        public AnsonMsg Delete(string uri, string tbl, string[] act = null)
         {
             AnUpdateReq itm = AnUpdateReq.formatDelReq(uri, null, tbl);
-            AnsonMsg jmsg = UserReq(new Port(Port.update), act, itm);
+            AnsonMsg jmsg = UserReq(uri, new Port(Port.update), act, itm);
 
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
             if (act != null && act.Length > 0)
@@ -87,12 +86,12 @@ namespace io.odysz.anclient
             return jmsg.Header(header);
         }
 
-        public AnsonMsg UserReq(IPort port, AnsonBody req)
+        public AnsonMsg UserReq(string uri, IPort port, AnsonBody req)
         {
-            return UserReq(port, null, req);
+            return UserReq(uri, port, null, req);
         }
 
-        public AnsonMsg UserReq(IPort port, string[] act, AnsonBody req)
+        public AnsonMsg UserReq(string uri, IPort port, string[] act, AnsonBody req)
         {
             if (ssInf == null)
                 throw new SemanticException("SessionClient can not visit jserv without session information.");
@@ -102,25 +101,25 @@ namespace io.odysz.anclient
             if (act != null)
                 Header().act(act);
             jmsg.Header(header);
-            jmsg.Body(req);
+            jmsg.Body(req, uri);
 
             return jmsg;
         }
 
-        public AnsonMsg Insert(string conn, string tbl, string[] act = null)
+        public AnsonMsg Insert(string uri, string tbl, string[] act = null)
         {
-            AnInsertReq itm = AnInsertReq.formatInsertReq(conn, null, tbl);
-            AnsonMsg jmsg = UserReq(new Port(Port.insert), act, itm);
+            AnInsertReq itm = AnInsertReq.formatInsertReq(null, tbl, uri);
+            AnsonMsg jmsg = UserReq(uri, new Port(Port.insert), act, itm);
 
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
             if (act != null && act.Length > 0)
                 header.act(act);
 
             return jmsg.Header(header)
-                        .Body(itm);
+                        .Body(itm, uri);
         }
 
-        public string download(string uri, IPort port, DocsReq body, String localpath, string[] act = null)
+        public string download(string uri, IPort port, DocsReq body, string localpath, string[] act = null)
         {
             if (port == null)
                 throw new AnsonException("AnsonMsg<DocsReq> needs port explicitly specified.");
@@ -132,7 +131,7 @@ namespace io.odysz.anclient
 
             AnsonMsg msg = new AnsonMsg(port.name)
                             .Header(header)
-                            .Body(body);
+                            .Body(body, uri);
 
             if (AnClient.verbose) Utils.Logi(msg.ToString());
 
@@ -250,9 +249,10 @@ namespace io.odysz.anclient
         /// this method used 2 round of memory copy, should implemented in stream style
         /// </summary>
         /// <param name="files"></param>
+        /// <param name="uri">see {@link https://odys-z.github.io/Anclient/guide/func-uri.html Anclient doc}</param>
         /// <param name="busiTbl">business table to which file is attached, e.g. "a_users"</param>
         /// <param name="recid">business record Id to which file is owned, e.g. "admin"</param>
-        public void AttachFiles(List<string> files, string busiTbl, string recid,
+        public void AttachFiles(List<string> files, string uri, string busiTbl, string recid,
                                 OnOk onOk, OnError onErr)
         {
             AnsonMsg jmsg = Delete(uri, "a_attaches");

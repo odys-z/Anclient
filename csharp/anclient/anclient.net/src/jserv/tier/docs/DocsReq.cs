@@ -41,11 +41,11 @@ public class DocsReq : AnsonBody {
 
 	string docState;
 	
-	public DocsReq() : base(null) {
-	//	blockSeq = -1;
+	public DocsReq() : base(null, null)
+	{
 	}
 
-	protected DocsReq(AnsonMsg parent) : base(parent)
+	protected DocsReq(string uri, AnsonMsg parent) : base(uri, parent)
 	{
 	}
 

@@ -17,6 +17,8 @@ namespace io.odysz.anclient
     [TestClass()]
     public class ClientsTests
     {
+        const string uri = "test.cs";
+
         private const string jserv = "http://localhost:8080/jserv-sample";
         private const string pswd = "----------123456"; // TODO needing 16/32 padding
         private const string uid =  "admin";
@@ -63,14 +65,14 @@ namespace io.odysz.anclient
         // [TestMethod()]
         public void TestMenu(string s, string roleId)
         {
-            AnDatasetReq req = new AnDatasetReq(null, "sys-sqlite");
+            AnDatasetReq req = new AnDatasetReq(uri, null);
 
             string t = "menu";
             AnsonHeader header = client.Header()
                     .UsrAct("SemanticClientTest", "init", t,
                         "test jclient.java loading menu from menu.sample");
 
-            AnsonMsg jmsg = client.UserReq(new Port(Port.echo), null, req);
+            AnsonMsg jmsg = client.UserReq(uri, new Port(Port.echo), null, req);
             jmsg.Header(header);
 
             client.Console(jmsg);
@@ -132,7 +134,7 @@ namespace io.odysz.anclient
             upd.Nv("nationId", "CN")
                 .WhereEq("userId", "admin")
                 // .post(((UpdateReq) new UpdateReq(null, "a_attach")
-                .Post(AnUpdateReq.formatDelReq(null, "a_attaches")
+                .Post(AnUpdateReq.formatDelReq(uri, null, "a_attaches")
                         .WhereEq("busiTbl", "a_users")
                         .WhereEq("busiId", "admin")
                         .Post((AnInsertReq.formatInsertReq(null, null, "a_attaches")

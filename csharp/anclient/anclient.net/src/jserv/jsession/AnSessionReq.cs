@@ -14,14 +14,14 @@ namespace io.odysz.semantic.jsession
 	public class AnSessionReq : AnsonBody
 	{
 		// string type;
-		public AnSessionReq() : base(null)
+		public AnSessionReq() : base(null, null)
 		{
 			// type = "io.odysz.semantic.jsession.AnSessionReq";
 		}
 
 		/// <summary>Session connection is ignored and controlled by server.</summary>
 		/// <param name="parent"/>
-		public AnSessionReq(AnsonMsg parent) : base(parent)
+		public AnSessionReq(AnsonMsg parent) : base(null, parent)
 		{
 			// type = "io.odysz.semantic.jsession.AnSessionReq";
 		}
@@ -59,11 +59,13 @@ namespace io.odysz.semantic.jsession
 		}
 
 		/// <summary>Format login request message.</summary>
-		/// <param name="uid"/>
-		/// <param name="tk64"/>
-		/// <param name="iv64"/>
+		/// <param name="uri"></param>
+		/// <param name="uid"></param>
+		/// <param name="tk64"></param>
+		/// <param name="iv64"></param>
+		/// <param name="device"></param>
 		/// <returns>login request message</returns>
-		public static AnsonMsg formatLogin(string uid, string tk64, string iv64, string device = null)
+		public static AnsonMsg formatLogin(string uri, string uid, string tk64, string iv64, string device = null)
 		{
 			// AnSessionReq : AnsonBody
 			AnsonMsg jmsg = new AnsonMsg(new Port(Port.session), null);
@@ -73,7 +75,7 @@ namespace io.odysz.semantic.jsession
 
 			itm.deviceId = device;
 
-			jmsg.Body((AnsonBody)itm);
+			jmsg.Body((AnsonBody)itm, uri);
 			return jmsg;
 		}
 

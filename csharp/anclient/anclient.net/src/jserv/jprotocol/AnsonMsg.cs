@@ -298,8 +298,9 @@ namespace io.odysz.semantic.jprotocol
 
 		/// <summary>Add a request body to the request list.</summary>
 		/// <param name="bodyItem"/>
+		/// <param name="uri"/>
 		/// <returns>new message object</returns>
-		public virtual AnsonMsg Body(AnsonBody bodyItem)
+		public virtual AnsonMsg Body(AnsonBody bodyItem, string uri)
 		{
 			if (body == null)
 			{
@@ -307,7 +308,7 @@ namespace io.odysz.semantic.jprotocol
 			}
 			body.Add(bodyItem);
 			// bodyItem.parent = this;
-			bodyItem.Parent(this);
+			bodyItem.Parent(this, uri);
 			return this;
 		}
 
@@ -335,12 +336,12 @@ namespace io.odysz.semantic.jprotocol
 		public static AnsonMsg Ok(IPort p, string txt)
 		{
 			AnsonResp bd = new AnsonResp(txt);
-			return new AnsonMsg(p, new MsgCode(MsgCode.ok)).Body(bd);
+			return new AnsonMsg(p, new MsgCode(MsgCode.ok)).Body(bd, null);
 		}
 
 		public static AnsonMsg Ok(IPort p, AnsonBody resp)
 		{
-			return new AnsonMsg(p, new MsgCode(MsgCode.ok)).Body(resp);
+			return new AnsonMsg(p, new MsgCode(MsgCode.ok)).Body(resp, null);
 		}
     }
 }

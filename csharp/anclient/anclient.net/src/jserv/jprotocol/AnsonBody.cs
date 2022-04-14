@@ -13,10 +13,9 @@ namespace io.odysz.semantic.jprotocol
 		public AnsonBody Parent(AnsonMsg p, string uri)
         {
 			parent = p;
+			this.uri = uri;
 			return this;
         }
-
-		// public string conn { get; protected set; }
 
 		/// <summary>
 		/// Action: login | C | R | U | D | any serv extension
@@ -43,10 +42,10 @@ namespace io.odysz.semantic.jprotocol
             return this;
         }
 
-        public AnsonBody(AnsonMsg parent)
+        public AnsonBody(string uri, AnsonMsg parent)
 		{
 			this.parent = parent;
-			// this.conn = conn;
+			this.uri = uri;
 		}
 	}
 }

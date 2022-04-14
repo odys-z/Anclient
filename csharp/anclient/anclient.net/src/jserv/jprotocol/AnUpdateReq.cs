@@ -49,13 +49,12 @@ namespace io.odysz.semantic.jserv.U
 		/// <param name="uri"/>
 		/// <param name="parent"/>
 		/// <param name="tabl"/>
-		/// <param name="cmd">
 		/// <see cref="JProtocol.CRUD"/>.C R U D
 		/// </param>
 		/// <returns>a new update request</returns>
-		public static AnUpdateReq FormatUpdateReq(AnsonMsg parent, string tabl)
+		public static AnUpdateReq FormatUpdateReq(string uri, AnsonMsg parent, string tabl)
 		{
-			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(parent)
+			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(uri, parent)
 				.A(JProtocol.CRUD.U))
 				.Mtabl(tabl);
 			return bdItem;
@@ -66,9 +65,9 @@ namespace io.odysz.semantic.jserv.U
 		/// <param name="parent"/>
 		/// <param name="tabl"/>
 		/// <returns>a new deleting request</returns>
-		public static AnUpdateReq formatDelReq(AnsonMsg parent, string tabl)
+		public static AnUpdateReq formatDelReq(string uri, AnsonMsg parent, string tabl)
 		{
-			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(parent)
+			AnUpdateReq bdItem = ((AnUpdateReq)new AnUpdateReq(uri, parent)
 				.A(JProtocol.CRUD.D))
 				.Mtabl(tabl);
 			return bdItem;
@@ -121,7 +120,7 @@ namespace io.odysz.semantic.jserv.U
 
 		internal List<object[]> attacheds;
 
-		public AnUpdateReq() : base(null)
+		public AnUpdateReq() : base(null, null)
 		{
 		}
 
@@ -131,10 +130,10 @@ namespace io.odysz.semantic.jserv.U
 		/// .
 		/// This constructor is declared publicly for JHelper.
 		/// </summary>
+		/// <param name="uri"/>
 		/// <param name="parent"/>
-		/// <param name="conn"/>
-		public AnUpdateReq(AnsonMsg parent)
-			: base(parent)
+		public AnUpdateReq(string uri, AnsonMsg parent)
+			: base(uri, parent)
 		{
 		}
 

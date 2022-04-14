@@ -1,6 +1,17 @@
 Func URI & Datasource Mapping
 =============================
 
+About
+-----
+
+The client uses it to specify the function group; The jserv uses the configured
+datasource mapping to retieve data.
+
+Function group (uri) should be the same granuity with Semantier.
+
+Implementation
+--------------
+
 - Client provide function uri
 
 TS: @anclient/semantier-st
@@ -38,10 +49,18 @@ TS: @anclient/semantier-st
     }
 ..
 
-Function uri holds the same granuity with Semantier.
-
 - JServ decide which datasource to access, according to WEB-INF/connects
 
 .. code-block:: xml
 
+    <t id="conn-uri" pk='uri' columns="uri, conn">
+   	<c>
+  		<uri>/local/*</uri>
+  		<conn>sys-sqlite</conn>
+  	</c>
+   	<c>
+  		<uri>/cloud/*</uri>
+  		<conn>album-cloud</conn>
+  	</c>
+    </t>
 ..

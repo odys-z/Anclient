@@ -88,10 +88,7 @@
     <Compile Include="src\jserv\tier\TierCol.cs" />
     <Compile Include="src\jserv\tier\Tierec.cs" />
     <Compile Include="src\jserv\tier\Tierelations.cs" />
-    <Compile Include="src\transact\ISemantext.cs" />
     <Compile Include="src\transact\IUser.cs" />
-    <Compile Include="src\transact\meta\ColMeta.cs" />
-    <Compile Include="src\transact\meta\TableMeta.cs" />
     <Compile Include="src\transact\SemanticObject.cs" />
     <Compile Include="src\transact\sql\Query.cs" />
     <Compile Include="src\x\AnsonException.cs" />

@@ -23,7 +23,7 @@ namespace io.odysz.anclient
 
         /// <summary> DB connection ID. same in connects.xml/t/C/id at server side.
         /// </summary>
-        private static string conn;
+        // private static string conn;
 
 		/// <summary>Initialize configuration.
 		/// </summary>
@@ -35,7 +35,7 @@ namespace io.odysz.anclient
 			JSONAnsonListener.setAssembly("anclient.net");
 
 			servRt = servRoot;
-			conn = null; // client can't control engine connect. configured in workflow-meta.xml
+			// conn = null; // client can't control engine connect. configured in workflow-meta.xml
 		}
 
         /// <summary>
@@ -90,10 +90,10 @@ namespace io.odysz.anclient
 
         /// <summary>Helper for generate serv url (with configured server root and db connection ID).</summary>
         /// <paramref name="port"></paramref>
-        /// <return>url, e.g. http://localhost:8080/query.serv?conn=null </return> 
+        /// <return>url, e.g. http://localhost:8080/query.serv </return> 
         public static string ServUrl(IPort port)
         {
-            return string.Format("{0:S}/{1:S}?", servRt, port.Url(), conn);
+            return string.Format("{0:S}/{1:S}", servRt, port.Url());
         }
 
     }
