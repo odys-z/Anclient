@@ -1,7 +1,7 @@
 QueryForm
 =========
 
-.. attention:: This doc is deprecated
+.. attention:: This doc is deprecated!
 ..
 
 1. Combobox binding:
