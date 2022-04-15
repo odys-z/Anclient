@@ -58,14 +58,18 @@ namespace io.odysz.semantic.jsession
 			return this;
 		}
 
-		/// <summary>Format login request message.</summary>
-		/// <param name="uri"></param>
+		/// <summary>Format login request message.
+		/// The equivolance of ts is @anclient/semantier-st/Protocol.formatSessionLogin():
+		/// </summary>
+		/// <example>
+		///    static formatSessionLogin(uid: string, tk64: string, iv64: string): AnsonMsg<AnSessionReq>
+		/// </example>
 		/// <param name="uid"></param>
 		/// <param name="tk64"></param>
 		/// <param name="iv64"></param>
 		/// <param name="device"></param>
 		/// <returns>login request message</returns>
-		public static AnsonMsg formatLogin(string uri, string uid, string tk64, string iv64, string device = null)
+		public static AnsonMsg formatLogin(string uid, string tk64, string iv64, string device = null)
 		{
 			// AnSessionReq : AnsonBody
 			AnsonMsg jmsg = new AnsonMsg(new Port(Port.session), null);
@@ -75,7 +79,7 @@ namespace io.odysz.semantic.jsession
 
 			itm.deviceId = device;
 
-			jmsg.Body((AnsonBody)itm, uri);
+			jmsg.Body((AnsonBody)itm, null);
 			return jmsg;
 		}
 

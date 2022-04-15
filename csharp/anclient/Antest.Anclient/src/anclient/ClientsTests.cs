@@ -87,8 +87,9 @@ namespace io.odysz.anclient
         static CancellationTokenSource waker;
         class OnloginUpload : OnLogin
         {
-            public void ok(SessionClient client)
+            public void ok(SessionClient _client)
             {
+                client = _client;
                 UploadTransaction(waker, client, "Sun Yet-sen.jpg");
             }
         }
@@ -137,7 +138,7 @@ namespace io.odysz.anclient
                 .Post(AnUpdateReq.formatDelReq(uri, null, "a_attaches")
                         .WhereEq("busiTbl", "a_users")
                         .WhereEq("busiId", "admin")
-                        .Post((AnInsertReq.formatInsertReq(null, null, "a_attaches")
+                        .Post((AnInsertReq.formatInsertReq(null, "a_attaches", "a_attaches")
                                 .Cols("attName", "busiId", "busiTbl", "uri")
                                 .Nv("attName", "-Anclient.cs Test")
                                 // The parent pk can't be resulved, we must provide the value.
@@ -160,6 +161,7 @@ namespace io.odysz.anclient
                 // waker );
                 new OnUploadError() );
 
+            succeed = true;
             waker.Cancel();
         }
     }

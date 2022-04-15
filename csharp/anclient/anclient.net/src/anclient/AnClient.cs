@@ -75,7 +75,8 @@ namespace io.odysz.anclient
                 // create a logged in client
                 inst[0] = new SessionClient(((AnSessionResp) msg.Body()[0]).ssInf);
                 if (onlogin != null)
-                    onlogin.ok(new SessionClient(((AnSessionResp)msg.Body()[0]).ssInf));
+                    // onlogin.ok(new SessionClient(((AnSessionResp)msg.Body()[0]).ssInf));
+                    onlogin.ok(inst[0]);
 
                 if (AnClient.console)
                     Console.WriteLine(msg.ToString());

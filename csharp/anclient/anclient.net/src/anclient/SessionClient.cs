@@ -62,7 +62,6 @@ namespace io.odysz.anclient
 
         public AnsonMsg Update(string uri, string tbl, string[] act = null)
         {
-
             AnUpdateReq itm = AnUpdateReq.FormatUpdateReq(uri, null, tbl);
             AnsonMsg jmsg = UserReq(uri, new Port(Port.update), act, itm);
 
