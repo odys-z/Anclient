@@ -1,3 +1,5 @@
+.. _uri-mapping
+
 Func URI & Datasource Mapping
 =============================
 

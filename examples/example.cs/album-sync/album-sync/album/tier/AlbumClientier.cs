@@ -23,7 +23,7 @@ namespace album_sync.album.tier
     {
 		private SessionClient client;
 		private ErrorCtx errCtx;
-		private readonly string clientUri;
+		private readonly string uri;
 
 		public static int blocksize = 3 * 1024 * 1024;
 
@@ -38,13 +38,13 @@ namespace album_sync.album.tier
         {
             this.client = client;
             this.errCtx = errCtx;
-            this.clientUri = clientUri;
+            this.uri = clientUri;
         }
 
         public AlbumResp getCollect(string collectId) {
-            AlbumReq req = new AlbumReq(clientUri).CollectId("c-001");
+            AlbumReq req = new AlbumReq(uri).CollectId("c-001");
             req.A(A.collect);
-                AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), null, req);
+                AnsonMsg q = client.UserReq(uri, new AlbumPort(AlbumPort.album), null, req);
             return (AlbumResp) client.Commit(q, errCtx);
         }
 
@@ -58,10 +58,10 @@ namespace album_sync.album.tier
                             .Header()
                             .UsrAct("album.c#", "profile", "r/settings", "load profile");
 
-                        AlbumReq req = new AlbumReq(clientUri);
+                        AlbumReq req = new AlbumReq(uri);
                         req.A(A.getPrefs);
                         AnsonMsg q = client
-									.UserReq(new AlbumPort(AlbumPort.album), null, req)
+									.UserReq(uri, new AlbumPort(AlbumPort.album), null, req)
 									.Header(header);
 
                         client.CommitAsync(q, onOk, onErr);
@@ -89,7 +89,7 @@ namespace album_sync.album.tier
                 }
                 catch (Exception e)
                 {
-                    onErr.err(new MsgCode(MsgCode.exIo), clientUri, new string[] { e.GetType().Name, e.Message });
+                    onErr.err(new MsgCode(MsgCode.exIo), uri, new string[] { e.GetType().Name, e.Message });
                 }
             } );
             return this;
@@ -113,7 +113,7 @@ namespace album_sync.album.tier
                     DocsReq req = new DocsReq()
                             .blockStart(p, user);
 
-                    AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                    AnsonMsg q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                             .Header(header);
 
                     resp = (DocsResp)client.Commit(q, errHandler);
@@ -136,7 +136,7 @@ namespace album_sync.album.tier
                             // req.a(DocsReq.A.blockUp);
                             seq++;
 
-                            q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                            q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                         .Header(header);
 
                             resp = (DocsResp)client.Commit(q, errHandler);
@@ -146,7 +146,7 @@ namespace album_sync.album.tier
                         }
                         req = new DocsReq().blockEnd(resp, user);
                         // req.a(DocsReq.A.blockEnd);
-                        q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                        q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                     .Header(header);
 
                         resp = (DocsResp)client.Commit(q, errHandler);
@@ -158,7 +158,7 @@ namespace album_sync.album.tier
 
                         req = new DocsReq().blockAbort(resp, user);
                         req.A(DocsReq.A.blockAbort);
-                        q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                        q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                     .Header(header);
                         resp = (DocsResp)client.Commit(q, errHandler);
                         if (proc != null) proc.proc(px, totalBlocks, resp);
@@ -180,20 +180,20 @@ namespace album_sync.album.tier
         }
 
         public string download(Photo photo, string localpath) {
-            AlbumReq req = new AlbumReq(clientUri).download(photo);
+            AlbumReq req = new AlbumReq(uri).download(photo);
             req.A(A.download);
-            return client.download(clientUri, new AlbumPort(AlbumPort.album), req, localpath);
+            return client.download(uri, new AlbumPort(AlbumPort.album), req, localpath);
         }
 
         public AlbumResp insertPhoto(string collId, string fullpath, string clientname) {
 
-            AlbumReq req = new AlbumReq(clientUri)
+            AlbumReq req = new AlbumReq(uri)
                     .createPhoto(collId, fullpath)
                     .photoName(clientname);
             req.A(A.insertPhoto);
 
             AnsonHeader header = client.Header().act("album.c#", "create", "c/photo", "create photo");
-            AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+            AnsonMsg q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                         .Header(header);
 
             return (AlbumResp)client.Commit(q, errCtx);
@@ -225,7 +225,7 @@ namespace album_sync.album.tier
                         req.querySync(p);
                     }
 
-                    AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                    AnsonMsg q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                             .Header(header);
 
 
@@ -236,7 +236,7 @@ namespace album_sync.album.tier
                     onOk.ok(resp);
                 }
                 catch (Exception e) {
-                    onErr.err(new MsgCode(MsgCode.exIo), clientUri, new string[] { e.GetType().Name, e.Message });
+                    onErr.err(new MsgCode(MsgCode.exIo), uri, new string[] { e.GetType().Name, e.Message });
                 }
             });
             return this;
@@ -253,7 +253,7 @@ namespace album_sync.album.tier
                         .Device(user.device)
                         .createPhoto(p, user);
 
-                AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                AnsonMsg q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                         .Header(header);
 
                 AlbumResp resp = (AlbumResp)client.Commit(q, errCtx);
@@ -284,7 +284,7 @@ namespace album_sync.album.tier
                     AlbumReq req = new AlbumReq()
                             .createPhoto(p, user);
 
-                    AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                    AnsonMsg q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                             .Header(header);
 
                     Task<AnsonResp> tresp = (Task<AnsonResp>)client.Commit_async(q, null, onErr);
@@ -313,7 +313,7 @@ namespace album_sync.album.tier
             AlbumResp resp = null;
             try
             {
-                AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                AnsonMsg q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                             .Header(header);
 
                 resp = (AlbumResp)client.Commit(q, errCtx);
@@ -341,7 +341,7 @@ namespace album_sync.album.tier
             try
             {
                 AnsonHeader header = client.Header().act("album.c#", "del", "d/photo", "");
-                AnsonMsg q = client.UserReq(new AlbumPort(AlbumPort.album), req)
+                AnsonMsg q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                             .Header(header);
 
                 resp = (DocsResp)client.Commit(q, errCtx);

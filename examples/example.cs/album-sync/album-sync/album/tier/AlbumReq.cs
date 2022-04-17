@@ -39,11 +39,11 @@ namespace io.oz.album.tier
         {
         }
 
-        public AlbumReq(string funcUri) : base(null, funcUri)
+        public AlbumReq(string funcUri) : base(funcUri, null)
         {
         }
 
-        protected AlbumReq(AnsonMsg parent, string uri) : base(parent, uri)
+        protected AlbumReq(AnsonMsg parent, string uri) : base(uri, parent)
         {
         }
 

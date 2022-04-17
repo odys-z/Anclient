@@ -1,4 +1,5 @@
-﻿using System;
+﻿using io.odysz.anclient;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -8,10 +9,13 @@ using System.Windows;
 
 namespace album_sync
 {
+
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
+        public SessionClient client { get; set; }
+        public bool loggedIn { get; internal set; }
     }
 }

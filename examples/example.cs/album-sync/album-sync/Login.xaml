@@ -124,7 +124,7 @@
         </Grid>
 
         <Button x:Name="btLogin" Content="Login" Margin="6" Padding="4,4,4,4"
-                Click="onLogin" Background="#FFFDF2DE" IsEnabled="False"/>
+                Click="toLogin" Background="#FFFDF2DE" IsEnabled="False"/>
       </StackPanel>
     </StackPanel>
   </Grid>
