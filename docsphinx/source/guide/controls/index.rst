@@ -6,3 +6,4 @@ Guid (Tips)
    :caption: Contents:
 
    query-form
+   formatters

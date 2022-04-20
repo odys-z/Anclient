@@ -14,7 +14,7 @@ Semantier is short for Semantics Tier, a low level js client API for accessing s
 providen by semantic-jserver.
 
 Since 0.9.42, it's ported to Typescript, with types for better user experience with
-support of VS Code Intellisense. 
+support of VS Code Intellisense.
 
 * @anclient/anreact,
 
@@ -32,7 +32,7 @@ Start with the basic API
 
 1. Deploy a web application of Semantic-jserv
 
-Say, :ref:`jsample<jsample-quick-start>`.
+Say, :ref:`jsample <jsample-quick-start>`.
 
 2. Install Anclient.
 

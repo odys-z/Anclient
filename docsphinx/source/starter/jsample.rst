@@ -192,4 +192,4 @@ and should get some error message like above.
 
 That's all! The sample service are running now. Next you should visit the service
 using one of the different version of Anclient. See the
-:ref:`js client sample quick start <jsample-quickstart-js>` and the java client (TODO doc).
+:ref:`js client sample quick start <jsample-quick-start>` and the java client (TODO doc).
