@@ -35,7 +35,6 @@ namespace io.odysz.anclient
 			JSONAnsonListener.setAssembly("anclient.net");
 
 			servRt = servRoot;
-			// conn = null; // client can't control engine connect. configured in workflow-meta.xml
 		}
 
         /// <summary>
@@ -58,7 +57,8 @@ namespace io.odysz.anclient
             if (uid == null || pswdPlain == null)
                 throw new SemanticException("user id and password can not be null.");
 
-            string tk64 = AESHelper.Encrypt("-----------" + uid, pswdPlain, iv);
+            // string tk64 = AESHelper.Encrypt("-----------" + uid, pswdPlain, iv);
+            string tk64 = AESHelper.Encrypt(uid, pswdPlain, iv);
 
             // formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
             // AnsonMsg<? extends AnsonBody> reqv11 = new AnsonMsg<AnQueryReq>(Port.session);;
@@ -68,7 +68,7 @@ namespace io.odysz.anclient
             HttpServClient httpClient = new HttpServClient();
 
             SessionClient[] inst = new SessionClient[1];
-            AnsonMsg msg = await httpClient.Post(url, reqv11);
+            AnsonMsg msg = await httpClient.Post(url, reqv11).ConfigureAwait(false);
             MsgCode code = msg.code;
 
             if (code != null && MsgCode.ok == code.code) {

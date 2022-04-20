@@ -1,4 +1,5 @@
-﻿using System;
+﻿using io.odysz.anclient;
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -12,15 +13,18 @@ namespace TreeViewFileExplorer
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private SessionClient client;
+        public MainWindow(SessionClient client)
         {
             InitializeComponent();
             InitializeFileSystemObjects();
+            
+            this.client = client;
         }
 
         #region Events
 
-        private void FileSystemObject_AfterExplore(object sender, System.EventArgs e)
+        private void FileSystemObject_AfterExplore(object sender, EventArgs e)
         {
             Cursor = Cursors.Arrow;
         }
@@ -107,8 +111,7 @@ namespace TreeViewFileExplorer
             return null;
         }
 
-        private bool IsParentPath(string path,
-            string targetPath)
+        private bool IsParentPath(string path, string targetPath)
         {
             return path.StartsWith(targetPath);
         }

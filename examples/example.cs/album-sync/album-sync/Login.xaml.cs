@@ -1,10 +1,8 @@
 ﻿using album_sync;
 using io.odysz.anclient;
 using io.odysz.anson.common;
-using io.odysz.semantic.jprotocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -12,7 +10,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
-using static io.odysz.semantic.jprotocol.JProtocol;
 
 namespace TreeViewFileExplorer
 {
@@ -22,8 +19,8 @@ namespace TreeViewFileExplorer
     public partial class Login : Window
     {
         // MainWindow main;
+        private const string jservPath = "jserv-album";
         string execPath;
-        private SessionClient client;
         const string kdevice = "device";
         const string kserv = "jserv";
         const string kport = "port";
@@ -90,15 +87,17 @@ namespace TreeViewFileExplorer
 
         private void savePrefs()
         {
+            string dev = device.Text?.Trim();
+
             string[] xml = {
             "<?xml version = \"1.0\" encoding = \"UTF-8\" ?>",
             "<!DOCTYPE xml>",
             "<configs>",
             "  <t id=\"preferences\" pk=\"k\" columns=\"k,v\">",
-            string.Format("\t<c><k>{0}</k><v>{1}</v></c>", kdevice, device.Text.Trim()),
-            string.Format("\t<c><k>{0}</k><v>{1}</v></c>", kserv, jserv.Text.Trim()),
-            string.Format("\t<c><k>{0}</k><v>{1}</v></c>", kport, port.Text.Trim()),
-            string.Format("\t<c><k>{0}</k><v>{1}</v></c>", klogid, logid.Text.Trim()),
+            string.Format("\t<c><k>{0}</k><v>{1}</v></c>", kdevice, dev),
+            string.Format("\t<c><k>{0}</k><v>{1}</v></c>", kserv, jserv.Text?.Trim()),
+            string.Format("\t<c><k>{0}</k><v>{1}</v></c>", kport, port.Text?.Trim()),
+            string.Format("\t<c><k>{0}</k><v>{1}</v></c>", klogid, logid.Text?.Trim()),
             "  </t>",
             "</configs>",
             };
@@ -139,23 +138,39 @@ namespace TreeViewFileExplorer
         #region login
         internal void Loging(string logid, string pswd, string device)
         {
-            Task<SessionClient> tclient = AnClient.Login(logid, pswd, device, new OnLoginHandler());
-            tclient.Wait();
-            client = tclient.Result;
-            Assert.IsNotNull(client);
+            if (LangExt.isblank(jserv.Text.Trim()))
+                jserv.Text = "127.0.0.1";
+            if (LangExt.isblank(port.Text.Trim()))
+                port.Text = "8080";
+            AnClient.Init(string.Format("http://{0}:{1}/{2}", jserv.Text, port.Text, jservPath));
+
+            // Task<SessionClient> tclient =
+                AnClient.Login(logid, pswd, device, new OnLoginHandler(this));
+            // tclient.Wait();
+            // client = tclient.Result;
+            // Assert.IsNotNull(client);
         }
 
         class OnLoginHandler : OnLogin
         {
+            Login dlg;
+            public OnLoginHandler(Login loginDlg)
+            {
+                this.dlg = loginDlg;
+            }
             public void ok(SessionClient client)
             {
                 ((App)Application.Current).loggedIn = true;
                 ((App)Application.Current).client = client;
 
-                MainWindow main = new MainWindow();
-                //main.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                //main.SourceInitialized += (s, a) => main.WindowState = WindowState.Maximized;
-                main.ShowDialog();
+                Application.Current.Dispatcher.Invoke(new Action(() => {
+                    dlg.savePrefs();
+
+                    MainWindow main = new MainWindow(client);
+                    //main.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    //main.SourceInitialized += (s, a) => main.WindowState = WindowState.Maximized;
+                    main.ShowDialog();
+                }));
             }
         }
 

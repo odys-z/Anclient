@@ -52,7 +52,7 @@
         <Grid Margin="6">
           <TextBox x:Name="jserv" Width="120" FontSize="16" VerticalAlignment="Center"
                   Background="#FFFAF4E9" HorizontalAlignment="Left" />
-          <TextBlock IsHitTestVisible="False" Text="Server Address" VerticalAlignment="Center"
+          <TextBlock IsHitTestVisible="False" Text="Server: 127.0.0.1" VerticalAlignment="Center"
                    HorizontalAlignment="Left" Margin="2,0,0,0" Foreground="DarkGray">
             <TextBlock.Style>
               <Style TargetType="{x:Type TextBlock}">
@@ -70,7 +70,7 @@
         <Grid Margin="6">
           <TextBox x:Name="port" Width="120" FontSize="16" VerticalAlignment="Center"
                   Background="#FFFAF4E9" HorizontalAlignment="Left" PreviewTextInput="portPreview" />
-          <TextBlock IsHitTestVisible="False" Text="Port" VerticalAlignment="Center"
+          <TextBlock IsHitTestVisible="False" Text="Port: 8080" VerticalAlignment="Center"
                    HorizontalAlignment="Left" Margin="2,0,0,0" Foreground="DarkGray">
             <TextBlock.Style>
               <Style TargetType="{x:Type TextBlock}">

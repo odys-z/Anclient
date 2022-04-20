@@ -87,7 +87,7 @@ namespace TreeViewFileExplorer.ShellClasses
                             RaiseBeforeExplore();
                             RemoveDummy();
                             ExploreDirectories();
-                            ExploreFiles();
+                            // ExploreFiles();
                             RaiseAfterExplore();
                         }
                     }
@@ -166,8 +166,8 @@ namespace TreeViewFileExplorer.ShellClasses
             }
             if (FileSystemInfo is DirectoryInfo)
             {
-                var directories = ((DirectoryInfo)FileSystemInfo).GetDirectories();
-                foreach (var directory in directories.OrderBy(d => d.Name))
+                var subdirs = ((DirectoryInfo)FileSystemInfo).GetDirectories(); // Returns the subdirectories of the current directory.
+                foreach (var directory in subdirs.OrderBy(d => d.Name))
                 {
                     if ((directory.Attributes & FileAttributes.System) != FileAttributes.System &&
                         (directory.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
