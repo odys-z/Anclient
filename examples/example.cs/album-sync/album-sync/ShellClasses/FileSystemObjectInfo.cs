@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Media;
 using TreeViewFileExplorer.Enums;
 
@@ -10,15 +11,13 @@ namespace TreeViewFileExplorer.ShellClasses
 {
     public class FileSystemObjectInfo : BaseObject
     {
-        public FileSystemObjectInfo(FileSystemInfo info)
+        public FileSystemObjectInfo(FileSystemInfo info, ref ListView filelist)
         {
-            if (this is DummyFileSystemObjectInfo)
-            {
-                return;
-            }
+            if (this is DummyFileSystemObjectInfo) return;
 
             Children = new ObservableCollection<FileSystemObjectInfo>();
             FileSystemInfo = info;
+            this.filelist = filelist;
 
             if (info is DirectoryInfo)
             {
@@ -33,8 +32,8 @@ namespace TreeViewFileExplorer.ShellClasses
             PropertyChanged += new PropertyChangedEventHandler(FileSystemObjectInfo_PropertyChanged);
         }
 
-        public FileSystemObjectInfo(DriveInfo drive)
-            : this(drive.RootDirectory)
+        public FileSystemObjectInfo(DriveInfo drive, ref ListView list)
+            : this(drive.RootDirectory, ref list)
         {
         }
 
@@ -97,6 +96,25 @@ namespace TreeViewFileExplorer.ShellClasses
                     }
                     RaiseAfterExpand();
                 }
+                else if (string.Equals(e.PropertyName, "IsSelect", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    filelist.Items.Clear();
+
+                    try
+                    {
+                        var dirs = ((DirectoryInfo)FileSystemInfo).GetDirectories();
+                        foreach (DirectoryInfo f in dirs)
+                            filelist.Items.Add(f);
+                    }
+                    catch (UnauthorizedAccessException) { }
+
+                    try {
+                        var files = ((DirectoryInfo)FileSystemInfo).GetFiles();
+                        foreach (FileInfo f in files)
+                            filelist.Items.Add(f);
+                    }
+                    catch (UnauthorizedAccessException) { }
+                }
             }
         }
 
@@ -121,12 +139,19 @@ namespace TreeViewFileExplorer.ShellClasses
             get { return GetValue<bool>("IsExpanded"); }
             set { SetValue("IsExpanded", value); }
         }
+        public bool IsSelect
+        {
+            get { return GetValue<bool>("IsSelect"); }
+            set { SetValue("IsSelect", value); }
+        }
 
         public FileSystemInfo FileSystemInfo
         {
             get { return GetValue<FileSystemInfo>("FileSystemInfo"); }
             private set { SetValue("FileSystemInfo", value); }
         }
+
+        private ListView filelist;
 
         private DriveInfo Drive
         {
@@ -140,7 +165,7 @@ namespace TreeViewFileExplorer.ShellClasses
 
         private void AddDummy()
         {
-            Children.Add(new DummyFileSystemObjectInfo());
+            Children.Add(new DummyFileSystemObjectInfo(ref filelist));
         }
 
         private bool HasDummy()
@@ -172,7 +197,7 @@ namespace TreeViewFileExplorer.ShellClasses
                     if ((directory.Attributes & FileAttributes.System) != FileAttributes.System &&
                         (directory.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                     {
-                        var fileSystemObject = new FileSystemObjectInfo(directory);
+                        var fileSystemObject = new FileSystemObjectInfo(directory, ref filelist);
                         fileSystemObject.BeforeExplore += FileSystemObject_BeforeExplore;
                         fileSystemObject.AfterExplore += FileSystemObject_AfterExplore;
                         Children.Add(fileSystemObject);
@@ -205,7 +230,7 @@ namespace TreeViewFileExplorer.ShellClasses
                     if ((file.Attributes & FileAttributes.System) != FileAttributes.System &&
                         (file.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                     {
-                        Children.Add(new FileSystemObjectInfo(file));
+                        Children.Add(new FileSystemObjectInfo(file, ref filelist));
                     }
                 }
             }

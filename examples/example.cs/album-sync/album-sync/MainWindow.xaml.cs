@@ -46,7 +46,7 @@ namespace TreeViewFileExplorer
                 .ToList()
                 .ForEach(drive =>
                 {
-                    var fileSystemObject = new FileSystemObjectInfo(drive);
+                    var fileSystemObject = new FileSystemObjectInfo(drive, ref filelist);
                     fileSystemObject.BeforeExplore += FileSystemObject_BeforeExplore;
                     fileSystemObject.AfterExplore += FileSystemObject_AfterExplore;
                     treeView.Items.Add(fileSystemObject);

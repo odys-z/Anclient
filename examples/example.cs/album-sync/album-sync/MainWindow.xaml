@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TreeViewFileExplorer"
         xmlns:classes="clr-namespace:TreeViewFileExplorer.ShellClasses"
         mc:Ignorable="d"
         Title="TreeView File Explorer for Windows (by Michael Pendon)" Height="800" Width="1280" Icon="res/ic_launcher.png" WindowState="Maximized">
@@ -17,14 +16,15 @@
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelect, Mode=TwoWay}" />
                     <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type classes:FileSystemObjectInfo}" ItemsSource="{Binding Path=Children}">
+                <HierarchicalDataTemplate DataType="{x:Type classes:FileSystemObjectInfo}" ItemsSource="{Binding Path=Children}" >
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding Path=ImageSource, UpdateSourceTrigger=PropertyChanged}" Margin="0,1,8,1"></Image>
-                        <CheckBox x:Name="selected" Margin="0,0,5,0" />
+                        <Image Source="{Binding Path=ImageSource, UpdateSourceTrigger=PropertyChanged}" Margin="0,1,4,1"></Image>
+                        <CheckBox x:Name="selected" Margin="0,0,2,0" />
                         <TextBlock Text="{Binding Path=FileSystemInfo.Name}"></TextBlock>
                     </StackPanel>
                 </HierarchicalDataTemplate>
@@ -34,13 +34,52 @@
         <StackPanel Grid.Column="2" >
             <ToolBar >
               <Button x:Name="btUpload" Height="32" Cursor="ArrowCD" >
-                  <StackPanel Orientation="Horizontal" Width="110" >
-                      <Image Source="res\ic_launcher.png" />
-                      <TextBlock Margin="5">Synchronize</TextBlock>
+                <StackPanel Orientation="Horizontal" Width="110" >
+                  <Image Source="res\ic_launcher.png" />
+                  <TextBlock Margin="5">Synchronize</TextBlock>
                 </StackPanel>
               </Button>
             </ToolBar>
-            <ListView />
+
+            <ListView ItemsSource="{Binding Path=Children}" Name="filelist" >
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Image Source="{Binding Path=ImageSource, UpdateSourceTrigger=PropertyChanged}"
+                                           Margin="0,1,2,1" />
+                                        <CheckBox IsChecked="{Binding Path=FileSystemInfo.IsSelected}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding}"/>
+                        <!--
+                        <GridViewColumn Header="Size">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock x:Name="Size" Text="{Binding Size}"/>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsFile}" Value="False">
+                                            <Setter TargetName="Size" Property="Text" Value="[Directory]"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path=FullName}"/>
+                        -->
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </StackPanel>
     </Grid>
 </Window>
