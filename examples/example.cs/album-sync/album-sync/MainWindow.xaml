@@ -33,7 +33,7 @@
         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
         <StackPanel Grid.Column="2" >
             <ToolBar >
-              <Button x:Name="btUpload" Height="32" Cursor="ArrowCD" >
+              <Button x:Name="btUpload" Height="32" Cursor="ArrowCD" Click="toUpload" >
                 <StackPanel Orientation="Horizontal" Width="110" >
                   <Image Source="res\ic_launcher.png" />
                   <TextBlock Margin="5">Synchronize</TextBlock>
@@ -41,32 +41,32 @@
               </Button>
             </ToolBar>
 
-            <ListView ItemsSource="{Binding Path=Children}" Name="filelist" >
+            <ListView ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ItemsSource="{Binding Path=Children}" Name="filelist" >
                 <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                    <Style TargetType="{x:Type ListViewItem}" >
+                        <Setter Property="IsSelected" Value="{Binding IsSelect, Mode=TwoWay}"/>
                     </Style>
                 </ListView.ItemContainerStyle>
 
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn>
+                        <GridViewColumn Width="32" >
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" >
                                         <Image Source="{Binding Path=ImageSource, UpdateSourceTrigger=PropertyChanged}"
                                            Margin="0,1,2,1" />
-                                        <CheckBox IsChecked="{Binding Path=FileSystemInfo.IsSelected}"/>
+                                        <CheckBox IsChecked="{Binding Path=IsSelect}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding}"/>
-                        <!--
-                        <GridViewColumn Header="Size">
+                        <GridViewColumn Width="400" Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
+                        <GridViewColumn Width="100" Header="Size">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock x:Name="Size" Text="{Binding Size}"/>
+                                    <TextBlock x:Name="Size" Text="{Binding Path=Size}"/>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding IsFile}" Value="False">
                                             <Setter TargetName="Size" Property="Text" Value="[Directory]"/>
@@ -75,8 +75,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path=FullName}"/>
-                        -->
+                        <GridViewColumn Width="300" Header="Repository" DisplayMemberBinding="{Binding Path=repoName}"/>
                     </GridView>
                 </ListView.View>
             </ListView>

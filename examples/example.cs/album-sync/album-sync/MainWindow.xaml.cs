@@ -1,5 +1,6 @@
 ﻿using io.odysz.anclient;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -116,6 +117,12 @@ namespace TreeViewFileExplorer
             return path.StartsWith(targetPath);
         }
 
+        private void toUpload(object sender, RoutedEventArgs e)
+        {
+            List<FileSystemInfo> bufUpload = new List<FileSystemInfo>();
+            foreach (FileSystemInfo file in filelist.Items)
+                bufUpload.Add(file);
+        }
         #endregion
     }
 }

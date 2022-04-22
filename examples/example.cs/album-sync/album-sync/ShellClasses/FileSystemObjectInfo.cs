@@ -100,20 +100,24 @@ namespace TreeViewFileExplorer.ShellClasses
                 {
                     filelist.Items.Clear();
 
-                    try
+                    if (IsSelect)
                     {
-                        var dirs = ((DirectoryInfo)FileSystemInfo).GetDirectories();
-                        foreach (DirectoryInfo f in dirs)
-                            filelist.Items.Add(f);
-                    }
-                    catch (UnauthorizedAccessException) { }
+                        try
+                        {
+                            var dirs = ((DirectoryInfo)FileSystemInfo).GetDirectories();
+                            foreach (DirectoryInfo f in dirs)
+                                filelist.Items.Add(new FileSystemObjectInfo(f, ref filelist));
+                        }
+                        catch (UnauthorizedAccessException) { }
 
-                    try {
-                        var files = ((DirectoryInfo)FileSystemInfo).GetFiles();
-                        foreach (FileInfo f in files)
-                            filelist.Items.Add(f);
+                        try
+                        {
+                            var files = ((DirectoryInfo)FileSystemInfo).GetFiles();
+                            foreach (FileInfo f in files)
+                                filelist.Items.Add(new FileSystemObjectInfo(f, ref filelist));
+                        }
+                        catch (UnauthorizedAccessException) { }
                     }
-                    catch (UnauthorizedAccessException) { }
                 }
             }
         }
@@ -143,6 +147,20 @@ namespace TreeViewFileExplorer.ShellClasses
         {
             get { return GetValue<bool>("IsSelect"); }
             set { SetValue("IsSelect", value); }
+        }
+
+        private string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+        public string Size
+        {
+            get
+            {   long s = GetValue<long>("Length");
+                if (s == 0)
+                    return "0" + suf[0];
+                long bytes = Math.Abs(s);
+                int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+                double num = Math.Round(bytes / Math.Pow(1024, place), 1);
+                return (Math.Sign(s) * num).ToString() + suf[place];
+            }
         }
 
         public FileSystemInfo FileSystemInfo
