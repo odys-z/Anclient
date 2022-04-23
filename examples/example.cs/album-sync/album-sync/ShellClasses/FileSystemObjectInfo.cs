@@ -149,11 +149,21 @@ namespace TreeViewFileExplorer.ShellClasses
             set { SetValue("IsSelect", value); }
         }
 
+        public bool isChecked
+        {
+            get { return GetValue<bool>("isChecked"); }
+            set { SetValue("isChecked", value); }
+        }
+
         private string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
         public string Size
         {
             get
-            {   long s = GetValue<long>("Length");
+            {
+                long s = 0;
+                if (FileSystemInfo is FileInfo)
+                    s = ((FileInfo)FileSystemInfo).Length;
+                else return "";
                 if (s == 0)
                     return "0" + suf[0];
                 long bytes = Math.Abs(s);

@@ -51,18 +51,18 @@
 
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="32" >
+                        <GridViewColumn Width="64" >
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" >
+                                        <CheckBox IsChecked="{Binding Path=isChecked}"/>
                                         <Image Source="{Binding Path=ImageSource, UpdateSourceTrigger=PropertyChanged}"
                                            Margin="0,1,2,1" />
-                                        <CheckBox IsChecked="{Binding Path=IsSelect}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Width="400" Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
+                        <GridViewColumn Width="400" Header="Name" DisplayMemberBinding="{Binding Path=FileSystemInfo.Name}"/>
                         <GridViewColumn Width="100" Header="Size">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -75,7 +75,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Width="300" Header="Repository" DisplayMemberBinding="{Binding Path=repoName}"/>
+                        <GridViewColumn Width="300" Header="Repository Path" DisplayMemberBinding="{Binding Path=repoName}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
