@@ -119,6 +119,11 @@ namespace TreeViewFileExplorer.ShellClasses
                         catch (UnauthorizedAccessException) { }
                     }
                 }
+                else if (string.Equals(e.PropertyName, "IsSelectItem", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (FileSystemInfo is DirectoryInfo)
+                        ;
+                }
             }
         }
 
@@ -143,16 +148,29 @@ namespace TreeViewFileExplorer.ShellClasses
             get { return GetValue<bool>("IsExpanded"); }
             set { SetValue("IsExpanded", value); }
         }
+
+        /// <summary>
+        /// Select tree item
+        /// </summary>
         public bool IsSelect
         {
             get { return GetValue<bool>("IsSelect"); }
             set { SetValue("IsSelect", value); }
         }
 
-        public bool isChecked
+        /// <summary>
+        /// Select file list item
+        /// </summary>
+        public bool IsSelectItem
         {
-            get { return GetValue<bool>("isChecked"); }
-            set { SetValue("isChecked", value); }
+            get { return GetValue<bool>("IsSelectItem"); }
+            set { SetValue("IsSelectItem", value); }
+        }
+
+        public bool IsChecked
+        {
+            get { return GetValue<bool>("IsChecked"); }
+            set { SetValue("IsChecked", value); }
         }
 
         private string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
