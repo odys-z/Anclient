@@ -46,6 +46,7 @@
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}" >
                         <Setter Property="IsSelected" Value="{Binding IsSelectItem, Mode=TwoWay}"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     </Style>
                 </ListView.ItemContainerStyle>
 
@@ -63,15 +64,17 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Width="400" Header="Name" DisplayMemberBinding="{Binding Path=FileSystemInfo.Name}"/>
-                        <GridViewColumn Width="100" Header="Size">
+                        <GridViewColumn Width="80" Header="Size" >
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock x:Name="Size" Text="{Binding Path=Size}"/>
+                                    <TextBlock x:Name="Size" Text="{Binding Path=Size}" TextAlignment="Right" />
+                                    <!--
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding IsFile}" Value="False">
                                             <Setter TargetName="Size" Property="Text" Value="[Directory]"/>
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
+                                    -->
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
