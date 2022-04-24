@@ -78,6 +78,13 @@ public class Clients {
 				resp.code(), ((AnsonResp)resp.body(0)).msg());
 	}
 	
+	/** Login asynchronously.
+	 * @param uid
+	 * @param pswdPlain
+	 * @param onOk
+	 * @param onErr
+	 * @param mac
+	 */
 	public static void loginAsync(String uid, String pswdPlain, OnLogin onOk, OnError onErr, String... mac) {
 		new Thread(new Runnable() {
 	        public void run() {

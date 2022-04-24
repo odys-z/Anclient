@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.anclient
 {
@@ -20,6 +21,7 @@ namespace io.odysz.anclient
         }
 
         /// <summary>
+        /// Js equivalent: Ajax.
         /// We use HttpClient, see https://stackoverflow.com/a/4015346/7362888
         /// </summary>
         /// <param name="url"></param>
@@ -45,7 +47,9 @@ namespace io.odysz.anclient
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.StackTrace);
-                    throw new IOException(ex.Message);
+                    // throw new IOException(ex.Message);
+                    return new AnsonMsg(req.port, new MsgCode(MsgCode.exIo))
+                            .Body(new AnsonResp(null, ex.Message), null);
                 }
             }
         }
@@ -70,9 +74,6 @@ namespace io.odysz.anclient
             {
                 jreq.ToBlock(stream);
             }
-
-            // JHelper.writeAnsonReq(con.getOutputStream(), jreq);
-            // jreq.ToBlock(con.getOutputStream());
 
             if (AnClient.verbose) Utils.Logi(url);
 

@@ -214,10 +214,6 @@ public class HttpServClient {
 		if (Clients.verbose) Utils.logi(url);
 
 		req.toBlockStream(ups);
-//		FileInputStream ifs = new FileInputStream(localpath);  
-//		req.toBlock(ups);
-//		IOUtils.copy(ifs, ups);
-//		ifs.close();
 
 		int repcode = con.getResponseCode();
 		if (repcode == 200) {

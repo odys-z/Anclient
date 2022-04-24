@@ -1,6 +1,7 @@
 ﻿using album_sync;
 using io.odysz.anclient;
 using io.odysz.anson.common;
+using io.odysz.semantic.jprotocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
+using static io.odysz.semantic.jprotocol.JProtocol;
 
 namespace TreeViewFileExplorer
 {
@@ -144,20 +146,37 @@ namespace TreeViewFileExplorer
                 port.Text = "8080";
             AnClient.Init(string.Format("http://{0}:{1}/{2}", jserv.Text, port.Text, jservPath));
 
-            // Task<SessionClient> tclient =
-                AnClient.Login(logid, pswd, device, new OnLoginHandler(this));
-            // tclient.Wait();
-            // client = tclient.Result;
-            // Assert.IsNotNull(client);
+            try
+            {
+                Task<SessionClient> tclient =
+                AnClient.Login(logid, pswd, device, new OnLoginHandler(this), new OnLoginHandler(this));
+                // tclient.Wait();
+                // client = tclient.Result;
+                // Assert.IsNotNull(client);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(String.Format(
+                    "Login Failed!\ndetails:\n{0}\n{1}", ex.Message, ex.InnerException?.Message),
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        class OnLoginHandler : OnLogin
+        class OnLoginHandler : OnLogin, OnError
         {
             Login dlg;
             public OnLoginHandler(Login loginDlg)
             {
                 this.dlg = loginDlg;
             }
+
+            public void err(AnsonMsg.MsgCode code, string msg, string[] args = null)
+            {
+                MessageBox.Show(String.Format(
+                    "Login Failed!\ndetails:\n{0}", msg),
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
             public void ok(SessionClient client)
             {
                 ((App)Application.Current).loggedIn = true;

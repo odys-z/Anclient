@@ -50,7 +50,8 @@ namespace io.odysz.anclient
         /// <throws>GeneralSecurityException  other error</throws> 
         /// <throws>Exception, most likely the network failed</throws> 
         /// <return>null if failed, a SessionClient instance if login succeed.</return>
-		public static async Task<SessionClient> Login(string uid, string pswdPlain, string device = null, OnLogin onlogin = null, OnError err = null)
+		public static async Task<SessionClient> Login(string uid, string pswdPlain, string device,
+            OnLogin onlogin, OnError err = null)
 		{
             byte[] iv = AESHelper.getRandom();
             string iv64 = AESHelper.Encode64(iv);
