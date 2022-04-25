@@ -93,6 +93,7 @@
     <Compile Include="ProperyNotifier.cs" />
     <Compile Include="ShellClasses\DummyFileSystemObjectInfo.cs" />
     <Compile Include="ShellClasses\FileSystemObjectInfo.cs" />
+    <Compile Include="ShellClasses\SynchObjectInfo.cs" />
     <Compile Include="ShellManager.cs" />
     <Compile Include="Structs\ShellFileInfo.cs" />
   </ItemGroup>

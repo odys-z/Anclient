@@ -106,7 +106,8 @@ namespace TreeViewFileExplorer.ShellClasses
                         {
                             var dirs = ((DirectoryInfo)FileSystemInfo).GetDirectories();
                             foreach (DirectoryInfo f in dirs)
-                                filelist.Items.Add(new FileSystemObjectInfo(f, ref filelist));
+                                // filelist.Items.Add(new FileSystemObjectInfo(f, ref filelist));
+                                filelist.Items.Add(new SyncObjectInfo(f));
                         }
                         catch (UnauthorizedAccessException) { }
 
@@ -114,7 +115,8 @@ namespace TreeViewFileExplorer.ShellClasses
                         {
                             var files = ((DirectoryInfo)FileSystemInfo).GetFiles();
                             foreach (FileInfo f in files)
-                                filelist.Items.Add(new FileSystemObjectInfo(f, ref filelist));
+                                // filelist.Items.Add(new FileSystemObjectInfo(f, ref filelist));
+                                filelist.Items.Add(new SyncObjectInfo(f));
                         }
                         catch (UnauthorizedAccessException) { }
                     }
@@ -125,12 +127,12 @@ namespace TreeViewFileExplorer.ShellClasses
                         this.IsChecked = !this.IsChecked;
                 }
             }
-            else if (FileSystemInfo is FileInfo
-                && string.Equals(e.PropertyName, "IsSelectItem", StringComparison.CurrentCultureIgnoreCase))
-            {
-                if (this.IsSelectItem)
-                    this.IsChecked = !this.IsChecked;
-            }
+            //else if (FileSystemInfo is FileInfo
+            //    && string.Equals(e.PropertyName, "IsSelectItem", StringComparison.CurrentCultureIgnoreCase))
+            //{
+            //    if (this.IsSelectItem)
+            //        this.IsChecked = !this.IsChecked;
+            //}
         }
 
         #endregion
