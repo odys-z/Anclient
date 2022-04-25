@@ -247,7 +247,8 @@ namespace TreeViewFileExplorer.ShellClasses
                 foreach (var directory in subdirs.OrderBy(d => d.Name))
                 {
                     if ((directory.Attributes & FileAttributes.System) != FileAttributes.System &&
-                        (directory.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                        (directory.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden &&
+                        !IsRepoDir(directory))
                     {
                         var fileSystemObject = new FileSystemObjectInfo(directory, ref filelist);
                         fileSystemObject.BeforeExplore += FileSystemObject_BeforeExplore;
@@ -257,6 +258,27 @@ namespace TreeViewFileExplorer.ShellClasses
                 }
             }
         }
+        
+        /// <summary>
+        /// Is this dir contain "system.db"?
+        /// </summary>
+        /// <param name="path"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private static bool IsRepoDir(DirectoryInfo dir)
+        {
+            try
+            {
+                FileInfo[] files = dir.GetFiles();
+                foreach (FileInfo f in files)
+                {
+                    if (f.Name == "system.db")
+                        return true;
+                }
+            } catch { }
+            return false;
+        }
+
+
 
         private void FileSystemObject_AfterExplore(object sender, EventArgs e)
         {

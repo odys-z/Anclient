@@ -83,9 +83,12 @@ namespace TreeViewFileExplorer
                         PreSelect(childFileSystemObjectInfo, path);
                     }
                 }
+                //else if (IsRepoDir(childFileSystemObjectInfo))
+                //{
+                //    continue;
+                //}
             }
         }
-
         #endregion
 
         #region Helpers
