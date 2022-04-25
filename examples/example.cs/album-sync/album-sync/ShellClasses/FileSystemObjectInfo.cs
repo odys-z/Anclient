@@ -121,10 +121,15 @@ namespace TreeViewFileExplorer.ShellClasses
                 }
                 else if (string.Equals(e.PropertyName, "IsSelectItem", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    // if (!(FileSystemInfo is DirectoryInfo))
                     if (this.IsSelectItem)
                         this.IsChecked = !this.IsChecked;
                 }
+            }
+            else if (FileSystemInfo is FileInfo
+                && string.Equals(e.PropertyName, "IsSelectItem", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (this.IsSelectItem)
+                    this.IsChecked = !this.IsChecked;
             }
         }
 

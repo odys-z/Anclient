@@ -63,7 +63,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Width="400" Header="Name" DisplayMemberBinding="{Binding Path=FileSystemInfo.Name}"/>
+                        <GridViewColumn Width="700" Header="Name" DisplayMemberBinding="{Binding Path=FileSystemInfo.Name}"/>
                         <GridViewColumn Width="80" Header="Size" >
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>

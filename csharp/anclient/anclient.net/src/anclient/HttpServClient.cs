@@ -59,8 +59,8 @@ namespace io.odysz.anclient
             // Stream stream = con.GetResponseStream();
 
             //add reuqest header
-            req.Method = "POST"; //.setRequestMethod("POST");
-            req.UserAgent = USER_AGENT; // .setRequestProperty("User-Agent", USER_AGENT);
+            req.Method = "POST";
+            req.UserAgent = USER_AGENT;
             // req.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
             req.Headers.Add("Accept-Language", "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3");
             // con.setRequestProperty("Content-Type", "text/plain"); 
