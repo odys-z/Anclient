@@ -122,8 +122,8 @@ namespace TreeViewFileExplorer
 
         private void toUpload(object sender, RoutedEventArgs e)
         {
-            List<FileSystemInfo> bufUpload = new List<FileSystemInfo>();
-            foreach (FileSystemInfo file in filelist.Items)
+            List<SyncObjectInfo> bufUpload = new List<SyncObjectInfo>();
+            foreach (SyncObjectInfo file in filelist.Items)
                 bufUpload.Add(file);
         }
         #endregion
