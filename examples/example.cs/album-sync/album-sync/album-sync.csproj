@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>album_sync</RootNamespace>
     <AssemblyName>album-sync</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -149,6 +149,10 @@
     <ProjectReference Include="..\..\..\..\csharp\anclient\anclient.net\anclient.net.csproj">
       <Project>{327ae5aa-030c-4782-80e3-c2951f12f93e}</Project>
       <Name>anclient.net</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\csharp\anclient\MediaGallery\MediaGallery.csproj">
+      <Project>{a65e4ece-e819-4b5c-8574-88c5713307cc}</Project>
+      <Name>MediaGallery</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

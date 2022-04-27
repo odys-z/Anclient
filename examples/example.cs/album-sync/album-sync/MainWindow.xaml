@@ -46,6 +46,7 @@
               </Button>
             </ToolBar>
 
+            <!--
             <ListView ScrollViewer.VerticalScrollBarVisibility="Visible"
                       MaxHeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type StackPanel}}, Path=Height}"
                       Name="filelist" Grid.Row="1" >
@@ -86,6 +87,7 @@
                     </GridView>
                 </ListView.View>
             </ListView>
+            -->
         </Grid>
         <Image Name="img" Source="{Binding}"/>
     </Grid>

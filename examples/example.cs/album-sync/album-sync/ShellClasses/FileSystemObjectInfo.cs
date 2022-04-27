@@ -11,7 +11,8 @@ namespace TreeViewFileExplorer.ShellClasses
 {
     public class FileSystemObjectInfo : BaseObject
     {
-        public FileSystemObjectInfo(FileSystemInfo info, ref ListView filelist)
+        // public FileSystemObjectInfo(FileSystemInfo info, ref ListView filelist)
+        public FileSystemObjectInfo(FileSystemInfo info, ref MediaGallery.Gallery filelist)
         {
             if (this is DummyFileSystemObjectInfo) return;
 
@@ -32,7 +33,8 @@ namespace TreeViewFileExplorer.ShellClasses
             PropertyChanged += new PropertyChangedEventHandler(FileSystemObjectInfo_PropertyChanged);
         }
 
-        public FileSystemObjectInfo(DriveInfo drive, ref ListView list)
+        // public FileSystemObjectInfo(DriveInfo drive, ref ListView list)
+        public FileSystemObjectInfo(DriveInfo drive, ref MediaGallery.Gallery list)
             : this(drive.RootDirectory, ref list)
         {
         }
@@ -205,7 +207,8 @@ namespace TreeViewFileExplorer.ShellClasses
             private set { SetValue("FileSystemInfo", value); }
         }
 
-        private ListView filelist;
+        // private ListView filelist;
+        private MediaGallery.Gallery filelist;
 
         private DriveInfo Drive
         {
