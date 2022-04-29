@@ -123,21 +123,21 @@ class PswdTier extends MyInfTier {
 		  autocomplete: "on",
 		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ] as Array<any>;
 
-	// changePswd(opts, onOk) {
-	// 	if (!this.client) return;
-	// 	// let client = this.client;
-	// 	// let that = this;
+	changePswd(opts, onOk) {
+		if (!this.client) return;
+		// let client = this.client;
+		// let that = this;
 
-	// 	// let { uri } = opts;
-	// 	let { pswd, pswd1, pswd2 } = this.rec;
+		// let { uri } = opts;
+		let { pswd, pswd1, pswd2 } = this.rec;
 
-	// 	if (this.validate()) {
-	// 		this.client.setPswd(pswd, pswd1, {
-	// 			onOk,
-	// 			onError: this.errCtx
-	// 		});
-	// 		return true;
-	// 	}
-	// 	else return false;
-	// }
+		if (this.validate()) {
+			this.client.setPswd(pswd, pswd1, {
+				onOk,
+				onError: this.errCtx
+			});
+			return true;
+		}
+		else return false;
+	}
 }
