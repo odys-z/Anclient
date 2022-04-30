@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.Windows;
 
 namespace album_sync
 {
@@ -70,8 +71,15 @@ namespace album_sync
             ArrayList children = new ArrayList();
             if (this.IsDirectory)
             {
+                try
+                {
                 foreach (FileSystemInfo x in this.AsDirectory.GetFileSystemInfos())
                     children.Add(new MyFileSystemInfo(x));
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Info");
+                }
             }
             return children;
         }

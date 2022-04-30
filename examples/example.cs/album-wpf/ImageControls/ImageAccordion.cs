@@ -10,7 +10,6 @@ using System.Windows.Forms;
 using System.Collections.ObjectModel;
 namespace ImageControls
 {
-
     public partial class ImageAccordion : UserControl
     {
         #region Privates
@@ -155,22 +154,28 @@ namespace ImageControls
             HoverColor = Color.Purple;
             SelectedColor = Color.DarkBlue;
             ThumbnailsBox = new List<ThumbnailBox>();
-           
         }
         #region Public Methods
 
         public void Add(Thumbnail thumbnail) 
         {
             var thumbnailBox = new ThumbnailBox();
-            thumbnailBox.Width = this.Height;
-            thumbnailBox.Height = this.Height - 10;
+            // thumbnailBox.Width = this.Height;
+            // thumbnailBox.Height = this.Height - 10;
+            thumbnailBox.Width = 140;
+            thumbnailBox.Height = 100;
             this.ThumbnailsBox.Add(thumbnailBox);
             thumbnailBox.Thumbnail = thumbnail;
             this.flowLayoutPanel1.Controls.Add(thumbnailBox);
             validateButtonState();
             thumbnailBox.Selected += thumbnailBox_Select;
-
         }
+
+        public void Clear()
+        {
+            this.flowLayoutPanel1.Controls.Clear();
+        }
+
         public void RemoveAt(int index)
         {
             ThumbnailsBox[index].Selected -= thumbnailBox_Select;
@@ -216,9 +221,5 @@ namespace ImageControls
         }
 
         #endregion
-     
-
-      
-  
     }
 }

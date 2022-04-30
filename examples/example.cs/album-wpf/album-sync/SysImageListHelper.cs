@@ -116,7 +116,7 @@ namespace album_sync
         public int GetImageIndex(string path)
         {
             if (System.IO.Directory.Exists(path))
-                path = System.Environment.SystemDirectory; // optimization! give all directories the same image
+                path = Environment.SystemDirectory; // optimization! give all directories the same image
             else
                 if (System.IO.Path.HasExtension(path))
                 path = System.IO.Path.GetExtension(path);
@@ -198,7 +198,7 @@ namespace album_sync
         /// </summary>
         /// <param name="path">The file or directory whose type is to be fetched</param>
         /// <returns>A string describing the type of the file, or an empty string if something goes wrong.</returns>
-        public static String GetFileType(string path)
+        public static string GetFileType(string path)
         {
             SHFILEINFO shfi = new SHFILEINFO();
             int flags = SHGFI_TYPENAME;

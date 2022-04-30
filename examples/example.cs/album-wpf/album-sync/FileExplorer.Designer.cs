@@ -36,9 +36,12 @@
             this.colSize = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colType = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colAttrs = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.lbClientPath = new System.Windows.Forms.Label();
+            this.imgslide = new ImageControls.ImageSilder.ImageSliderBox();
             this.folderContents = new ImageControls.ImageAccordion();
-            this.imageSliderBox1 = new ImageControls.ImageSilder.ImageSliderBox();
             ((System.ComponentModel.ISupportInitialize)(this.treeListView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // treeListView
@@ -48,6 +51,7 @@
             this.treeListView.AllColumns.Add(this.colSize);
             this.treeListView.AllColumns.Add(this.colType);
             this.treeListView.AllColumns.Add(this.colAttrs);
+            this.treeListView.BackColor = System.Drawing.Color.OldLace;
             this.treeListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colName,
             this.colCreateTime,
@@ -73,7 +77,7 @@
             this.colName.IsEditable = false;
             this.colName.Text = "Folder";
             this.colName.UseInitialLetterForGroup = true;
-            this.colName.Width = 110;
+            this.colName.Width = 210;
             this.colName.WordWrap = true;
             // 
             // colCreateTime
@@ -95,8 +99,8 @@
             // colType
             // 
             this.colType.IsEditable = false;
-            this.colType.Text = "File Type";
-            this.colType.Width = 140;
+            this.colType.Text = "Type";
+            this.colType.Width = 70;
             // 
             // colAttrs
             // 
@@ -104,41 +108,66 @@
             this.colAttrs.Text = "Album";
             this.colAttrs.Width = 105;
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(581, 2);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(24, 24);
+            this.pictureBox1.TabIndex = 3;
+            this.pictureBox1.TabStop = false;
+            // 
+            // lbClientPath
+            // 
+            this.lbClientPath.AutoSize = true;
+            this.lbClientPath.Location = new System.Drawing.Point(611, 9);
+            this.lbClientPath.Name = "lbClientPath";
+            this.lbClientPath.Size = new System.Drawing.Size(55, 15);
+            this.lbClientPath.TabIndex = 4;
+            this.lbClientPath.Text = "label1";
+            // 
+            // imgslide
+            // 
+            this.imgslide.AutoStart = false;
+            this.imgslide.BackColor = System.Drawing.Color.OldLace;
+            this.imgslide.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.imgslide.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imgslide.Location = new System.Drawing.Point(581, 32);
+            this.imgslide.Loop = false;
+            this.imgslide.Name = "imgslide";
+            this.imgslide.Size = new System.Drawing.Size(598, 303);
+            this.imgslide.TabIndex = 2;
+            this.imgslide.TabStop = false;
+            // 
             // folderContents
             // 
+            this.folderContents.BackColor = System.Drawing.Color.OldLace;
             this.folderContents.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.folderContents.HoverColor = System.Drawing.Color.Purple;
-            this.folderContents.Location = new System.Drawing.Point(581, 156);
+            this.folderContents.Location = new System.Drawing.Point(581, 341);
             this.folderContents.Name = "folderContents";
             this.folderContents.SelectedColor = System.Drawing.Color.DarkBlue;
-            this.folderContents.Size = new System.Drawing.Size(598, 558);
+            this.folderContents.Size = new System.Drawing.Size(598, 373);
             this.folderContents.TabIndex = 1;
-            // 
-            // imageSliderBox1
-            // 
-            this.imageSliderBox1.AutoStart = false;
-            this.imageSliderBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.imageSliderBox1.Location = new System.Drawing.Point(581, 0);
-            this.imageSliderBox1.Loop = false;
-            this.imageSliderBox1.Name = "imageSliderBox1";
-            this.imageSliderBox1.Size = new System.Drawing.Size(598, 150);
-            this.imageSliderBox1.TabIndex = 2;
-            this.imageSliderBox1.TabStop = false;
+            this.folderContents.ThumbnailChanged += new ImageControls.ImageAccordion.ThumbnailChangedDelegate(this.toChangeImg);
             // 
             // FileExplorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Bisque;
+            this.BackColor = System.Drawing.Color.Cornsilk;
             this.ClientSize = new System.Drawing.Size(1182, 713);
-            this.Controls.Add(this.imageSliderBox1);
+            this.Controls.Add(this.lbClientPath);
+            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.imgslide);
             this.Controls.Add(this.folderContents);
             this.Controls.Add(this.treeListView);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FileExplorer";
             this.Text = "Album Synchronizer";
             ((System.ComponentModel.ISupportInitialize)(this.treeListView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -151,6 +180,8 @@
         private BrightIdeasSoftware.OLVColumn colType;
         private BrightIdeasSoftware.OLVColumn colAttrs;
         private ImageControls.ImageAccordion folderContents;
-        private ImageControls.ImageSilder.ImageSliderBox imageSliderBox1;
+        private ImageControls.ImageSilder.ImageSliderBox imgslide;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Label lbClientPath;
     }
 }

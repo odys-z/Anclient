@@ -1,14 +1,17 @@
 ﻿using BrightIdeasSoftware;
+using ImageControls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -142,10 +145,31 @@ namespace album_sync
             if (p == null)
                 msg = listView.SelectedIndices.Count.ToString();
             else
+            {
                 msg = string.Format("'{0}'", p.Name);
+                Debug.WriteLine(msg);
+
+                folderContents.Clear();
+                foreach(MyFileSystemInfo c in p.GetFileSystemInfos())
+                {
+                    Debug.WriteLine(c.Name);
+                    // if (c.Name.EndsWith("(.png)|(.jpg)"))
+                    if (Regex.Match(c.Name, "\\.(png)|(jpg)").Success)
+                    {
+                        // folderContents.Add(new Thumbnail(c.Name, Image.FromFile(c.FullName)));
+                        folderContents.Add(new Thumbnail(c.Name, c.FullName));
+                    }
+                }
+            }
             // Person focused = listView.FocusedItem == null ? null : (((OLVListItem)listView.FocusedItem).RowObject) as Person;
             // this.lbTreeItemName.Text = string.Format("Selected {0} of {1} items", msg, listView.GetItemCount());
+        }
 
+        private void toChangeImg(int OldIndex, int NewIndex, Thumbnail thumbnail)
+        {
+            imgslide.BackgroundImage = thumbnail.Image;
+            lbClientPath.Text = thumbnail.Text;
+            // lbClientPath.Left = (lbClientPath.Width - lbClientPath.Width) / 2;
         }
     }
 }

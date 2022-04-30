@@ -60,7 +60,7 @@ namespace ImageControls.ImageSilder
           //  UpdateStyles();
             this.DoubleBuffered = true;
             base.TabStop = false;
-            base.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            base.BorderStyle = BorderStyle.FixedSingle;
             Frames = _Frames;
         }
 
@@ -77,8 +77,6 @@ namespace ImageControls.ImageSilder
         #region Methods
         public void Start() 
         {
-           
-
             Next();
         }
         public void Next() 

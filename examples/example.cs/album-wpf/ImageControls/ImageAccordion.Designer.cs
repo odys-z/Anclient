@@ -40,12 +40,13 @@
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(200, 100);
             this.flowLayoutPanel1.TabIndex = 2;
-            this.flowLayoutPanel1.WrapContents = false;
             // 
             // rightButton
             // 
             this.rightButton.Dock = System.Windows.Forms.DockStyle.Right;
+            this.rightButton.DownColor = System.Drawing.Color.DarkBlue;
             this.rightButton.Face = ImageControls.AccodionButtonFace.Right;
+            this.rightButton.HoverColor = System.Drawing.Color.Orange;
             this.rightButton.IsEnable = true;
             this.rightButton.Location = new System.Drawing.Point(408, 0);
             this.rightButton.Name = "rightButton";
@@ -58,7 +59,9 @@
             // leftButton
             // 
             this.leftButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.leftButton.DownColor = System.Drawing.Color.DarkBlue;
             this.leftButton.Face = ImageControls.AccodionButtonFace.Left;
+            this.leftButton.HoverColor = System.Drawing.Color.Orange;
             this.leftButton.IsEnable = true;
             this.leftButton.Location = new System.Drawing.Point(0, 0);
             this.leftButton.Name = "leftButton";
@@ -70,6 +73,7 @@
             // 
             // ImageAccordion
             // 
+            this.BackColor = System.Drawing.Color.OldLace;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.rightButton);

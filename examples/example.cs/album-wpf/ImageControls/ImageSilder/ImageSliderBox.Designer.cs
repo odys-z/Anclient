@@ -28,8 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-                        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.SuspendLayout();
+            // 
+            // ImageSliderBox
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.Bisque;
+            this.Name = "ImageSliderBox";
+            this.ResumeLayout(false);
+
         }
 
         #endregion
