@@ -38,10 +38,15 @@
             this.colAttrs = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.lbClientPath = new System.Windows.Forms.Label();
-            this.imgslide = new ImageControls.ImageSilder.ImageSliderBox();
             this.folderContents = new ImageControls.ImageAccordion();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.imgbox = new Cyotek.Windows.Forms.ImageBox();
             ((System.ComponentModel.ISupportInitialize)(this.treeListView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // treeListView
@@ -51,6 +56,8 @@
             this.treeListView.AllColumns.Add(this.colSize);
             this.treeListView.AllColumns.Add(this.colType);
             this.treeListView.AllColumns.Add(this.colAttrs);
+            this.treeListView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.treeListView.BackColor = System.Drawing.Color.OldLace;
             this.treeListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colName,
@@ -110,7 +117,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(581, 2);
+            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(24, 24);
             this.pictureBox1.TabIndex = 3;
@@ -119,55 +126,79 @@
             // lbClientPath
             // 
             this.lbClientPath.AutoSize = true;
-            this.lbClientPath.Location = new System.Drawing.Point(611, 9);
+            this.lbClientPath.Location = new System.Drawing.Point(33, 6);
             this.lbClientPath.Name = "lbClientPath";
-            this.lbClientPath.Size = new System.Drawing.Size(55, 15);
+            this.lbClientPath.Size = new System.Drawing.Size(31, 15);
             this.lbClientPath.TabIndex = 4;
-            this.lbClientPath.Text = "label1";
-            // 
-            // imgslide
-            // 
-            this.imgslide.AutoStart = false;
-            this.imgslide.BackColor = System.Drawing.Color.OldLace;
-            this.imgslide.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.imgslide.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.imgslide.Location = new System.Drawing.Point(581, 32);
-            this.imgslide.Loop = false;
-            this.imgslide.Name = "imgslide";
-            this.imgslide.Size = new System.Drawing.Size(598, 303);
-            this.imgslide.TabIndex = 2;
-            this.imgslide.TabStop = false;
+            this.lbClientPath.Text = "...";
             // 
             // folderContents
             // 
+            this.folderContents.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.folderContents.BackColor = System.Drawing.Color.OldLace;
             this.folderContents.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.folderContents.HoverColor = System.Drawing.Color.Purple;
-            this.folderContents.Location = new System.Drawing.Point(581, 341);
+            this.folderContents.Location = new System.Drawing.Point(0, -2);
             this.folderContents.Name = "folderContents";
             this.folderContents.SelectedColor = System.Drawing.Color.DarkBlue;
-            this.folderContents.Size = new System.Drawing.Size(598, 373);
+            this.folderContents.Size = new System.Drawing.Size(762, 377);
             this.folderContents.TabIndex = 1;
             this.folderContents.ThumbnailChanged += new ImageControls.ImageAccordion.ThumbnailChangedDelegate(this.toChangeImg);
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.Location = new System.Drawing.Point(581, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.imgbox);
+            this.splitContainer1.Panel1.Controls.Add(this.lbClientPath);
+            this.splitContainer1.Panel1.Controls.Add(this.pictureBox1);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.folderContents);
+            this.splitContainer1.Size = new System.Drawing.Size(762, 714);
+            this.splitContainer1.SplitterDistance = 335;
+            this.splitContainer1.TabIndex = 6;
+            // 
+            // imgbox
+            // 
+            this.imgbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.imgbox.AutoSize = false;
+            this.imgbox.Location = new System.Drawing.Point(3, 27);
+            this.imgbox.Name = "imgbox";
+            this.imgbox.Size = new System.Drawing.Size(759, 304);
+            this.imgbox.TabIndex = 0;
             // 
             // FileExplorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Cornsilk;
-            this.ClientSize = new System.Drawing.Size(1182, 713);
-            this.Controls.Add(this.lbClientPath);
-            this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.imgslide);
-            this.Controls.Add(this.folderContents);
+            this.ClientSize = new System.Drawing.Size(1344, 713);
+            this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.treeListView);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FileExplorer";
             this.Text = "Album Synchronizer";
             ((System.ComponentModel.ISupportInitialize)(this.treeListView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -180,8 +211,9 @@
         private BrightIdeasSoftware.OLVColumn colType;
         private BrightIdeasSoftware.OLVColumn colAttrs;
         private ImageControls.ImageAccordion folderContents;
-        private ImageControls.ImageSilder.ImageSliderBox imgslide;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label lbClientPath;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private Cyotek.Windows.Forms.ImageBox imgbox;
     }
 }

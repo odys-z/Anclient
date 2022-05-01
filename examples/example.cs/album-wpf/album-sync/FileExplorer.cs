@@ -167,9 +167,10 @@ namespace album_sync
 
         private void toChangeImg(int OldIndex, int NewIndex, Thumbnail thumbnail)
         {
-            imgslide.BackgroundImage = thumbnail.Image;
+            // imgslide.BackgroundImage = thumbnail.Image;
             lbClientPath.Text = thumbnail.Text;
-            // lbClientPath.Left = (lbClientPath.Width - lbClientPath.Width) / 2;
+
+            imgbox.Image = Image.FromFile(thumbnail.Path);
         }
     }
 }

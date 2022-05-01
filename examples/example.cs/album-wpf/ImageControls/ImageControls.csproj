@@ -60,6 +60,12 @@
     <Compile Include="ImageAccordion.designer.cs">
       <DependentUpon>ImageAccordion.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImageBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageBox.designer.cs">
+      <DependentUpon>ImageBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="ImageSilder\Transitions\BarsDown.cs" />
     <Compile Include="ImageSilder\Transitions\BarsDowns.cs" />
     <Compile Include="ImageSilder\Transitions\CircleIn.cs" />
