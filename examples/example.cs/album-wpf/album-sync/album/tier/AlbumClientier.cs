@@ -19,7 +19,7 @@ using static io.oz.album.tier.AlbumReq;
 
 namespace album_sync.album.tier
 {
-    class AlbumClientier
+    public class AlbumClientier
     {
 		private SessionClient client;
 		private ErrorCtx errCtx;

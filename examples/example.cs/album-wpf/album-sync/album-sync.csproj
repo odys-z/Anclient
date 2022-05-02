@@ -171,5 +171,11 @@
       <Name>ObjectListView2012</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\up1.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\up2.bmp" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

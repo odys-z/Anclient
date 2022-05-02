@@ -192,7 +192,7 @@ namespace io.oz.album
                     //main.SourceInitialized += (s, a) => main.WindowState = WindowState.Maximized;
                     main.ShowDialog();
                     */
-                    FileExplorer form = new FileExplorer();
+                    FileExplorer form = new FileExplorer(client);
                     // WindowInteropHelper wih = new WindowInteropHelper(dlg);
                     // wih.Owner = form.Handle;
                     dlg.Hide();

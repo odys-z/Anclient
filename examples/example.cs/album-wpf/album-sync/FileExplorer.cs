@@ -1,33 +1,35 @@
-﻿using BrightIdeasSoftware;
+﻿using album_sync.album.tier;
+using BrightIdeasSoftware;
 using ImageControls;
+using io.odysz.anclient;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace album_sync
 {
     public partial class FileExplorer : Form
     {
-        public FileExplorer()
+        private HashSet<string> browsingFolder;
+        private AlbumClientier tier;
+
+        public FileExplorer(AlbumClientier tier)
         {
+            this.tier = tier;
             InitializeComponent();
+
+            btUpload.ImageIndex = 0;
             InitializeTreeListExample();
         }
 
         void InitializeTreeListExample()
         {
-
             this.treeListView.HierarchicalCheckboxes = true;
             this.treeListView.HideSelection = false;
             this.treeListView.CanExpandGetter = delegate (object x) {
@@ -45,10 +47,6 @@ namespace album_sync
                     return new ArrayList();
                 }
             };
-
-            // checkBox11.Checked = this.treeListView.HierarchicalCheckboxes;
-
-            //this.treeListView.CheckBoxes = false;
 
             // You can change the way the connection lines are drawn by changing the pen
             TreeListView.TreeRenderer renderer = this.treeListView.TreeColumnRenderer;
@@ -120,7 +118,6 @@ namespace album_sync
                 }
             }
             this.treeListView.Roots = roots;
-
         }
 
         static string FormatFileSize(long size)
@@ -149,15 +146,17 @@ namespace album_sync
                 msg = string.Format("'{0}'", p.Name);
                 Debug.WriteLine(msg);
 
+
                 folderContents.Clear();
+
+                browsingFolder = new HashSet<string>();
+
                 foreach(MyFileSystemInfo c in p.GetFileSystemInfos())
                 {
                     Debug.WriteLine(c.Name);
-                    // if (c.Name.EndsWith("(.png)|(.jpg)"))
                     if (Regex.Match(c.Name, "\\.(png)|(jpg)").Success)
                     {
-                        // folderContents.Add(new Thumbnail(c.Name, Image.FromFile(c.FullName)));
-                        folderContents.Add(new Thumbnail(c.Name, c.FullName));
+                        folderContents.Add(new Thumbnail(c.Name, c.FullName), ref browsingFolder);
                     }
                 }
             }
@@ -167,10 +166,18 @@ namespace album_sync
 
         private void toChangeImg(int OldIndex, int NewIndex, Thumbnail thumbnail)
         {
-            // imgslide.BackgroundImage = thumbnail.Image;
             lbClientPath.Text = thumbnail.Text;
 
             imgbox.Image = Image.FromFile(thumbnail.Path);
+        }
+
+        private void btUpload_Hover(object sender, EventArgs e) => btUpload.ImageIndex = 1;
+        private void btUpload_Leave(object sender, EventArgs e) => btUpload.ImageIndex = 0;
+
+        private void toUpload(object sender, MouseEventArgs e)
+        {
+            // foreach (string pth in browsingFolder)
+            tier.asyncPhotos(browsingFolder);
         }
     }
 }

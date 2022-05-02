@@ -66,8 +66,6 @@ public class AlbumContext {
 
     public AlbumClientier tier;
 
-    // private SessionClient client;
-
     public SessionInf photoUser;
 
     ConnState state;

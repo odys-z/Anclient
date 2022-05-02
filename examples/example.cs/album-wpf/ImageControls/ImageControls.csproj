@@ -84,6 +84,11 @@
     <Compile Include="ImageSilder\Transitions\Star.cs" />
     <Compile Include="ImageSilder\Utility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Thumbnail.cs" />
     <Compile Include="ThumbnailBox.cs">
       <SubType>UserControl</SubType>
@@ -103,6 +108,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ImageSilder\ImageSliderBox.resx">
       <DependentUpon>ImageSliderBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="ThumbnailBox.resx">
       <DependentUpon>ThumbnailBox.cs</DependentUpon>

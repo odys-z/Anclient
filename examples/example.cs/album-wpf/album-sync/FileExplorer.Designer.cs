@@ -36,13 +36,13 @@
             this.colSize = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colType = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colAttrs = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.lbClientPath = new System.Windows.Forms.Label();
-            this.folderContents = new ImageControls.ImageAccordion();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.imgbox = new Cyotek.Windows.Forms.ImageBox();
+            this.btUpload = new System.Windows.Forms.Button();
+            this.imgUpload = new System.Windows.Forms.ImageList(this.components);
+            this.folderContents = new ImageControls.ImageAccordion();
             ((System.ComponentModel.ISupportInitialize)(this.treeListView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -115,37 +115,14 @@
             this.colAttrs.Text = "Album";
             this.colAttrs.Width = 105;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(24, 24);
-            this.pictureBox1.TabIndex = 3;
-            this.pictureBox1.TabStop = false;
-            // 
             // lbClientPath
             // 
             this.lbClientPath.AutoSize = true;
-            this.lbClientPath.Location = new System.Drawing.Point(33, 6);
+            this.lbClientPath.Location = new System.Drawing.Point(3, 7);
             this.lbClientPath.Name = "lbClientPath";
             this.lbClientPath.Size = new System.Drawing.Size(31, 15);
             this.lbClientPath.TabIndex = 4;
             this.lbClientPath.Text = "...";
-            // 
-            // folderContents
-            // 
-            this.folderContents.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.folderContents.BackColor = System.Drawing.Color.OldLace;
-            this.folderContents.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.folderContents.HoverColor = System.Drawing.Color.Purple;
-            this.folderContents.Location = new System.Drawing.Point(0, -2);
-            this.folderContents.Name = "folderContents";
-            this.folderContents.SelectedColor = System.Drawing.Color.DarkBlue;
-            this.folderContents.Size = new System.Drawing.Size(762, 377);
-            this.folderContents.TabIndex = 1;
-            this.folderContents.ThumbnailChanged += new ImageControls.ImageAccordion.ThumbnailChangedDelegate(this.toChangeImg);
             // 
             // splitContainer1
             // 
@@ -160,10 +137,10 @@
             // 
             this.splitContainer1.Panel1.Controls.Add(this.imgbox);
             this.splitContainer1.Panel1.Controls.Add(this.lbClientPath);
-            this.splitContainer1.Panel1.Controls.Add(this.pictureBox1);
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.btUpload);
             this.splitContainer1.Panel2.Controls.Add(this.folderContents);
             this.splitContainer1.Size = new System.Drawing.Size(762, 714);
             this.splitContainer1.SplitterDistance = 335;
@@ -180,6 +157,43 @@
             this.imgbox.Size = new System.Drawing.Size(759, 304);
             this.imgbox.TabIndex = 0;
             // 
+            // btUpload
+            // 
+            this.btUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btUpload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btUpload.ImageList = this.imgUpload;
+            this.btUpload.Location = new System.Drawing.Point(623, 340);
+            this.btUpload.Name = "btUpload";
+            this.btUpload.Size = new System.Drawing.Size(128, 32);
+            this.btUpload.TabIndex = 2;
+            this.btUpload.Text = "Upload";
+            this.btUpload.UseVisualStyleBackColor = true;
+            this.btUpload.MouseLeave += new System.EventHandler(this.btUpload_Leave);
+            this.btUpload.MouseHover += new System.EventHandler(this.btUpload_Hover);
+            this.btUpload.MouseUp += new System.Windows.Forms.MouseEventHandler(this.toUpload);
+            // 
+            // imgUpload
+            // 
+            this.imgUpload.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imgUpload.ImageStream")));
+            this.imgUpload.TransparentColor = System.Drawing.Color.Transparent;
+            this.imgUpload.Images.SetKeyName(0, "up1.bmp");
+            this.imgUpload.Images.SetKeyName(1, "up2.bmp");
+            // 
+            // folderContents
+            // 
+            this.folderContents.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.folderContents.BackColor = System.Drawing.Color.OldLace;
+            this.folderContents.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.folderContents.HoverColor = System.Drawing.Color.Purple;
+            this.folderContents.Location = new System.Drawing.Point(0, -2);
+            this.folderContents.Name = "folderContents";
+            this.folderContents.SelectedColor = System.Drawing.Color.DarkBlue;
+            this.folderContents.Size = new System.Drawing.Size(762, 339);
+            this.folderContents.TabIndex = 1;
+            this.folderContents.ThumbnailChanged += new ImageControls.ImageAccordion.ThumbnailChangedDelegate(this.toChangeImg);
+            // 
             // FileExplorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -192,7 +206,6 @@
             this.Name = "FileExplorer";
             this.Text = "Album Synchronizer";
             ((System.ComponentModel.ISupportInitialize)(this.treeListView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -211,9 +224,10 @@
         private BrightIdeasSoftware.OLVColumn colType;
         private BrightIdeasSoftware.OLVColumn colAttrs;
         private ImageControls.ImageAccordion folderContents;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label lbClientPath;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private Cyotek.Windows.Forms.ImageBox imgbox;
+        private System.Windows.Forms.Button btUpload;
+        private System.Windows.Forms.ImageList imgUpload;
     }
 }

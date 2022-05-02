@@ -157,9 +157,9 @@ namespace ImageControls
         }
         #region Public Methods
 
-        public void Add(Thumbnail thumbnail) 
+        public void Add(Thumbnail thumbnail, ref HashSet<string> folderset) 
         {
-            var thumbnailBox = new ThumbnailBox();
+            var thumbnailBox = new ThumbnailBox(folderset);
             // thumbnailBox.Width = this.Height;
             // thumbnailBox.Height = this.Height - 10;
             thumbnailBox.Width = 140;

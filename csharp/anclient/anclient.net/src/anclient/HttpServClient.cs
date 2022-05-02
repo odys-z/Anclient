@@ -56,7 +56,6 @@ namespace io.odysz.anclient
 		public string streamdown(string url, AnsonMsg jreq, string localpath) {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse con = (HttpWebResponse)req.GetResponse();
-            // Stream stream = con.GetResponseStream();
 
             //add reuqest header
             req.Method = "POST";

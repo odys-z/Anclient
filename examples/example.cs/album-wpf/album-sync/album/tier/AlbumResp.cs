@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace io.oz.album.tier
 {
-    class AlbumResp : AnsonResp
+    public class AlbumResp : AnsonResp
     {
 		protected string albumId;
 		protected string ownerId;
