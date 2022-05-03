@@ -19,12 +19,13 @@ namespace album_sync
         private HashSet<string> browsingFolder;
         private AlbumClientier tier;
 
-        public FileExplorer(AlbumClientier tier)
+        public FileExplorer(SessionClient client)
         {
-            this.tier = tier;
+            // this.tier = tier;
             InitializeComponent();
 
             btUpload.ImageIndex = 0;
+
             InitializeTreeListExample();
         }
 
@@ -176,8 +177,7 @@ namespace album_sync
 
         private void toUpload(object sender, MouseEventArgs e)
         {
-            // foreach (string pth in browsingFolder)
-            tier.asyncPhotos(browsingFolder);
+            tier.asyncPhotos(browsingFolder, client.);
         }
     }
 }

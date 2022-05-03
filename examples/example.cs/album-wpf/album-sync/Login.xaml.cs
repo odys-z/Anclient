@@ -1,7 +1,9 @@
 ﻿using album_sync;
+using album_sync.album.tier;
 using io.odysz.anclient;
 using io.odysz.anson.common;
 using io.odysz.semantic.jprotocol;
+using io.oz.album.tier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -24,16 +26,15 @@ namespace io.oz.album
         // MainWindow main;
         private const string jservPath = "jserv-album";
         string execPath;
-        const string kdevice = "device";
-        const string kserv = "jserv";
-        const string kport = "port";
-        const string klogid = "logid";
+        //const string kdevice = "device";
+        //const string kserv = "jserv";
+        //const string kport = "port";
+        //const string klogid = "logid";
 
         public Login()
         {
             InitializeComponent();
-            execPath = AppDomain.CurrentDomain.BaseDirectory;
-            loadDeviceInfo(execPath);
+            loadDeviceInfo();
         }
 
         #region Handlers
@@ -57,10 +58,12 @@ namespace io.oz.album
             }
         }
 
-        private void loadDeviceInfo(string execPath)
+        private void loadDeviceInfo()
         {
             try
             {
+                execPath = AppDomain.CurrentDomain.BaseDirectory;
+                /*
                 if (File.Exists(Path.Combine(execPath, "device.xml")))
                 {
                     XmlDocument doc = new XmlDocument();
@@ -83,9 +86,11 @@ namespace io.oz.album
                     turnOnDevice(true);
                 }
                 else turnOnDevice(false);
+                */
+                AlbumContext.init(execPath);
+
             }
             catch (Exception) { }
-
         }
 
         private void savePrefs()
@@ -121,7 +126,8 @@ namespace io.oz.album
         {
             if (LangExt.isblank(device.Text.Trim()))
             {
-                MessageBox.Show("Device name can not be empty!", "Information", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show("Device name can not be empty!", "Information",
+                                MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
             else
@@ -145,6 +151,10 @@ namespace io.oz.album
                 jserv.Text = "127.0.0.1";
             if (LangExt.isblank(port.Text.Trim()))
                 port.Text = "8080";
+
+            // AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr)
+            AlbumContext.login(logid, pswd, new OnLoginHandler(this));
+
             AnClient.Init(string.Format("http://{0}:{1}/{2}", jserv.Text, port.Text, jservPath));
 
             try
@@ -157,7 +167,7 @@ namespace io.oz.album
             }
             catch (Exception ex)
             {
-                MessageBox.Show(String.Format(
+                MessageBox.Show(string.Format(
                     "Login Failed!\ndetails:\n{0}\n{1}", ex.Message, ex.InnerException?.Message),
                     "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -186,15 +196,9 @@ namespace io.oz.album
                 Application.Current.Dispatcher.Invoke(new Action(() => {
                     dlg.savePrefs();
 
-                    /*
-                    MainWindow main = new MainWindow(client);
-                    //main.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                    //main.SourceInitialized += (s, a) => main.WindowState = WindowState.Maximized;
-                    main.ShowDialog();
-                    */
+                    // MainWindow main = new MainWindow(client);
+                    // main.ShowDialog();
                     FileExplorer form = new FileExplorer(client);
-                    // WindowInteropHelper wih = new WindowInteropHelper(dlg);
-                    // wih.Owner = form.Handle;
                     dlg.Hide();
                     form.ShowDialog();
                     dlg.Show();

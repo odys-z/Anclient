@@ -16,6 +16,8 @@ import io.oz.album.AlbumPort;
 import io.oz.album.client.AlbumClientier;
 
 public class AlbumContext {
+    protected static final boolean verbose = true;
+
     public static final String jdocbase  = "jserv-album";
     public static final String albumHome = "dist/index.html";
     public static final String synchPage = "dist/sync.html";
@@ -46,8 +48,6 @@ public class AlbumContext {
     }
 
     public enum ConnState { Online, Disconnected, LoginFailed }
-
-    protected static final boolean verbose = true;
 
     public final String clientUri = "album.and";
     public final ErrorCtx errCtx = new ErrorCtx() {

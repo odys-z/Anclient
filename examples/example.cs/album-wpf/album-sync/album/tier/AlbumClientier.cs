@@ -65,7 +65,6 @@ namespace album_sync.album.tier
 									.Header(header);
 
                         client.CommitAsync(q, onOk, onErr);
-                        // onOk.ok(resp);
                     }
                     catch (Exception e)
                     {
@@ -109,7 +108,7 @@ namespace album_sync.album.tier
                 for (int px = 0; px < videos.Count; px++)
                 {
 
-                    IFileDescriptor p = (IFileDescriptor)videos[px];
+                    IFileDescriptor p = videos[px];
                     DocsReq req = new DocsReq()
                             .blockStart(p, user);
 
@@ -133,7 +132,6 @@ namespace album_sync.album.tier
                         while (b64 != null)
                         {
                             req = new DocsReq().blockUp(seq, resp, b64, user);
-                            // req.a(DocsReq.A.blockUp);
                             seq++;
 
                             q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
@@ -145,7 +143,6 @@ namespace album_sync.album.tier
                             b64 = AESHelper.Encode64(ifs, blocksize);
                         }
                         req = new DocsReq().blockEnd(resp, user);
-                        // req.a(DocsReq.A.blockEnd);
                         q = client.UserReq(uri, new AlbumPort(AlbumPort.album), req)
                                     .Header(header);
 
@@ -199,13 +196,14 @@ namespace album_sync.album.tier
             return (AlbumResp)client.Commit(q, errCtx);
         }
 
-        /**Asynchronously query synchronizing records.
-         * @param files
-         * @param page
-         * @param onOk
-         * @param onErr
-         * @return this
-         */
+        /// <summary>
+        /// Asynchronously query synchronizing records.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="page"></param>
+        /// <param name="onOk"></param>
+        /// <param name="onErr"></param>
+        /// <returns>this</returns>
         public AlbumClientier asyncQuerySyncs(IList<IFileDescriptor> files, SyncingPage page, OnOk onOk, OnError onErr)
         {
             Task.Run(() =>
@@ -263,15 +261,17 @@ namespace album_sync.album.tier
             return reslts;
         }
 	
-        /**Asynchronously synchronize photos
-         * @param photos
-         * @param user
-         * @param onOk
-         * @param onErr
-         * @throws SemanticException
-         * @throws IOException
-         * @throws AnsonException
-         */
+        /// <summary>
+        /// Asynchronously synchronize photos
+        /// </summary>
+        /// <param name="photos"></param>
+        /// <param name="user"></param>
+        /// <param name="onOk"></param>
+        /// <param name="onErr"></param>
+        /// <exception cref="SemanticException"></exception>
+        /// <exception cref="SemanticException"></exception>
+        /// <exception cref="IOException"></exception>
+        /// <exception cref="AnsonException"></exception>
         public void asyncPhotos(List<IFileDescriptor> photos, SessionInf user, OnOk onOk, OnError onErr) {
             DocsResp resp = null;
             try
