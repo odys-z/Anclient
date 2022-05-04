@@ -15,7 +15,5 @@ namespace album_sync
     /// </summary>
     public partial class App : Application
     {
-        public SessionClient client { get; set; }
-        public bool loggedIn { get; internal set; }
     }
 }

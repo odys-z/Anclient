@@ -95,5 +95,9 @@ namespace io.odysz.anclient
             return string.Format("{0:S}/{1:S}", servRt, port.Url());
         }
 
+        //public static void loginAsync(string uid, string pswd, JProtocol.OnOk onLogin, JProtocol.OnError err, string device)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

@@ -73,11 +73,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="album\AlbumPort.cs" />
+    <Compile Include="album\Preferences.cs" />
     <Compile Include="album\tier\AlbumClientier.cs" />
     <Compile Include="album\tier\AlbumContext.cs" />
     <Compile Include="album\tier\AlbumReq.cs" />
     <Compile Include="album\tier\AlbumResp.cs" />
     <Compile Include="album\tier\Photo.cs" />
+    <Compile Include="album\tier\TierCallback.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

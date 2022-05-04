@@ -104,6 +104,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\csharp\anclient\anclient.net\src\jserv\tier\docs\DocsReq.cs">
+      <Link>DocsReq.cs</Link>
+    </Compile>
     <Compile Include="..\gltf-export\src\Core.cs">
       <Link>Core.cs</Link>
     </Compile>

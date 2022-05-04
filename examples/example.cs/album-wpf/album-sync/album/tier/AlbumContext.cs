@@ -1,73 +1,130 @@
 ﻿using album_sync.album.tier;
 using anclient.net.jserv.tier;
 using io.odysz.anclient;
-using io.odysz.anson;
 using io.odysz.anson.common;
 using io.odysz.semantic.jprotocol;
 using io.odysz.semantic.jsession;
-using io.oz.album;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+using System.Windows;
+using static io.odysz.semantic.jprotocol.AnsonMsg;
+using static io.oz.album.tier.AlbumContext;
 
 namespace io.oz.album.tier
 {
     public class PrefKeys
     {
-        // public const string homeCate = "";
-        // public const string home;
-
-        //public const string jserv = "jserv";
-        //public const string device = "device";
-        //public const string usrid = "userid";
-        //public const string pswd = "pswd";
-
-        public const string kdevice = "device";
-        public const string kserv = "jserv";
-        public const string kport = "port";
-        public const string klogid = "logid";
-
-        // public const string login_summery;
-
-        /** button key in prefs screen for registering device
-        public const string bt_regist;
-        public const string bt_login;
-        */
+        public const string device = "device";
+        public const string jserv = "jserv";
+        public const string port = "port";
+        public const string logid = "logid";
     }
 
-    public class AlbumContext
+    class LoginHandler : OnLogin, JProtocol.OnError
     {
-        protected const bool verbose = true;
-
-        public const string jdocbase  = "jserv-album";
-        public const string albumHome = "dist/index.html";
-        public const string synchPage = "dist/sync.html";
-        
-        static AlbumContext instance;
-
-        //static AlbumContext() {
-        //    // AnsonMsg.understandPorts(AlbumPort.album);
-        //    // Anson.verbose = false;
-        //}
-        private string device;
-
-        private string pswd;
-        public AlbumContext Pswd(string pswd)
+        public void err(MsgCode code, string msg, string[] args = null)
         {
-            this.pswd = pswd;
-            return this;
+            AlbumContext.GetInstance().State(ConnState.LoginFailed);
+            AlbumContext.GetInstance().onError(code, msg, args);
         }
 
+        /*
+        public void ok(AnsonResp resp)
+        {
+            AlbumContext.GetInstance().loggedIn = true;
+            AlbumContext.GetInstance().client = client;
+
+                (SessionClient client) =>
+                {
+                    client.closeLink();
+
+                    tier = new AlbumClientier(clientUri, client, errCtx);
+
+                    client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 fails in 3 min
+                            state = ConnState.Online;
+                            if (onOk != null)
+                                onOk.ok(tier);
+                },
+                // Design Note: since error context don't have unified error message box,
+                // error context pattern of React is not applicable.
+                // errCtx.onError(c, r, (Object)v);
+                (MsgCode c, string r, object v) => {
+                    state = ConnState.LoginFailed;
+                    if (onErr != null)
+                        onErr.err(c, r, v);
+                }, photoUser.device);
+        }
+        */
+
+        /// <summary>
+        /// On login
+        /// </summary>
+        /// <param name="client"></param>
+        public void ok(SessionClient client)
+        {
+            client.closeLink();
+            AlbumClientier tier = new AlbumClientier(AlbumContext.clientUri, client, AlbumContext.GetInstance());
+            client.openLink(AlbumContext.clientUri, heartbeatHandler, heartbeatHandler, 19900); // 4 fails in 3 min
+            AlbumContext.GetInstance().State(ConnState.Online);
+
+            // if (onOk != null) onOk.ok(tier);
+        }
+
+        HeartbeatHandler heartbeatHandler = new HeartbeatHandler();
+
+    }
+
+    internal class HeartbeatHandler : JProtocol.OnOk, JProtocol.OnError
+    {
+        public HeartbeatHandler()
+        {
+        }
+
+        public void err(MsgCode code, string msg, string[] args = null)
+        {
+            if (AlbumContext.GetInstance().State() == ConnState.Disconnected)
+                ; // how to notify?
+            AlbumContext.GetInstance().State(ConnState.Online);
+        }
+
+        public void ok(AnsonResp resp)
+        {
+            AlbumContext.GetInstance().State(ConnState.Disconnected);
+        }
+    }
+
+    public class AlbumContext : ErrorCtx
+    {
+        static AlbumContext instance;
         public static AlbumContext GetInstance()
         {
             if (instance == null)
                 instance = new AlbumContext();
             return instance;
         }
+
+        public SessionClient client { get; set; }
+        public bool loggedIn { get; internal set; }
+
+        protected bool verbose = true;
+
+        public const string clientUri = "album.cs";
+        public const string jdocbase  = "jserv-album";
+        public const string albumHome = "dist/index.html";
+        public const string synchPage = "dist/sync.html";
+
+        public string jserv {
+            get { return Preferences.jserv; }
+            set {  Preferences.jserv = value; } 
+        }
+        
+        public string pswd;
+        public AlbumContext Pswd(string pswd)
+        {
+            this.pswd = pswd;
+            return this;
+        }
+
 
         public bool needSetup()
         {
@@ -77,9 +134,6 @@ namespace io.oz.album.tier
         }
 
         public enum ConnState { Online, Disconnected, LoginFailed }
-
-
-        public const string clientUri = "album.cs";
 
         /*
         public const ErrorCtx errCtx = new ErrorCtx()
@@ -95,13 +149,6 @@ namespace io.oz.album.tier
         };
         */
 
-
-        string jserv;
-
-        string port;
-
-        string logid;
-
         public string homeName;
 
         public AlbumClientier tier;
@@ -110,69 +157,32 @@ namespace io.oz.album.tier
 
         ConnState state;
         public ConnState State() { return state; }
+        public AlbumContext State(ConnState state) {
+            this.state = state;
+            return this;
+        }
 
         public AlbumContext()
         {
             state = ConnState.Disconnected;
+
+            // jserv = Preferences.jserv;
+            Assert.IsNotNull(jserv);
         }
 
-        /// <summary>
-        /// Init with preferences. Not login yet.
-        /// </summary>
-        /// <param name="execPath"></param>
-        public static void init(string execPath)
-        {
-            /*
-            homeName = sharedPref.getString(prefkeys.home, "");
-            string uid = sharedPref.getString(prefkeys.usrid, "");
-            string device = sharedPref.getString(prefkeys.device, "");
-            photoUser = new SessionInf(null, uid);
-            photoUser.device = device;
-            pswd = sharedPref.getString(prefkeys.pswd, "");
-            jserv = sharedPref.getString(prefkeys.jserv, "");
-
-            AnClient.init(jserv + "/" + jdocbase, verbose);
-            */
-
-            try
-            {
-                // string execPath = AppDomain.CurrentDomain.BaseDirectory;
-                if (File.Exists(Path.Combine(execPath, "device.xml")))
-                {
-                    XmlDocument doc = new XmlDocument();
-                    doc.Load(Path.Combine(execPath, "device.xml"));
-                    XmlNodeList xnodes = doc.DocumentElement.SelectNodes("/configs/t[@id='preferences']/c");
-                    foreach (XmlNode n in xnodes)
-                    {
-                        XmlNode k = n.ChildNodes[0];
-                        XmlNode v = n.ChildNodes[1];
-                        if (PrefKeys.kdevice.Equals(k.InnerText))
-                            device = v.InnerText;
-                        else if (PrefKeys.kserv.Equals(k.InnerText))
-                            jserv = v.InnerText;
-                        else if (PrefKeys.kport.Equals(k.InnerText))
-                            port = v.InnerText.Trim();
-                        else if (PrefKeys.klogid.Equals(k.InnerText))
-                            logid = v.InnerText.Trim();
-                    }
-
-                    // turnOnDevice(true);
-                }
-                // else turnOnDevice(false);
-            }
-            catch (Exception) { }
-        }
-
-
-        AlbumContext login(string uid, string pswd, TierCallback onOk, JProtocol.OnError onErr)
+        AlbumContext login(string uid, string pswd, TierCallback onLogin, JProtocol.OnError onErr)
         {
             if (LangExt.isblank(photoUser.device, new string[] { "\\.", "/", "\\?", ":" }))
                 throw new Exception("Device Id is null.");
 
             AnClient.Init(jserv + "/" + jdocbase, verbose);
 
-            AnClient.loginAsync(uid, pswd,
-                (client) => {
+            LoginHandler callback = new LoginHandler();
+            AnClient.Login(uid, pswd, photoUser.device, callback, callback);
+
+            /*
+                (SessionClient client) =>
+                {
                     client.closeLink();
 
                     tier = new AlbumClientier(clientUri, client, errCtx);
@@ -185,37 +195,45 @@ namespace io.oz.album.tier
                 // Design Note: since error context don't have unified error message box,
                 // error context pattern of React is not applicable.
                 // errCtx.onError(c, r, (Object)v);
-                (c, r, v)-> {
+                (MsgCode c, string r, object v) => {
                     state = ConnState.LoginFailed;
                     if (onErr != null)
                         onErr.err(c, r, v);
                 }, photoUser.device);
-                return this;
-            }
+            */
+            return this;
+        }
 
-    public void login(TierCallback onOk, JProtocol.OnError onErr)
-            throws GeneralSecurityException
-{
-    login(photoUser.uid(), pswd, onOk, onErr);
-}
+        public void login(TierCallback onOk, JProtocol.OnError onErr)
+        {
+            login(photoUser.uid, pswd, onOk, onErr);
+        }
 
-JProtocol.OnOk onHeartbeat = ((resp)-> {
-        if (state == ConnState.Disconnected)
-            ; // how to notify?
-state = ConnState.Online;
-    });
+        /*
+        JProtocol.OnOk onHeartbeat = ((resp) => {
+                if (state == ConnState.Disconnected)
+                    ; // how to notify?
+            state = ConnState.Online;
+        });
 
-JProtocol.OnError onLinkBroken = ((c, r, args)-> {
-        state = ConnState.Disconnected;
-    });
+        JProtocol.OnError onLinkBroken = ((c, r, args) => {
+                state = ConnState.Disconnected;
+        });
+        */
 
-public AlbumContext jserv(String newVal)
-{
-    jserv = newVal;
-    Clients.init(jserv + "/" + jdocbase, verbose);
-    return this;
-}
+        public AlbumContext Jserv(string newVal)
+        {
+            jserv = newVal;
+            AnClient.Init(jserv + "/" + jdocbase, verbose);
+            return this;
+        }
 
-public String jserv() { return jserv; }
+        #region ErrorCtx
+        public override void onError(MsgCode code, string msg, string[] args = null)
+        {
+            MessageBox.Show(msg, "Error: " + code.Name(), MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        #endregion
     }
 }

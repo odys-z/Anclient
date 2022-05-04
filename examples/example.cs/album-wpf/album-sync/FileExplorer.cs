@@ -2,6 +2,9 @@
 using BrightIdeasSoftware;
 using ImageControls;
 using io.odysz.anclient;
+using io.odysz.semantic.jprotocol;
+using io.odysz.semantic.tier.docs;
+using io.oz.album.tier;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,13 +21,29 @@ namespace album_sync
     {
         private HashSet<string> browsingFolder;
         private AlbumClientier tier;
+        private AlbumContext singl;
 
+        UploadHandler uploadhandler;
+
+        /// <summary>
+        /// deprecated
+        /// </summary>
+        /// <param name="client"></param>
         public FileExplorer(SessionClient client)
         {
-            // this.tier = tier;
             InitializeComponent();
 
             btUpload.ImageIndex = 0;
+
+            InitializeTreeListExample();
+        }
+
+        public FileExplorer(AlbumClientier tier)
+        {
+            this.tier = tier;
+
+            btUpload.ImageIndex = 0;
+            InitializeComponent();
 
             InitializeTreeListExample();
         }
@@ -177,7 +196,51 @@ namespace album_sync
 
         private void toUpload(object sender, MouseEventArgs e)
         {
-            tier.asyncPhotos(browsingFolder, client.);
+            // tier.asyncPhotos(browsingFolder);
+
+            // Intent data = result.getData();
+            if (browsingFolder != null && browsingFolder.Count > 0)
+            {
+                List<IFileDescriptor> list = new List<IFileDescriptor>();
+                // ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+                foreach (string fullpath in browsingFolder)
+                    list.Add(new SyncRec(fullpath));
+
+                if (tier == null)
+                    ; // showMsg(R.string.txt_please_login);
+                else
+                    tier.asyncVideos(list, singl.photoUser, uploadhandler, uploadhandler, uploadhandler);
+            }
+        }
+    }
+
+    public class UploadHandler : JProtocol.OnProcess, JProtocol.OnOk, JProtocol.OnError
+    {
+        private Label ui;
+        public UploadHandler(Label status)
+        {
+            this.ui = status;
+        }
+
+        public void err(AnsonMsg.MsgCode code, string msg, string[] args = null)
+        {
+            AlbumContext singl = AlbumContext.GetInstance();
+            ui.Text = string.Format("Login failed. logid: {0}, Uri: {1}", singl.photoUser.uid, singl.jserv);
+        }
+
+        public void ok(AnsonResp resp)
+        {
+            AlbumContext singl = AlbumContext.GetInstance();
+            ui.Text = string.Format("Upload Finished. {}", resp.Msg());
+        }
+
+        public void proc(int listIndx, int totalBlocks, AnsonResp blockResp)
+        {
+            Label lbl = new Label();
+            DocsResp resp = (DocsResp)blockResp;
+            string msg = string.Format("{0} / {1} {2} {3,:P1}",
+                    listIndx, totalBlocks, resp.clientname(), (float)resp.blockSeq() / totalBlocks * 100);
+            ui.Text = msg;
         }
     }
 }

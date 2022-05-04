@@ -42,6 +42,7 @@
             this.btUpload = new System.Windows.Forms.Button();
             this.imgUpload = new System.Windows.Forms.ImageList(this.components);
             this.folderContents = new ImageControls.ImageAccordion();
+            this.lbstatus = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.treeListView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -140,6 +141,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.lbstatus);
             this.splitContainer1.Panel2.Controls.Add(this.btUpload);
             this.splitContainer1.Panel2.Controls.Add(this.folderContents);
             this.splitContainer1.Size = new System.Drawing.Size(762, 714);
@@ -162,7 +164,7 @@
             this.btUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btUpload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btUpload.ImageList = this.imgUpload;
-            this.btUpload.Location = new System.Drawing.Point(623, 340);
+            this.btUpload.Location = new System.Drawing.Point(634, 340);
             this.btUpload.Name = "btUpload";
             this.btUpload.Size = new System.Drawing.Size(128, 32);
             this.btUpload.TabIndex = 2;
@@ -194,6 +196,15 @@
             this.folderContents.TabIndex = 1;
             this.folderContents.ThumbnailChanged += new ImageControls.ImageAccordion.ThumbnailChangedDelegate(this.toChangeImg);
             // 
+            // lbstatus
+            // 
+            this.lbstatus.AutoSize = true;
+            this.lbstatus.Location = new System.Drawing.Point(6, 344);
+            this.lbstatus.Name = "lbstatus";
+            this.lbstatus.Size = new System.Drawing.Size(47, 15);
+            this.lbstatus.TabIndex = 3;
+            this.lbstatus.Text = "ready";
+            // 
             // FileExplorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -209,6 +220,7 @@
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -229,5 +241,6 @@
         private Cyotek.Windows.Forms.ImageBox imgbox;
         private System.Windows.Forms.Button btUpload;
         private System.Windows.Forms.ImageList imgUpload;
+        private System.Windows.Forms.Label lbstatus;
     }
 }
