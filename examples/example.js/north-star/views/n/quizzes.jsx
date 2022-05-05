@@ -219,7 +219,8 @@ class QuizzesComp extends CrudCompW {
 		return ( <>{this.funcName}
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
-				conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
+				// conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
+				fields={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
 				query={ (q) => { return {
 					qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
 					qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
