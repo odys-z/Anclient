@@ -241,7 +241,7 @@ export class DocsQuery extends React.Component {
 		let that = this;
 		return (
 		<AnQueryst {...this.props}
-			conds={this.conds}
+			conds={this.conds} fields={this.conds}
 			onSearch={() => this.props.onQuery(that.collect()) }
 			onLoaded={() => that.props.onQuery(that.collect()) }
 		/> );
