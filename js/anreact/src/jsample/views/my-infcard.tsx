@@ -234,8 +234,6 @@ export class MyInfTier extends Semantier {
 					.whereEq('busiId', rec[this.pkval.pk] as string || '')
 					.whereEq('busiTbl', this.mtabl) );
 		if ( rec[this.imgProp] ) {
-			// let {name, mime} = rec.fileMeta as {name: string, mime: string};
-
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v)
