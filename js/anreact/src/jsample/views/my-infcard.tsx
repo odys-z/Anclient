@@ -133,9 +133,11 @@ MyInfCardComp.contextType = AnContext;
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 
 export class MyInfTier extends Semantier {
-	rec = {} as MyInfRec; // Tierec & {mime: string, attName: string, attId: string};
+	//#region : db meta
+	readonly imgProp = 'img';
+	//#endregion
 
-	imgProp = 'img';
+	rec = {} as MyInfRec; // Tierec & {mime: string, attName: string, attId: string};
 
 	constructor(comp) {
 		super(comp);
@@ -153,17 +155,18 @@ export class MyInfTier extends Semantier {
 		{ field: 'roleId',   label: L('Role'), disabled: true,
 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-		{ field: this.imgProp, label: L('Avatar'), grid: {sm: 6, lg: 4}, fieldFormatter: this.loadAvatar }
+		{ field: this.imgProp, label: L('Avatar'), grid: {sm: 6, lg: 4}, fieldFormatter: this.loadAvatar.bind(this) }
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	/**
 	 * Format an image upload component.
 	 * @param record for the form
 	 * @param field difinetion, e.g. field of tier._fileds
-	 * @param tier not necessarily this class's object - this method will be moved
+	 * @param opts classes and media for future
 	 * @return {React.component} ImageUpload
 	 */
-	loadAvatar(rec: MyInfRec, field: {field: string}, tier: MyInfTier) {
+	loadAvatar(rec: MyInfRec, field: {field: string}, opts: CompOpts) {
+		let tier = this as MyInfTier;
 		return (
 			<ImageUpload
 				blankIcon={{color: "primary", width: 32, height: 32}}
@@ -172,7 +175,7 @@ export class MyInfTier extends Semantier {
 			/>);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk) {
+	record(conds: QueryConditions, onLoad: OnLoadOk<MyInfRec>) {
 		let { userId } = conds;
 
 		let client = this.client;
@@ -223,13 +226,13 @@ export class MyInfTier extends Semantier {
 		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
 		if ( rec.attId )
 			// NOTE this is a design error
-			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
+			// have to: 1. delete a_users/userId's attached file, all of his / her - in case previous deletion failed
 			//          2. delete saved attId file (trigged by semantic handler)
 			req.Body()
-				.post( new DeleteReq(this.uri, "a_attaches", rec.attId as string))
+				// .post( new DeleteReq(this.uri, "a_attaches", ["attId", rec.attId as string])
 				.post( new DeleteReq(this.uri, "a_attaches", undefined)
-						.whereEq('busiId', rec[this.pkval.pk] as string || '')
-					 	.whereEq('busiTbl', this.mtabl));
+					.whereEq('busiId', rec[this.pkval.pk] as string || '')
+					.whereEq('busiTbl', this.mtabl) );
 		if ( rec[this.imgProp] ) {
 			// let {name, mime} = rec.fileMeta as {name: string, mime: string};
 

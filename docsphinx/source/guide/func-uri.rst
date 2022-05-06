@@ -1,4 +1,4 @@
-.. _uri-mapping
+.. _uri-mapping:
 
 Func URI & Datasource Mapping
 =============================

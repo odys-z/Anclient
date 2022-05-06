@@ -107,8 +107,8 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	}
 }
 
-const MyPswd = withWidth()(withStyles(styles)(MyPswdComp));
-// const MyPswd = withStyles<any, any, Comprops>(styles)(MyPswdComp);
+// const MyPswd = withWidth()(withStyles(styles)(MyPswdComp));
+const MyPswd = withStyles<any, any, Comprops>(styles)(withWidth()(MyPswdComp));
 export { MyPswd, MyPswdComp }
 
 class PswdTier extends MyInfTier {
