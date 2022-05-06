@@ -167,10 +167,10 @@ namespace io.oz.album.tier
             state = ConnState.Disconnected;
 
             // jserv = Preferences.jserv;
-            Assert.IsNotNull(jserv);
+            // Assert.IsNotNull(jserv);
         }
 
-        AlbumContext login(string uid, string pswd, TierCallback onLogin, JProtocol.OnError onErr)
+        AlbumContext login(string uid, string pswd)
         {
             if (LangExt.isblank(photoUser.device, new string[] { "\\.", "/", "\\?", ":" }))
                 throw new Exception("Device Id is null.");
@@ -204,9 +204,9 @@ namespace io.oz.album.tier
             return this;
         }
 
-        public void login(TierCallback onOk, JProtocol.OnError onErr)
+        public void login()
         {
-            login(photoUser.uid, pswd, onOk, onErr);
+            login(photoUser.uid, pswd);
         }
 
         /*

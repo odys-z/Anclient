@@ -32,6 +32,8 @@ namespace io.oz.album
             this.singleton = AlbumContext.GetInstance();
 
             InitializeComponent();
+
+            Preferences.load();
         }
 
         #region Handlers
@@ -117,58 +119,58 @@ namespace io.oz.album
             AnClient.Init(string.Format("http://{0}:{1}/{2}", jserv.Text, port.Text, jservPath));
 
             // AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr)
-            singleton.login(new OnLoginHandler(this), new OnLoginHandler(this));
+            singleton.login();
         }
 
-        class OnLoginHandler : TierCallback, OnError
-        {
-            Login dlg;
-            public OnLoginHandler(Login loginDlg)
-            {
-                this.dlg = loginDlg;
-            }
+        //class OnLoginHandler : TierCallback, OnError
+        //{
+        //    Login dlg;
+        //    public OnLoginHandler(Login loginDlg)
+        //    {
+        //        this.dlg = loginDlg;
+        //    }
 
-            public void err(AnsonMsg.MsgCode code, string msg, string[] args = null)
-            {
-                MessageBox.Show(string.Format(
-                    "Login Failed!\ndetails:\n{0}", msg),
-                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+        //    public void err(AnsonMsg.MsgCode code, string msg, string[] args = null)
+        //    {
+        //        MessageBox.Show(string.Format(
+        //            "Login Failed!\ndetails:\n{0}", msg),
+        //            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        //    }
 
-            /*
-            public void ok(SessionClient client)
-            {
-                ((App)Application.Current).loggedIn = true;
-                ((App)Application.Current).client = client;
+        //    /*
+        //    public void ok(SessionClient client)
+        //    {
+        //        ((App)Application.Current).loggedIn = true;
+        //        ((App)Application.Current).client = client;
 
-                Application.Current.Dispatcher.Invoke(new Action(() => {
-                    dlg.savePrefs();
+        //        Application.Current.Dispatcher.Invoke(new Action(() => {
+        //            dlg.savePrefs();
 
-                    // MainWindow main = new MainWindow(client);
-                    // main.ShowDialog();
-                    FileExplorer form = new FileExplorer(client);
-                    dlg.Hide();
-                    form.ShowDialog();
-                    dlg.Show();
-                }));
-            }
-            */
+        //            // MainWindow main = new MainWindow(client);
+        //            // main.ShowDialog();
+        //            FileExplorer form = new FileExplorer(client);
+        //            dlg.Hide();
+        //            form.ShowDialog();
+        //            dlg.Show();
+        //        }));
+        //    }
+        //    */
 
-            public void ok(AlbumClientier tier)
-            {
-                // ((App)Application.Current).loggedIn = true;
-                // ((App)Application.Current).client = client;
+        //    public void ok(AlbumClientier tier)
+        //    {
+        //        // ((App)Application.Current).loggedIn = true;
+        //        // ((App)Application.Current).client = client;
 
-                Application.Current.Dispatcher.Invoke(new Action(() => {
-                    dlg.savePrefs();
+        //        Application.Current.Dispatcher.Invoke(new Action(() => {
+        //            dlg.savePrefs();
 
-                    FileExplorer form = new FileExplorer(tier);
-                    dlg.Hide();
-                    form.ShowDialog();
-                    dlg.Show();
-                }));
-            }
-        }
+        //            FileExplorer form = new FileExplorer(tier);
+        //            dlg.Hide();
+        //            form.ShowDialog();
+        //            dlg.Show();
+        //        }));
+        //    }
+        //}
 
         #endregion
 

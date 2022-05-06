@@ -239,7 +239,7 @@ namespace album_sync
             Label lbl = new Label();
             DocsResp resp = (DocsResp)blockResp;
             string msg = string.Format("{0} / {1} {2} {3,:P1}",
-                    listIndx, totalBlocks, resp.clientname(), (float)resp.blockSeq() / totalBlocks * 100);
+                    listIndx, totalBlocks, resp.clientname(), (float)resp.blockSeq() / totalBlocks);
             ui.Text = msg;
         }
     }
