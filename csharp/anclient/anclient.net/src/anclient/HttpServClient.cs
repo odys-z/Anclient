@@ -8,7 +8,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using static io.odysz.semantic.jprotocol.AnsonMsg;
 
 namespace io.odysz.anclient
 {

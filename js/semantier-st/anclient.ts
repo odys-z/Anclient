@@ -229,7 +229,7 @@ class AnClient {
 					else console.log(resp);
 				}
 			},
-			error: function (resp) {
+			error: function (resp: any) {
 				// JSON.stringify(resp):
 				// {"readyState":0,"status":0,"statusText":"error"};
 
@@ -668,7 +668,8 @@ class SessionClient {
 		return jmsg;
 	}
 
-	getSks(onLoad: OnLoadOk<string[] & Tierec>, errCtx: ErrorCtx) {
+	// getSks(onLoad: OnLoadOk<string[] & Tierec>, errCtx: ErrorCtx) {
+	getSks<T extends Tierec>(onLoad: OnLoadOk<T>, errCtx: ErrorCtx) {
 		let req = this.userReq(null, 'datasetier',
 					new DatasetierReq(undefined)
 					.A(DatasetierReq.A.sks), undefined );

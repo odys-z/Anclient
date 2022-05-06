@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
+import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
 	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
 } from '@anclient/semantier-st';
 
@@ -19,7 +19,6 @@ import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
 import { CompOpts } from '../../react/anreact';
-import { toBool } from '@anclient/anreact/src/utils/helpers';
 import { Theme } from '@material-ui/core/styles';
 
 const styles = (theme: Theme) => ( {
@@ -320,7 +319,7 @@ export class UsersTier extends Semantier {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
-				onLoad(cols, rows);
+				onLoad(cols, rows as T[]);
 			},
 			this.errCtx);
 	}
@@ -339,7 +338,7 @@ export class UsersTier extends Semantier {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				// that.rows = rows;
 				that.rec = rows && rows[0];
-				onLoad(cols, rows);
+				onLoad(cols, rows as T[]);
 			},
 			this.errCtx);
 	}
