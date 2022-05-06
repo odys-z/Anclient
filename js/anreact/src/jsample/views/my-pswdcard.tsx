@@ -10,11 +10,21 @@ import { Semantext } from '@anclient/semantier-st';
 
 import { MyInfTier } from './my-infcard';
 import { Comprops, DetailFormW } from '../../react/crud';
+import { Theme, withWidth } from '@material-ui/core';
 
-const styles = theme => (Object.assign(
+// const styles = (theme: Theme) => ({
+//   root: { }
+// });
+
+// const styles = theme => (Object.assign(
+// 	invalidStyles, { } 
+// ));
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
+		root: {}
 	} )
 );
+
 
 /**
  * Adding-only file list shared for every users.
@@ -97,7 +107,8 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	}
 }
 
-const MyPswd = withStyles<any, any, Comprops>(styles)(MyPswdComp);
+const MyPswd = withWidth()(withStyles(styles)(MyPswdComp));
+// const MyPswd = withStyles<any, any, Comprops>(styles)(MyPswdComp);
 export { MyPswd, MyPswdComp }
 
 class PswdTier extends MyInfTier {
