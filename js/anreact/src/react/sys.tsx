@@ -60,23 +60,23 @@ const _icons = {
 	'deflt': <Inbox />,
 }
 
-export function uri(comp: CrudComp<Comprops>, uri: string) {
-	return comp;
-	/* FIXME this function is unnecessary if moved URI to Semantier.
-	if (comp.Naked)
-		comp.Naked.prototype.uri = uri;
+// export function uri(comp: CrudComp<Comprops>, uri: string) {
+// 	return comp;
+// 	/* FIXME this function is unnecessary if moved URI to Semantier.
+// 	if (comp.Naked)
+// 		comp.Naked.prototype.uri = uri;
 
-	// for SysComp using Route: component={_comps[c.path]}
-	else if (comp.prototype)
-		comp.prototype.uri = uri;
+// 	// for SysComp using Route: component={_comps[c.path]}
+// 	else if (comp.prototype)
+// 		comp.prototype.uri = uri;
 
-	// for direct component rendering, e.g. less-app/App#render()
-	else if (comp.type && comp.type.Naked)
-		comp.type.Naked.prototype.uri = uri;
+// 	// for direct component rendering, e.g. less-app/App#render()
+// 	else if (comp.type && comp.type.Naked)
+// 		comp.type.Naked.prototype.uri = uri;
 
-	return comp;
-	*/
-}
+// 	return comp;
+// 	*/
+// }
 
 /**
  * Map of uri to UI components.
