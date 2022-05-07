@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { SessionClient } from '@anclient/semantier-st';
+import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier-st';
 import { AnContext, AnError, AnReact, L, Login } from '@anclient/anreact';
 import { Comprops } from '../../anreact/src/react/crud';
 import { AnreactAppOptions, JsonServs } from '../../anreact/src/an-components';
@@ -46,9 +46,9 @@ class LoginApp extends React.Component<LoginProps> {
 		this.onLogin = this.onLogin.bind(this);
 	}
 
-	onError(c, r) {
+	onError(c : string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
-		this.setState({hasError: !!c, err: r.msg()});
+		this.setState({hasError: !!c, err: r.Body().msg()});
 	}
 
 	onErrorClose() {

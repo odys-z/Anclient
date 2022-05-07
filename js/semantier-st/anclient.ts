@@ -111,8 +111,6 @@ class AnClient {
 		let cpwd = aes.encrypt(usrId, pswd, iv);
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
 
-		let servRoot = an.cfg.defaultServ;
-
 		this.post(req,
 			/**@param {object} resp
 			 * code: "ok"
@@ -121,7 +119,7 @@ class AnClient {
 			 */
 			function(resp) {
 				let ssInf = resp.Body().ssInf;
-				ssInf.servRoot = servRoot;
+				ssInf.jserv = an.cfg.defaultServ;
 				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
 				sessionClient.an = this;
 				if (typeof onLogin === "function")
@@ -372,6 +370,11 @@ export const an = new AnClient(undefined);
 
 export type SessionInf = {
 	type: "io.odysz.semantic.jsession.SessionInf";
+	/**A facillity for page redirection.
+	 * Value is set by Login into local storage, restored by SessionClient constructor.
+	 * (Log into to jserv backend and holding session information for each jserv service?)
+	 */
+	jserv: string;
 	uid: string;
 	iv?: string;
 	ssid: string;
@@ -446,7 +449,7 @@ class SessionClient {
 
 	static loadStorage() {
 		// skipped, created from local storage instead
-		let ssInf;
+		let ssInf: SessionInf;
 		if (window && localStorage) {
 			var sstr = localStorage.getItem(SessionClient.ssInfo);
 			// What about refesh if removed this?
@@ -454,7 +457,7 @@ class SessionClient {
 			if (sstr && sstr !== '' && sstr !== 'null') {
 				ssInf = JSON.parse(sstr);
 				ssInf.iv = aes.b64ToBytes(ssInf.iv);
-				an.init(ssInf.servRoot);
+				an.init(ssInf.jserv);
 			}
 			else
 				console.error("Can't find credential in local storage. SessionClient deserializing failed.");
@@ -668,7 +671,6 @@ class SessionClient {
 		return jmsg;
 	}
 
-	// getSks(onLoad: OnLoadOk<string[] & Tierec>, errCtx: ErrorCtx) {
 	getSks<T extends Tierec>(onLoad: OnLoadOk<T>, errCtx: ErrorCtx) {
 		let req = this.userReq(null, 'datasetier',
 					new DatasetierReq(undefined)
@@ -733,10 +735,11 @@ class SessionClient {
 	}
 
 	/**@deprecated not good practice for vscode.
-	 * For name errata */
+	 * For name errata
 	userAct(f: string, c: string, m: string, r: string) : this {
 		return this.usrAct(f, c, m, r);
 	}
+	 * */
 
 	/**Set user's current action to be logged.
 	 * @param cmd user's command, e.g. 'save'
@@ -758,8 +761,6 @@ class SessionClient {
 		},
 		{ onError: (c, e) => {
         	localStorage.setItem(SessionClient.ssInfo, null);
-			// if (typeof onError === 'function')
-			// 	onError(c, e);
 		} });
 	}
 }

@@ -6,7 +6,7 @@ import React from 'react';
 	import TextField from '@material-ui/core/TextField';
 	import Box from '@material-ui/core/Box';
 
-import { AnClient, OnCommitOk, Protocol } from '@anclient/semantier-st';
+import { AnClient, AnsonMsg, AnsonResp, OnCommitOk, Protocol } from '@anclient/semantier-st';
 
 import { an, SessionClient } from '@anclient/semantier-st';
 	import {AnContext, AnContextType} from './reactext';
@@ -46,11 +46,15 @@ class LoginComp extends React.Component<LoginProps> {
 	ssClient: SessionClient;
 	confirm: JSX.Element;
 
+	state: {
+		userId: string,
+		pswd: string
+	};
 
 	/**
 	 * initialize a instance of Anclient visition jserv service.
 	 * @param props
-	 * @param props.jserv e.g. "http://127.0.0.1:8080/jserv-quiz"); url to service root.
+	 * @param props.jserv e.g. "http://127.0.0.1:8080/jserv-quiz"); url to the jserv web root.
 	 * @constructor
 	 */
 	constructor(props: LoginProps) {
@@ -58,12 +62,16 @@ class LoginComp extends React.Component<LoginProps> {
 
 		this.an = an;
 
+		this.state = {userId: this.config.userid, pswd: this.config.pswd};
+
 		this.alert = this.alert.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.onLogin = this.onLogin.bind(this);
 	}
 
 	componentDidMount() {
+		this.state.pswd = this.config.pswd;
+		this.state.userId = this.config.userid;
 	}
 
 	alert() {
@@ -87,8 +95,8 @@ class LoginComp extends React.Component<LoginProps> {
 	onLogin() {
 		let that = this;
 		// console.log(that.context);
-		let uid = this.config.userid;
-		let pwd = this.config.pswd;
+		let uid = this.state.userId;
+		let pwd = this.state.pswd;
 		if (!uid || !pwd) {
 			this.alert();
 			return;
@@ -105,7 +113,7 @@ class LoginComp extends React.Component<LoginProps> {
 			an.login( uid, pwd, reload, {onError} );
 		}
 
-		function reload (client) {
+		function reload (client: SessionClient) {
 			that.ssClient = client;
 			that.setState( {loggedin: true} );
 			if (typeof that.props.onLoginOk === 'function')
@@ -122,15 +130,19 @@ class LoginComp extends React.Component<LoginProps> {
 				console.error('Logged in successfully but results be ignored: ', client);
 		}
 
-		function onError (code, resp) {
+		function onError (code: string, resp: AnsonMsg<AnsonResp>) {
 			console.log(an);
 			if (typeof ctx.error === 'object') {
 				let errCtx = ctx.error;
-				// errCtx.hasError = true;
-				// errCtx.code = code;
 				errCtx.msg = resp.Body().msg();
 				if (typeof errCtx.onError === 'function')
-					errCtx.onError(code, resp.Body());
+					// FIXME guess to be verified:
+					// FIXME guess to be verified:
+					// FIXME guess to be verified:
+					// FIXME guess to be verified:
+					// errCtx.onError(code, resp.Body());
+					console.error(" // FIXME guess to be verified ");
+					errCtx.onError(code, resp);
 			}
 			else if (code === Protocol.MsgCode.exIo)
 				console.error('Network Failed!');
@@ -146,7 +158,7 @@ class LoginComp extends React.Component<LoginProps> {
 			this.props.onLogout();
 	}
 
-	update(val) {
+	update(val: any) {
 		this.setState(val);
 	}
 
@@ -167,12 +179,13 @@ class LoginComp extends React.Component<LoginProps> {
 					required id="userid" label={L("User Id")}
 					autoComplete="username"
 					defaultValue={this.config.userid}
-					onChange={event => this.setState({userid: event.target.value})} />
+					onChange={event => this.setState({userId: event.target.value})} />
 				<TextField className={classes.field2}
 					id="pswd" label={L("Password")}
-					type="password" value={this.config.pswd}
+					type="password"
 					autoComplete="new-password"
 					onKeyUp={(e) => {if (e.code === "Enter") that.onLogin();} }
+					defaultValue={this.config.pswd}
 					onChange={event => this.setState({pswd: event.target.value})} />
 				<Button className={classes.field2}
 					variant="contained"

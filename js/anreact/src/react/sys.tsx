@@ -24,7 +24,7 @@ import {
 	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School
 } from '@material-ui/icons';
 
-import { MemoryRouter as Router } from 'react-router';
+import { MemoryRouter as Router, Routes } from 'react-router';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import { Route } from 'react-router-dom'
