@@ -8,10 +8,9 @@ import { stree_t, Tierec,
 } from '@anclient/semantier-st';
 
 import { AnConst } from '../utils/consts';
-import { toBool } from '../utils/helpers';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
-import { JsonServs } from '@anclient/anreact/src/react/reactext';
+import { JsonServs } from './reactext';
 
 export interface ClassNames {[c: string]: string};
 
