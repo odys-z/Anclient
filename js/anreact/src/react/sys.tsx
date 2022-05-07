@@ -36,7 +36,7 @@ import { AnContext, AnContextType } from './reactext';
 	import { L } from '../utils/langstr';
 
 import {
-	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW 
+	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW
 } from './crud'
 import { ClassNameMap } from '@material-ui/styles';
 import { AnReactExt, ClassNames } from './anreact';
@@ -60,23 +60,23 @@ const _icons = {
 	'deflt': <Inbox />,
 }
 
-export function uri(comp: CrudComp<Comprops>, uri: string) {
-	return comp;
-	/* FIXME this function is unnecessary if moved URI to Semantier.
-	if (comp.Naked)
-		comp.Naked.prototype.uri = uri;
-
-	// for SysComp using Route: component={_comps[c.path]}
-	else if (comp.prototype)
-		comp.prototype.uri = uri;
-
-	// for direct component rendering, e.g. less-app/App#render()
-	else if (comp.type && comp.type.Naked)
-		comp.type.Naked.prototype.uri = uri;
-
-	return comp;
-	*/
-}
+// export function uri(comp: CrudComp<Comprops>, uri: string) {
+// 	return comp;
+// 	/* FIXME this function is unnecessary if moved URI to Semantier.
+// 	if (comp.Naked)
+// 		comp.Naked.prototype.uri = uri;
+//
+// 	// for SysComp using Route: component={_comps[c.path]}
+// 	else if (comp.prototype)
+// 		comp.prototype.uri = uri;
+//
+// 	// for direct component rendering, e.g. less-app/App#render()
+// 	else if (comp.type && comp.type.Naked)
+// 		comp.type.Naked.prototype.uri = uri;
+//
+// 	return comp;
+// 	*/
+// }
 
 /**
  * Map of uri to UI components.
@@ -183,7 +183,7 @@ export interface MenuItem {
 
 /**
  * Parse lagacy json format.
- * @return {menu, paths} 
+ * @return {menu, paths}
  * */
 export function parseMenus(json = []): {
 	menu: Array<MenuItem>;
@@ -255,7 +255,7 @@ class SysComp extends CrudCompW<SysProps> {
 
 	static extendLinks(links) {
 		links.forEach( (l, x) => {
-			_comps[l.path] = uri(l.comp, l.path);
+			_comps[l.path] = l.comp; //uri(l.comp, l.path);
 		});
 	}
 
