@@ -1,3 +1,4 @@
+import { SessionInf } from '@anclient/semantier-st/anclient';
 import * as CSS from 'csstype';
 import { Tierec } from './semantier';
 
@@ -6,7 +7,7 @@ export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
 /**Callback of CRUD.r
  * T is the record type
  */
- export type OnLoadOk<T extends Tierec> = (cols: Array<string>, rows: Array<T>) => void
+export type OnLoadOk<T extends Tierec> = (cols: Array<string>, rows: Array<T>) => void
 
 export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 
@@ -58,7 +59,7 @@ export interface DbCol {
 export type SemanticType = 'fk' | 'stree' | 'm2m' | 'customer';
 
 export interface FKRelation {
-	/**table naem */
+	/**table name */
 	tabl: string;
 
 	/**chiled table pk */
@@ -83,7 +84,7 @@ export interface Stree {
 export type Semantics = {
 	// [reltype in SemanticType]: FKRelation | Stree | any;
 	fk?: FKRelation,
-	/**smantic tree */
+	/**semantic tree */
 	stree?: Stree,
 	/**Multiple to mulitple */
 	m2m?: any,
@@ -313,7 +314,7 @@ export class AnsonMsg<T extends AnsonBody> {
     opts: {};
     header: AnHeader;
     body: T[];
-	static __type__ = '';
+    static __type__ = '';
 
 
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
@@ -323,7 +324,7 @@ export class AnsonMsg<T extends AnsonBody> {
 		return [];
 	}
 
-    constructor(json) {
+    constructor(json: any) {
 		if (typeof json !== 'object')
 			throw new Error("AnClient is upgraded, takes only one arg, the json obj.");
 
@@ -410,14 +411,14 @@ export class AnsonMsg<T extends AnsonBody> {
 }
 
 export class AnsonBody {
-	msg(): any {
+	msg(): string {
 		throw new Error('Method not implemented.');
 	}
 	ajax: any;
 	Rs(): any {
 		throw new Error('Method not implemented.');
 	}
-	ssInf: any;
+	ssInf: SessionInf | undefined;
 	post(pst: AnsonBody): AnsonBody {
 		throw new Error("AnsonBody is an abstract class.");
 	}
@@ -892,7 +893,7 @@ export class UpdateReq extends AnsonBody {
 }
 
 export class DeleteReq extends UpdateReq {
-	constructor (uri: string, tabl: string, pk: string) {
+	constructor (uri: string, tabl: string, pk: string[] | PkMeta) {
 		super (uri, tabl, pk);
 		this.a = CRUD.d;
 	}

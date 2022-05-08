@@ -4,7 +4,7 @@ import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { AnlistColAttrs, NV, QueryConditions, TierCol, TierComboField } from '@anclient/semantier-st';
+import { toBool, AnlistColAttrs, NV, QueryConditions, TierCol, TierComboField } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
@@ -13,7 +13,6 @@ import { Comprops, CrudCompW } from '../crud'
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 import { ComboItem } from './dataset-combo';
 import { AnReactExt, CompOpts } from '../anreact';
-import { toBool } from '../../utils/helpers';
 
 interface ComboCondType extends TierComboField<JSX.Element, CompOpts>, QueryConditions {
 };
@@ -88,7 +87,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 	}
 
 	/**TODO: all widgets should bind data by themselves, so this function shouldn't exits.
-	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed. 
+	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed.
 	 */
 	bindConds() {
 		// if (!this.context || !this.context.anReact)

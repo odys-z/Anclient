@@ -50,15 +50,17 @@ class HistogramComp extends React.Component {
 	initTest() {
 		// in case testing
 		if (!document) return;
-		let data = [{ "price": "75.0" }, { "price": "104.0" }, { "price": "369.0" }, { "price": "300.0" },
-					{ "price": "92.0" }, { "price": "64.0" }, { "price": "265.0" }, { "price": "35.0" },
-					{ "price": "287.0" }, { "price": "69.0" }, { "price": "52.0" }, { "price": "23.0" },
-					{ "price": "287.0" }, { "price": "87.0" }, { "price": "114.0" }, { "price": "114.0" },
-					{ "price": "98.0" }, { "price": "137.0" }, { "price": "87.0" }, { "price": "90.0" },
-					{ "price": "63.0" }, { "price": "69.0" }, { "price": "80.0" }, { "price": "113.0" },
-				    { "price": "58.0" }, { "price": "115.0" }, { "price": "30.0" }, { "price": "35.0" },
-				    { "price": "92.0" }, { "price": "460.0" }, { "price": "74.0" }, { "price": "72.0" },
-				    { "price": "63.0" }];
+		let data = [
+			/*  { "price": "75.0" }, { "price": "104.0" }, { "price": "369.0" }, { "price": "300.0" },
+				{ "price": "92.0" }, { "price": "64.0" }, { "price": "265.0" }, { "price": "35.0" },
+				{ "price": "287.0" }, { "price": "69.0" }, { "price": "52.0" }, { "price": "23.0" },
+				{ "price": "287.0" }, { "price": "87.0" }, { "price": "114.0" }, { "price": "114.0" },
+				{ "price": "98.0" }, { "price": "137.0" }, { "price": "87.0" }, { "price": "90.0" },
+				{ "price": "63.0" }, { "price": "69.0" }, { "price": "80.0" }, { "price": "113.0" },
+				{ "price": "58.0" }, { "price": "115.0" }, { "price": "30.0" }, { "price": "35.0" },
+				{ "price": "92.0" }, { "price": "460.0" }, { "price": "74.0" }, { "price": "72.0" },
+				{ "price": "63.0" } */
+			];
 		data = data.map( (d) => +d.price );
 
 		let margin = {top: 10, right: 30, bottom: 30, left: 40},
@@ -138,7 +140,7 @@ class HistogramComp extends React.Component {
 		let y = d3.scaleLinear()
 			.range([height, 0]);
 		let histogram = d3
-			.histogram()
+			.bin()
 			.value(function(d) { return +d.happy; })
 			.domain(x.domain())  // then the domain of the graphic
 			.thresholds(x.ticks(bands)); // then the numbers of bins

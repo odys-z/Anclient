@@ -1,5 +1,5 @@
 *.testlog
-.vs
-obj
+**/.vs
+**/obj
 packages
 TestResults

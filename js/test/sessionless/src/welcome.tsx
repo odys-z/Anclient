@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
-import { Semantier, Tierec } from '@anclient/semantier-st';
+import { OnLoadOk, QueryConditions, Semantier, Tierec } from '@anclient/semantier-st';
 import { Comprops, CrudComp, jsample } from '@anclient/anreact';
 
 const styles = (theme: Theme) => ( {
@@ -120,9 +120,10 @@ class WelcomeTier extends Semantier {
 	/**
 	 * @override(Semantier)
 	 */
-	records<WelcomeRec>() {
+	records<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
 		this.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
-		return this.rows as unknown as Array<WelcomeRec>; // FIXME shouldn't use "as unknown"
+		onLoad([], this.rows as unknown as Array<T>);
+		return this.rows as unknown as Array<T>; // FIXME shouldn't use "as unknown"
 	}
 
 	myNotifies() {

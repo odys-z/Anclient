@@ -1,35 +1,75 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Issues &amp; Handling &mdash; Anclient Anclient documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+  
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    <script src="../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="CodeSandbox" href="mui-examples.html" />
     <link rel="prev" title="Hard learnt lessons: JS" href="note-js-npm.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../index.html" class="icon icon-home"> Anclient
+          
+
+          
           </a>
+
+          
+            
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -37,8 +77,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../starter/index.html">Quick Start (js only)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../guide/index.html">Guid (Tips)</a></li>
@@ -66,44 +117,86 @@
 </li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Anclient</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="index.html">For developers</a> &raquo;</li>
+        
       <li>Issues &amp; Handling</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="../_sources/dev/issues.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
-  <section id="issues-handling">
-<h1>Issues &amp; Handling<a class="headerlink" href="#issues-handling" title="Permalink to this headline"></a></h1>
-<section id="invalid-hook-call">
-<h2>Invalid hook call<a class="headerlink" href="#invalid-hook-call" title="Permalink to this headline"></a></h2>
+            
+  <div class="section" id="issues-handling">
+<h1>Issues &amp; Handling<a class="headerlink" href="#issues-handling" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="invalid-hook-call">
+<h2>Invalid hook call<a class="headerlink" href="#invalid-hook-call" title="Permalink to this headline">¶</a></h2>
 <p>To solve the “Invalid hook call” error and helping example tests, Anclient/js now
 break into 2 module, &#64;anclient/semantier &amp; &#64;anclient/anreact.
 ( <a class="reference internal" href="#about-invalid-hook-call"><span class="std std-ref">the next section</span></a> can be a good example shows
 how this issue is a big trouble)</p>
 <p>For details on structure used to meet independent unit test and test with local
 npm link, see <a class="reference internal" href="note-js-npm.html#how-anreact-evolved"><span class="std std-ref">How is &#64;anclient/aneact evolved</span></a>.</p>
-</section>
-<section id="react-issue-13991-invalid-hook-call">
-<span id="about-invalid-hook-call"></span><h2>React Issue #13991 - Invalid hook call<a class="headerlink" href="#react-issue-13991-invalid-hook-call" title="Permalink to this headline"></a></h2>
+</div>
+<div class="section" id="react-issue-13991-invalid-hook-call">
+<span id="about-invalid-hook-call"></span><h2>React Issue #13991 - Invalid hook call<a class="headerlink" href="#react-issue-13991-invalid-hook-call" title="Permalink to this headline">¶</a></h2>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
 <p>Since &#64;anclient/react verified, this issue is closed.</p>
@@ -117,8 +210,8 @@ npm link, see <a class="reference internal" href="note-js-npm.html#how-anreact-e
 <p>To test with test/jsample, use
 [ npm link anclient ]</p>
 </div>
-<section id="about-the-error">
-<h3>About the error<a class="headerlink" href="#about-the-error" title="Permalink to this headline"></a></h3>
+<div class="section" id="about-the-error">
+<h3>About the error<a class="headerlink" href="#about-the-error" title="Permalink to this headline">¶</a></h3>
 <p>With webpack transpiled package, both via NPM and minified js, referencing component
 will reporting error.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NorthApp</span>
@@ -138,9 +231,9 @@ Webpack also have similar issue report. See
 <a class="reference external" href="https://reactjs.org/link/error-boundaries">Rreact Document</a> and issues:</p>
 <p><a class="reference external" href="https://github.com/facebook/react/issues/13991">Facebook issue 13991</a> and</p>
 <p><a class="reference external" href="https://github.com/webpack/webpack/issues/13868">Webpack issue 13868</a></p>
-</section>
-<section id="cause-of-error">
-<h3>Cause of Error<a class="headerlink" href="#cause-of-error" title="Permalink to this headline"></a></h3>
+</div>
+<div class="section" id="cause-of-error">
+<h3>Cause of Error<a class="headerlink" href="#cause-of-error" title="Permalink to this headline">¶</a></h3>
 <p>This error is suppressed by resolving react of NorthApp to Anclient’s node_modules/react.</p>
 <p>In example.js/north-star/webpack.config.js:</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
@@ -149,9 +242,9 @@ Webpack also have similar issue report. See
 </pre></div>
 </div>
 <p>This can be explained as duplicated react libs been used.</p>
-</section>
-<section id="solution">
-<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline"></a></h3>
+</div>
+<div class="section" id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
 <p>In Anclient, react, react-dom &amp; material-ui/core are transpiled as external by webpack, see webpack.config.js.</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">externals</span><span class="o">:</span> <span class="p">{</span>
@@ -166,17 +259,17 @@ Webpack also have similar issue report. See
 </pre></div>
 </div>
 <p>In NorthApp, react &amp; react-dom are installed locally. Then Anclient can be imported like:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="p">{</span>
     <span class="nx">an</span><span class="p">,</span> <span class="nx">AnClient</span><span class="p">,</span> <span class="nx">SessionClient</span><span class="p">,</span> <span class="nx">Protocol</span><span class="p">,</span>
     <span class="nx">L</span><span class="p">,</span> <span class="nx">Langstrs</span><span class="p">,</span>
     <span class="nx">AnContext</span><span class="p">,</span> <span class="nx">AnError</span><span class="p">,</span> <span class="nx">AnReactExt</span><span class="p">,</span>
     <span class="nx">Sys</span><span class="p">,</span> <span class="nx">SysComp</span><span class="p">,</span> <span class="nx">Domain</span><span class="p">,</span> <span class="nx">Roles</span><span class="p">,</span> <span class="nx">Orgs</span><span class="p">,</span> <span class="nx">Users</span>
-<span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;anclient&#39;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">from</span> <span class="s1">&#39;anclient&#39;</span><span class="p">;</span>
 </pre></div>
 </div>
-</section>
-<section id="similar-of-react-issue-13991">
-<h3>Similar of React Issue #13991<a class="headerlink" href="#similar-of-react-issue-13991" title="Permalink to this headline"></a></h3>
+</div>
+<div class="section" id="similar-of-react-issue-13991">
+<h3>Similar of React Issue #13991<a class="headerlink" href="#similar-of-react-issue-13991" title="Permalink to this headline">¶</a></h3>
 <p>A tried scenario:</p>
 <ol class="arabic simple">
 <li><p>publish test/react-app as &#64;anclient/test-react</p></li>
@@ -190,18 +283,18 @@ Webpack also have similar issue report. See
 <span class="p">}</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="referenceerror-regeneratorruntime-is-not-defined">
-<h2>ReferenceError: regeneratorRuntime is not defined<a class="headerlink" href="#referenceerror-regeneratorruntime-is-not-defined" title="Permalink to this headline"></a></h2>
-<section id="id1">
-<h3>About the error<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+</div>
+</div>
+<div class="section" id="referenceerror-regeneratorruntime-is-not-defined">
+<h2>ReferenceError: regeneratorRuntime is not defined<a class="headerlink" href="#referenceerror-regeneratorruntime-is-not-defined" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>About the error<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>When handling D3 with Babel 8.2.2 or later, the async functions requiring
 <a class="reference external" href="https://babeljs.io/docs/en/babel-plugin-transform-regenerator">regenerator runtime</a>.</p>
 <p>There are similar reports like <a class="reference external" href="https://stackoverflow.com/questions/53558916/babel-7-referenceerror-regeneratorruntime-is-not-defined">here</a>.</p>
-</section>
-<section id="id2">
-<h3>Solution<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+</div>
+<div class="section" id="id2">
+<h3>Solution<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>Follow <a class="reference external" href="https://stackoverflow.com/a/54490329">the answer</a>.</p>
 <p>install core-js &amp; regenerator-runtime</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm install --save core-js
@@ -209,44 +302,61 @@ npm install --save regenerator-runtime
 </pre></div>
 </div>
 <p>In histogram.jsx:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="s2">&quot;core-js/stable&quot;</span><span class="p">;</span>
-<span class="kr">import</span> <span class="s2">&quot;regenerator-runtime/runtime&quot;</span><span class="p">;</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="s2">&quot;core-js/stable&quot;</span><span class="p">;</span>
+<span class="k">import</span> <span class="s2">&quot;regenerator-runtime/runtime&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>These 2 steps should solve the problem.</p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="note-js-npm.html" class="btn btn-neutral float-left" title="Hard learnt lessons: JS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="mui-examples.html" class="btn btn-neutral float-right" title="CodeSandbox" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="note-js-npm.html" class="btn btn-neutral float-left" title="Hard learnt lessons: JS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Odys Zhou.</p>
-  </div>
+    <p>
+        &#169; Copyright 2022, Odys Zhou.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
