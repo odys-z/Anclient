@@ -144,7 +144,8 @@ class Jregex {
 /**Json protocol helper to support jclient.
  * All AnsonBody and JHelper static helpers are here. */
 export class Protocol {
-	// static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
+	/** @deprecated replaced by enum CRUD. */
+	static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
 	static Port = {	heartbeat: "ping.serv11",
 		echo: "echo.serv11", session: "login.serv11",
@@ -1159,7 +1160,7 @@ export class AnsonResp extends AnsonBody {
 }
 
 export class AnSessionResp extends AnsonResp {
-	ssInf: {uid: string, ssid: string, iv: string, usrName?: string};
+	ssInf: SessionInf;
 
 	constructor(ssResp) {
 		super(ssResp);

@@ -5,13 +5,11 @@ import Typography from '@material-ui/core/Button';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { CRUD } from '@anclient/semantier-st';
-import { L, isEmpty,
+import { CRUD, Semantier, isEmpty } from '@anclient/semantier-st';
+import { L,
 	AnContext, ConfirmDialog, TRecordForm,
 	jsample, Overlay, AnGridsheet, anMultiRowRenderer
 } from '@anclient/anreact';
@@ -68,6 +66,11 @@ class QuizsheetComp extends React.Component {
 		this.toSave = this.toSave.bind(this);
 		this.toSetPollUsers = this.toSetPollUsers.bind(this);
 		this.alert = this.alert.bind(this);
+	}
+
+	componentDidMount() {
+		this.tier = new QuizTier(this);
+		this.tier.setContext(this.context);
 	}
 
 	quizHook = {};
@@ -189,7 +192,7 @@ class QuizsheetComp extends React.Component {
 			this.jquiz.insertQuiz(this.props.uri, this.state,
 				(resp) => {
 					let {quizId, title} = JQuiz.parseResp(resp);
-					if (isEmpty(quizId))
+					if (isblank(quizId))
 						console.error ("Something Wrong!");
 					that.state.quiz.qid = quizId;
 					that.state.crud = CRUD.u;
@@ -209,8 +212,8 @@ class QuizsheetComp extends React.Component {
 		let props = this.props;
 		let {classes} = props;
 
-		let title = props.title ? props.title : '';
-		let msg = props.msg;
+		// let title = props.title ? props.title : '';
+		// let msg = props.msg;
 		let displayCancel = props.cancel === false ? 'none' : 'block';
 		let txtCancel = props.cancel === 'string' ? props.cancel : L('Close');
 		let txtSave = L('Publish');
@@ -227,13 +230,14 @@ class QuizsheetComp extends React.Component {
 
 			<Box className={classes.formWrapper} >
 				{/*FIXME let's deprecate RecordForm */}
-				<RecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
+				<TRecordForm uri={this.props.uri} pk='qid' mtabl='quiz'
+					tier={this.tier}
 					stateHook={this.quizHook}
-					fields={[ { field: 'qid', label: '', hide: true },
-							  { field: 'title', label: L('Title'), grid: {sm: 6, md: 3} },
-						      { field: 'tags', label: L('#Hashtag'), grid: {sm: 5, md: 3} },
-						      { field: 'quizinfo', label: L('Description'), grid: {sm: 11, md: 6} }
-						]}
+					// fields={[ { field: 'qid', label: '', hide: true },
+					// 		  { field: 'title', label: L('Title'), grid: {sm: 6, md: 3} },
+					// 	      { field: 'tags', label: L('#Hashtag'), grid: {sm: 5, md: 3} },
+					// 	      { field: 'quizinfo', label: L('Description'), grid: {sm: 11, md: 6} }
+					// 	]}
 					record={{qid: this.state.quizId, ... this.state.quiz }} dense />
 			</Box>
 
@@ -282,3 +286,24 @@ QuizsheetComp.contextType = AnContext;
 
 const Quizsheet = withStyles(styles)(QuizsheetComp);
 export { Quizsheet, QuizsheetComp };
+
+class QuizTier extends Semantier {
+
+	port = 'mykidstier';
+	mtabl = 'n_mykids';
+
+	_cols = [ ];
+
+	_fields = [
+		{ field: 'qid', label: '', hide: true },
+		{ field: 'title', label: L('Title'), grid: {sm: 6, md: 3} },
+		{ field: 'tags', label: L('#Hashtag'), grid: {sm: 5, md: 3} },
+		{ field: 'quizinfo', label: L('Description'), grid: {sm: 11, md: 6} }
+	];
+
+	constructor(comp) {
+		// super(Object.assign(comp || {}, {port: 'mykidstier'}));
+		super(comp);
+	}
+
+}

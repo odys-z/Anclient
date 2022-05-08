@@ -55,6 +55,9 @@ class QuizFormComp extends DetailFormW {
 		console.log(this.props.uri);
 		let ctx = this.context;
 		this.jquiz = new JQuiz(ctx.anClient, ctx.error);
+
+		this.tier = new PollsTier(this);
+		this.tier.setContext(this.context);
 	}
 
 	onCancel(e) {
