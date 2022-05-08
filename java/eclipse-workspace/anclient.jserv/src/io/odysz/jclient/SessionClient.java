@@ -51,6 +51,14 @@ public class SessionClient {
 		this.ssInf = sessionInfo;
 	}
 	
+	/**
+	 * Start a heart beat thread, sleeping on signal {@link #syncFlag}.
+	 * @param clientUri
+	 * @param onLink
+	 * @param onBroken
+	 * @param msInterv
+	 * @return this
+	 */
 	public SessionClient openLink(String clientUri, OnOk onLink, OnError onBroken, int... msInterv) {
 		// link
 		syncFlag = "link";
@@ -91,6 +99,10 @@ public class SessionClient {
 		return this;
 	}
 	
+	/**Release any threads block on {@link #syncFlag}.
+	 * @see #openLink(String, OnOk, OnError, int...)
+	 * @return this
+	 */
 	public SessionClient closeLink() {
 		stoplink = true;
 		if (syncFlag != null)
