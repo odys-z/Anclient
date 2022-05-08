@@ -33,7 +33,7 @@ namespace io.oz.album
 
             InitializeComponent();
 
-            Preferences.load();
+            Preferences.load( AppDomain.CurrentDomain.BaseDirectory );
         }
 
         #region Handlers
