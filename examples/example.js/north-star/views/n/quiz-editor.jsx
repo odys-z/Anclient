@@ -12,10 +12,10 @@ import React from 'react';
 	import Button from '@material-ui/core/Button';
 	import Box from '@material-ui/core/Box';
 
-import { Protocol, CRUD } from '@anclient/semantier-st';
-import { L, AnContext, DetailFormW, DatasetCombo, TRecordForm } from '@anclient/anreact';
+import { CRUD } from '@anclient/semantier-st';
+import { L, AnContext, DetailFormW, DatasetCombo } from '@anclient/anreact';
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
-import { JQuiz } from '../../common/an-quiz.js';
+import { JQuiz } from '../../common/an-quiz';
 import { QuizUserForm } from './quiz-users';
 
 var quid = -1;

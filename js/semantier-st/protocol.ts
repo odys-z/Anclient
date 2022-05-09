@@ -18,7 +18,7 @@ export interface JsonOptions {
     noBoolean: boolean | string;
 };
 
-export type PageInf = { page: number, size: number };
+export type PageInf = { page: number, size: number, total?: number };
 
 /**Lagecy from jquery & easui, replaced by NV - no need to collect form using JQuery in the future. */
 export type NameValue = {name: string, value: object};

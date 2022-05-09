@@ -124,6 +124,14 @@ class HomeComp extends CrudComp<Comprops> {
 }
 const Home = withStyles(styles)(HomeComp);
 
+class ErrorPageComp extends CrudComp<Comprops>  {
+	render() {
+		return (<>Error Page</>);
+	}
+}
+const ErrorPage = withStyles(styles)(ErrorPageComp);
+
+
 class DomainComp extends CrudComp<Comprops>  {
 	render() {
 		return (<>Domain</>);
@@ -191,6 +199,7 @@ export {
 	Comprops, CrudComp,
 	CrudCompW, DetailFormW,
 	Home, HomeComp,
+	ErrorPage, ErrorPageComp,
 	Domain, DomainComp,
 	Roles, RolesComp,
 	Users, UsersComp,

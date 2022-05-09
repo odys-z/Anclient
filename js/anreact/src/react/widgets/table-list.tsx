@@ -11,8 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, Tierec } from '@anclient/semantier-st';
-import { toBool } from '../../utils/helpers';
+import { AnlistColAttrs, Tierec, toBool } from '@anclient/semantier-st';
 import { Comprops, DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 
@@ -107,16 +106,16 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	};
 
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
-		let ids = this.props.selectedIds.Ids || this.props.selectedIds.ids;
+		let ids = this.props.selected.ids; // || this.props.selectedIds.ids;
 		if (e.target.checked) {
-			this.props.rows.forEach((r) => ids.add(r[this.props.pk]));
+			this.props.rows.forEach((r) => ids.add(r[this.props.pk] as string));
 			this.updateSelectd(ids);
 		}
 		else {
 			ids.clear();
-			this.setState({});
 			this.updateSelectd(ids);
 		}
+			this.setState({});
 	};
 
 	updateSelectd (set: Set<string>) {
@@ -144,7 +143,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	 */
 	th(columns: Array<AnlistColAttrs<JSX.Element, CompOpts>> = []) {
 		return columns
-			.filter( (v, x) => !toBool(v.visible) ? false
+			.filter( (v, x) => !toBool(v.visible, true) ? false
 						: !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
@@ -178,7 +177,8 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 							/>
 						</TableCell>)
 					}
-					{columns.filter( (v, x) => !toBool(v.hide)
+					{columns.filter( (v, x) => //!toBool(v.hide)
+									!toBool(v.hide) && toBool(v.visible, true)
 									&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
 							.map( (colObj, x) => {
 								if (colObj.field === undefined)
