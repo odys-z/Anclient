@@ -2,14 +2,11 @@
 using album_sync.album.tier;
 using io.odysz.anclient;
 using io.odysz.anson.common;
-using io.odysz.semantic.jprotocol;
 using io.oz.album.tier;
-using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static io.odysz.semantic.jprotocol.JProtocol;
 
 namespace io.oz.album
 {
