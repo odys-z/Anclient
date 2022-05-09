@@ -115,7 +115,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			ids.clear();
 			this.updateSelectd(ids);
 		}
-			this.setState({});
+		this.setState({});
 	};
 
 	updateSelectd (set: Set<string>) {
