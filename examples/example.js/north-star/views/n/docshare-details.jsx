@@ -12,16 +12,13 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { Protocol } from '@anclient/semantier-st';
+import { Protocol, CRUD } from '@anclient/semantier-st';
 import { L, AnConst,
 	AnContext, AnError,
 	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
-import { DocsTier } from './docshares';
-
-const { CRUD } = Protocol;
 
 const DocshareStyle = (theme) => ({
 	dialogPaper: {
@@ -103,8 +100,8 @@ class DocshareDetailsComp extends DetailFormW {
 				  disableForm: true },
 				resp => {
 					// NOTE should crud moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
+					if (that.state.crud === CRUD.c) {
+						that.state.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 				} );
@@ -130,8 +127,8 @@ class DocshareDetailsComp extends DetailFormW {
 	render () {
 		const { tier, classes, width } = this.props;
 
-		let c = this.state.crud === Protocol.CRUD.c;
-		let u = this.state.crud === Protocol.CRUD.u;
+		let c = this.state.crud === CRUD.c;
+		let u = this.state.crud === CRUD.u;
 		let title = L('Share Documents');
 
 		let rec = this.state.record;

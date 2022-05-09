@@ -1,7 +1,7 @@
 /** Legacy from Anclient/example.js/react-quiz
  */
 import {
-	Protocol, UserReq
+	Protocol, CRUD, UserReq
 } from '@anclient/semantier-st';
 
 import { QuizReq, QuizProtocol, CenterProtocol } from './protocol.quiz.js';
@@ -33,7 +33,7 @@ class JQuiz {
 		this.client.usrAct({
 			func: 'quiz',
 			cmd: a,
-			cate: Protocol.CRUD.r,
+			cate: CRUD.r,
 			remarks: 'quiz.serv' });
 
 		let reqMsg = this.client.userReq(uri, JQuiz.port, req);
@@ -170,7 +170,7 @@ class JQuiz {
 		let that = this;
 		let {quiz, questions, quizUsers} = hooked;
 		let date = new Date();
-		this.client.usrAct('quiz', QuizProtocol.A.insert, Protocol.CRUD.c, quiz.title);
+		this.client.usrAct('quiz', QuizProtocol.A.insert, CRUD.c, quiz.title);
 
 		let props = {}
 		/* DESIGN NOTE
@@ -204,7 +204,7 @@ class JQuiz {
 	update(uri, hooked, onOk, errCtx) {
 		let that = this;
 		let {quiz, questions, quizUsers} = hooked;
-		this.client.usrAct('quiz', QuizProtocol.A.update, Protocol.CRUD.u, quiz.title);
+		this.client.usrAct('quiz', QuizProtocol.A.update, CRUD.u, quiz.title);
 
 		let props = {}
 		props[QuizProtocol.quizId] = quiz.qid || quiz.quizId;

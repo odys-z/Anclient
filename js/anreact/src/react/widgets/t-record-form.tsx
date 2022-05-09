@@ -42,7 +42,8 @@ const styles = (theme: Theme) => (Object.assign(
 
 export interface RecordFormProps extends Comprops {
 	/**Default: true */
-    enableValidate?: boolean;
+    enableValidate?: boolean,
+	tier: Semantier
 };
 
 /**
@@ -133,7 +134,6 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			return (
 			<TextField key={f.field} type={f.type || type}
 				disabled={!!f.disabled}
-				// autoComplete={f.autocomplete}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
@@ -175,7 +175,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		const { classes, width } = this.props;
 		let media = CrudCompW.getMedia(width);
 
-		let rec = this.tier.rec;
+		let rec = this.tier?.rec;
 
 		return rec ?
 			<Grid container className={classes.root} direction='row'>

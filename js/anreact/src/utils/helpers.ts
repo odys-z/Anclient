@@ -1,5 +1,5 @@
 
-import {} from './lang-ext';
+
 
 /**@deprecated moved to @anclient/semantier-st
  * 
