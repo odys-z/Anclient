@@ -268,9 +268,10 @@ export class DocsTier extends Semantier {
 	reltabl = 'n_doc_kid';
 	rel = {'n_doc_kid': {
 		fk: {
-			fk: 'docId',  // fk to main table
-			col: 'userId',// checking col
-			sk: 'trees.doc_kid' }
+			tabl: 'n_mykids',
+			pk: 'userId',
+			relcolumn: 'userId',
+		 }
 		}};
 	checkbox = true;
 
