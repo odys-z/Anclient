@@ -607,7 +607,7 @@ class SessionClient {
 		return jreq as AnsonMsg<QueryReq>;
 	}
 
-	update(uri, maintbl, pk: PkMeta, nvs) {
+	update(uri: string, maintbl: string, pk: PkMeta, nvs: string | string[] | Tierec) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("Anclient is designed to support user updating log natively. User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");

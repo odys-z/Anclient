@@ -62,10 +62,10 @@ export interface FKRelation {
 	/**table name */
 	tabl: string;
 
-	/**chiled table pk */
+	/**child table pk */
 	pk: string,
 
-	/**Child foreign column in DB table */
+	/**child foreign column in DB table */
 	col: string,
 
 	/**value for col - column-map's key for where to get the value */
@@ -84,9 +84,9 @@ export interface Stree {
 export type Semantics = {
 	// [reltype in SemanticType]: FKRelation | Stree | any;
 	fk?: FKRelation,
-	/**semantic tree */
+	/**TODO: semantic tree */
 	stree?: Stree,
-	/**Multiple to mulitple */
+	/**TODO: Multiple to mulitple */
 	m2m?: any,
 }
 
@@ -115,10 +115,7 @@ export interface AttachMeta {
 export interface AnResultset {
 	results: Array<Array<any>>;
 	length() : number;
-    // results: Array<any>;
     total: number;
-    // filter(arg0: (r: any) => boolean) : Array<{}>;
-    // rs: Array<{}>;
     colnames: {};
 }
 
