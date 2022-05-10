@@ -37,9 +37,9 @@ class QuizzesComp extends CrudCompW {
 		queryReq : undefined,
 		buttons: { add: false, edit: false, del: false},
 
-		condTitl: { type: 'text', val: '', label: L('Title')},
-		condTags: { type: 'text', val: '', label: L('Tags')},
-		condDate: { type: 'date', val: '', label: L('Create Date')},
+		condTitl: { type: 'text', field: 'title', val: '', label: L('Title')},
+		condTags: { type: 'text', field: 'tags',  val: '', label: L('Tags')},
+		condDate: { type: 'date', field: 'cdate', val: '', label: L('Create Date')},
 
 		selected: {ids: new Set()},
 	};
@@ -72,7 +72,7 @@ class QuizzesComp extends CrudCompW {
 		this.toSearch();
 	}
 
-	toSearch(e, query) {
+	toSearch(query) {
 
 		let pageInf = this.state.pageInf;
 
@@ -225,11 +225,11 @@ class QuizzesComp extends CrudCompW {
 				onSearch={this.toSearch}
 				// conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
 				fields={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
-				query={ (q) => { return {
-					qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
-					qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
-					qdate: q.state.conds[2].val ? q.state.conds[2].val : undefined,
-				}} }
+				// query={ (q) => { return {
+				// 	qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
+				// 	qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
+				// 	qdate: q.state.conds[2].val ? q.state.conds[2].val : undefined,
+				// }} }
 			/>
 
 			<Typography className={classes.tip} color='primary' >

@@ -63,6 +63,7 @@ export interface TierCol extends DbCol {
 
     disabled?: boolean;
 	visible?: boolean;
+	hide?: boolean; // backward compatible
     checkbox?: boolean;
 }
 

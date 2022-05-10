@@ -290,7 +290,7 @@ export const QuizProtocol = {
 /**
  */
 export const CenterProtocol = {
-	// Prameter names
+	// Parameter names
 	pollId: "pollId",
 
 	myClasses: "classes",
@@ -301,6 +301,8 @@ export const CenterProtocol = {
 	pollResults: "poll-results",
 	pollState: "poll-state",
 	pollIssuer: "poll-issuer",
+	quizTag: "quiz-tag",
+	quizTitle: "quiz-title",
 
 	A: {
 		getClasses: "classes",

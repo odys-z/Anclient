@@ -10,13 +10,13 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol, CRUD } from '@anclient/semantier-st';
+import { CRUD } from '@anclient/semantier-st';
 import { L, AnContext,
 	DetailFormW, ConfirmDialog, utils
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
-import { docListyle } from '../n/docshares';
+import { docListyle } from '../n-tsx/docshares';
 
 const { regex } = utils;
 

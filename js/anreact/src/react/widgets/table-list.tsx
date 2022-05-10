@@ -143,8 +143,9 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	 */
 	th(columns: Array<AnlistColAttrs<JSX.Element, CompOpts>> = []) {
 		return columns
-			.filter( (v, x) => !toBool(v.visible, true) ? false
-						: !(this.props.checkbox && x === 0)) // first columen as checkbox
+			.filter( (v, x) => // !toBool(v.visible, true) ? 
+							toBool(v.hide) || !toBool(v.visible, true) ?
+							false : !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
 					{colObj.label || colObj.field}

@@ -10,7 +10,7 @@ const { JsampleIcons } = jsample;
 const { CRUD } = Protocol;
 
 import { starTheme } from '../../common/star-theme';
-import { DocsTier, DocsQuery, DocsReq, docListyle } from '../n/docshares';
+import { DocsTier, DocsQuery, DocsReq, docListyle } from '../n-tsx/docshares';
 import { MyDocView } from './mydoc-view';
 
 const styles = (theme) => Object.assign(starTheme(theme),
