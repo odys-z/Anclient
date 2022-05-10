@@ -271,6 +271,7 @@ export class DocsTier extends Semantier {
 			tabl: 'n_mykids',
 			pk: 'userId',
 			relcolumn: 'userId',
+			col: 'userId'
 		 }
 		}};
 	checkbox = true;
