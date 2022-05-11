@@ -11,7 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, Tierec, toBool } from '@anclient/semantier-st';
+import { AnlistColAttrs, isEmpty, Tierec, toBool } from '@anclient/semantier-st';
 import { Comprops, DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 
@@ -79,6 +79,8 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 
 		this.th = this.th.bind(this);
 		this.tr = this.tr.bind(this);
+		if (isEmpty(props.pk)) // for jsx checking
+			console.error("WARN: AnTablist uses rows[props.pk] for React.js children keys. Null pk will report error.");
 	}
 
 	componentDidMount() {

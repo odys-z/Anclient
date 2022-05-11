@@ -2,7 +2,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -11,7 +10,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { CRUD, Semantier, Tierec } from '@anclient/semantier-st';
+import { CRUD } from '@anclient/semantier-st';
 import { L, AnContext,
 	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree, Comprops
 } from '@anclient/anreact';

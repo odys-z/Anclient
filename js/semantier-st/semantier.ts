@@ -3,7 +3,7 @@ import { toBool } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, Semantics, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations
+	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations, FKRelation
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -140,7 +140,7 @@ export interface UIComponent {
 export class Semantier {
     /**
      *
-     * @param {uri: string} props
+     * @param props
      */
     constructor(props: UIComponent) {
         if (!props || !props.uri)
@@ -170,7 +170,7 @@ export class Semantier {
     rec: Tierec;
 
     /** All sub table's relationships */
-    relMeta: Tierelations;
+    relMeta: {[tabl: string]: Tierelations};
 
     /** currrent relation table - wrong */
     // reltabl: string;
@@ -306,18 +306,19 @@ export class Semantier {
 
 		// typically relationships are tree data
 		let { reltabl, sqlArgs, sqlArg } = opts;
-		let fkRel = this.relMeta[reltabl] as unknown as Stree;
-		let { sk, fk, fullpath } = fkRel;
+		let fkRel = this.relMeta[reltabl] as Tierelations;
+		// let { stree, fk, fullpath } = fkRel;
+		let stree = fkRel.stree;
 
 		sqlArgs = sqlArgs || [sqlArg];
 
-		if (!sk)
+		if (!stree)
 			throw Error('TODO ...');
 
 		let t = stree_t.sqltree;
 
 		let ds = {uri : this.uri,
-			sk, t, sqlArgs,
+			sk: stree.sk, t, sqlArgs,
 		};
 
 		Semantier.stree(ds, client,
@@ -445,7 +446,7 @@ export class Semantier {
 	 * @param parentpkv pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
-	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Semantics, parentpkv: PkMeta ) : AnsonMsg<T> {
+	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Tierelations, parentpkv: PkMeta ) : AnsonMsg<T> {
 		if (relation.stree || relation.m2m)
 			throw Error('TODO ...');
 

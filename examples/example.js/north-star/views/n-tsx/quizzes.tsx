@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { Typography, Grid, Button } from '@material-ui/core';
 
 import dateFormat from 'dateformat';
-import { PageInf, QueryConditions, UserReq } from '@anclient/semantier-st';
+import { AnsonResp, PageInf, QueryConditions, UserReq } from '@anclient/semantier-st';
 import {
     L,
     AnConst, AnContext, CrudCompW, AnQueryst,
@@ -153,18 +153,18 @@ class QuizzesComp extends CrudCompW<Comprops> {
 			/>);
 	}
 
-	del(qids) {
+	del(qids: Set<string>) {
 		let client = this.context.anClient;
 		let req = client.userReq( this.uri, 'quiz',
 					new UserReq( this.uri, "quiz" )
 					.A(QuizProtocol.A.deleteq) );
 
 		let reqBd = req.Body();
-		reqBd.set(QuizProtocol.quizId, [...qids]);
+		reqBd.set(QuizProtocol.quizId, Array.from(qids));
 
 		let that = this;
 		client.commit(req,
-			(resp) => {
+			(resp : AnsonResp) => {
 				that.state.selected.ids.clear();
 				that.confirm =
 					(<ConfirmDialog open={true}
@@ -228,11 +228,11 @@ class QuizzesComp extends CrudCompW<Comprops> {
 				onSearch={this.toSearch}
 				// conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
 				fields={[ this.condTitl, this.condTags, this.condDate ]}
-				query={ (q) => { return {
-					qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
-					qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
-					qdate: q.state.conds[2].val ? q.state.conds[2].val : undefined,
-				}} }
+				// query={ (q) => { return {
+				// 	qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
+				// 	qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
+				// 	qdate: q.state.conds[2].val ? q.state.conds[2].val : undefined,
+				// }} }
 			/>
 
 			<Typography className={classes.tip} color='primary' >
@@ -273,7 +273,7 @@ class QuizzesComp extends CrudCompW<Comprops> {
 			<AnTablist selected={this.state.selected}
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
-					{ text: L('qid'), hide:1, field: "qid" },
+					{ text: L('qid'), hide: true, field: "qid" },
 					{ text: L('Title'),       field: "title",    color: 'primary', className: 'bold' },
 					{ text: L('Tags'),        field: "tags",     color: 'primary' },
 					{ text: L('Date Created'),field: "dcreate",  color: 'primary',

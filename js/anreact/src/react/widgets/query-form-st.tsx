@@ -292,7 +292,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 }
 AnQuerystComp.contextType = AnContext;
 
-interface QueryFormProps extends Comprops {
+export interface QueryFormProps extends Comprops {
 	fields: AnlistColAttrs<JSX.Element, CompOpts>[];
 	/**User actions: search button clicked */
 	onSearch : (conds: QueryConditions) => void,

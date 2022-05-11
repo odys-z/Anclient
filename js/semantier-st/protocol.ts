@@ -73,25 +73,32 @@ export interface FKRelation {
 }
 
 export interface Stree {
-	sk: string,
-	pk: string,
-	fk: string,
-	sort: string,
-	fullpath: string,
+	sk : string, 	// s-tree semantic key
+	col: string,	// check col at client side
+	fk : string,	// fk to main table
+	sort?: string,
+	fullpath?: string,
 }
 
 /**Is this semantic-DA.Semantics? */
-export type Semantics = {
-	// [reltype in SemanticType]: FKRelation | Stree | any;
+// export type Semantics = {
+// 	// [reltype in SemanticType]: FKRelation | Stree | any;
+// 	fk?: FKRelation,
+
+// 	/**TODO: semantic tree */
+// 	stree?: Stree,
+
+// 	/**TODO: Multiple to mulitple */
+// 	m2m?: any,
+// }
+
+export interface DbRelations {
+    // [tabl: string]: Semantics;
 	fk?: FKRelation,
 	/**TODO: semantic tree */
 	stree?: Stree,
 	/**TODO: Multiple to mulitple */
 	m2m?: any,
-}
-
-export interface DbRelations {
-    [tabl: string]: Semantics;
 }
 
 export interface UIRelations {

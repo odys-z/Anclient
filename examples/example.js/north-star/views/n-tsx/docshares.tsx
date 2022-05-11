@@ -3,10 +3,9 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Box, Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp, AnsonBody, Semantier, UIComponent, Tierec, PkMeta, JsonOptions, OnCommitOk } from '@anclient/semantier-st';
+import { Protocol, AnsonResp, AnsonBody, Semantier, UIComponent, Tierec, PkMeta, OnCommitOk, AnsonMsg, OnLoadOk, QueryConditions } from '@anclient/semantier-st';
 import { L, AnContext,
-	CrudCompW, AnQueryst, AnTablist, ConfirmDialog, jsample, utils, Comprops, ClassNames, AnreactAppOptions
-} from '@anclient/anreact';
+	CrudCompW, AnQueryst, AnTablist, ConfirmDialog, jsample, utils, Comprops, ClassNames} from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 const { mimeOf, dataOfurl, regex } = utils;
 
@@ -255,10 +254,6 @@ export class DocsQuery extends React.Component<DocsQueryProps> {
 		/> );
 	}
 }
-// DocsQuery.propTypes = {
-// 	uri: PropTypes.string.isRequired,
-// 	onQuery: PropTypes.func.isRequired
-// }
 
 export class DocsTier extends Semantier {
 	port = 'docstier';
@@ -267,11 +262,10 @@ export class DocsTier extends Semantier {
 
 	reltabl = 'n_doc_kid';
 	rel = {'n_doc_kid': {
-		fk: {
-			tabl: 'n_mykids',
-			pk: 'userId',
-			relcolumn: 'userId',
-			col: 'userId'
+		stree: {
+			sk : 'trees.doc_kid',
+			fk : 'docId',	// fk to main table
+			col: 'userId',	// checking col
 		 }
 		}};
 	checkbox = true;
@@ -289,14 +283,14 @@ export class DocsTier extends Semantier {
 
 	_fields = [
 		{ type: 'text', field: 'docId',   label: 'Doc ID',
-		  disabled: true },
+		  hide: true },
 		{ type: 'text', field: 'docName', label: 'File Name',
 		  disabled: true },
 		{ type: 'text', field: 'mime',    label: 'File Type',
 		  disabled: true, formatter: undefined }
 	];
 
-	constructor(comp) {
+	constructor(comp: UIComponent) {
 		super(comp);
 		this.relMeta = this.rel;
 	}
@@ -332,7 +326,7 @@ export class DocsTier extends Semantier {
 					.A( DocsReq.A.upload ) );
 
 				client.commit(req,
-					(resp) => {
+					(resp: AnsonMsg<AnsonResp>) => {
 						let bd = resp.Body();
 						// NOTE:
 						// resulving auto-k is a typicall semantic processing, don't expose this to caller
@@ -348,7 +342,7 @@ export class DocsTier extends Semantier {
 		});
 	}
 
-	records(conds, onLoad) {
+	records(conds: QueryConditions, onLoad: OnLoadOk<Tierec>): void {
 		if (!this.client) return;
 
 		let client = this.client;
@@ -359,7 +353,7 @@ export class DocsTier extends Semantier {
 					.A(DocsReq.A.records) );
 
 		client.commit(req,
-			(resp) => {
+			(resp: AnsonMsg<AnsonResp>) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
 				that.resetFormSession();
@@ -368,7 +362,7 @@ export class DocsTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds, onLoad) {
+	record(conds: {}, onLoad: OnLoadOk<Tierec>) : void {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
