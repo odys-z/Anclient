@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import { Box, Button, Grid } from '@material-ui/core';
+import { Box, Button, Grid, Theme } from '@material-ui/core';
 
 import { Protocol, AnsonResp, AnsonBody, Semantier, UIComponent, Tierec, PkMeta, OnCommitOk, AnsonMsg, OnLoadOk, QueryConditions } from '@anclient/semantier-st';
 import { L, AnContext,
@@ -25,13 +25,13 @@ export const docListyle = (theme) => {return {
 		border: "solid 1px red",
 		width: "100%",
 		height: "100%",
-		// position: "relative",
+		position: "relative",
 		top: -48,
 		opacity: 0
 	}
 }; };
 
-const styles = (theme) => Object.assign(starTheme(theme), docListyle(theme));
+const styles = (theme: Theme) => Object.assign(starTheme(theme), docListyle(theme));
 
 class DocsharesComp extends CrudCompW<Comprops> {
 	state = {
@@ -135,7 +135,7 @@ class DocsharesComp extends CrudCompW<Comprops> {
 
 	toAdd(e : ChangeEvent<HTMLInputElement>) {
 		let that = this;
-		let files = this.fileInput.files;
+		let files = this.fileInput.files as FileList;
 		this.tier.upload(files, (docId) => {
 			that.tier.pkval.v = docId; // FIXME NOTE where is the best place to do this?
 
@@ -209,7 +209,6 @@ class DocsharesComp extends CrudCompW<Comprops> {
 }
 DocsharesComp.contextType = AnContext;
 
-// const Docshares = withWidth()(withStyles(styles)(DocsharesComp));
 const Docshares = withStyles(styles)(withWidth()(DocsharesComp));
 export { Docshares, DocsharesComp }
 
@@ -262,11 +261,21 @@ export class DocsTier extends Semantier {
 
 	reltabl = 'n_doc_kid';
 	rel = {'n_doc_kid': {
+		// experimental: loading tree
 		stree: {
 			sk : 'trees.doc_kid',
+			childTabl: 'n_doc_kid',
 			fk : 'docId',	// fk to main table
 			col: 'userId',	// checking col
-		 }
+			colProp: 'nodeId', // tree item property: useId
+		 },
+		// experimantal: saving relations
+		// fk: {
+		// 	tabl: '',
+		// 	pk: '',
+		// 	fk : 'docId',	// fk to main table
+		// 	relcolumn: 'userId',	// checking col
+		//  }
 		}};
 	checkbox = true;
 
@@ -295,13 +304,13 @@ export class DocsTier extends Semantier {
 		this.relMeta = this.rel;
 	}
 
-	upload(files, onOk: (docId: string) => void) {
-		if (!files) return;
+	upload(files: FileList, onOk: (docId: string) => void) {
+		if (!files || files.length === 0) return;
 
 		let that = this;
 		let client = this.client;
 
-		files.forEach( (file, x) => {
+		Array.from(files).forEach( (file, x) => {
 			let row = {
 				docId: 'loading',
 				// uri  : undefined,
@@ -322,7 +331,7 @@ export class DocsTier extends Semantier {
 				// file always uploaded as insertion, - delete first (even null Id)
 				let req = client
 					.userReq( that.uri, that.port,
-					new DocsReq( that.uri, { deletings: [that.pkval], ...row } )
+					new DocsReq( that.uri, row )
 					.A( DocsReq.A.upload ) );
 
 				client.commit(req,
@@ -349,7 +358,7 @@ export class DocsTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new DocsReq( this.uri, conds )
+					new DocsReq( this.uri, conds as any )
 					.A(DocsReq.A.records) );
 
 		client.commit(req,
@@ -372,7 +381,7 @@ export class DocsTier extends Semantier {
 					.A(DocsReq.A.rec) );
 
 		client.commit(req,
-			(resp) => {
+			(resp: AnsonMsg<AnsonResp>) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
 				onLoad(cols, rows);
@@ -445,9 +454,15 @@ export class DocsReq extends AnsonBody {
     docName: string;
     mime: string;
     uri64: string;
-    deletings: string;
+    deletings: string[];
 
-	constructor(uri, args = {} as any) {
+	/**
+	 * 
+	 * @param uri 
+	 * @param args
+	 * args.deletings: old docId to be deleted 
+	 */
+	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super();
 		this.type = DocsReq.type;
 		this.docId = args.docId;

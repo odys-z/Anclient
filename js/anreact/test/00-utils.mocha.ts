@@ -1,8 +1,9 @@
 import { assert } from 'chai';
 
+import { toBool, isEmpty } from '@anclient/semantier-st';
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
-import { toBool, isEmpty } from '../../anreact/src/utils/helpers';
 import { regex } from '../../anreact/src/utils/regex';
+import { swap } from '../src/utils/lang-ext';
 
 describe('case: [0.0] utils', () => {
 	it('helpers: toBool, isEmpty', () =>{
@@ -25,7 +26,7 @@ describe('case: [0.0] utils', () => {
 
 	it('Array pathc', () => {
 		let arr = [1, 2, 3];
-		arr.swap(0, 1);
+		swap(arr, 0, 1);
 		assert.equal(arr.length, 3);
 		assert.equal(arr[0], 2);
 		assert.equal(arr[1], 1);

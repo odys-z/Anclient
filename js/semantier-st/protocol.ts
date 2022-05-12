@@ -58,7 +58,7 @@ export interface DbCol {
  * */
 export type SemanticType = 'fk' | 'stree' | 'm2m' | 'customer';
 
-export interface FKRelation {
+export interface relFK {
 	/**table name */
 	tabl: string;
 
@@ -72,10 +72,18 @@ export interface FKRelation {
 	relcolumn: string,
 }
 
-export interface Stree {
-	sk : string, 	// s-tree semantic key
-	col: string,	// check col at client side
-	fk : string,	// fk to main table
+/**
+ * An experiment for semantic pattern of relation tree,
+ * trying UI handling s-tree in automatic pattern.
+ * 
+ * Used by {@link Semantier.formatRel()}
+ */
+export interface relStree {
+	sk : string, 		// s-tree semantic key
+	childTabl?: string,	// child table (optional when loading / binding records)
+	col: string,		// check col at client side
+	colProp?: string,	// propterty name (of which the value will be collected)
+	fk : string,		// fk to main table
 	sort?: string,
 	fullpath?: string,
 }
@@ -93,11 +101,11 @@ export interface Stree {
 // }
 
 export interface DbRelations {
-    // [tabl: string]: Semantics;
-	fk?: FKRelation,
-	/**TODO: semantic tree */
-	stree?: Stree,
-	/**TODO: Multiple to mulitple */
+	/** TODO:  [tabl: string]: Semantics; */
+	fk?: relFK,
+	/** semantic tree */
+	stree?: relStree,
+	/** TODO: Multiple to mulitple */
 	m2m?: any,
 }
 

@@ -10,12 +10,13 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { CRUD } from '@anclient/semantier-st';
+import { CRUD, TierCol, Tierec } from '@anclient/semantier-st';
 import { L, AnContext,
 	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree, Comprops
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
+import { DocsTier } from './docshares';
 
 const DocshareStyle = (theme) => ({
 	dialogPaper: {
@@ -69,7 +70,8 @@ class DocshareDetailsComp extends DetailFormW<DocshareDetailProps> {
 		record: {},
         crud: undefined
 	};
-    tier: any;
+
+    tier: DocsTier;
     confirm: JSX.Element;
     handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
@@ -93,21 +95,23 @@ class DocshareDetailsComp extends DetailFormW<DocshareDetailProps> {
 			let that = this;
 			let cond = {};
 			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
-				that.setState({record: rows[0]});
+			this.tier.record(cond, () => {
+				that.setState({});
 			} );
 		}
 	}
 
-	toSave(e) {
+	toSave(e: React.UIEvent) {
 		if (e) e.stopPropagation();
 
 		let that = this;
 
-		if (this.tier.validate(this.tier.rec, this.recfields)) // field style updated
+		if (this.tier.validate(this.tier.rec, this.tier.fields())) // field style updated
 			this.tier.saveRec(
 				{ crud: CRUD.u,
-				  disableForm: true },
+				  disableForm: true,
+				  reltabl: 'n_doc_kid'
+				},
 				resp => {
 					// NOTE should crud moved to tier, just like the pkval?
 					if (that.state.crud === CRUD.c) {
@@ -117,14 +121,10 @@ class DocshareDetailsComp extends DetailFormW<DocshareDetailProps> {
 				} );
 		else this.setState({});
 	}
-    recfields(rec: any, recfields: any) {
-        throw new Error('Method not implemented.');
-    }
 
-	toCancel (e) {
+	toCancel (e: React.UIEvent) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
-			// this.props.onClose({code: 'cancel'});
 			this.props.onClose();
 	}
 
@@ -148,7 +148,7 @@ class DocshareDetailsComp extends DetailFormW<DocshareDetailProps> {
 		let u = this.state.crud === CRUD.u;
 		let title = L('Share Documents');
 
-		let rec = this.state.record;
+		// let rec = this.state.record;
 
 		return (<>
 		  <Dialog className={classes.root}

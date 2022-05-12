@@ -54,10 +54,10 @@ class MyDocViewComp extends DetailFormW {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
+		if (this.tier.pkval.v) {
 			let that = this;
 			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
+			cond[this.tier.pk] = this.tier.pkval.v;
 			this.tier.record(cond, (cols, rows, fkOpts) => {
 				that.setState({record: rows[0]});
 			} );

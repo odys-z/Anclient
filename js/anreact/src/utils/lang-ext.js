@@ -1,5 +1,6 @@
 if (!Array.swap) {
 	/**Usage: arr.swap(a, b);
+	 * @deprecated
 	 * see https://stackoverflow.com/a/4011851/7362888
 	 */
 	Array.prototype.swap = function(a, b){
@@ -25,4 +26,12 @@ if (!Array.swap) {
 	};
 }
 
-export {}
+function swap (arr, a, b) {
+	if (Array.isArray(arr)) {
+		arr[a] = arr.splice(b, 1, arr[a])[0];
+		return arr;
+	}
+	else return arr;
+}
+
+export {swap}

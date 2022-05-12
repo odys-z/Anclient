@@ -3,7 +3,7 @@ import { toBool } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, Stree, NV, PageInf, AnTreeNode, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations, FKRelation
+	DbCol, DbRelations, relStree, NV, PageInf, AnTreeNode, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -437,7 +437,7 @@ export class Semantier {
     }
 
 	/**
-	 * format relationship records - only fk supported
+	 * Formatting relationship records - only relStree is supported
 	 *
 	 * TODO change to static
 	 * @param uri
@@ -447,20 +447,20 @@ export class Semantier {
 	 * @returns req with post updating semantics
 	 */
 	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Tierelations, parentpkv: PkMeta ) : AnsonMsg<T> {
-		if (relation.stree || relation.m2m)
+		if (relation.fk || relation.m2m)
 			throw Error('TODO ...');
 
-		let rel = relation.fk;
+		let rel = relation.stree;
 		// collect relationships
 		let columnMap = {};
-		columnMap[rel.col] = rel.relcolumn; // columnMap[rel.col] = 'nodeId';
+		columnMap[rel.col] = rel.colProp || rel.col; // columnMap[rel.col] = 'nodeId';
 
 		// semantics handler can only resulve fk at inserting when master pk is auto-pk
 		columnMap[parentpkv.pk] = parentpkv.v;
 
 		let insRels = this.inserTreeChecked(
-				this.rels[rel.tabl] as AnTreeNode[],
-				{ table: rel.tabl,
+				this.rels[rel.childTabl] as AnTreeNode[],
+				{ table: rel.childTabl,
 				  columnMap,
 				  check: 'checked',
 				  // middle nodes been corrected according to children
@@ -471,12 +471,14 @@ export class Semantier {
 			if (req)
 				req.Body().post(insRels);
 			else
-				req = this.client.userReq(uri, 'insert', insRels) as unknown as AnsonMsg<T>;
+				req = this.client.userReq<InsertReq>(uri, 'insert', insRels) as unknown as AnsonMsg<T>;
 		}
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
-			let del_rf = new DeleteReq(uri, rel.tabl, [rel.pk, rel.col])
-							.whereEq(rel.col, parentpkv.v)
+			let del_rf = new DeleteReq(uri, rel.childTabl,
+							[rel.fk, parentpkv.v])
+							//[rel.fk, rel.col])
+							// .whereEq(rel.col, parentpkv.v)
 							.post(insRels);
 
 			if (req)
@@ -487,12 +489,16 @@ export class Semantier {
 		return req;
 	}
 
-	/**move this to a semantics handler, e.g. shFK ?
-	 * Generate an insert request according to tree/forest checked items.
+	/**- todo move this to a semantics handler, e.g. shFK ?
+	 * @description Generate an insert request according to tree/forest checked items.
 	 * @param forest forest of tree nodes, the forest / tree data, tree node: {id, node}
 	 * @param opts options
 	 * - opts.table: relationship table name
 	 * - opts.columnMap: column's value to be inserted
+	 * 
+	 * If the item has a same named property, the value is collected from the item;<br>
+	 * Otherwise the argument's value will be used.
+	 * 
 	 * - opts.check: checking column name
 	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checed.
 	 * @return subclass of AnsonBody
@@ -515,10 +521,11 @@ export class Semantier {
 		ins.nvRows(rows);
 		return ins;
 
-		/**Design Notes:
+		/**
+		 * Design Notes:
 		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
 		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
-		*/
+		 */
 		function collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>) {
 			let cnt = 0;
 			forest.forEach( (tree: AnTreeNode, _i: number) => {
@@ -540,9 +547,16 @@ export class Semantier {
 			return cnt;
 		}
 
-		/**convert to [name-value, ...] as a row (Array<{name, value}>), e.g.
+		/**
+		 * Convert tree item (AnTreeNode) to [name-value, ...] as a nv record (Array<{name, value}>),
+		 * e.g.
+		 * 
 		 * [ { "name": "funcId", "value": "sys-domain" },
+		 * 
 		 *   { "name": "roleId", "value": "r003" } ]
+		 * 
+		 * If the item has a same named property, the value is collected from the item;<br>
+		 * Otherwise the argument's value will be used.
 		 *
 		 * @param node   TreeNode from wich row will be collected
 		 * @param dbcols column names to be converted from node
