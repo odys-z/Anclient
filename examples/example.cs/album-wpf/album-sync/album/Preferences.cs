@@ -47,8 +47,7 @@ namespace io.oz.album
         /// <summary>
         /// Init with preferences. Not login yet.
         /// </summary>
-        /// <param name="execPath"></param>
-        public static void load(string execPath)
+        public static void load()
         {
             try
             {

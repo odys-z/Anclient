@@ -129,8 +129,6 @@ class PswdTier extends MyInfTier {
 
 	changePswd(opts, onOk) {
 		if (!this.client) return;
-		// let client = this.client;
-		// let that = this;
 
 		// let { uri } = opts;
 		let { pswd, pswd1, pswd2 } = this.rec;

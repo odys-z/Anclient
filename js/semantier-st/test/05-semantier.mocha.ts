@@ -296,15 +296,13 @@ describe('case: [05.0 dataset + s-tree]', () => {
 		let req = new AnsonMsg<InsertReq>({body: [body]});
 
 		semantier.formatRel('test 05', req,
-					{fk: {tabl: 'a_role_func', pk: 'roleId', col: 'funcId', relcolumn: 'nodeId'}},
+					{stree: {sk: 'fake-test', childTabl: 'a_role_func', fk: 'roleId', col: 'funcId', colProp: 'nodeId'}},
 					{pk: 'roleId', v: 'r00'});
 
 		let del = req.Body().postUpds[0] as UpdateReq;
 
 		let ins = del.postUpds[0] as InsertReq;
-		// console.log(ins);
 		let nvss = ins.nvss;
-		// console.log(nvss[0], nvss[1]);
 
 		assert.equal(del.type, 'io.odysz.semantic.jserv.U.AnUpdateReq', 'del');
 		assert.equal(del.a, 'D', 'del.a');

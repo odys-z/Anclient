@@ -12,11 +12,11 @@ import MobileStepper from "@material-ui/core/MobileStepper";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 
-import { Protocol, CRUD, UserReq } from '@anclient/semantier-st'
+import { CRUD, UserReq } from '@anclient/semantier-st'
 import { L, AnContext, CrudCompW} from '@anclient/anreact';
 
 import { CenterProtocol } from "../../common/protocol.quiz.js";
-import { JQuiz } from '../../common/an-quiz.js';
+import { JQuiz } from '../../common/an-quiz';
 import { CarouselCard, CarouselSubmitCard } from "./carousel-card";
 
 const styles = (theme) => ( {

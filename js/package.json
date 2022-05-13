@@ -21,6 +21,8 @@
   "author": "odys-z@github.com",
   "license": "Apache-2.0",
   "dependencies": {
+    "@anclient/anreact": "^0.3.66",
+    "@anclient/semantier-st": "^0.9.63",
     "@emotion/react": "^11.9.0",
     "@types/jquery": "^3.5.13",
     "mime-types-no-nodejs": "^0.9.1",
@@ -45,6 +47,7 @@
     "babel-preset-env": "^1.7.0",
     "chai": "^4.3.4",
     "css-loader": "^2.1.1",
+    "css-select": "^5.1.0",
     "d3": "^7.0.1",
     "jquery": "^3.6.0",
     "jsdoc": "^3.6.10",

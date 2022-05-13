@@ -49,6 +49,10 @@ class MyStudentsComp extends UserstComp {
 		this.tier.setContext(this.context);
 	}
 
+	componentDidMount() {
+		console.log(this.uri);
+	}
+
 	toAdd() {
 		let that = this;
 		this.tier.pkval = undefined;
@@ -98,7 +102,7 @@ class MyStudentsComp extends UserstComp {
 				>{L('Delete')}</Button>
 			</Box>
 
-			{tier && <AnTablist pk={tier.pk} selected={this.state.selected}
+			{tier && <AnTablist pk={tier.pkval.pk} selected={this.state.selected}
 				className={classes.root} checkbox={true}
 				columns={tier.columns()}
 				rows={tier.rows}
@@ -158,6 +162,7 @@ class MyKidsTier extends UsersTier {
 
 	port = 'mykidstier';
 	mtabl = 'n_mykids';
+	pkval = {pk: 'userId', v: undefined};
 
 	_cols = [
 		{ text: L('Log ID'), field: 'userId', checked: true },
@@ -179,7 +184,6 @@ class MyKidsTier extends UsersTier {
 	];
 
 	constructor(comp) {
-		// super(Object.assign(comp || {}, {port: 'mykidstier'}));
 		super(comp);
 	}
 

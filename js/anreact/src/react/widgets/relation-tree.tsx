@@ -56,12 +56,12 @@ const styles = (theme: Theme) => ({
 });
 
 interface RelationTreeProps extends Comprops {
-	reltabl: string;
-	sk: string;
+	reltabl?: string;
+	sk?: string;
 
 	/**Semantier.formatRel() use this name to format relationship records,
 	 * where in UI component the FK value comes from */
-	relcolumn: string;
+	relcolumn?: string;
 };
 
 /**

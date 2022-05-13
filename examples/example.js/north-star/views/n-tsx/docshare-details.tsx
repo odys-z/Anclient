@@ -2,23 +2,21 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { Protocol, CRUD } from '@anclient/semantier-st';
-import { L, AnConst,
-	AnContext, AnError,
-	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree
+import { CRUD, TierCol, Tierec } from '@anclient/semantier-st';
+import { L, AnContext,
+	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree, Comprops
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
+import { DocsTier } from './docshares';
 
 const DocshareStyle = (theme) => ({
 	dialogPaper: {
@@ -52,18 +50,32 @@ const DocshareStyle = (theme) => ({
 
 const styles = (theme) => Object.assign(starTheme(theme), DocshareStyle(theme));
 
+
+export interface DocshareDetailProps extends Comprops {
+	c?: boolean;
+	u?: boolean;
+	dense?: boolean;
+	onOk: () => void;
+	onClose: () => void;
+};
+
 /**
  * Tiered record form is a component for UI record layout, automaitcally bind data,
  * resolving FK's auto-cbb. As to child relation table, this component currently
  * is not planned to supprt.
  * <p>A kid always been saved as a "Dynamo"</p>
  */
-class DocshareDetailsComp extends DetailFormW {
+class DocshareDetailsComp extends DetailFormW<DocshareDetailProps> {
 	state = {
 		record: {},
+        crud: undefined
 	};
 
-	constructor (props = {}) {
+    tier: DocsTier;
+    confirm: JSX.Element;
+    handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
+
+	constructor (props) {
 		super(props);
 
 		this.state.crud = props.crud ? props.crud
@@ -83,21 +95,23 @@ class DocshareDetailsComp extends DetailFormW {
 			let that = this;
 			let cond = {};
 			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
-				that.setState({record: rows[0]});
+			this.tier.record(cond, () => {
+				that.setState({});
 			} );
 		}
 	}
 
-	toSave(e) {
+	toSave(e: React.UIEvent) {
 		if (e) e.stopPropagation();
 
 		let that = this;
 
-		if (this.tier.validate(this.tier.rec, this.recfields)) // field style updated
+		if (this.tier.validate(this.tier.rec, this.tier.fields())) // field style updated
 			this.tier.saveRec(
 				{ crud: CRUD.u,
-				  disableForm: true },
+				  disableForm: true,
+				  reltabl: 'n_doc_kid'
+				},
 				resp => {
 					// NOTE should crud moved to tier, just like the pkval?
 					if (that.state.crud === CRUD.c) {
@@ -108,10 +122,10 @@ class DocshareDetailsComp extends DetailFormW {
 		else this.setState({});
 	}
 
-	toCancel (e) {
+	toCancel (e: React.UIEvent) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
-			this.props.onClose({code: 'cancel'});
+			this.props.onClose();
 	}
 
 	showConfirm(msg) {
@@ -119,7 +133,10 @@ class DocshareDetailsComp extends DetailFormW {
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('OK')} cancel={false} open
-				onClose={() => {that.confirm = undefined;} }
+				onClose={() => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
 				msg={msg} />);
 		this.setState({});
 	}
@@ -131,7 +148,7 @@ class DocshareDetailsComp extends DetailFormW {
 		let u = this.state.crud === CRUD.u;
 		let title = L('Share Documents');
 
-		let rec = this.state.record;
+		// let rec = this.state.record;
 
 		return (<>
 		  <Dialog className={classes.root}
@@ -175,15 +192,6 @@ class DocshareDetailsComp extends DetailFormW {
 	}
 }
 DocshareDetailsComp.contextType = AnContext;
-
-DocshareDetailsComp.propTypes = {
-	uri: PropTypes.string.isRequired,
-	tier: PropTypes.object.isRequired,
-	crud: PropTypes.string,
-	c: PropTypes.bool,
-	u: PropTypes.bool,
-	dense: PropTypes.bool
-};
 
 const DocshareDetails = withWidth()(withStyles(styles)(DocshareDetailsComp));
 export { DocshareDetails, DocshareDetailsComp };

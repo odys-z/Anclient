@@ -4,7 +4,7 @@ import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { toBool, AnlistColAttrs, NV, QueryConditions, TierCol, TierComboField } from '@anclient/semantier-st';
+import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField } from '@anclient/semantier-st';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
@@ -63,6 +63,9 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 
 	constructor(props: QueryFormProps) {
 		super(props);
+
+		if (props.conds && !props.fields)
+			throw Error("AnQuerystComp now is using [fields] for conditions's declaration.");
 
 		this.bindConds = this.bindConds.bind(this);
 
@@ -160,20 +163,23 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		};
 	}
 
-	toSearch( _e ) {
+	toSearch( _e : React.UIEvent ) {
 		let conds = query(this.qFields);
 		this.props.onSearch(conds);
 
 		function query(fields: AnlistColAttrs<JSX.Element, CompOpts>[]): QueryConditions {
 			conds = {};
 			fields?.forEach( (f, x) => {
-				conds[f.name || f.field] = f.type == 'cbb' || f.type == 'autocbb' ? f.val?.v : f.val;
+				if (!f.name && !f.field)
+					console.error("Condition field ignored: ", f);
+				else
+					conds[f.name || f.field] = f.type == 'cbb' || f.type == 'autocbb' ? f.val?.v : f.val;
 			} );
 			return conds;
 		}
 	}
 
-	toClear( _e ) {
+	toClear( _e : React.UIEvent ) {
 		this.qFields
 			.filter( c => !!c )
 			.forEach( (c: ComboCondType, x) => {
@@ -286,7 +292,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 }
 AnQuerystComp.contextType = AnContext;
 
-interface QueryFormProps extends Comprops {
+export interface QueryFormProps extends Comprops {
 	fields: AnlistColAttrs<JSX.Element, CompOpts>[];
 	/**User actions: search button clicked */
 	onSearch : (conds: QueryConditions) => void,

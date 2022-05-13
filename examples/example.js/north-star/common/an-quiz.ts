@@ -1,14 +1,28 @@
 /** Legacy from Anclient/example.js/react-quiz
  */
 import {
-	Protocol, CRUD, UserReq
+	Protocol, CRUD, UserReq, SessionClient, SessionInf, ErrorCtx, Tierec
 } from '@anclient/semantier-st';
 
 import { QuizReq, QuizProtocol, CenterProtocol } from './protocol.quiz.js';
 
+/**DB quezzes & sub table records (questions + quizUsers) */
+export interface QuizRec extends Tierec {
+	qid: string | undefined,
+    title?: string,
+    hashtags?: string,
+    quizinfo?: string,
+
+	questions?: Array<any>,
+	quizUsers?: Array<string>,
+}
+
 export
 /** Helper handling protocol / data type of quiz.serv */
 class JQuiz {
+    client: SessionClient;
+    ssInf: SessionInf;
+    err: ErrorCtx;
 	/**@param {SessionClient} ssClient client created via login
 	 * @param {object} errHandler, AnContext.error, the app error handler
 	 */
@@ -18,23 +32,18 @@ class JQuiz {
 		this.err = errHandler;
 	}
 
-	static get port() { return 'quiz'; }
+	public static port = 'quiz';
 
 	serv (uri, a, conds = {}, onLoad, errCtx) {
-		let req = new UserReq(uri)
-			.A(a); // this is a reading request
+		let req = new UserReq(uri, 'quizzes')
+			.A<UserReq>(a);
 
 		for (let k in conds)
 			req.set(k, conds[k]);
 
 		let header = Protocol.formatHeader(this.ssInf);
 
-		// for logging user action at server side.
-		this.client.usrAct({
-			func: 'quiz',
-			cmd: a,
-			cate: CRUD.r,
-			remarks: 'quiz.serv' });
+		this.client.usrAct( 'quiz', a, CRUD.r, 'quiz.serv' );
 
 		let reqMsg = this.client.userReq(uri, JQuiz.port, req);
 
@@ -55,7 +64,7 @@ class JQuiz {
 	startQuizA(opt, onLoad, errCtx) {
 		let {templ, uri} = opt;
 		let option = {};
-		option[QuizProtocol.templName] = templ || 'A'; // only 'A' or 'B'
+		option[QuizProtocol.templName] = templ || 'A';
 		return this.serv(uri, QuizProtocol.A.start, option, onLoad, errCtx);
 	}
 
@@ -68,14 +77,14 @@ class JQuiz {
 	 * @param {AnContext.error}
 	 * */
 	submitPoll(uri, pollResult, onLoad, errCtx) {
-		let reqBd = new UserReq();
+		let reqBd = new UserReq(uri, "polls");
 
 		let { questions, pollId } = pollResult;
 
 		let client = this.client;
 		let req = client.userReq( uri, 'center',
 					new UserReq( uri, "center" )
-						.A(CenterProtocol.A.submitPoll)
+						.A<UserReq>(CenterProtocol.A.submitPoll)
 					 	.set(CenterProtocol.pollId, pollId)
 					 	.set(CenterProtocol.pollResults, ques2PollDetail(questions) ));
 
@@ -162,13 +171,13 @@ class JQuiz {
 
 	/**Insert a quiz (deprecated?)
 	 * @param {string} uri
-	 * @param {object} hooked { quiz: {qtitle, tags, subject, quizinf}, questions, quizUsers }
+	 * @param {object} quiz { qtitle, tags, subject, quizinf, questions, quizUsers }
 	 * @param {function} onOk
 	 * @param {AnContext.error} errCtx
 	 */
-	insertQuiz(uri, hooked, onOk, errCtx) {
+	insertQuiz(uri, quiz, onOk, errCtx) {
 		let that = this;
-		let {quiz, questions, quizUsers} = hooked;
+		let {questions, quizUsers} = quiz;
 		let date = new Date();
 		this.client.usrAct('quiz', QuizProtocol.A.insert, CRUD.c, quiz.title);
 
@@ -197,13 +206,13 @@ class JQuiz {
 
 	/**Update a quiz (intanced indicators)
 	 * @param {string} uri
-	 * @param {object} quiz {qtitle, questions, quizifno}
+	 * @param {object} quiz { qtitle, tags, subject, quizinf, questions, quizUsers }
 	 * @param {function} onOk
 	 * @param {AnContext.error} errCtx
 	 */
-	update(uri, hooked, onOk, errCtx) {
-		let that = this;
-		let {quiz, questions, quizUsers} = hooked;
+	update(uri, quiz, onOk, errCtx) {
+		// let that = this;
+		let {questions, quizUsers} = quiz;
 		this.client.usrAct('quiz', QuizProtocol.A.update, CRUD.u, quiz.title);
 
 		let props = {}

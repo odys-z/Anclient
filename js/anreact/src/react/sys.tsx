@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Context } from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import clsx from 'clsx';
 import Grid from '@material-ui/core/Grid';
@@ -36,7 +36,7 @@ import { AnContext, AnContextType } from './reactext';
 	import { L } from '../utils/langstr';
 
 import {
-	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW 
+	Home, ErrorPage, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW
 } from './crud'
 import { ClassNameMap } from '@material-ui/styles';
 import { AnReactExt, ClassNames } from './anreact';
@@ -175,7 +175,7 @@ export interface MenuItem {
 	id: string;
 	funcName: string;
 	url: string;
-	css: React.CSSProperties;
+	css: React.CSSProperties & {icon: string};
 	flags: string;
 	parentId: string;
 	sort: number;
@@ -185,7 +185,7 @@ export interface MenuItem {
 
 /**
  * Parse lagacy json format.
- * @return {menu, paths} 
+ * @return {menu, paths}
  * */
 export function parseMenus(json = []): {
 	menu: Array<MenuItem>;
@@ -218,10 +218,6 @@ export function parseMenus(json = []): {
 	}
 }
 
-// const Tag = (tagName, props, children = undefined): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> => (
-// 	React.createElement(tagName, props , children)
-//   )
-
 /**
  * <pre>a_functions
  funcId       |funcName           |url                               |css |flags |fullpath         |parentId |sibling |
@@ -245,7 +241,7 @@ class SysComp extends CrudCompW<SysProps> {
 		skMenu: undefined, // e.g. 'sys.menu.jserv-sample';
 		// {funcId, funcName,url, css: {icon}, fullpath, parentId, sibling, children: [] }
 		sysMenu: [ ] as MenuItem[],
-	
+
 		cruds: [{path: '/', params: undefined, comp: Home}],
 		paths: [],
 
@@ -310,7 +306,7 @@ class SysComp extends CrudCompW<SysProps> {
 			  </Card>);
 		}
 		else {
-			return this.props.welcome(classes, this.context, this);
+			return this.props.welcome(classes, this.context as Context<AnContextType>, this);
 		}
 	}
 
@@ -341,12 +337,9 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	toLogout() {
-		// Notify children? - not so simple for each target CrudComp needs to be notified.
-
 		let that = this;
 		this.confirmLogout =
 		<ConfirmDialog ok={L('Good Bye')} title={L('Info')} // cancel={false}
-			// open={true}
 			onOk={() => {
 				that.confirmLogout = undefined;
 				that.props.onLogout();
@@ -413,11 +406,11 @@ class SysComp extends CrudCompW<SysProps> {
 								e => {
 									if (that.state.welcome)
 										that.setState( {welcome: false} );
-									
+
 									if (that.state.currentPage?.url !== menu.url)
 										that.setState( {currentPage: menu} );
 								} } >
-							<ListItemIcon>{icon(menu.css)}</ListItemIcon>
+							<ListItemIcon>{icon(menu.css?.icon)}</ListItemIcon>
 							<ListItemText primary={L(menu.funcName)} />
 							</ListItem>
 						{/* </Link> */}
@@ -432,12 +425,6 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	route() {
-		// return this.state.cruds
-		// 	.map( (c, x) =>
-		// 		(<Route exact path={c.path} key={x} component={_comps[c.path]} params={c.params}/>)
-		// 		// (<Route exact path={c.path} key={x} element={React.cloneElement(_comps[c.path] || Home, [{uri: c.path}, {...c.params}]) }/>)
-		// 	);
-
 		const TagName = _comps[this.state.currentPage?.url || '/home'];
 		return <TagName uri={this.state.currentPage?.url || '/'} />;
 	}
@@ -520,7 +507,8 @@ class SysComp extends CrudCompW<SysProps> {
 			{/* </Router> */}
 
 			{this.state.showMine && <MyInfo
-				panels={typeof this.props.myInfo === 'function' ? this.props.myInfo(this.context) : this.props.myInfo}
+				panels={typeof this.props.myInfo === 'function'
+					? this.props.myInfo(this.context as Context<AnContextType>) : this.props.myInfo}
 				onClose={() => this.setState({ showMine: false })} />}
 			{this.confirmLogout}
 		  </div>);
@@ -536,7 +524,7 @@ SysComp.extendLinks([
 	{path: '/views/sys/org/users.html', comp: Users},
 	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
 	{path: '/v2/users-v2.0', comp: Users},
-	{path: '/sys/error', comp: Error} // FIXME bug
+	{path: '/sys/error', comp: ErrorPage}
 ]);
 
 const Sys = withStyles(styles)(SysComp);

@@ -1,19 +1,16 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
-import PropTypes from "prop-types";
-import { Box, Button, Grid } from '@material-ui/core';
+import { Box, Button, Grid, Theme } from '@material-ui/core';
 
-import { Protocol, AnsonResp, AnsonBody, Semantier } from '@anclient/semantier-st';
-import { L, AnContext, CrudCompW, AnQueryst, AnTablist, ConfirmDialog, jsample, utils
-} from '@anclient/anreact';
+import { Protocol, AnsonResp, AnsonBody, Semantier, UIComponent, Tierec, PkMeta, OnCommitOk, AnsonMsg, OnLoadOk, QueryConditions } from '@anclient/semantier-st';
+import { L, AnContext,
+	CrudCompW, AnQueryst, AnTablist, ConfirmDialog, jsample, utils, Comprops, ClassNames} from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 const { mimeOf, dataOfurl, regex } = utils;
 
 import { starTheme } from '../../common/star-theme';
 import { DocshareDetails } from './docshare-details';
-
-const { CRUD } = Protocol;
 
 export const docListyle = (theme) => {return {
 	imgUploadBox: {
@@ -34,18 +31,23 @@ export const docListyle = (theme) => {return {
 	}
 }; };
 
-const styles = (theme) => Object.assign(starTheme(theme), docListyle(theme));
+const styles = (theme: Theme) => Object.assign(starTheme(theme), docListyle(theme));
 
-class DocsharesComp extends CrudCompW {
+class DocsharesComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
 		pageInf: { page: 0, size: 10, total: 0 },
-		selected: {ids: new Set()},
+		selected: {ids: new Set<string>()},
 	};
 
-	tier = undefined;
+	tier: DocsTier;
 
 	fileInput = undefined;
+    confirm: JSX.Element;
+    q: any;
+    recForm: JSX.Element;
+    pageInf: any;
+    onPageInf: any;
 
 	constructor(props) {
 		super(props);
@@ -103,7 +105,7 @@ class DocsharesComp extends CrudCompW {
 		} );
 	}
 
-	toDel(e, v) {
+	toDel(e : React.UIEvent) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
@@ -124,33 +126,34 @@ class DocsharesComp extends CrudCompW {
 						ok={L('OK')} cancel={false} open
 						onClose={() => {
 							that.confirm = undefined;
-							that.toSearch();
+							that.toSearch(undefined);
 						} }
 						msg={L('Deleting Succeed!')} />);
-				that.toSearch();
+				that.toSearch(undefined);
 			} );
 	}
 
-	toAdd(e, v) {
+	toAdd(e : ChangeEvent<HTMLInputElement>) {
 		let that = this;
-		let files = this.fileInput.files;
+		let files = this.fileInput.files as FileList;
 		this.tier.upload(files, (docId) => {
-			that.tier.pkval = docId; // FIXME NOTE where is the best place to do this?
+			that.tier.pkval.v = docId; // FIXME NOTE where is the best place to do this?
 
 			this.state.selected.ids.clear();
 			this.state.selected.ids.add(docId);
-			that.toEdit(e, docId);
+			that.toEdit(undefined);
 		});
 	}
 
-	toEdit(e, v) {
+	toEdit(e : React.UIEvent) {
 		let that = this;
-		this.tier.pkval = [...this.state.selected.ids][0];
+		this.tier.pkval.v = Array.from(this.state.selected.ids)[0];
 		this.recForm = (<DocshareDetails u
 			uri={this.uri}
 			tier={this.tier}
-			onOk={(r) => that.toSearch()}
-			onClose={this.closeDetails} />);
+			onOk={() => that.toSearch(undefined)}
+			onClose={this.closeDetails}
+			/>);
 		that.setState({});
 	}
 
@@ -192,7 +195,7 @@ class DocsharesComp extends CrudCompW {
 
 			{tier && <AnTablist pk={tier.pk} selected={this.state.selected}
 				className={classes.root} checkbox={tier.checkbox}
-				columns={tier.columns( {mime: {formatter: (v, x, rec) => DocsTier.getMimeIcon(v, rec, classes)}} )}
+				columns={tier.columns( {formatter: (v, x, rec) => DocsTier.getMimeIcon(v.field, rec as Tierec, classes) as UIComponent} )}
 				rows={tier.rows}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
@@ -206,15 +209,17 @@ class DocsharesComp extends CrudCompW {
 }
 DocsharesComp.contextType = AnContext;
 
-const Docshares = withWidth()(withStyles(styles)(DocsharesComp));
+const Docshares = withStyles(styles)(withWidth()(DocsharesComp));
 export { Docshares, DocsharesComp }
 
-export class DocsQuery extends React.Component {
+export interface  DocsQueryProps { uri: string; onQuery: (...args: any[]) => any; };
+
+// export class DocsQuery extends React.Component {
+export class DocsQuery extends React.Component<DocsQueryProps> {
 	conds = [
-		// FIXME 'name' not used?
-		{ name: 'docName', type: 'text', val: '', label: L('File Name') },
-		{ name: 'tag',     type: 'text', val: '', label: L('Tag') },
-		{ name: 'mime',    type: 'cbb',  val: '', label: L('Format'),
+		{ field: 'docName', type: 'text', val: '', label: L('File Name') },
+		{ field: 'tag',     type: 'text', val: '', label: L('Tag') },
+		{ field: 'mime',    type: 'cbb',  val: {n: '', v: ''}, label: L('Format'),
 		  options: [{n: 'Office Word', v: 'doc'},
 		  			{n: 'Office Excel', v: 'xsl'},
 					{n: 'Office PPT', v: 'ppt'},
@@ -222,7 +227,7 @@ export class DocsQuery extends React.Component {
 					{n: 'Image', v:'image'}] },
 	];
 
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.collect = this.collect.bind(this);
 	}
@@ -231,7 +236,8 @@ export class DocsQuery extends React.Component {
 		return {
 			docName: this.conds[0].val ? this.conds[0].val : undefined,
 			tag    : this.conds[1].val ? this.conds[1].val : undefined,
-			mime   : this.conds[2].val ? regex.type2mime(this.conds[2].val.v) : undefined };
+			mime   : this.conds[2].val ? regex.type2mime(
+					(this.conds[2].val as {n: string, v: string}).v) : undefined };
 	}
 
 	/** Design Note:
@@ -241,15 +247,11 @@ export class DocsQuery extends React.Component {
 		let that = this;
 		return (
 		<AnQueryst {...this.props}
-			conds={this.conds} fields={this.conds}
+            fields={this.conds}
 			onSearch={() => this.props.onQuery(that.collect()) }
 			onLoaded={() => that.props.onQuery(that.collect()) }
 		/> );
 	}
-}
-DocsQuery.propTypes = {
-	uri: PropTypes.string.isRequired,
-	onQuery: PropTypes.func.isRequired
 }
 
 export class DocsTier extends Semantier {
@@ -259,15 +261,28 @@ export class DocsTier extends Semantier {
 
 	reltabl = 'n_doc_kid';
 	rel = {'n_doc_kid': {
-		fk: 'docId',  // fk to main table
-		col: 'userId',// checking col
-		sk: 'trees.doc_kid' }};
+		// experimental: loading tree
+		stree: {
+			sk : 'trees.doc_kid',
+			childTabl: 'n_doc_kid',
+			fk : 'docId',	// fk to main table
+			col: 'userId',	// checking col
+			colProp: 'nodeId', // tree item property: useId
+		 },
+		// experimantal: saving relations
+		// fk: {
+		// 	tabl: '',
+		// 	pk: '',
+		// 	fk : 'docId',	// fk to main table
+		// 	relcolumn: 'userId',	// checking col
+		//  }
+		}};
 	checkbox = true;
 
 	client = undefined;
 	rows = [];
-	pkval = undefined;
-	rec = {};
+	pkval = {pk: 'docId', v: undefined} as PkMeta;
+	rec = {} as Tierec;
 
 	_cols = [
 		{ text: L('ID'), field: 'docId', checked: true },
@@ -277,48 +292,50 @@ export class DocsTier extends Semantier {
 
 	_fields = [
 		{ type: 'text', field: 'docId',   label: 'Doc ID',
-		  disabled: true },
+		  hide: true },
 		{ type: 'text', field: 'docName', label: 'File Name',
 		  disabled: true },
 		{ type: 'text', field: 'mime',    label: 'File Type',
 		  disabled: true, formatter: undefined }
 	];
 
-	constructor(comp) {
+	constructor(comp: UIComponent) {
 		super(comp);
+		this.relMeta = this.rel;
 	}
 
-	upload(files, onOk) {
-		if (!files) return;
+	upload(files: FileList, onOk: (docId: string) => void) {
+		if (!files || files.length === 0) return;
 
 		let that = this;
 		let client = this.client;
 
-		files.forEach( (file, x) => {
+		Array.from(files).forEach( (file, x) => {
 			let row = {
 				docId: 'loading',
 				// uri  : undefined,
 				mime : undefined,
 				docName: file.name,
-				reader: new FileReader()
+				reader: new FileReader(),
+                uri64: undefined
 			};
 			that.rows.push(row);
 
 			row.reader.onload = function (e) {
 				// FIXME how about stream mode?
-				row.mime = mimeOf( row.reader.result );
-				row.uri64 = dataOfurl( row.reader.result );
+				row.mime = mimeOf( row.reader.result as string );
+				row.uri64 = dataOfurl( row.reader.result as string );
 				delete row.reader;
 				row.docId = undefined;
 
 				// file always uploaded as insertion, - delete first (even null Id)
 				let req = client
 					.userReq( that.uri, that.port,
-					new DocsReq( that.uri, { deletings: [that.pkval], ...row } )
+					new DocsReq( that.uri, row )
 					.A( DocsReq.A.upload ) );
 
 				client.commit(req,
-					(resp) => {
+					(resp: AnsonMsg<AnsonResp>) => {
 						let bd = resp.Body();
 						// NOTE:
 						// resulving auto-k is a typicall semantic processing, don't expose this to caller
@@ -334,18 +351,18 @@ export class DocsTier extends Semantier {
 		});
 	}
 
-	records(conds, onLoad) {
+	records(conds: QueryConditions, onLoad: OnLoadOk<Tierec>): void {
 		if (!this.client) return;
 
 		let client = this.client;
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new DocsReq( this.uri, conds )
+					new DocsReq( this.uri, conds as any )
 					.A(DocsReq.A.records) );
 
 		client.commit(req,
-			(resp) => {
+			(resp: AnsonMsg<AnsonResp>) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
 				that.resetFormSession();
@@ -354,7 +371,7 @@ export class DocsTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds, onLoad) {
+	record(conds: {}, onLoad: OnLoadOk<Tierec>) : void {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -364,7 +381,7 @@ export class DocsTier extends Semantier {
 					.A(DocsReq.A.rec) );
 
 		client.commit(req,
-			(resp) => {
+			(resp: AnsonMsg<AnsonResp>) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
 				onLoad(cols, rows);
@@ -373,10 +390,10 @@ export class DocsTier extends Semantier {
 	}
 
 	/**
-	 * @param {Set} ids record id
-	 * @param {function} onOk: function(AnsonResp);
+	 * @param opts
+	 * @param onOk: function(AnsonResp);
 	 */
-	del(opts, onOk) {
+	del(opts, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -392,13 +409,13 @@ export class DocsTier extends Semantier {
 	}
 
 	/**
-	 * @param{string} mime
-	 * @param{object} rec
-	 * @param{object} classes
-	 * @param{string} iconpath
-	 * @return{React.fragment} <img/>
+	 * @param mime
+	 * @param rec
+	 * @param classes
+	 * @param iconpath
+	 * @return <img/>
 	 */
-	static getMimeIcon(mime, rec, classes, iconpath) {
+	static getMimeIcon(mime: string, rec: Tierec, classes: ClassNames, iconpath? : string) {
 		const known = { image: 'image.svg', '.txt': 'text.svg',
 				'.doc': 'docx.svg', '.docx': 'docx.svg', '.zip': '7zip.svg',
 				'.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
@@ -433,8 +450,19 @@ export class DocsReq extends AnsonBody {
 		del: 'd',
 		//preview: 'r/preview',
 	}
+    docId: string;
+    docName: string;
+    mime: string;
+    uri64: string;
+    deletings: string[];
 
-	constructor(uri, args = {}) {
+	/**
+	 * 
+	 * @param uri 
+	 * @param args
+	 * args.deletings: old docId to be deleted 
+	 */
+	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super();
 		this.type = DocsReq.type;
 		this.docId = args.docId;
