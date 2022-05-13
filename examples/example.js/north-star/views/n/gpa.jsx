@@ -1,25 +1,21 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import PropTypes from "prop-types";
 
-import Typography from '@material-ui/core/Button';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
-import Divider from '@material-ui/core/Box';
-
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { Protocol, AnsonBody, AnsonResp } from '@anclient/semantier-st';
-import { L, isEmpty,
-	AnContext, DatasetCombo, ConfirmDialog, CrudComp,
-	jsample, Overlay, AnGridsheet, AnNumericEdit, AnIndicatorRenderer
+import dateFormat from 'dateformat';
+
+import { L,
+	AnContext, ConfirmDialog, CrudComp,
+	jsample, AnGridsheet, AnNumericEdit, AnIndicatorRenderer
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { GPATier, GPAReq, GPAResp } from './gpa-tier'
+import { GPATier, GPAResp } from './gpa-tier'
 
 const styles = (theme) => ({
 	root: {
@@ -69,8 +65,7 @@ class GPAsheetComp extends CrudComp {
 	}
 
 	toAdd(e) {
-
-		let newGday = new Date().toISOStr();
+		let newGday = dateFormat('yyyy-mm-dd'); //. new Date().toISOStr();
 		// avoid duplicated key
 		let found = false;
 		let x = this.state.rows.length - 1;
@@ -81,12 +76,21 @@ class GPAsheetComp extends CrudComp {
 			}
 
 		if (found) {
+			/*
 			try {
 				let d = new Date(this.state.rows[this.state.rows.length - 1].gday.trim());
 				newGday = d.addDays(1).toISOStr();
 			} catch(e) {
 				newGday = new Date().addDays(1).toISOStr();
 			}
+			*/
+			try {
+				let d = dateFormat(this.state.rows[this.state.rows.length - 1].gday.trim(), 'yyyy-mm-dd');
+				newGday = addDays(d, 1).toISOStr();
+			} catch(e) {
+				newGday = new Date().addDays(1).toISOStr();
+			}
+
 		}
 
 		let r = Object.assign({}, this.avrow);
@@ -105,6 +109,10 @@ class GPAsheetComp extends CrudComp {
 		this.api.ensureColumnVisible(firstEditCol );
 		this.api.setFocusedCell(rowIndex, firstEditCol);
 		this.api.startEditingCell({ rowIndex, colKey: 'gday' });
+	}
+
+	toDel(e) {
+		let newGday = dateFormat('yyyy-mm-dd');
 	}
 
 	bindSheet(gpaResp) {
@@ -224,6 +232,13 @@ class GPAsheetComp extends CrudComp {
 						onClick={this.toAdd}
 						endIcon={<JsampleIcons.Add />}
 					>{L('Add Row')}
+					</Button>
+					<Button variant="outlined"
+						className={classes.usersButton}
+						color='secondary'
+						onClick={this.toDel}
+						endIcon={<JsampleIcons.Delete />}
+					>{L('Delete')}
 					</Button>
 				</div>
 			</div>
