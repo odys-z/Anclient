@@ -12,7 +12,7 @@ import React from 'react';
 	import Button from '@material-ui/core/Button';
 	import Box from '@material-ui/core/Box';
 
-import { Protocol } from '@anclient/semantier-st';
+import { Protocol, CRUD } from '@anclient/semantier-st';
 import { L, AnContext, DetailFormW, DatasetCombo, TRecordForm } from '@anclient/anreact';
 import { QuizResp, QuizProtocol } from '../../common/protocol.quiz.js';
 import { JQuiz } from '../../common/an-quiz.js';
@@ -57,9 +57,9 @@ class QuizEditorComp extends DetailFormW {
 	constructor(props) {
 		super(props);
 
-		this.state.crud = props.c ? Protocol.CRUD.c
-						: props.u ? Protocol.CRUD.u
-						: Protocol.CRUD.r;
+		this.state.crud = props.c ? CRUD.c
+						: props.u ? CRUD.u
+						: CRUD.r;
 
 		// We use this class wrapped with function. Can be changed if there is a better way like forwardRef.
 		props.stateHook.collect = function (me) {
@@ -97,7 +97,7 @@ class QuizEditorComp extends DetailFormW {
 	componentDidMount() {
 		let ctx = this.context;
 		this.jquiz = new JQuiz(ctx.anClient, ctx.error);
-		if (this.state.crud !== Protocol.CRUD.c)
+		if (this.state.crud !== CRUD.c)
 			this.jquiz.quiz(this.props.uri, this.state.quizId, this.bindQuiz, ctx.error);
 		else
 			this.jquiz.startQuizA({uri: this.props.uri, templ: this.props.templ},

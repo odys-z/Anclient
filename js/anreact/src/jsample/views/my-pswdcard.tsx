@@ -4,7 +4,6 @@ import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
 import { Semantext } from '@anclient/semantier-st';
-	// import { invalidStyles } from '@anclient/anreact';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 
@@ -13,19 +12,11 @@ import { Comprops, DetailFormW } from '../../react/crud';
 import { Theme, withWidth } from '@material-ui/core';
 import { invalidStyles } from '../../react/anreact';
 
-// const styles = (theme: Theme) => ({
-//   root: { }
-// });
-
-// const styles = theme => (Object.assign(
-// 	invalidStyles, { } 
-// ));
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
 		root: {}
 	} )
 );
-
 
 /**
  * Adding-only file list shared for every users.
@@ -134,8 +125,7 @@ class PswdTier extends MyInfTier {
 		  validator: {notNull: true} },
 		{ field: 'pswd2', type: 'password', label: L('Confirm New'),  grid: {md: 6, lg: 4},
 		  autocomplete: "on",
-		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' }
-	] as Array<any>;
+		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ] as Array<any>;
 
 	changePswd(opts, onOk) {
 		if (!this.client) return;
@@ -143,7 +133,7 @@ class PswdTier extends MyInfTier {
 		// let that = this;
 
 		// let { uri } = opts;
-		let { pswd, pswd1 } = this.rec;
+		let { pswd, pswd1, pswd2 } = this.rec;
 
 		if (this.validate()) {
 			this.client.setPswd(pswd, pswd1, {

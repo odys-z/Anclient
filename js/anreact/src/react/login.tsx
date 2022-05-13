@@ -76,10 +76,6 @@ class LoginComp extends React.Component<LoginProps> {
 
 	alert() {
 		let that = this;
-		// this.setState({
-		// 	alert: L('User Id or password is not correct.'),
-		// 	showAlert: true,
-		// });
 		this.confirm = <ConfirmDialog ok={L('OK')} title={L('Info')} cancel={false}
 					open={true} onClose={ () => { that.confirm = undefined; } }
 					msg={ L('User Id or password is not correct.') } />
@@ -136,12 +132,6 @@ class LoginComp extends React.Component<LoginProps> {
 				let errCtx = ctx.error;
 				errCtx.msg = resp.Body().msg();
 				if (typeof errCtx.onError === 'function')
-					// FIXME guess to be verified:
-					// FIXME guess to be verified:
-					// FIXME guess to be verified:
-					// FIXME guess to be verified:
-					// errCtx.onError(code, resp.Body());
-					console.error(" // FIXME guess to be verified ");
 					errCtx.onError(code, resp);
 			}
 			else if (code === Protocol.MsgCode.exIo)

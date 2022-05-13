@@ -4,16 +4,15 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
-import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier-st';
-import { L, toBool,
-    AnContext, AnError, CrudCompW, AnTablist, AnQueryst,
-	jsample
+import { Protocol, CRUD } from '@anclient/semantier-st';
+import { L,
+	AnContext, AnTablist, AnQueryst, jsample
 } from '@anclient/anreact';
-const { JsampleIcons, UsersTier, UserstReq, UserstComp } = jsample;
+
+const { JsampleIcons, UsersTier, UserstComp } = jsample;
 
 import { KidDetailst } from './mykid-details';
 
@@ -55,7 +54,7 @@ class MyStudentsComp extends UserstComp {
 		this.tier.pkval = undefined;
 		this.tier.rec = {};
 
-		this.recForm = (<KidDetailst crud={Protocol.CRUD.c}
+		this.recForm = (<KidDetailst crud={CRUD.c}
 			uri={this.uri}
 			tier={this.tier}
 			onOk={(r) => that.toSearch()}
@@ -66,7 +65,7 @@ class MyStudentsComp extends UserstComp {
 		let that = this;
 		let pkv = [...this.state.selected.ids][0];
 		this.tier.pkval = pkv;
-		this.recForm = (<KidDetailst crud={Protocol.CRUD.u}
+		this.recForm = (<KidDetailst crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
 			recId={pkv}

@@ -22,19 +22,19 @@ namespace io.odysz.anclient
     {
         public SessionInf ssInf { get; }
 
-		private List<string[]> urlparas;
+        private List<string[]> urlparas;
 
-		private AnsonHeader header;
+        private AnsonHeader header;
 
         /// <summary>Session login response from server.</summary>
         /// <paramref name="sessionInfo"></paramref>
         public SessionClient(SessionInf sessionInfo)
-		{
-			this.ssInf = sessionInfo;
-		}
+        {
+            this.ssInf = sessionInfo;
+        }
 
-		/// <summary>Format a query request object, including all information for
-		/// construct a "select" statement.</summary>
+        /// <summary>Format a query request object, including all information for
+        /// construct a "select" statement.</summary>
         /// <param name="uri"></param>
         /// <param name="tbl"></param>
         /// <param name="alias">main table alias</param>
@@ -42,10 +42,10 @@ namespace io.odysz.anclient
         /// <param name="size"></param>
         /// <param name="funcId">current function ID</param>
         /// <returns>formatted query object</returns>
-	    public AnsonMsg query(string uri, string tbl, string alias,
-				int page, int size, string funcId = null) 
-		{
-			AnsonMsg msg = new AnsonMsg((IPort)new Port(Port.query), null);
+        public AnsonMsg query(string uri, string tbl, string alias,
+                int page, int size, string funcId = null)
+        {
+            AnsonMsg msg = new AnsonMsg((IPort)new Port(Port.query), null);
 
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
             if (funcId != null && funcId.Length > 0)
@@ -68,7 +68,7 @@ namespace io.odysz.anclient
             AnsonHeader header = new AnsonHeader(ssInf.ssid, ssInf.uid);
             if (act != null && act.Length > 0)
                 header.act(act);
-            
+
             return jmsg.Header(header)
                         ;//.Body(itm);
         }
@@ -95,7 +95,7 @@ namespace io.odysz.anclient
             if (ssInf == null)
                 throw new SemanticException("SessionClient can not visit jserv without session information.");
 
-            AnsonMsg  jmsg = new AnsonMsg(port, null);
+            AnsonMsg jmsg = new AnsonMsg(port, null);
 
             if (act != null)
                 Header().act(act);
@@ -126,7 +126,7 @@ namespace io.odysz.anclient
             // let header = Protocol.formatHeader(this.ssInf);
             body.Uri(uri);
             if (act != null && act.Length > 0)
-                header.act(act); 
+                header.act(act);
 
             AnsonMsg msg = new AnsonMsg(port.name)
                             .Header(header)
@@ -160,7 +160,8 @@ namespace io.odysz.anclient
          */
         public SessionClient Console(AnsonMsg req)
         {
-            if(AnClient.console) {
+            if (AnClient.console)
+            {
                 try
                 {
                     Debug.WriteLine(req.ToString());
@@ -178,7 +179,8 @@ namespace io.odysz.anclient
         /// <param name="onErr"></param>
         public void CommitAsync(AnsonMsg req, OnOk onOk, OnError onErr = null, CancellationTokenSource waker = null)
         {
-            Task t = Task.Run( async delegate {
+            Task t = Task.Run(async delegate
+            {
                 try
                 {
                     HttpServClient httpClient = new HttpServClient();
@@ -197,7 +199,7 @@ namespace io.odysz.anclient
                 }
                 catch (Exception _) { }
                 finally { if (waker != null) waker.Cancel(); }
-            } );
+            });
         }
 
         public AnsonResp Commit(AnsonMsg req, ErrorCtx err = null)
@@ -239,7 +241,7 @@ namespace io.odysz.anclient
             }
         }
 
-	    public void Logout() { }
+        public void Logout() { }
 
         /// <summary>
         /// Upload files to "a_attaches" table. Before files been saved, all files attached to
@@ -296,6 +298,18 @@ namespace io.odysz.anclient
                 });
             */
             Commit_async(jmsg, onOk, onErr);
+        }
+
+        public SessionClient openLink(String clientUri, OnOk onLink, OnError onBroken, int msInterv = 3000 * 60)
+        {
+
+            return this;
+        }
+
+        public SessionClient closeLink()
+        {
+
+            return this;
         }
     }
 }

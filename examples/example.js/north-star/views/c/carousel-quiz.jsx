@@ -12,7 +12,7 @@ import MobileStepper from "@material-ui/core/MobileStepper";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 
-import { Protocol, UserReq } from '@anclient/semantier-st'
+import { Protocol, CRUD, UserReq } from '@anclient/semantier-st'
 import { L, AnContext, CrudCompW} from '@anclient/anreact';
 
 import { CenterProtocol } from "../../common/protocol.quiz.js";
@@ -90,7 +90,7 @@ class CarouselQuizComp extends CrudCompW {
 			this.props.uri,
 			{pollId: this.state.pollId, questions: this.state.quiz.questions},
 			() => {
-				that.state.crud = Protocol.CRUD.u;
+				that.state.crud = CRUD.u;
 				that.setState({submitted: true});
 				// that.loadQuiz();
 				that.props.onSubmit();
