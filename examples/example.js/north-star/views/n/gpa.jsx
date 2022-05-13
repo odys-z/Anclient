@@ -85,10 +85,10 @@ class GPAsheetComp extends CrudComp {
 			}
 			*/
 			try {
-				let d = dateFormat(this.state.rows[this.state.rows.length - 1].gday.trim(), 'yyyy-mm-dd');
-				newGday = addDays(d, 1).toISOStr();
+				let d = new Date(this.state.rows[this.state.rows.length - 1].gday.trim(), 'yyyy-mm-dd');
+				newGday = dateFormat(addDays(d, 1), 'yyyy-mm-dd');
 			} catch(e) {
-				newGday = new Date().addDays(1).toISOStr();
+				newGday = dateFormat(new Date().addDays(1), 'yyyy-mm-dd');
 			}
 
 		}
