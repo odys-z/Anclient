@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta
+	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta, PageInf, NV
 } from './protocol';
 import { ErrorCtx, Tierec } from './semantier';
 
@@ -56,7 +56,7 @@ class AnClient {
 			return;
 		}
 
-		var ulr;
+		let ulr: string;
 		if (Protocol.Port[port] !== undefined)
 			ulr = this.cfg.defaultServ + '/'
 				+ Protocol.Port[port];
@@ -80,7 +80,7 @@ class AnClient {
     /** Understand the prots' name of the calling app's.<br>
      * As jclient defined the basice ports, more ports extension shoould been understood by the API lib.
      * This function must been callded to extned port's names.
-     * @param new Ports
+     * @param newPorts
      * @return this */
 	understandPorts (newPorts: { [p: string]: string; }) : this {
 		// Object.assign(Protocol.Port, newPorts);
@@ -101,7 +101,7 @@ class AnClient {
      * @param usrId
      * @param pswd
      * @param onLogin on login ok handler
-     * @param on failed
+     * @param onError error handler
      */
 	login (usrId: string, pswd: string,
 		onLogin: { (ssClient: any): void; (arg0: SessionClient): void; },
@@ -150,12 +150,12 @@ class AnClient {
 
     /**Check Response form jserv
      * @param {any} resp
-     */
 	static checkResponse(resp: any) : false | "err_NA" {
 		if (typeof resp === "undefined" || resp === null || resp.length < 2)
 			return "err_NA";
 		else return false;
 	}
+     */
 
     /**Post a request, using Ajax.
      * @param jreq
@@ -288,7 +288,7 @@ class AnClient {
 	/** Get the cols from jserv's rows
 	 * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
 	 * @param resp
-	 * @param rs index
+	 * @param ix index
 	 * @return column names */
 	respCols(resp: AnsonMsg<AnsonResp>, ix?: number): Array<string> {
 		if (ix === null || ix === undefined )
@@ -308,25 +308,24 @@ class AnClient {
     /** Get the rows from jserv's rows.
      * (response from port returning AnsonMsg&lt;AnsonResp&gt;)
 	 * @deprecated
-     * @param {AnsonMsg<AnsonResp>} resp
-     * @param {ix} the rs index
-     * @return {array} array of rows */
-	respRows(resp, ix) {
+     * @param resp
+     * @param ix rs index
+     * @return array of rows */
+	respRows(resp: AnsonMsg<AnsonResp>, ix: number) {
 		if (ix === null || ix === undefined )
 			ix = 0;
 		return resp !== null && resp !== undefined && resp.code === "ok"
-			// ? resp.data.rs[ix].slice(1) : [];
 			? resp.body[0].rs[0].results : [];
 	}
 
     /** Get the objects from jserv's rows (response from port returning SResultsets)
 	 * @deprecated
-     * @param {AnsonMsg<AnsonResp>} resp
-     * @param {int} start start to splice
-     * @param {int} len max length
-     * @return {array} array of objects<br>
+     * @param resp
+     * @param start start to splice
+     * @param len max length
+     * @return array of objects<br>
      * e.g [ [col1: cell1], ...] */
-	respObjs(resp, start, len) {
+	respObjs(resp: AnsonMsg<AnsonResp>, start: number, len: number): Array<any> {
 		var cols = this.respCols(resp);
 
 		// start from 0
@@ -346,8 +345,8 @@ class AnClient {
 
 	/// helpers
 	/** Try change ajax error object to AnsonMsg<AnsonResp>
-	 * @param {object} ajaxResp
-	 * @return {AnsonMsg<AnsonResp>}
+	 * @param ajaxResp
+	 * @return a fake resposne built from ajax report
 	 */
 	static fromAjaxError(ajaxResp: AjaxReport): AnsonMsg<AnsonResp> {
 		let json = {
@@ -573,17 +572,18 @@ class SessionClient {
 
 	/**
 	 * create a query message.
-	 * @param {string} uri component uri
-	 * @param {string} maintbl target table
-	 * @param {string} alias target table alias
-	 * @param {Object} pageInf<br>
+	 * @param uri component uri
+	 * @param maintbl target table
+	 * @param alias target table alias
+	 * @param pageInf<br>
 	 * page: page index, -1 for no paging<br>
 	 * size: page size, default 20, -1 for no paging
-	 * @param {Object} act user's action for logging<br>
+	 * @param act user's action for logging<br>
 	 * {func, cate, cmd, remarks};
-	 * @return {AnsonMsg} the request message
+	 * @return the request message
 	 */
-	query(uri, maintbl, alias, pageInf?, act?) : AnsonMsg<QueryReq> {
+	query ( uri: string, maintbl: string, alias: string, pageInf?: PageInf,
+			act?: {func: string, cate: string, cmd: string, remarks: string} ) : AnsonMsg<QueryReq> {
 		let qryItem = new QueryReq(uri, maintbl, alias, pageInf);
 
 		// let header = Protocol.formatHeader(this.ssInf);
@@ -607,7 +607,7 @@ class SessionClient {
 		return jreq as AnsonMsg<QueryReq>;
 	}
 
-	update(uri, maintbl, pk: PkMeta, nvs) {
+	update(uri : string, maintbl: string, pk: PkMeta, nvs: string[]) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("Anclient is designed to support user updating log natively. User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -631,7 +631,7 @@ class SessionClient {
 		return jmsg;
 	}
 
-	insert(uri, maintbl, nvs) {
+	insert(uri: string, maintbl: string, nvs: string | string[]) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -648,7 +648,7 @@ class SessionClient {
 		return jmsg;
 	}
 
-	delete(uri, maintbl, pk) {
+	delete(uri: string, maintbl: string, pk: PkMeta | string[]) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -733,13 +733,6 @@ class SessionClient {
 			{func: funcId, cate: cate, cmd: cmd, remarks: remarks});
 		return this;
 	}
-
-	/**@deprecated not good practice for vscode.
-	 * For name errata
-	userAct(f: string, c: string, m: string, r: string) : this {
-		return this.usrAct(f, c, m, r);
-	}
-	 * */
 
 	/**Set user's current action to be logged.
 	 * @param cmd user's command, e.g. 'save'
