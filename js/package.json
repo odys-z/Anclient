@@ -49,6 +49,7 @@
     "css-loader": "^2.1.1",
     "css-select": "^5.1.0",
     "d3": "^7.0.1",
+    "dateformat": "^5.0.3",
     "jquery": "^3.6.0",
     "jsdoc": "^3.6.10",
     "mocha": "^9.2.0",

@@ -1,31 +1,33 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import PropTypes from "prop-types";
 
-import Typography from '@material-ui/core/Button';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
-import Divider from '@material-ui/core/Box';
-
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { Protocol, AnsonBody, AnsonResp } from '@anclient/semantier-st';
-import { L, isEmpty,
-	AnContext, DatasetCombo, ConfirmDialog, CrudComp,
-	jsample, Overlay, AnGridsheet, AnNumericEdit, AnIndicatorRenderer
+import dateFormat from 'dateformat';
+
+import { L,
+	AnContext, ConfirmDialog, CrudComp,
+	jsample, AnGridsheet, AnNumericEdit, AnIndicatorRenderer
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { GPATier, GPAReq, GPAResp } from './gpa-tier'
+import { GPATier, GPAResp } from '../n-tsx/gpa-tier'
 
 const styles = (theme) => ({
 	root: {
 		height: "calc(100vh - 18ch)"
 	},
 	actionButton: {
+	},
+	usersButton: {
+		marginLeft: 20,
+		marginRight: 20,
+		marginTop: 6,
+		width: 150,
 	}
 });
 
@@ -69,8 +71,7 @@ class GPAsheetComp extends CrudComp {
 	}
 
 	toAdd(e) {
-
-		let newGday = new Date().toISOStr();
+		let newGday = dateFormat('yyyy-mm-dd'); //. new Date().toISOStr();
 		// avoid duplicated key
 		let found = false;
 		let x = this.state.rows.length - 1;
@@ -81,12 +82,21 @@ class GPAsheetComp extends CrudComp {
 			}
 
 		if (found) {
+			/*
 			try {
 				let d = new Date(this.state.rows[this.state.rows.length - 1].gday.trim());
 				newGday = d.addDays(1).toISOStr();
 			} catch(e) {
 				newGday = new Date().addDays(1).toISOStr();
 			}
+			*/
+			try {
+				let d = new Date(this.state.rows[this.state.rows.length - 1].gday.trim(), 'yyyy-mm-dd');
+				newGday = dateFormat(addDays(d, 1), 'yyyy-mm-dd');
+			} catch(e) {
+				newGday = dateFormat(new Date().addDays(1), 'yyyy-mm-dd');
+			}
+
 		}
 
 		let r = Object.assign({}, this.avrow);
@@ -107,11 +117,17 @@ class GPAsheetComp extends CrudComp {
 		this.api.startEditingCell({ rowIndex, colKey: 'gday' });
 	}
 
+	toDel(e) {
+		let newGday = dateFormat('yyyy-mm-dd');
+		console.log(newGday);
+	}
+
 	bindSheet(gpaResp) {
 		// Why we have to handle data at both side?
 		// can date been specified as columens? - won't work if not generated (for js)
 		let resp = new GPAResp(gpaResp.Body());
 		let { kids, cols, rows } = GPAResp.GPAs(resp);
+		this.tier.rows = rows;
 
 		let ths = [{ field: 'gday', label: L('DATE'), width: 120,
 					editable: this.rowEditableChecker,
@@ -162,6 +178,19 @@ class GPAsheetComp extends CrudComp {
 					that.setState({addingNew: false})
 				});
 		}
+		// else if (!this.state.addingNew && p.node.rowIndex > 0 &&
+		// 	p.colDef.field === 'gday' && p.node.rowIndex === rowIndex) {
+
+		// 	let that = this;
+		// 	this.tier.updateGDay( {
+		// 			uri: this.uri,
+		// 			oldGday: p.oldValue,
+		// 			newGday: p.value },
+		// 		e => {
+		// 			that.setState({addingNew: false})
+		// 		});
+
+		}
 	}
 
 	changeGPA(p) {
@@ -184,7 +213,7 @@ class GPAsheetComp extends CrudComp {
 			return true;
 		else
 			// first average not editable
-			return p.node.rowIndex > 0;
+			return p.colDef.field !== 'gday' && p.node.rowIndex > 0;
 	}
 
 	render () {
@@ -223,7 +252,14 @@ class GPAsheetComp extends CrudComp {
 						color='primary'
 						onClick={this.toAdd}
 						endIcon={<JsampleIcons.Add />}
-					>{L('Add Row')}
+					>{L('Add GPA')}
+					</Button>
+					<Button variant="outlined"
+						className={classes.usersButton}
+						color='secondary'
+						onClick={this.toDel}
+						endIcon={<JsampleIcons.Delete />}
+					>{L('Delete GPA')}
 					</Button>
 				</div>
 			</div>

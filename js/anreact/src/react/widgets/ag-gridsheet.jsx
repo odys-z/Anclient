@@ -79,7 +79,6 @@ export class AnGridsheet extends React.Component {
 					) )
 			} );
 		}
-
 	}
 
 	/** load default context menu, together with user's menu items.
@@ -129,6 +128,7 @@ export class AnGridsheet extends React.Component {
 	};
 
 	onCellClicked = (p) => {
+		console.log(p);
 	};
 
 	/** Grid event API:
@@ -147,6 +147,7 @@ export class AnGridsheet extends React.Component {
 	render () {
 	  return (
 		<AgGridReact
+			editable={this.isEditable}
 			onCellClicked={this.onCellClicked}
 			columnDefs={this.coldefs}
 			components={this.props.components}
