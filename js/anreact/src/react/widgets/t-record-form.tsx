@@ -42,7 +42,8 @@ const styles = (theme: Theme) => (Object.assign(
 
 export interface RecordFormProps extends Comprops {
 	/**Default: true */
-    enableValidate?: boolean;
+	enableValidate?: boolean,
+	tier: Semantier
 };
 
 /**
@@ -133,7 +134,6 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			return (
 			<TextField key={f.field} type={f.type || type}
 				disabled={!!f.disabled}
-				// autoComplete={f.autocomplete}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
@@ -154,7 +154,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		const isSm = this.props.dense || toBool(media.isMd);
 
 		this.props.fields.forEach( (f, i) => {
-		  if (!f.hide) {
+		  if (!f.hide && toBool(f.visible, true)) {
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
 					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
@@ -175,7 +175,9 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		const { classes, width } = this.props;
 		let media = CrudCompW.getMedia(width);
 
-		let rec = this.tier.rec;
+		let rec = this.tier?.rec;
+
+		if (!rec) console.warn("TRecordForm used without records, for empty UI?");
 
 		return rec ?
 			<Grid container className={classes.root} direction='row'>

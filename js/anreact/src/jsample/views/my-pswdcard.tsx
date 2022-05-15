@@ -18,7 +18,6 @@ const styles = (theme: Theme) => (Object.assign(
 	} )
 );
 
-
 /**
  * Adding-only file list shared for every users.
  */

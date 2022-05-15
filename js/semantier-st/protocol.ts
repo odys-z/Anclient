@@ -18,7 +18,7 @@ export interface JsonOptions {
     noBoolean: boolean | string;
 };
 
-export type PageInf = { page: number, size: number };
+export type PageInf = { page: number, size: number, total?: number };
 
 /**Lagecy from jquery & easui, replaced by NV - no need to collect form using JQuery in the future. */
 export type NameValue = {name: string, value: object};
@@ -58,40 +58,55 @@ export interface DbCol {
  * */
 export type SemanticType = 'fk' | 'stree' | 'm2m' | 'customer';
 
-export interface FKRelation {
+export interface relFK {
 	/**table name */
 	tabl: string;
 
-	/**chiled table pk */
+	/**child table pk */
 	pk: string,
 
-	/**Child foreign column in DB table */
+	/**child foreign column in DB table */
 	col: string,
 
 	/**value for col - column-map's key for where to get the value */
 	relcolumn: string,
 }
 
-export interface Stree {
-	sk: string,
-	pk: string,
-	fk: string,
-	sort: string,
-	fullpath: string,
+/**
+ * An experiment for semantic pattern of relation tree,
+ * trying UI handling s-tree in automatic pattern.
+ * 
+ * Used by {@link Semantier.formatRel()}
+ */
+export interface relStree {
+	sk : string, 		// s-tree semantic key
+	childTabl?: string,	// child table (optional when loading / binding records)
+	col: string,		// check col at client side
+	colProp?: string,	// propterty name (of which the value will be collected)
+	fk : string,		// fk to main table
+	sort?: string,
+	fullpath?: string,
 }
 
 /**Is this semantic-DA.Semantics? */
-export type Semantics = {
-	// [reltype in SemanticType]: FKRelation | Stree | any;
-	fk?: FKRelation,
-	/**semantic tree */
-	stree?: Stree,
-	/**Multiple to mulitple */
-	m2m?: any,
-}
+// export type Semantics = {
+// 	// [reltype in SemanticType]: FKRelation | Stree | any;
+// 	fk?: FKRelation,
+
+// 	/**TODO: semantic tree */
+// 	stree?: Stree,
+
+// 	/**TODO: Multiple to mulitple */
+// 	m2m?: any,
+// }
 
 export interface DbRelations {
-    [tabl: string]: Semantics;
+	/** TODO:  [tabl: string]: Semantics; */
+	fk?: relFK,
+	/** semantic tree */
+	stree?: relStree,
+	/** TODO: Multiple to mulitple */
+	m2m?: any,
 }
 
 export interface UIRelations {
@@ -115,10 +130,7 @@ export interface AttachMeta {
 export interface AnResultset {
 	results: Array<Array<any>>;
 	length() : number;
-    // results: Array<any>;
     total: number;
-    // filter(arg0: (r: any) => boolean) : Array<{}>;
-    // rs: Array<{}>;
     colnames: {};
 }
 
@@ -144,7 +156,8 @@ class Jregex {
 /**Json protocol helper to support jclient.
  * All AnsonBody and JHelper static helpers are here. */
 export class Protocol {
-	// static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
+	/** @deprecated replaced by enum CRUD. */
+	static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
 	static Port = {	heartbeat: "ping.serv11",
 		echo: "echo.serv11", session: "login.serv11",
@@ -1159,7 +1172,7 @@ export class AnsonResp extends AnsonBody {
 }
 
 export class AnSessionResp extends AnsonResp {
-	ssInf: {uid: string, ssid: string, iv: string, usrName?: string};
+	ssInf: SessionInf;
 
 	constructor(ssResp) {
 		super(ssResp);

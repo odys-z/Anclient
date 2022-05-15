@@ -10,15 +10,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol } from '@anclient/semantier-st';
+import { CRUD } from '@anclient/semantier-st';
 import { L, AnContext,
 	DetailFormW, ConfirmDialog, utils
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
-import { docListyle } from '../n/docshares';
+import { docListyle } from '../n-tsx/docshares';
 
-const { CRUD } = Protocol;
 const { regex } = utils;
 
 const styles = (theme) => Object.assign(starTheme(theme),
@@ -55,10 +54,10 @@ class MyDocViewComp extends DetailFormW {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
+		if (this.tier.pkval.v) {
 			let that = this;
 			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
+			cond[this.tier.pk] = this.tier.pkval.v;
 			this.tier.record(cond, (cols, rows, fkOpts) => {
 				that.setState({record: rows[0]});
 			} );
@@ -76,8 +75,8 @@ class MyDocViewComp extends DetailFormW {
 				  disableForm: true },
 				resp => {
 					// NOTE should crud moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
+					if (that.state.crud === CRUD.c) {
+						that.state.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 				} );
@@ -116,8 +115,8 @@ class MyDocViewComp extends DetailFormW {
 	render () {
 		const { tier, classes, width } = this.props;
 
-		let c = this.state.crud === Protocol.CRUD.c;
-		let u = this.state.crud === Protocol.CRUD.u;
+		let c = this.state.crud === CRUD.c;
+		let u = this.state.crud === CRUD.u;
 		let title = L('Share Documents');
 
 		let rec = this.state.record;

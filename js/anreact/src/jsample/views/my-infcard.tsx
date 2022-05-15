@@ -25,9 +25,14 @@ interface MyInfRec extends Tierec {
 	roleId?: string,
 	userName: string,
 	img?: string,
+	/**mime readed from server. */
 	mime?: string,
+	/**filename readed from server. */
 	attName?: string,
 	attId?: string,
+
+	/**The local file description - note that mime & attName are readed from server. */
+	fileMeta?: {name: string, mime: string}
 }
 
 interface MyInfProps extends Comprops {
@@ -201,7 +206,8 @@ export class MyInfTier extends Semantier {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0] as MyInfRec;
 				that.pkval.v = that.rec && that.rec[that.pkval.pk];
-				that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
+				if (that.rec[that.imgProp])
+					that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
 				onLoad(cols, rows as Array<MyInfRec>);
 			},
 			this.errCtx);
@@ -233,11 +239,14 @@ export class MyInfTier extends Semantier {
 					.whereEq('busiId', rec[this.pkval.pk] as string || '')
 					.whereEq('busiTbl', this.mtabl) );
 		if ( rec[this.imgProp] ) {
+			if (!rec.fileMeta)
+				console.error("Uploading file without fileMeta information?");
+
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v)
-					.nv('attName', rec.attName)
-					.nv('mime', rec.mime)
+					// .nv('attName', rec.attName).nv('mime', rec.mime)
+					.nv('attName', rec.fileMeta?.name).nv('mime', rec.fileMeta?.mime)
 					.nv('uri', dataOfurl(rec[this.imgProp] as string)) );
 		}
 

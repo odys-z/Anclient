@@ -13,11 +13,11 @@ import { StarPorts } from './common/port';
 
 import { Dashboard } from './views/n/dashboard';
 import { Indicators } from './views/n-tsx/indicators';
-import { Quizzes } from './views/n/quizzes';
+import { Quizzes } from './views/n-tsx/quizzes';
 import { Polls } from './views/n-tsx/polls';
 import { MyStudents } from './views/n/my-students';
 import { GPAsheet } from './views/n/gpa';
-import { Docshares } from './views/n/docshares';
+import { Docshares } from './views/n-tsx/docshares';
 
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';

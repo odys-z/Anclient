@@ -1,10 +1,6 @@
 ﻿using io.oz.album.tier;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace io.oz.album
@@ -74,9 +70,7 @@ namespace io.oz.album
                         else if (PrefKeys.logid.Equals(k.InnerText))
                             logid = v.InnerText.Trim();
                     }
-                    // turnOnDevice(true);
                 }
-                // else turnOnDevice(false);
             }
             catch (Exception) { }
         }

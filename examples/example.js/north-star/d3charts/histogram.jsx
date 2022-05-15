@@ -7,11 +7,7 @@ import PropTypes from 'prop-types';
 
 import * as d3 from 'd3';
 
-import {
-	L, Langstrs,
-    AnClient, SessionClient, Protocol,
-    AnContext, AnError, CrudComp, AnReactExt
-} from '@anclient/anreact';
+import { L, AnContext } from '@anclient/anreact';
 
 import { NChartReq } from './chartier';
 
@@ -30,7 +26,6 @@ class HistogramComp extends React.Component {
 
 	componentDidMount() {
 		console.log(this.props.uri);
-		// this.initTest();
 
 		let that = this;
 		let client = this.context.anClient;
@@ -43,8 +38,8 @@ class HistogramComp extends React.Component {
 				let centerResp = resp.Body()
 				let happiness = centerResp.happyHist().rows;
 				that.initHist(happiness, Math.min(happiness.length, 4));
-				// that.setState({});
-			});
+			},
+			this.context.error);
 	}
 
 	initTest() {

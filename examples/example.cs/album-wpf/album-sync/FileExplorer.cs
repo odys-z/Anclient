@@ -209,7 +209,10 @@ namespace album_sync
                 if (tier == null)
                     ; // showMsg(R.string.txt_please_login);
                 else
+                {
+                    uploadhandler = new UploadHandler(lbstatus);
                     tier.asyncVideos(list, singl.photoUser, uploadhandler, uploadhandler, uploadhandler);
+                }
             }
         }
     }
@@ -217,9 +220,9 @@ namespace album_sync
     public class UploadHandler : JProtocol.OnProcess, JProtocol.OnOk, JProtocol.OnError
     {
         private Label ui;
-        public UploadHandler(Label status)
+        public UploadHandler(Label statusLabel)
         {
-            this.ui = status;
+            this.ui = statusLabel;
         }
 
         public void err(AnsonMsg.MsgCode code, string msg, string[] args = null)

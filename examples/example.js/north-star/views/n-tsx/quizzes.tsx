@@ -1,20 +1,21 @@
-
 import React from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Typography, Grid, Button } from '@material-ui/core';
 
-import { UserReq } from '@anclient/semantier-st';
+import dateFormat from 'dateformat';
+import { AnsonResp, PageInf, QueryConditions, UserReq } from '@anclient/semantier-st';
 import {
     L,
     AnConst, AnContext, CrudCompW, AnQueryst,
-	AnTablist, DatasetCombo, ConfirmDialog, jsample
+	AnTablist, DatasetCombo, ConfirmDialog, jsample, Comprops
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';
-import { Quizsheet } from './quizsheet-ag';
-import { QuizForm } from './quiz-form';
+import { Quizsheet } from '../n/quizsheet-ag';
+import { QuizForm } from '../n/quiz-form';
+import { QuizRec } from '../../common/an-quiz.js';
 
 const styles = (theme) => ( {
 	root: {
@@ -30,21 +31,29 @@ const styles = (theme) => ( {
 	}
 } );
 
-class QuizzesComp extends CrudCompW {
+class QuizzesComp extends CrudCompW<Comprops> {
 	state = {
-		quizzes: [],
-		pageInf: {page: 0, size: 25},
+		rows: [] as Array<QuizRec>, // quizzes set by Anreact
+		pageInf: {page: 0, size: 25} as PageInf,
 		queryReq : undefined,
-		buttons: { add: false, edit: false, del: false},
 
-		condTitl: { type: 'text', val: '', label: L('Title')},
-		condTags: { type: 'text', val: '', label: L('Tags')},
-		condDate: { type: 'date', val: '', label: L('Create Date')},
-
-		selected: {ids: new Set()},
+		selected: {ids: new Set<string>()},
 	};
 
+	/** buttons enable / disable */
+	buttons = { add: false, edit: false, del: false, stop: false};
+
 	funcName = L('North - Quizzes');
+	confirm: JSX.Element;
+	quizForm: JSX.Element;
+	/** Quiz template Id */
+	templ: string;
+
+	// conditions
+	condTitl = { type: 'text', field: '', val: '', label: L('Title')};
+	condTags = { type: 'text', field: '', val: '', label: L('Tags')};
+	condDate = { type: 'date', field: '', val: '', label: L('Create Date')};
+
 
 	constructor(props) {
 		super(props);
@@ -65,10 +74,10 @@ class QuizzesComp extends CrudCompW {
 
 	componentDidMount() {
 		console.log(this.uri);
-		this.toSearch();
+		this.toSearch(undefined);
 	}
 
-	toSearch(e, query) {
+	toSearch(query?: QueryConditions) {
 
 		let pageInf = this.state.pageInf;
 
@@ -110,7 +119,7 @@ class QuizzesComp extends CrudCompW {
 		return queryReq;
 	}
 
-	onPageInf(page, size) {
+	onPageInf(page: number, size: number) {
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
 		let query = this.state.queryReq;
@@ -121,17 +130,17 @@ class QuizzesComp extends CrudCompW {
 		}
 	}
 
-	onTableSelect(rowIds) {
+	onTableSelect(rowIds: Array<string>) {
 		this.setState( {
 			buttons: {
-				add : this.state.buttons.add,
+				add : this.buttons.add,
 				stop: rowIds && rowIds.length === 1,
 				del : rowIds &&  rowIds.length >= 1,
 			},
 		} );
 	}
 
-	toDel(e, v) {
+	toDel(e: React.UIEvent) {
 		let that = this;
 		let txt = L('Totally {count} records will be deleted. Are you sure?',
 				{count: that.state.selected.ids.size});
@@ -144,18 +153,18 @@ class QuizzesComp extends CrudCompW {
 			/>);
 	}
 
-	del(qids) {
+	del(qids: Set<string>) {
 		let client = this.context.anClient;
 		let req = client.userReq( this.uri, 'quiz',
 					new UserReq( this.uri, "quiz" )
 					.A(QuizProtocol.A.deleteq) );
 
 		let reqBd = req.Body();
-		reqBd.set(QuizProtocol.quizId, [...qids]);
+		reqBd.set(QuizProtocol.quizId, Array.from(qids));
 
 		let that = this;
 		client.commit(req,
-			(resp) => {
+			(resp : AnsonResp) => {
 				that.state.selected.ids.clear();
 				that.confirm =
 					(<ConfirmDialog open={true}
@@ -174,32 +183,30 @@ class QuizzesComp extends CrudCompW {
 
 	// worksheet
 	toAddB() {
-		let that = this;
 		this.quizForm = (
-			<Quizsheet c uri={this.uri} templ={this.state.templ}
+			<Quizsheet c uri={this.uri} templ={this.templ}
 				quizId={undefined}
 				onCancel={ this.closeDetails }
 				onOk={ this.closeDetails } />);
 	}
 
-	// item collapse
+	// item collapse - deprecated
 	toAddA() {
-		let that = this;
 		this.quizForm = (
-			<QuizForm c uri={this.uri} templ={this.state.templ}
+			<QuizForm c uri={this.uri} templ={this.templ}
 				quizId={undefined}
 				onCancel={ this.closeDetails }
 				onOk={ this.closeDetails } />);
 	}
 
-	toEdit(e, v) {
+	toEdit(e: React.UIEvent) {
 		let that = this;
 		let qid = this.state.selected.ids;
 		if (qid.size === 0)
 			console.error("Something wrong!");
 		else {
 			this.quizForm = (<Quizsheet u uri={this.uri}
-				quizId={[...qid][0]}
+				quizId={[... Array.from(qid)][0]}
 				onCancel={this.closeDetails}
 				onOk={ () => {
 					that.closeDetails();
@@ -215,17 +222,17 @@ class QuizzesComp extends CrudCompW {
 	render () {
 		let that = this;
 		const { classes } = this.props;
-		let btn = this.state.buttons;
+		let btn = this.buttons;
 		return ( <>{this.funcName}
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				// conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
-				fields={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
-				query={ (q) => { return {
-					qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
-					qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
-					qdate: q.state.conds[2].val ? q.state.conds[2].val : undefined,
-				}} }
+				fields={[ this.condTitl, this.condTags, this.condDate ]}
+				// query={ (q) => { return {
+				// 	qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
+				// 	qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
+				// 	qdate: q.state.conds[2].val ? q.state.conds[2].val : undefined,
+				// }} }
 			/>
 
 			<Typography className={classes.tip} color='primary' >
@@ -238,8 +245,8 @@ class QuizzesComp extends CrudCompW {
 					label={L('Quiz Types')}
 					options={[AnConst.cbbAllItem]} style={{width: 200}}
 					onSelect={ (v) => {
-						that.state.templ = v.v;
-						let buttons = that.state.buttons;
+						that.templ = v.v as string;
+						let buttons = that.buttons;
 						buttons.add = true;
 						that.setState({buttons});
 					} }
@@ -266,10 +273,11 @@ class QuizzesComp extends CrudCompW {
 			<AnTablist selected={this.state.selected}
 				className={classes.root} checkbox= {true} pk= "qid"
 				columns={[
-					{ text: L('qid'), hide:1, field: "qid" },
+					{ text: L('qid'), hide: true, field: "qid" },
 					{ text: L('Title'),       field: "title",    color: 'primary', className: 'bold' },
 					{ text: L('Tags'),        field: "tags",     color: 'primary' },
-					{ text: L('Date Created'),field: "dcreate",  color: 'primary', formatter: d => d && d.substring(0, 10) },
+					{ text: L('Date Created'),field: "dcreate",  color: 'primary',
+					  formatter: d => d && dateFormat(d as any, 'yyyy-mm-dd') as any },
 					{ text: L('Total Q'),     field: "questions",color: 'primary' },
 					{ text: L('Polls'),       field: "polls",    color: 'primary' }
 				]}

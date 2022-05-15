@@ -42,7 +42,7 @@ class IndicatorsComp extends CrudCompW<Comprops> {
 
 	reshape(e) {
 		// ask server tag all subtrees
-		let client = this.context.anClient;
+		// let client = this.context.anClient;
 		let that = this;
 
 		let uri = this.uri;
