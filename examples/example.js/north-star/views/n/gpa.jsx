@@ -133,7 +133,7 @@ class GPAsheetComp extends CrudComp {
 					editable: this.rowEditableChecker,
 					anEditStop: this.changeLastDay }];
 
-		this.avrow = {gday: L('mean / median')}; // average row
+		this.avrow = {gday: L('mean')}; // average row
 		kids.filter( k => !!k )
 			.forEach( (k, x) => {
 				ths.push( {
@@ -178,18 +178,17 @@ class GPAsheetComp extends CrudComp {
 					that.setState({addingNew: false})
 				});
 		}
-		// else if (!this.state.addingNew && p.node.rowIndex > 0 &&
-		// 	p.colDef.field === 'gday' && p.node.rowIndex === rowIndex) {
+		else if (!this.state.addingNew && p.node.rowIndex > 0 &&
+			p.colDef.field === 'gday' && p.node.rowIndex === rowIndex) {
 
-		// 	let that = this;
-		// 	this.tier.updateGDay( {
-		// 			uri: this.uri,
-		// 			oldGday: p.oldValue,
-		// 			newGday: p.value },
-		// 		e => {
-		// 			that.setState({addingNew: false})
-		// 		});
-
+			let that = this;
+			this.tier.updateGDay( {
+					uri: this.uri,
+					oldGday: p.oldValue,
+					newGday: p.value },
+				e => {
+					that.setState({addingNew: false})
+				});
 		}
 	}
 

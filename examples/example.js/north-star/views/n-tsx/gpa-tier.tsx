@@ -36,7 +36,7 @@ export class GPATier extends Semantier {
 		client.commit(req, onLoad, this.errCtx);
 	}
 
-	updateRow(opts: {uri: string, oldGday: string, gpaRow: string}, onOk: OnCommitOk) {
+	updateRow(opts: {uri: string, oldGday: string, gpaRow: Tierec}, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -56,7 +56,7 @@ export class GPATier extends Semantier {
 		let { uri, oldGday, newGday } = opts;
 
 		let req = client.userReq(uri, this.port,
-						new GPAReq( {uri, gday: newGday, oldDay: oldGday} )
+						new GPAReq( {uri, gday: newGday, olday: oldGday} )
 						.A(GPAReq.A.changeDay) );
 
 		client.commit(req, onOk, this.errCtx);
