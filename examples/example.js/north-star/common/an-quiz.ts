@@ -2,7 +2,7 @@
  */
 import {
 	Protocol, CRUD, UserReq, SessionClient, SessionInf, ErrorCtx, Tierec
-} from '@anclient/semantier-st';
+} from '@anclient/semantier';
 
 import { QuizReq, QuizProtocol, CenterProtocol } from './protocol.quiz.js';
 

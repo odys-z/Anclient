@@ -11,7 +11,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import dateFormat from "dateformat";
-import { CRUD, AnsonResp } from '@anclient/semantier-st';
+import { CRUD, AnsonResp } from '@anclient/semantier';
 import { L, AnContext, CrudCompW, AnTablist
 } from '@anclient/anreact';
 

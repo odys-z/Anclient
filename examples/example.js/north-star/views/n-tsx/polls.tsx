@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
 	OnLoadOk, QueryConditions, AnlistColAttrs, Tierec
-} from "@anclient/semantier-st";
+} from "@anclient/semantier";
 
 import {
 	L, AnConst, Comprops,

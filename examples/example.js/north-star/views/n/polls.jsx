@@ -4,7 +4,7 @@
 // import withWidth from "@material-ui/core/withWidth";
 // import { Grid, Button, Card, TextField, Typography } from '@material-ui/core';
 
-// import { AnClient, SessionClient, Protocol } from '@anclient/semantier-st';
+// import { AnClient, SessionClient, Protocol } from '@anclient/semantier';
 // import {
 // 	L, Langstrs, AnConst,
 //     AnContext, AnError, CrudCompW, AnReactExt,

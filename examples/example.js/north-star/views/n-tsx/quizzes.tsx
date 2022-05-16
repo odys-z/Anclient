@@ -4,7 +4,7 @@ import withWidth from "@material-ui/core/withWidth";
 import { Typography, Grid, Button } from '@material-ui/core';
 
 import dateFormat from 'dateformat';
-import { AnsonResp, PageInf, QueryConditions, UserReq } from '@anclient/semantier-st';
+import { AnsonResp, PageInf, QueryConditions, UserReq } from '@anclient/semantier';
 import {
     L,
     AnConst, AnContext, CrudCompW, AnQueryst,

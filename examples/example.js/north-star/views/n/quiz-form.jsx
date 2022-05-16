@@ -9,7 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { CRUD, isEmpty } from '@anclient/semantier-st';
+import { CRUD, isEmpty } from '@anclient/semantier';
 import { L, DetailFormW, ConfirmDialog } from '@anclient/anreact';
 import { JQuiz } from '../../common/an-quiz';
 import { QuizEditor } from './quiz-editor';

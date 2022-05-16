@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 
 import { L } from '@anclient/anreact';
-import { Tierec } from '@anclient/semantier-st';
+import { Tierec } from '@anclient/semantier';
 
 /**
  * Formatting json string (can be parsed by JSON) into &gt;Typography/&lg;.

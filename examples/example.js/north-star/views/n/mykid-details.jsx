@@ -11,7 +11,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol, CRUD } from '@anclient/semantier-st';
+import { Protocol, CRUD } from '@anclient/semantier';
 import { L, AnConst,
 	AnContext, AnError,
 	DetailFormW, ConfirmDialog,

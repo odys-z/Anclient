@@ -10,7 +10,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { CRUD, TierCol, Tierec } from '@anclient/semantier-st';
+import { CRUD, TierCol, Tierec } from '@anclient/semantier';
 import { L, AnContext,
 	DetailFormW, ConfirmDialog, TRecordForm, AnRelationTree, Comprops
 } from '@anclient/anreact';

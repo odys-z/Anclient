@@ -4,7 +4,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 import { Button, Typography } from '@material-ui/core';
 
-import { isEmpty, UserReq } from '@anclient/semantier-st'
+import { isEmpty, UserReq } from '@anclient/semantier'
 import {
 	L, AnConst,
     AnContext, CrudCompW, AnTablist, AnQueryst

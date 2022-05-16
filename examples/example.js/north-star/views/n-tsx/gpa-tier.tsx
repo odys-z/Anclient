@@ -2,7 +2,7 @@
 import {
     Protocol, AnsonResp, AnsonBody, Semantier, Tierec, UIComponent, Semantext,
     QueryConditions, OnLoadOk, OnCommitOk, TierCol
-} from '@anclient/semantier-st';
+} from '@anclient/semantier';
 
 export interface GPARec extends Tierec {
 	gday: string,

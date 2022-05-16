@@ -12,7 +12,7 @@ import MobileStepper from "@material-ui/core/MobileStepper";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 
-import { CRUD, UserReq } from '@anclient/semantier-st'
+import { CRUD, UserReq } from '@anclient/semantier'
 import { L, AnContext, CrudCompW} from '@anclient/anreact';
 
 import { CenterProtocol } from "../../common/protocol.quiz.js";

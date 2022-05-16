@@ -10,7 +10,7 @@ import { L, AnContext,
 } from '@anclient/anreact';
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';
-import { AnTreeNode } from '@anclient/semantier-st/protocol';
+import { AnTreeNode } from '@anclient/semantier/protocol';
 import { Theme } from '@material-ui/core/styles';
 
 const styles = (theme: Theme) => ( {

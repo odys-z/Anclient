@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Box, Button, Grid, Theme } from '@material-ui/core';
 
-import { Protocol, AnsonResp, AnsonBody, Semantier, UIComponent, Tierec, PkMeta, OnCommitOk, AnsonMsg, OnLoadOk, QueryConditions } from '@anclient/semantier-st';
+import { Protocol, AnsonResp, AnsonBody, Semantier, UIComponent, Tierec, PkMeta, OnCommitOk, AnsonMsg, OnLoadOk, QueryConditions } from '@anclient/semantier';
 import { L, AnContext,
 	CrudCompW, AnQueryst, AnTablist, ConfirmDialog, jsample, utils, Comprops, ClassNames} from '@anclient/anreact';
 const { JsampleIcons } = jsample;

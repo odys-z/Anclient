@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { Protocol, CRUD } from '@anclient/semantier-st';
+import { Protocol, CRUD } from '@anclient/semantier';
 import { L,
 	AnContext, AnTablist, AnQueryst, jsample
 } from '@anclient/anreact';

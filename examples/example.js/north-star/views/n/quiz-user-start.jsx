@@ -6,7 +6,7 @@
 
 // import { Card, TextField, Typography } from '@material-ui/core';
 
-// import { AnClient, SessionClient, Protocol } from '@anclient/semantier-st';
+// import { AnClient, SessionClient, Protocol } from '@anclient/semantier';
 // import { L, Langstrs,
 //     AnContext, AnError, CrudCompW, AnReactExt, AnQueryForm,
 //     AnTree, stree_t

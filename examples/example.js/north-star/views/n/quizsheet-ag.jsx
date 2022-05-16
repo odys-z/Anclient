@@ -8,7 +8,7 @@ import Box from '@material-ui/core/Box';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import { CRUD, Semantier, isEmpty } from '@anclient/semantier-st';
+import { CRUD, Semantier, isEmpty } from '@anclient/semantier';
 import { L,
 	AnContext, ConfirmDialog, TRecordForm,
 	jsample, Overlay, AnGridsheet, anMultiRowRenderer

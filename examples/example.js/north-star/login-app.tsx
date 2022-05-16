@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier-st'
+import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier'
 import { L, Langstrs, AnContext, AnError, AnReact, Login, jsample } from '@anclient/anreact';
 import { Northprops } from './common/north';
 
