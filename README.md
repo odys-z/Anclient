@@ -7,8 +7,8 @@ is also been verified.
 
 - Anclient.js
 
-[![npm](https://img.shields.io/npm/v/@anclient/semantier-st?logo=npm)](https://npmjs.org/package/@anclient/semantier-st)
-@anclient/semantier-st
+[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
+@anclient/semantier 
 
 together with
 
