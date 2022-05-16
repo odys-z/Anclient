@@ -45,19 +45,19 @@ There issue of invalid hook makes the test project in trouble linking the lib. S
 to run this example from source, it's needed to install React manually::
 
 ```
-    npm install react react-dom react-router react-router-dom
+    npm install react react-dom
     npm install @anclient/anreact @anclient/semantier
 ```
 
 # Release Log
 
-- v0.5
+- v0.6.1
 
     docker image:
 
 ```
-	odysz/connect-polestar:0.5
-	odysz/emr-web:0.5
+	odysz/connect-polestar:0.6.1
+	odysz/emr-web:0.6.1
 ```
 
-Volume north.sqlite can be found in Polestar.
+Volume's db files, north.sqlite & systme.sqlite can be found in polestar-docker/volume.
