@@ -39,7 +39,6 @@
   },
   "dependencies": {
     "@anclient/anreact": "^0.3.66",
-    "@anclient/semantier-st": "^0.9.61",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@emotion/react": "^11.9.0",
     "@material-ui/lab": "^4.0.0-alpha.60",

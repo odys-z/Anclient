@@ -1,9 +1,11 @@
 /**Test case of anclient/js/Protocol with mocha and chai.
  */
 
-import { assert } from 'chai'
+import chai from 'chai'
+import { expect, assert } from 'chai'
 
-import {AnsonMsg, AnsonResp} from '../protocol'
+import {Protocol, AnsonMsg, UserReq, AnsonResp} from '../protocol-v2'
+
 
 const dsResp = {
 	"type": "io.odysz.semantic.jprotocol.AnsonMsg",

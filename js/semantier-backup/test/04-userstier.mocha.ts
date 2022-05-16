@@ -1,7 +1,7 @@
 
 import { assert } from 'chai'
 
-import {AnsonMsg, AnsonResp} from '../protocol';
+import {AnsonMsg, AnsonResp} from '../protocol-v2';
 
 const respInsUser = {
   "type": "io.odysz.semantic.jprotocol.AnsonResp",
