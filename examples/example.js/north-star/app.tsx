@@ -16,14 +16,12 @@ import { Indicators } from './views/n-tsx/indicators';
 import { Quizzes } from './views/n-tsx/quizzes';
 import { Polls } from './views/n-tsx/polls';
 import { MyStudents } from './views/n/my-students';
-import { GPAsheet } from './views/n/gpa';
+import { GPAsheet } from './views/n-tsx/gpa';
 import { Docshares } from './views/n-tsx/docshares';
 
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
 import { MyDocs } from './views/c/my-docs';
-// import { PhotoGallery } from './views/c-tsx/photo-gallery';
-// import { MyConnect } from './views/c/connect';
 
 import { welcome } from './views/c-tsx/nwelcome';
 import { Northprops } from './common/north';

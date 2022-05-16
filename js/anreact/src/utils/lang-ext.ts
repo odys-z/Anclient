@@ -26,7 +26,7 @@
 // 	};
 // }
 
-function swap (arr, a, b) {
+function swap (arr: any[], a: number, b: number) {
 	if (Array.isArray(arr)) {
 		arr[a] = arr.splice(b, 1, arr[a])[0];
 		return arr;

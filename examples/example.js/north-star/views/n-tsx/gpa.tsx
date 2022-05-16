@@ -11,13 +11,13 @@ import dateFormat from 'dateformat';
 
 import { L,
 	AnContext, ConfirmDialog, CrudComp,
-	jsample, AnGridsheet, AnNumericEdit, AnIndicatorRenderer
+	jsample, AnGridsheet, AnNumericEdit, AnIndicatorRenderer, addDays
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { GPATier, GPAResp } from '../n-tsx/gpa-tier'
+import { GPATier, GPAResp, GPARec } from '../n-tsx/gpa-tier'
 
-const styles = (theme) => ({
+const styles = (_theme) => ({
 	root: {
 		height: "calc(100vh - 18ch)"
 	},
@@ -41,12 +41,21 @@ const styles = (theme) => ({
  * For public results, go
  * https://ag-grid-react-hello-world-8lxdjj.stackblitz.io
  */
-class GPAsheetComp extends CrudComp {
+class GPAsheetComp extends CrudComp<any> {
 	state = {
+        addingNew: false,
 		dirty: false,
 		cols: [],
 		rows: [],
 	};
+
+    tier: GPATier;
+    api: any;
+    columnApi: any;
+    confirm: JSX.Element;
+    currentId: any;
+
+    avrow: GPARec;
 
 	constructor (props) {
 		super(props);
@@ -55,6 +64,7 @@ class GPAsheetComp extends CrudComp {
 
 		this.bindSheet = this.bindSheet.bind(this);
 		this.toAdd = this.toAdd.bind(this);
+		this.toDel = this.toDel.bind(this);
 		this.alert = this.alert.bind(this);
 		// this.toSave = this.toSave.bind(this);
 
@@ -82,27 +92,17 @@ class GPAsheetComp extends CrudComp {
 			}
 
 		if (found) {
-			/*
 			try {
 				let d = new Date(this.state.rows[this.state.rows.length - 1].gday.trim());
-				newGday = d.addDays(1).toISOStr();
-			} catch(e) {
-				newGday = new Date().addDays(1).toISOStr();
-			}
-			*/
-			try {
-				let d = new Date(this.state.rows[this.state.rows.length - 1].gday.trim(), 'yyyy-mm-dd');
 				newGday = dateFormat(addDays(d, 1), 'yyyy-mm-dd');
 			} catch(e) {
-				newGday = dateFormat(new Date().addDays(1), 'yyyy-mm-dd');
+				newGday = dateFormat(addDays(new Date(), 1), 'yyyy-mm-dd');
 			}
-
 		}
 
-		let r = Object.assign({}, this.avrow);
+		let r = Object.assign({}, this.avrow) as GPARec;
 		r.gday = newGday;
 
-		// using stat.rows all because data are handled at both client and server.
 		this.state.rows.push(r);
 		this.state.addingNew = true;
 
@@ -117,9 +117,16 @@ class GPAsheetComp extends CrudComp {
 		this.api.startEditingCell({ rowIndex, colKey: 'gday' });
 	}
 
+    // avrow(arg0: {}, avrow: any) : GPARec {
+    //     throw new Error('Method not implemented.');
+    // }
+
 	toDel(e) {
-		let newGday = dateFormat('yyyy-mm-dd');
-		console.log(newGday);
+		let that = this;
+		if (this.currentId)
+			this.tier.del({ids: [this.currentId]}, (resp) => {
+				that.tier.records(null, that.bindSheet);
+			});
 	}
 
 	bindSheet(gpaResp) {
@@ -129,22 +136,26 @@ class GPAsheetComp extends CrudComp {
 		let { kids, cols, rows } = GPAResp.GPAs(resp);
 		this.tier.rows = rows;
 
-		let ths = [{ field: 'gday', label: L('DATE'), width: 120,
+		let ths = [{width: 120, cellEditor: undefined,
+                    cellEditorParams: undefined,
+                    field: 'gday', label: L('DATE'),
 					editable: this.rowEditableChecker,
-					anEditStop: this.changeLastDay }];
+					anEditStop: this.changeLastDay,
+                    cellRenderer: undefined }];
 
 		this.avrow = {gday: L('mean')}; // average row
 		kids.filter( k => !!k )
 			.forEach( (k, x) => {
 				ths.push( {
-					field: k.kid, label: k.userName, width: 120,
+                    width: 120,
+					field: k.kid as string, label: k.userName as string,
 					cellEditor: 'anNumberEdit',
 					editable: this.rowEditableChecker,
 					anEditStop: this.changeGPA,
 					cellEditorParams: {min: 0, max: 10},
 					cellRenderer: AnIndicatorRenderer } );
 
-				this.avrow[k.kid] = k.avg;
+				this.avrow[k.kid as string] = k.avg as string;
 			});
 
 		rows.unshift(this.avrow);
@@ -179,10 +190,11 @@ class GPAsheetComp extends CrudComp {
 				});
 		}
 		else if (!this.state.addingNew && p.node.rowIndex > 0 &&
-			p.colDef.field === 'gday' && p.node.rowIndex === rowIndex) {
+			p.colDef.field === 'gday' && p.node.rowIndex === rowIndex &&
+			p.oldValue !== p.value ) {
 
 			let that = this;
-			this.tier.updateGDay( {
+			this.tier.changeDay( {
 					uri: this.uri,
 					oldGday: p.oldValue,
 					newGday: p.value },
@@ -233,6 +245,12 @@ class GPAsheetComp extends CrudComp {
 					defaultColDef={ {
 						editable: this.rowEditableChecker
 					} }
+					onCellClicked={
+						(p) => {
+							if (p.data && p.data.gday)
+								that.currentId = p.data.gday;
+						}
+					}
 					contextMenu={ {
 						name: L('Show Chart [TODO]'),
 						action: p => { console.log(p); }

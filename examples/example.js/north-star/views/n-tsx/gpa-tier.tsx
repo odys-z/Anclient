@@ -1,28 +1,25 @@
 
 import {
     Protocol, AnsonResp, AnsonBody, Semantier, Tierec, UIComponent, Semantext,
-    QueryConditions, OnLoadOk, OnCommitOk
+    QueryConditions, OnLoadOk, OnCommitOk, TierCol
 } from '@anclient/semantier-st';
+
+export interface GPARec extends Tierec {
+	gday: string,
+	[kid: string]: string
+};
 
 export class GPATier extends Semantier {
 	port = 'gpatier';
 	client = undefined;
-	// kids = [
-	// ];
-	rows = [{ date: 'yyyy' } as Tierec];
+	rows = [{ gday: 'yyyy' } as GPARec];
 	ths_ = [];
 
 	constructor(comp: UIComponent) {
 		super(comp);
 	}
 
-	// setContext(context: Semantext) {
-	// 	this.client = context.anClient;
-	// 	this.errCtx = context.error;
-    //     return this;
-	// }
-
-	records(conds: QueryConditions, onLoad: OnLoadOk<Tierec> ) {
+	records(conds: QueryConditions, onLoad: OnLoadOk<GPARec> ) {
 		if (!this.client) return;
 
 		let client = this.client;
@@ -49,7 +46,7 @@ export class GPATier extends Semantier {
 		client.commit(req, onOk, this.errCtx);
 	}
 
-	updateGDay(opts: {uri: string, oldGday: string, newGday: string}, onOk: OnCommitOk) {
+	changeDay(opts: {uri: string, oldGday: string, newGday: string}, onOk: OnCommitOk) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -83,14 +80,13 @@ export class GPATier extends Semantier {
 	del(opts: { ids: Array<string> }, onOk: OnCommitOk ) {
 		if (!this.client) return;
 		let client = this.client;
-		let that = this;
 		let { ids } = opts;
 
 		if (ids && ids.length > 0) {
 			let req = this.client.userReq(this.uri, this.port,
 				// new GPAReq( uri, { deletings: [...ids] } )
-				new GPAReq( {uri: this.uri} )
-				.A(GPAReq.A.del) );
+				new GPAReq( {uri: this.uri, gday: ids[0]} )
+				.A(GPAReq.A.delDay) );
 
 			client.commit(req, onOk, this.errCtx);
 		}
@@ -111,10 +107,10 @@ export class GPAResp extends AnsonResp {
 		this.cols = jsonbd.cols;
 	}
 
-	static GPAs(body) {
+	static GPAs(body: GPAResp) : {kids: Tierec[], cols: string[], rows: GPARec[]} {
 		let gpas = AnsonResp.rs2arr(body.gpas);
 		let kids = AnsonResp.rs2arr(body.kids);
-		return {kids: kids.rows, cols: gpas.cols, rows: gpas.rows};
+		return {kids: kids.rows, cols: gpas.cols, rows: gpas.rows as GPARec[]};
 	}
 }
 
@@ -136,14 +132,14 @@ export class GPAReq extends AnsonBody {
 	static A = {
 		gpas: 'r/gpas',
 		update: 'u',
+		delDay: 'd/gday',
 		updateRow: 'u/row',
 		changeDay: 'u/gday',
 		insert: 'c',
-		del: 'd',
 	};
 
     gpaRow: Tierec;
-    kid: any;
+    kid: string;
     gpa: string;
     gday: string;
     olday: string;

@@ -1,8 +1,10 @@
 export function anMultiRowRenderer(param: any): string;
 export function AnIndicatorRenderer(param: any): any;
 /**Thin wrapper of ag-grid.
+ * 
  * For ag-grid practice, go
  * https://stackblitz.com/edit/ag-grid-react-hello-world-8lxdjj?file=index.js
+ * 
  * For public results, go
  * https://ag-grid-react-hello-world-8lxdjj.stackblitz.io
  *
