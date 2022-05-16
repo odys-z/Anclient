@@ -25,7 +25,7 @@ host: http://[your-server-ip]:8080/connects
 
 To use the data server with docker image, ***odysz/connect-polestar*** wich is
 available at docker hub. The server side docker image must work with these two
-[sqlite3 db file](./volume/polestar.sqlite.zip) - put it in the volume configured
+[sqlite3 db file](./polestar-docker/volume/polestar.zip) - put it in the volume configured
 for the docker container.
 
 3. check both of your docker containers are runing:
