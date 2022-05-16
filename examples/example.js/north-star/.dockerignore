@@ -1,5 +1,6 @@
 dist/private.json
 dist/private
+polestar-docker
 
 # check the file dosn't exits:
 # start Alpine with -it
