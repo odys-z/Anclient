@@ -5,7 +5,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt, jsample
+	AnContext, AnError, AnReactExt, jsample, AnContextType
 } from '@anclient/anreact';
 const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
 
@@ -182,7 +182,7 @@ class App extends React.Component<Northprops, any> {
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
-		function myInfoPanels(anContext) {
+		function myInfoPanels(anContext: AnContextType) {
 			return [
 				{ title: L('Basic'),
 				  panel: <jsample.MyInfCard uri={'/sys/session'}
