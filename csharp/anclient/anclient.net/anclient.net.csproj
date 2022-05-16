@@ -38,7 +38,7 @@
       <HintPath>..\packages\Antlr4.Runtime.Standard.4.9.2\lib\netstandard2.0\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
     <Reference Include="antson.csharp, Version=0.9.0.24, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Antson.CSharp.0.9.24\lib\net471\antson.csharp.dll</HintPath>
+      <HintPath>..\packages\Antson.CSharp.0.9.31\lib\net471\antson.csharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,8 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\anclient\AnsonClient.cs" />
-    <Compile Include="src\anclient\Clients.cs" />
+    <Compile Include="src\anclient\SessionClient.cs" />
+    <Compile Include="src\anclient\AnClient.cs" />
     <Compile Include="src\anclient\HttpServClient.cs" />
     <Compile Include="src\common\AESHelper.cs" />
     <Compile Include="src\common\Radix64.cs" />
@@ -77,12 +77,21 @@
     <Compile Include="src\jserv\jsession\AnSessionResp.cs" />
     <Compile Include="src\jserv\jsession\JRobot.cs" />
     <Compile Include="src\jserv\jsession\SessionInf.cs" />
-    <Compile Include="src\transact\ISemantext.cs" />
+    <Compile Include="src\jserv\tier\docs\BlockChain.cs" />
+    <Compile Include="src\jserv\tier\docs\DocsReq.cs" />
+    <Compile Include="src\jserv\tier\docs\DocsResp.cs" />
+    <Compile Include="src\jserv\tier\docs\IFileDescriptor.cs" />
+    <Compile Include="src\jserv\tier\docs\SyncingPage.cs" />
+    <Compile Include="src\jserv\tier\docs\SyncRec.cs" />
+    <Compile Include="src\jserv\tier\ErrorCtx.cs" />
+    <Compile Include="src\jserv\tier\Semantier.cs" />
+    <Compile Include="src\jserv\tier\TierCol.cs" />
+    <Compile Include="src\jserv\tier\Tierec.cs" />
+    <Compile Include="src\jserv\tier\Tierelations.cs" />
     <Compile Include="src\transact\IUser.cs" />
-    <Compile Include="src\transact\meta\ColMeta.cs" />
-    <Compile Include="src\transact\meta\TableMeta.cs" />
     <Compile Include="src\transact\SemanticObject.cs" />
     <Compile Include="src\transact\sql\Query.cs" />
+    <Compile Include="src\x\AnsonException.cs" />
     <Compile Include="src\x\SemanticException.cs" />
     <Compile Include="src\x\TransException.cs" />
   </ItemGroup>

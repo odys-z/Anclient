@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 import { Button, Typography } from '@material-ui/core';
 
-import { UserReq } from '@anclient/semantier-st'
+import { isEmpty, UserReq } from '@anclient/semantier'
 import {
 	L, AnConst,
-    AnContext, CrudCompW, AnQueryForm, AnTablist, AnQueryst
+    AnContext, CrudCompW, AnTablist, AnQueryst
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
@@ -29,16 +29,16 @@ class MyPollsComp extends CrudCompW {
 	state = {
 		polls: {cols:[], rows: []},
 
-		condTitl: { type: 'text', val: '', label: L('Title') },
-		condTags: { type: 'text', val: '', label: L('Tags') },
-		condIssr: { type: 'cbb',  val: AnConst.cbbAllItem,
+		condTitl: { type: 'text', field: 'title',   val: '', label: L('Title') },
+		condTags: { type: 'text', field: 'tags',    val: '', label: L('Tags') },
+		condIssr: { type: 'cbb',  field: 'issuer',val: AnConst.cbbAllItem,
 					sk: 'center.my-polls.issuers', nv: {n: 'txt', v: 'val'},
 					sqlArgs: undefined, //['pollee-id', 'pollee-role', 'issuer-role'],
 					options: [ AnConst.cbbAllItem ],
 					label: L('Issuers') },
-		condWait: { type: 'switch', val: true, label: L('Has waitings') },
+		condWait: { type: 'switch',field: 'qwait',  val: true, label: L('Has waitings') },
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 		waitingPollIds: new Set(),
 	};
 
@@ -59,7 +59,7 @@ class MyPollsComp extends CrudCompW {
 		this.toSearch();
 	}
 
-	toSearch(e, query) {
+	toSearch(query) {
 
 		let client = this.context.anClient;
 		let req = client.userReq( this.uri, 'center',
@@ -68,11 +68,17 @@ class MyPollsComp extends CrudCompW {
 
 		let reqBd = req.Body();
 
-		if (query && query.qWait)
+		if (!query || query.qwait)
 			reqBd.set(CenterProtocol.pollState, CenterProtocol.PollState.wait);
 
-		if (query && query.qIssr.val && query.qIssr.val != AnConst.cbbAllItem.v)
-			reqBd.set(CenterProtocol.pollIssuer, qIssr.val);
+		if (query) {
+			// if (query && query.issuer.val && query.issuer.val != AnConst.cbbAllItem.v)
+			if (!isEmpty(query.issuer, '') && query.issuer != AnConst.cbbAllItem.v)
+				reqBd.set(CenterProtocol.pollIssuer, query.issuer);
+			
+				reqBd.set(CenterProtocol.quizTag, query.tags);
+				reqBd.set(CenterProtocol.quizTitle, query.title);
+		}
 
 		this.state.req = req;
 
@@ -82,11 +88,11 @@ class MyPollsComp extends CrudCompW {
 				let centerResp = resp.Body()
 				let polls = centerResp.polls();
 				that.setState({polls});
-				that.state.selected.Ids.clear(0);
+				that.state.selected.ids.clear(0);
 
 				// reset flags
 				let myTaskIds = centerResp.myTaskIds();
-				console.log(myTaskIds);
+				console.log(polls?.rows?.length, myTaskIds);
 				that.state.waitingPollIds = myTaskIds;
 			},
 			this.context.error);
@@ -98,7 +104,7 @@ class MyPollsComp extends CrudCompW {
 		let that = this;
 		this.quizForm = (
 			<CarouselQuiz uri={this.uri}
-				pollId={[...this.state.selected.Ids][0]} // load by itself
+				pollId={[...this.state.selected.ids][0]} // load by itself
 				// quiz are loaded by CarouselQuizComp, so committed by itself
 				onSubmit={() => {that.quizForm = undefined;}} // no thanks?
 				onClose={ () => {that.quizForm = undefined;}}
@@ -114,13 +120,13 @@ class MyPollsComp extends CrudCompW {
 			{ this.state.condIssr.sqlArgs && // must load userId before reandering issuers cbb.
 			  <AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
-				conds={[ this.state.condTitl, this.state.condTags, this.state.condIssr, this.state.condWait ]}
-				query={ (q) => { return {
-					qTitl: q.state.conds[0].val,
-					qTags: q.state.conds[1].val,
-					qIssr: q.state.conds[2].val && q.state.conds[2].val.v,
-					qWait: q.state.conds[3].val,
-				}} }
+				fields={[ this.state.condTitl, this.state.condTags, this.state.condIssr, this.state.condWait ]}
+				// query={ (q) => { return {
+				// 	qTitl: q.state.conds[0].val,
+				// 	qTags: q.state.conds[1].val,
+				// 	qIssr: q.state.conds[2].val && q.state.conds[2].val.v,
+				// 	qWait: q.state.conds[3].val,
+				// }} }
 			/>}
 
 			<Typography color='secondary' className={classes.smalltip}>
@@ -130,12 +136,12 @@ class MyPollsComp extends CrudCompW {
 			</Typography>
 			<Button variant="outlined" color='secondary'
 				onClick={this.takePoll}
-				disabled={this.state.selected.Ids.size <= 0 ||
-						!this.state.waitingPollIds.has([...this.state.selected.Ids][0] ) }
+				disabled={this.state.selected.ids.size <= 0 ||
+						!this.state.waitingPollIds.has([...this.state.selected.ids][0] ) }
 			> {L('Take Poll')}
 			</Button>
-			<AnTablist pk='pid' checkbox singleCheck
-				selectedIds={this.state.selected}
+			<AnTablist selected={this.state.selected}
+				pk='pid' checkbox singleCheck
 				className={classes.root}
 				columns={[
 					{ text: L('chk'), hide: true, field: "checked" },

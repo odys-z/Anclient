@@ -1,5 +1,6 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
+import { Theme } from '@material-ui/core/styles';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -10,20 +11,29 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { Tierec } from '@anclient/semantier-st';
-import { toBool } from '../../utils/helpers';
+import { AnlistColAttrs, isEmpty, Tierec, toBool } from '@anclient/semantier';
 import { Comprops, DetailFormW } from '../crud';
+import { CompOpts } from '../anreact';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 	}
 } );
 
 interface AnTablistProps extends Comprops {
 	pk: string;
-	selected: {ids: Set<string>};
-	rows: Tierec[];
+	/**
+	 * Selected row ids - not used if no need to update data?
+	 */
+	selected?: {ids: Set<string>};
+
+	columns: Array<AnlistColAttrs<JSX.Element, CompOpts> & Comprops>;
+
+	/**In tier mode, data is supposed to be bound by widget itself. */
+	rows?: Tierec[];
+
 	onSelectChange: (ids: Array<string>) => void;
+	onPageChange?: (page: number) => void;
 }
 
 /**Table / list for records.
@@ -45,6 +55,8 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		super(props)
 
 		let {sizeOptions, selected} = props;
+		if (!selected || !selected.ids)
+			throw Error('Type safe checking: @anclient/react now using ref ids: Set<string> to save selected row ids. (props selectedIds renamed as selected)')
 		this.state.selected = selected.ids;
 		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selected.ids must be a set");
@@ -67,6 +79,8 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 
 		this.th = this.th.bind(this);
 		this.tr = this.tr.bind(this);
+		if (isEmpty(props.pk)) // for jsx checking
+			console.error("WARN: AnTablist uses rows[props.pk] for React.js children keys. Null pk will report error.");
 	}
 
 	componentDidMount() {
@@ -94,16 +108,16 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	};
 
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
-		let ids = this.props.selectedIds.Ids || this.props.selectedIds.ids;
+		let ids = this.props.selected.ids; // || this.props.selectedIds.ids;
 		if (e.target.checked) {
-			this.props.rows.forEach((r) => ids.add(r[this.props.pk]));
+			this.props.rows.forEach((r) => ids.add(r[this.props.pk] as string));
 			this.updateSelectd(ids);
 		}
 		else {
 			ids.clear();
-			this.setState({});
 			this.updateSelectd(ids);
 		}
+		this.setState({});
 	};
 
 	updateSelectd (set: Set<string>) {
@@ -129,12 +143,14 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	 * @param {array} [columns] table columns
 	 * @returns [<TableCell>,...]
 	 */
-	th(columns = []) {
-		return columns.filter( (v, x) => toBool(v.hide) ? false
-							: !(this.props.checkbox && x === 0)) // first columen as checkbox
+	th(columns: Array<AnlistColAttrs<JSX.Element, CompOpts>> = []) {
+		return columns
+			.filter( (v, x) => // !toBool(v.visible, true) ? 
+							toBool(v.hide) || !toBool(v.visible, true) ?
+							false : !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
-					{colObj.label || colObj.text || colObj.field}
+					{colObj.label || colObj.field}
 				</TableCell>);
 	}
 
@@ -164,7 +180,8 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 							/>
 						</TableCell>)
 					}
-					{columns.filter( (v, x) => !toBool(v.hide)
+					{columns.filter( (v, x) => //!toBool(v.hide)
+									!toBool(v.hide) && toBool(v.visible, true)
 									&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
 							.map( (colObj, x) => {
 								if (colObj.field === undefined)

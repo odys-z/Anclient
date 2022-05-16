@@ -23,10 +23,10 @@ namespace io.odysz.semantic.jserv.U
 		/// <see cref="#formatReq(String,JMessage,String)"/>.
 		/// This constructor is declared publicly for JHelper.
 		/// </summary>
-		/// <param name="parent"/>
-		/// <param name="conn"/>
-		public AnInsertReq(AnsonMsg parent, string conn)
-			: base(parent, conn)
+		/// <param name="(parent"/>
+		/// <param name="uri"/>
+		public AnInsertReq(string uri, AnsonMsg parent)
+			: base(uri, parent)
 		{
 			a = JProtocol.CRUD.C;
 		}
@@ -39,18 +39,17 @@ namespace io.odysz.semantic.jserv.U
 		}
 
 		/// <summary>Format an insert request.</summary>
-		/// <param name="conn"/>
 		/// <param name="parent"/>
 		/// <param name="tabl"/>
-		/// <param name="cmd">
+		/// <param name="uri"/>
 		/// 
 		/// <see cref="JProtocol.CRUD"/>
 		/// .C R U D
 		/// </param>
 		/// <returns>a new update request</returns>
-		public static AnInsertReq formatInsertReq(string conn, AnsonMsg parent, string tabl)
+		public static AnInsertReq formatInsertReq(AnsonMsg parent, string tabl, string uri)
 		{
-			AnInsertReq bdItem = (AnInsertReq) new AnInsertReq(parent, conn).A(JProtocol.CRUD.C);
+			AnInsertReq bdItem = (AnInsertReq) new AnInsertReq(uri, parent).A(JProtocol.CRUD.C);
 			bdItem.mtabl = tabl;
 			return bdItem;
 		}

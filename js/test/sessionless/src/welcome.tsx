@@ -1,11 +1,10 @@
-import React, { MouseEventHandler } from 'react';
-import { withStyles } from '@material-ui/styles';
-import { Box, Card, IconButton, Link, Paper, Typography, withWidth } from '@material-ui/core';
+import React from 'react';
+import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
-import { Semantier, Tierec } from '@anclient/semantier-st';
+import { OnLoadOk, QueryConditions, Semantier, Tierec } from '@anclient/semantier';
 import { Comprops, CrudComp, jsample } from '@anclient/anreact';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 	},
 	button: {
@@ -35,7 +34,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 	classes: any;
 	uri: any;
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 
 		this.classes = props.classes;
@@ -53,7 +52,6 @@ class WelcomeComp extends CrudComp<Comprops>{
 	}
 
 	icon(e: WelcomeRec) {
-		// return jsample.JsampleIcons[e.css?.icon || 'Star'] || jsample.JsampleIcons['Star']
 		let color = e.css?.important ? 'secondary' : 'primary';
 
 		return e.css?.type === 'auto'
@@ -99,8 +97,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 	}
 }
 
-// FIXME ignoring eslint report report error before anreact upgraded to TS.
-export default withWidth()(withStyles(styles)(WelcomeComp));
+export default withStyles<any, any, Comprops>(styles)(withWidth()(WelcomeComp));
 
 interface WelcomeRec extends Tierec {
 	eid: string,
@@ -123,9 +120,10 @@ class WelcomeTier extends Semantier {
 	/**
 	 * @override(Semantier)
 	 */
-	records<WelcomeRec>() {
+	records<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
 		this.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
-		return this.rows as unknown as Array<WelcomeRec>; // FIXME shouldn't use "as unknown"
+		onLoad([], this.rows as unknown as Array<T>);
+		return this.rows as unknown as Array<T>; // FIXME shouldn't use "as unknown"
 	}
 
 	myNotifies() {

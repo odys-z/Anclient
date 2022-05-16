@@ -10,9 +10,8 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, TierComboField, Tierec } from '@anclient/semantier-st';
+import { AnlistColAttrs, Semantier, TierComboField, Tierec, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
-import { toBool } from '../../utils/helpers';
 import { Comprops, CrudCompW } from '../crud';
 import { DatasetCombo } from './dataset-combo';
 import { ClassNames, CompOpts, invalidStyles, Media, toReactStyles } from '../anreact';
@@ -43,7 +42,8 @@ const styles = (theme: Theme) => (Object.assign(
 
 export interface RecordFormProps extends Comprops {
 	/**Default: true */
-    enableValidate?: boolean;
+	enableValidate?: boolean,
+	tier: Semantier
 };
 
 /**
@@ -68,7 +68,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		dirty: false,
 		pk: undefined,
 	};
-    tier: any;
+    tier: Semantier;
 
 	constructor (props: RecordFormProps) {
 		super(props);
@@ -79,16 +79,15 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
+		if (this.tier.pkval.v) {
 			// in case rec is already loaded by parent component
 			if (this.tier.rec && Object.keys(this.tier.rec).length > 0)
 				console.warn("TRecordFormComp is supposed to load form data with pkval by itself.");
 
 			let that = this;
 			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
-			this.tier.record(cond, (cols, rows, fkOpts) => {
-				// that.rec = rows && rows[0] ? rows[0] : {};
+			cond[this.tier.pkval.pk] = this.tier.pkval.v;
+			this.tier.record(cond, (_cols, _rows) => {
 				that.setState({});
 			} );
 		}
@@ -135,7 +134,6 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			return (
 			<TextField key={f.field} type={f.type || type}
 				disabled={!!f.disabled}
-				// autoComplete={f.autocomplete}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
@@ -156,7 +154,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		const isSm = this.props.dense || toBool(media.isMd);
 
 		this.props.fields.forEach( (f, i) => {
-		  if (!f.hide) {
+		  if (!f.hide && toBool(f.visible, true)) {
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
 					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
@@ -177,7 +175,9 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		const { classes, width } = this.props;
 		let media = CrudCompW.getMedia(width);
 
-		let rec = this.tier.rec;
+		let rec = this.tier?.rec;
+
+		if (!rec) console.warn("TRecordForm used without records, for empty UI?");
 
 		return rec ?
 			<Grid container className={classes.root} direction='row'>

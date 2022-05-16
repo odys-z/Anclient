@@ -1,9 +1,9 @@
 import React from 'react';
-import { StandardProps } from '@material-ui/core';
 import ReactDOM from 'react-dom';
-import { SessionClient } from '@anclient/semantier-st';
+import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier';
 import { AnContext, AnError, AnReact, L, Login } from '@anclient/anreact';
 import { Comprops } from '../../anreact/src/react/crud';
+import { AnreactAppOptions, JsonServs } from '../../anreact/src/an-components';
 
 const styles = (theme) => ({
 	root: {
@@ -12,7 +12,7 @@ const styles = (theme) => ({
 });
 
 interface LoginProps extends Comprops {
-	servs: {[h: string]: string};
+	servs: JsonServs;
 	servId: string;
 };
 
@@ -46,9 +46,9 @@ class LoginApp extends React.Component<LoginProps> {
 		this.onLogin = this.onLogin.bind(this);
 	}
 
-	onError(c, r) {
+	onError(c : string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
-		this.setState({hasError: !!c, err: r.msg()});
+		this.setState({hasError: !!c, err: r.Body().msg()});
 	}
 
 	onErrorClose() {
@@ -95,15 +95,14 @@ class LoginApp extends React.Component<LoginProps> {
 	 *
 	 * For test, have elem = undefined
 	 * @param {string} elem html element id, null for test
-	 * @param {object} [opts={}] serv id
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.home='main.html'] system main page
-	 * @param {Window} [opts.parent=undefined] parent window if for redirecting target
+	 * optional opts.serv='host': serv id
+	 * optional opts.home='main.html': system main page
+	 * optional opts.parent=undefined: parent window if for redirecting target
 	 */
-	static bindHtml(elem, opts = {}) {
+	static bindHtml(elem: string, opts: AnreactAppOptions = {serv: 'localhost'}) {
 		AnReact.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, opts, json) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
 				<LoginApp servs={json} servId={opts.serv} iparent={opts.parent} ihome={opts.home} />, dom);

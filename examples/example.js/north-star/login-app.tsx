@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { SessionClient } from '@anclient/semantier-st'
+import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier'
 import { L, Langstrs, AnContext, AnError, AnReact, Login, jsample } from '@anclient/anreact';
 import { Northprops } from './common/north';
 
@@ -38,9 +38,9 @@ class LoginApp extends React.Component<Northprops> {
 		this.onLogin = this.onLogin.bind(this);
 	}
 
-	onError(c, r) {
+	onError(c : string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
-		this.setState({hasError: !!c, err: r.msg()});
+		this.setState({hasError: !!c, err: r.Body().msg()});
 	}
 
 	onErrorClose() {

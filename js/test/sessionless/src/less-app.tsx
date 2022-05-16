@@ -2,20 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg } from '@anclient/semantier-st';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
-import { Langstrs,
+import { L, Langstrs,
 	AnContext, AnError, AnReactExt,
 	jsample,
-	L
+	JsonServs
 } from '@anclient/anreact';
 
 import Welcome from './welcome';
 
 const { Userst, JsampleTheme } = jsample;
 
-type Props = {
-	servs: any;
+type LessProps = {
+	servs: JsonServs;
 	servId: string;
 	iportal?: string;
 	iparent?: any; // parent of iframe
@@ -23,7 +23,7 @@ type Props = {
 }
 
 type State = {
-	servs?: any;
+	servs?: JsonServs;
 	servId: string;
 	iportal?: string;
 	hasError?: boolean;
@@ -31,15 +31,17 @@ type State = {
 }
 
 /** The application main, context singleton and error handler */
-class App extends React.Component<Props, State> {
+class App extends React.Component<LessProps, State> {
+	/** {@link InsercureClient} */
+	inclient: Inseclient;
+	anReact: AnReactExt;  // helper for React
+
+	error: ErrorCtx;
+
 	state = {
-		/** {@link InsercureClient} */
-		inclient: undefined,
-		anReact: undefined,  // helper for React
 		hasError: false,
 		iportal: 'portal.html',
 		nextAction: undefined, // e.g. re-login
-		error: undefined,
 
 		/** json object specifying host's urls */
 		servs: undefined,
@@ -49,7 +51,7 @@ class App extends React.Component<Props, State> {
 
 	/**Restore session from window.localStorage
 	 */
-	constructor(props: Props | Readonly<Props>) {
+	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
 
 		this.state.iportal = this.props.iportal;
@@ -61,9 +63,9 @@ class App extends React.Component<Props, State> {
 		this.state.servs = this.props.servs;
 		// this.state.jserv = this.props.servs[this.state.servId];
 
-		this.state.inclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
+		this.inclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
 
-		this.state.error = {onError: this.onError, msg: ''};
+		this.error = {onError: this.onError, msg: ''};
 
 		this.state = Object.assign(this.state, {
 			nextAction: 're-login',
@@ -71,7 +73,10 @@ class App extends React.Component<Props, State> {
 			msg: undefined
 		});
 
-		this.state.anReact = new AnReactExt(this.state.inclient, this.state.error)
+		Protocol.sk.cbbOrg = 'org.all';
+		Protocol.sk.cbbRole = 'roles';
+
+		this.anReact = new AnReactExt(this.inclient, this.error)
 								.extendPorts({
 									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
 								});
@@ -79,7 +84,7 @@ class App extends React.Component<Props, State> {
 
 	onError(c: any, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r);
-		this.state.error.msg = r.Body().msg();
+		this.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
 			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
@@ -97,15 +102,15 @@ class App extends React.Component<Props, State> {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
-				anReact: this.state.anReact,
+				anReact: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				anClient: this.state.inclient,
+				anClient: this.inclient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
-				error: this.state.error,
+				error: this.error,
 				ssInf: undefined,
 			}} >
 				{<Userst port='userstier' uri={'/less/users'}/>}
@@ -114,7 +119,7 @@ class App extends React.Component<Props, State> {
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={"/login"} tier={undefined}
-							title={L('Error')} msg={this.state.error.msg} />}
+							title={L('Error')} msg={this.error.msg} />}
 				<hr/>
 				アプリ コンポーネントの内容は, 上記のすべて...<br/> {Date().toString()}
 			</AnContext.Provider>
@@ -135,7 +140,7 @@ class App extends React.Component<Props, State> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: { serv: string; }, json: any) {
+		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

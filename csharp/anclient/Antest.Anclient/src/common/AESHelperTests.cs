@@ -24,8 +24,14 @@ namespace io.odysz.common.tests
                 Debug.WriteLine(string.Format("Cypher:\n{0}", cypherss[0]));
                 Debug.WriteLine(string.Format("Key:\n{0},\nIV:\n{1}", k2, cypherss[1]));
                 Debug.WriteLine(string.Format("Expacting:\n{0}", plain));
+
+                plain = "Слава Україні";
+                cypher = AESHelper.Encrypt(plain, k1, iv64);
+                cypherss = AESHelper.Dencrypt(cypher, k1, iv, k2);
+                Assert.AreEqual(plain, AESHelper.Decrypt(cypherss[0], k2, AESHelper.Decode64(cypherss[1])));
             }
             catch (Exception e) {
+                Debug.WriteLine(e.ToString());
                 Assert.Fail(e.Message);
             }
         }

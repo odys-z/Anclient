@@ -13,17 +13,17 @@ namespace io.odysz.semantic.jsession
 	/// <author>odys-z@github.com</author>
 	public class AnSessionReq : AnsonBody
 	{
-		string type;
+		// string type;
 		public AnSessionReq() : base(null, null)
 		{
-			type = "io.odysz.semantic.jsession.AnSessionReq";
+			// type = "io.odysz.semantic.jsession.AnSessionReq";
 		}
 
 		/// <summary>Session connection is ignored and controlled by server.</summary>
 		/// <param name="parent"/>
-		public AnSessionReq(AnsonMsg parent) : base(parent, null)
+		public AnSessionReq(AnsonMsg parent) : base(null, parent)
 		{
-			type = "io.odysz.semantic.jsession.AnSessionReq";
+			// type = "io.odysz.semantic.jsession.AnSessionReq";
 		}
 
 		internal string uid;
@@ -35,7 +35,7 @@ namespace io.odysz.semantic.jsession
 
 		public string iv { get; protected set; }
 
-		// internal virtual string iv() { return iv; }
+		public string deviceId { get; set; }
 
 		internal Dictionary<string, object> mds;
 
@@ -58,12 +58,18 @@ namespace io.odysz.semantic.jsession
 			return this;
 		}
 
-		/// <summary>Format login request message.</summary>
-		/// <param name="uid"/>
-		/// <param name="tk64"/>
-		/// <param name="iv64"/>
+		/// <summary>Format login request message.
+		/// The equivolance of ts is @anclient/semantier-st/Protocol.formatSessionLogin():
+		/// </summary>
+		/// <example>
+		///    static formatSessionLogin(uid: string, tk64: string, iv64: string): AnsonMsg<AnSessionReq>
+		/// </example>
+		/// <param name="uid"></param>
+		/// <param name="tk64"></param>
+		/// <param name="iv64"></param>
+		/// <param name="device"></param>
 		/// <returns>login request message</returns>
-		public static AnsonMsg formatLogin(string uid, string tk64, string iv64)
+		public static AnsonMsg formatLogin(string uid, string tk64, string iv64, string device = null)
 		{
 			// AnSessionReq : AnsonBody
 			AnsonMsg jmsg = new AnsonMsg(new Port(Port.session), null);
@@ -71,7 +77,9 @@ namespace io.odysz.semantic.jsession
 			itm.setup(uid, tk64, iv64);
 			itm.A("login");
 
-			jmsg.Body((AnsonBody)itm);
+			itm.deviceId = device;
+
+			jmsg.Body((AnsonBody)itm, null);
 			return jmsg;
 		}
 

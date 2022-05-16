@@ -8,13 +8,11 @@ import Button from "@material-ui/core/Button";
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { AnClient, SessionClient, Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
-import { L, Langstrs,
-    AnContext, AnError, CrudCompW, AnReactExt,
-    AnTablist
+import dateFormat from "dateformat";
+import { CRUD, AnsonResp } from '@anclient/semantier';
+import { L, AnContext, CrudCompW, AnTablist
 } from '@anclient/anreact';
 
 const styles = (theme) => ( {
@@ -26,8 +24,7 @@ class QuizUserFormComp extends CrudCompW {
 	state = {
 		title: '',
 		rows: [],
-		// selected: {Ids: new Set()},
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 	};
 
 	constructor(props) {
@@ -40,8 +37,8 @@ class QuizUserFormComp extends CrudCompW {
 	toSave(e) {
 		if (e) e.stopPropagation();
 
-		if (this.props.onClose)
-			this.props.onSave([...this.state.selected.Ids]);
+		if (this.props.onSave)
+			this.props.onSave([...this.state.selected.ids]);
 	}
 
 	toClose(e) {
@@ -51,8 +48,6 @@ class QuizUserFormComp extends CrudCompW {
 	}
 
 	onTableSelect(selectedIds) {
-		// this.setState({selectedIds});
-		// console.log(selectedIds);
 	}
 
 	componentDidMount() {
@@ -67,7 +62,7 @@ class QuizUserFormComp extends CrudCompW {
 				let {cols, rows} = AnsonResp.rs2arr(users);
 				if (rows)
 					rows.forEach( (r, x) => {
-						r.myMsg = 'TODO ...';
+						r.myMsg = `${dateFormat()} @ ${r.userName}`;
 					});
 				console.log(cols, rows);
 				that.setState({
@@ -88,14 +83,13 @@ class QuizUserFormComp extends CrudCompW {
 				<DialogTitle id="t-quizusers">{this.state.title}</DialogTitle>
 
 				<DialogContent>
-					<AnTablist
+					<AnTablist selected={this.state.selected}
 						className={classes.root} checkbox={true} paging={false}
-						selectedIds={this.state.selected}
 						columns={[
-							{ text: L(''), field:"checked" },  // first field as checkbox
-							{ text: L('userId'), hide: true, field: "userId" },
-							{ text: L('User Name'), color: 'primary', field: "userName", className: 'bold'},
-							{ text: L('My Message'), color: 'primary', field: "myMsg", editabl: true},
+							{ label: L(''), field:"checked" },  // first field as checkbox
+							{ label: L('userId'), visible: false, field: "userId" },
+							{ label: L('User Name'), color: 'primary', field: "userName", className: 'bold'},
+							{ label: L('Message'), color: 'primary', field: "myMsg", editabl: true},
 						]}
 						rows={this.state.rows} pk='userId'
 						onSelectChange={this.onTableSelect}

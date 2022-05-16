@@ -1,8 +1,9 @@
 import React from "react";
 import { AnContext, AnContextType, ClassNames, CrudCompW, invalidStyles, SysComp } from "@anclient/anreact";
-import { Semantier, Tierec } from "@anclient/semantier-st";
-import { Card, Grid, Link, Paper, SvgIcon, Theme, Typography, withStyles, withWidth } from "@material-ui/core";
+import { Semantier, Tierec, UIComponent } from "@anclient/semantier";
+import { Card, Grid, Link, Paper, SvgIcon, Typography, withStyles, withWidth } from "@material-ui/core";
 import { WelcomeProp } from "../../common/north";
+import { StarTheme } from "../../common/star-theme";
 
 class WelcomeComp extends CrudCompW<WelcomeProp> {
     uri = '/n/home';
@@ -81,7 +82,7 @@ interface CardCss {
  * @param theme
  * @returns
  */
-const styles = (theme: Theme) => (Object.assign(
+const styles = (theme: StarTheme) => (Object.assign(
 	invalidStyles,
     { board: {
 		backgroundColor: '#f7f9f1',
@@ -134,7 +135,7 @@ interface NoteRec extends Tierec {
 }
 
 class WelcomeTier extends Semantier {
-    constructor(comp: React.Component) {
+    constructor(comp: UIComponent) {
         super(comp);
     }
 

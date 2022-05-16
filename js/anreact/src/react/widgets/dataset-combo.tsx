@@ -8,7 +8,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value
 } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 
-import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField } from '@anclient/semantier-st';
+import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField } from '@anclient/semantier';
 import { AnConst } from '../../utils/consts';
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud';
@@ -17,18 +17,14 @@ import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
 export interface ComboItem extends NV {};
 
 /**E.g. form's combobox field declaration */
-// export interface TierComboField extends AnlistColAttrs<JSX.Element, CompOpts> {
-// 	type: string;
-//     className: undefined | "root" | InvalidClassNames | AutocompleteClassKey;
-// 	nv: {n: string; v: string};
-// 	sk: string;
-//     options?: Array<ComboItem>;
-// }
 type ComboFieldType = TierComboField<JSX.Element, CompOpts>;
 
 export interface ComboProps extends Comprops {
 	/**Intial options (default values), will be replaced after data binding with field's options */
 	options?: Array<ComboItem>;
+	label?: string;
+	// style: CSSStyleDeclaration;
+	onSelect?: (it: NV) => void
 }
 
 const styles = (theme: Theme) => (Object.assign(
@@ -106,7 +102,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		let _that = this;
 		// let _cmb = this.state.combo;
 		// _cmb.ref = _ref;
-		return (e, item) => {
+		return (e, item: NV) => {
 			if (e) e.stopPropagation();
 			let selectedItem = item ? item : AnConst.cbbAllItem;
 
@@ -136,9 +132,10 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			this.state.selectedItem = selectedItem;
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
-		// avoid set defaultValue before loaded
+		let opts = this.combo && this.combo.options || this.props.options; 
 		return (
-		  this.props.sk && !this.props.options ? <></> :
+		  // avoid set defaultValue before loaded
+		  opts ?
 		  <Autocomplete<ComboItem>
 			ref={this.refcbb}
 			disabled={this.props.disabled || this.props.readonly || this.props.readOnly}
@@ -147,17 +144,16 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			onChange={ this.onCbbRefChange(this.refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
-			options={this.combo.options}
+			options={opts}
 			style={this.props.style}
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
-			// filter={Autocomplete.caseInsensitiveFilter}
 			renderInput={
 				(params) => <TextField {...params}
 					label={this.props.showLable && v ? v.n : ''}
 					variant="outlined" /> }
-		/>);
+		  /> : <></>);
 
 		function findOption (opts, v) {
 			if (opts && v !== undefined) {

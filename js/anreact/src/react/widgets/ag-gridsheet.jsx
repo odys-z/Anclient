@@ -1,22 +1,16 @@
 import React from 'react';
 import PropTypes from "prop-types";
 
-import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
-
 import { AgGridReact } from 'ag-grid-react';
-import { Overlay } from '../../patch/react-portal-overlay';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-// import { L, isEmpty, Protocol, AnContext, DatasetCombo, ConfirmDialog } from 'anclient';
-// import { JQuiz } from '../../common/an-quiz.js';
-import { L } from '../../utils/langstr';
-
 /**Thin wrapper of ag-grid.
+ * 
  * For ag-grid practice, go
  * https://stackblitz.com/edit/ag-grid-react-hello-world-8lxdjj?file=index.js
+ * 
  * For public results, go
  * https://ag-grid-react-hello-world-8lxdjj.stackblitz.io
  *
@@ -41,13 +35,6 @@ export class AnGridsheet extends React.Component {
 
 	constructor(props) {
 		super(props);
-
-		// props.stateHook.collect = function (me) {
-		// 	let that = me;
-		// 	return function(hookObj) {
-		// 		hookObj.rows = that.state.rows;
-		// 		hookObj.cols = that.coldefs;
-		// 	}; }(this);
 
 		let {resizable, editable, singleClickEdit} = props.defaultColDef || {};
 		this.defaultColDef = Object.assign(
@@ -87,7 +74,6 @@ export class AnGridsheet extends React.Component {
 					) )
 			} );
 		}
-
 	}
 
 	/** load default context menu, together with user's menu items.
@@ -136,7 +122,23 @@ export class AnGridsheet extends React.Component {
 		params.api.sizeColumnsToFit();
 	};
 
+	/**
+	api: GridApi,
+	colDef: {headerName: 'DATE', field: 'gday', editable: ƒ, …},
+	column: Column,
+	columnApi: ColumnApi
+	context: undefined
+	data: {gday: '2021-09-14', alice: '2', ashley: '', caesar: null, george: '4', …}
+	event: PointerEvent {isTrusted: true, pointerId: 1, width: 1, height: 1, pressure: 0, …}
+	node: RowNode {rowIndex: 2, key: null, childrenMapped: {…}, displayed: true, rowTop: 84, …}
+	rowIndex: 2
+	rowPinned: undefined
+	type: "cellClicked"
+	value: "2021-09-14"
+	*/
 	onCellClicked = (p) => {
+		if (typeof this.props.onCellClicked === 'function')
+			this.props.onCellClicked(p);
 	};
 
 	/** Grid event API:
@@ -155,6 +157,7 @@ export class AnGridsheet extends React.Component {
 	render () {
 	  return (
 		<AgGridReact
+			editable={this.isEditable}
 			onCellClicked={this.onCellClicked}
 			columnDefs={this.coldefs}
 			components={this.props.components}
@@ -172,7 +175,8 @@ AnGridsheet.propTypes = {
 	columns: PropTypes.array.isRequired,
 	rows: PropTypes.array.isRequired,
 	// stateHook: PropTypes.object.isRequired,
-	contextMenu: PropTypes.object
+	contextMenu: PropTypes.object,
+	onCellClicked: PropTypes.func,
 };
 
 export function anMultiRowRenderer (param) {

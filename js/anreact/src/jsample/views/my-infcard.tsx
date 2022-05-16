@@ -3,7 +3,10 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 
-import { Protocol, CRUD, InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, OnCommitOk, OnLoadOk, QueryConditions } from '@anclient/semantier-st';
+import { Protocol, CRUD,
+	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs,
+	OnCommitOk, OnLoadOk, QueryConditions, SessionInf
+} from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 import { AnContext, AnContextType } from '../../react/reactext';
@@ -17,18 +20,37 @@ const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
 });
 
+interface MyInfRec extends Tierec {
+	userId: string,
+	roleId?: string,
+	userName: string,
+	img?: string,
+	/**mime readed from server. */
+	mime?: string,
+	/**filename readed from server. */
+	attName?: string,
+	attId?: string,
+
+	/**The local file description - note that mime & attName are readed from server. */
+	fileMeta?: {name: string, mime: string}
+}
+
+interface MyInfProps extends Comprops {
+	ssInf: SessionInf;
+};
+
 /** Simple session info card. Jsample use this to show user's personal info.
  * As UserDetails handling data binding by itself, and quit with data persisted
  * at jserv, this component is used to try the other way - no data persisting,
  * but with data automated data loading and state hook.
  */
-class MyInfCardComp extends DetailFormW<Comprops> {
+class MyInfCardComp extends DetailFormW<MyInfProps> {
 
 	state = { }
 	tier: MyInfTier;
 	confirm: JSX.Element;
 
-	constructor (props) {
+	constructor (props: MyInfProps) {
 		super(props);
 
 		this.uri = this.props.uri;
@@ -46,9 +68,9 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 
 		if (!this.tier) this.getTier()
 
-		this.tier.pkval = this.props.ssInf.uid;
+		this.tier.pkval.v = this.props.ssInf.uid;
 		let {uid, roleId} = this.props.ssInf;
-		this.tier.rec = {uid, roleId}
+		this.tier.rec = {userId: uid, roleId, userName: undefined};
 
 		this.setState({});
 	}
@@ -58,7 +80,10 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('OK')} cancel={false} open
-				onClose={() => {that.confirm = undefined;} }
+				onClose={() => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
 				msg={msg} />);
 		this.setState({});
 	}
@@ -72,7 +97,7 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.tier.crud,
-				  pkval: this.tier.pkval,
+				  pkval: this.tier.pkval.v,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
@@ -111,20 +136,20 @@ class MyInfCardComp extends DetailFormW<Comprops> {
 MyInfCardComp.contextType = AnContext;
 
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
-export { MyInfCard, MyInfCardComp };
 
 export class MyInfTier extends Semantier {
-	rec = {} as Tierec;
+	//#region : db meta
+	readonly imgProp = 'img';
+	//#endregion
 
-	// uri = undefined;
-	imgProp = 'img';
+	rec = {} as MyInfRec; // Tierec & {mime: string, attName: string, attId: string};
 
 	constructor(comp) {
 		super(comp);
 		// FIXME move to super class?
 		// this.uri = comp.uri;
 		this.mtabl = 'a_users';
-		this.pk = 'userId';
+		this.pkval.pk = 'userId';
 
 		this.loadAvatar = this.loadAvatar.bind(this);
 	}
@@ -135,17 +160,18 @@ export class MyInfTier extends Semantier {
 		{ field: 'roleId',   label: L('Role'), disabled: true,
 		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
 		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
-		{ field: this.imgProp,label: L('Avatar'), grid: {md: 6}, fieldFormatter: this.loadAvatar }
+		{ field: this.imgProp, label: L('Avatar'), grid: {sm: 6, lg: 4}, fieldFormatter: this.loadAvatar.bind(this) }
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	/**
 	 * Format an image upload component.
-	 * @param {object} record for the form
-	 * @param {object} field difinetion, e.g. field of tier._fileds
-	 * @param {Semantier} tier not necessarily this class's object - this method will be moved
+	 * @param record for the form
+	 * @param field difinetion, e.g. field of tier._fileds
+	 * @param opts classes and media for future
 	 * @return {React.component} ImageUpload
 	 */
-	loadAvatar(rec, field, tier) {
+	loadAvatar(rec: MyInfRec, field: {field: string}, opts: CompOpts) {
+		let tier = this as MyInfTier;
 		return (
 			<ImageUpload
 				blankIcon={{color: "primary", width: 32, height: 32}}
@@ -154,7 +180,7 @@ export class MyInfTier extends Semantier {
 			/>);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk) {
+	record(conds: QueryConditions, onLoad: OnLoadOk<MyInfRec>) {
 		let { userId } = conds;
 
 		let client = this.client;
@@ -178,10 +204,11 @@ export class MyInfTier extends Semantier {
 			(resp) => {
 				// NOTE because of using general query, extra hanling is needed
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				that.rec = rows && rows[0];
-				that.pkval = that.rec && that.rec[that.pk];
-				that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
-				onLoad(cols, rows);
+				that.rec = rows && rows[0] as MyInfRec;
+				that.pkval.v = that.rec && that.rec[that.pkval.pk];
+				if (that.rec[that.imgProp])
+					that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
+				onLoad(cols, rows as Array<MyInfRec>);
 			},
 			this.errCtx);
 	}
@@ -199,28 +226,28 @@ export class MyInfTier extends Semantier {
 		let req = this.client
 					.usrAct(this.uri, CRUD.u, "save", "save my info")
 					.update(this.uri, this.mtabl,
-							{pk: this.pk, v: this.pkval},
+							{pk: this.pkval.pk, v: opts.pkval},
 							{roleId, userName});
 		// about attached image:
 		// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)
 		if ( rec.attId )
-			// NOTE this is a design erro
-			// have to: 1. delete a_users/userId's attached file - in case previous deletion failed
+			// NOTE this is a design error
+			// have to: 1. delete a_users/userId's attached file, all of his / her - in case previous deletion failed
 			//          2. delete saved attId file (trigged by semantic handler)
-			req.Body().post(
-					new DeleteReq(this.uri, "a_attaches", rec.attId as string))
-				.post(
-					new DeleteReq(this.uri, "a_attaches", undefined)
-						.whereEq('busiId', rec[this.pk] as string || '')
-					 	.whereEq('busiTbl', this.mtabl));
+			req.Body()
+				.post( new DeleteReq(this.uri, "a_attaches", undefined)
+					.whereEq('busiId', rec[this.pkval.pk] as string || '')
+					.whereEq('busiTbl', this.mtabl) );
 		if ( rec[this.imgProp] ) {
-			let {name, mime} = rec.fileMeta as {name: string, mime: string};
+			if (!rec.fileMeta)
+				console.error("Uploading file without fileMeta information?");
+
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
-					.nv('busiTbl', 'a_users').nv('busiId', this.pkval)
-					.nv('attName', name)
-					.nv('mime', mime)
-					.nv('uri', dataOfurl(rec[this.imgProp])) );
+					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v)
+					// .nv('attName', rec.attName).nv('mime', rec.mime)
+					.nv('attName', rec.fileMeta?.name).nv('mime', rec.fileMeta?.mime)
+					.nv('uri', dataOfurl(rec[this.imgProp] as string)) );
 		}
 
 		client.commit(req,
@@ -229,9 +256,11 @@ export class MyInfTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval = bd.resulve(that.mtabl, that.pk, that.rec);
+					that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);
 	}
 }
+
+export { MyInfCard, MyInfCardComp, MyInfProps };

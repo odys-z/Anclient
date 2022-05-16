@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Image Upload Example (React.js) &mdash; Anclient Anclient documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Formatters (AnReact)" href="formatters.html" />
+    <link rel="prev" title="QueryForm" href="query-form.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Anclient
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../starter/index.html">Quick Start (js only)</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Guid (Tips)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../func-uri.html">Func URI &amp; Datasource Mapping</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Guid (Tips)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="query-form.html">QueryForm</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Image Upload Example (React.js)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-myinftier-loadavatar">The MyInfTier &amp; loadAvatar()</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#file-handling-semantics">File Handling Semantics</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="formatters.html">Formatters (AnReact)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../docker.html">Play with Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/index.html">For developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Anclient</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Guid (Tips)</a> &raquo;</li>
+        
+          <li><a href="index.html">Guid (Tips)</a> &raquo;</li>
+        
+      <li>Image Upload Example (React.js)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/guide/controls/img-upload.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="image-upload-example-react-js">
+<h1>Image Upload Example (React.js)<a class="headerlink" href="#image-upload-example-react-js" title="Permalink to this headline">¶</a></h1>
+<p>version: since &#64;anclient/anreact 0.9.65</p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/03-image-upload-form.png" src="../../_images/03-image-upload-form.png" />
+<p>source: <a class="reference external" href="https://github.com/odys-z/Anclient/blob/master/js/anreact/src/jsample/views/my-infcard.tsx">&#64;anclient/anreact/MyInfCardComp</a></p>
+<p>This component uses TRecordForm &amp; formatter callback to render a image upload control.
+TRecordForm is control automantically bind JSX element with data (fields property).</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>The Image uploading control is a JSX element for view and upload image file.</p>
+<p>The react renderer:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="p">{</span> <span class="nx">ImageUpload</span> <span class="p">}</span> <span class="k">from</span> <span class="s1">&#39;../../react/widgets/image-upload&#39;</span><span class="p">;</span>
+
+<span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;</span><span class="nx">ImageUpload</span>
+        <span class="nx">blankIcon</span><span class="o">=</span><span class="p">{{</span><span class="nx">color</span><span class="o">:</span> <span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="nx">width</span>: <span class="kt">32</span><span class="p">,</span> <span class="nx">height</span>: <span class="kt">32</span><span class="p">}}</span>
+        <span class="nx">tier</span><span class="o">=</span><span class="p">{</span><span class="nx">tier</span><span class="p">}</span> <span class="nx">field</span><span class="o">=</span><span class="p">{</span><span class="nx">field</span><span class="p">}</span>
+        <span class="nx">src64</span><span class="o">=</span><span class="p">{</span><span class="nx">rec</span> <span class="o">&amp;&amp;</span> <span class="nx">field</span> <span class="o">&amp;&amp;</span> <span class="nx">rec</span><span class="p">[</span><span class="nx">field</span><span class="p">.</span><span class="nx">field</span><span class="p">]}</span>
+    <span class="o">/&gt;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-myinftier-loadavatar">
+<h2>The MyInfTier &amp; loadAvatar()<a class="headerlink" href="#the-myinftier-loadavatar" title="Permalink to this headline">¶</a></h2>
+<p>The MyInfTier is the data layer for the page including a image control.</p>
+<p>loadAvatar() is the formatter of TRecordForm’s field, which providing the JSX
+element for showing image preview and handling the click event.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="nx">loadAvatar</span><span class="p">(</span><span class="nx">rec</span>: <span class="kt">MyInfRec</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="p">{</span><span class="nx">field</span>: <span class="kt">string</span><span class="p">},</span> <span class="nx">opts</span>: <span class="kt">CompOpts</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">tier</span> <span class="o">=</span> <span class="k">this</span> <span class="kr">as</span> <span class="nx">MyInfTier</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="o">&lt;</span><span class="nx">ImageUpload</span>
+            <span class="nx">blankIcon</span><span class="o">=</span><span class="p">{{</span><span class="nx">color</span><span class="o">:</span> <span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="nx">width</span>: <span class="kt">32</span><span class="p">,</span> <span class="nx">height</span>: <span class="kt">32</span><span class="p">}}</span>
+            <span class="nx">tier</span><span class="o">=</span><span class="p">{</span><span class="nx">tier</span><span class="p">}</span> <span class="nx">field</span><span class="o">=</span><span class="p">{</span><span class="nx">field</span><span class="p">}</span>
+            <span class="nx">src64</span><span class="o">=</span><span class="p">{</span><span class="nx">rec</span> <span class="o">&amp;&amp;</span> <span class="nx">field</span> <span class="o">&amp;&amp;</span> <span class="nx">rec</span><span class="p">[</span><span class="nx">field</span><span class="p">.</span><span class="nx">field</span><span class="p">]}</span>
+        <span class="o">/&gt;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>CSSProperties:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tier</span><span class="p">:</span> <span class="n">the</span> <span class="n">instance</span> <span class="n">of</span> <span class="n">MyInfTier</span><span class="p">,</span> <span class="n">of</span> <span class="n">which</span> <span class="n">the</span> <span class="n">user</span> <span class="n">choosed</span> <span class="n">file</span> <span class="ow">is</span> <span class="n">stored</span> <span class="k">as</span> <span class="n">tier</span><span class="o">.</span><span class="n">rec</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+
+<span class="n">src64</span><span class="p">:</span> <span class="n">base64</span> <span class="n">encoded</span> <span class="n">image</span> <span class="n">data</span>
+
+<span class="n">field</span><span class="p">:</span> <span class="n">field</span> <span class="n">name</span>
+</pre></div>
+</div>
+<p>loadAvatar() is configured as a fieldFormatter for the field of TRecordForm.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="nx">_fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">...</span> <span class="p">,</span>
+        <span class="p">{</span> <span class="nx">field</span>: <span class="kt">this.imgProp</span><span class="p">,</span> <span class="nx">label</span>: <span class="kt">L</span><span class="p">(</span><span class="s1">&#39;Avatar&#39;</span><span class="p">),</span> <span class="nx">grid</span><span class="o">:</span> <span class="p">{</span><span class="nx">sm</span>: <span class="kt">6</span><span class="p">,</span> <span class="nx">lg</span>: <span class="kt">4</span><span class="p">},</span>
+          <span class="nx">fieldFormatter</span>: <span class="kt">this.loadAvatar.bind</span><span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="p">}</span>
+<span class="p">]</span> <span class="kr">as</span> <span class="nx">AnlistColAttrs</span><span class="o">&lt;</span><span class="nx">JSX</span><span class="p">.</span><span class="nx">Element</span><span class="p">,</span> <span class="nx">CompOpts</span><span class="o">&gt;</span><span class="p">[];</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="file-handling-semantics">
+<h2>File Handling Semantics<a class="headerlink" href="#file-handling-semantics" title="Permalink to this headline">¶</a></h2>
+<p>The image is uploaded as a special field of request’s NV value. This code handling
+upload event.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="nx">saveRec</span><span class="p">(</span><span class="nx">opts</span><span class="o">:</span> <span class="p">{</span> <span class="nx">uri</span>: <span class="kt">string</span><span class="p">;</span> <span class="nx">crud</span>: <span class="kt">CRUD</span><span class="p">;</span> <span class="nx">pkval</span>: <span class="kt">string</span><span class="p">;</span> <span class="p">},</span> <span class="nx">onOk</span>: <span class="kt">OnCommitOk</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">that</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">crud</span> <span class="o">=</span> <span class="nx">CRUD</span><span class="p">.</span><span class="nx">u</span><span class="p">;</span>
+
+    <span class="kd">let</span> <span class="nx">rec</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rec</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="p">{</span><span class="nx">roleId</span><span class="p">,</span> <span class="nx">userName</span><span class="p">}</span> <span class="o">=</span> <span class="nx">rec</span><span class="p">;</span>
+
+    <span class="kd">let</span> <span class="nx">req</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">client</span>
+                <span class="p">.</span><span class="nx">usrAct</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">uri</span><span class="p">,</span> <span class="nx">CRUD</span><span class="p">.</span><span class="nx">u</span><span class="p">,</span> <span class="s2">&quot;save&quot;</span><span class="p">,</span> <span class="s2">&quot;save my info&quot;</span><span class="p">)</span>
+                <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">uri</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">mtabl</span><span class="p">,</span>
+                        <span class="p">{</span><span class="nx">pk</span>: <span class="kt">this.pkval.pk</span><span class="p">,</span> <span class="nx">v</span>: <span class="kt">opts.pkval</span><span class="p">},</span>
+                        <span class="p">{</span><span class="nx">roleId</span><span class="p">,</span> <span class="nx">userName</span><span class="p">});</span>
+    <span class="c1">// about attached image:</span>
+    <span class="c1">// delete old, insert new (image in rec[imgProp] is updated by TRecordForm/ImageUpload)</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="nx">rec</span><span class="p">.</span><span class="nx">attId</span> <span class="p">)</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">Body</span><span class="p">()</span>
+            <span class="p">.</span><span class="nx">post</span><span class="p">(</span> <span class="k">new</span> <span class="nx">DeleteReq</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">uri</span><span class="p">,</span> <span class="s2">&quot;a_attaches&quot;</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">)</span>
+                <span class="p">.</span><span class="nx">whereEq</span><span class="p">(</span><span class="s1">&#39;busiId&#39;</span><span class="p">,</span> <span class="nx">rec</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">pkval</span><span class="p">.</span><span class="nx">pk</span><span class="p">]</span> <span class="kr">as</span> <span class="kt">string</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="p">.</span><span class="nx">whereEq</span><span class="p">(</span><span class="s1">&#39;busiTbl&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">mtabl</span><span class="p">)</span> <span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="nx">rec</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">imgProp</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">req</span><span class="p">.</span><span class="nx">Body</span><span class="p">().</span><span class="nx">post</span><span class="p">(</span>
+            <span class="k">new</span> <span class="nx">InsertReq</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">uri</span><span class="p">,</span> <span class="s2">&quot;a_attaches&quot;</span><span class="p">)</span>
+                <span class="p">.</span><span class="nx">nv</span><span class="p">(</span><span class="s1">&#39;busiTbl&#39;</span><span class="p">,</span> <span class="s1">&#39;a_users&#39;</span><span class="p">).</span><span class="nx">nv</span><span class="p">(</span><span class="s1">&#39;busiId&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">pkval</span><span class="p">.</span><span class="nx">v</span><span class="p">)</span>
+                <span class="p">.</span><span class="nx">nv</span><span class="p">(</span><span class="s1">&#39;attName&#39;</span><span class="p">,</span> <span class="nx">rec</span><span class="p">.</span><span class="nx">attName</span><span class="p">)</span>
+                <span class="p">.</span><span class="nx">nv</span><span class="p">(</span><span class="s1">&#39;mime&#39;</span><span class="p">,</span> <span class="nx">rec</span><span class="p">.</span><span class="nx">mime</span><span class="p">)</span>
+                <span class="p">.</span><span class="nx">nv</span><span class="p">(</span><span class="s1">&#39;uri&#39;</span><span class="p">,</span> <span class="nx">dataOfurl</span><span class="p">(</span><span class="nx">rec</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">imgProp</span><span class="p">]</span> <span class="kr">as</span> <span class="kt">string</span><span class="p">))</span> <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nx">client</span><span class="p">.</span><span class="nx">commit</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span>
+        <span class="p">(</span><span class="nx">resp</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="kd">let</span> <span class="nx">bd</span> <span class="o">=</span> <span class="nx">resp</span><span class="p">.</span><span class="nx">Body</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">crud</span> <span class="o">===</span> <span class="nx">CRUD</span><span class="p">.</span><span class="nx">c</span><span class="p">)</span>
+                <span class="c1">// NOTE:</span>
+                <span class="c1">// resulving auto-k is a typicall semantic processing, don&#39;t expose this to caller</span>
+                <span class="nx">that</span><span class="p">.</span><span class="nx">pkval</span><span class="p">.</span><span class="nx">v</span> <span class="o">=</span> <span class="nx">bd</span><span class="p">.</span><span class="nx">resulve</span><span class="p">(</span><span class="nx">that</span><span class="p">.</span><span class="nx">mtabl</span><span class="p">,</span> <span class="nx">that</span><span class="p">.</span><span class="nx">pkval</span><span class="p">.</span><span class="nx">pk</span><span class="p">,</span> <span class="nx">that</span><span class="p">.</span><span class="nx">rec</span><span class="p">);</span>
+            <span class="nx">onOk</span><span class="p">(</span><span class="nx">resp</span><span class="p">);</span>
+        <span class="p">},</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">errCtx</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This method creates a post delete and insert request, uploading the file as a
+database field: a_attaches.uri, value = dataOfurl(rec[this.imgProp]).</p>
+<p>Function dataOfurl() convert file content into base 64 string for uploading.</p>
+<p>The image file is saved as a External File.</p>
+<p>Semantics configuration example:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="c">&lt;!-- external file (attachments to a_user): save as file --&gt;</span>
+<span class="nt">&lt;s&gt;</span>
+    <span class="nt">&lt;id&gt;</span>att.02<span class="nt">&lt;/id&gt;</span>
+    <span class="nt">&lt;smtc&gt;</span>ef<span class="nt">&lt;/smtc&gt;</span>
+    <span class="nt">&lt;tabl&gt;</span>a_attaches<span class="nt">&lt;/tabl&gt;</span>
+    <span class="nt">&lt;pk&gt;</span>attId<span class="nt">&lt;/pk&gt;</span>
+    <span class="nt">&lt;args&gt;</span>$VOLUME_HOME/uploads,uri,busiTbl,busiId,attName<span class="nt">&lt;/args&gt;</span>
+<span class="nt">&lt;/s&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="formatters.html" class="btn btn-neutral float-right" title="Formatters (AnReact)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="query-form.html" class="btn btn-neutral float-left" title="QueryForm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Odys Zhou.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -60,7 +60,7 @@ namespace io.odysz.semantic.jserv.R
 
 		internal List<string[]> havings;
 
-		public AnQueryReq(AnsonMsg parent, string conn) : base(parent, conn)
+		public AnQueryReq(string uri, AnsonMsg parent) : base(uri, parent)
 		{
 			a = JProtocol.CRUD.R;
 		}
@@ -71,8 +71,8 @@ namespace io.odysz.semantic.jserv.R
 			a = JProtocol.CRUD.R;
 		}
 
-		public AnQueryReq(AnsonMsg parent, string conn, string fromTbl, params string[] alias)
-			: base(parent, conn)
+		public AnQueryReq(string uri, AnsonMsg parent, string fromTbl, params string[] alias)
+			: base(uri, parent)
 		{
 			a = JProtocol.CRUD.R;
 			mtabl = fromTbl;
@@ -184,15 +184,15 @@ namespace io.odysz.semantic.jserv.R
 		/// <see cref="Query">Query</see>
 		/// .</p>
 		/// </summary>
-		/// <param name="conn"/>
+		/// <param name="uri"/>
 		/// <param name="parent"/>
 		/// <param name="from"></param>
-		/// <param name="as"></param>
+		/// <param name="asTabl"></param>
 		/// <returns>query request</returns>
-		public static AnQueryReq formatReq(string conn, AnsonMsg parent, string from, params string[] @as)
+		public static AnQueryReq formatReq(string uri, AnsonMsg parent, string from, params string[] asTabl)
 		{
-			AnQueryReq bdItem = new AnQueryReq
-				(parent, conn, from, @as == null || @as.Length == 0 ? null : @as[0]);
+			AnQueryReq bdItem = new AnQueryReq(uri, parent, from,
+											   asTabl == null || asTabl.Length == 0 ? null : asTabl[0]);
 			return bdItem;
 		}
 

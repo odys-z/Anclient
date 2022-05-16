@@ -2,7 +2,7 @@
   "include": ["."],
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2015",
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
