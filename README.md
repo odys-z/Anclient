@@ -5,7 +5,7 @@
 Clients of semantic-\*. Including a Java and Javascript version. The C# version
 is also been verified.
 
-- Anclient.js
+- Anclient.ts
 
 [![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
 @anclient/semantier 
