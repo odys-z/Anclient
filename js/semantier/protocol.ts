@@ -1,4 +1,4 @@
-import { SessionInf } from '@anclient/semantier-st/anclient';
+import { SessionInf } from '@anclient/semantier/anclient';
 import * as CSS from 'csstype';
 import { Tierec } from './semantier';
 

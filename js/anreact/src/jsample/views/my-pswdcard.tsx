@@ -3,7 +3,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
-import { Semantext } from '@anclient/semantier-st';
+import { Semantext } from '@anclient/semantier';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
 	import { TRecordForm } from '../../react/widgets/t-record-form';
 

@@ -40,7 +40,7 @@ import {
 } from './crud'
 import { ClassNameMap } from '@material-ui/styles';
 import { AnReactExt, ClassNames } from './anreact';
-import { AnDatasetResp, AnsonMsg } from '@anclient/semantier-st/protocol';
+import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 
 export interface SysProps extends Comprops {
     /**Welcome page formatter */

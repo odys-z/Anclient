@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
-import { OnLoadOk, QueryConditions, Semantier, Tierec } from '@anclient/semantier-st';
+import { OnLoadOk, QueryConditions, Semantier, Tierec } from '@anclient/semantier';
 import { Comprops, CrudComp, jsample } from '@anclient/anreact';
 
 const styles = (theme: Theme) => ( {

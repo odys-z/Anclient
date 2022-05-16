@@ -6,10 +6,10 @@ import Grid from '@material-ui/core/Grid';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
 	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
-} from '@anclient/semantier-st';
+} from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-import { Semantier } from '@anclient/semantier-st';
+import { Semantier } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { AnContext } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'

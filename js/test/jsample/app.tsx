@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp
-} from '@anclient/semantier-st';
+} from '@anclient/semantier';
 
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
 import { AnContext, JsonServs } from '../../anreact/src/react/reactext';

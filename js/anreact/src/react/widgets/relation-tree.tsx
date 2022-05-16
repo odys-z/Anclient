@@ -10,7 +10,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, toBool } from '@anclient/semantier-st';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";

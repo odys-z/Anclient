@@ -5,7 +5,7 @@ import { stree_t, Tierec,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk, QueryConditions, NameValue, Semantier
-} from '@anclient/semantier-st';
+} from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
 import { Comprops, CrudComp } from './crud';

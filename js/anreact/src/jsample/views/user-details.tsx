@@ -9,7 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { CRUD, TierCol } from '@anclient/semantier-st';
+import { CRUD, TierCol } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';

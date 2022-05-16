@@ -4,7 +4,7 @@ import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField } from '@anclient/semantier-st';
+import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';

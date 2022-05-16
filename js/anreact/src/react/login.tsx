@@ -6,9 +6,9 @@ import React from 'react';
 	import TextField from '@material-ui/core/TextField';
 	import Box from '@material-ui/core/Box';
 
-import { AnClient, AnsonMsg, AnsonResp, OnCommitOk, Protocol } from '@anclient/semantier-st';
+import { AnClient, AnsonMsg, AnsonResp, OnCommitOk, Protocol } from '@anclient/semantier';
 
-import { an, SessionClient } from '@anclient/semantier-st';
+import { an, SessionClient } from '@anclient/semantier';
 	import {AnContext, AnContextType} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
 	import {L} from '../utils/langstr'

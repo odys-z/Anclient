@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { toBool, isEmpty } from '@anclient/semantier-st';
+import { toBool, isEmpty } from '@anclient/semantier';
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
 import { regex } from '../../anreact/src/utils/regex';
 import { swap } from '../src/utils/lang-ext';

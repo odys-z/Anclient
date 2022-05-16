@@ -8,7 +8,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value
 } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 
-import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField } from '@anclient/semantier-st';
+import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField } from '@anclient/semantier';
 import { AnConst } from '../../utils/consts';
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud';

@@ -7,7 +7,7 @@ import Button from "@material-ui/core/Button";
 import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
-import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, Tierec } from "@anclient/semantier-st";
+import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, Tierec } from "@anclient/semantier";
 
 import { L } from '../../utils/langstr';
 import { toBool } from '../../utils/helpers';

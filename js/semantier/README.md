@@ -1,4 +1,4 @@
-# About @anclient/semantier-st
+# About @anclient/semantier
 
  description:
 
@@ -7,14 +7,14 @@
 # .d.ts
 
 Since v0.9.22, @anclient/semantier is deprecated, replaced by the typescript
-version, @anclient/semantier-st.
+version, @anclient/semantier.
 
 # Memo
 
 - merge part of branches
 
 ```
-    git diff master:js/semantier-st..tsx:js/semantier-st
+    git diff master:js/semantier..tsx:js/semantier
     git checkout master
     git checkout --patch tsx semantier.ts
 ```

@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import { Protocol, CRUD,
 	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs,
 	OnCommitOk, OnLoadOk, QueryConditions, SessionInf
-} from '@anclient/semantier-st';
+} from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 import { AnContext, AnContextType } from '../../react/reactext';

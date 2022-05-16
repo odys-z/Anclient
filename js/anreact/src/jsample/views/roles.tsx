@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
 	QueryConditions, Semantics, OnLoadOk, UIComponent, AnsonMsg
-} from '@anclient/semantier-st';
+} from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';

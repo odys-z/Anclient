@@ -1,5 +1,5 @@
 
-import { NV } from '@anclient/semantier-st/protocol';
+import { NV } from '@anclient/semantier/protocol';
 import { L } from './langstr';
 
 export const AnConst = {

@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { AnsonMsg, DatasetReq, AnDatasetResp } from '../../semantier-st/protocol'
+import { AnsonMsg, DatasetReq, AnDatasetResp } from '../../semantier/protocol'
 import { parseMenus } from '../src/react/sys'
 
 const dsTestResp = {

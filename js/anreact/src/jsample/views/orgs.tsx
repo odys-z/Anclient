@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
-import { Tierec } from '@anclient/semantier-st';
+import { Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../../react/crud'

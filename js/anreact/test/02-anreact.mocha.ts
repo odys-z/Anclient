@@ -1,7 +1,7 @@
-// import { Semantier } from '@anclient/semantier-st/anclient';
+// import { Semantier } from '@anclient/semantier/anclient';
 // import { assert } from 'chai';
 
-// import {ErrorCtx, SessionClient, SessionInf} from '../../semantier-st/anclient';
+// import {ErrorCtx, SessionClient, SessionInf} from '../../semantier/anclient';
 // // import {AnReact} from '../src/react/anreact';
 
 // const checkBoxForest = [
