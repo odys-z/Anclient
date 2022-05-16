@@ -53,6 +53,10 @@ js client API depending on jquery. The test project is using React.
 
 Check js/test & examples/example.js for running tests and examples.
 
+- c#
+
+published as nuget package (coming).
+
 # Examples
 
 - example.js
