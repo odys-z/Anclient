@@ -174,7 +174,7 @@ class App extends React.Component<Northprops, any> {
 					sys='Emotion Regulation - TSX' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					hrefDoc={'docs/index.html'}
-					welcome={welcome}
+					// welcome={welcome}
 					onLogout={this.logout} />
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
