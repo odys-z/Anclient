@@ -1,39 +1,65 @@
 import React from 'react';
-import PropTypes from "prop-types";
 
 import { AgGridReact } from 'ag-grid-react';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+import { Comprops, CrudComp } from '../crud';
+import { TierCol, Tierec } from '@anclient/semantier/semantier';
+import { CellClickedEvent, CellEditingStoppedEvent, ColDef, GetContextMenuItems, GetContextMenuItemsParams, GridReadyEvent } from 'ag-grid-community';
+
+export interface SheetCol extends TierCol {
+	label: string;
+
+	thFormatter?: () => SheetCol & {headerName: string};
+	anEditStop?: (e: CellEditingStoppedEvent) => void;
+
+	isEditable?: () => boolean | boolean;
+}
+
+export interface SpreadsheetProps extends Comprops {
+	columns: SheetCol[];
+	rows: Tierec[];
+
+	/** not used - only for AgGridReact community version */
+	contextMenu?: object;
+
+    onCellClicked?: (e: CellClickedEvent) => void;
+
+	onSheetReady?: (e: GridReadyEvent) => void;
+}
 
 /**Thin wrapper of ag-grid.
- * 
+ *
  * For ag-grid practice, go
  * https://stackblitz.com/edit/ag-grid-react-hello-world-8lxdjj?file=index.js
- * 
+ *
  * For public results, go
  * https://ag-grid-react-hello-world-8lxdjj.stackblitz.io
  *
  * Desgin Note: But is it possible handled by Semantic-DA?
  */
-export class AnGridsheet extends React.Component {
+export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	state = {
 		dirty: false,
-
-		rows: [{id: ''}]
 	};
 
-	coldefs = [];
+	coldefs = [] as ColDef[];
 	defaultColDef = {
 		resizable: true,
 		editable: true,
 		singleClickEdit: true,
 		stopEditingWhenCellsLoseFocus: true,
-	};
+	} as ColDef;
 
-	editHandlers = {};
+	editHandlers = {} as {[fname: string]: (p: CellEditingStoppedEvent) => void};
 
-	constructor(props) {
+	gridApi: any;
+	gridColumnApi: any;
+
+	isEditable = true;
+
+	constructor(props: SpreadsheetProps) {
 		super(props);
 
 		let {resizable, editable, singleClickEdit} = props.defaultColDef || {};
@@ -69,7 +95,7 @@ export class AnGridsheet extends React.Component {
 						singleClickEdit: true,
 						width,
 						minWidth: 50 },
-					  c.thFormatter ? c.thFormatter () :
+					  c.thFormatter ? c.thFormatter() :
 						{ headerName, ...c}
 					) )
 			} );
@@ -82,23 +108,23 @@ export class AnGridsheet extends React.Component {
 	 * where the value of 'qtype' is the ag-gride context menu item:
 	 * @deprecated context menu is a module of ag-grid enterprise.
 	 */
-	getContextMenuItems = (para) =>  {
+	getContextMenuItems = ((para: GetContextMenuItemsParams) =>  {
 		// cellval = param.value;
 		debugger
 		let result = [
-			{ name: 'cell ' + params.value,
+			{ name: 'cell ' + para.value,
 			  action: function () { } },
 			'copy', 'paste', 'cut', 'delete'
 			];
-		if (props.contextMenu) {
+		if (this.props.contextMenu) {
 			result.push('separator');
-			for (let colname in props.contextMenu)
+			for (let colname in this.props.contextMenu)
 				if (colname === para.column.getColDef().field)
-					result.push(props.contextMenu[colname]);
+					result.push(this.props.contextMenu[colname]);
 		}
 
 		return result;
-	}
+	}) as GetContextMenuItems;
 
 	/**<pre>
 	  GetContextMenuItemsParams {
@@ -136,7 +162,7 @@ export class AnGridsheet extends React.Component {
 	type: "cellClicked"
 	value: "2021-09-14"
 	*/
-	onCellClicked = (p) => {
+	onCellClicked = (p: CellClickedEvent) => {
 		if (typeof this.props.onCellClicked === 'function')
 			this.props.onCellClicked(p);
 	};
@@ -144,12 +170,7 @@ export class AnGridsheet extends React.Component {
 	/** Grid event API:
 	 * https://www.ag-grid.com/javascript-data-grid/grid-events/
 	 */
-	onEditStop (p) {
-		// { "indId": "", "indName": "", "command": "b" }
-		// console.log(p.data, p.value, p.data.qtype);
-		// if (p.data.command === 'close')
-		// 	that.setState({ open: false });
-
+	onEditStop (p: CellEditingStoppedEvent) {
 		if (typeof this.editHandlers[p.colDef.field] === 'function')
 			this.editHandlers[p.colDef.field](p);
 	}
@@ -157,7 +178,6 @@ export class AnGridsheet extends React.Component {
 	render () {
 	  return (
 		<AgGridReact
-			editable={this.isEditable}
 			onCellClicked={this.onCellClicked}
 			columnDefs={this.coldefs}
 			components={this.props.components}
@@ -165,19 +185,11 @@ export class AnGridsheet extends React.Component {
 			stopEditingWhenCellsLoseFocus={true}
 			onCellEditingStopped={this.onEditStop}
 			getContextMenuItems={this.getContextMenuItems}
-			onGridReady={this.props.onGridReady}
+			onGridReady={this.props.onSheetReady}
 			rowData={this.props.rows} >
 		</AgGridReact> );
 	}
 }
-
-AnGridsheet.propTypes = {
-	columns: PropTypes.array.isRequired,
-	rows: PropTypes.array.isRequired,
-	// stateHook: PropTypes.object.isRequired,
-	contextMenu: PropTypes.object,
-	onCellClicked: PropTypes.func,
-};
 
 export function anMultiRowRenderer (param) {
 	if (param.value)
@@ -192,6 +204,8 @@ export function AnIndicatorRenderer (param) {
 
 // https://www.ag-grid.com/javascript-data-grid/component-cell-editor/#angular-cell-editing
 export class AnNumericEdit {
+  eInput: HTMLInputElement;
+  cancelBeforeStart: boolean;
   // gets called once before the renderer is used
   init(params) {
     // create the cell

@@ -31,7 +31,7 @@ export class GPATier extends Semantier {
 
 		client.commit(req, (resp: AnsonMsg<GPAResp>) => {
 			let { kids, cols, rows } = GPAResp.GPAs(resp?.Body());
-			onLoad(kids, rows);
+			onLoad(kids as any[], rows);
 		}, this.errCtx);
 	}
 
