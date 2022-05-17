@@ -126,15 +126,6 @@ class GPAsheetComp extends CrudComp<any> {
 	}
 
 	bindSheet(kids: any[], rows: Array<GPARec>) {
-	// bindSheet(gpaResp: AnsonMsg<GPAResp>) {
-
-		// Why we have to handle data at both side?
-		// can date been specified as columns? - won't work if not generated (for js)
-
-		// let resp = new GPAResp(gpaResp.Body());
-		// let { kids, cols, rows } = GPAResp.GPAs(resp);
-		// this.tier.rows = rows;
-
 		let ths = [{width: 120, cellEditor: undefined,
                     cellEditorParams: undefined,
                     field: 'gday', label: L('DATE'),
