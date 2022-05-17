@@ -1,7 +1,7 @@
 
 import {
     Protocol, AnsonResp, AnsonBody, Semantier, Tierec, UIComponent, Semantext,
-    QueryConditions, OnLoadOk, OnCommitOk, TierCol
+    QueryConditions, OnLoadOk, OnCommitOk, TierCol, SessionClient, AnsonMsg
 } from '@anclient/semantier';
 
 export interface GPARec extends Tierec {
@@ -11,7 +11,7 @@ export interface GPARec extends Tierec {
 
 export class GPATier extends Semantier {
 	port = 'gpatier';
-	client = undefined;
+	client = undefined as SessionClient;
 	rows = [{ gday: 'yyyy' } as GPARec];
 	ths_ = [];
 
@@ -26,11 +26,13 @@ export class GPATier extends Semantier {
 		let that = this;
 
 		let req = client.userReq( this.uri, this.port,
-					// new GPAReq( this.uri, conds )
-					new GPAReq( {uri: this.uri} )
+					new GPAReq( {uri: this.uri, ...conds} )
 					.A(GPAReq.A.gpas) );
 
-		client.commit(req, onLoad, this.errCtx);
+		client.commit(req, (resp: AnsonMsg<GPAResp>) => {
+			let { kids, cols, rows } = GPAResp.GPAs(resp?.Body());
+			onLoad(kids, rows);
+		}, this.errCtx);
 	}
 
 	updateRow(opts: {uri: string, oldGday: string, gpaRow: Tierec}, onOk: OnCommitOk) {

@@ -9,6 +9,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 import dateFormat from 'dateformat';
 
+import { AnsonMsg, TierCol } from '@anclient/semantier';
 import { L,
 	AnContext, ConfirmDialog, CrudComp,
 	jsample, AnGridsheet, AnNumericEdit, AnIndicatorRenderer, addDays
@@ -66,7 +67,6 @@ class GPAsheetComp extends CrudComp<any> {
 		this.toAdd = this.toAdd.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.alert = this.alert.bind(this);
-		// this.toSave = this.toSave.bind(this);
 
 		this.changeLastDay = this.changeLastDay.bind(this);
 		this.rowEditableChecker = this.rowEditableChecker.bind(this);
@@ -80,7 +80,7 @@ class GPAsheetComp extends CrudComp<any> {
 		this.tier.records(null, this.bindSheet);
 	}
 
-	toAdd(e) {
+	toAdd(e: React.UIEvent) {
 		let newGday = dateFormat('yyyy-mm-dd'); //. new Date().toISOStr();
 		// avoid duplicated key
 		let found = false;
@@ -117,24 +117,23 @@ class GPAsheetComp extends CrudComp<any> {
 		this.api.startEditingCell({ rowIndex, colKey: 'gday' });
 	}
 
-    // avrow(arg0: {}, avrow: any) : GPARec {
-    //     throw new Error('Method not implemented.');
-    // }
-
-	toDel(e) {
+	toDel(e: React.UIEvent) {
 		let that = this;
 		if (this.currentId)
-			this.tier.del({ids: [this.currentId]}, (resp) => {
+			this.tier.del({ids: [this.currentId]}, (_resp) => {
 				that.tier.records(null, that.bindSheet);
 			});
 	}
 
-	bindSheet(gpaResp) {
+	bindSheet(kids: any[], rows: Array<GPARec>) {
+	// bindSheet(gpaResp: AnsonMsg<GPAResp>) {
+
 		// Why we have to handle data at both side?
-		// can date been specified as columens? - won't work if not generated (for js)
-		let resp = new GPAResp(gpaResp.Body());
-		let { kids, cols, rows } = GPAResp.GPAs(resp);
-		this.tier.rows = rows;
+		// can date been specified as columns? - won't work if not generated (for js)
+
+		// let resp = new GPAResp(gpaResp.Body());
+		// let { kids, cols, rows } = GPAResp.GPAs(resp);
+		// this.tier.rows = rows;
 
 		let ths = [{width: 120, cellEditor: undefined,
                     cellEditorParams: undefined,
@@ -164,7 +163,7 @@ class GPAsheetComp extends CrudComp<any> {
 		this.setState( { cols: ths, rows, kids } );
 	}
 
-	alert(msg) {
+	alert(msg: string | string[]) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
@@ -185,7 +184,7 @@ class GPAsheetComp extends CrudComp<any> {
 					uri: this.uri,
 					oldGday: p.oldValue,
 					gpaRow: p.data },
-				e => {
+				() => {
 					that.setState({addingNew: false})
 				});
 		}
@@ -198,13 +197,13 @@ class GPAsheetComp extends CrudComp<any> {
 					uri: this.uri,
 					oldGday: p.oldValue,
 					newGday: p.value },
-				e => {
+				() => {
 					that.setState({addingNew: false})
 				});
 		}
 	}
 
-	changeGPA(p) {
+	changeGPA(p: { data: { gday: string; }; colDef: { field: any; }; value: string; }) {
 		console.log(p);
 
 		let gday = p.data.gday;
@@ -214,10 +213,10 @@ class GPAsheetComp extends CrudComp<any> {
 					uri: this.uri,
 					gday, kid,
 					gpa: p.value },
-				e => { });
+				(_e: any) => { } );
 	}
 
-	rowEditableChecker(p) {
+	rowEditableChecker(p: { node: { rowIndex: number; }; colDef: { field: string; }; }) {
 		if (p.node.rowIndex > 0 &&
 			p.colDef.field === 'gday' && p.node.rowIndex === this.tier.rows.length - 1) // last gday
 			// last gday is editable
