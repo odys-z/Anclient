@@ -9,7 +9,7 @@ import { TierCol, Tierec } from '@anclient/semantier/semantier';
 import { CellClickedEvent, CellEditingStoppedEvent, ColDef, GetContextMenuItems, GetContextMenuItemsParams, GridReadyEvent } from 'ag-grid-community';
 
 export interface SheetCol extends TierCol {
-	label: string;
+	label: string; 
 
 	thFormatter?: () => SheetCol & {headerName: string};
 	anEditStop?: (e: CellEditingStoppedEvent) => void;
