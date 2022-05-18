@@ -14,7 +14,7 @@ import { CRUD, TierCol } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';
 import { ConfirmDialog } from '../../react/widgets/messagebox';
-import { TRecordForm } from '../../react/widgets/t-record-form';
+import { TRecordForm } from '../../react/widgets/record-form';
 import { UsersTier } from './users';
 
 const styles = (theme: Theme) => ({

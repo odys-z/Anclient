@@ -1,8 +1,9 @@
 import React from 'react';
 import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
-import { OnLoadOk, QueryConditions, Semantier, Tierec } from '@anclient/semantier';
-import { Comprops, CrudComp, jsample } from '@anclient/anreact';
+import { OnLoadOk } from '../../../semantier/protocol';
+import { QueryConditions, Semantier, Tierec } from '../../../semantier/semantier';
+import { ClassNames, Comprops, CrudComp, jsample } from '../../../anreact/src/an-components';
 
 const styles = (theme: Theme) => ( {
 	root: {
@@ -31,8 +32,9 @@ const styles = (theme: Theme) => ( {
 
 class WelcomeComp extends CrudComp<Comprops>{
 	tier: WelcomeTier;
-	classes: any;
-	uri: any;
+	classes: ClassNames;
+	uri: string;
+	props: any;
 
 	constructor(props: Comprops) {
 		super(props);
@@ -123,7 +125,7 @@ class WelcomeTier extends Semantier {
 	records<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
 		this.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
 		onLoad([], this.rows as unknown as Array<T>);
-		return this.rows as unknown as Array<T>; // FIXME shouldn't use "as unknown"
+		return this.rows;
 	}
 
 	myNotifies() {

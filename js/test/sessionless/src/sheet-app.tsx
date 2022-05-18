@@ -8,9 +8,9 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
 } from '../../../anreact/src/an-components';
 
-import Welcome from './welcome';
+import Worksheet from './workbook';
 
-const { Userst, JsampleTheme } = jsample;
+const { JsampleTheme } = jsample;
 
 type LessProps = {
 	servs: JsonServs;
@@ -39,16 +39,19 @@ class App extends React.Component<LessProps, State> {
 	state = {
 		hasError: false,
 		iportal: 'portal.html',
-		nextAction: undefined, // e.g. re-login
+		nextAction: undefined as string, // e.g. re-login
 
 		/** json object specifying host's urls */
 		servs: undefined,
-		/** the serv id for picking url */
+		/** the serv id for selecting url from configured hosts */
 		servId: '',
 	};
 
-	/**Restore session from window.localStorage
-	 */
+	/**
+     * Restore session from window.localStorage 
+     * 
+     * @param props 
+     */
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
 
@@ -59,7 +62,6 @@ class App extends React.Component<LessProps, State> {
 
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
-		// this.state.jserv = this.props.servs[this.state.servId];
 
 		this.inclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
 
@@ -75,9 +77,10 @@ class App extends React.Component<LessProps, State> {
 		Protocol.sk.cbbRole = 'roles';
 
 		this.anReact = new AnReactExt(this.inclient, this.error)
-								.extendPorts({
-									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
-								});
+                        .extendPorts({
+                            /* see jserv-sandbox/UsersTier, port name: sheetier, filter: sheet.less */
+                            userstier: "sheet.less",
+                        });
 	}
 
 	onError(c: any, r: AnsonMsg<AnsonResp> ) {
@@ -96,7 +99,6 @@ class App extends React.Component<LessProps, State> {
 	}
 
 	render() {
-	  let that = this;
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
@@ -111,15 +113,11 @@ class App extends React.Component<LessProps, State> {
 				error: this.error,
 				ssInf: undefined,
 			}} >
-				{<Userst port='userstier' uri={'/less/users'}/>}
-				<hr/>
-				{<Welcome port='welcomeless' uri={'/less/welcome'}/>}
+				{<Worksheet port='sheet' uri={'/less/sheet'}/>}
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={"/login"} tier={undefined}
 							title={L('Error')} msg={this.error.msg} />}
-				<hr/>
-				アプリ コンポーネントの内容は, 上記のすべて...<br/> {Date().toString()}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}
@@ -130,8 +128,8 @@ class App extends React.Component<LessProps, State> {
 	 * where serv-id = this.context.servId || host
 	 *
 	 * For test, have elem = undefined
-	 * @param elem html element id, null for test
-	 * @param opts={} serv id
+	 * @param elem html element id
+	 * @param opts 
 	 */
 	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
 		let portal = opts.portal ?? 'index.html';

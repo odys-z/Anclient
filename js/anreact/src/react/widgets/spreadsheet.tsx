@@ -191,23 +191,28 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	}
 }
 
-export function anMultiRowRenderer (param) {
+export function anRowsRenderer (param) {
 	if (param.value)
 		return `<p style="line-height: 1.2em" >${param.value.split('\n').join('<br/>')}</p>`;
 }
 
-export function AnIndicatorRenderer (param) {
-	if (param.rowIndex === 0)
-		return `<p style="line-height: 1.2em" >[avg] : ${param.value}</p>`;
-	else return param.value;
-}
+// export function anIndicatorRenderer (param) {
+// 	if (param.rowIndex === 0)
+// 		return `<p style="line-height: 1.2em" >[avg] : ${param.value}</p>`;
+// 	else return param.value;
+// }
 
 // https://www.ag-grid.com/javascript-data-grid/component-cell-editor/#angular-cell-editing
-export class AnNumericEdit {
+export class AnNumerCellEdit {
   eInput: HTMLInputElement;
   cancelBeforeStart: boolean;
-  // gets called once before the renderer is used
-  init(params) {
+
+  /**
+   * This is gets called once before the renderer is used.
+   *
+   * @param params 
+   */
+  init(params: { charPress: string; value: string; }) {
     // create the cell
     this.eInput = document.createElement('input');
 
@@ -219,7 +224,7 @@ export class AnNumericEdit {
       }
     }
 
-    this.eInput.addEventListener('keypress', (event) => {
+    this.eInput.addEventListener('keypress', (event): void => {
       if (!this.isKeyPressedNumeric(event)) {
         this.eInput.focus();
         if (event.preventDefault) event.preventDefault();
@@ -234,7 +239,7 @@ export class AnNumericEdit {
     this.cancelBeforeStart = charPressIsNotANumber;
   }
 
-  isKeyPressedNavigation(event) {
+  isKeyPressedNavigation(event: KeyboardEvent) {
     return event.keyCode === 39 || event.keyCode === 37;
   }
 

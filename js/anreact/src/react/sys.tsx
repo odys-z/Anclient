@@ -527,5 +527,5 @@ SysComp.extendLinks([
 	{path: '/sys/error', comp: ErrorPage}
 ]);
 
-const Sys = withStyles(styles)(SysComp);
+const Sys = withStyles<any, any, SysProps>(styles)(SysComp);
 export { Sys, SysComp };

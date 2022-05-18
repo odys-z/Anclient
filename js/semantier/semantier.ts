@@ -109,10 +109,26 @@ export interface TierComboField<F, FO> extends AnlistColAttrs<F, FO> {
 export interface Tierelations extends DbRelations {
 }
 
-/**Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.  */
+export interface QueryCondition extends TierCol {
+	// [q: string]: string | number | object | boolean;
+}
+
+/**Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
+ * @deprecated
+ */
 export interface QueryConditions {
 	pageInf?: PageInf;
 	[q: string]: string | number | object | boolean;
+
+	/**
+	 * should be only type of QueryCondition. String & number value for backward compatability  
+	[q: string]: QueryCondition | string | number;
+	 */
+}
+
+export interface QueryPage {
+	pageInf?: PageInf;
+	query?: QueryCondition[] | QueryConditions;
 }
 
 /**
@@ -334,15 +350,15 @@ export class Semantier {
 	 * @param conds
 	 * @param onLoad
 	 */
-    record(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) : void {
+    record(conds: QueryConditions | QueryCondition[], onLoad: OnLoadOk<Tierec>) : void {
     }
 
 	/** Load records of conditions.
 	 *
-	 * @param opts
+	 * @param conds QueryConditions type is deprecated
 	 * @param onLoad
 	 */
-    records(opts: QueryConditions, onLoad: OnLoadOk<Tierec>) : void {
+    records(conds: QueryConditions | QueryPage, onLoad: OnLoadOk<Tierec>) : void {
 	}
 
     /** save form with a relationship table.

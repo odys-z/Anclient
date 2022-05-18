@@ -16,7 +16,7 @@ import { JsampleIcons } from '../styles'
 import { Comprops, DetailFormW } from '../../react/crud'
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnRelationTree } from '../../react/widgets/relation-tree';
-import { TRecordForm } from '../../react/widgets/t-record-form';
+import { TRecordForm } from '../../react/widgets/record-form';
 import { RoleTier } from './roles';
 
 const styles = theme => ({

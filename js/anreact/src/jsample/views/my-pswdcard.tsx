@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import { L } from '../../utils/langstr';
 import { Semantext } from '@anclient/semantier';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { TRecordForm } from '../../react/widgets/t-record-form';
+	import { TRecordForm } from '../../react/widgets/record-form';
 
 import { MyInfTier } from './my-infcard';
 import { Comprops, DetailFormW } from '../../react/crud';

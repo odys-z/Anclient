@@ -4,7 +4,7 @@ import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField } from '@anclient/semantier';
+import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField, TierCol, QueryCondition, QueryPage } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
@@ -14,7 +14,11 @@ import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputC
 import { ComboItem } from './dataset-combo';
 import { AnReactExt, CompOpts } from '../anreact';
 
-interface ComboCondType extends TierComboField<JSX.Element, CompOpts>, QueryConditions {
+interface ComboCondType extends TierComboField<JSX.Element, CompOpts>, QueryCondition {
+	/** is cbb clean */
+	clean: boolean;
+	sk: string,
+	type: 'cbb' | 'autocbb';
 };
 
 const styles = (theme: Theme) => ( {
@@ -109,7 +113,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
 						sqlArgs: cond.sqlArgs,
-						cond,
+						// cond,
 						onLoad: (_cols, rows) => {
 							cond.options = rows as NV[];
 							that.setState({});
@@ -293,11 +297,24 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 AnQuerystComp.contextType = AnContext;
 
 export interface QueryFormProps extends Comprops {
-	fields: AnlistColAttrs<JSX.Element, CompOpts>[];
-	/**User actions: search button clicked */
-	onSearch : (conds: QueryConditions) => void,
-	/**Bounding components successfully */
+	/** @deprecated replaced by conds */
+	fields?: AnlistColAttrs<JSX.Element, CompOpts>[];
+
+	conds?: QueryPage,
+
+	/**User actions: search button clicked
+	 * @deprecated replaced by onQuery
+	 */
+	onSearch?: (conds: QueryConditions) => void,
+	onQuery? : (conds: QueryPage) => void,
+
+	/**Bounding components successfully
+	 * 
+	 * @deprecated replaced by onQuery
+	 */
 	onLoaded?: (conds: QueryConditions) => void,
+	onReady? : (conds: QueryPage) => void,
+
 	/**@deprecated Render can get Mediat parameter and field can be defined by user data. */
 	buttonStyle?: "norm" | "dense"
 }

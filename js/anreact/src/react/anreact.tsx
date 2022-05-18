@@ -4,7 +4,7 @@ import $ from 'jquery';
 import { stree_t, Tierec,
 	SessionClient, InsertReq,
 	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk, QueryConditions, NameValue, Semantier
+	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk, QueryConditions, NameValue, Semantier, QueryCondition
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
@@ -286,17 +286,17 @@ export class AnReactExt extends AnReact {
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
 				  nv: NV;
-				  cond: QueryConditions; // CbbCondition;
+				//   cond: QueryCondition;
 				  onLoad?: OnLoadOk<Tierec>;
 				  /**don't add "-- ALL --" item */
 				  noAllItem?: boolean; } ): AnReactExt {
-		let {uri, sk, sqlArgs, nv, cond, onLoad, noAllItem} = opts;
+		let {uri, sk, sqlArgs, nv, onLoad, noAllItem} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		cond.loading = true;
+		let loading = true;
 
 		this.dataset( {
 				port: 'dataset',
@@ -315,7 +315,7 @@ export class AnReactExt extends AnReact {
 					rows.unshift(AnConst.cbbAllItem);
 				this.options = rows;
 
-				this.loading = false;
+				loading = false;
 
 				if (onLoad)
 					onLoad(cols, rows);

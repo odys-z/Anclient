@@ -18,7 +18,7 @@ import { Orgs } from '../../anreact/src/jsample/views/orgs';
 
 import { StandardProps } from '@material-ui/core';
 import { JsampleTheme } from '../../anreact/src/jsample/styles';
-import { MyInfCard } from '../../anreact/src/jsample/views/my-infcard';
+import { MyInfCard, MyInfCardComp } from '../../anreact/src/jsample/views/my-infcard';
 import { MyPswd } from '../../anreact/src/jsample/views/my-pswdcard';
 
 
@@ -132,11 +132,8 @@ class App extends React.Component<Approps> {
 					if (this.props.iwindow)
 						this.props.iwindow.location = this.state.iportal;
 				},
-				(c, e) => {
-					// something wrong
-					// console.warn('Logout failed', c, e)
-					cleanup (that);
-				});
+				{ onError: (c, e) => { cleanup (that); } }
+				);
 		}
 		catch(_) {
 			cleanup (that);
@@ -145,7 +142,7 @@ class App extends React.Component<Approps> {
 			this.state.anClient = undefined;
 		}
 
-		function cleanup(app) {
+		function cleanup(app: App) {
 			if (app.state.anClient)
 				localStorage.setItem(SessionClient.ssInfo, null);
 			if (app.props.iwindow)
@@ -172,7 +169,7 @@ class App extends React.Component<Approps> {
 				ihome: this.props.iportal || 'portal.html',
 				error: this.errCtx,
 			}} >
-				<Sys menu='sys.menu.jsample'
+				<SysComp menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					onLogout={this.logout} />

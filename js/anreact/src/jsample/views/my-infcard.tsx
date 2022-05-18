@@ -5,13 +5,13 @@ import Button from '@material-ui/core/Button';
 
 import { Protocol, CRUD,
 	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs,
-	OnCommitOk, OnLoadOk, QueryConditions, SessionInf
+	OnCommitOk, OnLoadOk, QueryConditions, SessionInf, UIComponent
 } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 import { AnContext, AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
-import { TRecordForm } from '../../react/widgets/t-record-form';
+import { TRecordForm } from '../../react/widgets/record-form';
 import { ImageUpload } from '../../react/widgets/image-upload';
 import { Comprops, DetailFormW } from '../../react/crud';
 import { CompOpts } from '../../an-components';
@@ -135,6 +135,7 @@ class MyInfCardComp extends DetailFormW<MyInfProps> {
 }
 MyInfCardComp.contextType = AnContext;
 
+// const MyInfCard = withStyles<any, any, MyInfProps>(styles)(withWidth()(MyInfCardComp));
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 
 export class MyInfTier extends Semantier {
@@ -144,7 +145,7 @@ export class MyInfTier extends Semantier {
 
 	rec = {} as MyInfRec; // Tierec & {mime: string, attName: string, attId: string};
 
-	constructor(comp) {
+	constructor(comp: UIComponent) {
 		super(comp);
 		// FIXME move to super class?
 		// this.uri = comp.uri;
