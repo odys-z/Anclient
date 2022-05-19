@@ -68,8 +68,8 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 	constructor(props: QueryFormProps) {
 		super(props);
 
-		if (props.conds && !props.fields)
-			throw Error("AnQuerystComp now is using [fields] for conditions's declaration.");
+		// if (props.conds && !props.fields)
+		// 	throw Error("AnQuerystComp now is using [fields] for conditions's declaration.");
 
 		this.bindConds = this.bindConds.bind(this);
 
@@ -316,7 +316,7 @@ export interface QueryFormProps extends Comprops {
 	onReady? : (conds: QueryPage) => void,
 
 	/**@deprecated Render can get Mediat parameter and field can be defined by user data. */
-	buttonStyle?: "norm" | "dense"
+	// buttonStyle?: "norm" | "dense"
 }
 
 const AnQueryst = withStyles<any, any, QueryFormProps>(styles)(withWidth()(AnQuerystComp));

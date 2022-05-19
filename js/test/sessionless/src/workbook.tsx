@@ -78,7 +78,7 @@ class WorkbookComp extends CrudComp<Comprops>{
 	render() {
 		let that = this;
 		return (<div>
-			{<AnQueryst {...this.props}
+			{<AnQueryst 
 				conds={this.conds}
 				onSearch={() => that.props.onQuery(that.queryConds()) }
 				onLoaded={() => that.props.onQuery(that.queryConds()) }
