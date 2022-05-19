@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
 
@@ -16,6 +16,11 @@ export interface SheetCol extends TierCol {
 
 	isEditable?: () => boolean | boolean;
 }
+
+export interface SpreadsheetRec extends Tierec {
+	id: string,
+	css?: CSSProperties,
+};
 
 export interface SpreadsheetProps extends Comprops {
 	columns: SheetCol[];
@@ -102,6 +107,10 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 		}
 	}
 
+	componentDidMount() {
+		console.log(this.coldefs);
+	}
+
 	/** load default context menu, together with user's menu items.
 	 * user's menu items defined in props like:
 	 * {"qtype": {name: 'Format Answer', action}, ...}
@@ -137,14 +146,14 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	    defaultItems: string[] | undefined // names of the items that would be provided by default
 	  }</pre>
 	 */
-	onGridReady = (params) => {
+	onGridReady = (params: { api: { sizeColumnsToFit: () => void; }; columnApi: any; }) => {
 		this.gridApi = params.api;
 		this.gridColumnApi = params.columnApi;
 
 		params.api.sizeColumnsToFit();
 	};
 
-	onFirstDataRendered = (params) => {
+	onFirstDataRendered = (params: { api: { sizeColumnsToFit: () => void; }; }) => {
 		params.api.sizeColumnsToFit();
 	};
 
@@ -191,7 +200,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	}
 }
 
-export function anRowsRenderer (param) {
+export function anRowsRenderer (param: { value: string; }) {
 	if (param.value)
 		return `<p style="line-height: 1.2em" >${param.value.split('\n').join('<br/>')}</p>`;
 }
@@ -286,11 +295,11 @@ export class AnNumerCellEdit {
     return typeof event.which == 'undefined' ? event.keyCode : event.which;
   }
 
-  isCharNumeric(charStr) {
+  isCharNumeric(charStr: string) {
     return !!/\d/.test(charStr);
   }
 
-  isKeyPressedNumeric(event) {
+  isKeyPressedNumeric(event: KeyboardEvent) {
     const charCode = this.getCharCodeFromEvent(event);
     const charStr = String.fromCharCode(charCode);
     return this.isCharNumeric(charStr);

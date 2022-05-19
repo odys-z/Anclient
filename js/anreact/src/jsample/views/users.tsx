@@ -14,7 +14,7 @@ import { Comprops, CrudCompW } from '../../react/crud';
 import { AnContext } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnTablist } from '../../react/widgets/table-list';
-import { AnQueryst } from '../../react/widgets/query-form-st';
+import { AnQueryst } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
@@ -429,6 +429,7 @@ export class UserstReq extends UserReq {
 
 		mykids: 'r/kids',
 	}
+
 	userId: string;
 	userName: string;
 	orgId: string;

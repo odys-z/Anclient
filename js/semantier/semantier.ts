@@ -197,7 +197,7 @@ export class Semantier {
 	 */
     rels: UIRelations = {};
 
-    lastCondit: QueryConditions;
+    lastCondit: QueryConditions | QueryPage;
 
     /**
      * @param context
@@ -310,13 +310,16 @@ export class Semantier {
 			} );
 	}
 
-    /** Load relationships */
+    /**
+	 * Load relationships
+	 * @param client 
+	 * @param opts 
+	 * @param onOk 
+	 */
     relations( client: SessionClient | Inseclient,
-		opts: {
-			uri: string;
-			reltabl: string;
-			sqlArgs?: string[]; sqlArg?: string; } ,
-			onOk: OnCommitOk): void {
+		opts: { uri: string; reltabl: string;
+				sqlArgs?: string[]; sqlArg?: string; } ,
+		onOk: OnCommitOk): void {
 
 		let that = this;
 

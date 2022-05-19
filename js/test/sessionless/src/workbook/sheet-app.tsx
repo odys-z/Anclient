@@ -2,15 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '../../../semantier/anclient';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '../../../../semantier/anclient';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
-} from '../../../anreact/src/an-components';
+} from '../../../../anreact/src/an-components';
 
 import Worksheet from './workbook';
+import { MyWorkbookTier } from './workbook-tier';
 
-const { JsampleTheme } = jsample;
+const { JsampleTheme } = jsample; 
 
 type LessProps = {
 	servs: JsonServs;
@@ -99,7 +100,9 @@ class App extends React.Component<LessProps, State> {
 	}
 
 	render() {
+	  let uri = '/less/sheet';
 	  return (
+
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				anReact: this.anReact,
@@ -113,7 +116,9 @@ class App extends React.Component<LessProps, State> {
 				error: this.error,
 				ssInf: undefined,
 			}} >
-				{<Worksheet port='sheet' uri={'/less/sheet'}/>}
+				{<Worksheet port='sheet' uri={uri}
+					tier={new MyWorkbookTier({uri})}
+				/>}
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={"/login"} tier={undefined}

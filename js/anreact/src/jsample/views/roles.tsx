@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	QueryConditions, Semantics, OnLoadOk, UIComponent, AnsonMsg
+	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -20,7 +20,7 @@ import { AnTablist } from '../../react/widgets/table-list';
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';
 import { ClassNames, CompOpts } from '../../react/anreact';
-import { AnQueryst } from '../../react/widgets/query-form-st';
+import { AnQueryst } from '../../react/widgets/query-form';
 
 const styles = (theme: Theme) => ( {
 	root: {
@@ -255,11 +255,11 @@ class RoleTier extends Semantier {
 				col: 'funcId', // checking col
 				relcolumn: 'nodeId' },// where is the data in UI 
 			sk: 'trees.role_funcs'
-			} as Semantics
+			} as DbRelations
 		};
 	}
 
-	records(conds = {} as {roleId?: string; orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk) {
+	records(conds = {} as {roleId?: string; orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk<Tierec>) {
 		let { orgId, roleName, pageInf } = conds;
 		let queryReq = this.client.query(this.uri, this.mtabl, 'r', pageInf)
 		let req = queryReq.Body()
@@ -279,7 +279,7 @@ class RoleTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk) {
+	record(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let client = this.client;

@@ -8,7 +8,7 @@ module.exports = {
 	mode: v,
 	devtool: 'source-map',
 	entry: {'AnHome': './src/less-app.tsx',
-			'AnSheet': './src/sheet-app.tsx' },
+			'AnSheet': './src/workbook/sheet-app.tsx' },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",

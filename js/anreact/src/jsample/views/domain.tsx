@@ -10,7 +10,7 @@ import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTablist } from '../../react/widgets/table-list'
 import { QueryConditions, Semantier } from '@anclient/semantier';
-import { AnQueryst } from '../../react/widgets/query-form-st';
+import { AnQueryst } from '../../react/widgets/query-form';
 
 const styles = (theme: Theme) => ( {
 	root: {

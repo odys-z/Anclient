@@ -4,7 +4,7 @@ import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth 
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField, TierCol, QueryCondition, QueryPage } from '@anclient/semantier';
+import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField, QueryCondition, QueryPage } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
@@ -14,9 +14,9 @@ import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputC
 import { ComboItem } from './dataset-combo';
 import { AnReactExt, CompOpts } from '../anreact';
 
-interface ComboCondType extends TierComboField<JSX.Element, CompOpts>, QueryCondition {
+export interface ComboCondType extends TierComboField<JSX.Element, CompOpts>, QueryCondition {
 	/** is cbb clean */
-	clean: boolean;
+	clean?: boolean;
 	sk: string,
 	type: 'cbb' | 'autocbb';
 };
@@ -237,7 +237,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 			.map( (cond: ComboCondType, x) => {
 				if (cond.type === 'cbb') {
 					let refcbb = React.createRef<HTMLDivElement>();
-					let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
+					// let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
 					return (<Autocomplete<ComboItem> key={'cbb' + x}
 						id={String(x)} data-name={String(x)} ref={refcbb}
 						onChange={ that.onCbbRefChange(refcbb) }
@@ -251,7 +251,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				}
 				else if (cond.type === 'autocbb') {
 					let refcbb = React.createRef<HTMLDivElement>();
-					let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
+					// let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
 					return (<Autocomplete<ComboItem> key={'cbb' + x}
 						id={String(x)} data-name={String(x)} ref={refcbb}
 						onChange={ that.onCbbRefChange(refcbb) }
