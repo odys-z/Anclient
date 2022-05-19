@@ -4,6 +4,26 @@ import { AnsonBody, AnsonResp, CRUD, ErrorCtx,
 
 import { L, SheetCol, SpreadsheetRec, } from '../../../../anreact/src/an-components';
 
+/**
+ * @example table DDL
+ drop table if exists b_curriculums;
+CREATE TABLE b_curriculums (
+  cid varchar2(12) NOT NULL,
+  parentId varchar2(12),
+  currName varchar2(256) NOT NULL,
+  clevel varchar2(12),
+  module varchar2(12),
+  cate   varchar2(12),
+  subject varchar2(12),
+  sort varchar2(12),
+  fullpath varchar2(80),
+  oper varchar2(12) NOT NULL,
+  optime DATETIME NOT NULL,
+  PRIMARY KEY ("cid")
+);
+
+select * from b_curriculums;
+ */
 class MyWorkbookTier extends Semantier {
 	static port = 'sheet.less';
 	/**
@@ -55,7 +75,7 @@ class MyWorkbookTier extends Semantier {
 	}
 
 	columns (): Array<SheetCol> {
-		return this._cols as Array<SheetCol>; 
+		return this._cols as Array<SheetCol>;
 	}
 }
 
@@ -74,7 +94,7 @@ class MyBookReq extends AnsonBody {
 		delete: 'd',
 		records: 'r',
 		rec: 'rec',
-	} 
+	}
 
 	rec: SpreadsheetRec;
 	conds: QueryCondition[];
