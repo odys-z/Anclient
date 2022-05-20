@@ -109,9 +109,9 @@ export interface TierComboField<F, FO> extends AnlistColAttrs<F, FO> {
 export interface Tierelations extends DbRelations {
 }
 
-export interface QueryCondition extends TierCol {
-	// [q: string]: string | number | object | boolean;
-}
+// export interface QueryCondition extends TierCol {
+// 	// [q: string]: string | number | object | boolean;
+// }
 
 /**Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
  * @deprecated
@@ -128,7 +128,7 @@ export interface QueryConditions {
 
 export interface QueryPage {
 	pageInf?: PageInf;
-	query?: QueryCondition[] | QueryConditions;
+	query?: AnlistColAttrs<JSX.Element, any>[];
 }
 
 /**
@@ -353,7 +353,7 @@ export class Semantier {
 	 * @param conds
 	 * @param onLoad
 	 */
-    record(conds: QueryConditions | QueryCondition[], onLoad: OnLoadOk<Tierec>) : void {
+    record(conds: QueryConditions | QueryPage, onLoad: OnLoadOk<Tierec>) : void {
     }
 
 	/** Load records of conditions.

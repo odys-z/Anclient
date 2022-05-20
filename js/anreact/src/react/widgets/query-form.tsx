@@ -1,20 +1,20 @@
 import React from 'react';
 import { Theme, withStyles } from "@material-ui/core/styles";
 import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth } from '@material-ui/core';
+import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField, QueryCondition, QueryPage } from '@anclient/semantier';
+import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField, QueryPage } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud'
-import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 import { ComboItem } from './dataset-combo';
 import { AnReactExt, CompOpts } from '../anreact';
 
-export interface ComboCondType extends TierComboField<JSX.Element, CompOpts>, QueryCondition {
+export interface ComboCondType extends TierComboField<JSX.Element, CompOpts> {
 	/** is cbb clean */
 	clean?: boolean;
 	sk: string,
@@ -50,12 +50,13 @@ const styles = (theme: Theme) => ( {
 /**
  * Bind query conditions to React Components.
  * @example conds example:
+ * {pageInf: {page, size},
   [ { type: 'text', val: '', label: 'text condition'},
     { type: 'autocbb', sk: 'lvl1.domain.jsample',
       val: AnConst.cbbAllItem,
       options: [AnConst.cbbAllItem, {n: 'first', v: 1}, {n: 'second', v: 2}, {n: 'third', v: 3} ],
       label: 'auto complecte'},
-  ]
+  ]}
  */
 class AnQuerystComp extends CrudCompW<QueryFormProps> {
 
@@ -78,7 +79,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		this.toSearch = this.toSearch.bind(this);
 		this.toClear = this.toClear.bind(this);
 
-		this.qFields = props.fields || [];
+		this.qFields = props.conds?.query || props.fields || [];
 	}
 
 	componentDidMount() {
@@ -101,6 +102,9 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		// 	throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
 		const ctx = this.context as unknown as AnContextType;
 		const that = this;
+
+		if (this.props.stopBinding)
+			return;
 
 		this.qFields
 		  .filter((c: ComboCondType, x ) => !!c && !c.loading && !c.clean)
@@ -297,23 +301,25 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 AnQuerystComp.contextType = AnContext;
 
 export interface QueryFormProps extends Comprops {
+	uri: string;
+
 	/** @deprecated replaced by conds */
 	fields?: AnlistColAttrs<JSX.Element, CompOpts>[];
 
-	conds?: QueryPage,
+	/**Set to true if connection error occurs
+	 * - to disable error context handling triggering endless loop. */
+	stopBinding?: boolean;
 
 	/**User actions: search button clicked
 	 * @deprecated replaced by onQuery
 	 */
-	onSearch?: (conds: QueryConditions) => void,
-	onQuery? : (conds: QueryPage) => void,
+	onSearch?: (conds: QueryConditions | QueryPage) => void,
 
 	/**Bounding components successfully
 	 * 
 	 * @deprecated replaced by onQuery
 	 */
-	onLoaded?: (conds: QueryConditions) => void,
-	onReady? : (conds: QueryPage) => void,
+	onLoaded?: (conds: QueryConditions | QueryPage) => void,
 
 	/**@deprecated Render can get Mediat parameter and field can be defined by user data. */
 	// buttonStyle?: "norm" | "dense"

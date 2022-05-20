@@ -388,8 +388,6 @@ class SessionClient {
 	an: AnClient;
 	ssInf: any;
 
-	// errCtx = {onError: undefined, msg: undefined} as ErrorCtx;
-
 	currentAct: LogAct = {
 		func: '',
 		cmd: '',
@@ -398,25 +396,37 @@ class SessionClient {
 	};
 	static get ssInfo() { return "ss-info"; }
 
-	/**Create SessionClient with credential information or load from localStorage.<br>
-	 * Because of two senarios of login / home page integration, there are 2 typical useses:<br>
-	 * Use Case 1 (persisted): logged in, then create a client with response,
-	 * 		save in local storage, then load it in new page.<br>
-	 * Use Case 1 (not persisted): logged in, then create a client with response,
-	 * 		user's app handled the object, then provided to other functions,<br>
-	 * 		typicall a home.vue component.<br>
-	 * <p><b>Note</b></p>
-	 * <p>Local storage may be sometimes confusing if not familiar with W3C standars.<br>
+	/**Create SessionClient with credential information or load from localStorage.
+	 * Because of two senarios of login / home page integration, there are 2 typical useses:
+	 * 
+	 * Use Case 1 (persisted):
+	 * 
+	 * logged in, then create a client with response, save in local storage, then load it in new page.
+	 * 
+	 * Use Case 2 (not persisted):
+	 * 
+	 * logged in, then create a client with response, user's app handled the object,
+	 * then provided to other functions, typicall a home.vue component.
+	 * 
+	 * Note
+	 * 
+	 * Local storage may be sometimes confusing if not familiar with W3C standars.
+	 * 
 	 * The local storage can't be cross domain referenced. It's can not been loaded by home page
-	 * if you linked from login page like this, as showed by this example in login.vue:</p>
-	 * <p>window.top.location = response.home</p>
-	 * <p>One recommended practice is initializing home.vue with login credential
-	 * by login.vue, in app.vue.</p>
-	 * <p>But this design makes home page and login component integrated. It's not
+	 * if you linked from login page like this, as showed by this example in login.vue:
+	 * 
+	 * window.top.location = response.home
+	 * 
+	 * One recommended practice is initializing home.vue with login credential
+	 * by login.vue, in app.vue.
+	 * 
+	 * But this design makes home page and login component integrated. It's not
 	 * friedly to application pattern like a port page with login which is independent
-	 * to the system background home page.</p>
-	 * <p>How should this pattern can be improved is open for discussion.
-	 * If your are interested in this subject, leave any comments in wiki page please.</p>
+	 * to the system background home page.
+	 * 
+	 * How should this pattern can be improved is open for discussion.
+	 * If your are interested in this subject, leave any comments in wiki page please.
+	 * 
 	 * @param ssInf login response form server: {ssid, uid}, if null, will try restore window.for localStorage
 	 * @param iv iv used for cipher when login.
 	 * @param dontPersist don't save into local storage.

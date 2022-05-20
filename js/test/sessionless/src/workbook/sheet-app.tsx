@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '../../../../semantier/anclient';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '../../../../semantier/anclient';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
@@ -27,6 +27,7 @@ type State = {
 	iportal?: string;
 	hasError?: boolean;
 	nextAction?: string;
+	conn_state: TMsgCode;
 }
 
 /** The application main, context singleton and error handler */
@@ -38,6 +39,7 @@ class App extends React.Component<LessProps, State> {
 	error: ErrorCtx;
 
 	state = {
+		conn_state: Protocol.MsgCode.ok as TMsgCode,
 		hasError: false,
 		iportal: 'portal.html',
 		nextAction: undefined as string, // e.g. re-login
@@ -47,6 +49,9 @@ class App extends React.Component<LessProps, State> {
 		/** the serv id for selecting url from configured hosts */
 		servId: '',
 	};
+
+	uri = '/less/sheet';
+	tier: MyWorkbookTier;
 
 	/**
      * Restore session from window.localStorage 
@@ -82,12 +87,15 @@ class App extends React.Component<LessProps, State> {
                             /* see jserv-sandbox/UsersTier, port name: sheetier, filter: sheet.less */
                             userstier: "sheet.less",
                         });
+		
+		this.tier = new MyWorkbookTier({uri: this.uri});
 	}
 
-	onError(c: any, r: AnsonMsg<AnsonResp> ) {
+	onError(c: TMsgCode, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r);
 		this.error.msg = r.Body().msg();
 		this.setState({
+			conn_state: c,
 			hasError: !!c,
 			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
@@ -100,7 +108,6 @@ class App extends React.Component<LessProps, State> {
 	}
 
 	render() {
-	  let uri = '/less/sheet';
 	  return (
 
 		<MuiThemeProvider theme={JsampleTheme}>
@@ -116,9 +123,7 @@ class App extends React.Component<LessProps, State> {
 				error: this.error,
 				ssInf: undefined,
 			}} >
-				{<Worksheet port='sheet' uri={uri}
-					tier={new MyWorkbookTier({uri})}
-				/>}
+				{<Worksheet port='sheet' uri={this.uri} tier={this.tier} conn_state={this.state.conn_state} />}
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={"/login"} tier={undefined}
