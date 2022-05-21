@@ -153,6 +153,8 @@ class Jregex {
 	}
 }
 
+export type TMsgCode = 'ok' | 'exSession' | 'exSemantic' | 'exIo' | 'exTransct' | 'exDA' | 'exGeneral';
+
 /**Json protocol helper to support jclient.
  * All AnsonBody and JHelper static helpers are here. */
 export class Protocol {
@@ -167,10 +169,14 @@ export class Protocol {
 		datasetier: "ds.tier"
 	};
 
-	static MsgCode = {ok: "ok",
-		exSession: "exSession", exSemantic: "exSemantic",
-        exIo: "exIo", exTransct: "exTransct", exDA: "exDA",
-        exGeneral: "exGeneral"
+	static MsgCode = {
+		ok: "ok" as TMsgCode,
+		exSession: "exSession" as TMsgCode,
+		exSemantic: "exSemantic" as TMsgCode,
+		exIo: "exIo" as TMsgCode,
+		exTransct: "exTransct" as TMsgCode,
+		exDA: "exDA" as TMsgCode,
+		exGeneral: "exGeneral" as TMsgCode
 	};
 
 	static Notify = {changePswd: "changePswd", todos: "todos"};

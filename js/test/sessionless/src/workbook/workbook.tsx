@@ -1,7 +1,7 @@
 import React from 'react';
 import { Theme, withStyles, withWidth } from '@material-ui/core';
 
-import { QueryPage } from '../../../../semantier/anclient';
+import { Protocol, QueryPage } from '../../../../semantier/anclient';
 
 import {
 	L, ComboCondType, ClassNames, Comprops, CrudComp,
@@ -34,18 +34,19 @@ const styles = (theme: Theme) => ( {
 	}
 });
 
-class WorkbookComp extends CrudComp<Comprops>{
+class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
 	tier: MyWorkbookTier;
 	classes: ClassNames;
-	uri: string;
+	// uri: string;
 	conds = { pageInf: {page: 0, size: 20},
-			  cate: { type: 'cbb', sk: 'curr-cate', uri: this.uri,
-			  		  label: L('Category'), field: '--'} as ComboCondType,
-			  subject:{type: 'cbb', sk: 'curr-subj', uri: this.uri,
-			  		  label: L('Subject'), field: '--'} as ComboCondType,
-		} as QueryPage;
+			  query: [
+				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
+				  label: L('Category'), field: '--'} as ComboCondType,
+				{ type: 'cbb', sk: 'curr-subj', uri: this.uri,
+				  label: L('Subject'), field: '--'} as ComboCondType,
+			] } as QueryPage;
 
-	constructor(props: Comprops) {
+	constructor(props: Comprops & {conn_state: string}) {
 		super(props);
 
 		this.classes = props.classes;
@@ -66,7 +67,7 @@ class WorkbookComp extends CrudComp<Comprops>{
 	icon(e: SpreadsheetRec) {
 		let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
 
-		return e.css?.alignContent === 'middle'
+		return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
 			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
 			: <jsample.JsampleIcons.Star color={color} className={this.classes.svgicn}/>
 			;
@@ -88,8 +89,10 @@ class WorkbookComp extends CrudComp<Comprops>{
 	render() {
 		let that = this;
 		return (<div>
-			{<AnQueryst 
-				conds={this.conds}
+			{<AnQueryst
+				stopBinding={this.props.conn_state !== Protocol.MsgCode.ok}
+				uri={this.uri}
+				fields={this.conds.query}
 				onSearch={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
 				onReady={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
 			/>}

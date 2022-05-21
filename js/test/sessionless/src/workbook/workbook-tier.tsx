@@ -1,5 +1,5 @@
-import { AnsonBody, AnsonResp, CRUD, ErrorCtx,
-	OnCommitOk, OnLoadOk, PageInf, QueryCondition, QueryPage, Semantier
+import { AnlistColAttrs, AnsonBody, AnsonResp, CRUD, ErrorCtx,
+	OnCommitOk, OnLoadOk, PageInf, QueryPage, Semantier
 } from '../../../../semantier/anclient';
 
 import { L, SheetCol, SpreadsheetRec, } from '../../../../anreact/src/an-components';
@@ -97,13 +97,13 @@ class MyBookReq extends AnsonBody {
 	}
 
 	rec: SpreadsheetRec;
-	conds: QueryCondition[];
+	conds: AnlistColAttrs<JSX.Element, {}>[];
 	page: PageInf;
 
 	constructor(query?: QueryPage, rec?: MyCurriculum) {
 		super();
 
-		this.conds = query.query as QueryCondition[];
+		this.conds = query.query;
 		this.page = query.pageInf;
 		this.rec = rec;
 	}

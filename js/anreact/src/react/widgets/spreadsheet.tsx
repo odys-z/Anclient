@@ -10,7 +10,13 @@ import { CellClickedEvent, CellEditingStoppedEvent, ColDef, GetContextMenuItems,
 
 export interface SheetCol extends TierCol {
 	label: string; 
-
+	field: string;
+	suppressSizeToFit?: boolean;
+	resizable?: boolean;
+	editable?: boolean;
+	singleClickEdit?: boolean;
+	width?: 120;
+	minWidth?: 50; 
 	thFormatter?: () => SheetCol & {headerName: string};
 	anEditStop?: (e: CellEditingStoppedEvent) => void;
 
