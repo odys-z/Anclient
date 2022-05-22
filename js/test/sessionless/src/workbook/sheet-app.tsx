@@ -88,7 +88,17 @@ class App extends React.Component<LessProps, State> {
                             userstier: "sheet.less",
                         });
 		
-		this.tier = new MyWorkbookTier({uri: this.uri});
+		this.tier = new MyWorkbookTier({
+			uri: this.uri,
+			cols: [
+				{field: 'cId', label: L("Id"), width: 120},
+				{field: 'currName', label: L("curriculum"), width: 160},
+				{field: 'clevel', label: L("Level"), width: 80},
+				{field: 'module', label: L('Module'), width: 120, type: 'cbb'},
+				{field: 'cate', label: L("Category"), width: 120},
+				{field: 'subject', label: L("Subject"), width: 160},
+			]
+		});
 	}
 
 	onError(c: TMsgCode, r: AnsonMsg<AnsonResp> ) {

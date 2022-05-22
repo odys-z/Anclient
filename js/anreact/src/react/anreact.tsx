@@ -2,9 +2,8 @@
 import $ from 'jquery';
 
 import { stree_t, Tierec,
-	SessionClient, InsertReq,
-	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk, QueryConditions, NameValue, Semantier, QueryCondition
+	SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
+	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames, NV, OnLoadOk, Semantier
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
@@ -307,8 +306,9 @@ export class AnReactExt extends AnReact {
 			(dsResp) => {
 				let rs = dsResp.Body().Rs();
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
-					console.error("Can't find data in rs for option label. column: 'name'.",
-						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
+					console.error("Can't find data in rs for cbb item's label - needing column: 'name'.",
+						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}",
+						 "rs columns: ", rs?.colnames);
 
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)

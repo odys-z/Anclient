@@ -1,8 +1,10 @@
-import { AnlistColAttrs, AnsonBody, AnsonResp, CRUD, ErrorCtx,
-	OnCommitOk, OnLoadOk, PageInf, QueryPage, Semantier
+import { AnElemFormatter, AnlistColAttrs, AnsonBody, AnsonMsg, AnsonResp, AnTreeNode, CRUD, ErrorCtx,
+	Inseclient,
+	InsertReq,
+	OnCommitOk, OnLoadOk, PageInf, PkMeta, QueryConditions, QueryPage, Semantext, Semantier, SessionClient, TierCol, Tierec, Tierelations, UIRelations 
 } from '../../../../semantier/anclient';
 
-import { L, SheetCol, SpreadsheetRec, } from '../../../../anreact/src/an-components';
+import { L, SheetCol, SpreadsheetRec, Spreadsheetier } from '../../../../anreact/src/an-components';
 
 /**
  * @example table DDL
@@ -24,7 +26,7 @@ CREATE TABLE b_curriculums (
 
 select * from b_curriculums;
  */
-class MyWorkbookTier extends Semantier {
+class MyWorkbookTier implements Spreadsheetier {
 	static port = 'sheet.less';
 	/**
 	 * @param props
@@ -33,8 +35,67 @@ class MyWorkbookTier extends Semantier {
 		super(props);
 		console.log(this.uri);
 
-		this.rows = [{id: '1911-10-10'}];
-		this._cols = props.cols? props.cols : [{field: 'id', label: '#'}];
+		this.rows = [{cId: 'Math Jasmine'}];
+		this._cols = props.cols? props.cols : [{field: 'cId', label: '#'}];
+	}
+	cbbCellOptions(p: { value: any; data: SpreadsheetRec; }) {
+		throw new Error('Method not implemented.');
+	}
+	decode;
+	mtabl: string;
+	_cols: TierCol[];
+	uri: string;
+	_fields: TierCol[];
+	crud: CRUD;
+	rows: Tierec[];
+	pkval: PkMeta;
+	rec: Tierec;
+	relMeta: { [tabl: string]: Tierelations; };
+	rels: UIRelations;
+	lastCondit: QueryConditions | QueryPage;
+	setContext(context: Semantext): Semantier {
+		throw new Error('Method not implemented.');
+	}
+	isReadonly(field: TierCol): boolean {
+		throw new Error('Method not implemented.');
+	}
+	client: SessionClient | Inseclient;
+	errCtx: ErrorCtx;
+	disableValidate: any;
+	validate(rec?: {}, fields?: TierCol[]): boolean {
+		throw new Error('Method not implemented.');
+	}
+	fields(modifier?: { [x: string]: object | AnElemFormatter; }): TierCol[] {
+		throw new Error('Method not implemented.');
+	}
+	relations(client: SessionClient | Inseclient, opts: { uri: string; reltabl: string; sqlArgs?: string[]; sqlArg?: string; }, onOk: OnCommitOk): void {
+		throw new Error('Method not implemented.');
+	}
+	record(conds: QueryConditions | QueryPage, onLoad: OnLoadOk<Tierec>): void {
+		throw new Error('Method not implemented.');
+	}
+	saveRec(opts: { crud: CRUD; disableForm?: boolean; disableRelations?: boolean; reltabl?: string; }, onOk: OnCommitOk): void {
+		throw new Error('Method not implemented.');
+	}
+	del(opts: { ids: string[]; posts?: AnsonBody[]; }, onOk: OnCommitOk): void {
+		throw new Error('Method not implemented.');
+	}
+	resetFormSession(): void {
+		throw new Error('Method not implemented.');
+	}
+	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Tierelations, parentpkv: PkMeta): AnsonMsg<T> {
+		throw new Error('Method not implemented.');
+	}
+	inserTreeChecked(forest: AnTreeNode[], opts: { table: string; columnMap: {}; check: string; reshape: boolean; }): InsertReq {
+		throw new Error('Method not implemented.');
+	}
+
+	insert(onOk: OnCommitOk) {
+		let req = this.client.userReq(this.uri,
+				MyWorkbookTier.port,
+				new MyBookReq( undefined ).A(MyBookReq.A.insert));
+
+		this.client.commit(req, onOk, this.errCtx);
 	}
 
 	/**

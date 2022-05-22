@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, withStyles } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
@@ -9,16 +9,15 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 import dateFormat from 'dateformat';
 
-import { AnsonMsg, TierCol } from '@anclient/semantier';
 import { L,
 	AnContext, ConfirmDialog, CrudComp,
-	jsample, AnGridsheet, AnNumericEdit, AnIndicatorRenderer, addDays
+	jsample, AnGridsheet, AnNumericEdit, AnIndicatorRenderer, addDays, Comprops
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { GPATier, GPAResp, GPARec } from '../n-tsx/gpa-tier'
+import { GPATier, GPARec } from '../n-tsx/gpa-tier'
 
-const styles = (_theme) => ({
+const styles = (_theme: Theme) => ({
 	root: {
 		height: "calc(100vh - 18ch)"
 	},
@@ -42,7 +41,7 @@ const styles = (_theme) => ({
  * For public results, go
  * https://ag-grid-react-hello-world-8lxdjj.stackblitz.io
  */
-class GPAsheetComp extends CrudComp<any> {
+class GPAsheetComp extends CrudComp<Comprops> {
 	state = {
         addingNew: false,
 		dirty: false,
@@ -58,7 +57,7 @@ class GPAsheetComp extends CrudComp<any> {
 
     avrow: GPARec;
 
-	constructor (props) {
+	constructor (props: Comprops) {
 		super(props);
 
 		this.tier = new GPATier(this);
@@ -80,7 +79,7 @@ class GPAsheetComp extends CrudComp<any> {
 		this.tier.records(null, this.bindSheet);
 	}
 
-	toAdd(e: React.UIEvent) {
+	toAdd(_e: React.UIEvent) {
 		let newGday = dateFormat('yyyy-mm-dd'); //. new Date().toISOStr();
 		// avoid duplicated key
 		let found = false;
@@ -236,7 +235,7 @@ class GPAsheetComp extends CrudComp<any> {
 						editable: this.rowEditableChecker
 					} }
 					onCellClicked={
-						(p) => {
+						(p: { data: GPARec; }) => {
 							if (p.data && p.data.gday)
 								that.currentId = p.data.gday;
 						}
@@ -246,7 +245,7 @@ class GPAsheetComp extends CrudComp<any> {
 						action: p => { console.log(p); }
 					} }
 					onGridReady={
-						p => {
+						(p: { api: any; columnApi: any; }) => {
 							that.api = p.api;
 							that.columnApi = p.columnApi;
 						}

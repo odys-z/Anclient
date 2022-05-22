@@ -1,50 +1,58 @@
 import React from 'react';
-import { Theme, withStyles, withWidth } from '@material-ui/core';
+import { Button, Theme, withStyles, withWidth } from '@material-ui/core';
 
-import { Protocol, QueryPage } from '../../../../semantier/anclient';
+import { AnsonMsg, AnsonResp, QueryPage } from '../../../../semantier/anclient';
 
 import {
 	L, ComboCondType, ClassNames, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec,
 } from '../../../../anreact/src/an-components';
 import { MyWorkbookTier } from './workbook-tier';
+import { JsampleIcons } from '../../../../anreact/src/jsample/styles';
 
 const styles = (theme: Theme) => ( {
 	root: {
 	},
 	button: {
-		marginLeft: theme.spacing(1)
+		marginLeft: theme.spacing(1),
+		marginRight: theme.spacing(1),
+		marginTop: 6,
+		width: 150,
 	},
-	card: {
-		width: "28vw",
-		margin: theme.spacing(1)
-	},
-	cardTitle: {
-		color: "blue",
-		textShadow: "4px 4px 3px #688a8a",
-		textAlign: "center" as const,
-		margin: theme.spacing(1)
-	},
-	cartText: {
-		width: "86%",
-		margin: theme.spacing(1)
-	},
-	svgicn: {
-		verticalAlign: "middle",
-	}
+	// card: {
+	// 	width: "28vw",
+	// 	margin: theme.spacing(1)
+	// },
+	// cbbCate: {
+	// 	color: "blue",
+	// 	width: 80,
+	// 	margin: theme.spacing(1)
+	// },
+	// cbbSubj: {
+	// 	width: 60,
+	// 	margin: theme.spacing(1)
+	// },
+	// svgicn: {
+	// 	verticalAlign: "middle",
+	// }
 });
 
 class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
 	tier: MyWorkbookTier;
 	classes: ClassNames;
+
+	confirm: JSX.Element;
+
 	// uri: string;
 	conds = { pageInf: {page: 0, size: 20},
 			  query: [
 				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
-				  label: L('Category'), field: '--'} as ComboCondType,
+				  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
 				{ type: 'cbb', sk: 'curr-subj', uri: this.uri,
-				  label: L('Subject'), field: '--'} as ComboCondType,
+				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
+
+	currentId: string;
 
 	constructor(props: Comprops & {conn_state: string}) {
 		super(props);
@@ -73,6 +81,25 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
 			;
 	}
 
+	bindSheet(_resp: AnsonMsg<AnsonResp>) {
+		let that = this;
+		this.tier.records(this.conds,
+			(_cols, rows) => {
+				that.tier.rows = rows;
+				that.setState({})
+			});
+	}
+
+	toAdd(_e: React.UIEvent) {
+		this.tier.insert(this.bindSheet);
+	}
+
+	toDel(e: React.UIEvent) {
+		let that = this;
+		if (this.currentId)
+			this.tier.del({ids: [this.currentId]}, this.bindSheet);
+	}
+
 	// paper(e: SpreadsheetRec) {
 	// 	return (
 	// 		<Paper elevation={4} style={{ margin: 24 }}
@@ -88,9 +115,11 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
 
 	render() {
 		let that = this;
+		let {classes} = this.props;
+
 		return (<div>
 			{<AnQueryst
-				stopBinding={this.props.conn_state !== Protocol.MsgCode.ok}
+				// stopBinding={this.props.conn_state !== Protocol.MsgCode.ok}
 				uri={this.uri}
 				fields={this.conds.query}
 				onSearch={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
@@ -98,8 +127,25 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
 			/>}
 			{this.tier &&
 			  <div className='ag-theme-alpine' style={{height: '78vh', width: '100%', margin:'auto'}}>
-				<AnSpreadsheet columns={this.tier.columns()} rows={this.tier.rows} />
+				<AnSpreadsheet tier={this.tier} columns={this.tier.columns()} rows={this.tier.rows} />
 			  </div>}
+			<div style={{textAlign: 'center', background: '#f8f8f8'}}>
+				<Button variant="outlined"
+					className={classes.button}
+					color='primary'
+					onClick={this.toAdd}
+					endIcon={<JsampleIcons.Add />}
+				>{L('Append')}
+				</Button>
+				<Button variant="outlined"
+					className={classes.button}
+					color='secondary'
+					onClick={this.toDel}
+					endIcon={<JsampleIcons.Delete />}
+				>{L('Delete')}
+				</Button>
+			</div>
+			{this.confirm}
 		</div>);
 	}
 

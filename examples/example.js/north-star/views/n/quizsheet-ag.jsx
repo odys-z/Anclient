@@ -143,16 +143,6 @@ class QuizsheetComp extends React.Component {
 		let {quizId, quiz, questions} = qresp.quiz_questions();
 		let quizUsers = qresp.quizUserIds();
 
-		// Wrong comments: this.tier.pkval = {pk: 'qid', v: quizId || ''}; // TRecordForm use this binding rec.
-
-		// this.setState( {
-		// 	questions: questions,
-		// 	quiz,
-		// 	quizUsers,
-		// 	currentqx: -1,
-		// 	dirty:   false
-		// } );
-
 		let rec = this.tier.rec;
 		rec.questions = questions;
 		rec.quizUsers = quizUsers,
@@ -193,17 +183,14 @@ class QuizsheetComp extends React.Component {
 				jquiz={this.jquiz}
 				onSave={ ids => {
 					that.quizUserForm = undefined;
-					// that.setStateHooked({quizUsers: ids});
 					that.tier.rec.quizUsers = ids;
 					that.setState({});
 				} }
 				onClose={e => {
 					that.quizUserForm = undefined;
-					// that.setStateHooked({});
 					that.setState({});
 				}}
 			/> );
-		// this.setStateHooked({});
 		this.setState({});
 	}
 

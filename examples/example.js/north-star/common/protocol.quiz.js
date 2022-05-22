@@ -278,7 +278,6 @@ export const QuizProtocol = {
 		},
 
 		agRenderer: (p) => {
-			// return '**' + p.value + '**';
 			return QuizProtocol.Qtype.decode(p.value);
 		},
 
