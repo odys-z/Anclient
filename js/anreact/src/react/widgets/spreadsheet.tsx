@@ -1,12 +1,14 @@
 import React, { CSSProperties } from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, CellEditingStoppedEvent, ColDef, GetContextMenuItems, GetContextMenuItemsParams, GridReadyEvent, ICellRendererParams, StartEditingCellParams } from 'ag-grid-community';
+import { CellClickedEvent, CellEditingStoppedEvent, ColDef, ColumnApi,
+	GetContextMenuItems, GetContextMenuItemsParams, GridApi, GridReadyEvent, ICellRendererParams
+} from 'ag-grid-community';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
-import { TierCol, Tierec, isEmpty, Semantier } from '../../../../semantier/anclient';
+import { TierCol, Tierec, Semantier } from '../../../../semantier/anclient';
 
 export interface SheetCol extends TierCol {
 	label: string; 
@@ -23,7 +25,7 @@ export interface SheetCol extends TierCol {
 	width?: number;
 	minWidth?: number; 
 	thFormatter?: () => SheetCol & {headerName: string};
-	anEditStop?: (e: CellEditingStoppedEvent) => void;
+	onEditStop?: (e: CellEditingStoppedEvent) => void;
 
 	isEditable?: () => boolean | boolean;
 }
@@ -34,13 +36,14 @@ export interface SpreadsheetRec extends Tierec {
 }
 
 export class Spreadsheetier extends Semantier {
-	cbbCellOptions: (p: {value: any, data: SpreadsheetRec}) => string[]
+	cbbCellOptions(p: {value: any, data: SpreadsheetRec}) : string[] { return [p.value]; }
 
-	decode: (p: ICellRendererParams) => string | object | undefined;
+	decode(p: ICellRendererParams) : string | object | undefined { return p.value; }
 }
 
 export interface SpreadsheetProps extends Comprops {
 	columns: SheetCol[];
+	/** Initial rows - updated with jserv response */
 	rows: Tierec[];
 
 	tier: Spreadsheetier;
@@ -78,13 +81,16 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 
 	editHandlers = {} as {[fname: string]: (p: CellEditingStoppedEvent) => void};
 
-	gridApi: any;
-	gridColumnApi: any;
+	gridApi: GridApi;
+	gridColumnApi: ColumnApi;
 
 	isEditable = true;
+	tier: Spreadsheetier;
 
 	constructor(props: SpreadsheetProps) {
 		super(props);
+
+		this.tier = props.tier;
 
 		let {resizable, editable, singleClickEdit} = props.defaultColDef || {};
 		this.defaultColDef = Object.assign(
@@ -95,20 +101,15 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 		this.onEditStop = this.onEditStop.bind(this);
 		let that = this;
 
-		console.log(this.coldefs);
-	}
-
-	componentDidMount() {
-		let that = this;
 		if (this.props.columns) {
 			this.props.columns.forEach( (c, x) =>  {
 				let headerName = c.label;
 				delete c.label;
 
-				let anEditStop = c.anEditStop;
+				let anEditStop = c.onEditStop;
 				if (anEditStop) {
 					that.editHandlers[c.field] = anEditStop;
-					delete c.anEditStop;
+					delete c.onEditStop;
 				}
 				let width = 120;
 				if (x === this.coldefs.length - 1)
@@ -123,17 +124,18 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 						width,
 						minWidth: 50 },
 					  c.thFormatter ? c.thFormatter() :
-						{ headerName, ...c}) as any;
+						{ headerName, ...c}) as ColDef;
 				
 				if (col.type === 'cbb') {
+					col.type = undefined; // 'agSelectEditor';
 					col.cellEditor = 'agSelectCellEditor';
 					// p type: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
 					col.cellEditorParams = (p: any) => {
-						console.error('p type');
+						console.error('p type', p);
 						return { values: that.props.tier.cbbCellOptions(p) };
 					  };
-					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p)),
-					col.anEditStop = anEditStop
+					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p))
+					// col.onCellEditingStopped = anEditStop
 					// (e: { value: any; data: SpreadsheetRec; }) => {
 					// }
 				}
@@ -141,6 +143,14 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 				that.coldefs.push( col );
 			} );
 		}
+		console.log(this.coldefs);
+	}
+
+	componentDidMount() {
+		this.tier.setContext(this.context);
+
+		let that = this;
+		this.tier.records(undefined, () => that.setState({}));
 	}
 
 	/** load default context menu, together with user's menu items.
@@ -178,7 +188,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	    defaultItems: string[] | undefined // names of the items that would be provided by default
 	  }</pre>
 	 */
-	onGridReady = (params: { api: { sizeColumnsToFit: () => void; }; columnApi: any; }) => {
+	onGridReady = (params: { api: GridApi; columnApi: ColumnApi; }) => {
 		this.gridApi = params.api;
 		this.gridColumnApi = params.columnApi;
 
@@ -227,7 +237,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 			onCellEditingStopped={this.onEditStop}
 			getContextMenuItems={this.getContextMenuItems}
 			onGridReady={this.props.onSheetReady}
-			rowData={this.props.rows} >
+			rowData={this.tier.rows} >
 		</AgGridReact> );
 	}
 }
@@ -322,12 +332,12 @@ export class AnNumerCellEdit {
     return false;
   }
 
-  getCharCodeFromEvent(event) {
+  private getCharCodeFromEvent(event) {
     event = event || window.event;
     return typeof event.which == 'undefined' ? event.keyCode : event.which;
   }
 
-  isCharNumeric(charStr: string) {
+  private isCharNumeric(charStr: string) {
     return !!/\d/.test(charStr);
   }
 

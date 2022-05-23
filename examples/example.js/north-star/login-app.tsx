@@ -4,8 +4,9 @@ import ReactDOM from 'react-dom';
 import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier'
 import { L, Langstrs, AnContext, AnError, AnReact, Login, jsample } from '@anclient/anreact';
 import { Northprops } from './common/north';
+import { Theme } from '@material-ui/core/styles';
 
-const styles = (theme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
   jsample.jstyles(theme),
   { root: {
 	    '& *': { margin: theme.spacing(1) }

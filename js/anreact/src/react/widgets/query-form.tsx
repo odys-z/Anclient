@@ -5,7 +5,7 @@ import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputC
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Search, Replay } from '@material-ui/icons';
 
-import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField, QueryPage } from '@anclient/semantier';
+import { toBool, AnlistColAttrs, NV, QueryConditions, TierComboField, PageInf } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
@@ -243,7 +243,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 					let refcbb = React.createRef<HTMLDivElement>();
 					// let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
 					return (
-					<Grid item className={classes.container} {...cond.grid}>
+					<Grid key={'q-' + x} item className={classes.container} {...cond.grid}>
 					<Autocomplete<ComboItem> key={'cbb' + x}
 						id={String(x)} data-name={String(x)} ref={refcbb}
 						onChange={ that.onCbbRefChange(refcbb) }
@@ -260,7 +260,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 					let refcbb = React.createRef<HTMLDivElement>();
 					// let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
 					return (
-					<Grid item className={classes.container} {...cond.grid}>
+					<Grid key={'q-' + x} item className={classes.container} {...cond.grid}>
 					<Autocomplete<ComboItem> key={'cbb' + x}
 						id={String(x)} data-name={String(x)} ref={refcbb}
 						onChange={ that.onCbbRefChange(refcbb) }
@@ -279,7 +279,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 					let v = cond && cond.val ? cond.val : '';
 					let label = cond && cond.label ? cond.label : "date"
 					return (
-					<Grid item className={classes.container} {...cond.grid}>
+					<Grid key={'q-' + x} item className={classes.container} {...cond.grid}>
 						<TextField key={x} value = {v} label={label}
 							type="date" style={{ width: 300 }}
 							onChange = {event => {that.onDateChange(event, x)}}
@@ -290,7 +290,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 					// let v = cond && cond.val || false;
 					let v = toBool(cond.val);
 					return (
-					<Grid item className={classes.container} {...cond.grid}>
+					<Grid key={'q-' + x} item className={classes.container} {...cond.grid}>
 						<FormControlLabel key={'sch' + x}
 					        control={ <Switch key={x}
 										checked={v} color='primary'
@@ -300,7 +300,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				}
 				else // if (cond.type === 'text')
 					return (
-					<Grid item className={classes.container} {...cond.grid}>
+					<Grid key={'q-' + x} item className={classes.container} {...cond.grid}>
 					<TextField label={cond.label} key={'text' + x}
 						id={String(x)} value={cond.val || ''}
 						onChange={e => {that.onTxtChange(e, x)}}/>
@@ -389,13 +389,13 @@ export interface QueryFormProps extends Comprops {
 	/**User actions: search button clicked
 	 * @deprecated replaced by onQuery
 	 */
-	onSearch?: (conds: QueryConditions | QueryPage) => void,
+	onSearch?: (conds: QueryConditions | PageInf) => void,
 
 	/**Bounding components successfully
 	 * 
 	 * @deprecated replaced by onQuery
 	 */
-	onLoaded?: (conds: QueryConditions | QueryPage) => void,
+	onLoaded?: (conds: QueryConditions | PageInf) => void,
 
 	/**@deprecated Render can get Mediat parameter and field can be defined by user data. */
 	// buttonStyle?: "norm" | "dense"

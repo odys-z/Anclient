@@ -3,7 +3,7 @@ import $ from 'jquery';
 
 import { stree_t, Tierec,
 	SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames, NV, OnLoadOk, Semantier
+	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames, NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
@@ -21,6 +21,18 @@ export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: 
 export interface CompOpts {
 	classes: ClassNames;
 	media: Media;
+}
+
+export interface QueryPage {
+	pageInf?: PageInf;
+	query?: AnlistColAttrs<JSX.Element, any>[];
+}
+
+export function toPageInf(query: QueryPage) : PageInf {
+	console.error('todo', query);
+	let p = new PageInf(query.pageInf.page, query.pageInf.size);
+	p.condts = [];
+	return p;
 }
 
 export const invalidStyles = {

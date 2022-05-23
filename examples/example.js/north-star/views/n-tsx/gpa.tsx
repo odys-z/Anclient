@@ -16,6 +16,7 @@ import { L,
 const { JsampleIcons } = jsample;
 
 import { GPATier, GPARec } from '../n-tsx/gpa-tier'
+import { ColumnApi, GridApi } from 'ag-grid-community';
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -50,10 +51,10 @@ class GPAsheetComp extends CrudComp<Comprops> {
 	};
 
     tier: GPATier;
-    api: any;
-    columnApi: any;
+    api: GridApi;
+    columnApi: ColumnApi;
     confirm: JSX.Element;
-    currentId: any;
+    currentId: string;
 
     avrow: GPARec;
 
@@ -245,7 +246,7 @@ class GPAsheetComp extends CrudComp<Comprops> {
 						action: p => { console.log(p); }
 					} }
 					onGridReady={
-						(p: { api: any; columnApi: any; }) => {
+						(p: { api: GridApi; columnApi: ColumnApi; }) => {
 							that.api = p.api;
 							that.columnApi = p.columnApi;
 						}

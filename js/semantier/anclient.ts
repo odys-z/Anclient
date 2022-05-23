@@ -318,7 +318,7 @@ class AnClient {
 			? resp.body[0].rs[0].results : [];
 	}
 
-    /** Get the objects from jserv's rows (response from port returning SResultsets)
+    /** Get the objects from jserv's rows (response with AnResultset)
 	 * @deprecated
      * @param resp
      * @param start start to splice

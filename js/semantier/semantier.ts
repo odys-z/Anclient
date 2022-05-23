@@ -8,7 +8,8 @@ import { stree_t, CRUD,
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-/**<p>UI element formatter</p>
+/**UI Element Formatter
+ * 
  * E.g. TRecordForm will use this to format a field in form.
  * Currently tiers also accept this as field modifier. (FIXME - to be optimized)
  */
@@ -69,7 +70,9 @@ export interface TierCol extends DbCol {
 
 /**Meta data handled from tier (DB field).
  * field and label properties are required.
+ * 
  * F: field type, e.g. JSX.Element;
+ * 
  * FO: options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
 */
 export interface AnlistColAttrs<F, FO> extends TierCol {
@@ -109,10 +112,6 @@ export interface TierComboField<F, FO> extends AnlistColAttrs<F, FO> {
 export interface Tierelations extends DbRelations {
 }
 
-// export interface QueryCondition extends TierCol {
-// 	// [q: string]: string | number | object | boolean;
-// }
-
 /**Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
  * @deprecated
  */
@@ -124,11 +123,6 @@ export interface QueryConditions {
 	 * should be only type of QueryCondition. String & number value for backward compatability  
 	[q: string]: QueryCondition | string | number;
 	 */
-}
-
-export interface QueryPage {
-	pageInf?: PageInf;
-	query?: AnlistColAttrs<JSX.Element, any>[];
 }
 
 /**
@@ -197,7 +191,7 @@ export class Semantier {
 	 */
     rels: UIRelations = {};
 
-    lastCondit: QueryConditions | QueryPage;
+    // lastCondit: QueryConditions | QueryPage;
 
     /**
      * @param context
@@ -353,7 +347,7 @@ export class Semantier {
 	 * @param conds
 	 * @param onLoad
 	 */
-    record(conds: QueryConditions | QueryPage, onLoad: OnLoadOk<Tierec>) : void {
+    record(conds: QueryConditions | PageInf, onLoad: OnLoadOk<Tierec>) : void {
     }
 
 	/** Load records of conditions.
@@ -361,7 +355,7 @@ export class Semantier {
 	 * @param conds QueryConditions type is deprecated
 	 * @param onLoad
 	 */
-    records(conds: QueryConditions | QueryPage, onLoad: OnLoadOk<Tierec>) : void {
+    records(conds: QueryConditions | PageInf, onLoad: OnLoadOk<Tierec>) : void {
 	}
 
     /** save form with a relationship table.

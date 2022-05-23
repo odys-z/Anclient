@@ -23,7 +23,6 @@ import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
 import { MyDocs } from './views/c/my-docs';
 
-import { welcome } from './views/c-tsx/nwelcome';
 import { Northprops } from './common/north';
 
 /** The application main, context singleton and error handler */

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '../../../../semantier/anclient';
@@ -8,7 +9,7 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
 } from '../../../../anreact/src/an-components';
 
-import Worksheet from './workbook';
+import { Workbook } from './workbook';
 import { MyWorkbookTier } from './workbook-tier';
 
 const { JsampleTheme } = jsample; 
@@ -32,7 +33,6 @@ type State = {
 
 /** The application main, context singleton and error handler */
 class App extends React.Component<LessProps, State> {
-	/** {@link InsercureClient} */
 	inclient: Inseclient;
 	anReact: AnReactExt;  // helper for React
 
@@ -85,7 +85,7 @@ class App extends React.Component<LessProps, State> {
 		this.anReact = new AnReactExt(this.inclient, this.error)
                         .extendPorts({
                             /* see jserv-sandbox/UsersTier, port name: sheetier, filter: sheet.less */
-                            userstier: "sheet.less",
+                            workbook: "sheet.less",
                         });
 		
 		this.tier = new MyWorkbookTier({
@@ -133,7 +133,7 @@ class App extends React.Component<LessProps, State> {
 				error: this.error,
 				ssInf: undefined,
 			}} >
-				{<Worksheet port='sheet' uri={this.uri} tier={this.tier} conn_state={this.state.conn_state} />}
+				{<Workbook port='sheet' uri={this.uri} tier={this.tier} conn_state={this.state.conn_state} />}
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={"/login"} tier={undefined}

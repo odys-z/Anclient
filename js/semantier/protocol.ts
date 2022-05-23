@@ -18,7 +18,29 @@ export interface JsonOptions {
     noBoolean: boolean | string;
 };
 
-export type PageInf = { page: number, size: number, total?: number };
+/** An abstract object for query condition
+ * 
+ * What's this experimening:
+ * export type PageInf = { page: number, size: number, total?: number };
+ * 
+ * Tier pattern handling query condition at server side.
+ * So use this to send by query form status.
+ *  */
+export class PageInf {
+	type: string;
+
+	page: number;
+	size?: number;
+	total?: number;
+	condts?: Array<string[]>;
+
+	constructor(page?: number, size?: number, total?: number) {
+		this.type = 'io.odysz.semantic.jserv.R.PageInf';
+		this.page = page || 0;
+		this.size = size || -1;
+		this.total = total || 0;
+	}
+};
 
 /**Lagecy from jquery & easui, replaced by NV - no need to collect form using JQuery in the future. */
 export type NameValue = {name: string, value: object};

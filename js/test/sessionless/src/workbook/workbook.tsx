@@ -1,50 +1,38 @@
 import React from 'react';
-import { Button, Theme, withStyles, withWidth } from '@material-ui/core';
+import { Button } from '@material-ui/core';
+import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, QueryPage } from '../../../../semantier/anclient';
+import { AnsonMsg, AnsonResp, PageInf } from '../../../../semantier/anclient';
 
 import {
-	L, ComboCondType, ClassNames, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec,
+	L, ComboCondType, Comprops, CrudComp,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf,
 } from '../../../../anreact/src/an-components';
 import { MyWorkbookTier } from './workbook-tier';
 import { JsampleIcons } from '../../../../anreact/src/jsample/styles';
 
-const styles = (theme: Theme) => ( {
+const styles = (_theme: Theme) => ({
 	root: {
+		height: "calc(100vh - 18ch)"
 	},
-	button: {
-		marginLeft: theme.spacing(1),
-		marginRight: theme.spacing(1),
+	actionButton: {
+	},
+	usersButton: {
+		marginLeft: 20,
+		marginRight: 20,
 		marginTop: 6,
 		width: 150,
-	},
-	// card: {
-	// 	width: "28vw",
-	// 	margin: theme.spacing(1)
-	// },
-	// cbbCate: {
-	// 	color: "blue",
-	// 	width: 80,
-	// 	margin: theme.spacing(1)
-	// },
-	// cbbSubj: {
-	// 	width: 60,
-	// 	margin: theme.spacing(1)
-	// },
-	// svgicn: {
-	// 	verticalAlign: "middle",
-	// }
+	}
 });
 
-class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
+class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWorkbookTier}>{
 	tier: MyWorkbookTier;
-	classes: ClassNames;
+	// classes: ClassNames;
 
 	confirm: JSX.Element;
 
 	// uri: string;
-	conds = { pageInf: {page: 0, size: 20},
+	conds = { pageInf: new PageInf(0, 20),
 			  query: [
 				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
 				  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
@@ -54,30 +42,37 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
 
 	currentId: string;
 
-	constructor(props: Comprops & {conn_state: string}) {
+	constructor(props: Comprops & {conn_state: string, tier: MyWorkbookTier}) {
 		super(props);
 
-		this.classes = props.classes;
+		// this.classes = props.classes;
 		this.uri = props.uri;
 		this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
+
+		this.toAdd = this.toAdd.bind(this);
+		this.toDel = this.toDel.bind(this);
+		this.bindSheet = this.bindSheet.bind(this);
 	}
 
 	componentDidMount() {
 		let uri = this.uri;
 		console.log(uri);
 
-		this.tier = this.props.tier as MyWorkbookTier;
+		this.tier = this.props.tier;
+		this.tier.setContext(this.context);
 
 		this.setState({});
 	}
 
 	icon(e: SpreadsheetRec) {
+		let {classes} = this.props;
+
 		let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
 
 		return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
 			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-			: <jsample.JsampleIcons.Star color={color} className={this.classes.svgicn}/>
+			: <jsample.JsampleIcons.Star color={color} className={classes.svgicn}/>
 			;
 	}
 
@@ -131,14 +126,14 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
 			  </div>}
 			<div style={{textAlign: 'center', background: '#f8f8f8'}}>
 				<Button variant="outlined"
-					className={classes.button}
+					className={classes.usersButton}
 					color='primary'
 					onClick={this.toAdd}
 					endIcon={<JsampleIcons.Add />}
 				>{L('Append')}
 				</Button>
 				<Button variant="outlined"
-					className={classes.button}
+					className={classes.usersButton}
 					color='secondary'
 					onClick={this.toDel}
 					endIcon={<JsampleIcons.Delete />}
@@ -149,9 +144,11 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string}>{
 		</div>);
 	}
 
-	queryConds(): QueryPage {
-		return this.conds;
+	queryConds(): PageInf {
+		return toPageInf(this.conds);
 	}
 }
+WorkbookComp.contextType = AnContext;
 
-export default withStyles<any, any, Comprops>(styles)(withWidth()(WorkbookComp));
+const Workbook = withStyles(styles)(WorkbookComp);
+export { Workbook, WorkbookComp };

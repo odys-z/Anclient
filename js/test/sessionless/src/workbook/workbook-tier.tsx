@@ -1,4 +1,4 @@
-import { AnlistColAttrs, AnsonBody, AnsonResp, CRUD, ErrorCtx,
+import { Protocol, AnlistColAttrs, AnsonBody, AnsonResp, CRUD, ErrorCtx,
 	OnCommitOk, OnLoadOk, PageInf, QueryPage 
 } from '../../../../semantier/anclient';
 
@@ -25,7 +25,7 @@ CREATE TABLE b_curriculums (
 select * from b_curriculums;
  */
 class MyWorkbookTier extends Spreadsheetier {
-	static port = 'sheet.less';
+	static port = 'workbook';
 	/**
 	 * @param props
 	 */
@@ -35,6 +35,10 @@ class MyWorkbookTier extends Spreadsheetier {
 
 		this.rows = [{cId: 'Math Jasmine'}];
 		this._cols = props.cols? props.cols : [{field: 'cId', label: '#'}];
+	}
+
+	decode(p) {
+		return p.value;
 	}
 
 	insert(onOk: OnCommitOk) {
@@ -104,21 +108,25 @@ class MyBookReq extends AnsonBody {
 		rec: 'rec',
 	}
 
+	port: 'workbook';
+
 	rec: SpreadsheetRec;
 	conds: AnlistColAttrs<JSX.Element, {}>[];
 	page: PageInf;
 
 	constructor(query?: QueryPage, rec?: MyCurriculum) {
-		super();
+		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
 
-		this.conds = query.query;
-		this.page = query.pageInf;
+		this.conds = query?.query;
+		this.page = query?.pageInf;
 		this.rec = rec;
 	}
 }
 
 class MyBookResp extends AnsonResp {
-
 }
+
+Protocol.registerBody('io.oz.sandbox.sheet.SpreadsheetResp',
+					  (jsonBd) => { return new MyBookResp(jsonBd); });
 
 export { MyWorkbookTier, MyCurriculum, MyBookReq, MyBookResp };

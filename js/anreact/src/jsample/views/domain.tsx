@@ -9,7 +9,7 @@ import { AnConst } from '../../utils/consts';
 import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTablist } from '../../react/widgets/table-list'
-import { QueryConditions, Semantier } from '@anclient/semantier';
+import { PageInf, QueryConditions, Semantier } from '@anclient/semantier';
 import { AnQueryst } from '../../react/widgets/query-form';
 
 const styles = (theme: Theme) => ( {
@@ -36,7 +36,7 @@ class DomainComp extends CrudCompW<Comprops> {
 					label: 'autocbb'},
 		condDate: {type: 'date', val: '', label: 'operTime'},
 		*/
-		pageInf : { page: 0, size: 25, total: 0 },
+		pageInf : new PageInf(0, 25, 0 ),
 
 		selected: {ids: new Set<string>()},
 	};
