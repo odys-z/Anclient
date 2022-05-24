@@ -76,7 +76,7 @@ export class GPATier extends Semantier {
 	}
 
 	/**
-	 * @param opts { uri, ids : Set<string>}
+	 * @param opts { uri, ids : Set<string> } 
 	 * @param onOk: function(AnsonResp);
 	 */
 	del(opts: { ids: Array<string> }, onOk: OnCommitOk ) {

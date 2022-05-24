@@ -1,8 +1,7 @@
-import { Protocol, AnlistColAttrs, AnsonBody, AnsonResp, CRUD, ErrorCtx,
-	OnCommitOk, OnLoadOk, PageInf, QueryPage 
-} from '../../../../semantier/anclient';
+import { Protocol, AnsonBody, AnsonResp, CRUD, ErrorCtx,
+	OnCommitOk, OnLoadOk, PageInf} from '../../../../semantier/anclient';
 
-import { L, SheetCol, SpreadsheetRec, Spreadsheetier } from '../../../../anreact/src/an-components';
+import { SheetCol, SpreadsheetRec, Spreadsheetier } from '../../../../anreact/src/an-components';
 
 /**
  * @example table DDL
@@ -26,6 +25,7 @@ select * from b_curriculums;
  */
 class MyWorkbookTier extends Spreadsheetier {
 	static port = 'workbook';
+
 	/**
 	 * @param props
 	 */
@@ -34,10 +34,10 @@ class MyWorkbookTier extends Spreadsheetier {
 		console.log(this.uri);
 
 		this.rows = [{cId: 'Math Jasmine'}];
-		this._cols = props.cols? props.cols : [{field: 'cId', label: '#'}];
+		this._cols = props.cols? props.cols : [{field: 'cid', label: '#'}];
 	}
 
-	decode(p) {
+	decode(p): string | Element {
 		return p.value;
 	}
 
@@ -52,7 +52,7 @@ class MyWorkbookTier extends Spreadsheetier {
 	/**
 	 * @override(Semantier)
 	 */
-	records<T extends SpreadsheetRec>(conds: QueryPage, onLoad: OnLoadOk<T>) {
+	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
 		if (!this.client) return;
 
 		let client = this.client;
@@ -111,14 +111,14 @@ class MyBookReq extends AnsonBody {
 	port: 'workbook';
 
 	rec: SpreadsheetRec;
-	conds: AnlistColAttrs<JSX.Element, {}>[];
 	page: PageInf;
+	// conds: Array<string[]>;
 
-	constructor(query?: QueryPage, rec?: MyCurriculum) {
+	constructor(query?: PageInf, rec?: MyCurriculum) {
 		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
 
-		this.conds = query?.query;
-		this.page = query?.pageInf;
+		this.page = query;
+		// this.conds = query?.condts;
 		this.rec = rec;
 	}
 }

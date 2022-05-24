@@ -61,6 +61,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 
 		this.tier = this.props.tier;
 		this.tier.setContext(this.context);
+		this.tier.loadCbbOptions(this.context);
 
 		this.setState({});
 	}
@@ -78,7 +79,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
-		this.tier.records(this.conds,
+		this.tier.records(toPageInf(this.conds),
 			(_cols, rows) => {
 				that.tier.rows = rows;
 				that.setState({})

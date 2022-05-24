@@ -192,7 +192,7 @@ export interface AnreactAppOptions {
  */
 export class AnReactExt extends AnReact {
 	loading: boolean;
-	options: NV[];
+	// options: NV[];
 
 	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
@@ -282,23 +282,31 @@ export class AnReactExt extends AnReact {
 	 *
 	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *
-	 * @deprecated
-	 * TODO: all widgets should bind data by themselves, so this helper function shouldn't exits.
-	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed.
+	 * TODO: All widgets should bind data by themselves, so the helper of DatasetCombo shouldn't exits.
+	 * Once the Autocomplete is replaced by DatasetCombo, that function should be removed.
 	 * 
 	 * @param opts options
-	 * @param opts.sk semantic key (dataset id)
-	 * @param opts.cond the component's state.conds[#] of which the options need to be updated
-	 * @param opts.nv {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
-	 * @param opts.onLoad on done event's handler: function f(cond)
-	 * @param opts.onAll no 'ALL' otion item
-	 * @param errCtx error handling context
+	 * - opts.sk: semantic key (dataset id)
+	 * - opts.cond: the component's state.conds[#] of which the options need to be updated
+	 * - opts.nv: {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * - opts.onLoad: on done event's handler: function f(cond)
+	 * - opts.onAll: no 'ALL' otion item
+	 * - errCtx: error handling context
 	 * @return this
+	 * 
+	 * @example
+		let ctx = this.context as AnContextType;
+		let an = ctx.anReact as AnReactExt;
+		an.ds2cbbOptions({uri, sk, noAllItem,
+			onLoad: (cols, rows) => {
+				this.loading = false;
+				if (onDone)
+					onDone(cols, rows);
+			});
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
-				  nv: NV;
-				//   cond: QueryCondition;
-				  onLoad?: OnLoadOk<Tierec>;
+				  nv: NV | undefined;
+				  onLoad?: OnLoadOk<NV>;
 				  /**don't add "-- ALL --" item */
 				  noAllItem?: boolean; } ): AnReactExt {
 		let {uri, sk, sqlArgs, nv, onLoad, noAllItem} = opts;
@@ -307,7 +315,7 @@ export class AnReactExt extends AnReact {
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		let loading = true;
+		// let loading = true;
 
 		this.dataset( {
 				port: 'dataset',
@@ -325,9 +333,9 @@ export class AnReactExt extends AnReact {
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				this.options = rows;
+				// this.options = rows;
 
-				loading = false;
+				// loading = false;
 
 				if (onLoad)
 					onLoad(cols, rows);

@@ -28,7 +28,7 @@
 		assert.isFalse(toBool(null, null), 't');
 	} );
  * @param str 
- * @param undefinedNull default value if str is undefined or null
+ * @param undefinedNull take undefind & null as true or false
  * @returns 
  */
 export function toBool(str: string | number | boolean, undefinedNull?: boolean): boolean {

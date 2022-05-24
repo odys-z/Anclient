@@ -19,6 +19,8 @@ export interface ComboCondType extends TierComboField<JSX.Element, CompOpts> {
 	clean?: boolean;
 	sk: string,
 	type: 'cbb' | 'autocbb';
+	/** Without '-- ALL --' option */
+	noAllItam?: boolean;
 };
 
 const styles = (theme: Theme) => ( {

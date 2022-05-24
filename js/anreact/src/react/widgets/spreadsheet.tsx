@@ -1,14 +1,16 @@
 import React, { CSSProperties } from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, CellEditingStoppedEvent, ColDef, ColumnApi,
-	GetContextMenuItems, GetContextMenuItemsParams, GridApi, GridReadyEvent, ICellRendererParams
+import { CellClickedEvent, CellEditingStoppedEvent, ColDef, Column, ColumnApi,
+	GetContextMenuItems, GetContextMenuItemsParams, GridApi, GridReadyEvent, ICellRendererParams, RowNode
 } from 'ag-grid-community';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
-import { TierCol, Tierec, Semantier } from '../../../../semantier/anclient';
+import { TierCol, Tierec, Semantier, Semantext, NV, toBool } from '@anclient/semantier';
+import { AnReactExt } from '../anreact';
+import { AnConst, ComboCondType } from '../../an-components';
 
 export interface SheetCol extends TierCol {
 	label: string; 
@@ -16,6 +18,7 @@ export interface SheetCol extends TierCol {
 
 	/**cell type, default: text */
 	type?: 'text' | 'cbb';
+	sk?  : string;
 	form?: JSX.Element;
 
 	suppressSizeToFit?: boolean;
@@ -35,10 +38,94 @@ export interface SpreadsheetRec extends Tierec {
 	css?: CSSProperties,
 }
 
-export class Spreadsheetier extends Semantier {
-	cbbCellOptions(p: {value: any, data: SpreadsheetRec}) : string[] { return [p.value]; }
+/**
+ * According to ag-grid document, p's type is any: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
+ */
+export interface CbbCellValue {
+	api: GridApi;
+	cellStartedEdit: boolean;
+	charPress: any;
+	colDef: ColDef;
+	column: Column;
+	columnApi: ColumnApi;
+	context: any
+	/**
+	 * eg. {cid: '000006', parentId: null, currName: 'curr name', clevel: 'level', module: '[] - [[] - [module]]', …}
+	 */
+	data: SpreadsheetRec;
+	/**
+	 * div.ag-cell.ag-cell-normal-height.ag-cell-value.ag-cell-focus.ag-cell-not-inline-editing
+	 */
+	eGridCell: any;
+	formatValue: () => any;
+	keyPress: any;
+	/**
+	 * {rowIndex: 5, key: null, childrenMapped: {}, displayed: true, rowTop: 210, data: SpreadsheetRec}
+	 */
+	node: RowNode;
+	onKeyDown: () => any;
+	parseValue: () => any;
+	rowIndex: number;
+	stopEditing: () => any;
 
-	decode(p: ICellRendererParams) : string | object | undefined { return p.value; }
+	/**
+	 * current cell value
+	 */
+	value: any
+}
+
+export class Spreadsheetier extends Semantier {
+    loadCbbOptions(ctx: Semantext): Semantier {
+		let that = this;
+		let an = ctx.anReact as AnReactExt;
+		// load all options
+		this._cols?.forEach((c: ComboCondType, x: number) => {
+			if (c.type === 'cbb') {
+				if (c.sk) {
+				  an.ds2cbbOptions({
+					uri: this.uri,
+					sk: c.sk as string,
+					nv: c.nv,
+					noAllItem: toBool(c.noAllItam, true),
+					sqlArgs: c.sqlArgs,
+					onLoad: (_cols, rows) => {
+						if (rows) {
+							let ns = [];
+							rows.forEach( (nv: NV, x) => ns.push(nv.n) )
+							that.cbbOptions[c.field] = ns;
+						}
+					}
+				  });
+				  delete c.sk;
+				}
+				else console.warn("Combobox cell's option loading ignored for null sk: ", c);
+			}
+		});
+
+		return this;
+	}
+
+	cbbOptions = {default: [AnConst.cbbAllItem]};
+
+	/**
+	 * Providing options for AgSelectEditor's items.
+	 *  
+	 * @param p parameter for colDef.cellEditorParams = (p: any) => string[] .
+	 * 
+	 * According to ag-grid document, p's type is any: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
+	 * 
+	 * @returns options
+	 */
+	cbbCellOptions(p: CbbCellValue): string[] {
+		return this.cbbOptions[p.colDef?.field] || [p.value];
+	}
+
+	/**
+	 * docde record value for display cell content - called by AgSelectCell for rendering.
+	 * @param p 
+	 * @returns showing element
+	 */
+	decode(p: ICellRendererParams) : string | Element | undefined { return p.value; }
 }
 
 export interface SpreadsheetProps extends Comprops {
@@ -129,9 +216,9 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 				if (col.type === 'cbb') {
 					col.type = undefined; // 'agSelectEditor';
 					col.cellEditor = 'agSelectCellEditor';
-					// p type: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
-					col.cellEditorParams = (p: any) => {
-						console.error('p type', p);
+					// p type is any (May 2022):
+					// https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
+					col.cellEditorParams = (p: CbbCellValue) => {
 						return { values: that.props.tier.cbbCellOptions(p) };
 					  };
 					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p))
