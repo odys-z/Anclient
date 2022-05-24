@@ -1,7 +1,7 @@
 import { Protocol, AnsonBody, AnsonResp, CRUD, ErrorCtx,
 	OnCommitOk, OnLoadOk, PageInf} from '../../../../semantier/anclient';
 
-import { SheetCol, SpreadsheetRec, Spreadsheetier } from '../../../../anreact/src/an-components';
+import { SheetCol, SpreadsheetRec, Spreadsheetier, CellEditingStoppedEvent } from '../../../../anreact/src/an-components';
 
 /**
  * @example table DDL
@@ -24,26 +24,26 @@ CREATE TABLE b_curriculums (
 select * from b_curriculums;
  */
 class MyWorkbookTier extends Spreadsheetier {
-	static port = 'workbook';
+	static curriculPk = {pk: 'cid', v: undefined, tabl: 'b_curriculums'};
 
 	/**
 	 * @param props
 	 */
 	constructor(props: {uri: string, cols?: SheetCol[]}) {
-		super(props);
+		super('workbook',
+			Object.assign(props, 
+			/* not used, but is usefull for session client - which using prot 'update'. */
+			{pkval: MyWorkbookTier.curriculPk}));
+
 		console.log(this.uri);
 
 		this.rows = [{cId: 'Math Jasmine'}];
 		this._cols = props.cols? props.cols : [{field: 'cid', label: '#'}];
 	}
 
-	decode(p): string | Element {
-		return p.value;
-	}
-
 	insert(onOk: OnCommitOk) {
 		let req = this.client.userReq(this.uri,
-				MyWorkbookTier.port,
+				this.port,
 				new MyBookReq( undefined ).A(MyBookReq.A.insert));
 
 		this.client.commit(req, onOk, this.errCtx);
@@ -58,7 +58,7 @@ class MyWorkbookTier extends Spreadsheetier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, MyWorkbookTier.port,
+		let req = client.userReq(this.uri, this.port,
 					new MyBookReq( conds )
 					.A(MyBookReq.A.records) );
 
@@ -77,7 +77,7 @@ class MyWorkbookTier extends Spreadsheetier {
 		if (!this.client) return;
 		let client = this.client;
 
-		let req = client.userReq(this.uri, MyWorkbookTier.port,
+		let req = client.userReq(this.uri, this.port,
 						new MyBookReq( undefined, rec )
 						.A( crud === CRUD.d ? MyBookReq.A.delete :
 							crud === CRUD.c ? MyBookReq.A.insert :
@@ -89,13 +89,32 @@ class MyWorkbookTier extends Spreadsheetier {
 	columns (): Array<SheetCol> {
 		return this._cols as Array<SheetCol>;
 	}
+
+	updateCell(p: CellEditingStoppedEvent): void {
+		let rec = {cid: p.data.cid};
+		let {value, oldValue} = p;
+		if (value !== oldValue) {
+			value = this.encode(p.colDef.field, value);
+			// oldValue = this.encode(p.colDef.field, oldValue);
+
+			rec[p.colDef.field] = value;
+			this.update(CRUD.u, rec, undefined, this.errCtx);
+		}
+	}
+
+	del(opts: {
+        ids: Array<string>;
+        posts?: Array<AnsonBody>;
+    }, onOk: OnCommitOk): void {
+		throw Error('TODO override for session less');
+	}
 }
 
 interface MyCurriculum extends SpreadsheetRec {
     cid: string;
-    cate: string;
-    module: string;
-    subject: string;
+    cate?: string;
+    module?: string;
+    subject?: string;
     parentId?: string;
 }
 
@@ -118,7 +137,6 @@ class MyBookReq extends AnsonBody {
 		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
 
 		this.page = query;
-		// this.conds = query?.condts;
 		this.rec = rec;
 	}
 }

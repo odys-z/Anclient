@@ -191,8 +191,6 @@ export class Semantier {
 	 */
     rels: UIRelations = {};
 
-    // lastCondit: QueryConditions | QueryPage;
-
     /**
      * @param context
      */

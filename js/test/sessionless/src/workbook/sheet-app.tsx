@@ -6,11 +6,11 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '../../../../semantier/anclient';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs
+	AnContext, AnError, AnReactExt, jsample, JsonServs, CellEditingStoppedEvent
 } from '../../../../anreact/src/an-components';
 
 import { Workbook } from './workbook';
-import { MyWorkbookTier } from './workbook-tier';
+import { MyBookReq, MyWorkbookTier } from './workbook-tier';
 
 const { JsampleTheme } = jsample; 
 
@@ -65,6 +65,7 @@ class App extends React.Component<LessProps, State> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.onEdited = this.onEdited.bind(this);
 
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
@@ -88,16 +89,18 @@ class App extends React.Component<LessProps, State> {
                             workbook: "sheet.less",
                         });
 		
+		let onEditStop = this.onEdited;
+
 		this.tier = new MyWorkbookTier({
 			uri: this.uri,
 			cols: [
-				{field: 'cid', label: L("Id"), width: 120},
-				{field: 'currName', label: L("curriculum"), width: 160},
-				{field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level'},
-				{field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu'},
-				{field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate'},
-				{field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj'},
-			]
+				{field: 'cid', label: L("Id"), width: 120, editable: false },
+				{field: 'currName', label: L("curriculum"), width: 160 },
+				{field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', onEditStop },
+				{field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
+				{field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
+				{field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj' },
+			],
 		});
 	}
 
@@ -117,9 +120,14 @@ class App extends React.Component<LessProps, State> {
 		this.setState({hasError: false});
 	}
 
+	onEdited(p: CellEditingStoppedEvent): void {
+		// TODO change color
+
+		this.tier.updateCell(p);
+	}
+
 	render() {
 	  return (
-
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				anReact: this.anReact,

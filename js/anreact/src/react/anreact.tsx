@@ -29,9 +29,12 @@ export interface QueryPage {
 }
 
 export function toPageInf(query: QueryPage) : PageInf {
-	console.error('todo', query);
 	let p = new PageInf(query.pageInf.page, query.pageInf.size);
 	p.condts = [];
+	query.query?.forEach( (q, x) => {
+		p.condts.push( [q.field, q.val?.v || q.val] );
+	});
+
 	return p;
 }
 
@@ -48,12 +51,12 @@ export function toReactStyles(styles: CSSStyleDeclaration): CSSProperties {
 }
 
 /**JSX.Element like row formatter results */
-export interface AnRow extends JSX.Element { }
+// export interface AnRow extends JSX.Element { }
 
 /**(list) row formatter
  * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
  */
-export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> AnRow);
+// export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> AnRow);
 
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact
