@@ -1,0 +1,132 @@
+import { Protocol, AnsonBody, AnsonResp, CRUD, ErrorCtx,
+	OnCommitOk, OnLoadOk, PageInf} from '../../../../semantier/anclient';
+
+import { SheetCol, SpreadsheetRec, Spreadsheetier } from '../../../../anreact/src/an-components';
+
+/**
+ * @example table DDL
+ drop table if exists b_curriculums;
+CREATE TABLE b_curriculums (
+  cid varchar2(12) NOT NULL,
+  parentId varchar2(12),
+  currName varchar2(256) NOT NULL,
+  clevel varchar2(12),
+  module varchar2(12),
+  cate   varchar2(12),
+  subject varchar2(12),
+  sort varchar2(12),
+  fullpath varchar2(80),
+  oper varchar2(12) NOT NULL,
+  optime DATETIME NOT NULL,
+  PRIMARY KEY ("cid")
+);
+
+select * from b_curriculums;
+ */
+class MyWorkbookTier extends Spreadsheetier {
+	static port = 'workbook';
+
+	/**
+	 * @param props
+	 */
+	constructor(props: {uri: string, cols?: SheetCol[]}) {
+		super(props);
+		console.log(this.uri);
+
+		this.rows = [{cId: 'Math Jasmine'}];
+		this._cols = props.cols? props.cols : [{field: 'cid', label: '#'}];
+	}
+
+	decode(p): string | Element {
+		return p.value;
+	}
+
+	insert(onOk: OnCommitOk) {
+		let req = this.client.userReq(this.uri,
+				MyWorkbookTier.port,
+				new MyBookReq( undefined ).A(MyBookReq.A.insert));
+
+		this.client.commit(req, onOk, this.errCtx);
+	}
+
+	/**
+	 * @override(Semantier)
+	 */
+	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
+		if (!this.client) return;
+
+		let client = this.client;
+		let that = this;
+
+		let req = client.userReq(this.uri, MyWorkbookTier.port,
+					new MyBookReq( conds )
+					.A(MyBookReq.A.records) );
+
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rows = rows;
+				onLoad(cols, rows as T[]);
+			},
+			this.errCtx);
+	}
+
+	update(crud: CRUD, rec: MyCurriculum, ok: OnCommitOk, err: ErrorCtx) {
+		console.log(rec);
+
+		if (!this.client) return;
+		let client = this.client;
+
+		let req = client.userReq(this.uri, MyWorkbookTier.port,
+						new MyBookReq( undefined, rec )
+						.A( crud === CRUD.d ? MyBookReq.A.delete :
+							crud === CRUD.c ? MyBookReq.A.insert :
+							MyBookReq.A.update ) );
+
+		client.commit(req, ok, err);
+	}
+
+	columns (): Array<SheetCol> {
+		return this._cols as Array<SheetCol>;
+	}
+}
+
+interface MyCurriculum extends SpreadsheetRec {
+    cid: string;
+    cate: string;
+    module: string;
+    subject: string;
+    parentId?: string;
+}
+
+class MyBookReq extends AnsonBody {
+	static A = {
+		update: 'u',
+		insert: 'c',
+		delete: 'd',
+		records: 'r',
+		rec: 'rec',
+	}
+
+	port: 'workbook';
+
+	rec: SpreadsheetRec;
+	page: PageInf;
+	// conds: Array<string[]>;
+
+	constructor(query?: PageInf, rec?: MyCurriculum) {
+		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
+
+		this.page = query;
+		// this.conds = query?.condts;
+		this.rec = rec;
+	}
+}
+
+class MyBookResp extends AnsonResp {
+}
+
+Protocol.registerBody('io.oz.sandbox.sheet.SpreadsheetResp',
+					  (jsonBd) => { return new MyBookResp(jsonBd); });
+
+export { MyWorkbookTier, MyCurriculum, MyBookReq, MyBookResp };

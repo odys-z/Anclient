@@ -1,4 +1,4 @@
-import { ErrorCtx, Semantext, SessionInf } from '@anclient/semantier-st';
+import { ErrorCtx, Semantext, SessionInf } from '@anclient/semantier';
 import React from 'react';
 
 import { AnReact } from './anreact';

@@ -13,7 +13,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnFieldValidation, AnFieldValidator, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, PkMeta, TierCol, Tierec } from '@anclient/semantier-st';
+import { AnFieldValidation, AnFieldValidator, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, PkMeta, TierCol, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';

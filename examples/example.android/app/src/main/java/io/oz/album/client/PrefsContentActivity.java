@@ -6,15 +6,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.tier.AlbumResp;

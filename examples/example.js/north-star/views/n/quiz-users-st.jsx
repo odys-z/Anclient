@@ -11,7 +11,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { AnClient, SessionClient, Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
+import { AnClient, SessionClient, Protocol, CRUD, AnsonResp } from '@anclient/semantier';
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt,
     AnTablist

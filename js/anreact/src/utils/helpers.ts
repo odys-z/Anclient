@@ -1,7 +1,7 @@
 
-import {} from './lang-ext';
 
-/**@deprecated moved to @anclient/semantier-st
+
+/**@deprecated moved to @anclient/semantier
  * 
  * Convert string to boolean
  * @example
@@ -44,7 +44,7 @@ export function toBool(str: string | number | boolean, undefinedNull?: boolean):
 			? false : true;
 }
 
-/**@deprecated moved to @anclient/semantier-st
+/**@deprecated moved to @anclient/semantier
  * @param str 
  * @returns 
  */

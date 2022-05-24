@@ -8,7 +8,7 @@
 // import Button from '@material-ui/core/Button';
 // import Box from '@material-ui/core/Box';
 //
-// import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier-st';
+// import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier';
 // import { L, toBool,
 //     AnContext, AnError, CrudCompW, AnTablist, AnQueryst,
 // 	jsample
@@ -56,7 +56,7 @@
 // 		this.tier.pkval = undefined;
 // 		this.tier.rec = {};
 //
-// 		this.recForm = (<KidDetailst crud={Protocol.CRUD.c}
+// 		this.recForm = (<KidDetailst crud={CRUD.c}
 // 			uri={this.uri}
 // 			tier={this.tier}
 // 			onOk={(r) => that.toSearch()}
@@ -67,7 +67,7 @@
 // 		let that = this;
 // 		let pkv = [...this.state.selected.Ids][0];
 // 		this.tier.pkval = pkv;
-// 		this.recForm = (<KidDetailst crud={Protocol.CRUD.u}
+// 		this.recForm = (<KidDetailst crud={CRUD.u}
 // 			uri={this.uri}
 // 			tier={this.tier}
 // 			recId={pkv}

@@ -2,16 +2,14 @@
 import $ from 'jquery';
 
 import { stree_t, Tierec,
-	SessionClient, InsertReq,
-	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk, QueryConditions, NameValue, Semantier
-} from '@anclient/semantier-st';
+	SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
+	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames, NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
+} from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
-import { toBool } from '../utils/helpers';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
-import { JsonServs } from '@anclient/anreact/src/react/reactext';
+import { JsonServs } from './reactext';
 
 export interface ClassNames {[c: string]: string};
 
@@ -23,6 +21,18 @@ export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: 
 export interface CompOpts {
 	classes: ClassNames;
 	media: Media;
+}
+
+export interface QueryPage {
+	pageInf?: PageInf;
+	query?: AnlistColAttrs<JSX.Element, any>[];
+}
+
+export function toPageInf(query: QueryPage) : PageInf {
+	console.error('todo', query);
+	let p = new PageInf(query.pageInf.page, query.pageInf.size);
+	p.condts = [];
+	return p;
 }
 
 export const invalidStyles = {
@@ -182,7 +192,7 @@ export interface AnreactAppOptions {
  */
 export class AnReactExt extends AnReact {
 	loading: boolean;
-	options: NV[];
+	// options: NV[];
 
 	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
@@ -272,32 +282,40 @@ export class AnReactExt extends AnReact {
 	 *
 	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *
-	 * @deprecated
-	 * TODO: all widgets should bind data by themselves, so this helper function shouldn't exits.
-	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed.
+	 * TODO: All widgets should bind data by themselves, so the helper of DatasetCombo shouldn't exits.
+	 * Once the Autocomplete is replaced by DatasetCombo, that function should be removed.
 	 * 
 	 * @param opts options
-	 * @param opts.sk semantic key (dataset id)
-	 * @param opts.cond the component's state.conds[#] of which the options need to be updated
-	 * @param opts.nv {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
-	 * @param opts.onLoad on done event's handler: function f(cond)
-	 * @param opts.onAll no 'ALL' otion item
-	 * @param errCtx error handling context
+	 * - opts.sk: semantic key (dataset id)
+	 * - opts.cond: the component's state.conds[#] of which the options need to be updated
+	 * - opts.nv: {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * - opts.onLoad: on done event's handler: function f(cond)
+	 * - opts.onAll: no 'ALL' otion item
+	 * - errCtx: error handling context
 	 * @return this
+	 * 
+	 * @example
+		let ctx = this.context as AnContextType;
+		let an = ctx.anReact as AnReactExt;
+		an.ds2cbbOptions({uri, sk, noAllItem,
+			onLoad: (cols, rows) => {
+				this.loading = false;
+				if (onDone)
+					onDone(cols, rows);
+			});
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
-				  nv: NV;
-				  cond: QueryConditions; // CbbCondition;
-				  onLoad?: OnLoadOk<Tierec>;
+				  nv: NV | undefined;
+				  onLoad?: OnLoadOk<NV>;
 				  /**don't add "-- ALL --" item */
 				  noAllItem?: boolean; } ): AnReactExt {
-		let {uri, sk, sqlArgs, nv, cond, onLoad, noAllItem} = opts;
+		let {uri, sk, sqlArgs, nv, onLoad, noAllItem} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		cond.loading = true;
+		// let loading = true;
 
 		this.dataset( {
 				port: 'dataset',
@@ -308,15 +326,16 @@ export class AnReactExt extends AnReact {
 			(dsResp) => {
 				let rs = dsResp.Body().Rs();
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
-					console.error("Can't find data in rs for option label. column: 'name'.",
-						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
+					console.error("Can't find data in rs for cbb item's label - needing column: 'name'.",
+						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}",
+						 "rs columns: ", rs?.colnames);
 
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				this.options = rows;
+				// this.options = rows;
 
-				this.loading = false;
+				// loading = false;
 
 				if (onLoad)
 					onLoad(cols, rows);

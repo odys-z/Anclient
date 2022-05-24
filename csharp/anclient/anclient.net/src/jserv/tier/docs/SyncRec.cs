@@ -1,4 +1,5 @@
 using io.odysz.anson;
+using System.IO;
 
 namespace io.odysz.semantic.tier.docs {
 
@@ -17,7 +18,11 @@ public class SyncRec : Anson, IFileDescriptor {
 	private string filename;
 	private string cdate;
 
-	public SyncRec() { }
+	public SyncRec(string fullpath) {
+		this.clientpath = fullpath;
+		this.filename = Path.GetFileName(fullpath);
+		cdate = File.GetCreationTime(fullpath).ToLongDateString();
+	}
 
 	public SyncRec(IFileDescriptor p) {
 		this.clientpath = p.fullpath();

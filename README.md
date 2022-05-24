@@ -5,10 +5,10 @@
 Clients of semantic-\*. Including a Java and Javascript version. The C# version
 is also been verified.
 
-- Anclient.js
+- Anclient.ts
 
-[![npm](https://img.shields.io/npm/v/@anclient/semantier-st?logo=npm)](https://npmjs.org/package/@anclient/semantier-st)
-@anclient/semantier-st
+[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
+@anclient/semantier 
 
 together with
 
@@ -45,13 +45,17 @@ There are 3 clients in the solution:
 
 - java
 
-Java client (not for Android yet)
+Java client (also working for Android)
 
-- js
+- js (Typescript)
 
-js client API depending on jquery. The test project is using React.
+Ts client API depending on jquery. The test project is using React.
 
 Check js/test & examples/example.js for running tests and examples.
+
+- c#
+
+published as nuget package (coming).
 
 # Examples
 
@@ -65,20 +69,7 @@ Check js/test & examples/example.js for running tests and examples.
 
 - example.cs
 
--- gltf-export
-
-    A [Revit](https://en.wikipedia.org/wiki/Autodesk_Revit) plugin using anclient.net
-    exporting gltf and communicate with semantic-\* server with Antson for protocol
-    packages handling.
-
-    To run this example, user must have Revit installed. This example is running
-    on Revit 2017 and has no plan to upgrade.
-
--- file.upload
-
-    The trying and testing project of gltf-export, also used to test jserv-sample
-    project's file uploading function. Jserv-sample project source can be downloaded
-    [here](https://github.com/odys-z/semantic-jserv/releases).
+    Example for Winform built upon Anclient.cs
 
 # Document
 

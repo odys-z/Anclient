@@ -2,13 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier-st';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '../../../semantier/anclient';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt,
-	jsample,
-	JsonServs
-} from '@anclient/anreact';
+	AnContext, AnError, AnReactExt, jsample, JsonServs
+} from '../../../anreact/src/an-components';
 
 import Welcome from './welcome';
 

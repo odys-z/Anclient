@@ -7,8 +7,8 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
-	OnLoadOk, QueryConditions, AnlistColAttrs
-} from "@anclient/semantier-st";
+	OnLoadOk, QueryConditions, AnlistColAttrs, Tierec
+} from "@anclient/semantier";
 
 import {
 	L, AnConst, Comprops,
@@ -252,7 +252,7 @@ class PollsTier extends Semantier {
      * @param errCtx
      * @returns
      */
-    records(opts: QueryConditions, onLoad: OnLoadOk) {
+    records(opts: QueryConditions, onLoad: OnLoadOk<Tierec>) {
 		let {pollIds, states} = opts;
 		let opt = {};
 		opt[NPollsReq.pollIds] = pollIds;
@@ -284,7 +284,7 @@ class PollsTier extends Semantier {
 	 * @param onLoad
 	 * @returns
 	 */
-    record(opts: {pkval: string}, onLoad: OnLoadOk) {
+    record(opts: {pkval: string}, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let { pkval } = opts;

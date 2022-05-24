@@ -3,15 +3,18 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
-	import { invalidStyles } from '@anclient/anreact';
+import { Semantext } from '@anclient/semantier';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { TRecordForm } from '../../react/widgets/t-record-form';
+	import { TRecordForm } from '../../react/widgets/record-form';
 
 import { MyInfTier } from './my-infcard';
 import { Comprops, DetailFormW } from '../../react/crud';
+import { Theme, withWidth } from '@material-ui/core';
+import { invalidStyles } from '../../react/anreact';
 
-const styles = theme => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
+		root: {}
 	} )
 );
 
@@ -28,7 +31,7 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	}
 
 	// selected = undefined; // props.selected.Ids, the set
-	tier: any;
+	tier: PswdTier;
 	confirm: JSX.Element;
 
 	constructor(props){
@@ -54,7 +57,9 @@ class MyPswdComp extends DetailFormW<Comprops> {
 
 	getTier = () => {
 		this.tier = new PswdTier(this);
-		this.tier.setContext(this.context);
+
+		// Semantier is the lower tier, shouldn't know React.Context. Any better way?
+		this.tier.setContext(this.context as unknown as Semantext);
 	}
 
 	showConfirm(msg: string | string[]) {
@@ -94,18 +99,17 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	}
 }
 
-const MyPswd = withStyles<any, any, Comprops>(styles)(MyPswdComp);
+// const MyPswd = withWidth()(withStyles(styles)(MyPswdComp));
+const MyPswd = withStyles<any, any, Comprops>(styles)(withWidth()(MyPswdComp));
 export { MyPswd, MyPswdComp }
 
 class PswdTier extends MyInfTier {
 
-	// uri = undefined;
 	rec = undefined;
 	rows = undefined;
 
 	constructor(comp) {
 		super(comp);
-		//this.uri = comp.uri;
 	}
 
 	// NOTE
@@ -123,21 +127,19 @@ class PswdTier extends MyInfTier {
 		  autocomplete: "on",
 		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ] as Array<any>;
 
-	// changePswd(opts, onOk) {
-	// 	if (!this.client) return;
-	// 	// let client = this.client;
-	// 	// let that = this;
+	changePswd(opts, onOk) {
+		if (!this.client) return;
 
-	// 	// let { uri } = opts;
-	// 	let { pswd, pswd1, pswd2 } = this.rec;
+		// let { uri } = opts;
+		let { pswd, pswd1, pswd2 } = this.rec;
 
-	// 	if (this.validate()) {
-	// 		this.client.setPswd(pswd, pswd1, {
-	// 			onOk,
-	// 			onError: this.errCtx
-	// 		});
-	// 		return true;
-	// 	}
-	// 	else return false;
-	// }
+		if (this.validate()) {
+			this.client.setPswd(pswd, pswd1, {
+				onOk,
+				onError: this.errCtx
+			});
+			return true;
+		}
+		else return false;
+	}
 }

@@ -2,10 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier-st'
+import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt, jsample
+	AnContext, AnError, AnReactExt, jsample, AnContextType
 } from '@anclient/anreact';
 const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
 
@@ -13,19 +13,16 @@ import { StarPorts } from './common/port';
 
 import { Dashboard } from './views/n/dashboard';
 import { Indicators } from './views/n-tsx/indicators';
-import { Quizzes } from './views/n/quizzes';
+import { Quizzes } from './views/n-tsx/quizzes';
 import { Polls } from './views/n-tsx/polls';
 import { MyStudents } from './views/n/my-students';
-import { GPAsheet } from './views/n/gpa';
-import { Docshares } from './views/n/docshares';
+import { GPAsheet } from './views/n-tsx/gpa';
+import { Docshares } from './views/n-tsx/docshares';
 
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
 import { MyDocs } from './views/c/my-docs';
-// import { PhotoGallery } from './views/c-tsx/photo-gallery';
-// import { MyConnect } from './views/c/connect';
 
-import { welcome } from './views/c-tsx/nwelcome';
 import { Northprops } from './common/north';
 
 /** The application main, context singleton and error handler */
@@ -176,7 +173,7 @@ class App extends React.Component<Northprops, any> {
 					sys='Emotion Regulation - TSX' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					hrefDoc={'docs/index.html'}
-					welcome={welcome}
+					// welcome={welcome}
 					onLogout={this.logout} />
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
@@ -184,7 +181,7 @@ class App extends React.Component<Northprops, any> {
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
-		function myInfoPanels(anContext) {
+		function myInfoPanels(anContext: AnContextType) {
 			return [
 				{ title: L('Basic'),
 				  panel: <jsample.MyInfCard uri={'/sys/session'}

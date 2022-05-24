@@ -12,7 +12,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
-import { Tierec, CRUD, TierCol } from '@anclient/semantier-st';
+import { Tierec, CRUD, TierCol } from '@anclient/semantier';
 import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Media, CrudCompW } from '@anclient/anreact';
 
 import { PollsTier } from './polls';

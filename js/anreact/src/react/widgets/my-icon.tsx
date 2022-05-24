@@ -6,7 +6,7 @@ import SvgIcon from "@material-ui/core/SvgIcon";
 
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops } from '../crud';
-import { SessionClient } from '@anclient/semantier-st/anclient';
+import { SessionClient } from '@anclient/semantier/anclient';
 
 const styles = theme => ({
   root: {

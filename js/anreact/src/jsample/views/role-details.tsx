@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { CRUD, PkMeta, Tierec } from '@anclient/semantier-st';
+import { CRUD, PkMeta, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnContext, } from '../../react/reactext'
@@ -16,7 +16,7 @@ import { JsampleIcons } from '../styles'
 import { Comprops, DetailFormW } from '../../react/crud'
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnRelationTree } from '../../react/widgets/relation-tree';
-import { TRecordForm } from '../../react/widgets/t-record-form';
+import { TRecordForm } from '../../react/widgets/record-form';
 import { RoleTier } from './roles';
 
 const styles = theme => ({

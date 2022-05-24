@@ -4,8 +4,7 @@
 import { assert } from 'chai'
 
 import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp, AnResultset } from '../protocol';
-import { AnClient, SessionClient, SessionInf } from '../anclient';
-const { CRUD } = Protocol;
+import { AnClient, SessionClient, SessionInf, CRUD } from '../anclient';
 
 const resp = {
     "type": "io.odysz.semantic.jprotocol.AnsonMsg",
@@ -198,8 +197,8 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 		assert.equal(ur.tabl, 'quizzes', "2 ---");
 		assert.equal(ur.a, 'query', "3 ---");
 
-		assert.equal(ur.get('quizId'), '000001', "4 ---");
-		assert.equal(ur.get('title'), 'user-req', "5 ---");
+		assert.equal(ur.get('quizId') as unknown as string, '000001', "4 ---");
+		assert.equal(ur.get('title') as unknown as string, 'user-req', "5 ---");
 
 		// must keep consists as js/cs/java all denpends on this structure
 		assert.equal(ur.data.props['title'], 'user-req', "6 ---");
@@ -226,6 +225,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 	});
 
 	it('InsertReq <UpdateReq.A(insert)>', () => {
+		debugger
 		let ir = new UpdateReq('con-1', 'quizzes', 'quizId')
 			.A<UpdateReq>('insert');
 
@@ -317,7 +317,7 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 
 	it('AnsonResp {colnames, results} => [{n, v}, ...] ', () => {
 		type Vec = {vid: string, amount: string};
-		
+
 		assert.isTrue(typeof(Protocol.rs2arr) === 'function', "1 ---");
 
 		let { rows } = AnsonResp.rs2arr(resp.body[0].rs[0] as unknown as AnResultset);

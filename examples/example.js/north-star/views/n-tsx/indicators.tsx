@@ -10,7 +10,7 @@ import { L, AnContext,
 } from '@anclient/anreact';
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';
-import { AnTreeNode } from '@anclient/semantier-st/protocol';
+import { AnTreeNode } from '@anclient/semantier/protocol';
 import { Theme } from '@material-ui/core/styles';
 
 const styles = (theme: Theme) => ( {
@@ -42,7 +42,7 @@ class IndicatorsComp extends CrudCompW<Comprops> {
 
 	reshape(e) {
 		// ask server tag all subtrees
-		let client = this.context.anClient;
+		// let client = this.context.anClient;
 		let that = this;
 
 		let uri = this.uri;

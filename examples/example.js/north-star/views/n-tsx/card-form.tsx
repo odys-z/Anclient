@@ -8,7 +8,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { TierComboField, Semantier, Tierec, AnlistColAttrs, TierCol, toBool } from '@anclient/semantier-st';
+import { TierComboField, Semantier, Tierec, AnlistColAttrs, TierCol, toBool } from '@anclient/semantier';
 
 import { L, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts, ClassNames, toReactStyles } from '@anclient/anreact';
 

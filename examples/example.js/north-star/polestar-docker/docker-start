@@ -1,0 +1,12 @@
+echo "Ever finished: 'docker build -t polestar .' ?"
+echo "remove and re-create volume north.sqlit? [n]"
+read -n 1 -p "y/n:" isdel
+if [ "$isdel" = 'y' ]
+then
+    docker volume rm north.sqlite
+    docker volume create north.sqlite
+    sudo cp -r volume/* /var/lib/docker/volumes/north.sqlite/_data
+else
+    echo "Using volume's private.json without updating volume data."
+fi
+docker run --name polestar -v north.sqlite:/var/local/volume -p 8080:8080 -d --rm odysz/connect-polestar

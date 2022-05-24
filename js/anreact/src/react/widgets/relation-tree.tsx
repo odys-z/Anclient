@@ -10,7 +10,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, toBool } from '@anclient/semantier-st';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
@@ -56,12 +56,12 @@ const styles = (theme: Theme) => ({
 });
 
 interface RelationTreeProps extends Comprops {
-	reltabl: string;
-	sk: string;
+	reltabl?: string;
+	sk?: string;
 
 	/**Semantier.formatRel() use this name to format relationship records,
 	 * where in UI component the FK value comes from */
-	relcolumn: string;
+	relcolumn?: string;
 };
 
 /**

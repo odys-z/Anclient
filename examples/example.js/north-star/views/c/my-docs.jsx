@@ -3,14 +3,13 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Button, Grid } from '@material-ui/core';
 
-import { Protocol, AnsonResp } from '@anclient/semantier-st';
+import { CRUD, AnsonResp } from '@anclient/semantier';
 import { L, AnContext, CrudCompW, AnTablist, jsample, utils
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
-const { CRUD } = Protocol;
 
 import { starTheme } from '../../common/star-theme';
-import { DocsTier, DocsQuery, DocsReq, docListyle } from '../n/docshares';
+import { DocsTier, DocsQuery, DocsReq, docListyle } from '../n-tsx/docshares';
 import { MyDocView } from './mydoc-view';
 
 const styles = (theme) => Object.assign(starTheme(theme),
@@ -94,13 +93,13 @@ class MyDocsComp extends CrudCompW {
 
 	toDownload(e, v) {
 		let that = this;
-		let pkv = [...this.state.selected.ids][0];
-		this.tier.pkval = pkv;
+		let docId = [...this.state.selected.ids][0];
+		this.tier.pkval.v = docId;
 
-		if (this.tier.pkval) {
+		if (this.tier.pkval.v) {
 			let that = this;
 			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
+			cond[this.tier.pk] = this.tier.pkval.v;
 			// this.tier.record(cond, (cols, rows, fkOpts) => {
 			this.tier.record(cond, (cols, rows) => {
 				that.downloadLink.current.download = rows[0].docName;
@@ -111,12 +110,12 @@ class MyDocsComp extends CrudCompW {
 	}
 
 	toView(e, v) {
-		let pkv = [...this.state.selected.ids][0];
-		this.tier.pkval = pkv;
+		let docId = [...this.state.selected.ids][0];
+		this.tier.pkval.v = docId;
 		this.recForm = (<MyDocView crud={CRUD.r}
 			uri={this.uri}
 			tier={this.tier}
-			recId={pkv}
+			recId={docId}
 			onOk={(r) => that.toSearch()}
 			onClose={this.closeDetails} />);
 	}

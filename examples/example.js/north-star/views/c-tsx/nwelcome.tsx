@@ -1,6 +1,6 @@
 import React from "react";
 import { AnContext, AnContextType, ClassNames, CrudCompW, invalidStyles, SysComp } from "@anclient/anreact";
-import { Semantier, Tierec, UIComponent } from "@anclient/semantier-st";
+import { Semantier, Tierec, UIComponent } from "@anclient/semantier";
 import { Card, Grid, Link, Paper, SvgIcon, Typography, withStyles, withWidth } from "@material-ui/core";
 import { WelcomeProp } from "../../common/north";
 import { StarTheme } from "../../common/star-theme";

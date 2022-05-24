@@ -1,10 +1,10 @@
 import React from 'react';
-import { Color, PropTypes, StandardProps, Theme, withStyles } from '@material-ui/core';
+import { PropTypes, StandardProps, Theme, withStyles } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
 import { Media, ClassNames } from './anreact';
-import { CRUD, Semantier, UIComponent } from '@anclient/semantier-st';
+import { CRUD, Semantier, UIComponent } from '@anclient/semantier';
 
 interface Comprops extends StandardProps<any, string>, UIComponent {
 	/**The matching url in React.Route */
@@ -124,6 +124,14 @@ class HomeComp extends CrudComp<Comprops> {
 }
 const Home = withStyles(styles)(HomeComp);
 
+class ErrorPageComp extends CrudComp<Comprops>  {
+	render() {
+		return (<>Error Page</>);
+	}
+}
+const ErrorPage = withStyles(styles)(ErrorPageComp);
+
+
 class DomainComp extends CrudComp<Comprops>  {
 	render() {
 		return (<>Domain</>);
@@ -191,6 +199,7 @@ export {
 	Comprops, CrudComp,
 	CrudCompW, DetailFormW,
 	Home, HomeComp,
+	ErrorPage, ErrorPageComp,
 	Domain, DomainComp,
 	Roles, RolesComp,
 	Users, UsersComp,

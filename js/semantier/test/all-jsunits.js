@@ -3,7 +3,6 @@
 	npm test
  */
 
-// const window = {};
 const __TESTING__ = true;
 context = require.context('.', true, /\.mocha\.ts$/);
 

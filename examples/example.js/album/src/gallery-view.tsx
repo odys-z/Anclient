@@ -7,20 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import { Comprops, CrudCompW } from '@anclient/anreact';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
-import { photos } from "./temp-photos";
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
-
-// const customStyles = {
-// 	content: {
-// 		// top: '50%',
-// 		// left: '50%',
-// 		height: '70%',
-// 		right: 'auto',
-// 		bottom: 'auto',
-// 		// marginRight: '-50%',
-// 		// transform: 'translate(-50%, -50%)',
-// 	},
-// };
 
 export interface PhotoSlide<T extends {}> {
     index: number
@@ -35,7 +22,8 @@ export default class GalleryView extends CrudCompW<Comprops>{
 	uri: any;
 	currentImx: number = -1;
 	showCarousel: boolean = false;
-
+	album: PhotoCollect[] | undefined;
+	
 	constructor(props: Comprops) {
 		super(props);
 
@@ -48,10 +36,14 @@ export default class GalleryView extends CrudCompW<Comprops>{
 
 	componentDidMount() {
 		let uri = this.uri;
+		let that = this;
 		console.log("super.uri", uri);
 
 		this.tier = new GalleryTier({uri, comp: this});
-		this.setState({});
+		this.tier.myAlbum((cols, rows) => {
+			that.album = rows;
+			that.setState({});
+		})
 	}
 
 	openLightbox (event: React.MouseEvent, photo: PhotoSlide<{}>) {
@@ -68,7 +60,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 	};
 
 	gallery(collections: Array<PhotoCollect>) {
-	  
+		let photos = collections[0].photos;
 		return (
 		  <div>
 			{this.showCarousel &&
@@ -77,7 +69,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
-			<Gallery photos={photos} onClick={this.openLightbox}
+			<Gallery<PhotoRec> photos={photos} onClick={this.openLightbox}
 					limitNodeSearch={ (containerWidth: number) => {
 						if (containerWidth < 800)
 							return 4;
@@ -89,13 +81,12 @@ export default class GalleryView extends CrudCompW<Comprops>{
 		);
 	}
 
-	photoCarousel(photos: Array<any>, imgx: number) : JSX.Element {
-
+	photoCarousel(photos: Array<PhotoProps>, imgx: number) : JSX.Element {
 		return (
-			<Carousel showArrows={true} dynamicHeight={true} >
+			<Carousel showArrows={true} dynamicHeight={true} selectedItem={imgx} >
 				{photos.map( (ph, x) => (
-				  <div key={x} style={{height: "80vh"}}>
-					<img src={ph.src} ></img>
+				  <div key={x}>
+					<img src={ph.src} loading="lazy"></img>
 					<p className="legend">{ph.src}</p>
 				  </div>)
 				)}
@@ -105,7 +96,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 
 	render() {
 		return (<div>Album Example - Clicke to show large photo
-			{this.tier && this.gallery(this.tier.myAlbum())}
+			{this.tier && this.album && this.gallery(this.album)}
 		</div>);
 	}
 }

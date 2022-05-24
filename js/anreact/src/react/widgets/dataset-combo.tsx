@@ -8,7 +8,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value
 } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 
-import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField } from '@anclient/semantier-st';
+import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField, Tierec } from '@anclient/semantier';
 import { AnConst } from '../../utils/consts';
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud';
@@ -56,7 +56,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	refcbb = React.createRef<HTMLDivElement>();
 	loading = false;
-	items: NV[];
+	// items: NV[];
 
 	constructor(props: ComboProps) {
 		super(props);
@@ -187,7 +187,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	public ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
 						nv: NV;
 						//cond?: {loading: boolean, options: NV[], clean: boolean};
-						onDone: OnLoadOk;
+						onDone: OnLoadOk<Tierec>;
 						/**don't add "-- ALL --" item */
 						noAllItem?: boolean; } ): DatasetComboComp {
 		let {uri, sk, sqlArgs, nv, onDone, noAllItem} = opts;
@@ -199,8 +199,9 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		// cond.loading = true;
 		this.loading = true;
 
-		let ctx = this.context as unknown as AnContextType;
+		let ctx = this.context as AnContextType;
 		let an = ctx.anReact as AnReactExt;
+
 		an.dataset( { port: 'dataset', uri, sqlArgs, sk },
 			(dsResp: AnsonMsg<AnsonResp>) => {
 				let rs = dsResp.Body().Rs();
@@ -211,7 +212,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				this.items = rows;
+				// this.items = rows;
 
 				this.loading = false;
 
@@ -225,4 +226,3 @@ DatasetComboComp.contextType = AnContext;
 
 const DatasetCombo = withStyles<any, any, ComboProps>(styles)(withWidth()(DatasetComboComp));
 export { DatasetCombo, DatasetComboComp }
-

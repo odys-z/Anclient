@@ -4,22 +4,21 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
-	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
-} from '@anclient/semantier-st';
+import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
+	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf, QueryPage
+} from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-import { Semantier } from '@anclient/semantier-st';
+import { Semantier } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { AnContext } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnTablist } from '../../react/widgets/table-list';
-import { AnQueryst } from '../../react/widgets/query-form-st';
+import { AnQueryst } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
 import { CompOpts } from '../../react/anreact';
-import { toBool } from '@anclient/anreact/src/utils/helpers';
 import { Theme } from '@material-ui/core/styles';
 
 const styles = (theme: Theme) => ( {
@@ -217,7 +216,7 @@ UserstComp.contextType = AnContext;
 const Userst = withStyles<any, any, Comprops>(styles)(withWidth()(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions) => void}> {
+class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryPage) => void}> {
 	conds = [
 		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student') },
 		{ name: 'orgId',    field: 'orgId', type: 'cbb',  val: undefined, label: L('Class'),
@@ -232,10 +231,10 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 	}
 
 	collect() {
-		return {
+		return { query: {
 			userName: this.conds[0].val ? this.conds[0].val : undefined,
 			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
-			roleId  : (this.conds[2].val as {n: string, v: string}) ?.v };
+			roleId  : (this.conds[2].val as {n: string, v: string}) ?.v } };
 	}
 
 	/** Design Note:
@@ -306,7 +305,7 @@ export class UsersTier extends Semantier {
 		return this._cols;
 	}
 
-	records(conds: QueryConditions, onLoad: OnLoadOk<any>) {
+	records(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let client = this.client;
@@ -320,12 +319,12 @@ export class UsersTier extends Semantier {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
-				onLoad(cols, rows);
+				onLoad(cols, rows as Tierec[]);
 			},
 			this.errCtx);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk<any>) {
+	record(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -339,7 +338,7 @@ export class UsersTier extends Semantier {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				// that.rows = rows;
 				that.rec = rows && rows[0];
-				onLoad(cols, rows);
+				onLoad(cols, rows as Tierec[]);
 			},
 			this.errCtx);
 	}
@@ -430,6 +429,7 @@ export class UserstReq extends UserReq {
 
 		mykids: 'r/kids',
 	}
+
 	userId: string;
 	userName: string;
 	orgId: string;
