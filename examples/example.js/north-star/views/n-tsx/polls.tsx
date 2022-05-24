@@ -7,8 +7,8 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
-	OnLoadOk, QueryConditions, AnlistColAttrs
-} from "@anclient/semantier-st";
+	OnLoadOk, QueryConditions, AnlistColAttrs, Tierec
+} from "@anclient/semantier";
 
 import {
 	L, AnConst, Comprops,
@@ -45,9 +45,9 @@ class PollsComp extends CrudCompW<PollsProp> {
 
 	state = {
 		students: [],
-		condQzName: { type: 'text', val: '', label: L('Quiz Name') },
-		condTag:  { type: 'text', val: '', label: L('Quiz Tag') },
-		condUser: { type: 'cbb',
+		condQzName: { type: 'text', field: '', val: '', label: L('Quiz Name') },
+		condTag:  { type: 'text', field: '', val: '', label: L('Quiz Tag') },
+		condUser: { type: 'cbb', field: '',
 					sk: 'users.org-arg', nv: {n: 'text', v: 'value'},
 					sqlArgs: [],
 					val: AnConst.cbbAllItem,
@@ -85,7 +85,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 		this.tier.setContext(this.context);
 	}
 
-	toSearch(e: React.UIEvent, condts?: QueryConditions) {
+	toSearch(condts?: QueryConditions) {
 		if (this.tier) {
 			let that = this;
 			this.q = condts || this.q;
@@ -121,7 +121,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 	}
 
     toShowDetails(e: React.UIEvent): void {
-		this.tier.pkval = this.getByIx(this.state.selected.ids, 0);
+		this.tier.pkval.v = this.getByIx(this.state.selected.ids, 0);
         this.detailsForm = (
             <PollDetails uri={this.uri}
 				tier={this.tier}
@@ -141,7 +141,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 							  users: users.Body().msg() });
 				that.confirm =
 					(<ConfirmDialog open={true}
-						ok={L('OK')} cancel={true}
+						ok={L('OK')} cancel={true} 
 						title={L('Info')} msg={txt}
 						onOk={ () => {
 								that.tier.stopolls(this.uri, this.getByIx(ids),
@@ -167,7 +167,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 			<Typography className={classes.funcName} >{L('Polls Trending - TSX')}</Typography>
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
-				conds={[ this.state.condQzName, this.state.condTag, this.state.condUser ]}
+				fields={[ this.state.condQzName, this.state.condTag, this.state.condUser ]}
 				// query={ (q: typeof AnQueryst) => { return {
 				// 	qzName:q.conds[0].val ? q.conds[0].val : undefined,
 				// 	tag:   q.conds[1].val ? q.conds[1].val : undefined,
@@ -197,7 +197,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 				rows={this.tier.rows}
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
-				selectedIds={this.state.selected}
+				selected={this.state.selected}
 				onSelectChange={this.onTableSelect}
 			/>}
 			{this.detailsForm}
@@ -252,7 +252,7 @@ class PollsTier extends Semantier {
      * @param errCtx
      * @returns
      */
-    records(opts: QueryConditions, onLoad: OnLoadOk) {
+    records(opts: QueryConditions, onLoad: OnLoadOk<Tierec>) {
 		let {pollIds, states} = opts;
 		let opt = {};
 		opt[NPollsReq.pollIds] = pollIds;
@@ -284,12 +284,12 @@ class PollsTier extends Semantier {
 	 * @param onLoad
 	 * @returns
 	 */
-    record(opts: {pkval: string}, onLoad: OnLoadOk) {
+    record(opts: {pkval: string}, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let { pkval } = opts;
 
-		pkval = pkval || this.pkval ;
+		pkval = pkval || this.pkval.v ;
 		if (!pkval) {
 			console.warn("Calling record() with empty pk.");
 			return;

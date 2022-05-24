@@ -1,8 +1,8 @@
 {
   "name": "@anclient/semantier",
-  "version": "0.9.25",
-  "description": "The anclient's sub package depending on pure js object that can be used for js unit test.",
-  "main": "./anclient.js",
+  "version": "0.9.68",
+  "description": "The anclient's common package depending on pure js object that can be used for js unit test.",
+  "main": "./anclient.ts",
   "directories": {},
   "scripts": {
     "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
@@ -12,8 +12,8 @@
     "name": "@anclient/semantier",
     "author": "ody-zhou",
     "version": "3.0.0",
-    "main": "./anclient.js",
-    "types": "./ts/anclient.d.ts"
+    "main": "./anclient.ts",
+    "types": "./anclient.ts"
   },
   "keywords": [
     "anclient",

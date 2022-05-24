@@ -6,3 +6,5 @@ Guid (Tips)
    :caption: Contents:
 
    query-form
+   img-upload
+   formatters

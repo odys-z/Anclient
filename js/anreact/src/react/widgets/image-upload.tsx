@@ -22,6 +22,7 @@ const styles = (theme: Theme) => (Object.assign(
  */
 interface ImgFormProps extends Comprops {
 	blankIcon: object;
+	field: string;
 }
 
 class ImageUploadComp extends DetailFormW<ImgFormProps> {
@@ -75,7 +76,7 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 				if (that.props.tier && that.field.field) {
 					that.props.tier.rec[that.field.field] = reader.result;
 					that.props.tier.rec.fileMeta = {
-						mime: mimeOf( reader.result ),
+						mime: mimeOf( reader.result as string ),
 						name: file.name};
 				}
 			}
@@ -105,7 +106,7 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 
 		return (
 		  //<Box style={{height: 48, border: "solid 1px #aaa2"}}>
-		  <Box className={ this.props.classBox || classes.imgUploadBox }>
+		  <Box className={ classes.imgUploadBox }>
 			<img src={dataimg} style={{ width: "auto", height: "100%", minHeight: 48 }}
 				ref={(ref) => this.imgPreview = ref} />
 			<input type='file' style={ bg }

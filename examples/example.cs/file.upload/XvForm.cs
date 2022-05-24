@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace file.upload
 {
     public partial class XvForm : Form {
-        private AnsonClient client;
+        private SessionClient client;
         private string uid;
         private List<string> currentFiles;
 
@@ -27,11 +27,11 @@ namespace file.upload
 
             try
             {
-                Clients.Init(txtUrl.Text);
-                await Clients.Login(uid, "----------" + pwd,
+                AnClient.Init(txtUrl.Text);
+                await AnClient.Login(uid, "----------" + pwd,
                     (code, resp) =>
                     {
-                        client = new AnsonClient(resp.ssInf);
+                        client = new SessionClient(resp.ssInf);
                         txtRegistry.Text = client.ssInf.ssid;
                     });
             }

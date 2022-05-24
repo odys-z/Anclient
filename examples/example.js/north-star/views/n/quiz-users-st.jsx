@@ -11,7 +11,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { AnClient, SessionClient, Protocol, CRUD, AnsonResp } from '@anclient/semantier-st';
+import { AnClient, SessionClient, Protocol, CRUD, AnsonResp } from '@anclient/semantier';
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt,
     AnTablist
@@ -26,7 +26,7 @@ class QuizUserFormComp extends CrudCompW {
 	state = {
 		title: '',
 		rows: [],
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 	};
 
 	constructor(props) {
@@ -63,7 +63,7 @@ class QuizUserFormComp extends CrudCompW {
 		if (e) e.stopPropagation();
 
 		if (this.props.onClose)
-			this.props.onSave([...this.state.selected.Ids]);
+			this.props.onSave([...this.state.selected.ids]);
 	}
 
 	toClose(e) {
@@ -92,7 +92,7 @@ class QuizUserFormComp extends CrudCompW {
 						className={classes.root} checkbox={true}
 						columns={tier.columns()}
 						rows={this.state.rows}
-						selectedIds={this.state.selected}
+						selected={this.state.selected}
 						pageInf={this.state.pageInf}
 						onPageInf={this.onPageInf}
 						onSelectChange={this.onTableSelect}

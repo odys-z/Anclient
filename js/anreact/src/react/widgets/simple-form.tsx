@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
 
 import Button from '@material-ui/core/Button';
@@ -13,7 +13,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, TierCol, Tierec } from '@anclient/semantier-st';
+import { AnFieldValidation, AnFieldValidator, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, PkMeta, TierCol, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
@@ -56,11 +56,11 @@ const styles = (theme) => ({
 });
 
 interface SimpleFormProps extends Comprops {
-    funcId: string;
+    // funcId: string;
     crud: CRUD;
     fields: TierCol[];
-    pk: string;
-    pkval: any;
+    // pk: string;
+    pkval: PkMeta;
     parent: JSX.Element;
     parentId: string;
 	mtabl: string;
@@ -72,6 +72,8 @@ interface SimpleFormProps extends Comprops {
 class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 	uri = undefined;
 
+    pkval: PkMeta = { pk: undefined, v: undefined };
+
 	state = {
 		crud: undefined,
 		dirty: false,
@@ -81,8 +83,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		nodeId: undefined,
 		node: undefined,
 
-        pk: undefined,
-        pkval: undefined,
+        pk: undefined as PkMeta,
 
 		mtabl: '',
 		// indId, indName, parent, sort, fullpath, css, weight, qtype, remarks, extra
@@ -123,7 +124,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		this.state.mtabl = props.mtabl;
 
 		this.state.pk = props.pk;
-		this.state.pkval = props.pkval;
+		this.pkval = props.pkval;
 
 		this.state.parent = props.parent;
 		this.state.parentId = props.parentId;
@@ -144,13 +145,13 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		let that = this;
 
 		if (this.state.crud !== CRUD.c) {
-			if (!this.state.pkval)
+			if (!this.pkval.v)
 				throw Error("The pkval property not been set correctly. Record can not be loaded.");
 
 			// load the record
 			const ctx = this.context as unknown as AnContextType;
 			let queryReq = ctx.anClient.query(this.uri, this.props.mtabl, 'r')
-			queryReq.Body().whereEq(this.state.pk.field, this.state.pkval);
+			queryReq.Body().whereEq(this.state.pk.pk, this.pkval.v);
 			// FIXME but sometimes we have FK in record. Meta here?
 			ctx.anReact.bindStateRec({req: queryReq,
 				onOk: (resp: AnsonMsg<AnsonResp>) => {
@@ -171,13 +172,13 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 		let valid = true;
 	    this.state.fields.forEach( (f, x) => {
-			f.valid = validField(f, {validator: (v) => !!v});
+			f.valid = validField(f, v => !!v);
 			f.style = f.valid ? undefined : invalid;
 			valid &&= f.valid;
 	    } );
 		return valid;
 
-		function validField (f, valider): boolean {
+		function validField (f: AnlistColAttrs<JSX.Element, CompOpts>, valider: AnFieldValidation | ((v: any) => boolean)): boolean {
 			let v = that.state.record[f.field];
 
 			if (f.type === 'int')
@@ -186,7 +187,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			if (typeof valider === 'function')
 				return valider(v);
 			else if (f.validator) {
-				let vd = f.validator;
+				let vd = f.validator as AnFieldValidation;
 				if(vd.notNull && (v === undefined || v === null || v.length === 0))
 					return false;
 				if (vd.len && v && v.length > vd.len)
@@ -198,7 +199,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		}
 	}
 
-	toSave(e) {
+	toSave(e: React.MouseEvent<HTMLInputElement>) {
 		e.stopPropagation();
 
 		if (!this.validate(this.props.invalidStyle)) {
@@ -232,9 +233,9 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		// console.log(nvs);
 
 		// 2. request (insert / update)
-		let pk = this.state.pk;
+		let pkv = this.state.pk;
 		if (this.state.crud === CRUD.c) {
-			nvs.push({name: pk.field, value: rec[pk.field]});
+			nvs.push({name: pkv.pk, value: rec[pkv.pk]});
 			req = client
 				.usrAct(this.uri, CRUD.c, this.props.title || 'new record')
 				.insert(this.uri, this.state.mtabl, nvs);
@@ -242,9 +243,9 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		else {
 			req = client
 				.usrAct(this.funcId, CRUD.u, 'edit card')
-				.update(this.uri, this.state.mtabl, pk.field, nvs);
+				.update(this.uri, this.state.mtabl, pkv, nvs);
 			req.Body()
-				.whereEq(pk.field, rec[pk.field]);
+				.whereEq(pkv.pk, rec[pkv.pk]);
 		}
 
 		let that = this;
@@ -262,7 +263,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			this.props.onClose({code: 'cancel'});
 	}
 
-	showOk(txt) {
+	showOk(txt: string | string[]) {
 		let that = this;
 		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
 					title={L('Info')}
@@ -376,5 +377,5 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 }
 SimpleFormComp.contextType = AnContext;
 
-const SimpleForm = withWidth()(withStyles(styles)(SimpleFormComp));
+const SimpleForm = withStyles<any, any, SimpleFormProps>(styles)(withWidth()(SimpleFormComp));
 export { SimpleForm, SimpleFormComp };

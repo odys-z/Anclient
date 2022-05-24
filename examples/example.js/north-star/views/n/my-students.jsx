@@ -4,16 +4,15 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
-import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
-import { AnClient, SessionClient, Protocol, UserReq, AnsonResp } from '@anclient/semantier-st';
-import { L, toBool,
-    AnContext, AnError, CrudCompW, AnTablist, AnQueryst,
-	jsample
+import { Protocol, CRUD } from '@anclient/semantier';
+import { L,
+	AnContext, AnTablist, AnQueryst, jsample
 } from '@anclient/anreact';
-const { JsampleIcons, UsersTier, UserstReq, UserstComp } = jsample;
+
+const { JsampleIcons, UsersTier, UserstComp } = jsample;
 
 import { KidDetailst } from './mykid-details';
 
@@ -30,10 +29,9 @@ class MyStudentsComp extends UserstComp {
 		rows: [],
 		query: undefined,
 
-		selected: {Ids: new Set()},
+		selected: {ids: new Set()},
 		buttons: {add: true, edit: false, del: false},
 
-		selected: {Ids: new Set()}
 	};
 
 	tier = undefined;
@@ -51,12 +49,16 @@ class MyStudentsComp extends UserstComp {
 		this.tier.setContext(this.context);
 	}
 
+	componentDidMount() {
+		console.log(this.uri);
+	}
+
 	toAdd() {
 		let that = this;
 		this.tier.pkval = undefined;
 		this.tier.rec = {};
 
-		this.recForm = (<KidDetailst crud={Protocol.CRUD.c}
+		this.recForm = (<KidDetailst crud={CRUD.c}
 			uri={this.uri}
 			tier={this.tier}
 			onOk={(r) => that.toSearch()}
@@ -65,9 +67,9 @@ class MyStudentsComp extends UserstComp {
 
 	toEdit() {
 		let that = this;
-		let pkv = [...this.state.selected.Ids][0];
+		let pkv = [...this.state.selected.ids][0];
 		this.tier.pkval = pkv;
-		this.recForm = (<KidDetailst crud={Protocol.CRUD.u}
+		this.recForm = (<KidDetailst crud={CRUD.u}
 			uri={this.uri}
 			tier={this.tier}
 			recId={pkv}
@@ -100,11 +102,10 @@ class MyStudentsComp extends UserstComp {
 				>{L('Delete')}</Button>
 			</Box>
 
-			{tier && <AnTablist pk={tier.pk}
+			{tier && <AnTablist pk={tier.pkval.pk} selected={this.state.selected}
 				className={classes.root} checkbox={true}
 				columns={tier.columns()}
 				rows={tier.rows}
-				selectedIds={this.state.selected}
 				pageInf={this.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
@@ -146,7 +147,7 @@ class MyStudentsQuery extends React.Component {
 		let that = this;
 		return (
 		<AnQueryst {...this.props}
-			conds={this.conds}
+			fields={this.conds}
 			onSearch={() => that.props.onQuery(that.collect()) }
 			onLoaded={() => that.props.onQuery(that.collect()) }
 		/> );
@@ -161,6 +162,7 @@ class MyKidsTier extends UsersTier {
 
 	port = 'mykidstier';
 	mtabl = 'n_mykids';
+	pkval = {pk: 'userId', v: undefined};
 
 	_cols = [
 		{ text: L('Log ID'), field: 'userId', checked: true },
@@ -182,7 +184,6 @@ class MyKidsTier extends UsersTier {
 	];
 
 	constructor(comp) {
-		// super(Object.assign(comp || {}, {port: 'mykidstier'}));
 		super(comp);
 	}
 

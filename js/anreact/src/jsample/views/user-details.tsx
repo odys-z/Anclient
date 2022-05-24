@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 
 import Dialog from '@material-ui/core/Dialog';
@@ -9,16 +9,15 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { CRUD, TierCol } from '@anclient/semantier-st';
+import { CRUD, TierCol } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	import { Comprops, CrudComp, CrudCompW, DetailFormW } from '../../react/crud';
-	import { ConfirmDialog } from '../../react/widgets/messagebox';
-	import { TRecordForm } from '../../react/widgets/t-record-form';
-
+import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';
+import { ConfirmDialog } from '../../react/widgets/messagebox';
+import { TRecordForm } from '../../react/widgets/record-form';
 import { UsersTier } from './users';
 
-const styles = (theme) => ({
+const styles = (theme: Theme) => ({
   root: {
 	maxWidth: 720,
 	margin: 'auto',
@@ -56,7 +55,7 @@ const styles = (theme) => ({
  * is not planned to supprt. See performance issue: https://stackoverflow.com/a/66934465
  * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
  */
-class UserDetailstComp extends DetailFormW<Comprops> {
+class UserDetailstComp extends DetailFormW<Comprops & {tier: UsersTier}> {
 	state = {
 		record: {},
 	};
@@ -67,7 +66,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 
 	fields: TierCol[];
 
-	constructor (props: Comprops) {
+	constructor (props: Comprops & {tier: UsersTier}) {
 		super(props);
 
 		this.crud = props.crud;
@@ -94,7 +93,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.crud,
-				  pkval: this.props.tier.pkval,
+				  pkval: this.props.tier.pkval.v,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
@@ -139,7 +138,7 @@ class UserDetailstComp extends DetailFormW<Comprops> {
 					  : u ? L('Edit User')
 					  : L('User Details');
 
-		let rec = this.state.record;
+		// let rec = this.state.record;
 
 		return (<>
 		  <Dialog className={classes.root}

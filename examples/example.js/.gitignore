@@ -9,3 +9,4 @@ dist/*
 **/private.json
 private
 _build
+package-lock.json

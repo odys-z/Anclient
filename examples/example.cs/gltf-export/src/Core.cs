@@ -49,7 +49,7 @@ namespace io.odysz.anclient.example.revit
             return fullpath;
         }
 
-        public static void UploadUi(AnsonClient client, string busic, string uid, List<string> fullpaths, Action<SemanticObject> onOk = null)
+        public static void UploadUi(SessionClient client, string busic, string uid, List<string> fullpaths, Action<SemanticObject> onOk = null)
         {
             // upload to a_attaches
             if (client == null)

@@ -42,6 +42,11 @@ namespace io.odysz.semantic.jprotocol
 		}
 		*/
 
+		public virtual AnsonHeader act (string funcId, string cmd, string cate, string remarks = null)
+        {
+			return act(new string[] { funcId, cmd, cate, remarks });
+        }
+
 		public virtual AnsonHeader act(string[] act)
 		{
 			usrAct = act;

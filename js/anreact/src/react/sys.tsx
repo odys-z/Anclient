@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Context } from 'react';
 import { withStyles } from "@material-ui/core/styles";
 import clsx from 'clsx';
 import Grid from '@material-ui/core/Grid';
@@ -20,14 +20,14 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import {
 	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School
 } from '@material-ui/icons';
 
-import { MemoryRouter as Router } from 'react-router';
-import { Link as RouterLink } from 'react-router-dom';
-import Link from '@material-ui/core/Link';
-import { Route } from 'react-router-dom'
+// import { MemoryRouter as Router, Routes } from 'react-router';
+// import { Link as RouterLink } from 'react-router-dom';
+// import { Route } from 'react-router-dom'
 
 import { AnContext, AnContextType } from './reactext';
 	import { ConfirmDialog } from './widgets/messagebox';
@@ -36,11 +36,11 @@ import { AnContext, AnContextType } from './reactext';
 	import { L } from '../utils/langstr';
 
 import {
-	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW 
+	Home, ErrorPage, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW
 } from './crud'
 import { ClassNameMap } from '@material-ui/styles';
 import { AnReactExt, ClassNames } from './anreact';
-import { AnDatasetResp, AnsonMsg } from '@anclient/semantier-st/protocol';
+import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 
 export interface SysProps extends Comprops {
     /**Welcome page formatter */
@@ -60,23 +60,23 @@ const _icons = {
 	'deflt': <Inbox />,
 }
 
-export function uri(comp: CrudComp<Comprops>, uri: string) {
-	return comp;
-	/* FIXME this function is unnecessary if moved URI to Semantier.
-	if (comp.Naked)
-		comp.Naked.prototype.uri = uri;
+// export function uri(comp: CrudComp<Comprops>, uri: string) {
+// 	return comp;
+// 	/* FIXME this function is unnecessary if moved URI to Semantier.
+// 	if (comp.Naked)
+// 		comp.Naked.prototype.uri = uri;
 
-	// for SysComp using Route: component={_comps[c.path]}
-	else if (comp.prototype)
-		comp.prototype.uri = uri;
+// 	// for SysComp using Route: component={_comps[c.path]}
+// 	else if (comp.prototype)
+// 		comp.prototype.uri = uri;
 
-	// for direct component rendering, e.g. less-app/App#render()
-	else if (comp.type && comp.type.Naked)
-		comp.type.Naked.prototype.uri = uri;
+// 	// for direct component rendering, e.g. less-app/App#render()
+// 	else if (comp.type && comp.type.Naked)
+// 		comp.type.Naked.prototype.uri = uri;
 
-	return comp;
-	*/
-}
+// 	return comp;
+// 	*/
+// }
 
 /**
  * Map of uri to UI components.
@@ -171,9 +171,11 @@ const styles = theme => ({
 });
 
 export interface MenuItem {
-	funcId: string; id: string;
-	funcName: string; url: string;
-	css: React.CSSProperties;
+	funcId: string;
+	id: string;
+	funcName: string;
+	url: string;
+	css: React.CSSProperties & {icon: string};
 	flags: string;
 	parentId: string;
 	sort: number;
@@ -183,7 +185,7 @@ export interface MenuItem {
 
 /**
  * Parse lagacy json format.
- * @return {menu, paths} 
+ * @return {menu, paths}
  * */
 export function parseMenus(json = []): {
 	menu: Array<MenuItem>;
@@ -238,7 +240,7 @@ class SysComp extends CrudCompW<SysProps> {
 		sysName: 'Anreact Sample',
 		skMenu: undefined, // e.g. 'sys.menu.jserv-sample';
 		// {funcId, funcName,url, css: {icon}, fullpath, parentId, sibling, children: [] }
-		sysMenu: { },
+		sysMenu: [ ] as MenuItem[],
 
 		cruds: [{path: '/', params: undefined, comp: Home}],
 		paths: [],
@@ -246,7 +248,8 @@ class SysComp extends CrudCompW<SysProps> {
 		menuTitle: 'Sys Menu',
 		showMenu: false,
 		expandings: new Set(),
-        showMine: false,
+		showMine: false,
+		currentPage: undefined as MenuItem
 	};
 
 	anreact: AnReactExt;
@@ -255,7 +258,7 @@ class SysComp extends CrudCompW<SysProps> {
 
 	static extendLinks(links) {
 		links.forEach( (l, x) => {
-			_comps[l.path] = uri(l.comp, l.path);
+			_comps[l.path] = l.comp; // uri(l.comp, l.path);
 		});
 	}
 
@@ -303,7 +306,7 @@ class SysComp extends CrudCompW<SysProps> {
 			  </Card>);
 		}
 		else {
-			return this.props.welcome(classes, this.context, this);
+			return this.props.welcome(classes, this.context as Context<AnContextType>, this);
 		}
 	}
 
@@ -334,12 +337,9 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	toLogout() {
-		// Notify children? - not so simple for each target CrudComp needs to be notified.
-
 		let that = this;
 		this.confirmLogout =
 		<ConfirmDialog ok={L('Good Bye')} title={L('Info')} // cancel={false}
-			// open={true}
 			onOk={() => {
 				that.confirmLogout = undefined;
 				that.props.onLogout();
@@ -376,7 +376,7 @@ class SysComp extends CrudCompW<SysProps> {
 		let mtree = buildMenu(m);
 		return mtree;
 
-		function buildMenu(menu) {
+		function buildMenu( menu : MenuItem | MenuItem[] ) {
 			if (Array.isArray(menu)) {
 				return menu.map( (i, x) => {
 						return buildMenu(i);
@@ -400,17 +400,20 @@ class SysComp extends CrudCompW<SysProps> {
 				  </div>);
 				else
 				  return (menu && menu.funcId ?
-					<div key={menu.funcId}>
-						<Link component={RouterLink} to={menu.url}>
+					<div key={menu.funcId} >
+						{/* <Link component={RouterLink} to={menu.url}> */}
 							<ListItem button className={classes.nested} onClick={
 								e => {
 									if (that.state.welcome)
 										that.setState( {welcome: false} );
+
+									if (that.state.currentPage?.url !== menu.url)
+										that.setState( {currentPage: menu} );
 								} } >
-							<ListItemIcon>{icon(menu.css)}</ListItemIcon>
+							<ListItemIcon>{icon(menu.css?.icon)}</ListItemIcon>
 							<ListItemText primary={L(menu.funcName)} />
 							</ListItem>
-						</Link>
+						{/* </Link> */}
 					</div> : '');
 			}
 		}
@@ -422,11 +425,8 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	route() {
-		return this.state.cruds
-			.map( (c, x) =>
-				(<Route exact path={c.path} key={x} component={_comps[c.path]} params={c.params}/>)
-				// (<Route exact path={c.path} key={x} element={React.cloneElement(_comps[c.path] || Home, [{uri: c.path}, {...c.params}]) }/>)
-			);
+		const TagName = _comps[this.state.currentPage?.url || '/home'];
+		return <TagName uri={this.state.currentPage?.url || '/'} />;
 	}
 
 	render() {
@@ -472,8 +472,8 @@ class SysComp extends CrudCompW<SysProps> {
 				</Grid>
 			</Toolbar>
 			</AppBar>
-			<Router>
-			  <React.Fragment><Drawer
+			{/* <Router><React.Fragment> */}
+				<Drawer
 					className={claz.drawer}
 					variant="persistent"
 					anchor="left"
@@ -490,7 +490,8 @@ class SysComp extends CrudCompW<SysProps> {
 				<List>
 					{this.menuItems(claz)}
 				</List>
-			  </Drawer></React.Fragment>
+			  </Drawer>
+			  {/* </React.Fragment> */}
 			  <main onClick={this.hideMenu}
 				className={clsx(claz.content, {
 					[claz.contentShift]: open,
@@ -503,10 +504,11 @@ class SysComp extends CrudCompW<SysProps> {
 						{this.route()}
 					</div>}
 			  </main>
-			</Router>
+			{/* </Router> */}
 
 			{this.state.showMine && <MyInfo
-				panels={typeof this.props.myInfo === 'function' ? this.props.myInfo(this.context) : this.props.myInfo}
+				panels={typeof this.props.myInfo === 'function'
+					? this.props.myInfo(this.context as Context<AnContextType>) : this.props.myInfo}
 				onClose={() => this.setState({ showMine: false })} />}
 			{this.confirmLogout}
 		  </div>);
@@ -522,8 +524,8 @@ SysComp.extendLinks([
 	{path: '/views/sys/org/users.html', comp: Users},
 	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
 	{path: '/v2/users-v2.0', comp: Users},
-	{path: '/sys/error', comp: Error} // FIXME bug
+	{path: '/sys/error', comp: ErrorPage}
 ]);
 
-const Sys = withStyles(styles)(SysComp);
+const Sys = withStyles<any, any, SysProps>(styles)(SysComp);
 export { Sys, SysComp };

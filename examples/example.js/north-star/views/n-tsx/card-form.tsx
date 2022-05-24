@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 
 import Grid from '@material-ui/core/Grid';
@@ -8,11 +8,9 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { TierComboField, Semantier, Tierec, AnlistColAttrs, TierCol } from '@anclient/semantier-st';
+import { TierComboField, Semantier, Tierec, AnlistColAttrs, TierCol, toBool } from '@anclient/semantier';
 
-import { L, toBool, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts, ClassNames } from '@anclient/anreact';
-
-import { starTheme } from '../../common/star-theme';
+import { L, DatasetCombo, invalidStyles, Comprops, CrudCompW, Media, CompOpts, ClassNames, toReactStyles } from '@anclient/anreact';
 
 /**
  * Some parent controlled user actions, like SessionInf can be added here.
@@ -24,7 +22,7 @@ export interface CardsFormProps extends Comprops {
 	cardFormatter?: (rec: Tierec, rx: number, classes: ClassNames, media: Media) => JSX.Element;
 };
 
-const styles = (theme: starTheme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles,
 	{ root: {
 		display: 'flex',
@@ -69,11 +67,8 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 				console.warn("TRecordFormComp is supposed to load form data with pkval by itself.");
 
 			let that = this;
-			// let cond = {};
-			// cond[this.tier.pk] = this.tier.pkval;
 			this.tier.record(undefined, // using this.tier.pkval,
 				(_cols, _rows) => {
-				// that.rec = rows && rows[0] ? rows[0] : {};
 				that.setState({});
 			} );
 		}
@@ -92,7 +87,7 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 		let that = this;
 
 		if (f.type === 'enum' || f.type === 'cbb') {
-            const df = f as unknown as TierComboField;
+            const df = f as unknown as TierComboField<JSX.Element, CompOpts>;
 			return (
 				<DatasetCombo uri={ this.props.uri }
 					sk={df.sk} nv={ df.nv }
@@ -100,7 +95,8 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 					readOnly={ !df && f.disabled }
 					options={ df.options || []} val={{n: undefined, v:rec[f.field]} }
 					label={ f.label }
-					style={ f.css || {width: 200} }
+					style={ toReactStyles(f.css) || {width: 200} }
+					className={ f.style }
 					invalidStyle={ f.css }
 					onSelect={ (v) => {
 						rec[df.field] = v.v;
@@ -115,7 +111,6 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 			);
 		}
 		else {
-            // const tf = f as TierCol;
 			let type = 'text';
 			if (f.type === 'float' || f.type === 'int')
 				type = 'number';
@@ -147,7 +142,6 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
 					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
-				  {/* <Box className={classes.rowBox} {...f.box} > */}
 				  <Box {...f.box} >
 					{!isSm && f.label &&
 					  <Typography className={classes.formLabel} >
@@ -160,22 +154,6 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 		} } );
 		return fs;
 	}
-
-	/**
-	 * Create a formatter to compose a card for each record.
-	 * @param c column meta
-	 * @param x
-	 * @returns
-	formatCard = (c: AnlistCol, x: number) => {
-		const modifier: AnlistColAttrs = {};
-		modifier[c.field] = {
-			formatter: (rec: any) => (<>
-				{rec[c.field]}
-			</>)
-		};
-		return modifier;
-	}
-	 */
 
 	render () {
 		const { classes, width } = this.props;
@@ -190,16 +168,11 @@ class CardsFormComp extends CrudCompW<CardsFormProps> {
 		  </>;
 	}
 
-	// PaperHead(classes: {[x: string] : any}, media: Media): React.ReactNode {
-	// 	let pl = this.tier.rec;
-	// 	return <Card className={classes.paperHead}>{pl?.Title}</Card>
-	// }
-
 	cards(classes: {[x: string] : any}, media: Media): React.ReactNode {
-		// return this.tier.rows?.map( (r, x) => this.props.CardsFormatter(r, x, classes, media) );
 		return this.props.CardsFormatter(this.tier.rows, classes, media);
 	}
 }
 
 const CardsForm = withStyles<any, any, CardsFormProps>(styles)(withWidth()(CardsFormComp));
 export { CardsForm, CardsFormComp }
+

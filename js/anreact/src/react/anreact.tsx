@@ -2,15 +2,14 @@
 import $ from 'jquery';
 
 import { stree_t, Tierec,
-	SessionClient, InsertReq,
-	DatasetReq, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, CRUD, AnsonBody, AnResultset, AnTreeNode, InvalidClassNames, NV, OnLoadOk
-} from '@anclient/semantier-st';
+	SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
+	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames, NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
+} from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
-import { toBool } from '../utils/helpers';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
+import { JsonServs } from './reactext';
 
 export interface ClassNames {[c: string]: string};
 
@@ -22,6 +21,18 @@ export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: 
 export interface CompOpts {
 	classes: ClassNames;
 	media: Media;
+}
+
+export interface QueryPage {
+	pageInf?: PageInf;
+	query?: AnlistColAttrs<JSX.Element, any>[];
+}
+
+export function toPageInf(query: QueryPage) : PageInf {
+	console.error('todo', query);
+	let p = new PageInf(query.pageInf.page, query.pageInf.size);
+	p.condts = [];
+	return p;
 }
 
 export const invalidStyles = {
@@ -111,80 +122,6 @@ export class AnReact {
 		return this;
 	}
 
-	/**TODO move this to a semantics handler, e.g. shFK.
-	 * Generate an insert request according to tree/forest checked items.
-	 * @param {object} forest forest of tree nodes, the forest / tree data, tree node: {id, node}
-	 * @param {object} opts options
-	 * @param {object} opts.check checking column name
-	 * @param {object} opts.columns, column's value to be inserted
-	 * @param {object} opts.rows, n-v rows to be inserted
-	 * @param {object} opts.reshape set middle tree node while traverse.
-	 * @return {InsertReq} subclass of AnsonBody
-	 */
-	inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: any; check: string; reshape: boolean; }) {
-		let {table, columnMap, check, reshape} = opts;
-
-		// FIXME shouldn't we map this at server side?
-		let dbCols = Object.keys(columnMap);
-
-		let ins = new InsertReq(null, table)
-			.A<InsertReq>(CRUD.c)
-			.columns(dbCols);
-
-		let rows = [];
-
-		collectTree(forest, rows);
-
-		ins.nvRows(rows);
-		return ins;
-
-		/**Design Notes:
-		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
-		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
-		*/
-		function collectTree(forest: AnTreeNode[], rows: Array<{name: string, value: string}[]>) {
-			let cnt = 0;
-			forest.forEach( (tree: AnTreeNode, _i: number) => {
-				if (tree && tree.node) {
-					if (tree.node.children && tree.node.children.length > 0) {
-						let childCnt = collectTree(tree.node.children, rows);
-
-						if (childCnt > 0)
-							tree.node[check] = 1;
-						else
-							tree.node[check] = 0;
-					}
-					if ( toBool(tree.node[check]) ) {
-						rows.push(toNvRow(tree.node, dbCols, columnMap));
-						cnt++;
-					}
-				}
-			});
-			return cnt;
-		}
-
-		/**convert to [name-value, ...] as a row (Array<{name, value}>), e.g.
-		 * [ { "name": "funcId", "value": "sys-domain" },
-		 *   { "name": "roleId", "value": "r003" } ]
-		 */
-		function toNvRow(node: AnTreeNode["node"],
-				  dbcols: string[], colMap: { [x: string]: any; })
-				: Array<{name: string, value: string}> {
-
-			let r = [];
-			dbcols.forEach( (col: string, j: number) => {
-				let mapto = colMap[col];
-				if (node.hasOwnProperty(mapto))
-					// e.g. roleName: 'text'
-					r.push({name: col, value: node[mapto]});
-				else
-					// e.g. roleId: '0001'
-					r.push({name: col, value: mapto});
-			} );
-			return r;
-		}
-	}
-
 	/**Try figure out serv root, then bind to html tag.
 	 * First try ./private/host.json<serv-id>,
 	 * then  ./github.json/<serv-id>,
@@ -194,21 +131,21 @@ export class AnReact {
 	 * @param {string} elem html element id, null for test
 	 * @param {object} opts {serv, home, parent window}
 	 * @param {function} onJsonServ function to render React Dom, i. e.
-	 * <pre>(elem, json) => {
-			let dom = document.getElementById(elem);
-			ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
-	}</pre>
+	 * @example
+	 * // see Anclient/js/test/jsample/login-app.tsx
+	 * (elem, json) => {
+	 * 	let dom = document.getElementById(elem);
+	 * 	ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
+	 * }
+	 * 
+	 * // see Anclient/js/test/jsample/app.tsx
+	 * function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+	 * 	let dom = document.getElementById(elem);
+	 * 	ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+	 * } 
 	 */
-	static bindDom( elem: string, opts: {
-					/** not used */
-					portal?: string;
-					/** serv id */
-					serv?: string;
-					/** system main page */
-					home?: string;
-					/** path to json config file */
-					jsonUrl?: string; },
-					onJsonServ: (elem: string, opts: object, json: object) => any) {
+	static bindDom( elem: string, opts: AnreactAppOptions,
+				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
 		if (!opts.home) opts.home = 'main.html';
@@ -216,27 +153,46 @@ export class AnReact {
 		if (typeof elem === 'string') {
 			$.ajax({
 				dataType: "json",
-				url: opts.jsonUrl || 'private/host.json',
+				url: opts.jsonPath || 'private/host.json',
 			})
-			.done( (json: object) => onJsonServ(elem, opts, json) )
+			.done( (json: JsonServs) => onJsonServ(elem, opts, json) )
 			.fail( (e: any) => {
 				$.ajax({
 					dataType: "json",
 					url: 'github.json',
 				})
-				.done((json: object) => onJsonServ(elem, opts, json))
+				.done((json: JsonServs) => onJsonServ(elem, opts, json))
 				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )
 			} )
 		}
 	}
 }
 
-/**Ectending AnReact with dataset & sys-menu, the same of layers extinding of jsample.
+export interface AnreactAppOptions {
+	/** serv id, default: host */
+	serv?: string;
+
+	/** system main page */
+	home?: string;
+
+	/** path to json config file for jserv root url, e.g. 'parivate/host.json' */
+	jsonPath?: string;
+
+	/** not used */
+	portal?: string;
+
+	/**parent window */
+	parent?: Window;
+};
+
+/**
+ * Extending AnReact with dataset & sys-menu - the same of tier extending of Jsample.
+ * 
  * @class
  */
 export class AnReactExt extends AnReact {
 	loading: boolean;
-	options: NV[];
+	// options: NV[];
 
 	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
@@ -267,20 +223,7 @@ export class AnReactExt extends AnReact {
 	 * @return this
 	 */
 	dataset(ds: DatasetOpts, onLoad: OnCommitOk): AnReactExt {
-		// let ssInf = this.client.ssInf;
-		let {uri, sk, sqlArgs, t, rootId} = ds;
-		sqlArgs = sqlArgs || [];
-		let port = ds.port ||'dataset';
-
-		let reqbody = new DatasetReq({
-				uri, port,
-				mtabl: undefined,
-				sk, sqlArgs, rootId
-			})
-			.TA(t || stree_t.query);
-		let jreq = this.client.userReq(uri, port, reqbody, undefined);
-
-		this.client.an.post(jreq, onLoad, this.errCtx);
+		Semantier.dataset(ds, this.client, onLoad, this.errCtx);
 		return this;
 	}
 
@@ -296,22 +239,15 @@ export class AnReactExt extends AnReact {
 	 * @return this
 	 */
 	stree(opts: DatasetOpts, component: CrudComp<Comprops>): void {
-		let {uri, onOk} = opts;
-
-		if (!uri)
-			throw Error('Since v0.9.50, Anclient request needs function uri to find datasource.');
-
-		if (opts.sk && !opts.t)
-			opts.a = stree_t.sqltree;
+		// let {uri, onOk} = opts;
+		let {onOk} = opts;
 
 		let onload = onOk || function (resp: AnsonMsg<AnDatasetResp>) {
 			if (component)
 				component.setState({forest: resp.Body().forest});
 		}
 
-		opts.port = 'stree';
-
-		this.dataset(opts, onload);
+		Semantier.stree(opts, this.client, onload, this.errCtx);
 	}
 
 	rebuildTree(opts: DatasetOpts, onOk: (resp: any) => void) {
@@ -346,32 +282,40 @@ export class AnReactExt extends AnReact {
 	 *
 	 * <p> See AnQueryFormComp.componentDidMount() for example. </p>
 	 *
-	 * @deprecated
-	 * TODO: all widgets should bind data by themselves, so this helper function shouldn't exits.
-	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed.
+	 * TODO: All widgets should bind data by themselves, so the helper of DatasetCombo shouldn't exits.
+	 * Once the Autocomplete is replaced by DatasetCombo, that function should be removed.
 	 * 
 	 * @param opts options
-	 * @param opts.sk semantic key (dataset id)
-	 * @param opts.cond the component's state.conds[#] of which the options need to be updated
-	 * @param opts.nv {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
-	 * @param opts.onLoad on done event's handler: function f(cond)
-	 * @param opts.onAll no 'ALL' otion item
-	 * @param errCtx error handling context
+	 * - opts.sk: semantic key (dataset id)
+	 * - opts.cond: the component's state.conds[#] of which the options need to be updated
+	 * - opts.nv: {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
+	 * - opts.onLoad: on done event's handler: function f(cond)
+	 * - opts.onAll: no 'ALL' otion item
+	 * - errCtx: error handling context
 	 * @return this
+	 * 
+	 * @example
+		let ctx = this.context as AnContextType;
+		let an = ctx.anReact as AnReactExt;
+		an.ds2cbbOptions({uri, sk, noAllItem,
+			onLoad: (cols, rows) => {
+				this.loading = false;
+				if (onDone)
+					onDone(cols, rows);
+			});
 	 */
 	ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
-				  nv: NV;
-				  cond: CbbCondition;
-				  onLoad?: OnLoadOk;
+				  nv: NV | undefined;
+				  onLoad?: OnLoadOk<NV>;
 				  /**don't add "-- ALL --" item */
 				  noAllItem?: boolean; } ): AnReactExt {
-		let {uri, sk, sqlArgs, nv, cond, onLoad, noAllItem} = opts;
+		let {uri, sk, sqlArgs, nv, onLoad, noAllItem} = opts;
 		if (!uri)
 			throw Error('Since v0.9.50, uri is needed to access jserv.');
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		cond.loading = true;
+		// let loading = true;
 
 		this.dataset( {
 				port: 'dataset',
@@ -382,15 +326,16 @@ export class AnReactExt extends AnReact {
 			(dsResp) => {
 				let rs = dsResp.Body().Rs();
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
-					console.error("Can't find data in rs for option label. column: 'name'.",
-						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
+					console.error("Can't find data in rs for cbb item's label - needing column: 'name'.",
+						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}",
+						 "rs columns: ", rs?.colnames);
 
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				this.options = rows;
+				// this.options = rows;
 
-				this.loading = false;
+				// loading = false;
 
 				if (onLoad)
 					onLoad(cols, rows);

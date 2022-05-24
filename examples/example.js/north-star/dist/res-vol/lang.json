@@ -65,6 +65,8 @@
     "with polls to do": "有未完成问卷",
     "Take Poll": "填写问卷",
     "Has waitings": "有未完成问卷",
-	"Your have {tasks} {quiz} to complete.": "有{tasks}项未完成问卷."
+    "Your have {tasks} {quiz} to complete.": "有{tasks}项未完成问卷.",
+    "Add GPA": "添加 GPA",
+    "Delete GPA": "删除 GPA"
   }
 }

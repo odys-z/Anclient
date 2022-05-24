@@ -1,7 +1,15 @@
-import { ErrorCtx, Semantext, SessionClient, SessionInf } from '@anclient/semantier-st';
+import { ErrorCtx, Semantext, SessionInf } from '@anclient/semantier';
 import React from 'react';
 
 import { AnReact } from './anreact';
+
+/**
+ * The configuration used by user App to setup jserv root URL.
+ */
+export interface JsonServs {
+	host?: string;
+	[h: string]: string,
+}
 
 export interface AnContextType extends Semantext {
 	ssInf?: SessionInf,
@@ -13,16 +21,13 @@ export interface AnContextType extends Semantext {
 	/**default: host */
 	servId: string,
 
-	servs: { host?: string; [h: string]: string },
+	servs: JsonServs, 
 
 	hasError: boolean,
 } 
 
 export const AnContext = React.createContext({
-	/**	Anclient */
-	// an: undefined,
-    /**@type = SessionIfn */
-	ssInf: undefined,
+	ssInf: undefined as SessionInf,
 
 	pageOrigin: '.',
 	iparent: {},    // usually the parent window of ifram
@@ -31,7 +36,7 @@ export const AnContext = React.createContext({
 	/**default: host */
 	servId: undefined as string,
 
-	servs: { host: 'http://localhost:8080' },
+	servs: { host: 'http://localhost:8080' } as JsonServs,
 
 	anClient: undefined,
 	anReact: undefined,

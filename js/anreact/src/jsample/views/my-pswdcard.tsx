@@ -3,15 +3,18 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
-	import { invalidStyles } from '@anclient/anreact';
+import { Semantext } from '@anclient/semantier';
 	import { ConfirmDialog } from '../../react/widgets/messagebox'
-	import { TRecordForm } from '../../react/widgets/t-record-form';
+	import { TRecordForm } from '../../react/widgets/record-form';
 
 import { MyInfTier } from './my-infcard';
 import { Comprops, DetailFormW } from '../../react/crud';
+import { Theme, withWidth } from '@material-ui/core';
+import { invalidStyles } from '../../react/anreact';
 
-const styles = theme => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
+		root: {}
 	} )
 );
 
@@ -27,8 +30,8 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		size: 10,
 	}
 
-	selected = undefined; // props.selected.Ids, the set
-	tier: any;
+	// selected = undefined; // props.selected.Ids, the set
+	tier: PswdTier;
 	confirm: JSX.Element;
 
 	constructor(props){
@@ -48,16 +51,15 @@ class MyPswdComp extends DetailFormW<Comprops> {
 		this.context = this.props.anContext || this.context;
 		this.getTier();
 
-		this.tier.pkval = this.props.ssInf.uid;
+		this.tier.pkval.v = this.props.ssInf.uid;
 		this.setState({});
-		// let that = this;
-		// this.tier.myInf({userId: this.props.ssInf.uid},
-		// 				(cols, record) => that.setState({cols, record}) );
 	}
 
 	getTier = () => {
 		this.tier = new PswdTier(this);
-		this.tier.setContext(this.context);
+
+		// Semantier is the lower tier, shouldn't know React.Context. Any better way?
+		this.tier.setContext(this.context as unknown as Semantext);
 	}
 
 	showConfirm(msg: string | string[]) {
@@ -97,18 +99,17 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	}
 }
 
-const MyPswd = withStyles<any, any, Comprops>(styles)(MyPswdComp);
+// const MyPswd = withWidth()(withStyles(styles)(MyPswdComp));
+const MyPswd = withStyles<any, any, Comprops>(styles)(withWidth()(MyPswdComp));
 export { MyPswd, MyPswdComp }
 
 class PswdTier extends MyInfTier {
 
-	// uri = undefined;
 	rec = undefined;
 	rows = undefined;
 
 	constructor(comp) {
 		super(comp);
-		//this.uri = comp.uri;
 	}
 
 	// NOTE
@@ -128,10 +129,8 @@ class PswdTier extends MyInfTier {
 
 	changePswd(opts, onOk) {
 		if (!this.client) return;
-		let client = this.client;
-		let that = this;
 
-		let { uri } = opts;
+		// let { uri } = opts;
 		let { pswd, pswd1, pswd2 } = this.rec;
 
 		if (this.validate()) {

@@ -4,11 +4,11 @@ import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, SessionClient, ErrorCtx, SessionInf, AnsonMsg, AnsonResp
-} from '@anclient/semantier-st';
+} from '@anclient/semantier';
 
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
-import { AnContext } from '../../anreact/src/react/reactext';
-import { AnReact, AnReactExt } from '../../anreact/src/react/anreact';
+import { AnContext, JsonServs } from '../../anreact/src/react/reactext';
+import { AnReact, AnReactExt, AnreactAppOptions } from '../../anreact/src/react/anreact';
 import { AnError } from '../../anreact/src/react/widgets/messagebox';
 import { Sys, SysComp } from '../../anreact/src/react/sys';
 import { Userst } from '../../anreact/src/jsample/views/users';
@@ -18,13 +18,13 @@ import { Orgs } from '../../anreact/src/jsample/views/orgs';
 
 import { StandardProps } from '@material-ui/core';
 import { JsampleTheme } from '../../anreact/src/jsample/styles';
-import { MyInfCard } from '../../anreact/src/jsample/views/my-infcard';
+import { MyInfCard, MyInfCardComp } from '../../anreact/src/jsample/views/my-infcard';
 import { MyPswd } from '../../anreact/src/jsample/views/my-pswdcard';
 
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
-	servs: {[h: string]: string};
+	servs: JsonServs;
 	servId: string;
 };
 
@@ -132,11 +132,8 @@ class App extends React.Component<Approps> {
 					if (this.props.iwindow)
 						this.props.iwindow.location = this.state.iportal;
 				},
-				(c, e) => {
-					// something wrong
-					// console.warn('Logout failed', c, e)
-					cleanup (that);
-				});
+				{ onError: (c, e) => { cleanup (that); } }
+				);
 		}
 		catch(_) {
 			cleanup (that);
@@ -145,7 +142,7 @@ class App extends React.Component<Approps> {
 			this.state.anClient = undefined;
 		}
 
-		function cleanup(app) {
+		function cleanup(app: App) {
 			if (app.state.anClient)
 				localStorage.setItem(SessionClient.ssInfo, null);
 			if (app.props.iwindow)
@@ -172,7 +169,7 @@ class App extends React.Component<Approps> {
 				ihome: this.props.iportal || 'portal.html',
 				error: this.errCtx,
 			}} >
-				<Sys menu='sys.menu.jsample'
+				<SysComp menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					onLogout={this.logout} />
@@ -207,17 +204,16 @@ class App extends React.Component<Approps> {
 	 * where serv-id = this.context.servId || host
 	 *
 	 * For test, have elem = undefined
-	 * @param {string} elem html element id, null for test
-	 * @param {object} [opts={}] serv id
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.iportal='portal.html'] page showed after logout
+	 * @param elem html element id, null for test
+	 * [opts.serv='host'] serv id
+	 * [opts.iportal='index.html'] page showed after logout
 	 */
-	static bindHtml(elem, opts = {portal: 'index.html'}) {
-		let portal = opts.portal ? opts.portal : 'index.html';
+	static bindHtml(elem: string, opts: {serv: string, portal?: string}) : void {
+		let portal = opts.portal || 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem, opts, json) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
