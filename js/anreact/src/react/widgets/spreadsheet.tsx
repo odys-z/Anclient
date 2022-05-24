@@ -85,6 +85,8 @@ export class Spreadsheetier extends Semantier {
 		super(props);
 		this.port = port;
 		this.pkval = props.pkval;
+
+		this.onCellClick = this.onCellClick.bind(this);
 	}
 
     loadCbbOptions(ctx: Semantext): Semantier {

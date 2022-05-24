@@ -101,6 +101,13 @@ class MyWorkbookTier extends Spreadsheetier {
 			this.update(CRUD.u, rec, undefined, this.errCtx);
 		}
 	}
+
+	del(opts: {
+        ids: Array<string>;
+        posts?: Array<AnsonBody>;
+    }, onOk: OnCommitOk): void {
+		throw Error('TODO override for session less');
+	}
 }
 
 interface MyCurriculum extends SpreadsheetRec {
