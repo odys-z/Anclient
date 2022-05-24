@@ -142,6 +142,7 @@ export interface UIRelations {
 export interface PkMeta {
     v: any;
     pk: string;
+    tabl?: string;
 }
 
 export interface AttachMeta {

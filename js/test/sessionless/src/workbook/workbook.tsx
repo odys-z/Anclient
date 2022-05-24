@@ -40,7 +40,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
-	currentId: string;
+	// currentId: string;
 
 	constructor(props: Comprops & {conn_state: string, tier: MyWorkbookTier}) {
 		super(props);
@@ -92,8 +92,8 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 
 	toDel(e: React.UIEvent) {
 		let that = this;
-		if (this.currentId)
-			this.tier.del({ids: [this.currentId]}, this.bindSheet);
+		// if (this.currentId)
+		this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
 	}
 
 	// paper(e: SpreadsheetRec) {
@@ -123,7 +123,12 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 			/>}
 			{this.tier &&
 			  <div className='ag-theme-alpine' style={{height: '78vh', width: '100%', margin:'auto'}}>
-				<AnSpreadsheet tier={this.tier} columns={this.tier.columns()} rows={this.tier.rows} />
+				<AnSpreadsheet
+					tier={this.tier}
+					autosave={true}
+					onCellClicked={this.tier.onCellClick}
+					columns={this.tier.columns()}
+					rows={this.tier.rows} />
 			  </div>}
 			<div style={{textAlign: 'center', background: '#f8f8f8'}}>
 				<Button variant="outlined"

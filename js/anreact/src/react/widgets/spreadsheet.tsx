@@ -4,11 +4,12 @@ import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, CellEditingStoppedEvent, ColDef, Column, ColumnApi,
 	GetContextMenuItems, GetContextMenuItemsParams, GridApi, GridReadyEvent, ICellRendererParams, RowNode
 } from 'ag-grid-community';
+export { CellEditingStoppedEvent, CellClickedEvent };
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
-import { TierCol, Tierec, Semantier, Semantext, NV, toBool } from '@anclient/semantier';
+import { TierCol, Tierec, Semantier, Semantext, NV, toBool, UpdateReq, Inseclient, UIComponent, PkMeta } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { AnConst, ComboCondType } from '../../an-components';
 
@@ -34,7 +35,8 @@ export interface SheetCol extends TierCol {
 }
 
 export interface SpreadsheetRec extends Tierec {
-	id: string,
+	/**This is optional because subclass will rename it */
+	id?: string,
 	css?: CSSProperties,
 }
 
@@ -75,6 +77,16 @@ export interface CbbCellValue {
 }
 
 export class Spreadsheetier extends Semantier {
+	/**jserv port name, e.g. 'workbook' */
+	port: string;
+	currentRecId: any;
+
+	constructor(port: string, props: UIComponent & {pkval: PkMeta}) {
+		super(props);
+		this.port = port;
+		this.pkval = props.pkval;
+	}
+
     loadCbbOptions(ctx: Semantext): Semantier {
 		let that = this;
 		let an = ctx.anReact as AnReactExt;
@@ -93,6 +105,7 @@ export class Spreadsheetier extends Semantier {
 							let ns = [];
 							rows.forEach( (nv: NV, x) => ns.push(nv.n) )
 							that.cbbOptions[c.field] = ns;
+							that.cbbItems[c.field] = rows;
 						}
 					}
 				  });
@@ -105,7 +118,8 @@ export class Spreadsheetier extends Semantier {
 		return this;
 	}
 
-	cbbOptions = {default: [AnConst.cbbAllItem]};
+	cbbOptions = {default: [AnConst.cbbAllItem.n]} as {[f: string]: string[]};
+	cbbItems = {default: [AnConst.cbbAllItem]} as {[f: string]: NV[]};
 
 	/**
 	 * Providing options for AgSelectEditor's items.
@@ -122,10 +136,56 @@ export class Spreadsheetier extends Semantier {
 
 	/**
 	 * docde record value for display cell content - called by AgSelectCell for rendering.
-	 * @param p 
+	 * 
+	 * @param field field name for finding NV records to decode. 
+	 * @param v 
 	 * @returns showing element
 	 */
-	decode(p: ICellRendererParams) : string | Element | undefined { return p.value; }
+	decode(field: string, v: string): string | Element {
+		let nvs = this.cbbItems[field];
+		for (let i = 0; i < nvs?.length; i++)
+			if (nvs[i].v === v)
+				return nvs[i].n;
+		return v;
+	}
+
+	encode(field: string, n: string): string | object {
+		let nvs = this.cbbItems[field];
+		if (!nvs) // plain text
+			return n;
+
+		for (let i = 0; i < nvs.length; i++)
+			if (nvs[i].n === n)
+				return nvs[i].v;
+		return `[${n}]`; // [] for tagging the invalid data in database
+	}
+
+	onCellClick (e: CellClickedEvent) {
+		this.currentRecId = e.data[this.pkval.pk];
+	};
+
+	updateCell(p: CellEditingStoppedEvent) {
+		if (!this.client) {
+			console.error("somthing wrong ...");
+			return;
+		}
+
+		if (!this.pkval)
+			throw Error("Default auto updating only works when PkMeta is provided. Eighter provid it or override updateCell(CellEditingStoppedEvent).");
+		
+		if (this.client instanceof Inseclient)
+			throw Error("Spreadsheetir.updateCell is using port.update, and can only work in session mode. To use in session less mode, user need override this method or provide SheetCol.onEditStop.");
+
+		let client = this.client;
+		let pkv = p.data[this.pkval?.pk]
+		let v   = p.data[p.colDef.field]
+
+		let req = client.userReq(this.uri, 'update',
+						new UpdateReq( this.uri, this.pkval.tabl, {pk: this.pkval.pk, v: pkv} )
+						.nv(p.colDef.field, v) );
+
+		client.commit(req, () => {}, this.errCtx);
+	}
 }
 
 export interface SpreadsheetProps extends Comprops {
@@ -221,7 +281,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 					col.cellEditorParams = (p: CbbCellValue) => {
 						return { values: that.props.tier.cbbCellOptions(p) };
 					  };
-					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p))
+					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p.colDef.field, p.value))
 					// col.onCellEditingStopped = anEditStop
 					// (e: { value: any; data: SpreadsheetRec; }) => {
 					// }
@@ -311,6 +371,8 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	onEditStop (p: CellEditingStoppedEvent) {
 		if (typeof this.editHandlers[p.colDef.field] === 'function')
 			this.editHandlers[p.colDef.field](p);
+		else if (this.props.autosave)
+			this.tier.updateCell(p);
 	}
 
 	render () {

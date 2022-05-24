@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
-	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf, QueryPage
+	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -25,6 +25,10 @@ const styles = (theme: Theme) => ( {
 	root: {
 		backgroundColor: '#eef'
 	},
+	warn: {
+		backgroundColor: '#522',
+		color: 'red'
+	},
 	button: {
 		marginLeft: theme.spacing(1)
 	}
@@ -41,7 +45,7 @@ class UserstComp extends CrudCompW<Comprops> {
 	q: QueryConditions;
 	confirm: JSX.Element;
 	recForm: JSX.Element;
-	pageInf: PageInf;
+	// pageInf: PageInf;
 	onPageInf: (page: number) => void;
 
 	constructor(props) {
@@ -178,7 +182,7 @@ class UserstComp extends CrudCompW<Comprops> {
 
 		return (<div className={classes.root}>
 			{this.props.funcName || this.props.title || 'Users of Jsample'}
-
+			<div className={classes.warn}>TODO Test Query Form!</div>
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
 			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode
@@ -202,7 +206,7 @@ class UserstComp extends CrudCompW<Comprops> {
 				selected={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
-				pageInf={this.pageInf}
+				// pageInf={this.pageInf}
 				onPageChange={this.onPageInf}
 				onSelectChange={this.onTableSelect}
 			/>}
@@ -216,7 +220,7 @@ UserstComp.contextType = AnContext;
 const Userst = withStyles<any, any, Comprops>(styles)(withWidth()(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryPage) => void}> {
+class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions) => void}> {
 	conds = [
 		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student') },
 		{ name: 'orgId',    field: 'orgId', type: 'cbb',  val: undefined, label: L('Class'),
@@ -243,7 +247,7 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryPage) => vo
 	render () {
 		let that = this;
 		return (
-		<AnQueryst {...this.props}
+		<AnQueryst {...this.props} uri={this.uri}
 			fields={this.conds}
 			onSearch={() => that.props.onQuery(that.collect()) }
 			onLoaded={() => that.props.onQuery(that.collect()) }
