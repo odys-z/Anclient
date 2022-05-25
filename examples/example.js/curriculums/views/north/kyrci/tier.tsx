@@ -23,7 +23,7 @@ CREATE TABLE b_curriculums (
 
 select * from b_curriculums;
  */
-class MyWorkbookTier extends Spreadsheetier {
+class CourseTier extends Spreadsheetier {
 	static curriculPk = {pk: 'cid', v: undefined, tabl: 'b_curriculums'};
 
 	/**
@@ -33,7 +33,7 @@ class MyWorkbookTier extends Spreadsheetier {
 		super('workbook',
 			Object.assign(props, 
 			/* not used, but is usefull for session client - which using prot 'update'. */
-			{pkval: MyWorkbookTier.curriculPk}));
+			{pkval: CourseTier.curriculPk}));
 
 		console.log(this.uri);
 
@@ -147,4 +147,4 @@ class MyBookResp extends AnsonResp {
 Protocol.registerBody('io.oz.sandbox.sheet.SpreadsheetResp',
 					  (jsonBd) => { return new MyBookResp(jsonBd); });
 
-export { MyWorkbookTier, MyCurriculum, MyBookReq, MyBookResp };
+export { CourseTier, MyCurriculum, MyBookReq, MyBookResp };

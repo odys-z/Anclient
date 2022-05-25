@@ -7,9 +7,10 @@ import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 import {
 	L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf,
-	JsampleIcons,
 } from '@anclient/anreact';
-import { CourseTier } from './workbook-tier';
+const { JsampleIcons } = jsample;
+
+import { CourseTier } from './tier';
 
 const styles = (_theme: Theme) => ({
 	root: {

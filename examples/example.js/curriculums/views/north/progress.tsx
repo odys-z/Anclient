@@ -2,13 +2,15 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
+import { CRUD, AnsonMsg, AnsonResp, PageInf, OnCommitOk } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf,
-	JsampleIcons,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier,
 } from '@anclient/anreact';
+const { JsampleIcons } = jsample;
+
+import { CourseTier, MyBookReq } from './kyrci/tier';
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -24,7 +26,21 @@ const styles = (_theme: Theme) => ({
 	}
 });
 
-class CourseComp extends CrudComp<Comprops & {conn_state: string, tier: CourseTier}>{
+class ProgressTier extends Spreadsheetier {
+
+	insert(onOk: OnCommitOk) {
+		let req = this.client.userReq(this.uri,
+				this.port,
+				new MyBookReq( undefined ).A(MyBookReq.A.insert));
+
+		this.client.commit(req, onOk, this.errCtx);
+	}
+
+	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: any) {
+    }
+}
+
+class CourseComp extends CrudComp<Comprops & {conn_state: string, tier: ProgressTier}>{
 	tier: ProgressTier;
 	// classes: ClassNames;
 
