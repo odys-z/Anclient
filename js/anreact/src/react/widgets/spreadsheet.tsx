@@ -11,7 +11,8 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, UpdateReq, Inseclient, UIComponent, PkMeta } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
-import { AnConst, ComboCondType } from '../../an-components';
+import { ComboCondType } from './query-form';
+import { AnConst } from '../../utils/consts';
 
 export interface SheetCol extends TierCol {
 	label: string; 

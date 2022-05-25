@@ -9,7 +9,7 @@ import { AnConst } from '../../utils/consts';
 import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTablist } from '../../react/widgets/table-list'
-import { PageInf, QueryConditions, Semantier } from '@anclient/semantier';
+import { AnsonResp, PageInf, QueryConditions, Semantier } from '@anclient/semantier';
 import { AnQueryst } from '../../react/widgets/query-form';
 
 const styles = (theme: Theme) => ( {
