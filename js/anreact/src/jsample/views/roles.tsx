@@ -249,12 +249,14 @@ class RoleTier extends Semantier {
 		 * Hard coded here since it's a business string for jsample app.
 		 */
 		this.relMeta = {'a_role_func':
-			{ fk: {
+			{ stree: {
 				tabl: 'a_role_func',
 				pk: 'roleId',	 // fk to main table
+				fk: 'roleId',	 // fk to main table
 				col: 'funcId', // checking col
-				relcolumn: 'nodeId' },// where is the data in UI 
-			sk: 'trees.role_funcs'
+				relcolumn: 'nodeId',
+				sk: 'trees.role_funcs'
+			},
 			} as DbRelations
 		};
 	}

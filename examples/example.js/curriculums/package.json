@@ -1,0 +1,15 @@
+{
+  "name": "@anclient/jsample-curriculums",
+  "version": "1.0.0",
+  "description": "Test project for Anclient.js",
+  "main": "login.jsx, app.jsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": " webpack-cli"
+  },
+  "keywords": [
+    "AnClient"
+  ],
+  "author": "Ody Zhou",
+  "license": "Apache-2.0"
+}

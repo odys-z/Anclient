@@ -2,14 +2,13 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '../../../../semantier/anclient';
+import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf,
-} from '../../../../anreact/src/an-components';
-import { MyWorkbookTier } from './workbook-tier';
-import { JsampleIcons } from '../../../../anreact/src/jsample/styles';
+	JsampleIcons,
+} from '@anclient/anreact';
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -25,8 +24,8 @@ const styles = (_theme: Theme) => ({
 	}
 });
 
-class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWorkbookTier}>{
-	tier: MyWorkbookTier;
+class CourseComp extends CrudComp<Comprops & {conn_state: string, tier: CourseTier}>{
+	tier: ProgressTier;
 	// classes: ClassNames;
 
 	confirm: JSX.Element;
@@ -42,7 +41,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 
 	// currentId: string;
 
-	constructor(props: Comprops & {conn_state: string, tier: MyWorkbookTier}) {
+	constructor(props: Comprops & {conn_state: string, tier: CourseTier}) {
 		super(props);
 
 		// this.classes = props.classes;
@@ -153,7 +152,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 		return toPageInf(this.conds);
 	}
 }
-WorkbookComp.contextType = AnContext;
+CourseComp.contextType = AnContext;
 
-const Workbook = withStyles(styles)(WorkbookComp);
-export { Workbook, WorkbookComp };
+const Course = withStyles(styles)(CourseComp);
+export { Course, CourseComp };

@@ -85,7 +85,15 @@ class DomainComp extends CrudCompW<Comprops> {
 
 		this.q = query || this.q || {};
 
-		ctx.anReact.bindTablist(queryReq, this, ctx.error);
+		// ctx.anReact.bindTablist(queryReq, this, ctx.error);
+		let that = this;
+		ctx.anClient.commit(queryReq,
+			(qrsp) => {
+				let rs = qrsp.Body().Rs();
+				let {rows} = AnsonResp.rs2arr( rs );
+				that.setState({});
+				that.tier.rows = rows;
+			}, ctx.error );
 	}
 
 	onPageInf(page, size) {
@@ -122,7 +130,7 @@ class DomainComp extends CrudCompW<Comprops> {
 				columns={[
 					{ label: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
 					{ label: L('Domain Name'), color: 'primary', field:"domainName"},
-					{ label: L('parent'), color: 'primary',field:"parentId" }
+					{ label: L('Parent Domain'), color: 'primary',field:"parentId" }
 				]}
 				rows={this.tier.rows} pk='domainId'
 				pageInf={this.state.pageInf}

@@ -1,0 +1,9 @@
+dist/private.json
+dist/private
+polestar-docker
+
+# check the file dosn't exits:
+# start Alpine with -it
+# docker run -p 8889:80 --name emr --rm -it 5ef /bin/sh
+# the web root should be (see Dockerfile)
+# /usr/share/nginx/html/emr

@@ -9,6 +9,7 @@
     "Logout": "退出登录",
     "Domain ID": "码表 ID",
     "Domain Name": "码表项",
+    "parent": "parent",
     "Parent Domain": "父码表项",
     "Search": "查询",
     "Reset": "重置",

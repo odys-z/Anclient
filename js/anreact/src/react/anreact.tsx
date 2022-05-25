@@ -76,10 +76,11 @@ export class AnReact {
 		this.errCtx = errCtx;
 	}
 
-	/** @deprecated new tiered way don't need any more.
+	/**
+	 * @deprecated new tiered way don't need this any more.
 	 * set component.state with request's respons.rs, or call req.onLoad.
 	 */
-	bindTablist(req: AnsonMsg<AnsonBody>, comp: CrudComp<any>, errCtx: ErrorCtx) {
+	bindTablist(req: AnsonMsg<AnsonBody>, comp: CrudComp<Comprops>, errCtx: ErrorCtx) {
 		this.client.commit(req, (qrsp) => {
 			// if (req.onLoad)
 			// 	req.onLoad(qrsp);

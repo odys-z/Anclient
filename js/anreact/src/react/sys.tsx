@@ -25,10 +25,6 @@ import {
 	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School
 } from '@material-ui/icons';
 
-// import { MemoryRouter as Router, Routes } from 'react-router';
-// import { Link as RouterLink } from 'react-router-dom';
-// import { Route } from 'react-router-dom'
-
 import { AnContext, AnContextType } from './reactext';
 	import { ConfirmDialog } from './widgets/messagebox';
 	import { MyIcon } from './widgets/my-icon';
@@ -59,24 +55,6 @@ const _icons = {
 	'menu-leaf': <Sms />,
 	'deflt': <Inbox />,
 }
-
-// export function uri(comp: CrudComp<Comprops>, uri: string) {
-// 	return comp;
-// 	/* FIXME this function is unnecessary if moved URI to Semantier.
-// 	if (comp.Naked)
-// 		comp.Naked.prototype.uri = uri;
-
-// 	// for SysComp using Route: component={_comps[c.path]}
-// 	else if (comp.prototype)
-// 		comp.prototype.uri = uri;
-
-// 	// for direct component rendering, e.g. less-app/App#render()
-// 	else if (comp.type && comp.type.Naked)
-// 		comp.type.Naked.prototype.uri = uri;
-
-// 	return comp;
-// 	*/
-// }
 
 /**
  * Map of uri to UI components.
@@ -233,7 +211,6 @@ export function parseMenus(json = []): {
  * @class SysComp
  */
 class SysComp extends CrudCompW<SysProps> {
-// class SysComp extends React.Component<SysProps, any, any> {
 	state = {
 		window: undefined,
 		welcome: true,
@@ -257,12 +234,12 @@ class SysComp extends CrudCompW<SysProps> {
     confirmLogout: any;
 
 	static extendLinks(links) {
-		links.forEach( (l, x) => {
+		links.forEach( (l: { path: string ; comp: CrudComp<Comprops>; }, _x: number) => {
 			_comps[l.path] = l.comp; // uri(l.comp, l.path);
 		});
 	}
 
-	constructor(props) {
+	constructor(props: SysProps) {
 		super(props);
 		this.state.window = props.window;
 
@@ -444,7 +421,7 @@ class SysComp extends CrudCompW<SysProps> {
 				})}
 			>
 			<Toolbar>
-				<Grid container spacing={1} >
+			   <Grid container spacing={1} >
 				<Grid item sm={5}>
 				<Box flexWrap="nowrap" display="flex" >
 					<IconButton
@@ -469,17 +446,15 @@ class SysComp extends CrudCompW<SysProps> {
 						</Button>
 					</DialogActions>
 				</Grid>
-				</Grid>
+			  </Grid>
 			</Toolbar>
 			</AppBar>
-			{/* <Router><React.Fragment> */}
-				<Drawer
-					className={claz.drawer}
+			<Drawer className={claz.drawer}
 					variant="persistent"
 					anchor="left"
 					open={open}
 					classes={{paper: claz.drawerPaper}}
-				>
+			>
 				<div className={claz.drawerHeader}>
 					<IconButton onClick={this.hideMenu}>
 						<ListItemText>{this.state.menuTitle}</ListItemText>
@@ -490,21 +465,20 @@ class SysComp extends CrudCompW<SysProps> {
 				<List>
 					{this.menuItems(claz)}
 				</List>
-			  </Drawer>
-			  {/* </React.Fragment> */}
-			  <main onClick={this.hideMenu}
+			</Drawer>
+
+			<main onClick={this.hideMenu}
 				className={clsx(claz.content, {
 					[claz.contentShift]: open,
 				})}
-			  >
+			>
 				<div className={claz.drawerHeader} />
 				{this.state.welcome ?
 					this.welcomePaper(classes) :
 					<div className="content">
 						{this.route()}
 					</div>}
-			  </main>
-			{/* </Router> */}
+			</main>
 
 			{this.state.showMine && <MyInfo
 				panels={typeof this.props.myInfo === 'function'
