@@ -118,7 +118,7 @@ interface MyCurriculum extends SpreadsheetRec {
     parentId?: string;
 }
 
-class MyBookReq extends AnsonBody {
+class MyBookReq<T extends SpreadsheetRec> extends AnsonBody {
 	static A = {
 		update: 'u',
 		insert: 'c',
@@ -133,7 +133,7 @@ class MyBookReq extends AnsonBody {
 	page: PageInf;
 	// conds: Array<string[]>;
 
-	constructor(query?: PageInf, rec?: MyCurriculum) {
+	constructor(query?: PageInf, rec?: T) {
 		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
 
 		this.page = query;
