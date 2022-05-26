@@ -69,7 +69,7 @@ export interface CellEditingStoppedEvent extends CellEvent {
 }
 
 export interface SheetCol extends TierCol {
-	label: string; 
+	label: string;
 	field: string;
 
 	/**cell type, default: text */
@@ -82,7 +82,7 @@ export interface SheetCol extends TierCol {
 	editable?: boolean;
 	singleClickEdit?: boolean;
 	width?: number;
-	minWidth?: number; 
+	minWidth?: number;
 	thFormatter?: () => SheetCol & {headerName: string};
 	onEditStop?: (e: CellEditingStoppedEvent) => void;
 
@@ -149,13 +149,6 @@ export class SpreadsheetReq extends UserReq {
 			throw Error("opts.type is undefined. Spreadsheet is a mimic of Generic type, but can only work with type explictly specified.");
 		this.type = opts.type;
 	}
-
-	// getNew(args: {type: string, tabl?: string}) {
-	// 	let obj = new this.ReqType(args)
-	// 	obj.type = args.type;
-	// }
-
-	// getType: () => string;// { throw Error('Subclass must override this method'); }
 }
 
 
@@ -177,7 +170,7 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 
 		this.rows = [];
 		this._cols = props.cols;
-	
+
 		this.onCellClick = this.onCellClick.bind(this);
 	}
 
@@ -217,11 +210,11 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 
 	/**
 	 * Providing options for AgSelectEditor's items.
-	 *  
+	 *
 	 * @param p parameter for colDef.cellEditorParams = (p: any) => string[] .
-	 * 
+	 *
 	 * According to ag-grid document, p's type is any: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
-	 * 
+	 *
 	 * @returns options
 	 */
 	cbbCellOptions(p: CbbCellValue): string[] {
@@ -230,9 +223,9 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 
 	/**
 	 * Decode record's FK value for display cell content - called by AgSelectCell for rendering.
-	 * 
-	 * @param field field name for finding NV records to decode. 
-	 * @param v 
+	 *
+	 * @param field field name for finding NV records to decode.
+	 * @param v
 	 * @returns showing element
 	 */
 	decode(field: string, v: string): string | Element {
@@ -245,10 +238,10 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 
 	/**
 	 * Encode record's FK value to get db value - called by spread tier for updating.
-	 * 
-	 * @param field 
-	 * @param n 
-	 * @returns 
+	 *
+	 * @param field
+	 * @param n
+	 * @returns
 	 */
 	encode(field: string, n: string): string | object {
 		let nvs = this.cbbItems[field];
@@ -273,7 +266,7 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 
 		if (!this.pkval)
 			throw Error("Default auto updating only works when PkMeta is provided. Eighter provid it or override updateCell(CellEditingStoppedEvent).");
-		
+
 		if (this.client instanceof Inseclient)
 			throw Error("Spreadsheetir.updateCell is using port.update, and can only work in session mode. To use in session less mode, user need override this method or provide SheetCol.onEditStop.");
 
@@ -418,7 +411,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 						minWidth: 50 },
 					  c.thFormatter ? c.thFormatter() :
 						{ headerName, ...c}) as ColDef;
-				
+
 				if (col.type === 'cbb') {
 					col.type = undefined; // 'agSelectEditor';
 					col.cellEditor = 'agSelectCellEditor';
@@ -544,12 +537,6 @@ export function anRowsRenderer (param: { value: string; }) {
 		return `<p style="line-height: 1.2em" >${param.value.split('\n').join('<br/>')}</p>`;
 }
 
-// export function anIndicatorRenderer (param) {
-// 	if (param.rowIndex === 0)
-// 		return `<p style="line-height: 1.2em" >[avg] : ${param.value}</p>`;
-// 	else return param.value;
-// }
-
 // https://www.ag-grid.com/javascript-data-grid/component-cell-editor/#angular-cell-editing
 export class AnNumerCellEdit {
   eInput: HTMLInputElement;
@@ -558,7 +545,7 @@ export class AnNumerCellEdit {
   /**
    * This is gets called once before the renderer is used.
    *
-   * @param params 
+   * @param params
    */
   init(params: { charPress: string; value: string; }) {
     // create the cell
