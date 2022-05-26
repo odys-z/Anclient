@@ -44,25 +44,6 @@ class CourseTier extends Spreadsheetier<CourseReq> {
 		this.client.commit(req, onOk, this.errCtx);
 	}
 
-	// records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
-	// 	if (!this.client) return;
-
-	// 	let client = this.client;
-	// 	let that = this;
-
-	// 	let req = client.userReq(this.uri, this.port,
-	// 				new MyBookReq( conds )
-	// 				.A(MyBookReq.A.records) );
-
-	// 	client.commit(req,
-	// 		(resp) => {
-	// 			let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-	// 			that.rows = rows;
-	// 			onLoad(cols, rows as T[]);
-	// 		},
-	// 		this.errCtx);
-	// }
-
 	update(crud: CRUD, rec: MyCurriculum, ok: OnCommitOk, err: ErrorCtx) {
 		console.log(rec);
 

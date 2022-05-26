@@ -142,24 +142,42 @@ export class SpreadsheetReq extends UserReq {
 		rec: 'rec',
 	}
 
-	constructor(private ReqType) {
-		super(undefined, undefined);
+	constructor(opts: {type: string, tabl?: string}) {
+		super(undefined, opts.tabl);
+
+		if (!opts.type)
+			throw Error("opts.type is undefined. Spreadsheet is a mimic of Generic type, but can only work with type explictly specified.");
+		this.type = opts.type;
 	}
 
-	getNew(...args: any) { return new this.ReqType(args) }
+	// getNew(args: {type: string, tabl?: string}) {
+	// 	let obj = new this.ReqType(args)
+	// 	obj.type = args.type;
+	// }
+
+	// getType: () => string;// { throw Error('Subclass must override this method'); }
 }
 
 
 export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
+	static reqfactory: (conds: PageInf) => SpreadsheetReq;
+
+	static registerReq(factory: (conds: PageInf) => SpreadsheetReq) {
+		Spreadsheetier.reqfactory = factory;
+	}
+
 	/**jserv port name, e.g. 'workbook' */
 	port: string;
 	currentRecId: any;
 
-	constructor(port: string, props: UIComponent & {pkval: PkMeta}) {
+	constructor(port: string, props: {uri: string, pkval: PkMeta, cols: SheetCol[]}) {
 		super(props);
 		this.port = port;
 		this.pkval = props.pkval;
 
+		this.rows = [];
+		this._cols = props.cols;
+	
 		this.onCellClick = this.onCellClick.bind(this);
 	}
 
@@ -275,7 +293,9 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 	}
 
 	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
-		function activator<S>(type: {new(...arg: any[]) : SpreadsheetReq} ): S {
+		function activator<S>(type: {
+				new(...arg: any[]) : SpreadsheetReq,
+			} ): S {
 			return new type(conds) as unknown as S;
 		}
 
@@ -284,11 +304,15 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 		let client = this.client;
 		let that = this;
 
-		let r: R = activator<R>(SpreadsheetReq);
+		// let r: R = activator<R>(SpreadsheetReq);
+		// if (r.type === 'io.odysz.semantic.jserv.user.UserReq')
+		// 	throw Error('');
+		// r.type = r.getType();
+		let r = Spreadsheetier.reqfactory(conds);
+
 
 		let req = client.userReq(this.uri, this.port,
-					r
-					.A(SpreadsheetReq.A.records) );
+					r.A(SpreadsheetReq.A.records) );
 
 		client.commit(req,
 			(resp) => {
@@ -337,6 +361,7 @@ export interface SpreadsheetProps extends Comprops {
 export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	state = {
 		dirty: false,
+		ready: false
 	};
 
 	coldefs = [] as ColDef[];
@@ -416,9 +441,12 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 
 	componentDidMount() {
 		this.tier.setContext(this.context);
+		this.tier.setContext(this.context);
+		this.tier.loadCbbOptions(this.context);
 
 		let that = this;
-		this.tier.records(undefined, () => that.setState({}));
+		this.tier.records(undefined, () => that.setState({ready: true}));
+		// this.setState({});
 	}
 
 	/** load default context menu, together with user's menu items.
@@ -429,7 +457,6 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	 */
 	getContextMenuItems = ((para: GetContextMenuItemsParams) =>  {
 		// cellval = param.value;
-		debugger
 		let result = [
 			{ name: 'cell ' + para.value,
 			  action: function () { } },
