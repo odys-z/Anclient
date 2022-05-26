@@ -17,7 +17,12 @@ export const Langstrs = {
 
 	lang: 'en',
 
-	load: function(url) {
+	/**
+	 * Load the string resource.
+	 * 
+	 * @param url relative json path
+	 */
+	load: function(url: string) {
 		$.ajax({
 			dataType: "json",
 			url,
