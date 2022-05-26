@@ -12,7 +12,7 @@ import { L, Langstrs,
 import { Workbook } from './workbook';
 import { MyBookReq, MyWorkbookTier } from './workbook-tier';
 
-const { JsampleTheme } = jsample; 
+const { JsampleTheme } = jsample;
 
 type LessProps = {
 	servs: JsonServs;
@@ -54,9 +54,9 @@ class App extends React.Component<LessProps, State> {
 	tier: MyWorkbookTier;
 
 	/**
-     * Restore session from window.localStorage 
-     * 
-     * @param props 
+     * Restore session from window.localStorage
+     *
+     * @param props
      */
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
@@ -88,7 +88,7 @@ class App extends React.Component<LessProps, State> {
                             /* see jserv-sandbox/UsersTier, port name: sheetier, filter: sheet.less */
                             workbook: "sheet.less",
                         });
-		
+
 		let onEditStop = this.onEdited;
 
 		this.tier = new MyWorkbookTier({
@@ -157,7 +157,9 @@ class App extends React.Component<LessProps, State> {
 	 *
 	 * For test, have elem = undefined
 	 * @param elem html element id
-	 * @param opts 
+	 * @param opts default: {serv: 'host', portal: 'index.html'}
+	 * - serv: string,
+	 * - portal: string
 	 */
 	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
 		let portal = opts.portal ?? 'index.html';

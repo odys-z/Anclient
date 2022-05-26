@@ -85,14 +85,13 @@ class LoginApp extends React.Component<Northprops> {
 	 * First try ./private/host.json/<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
-	 * 
+	 *
 	 *
 	 * For test, have elem = undefined
-	 * @param {string} elem html element id, null for test
-	 * @param {object} [opts={}] serv id
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.home='index.html'] system main page
-	 * @param {Window} [opts.parent=undefined] parent window if for redirecting target
+	 * @param elem html element id, null for test
+	 * @param opts default: {serv: 'host', portal: 'index.html'}
+	 * - serv: string,
+	 * - portal: string
 	 */
 	static bindHtml(elem, opts = {}) {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}

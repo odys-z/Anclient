@@ -375,10 +375,12 @@ export type SessionInf = {
 	 */
 	jserv: string;
 	uid: string;
+	usrName?: string;
 	iv?: string;
 	ssid: string;
+
 	roleId?: string;
-	usrName?: string
+	roleName?: string
 }
 
 /**Client with session logged in.
@@ -386,7 +388,7 @@ export type SessionInf = {
  */
 class SessionClient {
 	an: AnClient;
-	ssInf: any;
+	ssInf: SessionInf;
 
 	currentAct: LogAct = {
 		func: '',
@@ -780,7 +782,7 @@ class Inseclient extends SessionClient {
 	 */
 	constructor(opts: { urlRoot: string; }) {
 		super(undefined, undefined, true);
-		this.ssInf = {}
+		this.ssInf = {} as SessionInf;
 		this.an = an;
 		an.init(opts.urlRoot);
 	}

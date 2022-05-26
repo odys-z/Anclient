@@ -2,15 +2,13 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
+import { CRUD, AnsonMsg, AnsonResp, PageInf, OnCommitOk } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SheetCol, SpreadsheetReq,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
-
-import { CourseTier } from './tier';
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -26,13 +24,33 @@ const styles = (_theme: Theme) => ({
 	}
 });
 
-class CourseComp extends CrudComp<Comprops & {conn_state: string, tier: CourseTier}>{
-	tier: CourseTier;
-	// classes: ClassNames;
+class MyReq extends SpreadsheetReq {
+
+}
+
+class MyTier extends Spreadsheetier<MyReq> {
+
+	insert(onOk: OnCommitOk) {
+		let req = this.client.userReq(this.uri,
+				this.port,
+				new MyReq( undefined ).A(MyReq.A.insert));
+
+		this.client.commit(req, onOk, this.errCtx);
+	}
+
+	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: any) {
+    }
+
+	columns (): Array<SheetCol> {
+		return this._cols as Array<SheetCol>;
+	}
+}
+
+class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyTier}>{
+	tier: MyTier;
 
 	confirm: JSX.Element;
 
-	// uri: string;
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
 				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
@@ -41,12 +59,9 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string, tier: CourseTi
 				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
-	// currentId: string;
-
-	constructor(props: Comprops & {conn_state: string, tier: CourseTier}) {
+	constructor(props: Comprops & {conn_state: string, tier: MyTier}) {
 		super(props);
 
-		// this.classes = props.classes;
 		this.uri = props.uri;
 		this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
@@ -73,8 +88,8 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string, tier: CourseTi
 		let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
 
 		return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
-			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-			: <jsample.JsampleIcons.Star color={color} className={classes.svgicn}/>
+			? <JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
+			: <JsampleIcons.Star color={color} className={classes.svgicn}/>
 			;
 	}
 
@@ -96,19 +111,6 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string, tier: CourseTi
 		// if (this.currentId)
 		this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
 	}
-
-	// paper(e: SpreadsheetRec) {
-	// 	return (
-	// 		<Paper elevation={4} style={{ margin: 24 }}
-	// 			className={this.classes.welcome}>
-	// 			<IconButton onClick={this.props.showMenu} >
-	// 				{this.icon(e)}
-	// 				<Box component='span' display='inline' className={this.classes.cardText} >
-	// 					Please click menu to start.
-	// 				</Box>
-	// 			</IconButton>
-	// 		</Paper>);
-	// }
 
 	render() {
 		let that = this;
@@ -154,7 +156,7 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string, tier: CourseTi
 		return toPageInf(this.conds);
 	}
 }
-CourseComp.contextType = AnContext;
+MyComp.contextType = AnContext;
 
-const Course = withStyles(styles)(CourseComp);
-export { Course, CourseComp };
+const My = withStyles<any, any, Comprops>(styles)(MyComp);
+export { My, MyComp };

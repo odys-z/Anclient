@@ -5,16 +5,17 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt, jsample, AnContextType
+	AnContext, AnError, AnReactExt, jsample, AnContextType, Home
 } from '@anclient/anreact';
 const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
 
 import { StarPorts } from './common/port';
 
-import { Course } from './views/north/kyrci/courses';
+import { Course } from './views/north/kypci/courses';
 import { Progress } from './views/north/progress';
+import { My } from './views/center/my-decision';
 
-export interface Northprops {
+export interface Approps {
     iportal?: string;
     servId: string;
     servs?: {host?: string, [h: string]: string};
@@ -26,7 +27,7 @@ export interface Northprops {
 }
 
 /** 📦  @anclient/semantier@0.9.69 */
-class App extends React.Component<Northprops, any> {
+class App extends React.Component<Approps, any> {
 	state = {
 		anClient: undefined, // SessionClient
 		anReact: undefined,  // helper for React
@@ -43,7 +44,7 @@ class App extends React.Component<Northprops, any> {
 
 	/**Restore session from window.localStorage
 	 */
-	constructor(props: Northprops) {
+	constructor(props: Approps) {
 		super(props);
 
 		this.state.iportal = this.props.iportal;
@@ -80,8 +81,10 @@ class App extends React.Component<Northprops, any> {
 			{path: '/sys/orgs', comp: Orgs},
 			{path: '/sys/users', comp: Userst},
 
-			{path: '/n/kyrci', comp: Course},
-			{path: '/n//prohres', comp: Overview},
+			{path: '/n/kypci', comp: Course},
+			{path: '/n/prohres', comp: Progress},
+			{path: '/c/status', comp: Home},
+			{path: '/c/my', comp: My},
 		] );
 	}
 
@@ -171,7 +174,7 @@ class App extends React.Component<Northprops, any> {
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
-		function myInfoPanels(anContext: AnContextType) {
+		function myInfoPanels(anContext: React.Context<AnContextType>) {
 			return [
 				{ title: L('Basic'),
 				  panel: <jsample.MyInfCard uri={'/sys/session'}
@@ -192,7 +195,9 @@ class App extends React.Component<Northprops, any> {
 	 *
 	 * For test, have elem = undefined
 	 * @param elem html element id, null for test
-	 * @param opts {serv: string, portal: string} default: {host, index.html}
+	 * @param opts default: {serv: 'host', portal: 'index.html'}
+	 * - serv: string,
+	 * - portal: string
 	 */
 	static bindHtml(elem: string, opts = {portal: 'indexe.html'}): void {
 		let portal = opts.portal ? opts.portal : 'index.html';

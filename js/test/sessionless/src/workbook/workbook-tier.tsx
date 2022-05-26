@@ -1,13 +1,13 @@
 import { Protocol, AnsonBody, AnsonResp, CRUD, ErrorCtx,
 	OnCommitOk, OnLoadOk, PageInf} from '../../../../semantier/anclient';
 
-import { SheetCol, SpreadsheetRec, Spreadsheetier, CellEditingStoppedEvent } from '../../../../anreact/src/an-components';
+import { SheetCol, SpreadsheetRec, Spreadsheetier, SpreadsheetReq, CellEditingStoppedEvent } from '../../../../anreact/src/an-components';
 
 /**
  * @example table DDL
  drop table if exists b_curriculums;
 CREATE TABLE b_curriculums (
-  cid varchar2(12) NOT NULL,
+  cId varchar2(12) NOT NULL,
   parentId varchar2(12),
   currName varchar2(256) NOT NULL,
   clevel varchar2(12),
@@ -18,12 +18,15 @@ CREATE TABLE b_curriculums (
   fullpath varchar2(80),
   oper varchar2(12) NOT NULL,
   optime DATETIME NOT NULL,
-  PRIMARY KEY ("cid")
+  PRIMARY KEY ("cId")
 );
+
+insert into oz_autoseq (sid, seq, remaks)
+values ('b_curriculums.cId', 0, 'north.curr');
 
 select * from b_curriculums;
  */
-class MyWorkbookTier extends Spreadsheetier {
+class MyWorkbookTier extends Spreadsheetier<MyBookReq<MyCurriculum>> {
 	static curriculPk = {pk: 'cid', v: undefined, tabl: 'b_curriculums'};
 
 	/**
@@ -31,7 +34,7 @@ class MyWorkbookTier extends Spreadsheetier {
 	 */
 	constructor(props: {uri: string, cols?: SheetCol[]}) {
 		super('workbook',
-			Object.assign(props, 
+			Object.assign(props,
 			/* not used, but is usefull for session client - which using prot 'update'. */
 			{pkval: MyWorkbookTier.curriculPk}));
 
@@ -118,7 +121,7 @@ interface MyCurriculum extends SpreadsheetRec {
     parentId?: string;
 }
 
-class MyBookReq<T extends SpreadsheetRec> extends AnsonBody {
+class MyBookReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	static A = {
 		update: 'u',
 		insert: 'c',

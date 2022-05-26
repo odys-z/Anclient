@@ -1,9 +1,12 @@
 import React from "react";
-import { AnContext, AnContextType, ClassNames, CrudCompW, invalidStyles, SysComp } from "@anclient/anreact";
+import { AnContext, AnContextType, ClassNames, Comprops, CrudCompW, invalidStyles, SysComp } from "@anclient/anreact";
 import { Semantier, Tierec, UIComponent } from "@anclient/semantier";
 import { Card, Grid, Link, Paper, SvgIcon, Typography, withStyles, withWidth } from "@material-ui/core";
-import { WelcomeProp } from "../../common/north";
 import { StarTheme } from "../../common/star-theme";
+
+export interface WelcomeProp extends Comprops {
+    readonly sys: typeof SysComp
+};
 
 class WelcomeComp extends CrudCompW<WelcomeProp> {
     uri = '/n/home';
@@ -77,6 +80,7 @@ interface WelcomeClasses extends ClassNames {
 interface CardCss {
     icon: string;
 }
+
 /**
  *
  * @param theme

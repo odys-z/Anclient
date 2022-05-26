@@ -2,15 +2,15 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, AnsonMsg, AnsonResp, PageInf, OnCommitOk } from '@anclient/semantier';
+import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SheetCol, SpreadsheetReq,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, CellEditingStoppedEvent,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { CourseReq } from './kypci/tier';
+import { Curriculum, CourseReq } from './tier';
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -26,30 +26,8 @@ const styles = (_theme: Theme) => ({
 	}
 });
 
-class PregressReq extends SpreadsheetReq {
-
-}
-
-class ProgressTier extends Spreadsheetier<PregressReq> {
-
-	insert(onOk: OnCommitOk) {
-		let req = this.client.userReq(this.uri,
-				this.port,
-				new CourseReq( undefined ).A(CourseReq.A.insert));
-
-		this.client.commit(req, onOk, this.errCtx);
-	}
-
-	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: any) {
-    }
-
-	columns (): Array<SheetCol> {
-		return this._cols as Array<SheetCol>;
-	}
-}
-
-class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: ProgressTier}>{
-	tier: ProgressTier;
+class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
+	tier: Spreadsheetier<CourseReq<Curriculum>>;
 
 	confirm: JSX.Element;
 
@@ -61,7 +39,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
-	constructor(props: Comprops & {conn_state: string, tier: ProgressTier}) {
+	constructor(props: Comprops & {conn_state: string}) {
 		super(props);
 
 		this.uri = props.uri;
@@ -71,17 +49,33 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 		this.toAdd = this.toAdd.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
+
+		this.tier = new Spreadsheetier<CourseReq<Curriculum>>('curriculum',
+			{ uri: this.uri,
+			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},
+			  cols: [
+				{ field: 'cid', label: L("Id"), width: 120, editable: false },
+				{ field: 'currName', label: L("curriculum"), width: 160 },
+				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level',
+				  onEditStop: this.onEdited },
+				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
+				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
+				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj' },
+			] });
 	}
 
 	componentDidMount() {
 		let uri = this.uri;
 		console.log(uri);
 
-		this.tier = this.props.tier;
 		this.tier.setContext(this.context);
 		this.tier.loadCbbOptions(this.context);
 
 		this.setState({});
+	}
+
+	onEdited(p: CellEditingStoppedEvent): void {
+		this.tier.updateCell(p);
 	}
 
 	icon(e: SpreadsheetRec) {
@@ -90,8 +84,8 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 		let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
 
 		return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
-			? <JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-			: <JsampleIcons.Star color={color} className={classes.svgicn}/>
+			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
+			: <jsample.JsampleIcons.Star color={color} className={classes.svgicn}/>
 			;
 	}
 
@@ -113,6 +107,19 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 		// if (this.currentId)
 		this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
 	}
+
+	// paper(e: SpreadsheetRec) {
+	// 	return (
+	// 		<Paper elevation={4} style={{ margin: 24 }}
+	// 			className={this.classes.welcome}>
+	// 			<IconButton onClick={this.props.showMenu} >
+	// 				{this.icon(e)}
+	// 				<Box component='span' display='inline' className={this.classes.cardText} >
+	// 					Please click menu to start.
+	// 				</Box>
+	// 			</IconButton>
+	// 		</Paper>);
+	// }
 
 	render() {
 		let that = this;
@@ -158,7 +165,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 		return toPageInf(this.conds);
 	}
 }
-ProgressComp.contextType = AnContext;
+CourseComp.contextType = AnContext;
 
-const Progress = withStyles<any, any, Comprops>(styles)(ProgressComp);
-export { Progress, ProgressComp };
+const Course = withStyles(styles)(CourseComp);
+export { Course, CourseComp };

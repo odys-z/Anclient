@@ -1,7 +1,6 @@
-import { Protocol, AnsonBody, AnsonResp, CRUD, ErrorCtx,
-	OnCommitOk, OnLoadOk, PageInf} from '@anclient/semantier';
+import { Protocol, AnsonBody, AnsonResp, PageInf} from '@anclient/semantier';
 
-import { SheetCol, SpreadsheetRec, Spreadsheetier, CellEditingStoppedEvent } from '@anclient/anreact';
+import { SpreadsheetRec, SpreadsheetReq } from '@anclient/anreact';
 
 /**
  * @example table DDL
@@ -22,17 +21,13 @@ CREATE TABLE b_curriculums (
 );
 
 select * from b_curriculums;
- */
-class CourseTier extends Spreadsheetier {
+class CourseTier extends Spreadsheetier<CourseReq> {
 	static curriculPk = {pk: 'cid', v: undefined, tabl: 'b_curriculums'};
 
-	/**
-	 * @param props
-	 */
 	constructor(props: {uri: string, cols?: SheetCol[]}) {
 		super('workbook',
 			Object.assign(props, 
-			/* not used, but is usefull for session client - which using prot 'update'. */
+			// not used, but is usefull for session client - which using prot 'update'.
 			{pkval: CourseTier.curriculPk}));
 
 		console.log(this.uri);
@@ -49,27 +44,24 @@ class CourseTier extends Spreadsheetier {
 		this.client.commit(req, onOk, this.errCtx);
 	}
 
-	/**
-	 * @override(Semantier)
-	 */
-	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
-		if (!this.client) return;
+	// records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
+	// 	if (!this.client) return;
 
-		let client = this.client;
-		let that = this;
+	// 	let client = this.client;
+	// 	let that = this;
 
-		let req = client.userReq(this.uri, this.port,
-					new MyBookReq( conds )
-					.A(MyBookReq.A.records) );
+	// 	let req = client.userReq(this.uri, this.port,
+	// 				new MyBookReq( conds )
+	// 				.A(MyBookReq.A.records) );
 
-		client.commit(req,
-			(resp) => {
-				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				that.rows = rows;
-				onLoad(cols, rows as T[]);
-			},
-			this.errCtx);
-	}
+	// 	client.commit(req,
+	// 		(resp) => {
+	// 			let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+	// 			that.rows = rows;
+	// 			onLoad(cols, rows as T[]);
+	// 		},
+	// 		this.errCtx);
+	// }
 
 	update(crud: CRUD, rec: MyCurriculum, ok: OnCommitOk, err: ErrorCtx) {
 		console.log(rec);
@@ -86,16 +78,11 @@ class CourseTier extends Spreadsheetier {
 		client.commit(req, ok, err);
 	}
 
-	columns (): Array<SheetCol> {
-		return this._cols as Array<SheetCol>;
-	}
-
 	updateCell(p: CellEditingStoppedEvent): void {
 		let rec = {cid: p.data.cid};
 		let {value, oldValue} = p;
 		if (value !== oldValue) {
 			value = this.encode(p.colDef.field, value);
-			// oldValue = this.encode(p.colDef.field, oldValue);
 
 			rec[p.colDef.field] = value;
 			this.update(CRUD.u, rec, undefined, this.errCtx);
@@ -106,11 +93,14 @@ class CourseTier extends Spreadsheetier {
         ids: Array<string>;
         posts?: Array<AnsonBody>;
     }, onOk: OnCommitOk): void {
-		throw Error('TODO override for session less');
+		if (!this.client?.ssInf?.ssid)
+			throw Error('TODO override for session less');
+		else super.del(opts, onOk);
 	}
 }
+ */
 
-interface MyCurriculum extends SpreadsheetRec {
+interface Curriculum extends SpreadsheetRec {
     cid: string;
     cate?: string;
     module?: string;
@@ -118,7 +108,7 @@ interface MyCurriculum extends SpreadsheetRec {
     parentId?: string;
 }
 
-class MyBookReq<T extends SpreadsheetRec> extends AnsonBody {
+class CourseReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	static A = {
 		update: 'u',
 		insert: 'c',
@@ -131,20 +121,25 @@ class MyBookReq<T extends SpreadsheetRec> extends AnsonBody {
 
 	rec: SpreadsheetRec;
 	page: PageInf;
-	// conds: Array<string[]>;
+
+	type: 'io.odysz.jsample.semantier.CourseReq';
 
 	constructor(query?: PageInf, rec?: T) {
-		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
+		super({}); //{type: 'io.odysz.jsample.semantier.CourseReq'});
+		debugger
+		this.type = 'io.odysz.jsample.semantier.CourseReq';
 
 		this.page = query;
 		this.rec = rec;
 	}
+
+	getType() {return 'io.odysz.jsample.semantier.CourseReq'}
 }
 
-class MyBookResp extends AnsonResp {
+class CourseResp extends AnsonResp {
 }
 
-Protocol.registerBody('io.oz.sandbox.sheet.SpreadsheetResp',
-					  (jsonBd) => { return new MyBookResp(jsonBd); });
+Protocol.registerBody('io.odysz.jsample.semantier.SpreadsheetResp',
+					  (jsonBd) => { return new CourseResp(jsonBd); });
 
-export { CourseTier, MyCurriculum, MyBookReq, MyBookResp };
+export { Curriculum, CourseReq, CourseResp };

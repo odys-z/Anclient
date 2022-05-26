@@ -1,18 +1,72 @@
 import React, { CSSProperties } from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, CellEditingStoppedEvent, ColDef, Column, ColumnApi,
+import { CellClickedEvent, ColDef, Column, ColumnApi,
 	GetContextMenuItems, GetContextMenuItemsParams, GridApi, GridReadyEvent, ICellRendererParams, RowNode
 } from 'ag-grid-community';
-export { CellEditingStoppedEvent, CellClickedEvent };
+// export { CellEditingStoppedEvent, CellClickedEvent };
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
-import { TierCol, Tierec, Semantier, Semantext, NV, toBool, UpdateReq, Inseclient, UIComponent, PkMeta } from '@anclient/semantier';
+import { TierCol, Tierec, Semantier, Semantext, NV, toBool, UpdateReq, Inseclient, UIComponent, PkMeta,
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { ComboCondType } from './query-form';
 import { AnConst } from '../../utils/consts';
+
+/**
+ * Short-cut for ag-grid-community (License: MID)
+ */
+ export interface AgEvent {
+    /** Event identifier */
+    type: string;
+}
+
+/**
+ * Short-cut for ag-grid-community (License: MID)
+ */
+export interface AgGridEvent extends AgEvent {
+    api: any;
+    columnApi: any;
+}
+
+/**
+ * Short-cut for ag-grid-community (License: MID)
+ */
+export interface RowEvent extends AgGridEvent {
+    node: any;
+    /** The user provided data for the row */
+    data: any;
+    /** The visible row index for the row */
+    rowIndex: number | null;
+    /** Either 'top', 'bottom' or null / undefined (if not set) */
+    rowPinned: string | null;
+    /** The context as provided on `gridOptions.context` */
+    context: any;
+    /** If event was due to browser event (eg click), this is the browser event */
+    event?: Event | null;
+}
+
+/**
+ * Short-cut for ag-grid-community (License: MID)
+ */
+export interface CellEvent extends RowEvent {
+    column: any;
+    colDef: any;
+    /** The value for the cell */
+    value: any;
+}
+
+/**
+ * Short-cut for ag-grid-community (License: MID)
+ */
+export interface CellEditingStoppedEvent extends CellEvent {
+    /** The old value before editing */
+    oldValue: any;
+    /** The new value after editing */
+    newValue: any;
+}
 
 export interface SheetCol extends TierCol {
 	label: string; 
@@ -77,7 +131,26 @@ export interface CbbCellValue {
 	value: any
 }
 
-export class Spreadsheetier extends Semantier {
+export class SpreadsheetReq extends UserReq {
+	// new (...args: any[]) : Req
+	// { return new Req(args);}
+	static A = {
+		update: 'u',
+		insert: 'c',
+		delete: 'd',
+		records: 'r',
+		rec: 'rec',
+	}
+
+	constructor(private ReqType) {
+		super(undefined, undefined);
+	}
+
+	getNew(...args: any) { return new this.ReqType(args) }
+}
+
+
+export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 	/**jserv port name, e.g. 'workbook' */
 	port: string;
 	currentRecId: any;
@@ -138,7 +211,7 @@ export class Spreadsheetier extends Semantier {
 	}
 
 	/**
-	 * docde record value for display cell content - called by AgSelectCell for rendering.
+	 * Decode record's FK value for display cell content - called by AgSelectCell for rendering.
 	 * 
 	 * @param field field name for finding NV records to decode. 
 	 * @param v 
@@ -152,6 +225,13 @@ export class Spreadsheetier extends Semantier {
 		return v;
 	}
 
+	/**
+	 * Encode record's FK value to get db value - called by spread tier for updating.
+	 * 
+	 * @param field 
+	 * @param n 
+	 * @returns 
+	 */
 	encode(field: string, n: string): string | object {
 		let nvs = this.cbbItems[field];
 		if (!nvs) // plain text
@@ -189,6 +269,44 @@ export class Spreadsheetier extends Semantier {
 
 		client.commit(req, () => {}, this.errCtx);
 	}
+
+    record(conds: PageInf, onLoad: OnLoadOk<SpreadsheetRec>) : void {
+		super.records(conds, onLoad);
+	}
+
+	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
+		function activator<S>(type: {new(...arg: any[]) : SpreadsheetReq} ): S {
+			return new type(conds) as unknown as S;
+		}
+
+		if (!this.client) return;
+
+		let client = this.client;
+		let that = this;
+
+		let r: R = activator<R>(SpreadsheetReq);
+
+		let req = client.userReq(this.uri, this.port,
+					r
+					.A(SpreadsheetReq.A.records) );
+
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rows = rows;
+				onLoad(cols, rows as T[]);
+			},
+			this.errCtx);
+	}
+
+
+	insert(onOk: OnCommitOk) {
+		console.log('can be abstracted?');
+	}
+
+	 columns (modifier?: {[x: string]: AnElemFormatter}): Array<SheetCol> {
+		 return this._cols as Array<SheetCol>;
+	 }
 }
 
 export interface SpreadsheetProps extends Comprops {
@@ -196,7 +314,7 @@ export interface SpreadsheetProps extends Comprops {
 	/** Initial rows - updated with jserv response */
 	rows: Tierec[];
 
-	tier: Spreadsheetier;
+	tier: Spreadsheetier<any>;
 
 	/** not used - only for AgGridReact community version */
 	contextMenu?: object;
@@ -235,7 +353,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	gridColumnApi: ColumnApi;
 
 	isEditable = true;
-	tier: Spreadsheetier;
+	tier: Spreadsheetier<any>;
 
 	constructor(props: SpreadsheetProps) {
 		super(props);

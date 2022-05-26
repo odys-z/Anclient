@@ -44,7 +44,7 @@ export interface SysProps extends Comprops {
     // classes: {[x: string]: string};
     hrefDoc: string;
     onLogout: () => void;
-    myInfo: JSX.Element | ((context: typeof AnContext) => JSX.Element);
+    myInfo: JSX.Element | ((context: Context<AnContextType>) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
 }
 
 const _icons = {

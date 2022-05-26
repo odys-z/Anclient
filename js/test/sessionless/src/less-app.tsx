@@ -131,7 +131,9 @@ class App extends React.Component<LessProps, State> {
 	 *
 	 * For test, have elem = undefined
 	 * @param elem html element id, null for test
-	 * @param opts={} serv id
+	 * @param opts default: {serv: 'host', portal: 'index.html'}
+	 * - serv: string,
+	 * - portal: string
 	 */
 	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
 		let portal = opts.portal ?? 'index.html';
