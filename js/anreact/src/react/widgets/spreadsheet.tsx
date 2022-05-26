@@ -4,7 +4,6 @@ import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, ColDef, Column, ColumnApi,
 	GetContextMenuItems, GetContextMenuItemsParams, GridApi, GridReadyEvent, ICellRendererParams, RowNode
 } from 'ag-grid-community';
-// export { CellEditingStoppedEvent, CellClickedEvent };
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
