@@ -11,18 +11,19 @@ import {
 const { JsampleIcons } = jsample;
 
 import { Curriculum, CourseReq } from './tier';
+import { StarTheme } from '../../../common/star-theme';
 
-const styles = (_theme: Theme) => ({
+const styles = (_theme: StarTheme) => ({
 	root: {
 		height: "calc(100vh - 18ch)"
 	},
 	actionButton: {
 	},
 	usersButton: {
-		marginLeft: 20,
-		marginRight: 20,
-		marginTop: 6,
-		width: 150,
+		// marginLeft: 20,
+		// marginRight: 20,
+		margin: 6,
+		width: 120,
 	}
 });
 
@@ -69,7 +70,7 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		console.log(uri);
 
 		this.tier.setContext(this.context);
-		this.tier.loadCbbOptions(this.context);
+		// this.tier.loadCbbOptions(this.context);
 
 		this.setState({});
 	}

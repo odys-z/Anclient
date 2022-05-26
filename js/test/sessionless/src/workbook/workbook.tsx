@@ -31,7 +31,6 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 
 	confirm: JSX.Element;
 
-	// uri: string;
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
 				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
@@ -40,12 +39,9 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
-	// currentId: string;
-
 	constructor(props: Comprops & {conn_state: string, tier: MyWorkbookTier}) {
 		super(props);
 
-		// this.classes = props.classes;
 		this.uri = props.uri;
 		this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);

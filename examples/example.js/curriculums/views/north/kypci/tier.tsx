@@ -1,6 +1,6 @@
 import { Protocol, AnsonBody, AnsonResp, PageInf} from '@anclient/semantier';
 
-import { SpreadsheetRec, SpreadsheetReq } from '@anclient/anreact';
+import { Spreadsheetier, SpreadsheetRec, SpreadsheetReq } from '@anclient/anreact';
 
 /**
  * @example table DDL
@@ -122,19 +122,18 @@ class CourseReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	rec: SpreadsheetRec;
 	page: PageInf;
 
-	type: 'io.odysz.jsample.semantier.CourseReq';
-
 	constructor(query?: PageInf, rec?: T) {
-		super({}); //{type: 'io.odysz.jsample.semantier.CourseReq'});
-		debugger
-		this.type = 'io.odysz.jsample.semantier.CourseReq';
+		super({type: 'io.odysz.jsample.semantier.CourseReq'});
 
 		this.page = query;
 		this.rec = rec;
+
+		console.log(this.type);
 	}
 
-	getType() {return 'io.odysz.jsample.semantier.CourseReq'}
 }
+
+Spreadsheetier.registerReq((conds: PageInf) => { return new CourseReq(conds) });
 
 class CourseResp extends AnsonResp {
 }
