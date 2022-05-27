@@ -57,7 +57,6 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 
 		this.tier = this.props.tier;
 		this.tier.setContext(this.context);
-		this.tier.loadCbbOptions(this.context);
 
 		this.setState({});
 	}

@@ -32,11 +32,11 @@ class MyWorkbookTier extends Spreadsheetier<MyBookReq<MyCurriculum>> {
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string, cols?: SheetCol[]}) {
-		super('workbook',
-			Object.assign(props,
-			/* not used, but is usefull for session client - which using prot 'update'. */
-			{pkval: MyWorkbookTier.curriculPk}));
+	constructor(props: {uri: string, cols: SheetCol[]}) {
+		super( 'workbook',	// jserv-sandbox/io.oz.sandbox.sheet.Spreadsheetier
+				Object.assign( props,
+				/* not used, but is usefull for session client - which using prot 'update'. */
+				{pkval: MyWorkbookTier.curriculPk} ));
 
 		console.log(this.uri);
 
