@@ -2,64 +2,58 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, AnsonMsg, AnsonResp, PageInf, OnCommitOk } from '@anclient/semantier';
+import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SheetCol, SpreadsheetReq,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
 	root: {
-		height: "calc(100vh - 18ch)"
+		// height: "calc(100vh - 92ch)"
+		height: "72vh"
 	},
 	actionButton: {
 	},
 	usersButton: {
-		marginLeft: 20,
-		marginRight: 20,
-		marginTop: 6,
+		// marginLeft: 20,
+		// marginRight: 20,
+		// marginTop: 6,
+		margin: 6,
 		width: 150,
 	}
 });
 
-class MyReq extends SpreadsheetReq {
+interface Decision extends SpreadsheetRec {
 
 }
 
-class MyTier extends Spreadsheetier<MyReq> {
+class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
+	rec: T;
 
-	insert(onOk: OnCommitOk) {
-		let req = this.client.userReq(this.uri,
-				this.port,
-				new MyReq( undefined ).A(MyReq.A.insert));
-
-		this.client.commit(req, onOk, this.errCtx);
-	}
-
-	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: any) {
-    }
-
-	columns (): Array<SheetCol> {
-		return this._cols as Array<SheetCol>;
+	constructor(query: PageInf) {
+		super({type: 'io.oz.curr.decision.MyReq', tabl: 'b_mydecissions', query});
 	}
 }
 
-class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyTier}>{
-	tier: MyTier;
+class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier<MyReq<Decision>>}>{
+	tier: Spreadsheetier<MyReq<Decision>>;
 
 	confirm: JSX.Element;
 
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
-				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
-				  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
-				{ type: 'cbb', sk: 'curr-subj', uri: this.uri,
-				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
+				{ type: 'cbb', sk: 'ann-rec', uri: this.uri, sqlArgs: [this.getUserId()],
+				  label: L('Annual Records'), field: 'ann', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
+	
+	getUserId() {
+		return this.props.ssInf.uid;
+	}
 
-	constructor(props: Comprops & {conn_state: string, tier: MyTier}) {
+	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier<MyReq<Decision>>}) {
 		super(props);
 
 		this.uri = props.uri;
@@ -69,15 +63,27 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyTier}>{
 		this.toAdd = this.toAdd.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
+
+		Spreadsheetier.registerReq((conds: PageInf) => { return new MyReq(conds);});
+
+		this.tier = new Spreadsheetier<MyReq<Decision>>('mydecisions',
+			{ uri: this.uri,
+			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},
+			  cols: [
+				{ field: 'cid', label: L("Id"), width: 120, editable: false },
+				{ field: 'currName', label: L("curriculum"), width: 160 },
+				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level' },
+				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
+				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
+				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj' },
+			] });
 	}
 
 	componentDidMount() {
 		let uri = this.uri;
 		console.log(uri);
 
-		this.tier = this.props.tier;
 		this.tier.setContext(this.context);
-		this.tier.loadCbbOptions(this.context);
 
 		this.setState({});
 	}

@@ -403,7 +403,10 @@ class SysComp extends CrudCompW<SysProps> {
 
 	route() {
 		const TagName = _comps[this.state.currentPage?.url || '/home'];
-		return <TagName uri={this.state.currentPage?.url || '/'} />;
+		return (
+		  <TagName
+			uri={this.state.currentPage?.url || '/'}
+			ssInf={this.context.anClient?.ssInf} /> );
 	}
 
 	render() {

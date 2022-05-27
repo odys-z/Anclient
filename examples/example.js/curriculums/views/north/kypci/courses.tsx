@@ -1,12 +1,13 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
-import { Theme, withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 
 import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, CellEditingStoppedEvent,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext,
+	QueryPage, toPageInf, Spreadsheetier, CellEditingStoppedEvent,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
@@ -15,7 +16,8 @@ import { StarTheme } from '../../../common/star-theme';
 
 const styles = (_theme: StarTheme) => ({
 	root: {
-		height: "calc(100vh - 18ch)"
+		// height: "calc(100vh - 92ch)"
+		height: "72vh"
 	},
 	actionButton: {
 	},
@@ -51,11 +53,14 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 
+		/** Let's move this to Spreadsheetier's constructor parameter */
+		Spreadsheetier.registerReq((conds: PageInf, rec: Curriculum) => { return new CourseReq(conds, rec) });
+
 		this.tier = new Spreadsheetier<CourseReq<Curriculum>>('curriculum',
 			{ uri: this.uri,
 			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},
 			  cols: [
-				{ field: 'cid', label: L("Id"), width: 120, editable: false },
+				{ field: 'cId', label: L("Id"), width: 120, editable: false },
 				{ field: 'currName', label: L("curriculum"), width: 160 },
 				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level',
 				  onEditStop: this.onEdited },
@@ -70,12 +75,12 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		console.log(uri);
 
 		this.tier.setContext(this.context);
-		// this.tier.loadCbbOptions(this.context);
 
 		this.setState({});
 	}
 
 	onEdited(p: CellEditingStoppedEvent): void {
+		// TODO set background color
 		this.tier.updateCell(p);
 	}
 
@@ -85,8 +90,8 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
 
 		return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
-			? <jsample.JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-			: <jsample.JsampleIcons.Star color={color} className={classes.svgicn}/>
+			? <JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
+			: <JsampleIcons.Star color={color} className={classes.svgicn}/>
 			;
 	}
 
@@ -109,19 +114,6 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
 	}
 
-	// paper(e: SpreadsheetRec) {
-	// 	return (
-	// 		<Paper elevation={4} style={{ margin: 24 }}
-	// 			className={this.classes.welcome}>
-	// 			<IconButton onClick={this.props.showMenu} >
-	// 				{this.icon(e)}
-	// 				<Box component='span' display='inline' className={this.classes.cardText} >
-	// 					Please click menu to start.
-	// 				</Box>
-	// 			</IconButton>
-	// 		</Paper>);
-	// }
-
 	render() {
 		let that = this;
 		let {classes} = this.props;
@@ -134,7 +126,7 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 				onReady={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
 			/>}
 			{this.tier &&
-			  <div className='ag-theme-alpine' style={{height: '78vh', width: '100%', margin:'auto'}}>
+			  <div className='ag-theme-alpine' style={{height: '68vh', width: '100%', margin:'auto'}}>
 				<AnSpreadsheet
 					tier={this.tier}
 					autosave={true}

@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, UpdateReq, Inseclient, UIComponent, PkMeta,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq } from '@anclient/semantier';
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { ComboCondType } from './query-form';
 import { AnConst } from '../../utils/consts';
@@ -140,21 +140,27 @@ export class SpreadsheetReq extends UserReq {
 		records: 'r',
 		rec: 'rec',
 	}
+	page: PageInf;
 
-	constructor(opts: {type: string, tabl?: string}) {
+	constructor(opts: {type: string, tabl?: string, query: PageInf}) {
 		super(undefined, opts.tabl);
+
+		if (!opts)
+			throw Error("Argument opts is required. If this is not checked by Typescript, it's probably the registered constructor doesn't work.")
 
 		if (!opts.type)
 			throw Error("opts.type is undefined. Spreadsheet is a mimic of Generic type, but can only work with type explictly specified.");
 		this.type = opts.type;
+
+		this.page = opts.query;
 	}
 }
 
 
 export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
-	static reqfactory: (conds: PageInf) => SpreadsheetReq;
+	static reqfactory: (conds: PageInf, rec?: SpreadsheetRec) => SpreadsheetReq;
 
-	static registerReq(factory: (conds: PageInf) => SpreadsheetReq) {
+	static registerReq(factory: (conds: PageInf, rec: SpreadsheetRec) => SpreadsheetReq) {
 		Spreadsheetier.reqfactory = factory;
 	}
 
@@ -257,7 +263,27 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 		this.currentRecId = e.data[this.pkval.pk];
 	};
 
-	updateCell(p: CellEditingStoppedEvent) {
+	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: ErrorCtx) {
+		console.log(rec);
+
+		if (!this.client) return;
+		let client = this.client;
+
+		let req = client.userReq(this.uri, this.port,
+						// new MyBookReq( undefined, rec )
+						Spreadsheetier.reqfactory( undefined, rec)
+						.A( crud === CRUD.d ? SpreadsheetReq.A.delete :
+							crud === CRUD.c ? SpreadsheetReq.A.insert :
+							SpreadsheetReq.A.update ) );
+
+		client.commit(req, ok, err);
+	}
+
+	columns (modifier?: {[x: string]: AnElemFormatter}): Array<SheetCol> {
+		return this._cols as Array<SheetCol>;
+	}
+
+	updateCell(p: CellEditingStoppedEvent) : void {
 		if (!this.client) {
 			console.error("somthing wrong ...");
 			return;
@@ -269,15 +295,27 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 		if (this.client instanceof Inseclient)
 			throw Error("Spreadsheetir.updateCell is using port.update, and can only work in session mode. To use in session less mode, user need override this method or provide SheetCol.onEditStop.");
 
-		let client = this.client;
-		let pkv = p.data[this.pkval?.pk]
-		let v   = p.data[p.colDef.field]
+		// let client = this.client;
+		// let pkv = p.data[this.pkval?.pk]
+		// let v   = p.data[p.colDef.field]
 
-		let req = client.userReq(this.uri, 'update',
-						new UpdateReq( this.uri, this.pkval.tabl, {pk: this.pkval.pk, v: pkv} )
-						.nv(p.colDef.field, v) );
+		// let req = client.userReq(this.uri, 'update',
+		// 				new UpdateReq( this.uri, this.pkval.tabl, {pk: this.pkval.pk, v: pkv} )
+		// 				.nv(p.colDef.field, v) );
 
-		client.commit(req, () => {}, this.errCtx);
+		// client.commit(req, () => {}, this.errCtx);
+
+		let rec = {} as SpreadsheetRec;
+		rec[this.pkval.pk] = this.currentRecId;
+
+		let {value, oldValue} = p;
+		if (value !== oldValue) {
+			value = this.encode(p.colDef.field, value);
+			// oldValue = this.encode(p.colDef.field, oldValue);
+
+			rec[p.colDef.field] = value;
+			this.update(CRUD.u, rec, undefined, this.errCtx);
+		}
 	}
 
     record(conds: PageInf, onLoad: OnLoadOk<SpreadsheetRec>) : void {
@@ -318,11 +356,13 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 
 	insert(onOk: OnCommitOk) {
 		console.log('can be abstracted?');
-	}
+		let bd = Spreadsheetier.reqfactory(undefined).A(SpreadsheetReq.A.insert);
+		let req = this.client.userReq(this.uri,
+			this.port, bd);
+			// new MyBookReq( undefined ).A(MyBookReq.A.insert));
 
-	 columns (modifier?: {[x: string]: AnElemFormatter}): Array<SheetCol> {
-		 return this._cols as Array<SheetCol>;
-	 }
+		this.client.commit(req, onOk, this.errCtx);
+	}
 }
 
 export interface SpreadsheetProps extends Comprops {
@@ -340,7 +380,8 @@ export interface SpreadsheetProps extends Comprops {
 	onSheetReady?: (e: GridReadyEvent) => void;
 }
 
-/**Thin wrapper of ag-grid.
+/**
+ * Thin wrapper of ag-grid.
  *
  * For ag-grid practice, go
  * https://stackblitz.com/edit/ag-grid-react-hello-world-8lxdjj?file=index.js

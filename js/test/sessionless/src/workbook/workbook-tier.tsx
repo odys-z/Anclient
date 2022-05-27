@@ -132,14 +132,14 @@ class MyBookReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 
 	port: 'workbook';
 
-	rec: SpreadsheetRec;
-	page: PageInf;
+	rec: T;
+	// page: PageInf;
 	// conds: Array<string[]>;
 
 	constructor(query?: PageInf, rec?: T) {
-		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
+		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq', query});
 
-		this.page = query;
+		// this.page = query;
 		this.rec = rec;
 	}
 }

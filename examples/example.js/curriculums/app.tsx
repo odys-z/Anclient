@@ -82,7 +82,7 @@ class App extends React.Component<Approps, any> {
 			{path: '/sys/users', comp: Userst},
 
 			{path: '/n/kypci', comp: Course},
-			{path: '/n/prohres', comp: Progress},
+			{path: '/n/ohlyad', comp: Progress},
 			{path: '/c/status', comp: Home},
 			{path: '/c/my', comp: My},
 		] );
@@ -163,7 +163,7 @@ class App extends React.Component<Approps, any> {
 				error: this.state.error,
 			}} >
 				<Sys menu='sys.menu.jsample'
-					sys='Emotion Regulation - TSX' menuTitle='Sys Menu'
+					sys={L('AP Courses')} menuTitle={L('Sys Menu')}
 					myInfo={myInfoPanels}
 					hrefDoc={'docs/index.html'}
 					// welcome={welcome}

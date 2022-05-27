@@ -1,6 +1,7 @@
 import { Protocol, AnsonResp, PageInf} from '@anclient/semantier';
 
 import { Spreadsheetier, SpreadsheetRec, SpreadsheetReq } from '@anclient/anreact';
+import { CSSProperties } from 'react';
 
 /**
  * @example table DDL
@@ -81,12 +82,21 @@ class CourseTier extends Spreadsheetier<CourseReq> {
 }
  */
 
-interface Curriculum extends SpreadsheetRec {
+export class Course implements SpreadsheetRec {
+	[f: string]: string | object;
+	id?: string;
+	css?: CSSProperties;
+
+	type: string;
     cid: string;
     cate?: string;
     module?: string;
     subject?: string;
     parentId?: string;
+
+	constructor() {
+		this.type = "io.oz.curr.north.Course";
+	}
 }
 
 class CourseReq<T extends SpreadsheetRec> extends SpreadsheetReq {
@@ -98,13 +108,11 @@ class CourseReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 		rec: 'rec',
 	}
 
-	port: 'workbook';
-
 	rec: SpreadsheetRec;
 	page: PageInf;
 
 	constructor(query?: PageInf, rec?: T) {
-		super({type: 'io.odysz.jsample.semantier.CourseReq'});
+		super({type: 'io.oz.curr.north.CourseReq', query});
 
 		this.page = query;
 		this.rec = rec;
@@ -122,4 +130,4 @@ class CourseResp extends AnsonResp {
 Protocol.registerBody('io.odysz.jsample.semantier.SpreadsheetResp',
 					  (jsonBd) => { return new CourseResp(jsonBd); });
 
-export { Curriculum, CourseReq, CourseResp };
+export { Course as Curriculum, CourseReq, CourseResp };

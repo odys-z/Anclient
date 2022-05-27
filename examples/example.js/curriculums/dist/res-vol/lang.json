@@ -7,6 +7,8 @@
     "error": "错误",
     "ALL": "全部",
     "Logout": "退出登录",
+    "Sys Menu": "系统功能",
+
     "Domain ID": "码表 ID",
     "Domain Name": "码表项",
     "parent": "parent",
@@ -43,10 +45,12 @@
     "Uesr Manage": "系统用户管理",
     "Emotion Indicators": "情绪指标",
 
-    "North Pole": "指南针功能",
+    "Curriculums": "课程管理",
+    "Course Name": "课程名",
+    "Progress": "进度",
+    "Students Count": "人数统计",
+
     "North Dashboard": "仪表盘",
-    "Quizzes": "问卷管理",
-    "Polls Overview": "调查进度",
     "My Students": "我的班级",
     "GPA Records": "GPA 成绩",
     "Share Documents": "分享文档",
@@ -55,19 +59,10 @@
     "My Polls": "问卷任务",
     "My Docs": "共享文档",
 
-    "Weight": "权重",
-    "Question Type": "题型",
-    "Indicator": "指标项",
-    "Todos": "任务项",
-
     "Documents Sharing": "分享我的文档",
     "Shared Documents": "已共享文档",
 
-    "with polls to do": "有未完成问卷",
-    "Take Poll": "填写问卷",
-    "Has waitings": "有未完成问卷",
-    "Your have {tasks} {quiz} to complete.": "有{tasks}项未完成问卷.",
-    "Add GPA": "添加 GPA",
-    "Delete GPA": "删除 GPA"
+    "Add Course": "添加课程",
+    "Delete Course": "删除课程"
   }
 }

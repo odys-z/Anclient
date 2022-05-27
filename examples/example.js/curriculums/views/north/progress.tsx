@@ -2,54 +2,49 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, AnsonMsg, AnsonResp, PageInf, OnCommitOk } from '@anclient/semantier';
+import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SheetCol, SpreadsheetReq,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { CourseReq } from './kypci/tier';
 
 const styles = (_theme: Theme) => ({
 	root: {
-		height: "calc(100vh - 18ch)"
+		// height: "calc(100vh - 92ch)"
+		height: "72vh"
 	},
 	actionButton: {
 	},
 	usersButton: {
-		marginLeft: 20,
-		marginRight: 20,
-		marginTop: 6,
+		// marginLeft: 20,
+		// marginRight: 20,
+		// marginTop: 6,
+		margin: 6,
 		width: 150,
 	}
 });
 
-class PregressReq extends SpreadsheetReq {
+interface Progress extends SpreadsheetRec {
 
 }
 
-class ProgressTier extends Spreadsheetier<PregressReq> {
+class ProgressReq<R extends SpreadsheetRec> extends SpreadsheetReq {
+	rec: R;
 
-	insert(onOk: OnCommitOk) {
-		let req = this.client.userReq(this.uri,
-				this.port,
-				new CourseReq( undefined ).A(CourseReq.A.insert));
+	constructor(query?: PageInf, rec?: R) {
+		super({type: 'io.oz.curr.north.ProgressReq', query});
 
-		this.client.commit(req, onOk, this.errCtx);
-	}
+		this.rec = rec;
 
-	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: any) {
-    }
-
-	columns (): Array<SheetCol> {
-		return this._cols as Array<SheetCol>;
+		console.log(this.type);
 	}
 }
 
-class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: ProgressTier}>{
-	tier: ProgressTier;
+class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier<ProgressReq<Progress>>}>{
+	tier: Spreadsheetier<ProgressReq<Progress>>;
 
 	confirm: JSX.Element;
 
@@ -61,7 +56,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
-	constructor(props: Comprops & {conn_state: string, tier: ProgressTier}) {
+	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier<ProgressReq<Progress>>}) {
 		super(props);
 
 		this.uri = props.uri;
@@ -71,15 +66,28 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 		this.toAdd = this.toAdd.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
+
+		Spreadsheetier.registerReq((conds: PageInf) => { return new ProgressReq(conds) });
+
+		this.tier = new Spreadsheetier<ProgressReq<Progress>>('progress',
+		{ uri: this.uri,
+		  pkval: {pk: 'myId', v: undefined, tabl: 'b_mydecisions'},
+		  cols: [
+			{ field: 'cid', label: L("Id"), width: 120, editable: false },
+			{ field: 'progress', label: L("Students Count"), width: 80 },
+			{ field: 'currName', label: L("Course Name"), width: 160 },
+			{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level' },
+			{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
+			{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
+			{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj' },
+		] });
 	}
 
 	componentDidMount() {
 		let uri = this.uri;
 		console.log(uri);
 
-		this.tier = this.props.tier;
 		this.tier.setContext(this.context);
-		this.tier.loadCbbOptions(this.context);
 
 		this.setState({});
 	}
@@ -109,8 +117,6 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 	}
 
 	toDel(e: React.UIEvent) {
-		let that = this;
-		// if (this.currentId)
 		this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
 	}
 
@@ -134,7 +140,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />
 			  </div>}
-			<div style={{textAlign: 'center', background: '#f8f8f8'}}>
+			{/* <div style={{textAlign: 'center', background: '#f8f8f8'}}>
 				<Button variant="outlined"
 					className={classes.usersButton}
 					color='primary'
@@ -149,7 +155,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Progre
 					endIcon={<JsampleIcons.Delete />}
 				>{L('Delete')}
 				</Button>
-			</div>
+			</div> */}
 			{this.confirm}
 		</div>);
 	}

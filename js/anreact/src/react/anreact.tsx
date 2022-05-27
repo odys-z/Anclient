@@ -291,6 +291,7 @@ export class AnReactExt extends AnReact {
 	 * 
 	 * @param opts options
 	 * - opts.sk: semantic key (dataset id)
+	 * - opts.sqlArs: arguments for sql
 	 * - opts.cond: the component's state.conds[#] of which the options need to be updated
 	 * - opts.nv: {n: 'name', v: 'value'} option's name and value, e.g. {n: 'domainName', v: 'domainId'}
 	 * - opts.onLoad: on done event's handler: function f(cond)
