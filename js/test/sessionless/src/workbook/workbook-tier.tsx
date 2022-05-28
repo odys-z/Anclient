@@ -26,7 +26,7 @@ values ('b_curriculums.cId', 0, 'north.curr');
 
 select * from b_curriculums;
  */
-class MyWorkbookTier extends Spreadsheetier<MyBookReq<MyCurriculum>> {
+class MyWorkbookTier extends Spreadsheetier {
 	static curriculPk = {pk: 'cid', v: undefined, tabl: 'b_curriculums'};
 
 	/**

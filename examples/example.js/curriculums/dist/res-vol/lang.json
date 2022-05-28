@@ -1,5 +1,7 @@
 { "using": "zh",
   "zh": {
+    "events-btn-width": 160,
+
     "OK": "确定",
     "info": "提示信息",
     "Info": "提示信息",
@@ -61,6 +63,9 @@
 
     "Documents Sharing": "分享我的文档",
     "Shared Documents": "已共享文档",
+
+    "Add AP Event": "添加 AP 选课",
+    "Delete Event": "删除选课事件",
 
     "Add Course": "添加课程",
     "Delete Course": "删除课程"

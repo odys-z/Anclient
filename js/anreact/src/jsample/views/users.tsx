@@ -297,7 +297,7 @@ export class UsersTier extends Semantier {
 		super(comp);
 
 		// this.port = 'userstier';
-		this.mtabl = 'a_users';
+		this.pkval.tabl = 'a_users';
 		this.pkval.pk = 'userId';
 		this.checkbox = true;
 		this.rows = [];
@@ -371,7 +371,7 @@ export class UsersTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
+					that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);

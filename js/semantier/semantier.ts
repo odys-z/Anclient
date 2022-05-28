@@ -160,7 +160,8 @@ export class Semantier {
     }
 
     /**main table name */
-    mtabl: string;
+    // mtabl: string;
+
     /** list's columns */
     _cols: Array<TierCol>;
     /** client function / CRUD identity */
@@ -378,13 +379,13 @@ export class Semantier {
 			console.log(crud, CRUD.c);
 			if ( crud === CRUD.c ) {
 				req = this.client.userReq<UpdateReq>(uri, 'insert',
-							new InsertReq( uri, this.mtabl )
+							new InsertReq( uri, this.pkval.tabl )
 							.columns(this._fields)
 							.record(this.rec) );
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
-							new UpdateReq( uri, this.mtabl, this.pkval)
+							new UpdateReq( uri, this.pkval.tabl, this.pkval)
 							.record(this.rec, this.pkval.pk) );
 			}
 		}
@@ -403,7 +404,7 @@ export class Semantier {
 					if (crud === CRUD.c)
 						// NOTE:
 						// resulving auto-k is a typicall semantic processing, don't expose this to caller
-						that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
+						that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
 					onOk(resp);
 				},
 				this.errCtx);
@@ -426,8 +427,8 @@ export class Semantier {
 
 		if (ids && ids.length > 0) {
 			let req = client
-				.usrAct(this.mtabl, CRUD.d, 'delete')
-				.deleteMulti(this.uri, this.mtabl, this.pkval.pk, [...ids]);
+				.usrAct(this.pkval.tabl, CRUD.d, 'delete')
+				.deleteMulti(this.uri, this.pkval.tabl, this.pkval.pk, [...ids]);
 
 			if (posts) {
 				let d = req.Body();

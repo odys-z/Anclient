@@ -2,11 +2,11 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
+import { CRUD, AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
@@ -38,44 +38,44 @@ class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	}
 }
 
-class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier<MyReq<Decision>>}>{
-	tier: Spreadsheetier<MyReq<Decision>>;
+class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier}>{
+	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
 
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
 				{ type: 'cbb', sk: 'ann-rec', uri: this.uri, sqlArgs: [this.getUserId()],
-				  label: L('Annual Records'), field: 'ann', grid: {sm: 2, md: 2}} as ComboCondType,
+				  label: L('AP Events'), field: 'eId', grid: {sm: 8, md: 8}} as ComboCondType,
 			] } as QueryPage;
 	
 	getUserId() {
 		return this.props.ssInf.uid;
 	}
 
-	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier<MyReq<Decision>>}) {
+	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier}) {
 		super(props);
 
 		this.uri = props.uri;
 		this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
 
-		this.toAdd = this.toAdd.bind(this);
+		this.toSave = this.toSave.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 
 		Spreadsheetier.registerReq((conds: PageInf) => { return new MyReq(conds);});
 
-		this.tier = new Spreadsheetier<MyReq<Decision>>('mydecisions',
+		this.tier = new Spreadsheetier('mydecisions',
 			{ uri: this.uri,
-			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},
+			  pkval: {pk: 'module', v: undefined, tabl: 'b_mycourses'},
 			  cols: [
-				{ field: 'cid', label: L("Id"), width: 120, editable: false },
-				{ field: 'currName', label: L("curriculum"), width: 160 },
-				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level' },
-				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
-				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
-				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj' },
+				{ field: 'myId', label: L("decision Id"), width: 10, visible: false },
+				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
+				{ field: 'cId', label: L("curriculum"), width: 160, type: 'cbb', sk: 'kypc/modul' },
+				{ field: 'clevel', label: L("Level"), width: 140, editable: false },
+				{ field: 'cate', label: L("Category"), width: 120, editable: false },
+				{ field: 'subject', label: L("Subject"), width: 160, editable: false },
 			] });
 	}
 
@@ -108,14 +108,27 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheeti
 			});
 	}
 
-	toAdd(_e: React.UIEvent) {
-		this.tier.insert(this.bindSheet);
+	toSave(_e: React.UIEvent) {
+		let that = this;
+		this.tier.update(
+			this.tier.pkval.v ? CRUD.u : CRUD.c,
+			this.tier.rec, 
+			(resp: AnsonMsg<AnsonResp>) => {
+				that.tier.pkval.v = resp.Body().data['rec']['myId'];
+
+				let msg = resp.Body().msg;
+				this.confirm = (
+					<ConfirmDialog title={L('Info')}
+						ok={L('OK')} cancel={false} open
+						onClose={() => {that.confirm = undefined;} }
+						msg={msg} />);
+				this.setState({});
+			}, this.context.error);
 	}
 
 	toDel(e: React.UIEvent) {
-		let that = this;
-		// if (this.currentId)
-		this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
+		console.error("shouldn't here");
+		// this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
 	}
 
 	render() {
@@ -130,7 +143,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheeti
 				onReady={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
 			/>}
 			{this.tier &&
-			  <div className='ag-theme-alpine' style={{height: '78vh', width: '100%', margin:'auto'}}>
+			  <div className='ag-theme-alpine' style={{height: '60vh', width: '100%', margin:'auto'}}>
 				<AnSpreadsheet
 					tier={this.tier}
 					autosave={true}
@@ -142,16 +155,9 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheeti
 				<Button variant="outlined"
 					className={classes.usersButton}
 					color='primary'
-					onClick={this.toAdd}
+					onClick={this.toSave}
 					endIcon={<JsampleIcons.Add />}
-				>{L('Append')}
-				</Button>
-				<Button variant="outlined"
-					className={classes.usersButton}
-					color='secondary'
-					onClick={this.toDel}
-					endIcon={<JsampleIcons.Delete />}
-				>{L('Delete')}
+				>{L('Save')}
 				</Button>
 			</div>
 			{this.confirm}

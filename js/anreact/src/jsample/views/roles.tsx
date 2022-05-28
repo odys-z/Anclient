@@ -241,7 +241,7 @@ class RoleTier extends Semantier {
 	constructor(comp: UIComponent) {
 		super(comp);
 
-		this.mtabl = 'a_roles';
+		this.pkval.tabl = 'a_roles';
 		this.pkval.pk = 'roleId';
 		// this.reltabl = 'a_role_func';
 
@@ -263,7 +263,7 @@ class RoleTier extends Semantier {
 
 	records(conds = {} as {roleId?: string; orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk<Tierec>) {
 		let { orgId, roleName, pageInf } = conds;
-		let queryReq = this.client.query(this.uri, this.mtabl, 'r', pageInf)
+		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'r', pageInf)
 		let req = queryReq.Body()
 			.expr('r.roleId').expr('roleName').expr('r.remarks').expr('orgName')
 			.l('a_orgs', 'o', 'o.orgId = r.orgId');

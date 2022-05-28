@@ -8,7 +8,7 @@ import { CellClickedEvent, ColDef, Column, ColumnApi,
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
-import { TierCol, Tierec, Semantier, Semantext, NV, toBool, UpdateReq, Inseclient, UIComponent, PkMeta,
+import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
 	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { ComboCondType } from './query-form';
@@ -157,7 +157,7 @@ export class SpreadsheetReq extends UserReq {
 }
 
 
-export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
+export class Spreadsheetier extends Semantier {
 	static reqfactory: (conds: PageInf, rec?: SpreadsheetRec) => SpreadsheetReq;
 
 	static registerReq(factory: (conds: PageInf, rec: SpreadsheetRec) => SpreadsheetReq) {
@@ -166,7 +166,7 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 
 	/**jserv port name, e.g. 'workbook' */
 	port: string;
-	currentRecId: any;
+	// currentRecId: any;
 
 	constructor(port: string, props: {uri: string, pkval: PkMeta, cols: SheetCol[]}) {
 		super(props);
@@ -260,7 +260,7 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 	}
 
 	onCellClick (e: CellClickedEvent) {
-		this.currentRecId = e.data[this.pkval.pk];
+		this.pkval.v = e.data[this.pkval.pk];
 	};
 
 	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: ErrorCtx) {
@@ -270,7 +270,6 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 		let client = this.client;
 
 		let req = client.userReq(this.uri, this.port,
-						// new MyBookReq( undefined, rec )
 						Spreadsheetier.reqfactory( undefined, rec)
 						.A( crud === CRUD.d ? SpreadsheetReq.A.delete :
 							crud === CRUD.c ? SpreadsheetReq.A.insert :
@@ -295,23 +294,13 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 		if (this.client instanceof Inseclient)
 			throw Error("Spreadsheetir.updateCell is using port.update, and can only work in session mode. To use in session less mode, user need override this method or provide SheetCol.onEditStop.");
 
-		// let client = this.client;
-		// let pkv = p.data[this.pkval?.pk]
-		// let v   = p.data[p.colDef.field]
-
-		// let req = client.userReq(this.uri, 'update',
-		// 				new UpdateReq( this.uri, this.pkval.tabl, {pk: this.pkval.pk, v: pkv} )
-		// 				.nv(p.colDef.field, v) );
-
-		// client.commit(req, () => {}, this.errCtx);
-
 		let rec = {} as SpreadsheetRec;
-		rec[this.pkval.pk] = this.currentRecId;
+		// rec[this.pkval.pk] = this.currentRecId;
+		rec[this.pkval.pk] = this.pkval.v;
 
 		let {value, oldValue} = p;
 		if (value !== oldValue) {
 			value = this.encode(p.colDef.field, value);
-			// oldValue = this.encode(p.colDef.field, oldValue);
 
 			rec[p.colDef.field] = value;
 			this.update(CRUD.u, rec, undefined, this.errCtx);
@@ -334,12 +323,7 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 		let client = this.client;
 		let that = this;
 
-		// let r: R = activator<R>(SpreadsheetReq);
-		// if (r.type === 'io.odysz.semantic.jserv.user.UserReq')
-		// 	throw Error('');
-		// r.type = r.getType();
 		let r = Spreadsheetier.reqfactory(conds);
-
 
 		let req = client.userReq(this.uri, this.port,
 					r.A(SpreadsheetReq.A.records) );
@@ -370,7 +354,7 @@ export interface SpreadsheetProps extends Comprops {
 	/** Initial rows - updated with jserv response */
 	rows: Tierec[];
 
-	tier: Spreadsheetier<any>;
+	tier: Spreadsheetier;
 
 	/** not used - only for AgGridReact community version */
 	contextMenu?: object;
@@ -411,7 +395,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	gridColumnApi: ColumnApi;
 
 	isEditable = true;
-	tier: Spreadsheetier<any>;
+	tier: Spreadsheetier;
 
 	constructor(props: SpreadsheetProps) {
 		super(props);
@@ -474,12 +458,10 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 
 	componentDidMount() {
 		this.tier.setContext(this.context);
-		this.tier.setContext(this.context);
 		this.tier.loadCbbOptions(this.context);
 
 		let that = this;
 		this.tier.records(undefined, () => that.setState({ready: true}));
-		// this.setState({});
 	}
 
 	/** load default context menu, together with user's menu items.

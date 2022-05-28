@@ -108,7 +108,7 @@ class CourseReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 		rec: 'rec',
 	}
 
-	rec: SpreadsheetRec;
+	rec: T;
 	page: PageInf;
 
 	constructor(query?: PageInf, rec?: T) {
