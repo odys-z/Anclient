@@ -33,8 +33,9 @@ interface Decision extends SpreadsheetRec {
 class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	rec: T;
 
-	constructor(query: PageInf) {
+	constructor(query: PageInf, rec: T) {
 		super({type: 'io.oz.curr.decision.MyReq', tabl: 'b_mydecissions', query});
+		this.rec = rec;
 	}
 }
 
@@ -45,7 +46,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheeti
 
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
-				{ type: 'cbb', sk: 'ann-rec', uri: this.uri, sqlArgs: [this.getUserId()],
+				{ type: 'cbb', sk: 'kypc/modul', uri: this.uri, sqlArgs: [this.getUserId()],
 				  label: L('AP Events'), field: 'eId', grid: {sm: 8, md: 8}} as ComboCondType,
 			] } as QueryPage;
 	
@@ -64,7 +65,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheeti
 		this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 
-		Spreadsheetier.registerReq((conds: PageInf) => { return new MyReq(conds);});
+		Spreadsheetier.registerReq((conds: PageInf, rec: Decision) => { return new MyReq(conds, rec);});
 
 		this.tier = new Spreadsheetier('mydecisions',
 			{ uri: this.uri,
