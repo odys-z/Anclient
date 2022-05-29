@@ -190,7 +190,7 @@ export class Spreadsheetier extends Semantier {
 					uri: this.uri,
 					sk: c.sk as string,
 					nv: c.nv,
-					noAllItem: toBool(c.noAllItam, true),
+					noAllItem: toBool(c.noAllItem, true),
 					sqlArgs: c.sqlArgs,
 					onLoad: (_cols, rows) => {
 						if (rows) {

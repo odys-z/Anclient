@@ -24,7 +24,11 @@ export interface ComboProps extends Comprops {
 	options?: Array<ComboItem>;
 	label?: string;
 	// style: CSSStyleDeclaration;
-	onSelect?: (it: NV) => void
+	onSelect?: (it: NV) => void;
+
+
+	sk?: string,
+	noAllItem?: boolean,
 }
 
 const styles = (theme: Theme) => (Object.assign(
@@ -84,6 +88,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				// user uses this, e.g. name and value to access data
 				nv: this.props.nv || {n: 'name', v: 'value'},
 				// cond: this.state.condits, TODO: not used?
+				noAllItem: this.props.noAllItem,
 				onDone: (cols, rows) => {
 					that.combo.options = rows as Array<ComboItem>;
 					that.setState({});
@@ -196,7 +201,6 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		// cond.loading = true;
 		this.loading = true;
 
 		let ctx = this.context as AnContextType;
@@ -212,7 +216,6 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				// this.items = rows;
 
 				this.loading = false;
 

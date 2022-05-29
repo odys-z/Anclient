@@ -20,7 +20,7 @@ export interface ComboCondType extends TierComboField<JSX.Element, CompOpts> {
 	sk: string,
 	type: 'cbb' | 'autocbb';
 	/** Without '-- ALL --' option */
-	noAllItam?: boolean;
+	noAllItem?: boolean;
 };
 
 const styles = (theme: Theme) => ( {
@@ -118,6 +118,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
 						sqlArgs: cond.sqlArgs,
+						noAllItem: cond.noAllItem,
 						// cond,
 						onLoad: (_cols, rows) => {
 							cond.options = rows as NV[];
@@ -329,7 +330,7 @@ export interface QueryFormProps extends Comprops {
 	onSearch?: (conds: QueryConditions | PageInf) => void,
 
 	/**Bounding components successfully
-	 * 
+	 *
 	 * @deprecated replaced by onQuery
 	 */
 	onLoaded?: (conds: QueryConditions | PageInf) => void,

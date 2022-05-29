@@ -2,12 +2,13 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
+import { CRUD, PkMeta, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo,
 } from '@anclient/anreact';
+import { CellEditingStoppedEvent } from 'ag-grid-community';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
@@ -39,14 +40,42 @@ class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	}
 }
 
-class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier}>{
-	tier: Spreadsheetier;
+class MyCoursesTier extends Spreadsheetier {
+	myId?: string;
+
+	constructor(props: {uri: string, pkval: PkMeta, cols: SheetCol[]}) {
+		super('mydecisions', props);
+	}
+
+	updateCell(p: CellEditingStoppedEvent, onOk: OnCommitOk) : void {
+		if (!this.client || isEmpty(this.myId)) {
+			console.error("sholdn't be here");
+			return;
+		}
+
+		let rec = {myId: this.myId} as Decision;
+		rec[this.pkval.pk] = this.pkval.v;
+
+		let {value, oldValue} = p;
+		if (value !== oldValue) {
+			value = this.encode(p.colDef.field, value);
+
+			rec[p.colDef.field] = value;
+			this.update(CRUD.u, rec, onOk, this.errCtx);
+		}
+	}
+}
+
+class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTier}>{
+	tier: MyCoursesTier;
 
 	confirm: JSX.Element;
 
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
-				{ type: 'cbb', sk: 'kypc/modul', uri: this.uri, sqlArgs: [this.getUserId()],
+				{ type: 'cbb', sk: 'ann-evt', uri: this.uri,
+				  sqlArgs: [this.getUserId()],
+				  noAllItem: true,
 				  label: L('AP Events'), field: 'eId', grid: {sm: 8, md: 8}} as ComboCondType,
 			] } as QueryPage;
 	
@@ -63,17 +92,18 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheeti
 
 		this.toSave = this.toSave.bind(this);
 		this.toDel = this.toDel.bind(this);
+		this.edited = this.edited.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 
 		Spreadsheetier.registerReq((conds: PageInf, rec: Decision) => { return new MyReq(conds, rec);});
 
-		this.tier = new Spreadsheetier('mydecisions',
+		this.tier = new MyCoursesTier(
 			{ uri: this.uri,
 			  pkval: {pk: 'module', v: undefined, tabl: 'b_mycourses'},
 			  cols: [
 				{ field: 'myId', label: L("decision Id"), width: 10, visible: false },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'cbb', sk: 'kypc/modul' },
+				{ field: 'cId', label: L("curriculum"), width: 160, type: 'cbb', sk: 'kypc/modul', onEditStop: this.edited },
 				{ field: 'clevel', label: L("Level"), width: 140, editable: false },
 				{ field: 'cate', label: L("Category"), width: 120, editable: false },
 				{ field: 'subject', label: L("Subject"), width: 160, editable: false },
@@ -129,7 +159,10 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheeti
 
 	toDel(e: React.UIEvent) {
 		console.error("shouldn't here");
-		// this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
+	}
+
+	edited(p: CellEditingStoppedEvent) {
+		this.tier.updateCell(p, this.bindSheet);
 	}
 
 	render() {
@@ -143,10 +176,11 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheeti
 				onSearch={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
 				onReady={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
 			/>}
+			<DatasetCombo uri={this.uri} sk={'ann-evt'} noAllItem={true} />
 			{this.tier &&
 			  <div className='ag-theme-alpine' style={{height: '60vh', width: '100%', margin:'auto'}}>
 				<AnSpreadsheet
-					tier={this.tier}
+					tier={this.tier as Spreadsheetier}
 					autosave={true}
 					onCellClicked={this.tier.onCellClick}
 					columns={this.tier.columns()}
