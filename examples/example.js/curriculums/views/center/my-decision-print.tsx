@@ -6,7 +6,7 @@ import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } f
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, CbbCellValue,
+	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, CbbCellValue, SpreadsheetResp,
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent, GridApi } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
@@ -280,11 +280,13 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 	toSave(_e: React.UIEvent) {
 		let that = this;
+        this.tier.rec = {eventId: this.tier.eventId}
+        // update id: eventId + usrId
 		this.tier.update(
 			this.tier.pkval.v ? CRUD.u : CRUD.c,
 			this.tier.rec, 
-			(resp: AnsonMsg<AnsonResp>) => {
-				that.tier.pkval.v = resp.Body().data['rec']['myId'];
+			(resp: AnsonMsg<SpreadsheetResp>) => {
+				that.tier.pkval.v = resp.Body().rec.myId;
 
 				let msg = resp.Body().msg;
 				this.confirm = (
