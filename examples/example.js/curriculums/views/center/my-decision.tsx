@@ -10,7 +10,6 @@ import {
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
-import { ThumbUpAltTwoTone } from '@material-ui/icons';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
@@ -130,7 +129,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 		this.toSave = this.toSave.bind(this);
 		this.toDel = this.toDel.bind(this);
-		this.edited = this.edited.bind(this);
+		// this.edited = this.edited.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 
 		Spreadsheetier.registerReq((conds: PageInf, rec: Decision) => { return new MyReq(conds, rec);});
@@ -141,7 +140,8 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			  cols: [
 				{ field: 'myId', label: L("decision Id"), width: 10, visible: false },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'cbb', sk: '', onEditStop: this.edited },
+				{ field: 'cId', label: L("curriculum"), width: 160,
+				  type: 'cbb-local', cbbOptions: (modul: string) => this.tier.courses[modul] },
 				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
 				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj', editable: false },
@@ -200,9 +200,9 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		console.error("shouldn't here");
 	}
 
-	edited(p: CellEditingStoppedEvent) {
-		this.tier.updateCell(p, this.bindSheet);
-	}
+	// edited(p: CellEditingStoppedEvent) {
+	// 	this.tier.updateCell(p, this.bindSheet);
+	// }
 
 	render() {
 		let that = this;
