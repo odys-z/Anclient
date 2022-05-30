@@ -71,8 +71,11 @@ export interface SheetCol extends TierCol {
 	label: string;
 	field: string;
 
-	/**cell type, default: text */
-	type?: 'text' | 'cbb';
+	/**cell type, default: text
+	 * - cbb: bind options with sk
+	 * - dynamic-cbb: options changing for each rows
+	 */
+	type?: 'text' | 'cbb' | 'dynamic-cbb';
 	sk?  : string;
 	form?: JSX.Element;
 
@@ -312,11 +315,11 @@ export class Spreadsheetier extends Semantier {
 	}
 
 	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
-		function activator<S>(type: {
-				new(...arg: any[]) : SpreadsheetReq,
-			} ): S {
-			return new type(conds) as unknown as S;
-		}
+		// function activator<S>(type: {
+		// 		new(...arg: any[]) : SpreadsheetReq,
+		// 	} ): S {
+		// 	return new type(conds) as unknown as S;
+		// }
 
 		if (!this.client) return;
 
