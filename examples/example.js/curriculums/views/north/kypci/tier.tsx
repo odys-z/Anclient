@@ -88,7 +88,7 @@ export class Course implements SpreadsheetRec {
 	css?: CSSProperties;
 
 	type: string;
-    cid: string;
+    cId: string;
     cate?: string;
     module?: string;
     subject?: string;

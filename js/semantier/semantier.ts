@@ -94,7 +94,7 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
 
 /**Record handled from tier */
 export interface Tierec {
-	[f: string]: string | object | undefined;
+	[f: string]: string | number | boolean | object | undefined;
 }
 
 /**E.g. form's combobox field declaration */

@@ -282,7 +282,7 @@ export class Spreadsheetier extends Semantier {
 		return this._cols as Array<SheetCol>;
 	}
 
-	updateCell(p: CellEditingStoppedEvent) : void {
+	updateCell(p: CellEditingStoppedEvent, ok?: OnCommitOk) : void {
 		if (!this.client) {
 			console.error("somthing wrong ...");
 			return;
@@ -303,7 +303,7 @@ export class Spreadsheetier extends Semantier {
 			value = this.encode(p.colDef.field, value);
 
 			rec[p.colDef.field] = value;
-			this.update(CRUD.u, rec, undefined, this.errCtx);
+			this.update(CRUD.u, rec, ok, this.errCtx);
 		}
 	}
 

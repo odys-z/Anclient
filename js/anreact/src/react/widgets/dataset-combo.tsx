@@ -26,7 +26,6 @@ export interface ComboProps extends Comprops {
 	// style: CSSStyleDeclaration;
 	onSelect?: (it: NV) => void;
 
-
 	sk?: string,
 	noAllItem?: boolean,
 }

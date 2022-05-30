@@ -43,8 +43,8 @@ class ProgressReq<R extends SpreadsheetRec> extends SpreadsheetReq {
 	}
 }
 
-class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier<ProgressReq<Progress>>}>{
-	tier: Spreadsheetier<ProgressReq<Progress>>;
+class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier}>{
+	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
 
@@ -56,7 +56,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
-	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier<ProgressReq<Progress>>}) {
+	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier}) {
 		super(props);
 
 		this.uri = props.uri;
@@ -69,7 +69,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 
 		Spreadsheetier.registerReq((conds: PageInf) => { return new ProgressReq(conds) });
 
-		this.tier = new Spreadsheetier<ProgressReq<Progress>>('progress',
+		this.tier = new Spreadsheetier('progress',
 		{ uri: this.uri,
 		  pkval: {pk: 'myId', v: undefined, tabl: 'b_mydecisions'},
 		  cols: [
@@ -117,7 +117,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 	}
 
 	toDel(e: React.UIEvent) {
-		this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
+		this.tier.del({ids: [this.tier.pkval?.v]}, this.bindSheet);
 	}
 
 	render() {

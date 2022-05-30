@@ -6,9 +6,11 @@ import { CRUD, PkMeta, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } from 
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, AnReactExt,
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent } from 'ag-grid-community';
+import { Course } from '../north/kypci/tier';
+import { ThumbUpAltTwoTone } from '@material-ui/icons';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
@@ -29,10 +31,15 @@ const styles = (_theme: Theme) => ({
 
 interface Decision extends SpreadsheetRec {
 
+	dirty: boolean;
+	cId: string;
 }
 
 class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	rec: T;
+
+	static A = Object.assign(SpreadsheetReq.A,
+		{ courses: 'r/courses', });
 
 	constructor(query: PageInf, rec: T) {
 		super({type: 'io.oz.curr.decision.MyReq', tabl: 'b_mydecissions', query});
@@ -42,27 +49,58 @@ class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 
 class MyCoursesTier extends Spreadsheetier {
 	myId?: string;
+	/** client buffer for updating rows */
+	courses: Course[];
+
+	skCourses = 'couse-templ';
 
 	constructor(props: {uri: string, pkval: PkMeta, cols: SheetCol[]}) {
 		super('mydecisions', props);
 	}
 
+	loadCourses(ctx: AnContextType) {
+		let an = ctx.anReact as AnReactExt;
+		let uri = this.uri;
+		let that = this;
+
+		let client = this.client;
+		
+		let bdy = new MyReq(undefined, undefined)
+				.A(MyReq.A.courses);
+		
+		let req = client.userReq(this.uri, this.port, bdy);
+
+		client.commit(req,
+			(resp) => {
+				let {rows} = AnsonResp.rs2arr(resp.Body().Rs());
+					that.courses = rows as Course[];
+			},
+			this.errCtx);
+	}
+
 	updateCell(p: CellEditingStoppedEvent, onOk: OnCommitOk) : void {
-		if (!this.client || isEmpty(this.myId)) {
+		if (!this.client || isEmpty(this.pkval?.v)) {
 			console.error("sholdn't be here");
 			return;
 		}
 
-		let rec = {myId: this.myId} as Decision;
-		rec[this.pkval.pk] = this.pkval.v;
-
 		let {value, oldValue} = p;
 		if (value !== oldValue) {
-			value = this.encode(p.colDef.field, value);
-
-			rec[p.colDef.field] = value;
-			this.update(CRUD.u, rec, onOk, this.errCtx);
+			let row = this.rows[p.rowIndex] as Decision;
+			row = Object.assign(row, this.courses[row.cId]);
+			row.dirty = true;
 		}
+
+		// let rec = {myId: this.myId} as Decision;
+		// rec[this.pkval.pk] = this.pkval.v;
+
+		// let {value, oldValue} = p;
+		// if (value !== oldValue) {
+		// 	value = this.encode(p.colDef.field, value);
+
+		// 	rec[p.colDef.field] = value;
+		// 	this.update(CRUD.u, rec, onOk, this.errCtx);
+		// }
 	}
 }
 
@@ -83,7 +121,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		return this.props.ssInf.uid;
 	}
 
-	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier}) {
+	constructor(props: Comprops & {conn_state: string, tier: MyCoursesTier}) {
 		super(props);
 
 		this.uri = props.uri;
@@ -103,10 +141,10 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			  cols: [
 				{ field: 'myId', label: L("decision Id"), width: 10, visible: false },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'cbb', sk: 'kypc/modul', onEditStop: this.edited },
-				{ field: 'clevel', label: L("Level"), width: 140, editable: false },
-				{ field: 'cate', label: L("Category"), width: 120, editable: false },
-				{ field: 'subject', label: L("Subject"), width: 160, editable: false },
+				{ field: 'cId', label: L("curriculum"), width: 160, type: 'cbb', sk: '', onEditStop: this.edited },
+				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
+				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
+				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj', editable: false },
 			] });
 	}
 
@@ -115,6 +153,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		console.log(uri);
 
 		this.tier.setContext(this.context);
+		this.tier.loadCourses(this.context);
 
 		this.setState({});
 	}
