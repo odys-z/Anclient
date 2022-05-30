@@ -34,11 +34,12 @@ export class PageInf {
 	total?: number;
 	condts?: Array<string[]>;
 
-	constructor(page?: number, size?: number, total?: number) {
+	constructor(page?: number, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.semantic.jserv.R.PageInf';
 		this.page = page || 0;
 		this.size = size || -1;
 		this.total = total || 0;
+		this.condts = condts;
 	}
 };
 

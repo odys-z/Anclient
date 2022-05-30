@@ -83,16 +83,22 @@ class CourseTier extends Spreadsheetier<CourseReq> {
  */
 
 export class Course implements SpreadsheetRec {
-	[f: string]: string | object;
+	[f: string]: string | boolean | number | object;
 	id?: string;
 	css?: CSSProperties;
 
+	/** evelope type */
 	type: string;
+
     cId: string;
     cate?: string;
     module?: string;
     subject?: string;
     parentId?: string;
+
+	currName: string;
+
+	dirty: boolean;
 
 	constructor() {
 		this.type = "io.oz.curr.north.Course";

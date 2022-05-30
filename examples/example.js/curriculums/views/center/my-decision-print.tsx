@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
@@ -6,9 +6,9 @@ import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } f
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, AnReactExt, CbbCellValue,
+	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, CbbCellValue,
 } from '@anclient/anreact';
-import { CellEditingStoppedEvent } from 'ag-grid-community';
+import { CellEditingStoppedEvent, GridApi } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
 const { JsampleIcons } = jsample;
 
@@ -27,6 +27,20 @@ const styles = (_theme: Theme) => ({
 		width: 150,
 	}
 });
+
+const setPrinterFriendly = (api: GridApi) => {
+    const eGridDiv = document.querySelector('#myGrid') as any;
+    eGridDiv.style.height = '';
+    api.setDomLayout('print');
+};
+  
+const setNormal = (api) => {
+    const eGridDiv = document.querySelector('#myGrid') as any;
+    eGridDiv.style.width = '700px';
+    eGridDiv.style.height = '200px';
+    api.setDomLayout();
+};
+ 
 
 interface Decision extends SpreadsheetRec {
 
@@ -48,7 +62,7 @@ class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 }
 
 class MyCoursesTier extends Spreadsheetier {
-	myId?: string;
+	eventId?: string;
 	/** client buffer for updating rows */
 	courses: {[cId: string]: Course[]};
 
@@ -175,6 +189,8 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			] } as QueryPage;
 
 	gridRef: React.MutableRefObject<undefined>;
+    sheetRef: AnSpreadsheet;
+    api: GridApi;
 	
 	getUserId() {
 		return this.props.ssInf.uid;
@@ -189,8 +205,10 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 		this.toSave = this.toSave.bind(this);
 		this.toDel = this.toDel.bind(this);
+		this.toPrint = this.toPrint.bind(this);
 		this.edited = this.edited.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
+		this.onSelectDecision = this.onSelectDecision.bind(this);
 
 		Spreadsheetier.registerReq((conds: PageInf, rec: Decision) => { return new MyReq(conds, rec);});
 
@@ -206,7 +224,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj', editable: false },
 			] });
 		
-		this.gridRef = useRef();
+        this.gridRef = React.createRef();
 
 	}
 
@@ -217,6 +235,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.tier.setContext(this.context);
 		this.tier.loadCourses(this.context);
 
+		// Spreadsheet + MyReq will load course pre module for last active event (mydecision : records)
 		this.setState({});
 	}
 
@@ -233,12 +252,24 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
-		this.tier.records(toPageInf(this.conds),
+		// this.tier.records(toPageInf(this.conds),
+        this.tier.records(new PageInf(0, -1, 0, [['eventId', this.tier.eventId]]),
 			(_cols, rows) => {
 				that.tier.rows = rows;
 				that.setState({})
 			});
 	}
+
+    onSelectDecision (event: NV) : void {
+        // let that = this;
+        this.tier.eventId = event.v as string;
+        this.bindSheet(undefined);
+        // this.tier.records(new PageInf(0, -1, 0, [['myId', this.tier.myId]]),
+		// 	(_cols, rows) => {
+		// 		that.tier.rows = rows;
+		// 		that.setState({})
+		// 	});
+    };
 
 	edited (p: CellEditingStoppedEvent) : void {
 		this.tier.updateCell(p, () => {
@@ -269,28 +300,34 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		console.error("shouldn't here");
 	}
 
+    toPrint(_e: React.UIEvent) {
+        setPrinterFriendly(this.api);
+        print();
+    }
+
 	render() {
 		let that = this;
 		let {classes} = this.props;
 
 		return (<div>
-			{/* {<AnQueryst
-				uri={this.uri}
-				fields={this.conds.query}
-				onSearch={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
-				onReady={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
-			/>} */}
-			<DatasetCombo uri={this.uri} sk={'ann-evt'} noAllItem={true} />
-			{this.tier &&
-			  <div className='ag-theme-alpine' style={{height: '60vh', width: '100%', margin:'auto'}}>
+            <div className='noPrint'>
+			<DatasetCombo uri={this.uri} sk={'ann-evt'} noAllItem={true} className='noPrint' onSelect={this.onSelectDecision} />
+            </div>
+            <div className='onlyPrint'>
+                <h1>{L('Signature')}</h1>
+            </div>
+			{ this.tier &&
+			  <div id="myGrid" className='ag-theme-alpine' style={{height: '60vh', width: '100%', margin:'auto'}}>
 				<AnSpreadsheet
+				 	ref={ (ref) => this.sheetRef = ref }
 					tier={this.tier as Spreadsheetier}
+                    onSheetReady={(params) => this.api = params.api}
 					autosave={true}
 					onCellClicked={this.tier.onCellClick}
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />
 			  </div>}
-			<div style={{textAlign: 'center', background: '#f8f8f8'}}>
+			<div style={{textAlign: 'center', background: '#f8f8f8'}} className={'noPrint'}>
 				<Button variant="outlined"
 					className={classes.usersButton}
 					color='primary'
@@ -298,8 +335,15 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					endIcon={<JsampleIcons.Add />}
 				>{L('Save')}
 				</Button>
+				<Button variant="outlined"
+					className={classes.usersButton}
+					color='primary'
+					onClick={this.toPrint}
+					endIcon={<JsampleIcons.Add />}
+				>{L('Print')}
+                </Button>
 			</div>
-			{this.confirm}
+			{ this.confirm }
 		</div>);
 	}
 

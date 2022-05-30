@@ -11,7 +11,6 @@ import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
 	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
-import { ComboCondType } from './query-form';
 import { AnConst } from '../../utils/consts';
 
 /**
@@ -76,10 +75,14 @@ export interface SheetCol extends TierCol {
 	 * - dynamic-cbb: options changing for each rows, work together with cbbOptions
 	 */
 	type?: 'text' | 'cbb' | 'dynamic-cbb';
-	cbbOtpions: (rec: Sheet) => 
-
+	/** dynamic options per record. */
+	cbbOptions?: (rec: SpreadsheetRec) => string[] 
 	sk?  : string;
+	sqlArgs?: string[],
+
 	form?: JSX.Element;
+
+	noAllItem?: boolean,
 
 	suppressSizeToFit?: boolean;
 	resizable?: boolean;
@@ -188,13 +191,13 @@ export class Spreadsheetier extends Semantier {
 		let that = this;
 		let an = ctx.anReact as AnReactExt;
 		// load all options
-		this._cols?.forEach((c: ComboCondType, x: number) => {
+		this._cols?.forEach((c: SheetCol, x: number) => {
 			if (c.type === 'cbb') {
 				if (c.sk) {
 				  an.ds2cbbOptions({
 					uri: this.uri,
 					sk: c.sk as string,
-					nv: c.nv,
+					nv: {n: 'name', v: 'value'}, //c.nv,
 					noAllItem: toBool(c.noAllItem, true),
 					sqlArgs: c.sqlArgs,
 					onLoad: (_cols, rows) => {
@@ -209,6 +212,10 @@ export class Spreadsheetier extends Semantier {
 				  delete c.sk;
 				}
 				else console.warn("Combobox cell's option loading ignored for null sk: ", c);
+			}
+			else if (c.type === 'dynamic-cbb') {
+				// that.cbbOptions[c.field] = c.cbbOptions;
+				// delete c.cbbOptions;
 			}
 		});
 
@@ -236,9 +243,10 @@ export class Spreadsheetier extends Semantier {
 	 *
 	 * @param field field name for finding NV records to decode.
 	 * @param v
+	 * @param rec not used
 	 * @returns showing element
 	 */
-	decode(field: string, v: string): string | Element {
+	decode(field: string, v: string, rec: SpreadsheetRec): string | Element {
 		let nvs = this.cbbItems[field];
 		for (let i = 0; i < nvs?.length; i++)
 			if (nvs[i].v === v)
@@ -251,9 +259,10 @@ export class Spreadsheetier extends Semantier {
 	 *
 	 * @param field
 	 * @param n
+	 * @param rec not used
 	 * @returns
 	 */
-	encode(field: string, n: string): string | object {
+	encode(field: string, n: string, rec: SpreadsheetRec): string | object {
 		let nvs = this.cbbItems[field];
 		if (!nvs) // plain text
 			return n;
@@ -305,7 +314,7 @@ export class Spreadsheetier extends Semantier {
 
 		let {value, oldValue} = p;
 		if (value !== oldValue) {
-			value = this.encode(p.colDef.field, value);
+			value = this.encode(p.colDef.field, value, p.data);
 
 			rec[p.colDef.field] = value;
 			this.update(CRUD.u, rec, ok, this.errCtx);
@@ -402,6 +411,9 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	isEditable = true;
 	tier: Spreadsheetier;
 
+	ref: AgGridReact;
+	api: GridApi;
+
 	constructor(props: SpreadsheetProps) {
 		super(props);
 
@@ -441,7 +453,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 					  c.thFormatter ? c.thFormatter() :
 						{ headerName, ...c}) as ColDef;
 
-				if (col.type === 'cbb') {
+				if (col.type === 'cbb' || col.type === 'dynamic-cbb') {
 					col.type = undefined; // 'agSelectEditor';
 					col.cellEditor = 'agSelectCellEditor';
 					// p type is any (May 2022):
@@ -449,7 +461,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 					col.cellEditorParams = (p: CbbCellValue) => {
 						return { values: that.props.tier.cbbCellOptions(p) };
 					  };
-					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p.colDef.field, p.value))
+					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p.colDef.field, p.value, p.data))
 					// col.onCellEditingStopped = anEditStop
 					// (e: { value: any; data: SpreadsheetRec; }) => {
 					// }
@@ -468,6 +480,9 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 		let that = this;
 		this.tier.records(undefined, () => that.setState({ready: true}));
 	}
+
+	getRef() { return this.ref; }
+	getApi() { return this.api; }
 
 	/** load default context menu, together with user's menu items.
 	 * user's menu items defined in props like:
@@ -508,6 +523,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 		this.gridColumnApi = params.columnApi;
 
 		params.api.sizeColumnsToFit();
+		this.api = params.api;
 	};
 
 	onFirstDataRendered = (params: { api: { sizeColumnsToFit: () => void; }; }) => {
@@ -546,6 +562,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	render () {
 	  return (
 		<AgGridReact
+			ref={(ref) => this.ref = ref}
 			onCellClicked={this.onCellClicked}
 			columnDefs={this.coldefs}
 			components={this.props.components}

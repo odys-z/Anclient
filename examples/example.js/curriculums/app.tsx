@@ -13,7 +13,7 @@ import { StarPorts } from './common/port';
 
 import { Course } from './views/north/kypci/courses';
 import { Progress } from './views/north/progress';
-import { My } from './views/center/my-decision';
+import { My } from './views/center/my-decision-print';
 import { APEvents } from './views/north/kypci/events';
 
 export interface Approps {
