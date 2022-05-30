@@ -73,9 +73,11 @@ export interface SheetCol extends TierCol {
 
 	/**cell type, default: text
 	 * - cbb: bind options with sk
-	 * - dynamic-cbb: options changing for each rows
+	 * - dynamic-cbb: options changing for each rows, work together with cbbOptions
 	 */
 	type?: 'text' | 'cbb' | 'dynamic-cbb';
+	cbbOtpions: (rec: Sheet) => 
+
 	sk?  : string;
 	form?: JSX.Element;
 
