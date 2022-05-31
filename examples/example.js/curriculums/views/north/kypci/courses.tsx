@@ -67,7 +67,7 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 				  onEditStop: this.onEdited },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
-				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj' },
+				{ field: 'remarks', label: L("Remarks"), width: 360, type: 'text' },
 			] });
 	}
 

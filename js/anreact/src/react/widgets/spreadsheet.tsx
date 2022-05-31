@@ -102,6 +102,10 @@ export interface SpreadsheetRec extends Tierec {
 	css?: CSSProperties,
 }
 
+export interface SpreadsheetResp extends AnsonResp {
+	rec: SpreadsheetRec;
+}
+
 /**
  * According to ag-grid document, p's type is any: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
  */

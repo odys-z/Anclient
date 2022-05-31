@@ -152,11 +152,12 @@ export class Semantier {
      *
      * @param props
      */
-    constructor(props: UIComponent) {
+    constructor(props: UIComponent & {pkval?: PkMeta}) {
         if (!props || !props.uri)
             throw Error("uri is required!");
 
         this.uri = props.uri;
+        this.pkval = props.pkval || {pk: undefined, v: undefined};
     }
 
     /**main table name */
@@ -364,7 +365,10 @@ export class Semantier {
 	 * @returns
 	 */
     saveRec(opts: {crud: CRUD; disableForm?: boolean; disableRelations?: boolean, reltabl?: string}, onOk: OnCommitOk): void {
-		if (!this.client) return;
+		if (!this.client) {
+			console.error("Saving with undefined AnClient. Ever called setContext(context) ?");
+			return;
+		}
 		let client = this.client;
 		let that = this;
 

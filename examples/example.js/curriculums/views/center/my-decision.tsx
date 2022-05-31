@@ -35,7 +35,7 @@ interface Decision extends SpreadsheetRec {
 	myCourses: Course[];
 }
 
-class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
+export class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	rec: T;
 
 	static A = Object.assign(SpreadsheetReq.A,
@@ -203,7 +203,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited },
 				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
-				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj', editable: false },
+				{ field: 'remarks', label: L("Remarks"), width: 360, type: 'text' },
 			] });
 		
 		this.gridRef = useRef();
@@ -274,12 +274,6 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		let {classes} = this.props;
 
 		return (<div>
-			{/* {<AnQueryst
-				uri={this.uri}
-				fields={this.conds.query}
-				onSearch={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
-				onReady={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
-			/>} */}
 			<DatasetCombo uri={this.uri} sk={'ann-evt'} noAllItem={true} />
 			{this.tier &&
 			  <div className='ag-theme-alpine' style={{height: '60vh', width: '100%', margin:'auto'}}>

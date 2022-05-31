@@ -1,5 +1,5 @@
 import React from "react";
-import { AnContext, AnContextType, ClassNames, Comprops, CrudCompW, invalidStyles, SysComp } from "@anclient/anreact";
+import { AnContext, AnContextType, ClassNames, Comprops, CrudCompW, invalidStyles, L, SysComp } from "@anclient/anreact";
 import { Semantier, Tierec, UIComponent } from "@anclient/semantier";
 import { Card, Grid, Link, Paper, SvgIcon, Typography, withStyles, withWidth } from "@material-ui/core";
 import { StarTheme } from "../../common/star-theme";
@@ -98,7 +98,7 @@ const styles = (theme: StarTheme) => (Object.assign(
       },
 	  card: {
         minHeight: 100,
-        maxHeight: "24vh",
+        // maxHeight: "24vh",
         minWidth: "99%",
         margin: theme.spacing(1),
 		backgroundColor: '#f1fffe',
@@ -144,16 +144,15 @@ class WelcomeTier extends Semantier {
     }
 
     rows: NoteRec[] = [
-        { title: 'Notification 1', msg: 'Anprism.ts is on the road ...', date: new Date(), pusher: 'Robot',
-          grid: {md: 6, sm: 12} },
-        { title: 'Coding cat is retired!', msg: `Never mind.
-          Here comes the footing dog.`, date: 'Yesterday', pusher: 'Ody',
+        { title: L('AP Requriements'), msg: L('msg: AP Requriements'), date: new Date(), pusher: 'CDFLS',
           grid: {md: 12, sm: 12} },
-        { title: 'VS Code!', date: 'Last Year', msg: 'Credits: Icons8 Flat Color Icons',
-          link: 'https://github.com/icons8/flat-color-icons',
-          pusher: 'Bill', css: {icon: 'Send'},
-          grid: {md: 6, sm: 12} },
-        { title: 'Big Names!', date: '--', pusher: 'Trump', css: {icon: 'Add'},
+        { title: L('Graduate Quility'), msg: L('msg: graduate quality'), date: 'Yesterday', pusher: 'CDFLS',
+          grid: {md: 12, sm: 12} },
+        { title: L('About English'), msg: L('msg: about english'), date: 'Yesterday', pusher: 'CDFLS',
+          grid: {md: 12, sm: 12} },
+        { title: L('College Board'), date: 'Last Year', msg: 'College Board Homepage',
+          link: 'https://international.collegeboard.org/students/ap/taking-ap-china',
+          pusher: 'College Board', css: {icon: 'Send'},
           grid: {md: 6, sm: 12} },
     ];
 }

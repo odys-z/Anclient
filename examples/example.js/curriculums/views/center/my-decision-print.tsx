@@ -5,8 +5,9 @@ import { Theme, withStyles } from '@material-ui/core/styles';
 import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } from '@anclient/semantier';
 
 import {
-	L, ComboCondType, Comprops, CrudComp,
-	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, CbbCellValue, SpreadsheetResp,
+	L, ComboCondType, Comprops, CrudComp, AnContextType,
+	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, DatasetCombo,
+	Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, CbbCellValue, SpreadsheetResp,
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent, GridApi } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
@@ -43,10 +44,13 @@ const setNormal = (api) => {
  
 
 interface Decision extends SpreadsheetRec {
+	/** client only */
+	dirty?: boolean;
 
-	dirty: boolean;
-	cId: string;
-	myCourses: Course[];
+	/** optional for myId = eventId + kid */
+	myId?: string;
+	eventId: string;
+	cIds: String[];
 }
 
 class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
@@ -120,6 +124,14 @@ class MyCoursesTier extends Spreadsheetier {
 		return this.cbbOptions[p.colDef?.field] || [p.value];
 	}
 
+	/**
+	 * Enocde name to code according cbb items data.
+	 * 
+	 * @param field 
+	 * @param n 
+	 * @param rec current row for dynamic encoding (current module for each course groups)
+	 * @returns 
+	 */
 	encode(field: string, n: string, rec: Course): string | object {
 		if (field === 'cId') {
 			let nvs = this.courseItemsPerModule[rec.module];
@@ -155,23 +167,12 @@ class MyCoursesTier extends Spreadsheetier {
 		let {value, oldValue} = p;
 		if (value !== oldValue) {
 			let row = this.rows[p.rowIndex] as Course;
-			row = Object.assign(row, this.courses[row.module]?.[this.encode('cId', row.cId, row) as string]);
+			row = Object.assign(row, this.courses[row.module]?.[this.encode('cId', value, row) as string]);
 			console.log('new course', row);
 			row.dirty = true;
 
 			onOk(undefined);
 		}
-
-		// let rec = {myId: this.myId} as Decision;
-		// rec[this.pkval.pk] = this.pkval.v;
-
-		// let {value, oldValue} = p;
-		// if (value !== oldValue) {
-		// 	value = this.encode(p.colDef.field, value);
-
-		// 	rec[p.colDef.field] = value;
-		// 	this.update(CRUD.u, rec, onOk, this.errCtx);
-		// }
 	}
 }
 
@@ -221,7 +222,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited },
 				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
-				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj', editable: false },
+				{ field: 'remarks', label: L("Remarks"), width: 360, type: 'text' },
 			] });
 		
         this.gridRef = React.createRef();
@@ -273,14 +274,20 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 	edited (p: CellEditingStoppedEvent) : void {
 		this.tier.updateCell(p, () => {
-			if (p.colDef.field === 'cId')
-				this.setState({});
+			if (p.colDef.field === 'cId') {
+				p.api.redrawRows();
+				// this.setState({});
+			}
 		});
 	};
 
 	toSave(_e: React.UIEvent) {
 		let that = this;
-        this.tier.rec = {eventId: this.tier.eventId}
+        this.tier.rec = {
+			eventId: this.tier.eventId,
+			cIds: collectCourses(this.tier.rows as Course[])
+		} as Decision;
+
         // update id: eventId + usrId
 		this.tier.update(
 			this.tier.pkval.v ? CRUD.u : CRUD.c,
@@ -296,6 +303,14 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 						msg={msg} />);
 				this.setState({});
 			}, this.context.error);
+		
+		function collectCourses(rows: Course[]) {
+			let cIds = [];
+			rows?.forEach( (c, x) => {
+				cIds.push( c.cId );
+			});
+			return cIds;
+		}
 	}
 
 	toDel(e: React.UIEvent) {
@@ -303,6 +318,11 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	}
 
     toPrint(_e: React.UIEvent) {
+        setPrinterFriendly(this.api);
+        print();
+    }
+
+    toUpload(_e: React.UIEvent) {
         setPrinterFriendly(this.api);
         print();
     }
@@ -334,15 +354,22 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					className={classes.usersButton}
 					color='primary'
 					onClick={this.toSave}
-					endIcon={<JsampleIcons.Add />}
+					endIcon={<JsampleIcons.Edit />}
 				>{L('Save')}
 				</Button>
 				<Button variant="outlined"
 					className={classes.usersButton}
 					color='primary'
 					onClick={this.toPrint}
-					endIcon={<JsampleIcons.Add />}
+					endIcon={<JsampleIcons.Export />}
 				>{L('Print')}
+                </Button>
+				<Button variant="outlined"
+					className={classes.usersButton}
+					color='primary'
+					onClick={this.toUpload}
+					endIcon={<JsampleIcons.Up />}
+				>{L('Upload')}
                 </Button>
 			</div>
 			{ this.confirm }
