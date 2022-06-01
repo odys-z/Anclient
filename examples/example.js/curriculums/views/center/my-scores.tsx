@@ -1,17 +1,18 @@
 import React from 'react';
-import { Box, Button, withWidth } from '@material-ui/core';
+import { Box, Button, Card, withWidth } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
 import { CRUD, PkMeta, AnlistColAttrs, Semantier, OnCommitOk } from '@anclient/semantier';
 
 import {
 	L, Comprops, CrudComp,
-	jsample, ConfirmDialog, TRecordForm, AnContext, AnContextType,
+	jsample, ConfirmDialog, TRecordForm, AnContext, AnContextType, invalidStyles,
 } from '@anclient/anreact';
 import { MyReq } from './my-decision';
 const { JsampleIcons } = jsample;
 
-const styles = (_theme: Theme) => ({
+const styles = (_theme: Theme) => (Object.assign (
+	invalidStyles, {
 	root: {
 		// height: "calc(100vh - 92ch)"
 		height: "72vh"
@@ -25,7 +26,7 @@ const styles = (_theme: Theme) => ({
 		margin: 6,
 		width: 150,
 	}
-});
+}));
 
 class MyScoreTier extends Semantier {
 	// kid?: string;
@@ -34,7 +35,7 @@ class MyScoreTier extends Semantier {
 		super(props);
 
 		this._fields = [
-			{field: 'grade', label: L('Grade'), grid: {md: 12}},
+			{field: 'grade', label: L('Grade'), grid: {md: 12}, validator: {notNull: true} },
 			{field: 'admission', label: 'admission', grid: {md: 12}},
 			{field: 'toefl', label: 'TOEFL', grid: {md: 12}},
 			{field: 'ielts', label: 'IELTS', grid: {md: 12}},
@@ -56,8 +57,9 @@ class MyScoreTier extends Semantier {
 		this.rec.kid = this.pkval.v;
 
 		let req = this.client.userReq(this.uri, 'mydecisions',
-			new MyReq( undefined, this.rec )
-			.A(crud === CRUD.c ? MyReq.A.insert : MyReq.A.update) );
+			new MyReq()
+			.scores( this.rec )
+			.A(MyReq.A.scores) );
 
 		client.commit(req,
 			(resp) => {
@@ -122,7 +124,8 @@ class MyScoresComp extends CrudComp<Comprops & {uri: string}> {
 
 		let that = this;
 
-		if (this.tier.validate(undefined, this.tier.fields()))
+		// if (this.tier.validate(undefined, this.tier.fields()))
+		if (this.tier.validate())
 			this.tier.saveRec(
 				{ crud: this.tier.crud },
 				resp => {
@@ -143,11 +146,14 @@ class MyScoresComp extends CrudComp<Comprops & {uri: string}> {
 	render() {
 		let { classes } = this.props;
 		return (<>
-		  <Box>{(this.context as AnContextType).ssInf.usrName}</Box>
+		  <Card>{L('Standardized Test Scores')}
+		    <Box>{(this.context as AnContextType).ssInf.usrName}</Box>
+		  </Card>
 		  {this.tier
 			 && <TRecordForm uri={this.props.uri}
 					tier={this.tier}
 					fields={this.tier.fields()}
+					enableValidate={true}
 				/>}
 			<Button onClick={this.toSave}
 				className={classes.actionButton} color="primary" variant="outlined">

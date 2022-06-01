@@ -148,6 +148,7 @@ class MyCoursesTier extends Spreadsheetier {
 	}
 
 	decode(field: string, v: string, rec: Course): string | Element { 
+		v = rec[field] as string;
 		if (field === 'cId') {
 			let nvs = this.courseItemsPerModule[rec.module];
 			for (let i = 0; i < nvs?.length; i++)
@@ -192,6 +193,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	gridRef: React.MutableRefObject<undefined>;
     sheetRef: AnSpreadsheet;
     api: GridApi;
+	buttons = {save: false, export: false, upload: false};
 	
 	getUserId() {
 		return this.props.ssInf.uid;
@@ -257,13 +259,23 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
         this.tier.records(new PageInf(0, -1, 0, [['eventId', this.tier.eventId]]),
 			(_cols, rows) => {
 				that.tier.rows = rows;
+				that.api.redrawRows();
 				that.setState({})
 			});
 	}
 
     onSelectDecision (event: NV) : void {
-        // let that = this;
+		let ename = event.n;
+		let isActive = ename.startsWith("Active: ");
+
+		this.buttons.save = isActive;
+		this.buttons.export = isActive;
+		this.buttons.upload = isActive;
+
+		this.setState({})
+
         this.tier.eventId = event.v as string;
+
         this.bindSheet(undefined);
         // this.tier.records(new PageInf(0, -1, 0, [['myId', this.tier.myId]]),
 		// 	(_cols, rows) => {
@@ -276,7 +288,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.tier.updateCell(p, () => {
 			if (p.colDef.field === 'cId') {
 				p.api.redrawRows();
-				// this.setState({});
+				this.setState({});
 			}
 		});
 	};
@@ -293,13 +305,17 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			this.tier.pkval.v ? CRUD.u : CRUD.c,
 			this.tier.rec, 
 			(resp: AnsonMsg<SpreadsheetResp>) => {
+				console.log(resp.Body());
 				that.tier.pkval.v = resp.Body().rec.myId;
 
-				let msg = resp.Body().msg;
+				let msg = resp.Body().msg();
 				this.confirm = (
 					<ConfirmDialog title={L('Info')}
 						ok={L('OK')} cancel={false} open
-						onClose={() => {that.confirm = undefined;} }
+						onClose={() => {
+							that.confirm = undefined;
+							that.setState({});
+						} }
 						msg={msg} />);
 				this.setState({});
 			}, this.context.error);
@@ -307,7 +323,8 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		function collectCourses(rows: Course[]) {
 			let cIds = [];
 			rows?.forEach( (c, x) => {
-				cIds.push( c.cId );
+				if (!isEmpty(c.cId))
+					cIds.push( c.cId );
 			});
 			return cIds;
 		}
@@ -333,7 +350,11 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 		return (<div>
             <div className='noPrint'>
-			<DatasetCombo uri={this.uri} sk={'ann-evt'} noAllItem={true} className='noPrint' onSelect={this.onSelectDecision} />
+				<DatasetCombo uri={this.uri}
+					sk={'ann-evt'}
+					noAllItem={true}
+					className='noPrint'
+					onSelect={this.onSelectDecision} />
             </div>
             <div className='onlyPrint'>
                 <h1>{L('Signature')}</h1>
@@ -351,6 +372,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			  </div>}
 			<div style={{textAlign: 'center', background: '#f8f8f8'}} className={'noPrint'}>
 				<Button variant="outlined"
+					disabled={!this.buttons.save}
 					className={classes.usersButton}
 					color='primary'
 					onClick={this.toSave}
@@ -358,6 +380,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				>{L('Save')}
 				</Button>
 				<Button variant="outlined"
+					disabled={!this.buttons.export}
 					className={classes.usersButton}
 					color='primary'
 					onClick={this.toPrint}
@@ -365,6 +388,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				>{L('Print')}
                 </Button>
 				<Button variant="outlined"
+					disabled={!this.buttons.upload}
 					className={classes.usersButton}
 					color='primary'
 					onClick={this.toUpload}

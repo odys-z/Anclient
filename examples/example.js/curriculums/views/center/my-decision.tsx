@@ -2,11 +2,11 @@ import React, { useRef } from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } from '@anclient/semantier';
+import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, Tierec } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, AnReactExt, CbbCellValue,
+	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, CbbCellValue,
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
@@ -35,15 +35,29 @@ interface Decision extends SpreadsheetRec {
 	myCourses: Course[];
 }
 
+interface MyScore extends Tierec {
+
+}
+
 export class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
-	rec: T;
+	rec?: T;
+
+	myscore?: MyScore;
 
 	static A = Object.assign(SpreadsheetReq.A,
-		{ courses: 'r/courses', });
+		{ courses: 'r/courses',
+		  scores: 'u/scores',
+		});
 
-	constructor(query: PageInf, rec: T) {
+	constructor(query?: PageInf, rec?: T) {
 		super({type: 'io.oz.curr.decision.MyReq', tabl: 'b_mydecissions', query});
 		this.rec = rec;
+	}
+
+	scores(score: MyScore) {
+		this.myscore = score;
+		this.myscore.type = "io.oz.curr.decision.MyScore";
+		return this;
 	}
 }
 

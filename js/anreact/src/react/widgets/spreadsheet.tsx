@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx } from '@anclient/semantier';
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { AnConst } from '../../utils/consts';
 
@@ -102,9 +102,19 @@ export interface SpreadsheetRec extends Tierec {
 	css?: CSSProperties,
 }
 
-export interface SpreadsheetResp extends AnsonResp {
+export class SpreadsheetResp extends AnsonResp {
 	rec: SpreadsheetRec;
+
+	constructor(json) {
+		super(json);
+		this.rec = json.rec;
+	}
 }
+
+Protocol.registerBody("io.odysz.jsample.semantier.SpreadsheetResp",
+	(json) => {
+		return new SpreadsheetResp(json);
+	});
 
 /**
  * According to ag-grid document, p's type is any: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
@@ -247,10 +257,11 @@ export class Spreadsheetier extends Semantier {
 	 *
 	 * @param field field name for finding NV records to decode.
 	 * @param v
-	 * @param rec not used
+	 * @param rec current row (p.data)
 	 * @returns showing element
 	 */
 	decode(field: string, v: string, rec: SpreadsheetRec): string | Element {
+		v = rec[field] as string;
 		let nvs = this.cbbItems[field];
 		for (let i = 0; i < nvs?.length; i++)
 			if (nvs[i].v === v)

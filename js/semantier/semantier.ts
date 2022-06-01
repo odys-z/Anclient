@@ -221,6 +221,19 @@ export class Semantier {
 
     disableValidate: any;
 
+	/**
+	 * Change each field's style according to it's validator.
+	 * 
+	 * FIXME:
+	 * 
+	 * the second parameter, fields, if provided, will be created a new instance. this is bug.
+	 * 
+	 * See jsample/views/my-pswdcard for usage.
+	 * 
+	 * @param rec 
+	 * @param fields 
+	 * @returns 
+	 */
     validate(rec?: {}, fields?: Array<TierCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;

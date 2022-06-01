@@ -130,10 +130,10 @@ class CourseReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 
 Spreadsheetier.registerReq((conds: PageInf) => { return new CourseReq(conds) });
 
-class CourseResp extends AnsonResp {
-}
+// class CourseResp extends AnsonResp {
+// }
 
-Protocol.registerBody('io.odysz.jsample.semantier.SpreadsheetResp',
-					  (jsonBd) => { return new CourseResp(jsonBd); });
+// Protocol.registerBody('io.odysz.jsample.semantier.SpreadsheetResp',
+// 					  (jsonBd) => { return new CourseResp(jsonBd); });
 
-export { Course as Curriculum, CourseReq, CourseResp };
+export { Course as Curriculum, CourseReq };
