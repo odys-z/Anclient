@@ -77,6 +77,16 @@ export interface SheetCol extends TierCol {
 	type?: 'text' | 'cbb' | 'dynamic-cbb';
 	/** dynamic options per record. */
 	cbbOptions?: (rec: SpreadsheetRec) => string[] 
+
+	/** The semantic key - Spreadsheet load combobox options automaticall
+	 * 
+	 * A note about ag-grid warning:
+	 * invalid colDef property 'sk' did you mean any of these: __v_skip, ...
+	 * 
+	 * This warning occures when rendering Spreadsheet before all comboboxes' loading triggered
+	 * (where the sk be deleted). Currently avoiding this happening is depending on user's code.
+	 * There is no plan to solve this.
+	 */
 	sk?  : string;
 	sqlArgs?: string[],
 
@@ -240,6 +250,9 @@ export class Spreadsheetier extends Semantier {
 				  delete c.sk;
 				}
 				else console.warn("Combobox cell's option loading ignored for null sk: ", c);
+			}
+			else if (c.type === 'text') {
+				delete c.type;
 			}
 			else if (c.type === 'dynamic-cbb') {
 				// that.cbbOptions[c.field] = c.cbbOptions;
