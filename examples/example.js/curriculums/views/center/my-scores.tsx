@@ -2,13 +2,13 @@ import React from 'react';
 import { Box, Button, Card, withWidth } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, PkMeta, AnlistColAttrs, Semantier, OnCommitOk } from '@anclient/semantier';
+import { CRUD, PkMeta, AnsonMsg, PageInf, OnLoadOk, Tierec, AnlistColAttrs, Semantier, OnCommitOk } from '@anclient/semantier';
 
 import {
 	L, Comprops, CrudComp,
-	jsample, ConfirmDialog, TRecordForm, AnContext, AnContextType, invalidStyles,
+	jsample, ConfirmDialog, TRecordForm, AnContext, AnContextType, invalidStyles, SpreadsheetResp,
 } from '@anclient/anreact';
-import { MyReq } from './my-decision';
+import { MyReq } from './my-decision-print';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => (Object.assign (
@@ -28,7 +28,11 @@ const styles = (_theme: Theme) => (Object.assign (
 	}
 }));
 
+export interface MyScore extends Tierec {
+}
+
 class MyScoreTier extends Semantier {
+	myscores: {};
 	// kid?: string;
 
 	constructor(props: {uri: string, pkval: PkMeta}) {
@@ -42,6 +46,23 @@ class MyScoreTier extends Semantier {
 			{field: 'act', label: 'ACT', grid: {md: 12}},
 			{field: 'sat', label: 'SAT', grid: {md: 12}},
 		] as AnlistColAttrs<JSX.Element, {}>[];
+	}
+
+    record(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
+		let req = this.client.userReq(this.uri, 'mydecisions',
+			new MyReq()
+			.A(MyReq.A.loadScore) );
+		
+		let that = this;
+		this.client.commit(req,
+			(resp: AnsonMsg<SpreadsheetResp>) => {
+				// let bd = resp.Body();
+				// that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
+				// let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rec = resp.Body().rec;
+				onLoad(undefined, [that.rec]);
+			},
+			this.errCtx);
 	}
 
 	saveRec(opts: { crud: CRUD; }, onOk: OnCommitOk) {
@@ -63,11 +84,11 @@ class MyScoreTier extends Semantier {
 
 		client.commit(req,
 			(resp) => {
-				let bd = resp.Body();
-				if (crud === CRUD.c)
-					// NOTE:
-					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
+				// let bd = resp.Body();
+				// if (crud === CRUD.c)
+				// 	// NOTE:
+				// 	// resulving auto-k is a typicall semantic processing, don't expose this to caller
+				// 	that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);
@@ -103,7 +124,10 @@ class MyScoresComp extends CrudComp<Comprops & {uri: string}> {
 
 		this.tier.rec = {kid: uid};
 
-		this.setState({});
+		let that = this;
+		this.tier.record(new PageInf(), () => {
+			that.setState({});
+		});
 	}
 
 	showConfirm(msg: string | string[]) {

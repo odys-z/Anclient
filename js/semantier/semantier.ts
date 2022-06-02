@@ -69,11 +69,12 @@ export interface TierCol extends DbCol {
 }
 
 /**Meta data handled from tier (DB field).
- * field and label properties are required.
- *
- * F: field type, e.g. JSX.Element;
- *
- * FO: options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
+ * 
+ * This type need 2 parameters:
+ * 
+ * F: UI field type, e.g. JSX.Element;
+ * 
+ * FO: extended field options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
 */
 export interface AnlistColAttrs<F, FO> extends TierCol {
     /** Readable text (field name) */

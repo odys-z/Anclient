@@ -11,6 +11,7 @@ import {
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent, GridApi } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
+import { MyScore } from './my-scores';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
@@ -41,31 +42,40 @@ const setNormal = (api) => {
     eGridDiv.style.height = '200px';
     api.setDomLayout();
 };
- 
 
-interface Decision extends SpreadsheetRec {
+export interface Decision extends SpreadsheetRec {
 	/** client only */
 	dirty?: boolean;
 
 	/** optional for myId = eventId + kid */
 	myId?: string;
 	eventId: string;
-	cIds: String[];
+	cIds: Course[];
 }
 
-class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
+export class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	rec: T;
+	myscore: MyScore;
 
 	static A = Object.assign(SpreadsheetReq.A,
-		{ courses: 'r/courses', });
+		{ courses: 'r/courses',
+		  scores: 'u/scores',
+		  loadScore: 'r/scores',
+		});
 
-	constructor(query: PageInf, rec: T) {
+	constructor(query?: PageInf, rec?: T) {
 		super({type: 'io.oz.curr.decision.MyReq', tabl: 'b_mydecissions', query});
 		this.rec = rec;
 	}
+
+	scores(score: MyScore) {
+		this.myscore = score;
+		this.myscore.type = "io.oz.curr.decision.MyScore";
+		return this;
+	}
 }
 
-class MyCoursesTier extends Spreadsheetier {
+export class MyCoursesTier extends Spreadsheetier {
 	eventId?: string;
 	/** client buffer for updating rows */
 	courses: {[cId: string]: Course[]};
@@ -80,6 +90,10 @@ class MyCoursesTier extends Spreadsheetier {
 
 		this.coursesPerModule = {};
 		this.courseItemsPerModule = {};
+	}
+
+	columns4print(): SheetCol[] {
+		return (this._cols as SheetCol[]).splice(0, this._cols.length - 2);
 	}
 
 	loadCourses(ctx: AnContextType) {
@@ -114,6 +128,12 @@ class MyCoursesTier extends Spreadsheetier {
 						that.courseItemsPerModule[r.module].push({n: r.currName, v: r.cId});
 						that.coursesPerModule[r.module].push(r.currName);
 					});
+
+					// delete option
+					for (let m in that.courseItemsPerModule) {
+						that.courseItemsPerModule[m].push({n: L(' - clear - '), v: undefined});
+						that.coursesPerModule[m].push(L(' - clear - '));
+					}
 			},
 			this.errCtx);
 	}
@@ -167,12 +187,26 @@ class MyCoursesTier extends Spreadsheetier {
 
 		let {value, oldValue} = p;
 		if (value !== oldValue) {
-			let row = this.rows[p.rowIndex] as Course;
-			row = Object.assign(row, this.courses[row.module]?.[this.encode('cId', value, row) as string]);
-			console.log('new course', row);
-			row.dirty = true;
+			if (p.colDef.field === Course.pk) {
+				let row = this.rows[p.rowIndex] as Course;
+				let cId = this.encode('cId', value, row) as string;
+				if (cId) { // not clearing
+					row = Object.assign(row, this.courses[row.module]?.[cId]);
+					console.log('new course', row);
+				}
+				else {
+					// clear the row
+					row.cId = undefined;
+					row.cate = undefined;
+					row.clevel = undefined;
+					row.currName = undefined;
+					row.subject = undefined;
+					row.remarks = undefined;
+				}
+				row.dirty = true;
 
-			onOk(undefined);
+				onOk(undefined);
+			}
 		}
 	}
 }
@@ -209,6 +243,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.toSave = this.toSave.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.toPrint = this.toPrint.bind(this);
+		this.toUpload = this.toUpload.bind(this);
 		this.edited = this.edited.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 		this.onSelectDecision = this.onSelectDecision.bind(this);
@@ -219,16 +254,16 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			{ uri: this.uri,
 			  pkval: {pk: 'module', v: undefined, tabl: 'b_mycourses'},
 			  cols: [
-				{ field: 'myId', label: L("decision Id"), width: 10, visible: false },
+				{ field: 'myId', label: L("decision Id"), width: 10, hide: true },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited },
+				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited, delText: L('-- Clear --') },
 				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
-				{ field: 'remarks', label: L("Remarks"), width: 360, type: 'text' },
+				{ field: 'remarks', label: L("Memo"), width: 140, type: 'text' },
+				{ field: 'descript', label: L("Remarks"), width: 200, type: 'text', editable: false },
 			] });
 		
         this.gridRef = React.createRef();
-
 	}
 
 	componentDidMount() {
@@ -277,11 +312,6 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
         this.tier.eventId = event.v as string;
 
         this.bindSheet(undefined);
-        // this.tier.records(new PageInf(0, -1, 0, [['myId', this.tier.myId]]),
-		// 	(_cols, rows) => {
-		// 		that.tier.rows = rows;
-		// 		that.setState({})
-		// 	});
     };
 
 	edited (p: CellEditingStoppedEvent) : void {
@@ -321,10 +351,10 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			}, this.context.error);
 		
 		function collectCourses(rows: Course[]) {
-			let cIds = [];
+			let cIds = [] as Course[];
 			rows?.forEach( (c, x) => {
 				if (!isEmpty(c.cId))
-					cIds.push( c.cId );
+					cIds.push( new Course({cId: c.cId, remarks: c.remarks} ));
 			});
 			return cIds;
 		}
@@ -335,13 +365,19 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	}
 
     toPrint(_e: React.UIEvent) {
+		// not working: this.tier._cols[this.tier._cols.length - 1].hide = true;
+		this.api.redrawRows();
+		this.setState({});
+
         setPrinterFriendly(this.api);
-        print();
+		setTimeout(function () {
+			print();
+			// setNormal(this.api);
+			// this.tier._cols[this.tier._cols.length - 1].hide = false;
+		  }, 1000);
     }
 
     toUpload(_e: React.UIEvent) {
-        setPrinterFriendly(this.api);
-        print();
     }
 
 	render() {
@@ -369,7 +405,19 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					onCellClicked={this.tier.onCellClick}
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />
-			  </div>}
+			  </div>
+			// &&
+			//   <div id="myGrid" className='ag-theme-alpine onlyPrint' style={{height: '60vh', width: '100%', margin:'auto'}}>
+			// 	<AnSpreadsheet
+			// 	 	ref={ (ref) => this.sheetRef = ref }
+			// 		tier={this.tier as Spreadsheetier}
+            //         onSheetReady={(params) => this.api = params.api}
+			// 		autosave={true}
+			// 		onCellClicked={this.tier.onCellClick}
+			// 		columns={this.tier.columns4print()}
+			// 		rows={this.tier.rows} />
+			//   </div>
+			}
 			<div style={{textAlign: 'center', background: '#f8f8f8'}} className={'noPrint'}>
 				<Button variant="outlined"
 					disabled={!this.buttons.save}

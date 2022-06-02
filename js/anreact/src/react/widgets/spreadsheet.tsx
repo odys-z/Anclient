@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol } from '@anclient/semantier';
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, isEmpty } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { AnConst } from '../../utils/consts';
 
@@ -83,6 +83,12 @@ export interface SheetCol extends TierCol {
 	form?: JSX.Element;
 
 	noAllItem?: boolean,
+
+	/** An additional option item for clear the selection (an additonal clear button)
+	 * 
+	 * How this works: have encoder return a null value - so currently only works for relation table
+	 */
+	delText?: string;
 
 	suppressSizeToFit?: boolean;
 	resizable?: boolean;
@@ -221,6 +227,14 @@ export class Spreadsheetier extends Semantier {
 							that.cbbOptions[c.field] = ns;
 							that.cbbItems[c.field] = rows;
 						}
+						else {
+							that.cbbOptions[c.field] = [];
+							that.cbbItems[c.field] = [];
+						}
+						if ( c.delText ) {
+							that.cbbOptions[c.field].unshift(c.delText)
+							that.cbbItems[c.field].unshift( { n: c.delText, v: undefined } );
+						}
 					}
 				  });
 				  delete c.sk;
@@ -328,7 +342,7 @@ export class Spreadsheetier extends Semantier {
 		rec[this.pkval.pk] = this.pkval.v;
 
 		let {value, oldValue} = p;
-		if (value !== oldValue) {
+		if (value !== oldValue && (value || oldValue)) {
 			value = this.encode(p.colDef.field, value, p.data);
 
 			rec[p.colDef.field] = value;
@@ -341,11 +355,6 @@ export class Spreadsheetier extends Semantier {
 	}
 
 	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
-		// function activator<S>(type: {
-		// 		new(...arg: any[]) : SpreadsheetReq,
-		// 	} ): S {
-		// 	return new type(conds) as unknown as S;
-		// }
 
 		if (!this.client) return;
 
