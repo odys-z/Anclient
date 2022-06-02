@@ -12,7 +12,7 @@ import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext } from '../../react/reactext'
 import { AnTreegrid } from '../../react/widgets/treegrid'
 
-const styles = (theme: Theme) => ( {
+const styles = (_theme: Theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'

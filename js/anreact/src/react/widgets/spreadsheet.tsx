@@ -8,10 +8,9 @@ import { CellClickedEvent, ColDef, Column, ColumnApi,
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
-import { TierCol, Tierec, Semantier, Semantext, NV, toBool, UpdateReq, Inseclient, UIComponent, PkMeta,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq } from '@anclient/semantier';
+import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, isEmpty } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
-import { ComboCondType } from './query-form';
 import { AnConst } from '../../utils/consts';
 
 /**
@@ -71,10 +70,25 @@ export interface SheetCol extends TierCol {
 	label: string;
 	field: string;
 
-	/**cell type, default: text */
-	type?: 'text' | 'cbb';
+	/**cell type, default: text
+	 * - cbb: bind options with sk
+	 * - dynamic-cbb: options changing for each rows, work together with cbbOptions
+	 */
+	type?: 'text' | 'cbb' | 'dynamic-cbb';
+	/** dynamic options per record. */
+	cbbOptions?: (rec: SpreadsheetRec) => string[] 
 	sk?  : string;
+	sqlArgs?: string[],
+
 	form?: JSX.Element;
+
+	noAllItem?: boolean,
+
+	/** An additional option item for clear the selection (an additonal clear button)
+	 * 
+	 * How this works: have encoder return a null value - so currently only works for relation table
+	 */
+	delText?: string;
 
 	suppressSizeToFit?: boolean;
 	resizable?: boolean;
@@ -93,6 +107,20 @@ export interface SpreadsheetRec extends Tierec {
 	id?: string,
 	css?: CSSProperties,
 }
+
+export class SpreadsheetResp extends AnsonResp {
+	rec: SpreadsheetRec;
+
+	constructor(json) {
+		super(json);
+		this.rec = json.rec;
+	}
+}
+
+Protocol.registerBody("io.odysz.jsample.semantier.SpreadsheetResp",
+	(json) => {
+		return new SpreadsheetResp(json);
+	});
 
 /**
  * According to ag-grid document, p's type is any: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
@@ -140,27 +168,33 @@ export class SpreadsheetReq extends UserReq {
 		records: 'r',
 		rec: 'rec',
 	}
+	page: PageInf;
 
-	constructor(opts: {type: string, tabl?: string}) {
+	constructor(opts: {type: string, tabl?: string, query: PageInf}) {
 		super(undefined, opts.tabl);
+
+		if (!opts)
+			throw Error("Argument opts is required. If this is not checked by Typescript, it's probably the registered constructor doesn't work.")
 
 		if (!opts.type)
 			throw Error("opts.type is undefined. Spreadsheet is a mimic of Generic type, but can only work with type explictly specified.");
 		this.type = opts.type;
+
+		this.page = opts.query;
 	}
 }
 
 
-export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
-	static reqfactory: (conds: PageInf) => SpreadsheetReq;
+export class Spreadsheetier extends Semantier {
+	static reqfactory: (conds: PageInf, rec?: SpreadsheetRec) => SpreadsheetReq;
 
-	static registerReq(factory: (conds: PageInf) => SpreadsheetReq) {
+	static registerReq(factory: (conds: PageInf, rec: SpreadsheetRec) => SpreadsheetReq) {
 		Spreadsheetier.reqfactory = factory;
 	}
 
 	/**jserv port name, e.g. 'workbook' */
 	port: string;
-	currentRecId: any;
+	// currentRecId: any;
 
 	constructor(port: string, props: {uri: string, pkval: PkMeta, cols: SheetCol[]}) {
 		super(props);
@@ -177,14 +211,14 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 		let that = this;
 		let an = ctx.anReact as AnReactExt;
 		// load all options
-		this._cols?.forEach((c: ComboCondType, x: number) => {
+		this._cols?.forEach((c: SheetCol, x: number) => {
 			if (c.type === 'cbb') {
 				if (c.sk) {
 				  an.ds2cbbOptions({
 					uri: this.uri,
 					sk: c.sk as string,
-					nv: c.nv,
-					noAllItem: toBool(c.noAllItam, true),
+					nv: {n: 'name', v: 'value'}, //c.nv,
+					noAllItem: toBool(c.noAllItem, true),
 					sqlArgs: c.sqlArgs,
 					onLoad: (_cols, rows) => {
 						if (rows) {
@@ -193,11 +227,23 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 							that.cbbOptions[c.field] = ns;
 							that.cbbItems[c.field] = rows;
 						}
+						else {
+							that.cbbOptions[c.field] = [];
+							that.cbbItems[c.field] = [];
+						}
+						if ( c.delText ) {
+							that.cbbOptions[c.field].unshift(c.delText)
+							that.cbbItems[c.field].unshift( { n: c.delText, v: undefined } );
+						}
 					}
 				  });
 				  delete c.sk;
 				}
 				else console.warn("Combobox cell's option loading ignored for null sk: ", c);
+			}
+			else if (c.type === 'dynamic-cbb') {
+				// that.cbbOptions[c.field] = c.cbbOptions;
+				// delete c.cbbOptions;
 			}
 		});
 
@@ -225,9 +271,11 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 	 *
 	 * @param field field name for finding NV records to decode.
 	 * @param v
+	 * @param rec current row (p.data)
 	 * @returns showing element
 	 */
-	decode(field: string, v: string): string | Element {
+	decode(field: string, v: string, rec: SpreadsheetRec): string | Element {
+		v = rec[field] as string;
 		let nvs = this.cbbItems[field];
 		for (let i = 0; i < nvs?.length; i++)
 			if (nvs[i].v === v)
@@ -240,9 +288,10 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 	 *
 	 * @param field
 	 * @param n
+	 * @param rec not used
 	 * @returns
 	 */
-	encode(field: string, n: string): string | object {
+	encode(field: string, n: string, rec: SpreadsheetRec): string | object {
 		let nvs = this.cbbItems[field];
 		if (!nvs) // plain text
 			return n;
@@ -254,10 +303,29 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 	}
 
 	onCellClick (e: CellClickedEvent) {
-		this.currentRecId = e.data[this.pkval.pk];
+		this.pkval.v = e.data[this.pkval.pk];
 	};
 
-	updateCell(p: CellEditingStoppedEvent) {
+	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: ErrorCtx) {
+		console.log(rec);
+
+		if (!this.client) return;
+		let client = this.client;
+
+		let req = client.userReq(this.uri, this.port,
+						Spreadsheetier.reqfactory( undefined, rec)
+						.A( crud === CRUD.d ? SpreadsheetReq.A.delete :
+							crud === CRUD.c ? SpreadsheetReq.A.insert :
+							SpreadsheetReq.A.update ) );
+
+		client.commit(req, ok, err);
+	}
+
+	columns (modifier?: {[x: string]: AnElemFormatter}): Array<SheetCol> {
+		return this._cols as Array<SheetCol>;
+	}
+
+	updateCell(p: CellEditingStoppedEvent, ok?: OnCommitOk) : void {
 		if (!this.client) {
 			console.error("somthing wrong ...");
 			return;
@@ -269,15 +337,17 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 		if (this.client instanceof Inseclient)
 			throw Error("Spreadsheetir.updateCell is using port.update, and can only work in session mode. To use in session less mode, user need override this method or provide SheetCol.onEditStop.");
 
-		let client = this.client;
-		let pkv = p.data[this.pkval?.pk]
-		let v   = p.data[p.colDef.field]
+		let rec = {} as SpreadsheetRec;
+		// rec[this.pkval.pk] = this.currentRecId;
+		rec[this.pkval.pk] = this.pkval.v;
 
-		let req = client.userReq(this.uri, 'update',
-						new UpdateReq( this.uri, this.pkval.tabl, {pk: this.pkval.pk, v: pkv} )
-						.nv(p.colDef.field, v) );
+		let {value, oldValue} = p;
+		if (value !== oldValue && (value || oldValue)) {
+			value = this.encode(p.colDef.field, value, p.data);
 
-		client.commit(req, () => {}, this.errCtx);
+			rec[p.colDef.field] = value;
+			this.update(CRUD.u, rec, ok, this.errCtx);
+		}
 	}
 
     record(conds: PageInf, onLoad: OnLoadOk<SpreadsheetRec>) : void {
@@ -285,23 +355,13 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 	}
 
 	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
-		function activator<S>(type: {
-				new(...arg: any[]) : SpreadsheetReq,
-			} ): S {
-			return new type(conds) as unknown as S;
-		}
 
 		if (!this.client) return;
 
 		let client = this.client;
 		let that = this;
 
-		// let r: R = activator<R>(SpreadsheetReq);
-		// if (r.type === 'io.odysz.semantic.jserv.user.UserReq')
-		// 	throw Error('');
-		// r.type = r.getType();
 		let r = Spreadsheetier.reqfactory(conds);
-
 
 		let req = client.userReq(this.uri, this.port,
 					r.A(SpreadsheetReq.A.records) );
@@ -318,11 +378,13 @@ export class Spreadsheetier<R extends SpreadsheetReq> extends Semantier {
 
 	insert(onOk: OnCommitOk) {
 		console.log('can be abstracted?');
-	}
+		let bd = Spreadsheetier.reqfactory(undefined).A(SpreadsheetReq.A.insert);
+		let req = this.client.userReq(this.uri,
+			this.port, bd);
+			// new MyBookReq( undefined ).A(MyBookReq.A.insert));
 
-	 columns (modifier?: {[x: string]: AnElemFormatter}): Array<SheetCol> {
-		 return this._cols as Array<SheetCol>;
-	 }
+		this.client.commit(req, onOk, this.errCtx);
+	}
 }
 
 export interface SpreadsheetProps extends Comprops {
@@ -330,7 +392,7 @@ export interface SpreadsheetProps extends Comprops {
 	/** Initial rows - updated with jserv response */
 	rows: Tierec[];
 
-	tier: Spreadsheetier<any>;
+	tier: Spreadsheetier;
 
 	/** not used - only for AgGridReact community version */
 	contextMenu?: object;
@@ -340,7 +402,8 @@ export interface SpreadsheetProps extends Comprops {
 	onSheetReady?: (e: GridReadyEvent) => void;
 }
 
-/**Thin wrapper of ag-grid.
+/**
+ * Thin wrapper of ag-grid.
  *
  * For ag-grid practice, go
  * https://stackblitz.com/edit/ag-grid-react-hello-world-8lxdjj?file=index.js
@@ -370,7 +433,10 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	gridColumnApi: ColumnApi;
 
 	isEditable = true;
-	tier: Spreadsheetier<any>;
+	tier: Spreadsheetier;
+
+	ref: AgGridReact;
+	api: GridApi;
 
 	constructor(props: SpreadsheetProps) {
 		super(props);
@@ -411,7 +477,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 					  c.thFormatter ? c.thFormatter() :
 						{ headerName, ...c}) as ColDef;
 
-				if (col.type === 'cbb') {
+				if (col.type === 'cbb' || col.type === 'dynamic-cbb') {
 					col.type = undefined; // 'agSelectEditor';
 					col.cellEditor = 'agSelectCellEditor';
 					// p type is any (May 2022):
@@ -419,7 +485,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 					col.cellEditorParams = (p: CbbCellValue) => {
 						return { values: that.props.tier.cbbCellOptions(p) };
 					  };
-					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p.colDef.field, p.value))
+					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p.colDef.field, p.value, p.data))
 					// col.onCellEditingStopped = anEditStop
 					// (e: { value: any; data: SpreadsheetRec; }) => {
 					// }
@@ -433,13 +499,14 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 
 	componentDidMount() {
 		this.tier.setContext(this.context);
-		this.tier.setContext(this.context);
 		this.tier.loadCbbOptions(this.context);
 
 		let that = this;
 		this.tier.records(undefined, () => that.setState({ready: true}));
-		// this.setState({});
 	}
+
+	getRef() { return this.ref; }
+	getApi() { return this.api; }
 
 	/** load default context menu, together with user's menu items.
 	 * user's menu items defined in props like:
@@ -480,6 +547,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 		this.gridColumnApi = params.columnApi;
 
 		params.api.sizeColumnsToFit();
+		this.api = params.api;
 	};
 
 	onFirstDataRendered = (params: { api: { sizeColumnsToFit: () => void; }; }) => {
@@ -518,6 +586,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	render () {
 	  return (
 		<AgGridReact
+			ref={(ref) => this.ref = ref}
 			onCellClicked={this.onCellClicked}
 			columnDefs={this.coldefs}
 			components={this.props.components}

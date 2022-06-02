@@ -44,7 +44,7 @@ export function toBool(str: string | number | boolean, undefinedNull?: boolean):
 			? false : true;
 }
 
-/**@deprecated moved to @anclient/semantier
+/**@deprecated moved to Semantier.
  * @param str 
  * @returns 
  */

@@ -149,7 +149,8 @@ export class MyInfTier extends Semantier {
 		super(comp);
 		// FIXME move to super class?
 		// this.uri = comp.uri;
-		this.mtabl = 'a_users';
+		// this.mtabl = 'a_users';
+		this.pkval.tabl = 'a_users';
 		this.pkval.pk = 'userId';
 
 		this.loadAvatar = this.loadAvatar.bind(this);
@@ -226,7 +227,7 @@ export class MyInfTier extends Semantier {
 
 		let req = this.client
 					.usrAct(this.uri, CRUD.u, "save", "save my info")
-					.update(this.uri, this.mtabl,
+					.update(this.uri, this.pkval.tabl,
 							{pk: this.pkval.pk, v: opts.pkval},
 							{roleId, userName});
 		// about attached image:
@@ -238,7 +239,7 @@ export class MyInfTier extends Semantier {
 			req.Body()
 				.post( new DeleteReq(this.uri, "a_attaches", undefined)
 					.whereEq('busiId', rec[this.pkval.pk] as string || '')
-					.whereEq('busiTbl', this.mtabl) );
+					.whereEq('busiTbl', this.pkval.tabl) );
 		if ( rec[this.imgProp] ) {
 			if (!rec.fileMeta)
 				console.error("Uploading file without fileMeta information?");
@@ -257,7 +258,7 @@ export class MyInfTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
+					that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);

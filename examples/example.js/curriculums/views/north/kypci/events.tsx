@@ -5,42 +5,44 @@ import { withStyles } from '@material-ui/core/styles';
 import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
-	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext,
-	QueryPage, toPageInf, Spreadsheetier, CellEditingStoppedEvent,
+	L, Comprops, CrudComp,
+	jsample, AnSpreadsheet, SpreadsheetRec, AnContext,
+	toPageInf, Spreadsheetier, SpreadsheetReq,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { Curriculum, CourseReq } from './tier';
 import { StarTheme } from '../../../common/star-theme';
 
 const styles = (_theme: StarTheme) => ({
 	root: {
 		// height: "calc(100vh - 92ch)"
-		height: "72vh"
+		height: "82vh"
 	},
 	actionButton: {
 	},
 	usersButton: {
-		// marginLeft: 20,
-		// marginRight: 20,
 		margin: 6,
-		width: 120,
+		width: L("events-btn-width"),
 	}
 });
 
-class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
+interface EventRec extends SpreadsheetRec {
+
+}
+
+class EventReq extends SpreadsheetReq {
+    rec: EventRec;
+
+    constructor(conds?: PageInf, rec?: EventRec) {
+        super({type: 'io.oz.curr.north.APEventReq', query: conds});
+        this.rec = rec;
+    }
+}
+
+class EventsComp extends CrudComp<Comprops & {conn_state: string}>{
 	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
-
-	conds = { pageInf: new PageInf(0, 20),
-			  query: [
-				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
-				  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
-				{ type: 'cbb', sk: 'curr-subj', uri: this.uri,
-				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
-			] } as QueryPage;
 
 	constructor(props: Comprops & {conn_state: string}) {
 		super(props);
@@ -52,22 +54,19 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.toAdd = this.toAdd.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
-		this.onEdited = this.onEdited.bind(this);
 
 		/** Let's move this to Spreadsheetier's constructor parameter */
-		Spreadsheetier.registerReq((conds: PageInf, rec: Curriculum) => { return new CourseReq(conds, rec) });
+		Spreadsheetier.registerReq((conds: PageInf, rec: EventRec) => { return new EventReq(conds, rec) });
 
-		this.tier = new Spreadsheetier('curriculum',
+		this.tier = new Spreadsheetier('apevents',
 			{ uri: this.uri,
-			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},
+			  pkval: {pk: 'eId', v: undefined, tabl: 'b_currevents'},
 			  cols: [
-				{ field: 'cId', label: L("Id"), width: 120, editable: false },
-				{ field: 'currName', label: L("curriculum"), width: 160 },
-				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level',
-				  onEditStop: this.onEdited },
-				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
-				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
-				{ field: 'remarks', label: L("Remarks"), width: 360, type: 'text' },
+				{ field: 'eId', label: L("Event Id"), width: 120, editable: false },
+				{ field: 'eventName', label: L("Event"), width: 160 },
+				{ field: 'yyyymm', label: L("Year"), width: 120 },
+				{ field: 'estate', label: L("estate"), width: 80, type: 'cbb', sk: 'evt-state' },
+				{ field: 'remarks', label: L("Remarks"), width: 400 },
 			] });
 	}
 
@@ -78,11 +77,6 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.tier.setContext(this.context);
 
 		this.setState({});
-	}
-
-	onEdited(p: CellEditingStoppedEvent): void {
-		// TODO set background color
-		this.tier.updateCell(p);
 	}
 
 	icon(e: SpreadsheetRec) {
@@ -98,9 +92,10 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
-		this.tier.records(toPageInf(this.conds),
+		this.tier.records( undefined,
 			(_cols, rows) => {
 				that.tier.rows = rows;
+                that.tier.resetFormSession();
 				that.setState({})
 			});
 	}
@@ -116,16 +111,9 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 	}
 
 	render() {
-		let that = this;
 		let {classes} = this.props;
 
 		return (<div>
-			{<AnQueryst
-				uri={this.uri}
-				fields={this.conds.query}
-				onSearch={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
-				onReady={() => that.tier.records(that.queryConds(), () => {that.setState({})}) }
-			/>}
 			{this.tier &&
 			  <div className='ag-theme-alpine' style={{height: '68vh', width: '100%', margin:'auto'}}>
 				<AnSpreadsheet
@@ -141,14 +129,14 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 					color='primary'
 					onClick={this.toAdd}
 					endIcon={<JsampleIcons.Add />}
-				>{L('Append')}
+				>{L('Add AP Event')}
 				</Button>
 				<Button variant="outlined"
 					className={classes.usersButton}
 					color='secondary'
 					onClick={this.toDel}
 					endIcon={<JsampleIcons.Delete />}
-				>{L('Delete')}
+				>{L('Delete Event')}
 				</Button>
 			</div>
 			{this.confirm}
@@ -156,10 +144,10 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 	}
 
 	queryConds(): PageInf {
-		return toPageInf(this.conds);
+		return toPageInf(undefined);
 	}
 }
-CourseComp.contextType = AnContext;
+EventsComp.contextType = AnContext;
 
-const Course = withStyles(styles)(CourseComp);
-export { Course, CourseComp };
+const APEvents = withStyles(styles)(EventsComp);
+export { APEvents, EventsComp };

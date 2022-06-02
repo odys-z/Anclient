@@ -1,6 +1,10 @@
 
 export const StarPorts = {
 	menu: "menu.serv",
-	curriculum: 'curr.tier',
 	userstier: 'users.tier',
+
+	apevents: 'apevent.tier',
+	curriculum: 'curr.tier',
+	mydecisions: 'my.tier',
+	progress: 'progress.tier',
 }

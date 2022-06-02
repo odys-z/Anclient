@@ -20,7 +20,7 @@ export interface ComboCondType extends TierComboField<JSX.Element, CompOpts> {
 	sk: string,
 	type: 'cbb' | 'autocbb';
 	/** Without '-- ALL --' option */
-	noAllItam?: boolean;
+	noAllItem?: boolean;
 };
 
 const styles = (theme: Theme) => ( {
@@ -118,6 +118,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 						// user uses this, e.g. name and value to access data
 						nv: cond.nv,
 						sqlArgs: cond.sqlArgs,
+						noAllItem: cond.noAllItem,
 						// cond,
 						onLoad: (_cols, rows) => {
 							cond.options = rows as NV[];
@@ -309,71 +310,6 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 					</Grid>);
 			} );
 		}
-
-		/** Render query form controls
-		 * @param{array} [conds] conditions
-		 * @return (auto complete) combobox
-		function conditions(conds: AnlistColAttrs<JSX.Element, CompOpts>[]) {
-		  return conds
-			.filter((c, _x ) => !!c)
-			.map( (cond: ComboCondType, x) => {
-				if (cond.type === 'cbb') {
-					let refcbb = React.createRef<HTMLDivElement>();
-					// let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
-					return (<Autocomplete<ComboItem> key={'cbb' + x}
-						id={String(x)} data-name={String(x)} ref={refcbb}
-						onChange={ that.onCbbRefChange(refcbb) }
-						onInputChange={ that.onCbbRefChange(refcbb) }
-						options={cond.options || [AnConst.cbbAllItem]}
-						getOptionLabel={ (it) => it ? it.n || '' : '' }
-						getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
-						style={{ width: classes.width || 300 }}
-						renderInput={(params) => <TextField {...params} label={cond.label} variant="outlined" />}
-					/>);
-				}
-				else if (cond.type === 'autocbb') {
-					let refcbb = React.createRef<HTMLDivElement>();
-					// let v = cond && cond.val ? cond.val : AnConst.cbbAllItem;
-					return (<Autocomplete<ComboItem> key={'cbb' + x}
-						id={String(x)} data-name={String(x)} ref={refcbb}
-						onChange={ that.onCbbRefChange(refcbb) }
-						options={cond.options}
-						getOptionLabel={ (it) => it && it.n ? it.n || '' : '' }
-						getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
-						style={{ width: classes.width || 300 }}
-						renderInput={(params) => <TextField {...params} label={cond.label} variant="outlined" />}
-					/>);
-				}
-				else if(cond.type === "date"){
-					//uncontrolled Components
-					//let refDate = React.createRef();
-					//uncontrolled Components to controlled component
-					let v = cond && cond.val ? cond.val : '';
-					let label = cond && cond.label ? cond.label : "date"
-					return (
-						<TextField key={x} value = {v} label={label}
-							type="date" style={{ width: 300 }}
-							onChange = {event => {that.onDateChange(event, x)}}
-							InputLabelProps={{ shrink: true }}/>
-					)
-				}
-				else if (cond.type === "switch") {
-					// let v = cond && cond.val || false;
-					let v = toBool(cond.val);
-					return (
-						<FormControlLabel key={'sch' + x}
-					        control={ <Switch key={x}
-										checked={v} color='primary'
-										onChange = {e => {that.onSwitchChange(e, x)}} /> }
-							label={cond.label} />
-					);
-				}
-				else // if (cond.type === 'text')
-					return (<TextField label={cond.label} key={'text' + x}
-						id={String(x)} value={cond.val || ''}
-						onChange={e => {that.onTxtChange(e, x)}}/>);
-			} );
-		 */
 	}
 }
 AnQuerystComp.contextType = AnContext;
@@ -394,7 +330,7 @@ export interface QueryFormProps extends Comprops {
 	onSearch?: (conds: QueryConditions | PageInf) => void,
 
 	/**Bounding components successfully
-	 * 
+	 *
 	 * @deprecated replaced by onQuery
 	 */
 	onLoaded?: (conds: QueryConditions | PageInf) => void,

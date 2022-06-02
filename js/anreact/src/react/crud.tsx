@@ -4,7 +4,7 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
 import { Media, ClassNames } from './anreact';
-import { CRUD, Semantier, UIComponent } from '@anclient/semantier';
+import { CRUD, Semantier, SessionInf, UIComponent } from '@anclient/semantier';
 
 interface Comprops extends StandardProps<any, string>, UIComponent {
 	/**The matching url in React.Route */
@@ -20,6 +20,8 @@ interface Comprops extends StandardProps<any, string>, UIComponent {
 	classes?: ClassNames;
 	readonly tier?: Semantier;
 	readonly width?: Breakpoint;
+
+	ssInf?: SessionInf;
 }
 
 const styles = (theme: Theme) => ( {

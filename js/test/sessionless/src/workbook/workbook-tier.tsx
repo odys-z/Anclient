@@ -26,7 +26,7 @@ values ('b_curriculums.cId', 0, 'north.curr');
 
 select * from b_curriculums;
  */
-class MyWorkbookTier extends Spreadsheetier<MyBookReq<MyCurriculum>> {
+class MyWorkbookTier extends Spreadsheetier {
 	static curriculPk = {pk: 'cid', v: undefined, tabl: 'b_curriculums'};
 
 	/**
@@ -132,14 +132,14 @@ class MyBookReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 
 	port: 'workbook';
 
-	rec: SpreadsheetRec;
-	page: PageInf;
+	rec: T;
+	// page: PageInf;
 	// conds: Array<string[]>;
 
 	constructor(query?: PageInf, rec?: T) {
-		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
+		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq', query});
 
-		this.page = query;
+		// this.page = query;
 		this.rec = rec;
 	}
 }

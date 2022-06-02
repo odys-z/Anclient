@@ -115,12 +115,11 @@ class LoginComp extends React.Component<LoginProps> {
 			if (typeof that.props.onLoginOk === 'function')
 				that.props.onLoginOk(client);
 			else if (ctx.iparent) {
-				// FIXME this branch can't work for npm package anclient.
-				// FIXME but why?
 				ctx.ssInf = client.ssInf;
 				SessionClient.persistorage(client.ssInf);
-				ctx.iparent.location = client.ssInf.home ?
-							client.ssInf.home : `${ctx.ihome}?serv=${ctx.servId}`;
+				// ctx.iparent.location = client.ssInf.home ?
+				// 			client.ssInf.home : `${ctx.ihome}?serv=${ctx.servId}`;
+				ctx.iparent.location = `${ctx.ihome}?serv=${ctx.servId}`;
 			}
 			else
 				console.error('Logged in successfully but results be ignored: ', client);
