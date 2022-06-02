@@ -1,4 +1,4 @@
-import { Protocol, AnsonResp, PageInf} from '@anclient/semantier';
+import { PageInf} from '@anclient/semantier';
 
 import { Spreadsheetier, SpreadsheetRec, SpreadsheetReq } from '@anclient/anreact';
 import { CSSProperties } from 'react';
