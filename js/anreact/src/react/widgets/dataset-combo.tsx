@@ -144,7 +144,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			ref={this.refcbb}
 			disabled={this.props.disabled || this.props.readonly || this.props.readOnly}
 			// defaultValue={this.props.val}
-			value={v}
+			value={this.props.noAllItem ? undefined : v}
 			onChange={ this.onCbbRefChange(this.refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'

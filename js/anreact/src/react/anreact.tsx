@@ -1,8 +1,7 @@
 
 import $ from 'jquery';
 
-import { stree_t, Tierec,
-	SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
+import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames, NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
 } from '@anclient/semantier';
 

@@ -7,12 +7,11 @@ import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 import {
 	L, Comprops, CrudComp,
 	jsample, AnSpreadsheet, SpreadsheetRec, AnContext,
-	toPageInf, Spreadsheetier, CellEditingStoppedEvent, SpreadsheetReq,
+	toPageInf, Spreadsheetier, SpreadsheetReq,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
 import { StarTheme } from '../../../common/star-theme';
-import { ThreeSixtySharp } from '@material-ui/icons';
 
 const styles = (_theme: StarTheme) => ({
 	root: {
@@ -44,14 +43,6 @@ class EventsComp extends CrudComp<Comprops & {conn_state: string}>{
 	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
-
-	// conds = { pageInf: new PageInf(0, 20),
-	// 		  query: [
-	// 			{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
-	// 			  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
-	// 			{ type: 'cbb', sk: 'curr-subj', uri: this.uri,
-	// 			  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
-	// 		] } as QueryPage;
 
 	constructor(props: Comprops & {conn_state: string}) {
 		super(props);

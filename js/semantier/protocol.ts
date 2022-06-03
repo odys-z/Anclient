@@ -238,6 +238,10 @@ export class Protocol {
 	 * @param bodyConstructor AnsonBody constructor
 	 */
 	static registerBody = function(type: string, bodyConstructor: { (json: any): AnsonBody; } ) {
+		if ( Protocol.ansonTypes[type] )
+			console.error("Repeatedly registering protocol body, wrong type registering?",
+				type, Protocol.ansonTypes, bodyConstructor);
+
 		Protocol.ansonTypes[type] = bodyConstructor;
 	}
 

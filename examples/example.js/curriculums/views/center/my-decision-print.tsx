@@ -5,11 +5,13 @@ import { Theme, withStyles } from '@material-ui/core/styles';
 import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } from '@anclient/semantier';
 
 import {
-	L, ComboCondType, Comprops, CrudComp,
-	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, DatasetCombo, AnContextType, CbbCellValue, SpreadsheetResp,
+	L, ComboCondType, Comprops, CrudComp, AnContextType,
+	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, DatasetCombo,
+	Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, CbbCellValue, SpreadsheetResp,
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent, GridApi } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
+import { MyScore } from './my-scores';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
@@ -40,28 +42,40 @@ const setNormal = (api) => {
     eGridDiv.style.height = '200px';
     api.setDomLayout();
 };
- 
 
-interface Decision extends SpreadsheetRec {
+export interface Decision extends SpreadsheetRec {
+	/** client only */
+	dirty?: boolean;
 
-	dirty: boolean;
-	cId: string;
-	myCourses: Course[];
+	/** optional for myId = eventId + kid */
+	myId?: string;
+	eventId: string;
+	cIds: Course[];
 }
 
-class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
+export class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 	rec: T;
+	myscore: MyScore;
 
 	static A = Object.assign(SpreadsheetReq.A,
-		{ courses: 'r/courses', });
+		{ courses: 'r/courses',
+		  scores: 'u/scores',
+		  loadScore: 'r/scores',
+		});
 
-	constructor(query: PageInf, rec: T) {
+	constructor(query?: PageInf, rec?: T) {
 		super({type: 'io.oz.curr.decision.MyReq', tabl: 'b_mydecissions', query});
 		this.rec = rec;
 	}
+
+	scores(score: MyScore) {
+		this.myscore = score;
+		this.myscore.type = "io.oz.curr.decision.MyScore";
+		return this;
+	}
 }
 
-class MyCoursesTier extends Spreadsheetier {
+export class MyCoursesTier extends Spreadsheetier {
 	eventId?: string;
 	/** client buffer for updating rows */
 	courses: {[cId: string]: Course[]};
@@ -76,6 +90,10 @@ class MyCoursesTier extends Spreadsheetier {
 
 		this.coursesPerModule = {};
 		this.courseItemsPerModule = {};
+	}
+
+	columns4print(): SheetCol[] {
+		return (this._cols as SheetCol[]).splice(0, this._cols.length - 2);
 	}
 
 	loadCourses(ctx: AnContextType) {
@@ -110,6 +128,12 @@ class MyCoursesTier extends Spreadsheetier {
 						that.courseItemsPerModule[r.module].push({n: r.currName, v: r.cId});
 						that.coursesPerModule[r.module].push(r.currName);
 					});
+
+					// delete option
+					for (let m in that.courseItemsPerModule) {
+						that.courseItemsPerModule[m].push({n: L(' - clear - '), v: undefined});
+						that.coursesPerModule[m].push(L(' - clear - '));
+					}
 			},
 			this.errCtx);
 	}
@@ -120,6 +144,14 @@ class MyCoursesTier extends Spreadsheetier {
 		return this.cbbOptions[p.colDef?.field] || [p.value];
 	}
 
+	/**
+	 * Enocde name to code according cbb items data.
+	 * 
+	 * @param field 
+	 * @param n 
+	 * @param rec current row for dynamic encoding (current module for each course groups)
+	 * @returns 
+	 */
 	encode(field: string, n: string, rec: Course): string | object {
 		if (field === 'cId') {
 			let nvs = this.courseItemsPerModule[rec.module];
@@ -136,6 +168,7 @@ class MyCoursesTier extends Spreadsheetier {
 	}
 
 	decode(field: string, v: string, rec: Course): string | Element { 
+		v = rec[field] as string;
 		if (field === 'cId') {
 			let nvs = this.courseItemsPerModule[rec.module];
 			for (let i = 0; i < nvs?.length; i++)
@@ -154,24 +187,27 @@ class MyCoursesTier extends Spreadsheetier {
 
 		let {value, oldValue} = p;
 		if (value !== oldValue) {
-			let row = this.rows[p.rowIndex] as Course;
-			row = Object.assign(row, this.courses[row.module]?.[this.encode('cId', row.cId, row) as string]);
-			console.log('new course', row);
-			row.dirty = true;
+			if (p.colDef.field === Course.pk) {
+				let row = this.rows[p.rowIndex] as Course;
+				let cId = this.encode('cId', value, row) as string;
+				if (cId) { // not clearing
+					row = Object.assign(row, this.courses[row.module]?.[cId]);
+					console.log('new course', row);
+				}
+				else {
+					// clear the row
+					row.cId = undefined;
+					row.cate = undefined;
+					row.clevel = undefined;
+					row.currName = undefined;
+					row.subject = undefined;
+					row.remarks = undefined;
+				}
+				row.dirty = true;
 
-			onOk(undefined);
+				onOk(undefined);
+			}
 		}
-
-		// let rec = {myId: this.myId} as Decision;
-		// rec[this.pkval.pk] = this.pkval.v;
-
-		// let {value, oldValue} = p;
-		// if (value !== oldValue) {
-		// 	value = this.encode(p.colDef.field, value);
-
-		// 	rec[p.colDef.field] = value;
-		// 	this.update(CRUD.u, rec, onOk, this.errCtx);
-		// }
 	}
 }
 
@@ -191,6 +227,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	gridRef: React.MutableRefObject<undefined>;
     sheetRef: AnSpreadsheet;
     api: GridApi;
+	buttons = {save: false, export: false, upload: false};
 	
 	getUserId() {
 		return this.props.ssInf.uid;
@@ -206,6 +243,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.toSave = this.toSave.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.toPrint = this.toPrint.bind(this);
+		this.toUpload = this.toUpload.bind(this);
 		this.edited = this.edited.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 		this.onSelectDecision = this.onSelectDecision.bind(this);
@@ -216,16 +254,16 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			{ uri: this.uri,
 			  pkval: {pk: 'module', v: undefined, tabl: 'b_mycourses'},
 			  cols: [
-				{ field: 'myId', label: L("decision Id"), width: 10, visible: false },
+				{ field: 'myId', label: L("decision Id"), width: 10, hide: true },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited },
+				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited, delText: L('-- Clear --') },
 				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
-				{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj', editable: false },
+				{ field: 'remarks', label: L("Memo"), width: 140, type: 'text' },
+				{ field: 'descript', label: L("Remarks"), width: 200, type: 'text', editable: false },
 			] });
 		
         this.gridRef = React.createRef();
-
 	}
 
 	componentDidMount() {
@@ -256,46 +294,70 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
         this.tier.records(new PageInf(0, -1, 0, [['eventId', this.tier.eventId]]),
 			(_cols, rows) => {
 				that.tier.rows = rows;
+				that.api.redrawRows();
 				that.setState({})
 			});
 	}
 
     onSelectDecision (event: NV) : void {
-        // let that = this;
+		let ename = event.n;
+		let isActive = ename.startsWith("Active: ");
+
+		this.buttons.save = isActive;
+		this.buttons.export = isActive;
+		this.buttons.upload = isActive;
+
+		this.setState({})
+
         this.tier.eventId = event.v as string;
+
         this.bindSheet(undefined);
-        // this.tier.records(new PageInf(0, -1, 0, [['myId', this.tier.myId]]),
-		// 	(_cols, rows) => {
-		// 		that.tier.rows = rows;
-		// 		that.setState({})
-		// 	});
     };
 
 	edited (p: CellEditingStoppedEvent) : void {
 		this.tier.updateCell(p, () => {
-			if (p.colDef.field === 'cId')
+			if (p.colDef.field === 'cId') {
+				p.api.redrawRows();
 				this.setState({});
+			}
 		});
 	};
 
 	toSave(_e: React.UIEvent) {
 		let that = this;
-        this.tier.rec = {eventId: this.tier.eventId}
+        this.tier.rec = {
+			eventId: this.tier.eventId,
+			cIds: collectCourses(this.tier.rows as Course[])
+		} as Decision;
+
         // update id: eventId + usrId
 		this.tier.update(
 			this.tier.pkval.v ? CRUD.u : CRUD.c,
 			this.tier.rec, 
 			(resp: AnsonMsg<SpreadsheetResp>) => {
+				console.log(resp.Body());
 				that.tier.pkval.v = resp.Body().rec.myId;
 
-				let msg = resp.Body().msg;
+				let msg = resp.Body().msg();
 				this.confirm = (
 					<ConfirmDialog title={L('Info')}
 						ok={L('OK')} cancel={false} open
-						onClose={() => {that.confirm = undefined;} }
+						onClose={() => {
+							that.confirm = undefined;
+							that.setState({});
+						} }
 						msg={msg} />);
 				this.setState({});
 			}, this.context.error);
+		
+		function collectCourses(rows: Course[]) {
+			let cIds = [] as Course[];
+			rows?.forEach( (c, x) => {
+				if (!isEmpty(c.cId))
+					cIds.push( new Course({cId: c.cId, remarks: c.remarks} ));
+			});
+			return cIds;
+		}
 	}
 
 	toDel(e: React.UIEvent) {
@@ -303,8 +365,19 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	}
 
     toPrint(_e: React.UIEvent) {
+		// not working: this.tier._cols[this.tier._cols.length - 1].hide = true;
+		this.api.redrawRows();
+		this.setState({});
+
         setPrinterFriendly(this.api);
-        print();
+		setTimeout(function () {
+			print();
+			// setNormal(this.api);
+			// this.tier._cols[this.tier._cols.length - 1].hide = false;
+		  }, 1000);
+    }
+
+    toUpload(_e: React.UIEvent) {
     }
 
 	render() {
@@ -313,7 +386,11 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 		return (<div>
             <div className='noPrint'>
-			<DatasetCombo uri={this.uri} sk={'ann-evt'} noAllItem={true} className='noPrint' onSelect={this.onSelectDecision} />
+				<DatasetCombo uri={this.uri}
+					sk={'ann-evt'}
+					noAllItem={true}
+					className='noPrint'
+					onSelect={this.onSelectDecision} />
             </div>
             <div className='onlyPrint'>
                 <h1>{L('Signature')}</h1>
@@ -328,21 +405,43 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					onCellClicked={this.tier.onCellClick}
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />
-			  </div>}
+			  </div>
+			// &&
+			//   <div id="myGrid" className='ag-theme-alpine onlyPrint' style={{height: '60vh', width: '100%', margin:'auto'}}>
+			// 	<AnSpreadsheet
+			// 	 	ref={ (ref) => this.sheetRef = ref }
+			// 		tier={this.tier as Spreadsheetier}
+            //         onSheetReady={(params) => this.api = params.api}
+			// 		autosave={true}
+			// 		onCellClicked={this.tier.onCellClick}
+			// 		columns={this.tier.columns4print()}
+			// 		rows={this.tier.rows} />
+			//   </div>
+			}
 			<div style={{textAlign: 'center', background: '#f8f8f8'}} className={'noPrint'}>
 				<Button variant="outlined"
+					disabled={!this.buttons.save}
 					className={classes.usersButton}
 					color='primary'
 					onClick={this.toSave}
-					endIcon={<JsampleIcons.Add />}
+					endIcon={<JsampleIcons.Edit />}
 				>{L('Save')}
 				</Button>
 				<Button variant="outlined"
+					disabled={!this.buttons.export}
 					className={classes.usersButton}
 					color='primary'
 					onClick={this.toPrint}
-					endIcon={<JsampleIcons.Add />}
+					endIcon={<JsampleIcons.Export />}
 				>{L('Print')}
+                </Button>
+				<Button variant="outlined"
+					disabled={!this.buttons.upload}
+					className={classes.usersButton}
+					color='primary'
+					onClick={this.toUpload}
+					endIcon={<JsampleIcons.Up />}
+				>{L('Upload')}
                 </Button>
 			</div>
 			{ this.confirm }

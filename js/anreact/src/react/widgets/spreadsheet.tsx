@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx } from '@anclient/semantier';
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, isEmpty } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { AnConst } from '../../utils/consts';
 
@@ -77,12 +77,28 @@ export interface SheetCol extends TierCol {
 	type?: 'text' | 'cbb' | 'dynamic-cbb';
 	/** dynamic options per record. */
 	cbbOptions?: (rec: SpreadsheetRec) => string[] 
+
+	/** The semantic key - Spreadsheet load combobox options automaticall
+	 * 
+	 * A note about ag-grid warning:
+	 * invalid colDef property 'sk' did you mean any of these: __v_skip, ...
+	 * 
+	 * This warning occures when rendering Spreadsheet before all comboboxes' loading triggered
+	 * (where the sk be deleted). Currently avoiding this happening is depending on user's code.
+	 * There is no plan to solve this.
+	 */
 	sk?  : string;
 	sqlArgs?: string[],
 
 	form?: JSX.Element;
 
 	noAllItem?: boolean,
+
+	/** An additional option item for clear the selection (an additonal clear button)
+	 * 
+	 * How this works: have encoder return a null value - so currently only works for relation table
+	 */
+	delText?: string;
 
 	suppressSizeToFit?: boolean;
 	resizable?: boolean;
@@ -101,6 +117,20 @@ export interface SpreadsheetRec extends Tierec {
 	id?: string,
 	css?: CSSProperties,
 }
+
+export class SpreadsheetResp extends AnsonResp {
+	rec: SpreadsheetRec;
+
+	constructor(json) {
+		super(json);
+		this.rec = json.rec;
+	}
+}
+
+Protocol.registerBody("io.odysz.jsample.semantier.SpreadsheetResp",
+	(json) => {
+		return new SpreadsheetResp(json);
+	});
 
 /**
  * According to ag-grid document, p's type is any: https://www.ag-grid.com/react-data-grid/cell-editors/#reference-CellEditorSelectorResult-params
@@ -210,11 +240,22 @@ export class Spreadsheetier extends Semantier {
 							that.cbbOptions[c.field] = ns;
 							that.cbbItems[c.field] = rows;
 						}
+						else {
+							that.cbbOptions[c.field] = [];
+							that.cbbItems[c.field] = [];
+						}
+						if ( c.delText ) {
+							that.cbbOptions[c.field].unshift(c.delText)
+							that.cbbItems[c.field].unshift( { n: c.delText, v: undefined } );
+						}
 					}
 				  });
 				  delete c.sk;
 				}
 				else console.warn("Combobox cell's option loading ignored for null sk: ", c);
+			}
+			else if (c.type === 'text') {
+				delete c.type;
 			}
 			else if (c.type === 'dynamic-cbb') {
 				// that.cbbOptions[c.field] = c.cbbOptions;
@@ -246,10 +287,11 @@ export class Spreadsheetier extends Semantier {
 	 *
 	 * @param field field name for finding NV records to decode.
 	 * @param v
-	 * @param rec not used
+	 * @param rec current row (p.data)
 	 * @returns showing element
 	 */
 	decode(field: string, v: string, rec: SpreadsheetRec): string | Element {
+		v = rec[field] as string;
 		let nvs = this.cbbItems[field];
 		for (let i = 0; i < nvs?.length; i++)
 			if (nvs[i].v === v)
@@ -316,7 +358,7 @@ export class Spreadsheetier extends Semantier {
 		rec[this.pkval.pk] = this.pkval.v;
 
 		let {value, oldValue} = p;
-		if (value !== oldValue) {
+		if (value !== oldValue && (value || oldValue)) {
 			value = this.encode(p.colDef.field, value, p.data);
 
 			rec[p.colDef.field] = value;
@@ -329,11 +371,6 @@ export class Spreadsheetier extends Semantier {
 	}
 
 	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {
-		// function activator<S>(type: {
-		// 		new(...arg: any[]) : SpreadsheetReq,
-		// 	} ): S {
-		// 	return new type(conds) as unknown as S;
-		// }
 
 		if (!this.client) return;
 

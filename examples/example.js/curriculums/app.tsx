@@ -14,7 +14,9 @@ import { StarPorts } from './common/port';
 import { Course } from './views/north/kypci/courses';
 import { Progress } from './views/north/progress';
 import { My } from './views/center/my-decision-print';
+import { MyScores } from './views/center/my-scores';
 import { APEvents } from './views/north/kypci/events';
+import { welcome } from './views/center/nwelcome';
 
 export interface Approps {
     iportal?: string;
@@ -85,7 +87,7 @@ class App extends React.Component<Approps, any> {
 			{path: '/n/podiyi', comp: APEvents},
 			{path: '/n/kypci', comp: Course},
 			{path: '/n/ohlyad', comp: Progress},
-			{path: '/c/status', comp: Home},
+			{path: '/c/status', comp: MyScores},
 			{path: '/c/my', comp: My},
 		] );
 	}
@@ -168,7 +170,7 @@ class App extends React.Component<Approps, any> {
 					sys={L('AP Courses')} menuTitle={L('Sys Menu')}
 					myInfo={myInfoPanels}
 					hrefDoc={'docs/index.html'}
-					// welcome={welcome}
+					welcome={welcome}
 					onLogout={this.logout} />
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
