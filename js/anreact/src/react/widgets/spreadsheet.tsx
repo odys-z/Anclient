@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import React from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, ColDef, Column, ColumnApi,
@@ -12,6 +12,7 @@ import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
 	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, isEmpty } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { AnConst } from '../../utils/consts';
+import { CSSProperties } from '@material-ui/styles';
 
 /**
  * Short-cut for ag-grid-community (License: MID)
@@ -98,7 +99,7 @@ export interface SheetCol extends TierCol {
 	 * 
 	 * How this works: have encoder return a null value - so currently only works for relation table
 	 */
-	delText?: string;
+	delItemName?: string;
 
 	suppressSizeToFit?: boolean;
 	resizable?: boolean;
@@ -240,9 +241,9 @@ export class Spreadsheetier extends Semantier {
 							that.cbbOptions[c.field] = [];
 							that.cbbItems[c.field] = [];
 						}
-						if ( c.delText ) {
-							that.cbbOptions[c.field].unshift(c.delText)
-							that.cbbItems[c.field].unshift( { n: c.delText, v: undefined } );
+						if ( c.delItemName ) {
+							that.cbbOptions[c.field].unshift(c.delItemName)
+							that.cbbItems[c.field].unshift( { n: c.delItemName, v: undefined } );
 						}
 					}
 				  });

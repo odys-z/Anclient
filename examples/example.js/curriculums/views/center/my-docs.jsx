@@ -43,11 +43,7 @@ class MyDocsComp extends CrudCompW {
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 
-		// this.toAdd = this.toAdd.bind(this);
-		// this.toEdit = this.toEdit.bind(this);
 		this.onTableSelect = this.onTableSelect.bind(this);
-		// this.toDel = this.toDel.bind(this);
-		// this.del = this.del.bind(this);
 		this.toView = this.toView.bind(this);
 		this.toDownload = this.toDownload.bind(this);
 	}

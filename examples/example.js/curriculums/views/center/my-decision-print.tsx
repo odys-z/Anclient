@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
+import { Box, Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
 import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } from '@anclient/semantier';
@@ -7,7 +7,7 @@ import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } f
 import {
 	L, ComboCondType, Comprops, CrudComp, AnContextType,
 	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, DatasetCombo,
-	Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, CbbCellValue, SpreadsheetResp,
+	Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, CbbCellValue, SpreadsheetResp, ImageUpload,
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent, GridApi } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
@@ -77,6 +77,8 @@ export class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 
 export class MyCoursesTier extends Spreadsheetier {
 	eventId?: string;
+	eventName?: string;
+
 	/** client buffer for updating rows */
 	courses: {[cId: string]: Course[]};
 
@@ -246,7 +248,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.toUpload = this.toUpload.bind(this);
 		this.edited = this.edited.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
-		this.onSelectDecision = this.onSelectDecision.bind(this);
+		this.onSelectEvent = this.onSelectEvent.bind(this);
 
 		Spreadsheetier.registerReq((conds: PageInf, rec: Decision) => { return new MyReq(conds, rec);});
 
@@ -256,7 +258,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			  cols: [
 				{ field: 'myId', label: L("decision Id"), width: 10, hide: true },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited, delText: L('-- Clear --') },
+				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited, delItemName: L('-- Clear --') },
 				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
 				{ field: 'remarks', label: L("Memo"), width: 140, type: 'text' },
@@ -299,7 +301,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			});
 	}
 
-    onSelectDecision (event: NV) : void {
+    onSelectEvent (event: NV) : void {
 		let ename = event.n;
 		let isActive = ename.startsWith("Active: ");
 
@@ -310,6 +312,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.setState({})
 
         this.tier.eventId = event.v as string;
+        this.tier.eventName = event.n;
 
         this.bindSheet(undefined);
     };
@@ -323,6 +326,13 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		});
 	};
 
+	/**
+	 * Save recored (decision) without file uri.
+	 * 
+	 * So update won't change uploaded file.
+	 * 
+	 * @param _e 
+	 */
 	toSave(_e: React.UIEvent) {
 		let that = this;
         this.tier.rec = {
@@ -369,7 +379,8 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.api.redrawRows();
 		this.setState({});
 
-        setPrinterFriendly(this.api);
+		document.title = `${this.tier.eventName?.replace("Active: ", "")} ${(this.context as AnContextType).ssInf.usrName}`;
+        // setPrinterFriendly(this.api);
 		setTimeout(function () {
 			print();
 			// setNormal(this.api);
@@ -377,11 +388,10 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		  }, 1000);
     }
 
-    toUpload(_e: React.UIEvent) {
+    toUpload(meta: {mime: string, name: string}, blob: string) {
     }
 
 	render() {
-		let that = this;
 		let {classes} = this.props;
 
 		return (<div>
@@ -390,7 +400,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					sk={'ann-evt'}
 					noAllItem={true}
 					className='noPrint'
-					onSelect={this.onSelectDecision} />
+					onSelect={this.onSelectEvent} />
             </div>
             <div className='onlyPrint'>
                 <h1>{L('Signature')}</h1>
@@ -405,19 +415,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					onCellClicked={this.tier.onCellClick}
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />
-			  </div>
-			// &&
-			//   <div id="myGrid" className='ag-theme-alpine onlyPrint' style={{height: '60vh', width: '100%', margin:'auto'}}>
-			// 	<AnSpreadsheet
-			// 	 	ref={ (ref) => this.sheetRef = ref }
-			// 		tier={this.tier as Spreadsheetier}
-            //         onSheetReady={(params) => this.api = params.api}
-			// 		autosave={true}
-			// 		onCellClicked={this.tier.onCellClick}
-			// 		columns={this.tier.columns4print()}
-			// 		rows={this.tier.rows} />
-			//   </div>
-			}
+			  </div> }
 			<div style={{textAlign: 'center', background: '#f8f8f8'}} className={'noPrint'}>
 				<Button variant="outlined"
 					disabled={!this.buttons.save}
@@ -435,14 +433,22 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					endIcon={<JsampleIcons.Export />}
 				>{L('Print')}
                 </Button>
-				<Button variant="outlined"
+				{/* <Button variant="outlined"
 					disabled={!this.buttons.upload}
 					className={classes.usersButton}
 					color='primary'
 					onClick={this.toUpload}
 					endIcon={<JsampleIcons.Up />}
 				>{L('Upload')}
-                </Button>
+                </Button> */}
+				<Box>
+				<ImageUpload
+					disabled={!this.buttons.export}
+					blankIcon={{color: "primary", width: 32, height: 32}}
+					tier={this.tier} field={'uri'}
+					onFileLoaded={this.toUpload}
+				/>{L('Upload')}
+				</Box>
 			</div>
 			{ this.confirm }
 		</div>);
