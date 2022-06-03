@@ -164,6 +164,9 @@ export class SpreadsheetReq extends UserReq {
 	}
 }
 
+export class SpreadsheetResp extends AnsonResp {
+	rec: SpreadsheetRec;
+}
 
 export class Spreadsheetier extends Semantier {
 	static reqfactory: (conds: PageInf, rec?: SpreadsheetRec) => SpreadsheetReq;
