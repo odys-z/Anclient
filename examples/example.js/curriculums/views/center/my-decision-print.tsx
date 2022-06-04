@@ -9,7 +9,7 @@ import {
 	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, DatasetCombo,
 	Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, CbbCellValue, SpreadsheetResp, ImageUpload,
 } from '@anclient/anreact';
-import { CellEditingStoppedEvent, GridApi } from 'ag-grid-community';
+import { CellEditingStoppedEvent, GridApi, ICellRendererParams } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
 import { MyScore } from './my-scores';
 const { JsampleIcons } = jsample;
@@ -169,6 +169,7 @@ export class MyCoursesTier extends Spreadsheetier {
 		return super.encode(field, n, rec);
 	}
 
+	/*
 	decode(field: string, v: string, rec: Course): string | Element { 
 		v = rec[field] as string;
 		if (field === 'cId') {
@@ -179,6 +180,20 @@ export class MyCoursesTier extends Spreadsheetier {
 			return v;
 		}
 		return super.decode(field, v, rec);
+	}
+	*/
+	decode(p: ICellRendererParams): string | Element { 
+		let field = p.colDef.field;
+		let rec = this.rows[p.rowIndex] as Course;
+		let v = this.rows[p.rowIndex][field] as string;
+		if (field === 'cId') {
+			let nvs = this.courseItemsPerModule[rec.module];
+			for (let i = 0; i < nvs?.length; i++)
+				if (nvs[i].v === v)
+					return nvs[i].n;
+			return v;
+		}
+		return super.decode(p);
 	}
 
 	updateCell(p: CellEditingStoppedEvent, onOk: OnCommitOk) : void {
@@ -242,6 +257,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
 
+		this.showConfirm = this.showConfirm.bind(this);
 		this.toSave = this.toSave.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.toPrint = this.toPrint.bind(this);
@@ -301,6 +317,23 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			});
 	}
 
+	showConfirm(resp: AnsonMsg<SpreadsheetResp>) {
+		console.log(resp.Body());
+		this.tier.pkval.v = resp.Body().rec.myId;
+
+		let that = this;
+		let msg = resp.Body().msg();
+		this.confirm = (
+			<ConfirmDialog title={L('Info')}
+				ok={L('OK')} cancel={false} open
+				onClose={() => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
+				msg={msg} />);
+		this.setState({});
+	}
+
     onSelectEvent (event: NV) : void {
 		let ename = event.n;
 		let isActive = ename.startsWith("Active: ");
@@ -334,31 +367,18 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	 * @param _e 
 	 */
 	toSave(_e: React.UIEvent) {
-		let that = this;
         this.tier.rec = {
 			eventId: this.tier.eventId,
-			cIds: collectCourses(this.tier.rows as Course[])
+			cIds: collectCourses(this.tier.rows as Course[]),
 		} as Decision;
+
 
         // update id: eventId + usrId
 		this.tier.update(
 			this.tier.pkval.v ? CRUD.u : CRUD.c,
 			this.tier.rec, 
-			(resp: AnsonMsg<SpreadsheetResp>) => {
-				console.log(resp.Body());
-				that.tier.pkval.v = resp.Body().rec.myId;
-
-				let msg = resp.Body().msg();
-				this.confirm = (
-					<ConfirmDialog title={L('Info')}
-						ok={L('OK')} cancel={false} open
-						onClose={() => {
-							that.confirm = undefined;
-							that.setState({});
-						} }
-						msg={msg} />);
-				this.setState({});
-			}, this.context.error);
+			this.showConfirm,
+			this.context.error);
 		
 		function collectCourses(rows: Course[]) {
 			let cIds = [] as Course[];
@@ -389,6 +409,39 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
     }
 
     toUpload(meta: {mime: string, name: string}, blob: string) {
+		if ( isEmpty( this.tier.pkval.v ) ) {
+			let that = this;
+			this.confirm = (
+				<ConfirmDialog title={L('Info')}
+					ok={L('OK')} cancel={false} open
+					onClose={() => {
+						that.confirm = undefined;
+						that.setState({});
+					} }
+					msg={L('Please save decision first!')} />);
+			return;
+		}
+
+		this.tier.update(
+			CRUD.u,
+			{myId: this.tier.pkval.v, uri: blob}, 
+			this.showConfirm,
+			// (resp: AnsonMsg<SpreadsheetResp>) => {
+			// 	console.log(resp.Body());
+			// 	that.tier.pkval.v = resp.Body().rec.myId;
+
+			// 	let msg = resp.Body().msg();
+			// 	this.confirm = (
+			// 		<ConfirmDialog title={L('Info')}
+			// 			ok={L('OK')} cancel={false} open
+			// 			onClose={() => {
+			// 				that.confirm = undefined;
+			// 				that.setState({});
+			// 			} }
+			// 			msg={msg} />);
+			// 	this.setState({});
+			// },
+			this.context.error);
     }
 
 	render() {

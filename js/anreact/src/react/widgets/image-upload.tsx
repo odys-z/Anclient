@@ -25,8 +25,12 @@ interface ImageUploadProps extends Comprops {
 	/** Date record's field name */
 	field: string;
 
-	/** callback on file loaded */
-	onFileLoaded?: (fileMeta: {mime: string, name: string}, rederResult: string | ArrayBuffer) => void;
+	/** callback on file loaded
+	 * 
+	 * blob: 
+	 * File content wrapped with dataUrl()
+	 */
+	onFileLoaded?: (fileMeta: {mime: string, name: string}, blob: string) => void;
 }
 
 class ImageUploadComp extends DetailFormW<ImageUploadProps> {
