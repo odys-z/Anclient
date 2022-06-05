@@ -2,16 +2,17 @@ import React from 'react';
 import { Box, Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk } from '@anclient/semantier';
+import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp, AnContextType,
 	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, DatasetCombo,
-	Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, CbbCellValue, SpreadsheetResp, ImageUpload,
+	Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, CbbCellValue, SpreadsheetResp, ImageUpload, TRecordForm,
 } from '@anclient/anreact';
 import { CellEditingStoppedEvent, GridApi, ICellRendererParams } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
-import { MyScore } from './my-scores';
+import { MyScore, MyScoreTier } from './my-scores';
+import { ThumbUpAltTwoTone } from '@material-ui/icons';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
@@ -61,6 +62,7 @@ export class MyReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 		{ courses: 'r/courses',
 		  scores: 'u/scores',
 		  loadScore: 'r/scores',
+		  upload: 'u/uri',
 		});
 
 	constructor(query?: PageInf, rec?: T) {
@@ -139,6 +141,17 @@ export class MyCoursesTier extends Spreadsheetier {
 			},
 			this.errCtx);
 	}
+
+	// loadMyScores(ctx: AnContextType) {
+	// 	let st = new MyScoreTier({ uri: this.uri, pkval: {pk: 'kid', v: 'not-used'} } )
+	// 				.setContext({ anClient: this.client,
+	// 							  anReact: undefined,
+	// 							  error: this.errCtx });
+	// 	let that = this;
+	// 	st.record(undefined, (cols, rows) => {
+	// 		that.myscore = rows[0] as MyScore;
+	// 	});
+	// }
 
 	cbbCellOptions(p: CbbCellValue): string[] {
 		if (p.colDef.field === 'cId')
@@ -226,6 +239,19 @@ export class MyCoursesTier extends Spreadsheetier {
 			}
 		}
 	}
+
+	upload(filename: string, blob: string, ok: OnCommitOk, err: ErrorCtx) {
+		let rec = {myId: this.pkval.v, eventId: this.eventId, uri: blob, filename}; 
+
+		if (!this.client) return;
+		let client = this.client;
+
+		let req = client.userReq(this.uri, this.port,
+						Spreadsheetier.reqfactory( undefined, rec)
+						.A( MyReq.A.upload ) );
+
+		client.commit(req, ok, err);
+	}
 }
 
 class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTier}>{
@@ -245,6 +271,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
     sheetRef: AnSpreadsheet;
     api: GridApi;
 	buttons = {save: false, export: false, upload: false};
+	scoretier: MyScoreTier;
 	
 	getUserId() {
 		return this.props.ssInf.uid;
@@ -282,6 +309,10 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			] });
 		
         this.gridRef = React.createRef();
+
+		this.scoretier = new MyScoreTier({
+			uri: this.uri,
+			pkval: {pk: 'kid', v: undefined, tabl: 'b_myscores'}});
 	}
 
 	componentDidMount() {
@@ -290,6 +321,11 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 		this.tier.setContext(this.context);
 		this.tier.loadCourses(this.context);
+		// this.tier.loadMyScores(this.context);
+		this.scoretier.setContext(this.context);
+		this.scoretier.record(undefined, () => {
+
+		});
 
 		// Spreadsheet + MyReq will load course pre module for last active event (mydecision : records)
 		this.setState({});
@@ -312,6 +348,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
         this.tier.records(new PageInf(0, -1, 0, [['eventId', this.tier.eventId]]),
 			(_cols, rows) => {
 				that.tier.rows = rows;
+				that.tier.pkval.v = rows[0].myId;
 				that.api.redrawRows();
 				that.setState({})
 			});
@@ -372,11 +409,10 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			cIds: collectCourses(this.tier.rows as Course[]),
 		} as Decision;
 
-
         // update id: eventId + usrId
 		this.tier.update(
 			this.tier.pkval.v ? CRUD.u : CRUD.c,
-			this.tier.rec, 
+			this.tier.rec,
 			this.showConfirm,
 			this.context.error);
 		
@@ -399,8 +435,8 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.api.redrawRows();
 		this.setState({});
 
-		document.title = `${this.tier.eventName?.replace("Active: ", "")} ${(this.context as AnContextType).ssInf.usrName}`;
-        // setPrinterFriendly(this.api);
+		document.title = `${this.tier.eventName?.replace("Active: ", "")} ${this.scoretier.rec.userName}`;
+        setPrinterFriendly(this.api);
 		setTimeout(function () {
 			print();
 			// setNormal(this.api);
@@ -409,7 +445,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
     }
 
     toUpload(meta: {mime: string, name: string}, blob: string) {
-		if ( isEmpty( this.tier.pkval.v ) ) {
+		if ( isEmpty( this.tier.eventId ) ) {
 			let that = this;
 			this.confirm = (
 				<ConfirmDialog title={L('Info')}
@@ -422,25 +458,9 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			return;
 		}
 
-		this.tier.update(
-			CRUD.u,
-			{myId: this.tier.pkval.v, uri: blob}, 
+		this.tier.upload(
+			meta.name, blob, 
 			this.showConfirm,
-			// (resp: AnsonMsg<SpreadsheetResp>) => {
-			// 	console.log(resp.Body());
-			// 	that.tier.pkval.v = resp.Body().rec.myId;
-
-			// 	let msg = resp.Body().msg();
-			// 	this.confirm = (
-			// 		<ConfirmDialog title={L('Info')}
-			// 			ok={L('OK')} cancel={false} open
-			// 			onClose={() => {
-			// 				that.confirm = undefined;
-			// 				that.setState({});
-			// 			} }
-			// 			msg={msg} />);
-			// 	this.setState({});
-			// },
 			this.context.error);
     }
 
@@ -456,10 +476,20 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					onSelect={this.onSelectEvent} />
             </div>
             <div className='onlyPrint'>
-                <h1>{L('Signature')}</h1>
+                <h1>{this.tier.eventName?.replace("Active: ", "")}</h1>
+				<h2>{`${L('Student Name')}: ${this.scoretier.rec?.userName}`}</h2>
             </div>
+			<div className='onlyPrint'>
+			{ this.scoretier &&
+				<TRecordForm uri={this.props.uri}
+						tier={this.scoretier}
+						fields={this.scoretier.fields()}
+						enableValidate={true}
+				/>}
+				<Box>AP Courses</Box>
+			</div>
 			{ this.tier &&
-			  <div id="myGrid" className='ag-theme-alpine' style={{height: '60vh', width: '100%', margin:'auto'}}>
+			  <div id="myGrid" className='ag-theme-alpine' style={{height: '50vh', width: '100%', margin:'auto'}}>
 				<AnSpreadsheet
 				 	ref={ (ref) => this.sheetRef = ref }
 					tier={this.tier as Spreadsheetier}
@@ -486,14 +516,6 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					endIcon={<JsampleIcons.Export />}
 				>{L('Print')}
                 </Button>
-				{/* <Button variant="outlined"
-					disabled={!this.buttons.upload}
-					className={classes.usersButton}
-					color='primary'
-					onClick={this.toUpload}
-					endIcon={<JsampleIcons.Up />}
-				>{L('Upload')}
-                </Button> */}
 				<Box>
 				<ImageUpload
 					disabled={!this.buttons.export}
@@ -503,6 +525,11 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				/>{L('Upload')}
 				</Box>
 			</div>
+            <div className='onlyPrint'>
+                <h4>{L('Student Name')}  _____________________________</h4>
+                <h4>{L('Signature')}</h4>
+                <h4>{L('Date')}</h4>
+            </div>
 			{ this.confirm }
 		</div>);
 	}
