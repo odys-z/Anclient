@@ -6,9 +6,9 @@ import { CRUD, PkMeta, AnsonMsg, PageInf, OnLoadOk, Tierec, AnlistColAttrs, Sema
 
 import {
 	L, Comprops, CrudComp,
-	jsample, ConfirmDialog, TRecordForm, AnContext, AnContextType, invalidStyles, SpreadsheetResp,
+	jsample, ConfirmDialog, TRecordForm, AnContext, invalidStyles, SpreadsheetResp,
 } from '@anclient/anreact';
-import { MyReq } from './my-decision-print';
+import { MyReq } from './my-decision';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => (Object.assign (
@@ -29,12 +29,25 @@ const styles = (_theme: Theme) => (Object.assign (
 }));
 
 export interface MyScore extends Tierec {
+	kid: string;
+	userName: string;
+	grade: string;
+	ielts: string;
+	toefl: string;
+	act: string;
+	sat: string;
+	admission: string;
+	remarks: string;
 }
 
 class MyScoreTier extends Semantier {
 	myscores: {};
 	// kid?: string;
 
+	/**
+	 * 
+	 * @param props uri, {pk: kid, v: not-used}
+	 */
 	constructor(props: {uri: string, pkval: PkMeta}) {
 		super(props);
 
@@ -79,16 +92,11 @@ class MyScoreTier extends Semantier {
 
 		let req = this.client.userReq(this.uri, 'mydecisions',
 			new MyReq()
-			.scores( this.rec )
+			.scores( this.rec as MyScore )
 			.A(MyReq.A.scores) );
 
 		client.commit(req,
 			(resp) => {
-				// let bd = resp.Body();
-				// if (crud === CRUD.c)
-				// 	// NOTE:
-				// 	// resulving auto-k is a typicall semantic processing, don't expose this to caller
-				// 	that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);
@@ -164,21 +172,18 @@ class MyScoresComp extends CrudComp<Comprops & {uri: string}> {
 		else this.setState({});
 	}
 
-	toUpload (e) {
-	}
-
 	render() {
 		let { classes } = this.props;
 		return (<>
 		  <Card>{L('Standardized Test Scores')}
-		    <Box>{(this.context as AnContextType).ssInf.usrName}</Box>
+		    <Box>{this.tier?.rec?.userName}</Box>
 		  </Card>
-		  {this.tier
-			 && <TRecordForm uri={this.props.uri}
+		  {this.tier &&
+		  	<TRecordForm uri={this.props.uri}
 					tier={this.tier}
 					fields={this.tier.fields()}
 					enableValidate={true}
-				/>}
+			/>}
 			<Button onClick={this.toSave}
 				className={classes.actionButton} color="primary" variant="outlined">
 				{L('Save')}
@@ -192,4 +197,4 @@ MyScoresComp.contextType = AnContext;
 
 const MyScores = withStyles<any, any, Comprops>(styles)(withWidth()(MyScoresComp));
 
-export { MyScores, MyScoresComp }
+export { MyScoreTier, MyScores, MyScoresComp }

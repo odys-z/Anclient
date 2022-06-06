@@ -36,17 +36,20 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
+				{ type: 'text', label: L('Course'), field: 'currName', grid: {sm: 3, md: 3}},
+				{ type: 'cbb', sk: 'curr-modu', uri: this.uri,
+				  label: L('Module'), field: 'module', grid: {sm: 3, md: 3}} as ComboCondType,
 				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
-				  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
-				{ type: 'cbb', sk: 'curr-subj', uri: this.uri,
-				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
+				  label: L('Category'), field: 'cate', grid: {sm: 3, md: 3}} as ComboCondType,
+				{ type: 'cbb', sk: 'curr-level', uri: this.uri,
+				  label: L('Level'), field: 'clevel', grid: {sm: 3, md: 3}} as ComboCondType,
 			] } as QueryPage;
 
 	constructor(props: Comprops & {conn_state: string}) {
 		super(props);
 
 		this.uri = props.uri;
-		this.icon = this.icon.bind(this);
+		// this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
 
 		this.toAdd = this.toAdd.bind(this);
@@ -85,16 +88,16 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.tier.updateCell(p);
 	}
 
-	icon(e: SpreadsheetRec) {
-		let {classes} = this.props;
+	// icon(e: SpreadsheetRec) {
+	// 	let {classes} = this.props;
 
-		let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
+	// 	let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
 
-		return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
-			? <JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-			: <JsampleIcons.Star color={color} className={classes.svgicn}/>
-			;
-	}
+	// 	return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
+	// 		? <JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
+	// 		: <JsampleIcons.Star color={color} className={classes.svgicn}/>
+	// 		;
+	// }
 
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
@@ -111,7 +114,6 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 
 	toDel(e: React.UIEvent) {
 		let that = this;
-		// if (this.currentId)
 		this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
 	}
 

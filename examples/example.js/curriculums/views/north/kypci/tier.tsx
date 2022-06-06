@@ -1,7 +1,7 @@
 import { PageInf} from '@anclient/semantier';
 
 import { Spreadsheetier, SpreadsheetRec, SpreadsheetReq } from '@anclient/anreact';
-import { CSSProperties } from 'react';
+import { CSSProperties } from '@material-ui/styles';
 
 export class Course implements SpreadsheetRec {
 	static pk = 'cId';

@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import React from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, ColDef, Column, ColumnApi,
@@ -12,6 +12,7 @@ import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
 	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, isEmpty } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { AnConst } from '../../utils/consts';
+import { CSSProperties } from '@material-ui/styles';
 
 /**
  * Short-cut for ag-grid-community (License: MID)
@@ -98,7 +99,7 @@ export interface SheetCol extends TierCol {
 	 * 
 	 * How this works: have encoder return a null value - so currently only works for relation table
 	 */
-	delText?: string;
+	delItemName?: string;
 
 	suppressSizeToFit?: boolean;
 	resizable?: boolean;
@@ -194,7 +195,6 @@ export class SpreadsheetReq extends UserReq {
 	}
 }
 
-
 export class Spreadsheetier extends Semantier {
 	static reqfactory: (conds: PageInf, rec?: SpreadsheetRec) => SpreadsheetReq;
 
@@ -241,9 +241,9 @@ export class Spreadsheetier extends Semantier {
 							that.cbbOptions[c.field] = [];
 							that.cbbItems[c.field] = [];
 						}
-						if ( c.delText ) {
-							that.cbbOptions[c.field].unshift(c.delText)
-							that.cbbItems[c.field].unshift( { n: c.delText, v: undefined } );
+						if ( c.delItemName ) {
+							that.cbbOptions[c.field].unshift(c.delItemName)
+							that.cbbItems[c.field].unshift( { n: c.delItemName, v: undefined } );
 						}
 					}
 				  });
@@ -286,7 +286,6 @@ export class Spreadsheetier extends Semantier {
 	 * @param v
 	 * @param rec current row (p.data)
 	 * @returns showing element
-	 */
 	decode(field: string, v: string, rec: SpreadsheetRec): string | Element {
 		v = rec[field] as string;
 		let nvs = this.cbbItems[field];
@@ -294,6 +293,18 @@ export class Spreadsheetier extends Semantier {
 			if (nvs[i].v === v)
 				return nvs[i].n;
 		return v;
+	}
+	 */
+	decode(p: ICellRendererParams) : string | Element {
+		let field = p.colDef?.field;
+		if (field) {
+			let v = this.rows[p.rowIndex][field] as string;
+			let nvs = this.cbbItems[field];
+			for (let i = 0; i < nvs?.length; i++)
+				if (nvs[i].v === v)
+					return nvs[i].n;
+			return v;
+		}
 	}
 
 	/**
@@ -498,7 +509,8 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 					col.cellEditorParams = (p: CbbCellValue) => {
 						return { values: that.props.tier.cbbCellOptions(p) };
 					  };
-					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p.colDef.field, p.value, p.data))
+					// col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p.colDef.field, p.value, p.data))
+					col.cellRenderer = that.props.cbbCellRender || ((p: ICellRendererParams) => that.props.tier.decode(p))
 					// col.onCellEditingStopped = anEditStop
 					// (e: { value: any; data: SpreadsheetRec; }) => {
 					// }

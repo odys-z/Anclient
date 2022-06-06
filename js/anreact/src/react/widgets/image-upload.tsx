@@ -6,7 +6,7 @@ import Box from '@material-ui/core/Box';
 
 
 import { gCamera, gCameraViewBox } from './my-icon';
-import { mimeOf } from '../../utils/file-utils';
+import { dataOfurl, mimeOf } from '../../utils/file-utils';
 import { DetailFormW, Comprops } from '../crud';
 import { invalidStyles } from '../anreact';
 
@@ -20,12 +20,20 @@ const styles = (theme: Theme) => (Object.assign(
 
 /**
  */
-interface ImgFormProps extends Comprops {
+interface ImageUploadProps extends Comprops {
 	blankIcon: object;
+	/** Date record's field name */
 	field: string;
+
+	/** callback on file loaded
+	 * 
+	 * blob: 
+	 * File content wrapped with dataUrl()
+	 */
+	onFileLoaded?: (fileMeta: {mime: string, name: string}, blob: string) => void;
 }
 
-class ImageUploadComp extends DetailFormW<ImgFormProps> {
+class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 	state = {
 		src: undefined,
 	}
@@ -35,7 +43,7 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 
 	field: any;
 
-	constructor(props: ImgFormProps) {
+	constructor(props: ImageUploadProps) {
 		super(props);
 
 		this.toShowImage = this.toShowImage.bind(this);
@@ -46,19 +54,6 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 
 	componentDidMount() {
 		if (this.props.file) {
-			// let freader = new FileReader();
-			// freader.onload = function (e) {
-			// 	var b64 = fileclient.Uint8ToBase64(new Uint8Array(freader.result));
-			// 	if (typeof onok === 'function') {
-			// 		onok(fileclient.file, b64);
-			// 	}
-			// }
-			// if (fileclient.file) {
-			// 	freader.readAsArrayBuffer(fileclient.file);
-			// }
-
-			// this.state.src = this.props.src;
-
 		}
 	}
 
@@ -73,18 +68,26 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 
 			reader.onload = function(e) {
 				that.imgPreview.src = reader.result;
+
+				let fileMeta = {
+					mime: mimeOf( reader.result as string ),
+					name: file.name
+				};
+
 				if (that.props.tier && that.field.field) {
 					that.props.tier.rec[that.field.field] = reader.result;
-					that.props.tier.rec.fileMeta = {
-						mime: mimeOf( reader.result as string ),
-						name: file.name};
+					that.props.tier.rec.fileMeta = fileMeta;
 				}
+
+				if (that.props.onFileLoaded)
+					that.props.onFileLoaded(fileMeta, dataOfurl( reader.result as string ));
 			}
 
 			reader.readAsDataURL(file);
 		} else {
 			this.setState({invalid: true});
 		}
+
 	}
 
 	render() {
@@ -107,9 +110,11 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 		return (
 		  //<Box style={{height: 48, border: "solid 1px #aaa2"}}>
 		  <Box className={ classes.imgUploadBox }>
-			<img src={dataimg} style={{ width: "auto", height: "100%", minHeight: 48 }}
+			<img
+				src={dataimg}
+				style={{ width: this.props.width || "auto", height: "100%", minHeight: 48 }}
 				ref={(ref) => this.imgPreview = ref} />
-			<input type='file' style={ bg }
+			<input type='file' style={ bg } disabled={this.props.disabled}
 		 		ref={ (ref) => this.fileInput = ref }
 		 		onChange={ this.toShowImage } />
 		  </Box>);
@@ -117,4 +122,4 @@ class ImageUploadComp extends DetailFormW<ImgFormProps> {
 }
 
 const ImageUpload = withWidth()(withStyles(styles)(ImageUploadComp));
-export { ImageUpload, ImageUploadComp };
+export { ImageUpload, ImageUploadComp, ImageUploadProps };

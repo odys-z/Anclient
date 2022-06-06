@@ -31,7 +31,7 @@ export function toPageInf(query: QueryPage) : PageInf {
 	let p = new PageInf(query.pageInf.page, query.pageInf.size);
 	p.condts = [];
 	query.query?.forEach( (q, x) => {
-		p.condts.push( [q.field, q.val?.v || q.val] );
+		p.condts.push( [q.field, typeof q.val === 'string' ? q.val : q.val?.v] );
 	});
 
 	return p;

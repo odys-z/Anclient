@@ -5,7 +5,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt, jsample, AnContextType, Home
+	AnContext, AnError, AnReactExt, jsample, AnContextType
 } from '@anclient/anreact';
 const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
 
@@ -13,7 +13,7 @@ import { StarPorts } from './common/port';
 
 import { Course } from './views/north/kypci/courses';
 import { Progress } from './views/north/progress';
-import { My } from './views/center/my-decision-print';
+import { My } from './views/center/my-decision';
 import { MyScores } from './views/center/my-scores';
 import { APEvents } from './views/north/kypci/events';
 import { welcome } from './views/center/nwelcome';
