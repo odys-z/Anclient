@@ -6,9 +6,9 @@ import { CRUD, PkMeta, AnsonMsg, PageInf, OnLoadOk, Tierec, AnlistColAttrs, Sema
 
 import {
 	L, Comprops, CrudComp,
-	jsample, ConfirmDialog, TRecordForm, AnContext, AnContextType, invalidStyles, SpreadsheetResp,
+	jsample, ConfirmDialog, TRecordForm, AnContext, invalidStyles, SpreadsheetResp,
 } from '@anclient/anreact';
-import { MyReq } from './my-decision-print';
+import { MyReq } from './my-decision';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => (Object.assign (
