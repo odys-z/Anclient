@@ -14,7 +14,7 @@ import { Comprops, CrudCompW } from '../../react/crud';
 import { AnContext, AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnTablist } from '../../react/widgets/table-list';
-import { AnQueryst } from '../../react/widgets/query-form';
+import { AnQueryst, ComboCondType } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
@@ -69,13 +69,6 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.tier = new UsersTier(this);
 		this.tier.setContext(this.context as AnContextType);
 	}
-
-	// getTier = () => {
-	// 	// // FIXME for override port for sessionless mode
-	// 	// // Once the uri & port been moved to semnantier, this section should be removed
-	// 	// if (this.props.port)
-	// 	// 	this.tier.port = this.props.port;
-	// }
 
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
@@ -220,11 +213,12 @@ export { Userst, UserstComp }
 
 class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions) => void}> {
 	conds = [
-		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student') },
+		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student'),
+		  grid: {sm: 3, md: 2} } as AnlistColAttrs<any, any>,
 		{ name: 'orgId',    field: 'orgId', type: 'cbb',  val: undefined, label: L('Class'),
-		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ name: 'roleId',   field: 'roleId', type: 'cbb',  val: undefined, label: L('Role'),
-		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'}, grid: {sm: 3, md: 2} } as ComboCondType,
+		// { name: 'roleId',   field: 'roleId', type: 'cbb',  val: undefined, label: L('Role'),
+		//   sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'}, grid: {md: 2, sm: 3} },
 	];
 
 	constructor(props: Comprops) {
@@ -236,7 +230,8 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 		return { query: {
 			userName: this.conds[0].val ? this.conds[0].val : undefined,
 			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
-			roleId  : (this.conds[2].val as {n: string, v: string}) ?.v } };
+			// roleId  : (this.conds[2].val as {n: string, v: string}) ?.v }
+		} };
 	}
 
 	/** Design Note:
