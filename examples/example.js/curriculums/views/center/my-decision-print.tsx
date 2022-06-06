@@ -12,7 +12,6 @@ import {
 import { CellEditingStoppedEvent, GridApi, ICellRendererParams } from 'ag-grid-community';
 import { Course } from '../north/kypci/tier';
 import { MyScore, MyScoreTier } from './my-scores';
-import { ThumbUpAltTwoTone } from '@material-ui/icons';
 const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
@@ -142,17 +141,6 @@ export class MyCoursesTier extends Spreadsheetier {
 			this.errCtx);
 	}
 
-	// loadMyScores(ctx: AnContextType) {
-	// 	let st = new MyScoreTier({ uri: this.uri, pkval: {pk: 'kid', v: 'not-used'} } )
-	// 				.setContext({ anClient: this.client,
-	// 							  anReact: undefined,
-	// 							  error: this.errCtx });
-	// 	let that = this;
-	// 	st.record(undefined, (cols, rows) => {
-	// 		that.myscore = rows[0] as MyScore;
-	// 	});
-	// }
-
 	cbbCellOptions(p: CbbCellValue): string[] {
 		if (p.colDef.field === 'cId')
 			return this.coursesPerModule[(p.data as Course).module];
@@ -182,19 +170,6 @@ export class MyCoursesTier extends Spreadsheetier {
 		return super.encode(field, n, rec);
 	}
 
-	/*
-	decode(field: string, v: string, rec: Course): string | Element { 
-		v = rec[field] as string;
-		if (field === 'cId') {
-			let nvs = this.courseItemsPerModule[rec.module];
-			for (let i = 0; i < nvs?.length; i++)
-				if (nvs[i].v === v)
-					return nvs[i].n;
-			return v;
-		}
-		return super.decode(field, v, rec);
-	}
-	*/
 	decode(p: ICellRendererParams): string | Element { 
 		let field = p.colDef.field;
 		let rec = this.rows[p.rowIndex] as Course;
@@ -472,7 +447,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				<DatasetCombo uri={this.uri}
 					sk={'ann-evt'}
 					noAllItem={true}
-					className='noPrint'
+					// className='noPrint'
 					onSelect={this.onSelectEvent} />
             </div>
             <div className='onlyPrint'>

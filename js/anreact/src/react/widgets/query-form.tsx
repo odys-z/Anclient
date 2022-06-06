@@ -324,19 +324,17 @@ export interface QueryFormProps extends Comprops {
 	 * - to disable error context handling triggering endless loop. */
 	// stopBinding?: boolean;
 
-	/**User actions: search button clicked
-	 * @deprecated replaced by onQuery
+	/**
+	 * User actions: search button clicked
 	 */
 	onSearch?: (conds: QueryConditions | PageInf) => void,
 
 	/**Bounding components successfully
 	 *
-	 * @deprecated replaced by onQuery
+	 * This event can even be triggered early than componentDidMount.
+	 * 
 	 */
 	onLoaded?: (conds: QueryConditions | PageInf) => void,
-
-	/**@deprecated Render can get Mediat parameter and field can be defined by user data. */
-	// buttonStyle?: "norm" | "dense"
 }
 
 const AnQueryst = withStyles<any, any, QueryFormProps>(styles)(withWidth()(AnQuerystComp));

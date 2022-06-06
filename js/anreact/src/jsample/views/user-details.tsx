@@ -114,7 +114,7 @@ class UserDetailstComp extends DetailFormW<Comprops & {tier: UsersTier}> {
 			this.props.onClose({code: 'cancel'});
 	}
 
-	showConfirm(msg) {
+	showConfirm(msg: string) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
@@ -137,8 +137,6 @@ class UserDetailstComp extends DetailFormW<Comprops & {tier: UsersTier}> {
 		let title = c ? L('Create User')
 					  : u ? L('Edit User')
 					  : L('User Details');
-
-		// let rec = this.state.record;
 
 		return (<>
 		  <Dialog className={classes.root}
