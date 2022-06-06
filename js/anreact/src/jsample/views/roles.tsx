@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations
+	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -217,7 +217,6 @@ const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
 
 class RoleTier extends Semantier {
 	checkbox = true;
-	// rels = [];
 
 	_cols = [
 		{ text: L('Role Id'),  field: "roleId", hide: true },
@@ -243,20 +242,20 @@ class RoleTier extends Semantier {
 
 		this.pkval.tabl = 'a_roles';
 		this.pkval.pk = 'roleId';
-		// this.reltabl = 'a_role_func';
 
 		/**sk: role-funcs
 		 * Hard coded here since it's a business string for jsample app.
 		 */
 		this.relMeta = {'a_role_func':
 			{ stree: {
-				tabl: 'a_role_func',
+				childTabl: 'a_role_func',
 				pk: 'roleId',	 // fk to main table
 				fk: 'roleId',	 // fk to main table
 				col: 'funcId', // checking col
-				relcolumn: 'nodeId',
+				// relcolumn: 'nodeId',  // FIXME delete?
+				colProp: 'nodeId',
 				sk: 'trees.role_funcs'
-			},
+			} as relStree,
 			} as DbRelations
 		};
 	}

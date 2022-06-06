@@ -111,6 +111,23 @@ export interface SheetCol extends TierCol {
 	onEditStop?: (e: CellEditingStoppedEvent) => void;
 
 	isEditable?: () => boolean | boolean;
+
+	wrapText?: boolean,
+	autoHeight?: boolean,
+
+	/**
+	 * e.g.  cellRenderer: anMultiRowRenderer,
+	 */
+	cellRenderer?: Function | string,
+
+	/**
+	 * e.g. 'agLargeTextCellEditor',
+	 * 
+	 * https://ag-grid.com/javascript-data-grid/provided-cell-editors/
+	 * */
+	cellEditor?: string,
+	maxLength?: number,
+	cellEditorParams?: {cols?: number, rows?: number, maxLength?: number}
 }
 
 export interface SpreadsheetRec extends Tierec {
@@ -206,7 +223,9 @@ export class Spreadsheetier extends Semantier {
 	port: string;
 	// currentRecId: any;
 
-	constructor(port: string, props: {uri: string, pkval: PkMeta, cols: SheetCol[]}) {
+	constructor(port: string, props: {uri: string, pkval: PkMeta, cols: SheetCol[],
+		/** e.g. {gridOptions: { rowHeight: 50 } } - not working */
+		aggrid?: any}) {
 		super(props);
 		this.port = port;
 		this.pkval = props.pkval;
@@ -620,7 +639,9 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 			onCellEditingStopped={this.onEditStop}
 			getContextMenuItems={this.getContextMenuItems}
 			onGridReady={this.props.onSheetReady}
-			rowData={this.tier.rows} >
+			rowData={this.tier.rows}
+			{...this.props.aggrid}
+			>
 		</AgGridReact> );
 	}
 }

@@ -157,6 +157,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 					mtabl='a_roles' reltabl='a_role_func' relcolumn='nodeId'
 					sqlArgs={[this.pkval.v]}
 				/>
+					{/* relcolumn='nodeId' */}
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
 			  {crud &&
