@@ -181,7 +181,6 @@ class UserstComp extends CrudCompW<Comprops> {
 
 		return (<div className={classes.root}>
 			{this.props.funcName || this.props.title || 'Users of Jsample'}
-			<div className={classes.warn}>TODO Test Query Form!</div>
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
 			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode
@@ -256,13 +255,7 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 
 export class UsersTier extends Semantier {
 	port = 'userstier';
-	// mtabl = 'a_users';
-	// pk = 'userId';
 	checkbox = true;
-	// rows = [];
-	// pkval = undefined;
-	// rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
-
 
 	// TODO doc: samantier where disable pk field if pkval exists
 	_fields = [
@@ -292,21 +285,14 @@ export class UsersTier extends Semantier {
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
 	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
-	constructor(comp) {
+	constructor(comp: Comprops) {
 		super(comp);
 
-		// this.port = 'userstier';
 		this.pkval.tabl = 'a_users';
 		this.pkval.pk = 'userId';
 		this.checkbox = true;
 		this.rows = [];
-		// pkval = undefined;
-		// rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
 	}
-
-	// columns() {
-	// 	return this._cols;
-	// }
 
 	records(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
@@ -403,17 +389,6 @@ export class UsersTier extends Semantier {
 	}
 }
 
-/*
-type UserstReqArgs = {
-	record?: Tierec;
-	pk?: string; relations?: DbRelations;
-	deletings?: string[];
-	userId?: string; userName?: string;
-	orgId?: string; roleId?: string;
-	hasTodos?: string;
-};
-*/
-
 export class UserstReq extends UserReq {
 	static __type__ = 'io.odysz.jsample.semantier.UserstReq';
 	static __init__ = function (uri) {
@@ -440,7 +415,6 @@ export class UserstReq extends UserReq {
 	orgId: string;
 	roleId: string;
 	hasTodos: boolean;
-	// pk: string;
 	record: Tierec;
 	relations: DbRelations;
 	deletings: string[];
@@ -456,9 +430,6 @@ export class UserstReq extends UserReq {
 		this.hasTodos = toBool(args.hasTodos as string | boolean);
 
 		/// case u
-		// this.pk = args.pk;
-		// this.pkval.pk = args.pk;
-
 		this.record = args.record as Tierec;
 		this.relations = args.relations as DbRelations;
 

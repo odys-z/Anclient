@@ -36,10 +36,13 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
+				{ type: 'text', label: L('Course'), field: 'currName', grid: {sm: 3, md: 3}},
+				{ type: 'cbb', sk: 'curr-modu', uri: this.uri,
+				  label: L('Module'), field: 'module', grid: {sm: 3, md: 3}} as ComboCondType,
 				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
-				  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
-				{ type: 'cbb', sk: 'curr-subj', uri: this.uri,
-				  label: L('Subject'), field: 'subject', grid: {sm: 2, md: 2}} as ComboCondType,
+				  label: L('Category'), field: 'cate', grid: {sm: 3, md: 3}} as ComboCondType,
+				{ type: 'cbb', sk: 'curr-level', uri: this.uri,
+				  label: L('Level'), field: 'clevel', grid: {sm: 3, md: 3}} as ComboCondType,
 			] } as QueryPage;
 
 	constructor(props: Comprops & {conn_state: string}) {
