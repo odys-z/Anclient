@@ -217,7 +217,6 @@ const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
 
 class RoleTier extends Semantier {
 	checkbox = true;
-	// rels = [];
 
 	_cols = [
 		{ text: L('Role Id'),  field: "roleId", hide: true },
