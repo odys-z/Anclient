@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
 import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
@@ -50,10 +49,12 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
+				{ type: 'cbb', sk: 'ann-evt', uri: this.uri,
+				  label: L('Event'), field: 'eventId', grid: {sm: 2, md: 2}} as ComboCondType,
 				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
 				  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
-				{ type: 'cbb', sk: 'curr-subj', uri: this.uri,
-				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
+				{ type: 'cbb', sk: 'curr-modu', uri: this.uri,
+				  label: L('Module'), field: 'module', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
 	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier}) {
@@ -74,12 +75,12 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 		  pkval: {pk: 'myId', v: undefined, tabl: 'b_mydecisions'},
 		  cols: [
 			{ field: 'cId', label: L("Id"), width: 100, editable: false },
+			{ field: 'eventName', label: L("AP Event"), width: 160, noAllItem: true, editable: false },
 			{ field: 'progress', label: L("Students Count"), width: 120, editable: false },
 			{ field: 'currName', label: L("Course Name"), width: 160, editable: false },
 			{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
 			{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
 			{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
-			{ field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj', editable: false },
 		] });
 	}
 

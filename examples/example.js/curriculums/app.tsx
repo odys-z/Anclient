@@ -15,6 +15,7 @@ import { Course } from './views/north/kypci/courses';
 import { Progress } from './views/north/progress';
 import { My } from './views/center/my-decision';
 import { MyScores } from './views/center/my-scores';
+import { CourseReadonly } from './views/center/course-readonly';
 import { APEvents } from './views/north/kypci/events';
 import { welcome } from './views/center/nwelcome';
 
@@ -87,6 +88,7 @@ class App extends React.Component<Approps, any> {
 			{path: '/n/podiyi', comp: APEvents},
 			{path: '/n/kypci', comp: Course},
 			{path: '/n/ohlyad', comp: Progress},
+			{path: '/c/course', comp: CourseReadonly},
 			{path: '/c/status', comp: MyScores},
 			{path: '/c/my', comp: My},
 		] );

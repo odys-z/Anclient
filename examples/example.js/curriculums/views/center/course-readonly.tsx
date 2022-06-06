@@ -11,8 +11,8 @@ import {
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
-import { Curriculum, CourseReq } from './tier';
-import { StarTheme } from '../../../common/star-theme';
+import { Curriculum, CourseReq } from '../north/kypci/tier'
+import { StarTheme } from '../../common/star-theme';
 
 const styles = (_theme: StarTheme) => ({
 	root: {
@@ -29,7 +29,7 @@ const styles = (_theme: StarTheme) => ({
 	}
 });
 
-class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
+class CourseReadonlyComp extends CrudComp<Comprops & {conn_state: string}>{
 	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
@@ -52,10 +52,9 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		// this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
 
-		this.toAdd = this.toAdd.bind(this);
-		this.toDel = this.toDel.bind(this);
+		// this.toAdd = this.toAdd.bind(this);
+		// this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
-		this.onEdited = this.onEdited.bind(this);
 
 		/** Let's move this to Spreadsheetier's constructor parameter */
 		Spreadsheetier.registerReq((conds: PageInf, rec: Curriculum) => { return new CourseReq(conds, rec) });
@@ -65,13 +64,12 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},
 			  cols: [
 				{ field: 'cId', label: L("Id"), width: 120, editable: false, hide: true },
-				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
-				{ field: 'currName', label: L("curriculum"), width: 160 },
-				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level',
-				  onEditStop: this.onEdited },
-				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
-				{ field: 'remarks', label: L("Remarks"), width: 960, type: 'text',
-				  wrapText: true, autoHeight: true,
+				{ field: 'module', label: L('Module'), width: 100, type: 'cbb', sk: 'curr-modu', editable: false },
+				{ field: 'currName', label: L("curriculum"), width: 160, editable: false },
+				{ field: 'clevel', label: L("Level"), width: 100, type: 'cbb', sk: 'curr-level', editable: false },
+				{ field: 'cate', label: L("Category"), width: 160, type: 'cbb', sk: 'curr-cate', editable: false },
+				{ field: 'remarks', label: L("Remarks"), width: 1500, type: 'text',
+				  wrapText: true, autoHeight: true, editable: false,
 				  cellEditor: 'agLargeTextCellEditor',
 				  cellEditorParams: {cols: 80, rows: 12, maxLength: 4096 },
 				  cellRenderer: anMultiRowRenderer,
@@ -88,20 +86,9 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.setState({});
 	}
 
-	onEdited(p: CellEditingStoppedEvent): void {
-		// TODO set background color
-		this.tier.updateCell(p);
-	}
-
-	// icon(e: SpreadsheetRec) {
-	// 	let {classes} = this.props;
-
-	// 	let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
-
-	// 	return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
-	// 		? <JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-	// 		: <JsampleIcons.Star color={color} className={classes.svgicn}/>
-	// 		;
+	// onEdited(p: CellEditingStoppedEvent): void {
+	// 	// TODO set background color
+	// 	this.tier.updateCell(p);
 	// }
 
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
@@ -113,14 +100,14 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 			});
 	}
 
-	toAdd(_e: React.UIEvent) {
-		this.tier.insert(this.bindSheet);
-	}
+	// toAdd(_e: React.UIEvent) {
+	// 	this.tier.insert(this.bindSheet);
+	// }
 
-	toDel(e: React.UIEvent) {
-		let that = this;
-		this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
-	}
+	// toDel(e: React.UIEvent) {
+	// 	let that = this;
+	// 	this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
+	// }
 
 	render() {
 		let that = this;
@@ -142,7 +129,7 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />
 			  </div>}
-			<div style={{textAlign: 'center', background: '#f8f8f8'}}>
+			{/* <div style={{textAlign: 'center', background: '#f8f8f8'}}>
 				<Button variant="outlined"
 					className={classes.usersButton}
 					color='primary'
@@ -157,8 +144,8 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 					endIcon={<JsampleIcons.Delete />}
 				>{L('Delete')}
 				</Button>
-			</div>
-			{this.confirm}
+			</div> */}
+			{/* {this.confirm} */}
 		</div>);
 	}
 
@@ -166,7 +153,7 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		return toPageInf(this.conds);
 	}
 }
-CourseComp.contextType = AnContext;
+CourseReadonlyComp.contextType = AnContext;
 
-const Course = withStyles(styles)(CourseComp);
-export { Course, CourseComp };
+const CourseReadonly = withStyles(styles)(CourseReadonlyComp);
+export { CourseReadonly, CourseReadonlyComp };
