@@ -296,7 +296,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds.query )
+					new UserstReq( this.uri, conds.query as Tierec )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
@@ -337,9 +337,13 @@ export class UsersTier extends Semantier {
 		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
+		/**
+		 *  This is intial password
 		let {cipher, iv} = this.client.encryptoken(this.rec.pswd as string);
 		this.rec.pswd = cipher;
 		this.rec.iv = iv;
+		*/
+		this.rec.iv = undefined;
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )
@@ -418,7 +422,7 @@ export class UserstReq extends UserReq {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
-		this.userId = args.userId as string;
+		this.userId = (args.userId || args.record?.userId) as string;
 		this.userName = args.userName as string;
 		this.orgId = args.orgId as string;
 		this.roleId = args.roleId as string;

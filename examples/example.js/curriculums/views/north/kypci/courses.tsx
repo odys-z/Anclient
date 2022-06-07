@@ -93,17 +93,6 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.tier.updateCell(p);
 	}
 
-	// icon(e: SpreadsheetRec) {
-	// 	let {classes} = this.props;
-
-	// 	let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
-
-	// 	return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
-	// 		? <JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-	// 		: <JsampleIcons.Star color={color} className={classes.svgicn}/>
-	// 		;
-	// }
-
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
 		this.tier.records(toPageInf(this.conds),

@@ -76,6 +76,7 @@
 
     "msg: AP Requriements": "AP Requriements\nG10\nG11\n...",
 
+    "Please setup password before uploading signalture.": "请先修改密码后上传图片.",
     "": ""
   }
 }

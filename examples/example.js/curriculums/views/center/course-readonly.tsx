@@ -7,7 +7,7 @@ import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 import {
 	L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, AnContext,
-	QueryPage, toPageInf, Spreadsheetier, CellEditingStoppedEvent, anMultiRowRenderer,
+	QueryPage, toPageInf, Spreadsheetier, anMultiRowRenderer,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
@@ -49,11 +49,8 @@ class CourseReadonlyComp extends CrudComp<Comprops & {conn_state: string}>{
 		super(props);
 
 		this.uri = props.uri;
-		// this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
 
-		// this.toAdd = this.toAdd.bind(this);
-		// this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 
 		/** Let's move this to Spreadsheetier's constructor parameter */
@@ -70,8 +67,6 @@ class CourseReadonlyComp extends CrudComp<Comprops & {conn_state: string}>{
 				{ field: 'cate', label: L("Category"), width: 160, type: 'cbb', sk: 'curr-cate', editable: false },
 				{ field: 'remarks', label: L("Remarks"), width: 1500, type: 'text',
 				  wrapText: true, autoHeight: true, editable: false,
-				  cellEditor: 'agLargeTextCellEditor',
-				  cellEditorParams: {cols: 80, rows: 12, maxLength: 4096 },
 				  cellRenderer: anMultiRowRenderer,
 				 },
 			] });
@@ -86,11 +81,6 @@ class CourseReadonlyComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.setState({});
 	}
 
-	// onEdited(p: CellEditingStoppedEvent): void {
-	// 	// TODO set background color
-	// 	this.tier.updateCell(p);
-	// }
-
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
 		this.tier.records(toPageInf(this.conds),
@@ -100,18 +90,8 @@ class CourseReadonlyComp extends CrudComp<Comprops & {conn_state: string}>{
 			});
 	}
 
-	// toAdd(_e: React.UIEvent) {
-	// 	this.tier.insert(this.bindSheet);
-	// }
-
-	// toDel(e: React.UIEvent) {
-	// 	let that = this;
-	// 	this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
-	// }
-
 	render() {
 		let that = this;
-		let {classes} = this.props;
 
 		return (<div>
 			{<AnQueryst
@@ -129,23 +109,6 @@ class CourseReadonlyComp extends CrudComp<Comprops & {conn_state: string}>{
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />
 			  </div>}
-			{/* <div style={{textAlign: 'center', background: '#f8f8f8'}}>
-				<Button variant="outlined"
-					className={classes.usersButton}
-					color='primary'
-					onClick={this.toAdd}
-					endIcon={<JsampleIcons.Add />}
-				>{L('Append')}
-				</Button>
-				<Button variant="outlined"
-					className={classes.usersButton}
-					color='secondary'
-					onClick={this.toDel}
-					endIcon={<JsampleIcons.Delete />}
-				>{L('Delete')}
-				</Button>
-			</div> */}
-			{/* {this.confirm} */}
 		</div>);
 	}
 

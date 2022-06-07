@@ -103,7 +103,7 @@ export interface SheetCol extends TierCol {
 
 	suppressSizeToFit?: boolean;
 	resizable?: boolean;
-	editable?: boolean;
+	editable?: boolean | Function;
 	singleClickEdit?: boolean;
 	width?: number;
 	minWidth?: number;

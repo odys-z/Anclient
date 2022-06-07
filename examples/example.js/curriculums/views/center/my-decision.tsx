@@ -172,8 +172,11 @@ export class MyCoursesTier extends Spreadsheetier {
 
 	decode(p: ICellRendererParams): string | Element { 
 		let field = p.colDef.field;
+		if (p.rowIndex >= this.rows.length) return p.value;
+
 		let rec = this.rows[p.rowIndex] as Course;
-		let v = this.rows[p.rowIndex][field] as string;
+		if (!rec) console.log(p.rowIndex, this.rows);
+		let v = rec[field] as string;
 		if (field === 'cId') {
 			let nvs = this.courseItemsPerModule[rec.module];
 			for (let i = 0; i < nvs?.length; i++)
@@ -267,6 +270,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.edited = this.edited.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 		this.onSelectEvent = this.onSelectEvent.bind(this);
+		this.isActive = this.isActive.bind(this);
 
 		Spreadsheetier.registerReq((conds: PageInf, rec: Decision) => { return new MyReq(conds, rec);});
 
@@ -276,11 +280,12 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			  cols: [
 				{ field: 'myId', label: L("decision Id"), width: 10, hide: true },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb', onEditStop: this.edited, delItemName: L('-- Clear --') },
+				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb',
+				  editable: this.isActive, onEditStop: this.edited, delItemName: L('-- Clear --') },
 				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
 				{ field: 'remarks', label: L("Memo"), width: 140, type: 'text' },
-				{ field: 'descript', label: L("Remarks"), width: 200, type: 'text', editable: false },
+				// { field: 'descript', label: L("Remarks"), width: 200, type: 'text', editable: false },
 			] });
 		
         this.gridRef = React.createRef();
@@ -296,11 +301,8 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 		this.tier.setContext(this.context);
 		this.tier.loadCourses(this.context);
-		// this.tier.loadMyScores(this.context);
 		this.scoretier.setContext(this.context);
-		this.scoretier.record(undefined, () => {
-
-		});
+		this.scoretier.record(undefined, () => { });
 
 		// Spreadsheet + MyReq will load course pre module for last active event (mydecision : records)
 		this.setState({});
@@ -347,20 +349,25 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	}
 
     onSelectEvent (event: NV) : void {
-		let ename = event.n;
-		let isActive = ename.startsWith("Active: ");
+        this.tier.eventId = event.v as string;
+        this.tier.eventName = event.n;
+
+		// let ename = event.n;
+		// let isActive = ename.startsWith("Active: ");
+		let isActive = this.isActive();
 
 		this.buttons.save = isActive;
 		this.buttons.export = isActive;
 		this.buttons.upload = isActive;
 
 		this.setState({})
-
-        this.tier.eventId = event.v as string;
-        this.tier.eventName = event.n;
-
         this.bindSheet(undefined);
-    };
+    }
+
+	isActive() {
+		return this.tier?.eventName?.startsWith("Active: ");
+	}
+;
 
 	edited (p: CellEditingStoppedEvent) : void {
 		this.tier.updateCell(p, () => {
