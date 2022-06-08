@@ -4,8 +4,6 @@ node_modules
 # !react-quiz/dist
 */dist/*.min.js*
 dist/*
-!dist/*.html
-dist/index.html
 **/private.html
 **/private.json
 private
