@@ -182,6 +182,7 @@ AnGridsheet.propTypes = {
 export function anMultiRowRenderer (param) {
 	if (param.value)
 		return `<p style="line-height: 1.2em" >${param.value.split('\n').join('<br/>')}</p>`;
+	else return '<p style="line-height: 1.2em" >&nbsp;</p>';
 }
 
 export function AnIndicatorRenderer (param) {

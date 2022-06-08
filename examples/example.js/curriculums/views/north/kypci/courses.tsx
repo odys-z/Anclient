@@ -72,6 +72,7 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
 				{ field: 'remarks', label: L("Remarks"), width: 960, type: 'text',
 				  wrapText: true, autoHeight: true,
+				  minHeight: '1.1em',
 				  cellEditor: 'agLargeTextCellEditor',
 				  cellEditorParams: {cols: 80, rows: 12, maxLength: 4096 },
 				  cellRenderer: anMultiRowRenderer,

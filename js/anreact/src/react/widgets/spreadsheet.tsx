@@ -114,6 +114,7 @@ export interface SheetCol extends TierCol {
 
 	wrapText?: boolean,
 	autoHeight?: boolean,
+	minHeight?: string | number,
 
 	/**
 	 * e.g.  cellRenderer: anMultiRowRenderer,

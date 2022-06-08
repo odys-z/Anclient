@@ -3,8 +3,7 @@ import { Theme, withStyles } from '@material-ui/core/styles';
 
 import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
-import {
-	L, ComboCondType, Comprops, CrudComp,
+import { L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
@@ -64,8 +63,8 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 		this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
 
-		this.toAdd = this.toAdd.bind(this);
-		this.toDel = this.toDel.bind(this);
+		// this.toAdd = this.toAdd.bind(this);
+		// this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 
 		Spreadsheetier.registerReq((conds: PageInf) => { return new ProgressReq(conds) });
@@ -113,13 +112,13 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 			});
 	}
 
-	toAdd(_e: React.UIEvent) {
-		this.tier.insert(this.bindSheet);
-	}
+	// toAdd(_e: React.UIEvent) {
+	// 	this.tier.insert(this.bindSheet);
+	// }
 
-	toDel(e: React.UIEvent) {
-		this.tier.del({ids: [this.tier.pkval?.v]}, this.bindSheet);
-	}
+	// toDel(e: React.UIEvent) {
+	// 	this.tier.del({ids: [this.tier.pkval?.v]}, this.bindSheet);
+	// }
 
 	render() {
 		let that = this;
@@ -145,16 +144,9 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 				<Button variant="outlined"
 					className={classes.usersButton}
 					color='primary'
-					onClick={this.toAdd}
-					endIcon={<JsampleIcons.Add />}
-				>{L('Append')}
-				</Button>
-				<Button variant="outlined"
-					className={classes.usersButton}
-					color='secondary'
-					onClick={this.toDel}
-					endIcon={<JsampleIcons.Delete />}
-				>{L('Delete')}
+					onClick={this.showDetails}
+					endIcon={<JsampleIcons.ViewColumn />}
+				>{L('View')}
 				</Button>
 			</div> */}
 			{this.confirm}
