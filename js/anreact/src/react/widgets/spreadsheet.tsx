@@ -57,6 +57,9 @@ export interface CellEvent extends RowEvent {
     value: any;
 }
 
+export interface CellClickedEvent extends CellEvent {
+} 
+
 /**
  * Short-cut for ag-grid-community (License: MID)
  */

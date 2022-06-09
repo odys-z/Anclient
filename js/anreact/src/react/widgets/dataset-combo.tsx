@@ -46,15 +46,12 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		// sk: undefined,
 		// combo: {label: undefined, val: undefined, initVal: undefined, ref: undefined, options: []},
 		// options: [] as Array<ComboItem>,
-
-
 		selectedItem: undefined,
 	};
 
 	combo = {
 		options: undefined as Array<ComboItem>,
 		loading: false,
-		// initVal: undefined
 	};
 
 	refcbb = React.createRef<HTMLDivElement>();
