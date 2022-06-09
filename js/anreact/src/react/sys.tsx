@@ -1,5 +1,5 @@
 import React, { Context } from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { Theme, withStyles } from "@material-ui/core/styles";
 import clsx from 'clsx';
 import Grid from '@material-ui/core/Grid';
 import Drawer from '@material-ui/core/Drawer';
@@ -22,14 +22,15 @@ import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import {
-	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School
+	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School, SettingsOutlined, BarChart,
+	GroupAdd, MoreHoriz, Description, Ballot, ScreenShareOutlined, FolderSharedOutlined, HowToRegSharp
 } from '@material-ui/icons';
 
 import { AnContext, AnContextType } from './reactext';
-	import { ConfirmDialog } from './widgets/messagebox';
-	import { MyIcon } from './widgets/my-icon';
-	import { MyInfo } from './widgets/my-info';
-	import { L } from '../utils/langstr';
+import { ConfirmDialog } from './widgets/messagebox';
+import { MyIcon } from './widgets/my-icon';
+import { MyInfo } from './widgets/my-info';
+import { L } from '../utils/langstr';
 
 import {
 	Home, ErrorPage, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW
@@ -54,6 +55,17 @@ const _icons = {
 	'menu-lv1': <Drafts />,
 	'menu-leaf': <Sms />,
 	'deflt': <Inbox />,
+
+	'sys': <Ballot />,
+	'settings': <SettingsOutlined />,
+	'users': <GroupAdd />,
+	'children': <School />,
+	'paper': <Description />,
+	'blank': <MoreHoriz />,
+	'send': <ScreenShareOutlined />,
+	'doc': <FolderSharedOutlined />,
+	'chart': <BarChart />,
+	'mystudent': <HowToRegSharp />,
 }
 
 /**
@@ -67,7 +79,7 @@ const _comps = { }
 
 const drawerWidth = 240;
 
-const styles = theme => ({
+const styles = (theme: Theme) => ({
 	direction: theme.direction || 'ltr',
 	root: {
 		display: 'flex',
@@ -180,6 +192,9 @@ export function parseMenus(json = []): {
 			// this is just a lagacy of EasyUI, will be deprecated
 			let {funcId, id, funcName, text, url, css, flags, parentId, sort, sibling, children}
 				= json.node;
+
+			if (typeof css === 'string')
+				try { css = eval('(' + css + ')'); } catch {}
 
 			sibling = sibling || sort;
 			funcId = funcId || id;
@@ -350,13 +365,13 @@ class SysComp extends CrudCompW<SysProps> {
 
 		let m = this.state.sysMenu;
 		let expandItem = this.toExpandItem;
-		let mtree = buildMenu(m);
+		let mtree = buildMenu(-1, m);
 		return mtree;
 
-		function buildMenu( menu : MenuItem | MenuItem[] ) {
+		function buildMenu( depth: number, menu : MenuItem | MenuItem[] ) {
 			if (Array.isArray(menu)) {
 				return menu.map( (i, x) => {
-						return buildMenu(i);
+						return buildMenu( depth + 1, i );
 					} );
 			}
 			else {
@@ -365,48 +380,53 @@ class SysComp extends CrudCompW<SysProps> {
 				  return (
 				  <div key={menu.funcId}>
 					<ListItem button onClick={expandItem} data-iid={menu.funcId}>
-						<ListItemIcon>{icon(menu.css?.icon)}</ListItemIcon>
+						<ListItemIcon key={menu.funcId}>{icon(depth, menu.css?.icon)}</ListItemIcon>
 						<ListItemText primary={L(menu.funcName)} />
-						{ open ? icon('expand') : icon('collapse') }
+						{ open ? icon(0, 'expand') : icon(0, 'collapse') }
 					</ListItem>
 					<Collapse in={open} timeout="auto" unmountOnExit>
 						<List component="div" disablePadding>
-							{buildMenu(menu.children)}
+							{buildMenu(depth, menu.children)}
 						</List>
 					</Collapse>
 				  </div>);
 				else
 				  return (menu && menu.funcId ?
 					<div key={menu.funcId} >
-						{/* <Link component={RouterLink} to={menu.url}> */}
-							<ListItem button className={classes.nested} onClick={
-								e => {
-									if (that.state.welcome)
-										that.setState( {welcome: false} );
+						<ListItem button className={classes.nested} onClick={
+							e => {
+								if (that.state.welcome)
+									that.setState( {welcome: false} );
 
-									if (that.state.currentPage?.url !== menu.url)
-										that.setState( {currentPage: menu} );
-								} } >
-							<ListItemIcon>{icon(menu.css?.icon)}</ListItemIcon>
-							<ListItemText primary={L(menu.funcName)} />
-							</ListItem>
-						{/* </Link> */}
+								if (that.state.currentPage?.url !== menu.url)
+									that.setState( {currentPage: menu} );
+							} } >
+						<ListItemIcon>{icon(depth, menu.css?.icon)}</ListItemIcon>
+						<ListItemText primary={L(menu.funcName)} />
+						</ListItem>
 					</div> : '');
 			}
 		}
 
-		function icon(icon: string) {
-			// shall we use theme here?
-			return _icons[icon] || _icons['deflt'];
+		function icon(levelIndent: number, icon: string) {
+			// return _icons[icon] || _icons['deflt'];
+			let indent = []
+			for (let i = 0; i < levelIndent; i++)
+				indent.push( <div key={i}>{_icons.blank}</div> );
+			indent.push( <div key={indent.length}>{_icons[icon] || _icons.deflt}</div> );
+
+			return indent;
 		}
 	}
 
 	route() {
 		const TagName = _comps[this.state.currentPage?.url || '/home'];
-		return (
-		  <TagName
-			uri={this.state.currentPage?.url || '/'}
-			ssInf={this.context.anClient?.ssInf} /> );
+		if (TagName)
+		  return (
+			<TagName
+				uri={this.state.currentPage?.url || '/'}
+				ssInf={this.context.anClient?.ssInf} /> );
+		else return <Home />;
 	}
 
 	render() {

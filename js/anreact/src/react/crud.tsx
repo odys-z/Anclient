@@ -121,7 +121,7 @@ CrudCompW.contextType = AnContext;
 
 class HomeComp extends CrudComp<Comprops> {
 	render() {
-		return (<>Welcome to AnReact (Anclient JS)</>);
+		return (<>Home Page (wrong role - function configuration?)</>);
 	}
 }
 const Home = withStyles(styles)(HomeComp);
