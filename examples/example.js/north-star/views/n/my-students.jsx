@@ -44,18 +44,17 @@ class MyStudentsComp extends UserstComp {
 	}
 
 	// override works
-	getTier = () => {
+	// getTier = () => { }
+
+	componentDidMount() {
+		console.log(this.uri);
 		this.tier = new MyKidsTier(this);
 		this.tier.setContext(this.context);
 	}
 
-	componentDidMount() {
-		console.log(this.uri);
-	}
-
 	toAdd() {
 		let that = this;
-		this.tier.pkval = undefined;
+		this.tier.pkval.v = undefined;
 		this.tier.rec = {};
 
 		this.recForm = (<KidDetailst crud={CRUD.c}
@@ -78,7 +77,6 @@ class MyStudentsComp extends UserstComp {
 	}
 
 	render() {
-		let args = {};
 		let tier = this.tier;
 		const { classes } = this.props;
 		let btn = this.state.buttons;
@@ -134,10 +132,10 @@ class MyStudentsQuery extends React.Component {
 	}
 
 	collect() {
-		return {
+		return { query: {
 			orgId    : this.conds[0].val ? this.conds[0].val.v : undefined,
 			userName : this.conds[1].val ? this.conds[1].val : undefined,
-			hasTodos : this.conds[2].val ? this.conds[2].val : false };
+			hasTodos : this.conds[2].val ? this.conds[2].val : false } };
 	}
 
 	/** Design Note:

@@ -296,7 +296,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds.query as Tierec )
+					new UserstReq( this.uri, conds?.query as Tierec )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
@@ -418,7 +418,7 @@ export class UserstReq extends UserReq {
 	relations: DbRelations;
 	deletings: string[];
 
-	constructor (uri: string, args: Tierec) {
+	constructor (uri: string, args = {} as Tierec) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;

@@ -3,7 +3,7 @@ import { toBool } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, relStree, NV, PageInf, AnTreeNode, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
+	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -54,8 +54,11 @@ export interface ErrorCtx {
 }
 
 export interface TierCol extends DbCol {
-    /**input type / form type, not db type */
-    type?: string;
+    /**input type / form type, not db type
+	 * - actions: user bottons, to be removed
+	 * - formatter: user function for UI element
+	 */
+    type?: 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
     style?: string;

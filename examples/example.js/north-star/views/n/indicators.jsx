@@ -76,7 +76,7 @@ class IndicatorsComp extends CrudCompW {
 				  validator: {len: 200, notNull: true} },
 				{ type: 'float', field: 'weight', label: L('Default Weight'),
 				  validator: {min: 0.0} },
-				{ type: 'enum', field: 'qtype', label: L('Question Type'),
+				{ type: 'cbb', field: 'qtype', label: L('Question Type'),
 				  // If a node is the type of the first option, it means that node is middle (internal) node.
 				  options: [{n: L('[ Category ]'), v: 'cate'}, ...QuizProtocol.Qtype.options()],
 				  validator: {notNull: true} },

@@ -291,7 +291,8 @@ class SysComp extends CrudCompW<SysProps> {
 				<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
 					<School color='primary'/>
 					<Box component='span' display='inline'>Documents:
-						<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
+						<Link style={{ marginLeft: 4 }} target='_blank'
+							href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
 							{`${this.state.sysName}`}</Link>
 					</Box>
 				</Paper>
