@@ -420,7 +420,7 @@ export class UserstReq extends UserReq {
 	relations: DbRelations;
 	deletings: string[];
 
-	constructor (uri: string, args = {} as Tierec) {
+	constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
