@@ -343,8 +343,8 @@ export class UsersTier extends Semantier {
 		this.rec.pswd = cipher;
 		this.rec.iv = iv;
 		*/
-		this.rec.iv = "null";
-
+		// this.rec.iv = undefined; // won't work
+		this.rec.iv = null; // working - but why? (didn't sent by Chrome)
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )
 			.A(crud === CRUD.c ? UserstReq.A.insert : UserstReq.A.update) );
