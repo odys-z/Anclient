@@ -53,12 +53,14 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
+export type ColType = 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+
 export interface TierCol extends DbCol {
     /**input type / form type, not db type
 	 * - actions: user bottons, to be removed
 	 * - formatter: user function for UI element
 	 */
-    type?: 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+    type?: ColType; // 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
     style?: string;

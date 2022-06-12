@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, ColDef, Column, ColumnApi,
+import { ColDef, Column, ColumnApi,
+	ColumnFunctionCallbackParams,
 	GetContextMenuItems, GetContextMenuItemsParams, GridApi, GridReadyEvent, ICellRendererParams, RowNode
 } from 'ag-grid-community';
 
@@ -9,10 +10,11 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, isEmpty } from '@anclient/semantier';
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, isEmpty, ColType } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { AnConst } from '../../utils/consts';
 import { CSSProperties } from '@material-ui/styles';
+import { AnContextType } from '../reactext';
 
 /**
  * Short-cut for ag-grid-community (License: MID)
@@ -60,6 +62,13 @@ export interface CellEvent extends RowEvent {
 export interface CellClickedEvent extends CellEvent {
 } 
 
+export interface EditableCallbackParams extends ColumnFunctionCallbackParams {
+}
+
+export interface EditableCallback {
+    (params: EditableCallbackParams): boolean;
+}
+
 /**
  * Short-cut for ag-grid-community (License: MID)
  */
@@ -78,7 +87,7 @@ export interface SheetCol extends TierCol {
 	 * - cbb: bind options with sk
 	 * - dynamic-cbb: options changing for each rows, work together with cbbOptions
 	 */
-	type?: 'text' | 'cbb' | 'dynamic-cbb';
+	type?: 'dynamic-cbb' & ColType; //'text' | 'cbb' | 'dynamic-cbb';
 	/** dynamic options per record. */
 	cbbOptions?: (rec: SpreadsheetRec) => string[] 
 
@@ -546,8 +555,8 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	}
 
 	componentDidMount() {
-		this.tier.setContext(this.context);
-		this.tier.loadCbbOptions(this.context);
+		this.tier.setContext(this.context as AnContextType);
+		this.tier.loadCbbOptions(this.context as AnContextType);
 
 		let that = this;
 		this.tier.records(undefined, () => that.setState({ready: true}));

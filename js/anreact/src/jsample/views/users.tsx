@@ -343,7 +343,7 @@ export class UsersTier extends Semantier {
 		this.rec.pswd = cipher;
 		this.rec.iv = iv;
 		*/
-		this.rec.iv = undefined;
+		this.rec.iv = "null";
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )

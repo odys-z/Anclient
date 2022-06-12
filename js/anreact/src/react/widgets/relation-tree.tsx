@@ -155,12 +155,8 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 								onChange={(e) => {
 								  e.stopPropagation();
 								  node.checked = !toBool(node.checked);
-								  // if (typeof that.props.onCheck === 'function')
-									// that.props.onCheck(e);
-
-									// checkAll(e.target.checked, node.children)
-									node.children.forEach( c => { c.node.checked = e.target.checked } );
-									that.setState({});
+								  node.children.forEach( c => { c.node.checked = e.target.checked } );
+								  that.setState({});
 								}}/>
 						  }
 						  {node.text}
