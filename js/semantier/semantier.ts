@@ -53,6 +53,7 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
+/** List column / record field (UI) Type */
 export type ColType = 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {

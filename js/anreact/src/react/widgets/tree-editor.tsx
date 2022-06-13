@@ -45,6 +45,9 @@ const styles = (theme: Theme) => ({
 	  backgroundColor: "#ccc"
 	}
   },
+  forest: {
+	  height: '90vh',
+  },
   treeItem: {
 	padding: theme.spacing(1),
 	borderLeft: "1px solid #bcd",
@@ -374,7 +377,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 		let m = this.state.forest;
 		let mtree = buildTreegrid( m, undefined, compOts );
-		return mtree;
+		return (<div className={classes.forest}>{mtree}</div>);
 
 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts: CompOpts) {
 		  if (Array.isArray(tnode)) {

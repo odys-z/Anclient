@@ -10,7 +10,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, isEmpty, ColType } from '@anclient/semantier';
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, ColType } from '@anclient/semantier';
 import { AnReactExt } from '../anreact';
 import { AnConst } from '../../utils/consts';
 import { CSSProperties } from '@material-ui/styles';
@@ -79,6 +79,11 @@ export interface CellEditingStoppedEvent extends CellEvent {
     newValue: any;
 }
 
+/**
+ * Spreadsheet column type, where 'dynamic-cbb' type is a combobox changing code/value options for each row.
+ */
+export type SheetColType = 'dynamic-cbb' & ColType;
+
 export interface SheetCol extends TierCol {
 	label: string;
 	field: string;
@@ -87,7 +92,7 @@ export interface SheetCol extends TierCol {
 	 * - cbb: bind options with sk
 	 * - dynamic-cbb: options changing for each rows, work together with cbbOptions
 	 */
-	type?: 'dynamic-cbb' & ColType; //'text' | 'cbb' | 'dynamic-cbb';
+	type?: SheetColType;
 	/** dynamic options per record. */
 	cbbOptions?: (rec: SpreadsheetRec) => string[] 
 
