@@ -53,15 +53,17 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
-/** List column / record field (UI) Type */
-export type ColType = 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+/** List column / record field (UI) Type
+ * - dynamic-cbb' type is a combobox changing code/value options for each row.
+ */
+export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {
     /**input type / form type, not db type
 	 * - actions: user bottons, to be removed
 	 * - formatter: user function for UI element
 	 */
-    type?: ColType; // 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+    type?: ColType;
 
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
     style?: string;
@@ -167,17 +169,12 @@ export class Semantier {
         this.pkval = props.pkval || {pk: undefined, v: undefined};
     }
 
-    /**main table name */
-    // mtabl: string;
-
     /** list's columns */
     _cols: Array<TierCol>;
     /** client function / CRUD identity */
     uri: string;
     /** Fields in details from, e.g. maintable's record fields */
     _fields: TierCol[];
-    /** optional main table's pk */
-    // pk: string;
 
     /** current crud */
     crud: CRUD;

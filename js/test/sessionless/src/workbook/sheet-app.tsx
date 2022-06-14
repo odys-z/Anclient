@@ -9,8 +9,8 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs, CellEditingStoppedEvent, Spreadsheetier
 } from '../../../../anreact/src/an-components';
 
-import { Workbook } from './workbook';
-import { MyBookReq, MyWorkbookTier } from './workbook-tier';
+import { Workbook } from './workbook-no-tier';
+import { MyBookReq } from './workbook-tier';
 
 const { JsampleTheme } = jsample;
 

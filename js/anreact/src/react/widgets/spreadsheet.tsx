@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, Column, ColumnApi,
-	ColumnFunctionCallbackParams,
-	GetContextMenuItems, GetContextMenuItemsParams, GridApi, GridReadyEvent, ICellRendererParams, RowNode
+import { ColDef, Column, ColumnApi, GridApi,
+	ColumnFunctionCallbackParams, GetContextMenuItems, GetContextMenuItemsParams,
+	GridReadyEvent, ICellRendererParams, RowNode
 } from 'ag-grid-community';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -79,11 +79,6 @@ export interface CellEditingStoppedEvent extends CellEvent {
     newValue: any;
 }
 
-/**
- * Spreadsheet column type, where 'dynamic-cbb' type is a combobox changing code/value options for each row.
- */
-export type SheetColType = 'dynamic-cbb' & ColType;
-
 export interface SheetCol extends TierCol {
 	label: string;
 	field: string;
@@ -92,7 +87,7 @@ export interface SheetCol extends TierCol {
 	 * - cbb: bind options with sk
 	 * - dynamic-cbb: options changing for each rows, work together with cbbOptions
 	 */
-	type?: SheetColType;
+	type?: ColType;
 	/** dynamic options per record. */
 	cbbOptions?: (rec: SpreadsheetRec) => string[] 
 

@@ -6,7 +6,7 @@ import { AnsonMsg, AnsonResp, PageInf } from '../../../../semantier/anclient';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, AnContextType,
 } from '../../../../anreact/src/an-components';
 import { JsampleIcons } from '../../../../anreact/src/jsample/styles';
 
@@ -55,7 +55,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 		console.log(uri);
 
 		this.tier = this.props.tier;
-		this.tier.setContext(this.context);
+		this.tier.setContext(this.context as AnContextType);
 
 		this.setState({});
 	}
