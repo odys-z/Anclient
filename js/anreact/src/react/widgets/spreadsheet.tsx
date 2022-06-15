@@ -225,6 +225,11 @@ export class SpreadsheetReq extends UserReq {
 	}
 }
 
+/**
+ * Spreadsheetier is a virtual tier that only works with an actual tier providing service in recognized patterns.
+ * 
+ * @FIXME There is no corresponding server side currently.
+ */
 export class Spreadsheetier extends Semantier {
 	static reqfactory: (conds: PageInf, rec?: SpreadsheetRec) => SpreadsheetReq;
 
