@@ -25,11 +25,10 @@ const styles = (_theme: Theme) => ({
 	}
 });
 
-interface Progress extends SpreadsheetRec {
-
-}
-
 class ProgressReq<R extends SpreadsheetRec> extends SpreadsheetReq {
+	static mtabl: 'b_mydecisions';
+	static pk: 'myId';
+
 	rec: R;
 
 	constructor(query?: PageInf, rec?: R) {
@@ -63,23 +62,21 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 		this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
 
-		// this.toAdd = this.toAdd.bind(this);
-		// this.toDel = this.toDel.bind(this);
 		this.bindSheet = this.bindSheet.bind(this);
 
 		Spreadsheetier.registerReq((conds: PageInf) => { return new ProgressReq(conds) });
 
 		this.tier = new Spreadsheetier('progress',
 		{ uri: this.uri,
-		  pkval: {pk: 'myId', v: undefined, tabl: 'b_mydecisions'},
+		  pkval: { pk: ProgressReq.pk, v: undefined, tabl: ProgressReq.mtabl },
 		  cols: [
 			{ field: 'cId', label: L("Id"), width: 100, editable: false },
 			{ field: 'eventName', label: L("AP Event"), width: 160, noAllItem: true, editable: false },
-			{ field: 'progress', label: L("Students Count"), width: 120, editable: false },
-			{ field: 'currName', label: L("Course Name"), width: 160, editable: false },
+			{ field: 'progress', label: L("Students Count"), width: 100, editable: false },
+			{ field: 'currName', label: L("Course Name"), width: 260, editable: false },
 			{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
-			{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-			{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
+			{ field: 'module', label: L('Module'), width: 110, type: 'cbb', sk: 'curr-modu', editable: false },
+			{ field: 'cate', label: L("Category"), width: 260, type: 'cbb', sk: 'curr-cate', editable: false },
 		] });
 	}
 
@@ -112,14 +109,6 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 			});
 	}
 
-	// toAdd(_e: React.UIEvent) {
-	// 	this.tier.insert(this.bindSheet);
-	// }
-
-	// toDel(e: React.UIEvent) {
-	// 	this.tier.del({ids: [this.tier.pkval?.v]}, this.bindSheet);
-	// }
-
 	render() {
 		let that = this;
 		let {classes} = this.props;
@@ -140,15 +129,6 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />
 			  </div>}
-			{/* <div style={{textAlign: 'center', background: '#f8f8f8'}}>
-				<Button variant="outlined"
-					className={classes.usersButton}
-					color='primary'
-					onClick={this.showDetails}
-					endIcon={<JsampleIcons.ViewColumn />}
-				>{L('View')}
-				</Button>
-			</div> */}
 			{this.confirm}
 		</div>);
 	}

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { AgGridReact } from 'ag-grid-react';
+import { AgGridColumn, AgGridColumnProps, AgGridReact } from 'ag-grid-react';
 import { ColDef, Column, ColumnApi, GridApi,
 	ColumnFunctionCallbackParams, GetContextMenuItems, GetContextMenuItemsParams,
-	GridReadyEvent, ICellRendererParams, RowNode
+	GridReadyEvent, ICellRendererParams, RowNode, ICellRendererComp, ICellRendererFunc
 } from 'ag-grid-community';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -79,7 +79,11 @@ export interface CellEditingStoppedEvent extends CellEvent {
     newValue: any;
 }
 
-export interface SheetCol extends TierCol {
+/**
+ * For ag-grid column options, see
+ * https://www.ag-grid.com/react-data-grid/column-properties/
+ */
+export interface SheetCol extends TierCol, AgGridColumnProps {
 	label: string;
 	field: string;
 
@@ -117,7 +121,7 @@ export interface SheetCol extends TierCol {
 
 	suppressSizeToFit?: boolean;
 	resizable?: boolean;
-	editable?: boolean | Function;
+	editable?: boolean | EditableCallback;
 	singleClickEdit?: boolean;
 	width?: number;
 	minWidth?: number;
@@ -133,7 +137,7 @@ export interface SheetCol extends TierCol {
 	/**
 	 * e.g.  cellRenderer: anMultiRowRenderer,
 	 */
-	cellRenderer?: Function | string,
+	cellRenderer?: string | (new () => ICellRendererComp) | ICellRendererFunc,
 
 	/**
 	 * e.g. 'agLargeTextCellEditor',
@@ -397,8 +401,24 @@ export class Spreadsheetier extends Semantier {
 		}
 	}
 
-    record(conds: PageInf, onLoad: OnLoadOk<SpreadsheetRec>) : void {
-		super.records(conds, onLoad);
+    record<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<SpreadsheetRec>) : void {
+		if (!this.client) return;
+
+		let client = this.client;
+		let that = this;
+
+		let r = Spreadsheetier.reqfactory(conds);
+
+		let req = client.userReq(this.uri, this.port,
+					r.A(SpreadsheetReq.A.rec) );
+
+		client.commit(req,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rec = rows? rows[0] : undefined;
+				onLoad(cols, rows as T[]);
+			},
+			this.errCtx);
 	}
 
 	records<T extends SpreadsheetRec>(conds: PageInf, onLoad: OnLoadOk<T>) {

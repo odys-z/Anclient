@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
-	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
+	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';

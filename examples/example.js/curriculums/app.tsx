@@ -18,6 +18,7 @@ import { MyScores } from './views/center/my-scores';
 import { CourseReadonly } from './views/center/course-readonly';
 import { APEvents } from './views/north/kypci/events';
 import { welcome } from './views/center/nwelcome';
+import { MyClass } from './views/north/my-clsss';
 
 export interface Approps {
     iportal?: string;
@@ -88,6 +89,7 @@ class App extends React.Component<Approps, any> {
 			{path: '/n/podiyi', comp: APEvents},
 			{path: '/n/kypci', comp: Course},
 			{path: '/n/ohlyad', comp: Progress},
+			{path: '/n/myclass', comp: MyClass},
 			{path: '/c/course', comp: CourseReadonly},
 			{path: '/c/status', comp: MyScores},
 			{path: '/c/my', comp: My},
