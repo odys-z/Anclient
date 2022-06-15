@@ -83,8 +83,10 @@ export interface SheetCol extends TierCol {
 	label: string;
 	field: string;
 
-	/**cell type, default: text
+	/**
+	 * cell type, default: text
 	 * - cbb: bind options with sk
+	 * - autocbb: same to cbb for anreact
 	 * - dynamic-cbb: options changing for each rows, work together with cbbOptions
 	 */
 	type?: ColType;
@@ -200,8 +202,6 @@ export interface CbbCellValue {
 }
 
 export class SpreadsheetReq extends UserReq {
-	// new (...args: any[]) : Req
-	// { return new Req(args);}
 	static A = {
 		update: 'u',
 		insert: 'c',
@@ -234,7 +234,6 @@ export class Spreadsheetier extends Semantier {
 
 	/**jserv port name, e.g. 'workbook' */
 	port: string;
-	// currentRecId: any;
 
 	constructor(port: string, props: {uri: string, pkval: PkMeta, cols: SheetCol[],
 		/** e.g. {gridOptions: { rowHeight: 50 } } - not working */
@@ -312,20 +311,12 @@ export class Spreadsheetier extends Semantier {
 	}
 
 	/**
+	 * 
 	 * Decode record's FK value for display cell content - called by AgSelectCell for rendering.
-	 *
-	 * @param field field name for finding NV records to decode.
-	 * @param v
-	 * @param rec current row (p.data)
-	 * @returns showing element
-	decode(field: string, v: string, rec: SpreadsheetRec): string | Element {
-		v = rec[field] as string;
-		let nvs = this.cbbItems[field];
-		for (let i = 0; i < nvs?.length; i++)
-			if (nvs[i].v === v)
-				return nvs[i].n;
-		return v;
-	}
+	 * 
+	 * @param p 
+	 * - p.coleDef.field: data name
+	 * @returns 
 	 */
 	decode(p: ICellRendererParams) : string | Element {
 		let field = p.colDef?.field;
@@ -430,7 +421,6 @@ export class Spreadsheetier extends Semantier {
 			},
 			this.errCtx);
 	}
-
 
 	insert(onOk: OnCommitOk) {
 		console.log('can be abstracted?');
