@@ -127,11 +127,6 @@ export interface Tierelations extends DbRelations {
 export interface QueryConditions {
 	pageInf?: PageInf;
 	[q: string]: string | number | object | boolean;
-
-	/**
-	 * should be only type of QueryCondition. String & number value for backward compatability
-	[q: string]: QueryCondition | string | number;
-	 */
 }
 
 /**
