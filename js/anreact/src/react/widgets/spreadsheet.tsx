@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AgGridColumn, AgGridColumnProps, AgGridReact } from 'ag-grid-react';
+import { AgGridColumnProps, AgGridReact } from 'ag-grid-react';
 import { ColDef, Column, ColumnApi, GridApi,
 	ColumnFunctionCallbackParams, GetContextMenuItems, GetContextMenuItemsParams,
 	GridReadyEvent, ICellRendererParams, RowNode, ICellRendererComp, ICellRendererFunc
@@ -11,7 +11,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
 	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, ColType } from '@anclient/semantier';
-import { AnReactExt } from '../anreact';
+import { utils, AnReactExt } from '@anclient/anreact';
 import { AnConst } from '../../utils/consts';
 import { CSSProperties } from '@material-ui/styles';
 import { AnContextType } from '../reactext';
@@ -60,7 +60,7 @@ export interface CellEvent extends RowEvent {
 }
 
 export interface CellClickedEvent extends CellEvent {
-} 
+}
 
 export interface EditableCallbackParams extends ColumnFunctionCallbackParams {
 }
@@ -95,13 +95,13 @@ export interface SheetCol extends TierCol, AgGridColumnProps {
 	 */
 	type?: ColType;
 	/** dynamic options per record. */
-	cbbOptions?: (rec: SpreadsheetRec) => string[] 
+	cbbOptions?: (rec: SpreadsheetRec) => string[]
 
 	/** The semantic key - Spreadsheet load combobox options automaticall
-	 * 
+	 *
 	 * A note about ag-grid warning:
 	 * invalid colDef property 'sk' did you mean any of these: __v_skip, ...
-	 * 
+	 *
 	 * This warning occures when rendering Spreadsheet before all comboboxes' loading triggered
 	 * (where the sk be deleted). Currently avoiding this happening is depending on user's code.
 	 * There is no plan to solve this.
@@ -114,7 +114,7 @@ export interface SheetCol extends TierCol, AgGridColumnProps {
 	noAllItem?: boolean,
 
 	/** An additional option item for clear the selection (an additonal clear button)
-	 * 
+	 *
 	 * How this works: have encoder return a null value - so currently only works for relation table
 	 */
 	delItemName?: string;
@@ -141,7 +141,7 @@ export interface SheetCol extends TierCol, AgGridColumnProps {
 
 	/**
 	 * e.g. 'agLargeTextCellEditor',
-	 * 
+	 *
 	 * https://ag-grid.com/javascript-data-grid/provided-cell-editors/
 	 * */
 	cellEditor?: string,
@@ -164,7 +164,7 @@ export class SpreadsheetResp extends AnsonResp {
 	}
 }
 
-Protocol.registerBody("io.odysz.jsample.semantier.SpreadsheetResp",
+Protocol.registerBody("io.oz.spreadsheet.SpreadsheetResp",
 	(json) => {
 		return new SpreadsheetResp(json);
 	});
@@ -315,12 +315,12 @@ export class Spreadsheetier extends Semantier {
 	}
 
 	/**
-	 * 
+	 *
 	 * Decode record's FK value for display cell content - called by AgSelectCell for rendering.
-	 * 
-	 * @param p 
+	 *
+	 * @param p
 	 * - p.coleDef.field: data name
-	 * @returns 
+	 * @returns
 	 */
 	decode(p: ICellRendererParams) : string | Element {
 		let field = p.colDef?.field;
@@ -450,6 +450,10 @@ export class Spreadsheetier extends Semantier {
 			// new MyBookReq( undefined ).A(MyBookReq.A.insert));
 
 		this.client.commit(req, onOk, this.errCtx);
+	}
+
+	uri2src() {
+		return utils.urlOfdata(this.rec.mime as string, this.rec.uri64);
 	}
 }
 

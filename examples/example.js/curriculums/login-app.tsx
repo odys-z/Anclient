@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier'
 import { L, Langstrs, AnContext, AnError, AnReact, Login, jsample } from '@anclient/anreact';
-import { Northprops } from './common/north';
+// import { Northprops } from './common/north';
 import { Theme } from '@material-ui/core/styles';
 
 const styles = (theme: Theme) => (Object.assign(
@@ -13,6 +13,17 @@ const styles = (theme: Theme) => (Object.assign(
 	  },
   })
 );
+
+export interface Northprops {
+    iportal?: string;
+    servId: string;
+    servs?: {host?: string, [h: string]: string};
+
+    iwindow?: typeof window;
+    iparent?: typeof parent;
+    ilocation?: string;
+	ihome?: string;
+}
 
 /** The application main, context singleton and error handler, but only for login
  * used in iframe (no origin change). */

@@ -51,7 +51,8 @@ class MyDocViewComp extends DetailFormW<CompOpts & {uri: string, tier: Spreadshe
 		if (this.tier.pkval.v) {
 			let that = this;
 			let page = new PageInf(0, -1)
-				.nv(this.tier.pkval.pk, this.tier.pkval.v);
+				.nv(this.tier.pkval.pk, this.tier.pkval.v)
+				.nv("eId", this.tier.rec?.eId as string);
 			this.tier.record(page, () => {
 				that.setState({});
 			} );
@@ -80,9 +81,13 @@ class MyDocViewComp extends DetailFormW<CompOpts & {uri: string, tier: Spreadshe
 			let typ = rec.mime ? regex.mime2type(rec.mime as string) : 'image';
 			if (typ === '.pdf')
 				return <object width="100%" height="650" type="application/pdf"
-							data={this.tier.rec?.uri as string} />;
+							data={this.tier.uri2src()} />;
+							// data={this.tier.rec?.uri64 as string} />;
 			else if (typ === 'image')
-				return <img width="100%" src={this.tier.rec?.uri as string} />;
+				return <img width="100%"
+					// src={this.tier.rec?.uri64 as string}
+					src={this.tier.uri2src()}
+					/>;
 		}
 		else return <></>;
 	}

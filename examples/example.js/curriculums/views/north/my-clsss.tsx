@@ -10,6 +10,7 @@ import { L, ComboCondType, Comprops, CrudComp,
 import { CellClickedEvent } from 'ag-grid-community';
 
 import { MyDocView } from '../center/mydoc-view';
+import { getMimeIcon } from '../../common/star-theme';
 
 const { JsampleIcons } = jsample;
 const { sk } = Protocol;
@@ -70,7 +71,8 @@ class MyClassComp extends CrudComp<Comprops & {conn_state: string, tier: Spreads
 
 		this.bindSheet = this.bindSheet.bind(this);
 		this.showDoc = this.showDoc.bind(this);
-
+		this.imgCellRederer = this.imgCellRederer.bind(this);
+              
 		Spreadsheetier.registerReq((conds: PageInf) => { return new MyClassReq(conds) });
 
 		this.tier = new Spreadsheetier('myclass',
@@ -78,10 +80,12 @@ class MyClassComp extends CrudComp<Comprops & {conn_state: string, tier: Spreads
 		  pkval: {pk: MyClassReq.pk, v: undefined, tabl: MyClassReq.mtabl},
 		  cols: [
 			{ field: 'kid', label: L("Id"), width: 100, editable: false },
+			{ field: 'eId', label: L("Id"), width: 100, hide: true },
+			{ field: 'eventName', label: L("AP Event"), width: 160, editable: false },
 			{ field: 'userName', label: L("Student"), width: 160, editable: false },
 			{ field: 'courses', label: L("Count"), width: 80, editable: false },
 			{ field: 'optime', label: L("Date"), width: 180, editable: false },
-			{ field: 'uri', label: L("Signature"), width: 120, type: 'text',
+			{ field: 'mime', label: L("Signature"), width: 120, type: 'text',
               cellRenderer: this.imgCellRederer,
               onCellClicked: this.showDoc, editable: false },
 		] });
@@ -120,17 +124,20 @@ class MyClassComp extends CrudComp<Comprops & {conn_state: string, tier: Spreads
     // imgCellRedere: string | (new () => ICellRendererComp) | ICellRendererFunc;
     imgCellRederer(p: { value: string; }) {
         if (p.value && p.value.length > 1)
-            return "<img src='favicon.ico'></img>";
+            return getMimeIcon(p.value);
         else 
             return "<div>&nbsp;</div>";
     }
 
     showDoc(p: CellClickedEvent) {
+		if (!p.data.mime)
+			return;
         console.log('.......................');
 
         let that = this;
         this.tier.pkval = {pk: MyClassReq.pk, v: p.data[MyClassReq.pk], tabl: MyClassReq.mtabl}
         // let docId = this.tier.pkval.v;
+		this.tier.rec = {eId: p.data.eId};
         
 		this.docForm = (<MyDocView 
 			uri={this.uri}

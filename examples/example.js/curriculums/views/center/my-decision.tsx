@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button } from '@material-ui/core';
+import { Box, Button, Typography } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
 import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx } from '@anclient/semantier';
@@ -27,6 +27,12 @@ const styles = (_theme: Theme) => ({
 		// marginTop: 6,
 		margin: 6,
 		width: 150,
+	},
+	smalltip: {
+		fontSize: "0.8em",
+		color: "#fd4141",
+		backgroundColor: "silver",
+		marginBottom: 22,
 	}
 });
 
@@ -218,8 +224,8 @@ export class MyCoursesTier extends Spreadsheetier {
 		}
 	}
 
-	upload(filename: string, blob: string, ok: OnCommitOk, err: ErrorCtx) {
-		let rec = {myId: this.pkval.v, eventId: this.eventId, uri: blob, filename}; 
+	upload(meta: {mime: string, name: string}, blob: string, ok: OnCommitOk, err: ErrorCtx) {
+		let rec = {myId: this.pkval.v, eventId: this.eventId, uri: blob, filename: meta.name, mime: meta.mime}; 
 
 		if (!this.client) return;
 		let client = this.client;
@@ -291,8 +297,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
         this.gridRef = React.createRef();
 
 		this.scoretier = new MyScoreTier({
-			uri: this.uri,
-			pkval: {pk: 'kid', v: undefined, tabl: 'b_myscores'}});
+			uri: this.uri});
 	}
 
 	componentDidMount() {
@@ -441,7 +446,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		}
 
 		this.tier.upload(
-			meta.name, blob, 
+			meta, blob, 
 			this.showConfirm,
 			this.context.error);
     }
@@ -453,9 +458,14 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
             <div className='noPrint'>
 				<DatasetCombo uri={this.uri}
 					sk={'ann-evt'}
+					label={'AP Event'}
 					noAllItem={true}
+					autoHighlight={true}
 					// className='noPrint'
-					onSelect={this.onSelectEvent} />
+					onSelect={this.onSelectEvent} onLoad={(cols, rows) => {
+						console.log(rows);
+					}}/>
+				{!this.tier.eventId && <Typography className={classes.smalltip}>{L('Please select an AP Event!')}</Typography>}
             </div>
             <div className='onlyPrint'>
                 <h1>{this.tier.eventName?.replace("Active: ", "")}</h1>
