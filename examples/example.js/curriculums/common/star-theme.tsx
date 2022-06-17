@@ -41,3 +41,19 @@ export function getMimeIcon(mime: string, iconpath = '/res-vol/icons') {
 
    return (`<img style='height: 90%' src='${iconpath}/${src}'}></img>`);
 }
+
+/**
+ * Set color class: c-l1, c-l2, c-l3
+ */
+export function addAgStyle() {
+	let dstyle = document.getElementById('ag-row-rule-styles');
+	if (!dstyle) {
+		let newStyle = document.createElement("style");
+		newStyle.id = 'ag-row-rule-styles';
+		newStyle.innerHTML = `
+			.c-l1 { color: red !important;}
+			.c-l2 { color: rgb(164,164,0) !important;}
+			.c-l3 { color: green !important;}`;
+		document.getElementsByTagName("head")[0].appendChild(newStyle);
+	}
+}
