@@ -6,9 +6,9 @@ import { AnsonMsg, AnsonResp, PageInf } from '../../../../semantier/anclient';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, AnContextType, Spreadsheetier,
 } from '../../../../anreact/src/an-components';
-import { MyWorkbookTier } from './workbook-tier';
+// import { MyWorkbookTier } from './workbook-tier';
 import { JsampleIcons } from '../../../../anreact/src/jsample/styles';
 
 const styles = (_theme: Theme) => ({
@@ -25,9 +25,9 @@ const styles = (_theme: Theme) => ({
 	}
 });
 
-class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWorkbookTier}>{
-	tier: MyWorkbookTier;
-	// classes: ClassNames;
+class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier}>{
+	// tier: MyWorkbookTier;
+	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
 
@@ -39,7 +39,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 				  label: L('Subject'), field: 'subj', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
-	constructor(props: Comprops & {conn_state: string, tier: MyWorkbookTier}) {
+	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier}) {
 		super(props);
 
 		this.uri = props.uri;
@@ -56,7 +56,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 		console.log(uri);
 
 		this.tier = this.props.tier;
-		this.tier.setContext(this.context);
+		this.tier.setContext(this.context as AnContextType);
 
 		this.setState({});
 	}
@@ -86,23 +86,12 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: MyWork
 	}
 
 	toDel(e: React.UIEvent) {
-		let that = this;
-		// if (this.currentId)
-		this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
+		// let that = this;
+		// // if (this.currentId)
+		// this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
+		
+		this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
 	}
-
-	// paper(e: SpreadsheetRec) {
-	// 	return (
-	// 		<Paper elevation={4} style={{ margin: 24 }}
-	// 			className={this.classes.welcome}>
-	// 			<IconButton onClick={this.props.showMenu} >
-	// 				{this.icon(e)}
-	// 				<Box component='span' display='inline' className={this.classes.cardText} >
-	// 					Please click menu to start.
-	// 				</Box>
-	// 			</IconButton>
-	// 		</Paper>);
-	// }
 
 	render() {
 		let that = this;

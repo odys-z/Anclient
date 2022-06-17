@@ -7,12 +7,12 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { CrudComp } from '../crud';
 import { GetContextMenuItems } from 'ag-grid-community';
-import { CellClickedEvent, CellEditingStoppedEvent, SpreadsheetRec } from './spreadsheet';
+import { CellClickedEvent, CellEditingStoppedEvent, EditableCallback, SpreadsheetRec } from './spreadsheet';
 
 export interface SheetProps {
     defaultColDef: {
         resizable?: boolean;
-        editable?: boolean;
+        editable?: boolean | EditableCallback;
         singleClickEdit?: boolean;
         stopEditingWhenCellsLoseFocus?: boolean; };
     columns: any;

@@ -26,8 +26,8 @@ interface ImageUploadProps extends Comprops {
 	field: string;
 
 	/** callback on file loaded
-	 * 
-	 * blob: 
+	 *
+	 * blob:
 	 * File content wrapped with dataUrl()
 	 */
 	onFileLoaded?: (fileMeta: {mime: string, name: string}, blob: string) => void;
@@ -108,7 +108,6 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 		let { classes } = this.props;
 
 		return (
-		  //<Box style={{height: 48, border: "solid 1px #aaa2"}}>
 		  <Box className={ classes.imgUploadBox }>
 			<img
 				src={dataimg}

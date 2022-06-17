@@ -125,7 +125,7 @@ class QuizzesComp extends CrudCompW<Comprops> {
 		let query = this.state.queryReq;
 		if (query) {
 			query.Body().Page(size, page);
-			this.state.pageInf = {page, size, total: this.state.pageInf.total};
+			this.state.pageInf = new PageInf(page, size, this.state.pageInf.total); // {page, size, total: this.state.pageInf.total};
 			this.context.anReact.bindTablist(query, this, this.context.error);
 		}
 	}
@@ -243,7 +243,7 @@ class QuizzesComp extends CrudCompW<Comprops> {
 				<DatasetCombo uri={this.uri}
 					sk='north.ind_cate'
 					label={L('Quiz Types')}
-					options={[AnConst.cbbAllItem]} style={{width: 200}}
+					options={[AnConst.cbbAllItem]} style={{width: 300}}
 					onSelect={ (v) => {
 						that.templ = v.v as string;
 						let buttons = that.buttons;
@@ -252,10 +252,6 @@ class QuizzesComp extends CrudCompW<Comprops> {
 					} }
 				/>
 
-				{/* <Button variant="contained" disabled={!btn.add}
-					className={classes.button} onClick={this.toAddA}
-					startIcon={<JsampleIcons.ItemCollapse />}
-				>{L('Start')}</Button> */}
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAddB}
 					startIcon={<JsampleIcons.Worksheet />}

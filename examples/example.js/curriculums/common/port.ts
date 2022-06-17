@@ -7,4 +7,5 @@ export const StarPorts = {
 	curriculum: 'curr.tier',
 	mydecisions: 'my.tier',
 	progress: 'progress.tier',
+	myclass: 'myclass.tier',
 }

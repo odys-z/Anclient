@@ -108,7 +108,6 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 	}
 
 	toDel(e: React.UIEvent) {
-		let that = this;
 		this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
 	}
 

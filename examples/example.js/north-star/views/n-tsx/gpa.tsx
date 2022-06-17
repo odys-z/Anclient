@@ -207,7 +207,7 @@ class GPAsheetComp extends CrudComp<Comprops> {
 				(_e: any) => { } );
 	}
 
-	rowEditableChecker(p: { node: { rowIndex: number; }; colDef: { field: string; }; }) {
+	rowEditableChecker(p: { node: { rowIndex: number; }; colDef: { field?: string; }; }) {
 		if (p.node.rowIndex > 0 &&
 			p.colDef.field === 'gday' && p.node.rowIndex === this.tier.rows.length - 1) // last gday
 			// last gday is editable

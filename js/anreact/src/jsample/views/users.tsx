@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
-	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
+	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -296,7 +296,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds.query as Tierec )
+					new UserstReq( this.uri, conds?.query as Tierec )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
@@ -343,7 +343,9 @@ export class UsersTier extends Semantier {
 		this.rec.pswd = cipher;
 		this.rec.iv = iv;
 		*/
-		this.rec.iv = undefined;
+
+		// this.rec.iv = undefined; // won't work - didn't sent by Chrome 
+		this.rec.iv = null; // working - but why?
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )
@@ -418,7 +420,7 @@ export class UserstReq extends UserReq {
 	relations: DbRelations;
 	deletings: string[];
 
-	constructor (uri: string, args: Tierec) {
+	constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;

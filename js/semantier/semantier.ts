@@ -59,11 +59,11 @@ export interface ErrorCtx {
 export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {
-    /**input type / form type, not db type
-     * - actions: user bottons, to be removed
-     * - formatter: user function for UI element
-     */
-    type?: ColType;
+	/**input type / form type, not db type
+	 * - actions: user bottons, to be removed
+	 * - formatter: user function for UI element
+	 */
+	type?: ColType;
 
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
     style?: string;
@@ -77,11 +77,11 @@ export interface TierCol extends DbCol {
 }
 
 /**Meta data handled from tier (DB field).
- * 
+ *
  * This type need 2 parameters:
- * 
+ *
  * F: UI field type, e.g. JSX.Element;
- * 
+ *
  * FO: extended field options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
 */
 export interface AnlistColAttrs<F, FO> extends TierCol {

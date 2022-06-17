@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.4.12",
+  "version": "0.4.14",
   "description": "Anclient built on ReactJs.",
   "main": "./src/an-components.ts",
   "directories": {
@@ -26,7 +26,7 @@
   "author": "Ody Zhou",
   "license": "MIT",
   "dependencies": {
-    "@anclient/semantier": "^0.9.76",
+    "@anclient/semantier": "^0.9.78",
     "@emotion/react": "^11.4.1",
     "acorn": "^8.4.1",
     "ag-grid-community": "^26.0.0",

@@ -1,4 +1,6 @@
 import { Theme } from "@material-ui/core/styles";
+import { ClassNames } from "@anclient/anreact";
+import { regex } from "@anclient/anreact/src/utils/regex";
 
 export function starTheme(theme: Theme) {
   return {
@@ -21,3 +23,21 @@ export function starTheme(theme: Theme) {
 export interface StarTheme extends Theme {
 
 };
+
+/**
+* @param mime
+* @param iconpath 
+* @return &lt;img/&gt;
+*/
+export function getMimeIcon(mime: string, iconpath = '/res-vol/icons') {
+   const known = { image: 'image.svg', '.txt': 'text.svg',
+		   '.doc': 'docx.svg', '.docx': 'docx.svg', '.zip': '7zip.svg',
+		   '.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
+   const unknown = 'unknown.svg';
+
+   let src = regex.mime2type(mime);
+   if (src) src = known[src];
+   else src = unknown
+
+   return (`<img style='height: 90%' src='${iconpath}/${src}'}></img>`);
+}

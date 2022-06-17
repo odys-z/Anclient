@@ -147,7 +147,7 @@ class MyBookReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 class MyBookResp extends AnsonResp {
 }
 
-Protocol.registerBody('io.oz.sandbox.sheet.SpreadsheetResp',
+Protocol.registerBody('io.oz.spreadsheet.SpreadsheetResp',
 					  (jsonBd) => { return new MyBookResp(jsonBd); });
 
 export { MyWorkbookTier, MyCurriculum, MyBookReq, MyBookResp };
