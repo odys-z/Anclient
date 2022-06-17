@@ -12,7 +12,7 @@ import {
 const { JsampleIcons } = jsample;
 
 import { Curriculum, CourseReq } from '../north/kypci/tier'
-import { StarTheme } from '../../common/star-theme';
+import { addAgStyle, StarTheme } from '../../common/star-theme';
 
 const styles = (_theme: StarTheme) => ({
 	root: {
@@ -45,8 +45,23 @@ class CourseReadonlyComp extends CrudComp<Comprops & {conn_state: string}>{
 				  label: L('Level'), field: 'clevel', grid: {sm: 3, md: 3}} as ComboCondType,
 			] } as QueryPage;
 
+	rowClassRules = {
+		'c-l1': (params) => this.lvlColor(params, 'c-l1'),
+		'c-l2': (params) => this.lvlColor(params, 'c-l2'),
+		'c-l3': (params) => this.lvlColor(params, 'c-l3'),
+	};
+
+	lvlColor(p, className) {
+        let lvl = p.data.clevel;
+		lvl = this.tier ? this.tier.encode('clevel', lvl, p.data) : lvl; 
+		return lvl === className || '[' + className + ']' === lvl;
+	}
+
+
 	constructor(props: Comprops & {conn_state: string}) {
 		super(props);
+
+		addAgStyle();
 
 		this.uri = props.uri;
 		this.queryConds = this.queryConds.bind(this);
@@ -105,6 +120,7 @@ class CourseReadonlyComp extends CrudComp<Comprops & {conn_state: string}>{
 				<AnSpreadsheet
 					tier={this.tier}
 					autosave={true}
+					aggrid={{rowClassRules: this.rowClassRules}}
 					onCellClicked={this.tier.onCellClick}
 					columns={this.tier.columns()}
 					rows={this.tier.rows} />

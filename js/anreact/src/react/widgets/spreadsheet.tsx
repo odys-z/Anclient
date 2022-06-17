@@ -320,10 +320,11 @@ export class Spreadsheetier extends Semantier {
 	 *
 	 * @param p
 	 * - p.coleDef.field: data name
+	 * @param field override p.colDef?.field
 	 * @returns
 	 */
-	decode(p: ICellRendererParams) : string | Element {
-		let field = p.colDef?.field;
+	decode(p: ICellRendererParams, field?: string) : string | Element {
+		field = field ? field : p.colDef?.field;
 		if (field) {
 			let v = this.rows[p.rowIndex][field] as string;
 			let nvs = this.cbbItems[field];
