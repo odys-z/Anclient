@@ -25,9 +25,12 @@ export interface ComboProps extends Comprops {
 	label?: string;
 	// style: CSSStyleDeclaration;
 	onSelect?: (it: NV) => void;
+	onLoad?: OnLoadOk<ComboItem>;
 
 	sk?: string,
 	noAllItem?: boolean,
+
+	autoHighlight?: boolean,
 }
 
 const styles = (theme: Theme) => (Object.assign(
@@ -88,6 +91,9 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				onDone: (cols, rows) => {
 					that.combo.options = rows as Array<ComboItem>;
 					that.setState({});
+
+					if(typeof that.props.onLoad === 'function')
+						that.props.onLoad(cols, rows as Array<ComboItem>);
 				}
 			});
 		}
@@ -146,13 +152,14 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
 			options={opts}
+			autoHighlight={this.props.autoHighlight}
 			style={this.props.style}
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
 			renderInput={
 				(params) => <TextField {...params}
-					label={this.props.showLable && v ? v.n : ''}
+					label={this.props.showLable && v ? v.n : this.props.label || ''}
 					variant="outlined" /> }
 		  /> : <></>);
 

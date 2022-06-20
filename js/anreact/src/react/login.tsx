@@ -33,8 +33,8 @@ class LoginComp extends React.Component<LoginProps> {
     config = {
 		loggedin: false,
 		show: true,  // show textarear or only "login"
-		pswd: '123456',
-		userid: 'admin',
+		pswd: '',
+		userid: '',
 
 		alert: '',
 		showAlert: false,

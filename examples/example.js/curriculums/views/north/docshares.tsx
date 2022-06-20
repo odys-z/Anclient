@@ -3,9 +3,9 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Box, Button, Grid, Theme } from '@material-ui/core';
 
-import { Protocol, AnsonResp, AnsonBody, Semantier, UIComponent, Tierec, PkMeta, OnCommitOk, AnsonMsg, OnLoadOk, QueryConditions } from '@anclient/semantier';
+import { Protocol, AnlistColAttrs, AnsonResp, AnsonBody, Semantier, UIComponent, Tierec, PkMeta, OnCommitOk, AnsonMsg, OnLoadOk, QueryConditions } from '@anclient/semantier';
 import { L, AnContext,
-	CrudCompW, AnQueryst, AnTablist, ConfirmDialog, jsample, utils, Comprops, ClassNames} from '@anclient/anreact';
+	CrudCompW, AnQueryst, AnTablist, ConfirmDialog, jsample, utils, Comprops, ClassNames, CompOpts, ComboCondType} from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 const { mimeOf, dataOfurl, regex } = utils;
 
@@ -225,7 +225,7 @@ export class DocsQuery extends React.Component<DocsQueryProps> {
 					{n: 'Office PPT', v: 'ppt'},
 					{n: 'PDF', v: 'pdf'},
 					{n: 'Image', v:'image'}] },
-	];
+	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	constructor(props: any) {
 		super(props);
@@ -297,7 +297,7 @@ export class DocsTier extends Semantier {
 		  disabled: true },
 		{ type: 'text', field: 'mime',    label: 'File Type',
 		  disabled: true, formatter: undefined }
-	];
+	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	constructor(comp: UIComponent) {
 		super(comp);

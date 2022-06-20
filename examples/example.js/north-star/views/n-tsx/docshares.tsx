@@ -412,15 +412,15 @@ export class DocsTier extends Semantier {
 	 * @param mime
 	 * @param rec
 	 * @param classes
-	 * @param iconpath
-	 * @return <img/>
+	 * @param iconpath 
+	 * @return &lt;img/&gt;
 	 */
-	static getMimeIcon(mime: string, rec: Tierec, classes: ClassNames, iconpath? : string) {
+	static getMimeIcon(mime: string, rec: Tierec, classes: ClassNames, iconpath = '/res-vol/icons') {
 		const known = { image: 'image.svg', '.txt': 'text.svg',
 				'.doc': 'docx.svg', '.docx': 'docx.svg', '.zip': '7zip.svg',
 				'.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
 		const unknown = 'unknown.svg';
-		iconpath = iconpath || '/res-vol/icons';
+		// iconpath = iconpath || '/res-vol/icons';
 
 		let src = regex.mime2type(mime);
 		if (src) src = known[src];

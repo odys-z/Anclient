@@ -19,7 +19,7 @@ export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: 
  */
 export interface CompOpts {
 	classes: ClassNames;
-	media: Media;
+	media?: Media;
 }
 
 export interface QueryPage {

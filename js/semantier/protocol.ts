@@ -41,6 +41,13 @@ export class PageInf {
 		this.total = total || 0;
 		this.condts = condts;
 	}
+
+	nv(k: string, v: string) {
+		if (!this.condts)
+			this.condts = [];
+		this.condts.push([k, v]);
+		return this;
+	}
 };
 
 /**Lagecy from jquery & easui, replaced by NV - no need to collect form using JQuery in the future. */

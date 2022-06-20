@@ -64,24 +64,24 @@ class MyDocViewComp extends DetailFormW {
 		}
 	}
 
-	toSave(e) {
-		if (e) e.stopPropagation();
+	// toSave(e) {
+	// 	if (e) e.stopPropagation();
 
-		let that = this;
+	// 	let that = this;
 
-		if (this.tier.validate(this.tier.rec, this.recfields)) // field style updated
-			this.tier.saveRec(
-				{ crud: CRUD.u,
-				  disableForm: true },
-				resp => {
-					// NOTE should crud moved to tier, just like the pkval?
-					if (that.state.crud === CRUD.c) {
-						that.state.crud = CRUD.u;
-					}
-					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
-				} );
-		else this.setState({});
-	}
+	// 	if (this.tier.validate(this.tier.rec, this.recfields)) // field style updated
+	// 		this.tier.saveRec(
+	// 			{ crud: CRUD.u,
+	// 			  disableForm: true },
+	// 			resp => {
+	// 				// NOTE should crud moved to tier, just like the pkval?
+	// 				if (that.state.crud === CRUD.c) {
+	// 					that.state.crud = CRUD.u;
+	// 				}
+	// 				that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
+	// 			} );
+	// 	else this.setState({});
+	// }
 
 	toCancel (e) {
 		e.stopPropagation();
