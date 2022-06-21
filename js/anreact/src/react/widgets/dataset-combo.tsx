@@ -24,7 +24,13 @@ export interface ComboProps extends Comprops {
 	options?: Array<ComboItem>;
 	label?: string;
 	// style: CSSStyleDeclaration;
-	onSelect?: (it: NV) => void
+	onSelect?: (it: NV) => void;
+	onLoad?: OnLoadOk<ComboItem>;
+
+	sk?: string,
+	noAllItem?: boolean,
+
+	autoHighlight?: boolean,
 }
 
 const styles = (theme: Theme) => (Object.assign(
@@ -43,15 +49,12 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		// sk: undefined,
 		// combo: {label: undefined, val: undefined, initVal: undefined, ref: undefined, options: []},
 		// options: [] as Array<ComboItem>,
-
-
 		selectedItem: undefined,
 	};
 
 	combo = {
 		options: undefined as Array<ComboItem>,
 		loading: false,
-		// initVal: undefined
 	};
 
 	refcbb = React.createRef<HTMLDivElement>();
@@ -84,9 +87,13 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				// user uses this, e.g. name and value to access data
 				nv: this.props.nv || {n: 'name', v: 'value'},
 				// cond: this.state.condits, TODO: not used?
+				noAllItem: this.props.noAllItem,
 				onDone: (cols, rows) => {
 					that.combo.options = rows as Array<ComboItem>;
 					that.setState({});
+
+					if(typeof that.props.onLoad === 'function')
+						that.props.onLoad(cols, rows as Array<ComboItem>);
 				}
 			});
 		}
@@ -140,18 +147,19 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			ref={this.refcbb}
 			disabled={this.props.disabled || this.props.readonly || this.props.readOnly}
 			// defaultValue={this.props.val}
-			value={v}
+			value={this.props.noAllItem ? undefined : v}
 			onChange={ this.onCbbRefChange(this.refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
 			options={opts}
+			autoHighlight={this.props.autoHighlight}
 			style={this.props.style}
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
 			renderInput={
 				(params) => <TextField {...params}
-					label={this.props.showLable && v ? v.n : ''}
+					label={this.props.showLable && v ? v.n : this.props.label || ''}
 					variant="outlined" /> }
 		  /> : <></>);
 
@@ -196,7 +204,6 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		// cond.loading = true;
 		this.loading = true;
 
 		let ctx = this.context as AnContextType;
@@ -212,7 +219,6 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				// this.items = rows;
 
 				this.loading = false;
 

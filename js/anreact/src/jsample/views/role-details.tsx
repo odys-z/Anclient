@@ -11,43 +11,46 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { CRUD, PkMeta, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-import { AnContext, } from '../../react/reactext'
-import { JsampleIcons } from '../styles'
-import { Comprops, DetailFormW } from '../../react/crud'
-import { ConfirmDialog } from '../../react/widgets/messagebox'
+import { AnContext, } from '../../react/reactext';
+import { JsampleIcons } from '../styles';
+import { Comprops, DetailFormW } from '../../react/crud';
+import { ConfirmDialog } from '../../react/widgets/messagebox';
 import { AnRelationTree } from '../../react/widgets/relation-tree';
 import { TRecordForm } from '../../react/widgets/record-form';
 import { RoleTier } from './roles';
+import { Theme } from '@material-ui/core';
 
-const styles = theme => ({
-  dialogPaper: {
-	height: "100%"
-  },
-  root: {
-	marginTop: 60,
-	minHeight: "60vh",
-	maxHeight: "86vh",
-	maxWidth: "70vw",
-	minWidth: 600,
-	margin: "auto"
-  },
-  title: {
-	backgroundColor: "linen",
-	height: "5ch",
-	width: "100%",
-	color: "primary"
-  },
-  content: {
-	height: "100%",
-  },
-  buttons: {
-	justifyContent: "center",
-	verticalAlign: "middle",
-	"& > button": {
-	  width: "20ch"
-	}
-  },
-});
+const styles = (theme: Theme) => {
+	return ({
+		dialogPaper: {
+			height: "100%"
+		},
+		root: {
+			marginTop: 60,
+			minHeight: "60vh",
+			maxHeight: "86vh",
+			maxWidth: "70vw",
+			minWidth: 600,
+			margin: "auto"
+		},
+		title: {
+			backgroundColor: "linen",
+			height: "5ch",
+			width: "100%",
+			color: "primary"
+		},
+		content: {
+			height: "100%",
+		},
+		buttons: {
+			justifyContent: "center",
+			verticalAlign: "middle",
+			"& > button": {
+				width: "20ch"
+			}
+		},
+	});
+};
 
 class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk: string }> {
 
@@ -157,6 +160,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 					mtabl='a_roles' reltabl='a_role_func' relcolumn='nodeId'
 					sqlArgs={[this.pkval.v]}
 				/>
+					{/* relcolumn='nodeId' */}
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
 			  {crud &&

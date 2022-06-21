@@ -55,13 +55,18 @@ const styles = (theme: Theme) => ({
   }
 });
 
+/** FIXME shouldn't merge with relTree? */
 interface RelationTreeProps extends Comprops {
 	reltabl?: string;
 	sk?: string;
 
 	/**Semantier.formatRel() use this name to format relationship records,
-	 * where in UI component the FK value comes from */
-	relcolumn?: string;
+	 * where in UI component the FK value comes from
+	 *
+	 * FIXME shouldn't be changed to colProp
+	 * */
+	// relcolumn?: string;
+	colProp?: string;
 };
 
 /**
@@ -150,12 +155,8 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 								onChange={(e) => {
 								  e.stopPropagation();
 								  node.checked = !toBool(node.checked);
-								  // if (typeof that.props.onCheck === 'function')
-									// that.props.onCheck(e);
-
-									// checkAll(e.target.checked, node.children)
-									node.children.forEach( c => { c.node.checked = e.target.checked } );
-									that.setState({});
+								  node.children.forEach( c => { c.node.checked = e.target.checked } );
+								  that.setState({});
 								}}/>
 						  }
 						  {node.text}

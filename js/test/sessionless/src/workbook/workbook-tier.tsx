@@ -26,17 +26,17 @@ values ('b_curriculums.cId', 0, 'north.curr');
 
 select * from b_curriculums;
  */
-class MyWorkbookTier extends Spreadsheetier<MyBookReq<MyCurriculum>> {
+class MyWorkbookTier extends Spreadsheetier {
 	static curriculPk = {pk: 'cid', v: undefined, tabl: 'b_curriculums'};
 
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string, cols?: SheetCol[]}) {
-		super('workbook',
-			Object.assign(props,
-			/* not used, but is usefull for session client - which using prot 'update'. */
-			{pkval: MyWorkbookTier.curriculPk}));
+	constructor(props: {uri: string, cols: SheetCol[]}) {
+		super( 'workbook',	// jserv-sandbox/io.oz.sandbox.sheet.Spreadsheetier
+				Object.assign( props,
+				/* not used, but is usefull for session client - which using prot 'update'. */
+				{pkval: MyWorkbookTier.curriculPk} ));
 
 		console.log(this.uri);
 
@@ -132,14 +132,14 @@ class MyBookReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 
 	port: 'workbook';
 
-	rec: SpreadsheetRec;
-	page: PageInf;
+	rec: T;
+	// page: PageInf;
 	// conds: Array<string[]>;
 
 	constructor(query?: PageInf, rec?: T) {
-		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq'});
+		super({type: 'io.oz.sandbox.sheet.SpreadsheetReq', query});
 
-		this.page = query;
+		// this.page = query;
 		this.rec = rec;
 	}
 }
@@ -147,7 +147,7 @@ class MyBookReq<T extends SpreadsheetRec> extends SpreadsheetReq {
 class MyBookResp extends AnsonResp {
 }
 
-Protocol.registerBody('io.oz.sandbox.sheet.SpreadsheetResp',
+Protocol.registerBody('io.oz.spreadsheet.SpreadsheetResp',
 					  (jsonBd) => { return new MyBookResp(jsonBd); });
 
 export { MyWorkbookTier, MyCurriculum, MyBookReq, MyBookResp };

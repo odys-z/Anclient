@@ -7,6 +7,7 @@ dist/*
 !dist/*.html
 **/private.html
 **/private.json
+**/*.back.*
 private
 _build
 package-lock.json

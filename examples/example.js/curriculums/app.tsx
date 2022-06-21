@@ -5,15 +5,21 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt, jsample, AnContextType, Home
+	AnContext, AnError, AnReactExt, jsample, AnContextType
 } from '@anclient/anreact';
-const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
+const { Domain, Roles, Orgs, JsampleTheme } = jsample;
 
 import { StarPorts } from './common/port';
 
 import { Course } from './views/north/kypci/courses';
 import { Progress } from './views/north/progress';
 import { My } from './views/center/my-decision';
+import { MyScores } from './views/center/my-scores';
+import { CourseReadonly } from './views/center/course-readonly';
+import { APEvents } from './views/north/kypci/events';
+import { welcome } from './views/center/nwelcome';
+import { MyClass } from './views/north/my-clsss';
+import { ApUsers } from './views/north/ap-users';
 
 export interface Approps {
     iportal?: string;
@@ -62,7 +68,7 @@ class App extends React.Component<Approps, any> {
 		// Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
-		Protocol.sk.cbbMyClass = 'north.my-class';
+		Protocol.sk.cbbClasses = 'org.classes';
 
 		// singleton error handler
 		if ( !this.state.anClient || !this.state.anClient.ssInf
@@ -79,11 +85,14 @@ class App extends React.Component<Approps, any> {
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
-			{path: '/sys/users', comp: Userst},
+			{path: '/sys/users', comp: ApUsers},
 
+			{path: '/n/podiyi', comp: APEvents},
 			{path: '/n/kypci', comp: Course},
-			{path: '/n/prohres', comp: Progress},
-			{path: '/c/status', comp: Home},
+			{path: '/n/ohlyad', comp: Progress},
+			{path: '/n/myclass', comp: MyClass},
+			{path: '/c/course', comp: CourseReadonly},
+			{path: '/c/status', comp: MyScores},
 			{path: '/c/my', comp: My},
 		] );
 	}
@@ -163,10 +172,10 @@ class App extends React.Component<Approps, any> {
 				error: this.state.error,
 			}} >
 				<Sys menu='sys.menu.jsample'
-					sys='Emotion Regulation - TSX' menuTitle='Sys Menu'
+					sys={L('AP Courses')} menuTitle={L('Sys Menu')}
 					myInfo={myInfoPanels}
 					hrefDoc={'docs/index.html'}
-					// welcome={welcome}
+					welcome={welcome}
 					onLogout={this.logout} />
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}

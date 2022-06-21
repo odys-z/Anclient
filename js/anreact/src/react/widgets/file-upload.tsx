@@ -35,27 +35,10 @@ class FileUploadComp extends DetailFormW<Comprops>  {
 
 		// usually element in record form must know this
 		this.field = props.field;
-
-		// if (this.props.src64 && !this.state.src64) {
-		// 	this.state.src64 = this.props.src;
-		// }
 	}
 
 	componentDidMount() {
-
 		if (this.props.file) {
-			// let freader = new FileReader();
-			// freader.onload = function (e) {
-			// 	var b64 = fileclient.Uint8ToBase64(new Uint8Array(freader.result));
-			// 	if (typeof onok === 'function') {
-			// 		onok(fileclient.file, b64);
-			// 	}
-			// }
-			// if (fileclient.file) {
-			// 	freader.readAsArrayBuffer(fileclient.file);
-			// }
-
-			// this.state.src = this.props.src;
 		}
 	}
 
@@ -115,7 +98,6 @@ class FileUploadComp extends DetailFormW<Comprops>  {
 
 FileUploadComp.propTypes = {
 	tier: PropTypes.object.isRequired,
-	// nv: PropTypes.object, // the record field and value
 };
 
 const FileUpload = withWidth()(withStyles(styles)(FileUploadComp));

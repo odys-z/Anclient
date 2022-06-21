@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier';
-import { AnContext, AnError, AnReact, L, Login } from '@anclient/anreact';
+import { AnsonMsg, AnsonResp, SessionClient } from '../../semantier/anclient';
+import { AnContext, AnError, AnReact, L, Login } from '../../anreact/src/an-components';
 import { Comprops } from '../../anreact/src/react/crud';
 import { AnreactAppOptions, JsonServs } from '../../anreact/src/an-components';
 

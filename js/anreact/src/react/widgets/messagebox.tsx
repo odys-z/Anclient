@@ -43,8 +43,8 @@ const styles = theme => ({
 });
 
 export interface DialogProps extends Comprops {
-	onOk?: (sender: React.ReactNode) => void;
-	onCancel?: (sender: React.ReactNode) => void;
+	onOk?: (sender: React.ReactNode | HTMLElement) => void;
+	onCancel?: (sender: React.ReactNode | HTMLElement) => void;
 	onClose?: () => void;
 
 	title: string;
@@ -81,7 +81,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 			this.props.onClose();
 	}
 
-	toCancel(e: React.MouseEvent<HTMLElement>, reason?) {
+	toCancel(e: React.MouseEvent<HTMLElement>, _reason?) {
 		this.setState({closed: true});
 		if (typeof this.props.onCancel === 'function')
 			this.props.onCancel(e.currentTarget);

@@ -1,10 +1,23 @@
 import React from 'react';
 import PropTypes from "prop-types";
 
-import { AgGridReact } from 'ag-grid-react';
+import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+import { CrudComp } from '../crud';
+import { GetContextMenuItems } from 'ag-grid-community';
+import { CellClickedEvent, CellEditingStoppedEvent, EditableCallback, SpreadsheetRec } from './spreadsheet';
+
+export interface SheetProps {
+    defaultColDef: {
+        resizable?: boolean;
+        editable?: boolean | EditableCallback;
+        singleClickEdit?: boolean;
+        stopEditingWhenCellsLoseFocus?: boolean; };
+    columns: any;
+    rows: SpreadsheetRec[];
+}
 
 /**Thin wrapper of ag-grid.
  * 
@@ -16,7 +29,8 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
  *
  * Desgin Note: But is it possible handled by Semantic-DA?
  */
-export class AnGridsheet extends React.Component {
+export class AnGridsheet extends CrudComp<SheetProps & AgGridReactProps> {
+//export class AnGridsheet extends React.Component {
 	state = {
 		dirty: false,
 
@@ -32,8 +46,17 @@ export class AnGridsheet extends React.Component {
 	};
 
 	editHandlers = {};
+    gridApi: any;
+    gridColumnApi: any;
+    isEditable: any;
+    getContextMenuItems: GetContextMenuItems;
+    static propTypes: {
+        columns: PropTypes.Validator<any[]>; rows: PropTypes.Validator<any[]>;
+        // stateHook: PropTypes.object.isRequired,
+        contextMenu: PropTypes.Requireable<object>; onCellClicked: PropTypes.Requireable<(...args: any[]) => any>;
+    };
 
-	constructor(props) {
+	constructor(props: SheetProps) {
 		super(props);
 
 		let {resizable, editable, singleClickEdit} = props.defaultColDef || {};
@@ -81,7 +104,6 @@ export class AnGridsheet extends React.Component {
 	 * {"qtype": {name: 'Format Answer', action}, ...}
 	 * where the value of 'qtype' is the ag-gride context menu item:
 	 * @deprecated context menu is a module of ag-grid enterprise.
-	 */
 	getContextMenuItems = (para) =>  {
 		// cellval = param.value;
 		debugger
@@ -99,6 +121,7 @@ export class AnGridsheet extends React.Component {
 
 		return result;
 	}
+	 */
 
 	/**<pre>
 	  GetContextMenuItemsParams {
@@ -136,7 +159,7 @@ export class AnGridsheet extends React.Component {
 	type: "cellClicked"
 	value: "2021-09-14"
 	*/
-	onCellClicked = (p) => {
+	onCellClicked = (p: CellClickedEvent) => {
 		if (typeof this.props.onCellClicked === 'function')
 			this.props.onCellClicked(p);
 	};
@@ -144,12 +167,7 @@ export class AnGridsheet extends React.Component {
 	/** Grid event API:
 	 * https://www.ag-grid.com/javascript-data-grid/grid-events/
 	 */
-	onEditStop (p) {
-		// { "indId": "", "indName": "", "command": "b" }
-		// console.log(p.data, p.value, p.data.qtype);
-		// if (p.data.command === 'close')
-		// 	that.setState({ open: false });
-
+	onEditStop (p: CellEditingStoppedEvent) {
 		if (typeof this.editHandlers[p.colDef.field] === 'function')
 			this.editHandlers[p.colDef.field](p);
 	}
@@ -157,7 +175,7 @@ export class AnGridsheet extends React.Component {
 	render () {
 	  return (
 		<AgGridReact
-			editable={this.isEditable}
+			// editable={this.isEditable}
 			onCellClicked={this.onCellClicked}
 			columnDefs={this.coldefs}
 			components={this.props.components}
@@ -179,12 +197,13 @@ AnGridsheet.propTypes = {
 	onCellClicked: PropTypes.func,
 };
 
-export function anMultiRowRenderer (param) {
+export function anMultiRowRenderer (param: { value?: string; }) {
 	if (param.value)
 		return `<p style="line-height: 1.2em" >${param.value.split('\n').join('<br/>')}</p>`;
+	else return '<p style="line-height: 1.2em" >&nbsp;</p>';
 }
 
-export function AnIndicatorRenderer (param) {
+export function AnIndicatorRenderer (param: { rowIndex?: number; value?: string | Function | Element; }) {
 	if (param.rowIndex === 0)
 		return `<p style="line-height: 1.2em" >[avg] : ${param.value}</p>`;
 	else return param.value;
@@ -192,6 +211,8 @@ export function AnIndicatorRenderer (param) {
 
 // https://www.ag-grid.com/javascript-data-grid/component-cell-editor/#angular-cell-editing
 export class AnNumericEdit {
+  eInput: HTMLInputElement;
+  cancelBeforeStart: boolean;
   // gets called once before the renderer is used
   init(params) {
     // create the cell
@@ -220,7 +241,7 @@ export class AnNumericEdit {
     this.cancelBeforeStart = charPressIsNotANumber;
   }
 
-  isKeyPressedNavigation(event) {
+  isKeyPressedNavigation(event: KeyboardEvent) {
     return event.keyCode === 39 || event.keyCode === 37;
   }
 
@@ -262,8 +283,8 @@ export class AnNumericEdit {
     return false;
   }
 
-  getCharCodeFromEvent(event) {
-    event = event || window.event;
+  getCharCodeFromEvent(event: KeyboardEvent) {
+    event = event || window.event as any;
     return typeof event.which == 'undefined' ? event.keyCode : event.which;
   }
 
@@ -271,7 +292,7 @@ export class AnNumericEdit {
     return !!/\d/.test(charStr);
   }
 
-  isKeyPressedNumeric(event) {
+  isKeyPressedNumeric(event: KeyboardEvent) {
     const charCode = this.getCharCodeFromEvent(event);
     const charStr = String.fromCharCode(charCode);
     return this.isCharNumeric(charStr);

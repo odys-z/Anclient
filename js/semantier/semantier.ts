@@ -3,13 +3,13 @@ import { toBool } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, relStree, NV, PageInf, AnTreeNode, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
+	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 /**UI Element Formatter
- * 
+ *
  * E.g. TRecordForm will use this to format a field in form.
  * Currently tiers also accept this as field modifier. (FIXME - to be optimized)
  */
@@ -53,9 +53,17 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
+/** List column / record field (UI) Type
+ * - dynamic-cbb' type is a combobox changing code/value options for each row.
+ */
+export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+
 export interface TierCol extends DbCol {
-    /**input type / form type, not db type */
-    type?: string;
+	/**input type / form type, not db type
+	 * - actions: user bottons, to be removed
+	 * - formatter: user function for UI element
+	 */
+	type?: ColType;
 
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
     style?: string;
@@ -69,11 +77,12 @@ export interface TierCol extends DbCol {
 }
 
 /**Meta data handled from tier (DB field).
- * field and label properties are required.
- * 
- * F: field type, e.g. JSX.Element;
- * 
- * FO: options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
+ *
+ * This type need 2 parameters:
+ *
+ * F: UI field type, e.g. JSX.Element;
+ *
+ * FO: extended field options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
 */
 export interface AnlistColAttrs<F, FO> extends TierCol {
     /** Readable text (field name) */
@@ -94,7 +103,7 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
 
 /**Record handled from tier */
 export interface Tierec {
-	[f: string]: string | object | undefined;
+	[f: string]: string | number | boolean | object | undefined;
 }
 
 /**E.g. form's combobox field declaration */
@@ -118,11 +127,6 @@ export interface Tierelations extends DbRelations {
 export interface QueryConditions {
 	pageInf?: PageInf;
 	[q: string]: string | number | object | boolean;
-
-	/**
-	 * should be only type of QueryCondition. String & number value for backward compatability  
-	[q: string]: QueryCondition | string | number;
-	 */
 }
 
 /**
@@ -152,23 +156,20 @@ export class Semantier {
      *
      * @param props
      */
-    constructor(props: UIComponent) {
+    constructor(props: UIComponent & {pkval?: PkMeta}) {
         if (!props || !props.uri)
             throw Error("uri is required!");
 
         this.uri = props.uri;
+        this.pkval = props.pkval || {pk: undefined, v: undefined};
     }
 
-    /**main table name */
-    mtabl: string;
     /** list's columns */
     _cols: Array<TierCol>;
     /** client function / CRUD identity */
     uri: string;
     /** Fields in details from, e.g. maintable's record fields */
     _fields: TierCol[];
-    /** optional main table's pk */
-    // pk: string;
 
     /** current crud */
     crud: CRUD;
@@ -219,6 +220,19 @@ export class Semantier {
 
     disableValidate: any;
 
+	/**
+	 * Change each field's style according to it's validator.
+	 *
+	 * FIXME: lagacy of js
+	 *
+	 * the second parameter, fields, if provided, will be created a new instance. this is bug.
+	 *
+	 * See jsample/views/my-pswdcard for usage.
+	 *
+	 * @param rec
+	 * @param fields
+	 * @returns
+	 */
     validate(rec?: {}, fields?: Array<TierCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
@@ -304,9 +318,9 @@ export class Semantier {
 
     /**
 	 * Load relationships
-	 * @param client 
-	 * @param opts 
-	 * @param onOk 
+	 * @param client
+	 * @param opts
+	 * @param onOk
 	 */
     relations( client: SessionClient | Inseclient,
 		opts: { uri: string; reltabl: string;
@@ -363,7 +377,10 @@ export class Semantier {
 	 * @returns
 	 */
     saveRec(opts: {crud: CRUD; disableForm?: boolean; disableRelations?: boolean, reltabl?: string}, onOk: OnCommitOk): void {
-		if (!this.client) return;
+		if (!this.client) {
+			console.error("Saving with undefined AnClient. Ever called setContext(context) ?");
+			return;
+		}
 		let client = this.client;
 		let that = this;
 
@@ -378,13 +395,13 @@ export class Semantier {
 			console.log(crud, CRUD.c);
 			if ( crud === CRUD.c ) {
 				req = this.client.userReq<UpdateReq>(uri, 'insert',
-							new InsertReq( uri, this.mtabl )
+							new InsertReq( uri, this.pkval.tabl )
 							.columns(this._fields)
 							.record(this.rec) );
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
-							new UpdateReq( uri, this.mtabl, this.pkval)
+							new UpdateReq( uri, this.pkval.tabl, this.pkval)
 							.record(this.rec, this.pkval.pk) );
 			}
 		}
@@ -403,7 +420,7 @@ export class Semantier {
 					if (crud === CRUD.c)
 						// NOTE:
 						// resulving auto-k is a typicall semantic processing, don't expose this to caller
-						that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
+						that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
 					onOk(resp);
 				},
 				this.errCtx);
@@ -426,8 +443,8 @@ export class Semantier {
 
 		if (ids && ids.length > 0) {
 			let req = client
-				.usrAct(this.mtabl, CRUD.d, 'delete')
-				.deleteMulti(this.uri, this.mtabl, this.pkval.pk, [...ids]);
+				.usrAct(this.pkval.tabl, CRUD.d, 'delete')
+				.deleteMulti(this.uri, this.pkval.tabl, this.pkval.pk, [...ids]);
 
 			if (posts) {
 				let d = req.Body();
@@ -506,10 +523,10 @@ export class Semantier {
 	 * @param opts options
 	 * - opts.table: relationship table name
 	 * - opts.columnMap: column's value to be inserted
-	 * 
+	 *
 	 * If the item has a same named property, the value is collected from the item;<br>
 	 * Otherwise the argument's value will be used.
-	 * 
+	 *
 	 * - opts.check: checking column name
 	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checed.
 	 * @return subclass of AnsonBody
@@ -561,11 +578,11 @@ export class Semantier {
 		/**
 		 * Convert tree item (AnTreeNode) to [name-value, ...] as a nv record (Array<{name, value}>),
 		 * e.g.
-		 * 
+		 *
 		 * [ { "name": "funcId", "value": "sys-domain" },
-		 * 
+		 *
 		 *   { "name": "roleId", "value": "r003" } ]
-		 * 
+		 *
 		 * If the item has a same named property, the value is collected from the item;<br>
 		 * Otherwise the argument's value will be used.
 		 *

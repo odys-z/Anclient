@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations
+	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -51,11 +51,11 @@ const styles = (theme: Theme) => ( {
 class RolesComp extends CrudCompW<Comprops> {
 
 	state = {
-		condName: { type: 'text', field: 'roleName', val: '', label: L('Role Name')},
+		condName: { type: 'text', field: 'roleName', val: '', label: L('Role Name')} as AnlistColAttrs<JSX.Element, any>,
 		condOrg : { type: 'cbb',  field: 'orgId',    val: AnConst.cbbAllItem,
 					sk: 'org.all', nv: {n: 'text', v: 'value'},
 					options: [ AnConst.cbbAllItem ],
-					label: L('Organization') },
+					label: L('Organization') } as TierComboField<JSX.Element, any>,
 
 		// active buttons
 		buttons: { add: true, edit: false, del: false},
@@ -217,7 +217,6 @@ const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
 
 class RoleTier extends Semantier {
 	checkbox = true;
-	// rels = [];
 
 	_cols = [
 		{ text: L('Role Id'),  field: "roleId", hide: true },
@@ -241,29 +240,29 @@ class RoleTier extends Semantier {
 	constructor(comp: UIComponent) {
 		super(comp);
 
-		this.mtabl = 'a_roles';
+		this.pkval.tabl = 'a_roles';
 		this.pkval.pk = 'roleId';
-		// this.reltabl = 'a_role_func';
 
 		/**sk: role-funcs
 		 * Hard coded here since it's a business string for jsample app.
 		 */
 		this.relMeta = {'a_role_func':
 			{ stree: {
-				tabl: 'a_role_func',
+				childTabl: 'a_role_func',
 				pk: 'roleId',	 // fk to main table
 				fk: 'roleId',	 // fk to main table
 				col: 'funcId', // checking col
-				relcolumn: 'nodeId',
+				// relcolumn: 'nodeId',  // FIXME delete?
+				colProp: 'nodeId',
 				sk: 'trees.role_funcs'
-			},
+			} as relStree,
 			} as DbRelations
 		};
 	}
 
 	records(conds = {} as {roleId?: string; orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk<Tierec>) {
 		let { orgId, roleName, pageInf } = conds;
-		let queryReq = this.client.query(this.uri, this.mtabl, 'r', pageInf)
+		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'r', pageInf)
 		let req = queryReq.Body()
 			.expr('r.roleId').expr('roleName').expr('r.remarks').expr('orgName')
 			.l('a_orgs', 'o', 'o.orgId = r.orgId');

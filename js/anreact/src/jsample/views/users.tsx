@@ -5,16 +5,16 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
-	OnCommitOk, Semantext, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
+	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Semantier } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
-import { AnContext } from '../../react/reactext';
+import { AnContext, AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnTablist } from '../../react/widgets/table-list';
-import { AnQueryst } from '../../react/widgets/query-form';
+import { AnQueryst, ComboCondType } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
@@ -48,7 +48,7 @@ class UserstComp extends CrudCompW<Comprops> {
 	// pageInf: PageInf;
 	onPageInf: (page: number) => void;
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 
 		this.state.selected.ids = new Set();
@@ -64,19 +64,10 @@ class UserstComp extends CrudCompW<Comprops> {
 	}
 
 	componentDidMount() {
-		if (!this.tier) {
-			this.getTier()
-		}
-	}
-
-	getTier = () => {
+		// if (!this.tier) { this.getTier() }
+		console.log(this.uri);
 		this.tier = new UsersTier(this);
-		this.tier.setContext(this.context as any as Semantext);
-
-		// FIXME for override port for sessionless mode
-		// Once the uri & port been moved to semnantier, this section should be removed
-		if (this.props.port)
-			this.tier.port = this.props.port;
+		this.tier.setContext(this.context as AnContextType);
 	}
 
 	/** If condts is null, use the last condts to query.
@@ -84,9 +75,10 @@ class UserstComp extends CrudCompW<Comprops> {
 	 * @param condts the query conditions collected from query form.
 	 */
 	toSearch(condts: QueryConditions): void {
-		// querst.onLoad (query.componentDidMount) event can even early than componentDidMount.
 		if (!this.tier) {
-			this.getTier();
+			// this.getTier();
+			console.warn("really happens?")
+			return;
 		}
 
 		let that = this;
@@ -147,7 +139,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.recForm = (<UserDetailst crud={CRUD.c}
 			uri={this.uri}
 			tier={this.tier}
-			onOk={(r) => that.toSearch(undefined)}
+			onOk={() => that.toSearch(undefined)}
 			onClose={this.closeDetails} />);
 
 		// NOTE:
@@ -164,7 +156,7 @@ class UserstComp extends CrudCompW<Comprops> {
 			uri={this.uri}
 			tier={this.tier}
 			recId={pkv}
-			onOk={(r) => that.toSearch(undefined)}
+			onOk={() => that.toSearch(undefined)}
 			onClose={this.closeDetails} />);
 	}
 
@@ -182,7 +174,6 @@ class UserstComp extends CrudCompW<Comprops> {
 
 		return (<div className={classes.root}>
 			{this.props.funcName || this.props.title || 'Users of Jsample'}
-			<div className={classes.warn}>TODO Test Query Form!</div>
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
 			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode
@@ -222,11 +213,12 @@ export { Userst, UserstComp }
 
 class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions) => void}> {
 	conds = [
-		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student') },
+		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student'),
+		  grid: {sm: 3, md: 2} } as AnlistColAttrs<any, any>,
 		{ name: 'orgId',    field: 'orgId', type: 'cbb',  val: undefined, label: L('Class'),
-		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'} },
-		{ name: 'roleId',   field: 'roleId', type: 'cbb',  val: undefined, label: L('Role'),
-		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'}, grid: {sm: 3, md: 2} } as ComboCondType,
+		// { name: 'roleId',   field: 'roleId', type: 'cbb',  val: undefined, label: L('Role'),
+		//   sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'}, grid: {md: 2, sm: 3} },
 	];
 
 	constructor(props: Comprops) {
@@ -238,7 +230,8 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 		return { query: {
 			userName: this.conds[0].val ? this.conds[0].val : undefined,
 			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
-			roleId  : (this.conds[2].val as {n: string, v: string}) ?.v } };
+			// roleId  : (this.conds[2].val as {n: string, v: string}) ?.v }
+		} };
 	}
 
 	/** Design Note:
@@ -257,13 +250,7 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 
 export class UsersTier extends Semantier {
 	port = 'userstier';
-	// mtabl = 'a_users';
-	// pk = 'userId';
 	checkbox = true;
-	// rows = [];
-	// pkval = undefined;
-	// rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
-
 
 	// TODO doc: samantier where disable pk field if pkval exists
 	_fields = [
@@ -293,20 +280,13 @@ export class UsersTier extends Semantier {
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} }
 	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
-	constructor(comp) {
+	constructor(comp: Comprops) {
 		super(comp);
 
-		// this.port = 'userstier';
-		this.mtabl = 'a_users';
+		this.pkval.tabl = 'a_users';
 		this.pkval.pk = 'userId';
 		this.checkbox = true;
 		this.rows = [];
-		// pkval = undefined;
-		// rec = undefined as Tierec; // {pswd: undefined as string, iv: undefined as string};
-	}
-
-	columns() {
-		return this._cols;
 	}
 
 	records(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
@@ -316,7 +296,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds as UserstReqArgs )
+					new UserstReq( this.uri, conds?.query as Tierec )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
@@ -334,7 +314,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds as UserstReqArgs )
+					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.rec) );
 
 		client.commit(req,
@@ -357,9 +337,15 @@ export class UsersTier extends Semantier {
 		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
+		/**
+		 *  This is intial password
 		let {cipher, iv} = this.client.encryptoken(this.rec.pswd as string);
 		this.rec.pswd = cipher;
 		this.rec.iv = iv;
+		*/
+
+		// this.rec.iv = undefined; // won't work - didn't sent by Chrome 
+		this.rec.iv = null; // working - but why?
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )
@@ -371,7 +357,7 @@ export class UsersTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
+					that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);
@@ -404,15 +390,6 @@ export class UsersTier extends Semantier {
 	}
 }
 
-type UserstReqArgs = {
-	record?: Tierec;
-	pk?: string; relations?: DbRelations;
-	deletings?: string[];
-	userId?: string; userName?: string;
-	orgId?: string; roleId?: string;
-	hasTodos?: string;
-};
-
 export class UserstReq extends UserReq {
 	static __type__ = 'io.odysz.jsample.semantier.UserstReq';
 	static __init__ = function (uri) {
@@ -439,27 +416,25 @@ export class UserstReq extends UserReq {
 	orgId: string;
 	roleId: string;
 	hasTodos: boolean;
-	pk: string;
 	record: Tierec;
 	relations: DbRelations;
 	deletings: string[];
 
-	constructor (uri: string, args: UserstReqArgs = {}) {
+	constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
-		this.userId = args.userId;
-		this.userName = args.userName;
-		this.orgId = args.orgId;
-		this.roleId = args.roleId;
-		this.hasTodos = toBool(args.hasTodos);
+		this.userId = (args.userId || args.record?.userId) as string;
+		this.userName = args.userName as string;
+		this.orgId = args.orgId as string;
+		this.roleId = args.roleId as string;
+		this.hasTodos = toBool(args.hasTodos as string | boolean);
 
 		/// case u
-		this.pk = args.pk;
-		this.record = args.record;
-		this.relations = args.relations;
+		this.record = args.record as Tierec;
+		this.relations = args.relations as DbRelations;
 
 		// case d
-		this.deletings = args.deletings;
+		this.deletings = args.deletings as string[];
 	}
 }

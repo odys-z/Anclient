@@ -34,11 +34,19 @@ export class PageInf {
 	total?: number;
 	condts?: Array<string[]>;
 
-	constructor(page?: number, size?: number, total?: number) {
+	constructor(page?: number, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.semantic.jserv.R.PageInf';
 		this.page = page || 0;
 		this.size = size || -1;
 		this.total = total || 0;
+		this.condts = condts;
+	}
+
+	nv(k: string, v: string) {
+		if (!this.condts)
+			this.condts = [];
+		this.condts.push([k, v]);
+		return this;
 	}
 };
 
@@ -237,6 +245,10 @@ export class Protocol {
 	 * @param bodyConstructor AnsonBody constructor
 	 */
 	static registerBody = function(type: string, bodyConstructor: { (json: any): AnsonBody; } ) {
+		if ( Protocol.ansonTypes[type] )
+			console.error("Repeatedly registering protocol body, wrong type registering?",
+				type, Protocol.ansonTypes, bodyConstructor);
+
 		Protocol.ansonTypes[type] = bodyConstructor;
 	}
 

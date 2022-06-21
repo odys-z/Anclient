@@ -6,11 +6,11 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '../../../../semantier/anclient';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs, CellEditingStoppedEvent
+	AnContext, AnError, AnReactExt, jsample, JsonServs, CellEditingStoppedEvent, Spreadsheetier
 } from '../../../../anreact/src/an-components';
 
-import { Workbook } from './workbook';
-import { MyBookReq, MyWorkbookTier } from './workbook-tier';
+import { Workbook } from './workbook-no-tier';
+// import { MyBookReq } from './workbook-tier';
 
 const { JsampleTheme } = jsample;
 
@@ -18,7 +18,7 @@ type LessProps = {
 	servs: JsonServs;
 	servId: string;
 	iportal?: string;
-	iparent?: any; // parent of iframe
+	iparent?: string; // parent of iframe
 	iwindow?: any; // window object
 }
 
@@ -51,7 +51,7 @@ class App extends React.Component<LessProps, State> {
 	};
 
 	uri = '/less/sheet';
-	tier: MyWorkbookTier;
+	tier: Spreadsheetier;
 
 	/**
      * Restore session from window.localStorage
@@ -91,9 +91,13 @@ class App extends React.Component<LessProps, State> {
 
 		let onEditStop = this.onEdited;
 
-		this.tier = new MyWorkbookTier({
-			uri: this.uri,
-			cols: [
+
+		// Spreadsheetier.registerReq((p, r) => { return new MyBookReq(p, r); })
+
+		this.tier = new Spreadsheetier('workbook',
+			{ uri: this.uri,
+			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},
+			  cols: [
 				{field: 'cid', label: L("Id"), width: 120, editable: false },
 				{field: 'currName', label: L("curriculum"), width: 160 },
 				{field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', onEditStop },
