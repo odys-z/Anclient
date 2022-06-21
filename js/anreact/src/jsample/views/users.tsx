@@ -48,7 +48,7 @@ class UserstComp extends CrudCompW<Comprops> {
 	// pageInf: PageInf;
 	onPageInf: (page: number) => void;
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 
 		this.state.selected.ids = new Set();

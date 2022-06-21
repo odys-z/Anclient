@@ -56,7 +56,7 @@ class MyClassComp extends CrudComp<Comprops & {conn_state: string, tier: Spreads
 			  query: [
 				{ type: 'cbb', sk: 'ann-evt', uri: this.uri,
 				  label: L('Event'), field: 'eId', grid: {sm: 4, md: 3}} as ComboCondType,
-				{ type: 'cbb', sk: Protocol.sk.cbbOrg, uri: this.uri, nv: {n: 'text', v: 'value'},
+				{ type: 'cbb', sk: Protocol.sk.cbbClasses, uri: this.uri, nv: {n: 'text', v: 'value'},
 				  label: L('My Class'), field: 'orgId', grid: {sm: 4, md: 3}} as ComboCondType,
 			] } as QueryPage;
 

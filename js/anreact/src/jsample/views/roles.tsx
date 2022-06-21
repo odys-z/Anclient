@@ -51,11 +51,11 @@ const styles = (theme: Theme) => ( {
 class RolesComp extends CrudCompW<Comprops> {
 
 	state = {
-		condName: { type: 'text', field: 'roleName', val: '', label: L('Role Name')},
+		condName: { type: 'text', field: 'roleName', val: '', label: L('Role Name')} as AnlistColAttrs<JSX.Element, any>,
 		condOrg : { type: 'cbb',  field: 'orgId',    val: AnConst.cbbAllItem,
 					sk: 'org.all', nv: {n: 'text', v: 'value'},
 					options: [ AnConst.cbbAllItem ],
-					label: L('Organization') },
+					label: L('Organization') } as TierComboField<JSX.Element, any>,
 
 		// active buttons
 		buttons: { add: true, edit: false, del: false},

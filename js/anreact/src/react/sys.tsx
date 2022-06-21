@@ -426,7 +426,7 @@ class SysComp extends CrudCompW<SysProps> {
 		  return (
 			<TagName
 				uri={this.state.currentPage?.url || '/'}
-				ssInf={this.context.anClient?.ssInf} /> );
+				ssInf={(this.context as AnContextType).anClient?.ssInf} /> );
 		else return <Home />;
 	}
 

@@ -7,7 +7,7 @@ import { L, Langstrs,
 	Sys, SysComp,
 	AnContext, AnError, AnReactExt, jsample, AnContextType
 } from '@anclient/anreact';
-const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
+const { Domain, Roles, Orgs, JsampleTheme } = jsample;
 
 import { StarPorts } from './common/port';
 
@@ -19,6 +19,7 @@ import { CourseReadonly } from './views/center/course-readonly';
 import { APEvents } from './views/north/kypci/events';
 import { welcome } from './views/center/nwelcome';
 import { MyClass } from './views/north/my-clsss';
+import { ApUsers } from './views/north/ap-users';
 
 export interface Approps {
     iportal?: string;
@@ -67,7 +68,7 @@ class App extends React.Component<Approps, any> {
 		// Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
-		Protocol.sk.cbbMyClass = 'north.my-class';
+		Protocol.sk.cbbClasses = 'org.classes';
 
 		// singleton error handler
 		if ( !this.state.anClient || !this.state.anClient.ssInf
@@ -84,7 +85,7 @@ class App extends React.Component<Approps, any> {
 			{path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
 			{path: '/sys/orgs', comp: Orgs},
-			{path: '/sys/users', comp: Userst},
+			{path: '/sys/users', comp: ApUsers},
 
 			{path: '/n/podiyi', comp: APEvents},
 			{path: '/n/kypci', comp: Course},
