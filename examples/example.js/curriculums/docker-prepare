@@ -4,6 +4,8 @@ cp -f ../../../../ever/curricula/res/index.html dist/index.html
 mv dist/res-vol/lang.json dist/res-vol/lang.back.json
 cp -f ../../../../ever/curricula/res/lang.json dist/res-vol/lang.json
 
+cp -rf ../../../../ever/curricula/docs dist/
+
 echo "finishing command:"
 echo "mv dist/index.back.html dist/index.html"
 echo "mv dist/res-vol/lang.back.json dist/res-vol/lang.json"

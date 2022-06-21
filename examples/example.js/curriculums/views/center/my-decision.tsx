@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button, Typography } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx } from '@anclient/semantier';
+import { Protocol, CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp, AnContextType,
@@ -239,6 +239,8 @@ export class MyCoursesTier extends Spreadsheetier {
 }
 
 class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTier}>{
+	state: {dirty: false};
+
 	tier: MyCoursesTier;
 
 	confirm: JSX.Element;
@@ -347,7 +349,8 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				ok={L('OK')} cancel={false} open
 				onClose={() => {
 					that.confirm = undefined;
-					that.setState({});
+					// swith off dirty if it is true, and saving, loading is ok
+					that.setState({dirty: that.state.dirty && resp?.code !== Protocol.MsgCode.ok});
 				} }
 				msg={msg} />);
 		this.setState({});
@@ -365,7 +368,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.buttons.export = isActive;
 		this.buttons.upload = isActive;
 
-		this.setState({})
+		this.setState({dirty: false})
         this.bindSheet(undefined);
     }
 
@@ -378,7 +381,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.tier.updateCell(p, () => {
 			if (p.colDef.field === 'cId') {
 				p.api.redrawRows();
-				this.setState({});
+				this.setState({dirty: true});
 			}
 		});
 	};
@@ -418,6 +421,19 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	}
 
     toPrint(_e: React.UIEvent) {
+		if (this.state.dirty) {
+			let that = this;
+			this.confirm = (
+				<ConfirmDialog title={L('Info')}
+					ok={L('OK')} cancel={false} open
+					onClose={() => {
+						that.confirm = undefined;
+						that.setState({});
+					} }
+					msg={L('Please save decision first!')} />);
+			return;
+		}
+
 		// not working: this.tier._cols[this.tier._cols.length - 1].hide = true;
 		this.api.redrawRows();
 		this.setState({});
@@ -514,7 +530,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					blankIcon={{color: "primary", width: 32, height: 32}}
 					tier={this.tier} field={'uri'}
 					onFileLoaded={this.toUpload}
-				/>{L('Upload')}
+				/>{L('Upload Signature')}
 				</Box>
 			</div>
             <div className='onlyPrint'>

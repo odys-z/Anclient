@@ -161,6 +161,9 @@ const styles = (theme: Theme) => ({
 });
 
 export interface MenuItem {
+	/** additonal proterties directly passed on to CRUD page component */
+	props: string | object;
+
 	funcId: string;
 	id: string;
 	funcName: string;
@@ -426,6 +429,7 @@ class SysComp extends CrudCompW<SysProps> {
 		  return (
 			<TagName
 				uri={this.state.currentPage?.url || '/'}
+				{...this.state.currentPage.props}
 				ssInf={(this.context as AnContextType).anClient?.ssInf} /> );
 		else return <Home />;
 	}
