@@ -3,6 +3,8 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import Typography from '@material-ui/core/Typography';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
 	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
@@ -173,7 +175,11 @@ class UserstComp extends CrudCompW<Comprops> {
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			{this.props.funcName || this.props.title || 'Users of Jsample'}
+			<Card>
+				<Typography variant="h6" gutterBottom>{}
+					{this.props.funcName || this.props.title || 'Users of Jsample'}
+				</Typography>
+			</Card>
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
 
 			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode

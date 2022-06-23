@@ -20,6 +20,9 @@ const styles = (_theme: Theme) => ( {
 	}
 } );
 
+/**
+ * This component shows tree data to table binding
+ */
 class OrgsComp extends CrudCompW<Comprops> {
 	state = {
 	};
@@ -42,8 +45,8 @@ class OrgsComp extends CrudCompW<Comprops> {
 		const { classes } = this.props;
 		return ( <>
 			<Card>
-				<Typography variant="h6" gutterBottom>
-					This page shows tree data to table binding
+				<Typography variant="h6" gutterBottom>{}
+					{this.props.funcName || this.props.title || 'Orgnization Tree'}
 				</Typography>
 			</Card>
 			<AnTreegrid uri={this.uri}
