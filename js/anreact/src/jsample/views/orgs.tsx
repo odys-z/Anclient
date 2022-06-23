@@ -5,7 +5,7 @@ import withWidth from "@material-ui/core/withWidth";
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
-import { Tierec } from '@anclient/semantier';
+import { Semantier } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../../react/crud'
@@ -22,8 +22,8 @@ const styles = (_theme: Theme) => ( {
 
 class OrgsComp extends CrudCompW<Comprops> {
 	state = {
-		rows: [] as Tierec[],
 	};
+	tier: StreeTier;
 
 	constructor(props) {
 		super(props);
@@ -39,7 +39,6 @@ class OrgsComp extends CrudCompW<Comprops> {
 	}
 
 	render() {
-		let args = {};
 		const { classes } = this.props;
 		return ( <>
 			<Card>
@@ -54,7 +53,7 @@ class OrgsComp extends CrudCompW<Comprops> {
 					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
 					{ text: L('parent'), color: 'primary',field:"parentId" }
 				]}
-				rows = {this.state.rows}
+				rows = {this.tier.rows}
 			/>
 		</>);
 	}
@@ -63,3 +62,7 @@ OrgsComp.contextType = AnContext;
 
 const Orgs = withWidth()(withStyles(styles)(OrgsComp));
 export { Orgs, OrgsComp }
+
+export class StreeTier extends Semantier {
+
+}
