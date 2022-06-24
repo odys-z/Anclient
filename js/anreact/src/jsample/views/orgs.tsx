@@ -45,7 +45,7 @@ class OrgsComp extends CrudCompW<Comprops> {
 		const { classes } = this.props;
 		return ( <>
 			<Card>
-				<Typography variant="h6" gutterBottom>{}
+				<Typography variant="h6" gutterBottom>
 					{this.props.funcName || this.props.title || 'Orgnization Tree'}
 				</Typography>
 			</Card>

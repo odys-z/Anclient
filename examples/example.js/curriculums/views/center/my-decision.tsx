@@ -288,12 +288,11 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			  cols: [
 				{ field: 'myId', label: L("decision Id"), width: 10, hide: true },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb',
+				{ field: 'cId', label: L("curriculum"), width: 280, type: 'dynamic-cbb',
 				  editable: this.isActive, onEditStop: this.edited, delItemName: L('-- Clear --') },
-				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
-				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
-				{ field: 'remarks', label: L("Memo"), width: 140, type: 'text' },
-				// { field: 'descript', label: L("Remarks"), width: 200, type: 'text', editable: false },
+				{ field: 'clevel', label: L("Level"), width: 150, type: 'cbb', sk: 'curr-level', editable: false },
+				{ field: 'cate', label: L("Category"), width: 240, type: 'cbb', sk: 'curr-cate', editable: false },
+				{ field: 'remarks', label: L("Memo"), width: 160, type: 'text' },
 			] });
 		
         this.gridRef = React.createRef();
@@ -477,7 +476,6 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					label={'AP Event'}
 					noAllItem={true}
 					autoHighlight={true}
-					// className='noPrint'
 					onSelect={this.onSelectEvent} onLoad={(cols, rows) => {
 						console.log(rows);
 					}}/>
@@ -534,7 +532,9 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				</Box>
 			</div>
             <div className='onlyPrint'>
+				<h4>&nbsp;</h4>
                 <h4>{L('Student Name')}  _____________________________</h4>
+				<h4>&nbsp;</h4>
                 <h4>{L('Signature')}</h4>
                 <h4>{L('Date')}</h4>
             </div>

@@ -1,5 +1,5 @@
 import { SessionClient, Inseclient } from "./anclient";
-import { toBool } from "./helpers";
+import { toBool, isEmpty } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
@@ -370,7 +370,14 @@ export class Semantier {
     records(conds: QueryConditions | PageInf, onLoad: OnLoadOk<Tierec>) : void {
 	}
 
-    /** save form with a relationship table.
+    /**
+	 * Save form with a relationship table.
+	 * 
+	 * Note 2022.6.24:
+	 * 
+	 * If the main record's pk value is not automatic and the child relation table need this,
+	 * this.pkval.v is required not null - this is subjected to be changed in the future
+	 * ( all semantics handling is planned to move to server side as possible ). 
 	 *
 	 * @param opts semantic options for saving a maintable record
 	 * @param onOk callback
@@ -392,12 +399,17 @@ export class Semantier {
 
 		let req: AnsonMsg<AnsonBody>;
 		if (!disableForm) {
-			console.log(crud, CRUD.c);
+			// console.log(crud, CRUD.c);
 			if ( crud === CRUD.c ) {
 				req = this.client.userReq<UpdateReq>(uri, 'insert',
 							new InsertReq( uri, this.pkval.tabl )
 							.columns(this._fields)
 							.record(this.rec) );
+
+				// TODO to be verified
+				// Try figure out pk value - auto-key shouldn't have user fill in the value in a form
+				if (isEmpty(this.pkval.v))
+					this.pkval.v = this.rec[this.pkval.pk];
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
@@ -409,9 +421,14 @@ export class Semantier {
 		if (!disableRelations && !reltabl)
 			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
 
-		if (!disableRelations)
+		if (!disableRelations) {
+			if (crud === CRUD.c && !isEmpty(this.pkval?.v))
+				console.warn( "FIXME: empty pkval.v only suitable for auto-key. This change has a profound effection.",
+							  this.pkval);
 			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl],
-											crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
+						// crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
+						this.pkval);
+		}
 
 		if (req)
 			client.commit(req,
@@ -551,8 +568,14 @@ export class Semantier {
 
 		/**
 		 * Design Notes:
+		 * 
 		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
+		 * 
 		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
+		 * 
+		 * @param forest 
+		 * @param rows 
+		 * @returns 
 		 */
 		function collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>) {
 			let cnt = 0;

@@ -132,7 +132,6 @@ class MyClassComp extends CrudComp<Comprops & {conn_state: string, tier: Spreads
     showDoc(p: CellClickedEvent) {
 		if (!p.data.mime)
 			return;
-        console.log('.......................');
 
         let that = this;
         this.tier.pkval = {pk: MyClassReq.pk, v: p.data[MyClassReq.pk], tabl: MyClassReq.mtabl}

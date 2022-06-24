@@ -50,7 +50,7 @@ export class PageInf {
 	}
 };
 
-/**Lagecy from jquery & easui, replaced by NV - no need to collect form using JQuery in the future. */
+/**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
 export type NameValue = {name: string, value: object};
 export type NV = {n: string, v: string | object};
 

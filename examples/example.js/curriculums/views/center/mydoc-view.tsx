@@ -100,7 +100,8 @@ class MyDocViewComp extends DetailFormW<CompOpts & {uri: string, tier: Spreadshe
 		return (<>
 		  <Dialog className={classes.root}
 			classes={{ paper: classes.dialogPaper }}
-			open={true} fullWidth maxWidth="lg"
+			open={true} fullWidth
+			maxWidth="md"
 			onClose={this.toCancel}
 		  >
 			<DialogTitle id="u-title" color="primary" >
