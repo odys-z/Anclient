@@ -137,7 +137,7 @@ export interface Semantext {
     anClient: SessionClient;
 	/**FIXME rename as TSHelper:
 	 * Gloabal UI helper, e.g. AnReact */
-    anReact: any;
+    // anReact: any;
     error: ErrorCtx;
 }
 
