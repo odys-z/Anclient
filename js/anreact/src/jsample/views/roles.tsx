@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree
+	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree, TierComboField
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
