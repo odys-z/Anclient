@@ -456,7 +456,13 @@ export class Spreadsheetier extends Semantier {
 		this.client.commit(req, onOk, this.errCtx);
 	}
 
+	/**FIXME move to Docstier */
 	uri2src() {
+		return utils.urlOfdata(this.rec.mime as string, this.rec.uri64);
+	}
+
+	/**FIXME move to Docstier */
+	heic2src() {
 		return utils.urlOfdata(this.rec.mime as string, this.rec.uri64);
 	}
 }

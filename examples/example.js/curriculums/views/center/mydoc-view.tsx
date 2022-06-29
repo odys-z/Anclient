@@ -9,12 +9,16 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
+import heic2any from 'heic2any';
 import { PageInf } from '@anclient/semantier';
 import { L, AnContext,
 	DetailFormW, ConfirmDialog, utils, CompOpts, Spreadsheetier
 } from '@anclient/anreact';
 
 import { Theme } from '@material-ui/core/styles';
+import { ThumbUpAltTwoTone } from '@material-ui/icons';
+
+// const convert = require('heic-convert');
 
 const { regex } = utils;
 
@@ -34,7 +38,7 @@ class MyDocViewComp extends DetailFormW<CompOpts & {uri: string, tier: Spreadshe
 	state = {
 	};
 
-	tier: Spreadsheetier;
+	tier: Spreadsheetier;	// FIXME: should be Docstier
 	confirm: JSX.Element;
 
 	constructor (props: CompOpts & {uri: string, tier: Spreadsheetier, onClose: Function} ) {
@@ -70,12 +74,18 @@ class MyDocViewComp extends DetailFormW<CompOpts & {uri: string, tier: Spreadshe
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
 				ok={L('OK')} cancel={false} open
-				onClose={() => {that.confirm = undefined;} }
+				onClose={() => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
 				msg={msg} />);
 		this.setState({});
 	}
 
 	preview = () => {
+		let that = this;
+		let id = "heif" + this.tier.pkval.v;
+
 		let rec = this.tier && this.tier.rec;
 		if (rec && rec.uri64) {
 			let typ = rec.mime ? regex.mime2type(rec.mime as string) : 'image';
@@ -85,9 +95,26 @@ class MyDocViewComp extends DetailFormW<CompOpts & {uri: string, tier: Spreadshe
 							// data={this.tier.rec?.uri64 as string} />;
 			else if (typ === 'image')
 				return <img width="100%"
-					// src={this.tier.rec?.uri64 as string}
 					src={this.tier.uri2src()}
 					/>;
+			else if (typ === 'heif') {
+				let uri64 = utils.urlOfdata(this.tier.rec.mime as string, this.tier.rec.uri64);
+
+				fetch(uri64)
+					.then((res) => {console.log(res); return res.blob(); })
+					.then((blob: any) => heic2any({ blob }))
+					.then((conversionResult: Blob) => {
+						console.log(conversionResult);
+						var url = URL.createObjectURL(conversionResult);
+						document.getElementById(id).innerHTML = `<img width="100%" src="${url}">`;
+					})
+					.catch((e) => {
+						console.error(e);
+						that.showConfirm(L("Failed to convert heic image."));
+					});
+
+				return <div id={id}>Converting iPhone image ...</div>;
+			}
 		}
 		else return <></>;
 	}
