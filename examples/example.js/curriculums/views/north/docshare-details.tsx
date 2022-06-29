@@ -142,13 +142,11 @@ class DocshareDetailsComp extends DetailFormW<DocshareDetailProps> {
 	}
 
 	render () {
-		const { tier, classes, width } = this.props;
+		const { classes } = this.props;
 
 		let c = this.state.crud === CRUD.c;
 		let u = this.state.crud === CRUD.u;
 		let title = L('Share Documents');
-
-		// let rec = this.state.record;
 
 		return (<>
 		  <Dialog className={classes.root}
