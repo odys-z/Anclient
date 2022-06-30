@@ -13,6 +13,7 @@ export interface JsonServs {
 
 export interface AnContextType extends Semantext {
 	ssInf?: SessionInf,
+	anReact?: AnReact, // currently neccessary
 
 	pageOrigin?: string,
 	iparent?: any,    // usually the parent window of ifram
