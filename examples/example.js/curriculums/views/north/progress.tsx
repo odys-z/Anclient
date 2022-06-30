@@ -40,7 +40,7 @@ class ProgressReq<R extends SpreadsheetRec> extends SpreadsheetReq {
 	}
 }
 
-class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier}>{
+class ProgressComp extends CrudComp<Comprops & {conn_state: string}>{
 	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
@@ -55,7 +55,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 				  label: L('Module'), field: 'module', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
 
-	constructor(props: Comprops & {conn_state: string, tier: Spreadsheetier}) {
+	constructor(props: Comprops & {conn_state: string}) {
 		super(props);
 
 		this.uri = props.uri;
@@ -111,7 +111,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 
 	render() {
 		let that = this;
-		let {classes} = this.props;
+		// let {classes} = this.props;
 
 		return (<div>
 			{<AnQueryst
@@ -140,4 +140,4 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 ProgressComp.contextType = AnContext;
 
 const Progress = withStyles<any, any, Comprops>(styles)(ProgressComp);
-export { Progress, ProgressComp };
+export { ProgressReq, Progress, ProgressComp };

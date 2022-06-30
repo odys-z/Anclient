@@ -249,7 +249,7 @@ class SysComp extends CrudCompW<SysProps> {
 
 	anreact: AnReactExt;
 
-    confirmLogout: any;
+	confirmLogout: any;
 
 	static extendLinks(links) {
 		links.forEach( (l: { path: string ; comp: CrudComp<Comprops>; }, _x: number) => {

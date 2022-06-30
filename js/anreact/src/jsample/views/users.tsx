@@ -175,7 +175,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			<Card>
+			<Card className={classes.funcard}>
 				<Typography variant="h6" gutterBottom>{}
 					{this.props.funcName || this.props.title || 'Users of Jsample'}
 				</Typography>
@@ -258,7 +258,6 @@ export class UsersTier extends Semantier {
 	port = 'userstier';
 	checkbox = true;
 
-	// TODO doc: samantier where disable pk field if pkval exists
 	_fields = [
 		{ type: 'text', field: 'userId', label: L('Log ID'),
 		  validator: {len: 12, notNull: true} },
@@ -266,11 +265,11 @@ export class UsersTier extends Semantier {
 		{ type: 'password', field: 'pswd', label: L('Password'),
 		  validator: {notNull: true} },
 		{ type: 'cbb', field: 'roleId', label: L('Role'),
-		  grid: {md: 5}, // defaultStyle: {marginTop: "8px", width: 220 },
+		  grid: {md: 5},
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
 		{ type: 'cbb', field: 'orgId', label: L('Organization'),
-		  grid: {md: 5}, // defaultStyle: {marginTop: "8px", width: 220 },
+		  grid: {md: 5},
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];

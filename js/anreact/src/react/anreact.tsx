@@ -197,10 +197,10 @@ export class AnReactExt extends AnReact {
 	loading: boolean;
 	// options: NV[];
 
-	extendPorts(ports: {[p: string]: string}) {
-		this.client.an.understandPorts(ports);
-		return this;
-	}
+	// extendPorts(ports: {[p: string]: string}) {
+	// 	this.client.an.understandPorts(ports);
+	// 	return this;
+	// }
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
 	 * Since v0.9.32, AnReact(Ext) won't care error handling anymore.
