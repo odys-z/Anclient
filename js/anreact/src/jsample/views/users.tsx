@@ -78,7 +78,6 @@ class UserstComp extends CrudCompW<Comprops> {
 	 */
 	toSearch(condts: QueryConditions): void {
 		if (!this.tier) {
-			// this.getTier();
 			console.warn("really happens?")
 			return;
 		}
@@ -203,7 +202,6 @@ class UserstComp extends CrudCompW<Comprops> {
 				selected={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
-				// pageInf={this.pageInf}
 				onPageChange={this.onPageInf}
 				onSelectChange={this.onTableSelect}
 			/>}
@@ -261,7 +259,7 @@ export class UsersTier extends Semantier {
 	// TODO doc: samantier where disable pk field if pkval exists
 	_fields = [
 		{ type: 'text', field: 'userId', label: L('Log ID'),
-		  validator: {len: 12, notNull: true} },
+		  validator: {len: 20, notNull: true} },
 		{ type: 'text', field: 'userName', label: L('User Name') },
 		{ type: 'password', field: 'pswd', label: L('Password'),
 		  validator: {notNull: true} },
