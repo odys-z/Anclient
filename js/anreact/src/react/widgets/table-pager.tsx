@@ -116,10 +116,10 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			this.props.onSelectChange(Array.from(set));
 	}
 
-	changePage(event, page) {
+	changePage(_event: React.UIEvent, page: number) {
 		this.setState({page});
-		if (typeof this.props.onPageInf === 'function')
-			this.props.onPageInf (this.page.page, this.page.size);
+		if (typeof this.props.onPageChange === 'function')
+			this.props.onPageChange (page);
 	}
 
 	changeSize (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {

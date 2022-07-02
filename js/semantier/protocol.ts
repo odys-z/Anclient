@@ -32,7 +32,12 @@ export class PageInf {
 	page: number;
 	size?: number;
 	total?: number;
+
+	/** @deprected replaced by condtRec */
 	condts?: Array<string[]>;
+
+	/** Not used yet */
+	// condtsRec?: Tierec;
 
 	constructor(page?: number, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.semantic.jserv.R.PageInf';
@@ -47,6 +52,20 @@ export class PageInf {
 			this.condts = [];
 		this.condts.push([k, v]);
 		return this;
+	}
+
+	/**
+	 * This is used for deprecationg this#condts
+	 * 
+	 * @returns conditions 
+	 */
+	condtsRec () {
+		let rec = {} as Tierec;
+		for(let nv in this.condts) {
+			if (nv && nv[0])
+				rec[nv[0]] = rec[nv[1]];
+		}
+		return rec;
 	}
 };
 

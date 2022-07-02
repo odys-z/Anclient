@@ -17,6 +17,7 @@ import { CompOpts } from '../anreact';
 
 const styles = (theme: Theme) => ( {
 	root: {
+		margin: theme.spacing(1),
 	}
 } );
 
@@ -45,13 +46,14 @@ interface AnTablistProps extends Comprops {
 class AnTablistComp extends DetailFormW<AnTablistProps> {
 
 	state = {
-		// sizeOptions:[10, 25, 50],
 		total: 0,
 		page: 0,
 		size: 10,
 
 		selected: undefined
 	}
+
+	// sizeOptions:[10, 25, 50],
 
 	checkAllBox: HTMLButtonElement;
 
@@ -130,10 +132,10 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			this.props.onSelectChange(Array.from(set));
 	}
 
-	changePage(event, page) {
+	changePage(_event: React.UIEvent, page: number) {
 		this.setState({page});
-		if (typeof this.props.onPageInf === 'function')
-			this.props.onPageInf (this.state.page, this.state.size);
+		if (typeof this.props.onPageChange === 'function')
+			this.props.onPageChange (page);
 	}
 
 	changeSize (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
@@ -225,7 +227,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			</TableBody>
 		</Table>
 		</TableContainer>
-		{!!this.props.paging && <TablePagination
+		{(!!this.props.paging || this.props.onPageChange) && <TablePagination
 			count = {this.props.pageInf ? this.props.pageInf.total || 0 : 0}
 			rowsPerPage={this.state.size}
 			onPageChange={this.changePage}

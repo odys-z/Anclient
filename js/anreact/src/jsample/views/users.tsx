@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
-import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
+import { toBool, Protocol, CRUD, AnsonResp , UserReq, PageInf, Tierec,
 	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
 } from '@anclient/semantier';
 
@@ -15,7 +15,7 @@ import { Semantier } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { AnContext, AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
-import { AnTablist } from '../../react/widgets/table-list';
+import { AnTablPager } from '../../react/widgets/table-pager';
 import { AnQueryst, ComboCondType } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
@@ -36,6 +36,9 @@ const styles = (theme: Theme) => ( {
 	}
 } );
 
+
+// GIT: task: AnTablist Paginator
+
 class UserstComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
@@ -44,10 +47,9 @@ class UserstComp extends CrudCompW<Comprops> {
 	};
 
 	tier = undefined as UsersTier;
-	q: QueryConditions;
+	q: PageInf;
 	confirm: JSX.Element;
 	recForm: JSX.Element;
-	// pageInf: PageInf;
 	onPageInf: (page: number) => void;
 
 	constructor(props: Comprops) {
@@ -66,7 +68,6 @@ class UserstComp extends CrudCompW<Comprops> {
 	}
 
 	componentDidMount() {
-		// if (!this.tier) { this.getTier() }
 		console.log(this.uri);
 		this.tier = new UsersTier(this);
 		this.tier.setContext(this.context as AnContextType);
@@ -76,7 +77,7 @@ class UserstComp extends CrudCompW<Comprops> {
 	 * on succeed: set state.rows.
 	 * @param condts the query conditions collected from query form.
 	 */
-	toSearch(condts: QueryConditions): void {
+	toSearch(condts: PageInf): void {
 		if (!this.tier) {
 			console.warn("really happens?")
 			return;
@@ -197,7 +198,7 @@ class UserstComp extends CrudCompW<Comprops> {
 					>{L('Edit')}</Button>
 				</Grid>}
 
-			{tier && <AnTablist pk={tier.pkval.pk}
+			{tier && <AnTablPager pk={tier.pkval.pk}
 				className={classes.root} checkbox={tier.checkbox}
 				selected={this.state.selected}
 				columns={tier.columns()}
@@ -215,7 +216,7 @@ UserstComp.contextType = AnContext;
 const Userst = withStyles<any, any, Comprops>(styles)(withWidth()(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions) => void}> {
+class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: PageInf) => void}> {
 	conds = [
 		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student'),
 		  grid: {sm: 3, md: 2} } as AnlistColAttrs<any, any>,
@@ -230,12 +231,15 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 		this.collect = this.collect.bind(this);
 	}
 
-	collect() {
-		return { query: {
-			userName: this.conds[0].val ? this.conds[0].val : undefined,
-			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
-			// roleId  : (this.conds[2].val as {n: string, v: string}) ?.v }
-		} };
+	collect() : PageInf {
+		// return { query: {
+		// 	userName: this.conds[0].val ? this.conds[0].val : undefined,
+		// 	orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
+		// } };
+
+		return new PageInf()
+				.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
+				.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
 	}
 
 	/** Design Note:
@@ -293,14 +297,14 @@ export class UsersTier extends Semantier {
 		this.rows = [];
 	}
 
-	records(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
+	records(conds: PageInf, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let client = this.client;
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds?.query as Tierec )
+					new UserstReq( this.uri, conds?.condtsRec() )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
@@ -312,13 +316,13 @@ export class UsersTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
+	record(conds: PageInf, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds )
+					new UserstReq( this.uri, conds.condtsRec() )
 					.A(UserstReq.A.rec) );
 
 		client.commit(req,
