@@ -11,56 +11,39 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, isEmpty, Tierec, toBool } from '@anclient/semantier';
-import { Comprops, DetailFormW } from '../crud';
+import { AnlistColAttrs, isEmpty, PageInf, toBool } from '@anclient/semantier';
+import { DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
+import { AnTablistProps } from './table-list';
 
 const styles = (theme: Theme) => ( {
 	root: {
-		margin: theme.spacing(1),
 	}
 } );
 
-interface AnTablistProps extends Comprops {
-	pk: string;
-	/**
-	 * Selected row ids - not used if no need to update data?
-	 */
-	selected?: {ids: Set<string>};
-
-	columns: Array<AnlistColAttrs<JSX.Element, CompOpts> & Comprops>;
-
-	/**In tier mode, data is supposed to be bound by widget itself. */
-	rows?: Tierec[];
-
-	onSelectChange: (ids: Array<string>) => void;
-	onPageChange?: (page: number) => void;
-
-	/**Page size options, Default [10, 25, 50]. */
-	sizeOptions?: Array<number>;
-}
-
 /**
- * Table / list with pager.
+ * Table / list with pager. (Experimental)
  */
-class AnTablistComp extends DetailFormW<AnTablistProps> {
+class AnTablPagerComp extends DetailFormW<AnTablistProps> {
+
+	sizeOptions = [10, 25, 50];
 
 	state = {
-		total: 0,
-		page: 0,
-		size: 10,
+		// total: 0,
+		// page: 0,
+		// size: 10,
 
 		selected: undefined
 	}
 
-	// sizeOptions:[10, 25, 50],
+    page: PageInf;
 
 	checkAllBox: HTMLButtonElement;
 
-	constructor(props: AnTablistProps){
+	constructor(props: AnTablistProps) {
 		super(props)
 
-		let {sizeOptions, selected} = props;
+		let {selected} = props;
 		if (!selected || !selected.ids)
 			throw Error('Type safe checking: @anclient/react now using ref ids: Set<string> to save selected row ids. (props selectedIds renamed as selected)')
 		this.state.selected = selected.ids;
@@ -69,11 +52,12 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 
 		// if (sizeOptions)
 		// 	this.state.sizeOptions = sizeOptions;
+        this.sizeOptions = props.sizeOptions;
 
 		let {total, page, size} = props.pageInf || {};
-		this.state.total = total || -1;
-		this.state.page = page || 0;
-		this.state.size = size || 25;
+		this.page.total = total || -1;
+		this.page.page = page || 0;
+		this.page.size = size || 25;
 
 
 		this.isSelected = this.isSelected.bind(this);
@@ -142,7 +126,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		let size = parseInt(event.target.value, 10);
 		this.setState({size});
 		if (typeof this.props.onPageInf  === 'function')
-			this.props.onPageInf (this.state.page, this.state.size);
+			this.props.onPageInf (this.page.page, this.page.size);
 	}
 
 	/**
@@ -206,7 +190,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	render() {
 		return (<>
 		<TableContainer>
-		<Table style={{width:"100%"}} aria-label="simple table">
+		  <Table style={{width:"100%"}} aria-label="simple table">
 			<TableHead>
 				<TableRow>
 					{ this.props.checkbox &&
@@ -225,20 +209,20 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			<TableBody>
 				{this.tr(this.props.rows, this.props.columns)}
 			</TableBody>
-		</Table>
+		  </Table>
 		</TableContainer>
-		{(!!this.props.paging || this.props.onPageChange) && <TablePagination
+		{!!this.props.paging && <TablePagination
 			count = {this.props.pageInf ? this.props.pageInf.total || 0 : 0}
-			rowsPerPage={this.state.size}
+			rowsPerPage={this.page.size}
 			onPageChange={this.changePage}
 			onRowsPerPageChange={this.changeSize}
-			page={this.state.page}
+			page={this.page.page}
 			component="div"
-			// rowsPerPageOptions={this.state.sizeOptions}
+			rowsPerPageOptions={this.sizeOptions}
 		/>}
 		</>);
 	}
 }
 
-const AnTablist = withStyles<any, any, AnTablistProps>(styles)(AnTablistComp);
-export { AnTablist, AnTablistComp, AnTablistProps }
+const AnTablPager = withStyles<any, any, AnTablistProps>(styles)(AnTablPagerComp);
+export { AnTablPager, AnTablPagerComp }

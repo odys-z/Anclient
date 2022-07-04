@@ -43,7 +43,7 @@ export interface SysProps extends Comprops {
     /**Welcome page formatter */
     welcome?: (classes: ClassNameMap, context: typeof AnContext, comp: SysComp) => JSX.Element;
     // classes: {[x: string]: string};
-    hrefDoc: string;
+    hrefDoc?: string;
     onLogout: () => void;
     myInfo: JSX.Element | ((context: Context<AnContextType>) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
 }
@@ -162,7 +162,7 @@ const styles = (theme: Theme) => ({
 
 export interface MenuItem {
 	/** additonal proterties directly passed on to CRUD page component */
-	props: string | object;
+	props: object;
 
 	funcId: string;
 	id: string;

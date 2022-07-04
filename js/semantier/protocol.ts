@@ -32,7 +32,12 @@ export class PageInf {
 	page: number;
 	size?: number;
 	total?: number;
+
+	/** @deprected replaced by condtRec */
 	condts?: Array<string[]>;
+
+	/** Not used yet */
+	// condtsRec?: Tierec;
 
 	constructor(page?: number, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.semantic.jserv.R.PageInf';
@@ -48,9 +53,23 @@ export class PageInf {
 		this.condts.push([k, v]);
 		return this;
 	}
+
+	/**
+	 * This is used for deprecationg this#condts
+	 * 
+	 * @returns conditions 
+	 */
+	condtsRec () {
+		let rec = {} as Tierec;
+		for(let nv in this.condts) {
+			if (nv && nv[0])
+				rec[nv[0]] = rec[nv[1]];
+		}
+		return rec;
+	}
 };
 
-/**Lagecy from jquery & easui, replaced by NV - no need to collect form using JQuery in the future. */
+/**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
 export type NameValue = {name: string, value: object};
 export type NV = {n: string, v: string | object};
 

@@ -25,6 +25,7 @@
     "earcut": "^2.2.3",
     "emotion": "^11.0.0",
     "exports-loader": "^3.0.0",
+    "heic2any": "^0.0.3",
     "i18next": "^21.6.14",
     "jquery": "^3.6.0",
     "mocha": "^9.2.2",

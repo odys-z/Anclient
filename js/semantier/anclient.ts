@@ -493,7 +493,8 @@ class SessionClient {
 		}
 	}
 
-	/**Get a header the jserv can verify successfully.
+	/**
+	 * Get a header the jserv can verify successfully.
 	 * This method is not recommended used directly.
 	 * @param {Object} act user's action for logging<br>
 	 * {func, cate, cmd, remarks};
@@ -551,7 +552,9 @@ class SessionClient {
 		return this;
 	}
 
-	/**Encrypt text with ssInf token - the client side for de-encrypt semantics
+	/**
+	 * Encrypt text with ssInf token - the client side for de-encrypt semantics
+	 * 
 	 * @param plain plain text
 	 * @return {cipher, iv: base64}
 	 */

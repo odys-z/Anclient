@@ -3,6 +3,7 @@
     "events-btn-width": 160,
 
     "OK": "确定",
+    "Cancel": "取消",
     "info": "提示信息",
     "Info": "提示信息",
     "Error": "错误信息",
@@ -37,6 +38,7 @@
     "Upload": "上传",
     "Role ID": "角色ID",
     "Data Saved!": "數據保存成功！",
+    "Data Deleted!": "數據删除成功！",
     "Publish": "發布",
     "Password doesn't match!": "密码错误！",
     "Saving Succeed!": "保存成功！",
