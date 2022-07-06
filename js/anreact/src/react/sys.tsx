@@ -462,7 +462,7 @@ class SysComp extends CrudCompW<SysProps> {
 					>
 					<Menu />
 					</IconButton>
-					<Typography variant="h5" className={classes.sysName} noWrap >{L(this.state.sysName)}</Typography>
+					<Typography variant="h5" className={claz.sysName} noWrap >{L(this.state.sysName)}</Typography>
 				</Box>
 				</Grid>
 

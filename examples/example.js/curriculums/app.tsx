@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier'
+import { Protocol, AnsonMsg, SessionClient, AnsonResp, ErrorCtx } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
 	AnContext, AnError, AnReactExt, jsample, AnContextType
@@ -35,8 +35,6 @@ export interface Approps {
 /** 📦  @anclient/semantier@0.9.69 */
 class App extends React.Component<Approps, any> {
 	state = {
-		anClient: undefined, // SessionClient
-		anReact: undefined,  // helper for React
 
 		iportal: 'portal.html',
         jserv: undefined,
@@ -45,8 +43,11 @@ class App extends React.Component<Approps, any> {
 
 		hasError: false,
 		nextAction: undefined, // e.g. re-login
-		error: undefined,
 	};
+
+	anClient: SessionClient; // SessionClient
+	anReact: AnReactExt;  // helper for React
+	error: ErrorCtx;
 
 	/**Restore session from window.localStorage
 	 */
@@ -60,9 +61,9 @@ class App extends React.Component<Approps, any> {
 		this.logout = this.logout.bind(this);
 
 		// design: will load anclient from localStorage
-		this.state.error = {onError: this.onError, msg: ''};
-		this.state.anClient = new SessionClient();
-		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
+		this.error = {onError: this.onError, msg: ''};
+		this.anClient = new SessionClient();
+		this.anReact = new AnReactExt(this.anClient, this.error)
 								.extendPorts(StarPorts);
 
 		// Protocol.sk.xvec = 'x.cube.vec';
@@ -71,8 +72,8 @@ class App extends React.Component<Approps, any> {
 		Protocol.sk.cbbClasses = 'org.classes';
 
 		// singleton error handler
-		if ( !this.state.anClient || !this.state.anClient.ssInf
-		  || !this.state.anClient || !this.state.anClient.ssInf) {
+		if ( !this.anClient || !this.anClient.ssInf
+		  || !this.anClient || !this.anClient.ssInf) {
 			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
@@ -130,21 +131,22 @@ class App extends React.Component<Approps, any> {
 		let that = this;
 		// leaving
 		try {
-			this.state.anClient.logout(
+			this.anClient.logout(
 				() => {
 					if (this.props.iwindow)
 						this.props.iwindow.location.href = this.state.iportal;
 				},
-				(c, e) => {
+				{ onError: (c, e) => {
 					// something wrong
 					cleanup (that);
-				});
+				} }
+				);
 		}
 		catch(_) {
 			cleanup (that);
 		}
 		finally {
-			this.state.anClient = undefined;
+			this.anClient = undefined;
 		}
 
 		function cleanup(app) {
@@ -160,16 +162,16 @@ class App extends React.Component<Approps, any> {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
-				ssInf: this.state.anClient.ssInf,
-				anReact: this.state.anReact,
+				ssInf: this.anClient.ssInf,
+				anReact: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				anClient: this.state.anClient,
+				anClient: this.anClient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
-				error: this.state.error,
+				error: this.error,
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys={L('AP Courses')} menuTitle={L('Sys Menu')}
@@ -179,7 +181,7 @@ class App extends React.Component<Approps, any> {
 					onLogout={this.logout} />
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
-						msg={this.state.error.msg} title={L('Error')} />}
+						msg={this.error.msg} title={L('Error')} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
@@ -188,11 +190,11 @@ class App extends React.Component<Approps, any> {
 				{ title: L('Basic'),
 				  panel: <jsample.MyInfCard uri={'/sys/session'}
 								anContext={anContext}
-								ssInf={that.state.anClient.ssInf} /> },
+								ssInf={that.anClient.ssInf} /> },
 				{ title: L('Password'),
 				  panel: <jsample.MyPswd uri={'/sys/session'}
 								anContext={anContext}
-								ssInf={that.state.anClient.ssInf} /> }
+								ssInf={that.anClient.ssInf} /> }
 			  ];
 		}
 	}

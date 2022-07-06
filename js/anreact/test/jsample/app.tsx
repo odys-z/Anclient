@@ -20,6 +20,7 @@ import { StandardProps } from '@material-ui/core';
 import { JsampleTheme } from '../../../anreact/src/jsample/styles';
 import { MyInfCard } from '../../../anreact/src/jsample/views/my-infcard';
 import { MyPswd } from '../../../anreact/src/jsample/views/my-pswdcard';
+import { ErrorCtx, SessionInf } from '@anclient/semantier';
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
@@ -42,6 +43,7 @@ class App extends React.Component<Approps> {
 	// errCtx = {msg: undefined, onError: this.onError} as ErrorCtx;
 
 	errorMsgbox: JSX.Element | undefined;
+	errorCtx: ErrorCtx;
 
 	/**Restore session from window.localStorage
 	 * 
@@ -52,19 +54,18 @@ class App extends React.Component<Approps> {
 
 		this.state.iportal = this.props.iportal;
 
-		// this.onError = this.onError.bind(this);
-		// this.errCtx.onError = this.errCtx.onError.bind(this);
-		let errCtx = (this.context as AnContextType).error;
+		this.onError = this.onError.bind(this);
+		this.onErrorClose = this.onErrorClose.bind(this);
+		this.logout = this.logout.bind(this);
+
+		this.errorCtx = {onError: this.onError, msg: ''};
+
 
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.logout = this.logout.bind(this);
 
 		// design: will load anclient from localStorage
 		this.anClient = new SessionClient();
-
-		// in case jserv config changed since last login
-		if (props.servs)
-			this.anClient.an.init(props.servs[props.servId || 'host']);
 
 		// singleton error handler
 		if (!this.anClient || !this.anClient.ssInf) {
@@ -75,7 +76,7 @@ class App extends React.Component<Approps> {
 			});
 		}
 
-		this.anReact = new AnReactExt(this.anClient, errCtx)
+		this.anReact = new AnReactExt(this.anClient, this.errorCtx)
 						.extendPorts({
 							menu: "menu.serv",
 							userstier: "users.tier",
@@ -87,7 +88,7 @@ class App extends React.Component<Approps> {
 		this.anClient.getSks((sks) => {
 			Object.assign(Protocol.sk, sks);
 			console.log(sks);
-		}, errCtx);
+		}, this.errorCtx);
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
@@ -142,7 +143,7 @@ class App extends React.Component<Approps> {
 			cleanup (that);
 		}
 		finally {
-			this.anClient.ssInf = undefined;
+			this.anClient.ssInf = undefined as unknown as SessionInf;
 		}
 
 		function cleanup(app: App) {
@@ -161,7 +162,6 @@ class App extends React.Component<Approps> {
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				ssInf: undefined,
-				// anReact: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
@@ -169,7 +169,7 @@ class App extends React.Component<Approps> {
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
-				error: (this.context as AnContextType).error,
+				error: this.errorCtx,
 			}} >
 				<SysComp menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
