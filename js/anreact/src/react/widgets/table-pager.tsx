@@ -52,13 +52,10 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 
 		// if (sizeOptions)
 		// 	this.state.sizeOptions = sizeOptions;
-        this.sizeOptions = props.sizeOptions;
+        this.sizeOptions = props.sizeOptions || [10, 25, 50];
 
 		let {total, page, size} = props.pageInf || {};
-		this.page.total = total || -1;
-		this.page.page = page || 0;
-		this.page.size = size || 25;
-
+		this.page = new PageInf(page || 0, size || 25, total || 0);
 
 		this.isSelected = this.isSelected.bind(this);
 		this.toSelectAll = this.toSelectAll.bind(this);
@@ -211,7 +208,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			</TableBody>
 		  </Table>
 		</TableContainer>
-		{!!this.props.paging && <TablePagination
+		{toBool(this.props.paging, true) && <TablePagination
 			count = {this.props.pageInf ? this.props.pageInf.total || 0 : 0}
 			rowsPerPage={this.page.size}
 			onPageChange={this.changePage}

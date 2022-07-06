@@ -41,7 +41,7 @@ const setPrinterFriendly = (api: GridApi) => {
     eGridDiv.style.height = '';
     api.setDomLayout('print');
 };
-  
+
 const setNormal = (api) => {
     const eGridDiv = document.querySelector('#myGrid') as any;
     eGridDiv.style.width = '700px';
@@ -106,15 +106,13 @@ export class MyCoursesTier extends Spreadsheetier {
 	}
 
 	loadCourses(ctx: AnContextType) {
-		// let an = ctx.anReact as AnReactExt;
-		// let uri = this.uri;
 		let that = this;
 
 		let client = this.client;
-		
+
 		let bdy = new MyReq(undefined, undefined)
 				.A(MyReq.A.courses);
-		
+
 		let req = client.userReq(this.uri, this.port, bdy);
 
 		client.commit(req,
@@ -155,11 +153,11 @@ export class MyCoursesTier extends Spreadsheetier {
 
 	/**
 	 * Enocde name to code according cbb items data.
-	 * 
-	 * @param field 
-	 * @param n 
+	 *
+	 * @param field
+	 * @param n
 	 * @param rec current row for dynamic encoding (current module for each course groups)
-	 * @returns 
+	 * @returns
 	 */
 	encode(field: string, n: string, rec: Course): string | object {
 		if (field === 'cId') {
@@ -176,7 +174,7 @@ export class MyCoursesTier extends Spreadsheetier {
 		return super.encode(field, n, rec);
 	}
 
-	decode(p: ICellRendererParams): string | Element { 
+	decode(p: ICellRendererParams): string | Element {
 		let field = p.colDef.field;
 		if (p.rowIndex >= this.rows.length) return p.value;
 
@@ -225,7 +223,7 @@ export class MyCoursesTier extends Spreadsheetier {
 	}
 
 	upload(meta: {mime: string, name: string}, blob: string, ok: OnCommitOk, err: ErrorCtx) {
-		let rec = {myId: this.pkval.v, eventId: this.eventId, uri: blob, filename: meta.name, mime: meta.mime}; 
+		let rec = {myId: this.pkval.v, eventId: this.eventId, uri: blob, filename: meta.name, mime: meta.mime};
 
 		if (!this.client) return;
 		let client = this.client;
@@ -258,7 +256,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
     api: GridApi;
 	buttons = {save: false, export: false, upload: false};
 	scoretier: MyScoreTier;
-	
+
 	getUserId() {
 		return this.props.ssInf.uid;
 	}
@@ -294,7 +292,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				{ field: 'cate', label: L("Category"), width: 240, type: 'cbb', sk: 'curr-cate', editable: false },
 				{ field: 'remarks', label: L("Memo"), width: 160, type: 'text' },
 			] });
-		
+
         this.gridRef = React.createRef();
 
 		this.scoretier = new MyScoreTier({
@@ -387,10 +385,10 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 	/**
 	 * Save recored (decision) without file uri.
-	 * 
+	 *
 	 * So update won't change uploaded file.
-	 * 
-	 * @param _e 
+	 *
+	 * @param _e
 	 */
 	toSave(_e: React.UIEvent) {
         this.tier.rec = {
@@ -404,7 +402,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			this.tier.rec,
 			this.showConfirm,
 			this.context.error);
-		
+
 		function collectCourses(rows: Course[]) {
 			let cIds = [] as Course[];
 			rows?.forEach( (c, x) => {
@@ -461,7 +459,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		}
 
 		this.tier.upload(
-			meta, blob, 
+			meta, blob,
 			this.showConfirm,
 			this.context.error);
     }

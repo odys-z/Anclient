@@ -9,7 +9,7 @@ import { Semantier } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../../react/crud'
-import { AnContext } from '../../react/reactext'
+import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTreegrid } from '../../react/widgets/treegrid'
 
 const styles = (_theme: Theme) => ( {
@@ -35,10 +35,16 @@ class OrgsComp extends CrudCompW<Comprops> {
 	}
 
 	componentDidMount() {
-		let that = this;
+		if (!this.tier) {
+			this.tier = new StreeTier(this);
+			this.tier.setContext(this.context as unknown as AnContextType);
+		}
+
+		this.toSearch(undefined);
 	}
 
-	toSearch(e, query) {
+	toSearch(e) {
+		this.setState({})
 	}
 
 	render() {
@@ -49,7 +55,7 @@ class OrgsComp extends CrudCompW<Comprops> {
 					{this.props.funcName || this.props.title || 'Orgnization Tree'}
 				</Typography>
 			</Card>
-			<AnTreegrid uri={this.uri}
+			{this.tier && <AnTreegrid uri={this.uri}
 				className={classes.root}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
@@ -57,7 +63,7 @@ class OrgsComp extends CrudCompW<Comprops> {
 					{ text: L('parent'), color: 'primary',field:"parentId" }
 				]}
 				rows = {this.tier.rows}
-			/>
+			/>}
 		</>);
 	}
 }

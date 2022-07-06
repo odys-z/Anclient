@@ -40,6 +40,8 @@ import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 
 export interface SysProps extends Comprops {
+	/** Dataset (stree) sk of system menu */
+	menu: string;
     /**Welcome page formatter */
     welcome?: (classes: ClassNameMap, context: typeof AnContext, comp: SysComp) => JSX.Element;
     // classes: {[x: string]: string};
@@ -249,7 +251,7 @@ class SysComp extends CrudCompW<SysProps> {
 
 	anreact: AnReactExt;
 
-    confirmLogout: any;
+	confirmLogout: any;
 
 	static extendLinks(links) {
 		links.forEach( (l: { path: string ; comp: CrudComp<Comprops>; }, _x: number) => {
@@ -275,7 +277,7 @@ class SysComp extends CrudCompW<SysProps> {
 		this.welcomePaper = this.welcomePaper.bind(this);
 	}
 
-	welcomePaper(classes: ClassNames) {
+	welcomePaper(classes = {} as ClassNames) {
 		if (typeof this.props.welcome !== 'function') {
 			return (
 			  <Card >
@@ -310,7 +312,7 @@ class SysComp extends CrudCompW<SysProps> {
 		const ctx = this.context as unknown as AnContextType;
 
 		// load menu
-		this.anreact = ctx.anReact;
+		this.anreact = ctx.uiHelper;
 
 		let that = this;
 		this.anreact.loadMenu(

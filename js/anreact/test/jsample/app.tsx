@@ -39,13 +39,19 @@ class App extends React.Component<Approps> {
 	anClient: SessionClient;
 	anReact: AnReact;
 
-	// FIXME in this pattern, no need to use an object for error handling - callback is enough
-	// errCtx = {msg: undefined, onError: this.onError} as ErrorCtx;
-
 	errorMsgbox: JSX.Element | undefined;
 	errorCtx: ErrorCtx;
 
-	/**Restore session from window.localStorage
+	/**
+	 * Application main entrance.
+	 * 
+	 * Set up:
+	 * - error context,
+	 * - AnContext,
+	 * - extend url link routes,
+	 * - protocol sk of dataset.
+	 * 
+	 * Also restore session from window.localStorage
 	 * 
 	 * @param props 
 	 */
@@ -59,13 +65,14 @@ class App extends React.Component<Approps> {
 		this.logout = this.logout.bind(this);
 
 		this.errorCtx = {onError: this.onError, msg: ''};
-
+		// Will load anclient from localStorage.
+		this.anClient = new SessionClient();
+		this.anReact = new AnReactExt(this.anClient, this.errorCtx);
+								// .extendPorts(StarPorts);
 
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.logout = this.logout.bind(this);
 
-		// design: will load anclient from localStorage
-		this.anClient = new SessionClient();
 
 		// singleton error handler
 		if (!this.anClient || !this.anClient.ssInf) {
@@ -109,11 +116,15 @@ class App extends React.Component<Approps> {
 	onError(c: string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
 
-		let errCtx = (this.context as AnContextType).error;
-		errCtx.msg = r.Body()?.msg();
-		this.errorMsgbox = <AnError onClose={() => this.onErrorClose(c)} fullScreen={false}
-							title={L('Error')} msg={errCtx.msg as string} />
-		this.setState({});
+		this.errorCtx.msg = r.Body()?.msg();
+		this.errorMsgbox = <AnError
+							onClose={() => this.onErrorClose(c)} fullScreen={false}
+							title={L('Error')}
+							msg={this.errorCtx.msg as string} />
+
+		this.setState({
+			hasError: !!c,
+			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
 	onErrorClose(code: string) {
@@ -166,6 +177,7 @@ class App extends React.Component<Approps> {
 				servId: this.state.servId,
 				servs: this.props.servs,
 				anClient: this.anClient, // as typeof SessionClient | Inseclient,
+				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',

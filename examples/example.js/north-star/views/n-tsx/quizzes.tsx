@@ -84,7 +84,7 @@ class QuizzesComp extends CrudCompW<Comprops> {
 		let queryReq = QuizzesComp.buildReq(this.context.anClient, this.uri, query, pageInf);
 		this.state.queryReq = queryReq;
 
-		this.context.anReact.bindTablist(queryReq, this, this.context.error);
+		this.context?.uiHelper?.bindTablist(queryReq, this, this.context.error);
 
 		this.state.selected.ids.clear();
 	}
@@ -126,7 +126,7 @@ class QuizzesComp extends CrudCompW<Comprops> {
 		if (query) {
 			query.Body().Page(size, page);
 			this.state.pageInf = new PageInf(page, size, this.state.pageInf.total); // {page, size, total: this.state.pageInf.total};
-			this.context.anReact.bindTablist(query, this, this.context.error);
+			this.context?.uiHelper?.bindTablist(query, this, this.context.error);
 		}
 	}
 

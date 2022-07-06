@@ -140,12 +140,12 @@ export class AnReact {
 	 * 	let dom = document.getElementById(elem);
 	 * 	ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
 	 * }
-	 * 
+	 *
 	 * // see Anclient/js/test/jsample/app.tsx
 	 * function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 	 * 	let dom = document.getElementById(elem);
 	 * 	ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
-	 * } 
+	 * }
 	 */
 	static bindDom( elem: string, opts: AnreactAppOptions,
 				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
@@ -190,12 +190,11 @@ export interface AnreactAppOptions {
 
 /**
  * Extending AnReact with dataset & sys-menu - the same of tier extending of Jsample.
- * 
+ *
  * @class
  */
 export class AnReactExt extends AnReact {
 	loading: boolean;
-	// options: NV[];
 
 	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
@@ -287,7 +286,7 @@ export class AnReactExt extends AnReact {
 	 *
 	 * TODO: All widgets should bind data by themselves, so the helper of DatasetCombo shouldn't exits.
 	 * Once the Autocomplete is replaced by DatasetCombo, that function should be removed.
-	 * 
+	 *
 	 * @param opts options
 	 * - opts.sk: semantic key (dataset id)
 	 * - opts.sqlArs: arguments for sql
@@ -297,10 +296,10 @@ export class AnReactExt extends AnReact {
 	 * - opts.onAll: no 'ALL' otion item
 	 * - errCtx: error handling context
 	 * @return this
-	 * 
+	 *
 	 * @example
 		let ctx = this.context as AnContextType;
-		let an = ctx.anReact as AnReactExt;
+		let an = ctx.uiHelper as AnReactExt;
 		an.ds2cbbOptions({uri, sk, noAllItem,
 			onLoad: (cols, rows) => {
 				this.loading = false;

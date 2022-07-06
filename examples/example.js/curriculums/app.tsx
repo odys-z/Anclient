@@ -109,7 +109,7 @@ class App extends React.Component<Approps, any> {
 	 */
 	onError(c: string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
-		this.state.error.msg = r.Body().msg();
+		this.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
 			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
@@ -168,6 +168,7 @@ class App extends React.Component<Approps, any> {
 				servId: this.state.servId,
 				servs: this.props.servs,
 				anClient: this.anClient,
+				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',

@@ -36,9 +36,6 @@ export class PageInf {
 	/** @deprected replaced by condtRec */
 	condts?: Array<string[]>;
 
-	/** Not used yet */
-	// condtsRec?: Tierec;
-
 	constructor(page?: number, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.semantic.jserv.R.PageInf';
 		this.page = page || 0;
