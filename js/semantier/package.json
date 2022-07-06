@@ -20,5 +20,9 @@
     "semantier"
   ],
   "author": "Ody Zhou",
-  "license": "MIT"
+  "license": "MIT",
+
+  "publishConfig": {
+    "registry":"https://registry.npmjs.org/"
+  }
 }
