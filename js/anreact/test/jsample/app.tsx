@@ -3,8 +3,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, AnsonMsg, AnsonResp
-} from '../../../semantier/anclient';
+import { Protocol, SessionClient, ErrorCtx, SessionInf,
+	AnsonMsg, AnsonResp
+} from '@anclient/semantier';
 
 import { L, Langstrs } from '../../../anreact/src/utils/langstr';
 import { AnContext, AnContextType, JsonServs } from '../../../anreact/src/react/reactext';
@@ -20,7 +21,6 @@ import { StandardProps } from '@material-ui/core';
 import { JsampleTheme } from '../../../anreact/src/jsample/styles';
 import { MyInfCard } from '../../../anreact/src/jsample/views/my-infcard';
 import { MyPswd } from '../../../anreact/src/jsample/views/my-pswdcard';
-import { ErrorCtx, SessionInf } from '@anclient/semantier';
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
@@ -96,6 +96,7 @@ class App extends React.Component<Approps> {
 			Object.assign(Protocol.sk, sks);
 			console.log(sks);
 		}, this.errorCtx);
+ 
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';

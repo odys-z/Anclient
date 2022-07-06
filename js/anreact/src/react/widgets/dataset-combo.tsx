@@ -94,6 +94,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				}
 			});
 		}
+		else console.warn("DatasetCombo used for null sk?", this.props.label);
 	}
 
 	onCbbRefChange( refcbb: React.RefObject<HTMLDivElement> ) : (
