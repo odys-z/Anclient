@@ -35,7 +35,7 @@ import { L } from '../utils/langstr';
 import {
 	Home, ErrorPage, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW
 } from './crud'
-import { ClassNameMap } from '@material-ui/styles';
+// import { ClassNameMap } from '@material-ui/styles';
 import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 
@@ -43,7 +43,10 @@ export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
 	menu: string;
     /**Welcome page formatter */
-    welcome?: (classes: ClassNameMap, context: typeof AnContext, comp: SysComp) => JSX.Element;
+    welcome?: (
+		/** @deprecated not used */
+		classes: ClassNames | undefined,
+		context: AnContextType, comp: SysComp) => JSX.Element;
     // classes: {[x: string]: string};
     hrefDoc?: string;
     onLogout: () => void;
@@ -304,7 +307,7 @@ class SysComp extends CrudCompW<SysProps> {
 			  </Card>);
 		}
 		else {
-			return this.props.welcome(classes, this.context as Context<AnContextType>, this);
+			return this.props.welcome(classes, this.context as AnContextType, this);
 		}
 	}
 

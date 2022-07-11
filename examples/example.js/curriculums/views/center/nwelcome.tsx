@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ContextType } from "react";
 import { AnContext, AnContextType, ClassNames, Comprops, CrudCompW, invalidStyles, L, SysComp } from "@anclient/anreact";
 import { Semantier, Tierec, UIComponent } from "@anclient/semantier";
 import { Card, Grid, Link, Paper, SvgIcon, Typography, withStyles, withWidth } from "@material-ui/core";
@@ -157,8 +157,10 @@ class WelcomeTier extends Semantier {
     ];
 }
 
-export function welcome(sysComp: typeof SysComp, props: WelcomeProp) {
-    return <WelcomePage sys={sysComp} classes={props.classes} {...props} />
+// export function welcome(sysComp: typeof SysComp, props: WelcomeProp) {
+export function welcome(classes: ClassNames, ctx: AnContextType, sysComp: SysComp) {
+    // return <WelcomePage sys={sysComp} classes={props.classes} {...props} />
+    return <WelcomePage sys={sysComp} className={classes.welcome} />
 }
 
 /**

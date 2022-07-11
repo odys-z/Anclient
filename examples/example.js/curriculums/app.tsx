@@ -163,7 +163,6 @@ class App extends React.Component<Approps, any> {
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				ssInf: this.anClient.ssInf,
-				anReact: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
