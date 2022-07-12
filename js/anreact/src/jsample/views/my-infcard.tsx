@@ -247,7 +247,6 @@ export class MyInfTier extends Semantier {
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
 					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v)
-					// .nv('attName', rec.attName).nv('mime', rec.mime)
 					.nv('attName', rec.fileMeta?.name).nv('mime', rec.fileMeta?.mime)
 					.nv('uri', dataOfurl(rec[this.imgProp] as string)) );
 		}

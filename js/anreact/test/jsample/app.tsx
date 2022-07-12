@@ -8,7 +8,7 @@ import { Protocol, SessionClient, ErrorCtx, SessionInf,
 } from '@anclient/semantier';
 
 import { L, Langstrs } from '../../../anreact/src/utils/langstr';
-import { AnContext, AnContextType, JsonServs } from '../../../anreact/src/react/reactext';
+import { AnContext, JsonServs } from '../../../anreact/src/react/reactext';
 import { AnReact, AnReactExt, AnreactAppOptions } from '../../../anreact/src/react/anreact';
 import { AnError } from '../../../anreact/src/react/widgets/messagebox';
 import { SysComp } from '../../../anreact/src/react/sys';
@@ -67,7 +67,7 @@ class App extends React.Component<Approps> {
 		this.errorCtx = {onError: this.onError, msg: ''};
 		// Will load anclient from localStorage.
 		this.anClient = new SessionClient();
-		this.anReact = new AnReactExt(this.anClient, this.errorCtx);
+		this.anReact = new AnReactExt(this.anClient, this.errorCtx); 
 								// .extendPorts(StarPorts);
 
 		this.onErrorClose = this.onErrorClose.bind(this);

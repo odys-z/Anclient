@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import withStyles from "@material-ui/core/styles/withStyles";
 import { Theme } from '@material-ui/core/styles';
 
@@ -8,7 +8,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TablePagination from '@material-ui/core/TablePagination';
+import TablePagination, { LabelDisplayedRowsArgs } from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
 import { AnlistColAttrs, isEmpty, PageInf, toBool } from '@anclient/semantier';
@@ -18,6 +18,7 @@ import { AnTablistProps } from './table-list';
 
 const styles = (theme: Theme) => ( {
 	root: {
+		margin: theme.spacing(1),
 	}
 } );
 
@@ -55,11 +56,12 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
         this.sizeOptions = props.sizeOptions || [10, 25, 50];
 
 		let {total, page, size} = props.pageInf || {};
-		this.page = new PageInf(page || 0, size || 25, total || 0);
+		this.page = new PageInf(page || 0, size || this.sizeOptions[0], total || 0);
 
 		this.isSelected = this.isSelected.bind(this);
 		this.toSelectAll = this.toSelectAll.bind(this);
 
+		this.rowPageLabel = this.rowPageLabel.bind(this);
 		this.changePage = this.changePage.bind(this);
 		this.changeSize = this.changeSize.bind(this);
 		this.handleClick = this.handleClick.bind(this);
@@ -76,6 +78,15 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 
 	isSelected(k: string) {
 		return this.state.selected.has(k);
+	}
+
+	rowPageLabel (paginationInfo: LabelDisplayedRowsArgs) : ReactNode {
+		console.log(paginationInfo);
+		let from = this.page.page * this.page.size;
+		let to = this.page.size > 0 ? (this.page.page + 1) * this.page.size : 0;
+		let count = this.page.total > 0 ? (this.page.total + this.page.page - 1) / this.page.total : -1;
+
+		return `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`;
 	}
 
 	handleClick(e: React.MouseEvent<HTMLElement>, newSelct: string) {
@@ -96,7 +107,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	};
 
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
-		let ids = this.props.selected.ids; // || this.props.selectedIds.ids;
+		let ids = this.props.selected.ids;
 		if (e.target.checked) {
 			this.props.rows.forEach((r) => ids.add(r[this.props.pk] as string));
 			this.updateSelectd(ids);
@@ -116,14 +127,15 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	changePage(_event: React.UIEvent, page: number) {
 		this.setState({page});
 		if (typeof this.props.onPageChange === 'function')
-			this.props.onPageChange (page);
+			this.props.onPageChange (page, this.page.size);
 	}
 
 	changeSize (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
 		let size = parseInt(event.target.value, 10);
 		this.setState({size});
-		if (typeof this.props.onPageInf  === 'function')
-			this.props.onPageInf (this.page.page, this.page.size);
+		this.page.size = size;
+		if (typeof this.props.onPageChange  === 'function')
+			this.props.onPageChange (this.page.page, this.page.size);
 	}
 
 	/**
@@ -133,9 +145,9 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	 */
 	th(columns: Array<AnlistColAttrs<JSX.Element, CompOpts>> = []) {
 		return columns
-			.filter( (v, x) => // !toBool(v.visible, true) ? 
-							toBool(v.hide) || !toBool(v.visible, true) ?
-							false : !(this.props.checkbox && x === 0)) // first columen as checkbox
+			.filter( (v, x) =>
+						toBool(v.hide) || !toBool(v.visible, true) ?
+						false : !(this.props.checkbox && x === 0) ) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
 					{colObj.label || colObj.field}
@@ -216,6 +228,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			page={this.page.page}
 			component="div"
 			rowsPerPageOptions={this.sizeOptions}
+			labelDisplayedRows={this.rowPageLabel}
 		/>}
 		</>);
 	}

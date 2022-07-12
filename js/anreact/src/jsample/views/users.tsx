@@ -6,8 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
-import { toBool, Protocol, CRUD, AnsonResp , UserReq, PageInf, Tierec,
-	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
+import { toBool, Protocol, CRUD, AnsonResp , UserReq, Tierec,
+	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -50,7 +50,6 @@ class UserstComp extends CrudCompW<Comprops> {
 	q: PageInf;
 	confirm: JSX.Element;
 	recForm: JSX.Element;
-	onPageInf: (page: number) => void;
 
 	constructor(props: Comprops) {
 		super(props);
@@ -65,6 +64,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.onTableSelect = this.onTableSelect.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.del = this.del.bind(this);
+		this.onPageInf = this.onPageInf.bind(this);
 	}
 
 	componentDidMount() {
@@ -86,10 +86,16 @@ class UserstComp extends CrudCompW<Comprops> {
 		let that = this;
 		this.q = condts || this.q;
 		this.tier.records( this.q,
-			(cols, rows) => {
+			(_cols, rows) => {
 				that.state.selected.ids.clear();
 				that.setState(rows);
 			} );
+	}
+
+	onPageInf(page: number, size? : number) : void {
+		this.q.page = page || 0;
+		this.q.size = size;
+		this.toSearch(this.q);
 	}
 
 	onTableSelect(rowIds: Array<string>) {
@@ -126,7 +132,7 @@ class UserstComp extends CrudCompW<Comprops> {
 							that.confirm = undefined;
 							that.toSearch(undefined);
 						} }
-						msg={L('Deleting Succeed!')} />);
+						msg={L(resp.Body(0).msg() || 'Deleting Succeed!')} />);
 				that.toSearch(undefined);
 			} );
 	}
@@ -177,7 +183,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		return (<div className={classes.root}>
 			<Card>
 				<Typography variant="h6" gutterBottom>{}
-					{this.props.funcName || this.props.title || 'Users of Jsample'}
+					{this.props.funcName || this.props.title || L('Users of Jsample')}
 				</Typography>
 			</Card>
 			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
@@ -199,10 +205,13 @@ class UserstComp extends CrudCompW<Comprops> {
 				</Grid>}
 
 			{tier && <AnTablPager pk={tier.pkval.pk}
-				className={classes.root} checkbox={tier.checkbox}
+				className={classes.root}
+				checkbox={tier.checkbox}
 				selected={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
+				sizeOptions={[5, 8, 10]}
+				pageInf={this.q}
 				onPageChange={this.onPageInf}
 				onSelectChange={this.onTableSelect}
 			/>}
@@ -304,7 +313,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds?.condtsRec() )
+					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
@@ -322,7 +331,7 @@ export class UsersTier extends Semantier {
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds.condtsRec() )
+					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.rec) );
 
 		client.commit(req,
@@ -428,10 +437,12 @@ export class UserstReq extends UserReq {
 	relations: DbRelations;
 	deletings: string[];
 
-	constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
+	// constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
+	constructor (uri: string, query: PageInf | any) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
+		/*
 		this.userId = (args.userId || args.record?.userId) as string;
 		this.userName = args.userName as string;
 		this.orgId = args.orgId as string;
@@ -444,5 +455,27 @@ export class UserstReq extends UserReq {
 
 		// case d
 		this.deletings = args.deletings as string[];
+		*/
+
+		// case r
+		if (query.page === undefined && typeof query.condtsRec === 'function')
+			throw Error("Scince anreact 0.4.17, UserstReq no longer user Tierec as query condition.");
+
+		if (query.condtsRec) {
+			let args = query.condtsRec() as Tierec & { record? : {userId?: string} };
+			this.userId = (args.userId || args.record?.userId) as string;
+			this.userName = args.userName as string;
+			this.orgId = args.orgId as string;
+			this.roleId = args.roleId as string;
+			this.hasTodos = toBool(args.hasTodos as string | boolean);
+		}
+
+		/// case u
+		this.record = query.record as Tierec;
+		this.relations = query.relations as DbRelations;
+
+		// case d
+		this.deletings = query.deletings as string[];
+	
 	}
 }

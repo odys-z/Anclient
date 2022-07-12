@@ -34,7 +34,7 @@ interface AnTablistProps extends Comprops {
 	rows?: Tierec[];
 
 	onSelectChange: (ids: Array<string>) => void;
-	onPageChange?: (page: number) => void;
+	onPageChange?: (page: number, size?: number) => void;
 
 	/**Page size options, Default [10, 25, 50]. */
 	sizeOptions?: Array<number>;
@@ -115,7 +115,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	};
 
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
-		let ids = this.props.selected.ids; // || this.props.selectedIds.ids;
+		let ids = this.props.selected.ids;
 		if (e.target.checked) {
 			this.props.rows.forEach((r) => ids.add(r[this.props.pk] as string));
 			this.updateSelectd(ids);
