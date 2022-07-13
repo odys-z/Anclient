@@ -11,7 +11,7 @@ import { L, Langstrs } from '../../../anreact/src/utils/langstr';
 import { AnContext, JsonServs } from '../../../anreact/src/react/reactext';
 import { AnReact, AnReactExt, AnreactAppOptions } from '../../../anreact/src/react/anreact';
 import { AnError } from '../../../anreact/src/react/widgets/messagebox';
-import { SysComp } from '../../../anreact/src/react/sys';
+import { Sys, SysComp } from '../../../anreact/src/react/sys';
 import { Userst } from '../../../anreact/src/jsample/views/users';
 import { Domain } from '../../../anreact/src/jsample/views/domain';
 import { Roles } from '../../../anreact/src/jsample/views/roles';
@@ -184,7 +184,7 @@ class App extends React.Component<Approps> {
 				ihome: this.props.iportal || 'portal.html',
 				error: this.errorCtx,
 			}} >
-				<SysComp menu='sys.menu.jsample'
+				<Sys menu='sys.menu.jsample'
 					sys='AnReact' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					onLogout={this.logout} />
