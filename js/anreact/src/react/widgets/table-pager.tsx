@@ -30,12 +30,8 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	sizeOptions = [10, 25, 50];
 
 	state = {
-		// total: 0,
-		// page: 0,
-		// size: 10,
-
 		selected: undefined
-	}
+	};
 
     page: PageInf;
 
@@ -51,12 +47,9 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selected.ids must be a set");
 
-		// if (sizeOptions)
-		// 	this.state.sizeOptions = sizeOptions;
         this.sizeOptions = props.sizeOptions || [10, 25, 50];
 
-		let {total, page, size} = props.pageInf || {};
-		this.page = new PageInf(page || 0, size || this.sizeOptions[0], total || 0);
+		this.page = props.pageInf;
 
 		this.isSelected = this.isSelected.bind(this);
 		this.toSelectAll = this.toSelectAll.bind(this);
@@ -81,10 +74,11 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	}
 
 	rowPageLabel (paginationInfo: LabelDisplayedRowsArgs) : ReactNode {
-		console.log(paginationInfo);
 		let from = this.page.page * this.page.size;
 		let to = this.page.size > 0 ? (this.page.page + 1) * this.page.size : 0;
-		let count = this.page.total > 0 ? (this.page.total + this.page.page - 1) / this.page.total : -1;
+		let count = this.page.total > 0
+			? Math.round((this.page.total + this.page.size - 1) / this.page.size)
+			: -1;
 
 		return `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`;
 	}

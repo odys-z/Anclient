@@ -55,6 +55,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		super(props);
 
 		this.state.selected.ids = new Set();
+		this.q = new PageInf(0, 10);
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
@@ -75,20 +76,20 @@ class UserstComp extends CrudCompW<Comprops> {
 
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
-	 * @param condts the query conditions collected from query form.
+	 * @param _condts the query conditions collected from query form.
 	 */
-	toSearch(condts: PageInf): void {
+	toSearch(_condts: PageInf): void {
 		if (!this.tier) {
 			console.warn("really happens?")
 			return;
 		}
 
 		let that = this;
-		this.q = condts || this.q;
+	
 		this.tier.records( this.q,
-			(_cols, rows) => {
+			(_cols, _rows) => {
 				that.state.selected.ids.clear();
-				that.setState(rows);
+				that.setState( {buttons: {add: true, edit: false, del: false}} );
 			} );
 	}
 
@@ -109,7 +110,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		} );
 	}
 
-	toDel(e: React.MouseEvent<Element, MouseEvent>) {
+	toDel(_e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
@@ -130,7 +131,7 @@ class UserstComp extends CrudCompW<Comprops> {
 						ok={L('OK')} cancel={false} open
 						onClose={() => {
 							that.confirm = undefined;
-							that.toSearch(undefined);
+							that.toSearch(that.q);
 						} }
 						msg={L(resp.Body(0).msg() || 'Deleting Succeed!')} />);
 				that.toSearch(undefined);
@@ -156,7 +157,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.setState({});
 	}
 
-	toEdit(e: React.MouseEvent<Element, MouseEvent>) {
+	toEdit(_e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
 		let pkv = this.getByIx(this.state.selected.ids);
 		this.tier.pkval.v = pkv;
@@ -186,7 +187,7 @@ class UserstComp extends CrudCompW<Comprops> {
 					{this.props.funcName || this.props.title || L('Users of Jsample')}
 				</Typography>
 			</Card>
-			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
+			<UsersQuery uri={this.uri} pageInf={this.q} onQuery={this.toSearch} />
 
 			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode
 				<Grid container alignContent="flex-end" >
@@ -225,7 +226,7 @@ UserstComp.contextType = AnContext;
 const Userst = withStyles<any, any, Comprops>(styles)(withWidth()(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: PageInf) => void}> {
+class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds: PageInf) => void}> {
 	conds = [
 		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student'),
 		  grid: {sm: 3, md: 2} } as AnlistColAttrs<any, any>,
@@ -235,23 +236,21 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: PageInf) => void
 		//   sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'}, grid: {md: 2, sm: 3} },
 	];
 
-	constructor(props: Comprops) {
+	constructor(props: Comprops & {pageInf: PageInf, onQuery: (conds: PageInf) => void}) {
 		super(props);
 		this.collect = this.collect.bind(this);
 	}
 
-	collect() : PageInf {
-		// return { query: {
-		// 	userName: this.conds[0].val ? this.conds[0].val : undefined,
-		// 	orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
-		// } };
-
-		return new PageInf()
+	collect(pageInf: PageInf) : PageInf {
+		// return new PageInf()
+		return pageInf
 				.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
 				.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
 	}
 
-	/** Design Note:
+	/**
+	 * Design Note:
+	 * 
 	 * Problem: This way bound the query form, so no way to expose visual effects modification?
 	 */
 	render () {
@@ -259,8 +258,8 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: PageInf) => void
 		return (
 		<AnQueryst {...this.props} uri={this.uri}
 			fields={this.conds}
-			onSearch={() => that.props.onQuery(that.collect()) }
-			onLoaded={() => that.props.onQuery(that.collect()) }
+			onSearch={() => that.props.onQuery(that.collect(that.props.pageInf)) }
+			onLoaded={() => that.props.onQuery(that.collect(that.props.pageInf)) }
 		/> );
 	}
 }
@@ -320,6 +319,7 @@ export class UsersTier extends Semantier {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
+				conds.total = resp.Body()?.Rs()?.total || 0;
 				onLoad(cols, rows as Tierec[]);
 			},
 			this.errCtx);
@@ -428,6 +428,7 @@ export class UserstReq extends UserReq {
 		mykids: 'r/kids',
 	}
 
+	pk: any;
 	userId: string;
 	userName: string;
 	orgId: string;
@@ -436,28 +437,17 @@ export class UserstReq extends UserReq {
 	record: Tierec;
 	relations: DbRelations;
 	deletings: string[];
+	page: PageInf;
 
 	// constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
 	constructor (uri: string, query: PageInf | any) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
-		/*
-		this.userId = (args.userId || args.record?.userId) as string;
-		this.userName = args.userName as string;
-		this.orgId = args.orgId as string;
-		this.roleId = args.roleId as string;
-		this.hasTodos = toBool(args.hasTodos as string | boolean);
 
-		/// case u
-		this.record = args.record as Tierec;
-		this.relations = args.relations as DbRelations;
+		/// FIXME: obviousely this is should be refactored to the chained calls API
 
-		// case d
-		this.deletings = args.deletings as string[];
-		*/
-
-		// case r
+		/// case r
 		if (query.page === undefined && typeof query.condtsRec === 'function')
 			throw Error("Scince anreact 0.4.17, UserstReq no longer user Tierec as query condition.");
 
@@ -468,14 +458,23 @@ export class UserstReq extends UserReq {
 			this.orgId = args.orgId as string;
 			this.roleId = args.roleId as string;
 			this.hasTodos = toBool(args.hasTodos as string | boolean);
+
+			this.page = new PageInf(query.page, query.size);
+		}
+		/// case A = rec (TRecordForm loading)
+		else if (query.userId) {
+			this.record = query as Tierec;
+			this.userId = query.userId;
+			this.page = new PageInf(0, -1);
+		}
+		/// case A = u
+		else if (query.pk) {
+			this.pk = query.pk;
+			this.record = query.record as Tierec;
+			this.relations = query.relations as DbRelations;
 		}
 
-		/// case u
-		this.record = query.record as Tierec;
-		this.relations = query.relations as DbRelations;
-
-		// case d
+		/// case d
 		this.deletings = query.deletings as string[];
-	
 	}
 }
