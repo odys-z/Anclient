@@ -5,7 +5,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonMsg, SessionClient, AnsonResp, ErrorCtx } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt, jsample, AnContextType
+	AnContext, AnError, AnReactExt, jsample, AnContextType, AnReact
 } from '@anclient/anreact';
 const { Domain, Roles, Orgs, JsampleTheme } = jsample;
 
@@ -20,6 +20,7 @@ import { APEvents } from './views/north/kypci/events';
 import { welcome } from './views/center/nwelcome';
 import { MyClass } from './views/north/my-clsss';
 import { ApUsers } from './views/north/ap-users';
+import { AllDecisions } from './views/north/all-decisions';
 
 export interface Approps {
     iportal?: string;
@@ -35,6 +36,8 @@ export interface Approps {
 /** 📦  @anclient/semantier@0.9.69 */
 class App extends React.Component<Approps, any> {
 	state = {
+		anClient: undefined as SessionClient,
+		anReact: undefined as AnReact, // helper for React
 
 		iportal: 'portal.html',
         jserv: undefined,
@@ -92,6 +95,8 @@ class App extends React.Component<Approps, any> {
 			{path: '/n/kypci', comp: Course},
 			{path: '/n/ohlyad', comp: Progress},
 			{path: '/n/myclass', comp: MyClass},
+			{path: '/n/all-decisions', comp: AllDecisions},
+
 			{path: '/c/course', comp: CourseReadonly},
 			{path: '/c/status', comp: MyScores},
 			{path: '/c/my', comp: My},
@@ -139,8 +144,7 @@ class App extends React.Component<Approps, any> {
 				{ onError: (c, e) => {
 					// something wrong
 					cleanup (that);
-				} }
-				);
+				} } );
 		}
 		catch(_) {
 			cleanup (that);

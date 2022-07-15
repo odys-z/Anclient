@@ -1,4 +1,8 @@
-{ "using": "zh",
+{ "using": "ua",
   "zh": {
+  },
+  "ua": {
+    "Jsample": "JЗразок",
+    "Sys Menu": "Сис Меню"
   }
 }

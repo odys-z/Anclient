@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Typography } from '@material-ui/core';
+import { Box, Button, Card, Typography } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
 import { Protocol, CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx } from '@anclient/semantier';
@@ -325,7 +325,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
-		// this.tier.records(toPageInf(this.conds),
+
         this.tier.records(new PageInf(0, -1, 0, [['eventId', this.tier.eventId]]),
 			(_cols, rows) => {
 				that.tier.rows = rows;

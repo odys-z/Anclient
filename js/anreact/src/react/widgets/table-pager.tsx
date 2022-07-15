@@ -80,7 +80,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			? Math.round((this.page.total + this.page.size - 1) / this.page.size)
 			: -1;
 
-		return `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`;
+		return `${from}–${to} in page ${this.page.page} of ${count !== -1 ? count : `more than ${to}`}`;
 	}
 
 	handleClick(e: React.MouseEvent<HTMLElement>, newSelct: string) {

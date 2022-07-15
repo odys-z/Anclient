@@ -1,11 +1,14 @@
 import React from 'react';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
+import { Protocol, AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import { L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq,
 } from '@anclient/anreact';
+import { ProgressReq } from './progress';
+import Card from '@material-ui/core/Card';
+import Typography from '@material-ui/core/Typography';
 const { JsampleIcons } = jsample;
 
 
@@ -25,22 +28,22 @@ const styles = (_theme: Theme) => ({
 	}
 });
 
-class ProgressReq<R extends SpreadsheetRec> extends SpreadsheetReq {
-	static mtabl: 'b_mydecisions';
-	static pk: 'myId';
+// class ProgressReq<R extends SpreadsheetRec> extends SpreadsheetReq {
+// 	static mtabl: 'b_mydecisions';
+// 	static pk: 'myId';
 
-	rec: R;
+// 	rec: R;
 
-	constructor(query?: PageInf, rec?: R) {
-		super({type: 'io.oz.curr.north.ProgressReq', query});
+// 	constructor(query?: PageInf, rec?: R) {
+// 		super({type: 'io.oz.curr.north.ProgressReq', query});
 
-		this.rec = rec;
+// 		this.rec = rec;
 
-		console.log(this.type);
-	}
-}
+// 		console.log(this.type);
+// 	}
+// }
 
-class ProgressComp extends CrudComp<Comprops & {conn_state: string}>{
+class AllDecisionsComp extends CrudComp<Comprops & {conn_state: string}>{
 	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
@@ -49,8 +52,8 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string}>{
 			  query: [
 				{ type: 'cbb', sk: 'ann-evt', uri: this.uri,
 				  label: L('Event'), field: 'eventId', grid: {sm: 2, md: 2}} as ComboCondType,
-				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
-				  label: L('Category'), field: 'cate', grid: {sm: 2, md: 2}} as ComboCondType,
+				{ type: 'cbb', sk: Protocol.sk.cbbClasses, uri: this.uri, nv: {n: 'text', v: 'value'},
+				  label: L('My Class'), field: 'orgId', grid: {sm: 2, md: 2}} as ComboCondType,
 				{ type: 'cbb', sk: 'curr-modu', uri: this.uri,
 				  label: L('Module'), field: 'module', grid: {sm: 2, md: 2}} as ComboCondType,
 			] } as QueryPage;
@@ -59,7 +62,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string}>{
 		super(props);
 
 		this.uri = props.uri;
-		this.icon = this.icon.bind(this);
+		// this.icon = this.icon.bind(this);
 		this.queryConds = this.queryConds.bind(this);
 
 		this.bindSheet = this.bindSheet.bind(this);
@@ -70,12 +73,12 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string}>{
 		{ uri: this.uri,
 		  pkval: { pk: ProgressReq.pk, v: undefined, tabl: ProgressReq.mtabl },
 		  cols: [
-			{ field: 'cId', label: L("Id"), width: 100, editable: false },
-			{ field: 'eventName', label: L("AP Event"), width: 160, noAllItem: true, editable: false },
-			{ field: 'progress', label: L("Students Count"), width: 100, editable: false },
+			{ field: 'cId', label: L("Id"), width: 100, editable: false, hide: true },
+			{ field: 'userName', label: L("Student"), width: 160, noAllItem: true, editable: false },
+			// { field: 'progress', label: L("Students Count"), width: 100, editable: false },
+			{ field: 'module', label: L('Module'), width: 110, type: 'cbb', sk: 'curr-modu', editable: false },
 			{ field: 'currName', label: L("Course Name"), width: 260, editable: false },
 			{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
-			{ field: 'module', label: L('Module'), width: 110, type: 'cbb', sk: 'curr-modu', editable: false },
 			{ field: 'cate', label: L("Category"), width: 260, type: 'cbb', sk: 'curr-cate', editable: false },
 		] });
 	}
@@ -89,17 +92,6 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string}>{
 		this.setState({});
 	}
 
-	icon(e: SpreadsheetRec) {
-		let {classes} = this.props;
-
-		let color = e.css.color === 'secondary' ? 'secondary' : 'primary';
-
-		return e.css?.alignContent === 'middle' || e.css?.alignSelf === 'middle'
-			? <JsampleIcons.Search color={color} style={{veritalAlign: "middle"}}/>
-			: <JsampleIcons.Star color={color} className={classes.svgicn}/>
-			;
-	}
-
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
 		this.tier.records(toPageInf(this.conds),
@@ -111,9 +103,14 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string}>{
 
 	render() {
 		let that = this;
-		// let {classes} = this.props;
+		let {classes} = this.props;
 
 		return (<div>
+			<Card className={classes.funcard}>
+				<Typography variant="h6" gutterBottom>{}
+					{this.props.funcName || this.props.title || L('Class Courses')}
+				</Typography>
+			</Card>
 			{<AnQueryst
 				uri={this.uri}
 				fields={this.conds.query}
@@ -137,7 +134,7 @@ class ProgressComp extends CrudComp<Comprops & {conn_state: string}>{
 		return toPageInf(this.conds);
 	}
 }
-ProgressComp.contextType = AnContext;
+AllDecisionsComp.contextType = AnContext;
 
-const Progress = withStyles<any, any, Comprops>(styles)(ProgressComp);
-export { ProgressReq, Progress, ProgressComp };
+const AllDecisions = withStyles<any, any, Comprops>(styles)(AllDecisionsComp);
+export { AllDecisions, AllDecisionsComp };

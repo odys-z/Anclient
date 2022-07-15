@@ -185,7 +185,7 @@ class App extends React.Component<Approps> {
 				error: this.errorCtx,
 			}} >
 				<Sys menu='sys.menu.jsample'
-					sys='AnReact' menuTitle='Sys Menu'
+					sys={L('AnReact')} menuTitle={L('Sys Menu')}
 					myInfo={myInfoPanels}
 					onLogout={this.logout} />
 				{this.errorMsgbox}
