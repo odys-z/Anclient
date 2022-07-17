@@ -31,7 +31,7 @@ export const AnContext = React.createContext({
 	ssInf: undefined as SessionInf,
 
 	pageOrigin: '.',
-	iparent: {},    // usually the parent window of ifram
+	iparent: {},
 	ihome: undefined as string,
 
 	/**default: host */
@@ -43,7 +43,7 @@ export const AnContext = React.createContext({
 	anReact: undefined,
 
 	error: {
-        /**@function (code: string, AnsonMsg<AnsonResp>) => void */
+		/**@function (code: string, AnsonMsg<AnsonResp>) => void */
 		onError: undefined,
 		msg: undefined
 	} as ErrorCtx,
@@ -51,4 +51,4 @@ export const AnContext = React.createContext({
 
 	/** Only nullable for Login */
 	reactHelper: undefined as AnReact,
-} as AnContextType);
+} as unknown as AnContextType);
