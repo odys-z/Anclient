@@ -50,7 +50,7 @@ export interface SysProps extends Comprops {
     // classes: {[x: string]: string};
     hrefDoc?: string;
     onLogout: () => void;
-    myInfo: JSX.Element | ((context: Context<AnContextType>) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
+    myInfo: JSX.Element | ((context: AnContextType) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
 }
 
 const _icons = {
@@ -515,7 +515,7 @@ class SysComp extends CrudCompW<SysProps> {
 
 			{this.state.showMine && <MyInfo
 				panels={typeof this.props.myInfo === 'function'
-					? this.props.myInfo(this.context as Context<AnContextType>) : this.props.myInfo}
+					? this.props.myInfo(this.context as AnContextType) : this.props.myInfo}
 				onClose={() => this.setState({ showMine: false })} />}
 			{this.confirmLogout}
 		  </div>);

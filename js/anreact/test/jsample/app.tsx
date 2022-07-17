@@ -8,7 +8,7 @@ import { Protocol, SessionClient, ErrorCtx, SessionInf,
 } from '@anclient/semantier';
 
 import { L, Langstrs } from '../../../anreact/src/utils/langstr';
-import { AnContext, JsonServs } from '../../../anreact/src/react/reactext';
+import { AnContext, AnContextType, JsonServs } from '../../../anreact/src/react/reactext';
 import { AnReact, AnReactExt, AnreactAppOptions } from '../../../anreact/src/react/anreact';
 import { AnError } from '../../../anreact/src/react/widgets/messagebox';
 import { Sys, SysComp } from '../../../anreact/src/react/sys';
@@ -197,7 +197,7 @@ class App extends React.Component<Approps> {
 		 * To avoid create component before context avialable, this function need the caller' context as parameter.
 		 * @param anContext
 		 */
-		function myInfoPanels(anContext: typeof AnContext) {
+		function myInfoPanels(anContext: AnContextType) {
 			return [
 				{ title: L('Basic'),
 				  panel: <MyInfCard
