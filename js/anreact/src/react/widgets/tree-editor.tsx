@@ -45,6 +45,9 @@ const styles = (theme: Theme) => ({
 	  backgroundColor: "#ccc"
 	}
   },
+  forest: {
+	  height: '90vh',
+  },
   treeItem: {
 	padding: theme.spacing(1),
 	borderLeft: "1px solid #bcd",
@@ -263,7 +266,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		console.log(this.props.uri);
 
 		const ctx = this.context as unknown as AnContextType;
-		this.anReact = ctx.anReact;
+		this.anReact = ctx.uiHelper;
 		this.toSearch();
 	}
 
@@ -335,7 +338,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 					// close as data saved, search later in case re-shape failed. (shouldn't be a transaction?)
 					let {uri, sk} = this.props;
-					(this.context as unknown as AnContextType).anReact
+					(this.context as unknown as AnContextType).uiHelper
                         .rebuildTree({uri, sk, rootId: me}, () => {
                             that.toSearch();
                         });
@@ -358,7 +361,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
 			})
-        
+
         function icon(iconame?: string) {
 	        return AnTreeIcons[iconame || "deflt"];
         }
@@ -374,7 +377,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 		let m = this.state.forest;
 		let mtree = buildTreegrid( m, undefined, compOts );
-		return mtree;
+		return (<div className={classes.forest}>{mtree}</div>);
 
 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts: CompOpts) {
 		  if (Array.isArray(tnode)) {

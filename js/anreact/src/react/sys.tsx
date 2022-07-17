@@ -35,15 +35,20 @@ import { L } from '../utils/langstr';
 import {
 	Home, ErrorPage, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW
 } from './crud'
-import { ClassNameMap } from '@material-ui/styles';
+// import { ClassNameMap } from '@material-ui/styles';
 import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 
 export interface SysProps extends Comprops {
+	/** Dataset (stree) sk of system menu */
+	menu: string;
     /**Welcome page formatter */
-    welcome?: (classes: ClassNameMap, context: typeof AnContext, comp: SysComp) => JSX.Element;
+    welcome?: (
+		/** @deprecated not used */
+		classes: ClassNames | undefined,
+		context: AnContextType, comp: SysComp) => JSX.Element;
     // classes: {[x: string]: string};
-    hrefDoc: string;
+    hrefDoc?: string;
     onLogout: () => void;
     myInfo: JSX.Element | ((context: Context<AnContextType>) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
 }
@@ -161,6 +166,9 @@ const styles = (theme: Theme) => ({
 });
 
 export interface MenuItem {
+	/** additonal proterties directly passed on to CRUD page component */
+	props: object;
+
 	funcId: string;
 	id: string;
 	funcName: string;
@@ -246,7 +254,7 @@ class SysComp extends CrudCompW<SysProps> {
 
 	anreact: AnReactExt;
 
-    confirmLogout: any;
+	confirmLogout: any;
 
 	static extendLinks(links) {
 		links.forEach( (l: { path: string ; comp: CrudComp<Comprops>; }, _x: number) => {
@@ -272,7 +280,7 @@ class SysComp extends CrudCompW<SysProps> {
 		this.welcomePaper = this.welcomePaper.bind(this);
 	}
 
-	welcomePaper(classes: ClassNames) {
+	welcomePaper(classes = {} as ClassNames) {
 		if (typeof this.props.welcome !== 'function') {
 			return (
 			  <Card >
@@ -299,7 +307,7 @@ class SysComp extends CrudCompW<SysProps> {
 			  </Card>);
 		}
 		else {
-			return this.props.welcome(classes, this.context as Context<AnContextType>, this);
+			return this.props.welcome(classes, this.context as AnContextType, this);
 		}
 	}
 
@@ -307,7 +315,7 @@ class SysComp extends CrudCompW<SysProps> {
 		const ctx = this.context as unknown as AnContextType;
 
 		// load menu
-		this.anreact = ctx.anReact;
+		this.anreact = ctx.uiHelper;
 
 		let that = this;
 		this.anreact.loadMenu(
@@ -426,7 +434,8 @@ class SysComp extends CrudCompW<SysProps> {
 		  return (
 			<TagName
 				uri={this.state.currentPage?.url || '/'}
-				ssInf={this.context.anClient?.ssInf} /> );
+				{...this.state.currentPage.props}
+				ssInf={(this.context as AnContextType).anClient?.ssInf} /> );
 		else return <Home />;
 	}
 
@@ -458,7 +467,7 @@ class SysComp extends CrudCompW<SysProps> {
 					>
 					<Menu />
 					</IconButton>
-					<Typography variant="h5" className={classes.sysName} noWrap >{L(this.state.sysName)}</Typography>
+					<Typography variant="h5" className={claz.sysName} noWrap >{L(this.state.sysName)}</Typography>
 				</Box>
 				</Grid>
 

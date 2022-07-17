@@ -153,7 +153,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			let queryReq = ctx.anClient.query(this.uri, this.props.mtabl, 'r')
 			queryReq.Body().whereEq(this.pkval.pk, this.pkval.v);
 			// FIXME but sometimes we have FK in record. Meta here?
-			ctx.anReact.bindStateRec({req: queryReq,
+			(ctx.uiHelper as AnContextType).bindStateRec({req: queryReq,
 				onOk: (resp: AnsonMsg<AnsonResp>) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 						if (!rows || rows.length !== 1)

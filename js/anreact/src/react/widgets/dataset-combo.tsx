@@ -25,9 +25,12 @@ export interface ComboProps extends Comprops {
 	label?: string;
 	// style: CSSStyleDeclaration;
 	onSelect?: (it: NV) => void;
+	onLoad?: OnLoadOk<ComboItem>;
 
 	sk?: string,
 	noAllItem?: boolean,
+
+	autoHighlight?: boolean,
 }
 
 const styles = (theme: Theme) => (Object.assign(
@@ -56,13 +59,10 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	refcbb = React.createRef<HTMLDivElement>();
 	loading = false;
-	// items: NV[];
 
 	constructor(props: ComboProps) {
 		super(props);
 		this.combo.options = props.options;
-		// this.state.combo.label = props.label;
-		// this.combo.initVal = props.val;
 
 		if (this.props.sk && !this.props.uri)
 			console.warn("DatasetCombo is configured as loading data with sk, but uri is undefined.")
@@ -72,7 +72,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	componentDidMount() {
 		let ctx = this.context as unknown as AnContextType;
-		let anreact = ctx?.anReact as AnReactExt;
+		let anreact = ctx?.uiHelper as AnReactExt;
 		if (!anreact)
 			throw new Error('DatasetCombo can\'t bind controls without AnContext initialized with AnReact.');
 
@@ -88,9 +88,13 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				onDone: (cols, rows) => {
 					that.combo.options = rows as Array<ComboItem>;
 					that.setState({});
+
+					if(typeof that.props.onLoad === 'function')
+						that.props.onLoad(cols, rows as Array<ComboItem>);
 				}
 			});
 		}
+		else console.warn("DatasetCombo used for null sk?", this.props.label);
 	}
 
 	onCbbRefChange( refcbb: React.RefObject<HTMLDivElement> ) : (
@@ -99,18 +103,16 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			reason: AutocompleteChangeReason | AutocompleteInputChangeReason,
 			details?: AutocompleteChangeDetails<ComboItem>
 	) => void {
-		let _ref = refcbb;
-		let _that = this;
-		// let _cmb = this.state.combo;
-		// _cmb.ref = _ref;
+		let that = this;
+
 		return (e, item: NV) => {
 			if (e) e.stopPropagation();
 			let selectedItem = item ? item : AnConst.cbbAllItem;
 
-			if (typeof _that.props.onSelect === 'function')
-				_that.props.onSelect(selectedItem);
+			if (typeof that.props.onSelect === 'function')
+				that.props.onSelect(selectedItem);
 
-			_that.setState({selectedItem});
+			that.setState({selectedItem});
 		};
 	}
 
@@ -133,7 +135,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			this.state.selectedItem = selectedItem;
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
-		let opts = this.combo && this.combo.options || this.props.options; 
+		let opts = this.combo && this.combo.options || this.props.options;
 		return (
 		  // avoid set defaultValue before loaded
 		  opts ?
@@ -146,13 +148,14 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
 			options={opts}
+			autoHighlight={this.props.autoHighlight}
 			style={this.props.style}
 			className={classes[this.props.invalidStyle || 'ok']}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
 			renderInput={
 				(params) => <TextField {...params}
-					label={this.props.showLable && v ? v.n : ''}
+					label={this.props.showLable && v ? v.n : this.props.label || ''}
 					variant="outlined" /> }
 		  /> : <></>);
 
@@ -200,7 +203,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		this.loading = true;
 
 		let ctx = this.context as AnContextType;
-		let an = ctx.anReact as AnReactExt;
+		let an = ctx.uiHelper as AnReactExt;
 
 		an.dataset( { port: 'dataset', uri, sqlArgs, sk },
 			(dsResp: AnsonMsg<AnsonResp>) => {

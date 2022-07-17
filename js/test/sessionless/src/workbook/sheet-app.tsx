@@ -9,8 +9,8 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs, CellEditingStoppedEvent, Spreadsheetier
 } from '../../../../anreact/src/an-components';
 
-import { Workbook } from './workbook';
-import { MyBookReq, MyWorkbookTier } from './workbook-tier';
+import { Workbook } from './workbook-no-tier';
+// import { MyBookReq } from './workbook-tier';
 
 const { JsampleTheme } = jsample;
 
@@ -18,7 +18,7 @@ type LessProps = {
 	servs: JsonServs;
 	servId: string;
 	iportal?: string;
-	iparent?: any; // parent of iframe
+	iparent?: string; // parent of iframe
 	iwindow?: any; // window object
 }
 
@@ -52,7 +52,6 @@ class App extends React.Component<LessProps, State> {
 
 	uri = '/less/sheet';
 	tier: Spreadsheetier;
-	// tier: MyWorkbookTier;
 
 	/**
      * Restore session from window.localStorage
@@ -93,7 +92,8 @@ class App extends React.Component<LessProps, State> {
 		let onEditStop = this.onEdited;
 
 
-		Spreadsheetier.registerReq((p, r) => { return new MyBookReq(p, r); })
+		// Spreadsheetier.registerReq((p, r) => { return new MyBookReq(p, r); })
+
 		this.tier = new Spreadsheetier('workbook',
 			{ uri: this.uri,
 			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},

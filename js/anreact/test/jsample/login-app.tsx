@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AnsonMsg, AnsonResp, SessionClient } from '../../semantier/anclient';
-import { AnContext, AnError, AnReact, L, Login } from '../../anreact/src/an-components';
-import { Comprops } from '../../anreact/src/react/crud';
-import { AnreactAppOptions, JsonServs } from '../../anreact/src/an-components';
+import { AnsonMsg, AnsonResp, SessionClient } from '../../../semantier/anclient';
+import { AnContext, AnError, AnReact, L, Login } from '../../../anreact/src/an-components';
+import { Comprops } from '../../../anreact/src/react/crud';
+import { AnreactAppOptions, JsonServs } from '../../../anreact/src/an-components';
 
 const styles = (theme) => ({
 	root: {
@@ -13,18 +13,18 @@ const styles = (theme) => ({
 
 interface LoginProps extends Comprops {
 	servs: JsonServs;
-	servId: string;
+	servId?: string;
 };
 
 /** The application main, context singleton and error handler, but only for login
  * used in iframe (no origin change). */
 class LoginApp extends React.Component<LoginProps> {
 	state = {
-		anClient: undefined,
 		hasError: false,
 		home: 'index.html',
 		servId: 'host',
 	};
+	anClient: SessionClient;
 
 	servId: string;
 
@@ -32,14 +32,14 @@ class LoginApp extends React.Component<LoginProps> {
 	jserv: string;
 	errCtx = {
 		msg: '',
-		onError: this.onError // .bind(this),
+		onError: this.onError
 	};
 
 	constructor(props: LoginProps) {
 		super(props);
 
 		this.servId = props.servId ? props.servId : 'host';
-		this.jserv = props.servs ? props.servs[this.servId] : undefined,
+		this.jserv = props.servs[this.servId];
 
 		this.errCtx.onError = this.errCtx.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -48,7 +48,7 @@ class LoginApp extends React.Component<LoginProps> {
 
 	onError(c : string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
-		this.setState({hasError: !!c, err: r.Body().msg()});
+		this.setState({hasError: !!c, err: r.Body()?.msg()});
 	}
 
 	onErrorClose() {
@@ -72,12 +72,12 @@ class LoginApp extends React.Component<LoginProps> {
 		return (
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
-				ssInf: undefined,   // not need
+				ssInf: undefined,
 				ihome: '',
-				anReact: undefined, // not neeed
+				// anReact: undefined,
 				servId: this.state.servId,
 				servs: this.props.servs,
-				anClient: this.state.anClient,
+				anClient: this.anClient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				error: this.errCtx,

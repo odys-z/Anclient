@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Button } from '@material-ui/core';
+import { Box, Button, Card, Typography } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx } from '@anclient/semantier';
+import { Protocol, CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp, AnContextType,
@@ -27,6 +27,12 @@ const styles = (_theme: Theme) => ({
 		// marginTop: 6,
 		margin: 6,
 		width: 150,
+	},
+	smalltip: {
+		fontSize: "0.8em",
+		color: "#fd4141",
+		backgroundColor: "silver",
+		marginBottom: 22,
 	}
 });
 
@@ -35,7 +41,7 @@ const setPrinterFriendly = (api: GridApi) => {
     eGridDiv.style.height = '';
     api.setDomLayout('print');
 };
-  
+
 const setNormal = (api) => {
     const eGridDiv = document.querySelector('#myGrid') as any;
     eGridDiv.style.width = '700px';
@@ -100,15 +106,13 @@ export class MyCoursesTier extends Spreadsheetier {
 	}
 
 	loadCourses(ctx: AnContextType) {
-		// let an = ctx.anReact as AnReactExt;
-		// let uri = this.uri;
 		let that = this;
 
 		let client = this.client;
-		
+
 		let bdy = new MyReq(undefined, undefined)
 				.A(MyReq.A.courses);
-		
+
 		let req = client.userReq(this.uri, this.port, bdy);
 
 		client.commit(req,
@@ -149,11 +153,11 @@ export class MyCoursesTier extends Spreadsheetier {
 
 	/**
 	 * Enocde name to code according cbb items data.
-	 * 
-	 * @param field 
-	 * @param n 
+	 *
+	 * @param field
+	 * @param n
 	 * @param rec current row for dynamic encoding (current module for each course groups)
-	 * @returns 
+	 * @returns
 	 */
 	encode(field: string, n: string, rec: Course): string | object {
 		if (field === 'cId') {
@@ -170,7 +174,7 @@ export class MyCoursesTier extends Spreadsheetier {
 		return super.encode(field, n, rec);
 	}
 
-	decode(p: ICellRendererParams): string | Element { 
+	decode(p: ICellRendererParams): string | Element {
 		let field = p.colDef.field;
 		if (p.rowIndex >= this.rows.length) return p.value;
 
@@ -218,8 +222,8 @@ export class MyCoursesTier extends Spreadsheetier {
 		}
 	}
 
-	upload(filename: string, blob: string, ok: OnCommitOk, err: ErrorCtx) {
-		let rec = {myId: this.pkval.v, eventId: this.eventId, uri: blob, filename}; 
+	upload(meta: {mime: string, name: string}, blob: string, ok: OnCommitOk, err: ErrorCtx) {
+		let rec = {myId: this.pkval.v, eventId: this.eventId, uri: blob, filename: meta.name, mime: meta.mime};
 
 		if (!this.client) return;
 		let client = this.client;
@@ -233,6 +237,8 @@ export class MyCoursesTier extends Spreadsheetier {
 }
 
 class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTier}>{
+	state: {dirty: false};
+
 	tier: MyCoursesTier;
 
 	confirm: JSX.Element;
@@ -250,7 +256,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
     api: GridApi;
 	buttons = {save: false, export: false, upload: false};
 	scoretier: MyScoreTier;
-	
+
 	getUserId() {
 		return this.props.ssInf.uid;
 	}
@@ -280,19 +286,17 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			  cols: [
 				{ field: 'myId', label: L("decision Id"), width: 10, hide: true },
 				{ field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu', editable: false },
-				{ field: 'cId', label: L("curriculum"), width: 160, type: 'dynamic-cbb',
+				{ field: 'cId', label: L("curriculum"), width: 280, type: 'dynamic-cbb',
 				  editable: this.isActive, onEditStop: this.edited, delItemName: L('-- Clear --') },
-				{ field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', editable: false },
-				{ field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate', editable: false },
-				{ field: 'remarks', label: L("Memo"), width: 140, type: 'text' },
-				// { field: 'descript', label: L("Remarks"), width: 200, type: 'text', editable: false },
+				{ field: 'clevel', label: L("Level"), width: 150, type: 'cbb', sk: 'curr-level', editable: false },
+				{ field: 'cate', label: L("Category"), width: 240, type: 'cbb', sk: 'curr-cate', editable: false },
+				{ field: 'remarks', label: L("Memo"), width: 160, type: 'text' },
 			] });
-		
+
         this.gridRef = React.createRef();
 
 		this.scoretier = new MyScoreTier({
-			uri: this.uri,
-			pkval: {pk: 'kid', v: undefined, tabl: 'b_myscores'}});
+			uri: this.uri});
 	}
 
 	componentDidMount() {
@@ -321,7 +325,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 
 	bindSheet(_resp: AnsonMsg<AnsonResp>) {
 		let that = this;
-		// this.tier.records(toPageInf(this.conds),
+
         this.tier.records(new PageInf(0, -1, 0, [['eventId', this.tier.eventId]]),
 			(_cols, rows) => {
 				that.tier.rows = rows;
@@ -342,7 +346,8 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				ok={L('OK')} cancel={false} open
 				onClose={() => {
 					that.confirm = undefined;
-					that.setState({});
+					// swith off dirty if it is true, and saving, loading is ok
+					that.setState({dirty: that.state.dirty && resp?.code !== Protocol.MsgCode.ok});
 				} }
 				msg={msg} />);
 		this.setState({});
@@ -360,7 +365,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.buttons.export = isActive;
 		this.buttons.upload = isActive;
 
-		this.setState({})
+		this.setState({dirty: false})
         this.bindSheet(undefined);
     }
 
@@ -373,17 +378,17 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		this.tier.updateCell(p, () => {
 			if (p.colDef.field === 'cId') {
 				p.api.redrawRows();
-				this.setState({});
+				this.setState({dirty: true});
 			}
 		});
 	};
 
 	/**
 	 * Save recored (decision) without file uri.
-	 * 
+	 *
 	 * So update won't change uploaded file.
-	 * 
-	 * @param _e 
+	 *
+	 * @param _e
 	 */
 	toSave(_e: React.UIEvent) {
         this.tier.rec = {
@@ -397,7 +402,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 			this.tier.rec,
 			this.showConfirm,
 			this.context.error);
-		
+
 		function collectCourses(rows: Course[]) {
 			let cIds = [] as Course[];
 			rows?.forEach( (c, x) => {
@@ -413,6 +418,19 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 	}
 
     toPrint(_e: React.UIEvent) {
+		if (this.state.dirty) {
+			let that = this;
+			this.confirm = (
+				<ConfirmDialog title={L('Info')}
+					ok={L('OK')} cancel={false} open
+					onClose={() => {
+						that.confirm = undefined;
+						that.setState({});
+					} }
+					msg={L('Please save decision first!')} />);
+			return;
+		}
+
 		// not working: this.tier._cols[this.tier._cols.length - 1].hide = true;
 		this.api.redrawRows();
 		this.setState({});
@@ -441,7 +459,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 		}
 
 		this.tier.upload(
-			meta.name, blob, 
+			meta, blob,
 			this.showConfirm,
 			this.context.error);
     }
@@ -453,9 +471,13 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
             <div className='noPrint'>
 				<DatasetCombo uri={this.uri}
 					sk={'ann-evt'}
+					label={'AP Event'}
 					noAllItem={true}
-					// className='noPrint'
-					onSelect={this.onSelectEvent} />
+					autoHighlight={true}
+					onSelect={this.onSelectEvent} onLoad={(cols, rows) => {
+						console.log(rows);
+					}}/>
+				{!this.tier.eventId && <Typography className={classes.smalltip}>{L('Please select an AP Event!')}</Typography>}
             </div>
             <div className='onlyPrint'>
                 <h1>{this.tier.eventName?.replace("Active: ", "")}</h1>
@@ -504,11 +526,13 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 					blankIcon={{color: "primary", width: 32, height: 32}}
 					tier={this.tier} field={'uri'}
 					onFileLoaded={this.toUpload}
-				/>{L('Upload')}
+				/>{L('Upload Signature')}
 				</Box>
 			</div>
             <div className='onlyPrint'>
+				<h4>&nbsp;</h4>
                 <h4>{L('Student Name')}  _____________________________</h4>
+				<h4>&nbsp;</h4>
                 <h4>{L('Signature')}</h4>
                 <h4>{L('Date')}</h4>
             </div>

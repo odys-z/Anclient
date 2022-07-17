@@ -3,6 +3,7 @@
     "events-btn-width": 160,
 
     "OK": "确定",
+    "Cancel": "取消",
     "info": "提示信息",
     "Info": "提示信息",
     "Error": "错误信息",
@@ -37,6 +38,7 @@
     "Upload": "上传",
     "Role ID": "角色ID",
     "Data Saved!": "數據保存成功！",
+    "Data Deleted!": "數據删除成功！",
     "Publish": "發布",
     "Password doesn't match!": "密码错误！",
     "Saving Succeed!": "保存成功！",
@@ -78,13 +80,13 @@
 
 
     "AP Requriements": "选课说明",
-    "msg: AP Requriements": "AP项目实行高一-高三跨年级混选课制度\n按照课程难度分类：红色部分为综合类课程； 黄色部分为一般课程；绿色部分为进阶课程；白色部分为英语标化课程\n按照课程内容分类：数学类；英语类；科学类；人文类；综合类\n每个学生需要在每个模块必须选一门且只能选一门课\n班级人数低于五人，则不会开班，学生需要在该模块内重新选择其他课程\n班级人数超过30人，则会均分为两个'同步班'进行授课",
+    "msg: AP Requriements": "AP Requriements",
     "Graduate Quility": "毕业要求",
-    "msg: graduate quality": "G10和G11的学生必须每年完成一门数学课程\n三年中至少完成两门Science课程\n三年中至少完成两门Humanity课程\nG11的学生，至少选择2门AP课程",
+    "msg: graduate quality": "Graduate Quality",
     "About Curriculums": "选课要求",
-    "msg: About Curriculums": "任一学年中，不能选择超过2门素质类课程（红色部分）\n任一学年中，不能选择超过2门融合基础类课程（黄色部分）\nG11的学生，至少选择2门AP课程（绿色部分）\n三年内，不能重复选择已学过课程\n默认所有选择了AP课程的学生都会参加全球AP统考，如果学生在10月份没有报名缴费AP该科考试，则会被强行要求停止在该班的学习，学生再在该模块里另选一门其他课程。",
+    "msg: About Curriculums": "About Curriculums",
     "About English": "选课要求（英语）",
-    "msg: about english": "1. ACT：\n托福大于等于90分或雅思大于等于6.5，准备参加ACT考试的可选择ACT，模块3和模块6会上ACT Grammar & Science+ACT Reading全套课程，ACT全套课程不再拆分到两个模块，模块3和模块6为ACT平行班，平行选课，要学ACT的，任选一个模块即可\n2. 英语课：\n托福70以下或雅思5.5以下：必选2个module的英语课程：TOEFL Reading and Listening 3  + TOEFL Speaking and Writing 2\n托福 70-90或雅思6分：TOEFL Reading and Listening 2/TOEFL Speaking and Writing 2 ，任选其一或两个都选，按需选取\n托福大于等于90分或雅思大于等于6.5：可以根据知识所需选取 TOEFL Reading and Listening 1和/或者TOEFL Speaking and Writing 1，或者完全不选",
+    "msg: about english": "选课要求（英语）",
 
     "College Board Homepage": "College Board Homepage",
     "": ""

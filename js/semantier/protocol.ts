@@ -19,10 +19,10 @@ export interface JsonOptions {
 };
 
 /** An abstract object for query condition
- * 
+ *
  * What's this experimening:
  * export type PageInf = { page: number, size: number, total?: number };
- * 
+ *
  * Tier pattern handling query condition at server side.
  * So use this to send by query form status.
  *  */
@@ -32,18 +32,41 @@ export class PageInf {
 	page: number;
 	size?: number;
 	total?: number;
+
+	/** @deprected replaced by condtRec */
 	condts?: Array<string[]>;
 
 	constructor(page?: number, size?: number, total?: number, condts?: Array<string[]>) {
-		this.type = 'io.odysz.semantic.jserv.R.PageInf';
+		this.type = 'io.odysz.transact.sql.PageInf';
 		this.page = page || 0;
 		this.size = size || -1;
 		this.total = total || 0;
 		this.condts = condts;
 	}
+
+	nv(k: string, v: string) {
+		if (!this.condts)
+			this.condts = [];
+		this.condts.push([k, v]);
+		return this;
+	}
+
+	/**
+	 * This is used for deprecationg this#condts
+	 *
+	 * @returns conditions
+	 */
+	condtsRec () {
+		let rec = {} as Tierec;
+		this.condts?.forEach( nv => {
+			if (nv && nv[0])
+				rec[nv[0]] = nv[1];
+		})
+		return rec;
+	}
 };
 
-/**Lagecy from jquery & easui, replaced by NV - no need to collect form using JQuery in the future. */
+/**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
 export type NameValue = {name: string, value: object};
 export type NV = {n: string, v: string | object};
 
@@ -98,7 +121,7 @@ export interface relFK {
 /**
  * An experiment for semantic pattern of relation tree,
  * trying UI handling s-tree in automatic pattern.
- * 
+ *
  * Used by {@link Semantier.formatRel()}
  */
 export interface relStree {

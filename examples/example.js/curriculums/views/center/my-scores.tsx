@@ -48,8 +48,10 @@ class MyScoreTier extends Semantier {
 	 * 
 	 * @param props uri, {pk: kid, v: not-used}
 	 */
-	constructor(props: {uri: string, pkval: PkMeta}) {
-		super(props);
+	constructor(props: {uri: string}) {
+		super(Object.assign(
+			props,
+			{pkval: {pk: 'kid', v: undefined, tabl: 'b_myscores'}}));
 
 		this._fields = [
 			{field: 'grade', label: L('Grade'), grid: {md: 12}, validator: {notNull: true} },
@@ -113,9 +115,7 @@ class MyScoresComp extends CrudComp<Comprops & {uri: string}> {
 
 		this.uri = this.props.uri;
 
-        this.tier = new MyScoreTier({
-			uri: this.uri,
-			pkval: {pk: 'kid', v: undefined, tabl: 'b_myscores'}});
+        this.tier = new MyScoreTier({ uri: this.uri });
 
 		this.toSave = this.toSave.bind(this);
 		this.showConfirm = this.showConfirm.bind(this);

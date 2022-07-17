@@ -6,7 +6,7 @@ import { AnsonMsg, AnsonResp, PageInf } from '../../../../semantier/anclient';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, AnContextType,
 } from '../../../../anreact/src/an-components';
 import { JsampleIcons } from '../../../../anreact/src/jsample/styles';
 
@@ -26,7 +26,6 @@ const styles = (_theme: Theme) => ({
 
 class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier}>{
 	tier: Spreadsheetier;
-	// classes: ClassNames;
 
 	confirm: JSX.Element;
 
@@ -55,7 +54,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 		console.log(uri);
 
 		this.tier = this.props.tier;
-		this.tier.setContext(this.context);
+		this.tier.setContext(this.context as AnContextType);
 
 		this.setState({});
 	}
@@ -85,23 +84,8 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 	}
 
 	toDel(e: React.UIEvent) {
-		let that = this;
-		// if (this.currentId)
 		this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
 	}
-
-	// paper(e: SpreadsheetRec) {
-	// 	return (
-	// 		<Paper elevation={4} style={{ margin: 24 }}
-	// 			className={this.classes.welcome}>
-	// 			<IconButton onClick={this.props.showMenu} >
-	// 				{this.icon(e)}
-	// 				<Box component='span' display='inline' className={this.classes.cardText} >
-	// 					Please click menu to start.
-	// 				</Box>
-	// 			</IconButton>
-	// 		</Paper>);
-	// }
 
 	render() {
 		let that = this;

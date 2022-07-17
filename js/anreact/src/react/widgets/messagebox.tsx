@@ -50,7 +50,7 @@ export interface DialogProps extends Comprops {
 	title: string;
 
 	/**with cancel button label ("false" will disable button) */
-	cancel?: string | false;
+	cancel?: string | boolean;
 	ok?: string;
 
 	/**dialog message */
@@ -64,8 +64,6 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 	state = {
 		closed: false,
 	};
-
-	// handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
 	constructor (props: DialogProps) {
 		super(props);
@@ -104,9 +102,9 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 		// let open = props.open && !this.state.closed;
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
-		// this.state.title = title;
+
 		let displayCancel = props.cancel === false ? 'none' : 'block';
-		let txtCancel = props.cancel || "Cancel";
+		let txtCancel = props.cancel === true ? L("Cancel") : props.cancel as string;
 		let txtOk = props.ok || "OK";
 
 		let txtLines = this.textLines(props.msg);
@@ -115,8 +113,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 
 		let full = this.props.fullScreen || this.props.fullWidth;
 
-		// if (full)
-		  return (
+		return (
 			<Dialog className={classes.root}
 				open={true}
 				fullScreen={full}
@@ -144,7 +141,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				  </Box>
 				</DialogActions>
 			</Dialog>
-		  );
+		);
 	}
 }
 const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
@@ -157,9 +154,6 @@ export interface ErrorProps extends DialogProps {
 }
 
 export class AnError extends CrudCompW<ErrorProps> {
-	// props = undefined;
-	// context: React.ContextType<typeof AnContext>
-
 	state = {
 	};
 

@@ -17,6 +17,7 @@ import { CompOpts } from '../anreact';
 
 const styles = (theme: Theme) => ( {
 	root: {
+		margin: theme.spacing(1),
 	}
 } );
 
@@ -33,21 +34,26 @@ interface AnTablistProps extends Comprops {
 	rows?: Tierec[];
 
 	onSelectChange: (ids: Array<string>) => void;
-	onPageChange?: (page: number) => void;
+	onPageChange?: (page: number, size?: number) => void;
+
+	/**Page size options, Default [10, 25, 50]. */
+	sizeOptions?: Array<number>;
 }
 
-/**Table / list for records.
+/**
+ * Table / list with pager.
  */
 class AnTablistComp extends DetailFormW<AnTablistProps> {
 
 	state = {
-		sizeOptions:[10, 25, 50],
 		total: 0,
 		page: 0,
 		size: 10,
 
 		selected: undefined
 	}
+
+	// sizeOptions:[10, 25, 50],
 
 	checkAllBox: HTMLButtonElement;
 
@@ -60,8 +66,9 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		this.state.selected = selected.ids;
 		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selected.ids must be a set");
-		if (sizeOptions)
-			this.state.sizeOptions = sizeOptions;
+
+		// if (sizeOptions)
+		// 	this.state.sizeOptions = sizeOptions;
 
 		let {total, page, size} = props.pageInf || {};
 		this.state.total = total || -1;
@@ -108,7 +115,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	};
 
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
-		let ids = this.props.selected.ids; // || this.props.selectedIds.ids;
+		let ids = this.props.selected.ids;
 		if (e.target.checked) {
 			this.props.rows.forEach((r) => ids.add(r[this.props.pk] as string));
 			this.updateSelectd(ids);
@@ -125,10 +132,10 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			this.props.onSelectChange(Array.from(set));
 	}
 
-	changePage(event, page) {
+	changePage(_event: React.UIEvent, page: number) {
 		this.setState({page});
-		if (typeof this.props.onPageInf === 'function')
-			this.props.onPageInf (this.state.page, this.state.size);
+		if (typeof this.props.onPageChange === 'function')
+			this.props.onPageChange (page);
 	}
 
 	changeSize (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
@@ -220,14 +227,14 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			</TableBody>
 		</Table>
 		</TableContainer>
-		{!!this.props.paging && <TablePagination
+		{(!!this.props.paging || this.props.onPageChange) && <TablePagination
 			count = {this.props.pageInf ? this.props.pageInf.total || 0 : 0}
 			rowsPerPage={this.state.size}
 			onPageChange={this.changePage}
 			onRowsPerPageChange={this.changeSize}
 			page={this.state.page}
 			component="div"
-			rowsPerPageOptions={this.state.sizeOptions}
+			// rowsPerPageOptions={this.state.sizeOptions}
 		/>}
 		</>);
 	}

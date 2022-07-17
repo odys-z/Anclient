@@ -36,11 +36,11 @@ export function toBool(str: string | number | boolean, undefinedNull?: boolean):
 		&& (str === undefined || str === null))
 		return undefinedNull;
 
-	return  !str || str === '0' || str === 'false'
+	return (!str || str === '0' || str === 'false'
 			|| (typeof str === 'string' && str.trim().length === 0)
-			? false : true;
+			? false : true);
 }
 
 export function isEmpty(str: string | number) : boolean {
-	return typeof str === 'undefined' || str === null || str === '';
+	return (typeof str === 'undefined' || str === null || str === '');
 } 

@@ -5,11 +5,11 @@ import withWidth from "@material-ui/core/withWidth";
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
-import { Tierec } from '@anclient/semantier';
+import { Semantier } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../../react/crud'
-import { AnContext } from '../../react/reactext'
+import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTreegrid } from '../../react/widgets/treegrid'
 
 const styles = (_theme: Theme) => ( {
@@ -20,10 +20,13 @@ const styles = (_theme: Theme) => ( {
 	}
 } );
 
+/**
+ * This component shows tree data to table binding
+ */
 class OrgsComp extends CrudCompW<Comprops> {
 	state = {
-		rows: [] as Tierec[],
 	};
+	tier: StreeTier;
 
 	constructor(props) {
 		super(props);
@@ -32,30 +35,35 @@ class OrgsComp extends CrudCompW<Comprops> {
 	}
 
 	componentDidMount() {
-		let that = this;
+		if (!this.tier) {
+			this.tier = new StreeTier(this);
+			this.tier.setContext(this.context as unknown as AnContextType);
+		}
+
+		this.toSearch(undefined);
 	}
 
-	toSearch(e, query) {
+	toSearch(e) {
+		this.setState({})
 	}
 
 	render() {
-		let args = {};
 		const { classes } = this.props;
 		return ( <>
 			<Card>
 				<Typography variant="h6" gutterBottom>
-					This page shows tree data to table binding
+					{this.props.funcName || this.props.title || 'Orgnization Tree'}
 				</Typography>
 			</Card>
-			<AnTreegrid uri={this.uri}
+			{this.tier && <AnTreegrid uri={this.uri}
 				className={classes.root}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
 					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
 					{ text: L('parent'), color: 'primary',field:"parentId" }
 				]}
-				rows = {this.state.rows}
-			/>
+				rows = {this.tier.rows}
+			/>}
 		</>);
 	}
 }
@@ -63,3 +71,7 @@ OrgsComp.contextType = AnContext;
 
 const Orgs = withWidth()(withStyles(styles)(OrgsComp));
 export { Orgs, OrgsComp }
+
+export class StreeTier extends Semantier {
+
+}

@@ -1,5 +1,5 @@
 import { SessionClient, Inseclient } from "./anclient";
-import { toBool } from "./helpers";
+import { toBool, isEmpty } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
@@ -53,14 +53,17 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
-export type ColType = 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+/** List column / record field (UI) Type
+ * - dynamic-cbb' type is a combobox changing code/value options for each row.
+ */
+export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {
-    /**input type / form type, not db type
+	/**input type / form type, not db type
 	 * - actions: user bottons, to be removed
 	 * - formatter: user function for UI element
 	 */
-    type?: ColType; // 'autocbb' | 'cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+	type?: ColType;
 
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
     style?: string;
@@ -74,11 +77,11 @@ export interface TierCol extends DbCol {
 }
 
 /**Meta data handled from tier (DB field).
- * 
+ *
  * This type need 2 parameters:
- * 
+ *
  * F: UI field type, e.g. JSX.Element;
- * 
+ *
  * FO: extended field options, e.g. {classes?: ClassNames, media?: Media} for react field formatter;
 */
 export interface AnlistColAttrs<F, FO> extends TierCol {
@@ -124,11 +127,6 @@ export interface Tierelations extends DbRelations {
 export interface QueryConditions {
 	pageInf?: PageInf;
 	[q: string]: string | number | object | boolean;
-
-	/**
-	 * should be only type of QueryCondition. String & number value for backward compatability
-	[q: string]: QueryCondition | string | number;
-	 */
 }
 
 /**
@@ -139,7 +137,7 @@ export interface Semantext {
     anClient: SessionClient;
 	/**FIXME rename as TSHelper:
 	 * Gloabal UI helper, e.g. AnReact */
-    anReact: any;
+    uiHelper: any;
     error: ErrorCtx;
 }
 
@@ -166,17 +164,12 @@ export class Semantier {
         this.pkval = props.pkval || {pk: undefined, v: undefined};
     }
 
-    /**main table name */
-    // mtabl: string;
-
     /** list's columns */
     _cols: Array<TierCol>;
     /** client function / CRUD identity */
     uri: string;
     /** Fields in details from, e.g. maintable's record fields */
     _fields: TierCol[];
-    /** optional main table's pk */
-    // pk: string;
 
     /** current crud */
     crud: CRUD;
@@ -377,7 +370,14 @@ export class Semantier {
     records(conds: QueryConditions | PageInf, onLoad: OnLoadOk<Tierec>) : void {
 	}
 
-    /** save form with a relationship table.
+    /**
+	 * Save form with a relationship table.
+	 * 
+	 * Note 2022.6.24:
+	 * 
+	 * If the main record's pk value is not automatic and the child relation table need this,
+	 * this.pkval.v is required not null - this is subjected to be changed in the future
+	 * ( all semantics handling is planned to move to server side as possible ). 
 	 *
 	 * @param opts semantic options for saving a maintable record
 	 * @param onOk callback
@@ -399,12 +399,17 @@ export class Semantier {
 
 		let req: AnsonMsg<AnsonBody>;
 		if (!disableForm) {
-			console.log(crud, CRUD.c);
+			// console.log(crud, CRUD.c);
 			if ( crud === CRUD.c ) {
 				req = this.client.userReq<UpdateReq>(uri, 'insert',
 							new InsertReq( uri, this.pkval.tabl )
 							.columns(this._fields)
 							.record(this.rec) );
+
+				// TODO to be verified
+				// Try figure out pk value - auto-key shouldn't have user fill in the value in a form
+				if (isEmpty(this.pkval.v))
+					this.pkval.v = this.rec[this.pkval.pk];
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
@@ -416,9 +421,14 @@ export class Semantier {
 		if (!disableRelations && !reltabl)
 			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
 
-		if (!disableRelations)
+		if (!disableRelations) {
+			if (crud === CRUD.c && !isEmpty(this.pkval?.v))
+				console.warn( "FIXME: empty pkval.v only suitable for auto-key. This change has a profound effection.",
+							  this.pkval);
 			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl],
-											crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
+						// crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
+						this.pkval);
+		}
 
 		if (req)
 			client.commit(req,
@@ -558,8 +568,14 @@ export class Semantier {
 
 		/**
 		 * Design Notes:
+		 * 
 		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
+		 * 
 		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
+		 * 
+		 * @param forest 
+		 * @param rows 
+		 * @returns 
 		 */
 		function collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>) {
 			let cnt = 0;

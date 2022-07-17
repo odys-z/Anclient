@@ -100,19 +100,15 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 	 * Once the Autocomplete is replaced by DatasetCombo, this function should be removed.
 	 */
 	bindConds() {
-		// if (!this.context || !this.context.anReact)
-		// 	throw new Error('AnQueryFormComp can\'t bind controls without AnContext initialized with AnReact.');
 		const ctx = this.context as unknown as AnContextType;
 		const that = this;
-
-		// if (this.props.stopBinding) return;
 
 		this.qFields
 		  .filter((c: ComboCondType, x ) => !!c && !c.loading && !c.clean)
 		  .forEach( (cond: ComboCondType, cx) => {
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
 				cond.loading = true; // prevent re-loading
-				(ctx.anReact as AnReactExt).ds2cbbOptions({
+				(ctx.uiHelper as AnReactExt).ds2cbbOptions({
 						uri: this.props.uri,
 						sk: cond.sk as string,
 						// user uses this, e.g. name and value to access data
@@ -332,7 +328,7 @@ export interface QueryFormProps extends Comprops {
 	/**Bounding components successfully
 	 *
 	 * This event can even be triggered early than componentDidMount.
-	 * 
+	 *
 	 */
 	onLoaded?: (conds: QueryConditions | PageInf) => void,
 }
