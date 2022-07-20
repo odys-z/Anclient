@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { render } from "react-dom";
-import Gallery from "react-photo-gallery";
+import Gallery from "../react-photo-gallery/src/Gallery";
 import Carousel, { Modal, ModalGateway } from "react-images";
-import { photos } from "./photos";
+import { photos } from "../src/temp-photos";
 
 function App() {
   const [currentImage, setCurrentImage] = useState(0);
@@ -26,9 +26,11 @@ function App() {
           <Modal onClose={closeLightbox}>
             <Carousel
               currentIndex={currentImage}
-              views={photos.map(x => ({
+              views={
+                photos.map(x => ({
                 ...x,
-                srcset: x.srcSet,
+                source: x.src,
+                // srcset: x.srcSet,
                 caption: x.title
               }))}
             />

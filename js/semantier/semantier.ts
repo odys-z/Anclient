@@ -152,6 +152,7 @@ export interface UIComponent {
  * Base class of semantic tier
  */
 export class Semantier {
+    uiHelper: any;
     /**
      *
      * @param props
@@ -200,7 +201,7 @@ export class Semantier {
 			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
 		this.client = context.anClient;
-		// this.anReact = context.anReact;
+		this.uiHelper = context.uiHelper;
 		this.errCtx = context.error;
 		return this;
 	}
