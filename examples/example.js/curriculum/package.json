@@ -1,7 +1,7 @@
 {
-  "name": "@anclient/jsample-curriculums",
+  "name": "@anclient/curriculum-web",
   "version": "1.0.0",
-  "description": "Test project for Anclient.js",
+  "description": "Example project of Anclient.js",
   "main": "login.jsx, app.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
