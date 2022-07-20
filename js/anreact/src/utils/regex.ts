@@ -28,15 +28,18 @@ export const regex = {
 	},
 
 	_regImage: /^image\//,
+	_regHeif: /^image\/heic/,
 
 	/**Find preview type (not doc type) of mime
 	 * https://docs.w3cub.com/http/basics_of_http/mime_types/complete_list_of_mime_types
 	 * @param mime
-	 * @return .doc or undefined
+	 * @return "" | "heif" | "image" | undefined
 	 */
 	mime2type: function (mime: string): string {
 		if (!mime)
 			return '';
+		else if (regex._regHeif.test(mime))
+			return "heif";
 		else if (regex._regImage.test(mime))
 			return 'image';
 		else return "." + (mime.startsWith('/') ?

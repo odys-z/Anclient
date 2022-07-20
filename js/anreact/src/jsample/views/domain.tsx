@@ -85,7 +85,6 @@ class DomainComp extends CrudCompW<Comprops> {
 
 		this.q = query || this.q || {};
 
-		// ctx.anReact.bindTablist(queryReq, this, ctx.error);
 		let that = this;
 		ctx.anClient.commit(queryReq,
 			(qrsp) => {
@@ -100,12 +99,6 @@ class DomainComp extends CrudCompW<Comprops> {
 		const ctx = this.context as unknown as AnContextType;
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
-		// let query = this.queryReq;
-		// if (query) {
-		// 	query.Body().Page(size, page);
-		// 	this.state.pageInf = {page, size, total: this.state.pageInf.total};
-		// 	ctx.anReact.bindTablist(query, this, ctx.error);
-		// }
 		this.toSearch(undefined);
 	}
 

@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree
+	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree, TierComboField
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -109,13 +109,6 @@ class RolesComp extends CrudCompW<Comprops> {
 		this.state.pageInf.size = size || 0;
 		this.state.pageInf.page = page;
 
-		// let query = this.q;
-		// if (query) {
-		// 	const ctx = this.context as unknown as AnContextType;
-		// 	query.Body().Page(size, page);
-		// 	this.state.pageInf = {page, size, total: this.state.pageInf.total};
-		// 	ctx.anReact.bindTablist(query, this, ctx.error);
-		// }
 		this.toSearch(this.q, this.state.pageInf);
 	}
 
@@ -138,11 +131,24 @@ class RolesComp extends CrudCompW<Comprops> {
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
 				onOk={ () => {
-						that.tier.del({ids: Array.from(that.state.selected.ids)}, (_resp) => {
-						});
-				 	}
-				}
-				onClose={ () => {that.confirm === undefined} }
+						that.tier.del({ids: Array.from(that.state.selected.ids)},
+						(_resp) => {
+							that.confirm = (
+								<ConfirmDialog open={true}
+									ok={L('OK')} cancel={false}
+									title={L('Info')} msg={L('Data Deleted!')}
+									onOk={ () => {
+										that.confirm = undefined;
+										// that.setState({});
+										that.toSearch();
+									} }
+								/>);
+							that.setState({});
+						} ); } }
+				onClose={ () => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
 			/>);
 	}
 
@@ -169,10 +175,10 @@ class RolesComp extends CrudCompW<Comprops> {
 		this.tier.resetFormSession();
 		this.setState({});
 		this.onTableSelect([]);
+		this.toSearch();
 	}
 
 	render() {
-		let args = {};
 		const { classes } = this.props;
 		let btn = this.state.buttons;
 		return ( <>
@@ -252,7 +258,6 @@ class RoleTier extends Semantier {
 				pk: 'roleId',	 // fk to main table
 				fk: 'roleId',	 // fk to main table
 				col: 'funcId', // checking col
-				// relcolumn: 'nodeId',  // FIXME delete?
 				colProp: 'nodeId',
 				sk: 'trees.role_funcs'
 			} as relStree,
@@ -298,8 +303,6 @@ class RoleTier extends Semantier {
 
 		client.commit(req,
 			(resp: AnsonMsg<AnsonResp>) => {
-				// Design Memo:
-				// because of using general query, extra hanling is needed: onLoad(cols, rows)
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0];
 				that.pkval.v = that.rec && that.rec[that.pkval.pk];

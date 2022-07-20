@@ -3,9 +3,11 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import Typography from '@material-ui/core/Typography';
 
-import { toBool, Protocol, CRUD, AnsonResp , UserReq, QueryConditions, Tierec,
-	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations
+import { toBool, Protocol, CRUD, AnsonResp , UserReq, Tierec,
+	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -13,7 +15,7 @@ import { Semantier } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { AnContext, AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
-import { AnTablist } from '../../react/widgets/table-list';
+import { AnTablPager } from '../../react/widgets/table-pager';
 import { AnQueryst, ComboCondType } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
@@ -34,6 +36,9 @@ const styles = (theme: Theme) => ( {
 	}
 } );
 
+
+// GIT: task: AnTablist Paginator
+
 class UserstComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
@@ -42,16 +47,15 @@ class UserstComp extends CrudCompW<Comprops> {
 	};
 
 	tier = undefined as UsersTier;
-	q: QueryConditions;
+	q: PageInf;
 	confirm: JSX.Element;
 	recForm: JSX.Element;
-	// pageInf: PageInf;
-	onPageInf: (page: number) => void;
 
 	constructor(props: Comprops) {
 		super(props);
 
 		this.state.selected.ids = new Set();
+		this.q = new PageInf(0, 10);
 
 		this.closeDetails = this.closeDetails.bind(this);
 		this.toSearch = this.toSearch.bind(this);
@@ -61,10 +65,10 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.onTableSelect = this.onTableSelect.bind(this);
 		this.toDel = this.toDel.bind(this);
 		this.del = this.del.bind(this);
+		this.onPageInf = this.onPageInf.bind(this);
 	}
 
 	componentDidMount() {
-		// if (!this.tier) { this.getTier() }
 		console.log(this.uri);
 		this.tier = new UsersTier(this);
 		this.tier.setContext(this.context as AnContextType);
@@ -72,22 +76,27 @@ class UserstComp extends CrudCompW<Comprops> {
 
 	/** If condts is null, use the last condts to query.
 	 * on succeed: set state.rows.
-	 * @param condts the query conditions collected from query form.
+	 * @param _condts the query conditions collected from query form.
 	 */
-	toSearch(condts: QueryConditions): void {
+	toSearch(_condts: PageInf): void {
 		if (!this.tier) {
-			// this.getTier();
 			console.warn("really happens?")
 			return;
 		}
 
 		let that = this;
-		this.q = condts || this.q;
+	
 		this.tier.records( this.q,
-			(cols, rows) => {
+			(_cols, _rows) => {
 				that.state.selected.ids.clear();
-				that.setState(rows);
+				that.setState( {buttons: {add: true, edit: false, del: false}} );
 			} );
+	}
+
+	onPageInf(page: number, size? : number) : void {
+		this.q.page = page || 0;
+		this.q.size = size;
+		this.toSearch(this.q);
 	}
 
 	onTableSelect(rowIds: Array<string>) {
@@ -101,7 +110,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		} );
 	}
 
-	toDel(e: React.MouseEvent<Element, MouseEvent>) {
+	toDel(_e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
@@ -122,9 +131,9 @@ class UserstComp extends CrudCompW<Comprops> {
 						ok={L('OK')} cancel={false} open
 						onClose={() => {
 							that.confirm = undefined;
-							that.toSearch(undefined);
+							that.toSearch(that.q);
 						} }
-						msg={L('Deleting Succeed!')} />);
+						msg={L(resp.Body(0).msg() || 'Deleting Succeed!')} />);
 				that.toSearch(undefined);
 			} );
 	}
@@ -148,7 +157,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.setState({});
 	}
 
-	toEdit(e: React.MouseEvent<Element, MouseEvent>) {
+	toEdit(_e: React.MouseEvent<Element, MouseEvent>) {
 		let that = this;
 		let pkv = this.getByIx(this.state.selected.ids);
 		this.tier.pkval.v = pkv;
@@ -173,8 +182,12 @@ class UserstComp extends CrudCompW<Comprops> {
 		let tier = this.tier;
 
 		return (<div className={classes.root}>
-			{this.props.funcName || this.props.title || 'Users of Jsample'}
-			<UsersQuery uri={this.uri} onQuery={this.toSearch} />
+			<Card className={classes.funcard}>
+				<Typography variant="h6" gutterBottom>{}
+					{this.props.funcName || this.props.title || L('Users of Jsample')}
+				</Typography>
+			</Card>
+			<UsersQuery uri={this.uri} pageInf={this.q} onQuery={this.toSearch} />
 
 			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode
 				<Grid container alignContent="flex-end" >
@@ -192,12 +205,14 @@ class UserstComp extends CrudCompW<Comprops> {
 					>{L('Edit')}</Button>
 				</Grid>}
 
-			{tier && <AnTablist pk={tier.pkval.pk}
-				className={classes.root} checkbox={tier.checkbox}
+			{tier && <AnTablPager pk={tier.pkval.pk}
+				className={classes.root}
+				checkbox={tier.checkbox}
 				selected={this.state.selected}
 				columns={tier.columns()}
 				rows={tier.rows}
-				// pageInf={this.pageInf}
+				sizeOptions={[5, 8, 10]}
+				pageInf={this.q}
 				onPageChange={this.onPageInf}
 				onSelectChange={this.onTableSelect}
 			/>}
@@ -211,7 +226,7 @@ UserstComp.contextType = AnContext;
 const Userst = withStyles<any, any, Comprops>(styles)(withWidth()(UserstComp));
 export { Userst, UserstComp }
 
-class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions) => void}> {
+class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds: PageInf) => void}> {
 	conds = [
 		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student'),
 		  grid: {sm: 3, md: 2} } as AnlistColAttrs<any, any>,
@@ -221,20 +236,21 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 		//   sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'}, grid: {md: 2, sm: 3} },
 	];
 
-	constructor(props: Comprops) {
+	constructor(props: Comprops & {pageInf: PageInf, onQuery: (conds: PageInf) => void}) {
 		super(props);
 		this.collect = this.collect.bind(this);
 	}
 
-	collect() {
-		return { query: {
-			userName: this.conds[0].val ? this.conds[0].val : undefined,
-			orgId   : (this.conds[1].val as {n: string, v: string}) ?.v,
-			// roleId  : (this.conds[2].val as {n: string, v: string}) ?.v }
-		} };
+	collect(pageInf: PageInf) : PageInf {
+		// return new PageInf()
+		return pageInf
+				.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
+				.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
 	}
 
-	/** Design Note:
+	/**
+	 * Design Note:
+	 * 
 	 * Problem: This way bound the query form, so no way to expose visual effects modification?
 	 */
 	render () {
@@ -242,8 +258,8 @@ class UsersQuery extends CrudCompW<Comprops & {onQuery: (conds: QueryConditions)
 		return (
 		<AnQueryst {...this.props} uri={this.uri}
 			fields={this.conds}
-			onSearch={() => that.props.onQuery(that.collect()) }
-			onLoaded={() => that.props.onQuery(that.collect()) }
+			onSearch={() => that.props.onQuery(that.collect(that.props.pageInf)) }
+			onLoaded={() => that.props.onQuery(that.collect(that.props.pageInf)) }
 		/> );
 	}
 }
@@ -252,19 +268,18 @@ export class UsersTier extends Semantier {
 	port = 'userstier';
 	checkbox = true;
 
-	// TODO doc: samantier where disable pk field if pkval exists
 	_fields = [
 		{ type: 'text', field: 'userId', label: L('Log ID'),
-		  validator: {len: 12, notNull: true} },
+		  validator: {len: 20, notNull: true} },
 		{ type: 'text', field: 'userName', label: L('User Name') },
 		{ type: 'password', field: 'pswd', label: L('Password'),
 		  validator: {notNull: true} },
 		{ type: 'cbb', field: 'roleId', label: L('Role'),
-		  grid: {md: 5}, // defaultStyle: {marginTop: "8px", width: 220 },
+		  grid: {md: 5},
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
 		{ type: 'cbb', field: 'orgId', label: L('Organization'),
-		  grid: {md: 5}, // defaultStyle: {marginTop: "8px", width: 220 },
+		  grid: {md: 5},
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
 		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
@@ -289,26 +304,27 @@ export class UsersTier extends Semantier {
 		this.rows = [];
 	}
 
-	records(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
+	records(conds: PageInf, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let client = this.client;
 		let that = this;
 
 		let req = client.userReq(this.uri, this.port,
-					new UserstReq( this.uri, conds?.query as Tierec )
+					new UserstReq( this.uri, conds )
 					.A(UserstReq.A.records) );
 
 		client.commit(req,
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rows = rows;
+				conds.total = resp.Body()?.Rs()?.total || 0;
 				onLoad(cols, rows as Tierec[]);
 			},
 			this.errCtx);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
+	record(conds: PageInf, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 		let client = this.client;
 		let that = this;
@@ -411,6 +427,7 @@ export class UserstReq extends UserReq {
 		mykids: 'r/kids',
 	}
 
+	pk: any;
 	userId: string;
 	userName: string;
 	orgId: string;
@@ -419,22 +436,44 @@ export class UserstReq extends UserReq {
 	record: Tierec;
 	relations: DbRelations;
 	deletings: string[];
+	page: PageInf;
 
-	constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
+	// constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
+	constructor (uri: string, query: PageInf | any) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
-		this.userId = (args.userId || args.record?.userId) as string;
-		this.userName = args.userName as string;
-		this.orgId = args.orgId as string;
-		this.roleId = args.roleId as string;
-		this.hasTodos = toBool(args.hasTodos as string | boolean);
 
-		/// case u
-		this.record = args.record as Tierec;
-		this.relations = args.relations as DbRelations;
+		/// FIXME: obviousely this is should be refactored to the chained calls API
 
-		// case d
-		this.deletings = args.deletings as string[];
+		/// case r
+		if (query.page === undefined && typeof query.condtsRec === 'function')
+			throw Error("Scince anreact 0.4.17, UserstReq no longer user Tierec as query condition.");
+
+		if (query.condtsRec) {
+			let args = query.condtsRec() as Tierec & { record? : {userId?: string} };
+			this.userId = (args.userId || args.record?.userId) as string;
+			this.userName = args.userName as string;
+			this.orgId = args.orgId as string;
+			this.roleId = args.roleId as string;
+			this.hasTodos = toBool(args.hasTodos as string | boolean);
+
+			this.page = new PageInf(query.page, query.size);
+		}
+		/// case A = rec (TRecordForm loading)
+		else if (query.userId) {
+			this.record = query as Tierec;
+			this.userId = query.userId;
+			this.page = new PageInf(0, -1);
+		}
+		/// case A = u
+		else if (query.pk) {
+			this.pk = query.pk;
+			this.record = query.record as Tierec;
+			this.relations = query.relations as DbRelations;
+		}
+
+		/// case d
+		this.deletings = query.deletings as string[];
 	}
 }

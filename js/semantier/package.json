@@ -1,6 +1,6 @@
 {
   "name": "@anclient/semantier",
-  "version": "0.9.78",
+  "version": "0.9.80",
   "description": "The anclient's common package depending on pure js object that can be used for js unit test.",
   "main": "./anclient.ts",
   "directories": {},
@@ -20,5 +20,9 @@
     "semantier"
   ],
   "author": "Ody Zhou",
-  "license": "MIT"
+  "license": "MIT",
+
+  "publishConfig": {
+    "registry":"https://registry.npmjs.org/"
+  }
 }

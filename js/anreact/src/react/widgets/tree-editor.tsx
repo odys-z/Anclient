@@ -266,7 +266,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		console.log(this.props.uri);
 
 		const ctx = this.context as unknown as AnContextType;
-		this.anReact = ctx.anReact;
+		this.anReact = ctx.uiHelper;
 		this.toSearch();
 	}
 
@@ -338,7 +338,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 					// close as data saved, search later in case re-shape failed. (shouldn't be a transaction?)
 					let {uri, sk} = this.props;
-					(this.context as unknown as AnContextType).anReact
+					(this.context as unknown as AnContextType).uiHelper
                         .rebuildTree({uri, sk, rootId: me}, () => {
                             that.toSearch();
                         });
@@ -361,7 +361,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
 			})
-        
+
         function icon(iconame?: string) {
 	        return AnTreeIcons[iconame || "deflt"];
         }
