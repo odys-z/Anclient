@@ -69,7 +69,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 		return (
 		  <div>
 			{this.showCarousel &&
-				<Modal isOpen={true}
+				<Modal isOpen={true} ariaHideApp={false}
 					onRequestClose={this.closeLightbox}
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}

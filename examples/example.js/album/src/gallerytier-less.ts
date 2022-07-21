@@ -12,12 +12,13 @@ export interface PhotoCollect extends Tierec {
 }
 
 export interface PhotoRec extends Tierec {
-	eid?: string,
-	ename?: string, // card title
-	publisher?: string | undefined,
-	edate?: string,
+	pid?: string,
+	/** card title */
+	pname?: string,
+	shareby?: string | undefined,
+	sharedate?: string,
 	css?: any,
-	extra?: string,
+	device?: string,
 
 	src: string,
 };
@@ -45,10 +46,6 @@ export class GalleryTier extends Semantier {
 	 * @override(Semantier)
 	 */
     records<T extends Tierec>(conds: PageInf, onLoad: OnLoadOk<T>) : void {
-		// let photo1 = {deviceId: '01', pid: '01', pname: 'Abc@D', pdate: '2021-10-10', owner: 'ody', exif: '100', uri: ''};
-		// this.rows = [{title: 'test', photos}];
-		// return this.rows as unknown as Array<PhotoCollect>;
-
 		if (!this.client) {
 			console.error("Anclient is not ready yet.");
 			return;
@@ -57,8 +54,8 @@ export class GalleryTier extends Semantier {
 		let client = this.client;
 		let that = this;
 
-		let req = client.userReq(this.uri, this.port,
-					new AlbumReq( this.uri, conds as AlbumArgs )
+		let req = client.userReq( this.uri, this.port,
+					new AlbumReq( this.uri, conds as AlbumPage )
 					.A(AlbumReq.A.records) );
 
 		client.commit(req,
@@ -83,10 +80,23 @@ export class GalleryTier extends Semantier {
     }
 }
 
-type AlbumArgs = {
+interface AlbumRec extends Tierec {
+	/** Album Id (h_albems.aid) */
 	album?: string;
+
+	/** Collects' ids */
 	collects?: Array<string>;
+
+	/** Collects' default length (first page size) */
+	collectSize: number;
+
+	/** Photos */
 	photos?: Array<string>;
+}
+
+interface AlbumPage extends PageInf {
+	/** A temperoray solution before PageInf.condts evolved to Tierec. */
+	qrec: AlbumRec;
 }
 
 class AlbumReq extends AnsonBody {
@@ -104,13 +114,15 @@ class AlbumReq extends AnsonBody {
 	cids?: string[];
 	pids?: string[];
 
-	constructor (uri: string, args: AlbumArgs = {}) {
+	constructor (uri: string, page: AlbumPage) {
 		super({uri, type: 'io.oz.album.tier.AlbumReq'});
 
-		this.pageInf = new PageInf(0, 20);
+		this.pageInf = new PageInf(page);
 
-		this.aid = args.album;
-		this.cids = args.collects;
-		this.pids = args.photos;
+		if (page.qrec) {
+			this.aid = page.qrec.album;
+			this.cids = page.qrec.collects;
+			this.pids = page.qrec.photos;
+		}
 	}
 }
