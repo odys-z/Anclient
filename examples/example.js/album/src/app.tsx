@@ -123,7 +123,7 @@ export class App extends React.Component<AlbumProps, AlbumConfig> {
 	 * - serv: string,
 	 * - portal: string
 	 */
-	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
+	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
 		let portal = opts.portal ?? 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
