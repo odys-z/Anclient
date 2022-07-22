@@ -57,7 +57,7 @@ class IndicatorsComp extends CrudCompW<Comprops> {
 			that.setState({});
 		}};
 
-		that.context.anReact.stree(ds, that.context.error);
+		that.context.uiHelper.stree(ds, that.context.error);
 	}
 
 	render () {

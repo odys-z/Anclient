@@ -105,7 +105,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 		// if (query) {
 		// 	query.Body().Page(size, page);
 		// 	this.state.pageInf = {page, size, total: this.state.pageInf.total};
-		// 	this.context.anReact.bindTablist(query, this, this.context.error);
+		// 	this.context.uiHelper.bindTablist(query, this, this.context.error);
 		// }
 	}
 
@@ -141,7 +141,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 							  users: users.Body().msg() });
 				that.confirm =
 					(<ConfirmDialog open={true}
-						ok={L('OK')} cancel={true} 
+						ok={L('OK')} cancel={true}
 						title={L('Info')} msg={txt}
 						onOk={ () => {
 								that.tier.stopolls(this.uri, this.getByIx(ids),

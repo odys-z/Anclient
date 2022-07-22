@@ -5,7 +5,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt, jsample, AnContextType
+	AnContext, AnError, AnReactExt, jsample, AnContextType, AnreactAppOptions
 } from '@anclient/anreact';
 const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
 
@@ -133,7 +133,7 @@ class App extends React.Component<Northprops, any> {
 					if (this.props.iwindow)
 						this.props.iwindow.location.href = this.state.iportal;
 				},
-				(c, e) => {
+				(_c, _e) => {
 					// something wrong
 					cleanup (that);
 				});
@@ -159,7 +159,7 @@ class App extends React.Component<Northprops, any> {
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				ssInf: this.state.anClient.ssInf,
-				anReact: this.state.anReact,
+				uiHelper: this.state.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
@@ -206,12 +206,12 @@ class App extends React.Component<Northprops, any> {
 	 * - serv: string,
 	 * - portal: string
 	 */
-	static bindHtml(elem: string, opts = {portal: 'indexe.html'}): void {
+	static bindHtml(elem: string, opts : AnreactAppOptions = {portal: 'indexe.html'}): void {
 		let portal = opts.portal ? opts.portal : 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: {serv: string, portal: string}, json: any) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: any) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

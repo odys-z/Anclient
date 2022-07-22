@@ -47,7 +47,7 @@ class QuizUserFormComp extends CrudCompW {
 			this.props.onClose();
 	}
 
-	onTableSelect(selectedIds) {
+	onTableSelect(_ids) {
 	}
 
 	componentDidMount() {
