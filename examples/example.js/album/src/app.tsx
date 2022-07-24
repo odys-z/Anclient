@@ -91,8 +91,6 @@ export class App extends React.Component<AlbumProps, AlbumConfig> {
 	render() {
 	  return (
 		<AnContext.Provider value={{
-			// anReact: this.anReact,
-			// pageOrigin: window ? window.origin : 'localhost',
 			servId: this.config.servId,
 			servs: this.props.servs,
 			anClient: this.inclient,
