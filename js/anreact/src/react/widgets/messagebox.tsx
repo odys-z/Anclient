@@ -113,8 +113,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 
 		let full = this.props.fullScreen || this.props.fullWidth;
 
-		// if (full)
-		  return (
+		return (
 			<Dialog className={classes.root}
 				open={true}
 				fullScreen={full}
@@ -142,7 +141,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				  </Box>
 				</DialogActions>
 			</Dialog>
-		  );
+		);
 	}
 }
 const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
@@ -155,9 +154,6 @@ export interface ErrorProps extends DialogProps {
 }
 
 export class AnError extends CrudCompW<ErrorProps> {
-	// props = undefined;
-	// context: React.ContextType<typeof AnContext>
-
 	state = {
 	};
 

@@ -9,4 +9,5 @@ For developers
    note-react
    note-js-npm
    issues
+   tips
    mui-examples

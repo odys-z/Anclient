@@ -3,9 +3,12 @@ node_modules
 # dist is copied to docker image
 # !react-quiz/dist
 */dist/*.min.js*
-dist/*
+**/dist/*
 **/dist/docs
-!dist/*.html
+**/dist/img/sample.png
+!**/dist/*.html
+!**/dist/*.json
+
 **/private.html
 **/private.json
 **/*.back.*

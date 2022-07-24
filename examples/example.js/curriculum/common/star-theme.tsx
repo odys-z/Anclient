@@ -30,9 +30,10 @@ export interface StarTheme extends Theme {
 * @return &lt;img/&gt;
 */
 export function getMimeIcon(mime: string, iconpath = '/res-vol/icons') {
-   const known = { image: 'image.svg', '.txt': 'text.svg',
-		   '.doc': 'docx.svg', '.docx': 'docx.svg', '.zip': '7zip.svg',
-		   '.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
+   const known = { image: 'image.svg', heif: 'image.svg',
+   			'.txt': 'text.svg',
+			'.doc': 'docx.svg', '.docx': 'docx.svg', '.zip': '7zip.svg',
+			'.pdf': 'pdf.svg', '.rtf': 'txt.svg'};
    const unknown = 'unknown.svg';
 
    let src = regex.mime2type(mime);

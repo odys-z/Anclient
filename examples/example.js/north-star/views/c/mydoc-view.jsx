@@ -49,7 +49,7 @@ class MyDocViewComp extends DetailFormW {
 		this.tier = props.tier;
 
 		this.toCancel = this.toCancel.bind(this);
-		this.toSave = this.toSave.bind(this);
+		// this.toSave = this.toSave.bind(this);
 		this.showConfirm = this.showConfirm.bind(this);
 	}
 

@@ -3,7 +3,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Button from '@material-ui/core/Button';
 
 import { L } from '../../utils/langstr';
-import { Semantext } from '@anclient/semantier';
+import { Semantext, UIComponent } from '@anclient/semantier';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { TRecordForm } from '../../react/widgets/record-form';
 
@@ -99,7 +99,6 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	}
 }
 
-// const MyPswd = withWidth()(withStyles(styles)(MyPswdComp));
 const MyPswd = withStyles<any, any, Comprops>(styles)(withWidth()(MyPswdComp));
 export { MyPswd, MyPswdComp }
 
@@ -108,7 +107,7 @@ class PswdTier extends MyInfTier {
 	rec = undefined;
 	rows = undefined;
 
-	constructor(comp) {
+	constructor(comp: UIComponent) {
 		super(comp);
 	}
 
@@ -130,8 +129,7 @@ class PswdTier extends MyInfTier {
 	changePswd(opts, onOk) {
 		if (!this.client) return;
 
-		// let { uri } = opts;
-		let { pswd, pswd1, pswd2 } = this.rec;
+		let { pswd, pswd1 } = this.rec;
 
 		if (this.validate()) {
 			this.client.setPswd(pswd, pswd1, {

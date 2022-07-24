@@ -10,7 +10,9 @@ break into 2 module, @anclient/semantier & @anclient/anreact.
 how this issue is a big trouble)
 
 For details on structure used to meet independent unit test and test with local
-npm link, see :ref:`How is @anclient/aneact evolved<how-anreact-evolved>`.
+npm link.
+
+see :ref:`@anclient/aneact tree<anreact-tree>`.
 
 .. _about-invalid-hook-call:
 

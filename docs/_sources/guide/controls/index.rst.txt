@@ -1,5 +1,5 @@
-Guid (Tips)
-===========
+Widgets (some of)
+=================
 
 .. toctree::
    :maxdepth: 2

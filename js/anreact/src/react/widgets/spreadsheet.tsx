@@ -258,7 +258,7 @@ export class Spreadsheetier extends Semantier {
 
     loadCbbOptions(ctx: Semantext): Semantier {
 		let that = this;
-		let an = ctx.anReact as AnReactExt;
+		let an = ctx.uiHelper as AnReactExt;
 		// load all options
 		this._cols?.forEach((c: SheetCol, x: number) => {
 			if (c.type === 'cbb') {
@@ -456,7 +456,13 @@ export class Spreadsheetier extends Semantier {
 		this.client.commit(req, onOk, this.errCtx);
 	}
 
+	/**FIXME move to Docstier */
 	uri2src() {
+		return utils.urlOfdata(this.rec.mime as string, this.rec.uri64);
+	}
+
+	/**FIXME move to Docstier */
+	heic2src() {
 		return utils.urlOfdata(this.rec.mime as string, this.rec.uri64);
 	}
 }

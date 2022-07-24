@@ -59,13 +59,10 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	refcbb = React.createRef<HTMLDivElement>();
 	loading = false;
-	// items: NV[];
 
 	constructor(props: ComboProps) {
 		super(props);
 		this.combo.options = props.options;
-		// this.state.combo.label = props.label;
-		// this.combo.initVal = props.val;
 
 		if (this.props.sk && !this.props.uri)
 			console.warn("DatasetCombo is configured as loading data with sk, but uri is undefined.")
@@ -75,7 +72,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	componentDidMount() {
 		let ctx = this.context as unknown as AnContextType;
-		let anreact = ctx?.anReact as AnReactExt;
+		let anreact = ctx?.uiHelper as AnReactExt;
 		if (!anreact)
 			throw new Error('DatasetCombo can\'t bind controls without AnContext initialized with AnReact.');
 
@@ -97,6 +94,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				}
 			});
 		}
+		else console.warn("DatasetCombo used for null sk?", this.props.label);
 	}
 
 	onCbbRefChange( refcbb: React.RefObject<HTMLDivElement> ) : (
@@ -105,18 +103,16 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			reason: AutocompleteChangeReason | AutocompleteInputChangeReason,
 			details?: AutocompleteChangeDetails<ComboItem>
 	) => void {
-		let _ref = refcbb;
-		let _that = this;
-		// let _cmb = this.state.combo;
-		// _cmb.ref = _ref;
+		let that = this;
+
 		return (e, item: NV) => {
 			if (e) e.stopPropagation();
 			let selectedItem = item ? item : AnConst.cbbAllItem;
 
-			if (typeof _that.props.onSelect === 'function')
-				_that.props.onSelect(selectedItem);
+			if (typeof that.props.onSelect === 'function')
+				that.props.onSelect(selectedItem);
 
-			_that.setState({selectedItem});
+			that.setState({selectedItem});
 		};
 	}
 
@@ -139,7 +135,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			this.state.selectedItem = selectedItem;
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
-		let opts = this.combo && this.combo.options || this.props.options; 
+		let opts = this.combo && this.combo.options || this.props.options;
 		return (
 		  // avoid set defaultValue before loaded
 		  opts ?
@@ -207,7 +203,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		this.loading = true;
 
 		let ctx = this.context as AnContextType;
-		let an = ctx.anReact as AnReactExt;
+		let an = ctx.uiHelper as AnReactExt;
 
 		an.dataset( { port: 'dataset', uri, sqlArgs, sk },
 			(dsResp: AnsonMsg<AnsonResp>) => {

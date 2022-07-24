@@ -56,7 +56,7 @@ export interface ErrorCtx {
 /** List column / record field (UI) Type
  * - dynamic-cbb' type is a combobox changing code/value options for each row.
  */
-export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {
 	/**input type / form type, not db type
@@ -137,7 +137,7 @@ export interface Semantext {
     anClient: SessionClient;
 	/**FIXME rename as TSHelper:
 	 * Gloabal UI helper, e.g. AnReact */
-    // anReact: any;
+    uiHelper: any;
     error: ErrorCtx;
 }
 

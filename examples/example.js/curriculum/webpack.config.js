@@ -1,7 +1,7 @@
 var path = require('path')
 var webpack = require('webpack')
 
-var v = 'production'; // "production" | "development" | "none"
+var v = 'development'; // "production" | "development" | "none"
 var version = "1.0.0";
 
 module.exports = {

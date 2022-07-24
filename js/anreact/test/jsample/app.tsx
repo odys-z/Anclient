@@ -3,14 +3,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, AnsonMsg, AnsonResp
-} from '../../../semantier/anclient';
+import { Protocol, SessionClient, ErrorCtx, SessionInf,
+	AnsonMsg, AnsonResp
+} from '@anclient/semantier';
 
 import { L, Langstrs } from '../../../anreact/src/utils/langstr';
 import { AnContext, AnContextType, JsonServs } from '../../../anreact/src/react/reactext';
 import { AnReact, AnReactExt, AnreactAppOptions } from '../../../anreact/src/react/anreact';
 import { AnError } from '../../../anreact/src/react/widgets/messagebox';
-import { SysComp } from '../../../anreact/src/react/sys';
+import { Sys, SysComp } from '../../../anreact/src/react/sys';
 import { Userst } from '../../../anreact/src/jsample/views/users';
 import { Domain } from '../../../anreact/src/jsample/views/domain';
 import { Roles } from '../../../anreact/src/jsample/views/roles';
@@ -38,12 +39,19 @@ class App extends React.Component<Approps> {
 	anClient: SessionClient;
 	anReact: AnReact;
 
-	// FIXME in this pattern, no need to use an object for error handling - callback is enough
-	// errCtx = {msg: undefined, onError: this.onError} as ErrorCtx;
-
 	errorMsgbox: JSX.Element | undefined;
+	errorCtx: ErrorCtx;
 
-	/**Restore session from window.localStorage
+	/**
+	 * Application main entrance.
+	 * 
+	 * Set up:
+	 * - error context,
+	 * - AnContext,
+	 * - extend url link routes,
+	 * - protocol sk of dataset.
+	 * 
+	 * Also restore session from window.localStorage
 	 * 
 	 * @param props 
 	 */
@@ -52,19 +60,19 @@ class App extends React.Component<Approps> {
 
 		this.state.iportal = this.props.iportal;
 
-		// this.onError = this.onError.bind(this);
-		// this.errCtx.onError = this.errCtx.onError.bind(this);
-		let errCtx = (this.context as AnContextType).error;
+		this.onError = this.onError.bind(this);
+		this.onErrorClose = this.onErrorClose.bind(this);
+		this.logout = this.logout.bind(this);
+
+		this.errorCtx = {onError: this.onError, msg: ''};
+		// Will load anclient from localStorage.
+		this.anClient = new SessionClient();
+		this.anReact = new AnReactExt(this.anClient, this.errorCtx); 
+								// .extendPorts(StarPorts);
 
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.logout = this.logout.bind(this);
 
-		// design: will load anclient from localStorage
-		this.anClient = new SessionClient();
-
-		// in case jserv config changed since last login
-		if (props.servs)
-			this.anClient.an.init(props.servs[props.servId || 'host']);
 
 		// singleton error handler
 		if (!this.anClient || !this.anClient.ssInf) {
@@ -75,7 +83,7 @@ class App extends React.Component<Approps> {
 			});
 		}
 
-		this.anReact = new AnReactExt(this.anClient, errCtx)
+		this.anReact = new AnReactExt(this.anClient, this.errorCtx)
 						.extendPorts({
 							menu: "menu.serv",
 							userstier: "users.tier",
@@ -87,7 +95,8 @@ class App extends React.Component<Approps> {
 		this.anClient.getSks((sks) => {
 			Object.assign(Protocol.sk, sks);
 			console.log(sks);
-		}, errCtx);
+		}, this.errorCtx);
+ 
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
@@ -108,11 +117,15 @@ class App extends React.Component<Approps> {
 	onError(c: string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
 
-		let errCtx = (this.context as AnContextType).error;
-		errCtx.msg = r.Body()?.msg();
-		this.errorMsgbox = <AnError onClose={() => this.onErrorClose(c)} fullScreen={false}
-							title={L('Error')} msg={errCtx.msg as string} />
-		this.setState({});
+		this.errorCtx.msg = r.Body()?.msg();
+		this.errorMsgbox = <AnError
+							onClose={() => this.onErrorClose(c)} fullScreen={false}
+							title={L('Error')}
+							msg={this.errorCtx.msg as string} />
+
+		this.setState({
+			hasError: !!c,
+			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
 	onErrorClose(code: string) {
@@ -142,7 +155,7 @@ class App extends React.Component<Approps> {
 			cleanup (that);
 		}
 		finally {
-			this.anClient.ssInf = undefined;
+			this.anClient.ssInf = undefined as unknown as SessionInf;
 		}
 
 		function cleanup(app: App) {
@@ -161,18 +174,18 @@ class App extends React.Component<Approps> {
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				ssInf: undefined,
-				// anReact: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
 				anClient: this.anClient, // as typeof SessionClient | Inseclient,
+				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
-				error: (this.context as AnContextType).error,
+				error: this.errorCtx,
 			}} >
-				<SysComp menu='sys.menu.jsample'
-					sys='AnReact' menuTitle='Sys Menu'
+				<Sys menu='sys.menu.jsample'
+					sys={L('AnReact')} menuTitle={L('Sys Menu')}
 					myInfo={myInfoPanels}
 					onLogout={this.logout} />
 				{this.errorMsgbox}
@@ -184,7 +197,7 @@ class App extends React.Component<Approps> {
 		 * To avoid create component before context avialable, this function need the caller' context as parameter.
 		 * @param anContext
 		 */
-		function myInfoPanels(anContext: typeof AnContext) {
+		function myInfoPanels(anContext: AnContextType) {
 			return [
 				{ title: L('Basic'),
 				  panel: <MyInfCard

@@ -4,7 +4,6 @@ import { Theme, withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 import Box from '@material-ui/core/Box';
 
-
 import { gCamera, gCameraViewBox } from './my-icon';
 import { dataOfurl, mimeOf } from '../../utils/file-utils';
 import { DetailFormW, Comprops } from '../crud';
@@ -63,8 +62,12 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 
 		let imageType = /image.*/;
 
+		/**For .HEIC format, chrome reports type is "".
+		 * Since there are .heic files already uploaded, it's assumed that Safari will report it as "image".
+		 * Of which the mime is saved as "image/heic;base64".
+		 */
 		if (file.type.match(imageType)) {
-			var reader = new FileReader();
+			let reader = new FileReader();
 
 			reader.onload = function(e) {
 				that.imgPreview.src = reader.result;
@@ -114,7 +117,7 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 				style={{ width: this.props.width || "auto", height: "100%", minHeight: 48 }}
 				ref={(ref) => this.imgPreview = ref} />
 			<input type='file' style={ bg } disabled={this.props.disabled}
-		 		ref={ (ref) => this.fileInput = ref }
+		 		ref={ (ref) => this.fileInput = ref } accept="image/*"
 		 		onChange={ this.toShowImage } />
 		  </Box>);
 	}

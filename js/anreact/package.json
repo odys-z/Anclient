@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.4.14",
+  "version": "0.4.18",
   "description": "Anclient built on ReactJs.",
   "main": "./src/an-components.ts",
   "directories": {
@@ -26,7 +26,7 @@
   "author": "Ody Zhou",
   "license": "MIT",
   "dependencies": {
-    "@anclient/semantier": "^0.9.78",
+    "@anclient/semantier": "^0.9.80",
     "@emotion/react": "^11.4.1",
     "acorn": "^8.4.1",
     "ag-grid-community": "^26.0.0",
@@ -56,5 +56,8 @@
     "sass-loader": "^7.3.1",
     "style-loader": "^0.23.1",
     "webpack-cli": "^4.9.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }
