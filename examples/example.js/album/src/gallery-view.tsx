@@ -9,6 +9,7 @@ import { AnContextType, Comprops, CrudCompW } from '@anclient/anreact';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 import { photos } from './temp-photos';
+import { container } from 'webpack';
 
 export interface PhotoSlide<T extends {}> {
     index: number
@@ -75,6 +76,16 @@ export default class GalleryView extends CrudCompW<Comprops>{
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
 			<Gallery<PhotoRec> photos={photos} onClick={this.openLightbox}
+					targetRowHeight={containerWidth => {
+						if (containerWidth < 200)
+							return containerWidth;
+						else if (containerWidth < 400)
+							return containerWidth / 2;
+						else if (containerWidth < 800)
+							return containerWidth / 3;
+						else
+							return containerWidth / 4;
+					} }
 					limitNodeSearch={ (containerWidth: number) => {
 						if (containerWidth < 800)
 							return 4;
