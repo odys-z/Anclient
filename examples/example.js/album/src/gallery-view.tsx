@@ -5,9 +5,10 @@ import Gallery from '../react-photo-gallery/src/Gallery';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-import { Comprops, CrudCompW } from '@anclient/anreact';
+import { AnContextType, Comprops, CrudCompW } from '@anclient/anreact';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
+import { photos } from './temp-photos';
 
 export interface PhotoSlide<T extends {}> {
     index: number
@@ -39,7 +40,11 @@ export default class GalleryView extends CrudCompW<Comprops>{
 		let that = this;
 		console.log("super.uri", uri);
 
-		this.tier = new GalleryTier({uri, comp: this});
+		let client = (this.context as AnContextType).anClient;
+
+		this.tier = new GalleryTier({uri, comp: this, client})
+					.setContext(this.context) as GalleryTier;
+
 		this.tier.myAlbum((cols, rows) => {
 			that.album = rows;
 			that.setState({});
@@ -64,12 +69,22 @@ export default class GalleryView extends CrudCompW<Comprops>{
 		return (
 		  <div>
 			{this.showCarousel &&
-				<Modal isOpen={true}
+				<Modal isOpen={true} ariaHideApp={false}
 					onRequestClose={this.closeLightbox}
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
 			<Gallery<PhotoRec> photos={photos} onClick={this.openLightbox}
+					targetRowHeight={containerWidth => {
+						if (containerWidth < 200)
+							return containerWidth;
+						else if (containerWidth < 400)
+							return containerWidth / 2;
+						else if (containerWidth < 800)
+							return containerWidth / 3;
+						else
+							return containerWidth / 4; 
+					} }
 					limitNodeSearch={ (containerWidth: number) => {
 						if (containerWidth < 800)
 							return 4;
@@ -96,7 +111,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 
 	render() {
 		return (<div>Album Example - Clicke to show large photo
-			{this.tier && this.album && this.gallery(this.album)}
+			{this.tier && this.gallery( [{photos}] )}
 		</div>);
 	}
 }
