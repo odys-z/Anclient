@@ -75,19 +75,23 @@ export default class GalleryView extends CrudCompW<Comprops>{
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
-			<Gallery<PhotoRec> photos={photos} onClick={this.openLightbox}
+			<Gallery<PhotoRec> photos={[]} onClick={this.openLightbox}
 					targetRowHeight={containerWidth => {
-						if (containerWidth < 200)
+						if (containerWidth < 320)
 							return containerWidth;
-						else if (containerWidth < 400)
+						else if (containerWidth < 580)
 							return containerWidth / 2;
-						else if (containerWidth < 800)
+						else if (containerWidth < 720)
 							return containerWidth / 3;
-						else
+						else if (containerWidth < 960)
 							return containerWidth / 4;
+						else if (containerWidth < 1200)
+							return containerWidth / 5;
+						else
+							return containerWidth / 6;
 					} }
 					limitNodeSearch={ (containerWidth: number) => {
-						if (containerWidth < 800)
+						if (containerWidth < 720)
 							return 4;
 						else
 							return 12;

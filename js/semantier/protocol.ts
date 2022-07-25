@@ -16,7 +16,7 @@ export interface JsonOptions {
     verbose: number;
     noNull: boolean | string;
     noBoolean: boolean | string;
-};
+}
 
 /** An abstract object for query condition
  *
@@ -36,12 +36,20 @@ export class PageInf {
 	/** @deprected replaced by condtRec */
 	condts?: Array<string[]>;
 
-	constructor(page?: number, size?: number, total?: number, condts?: Array<string[]>) {
+	constructor(page?: number | PageInf, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.transact.sql.PageInf';
-		this.page = page || 0;
-		this.size = size || -1;
-		this.total = total || 0;
-		this.condts = condts;
+		if (typeof page === 'number') {
+			this.page = page || 0;
+			this.size = size || -1;
+			this.total = total || 0;
+			this.condts = condts;
+		}
+		else {// type safe: PageInf
+			this.page = page?.page || 0;
+			this.size = page?.size || -1;
+			this.total = page?.total || 0;
+			this.condts = page?.condts;
+		}
 	}
 
 	nv(k: string, v: string) {
@@ -58,13 +66,13 @@ export class PageInf {
 	 */
 	condtsRec () {
 		let rec = {} as Tierec;
-		this.condts?.forEach( nv => {
+		for(let nv in this.condts) {
 			if (nv && nv[0])
-				rec[nv[0]] = nv[1];
-		})
+				rec[nv[0]] = rec[nv[1]];
+		}
 		return rec;
 	}
-};
+}
 
 /**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
 export type NameValue = {name: string, value: object};
@@ -133,18 +141,6 @@ export interface relStree {
 	sort?: string,
 	fullpath?: string,
 }
-
-/**Is this semantic-DA.Semantics? */
-// export type Semantics = {
-// 	// [reltype in SemanticType]: FKRelation | Stree | any;
-// 	fk?: FKRelation,
-
-// 	/**TODO: semantic tree */
-// 	stree?: Stree,
-
-// 	/**TODO: Multiple to mulitple */
-// 	m2m?: any,
-// }
 
 export interface DbRelations {
 	/** TODO:  [tabl: string]: Semantics; */
@@ -1294,7 +1290,7 @@ export interface DatasetOpts {
 	args?: object;
 
 	onOk?: OnCommitOk;
-};
+}
 
 export class DatasetReq extends QueryReq {
     /**
@@ -1407,7 +1403,7 @@ export enum stree_t {
 	reforest = 'reforest',
 	/** Query with client provided QueryReq object, and format the result into tree. */
 	query = 'query'
-};
+}
 
 export class DatasetierReq extends AnsonBody {
 	static __type__ = "io.odysz.semantic.tier.DatasetierReq";
