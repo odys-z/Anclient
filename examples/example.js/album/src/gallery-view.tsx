@@ -9,7 +9,6 @@ import { AnContextType, Comprops, CrudCompW } from '@anclient/anreact';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 import { photos } from './temp-photos';
-import { container } from 'webpack';
 
 export interface PhotoSlide<T extends {}> {
     index: number
@@ -46,8 +45,8 @@ export default class GalleryView extends CrudCompW<Comprops>{
 		this.tier = new GalleryTier({uri, comp: this, client})
 					.setContext(this.context) as GalleryTier;
 
-		this.tier.myAlbum((cols, rows) => {
-			that.album = rows;
+		this.tier.myAlbum((collects?: PhotoCollect[]) => {
+			that.album = collects;
 			that.setState({});
 		})
 	}

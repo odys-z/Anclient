@@ -1,5 +1,5 @@
 import { Comprops, CrudComp } from '@anclient/anreact';
-import { AnsonResp, AnsonBody, OnLoadOk, PageInf, Semantier, SessionClient, Tierec } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonBody, OnLoadOk, PageInf, Semantier, SessionClient, Tierec } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
 export interface PhotoCollect extends Tierec {
@@ -28,6 +28,8 @@ export class GalleryTier extends Semantier {
 	port: string = "album";
 
 	page: PageInf;
+	collectRecords?: PhotoCollect[];
+
 	/**
 	 * @param props
 	 */
@@ -45,14 +47,13 @@ export class GalleryTier extends Semantier {
 	 * The file uri is an identifier of files managed by jserv, not same as function uri for Anclient component.
 	 * @override(Semantier)
 	 */
-    records<T extends Tierec>(conds: PageInf, onLoad: OnLoadOk<T>) : void {
+    collects(conds: PageInf, onLoad: ((collects?: PhotoCollect[]) => void)) : void {
 		if (!this.client) {
 			console.error("Anclient is not ready yet.");
 			return;
 		}
 
 		let client = this.client;
-		let that = this;
 
 		let req = client.userReq( this.uri, this.port,
 					new AlbumReq( this.uri, conds as AlbumPage )
@@ -60,23 +61,23 @@ export class GalleryTier extends Semantier {
 
 		client.commit(req,
 			(resp) => {
-				let body = resp.Body();
+				let body = resp.Body() as AlbumResp;
 				if (body) {
-					let {cols, rows} = AnsonResp.rs2arr(body.Rs());
-					that.rows = rows;
-					onLoad(cols, rows as T[]);
+					// let {cols, rows} = AnsonResp.rs2arr(body.Rs());
+					this.collectRecords = body.collectRecords;
+					onLoad(this.collectRecords);
 				}
 			},
 			this.errCtx);
-		onLoad([], this.rows as T[]);
+		onLoad(this.collectRecords);
 	}
 
 	photo(uri: string) {
 		return this;
 	}
 
-    myAlbum(onLoad: OnLoadOk<PhotoCollect>) {
-        this.records<PhotoCollect>(this.page, onLoad);
+    myAlbum(onLoad: ((collects?: PhotoCollect[]) => void)): void {
+        this.collects(this.page, onLoad);
     }
 }
 
@@ -126,3 +127,51 @@ class AlbumReq extends AnsonBody {
 		}
 	}
 }
+
+
+class Profiles extends AnsonBody {
+
+	home: string;
+	maxUsers: number;
+	servtype: number;
+
+	constructor (obj: {
+			servtype: number;
+			maxUsers: number;home: string }) {
+		super( { type: 'io.oz.album.tier.Profiles' } );
+		this.home = obj.home;
+		this.maxUsers = obj.maxUsers;
+		this.servtype = obj.servtype;
+	}
+}
+
+Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); })
+
+class AlbumResp extends AnsonResp {
+	albumId: string;
+	ownerId: string;
+	owner: string;
+	collectRecords: Array<PhotoCollect>;
+	profils: Profiles;
+
+	photos: Array<PhotoRec[]>;
+
+	clientPaths: object;
+	
+	photo: PhotoRec;
+
+	constructor (obj: any) {
+		super({type: 'io.oz.album.tier.AlbumResp'});
+
+		this.albumId = obj.albumId;
+		this.ownerId = obj.ownerId;
+		this.owner = obj.owner;
+		this.collectRecords = obj.collectRecords;
+		this.profils = obj.profils;
+		this.photos = obj.photos;
+		this.clientPaths = obj.clientPaths;
+		this.photo = obj.photo;
+	}
+}
+
+Protocol.registerBody('io.oz.album.tier.AlbumResp', (jsonBd) => { return new AlbumResp(jsonBd); })
