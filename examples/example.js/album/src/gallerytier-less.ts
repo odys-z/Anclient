@@ -1,5 +1,5 @@
 import { Comprops, CrudComp } from '@anclient/anreact';
-import { Protocol, AnsonResp, AnsonBody, OnLoadOk, PageInf, Semantier, SessionClient, Tierec } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonBody, PageInf, Semantier, SessionClient, Tierec } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
 export interface PhotoCollect extends Tierec {
@@ -42,9 +42,11 @@ export class GalleryTier extends Semantier {
 		this.page = new PageInf(0, -1);
 	}
 
-	/**Get photo for my album. 
-	 * Uri is not replaced with file. The img tag should use delay attributes and load according to uri.
+	/**
+	 * Get photo for my album. 
+	 * File system uri is not replaced with file. The img tag should use delay attributes and load file according to uri.
 	 * The file uri is an identifier of files managed by jserv, not same as function uri for Anclient component.
+	 * 
 	 * @override(Semantier)
 	 */
     collects(conds: PageInf, onLoad: ((collects?: PhotoCollect[]) => void)) : void {

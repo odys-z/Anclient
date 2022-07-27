@@ -44,7 +44,7 @@ export interface GalleryProps<CustomPhotoProps extends object = {}> {
     direction?: string
   
     renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>
-  }
+}
 
 export interface PhotoSlide<T extends {}> {
     index: number

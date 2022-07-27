@@ -48,7 +48,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 		this.tier.myAlbum((collects?: PhotoCollect[]) => {
 			that.album = collects;
 			that.setState({});
-		})
+		});
 	}
 
 	openLightbox (event: React.MouseEvent, photo: PhotoSlide<{}>) {
