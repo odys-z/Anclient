@@ -10,7 +10,7 @@ export interface PhotoCollect extends Tierec {
 	shareby?: string;
 	extlinks?: any; // another table?
 	photos: Array<PhotoProps<PhotoRec>>;
-}
+};
 
 export interface PhotoRec extends Tierec {
 	pid?: string,
@@ -28,7 +28,7 @@ export class GalleryTier extends Semantier {
 	comp: CrudComp<Comprops>;
 	port: string = "album";
 
-	page: PageInf;
+	page: AlbumPage;
 	collectRecords?: PhotoCollect[];
 
 	/**
@@ -40,7 +40,7 @@ export class GalleryTier extends Semantier {
 		this.comp = props.comp;
 		this.client = props.client;
 
-		this.page = new PageInf(0, -1);
+		this.page = new AlbumPage();
 	}
 
 	/**
@@ -82,7 +82,36 @@ export class GalleryTier extends Semantier {
     myAlbum(onLoad: ((collects?: PhotoCollect[]) => void)): void {
         this.collects(this.page, onLoad);
     }
-}
+
+	toGalleryImgs(idx: number) {
+		let that = this;
+		let imgs = [] as PhotoProps<PhotoRec>[];
+		if (this.collectRecords) {
+			let photos = this.collectRecords[idx] as unknown as PhotoRec[];
+			photos.forEach( (p, x) => {
+				console.log(p);
+				let src = that.imgSrc(p.src);
+				let srcSet = [src];
+				imgs.push( {
+					src: "",
+					srcSet,
+					// sizes: p.s,
+					width: 4,
+					height: 3,
+					alt: `${p.owner} ${p.title? ' # ' + p.title : ''}`,
+					key: x.toString()
+				} );
+			} );
+		}
+		return imgs;
+	}
+
+	imgSrc(furi: string) {
+		let req = new AlbumReq(this.uri, this.page);
+
+		return this.uiHelper.getReq();
+	}
+};
 
 interface AlbumRec extends Tierec {
 	/** Album Id (h_albems.aid) */
@@ -94,13 +123,21 @@ interface AlbumRec extends Tierec {
 	/** Collects' default length (first page size) */
 	collectSize: number;
 
-	/** Photos */
+	/** Photos ids */
 	photos?: Array<string>;
+
+	/** Photo id */
+	pid?: string;
 }
 
-interface AlbumPage extends PageInf {
+class AlbumPage extends PageInf {
 	/** A temperoray solution before PageInf.condts evolved to Tierec. */
-	qrec: AlbumRec;
+	qrec?: AlbumRec;
+
+	constructor (query?: AlbumRec) {
+		super();
+		this.qrec = query;
+	}
 }
 
 class AlbumReq extends AnsonBody {
