@@ -1,5 +1,6 @@
 import { Comprops, CrudComp } from '@anclient/anreact';
-import { Protocol, AnsonResp, AnsonBody, PageInf, Semantier, SessionClient, Tierec } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonBody, PageInf, Semantier, SessionClient, Tierec
+} from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
 export interface PhotoCollect extends Tierec {
@@ -129,7 +130,6 @@ class AlbumReq extends AnsonBody {
 		}
 	}
 }
-
 
 class Profiles extends AnsonBody {
 

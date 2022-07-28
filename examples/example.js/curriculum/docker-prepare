@@ -7,6 +7,7 @@ cp -f ../../../../ever/curricula/res/lang.json dist/res-vol/lang.json
 cp -rf ../../../../ever/curricula/res/img dist/
 
 cp -rf ../../../../ever/curricula/docs dist/
+cp -rf ../../../../ever/curricula/img dist/
 
 echo "finishing command:"
 echo "mv dist/index.back.html dist/index.html"

@@ -192,6 +192,7 @@ class CarouselQuizComp extends CrudCompW {
 						</Button>
 					}
 			/>
+			{this.agreement}
 		  </Dialog>
 		);
 	}

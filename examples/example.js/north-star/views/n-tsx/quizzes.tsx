@@ -4,11 +4,10 @@ import withWidth from "@material-ui/core/withWidth";
 import { Typography, Grid, Button } from '@material-ui/core';
 
 import dateFormat from 'dateformat';
-import { AnsonResp, PageInf, QueryConditions, UserReq } from '@anclient/semantier';
-import {
-    L,
+import { AnsonResp, PageInf, QueryConditions, UserReq, AnlistColAttrs } from '@anclient/semantier';
+import { L,
     AnConst, AnContext, CrudCompW, AnQueryst,
-	AnTablist, DatasetCombo, ConfirmDialog, jsample, Comprops
+	AnTablist, DatasetCombo, ConfirmDialog, jsample, Comprops, CompOpts
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
@@ -16,8 +15,9 @@ import { QuizProtocol } from '../../common/protocol.quiz.js';
 import { Quizsheet } from '../n/quizsheet-ag';
 import { QuizForm } from '../n/quiz-form';
 import { QuizRec } from '../../common/an-quiz.js';
+import { StarTheme } from '../../common/star-theme.js';
 
-const styles = (theme) => ( {
+const styles = (theme: StarTheme) => ( {
 	root: {
 		margin: theme.spacing(1),
 	},
@@ -50,12 +50,12 @@ class QuizzesComp extends CrudCompW<Comprops> {
 	templ: string;
 
 	// conditions
-	condTitl = { type: 'text', field: '', val: '', label: L('Title')};
-	condTags = { type: 'text', field: '', val: '', label: L('Tags')};
-	condDate = { type: 'date', field: '', val: '', label: L('Create Date')};
+	condTitl = { type: 'text', field: '', val: '', label: L('Title')} as AnlistColAttrs<JSX.Element, CompOpts>;
+	condTags = { type: 'text', field: '', val: '', label: L('Tags')} as AnlistColAttrs<JSX.Element, CompOpts>;
+	condDate = { type: 'date', field: '', val: '', label: L('Create Date')} as AnlistColAttrs<JSX.Element, CompOpts>;
 
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 
 		this.closeDetails = this.closeDetails.bind(this);
@@ -91,7 +91,7 @@ class QuizzesComp extends CrudCompW<Comprops> {
 
 	refresh() {
 		if (this.state.queryReq)
-			this.context.anReact.bindTablist(this.state.queryReq, this, this.context.error);
+			this.context.uiHelper.bindTablist(this.state.queryReq, this, this.context.error);
 
 		this.state.selected.ids.clear();
 	}
@@ -131,13 +131,12 @@ class QuizzesComp extends CrudCompW<Comprops> {
 	}
 
 	onTableSelect(rowIds: Array<string>) {
-		this.setState( {
-			buttons: {
-				add : this.buttons.add,
-				stop: rowIds && rowIds.length === 1,
-				del : rowIds &&  rowIds.length >= 1,
-			},
-		} );
+
+		this.buttons.add = this.buttons.add;
+		this.buttons.stop= rowIds && rowIds.length === 1;
+		this.buttons.del = rowIds &&  rowIds.length >= 1;
+
+		this.setState( { } );
 	}
 
 	toDel(e: React.UIEvent) {
@@ -190,7 +189,6 @@ class QuizzesComp extends CrudCompW<Comprops> {
 				onOk={ this.closeDetails } />);
 	}
 
-	// item collapse - deprecated
 	toAddA() {
 		this.quizForm = (
 			<QuizForm c uri={this.uri} templ={this.templ}
@@ -226,13 +224,7 @@ class QuizzesComp extends CrudCompW<Comprops> {
 		return ( <>{this.funcName}
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
-				// conds={[ this.state.condTitl, this.state.condTags, this.state.condDate ]}
 				fields={[ this.condTitl, this.condTags, this.condDate ]}
-				// query={ (q) => { return {
-				// 	qTitl: q.state.conds[0].val ? q.state.conds[0].val : undefined,
-				// 	qTags: q.state.conds[1].val ? q.state.conds[1].val : undefined,
-				// 	qdate: q.state.conds[2].val ? q.state.conds[2].val : undefined,
-				// }} }
 			/>
 
 			<Typography className={classes.tip} color='primary' >
