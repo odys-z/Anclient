@@ -74,7 +74,8 @@ export default class GalleryView extends CrudCompW<Comprops>{
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
-			<Gallery<PhotoRec> photos={[]} onClick={this.openLightbox}
+			{this.tier &&
+			  <Gallery<PhotoRec> photos={this.tier.toGalleryImgs(0)} onClick={this.openLightbox}
 					targetRowHeight={containerWidth => {
 						if (containerWidth < 320)
 							return containerWidth;
@@ -95,7 +96,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 						else
 							return 12;
 					} }
-			/>
+			/>}
 		  </div>
 		);
 	}

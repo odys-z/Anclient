@@ -143,7 +143,7 @@ class AnClient {
 	 * @param port
 	 * @param bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
 	 * @return AnsonMsg<T extends UserReq> */
-	restReq<T extends UserReq>(port: string, bodyItem: T): AnsonMsg<T> {
+	getReq<T extends UserReq>(port: string, bodyItem: T): AnsonMsg<T> {
 		let header = Protocol.formatHeader({});
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
@@ -601,7 +601,6 @@ class SessionClient {
 			act?: {func: string, cate: string, cmd: string, remarks: string} ) : AnsonMsg<QueryReq> {
 		let qryItem = new QueryReq(uri, maintbl, alias, pageInf);
 
-		// let header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}

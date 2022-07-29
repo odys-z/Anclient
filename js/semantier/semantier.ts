@@ -135,8 +135,11 @@ export interface QueryConditions {
  */
 export interface Semantext {
     anClient: SessionClient;
-	/**FIXME rename as TSHelper:
-	 * Gloabal UI helper, e.g. AnReact */
+	/**
+	 * FIXME rename as TSHelper:
+	 * 
+	 * Gloabal UI helper, e.g. AnReact
+	 */
     uiHelper: any;
     error: ErrorCtx;
 }
