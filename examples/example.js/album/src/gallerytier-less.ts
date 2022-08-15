@@ -116,11 +116,11 @@ export class GalleryTier extends Semantier {
 
 		let msg = this.client.an.getReq<AlbumReq>(this.port, req);
 
-		return GalleryTier.toUrl(this.client.an.servUrl(this.port), msg);
+		return GalleryTier.servUrl(this.client.an.servUrl(this.port), msg);
 	}
 
-	static toUrl(jserv: string, msg: AnsonMsg<UserReq>) {
-		return `${jserv}?header=${msg.toString()}`;
+	static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
+		return `${jserv}?header=${JSON.stringify(msg)}`;
 	}
 };
 
@@ -151,7 +151,7 @@ class AlbumPage extends PageInf {
 	}
 }
 
-class AlbumReq extends UserReq {
+class AlbumReq extends AnsonBody {
 	static A = {
 		records: 'r/collects',
 		collect: 'r/photos',
@@ -168,8 +168,7 @@ class AlbumReq extends UserReq {
 	pids?: string[];
 
 	constructor (uri: string, page: AlbumPage) {
-		super(uri, 'ablums');
-		this.type = 'io.oz.album.tier.AlbumReq';
+		super({uri, type: 'io.oz.album.tier.AlbumReq'});
 
 		this.pageInf = new PageInf(page);
 
