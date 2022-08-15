@@ -1,5 +1,5 @@
 import { Comprops, CrudComp } from '@anclient/anreact';
-import { Protocol, AnsonResp, AnsonBody, PageInf, Semantier, SessionClient, Tierec
+import { Protocol, AnsonMsg, AnsonResp, AnsonBody, PageInf, Semantier, SessionClient, Tierec, UserReq
 } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
@@ -13,7 +13,8 @@ export interface PhotoCollect extends Tierec {
 };
 
 export interface PhotoRec extends Tierec {
-	pid?: string,
+	/** pid */
+	recId?: string,
 	/** card title */
 	pname?: string,
 	shareby?: string | undefined,
@@ -87,10 +88,12 @@ export class GalleryTier extends Semantier {
 		let that = this;
 		let imgs = [] as PhotoProps<PhotoRec>[];
 		if (this.collectRecords) {
-			let photos = this.collectRecords[idx] as unknown as PhotoRec[];
-			photos.forEach( (p, x) => {
+			let album = this.collectRecords[idx];
+			album.photos.forEach( (p, x) => {
 				console.log(p);
-				let src = that.imgSrc(p.src);
+				if (!p.recId) return;
+
+				let src = that.imgSrc(p.recId);
 				let srcSet = [src];
 				imgs.push( {
 					src: "",
@@ -106,10 +109,18 @@ export class GalleryTier extends Semantier {
 		return imgs;
 	}
 
-	imgSrc(furi: string) {
+	imgSrc(recId: string) : string {
 		let req = new AlbumReq(this.uri, this.page);
+		req.a = AlbumReq.A.download;
+		req.pids = [recId];
 
-		return this.uiHelper.getReq();
+		let msg = this.client.an.getReq<AlbumReq>(this.port, req);
+
+		return GalleryTier.toUrl(this.client.an.servUrl(this.port), msg);
+	}
+
+	static toUrl(jserv: string, msg: AnsonMsg<UserReq>) {
+		return `${jserv}?header=${msg.toString()}`;
 	}
 };
 
@@ -140,11 +151,12 @@ class AlbumPage extends PageInf {
 	}
 }
 
-class AlbumReq extends AnsonBody {
+class AlbumReq extends UserReq {
 	static A = {
 		records: 'r/collects',
 		collect: 'r/photos',
 		rec: 'r/photo',
+		download: 'r/download',
 		update: 'u',
 		insert: 'c',
 		del: 'd',
@@ -156,7 +168,8 @@ class AlbumReq extends AnsonBody {
 	pids?: string[];
 
 	constructor (uri: string, page: AlbumPage) {
-		super({uri, type: 'io.oz.album.tier.AlbumReq'});
+		super(uri, 'ablums');
+		this.type = 'io.oz.album.tier.AlbumReq';
 
 		this.pageInf = new PageInf(page);
 

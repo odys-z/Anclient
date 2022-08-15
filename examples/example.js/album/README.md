@@ -20,8 +20,6 @@ see [here](https://www.typescriptlang.org/download)
 
 - react-photo-gallery
 
-Currently source (MIT) is copied from [original repository](https://github.dev/neptunian/react-photo-gallery).
+Currently the source (MIT) is copied from [original repository](https://github.dev/neptunian/react-photo-gallery).
 
 Not using dependency of npm for resolving react version confliction. See [PR #205, 2022-1-5](https://github.com/neptunian/react-photo-gallery/pull/210).
-
-
