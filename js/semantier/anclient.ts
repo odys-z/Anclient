@@ -143,7 +143,7 @@ class AnClient {
 	 * @param port
 	 * @param bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
 	 * @return AnsonMsg<T extends UserReq> */
-	getReq<T extends UserReq>(port: string, bodyItem: T): AnsonMsg<T> {
+	getReq<T extends AnsonBody>(port: string, bodyItem: T): AnsonMsg<T> {
 		let header = Protocol.formatHeader({});
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
@@ -500,7 +500,14 @@ class SessionClient {
 	 * {func, cate, cmd, remarks};
 	 * @return the logged in header */
 	getHeader(act: LogAct) {
-		var header = Protocol.formatHeader(this.ssInf);
+		let header = Protocol.formatHeader(this.ssInf);
+		/* FIXME
+		 * FIXME Album can not be published without fixing this
+		 * see AnSession.verify()
+		let ssid = this.ssInf.ssid;
+		let uid = aes.tokenize(ssInf, this.ssInf.uid);
+		let header = Protocol.formatHeader({ssid, uid});
+		*/
 		if (typeof act === 'object') {
 			header.userAct(act);
 		}
