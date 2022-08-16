@@ -3,6 +3,8 @@ import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq, PageInf, Semantier, 
 } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
+const debug = true;
+
 export interface PhotoCollect extends Tierec {
 	title?: string;
 	thumbUps?: Set<string>;
@@ -120,6 +122,9 @@ export class GalleryTier extends Semantier {
 	}
 
 	static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
+		if (debug)
+			console.log(msg);
+
 		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
 	}
 };

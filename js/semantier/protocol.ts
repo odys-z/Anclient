@@ -1464,8 +1464,8 @@ export class DocsReq extends AnsonBody {
 	 * args.deletings: old docId to be deleted
 	 */
 	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
-		super();
-		this.type = DocsReq.__type__;
+		super({uri, type: DocsReq.__type__});
+		// this.type = DocsReq.__type__;
 		this.docId = args.docId;
 		this.docName = args.docName;
 		this.mime = args.mime;
