@@ -364,7 +364,6 @@ export class Protocol {
 		}
 		return rows;
 	}
-
 }
 
 export enum CRUD { c = 'I', r = 'R', u = 'U', d = 'D' };
@@ -1430,3 +1429,50 @@ export class DatasetierResp extends AnsonResp {
 	}
 }
 Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json));
+
+export class DocsReq extends AnsonBody {
+	static __type__ = 'io.odysz.semantic.tier.docs.DocsReq';
+	// static __init__ = function () {
+	// 	// Design Note:
+	// 	// can we use dynamic Protocol?
+	// 	Protocol.registerBody(DocsReq.__type__, (jsonBd) => {
+	// 		return new DocsReq(jsonBd);
+	// 	});
+	// 	return undefined;
+	// }();
+
+	static A = {
+		records: 'r/list',
+		// mydocs: 'r/my-docs',
+		rec: 'r/rec',
+		upload: 'c/doc',
+		insert: 'c',
+		download: 'r/download',
+		del: 'd',
+	};
+
+	docId: string;
+	docName: string;
+	mime: string;
+	uri64: string;
+	deletings: string[];
+
+	/**
+	 *
+	 * @param uri
+	 * @param args
+	 * args.deletings: old docId to be deleted
+	 */
+	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
+		super();
+		this.type = DocsReq.__type__;
+		this.docId = args.docId;
+		this.docName = args.docName;
+		this.mime = args.mime;
+		this.uri64 = args.uri64;
+
+		// case d
+		this.deletings = args.deletings;
+	}
+}
+Protocol.registerBody(DocsReq.__type__, (json) => new DocsReq(json));

@@ -431,6 +431,9 @@ export class DocsTier extends Semantier {
 
 }
 
+/**
+ * @deprecated moved to semantier/protocol
+ */
 export class DocsReq extends AnsonBody {
 	static type = 'io.odysz.semantic.tier.docs.DocsReq';
 	static __init__ = function () {
@@ -457,10 +460,10 @@ export class DocsReq extends AnsonBody {
     deletings: string[];
 
 	/**
-	 * 
-	 * @param uri 
+	 *
+	 * @param uri
 	 * @param args
-	 * args.deletings: old docId to be deleted 
+	 * args.deletings: old docId to be deleted
 	 */
 	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super();

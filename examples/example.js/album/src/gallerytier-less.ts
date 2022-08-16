@@ -1,5 +1,5 @@
 import { Comprops, CrudComp } from '@anclient/anreact';
-import { Protocol, AnsonMsg, AnsonResp, AnsonBody, PageInf, Semantier, SessionClient, Tierec, UserReq
+import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq, PageInf, Semantier, SessionClient, Tierec
 } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
@@ -112,7 +112,7 @@ export class GalleryTier extends Semantier {
 	imgSrc(recId: string) : string {
 		let req = new AlbumReq(this.uri, this.page);
 		req.a = AlbumReq.A.download;
-		req.pids = [recId];
+		req.docId = recId;
 
 		let msg = this.client.an.getReq<AlbumReq>(this.port, req);
 
@@ -120,7 +120,7 @@ export class GalleryTier extends Semantier {
 	}
 
 	static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
-		return `${jserv}?header=${JSON.stringify(msg)}`;
+		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
 	}
 };
 
@@ -151,7 +151,7 @@ class AlbumPage extends PageInf {
 	}
 }
 
-class AlbumReq extends AnsonBody {
+class AlbumReq extends DocsReq {
 	static A = {
 		records: 'r/collects',
 		collect: 'r/photos',
@@ -159,6 +159,7 @@ class AlbumReq extends AnsonBody {
 		download: 'r/download',
 		update: 'u',
 		insert: 'c',
+		upload: 'c/doc',
 		del: 'd',
 	};
 
@@ -168,7 +169,8 @@ class AlbumReq extends AnsonBody {
 	pids?: string[];
 
 	constructor (uri: string, page: AlbumPage) {
-		super({uri, type: 'io.oz.album.tier.AlbumReq'});
+		super(uri, {docId: ''});
+		this.type = 'io.oz.album.tier.AlbumReq';
 
 		this.pageInf = new PageInf(page);
 

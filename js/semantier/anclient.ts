@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta, PageInf, NV
+	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta, PageInf, NV
 } from './protocol';
 import { ErrorCtx, Tierec } from './semantier';
 
@@ -370,8 +370,8 @@ export const an = new AnClient(undefined);
 export type SessionInf = {
 	type: "io.odysz.semantic.jsession.SessionInf";
 	/**A facillity for page redirection.
-	 * Value is set by Login into local storage, restored by SessionClient constructor.
-	 * (Log into to jserv backend and holding session information for each jserv service?)
+	 * Value is set by Login into local storage, and be restored by SessionClient constructor.
+	 * Usually these two steps are used in different html pages.
 	 */
 	jserv: string;
 	uid: string;
