@@ -39,7 +39,7 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@anclient/anreact": "^0.4.19",
+    "@anclient/anreact": "^0.4.21",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@emotion/react": "^11.9.0",
     "@material-ui/lab": "^4.0.0-alpha.60",
