@@ -5,10 +5,10 @@ import Gallery from '../react-photo-gallery/src/Gallery';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
+import { isEmpty } from "@anclient/semantier";
 import { AnContextType, Comprops, CrudCompW } from '@anclient/anreact';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
-import { photos } from './temp-photos';
 
 export interface PhotoSlide<T extends {}> {
     index: number
@@ -64,8 +64,8 @@ export default class GalleryView extends CrudCompW<Comprops>{
 		this.setState({})
 	};
 
-	gallery(collections: Array<PhotoCollect>) {
-		let photos = collections[0].photos;
+	gallery(photos: Array<PhotoRec>) {
+		// let photos = collections[0].photos;
 		return (
 		  <div>
 			{this.showCarousel &&
@@ -75,7 +75,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
 			{this.tier &&
-			  <Gallery<PhotoRec> photos={this.tier.toGalleryImgs(0)} onClick={this.openLightbox}
+			  <Gallery<PhotoRec> photos={photos} onClick={this.openLightbox}
 					targetRowHeight={containerWidth => {
 						if (containerWidth < 320)
 							return containerWidth;
@@ -104,19 +104,23 @@ export default class GalleryView extends CrudCompW<Comprops>{
 	photoCarousel(photos: Array<PhotoProps>, imgx: number) : JSX.Element {
 		return (
 			<Carousel showArrows={true} dynamicHeight={true} selectedItem={imgx} >
-				{photos.map( (ph, x) => (
-				  <div key={x}>
-					<img src={ph.src} loading="lazy"></img>
-					<p className="legend">{ph.src}</p>
-				  </div>)
+				{photos.map( (ph, x) => {
+				  let src = (isEmpty( ph.src ) && ph?.srcSet) ? ph.srcSet[ph.srcSet.length - 1] : ph.src || '';
+				  return (
+					<div key={x}>
+						<img src={src} loading="lazy"></img>
+						<p className="legend">{ph.src}</p>
+					</div>);
+				  }
 				)}
 			</Carousel>
 		);
 	}
 
 	render() {
+		let photos = this.tier?.toGalleryImgs(0) || [];
 		return (<div>Album Example - Clicke to show large photo
-			{this.tier && this.gallery( [{photos}] )}
+			{this.tier && this.gallery( photos )}
 		</div>);
 	}
 }

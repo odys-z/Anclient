@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta, PageInf, NV
+	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta, PageInf
 } from './protocol';
 import { ErrorCtx, Tierec } from './semantier';
 

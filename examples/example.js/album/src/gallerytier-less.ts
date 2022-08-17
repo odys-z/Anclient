@@ -25,6 +25,8 @@ export interface PhotoRec extends Tierec {
 	device?: string,
 
 	src: string,
+	width: number,
+	height: number
 };
 
 export class GalleryTier extends Semantier {
@@ -111,6 +113,12 @@ export class GalleryTier extends Semantier {
 		return imgs;
 	}
 
+	/**
+	 * Compose src of img tag, with AlbumReq request as anson64 parameter.
+	 * 
+	 * @param recId potho id
+	 * @returns 
+	 */
 	imgSrc(recId: string) : string {
 		let req = new AlbumReq(this.uri, this.page);
 		req.a = AlbumReq.A.download;
