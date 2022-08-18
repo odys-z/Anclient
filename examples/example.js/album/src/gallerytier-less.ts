@@ -99,12 +99,17 @@ export class GalleryTier extends Semantier {
 
 				let src = that.imgSrc(p.recId);
 				let srcSet = [src];
+
+				let css = JSON.parse(p.css);
+				let size = css?.size;
+				let width = size && size.length > 2 ? size[2] : 4;
+				let height = size && size.length > 3 ? size[3] : 3;
+
 				imgs.push( {
 					src: "",
 					srcSet,
-					// sizes: p.s,
-					width: 4,
-					height: 3,
+					width,
+					height,
 					alt: `${p.owner} ${p.title? ' # ' + p.title : ''}`,
 					key: x.toString()
 				} );
