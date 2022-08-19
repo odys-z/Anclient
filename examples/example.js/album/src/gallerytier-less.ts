@@ -105,12 +105,15 @@ export class GalleryTier extends Semantier {
 				let width = size && size.length > 2 ? size[2] : 4;
 				let height = size && size.length > 3 ? size[3] : 3;
 
+				let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
+
 				imgs.push( {
 					src: "",
 					srcSet,
 					width,
 					height,
-					alt: `${p.owner} ${p.title? ' # ' + p.title : ''}`,
+					alt,
+					title: alt, 
 					key: x.toString()
 				} );
 			} );
@@ -216,7 +219,7 @@ class Profiles extends AnsonBody {
 	}
 }
 
-Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); })
+Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
 
 class AlbumResp extends AnsonResp {
 	albumId: string;
@@ -245,4 +248,4 @@ class AlbumResp extends AnsonResp {
 	}
 }
 
-Protocol.registerBody('io.oz.album.tier.AlbumResp', (jsonBd) => { return new AlbumResp(jsonBd); })
+Protocol.registerBody('io.oz.album.tier.AlbumResp', (jsonBd) => { return new AlbumResp(jsonBd); });
