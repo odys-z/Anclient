@@ -12,7 +12,7 @@ export type PhotoProps<CustomPhotoProps extends object = {}> = {
     /**
      * srcSet attribute of the image
      */
-    srcSet?: string | string[]
+    srcSet?: string[]
     /**
      * sizes attribute of the image
      */

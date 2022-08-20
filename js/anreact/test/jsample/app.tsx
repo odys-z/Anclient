@@ -44,16 +44,16 @@ class App extends React.Component<Approps> {
 
 	/**
 	 * Application main entrance.
-	 * 
+	 *
 	 * Set up:
 	 * - error context,
 	 * - AnContext,
 	 * - extend url link routes,
 	 * - protocol sk of dataset.
-	 * 
+	 *
 	 * Also restore session from window.localStorage
-	 * 
-	 * @param props 
+	 *
+	 * @param props
 	 */
 	constructor(props: Approps) {
 		super(props);
@@ -67,7 +67,7 @@ class App extends React.Component<Approps> {
 		this.errorCtx = {onError: this.onError, msg: ''};
 		// Will load anclient from localStorage.
 		this.anClient = new SessionClient();
-		this.anReact = new AnReactExt(this.anClient, this.errorCtx); 
+		this.anReact = new AnReactExt(this.anClient, this.errorCtx);
 								// .extendPorts(StarPorts);
 
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -96,7 +96,7 @@ class App extends React.Component<Approps> {
 			Object.assign(Protocol.sk, sks);
 			console.log(sks);
 		}, this.errorCtx);
- 
+
 		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
@@ -222,7 +222,8 @@ class App extends React.Component<Approps> {
 	 * [opts.serv='host'] serv id
 	 * [opts.iportal='index.html'] page showed after logout
 	 */
-	static bindHtml(elem: string, opts: {serv: string, portal?: string}) : void {
+	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
+	// static bindHtml(elem: string, opts: {serv: string, portal?: string}) : void {
 		let portal = opts.portal || 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);

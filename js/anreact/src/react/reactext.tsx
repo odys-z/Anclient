@@ -31,7 +31,7 @@ export const AnContext = React.createContext({
 	ssInf: undefined as SessionInf,
 
 	pageOrigin: '.',
-	iparent: {},
+	iparent: {},    // usually the parent window of ifram
 	ihome: undefined as string,
 
 	/**default: host */

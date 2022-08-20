@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, UserReq, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta, PageInf, NV
+	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta, PageInf
 } from './protocol';
 import { ErrorCtx, Tierec } from './semantier';
 
@@ -143,7 +143,7 @@ class AnClient {
 	 * @param port
 	 * @param bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
 	 * @return AnsonMsg<T extends UserReq> */
-	restReq<T extends UserReq>(port: string, bodyItem: T): AnsonMsg<T> {
+	getReq<T extends AnsonBody>(port: string, bodyItem: T): AnsonMsg<T> {
 		let header = Protocol.formatHeader({});
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
@@ -370,8 +370,8 @@ export const an = new AnClient(undefined);
 export type SessionInf = {
 	type: "io.odysz.semantic.jsession.SessionInf";
 	/**A facillity for page redirection.
-	 * Value is set by Login into local storage, restored by SessionClient constructor.
-	 * (Log into to jserv backend and holding session information for each jserv service?)
+	 * Value is set by Login into local storage, and be restored by SessionClient constructor.
+	 * Usually these two steps are used in different html pages.
 	 */
 	jserv: string;
 	uid: string;
@@ -500,7 +500,14 @@ class SessionClient {
 	 * {func, cate, cmd, remarks};
 	 * @return the logged in header */
 	getHeader(act: LogAct) {
-		var header = Protocol.formatHeader(this.ssInf);
+		let header = Protocol.formatHeader(this.ssInf);
+		/* FIXME
+		 * FIXME Album can not be published without fixing this
+		 * see AnSession.verify()
+		let ssid = this.ssInf.ssid;
+		let uid = aes.tokenize(ssInf, this.ssInf.uid);
+		let header = Protocol.formatHeader({ssid, uid});
+		*/
 		if (typeof act === 'object') {
 			header.userAct(act);
 		}
@@ -601,7 +608,6 @@ class SessionClient {
 			act?: {func: string, cate: string, cmd: string, remarks: string} ) : AnsonMsg<QueryReq> {
 		let qryItem = new QueryReq(uri, maintbl, alias, pageInf);
 
-		// let header = Protocol.formatHeader(this.ssInf);
 		if (typeof act === 'object') {
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);
 		}
