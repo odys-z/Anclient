@@ -139,6 +139,15 @@ public class HttpServClient {
 		}
 	}
 
+	/**
+	 * @param url
+	 * @param jreq
+	 * @param localpath
+	 * @return localpath
+	 * @throws IOException
+	 * @throws AnsonException
+	 * @throws SemanticException
+	 */
 	@SuppressWarnings("unchecked")
 	public String streamdown(String url, AnsonMsg<? extends DocsReq> jreq, String localpath)
 			throws IOException, AnsonException, SemanticException {

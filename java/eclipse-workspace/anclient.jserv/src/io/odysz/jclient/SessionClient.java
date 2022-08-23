@@ -211,9 +211,20 @@ public class SessionClient {
 					.body(itm);
 	}
 
+	/**
+	 * @param uri
+	 * @param port
+	 * @param body
+	 * @param localpath
+	 * @param act
+	 * @return localpath
+	 * @throws AnsonException
+	 * @throws SemanticException
+	 * @throws IOException
+	 */
 	public <T extends DocsReq> String download(String uri, IPort port, T body, String localpath, LogAct... act) throws AnsonException, SemanticException, IOException {
 		if (port == null)
-			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port explicitly specified.");
+			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port being explicitly specified.");
 
 		// let header = Protocol.formatHeader(this.ssInf);
 		body.uri(uri);
