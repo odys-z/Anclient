@@ -324,8 +324,8 @@ public class SessionClient {
 
 	/**
 	 * Submit request.
-	 * @param <R>
-	 * @param <A>
+	 * @param <R> request type
+	 * @param <A> answer type
 	 * @param req
 	 * @param err
 	 * @return response
