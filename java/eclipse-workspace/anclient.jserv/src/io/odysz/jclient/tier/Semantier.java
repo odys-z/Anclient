@@ -25,7 +25,7 @@ public class Semantier {
     Tierec[] rows;
 
     /** current pk value */
-    PkMeta pkval; //  = {pk: undefined, v: undefined};
+    PkVal pkval; //  = {pk: undefined, v: undefined};
 
     /** current record */
     Tierec rec;

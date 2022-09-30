@@ -267,9 +267,4 @@ public class AnsonClientTest {
     		});
 	}
 	*/
-
-//	private static String randomVal() {
-//		double r = Math.random() * 100;
-//		return String.valueOf(r);
-//	}
 }

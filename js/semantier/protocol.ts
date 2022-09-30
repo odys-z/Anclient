@@ -159,7 +159,7 @@ export interface UIRelations {
  * example of this:
  * that.pkval.v = that.rec && that.rec[that.pk];
 */
-export interface PkMeta {
+export interface PkVal {
     v: any;
     pk: string;
     tabl?: string;
@@ -798,7 +798,7 @@ export class UpdateReq extends AnsonBody {
      * @param pkv conditions for pk.<br>
      * If pk is null, use this object's where_() | whereEq() | whereCond().
      */
-    constructor(uri: string, tabl: string, pkv: string[] | PkMeta) {
+    constructor(uri: string, tabl: string, pkv: string[] | PkVal) {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
@@ -809,7 +809,7 @@ export class UpdateReq extends AnsonBody {
 		if (Array.isArray(pkv))
 			this.where.push(['=', pkv[0], `'${pkv[1]}'`]);
 		else if (typeof pkv === "object") {
-            let pk_ = pkv as PkMeta;
+            let pk_ = pkv as PkVal;
 		 	if (pk_.pk !== undefined)
 				this.where.push(['=', pk_.pk, `'${pk_.v}'`]);
 			else console.error("UpdateReq: Can't understand pk: ", pkv);
@@ -958,7 +958,7 @@ export class UpdateReq extends AnsonBody {
 }
 
 export class DeleteReq extends UpdateReq {
-	constructor (uri: string, tabl: string, pk: string[] | PkMeta) {
+	constructor (uri: string, tabl: string, pk: string[] | PkVal) {
 		super (uri, tabl, pk);
 		this.a = CRUD.d;
 	}
