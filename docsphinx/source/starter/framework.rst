@@ -131,12 +131,12 @@ A jserv configuration object can be:
 
 ::
 
-   origin/app-path/github.com.
+   origin/app-path/github.json
 
 3. The jserv address are managed by AnContext.
 
 4. When an Anclient supported (React) page is loaded, the page will set a url
-parameter, serv to AnClient.servId. This is used as the default jserv location.
+parameter, "serv" to AnClient.servId. This is used as the default jserv location.
 If there is no such parameter, Anclient will use "host" as the default value.
 
 5. Ancontext are provided by React application as the type of root context. Nested
@@ -145,39 +145,50 @@ components will use it like a singleton.
 When to setup
 _____________
 
-It's the deploying process setting what jserv id and ur to be used. Take
-*jserv-quiz/react-quiz* for example, the jserv id is generated when user create
-the "*Share*" link, included in the target url as parameter::
+Since @anclient/anreact 0.4.20, it's recommended using docker image to run the
+exmaples (Let's call this script as *web-start*).
 
-    serv='host-1'
+Here is the snipet been used in the script for bring up docker service (web end)::
 
-This will be passed in plain-quiz/poll-anson.html as parameter to initialize the
-React applicaion:
+    # docker pull odysz/curricula-web
+    docker volume rm curriculum.host
+    docker volume create curriculum.host
+    sudo cp dist/private/host.json /var/lib/docker/volumes/curriculum.host/_data
 
-.. code-block:: javascript
+    docker run --mount source=curriculum.host,target=/usr/share/nginx/html/private -p 8889:80 --name curr-web --rm -d your-docker-image-tag
 
-    let searchParams = new URLSearchParams(window.location.search)
-    let serv = searchParams ? searchParams.get('serv') : undefined;
-    Quizlist.bindQuizzes('quizlist', serv);
 ..
 
-Where the *quizlist* is the id of <div/> for React root component.
+As you can see, the script copied a configure file, host.json, into the docker
+volume.
 
-If the parameter doesn't been found, AnContext will use *undefined* as id which
-will have AnContext use '*host*' as default jserv id.
+In case readers are not familiar with docker volume, this configuration means the
+json file can be accesses at::
 
-.. note:: There are two different serv-id in
+    http://your-ip:8889/host.json
 
-    *react-quiz/quizlist.html?serv=...*
+where the url root path is equivalent to::
 
-    and
+    examples.js/curriculum/dist
 
-    *plain-quiz/poll-anson.html?serv=...*.
+The source folder structure should be::
 
-    The first serv-id specify where Quizlist root component should save it's data;
-    the latter is specified by user while composing quizs and generated in share
-    link, which will have target poll save data to there.
+    [curriculum]
+      ├─Dockerfile
+      ├─[views]
+      ├─[common]
+      └─[dist]
+        ├─[res-vol]
+        │ └─[icons]
+        ├─[private]
+        │ └─host.json
+        ├─github.json
+        └─index.html
 
-    We can't figure out what's the scenario a polling page doesn't use the quiz
-    composer's data service as both share the same quizzes data.
-..
+Because the entire folder is copied to docker image with Dockerfile::
+
+    FROM nginx:stable-alpine
+    COPY dist/ /usr/share/nginx/html/
+
+FYI, this can build a docker image for web page service using Nginx. Once this
+image is build, it can be turn on with the script above, a.k.a. *web-start*.

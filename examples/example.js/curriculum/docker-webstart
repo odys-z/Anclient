@@ -1,4 +1,4 @@
-# docker pull odysz/emr-web
+# docker pull odysz/curricula-web
 docker volume rm curriculum.host
 docker volume create curriculum.host
 sudo cp dist/private/host.json /var/lib/docker/volumes/curriculum.host/_data

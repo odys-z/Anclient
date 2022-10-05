@@ -39,8 +39,8 @@ or::
 
     webpack
 
-There are many way to host the index.html page, e.g. start a python server in
-examples.js (index.html used 2 level parent path)::
+There are many ways to host the index.html page, e.g. start a python server in
+examples.js (url of index.html takes as a 2 level parent path)::
 
     python3 -m http.server 8080
 

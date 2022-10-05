@@ -1,5 +1,5 @@
-Quick Start (js only)
-=====================
+Quick Start (Typescript)
+========================
 
 .. toctree::
    :maxdepth: 2
