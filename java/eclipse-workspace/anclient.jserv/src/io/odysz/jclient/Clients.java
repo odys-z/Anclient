@@ -71,7 +71,12 @@ public class Clients {
 			Utils.logi(resp.toString());
 
 		if (AnsonMsg.MsgCode.ok == resp.code()) {
-			return new SessionClient(((AnSessionResp) resp.body(0)).ssInf());
+			SessionClient c = new SessionClient(((AnSessionResp) resp.body(0)).ssInf());
+
+			if (mac != null && mac.length > 0)
+				c.ssInfo().device(mac[0]);
+		
+			return c;
 		}
 		else throw new SsException(
 				"loging failed\ncode: %s\nerror: %s",
