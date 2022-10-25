@@ -3,14 +3,14 @@ package io.odysz.jclient.tier;
 import io.odysz.semantic.jprotocol.JProtocol.CRUD;
 
 public class Semantier {
-    /**main table name */
-    String mtabl;
+    /**main table name - replace with TableMeta? */
+    protected String mtabl;
 
     /** list's columns */
     TierCol[] _cols;
 
     /** client function / CRUD identity */
-    String uri;
+    protected String uri;
 
     /** Fields in details from, e.g. maintable's record fields */
     TierCol[] _fields;

@@ -52,7 +52,7 @@ public class SessionClient {
 	}
 	
 	/**
-	 * Start a heart beat thread, sleeping on signal {@link #syncFlag}.
+	 * Start a heart beat thread which is sleeping on thread signal {@link #syncFlag}.
 	 * @param clientUri
 	 * @param onLink
 	 * @param onBroken
