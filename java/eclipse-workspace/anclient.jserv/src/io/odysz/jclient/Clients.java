@@ -43,10 +43,14 @@ public class Clients {
 	}
 	
 	/**Login and return a client instance (with session managed by jserv).
+	 * 
+	 * <h5>Note since anclient.java 1.4.14</h5>
+	 * This module uses defualt url root initialized with {@link #init(String, boolean...)}. 
+	 * 
 	 * @param uid
 	 * @param pswdPlain
 	 * @param mac  client device name - server can required this or not
-	 * @return null if failed, a SessionClient instance if login succeed.
+	 * @return a SessionClient instance if login succeed.
 	 * @throws SemanticException Request can not parsed correctly 
 	 * @throws SsException  encrypting password error
 	 * @throws Exception, most likely the network failed
