@@ -76,12 +76,6 @@
 	    <version>[1.4.10,)</version>
 	</dependency>
 
-	<dependency>
-		<groupId>org.vishag</groupId>
-		<artifactId>async-helper</artifactId>
-		<version>[4.0.0,)</version>
-	</dependency>
-
   </dependencies>
 
   <build>
