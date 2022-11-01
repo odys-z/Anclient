@@ -15,133 +15,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5eb6677d-a777-4824-9d7e-85509a04ccd0" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/albumtier/.project" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/albumtier/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumSingletext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/androidTest/java/io/oz/albumtier/ExampleInstrumentedTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/androidTest/java/io/oz/albumtier/ExampleInstrumentedTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PrefKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PrefKeys.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/TierCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/TierCallback.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/io/oz/wv1/ExampleInstrumentedTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/wv1/MainAct.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/wv1/WvClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/bt_login.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/bt_login.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/bt_regist_device.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/bt_regist_device.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/welcome.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/welcome.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/wv.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/wv.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/menu_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/menu/menu_main.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/xml/pref.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/xml/pref.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/test/java/io/oz/wv1/ExampleUnitTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/androidTest/java/io/oz/fpick/ExampleInstrumentedTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/androidTest/java/io/oz/fpick/ExampleInstrumentedTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/Constant.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/Constant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/DividerGridItemDecoration.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/DividerGridItemDecoration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/DividerListItemDecoration.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/DividerListItemDecoration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/FolderListHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/FolderListHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/MaxHeightLayout.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/MaxHeightLayout.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/ToastUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/ToastUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/Util.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/AudioPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/AudioPickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/BaseActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/BaseActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImageBrowserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImageBrowserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImagePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImagePickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/NormalFilePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/NormalFilePickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/VideoPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/VideoPickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/AudioPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/AudioPickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/BaseAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/BaseAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/FolderListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/FolderListAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/ImagePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/NormalFilePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/NormalFilePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/OnSelectStateListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/OnSelectStateListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/VideoPickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/FileFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/FileFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/callback/FileLoaderCallbacks.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/callback/FileLoaderCallbacks.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/callback/FilterResultCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/callback/FilterResultCallback.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/AudioFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/AudioFile.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/BaseFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/BaseFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/Directory.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/Directory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/ImageFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/ImageFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/NormalFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/NormalFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/VideoFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/VideoFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/AudioLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/AudioLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/FileLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/FileLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/ImageLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/ImageLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/VideoLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/VideoLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/PickingMode.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/PickingMode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/filter/FileFilterx.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/filter/FileFilterx.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/anim/rotate_animation.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/anim/rotate_animation.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable-xxhdpi/vw_ic_synced.png" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable-xxhdpi/vw_ic_synced.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable-xxhdpi/vw_ic_synced_video.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/anim_rect.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/anim_rect.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/anim_square.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/anim_square.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/background_circle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/background_circle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/corner_animation_drawable.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/corner_animation_drawable.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_baseline_check_circle_24.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_baseline_check_circle_24.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_rectangle_93.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_rectangle_93.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_square_93.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_square_93.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_bg_folder_list.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_bg_folder_list.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_divider_rv.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_divider_rv.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_divider_rv_file.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_divider_rv_file.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_selector_cbx.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_selector_cbx.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_selector_cbx_audio.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_selector_cbx_audio.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_synced.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_synced.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_audio_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_audio_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_file_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_file_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_image_browser.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_image_browser.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_image_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_image_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_video_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_video_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_folder_list.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_folder_list.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_audio_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_audio_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_folder_list.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_folder_list.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_image_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_image_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_normal_file_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_normal_file_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_video_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_video_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_top_bar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_top_bar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/menu/vw_menu_image_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/menu/vw_menu_image_pick.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values-zh/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values-zh/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values/colors.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values/styles.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/xml/file_paths.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/xml/file_paths.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/test/java/io/oz/fpick/ExampleUnitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/test/java/io/oz/fpick/ExampleUnitTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/SessionClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/SessionClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/tier/ErrorAwaitHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/tier/ErrorAwaitHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/tier/ErrorCtx.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/tier/ErrorCtx.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/test/io/odysz/jclient/AnsonClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/test/io/odysz/jclient/AnsonClientTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -215,10 +106,168 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="example.android" type="b2602c69:ProjectViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="b2602c69:ProjectViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="b2602c69:ProjectViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="gradle" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="b2602c69:ProjectViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="gradle" type="462c0819:PsiDirectoryNode" />
+              <item name="wrapper" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="PackagesPane" />
-      <pane id="ProjectPane" />
-      <pane id="AndroidView" />
       <pane id="Scope" />
+      <pane id="AndroidView">
+        <subPane>
+          <expand>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="io" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="io" type="462c0819:PsiDirectoryNode" />
+              <item name="oz" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="res" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="res" type="462c0819:PsiDirectoryNode" />
+              <item name="layout" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="res" type="462c0819:PsiDirectoryNode" />
+              <item name="mipmap-anydpi-v26" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="res" type="462c0819:PsiDirectoryNode" />
+              <item name="mipmap-hdpi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="res" type="462c0819:PsiDirectoryNode" />
+              <item name="mipmap-mdpi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="res" type="462c0819:PsiDirectoryNode" />
+              <item name="mipmap-xhdpi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="res" type="462c0819:PsiDirectoryNode" />
+              <item name="mipmap-xxhdpi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="file-picker" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="example.android" type="462c0819:PsiDirectoryNode" />
+              <item name="file-picker" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="example.android" type="1abcf292:AndroidViewProjectNode" />
+              <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="ProjectViewState">
@@ -373,34 +422,35 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="49" y="-4" width="1391" height="904" extended-state="6" />
+    <frame x="48" y="-11" width="1393" height="912" extended-state="6" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Palette&#9;" />
-      <window_info id="Image Layers" />
-      <window_info id="Build Variants" side_tool="true" />
-      <window_info anchor="right" id="Capture Analysis" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="right" id="Palette&#9;" order="3" />
+      <window_info id="Image Layers" order="2" />
+      <window_info id="Build Variants" order="2" side_tool="true" />
+      <window_info anchor="right" id="Capture Analysis" order="3" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="right" id="Preview" visible="true" weight="0.28996283" />
+      <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info id="Capture Tool" />
-      <window_info id="Designer" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24981412" />
-      <window_info active="true" anchor="bottom" id="Build" visible="true" weight="0.32903227" />
-      <window_info anchor="right" id="Gradle" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info id="Capture Tool" order="2" />
+      <window_info id="Designer" order="2" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2654275" />
+      <window_info anchor="bottom" id="Build" order="7" weight="0.66967744" />
+      <window_info anchor="right" id="Gradle" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="right" id="Theme Preview" />
+      <window_info anchor="right" id="Theme Preview" order="3" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info id="Captures" order="2" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info id="Captures" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
     </layout>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -414,6 +464,278 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+          <folding>
+            <element signature="e#288#289#0" expanded="true" />
+            <element signature="e#311#312#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/VWebAlbum.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/WebAlbumAct.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="690">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/VWebAlbum.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/WebAlbumAct.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="690">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/VWebAlbum.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/WebAlbumAct.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="690">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/VWebAlbum.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="7" column="36" selection-start-line="7" selection-start-column="36" selection-end-line="7" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/WebAlbumAct.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="619">
+          <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="13" column="10" lean-forward="true" selection-start-line="13" selection-start-column="10" selection-end-line="13" selection-end-column="10" />
+          <folding>
+            <element signature="e#288#289#0" expanded="true" />
+            <element signature="e#311#312#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="63" lean-forward="true" selection-start-line="63" selection-end-line="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/bt_login.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="14" selection-start-line="14" selection-start-column="14" selection-end-line="14" selection-end-column="14" />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/welcome.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-132">
+          <caret line="31" column="43" selection-start-line="31" selection-start-column="43" selection-end-line="31" selection-end-column="43" />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
   </component>
   <component name="masterDetails">
     <states>

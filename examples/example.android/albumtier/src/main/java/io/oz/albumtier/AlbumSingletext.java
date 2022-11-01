@@ -1,8 +1,5 @@
 package io.oz.albumtier;
 
-// import android.content.SharedPreferences;
-// import android.content.res.Resources;
-
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
@@ -13,29 +10,36 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jsession.SessionInf;
 import io.oz.album.AlbumPort;
-import io.oz.album.client.AlbumClientier;
 
-public class AlbumContext {
+/**
+ * Alblum client context and singleton.
+ * 
+ * @author odys-z@github.com
+ *
+ */
+public class AlbumSingletext {
+   protected static final boolean verbose = true;
+
     public static final String jdocbase  = "jserv-album";
     public static final String albumHome = "dist/index.html";
     public static final String synchPage = "dist/sync.html";
 
-    static AlbumContext instance;
+    static AlbumSingletext instance;
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
-        Anson.verbose = true;
+        Anson.verbose = false;
     }
 
     private String pswd;
-    public AlbumContext pswd(String pswd) {
+    public AlbumSingletext pswd(String pswd) {
         this.pswd = pswd;
         return this;
     }
 
-    public static AlbumContext getInstance() {
+    public static AlbumSingletext getInstance() {
         if (instance == null)
-            instance = new AlbumContext();
+            instance = new AlbumSingletext();
         return instance;
     }
 
@@ -47,50 +51,36 @@ public class AlbumContext {
 
     public enum ConnState { Online, Disconnected, LoginFailed }
 
-    protected static final boolean verbose = true;
-
     public final String clientUri = "album.and";
     public final ErrorCtx errCtx = new ErrorCtx();
-//    public final ErrorCtx errCtx = new ErrorCtx() {
-//        String msg;
-//        AnsonMsg.MsgCode code;
-//        @Override
-//        public void err(AnsonMsg.MsgCode c, String msg, String ...args) {
-//            code = c;
-//            this.msg = msg;
-//        }
-//    };
 
     String jserv;
 
     public String homeName;
 
-    public AlbumClientier tier;
-
-    // private SessionClient client;
+    public PhotoSyntier syntier;
 
     public SessionInf photoUser;
 
     ConnState state;
     public ConnState state() { return state; }
 
-    public AlbumContext() {
+    public AlbumSingletext() {
         state = ConnState.Disconnected;
     }
 
     /**
      * Init with preferences. Not login yet.
-     * @since maven 0.1.0, this package no longer depends on android sdk.
      * public void init(PrefKeys prefkeys, SharedPreferences sharedPref)
      <pre>
-        homeName = sharedPref.getString(prefkeys.home, "");
+        String family = sharedPref.getString(prefkeys.home, "");
         String uid = sharedPref.getString(prefkeys.usrid, "");
         String device = sharedPref.getString(prefkeys.device, "");
-        photoUser = new SessionInf(null, uid);
-        photoUser.device = device;
-        pswd = sharedPref.getString(prefkeys.pswd, "");
-        jserv = sharedPref.getString(prefkeys.jserv, "");
+        String pswd = sharedPref.getString(prefkeys.pswd, "");
+        String jserv = sharedPref.getString(prefkeys.jserv, "");
      </pre>
+     * @param family org-id
+     * @since maven 0.1.0, this package no longer depends on android sdk.
      */
     public void init(String family, String uid, String device, String jserv) {
     	/*
@@ -108,7 +98,7 @@ public class AlbumContext {
         Clients.init(jserv + "/" + jdocbase, verbose);
     }
 
-    AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr)
+    AlbumSingletext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr)
             throws GeneralSecurityException {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
@@ -120,11 +110,11 @@ public class AlbumContext {
             (client) -> {
                 client.closeLink();
 
-                tier = new AlbumClientier(clientUri, client, errCtx);
+                syntier = new PhotoSyntier(clientUri, client, photoUser.device, errCtx);
                 client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min
                 state = ConnState.Online;
                 if (onOk != null)
-                    onOk.ok(tier);
+                    onOk.ok(syntier);
             },
             // Design Note: since error context don't have unified error message box,
             // error context pattern of React is not applicable.
@@ -152,7 +142,7 @@ public class AlbumContext {
         state = ConnState.Disconnected;
     });
 
-    public AlbumContext jserv(String newVal) {
+    public AlbumSingletext jserv(String newVal) {
         jserv = newVal;
         Clients.init(jserv + "/" + jdocbase, verbose);
         return this;

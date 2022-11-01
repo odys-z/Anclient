@@ -10,7 +10,6 @@ import java.util.Date;
 
 import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
-import io.oz.album.tier.Photo;
 
 /**
  * Modyfied by Ody Zhou
