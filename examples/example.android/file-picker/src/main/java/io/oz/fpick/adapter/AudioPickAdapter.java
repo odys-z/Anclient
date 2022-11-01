@@ -1,7 +1,6 @@
 package io.oz.fpick.adapter;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-
+import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.view.LayoutInflater;
@@ -12,21 +11,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.filter.entity.AudioFile;
 import com.vincent.filepicker.filter.entity.BaseFile;
+import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;
 
@@ -39,6 +31,10 @@ import io.oz.fpick.R;
  * Credits to Vincent Woo
  */
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
+    public AudioPickAdapter(Context ctx, ArrayList<AudioFile> list, int max) {
+        super(ctx, list);
+        mMaxNumber = max;
+    }
 
     public AudioPickAdapter(AudioPickActivity ctx, int max) {
         super(ctx, new ArrayList<>());
@@ -49,8 +45,8 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
     @Override
     public AudioPickViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.vw_layout_item_audio_pick, parent, false);
-        AudioPickViewHolder holder = new AudioPickViewHolder(itemView);
-        holder.setIsRecyclable ( true );
+        AudioPickViewHolder holder=new AudioPickViewHolder(itemView);
+        holder.setIsRecyclable ( false );
         return holder;
     }
 
@@ -70,29 +66,25 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         holder.mTvDuration.setText(Util.getDurationString(file.getDuration()));
         if (file.synchFlag == BaseFile.Synchronizing) {
             holder.mCbx.setSelected ( false );
-            // holder.icAlbum.setVisibility(View.GONE);
+            holder.icAlbum.setVisibility(View.GONE);
             holder.icSyncing.setVisibility(View.VISIBLE);
             holder.icSynced.setVisibility(View.GONE);
         }
         else if (file.synchFlag == BaseFile.Synchronized) {
             holder.mCbx.setSelected(true);
+            holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
             holder.icSynced.setVisibility(View.VISIBLE);
         }
         else if (file.isSelected()) {
             holder.mCbx.setSelected(true);
-            holder.icSyncing.setVisibility(View.GONE);
-            holder.icSynced.setVisibility(View.GONE);
             holder.animation.setVisibility ( View.VISIBLE );
             holder.animation.setAlpha ( 1f );
             AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
 //            Animation a = AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
             animationDrawable.start();
-        }
-        else {
+        } else {
             holder.mCbx.setSelected(false);
-            holder.icSyncing.setVisibility(View.GONE);
-            holder.icSynced.setVisibility(View.GONE);
             holder.animation.setVisibility ( View.INVISIBLE );
             holder.animation.setAlpha ( 0f );
         }
@@ -117,10 +109,6 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         holder.itemView.setOnClickListener(v -> {
             int index = holder.getAbsoluteAdapterPosition();
 
-            int sync = mList.get(index).synchFlag;
-            if ( sync == BaseFile.Synchronized || sync == BaseFile.Synchronizing)
-                return;
-
             if (!v.isSelected() && isUpToMax()) {
                 ToastUtil.getInstance(mContext).showToast(R.string.vw_up_to_max);
                 return;
@@ -144,12 +132,11 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
 
     @Override
     public int getItemCount() {
-        // return isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
-        return mList.size();
+        return isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
     }
 
     class AudioPickViewHolder extends RecyclerView.ViewHolder {
-        // private final ImageView icAlbum;
+        private final ImageView icAlbum;
         private final ImageView icSynced;
         private final ImageView icSyncing;
 
@@ -163,8 +150,16 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
 
         public AudioPickViewHolder(@NonNull View itemView) {
             super ( itemView );
-            icSyncing = (ImageView) itemView.findViewById(R.id.xiv_syncing_icon);
-            icSynced = (ImageView) itemView.findViewById(R.id.xiv_synced_icon);
+            icAlbum = (ImageView) itemView.findViewById ( R.id.xiv_album_icon);
+            icSyncing = (ImageView) itemView.findViewById ( R.id.xiv_syncing_icon);
+            icSynced = (ImageView) itemView.findViewById ( R.id.xiv_synced_icon);
+
+//            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
+//            mShadow = itemView.findViewById ( R.id.x_shadow );
+//            mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
+//            animation = itemView.findViewById ( R.id.animationSquarevideo );
+//            mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
+//            mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
 
             mTvTitle = (TextView) itemView.findViewById(R.id.tv_audio_title);
             mTvDuration = (TextView) itemView.findViewById(R.id.tv_duration);

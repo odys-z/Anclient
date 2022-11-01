@@ -45,9 +45,12 @@ import io.oz.fpick.R;
  */
 
 public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapter.VideoPickViewHolder> {
+//    private boolean isNeedCamera;
+//    private int mMaxNumber;
+//    private int mCurrentNumber = 0;
     public String mFilepath;
 
-    // public Uri mVideoUri;
+    public Uri mVideoUri;
 
     public VideoPickAdapter(Context ctx, boolean needCamera, int max ) {
         this ( ctx, new ArrayList<VideoFile> ( ), needCamera , max );
@@ -83,7 +86,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             holder.mIvThumbnail.setVisibility ( View.INVISIBLE );
             holder.mCbx.setVisibility ( View.GONE );
             holder.mShadow.setVisibility ( View.INVISIBLE );
-            holder.mDuration.setVisibility ( View.INVISIBLE );
         }
         else {
             holder.icSynced.setVisibility ( View.INVISIBLE );

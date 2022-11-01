@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
-        applicationId "io.oz.wv1"
-        minSdkVersion 17
-        targetSdkVersion 30
+        applicationId "io.oz.album"
+        minSdkVersion 26
+        targetSdkVersion 31
         versionCode 1
-        versionName "1.0"
+        versionName "$app_ver"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -18,20 +19,31 @@ android {
     }
 }
 
-allprojects {
-    repositories {
-        jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
-    }
-}
+//allprojects {
+//    repositories {
+//        jcenter()
+//        maven {
+//            url "https://maven.google.com"
+//        }
+//    }
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:+'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    testImplementation 'junit:junit:4.12'
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'pub.devrel:easypermissions:3.0.0'
+
+    implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver") {
+        exclude group: "org.apache.tika", module: "tika-core"
+        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
+    }
+
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation project(':albumtier')
+    implementation project(':file-picker')
 }

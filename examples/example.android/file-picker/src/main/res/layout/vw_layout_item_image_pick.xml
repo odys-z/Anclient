@@ -54,29 +54,27 @@
             android:layout_marginTop="5dp"
             android:src="@drawable/vw_ic_synced" />
     </RelativeLayout>
-
     <RelativeLayout
-        android:id="@+id/animationSquare"
+        android:alpha="0"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="0"
-        android:background="@drawable/anim_square">
-
+        android:background="@drawable/anim_square"
+        android:id="@+id/animationSquare">
         <RelativeLayout
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
             android:background="@drawable/background_circle"
+            android:layout_alignParentLeft="true"
 
             >
-
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_check_circle_24" />
+                android:src="@drawable/ic_baseline_check_circle_24"
+                />
         </RelativeLayout>
 
     </RelativeLayout>

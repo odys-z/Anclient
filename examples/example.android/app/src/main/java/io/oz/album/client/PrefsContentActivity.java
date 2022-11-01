@@ -6,12 +6,14 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import io.odysz.common.LangExt;
+import io.odysz.anson.Anson;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.tier.AlbumResp;
@@ -50,6 +52,7 @@ public class PrefsContentActivity extends AppCompatActivity {
                     updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
 
                     // load settings
+                    Anson.verbose = true;
                     tier.getSettings(
                         (resp) -> {
                             singleton.homeName = ((AlbumResp) resp).profils.home();
@@ -79,10 +82,6 @@ public class PrefsContentActivity extends AppCompatActivity {
     };
 
     public void onRegisterDevice(View btn) {
-        if (LangExt.isblank(prefFragment.device.getText())) {
-            prefFragment.device.setSummary(getString(R.string.msg_device_not_null));
-            return;
-        }
         if (prefFragment.btnRegist != null) {
             prefFragment.cateHome.removePreference(prefFragment.btnRegist);
         }

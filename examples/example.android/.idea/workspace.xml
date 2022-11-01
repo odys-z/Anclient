@@ -1,25 +1,199 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
   <component name="CMakeSettings">
     <configurations>
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5eb6677d-a777-4824-9d7e-85509a04ccd0" name="Default" comment="" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
-    <option name="TRACKING_ENABLED" value="true" />
+    <list default="true" id="5eb6677d-a777-4824-9d7e-85509a04ccd0" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PrefKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PrefKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/TierCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/TierCallback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/io/oz/wv1/ExampleInstrumentedTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/wv1/MainAct.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/wv1/WvClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_background.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/bt_login.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/bt_login.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/bt_regist_device.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/bt_regist_device.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/welcome.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/welcome.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/wv.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/wv.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/menu_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/menu/menu_main.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/xml/pref.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/xml/pref.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/test/java/io/oz/wv1/ExampleUnitTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/androidTest/java/io/oz/fpick/ExampleInstrumentedTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/androidTest/java/io/oz/fpick/ExampleInstrumentedTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/Constant.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/Constant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/DividerGridItemDecoration.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/DividerGridItemDecoration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/DividerListItemDecoration.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/DividerListItemDecoration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/FolderListHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/FolderListHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/MaxHeightLayout.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/MaxHeightLayout.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/ToastUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/ToastUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/Util.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/AudioPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/AudioPickActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/BaseActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/BaseActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImageBrowserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImageBrowserActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImagePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImagePickActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/NormalFilePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/NormalFilePickActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/VideoPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/VideoPickActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/AudioPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/AudioPickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/BaseAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/BaseAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/FolderListAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/FolderListAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/ImagePickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/NormalFilePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/NormalFilePickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/OnSelectStateListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/OnSelectStateListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/VideoPickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/FileFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/FileFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/callback/FileLoaderCallbacks.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/callback/FileLoaderCallbacks.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/callback/FilterResultCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/callback/FilterResultCallback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/AudioFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/AudioFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/BaseFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/BaseFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/Directory.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/Directory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/ImageFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/ImageFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/NormalFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/NormalFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/VideoFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/VideoFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/AudioLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/AudioLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/FileLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/FileLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/ImageLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/ImageLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/VideoLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/loader/VideoLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/PickingMode.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/PickingMode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/filter/FileFilterx.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/filter/FileFilterx.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/anim/rotate_animation.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/anim/rotate_animation.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable-xxhdpi/vw_ic_synced.png" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable-xxhdpi/vw_ic_synced.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable-xxhdpi/vw_ic_synced_video.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/anim_rect.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/anim_rect.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/anim_square.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/anim_square.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/background_circle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/background_circle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/corner_animation_drawable.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/corner_animation_drawable.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_baseline_check_circle_24.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_baseline_check_circle_24.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_rectangle_93.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_rectangle_93.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_square_93.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/ic_square_93.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_bg_folder_list.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_bg_folder_list.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_divider_rv.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_divider_rv.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_divider_rv_file.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_divider_rv_file.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_selector_cbx.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_selector_cbx.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_selector_cbx_audio.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_selector_cbx_audio.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_synced.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/drawable/vw_synced.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_audio_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_audio_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_file_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_file_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_image_browser.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_image_browser.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_image_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_image_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_video_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_activity_video_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_folder_list.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_folder_list.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_audio_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_audio_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_folder_list.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_folder_list.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_image_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_image_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_normal_file_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_normal_file_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_video_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_item_video_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_top_bar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/layout/vw_layout_top_bar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/menu/vw_menu_image_pick.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/menu/vw_menu_image_pick.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values-zh/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values-zh/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values/colors.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/xml/file_paths.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/xml/file_paths.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/test/java/io/oz/fpick/ExampleUnitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/test/java/io/oz/fpick/ExampleUnitTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\Alice\.android\avd\Nexus_5_API_26.avd]" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
-        <projects_view />
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/app">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="example.android" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="example.android" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="example.android" type="f1a62948:ProjectNode" />
+                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="example.android" type="f1a62948:ProjectNode" />
+                <item name="app" type="2d1252cf:ModuleNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
       </state>
     </system>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="GradleLocalSettings">
     <option name="projectSyncType">
@@ -34,6 +208,8 @@
     <option name="width" value="1316" />
     <option name="height" value="680" />
   </component>
+  <component name="ProjectId" id="2GqstoE9XolucGOp11rDGYyvzmH" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
@@ -45,24 +221,21 @@
       <pane id="Scope" />
     </panes>
   </component>
+  <component name="ProjectViewState">
+    <option name="flattenPackages" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="android.sdk.path" value="$USER_HOME$/progs/andriod-sdk" />
-    <property name="settings.editor.selected.configurable" value="http.proxy" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="last_opened_file_path" value="$USER_HOME$/.gradle" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
     <property name="show.do.not.copy.http.proxy.settings.to.gradle" value="true" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Android App.app">
     <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -79,36 +252,113 @@
       </option>
       <patterns />
     </configuration>
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App">
+      <module name="example.android.app" />
+      <option name="DEPLOY" value="true" />
+      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+      <option name="DEPLOY_AS_INSTANT" value="false" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ALL_USERS" value="false" />
+      <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="INSPECTION_WITHOUT_ACTIVITY_RESTART" value="false" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Hybrid>
+      <Java />
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
+      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
-    <configuration default="true" type="TestNG" factoryName="TestNG">
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="SUITE_NAME" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="GROUP_NAME" />
-      <option name="TEST_OBJECT" value="CLASS" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
+    <configuration name="example.android" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" value="" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="TEST_OBJECT" value="class" />
       <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <option name="OUTPUT_DIRECTORY" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <option name="USE_DEFAULT_REPORTERS" value="false" />
-      <option name="PROPERTIES_FILE" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="TestNG">
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
       <properties />
       <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
-    <configuration name="&lt;template&gt;" type="JUnit" default="true" selected="false">
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.example.android" />
+      </list>
+    </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration>$USER_HOME$/.subversion</configuration>
   </component>
@@ -153,8 +403,17 @@
       <window_info id="Captures" order="2" weight="0.25" />
     </layout>
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="masterDetails">
     <states>
