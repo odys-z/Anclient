@@ -1,8 +1,5 @@
 package io.oz.albumtier;
 
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-
 /**
  * The contract between string.xml items and app constants.
  *
@@ -17,7 +14,6 @@ import android.content.res.Resources;
  * shared preferences. Those preference key can only be provided from package resource.</p>
  *
  * @see AlbumContext#init(Resources, PrefKeys, SharedPreferences)
- */
 public class PrefKeys {
     public String homeCate;
     public String home;
@@ -28,7 +24,8 @@ public class PrefKeys {
 
     public String login_summery;
 
-    /** button key in prefs screen for registering device */
+    /** button key in prefs screen for registering device * /
     public String bt_regist;
     public String bt_login;
 }
+ */

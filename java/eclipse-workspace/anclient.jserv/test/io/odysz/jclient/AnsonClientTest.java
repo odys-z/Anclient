@@ -58,8 +58,8 @@ public class AnsonClientTest {
 
     	Clients.init(jserv);
     	errCtx = new ErrorCtx() {
-    		public void onError(MsgCode code, AnsonResp resp) {
-    			fail(String.format("code: %s\nmsg: %s", resp.msg()));
+    		public void err(MsgCode code, String resp, String ...args ) {
+    			fail(String.format("code: %s\nmsg: %s", resp));
     		}
     	};
     }
