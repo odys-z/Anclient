@@ -35,15 +35,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.Configs;
+import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.PrefKeys;
 import io.oz.album.client.AlbumClientier;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.album.client.PrefsContentActivity;
-import io.oz.albumtier.PrefKeys;
 import io.oz.fpick.PickingMode;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
@@ -67,6 +69,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         super.onCreate(savedInstanceState);
 
         AlbumApp.keys = new PrefKeys();
+        // ISSUE to be simplified
         AlbumApp.keys.homeCate = getString(R.string.key_home_cate);
         AlbumApp.keys.home = getString(R.string.key_home);
         AlbumApp.keys.device = getString(R.string.key_device);
@@ -79,7 +82,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
         singl = AlbumApp.singl;
-        singl.init(getResources(), AlbumApp.keys, PreferenceManager.getDefaultSharedPreferences(this));
+        // singl.init(getResources(), AlbumApp.keys, PreferenceManager.getDefaultSharedPreferences(this));
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String homeName = sharedPref.getString(AlbumApp.keys.home, "");
+        String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
+        String device = sharedPref.getString(AlbumApp.keys.device, "");
+        String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
+
+        singl.init(homeName, uid, device, jserv);
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
@@ -129,9 +139,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                         SharedPreferences sharePrefs =
                                 PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
-                        String name = sharePrefs.getString(AlbumApp.keys.usrid, "");
-                        String device = sharePrefs.getString(AlbumApp.keys.device, "");
-                        showMsg(R.string.msg_device_uid, name, device);
+                        // String name = sharePrefs.getString(AlbumApp.keys.usrid, "");
+                        // String device = sharePrefs.getString(AlbumApp.keys.device, "");
+                        showMsg(R.string.msg_device_uid, uid, device);
                     }
                 });
 

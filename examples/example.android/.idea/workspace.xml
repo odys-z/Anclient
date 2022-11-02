@@ -15,31 +15,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5eb6677d-a777-4824-9d7e-85509a04ccd0" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/albumtier/.project" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/albumtier/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumSingletext.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefKeys.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/androidTest/java/io/oz/albumtier/ExampleInstrumentedTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/androidTest/java/io/oz/albumtier/ExampleInstrumentedTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PrefKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PrefKeys.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/TierCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/TierCallback.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/BaseFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/filter/entity/BaseFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/SessionClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/SessionClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/tier/ErrorAwaitHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/tier/ErrorAwaitHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/tier/ErrorCtx.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/tier/ErrorCtx.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/test/io/odysz/jclient/AnsonClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/test/io/odysz/jclient/AnsonClientTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\Alice\.android\avd\Nexus_5_API_26.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\Alice\.android\avd\Pixel_2_API_26.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -280,9 +268,14 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="android.sdk.path" value="$USER_HOME$/progs/andriod-sdk" />
     <property name="cidr.known.project.marker" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/.gradle" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/java/io/oz/album" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
     <property name="show.do.not.copy.http.proxy.settings.to.gradle" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Alice\github\anclient\examples\example.android\app\src\main\java\io\oz\album" />
+    </key>
   </component>
   <component name="RunManager" selected="Android App.app">
     <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
