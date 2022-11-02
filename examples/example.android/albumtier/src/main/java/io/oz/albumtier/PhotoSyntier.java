@@ -1,25 +1,39 @@
 package io.oz.albumtier;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.jclient.tier.Semantier;
+import io.odysz.semantic.DA.Connects;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
+import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
+import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
+import io.oz.album.tier.Photo;
+import io.oz.album.tier.PhotoMeta;
 import io.oz.jserv.sync.Synclientier;
 
-import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.LangExt.isNull;
 
 /**
  * @author odys-z@github.com
@@ -27,6 +41,8 @@ import static io.odysz.common.LangExt.isblank;
  */
 public class PhotoSyntier extends Semantier {
 	public static int blocksize = 3 * 1024 * 1024;
+
+	protected static PhotoMeta meta;
 
 	protected String clientUri;
 	protected String device;
@@ -39,6 +55,7 @@ public class PhotoSyntier extends Semantier {
 
 	static {
 		AnsonMsg.understandPorts(AlbumPort.album);
+		meta = new PhotoMeta(Connects.defltConn());
 	}
 
 	/**
@@ -52,12 +69,6 @@ public class PhotoSyntier extends Semantier {
 		this.client = client;
 		this.device = device;
 		this.errCtx = errCtx;
-
-		// String nodeId = Configs.getCfg("");
-		// this.synctier = new Synclientier(clientUri, null, nodeId, errCtx);
-
-//		this.worker = new SyncWorker(SyncMode.main, nodeId, conn, Kyiv.JNode.worker, meta)
-//				.login(Kyiv.JNode.passwd);
 	}
 
 	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
@@ -81,11 +92,11 @@ public class PhotoSyntier extends Semantier {
 				AnsonResp resp = client.commit(q, errCtx);
 				onOk.ok(resp);
 			} catch (IOException e) {
-				if (isblank(onErr))
+				if (isNull(onErr))
 					errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 			} catch (AnsonException | SemanticException e) { 
-				if (isblank(onErr))
+				if (isNull(onErr))
 					errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
 			} 
@@ -94,14 +105,23 @@ public class PhotoSyntier extends Semantier {
 		return this;
 	}
 	
-//	/**
-//	 * 
-//	 * @param videos
-//	 * @param user
-//	 * @param proc
-//	 * @param onErr
-//	 * @return
-//	 */
+	/**
+	 * 
+	 * @param videos
+	 * @param user
+	 * @param proc
+	 * @param onErr
+	 * @return list of response
+	 * @throws SQLException 
+	 * @throws IOException 
+	 * @throws TransException 
+	 */
+	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
+				SessionInf user, OnProcess proc, ErrorCtx ... onErr)
+			throws TransException, IOException, SQLException {
+		return synctier.pushBlocks( meta, videos, client.ssInfo(), proc, null, onErr);
+	}
+
 //	public List<DocsResp> syncVideos(List<? extends IFileDescriptor> videos,
 //				SessionInf user, OnProcess proc, ErrorCtx ... onErr) {
 //
@@ -180,14 +200,39 @@ public class PhotoSyntier extends Semantier {
 //		}
 //		return null;
 //	}
-//
+
+	public String download(Photo photo, String localpath)
+			throws SemanticException, AnsonException, IOException {
+		return synctier.download(clientUri, meta.tbl, photo, localpath);
+	}
+
 //	public String download(Photo photo, String localpath)
 //			throws SemanticException, AnsonException, IOException {
 //		AlbumReq req = new AlbumReq(clientUri).download(photo);
 //		req.a(A.download);
 //		return client.download(clientUri, AlbumPort.album, req, localpath);
 //	}
-//
+
+	/**
+	 * @param collId
+	 * @param localpath
+	 * @param clientname
+	 * @param share one of {@link io.odysz.semantic.ext.DocTableMeta.Share Share}'s consts.
+	 * @return response
+	 */
+	public AlbumResp insertPhoto(String collId, String localpath, String clientname, String share) {
+		SyncDoc doc = (SyncDoc) new SyncDoc()
+					.share(client.ssInfo().uid(), share, new Date())
+					.folder(folder) // FIXME album tier is different with Docsyncer
+					.fullpath(localpath);
+
+		synctier.insertSyncDoc(meta, doc, new OnDocOk() {
+			@Override
+			public void ok(SyncDoc doc, AnsonResp resp)
+					throws IOException, AnsonException, TransException, SQLException {
+			}});
+	}
+
 //	public AlbumResp insertPhoto(String collId, String fullpath, String clientname)
 //			throws SemanticException, IOException, AnsonException {
 //
@@ -202,7 +247,7 @@ public class PhotoSyntier extends Semantier {
 //
 //		return client.commit(q, errCtx);
 //	}
-//	
+
 //	/**Asynchronously query synchronizing records.
 //	 * @param files
 //	 * @param page
