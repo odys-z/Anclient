@@ -1,6 +1,6 @@
 # start Huawei Pro 30 for debug
 
-1 adb device show nothing
+1 adb device shows nothing
 
 see [stackoverflow](https://stackoverflow.com/a/53887437/7362888).
 
@@ -10,7 +10,7 @@ see [stackoverflow](https://stackoverflow.com/a/53887437/7362888).
 
 3 ajax CROS error
 
-trying stackoverflow
+try of stackoverflow
 
 [answer 1](https://stackoverflow.com/a/10567914/7362888)
 
