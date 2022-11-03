@@ -217,7 +217,7 @@ public class SessionClient {
 	 * @param body
 	 * @param localpath
 	 * @param act
-	 * @return localpath
+	 * @return local full path
 	 * @throws AnsonException
 	 * @throws SemanticException
 	 * @throws IOException

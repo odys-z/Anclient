@@ -1,8 +1,9 @@
 package io.oz.albumtier;
 
+import static io.odysz.common.LangExt.isNull;
+
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantic.tier.docs.DocsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.SyncDoc;
@@ -32,8 +34,6 @@ import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Photo;
 import io.oz.album.tier.PhotoMeta;
 import io.oz.jserv.sync.Synclientier;
-
-import static io.odysz.common.LangExt.isNull;
 
 /**
  * @author odys-z@github.com
@@ -105,21 +105,10 @@ public class PhotoSyntier extends Semantier {
 		return this;
 	}
 	
-	/**
-	 * 
-	 * @param videos
-	 * @param user
-	 * @param proc
-	 * @param onErr
-	 * @return list of response
-	 * @throws SQLException 
-	 * @throws IOException 
-	 * @throws TransException 
-	 */
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
-				SessionInf user, OnProcess proc, ErrorCtx ... onErr)
+				SessionInf user, OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException, SQLException {
-		return synctier.pushBlocks( meta, videos, client.ssInfo(), proc, null, onErr);
+		return synctier.pushBlocks( meta, videos, client.ssInfo(), proc, docOk, onErr);
 	}
 
 //	public List<DocsResp> syncVideos(List<? extends IFileDescriptor> videos,
@@ -219,18 +208,23 @@ public class PhotoSyntier extends Semantier {
 	 * @param clientname
 	 * @param share one of {@link io.odysz.semantic.ext.DocTableMeta.Share Share}'s consts.
 	 * @return response
+	 * @throws IOException 
+	 * @throws SQLException 
+	 * @throws TransException 
 	 */
-	public AlbumResp insertPhoto(String collId, String localpath, String clientname, String share) {
-		SyncDoc doc = (SyncDoc) new SyncDoc()
+	public DocsResp insertPhoto(String collId, String localpath, String clientname, String share)
+			throws IOException, TransException, SQLException {
+		Photo doc = (Photo) new Photo()
 					.share(client.ssInfo().uid(), share, new Date())
-					.folder(folder) // FIXME album tier is different with Docsyncer
+					//.folder(folder) // FIXME album tier is different with Docsyncer
 					.fullpath(localpath);
 
-		synctier.insertSyncDoc(meta, doc, new OnDocOk() {
+		return synctier.insertSyncDoc(meta, doc, new OnDocOk() {
 			@Override
 			public void ok(SyncDoc doc, AnsonResp resp)
 					throws IOException, AnsonException, TransException, SQLException {
-			}});
+			}}
+		);
 	}
 
 //	public AlbumResp insertPhoto(String collId, String fullpath, String clientname)
@@ -248,13 +242,43 @@ public class PhotoSyntier extends Semantier {
 //		return client.commit(q, errCtx);
 //	}
 
-//	/**Asynchronously query synchronizing records.
-//	 * @param files
-//	 * @param page
-//	 * @param onOk
-//	 * @param onErr
-//	 * @return this
-//	 */
+	/**Asynchronously query synchronizing records.
+	 * @param files
+	 * @param page
+	 * @param onOk
+	 * @param onErr
+	 * @return this
+	 */
+	public PhotoSyntier asynQueryDocs(List<? extends IFileDescriptor> files, DocsPage page, OnOk onOk, OnError onErr) {
+		new Thread(new Runnable() {
+	        public void run() {
+	        	DocsResp resp = null; 
+				try {
+					resp = synctier.queryDocs(files, page);
+				} catch (IOException e) {
+					onErr.err(MsgCode.exIo, e.getClass().getName(),
+							e.getMessage(), resp == null ? null : resp.msg());
+				} catch (AnsonException | SQLException e) { 
+					onErr.err(MsgCode.exGeneral, e.getClass().getName(),
+							e.getMessage(), resp == null ? null : resp.msg());
+				} catch (SemanticException e) { 
+					onErr.err(MsgCode.exSemantic, e.getClass().getName(),
+							e.getMessage(), resp == null ? null : resp.msg());
+				} catch (TransException e) { 
+					onErr.err(MsgCode.exTransct, e.getClass().getName(),
+							e.getMessage(), resp == null ? null : resp.msg());
+				}
+
+				try {
+					onOk.ok(resp);
+				} catch (AnsonException | SemanticException | IOException e) {
+					e.printStackTrace();
+				}
+	        }
+	    }).start();
+		return this;
+	}
+
 //	public AlbumSyntier asyncQuerySyncs(List<? extends IFileDescriptor> files, SyncingPage page, OnOk onOk, OnError onErr) {
 //		new Thread(new Runnable() {
 //	        public void run() {
@@ -292,12 +316,9 @@ public class PhotoSyntier extends Semantier {
 //	    } } ).start();
 //		return null;
 //	}
-//
+
 //	/**
 //	 * push photos
-//	 * 
-//	 * <b>Issue:</b>
-//	 * Can this been replaced by SyncWorker.push() ?
 //	 * 
 //	 * @param photos
 //	 * @param user
@@ -327,16 +348,39 @@ public class PhotoSyntier extends Semantier {
 //		}
 //		return reslts;
 //	}
-//	
-//	/**Asynchronously synchronize photos
-//	 * @param photos
-//	 * @param user
-//	 * @param onOk
-//	 * @param onErr
-//	 * @throws SemanticException
-//	 * @throws IOException
-//	 * @throws AnsonException
-//	 */
+
+	/**
+	 * Asynchronously push photos. This is different from push/pull of jserv nodes.
+	 * 
+	 * @param photos
+	 * @param user
+	 * @param onOk
+	 * @param onErr
+	 * @return this
+	 * @throws SemanticException
+	 * @throws IOException
+	 * @throws AnsonException
+	 */
+	public PhotoSyntier asyncPhotosUp(List<? extends SyncDoc> photos, SessionInf user, OnProcess proc, OnDocOk docOk, OnError onErr)
+			throws SemanticException, IOException, AnsonException {
+		new Thread(new Runnable() {
+	        public void run() {
+				try {
+					synctier.syncUp(photos, client.ssInfo().uid(), meta, proc, docOk);
+				} catch (IOException e) {
+					onErr.err(MsgCode.exIo, e.getClass().getName());
+				} catch (AnsonException | SQLException e) { 
+					onErr.err(MsgCode.exGeneral, e.getClass().getName());
+				} catch (SemanticException e) { 
+					onErr.err(MsgCode.exSemantic, e.getClass().getName());
+				} catch (TransException e) { 
+					onErr.err(MsgCode.exTransct, e.getClass().getName());
+				}
+
+	    } } ).start();
+		return this;
+	}
+
 //	public void asyncPhotos(List<? extends IFileDescriptor> photos, SessionInf user, OnOk onOk, OnError onErr)
 //			throws SemanticException, IOException, AnsonException {
 //		new Thread(new Runnable() {
@@ -375,7 +419,11 @@ public class PhotoSyntier extends Semantier {
 //			}
 //	    } } ).start();
 //	}
-//
+
+	public AlbumResp selectPhotoRec(String docId, ErrorCtx ... onErr) throws SemanticException {
+		throw new SemanticException("Why needed?");
+	}
+
 //	/**Get a photo record (this synchronous file base64 content)
 //	 * @param docId
 //	 * @param onErr
@@ -402,18 +450,16 @@ public class PhotoSyntier extends Semantier {
 //		}
 //		return resp;
 //	}
-//
-//	public AlbumSyntier blockSize(int size) {
-//		blocksize = size;
-//		return this;
-//	}
-//
-//	/**
-//	 * @deprecated replaced by {@link Synclientier#del(String, String)}
-//	 * @param device
-//	 * @param clientpath
-//	 * @return
-//	 */
+
+	public PhotoSyntier blockSize(int size) {
+		synctier.blockSize(size);
+		return this;
+	}
+
+	public DocsResp del(String device, String clientpath) {
+		return synctier.del(meta, device, clientpath);
+	}
+
 //	public DocsResp del(String device, String clientpath) {
 //		AlbumReq req = new AlbumReq().del(device, clientpath);
 //
