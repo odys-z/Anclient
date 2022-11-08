@@ -18,6 +18,7 @@ import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
+import io.oz.albumtier.PhotoSyntier;
 
 /**
  */
@@ -47,15 +48,15 @@ public class PrefsContentActivity extends AppCompatActivity {
         try {
             singleton.login(
                 (tier) -> {
-                    singleton.tier = tier;
+                    // singleton.tier = (PhotoSyntier) tier;
                     updateSummery(prefFragment.summery, getString(R.string.login_succeed));
                     updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
 
                     // load settings
                     Anson.verbose = true;
-                    tier.getSettings(
+                    ((PhotoSyntier)singleton.tier).getSettings(
                         (resp) -> {
-                            singleton.homeName = ((AlbumResp) resp).profils.home();
+                            singleton.homeName = ((AlbumResp) resp).profiles().home();
                             updateSummery(prefFragment.homepref, singleton.homeName);
 
                             SharedPreferences sharedPref =
