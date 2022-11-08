@@ -7,11 +7,10 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import org.xml.sax.SAXException;
+
 import io.odysz.anson.x.AnsonException;
-import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
-import io.odysz.jclient.tier.Semantier;
-import io.odysz.semantic.DA.Connects;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
@@ -36,45 +35,52 @@ import io.oz.album.tier.PhotoMeta;
 import io.oz.jserv.sync.Synclientier;
 
 /**
+ * Photo client - won't access local db.
+ * 
  * @author odys-z@github.com
  *
  */
-public class PhotoSyntier extends Semantier {
+public class PhotoSyntier extends Synclientier {
 	public static int blocksize = 3 * 1024 * 1024;
 
 	protected static PhotoMeta meta;
 
-	protected String clientUri;
-	protected String device;
-
-	protected ErrorCtx errCtx;
-
-	protected Synclientier synctier;
-
-	private SessionClient client;
+//	protected String clientUri;
+//	protected String device;
+//
+//	protected ErrorCtx errCtx;
+//
+//	protected Synclientier synctier;
+//
+//	// private SessionClient client;
 
 	static {
 		AnsonMsg.understandPorts(AlbumPort.album);
-		meta = new PhotoMeta(Connects.defltConn());
+		meta = new PhotoMeta(null); // this tier won't access local db.
 	}
 
 	/**
 	 * @param clientUri - the client function uri this instance will be used for.
 	 * @param device
-	 * @param client 
 	 * @param errCtx
+	 * @throws IOException 
+	 * @throws SAXException 
+	 * @throws SQLException 
+	 * @throws SemanticException 
 	 */
-	public PhotoSyntier(String uri, SessionClient client, String device, ErrorCtx errCtx) {
-		this.clientUri = uri;
-		this.client = client;
-		this.device = device;
-		this.errCtx = errCtx;
+	public PhotoSyntier(String clientUri, String device, ErrorCtx errCtx)
+			throws SemanticException, IOException {
+		super(clientUri, device, errCtx);
+//		this.clientUri = uri;
+//		// this.client = client;
+//		this.device = device;
+//		this.errCtx = errCtx;
 	}
 
 	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
-		AlbumReq req = new AlbumReq(clientUri).collectId("c-001");
+		AlbumReq req = new AlbumReq(uri).collectId("c-001");
 		req.a(A.collect);
-		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(clientUri, AlbumPort.album, req);
+		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req);
 		return client.commit(q, errCtx);
 	}
 	
@@ -85,9 +91,9 @@ public class PhotoSyntier extends Semantier {
 				AnsonHeader header = client.header()
 						.act("album.java", "profile", "r/settings", "load profile");
 
-				AlbumReq req = new AlbumReq(clientUri);
+				AlbumReq req = new AlbumReq(uri);
 				req.a(A.getPrefs);
-				AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(clientUri, AlbumPort.album, req)
+				AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req)
 						.header(header);
 				AnsonResp resp = client.commit(q, errCtx);
 				onOk.ok(resp);
@@ -107,8 +113,8 @@ public class PhotoSyntier extends Semantier {
 	
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
 				SessionInf user, OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
-			throws TransException, IOException, SQLException {
-		return synctier.pushBlocks( meta, videos, client.ssInfo(), proc, docOk, onErr);
+			throws TransException, IOException {
+		return pushBlocks( meta, videos, client.ssInfo(), proc, docOk, onErr);
 	}
 
 //	public List<DocsResp> syncVideos(List<? extends IFileDescriptor> videos,
@@ -192,7 +198,7 @@ public class PhotoSyntier extends Semantier {
 
 	public String download(Photo photo, String localpath)
 			throws SemanticException, AnsonException, IOException {
-		return synctier.download(clientUri, meta.tbl, photo, localpath);
+		return download(uri, meta.tbl, photo, localpath);
 	}
 
 //	public String download(Photo photo, String localpath)
@@ -219,10 +225,10 @@ public class PhotoSyntier extends Semantier {
 					//.folder(folder) // FIXME album tier is different with Docsyncer
 					.fullpath(localpath);
 
-		return synctier.insertSyncDoc(meta, doc, new OnDocOk() {
+		return insertSyncDoc(meta, doc, new OnDocOk() {
 			@Override
 			public void ok(SyncDoc doc, AnsonResp resp)
-					throws IOException, AnsonException, TransException, SQLException {
+					throws IOException, AnsonException, TransException {
 			}}
 		);
 	}
@@ -254,7 +260,7 @@ public class PhotoSyntier extends Semantier {
 	        public void run() {
 	        	DocsResp resp = null; 
 				try {
-					resp = synctier.queryDocs(files, page);
+					resp = queryDocs(files, page);
 				} catch (IOException e) {
 					onErr.err(MsgCode.exIo, e.getClass().getName(),
 							e.getMessage(), resp == null ? null : resp.msg());
@@ -366,7 +372,7 @@ public class PhotoSyntier extends Semantier {
 		new Thread(new Runnable() {
 	        public void run() {
 				try {
-					synctier.syncUp(photos, client.ssInfo().uid(), meta, proc, docOk);
+					syncUp(photos, client.ssInfo().uid(), meta, proc, docOk);
 				} catch (IOException e) {
 					onErr.err(MsgCode.exIo, e.getClass().getName());
 				} catch (AnsonException | SQLException e) { 
@@ -451,13 +457,13 @@ public class PhotoSyntier extends Semantier {
 //		return resp;
 //	}
 
-	public PhotoSyntier blockSize(int size) {
-		synctier.blockSize(size);
-		return this;
-	}
+//	public PhotoSyntier blockSize(int size) {
+//		super.blockSize(size);
+//		return this;
+//	}
 
 	public DocsResp del(String device, String clientpath) {
-		return synctier.del(meta, device, clientpath);
+		return del(meta, device, clientpath);
 	}
 
 //	public DocsResp del(String device, String clientpath) {
