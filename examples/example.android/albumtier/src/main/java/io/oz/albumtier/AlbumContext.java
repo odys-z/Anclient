@@ -1,26 +1,32 @@
 package io.oz.albumtier;
 
-// import android.content.SharedPreferences;
-// import android.content.res.Resources;
-
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
+import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
-import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.jprotocol.JProtocol.OnError;
+import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
-import io.oz.album.client.AlbumClientier;
 
 public class AlbumContext {
+    public enum ConnState { Online, Disconnected, LoginFailed }
+
     public static final String jdocbase  = "jserv-album";
     public static final String albumHome = "dist/index.html";
     public static final String synchPage = "dist/sync.html";
+    public static boolean verbose = true;
 
     static AlbumContext instance;
+
+    public final String clientUri = "album.and";
+    public final ErrorCtx errCtx = new ErrorCtx();
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
@@ -45,27 +51,11 @@ public class AlbumContext {
                 || LangExt.isblank(photoUser.uid());
     }
 
-    public enum ConnState { Online, Disconnected, LoginFailed }
-
-    protected static final boolean verbose = true;
-
-    public final String clientUri = "album.and";
-    public final ErrorCtx errCtx = new ErrorCtx();
-//    public final ErrorCtx errCtx = new ErrorCtx() {
-//        String msg;
-//        AnsonMsg.MsgCode code;
-//        @Override
-//        public void err(AnsonMsg.MsgCode c, String msg, String ...args) {
-//            code = c;
-//            this.msg = msg;
-//        }
-//    };
-
     String jserv;
 
     public String homeName;
 
-    public AlbumClientier tier;
+    public PhotoSyntier tier;
 
     // private SessionClient client;
 
@@ -108,19 +98,23 @@ public class AlbumContext {
         Clients.init(jserv + "/" + jdocbase, verbose);
     }
 
-    AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr)
-            throws GeneralSecurityException {
+    AlbumContext login(String uid, String pswd, OnOk onOk, OnError onErr)
+            throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("Device Id is null.");
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 
+        tier = (PhotoSyntier) new PhotoSyntier(clientUri, photoUser.device, errCtx)
+				.login(uid, photoUser.device, pswd);
+
+        /*
         Clients.loginAsync(uid, pswd,
             (client) -> {
                 client.closeLink();
 
-                tier = new AlbumClientier(clientUri, client, errCtx);
+                tier = new PhotoSyntier(clientUri, client, photoUser.device, errCtx);
                 client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min
                 state = ConnState.Online;
                 if (onOk != null)
@@ -134,21 +128,22 @@ public class AlbumContext {
                 if (onErr != null)
                     onErr.err(c, r, v);
             }, photoUser.device);
+        */
         return this;
     }
 
-    public void login(TierCallback onOk, JProtocol.OnError onErr)
-            throws GeneralSecurityException {
+    public void login(OnOk onOk, OnError onErr)
+            throws GeneralSecurityException, SemanticException, AnsonException, IOException {
         login(photoUser.uid(), pswd, onOk, onErr);
     }
 
-    JProtocol.OnOk onHeartbeat = ((resp) -> {
+    OnOk onHeartbeat = ((resp) -> {
         if (state == ConnState.Disconnected)
             ; // how to notify?
         state = ConnState.Online;
     });
 
-    JProtocol.OnError onLinkBroken = ((c, r, args) -> {
+    OnError onLinkBroken = ((c, r, args) -> {
         state = ConnState.Disconnected;
     });
 
