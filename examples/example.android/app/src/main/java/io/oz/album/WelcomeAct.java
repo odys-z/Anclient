@@ -35,14 +35,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.Configs;
-import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
-import io.oz.album.PrefKeys;
-import io.oz.album.client.AlbumClientier;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.album.client.PrefsContentActivity;
@@ -113,7 +110,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     result -> {
                         if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                             if (singl.state() == AlbumContext.ConnState.Online) {
-                                onVideoPicked(result);
+                                try {
+                                    onVideoPicked(result);
+                                } catch (IOException | SemanticException e) {
+                                    e.printStackTrace();
+                                }
                             }
                             else showMsg(R.string.msg_ignored_when_offline);
                         }
@@ -137,8 +138,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
 
-                        SharedPreferences sharePrefs =
-                                PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+                        // SharedPreferences sharePrefs =
+                        //        PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
                         // String name = sharePrefs.getString(AlbumApp.keys.usrid, "");
                         // String device = sharePrefs.getString(AlbumApp.keys.device, "");
                         showMsg(R.string.msg_device_uid, uid, device);
@@ -154,9 +155,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             if (singl.needSetup())
                 // settings are cleared
                 startPrefsAct();
-            else singl.login(
-                (AlbumClientier tier) -> { },
-                (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
+            else
+                singl.pswd(sharedPref.getString(AlbumApp.keys.pswd, ""))
+                     .login(
+                        (tier) -> { },
+                        (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
         }
@@ -184,7 +187,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     void showProgress(int listIx, ArrayList<BaseFile> list, int blocks, DocsResp resp) {
         runOnUiThread(() -> {
             String msg = String.format(getString(R.string.msg_templ_progress),
-                    listIx, list.size(), resp.clientname(), (float) resp.blockSeq() / blocks * 100);
+                    listIx, list.size(), resp.doc.clientname(), (float) resp.blockSeq() / blocks * 100);
             msgv.setText(msg);
             msgv.setVisibility(View.VISIBLE);
         });
@@ -237,13 +240,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
                 else
-                    singl.tier.asyncPhotos(list, singl.photoUser,
-                        (resp) -> {
-                            showMsg(R.string.t_synch_ok, list.size());
-                        },
-                        (c, r, args) -> {
-                            showMsg(R.string.msg_upload_failed, (Object[]) args);
-                        });
+                    singl.tier.asyncPhotosUp(list, singl.photoUser,
+                        null,
+                        (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
+                        (c, r, args) -> showMsg(R.string.msg_upload_failed, (Object[]) args));
             }
         } catch (SemanticException | IOException | AnsonException e) {
             e.printStackTrace();
@@ -265,23 +265,17 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         vidPickActStarter.launch(imgIntent);
     }
 
-    protected void onVideoPicked(@NonNull ActivityResult result) {
+    protected void onVideoPicked(@NonNull ActivityResult result) throws IOException, SemanticException {
         Intent data = result.getData();
         if (data != null) {
             ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
             if (singl.tier == null)
                 showMsg(R.string.txt_please_login);
             else
-                singl.tier.asyncVideos(list, singl.photoUser,
-                        (lx, blocks, resp) -> {
-                            showProgress(lx, list, blocks, resp);
-                        },
-                        (resp) -> {
-                            showMsg(R.string.t_synch_ok, list.size());
-                        },
-                        (c, r, args) -> {
-                            showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
-                        });
+                singl.tier.asyncPhotosUp(list, singl.photoUser,
+                        (rx, rows, bx, total, resp) -> showProgress(rx, list, bx, (DocsResp) resp),
+                        (doc, resp) -> showMsg(R.string.t_synch_ok, list.size()),
+                        (c, r, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
         }
     }
 
@@ -363,9 +357,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     try {
                         if (singl.tier != null)
-                            singl.tier.syncPhotos(list, singl.photoUser);
+                            singl.tier.syncVideos(list, singl.photoUser, null, null);
                         else showMsg(R.string.msg_ignored_when_offline);
-                    } catch (IOException | AnsonException | SemanticException e) {
+                    } catch (IOException | AnsonException | TransException e) {
                         e.printStackTrace();
                     }
                 }

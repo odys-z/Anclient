@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.SyncingPage;
+import io.odysz.semantic.tier.docs.DocsPage;
 import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
@@ -49,7 +49,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     protected AlbumContext singleton;
 
-    protected SyncingPage synchPage;
+    protected DocsPage synchPage;
 
     public BaseSynchronizer(Context ctx, ArrayList<T> list) {
         this.singleton = AlbumContext.getInstance();
@@ -81,15 +81,15 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         mList.addAll(list);
         notifyDataSetChanged();
 
-        synchPage = new SyncingPage(0, Math.min(20, mList.size()));
+        synchPage = new DocsPage(0, Math.min(20, mList.size()));
         synchPage.taskNo = nextRandomInt();
         synchPage.device = singleton.photoUser.device;
         if (singleton.tier != null)
             startSynchQuery(synchPage);
     }
 
-    void startSynchQuery(SyncingPage page) {
-        singleton.tier.asyncQuerySyncs(mList, page,
+    void startSynchQuery(DocsPage page) {
+        singleton.tier.asynQueryDocs(mList, page,
                 onSychnQueryRespons,
                 (c, r, args) -> {
                     Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
@@ -121,7 +121,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
     };
 
-    void updateIcons(SyncingPage synchPage) {
+    void updateIcons(DocsPage synchPage) {
         ((Activity)mContext).runOnUiThread( () -> {
             notifyItemRangeChanged(synchPage.start, synchPage.end);
         });

@@ -10,6 +10,7 @@ import java.util.Date;
 
 import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.odysz.semantic.tier.docs.SyncDoc;
 
 /**
  * Modyfied by Ody Zhou
@@ -19,7 +20,7 @@ import io.odysz.semantic.tier.docs.IFileDescriptor;
  * Time: 17:32
  */
 
-public class BaseFile implements Parcelable, IFileDescriptor {
+public class BaseFile extends SyncDoc implements Parcelable {
     public static int Synchronized = 1;
     public static int SynchUnknown = 0;
     public static int Synchronizing = -1;
@@ -34,6 +35,8 @@ public class BaseFile implements Parcelable, IFileDescriptor {
     private boolean isSelected;
 
     public int synchFlag = SynchUnknown;
+
+    private String recId;
 
     @Override
     public boolean equals(Object o) {
@@ -151,36 +154,50 @@ public class BaseFile implements Parcelable, IFileDescriptor {
 
     // String recId; @Override public String recId() { return recId; }
 
-//    @Override
 //    public IFileDescriptor recId(String rid) {
 //        this.recId = rid;
 //        return this;
 //    }
 
-    @Override
-    public String fullpath() {
-        return path;
-    }
+//    @Override
+//    public String recId() {
+//        return recId;
+//    }
 
-    @Override
-    public IFileDescriptor fullpath(String clientpath) throws IOException {
-        path = clientpath;
-        return this;
-    }
+//    @Override
+//    public String fullpath() {
+//        return path;
+//    }
 
-    @Override
-    public String clientname() {
-        Path p = Paths.get(path);
-        return p.getFileName().toString();
-    }
-
-    @Override
-    public String cdate() {
-        return DateFormat.format(new Date(date));
-    }
-
-//    public BaseFile synchFlag(int syncFlag) {
-//        this.synchFlag = syncFlag;
+//    @Override
+//    public IFileDescriptor fullpath(String clientpath) throws IOException {
+//        path = clientpath;
 //        return this;
+//    }
+
+//    @Override
+//    public String clientname() {
+//        Path p = Paths.get(path);
+//        return p.getFileName().toString();
+//    }
+//
+//    @Override
+//    public String mime() {
+//        return "TODO";
+//    }
+
+//    @Override
+//    public String cdate() {
+//        return DateFormat.format(new Date(date));
+//    }
+//
+//    @Override
+//    public String device() {
+//        return "TODO";
+//    }
+
+//    @Override
+//    public String uri() {
+//        return "TODO";
 //    }
 }

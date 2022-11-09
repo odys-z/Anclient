@@ -39,9 +39,10 @@ dependencies {
     //     exclude group: "org.apache.tika", module: "tika-core"
     //     exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
     // }
-    implementation (group: 'io.github.odys-z', name: 'albumtier', version: "$albumtier_ver") {
+    implementation (group: 'io.github.odys-z', name: 'albumtier', version: "${albumtier_ver}") {
         exclude group: "org.apache.tika", module: "tika-core"
         exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
+        changing = true;
     }
 
     testImplementation 'junit:junit:4.13.2'
