@@ -45,15 +45,6 @@ public class PhotoSyntier extends Synclientier {
 
 	protected static PhotoMeta meta;
 
-//	protected String clientUri;
-//	protected String device;
-//
-//	protected ErrorCtx errCtx;
-//
-//	protected Synclientier synctier;
-//
-//	// private SessionClient client;
-
 	static {
 		AnsonMsg.understandPorts(AlbumPort.album);
 		meta = new PhotoMeta(null); // this tier won't access local db.
@@ -70,11 +61,7 @@ public class PhotoSyntier extends Synclientier {
 	 */
 	public PhotoSyntier(String clientUri, String device, ErrorCtx errCtx)
 			throws SemanticException, IOException {
-		super(clientUri, device, errCtx);
-//		this.clientUri = uri;
-//		// this.client = client;
-//		this.device = device;
-//		this.errCtx = errCtx;
+		super(clientUri, errCtx);
 	}
 
 	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
