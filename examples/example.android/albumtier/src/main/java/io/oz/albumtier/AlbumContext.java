@@ -7,6 +7,7 @@ import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
+import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
@@ -98,7 +99,7 @@ public class AlbumContext {
         Clients.init(jserv + "/" + jdocbase, verbose);
     }
 
-    AlbumContext login(String uid, String pswd, OnOk onOk, OnError onErr)
+    AlbumContext login(String uid, String pswd, OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
@@ -107,32 +108,12 @@ public class AlbumContext {
         Clients.init(jserv + "/" + jdocbase, verbose);
 
         tier = (PhotoSyntier) new PhotoSyntier(clientUri, photoUser.device, errCtx)
-				.login(uid, photoUser.device, pswd);
+				.asyLogin(uid, pswd, photoUser.device, onOk, onErr);
 
-        /*
-        Clients.loginAsync(uid, pswd,
-            (client) -> {
-                client.closeLink();
-
-                tier = new PhotoSyntier(clientUri, client, photoUser.device, errCtx);
-                client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min
-                state = ConnState.Online;
-                if (onOk != null)
-                    onOk.ok(tier);
-            },
-            // Design Note: since error context don't have unified error message box,
-            // error context pattern of React is not applicable.
-            // errCtx.onError(c, r, (Object)v);
-            (c, r, v) -> {
-                state = ConnState.LoginFailed;
-                if (onErr != null)
-                    onErr.err(c, r, v);
-            }, photoUser.device);
-        */
         return this;
     }
 
-    public void login(OnOk onOk, OnError onErr)
+    public void login(OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
         login(photoUser.uid(), pswd, onOk, onErr);
     }

@@ -10,6 +10,8 @@ import java.util.List;
 import org.xml.sax.SAXException;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.jclient.Clients;
+import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -63,6 +65,15 @@ public class PhotoSyntier extends Synclientier {
 			throws SemanticException, IOException {
 		super(clientUri, errCtx);
 	}
+	
+	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
+		Clients.loginAsync(uid, pswd, (client) -> {
+			onLogin(client);
+			ok.ok(client);
+		}, err, device);
+
+		return this;
+	}
 
 	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
 		AlbumReq req = new AlbumReq(uri).collectId("c-001");
@@ -71,7 +82,7 @@ public class PhotoSyntier extends Synclientier {
 		return client.commit(q, errCtx);
 	}
 	
-	public PhotoSyntier getSettings(OnOk onOk, OnError... onErr) {
+	public PhotoSyntier asyGetSettings(OnOk onOk, OnError... onErr) {
 		new Thread(new Runnable() {
 			public void run() {
 			try {
