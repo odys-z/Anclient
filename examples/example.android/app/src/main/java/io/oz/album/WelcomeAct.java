@@ -35,15 +35,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.Configs;
-import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
-import io.oz.album.PrefKeys;
-import io.oz.album.client.AlbumClientier;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.album.client.PrefsContentActivity;
@@ -142,8 +138,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
 
-                        SharedPreferences sharePrefs =
-                                PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+                        // SharedPreferences sharePrefs =
+                        //        PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
                         // String name = sharePrefs.getString(AlbumApp.keys.usrid, "");
                         // String device = sharePrefs.getString(AlbumApp.keys.device, "");
                         showMsg(R.string.msg_device_uid, uid, device);
@@ -246,12 +242,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 else
                     singl.tier.asyncPhotosUp(list, singl.photoUser,
                         null,
-                        (resp, v) -> {
-                            showMsg(R.string.t_synch_ok, list.size());
-                        },
-                        (c, r, args) -> {
-                            showMsg(R.string.msg_upload_failed, (Object[]) args);
-                        });
+                        (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
+                        (c, r, args) -> showMsg(R.string.msg_upload_failed, (Object[]) args));
             }
         } catch (SemanticException | IOException | AnsonException e) {
             e.printStackTrace();
@@ -281,15 +273,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 showMsg(R.string.txt_please_login);
             else
                 singl.tier.asyncPhotosUp(list, singl.photoUser,
-                        (rx, rows, bx, total, resp) -> {
-                            showProgress(rx, list, bx, (DocsResp) resp);
-                        },
-                        (doc, resp) -> {
-                            showMsg(R.string.t_synch_ok, list.size());
-                        },
-                        (c, r, args) -> {
-                            showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
-                        });
+                        (rx, rows, bx, total, resp) -> showProgress(rx, list, bx, (DocsResp) resp),
+                        (doc, resp) -> showMsg(R.string.t_synch_ok, list.size()),
+                        (c, r, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
         }
     }
 

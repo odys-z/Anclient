@@ -19,7 +19,7 @@ allprojects {
         anclient_ver = "0.4.16-SNAPSHOT"
         jserv_ver = "1.4.12"
         album_lib_ver = "0.4.20-SNAPSHOT"
-        albumtier_ver = "0.1.3-SNAPSHOT"
+        albumtier_ver = "0.1.7-SNAPSHOT"
     }
 
     repositories {
