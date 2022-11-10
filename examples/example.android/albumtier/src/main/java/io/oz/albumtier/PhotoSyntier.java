@@ -10,6 +10,8 @@ import java.util.List;
 import org.xml.sax.SAXException;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.jclient.Clients;
+import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -45,15 +47,6 @@ public class PhotoSyntier extends Synclientier {
 
 	protected static PhotoMeta meta;
 
-//	protected String clientUri;
-//	protected String device;
-//
-//	protected ErrorCtx errCtx;
-//
-//	protected Synclientier synctier;
-//
-//	// private SessionClient client;
-
 	static {
 		AnsonMsg.understandPorts(AlbumPort.album);
 		meta = new PhotoMeta(null); // this tier won't access local db.
@@ -70,11 +63,17 @@ public class PhotoSyntier extends Synclientier {
 	 */
 	public PhotoSyntier(String clientUri, String device, ErrorCtx errCtx)
 			throws SemanticException, IOException {
-		super(clientUri, device, errCtx);
-//		this.clientUri = uri;
-//		// this.client = client;
-//		this.device = device;
-//		this.errCtx = errCtx;
+		super(clientUri, errCtx);
+	}
+	
+	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
+		Clients.loginAsync(uid, pswd, (client) -> {
+			this.client = client;
+			onLogin(client);
+			ok.ok(client);
+		}, err, device);
+
+		return this;
 	}
 
 	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
@@ -84,7 +83,7 @@ public class PhotoSyntier extends Synclientier {
 		return client.commit(q, errCtx);
 	}
 	
-	public PhotoSyntier getSettings(OnOk onOk, OnError... onErr) {
+	public PhotoSyntier asyGetSettings(OnOk onOk, OnError... onErr) {
 		new Thread(new Runnable() {
 			public void run() {
 			try {
@@ -270,7 +269,7 @@ public class PhotoSyntier extends Synclientier {
 				} catch (SemanticException e) { 
 					onErr.err(MsgCode.exSemantic, e.getClass().getName(),
 							e.getMessage(), resp == null ? null : resp.msg());
-				} catch (TransException e) { 
+				} catch (TransException e) {
 					onErr.err(MsgCode.exTransct, e.getClass().getName(),
 							e.getMessage(), resp == null ? null : resp.msg());
 				}
