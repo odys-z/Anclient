@@ -28,6 +28,7 @@ import io.odysz.semantic.tier.docs.DocsPage;
 import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
+import io.oz.jserv.sync.SyncFlag;
 
 public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
@@ -90,13 +91,13 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     void startSynchQuery(DocsPage page) {
         singleton.tier.asynQueryDocs(mList, page,
-                onSychnQueryRespons,
+                onSyncQueryResponse,
                 (c, r, args) -> {
                     Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
                 });
     }
 
-    JProtocol.OnOk onSychnQueryRespons = (resp) -> {
+    JProtocol.OnOk onSyncQueryResponse = (resp) -> {
         AlbumResp rsp = (AlbumResp) resp;
         if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
 //            Photo[] phts = rsp.photos(0);
@@ -108,7 +109,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
             for (int i = synchPage.start; i < synchPage.end; i++) {
                 T f = mList.get(i);
                 if (phts.keySet().contains(f.fullpath())) {
-                    f.synchFlag = 1;
+                    // f.syncFlag = SyncFlag.priv;
                 }
             }
 
