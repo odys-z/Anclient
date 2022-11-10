@@ -47,7 +47,7 @@ public class PrefsContentActivity extends AppCompatActivity {
     public void onLogin(View btn) {
         try {
             singleton.login(
-                (tier) -> {
+                (client) -> {
                     // singleton.tier = (PhotoSyntier) tier;
                     updateSummery(prefFragment.summery, getString(R.string.login_succeed));
                     updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));

@@ -68,6 +68,7 @@ public class PhotoSyntier extends Synclientier {
 	
 	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
 		Clients.loginAsync(uid, pswd, (client) -> {
+			this.client = client;
 			onLogin(client);
 			ok.ok(client);
 		}, err, device);
@@ -268,7 +269,7 @@ public class PhotoSyntier extends Synclientier {
 				} catch (SemanticException e) { 
 					onErr.err(MsgCode.exSemantic, e.getClass().getName(),
 							e.getMessage(), resp == null ? null : resp.msg());
-				} catch (TransException e) { 
+				} catch (TransException e) {
 					onErr.err(MsgCode.exTransct, e.getClass().getName(),
 							e.getMessage(), resp == null ? null : resp.msg());
 				}

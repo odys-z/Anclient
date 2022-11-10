@@ -58,8 +58,6 @@ public class AlbumContext {
 
     public PhotoSyntier tier;
 
-    // private SessionClient client;
-
     public SessionInf photoUser;
 
     ConnState state;
@@ -83,7 +81,7 @@ public class AlbumContext {
         jserv = sharedPref.getString(prefkeys.jserv, "");
      </pre>
      */
-    public void init(String family, String uid, String device, String jserv) {
+    public AlbumContext init(String family, String uid, String device, String jserv) {
     	/*
         homeName = sharedPref.getString(prefkeys.home, "");
         String uid = sharedPref.getString(prefkeys.usrid, "");
@@ -97,6 +95,8 @@ public class AlbumContext {
         this.jserv = jserv;
 
         Clients.init(jserv + "/" + jdocbase, verbose);
+        
+        return this;
     }
 
     AlbumContext login(String uid, String pswd, OnLogin onOk, OnError onErr)
