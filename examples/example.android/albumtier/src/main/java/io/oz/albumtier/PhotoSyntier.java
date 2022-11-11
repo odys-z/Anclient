@@ -24,7 +24,6 @@ import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantic.tier.docs.DocsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
-import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -247,37 +246,38 @@ public class PhotoSyntier extends Synclientier {
 //		return client.commit(q, errCtx);
 //	}
 
-	/**Asynchronously query synchronizing records.
+	/**
+	 * Asynchronously query synchronizing records.
+	 * 
 	 * @param files
 	 * @param page
 	 * @param onOk
 	 * @param onErr
 	 * @return this
 	 */
-	public PhotoSyntier asynQueryDocs(List<? extends IFileDescriptor> files, DocsPage page, OnOk onOk, OnError onErr) {
+	public PhotoSyntier asynQueryDocs(List<? extends SyncDoc> files, DocsPage page, OnOk onOk, OnError onErr) {
 		new Thread(new Runnable() {
 	        public void run() {
 	        	DocsResp resp = null; 
 				try {
-					resp = queryDocs(files, page);
+					resp = queryDocs(files, page, meta);
+					try {
+						onOk.ok(resp);
+					} catch (AnsonException | SemanticException | IOException e) {
+						e.printStackTrace();
+					}
 				} catch (IOException e) {
 					onErr.err(MsgCode.exIo, e.getClass().getName(),
-							e.getMessage(), resp == null ? null : resp.msg());
+						e.getMessage(), resp == null ? null : resp.msg());
 				} catch (AnsonException | SQLException e) { 
 					onErr.err(MsgCode.exGeneral, e.getClass().getName(),
-							e.getMessage(), resp == null ? null : resp.msg());
+						e.getMessage(), resp == null ? null : resp.msg());
 				} catch (SemanticException e) { 
 					onErr.err(MsgCode.exSemantic, e.getClass().getName(),
-							e.getMessage(), resp == null ? null : resp.msg());
+						e.getMessage(), resp == null ? null : resp.msg());
 				} catch (TransException e) {
 					onErr.err(MsgCode.exTransct, e.getClass().getName(),
-							e.getMessage(), resp == null ? null : resp.msg());
-				}
-
-				try {
-					onOk.ok(resp);
-				} catch (AnsonException | SemanticException | IOException e) {
-					e.printStackTrace();
+						e.getMessage(), resp == null ? null : resp.msg());
 				}
 	        }
 	    }).start();
@@ -454,11 +454,6 @@ public class PhotoSyntier extends Synclientier {
 //			errHandler.onError(MsgCode.exIo, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
 //		}
 //		return resp;
-//	}
-
-//	public PhotoSyntier blockSize(int size) {
-//		super.blockSize(size);
-//		return this;
 //	}
 
 	public DocsResp del(String device, String clientpath) {
