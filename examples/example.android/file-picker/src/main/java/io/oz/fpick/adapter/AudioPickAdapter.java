@@ -23,6 +23,7 @@ import com.vincent.filepicker.filter.entity.VideoFile;
 import java.util.ArrayList;
 
 import io.oz.fpick.R;
+import io.oz.jserv.sync.SyncFlag;
 
 /**
  * Created by Ody Zhou
@@ -64,13 +65,15 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         }
 
         holder.mTvDuration.setText(Util.getDurationString(file.getDuration()));
-        if (file.synchFlag == BaseFile.Synchronizing) {
+        // if (BaseFile.Synchronizing.equals(file.syncFlag)) {
+        if (SyncFlag.priv.equals(file.syncFlag)) {
             holder.mCbx.setSelected ( false );
             holder.icAlbum.setVisibility(View.GONE);
             holder.icSyncing.setVisibility(View.VISIBLE);
             holder.icSynced.setVisibility(View.GONE);
         }
-        else if (file.synchFlag == BaseFile.Synchronized) {
+        // else if (BaseFile.Synchronized.equals(file.syncFlag)) {
+        else if (SyncFlag.publish.equals(file.syncFlag)) {
             holder.mCbx.setSelected(true);
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);

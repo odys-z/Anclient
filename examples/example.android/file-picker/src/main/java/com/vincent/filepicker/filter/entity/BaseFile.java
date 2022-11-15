@@ -21,9 +21,9 @@ import io.odysz.semantic.tier.docs.SyncDoc;
  */
 
 public class BaseFile extends SyncDoc implements Parcelable {
-    public static int Synchronized = 1;
-    public static int SynchUnknown = 0;
-    public static int Synchronizing = -1;
+//    public static int Synchronized = 1;
+//    public static int SynchUnknown = 0;
+//    public static int Synchronizing = -1;
 
     private long id;
     private String name;
@@ -34,7 +34,7 @@ public class BaseFile extends SyncDoc implements Parcelable {
     private long date;          //Added Date
     private boolean isSelected;
 
-    public int synchFlag = SynchUnknown;
+    // public int synchFlag = SynchUnknown;
 
     private String recId;
 
