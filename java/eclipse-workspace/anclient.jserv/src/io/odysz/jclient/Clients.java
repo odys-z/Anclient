@@ -43,22 +43,31 @@ public class Clients {
 	}
 	
 	/**Login and return a client instance (with session managed by jserv).
+	 * 
+	 * <h5>Note since anclient.java 1.4.14</h5>
+	 * This module uses defualt url root initialized with {@link #init(String, boolean...)}. 
+	 * 
 	 * @param uid
 	 * @param pswdPlain
 	 * @param mac  client device name - server can required this or not
-	 * @return null if failed, a SessionClient instance if login succeed.
+	 * @return a SessionClient instance if login succeed.
 	 * @throws SemanticException Request can not parsed correctly 
-	 * @throws GeneralSecurityException  encrypting password error
-	 * @throws SsException 
+	 * @throws SsException  encrypting password error
 	 * @throws Exception, most likely the network failed
 	 */
 	public static SessionClient login(String uid, String pswdPlain, String... mac)
-			throws IOException, SemanticException, GeneralSecurityException, AnsonException, SsException {
+			throws IOException, SemanticException, AnsonException, SsException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
 		if (uid == null || pswdPlain == null)
 			throw new SemanticException("user id and password can not be null.");
-		String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+		String tk64;
+		try {
+			tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+		} catch (GeneralSecurityException e) {
+			e.printStackTrace();
+			throw new SsException("AES encrpyt failed: %s\nCause: %s", e.getMessage(), e.getCause().getMessage());
+		}
 		
 		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
 		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
@@ -71,7 +80,12 @@ public class Clients {
 			Utils.logi(resp.toString());
 
 		if (AnsonMsg.MsgCode.ok == resp.code()) {
-			return new SessionClient(((AnSessionResp) resp.body(0)).ssInf());
+			SessionClient c = new SessionClient(((AnSessionResp) resp.body(0)).ssInf());
+
+			if (mac != null && mac.length > 0)
+				c.ssInfo().device(mac[0]);
+		
+			return c;
 		}
 		else throw new SsException(
 				"loging failed\ncode: %s\nerror: %s",

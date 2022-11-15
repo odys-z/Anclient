@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.SyncingPage;
+import io.odysz.semantic.tier.docs.DocsPage;
 import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
@@ -34,7 +34,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     protected boolean isNeedCamera;
     protected int mMaxNumber;
     protected int mCurrentNumber = 0;
-    private RecyclerView recyclerView;
 
     public boolean isUpToMax () {
         return mCurrentNumber >= mMaxNumber;
@@ -50,7 +49,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     protected AlbumContext singleton;
 
-    protected SyncingPage synchPage;
+    protected DocsPage synchPage;
 
     public BaseSynchronizer(Context ctx, ArrayList<T> list) {
         this.singleton = AlbumContext.getInstance();
@@ -77,31 +76,34 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     public List<T> getDataSet() { return (List<T>) mList; }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void refresh(List<T> list, RecyclerView ... mRecyclerView) {
-        this.recyclerView = mRecyclerView == null ? null : mRecyclerView[0];
-
+    public void refresh(List<T> list) {
         mList.clear();
         mList.addAll(list);
         notifyDataSetChanged();
 
-        synchPage = new SyncingPage(0, Math.min(20, mList.size()));
+        synchPage = new DocsPage(0, Math.min(20, mList.size()));
         synchPage.taskNo = nextRandomInt();
         synchPage.device = singleton.photoUser.device;
         if (singleton.tier != null)
             startSynchQuery(synchPage);
     }
 
-    void startSynchQuery(SyncingPage page) {
-        singleton.tier.asyncQuerySyncs(mList, page,
-                onSyncQueryRespons,
+    void startSynchQuery(DocsPage page) {
+        singleton.tier.asynQueryDocs(mList, page,
+                onSychnQueryRespons,
                 (c, r, args) -> {
                     Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
                 });
     }
 
-    JProtocol.OnOk onSyncQueryRespons = (resp) -> {
+    JProtocol.OnOk onSychnQueryRespons = (resp) -> {
         AlbumResp rsp = (AlbumResp) resp;
         if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
+//            Photo[] phts = rsp.photos(0);
+//            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
+//                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
+            // sequence order is guaranteed.
+
             HashMap<String, Object> phts = rsp.syncPaths();
             for (int i = synchPage.start; i < synchPage.end; i++) {
                 T f = mList.get(i);
@@ -110,7 +112,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
                 }
             }
 
-            updateIcons(rsp.syncing());
+            updateIcons(synchPage);
 
             if (mList.size() >= synchPage.end) {
                 synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
@@ -119,9 +121,9 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
     };
 
-    void updateIcons(SyncingPage syncPage) {
+    void updateIcons(DocsPage synchPage) {
         ((Activity)mContext).runOnUiThread( () -> {
-            notifyItemRangeChanged(syncPage.start, syncPage.end);
+            notifyItemRangeChanged(synchPage.start, synchPage.end);
         });
     }
 
@@ -132,6 +134,33 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     private static final Random RANDOM = new Random();
     public static int nextRandomInt() {
         return RANDOM.nextInt(1024 * 1024);
+    }
+
+    /**
+     * @param view the file view - not used currently
+     * @param dataType "video/*" or "image/*"
+     * @param path full path
+     * @return false
+     */
+    private boolean startMediaViewer(View view, String dataType, String path) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            File f = new File(path);
+            uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
+        }
+        else {
+            uri = Uri.parse("file://" + path);
+        }
+        intent.setDataAndType(uri, dataType);
+        if (Util.detectIntent(mContext, intent)) {
+            mContext.startActivity(intent);
+        }
+        else {
+            ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
+        }
+        return false;
     }
 
     /**
@@ -161,5 +190,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
         return false;
     }
+
 }
 

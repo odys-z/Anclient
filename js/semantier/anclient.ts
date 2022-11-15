@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkMeta, PageInf
+	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkVal, PageInf
 } from './protocol';
 import { ErrorCtx, Tierec } from './semantier';
 
@@ -628,7 +628,7 @@ class SessionClient {
 		return jreq as AnsonMsg<QueryReq>;
 	}
 
-	update(uri: string, maintbl: string, pk: PkMeta, nvs: string | string[] | Tierec) {
+	update(uri: string, maintbl: string, pk: PkVal, nvs: string | string[] | Tierec) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("Anclient is designed to support user updating log natively. User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -669,7 +669,7 @@ class SessionClient {
 		return jmsg;
 	}
 
-	delete(uri: string, maintbl: string, pk: PkMeta | string[]) {
+	delete(uri: string, maintbl: string, pk: PkVal | string[]) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");

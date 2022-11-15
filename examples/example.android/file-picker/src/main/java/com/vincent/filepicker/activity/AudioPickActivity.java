@@ -169,19 +169,22 @@ public class AudioPickActivity extends BaseActivity {
     }
 
     private void loadData() {
-        FileFilter.getAudios(this, directories -> {
-            // Refresh folder list
-            if (isNeedFolderList) {
-                ArrayList<Directory> list = new ArrayList<>();
-                Directory all = new Directory();
-                all.setName(getResources().getString(R.string.vw_all));
-                list.add(all);
-                list.addAll(directories);
-                mFolderHelper.fillData(list);
-            }
+        FileFilter.getAudios(this, new FilterResultCallback<AudioFile>() {
+            @Override
+            public void onResult(List<Directory<AudioFile>> directories) {
+                // Refresh folder list
+                if (isNeedFolderList) {
+                    ArrayList<Directory> list = new ArrayList<>();
+                    Directory all = new Directory();
+                    all.setName(getResources().getString(R.string.vw_all));
+                    list.add(all);
+                    list.addAll(directories);
+                    mFolderHelper.fillData(list);
+                }
 
-            mAll = directories;
-            refreshData(directories);
+                mAll = directories;
+                refreshData(directories);
+            }
         });
     }
 
@@ -210,7 +213,7 @@ public class AudioPickActivity extends BaseActivity {
                 list.get(index).setSelected(true);
             }
         }
-        mAdapter.refresh(list, mRecyclerView);
+        mAdapter.refresh(list);
     }
 
     private boolean findAndAddTaken(List<AudioFile> list) {

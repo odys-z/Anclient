@@ -1,8 +1,11 @@
 package io.oz.albumtier;
 
-import io.oz.album.client.AlbumClientier;
+import io.odysz.jclient.tier.Semantier;
 
-@FunctionalInterface
-public interface TierCallback {
-    void ok(AlbumClientier tier);
-}
+/**
+ * @author odys-z@github.com
+ */
+//@FunctionalInterface
+//public interface TierCallback {
+//    void ok(Semantier tier);
+//}

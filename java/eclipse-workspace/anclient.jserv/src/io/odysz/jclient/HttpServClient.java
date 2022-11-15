@@ -1,5 +1,6 @@
 package io.odysz.jclient;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.net.URL;
 import java.sql.SQLException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io_odysz.FilenameUtils;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
@@ -169,6 +171,12 @@ public class HttpServClient {
 		if (Clients.verbose) Utils.logi(url);
 
 		InputStream ins = con.getInputStream();
+		
+		String folder = FilenameUtils.getFullPath(localpath);
+		new File(folder).mkdirs();
+		File yourFile = new File(localpath);
+		yourFile.createNewFile(); // if file already exists will do nothing 
+
 		FileOutputStream ofs = new FileOutputStream(localpath);  
 		IOUtils.copy(ins, ofs);
 		ofs.close();

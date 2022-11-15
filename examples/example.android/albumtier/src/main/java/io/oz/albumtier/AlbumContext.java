@@ -1,32 +1,37 @@
 package io.oz.albumtier;
 
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
+import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
+import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
-import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.jprotocol.JProtocol.OnError;
+import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
-import io.oz.album.client.AlbumClientier;
 
 public class AlbumContext {
-    protected static final boolean verbose = true;
+    public enum ConnState { Online, Disconnected, LoginFailed }
 
     public static final String jdocbase  = "jserv-album";
     public static final String albumHome = "dist/index.html";
     public static final String synchPage = "dist/sync.html";
+    public static boolean verbose = true;
 
     static AlbumContext instance;
 
+    public final String clientUri = "album.and";
+    public final ErrorCtx errCtx = new ErrorCtx();
+
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
-        Anson.verbose = false;
+        Anson.verbose = true;
     }
 
     private String pswd;
@@ -47,24 +52,11 @@ public class AlbumContext {
                 || LangExt.isblank(photoUser.uid());
     }
 
-    public enum ConnState { Online, Disconnected, LoginFailed }
-
-    public final String clientUri = "album.and";
-    public final ErrorCtx errCtx = new ErrorCtx() {
-        String msg;
-        AnsonMsg.MsgCode code;
-        @Override
-        public void onError(AnsonMsg.MsgCode c, String msg) {
-            code = c;
-            this.msg = msg;
-        }
-    };
-
     String jserv;
 
     public String homeName;
 
-    public AlbumClientier tier;
+    public PhotoSyntier tier;
 
     public SessionInf photoUser;
 
@@ -77,11 +69,9 @@ public class AlbumContext {
 
     /**
      * Init with preferences. Not login yet.
-     * @param resources
-     * @param prefkeys
-     * @param sharedPref
-     */
-    public void init(Resources resources, PrefKeys prefkeys, SharedPreferences sharedPref) {
+     * @since maven 0.1.0, this package no longer depends on android sdk.
+     * public void init(PrefKeys prefkeys, SharedPreferences sharedPref)
+     <pre>
         homeName = sharedPref.getString(prefkeys.home, "");
         String uid = sharedPref.getString(prefkeys.usrid, "");
         String device = sharedPref.getString(prefkeys.device, "");
@@ -89,51 +79,52 @@ public class AlbumContext {
         photoUser.device = device;
         pswd = sharedPref.getString(prefkeys.pswd, "");
         jserv = sharedPref.getString(prefkeys.jserv, "");
+     </pre>
+     */
+    public AlbumContext init(String family, String uid, String device, String jserv) {
+    	/*
+        homeName = sharedPref.getString(prefkeys.home, "");
+        String uid = sharedPref.getString(prefkeys.usrid, "");
+        String device = sharedPref.getString(prefkeys.device, "");
+        photoUser = new SessionInf(null, uid);
+        photoUser.device = device;
+        */
+        homeName = family;
+        photoUser = new SessionInf(null, uid);
+        photoUser.device = device;
+        this.jserv = jserv;
 
         Clients.init(jserv + "/" + jdocbase, verbose);
+        
+        return this;
     }
 
-    AlbumContext login(String uid, String pswd, TierCallback onOk, JProtocol.OnError onErr)
-            throws GeneralSecurityException {
+    AlbumContext login(String uid, String pswd, OnLogin onOk, OnError onErr)
+            throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("Device Id is null.");
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 
-        Clients.loginAsync(uid, pswd,
-            (client) -> {
-                client.closeLink();
+        tier = (PhotoSyntier) new PhotoSyntier(clientUri, photoUser.device, errCtx)
+				.asyLogin(uid, pswd, photoUser.device, onOk, onErr);
 
-                tier = new AlbumClientier(clientUri, client, errCtx);
-                client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min
-                state = ConnState.Online;
-                if (onOk != null)
-                    onOk.ok(tier);
-            },
-            // Design Note: since error context don't have unified error message box,
-            // error context pattern of React is not applicable.
-            // errCtx.onError(c, r, (Object)v);
-            (c, r, v) -> {
-                state = ConnState.LoginFailed;
-                if (onErr != null)
-                    onErr.err(c, r, v);
-            }, photoUser.device);
         return this;
     }
 
-    public void login(TierCallback onOk, JProtocol.OnError onErr)
-            throws GeneralSecurityException {
+    public void login(OnLogin onOk, OnError onErr)
+            throws GeneralSecurityException, SemanticException, AnsonException, IOException {
         login(photoUser.uid(), pswd, onOk, onErr);
     }
 
-    JProtocol.OnOk onHeartbeat = ((resp) -> {
+    OnOk onHeartbeat = ((resp) -> {
         if (state == ConnState.Disconnected)
             ; // how to notify?
         state = ConnState.Online;
     });
 
-    JProtocol.OnError onLinkBroken = ((c, r, args) -> {
+    OnError onLinkBroken = ((c, r, args) -> {
         state = ConnState.Disconnected;
     });
 
