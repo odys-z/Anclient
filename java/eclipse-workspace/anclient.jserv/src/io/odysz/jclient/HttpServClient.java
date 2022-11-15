@@ -88,7 +88,6 @@ public class HttpServClient {
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
 	 * See {@link AnsonClientTest} for a query example.<br>
-	 * IMPORTANT onResponse is called synchronized.
 	 * @param url
 	 * @param jreq
 	 * @return response if succeed

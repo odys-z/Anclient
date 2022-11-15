@@ -85,7 +85,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		}
 
 		let that = this;
-	
+
 		this.tier.records( this.q,
 			(_cols, _rows) => {
 				that.state.selected.ids.clear();
@@ -250,7 +250,7 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 
 	/**
 	 * Design Note:
-	 * 
+	 *
 	 * Problem: This way bound the query form, so no way to expose visual effects modification?
 	 */
 	render () {
@@ -360,7 +360,7 @@ export class UsersTier extends Semantier {
 		this.rec.iv = iv;
 		*/
 
-		// this.rec.iv = undefined; // won't work - didn't sent by Chrome 
+		// this.rec.iv = undefined; // won't work - didn't sent by Chrome
 		this.rec.iv = null; // working - but why?
 
 		let req = this.client.userReq(uri, this.port,
@@ -407,7 +407,7 @@ export class UsersTier extends Semantier {
 }
 
 export class UserstReq extends UserReq {
-	static __type__ = 'io.odysz.jsample.semantier.UserstReq';
+	static __type__ = 'io.oz.jsample.semantier.UserstReq';
 	static __init__ = function (uri) {
 		// Design Note:
 		// can we use dynamic Protocol?
