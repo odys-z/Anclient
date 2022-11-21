@@ -6,14 +6,16 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import com.vincent.filepicker.ToastUtil;
+import com.vincent.filepicker.activity.ImageBrowserActivity;
+
 import io.odysz.anson.Anson;
+import io.odysz.common.LangExt;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.jsession.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.tier.AlbumResp;
@@ -41,7 +43,10 @@ public class PrefsContentActivity extends AppCompatActivity {
 
         // load settings fragment
         prefFragment = new AlbumPreferenceFragment(this);
-        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, prefFragment).commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(android.R.id.content, prefFragment)
+                .commit();
     }
 
     public void onLogin(View btn) {
@@ -54,7 +59,7 @@ public class PrefsContentActivity extends AppCompatActivity {
 
                     // load settings
                     Anson.verbose = true;
-                    ((PhotoSyntier)singleton.tier).getSettings(
+                    ((PhotoSyntier) singleton.tier).asyGetSettings(
                         (resp) -> {
                             singleton.homeName = ((AlbumResp) resp).profiles().home();
                             updateSummery(prefFragment.homepref, singleton.homeName);
@@ -83,10 +88,19 @@ public class PrefsContentActivity extends AppCompatActivity {
     };
 
     public void onRegisterDevice(View btn) {
+
+        String dev = singleton.photoUser.device;
+        if (LangExt.isblank(dev)) {
+            ToastUtil.getInstance ( getApplicationContext() )
+                    .showToast(io.oz.fpick.R.string.vprf_blank_device);
+            return;
+        }
+
         if (prefFragment.btnRegist != null) {
             prefFragment.cateHome.removePreference(prefFragment.btnRegist);
         }
         prefFragment.device.setEnabled(false);
+        prefFragment.btnLogin.setEnabled(false);
     }
 
     /**

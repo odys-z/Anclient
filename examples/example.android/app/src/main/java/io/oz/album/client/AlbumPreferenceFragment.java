@@ -3,9 +3,9 @@ package io.oz.album.client;
 import static io.oz.album.client.PrefsContentActivity.singleton;
 
 import android.app.Activity;
+import android.app.AutomaticZenRule;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +22,7 @@ import io.oz.R;
 import io.oz.albumtier.AlbumContext;
 
 public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
+    Preference btnLogin;
     Preference summery;
     Preference homepref;
     EditTextPreference device;
@@ -46,6 +47,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
 
         cateHome = findPreference(AlbumApp.keys.homeCate);
         btnRegist = findPreference(AlbumApp.keys.bt_regist);
+        btnLogin = findPreference(AlbumApp.keys.bt_login);
         device = findPreference(AlbumApp.keys.device);
 
         EditTextPreference pswd = findPreference(AlbumApp.keys.pswd);
@@ -65,6 +67,8 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         else {
             findPreference(AlbumApp.keys.device).setEnabled(true);
             device.setSummary(R.string.txt_only_once);
+
+            btnLogin.setEnabled(false);
         }
         summery = findPreference(AlbumApp.keys.login_summery);
     }

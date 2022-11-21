@@ -47,6 +47,7 @@ import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Photo;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
+import io.oz.jserv.sync.SyncFlag;
 
 /**
  * Created by Ody Zhou
@@ -128,14 +129,16 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                     .into ( holder.mIvThumbnail );
             // holder.mIvThumbnail.setImageURI(Uri.parse(file.getPath()));
 
-            if (file.synchFlag == BaseFile.Synchronizing) {
+            // if (file.synchFlag == BaseFile.Synchronizing) {
+            if (file.syncFlag == SyncFlag.pushing) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            else if (file.synchFlag == BaseFile.Synchronized) {
+            // else if (file.synchFlag == BaseFile.Synchronized) {
+            else if (file.syncFlag == SyncFlag.publish) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -197,8 +200,9 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
 
-                int sync = mList.get(index).synchFlag;
-                if ( sync == BaseFile.Synchronized || sync == BaseFile.Synchronizing)
+                String sync = mList.get(index).syncFlag;
+                // if ( BaseFile.Synchronized || sync == BaseFile.Synchronizing)
+                if ( SyncFlag.publish.equals(sync) || SyncFlag.pushing.equals(sync))
                     return;
 
                 if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {
