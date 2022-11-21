@@ -17,8 +17,6 @@ import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.filter.entity.AudioFile;
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;
 

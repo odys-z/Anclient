@@ -18,8 +18,9 @@ allprojects {
         bm_photoview_version = "1.4.1"
         anclient_ver = "0.4.16-SNAPSHOT"
         jserv_ver = "1.4.15-SNAPSHOT"
+        jserv_ext_syncdoc = "0.1.5-SNAPSHOT"
         album_lib_ver = "0.4.21-SNAPSHOT"
-        albumtier_ver = "0.1.8-SNAPSHOT"
+        // albumtier_ver = "0.1.8-SNAPSHOT"
     }
 
     repositories {
@@ -32,7 +33,7 @@ allprojects {
 }
 
 configurations {
-    compile.exclude module: 'albumtier'
+    // compile.exclude module: 'albumtier'
 }
 
 task clean(type: Delete) {

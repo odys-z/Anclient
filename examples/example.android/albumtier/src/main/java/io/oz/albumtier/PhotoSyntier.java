@@ -359,7 +359,6 @@ public class PhotoSyntier extends Synclientier {
 	 * 
 	 * @param photos
 	 * @param user
-	 * @param onOk
 	 * @param onErr
 	 * @return this
 	 * @throws SemanticException

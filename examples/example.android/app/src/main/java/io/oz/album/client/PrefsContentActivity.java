@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.vincent.filepicker.ToastUtil;
-import com.vincent.filepicker.activity.ImageBrowserActivity;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
@@ -65,7 +64,7 @@ public class PrefsContentActivity extends AppCompatActivity {
                             updateSummery(prefFragment.homepref, singleton.homeName);
 
                             SharedPreferences sharedPref =
-                                    PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
+                                    PreferenceManager.getDefaultSharedPreferences(this);
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putString(AlbumApp.keys.home, singleton.homeName);
                             editor.apply();
@@ -82,10 +81,9 @@ public class PrefsContentActivity extends AppCompatActivity {
     /**
      * common function for error handling
      */
-    JProtocol.OnError showErrSummary = (c, t, args) -> {
-        updateSummery(prefFragment.summery, String.format(t,
-                (Object[]) (args == null ? new String[]{"", ""} : args)));
-    };
+    JProtocol.OnError showErrSummary = (c, t, args) ->
+        updateSummery(prefFragment.summery,
+                      String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)));
 
     public void onRegisterDevice(View btn) {
 
@@ -100,7 +98,7 @@ public class PrefsContentActivity extends AppCompatActivity {
             prefFragment.cateHome.removePreference(prefFragment.btnRegist);
         }
         prefFragment.device.setEnabled(false);
-        prefFragment.btnLogin.setEnabled(false);
+        prefFragment.btnLogin.setEnabled(true);
     }
 
     /**

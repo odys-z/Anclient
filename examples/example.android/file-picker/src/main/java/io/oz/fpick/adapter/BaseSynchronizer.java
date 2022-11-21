@@ -25,6 +25,7 @@ import java.util.Random;
 
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsPage;
+import io.odysz.semantic.tier.docs.DocsResp;
 import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
@@ -98,7 +99,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     }
 
     JProtocol.OnOk onSyncQueryResponse = (resp) -> {
-        AlbumResp rsp = (AlbumResp) resp;
+        DocsResp rsp = (DocsResp) resp;
         if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
 //            Photo[] phts = rsp.photos(0);
 //            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
