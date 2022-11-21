@@ -13,14 +13,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import io.oz.album.tier.AlbumResp;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsPage;
+import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
-import io.oz.album.tier.*;
+import io.oz.album.tier.Photo;
 
 
 public class AlbumtierTest {
@@ -33,10 +33,11 @@ public class AlbumtierTest {
 	@Test
     public void testRefreshPage0() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
 		mList = new ArrayList<SyncDoc>(1);
-		mList.add(new Photo());
+		mList.add(new Photo().create("src/test/res/64x48.png"));
 		
 		onActCreate();
 
+		Utils.logi("Press Enter when you think the test is finished ...");
 		pause();
 		Utils.logi(singleton.photoUser.device);
     }
@@ -71,18 +72,19 @@ public class AlbumtierTest {
         singleton.tier.asynQueryDocs(mList, page,
                 onSychnQueryRespons,
                 (c, r, args) -> {
-                    Utils.warn("%s, %s", singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
+                    Utils.warn("%s, %s, %s", singleton.clientUri, r, args == null ? "null" : args[0]);
                 });
     }
-    
+
     JProtocol.OnOk onSychnQueryRespons = (resp) -> {
-        AlbumResp rsp = (AlbumResp) resp;
-        if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
+        DocsResp rsp = (DocsResp) resp;
+        if (rsp == null || rsp.syncing() == null)
+        	Utils.warn("OnSychnQueryRespons: Got response of empty synchronizing page.");
+        else if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
             HashMap<String, Object> phts = rsp.syncPaths();
             for (int i = synchPage.start; i < synchPage.end; i++) {
                 SyncDoc f = mList.get(i);
                 if (phts.keySet().contains(f.fullpath())) {
-                    // f.syncFlag = 1;
                 	assertEquals(singleton.photoUser.device, f.device());
                 }
             }

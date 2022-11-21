@@ -1,5 +1,10 @@
 *.iml
 .gradle
+.idea
+build
+target
+.settings
+*.android.iml
 /local.properties
 /.idea/caches/build_file_checksums.ser
 /.idea/libraries

@@ -103,7 +103,7 @@ public class AlbumContext {
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
-            throw new GeneralSecurityException("Device Id is null.");
+            throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 
