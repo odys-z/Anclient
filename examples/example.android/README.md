@@ -1,4 +1,15 @@
-# start Huawei Pro 30 for debug
+# About
+
+An Android client project based on semantic-* and extensions.
+
+This client running on Android accessing local files and synchronizes files with [jserv.syncdoc](https://github.com/odys-z/semantic-jserv/tree/master/docsync.jserv).
+
+<img src='docsphinx/res/01-img-picking.png' style="width: 9em; padding:0.4em"/>
+<img src='docsphinx/res/02-images.png' style="width: 9em; padding:0.4em"/>
+
+# Troubleshootings
+
+## start Huawei Pro 30 for debug
 
 1 adb device shows nothing
 
