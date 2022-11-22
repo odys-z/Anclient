@@ -110,7 +110,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
             for (int i = synchPage.start; i < synchPage.end; i++) {
                 T f = mList.get(i);
                 if (phts.keySet().contains(f.fullpath())) {
-                    // f.syncFlag = SyncFlag.priv;
+                    f.syncFlag = rsp.syncing().flag;
                 }
             }
 
