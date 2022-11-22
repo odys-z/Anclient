@@ -2,6 +2,8 @@
 
 For upgrading gradle and dependencies - using Androidx.
 
+Credits to [fishwjy/MultiType-FilePicker](https://github.com/fishwjy/MultiType-FilePicker).
+
 # MultiType-FilePicker
 [![Download](https://api.bintray.com/packages/vincentwoo/maven/MultiTypeFilePicker/images/download.svg) ](https://bintray.com/vincentwoo/maven/MultiTypeFilePicker/_latestVersion)
 
@@ -19,8 +21,8 @@ Please star this library if you like it. :)
 
 ## Usage
 ### 1.Import to your project
-    compile 'com.vincent.filepicker:MultiTypeFilePicker:latestVersion' 
-    
+    compile 'com.vincent.filepicker:MultiTypeFilePicker:latestVersion'
+
 ### 2.Start Activity For Result
     case R.id.btn_pick_image:
 		Intent intent1 = new Intent(this, ImagePickActivity.class);
@@ -46,7 +48,7 @@ Please star this library if you like it. :)
 		intent4.putExtra(NormalFilePickActivity.SUFFIX, new String[] {"xlsx", "xls", "doc", "docx", "ppt", "pptx", "pdf"});
 		startActivityForResult(intent4, Constant.REQUEST_CODE_PICK_FILE);
 		break;
-		
+
 ### 3.Receive the Result from Activity
     case Constant.REQUEST_CODE_PICK_IMAGE:
 		if (resultCode == RESULT_OK) {
