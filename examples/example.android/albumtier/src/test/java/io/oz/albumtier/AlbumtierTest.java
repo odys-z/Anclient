@@ -54,10 +54,10 @@ public class AlbumtierTest {
 
 	void onActCreate() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
 		singleton = new AlbumContext()
-				.init("f/zsu", "syrskyi", "junit.syrskyi", jserv)
-				.login( "syrskyi", "слава україні",
-						(client) -> refresh(mList),
-						(c, t, v) -> fail(t));
+			.init("f/zsu", "syrskyi", "junit.syrskyi", jserv)
+			.login( "syrskyi", "слава україні",
+					(client) -> refresh(mList),
+					(c, t, v) -> fail(t));
 	}
 
 	void refresh(List<? extends SyncDoc> mlist) {
@@ -70,22 +70,23 @@ public class AlbumtierTest {
 
     void startSynchQuery(DocsPage page) {
         singleton.tier.asynQueryDocs(mList, page,
-                onSychnQueryRespons,
-                (c, r, args) -> {
-                    Utils.warn("%s, %s, %s", singleton.clientUri, r, args == null ? "null" : args[0]);
-                });
+			onSyncQueryRespons,
+			(c, r, args) -> {
+				Utils.warn("%s, %s, %s", singleton.clientUri, r, args == null ? "null" : args[0]);
+			});
     }
 
-    JProtocol.OnOk onSychnQueryRespons = (resp) -> {
+    JProtocol.OnOk onSyncQueryRespons = (resp) -> {
         DocsResp rsp = (DocsResp) resp;
         if (rsp == null || rsp.syncing() == null)
-        	Utils.warn("OnSychnQueryRespons: Got response of empty synchronizing page.");
+        	Utils.warn("OnSyncQueryRespons: Got response of empty synchronizing page.");
         else if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
-            HashMap<String, Object> phts = rsp.syncPaths();
+            HashMap<String, String[]> phts = rsp.syncPaths();
             for (int i = synchPage.start; i < synchPage.end; i++) {
                 SyncDoc f = mList.get(i);
                 if (phts.keySet().contains(f.fullpath())) {
                 	assertEquals(singleton.photoUser.device, f.device());
+                	assertEquals(3, phts.get(f.fullpath()).length, "needing sync, share, share-date");
                 }
             }
 
