@@ -62,7 +62,7 @@ public class AlbumtierTest {
 
 	void refresh(List<? extends SyncDoc> mlist) {
 		synchPage = new DocsPage(0, Math.min(20, mlist.size()));
-		synchPage.taskNo = 1;   // nextRandomInt();
+		// synchPage.taskNo = 1;   // nextRandomInt();
 		synchPage.device = singleton.photoUser.device;
 		if (singleton.tier != null)
 			startSynchQuery(synchPage);
@@ -80,10 +80,13 @@ public class AlbumtierTest {
         DocsResp rsp = (DocsResp) resp;
         if (rsp == null || rsp.syncing() == null)
         	Utils.warn("OnSyncQueryRespons: Got response of empty synchronizing page.");
-        else if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
+        else if (//synchPage.taskNo == rsp.syncing().taskNo &&
+        		synchPage.end < mList.size()) {
             HashMap<String, String[]> phts = rsp.pathsPage().paths();
-            for (int i = synchPage.start; i < synchPage.end; i++) {
-                SyncDoc f = mList.get(i);
+            for (long i = synchPage.start; i < synchPage.end; i++) {
+				if (i < 0 || i > Integer.MAX_VALUE)
+					throw new SemanticException("Synclientier.queryDocs(): page's range is out of bounds: H%x", i);
+                SyncDoc f = mList.get((int)i);
                 if (phts.keySet().contains(f.fullpath())) {
                 	assertEquals(singleton.photoUser.device, f.device());
                 	assertEquals(3, phts.get(f.fullpath()).length, "needing sync, share, share-date");
