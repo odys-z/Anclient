@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.DocsPage;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
@@ -26,7 +26,7 @@ import io.oz.album.tier.Photo;
 public class AlbumtierTest {
     private static final String jserv = "http://localhost:8081";
 	private AlbumContext singleton;
-	private DocsPage synchPage;
+	private PathsPage synchPage;
 	
 	ArrayList<SyncDoc> mList;
 
@@ -54,21 +54,20 @@ public class AlbumtierTest {
 
 	void onActCreate() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
 		singleton = new AlbumContext()
-			.init("f/zsu", "syrskyi", "junit.syrskyi", jserv)
+			.init("f/zsu", "syrskyi", "omni", jserv)
 			.login( "syrskyi", "слава україні",
 					(client) -> refresh(mList),
 					(c, t, v) -> fail(t));
 	}
 
 	void refresh(List<? extends SyncDoc> mlist) {
-		synchPage = new DocsPage(0, Math.min(20, mlist.size()));
-		// synchPage.taskNo = 1;   // nextRandomInt();
+		synchPage = new PathsPage(0, Math.min(20, mlist.size()));
 		synchPage.device = singleton.photoUser.device;
 		if (singleton.tier != null)
 			startSynchQuery(synchPage);
 	}
 
-    void startSynchQuery(DocsPage page) {
+    void startSynchQuery(PathsPage page) {
         singleton.tier.asynQueryDocs(mList, page,
 			onSyncQueryRespons,
 			(c, r, args) -> {
@@ -80,8 +79,7 @@ public class AlbumtierTest {
         DocsResp rsp = (DocsResp) resp;
         if (rsp == null || rsp.syncing() == null)
         	Utils.warn("OnSyncQueryRespons: Got response of empty synchronizing page.");
-        else if (//synchPage.taskNo == rsp.syncing().taskNo &&
-        		synchPage.end < mList.size()) {
+        else if (synchPage.end < mList.size()) {
             HashMap<String, String[]> phts = rsp.pathsPage().paths();
             for (long i = synchPage.start; i < synchPage.end; i++) {
 				if (i < 0 || i > Integer.MAX_VALUE)

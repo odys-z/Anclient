@@ -1,6 +1,6 @@
 package io.oz.albumtier;
 
-import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -22,7 +22,7 @@ import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.jsession.SessionInf;
-import io.odysz.semantic.tier.docs.DocsPage;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
@@ -255,12 +255,23 @@ public class PhotoSyntier extends Synclientier {
 	 * @param onErr
 	 * @return this
 	 */
-	public PhotoSyntier asynQueryDocs(List<? extends SyncDoc> files, DocsPage page, OnOk onOk, OnError onErr) {
+	public PhotoSyntier asynQueryDocs(List<? extends SyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(new Runnable() {
 	        public void run() {
 	        	DocsResp resp = null; 
 				try {
-					resp = queryDocs(files, page, meta);
+					page.clear();
+					for (long i = page.start; i < page.end & i < files.size(); i++) {
+						if (i < 0 || i > Integer.MAX_VALUE)
+							throw new SemanticException("Synclientier.queryDocs(): page's range is out of bounds: H%x", i);
+
+						SyncDoc p = files.get((int)i);
+						if (isblank(p.fullpath()))
+							continue;
+						else page.add(p.fullpath());
+					}
+
+					resp = queryPaths(page, meta);
 					try {
 						onOk.ok(resp);
 					} catch (AnsonException | SemanticException | IOException e) {
