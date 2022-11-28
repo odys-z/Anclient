@@ -20,6 +20,7 @@ import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.x.TransException;
 import io.oz.album.tier.Photo;
 
 
@@ -31,11 +32,13 @@ public class AlbumtierTest {
 	ArrayList<SyncDoc> mList;
 
 	@Test
-    public void testRefreshPage0() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
+    public void testRefreshPage0() throws AnsonException, GeneralSecurityException, IOException, TransException {
 		mList = new ArrayList<SyncDoc>(1);
 		mList.add(new Photo().create("src/test/res/64x48.png"));
 		
 		onActCreate();
+		
+		onPhotosPicked();
 
 		Utils.logi("Press Enter when you think the test is finished ...");
 		pause();
@@ -97,4 +100,41 @@ public class AlbumtierTest {
             }
         }
     };
+    
+    /**
+     * see WelcomeAct.onImagePicked()
+     <pre>
+    protected void onImagePicked(@NonNull ActivityResult result) {
+        try {
+            Intent data = result.getData();
+            if (data != null) {
+                ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+                if (singl.tier == null)
+                    showMsg(R.string.txt_please_login);
+                else
+                    singl.tier.asyncPhotosUp(list, singl.photoUser,
+                        null,
+                        (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
+                        (c, r, args) -> showMsg(R.string.msg_upload_failed, (Object[]) args));
+            }
+        } catch (SemanticException | IOException | AnsonException e) {
+            e.printStackTrace();
+            showMsg(R.string.msg_upload_failed, e.getClass().getName(), e.getMessage());
+        }
+    }</pre>
+     * @param usr 
+     * @throws IOException 
+     * @throws TransException 
+     */
+   	void onPhotosPicked() throws TransException, IOException {
+   		singleton.tier.asyVideos(mList,
+   				photoProc, photoUp, singleton.errCtx);
+	}
+   	
+   	JProtocol.OnDocOk photoUp = (d, resp) -> {
+   		
+   	};
+
+	JProtocol.OnProcess photoProc = (rs, rx, bx, bs, rsp) -> {};
+
 }
