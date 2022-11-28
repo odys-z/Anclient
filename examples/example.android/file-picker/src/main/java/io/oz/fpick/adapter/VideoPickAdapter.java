@@ -19,7 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,16 +26,12 @@ import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.ImageFile;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
-import java.io.File;
 import java.util.ArrayList;
 
-import io.oz.albumtier.AlbumContext;
+import io.odysz.semantic.tier.docs.SyncFlag;
 import io.oz.fpick.R;
-import io.oz.jserv.sync.SyncFlag;
 
 /**
  * Created by Ody Zhou

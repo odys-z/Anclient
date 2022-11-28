@@ -26,10 +26,8 @@ import java.util.Random;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
-import io.oz.album.tier.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
-import io.oz.jserv.sync.SyncFlag;
 
 public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
@@ -106,11 +104,14 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 //                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
             // sequence order is guaranteed.
 
-            HashMap<String, Object> phts = rsp.syncPaths();
+            HashMap<String, String[]> phts = rsp.syncing().paths();
             for (int i = synchPage.start; i < synchPage.end; i++) {
                 T f = mList.get(i);
-                if (phts.keySet().contains(f.fullpath())) {
-                    f.syncFlag = rsp.syncing().flag;
+                if (phts.containsKey(f.fullpath())) {
+                    String[] inf = phts.get(f.fullpath());
+                    f.syncFlag = inf[0];
+                    f.shareflag = inf[1];
+                    f.sharedate(inf[2]);
                 }
             }
 
