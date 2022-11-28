@@ -261,10 +261,7 @@ public class PhotoSyntier extends Synclientier {
 	        	DocsResp resp = null; 
 				try {
 					page.clear();
-					for (long i = page.start; i < page.end & i < files.size(); i++) {
-						if (i < 0 || i > Integer.MAX_VALUE)
-							throw new SemanticException("Synclientier.queryDocs(): page's range is out of bounds: H%x", i);
-
+					for (int i = page.start(); i < page.end() & i < files.size(); i++) {
 						SyncDoc p = files.get((int)i);
 						if (isblank(p.fullpath()))
 							continue;

@@ -79,11 +79,9 @@ public class AlbumtierTest {
         DocsResp rsp = (DocsResp) resp;
         if (rsp == null || rsp.syncing() == null)
         	Utils.warn("OnSyncQueryRespons: Got response of empty synchronizing page.");
-        else if (synchPage.end < mList.size()) {
+        else if (synchPage.end() < mList.size()) {
             HashMap<String, String[]> phts = rsp.pathsPage().paths();
-            for (long i = synchPage.start; i < synchPage.end; i++) {
-				if (i < 0 || i > Integer.MAX_VALUE)
-					throw new SemanticException("Synclientier.queryDocs(): page's range is out of bounds: H%x", i);
+            for (long i = synchPage.start(); i < synchPage.end(); i++) {
                 SyncDoc f = mList.get((int)i);
                 if (phts.keySet().contains(f.fullpath())) {
                 	assertEquals(singleton.photoUser.device, f.device());
@@ -93,8 +91,8 @@ public class AlbumtierTest {
 
             // updateIcons(synchPage);
 
-            if (mList.size() >= synchPage.end) {
-                synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
+            if (mList.size() >= synchPage.end()) {
+                synchPage.nextPage(Math.min(20, mList.size() - synchPage.end()));
                 startSynchQuery(synchPage);
             }
         }
