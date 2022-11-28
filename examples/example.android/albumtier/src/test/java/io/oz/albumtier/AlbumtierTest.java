@@ -132,7 +132,7 @@ public class AlbumtierTest {
 	}
    	
    	JProtocol.OnDocOk photoUp = (d, resp) -> {
-   		
+   		// TODO
    	};
 
 	JProtocol.OnProcess photoProc = (rs, rx, bx, bs, rsp) -> {};
