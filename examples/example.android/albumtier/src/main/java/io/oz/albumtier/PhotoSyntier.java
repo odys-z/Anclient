@@ -109,8 +109,28 @@ public class PhotoSyntier extends Synclientier {
 		return this;
 	}
 	
+	public PhotoSyntier asyVideos(List<SyncDoc> videos,
+				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
+			throws TransException, IOException {
+		new Thread(new Runnable() {
+	        public void run() {
+				try {
+					syncVideos(videos, proc, docOk, onErr);
+				} catch (TransException e) {
+					e.printStackTrace();
+					if (!isNull(onErr))
+						onErr[0].err(MsgCode.exTransct, e.getMessage(), e.getClass().getName());
+				} catch (IOException e) {
+					e.printStackTrace();
+					if (!isNull(onErr))
+						onErr[0].err(MsgCode.exIo, e.getMessage(), e.getClass().getName());
+				}
+	    } } ).start();
+		return this;	
+	}
+
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
-				SessionInf user, OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
+				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
 		return pushBlocks( meta, videos, client.ssInfo(), proc, docOk, onErr);
 	}
@@ -364,6 +384,10 @@ public class PhotoSyntier extends Synclientier {
 
 	/**
 	 * Asynchronously push photos. This is different from push/pull of jserv nodes.
+	 * 
+	 * @deprecated since Albumtier 0.1.9, this methond also uses block chain for uploading. 
+	 * 
+	 * TODO: to be changed to handling short text.
 	 * 
 	 * @param photos
 	 * @param user
