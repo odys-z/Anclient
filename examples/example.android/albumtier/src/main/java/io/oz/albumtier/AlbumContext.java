@@ -108,8 +108,16 @@ public class AlbumContext {
         Clients.init(jserv + "/" + jdocbase, verbose);
 
         tier = (PhotoSyntier) new PhotoSyntier(clientUri, photoUser.device, errCtx)
-				.asyLogin(uid, pswd, photoUser.device, onOk, onErr);
-
+				.asyLogin(uid, pswd, photoUser.device,
+                // onOk, onErr);
+                (client) -> {
+				    state = ConnState.Online;
+				    onOk.ok(client);
+                },
+                (c, r, args) -> {
+                    state = ConnState.LoginFailed;
+                    onErr.err(c, r, args);
+                } );
         return this;
     }
 

@@ -24,8 +24,9 @@ import java.util.List;
 import java.util.Random;
 
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.DocsPage;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
 
@@ -49,7 +50,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     protected AlbumContext singleton;
 
-    protected DocsPage synchPage;
+    protected PathsPage synchPage;
 
     public BaseSynchronizer(Context ctx, ArrayList<T> list) {
         this.singleton = AlbumContext.getInstance();
@@ -81,14 +82,14 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         mList.addAll(list);
         notifyDataSetChanged();
 
-        synchPage = new DocsPage(0, Math.min(20, mList.size()));
-        synchPage.taskNo = nextRandomInt();
+        synchPage = new PathsPage(0, Math.min(20, mList.size()));
+        // synchPage.taskNo = nextRandomInt();
         synchPage.device = singleton.photoUser.device;
         if (singleton.tier != null)
             startSynchQuery(synchPage);
     }
 
-    void startSynchQuery(DocsPage page) {
+    void startSynchQuery(PathsPage page) {
         singleton.tier.asynQueryDocs(mList, page,
                 onSyncQueryResponse,
                 (c, r, args) -> {
@@ -98,15 +99,16 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     JProtocol.OnOk onSyncQueryResponse = (resp) -> {
         DocsResp rsp = (DocsResp) resp;
-        if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
+        if (// synchPage.taskNo == rsp.syncing().taskNo &&
+            synchPage.end() < mList.size()) {
 //            Photo[] phts = rsp.photos(0);
 //            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
 //                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
             // sequence order is guaranteed.
 
             HashMap<String, String[]> phts = rsp.syncing().paths();
-            for (int i = synchPage.start; i < synchPage.end; i++) {
-                T f = mList.get(i);
+            for (int i = synchPage.start(); i < synchPage.end(); i++) {
+                T f = mList.get((int)i);
                 if (phts.containsKey(f.fullpath())) {
                     String[] inf = phts.get(f.fullpath());
                     f.syncFlag = inf[0];
@@ -117,16 +119,20 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
             updateIcons(synchPage);
 
-            if (mList.size() >= synchPage.end) {
-                synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
+            if (mList.size() >= synchPage.end()) {
+                synchPage.nextPage(Math.min(20, mList.size() - synchPage.end()));
                 startSynchQuery(synchPage);
             }
         }
     };
 
-    void updateIcons(DocsPage synchPage) {
+    void updateIcons(PathsPage synchPage) {
         ((Activity)mContext).runOnUiThread( () -> {
-            notifyItemRangeChanged(synchPage.start, synchPage.end);
+            try {
+                notifyItemRangeChanged(synchPage.start(), synchPage.end());
+            } catch (SemanticException e) {
+                e.printStackTrace();
+            }
         });
     }
 

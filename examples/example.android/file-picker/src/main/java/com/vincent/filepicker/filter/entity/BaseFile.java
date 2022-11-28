@@ -27,7 +27,7 @@ public class BaseFile extends SyncDoc implements Parcelable {
 
     private long id;
     private String name;
-    private String path;
+    // private String path;
     private long size;          //byte
     private String bucketId;    //Directory ID
     private String bucketName;  //Directory Name
@@ -44,12 +44,12 @@ public class BaseFile extends SyncDoc implements Parcelable {
         if (!(o instanceof BaseFile)) return false;
 
         BaseFile file = (BaseFile) o;
-        return this.path.equals(file.path);
+        return this.clientpath.equals(file.clientpath);
     }
 
     @Override
     public int hashCode() {
-        return path.hashCode();
+        return clientpath.hashCode();
     }
 
     public long getId() {
@@ -69,11 +69,11 @@ public class BaseFile extends SyncDoc implements Parcelable {
     }
 
     public String getPath() {
-        return path;
+        return clientpath;
     }
 
     public void setPath(String path) {
-        this.path = path;
+        this.clientpath = path;
     }
 
     public long getSize() {
@@ -120,7 +120,7 @@ public class BaseFile extends SyncDoc implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
         dest.writeString(name);
-        dest.writeString(path);
+        dest.writeString(clientpath);
         dest.writeLong(size);
         dest.writeString(bucketId);
         dest.writeString(bucketName);
@@ -142,7 +142,7 @@ public class BaseFile extends SyncDoc implements Parcelable {
             BaseFile file = new BaseFile();
             file.id = in.readLong();
             file.name = in.readString();
-            file.path = in.readString();
+            file.clientpath = in.readString();
             file.size = in.readLong();
             file.bucketId = in.readString();
             file.bucketName = in.readString();
@@ -151,53 +151,4 @@ public class BaseFile extends SyncDoc implements Parcelable {
             return file;
         }
     };
-
-    // String recId; @Override public String recId() { return recId; }
-
-//    public IFileDescriptor recId(String rid) {
-//        this.recId = rid;
-//        return this;
-//    }
-
-//    @Override
-//    public String recId() {
-//        return recId;
-//    }
-
-//    @Override
-//    public String fullpath() {
-//        return path;
-//    }
-
-//    @Override
-//    public IFileDescriptor fullpath(String clientpath) throws IOException {
-//        path = clientpath;
-//        return this;
-//    }
-
-//    @Override
-//    public String clientname() {
-//        Path p = Paths.get(path);
-//        return p.getFileName().toString();
-//    }
-//
-//    @Override
-//    public String mime() {
-//        return "TODO";
-//    }
-
-//    @Override
-//    public String cdate() {
-//        return DateFormat.format(new Date(date));
-//    }
-//
-//    @Override
-//    public String device() {
-//        return "TODO";
-//    }
-
-//    @Override
-//    public String uri() {
-//        return "TODO";
-//    }
 }

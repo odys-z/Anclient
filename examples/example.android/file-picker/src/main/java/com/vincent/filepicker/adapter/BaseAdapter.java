@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.odysz.semantic.tier.docs.DocsPage;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.oz.albumtier.AlbumContext;
 
 /**
@@ -40,7 +40,7 @@ public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends
 
     protected AlbumContext singleton;
 
-    protected DocsPage synchPage;
+    protected PathsPage synchPage;
 
     public BaseAdapter(Context ctx, ArrayList<T> list) {
         mContext = ctx;
