@@ -29,14 +29,18 @@ public class AlbumtierTest {
 	private AlbumContext singleton;
 	private PathsPage synchPage;
 	
+	static final String testfile = "src/test/res/64x48.png";
+	
 	ArrayList<SyncDoc> mList;
 
 	@Test
     public void testRefreshPage0() throws AnsonException, GeneralSecurityException, IOException, TransException {
 		mList = new ArrayList<SyncDoc>(1);
-		mList.add(new Photo().create("src/test/res/64x48.png"));
+		mList.add(new Photo().create(testfile));
 		
 		onActCreate();
+		
+		singleton.tier.del("h_photos", singleton.photoUser.device, testfile);
 		
 		onPhotosPicked();
 

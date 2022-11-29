@@ -132,7 +132,7 @@ public class PhotoSyntier extends Synclientier {
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
-		return pushBlocks( meta, videos, client.ssInfo(), proc, docOk, onErr);
+		return pushBlocks(meta.tbl, videos, client.ssInfo(), proc, docOk, onErr);
 	}
 
 //	public List<DocsResp> syncVideos(List<? extends IFileDescriptor> videos,
@@ -243,7 +243,7 @@ public class PhotoSyntier extends Synclientier {
 					//.folder(folder) // FIXME album tier is different with Docsyncer
 					.fullpath(localpath);
 
-		return insertSyncDoc(meta, doc, new OnDocOk() {
+		return insertSyncDoc(meta.tbl, doc, new OnDocOk() {
 			@Override
 			public void ok(SyncDoc doc, AnsonResp resp)
 					throws IOException, AnsonException, TransException {
@@ -402,7 +402,7 @@ public class PhotoSyntier extends Synclientier {
 		new Thread(new Runnable() {
 	        public void run() {
 				try {
-					syncUp(photos, client.ssInfo().uid(), meta, proc, docOk);
+					syncUp(meta.tbl, photos, client.ssInfo().uid(), proc, docOk);
 				} catch (IOException e) {
 					onErr.err(MsgCode.exIo, e.getClass().getName());
 				} catch (AnsonException | SQLException e) { 
@@ -488,7 +488,7 @@ public class PhotoSyntier extends Synclientier {
 //	}
 
 	public DocsResp del(String device, String clientpath) {
-		return del(meta, device, clientpath);
+		return del(meta.tbl, device, clientpath);
 	}
 
 //	public DocsResp del(String device, String clientpath) {
