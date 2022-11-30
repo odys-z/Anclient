@@ -22,6 +22,7 @@ import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.tier.Photo;
+import io.oz.albumtier.AlbumContext.ConnState;
 
 
 public class AlbumtierTest {
@@ -34,15 +35,20 @@ public class AlbumtierTest {
 	ArrayList<SyncDoc> mList;
 
 	@Test
-    public void testRefreshPage0() throws AnsonException, GeneralSecurityException, IOException, TransException {
+    public void testRefreshPage0() throws AnsonException, GeneralSecurityException, IOException, TransException, InterruptedException {
 		mList = new ArrayList<SyncDoc>(1);
 		mList.add(new Photo().create(testfile));
 		
+		Utils.printCaller(true);
 		onActCreate();
 		
+		Thread.sleep(1000); // wait for login
+		if (singleton.state != ConnState.Online)
+			fail("Why? Or try to wait longer?");
+
 		singleton.tier.del("h_photos", singleton.photoUser.device, testfile);
 		
-		onPhotosPicked();
+		onImagePicked();
 
 		Utils.logi("Press Enter when you think the test is finished ...");
 		pause();
@@ -126,16 +132,15 @@ public class AlbumtierTest {
             showMsg(R.string.msg_upload_failed, e.getClass().getName(), e.getMessage());
         }
     }</pre>
-     * @param usr 
      * @throws IOException 
      * @throws TransException 
      */
-   	void onPhotosPicked() throws TransException, IOException {
+   	void onImagePicked() throws TransException, IOException {
    		singleton.tier.asyVideos(mList,
-   				photoProc, photoUp, singleton.errCtx);
+   				photoProc, photoPushed, singleton.errCtx);
 	}
    	
-   	JProtocol.OnDocOk photoUp = (d, resp) -> {
+   	JProtocol.OnDocOk photoPushed = (d, resp) -> {
    		// TODO
    	};
 

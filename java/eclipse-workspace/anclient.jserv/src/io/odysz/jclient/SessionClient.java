@@ -21,8 +21,8 @@ import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantic.jsession.HeartBeat;
-import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantic.tier.docs.DocsReq;
+import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 
 /**AnClient.java with session managed.
