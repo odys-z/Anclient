@@ -219,13 +219,6 @@ public class PhotoSyntier extends Synclientier {
 		return download(uri, meta.tbl, photo, localpath);
 	}
 
-//	public String download(Photo photo, String localpath)
-//			throws SemanticException, AnsonException, IOException {
-//		AlbumReq req = new AlbumReq(clientUri).download(photo);
-//		req.a(A.download);
-//		return client.download(clientUri, AlbumPort.album, req, localpath);
-//	}
-
 	/**
 	 * @param collId
 	 * @param localpath
