@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
+import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -31,6 +33,7 @@ public class AlbumtierTest {
 	private PathsPage synchPage;
 	
 	static final String testfile = "src/test/res/64x48.png";
+	static final String device = "omni";
 	
 	ArrayList<SyncDoc> mList;
 
@@ -44,7 +47,7 @@ public class AlbumtierTest {
 		
 		Thread.sleep(1000); // wait for login
 		if (singleton.state != ConnState.Online)
-			fail("Why? Or try to wait longer?");
+			fail("Why? Is server started? Or try to wait longer?");
 
 		singleton.tier.del("h_photos", singleton.photoUser.device, testfile);
 		
@@ -67,7 +70,7 @@ public class AlbumtierTest {
 
 	void onActCreate() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
 		singleton = new AlbumContext()
-			.init("f/zsu", "syrskyi", "omni", jserv)
+			.init("f/zsu", "syrskyi", device, jserv)
 			.login( "syrskyi", "слава україні",
 					(client) -> refresh(mList),
 					(c, t, v) -> fail(t));
@@ -141,7 +144,20 @@ public class AlbumtierTest {
 	}
    	
    	JProtocol.OnDocOk photoPushed = (d, resp) -> {
-   		// TODO
+		SyncDoc doc = ((DocsResp) resp).doc;
+		assertEquals(device, doc.device());
+		assertEquals(testfile, doc.clientpath);
+   		
+   		try {
+   			DocsResp pths = singleton.tier.queryPaths(new PathsPage(), "h_photos");
+			AnResultset rs = pths.rs(0).beforeFirst();
+			rs.next();
+			assertEquals(device, rs.getString("device"));
+			assertEquals(testfile, rs.getString("clientpath"));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
    	};
 
 	JProtocol.OnProcess photoProc = (rs, rx, bx, bs, rsp) -> {};
