@@ -109,6 +109,16 @@ public class PhotoSyntier extends Synclientier {
 		return this;
 	}
 	
+	/**
+	 * @see #syncVideos(List, OnProcess, OnDocOk, ErrorCtx...)
+	 * @param videos
+	 * @param proc
+	 * @param docOk
+	 * @param onErr
+	 * @return list of response
+	 * @throws TransException
+	 * @throws IOException
+	 */
 	public PhotoSyntier asyVideos(List<SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
@@ -129,6 +139,16 @@ public class PhotoSyntier extends Synclientier {
 		return this;	
 	}
 
+	/**
+	 * Push up videos (larg files) with {@link #pushBlocks(String, List, SessionInf, OnProcess, OnDocOk, ErrorCtx...)}.
+	 * @param videos
+	 * @param proc
+	 * @param docOk
+	 * @param onErr
+	 * @return list of response
+	 * @throws TransException
+	 * @throws IOException
+	 */
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
@@ -281,7 +301,7 @@ public class PhotoSyntier extends Synclientier {
 						else page.add(p.fullpath());
 					}
 
-					resp = queryPaths(page, meta);
+					resp = queryPaths(page, meta.tbl);
 					try {
 						onOk.ok(resp);
 					} catch (AnsonException | SemanticException | IOException e) {
@@ -290,7 +310,7 @@ public class PhotoSyntier extends Synclientier {
 				} catch (IOException e) {
 					onErr.err(MsgCode.exIo, e.getClass().getName(),
 						e.getMessage(), resp == null ? null : resp.msg());
-				} catch (AnsonException | SQLException e) { 
+				} catch (AnsonException e) { 
 					onErr.err(MsgCode.exGeneral, e.getClass().getName(),
 						e.getMessage(), resp == null ? null : resp.msg());
 				} catch (SemanticException e) { 
