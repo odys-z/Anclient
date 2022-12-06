@@ -1,13 +1,14 @@
 package io.oz.albumtier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
-import io.odysz.module.rs.AnResultset;
+import io.odysz.semantic.ext.DocTableMeta.Share;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -143,21 +144,27 @@ public class AlbumtierTest {
    				photoProc, photoPushed, singleton.errCtx);
 	}
    	
-   	JProtocol.OnDocOk photoPushed = (d, resp) -> {
-		SyncDoc doc = ((DocsResp) resp).doc;
+   	JProtocol.OnDocOk photoPushed = (doc, resp) -> {
+		// SyncDoc doc = ((DocsResp) resp).doc;
 		assertEquals(device, doc.device());
 		assertEquals(testfile, doc.clientpath);
    		
-   		try {
-   			DocsResp pths = singleton.tier.queryPaths(new PathsPage(), "h_photos");
-			AnResultset rs = pths.rs(0).beforeFirst();
-			rs.next();
-			assertEquals(device, rs.getString("device"));
-			assertEquals(testfile, rs.getString("clientpath"));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
+		assertEquals(device, doc.device(), "photoPushed()");
+		assertEquals(testfile, doc.clientpath, "photoPushed()");
+		assertEquals(Share.pub, doc.shareflag(), "photoPushed()");
+		// FIXME assertEquals(1603L, rs.getLong(meta.size), "photoPushed()");
+		assertEquals("2022_12", doc.folder(), "photoPushed()");
+		assertEquals("image/png", doc.mime(), "photoPushed()");
+		assertNotNull(doc.sharedate, "photoPushed()");
+
+		DocsResp pths = singleton.tier.queryPaths(new PathsPage().add(testfile), "h_photos");
+		assertTrue(pths.pathsPage().paths().size() > 0, "photoPushed()");
+		assertEquals(device, pths.pathsPage().device, "photoPushed()");
+		for (String p : pths.pathsPage().paths().keySet()) {
+			if (testfile.equals(p))
+				return;
 		}
+		fail("Pushed file can be not queried.");
    	};
 
 	JProtocol.OnProcess photoProc = (rs, rx, bx, bs, rsp) -> {};
