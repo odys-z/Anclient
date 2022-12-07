@@ -15,11 +15,6 @@ together with
 [![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
 @anclient/anreact
 
-- Anprism
-
-[![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
-VS Code extension
-
 - Anclient.java
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/)
