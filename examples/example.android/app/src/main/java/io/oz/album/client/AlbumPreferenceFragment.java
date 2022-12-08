@@ -16,7 +16,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 import io.odysz.common.LangExt;
-import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantics.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.albumtier.AlbumContext;

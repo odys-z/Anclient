@@ -37,17 +37,10 @@ import com.vincent.filepicker.adapter.BaseAdapter;
 import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
-import java.io.File;
 import java.util.ArrayList;
 
-import io.odysz.semantic.jprotocol.AnsonResp;
-import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.DocsResp;
-import io.odysz.semantic.tier.docs.SyncFlag;
-import io.oz.album.tier.AlbumResp;
-import io.oz.album.tier.Photo;
-import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
+import io.oz.jserv.sync.SyncFlag;
 
 /**
  * Created by Ody Zhou

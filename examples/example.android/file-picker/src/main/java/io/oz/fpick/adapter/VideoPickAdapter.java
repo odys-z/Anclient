@@ -30,7 +30,7 @@ import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;
 
-import io.odysz.semantic.tier.docs.SyncFlag;
+import io.oz.jserv.sync.SyncFlag;
 import io.oz.fpick.R;
 
 /**

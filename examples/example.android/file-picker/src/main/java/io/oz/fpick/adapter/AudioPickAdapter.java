@@ -20,8 +20,8 @@ import com.vincent.filepicker.filter.entity.AudioFile;
 
 import java.util.ArrayList;
 
-import io.odysz.semantic.tier.docs.SyncFlag;
 import io.oz.fpick.R;
+import io.oz.jserv.sync.SyncFlag;
 
 /**
  * Created by Ody Zhou

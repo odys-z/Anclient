@@ -357,7 +357,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                     try {
                         if (singl.tier != null)
-                            singl.tier.syncVideos(list, singl.photoUser, null, null);
+                            // singl.tier.syncVideos(list, singl.photoUser, null, null);
+                            singl.tier.syncVideos(list, null, null, singl.errCtx);
                         else showMsg(R.string.msg_ignored_when_offline);
                     } catch (IOException | AnsonException | TransException e) {
                         e.printStackTrace();
