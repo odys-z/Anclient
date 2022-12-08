@@ -13,12 +13,7 @@ is also been verified.
 together with
 
 [![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
-@anclient/anreact
-
-- Anprism
-
-[![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
-VS Code extension
+@anclient/anreact (and a VS plugin for HTML page editing [Anprism](https://github.dev/odys-z/Anclient/blob/master/js/anprism))
 
 - Anclient.java
 
