@@ -3,17 +3,12 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Date;
-
-import io.odysz.common.DateFormat;
-import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.SyncDoc;
+import io.odysz.transact.x.TransException;
 
 /**
- * Modyfied by Ody Zhou
+ * Modified by Ody Zhou
  *
  * Created by Vincent Woo
  * Date: 2016/10/10
@@ -27,16 +22,12 @@ public class BaseFile extends SyncDoc implements Parcelable {
 
     private long id;
     private String name;
-    // private String path;
     private long size;          //byte
-    private String bucketId;    //Directory ID
-    private String bucketName;  //Directory Name
+    private String localDirId;  //Directory ID
+    private String localDirName;//Directory Name
     private long date;          //Added Date
     private boolean isSelected;
-
-    // public int synchFlag = SynchUnknown;
-
-    private String recId;
+    // private String recId;
 
     @Override
     public boolean equals(Object o) {
@@ -84,20 +75,20 @@ public class BaseFile extends SyncDoc implements Parcelable {
         this.size = size;
     }
 
-    public String getBucketId() {
-        return bucketId;
+    public String getLocalDirId() {
+        return localDirId;
     }
 
-    public void setBucketId(String bucketId) {
-        this.bucketId = bucketId;
+    public void setLocalDirId(String localDirId) {
+        this.localDirId = localDirId;
     }
 
-    public String getBucketName() {
-        return bucketName;
+    public String getLocalDirName() {
+        return localDirName;
     }
 
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
+    public void setLocalDirName(String localDirName) {
+        this.localDirName = localDirName;
     }
 
     public long getDate() {
@@ -122,10 +113,11 @@ public class BaseFile extends SyncDoc implements Parcelable {
         dest.writeString(name);
         dest.writeString(clientpath);
         dest.writeLong(size);
-        dest.writeString(bucketId);
-        dest.writeString(bucketName);
+        dest.writeString(localDirId);
+        dest.writeString(localDirName);
         dest.writeLong(date);
         dest.writeByte((byte) (isSelected ? 1 : 0));
+        dest.writeString(folder);
     }
 
     @Override
@@ -139,16 +131,17 @@ public class BaseFile extends SyncDoc implements Parcelable {
 
         @Override
         public BaseFile createFromParcel(Parcel in) {
-            BaseFile file = new BaseFile();
-            file.id = in.readLong();
-            file.name = in.readString();
-            file.clientpath = in.readString();
-            file.size = in.readLong();
-            file.bucketId = in.readString();
-            file.bucketName = in.readString();
-            file.date = in.readLong();
-            file.isSelected = in.readByte() != 0;
-            return file;
+            throw new AnsonException(0, "No overriding?");
+//            BaseFile file = new BaseFile();
+//            file.id = in.readLong();
+//            file.name = in.readString();
+//            file.clientpath = in.readString();
+//            file.size = in.readLong();
+//            file.localDirId = in.readString();
+//            file.localDirName = in.readString();
+//            file.date = in.readLong();
+//            file.isSelected = in.readByte() != 0;
+//            return file;
         }
     };
 }

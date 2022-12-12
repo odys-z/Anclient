@@ -25,7 +25,8 @@ import io.oz.albumtier.PhotoSyntier;
  */
 public class PrefsContentActivity extends AppCompatActivity {
 
-    static AlbumContext singleton = AlbumContext.getInstance();
+    // static AlbumContext singleton = AlbumContext.getInstance(this);
+    static AlbumContext singleton;
 
     static String oldUid;
     private AlbumPreferenceFragment prefFragment;
@@ -34,7 +35,8 @@ public class PrefsContentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (singleton == null) {
-            singleton = AlbumApp.singl;
+            // singleton = AlbumApp.singl;
+            singleton = AlbumContext.getInstance(this);
             oldUid = null;
         } else oldUid = singleton.photoUser.uid();
 

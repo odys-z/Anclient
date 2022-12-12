@@ -119,7 +119,7 @@ public class PhotoSyntier extends Synclientier {
 	 * @throws TransException
 	 * @throws IOException
 	 */
-	public PhotoSyntier asyVideos(List<SyncDoc> videos,
+	public PhotoSyntier asyVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
 		new Thread(new Runnable() {

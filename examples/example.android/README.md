@@ -16,15 +16,15 @@ The app can running on Android accessing local files and synchronizing files wit
 
 # Troubleshootings
 
-1 start Huawei Pro 30 for debug and adb device shows nothing
+- 1 start Huawei Pro 30 for debug and adb device shows nothing
 
 see [stackoverflow](https://stackoverflow.com/a/53887437/7362888).
 
-2 access local Storage
+- 2 access local Storage
 
 [stackoverflow](https://stackoverflow.com/a/54342155/7362888)
 
-3 ajax CROS error
+- 3 ajax CROS error
 
 try of stackoverflow
 
@@ -32,7 +32,7 @@ try of stackoverflow
 
 [answer 2](https://stackoverflow.com/a/54342155/7362888)
 
-4 AVD emulator terminated
+- 4 AVD emulator terminated
 
 try start emulator with CLI
 
@@ -47,6 +47,18 @@ to remove Android SDK system images (using a lot of disk space), uncheck the ite
 in SDK Manager. See [here](https://stackoverflow.com/a/34369232).
 
 
-5 Download AVD system images failed
+- 5 Download AVD system images failed
 
 see [stackoverflow](https://stackoverflow.com/q/45686444)
+
+- 6 Can not connect loack web service
+
+```
+    java.io.IOException: unexpected end of stream on http://192.168.X.X:8081/jserv-album/...
+    ...
+```
+
+A similar report is [here](https://stackoverflow.com/q/72008226).
+None of these [answers](https://stackoverflow.com/q/5806220) work.
+
+Try disable Android Studio proxy setting and restart AVD device. The problem shouldn't appear again.

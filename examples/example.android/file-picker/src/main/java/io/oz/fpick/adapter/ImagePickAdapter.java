@@ -7,8 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
-import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +18,6 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -31,10 +28,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
-import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.adapter.BaseAdapter;
-import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.util.ArrayList;
@@ -240,13 +234,13 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
         public ImagePickViewHolder ( View itemView ) {
             super ( itemView );
-            icAlbum = (ImageView) itemView.findViewById ( R.id.xiv_album_icon);
-            icSyncing = (ImageView) itemView.findViewById ( R.id.xiv_syncing_icon);
-            icSynced = (ImageView) itemView.findViewById ( R.id.xiv_synced_icon);
+            icAlbum = itemView.findViewById ( R.id.xiv_album_icon);
+            icSyncing = itemView.findViewById ( R.id.xiv_syncing_icon);
+            icSynced = itemView.findViewById ( R.id.xiv_synced_icon);
 
-            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
+            mIvThumbnail = itemView.findViewById ( R.id.xiv_thumbnail );
             mShadow = itemView.findViewById ( R.id.x_shadow );
-            mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
+            mCbx = itemView.findViewById ( R.id.x_check );
             animation = itemView.findViewById ( R.id.animationSquare );
         }
     }
