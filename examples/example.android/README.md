@@ -5,8 +5,10 @@ This project is An Android application based on semantic-* and the extensions.
 The app can running on Android accessing local files and synchronizing files with
 [jserv.syncdoc](https://github.com/odys-z/semantic-jserv/tree/master/docsync.jserv).
 
+<figure>
 <img src='docsphinx/res/01-img-picking.png' style="width: 9em; padding:0.4em"/>
 <img src='docsphinx/res/02-images.png' style="width: 9em; padding:0.4em"/>
+</figure>
 
 # Credits
 
