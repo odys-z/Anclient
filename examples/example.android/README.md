@@ -43,3 +43,8 @@ see [stackoverflow](https://stackoverflow.com/a/44931679)
 
 to remove Android SDK system images (using a lot of disk space), uncheck the item
 in SDK Manager. See [here](https://stackoverflow.com/a/34369232).
+
+
+5 Download AVD system images failed
+
+see [stackoverflow](https://stackoverflow.com/q/45686444)

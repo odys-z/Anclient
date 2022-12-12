@@ -253,7 +253,6 @@ public class PhotoSyntier extends Synclientier {
 			throws IOException, TransException, SQLException {
 		Photo doc = (Photo) new Photo()
 					.share(client.ssInfo().uid(), share, new Date())
-					//.folder(folder) // FIXME album tier is different with Docsyncer
 					.fullpath(localpath);
 
 		return insertSyncDoc(meta.tbl, doc, new OnDocOk() {
