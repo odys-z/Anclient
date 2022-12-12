@@ -14,4 +14,4 @@ target
 /captures
 .externalNativeBuild
 local.properties
-gradle.log
+*.log
