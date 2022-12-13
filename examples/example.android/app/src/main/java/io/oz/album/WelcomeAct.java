@@ -1,11 +1,5 @@
 package io.oz.album;
 
-import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
-import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
-
-import static io.oz.album.webview.WebAlbumAct.Act_Help;
-import static io.oz.album.webview.WebAlbumAct.Web_ActionName;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,36 +8,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.vincent.filepicker.Constant;
+import com.vincent.filepicker.activity.AudioPickActivity;
+import com.vincent.filepicker.activity.ImagePickActivity;
+import com.vincent.filepicker.activity.VideoPickActivity;
+import com.vincent.filepicker.filter.entity.BaseFile;
+import com.vincent.filepicker.filter.entity.ImageFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
-
-import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.activity.AudioPickActivity;
-import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.activity.VideoPickActivity;
-import com.vincent.filepicker.filter.entity.AudioFile;
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.ImageFile;
-import com.vincent.filepicker.filter.entity.NormalFile;
-import com.vincent.filepicker.filter.entity.VideoFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.DocsResp;
-import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
-import io.oz.album.client.PrefsContentActivity;
 import io.oz.fpick.PickingMode;
+
+import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
+import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
+import static io.oz.album.webview.WebAlbumAct.Act_Help;
+import static io.oz.album.webview.WebAlbumAct.Web_ActionName;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
     AlbumContext singl;
@@ -80,7 +74,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
         // singl = AlbumApp.singl;
-        singl = AlbumContext.getInstance(this);
+        singl = AlbumContext.getInstance();
 
         // singl.init(getResources(), AlbumApp.keys, PreferenceManager.getDefaultSharedPreferences(this));
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);

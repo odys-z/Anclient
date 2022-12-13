@@ -74,7 +74,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         notifyItemChanged(index);
     }
 
-    public List<T> getDataSet() { return (List<T>) mList; }
+    public List<T> getDataSet() { return mList; }
 
     @SuppressLint("NotifyDataSetChanged")
     public void refresh(List<T> list) {
@@ -106,14 +106,17 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 //                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
             // sequence order is guaranteed.
 
+            // [sync-flag, share-falg, share-by, share-date]
             HashMap<String, String[]> phts = rsp.syncing().paths();
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
-                T f = mList.get((int)i);
+                T f = mList.get(i);
                 if (phts.containsKey(f.fullpath())) {
                     String[] inf = phts.get(f.fullpath());
+                    // TODO f.parseFlags(inf);
                     f.syncFlag = inf[0];
                     f.shareflag = inf[1];
-                    f.sharedate(inf[2]);
+                    f.shareby = inf[2];
+                    f.sharedate(inf[3]);
                 }
             }
 

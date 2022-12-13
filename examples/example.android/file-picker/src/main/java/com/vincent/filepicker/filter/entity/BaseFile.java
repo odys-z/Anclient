@@ -3,9 +3,17 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.vincent.filepicker.Util;
+
+import java.text.ParseException;
+import java.util.Date;
+
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.transact.x.TransException;
+
+import static io.odysz.common.LangExt.isNull;
 
 /**
  * Modified by Ody Zhou
@@ -21,13 +29,12 @@ public class BaseFile extends SyncDoc implements Parcelable {
 //    public static int Synchronizing = -1;
 
     private long id;
-    private String name;
-    private long size;          //byte
+    // private String name;
+    // private long size;          //byte
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
     private long date;          //Added Date
     private boolean isSelected;
-    // private String recId;
 
     @Override
     public boolean equals(Object o) {
@@ -51,33 +58,22 @@ public class BaseFile extends SyncDoc implements Parcelable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public String getName() { return pname; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setName(String name) { this.pname = name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public String getPath() { return clientpath; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setPath(String path) { this.clientpath = path; }
 
-    public String getPath() {
-        return clientpath;
-    }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public long getSize() { return size; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setSize(long size) { this.size = size; }
 
-    public void setPath(String path) {
-        this.clientpath = path;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public String getLocalDirId() {
-        return localDirId;
-    }
+    public String getLocalDirId() { return localDirId; }
 
     public void setLocalDirId(String localDirId) {
         this.localDirId = localDirId;
@@ -91,26 +87,19 @@ public class BaseFile extends SyncDoc implements Parcelable {
         this.localDirName = localDirName;
     }
 
-    public long getDate() {
-        return date;
-    }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public long getDate() { return date; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setDate(long date) { this.date = date; }
 
-    public void setDate(long date) {
-        this.date = date;
-    }
+    public boolean isSelected() { return isSelected; }
 
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
+    public void setSelected(boolean selected) { isSelected = selected; }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeString(name);
+        dest.writeString(pname);
         dest.writeString(clientpath);
         dest.writeLong(size);
         dest.writeString(localDirId);
@@ -144,4 +133,27 @@ public class BaseFile extends SyncDoc implements Parcelable {
 //            return file;
         }
     };
+
+    public String path() {
+        return Util.extractPathWithoutSeparator(clientpath);
+    }
+
+    public BaseFile cdate(long l) {
+        cdate(new Date(l));
+        return this;
+    }
+
+    /*
+    public BaseFile formatFolder(Date ...d) {
+        if (isNull(d)) {
+            try {
+                formatFolder(DateFormat.parse(createDate));
+            } catch (ParseException e) {
+                formatFolder(new Date());
+            }
+        }
+        else folder(DateFormat.formatYYmm(d[0]));
+        return this;
+    }
+     */
 }

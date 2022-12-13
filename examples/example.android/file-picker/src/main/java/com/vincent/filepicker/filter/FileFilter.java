@@ -15,6 +15,8 @@ import static com.vincent.filepicker.filter.callback.FileLoaderCallbacks.TYPE_VI
 import androidx.fragment.app.FragmentActivity;
 
 /**
+ * @deprecated replaced by FileFilterx for deprecated API usage.
+ *
  * Created by Vincent Woo
  * Date: 2016/10/11
  * Time: 10:19

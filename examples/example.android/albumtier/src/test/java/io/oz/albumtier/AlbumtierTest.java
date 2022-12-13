@@ -1,8 +1,6 @@
 package io.oz.albumtier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
@@ -18,11 +16,10 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
-import io.odysz.semantic.ext.DocTableMeta.Share;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;

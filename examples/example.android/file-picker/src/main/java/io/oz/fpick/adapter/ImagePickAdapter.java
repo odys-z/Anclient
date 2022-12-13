@@ -1,12 +1,9 @@
 package io.oz.fpick.adapter;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +12,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -33,8 +26,13 @@ import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.util.ArrayList;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import io.oz.fpick.R;
 import io.oz.jserv.sync.SyncFlag;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 /**
  * Created by Ody Zhou
@@ -65,7 +63,10 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
             WindowManager wm = (WindowManager) mContext.getSystemService ( Context.WINDOW_SERVICE );
-            int width = wm.getDefaultDisplay ( ).getWidth ( );
+            // int width = wm.getDefaultDisplay ( ).getWidth ( );
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(displaymetrics);
+            int width = displaymetrics.widthPixels;
             params.height = width / ImagePickActivity.COLUMN_NUMBER;
         }
         ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
@@ -117,7 +118,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             // holder.mIvThumbnail.setImageURI(Uri.parse(file.getPath()));
 
             // if (file.synchFlag == BaseFile.Synchronizing) {
-            if (file.syncFlag == SyncFlag.pushing) {
+            if (file.syncFlag.equals(SyncFlag.pushing)) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
@@ -125,7 +126,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.icSynced.setVisibility(View.GONE);
             }
             // else if (file.synchFlag == BaseFile.Synchronized) {
-            else if (file.syncFlag == SyncFlag.publish) {
+            else if (file.syncFlag.equals(SyncFlag.publish)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -185,10 +186,11 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
-                int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
+                // int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
+                int index = isNeedCamera ? holder.getAbsoluteAdapterPosition( ) - 1
+                                         : holder.getAbsoluteAdapterPosition( );
 
                 String sync = mList.get(index).syncFlag;
-                // if ( BaseFile.Synchronized || sync == BaseFile.Synchronizing)
                 if ( SyncFlag.publish.equals(sync) || SyncFlag.pushing.equals(sync))
                     return;
 

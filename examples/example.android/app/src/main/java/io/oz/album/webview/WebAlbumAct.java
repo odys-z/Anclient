@@ -40,9 +40,9 @@ public class WebAlbumAct extends AppCompatActivity {
 	private String loadUrls(int act) {
 	    switch (act) {
 			case Act_Album:
-				return getString(R.string.url_album, AlbumContext.getInstance(this).jserv(), AlbumContext.getInstance(this).albumHome);
+				return getString(R.string.url_album, AlbumContext.getInstance().jserv(), AlbumContext.getInstance().albumHome);
 			case Act_SyncReport:
-				return getString(R.string.url_sync_report, AlbumContext.getInstance(this).jserv(), AlbumContext.getInstance(this).synchPage);
+				return getString(R.string.url_sync_report, AlbumContext.getInstance().jserv(), AlbumContext.getInstance().synchPage);
 			case Act_Help:
 				return getString(R.string.url_help);
 			case Act_Landing:

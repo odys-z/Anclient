@@ -36,7 +36,7 @@ public class PrefsContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (singleton == null) {
             // singleton = AlbumApp.singl;
-            singleton = AlbumContext.getInstance(this);
+            singleton = AlbumContext.getInstance();
             oldUid = null;
         } else oldUid = singleton.photoUser.uid();
 
