@@ -109,9 +109,9 @@ public class AlbumContext {
 
         tier = (PhotoSyntier) new PhotoSyntier(clientUri, photoUser.device, errCtx)
 				.asyLogin(uid, pswd, photoUser.device,
-                // onOk, onErr);
                 (client) -> {
 				    state = ConnState.Online;
+				    client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min
 				    onOk.ok(client);
                 },
                 (c, r, args) -> {
