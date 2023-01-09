@@ -253,7 +253,7 @@ public class PhotoSyntier extends Synclientier {
 					syncUp(meta.tbl, photos, client.ssInfo().uid(), proc, docOk);
 				} catch (IOException e) {
 					onErr.err(MsgCode.exIo, e.getClass().getName());
-				} catch (AnsonException | SQLException e) { 
+				} catch (AnsonException e) { 
 					onErr.err(MsgCode.exGeneral, e.getClass().getName());
 				} catch (SemanticException e) { 
 					onErr.err(MsgCode.exSemantic, e.getClass().getName());
