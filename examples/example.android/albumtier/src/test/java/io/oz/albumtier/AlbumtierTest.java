@@ -49,7 +49,7 @@ public class AlbumtierTest {
 		if (singleton.state != ConnState.Online)
 			fail("Why? Is server started? Or try to wait longer?");
 
-		singleton.tier.del("h_photos", singleton.photoUser.device, testfile);
+		singleton.tier.synDel("h_photos", singleton.photoUser.device, testfile);
 		
 		onImagePicked();
 
@@ -151,7 +151,7 @@ public class AlbumtierTest {
 		// ! also make sure files are saved in volume/user-id
 		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());
    		
-		DocsResp pths = singleton.tier.queryPaths(new PathsPage().add(testfile), "h_photos");
+		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testfile), "h_photos");
 		PathsPage pthpage = pths.pathsPage();
 		assertEquals(device, pthpage.device);
 		assertEquals(1, pthpage.paths().size());

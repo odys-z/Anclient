@@ -176,7 +176,7 @@ public class PhotoSyntier extends Synclientier {
 					.share(client.ssInfo().uid(), share, new Date())
 					.fullpath(localpath);
 
-		return insertSyncDoc(meta.tbl, doc, new OnDocOk() {
+		return synInsertDoc(meta.tbl, doc, new OnDocOk() {
 			@Override
 			public void ok(SyncDoc doc, AnsonResp resp)
 					throws IOException, AnsonException, TransException {
@@ -206,7 +206,7 @@ public class PhotoSyntier extends Synclientier {
 						else page.add(p.fullpath());
 					}
 
-					resp = queryPaths(page, meta.tbl);
+					resp = synQueryPathsPage(page, meta.tbl);
 					try {
 						onOk.ok(resp);
 					} catch (AnsonException | SemanticException | IOException e) {
@@ -270,6 +270,6 @@ public class PhotoSyntier extends Synclientier {
 	}
 
 	public DocsResp del(String device, String clientpath) {
-		return del(meta.tbl, device, clientpath);
+		return synDel(meta.tbl, device, clientpath);
 	}
 }
