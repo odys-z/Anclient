@@ -22,20 +22,6 @@ Anclient for Java
 
 # Repository Structure
 
-This repository has multiple clients, it's planed all can work independently.
-
-With the protocol based on json, we are planning to implement the clients:
-
-- Anclient/csharp
-
-The C# client API runing on .net framework 4.7.1.
-
-The Visual Studio solution is
-
-```
-    csharp/anclient/anclient.sln
-```
-
 There are 3 clients in the solution:
 
 - java
@@ -58,13 +44,17 @@ published as nuget package (coming).
 
     Examples using Anclient.js.
 
- -- North Star
+  North Star
 
     Example using Anclient + React.
 
 - example.cs
 
     Example for Winform built upon Anclient.cs
+    
+- example.android
+
+    Example for Android built upon Anclient.java.
 
 # Document
 
