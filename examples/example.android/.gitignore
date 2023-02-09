@@ -13,3 +13,5 @@ target
 /build
 /captures
 .externalNativeBuild
+local.properties
+*.log
