@@ -30,10 +30,10 @@ import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
+import io.oz.jserv.docsync.Synclientier;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Photo;
 import io.oz.album.tier.PhotoMeta;
-import io.oz.jserv.sync.Synclientier;
 
 /**
  * Photo client, a asynchronous wrapper of {@link Synclientier}.
