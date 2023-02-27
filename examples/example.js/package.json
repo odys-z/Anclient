@@ -7,7 +7,7 @@
     "build": "echo \"cd react-quiz, webpack\"",
     "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
-  "author": "Odys Zhou",
+  "author": "Ody Zhou",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.17.8",

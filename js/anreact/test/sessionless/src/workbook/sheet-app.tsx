@@ -1,22 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '../../../semantier/anclient';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '../../../../semantier/anclient';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs
-} from '../../../anreact/src/an-components';
+	AnContext, AnError, AnReactExt, jsample, JsonServs, CellEditingStoppedEvent, Spreadsheetier
+} from '../../../../anreact/src/an-components';
 
-import Welcome from './welcome';
+import { Workbook } from './workbook-no-tier';
+// import { MyBookReq } from './workbook-tier';
 
-const { Userst, JsampleTheme } = jsample;
+const { JsampleTheme } = jsample;
 
 type LessProps = {
 	servs: JsonServs;
 	servId: string;
 	iportal?: string;
-	iparent?: any; // parent of iframe
+	iparent?: string; // parent of iframe
 	iwindow?: any; // window object
 }
 
@@ -26,29 +28,36 @@ type State = {
 	iportal?: string;
 	hasError?: boolean;
 	nextAction?: string;
+	conn_state: TMsgCode;
 }
 
 /** The application main, context singleton and error handler */
 class App extends React.Component<LessProps, State> {
-	/** {@link InsercureClient} */
 	inclient: Inseclient;
 	anReact: AnReactExt;  // helper for React
 
 	error: ErrorCtx;
 
 	state = {
+		conn_state: Protocol.MsgCode.ok as TMsgCode,
 		hasError: false,
 		iportal: 'portal.html',
-		nextAction: undefined, // e.g. re-login
+		nextAction: undefined as string, // e.g. re-login
 
 		/** json object specifying host's urls */
 		servs: undefined,
-		/** the serv id for picking url */
+		/** the serv id for selecting url from configured hosts */
 		servId: '',
 	};
 
-	/**Restore session from window.localStorage
-	 */
+	uri = '/less/sheet';
+	tier: Spreadsheetier;
+
+	/**
+     * Restore session from window.localStorage
+     *
+     * @param props
+     */
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
 
@@ -56,10 +65,10 @@ class App extends React.Component<LessProps, State> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.onEdited = this.onEdited.bind(this);
 
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
-		// this.state.jserv = this.props.servs[this.state.servId];
 
 		this.inclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
 
@@ -75,15 +84,35 @@ class App extends React.Component<LessProps, State> {
 		Protocol.sk.cbbRole = 'roles';
 
 		this.anReact = new AnReactExt(this.inclient, this.error)
-								.extendPorts({
-									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
-								});
+                        .extendPorts({
+                            /* see jserv-sandbox/UsersTier, port name: sheetier, filter: sheet.less */
+                            workbook: "sheet.less",
+                        });
+
+		let onEditStop = this.onEdited;
+
+
+		// Spreadsheetier.registerReq((p, r) => { return new MyBookReq(p, r); })
+
+		this.tier = new Spreadsheetier('workbook',
+			{ uri: this.uri,
+			  pkval: {pk: 'cId', v: undefined, tabl: 'b_curriculums'},
+			  cols: [
+				{field: 'cid', label: L("Id"), width: 120, editable: false },
+				{field: 'currName', label: L("curriculum"), width: 160 },
+				{field: 'clevel', label: L("Level"), width: 140, type: 'cbb', sk: 'curr-level', onEditStop },
+				{field: 'module', label: L('Module'), width: 120, type: 'cbb', sk: 'curr-modu' },
+				{field: 'cate', label: L("Category"), width: 120, type: 'cbb', sk: 'curr-cate' },
+				{field: 'subject', label: L("Subject"), width: 160, type: 'cbb', sk: 'curr-subj' },
+			],
+		});
 	}
 
-	onError(c: any, r: AnsonMsg<AnsonResp> ) {
+	onError(c: TMsgCode, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r);
 		this.error.msg = r.Body().msg();
 		this.setState({
+			conn_state: c,
 			hasError: !!c,
 			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
@@ -95,8 +124,13 @@ class App extends React.Component<LessProps, State> {
 		this.setState({hasError: false});
 	}
 
+	onEdited(p: CellEditingStoppedEvent): void {
+		// TODO change color
+
+		this.tier.updateCell(p);
+	}
+
 	render() {
-	  // let that = this;
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
@@ -111,15 +145,11 @@ class App extends React.Component<LessProps, State> {
 				error: this.error,
 				ssInf: undefined,
 			}} >
-				{<Userst port='userstier' uri={'/less/users'}/>}
-				<hr/>
-				{<Welcome port='welcomeless' uri={'/less/welcome'}/>}
+				{<Workbook port='sheet' uri={this.uri} tier={this.tier} conn_state={this.state.conn_state} />}
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={"/login"} tier={undefined}
 							title={L('Error')} msg={this.error.msg} />}
-				<hr/>
-				アプリ コンポーネントの内容は, 上記のすべて...<br/> {Date().toString()}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}
@@ -130,7 +160,7 @@ class App extends React.Component<LessProps, State> {
 	 * where serv-id = this.context.servId || host
 	 *
 	 * For test, have elem = undefined
-	 * @param elem html element id, null for test
+	 * @param elem html element id
 	 * @param opts default: {serv: 'host', portal: 'index.html'}
 	 * - serv: string,
 	 * - portal: string

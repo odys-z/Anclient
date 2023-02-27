@@ -316,10 +316,6 @@ export interface QueryFormProps extends Comprops {
 	/** @deprecated replaced by conds */
 	fields?: AnlistColAttrs<JSX.Element, CompOpts>[];
 
-	/**Set to true if connection error occurs
-	 * - to disable error context handling triggering endless loop. */
-	// stopBinding?: boolean;
-
 	/**
 	 * User actions: search button clicked
 	 */

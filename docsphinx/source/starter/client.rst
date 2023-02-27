@@ -10,8 +10,8 @@ the java client.
 
 * @anclient/semantier,
 
-Semantier is short for Semantics Tier, a low level js client API for accessing service
-providen by semantic-jserver.
+the semantics supported protocol layer, and *Semantier* is short for Semantics Tier,
+a low level js client API for accessing service providen by semantic-jserver.
 
 Since 0.9.42, it's ported to Typescript, with types for better user experience with
 support of VS Code Intellisense.
