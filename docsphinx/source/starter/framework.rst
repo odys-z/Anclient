@@ -113,7 +113,7 @@ singleton and implement these rules to resolve / find the jserv address.
 
 ::
 
-    origin/app-path/privat.json
+    <origin>/<app-path>/privat/host.json
 
 for configuration to find what the jserv url is.
 
