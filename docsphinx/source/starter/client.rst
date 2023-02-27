@@ -24,8 +24,8 @@ A presentation tier package for accessing semantier API, built on Material UI + 
 
 the planned c# client.
 
-JS Quick Start
-==============
+Anclient.js Quick Start
+=======================
 
 Start with the basic API
 ------------------------
@@ -34,13 +34,16 @@ Start with the basic API
 
 Say, :ref:`jsample <jsample-quick-start>`.
 
-2. Install Anclient.
+2. Install Anclient.js.
 
-It's a npm package::
+Anclient.js is actually implemented in Typescript.
+
+It's two npm packages::
 
     npm install react react-dom
     npm install @anclient/semantier @anclient/anreact
 
-3. Create a client
+3. Create a Typescript client
 
-See Anclient/js/test/jsample/dist/main.html
+See `Anclient/js/test/sessionless/dist/main.html <https://github.com/odys-z/Anclient/blob/master/js/test/sessionless/dist/index.html>`_
+for a reactJS client, which can accessing data service, a implementation based on semantic-jserv.

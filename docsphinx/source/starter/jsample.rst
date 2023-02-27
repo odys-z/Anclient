@@ -1,24 +1,24 @@
-About JSample
+About TSample
 =============
 
-The JSample is an example project showing how to use the semantic-jserv API to
-implement data service.
+The TSample is an example project showing how to use the semantic-jserv API to
+access data service, the semantic-jserv.
 
 Before flowing steps in the Anclient's quick start tutorial, you need to setup the
 sever. The 2 parts must work together though they can be deployed separately.
 
-JSample is the semantic-\* server side sample project, implemented ports like::
+TSample is the semantic-\* server side sample project, implemented ports like::
 
     menu (menu.serv)
     tools
     ...
 
 Check `javadoc: Samport <https://odys-z.github.io/javadoc/jserv.sample/io/odysz/jsample/protocol/Samport.html>`_
-for what JSample can do.
+for what TSample can do.
 
 .. _jsample-quick-start:
 
-JSample Quick Start
+TSample Quick Start
 ===================
 
 Start with binary release
@@ -128,7 +128,7 @@ Just import the sample project located in folder "jserv-sample".
 
 2. Check JDBC Connections
 
-JSample using a sqlite3 db file as the default datasource for test. The provided
+TSample using a sqlite3 db file as the default datasource for test. The provided
 project has some ready to run configurations.
 
 For the first time beginner, it's nothing to do here. More datasource configuration
@@ -139,7 +139,7 @@ It's recommended have a look at the JDBC connection file, located in::
 
     src/main/webapp/WEB-INF/connects.xml
 
-3.Update Maven Dependencies
+3. Update Maven Dependencies
 
 Right click the imported project, then "Maven -> Update Project...".
 

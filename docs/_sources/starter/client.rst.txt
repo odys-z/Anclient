@@ -43,4 +43,5 @@ It's a npm package::
 
 3. Create a client
 
-See Anclient/js/test/jsample/dist/main.html
+See @anclient/anreact test project jsampl (which is to be named as tsample)
+`main page <https://github.com/odys-z/Anclient/blob/master/js/anreact/test/jsample/dist/main.html>`_.
