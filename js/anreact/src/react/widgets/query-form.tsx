@@ -122,6 +122,11 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 						}
 					});
 			}
+			else if (!cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
+				// warning for old version usages
+				console.warn("Looks like this field is intend to be a combbox but no cond.sk proviced.",
+							cond);
+			}
 		});
 	}
 

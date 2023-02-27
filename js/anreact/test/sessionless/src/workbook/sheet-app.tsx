@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom';
 
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '../../../../semantier/anclient';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs, CellEditingStoppedEvent, Spreadsheetier
-} from '../../../../anreact/src/an-components';
+} from '../../../../src/an-components';
 
 import { Workbook } from './workbook-no-tier';
 // import { MyBookReq } from './workbook-tier';

@@ -2,14 +2,13 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '../../../../semantier/anclient';
+import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, AnContextType, Spreadsheetier,
-} from '../../../../anreact/src/an-components';
-// import { MyWorkbookTier } from './workbook-tier';
-import { JsampleIcons } from '../../../../anreact/src/jsample/styles';
+} from '../../../../src/an-components';
+import { JsampleIcons } from '../../../../src/jsample/styles';
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -89,7 +88,6 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 		// let that = this;
 		// // if (this.currentId)
 		// this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
-		
 		this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
 	}
 

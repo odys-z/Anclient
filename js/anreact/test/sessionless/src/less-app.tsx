@@ -2,11 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '../../../semantier/anclient';
+// import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '../../../../semantier/anclient';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
-} from '../../../anreact/src/an-components';
+// } from '../../../anreact/src/an-components';
+} from '../../../src/an-components';
 
 import Welcome from './welcome';
 
@@ -96,15 +98,16 @@ class App extends React.Component<LessProps, State> {
 	}
 
 	render() {
-	  // let that = this;
+	  let that = this;
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
-				anReact: this.anReact,
+				// anReact: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
 				anClient: this.inclient,
+				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',

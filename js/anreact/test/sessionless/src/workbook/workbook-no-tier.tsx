@@ -2,13 +2,13 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '../../../../semantier/anclient';
+import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, AnContextType,
-} from '../../../../anreact/src/an-components';
-import { JsampleIcons } from '../../../../anreact/src/jsample/styles';
+} from '../../../../src/an-components';
+import { JsampleIcons } from '../../../../src/jsample/styles';
 
 const styles = (_theme: Theme) => ({
 	root: {

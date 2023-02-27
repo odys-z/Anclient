@@ -1,9 +1,8 @@
 import React from 'react';
 import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
-import { OnLoadOk } from '../../../semantier/protocol';
-import { QueryConditions, Semantier, Tierec } from '../../../semantier/semantier';
-import { ClassNames, Comprops, CrudComp, jsample } from '../../../anreact/src/an-components';
+import { OnLoadOk, QueryConditions, Semantier, Tierec } from '@anclient/semantier';
+import { ClassNames, Comprops, CrudComp, jsample } from '../../../src/an-components';
 
 const styles = (theme: Theme) => ( {
 	root: {
