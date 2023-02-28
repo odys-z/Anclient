@@ -21,8 +21,8 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = u'Anclient'
-copyright = u'2022, Odys Zhou'
-author = u'Odys Zhou'
+copyright = u'2023, Ody Zhou'
+author = u'Ody Zhou'
 
 # The short X.Y version
 version = u''
