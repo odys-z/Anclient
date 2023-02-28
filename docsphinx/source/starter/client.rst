@@ -121,7 +121,7 @@ Then load the page from at::
     http://localhost:8888
 
 The App with a HTML page's source can be found at
-`Anclient/js/anreact/test/sessionless/dist/main.html <https://github.com/odys-z/Anclient/blob/master/js/anreact/test/sessionless/dist/index.html>`_.
+`Anclient/js/anreact/test/sessionless/dist/index.html <https://github.com/odys-z/Anclient/blob/master/js/anreact/test/sessionless/dist/index.html>`_.
 
 .. code-block:: html
 
