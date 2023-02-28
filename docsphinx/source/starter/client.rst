@@ -11,9 +11,9 @@ the java client.
 * @anclient/semantier,
 
 the semantics supported protocol layer, and *Semantier* is short for Semantics Tier,
-a low level js client API for accessing service providen by semantic-jserver.
+a low level js client API for accessing service provided by semantic-jserver.
 
-Since 0.9.42, it's ported to Typescript, with types for better user experience with
+Since 0.9.42, it's been ported to Typescript, with types for better user experience with
 support of VS Code Intellisense.
 
 * @anclient/anreact,
@@ -27,13 +27,13 @@ the planned c# client.
 Anclient.js Quick Start
 =======================
 
-There are 2 built-in typescript packages for testing come with the installed npm packages,
-which can be useful for kick start.
+There are 2 built-in typescript packages for testing that come with the installed
+npm packages, which can be useful for kick start.
 
-Start with session managed sample
+Start with session-managed client
 ---------------------------------
 
-This sample project consists two part, one from the test project of semantic-jserv,
+This sample project consists of two parts, one from the test project of semantic-jserv,
 one from the test of @anclient/anreact.
 
 1. Deploy a data service using Semantic-jserv
@@ -52,14 +52,14 @@ It's two npm packages::
 3. Create a Typescript client
 
 See `Anclient/js/areact/test/tsample/dist/.html <https://github.com/odys-z/Anclient/blob/master/js/test/sessionless/dist/index.html>`_
-for a reactJS client, which can accessing data service, a implementation based
+for a reactJS client, which can accessing data service, an implementation based
 on semantic-jserv.
 
 Start with the session less client
 ----------------------------------
 
 This way uses jserv-sandbox (`src <https://github.com/odys-z/Anclient/tree/master/js/anreact/test/sessionless>`_)
-as example for quick start, which won't verify http request at server side.
+as an example for quick start, which won't verify HTTP requests at server side.
 
 1. Deploy a web application of jserv-sandbox
 
@@ -87,7 +87,7 @@ path, like::
 And don't forget to allow CROS if planning to deploy the servicer side at a different
 domain to the web page server, where the html pages are loaded from.
 
-In web application's web.xml,
+In web application's configuration, e.g. tomcat server's web.xml, add
 
 .. code-block:: xml
 
@@ -132,7 +132,7 @@ Then load App with a HTML page like
 where the function *bindHtml(div, {jsonUrl, serv})* is implemented in
 `less-app.tsx <https://github.com/odys-z/Anclient/blob/master/js/anreact/test/sessionless/src/less-app.tsx>`_.
 
-The *jsonUrl* is a configure variable that can tells *bindHtml()* where to find
+The *jsonUrl* is a configure variable that can tell *bindHtml()* where to find
 json data service, the *jserv-sandbox*.
 
 The final result load with `Anprism <https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism>`_
