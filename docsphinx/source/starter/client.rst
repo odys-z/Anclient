@@ -30,10 +30,13 @@ Anclient.js Quick Start
 There are 2 built-in typescript packages for testing come with the installed npm packages,
 which can be useful for kick start.
 
-Test 1: Start with the tsample's client
----------------------------------------
+Start with session managed sample
+---------------------------------
 
-1. Deploy a web application of Semantic-jserv
+This sample project consists two part, one from the test project of semantic-jserv,
+one from the test of @anclient/anreact.
+
+1. Deploy a data service using Semantic-jserv
 
 Say, :ref:`tsample <jsample-quick-start>`.
 
@@ -49,7 +52,8 @@ It's two npm packages::
 3. Create a Typescript client
 
 See `Anclient/js/areact/test/tsample/dist/.html <https://github.com/odys-z/Anclient/blob/master/js/test/sessionless/dist/index.html>`_
-for a reactJS client, which can accessing data service, a implementation based on semantic-jserv.
+for a reactJS client, which can accessing data service, a implementation based
+on semantic-jserv.
 
 Test 2: Start with the session less client
 ------------------------------------------
@@ -57,16 +61,43 @@ Test 2: Start with the session less client
 1. Deploy a web application of jserv-sandbox
 
 Download the java web project and deploy to a servlet container,
-:download:`jserv-sandbox java project <path>`,
-and open as an existing maven project, install maven package and deploy to a Tomcat server.
+:download:`jserv-sandbox java project <https://github.com/odys-z/Anclient>`,
+and open as an existing maven project,
 
-To run the server, set **VOLUME_HOME** environment variable to the volume folder path,
-like::
+::
+
+    Eclipse -> File -> Open Projects from File System
+
+and install maven package, then deploy to a Tomcat server.
+
+To run the server, set **VOLUME_HOME** environment variable to the volume folder
+path, like::
 
     -DVOLUME_HOME="C:\\Users\\Ody\\jserv-sandbox\\volume"
 
+.. image:: ./imgs/01-eclipse-import-sandbox.jpg 
+    :height: 120px
+
 .. image:: ./imgs/04-sandbox-tomcat.png 
-    :width: 300px
+    :height: 120px
+
+And don't forget to allow CROS if planning to deploy the servicer side at a different
+domain to the web page server, where the html pages are loaded from.
+
+In web application's web.xml,
+
+.. code-block:: xml
+
+    <filter>
+	  <filter-name>CorsFilter</filter-name>
+	  <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+      <filter-name>CorsFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>
+..
 
 2. Install Anclient.js.
 
@@ -105,7 +136,7 @@ The final result load with `Anprism <https://marketplace.visualstudio.com/items?
 should like this:
 
 .. image:: ./imgs/05-sessionless-vscode.png
-    :height: 300px
+    :height: 160px
 
 .. image:: ./imgs/03-sessionless.png
-    :height: 300px
+    :height: 160px

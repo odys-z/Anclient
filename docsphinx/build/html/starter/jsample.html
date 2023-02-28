@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>About JSample &mdash; Anclient Anclient documentation</title>
+  <title>About TSample &mdash; Anclient Anclient documentation</title>
   
 
   
@@ -93,9 +93,9 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Quick Start (js only)</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="client.html">About Anclient</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client.html#js-quick-start">JS Quick Start</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">About JSample</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#jsample-quick-start">JSample Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="client.html#anclient-js-quick-start">Anclient.js Quick Start</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">About TSample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsample-quick-start">TSample Quick Start</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#start-with-binary-release">Start with binary release</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#start-from-source">Start from source</a></li>
 </ul>
@@ -157,13 +157,11 @@
         
           <li><a href="index.html">Quick Start (js only)</a> &raquo;</li>
         
-      <li>About JSample</li>
+      <li>About TSample</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../_sources/starter/jsample.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,23 +174,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="about-jsample">
-<h1>About JSample<a class="headerlink" href="#about-jsample" title="Permalink to this headline">¶</a></h1>
-<p>The JSample is an example project showing how to use the semantic-jserv API to
-implement data service.</p>
+  <div class="section" id="about-tsample">
+<h1>About TSample<a class="headerlink" href="#about-tsample" title="Permalink to this headline">¶</a></h1>
+<p>The TSample is an example project showing how to use the semantic-jserv API to
+access data service, the semantic-jserv.</p>
 <p>Before flowing steps in the Anclient’s quick start tutorial, you need to setup the
 sever. The 2 parts must work together though they can be deployed separately.</p>
-<p>JSample is the semantic-* server side sample project, implemented ports like:</p>
+<p>TSample is the semantic-* server side sample project, implemented ports like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">menu</span> <span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">serv</span><span class="p">)</span>
 <span class="n">tools</span>
 <span class="o">...</span>
 </pre></div>
 </div>
 <p>Check <a class="reference external" href="https://odys-z.github.io/javadoc/jserv.sample/io/odysz/jsample/protocol/Samport.html">javadoc: Samport</a>
-for what JSample can do.</p>
+for what TSample can do.</p>
 </div>
-<div class="section" id="jsample-quick-start">
-<span id="id1"></span><h1>JSample Quick Start<a class="headerlink" href="#jsample-quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="tsample-quick-start">
+<span id="jsample-quick-start"></span><h1>TSample Quick Start<a class="headerlink" href="#tsample-quick-start" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="start-with-binary-release">
 <h2>Start with binary release<a class="headerlink" href="#start-with-binary-release" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
@@ -289,7 +287,7 @@ library.</p>
 <ol class="arabic simple" start="2">
 <li><p>Check JDBC Connections</p></li>
 </ol>
-<p>JSample using a sqlite3 db file as the default datasource for test. The provided
+<p>TSample using a sqlite3 db file as the default datasource for test. The provided
 project has some ready to run configurations.</p>
 <p>For the first time beginner, it’s nothing to do here. More datasource configuration
 based on JDBC (both connection pool and driver manager mode) can be found in
@@ -298,7 +296,9 @@ semantic-DA documents.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">src</span><span class="o">/</span><span class="n">main</span><span class="o">/</span><span class="n">webapp</span><span class="o">/</span><span class="n">WEB</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">connects</span><span class="o">.</span><span class="n">xml</span>
 </pre></div>
 </div>
-<p>3.Update Maven Dependencies</p>
+<ol class="arabic simple" start="3">
+<li><p>Update Maven Dependencies</p></li>
+</ol>
 <p>Right click the imported project, then “Maven -&gt; Update Project…”.</p>
 <p>Wait for the project refreshed. Now the project should be ready to be deployed.</p>
 <ol class="arabic simple" start="4">
