@@ -55,8 +55,11 @@ See `Anclient/js/areact/test/tsample/dist/.html <https://github.com/odys-z/Ancli
 for a reactJS client, which can accessing data service, a implementation based
 on semantic-jserv.
 
-Test 2: Start with the session less client
-------------------------------------------
+Start with the session less client
+----------------------------------
+
+This way uses jserv-sandbox (`src <https://github.com/odys-z/Anclient/tree/master/js/anreact/test/sessionless>`_)
+as example for quick start, which won't verify http request at server side.
 
 1. Deploy a web application of jserv-sandbox
 
