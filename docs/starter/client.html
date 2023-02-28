@@ -269,16 +269,13 @@ domain to the web page server, where the html pages are loaded from.</p>
 <li><p>Install Anclient.js.</p></li>
 </ol>
 <p>Extract <em>anclient.sessionless.zip</em> to local folder, e.g. <em>anclient.sessionless</em>.</p>
-<dl class="simple">
-<dt>::</dt><dd><dl class="simple">
-<dt>cd anclient.sessionless</dt><dd><p>npm install
-cd test/sessionless &amp;&amp; npm install
-webpack
-cd dist &amp;&amp; python3 -m http.server 8888</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">anclient</span><span class="o">.</span><span class="n">sessionless</span>
+<span class="n">npm</span> <span class="n">install</span>
+<span class="n">cd</span> <span class="n">test</span><span class="o">/</span><span class="n">sessionless</span> <span class="o">&amp;&amp;</span> <span class="n">npm</span> <span class="n">install</span>
+<span class="n">webpack</span>
+<span class="n">cd</span> <span class="n">dist</span> <span class="o">&amp;&amp;</span> <span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">http</span><span class="o">.</span><span class="n">server</span> <span class="mi">8888</span>
+</pre></div>
+</div>
 <p>Now let’s edit sessionless/dist/github.json to point jserv to the corrrect address.
 Then load the page from at:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8888</span>

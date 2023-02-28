@@ -108,11 +108,12 @@ In web application's configuration, e.g. tomcat server's web.xml, add
 Extract *anclient.sessionless.zip* to local folder, e.g. *anclient.sessionless*.
 
 ::
+
     cd anclient.sessionless
-	npm install
-	cd test/sessionless && npm install
-	webpack
-	cd dist && python3 -m http.server 8888
+    npm install
+    cd test/sessionless && npm install
+    webpack
+    cd dist && python3 -m http.server 8888
 
 Now let's edit sessionless/dist/github.json to point jserv to the corrrect address.
 Then load the page from at::
