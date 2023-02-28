@@ -2,12 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-// import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '../../../../semantier/anclient';
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
-// } from '../../../anreact/src/an-components';
 } from '../../../src/an-components';
 
 import Welcome from './welcome';
@@ -30,7 +28,12 @@ type State = {
 	nextAction?: string;
 }
 
-/** The application main, context singleton and error handler */
+/**
+ * The main application, context singleton and error handler.
+ * 
+ * This application is used for test @anclient/anreact, and also as an example
+ * used in the sessionless tutorials. See Anclient/docs.
+ */
 class App extends React.Component<LessProps, State> {
 	/** {@link InsercureClient} */
 	inclient: Inseclient;
@@ -40,7 +43,9 @@ class App extends React.Component<LessProps, State> {
 
 	state = {
 		hasError: false,
+		/** Url of page provided in context for navigation when user logged out from main app. */
 		iportal: 'portal.html',
+
 		nextAction: undefined, // e.g. re-login
 
 		/** json object specifying host's urls */
@@ -49,8 +54,6 @@ class App extends React.Component<LessProps, State> {
 		servId: '',
 	};
 
-	/**Restore session from window.localStorage
-	 */
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
 
@@ -61,7 +64,6 @@ class App extends React.Component<LessProps, State> {
 
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
-		// this.state.jserv = this.props.servs[this.state.servId];
 
 		this.inclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
 
@@ -98,11 +100,9 @@ class App extends React.Component<LessProps, State> {
 	}
 
 	render() {
-	  let that = this;
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
-				// anReact: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
@@ -127,7 +127,8 @@ class App extends React.Component<LessProps, State> {
 		</MuiThemeProvider>);
 	}
 
-	/**Try figure out serv root, then bind to html tag.
+	/**
+	 * Try figure out serv root, then bind to html tag.
 	 * First try ./private.host/<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
@@ -135,8 +136,9 @@ class App extends React.Component<LessProps, State> {
 	 * For test, have elem = undefined
 	 * @param elem html element id, null for test
 	 * @param opts default: {serv: 'host', portal: 'index.html'}
-	 * - serv: string,
-	 * - portal: string
+	 * opts.serv: string, 
+	 * opts.portal: string,
+	 * opts.jsonUrl: the jserv service root url, e.g. http://localhost:8080/jserv-sandbox
 	 */
 	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
 		let portal = opts.portal ?? 'index.html';
