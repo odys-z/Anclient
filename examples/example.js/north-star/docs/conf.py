@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = u'ERA'
-copyright = u'2021, ERA Team'
+copyright = u'2023, ERA Team'
 author = u'ERA Team'
 
 # The short X.Y version
