@@ -55,11 +55,12 @@ See `Anclient/js/areact/test/tsample/dist/.html <https://github.com/odys-z/Ancli
 for a reactJS client, which can accessing data service, an implementation based
 on semantic-jserv.
 
-Start with the session less client
+Start with the session-less client
 ----------------------------------
 
 This way uses jserv-sandbox (`src <https://github.com/odys-z/Anclient/tree/master/js/anreact/test/sessionless>`_)
-as an example for quick start, which won't verify HTTP requests at server side.
+as an example for quick start, which won't verify HTTP requests session token at
+server side.
 
 0. Prerequisite
    
@@ -122,8 +123,8 @@ Extract *anclient.sessionless.zip* to local folder, e.g. *anclient.sessionless*.
     webpack
     cd dist && python3 -m http.server 8888
 
-Now let's edit sessionless/dist/github.json to point jserv to the corrrect address.
-Then load the page from at::
+Now let's edit sessionless/dist/github.json to point jserv to the sandbox root path.
+Then load the page at::
 
     http://localhost:8888
 
