@@ -1,5 +1,5 @@
-Guid (Tips)
-===========
+Guide & Tips
+============
 
 .. toctree::
    :maxdepth: 2
