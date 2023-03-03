@@ -128,6 +128,17 @@ Then load the page at::
 
     http://localhost:8888
 
+The final result load with `Anprism <https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism>`_
+should like this:
+
+.. image:: ./imgs/05-sessionless-vscode.png
+    :height: 160px
+
+.. image:: ./imgs/03-sessionless.png
+    :height: 160px
+
+Now it is the time to have a look how the application is loaded by the html page.
+
 The App with a HTML page's source can be found at
 `Anclient/js/anreact/test/sessionless/dist/index.html <https://github.com/odys-z/Anclient/blob/master/js/anreact/test/sessionless/dist/index.html>`_.
 
@@ -150,12 +161,3 @@ where the function *bindHtml(div, {jsonUrl, serv})* is implemented in
 
 The *jsonUrl* is a configure variable that can tell *bindHtml()* where to find
 json data service, the *jserv-sandbox*.
-
-The final result load with `Anprism <https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism>`_
-should like this:
-
-.. image:: ./imgs/05-sessionless-vscode.png
-    :height: 160px
-
-.. image:: ./imgs/03-sessionless.png
-    :height: 160px
