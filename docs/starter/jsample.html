@@ -98,6 +98,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#jserv-sample-quick-start">Jserv-sample Quick Start</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#start-with-binary-release">Start with binary release</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#start-from-source">Start from source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#test-with-docker">Test with Docker</a></li>
 </ul>
 </li>
 </ul>
@@ -190,12 +191,11 @@ for what TSample can do.</p>
 <span id="jsample-quick-start"></span><h1>Jserv-sample Quick Start<a class="headerlink" href="#jserv-sample-quick-start" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="start-with-binary-release">
 <h2>Start with binary release<a class="headerlink" href="#start-with-binary-release" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li><p>download the latest archive from <a class="reference external" href="https://github.com/odys-z/semantic-jserv/releases">release section</a>.</p></li>
-</ol>
+<p>1. download the <a class="reference external" href="https://github.com/odys-z/semantic-jserv/releases/tag/v1.2">jserv-sample v1.2</a>
+from release section.</p>
 <p>The zip file is a working sample project source for quick start. Unzip it to the
 local file system.</p>
-<ol class="arabic simple" start="2">
+<ol class="arabic simple">
 <li><p>import eclipse project</p></li>
 </ol>
 <p>In Eclipse:</p>
@@ -204,7 +204,7 @@ local file system.</p>
 </div>
 <p>Navigate to where the package is extracted.</p>
 <ol class="arabic simple" start="3">
-<li><p>create a servlet server with parameter “io.oz.root-key”</p></li>
+<li><p>create a servlet server with a 16 bytes string</p></li>
 </ol>
 <p>Here is a sample contex.xml for Tomcat.</p>
 <div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
@@ -223,11 +223,11 @@ local file system.</p>
 <p>The sample project comes with a sqlite3 db file and configured basice semantics.
 The project and deploy to tomcat with Eclipse, should reporting in console like:</p>
 <a class="reference internal image-reference" href="../_images/01-eclipse-deploy.jpg"><img alt="../_images/01-eclipse-deploy.jpg" src="../_images/01-eclipse-deploy.jpg" style="width: 480px;" /></a>
-<p>Visiting the login serv port:</p>
+<p>Visite the login serv port:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//&lt;</span><span class="n">server</span><span class="o">&gt;/&lt;</span><span class="n">path</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">jserv</span><span class="o">-</span><span class="n">sample</span><span class="o">&gt;/</span><span class="n">login</span><span class="o">.</span><span class="n">serv11</span>
 </pre></div>
 </div>
-<p>You will get some json data like this:</p>
+<p id="login-serv-get">You will get some json data like this:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;io.odysz.semantic.jprotocol.AnsonMsg&quot;</span><span class="p">,</span>
   <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;exSemantic&quot;</span><span class="p">,</span>
   <span class="nt">&quot;opts&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
@@ -343,6 +343,29 @@ it.</p>
 <p>That’s all! The jserv-sample service is running now. Next you should visit the
 service using one of the different versions of Anclient. See the
 <a class="reference internal" href="#jsample-quick-start"><span class="std std-ref">js client sample quick start</span></a> and the java client (TODO doc).</p>
+</div>
+<div class="section" id="test-with-docker">
+<h2>Test with Docker<a class="headerlink" href="#test-with-docker" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Only tested on Ubuntu.</p>
+</div>
+<p>Since jserv-sample v1.3.2, a scripts for starting docker image is provided
+<a class="reference external" href="https://github.com/odys-z/semantic-jserv/releases/tag/v1.2">here</a>.</p>
+<p>Download <strong>docker-start</strong> &amp; <strong>volume.zip</strong>. In the folder where <em>volume.zip</em>
+is extracted, run <em>docker-start</em>, which will setup volume for sqlite3 DB files
+and bring up docker container. You can run docker command to check the service.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">ps</span>
+<span class="n">CONTAINER</span> <span class="n">ID</span>   <span class="n">IMAGE</span>                <span class="n">COMMAND</span>             <span class="n">CREATED</span>          <span class="n">STATUS</span>          <span class="n">PORTS</span>                                       <span class="n">NAMES</span>
+<span class="n">d4205b113c49</span>   <span class="n">odysz</span><span class="o">/</span><span class="n">jserv</span><span class="o">-</span><span class="n">sample</span>   <span class="s2">&quot;catalina.sh run&quot;</span>   <span class="mi">15</span> <span class="n">minutes</span> <span class="n">ago</span>   <span class="n">Up</span> <span class="mi">15</span> <span class="n">minutes</span>   <span class="mf">0.0.0.0</span><span class="p">:</span><span class="mi">8080</span><span class="o">-&gt;</span><span class="mi">8080</span><span class="o">/</span><span class="n">tcp</span><span class="p">,</span> <span class="p">:::</span><span class="mi">8080</span><span class="o">-&gt;</span><span class="mi">8080</span><span class="o">/</span><span class="n">tcp</span>   <span class="n">jsample</span>
+</pre></div>
+</div>
+<p>Then use wget to check <em>session</em> port.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="o">-</span><span class="n">qO</span> <span class="o">-</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="n">jserv</span><span class="o">-</span><span class="n">sample</span><span class="o">/</span><span class="n">login</span><span class="o">.</span><span class="n">serv11</span>
+</pre></div>
+</div>
+<p>The result is <a class="reference internal" href="#login-serv-get"><span class="std std-ref">explained</span></a>.</p>
+<a class="reference internal image-reference" href="../_images/02-jsample-docker.png"><img alt="../_images/02-jsample-docker.png" src="../_images/02-jsample-docker.png" style="width: 320px;" /></a>
 </div>
 </div>
 

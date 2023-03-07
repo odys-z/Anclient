@@ -24,12 +24,13 @@ Jserv-sample Quick Start
 Start with binary release
 -------------------------
 
-1. download the latest archive from `release section <https://github.com/odys-z/semantic-jserv/releases>`_.
+1. download the `jserv-sample v1.2 <https://github.com/odys-z/semantic-jserv/releases/tag/v1.2>`_
+from release section.
 
 The zip file is a working sample project source for quick start. Unzip it to the
 local file system.
 
-2. import eclipse project
+1. import eclipse project
 
 In Eclipse::
 
@@ -37,7 +38,7 @@ In Eclipse::
 
 Navigate to where the package is extracted.
 
-3. create a servlet server with parameter "io.oz.root-key"
+3. create a servlet server with a 16 bytes string
 
 Here is a sample contex.xml for Tomcat.
 
@@ -61,9 +62,11 @@ The project and deploy to tomcat with Eclipse, should reporting in console like:
 .. image:: imgs/01-eclipse-deploy.jpg
     :width: 480px
 
-Visiting the login serv port::
+Visite the login serv port::
 
     http://<server>/<path e.g. jserv-sample>/login.serv11
+
+.. _login-serv-get:
 
 You will get some json data like this:
 
@@ -194,3 +197,39 @@ and should get some error messages like above.
 That's all! The jserv-sample service is running now. Next you should visit the
 service using one of the different versions of Anclient. See the
 :ref:`js client sample quick start <jsample-quick-start>` and the java client (TODO doc).
+
+Test with Docker
+----------------
+
+.. warning:: Only tested on Ubuntu.
+
+Since jserv-sample v1.3.2, a scripts for starting docker image is provided
+`here <https://github.com/odys-z/semantic-jserv/releases/tag/v1.2>`_.
+
+Download **docker-start** & **volume.zip**. In the folder where *volume.zip*
+is extracted, run *docker-start*, which will setup volume for sqlite3 DB files
+and bring up docker container. You can run docker command to check the service.
+
+::
+
+    docker ps
+    CONTAINER ID   IMAGE                COMMAND             CREATED          STATUS          PORTS                                       NAMES
+    d4205b113c49   odysz/jserv-sample   "catalina.sh run"   15 minutes ago   Up 15 minutes   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   jsample
+
+Then use wget to check *session* port.
+
+::
+
+    wget -qO - http://localhost:8080/jserv-sample/login.serv11
+
+The result is :ref:`explained<login-serv-get>`.
+
+.. image:: ./imgs/02-jsample-docker.png
+    :width: 320px
+
+
+
+
+
+
+
