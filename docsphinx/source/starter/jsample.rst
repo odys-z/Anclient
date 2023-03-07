@@ -26,8 +26,8 @@ Start with binary release
 
 1. download the latest archive from `release section <https://github.com/odys-z/semantic-jserv/releases>`_.
 
-The zip file is a working sample project source for quick start. Unzip it to local
-file system.
+The zip file is a working sample project source for quick start. Unzip it to the
+local file system.
 
 2. import eclipse project
 
@@ -35,7 +35,7 @@ In Eclipse::
 
     File -> Import ... -> Existing Projects into Workspace
 
-Navigate to where the package extracted.
+Navigate to where the package is extracted.
 
 3. create a servlet server with parameter "io.oz.root-key"
 
@@ -55,7 +55,7 @@ Here is a sample contex.xml for Tomcat.
 
 4. deploy to the servlet container server
 
-The sample project come with a sqlite3 db file and configured basice semantics.
+The sample project comes with a sqlite3 db file and configured basice semantics.
 The project and deploy to tomcat with Eclipse, should reporting in console like:
 
 .. image:: imgs/01-eclipse-deploy.jpg
@@ -88,12 +88,11 @@ You will get some json data like this:
 ..
 
 The service is reporting "No envelope is available" because the request with GET
-doesn't carry correct message. That means it's running correctly. the next step
-should be using a client to visit the service.
+request doesn't carry correct message. That means it's running correctly. the
+next step should be using a client to visit the service.
 
-.. attention:: Jserv is heavily depends on CORS data service. To avoid trouble,
-    it's recommended try an old version of Tomcat first, e.g. 7 or 8. And Configure
-    web.xml with this:
+.. attention:: Jserv is heavily dependent on CROS data service. To avoid trouble,
+    Configure web.xml with this to allow Cross Origin accessing:
 
 .. code-block:: xml
 
@@ -120,18 +119,18 @@ Start from source
 You can clone and import the project from here:
 `semantic-jserv repository <https://github.com/odys-z/semantic-jserv>`_.
 
-The repository contains 2 Eclipse project, the semantic-jserv server library and
+The repository contains 2 Eclipse projects, the semantic-jserv server library and
 the sample web application's sample project, jserv-sample, showing how to use the
 library.
 
-Just import the sample project located in folder "jserv-sample".
+Just import the sample project located in the folder "jserv-sample".
 
 2. Check JDBC Connections
 
 TSample using a sqlite3 db file as the default datasource for test. The provided
 project has some ready to run configurations.
 
-For the first time beginner, it's nothing to do here. More datasource configuration
+For the first time beginner, there is nothing to do here. More datasource configuration
 based on JDBC (both connection pool and driver manager mode) can be found in
 semantic-DA documents.
 
@@ -143,7 +142,8 @@ It's recommended have a look at the JDBC connection file, located in::
 
 Right click the imported project, then "Maven -> Update Project...".
 
-Wait for the project refreshed. Now the project should be ready to be deployed.
+Wait until for the project is refreshed. Now the project should be ready to be
+deployed.
 
 4. Deploy the Web Application
 
@@ -182,14 +182,15 @@ Note: while handling requests, you may find some error message in console like::
     line 1:19 mismatched input '<EOF>' expecting '.'
 
 That's because of a warning message from `antlr4 <https://github.com/antlr/antlr4>`_
-upon which semantic-\* are heavily based. Till now we find is safe to ignore it.
+upon which semansss-\* are heavily based. Till now we find its is safe to ignore
+it.
 
 Now, using a browser visiting e.g.::
 
     http://localhost:8080/jserv-sample/login.serv11
 
-and should get some error message like above.
+and should get some error messages like above.
 
-That's all! The sample service are running now. Next you should visit the service
-using one of the different version of Anclient. See the
+That's all! The jserv-sample service is running now. Next you should visit the
+service using one of the different versions of Anclient. See the
 :ref:`js client sample quick start <jsample-quick-start>` and the java client (TODO doc).

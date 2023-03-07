@@ -8,5 +8,6 @@ Guide & Tips
    framework
    examples/north
    examples/xvisual
+   docker
    func-uri
    controls/index

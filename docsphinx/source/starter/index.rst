@@ -7,4 +7,3 @@ Ancient.ts Quick Start
 
    client
    jsample
-   docker
