@@ -1,5 +1,5 @@
-Quick Start (js only)
-=====================
+Ancient.ts Quick Start
+======================
 
 .. toctree::
    :maxdepth: 2
@@ -7,6 +7,4 @@ Quick Start (js only)
 
    client
    jsample
-   framework
-   examples/north
-   examples/xvisual
+   docker

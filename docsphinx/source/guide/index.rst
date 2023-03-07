@@ -5,6 +5,8 @@ Guide & Tips
    :maxdepth: 2
    :caption: Contents:
 
+   framework
+   examples/north
+   examples/xvisual
    func-uri
    controls/index
-   docker

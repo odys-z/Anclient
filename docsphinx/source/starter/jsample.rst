@@ -1,5 +1,5 @@
-About TSample
-=============
+About jserv-sample
+==================
 
 The TSample is an example project showing how to use the semantic-jserv API to
 access data service, the semantic-jserv.
@@ -18,8 +18,8 @@ for what TSample can do.
 
 .. _jsample-quick-start:
 
-TSample Quick Start
-===================
+Jserv-sample Quick Start
+========================
 
 Start with binary release
 -------------------------

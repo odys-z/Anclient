@@ -1,30 +1,21 @@
-About Anclient
-==============
+About Anclient.ts
+=================
 
-Anclient is the client side API for semantic-jserv service like JSample, which
-including:
+Anclient is the client side API for semantic-jserv service like `jserv-sample <https://github.com/odys-z/semantic-jserv/tree/master/jserv-sample>`_.
+The typescript client version includes:
 
-* anclient.java,
-
-the java client.
-
-* @anclient/semantier,
-
-the semantics supported protocol layer, and *Semantier* is short for Semantics Tier,
-a low level js client API for accessing service provided by semantic-jserver.
-
-Since 0.9.42, it's been ported to Typescript, with types for better user experience with
-support of VS Code Intellisense.
+* @anclient/semantier &
 
 * @anclient/anreact,
 
-A presentation tier package for accessing semantier API, built on Material UI + ReactJS.
+Since 0.9.42, @anclient/semantier is a semantics supported protocol layer, and
+*Semantier* is short for Semantics Tier, a low level ts client API for accessing
+service provided by semantic-jserver.
 
-* anclient.cs,
+The @anclient/anreact is a presentation tier package for accessing semantier API,
+built on Material UI + ReactJS.
 
-the planned c# client.
-
-Anclient.js Quick Start
+Anclient.ts Quick Start
 =======================
 
 There are 2 built-in typescript packages for testing that come with the installed
@@ -33,14 +24,14 @@ npm packages, which can be useful for kick start.
 Start with session-managed client
 ---------------------------------
 
-This sample project consists of two parts, one from the test project of semantic-jserv,
-one from the test of @anclient/anreact.
+This sample project consists of two parts, one from the test project of
+semantic-jserv, one from the test of @anclient/anreact.
 
 1. Deploy a data service using Semantic-jserv
 
 Say, :ref:`tsample <jsample-quick-start>`.
 
-2. Install Anclient.js.
+2. Install Anclient.ts.
 
 Anclient.js is actually implemented in Typescript.
 
@@ -51,7 +42,7 @@ It's two npm packages::
 
 3. Create a Typescript client
 
-See `Anclient/js/areact/test/tsample/dist/.html <https://github.com/odys-z/Anclient/blob/master/js/test/sessionless/dist/index.html>`_
+See `Anclient/js/areact/test/tsample/dist/index.html <https://github.com/odys-z/Anclient/blob/master/js/test/sessionless/dist/index.html>`_
 for a reactJS client, which can accessing data service, an implementation based
 on semantic-jserv.
 
