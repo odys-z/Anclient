@@ -60,7 +60,7 @@ The sample project comes with a sqlite3 db file and configured basice semantics.
 The project and deploy to tomcat with Eclipse, should reporting in console like:
 
 .. image:: imgs/01-eclipse-deploy.jpg
-    :width: 480px
+    :width: 320px
 
 Visite the login serv port::
 
@@ -222,7 +222,7 @@ Then use wget to check *session* port.
 
     wget -qO - http://localhost:8080/jserv-sample/login.serv11
 
-The result is :ref:`explained<login-serv-get>`.
+The result is :ref:`explained here<login-serv-get>`.
 
 .. image:: ./imgs/02-jsample-docker.png
     :width: 320px
