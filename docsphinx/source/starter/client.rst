@@ -49,8 +49,8 @@ on semantic-jserv.
 Start with the session-less client
 ----------------------------------
 
-Use the released package
-________________________
+Use the Eclipse project
+_______________________
 
 This way uses jserv-sandbox (`src <https://github.com/odys-z/Anclient/tree/master/js/anreact/test/sessionless>`_)
 as an example for quick start, which won't verify HTTP requests session token at
