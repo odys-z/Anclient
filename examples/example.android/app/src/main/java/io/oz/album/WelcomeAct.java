@@ -1,11 +1,5 @@
 package io.oz.album;
 
-import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
-import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
-
-import static io.oz.album.webview.WebAlbumAct.Act_Help;
-import static io.oz.album.webview.WebAlbumAct.Web_ActionName;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,36 +8,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.vincent.filepicker.Constant;
+import com.vincent.filepicker.activity.AudioPickActivity;
+import com.vincent.filepicker.activity.ImagePickActivity;
+import com.vincent.filepicker.activity.VideoPickActivity;
+import com.vincent.filepicker.filter.entity.BaseFile;
+import com.vincent.filepicker.filter.entity.ImageFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
-
-import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.activity.AudioPickActivity;
-import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.activity.VideoPickActivity;
-import com.vincent.filepicker.filter.entity.AudioFile;
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.ImageFile;
-import com.vincent.filepicker.filter.entity.NormalFile;
-import com.vincent.filepicker.filter.entity.VideoFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.DocsResp;
-import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
-import io.oz.album.client.PrefsContentActivity;
 import io.oz.fpick.PickingMode;
+
+import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
+import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
+import static io.oz.album.webview.WebAlbumAct.Act_Help;
+import static io.oz.album.webview.WebAlbumAct.Web_ActionName;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
     AlbumContext singl;
@@ -60,6 +54,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     ActivityResultLauncher<Intent> webActStarter;
 
     TextView msgv;
+    AndErrorCtx errCtx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +73,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_regist = getString(R.string.key_regist);
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
-        singl = AlbumApp.singl;
+        // singl = AlbumApp.singl;
+        singl = AlbumContext.getInstance();
+
         // singl.init(getResources(), AlbumApp.keys, PreferenceManager.getDefaultSharedPreferences(this));
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String homeName = sharedPref.getString(AlbumApp.keys.home, "");
@@ -90,6 +87,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
+        errCtx = new AndErrorCtx().context(this);
 
         //
         if (imgPickActStarter == null)
@@ -110,11 +108,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     result -> {
                         if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                             if (singl.state() == AlbumContext.ConnState.Online) {
-                                try {
                                     onVideoPicked(result);
-                                } catch (IOException | SemanticException e) {
-                                    e.printStackTrace();
-                                }
                             }
                             else showMsg(R.string.msg_ignored_when_offline);
                         }
@@ -240,14 +234,22 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
                 else
+                    /*
                     singl.tier.asyncPhotosUp(list, singl.photoUser,
                         null,
                         (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
                         (c, r, args) -> showMsg(R.string.msg_upload_failed, (Object[]) args));
+                     */
+                    singl.tier.asyVideos(list,
+                       null,
+                            (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
+                            errCtx.prepare(msgv, R.string.msg_upload_failed));
             }
-        } catch (SemanticException | IOException | AnsonException e) {
+        } catch (TransException | IOException | AnsonException e) {
             e.printStackTrace();
-            showMsg(R.string.msg_upload_failed, e.getClass().getName(), e.getMessage());
+            // showMsg(R.string.msg_upload_failed, e.getClass().getName(), e.getMessage());
+            errCtx.prepare(msgv, R.string.msg_upload_failed)
+                  .err(null, e.getMessage(), e.getClass().getName());
         }
     }
 
@@ -265,17 +267,30 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         vidPickActStarter.launch(imgIntent);
     }
 
-    protected void onVideoPicked(@NonNull ActivityResult result) throws IOException, SemanticException {
+    protected void onVideoPicked(@NonNull ActivityResult result) {
         Intent data = result.getData();
         if (data != null) {
             ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
             if (singl.tier == null)
                 showMsg(R.string.txt_please_login);
             else
+                /*
                 singl.tier.asyncPhotosUp(list, singl.photoUser,
                         (rx, rows, bx, total, resp) -> showProgress(rx, list, bx, (DocsResp) resp),
                         (doc, resp) -> showMsg(R.string.t_synch_ok, list.size()),
                         (c, r, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
+                 */ {
+                try {
+                    singl.tier.asyVideos(list,
+                            (rows, rx, seq, total, resp) -> showProgress(rx, list, total, (DocsResp) resp),
+                            (doc, resp) -> showMsg(R.string.t_synch_ok, list.size()),
+                            errCtx.prepare(msgv, R.string.vw_no_video_play_app));
+                } catch (TransException | IOException e) {
+                    e.printStackTrace();
+                    errCtx.prepare(msgv, R.string.msg_upload_failed)
+                            .err(null, e.getMessage(), e.getClass().getName());
+                }
+            }
         }
     }
 
@@ -347,57 +362,57 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case Constant.REQUEST_CODE_PICK_IMAGE:
-                // shouldn't reach here
-                if (resultCode == RESULT_OK) {
-                    ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
-                    try {
-                        if (singl.tier != null)
-                            // singl.tier.syncVideos(list, singl.photoUser, null, null);
-                            singl.tier.syncVideos(list, null, null, singl.errCtx);
-                        else showMsg(R.string.msg_ignored_when_offline);
-                    } catch (IOException | AnsonException | TransException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            case Constant.REQUEST_CODE_PICK_VIDEO:
-                // shouldn't reach here
-                if (resultCode == RESULT_OK) {
-                    ArrayList<VideoFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
-                    StringBuilder builder = new StringBuilder();
-                    for (VideoFile file : list) {
-                        String path = file.getPath();
-                        builder.append(path + "\n");
-                    }
-                }
-                break;
-            case Constant.REQUEST_CODE_PICK_AUDIO:
-                // shouldn't reach here
-                if (resultCode == RESULT_OK) {
-                    ArrayList<AudioFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
-                    StringBuilder builder = new StringBuilder();
-                    for (AudioFile file : list) {
-                        String path = file.getPath();
-                        builder.append(path + "\n");
-                    }
-                }
-                break;
-            case Constant.REQUEST_CODE_PICK_FILE:
-                if (resultCode == RESULT_OK) {
-                    ArrayList<NormalFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_FILE);
-                    StringBuilder builder = new StringBuilder();
-                    for (NormalFile file : list) {
-                        String path = file.getPath();
-                        builder.append(path + "\n");
-                    }
-//                    mTvResult.setText(builder.toString());
-                }
-                break;
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch (requestCode) {
+//            case Constant.REQUEST_CODE_PICK_IMAGE:
+//                // shouldn't reach here
+//                if (resultCode == RESULT_OK) {
+//                    ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+//                    try {
+//                        if (singl.tier != null)
+//                            // singl.tier.syncVideos(list, singl.photoUser, null, null);
+//                            singl.tier.syncVideos(list, null, null, singl.errCtx);
+//                        else showMsg(R.string.msg_ignored_when_offline);
+//                    } catch (IOException | AnsonException | TransException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                break;
+//            case Constant.REQUEST_CODE_PICK_VIDEO:
+//                // shouldn't reach here
+//                if (resultCode == RESULT_OK) {
+//                    ArrayList<VideoFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+//                    StringBuilder builder = new StringBuilder();
+//                    for (VideoFile file : list) {
+//                        String path = file.getPath();
+//                        builder.append(path + "\n");
+//                    }
+//                }
+//                break;
+//            case Constant.REQUEST_CODE_PICK_AUDIO:
+//                // shouldn't reach here
+//                if (resultCode == RESULT_OK) {
+//                    ArrayList<AudioFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+//                    StringBuilder builder = new StringBuilder();
+//                    for (AudioFile file : list) {
+//                        String path = file.getPath();
+//                        builder.append(path + "\n");
+//                    }
+//                }
+//                break;
+//            case Constant.REQUEST_CODE_PICK_FILE:
+//                if (resultCode == RESULT_OK) {
+//                    ArrayList<NormalFile> list = data.getParcelableArrayListExtra(Constant.RESULT_PICK_FILE);
+//                    StringBuilder builder = new StringBuilder();
+//                    for (NormalFile file : list) {
+//                        String path = file.getPath();
+//                        builder.append(path + "\n");
+//                    }
+////                    mTvResult.setText(builder.toString());
+//                }
+//                break;
+//        }
+//    }
 }

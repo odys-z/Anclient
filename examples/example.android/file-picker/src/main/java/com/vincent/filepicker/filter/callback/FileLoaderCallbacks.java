@@ -129,16 +129,16 @@ public class FileLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor
             img.setName(data.getString(data.getColumnIndexOrThrow(TITLE)));
             img.setPath(data.getString(data.getColumnIndexOrThrow(DATA)));
             img.setSize(data.getLong(data.getColumnIndexOrThrow(SIZE)));
-            img.setBucketId(data.getString(data.getColumnIndexOrThrow(BUCKET_ID)));
-            img.setBucketName(data.getString(data.getColumnIndexOrThrow(BUCKET_DISPLAY_NAME)));
+            img.setLocalDirId(data.getString(data.getColumnIndexOrThrow(BUCKET_ID)));
+            img.setLocalDirName(data.getString(data.getColumnIndexOrThrow(BUCKET_DISPLAY_NAME)));
             img.setDate(data.getLong(data.getColumnIndexOrThrow(DATE_ADDED)));
 
             img.setOrientation(data.getInt(data.getColumnIndexOrThrow(ORIENTATION)));
 
             //Create a Directory
             Directory<ImageFile> directory = new Directory<>();
-            directory.setId(img.getBucketId());
-            directory.setName(img.getBucketName());
+            directory.setId(img.getLocalDirId());
+            directory.setName(img.getLocalDirName());
             directory.setPath(Util.extractPathWithoutSeparator(img.getPath()));
 
             if (!directories.contains(directory)) {
@@ -169,16 +169,16 @@ public class FileLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor
             video.setName(data.getString(data.getColumnIndexOrThrow(TITLE)));
             video.setPath(data.getString(data.getColumnIndexOrThrow(DATA)));
             video.setSize(data.getLong(data.getColumnIndexOrThrow(SIZE)));
-            video.setBucketId(data.getString(data.getColumnIndexOrThrow(BUCKET_ID)));
-            video.setBucketName(data.getString(data.getColumnIndexOrThrow(BUCKET_DISPLAY_NAME)));
+            video.setLocalDirId(data.getString(data.getColumnIndexOrThrow(BUCKET_ID)));
+            video.setLocalDirName(data.getString(data.getColumnIndexOrThrow(BUCKET_DISPLAY_NAME)));
             video.setDate(data.getLong(data.getColumnIndexOrThrow(DATE_ADDED)));
 
             video.setDuration(data.getLong(data.getColumnIndexOrThrow(DURATION)));
 
             //Create a Directory
             Directory<VideoFile> directory = new Directory<>();
-            directory.setId(video.getBucketId());
-            directory.setName(video.getBucketName());
+            directory.setId(video.getLocalDirId());
+            directory.setName(video.getLocalDirName());
             directory.setPath(Util.extractPathWithoutSeparator(video.getPath()));
 
             if (!directories.contains(directory)) {

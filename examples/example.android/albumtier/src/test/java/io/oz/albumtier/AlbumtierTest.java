@@ -1,7 +1,6 @@
 package io.oz.albumtier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -9,20 +8,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
-import io.odysz.semantic.ext.DocTableMeta.Share;
-import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -45,23 +43,22 @@ public class AlbumtierTest {
 		mList = new ArrayList<SyncDoc>(1);
 		mList.add(new Photo().create(testfile));
 		
-		Utils.printCaller(true);
-		onActCreate();
+		onActivityCreate();
 		
 		Thread.sleep(1000); // wait for login
 		if (singleton.state != ConnState.Online)
 			fail("Why? Is server started? Or try to wait longer?");
 
-		singleton.tier.del("h_photos", singleton.photoUser.device, testfile);
+		singleton.tier.synDel("h_photos", singleton.photoUser.device, testfile);
 		
 		onImagePicked();
 
-		Utils.logi("Press Enter when you think the test is finished ...");
-		pause();
+		pause("Press Enter when you think the test is finished ...");
 		Utils.logi(singleton.photoUser.device);
     }
 
-	public static void pause() {
+	public static void pause(String msg) {
+		Utils.logi(msg);
 		try {
 			BufferedReader reader = new BufferedReader(
 	            new InputStreamReader(System.in));
@@ -71,7 +68,7 @@ public class AlbumtierTest {
 		}
 	}
 
-	void onActCreate() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
+	void onActivityCreate() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
 		singleton = new AlbumContext()
 			.init("f/zsu", "syrskyi", device, jserv)
 			.login( "syrskyi", "слава україні",
@@ -146,44 +143,20 @@ public class AlbumtierTest {
    				photoProc, photoPushed, singleton.errCtx);
 	}
    	
-//   	JProtocol.OnDocOk photoPushed = (doc, resp) -> {
-//		// SyncDoc doc = ((DocsResp) resp).doc;
-//		assertEquals(device, doc.device());
-//		assertEquals(testfile, doc.clientpath);
-//
-//		assertEquals(device, doc.device(), "photoPushed()");
-//		assertEquals(testfile, doc.clientpath, "photoPushed()");
-//		assertEquals(Share.pub, doc.shareflag(), "photoPushed()");
-//		// FIXME assertEquals(1603L, rs.getLong(meta.size), "photoPushed()");
-//		assertEquals("2022_12", doc.folder(), "photoPushed()");
-//		assertEquals("image/png", doc.mime(), "photoPushed()");
-//		assertNotNull(doc.sharedate, "photoPushed()");
-//
-//		DocsResp pths = singleton.tier.queryPaths(new PathsPage().add(testfile), "h_photos");
-//		assertTrue(pths.pathsPage().paths().size() > 0, "photoPushed()");
-//		assertEquals(device, pths.pathsPage().device, "photoPushed()");
-//		for (String p : pths.pathsPage().paths().keySet()) {
-//			if (testfile.equals(p))
-//				return;
-//		}
-//		fail("Pushed file can be not queried.");
    	JProtocol.OnDocOk photoPushed = (d, resp) -> {
 		SyncDoc doc = ((DocsResp) resp).doc;
 		assertEquals(device, doc.device());
 		assertEquals(testfile, doc.clientpath);
+
+		// ! also make sure files are saved in volume/user-id
+		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());
    		
-   		try {
-   			DocsResp pths = singleton.tier.queryPaths(new PathsPage(), "h_photos");
-			AnResultset rs = pths.rs(0).beforeFirst();
-			rs.next();
-			assertEquals(device, rs.getString("device"));
-			assertEquals(testfile, rs.getString("clientpath"));
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testfile), "h_photos");
+		PathsPage pthpage = pths.pathsPage();
+		assertEquals(device, pthpage.device);
+		assertEquals(1, pthpage.paths().size());
+		assertTrue(pthpage.paths().containsKey(testfile));
    	};
 
 	JProtocol.OnProcess photoProc = (rs, rx, bx, bs, rsp) -> {};
-
 }

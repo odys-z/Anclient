@@ -8,7 +8,6 @@ import static com.vincent.filepicker.filter.callback.FileLoaderCallbacks.TYPE_VI
 import androidx.fragment.app.FragmentActivity;
 import androidx.loader.app.LoaderManager;
 
-import com.vincent.filepicker.filter.callback.FileLoaderCallbacks;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.AudioFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
@@ -18,21 +17,21 @@ import com.vincent.filepicker.filter.entity.VideoFile;
 public class FileFilterx {
     public static void getImages(FragmentActivity activity, FilterResultCallback<ImageFile> callback){
         LoaderManager.getInstance(activity).initLoader(0, null,
-                new FileLoaderCallbacks(activity, callback, TYPE_IMAGE));
+                new FileLoaderCallbackx(activity, callback, TYPE_IMAGE));
     }
 
     public static void getVideos(FragmentActivity activity, FilterResultCallback<VideoFile> callback){
         LoaderManager.getInstance(activity).initLoader(1, null,
-                new FileLoaderCallbacks(activity, callback, TYPE_VIDEO));
+                new FileLoaderCallbackx(activity, callback, TYPE_VIDEO));
     }
 
     public static void getAudios(FragmentActivity activity, FilterResultCallback<AudioFile> callback){
         LoaderManager.getInstance(activity).initLoader(2, null,
-                new FileLoaderCallbacks(activity, callback, TYPE_AUDIO));
+                new FileLoaderCallbackx(activity, callback, TYPE_AUDIO));
     }
 
     public static void getFiles(FragmentActivity activity, FilterResultCallback<NormalFile> callback, String[] suffix){
         LoaderManager.getInstance(activity).initLoader(3, null,
-                new FileLoaderCallbacks(activity, callback, TYPE_FILE, suffix));
+                new FileLoaderCallbackx(activity, callback, TYPE_FILE, suffix));
     }
 }

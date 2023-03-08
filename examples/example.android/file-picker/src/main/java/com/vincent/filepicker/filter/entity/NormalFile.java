@@ -26,8 +26,8 @@ public class NormalFile extends BaseFile implements Parcelable {
         dest.writeString(getName());
         dest.writeString(getPath());
         dest.writeLong(getSize());
-        dest.writeString(getBucketId());
-        dest.writeString(getBucketName());
+        dest.writeString(getLocalDirId());
+        dest.writeString(getLocalDirName());
         dest.writeLong(getDate());
         dest.writeByte((byte) (isSelected() ? 1 : 0));
         dest.writeString(getMimeType());
@@ -51,8 +51,8 @@ public class NormalFile extends BaseFile implements Parcelable {
             file.setName(in.readString());
             file.setPath(in.readString());
             file.setSize(in.readLong());
-            file.setBucketId(in.readString());
-            file.setBucketName(in.readString());
+            file.setLocalDirId(in.readString());
+            file.setLocalDirName(in.readString());
             file.setDate(in.readLong());
             file.setSelected(in.readByte() != 0);
             file.setMimeType(in.readString());
