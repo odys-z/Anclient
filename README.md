@@ -1,5 +1,3 @@
-<img style="width: 100%; height: 1em" src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAACFCAMAAAApQEceAAAAD1BMVEUAV7f/1wAAULuln3f/2wCAuqzxAAAAcUlEQVR4nO3PARGAMAwAsQ7mXzM2nl7iIDMAAAAAAAAAAAAAAADwB88S8y4xd4k5S4jUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNSI1IjUiNR8f3c50WjJ4v4AAAAASUVORK5CYII='>
- 
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 # About
@@ -15,12 +13,7 @@ is also been verified.
 together with
 
 [![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
-@anclient/anreact
-
-- Anprism
-
-[![install](https://vsmarketplacebadge.apphb.com/version-short/ody-zhou.anprism.svg)](https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism)
-VS Code extension
+@anclient/anreact (and a VS Code plugin for HTML page editing [Anprism](https://github.dev/odys-z/Anclient/blob/master/js/anprism))
 
 - Anclient.java
 
@@ -28,20 +21,6 @@ VS Code extension
 Anclient for Java
 
 # Repository Structure
-
-This repository has multiple clients, it's planed all can work independently.
-
-With the protocol based on json, we are planning to implement the clients:
-
-- Anclient/csharp
-
-The C# client API runing on .net framework 4.7.1.
-
-The Visual Studio solution is
-
-```
-    csharp/anclient/anclient.sln
-```
 
 There are 3 clients in the solution:
 
@@ -65,13 +44,17 @@ published as nuget package (coming).
 
     Examples using Anclient.js.
 
- -- North Star
+  North Star
 
     Example using Anclient + React.
 
 - example.cs
 
     Example for Winform built upon Anclient.cs
+    
+- example.android
+
+    Example for Android built upon Anclient.java.
 
 # Document
 

@@ -75,7 +75,7 @@ class MyPollsComp extends CrudCompW {
 			// if (query && query.issuer.val && query.issuer.val != AnConst.cbbAllItem.v)
 			if (!isEmpty(query.issuer, '') && query.issuer != AnConst.cbbAllItem.v)
 				reqBd.set(CenterProtocol.pollIssuer, query.issuer);
-			
+
 				reqBd.set(CenterProtocol.quizTag, query.tags);
 				reqBd.set(CenterProtocol.quizTitle, query.title);
 		}
@@ -121,12 +121,6 @@ class MyPollsComp extends CrudCompW {
 			  <AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				fields={[ this.state.condTitl, this.state.condTags, this.state.condIssr, this.state.condWait ]}
-				// query={ (q) => { return {
-				// 	qTitl: q.state.conds[0].val,
-				// 	qTags: q.state.conds[1].val,
-				// 	qIssr: q.state.conds[2].val && q.state.conds[2].val.v,
-				// 	qWait: q.state.conds[3].val,
-				// }} }
 			/>}
 
 			<Typography color='secondary' className={classes.smalltip}>

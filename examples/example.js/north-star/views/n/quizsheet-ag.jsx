@@ -75,15 +75,6 @@ class QuizsheetComp extends React.Component {
 		this.alert = this.alert.bind(this);
 	}
 
-	/*
-	quizHook = {};
-	setStateHooked(obj) {
-		this.quizHook.collect && this.quizHook.collect(this.state);
-		Object.assign(this.state, obj);
-		this.setState({});
-	}
-	*/
-
 	columns = [
 		{ field: 'title', label: 'Title', wrapText: true, width: 180,
 		  cellEditor: 'agLargeTextCellEditor',

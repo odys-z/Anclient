@@ -24,8 +24,9 @@ import java.util.List;
 import java.util.Random;
 
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.SyncingPage;
-import io.oz.album.tier.AlbumResp;
+import io.odysz.semantic.tier.docs.PathsPage;
+import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
 
@@ -34,7 +35,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     protected boolean isNeedCamera;
     protected int mMaxNumber;
     protected int mCurrentNumber = 0;
-    private RecyclerView recyclerView;
 
     public boolean isUpToMax () {
         return mCurrentNumber >= mMaxNumber;
@@ -50,7 +50,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     protected AlbumContext singleton;
 
-    protected SyncingPage synchPage;
+    protected PathsPage synchPage;
 
     public BaseSynchronizer(Context ctx, ArrayList<T> list) {
         this.singleton = AlbumContext.getInstance();
@@ -74,54 +74,68 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         notifyItemChanged(index);
     }
 
-    public List<T> getDataSet() { return (List<T>) mList; }
+    public List<T> getDataSet() { return mList; }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void refresh(List<T> list, RecyclerView ... mRecyclerView) {
-        this.recyclerView = mRecyclerView == null ? null : mRecyclerView[0];
-
+    public void refresh(List<T> list) {
         mList.clear();
         mList.addAll(list);
         notifyDataSetChanged();
 
-        synchPage = new SyncingPage(0, Math.min(20, mList.size()));
-        synchPage.taskNo = nextRandomInt();
+        synchPage = new PathsPage(0, Math.min(20, mList.size()));
+        // synchPage.taskNo = nextRandomInt();
         synchPage.device = singleton.photoUser.device;
         if (singleton.tier != null)
             startSynchQuery(synchPage);
     }
 
-    void startSynchQuery(SyncingPage page) {
-        singleton.tier.asyncQuerySyncs(mList, page,
-                onSyncQueryRespons,
+    void startSynchQuery(PathsPage page) {
+        singleton.tier.asynQueryDocs(mList, page,
+                onSyncQueryResponse,
                 (c, r, args) -> {
                     Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
                 });
     }
 
-    JProtocol.OnOk onSyncQueryRespons = (resp) -> {
-        AlbumResp rsp = (AlbumResp) resp;
-        if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
-            HashMap<String, Object> phts = rsp.syncPaths();
-            for (int i = synchPage.start; i < synchPage.end; i++) {
+    JProtocol.OnOk onSyncQueryResponse = (resp) -> {
+        DocsResp rsp = (DocsResp) resp;
+        if (// synchPage.taskNo == rsp.syncing().taskNo &&
+            synchPage.end() < mList.size()) {
+//            Photo[] phts = rsp.photos(0);
+//            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
+//                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
+            // sequence order is guaranteed.
+
+            // [sync-flag, share-falg, share-by, share-date]
+            HashMap<String, String[]> phts = rsp.syncing().paths();
+            for (int i = synchPage.start(); i < synchPage.end(); i++) {
                 T f = mList.get(i);
-                if (phts.keySet().contains(f.fullpath())) {
-                    f.synchFlag = 1;
+                if (phts.containsKey(f.fullpath())) {
+                    String[] inf = phts.get(f.fullpath());
+                    // TODO f.parseFlags(inf);
+                    f.syncFlag = inf[0];
+                    f.shareflag = inf[1];
+                    f.shareby = inf[2];
+                    f.sharedate(inf[3]);
                 }
             }
 
-            updateIcons(rsp.syncing());
+            updateIcons(synchPage);
 
-            if (mList.size() >= synchPage.end) {
-                synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
+            if (mList.size() >= synchPage.end()) {
+                synchPage.nextPage(Math.min(20, mList.size() - synchPage.end()));
                 startSynchQuery(synchPage);
             }
         }
     };
 
-    void updateIcons(SyncingPage syncPage) {
+    void updateIcons(PathsPage synchPage) {
         ((Activity)mContext).runOnUiThread( () -> {
-            notifyItemRangeChanged(syncPage.start, syncPage.end);
+            try {
+                notifyItemRangeChanged(synchPage.start(), synchPage.end());
+            } catch (SemanticException e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -132,6 +146,33 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     private static final Random RANDOM = new Random();
     public static int nextRandomInt() {
         return RANDOM.nextInt(1024 * 1024);
+    }
+
+    /**
+     * @param view the file view - not used currently
+     * @param dataType "video/*" or "image/*"
+     * @param path full path
+     * @return false
+     */
+    private boolean startMediaViewer(View view, String dataType, String path) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            File f = new File(path);
+            uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
+        }
+        else {
+            uri = Uri.parse("file://" + path);
+        }
+        intent.setDataAndType(uri, dataType);
+        if (Util.detectIntent(mContext, intent)) {
+            mContext.startActivity(intent);
+        }
+        else {
+            ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
+        }
+        return false;
     }
 
     /**
@@ -161,5 +202,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
         return false;
     }
+
 }
 

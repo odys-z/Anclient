@@ -6,7 +6,7 @@ android {
     compileSdk 31
 
     defaultConfig {
-        minSdk 26
+        minSdk 24
         targetSdk 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -42,6 +42,12 @@ dependencies {
 
     implementation group: 'io.github.odys-z', name: 'semantic.jserv', version: "$jserv_ver"
     implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver")
+//    implementation (group: 'io.github.odys-z', name: 'albumtier', version: "${albumtier_ver}") {
+//        exclude group: "org.apache.tika", module: "tika-core"
+//        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
+//        changing = true;
+//    }
+    implementation (group: 'io.github.odys-z', name: 'docsync.jserv', version: "${jserv_ext_syncdoc}")
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

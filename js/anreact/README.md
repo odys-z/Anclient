@@ -6,9 +6,9 @@ The ts client for semantic-jserv.
 
 Refactored:
 
-@anclient/react: React View + Jsample depending on @anclient/semantier.
+@anclient/react: React View + Jsample depending on @anclient/semantier,
 
-if Protocol are actually different.
+of which the protocol layer are actually different.
 
 ### Tip
 

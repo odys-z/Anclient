@@ -122,6 +122,11 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 						}
 					});
 			}
+			else if (!cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
+				// warning for old version usages
+				console.warn("Looks like this field is intend to be a combbox but no cond.sk proviced.",
+							cond);
+			}
 		});
 	}
 
@@ -315,10 +320,6 @@ export interface QueryFormProps extends Comprops {
 
 	/** @deprecated replaced by conds */
 	fields?: AnlistColAttrs<JSX.Element, CompOpts>[];
-
-	/**Set to true if connection error occurs
-	 * - to disable error context handling triggering endless loop. */
-	// stopBinding?: boolean;
 
 	/**
 	 * User actions: search button clicked

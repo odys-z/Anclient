@@ -91,11 +91,10 @@ export class App extends React.Component<AlbumProps, AlbumConfig> {
 	render() {
 	  return (
 		<AnContext.Provider value={{
-			anReact: this.anReact,
-			// pageOrigin: window ? window.origin : 'localhost',
 			servId: this.config.servId,
 			servs: this.props.servs,
 			anClient: this.inclient,
+			uiHelper: this.anReact,
 			hasError: this.config.hasError,
 			iparent: this.props.iparent,
 			ihome: this.props.iportal || 'portal.html',
@@ -122,7 +121,7 @@ export class App extends React.Component<AlbumProps, AlbumConfig> {
 	 * - serv: string,
 	 * - portal: string
 	 */
-	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
+	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
 		let portal = opts.portal ?? 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);

@@ -19,7 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,14 +26,11 @@ import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.ImageFile;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
-import java.io.File;
 import java.util.ArrayList;
 
-import io.oz.albumtier.AlbumContext;
+import io.oz.jserv.sync.SyncFlag;
 import io.oz.fpick.R;
 
 /**
@@ -45,9 +41,12 @@ import io.oz.fpick.R;
  */
 
 public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapter.VideoPickViewHolder> {
+//    private boolean isNeedCamera;
+//    private int mMaxNumber;
+//    private int mCurrentNumber = 0;
     public String mFilepath;
 
-    // public Uri mVideoUri;
+    public Uri mVideoUri;
 
     public VideoPickAdapter(Context ctx, boolean needCamera, int max ) {
         this ( ctx, new ArrayList<VideoFile> ( ), needCamera , max );
@@ -83,7 +82,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             holder.mIvThumbnail.setVisibility ( View.INVISIBLE );
             holder.mCbx.setVisibility ( View.GONE );
             holder.mShadow.setVisibility ( View.INVISIBLE );
-            holder.mDuration.setVisibility ( View.INVISIBLE );
         }
         else {
             holder.icSynced.setVisibility ( View.INVISIBLE );
@@ -105,14 +103,16 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                     .transition ( withCrossFade ( ) )
                     .into ( holder.mIvThumbnail );
 
-            if (file.synchFlag == BaseFile.Synchronizing) {
+            // if (file.synchFlag == BaseFile.Synchronizing) {
+            if (SyncFlag.pushing.equals(file.syncFlag)) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            else if (file.synchFlag == BaseFile.Synchronized) {
+            // else if (file.synchFlag == BaseFile.Synchronized) {
+            else if (SyncFlag.publish.equals(file.syncFlag)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -173,8 +173,9 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
 
-                int sync = mList.get(index).synchFlag;
-                if ( sync == BaseFile.Synchronized || sync == BaseFile.Synchronizing)
+                String sync = mList.get(index).syncFlag;
+                // if ( sync == BaseFile.Synchronized || sync == BaseFile.Synchronizing)
+                if ( SyncFlag.publish.equals(sync) || SyncFlag.pushing.equals(sync) )
                     return;
 
                 if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {

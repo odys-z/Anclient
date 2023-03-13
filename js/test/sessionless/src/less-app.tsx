@@ -96,7 +96,7 @@ class App extends React.Component<LessProps, State> {
 	}
 
 	render() {
-	  let that = this;
+	  // let that = this;
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{

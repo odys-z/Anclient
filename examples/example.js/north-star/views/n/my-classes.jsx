@@ -34,7 +34,7 @@ class MyClassTreeComp extends CrudCompW {
 					sqlArgs: [this.context.anClient.userInfo.uid],
 					// onOk: resp => {that.setState({}); console.log(resp)}
 				  };
-		this.context.anReact.stree(ds, this.context.error, this);
+		this.context.uiHelper.stree(ds, this.context.error, this);
 	}
 
 	render () {

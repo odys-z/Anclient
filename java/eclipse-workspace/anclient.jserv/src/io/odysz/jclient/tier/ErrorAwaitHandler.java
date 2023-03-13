@@ -1,6 +1,8 @@
 package io.odysz.jclient.tier;
 
-public class ErrorAwaitHandler implements ErrorCtx {
+import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+
+public class ErrorAwaitHandler extends ErrorCtx {
 
 	String signal;
 
@@ -13,6 +15,10 @@ public class ErrorAwaitHandler implements ErrorCtx {
 	public ErrorCtx notifySignal() {
 		this.signal.notify();
 		return this;
+	}
+
+	@Override
+	public void err(MsgCode ok, String msg, String... args) {
 	}
 
 }

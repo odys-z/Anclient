@@ -3,7 +3,7 @@ import { toBool, isEmpty } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkMeta, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
+	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkVal, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
 } from "./protocol";
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -56,7 +56,7 @@ export interface ErrorCtx {
 /** List column / record field (UI) Type
  * - dynamic-cbb' type is a combobox changing code/value options for each row.
  */
-export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {
 	/**input type / form type, not db type
@@ -135,8 +135,11 @@ export interface QueryConditions {
  */
 export interface Semantext {
     anClient: SessionClient;
-	/**FIXME rename as TSHelper:
-	 * Gloabal UI helper, e.g. AnReact */
+	/**
+	 * FIXME rename as TSHelper:
+	 * 
+	 * Gloabal UI helper, e.g. AnReact
+	 */
     uiHelper: any;
     error: ErrorCtx;
 }
@@ -152,11 +155,12 @@ export interface UIComponent {
  * Base class of semantic tier
  */
 export class Semantier {
+    uiHelper: any;
     /**
      *
      * @param props
      */
-    constructor(props: UIComponent & {pkval?: PkMeta}) {
+    constructor(props: UIComponent & {pkval?: PkVal}) {
         if (!props || !props.uri)
             throw Error("uri is required!");
 
@@ -176,7 +180,7 @@ export class Semantier {
     /** current list's data */
     rows: Tierec[];
     /** current pk value */
-    pkval: PkMeta = {pk: undefined, v: undefined};
+    pkval: PkVal = {pk: undefined, v: undefined};
     /** current record */
     rec: Tierec;
 
@@ -200,7 +204,7 @@ export class Semantier {
 			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
 		this.client = context.anClient;
-		// this.anReact = context.anReact;
+		this.uiHelper = context.uiHelper;
 		this.errCtx = context.error;
 		return this;
 	}
@@ -491,7 +495,7 @@ export class Semantier {
 	 * @param parentpkv pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
-	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Tierelations, parentpkv: PkMeta ) : AnsonMsg<T> {
+	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Tierelations, parentpkv: PkVal ) : AnsonMsg<T> {
 		if (relation.fk || relation.m2m)
 			throw Error('TODO ...');
 

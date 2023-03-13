@@ -6,7 +6,11 @@ node_modules
 **/dist/*
 **/dist/docs
 **/dist/img/sample.png
-!dist/*.html
+!**/dist/*.html
+!**/dist/*.json
+!**/dist/*.css
+!**/dist/res-vol
+
 **/private.html
 **/private.json
 **/*.back.*

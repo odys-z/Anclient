@@ -21,8 +21,8 @@ import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantic.jsession.HeartBeat;
-import io.odysz.semantic.jsession.SessionInf;
 import io.odysz.semantic.tier.docs.DocsReq;
+import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 
 /**AnClient.java with session managed.
@@ -52,7 +52,7 @@ public class SessionClient {
 	}
 	
 	/**
-	 * Start a heart beat thread, sleeping on signal {@link #syncFlag}.
+	 * Start a heart beat thread which is sleeping on thread signal {@link #syncFlag}.
 	 * @param clientUri
 	 * @param onLink
 	 * @param onBroken
@@ -114,7 +114,7 @@ public class SessionClient {
 	}
 	
 	/**Format a query request object, including all information for construct a "select" statement.
-	 * @param conn connection id
+	 * @param uri connection id
 	 * @param tbl main table, (sometimes function category), e.g. "e_areas"
 	 * @param alias from table alias, e.g. "a"
 	 * @param page -1 for no paging at server side.
@@ -123,7 +123,7 @@ public class SessionClient {
 	 * @return formatted query object.
 	 * @throws Exception
 	 */
-	public AnsonMsg<AnQueryReq> query(String conn, String tbl, String alias,
+	public AnsonMsg<AnQueryReq> query(String uri, String tbl, String alias,
 			int page, int size, String... funcId) throws SemanticException {
 
 		AnsonMsg<AnQueryReq> msg = new AnsonMsg<AnQueryReq>(Port.query);
@@ -133,7 +133,7 @@ public class SessionClient {
 			AnsonHeader.usrAct(funcId[0], "query", "R", "test");
 		msg.header(header);
 
-		AnQueryReq itm = AnQueryReq.formatReq(conn, msg, tbl, alias);
+		AnQueryReq itm = AnQueryReq.formatReq(uri, msg, tbl, alias);
 		msg.body(itm);
 		itm.page(page, size);
 
@@ -211,9 +211,20 @@ public class SessionClient {
 					.body(itm);
 	}
 
+	/**
+	 * @param uri
+	 * @param port
+	 * @param body
+	 * @param localpath
+	 * @param act
+	 * @return local full path
+	 * @throws AnsonException
+	 * @throws SemanticException
+	 * @throws IOException
+	 */
 	public <T extends DocsReq> String download(String uri, IPort port, T body, String localpath, LogAct... act) throws AnsonException, SemanticException, IOException {
 		if (port == null)
-			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port explicitly specified.");
+			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port being explicitly specified.");
 
 		// let header = Protocol.formatHeader(this.ssInf);
 		body.uri(uri);
@@ -313,8 +324,8 @@ public class SessionClient {
 
 	/**
 	 * Submit request.
-	 * @param <R>
-	 * @param <A>
+	 * @param <R> request type
+	 * @param <A> answer type
 	 * @param req
 	 * @param err
 	 * @return response
@@ -343,7 +354,7 @@ public class SessionClient {
 			return (A) resp.body(0);
 		}
 		else {
-			err.onError(code, resp.body(0).msg());
+			err.err(code, resp.body(0).msg());
 			return null;
 		}
 	}

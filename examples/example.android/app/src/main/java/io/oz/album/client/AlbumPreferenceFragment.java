@@ -3,10 +3,9 @@ package io.oz.album.client;
 import static io.oz.album.client.PrefsContentActivity.singleton;
 
 import android.app.Activity;
+import android.app.AutomaticZenRule;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,12 +16,13 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 import io.odysz.common.LangExt;
-import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantics.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.albumtier.AlbumContext;
 
 public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
+    Preference btnLogin;
     Preference summery;
     Preference homepref;
     EditTextPreference device;
@@ -47,6 +47,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
 
         cateHome = findPreference(AlbumApp.keys.homeCate);
         btnRegist = findPreference(AlbumApp.keys.bt_regist);
+        btnLogin = findPreference(AlbumApp.keys.bt_login);
         device = findPreference(AlbumApp.keys.device);
 
         EditTextPreference pswd = findPreference(AlbumApp.keys.pswd);
@@ -56,25 +57,24 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
 
         homepref = findPreference(AlbumApp.keys.home);
         String devid = singleton.photoUser.device;
-        EditTextPreference prefDev = findPreference(AlbumApp.keys.device);
         if (!LangExt.isblank(devid)) {
             // homepref.setSummary(getString(R.string.devide_name, devid));
             homepref.setSummary(AlbumContext.getInstance().homeName);
-            prefDev.setEnabled(false);
+            findPreference(AlbumApp.keys.device).setEnabled(false);
             cateHome.removePreference(btnRegist);
             device.setSummary(getString(R.string.devide_name, devid));
         }
         else {
-            prefDev.setEnabled(true);
+            findPreference(AlbumApp.keys.device).setEnabled(true);
             device.setSummary(R.string.txt_only_once);
+
+            btnLogin.setEnabled(false);
         }
         summery = findPreference(AlbumApp.keys.login_summery);
     }
 
-    static void bindPref2Val(@NonNull EditTextPreference preference) {
+    static void bindPref2Val(@NonNull Preference preference) {
         preference.setOnPreferenceChangeListener(prefsListener);
-
-        preference.setOnBindEditTextListener(TextView::setSingleLine);
 
         prefsListener.onPreferenceChange(preference,
                 PreferenceManager
@@ -88,7 +88,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
      */
     private static final Preference.OnPreferenceChangeListener prefsListener =
         (preference, newValue) -> {
-            String stringValue = newValue.toString().trim();
+            String stringValue = newValue.toString();
             String k = preference.getKey();
             if (k.equals(AlbumApp.keys.jserv)) {
                 singleton.jserv(stringValue);

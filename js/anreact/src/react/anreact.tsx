@@ -49,14 +49,6 @@ export function toReactStyles(styles: CSSStyleDeclaration): CSSProperties {
 	return styles as unknown as CSSProperties;
 }
 
-/**JSX.Element like row formatter results */
-// export interface AnRow extends JSX.Element { }
-
-/**(list) row formatter
- * E.g. @anclient/anreact.Tablist will use this to format a row. see also {@link AnFieldFormatter}
- */
-// export type AnRowFormatter = ((rec: Tierec, rowIndx: number, classes? : any, media?: Media)=> AnRow);
-
 /** React helpers of AnClient
  * AnReact uses AnContext to expose session error. So it's helpful using AnReact
  * in an An-React application (which handle error in top level).

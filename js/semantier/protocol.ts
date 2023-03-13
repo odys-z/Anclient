@@ -16,7 +16,7 @@ export interface JsonOptions {
     verbose: number;
     noNull: boolean | string;
     noBoolean: boolean | string;
-};
+}
 
 /** An abstract object for query condition
  *
@@ -36,12 +36,20 @@ export class PageInf {
 	/** @deprected replaced by condtRec */
 	condts?: Array<string[]>;
 
-	constructor(page?: number, size?: number, total?: number, condts?: Array<string[]>) {
+	constructor(page?: number | PageInf, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.transact.sql.PageInf';
-		this.page = page || 0;
-		this.size = size || -1;
-		this.total = total || 0;
-		this.condts = condts;
+		if (typeof page === 'number') {
+			this.page = page || 0;
+			this.size = size || -1;
+			this.total = total || 0;
+			this.condts = condts;
+		}
+		else {// type safe: PageInf
+			this.page = page?.page || 0;
+			this.size = page?.size || -1;
+			this.total = page?.total || 0;
+			this.condts = page?.condts;
+		}
 	}
 
 	nv(k: string, v: string) {
@@ -58,13 +66,13 @@ export class PageInf {
 	 */
 	condtsRec () {
 		let rec = {} as Tierec;
-		this.condts?.forEach( nv => {
+		for(let nv in this.condts) {
 			if (nv && nv[0])
-				rec[nv[0]] = nv[1];
-		})
+				rec[nv[0]] = rec[nv[1]];
+		}
 		return rec;
 	}
-};
+}
 
 /**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
 export type NameValue = {name: string, value: object};
@@ -134,18 +142,6 @@ export interface relStree {
 	fullpath?: string,
 }
 
-/**Is this semantic-DA.Semantics? */
-// export type Semantics = {
-// 	// [reltype in SemanticType]: FKRelation | Stree | any;
-// 	fk?: FKRelation,
-
-// 	/**TODO: semantic tree */
-// 	stree?: Stree,
-
-// 	/**TODO: Multiple to mulitple */
-// 	m2m?: any,
-// }
-
 export interface DbRelations {
 	/** TODO:  [tabl: string]: Semantics; */
 	fk?: relFK,
@@ -163,7 +159,7 @@ export interface UIRelations {
  * example of this:
  * that.pkval.v = that.rec && that.rec[that.pk];
 */
-export interface PkMeta {
+export interface PkVal {
     v: any;
     pk: string;
     tabl?: string;
@@ -368,7 +364,6 @@ export class Protocol {
 		}
 		return rows;
 	}
-
 }
 
 export enum CRUD { c = 'I', r = 'R', u = 'U', d = 'D' };
@@ -803,7 +798,7 @@ export class UpdateReq extends AnsonBody {
      * @param pkv conditions for pk.<br>
      * If pk is null, use this object's where_() | whereEq() | whereCond().
      */
-    constructor(uri: string, tabl: string, pkv: string[] | PkMeta) {
+    constructor(uri: string, tabl: string, pkv: string[] | PkVal) {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
@@ -814,7 +809,7 @@ export class UpdateReq extends AnsonBody {
 		if (Array.isArray(pkv))
 			this.where.push(['=', pkv[0], `'${pkv[1]}'`]);
 		else if (typeof pkv === "object") {
-            let pk_ = pkv as PkMeta;
+            let pk_ = pkv as PkVal;
 		 	if (pk_.pk !== undefined)
 				this.where.push(['=', pk_.pk, `'${pk_.v}'`]);
 			else console.error("UpdateReq: Can't understand pk: ", pkv);
@@ -963,7 +958,7 @@ export class UpdateReq extends AnsonBody {
 }
 
 export class DeleteReq extends UpdateReq {
-	constructor (uri: string, tabl: string, pk: string[] | PkMeta) {
+	constructor (uri: string, tabl: string, pk: string[] | PkVal) {
 		super (uri, tabl, pk);
 		this.a = CRUD.d;
 	}
@@ -1294,7 +1289,7 @@ export interface DatasetOpts {
 	args?: object;
 
 	onOk?: OnCommitOk;
-};
+}
 
 export class DatasetReq extends QueryReq {
     /**
@@ -1407,7 +1402,7 @@ export enum stree_t {
 	reforest = 'reforest',
 	/** Query with client provided QueryReq object, and format the result into tree. */
 	query = 'query'
-};
+}
 
 export class DatasetierReq extends AnsonBody {
 	static __type__ = "io.odysz.semantic.tier.DatasetierReq";
@@ -1434,3 +1429,50 @@ export class DatasetierResp extends AnsonResp {
 	}
 }
 Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json));
+
+export class DocsReq extends AnsonBody {
+	static __type__ = 'io.odysz.semantic.tier.docs.DocsReq';
+	// static __init__ = function () {
+	// 	// Design Note:
+	// 	// can we use dynamic Protocol?
+	// 	Protocol.registerBody(DocsReq.__type__, (jsonBd) => {
+	// 		return new DocsReq(jsonBd);
+	// 	});
+	// 	return undefined;
+	// }();
+
+	static A = {
+		records: 'r/list',
+		// mydocs: 'r/my-docs',
+		rec: 'r/rec',
+		upload: 'c/doc',
+		insert: 'c',
+		download: 'r/download',
+		del: 'd',
+	};
+
+	docId: string;
+	docName: string;
+	mime: string;
+	uri64: string;
+	deletings: string[];
+
+	/**
+	 *
+	 * @param uri
+	 * @param args
+	 * args.deletings: old docId to be deleted
+	 */
+	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
+		super({uri, type: DocsReq.__type__});
+		// this.type = DocsReq.__type__;
+		this.docId = args.docId;
+		this.docName = args.docName;
+		this.mime = args.mime;
+		this.uri64 = args.uri64;
+
+		// case d
+		this.deletings = args.deletings;
+	}
+}
+Protocol.registerBody(DocsReq.__type__, (json) => new DocsReq(json));
