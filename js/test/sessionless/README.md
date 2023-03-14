@@ -10,7 +10,7 @@ v 1.0.1, working together with sandbox v0.2.1.
 
 3. remove duplicate UserstReq at server side.
 
-# Setup project
+# Setup source project
 
 ```
     npm i typescript --save-dev
