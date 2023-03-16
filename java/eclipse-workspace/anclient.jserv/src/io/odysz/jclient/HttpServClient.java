@@ -141,6 +141,8 @@ public class HttpServClient {
 	}
 
 	/**
+	 * Stream mode downloading a file of any type but json.
+	 * 
 	 * @param url
 	 * @param jreq
 	 * @param localpath
@@ -150,7 +152,7 @@ public class HttpServClient {
 	 * @throws SemanticException
 	 */
 	@SuppressWarnings("unchecked")
-	public String streamdown(String url, AnsonMsg<? extends DocsReq> jreq, String localpath)
+	public String streamdown(String url, AnsonMsg<? extends AnsonBody> jreq, String localpath)
 			throws IOException, AnsonException, SemanticException {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();

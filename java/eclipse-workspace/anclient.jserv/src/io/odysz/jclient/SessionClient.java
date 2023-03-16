@@ -212,6 +212,10 @@ public class SessionClient {
 	}
 
 	/**
+	 * <p>Stream mode downloading a file of any type but json.</p>
+	 * 
+	 * The port + req.A is responsible for the stream response.
+	 * 
 	 * @param uri
 	 * @param port
 	 * @param body
@@ -222,7 +226,7 @@ public class SessionClient {
 	 * @throws SemanticException
 	 * @throws IOException
 	 */
-	public <T extends DocsReq> String download(String uri, IPort port, T body, String localpath, LogAct... act) throws AnsonException, SemanticException, IOException {
+	public <T extends AnsonBody> String download(String uri, IPort port, T body, String localpath, LogAct... act) throws AnsonException, SemanticException, IOException {
 		if (port == null)
 			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port being explicitly specified.");
 
