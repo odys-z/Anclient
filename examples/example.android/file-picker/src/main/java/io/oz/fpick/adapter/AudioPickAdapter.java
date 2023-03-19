@@ -44,7 +44,7 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
     @Override
     public AudioPickViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.vw_layout_item_audio_pick, parent, false);
-        AudioPickViewHolder holder=new AudioPickViewHolder(itemView);
+        AudioPickViewHolder holder= new AudioPickViewHolder(itemView);
         holder.setIsRecyclable ( false );
         return holder;
     }
@@ -126,7 +126,11 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             }
 
             if (mListener != null) {
-                mListener.onAudioStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
+                // mListener.onAudioStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
+                mListener.onAudioStateChanged (
+                        holder.mCbx.isSelected(),
+                        mList.get(holder.getAbsoluteAdapterPosition()),
+                        holder.animation);
             }
         });
     }
@@ -136,13 +140,13 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         return isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
     }
 
-    class AudioPickViewHolder extends RecyclerView.ViewHolder {
+    static class AudioPickViewHolder extends RecyclerView.ViewHolder {
         private final ImageView icAlbum;
         private final ImageView icSynced;
         private final ImageView icSyncing;
 
-        private TextView mTvTitle;
-        private TextView mTvDuration;
+        private final TextView mTvTitle;
+        private final TextView mTvDuration;
         private final ImageView mCbx;
         private final RelativeLayout animation;
 
@@ -151,9 +155,9 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
 
         public AudioPickViewHolder(@NonNull View itemView) {
             super ( itemView );
-            icAlbum = (ImageView) itemView.findViewById ( R.id.xiv_album_icon);
-            icSyncing = (ImageView) itemView.findViewById ( R.id.xiv_syncing_icon);
-            icSynced = (ImageView) itemView.findViewById ( R.id.xiv_synced_icon);
+            icAlbum = itemView.findViewById ( R.id.xiv_album_icon);
+            icSyncing = itemView.findViewById ( R.id.xiv_syncing_icon);
+            icSynced = itemView.findViewById ( R.id.xiv_synced_icon);
 
 //            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
 //            mShadow = itemView.findViewById ( R.id.x_shadow );
@@ -162,9 +166,9 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
 //            mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
 //            mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
 
-            mTvTitle = (TextView) itemView.findViewById(R.id.tv_audio_title);
-            mTvDuration = (TextView) itemView.findViewById(R.id.tv_duration);
-            mCbx = (ImageView) itemView.findViewById(R.id.cbx);
+            mTvTitle = itemView.findViewById(R.id.tv_audio_title);
+            mTvDuration = itemView.findViewById(R.id.tv_duration);
+            mCbx = itemView.findViewById(R.id.cbx);
             animation = itemView.findViewById ( R.id.animationAudio );
         }
     }

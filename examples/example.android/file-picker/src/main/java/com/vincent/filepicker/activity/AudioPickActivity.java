@@ -1,13 +1,10 @@
 package com.vincent.filepicker.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
-
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
@@ -20,9 +17,7 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerListItemDecoration;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
-import com.vincent.filepicker.filter.FileFilter;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.AudioFile;
 import com.vincent.filepicker.filter.entity.Directory;
@@ -31,8 +26,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.AudioPickAdapter;
+import io.oz.fpick.filter.FileFilterx;
 
 /**
  * Created by Vincent Woo
@@ -47,20 +46,16 @@ public class AudioPickActivity extends BaseActivity {
     public static final int DEFAULT_MAX_NUMBER = 9;
     private int mMaxNumber;
     private int mCurrentNumber = 0;
-    private RecyclerView mRecyclerView;
     private AudioPickAdapter mAdapter;
     private boolean isNeedRecorder;
     private boolean isTakenAutoSelected;
-    private ArrayList<AudioFile> mSelectedList = new ArrayList<>();
+    private final ArrayList<AudioFile> mSelectedList = new ArrayList<>();
     private List<Directory<AudioFile>> mAll;
     private String mAudioPath;
 
     private TextView tv_count;
     private TextView tv_folder;
-    private LinearLayout ll_folder;
-    private RelativeLayout rl_done;
     private RelativeLayout tb_pick;
-    private RelativeLayout rl_rec_aud;
 
     @Override
     void permissionGranted() {
@@ -82,7 +77,7 @@ public class AudioPickActivity extends BaseActivity {
         tv_count = (TextView) findViewById(R.id.tv_count);
         tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_audio_pick);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_audio_pick);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerListItemDecoration(this,
@@ -118,7 +113,7 @@ public class AudioPickActivity extends BaseActivity {
 
         });
 
-        rl_done = (RelativeLayout) findViewById(R.id.rl_done);
+        RelativeLayout rl_done = (RelativeLayout) findViewById(R.id.rl_done);
         rl_done.setOnClickListener(v -> {
             Intent intent = new Intent();
             // intent.putParcelableArrayListExtra(Constant.RESULT_PICK_AUDIO, mSelectedList);
@@ -128,7 +123,7 @@ public class AudioPickActivity extends BaseActivity {
         });
 
         tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
-        ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
+        LinearLayout ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
         if (isNeedFolderList) {
             ll_folder.setVisibility(View.VISIBLE);
             ll_folder.setOnClickListener(v -> mFolderHelper.toggle(tb_pick));
@@ -155,7 +150,7 @@ public class AudioPickActivity extends BaseActivity {
         }
 
         if (isNeedRecorder) {
-            rl_rec_aud = (RelativeLayout) findViewById(R.id.rl_rec_aud);
+            RelativeLayout rl_rec_aud = (RelativeLayout) findViewById(R.id.rl_rec_aud);
             rl_rec_aud.setVisibility(View.VISIBLE);
             rl_rec_aud.setOnClickListener(v -> {
                 Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
@@ -169,7 +164,7 @@ public class AudioPickActivity extends BaseActivity {
     }
 
     private void loadData() {
-        FileFilter.getAudios(this, new FilterResultCallback<AudioFile>() {
+        FileFilterx.getAudios(this, new FilterResultCallback<AudioFile>() {
             @Override
             public void onResult(List<Directory<AudioFile>> directories) {
                 // Refresh folder list
@@ -216,6 +211,7 @@ public class AudioPickActivity extends BaseActivity {
         mAdapter.refresh(list);
     }
 
+    @SuppressLint("SetTextI18n")
     private boolean findAndAddTaken(List<AudioFile> list) {
         for (AudioFile audioFile : list) {
             if (audioFile.getPath().equals(mAudioPath)) {

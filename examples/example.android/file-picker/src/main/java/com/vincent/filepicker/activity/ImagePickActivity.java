@@ -155,8 +155,8 @@ public class ImagePickActivity extends BaseActivity {
                 rl_done.setVisibility(View.GONE);
         }
 
-        tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
-        ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
+        tb_pick = findViewById(R.id.tb_pick);
+        ll_folder = findViewById(R.id.ll_folder);
         if (isNeedFolderList) {
             ll_folder.setVisibility(View.VISIBLE);
             ll_folder.setOnClickListener(new View.OnClickListener() {

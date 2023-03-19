@@ -30,13 +30,13 @@ import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
+import io.oz.jserv.docsync.Synclientier;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Photo;
 import io.oz.album.tier.PhotoMeta;
-import io.oz.jserv.sync.Synclientier;
 
 /**
- * Photo client - won't access local db.
+ * Photo client, a asynchronous wrapper of {@link Synclientier}.
  * 
  * @author odys-z@github.com
  *
@@ -119,7 +119,7 @@ public class PhotoSyntier extends Synclientier {
 	 * @throws TransException
 	 * @throws IOException
 	 */
-	public PhotoSyntier asyVideos(List<SyncDoc> videos,
+	public PhotoSyntier asyVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
 		new Thread(new Runnable() {
@@ -155,85 +155,6 @@ public class PhotoSyntier extends Synclientier {
 		return pushBlocks(meta.tbl, videos, client.ssInfo(), proc, docOk, onErr);
 	}
 
-//	public List<DocsResp> syncVideos(List<? extends IFileDescriptor> videos,
-//				SessionInf user, OnProcess proc, ErrorCtx ... onErr) {
-//
-//		ErrorCtx errHandler = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-//
-//        DocsResp resp = null;
-//		try {
-//			String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-//			AnsonHeader header = client.header().act(act);
-//
-//			List<DocsResp> reslts = new ArrayList<DocsResp>(videos.size());
-//
-//			for ( int px = 0; px < videos.size(); px++ ) {
-//
-//				IFileDescriptor p = videos.get(px);
-//				DocsReq req = new DocsReq()
-//						.blockStart(p, user);
-//
-//				AnsonMsg<DocsReq> q = client.<DocsReq>userReq(clientUri, AlbumPort.album, req)
-//										.header(header);
-//
-//				resp = client.commit(q, errHandler);
-//
-//				String pth = p.fullpath();
-//				if (!pth.equals(resp.doc.fullpath()))
-//					Utils.warn("Resp is not replied with exactly the same path: %s", resp.doc.fullpath());
-//
-//				int totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
-//				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp);
-//
-//				int seq = 0;
-//				FileInputStream ifs = new FileInputStream(new File(p.fullpath()));
-//				try {
-//					String b64 = AESHelper.encode64(ifs, blocksize);
-//					while (b64 != null) {
-//						req = new DocsReq().blockUp(seq, p, b64, user);
-//						seq++;
-//
-//						q = client.<DocsReq>userReq(clientUri, AlbumPort.album, req)
-//									.header(header);
-//
-//						resp = client.commit(q, errHandler);
-//						if (proc != null) proc.proc(videos.size(), px, seq, totalBlocks, resp);
-//
-//						b64 = AESHelper.encode64(ifs, blocksize);
-//					}
-//					req = new DocsReq().blockEnd(resp, user);
-//
-//					q = client.<DocsReq>userReq(clientUri, AlbumPort.album, req)
-//								.header(header);
-//					resp = client.commit(q, errHandler);
-//					if (proc != null) proc.proc(videos.size(), px, seq, totalBlocks, resp);
-//				}
-//				catch (Exception ex) {
-//					Utils.warn(ex.getMessage());
-//
-//					req = new DocsReq().blockAbort(resp, user);
-//					req.a(DocsReq.A.blockAbort);
-//					q = client.<DocsReq>userReq(clientUri, AlbumPort.album, req)
-//								.header(header);
-//					resp = client.commit(q, errHandler);
-//					if (proc != null) proc.proc(videos.size(), px, seq, totalBlocks, resp);
-//
-//					throw ex;
-//				}
-//				finally { ifs.close(); }
-//
-//				reslts.add(resp);
-//			}
-//
-//			return reslts;
-//		} catch (IOException e) {
-//			errHandler.onError(MsgCode.exIo, e.getClass().getName() + " " + e.getMessage());
-//		} catch (AnsonException | SemanticException e) { 
-//			errHandler.onError(MsgCode.exGeneral, e.getClass().getName() + " " + e.getMessage());
-//		}
-//		return null;
-//	}
-
 	public String download(Photo photo, String localpath)
 			throws SemanticException, AnsonException, IOException {
 		return download(uri, meta.tbl, photo, localpath);
@@ -255,28 +176,13 @@ public class PhotoSyntier extends Synclientier {
 					.share(client.ssInfo().uid(), share, new Date())
 					.fullpath(localpath);
 
-		return insertSyncDoc(meta.tbl, doc, new OnDocOk() {
+		return synInsertDoc(meta.tbl, doc, new OnDocOk() {
 			@Override
 			public void ok(SyncDoc doc, AnsonResp resp)
 					throws IOException, AnsonException, TransException {
 			}}
 		);
 	}
-
-//	public AlbumResp insertPhoto(String collId, String fullpath, String clientname)
-//			throws SemanticException, IOException, AnsonException {
-//
-//		AlbumReq req = new AlbumReq(clientUri)
-//				.createPhoto(collId, fullpath)
-//				.photoName(clientname);
-//
-//		String[] act = AnsonHeader.usrAct("album.java", "create", "c/photo", "create photo");
-//		AnsonHeader header = client.header().act(act);
-//		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(clientUri, AlbumPort.album, req)
-//									.header(header);
-//
-//		return client.commit(q, errCtx);
-//	}
 
 	/**
 	 * Asynchronously query synchronizing records.
@@ -300,7 +206,7 @@ public class PhotoSyntier extends Synclientier {
 						else page.add(p.fullpath());
 					}
 
-					resp = queryPaths(page, meta.tbl);
+					resp = synQueryPathsPage(page, meta.tbl);
 					try {
 						onOk.ok(resp);
 					} catch (AnsonException | SemanticException | IOException e) {
@@ -324,80 +230,10 @@ public class PhotoSyntier extends Synclientier {
 		return this;
 	}
 
-//	public AlbumSyntier asyncQuerySyncs(List<? extends IFileDescriptor> files, SyncingPage page, OnOk onOk, OnError onErr) {
-//		new Thread(new Runnable() {
-//	        public void run() {
-//	        DocsResp resp = null;
-//			try {
-//				String[] act = AnsonHeader.usrAct("album.java", "query", "r/states", "query sync");
-//				AnsonHeader header = client.header().act(act);
-//
-//				List<DocsResp> reslts = new ArrayList<DocsResp>(files.size());
-//
-//				AlbumReq req = (AlbumReq) new AlbumReq().syncing(page).a(A.selectSyncs);
-//
-//				for (int i = page.start; i < page.end & i < files.size(); i++) {
-//					IFileDescriptor p = files.get(i);
-//					// req.querySync(p);
-//				}
-//
-//				AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(clientUri, AlbumPort.album, req)
-//										.header(header);
-//
-//				resp = client.commit(q, new ErrorCtx() {
-//					@Override
-//					public void onError(MsgCode code, String msg) {
-//						onErr.err(code, msg);
-//					}
-//				});
-//
-//				reslts.add(resp);
-//				onOk.ok(resp);
-//			} catch (IOException e) {
-//				onErr.err(MsgCode.exIo, clientUri, e.getClass().getName(), e.getMessage());
-//			} catch (AnsonException | SemanticException e) { 
-//				onErr.err(MsgCode.exGeneral, clientUri, e.getClass().getName(), e.getMessage());
-//			}
-//	    } } ).start();
-//		return null;
-//	}
-
-//	/**
-//	 * push photos
-//	 * 
-//	 * @param photos
-//	 * @param user
-//	 * @return synchronizing result
-//	 * @throws SemanticException
-//	 * @throws IOException
-//	 * @throws AnsonException
-//	 */
-//	public List<AlbumResp> syncPhotos(List<? extends IFileDescriptor> photos, SessionInf user)
-//			throws SemanticException, IOException, AnsonException {
-//		String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-//		AnsonHeader header = client.header().act(act);
-//
-//		List<AlbumResp> reslts = new ArrayList<AlbumResp>(photos.size());
-//
-//		for (IFileDescriptor p : photos) {
-//			AlbumReq req = new AlbumReq()
-//					.device(user.device)
-//					.createPhoto(p, user);
-//
-//			AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(clientUri, AlbumPort.album, req)
-//									.header(header);
-//
-//			AlbumResp resp = client.commit(q, errCtx);
-//
-//			reslts.add(resp);
-//		}
-//		return reslts;
-//	}
-
 	/**
 	 * Asynchronously push photos. This is different from push/pull of jserv nodes.
 	 * 
-	 * @deprecated since Albumtier 0.1.9, this methond also uses block chain for uploading. 
+	 * @deprecated since Albumtier 0.1.9, this method also uses block chain for uploading. 
 	 * 
 	 * TODO: to be changed to handling short text.
 	 * 
@@ -417,7 +253,7 @@ public class PhotoSyntier extends Synclientier {
 					syncUp(meta.tbl, photos, client.ssInfo().uid(), proc, docOk);
 				} catch (IOException e) {
 					onErr.err(MsgCode.exIo, e.getClass().getName());
-				} catch (AnsonException | SQLException e) { 
+				} catch (AnsonException e) { 
 					onErr.err(MsgCode.exGeneral, e.getClass().getName());
 				} catch (SemanticException e) { 
 					onErr.err(MsgCode.exSemantic, e.getClass().getName());
@@ -429,96 +265,11 @@ public class PhotoSyntier extends Synclientier {
 		return this;
 	}
 
-//	public void asyncPhotos(List<? extends IFileDescriptor> photos, SessionInf user, OnOk onOk, OnError onErr)
-//			throws SemanticException, IOException, AnsonException {
-//		new Thread(new Runnable() {
-//	        public void run() {
-//	        DocsResp resp = null;
-//			try {
-//				String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-//				AnsonHeader header = client.header().act(act);
-//
-//				List<DocsResp> reslts = new ArrayList<DocsResp>(photos.size());
-//
-//				for (IFileDescriptor p : photos) {
-//					AlbumReq req = new AlbumReq()
-//							.createPhoto(p, user);
-//					// req.a(A.insertPhoto);
-//
-//					AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(clientUri, AlbumPort.album, req)
-//											.header(header);
-//
-//					resp = client.commit(q, new ErrorCtx() {
-//						// @Override public void onError(MsgCode code, AnsonResp obj) { onErr.err(code, obj.msg()); }
-//
-//						@Override
-//						public void onError(MsgCode code, String msg) {
-//							onErr.err(code, msg);
-//						}
-//					});
-//
-//					reslts.add(resp);
-//					onOk.ok(resp);
-//				}
-//			} catch (IOException e) {
-//				onErr.err(MsgCode.exIo, clientUri, e.getClass().getName(), e.getMessage());
-//			} catch (AnsonException | SemanticException e) { 
-//				onErr.err(MsgCode.exGeneral, clientUri, e.getClass().getName(), e.getMessage());
-//			}
-//	    } } ).start();
-//	}
-
 	public AlbumResp selectPhotoRec(String docId, ErrorCtx ... onErr) throws SemanticException {
 		throw new SemanticException("Why needed?");
 	}
 
-//	/**Get a photo record (this synchronous file base64 content)
-//	 * @param docId
-//	 * @param onErr
-//	 * @return response
-//	 */
-//	public AlbumResp selectPhotoRec(String docId, ErrorCtx ... onErr) {
-//		ErrorCtx errHandler = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-//		String[] act = AnsonHeader.usrAct("album.java", "synch", "c/photo", "multi synch");
-//		AnsonHeader header = client.header().act(act);
-//
-//		AlbumReq req = new AlbumReq().selectPhoto(docId);
-//		// req.a(A.rec);
-//
-//		AlbumResp resp = null;
-//		try {
-//			AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(clientUri, AlbumPort.album, req)
-//										.header(header);
-//
-//			resp = client.commit(q, errCtx);
-//		} catch (AnsonException | SemanticException e) {
-//			errHandler.onError(MsgCode.exSemantic, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
-//		} catch (IOException e) {
-//			errHandler.onError(MsgCode.exIo, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
-//		}
-//		return resp;
-//	}
-
 	public DocsResp del(String device, String clientpath) {
-		return del(meta.tbl, device, clientpath);
+		return synDel(meta.tbl, device, clientpath);
 	}
-
-//	public DocsResp del(String device, String clientpath) {
-//		AlbumReq req = new AlbumReq().del(device, clientpath);
-//
-//		DocsResp resp = null;
-//		try {
-//			String[] act = AnsonHeader.usrAct("album.java", "del", "d/photo", "");
-//			AnsonHeader header = client.header().act(act);
-//			AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(clientUri, AlbumPort.album, req)
-//										.header(header);
-//
-//			resp = client.commit(q, errCtx);
-//		} catch (AnsonException | SemanticException e) {
-//			errCtx.onError(MsgCode.exSemantic, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
-//		} catch (IOException e) {
-//			errCtx.onError(MsgCode.exIo, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
-//		}
-//		return resp;
-//	}
 }

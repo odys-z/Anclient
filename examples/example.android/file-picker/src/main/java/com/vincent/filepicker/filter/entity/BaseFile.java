@@ -3,17 +3,20 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.vincent.filepicker.Util;
+
+import java.text.ParseException;
 import java.util.Date;
 
+import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
-import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.SyncDoc;
+import io.odysz.transact.x.TransException;
+
+import static io.odysz.common.LangExt.isNull;
 
 /**
- * Modyfied by Ody Zhou
+ * Modified by Ody Zhou
  *
  * Created by Vincent Woo
  * Date: 2016/10/10
@@ -26,17 +29,12 @@ public class BaseFile extends SyncDoc implements Parcelable {
 //    public static int Synchronizing = -1;
 
     private long id;
-    private String name;
-    // private String path;
-    private long size;          //byte
-    private String bucketId;    //Directory ID
-    private String bucketName;  //Directory Name
+    // private String name;
+    // private long size;          //byte
+    private String localDirId;  //Directory ID
+    private String localDirName;//Directory Name
     private long date;          //Added Date
     private boolean isSelected;
-
-    // public int synchFlag = SynchUnknown;
-
-    private String recId;
 
     @Override
     public boolean equals(Object o) {
@@ -60,72 +58,55 @@ public class BaseFile extends SyncDoc implements Parcelable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public String getName() { return pname; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setName(String name) { this.pname = name; }
+
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public String getPath() { return clientpath; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setPath(String path) { this.clientpath = path; }
+
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public long getSize() { return size; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setSize(long size) { this.size = size; }
+
+    public String getLocalDirId() { return localDirId; }
+
+    public void setLocalDirId(String localDirId) {
+        this.localDirId = localDirId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getLocalDirName() {
+        return localDirName;
     }
 
-    public String getPath() {
-        return clientpath;
+    public void setLocalDirName(String localDirName) {
+        this.localDirName = localDirName;
     }
 
-    public void setPath(String path) {
-        this.clientpath = path;
-    }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public long getDate() { return date; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setDate(long date) { this.date = date; }
 
-    public long getSize() {
-        return size;
-    }
+    public boolean isSelected() { return isSelected; }
 
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public String getBucketId() {
-        return bucketId;
-    }
-
-    public void setBucketId(String bucketId) {
-        this.bucketId = bucketId;
-    }
-
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
-
-    public long getDate() {
-        return date;
-    }
-
-    public void setDate(long date) {
-        this.date = date;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
+    public void setSelected(boolean selected) { isSelected = selected; }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeString(name);
+        dest.writeString(pname);
         dest.writeString(clientpath);
         dest.writeLong(size);
-        dest.writeString(bucketId);
-        dest.writeString(bucketName);
+        dest.writeString(localDirId);
+        dest.writeString(localDirName);
         dest.writeLong(date);
         dest.writeByte((byte) (isSelected ? 1 : 0));
+        dest.writeString(folder);
     }
 
     @Override
@@ -139,16 +120,40 @@ public class BaseFile extends SyncDoc implements Parcelable {
 
         @Override
         public BaseFile createFromParcel(Parcel in) {
-            BaseFile file = new BaseFile();
-            file.id = in.readLong();
-            file.name = in.readString();
-            file.clientpath = in.readString();
-            file.size = in.readLong();
-            file.bucketId = in.readString();
-            file.bucketName = in.readString();
-            file.date = in.readLong();
-            file.isSelected = in.readByte() != 0;
-            return file;
+            throw new AnsonException(0, "No overriding?");
+//            BaseFile file = new BaseFile();
+//            file.id = in.readLong();
+//            file.name = in.readString();
+//            file.clientpath = in.readString();
+//            file.size = in.readLong();
+//            file.localDirId = in.readString();
+//            file.localDirName = in.readString();
+//            file.date = in.readLong();
+//            file.isSelected = in.readByte() != 0;
+//            return file;
         }
     };
+
+    public String path() {
+        return Util.extractPathWithoutSeparator(clientpath);
+    }
+
+    public BaseFile cdate(long l) {
+        cdate(new Date(l));
+        return this;
+    }
+
+    /*
+    public BaseFile formatFolder(Date ...d) {
+        if (isNull(d)) {
+            try {
+                formatFolder(DateFormat.parse(createDate));
+            } catch (ParseException e) {
+                formatFolder(new Date());
+            }
+        }
+        else folder(DateFormat.formatYYmm(d[0]));
+        return this;
+    }
+     */
 }
