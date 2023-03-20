@@ -152,7 +152,7 @@ public class PhotoSyntier extends Synclientier {
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
-		return pushBlocks(meta.tbl, videos, client.ssInfo(), proc, docOk, onErr);
+		return pushBlocks(meta.tbl, videos, proc, docOk, onErr);
 	}
 
 	public String download(Photo photo, String localpath)
