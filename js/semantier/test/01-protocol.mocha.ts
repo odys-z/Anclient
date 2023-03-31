@@ -226,15 +226,15 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
 	it('InsertReq <UpdateReq.A(insert)>', () => {
 		debugger
-		let ir = new UpdateReq('con-1', 'quizzes', 'quizId')
+		let ur = new UpdateReq('con-1', 'quizzes', ['quizId'])
 			.A<UpdateReq>('insert');
 
-		assert.equal(ir.uri, 'con-1', "1 ---");
-		assert.equal(ir.mtabl, 'quizzes', "2 ---");
-		assert.equal(ir.a, 'insert', "3 ---");
+		assert.equal(ur.uri, 'con-1', "1 ---");
+		assert.equal(ur.mtabl, 'quizzes', "2 ---");
+		assert.equal(ur.a, 'insert', "3 ---");
 
 		let port = 'test1';
-		let jreq = new AnsonMsg({ port, header: null, body: [ir] });
+		let jreq = new AnsonMsg({ port, header: null, body: [ur] });
 
         assert.equal(jreq.port, 'test1', "8 ---");
 
@@ -244,19 +244,19 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
 		let ssInf : SessionInf = { "type": "io.odysz.semantic.jsession.SessionInf",
 					  "uid": "admin", "roleId": null, "ssid": "001eysTj" };
-		ir = new SessionClient(ssInf, new TextEncoder().encode('iv 3456789ABCDEF'), true)
+		let ir = new SessionClient(ssInf, new TextEncoder().encode('iv 3456789ABCDEF'), true)
 				.usrAct('func', 'cate', 'cmd', 'remarks')
 				.insert(null, 'a_role_func', nvss)
 				.Body();
 
-		assert.equal(ir.nvss.length, 1, 'A ---');
-		assert.equal(ir.nvss[0].length, 2, 'B ---');
-		assert.equal(ir.mtabl, 'a_role_func', 'a_role_func ---');
+		assert.equal(ir?.nvss.length, 1, 'A ---');
+		assert.equal(ir?.nvss[0].length, 2, 'B ---');
+		assert.equal(ir?.mtabl, 'a_role_func', 'a_role_func ---');
 
 		jreq = new AnsonMsg({ port, header: null, body: [ir] });
 
         assert.equal(jreq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "C ---");
-        assert.equal(jreq.Body().type, "io.odysz.semantic.jserv.U.AnInsertReq", "D ---");
+        assert.equal(jreq.Body()?.type, "io.odysz.semantic.jserv.U.AnInsertReq", "D ---");
 	});
 });
 
@@ -273,8 +273,8 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 		let rp = new AnsonMsg( json );
 		assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- 1 -");
 		assert.equal(rp.code, 'exIo', "- 2 -");
-		assert.equal(rp.Body().type, 'io.odysz.semantic.jprotocol.AnsonResp', "- 3 -");
-		assert.equal(rp.Body().msg(), 'Ajax: network failed!', "- 4 -");
+		assert.equal(rp.Body()?.type, 'io.odysz.semantic.jprotocol.AnsonResp', "- 3 -");
+		assert.equal(rp.Body()?.msg(), 'Ajax: network failed!', "- 4 -");
 	});
 
     it('Ajax error handling 2', () => {
@@ -282,34 +282,34 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 		let rp = AnClient.fromAjaxError(ajaxError);
         assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- A -");
         assert.equal(rp.code, 'exIo', "- B -");
-		assert.equal(rp.Body().type, 'io.odysz.semantic.jprotocol.AnsonResp', "- C -");
-		assert.equal(rp.Body().msg(), 'Ajax: parsererror', "- D -");
-		assert.equal(rp.Body().ajax.statusText, ajaxError.statusText, "- E -");
-		assert.equal(rp.Body().ajax.responseText, ajaxError.responseText, "- F -");
+		assert.equal(rp.Body()?.type, 'io.odysz.semantic.jprotocol.AnsonResp', "- C -");
+		assert.equal(rp.Body()?.msg(), 'Ajax: parsererror', "- D -");
+		assert.equal(rp.Body()?.ajax.statusText, ajaxError.statusText, "- E -");
+		assert.equal(rp.Body()?.ajax.responseText, ajaxError.responseText, "- F -");
 	});
 
     it('AnsonResp response instancing', () => {
 		let rp = new AnsonMsg(resp);
-		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'person'), true, "0 000");
-		assert.equal(AnsonResp.hasColumn(rp.Body().Rs(), 'age'), true, "0 001");
+		assert.equal(AnsonResp.hasColumn(rp.Body()?.Rs(), 'person'), true, "0 000");
+		assert.equal(AnsonResp.hasColumn(rp.Body()?.Rs(), 'age'), true, "0 001");
         assert.equal(rp.code, 'ok', "1 ---");
         assert.equal(rp.port, 'query', "2 ---");
-        assert.equal(rp.Body().msg(), null, "3 ---");
+        assert.equal(rp.Body()?.msg(), null, "3 ---");
 
 		rp = new AnsonMsg(respErr);
 		assert.equal(rp.code, 'exSession', "4 ---");
-		assert.equal(rp.Body().msg(), 'session info is missing or timeout', "5 ---");
+		assert.equal(rp.Body()?.msg(), 'session info is missing or timeout', "5 ---");
 	} );
 
     it('SessionResp response instancing', () => {
 		let rp = new AnsonMsg(respSession);
         assert.equal(rp.code, 'ok', "1 ---");
         assert.equal(rp.port, 'session', "2 ---");
-        assert.equal(rp.Body().ssInf.type, "io.odysz.semantic.jsession.SessionInf", "3 ---");
-        assert.equal(rp.Body().ssInf.uid, "admin", "4 ---");
-        assert.equal(rp.Body().ssInf.ssid, "001eysTj", "5 ---");
+        assert.equal(rp.Body()?.ssInf?.type, "io.odysz.semantic.jsession.SessionInf", "3 ---");
+        assert.equal(rp.Body()?.ssInf?.uid, "admin", "4 ---");
+        assert.equal(rp.Body()?.ssInf?.ssid, "001eysTj", "5 ---");
 
-		let sessionClient = new SessionClient(rp.Body().ssInf, new TextEncoder().encode('iv....'), true);
+		let sessionClient = new SessionClient(rp.Body()?.ssInf, new TextEncoder().encode('iv....'), true);
 		let ssi = sessionClient.userInfo;
         assert.equal(ssi.uid, "admin", "6 ---");
         assert.equal(ssi.ssid, "001eysTj", "7 ---");
