@@ -144,8 +144,8 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
         assert.equal(ssReq.code, null, "1 ---");
         assert.equal(ssReq.port, 'session', "2 ---");
         assert.equal(ssReq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "3 ---");
-        assert.equal(ssReq.Body().type, "io.odysz.semantic.jsession.AnSessionReq", "4 ---");
-        assert.equal(ssReq.Body().uid, "user 1", "5 ---");
+        assert.equal(ssReq.Body()?.type, "io.odysz.semantic.jsession.AnSessionReq", "4 ---");
+        assert.equal(ssReq.Body()?.uid, "user 1", "5 ---");
 	});
 
 	it('QueryReq', () => {
