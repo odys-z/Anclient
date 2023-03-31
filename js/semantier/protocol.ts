@@ -382,8 +382,16 @@ export class AnsonMsg<T extends AnsonBody> {
     static __type__ = '';
 
 
+	/**
+	 * Get resultset's array mapping.
+	 * @param resp general response (AnsonResp)
+	 * @param rx resultset index
+	 * @returns array 
+	 */
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
-		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length > 0) {
+		if (resp.body && resp.body[0] && resp.body[0].rs
+			// A legacy of js. Type of rs will be changed to Array<AnResultset>
+			&& (resp.body[0].rs as Array<AnResultset>).length > 0) {
 			return AnsonResp.rsArr(resp.body, rx);
 		}
 		return [];
