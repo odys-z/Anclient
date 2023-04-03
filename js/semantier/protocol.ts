@@ -66,9 +66,9 @@ export class PageInf {
 	 */
 	condtsRec () {
 		let rec = {} as Tierec;
-		for(let nv in this.condts) {
+		for(let nv of this.condts) {/*修改1：in改为of*/
 			if (nv && nv[0])
-				rec[nv[0]] = rec[nv[1]];
+				rec[nv[0]] = nv[1];/*修改2：rec[nv[1]]修改为nv[1]*/
 		}
 		return rec;
 	}
