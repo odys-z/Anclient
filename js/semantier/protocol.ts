@@ -66,9 +66,9 @@ export class PageInf {
 	 */
 	condtsRec () {
 		let rec = {} as Tierec;
-		for(let nv in this.condts) {
+		for(let nv of this.condts) {
 			if (nv && nv[0])
-				rec[nv[0]] = rec[nv[1]];
+				rec[nv[0]] = nv[1];
 		}
 		return rec;
 	}
