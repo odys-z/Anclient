@@ -48,7 +48,12 @@ public class PhotoSyntier extends Synclientier {
 
 	static {
 		AnsonMsg.understandPorts(AlbumPort.album);
-		meta = new PhotoMeta(null); // this tier won't access local db.
+		try {
+			// this tier won't access local db.
+			meta = new PhotoMeta(null);
+		} catch (SemanticException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
