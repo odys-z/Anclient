@@ -51,7 +51,7 @@ public class PhotoSyntier extends Synclientier {
 		try {
 			// this tier won't access local db.
 			meta = new PhotoMeta(null);
-		} catch (SemanticException e) {
+		} catch (TransException e) {
 			e.printStackTrace();
 		}
 	}
