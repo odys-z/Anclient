@@ -10,6 +10,8 @@ import { AnContextType, Comprops, CrudCompW } from '@anclient/anreact';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
+import { photos as _photos } from "../src/temp-photos";
+
 export interface PhotoSlide<T extends {}> {
     index: number
     next: PhotoProps<T> | null
@@ -119,7 +121,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 	}
 
 	render() {
-		let photos = this.tier?.toGalleryImgs(0) || [];
+		let photos = this.tier?.toGalleryImgs(0) || _photos;
 		return (<div>Album Example - Clicke to show large photo
 			{this.tier && this.gallery( photos )}
 		</div>);
