@@ -12,10 +12,12 @@
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <script src="Album-1.0.0.min.js"></script>
   <script>
-	// let searchParams = new URLSearchParams(window.location.search)
-	// let serv = searchParams ? searchParams.get('serv') : undefined;
+	let searchParams = new URLSearchParams(window.location.search)
+	let aid = searchParams ? searchParams.get('album') : 'a-002';
+
 	album.App.bindHtml('app', {
 		jsonUrl: 'http://localhost:8889/github.json',
+    aid,
 		serv: 'host', Window, portal: 'index.html'});
   </script>
 </body>

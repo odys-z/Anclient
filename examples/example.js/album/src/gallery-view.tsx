@@ -19,19 +19,21 @@ export interface PhotoSlide<T extends {}> {
     previous: PhotoProps<T> | null
 }
 
-export default class GalleryView extends CrudCompW<Comprops>{
+export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 	tier: GalleryTier | undefined;
 	classes: any;
 	uri: any;
 	currentImx: number = -1;
 	showCarousel: boolean = false;
 	album: PhotoCollect[] | undefined;
+	aid: "";
 	
 	constructor(props: Comprops) {
 		super(props);
 
 		this.classes = props.classes;
 		this.uri = props.uri;
+		this.aid = props.aid;
 
 		this.openLightbox = this.openLightbox.bind(this);
 		this.closeLightbox = this.closeLightbox.bind(this);
@@ -44,7 +46,7 @@ export default class GalleryView extends CrudCompW<Comprops>{
 
 		let client = (this.context as AnContextType).anClient;
 
-		this.tier = new GalleryTier({uri, comp: this, client})
+		this.tier = new GalleryTier({uri, comp: this, client, album: this.aid})
 					.setContext(this.context) as GalleryTier;
 
 		this.tier.myAlbum((collects?: PhotoCollect[]) => {

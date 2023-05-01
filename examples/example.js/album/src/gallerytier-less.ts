@@ -39,13 +39,13 @@ export class GalleryTier extends Semantier {
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string, client: SessionClient, comp: CrudComp<Comprops>}, ) {
+	constructor(props: {uri: string, client: SessionClient, album: string, comp: CrudComp<Comprops>}, ) {
 		super(props);
 		console.log(this.uri);
 		this.comp = props.comp;
 		this.client = props.client;
 
-		this.page = new AlbumPage();
+		this.page = new AlbumPage({album: props.album});
 	}
 
 	/**
@@ -80,9 +80,9 @@ export class GalleryTier extends Semantier {
 		onLoad(this.collectRecords);
 	}
 
-	photo(uri: string) {
-		return this;
-	}
+	// photo(uri: string) {
+	// 	return this;
+	// }
 
     myAlbum(onLoad: ((collects?: PhotoCollect[]) => void)): void {
         this.collects(this.page, onLoad);
@@ -141,6 +141,7 @@ export class GalleryTier extends Semantier {
 		if (debug)
 			console.log(msg);
 
+		// use <img src='anson64'/> to GET Http resource
 		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
 	}
 };
@@ -153,7 +154,7 @@ interface AlbumRec extends Tierec {
 	collects?: Array<string>;
 
 	/** Collects' default length (first page size) */
-	collectSize: number;
+	collectSize?: number;
 
 	/** Photos ids */
 	photos?: Array<string>;
@@ -185,7 +186,7 @@ class AlbumReq extends DocsReq {
 	};
 
 	pageInf: PageInf;
-	aid?: string;
+	albumId: string | undefined;
 	cids?: string[];
 	pids?: string[];
 
@@ -196,7 +197,7 @@ class AlbumReq extends DocsReq {
 		this.pageInf = new PageInf(page);
 
 		if (page.qrec) {
-			this.aid = page.qrec.album;
+			this.albumId = page.qrec.album;
 			this.cids = page.qrec.collects;
 			this.pids = page.qrec.photos;
 		}
@@ -209,9 +210,7 @@ class Profiles extends AnsonBody {
 	maxUsers: number;
 	servtype: number;
 
-	constructor (obj: {
-			servtype: number;
-			maxUsers: number;home: string }) {
+	constructor (obj: { servtype: number; maxUsers: number; home: string }) {
 		super( { type: 'io.oz.album.tier.Profiles' } );
 		this.home = obj.home;
 		this.maxUsers = obj.maxUsers;

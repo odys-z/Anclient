@@ -12,19 +12,23 @@ import GalleryView from './gallery-view';
 type AlbumProps = {
 	servs: JsonServs;
 	servId: string;
+
+	/** album id */
+	aid: string;
+
 	iportal?: string;
 	iparent?: any; // parent of iframe
-	iwindow?: any; // window object
+	iwindow?: Window | undefined; // window object
 }
 
-type AlbumConfig = {
-	servs?: JsonServs;
-	servId: string;
-	iportal?: string;
-}
+// type AlbumConfig = {
+// 	servs?: JsonServs;
+// 	servId: string;
+// 	iportal?: string;
+// }
 
 /** The application main, context singleton and error handler */
-export class App extends React.Component<AlbumProps, AlbumConfig> {
+export class App extends React.Component<AlbumProps> {
     inclient: Inseclient;
 
 	anReact: AnReactExt;  // helper for React
@@ -75,7 +79,7 @@ export class App extends React.Component<AlbumProps, AlbumConfig> {
                         });
 	}
 
-	onError(c: any, r: AnsonMsg<AnsonResp> ) {
+	onError(c: string, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r);
 		this.error.msg = r.Body()?.msg();
 		this.hasError = !!c;
@@ -101,8 +105,8 @@ export class App extends React.Component<AlbumProps, AlbumConfig> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
-			{<GalleryView port='album' uri={'/local/album'}/>}
-			{this.config.hasError &&
+			{<GalleryView port='album' uri={'/local/album'} aid={this.props.aid}/>}
+			{this.hasError &&
 				<AnError onClose={this.onErrorClose} fullScreen={false}
 					uri={"/login"} tier={undefined}
 					title={L('Error')} msg={this.error.msg || ''} />}
@@ -117,18 +121,19 @@ export class App extends React.Component<AlbumProps, AlbumConfig> {
 	 *
 	 * For test, have elem = undefined
 	 * @param elem html element id, null for test
-	 * @param opts default: {serv: 'host', portal: 'index.html'}
+	 * @param opts default: {serv: 'host', portal: 'index.html', album: 'aid'}
 	 * - serv: string,
 	 * - portal: string
 	 */
-	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
+	static bindHtml(elem: string, opts: AnreactAppOptions & {aid: string}) : void {
 		let portal = opts.portal ?? 'index.html';
+		let aid = opts.aid;
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<App servs={json} servId={opts.serv || 'host'} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<App servs={json} servId={opts.serv || 'host'} aid={aid} iportal={portal} iwindow={window}/>, dom);
 		}
 	}
 
