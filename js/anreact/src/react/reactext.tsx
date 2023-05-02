@@ -13,13 +13,18 @@ export interface JsonServs {
 
 export interface AnContextType extends Semantext {
 	ssInf?: SessionInf,
-	anReact?: AnReact, // currently neccessary
+	/** AnReact instance. currently neccessary */
+	anReact?: AnReact,   
 
 	pageOrigin?: string,
-	iparent?: any,    // usually the parent window of ifram
+	/** Usually the parent window of ifram. */
+	iparent?: object | Window,
 	ihome?: string,
 
-	/**default: host */
+	/**
+	 * Jserv id configured within index.html for jserv url directing.
+	 * default: host
+	 */
 	servId: string,
 
 	servs: JsonServs, 

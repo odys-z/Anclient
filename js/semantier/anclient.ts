@@ -476,7 +476,7 @@ class SessionClient {
 		return ssInf;
 	}
 
-	static persistorage(ssInf) {
+	static persistorage(ssInf: SessionInf) {
 		if (window && localStorage) {
 			var sstr = JSON.stringify(ssInf);
 			localStorage.setItem(SessionClient.ssInfo, sstr);

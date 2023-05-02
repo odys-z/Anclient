@@ -130,15 +130,17 @@ export interface QueryConditions {
 }
 
 /**
+ * Client side context for Anclient to work in.
  * Not the same as java Semantext.
+ * 
  * { client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx }
  */
 export interface Semantext {
     anClient: SessionClient;
 	/**
-	 * FIXME rename as TSHelper:
+	 * FIXME rename as presentier:
 	 * 
-	 * Gloabal UI helper, e.g. AnReact
+	 * Gloabal UI presentation tier toolkit, e.g. AnReact
 	 */
     uiHelper: any;
     error: ErrorCtx;
@@ -264,7 +266,7 @@ export class Semantier {
 				let vd = f.validator;
 				if(vd.notNull && (v === undefined || v === null || (v as string | Array<any>).length === 0))
 					return 'notNull';
-				else if (vd.len && v && (v as string | Array<any>).length > vd.len)
+				else if (vd.len && v && (v as string | Array<any>).length > Number(vd.len))
 					return 'maxLen';
 				return 'ok';
 			}

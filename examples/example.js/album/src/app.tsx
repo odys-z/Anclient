@@ -21,12 +21,6 @@ type AlbumProps = {
 	iwindow?: Window | undefined; // window object
 }
 
-// type AlbumConfig = {
-// 	servs?: JsonServs;
-// 	servId: string;
-// 	iportal?: string;
-// }
-
 /** The application main, context singleton and error handler */
 export class App extends React.Component<AlbumProps> {
     inclient: Inseclient;
@@ -48,7 +42,8 @@ export class App extends React.Component<AlbumProps> {
     hasError: any;
     nextAction: string | undefined;
 
-	/**Restore session from window.localStorage
+	/**
+	 * Restore session from window.localStorage
 	 */
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
