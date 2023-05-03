@@ -2,12 +2,13 @@ var path = require('path')
 var webpack = require('webpack')
 
 var v = 'development'; // "production" | "development" | "none"
-var version = "1.0.0";
+var version = "0.1.5";
 
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: { 'Album': './src/app.tsx' },
+	entry: {"Album": "./src/app.tsx",
+			"Admin": "./src/admin.tsx" },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",

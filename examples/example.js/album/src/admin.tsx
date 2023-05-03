@@ -5,8 +5,12 @@ import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclien
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
-	AnTreeditor
+	AnTreeditor,
+	Comprops,
+	CrudCompW
 } from '@anclient/anreact';
+import { Button } from '@material-ui/core';
+import { Replay } from '@material-ui/icons';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -22,7 +26,7 @@ type AlbumProps = {
 }
 
 /** The application main, context singleton and error handler */
-export class Admin extends React.Component<AlbumProps> {
+export class Admin extends CrudCompW<AlbumProps & Comprops> {
 	servId: string;
 
     inclient: SessionClient;
@@ -37,6 +41,7 @@ export class Admin extends React.Component<AlbumProps> {
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
 
+		// this.uri = props.uri;
 		this.servId = props.servId || 'host';
 		this.nextAction = 're-login',
 
@@ -48,7 +53,7 @@ export class Admin extends React.Component<AlbumProps> {
 		this.error = {onError: this.onError, msg: ''};
 		this.hasError = false,
 
-		Protocol.sk.cbbViewType = 'v-type';
+		Protocol.sk.albumtree = 't-album';
 
         // design note: exendPorts shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
@@ -72,7 +77,8 @@ export class Admin extends React.Component<AlbumProps> {
 	}
 
 	render() {
-	  return (
+		let {classes} = this.props;
+	  	return (
 		<AnContext.Provider value={{
 			servId: this.servId,
 			servs: this.props.servs,
@@ -88,6 +94,45 @@ export class Admin extends React.Component<AlbumProps> {
 				title={""}
 				columns={[{label: "v", field: ""}]}
 				onSelectChange={(ids: String[])=>{}}/>}
+			<Button variant="contained" color='primary'
+				className={classes?.button} onClick={this.reshape}
+				startIcon={<Replay />}
+			>{L('Update')}</Button>
+
+			<AnTreeditor sk={Protocol.sk.albumtree}
+				uri={this.uri} mtabl='ind_emotion'
+				// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
+				parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
+				columns={[
+					{ type: 'text', field: 'indName', label: L('Indicator'),
+					validator: {len: 200, notNull: true}, grid: {xs: 6, sm: 6} },
+					{ type: 'float', field: 'weight', label: L('Weight'),
+					validator: {minLen: 0.0}, grid: {xs: 3, sm: 1},
+					formatter: (col, n) => n.node.weight},
+					{ type: 'formatter', label: L('Question Type'), grid: {xs: 2, sm: 2},
+					formatter: (col, rec) => { return readableQtype(rec.node.qtype || rec.node.vtype, true) } },
+					{ type: 'actions', label: '', grid: {xs: 3, md: 3} }
+				]}
+				fields={[
+					{ type: 'text', field: 'parent', label: 'parent', hide: 1 },
+					{ type: 'text', field: 'indName', label: L('Indicator'),
+					validator: {len: 200, notNull: true} },
+					{ type: 'float', field: 'weight', label: L('Default Weight'),
+					validator: {min: 0.0} },
+					{ type: 'cbb', field: 'qtype', label: L('Question Type'),
+					// If a node is the type of the first option, it means that node is middle (internal) node.
+					options: [{n: L('[ Category ]'), v: 'cate'}, ...QuizProtocol.Qtype.options()],
+					validator: {notNull: true} },
+					{ type: 'int',field: 'sort', label: L('UI Sort'),
+					validator: {notNull: true} },
+					{ type: 'text', field: 'remarks', label: L('Remarks'),
+					validator: {len: 500}, props: {sm: 12, lg: 6} }
+				]}
+				isMidNode={n => n.qtype === 'cate' || !n.qtype}
+				detailFormTitle={L('Indicator Details')}
+			/>
+			{this.confirm}
+
 			{this.hasError &&
 				<AnError onClose={this.onErrorClose} fullScreen={false}
 					uri={"/login"} tier={undefined}
