@@ -227,7 +227,7 @@ interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
 	formatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => UIComponent;
 }
 
-class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
+class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 	state = {
 		// window: undefined,
 		// [{id, node: {text, css, url}, level, children}. ... ]
@@ -532,7 +532,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		);
 	}
 }
-AnTreeditorComp.contextType = AnContext;
+AnTreeditorComp2.contextType = AnContext;
 
-const AnTreeditor = withStyles<any, any, TreecardProps>(styles)(withWidth()(AnTreeditorComp));
-export { AnTreeditor, AnTreeditorComp, TreecardProps }
+const AnTreeditor2 = withStyles<any, any, TreecardProps>(styles)(withWidth()(AnTreeditorComp2));
+export { AnTreeditor2, AnTreeditorComp2, TreecardProps }
