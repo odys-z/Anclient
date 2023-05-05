@@ -28,6 +28,7 @@ interface AnTablistProps extends Comprops {
 	 */
 	selected?: {ids: Set<string>};
 
+	/** List's column definition. */
 	columns: Array<AnlistColAttrs<JSX.Element, CompOpts> & Comprops>;
 
 	/**In tier mode, data is supposed to be bound by widget itself. */

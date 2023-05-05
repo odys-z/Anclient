@@ -97,7 +97,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		let {isSm} = media;
 		let that = this;
 
-		if (f.type === 'enum' || f.type === 'cbb') {
+		if (f.type === 'cbb') {
 			let fcbb = f as TierComboField<JSX.Element, CompOpts>;
 			return (
 				<DatasetCombo uri={ this.props.uri }
@@ -122,7 +122,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				console.warn('TRecordFormComp need formatter with signature of f(record, field, tier).', f.formatter)
 			return (<>{f.formatter(f, rec)}</>);
 		}
-		else if (f.type === 'formatter' || f.fieldFormatter) {
+		else if (f.fieldFormatter) {
 			return (<>{f.fieldFormatter(rec, f, {classes, media})}</>);
 		}
 		else {

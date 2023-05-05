@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
+import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx,
+	UIComponent, AnTreeNode, TierCol, Tierec } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
 	AnTreeditor,
-	Comprops,
-	CrudCompW
+	Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
 import { Button } from '@material-ui/core';
 import { Replay } from '@material-ui/icons';
@@ -38,6 +38,15 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
     hasError: any;
     nextAction: string | undefined;
 
+	confirm = <ConfirmDialog title={L('Info')}></ConfirmDialog>;
+ 
+	detailForm = undefined;
+
+	// AnElemFormatter | undefined;
+	preview = (_col: any, rec: any) => {
+		return <></>;
+	};
+		
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
 
@@ -47,13 +56,14 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.reshape = this.reshape.bind(this);
 
 		this.inclient = new SessionClient(SessionClient.loadStorage());
 
 		this.error = {onError: this.onError, msg: ''};
 		this.hasError = false,
 
-		Protocol.sk.albumtree = 't-album';
+		Protocol.sk.collectree = 't-collects';
 
         // design note: exendPorts shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
@@ -74,6 +84,10 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 	onErrorClose() {
         this.hasError = false;
 		this.setState({});
+	}
+
+	reshape() {
+
 	}
 
 	render() {
@@ -99,37 +113,27 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 				startIcon={<Replay />}
 			>{L('Update')}</Button>
 
-			<AnTreeditor sk={Protocol.sk.albumtree}
+			<AnTreeditor sk={Protocol.sk.collectree}
+				pk={'?'}
+				onSelectChange={ids => undefined}
 				uri={this.uri} mtabl='ind_emotion'
 				// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 				parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
 				columns={[
-					{ type: 'text', field: 'indName', label: L('Indicator'),
-					validator: {len: 200, notNull: true}, grid: {xs: 6, sm: 6} },
-					{ type: 'float', field: 'weight', label: L('Weight'),
-					validator: {minLen: 0.0}, grid: {xs: 3, sm: 1},
-					formatter: (col, n) => n.node.weight},
-					{ type: 'formatter', label: L('Question Type'), grid: {xs: 2, sm: 2},
-					formatter: (col, rec) => { return readableQtype(rec.node.qtype || rec.node.vtype, true) } },
-					{ type: 'actions', label: '', grid: {xs: 3, md: 3} }
+					{ type: 'text', field: 'share', label: L('Share'),
+					  validator: {len: 200, notNull: true}, grid: {xs: 6, sm: 6} },
+					{ type: 'text', field: 'shareby', label: L('By'),
+					  validator: {minLen: 0.0}, grid: {xs: 3, sm: 1} },
+					{ type: 'text', field: 'tags', label: L('Hashtag'),
+					  validator: {minLen: 0.0}, grid: {xs: 3, sm: 1} },
+					{ type: 'text', field: 'remarks', label: L('Description'),
+					  validator: {minLen: 0.0}, grid: {xs: 4, sm: 2} },
+					{ type: 'formatter', field: 'uri', label: L('Preview'), grid: {xs: 2, sm: 2},
+					  formatter: preview },
+					{ type: 'actions', field: '', label: '', grid: {xs: 3, md: 2} }
 				]}
-				fields={[
-					{ type: 'text', field: 'parent', label: 'parent', hide: 1 },
-					{ type: 'text', field: 'indName', label: L('Indicator'),
-					validator: {len: 200, notNull: true} },
-					{ type: 'float', field: 'weight', label: L('Default Weight'),
-					validator: {min: 0.0} },
-					{ type: 'cbb', field: 'qtype', label: L('Question Type'),
-					// If a node is the type of the first option, it means that node is middle (internal) node.
-					options: [{n: L('[ Category ]'), v: 'cate'}, ...QuizProtocol.Qtype.options()],
-					validator: {notNull: true} },
-					{ type: 'int',field: 'sort', label: L('UI Sort'),
-					validator: {notNull: true} },
-					{ type: 'text', field: 'remarks', label: L('Remarks'),
-					validator: {len: 500}, props: {sm: 12, lg: 6} }
-				]}
-				isMidNode={n => n.qtype === 'cate' || !n.qtype}
-				detailFormTitle={L('Indicator Details')}
+				isMidNode={(n: { rowtype: string; }) => n.rowtype === 'cate' || !n.rowtype}
+				editForm={this.detailForm}
 			/>
 			{this.confirm}
 
@@ -139,6 +143,16 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 					title={L('Error')} msg={this.error.msg || ''} />}
 		</AnContext.Provider>
 		);
+
+		/**Change qtype to readable component
+		 * @param {string} t qtype
+		 * @return {string} decoded text
+		 */
+		function preview( col: TierCol,
+			/**column index or record for the row */
+			rec: Tierec | number | AnTreeNode) : UIComponent {
+			return <></> as UIComponent;
+		}
 	}
 
 	/**

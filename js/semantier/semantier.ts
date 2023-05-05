@@ -8,7 +8,8 @@ import { stree_t, CRUD,
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-/**UI Element Formatter
+/**
+ * UI Element Formatter
  *
  * E.g. TRecordForm will use this to format a field in form.
  * Currently tiers also accept this as field modifier. (FIXME - to be optimized)
@@ -76,8 +77,9 @@ export interface TierCol extends DbCol {
     checkbox?: boolean;
 }
 
-/**Meta data handled from tier (DB field).
- *
+/**
+ * List's columns to be handled by tier.
+ * 
  * This type need 2 parameters:
  *
  * F: UI field type, e.g. JSX.Element;
@@ -89,13 +91,18 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     label?: string;
 
     opts?: FO;
+	/** Column cell formatter. Usually return type of F. */
     formatter?: AnElemFormatter;
+
     fieldFormatter?: AnFieldFormatter<F, FO>;
 
     valid?: boolean;
 
+	/**TODO move this to @anclient/anreact */
     css?: CSSStyleDeclaration;
-    grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
+	/**TODO move this to @anclient/anreact */
+    grid?: {xs: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
+	/**TODO move this to @anclient/anreact */
 	box?: {};
 
 	val?: any;  // FIXME: should we extends a editable type?  (check ag-grid)
