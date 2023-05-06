@@ -20,6 +20,7 @@ import { AnReactExt, ClassNames, CompOpts, Media } from "../anreact";
 import { PropTypes, Theme } from "@material-ui/core";
 import { AnTablistProps } from "./table-list";
 import { swap } from "../../utils/lang-ext";
+import GalleryView from "./gallery-view";
 
 const styles = (theme: Theme) => ({
   root: {
@@ -64,6 +65,24 @@ const styles = (theme: Theme) => ({
   }
 });
 
+/* experimental
+const R_ = [
+  { 
+	edit: 'a',
+	add: 'x',
+  },
+  {
+	edit: 'v',
+  }
+]
+
+class R {
+	static lang = 0;
+	static edit = R_[R.lang].edit;
+	static add  = R_[R.lang].add
+}
+*/
+
 interface TreecardProps extends AnTablistProps {
 	/**Used as default rows - data is bound by TreeEditor itself. */
 	// rows : Tierec[];
@@ -73,10 +92,22 @@ interface CssTreeItem extends React.CSSProperties {
     align: string
 }
 
-class TreeCardComp extends DetailFormW<TreecardProps> {
+export enum TreeNodeType { card, gallary };
+
+export interface ReactreeNode {
+	type: TreeNodeType;
+	toUp: (e: React.MouseEvent<HTMLElement>) => void;
+	toTop: (e: React.MouseEvent<HTMLElement>) => void;
+	toDown: (e: React.MouseEvent<HTMLElement>) => void;
+	toBottom: (e: React.MouseEvent<HTMLElement>) => void;
+}
+
+class TreeCardComp extends DetailFormW<TreecardProps> implements ReactreeNode {
 	state = {
 		node: {},
 	}
+
+	type: TreeNodeType.card;
 
 	newCard = undefined;
 
@@ -215,6 +246,13 @@ TreeCardComp.contextType = AnContext;
 const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCardComp));
 export { TreeCard, TreeCardComp }
 
+class TreeGallaryComp extends DetailFormW<TreecardProps> {
+
+}
+
+const TreeGallary = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeGallaryComp));
+export { TreeGallary, TreeGallaryComp }
+
 interface AnTreeditorProps extends AnTablistProps {
 	columns: Array<AnTreegridCol>;
 }
@@ -240,7 +278,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 	};
 
     anReact: AnReactExt;
-    addForm: JSX.Element;
+    editForm: JSX.Element;
     toDelCard: any; // FIXME bug by type checking
     onUpdate: any;  // FIXME bug by type checking
 
@@ -278,7 +316,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		let { uri, sk } = this.props;
 		this.anReact.stree({ uri, sk }, this);
 
-		this.addForm = undefined;
+		this.editForm = undefined;
 		this.state.expandings.clear();
 	}
 
@@ -298,14 +336,14 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		let me = e.currentTarget.getAttribute("data-me");
 
-		this.addForm = (
+		this.editForm = (
 			<SimpleForm crud={CRUD.c} uri={this.props.uri}
 				mtabl={this.props.mtabl}
 				pk={this.props.pk} fields={this.props.fields}
 				pkval={undefined} parent={this.props.parent} parentId={me}
 				title={this.props.detailFormTitle || 'Add Tree Node'}
-				onClose={() => {that.addForm = undefined; that.setState({}); }}
-				onOk={() => {that.addForm = undefined; that.toSearch(); }}
+				onClose={() => {that.editForm = undefined; that.setState({}); }}
+				onOk={() => {that.editForm = undefined; that.toSearch(); }}
 			/> );
 		this.setState({});
 	}
@@ -319,14 +357,14 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		let me = e.currentTarget.getAttribute("data-me");
 		let parentId = e.currentTarget.getAttribute("data-parent");
 
-		this.addForm = (
+		this.editForm = (
 			<SimpleForm crud={CRUD.u} uri={this.props.uri}
 				mtabl={this.props.mtabl}
 				// pk={this.props.pk}
 				fields={this.props.fields}
 				pkval={{pk: this.props.pk, v: me}} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
-				onClose={() => {that.addForm = undefined; that.setState({}) }}
+				onClose={() => {that.editForm = undefined; that.setState({}) }}
 				onOk={() => {
 					// Reshape in case fullpath has been changed.
 					// DESIGN NOTE:
@@ -404,7 +442,10 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			}
 			else
 			  return (
-				<TreeCard key={tnode.id} tnode={tnode} media={media}
+				tnode.node.nodeType === TreeNodeType.gallary
+				? <GalleryView key={tnode.id} aid={tnode.id} media
+				  />
+				: <TreeCard key={tnode.id} tnode={tnode} media
 					{...that.props} parent={parent}
 					toEdit={that.toEdit}
 					leadingIcons={that.leadingIcons}
@@ -527,7 +568,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			<div className={classes.root}>
 				{this.th(this.props.columns, classes, media)}
 				{this.treeNodes({classes, media})}
-				{this.addForm}
+				{this.editForm}
 			</div>
 		);
 	}
