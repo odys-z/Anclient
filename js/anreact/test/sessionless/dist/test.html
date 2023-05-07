@@ -8,7 +8,17 @@
 </head>
 
 <body>
-  <div id="app"></div>
-  <h2>You need to enable JavaScript to run this app.</h2>
+  <h2>Widgets tests' sessionless page</h2>
+  <div id="treedit">
+    <script src="AnHome-1.0.0.min.js"></script>
+    <script>
+    // let searchParams = new URLSearchParams(window.location.search)
+    // let serv = searchParams ? searchParams.get('serv') : undefined;
+    less.App.bindHtml('app', {
+      jsonUrl: 'http://localhost:8889/github.json',
+      serv: 'sandbox', Window, portal: '#'});
+    </script>
+  </div>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
 </body>
 </html>
