@@ -31,7 +31,7 @@
  * @param undefinedNull take undefind & null as true or false
  * @returns 
  */
-export function toBool(str: string | number | boolean, undefinedNull?: boolean): boolean {
+export function toBool(str: string | number | boolean | undefined, undefinedNull?: boolean): boolean {
 	if ( undefinedNull !== undefined && undefinedNull !== null
 		&& (str === undefined || str === null))
 		return undefinedNull;

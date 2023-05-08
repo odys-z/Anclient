@@ -162,7 +162,7 @@ class AnClient {
      * @param onOk
      * @param onErr must present. since 0.9.32, Anclient won't handle error anymore, and data accessing errors should be handled by App singleton.
      * @param ajaxOpts */
-	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
+	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk | undefined, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
 		if (!onErr || !onErr.onError) {
 			console.error("Since 0.9.32, this global error handler must present - error handling is supposed to be the app singleton's responsiblity.")
 		}
@@ -578,7 +578,7 @@ class SessionClient {
 	 * @param onOk
 	 * @param errCtx error handler of singleton. Since 0.9.32, this arg is required.
 	 */
-	commit (jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk, errCtx: ErrorCtx) {
+	commit (jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk | undefined, errCtx: ErrorCtx) {
 		an.post(jmsg, onOk, errCtx, undefined);
 	}
 

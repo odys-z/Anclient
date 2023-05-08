@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
 
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+// import 'ag-grid-community/dist/styles/ag-grid.css';
+// import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { CrudComp } from '../crud';
 import { GetContextMenuItems } from 'ag-grid-community';
 import { CellClickedEvent, CellEditingStoppedEvent, EditableCallback, SpreadsheetRec } from './spreadsheet';
@@ -37,7 +37,7 @@ export class AnGridsheet extends CrudComp<SheetProps & AgGridReactProps> {
 		rows: [{id: ''}]
 	};
 
-	coldefs = [];
+	coldefs: object[] = [];
 	defaultColDef = {
 		resizable: true,
 		editable: true,
@@ -80,8 +80,8 @@ export class AnGridsheet extends CrudComp<SheetProps & AgGridReactProps> {
 					delete c.anEditStop;
 				}
 				let width = 120;
-				if (x === coldefs.length - 1)
-					width = undefined;
+				// if (x === coldefs.length - 1)
+				// 	width = undefined as number;
 				coldefs.push(
 					Object.assign(
 					  { headerName: '--',
@@ -159,7 +159,7 @@ export class AnGridsheet extends CrudComp<SheetProps & AgGridReactProps> {
 	type: "cellClicked"
 	value: "2021-09-14"
 	*/
-	onCellClicked = (p: CellClickedEvent) => {
+	onCellClicked = (p: CellClickedEvent<any, any>) => {
 		if (typeof this.props.onCellClicked === 'function')
 			this.props.onCellClicked(p);
 	};
@@ -167,7 +167,7 @@ export class AnGridsheet extends CrudComp<SheetProps & AgGridReactProps> {
 	/** Grid event API:
 	 * https://www.ag-grid.com/javascript-data-grid/grid-events/
 	 */
-	onEditStop (p: CellEditingStoppedEvent) {
+	onEditStop (p: CellEditingStoppedEvent<any, any>) {
 		if (typeof this.editHandlers[p.colDef.field] === 'function')
 			this.editHandlers[p.colDef.field](p);
 	}

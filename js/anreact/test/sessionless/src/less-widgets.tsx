@@ -7,8 +7,7 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/s
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
 } from '../../../src/an-components';
-
-import { Testreeditor } from './widgets/treeditor';
+import { AnTreeditor2 } from './widgets/treeditor';
 
 const { JsampleTheme } = jsample;
 
@@ -111,7 +110,7 @@ class Widgets extends React.Component<LessProps> {
 				error: this.error,
 				ssInf: undefined,
 			}} >
-                <Testreeditor />
+                <AnTreeditor2 />
 				<hr/>
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}

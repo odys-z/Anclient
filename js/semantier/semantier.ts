@@ -6,6 +6,7 @@ import { stree_t, CRUD,
 	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkVal, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
 } from "./protocol";
 
+export { toBool, isEmpty };
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 /**
@@ -77,9 +78,8 @@ export interface TierCol extends DbCol {
     checkbox?: boolean;
 }
 
-/**
- * List's columns to be handled by tier.
- * 
+/**Meta data handled from tier (DB field).
+ *
  * This type need 2 parameters:
  *
  * F: UI field type, e.g. JSX.Element;
@@ -191,7 +191,7 @@ export class Semantier {
     /** current pk value */
     pkval: PkVal = {pk: undefined, v: undefined};
     /** current record */
-    rec: Tierec;
+    rec: Tierec | undefined;
 
     /** All sub table's relationships */
     relMeta: {[tabl: string]: Tierelations};
