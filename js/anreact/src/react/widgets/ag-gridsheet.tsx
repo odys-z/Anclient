@@ -30,7 +30,6 @@ export interface SheetProps {
  * Desgin Note: But is it possible handled by Semantic-DA?
  */
 export class AnGridsheet extends CrudComp<SheetProps & AgGridReactProps> {
-//export class AnGridsheet extends React.Component {
 	state = {
 		dirty: false,
 

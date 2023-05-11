@@ -1,5 +1,5 @@
 import { SessionInf } from './anclient';
-import * as CSS from 'csstype';
+// import * as CSS from 'csstype';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
