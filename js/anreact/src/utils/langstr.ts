@@ -72,7 +72,7 @@ const argex = /{(\s*(\w|\d)*\s*)}/g;
  * @param vals optional: value args
  * @returns
  */
-export function L(t: string, vals?: {[name: string]: string | number}): string {
+export function L(t: string | undefined, vals?: {[name: string]: string | number}): string {
 	if (! (t in Langstrs.s[Langstrs.lang]) )
 			Langstrs.s.en.add(t);
 	else t = Langstrs.lang === 'en' ?
@@ -83,7 +83,7 @@ export function L(t: string, vals?: {[name: string]: string | number}): string {
 	else
 		return t;
 
-	function replaceArg(t, args) {
+	function replaceArg(t: string, args? : object) {
 		if (t) {
 			t = t.replace(argex,
 				function(match, argname) {

@@ -11,7 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination, { LabelDisplayedRowsArgs } from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, isEmpty, PageInf, toBool } from '@anclient/semantier';
+import { AnlistColAttrs, Tierec, isEmpty, PageInf, toBool, len, DbCol, UIComponent } from '@anclient/semantier';
 import { DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 import { AnTablistProps } from './table-list';
@@ -30,12 +30,12 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	sizeOptions = [10, 25, 50];
 
 	state = {
-		selected: undefined
+		selected: undefined as unknown as Set<string>
 	};
 
     page: PageInf;
 
-	checkAllBox: HTMLButtonElement;
+	checkAllBox: HTMLButtonElement | null;
 
 	constructor(props: AnTablistProps) {
 		super(props)
@@ -74,10 +74,13 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	}
 
 	rowPageLabel (paginationInfo: LabelDisplayedRowsArgs) : ReactNode {
-		let from = this.page.page * this.page.size;
-		let to = this.page.size > 0 ? (this.page.page + 1) * this.page.size : 0;
-		let count = this.page.total > 0
-			? Math.round((this.page.total + this.page.size - 1) / this.page.size)
+		let sz = this.page.size || 0;
+		let total = this.page.total || 0;
+
+		let from = this.page.page * sz;
+		let to = sz > 0 ? (this.page.page + 1) * sz : 0;
+		let count = total > 0
+			? Math.round((total + sz - 1) / sz)
 			: -1;
 
 		return `${from}–${to} in page ${this.page.page} of ${count !== -1 ? count : `more than ${to}`}`;
@@ -101,9 +104,9 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	};
 
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
-		let ids = this.props.selected.ids;
+		let ids = this.props.selected?.ids || new Set<string>();
 		if (e.target.checked) {
-			this.props.rows.forEach((r) => ids.add(r[this.props.pk] as string));
+			this.props.rows?.forEach((r) => ids.add(r[this.props.pk] as string));
 			this.updateSelectd(ids);
 		}
 		else {
@@ -118,7 +121,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			this.props.onSelectChange(Array.from(set));
 	}
 
-	changePage(_event: React.UIEvent, page: number) {
+	changePage(_event: React.MouseEvent<HTMLElement> | null, page: number) {
 		this.setState({page});
 		if (typeof this.props.onPageChange === 'function')
 			this.props.onPageChange (page, this.page.size);
@@ -148,9 +151,9 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 				</TableCell>);
 	}
 
-	tr(rows = [], columns = []) {
+	tr(rows = [] as Tierec[], columns = [] as AnlistColAttrs<any, any>[]) {
 		return rows.map(row => {
-			let pkv = row[this.props.pk];
+			let pkv = row[this.props.pk] as string;
 
 			if (this.props.checkbox && toBool(row.checked)) {
 				this.state.selected.add(pkv)
@@ -159,7 +162,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			let isItemSelected = this.isSelected(pkv);
 
 			return (
-				<TableRow key= {row[this.props.pk]} hover
+				<TableRow key= {row[this.props.pk] as string} hover
 					selected={isItemSelected}
 					onClick= { (event) => {
 						this.handleClick(event, pkv);
@@ -181,9 +184,9 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 								if (colObj.field === undefined)
 									throw Error("Column field is required: " + JSON.stringify(colObj));
 								let v = row[colObj.field];
-								let cell = colObj.formatter && colObj.formatter(v, x, row);
+								let cell = colObj.formatter && colObj.formatter(v as DbCol, x, row); // bug?
 								if (cell)
-									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
+									cell = <TableCell key={colObj.field + x}>{cell}</TableCell> as UIComponent;
 								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
 							} )}
 				</TableRow>)
@@ -199,8 +202,8 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 					{ this.props.checkbox &&
 						(<TableCell padding="checkbox" >
 						  <Checkbox ref={ref => (this.checkAllBox = ref)}
-							indeterminate={this.state.selected.size > 0 && this.state.selected.size < this.props.rows.length}
-							checked={this.state.selected.size > 0 && this.state.selected.size === this.props.rows.length}
+							indeterminate={this.state.selected.size > 0 && this.state.selected.size < len(this.props.rows)}
+							checked={this.state.selected.size > 0 && this.state.selected.size === len(this.props.rows)}
 							color="primary"
 							inputProps={{ 'aria-label': 'checkAll' }}
 							onChange={this.toSelectAll}/>
@@ -216,7 +219,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 		</TableContainer>
 		{toBool(this.props.paging, true) && <TablePagination
 			count = {this.props.pageInf ? this.props.pageInf.total || 0 : 0}
-			rowsPerPage={this.page.size}
+			rowsPerPage={this.page.size || -1}
 			onPageChange={this.changePage}
 			onRowsPerPageChange={this.changeSize}
 			page={this.page.page}

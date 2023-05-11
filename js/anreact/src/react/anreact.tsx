@@ -45,7 +45,7 @@ export const invalidStyles = {
 	minLen : { border: "1px solid red" },
 } as {[n in InvalidClassNames]: CSSProperties};
 
-export function toReactStyles(styles: CSSStyleDeclaration): CSSProperties {
+export function toReactStyles(styles: CSSStyleDeclaration | undefined): CSSProperties {
 	return styles as unknown as CSSProperties;
 }
 

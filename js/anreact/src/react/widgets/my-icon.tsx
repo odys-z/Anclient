@@ -35,7 +35,7 @@ export const AvatarIcon = function (props: AvatarIconProps) {
   let { width, height, left, top, position } = props;
   let style = Object.assign (
 	{ width: 64, height: 64, position: 'inherit', left: 0, top: 32},
-	{ width, height, top, left, position});
+	{ width, height, top, left, position}) as React.CSSProperties;
 
   return (
 	<SvgIcon style={style} fontSize="inherit" {...props} >
@@ -89,7 +89,7 @@ class MyIconComp extends React.Component<AvatarIconProps> {
 		return (<>
 		<Button
 			variant="contained"
-			className={classes.root}
+			className={classes?.root}
 			color="primary"
 			onClick={this.onClick}
 			startIcon={<AccountCircleIcon />} >

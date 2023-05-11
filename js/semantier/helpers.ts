@@ -1,4 +1,4 @@
-
+// TODO: should be renamed as lang-ext.ts?
 /**
  * Convert string to boolean
  * @example
@@ -31,9 +31,10 @@
  * @param undefinedNull take undefind & null as true or false
  * @returns 
  */
-export function toBool(str: string | number | boolean | undefined, undefinedNull?: boolean): boolean {
-	if ( undefinedNull !== undefined && undefinedNull !== null
-		&& (str === undefined || str === null))
+export function toBool(str: string | number | boolean | object | undefined | null, undefinedNull?: boolean): boolean {
+	// if ( undefinedNull !== undefined && undefinedNull !== null
+	// 	&& (str === undefined || str === null))
+	if ( isEmpty(str))
 		return undefinedNull;
 
 	return (!str || str === '0' || str === 'false'
@@ -41,6 +42,25 @@ export function toBool(str: string | number | boolean | undefined, undefinedNull
 			? false : true);
 }
 
-export function isEmpty(str: string | number) : boolean {
+export function isEmpty(str: string | number | boolean | object | null | undefined) : boolean {
 	return (typeof str === 'undefined' || str === null || str === '');
 } 
+export function str(obj: any) {
+	return isEmpty(obj) ? undefined : String(obj);
+}
+
+export function str_(obj: any) {
+	return str(obj) || '';
+}
+
+export function size(arg: Set<any> | Map<any, any> | string | Array<any> | undefined | null) {
+		return  arg instanceof Set || arg instanceof Map ?
+				arg.size : len(arg);
+}
+
+export function len(arg: string | Array<any> | undefined | null) {
+	return Array.isArray(arg) ?
+		arg.length :
+		isEmpty(arg) ?
+		0 : (arg as string).length;
+}

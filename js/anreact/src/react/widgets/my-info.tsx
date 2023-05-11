@@ -82,12 +82,12 @@ class MyInfoComp extends DetailFormW<MyInfoProps> {
 		const { classes } = this.props;
 
 		return (
-			<Dialog className={classes.root}
+			<Dialog className={classes?.root}
 				open={true} // should be controld by upper level
 				fullScreen={!!this.props.fullScreen}
 				onClose={this.handleClose} >
 
-				<DialogTitle id="myinfo-title" disableTypography className={classes.dialogTitle} >
+				<DialogTitle id="myinfo-title" disableTypography className={classes?.dialogTitle} >
 					{title}
 					<IconButton onClick={this.handleClose}>
 						<Close />

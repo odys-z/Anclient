@@ -11,7 +11,7 @@ import { ColDef, Column, ColumnApi, GridApi,
 // import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
 import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkVal,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, ColType
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, ColType, str
 } from '@anclient/semantier';
 import { utils, AnConst, AnReactExt, AnContextType } from '../../an-components';
 
@@ -359,7 +359,7 @@ export class Spreadsheetier extends Semantier {
 	}
 
 	onCellClick (e: CellClickedEvent) {
-		this.pkval.v = e.data[this.pkval.pk];
+		this.pkval.v = e.data[str(this.pkval.pk) || ''];
 	};
 
 	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk | undefined, err: ErrorCtx) {
@@ -395,7 +395,7 @@ export class Spreadsheetier extends Semantier {
 
 		let rec = {} as SpreadsheetRec;
 		// rec[this.pkval.pk] = this.currentRecId;
-		rec[this.pkval.pk] = this.pkval.v;
+		rec[str(this.pkval.pk) || ''] = this.pkval.v;
 
 		let {value, oldValue} = p;
 		if (value !== oldValue && (value || oldValue)) {

@@ -10,7 +10,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, toBool } from '@anclient/semantier';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, str, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
@@ -67,6 +67,8 @@ interface RelationTreeProps extends Comprops {
 	 * */
 	// relcolumn?: string;
 	colProp?: string;
+
+	tier: Semantier;
 };
 
 /**
@@ -83,7 +85,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	};
 	tier: Semantier;
 
-	constructor(props) {
+	constructor(props: RelationTreeProps) {
 		super(props);
 
 		this.tier = this.props.tier;
@@ -97,7 +99,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		this.tier.relations((this.context as unknown as AnContextType).anClient,
 			{ uri: this.props.uri,
 			  reltabl: this.props.reltabl,
-			  sqlArg: this.tier.pkval.v,
+			  sqlArg: str(this.tier.pkval.v),
 			},
 			(rels: AnsonMsg<AnDatasetResp>) => {
 				// that.forest = rels.Body().forest as AnTreeNode[];
@@ -105,7 +107,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			} );
 	}
 
-	toExpandItem(e: React.MouseEvent<HTMLElement>) {
+	toExpandItem(e: React.UIEvent<HTMLElement>) {
 		e.stopPropagation();
 		let f = e.currentTarget.getAttribute("data-nid");
 
@@ -199,11 +201,11 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		  }
 		}
 
-		function icon(icon) {
+		function icon(icon: string) {
 			return AnTreeIcons[icon || "deflt"];
 		}
 
-		function leadingIcons(count) {
+		function leadingIcons(count: number) {
 			let c = [];
 			for (let i = 0; i < count; i++)
 				c.push(<React.Fragment key={i}>{icon(".")}</React.Fragment>);
@@ -217,11 +219,11 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 	render() {
 		const { classes } = this.props;
-		const forest = this.tier.rels[this.props.reltabl];
+		const forest = this.tier.rels[this.props.reltabl || ''];
 
 		return (
-			<div className={classes.root}>
-				{forest && this.buildTree(forest, classes)}
+			<div className={classes?.root}>
+				{forest && this.buildTree(forest, classes || {})}
 			</div> );
 	}
 }

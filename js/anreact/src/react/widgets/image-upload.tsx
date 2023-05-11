@@ -29,7 +29,7 @@ interface ImageUploadProps extends Comprops {
 	 * blob:
 	 * File content wrapped with dataUrl()
 	 */
-	onFileLoaded?: (fileMeta: {mime: string, name: string}, blob: string) => void;
+	onFileLoaded?: (fileMeta: {mime: string | undefined, name: string}, blob: string) => void;
 }
 
 class ImageUploadComp extends DetailFormW<ImageUploadProps> {
@@ -37,8 +37,8 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 		src: undefined,
 	}
 
-	fileInput = undefined;
-	imgPreview = undefined;
+	fileInput: HTMLInputElement | null = null;
+	imgPreview: HTMLImageElement | null = null;
 
 	field: any;
 
@@ -56,9 +56,9 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 		}
 	}
 
-	toShowImage(e) {
+	toShowImage(e: React.ChangeEvent<HTMLInputElement>) {
 		let that = this;
-		let file = this.fileInput.files[0];
+		let file = this.fileInput?.files?.item(0);
 
 		let imageType = /image.*/;
 
@@ -66,20 +66,21 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 		 * Since there are .heic files already uploaded, it's assumed that Safari will report it as "image".
 		 * Of which the mime is saved as "image/heic;base64".
 		 */
-		if (file.type.match(imageType)) {
+		if (file?.type.match(imageType)) {
 			let reader = new FileReader();
 
 			reader.onload = function(e) {
-				that.imgPreview.src = reader.result;
+				(that.imgPreview as HTMLImageElement).src = reader.result as string;
 
 				let fileMeta = {
 					mime: mimeOf( reader.result as string ),
-					name: file.name
+					name: file?.name || "shouldn't here" // whay vs code report error when file is checed?
 				};
 
-				if (that.props.tier && that.field.field) {
-					that.props.tier.rec[that.field.field] = reader.result;
-					that.props.tier.rec.fileMeta = fileMeta;
+				if (that.props.tier?.rec && that.field.field) {
+					const rec = that.props.tier.rec;
+					rec[that.field.field] = reader.result;
+					rec.fileMeta = fileMeta;
 				}
 
 				if (that.props.onFileLoaded)
@@ -111,7 +112,7 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 		let { classes } = this.props;
 
 		return (
-		  <Box className={ classes.imgUploadBox }>
+		  <Box className={ classes?.imgUploadBox }>
 			<img
 				src={dataimg}
 				style={{ width: this.props.width || "auto", height: "100%", minHeight: 48 }}

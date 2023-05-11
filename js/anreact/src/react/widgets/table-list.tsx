@@ -11,7 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, isEmpty, Tierec, toBool } from '@anclient/semantier';
+import { AnlistColAttrs, isEmpty, len, PkVal, Tierec, toBool, UIComponent } from '@anclient/semantier';
 import { Comprops, DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 
@@ -51,12 +51,12 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		page: 0,
 		size: 10,
 
-		selected: undefined
+		selected: undefined as unknown as Set<string>
 	}
 
 	// sizeOptions:[10, 25, 50],
 
-	checkAllBox: HTMLButtonElement;
+	checkAllBox: HTMLButtonElement | null;
 
 	constructor(props: AnTablistProps){
 		super(props)
@@ -64,6 +64,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		let {sizeOptions, selected} = props;
 		if (!selected || !selected.ids)
 			throw Error('Type safe checking: @anclient/react now using ref ids: Set<string> to save selected row ids. (props selectedIds renamed as selected)')
+
 		this.state.selected = selected.ids;
 		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selected.ids must be a set");
@@ -116,24 +117,24 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	};
 
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
-		let ids = this.props.selected.ids;
+		let ids = this.props.selected?.ids;
 		if (e.target.checked) {
-			this.props.rows.forEach((r) => ids.add(r[this.props.pk] as string));
+			this.props.rows?.forEach((r) => ids?.add(r[this.props.pk] as string));
 			this.updateSelectd(ids);
 		}
 		else {
-			ids.clear();
+			ids?.clear();
 			this.updateSelectd(ids);
 		}
 		this.setState({});
 	};
 
-	updateSelectd (set: Set<string>) {
+	updateSelectd (set: Set<string> | undefined) {
 		if (typeof this.props.onSelectChange === 'function')
-			this.props.onSelectChange(Array.from(set));
+			this.props.onSelectChange(Array.from(set || []));
 	}
 
-	changePage(_event: React.UIEvent, page: number) {
+	changePage(_event: React.MouseEvent<any, any> | null, page: number) {
 		this.setState({page});
 		if (typeof this.props.onPageChange === 'function')
 			this.props.onPageChange (page);
@@ -154,17 +155,17 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	th(columns: Array<AnlistColAttrs<JSX.Element, CompOpts>> = []) {
 		return columns
 			.filter( (v, x) => // !toBool(v.visible, true) ? 
-							toBool(v.hide) || !toBool(v.visible, true) ?
-							false : !(this.props.checkbox && x === 0)) // first columen as checkbox
+				toBool(v.hide) || !toBool(v.visible, true) ?
+				false : !(this.props.checkbox && x === 0)) // first columen as checkbox
 			.map( (colObj, index) =>
 				<TableCell key={index}>
 					{colObj.label || colObj.field}
 				</TableCell>);
 	}
 
-	tr(rows = [], columns = []) {
-		return rows.map(row => {
-			let pkv = row[this.props.pk];
+	tr(rows: Tierec[] & {checked: boolean | number | undefined | null}[] | undefined, columns : AnlistColAttrs<JSX.Element, CompOpts>[]) {
+		return rows?.map(row => {
+			let pkv = row[this.props.pk] as string;
 
 			if (this.props.checkbox && toBool(row.checked)) {
 				this.state.selected.add(pkv)
@@ -173,7 +174,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			let isItemSelected = this.isSelected(pkv);
 
 			return (
-				<TableRow key= {row[this.props.pk]} hover
+				<TableRow key= {row[this.props.pk] as string} hover
 					selected={isItemSelected}
 					onClick= { (event) => {
 						this.handleClick(event, pkv);
@@ -189,15 +190,15 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 						</TableCell>)
 					}
 					{columns.filter( (v, x) => //!toBool(v.hide)
-									!toBool(v.hide) && toBool(v.visible, true)
-									&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
+								!toBool(v.hide) && toBool(v.visible, true)
+								&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
 							.map( (colObj, x) => {
 								if (colObj.field === undefined)
 									throw Error("Column field is required: " + JSON.stringify(colObj));
 								let v = row[colObj.field];
-								let cell = colObj.formatter && colObj.formatter(v, x, row);
+								let cell = colObj.formatter && colObj.formatter(v as any, x, row); //v: bug?
 								if (cell)
-									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
+									cell = <TableCell key={colObj.field + x}>{cell}</TableCell> as UIComponent;
 								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
 							} )}
 				</TableRow>)
@@ -213,8 +214,9 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 					{ this.props.checkbox &&
 						(<TableCell padding="checkbox" >
 						  <Checkbox ref={ref => (this.checkAllBox = ref)}
-							indeterminate={this.state.selected.size > 0 && this.state.selected.size < this.props.rows.length}
-							checked={this.state.selected.size > 0 && this.state.selected.size === this.props.rows.length}
+							indeterminate={this.state.selected.size > 0
+										&& this.state.selected.size < len(this.props.rows)}
+							checked={this.state.selected.size > 0 && this.state.selected.size === len(this.props.rows)}
 							color="primary"
 							inputProps={{ 'aria-label': 'checkAll' }}
 							onChange={this.toSelectAll}/>
@@ -224,7 +226,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 				</TableRow>
 			</TableHead>
 			<TableBody>
-				{this.tr(this.props.rows, this.props.columns)}
+				{this.tr(this.props.rows as any, this.props.columns)}
 			</TableBody>
 		</Table>
 		</TableContainer>

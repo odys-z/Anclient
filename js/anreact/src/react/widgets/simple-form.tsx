@@ -13,7 +13,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnFieldValidation, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, PkMeta, TierCol, TierComboField, Tierec } from '@anclient/semantier';
+import { AnFieldValidation, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, PkVal, TierCol, TierComboField, Tierec, str, str_ } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
@@ -56,11 +56,8 @@ const styles = (theme) => ({
 });
 
 interface SimpleFormProps extends Comprops {
-    // funcId: string;
-    crud: CRUD;
     fields: TierCol[];
-    // pk: string;
-    pkval: PkMeta;
+    pkval: PkVal;
     parent: JSX.Element;
     parentId: string;
 	mtabl: string;
@@ -70,12 +67,12 @@ interface SimpleFormProps extends Comprops {
  * Use record form for UI record layout.
  */
 class SimpleFormComp extends DetailFormW<SimpleFormProps> {
-	uri = undefined;
+	// uri : string | undefined = undefined;
 
-    pkval: PkMeta = { pk: undefined, v: undefined };
+    pkval: PkVal = { pk: undefined, v: undefined };
 
 	state = {
-		crud: undefined,
+		crud: CRUD.r,
 		dirty: false,
 		parent: undefined,
 		parentId: undefined,
@@ -123,7 +120,6 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		this.state.crud = props.crud;
 		this.state.mtabl = props.mtabl;
 
-		// this.state.pk = props.pk;
 		this.pkval = props.pkval;
 
 		this.state.parent = props.parent;
@@ -150,15 +146,17 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 			// load the record
 			const ctx = this.context as unknown as AnContextType;
-			let queryReq = ctx.anClient.query(this.uri, this.props.mtabl, 'r')
-			queryReq.Body().whereEq(this.pkval.pk, this.pkval.v);
-			// FIXME but sometimes we have FK in record. Meta here?
-			(ctx.uiHelper as AnContextType).bindStateRec({req: queryReq,
+			let queryReq = ctx.anClient.query(str_(this.uri), this.props.mtabl, 'r')
+			queryReq.Body()?.whereEq(this.pkval.pk as string, str_(this.pkval.v));
+			ctx.uiHelper.bindStateRec({req: queryReq,
 				onOk: (resp: AnsonMsg<AnsonResp>) => {
-						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
-						if (!rows || rows.length !== 1)
-							console.error("Query reults not correct. One and only one row is needed.", rows, queryReq)
-						that.setState({record: rows[0]});
+						let rs = resp.Body()?.Rs();
+						if (rs) {
+							let {rows, cols} = AnsonResp.rs2arr(rs);
+							if (!rows || rows.length !== 1)
+								console.error("Query reults not correct. One and only one row is needed.", rows, queryReq)
+							that.setState({record: rows[0]});
+						}
 					}
 				},
 				ctx.error);
@@ -282,7 +280,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		if (f.type === 'cbb') {
 			let that = this;
 			let fd = f as TierComboField<JSX.Element, CompOpts>;
-			return (<DatasetCombo uri={this.props.uri}
+			return (<DatasetCombo uri={this.props.uri} crud={CRUD.r}
 				options={fd.options} val={rec[fd.field]}
 				label={f.label} style={fd.style}
 				onSelect={ (v) => {

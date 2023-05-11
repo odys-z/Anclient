@@ -1,5 +1,5 @@
 import { SessionInf } from './anclient';
-// import * as CSS from 'csstype';
+import * as CSS from 'csstype';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
@@ -143,7 +143,6 @@ export interface relStree {
 }
 
 export interface DbRelations {
-	/** TODO:  [tabl: string]: Semantics; */
 	fk?: relFK,
 	/** semantic tree */
 	stree?: relStree,
@@ -160,8 +159,8 @@ export interface UIRelations {
  * that.pkval.v = that.rec && that.rec[that.pk];
 */
 export interface PkVal {
-    v: any;
-    pk: string;
+    v: string | number | boolean | undefined;
+    pk: string | undefined;
     tabl?: string;
 }
 
@@ -1159,10 +1158,13 @@ export class AnsonResp extends AnsonBody {
      * rows: array like [ {col1: val1, ...}, ... ], <br>
      * e.g. if [results: {'01', 'fname'}], return [{n: 'fname', v: '01'}, ...]
      */
-    static rs2nvs(rs: AnResultset, nv: NV): {cols: Array<string>, rows: Array<NV>} {
+    static rs2nvs(rs: AnResultset | undefined, nv: NV): {cols: Array<string>, rows: Array<NV>} {
 		let cols = [];
 		let rows = [];
 		let ncol = -1, vcol = -1;
+
+		if (!rs)
+			return {cols: [], rows: []};
 
 		if (typeof(rs.colnames) === 'object') {
 			// rs with column index

@@ -76,7 +76,7 @@ class ExtImageComp extends DetailFormW<ExtImageProps> {
 		let { classes } = this.props;
 
 		return (
-		  <Box className={ classes.imgUploadBox }>
+		  <Box className={ classes?.imgUploadBox }>
             <img src={this.scr(this.props.recId)}
                 srcSet={this.srcSet(this.props.recId)}
                 alt={this.props.title} loading="lazy" />

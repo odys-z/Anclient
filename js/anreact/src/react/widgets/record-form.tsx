@@ -10,7 +10,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, Semantier, TierComboField, Tierec, toBool } from '@anclient/semantier';
+import { AnlistColAttrs, Semantier, TierComboField, Tierec, str_, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { DatasetCombo } from './dataset-combo';
@@ -86,14 +86,14 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 
 			let that = this;
 			let cond = {};
-			cond[this.tier.pkval.pk] = this.tier.pkval.v;
+			cond[str_(this.tier.pkval.pk)] = this.tier.pkval.v;
 			this.tier.record(cond, (_cols, _rows) => {
 				that.setState({});
 			} );
 		}
 	}
 
-	getField(f: AnlistColAttrs<JSX.Element, CompOpts>, rec: Tierec, classes: ClassNames, media: Media) {
+	getField(f: AnlistColAttrs<JSX.Element, CompOpts>, rec: Tierec, classes: ClassNames | undefined, media: Media) {
 		let {isSm} = media;
 		let that = this;
 
@@ -118,12 +118,12 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		}
 		else if (f.type === 'formatter' || f.formatter) {
 			console.warn("This branch is deprecated.");
-			if (f.formatter.length != 2)
-				console.warn('TRecordFormComp need formatter with signature of f(record, field, tier).', f.formatter)
-			return (<>{f.formatter(f, rec)}</>);
+			// if (len(f.formatter?.length != 2)
+			// 	console.warn('TRecordFormComp need formatter with signature of f(record, field, tier).', f.formatter)
+			// return (<>{f.formatter(f, rec)}</>);
 		}
 		else if (f.fieldFormatter) {
-			return (<>{f.fieldFormatter(rec, f, {classes, media})}</>);
+			return (<>{f.fieldFormatter(rec, f, {classes: classes || {}, media})}</>);
 		}
 		else {
 			let type = 'text';
@@ -132,7 +132,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			let readOnly = (typeof this.tier.isReadonly === 'function') ?
 							this.tier.isReadonly(f) : this.tier.isReadonly;
 			return (
-			<TextField key={f.field} type={f.type || type}
+			  <TextField key={f.field} type={f.type || type}
 				disabled={!!f.disabled}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
@@ -140,27 +140,27 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
 				inputProps={{ readOnly } }
 				className={clsx(f.opts?.classes, classes[f.style])}
-				onChange={(e) => {
+				onChange={ (e) => {
 					rec[f.field] = e.target.value;
 					f.style = undefined;
 					that.setState({dirty: true});
-				}}
-			/>);
+				} }
+			  />);
 		}
 	}
 
-	formFields(rec: Tierec, classes: ClassNames, media: Media) {
-		let fs = [];
+	formFields(rec: Tierec, classes: ClassNames | undefined, media: Media) {
+		let fs = [] as React.ReactNode[];
 		const isSm = this.props.dense || toBool(media.isMd);
 
 		this.props.fields.forEach( (f, i) => {
 		  if (!f.hide && toBool(f.visible, true)) {
 			fs.push(
 				<Grid item key={`${f.field}.${i}`}
-					{...f.grid} className={this.props.dense ? classes.labelText_dense : classes.labelText} >
-				  <Box className={classes.rowBox} {...f.box} >
+					{...f.grid} className={this.props.dense ? classes?.labelText_dense : classes?.labelText} >
+				  <Box className={classes?.rowBox} {...f.box} >
 					{!isSm && f.label &&
-					  <Typography className={classes.formLabel} >
+					  <Typography className={classes?.formLabel} >
 						{L(f.label)}
 					  </Typography>
 					}
@@ -180,7 +180,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		if (!rec) console.warn("TRecordForm used without records, for empty UI?");
 
 		return rec ?
-			<Grid container className={classes.root} direction='row'>
+			<Grid container className={classes?.root} direction='row'>
 				{this.formFields(rec, classes, media)}
 			</Grid>
 			: <></>; // have to wait until parent loaded data

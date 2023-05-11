@@ -1,5 +1,5 @@
 import { SessionClient, Inseclient } from "./anclient";
-import { toBool, isEmpty } from "./helpers";
+import { toBool, isEmpty, str } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
@@ -68,7 +68,7 @@ export interface TierCol extends DbCol {
 	type?: ColType;
 
     /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: string;
+    style?: any; //string;
 
 	validator?: AnFieldValidator | AnFieldValidation;
 
@@ -78,8 +78,9 @@ export interface TierCol extends DbCol {
     checkbox?: boolean;
 }
 
-/**Meta data handled from tier (DB field).
- *
+/**
+ * List's columns to be handled by tier.
+ * 
  * This type need 2 parameters:
  *
  * F: UI field type, e.g. JSX.Element;
@@ -110,7 +111,7 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
 
 /**Record handled from tier */
 export interface Tierec {
-	[f: string]: string | number | boolean | object | undefined;
+	[f: string]: string | number | boolean | object | undefined | null;
 }
 
 /**E.g. form's combobox field declaration */
@@ -336,8 +337,10 @@ export class Semantier {
 	 * @param onOk
 	 */
     relations( client: SessionClient | Inseclient,
-		opts: { uri: string; reltabl: string;
-				sqlArgs?: string[]; sqlArg?: string; } ,
+		opts: { uri?: string;
+				reltabl?: string;
+				sqlArgs?: string[];
+				sqlArg?: string; } ,
 		onOk: OnCommitOk): void {
 
 		let that = this;
@@ -422,7 +425,7 @@ export class Semantier {
 				// TODO to be verified
 				// Try figure out pk value - auto-key shouldn't have user fill in the value in a form
 				if (isEmpty(this.pkval.v))
-					this.pkval.v = this.rec[this.pkval.pk];
+					this.pkval.v = str(this.rec[this.pkval.pk]);
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
@@ -534,9 +537,7 @@ export class Semantier {
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
 			let del_rf = new DeleteReq(uri, rel.childTabl,
-							[rel.fk, parentpkv.v])
-							//[rel.fk, rel.col])
-							// .whereEq(rel.col, parentpkv.v)
+							[rel.fk, str(parentpkv.v)])
 							.post(insRels);
 
 			if (req)
@@ -697,3 +698,5 @@ export class Semantier {
 		Semantier.dataset(opts, client, onLoad, errCtx);
 	}
 }
+
+

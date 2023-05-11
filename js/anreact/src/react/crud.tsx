@@ -10,7 +10,7 @@ interface Comprops extends StandardProps<any, string>, UIComponent {
 	/**The matching url in React.Route */
 	match?: {path: string};
 
-	/** CRUD */
+	/** CRUD, if none of CRUD enum value is correct, use a R to indicate it's read only. */
 	crud?: CRUD;
 
 	/**MUI as default */
@@ -41,7 +41,7 @@ const styles = (theme: Theme) => ( {
  */
 class CrudComp<T extends Comprops> extends React.Component<T> {
 	state = {};
-	uri = undefined;
+	uri: string = undefined;
 
 	constructor(props: T) {
 		super(props);
@@ -81,7 +81,7 @@ class CrudCompW<T extends Comprops> extends CrudComp<T> {
 		CrudCompW.prototype.media = CrudCompW.getMedia(width);
 	}
 
-	static getMedia(width: string) {
+	static getMedia(width: string | undefined) {
 		let media = {} as Media;
 
 		if (width === 'lg') {
