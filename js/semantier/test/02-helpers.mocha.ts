@@ -150,12 +150,13 @@ describe('case: [02.0 dataset + s-tree]', () => {
 	it('[protocol] checkTree -> relation records', () => {
 		debugger
 		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					  "uid": "admin", "roleId": null, "ssid": "001eysTj"
+					  "jserv": undefined,
+					  "uid": "admin", "roleId": undefined, "ssid": "001eysTj"
 					} as SessionInf;
 		let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
 
 		let semantier = new Semantier({uri: 'test'});
-		semantier.rels = [{a_role_func: []}];
+		semantier.rels = {a_role_func: []};
 
 		// 1.
 		// using AnReact to collect role-func relation table's records
@@ -195,7 +196,8 @@ describe('case: [02.0 dataset + s-tree]', () => {
 
 	it('[recursive] checkTree -> relation records', () => {
 		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					  "uid": "admin", "roleId": null, "ssid": "001eysTj"
+					  "jserv": undefined,
+					  "uid": "admin", "roleId": undefined, "ssid": "001eysTj"
 					} as SessionInf;
 		// let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
 		// let anReact = new AnReact(client, AnContext.error);

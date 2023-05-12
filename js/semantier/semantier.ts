@@ -577,7 +577,7 @@ export class Semantier {
 
 		collectTree(forest, rows);
 
-		ins.nvRows(rows);
+		ins.rows(rows);
 		return ins;
 
 		/**

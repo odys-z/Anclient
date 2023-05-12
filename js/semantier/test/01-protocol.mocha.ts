@@ -4,7 +4,7 @@
 import { assert } from 'chai'
 
 import { Protocol, AnsonMsg, QueryReq, UserReq, UpdateReq, AnsonResp, AnResultset } from '../protocol';
-import { AnClient, SessionClient, SessionInf, CRUD } from '../anclient';
+import { AnClient, SessionClient, SessionInf, CRUD, NameValue, NV } from '../anclient';
 
 const resp = {
     "type": "io.odysz.semantic.jprotocol.AnsonMsg",
@@ -225,7 +225,6 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 	});
 
 	it('InsertReq <UpdateReq.A(insert)>', () => {
-		debugger
 		let ur = new UpdateReq('con-1', 'quizzes', ['quizId'])
 			.A<UpdateReq>('insert');
 
@@ -238,18 +237,20 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
         assert.equal(jreq.port, 'test1', "8 ---");
 
-		let nvss = [ [{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f01'}],
-					 [{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f02'}],
-					];
+		let nvss : Array<NameValue[]> = [
+			[{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f01'}],
+			[{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f02'}]
+		];
 
 		let ssInf : SessionInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					  "uid": "admin", "roleId": null, "ssid": "001eysTj" };
+					  "jserv": "",
+					  "uid": "admin", "roleId": undefined, "ssid": "001eysTj" };
 		let ir = new SessionClient(ssInf, new TextEncoder().encode('iv 3456789ABCDEF'), true)
 				.usrAct('func', 'cate', 'cmd', 'remarks')
-				.insert(null, 'a_role_func', nvss)
+				.inserts(undefined, 'a_role_func', nvss)
 				.Body();
 
-		assert.equal(ir?.nvss.length, 1, 'A ---');
+		assert.equal(ir?.nvss.length, 2, 'A ---');
 		assert.equal(ir?.nvss[0].length, 2, 'B ---');
 		assert.equal(ir?.mtabl, 'a_role_func', 'a_role_func ---');
 
@@ -257,6 +258,61 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 
         assert.equal(jreq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "C ---");
         assert.equal(jreq.Body()?.type, "io.odysz.semantic.jserv.U.AnInsertReq", "D ---");
+
+		ir?.newrow().nv("roleId", "r00").nv("roleId", "f00")
+		assert.equal(ir?.nvss.length, 3, 'E ---');
+		assert.equal(ir?.nvss[0].length, 2, 'F ---');
+		assert.equal(ir?.nvss[2][0][1], 'r00', 'F ---');
+		assert.equal(ir?.mtabl, 'a_role_func', 'F a_role_func ---');
+
+		jreq = new AnsonMsg({ port, header: null, body: [ir] });
+
+        assert.equal(jreq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "G ---");
+        assert.equal(jreq.Body()?.type, "io.odysz.semantic.jserv.U.AnInsertReq", "H ---");
+	});
+
+	it('InsertReq alternative rows', () => {
+		let ur = new UpdateReq('con-1', 'quizzes', ['quizId'])
+			.A<UpdateReq>('insert');
+
+		assert.equal(ur.uri, 'con-1', "1 ---");
+		assert.equal(ur.mtabl, 'quizzes', "2 ---");
+		assert.equal(ur.a, 'insert', "3 ---");
+
+		let port = 'test1';
+		let jreq = new AnsonMsg({ port, header: null, body: [ur] });
+
+		assert.equal(jreq.port, 'test1', "8 ---");
+
+		let nvss : Array<NV[]> = [
+			[{n: 'roleId', v: 'r01'}, {n: 'funcId', v: 'f01'}],
+			[{n: 'roleId', v: 'r01'}, {n: 'funcId', v: 'f02'}]
+		];
+
+		let ssInf : SessionInf = { "type": "io.odysz.semantic.jsession.SessionInf",
+					"jserv": "",
+					"uid": "admin", "roleId": undefined, "ssid": "001eysTj" };
+		let ir = new SessionClient(ssInf, new TextEncoder().encode('iv 3456789ABCDEF'), true)
+				.usrAct('func', 'cate', 'cmd', 'remarks')
+				.insert(undefined, "ZSU", nvss[0])
+				.Body()
+				?.newrow().nv("x", "1").nv("y", "2")
+				?.rows(nvss)
+				.newrow().nv("", "").nv("", "");
+
+		assert.equal(ir?.nvss.length, 5, 'A ---');
+		ir?.nvss.forEach((nvs, x) => {
+			assert.equal(ir?.nvss[0].length, 2, 'B ---');
+			assert.equal(nvs.length, 2, 'B ---');
+		});
+		assert.equal(ir?.mtabl, 'ZSU', 'ZSU ---');
+		assert.equal(ir?.nvss[2][1][1], 'f01', 'F ---');
+		assert.equal(ir?.nvss[1][1][1], '2', 'F ---');
+
+		jreq = new AnsonMsg({ port, header: null, body: [ir] });
+
+		assert.equal(jreq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "C ---");
+		assert.equal(jreq.Body()?.type, "io.odysz.semantic.jserv.U.AnInsertReq", "D ---");
 	});
 });
 

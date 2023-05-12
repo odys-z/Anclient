@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
 	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkVal, PageInf
+	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkVal, PageInf, NV, NameValue, isNV
 } from './protocol';
 import { ErrorCtx, Tierec } from './semantier';
 
@@ -37,11 +37,12 @@ class AnClient {
 		defaultServ: string;
 	};
 
-	/**@param urlRoot serv path root, e.g. 'http://localhost/jsample'
+	/**
+	 * @param urlRoot serv path root, e.g. 'http://localhost/jsample'
 	 */
-	constructor (urlRoot: string) {
+	constructor (urlRoot: string | undefined) {
 	 	this.cfg = {
-			defaultServ: urlRoot,
+			defaultServ: urlRoot || '',
 		}
 	}
 
@@ -369,11 +370,7 @@ export const an = new AnClient(undefined);
 
 export type SessionInf = {
 	type: "io.odysz.semantic.jsession.SessionInf";
-	/**A facillity for page redirection.
-	 * Value is set by Login into local storage, and be restored by SessionClient constructor.
-	 * Usually these two steps are used in different html pages.
-	 */
-	jserv: string;
+	jserv: string | undefined;
 	uid: string;
 	usrName?: string;
 	iv?: string;
@@ -521,9 +518,9 @@ class SessionClient {
 		return header;
 	}
 
-	SsInf(ssInf: SessionInf) {
-		throw new Error('Method not implemented.');
-	}
+	// SsInf(ssInf: SessionInf) {
+	// 	throw new Error('Method not implemented.');
+	// }
 
 	setPswd(oldPswd: string, newPswd : string, opts) {
 		let usrId = this.ssInf.uid;
@@ -647,12 +644,12 @@ class SessionClient {
 				upd.nv(nvs, undefined);
 			else if (typeof nvs === 'object')
 				upd.record(nvs)
-			else console.error("updating nvs must be an array of name-value.", nvs)
+			else console.error("Updating nvs must be an array of name-value.", nvs)
 		}
 		return jmsg;
 	}
 
-	insert(uri: string, maintbl: string, nvs: string | string[]) {
+	insert(uri: string | undefined, maintbl: string, nvs: Array<[string, string]> | Array<NV> | Array<NameValue>) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -662,10 +659,32 @@ class SessionClient {
 		var jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
 
 		if (nvs !== undefined) {
-			if (Array.isArray(nvs))
-				ins.valus(nvs, undefined);
-			else console.error("updating nvs must be an array of name-value.", nvs)
+			if (Array.isArray(nvs) && nvs.length > 0 && Array.isArray(nvs[0]))
+				ins.addArrow(nvs as Array<[string, string]>);
+			else if (Array.isArray(nvs) && nvs.length > 0 && isNV(nvs[0]))
+				ins.addNvrow(nvs as NV[] | NameValue[]);
+			else console.error("Inserting row must be an array of name-value.", nvs)
 		}
+		return jmsg;
+	}
+
+	inserts(uri: string | undefined, maintbl: string, nvss: Array<Array<[string, string]>> | Array<NV[]> | Array<NameValue[]>) {
+		debugger
+		if (this.currentAct === undefined || this.currentAct.func === undefined)
+			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
+						"To setup user's action information, call ssClient.usrAct().");
+
+		let ins = new InsertReq(uri, maintbl);
+		this.currentAct.cmd = 'insert';
+		let jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
+
+		nvss.forEach ((nvs: Array<[string, string]> | NV[] | NameValue[]) => {
+			if (Array.isArray(nvs) && nvs.length > 0 && Array.isArray(nvs[0]))
+				ins.addArrow(nvs as Array<[string, string]>);
+			else if (Array.isArray(nvs) && nvs.length > 0 && isNV(nvs[0]))
+				ins.addNvrow(nvs as NV[] | NameValue[]);
+			else console.error("Rows must be an array of name-values' array.", nvs)
+		});
 		return jmsg;
 	}
 
