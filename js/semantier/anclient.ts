@@ -4,9 +4,9 @@
 import * as $ from 'jquery';
 import AES from './aes';
 import {
-	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
-	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkVal, PageInf, NV, NameValue, isNV
+	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
+	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
+	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV
 } from './protocol';
 import { ErrorCtx, Tierec } from './semantier';
 
@@ -397,35 +397,35 @@ class SessionClient {
 
 	/**Create SessionClient with credential information or load from localStorage.
 	 * Because of two senarios of login / home page integration, there are 2 typical useses:
-	 * 
+	 *
 	 * Use Case 1 (persisted):
-	 * 
+	 *
 	 * logged in, then create a client with response, save in local storage, then load it in new page.
-	 * 
+	 *
 	 * Use Case 2 (not persisted):
-	 * 
+	 *
 	 * logged in, then create a client with response, user's app handled the object,
 	 * then provided to other functions, typicall a home.vue component.
-	 * 
+	 *
 	 * Note
-	 * 
+	 *
 	 * Local storage may be sometimes confusing if not familiar with W3C standars.
-	 * 
+	 *
 	 * The local storage can't be cross domain referenced. It's can not been loaded by home page
 	 * if you linked from login page like this, as showed by this example in login.vue:
-	 * 
+	 *
 	 * window.top.location = response.home
-	 * 
+	 *
 	 * One recommended practice is initializing home.vue with login credential
 	 * by login.vue, in app.vue.
-	 * 
+	 *
 	 * But this design makes home page and login component integrated. It's not
 	 * friedly to application pattern like a port page with login which is independent
 	 * to the system background home page.
-	 * 
+	 *
 	 * How should this pattern can be improved is open for discussion.
 	 * If your are interested in this subject, leave any comments in wiki page please.
-	 * 
+	 *
 	 * @param ssInf login response form server: {ssid, uid}, if null, will try restore window.for localStorage
 	 * @param iv iv used for cipher when login.
 	 * @param dontPersist don't save into local storage.
@@ -558,7 +558,7 @@ class SessionClient {
 
 	/**
 	 * Encrypt text with ssInf token - the client side for de-encrypt semantics
-	 * 
+	 *
 	 * @param plain plain text
 	 * @return {cipher, iv: base64}
 	 */

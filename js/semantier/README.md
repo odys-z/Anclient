@@ -11,3 +11,11 @@
 ```
     npm install @anclient/semantier
 ```
+
+# Troubleshooting
+
+Npm login requires a browser to authenticate.
+
+```
+    check the options "do not challenge from this IP"
+```
