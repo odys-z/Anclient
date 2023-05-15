@@ -21,7 +21,7 @@
 	it('toBool 2', () =>{
 		assert.isFalse(toBool('0', true), 'x');
 		assert.isFalse(toBool(' ', true), 'y');
-		assert.isFalse(toBool('' , true), 'z');
+		assert.isFalse(toBool('' , false), 'z');
 		assert.isTrue(toBool(undefined , true), 'r');
 		assert.isFalse(toBool(undefined), 's');
 		assert.isFalse(toBool(null), 's');
@@ -31,11 +31,12 @@
  * @param undefinedNull take undefind & null as true or false
  * @returns 
  */
-export function toBool(str: string | number | boolean | object | undefined | null, undefinedNull?: boolean): boolean {
+export function toBool(str: string | number | boolean | object | undefined | null, undefinedNull?: boolean | undefined | null): boolean {
 	// if ( undefinedNull !== undefined && undefinedNull !== null
 	// 	&& (str === undefined || str === null))
 	if ( isEmpty(str))
-		return undefinedNull;
+		// return !!undefinedNull;
+		return !isEmpty(undefinedNull) && undefinedNull;
 
 	return (!str || str === '0' || str === 'false'
 			|| (typeof str === 'string' && str.trim().length === 0)

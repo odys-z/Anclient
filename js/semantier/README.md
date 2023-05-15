@@ -14,7 +14,7 @@
 
 # Troubleshooting
 
-Npm login requires a browser to authenticate.
+Npm login requires a browser to authenticate while login with CLI.
 
 ```
     check the options "do not challenge from this IP"

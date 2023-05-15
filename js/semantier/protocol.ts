@@ -327,8 +327,8 @@ export class Protocol {
 		return [(nv as NV).n || (nv as NameValue).name, str((nv as NV).v || (nv as NameValue).value)];
 	}
 
-	static nvs2row (nvs) {
-		var row = [];
+	static nvs2row (nvs: NameValue[] | NV[]) {
+		var row = [] as [string, string][];
 		if (nvs) {
 			for (var ix = 0; ix < nvs.length; ix++)
 				row.push(Protocol.nv2cell(nvs[ix]));
@@ -848,15 +848,29 @@ export class UpdateReq extends AnsonBody {
      * @param v
      * @return this
      */
-    nv(n: string | Array<string>, v: string): UpdateReq {
+    nv(n: string, v: string): UpdateReq {
 		if (Array.isArray(n)) {
-			this.nvs = this.nvs.concat(Protocol.nvs2row(n));
+			// TODO cannot publish till all pages are bring up
+			throw Error('This branch is replaced with addArrow()')
+			// this.nvs = this.nvs.concat(Protocol.nvs2row(n));
+			// this.nvs = this.nvs.concat(n);
 		}
 		else {
-			this.nvs.push([n, v]);
+			this.nvs.push([n as string, v]);
 		}
 		return this;
     }
+
+	addNvrow (nv_row : NameValue[] | NV[]) : this {
+		this.nvs = this.nvs.concat(Protocol.nvs2row(nv_row));
+		return this;
+	}
+
+	addArrow (nvs: [string, string][]): UpdateReq {
+		// this.nvs = this.nvs.concat(Protocol.nvs2row(n));
+		this.nvs = this.nvs.concat(nvs);
+		return this;
+	}
 
     /** add n-v
      * @param rec
@@ -1018,7 +1032,8 @@ export class InsertReq extends UpdateReq {
 		return this;
 	}
 
-	/**Override Update.nv() - the insert statement uses valus() for nvss.
+	/**
+	 * Override Update.nv() - the insert statement uses valus() for nvss.
 	 * @param n
 	 * @param v
 	 * @return this*/
@@ -1102,9 +1117,9 @@ export class InsertReq extends UpdateReq {
 			else {
 				// guess as a n-v array
 				throw Error("This branch is replaced by addNvrow().");
-				if (this.cols === undefined)
-					this.columns(Protocol.nvs2cols(n_row as NV[]));
-				this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
+				// if (this.cols === undefined)
+				// 	this.columns(Protocol.nvs2cols(n_row as NV[]));
+				// this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
 			}
 		}
 		else if (typeof n_row === 'string'){
@@ -1307,7 +1322,8 @@ export class AnTreeNode {
 	node : {
 		// id: string;
 		children?: Array<AnTreeNode>;
-		css?: CSS.Properties;
+		/** With icon as a special field? */
+		css?: CSS.Properties & {icon?: string};
 		/** Any data by jserv */
 		[d: string]: any;
 	};

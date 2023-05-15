@@ -8,7 +8,7 @@ import {
 	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
 	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV
 } from './protocol';
-import { ErrorCtx, Tierec } from './semantier';
+import { ErrorCtx, Tierec, isEmpty, len } from './semantier';
 
 export interface AjaxOptions {async?: boolean; timeout?: number}
 
@@ -172,7 +172,8 @@ class AnClient {
 			console.error('jreq is null');
 			return;
 		}
-		if (jreq.port === undefined || jreq.port == '') {
+		// if (jreq.port === undefined || jreq.port == '') {
+		if (isEmpty(jreq.port)) {
 			// TODO docs...
 			console.error('Port is null - you probably created a requesting AnsonMsg with "new [User|Query|...]Req()".\n',
 				'Creating a new request message can mainly throught one of 2 ways:\n',
@@ -625,7 +626,7 @@ class SessionClient {
 		return jreq as AnsonMsg<QueryReq>;
 	}
 
-	update(uri: string, maintbl: string, pk: PkVal, nvs: string | string[] | Tierec) {
+	update(uri: string, maintbl: string, pk: PkVal, nvs: [string, string][] | NV[] | NameValue[] | Tierec) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("Anclient is designed to support user updating log natively. User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -641,7 +642,10 @@ class SessionClient {
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
-				upd.nv(nvs, undefined);
+				// FIXME no bugs here!
+				if (len(nvs) > 0 && isNV(nvs[0]))
+					upd.addNvrow(nvs as NV[]);
+				else ;
 			else if (typeof nvs === 'object')
 				upd.record(nvs)
 			else console.error("Updating nvs must be an array of name-value.", nvs)

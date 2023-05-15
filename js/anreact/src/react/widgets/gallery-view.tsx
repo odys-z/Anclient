@@ -1,22 +1,19 @@
 import React from 'react';
 import Modal from 'react-modal';
 
-import { PhotoProps, Gallery  } from 'react-photo-gallery';
+// import { PhotoProps, Gallery  } from 'react-photo-gallery';
+import { PhotoSlide } from '../../photo-gallery/src/Gallery';
+import Gallery from '../../photo-gallery/src/Gallery';
+
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import { isEmpty } from "@anclient/semantier";
-import { AnContextType, Comprops, CrudCompW } from '@anclient/anreact';
+import { Comprops, CrudCompW } from '../crud';
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
+import { AnContextType } from '../reactext';
 
 const _photos = [];
-
-export interface PhotoSlide<T extends {}> {
-    index: number
-    next: PhotoProps<T> | null
-    photo: PhotoProps<T>
-    previous: PhotoProps<T> | null
-}
 
 export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 	tier: GalleryTier | undefined;
@@ -54,9 +51,9 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 		});
 	}
 
-	openLightbox (event: React.MouseEvent, photo: PhotoSlide<{}>) {
+	openLightbox (event: React.MouseEvent, phts: PhotoSlide<PhotoRec>) {
 		console.log(event);
-		this.currentImx = photo.index;
+		this.currentImx = phts.index;
 		this.showCarousel = true;
 		this.setState({});
 	}
@@ -105,7 +102,7 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 		);
 	}
 
-	photoCarousel(photos: Array<PhotoProps>, imgx: number) : JSX.Element {
+	photoCarousel(photos: Array<PhotoRec>, imgx: number) : JSX.Element {
 		return (
 			<Carousel showArrows={true} dynamicHeight={true} selectedItem={imgx} >
 				{photos.map( (ph, x) => {

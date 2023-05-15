@@ -10,6 +10,7 @@ import {
 import { JsampleIcons } from '../../../../src/jsample/styles';
 import { AnTreeNode, CRUD } from '@anclient/semantier/protocol';
 import { toBool, AnlistColAttrs, UIComponent } from '@anclient/semantier';
+import GalleryView from './gallery-view';
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -32,8 +33,7 @@ interface TreecardProps extends AnTablistProps {
 	/** tree data node */
 	tnode: AnTreeNode;
 	onUpdate?: (n: AnTreeNode, p?: AnTreeNode, me?: number, elder?: number) => boolean;
-	// isMidNode?: (n: AnTreeNode, p?: AnTreeNode, me?: number, elder?: number) => boolean;
-       isMidNode?: (n: AnTreeNode, p?: AnTreeNode, me?: number, elder?: number) => boolean;
+    isMidNode?: (n: AnTreeNode, p?: AnTreeNode, me?: number, elder?: number) => boolean;
 };
 
 interface CssTreeItem extends React.CSSProperties {
@@ -230,7 +230,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
     toDelCard: any; // FIXME bug by type checking
     onUpdate: any;  // FIXME bug by type checking
 
-	constructor(props: TreecardProps) {
+	constructor(props: AnTreeditorProps) {
 		super(props);
 		this.state.sysName =
 			props.sys || props.sysName || props.name || this.state.sysName;
@@ -391,7 +391,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			else
 			  return (
 				tnode.node.nodeType === TreeNodeVisaul.gallary
-				? <Gallary key={tnode.id} aid={tnode.id} media
+				? <GalleryView key={tnode.id} aid={tnode.id} media
 				  />
 				: <TreeCard key={tnode.id} tnode={tnode} media
 					{...that.props} parent={parent}

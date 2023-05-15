@@ -1,8 +1,7 @@
-import React, {ReactNode} from 'react';
+import React from 'react';
 import Modal from 'react-modal';
 
-import Gallery from '../../../../src/photo-gallery/src/Gallery';
-import { PhotoProps } from '../../../../src/photo-gallery/src/Photo';
+import Gallery, { PhotoSlide } from '../../../../src/photo-gallery/src/Gallery';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
@@ -11,13 +10,6 @@ import { AnContextType, Comprops, CrudCompW } from '../../../../src/an-component
 import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
 
 const _photos = [];
-
-export interface PhotoSlide<T extends {}> {
-    index: number
-    next: PhotoProps<T> | null
-    photo: PhotoProps<T>
-    previous: PhotoProps<T> | null
-}
 
 export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 	tier: GalleryTier | undefined;
@@ -106,17 +98,16 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 		);
 	}
 
-	photoCarousel(photos: Array<PhotoProps>, imgx: number) : JSX.Element {
+	photoCarousel(photos: Array<PhotoRec>, imgx: number) : JSX.Element {
 		return (
 			<Carousel showArrows={true} dynamicHeight={true} selectedItem={imgx} >
 				{photos.map( (ph, x) => {
 				  let src = (isEmpty( ph.src ) && ph?.srcSet) ? ph.srcSet[ph.srcSet.length - 1] : ph.src || '';
 				  return (
-					<></> as ReactNode);
-					// <div key={x}>
-					// 	<img src={src} loading="lazy"></img>
-					// 	<p className="legend">{ph.src}</p>
-					// </div> as ReactNode) as ReactNode;
+					<div key={x}>
+						<img src={src} loading="lazy"></img>
+						<p className="legend">{ph.src}</p>
+					</div>);
 				  }
 				)}
 			</Carousel>

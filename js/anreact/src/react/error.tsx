@@ -1,7 +1,5 @@
 /** This is the error page of CRUD, not the error message box (AnError). */
-import $ from 'jquery';
 import React from 'react';
-	import ReactDOM from 'react-dom';
 	import { withStyles } from "@material-ui/core/styles";
 	import Button from '@material-ui/core/Button';
 
@@ -19,21 +17,17 @@ const styles = (theme) => ( {
 } );
 
 class ErrorComp extends CrudComp<Comprops> {
-	// const { classes } = this.props;
-
 	state = {
 		details: '',
 		info: '',
 		desc: '',
 		msg: undefined,
-		sysName: '',
+		sysName: ''
 	};
 
-	constructor(props) {
+	constructor(props: Comprops) {
 		super(props);
 		this.state.sysName = props.sys || props.sysName || props.name;
-
-		// this.onDetails = this.onDetails.bind(this);
 	}
 
 	/** A simulation of error triggering (used for error handling test). */

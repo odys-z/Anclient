@@ -106,7 +106,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 					readOnly={ this.tier && this.tier.isReadonly && this.tier.isReadonly(fcbb) }
 					options={ fcbb.options || []} val={{n: undefined, v:rec[fcbb.field]} }
 					label={ fcbb.label }
-					className={clsx(fcbb.opts?.classes, classes[fcbb.style])}
+					className={clsx(fcbb.opts?.classes, classes && classes[fcbb.style])}
 					style={ toReactStyles(fcbb.css) || { width: 200 } }
 					invalidStyle={ fcbb.style }
 					onSelect={ (v) => {
@@ -139,7 +139,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				placeholder={L(f.label)} margin='dense'
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
 				inputProps={{ readOnly } }
-				className={clsx(f.opts?.classes, classes[f.style])}
+				className={clsx(f.opts?.classes, classes && classes[f.style])}
 				onChange={ (e) => {
 					rec[f.field] = e.target.value;
 					f.style = undefined;

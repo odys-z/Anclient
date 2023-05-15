@@ -1,7 +1,7 @@
-import { Comprops, CrudComp } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq, PageInf, Semantier, SessionClient, Tierec
 } from '@anclient/semantier';
-import { PhotoProps } from '../react-photo-gallery/src/Photo';
+import { PhotoProps } from '../../photo-gallery/src/Photo';
+import { Comprops, CrudComp } from '../../an-components';
 
 const debug = true;
 
@@ -25,6 +25,7 @@ export interface PhotoRec extends Tierec {
 	device?: string,
 
 	src: string,
+	srcSet?: string[] | undefined,
 	width: number,
 	height: number
 };

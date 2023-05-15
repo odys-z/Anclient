@@ -7,6 +7,7 @@ import { stree_t, CRUD,
 } from "./protocol";
 
 export { toBool, isEmpty };
+export * from "./helpers";
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 /**
@@ -55,20 +56,30 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
-/** List column / record field (UI) Type
+/**
+ * List column / record field (UI) Type
+ * 
+ * Should be a valid HTML5 input type. (extended with enum, select)
+ * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
+ * 
  * - dynamic-cbb' type is a combobox changing code/value options for each row.
  */
 export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {
-	/**input type / form type, not db type
+	/**
+	 * Input type / form type, not db type.
+	 * 
 	 * - actions: user bottons, to be removed
 	 * - formatter: user function for UI element
 	 */
 	type?: ColType;
 
-    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: any; //string;
+    /**
+	 * Activated style e.g. invalide style, and is different form AnlistColAttrs.css
+     * TODO: style?: 'maxLen' | 'notNull' | 'ok';// any; //string;
+	 */
+    style?: string;
 
 	validator?: AnFieldValidator | AnFieldValidation;
 

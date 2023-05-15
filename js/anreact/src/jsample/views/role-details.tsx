@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { CRUD, PkMeta, Tierec } from '@anclient/semantier';
+import { CRUD, PkVal, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnContext, } from '../../react/reactext';
@@ -63,7 +63,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 		record: undefined as Tierec,
 	};
 
-	pkval: PkMeta = {pk: undefined, v: undefined};
+	pkval: PkVal = {pk: undefined, v: undefined};
 	tier: RoleTier;
 	ok: JSX.Element;
 

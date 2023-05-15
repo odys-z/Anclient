@@ -354,7 +354,7 @@ export class Spreadsheetier extends Semantier {
 
 		for (let i = 0; i < nvs.length; i++)
 			if (nvs[i].n === n)
-				return nvs[i].v;
+				return str(nvs[i].v);
 		return `[${n}]`; // [] for tagging the invalid data in database
 	}
 

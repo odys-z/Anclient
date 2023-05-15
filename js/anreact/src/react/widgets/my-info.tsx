@@ -50,7 +50,7 @@ class MyInfoComp extends DetailFormW<MyInfoProps> {
 		this.textInfo = this.textInfo.bind(this);
 	}
 
-	handleClose(e) {
+	handleClose(e: React.UIEvent) {
 		this.setState({closed: true});
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose();

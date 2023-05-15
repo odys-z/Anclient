@@ -18,7 +18,7 @@ export interface AnContextType extends Semantext {
 
 	pageOrigin?: string,
 	/** Usually the parent window of ifram. */
-	iparent?: object | Window,
+	iparent?: Window,
 	ihome?: string,
 
 	/**

@@ -34,20 +34,20 @@
  * @param undefinedNull default value if str is undefined or null
  * @returns 
  */
-export function toBool(str: string | number | boolean, undefinedNull?: boolean): boolean {
-	if ( undefinedNull !== undefined && undefinedNull !== null
-		&& (str === undefined || str === null))
-		return undefinedNull;
+// export function toBool(str: string | number | boolean, undefinedNull?: boolean): boolean {
+// 	if ( undefinedNull !== undefined && undefinedNull !== null
+// 		&& (str === undefined || str === null))
+// 		return undefinedNull;
 
-	return  !str || str === '0' || str === 'false'
-			|| (typeof str === 'string' && str.trim().length === 0)
-			? false : true;
-}
+// 	return  !str || str === '0' || str === 'false'
+// 			|| (typeof str === 'string' && str.trim().length === 0)
+// 			? false : true;
+// }
 
-/**@deprecated moved to Semantier.
- * @param str 
- * @returns 
- */
-export function isEmpty(str: string | number) : boolean {
-	return typeof str === 'undefined' || str === null || str === '';
-}
+// /**@deprecated moved to Semantier.
+//  * @param str 
+//  * @returns 
+//  */
+// export function isEmpty(str: string | number) : boolean {
+// 	return typeof str === 'undefined' || str === null || str === '';
+// }

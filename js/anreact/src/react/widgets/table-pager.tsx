@@ -73,7 +73,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 		return this.state.selected.has(k);
 	}
 
-	rowPageLabel (paginationInfo: LabelDisplayedRowsArgs) : ReactNode {
+	rowPageLabel (_paginationInfo: LabelDisplayedRowsArgs) : ReactNode {
 		let sz = this.page.size || 0;
 		let total = this.page.total || 0;
 
