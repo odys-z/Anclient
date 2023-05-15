@@ -299,7 +299,7 @@ describe('case: [05.0 dataset + s-tree]', () => {
 					{stree: {sk: 'fake-test', childTabl: 'a_role_func', fk: 'roleId', col: 'funcId', colProp: 'nodeId'}},
 					{pk: 'roleId', v: 'r00'});
 
-		let del = req.Body().postUpds[0] as UpdateReq;
+		let del = req.Body()?.postUpds[0] as UpdateReq;
 
 		let ins = del.postUpds[0] as InsertReq;
 		let nvss = ins.nvss;

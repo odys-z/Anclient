@@ -2,23 +2,14 @@ import React from 'react';
 import { Button, Collapse, Grid, PropTypes, Typography, withWidth } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-
 import {
-	L, AnContext, AnContextType,
-	AnReactExt,
-	AnTreeIcons,
-	ClassNames,
-	CompOpts,
-	CrudCompW,
-	DetailFormW,
-	Media,
-	SimpleForm,
-	swap,
-	AnTablistProps,
+	L, CrudCompW, AnTablistProps, DetailFormW,
+	AnContext, AnContextType, AnReactExt, AnTreeIcons,
+	Media, SimpleForm, ClassNames, CompOpts, swap,
 } from '../../../../src/an-components';
 import { JsampleIcons } from '../../../../src/jsample/styles';
 import { AnTreeNode, CRUD } from '@anclient/semantier/protocol';
-import { toBool, AnlistColAttrs, UIComponent } from '@anclient/semantier/semantier';
+import { toBool, AnlistColAttrs, UIComponent } from '@anclient/semantier';
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -38,6 +29,7 @@ interface TreecardProps extends AnTablistProps {
 	/**Used as default rows - data is bound by TreeEditor itself. */
 	// rows : Tierec[];
 	parent: AnTreeNode;
+	/** tree data node */
 	tnode: AnTreeNode;
 	onUpdate?: (n: AnTreeNode, p?: AnTreeNode, me?: number, elder?: number) => boolean;
 	// isMidNode?: (n: AnTreeNode, p?: AnTreeNode, me?: number, elder?: number) => boolean;

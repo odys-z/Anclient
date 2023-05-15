@@ -4,9 +4,9 @@
 import * as $ from 'jquery';
 import AES from './aes';
 import {
-	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
-	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkVal, PageInf
+	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
+	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
+	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV
 } from './protocol';
 import { ErrorCtx, Tierec } from './semantier';
 
@@ -37,11 +37,12 @@ class AnClient {
 		defaultServ: string;
 	};
 
-	/**@param urlRoot serv path root, e.g. 'http://localhost/jsample'
+	/**
+	 * @param urlRoot serv path root, e.g. 'http://localhost/jsample'
 	 */
-	constructor (urlRoot: string) {
+	constructor (urlRoot: string | undefined) {
 	 	this.cfg = {
-			defaultServ: urlRoot,
+			defaultServ: urlRoot || '',
 		}
 	}
 
@@ -369,11 +370,7 @@ export const an = new AnClient(undefined);
 
 export type SessionInf = {
 	type: "io.odysz.semantic.jsession.SessionInf";
-	/**A facillity for page redirection.
-	 * Value is set by Login into local storage, and be restored by SessionClient constructor.
-	 * Usually these two steps are used in different html pages.
-	 */
-	jserv: string;
+	jserv: string | undefined;
 	uid: string;
 	usrName?: string;
 	iv?: string;
@@ -400,35 +397,35 @@ class SessionClient {
 
 	/**Create SessionClient with credential information or load from localStorage.
 	 * Because of two senarios of login / home page integration, there are 2 typical useses:
-	 * 
+	 *
 	 * Use Case 1 (persisted):
-	 * 
+	 *
 	 * logged in, then create a client with response, save in local storage, then load it in new page.
-	 * 
+	 *
 	 * Use Case 2 (not persisted):
-	 * 
+	 *
 	 * logged in, then create a client with response, user's app handled the object,
 	 * then provided to other functions, typicall a home.vue component.
-	 * 
+	 *
 	 * Note
-	 * 
+	 *
 	 * Local storage may be sometimes confusing if not familiar with W3C standars.
-	 * 
+	 *
 	 * The local storage can't be cross domain referenced. It's can not been loaded by home page
 	 * if you linked from login page like this, as showed by this example in login.vue:
-	 * 
+	 *
 	 * window.top.location = response.home
-	 * 
+	 *
 	 * One recommended practice is initializing home.vue with login credential
 	 * by login.vue, in app.vue.
-	 * 
+	 *
 	 * But this design makes home page and login component integrated. It's not
 	 * friedly to application pattern like a port page with login which is independent
 	 * to the system background home page.
-	 * 
+	 *
 	 * How should this pattern can be improved is open for discussion.
 	 * If your are interested in this subject, leave any comments in wiki page please.
-	 * 
+	 *
 	 * @param ssInf login response form server: {ssid, uid}, if null, will try restore window.for localStorage
 	 * @param iv iv used for cipher when login.
 	 * @param dontPersist don't save into local storage.
@@ -521,9 +518,9 @@ class SessionClient {
 		return header;
 	}
 
-	SsInf(ssInf: SessionInf) {
-		throw new Error('Method not implemented.');
-	}
+	// SsInf(ssInf: SessionInf) {
+	// 	throw new Error('Method not implemented.');
+	// }
 
 	setPswd(oldPswd: string, newPswd : string, opts) {
 		let usrId = this.ssInf.uid;
@@ -561,7 +558,7 @@ class SessionClient {
 
 	/**
 	 * Encrypt text with ssInf token - the client side for de-encrypt semantics
-	 * 
+	 *
 	 * @param plain plain text
 	 * @return {cipher, iv: base64}
 	 */
@@ -647,12 +644,12 @@ class SessionClient {
 				upd.nv(nvs, undefined);
 			else if (typeof nvs === 'object')
 				upd.record(nvs)
-			else console.error("updating nvs must be an array of name-value.", nvs)
+			else console.error("Updating nvs must be an array of name-value.", nvs)
 		}
 		return jmsg;
 	}
 
-	insert(uri: string, maintbl: string, nvs: string | string[]) {
+	insert(uri: string | undefined, maintbl: string, nvs: Array<[string, string]> | Array<NV> | Array<NameValue>) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -662,10 +659,32 @@ class SessionClient {
 		var jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
 
 		if (nvs !== undefined) {
-			if (Array.isArray(nvs))
-				ins.valus(nvs, undefined);
-			else console.error("updating nvs must be an array of name-value.", nvs)
+			if (Array.isArray(nvs) && nvs.length > 0 && Array.isArray(nvs[0]))
+				ins.addArrow(nvs as Array<[string, string]>);
+			else if (Array.isArray(nvs) && nvs.length > 0 && isNV(nvs[0]))
+				ins.addNvrow(nvs as NV[] | NameValue[]);
+			else console.error("Inserting row must be an array of name-value.", nvs)
 		}
+		return jmsg;
+	}
+
+	inserts(uri: string | undefined, maintbl: string, nvss: Array<Array<[string, string]>> | Array<NV[]> | Array<NameValue[]>) {
+		debugger
+		if (this.currentAct === undefined || this.currentAct.func === undefined)
+			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
+						"To setup user's action information, call ssClient.usrAct().");
+
+		let ins = new InsertReq(uri, maintbl);
+		this.currentAct.cmd = 'insert';
+		let jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
+
+		nvss.forEach ((nvs: Array<[string, string]> | NV[] | NameValue[]) => {
+			if (Array.isArray(nvs) && nvs.length > 0 && Array.isArray(nvs[0]))
+				ins.addArrow(nvs as Array<[string, string]>);
+			else if (Array.isArray(nvs) && nvs.length > 0 && isNV(nvs[0]))
+				ins.addNvrow(nvs as NV[] | NameValue[]);
+			else console.error("Rows must be an array of name-values' array.", nvs)
+		});
 		return jmsg;
 	}
 

@@ -1,4 +1,5 @@
 import { SessionInf } from './anclient';
+import { str } from './helpers';
 import * as CSS from 'csstype';
 import { Tierec } from './semantier';
 
@@ -75,8 +76,12 @@ export class PageInf {
 }
 
 /**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
-export type NameValue = {name: string, value: object};
-export type NV = {n: string, v: string | object};
+export type NameValue = {name: string, value: object | string | number | boolean | undefined | null};
+export type NV = {n: string, v: string | object | string | number | boolean | undefined | null};
+export function isNV (obj: any) {
+	debugger;
+	return !!obj && (obj.name || obj.n);  
+}
 
 export interface LogAct {
     func   : string;
@@ -318,15 +323,15 @@ export class Protocol {
 		return AnsonResp.rs2arr(rs);
 	}
 
-	static nv2cell (nv: NameValue): [string, string] {
-		return [nv.name, nv.value as unknown as string];
+	static nv2cell (nv: NameValue | NV): [string, string] {
+		return [(nv as NV).n || (nv as NameValue).name, str((nv as NV).v || (nv as NameValue).value)];
 	}
 
 	static nvs2row (nvs) {
 		var row = [];
 		if (nvs) {
 			for (var ix = 0; ix < nvs.length; ix++)
-				row.push(this.nv2cell(nvs[ix]));
+				row.push(Protocol.nv2cell(nvs[ix]));
 		}
 		return row;
 	}
@@ -335,20 +340,23 @@ export class Protocol {
      * @param {Array} [n-v, ...]
      * @return {Array} [n1, n2, ...]
      */
-    static nvs2cols(nvArr: Array<NameValue>): Array<string> {
+    static nvs2cols(nvArr: Array<NameValue> | Array<NV> | Array<string>): Array<string> {
 		var cols = [];
 		if (nvArr) {
 			for (var ix = 0; ix < nvArr.length; ix++) {
-				if (nvArr[ix].name) {
-					cols.push(nvArr[ix].name);
+				if ((nvArr[ix] as NameValue).name) {
+					cols.push((nvArr[ix] as NameValue).name);
+				}
+				else if ((nvArr[ix] as NV).n) {
+					cols.push((nvArr[ix] as NV).n);
 				}
 				else
 					cols.push(ix);
 			}
 		}
 		return cols;
-
     }
+
     /** convert [[{name, value}]] to [[[name, value]]]
      * @param {Array} 2d array of n-v pairs
      * @return {Array} 3d array that can be used by server as nv rows
@@ -515,6 +523,8 @@ export class AnsonBody {
     a: string;
     parent: string; // AnsonMsg<AnsonBody>;
     uri: string;
+	version?: string;
+	seq?: number;
 
     /**set A tag a.<br>
      * a() can only been called once.
@@ -747,7 +757,7 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	groupby (expr) {
+	groupby (expr: string) {
 		// console.warn("groupby() is still to be implemented");
 		if (this.groups === undefined)
 			this.groups = [];
@@ -755,7 +765,7 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	groupbys (exprss) {
+	groupbys (exprss: string[]) {
 		// console.warn("groupby() is still to be implemented");
 		if (Array.isArray(exprss)) {
 			for (var ix = 0; ix < exprss.length; ix++) {
@@ -768,17 +778,18 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	/**limit clause.
-	 * @param {string} expr1
-	 * @param {string} expr2
+	/**
+	 * limit clause.
+	 * @param expr1 
+	 * @param expr2 
 	 */
-	limit (expr1, expr2) {
+	limit (expr1: string | number, expr2: string | number) {
 		this.limt = [];
 		if (expr1)
-			this.limt.push(expr1);
+			this.limt.push(str(expr1));
 
 		if (expr2)
-			this.limt.push(expr2);
+			this.limt.push(str(expr2));
 	}
 
 	commit () {
@@ -864,11 +875,11 @@ export class UpdateReq extends AnsonBody {
     /**Take exp as an expression
      * @param n
      * @param exp the expression string like "3 * 2"
-     * @return this*/
+     * @return this
     nExpr(n: string, exp: string): UpdateReq {
         console.error("bug !!");
 		return this.nv(n, exp);
-    }
+    }*/
 
 	/**Append where clause condiont
 	 * @param logic "=" | "<>" , ...
@@ -941,9 +952,9 @@ export class UpdateReq extends AnsonBody {
 	}
 
 	/**Add post operation
-	 * @param {UpdateReq | InsertReq} pst post request
-	 * @return {UpdateReq} this */
-	post (pst) {
+	 * @param pst post request
+	 * @return this */
+	post (pst: AnsonBody) {
 		if (pst === undefined) {
 			console.warn('You really wanna an undefined post operation?');
 			return this;
@@ -976,7 +987,7 @@ export class InsertReq extends UpdateReq {
 
 
     cols: Array<string>;
-    nvss: any;
+    // nvss: Array<Array<string[]>>;
 
 	constructor (uri: string, tabl: string) {
 		super (uri, tabl, undefined);
@@ -1012,20 +1023,56 @@ export class InsertReq extends UpdateReq {
 	 * @param v
 	 * @return this*/
 	nv (n: string, v: string): this {
-		return this.valus(n, v);
+		if (this.nvss === undefined)
+			this.nvss = [];
+
+		this.columns(n);
+		if (this.nvss.length == 0) {
+			this.nvss.push([[n, v]]);
+		}
+		else {
+			this.nvss[this.nvss.length - 1].push([n, v]);
+		}
+		return this;
+	}
+
+	newrow () : InsertReq {
+		if (this.nvss === undefined)
+			this.nvss = [];
+		this.nvss.push([]);
+		return this;
 	}
 
 	/**Take exp as an expression
 	 * @param n
 	 * @param exp the expression string like "3 * 2"
 	 * @return this
-	 **/
 	nExpr(n : string, exp : any): this {
         console.error("Bug!!");
 		return this.nv(n, exp);
 	}
+	 **/
 
-	/**Set inserting value(s).
+	addNvrow (n_row : NameValue[] | NV[]) : this {
+		if (this.nvss === undefined)
+			this.nvss = [];
+
+		if (this.cols === undefined)
+			this.columns(Protocol.nvs2cols(n_row as NV[]));
+		this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
+		return this;
+	}
+
+	addArrow (arrow : Array<[string, string]>) : this {
+		if (this.nvss === undefined)
+			this.nvss = [];
+
+		this.nvss = this.nvss.concat([arrow]);
+		return this;
+	}
+
+	/**
+	 * Set inserting value(s).
 	 * Becareful about function name - 'values' shall be reserved.
 	 * @param n_row field name or n-v array<br>
 	 * n_row can be typically return of jqueyr serializeArray, a.k.a [{name, value}, ...].<br>
@@ -1035,38 +1082,40 @@ export class InsertReq extends UpdateReq {
 	 * @param v value if n_row is name. Optional.
 	 * @return this
 	 */
-	valus (n_row : string | Array<string>, v : string) : this {
+	valuss (n_row : string | Array<string[]> | Array<NV>, v? : string) : this {
 		if (this.nvss === undefined)
 			this.nvss = [];
 
 		var warned = false;
 		if (Array.isArray(n_row)) {
 			if (Array.isArray(n_row[0])) {
-				// already a 2-d array
-				if (Array.isArray(n_row[0][0]) && !warned) {
-					console.warn('InsertReq is trying to handle multi rows in on value call, it is wrong. You must use InsertReq.nvRows(rows) instead.',
-							n_row);
-					warned = true;
-					this.nvss = this.nvss.concat(n_row);
-				}
-				else {this.nvss = this.nvss.concat([n_row]);}
+				throw Error("This branch is replaced by addArrow().");
+				// // already a 2-d array
+				// if (Array.isArray(n_row[0][0]) && !warned) {
+				// 	console.warn('InsertReq is trying to handle multi rows in on value call, it is wrong. You must use InsertReq.addArrows(rows) instead.',
+				// 			n_row);
+				// 	warned = true;
+				// 	this.nvss = this.nvss.concat(n_row);
+				// }
+				// else this.nvss = this.nvss.concat([n_row]);
 			}
 			else {
 				// guess as a n-v array
+				throw Error("This branch is replaced by addNvrow().");
 				if (this.cols === undefined)
-					this.columns(Protocol.nvs2cols(n_row as unknown as NameValue[]));
+					this.columns(Protocol.nvs2cols(n_row as NV[]));
 				this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
 			}
 		}
 		else if (typeof n_row === 'string'){
-            console.error("shouldn't reach here in ts.");
-			this.columns(n_row as unknown as DbCol);
-			if (this.nvss.length == 0) {
-				this.nvss.push([[n_row, v]]);
-			}
-			else {
-				this.nvss[0].push([n_row, v]);
-			}
+			throw Error("This branch is replaced by nv().");
+			// this.columns(n_row as unknown as DbCol);
+			// if (this.nvss.length == 0) {
+			// 	this.nvss.push([[n_row, v]]);
+			// }
+			// else {
+			// 	this.nvss[0].push([n_row, v]);
+			// }
 		}
 		else console.error('Error when setting n-v with', n_row, v,
 			'Check the type of n - only string for column, or n is an array represeting a row\'s n-vs!');
@@ -1077,10 +1126,21 @@ export class InsertReq extends UpdateReq {
 	 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
 	 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
 	*/
-	nvRows(rows) {
-		if (Array.isArray(rows)) {
-			for (var ix = 0; ix < rows.length && Array.isArray(rows[ix]); ix++) {
-				this.valus(rows[ix], undefined);
+	rows(rows: Array<NameValue[]> | Array<NV[]>) {
+		if (Array.isArray(rows) && rows.length > 0 && Array.isArray(rows[0])) {
+			for (var ix = 0; ix < rows.length; ix++) {
+				// this.valuss(rows[ix]);
+				this.addNvrow(rows[ix]);
+			}
+		}
+		return this;
+	}
+
+	rowsArr(rows: Array<Array<[string, string]>>) {
+		if (Array.isArray(rows) && rows.length > 0 && Array.isArray(rows[0])) {
+			for (var ix = 0; ix < rows.length; ix++) {
+				// this.valuss(rows[ix]);
+				this.addArrow(rows[ix]);
 			}
 		}
 		return this;

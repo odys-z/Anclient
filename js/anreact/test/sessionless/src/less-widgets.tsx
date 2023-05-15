@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, Semantier } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
@@ -34,6 +34,8 @@ class Widgets extends React.Component<LessProps> {
 	/** {@link InsercureClient} */
 	inclient: Inseclient;
 	anReact: AnReactExt;  // helper for React
+
+	tier: Treetier;
 
 	error: ErrorCtx;
 
@@ -110,7 +112,11 @@ class Widgets extends React.Component<LessProps> {
 				error: this.error,
 				ssInf: undefined,
 			}} >
-                <AnTreeditor2 />
+                <AnTreeditor2 parent={undefined}
+					port='welcomeless' uri={'/less/widgets'}
+					tnode={this.tier.treeroot()}
+					pk={''} columns={[]} onSelectChange={()=> undefined}
+				/>
 				<hr/>
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
@@ -139,6 +145,13 @@ class Widgets extends React.Component<LessProps> {
 	static reportTranslation() {
 		console.log(Langstrs.report());
 	}
+}
+
+class Treetier extends Semantier {
+	treeroot(): import("@anclient/semantier").AnTreeNode {
+		throw new Error('Method not implemented.');
+	}
+
 }
 
 export { Widgets };
