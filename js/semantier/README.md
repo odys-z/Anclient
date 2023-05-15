@@ -19,3 +19,15 @@ Npm login requires a browser to authenticate while login with CLI.
 ```
     check the options "do not challenge from this IP"
 ```
+
+Sometimes npm service problem, report at
+
+```
+    https://status.npmjs.org/
+```
+
+see
+
+```
+    https://stackoverflow.com/a/70366952
+```

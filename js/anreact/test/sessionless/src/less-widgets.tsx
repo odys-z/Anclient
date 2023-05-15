@@ -19,14 +19,6 @@ type LessProps = {
 	iwindow?: any; // window object
 }
 
-// type State = {
-// 	servs?: JsonServs;
-// 	servId: string;
-// 	iportal?: string;
-// 	hasError?: boolean;
-// 	nextAction?: string;
-// }
-
 /**
  * Widgets Tests
  */

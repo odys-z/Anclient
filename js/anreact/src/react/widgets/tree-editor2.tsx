@@ -457,7 +457,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 	}
 
 	th( columns: Array<AnTreegridCol> = [],
-		classes: ClassNames, media: Media) {
+		classes: ClassNames, media: Media ) {
 		return (
 			<Grid container className={classes.th} >
 				{columns

@@ -8,7 +8,7 @@ module.exports = {
 	mode: v,
 	devtool: 'source-map',
 	entry: {'AnHome': './src/less-app.tsx',
-			'AnWidgets': 'src/less-widgets.tsx',
+			'AnWidgets': './src/less-widgets.tsx',
 			'AnSheet': './src/workbook/sheet-app.tsx' },
 
 	output: {
