@@ -67,7 +67,7 @@ const styles = (theme: Theme) => ({
 
 /* experimental
 const R_ = [
-  { 
+  {
 	edit: 'a',
 	add: 'x',
   },
@@ -92,22 +92,23 @@ interface CssTreeItem extends React.CSSProperties {
     align: string
 }
 
-export enum TreeNodeType { card, gallary };
+export enum TreeNodeVisaul { card, gallary };
 
-export interface ReactreeNode {
-	type: TreeNodeType;
-	toUp: (e: React.MouseEvent<HTMLElement>) => void;
-	toTop: (e: React.MouseEvent<HTMLElement>) => void;
+export interface AnreactreeNode {
+	ntype : TreeNodeVisaul;
+	node  : AnTreeNode;
+	toUp  : (e: React.MouseEvent<HTMLElement>) => void;
+	toTop : (e: React.MouseEvent<HTMLElement>) => void;
 	toDown: (e: React.MouseEvent<HTMLElement>) => void;
 	toBottom: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
-class TreeCardComp extends DetailFormW<TreecardProps> implements ReactreeNode {
+class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeNode {
 	state = {
 		node: {},
 	}
 
-	type: TreeNodeType.card;
+	type: TreeNodeVisaul.card;
 
 	newCard = undefined;
 
@@ -120,6 +121,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements ReactreeNode {
 		this.toTop = this.toTop.bind(this);
 		this.toDown = this.toDown.bind(this);
 	}
+	node: AnTreeNode;
 
 	toUp(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
@@ -246,8 +248,13 @@ TreeCardComp.contextType = AnContext;
 const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCardComp));
 export { TreeCard, TreeCardComp }
 
-class TreeGallaryComp extends DetailFormW<TreecardProps> {
-
+class TreeGallaryComp extends DetailFormW<TreecardProps> implements AnreactreeNode {
+	ntype: TreeNodeType;
+	node: AnTreeNode;
+	toUp: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+	toTop: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+	toDown: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+	toBottom: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }
 
 const TreeGallary = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeGallaryComp));
@@ -282,7 +289,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
     toDelCard: any; // FIXME bug by type checking
     onUpdate: any;  // FIXME bug by type checking
 
-	constructor(props: TreecardProps) {
+	constructor(props: AnTreeditorProps) {
 		super(props);
 		this.state.sysName =
 			props.sys || props.sysName || props.name || this.state.sysName;
@@ -386,19 +393,19 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 	}
 
 	// TODO merge with treegrid
-	leadingIcons(treeItem, expand, expIcon) {
-		return treeItem.levelIcons ?
-			treeItem.levelIcons.map((v, x) => {
+	leadingIcons(treeItem: AnreactreeNode, expand: boolean, expIcon: string) {
+		return (treeItem.levelIcons ?
+			treeItem.levelIcons.map((v: string, x: React.Key) => {
 				return x === treeItem.levelIcons.length - 1 && expand
 					? expIcon ? <React.Fragment key={x}>{icon(expIcon || '+')}</React.Fragment>
 							  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
 					: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
 			})
-			: new Array(treeItem.level + 1).fill(0).map((v, x) => {
-				return x === treeItem.level - 1 && expand
+			: new Array(treeItem.node.level + 1).fill(0).map((v, x) => {
+				return x === treeItem.node.level - 1 && expand
 					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
-			})
+			}));
 
         function icon(iconame?: string) {
 	        return AnTreeIcons[iconame || "deflt"];
@@ -406,8 +413,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 	}
 
 	/**
-	 * @param {object} classes
-	 * @param {media} media
+	 * @param compOts
 	 */
 	treeNodes(compOts: CompOpts) {
 		let { classes, media } = compOts;
@@ -442,7 +448,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			}
 			else
 			  return (
-				tnode.node.nodeType === TreeNodeType.gallary
+				tnode.node.nodeType === TreeNodeVisaul.gallary
 				? <GalleryView key={tnode.id} aid={tnode.id} media
 				  />
 				: <TreeCard key={tnode.id} tnode={tnode} media
@@ -480,7 +486,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			</Grid>);
 	}
 
-	folderHead(columns=[], tnode, open, classes, media) {
+	folderHead(columns=[], tnode: AnTreeNode, open: boolean, classes: ClassNames, media: Media) {
 	  let n = tnode.node;
 	  n.css = n.css || {};
 	  return (
@@ -544,17 +550,17 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		</div>
 		);
 
-		function formatFolderDesc(tnode, media) {
+		function formatFolderDesc(tnode: { node: { text: string; children: object[]; }; }, media: { isMd: Media; isXl: Media; }) {
 			let {text, children} = tnode.node;
 
 			if (children)
-				children = `[${media.isMd ? 'children' : ''} ${children.length}]`;
-			else children = '';
+				children = `[${media.isMd ? 'children' : ''} ${children.length}]` as unknown as object[];
+			else children = [];
 
 			return `${media.isXl ? text : ''} ${children}`;
 		}
 
-		function icon(icon) {
+		function icon(icon: string) {
 			return AnTreeIcons[icon || "deflt"];
 		}
 	}

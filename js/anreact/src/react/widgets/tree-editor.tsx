@@ -350,7 +350,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 	// TODO merge with treegrid
 	leadingIcons(treeItem, expand, expIcon) {
 		return treeItem.levelIcons ?
-			treeItem.levelIcons.map((v, x) => {
+			treeItem.levelIcons.map((v: string, x: React.Key) => {
 				return x === treeItem.levelIcons.length - 1 && expand
 					? expIcon ? <React.Fragment key={x}>{icon(expIcon || '+')}</React.Fragment>
 							  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
@@ -368,8 +368,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 	}
 
 	/**
-	 * @param {object} classes
-	 * @param {media} media
+	 * @param compOts
 	 */
 	treeNodes(compOts: CompOpts) {
 		let { classes, media } = compOts;

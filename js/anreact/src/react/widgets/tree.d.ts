@@ -15,6 +15,13 @@ export const AnTreeIcons: {
     "+": JSX.Element;
     ".": JSX.Element;
 };
+
+export type AnTreeIconsType =
+        'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' |
+        'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand';
+
+// export type AnTreeIconsType: 'deflt' | '+' | '-' | 'T' | '.' | '[]' | '|-' | 'L' | 'E' | 'F' |
+// 				  'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand';
 export const AnTree: React.ComponentType<Pick<any, string | number | symbol> & import("@material-ui/core/styles").StyledComponentProps<"hide" | "row" | "root" | "rowHead" | "folder" | "folderHead" | "treeItem" | "treeLabel">>;
 export class AnTreeComp extends React.Component<any, any, any> {
     constructor(props: any);

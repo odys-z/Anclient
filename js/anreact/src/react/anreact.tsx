@@ -223,17 +223,32 @@ export class AnReactExt extends AnReact {
 
 	/** Load jsample.serv dataset. (using DatasetReq or menu.serv).
 	 * If opts.onOk is provided, will try to bind stree like this:
-	 <pre>
+	 @example
 	let onload = onOk || function (c, resp) {
 		if (compont)
 			compont.setState({stree: resp.Body().forest});
-	}</pre>
+	}
+	
+	// usage:
+	let that = this;
+	let ds = {uri, sk: this.sk, t: 'tagtrees',
+	  onOk: (e) => {
+	    that.confirm = (<ConfirmDialog
+			title={L('Info')}
+			ok={L('OK')} cancel={false} open
+			onOk={ that.del }
+			onClose={() => {that.confirm = undefined;} }
+			msg={L('Updating quiz teamplates finished!')}
+	    />);
+	    that.setState({});
+	  }};
+	this.context.uiHelper.stree(ds, this.context.error);
+
 	 * @param opts dataset info {sk, sqlArgs, onOk}
 	 * @param component
 	 * @return this
 	 */
 	stree(opts: DatasetOpts, component: CrudComp<Comprops>): void {
-		// let {uri, onOk} = opts;
 		let {onOk} = opts;
 
 		let onload = onOk || function (resp: AnsonMsg<AnDatasetResp>) {

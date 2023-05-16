@@ -69,9 +69,10 @@ class Widgets extends React.Component<LessProps> {
 		Protocol.sk.cbbRole = 'roles';
 
 		this.anReact = new AnReactExt(this.inclient, this.error)
-								.extendPorts({
-									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
-								});
+				// see jserv-sandbox
+				.extendPorts({
+					gallerytier: "gallerytree.less",
+				});
 	}
 
 	onError(c: any, r: AnsonMsg<AnsonResp> ) {
