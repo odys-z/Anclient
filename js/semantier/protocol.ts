@@ -1001,7 +1001,6 @@ export class InsertReq extends UpdateReq {
 
 
     cols: Array<string>;
-    // nvss: Array<Array<string[]>>;
 
 	constructor (uri: string, tabl: string) {
 		super (uri, tabl, undefined);
@@ -1101,7 +1100,7 @@ export class InsertReq extends UpdateReq {
 		if (this.nvss === undefined)
 			this.nvss = [];
 
-		var warned = false;
+		// var warned = false;
 		if (Array.isArray(n_row)) {
 			if (Array.isArray(n_row[0])) {
 				throw Error("This branch is replaced by addArrow().");
@@ -1317,9 +1316,12 @@ export class AnSessionResp extends AnsonResp {
 	}
 }
 
+/** Tree data node */
 export class AnTreeNode {
 	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	node : {
+	/** json data node */
+	jnode : {
+		nodetype?: string;
 		// id: string;
 		children?: Array<AnTreeNode>;
 		/** With icon as a special field? */

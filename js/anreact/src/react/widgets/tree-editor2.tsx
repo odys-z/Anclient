@@ -92,11 +92,13 @@ interface CssTreeItem extends React.CSSProperties {
     align: string
 }
 
-export enum TreeNodeVisaul { card, gallary };
+export enum TreeNodeVisual { card, gallary };
 
 export interface AnreactreeNode {
-	ntype : TreeNodeVisaul;
+	ntype : TreeNodeVisual;
 	node  : AnTreeNode;
+	/** @see AnTreeIcons */
+	levelIcons?: Array<AnTreeIconsType>;
 	toUp  : (e: React.MouseEvent<HTMLElement>) => void;
 	toTop : (e: React.MouseEvent<HTMLElement>) => void;
 	toDown: (e: React.MouseEvent<HTMLElement>) => void;
@@ -108,7 +110,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeNode 
 		node: {},
 	}
 
-	type: TreeNodeVisaul.card;
+	ntype: TreeNodeVisual.card;
 
 	newCard = undefined;
 
@@ -249,7 +251,7 @@ const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCar
 export { TreeCard, TreeCardComp }
 
 class TreeGallaryComp extends DetailFormW<TreecardProps> implements AnreactreeNode {
-	ntype: TreeNodeType;
+	ntype: TreeNodeVisual;
 	node: AnTreeNode;
 	toUp: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 	toTop: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
@@ -286,8 +288,6 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
     anReact: AnReactExt;
     editForm: JSX.Element;
-    toDelCard: any; // FIXME bug by type checking
-    onUpdate: any;  // FIXME bug by type checking
 
 	constructor(props: AnTreeditorProps) {
 		super(props);
@@ -355,7 +355,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		this.setState({});
 	}
 
-	toDel(e: React.MouseEvent<HTMLElement>) { }
+	toDel(_e: React.MouseEvent<HTMLElement>) { }
 
 	toEdit(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
@@ -367,21 +367,12 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		this.editForm = (
 			<SimpleForm crud={CRUD.u} uri={this.props.uri}
 				mtabl={this.props.mtabl}
-				// pk={this.props.pk}
 				fields={this.props.fields}
 				pkval={{pk: this.props.pk, v: me}} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
 				onClose={() => {that.editForm = undefined; that.setState({}) }}
 				onOk={() => {
-					// Reshape in case fullpath has been changed.
-					// DESIGN NOTE:
-					// Is this a good reason that widgets shouldn't connected with datat tier?
-					// Explaination:
-					// 1. A simple UI form doesn't understand this special post updating data processing such as tree re-shaping.
-					// 2. As the tree is loaded via port "stree", why saving items with general updating? Should this been wrapped into a component?
-					// If a general purpose widget can't be good at handling data tier, is it resonable has an independant module for a samntics process, e.g. tree reshaping?
 
-					// close as data saved, search later in case re-shape failed. (shouldn't be a transaction?)
 					let {uri, sk} = this.props;
 					(this.context as unknown as AnContextType).uiHelper
                         .rebuildTree({uri, sk, rootId: me}, () => {
@@ -395,7 +386,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 	// TODO merge with treegrid
 	leadingIcons(treeItem: AnreactreeNode, expand: boolean, expIcon: string) {
 		return (treeItem.levelIcons ?
-			treeItem.levelIcons.map((v: string, x: React.Key) => {
+			treeItem.levelIcons.map((v: string, x: number) => {
 				return x === treeItem.levelIcons.length - 1 && expand
 					? expIcon ? <React.Fragment key={x}>{icon(expIcon || '+')}</React.Fragment>
 							  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
@@ -448,7 +439,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			}
 			else
 			  return (
-				tnode.node.nodeType === TreeNodeVisaul.gallary
+				tnode.node.nodeType === TreeNodeVisual.gallary
 				? <GalleryView key={tnode.id} aid={tnode.id} media
 				  />
 				: <TreeCard key={tnode.id} tnode={tnode} media

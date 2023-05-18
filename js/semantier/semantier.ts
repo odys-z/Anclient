@@ -605,17 +605,17 @@ export class Semantier {
 		function collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>) {
 			let cnt = 0;
 			forest.forEach( (tree: AnTreeNode, _i: number) => {
-				if (tree && tree.node) {
-					if (tree.node.children && tree.node.children.length > 0) {
-						let childCnt = collectTree(tree.node.children, rows);
+				if (tree && tree.jnode) {
+					if (tree.jnode.children && tree.jnode.children.length > 0) {
+						let childCnt = collectTree(tree.jnode.children, rows);
 
 						if (childCnt > 0 && reshape)
-							tree.node[check] = 1;
+							tree.jnode[check] = 1;
 						else if (childCnt === 0)
-							tree.node[check] = 0;
+							tree.jnode[check] = 0;
 					}
-					if ( toBool(tree.node[check]) ) {
-						rows.push(toNvRow(tree.node, dbCols, columnMap));
+					if ( toBool(tree.jnode[check]) ) {
+						rows.push(toNvRow(tree.jnode, dbCols, columnMap));
 						cnt++;
 					}
 				}
@@ -639,7 +639,7 @@ export class Semantier {
 		 * @param colMap column's static value, e.g. { roleId: '00001' }
 		 * @returns
 		 */
-		function toNvRow(node: AnTreeNode["node"],
+		function toNvRow(node: AnTreeNode["jnode"],
 				  dbcols: string[], colMap: { [x: string]: any; })
 				: Array<NameValue> {
 

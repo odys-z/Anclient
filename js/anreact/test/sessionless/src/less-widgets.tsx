@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, Semantier } from '@anclient/semantier';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, Semantier, AnTreeNode } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
@@ -141,8 +141,26 @@ class Widgets extends React.Component<LessProps> {
 }
 
 class Treetier extends Semantier {
-	treeroot(): import("@anclient/semantier").AnTreeNode {
-		throw new Error('Method not implemented.');
+	treeroot(): AnTreeNode {
+		return {
+			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
+			jnode: {
+				nodetype: 'card',
+				children: [{
+					type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
+					jnode: {
+						nodetype: 'gallery',
+						collect: 'a01'
+					},
+					id: 'x',
+					level: 1,
+					parent: 'p0'
+				}]
+			},
+			id: 'p0',
+			level: 0,
+			parent: undefined,
+		}
 	}
 
 }

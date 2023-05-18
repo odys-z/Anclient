@@ -17,7 +17,7 @@ export const AnTreeIcons: {
 };
 
 export type AnTreeIconsType =
-        'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' |
+        'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
         'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand';
 
 // export type AnTreeIconsType: 'deflt' | '+' | '-' | 'T' | '.' | '[]' | '|-' | 'L' | 'E' | 'F' |

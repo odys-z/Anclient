@@ -386,16 +386,16 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		  }
 		  else if (tnode) {
 			let open = that.state.expandings.has(tnode.id)
-					&& tnode.node.children && tnode.node.children.length > 0;
-			tnode.node.css = tnode.node.css || {};
+					&& tnode.jnode.children && tnode.jnode.children.length > 0;
+			tnode.jnode.css = tnode.jnode.css || {};
 
-			if (that.props.isMidNode(tnode.node)) {
+			if (that.props.isMidNode(tnode.jnode)) {
 			  return (
 				<div key={tnode.id} className={classes.folder}>
 				  { that.folderHead(that.props.columns, tnode, open, classes, media) }
 				  { open &&
 					<Collapse in={open} timeout="auto" unmountOnExit>
-						{buildTreegrid(tnode.node.children, tnode, compOts)}
+						{buildTreegrid(tnode.jnode.children, tnode, compOts)}
 					</Collapse>
 				  }
 				</div>
