@@ -2,12 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, Semantier, AnTreeNode } from '@anclient/semantier';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
 } from '../../../src/an-components';
 import { AnTreeditor2 } from './widgets/treeditor';
+import { StreeTier } from './widgets/stree-tier';
 
 const { JsampleTheme } = jsample;
 
@@ -27,7 +28,7 @@ class Widgets extends React.Component<LessProps> {
 	inclient: Inseclient;
 	anReact: AnReactExt;  // helper for React
 
-	tier: Treetier;
+	albumtier: TestreeTier;
 
 	error: ErrorCtx;
 
@@ -68,6 +69,8 @@ class Widgets extends React.Component<LessProps> {
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 
+		this.albumtier = new TestreeTier();
+
 		this.anReact = new AnReactExt(this.inclient, this.error)
 				// see jserv-sandbox
 				.extendPorts({
@@ -107,8 +110,9 @@ class Widgets extends React.Component<LessProps> {
 			}} >
                 <AnTreeditor2 parent={undefined}
 					port='welcomeless' uri={'/less/widgets'}
-					tnode={this.tier.treeroot()}
-					pk={''} columns={[]} onSelectChange={()=> undefined}
+					tnode={this.albumtier.treeroot()} tier={this.albumtier}
+					pk={'NA'} columns={undefined}
+					onSelectChange={()=> undefined}
 				/>
 				<hr/>
 				{this.state.hasError &&
@@ -140,29 +144,24 @@ class Widgets extends React.Component<LessProps> {
 	}
 }
 
-class Treetier extends Semantier {
+class TestreeTier extends StreeTier {
+
+	constructor() {
+		super({uri: 'less/widgets', port: 'album'});
+
+	}
+
 	treeroot(): AnTreeNode {
 		return {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
 			jnode: {
 				nodetype: 'card',
-				children: [{
-					type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
-					jnode: {
-						nodetype: 'gallery',
-						collect: 'a01'
-					},
-					id: 'x',
-					level: 1,
-					parent: 'p0'
-				}]
 			},
 			id: 'p0',
 			level: 0,
 			parent: undefined,
 		}
 	}
-
 }
 
 export { Widgets };

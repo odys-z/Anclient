@@ -232,6 +232,7 @@ export class AnReactExt extends AnReact {
 	// usage:
 	let that = this;
 	let ds = {uri, sk: this.sk, t: 'tagtrees',
+	  port?: 'optional-port-name', // default s-tree.serv 
 	  onOk: (e) => {
 	    that.confirm = (<ConfirmDialog
 			title={L('Info')}
@@ -262,7 +263,7 @@ export class AnReactExt extends AnReact {
 	rebuildTree(opts: DatasetOpts, onOk: (resp: any) => void) {
 		let {uri, rootId} = opts;
 		if (!uri)
-			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
+			throw Error('opts.uri is required. Since v0.9.50, Anclient requests need client function uri to find datasource.');
 
 		if (!rootId)
 			console.log('Rebuild tree without rootId ?');

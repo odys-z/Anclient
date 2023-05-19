@@ -212,7 +212,8 @@ export class Protocol {
 		echo: "echo.serv11", session: "login.serv11",
 		query: "r.serv11", update: "u.serv11",
 		insert: "c.serv11", delete: "d.serv11",
-		dataset: "ds.serv11", stree: "s-tree.serv11",
+		dataset: "ds.serv",
+		stree: "s-tree.serv",
 		datasetier: "ds.tier"
 	};
 

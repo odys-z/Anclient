@@ -108,14 +108,14 @@ interface IndentIcons {
 	/** e.g. "L" */
 	childx?: AnTreeIconsType;
 	/** e.g. "|" */
-	linkln?: AnTreeIconsType;
+	vlink?: AnTreeIconsType;
 	/** e.g. " " or "."? */
 	spacex?: AnTreeIconsType;
 	/** e.g. "-" */
-	lastind?: AnTreeIconsType;
+	hlink?: AnTreeIconsType;
 }
 
-const defltIcons: IndentIcons = {expand: 'T', collaps: '+', child0: '|-', childx: 'L', linkln: '|', spacex: '.', lastind: '-'};
+const defltIcons: IndentIcons = {expand: 'T', collaps: '+', child0: '|-', childx: 'L', vlink: '|', spacex: '.', hlink: '-'};
 
 interface TreecardProps extends AnTablistProps {
 	/** gallery, card, etc. */
@@ -372,12 +372,12 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
     anReact: AnReactExt;
     editForm: JSX.Element;
+	treetier: StreeTier;
 
 	constructor(props: AnTreeditorProps) {
 		super(props);
 		this.sysName = props.sys || props.sysName || props.name || this.sysName;
 		this.window = props.window;
-
 		this.treetier = props.tier;
 
 		this.th = this.th.bind(this);
@@ -385,9 +385,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.toAddChild = this.toAddChild.bind(this);
 		this.toEditCard = this.toEditCard.bind(this);
-
 		this.treeNodes = this.treeNodes.bind(this);
-
 		this.toSearch = this.toSearch.bind(this);
 	}
 
@@ -405,7 +403,8 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
 
 		let { uri, sk } = this.props;
-		this.anReact.stree({ uri, sk }, this);
+		//this.anReact.stree({ uri, sk }, this);
+		this.treetier.stree({ uri, sk }, this);
 
 		this.editForm = undefined;
 		this.state.expandings.clear();

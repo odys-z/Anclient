@@ -62,7 +62,7 @@ export class App extends React.Component<AlbumProps> {
 		this.nextAction = 're-login',
 		this.hasError = false,
 
-		this.config = Object.assign(this.config, { });
+		this.config = Object.assign({}, this.config);
 
 		Protocol.sk.cbbViewType = 'v-type';
 

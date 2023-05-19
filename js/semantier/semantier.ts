@@ -3,7 +3,7 @@ import { toBool, isEmpty, str } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkVal, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
+	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkVal, NameValue, DatasetOpts, DatasetReq, UIRelations
 } from "./protocol";
 
 export { toBool, isEmpty };
@@ -682,15 +682,17 @@ export class Semantier {
 		client.an.post(jreq, onLoad, errCtx);
 	}
 
-	/** Load jsample.serv dataset. (using DatasetReq or menu.serv).
+	/**
+	 * Load jsample.serv dataset. (using DatasetReq or menu.serv).
 	 * If opts.onOk is provided, will try to bind stree like this:
 	 <pre>
 	let onload = onOk || function (c, resp) {
 		if (compont)
 			compont.setState({stree: resp.Body().forest});
 	}</pre>
-	 *
-	 * @param opts dataset info {sk, sqlArgs, onOk}
+	 * @since 0.9.86 opts.port can be overriden, with which user can modify s-tree service at server side.
+	 * @param opts dataset info {sk, sqlArgs, onOk, port}
+	 * where port is using s-tree if undefined.
 	 * @param client
 	 * @param onLoad
 	 * @param errCtx
@@ -704,7 +706,7 @@ export class Semantier {
 		if (opts.sk && !opts.t)
 			opts.a = stree_t.sqltree;
 
-		opts.port = 'stree';
+		opts.port = opts.port || 'stree';
 
 		Semantier.dataset(opts, client, onLoad, errCtx);
 	}

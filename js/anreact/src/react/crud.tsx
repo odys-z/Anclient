@@ -13,15 +13,14 @@ interface Comprops extends StandardProps<any, string>, UIComponent {
 	/** CRUD, if none of CRUD enum value is correct, use a R to indicate it's read only. */
 	crud?: CRUD;
 
-	/**MUI as default */
-	color?: PropTypes.Color;
-
 	/** Semantier */
-	classes?: ClassNames;
 	readonly tier?: Semantier;
-	readonly width?: Breakpoint;
-
 	ssInf?: SessionInf;
+
+	classes?: ClassNames;
+	/**MUI as default */
+	readonly width?: Breakpoint;
+	color?: PropTypes.Color;
 }
 
 const styles = (theme: Theme) => ( {
