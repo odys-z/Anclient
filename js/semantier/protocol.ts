@@ -405,6 +405,9 @@ export class AnsonMsg<T extends AnsonBody> {
 		return [];
 	}
 
+	/**
+	 * @param json a json object to be deserialized.
+	 */
     constructor(json: any) {
 		if (typeof json !== 'object')
 			throw new Error("AnClient is upgraded, takes only one arg, the json obj.");
@@ -414,7 +417,7 @@ export class AnsonMsg<T extends AnsonBody> {
 			this.header = header;
 		else this.header = new AnHeader(undefined, undefined);
 
-		let [body] = json.body ? json.body : [{}];
+		let [body] = json.body ? json.body : [{}] as any[];
 		let a = body.a;
 
 		// initiating json to class
@@ -1335,6 +1338,10 @@ export class AnTreeNode {
 	parent: string;
 }
 
+/**
+ * type: io.odysz.semantic.ext.AnDatasetResp,
+ * planned to be replaced by DatasetierResp
+ */
 export class AnDatasetResp extends AnsonResp {
 	forest: Array<AnTreeNode>;
 
@@ -1426,7 +1433,7 @@ export class DatasetReq extends QueryReq {
 	 * @param ask
 	 * @returns
 	 */
-	TA(ask: string | any[] | {
+	TA(ask: string | {
 			/** load dataset configured and format into tree with semantics defined by sk. */
 			sqltree: string;
 			/** Reformat the tree structure - reformat the 'fullpath', from the root */
@@ -1507,6 +1514,9 @@ export class DatasetierReq extends AnsonBody {
 }
 Protocol.registerBody(DatasetierReq.__type__, (json) => new DatasetierReq(json));
 
+/**
+ * type: io.odysz.semantic.tier.DatasetierResp
+ */
 export class DatasetierResp extends AnsonResp {
 	static __type__ = "io.odysz.semantic.tier.DatasetierResp";
 	sks: string[];

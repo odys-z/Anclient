@@ -1,7 +1,6 @@
 export * from './utils/consts';
 export * from './utils/langstr';
 export * from './utils/lang-ext';
-export * from './utils/helpers';
 
 export * from './patch/react-portal-overlay';
 

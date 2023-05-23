@@ -123,6 +123,8 @@ interface TreecardProps extends AnTablistProps {
 
 	indentStyle?: IndentIcons;
 
+	parent: AnTreeNode;
+	tnode: AnTreeNode;
 };
 
 interface CssTreeItem extends React.CSSProperties {
@@ -170,7 +172,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	toUp(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
-		let children = p.node.children;
+		let children = p.jnode.children;
 		let me = children.indexOf(n);
 		let elder = me - 1;
 		if (elder >= 0)
@@ -184,7 +186,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	toTop(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
-		let children = p.node.children;
+		let children = p.jnode.children;
 		let me = children.indexOf(n);
 		if (me > 0)
 			// children.swap(me, 0);
@@ -197,7 +199,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	toDown(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
-		let children = p.node.children;
+		let children = p.jnode.children;
 		let me = children.indexOf(n);
 		let younger = me + 1;
 		if (younger < children.length)
@@ -211,7 +213,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	toBottom(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
-		let children = p.node.children;
+		let children = p.jnode.children;
 		let me = children.indexOf(n);
 		if (me < children.length - 1)
 			// children.swap(me, children.length - 1);
@@ -248,7 +250,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 
 	render() {
 		let tnode = this.props.tnode;
-		let n = tnode.node;
+		let n = tnode.jnode;
 		n.css = n.css || {};
 		let { classes } = this.props;
 		return (
@@ -394,6 +396,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		const ctx = this.context as unknown as AnContextType;
 		this.anReact = ctx.uiHelper;
+		this.treetier.client = this.anReact.client;
 		this.toSearch();
 	}
 

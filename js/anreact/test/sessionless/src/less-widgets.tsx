@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode } from '@anclient/semantier';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, DatasetReq, DatasetOpts, UserReq } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs
@@ -45,6 +45,8 @@ class Widgets extends React.Component<LessProps> {
 		servId: '',
 	};
 
+	albumSk = 'album-tree';
+
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
 
@@ -69,6 +71,8 @@ class Widgets extends React.Component<LessProps> {
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 
+		this.inclient.an.understandPorts({album: 'album.less'});
+
 		this.albumtier = new TestreeTier();
 
 		this.anReact = new AnReactExt(this.inclient, this.error)
@@ -79,7 +83,7 @@ class Widgets extends React.Component<LessProps> {
 	}
 
 	onError(c: any, r: AnsonMsg<AnsonResp> ) {
-		console.error(c, r);
+		console.error(c, r.Body().msg(), r);
 		this.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
@@ -109,9 +113,9 @@ class Widgets extends React.Component<LessProps> {
 				ssInf: undefined,
 			}} >
                 <AnTreeditor2 parent={undefined}
-					port='welcomeless' uri={'/less/widgets'}
+					uri={'/less/widgets'}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
-					pk={'NA'} columns={undefined}
+					pk={'NA'} sk={this.albumSk} columns={undefined}
 					onSelectChange={()=> undefined}
 				/>
 				<hr/>
@@ -148,7 +152,6 @@ class TestreeTier extends StreeTier {
 
 	constructor() {
 		super({uri: 'less/widgets', port: 'album'});
-
 	}
 
 	treeroot(): AnTreeNode {
@@ -163,5 +166,18 @@ class TestreeTier extends StreeTier {
 		}
 	}
 }
+
+class AlbumReq extends UserReq {
+	static __type__ = 'io.oz.sandbox.album.AlbumReq';
+	root: string;
+
+	constructor(opts: DatasetOpts & { sk: string; sqlArgs?: string[]; }) {
+		super(opts.uri, undefined, undefined);
+		this.type = AlbumReq.__type__;
+
+		this.root = opts.rootId;
+	}
+}
+StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
 
 export { Widgets };

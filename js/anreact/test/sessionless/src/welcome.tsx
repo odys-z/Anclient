@@ -119,9 +119,12 @@ class WelcomeTier extends Semantier {
 	}
 
 	/**
-	 * @override(Semantier)
+	 * 
+	 * @param conds 
+	 * @param onLoad 
+	 * @returns 
 	 */
-	records<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
+	override records<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
 		this.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
 		onLoad([], this.rows as unknown as Array<T>);
 		return this.rows;
