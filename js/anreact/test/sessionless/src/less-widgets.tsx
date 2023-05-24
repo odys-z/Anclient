@@ -170,12 +170,14 @@ class TestreeTier extends StreeTier {
 class AlbumReq extends UserReq {
 	static __type__ = 'io.oz.sandbox.album.AlbumReq';
 	root: string;
+	sk: string;
 
 	constructor(opts: DatasetOpts & { sk: string; sqlArgs?: string[]; }) {
 		super(opts.uri, undefined, undefined);
 		this.type = AlbumReq.__type__;
 
 		this.root = opts.rootId;
+		this.sk = opts.sk;
 	}
 }
 StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });

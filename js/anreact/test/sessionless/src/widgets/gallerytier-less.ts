@@ -73,7 +73,7 @@ export class GalleryTier extends Semantier {
 				let body = resp.Body() as AlbumResp;
 				if (body) {
 					// let {cols, rows} = AnsonResp.rs2arr(body.Rs());
-					this.collectRecords = body.collectRecords;
+					this.collectRecords = body.collects;
 					onLoad(this.collectRecords);
 				}
 			},
@@ -148,21 +148,22 @@ interface AlbumRec extends Tierec {
 	album?: string;
 
 	/** Collects' ids */
-	collects?: Array<string>;
+	collects?: Array<PhotoCollect>;
 
 	/** Collects' default length (first page size) */
 	collectSize?: number;
 
-	/** Photos ids */
-	photos?: Array<string>;
-
-	/** Photo id */
-	pid?: string;
+	/** Photos ids, but what's for? */
+	collect?: Array<string>;
 }
 
 class AlbumPage extends PageInf {
 	/** A temperoray solution before PageInf.condts evolved to Tierec. */
 	qrec?: AlbumRec;
+
+	collectIds?: string[];
+	pids?: string[];
+	albumId: string | undefined;
 
 	constructor (query?: AlbumRec) {
 		super();
@@ -182,21 +183,18 @@ class AlbumReq extends DocsReq {
 		del: 'd',
 	};
 
-	pageInf: PageInf;
-	albumId: string | undefined;
-	cids?: string[];
-	pids?: string[];
+	pageInf: AlbumPage;
 
 	constructor (uri: string, page: AlbumPage) {
 		super(uri, {docId: ''});
 		this.type = 'io.oz.album.tier.AlbumReq';
 
-		this.pageInf = new PageInf(page);
+		this.pageInf = page;
 
 		if (page.qrec) {
-			this.albumId = page.qrec.album;
-			this.cids = page.qrec.collects;
-			this.pids = page.qrec.photos;
+			this.pageInf.albumId = page.qrec.album;
+			this.pageInf.collectIds = page.qrec.collectIds as string[];
+			this.pageInf.pids = page.qrec.collect;
 		}
 	}
 }
@@ -218,29 +216,22 @@ class Profiles extends AnsonBody {
 Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
 
 class AlbumResp extends AnsonResp {
-	albumId: string;
-	ownerId: string;
-	owner: string;
-	collectRecords: Array<PhotoCollect>;
-	profils: Profiles;
+	album?: AlbumRec;
 
-	photos: Array<PhotoRec[]>;
+	profils?: Profiles;
 
-	clientPaths: object;
-	
-	photo: PhotoRec;
+	collect?: Array<string>;
+	collects?: Array<PhotoCollect>;
 
-	constructor (obj: any) {
+	photo?: PhotoRec;
+
+	constructor (resp: AlbumRec & {profiles?: Profiles, photo?: PhotoRec, collect?: Array<string>}) {
 		super({type: 'io.oz.album.tier.AlbumResp'});
 
-		this.albumId = obj.albumId;
-		this.ownerId = obj.ownerId;
-		this.owner = obj.owner;
-		this.collectRecords = obj.collectRecords;
-		this.profils = obj.profils;
-		this.photos = obj.photos;
-		this.clientPaths = obj.clientPaths;
-		this.photo = obj.photo;
+		this.album = resp;
+		this.collect = resp.collect;
+		this.profils = resp.profiles;
+		this.collects = resp.collects;
 	}
 }
 
