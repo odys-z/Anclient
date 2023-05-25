@@ -45,7 +45,8 @@ class Widgets extends React.Component<LessProps> {
 		servId: '',
 	};
 
-	albumSk = 'album-tree';
+	albumSk = 'tree-album-family-folder';
+	albumUri = '/album/tree';
 
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
@@ -73,7 +74,7 @@ class Widgets extends React.Component<LessProps> {
 
 		this.inclient.an.understandPorts({album: 'album.less'});
 
-		this.albumtier = new TestreeTier();
+		this.albumtier = new TestreeTier(this.albumUri);
 
 		this.anReact = new AnReactExt(this.inclient, this.error)
 				// see jserv-sandbox
@@ -113,9 +114,13 @@ class Widgets extends React.Component<LessProps> {
 				ssInf: undefined,
 			}} >
                 <AnTreeditor2 parent={undefined}
-					uri={'/less/widgets'}
+					uri={this.albumUri}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
-					pk={'NA'} sk={this.albumSk} columns={undefined}
+					pk={'NA'} sk={this.albumSk}
+					columns={[
+						{ type: 'text', field: 'folder', label: L('Folder'),
+						  validator: {len: 200, notNull: true}, grid: {sm: 6} },
+					]}
 					onSelectChange={()=> undefined}
 				/>
 				<hr/>
@@ -150,14 +155,14 @@ class Widgets extends React.Component<LessProps> {
 
 class TestreeTier extends StreeTier {
 
-	constructor() {
-		super({uri: 'less/widgets', port: 'album'});
+	constructor(uri: string) {
+		super({uri, port: 'album'});
 	}
 
 	treeroot(): AnTreeNode {
 		return {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
-			jnode: {
+			node: {
 				nodetype: 'card',
 			},
 			id: 'p0',
@@ -166,20 +171,5 @@ class TestreeTier extends StreeTier {
 		}
 	}
 }
-
-class AlbumReq extends UserReq {
-	static __type__ = 'io.oz.sandbox.album.AlbumReq';
-	root: string;
-	sk: string;
-
-	constructor(opts: DatasetOpts & { sk: string; sqlArgs?: string[]; }) {
-		super(opts.uri, undefined, undefined);
-		this.type = AlbumReq.__type__;
-
-		this.root = opts.rootId;
-		this.sk = opts.sk;
-	}
-}
-StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
 
 export { Widgets };

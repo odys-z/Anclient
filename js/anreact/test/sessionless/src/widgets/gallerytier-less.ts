@@ -1,7 +1,8 @@
 import { Comprops, CrudComp } from '../../../../src/an-components';
-import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq, PageInf, Semantier, SessionClient, Tierec
+import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq, PageInf, Semantier, SessionClient, Tierec, UserReq, AnDatasetResp, AnTreeNode
 } from '@anclient/semantier';
 import { PhotoProps } from '../../../../src/photo-gallery/src/Photo';
+import { StreeTier } from './stree-tier';
 
 const debug = true;
 
@@ -65,7 +66,7 @@ export class GalleryTier extends Semantier {
 		let client = this.client;
 
 		let req = client.userReq( this.uri, this.port,
-					new AlbumReq( this.uri, conds as AlbumPage )
+					new AlbumReq( {uri: this.uri, page: conds} )
 					.A(AlbumReq.A.records) );
 
 		client.commit(req,
@@ -125,9 +126,9 @@ export class GalleryTier extends Semantier {
 	 * @returns 
 	 */
 	imgSrc(recId: string) : string {
-		let req = new AlbumReq(this.uri, this.page);
+		let req = new AlbumReq({uri: this.uri, page: this.page});
 		req.a = AlbumReq.A.download;
-		req.docId = recId;
+		req.pageInf.albumId = recId;
 
 		let msg = this.client.an.getReq<AlbumReq>(this.port, req);
 
@@ -163,7 +164,7 @@ class AlbumPage extends PageInf {
 
 	collectIds?: string[];
 	pids?: string[];
-	albumId: string | undefined;
+	albumId?: string | undefined;
 
 	constructor (query?: AlbumRec) {
 		super();
@@ -171,7 +172,8 @@ class AlbumPage extends PageInf {
 	}
 }
 
-class AlbumReq extends DocsReq {
+class AlbumReq extends UserReq {
+ 	static __type__ = 'io.oz.sandbox.album.AlbumReq';
 	static A = {
 		records: 'r/collects',
 		collect: 'r/photos',
@@ -184,20 +186,24 @@ class AlbumReq extends DocsReq {
 	};
 
 	pageInf: AlbumPage;
+	sk: string;
 
-	constructor (uri: string, page: AlbumPage) {
-		super(uri, {docId: ''});
-		this.type = 'io.oz.album.tier.AlbumReq';
+	constructor (opts: {uri: string, sk?: string, page?: AlbumPage}) {
+		super(opts.uri, undefined);
+		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
 
-		this.pageInf = page;
+		let {page, sk} = opts;
+		this.pageInf = opts.page;
+		this.sk = sk;
 
-		if (page.qrec) {
+		if (page?.qrec) {
 			this.pageInf.albumId = page.qrec.album;
 			this.pageInf.collectIds = page.qrec.collectIds as string[];
 			this.pageInf.pids = page.qrec.collect;
 		}
 	}
 }
+StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
 
 class Profiles extends AnsonBody {
 
@@ -215,7 +221,8 @@ class Profiles extends AnsonBody {
 
 Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
 
-class AlbumResp extends AnsonResp {
+class AlbumResp extends AnDatasetResp {
+	static __type__ = 'io.oz.sandbox.album.AlbumResp';
 	album?: AlbumRec;
 
 	profils?: Profiles;
@@ -225,8 +232,10 @@ class AlbumResp extends AnsonResp {
 
 	photo?: PhotoRec;
 
-	constructor (resp: AlbumRec & {profiles?: Profiles, photo?: PhotoRec, collect?: Array<string>}) {
-		super({type: 'io.oz.album.tier.AlbumResp'});
+	constructor (resp: AlbumRec & {forest: AnTreeNode[], profiles?: Profiles, photo?: PhotoRec, collect?: Array<string>}) {
+		super({
+			forest: resp.forest
+		});
 
 		this.album = resp;
 		this.collect = resp.collect;
@@ -235,4 +244,4 @@ class AlbumResp extends AnsonResp {
 	}
 }
 
-Protocol.registerBody('io.oz.album.tier.AlbumResp', (jsonBd) => { return new AlbumResp(jsonBd); });
+Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });

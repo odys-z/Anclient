@@ -8,7 +8,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
 
-import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, toBool } from "@anclient/semantier";
+import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, toBool, AnsonMsg, AnDatasetResp } from "@anclient/semantier";
 
 import GalleryView from "./gallery-view";
 import { PropTypes, Theme } from "@material-ui/core";
@@ -172,7 +172,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	toUp(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
-		let children = p.jnode.children;
+		let children = p.node.children;
 		let me = children.indexOf(n);
 		let elder = me - 1;
 		if (elder >= 0)
@@ -186,7 +186,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	toTop(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
-		let children = p.jnode.children;
+		let children = p.node.children;
 		let me = children.indexOf(n);
 		if (me > 0)
 			// children.swap(me, 0);
@@ -199,7 +199,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	toDown(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
-		let children = p.jnode.children;
+		let children = p.node.children;
 		let me = children.indexOf(n);
 		let younger = me + 1;
 		if (younger < children.length)
@@ -213,7 +213,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	toBottom(e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
-		let children = p.jnode.children;
+		let children = p.node.children;
 		let me = children.indexOf(n);
 		if (me < children.length - 1)
 			// children.swap(me, children.length - 1);
@@ -250,7 +250,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 
 	render() {
 		let tnode = this.props.tnode;
-		let n = tnode.jnode;
+		let n = tnode.node;
 		n.css = n.css || {};
 		let { classes } = this.props;
 		return (
@@ -264,7 +264,8 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 					if (cx === 0) return (
 						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
 							<Typography noWrap >
-								{this.props.leadingIcons(tnode, false)}
+								{/* {this.props.leadingIcons(tnode, false)} */}
+								{TreeCardComp.levelIcons(this.indentIcons, tnode.level, true, undefined)}
 								{icon(n.css.icon)}
 								{n.text}
 							</Typography>
@@ -406,8 +407,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
 
 		let { uri, sk } = this.props;
-		//this.anReact.stree({ uri, sk }, this);
-		this.treetier.stree({ uri, sk }, this);
+		this.treetier.stree({ uri, sk}, this);
 
 		this.editForm = undefined;
 		this.state.expandings.clear();
@@ -486,8 +486,6 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		return (<div className={classes.forest}>{mtree}</div>);
 
 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts: CompOpts) {
-
-
 		  if (Array.isArray(tnode)) {
 			return tnode.map((i, x) => {
 			  return buildTreegrid(i, parent, compOts);
@@ -495,18 +493,18 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		  }
 		  else if (tnode) {
 			let open = that.state.expandings.has(tnode.id)
-					&& tnode.jnode.children && tnode.jnode.children.length > 0;
-			tnode.jnode.css = tnode.jnode.css || {};
+					&& tnode.node.children && tnode.node.children.length > 0;
+			tnode.node.css = tnode.node.css || {};
 
-		  	console.log(TreeNodeVisual[tnode.jnode.nodetype]);
+		  	console.log(TreeNodeVisual[tnode.node.nodetype]);
 
-			if (that.props.isMidNode(tnode.jnode)) {
+			if (that.treetier.isMidNode(tnode.node)) {
 			  return (
 				<div key={tnode.id} className={classes.folder}>
 				  { that.folderHead(that.props.columns, tnode, open, classes, media) }
 				  { open &&
 					<Collapse in={open} timeout="auto" unmountOnExit>
-						{buildTreegrid(tnode.jnode.children, tnode, compOts)}
+						{buildTreegrid(tnode.node.children, tnode, compOts)}
 					</Collapse>
 				  }
 				</div>
@@ -514,7 +512,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			}
 			else 
 			  return (
-				tnode.jnode.nodetype === TreeNodeVisual[TreeNodeVisual.gallary]
+				tnode.node.nodetype === TreeNodeVisual[TreeNodeVisual.gallary]
 				? <TreeGallary key={tnode.id} aid={tnode.id}
 					tnode={tnode} media
 					{...that.props} parent={parent}
@@ -561,24 +559,24 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 	folderHead(columns=[] as AnTreegridCol[], treenode: AnTreeNode, open: boolean, classes: ClassNames, media: Media) {
 	  let that = this;
-	  let tnode = treenode.jnode;
-	  let n = tnode.node;
+	  let n = treenode.node;
+	  // let n = tnode.node;
 	  n.css = n.css || {};
 	  return (
 		<div
 			onClick={this.toExpandItem}
-			data-nid={tnode.id}
+			data-nid={treenode.id}
 			className={classes.folderHead}
 		>
-		  <Grid container spacing={0} key={tnode.id} >
+		  <Grid container spacing={0} key={treenode.id} >
 			{columns
 				.filter( v => v.hide != true)
 				.map( (col: AnTreegridCol, ix: number) => {
 					if (ix == 0) // row head
 					  return (
-						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography noWrap variant='body2' >
-							{TreeCardComp.levelIcons(that.props.leadingIcons, tnode.level, open, n.expandIcon)}
+							{TreeCardComp.levelIcons(that.props.leadingIcons, treenode.level, open, n.expandIcon)}
 							{icon(n.css.icon)}
 							{n.text}
 							{open ? icon("expand") : icon("collapse")}
@@ -586,20 +584,20 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						</Grid>);
 					else if (col.type === 'actions')
 					  return (
-						<Grid item key={`${tnode.id}.${ix}`} className={classes.actions}>
+						<Grid item key={`${treenode.id}.${ix}`} className={classes.actions}>
 							<Typography noWrap variant='body2' >
 								<Button onClick={this.toEditCard}
-									data-me={tnode.id}
+									data-me={treenode.id}
 									startIcon={<JsampleIcons.Edit />} color="primary" >
 									{media.isMd && L('Edit')}
 								</Button>
-								<Button onClick={this.toDel} data-me={tnode.id}
+								<Button onClick={this.toDel} data-me={treenode.id}
 									startIcon={<JsampleIcons.Delete />} color="secondary" >
 									{media.isMd && L('Delete')}
 								</Button>
-								{( this.props.isMidNode ? this.props.isMidNode(n) : true )
+								{( this.treetier.isMidNode(n) )
 								&& <Button onClick={this.toAddChild}
-										data-me={tnode.id} data-parent={n.parent}
+										data-me={treenode.id} data-parent={n.parent}
 										startIcon={<JsampleIcons.ListAdd />} color="primary" >
 										{media.isMd && L('New')}
 								</Button>}
@@ -608,14 +606,14 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						);
 					else if (col.type === 'formatter' || col.formatter)
 					  return (
-						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography variant='body2' >
 							  {col.formatter(col, treenode, {classes, media}) as ReactNode}
 							</Typography>
 						</Grid>);
 					else
 					  return (
-						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography variant='body2' >
 							{formatFolderDesc(treenode, media)}
 							</Typography>
@@ -626,7 +624,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		);
 
 		function formatFolderDesc(tnode: AnTreeNode, media: Media) {
-			let {text, children} = tnode.jnode;
+			let {text, children} = tnode.node;
 
 			if (children)
 				children = `[${media.isMd ? 'children' : ''} ${children.length}]` as unknown as AnTreeNode[];

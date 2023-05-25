@@ -1323,8 +1323,8 @@ export class AnSessionResp extends AnsonResp {
 /** Tree data node */
 export class AnTreeNode {
 	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	/** json data node */
-	jnode : {
+	/** json data node, for ui node composition */
+	node : {
 		nodetype?: string;
 		// id: string;
 		children?: Array<AnTreeNode>;

@@ -1,4 +1,4 @@
-import { Semantier, DatasetOpts, isEmpty, UIComponent, AnDatasetResp, AnsonMsg, Protocol, UserReq, LogAct } from "@anclient/semantier";
+import { Semantier, DatasetOpts, isEmpty, UIComponent, AnDatasetResp, AnsonMsg, Protocol, UserReq, LogAct, PageInf } from "@anclient/semantier";
 import { Comprops, CrudComp } from "../../../../src/react/crud";
 import { AnContextType } from "../../../../src/an-components";
 
@@ -8,8 +8,8 @@ import { AnContextType } from "../../../../src/an-components";
  * A helper of binding tree data to anreact Treeditor.
  */
 export class StreeTier extends Semantier {
-    static reqFactories: {[t: string]: (v: DatasetOpts & {sk: string, sqlArgs?: string[]}) => UserReq} = {};
-    static registTierequest(port: string, factory: (v: DatasetOpts & {sk: string, sqlArgs?: string[]}) => UserReq) {
+    static reqFactories: {[t: string]: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => UserReq} = {};
+    static registTierequest(port: string, factory: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => UserReq) {
         if (this.reqFactories[port])
             console.warn("Replacing new facotry of ", port, factory);
 
@@ -66,4 +66,8 @@ export class StreeTier extends Semantier {
         let context = comp.context as AnContextType;
 		this.client.an.post(jreq, onload, context.error);
     }
+
+	isMidNode(n: {nodetype?: string} | undefined) {
+		return n && (n.nodetype === 'cate' || !n.nodetype);
+	}
 }
