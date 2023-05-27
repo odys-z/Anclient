@@ -2,13 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, DatasetReq, DatasetOpts, UserReq } from '@anclient/semantier';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, DatasetReq, DatasetOpts, UserReq, SessionClient } from '@anclient/semantier';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs
+	AnContext, AnError, AnReactExt, jsample, JsonServs, Login
 } from '../../../src/an-components';
 import { AnTreeditor2 } from './widgets/treeditor';
 import { StreeTier } from './widgets/stree-tier';
+import { Button } from '@material-ui/core';
 
 const { JsampleTheme } = jsample;
 
@@ -25,12 +26,12 @@ type LessProps = {
  */
 class Widgets extends React.Component<LessProps> {
 	/** {@link InsercureClient} */
-	inclient: Inseclient;
+	ssclient: SessionClient;
 	anReact: AnReactExt;  // helper for React
 
 	albumtier: TestreeTier;
 
-	error: ErrorCtx;
+	errctx: ErrorCtx;
 
 	state = {
 		hasError: false,
@@ -43,6 +44,8 @@ class Widgets extends React.Component<LessProps> {
 		servs: undefined,
 		/** the serv id for picking url */
 		servId: '',
+
+		reload: false
 	};
 
 	albumSk = 'tree-album-family-folder';
@@ -55,13 +58,14 @@ class Widgets extends React.Component<LessProps> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.onLogin = this.onLogin.bind(this);
 
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
 
-		this.inclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
+		this.ssclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
 
-		this.error = {onError: this.onError, msg: ''};
+		this.errctx = {onError: this.onError, msg: ''};
 
 		this.state = Object.assign(this.state, {
 			nextAction: 're-login',
@@ -72,11 +76,16 @@ class Widgets extends React.Component<LessProps> {
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 
-		this.inclient.an.understandPorts({album: 'album.less'});
+		this.ssclient = new SessionClient();
+		this.ssclient.an.init(this.state.servs[this.props.servId]);
+
+		this.anReact  = new AnReactExt(this.ssclient, this.errctx)
+							.extendPorts({album: 'album.less'});
+
 
 		this.albumtier = new TestreeTier(this.albumUri);
 
-		this.anReact = new AnReactExt(this.inclient, this.error)
+		this.anReact = new AnReactExt(this.ssclient, this.errctx)
 				// see jserv-sandbox
 				.extendPorts({
 					gallerytier: "gallerytree.less",
@@ -85,7 +94,7 @@ class Widgets extends React.Component<LessProps> {
 
 	onError(c: any, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r.Body().msg(), r);
-		this.error.msg = r.Body().msg();
+		this.errctx.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
 			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
@@ -98,23 +107,36 @@ class Widgets extends React.Component<LessProps> {
 		this.setState({hasError: false});
 	}
 
+	/**
+	 * Login as test robot.
+	 * @param _e 
+	 */
+	onLogin(_e: React.UIEvent): void {
+		this.ssclient = new SessionClient(); // rebuild token
+		this.setState({reload: true});
+	}
+
 	render() {
+	  let reload =this.state.reload;
+	  this.state.reload = false;
+
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				anClient: this.inclient,
+				anClient: this.ssclient,
 				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
-				error: this.error,
+				error: this.errctx,
 				ssInf: undefined,
 			}} >
+				<Login onLoginOk={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
                 <AnTreeditor2 parent={undefined}
-					uri={this.albumUri}
+					uri={this.albumUri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[
@@ -127,7 +149,7 @@ class Widgets extends React.Component<LessProps> {
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={"/login"} tier={undefined}
-							title={L('Error')} msg={this.error.msg} />}
+							title={L('Error')} msg={this.errctx.msg} />}
 				<hr/>
                 {Date().toString()}
 			</AnContext.Provider>

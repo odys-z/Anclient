@@ -4,6 +4,7 @@ import { AnsonMsg, AnsonResp, SessionClient } from '../../../semantier/anclient'
 import { AnContext, AnError, AnReact, L, Login } from '../../../anreact/src/an-components';
 import { Comprops } from '../../../anreact/src/react/crud';
 import { AnreactAppOptions, JsonServs } from '../../../anreact/src/an-components';
+import { SessionInf } from '@anclient/semantier/anclient';
 
 const styles = (theme) => ({
 	root: {
@@ -55,7 +56,7 @@ class LoginApp extends React.Component<LoginProps> {
 		this.setState({hasError: false});
 	}
 
-	onLogin(clientInf: { ssInf: { home: string; }; }) {
+	onLogin(clientInf: { ssInf: SessionInf & {home?: string} }) {
 		SessionClient.persistorage(clientInf.ssInf);
 		if (this.props.iparent) {
 			let mainpage = clientInf.ssInf.home || this.props.ihome;
@@ -74,7 +75,7 @@ class LoginApp extends React.Component<LoginProps> {
 				pageOrigin: window ? window.origin : 'localhost',
 				ssInf: undefined,
 				ihome: '',
-				// anReact: undefined,
+				uiHelper: undefined,
 				servId: this.state.servId,
 				servs: this.props.servs,
 				anClient: this.anClient,
@@ -82,7 +83,7 @@ class LoginApp extends React.Component<LoginProps> {
 				iparent: this.props.iparent,
 				error: this.errCtx,
 			}} >
-				<Login onLoginOk={this.onLogin}/>
+				<Login onLoginOk={this.onLogin} />
 				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} title={L('Error')} msg={this.errCtx.msg} />}
 			</AnContext.Provider>
 		);

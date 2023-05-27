@@ -8,7 +8,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
 
-import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, toBool, AnsonMsg, AnDatasetResp } from "@anclient/semantier";
+import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, toBool } from "@anclient/semantier";
 
 import GalleryView from "./gallery-view";
 import { PropTypes, Theme } from "@material-ui/core";
@@ -148,7 +148,7 @@ export interface AnreactreeItem {
 
 class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem {
 	state = {
-		showCarousel: false
+		showCarousel: false,
 	}
 
 	vistype: TreeNodeVisual;
@@ -351,6 +351,8 @@ export { TreeGallary, TreeGallaryComp }
 interface AnTreeditorProps extends AnTablistProps {
 	columns: Array<AnTreegridCol>;
 	tier: StreeTier;
+
+	reload: boolean;
 }
 
 interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
@@ -368,6 +370,8 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		forest: [] as AnTreeNode[],
 
 		expandings: new Set(),
+
+		tobeLoad: true
 	};
 
     sysName: '';
@@ -398,7 +402,9 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		const ctx = this.context as unknown as AnContextType;
 		this.anReact = ctx.uiHelper;
 		this.treetier.client = this.anReact.client;
-		this.toSearch();
+		if (this.props.reload && this.state.tobeLoad) {
+			this.toSearch();
+		}
 	}
 
 	toSearch() {
@@ -407,6 +413,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
 
 		let { uri, sk } = this.props;
+		this.state.tobeLoad = false;
 		this.treetier.stree({ uri, sk}, this);
 
 		this.editForm = undefined;
@@ -642,6 +649,11 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		const { classes, width } = this.props;
 
 		let media = CrudCompW.getMedia(width);
+
+		if (this.props.reload && this.state.tobeLoad) {
+			this.toSearch();
+			this.state.tobeLoad = false;
+		}
 
 		return (
 			<div className={classes.root}>

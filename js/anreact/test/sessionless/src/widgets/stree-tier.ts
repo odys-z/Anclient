@@ -1,4 +1,4 @@
-import { Semantier, DatasetOpts, isEmpty, UIComponent, AnDatasetResp, AnsonMsg, Protocol, UserReq, LogAct, PageInf } from "@anclient/semantier";
+import { Semantier, DatasetOpts, isEmpty, UIComponent, AnDatasetResp, AnsonMsg, Protocol, UserReq, LogAct, PageInf, SessionClient } from "@anclient/semantier";
 import { Comprops, CrudComp } from "../../../../src/react/crud";
 import { AnContextType } from "../../../../src/an-components";
 
@@ -58,6 +58,9 @@ export class StreeTier extends Semantier {
 		 	throw Error('Decision since @anclient/anreact 0.4.25, port name is needed to load a tree.');
         if (!StreeTier.reqFactories[opts.port])
 		 	throw Error('User request factory must registered. Need request factory for port:' + opts.port);
+        
+        if (!(this.client instanceof SessionClient))
+            throw Error('Needing a intance of AnClient.');
 
 		let reqbody = StreeTier.reqFactories[opts.port](opts).A(StreeTier.A.stree);
 

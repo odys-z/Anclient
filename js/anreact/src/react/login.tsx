@@ -23,6 +23,9 @@ const styles = (theme) => Object.assign(jstyles(theme), {
 
 interface LoginProps extends Comprops {
 	onLogin: OnCommitOk;
+
+	/** Default pswd and user-id, usually for debug. */
+	config: {pswd?: string, userid?: string}
 }
 
 /**
@@ -52,7 +55,7 @@ class LoginComp extends React.Component<LoginProps> {
 	};
 
 	/**
-	 * initialize a instance of Anclient visition jserv service.
+	 * Initialize an instance of Anclient with which visiting jserv service.
 	 * @param props
 	 * @param props.jserv e.g. "http://127.0.0.1:8080/jserv-quiz"); url to the jserv web root.
 	 * @constructor
@@ -61,6 +64,8 @@ class LoginComp extends React.Component<LoginProps> {
 		super(props);
 
 		this.an = an;
+
+		this.config = Object.assign(this.config, props.config);
 
 		this.state = {userId: this.config.userid, pswd: this.config.pswd};
 
