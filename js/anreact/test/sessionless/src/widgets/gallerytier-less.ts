@@ -1,5 +1,6 @@
 import { Comprops, CrudComp } from '../../../../src/an-components';
-import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq, PageInf, Semantier, SessionClient, Tierec, UserReq, AnDatasetResp, AnTreeNode
+import { Protocol, AnsonMsg, AnsonBody, PageInf,
+	Semantier, SessionClient, Tierec, UserReq, AnDatasetResp, AnTreeNode
 } from '@anclient/semantier';
 import { PhotoProps } from '../../../../src/photo-gallery/src/Photo';
 import { StreeTier } from './stree-tier';

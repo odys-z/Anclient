@@ -6,7 +6,7 @@ import React from 'react';
 	import TextField from '@material-ui/core/TextField';
 	import Box from '@material-ui/core/Box';
 
-import { AnClient, AnsonMsg, AnsonResp, OnCommitOk, Protocol } from '@anclient/semantier';
+import { AnClient, AnsonMsg, AnsonResp, OnCommitOk, OnLoginOk, Protocol } from '@anclient/semantier';
 
 import { an, SessionClient } from '@anclient/semantier';
 	import {AnContext, AnContextType} from './reactext';
@@ -22,7 +22,9 @@ const styles = (theme) => Object.assign(jstyles(theme), {
 });
 
 interface LoginProps extends Comprops {
-	onLogin: OnCommitOk;
+	/** Providing a callback to handle login-ok event will override auto re-direction. */
+	onLogin?: OnLoginOk;
+	// onLogin: OnCommitOk;
 
 	/** Default pswd and user-id, usually for debug. */
 	config: {pswd?: string, userid?: string}
@@ -69,9 +71,13 @@ class LoginComp extends React.Component<LoginProps> {
 
 		this.state = {userId: this.config.userid, pswd: this.config.pswd};
 
+		// backward tolerence
+		if (!props.onLogin && props.onLoginOk)
+			throw Error("LoginProps.onLoginOk is renamed to onLogin");
+
 		this.alert = this.alert.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.onLogin = this.onLogin.bind(this);
+		this.toLogin = this.toLogin.bind(this);
 	}
 
 	componentDidMount() {
@@ -93,9 +99,8 @@ class LoginComp extends React.Component<LoginProps> {
 	 * Login and go main page (sys.jsx). Target html page is first specified by
 	 * login.serv (SessionInf.home).
 	 */
-	onLogin() {
+	toLogin() {
 		let that = this;
-		// console.log(that.context);
 		let uid = this.state.userId;
 		let pwd = this.state.pswd;
 		if (!uid || !pwd) {
@@ -117,8 +122,9 @@ class LoginComp extends React.Component<LoginProps> {
 		function reload (client: SessionClient) {
 			that.ssClient = client;
 			that.setState( {loggedin: true} );
-			if (typeof that.props.onLoginOk === 'function')
-				that.props.onLoginOk(client);
+			if (typeof that.props.onLogin === 'function')
+				// that.props.onLoginOk(client);
+				that.props.onLogin(client);
 			else if (ctx.iparent) {
 				ctx.ssInf = client.ssInf;
 				SessionClient.persistorage(client.ssInf);
@@ -163,7 +169,7 @@ class LoginComp extends React.Component<LoginProps> {
 			<Box display={!this.config.show ? "flex" : "none"}>
 				<Button variant="contained" color="primary"
 						style={{'whiteSpace': 'nowrap'}}
-						onClick={() => { this.setState({show: !this.config.show}) } } >
+						onClick={() => { that.setState({show: !that.config.show}) } } >
 					{this.config.show ? L('Cancel') : L('Login')}
 				</Button>
 			</Box>
@@ -178,13 +184,13 @@ class LoginComp extends React.Component<LoginProps> {
 					id="pswd" label={L("Password")}
 					type="password"
 					autoComplete="new-password"
-					onKeyUp={(e) => {if (e.code === "Enter") that.onLogin();} }
+					onKeyUp={(e) => {if (e.code === "Enter") that.toLogin();} }
 					defaultValue={this.config.pswd}
 					onChange={event => this.setState({pswd: event.target.value})} />
 				<Button className={classes.field2}
 					variant="contained"
 					color="primary"
-					onClick={this.onLogin} >{L('Login')}</Button>
+					onClick={this.toLogin} >{L('Login')}</Button>
 			</Collapse>
 			{this.confirm}
 		</div>);
@@ -193,4 +199,4 @@ class LoginComp extends React.Component<LoginProps> {
 LoginComp.contextType = AnContext;
 
 const Login = withStyles(styles)(LoginComp);
-export { Login, LoginComp };
+export { Login, LoginComp, LoginProps };

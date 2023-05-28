@@ -9,7 +9,6 @@ import { L, Langstrs,
 } from '../../../src/an-components';
 import { AnTreeditor2 } from './widgets/treeditor';
 import { StreeTier } from './widgets/stree-tier';
-import { Button } from '@material-ui/core';
 
 const { JsampleTheme } = jsample;
 
@@ -63,7 +62,7 @@ class Widgets extends React.Component<LessProps> {
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
 
-		this.ssclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
+		// this.ssclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
 
 		this.errctx = {onError: this.onError, msg: ''};
 
@@ -76,20 +75,14 @@ class Widgets extends React.Component<LessProps> {
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 
-		this.ssclient = new SessionClient();
-		this.ssclient.an.init(this.state.servs[this.props.servId]);
-
-		this.anReact  = new AnReactExt(this.ssclient, this.errctx)
-							.extendPorts({album: 'album.less'});
-
-
-		this.albumtier = new TestreeTier(this.albumUri);
-
-		this.anReact = new AnReactExt(this.ssclient, this.errctx)
-				// see jserv-sandbox
-				.extendPorts({
-					gallerytier: "gallerytree.less",
-				});
+		/* AnClient won't work like this as the client need to be built after logged in.
+		 *
+			this.ssclient = new SessionClient();
+			this.ssclient.an.init(this.state.servs[this.props.servId]);
+			this.anReact  = new AnReactExt(this.ssclient, this.errctx)
+								.extendPorts({album: 'album.less'});
+			this.albumtier = new TestreeTier(this.albumUri);
+		*/
 	}
 
 	onError(c: any, r: AnsonMsg<AnsonResp> ) {
@@ -108,11 +101,23 @@ class Widgets extends React.Component<LessProps> {
 	}
 
 	/**
-	 * Login as test robot.
-	 * @param _e 
+	 * Login as test robot, which is accutally a session based IUser instance.
+	 * 
+	 * Build AnClient & Semantier here, which is the same scenario of opening home page after logged in. 
+	 * 
+	 * TODO doc: this is another style of intitializing AnClient and SessionClient.
+	 * 
+	 * @param c 
 	 */
-	onLogin(_e: React.UIEvent): void {
-		this.ssclient = new SessionClient(); // rebuild token
+	onLogin(c: SessionClient): void {
+		this.ssclient = c;
+		this.ssclient.an.init(this.state.servs[this.props.servId]);
+
+		this.anReact  = new AnReactExt(this.ssclient, this.errctx)
+							.extendPorts({album: 'album.less'});
+
+		this.albumtier = new TestreeTier(this.albumUri, c);
+
 		this.setState({reload: true});
 	}
 
@@ -134,8 +139,8 @@ class Widgets extends React.Component<LessProps> {
 				error: this.errctx,
 				ssInf: undefined,
 			}} >
-				<Login onLoginOk={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
-                <AnTreeditor2 parent={undefined}
+				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
+                {this.albumtier && <AnTreeditor2 parent={undefined}
 					uri={this.albumUri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
@@ -143,8 +148,8 @@ class Widgets extends React.Component<LessProps> {
 						{ type: 'text', field: 'folder', label: L('Folder'),
 						  validator: {len: 200, notNull: true}, grid: {sm: 6} },
 					]}
-					onSelectChange={()=> undefined}
-				/>
+					onSelectChange={()=>{}}
+				/>}
 				<hr/>
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
@@ -177,8 +182,9 @@ class Widgets extends React.Component<LessProps> {
 
 class TestreeTier extends StreeTier {
 
-	constructor(uri: string) {
+	constructor(uri: string, client?: SessionClient) {
 		super({uri, port: 'album'});
+		this.client = client;
 	}
 
 	treeroot(): AnTreeNode {

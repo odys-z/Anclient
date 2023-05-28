@@ -1,4 +1,4 @@
-import { SessionInf } from './anclient';
+import { SessionClient, SessionInf } from './anclient';
 import { str } from './helpers';
 import * as CSS from 'csstype';
 import { Tierec } from './semantier';
@@ -9,6 +9,8 @@ export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
  * T is the record type
  */
 export type OnLoadOk<T extends Tierec> = (cols: Array<string>, rows: Array<T>) => void
+
+export type OnLoginOk = (resp: SessionClient) => void
 
 export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 

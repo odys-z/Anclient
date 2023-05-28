@@ -6,7 +6,7 @@ import AES from './aes';
 import {
 	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
 	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
-	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV
+	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV, OnLoginOk
 } from './protocol';
 import { ErrorCtx, Tierec, isEmpty, len } from './semantier';
 
@@ -75,6 +75,7 @@ class AnClient {
      * @retun this */
 	init (urlRoot: string) : this {
 		this.cfg.defaultServ = urlRoot;
+		console.info("AnClient initialized with url-root:", urlRoot);
         return this;
 	}
 
@@ -105,27 +106,30 @@ class AnClient {
      * @param onError error handler
      */
 	login (usrId: string, pswd: string,
-		onLogin: { (ssClient: any): void; (arg0: SessionClient): void; },
+		// onLogin: { (ssClient: any): void; (arg0: SessionClient): void; },
+		onLogin: OnLoginOk,
 		onError: ErrorCtx): this {
 
 		let iv = aes.getIv128() as unknown as Uint8Array;
 		let cpwd = aes.encrypt(usrId, pswd, iv);
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
 
+		let that = this;
 		this.post(req,
 			/**@param {object} resp
 			 * code: "ok"
 			 * data: Object { uid: "admin", ssid: "3sjUJk2JszDm", "user-name": "admin" }
 			 * port: "session"
 			 */
-			function(resp) {
+			(resp: AnsonMsg<AnsonResp>) => {
 				let ssInf = resp.Body().ssInf;
 				ssInf.jserv = an.cfg.defaultServ;
 				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
-				sessionClient.an = this;
+				sessionClient.an = that;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
-				else console.log(sessionClient);
+				else
+					console.log(sessionClient);
 			},
 			onError);
 		return this;

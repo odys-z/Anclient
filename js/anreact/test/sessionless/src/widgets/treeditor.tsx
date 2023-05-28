@@ -131,7 +131,7 @@ interface CssTreeItem extends React.CSSProperties {
     align: string
 }
 
-export enum TreeNodeVisual { card, gallary };
+export enum TreeNodeVisual { card, gallery };
 
 export interface AnreactreeItem {
 	node: AnTreeNode;
@@ -328,7 +328,7 @@ class TreeGallaryComp extends TreeCardComp {
 
 	constructor(props: TreecardProps) {
 		super(props);
-		this.vistype = TreeNodeVisual.gallary;
+		this.vistype = TreeNodeVisual.gallery;
 
 		this.tier = props.tier as GalleryTier;
 		this.node = props.tnode;
@@ -519,7 +519,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			}
 			else 
 			  return (
-				tnode.node.nodetype === TreeNodeVisual[TreeNodeVisual.gallary]
+				tnode.node.nodetype === TreeNodeVisual[TreeNodeVisual.gallery]
 				? <TreeGallary key={tnode.id} aid={tnode.id}
 					tnode={tnode} media
 					{...that.props} parent={parent}
