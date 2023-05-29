@@ -1,4 +1,6 @@
-import { Semantier, DatasetOpts, isEmpty, UIComponent, AnDatasetResp, AnsonMsg, Protocol, UserReq, LogAct, PageInf, SessionClient } from "@anclient/semantier";
+import { Semantier, DatasetOpts, isEmpty, UIComponent,
+    AnDatasetResp, AnsonMsg, Protocol, UserReq,
+    LogAct, PageInf, SessionClient, DatasetierReq } from "@anclient/semantier";
 import { Comprops, CrudComp } from "../../../../src/react/crud";
 import { AnContextType } from "../../../../src/an-components";
 
@@ -17,9 +19,6 @@ export class StreeTier extends Semantier {
 
         Protocol.registerBody(factory({uri: '', sk: ''}).type, factory);
     }
-    static A = {
-        stree: 'r',
-    }
 
     /** DESIGN MEMO: Once semantier can be generated, port will be force to be required. */
     port: string;
@@ -29,7 +28,7 @@ export class StreeTier extends Semantier {
      * @param opts uri: client id; port: jserv port
      * DESIGN MEMO: Once semantier can be generated, port will be force to be required.
      */
-    constructor(opts: UIComponent & {uri: string, port: string}) {
+    constructor(opts: UIComponent & {uri: string, port?: string}) {
         super(opts);
         this.port = opts.port || 'stree';
     }
@@ -57,12 +56,12 @@ export class StreeTier extends Semantier {
         if (!opts.port)
 		 	throw Error('Decision since @anclient/anreact 0.4.25, port name is needed to load a tree.');
         if (!StreeTier.reqFactories[opts.port])
-		 	throw Error('User request factory must registered. Need request factory for port:' + opts.port);
+		 	throw Error("User request's factory must registered. Need factory for port: " + opts.port);
         
         if (!(this.client instanceof SessionClient))
             throw Error('Needing a intance of AnClient.');
 
-		let reqbody = StreeTier.reqFactories[opts.port](opts).A(StreeTier.A.stree);
+		let reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 

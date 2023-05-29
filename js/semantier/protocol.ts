@@ -36,8 +36,8 @@ export class PageInf {
 	size?: number;
 	total?: number;
 
-	/** @deprected replaced by condtRec */
-	condts?: Array<string[]>;
+	/** Read via {@link PageInf#condtsRec()} */
+	private condts?: Array<string[]>;
 
 	constructor(page?: number | PageInf, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.transact.sql.PageInf';
@@ -1506,7 +1506,8 @@ export class DatasetierReq extends AnsonBody {
 	static __type__ = "io.odysz.semantic.tier.DatasetierReq";
 
     static A = {
-        sks: 'r/sks'
+        sks: 'r/sks',
+		stree: 'r/stree'
     };
 
     constructor(opts: any) {

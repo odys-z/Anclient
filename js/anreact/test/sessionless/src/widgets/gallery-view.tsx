@@ -5,46 +5,63 @@ import Gallery, { PhotoSlide } from '../../../../src/photo-gallery/src/Gallery';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-import { isEmpty } from "@anclient/semantier";
-import { AnContextType, Comprops, CrudCompW } from '../../../../src/an-components';
-import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
+import { AnTreeNode, isEmpty } from "@anclient/semantier";
+import { AlbumTier, PhotoCollect, PhotoRec } from './album-tier';
+import { Comprops, CrudCompW } from '../../../../src/react/crud';
 
 const _photos = [];
 
-export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
-	tier: GalleryTier | undefined;
+export default class GalleryView extends CrudCompW<Comprops & {tier: AlbumTier, cid: string, photos?: AnTreeNode[]}> {
+	tier: AlbumTier | undefined;
 	classes: any;
 	uri: any;
 	currentImx: number = -1;
 	showCarousel: boolean = false;
-	album: PhotoCollect[] | undefined;
-	aid: string;
+
+	cid: string;
+	photos: PhotoCollect | undefined; 
+	albumtier: AlbumTier;
 	
-	constructor(props: Comprops & {aid: string}) {
+	constructor(props: Comprops & {tier: AlbumTier, cid?: string, photos?: AnTreeNode[]}) {
 		super(props);
 
 		this.classes = props.classes;
 		this.uri = props.uri;
-		this.aid = props.aid;
+		this.cid = props.cid;
+
+		this.albumtier = props.tier;
 
 		this.openLightbox = this.openLightbox.bind(this);
 		this.closeLightbox = this.closeLightbox.bind(this);
+		this.parse = this.parse.bind(this);
 	}
 
 	componentDidMount() {
 		let uri = this.uri;
-		let that = this;
 		console.log("super.uri", uri);
 
+		this.photos = this.parse(this.props.tnode.node.children);
+		/*
+		let that = this;
 		let client = (this.context as AnContextType).anClient;
-
 		this.tier = new GalleryTier({uri, comp: this, client, album: this.aid})
 					.setContext(this.context) as GalleryTier;
 
-		this.tier.myAlbum((collects?: PhotoCollect[]) => {
-			that.album = collects;
+		this.tier.collect((collect?: PhotoCollect) => {
+			that.collect = collect;
 			that.setState({});
 		});
+		*/
+	}
+
+	parse(nodes: AnTreeNode[]) {
+		let photos = [] as PhotoRec[];
+		nodes?.forEach( (p, x) => {
+			// photos.push({src: p.node.pid, width: 60, height: 48});
+			photos.push({src: this.albumtier.imgSrc(p.node.pid), width: p.node.width, height: p.node.height});
+		});
+
+		return {photos};
 	}
 
 	openLightbox (event: React.MouseEvent, photo: PhotoSlide<{}>) {
@@ -61,7 +78,6 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 	};
 
 	gallery(photos: Array<PhotoRec>) {
-		// let photos = collections[0].photos;
 		return (
 		  <div>
 			{this.showCarousel &&
@@ -70,8 +86,7 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
-			{this.tier &&
-			  <Gallery<PhotoRec> photos={photos}
+			<Gallery<PhotoRec> photos={photos}
 			  	onClick={this.openLightbox}
 				targetRowHeight={containerWidth => {
 					if (containerWidth < 320)
@@ -93,7 +108,7 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 					else
 						return 12;
 				} }
-			/>}
+			/>
 		  </div>
 		);
 	}
@@ -115,9 +130,11 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 	}
 
 	render() {
-		let photos = this.tier?.toGalleryImgs(0) || _photos;
-		return (<div>Album Example - Clicke to show large photo
-			{this.tier && this.gallery( photos )}
+		// let photos = this.tier?.toGalleryImgs(0) || _photos;
+		let phs = this.photos?.photos || _photos;
+		return (<div>
+			{(this.photos?.title || ' - ') + ` [${phs.length}]`}
+			{this.gallery( phs )}
 		</div>);
 	}
 }

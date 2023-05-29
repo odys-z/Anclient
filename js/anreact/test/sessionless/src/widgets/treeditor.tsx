@@ -21,7 +21,7 @@ import { AnTreeIcons, AnTreeIconsType } from "../../../../src/react/widgets/tree
 import { AnContext, AnContextType } from "../../../../src/react/reactext";
 import { SimpleForm } from "../../../../src/react/widgets/simple-form";
 import { L } from "../../../../src/utils/langstr";
-import { GalleryTier } from "./gallerytier-less";
+import { AlbumTier } from "./album-tier";
 
 import { photos as _photos } from "./temp-photos";
 import { StreeTier } from "./stree-tier";
@@ -69,7 +69,7 @@ const styles = (theme: Theme) => ({
   }
 });
 
-/* experimental
+/* experimental for next L function.
 const R_ = [
   {
 	edit: 'a',
@@ -81,10 +81,13 @@ const R_ = [
 ]
 
 class R {
+	/** jsdoc ... * /
 	static lang = 0;
 	static edit = R_[R.lang].edit;
 	static add  = R_[R.lang].add
 }
+
+R.lang;
 */
 
 /**
@@ -131,7 +134,12 @@ interface CssTreeItem extends React.CSSProperties {
     align: string
 }
 
-export enum TreeNodeVisual { card, gallery };
+export enum TreeNodeVisual {
+	/** data item presented by {@link TreeCard} */
+	card,
+	/** container */
+	gallery
+};
 
 export interface AnreactreeItem {
 	node: AnTreeNode;
@@ -322,7 +330,7 @@ const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCar
 export { TreeCard, TreeCardComp }
 
 class TreeGallaryComp extends TreeCardComp {
-	tier: GalleryTier;
+	tier: AlbumTier;
 	/** pic collection id */
 	collect: string;
 
@@ -330,7 +338,7 @@ class TreeGallaryComp extends TreeCardComp {
 		super(props);
 		this.vistype = TreeNodeVisual.gallery;
 
-		this.tier = props.tier as GalleryTier;
+		this.tier = props.tier as AlbumTier;
 		this.node = props.tnode;
 	}
 
@@ -341,7 +349,12 @@ class TreeGallaryComp extends TreeCardComp {
 	// toBottom: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 
 	render() {
-		return (<GalleryView port='album' uri={this.uri} aid={this.collect}/>);
+		return (<GalleryView {... this.props}
+				ref={undefined} // suppress type error
+				tier={this.tier}
+				uri={this.uri} cid={this.collect}
+				photos={this.props.tnode.node.children} // or fire a request to get photos?
+			/>);
 	}
 }
 
@@ -353,6 +366,8 @@ interface AnTreeditorProps extends AnTablistProps {
 	tier: StreeTier;
 
 	reload: boolean;
+
+	nodeFormatter?: (n: AnTreeNode, parent: ReactNode, opts: CompOpts) => ReactNode;
 }
 
 interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
@@ -360,7 +375,7 @@ interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
 	 * Overide AnTablistProps#formatter
 	 * Formatt a tree item cell/grid from col and node.
 	 */
-	formatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => UIComponent;
+	colFormatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => UIComponent;
 }
 
 class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
@@ -517,25 +532,33 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 				</div>
 			  );
 			}
-			else 
+			else {
+			  let v = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
 			  return (
-				tnode.node.nodetype === TreeNodeVisual[TreeNodeVisual.gallery]
-				? <TreeGallary key={tnode.id} aid={tnode.id}
+				v === TreeNodeVisual[TreeNodeVisual.gallery]
+				? <TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)  
+					key={tnode.id} tier={that.treetier as AlbumTier}
 					tnode={tnode} media
-					{...that.props} parent={parent}
+					parent={parent}
 					indentStyle={Object.assign(defltIcons, that.props.indentIcons)}
 					delete={that.toDel}
 					onUpdate={that.toEditCard}
 				  />
-				: <TreeCard key={tnode.id}
+				: v === TreeNodeVisual[TreeNodeVisual.card]
+				? <TreeCard {...that.props}
+					key={tnode.id}
 					tnode={tnode} media
-					{...that.props} parent={parent}
+					parent={parent}
 					toEdit={that.toEditCard}
 					indentStyle={Object.assign(defltIcons, that.props.indentIcons)}
 					delete={that.toDel}
 					onUpdate={that.toEditCard}
 				  />
+				: that.props.nodeFormatter
+				? that.props.nodeFormatter(tnode, parent, compOpts)
+				: <>Unhandled tnode, id: {tnode.id}, visual type: {v}</>
 			  );
+			}
 		  }
 		}
 	}

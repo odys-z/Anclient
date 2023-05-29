@@ -2,13 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, DatasetReq, DatasetOpts, UserReq, SessionClient } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs, Login
+	AnContext, AnError, AnReactExt, jsample, JsonServs, Login, CrudComp
 } from '../../../src/an-components';
 import { AnTreeditor2 } from './widgets/treeditor';
 import { StreeTier } from './widgets/stree-tier';
+import { AlbumTier } from './widgets/album-tier';
 
 const { JsampleTheme } = jsample;
 
@@ -48,7 +49,7 @@ class Widgets extends React.Component<LessProps> {
 	};
 
 	albumSk = 'tree-album-family-folder';
-	albumUri = '/album/tree';
+	uri = '/album/tree';
 
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
@@ -116,7 +117,7 @@ class Widgets extends React.Component<LessProps> {
 		this.anReact  = new AnReactExt(this.ssclient, this.errctx)
 							.extendPorts({album: 'album.less'});
 
-		this.albumtier = new TestreeTier(this.albumUri, c);
+		this.albumtier = new TestreeTier(this.uri, this, c);
 
 		this.setState({reload: true});
 	}
@@ -141,7 +142,7 @@ class Widgets extends React.Component<LessProps> {
 			}} >
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
                 {this.albumtier && <AnTreeditor2 parent={undefined}
-					uri={this.albumUri} reload={reload}
+					uri={this.uri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[
@@ -180,10 +181,10 @@ class Widgets extends React.Component<LessProps> {
 	}
 }
 
-class TestreeTier extends StreeTier {
+class TestreeTier extends AlbumTier {
 
-	constructor(uri: string, client?: SessionClient) {
-		super({uri, port: 'album'});
+	constructor(uri: string, tree: CrudComp<any>, client?: SessionClient) {
+		super({uri, client, comp: tree});
 		this.client = client;
 	}
 

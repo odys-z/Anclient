@@ -120,7 +120,11 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
 	val?: any;  // FIXME: should we extends a editable type?  (check ag-grid)
 }
 
-/**Record handled from tier */
+/**
+ * Record handled from tier.
+ * 
+ * Java equivolant for this is java.lang.Object.
+ */
 export interface Tierec {
 	[f: string]: string | number | boolean | object | undefined | null;
 }
