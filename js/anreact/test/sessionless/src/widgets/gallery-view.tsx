@@ -58,7 +58,8 @@ export default class GalleryView extends CrudCompW<Comprops & {tier: AlbumTier, 
 		let photos = [] as PhotoRec[];
 		nodes?.forEach( (p, x) => {
 			// photos.push({src: p.node.pid, width: 60, height: 48});
-			photos.push({src: this.albumtier.imgSrc(p.node.pid), width: p.node.width, height: p.node.height});
+			let [width, height, w, h] = p.node.css?.size;
+			photos.push({src: this.albumtier.imgSrc(p.node.pid), width: w, height: h});
 		});
 
 		return {photos};
