@@ -138,7 +138,9 @@ export enum TreeNodeVisual {
 	/** data item presented by {@link TreeCard} */
 	card,
 	/** container */
-	gallery
+	gallery,
+	/** invisible */
+	hide
 };
 
 export interface AnreactreeItem {
@@ -177,7 +179,11 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 		this.leadingIcons = this.leadingIcons.bind(this);
 	}
 
-	toUp(e: React.MouseEvent<HTMLElement>) {
+	componentDidMount() {
+		this.setState({});
+	}
+
+	toUp(_e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
 		let children = p.node.children;
@@ -191,7 +197,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 			this.props.onUpdate(n, p, me, elder);
 	}
 
-	toTop(e: React.MouseEvent<HTMLElement>) {
+	toTop(_e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
 		let children = p.node.children;
@@ -204,7 +210,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 			this.props.onUpdate(n, p, me, 0);
 	}
 
-	toDown(e: React.MouseEvent<HTMLElement>) {
+	toDown(_e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
 		let children = p.node.children;
@@ -218,7 +224,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 			this.props.onUpdate(n, p, me, younger);
 	}
 
-	toBottom(e: React.MouseEvent<HTMLElement>) {
+	toBottom(_e: React.MouseEvent<HTMLElement>) {
 		let p = this.props.parent;
 		let n = this.props.tnode;
 		let children = p.node.children;
@@ -245,7 +251,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 							  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
 					: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
 			})
-			: new Array(level + 1).fill(0).map((v, x) => {
+			: new Array(level + 1).fill(0).map((_v, x) => {
 				return x === level - 1 && expand
 					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
@@ -272,7 +278,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 					if (cx === 0) return (
 						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
 							<Typography noWrap >
-								{/* {this.props.leadingIcons(tnode, false)} */}
+								{/* {`[${n.css.icon}]`} */}
 								{TreeCardComp.levelIcons(this.indentIcons, tnode.level, true, undefined)}
 								{icon(n.css.icon)}
 								{n.text}
@@ -320,7 +326,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 		}
 
 		function align(css: CssTreeItem): PropTypes.Alignment {
-		  return css.align ? css.align as PropTypes.Alignment : 'center';
+		  return css?.align ? css.align as PropTypes.Alignment : 'center';
 		}
 	}
 }
@@ -333,6 +339,8 @@ class TreeGallaryComp extends TreeCardComp {
 	tier: AlbumTier;
 	/** pic collection id */
 	collect: string;
+
+	toEditCard: ()=>void;
 
 	constructor(props: TreecardProps) {
 		super(props);
@@ -349,12 +357,24 @@ class TreeGallaryComp extends TreeCardComp {
 	// toBottom: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 
 	render() {
-		return (<GalleryView {... this.props}
+		let {tnode} = this.props;
+		let node = tnode.node;
+		return (
+			<TreeCard {... this.props}
+				uri={this.uri}
+				key={node.id} tier={this.tier as AlbumTier}
+				tnode={tnode} media
+				toEdit={this.toEditCard}
+				indentStyle={Object.assign(defltIcons, this.props.indentIcons)}
+			>
+			<GalleryView {... this.props}
 				ref={undefined} // suppress type error
+				uri={this.uri}
+				cid={this.collect}
 				tier={this.tier}
-				uri={this.uri} cid={this.collect}
 				photos={this.props.tnode.node.children} // or fire a request to get photos?
-			/>);
+			/>
+			</TreeCard>);
 	}
 }
 
@@ -509,7 +529,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts: CompOpts) {
 		  if (Array.isArray(tnode)) {
-			return tnode.map((i, x) => {
+			return tnode.map((i, _x) => {
 			  return buildTreegrid(i, parent, compOts);
 			});
 		  }
@@ -534,6 +554,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			}
 			else {
 			  let v = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
+			  // console.log(v, v === TreeNodeVisual[TreeNodeVisual.gallery], v === TreeNodeVisual[TreeNodeVisual.card]);
 			  return (
 				v === TreeNodeVisual[TreeNodeVisual.gallery]
 				? <TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)  
@@ -546,7 +567,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 				  />
 				: v === TreeNodeVisual[TreeNodeVisual.card]
 				? <TreeCard {...that.props}
-					key={tnode.id}
+					key={tnode.id} tier={that.treetier as AlbumTier}
 					tnode={tnode} media
 					parent={parent}
 					toEdit={that.toEditCard}

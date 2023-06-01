@@ -8,7 +8,6 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt, jsample, JsonServs, Login, CrudComp
 } from '../../../src/an-components';
 import { AnTreeditor2 } from './widgets/treeditor';
-import { StreeTier } from './widgets/stree-tier';
 import { AlbumTier } from './widgets/album-tier';
 
 const { JsampleTheme } = jsample;
@@ -146,8 +145,11 @@ class Widgets extends React.Component<LessProps> {
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[
-						{ type: 'text', field: 'folder', label: L('Folder'),
-						  validator: {len: 200, notNull: true}, grid: {sm: 6} },
+						{ type: 'text', field: 'folder', label: L('Indent'),
+						  grid: {sm: 6} },
+						{ type: 'text', field: 'folder', label: L('Photo Folder'),
+						  grid: {sm: 6} },
+						{ type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
 					onSelectChange={()=>{}}
 				/>}

@@ -1,6 +1,6 @@
 import { Comprops, CrudComp } from '../../../../src/an-components';
 import { Protocol, AnsonMsg, AnsonBody, PageInf,
-	Semantier, SessionClient, Tierec, UserReq, AnDatasetResp, AnTreeNode, DatasetierReq
+	SessionClient, Tierec, UserReq, AnDatasetResp, AnTreeNode, DatasetierReq
 } from '@anclient/semantier';
 import { PhotoProps } from '../../../../src/photo-gallery/src/Photo';
 import { StreeTier } from './stree-tier';
@@ -136,13 +136,21 @@ export class AlbumTier extends StreeTier {
 
 		return AlbumTier.servUrl(this.client.an.servUrl(this.port), msg);
 		*/
-		return AlbumTier.photoReq(this.uri, recId, this.port, this.client);
+		return AlbumTier.imgReq(this.uri, recId, this.port, this.client);
 	}
 
-	static photoReq(uri: string, pid: string, port: string, client: SessionClient) : string {
+	/**
+	 * Create an HTTP GET request for src of img tag.
+	 * 
+	 * @param uri 
+	 * @param pid 
+	 * @param port 
+	 * @param client 
+	 * @returns src for img, i.e. jserv?anst64=message-string 
+	 */
+	static imgReq(uri: string, pid: string, port: string, client: SessionClient) : string {
 		let req = new AlbumReq({uri, page: undefined});
 		req.a = AlbumReq.A.download;
-		// req.queryRec.album = pid;
 		req.pid = pid;
 
 		let msg = client.an.getReq<AlbumReq>(port, req);
