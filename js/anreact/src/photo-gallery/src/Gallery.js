@@ -24,7 +24,12 @@ const Gallery = React.memo(function Gallery({
     const observer = new ResizeObserver(entries => {
       // only do something if width changes
       const newWidth = entries[0].contentRect.width;
-      if (containerWidth !== newWidth) {
+
+      // Ody Z, 2023/6/2
+      // This stops endless animation of keeping shrinking photos. Yet the problem is understood.
+      // if (containerWidth !== newWidth) {
+      // ->
+      if (Math.abs(containerWidth - newWidth) > 1) {
         // put in an animation frame to stop "benign errors" from
         // ResizObserver https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
         animationFrameID = window.requestAnimationFrame(() => {
