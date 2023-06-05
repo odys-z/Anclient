@@ -107,7 +107,7 @@ export class AlbumTier extends StreeTier {
 				let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
 
 				imgs.push( {
-					src: "",
+					src,
 					srcSet,
 					width,
 					height,

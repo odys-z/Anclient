@@ -57,7 +57,6 @@ export default class GalleryView extends CrudCompW<Comprops & {tier: AlbumTier, 
 	parse(nodes: AnTreeNode[]) {
 		let photos = [] as PhotoRec[];
 		nodes?.forEach( (p, x) => {
-			// photos.push({src: p.node.pid, width: 60, height: 48});
 			let [_width, _height, w, h] = p.node.css?.size || [4, 3, 4, 3];
 			photos.push({src: this.albumtier.imgSrc(p.node.pid), width: w || 4, height: h || 3});
 		});
@@ -105,7 +104,7 @@ export default class GalleryView extends CrudCompW<Comprops & {tier: AlbumTier, 
 				} }
 				limitNodeSearch={ (containerWidth: number) => {
 					if (containerWidth < 720)
-						return 4;
+						return 8;
 					else
 						return 12;
 				} }

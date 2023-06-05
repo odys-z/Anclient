@@ -124,7 +124,7 @@ interface TreecardProps extends AnTablistProps {
 	/** gallery, card, etc. */
 	// vistype: TreeNodeVisual;
 
-	indentStyle?: IndentIcons;
+	indent?: IndentIcons;
 
 	parent: AnTreeNode;
 	tnode: AnTreeNode;
@@ -165,11 +165,16 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 
 	node: AnTreeNode;
 	// newCard = undefined;
-	indentIcons: AnTreeIconsType[] = [];
+	// indentIcons: AnTreeIconsType[] = [];
+	indentIcons: IndentIcons[];
 
 	constructor(props: TreecardProps) {
 		super(props);
 		this.vistype = TreeNodeVisual.card;
+
+		this.node = props.tnode;
+		// this.indentIcons = props.indent;
+		this.indentIcons = [];
 		
 		this.toUp = this.toUp.bind(this);
 		this.toDown = this.toDown.bind(this);
@@ -237,13 +242,34 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	}
 
 	leadingIcons () {
-		return TreeCardComp.levelIcons(this.indentIcons, this.node.level, this.props.expand, this.props.expIcon);
+		// return TreeCardComp.levelIcons(this.indentIcons, this.props.expand, this.props.expIcon);
+		return this.indentIcons;
 	}
 
 	// TODO merge with treegrid
-	static levelIcons(levelIcons: AnTreeIconsType[], level: number, expand: boolean, expIcon: string) {
-		// let expand: boolean;
-		// let expIcon: string;
+	static levelIcons(lvlIcons: string[], hasChildren: boolean, expand: boolean) {
+		/*
+		let levelIcons = [] as JSX.Element[];
+		for (let i = 0; i < levels.length; i++)
+			if (levels[i])
+				levelIcons.push(icon(indIcons.vlink));
+			else
+				levelIcons.push(icon(indIcons.vlink));
+
+		
+		if (hasChildren && !expand)
+			levelIcons.push(icon(indIcons.collaps));
+		else if (hasChildren && expand)
+			levelIcons.push(icon(indIcons.expand));
+		else 
+			levelIcons.push(icon(indIcons.hlink));
+		
+		return levelIcons;
+		*/
+		return lvlIcons.map( (i: string, x: number) => icon(i) );
+
+		/*
+	static levelIcons(indIcons: IndentIcons, level: number, expand: boolean, expIcon: string) {
 		return (levelIcons ?
 			levelIcons.map((v: string, x: number) => {
 				return x === levelIcons.length - 1 && expand
@@ -256,13 +282,15 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
 			}));
+		*/
 
-        function icon(iconame?: string) {
+        function icon(iconame?: string) : JSX.Element {
 	        return AnTreeIcons[iconame || "deflt"];
         }
 	}
 
 	render() {
+		let that = this;
 		let tnode = this.props.tnode;
 		let n = tnode.node;
 		n.css = n.css || {};
@@ -279,7 +307,8 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
 							<Typography noWrap >
 								{/* {`[${n.css.icon}]`} */}
-								{TreeCardComp.levelIcons(this.indentIcons, tnode.level, true, undefined)}
+								{/* {TreeCardComp.leadingIcons(this.indentIcons, tnode.level, true, undefined)} */}
+								{that.leadingIcons()}
 								{icon(n.css.icon)}
 								{n.text}
 							</Typography>
@@ -341,6 +370,7 @@ class TreeGallaryComp extends TreeCardComp {
 	collect: string;
 
 	toEditCard: ()=>void;
+	galleref: GalleryView;
 
 	constructor(props: TreecardProps) {
 		super(props);
@@ -357,24 +387,33 @@ class TreeGallaryComp extends TreeCardComp {
 	// toBottom: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 
 	render() {
-		let {tnode} = this.props;
+		let {classes, tnode} = this.props;
 		let node = tnode.node;
+		let indents = node.indentIcons.splice(0);
+		indents.push('');
 		return (
+			<Grid container {...this.props.grid} className={classes.th} >
+			<Grid item >
 			<TreeCard {... this.props}
 				uri={this.uri}
-				key={node.id} tier={this.tier as AlbumTier}
+				tier={this.tier as AlbumTier}
 				tnode={tnode} media
 				toEdit={this.toEditCard}
-				indentStyle={Object.assign(defltIcons, this.props.indentIcons)}
-			>
+				indIcons={Object.assign(defltIcons, this.props.indentIcons)}
+			/>
+			</Grid>
+			<Grid item>
 			<GalleryView {... this.props}
+				// ref={(r) => this.galleref = r} // suppress type error
 				ref={undefined} // suppress type error
 				uri={this.uri}
 				cid={this.collect}
 				tier={this.tier}
 				photos={this.props.tnode.node.children} // or fire a request to get photos?
 			/>
-			</TreeCard>);
+			</Grid>
+			</Grid>
+			);
 	}
 }
 
@@ -540,7 +579,9 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		  	console.log(TreeNodeVisual[tnode.node.nodetype]);
 
-			if (that.treetier.isMidNode(tnode.node)) {
+			let v = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
+			// if (that.treetier.isMidNode(tnode.node)) {
+			if (v === TreeNodeVisual[TreeNodeVisual.collapsable]) {
 			  return (
 				<div key={tnode.id} className={classes.folder}>
 				  { that.folderHead(that.props.columns, tnode, open, classes, media) }
@@ -553,7 +594,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			  );
 			}
 			else {
-			  let v = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
+			  // let v = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
 			  // console.log(v, v === TreeNodeVisual[TreeNodeVisual.gallery], v === TreeNodeVisual[TreeNodeVisual.card]);
 			  return (
 				v === TreeNodeVisual[TreeNodeVisual.gallery]
@@ -561,7 +602,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 					key={tnode.id} tier={that.treetier as AlbumTier}
 					tnode={tnode} media
 					parent={parent}
-					indentStyle={Object.assign(defltIcons, that.props.indentIcons)}
+					indent={Object.assign(defltIcons, that.props.indentIcons)}
 					delete={that.toDel}
 					onUpdate={that.toEditCard}
 				  />
@@ -571,7 +612,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 					tnode={tnode} media
 					parent={parent}
 					toEdit={that.toEditCard}
-					indentStyle={Object.assign(defltIcons, that.props.indentIcons)}
+					indent={Object.assign(defltIcons, that.props.indentIcons)}
 					delete={that.toDel}
 					onUpdate={that.toEditCard}
 				  />

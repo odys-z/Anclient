@@ -145,18 +145,18 @@ class Widgets extends React.Component<LessProps> {
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[
-						{ type: 'text', field: 'folder', label: L('Indent'),
+						{ type: 'text', field: 'folder', label: L(''),
 						  grid: {sm: 6} },
-						{ type: 'text', field: 'folder', label: L('Photo Folder'),
+						{ type: 'text', field: 'folder', label: L('Photo Folders'),
 						  grid: {sm: 6} },
-						{ type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
+						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
 					onSelectChange={()=>{}}
 				/>}
 				<hr/>
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
-							uri={"/login"} tier={undefined}
+							uri={this.uri} tier={undefined}
 							title={L('Error')} msg={this.errctx.msg} />}
 				<hr/>
                 {Date().toString()}
