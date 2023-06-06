@@ -246,7 +246,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	leadingIcons () {
 		return TreeCardComp.levelIcons(this.props.indent,
 			this.node.indentIcons, this.node.node.css?.icon,
-			this.props.tnode.islastChild, this.state.expand);
+			this.props.tnode.node.isLastChild, this.state.expand);
 	}
 
 	// TODO merge with treegrid
