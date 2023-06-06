@@ -1332,6 +1332,9 @@ export class AnTreeNode {
 		children?: Array<AnTreeNode>;
 		/** With icon as a special field? */
 		css?: CSS.Properties & {icon?: string, size?: number[]};
+		/** Indent icon names */
+		indentIcons?: string[];
+
 		/** Any data by jserv */
 		[d: string]: any;
 	};

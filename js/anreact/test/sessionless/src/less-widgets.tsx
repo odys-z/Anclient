@@ -140,7 +140,8 @@ class Widgets extends React.Component<LessProps> {
 				ssInf: undefined,
 			}} >
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
-                {this.albumtier && <AnTreeditor2 parent={undefined}
+                {this.albumtier && <AnTreeditor2
+					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}

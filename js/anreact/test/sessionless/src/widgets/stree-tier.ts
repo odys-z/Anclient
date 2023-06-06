@@ -69,7 +69,7 @@ export class StreeTier extends Semantier {
 		this.client.an.post(jreq, onload, context.error);
     }
 
-	isMidNode(n: {nodetype?: string} | undefined) {
-		return n && (n.nodetype === 'cate' || !n.nodetype);
-	}
+	// isMidNode(n: {nodetype?: string} | undefined) {
+	// 	return n && (n.nodetype === 'cate' || !n.nodetype);
+	// }
 }
