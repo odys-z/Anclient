@@ -169,7 +169,8 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		}
 	}
 
-	/**Bind dataset to combobox options (comp.state.condCbb).
+	/**
+	 * Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
 	 * <h6>About React Rendering Events</h6>

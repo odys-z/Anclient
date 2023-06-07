@@ -22,7 +22,7 @@ export type AnElemFormatter = ( (
 	/**column index or record for the row */
 	rec: number | Tierec | AnTreeNode,
 	opts?: object
-) => UIComponent );
+) => JSX.Element );
 
 export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
 

@@ -1,5 +1,5 @@
 
-import React, { MouseEvent } from 'react';
+import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
 
@@ -13,10 +13,11 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnFieldValidation, AnlistColAttrs, AnsonBody, AnsonMsg, AnsonResp, CRUD, NV, NameValue, PkVal, TierCol, TierComboField, Tierec, UpdateReq, str, str_ } from '@anclient/semantier';
+import { AnFieldValidation, AnlistColAttrs, AnsonMsg, AnsonResp,
+	CRUD, NameValue, PkVal, TierCol, TierComboField, Tierec, UpdateReq, str_, toBool
+} from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	import { toBool } from '../../utils/helpers';
 	import { AnContext, AnContextType } from '../reactext';
 	import { Comprops, CrudCompW, DetailFormW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
@@ -121,7 +122,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 		this.pkval = props.pkval;
 
-		this.state.parent = props.parent;
+		// this.state.parent = props.parent;
 		this.state.parentId = props.parentId;
 
 		this.uri = this.props.uri || '';

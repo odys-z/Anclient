@@ -47,10 +47,19 @@ export function toBool(str: string | number | boolean | object | undefined | nul
 export function isEmpty(str: string | number | boolean | object | null | undefined) : boolean {
 	return (typeof str === 'undefined' || str === null || str === '');
 } 
+/**
+ * Convert to string.
+ * @param obj 
+ * @returns string
+ */
 export function str(obj: any) {
 	return isEmpty(obj) ? undefined : String(obj);
 }
 
+/**Convert to string, '' for undefined.
+ * @param obj 
+ * @returns string 
+ */
 export function str_(obj: any) {
 	return str(obj) || '';
 }

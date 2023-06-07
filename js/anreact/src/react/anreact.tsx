@@ -14,12 +14,15 @@ export interface ClassNames {[c: string]: string};
 
 export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
 
+export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 /**
  * Component's visual options, e.g. options for field formatters.
  */
 export interface CompOpts {
 	classes: ClassNames;
 	media?: Media;
+	// box?: {};
+    // grid?: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 }
 
 export interface QueryPage {
@@ -29,9 +32,10 @@ export interface QueryPage {
 
 export function toPageInf(query: QueryPage) : PageInf {
 	let p = new PageInf(query.pageInf.page, query.pageInf.size);
-	p.condts = [];
+	// p.condts = [];
 	query.query?.forEach( (q, x) => {
-		p.condts.push( [q.field, typeof q.val === 'string' ? q.val : q.val?.v] );
+		// p.condts.push( [q.field, typeof q.val === 'string' ? q.val : q.val?.v] );
+		p.nv(q.field, typeof q.val === 'string' ? q.val : q.val?.v);
 	});
 
 	return p;
@@ -88,7 +92,7 @@ export class AnReact {
 
 	/**
 	 * Post a request, qmsg.req of AnsonMsg to jserv.
-	 * If suceed, call qmsg.onOk (onLoad) or set rs in respons to component's state.
+	 * If suceed, call qmsg.onOk (onLoad) or set rs' rows in respons to component's state.
 	 * This is a helper of simple form load & bind a record.
 	 * @param {object} qmsg
 	 * @param {AnContext.error} errCtx
@@ -282,7 +286,8 @@ export class AnReactExt extends AnReact {
 		this.dataset(opts, onload);
 	}
 
-	/**Bind dataset to combobox options (comp.state.condCbb).
+	/**
+	 * Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
 	 * <h6>About React Rendering Events</h6>

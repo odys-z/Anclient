@@ -77,9 +77,10 @@ export class PageInf {
 	}
 }
 
+export type AnsonValue = string | object | string | number | boolean | undefined | null;
 /**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
-export type NameValue = {name: string, value: object | string | number | boolean | undefined | null};
-export type NV = {n: string, v: string | object | string | number | boolean | undefined | null};
+export type NameValue = {name: string, value: AnsonValue};
+export type NV = {n: string, v: AnsonValue};
 export function isNV (obj: any) {
 	debugger;
 	return !!obj && (obj.name || obj.n);  
@@ -1322,6 +1323,29 @@ export class AnSessionResp extends AnsonResp {
 	}
 }
 
+export type Iconame = 'expand' | 'collapse' | 'child0' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
+
+export type AnTreeIconsType =
+        'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
+        'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand';
+
+/**
+ * Icons to compose tree item's indent, like indent of command npm ls:
+ * @example
+ * anclient/anreact
+ 	├─ anclient/anreact
+	│  ├─ anclient/semantier
+	│  ├─ babel/cli
+	│  └─ webpack-cli
+ 	└─ anclient/super
+       └─ webpack-cli
+ * @see AnTreeIcons for icon value
+ * @see defltIcons for defaults
+ */
+export type IndentIcons = {
+	[i in Iconame]: AnTreeIconsType;
+}
+
 /** Tree data node */
 export class AnTreeNode {
 	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
@@ -1330,17 +1354,21 @@ export class AnTreeNode {
 		nodetype?: string;
 		// id: string;
 		children?: Array<AnTreeNode>;
+		expandChildren?: boolean;
+
 		/** With icon as a special field? */
-		css?: CSS.Properties & {icon?: string, size?: number[]};
+		css?: CSS.Properties & {icon?: Iconame, size?: number[]};
+
 		/** Indent icon names */
-		indentIcons?: string[];
+		indentIcons?: Iconame[];
 
 		/** Any data by jserv */
-		[d: string]: any;
+		[d: string]: AnsonValue;
 	};
 	id: string;
 	level: number;
 	parent: string;
+	islastSibling?: boolean;
 }
 
 /**

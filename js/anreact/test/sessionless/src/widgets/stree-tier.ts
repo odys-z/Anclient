@@ -24,7 +24,6 @@ export class StreeTier extends Semantier {
     port: string;
 
     /**
-     * 
      * @param opts uri: client id; port: jserv port
      * DESIGN MEMO: Once semantier can be generated, port will be force to be required.
      */
@@ -68,8 +67,4 @@ export class StreeTier extends Semantier {
         let context = comp.context as AnContextType;
 		this.client.an.post(jreq, onload, context.error);
     }
-
-	// isMidNode(n: {nodetype?: string} | undefined) {
-	// 	return n && (n.nodetype === 'cate' || !n.nodetype);
-	// }
 }

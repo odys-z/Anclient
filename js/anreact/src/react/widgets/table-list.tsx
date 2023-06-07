@@ -11,7 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, isEmpty, len, PkVal, Tierec, toBool, UIComponent } from '@anclient/semantier';
+import { AnlistColAttrs, isEmpty, len, Tierec, toBool, UIComponent } from '@anclient/semantier';
 import { Comprops, DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 

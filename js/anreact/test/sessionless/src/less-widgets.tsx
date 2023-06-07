@@ -48,6 +48,7 @@ class Widgets extends React.Component<LessProps> {
 	};
 
 	albumSk = 'tree-album-family-folder';
+	rolefuncsk = 'trees.role_funcs';
 	uri = '/album/tree';
 
 	constructor(props: LessProps | Readonly<LessProps>) {
@@ -140,27 +141,41 @@ class Widgets extends React.Component<LessProps> {
 				ssInf: undefined,
 			}} >
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
+				{this.albumtier && <AnTreeditor2
+					parent={undefined} lastSibling={false}
+					uri={this.uri} reload={reload}
+					tnode={this.albumtier.sysroot()} tier={this.albumtier}
+					pk={'NA'} sk={this.rolefuncsk}
+					columns={[
+						{ type: 'text', field: 'nodeId', label: '',
+						  grid: {sm: 6, md: 3} },
+						{ type: 'text', field: 'text', label: L('Name'),
+						  grid: {sm: 6, md: 3} },
+					]}
+					onSelectChange={()=>{}}
+				/>}
+				{/* <hr/>
                 {this.albumtier && <AnTreeditor2
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[
-						{ type: 'text', field: 'folder', label: L(''),
-						  grid: {sm: 6} },
+						{ type: 'text', field: 'folder', label: '',
+						  grid: {sm: 6, md: 3} },
 						{ type: 'text', field: 'folder', label: L('Photo Folders'),
-						  grid: {sm: 6} },
+						  grid: {sm: 6, md: 3} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
 					onSelectChange={()=>{}}
 				/>}
-				<hr/>
+				<hr/> */}
+                {this.albumtier && Date().toString()}
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={this.uri} tier={undefined}
 							title={L('Error')} msg={this.errctx.msg} />}
 				<hr/>
-                {Date().toString()}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}
@@ -185,6 +200,17 @@ class Widgets extends React.Component<LessProps> {
 }
 
 class TestreeTier extends AlbumTier {
+	sysroot(): AnTreeNode {
+		return {
+			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
+			node: {
+				nodetype: 'card',
+			},
+			id: 'n01',
+			level: 0,
+			parent: undefined,
+		}
+	}
 
 	constructor(uri: string, tree: CrudComp<any>, client?: SessionClient) {
 		super({uri, client, comp: tree});
