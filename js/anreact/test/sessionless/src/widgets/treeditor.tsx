@@ -88,27 +88,6 @@ const styles = (theme: Theme) => ({
  */
 const defltIcons: IndentIcons = {expand: 'T', collapse: '+', child0: '|-', childx: 'L', vlink: '|', spacex: '.', hlink: '-', deflt: '.'};
 
-/* experimental for next L function.
-const R_ = [
-  {
-	edit: 'a',
-	add: 'x',
-  },
-  {
-	edit: 'v',
-  }
-]
-
-class R {
-	/** jsdoc ... * /
-	static lang = 0;
-	static edit = R_[R.lang].edit;
-	static add  = R_[R.lang].add
-}
-
-R.lang;
-*/
-
 interface TreecardProps extends AnTablistProps {
 	indentSettings?: IndentIcons;
 	lastSibling: boolean; 
@@ -249,7 +228,9 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	 * @param expand 
 	 * @returns indent fragment
 	 */
-	static levelIcons(iconNames: IndentIcons, lvls: IndentIconame[], itemIcon: AnTreeIconsType, lastSibling: boolean, hasChildren: boolean, expand: boolean, child?: AnTreeNode) {
+	static levelIcons(iconNames: IndentIcons, lvls: IndentIconame[],
+			itemIcon: AnTreeIconsType, lastSibling: boolean, hasChildren: boolean, expand: boolean,
+			child?: AnTreeNode) {
 		let lvlIcons = lvls || [] as Array<IndentIconame | AnTreeIconsType>;
 
 		if (hasChildren && expand)
