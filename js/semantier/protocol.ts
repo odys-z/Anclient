@@ -1323,7 +1323,12 @@ export class AnSessionResp extends AnsonResp {
 	}
 }
 
-export type Iconame = 'expand' | 'collapse' | 'child0' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
+/**
+ * expand: 'T'; collpase: e.g. '+', ...,
+ * 
+ * A tree widget uses this to find indent structure, then translate to icons via AnTreeIconsType.
+ */
+export type IndentIconame = 'expand' | 'collapse' | 'child0' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
 
 export type AnTreeIconsType =
         'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
@@ -1339,11 +1344,9 @@ export type AnTreeIconsType =
 	│  └─ webpack-cli
  	└─ anclient/super
        └─ webpack-cli
- * @see AnTreeIcons for icon value
- * @see defltIcons for defaults
  */
 export type IndentIcons = {
-	[i in Iconame]: AnTreeIconsType;
+	[i in IndentIconame]: AnTreeIconsType;
 }
 
 /** Tree data node */
@@ -1357,10 +1360,10 @@ export class AnTreeNode {
 		expandChildren?: boolean;
 
 		/** With icon as a special field? */
-		css?: CSS.Properties & {icon?: Iconame, size?: number[]};
+		css?: CSS.Properties & {icon?: AnTreeIconsType, size?: number[]};
 
 		/** Indent icon names */
-		indentIcons?: Iconame[];
+		indentIcons?: Array<IndentIconame>;
 
 		/** Any data by jserv */
 		[d: string]: AnsonValue;

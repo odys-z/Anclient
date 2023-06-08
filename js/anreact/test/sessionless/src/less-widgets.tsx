@@ -148,9 +148,9 @@ class Widgets extends React.Component<LessProps> {
 					pk={'NA'} sk={this.rolefuncsk}
 					columns={[
 						{ type: 'text', field: 'nodeId', label: '',
-						  grid: {sm: 6, md: 3} },
+						  grid: {xs: 12, sm: 6, md: 3} },
 						{ type: 'text', field: 'text', label: L('Name'),
-						  grid: {sm: 6, md: 3} },
+						  grid: {xs: false, sm: 6, md: 3} },
 					]}
 					onSelectChange={()=>{}}
 				/>}

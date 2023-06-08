@@ -31,4 +31,5 @@ export class AnTreeComp extends React.Component<any, any, any> {
      */
     buildTree(classes: object): any[];
 }
+import { IndentIconame } from "@anclient/semantier/anclient";
 import React from "react";

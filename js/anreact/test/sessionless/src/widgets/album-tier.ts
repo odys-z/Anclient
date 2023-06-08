@@ -273,7 +273,9 @@ class AlbumResp extends AnDatasetResp {
 
 	photo?: PhotoRec;
 
-	constructor (resp: AlbumRec & {forest: AnTreeNode[], profiles?: Profiles, photo?: PhotoRec, collect?: Array<string>}) {
+	constructor (resp: AlbumRec & {
+			forest: AnTreeNode[], profiles?: Profiles,
+			photo?: PhotoRec, collect?: Array<string>}) {
 		super({
 			forest: resp.forest
 		});
