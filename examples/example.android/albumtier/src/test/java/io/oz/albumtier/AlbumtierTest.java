@@ -146,7 +146,7 @@ public class AlbumtierTest {
    	JProtocol.OnDocOk photoPushed = (d, resp) -> {
 		SyncDoc doc = ((DocsResp) resp).doc;
 		assertEquals(device, doc.device());
-		assertEquals(testfile, doc.clientpath);
+		assertEquals(testfile, doc.fullpath());
 
 		// ! also make sure files are saved in volume/user-id
 		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());

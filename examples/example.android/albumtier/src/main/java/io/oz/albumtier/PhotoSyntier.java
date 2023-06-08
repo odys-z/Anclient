@@ -48,7 +48,11 @@ public class PhotoSyntier extends Synclientier {
 
 	static {
 		AnsonMsg.understandPorts(AlbumPort.album);
-		meta = new PhotoMeta(null); // this tier won't access local db.
+		try {
+			meta = new PhotoMeta(null);
+		} catch (TransException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -152,7 +156,7 @@ public class PhotoSyntier extends Synclientier {
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
-		return pushBlocks(meta.tbl, videos, client.ssInfo(), proc, docOk, onErr);
+		return pushBlocks(meta.tbl, videos, proc, docOk, onErr);
 	}
 
 	public String download(Photo photo, String localpath)
