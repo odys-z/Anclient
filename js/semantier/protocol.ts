@@ -1330,6 +1330,10 @@ export class AnSessionResp extends AnsonResp {
  */
 export type IndentIconame = 'expand' | 'collapse' | 'child0' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
 
+// export enum IndentUnit {
+// 	expand='expand', collapse='collapse', childi='childi', childx='childx', vlink='vlink', space='space', hlink='hlink', deflt='deflt'
+// }
+
 export type AnTreeIconsType =
         'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
         'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand';
@@ -1362,16 +1366,15 @@ export class AnTreeNode {
 		/** With icon as a special field? */
 		css?: CSS.Properties & {icon?: AnTreeIconsType, size?: number[]};
 
-		/** Indent icon names */
-		indentIcons?: Array<IndentIconame>;
-
 		/** Any data by jserv */
 		[d: string]: AnsonValue;
 	};
 	id: string;
-	level: number;
 	parent: string;
 	islastSibling?: boolean;
+	level: number;
+	/** Indent icon names */
+	indentIcons?: Array<IndentIconame>;
 }
 
 /**

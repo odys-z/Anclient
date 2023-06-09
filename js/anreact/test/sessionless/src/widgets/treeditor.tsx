@@ -86,11 +86,11 @@ const styles = (theme: Theme) => ({
  * child0: '|-',
  * childx: 'L', last child;
  */
-const defltIcons: IndentIcons = {expand: 'T', collapse: '+', child0: '|-', childx: 'L', vlink: '|', spacex: '.', hlink: '-', deflt: '.'};
+const defltIcons: IndentIcons = {expand: 'T', collapse: '+', childi: '|-', childx: 'L', vlink: '|', spacex: '.', hlink: '-', deflt: '.'};
 
 interface TreecardProps extends AnTablistProps {
 	indentSettings?: IndentIcons;
-	lastSibling: boolean; 
+	// lastSibling: boolean; 
 	parent: AnTreeNode;
 	tnode: AnTreeNode;
 };
@@ -209,11 +209,9 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 
 	leadingIcons () {
 		let tnode = this.props.tnode;
-		let {islastSibling} = tnode;
 		let n = tnode.node;
-		return TreeCardComp.levelIcons(this.props.indentSettings,
-			n.indentIcons, n.css?.icon, islastSibling,
-			n.children?.length > 0, this.state.expand, tnode);
+		return TreeCardComp.levelIcons(this.props.indentSettings, tnode.indents);
+			// n.css?.icon, islastSibling, n.children?.length > 0, this.state.expand, tnode)
 	}
 
 	// TODO merge with treegrid
@@ -227,7 +225,6 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	 * @param hasChildren 
 	 * @param expand 
 	 * @returns indent fragment
-	 */
 	static levelIcons(iconNames: IndentIcons, lvls: IndentIconame[],
 			itemIcon: AnTreeIconsType, lastSibling: boolean, hasChildren: boolean, expand: boolean,
 			child?: AnTreeNode) {
@@ -255,6 +252,12 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 
 		return (<React.Fragment >
 				{lvlIcons.map( (i, x) => TreeCardComp.icon(iconNames, i, x) )}
+			</React.Fragment>);
+	}
+	 */
+	static levelIcons(iconNames: IndentIcons, lvls: IndentIconame[]) {
+		return (<React.Fragment >
+				{lvls && lvls.map( (i, x) => TreeCardComp.icon(iconNames, i, x) )}
 			</React.Fragment>);
 	}
 
@@ -369,8 +372,6 @@ class TreeGallaryComp extends TreeCardComp {
 	render() {
 		let {classes, tnode} = this.props;
 		let node = tnode.node;
-		// let indents = node.indentIcons.splice(0);
-		// indents.push('');
 		return (
 		  <Grid container {...this.props.grid} className={classes.th} >
 			<Grid item >
@@ -547,28 +548,29 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		let that = this;
 
 		let m = this.state.forest;
-		let mtree = buildTreegrid( m, undefined, false, compOts );
+		let mtree = buildTreegrid( m, undefined, compOts );
 		return (<div className={classes.forest}>{mtree}</div>);
 
 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[],
-				parent: AnTreeNode, isLastChild: boolean, compOpts: CompOpts) {
+				parent: AnTreeNode, compOpts: CompOpts) {
 		  if (Array.isArray(tnode)) {
 			return tnode.map((i, x) => {
-			  return buildTreegrid(i, parent, parent?.node && x === parent.node.children?.length - 1, compOts);
+			  // return buildTreegrid(i, parent, parent?.node && x === parent.node.children?.length - 1, compOts);
+			  return buildTreegrid(i, parent, compOts);
 			});
 		  }
 		  else if (tnode) {
-			tnode = incIndent(tnode, parent, isLastChild);
+			// tnode = incIndent(tnode, parent, isLastChild);
 			tnode.node.css = tnode.node.css || {};
 
 			let ntype = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
 			if (tnode.node.children?.length > 0) {
 			  return (
 				<div key={tnode.id} className={classes.folder}>
-				  { that.folderHead(that.props.columns, tnode, isLastChild, classes, media) }
+				  { that.folderHead(that.props.columns, tnode, classes, media) }
 				  { open &&
 					<Collapse in={tnode.node.expandChildren} timeout="auto" unmountOnExit>
-						{buildTreegrid(tnode.node.children, tnode, false, compOts)}
+						{buildTreegrid(tnode.node.children, tnode, compOts)}
 					</Collapse>
 				  }
 				</div>
@@ -580,7 +582,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 				? <TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)  
 					key={tnode.id} tier={that.treetier as AlbumTier}
 					tnode={tnode} media={media}
-					parent={parent} lastSibling={isLastChild}
+					parent={parent}
 					indentSettings={Object.assign(defltIcons, that.props.indentIcons)}
 					delete={that.toDel}
 					onUpdate={that.toEditCard}
@@ -589,7 +591,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 				? <TreeCard {...that.props}
 					key={tnode.id} tier={that.treetier as AlbumTier}
 					tnode={tnode} media={media}
-					parent={parent} lastSibling={isLastChild}
+					parent={parent}
 					toEdit={that.toEditCard}
 					indentSettings={Object.assign(defltIcons, that.props.indentIcons)}
 					delete={that.toDel}
@@ -603,18 +605,18 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		  }
 		}
 
-		function incIndent(child: AnTreeNode, p: AnTreeNode, islastchild: boolean): AnTreeNode {
-			let indent = [] as IndentIconame[];
-			if (p) {
-				indent = (p.node.indentIcons?.splice(0) || []) as IndentIconame[];
-				if (p.islastSibling)
-					indent.push('childx');
-				else indent.push('child0');
-				child.node.indentIcons = indent;
-			}
-			child.islastSibling = !!islastchild;
-			return child;
-		}
+		// function incIndent(child: AnTreeNode, p: AnTreeNode, islastchild: boolean): AnTreeNode {
+		// 	let indent = [] as IndentIconame[];
+		// 	if (p) {
+		// 		indent = (p.node.indentIcons?.splice(0) || []) as IndentIconame[];
+		// 		if (p.islastSibling)
+		// 			indent.push('childx');
+		// 		else indent.push('child0');
+		// 		child.node.indentIcons = indent;
+		// 	}
+		// 	child.islastSibling = !!islastchild;
+		// 	return child;
+		// }
 	}
 
 	th( columns: Array<AnTreegridCol> = [],
@@ -641,8 +643,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			</Grid>);
 	}
 
-	folderHead( columns=[] as AnTreegridCol[], treenode: AnTreeNode, isLastChild: boolean,
-				classes: ClassNames, media: Media) {
+	folderHead( columns=[] as AnTreegridCol[], treenode: AnTreeNode, classes: ClassNames, media: Media) {
 	  let that = this;
 	  let n = treenode.node;
 	  n.css = n.css || {};
@@ -668,19 +669,21 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography noWrap variant='body2' >
 							{TreeCardComp.levelIcons(
-								this.props.indent,
-								treenode.node.indentIcons as IndentIconame[],
-								expd? '.' : 'menu-leaf',
-								isLastChild,
-								n.children?.length > 0,
-								expd)}
+								that.props.indent,
+								treenode.indents as IndentIconame[],
+								// expd? '.' : 'menu-leaf',
+								// isLastChild,
+								// n.children?.length > 0,
+								// expd
+								)}
+							{expd ? TreeCardComp.icon(that.props.indentIcons, "expand", 0)
+								: TreeCardComp.icon(that.props.indentIcons, "collapse", 0)}
 							{n.text}
-							{/* {expd ? icon(indentIcons, "expand") : icon(indentIcons, "collapse")} */}
 							</Typography>
 						</Grid>);
 					else if (col.type === 'actions')
 					  return (
-						hide(col.grid, media) || 
+						// hide(col.grid, media) || 
 						<Grid item key={`${treenode.id}.${ix}`} className={classes.actions}>
 							<Typography noWrap variant='body2' >
 								<Button onClick={this.toEditCard}
@@ -732,9 +735,9 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			return `${media.isXl ? text : ''} ${children}`;
 		}
 
-		function icon(iconNames: IndentIcons, icon: IndentIconame) {
-			return TreeCardComp.icon(iconNames, icon, icon) ;
-		}
+		// function icon(iconNames: IndentIcons, icon: IndentIconame) {
+		// 	return TreeCardComp.icon(iconNames, icon, icon) ;
+		// }
 	}
 
 	render() {
