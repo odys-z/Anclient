@@ -141,7 +141,22 @@ class Widgets extends React.Component<LessProps> {
 				ssInf: undefined,
 			}} >
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
-				{this.albumtier && <AnTreeditor2
+                {/* {this.albumtier && <AnTreeditor2 key={this.albumSk}
+					parent={undefined} lastSibling={false}
+					uri={this.uri} reload={reload}
+					tnode={this.albumtier.treeroot()} tier={this.albumtier}
+					pk={'NA'} sk={this.albumSk}
+					columns={[ // noly card for folder header
+						{ type: 'text', field: 'folder', label: 'Photo Folders',
+						  grid: {sm: 6, md: 3} },
+						{ type: 'text', field: 'tags', label: L('Hashtag'),
+						  grid: {sm: 6, md: 3} },
+						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
+					]}
+					onSelectChange={()=>{}}
+				/>}
+				<hr/> */}
+				{this.albumtier && <AnTreeditor2 key={this.rolefuncsk}
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tnode={this.albumtier.sysroot()} tier={this.albumtier}
@@ -154,23 +169,8 @@ class Widgets extends React.Component<LessProps> {
 					]}
 					onSelectChange={()=>{}}
 				/>}
-				{/* <hr/>
-                {this.albumtier && <AnTreeditor2
-					parent={undefined} lastSibling={false}
-					uri={this.uri} reload={reload}
-					tnode={this.albumtier.treeroot()} tier={this.albumtier}
-					pk={'NA'} sk={this.albumSk}
-					columns={[
-						{ type: 'text', field: 'folder', label: '',
-						  grid: {sm: 6, md: 3} },
-						{ type: 'text', field: 'folder', label: L('Photo Folders'),
-						  grid: {sm: 6, md: 3} },
-						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
-					]}
-					onSelectChange={()=>{}}
-				/>}
-				<hr/> */}
-                {this.albumtier && Date().toString()}
+				<hr/>
+                {/* {this.albumtier && Date().toString()} */}
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
 							uri={this.uri} tier={undefined}

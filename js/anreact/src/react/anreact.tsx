@@ -16,22 +16,29 @@ export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: 
 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
+/**
+ * 
+ * @param grid 
+ * @param media 
+ * @returns expample:
+ * 
+ * grid {xs: false, sm: false}
+ * 
+ * for 
+ * media {xs: true, sm: true, md: true}, will return false
+ * 
+ * for
+ * media {xs: true, sm: true, md: false}, will return true
+ */
 export function hide(grid: {
 		xs?: boolean | GridSize; sm?: boolean | GridSize;
 		md?: boolean | GridSize; lg?: boolean | GridSize; },
 		media: Media) {
 	return (
-	/*
-		grid.xs === false && media.isXs === true && !!media.isSm === false
-	 || grid.sm === false && media.isSm === true && !!media.isMd === false
-	 || grid.md === false && media.isMd === true && !!media.isLg === false
-	 || grid.lg === false && media.isLg === true && !!media.isXl === false
-	 // grid.xl === false && media.isXl === true
-	 */
 	 	grid.lg === false && media.isLg === true
-	 || grid.md === false && media.isMd === true // && !!media.isLg === false
-	 || grid.sm === false && media.isSm === true // && !!media.isMd === false
-	 || grid.xs === false && media.isXs === true // && !!media.isSm === false
+	 || grid.md === false && media.isMd === true && !!media.isLg === false
+	 || grid.sm === false && media.isSm === true && !!media.isMd === false
+	 || grid.xs === false && media.isXs === true && !!media.isSm === false
 	);
 }
 

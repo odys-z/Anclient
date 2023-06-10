@@ -225,35 +225,6 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 	 * @param hasChildren 
 	 * @param expand 
 	 * @returns indent fragment
-	static levelIcons(iconNames: IndentIcons, lvls: IndentIconame[],
-			itemIcon: AnTreeIconsType, lastSibling: boolean, hasChildren: boolean, expand: boolean,
-			child?: AnTreeNode) {
-		let lvlIcons = lvls || [] as Array<IndentIconame | AnTreeIconsType>;
-
-		if (hasChildren && expand)
-			lvlIcons.push('expand');
-		else if (hasChildren && !expand)
-			lvlIcons.push('collapse')
-		else {
-			if (lastSibling)
-				lvlIcons.push('childx')
-			else
-				lvlIcons.push('child0')
-		}
-
-		console.log("indents", lvlIcons);
-		if (child) {
-			let l = lvlIcons.length;
-			child.node.indentIcons = (lvlIcons as IndentIconame[])
-					.splice(0, l - 1, 'child0' === lvlIcons[l-1]? 'child0' : 'vlink');
-		}
-		
-		lvlIcons.push(itemIcon);
-
-		return (<React.Fragment >
-				{lvlIcons.map( (i, x) => TreeCardComp.icon(iconNames, i, x) )}
-			</React.Fragment>);
-	}
 	 */
 	static levelIcons(iconNames: IndentIcons, lvls: IndentIconame[]) {
 		return (<React.Fragment >
@@ -285,7 +256,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 				.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible, true) )
 				.map( (col: AnlistColAttrs<JSX.Element, CompOpts>, cx: number) => {
 				  if (cx === 0) return (
-					hide(col.grid, media) ||
+					hide(col.grid, media) ? undefined :
 					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
 						<Typography noWrap variant='body2'>
 							{that.leadingIcons()}
@@ -293,7 +264,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 						</Typography>
 					</Grid> );
 				  else if (col.type === 'actions') return (
-					hide(col.grid, media) ||
+					hide(col.grid, media) ? undefined :
 					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
 						<JsampleIcons.Up onClick={this.toUp} />
 						<JsampleIcons.Down onClick={this.toDown} />
@@ -324,11 +295,14 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 						}
 					</Grid> );
 				  else return (
-					hide(col.grid, media) ||
+					// Note: return "true" will result in warning: 
+					// Warning: Failed prop type: Invalid prop `children` supplied to `ForwardRef(Grid)`, expected a ReactNode.
+					// hide(col.grid, media) ||
+					hide(col.grid, media) ? undefined :
 					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
-						{ typeof col.formatter === 'function'
-							? col.formatter(col, tnode)
-							: <Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
+						{ typeof col.formatter === 'function' ?
+							col.formatter(col, tnode) :
+							<Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
 								{n.text}
 							</Typography>
 						}
@@ -372,20 +346,22 @@ class TreeGallaryComp extends TreeCardComp {
 	render() {
 		let {classes, tnode} = this.props;
 		let node = tnode.node;
-		return (
-		  <Grid container {...this.props.grid} className={classes.th} >
+		return (<>
+		  {/* <Grid container {...this.props.grid} className={classes.th} >
 			<Grid item >
-			<TreeCard {... this.props}
+			</Grid>
+			<Grid item>
+			</Grid>
+		  </Grid> */}
+			{/* <TreeCard {... this.props}
 				uri={this.uri}
 				tier={this.tier as AlbumTier}
 				tnode={tnode} media={this.props.media}
 				toEdit={this.toEditCard}
 				onClick={this.expand}
-			/>
-			</Grid>
+			/> */}
 
-			<Grid item>
-			<Collapse in={this.state.expand}>
+			{/* <Collapse in={this.state.expand}>
 			  <GalleryView {... this.props}
 				ref={undefined} // suppress type error
 				uri={this.uri} media={this.props.media}
@@ -393,9 +369,9 @@ class TreeGallaryComp extends TreeCardComp {
 				tier={this.tier}
 				photos={this.props.tnode.node.children} // or fire a request to get photos?
 			  />
-			</Collapse>
-			</Grid>
-		  </Grid>);
+			</Collapse> */}
+		</>
+		);
 	}
 }
 
@@ -563,8 +539,9 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			// tnode = incIndent(tnode, parent, isLastChild);
 			tnode.node.css = tnode.node.css || {};
 
-			let ntype = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
-			if (tnode.node.children?.length > 0) {
+			// let ntype = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
+			let ntype = TreeNodeVisual[tnode.node.nodetype] || TreeNodeVisual.card;
+			if (ntype === TreeNodeVisual.card && tnode.node.children?.length > 0) {
 			  return (
 				<div key={tnode.id} className={classes.folder}>
 				  { that.folderHead(that.props.columns, tnode, classes, media) }
@@ -578,8 +555,8 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			}
 			else {
 			  return (
-				ntype === TreeNodeVisual[TreeNodeVisual.gallery]
-				? <TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)  
+				ntype === TreeNodeVisual.gallery ?
+				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)  
 					key={tnode.id} tier={that.treetier as AlbumTier}
 					tnode={tnode} media={media}
 					parent={parent}
@@ -587,8 +564,8 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 					delete={that.toDel}
 					onUpdate={that.toEditCard}
 				  />
-				: ntype === TreeNodeVisual[TreeNodeVisual.card]
-				? <TreeCard {...that.props}
+				: ntype === TreeNodeVisual.card ?
+				<TreeCard {...that.props}
 					key={tnode.id} tier={that.treetier as AlbumTier}
 					tnode={tnode} media={media}
 					parent={parent}
@@ -604,19 +581,6 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			}
 		  }
 		}
-
-		// function incIndent(child: AnTreeNode, p: AnTreeNode, islastchild: boolean): AnTreeNode {
-		// 	let indent = [] as IndentIconame[];
-		// 	if (p) {
-		// 		indent = (p.node.indentIcons?.splice(0) || []) as IndentIconame[];
-		// 		if (p.islastSibling)
-		// 			indent.push('childx');
-		// 		else indent.push('child0');
-		// 		child.node.indentIcons = indent;
-		// 	}
-		// 	child.islastSibling = !!islastchild;
-		// 	return child;
-		// }
 	}
 
 	th( columns: Array<AnTreegridCol> = [],
@@ -665,17 +629,12 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 				.map( (col: AnTreegridCol, ix: number) => {
 					if (ix == 0) // row head
 					  return (
-						hide(col.grid, media) ||
+						hide(col.grid, media) ? undefined :
 						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography noWrap variant='body2' >
 							{TreeCardComp.levelIcons(
 								that.props.indent,
-								treenode.indents as IndentIconame[],
-								// expd? '.' : 'menu-leaf',
-								// isLastChild,
-								// n.children?.length > 0,
-								// expd
-								)}
+								treenode.indents as IndentIconame[])}
 							{expd ? TreeCardComp.icon(that.props.indentIcons, "expand", 0)
 								: TreeCardComp.icon(that.props.indentIcons, "collapse", 0)}
 							{n.text}
@@ -683,7 +642,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						</Grid>);
 					else if (col.type === 'actions')
 					  return (
-						// hide(col.grid, media) || 
+						hide(col.grid, media) ? undefined :
 						<Grid item key={`${treenode.id}.${ix}`} className={classes.actions}>
 							<Typography noWrap variant='body2' >
 								<Button onClick={this.toEditCard}
@@ -706,7 +665,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						);
 					else if (col.type === 'formatter' || col.formatter)
 					  return (
-						hide(col.grid, media) || 
+						hide(col.grid, media) ? undefined :
 						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography variant='body2' >
 							  {col.formatter(col, treenode, {classes, media}) as ReactNode}
@@ -714,7 +673,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						</Grid>);
 					else
 					  return (
-						hide(col.grid, media) || 
+						hide(col.grid, media) ? undefined :
 						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography noWrap variant='body2' >
 							{formatFolderDesc(treenode, media)}
