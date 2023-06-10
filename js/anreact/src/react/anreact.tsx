@@ -17,6 +17,15 @@ export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: 
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 /**
+ * Find hide or not for grid setting vs. media width.
+ * 
+ * TIP: to avoid ReactJS report warning like this:
+ * 
+ * Invalid prop supplied to `ForwardRef(Grid)`, expected a ReactNode.
+ * 
+ * do not return boolean in render() like this:
+ * 
+ * <Grid>hide(col.grid, this.props.media) || <></></Grid>
  * 
  * @param grid 
  * @param media 
