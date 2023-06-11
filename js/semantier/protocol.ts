@@ -1328,15 +1328,10 @@ export class AnSessionResp extends AnsonResp {
  * 
  * A tree widget uses this to find indent structure, then translate to icons via AnTreeIconsType.
  */
-export type IndentIconame = 'expand' | 'collapse' | 'child0' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
-
-// export enum IndentUnit {
-// 	expand='expand', collapse='collapse', childi='childi', childx='childx', vlink='vlink', space='space', hlink='hlink', deflt='deflt'
-// }
-
+export type IndentIconame = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
 export type AnTreeIconsType =
         'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
-        'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand';
+        'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand' | 'pic-lib' | '!' | '[]' | '>' | 'b';
 
 /**
  * Icons to compose tree item's indent, like indent of command npm ls:
@@ -1374,7 +1369,7 @@ export class AnTreeNode {
 	islastSibling?: boolean;
 	level: number;
 	/** Indent icon names */
-	indentIcons?: Array<IndentIconame>;
+	indents?: Array<IndentIconame>;
 }
 
 /**

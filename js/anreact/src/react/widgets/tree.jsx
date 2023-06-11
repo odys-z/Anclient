@@ -9,9 +9,14 @@ import SvgIcon from "@material-ui/core/SvgIcon";
 import {
 	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
 } from "@material-ui/icons";
+import PhotoLibraryOutlinedIcon from '@material-ui/icons/PhotoLibraryOutlined';
+// import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlinedIcon';
+import PinDropOutlined from '@material-ui/icons/PinDropOutlined';
+import Wallpaper from '@material-ui/icons/Wallpaper';
+import MovieRounded from '@material-ui/icons/MovieRounded';
+import FavoriteBorderOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 
 import { toBool } from '../../utils/helpers';
-
 export const AnTreeIcons = {
 	expand: <ExpandMore style={{verticalAlign: 'middle'}} />,
 	collapse: <ExpandLess style={{verticalAlign: 'middle'}} />,
@@ -29,6 +34,12 @@ export const AnTreeIcons = {
 	"E": <EIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
 	"+": <XIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
 	".": <NIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+
+	"pic-lib": <PhotoLibraryOutlinedIcon color="primary" style={{verticalAlign: 'middle', height: '1.5em', fontSize: '1.333333em'}} />,
+	"!": <PinDropOutlined color="primary" style={{verticalAlign: 'middle', height: '1.5em', fontSize: '1.333333em'}} />,
+	"[]": <Wallpaper color="primary" style={{verticalAlign: 'middle', height: '1.5em', fontSize: '1.333333em'}} />,
+	">": <MovieRounded color="primary" style={{verticalAlign: 'middle', height: '1.5em', fontSize: '1.333333em'}} />,
+	"b": <FavoriteBorderOutlined color="primary" style={{verticalAlign: 'middle', height: '1.5em', fontSize: '1.333333em'}} />,
 };
 
 function NIcon(props) {

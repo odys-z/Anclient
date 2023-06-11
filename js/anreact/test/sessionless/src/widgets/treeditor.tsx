@@ -8,7 +8,9 @@ import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
 
-import { CRUD, AnTreeNode, AnlistColAttrs, AnTreeIconsType, UIComponent, toBool, IndentIcons, IndentIconame } from "@anclient/semantier";
+import { CRUD, AnTreeNode, AnlistColAttrs, AnTreeIconsType,
+	UIComponent, toBool, IndentIcons, IndentIconame
+} from "@anclient/semantier";
 
 import GalleryView from "./gallery-view";
 import { PropTypes, Theme } from "@material-ui/core";
@@ -68,10 +70,13 @@ const styles = (theme: Theme) => ({
   },
   th: {
 	  textAlign: 'center' as const,
-	  border: '1px solid red'
+	  borderBottom: '1px solid #bcd'
   },
   rowText: {
-	marginTop: theme.spacing(1),
+	textShadow: '2px 2px 8px #112244'
+  },
+  galleryHead: {
+	padding: theme.spacing(1),
   }
 });
 
@@ -240,6 +245,40 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 		return React.cloneElement(i, {key: k});
 	}
 
+	static actionFragment(tnode: AnTreeNode, fragKey: string | number, handler, props: TreecardProps) {
+		let {col, classes, media} = props;
+		let parentId = tnode.parent;
+		<Grid key={`${tnode.id}.${fragKey}`} item {...col.grid} className={classes.treeItem}>
+			<JsampleIcons.Up onClick={handler.toUp} />
+			<JsampleIcons.Down onClick={handler.toDown} />
+			{media.isMd ?
+			  <><Button onClick={handler.toEdit}
+					data-me={tnode.id} data-parent={parentId}
+					startIcon={<JsampleIcons.Edit />} color="primary" >
+					{L('Edit')}
+					</Button>
+					<Button onClick={handler.toDel}
+					data-me={tnode.id} data-parent={parentId}
+					startIcon={<JsampleIcons.Delete />} color="secondary" >
+					{L('Delete')}
+					</Button>
+			  </>
+			  :
+			  <><JsampleIcons.Edit onClick={handler.toEdit}
+					className={classes.smallBtn}
+					data-me={tnode.id} data-parent={parentId}
+					color='primary'
+				/>
+					<JsampleIcons.Delete onClick={handler.toDel}
+					className={classes.smallBtn}
+					data-me={tnode.id} data-parent={parentId}
+					color='secondary'
+				/>
+			  </>
+			}
+		</Grid> 
+	} 
+
 	render() {
 		let that = this;
 		let tnode = this.props.tnode;
@@ -251,6 +290,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 		  <Grid container
 				key={tnode.id}
 				spacing={0}
+				onClick={this.props.conClick}
 				className={classes.row} >
 			{ this.props.columns
 				.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible, true) )
@@ -265,6 +305,8 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 					</Grid> );
 				  else if (col.type === 'actions') return (
 					hide(col.grid, media) ? undefined :
+					TreeCardComp.actionFragment(tnode, cx, this, this.props)
+					/*
 					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
 						<JsampleIcons.Up onClick={this.toUp} />
 						<JsampleIcons.Down onClick={this.toDown} />
@@ -293,7 +335,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 							  />
 							</>
 						}
-					</Grid> );
+					</Grid> */);
 				  else return (
 					// Note: return "true" will result in warning: 
 					// Warning: Failed prop type: Invalid prop `children` supplied to `ForwardRef(Grid)`, expected a ReactNode.
@@ -339,39 +381,106 @@ class TreeGallaryComp extends TreeCardComp {
 		this.expand = this.expand.bind(this);
 	}
 
-	expand() {
+	expand(e: React.UIEvent) {
+		console.log(e);
 		this.setState({expand: !this.state.expand});
 	}
 
 	render() {
-		let {classes, tnode} = this.props;
+		let that = this;
+		let {classes, tnode, onClick, media} = this.props;
 		let node = tnode.node;
-		return (<>
-		  {/* <Grid container {...this.props.grid} className={classes.th} >
-			<Grid item >
-			</Grid>
-			<Grid item>
-			</Grid>
-		  </Grid> */}
-			{/* <TreeCard {... this.props}
-				uri={this.uri}
-				tier={this.tier as AlbumTier}
-				tnode={tnode} media={this.props.media}
-				toEdit={this.toEditCard}
-				onClick={this.expand}
-			/> */}
-
-			{/* <Collapse in={this.state.expand}>
-			  <GalleryView {... this.props}
+		return (
+		  <>
+		  { this.galleryHead(that.props.columns, tnode, classes, media, onClick) }
+		  <Collapse in={this.state.expand}>
+			<GalleryView {... this.props} 
 				ref={undefined} // suppress type error
 				uri={this.uri} media={this.props.media}
 				cid={this.collect}
 				tier={this.tier}
-				photos={this.props.tnode.node.children} // or fire a request to get photos?
-			  />
-			</Collapse> */}
-		</>
+				photos={node.children} // or fire a request to get photos?
+			/>
+		  </Collapse>
+		  </>
+		  );
+	}
+
+	galleryHead (columns: AnTreegridCol[], tnode: AnTreeNode,
+			classes: ClassNames, media: Media,
+			onClick: React.MouseEventHandler<HTMLElement>): React.ReactNode {
+		let that = this;
+		let n = tnode.node;
+		n.css = n.css || {};
+		let expd = that.state.expand;
+
+		return (
+		<div onClick={ onClick ? onClick : (_e) => {
+				that.state.expand = !expd;
+				that.setState({})
+			}}
+		>
+		<Grid container spacing={0} key={tnode.id} >
+		  {columns
+			.filter( v => v.hide != true)
+			.map( (col: AnTreegridCol, ix: number) => {
+				if (ix == 0) // row head
+					return (
+					hide(col.grid, media) ? undefined :
+					<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						<Typography noWrap variant='body2' >
+						{TreeCardComp.levelIcons(
+							that.props.indentSettings,
+							tnode.indents as IndentIconame[])}
+						{expd ? TreeCardComp.icon(that.props.indentIcons, "pic-lib", 0)
+							: TreeCardComp.icon(that.props.indentIcons, "collapse", 0)}
+						{n.text}
+						</Typography>
+					</Grid>);
+				else if (col.type === 'actions')
+					return (
+					hide(col.grid, media) ? undefined :
+					TreeCardComp.actionFragment(tnode, ix, this, this.props)
+					);
+				else if (col.type === 'formatter' || col.formatter)
+					return (
+					hide(col.grid, media) ? undefined :
+					<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						<Typography variant='body2' >
+							{col.formatter(col, tnode, {classes, media}) as ReactNode}
+						</Typography>
+					</Grid>);
+				else
+					return (
+					hide(col.grid, media) ? undefined :
+					<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						{formatFolderDesc(tnode, col.grid, media)}
+					</Grid>);
+			}) }
+		</Grid> 
+		</div>
 		);
+
+		function formatFolderDesc(tnode: AnTreeNode, grid: {}, media: Media) {
+			let n = tnode.node;
+
+			return (
+			  <Typography noWrap variant='body2' className={classes.rowText} >
+				{hide(grid, media) ? undefined : `[${n.pname}]`}
+				{ Number(n.img) > 0 &&
+					[TreeCardComp.icon(that.props.indentIcons, "[]", 0),
+					`x ${n.img}`] } 
+				{ Number(n.geo) > 0 &&
+					[TreeCardComp.icon(that.props.indentIcons, "!", 0),
+					`x ${n.geo}`] } 
+				{ Number(n.mov) > 0 &&
+					[TreeCardComp.icon(that.props.indentIcons, ">", 0),
+					`x ${n.mov}`] }
+				{ Number(n.fav) > 0 &&
+					[TreeCardComp.icon(that.props.indentIcons, "b", 0),
+					`x ${n.fav}`] }
+			  </Typography>);
+		}
 	}
 }
 
@@ -418,7 +527,6 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		this.th = this.th.bind(this);
 		this.folderHead = this.folderHead.bind(this);
-		this.toExpandItem = this.toExpandItem.bind(this);
 		this.toAddChild = this.toAddChild.bind(this);
 		this.toEditCard = this.toEditCard.bind(this);
 		this.treeNodes = this.treeNodes.bind(this);
@@ -448,16 +556,6 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		this.editForm = undefined;
 		// this.state.expandings.clear();
-	}
-
-	toExpandItem(e: React.MouseEvent<HTMLElement>) {
-		// e.stopPropagation();
-		// let f = e.currentTarget.getAttribute("data-nid");
-
-		// let expandings = this.state.expandings;
-		// if (expandings.has(f)) expandings.delete(f);
-		// else expandings.add(f);
-		// this.setState({ expandings });
 	}
 
 	toAddChild (e: React.MouseEvent<HTMLElement>) {
@@ -633,7 +731,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography noWrap variant='body2' >
 							{TreeCardComp.levelIcons(
-								that.props.indent,
+								that.props.indentSettings,
 								treenode.indents as IndentIconame[])}
 							{expd ? TreeCardComp.icon(that.props.indentIcons, "expand", 0)
 								: TreeCardComp.icon(that.props.indentIcons, "collapse", 0)}
@@ -645,17 +743,17 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						hide(col.grid, media) ? undefined :
 						<Grid item key={`${treenode.id}.${ix}`} className={classes.actions}>
 							<Typography noWrap variant='body2' >
-								<Button onClick={this.toEditCard}
+								<Button onClick={that.toEditCard}
 									data-me={treenode.id}
 									startIcon={<JsampleIcons.Edit />} color="primary" >
 									{media.isMd && L('Edit')}
 								</Button>
-								<Button onClick={this.toDel} data-me={treenode.id}
+								<Button onClick={that.toDel} data-me={treenode.id}
 									startIcon={<JsampleIcons.Delete />} color="secondary" >
 									{media.isMd && L('Delete')}
 								</Button>
 								{ n.nodetype === TreeNodeVisual[TreeNodeVisual.collapsable] &&
-									<Button onClick={this.toAddChild}
+									<Button onClick={that.toAddChild}
 										data-me={treenode.id} data-parent={n.parent}
 										startIcon={<JsampleIcons.ListAdd />} color="primary" >
 										{media.isMd && L('New')}
@@ -693,10 +791,6 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 			return `${media.isXl ? text : ''} ${children}`;
 		}
-
-		// function icon(iconNames: IndentIcons, icon: IndentIconame) {
-		// 	return TreeCardComp.icon(iconNames, icon, icon) ;
-		// }
 	}
 
 	render() {
