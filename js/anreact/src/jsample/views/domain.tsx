@@ -138,12 +138,8 @@ class DomainComp extends CrudCompW<Comprops> {
 DomainComp.contextType = AnContext;
 
 export class DomainTier extends Semantier {
-
 	_fields = [{field: 'did', label: 'Domain ID'}];
-
 	_cols = [{field: 'did', label: 'Doamin ID'}];
-
-
 }
 
 const Domain = withStyles<any, any, Comprops>(styles)(withWidth()(DomainComp));
