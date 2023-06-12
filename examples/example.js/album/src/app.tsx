@@ -3,11 +3,9 @@ import ReactDOM from 'react-dom';
 
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
-import { L, Langstrs,
-	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
+import { L, Langstrs, AnContext, AnError, AnReactExt,
+	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW,
 } from '@anclient/anreact';
-
-import GalleryView from './gallery-view';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -22,7 +20,7 @@ type AlbumProps = {
 }
 
 /** The application main, context singleton and error handler */
-export class App extends React.Component<AlbumProps> {
+export class App extends CrudCompW<AlbumProps> {
     inclient: Inseclient;
 
 	anReact: AnReactExt;  // helper for React
@@ -31,7 +29,7 @@ export class App extends React.Component<AlbumProps> {
 
 	config = {
 		hasError: false,
-		iportal: 'portal.html',
+		iportal: '#',
 		nextAction: undefined, // e.g. re-login
 
 		/** json object specifying host's urls */
@@ -41,6 +39,7 @@ export class App extends React.Component<AlbumProps> {
 	};
     hasError: any;
     nextAction: string | undefined;
+	tier: any;
 
 	/**
 	 * Restore session from window.localStorage
@@ -100,7 +99,23 @@ export class App extends React.Component<AlbumProps> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
-			{<GalleryView port='album' uri={'/local/album'} aid={this.props.aid}/>}
+		  {/* {<GalleryView cid={''} port='album' uri={'/local/album'} aid={this.props.aid}/>} */}
+		  { <AnTreeditor2 {... this.props}
+				pk={'pid'}
+				sk={Protocol.sk.collectree} tnode={this.tier.root()}
+				onSelectChange={ids => undefined}
+				uri={this.uri} mtabl='ind_emotion'
+				// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
+				// parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
+				parent={ undefined }
+				columns={[
+					{ type: 'text', field: 'folder', label: 'Photo Folders', grid: {sm: 4, md: 2} },
+					{ type: 'text', field: 'tags',   label: L('Summary'), grid: {sm: 4, md: 2} },
+					{ type: 'text', field: 'shareby',label: L('By'), grid: {xs: false, sm: 2} },
+					{ type: 'actions', field: '',    label: '',      grid: {xs: 3, md: 2} }
+				]}
+				isMidNode={(n: { rowtype: string; }) => n.rowtype === 'cate' || !n.rowtype}
+			/> }
 			{this.hasError &&
 				<AnError onClose={this.onErrorClose} fullScreen={false}
 					uri={"/login"} tier={undefined}
@@ -109,7 +124,8 @@ export class App extends React.Component<AlbumProps> {
 		);
 	}
 
-	/**Try figure out serv root, then bind to html tag.
+	/**
+	 * Try figure out serv root, then bind to html tag.
 	 * First try ./private.host/<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
@@ -130,9 +146,5 @@ export class App extends React.Component<AlbumProps> {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv || 'host'} aid={aid} iportal={portal} iwindow={window}/>, dom);
 		}
-	}
-
-	static reportTranslation() {
-		console.log(Langstrs.report());
 	}
 }

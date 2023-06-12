@@ -31,6 +31,8 @@ export * from './react/widgets/simple-form';
 export * from './react/widgets/record-form';
 export * from './react/widgets/relation-tree';
 
+export * from './photo-gallery/src/Photo';
+
 import { JsampleIcons, JsampleTheme, jstyles } from './jsample/styles';
 import { Domain, DomainComp } from './jsample/views/domain';
 import { Orgs, OrgsComp } from './jsample/views/orgs';

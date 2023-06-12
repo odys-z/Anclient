@@ -9,8 +9,9 @@ import { AnConst } from '../../utils/consts';
 import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTablist } from '../../react/widgets/table-list'
-import { AnsonResp, PageInf, QueryConditions, Semantier } from '@anclient/semantier';
+import { AnlistColAttrs, AnsonResp, PageInf, QueryConditions, Semantier } from '@anclient/semantier';
 import { AnQueryst } from '../../react/widgets/query-form';
+import { CompOpts } from '../../an-components';
 
 const styles = (theme: Theme) => ( {
 	root: {
@@ -47,7 +48,8 @@ class DomainComp extends CrudCompW<Comprops> {
 	conds = [
 		{ type: 'text', field: '', val: '', text: 'No', label: 'text'},
 		{ type: 'autocbb', field: '',
-		  sk: 'lvl1.domain.jsample', nv: {n: 'domainName', v: 'domainId'},
+		  sk: 'lvl1.domain.jsample',
+		  nv: {n: 'domainName', v: 'domainId'},
 		  val: AnConst.cbbAllItem,
 		  options: [ AnConst.cbbAllItem ],
 		  label: 'Encoded Items'},
@@ -57,7 +59,7 @@ class DomainComp extends CrudCompW<Comprops> {
 		  val: AnConst.cbbAllItem,
 		  options: [ AnConst.cbbAllItem, {n: 'item', v: 1} ],
 		  label: 'Sub Items'},
-	];
+	] as unknown as AnlistColAttrs<any, CompOpts>[];
 
 	constructor(props: Comprops) {
 		super(props);
@@ -95,7 +97,7 @@ class DomainComp extends CrudCompW<Comprops> {
 			}, ctx.error );
 	}
 
-	onPageInf(page, size) {
+	onPageInf(page: number, size: number) {
 		const ctx = this.context as unknown as AnContextType;
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;

@@ -248,25 +248,25 @@ export class AlbumTier extends StreeTier {
 // }
 // StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
 
-class Profiles extends AnsonBody {
-	home: string;
-	maxUsers: number;
-	servtype: number;
+// class Profiles extends AnsonBody {
+// 	home: string;
+// 	maxUsers: number;
+// 	servtype: number;
 
-	constructor (obj: { servtype: number; maxUsers: number; home: string }) {
-		super( { type: 'io.oz.album.tier.Profiles' } );
-		this.home = obj.home;
-		this.maxUsers = obj.maxUsers;
-		this.servtype = obj.servtype;
-	}
-}
-Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
+// 	constructor (obj: { servtype: number; maxUsers: number; home: string }) {
+// 		super( { type: 'io.oz.album.tier.Profiles' } );
+// 		this.home = obj.home;
+// 		this.maxUsers = obj.maxUsers;
+// 		this.servtype = obj.servtype;
+// 	}
+// }
+// Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
 
 class AlbumResp extends AnDatasetResp {
 	static __type__ = 'io.oz.sandbox.album.AlbumResp';
 	album?: AlbumRec;
 
-	profils?: Profiles;
+	// profils?: Profiles;
 
 	collect?: Array<string>;
 	collects?: Array<PhotoCollect>;
@@ -274,7 +274,7 @@ class AlbumResp extends AnDatasetResp {
 	photo?: PhotoRec;
 
 	constructor (resp: AlbumRec & {
-			forest: AnTreeNode[], profiles?: Profiles,
+			forest: AnTreeNode[], // profiles?: Profiles,
 			photo?: PhotoRec, collect?: Array<string>}) {
 		super({
 			forest: resp.forest
@@ -282,7 +282,7 @@ class AlbumResp extends AnDatasetResp {
 
 		this.album = resp;
 		this.collect = resp.collect;
-		this.profils = resp.profiles;
+		// this.profils = resp.profiles;
 		this.collects = resp.collects;
 	}
 }

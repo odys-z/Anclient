@@ -1,16 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx,
-	UIComponent, AnTreeNode, TierCol, Tierec } from '@anclient/semantier';
+import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
-	AnTreeditor,
+	AnTreeditor2,
 	Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
-import { Button } from '@material-ui/core';
-import { Replay } from '@material-ui/icons';
+import { AlbumAdminTier } from './admin-tier';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -29,7 +27,8 @@ type AlbumProps = {
 export class Admin extends CrudCompW<AlbumProps & Comprops> {
 	servId: string;
 
-    inclient: SessionClient;
+    // ssclient: SessionClient;
+	tier: AlbumAdminTier;
 
 	anReact: AnReactExt;  // helper for React
 
@@ -50,7 +49,6 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
 
-		// this.uri = props.uri;
 		this.servId = props.servId || 'host';
 		this.nextAction = 're-login',
 
@@ -58,7 +56,8 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.reshape = this.reshape.bind(this);
 
-		this.inclient = new SessionClient(SessionClient.loadStorage());
+		let client = new SessionClient(SessionClient.loadStorage());
+		this.tier = new AlbumAdminTier({uri: '/example/album', comp: this, client});
 
 		this.error = {onError: this.onError, msg: ''};
 		this.hasError = false,
@@ -66,11 +65,11 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 		Protocol.sk.collectree = 't-collects';
 
         // design note: exendPorts shall be an automized processing
-		this.anReact = new AnReactExt(this.inclient, this.error)
-                        .extendPorts({
-                            /* see jserv-album/album, port name: album */
-                            album: "album.less",
-                        });
+		this.anReact = new AnReactExt(client, this.error)
+					.extendPorts({
+						/* see jserv-album/album, port name: album */
+						album: "album.less",
+					});
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
@@ -91,68 +90,46 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 	}
 
 	render() {
-		let {classes} = this.props;
-	  	return (
+	  return (
 		<AnContext.Provider value={{
 			servId: this.servId,
 			servs: this.props.servs,
-			anClient: this.inclient,
+			anClient: this.tier.client,
 			uiHelper: this.anReact,
 			hasError: this.hasError,
-			iparent: this.props.iparent,
+			iparent: this.props.iwindow,
 			ihome: this.props.iportal || 'portal.html',
 			error: this.error,
 			ssInf: undefined,
 		}} >
-			{<AnTreeditor pk={'/local/album'}
-				title={""}
-				columns={[{label: "v", field: ""}]}
-				onSelectChange={(ids: String[])=>{}}/>}
-			<Button variant="contained" color='primary'
-				className={classes?.button} onClick={this.reshape}
-				startIcon={<Replay />}
-			>{L('Update')}</Button>
+		  <AnTreeditor2 {... this.props}
+			pk={'pid'}
+			sk={Protocol.sk.collectree} tnode={this.tier.root()}
+			onSelectChange={ids => undefined}
+			uri={this.uri} mtabl='ind_emotion'
+			// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
+			// parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
+			parent={ undefined }
+			columns={[
+				{ type: 'text', field: 'share', label: L('Share'),
+					grid: {xs: 6, sm: 6} },
+				{ type: 'text', field: 'shareby', label: L('By'),
+					grid: {xs: 3, sm: 2} },
+				{ type: 'text', field: 'tags', label: L('Hashtag'),
+					grid: {xs: 3, sm: 2} },
+				{ type: 'actions', field: '', label: '', grid: {xs: 3, md: 2} }
+			]}
+			isMidNode={(n: { rowtype: string; }) => n.rowtype === 'cate' || !n.rowtype}
+			editForm={this.detailForm}
+		  />
+		  {this.confirm}
 
-			<AnTreeditor sk={Protocol.sk.collectree}
-				pk={'?'}
-				onSelectChange={ids => undefined}
-				uri={this.uri} mtabl='ind_emotion'
-				// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
-				parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
-				columns={[
-					{ type: 'text', field: 'share', label: L('Share'),
-					  validator: {len: 200, notNull: true}, grid: {xs: 6, sm: 6} },
-					{ type: 'text', field: 'shareby', label: L('By'),
-					  validator: {minLen: 0.0}, grid: {xs: 3, sm: 1} },
-					{ type: 'text', field: 'tags', label: L('Hashtag'),
-					  validator: {minLen: 0.0}, grid: {xs: 3, sm: 1} },
-					{ type: 'text', field: 'remarks', label: L('Description'),
-					  validator: {minLen: 0.0}, grid: {xs: 4, sm: 2} },
-					{ type: 'formatter', field: 'uri', label: L('Preview'), grid: {xs: 2, sm: 2},
-					  formatter: preview },
-					{ type: 'actions', field: '', label: '', grid: {xs: 3, md: 2} }
-				]}
-				isMidNode={(n: { rowtype: string; }) => n.rowtype === 'cate' || !n.rowtype}
-				editForm={this.detailForm}
-			/>
-			{this.confirm}
-
-			{this.hasError &&
-				<AnError onClose={this.onErrorClose} fullScreen={false}
-					uri={"/login"} tier={undefined}
-					title={L('Error')} msg={this.error.msg || ''} />}
-		</AnContext.Provider>
+		  {this.hasError &&
+			<AnError onClose={this.onErrorClose} fullScreen={false}
+				uri={"/login"} tier={undefined}
+				title={L('Error')} msg={this.error.msg || ''} />}
+		  </AnContext.Provider>
 		);
-
-		/**Change qtype to readable component
-		 * @param {string} t qtype
-		 * @return {string} decoded text
-		 */
-		function preview( col: TierCol,
-			/**column index or record for the row */
-			rec: Tierec | number | AnTreeNode) : UIComponent {
-			return <></> as UIComponent;
-		}
 	}
 
 	/**

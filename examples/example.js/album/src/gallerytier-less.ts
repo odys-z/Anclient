@@ -1,35 +1,36 @@
-import { Comprops, CrudComp } from '@anclient/anreact';
-import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq, PageInf, Semantier, SessionClient, Tierec
+import { Comprops, CrudComp, PhotoCollect, PhotoRec } from '@anclient/anreact';
+import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
+	PageInf, SessionClient, StreeTier, Tierec
 } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
 const debug = true;
 
-export interface PhotoCollect extends Tierec {
-	title?: string;
-	thumbUps?: Set<string>;
-	hashtags?: Array<string>;
-	shareby?: string;
-	extlinks?: any; // another table?
-	photos: Array<PhotoProps<PhotoRec>>;
-};
+// export interface PhotoCollect extends Tierec {
+// 	title?: string;
+// 	thumbUps?: Set<string>;
+// 	hashtags?: Array<string>;
+// 	shareby?: string;
+// 	extlinks?: any; // another table?
+// 	photos: Array<PhotoProps<PhotoRec>>;
+// };
 
-export interface PhotoRec extends Tierec {
-	/** pid */
-	recId?: string,
-	/** card title */
-	pname?: string,
-	shareby?: string | undefined,
-	sharedate?: string,
-	css?: any,
-	device?: string,
+// export interface PhotoRec extends Tierec {
+// 	/** pid */
+// 	recId?: string,
+// 	/** card title */
+// 	pname?: string,
+// 	shareby?: string | undefined,
+// 	sharedate?: string,
+// 	css?: any,
+// 	device?: string,
 
-	src: string,
-	width: number,
-	height: number
-};
+// 	src: string,
+// 	width: number,
+// 	height: number
+// };
 
-export class GalleryTier extends Semantier {
+export class GalleryTier extends StreeTier {
 	comp: CrudComp<Comprops>;
 	port: string = "album";
 

@@ -80,8 +80,7 @@ const styles = (theme: Theme) => ({
 
 interface TreecardProps extends AnTablistProps {
 	indentSettings?: IndentIcons;
-	// lastSibling: boolean; 
-	parent: AnTreeNode;
+	parent: AnTreeNode | undefined;
 	tnode: AnTreeNode;
 };
 
@@ -492,8 +491,6 @@ interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
 
 class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 	state = {
-		// window: undefined,
-		// [{id, node: {text, css, url}, level, children}. ... ]
 		forest: [] as AnTreeNode[],
 		tobeLoad: true
 	};

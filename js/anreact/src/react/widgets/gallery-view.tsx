@@ -4,7 +4,9 @@ import Modal from 'react-modal';
 import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
 import { Carousel } from 'react-responsive-carousel';
 
-import { AnTreeNode, DatasetierReq, PageInf, SessionClient, StreeTier, Tierec, UserReq, isEmpty } from "@anclient/semantier";
+import { AnTreeNode, DatasetierReq, PageInf, SessionClient, StreeTier, Tierec, UserReq, isEmpty
+} from "@anclient/semantier";
+
 import { Comprops, CrudCompW } from '../crud';
 import { PhotoProps } from '../../photo-gallery/src/Photo';
 

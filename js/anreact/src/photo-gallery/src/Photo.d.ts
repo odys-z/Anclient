@@ -66,4 +66,4 @@ export interface RenderImageProps<CustomPhotoProps extends object = {}> {
     left?: number
 }
 
-export default Photo;
+// export default Photo;
