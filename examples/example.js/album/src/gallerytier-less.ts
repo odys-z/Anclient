@@ -1,34 +1,10 @@
 import { Comprops, CrudComp, PhotoCollect, PhotoRec } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
-	PageInf, SessionClient, StreeTier, Tierec
+	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode
 } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
 const debug = true;
-
-// export interface PhotoCollect extends Tierec {
-// 	title?: string;
-// 	thumbUps?: Set<string>;
-// 	hashtags?: Array<string>;
-// 	shareby?: string;
-// 	extlinks?: any; // another table?
-// 	photos: Array<PhotoProps<PhotoRec>>;
-// };
-
-// export interface PhotoRec extends Tierec {
-// 	/** pid */
-// 	recId?: string,
-// 	/** card title */
-// 	pname?: string,
-// 	shareby?: string | undefined,
-// 	sharedate?: string,
-// 	css?: any,
-// 	device?: string,
-
-// 	src: string,
-// 	width: number,
-// 	height: number
-// };
 
 export class GalleryTier extends StreeTier {
 	comp: CrudComp<Comprops>;
@@ -81,6 +57,10 @@ export class GalleryTier extends StreeTier {
 		onLoad(this.collectRecords);
 	}
 
+	root(): AnTreeNode {
+		return new AnTreeNode();
+	}
+
     myAlbum(onLoad: ((collects?: PhotoCollect[]) => void)): void {
         this.collects(this.page, onLoad);
     }
@@ -91,7 +71,7 @@ export class GalleryTier extends StreeTier {
 		if (this.collectRecords) {
 			let album = this.collectRecords[idx];
 			album.photos.forEach( (p, x) => {
-				console.log(p);
+				// console.log(p);
 				if (!p.recId) return;
 
 				let src = that.imgSrc(p.recId);

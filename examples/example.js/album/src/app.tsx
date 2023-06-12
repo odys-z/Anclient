@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, AnTreeNode, ErrorCtx } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW,
+	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW, AnContextType,
 } from '@anclient/anreact';
+import { GalleryTier } from './gallerytier-less';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -39,18 +40,29 @@ export class App extends CrudCompW<AlbumProps> {
 	};
     hasError: any;
     nextAction: string | undefined;
-	tier: any;
+	tier: GalleryTier;
+	albumsk: string;
+
+	state = {
+		tobeLoad: true,
+		forest: [] as AnTreeNode[],
+	};
+
+	editForm: undefined;
 
 	/**
 	 * Restore session from window.localStorage
 	 */
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
+		this.uri = 'example.js/album';
+		this.albumsk = "??";
 
 		this.config.iportal = this.props.iportal as string;
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.toSearch = this.toSearch.bind(this);
 
 		this.config.servId = this.props.servId;
 		this.config.servs = this.props.servs;
@@ -65,12 +77,36 @@ export class App extends CrudCompW<AlbumProps> {
 
 		Protocol.sk.cbbViewType = 'v-type';
 
+		this.tier = new GalleryTier({uri: this.uri, client: this.inclient, album: "", comp: this});
+
         // design note: exendPorts shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
                         .extendPorts({
                             /* see jserv-album/album, port name: album */
                             album: "album.less",
                         });
+	}
+
+	componentDidMount() {
+		console.log(this.uri);
+
+		const ctx = this.context as unknown as AnContextType;
+		this.anReact = ctx.uiHelper;
+		this.state.tobeLoad = true;
+		this.toSearch();
+	}
+
+	toSearch() {
+		let that = this;
+
+		this.state.tobeLoad = false;
+		this.tier.stree({ uri: this.uri, sk: this.albumsk, uiHelper: this.context.uiHelper,
+			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
+				that.setState({forest: resp.Body()?.forest});
+			}},
+			this.context.error);
+
+		this.editForm = undefined;
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
@@ -87,6 +123,7 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	render() {
+	  console.log(this.uri);
 	  return (
 		<AnContext.Provider value={{
 			servId: this.config.servId,
@@ -101,12 +138,10 @@ export class App extends CrudCompW<AlbumProps> {
 		}} >
 		  {/* {<GalleryView cid={''} port='album' uri={'/local/album'} aid={this.props.aid}/>} */}
 		  { <AnTreeditor2 {... this.props}
-				pk={'pid'}
-				sk={Protocol.sk.collectree} tnode={this.tier.root()}
+				pk={'pid'} sk={Protocol.sk.collectree}
+				tier={this.tier} tnode={this.tier.root()} title={"title"}
 				onSelectChange={ids => undefined}
 				uri={this.uri} mtabl='ind_emotion'
-				// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
-				// parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
 				parent={ undefined }
 				columns={[
 					{ type: 'text', field: 'folder', label: 'Photo Folders', grid: {sm: 4, md: 2} },
@@ -114,7 +149,6 @@ export class App extends CrudCompW<AlbumProps> {
 					{ type: 'text', field: 'shareby',label: L('By'), grid: {xs: false, sm: 2} },
 					{ type: 'actions', field: '',    label: '',      grid: {xs: 3, md: 2} }
 				]}
-				isMidNode={(n: { rowtype: string; }) => n.rowtype === 'cate' || !n.rowtype}
 			/> }
 			{this.hasError &&
 				<AnError onClose={this.onErrorClose} fullScreen={false}
