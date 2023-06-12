@@ -10,6 +10,8 @@ import {
 } from './protocol';
 import { ErrorCtx, Tierec, isEmpty, len } from './semantier';
 
+export * from './stree-tier';
+
 export interface AjaxOptions {async?: boolean; timeout?: number}
 
 interface AjaxReport {
@@ -85,7 +87,6 @@ class AnClient {
      * @param newPorts
      * @return this */
 	understandPorts (newPorts: { [p: string]: string; }) : this {
-		// Object.assign(Protocol.Port, newPorts);
 		Protocol.extend(newPorts);
         return this;
 	}
@@ -106,7 +107,6 @@ class AnClient {
      * @param onError error handler
      */
 	login (usrId: string, pswd: string,
-		// onLogin: { (ssClient: any): void; (arg0: SessionClient): void; },
 		onLogin: OnLoginOk,
 		onError: ErrorCtx): this {
 
@@ -144,23 +144,17 @@ class AnClient {
 		});
 	}
 
-	/**Create a user request AnsonMsg for no-ssession request (no connId can be specified).
+	/**
+	 * Create a user request AnsonMsg for no-ssession request
+	 * (create header and link body.parent, and no connId can be specified).
 	 * @param port
 	 * @param bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
-	 * @return AnsonMsg<T extends UserReq> */
+	 * @return AnsonMsg<T extends UserReq>
+	 */
 	getReq<T extends AnsonBody>(port: string, bodyItem: T): AnsonMsg<T> {
 		let header = Protocol.formatHeader({});
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
-
-    /**Check Response form jserv
-     * @param {any} resp
-	static checkResponse(resp: any) : false | "err_NA" {
-		if (typeof resp === "undefined" || resp === null || resp.length < 2)
-			return "err_NA";
-		else return false;
-	}
-     */
 
     /**Post a request, using Ajax.
      * @param jreq
@@ -217,9 +211,6 @@ class AnClient {
 				}
 
 				if (resp.code !== Protocol.MsgCode.ok)
-					// if (typeof onErr === "function")
-					// 	onErr(resp.code, resp);
-					// else
 					if (onErr && typeof onErr.onError === "function"){
 						// a special case of AnContext.error
 						onErr.msg = resp.Body().msg();
@@ -230,7 +221,7 @@ class AnClient {
 				else {
 					if (typeof onOk === "function")
 						onOk(resp);
-					else console.log(resp);
+					else console.error("Response ignored.", resp);
 				}
 			},
 			error: function (resp: any) {

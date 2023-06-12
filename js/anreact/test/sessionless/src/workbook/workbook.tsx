@@ -7,8 +7,8 @@ import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 import {
 	L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, AnContextType, Spreadsheetier,
-} from '../../../../src/an-components';
-import { JsampleIcons } from '../../../../src/jsample/styles';
+} from '../../an-components';
+import { JsampleIcons } from '../../jsample/styles';
 
 const styles = (_theme: Theme) => ({
 	root: {

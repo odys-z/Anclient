@@ -1,36 +1,36 @@
-import { Comprops, CrudComp } from '../../../../src/an-components';
-import { Protocol, AnsonMsg, AnsonBody, PageInf,
-	SessionClient, Tierec, UserReq, AnDatasetResp, AnTreeNode, DatasetierReq
+import { Protocol, AnsonBody, PageInf,
+	SessionClient, AnDatasetResp, AnTreeNode, StreeTier
 } from '@anclient/semantier';
+import { Comprops, CrudComp, AlbumReq, PhotoCollect, PhotoRec, GalleryView, AlbumRec
+} from '../../../../src/an-components';
 import { PhotoProps } from '../../../../src/photo-gallery/src/Photo';
-import { StreeTier } from './stree-tier';
 
 const debug = true;
 
-export interface PhotoCollect extends Tierec {
-	title?: string;
-	thumbUps?: Set<string>;
-	hashtags?: Array<string>;
-	shareby?: string;
-	extlinks?: any; // another table?
-	photos: Array<PhotoProps<PhotoRec>>;
-};
+// export interface PhotoCollect extends Tierec {
+// 	title?: string;
+// 	thumbUps?: Set<string>;
+// 	hashtags?: Array<string>;
+// 	shareby?: string;
+// 	extlinks?: any; // another table?
+// 	photos: Array<PhotoProps<PhotoRec>>;
+// };
 
-export interface PhotoRec extends Tierec {
-	/** pid */
-	recId?: string,
-	/** card title */
-	pname?: string,
-	shareby?: string | undefined,
-	sharedate?: string,
-	css?: any,
-	device?: string,
+// export interface PhotoRec extends Tierec {
+// 	/** pid */
+// 	recId?: string,
+// 	/** card title */
+// 	pname?: string,
+// 	shareby?: string | undefined,
+// 	sharedate?: string,
+// 	css?: any,
+// 	device?: string,
 
-	src: string,
-	srcSet?: Array<string>,
-	width: number,
-	height: number
-};
+// 	src: string,
+// 	srcSet?: Array<string>,
+// 	width: number,
+// 	height: number
+// };
 
 export class AlbumTier extends StreeTier {
 	comp: CrudComp<Comprops>;
@@ -136,117 +136,117 @@ export class AlbumTier extends StreeTier {
 
 		return AlbumTier.servUrl(this.client.an.servUrl(this.port), msg);
 		*/
-		return AlbumTier.imgReq(this.uri, recId, this.port, this.client);
+		return GalleryView.imgSrcReq(recId, { uri: this.uri, port: this.port, client: this.client});
 	}
 
-	/**
-	 * Create an HTTP GET request for src of img tag.
-	 * 
-	 * @param uri 
-	 * @param pid 
-	 * @param port 
-	 * @param client 
-	 * @returns src for img, i.e. jserv?anst64=message-string 
-	 */
-	static imgReq(uri: string, pid: string, port: string, client: SessionClient) : string {
-		let req = new AlbumReq({uri, page: undefined});
-		req.a = AlbumReq.A.download;
-		req.pid = pid;
+	// /**
+	//  * Create an HTTP GET request for src of img tag.
+	//  * 
+	//  * @param uri 
+	//  * @param pid 
+	//  * @param port 
+	//  * @param client 
+	//  * @returns src for img, i.e. jserv?anst64=message-string 
+	//  */
+	// static imgReq(uri: string, pid: string, port: string, client: SessionClient) : string {
+	// 	let req = new AlbumReq({uri, page: undefined});
+	// 	req.a = AlbumReq.A.download;
+	// 	req.pid = pid;
 
-		let msg = client.an.getReq<AlbumReq>(port, req);
+	// 	let msg = client.an.getReq<AlbumReq>(port, req);
 
-		// return AlbumTier.servUrl(client.an.servUrl(port), msg);
-		let jserv = client.an.servUrl(port);
-		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
-	}
+	// 	// return AlbumTier.servUrl(client.an.servUrl(port), msg);
+	// 	let jserv = client.an.servUrl(port);
+	// 	return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
+	// }
 
-	static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
-		if (debug)
-			console.log(msg);
+	// static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
+	// 	if (debug)
+	// 		console.log(msg);
 
-		// use <img src='anson64'/> to GET Http resource
-		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
-	}
+	// 	// use <img src='anson64'/> to GET Http resource
+	// 	return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
+	// }
 };
 
-class AlbumRec {
-	static __type__: "io.oz.sandbox.album.AlbumRec";
+// class AlbumRec {
+// 	static __type__: "io.oz.sandbox.album.AlbumRec";
 
-	type: string;
+// 	type: string;
 
-	/** Album Id (h_albems.aid) */
-	album?: string;
+// 	/** Album Id (h_albems.aid) */
+// 	album?: string;
 
-	/** Collects' ids */
-	collects?: Array<PhotoCollect>;
+// 	/** Collects' ids */
+// 	collects?: Array<PhotoCollect>;
 
-	/** Collects' default length (first page size) */
-	collectSize?: number;
+// 	/** Collects' default length (first page size) */
+// 	collectSize?: number;
 
-	/** Photos ids, but what's for? */
-	collect?: Array<string>;
+// 	/** Photos ids, but what's for? */
+// 	collect?: Array<string>;
 
-	// [f: string]: string | number | boolean | object;
+// 	// [f: string]: string | number | boolean | object;
 
-	contructor () {
-		this.type = AlbumRec.__type__;
-	}
-}
+// 	contructor () {
+// 		this.type = AlbumRec.__type__;
+// 	}
+// }
 
-/*
-class AlbumPage extends PageInf {
-	static __type__: string;
+// /*
+// class AlbumPage extends PageInf {
+// 	static __type__: string;
 
-	/** A temperoray solution before PageInf.condts evolved to Tierec. * /
-	qrec?: AlbumRec;
+// 	/** A temperoray solution before PageInf.condts evolved to Tierec. * /
+// 	qrec?: AlbumRec;
 
-	collectIds?: string[];
-	pids?: string[];
-	albumId?: string | undefined;
+// 	collectIds?: string[];
+// 	pids?: string[];
+// 	albumId?: string | undefined;
 
-	constructor (query?: AlbumRec) {
-		super();
-		this.type = AlbumPage.__type__;
-		this.qrec = query;
-	}
-}
-*/
+// 	constructor (query?: AlbumRec) {
+// 		super();
+// 		this.type = AlbumPage.__type__;
+// 		this.qrec = query;
+// 	}
+// }
+// */
 
-class AlbumReq extends UserReq {
- 	static __type__ = 'io.oz.sandbox.album.AlbumReq';
-	static A = {
-		stree: DatasetierReq.A.stree,
-		records: 'r/collects',
-		collect: 'r/photos',
-		rec: 'r/photo',
-		download: 'r/download',
-		update: 'u',
-		insert: 'c',
-		upload: 'c/doc',
-		del: 'd',
-	};
+// class AlbumReq extends UserReq {
+//  	static __type__ = 'io.oz.sandbox.album.AlbumReq';
+// 	static A = {
+// 		stree: DatasetierReq.A.stree,
+// 		records: 'r/collects',
+// 		collect: 'r/photos',
+// 		rec: 'r/photo',
+// 		download: 'r/download',
+// 		update: 'u',
+// 		insert: 'c',
+// 		upload: 'c/doc',
+// 		del: 'd',
+// 	};
 
-	// pageInf: AlbumPage;
-	pageInf: PageInf;
-	sk: string;
-	queryRec: AlbumRec;
+// 	// pageInf: AlbumPage;
+// 	pageInf: PageInf;
+// 	sk: string;
+// 	queryRec: AlbumRec;
 
-	pid: string;
+// 	pid: string;
 
-	constructor (opts: {uri: string, sk?: string, qrec?: AlbumRec, page?: PageInf}) {
-		super(opts.uri, undefined);
-		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
+// 	constructor (opts: {uri: string, sk?: string, qrec?: AlbumRec, page?: PageInf}) {
+// 		super(opts.uri, undefined);
+// 		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
 
-		let {sk} = opts;
-		this.pageInf = opts.page;
-		this.sk = sk;
+// 		let {sk} = opts;
+// 		this.pageInf = opts.page;
+// 		this.sk = sk;
 
-		// if (opts?.qrec) {
-			this.queryRec = opts.qrec || new AlbumRec();
-		// }
-	}
-}
-StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
+// 		// if (opts?.qrec) {
+// 			this.queryRec = opts.qrec || new AlbumRec();
+// 		// }
+// 	}
+// }
+// StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
 
 class Profiles extends AnsonBody {
 	home: string;

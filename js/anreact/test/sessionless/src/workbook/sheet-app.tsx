@@ -6,11 +6,11 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '@anclient/semantier';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs, CellEditingStoppedEvent, Spreadsheetier
+	AnContext, AnError, AnReactExt, jsample, JsonServs, Spreadsheetier
 } from '../../../../src/an-components';
 
 import { Workbook } from './workbook-no-tier';
-// import { MyBookReq } from './workbook-tier';
+import { CellEditingStoppedEvent } from 'ag-grid-community';
 
 const { JsampleTheme } = jsample;
 
@@ -134,13 +134,13 @@ class App extends React.Component<LessProps, State> {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
-				anReact: this.anReact,
+				uiHelper: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
 				anClient: this.inclient,
 				hasError: this.state.hasError,
-				iparent: this.props.iparent,
+				iparent: this.props.iwindow,
 				ihome: this.props.iportal || 'portal.html',
 				error: this.error,
 				ssInf: undefined,

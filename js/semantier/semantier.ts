@@ -1,9 +1,9 @@
-import { SessionClient, Inseclient } from "./anclient";
+import { SessionClient, Inseclient, AnTreeNode } from "./anclient";
 import { toBool, isEmpty, str } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkVal, NameValue, DatasetOpts, DatasetReq, UIRelations
+	DbCol, DbRelations, NV, PageInf, PkVal, NameValue, DatasetOpts, DatasetReq
 } from "./protocol";
 
 export { toBool, isEmpty };
@@ -219,7 +219,7 @@ export class Semantier {
 	 *
 	 * Looks like all relationship records are item of main tree.
 	 */
-    rels: UIRelations = {};
+    rels: {};
 
     /**
      * @param context

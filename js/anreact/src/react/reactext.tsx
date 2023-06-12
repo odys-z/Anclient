@@ -4,7 +4,7 @@ import React from 'react';
 import { AnReact } from './anreact';
 
 /**
- * The configuration used by user App to setup jserv root URL.
+ * The configuration data object used by user App to setup jserv root URL.
  */
 export interface JsonServs {
 	host?: string;

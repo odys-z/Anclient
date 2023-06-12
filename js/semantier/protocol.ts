@@ -82,7 +82,6 @@ export type AnsonValue = string | object | string | number | boolean | undefined
 export type NameValue = {name: string, value: AnsonValue};
 export type NV = {n: string, v: AnsonValue};
 export function isNV (obj: any) {
-	debugger;
 	return !!obj && (obj.name || obj.n);  
 }
 
@@ -158,16 +157,16 @@ export interface DbRelations {
 	m2m?: any,
 }
 
-export interface UIRelations {
-    [tabl: string]: AnTreeNode[];
-}
+// export interface UIRelations {
+//     [tabl: string]: AnTreeNode[];
+// }
 
 /**Issue: As pk fields is wrapped up at server side, should clients caring about the pk name?
  * example of this:
  * that.pkval.v = that.rec && that.rec[that.pk];
 */
 export interface PkVal {
-    v: string | number | boolean | undefined;
+    v: AnsonValue;// string | number | boolean | undefined;
     pk: string | undefined;
     tabl?: string;
 }
@@ -1323,63 +1322,16 @@ export class AnSessionResp extends AnsonResp {
 	}
 }
 
-/**
- * expand: 'T'; collpase: e.g. '+', ...,
- * 
- * A tree widget uses this to find indent structure, then translate to icons via AnTreeIconsType.
- */
-export type IndentIconame = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
-export type AnTreeIconsType =
-        'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
-        'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand' | 'pic-lib' | '!' | '[]' | '>' | 'b';
 
-/**
- * Icons to compose tree item's indent, like indent of command npm ls:
- * @example
- * anclient/anreact
- 	├─ anclient/anreact
-	│  ├─ anclient/semantier
-	│  ├─ babel/cli
-	│  └─ webpack-cli
- 	└─ anclient/super
-       └─ webpack-cli
- */
-export type IndentIcons = {
-	[i in IndentIconame]: AnTreeIconsType;
-}
-
-/** Tree data node */
-export class AnTreeNode {
-	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	/** json data node, for ui node composition */
-	node : {
-		nodetype?: string;
-		// id: string;
-		children?: Array<AnTreeNode>;
-		expandChildren?: boolean;
-
-		/** With icon as a special field? */
-		css?: CSS.Properties & {icon?: AnTreeIconsType, size?: number[]};
-
-		/** Any data by jserv */
-		[d: string]: AnsonValue;
-	};
-	id: string;
-	parent: string;
-	islastSibling?: boolean;
-	level: number;
-	/** Indent icon names */
-	indents?: Array<IndentIconame>;
-}
 
 /**
  * type: io.odysz.semantic.ext.AnDatasetResp,
  * planned to be replaced by DatasetierResp
  */
 export class AnDatasetResp extends AnsonResp {
-	forest: Array<AnTreeNode>;
+	forest: Array<Tierec>;
 
-	constructor(dsJson: { forest: AnTreeNode[]; }) {
+	constructor(dsJson: { forest: Tierec[]; }) {
 		super(dsJson);
 		this.forest = dsJson.forest;
 	}
@@ -1566,14 +1518,6 @@ Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json
 
 export class DocsReq extends AnsonBody {
 	static __type__ = 'io.odysz.semantic.tier.docs.DocsReq';
-	// static __init__ = function () {
-	// 	// Design Note:
-	// 	// can we use dynamic Protocol?
-	// 	Protocol.registerBody(DocsReq.__type__, (jsonBd) => {
-	// 		return new DocsReq(jsonBd);
-	// 	});
-	// 	return undefined;
-	// }();
 
 	static A = {
 		records: 'r/list',

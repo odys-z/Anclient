@@ -198,7 +198,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 								let v = row[colObj.field];
 								let cell = colObj.formatter && colObj.formatter(v as any, x, row); //v: bug?
 								if (cell)
-									cell = <TableCell key={colObj.field + x}>{cell}</TableCell> as UIComponent;
+									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
 								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
 							} )}
 				</TableRow>)

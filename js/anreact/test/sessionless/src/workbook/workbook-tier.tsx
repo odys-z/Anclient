@@ -2,7 +2,7 @@ import { Protocol, AnsonBody, AnsonResp, CRUD, ErrorCtx,
 	OnCommitOk, OnLoadOk, PageInf} from '@anclient/semantier';
 
 import { SheetCol, SpreadsheetRec, Spreadsheetier, SpreadsheetReq, CellEditingStoppedEvent
-} from '../../../../src/an-components';
+} from '../../an-components';
 
 /**
  * @example table DDL

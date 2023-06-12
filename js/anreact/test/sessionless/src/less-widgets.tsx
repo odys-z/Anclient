@@ -4,10 +4,9 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
 
-import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs, Login, CrudComp
+import { L, Langstrs, AnContext, AnError, AnReactExt,
+	jsample, JsonServs, Login, CrudComp, AnTreeditor2
 } from '../../../src/an-components';
-import { AnTreeditor2 } from './widgets/treeditor';
 import { AlbumTier } from './widgets/album-tier';
 
 const { JsampleTheme } = jsample;
