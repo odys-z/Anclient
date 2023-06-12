@@ -26,7 +26,7 @@
   "author": "Ody Zhou",
   "license": "MIT",
   "dependencies": {
-    "@anclient/semantier": "0.9.85",
+    "@anclient/semantier": "^0.9.86",
     "@emotion/react": "^11.11.0",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
