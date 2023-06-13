@@ -5,11 +5,11 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
 
-import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, SessionClient, StreeTier, Tierec, isEmpty
+import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, SessionClient, StreeTier, Tierec, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
-import { PhotoProps } from '../../photo-gallery/src/Photo';
+import { CustomImgStyle, PhotoProps } from '../../photo-gallery/src/Photo';
 
 const _photos = [];
 
@@ -27,7 +27,16 @@ export interface ImageSlide {
 	height: number,
 	src: string,
 	srcSet?: string[],
-	legend: string
+	legend: string,
+
+	/**
+	 * Use maxWidth to limit picture size when too few pictures;
+	 * 
+	 * use width: auto, height: auto for keep original ratio.
+	 * 
+	 * defualt:  {maxWidth: '60%', width: 'auto', height: 'auto'}
+	 */
+	imgstyl?: CustomImgStyle
 }
 
 
@@ -67,13 +76,18 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 
 	parse(nodes: AnTreeNode[]) {
 		let photos = [] as ImageSlide[];
+		let imgstyl = len(nodes) === 1
+					? {width:'auto', maxHeight: '20vh'}
+					: undefined;
+		console.log(len(nodes), imgstyl, nodes);
 		nodes?.forEach( (p, x) => {
 			let [_width, _height, w, h] = (
 				JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
 			photos.push({
 				src: GalleryView.imgSrcReq(p.id, this.albumtier),
 				width: w, height: h,
-				legend: PhotoRec.toShareLable(p.node as PhotoRec)
+				legend: PhotoRec.toShareLable(p.node as PhotoRec),
+				imgstyl
 			})
 		});
 

@@ -26,7 +26,7 @@ const Gallery = React.memo(function Gallery({
       const newWidth = entries[0].contentRect.width;
 
       // Ody Z, 2023/6/2
-      // This stops endless animation of keeping shrinking photos. Yet the problem is understood.
+      // This stops endless animation of keeping shrinking photos. Yet the problem is not understood.
       // if (containerWidth !== newWidth) {
       // ->
       // ReactJS API, useLayoutEffect:
@@ -118,7 +118,7 @@ const Gallery = React.memo(function Gallery({
             margin,
             direction,
             onClick: onClick ? handleClick : null,
-            photo,
+            photo
           });
         })}
       </div>

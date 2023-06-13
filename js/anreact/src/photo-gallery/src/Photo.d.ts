@@ -1,6 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+export type CustomImgStyle = {
+    width?: string;
+    height?: string;
+    maxWidth?: string
+    maxHeight?: string
+}
+
 /**
  * Photos array item properties (passed into Gallery's photos property)
  */
@@ -33,6 +40,12 @@ export type PhotoProps<CustomPhotoProps extends object = {}> = {
      * key to be used on component
      */
     key?: string
+
+    // ody
+    /**
+	 * defualt:  {maxWidth: '60%', width: 'auto', height: 'auto'}
+     */
+    imgstyl?: CustomImgStyle
 } & CustomPhotoProps
   
 export type renderImageClickHandler = (

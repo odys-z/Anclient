@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 const imgWithClick = { cursor: 'pointer' };
 
 const Photo = ({ index, onClick, photo, margin, direction, top, left, key }) => {
-  const imgStyle = { margin: margin, display: 'block' };
+  // imgstyl = imgstyl || {maxWidth: '60%', height: 'auto'};
+  // imgstyl = imgstyl || {maxHeight: '40%', width: 'auto'};
+  const imgStyle = { margin: margin, display: 'block', ...photo.imgstyl };
   if (direction === 'column') {
     imgStyle.position = 'absolute';
     imgStyle.left = left;
