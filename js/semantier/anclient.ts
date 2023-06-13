@@ -830,4 +830,5 @@ class Inseclient extends SessionClient {
 export * from './helpers';
 export * from './protocol';
 export * from './semantier';
+export * from './stree-tier';
 export {AnClient, SessionClient, Inseclient, aes};
