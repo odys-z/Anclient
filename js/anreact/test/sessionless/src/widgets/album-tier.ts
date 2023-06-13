@@ -1,7 +1,7 @@
-import { Protocol, AnsonBody, PageInf,
-	SessionClient, AnDatasetResp, AnTreeNode, StreeTier
+import { Protocol, PageInf, SessionClient,
+	AnDatasetResp, AnTreeNode, StreeTier, AlbumReq, AlbumRec, PhotoRec
 } from '@anclient/semantier';
-import { Comprops, CrudComp, AlbumReq, PhotoCollect, PhotoRec, GalleryView, AlbumRec
+import { Comprops, CrudComp, PhotoCollect, GalleryView, ImageSlide
 } from '../../../../src/an-components';
 import { PhotoProps } from '../../../../src/photo-gallery/src/Photo';
 
@@ -89,7 +89,7 @@ export class AlbumTier extends StreeTier {
 
 	toGalleryImgs(idx: number) {
 		let that = this;
-		let imgs = [] as PhotoProps<PhotoRec>[];
+		let imgs = [] as PhotoProps<ImageSlide>[];
 		if (this.collects) {
 			let album = this.collects[idx];
 			album.photos.forEach( (p, x) => {
@@ -99,7 +99,7 @@ export class AlbumTier extends StreeTier {
 				let src = that.imgSrc(p.recId);
 				let srcSet = [src];
 
-				let css = JSON.parse(p.css);
+				let css = typeof p.css === 'string' ? JSON.parse(p.css as string) : p.css;
 				let size = css?.size;
 				let width = size && size.length > 2 ? size[2] : 4;
 				let height = size && size.length > 3 ? size[3] : 3;
@@ -112,7 +112,7 @@ export class AlbumTier extends StreeTier {
 					width,
 					height,
 					alt,
-					title: alt, 
+					legend: p.shareLable(), 
 					key: x.toString()
 				} );
 			} );
@@ -283,7 +283,7 @@ class AlbumResp extends AnDatasetResp {
 		this.album = resp;
 		this.collect = resp.collect;
 		// this.profils = resp.profiles;
-		this.collects = resp.collects;
+		this.collects = resp.collects as PhotoCollect[];
 	}
 }
 Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });

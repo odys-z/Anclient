@@ -1,11 +1,12 @@
 import * as CSS from 'csstype';
 
-import { AnsonValue, DatasetOpts, DatasetierReq,
-    ErrorCtx, LogAct, PageInf, AnClient, 
-    Protocol, SessionClient, UIComponent, UserReq, isEmpty
-} from './anclient';
+import { AnClient, SessionClient } from './anclient';
 
-import { Semantier, Tierec } from './semantier';
+import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, DocsReq, AnsonBody } from './protocol';
+
+import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
+
+import { isEmpty } from "./helpers";
 
 /**
  * expand: 'T'; collpase: e.g. '+', ...,
@@ -31,6 +32,22 @@ export type AnTreeIconsType =
 export type IndentIcons = {
 	[i in IndentIconame]: AnTreeIconsType;
 }
+
+/**
+ * defaults icons:
+ * 
+ * expand: 'T';
+ * collapse: "+";
+ * hlink: '-';
+ * spacex: '.';
+ * vlink: '|';
+ * child0: '|-',
+ * childx: 'L', last child;
+ */
+export const defltIcons: IndentIcons = {
+    expand: 'T', collapse: '+', childi: '|-', childx: 'L',
+    vlink: '|', spacex: '.', hlink: '-', deflt: '.'
+};
 
 /** Tree data node */
 export class AnTreeNode implements Tierec {
@@ -58,29 +75,37 @@ export class AnTreeNode implements Tierec {
 	indents?: Array<IndentIconame>;
 }
 
-/**
- * defaults icons:
- * 
- * expand: 'T';
- * collapse: "+";
- * hlink: '-';
- * spacex: '.';
- * vlink: '|';
- * child0: '|-',
- * childx: 'L', last child;
- */
-export const defltIcons: IndentIcons = {
-    expand: 'T', collapse: '+', childi: '|-', childx: 'L',
-    vlink: '|', spacex: '.', hlink: '-', deflt: '.'
-};
+export class AlbumRec {
+	static __type__: "io.oz.sandbox.album.AlbumRec";
+
+	type: string;
+
+	/** Album Id (h_albems.aid) */
+	album?: string;
+
+	/** Collects' ids */
+	collects?: Array<Tierec>;
+
+	/** Collects' default length (first page size) */
+	collectSize?: number;
+
+	/** Photos ids, but what's for? */
+	collect?: Array<string>;
+
+	// [f: string]: string | number | boolean | object;
+
+	contructor () {
+		this.type = AlbumRec.__type__;
+	}
+}
 
 /**
  * Light weight wrapper of Anreact.stree(), in consists with Semantier style.
  * A helper of binding tree data to anreact Treeditor.
  */
 export class StreeTier extends Semantier {
-    static reqFactories: {[t: string]: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => UserReq} = {};
-    static registTierequest(port: string, factory: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => UserReq) {
+    static reqFactories: {[t: string]: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody} = {};
+    static registTierequest(port: string, factory: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody) {
         if (this.reqFactories[port])
             console.warn("Replacing new facotry of ", port, factory);
 
@@ -140,4 +165,83 @@ export class StreeTier extends Semantier {
 		// this.client.an.post(jreq, onload, context.error);
 		this.client.an.post(jreq, opts.onOk, errCtx);
     }
+}
+
+export class PhotoRec implements Tierec {
+	static __type__: 'io.oz.album.tier.PhotoRec';
+
+    [f: string]: string | number | boolean | object;
+
+	type?: string;
+
+	/** pid */
+	recId?: string;
+	/** card title */
+	pname?: string;
+	shareby?: string | undefined;
+	sharedate?: string;
+	css?: PhotoCSS | string;
+	device?: string;
+
+	src: string;
+	srcSet?: Array<string>;
+	width: number;
+	height: number
+
+	constructor (opt: { recId: any; src?: any; device?: string}) {
+		this.type = PhotoRec.__type__;
+		this.src = opt.src
+		this.recId = opt.recId;
+		this.device = opt.device;
+	}
+
+	shareLable() {
+		return PhotoRec.toShareLable(this);
+	}
+
+	static toShareLable(p: {shareby?: string, device?: string}) {
+		return ((p.shareby && p.device)
+			? `shared by ${p.shareby} @ ${p.device}`
+			: p.shareby ?
+			`shared by ${p.shareby}`
+			: undefined );
+	}
+};
+
+export class AlbumReq extends DocsReq {
+ 	static __type__ = 'io.oz.album.tier.AlbumReq';
+	static A = {
+		stree: DatasetierReq.A.stree,
+		records: 'r/collects',
+		collect: 'r/photos',
+		rec: 'r/photo',
+		download: 'r/download',
+		update: 'u',
+		insert: 'c',
+		upload: 'c/doc',
+		del: 'd',
+	};
+
+	pageInf: PageInf;
+	sk: string;
+	photo: PhotoRec;
+
+	pid: string;
+
+	constructor (opts: {uri: string, sk?: string, qrec?: PhotoRec, page?: PageInf}) {
+		super(opts.uri, {docId: opts.sk});
+		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
+
+		let {sk} = opts;
+		this.pageInf = opts.page;
+		this.sk = sk;
+
+		this.photo = opts.qrec || new PhotoRec({recId: sk});
+	}
+}
+StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
+
+export class PhotoCSS {
+	type: 'io.oz.album.tier.PhotoCSS';
+	size: [0, 0, 0, 0];
 }

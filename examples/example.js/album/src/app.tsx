@@ -98,13 +98,14 @@ export class App extends CrudCompW<AlbumProps> {
 
 	toSearch() {
 		let that = this;
+		let {uiHelper, error} = this.context.uiHelper;
 
 		this.state.tobeLoad = false;
-		this.tier.stree({ uri: this.uri, sk: this.albumsk, uiHelper: this.context.uiHelper,
+		this.tier.stree({ uri: this.uri, sk: this.albumsk, uiHelper,
 			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
 				that.setState({forest: resp.Body()?.forest});
 			}},
-			this.context.error);
+			error);
 
 		this.editForm = undefined;
 	}

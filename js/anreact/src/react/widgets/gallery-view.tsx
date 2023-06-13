@@ -3,8 +3,9 @@ import Modal from 'react-modal';
 
 import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
 import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-import { AnTreeNode, DatasetierReq, PageInf, SessionClient, StreeTier, Tierec, UserReq, isEmpty
+import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, SessionClient, StreeTier, Tierec, isEmpty
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
@@ -21,103 +22,14 @@ export interface PhotoCollect extends Tierec {
 	photos: Array<PhotoProps<PhotoRec>>;
 };
 
-export interface PhotoRec extends Tierec {
-	/** pid */
-	recId?: string,
-	/** card title */
-	pname?: string,
-	shareby?: string | undefined,
-	sharedate?: string,
-	css?: any,
-	device?: string,
-
-	src: string,
-	srcSet?: Array<string>,
+export interface ImageSlide {
 	width: number,
-	height: number
-};
-
-export class PhotoCSS {
-	type: 'io.oz.album.tier.PhotoCSS';
-	size: [0, 0, 0, 0];
+	height: number,
+	src: string,
+	srcSet?: string[],
+	legend: string
 }
 
-export class AlbumRec {
-	static __type__: "io.oz.sandbox.album.AlbumRec";
-
-	type: string;
-
-	/** Album Id (h_albems.aid) */
-	album?: string;
-
-	/** Collects' ids */
-	collects?: Array<PhotoCollect>;
-
-	/** Collects' default length (first page size) */
-	collectSize?: number;
-
-	/** Photos ids, but what's for? */
-	collect?: Array<string>;
-
-	// [f: string]: string | number | boolean | object;
-
-	contructor () {
-		this.type = AlbumRec.__type__;
-	}
-}
-
-/*
-class AlbumPage extends PageInf {
-	static __type__: string;
-
-	/** A temperoray solution before PageInf.condts evolved to Tierec. * /
-	qrec?: AlbumRec;
-
-	collectIds?: string[];
-	pids?: string[];
-	albumId?: string | undefined;
-
-	constructor (query?: AlbumRec) {
-		super();
-		this.type = AlbumPage.__type__;
-		this.qrec = query;
-	}
-}
-*/
-
-export class AlbumReq extends UserReq {
- 	static __type__ = 'io.oz.sandbox.album.AlbumReq';
-	static A = {
-		stree: DatasetierReq.A.stree,
-		records: 'r/collects',
-		collect: 'r/photos',
-		rec: 'r/photo',
-		download: 'r/download',
-		update: 'u',
-		insert: 'c',
-		upload: 'c/doc',
-		del: 'd',
-	};
-
-	// pageInf: AlbumPage;
-	pageInf: PageInf;
-	sk: string;
-	queryRec: AlbumRec;
-
-	pid: string;
-
-	constructor (opts: {uri: string, sk?: string, qrec?: AlbumRec, page?: PageInf}) {
-		super(opts.uri, undefined);
-		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
-
-		let {sk} = opts;
-		this.pageInf = opts.page;
-		this.sk = sk;
-
-		this.queryRec = opts.qrec || new AlbumRec();
-	}
-}
-StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
 
 export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnTreeNode[]}> {
 	tier: StreeTier | undefined;
@@ -128,6 +40,7 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 
 	cid: string;
 	photos: PhotoCollect | undefined; 
+	slides: ImageSlide[];
 	albumtier: StreeTier;
 	
 	constructor(props: Comprops & {tier: StreeTier, cid?: string, photos?: AnTreeNode[]}) {
@@ -148,18 +61,23 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 		let uri = this.uri;
 		console.log("super.uri", uri);
 
-		this.photos = this.parse(this.props.tnode.node.children);
+		this.photos = this.props.tnode.node.children;
+		this.slides = this.parse(this.props.tnode.node.children);
 	}
 
 	parse(nodes: AnTreeNode[]) {
-		let photos = [] as PhotoRec[];
+		let photos = [] as ImageSlide[];
 		nodes?.forEach( (p, x) => {
 			let [_width, _height, w, h] = (
 				JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
-			photos.push({src: GalleryView.imgSrcReq(p.id, this.albumtier), width: w, height: h});
+			photos.push({
+				src: GalleryView.imgSrcReq(p.id, this.albumtier),
+				width: w, height: h,
+				legend: PhotoRec.toShareLable(p.node as PhotoRec)
+			})
 		});
 
-		return {photos};
+		return photos;
 	}
 
 	/**
@@ -172,7 +90,7 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 	static imgSrcReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) : string {
 		let {uri, port, client} = opts;
 		let req = StreeTier.reqFactories[port]({uri, sk: ''}).A(AlbumReq.A.download) as AlbumReq;
-		req.pid = pid;
+		req.docId = pid;
 
 		let msg = client.an.getReq<AlbumReq>(port, req);
 
@@ -180,8 +98,16 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
 	}
 
+	/**
+	 * FIXME or this one?
+	 * 
+	 * https://www.cssscript.com/fullscreen-image-viewer-lightbox/
+	 * 
+	 * @param event 
+	 * @param photo 
+	 */
 	openLightbox (event: React.MouseEvent, photo: PhotoSlide<{}>) {
-		console.log(event);
+		// console.log(event);
 		this.currentImx = photo.index;
 		this.showCarousel = true;
 		this.setState({});
@@ -193,7 +119,7 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 		this.setState({})
 	};
 
-	gallery(photos: Array<PhotoRec>) {
+	gallery(photos: Array<ImageSlide>) {
 		return (
 		  <div>
 			{this.showCarousel &&
@@ -202,7 +128,7 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>}
-			<Gallery<PhotoRec> photos={photos}
+			<Gallery<ImageSlide> photos={photos}
 			  	onClick={this.openLightbox}
 				targetRowHeight={containerWidth => {
 					if (containerWidth < 320)
@@ -229,15 +155,16 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 		);
 	}
 
-	photoCarousel(photos: Array<PhotoRec>, imgx: number) : JSX.Element {
+	photoCarousel(photos: Array<ImageSlide>, imgx: number) : JSX.Element {
 		return (
 			<Carousel showArrows={true} dynamicHeight={true} selectedItem={imgx} >
 				{photos.map( (ph, x) => {
 				  let src = (isEmpty( ph.src ) && ph?.srcSet) ? ph.srcSet[ph.srcSet.length - 1] : ph.src || '';
+				  let legend = ph.legend;
 				  return (
-					<div key={x}>
+					<div key={x} onClick={this.closeLightbox}>
 						<img src={src} loading="lazy"></img>
-						<p className="legend">{ph.src}</p>
+						{legend && <p className="legend">{legend}</p>}
 					</div>);
 				  }
 				)}
@@ -246,9 +173,9 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 	}
 
 	render() {
-		let phs = this.photos?.photos || _photos;
+		let phs = this.slides || _photos;
 		return (<div>
-			{(this.photos?.title || ' - ') + ` [${phs.length}]`}
+			{/* {(this.photos?.title || ' - ') + ` [${phs.length}]`} */}
 			{this.gallery( phs )}
 		</div>);
 	}
