@@ -1,6 +1,6 @@
-import { Comprops, CrudComp, PhotoCollect, PhotoRec } from '@anclient/anreact';
+import { Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
-	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode
+	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode, PhotoRec
 } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
@@ -16,13 +16,13 @@ export class GalleryTier extends StreeTier {
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string, client: SessionClient, album: string, comp: CrudComp<Comprops>}, ) {
+	constructor(props: {uri: string, client: SessionClient, comp: CrudComp<Comprops>}, ) {
 		super(props);
 		console.log(this.uri);
 		this.comp = props.comp;
 		this.client = props.client;
 
-		this.page = new AlbumPage({album: props.album});
+		this.page = new AlbumPage({});
 	}
 
 	/**
@@ -77,7 +77,7 @@ export class GalleryTier extends StreeTier {
 				let src = that.imgSrc(p.recId);
 				let srcSet = [src];
 
-				let css = JSON.parse(p.css);
+				let css = JSON.parse(p.css as string);
 				let size = css?.size;
 				let width = size && size.length > 2 ? size[2] : 4;
 				let height = size && size.length > 3 ? size[3] : 3;
@@ -90,6 +90,7 @@ export class GalleryTier extends StreeTier {
 					width,
 					height,
 					alt,
+					shareLable: () => PhotoRec.toShareLable(p),
 					title: alt, 
 					key: x.toString()
 				} );

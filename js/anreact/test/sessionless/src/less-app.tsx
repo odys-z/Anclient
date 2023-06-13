@@ -20,14 +20,6 @@ type LessProps = {
 	iwindow?: any; // window object
 }
 
-// type State = {
-// 	servs?: JsonServs;
-// 	servId: string;
-// 	iportal?: string;
-// 	hasError?: boolean;
-// 	nextAction?: string;
-// }
-
 /**
  * The main application, context singleton and error handler.
  * 
@@ -79,9 +71,9 @@ class App extends React.Component<LessProps> {
 		Protocol.sk.cbbRole = 'roles';
 
 		this.anReact = new AnReactExt(this.inclient, this.error)
-								.extendPorts({
-									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
-								});
+					.extendPorts({
+						userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
+					});
 	}
 
 	onError(c: any, r: AnsonMsg<AnsonResp> ) {

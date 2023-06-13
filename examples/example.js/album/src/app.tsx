@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, AnTreeNode, ErrorCtx } from '@anclient/semantier';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, AnsonBody,
+	AnTreeNode, ErrorCtx, an, SessionClient
+} from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW, AnContextType,
@@ -18,6 +20,9 @@ type AlbumProps = {
 	iportal?: string;
 	iparent?: any; // parent of iframe
 	iwindow?: Window | undefined; // window object
+
+	userid?: string;
+	passwd?: string;
 }
 
 /** The application main, context singleton and error handler */
@@ -29,26 +34,28 @@ export class App extends CrudCompW<AlbumProps> {
 	error: ErrorCtx;
 
 	config = {
-		hasError: false,
-		iportal: '#',
-		nextAction: undefined, // e.g. re-login
+		// hasError: false,
+		// iportal: '#',
+		// nextAction: undefined, // e.g. re-login
 
 		/** json object specifying host's urls */
 		servs: {} as JsonServs,
 		/** the serv id for picking url */
 		servId: '',
 	};
-    hasError: any;
     nextAction: string | undefined;
 	tier: GalleryTier;
 	albumsk: string;
 
 	state = {
+		hasError: false,
 		tobeLoad: true,
 		forest: [] as AnTreeNode[],
 	};
 
 	editForm: undefined;
+	ssclient: any;
+	albumtier: any;
 
 	/**
 	 * Restore session from window.localStorage
@@ -58,7 +65,7 @@ export class App extends CrudCompW<AlbumProps> {
 		this.uri = 'example.js/album';
 		this.albumsk = "??";
 
-		this.config.iportal = this.props.iportal as string;
+		// this.config.iportal = this.props.iportal as string;
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -71,13 +78,13 @@ export class App extends CrudCompW<AlbumProps> {
 
 		this.error = {onError: this.onError, msg: ''};
 		this.nextAction = 're-login',
-		this.hasError = false,
+		// this.hasError = false,
 
 		this.config = Object.assign({}, this.config);
 
 		Protocol.sk.cbbViewType = 'v-type';
 
-		this.tier = new GalleryTier({uri: this.uri, client: this.inclient, album: "", comp: this});
+		this.tier = new GalleryTier({uri: this.uri, client: this.inclient, comp: this});
 
         // design note: exendPorts shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
@@ -93,19 +100,38 @@ export class App extends CrudCompW<AlbumProps> {
 		const ctx = this.context as unknown as AnContextType;
 		this.anReact = ctx.uiHelper;
 		this.state.tobeLoad = true;
-		this.toSearch();
+		this.login();
+	}
+
+	login() {
+		const ctx = this.context as unknown as AnContextType;
+		let serv = ctx.servId || 'album';
+		let hosturl = ctx.servs[serv];
+		let {userid, passwd} = this.props;
+
+		let reload = (client: SessionClient) => {
+			this.ssclient = client;
+			this.ssclient.an.init(hosturl);
+
+			this.albumtier = new GalleryTier({uri: this.uri, comp: this, client});
+
+			this.setState({reload: true});
+		}
+	
+		an.init ( hosturl );
+		an.login( userid as string, passwd as string, reload, ctx.error );
 	}
 
 	toSearch() {
 		let that = this;
-		let {uiHelper, error} = this.context.uiHelper;
+		// let {uiHelper, error} = this.context.uiHelper;
 
 		this.state.tobeLoad = false;
-		this.tier.stree({ uri: this.uri, sk: this.albumsk, uiHelper,
-			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
-				that.setState({forest: resp.Body()?.forest});
+		this.tier?.stree({ uri: this.uri, sk: this.albumsk, an: this.inclient.an,
+			onOk: (resp: AnsonMsg<AnsonBody>) => {
+				that.setState({forest: (resp.Body() as AnDatasetResp)?.forest});
 			}},
-			error);
+			this.error);
 
 		this.editForm = undefined;
 	}
@@ -113,13 +139,13 @@ export class App extends CrudCompW<AlbumProps> {
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r);
 		this.error.msg = r.Body()?.msg();
-		this.hasError = !!c;
+		this.state.hasError = !!c;
 		this.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
 		this.setState({});
 	}
 
 	onErrorClose() {
-        this.hasError = false;
+        this.state.hasError = false;
 		this.setState({});
 	}
 
@@ -131,7 +157,7 @@ export class App extends CrudCompW<AlbumProps> {
 			servs: this.props.servs,
 			anClient: this.inclient,
 			uiHelper: this.anReact,
-			hasError: this.config.hasError,
+			hasError: this.state.hasError,
 			iparent: this.props.iparent,
 			ihome: this.props.iportal || 'portal.html',
 			error: this.error,
@@ -141,7 +167,7 @@ export class App extends CrudCompW<AlbumProps> {
 		  { <AnTreeditor2 {... this.props}
 				pk={'pid'} sk={Protocol.sk.collectree}
 				tier={this.tier} tnode={this.tier.root()} title={"title"}
-				onSelectChange={ids => undefined}
+				onSelectChange={() => undefined}
 				uri={this.uri} mtabl='ind_emotion'
 				parent={ undefined }
 				columns={[
@@ -151,7 +177,7 @@ export class App extends CrudCompW<AlbumProps> {
 					{ type: 'actions', field: '',    label: '',      grid: {xs: 3, md: 2} }
 				]}
 			/> }
-			{this.hasError &&
+			{this.state.hasError &&
 				<AnError onClose={this.onErrorClose} fullScreen={false}
 					uri={"/login"} tier={undefined}
 					title={L('Error')} msg={this.error.msg || ''} />}

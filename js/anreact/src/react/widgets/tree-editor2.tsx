@@ -536,7 +536,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		let { uri, sk } = this.props;
 		this.state.tobeLoad = false;
-		this.treetier.stree({ uri, sk, uiHelper: this.context.uiHelper,
+		this.treetier.stree({ uri, sk, an: this.context.uiHelper,
 			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
 				that.setState({forest: resp.Body().forest});
 			}},
