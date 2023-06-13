@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * Use this style to force some change of calculation. Currrently only for 1 pic gallery.
+ */
 export type CustomImgStyle = {
     width?: string;
     height?: string;
@@ -41,9 +44,14 @@ export type PhotoProps<CustomPhotoProps extends object = {}> = {
      */
     key?: string
 
-    // ody
     /**
-	 * defualt:  {maxWidth: '60%', width: 'auto', height: 'auto'}
+     * Change by ody.
+     * 
+     * Force image style
+     * 
+	 * defualt: undefined.
+     * 
+     * For one pic row align's reference value: {maxHeight: '20vh', width: 'auto'}
      */
     imgstyl?: CustomImgStyle
 } & CustomPhotoProps

@@ -74,12 +74,18 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 		this.slides = this.parse(this.props.tnode.node.children);
 	}
 
+	/**
+	 *  
+	 * @param nodes 
+	 * @returns parsed slides for <Gallery/>, height of 1 node gallery is forced to be 20vh.
+	 */
 	parse(nodes: AnTreeNode[]) {
 		let photos = [] as ImageSlide[];
+
 		let imgstyl = len(nodes) === 1
 					? {width:'auto', maxHeight: '20vh'}
 					: undefined;
-		console.log(len(nodes), imgstyl, nodes);
+		// console.log(len(nodes), imgstyl, nodes);
 		nodes?.forEach( (p, x) => {
 			let [_width, _height, w, h] = (
 				JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
