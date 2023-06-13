@@ -1,9 +1,8 @@
 import React from 'react';
 import Modal from 'react-modal';
-
-import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
 
 import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, SessionClient, StreeTier, Tierec, isEmpty
 } from "@anclient/semantier";
@@ -127,7 +126,8 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 					onRequestClose={this.closeLightbox}
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
-				</Modal>}
+				</Modal>
+			}
 			<Gallery<ImageSlide> photos={photos}
 			  	onClick={this.openLightbox}
 				targetRowHeight={containerWidth => {
