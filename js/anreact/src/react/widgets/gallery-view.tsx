@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from 'react-modal';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+
 import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
 
 import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, SessionClient, StreeTier, Tierec, isEmpty
@@ -157,7 +158,7 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 
 	photoCarousel(photos: Array<ImageSlide>, imgx: number) : JSX.Element {
 		return (
-			<Carousel showArrows={true} dynamicHeight={true} selectedItem={imgx} >
+			<Carousel showArrows={true} dynamicHeight={false} selectedItem={imgx} showThumbs={false} width={'80vw'} >
 				{photos.map( (ph, x) => {
 				  let src = (isEmpty( ph.src ) && ph?.srcSet) ? ph.srcSet[ph.srcSet.length - 1] : ph.src || '';
 				  let legend = ph.legend;
