@@ -110,11 +110,9 @@ export class App extends CrudCompW<AlbumProps> {
 		let reload = (client: SessionClient) => {
 			that.ssclient = client;
 			that.albumtier = new GalleryTier({uri: this.uri, comp: this, client});
-			// this.albumtier.stree({sk: this.albumsk}, this.error);
 			that.toSearch();
 		}
 	
-		// hosturl = `${hosturl}/jserv-album/`;
 		console.warn("Auto login with configured userid & passwd.",
 					 hosturl, userid, passwd);
 		an.init ( hosturl );
@@ -123,14 +121,6 @@ export class App extends CrudCompW<AlbumProps> {
 
 	toSearch() {
 		// let that = this;
-		// this.state.tobeLoad = false;
-
-		// this.albumtier?.stree({sk: this.albumsk,
-		// 	onOk: (resp: AnsonMsg<AnsonBody>) => {
-		// 		that.setState({forest: (resp.Body() as AnDatasetResp)?.forest});
-		// 	}},
-		// 	this.error);
-
 		this.editForm = undefined;
 		this.setState({tobeLoaded: true})
 	}
