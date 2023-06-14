@@ -221,13 +221,10 @@ class AnClient {
 				else {
 					if (typeof onOk === "function")
 						onOk(resp);
-					else console.error("Response ignored.", resp);
+					else console.error("A successful response ignored for no handler is provided.", resp);
 				}
 			},
 			error: function (resp: any) {
-				// JSON.stringify(resp):
-				// {"readyState":0,"status":0,"statusText":"error"};
-
 				if (typeof onErr === "function" || onErr && typeof onErr.onError === 'function') {
 					if (resp.statusText) {
 						resp.code = Protocol.MsgCode.exIo;

@@ -1345,7 +1345,7 @@ export interface DatasetOpts {
 	/** API args should ignore this */
 	port?: string;
 	/**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
-	uri: string;
+	uri?: string;
 	/** semantic key configured in WEB-INF/dataset.xml */
 	sk: string;
 	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/

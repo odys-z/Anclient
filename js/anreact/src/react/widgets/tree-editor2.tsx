@@ -107,6 +107,8 @@ export interface AnreactreeItem {
 	toDown  : (e: React.MouseEvent<HTMLElement>) => void;
 	toBottom: (e: React.MouseEvent<HTMLElement>) => void;
 
+	toEdit? : (e: React.MouseEvent<HTMLElement>) => void;
+	toDel?  : (e: React.MouseEvent<HTMLElement>) => void;
 	/** or just move to AnTreeReact and calculate with java? */
 	levelIcons?: Array<AnTreeIconsType>;
 
@@ -229,8 +231,10 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 		return React.cloneElement(icon, {key: k});
 	}
 
-	static actionFragment(tnode: AnTreeNode, fragKey: string | number, handler, props: TreecardProps) {
-		let {col, classes, media} = props;
+	static actionFragment(tnode: AnTreeNode, col: AnTreegridCol,
+			fragKey: string | number, handler: AnreactreeItem, props: TreecardProps) {
+
+		let {classes, media} = props;
 		let parentId = tnode.parent;
 		<Grid key={`${tnode.id}.${fragKey}`} item {...col.grid} className={classes.treeItem}>
 			<JsampleIcons.Up onClick={handler.toUp} />
@@ -289,7 +293,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 					</Grid> );
 				  else if (col.type === 'actions') return (
 					hide(col.grid, media) ? undefined :
-					TreeCardComp.actionFragment(tnode, cx, this, this.props)
+					TreeCardComp.actionFragment(tnode, col, cx, this, this.props)
 					/*
 					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
 						<JsampleIcons.Up onClick={this.toUp} />
@@ -425,7 +429,7 @@ class TreeGallaryComp extends TreeCardComp {
 				else if (col.type === 'actions')
 					return (
 					hide(col.grid, media) ? undefined :
-					TreeCardComp.actionFragment(tnode, ix, this, this.props)
+					TreeCardComp.actionFragment(tnode, col, ix, this, this.props)
 					);
 				else if (col.type === 'formatter' || col.formatter)
 					return (
@@ -536,7 +540,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		let { uri, sk } = this.props;
 		this.state.tobeLoad = false;
-		this.treetier.stree({ uri, sk, an: this.context.uiHelper,
+		this.treetier.stree({ uri, sk,// uiHelper: this.context.uiHelper,
 			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
 				that.setState({forest: resp.Body().forest});
 			}},

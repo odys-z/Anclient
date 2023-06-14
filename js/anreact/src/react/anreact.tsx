@@ -375,14 +375,11 @@ export class AnReactExt extends AnReact {
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
 					console.error("Can't find data in rs for cbb item's label - needing column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}",
-						 "rs columns: ", rs?.colnames);
+						"rs columns: ", rs?.colnames);
 
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				// this.options = rows;
-
-				// loading = false;
 
 				if (onLoad)
 					onLoad(cols, rows);

@@ -135,9 +135,10 @@ export class StreeTier extends Semantier {
      * @param opts 
      * @param comp 
      */
-	stree(opts: DatasetOpts & {act?: LogAct, uiHelper: AnClient}, errCtx: ErrorCtx): void {
-        if (isEmpty(this.uiHelper))
-            this.uiHelper = opts.uiHelper;
+	stree(opts: DatasetOpts & {act?: LogAct, uri?: string}, errCtx: ErrorCtx): void {
+        // if (isEmpty(this.uiHelper))
+        //     this.uiHelper = opts.an;
+
         opts.port = opts.port || this.port;
 
         if (!opts.onOk)
@@ -228,7 +229,7 @@ export class AlbumReq extends DocsReq {
 
 	pid: string;
 
-	constructor (opts: {uri: string, sk?: string, qrec?: PhotoRec, page?: PageInf}) {
+	constructor (opts: {uri?: string, sk?: string, qrec?: PhotoRec, page?: PageInf}) {
 		super(opts.uri, {docId: opts.sk});
 		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
 
