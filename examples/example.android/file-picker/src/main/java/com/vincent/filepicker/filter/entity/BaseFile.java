@@ -31,7 +31,7 @@ public class BaseFile extends SyncDoc implements Parcelable {
     private boolean isSelected;
 
     // FIXME remove this after .jar updated
-    String clientpath;
+    // String clientpath;
 
     @Override
     public boolean equals(Object o) {

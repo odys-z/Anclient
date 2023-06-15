@@ -24,16 +24,6 @@ public class ImageFile extends BaseFile implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeLong(getId());
-//        dest.writeString(getName());
-//        dest.writeString(getPath());
-//        dest.writeLong(getSize());
-//        dest.writeString(getLocalDirId());
-//        dest.writeString(getLocalDirName());
-//        dest.writeLong(getDate());
-//        dest.writeByte((byte) (isSelected() ? 1 : 0));
-//        dest.writeInt(orientation);
-
         super.writeToParcel(dest, flags);
         dest.writeInt(orientation);
     }
