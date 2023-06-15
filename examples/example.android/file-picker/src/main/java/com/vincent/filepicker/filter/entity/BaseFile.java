@@ -5,15 +5,11 @@ import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.SyncDoc;
-import io.odysz.transact.x.TransException;
 
-import static io.odysz.common.LangExt.isNull;
 
 /**
  * Modified by Ody Zhou
@@ -29,12 +25,13 @@ public class BaseFile extends SyncDoc implements Parcelable {
 //    public static int Synchronizing = -1;
 
     private long id;
-    // private String name;
-    // private long size;          //byte
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
     private long date;          //Added Date
     private boolean isSelected;
+
+    // FIXME remove this after .jar updated
+    String clientpath;
 
     @Override
     public boolean equals(Object o) {
@@ -142,18 +139,4 @@ public class BaseFile extends SyncDoc implements Parcelable {
         cdate(new Date(l));
         return this;
     }
-
-    /*
-    public BaseFile formatFolder(Date ...d) {
-        if (isNull(d)) {
-            try {
-                formatFolder(DateFormat.parse(createDate));
-            } catch (ParseException e) {
-                formatFolder(new Date());
-            }
-        }
-        else folder(DateFormat.formatYYmm(d[0]));
-        return this;
-    }
-     */
 }

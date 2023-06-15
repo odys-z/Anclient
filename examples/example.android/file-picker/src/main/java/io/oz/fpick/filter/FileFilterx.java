@@ -8,6 +8,7 @@ import static com.vincent.filepicker.filter.callback.FileLoaderCallbacks.TYPE_VI
 import androidx.fragment.app.FragmentActivity;
 import androidx.loader.app.LoaderManager;
 
+import com.vincent.filepicker.filter.callback.FileLoaderCallbacks;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.AudioFile;
 import com.vincent.filepicker.filter.entity.ImageFile;

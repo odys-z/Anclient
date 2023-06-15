@@ -21,7 +21,7 @@ import com.vincent.filepicker.filter.entity.AudioFile;
 import java.util.ArrayList;
 
 import io.oz.fpick.R;
-import io.oz.jserv.sync.SyncFlag;
+import io.oz.jserv.docsync.SyncFlag;
 
 /**
  * Created by Ody Zhou

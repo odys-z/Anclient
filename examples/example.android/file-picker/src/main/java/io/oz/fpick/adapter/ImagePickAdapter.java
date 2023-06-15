@@ -30,7 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import io.oz.fpick.R;
-import io.oz.jserv.sync.SyncFlag;
+import io.oz.jserv.docsync.SyncFlag;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 

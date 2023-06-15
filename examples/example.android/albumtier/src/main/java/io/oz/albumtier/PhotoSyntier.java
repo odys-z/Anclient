@@ -145,7 +145,9 @@ public class PhotoSyntier extends Synclientier {
 	}
 
 	/**
-	 * Push up videos (larg files) with {@link #pushBlocks(String, List, SessionInf, OnProcess, OnDocOk, ErrorCtx...)}.
+	 * Push up videos (larg files) with
+	 * {@link #pushBlocks(String, List, OnProcess, OnDocOk, ErrorCtx...)}.
+	 *
 	 * @param videos
 	 * @param proc
 	 * @param docOk
