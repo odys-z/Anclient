@@ -99,24 +99,26 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
             // RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
-                    .load ( file.getPath ( ) )
-                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
-                            .centerCrop()
-                            .error(R.drawable.vw_ic_synced))
-                    .transition ( withCrossFade ( ) )
-                    .listener(new RequestListener() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource) {
-                            return false;
-                        }
-                        @Override
-                        public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
-                            return false;
-                        }
-                    })
-                    .into ( holder.mIvThumbnail );
+                .load ( file.getPath ( ) )
+                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
+                        .centerCrop()
+                        .error(R.drawable.vw_ic_synced))
+                .transition ( withCrossFade ( ) )
+                .listener(new RequestListener() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource) {
+                        return false;
+                    }
+                    @Override
+                    public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
+                        return false;
+                    }
+                })
+                .into ( holder.mIvThumbnail );
             // holder.mIvThumbnail.setImageURI(Uri.parse(file.getPath()));
 
+            if (file.syncFlag == null)
+                file.syncFlag = SyncFlag.device;
             // if (file.synchFlag == BaseFile.Synchronizing) {
             if (file.syncFlag.equals(SyncFlag.pushing)) {
                 holder.mCbx.setSelected ( false );
