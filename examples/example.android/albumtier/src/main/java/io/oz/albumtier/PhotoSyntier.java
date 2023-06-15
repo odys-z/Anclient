@@ -32,7 +32,7 @@ import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.jserv.docsync.Synclientier;
 import io.oz.album.tier.AlbumResp;
-import io.oz.album.tier.Photo;
+import io.oz.album.tier.PhotoRec;
 import io.oz.album.tier.PhotoMeta;
 
 /**
@@ -48,7 +48,12 @@ public class PhotoSyntier extends Synclientier {
 
 	static {
 		AnsonMsg.understandPorts(AlbumPort.album);
-		meta = new PhotoMeta(null); // this tier won't access local db.
+		try {
+			// this tier won't access local db.
+			meta = new PhotoMeta(null);
+		} catch (TransException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -152,10 +157,10 @@ public class PhotoSyntier extends Synclientier {
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
 			throws TransException, IOException {
-		return pushBlocks(meta.tbl, videos, client.ssInfo(), proc, docOk, onErr);
+		return pushBlocks(meta.tbl, videos, proc, docOk, onErr);
 	}
 
-	public String download(Photo photo, String localpath)
+	public String download(PhotoRec photo, String localpath)
 			throws SemanticException, AnsonException, IOException {
 		return download(uri, meta.tbl, photo, localpath);
 	}
@@ -172,7 +177,7 @@ public class PhotoSyntier extends Synclientier {
 	 */
 	public DocsResp insertPhoto(String collId, String localpath, String clientname, String share)
 			throws IOException, TransException, SQLException {
-		Photo doc = (Photo) new Photo()
+		PhotoRec doc = (PhotoRec) new PhotoRec()
 					.share(client.ssInfo().uid(), share, new Date())
 					.fullpath(localpath);
 

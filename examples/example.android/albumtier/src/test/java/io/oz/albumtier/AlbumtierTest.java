@@ -24,7 +24,7 @@ import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
-import io.oz.album.tier.Photo;
+import io.oz.album.tier.PhotoRec;
 import io.oz.albumtier.AlbumContext.ConnState;
 
 
@@ -41,7 +41,7 @@ public class AlbumtierTest {
 	@Test
     public void testRefreshPage0() throws AnsonException, GeneralSecurityException, IOException, TransException, InterruptedException {
 		mList = new ArrayList<SyncDoc>(1);
-		mList.add(new Photo().create(testfile));
+		mList.add(new PhotoRec().create(testfile));
 		
 		onActivityCreate();
 		
@@ -146,7 +146,7 @@ public class AlbumtierTest {
    	JProtocol.OnDocOk photoPushed = (d, resp) -> {
 		SyncDoc doc = ((DocsResp) resp).doc;
 		assertEquals(device, doc.device());
-		assertEquals(testfile, doc.clientpath);
+		assertEquals(testfile, doc.fullpath());
 
 		// ! also make sure files are saved in volume/user-id
 		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());
