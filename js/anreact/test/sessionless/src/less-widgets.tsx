@@ -4,11 +4,9 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
 
-import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs, Login, CrudComp
+import { L, Langstrs, AnContext, AnError, AnReactExt,
+	jsample, JsonServs, Login, CrudComp, AnTreeditor2
 } from '../../../src/an-components';
-import { AnTreeditor2 } from './widgets/treeditor';
-import { StreeTier } from './widgets/stree-tier';
 import { AlbumTier } from './widgets/album-tier';
 
 const { JsampleTheme } = jsample;
@@ -49,6 +47,7 @@ class Widgets extends React.Component<LessProps> {
 	};
 
 	albumSk = 'tree-album-family-folder';
+	rolefuncsk = 'trees.role_funcs';
 	uri = '/album/tree';
 
 	constructor(props: LessProps | Readonly<LessProps>) {
@@ -141,23 +140,41 @@ class Widgets extends React.Component<LessProps> {
 				ssInf: undefined,
 			}} >
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
-                {this.albumtier && <AnTreeditor2 parent={undefined}
+                {this.albumtier && Date().toString()}
+				<hr/>
+                {this.albumtier && <AnTreeditor2 key={this.albumSk}
+					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
+					columns={[ // noly card for folder header
+						{ type: 'text', field: 'folder', label: 'Photo Folders',
+						  grid: {sm: 6, md: 3} },
+						{ type: 'text', field: 'tags', label: L('Summary'),
+						  grid: {xs: false, sm: 6, md: 3} },
+						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
+					]}
+					onSelectChange={()=>{}}
+				/>}
+				<hr/>
+				{this.albumtier && <AnTreeditor2 key={this.rolefuncsk}
+					parent={undefined} lastSibling={false}
+					uri={this.uri} reload={reload}
+					tnode={this.albumtier.sysroot()} tier={this.albumtier}
+					pk={'NA'} sk={this.rolefuncsk}
 					columns={[
-						{ type: 'text', field: 'folder', label: L('Folder'),
-						  validator: {len: 200, notNull: true}, grid: {sm: 6} },
+						{ type: 'text', field: 'nodeId', label: '',
+						  grid: {xs: 12, sm: 6, md: 3} },
+						{ type: 'text', field: 'text', label: L('Name'),
+						  grid: {xs: false, sm: 6, md: 3} },
 					]}
 					onSelectChange={()=>{}}
 				/>}
 				<hr/>
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
-							uri={"/login"} tier={undefined}
+							uri={this.uri} tier={undefined}
 							title={L('Error')} msg={this.errctx.msg} />}
-				<hr/>
-                {Date().toString()}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}
@@ -182,6 +199,17 @@ class Widgets extends React.Component<LessProps> {
 }
 
 class TestreeTier extends AlbumTier {
+	sysroot(): AnTreeNode {
+		return {
+			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
+			node: {
+				nodetype: 'card',
+			},
+			id: 'n01',
+			level: 0,
+			parent: undefined,
+		}
+	}
 
 	constructor(uri: string, tree: CrudComp<any>, client?: SessionClient) {
 		super({uri, client, comp: tree});

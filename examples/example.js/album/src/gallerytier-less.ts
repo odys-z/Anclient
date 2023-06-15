@@ -1,51 +1,29 @@
-import { Comprops, CrudComp } from '@anclient/anreact';
-import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq, PageInf, Semantier, SessionClient, Tierec
+import { Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
+import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
+	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode, PhotoRec
 } from '@anclient/semantier';
 import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
 const debug = true;
 
-export interface PhotoCollect extends Tierec {
-	title?: string;
-	thumbUps?: Set<string>;
-	hashtags?: Array<string>;
-	shareby?: string;
-	extlinks?: any; // another table?
-	photos: Array<PhotoProps<PhotoRec>>;
-};
-
-export interface PhotoRec extends Tierec {
-	/** pid */
-	recId?: string,
-	/** card title */
-	pname?: string,
-	shareby?: string | undefined,
-	sharedate?: string,
-	css?: any,
-	device?: string,
-
-	src: string,
-	width: number,
-	height: number
-};
-
-export class GalleryTier extends Semantier {
+export class GalleryTier extends StreeTier {
 	comp: CrudComp<Comprops>;
 	port: string = "album";
 
 	page: AlbumPage;
 	collectRecords?: PhotoCollect[];
+	albumTitle: string = 'title';
 
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string, client: SessionClient, album: string, comp: CrudComp<Comprops>}, ) {
+	constructor(props: {uri: string, client: SessionClient, comp: CrudComp<Comprops>}, ) {
 		super(props);
 		console.log(this.uri);
 		this.comp = props.comp;
 		this.client = props.client;
 
-		this.page = new AlbumPage({album: props.album});
+		this.page = new AlbumPage({});
 	}
 
 	/**
@@ -80,42 +58,47 @@ export class GalleryTier extends Semantier {
 		onLoad(this.collectRecords);
 	}
 
+	root(): AnTreeNode {
+		return new AnTreeNode();
+	}
+
     myAlbum(onLoad: ((collects?: PhotoCollect[]) => void)): void {
         this.collects(this.page, onLoad);
     }
 
-	toGalleryImgs(idx: number) {
-		let that = this;
-		let imgs = [] as PhotoProps<PhotoRec>[];
-		if (this.collectRecords) {
-			let album = this.collectRecords[idx];
-			album.photos.forEach( (p, x) => {
-				console.log(p);
-				if (!p.recId) return;
+	// toGalleryImgs(idx: number) {
+	// 	let that = this;
+	// 	let imgs = [] as PhotoProps<PhotoRec>[];
+	// 	if (this.collectRecords) {
+	// 		let album = this.collectRecords[idx];
+	// 		album.photos.forEach( (p, x) => {
+	// 			// console.log(p);
+	// 			if (!p.recId) return;
 
-				let src = that.imgSrc(p.recId);
-				let srcSet = [src];
+	// 			let src = that.imgSrc(p.recId);
+	// 			let srcSet = [src];
 
-				let css = JSON.parse(p.css);
-				let size = css?.size;
-				let width = size && size.length > 2 ? size[2] : 4;
-				let height = size && size.length > 3 ? size[3] : 3;
+	// 			let css = JSON.parse(p.css as string);
+	// 			let size = css?.size;
+	// 			let width = size && size.length > 2 ? size[2] : 4;
+	// 			let height = size && size.length > 3 ? size[3] : 3;
 
-				let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
+	// 			let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
 
-				imgs.push( {
-					src: "",
-					srcSet,
-					width,
-					height,
-					alt,
-					title: alt, 
-					key: x.toString()
-				} );
-			} );
-		}
-		return imgs;
-	}
+	// 			imgs.push( {
+	// 				src: "",
+	// 				srcSet,
+	// 				width,
+	// 				height,
+	// 				alt,
+	// 				shareLable: () => PhotoRec.toShareLable(p),
+	// 				title: alt, 
+	// 				key: x.toString()
+	// 			} );
+	// 		} );
+	// 	}
+	// 	return imgs;
+	// }
 
 	/**
 	 * Compose src of img tag, with AlbumReq request as anson64 parameter.
@@ -217,29 +200,33 @@ class Profiles extends AnsonBody {
 Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
 
 class AlbumResp extends AnsonResp {
-	albumId: string;
-	ownerId: string;
-	owner: string;
-	collectRecords: Array<PhotoCollect>;
-	profils: Profiles;
+	albumId: string | undefined;
+	ownerId: string | undefined;
+	owner: string | undefined;
 
-	photos: Array<PhotoRec[]>;
+	photo: PhotoRec | undefined;
+	photos: Array<PhotoRec[]> | undefined;
+	collectRecords: Array<PhotoCollect> | undefined;
+	forest: Array<PhotoCollect> | undefined;
 
-	clientPaths: object;
-	
-	photo: PhotoRec;
+	clientPaths: object | undefined;
 
-	constructor (obj: any) {
+	profils: Profiles | undefined;
+
+	constructor (obj: AlbumResp) {
 		super({type: 'io.oz.album.tier.AlbumResp'});
 
-		this.albumId = obj.albumId;
-		this.ownerId = obj.ownerId;
-		this.owner = obj.owner;
-		this.collectRecords = obj.collectRecords;
-		this.profils = obj.profils;
-		this.photos = obj.photos;
-		this.clientPaths = obj.clientPaths;
-		this.photo = obj.photo;
+		// this.albumId = obj.albumId;
+		// this.ownerId = obj.ownerId;
+		// this.owner = obj.owner;
+		// this.collectRecords = obj.collectRecords;
+		// this.profils = obj.profils;
+		// this.photos = obj.photos;
+		// this.clientPaths = obj.clientPaths;
+		// this.photo = obj.photo;
+		// this.forest = obj.forest;
+
+		Object.assign(this, obj);
 	}
 }
 

@@ -72,6 +72,7 @@ OrgsComp.contextType = AnContext;
 const Orgs = withWidth()(withStyles(styles)(OrgsComp));
 export { Orgs, OrgsComp }
 
-export class StreeTier extends Semantier {
+// FIXME merge with StreeTier
+class StreeTier extends Semantier {
 
 }

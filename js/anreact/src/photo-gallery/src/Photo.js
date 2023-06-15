@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 const imgWithClick = { cursor: 'pointer' };
 
 const Photo = ({ index, onClick, photo, margin, direction, top, left, key }) => {
-  const imgStyle = { margin: margin, display: 'block' };
+  // ody: add user styles: photo.imgstyl
+  const imgStyle = { margin: margin, display: 'block', ...photo.imgstyl };
   if (direction === 'column') {
     imgStyle.position = 'absolute';
     imgStyle.left = left;

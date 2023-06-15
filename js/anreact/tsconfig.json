@@ -1,5 +1,5 @@
 {
-  "include": ["."],
+  "include": [".", "../semantier/stree-tier.ts"],
   "compilerOptions": {
     "allowJs": true,
     "declaration": true,

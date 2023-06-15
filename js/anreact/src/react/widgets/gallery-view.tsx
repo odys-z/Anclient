@@ -1,59 +1,134 @@
 import React from 'react';
 import Modal from 'react-modal';
-
-// import { PhotoProps, Gallery  } from 'react-photo-gallery';
-import { PhotoSlide } from '../../photo-gallery/src/Gallery';
-import Gallery from '../../photo-gallery/src/Gallery';
-
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-import { isEmpty } from "@anclient/semantier";
+import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
+
+import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, SessionClient, StreeTier, Tierec, isEmpty, len
+} from "@anclient/semantier";
+
 import { Comprops, CrudCompW } from '../crud';
-import { GalleryTier, PhotoCollect, PhotoRec } from './gallerytier-less';
-import { AnContextType } from '../reactext';
+import { CustomImgStyle, PhotoProps } from '../../photo-gallery/src/Photo';
 
 const _photos = [];
 
-export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
-	tier: GalleryTier | undefined;
+export interface PhotoCollect extends Tierec {
+	title?: string;
+	thumbUps?: Set<string>;
+	hashtags?: Array<string>;
+	shareby?: string;
+	extlinks?: any; // another table?
+	photos: Array<PhotoProps<PhotoRec>>;
+};
+
+export interface ImageSlide {
+	width: number,
+	height: number,
+	src: string,
+	srcSet?: string[],
+	legend: string,
+
+	/**
+	 * Use maxWidth to limit picture size when too few pictures;
+	 * 
+	 * use width: auto, height: auto for keep original ratio.
+	 * 
+	 * defualt:  {maxWidth: '60%', width: 'auto', height: 'auto'}
+	 */
+	imgstyl?: CustomImgStyle
+}
+
+
+export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnTreeNode[]}> {
+	tier: StreeTier | undefined;
 	classes: any;
 	uri: any;
 	currentImx: number = -1;
 	showCarousel: boolean = false;
-	album: PhotoCollect[] | undefined;
-	aid: "";
+
+	cid: string;
+	photos: PhotoCollect | undefined; 
+	slides: ImageSlide[];
+	albumtier: StreeTier;
 	
-	constructor(props: Comprops) {
+	constructor(props: Comprops & {tier: StreeTier, cid?: string, photos?: AnTreeNode[]}) {
 		super(props);
 
 		this.classes = props.classes;
 		this.uri = props.uri;
-		this.aid = props.aid;
+		this.cid = props.cid;
+
+		this.albumtier = props.tier;
 
 		this.openLightbox = this.openLightbox.bind(this);
 		this.closeLightbox = this.closeLightbox.bind(this);
+		this.parse = this.parse.bind(this);
 	}
 
 	componentDidMount() {
 		let uri = this.uri;
-		let that = this;
 		console.log("super.uri", uri);
 
-		let client = (this.context as AnContextType).anClient;
-
-		this.tier = new GalleryTier({uri, comp: this, client, album: this.aid})
-					.setContext(this.context) as GalleryTier;
-
-		this.tier.myAlbum((collects?: PhotoCollect[]) => {
-			that.album = collects;
-			that.setState({});
-		});
+		this.photos = this.props.tnode.node.children;
+		this.slides = this.parse(this.props.tnode.node.children);
 	}
 
-	openLightbox (event: React.MouseEvent, phts: PhotoSlide<PhotoRec>) {
-		console.log(event);
-		this.currentImx = phts.index;
+	/**
+	 *  
+	 * @param nodes 
+	 * @returns parsed slides for <Gallery/>, height of 1 node gallery is forced to be 20vh.
+	 */
+	parse(nodes: AnTreeNode[]) {
+		let photos = [] as ImageSlide[];
+
+		let imgstyl = len(nodes) === 1
+					? {width:'auto', maxHeight: '20vh'}
+					: undefined;
+		// console.log(len(nodes), imgstyl, nodes);
+		nodes?.forEach( (p, x) => {
+			let [_width, _height, w, h] = (
+				JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
+			photos.push({
+				src: GalleryView.imgSrcReq(p.id, this.albumtier),
+				width: w, height: h,
+				legend: PhotoRec.toShareLable(p.node as PhotoRec),
+				imgstyl
+			})
+		});
+
+		return photos;
+	}
+
+	/**
+	 * Create an HTTP GET request for src of img tag.
+	 * 
+	 * @param pid 
+	 * @param opts 
+	 * @returns src for img, i.e. jserv?anst64=message-string 
+	 */
+	static imgSrcReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) : string {
+		let {uri, port, client} = opts;
+		let req = StreeTier.reqFactories[port]({uri, sk: ''}).A(AlbumReq.A.download) as AlbumReq;
+		req.docId = pid;
+
+		let msg = client.an.getReq<AlbumReq>(port, req);
+
+		let jserv = client.an.servUrl(port);
+		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
+	}
+
+	/**
+	 * FIXME or this one?
+	 * 
+	 * https://www.cssscript.com/fullscreen-image-viewer-lightbox/
+	 * 
+	 * @param event 
+	 * @param photo 
+	 */
+	openLightbox (event: React.MouseEvent, photo: PhotoSlide<{}>) {
+		// console.log(event);
+		this.currentImx = photo.index;
 		this.showCarousel = true;
 		this.setState({});
 	}
@@ -64,8 +139,7 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 		this.setState({})
 	};
 
-	gallery(photos: Array<PhotoRec>) {
-		// let photos = collections[0].photos;
+	gallery(photos: Array<ImageSlide>) {
 		return (
 		  <div>
 			{this.showCarousel &&
@@ -73,9 +147,9 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 					onRequestClose={this.closeLightbox}
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
-				</Modal>}
-			{this.tier &&
-			  <Gallery<PhotoRec> photos={photos}
+				</Modal>
+			}
+			<Gallery<ImageSlide> photos={photos}
 			  	onClick={this.openLightbox}
 				targetRowHeight={containerWidth => {
 					if (containerWidth < 320)
@@ -93,24 +167,25 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 				} }
 				limitNodeSearch={ (containerWidth: number) => {
 					if (containerWidth < 720)
-						return 4;
+						return 8;
 					else
 						return 12;
 				} }
-			/>}
+			/>
 		  </div>
 		);
 	}
 
-	photoCarousel(photos: Array<PhotoRec>, imgx: number) : JSX.Element {
+	photoCarousel(photos: Array<ImageSlide>, imgx: number) : JSX.Element {
 		return (
-			<Carousel showArrows={true} dynamicHeight={true} selectedItem={imgx} >
+			<Carousel showArrows={true} dynamicHeight={false} selectedItem={imgx} showThumbs={false} width={'80vw'} >
 				{photos.map( (ph, x) => {
 				  let src = (isEmpty( ph.src ) && ph?.srcSet) ? ph.srcSet[ph.srcSet.length - 1] : ph.src || '';
+				  let legend = ph.legend;
 				  return (
-					<div key={x}>
+					<div key={x} onClick={this.closeLightbox}>
 						<img src={src} loading="lazy"></img>
-						<p className="legend">{ph.src}</p>
+						{legend && <p className="legend">{legend}</p>}
 					</div>);
 				  }
 				)}
@@ -119,9 +194,10 @@ export default class GalleryView extends CrudCompW<Comprops & {aid: string}>{
 	}
 
 	render() {
-		let photos = this.tier?.toGalleryImgs(0) || _photos;
-		return (<div>Album Example - Clicke to show large photo
-			{this.tier && this.gallery( photos )}
+		let phs = this.slides || _photos;
+		return (<div>
+			{/* {(this.photos?.title || ' - ') + ` [${phs.length}]`} */}
+			{this.gallery( phs )}
 		</div>);
 	}
 }

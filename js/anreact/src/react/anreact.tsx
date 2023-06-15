@@ -2,7 +2,8 @@
 import $ from 'jquery';
 
 import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames, NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
+	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames,
+	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
@@ -14,12 +15,52 @@ export interface ClassNames {[c: string]: string};
 
 export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
 
+export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+/**
+ * Find out hide an element or not for the grid setting and media width.
+ * 
+ * TIP: to avoid ReactJS reporting warning like this:
+ * 
+ * Invalid prop supplied to `ForwardRef(Grid)`, expected a ReactNode,
+ * 
+ * do not return boolean in render() like this:
+ * 
+ * <Grid>hide(col.grid, this.props.media) || <></></Grid>
+ * 
+ * @param grid 
+ * @param media 
+ * @returns expample:
+ * 
+ * grid {xs: false, sm: false}
+ * 
+ * for 
+ * media {xs: true, sm: true, md: true}, will return false
+ * 
+ * for
+ * media {xs: true, sm: true, md: false}, will return true
+ */
+export function hide(grid: {
+		xs?: boolean | GridSize; sm?: boolean | GridSize;
+		md?: boolean | GridSize; lg?: boolean | GridSize; },
+		media: Media) {
+	return (
+	 	grid.lg === false && media.isLg === true
+	 || grid.md === false && media.isMd === true && !!media.isLg === false
+	 || grid.sm === false && media.isSm === true && !!media.isMd === false
+	 || grid.xs === false && media.isXs === true && !!media.isSm === false
+	);
+}
+
+
 /**
  * Component's visual options, e.g. options for field formatters.
  */
 export interface CompOpts {
 	classes: ClassNames;
 	media?: Media;
+	// box?: {};
+    // grid?: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 }
 
 export interface QueryPage {
@@ -29,9 +70,10 @@ export interface QueryPage {
 
 export function toPageInf(query: QueryPage) : PageInf {
 	let p = new PageInf(query.pageInf.page, query.pageInf.size);
-	p.condts = [];
+	// p.condts = [];
 	query.query?.forEach( (q, x) => {
-		p.condts.push( [q.field, typeof q.val === 'string' ? q.val : q.val?.v] );
+		// p.condts.push( [q.field, typeof q.val === 'string' ? q.val : q.val?.v] );
+		p.nv(q.field, typeof q.val === 'string' ? q.val : q.val?.v);
 	});
 
 	return p;
@@ -73,22 +115,15 @@ export class AnReact {
 	 */
 	bindTablist(req: AnsonMsg<AnsonBody>, comp: CrudComp<Comprops>, errCtx: ErrorCtx) {
 		this.client.commit(req, (qrsp) => {
-			// if (req.onLoad)
-			// 	req.onLoad(qrsp);
-			// else if (req.onOk)
-			// 	req.onLoad(qrsp);
-			// else {
-				let rs = qrsp.Body().Rs();
-				let {rows} = AnsonResp.rs2arr( rs );
-				// comp.pageInf?.total! = rs.total;
-				comp.setState({rows});
-			// }
+			let rs = qrsp.Body().Rs();
+			let {rows} = AnsonResp.rs2arr( rs );
+			comp.setState({rows});
 		}, errCtx );
 	}
 
 	/**
 	 * Post a request, qmsg.req of AnsonMsg to jserv.
-	 * If suceed, call qmsg.onOk (onLoad) or set rs in respons to component's state.
+	 * If suceed, call qmsg.onOk (onLoad) or set rs' rows in respons to component's state.
 	 * This is a helper of simple form load & bind a record.
 	 * @param {object} qmsg
 	 * @param {AnContext.error} errCtx
@@ -282,7 +317,8 @@ export class AnReactExt extends AnReact {
 		this.dataset(opts, onload);
 	}
 
-	/**Bind dataset to combobox options (comp.state.condCbb).
+	/**
+	 * Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
 	 * <h6>About React Rendering Events</h6>
@@ -339,14 +375,11 @@ export class AnReactExt extends AnReact {
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
 					console.error("Can't find data in rs for cbb item's label - needing column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}",
-						 "rs columns: ", rs?.colnames);
+						"rs columns: ", rs?.colnames);
 
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				// this.options = rows;
-
-				// loading = false;
 
 				if (onLoad)
 					onLoad(cols, rows);

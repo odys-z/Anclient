@@ -22,10 +22,11 @@
 		assert.isFalse(toBool('0', true), 'x');
 		assert.isFalse(toBool(' ', true), 'y');
 		assert.isFalse(toBool('' , false), 'z');
+		assert.isTrue(toBool('' , true), 'q');
 		assert.isTrue(toBool(undefined , true), 'r');
 		assert.isFalse(toBool(undefined), 's');
-		assert.isFalse(toBool(null), 's');
-		assert.isFalse(toBool(null, null), 't');
+		assert.isFalse(toBool(null), 't');
+		assert.isFalse(toBool(null, null), 'u');
 	} );
  * @param str 
  * @param undefinedNull take undefind & null as true or false
@@ -46,10 +47,19 @@ export function toBool(str: string | number | boolean | object | undefined | nul
 export function isEmpty(str: string | number | boolean | object | null | undefined) : boolean {
 	return (typeof str === 'undefined' || str === null || str === '');
 } 
+/**
+ * Convert to string.
+ * @param obj 
+ * @returns string
+ */
 export function str(obj: any) {
 	return isEmpty(obj) ? undefined : String(obj);
 }
 
+/**Convert to string, '' for undefined.
+ * @param obj 
+ * @returns string 
+ */
 export function str_(obj: any) {
 	return str(obj) || '';
 }

@@ -81,9 +81,7 @@ export class GalleryTier extends Semantier {
 		onLoad(this.collectRecords);
 	}
 
-	// photo(uri: string) {
-	// 	return this;
-	// }
+
 
     myAlbum(onLoad: ((collects?: PhotoCollect[]) => void)): void {
         this.collects(this.page, onLoad);

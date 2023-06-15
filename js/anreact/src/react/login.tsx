@@ -1,12 +1,12 @@
 
 import React from 'react';
-	import { withStyles } from '@material-ui/core/styles';
+	import { Theme, withStyles } from '@material-ui/core/styles';
 	import Collapse from '@material-ui/core/Collapse';
 	import Button from '@material-ui/core/Button';
 	import TextField from '@material-ui/core/TextField';
 	import Box from '@material-ui/core/Box';
 
-import { AnClient, AnsonMsg, AnsonResp, OnCommitOk, OnLoginOk, Protocol } from '@anclient/semantier';
+import { AnClient, AnsonMsg, AnsonResp, OnLoginOk, Protocol } from '@anclient/semantier';
 
 import { an, SessionClient } from '@anclient/semantier';
 	import {AnContext, AnContextType} from './reactext';
@@ -15,7 +15,7 @@ import { an, SessionClient } from '@anclient/semantier';
 	import {jstyles} from '../jsample/styles'
 import { Comprops } from './crud';
 
-const styles = (theme) => Object.assign(jstyles(theme), {
+const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 	root: {
 	    '& *': { margin: theme.spacing(1) }
 	},
@@ -87,9 +87,10 @@ class LoginComp extends React.Component<LoginProps> {
 
 	alert() {
 		let that = this;
-		this.confirm = <ConfirmDialog ok={L('OK')} title={L('Info')} cancel={false}
-					open={true} onClose={ () => { that.confirm = undefined; } }
-					msg={ L('User Id or password is not correct.') } />
+		this.confirm = <ConfirmDialog
+			ok={L('OK')} title={L('Info')} cancel={false}
+			open={true} onClose={ () => { that.confirm = undefined; } }
+			msg={ L('User Id or password is not correct.') } />
 	}
 
 	onErrorClose() {

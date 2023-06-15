@@ -77,11 +77,11 @@ export class PageInf {
 	}
 }
 
+export type AnsonValue = string | object | string | number | boolean | undefined | null;
 /**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
-export type NameValue = {name: string, value: object | string | number | boolean | undefined | null};
-export type NV = {n: string, v: string | object | string | number | boolean | undefined | null};
+export type NameValue = {name: string, value: AnsonValue};
+export type NV = {n: string, v: AnsonValue};
 export function isNV (obj: any) {
-	debugger;
 	return !!obj && (obj.name || obj.n);  
 }
 
@@ -157,16 +157,16 @@ export interface DbRelations {
 	m2m?: any,
 }
 
-export interface UIRelations {
-    [tabl: string]: AnTreeNode[];
-}
+// export interface UIRelations {
+//     [tabl: string]: AnTreeNode[];
+// }
 
 /**Issue: As pk fields is wrapped up at server side, should clients caring about the pk name?
  * example of this:
  * that.pkval.v = that.rec && that.rec[that.pk];
 */
 export interface PkVal {
-    v: string | number | boolean | undefined;
+    v: AnsonValue;// string | number | boolean | undefined;
     pk: string | undefined;
     tabl?: string;
 }
@@ -1322,32 +1322,16 @@ export class AnSessionResp extends AnsonResp {
 	}
 }
 
-/** Tree data node */
-export class AnTreeNode {
-	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	/** json data node, for ui node composition */
-	node : {
-		nodetype?: string;
-		// id: string;
-		children?: Array<AnTreeNode>;
-		/** With icon as a special field? */
-		css?: CSS.Properties & {icon?: string, size?: number[]};
-		/** Any data by jserv */
-		[d: string]: any;
-	};
-	id: string;
-	level: number;
-	parent: string;
-}
+
 
 /**
  * type: io.odysz.semantic.ext.AnDatasetResp,
  * planned to be replaced by DatasetierResp
  */
 export class AnDatasetResp extends AnsonResp {
-	forest: Array<AnTreeNode>;
+	forest: Array<Tierec>;
 
-	constructor(dsJson: { forest: AnTreeNode[]; }) {
+	constructor(dsJson: { forest: Tierec[]; }) {
 		super(dsJson);
 		this.forest = dsJson.forest;
 	}
@@ -1361,7 +1345,7 @@ export interface DatasetOpts {
 	/** API args should ignore this */
 	port?: string;
 	/**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
-	uri: string;
+	uri?: string;
 	/** semantic key configured in WEB-INF/dataset.xml */
 	sk: string;
 	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
@@ -1534,14 +1518,6 @@ Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json
 
 export class DocsReq extends AnsonBody {
 	static __type__ = 'io.odysz.semantic.tier.docs.DocsReq';
-	// static __init__ = function () {
-	// 	// Design Note:
-	// 	// can we use dynamic Protocol?
-	// 	Protocol.registerBody(DocsReq.__type__, (jsonBd) => {
-	// 		return new DocsReq(jsonBd);
-	// 	});
-	// 	return undefined;
-	// }();
 
 	static A = {
 		records: 'r/list',

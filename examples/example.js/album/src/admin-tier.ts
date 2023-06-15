@@ -1,13 +1,15 @@
-import { Protocol, PageInf, SessionClient,
-	AnDatasetResp, AnTreeNode, StreeTier, AlbumReq, AlbumRec, PhotoRec
+import { Protocol, AnsonBody, PageInf,
+	SessionClient, AnDatasetResp, AnTreeNode, StreeTier
 } from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView, ImageSlide
-} from '../../../../src/an-components';
-import { PhotoProps } from '../../../../src/photo-gallery/src/Photo';
+import { Comprops, CrudComp, AlbumReq, PhotoCollect, PhotoRec, GalleryView, AlbumRec, PhotoProps
+} from '@anclient/anreact';
 
 const debug = true;
 
-export class AlbumTier extends StreeTier {
+export class AlbumAdminTier extends StreeTier {
+	root(): AnTreeNode {
+		throw new Error('Method not implemented.');
+	}
 	comp: CrudComp<Comprops>;
 	port: string = "album";
 
@@ -64,7 +66,7 @@ export class AlbumTier extends StreeTier {
 
 	toGalleryImgs(idx: number) {
 		let that = this;
-		let imgs = [] as PhotoProps<ImageSlide>[];
+		let imgs = [] as PhotoProps<PhotoRec>[];
 		if (this.collects) {
 			let album = this.collects[idx];
 			album.photos.forEach( (p, x) => {
@@ -74,7 +76,7 @@ export class AlbumTier extends StreeTier {
 				let src = that.imgSrc(p.recId);
 				let srcSet = [src];
 
-				let css = typeof p.css === 'string' ? JSON.parse(p.css as string) : p.css;
+				let css = JSON.parse(p.css);
 				let size = css?.size;
 				let width = size && size.length > 2 ? size[2] : 4;
 				let height = size && size.length > 3 ? size[3] : 3;
@@ -82,14 +84,8 @@ export class AlbumTier extends StreeTier {
 				let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
 
 				imgs.push( {
-					src,
-					srcSet,
-					width,
-					height,
-					alt,
-					legend: p.shareLable(), 
-					key: x.toString()
-				} );
+					src, srcSet, width, height,
+					alt, title: alt, key: x.toString() } );
 			} );
 		}
 		return imgs;
@@ -102,24 +98,30 @@ export class AlbumTier extends StreeTier {
 	 * @returns 
 	 */
 	imgSrc(recId: string) : string {
-		/*
-		let req = new AlbumReq({uri: this.uri, page: this.page});
-		req.a = AlbumReq.A.download;
-		req.queryRec.album = recId;
-
-		let msg = this.client.an.getReq<AlbumReq>(this.port, req);
-
-		return AlbumTier.servUrl(this.client.an.servUrl(this.port), msg);
-		*/
 		return GalleryView.imgSrcReq(recId, { uri: this.uri, port: this.port, client: this.client});
 	}
+
 };
+
+class Profiles extends AnsonBody {
+	home: string;
+	maxUsers: number;
+	servtype: number;
+
+	constructor (obj: { servtype: number; maxUsers: number; home: string }) {
+		super( { type: 'io.oz.album.tier.Profiles' } );
+		this.home = obj.home;
+		this.maxUsers = obj.maxUsers;
+		this.servtype = obj.servtype;
+	}
+}
+Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
 
 class AlbumResp extends AnDatasetResp {
 	static __type__ = 'io.oz.sandbox.album.AlbumResp';
 	album?: AlbumRec;
 
-	// profils?: Profiles;
+	profils?: Profiles;
 
 	collect?: Array<string>;
 	collects?: Array<PhotoCollect>;
@@ -127,7 +129,7 @@ class AlbumResp extends AnDatasetResp {
 	photo?: PhotoRec;
 
 	constructor (resp: AlbumRec & {
-			forest: AnTreeNode[], // profiles?: Profiles,
+			forest: AnTreeNode[], profiles?: Profiles,
 			photo?: PhotoRec, collect?: Array<string>}) {
 		super({
 			forest: resp.forest
@@ -135,8 +137,8 @@ class AlbumResp extends AnDatasetResp {
 
 		this.album = resp;
 		this.collect = resp.collect;
-		// this.profils = resp.profiles;
-		this.collects = resp.collects as PhotoCollect[];
+		this.profils = resp.profiles;
+		this.collects = resp.collects;
 	}
 }
 Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });

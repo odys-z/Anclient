@@ -24,7 +24,20 @@ const Gallery = React.memo(function Gallery({
     const observer = new ResizeObserver(entries => {
       // only do something if width changes
       const newWidth = entries[0].contentRect.width;
-      if (containerWidth !== newWidth) {
+
+      // Ody Z, 2023/6/2
+      // This stops endless animation of keeping shrinking photos. Yet the problem is not understood.
+      // if (containerWidth !== newWidth) {
+      // ->
+      // ReactJS API, useLayoutEffect:
+      //
+      // Reference
+      // https://react.dev/reference/react/useLayoutEffect
+      // Resize Observer API, MDN:
+      // https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+
+      if (Math.abs(containerWidth - newWidth) > 1) {
+          
         // put in an animation frame to stop "benign errors" from
         // ResizObserver https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
         animationFrameID = window.requestAnimationFrame(() => {
@@ -105,7 +118,7 @@ const Gallery = React.memo(function Gallery({
             margin,
             direction,
             onClick: onClick ? handleClick : null,
-            photo,
+            photo
           });
         })}
       </div>

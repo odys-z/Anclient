@@ -11,7 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, isEmpty, len, PkVal, Tierec, toBool, UIComponent } from '@anclient/semantier';
+import { AnlistColAttrs, isEmpty, len, Tierec, toBool, UIComponent } from '@anclient/semantier';
 import { Comprops, DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 
@@ -198,7 +198,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 								let v = row[colObj.field];
 								let cell = colObj.formatter && colObj.formatter(v as any, x, row); //v: bug?
 								if (cell)
-									cell = <TableCell key={colObj.field + x}>{cell}</TableCell> as UIComponent;
+									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
 								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
 							} )}
 				</TableRow>)

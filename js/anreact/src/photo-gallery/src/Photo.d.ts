@@ -2,6 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 /**
+ * Use this style to force some change of calculation. Currrently only for 1 pic gallery.
+ */
+export type CustomImgStyle = {
+    width?: string;
+    height?: string;
+    maxWidth?: string
+    maxHeight?: string
+}
+
+/**
  * Photos array item properties (passed into Gallery's photos property)
  */
 export type PhotoProps<CustomPhotoProps extends object = {}> = {
@@ -33,6 +43,17 @@ export type PhotoProps<CustomPhotoProps extends object = {}> = {
      * key to be used on component
      */
     key?: string
+
+    /**
+     * Change by ody.
+     * 
+     * Force image style
+     * 
+	 * defualt: undefined.
+     * 
+     * For one pic row align's reference value: {maxHeight: '20vh', width: 'auto'}
+     */
+    imgstyl?: CustomImgStyle
 } & CustomPhotoProps
   
 export type renderImageClickHandler = (
@@ -66,4 +87,4 @@ export interface RenderImageProps<CustomPhotoProps extends object = {}> {
     left?: number
 }
 
-export default Photo;
+// export default Photo;

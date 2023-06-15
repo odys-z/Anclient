@@ -42,10 +42,11 @@ describe('case: [0.0] utils', () => {
 		assert.isFalse(toBool('0', true), 'x');
 		assert.isFalse(toBool(' ', true), 'y');
 		assert.isFalse(toBool('' , false), 'z');
+		assert.isTrue(toBool('' , true), 'q');
 		assert.isTrue(toBool(undefined , true), 'r');
 		assert.isFalse(toBool(undefined), 's');
-		assert.isFalse(toBool(null), 's');
-		assert.isFalse(toBool(null, null), 't');
+		assert.isFalse(toBool(null), 't');
+		assert.isFalse(toBool(null, null), 'u');
 	} );
 } );
 

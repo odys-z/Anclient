@@ -24,11 +24,14 @@ export * from './react/widgets/tree';
 export * from './react/widgets/treegrid';
 export * from './react/widgets/ag-gridsheet';
 export * from './react/widgets/spreadsheet';
-export * from './react/widgets/tree-editor';
+export * from './react/widgets/tree-editor2';
+export * from './react/widgets/gallery-view';
 
 export * from './react/widgets/simple-form';
 export * from './react/widgets/record-form';
 export * from './react/widgets/relation-tree';
+
+export * from './photo-gallery/src/Photo';
 
 import { JsampleIcons, JsampleTheme, jstyles } from './jsample/styles';
 import { Domain, DomainComp } from './jsample/views/domain';

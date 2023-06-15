@@ -1,5 +1,29 @@
 import $ from 'jquery';
 
+/* experimental for next L function.
+const R_ = [
+  {
+	edit: 'a',
+	add: 'x',
+  },
+  {
+	edit: 'v',
+  }
+]
+
+class R {
+	/** jsdoc ... * /
+	static lang = 0;
+	static edit = R_[R.lang].edit;
+	static add  = R_[R.lang].add
+}
+
+R.lang;
+*/
+
+/**
+ * 
+ */
 export interface StrResource {[x: string]: string };
 /**
  * A dynamic extending {string-key: parameterized-instance} translation mapper.
