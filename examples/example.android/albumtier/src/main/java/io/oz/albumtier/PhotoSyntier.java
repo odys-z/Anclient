@@ -68,7 +68,6 @@ public class PhotoSyntier extends Synclientier {
 	public PhotoSyntier(String clientUri, String device, OnError errCtx)
 			throws SemanticException, IOException {
 		super(clientUri, errCtx);
-		this.client.ssInfo().device(device);
 	}
 	
 	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {

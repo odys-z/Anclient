@@ -23,12 +23,16 @@ import com.vincent.filepicker.filter.entity.AudioFile;
 import com.vincent.filepicker.filter.entity.Directory;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import io.odysz.semantics.x.SemanticException;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.AudioPickAdapter;
 import io.oz.fpick.filter.FileFilterx;
@@ -178,12 +182,20 @@ public class AudioPickActivity extends BaseActivity {
                 }
 
                 mAll = directories;
-                refreshData(directories);
+                try {
+                    refreshData(directories);
+                } catch (GeneralSecurityException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (SemanticException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    private void refreshData(List<Directory<AudioFile>> directories) {
+    private void refreshData(List<Directory<AudioFile>> directories) throws GeneralSecurityException, IOException, SemanticException {
         boolean tryToFindTaken = isTakenAutoSelected;
 
         // if auto-select taken file is enabled, make sure requirements are met

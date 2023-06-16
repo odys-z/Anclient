@@ -2,11 +2,15 @@ package io.oz.album.webview;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import androidx.appcompat.app.AppCompatActivity;
 
+import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.R;
+import io.oz.album.AndErrorCtx;
 import io.oz.albumtier.AlbumContext;
 
 public class WebAlbumAct extends AppCompatActivity {
@@ -22,9 +26,13 @@ public class WebAlbumAct extends AppCompatActivity {
 
 	private static final String url_landing = "https://odys-z.github.io/Anclient";
 
+	AndErrorCtx errCtx;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.wv);
+
+		errCtx = new AndErrorCtx().context(this);
 
 		Intent intt = getIntent();
 		int act = intt.getIntExtra(Web_ActionName, Act_Landing);
@@ -38,11 +46,12 @@ public class WebAlbumAct extends AppCompatActivity {
 	}
 
 	private String loadUrls(int act) {
+		AlbumContext single = AlbumContext.getInstance(errCtx);
 	    switch (act) {
 			case Act_Album:
-				return getString(R.string.url_album, AlbumContext.getInstance().jserv(), AlbumContext.getInstance().albumHome);
+				return getString(R.string.url_album, single.jserv(), single.albumHome);
 			case Act_SyncReport:
-				return getString(R.string.url_sync_report, AlbumContext.getInstance().jserv(), AlbumContext.getInstance().synchPage);
+				return getString(R.string.url_sync_report, single.jserv(), single.synchPage);
 			case Act_Help:
 				return getString(R.string.url_help);
 			case Act_Landing:

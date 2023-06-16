@@ -41,10 +41,12 @@ public class AlbumContext {
     }
 
     public static AlbumContext getInstance(OnError err) {
-        if (instance == null) {
+        if (instance == null)
             instance = new AlbumContext();
+
+        if (err != null)
             instance.errCtx = err;
-        }
+
         return instance;
     }
 

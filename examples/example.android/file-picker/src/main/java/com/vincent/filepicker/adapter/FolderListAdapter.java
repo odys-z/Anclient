@@ -10,9 +10,13 @@ import android.widget.TextView;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantics.x.SemanticException;
 import io.oz.fpick.R;
 
 /**
@@ -42,7 +46,15 @@ public class FolderListAdapter extends BaseAdapter<Directory, FolderListAdapter.
             @Override
             public void onClick(View v) {
                 if (mListener != null) {
-                    mListener.onFolderListClick(mList.get(holder.getAdapterPosition()));
+                    try {
+                        mListener.onFolderListClick(mList.get(holder.getAdapterPosition()));
+                    } catch (GeneralSecurityException e) {
+                        singleton.errCtx.err(AnsonMsg.MsgCode.exSession, e.getMessage());
+                    } catch (IOException e) {
+                        singleton.errCtx.err(AnsonMsg.MsgCode.exIo, e.getMessage());
+                    } catch (SemanticException e) {
+                        singleton.errCtx.err(AnsonMsg.MsgCode.exSemantic, e.getMessage());
+                    }
                 }
             }
         });
@@ -64,7 +76,7 @@ public class FolderListAdapter extends BaseAdapter<Directory, FolderListAdapter.
     }
 
     public interface FolderListListener {
-        void onFolderListClick(Directory directory);
+        void onFolderListClick(Directory directory) throws GeneralSecurityException, IOException, SemanticException;
     }
 
     public void setListener(FolderListListener listener) {

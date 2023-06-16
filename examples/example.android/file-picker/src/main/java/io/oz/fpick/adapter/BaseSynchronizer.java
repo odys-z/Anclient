@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -55,7 +56,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     protected PathsPage synchPage;
 
     public BaseSynchronizer(Context ctx, ArrayList<T> list) {
-        this.singleton = AlbumContext.getInstance();
+        this.singleton = AlbumContext.getInstance(null);
         mContext = ctx;
         mList = list;
     }
@@ -79,7 +80,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     public List<T> getDataSet() { return mList; }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void refresh(List<T> list) throws GeneralSecurityException, IOException, SemanticException {
+    public void refresh(List<T> list) {
         mList.clear();
         mList.addAll(list);
         notifyDataSetChanged();
@@ -89,9 +90,18 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         synchPage.device = singleton.photoUser.device;
         if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
             startSynchQuery(synchPage);
-        singleton.login((r) -> startSynchQuery(synchPage), (c, r, args) -> {
-            Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
-        });
+        try {
+            singleton.login((r) -> startSynchQuery(synchPage),
+                // (c, r, args) -> { Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0])); }
+                singleton.errCtx
+                );
+        } catch (GeneralSecurityException e) {
+            singleton.errCtx.err(AnsonMsg.MsgCode.exSession, e.getMessage());
+        } catch (SemanticException e) {
+            singleton.errCtx.err(AnsonMsg.MsgCode.exSemantic, e.getMessage());
+        } catch (IOException e) {
+            singleton.errCtx.err(AnsonMsg.MsgCode.exIo, e.getMessage());
+        }
     }
 
     void startSynchQuery(PathsPage page) {

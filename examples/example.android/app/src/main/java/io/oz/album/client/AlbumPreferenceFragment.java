@@ -59,7 +59,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         String devid = singleton.photoUser.device;
         if (!LangExt.isblank(devid)) {
             // homepref.setSummary(getString(R.string.devide_name, devid));
-            homepref.setSummary(AlbumContext.getInstance().homeName);
+            homepref.setSummary(AlbumContext.getInstance(null).homeName);
             findPreference(AlbumApp.keys.device).setEnabled(false);
             cateHome.removePreference(btnRegist);
             device.setSummary(getString(R.string.devide_name, devid));

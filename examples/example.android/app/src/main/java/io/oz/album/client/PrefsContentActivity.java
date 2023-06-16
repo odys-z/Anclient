@@ -14,6 +14,7 @@ import com.vincent.filepicker.ToastUtil;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
+import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.AlbumApp;
 import io.oz.R;
@@ -23,7 +24,7 @@ import io.oz.albumtier.PhotoSyntier;
 
 /**
  */
-public class PrefsContentActivity extends AppCompatActivity {
+public class PrefsContentActivity extends AppCompatActivity implements JProtocol.OnError {
 
     // static AlbumContext singleton = AlbumContext.getInstance(this);
     static AlbumContext singleton;
@@ -36,7 +37,7 @@ public class PrefsContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (singleton == null) {
             // singleton = AlbumApp.singl;
-            singleton = AlbumContext.getInstance();
+            singleton = AlbumContext.getInstance(this);
             oldUid = null;
         } else oldUid = singleton.photoUser.uid();
 
@@ -119,5 +120,10 @@ public class PrefsContentActivity extends AppCompatActivity {
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void err(AnsonMsg.MsgCode ok, String msg, String... args) {
+        this.showErrSummary.err(ok, msg, args);
     }
 }

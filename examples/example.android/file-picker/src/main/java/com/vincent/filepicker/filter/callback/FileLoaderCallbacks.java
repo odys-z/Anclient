@@ -30,11 +30,15 @@ import com.vincent.filepicker.filter.loader.FileLoader;
 import com.vincent.filepicker.filter.loader.ImageLoader;
 import com.vincent.filepicker.filter.loader.VideoLoader;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.odysz.semantics.x.SemanticException;
 
 /**
  * Created by Vincent Woo
