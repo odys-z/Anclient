@@ -32,6 +32,7 @@ import io.oz.R;
 import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
+import io.oz.albumtier.IErrorContext;
 import io.oz.fpick.PickingMode;
 
 import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
@@ -39,7 +40,7 @@ import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
 import static io.oz.album.webview.WebAlbumAct.Act_Help;
 import static io.oz.album.webview.WebAlbumAct.Web_ActionName;
 
-public class WelcomeAct extends AppCompatActivity implements View.OnClickListener {
+public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, IErrorContext {
     AlbumContext singl;
 
     /** Preference activity starter */
@@ -74,7 +75,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
         // singl = AlbumApp.singl;
-        singl = AlbumContext.getInstance();
+        singl = AlbumContext.getInstance(this);
 
         // singl.init(getResources(), AlbumApp.keys, PreferenceManager.getDefaultSharedPreferences(this));
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -273,13 +274,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
             if (singl.tier == null)
                 showMsg(R.string.txt_please_login);
-            else
-                /*
-                singl.tier.asyncPhotosUp(list, singl.photoUser,
-                        (rx, rows, bx, total, resp) -> showProgress(rx, list, bx, (DocsResp) resp),
-                        (doc, resp) -> showMsg(R.string.t_synch_ok, list.size()),
-                        (c, r, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
-                 */ {
+            else {
                 try {
                     singl.tier.asyVideos(list,
                             (rows, rx, seq, total, resp) -> showProgress(rx, list, total, (DocsResp) resp),
@@ -308,6 +303,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         audPickActStarter.launch(imgIntent);
     }
 
+    /**
+     * Start help activities, etc.
+     * @param action
+     */
     protected void startWebAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
         intent.putExtra(Web_ActionName, action);

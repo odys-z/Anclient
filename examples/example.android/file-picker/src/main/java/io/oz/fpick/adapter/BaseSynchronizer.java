@@ -18,6 +18,8 @@ import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.entity.BaseFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +79,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     public List<T> getDataSet() { return mList; }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void refresh(List<T> list) {
+    public void refresh(List<T> list) throws GeneralSecurityException, IOException, SemanticException {
         mList.clear();
         mList.addAll(list);
         notifyDataSetChanged();
@@ -85,22 +87,30 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         synchPage = new PathsPage(0, Math.min(20, mList.size()));
         // synchPage.taskNo = nextRandomInt();
         synchPage.device = singleton.photoUser.device;
-        if (singleton.tier != null)
+        if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
             startSynchQuery(synchPage);
+        singleton.login((r) -> startSynchQuery(synchPage), (c, r, args) -> {
+            Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
+        });
     }
 
     void startSynchQuery(PathsPage page) {
         singleton.tier.asynQueryDocs(mList, page,
                 onSyncQueryResponse,
                 (c, r, args) -> {
-                    Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
+                    // Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
+                    singleton.errCtx.err(c, r, args);
+
+                    mContext.getApplicationContext();
                 });
     }
 
+    /**
+     * Query response handler, triggering query on following pages.
+     */
     JProtocol.OnOk onSyncQueryResponse = (resp) -> {
         DocsResp rsp = (DocsResp) resp;
-        if (// synchPage.taskNo == rsp.syncing().taskNo &&
-            synchPage.end() < mList.size()) {
+        if (synchPage.end() < mList.size()) {
 //            Photo[] phts = rsp.photos(0);
 //            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
 //                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
@@ -129,10 +139,10 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
     };
 
-    void updateIcons(PathsPage synchPage) {
+    void updateIcons(PathsPage synpage) {
         ((Activity)mContext).runOnUiThread( () -> {
             try {
-                notifyItemRangeChanged(synchPage.start(), synchPage.end());
+                notifyItemRangeChanged(synpage.start(), synpage.end());
             } catch (SemanticException e) {
                 e.printStackTrace();
             }

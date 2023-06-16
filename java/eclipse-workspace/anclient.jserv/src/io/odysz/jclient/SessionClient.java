@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
-import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -334,7 +333,7 @@ public class SessionClient {
 	 * @throws AnsonException
 	 */
 	@SuppressWarnings("unchecked")
-	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, ErrorCtx err)
+	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, OnError err)
 			throws SemanticException, IOException, AnsonException {
     	if (verbose) {
     		Utils.logi(Clients.servUrl(req.port()));

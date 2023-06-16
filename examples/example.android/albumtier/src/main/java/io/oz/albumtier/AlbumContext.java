@@ -8,7 +8,6 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
-import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
@@ -27,7 +26,8 @@ public class AlbumContext {
     static AlbumContext instance;
 
     public final String clientUri = "album.and";
-    public final ErrorCtx errCtx = new ErrorCtx();
+
+    public OnError errCtx; // = new AndErrorCtx();
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
@@ -40,9 +40,11 @@ public class AlbumContext {
         return this;
     }
 
-    public static AlbumContext getInstance() {
-        if (instance == null)
+    public static AlbumContext getInstance(OnError err) {
+        if (instance == null) {
             instance = new AlbumContext();
+            instance.errCtx = err;
+        }
         return instance;
     }
 
@@ -99,6 +101,18 @@ public class AlbumContext {
         return this;
     }
 
+    /**
+     * Call {@link PhotoSyntier#login(String, String, String)} to login.
+     * @param uid
+     * @param pswd
+     * @param onOk
+     * @param onErr
+     * @return this
+     * @throws GeneralSecurityException
+     * @throws SemanticException
+     * @throws AnsonException
+     * @throws IOException
+     */
     AlbumContext login(String uid, String pswd, OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
@@ -111,7 +125,7 @@ public class AlbumContext {
 				.asyLogin(uid, pswd, photoUser.device,
                 (client) -> {
 				    state = ConnState.Online;
-				    client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min
+				    client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min (FIXME too long)
 				    onOk.ok(client);
                 },
                 (c, r, args) -> {

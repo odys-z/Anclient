@@ -65,9 +65,10 @@ public class PhotoSyntier extends Synclientier {
 	 * @throws SQLException 
 	 * @throws SemanticException 
 	 */
-	public PhotoSyntier(String clientUri, String device, ErrorCtx errCtx)
+	public PhotoSyntier(String clientUri, String device, OnError errCtx)
 			throws SemanticException, IOException {
 		super(clientUri, errCtx);
+		this.client.ssInfo().device(device);
 	}
 	
 	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
@@ -125,7 +126,7 @@ public class PhotoSyntier extends Synclientier {
 	 * @throws IOException
 	 */
 	public PhotoSyntier asyVideos(List<? extends SyncDoc> videos,
-				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
+				OnProcess proc, OnDocOk docOk, OnError ... onErr)
 			throws TransException, IOException {
 		new Thread(new Runnable() {
 	        public void run() {
@@ -157,7 +158,7 @@ public class PhotoSyntier extends Synclientier {
 	 * @throws IOException
 	 */
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
-				OnProcess proc, OnDocOk docOk, ErrorCtx ... onErr)
+				OnProcess proc, OnDocOk docOk, OnError ... onErr)
 			throws TransException, IOException {
 		return pushBlocks(meta.tbl, videos, proc, docOk, onErr);
 	}
@@ -183,12 +184,7 @@ public class PhotoSyntier extends Synclientier {
 					.share(client.ssInfo().uid(), share, new Date())
 					.fullpath(localpath);
 
-		return synInsertDoc(meta.tbl, doc, new OnDocOk() {
-			@Override
-			public void ok(SyncDoc doc, AnsonResp resp)
-					throws IOException, AnsonException, TransException {
-			}}
-		);
+		return synInsertDoc(meta.tbl, doc, (SyncDoc d, AnsonResp resp) -> { } );
 	}
 
 	/**
