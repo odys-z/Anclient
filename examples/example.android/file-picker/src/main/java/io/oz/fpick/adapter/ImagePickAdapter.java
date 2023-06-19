@@ -53,7 +53,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         super ( ctx , list );
         isNeedCamera = needCamera;
         mMaxNumber = max;
-//        isNeedImagePager = needImagePager;
     }
 
     @NonNull

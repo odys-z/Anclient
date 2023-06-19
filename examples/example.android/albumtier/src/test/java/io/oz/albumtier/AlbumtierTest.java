@@ -24,6 +24,7 @@ import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
+import io.oz.album.AlbumPort;
 import io.oz.album.tier.PhotoRec;
 import io.oz.albumtier.AlbumContext.ConnState;
 
@@ -39,7 +40,8 @@ public class AlbumtierTest {
 	ArrayList<SyncDoc> mList;
 
 	@Test
-    public void testRefreshPage0() throws AnsonException, GeneralSecurityException, IOException, TransException, InterruptedException {
+    public void testRefreshPage0() throws AnsonException,
+    		GeneralSecurityException, IOException, TransException, InterruptedException {
 		mList = new ArrayList<SyncDoc>(1);
 		mList.add(new PhotoRec().create(testfile));
 		
@@ -151,7 +153,7 @@ public class AlbumtierTest {
 		// ! also make sure files are saved in volume/user-id
 		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());
    		
-		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testfile), "h_photos");
+		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testfile), "h_photos", AlbumPort.album);
 		PathsPage pthpage = pths.pathsPage();
 		assertEquals(device, pthpage.device);
 		assertEquals(1, pthpage.paths().size());

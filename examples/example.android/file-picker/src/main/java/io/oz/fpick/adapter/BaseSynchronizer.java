@@ -105,14 +105,12 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
     }
 
     void startSynchQuery(PathsPage page) {
-        singleton.tier.asynQueryDocs(mList, page,
-                onSyncQueryResponse,
-                (c, r, args) -> {
-                    // Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
-                    singleton.errCtx.err(c, r, args);
-
-                    mContext.getApplicationContext();
-                });
+        singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
+            (c, r, args) -> {
+                // Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
+                singleton.errCtx.err(c, r, args);
+                // mContext.getApplicationContext();
+            });
     }
 
     /**
@@ -120,12 +118,8 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
      */
     JProtocol.OnOk onSyncQueryResponse = (resp) -> {
         DocsResp rsp = (DocsResp) resp;
-        if (synchPage.end() < mList.size()) {
-//            Photo[] phts = rsp.photos(0);
-//            for (int i = synchPage.start; i < synchPage.end && i - synchPage.start < phts.length; i++)
-//                mList.get(i).synchFlag(phts[i - synchPage.start].syncFlag);
+        if (synchPage.end() <= mList.size()) {
             // sequence order is guaranteed.
-
             // [sync-flag, share-falg, share-by, share-date]
             HashMap<String, String[]> phts = rsp.syncing().paths();
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
@@ -142,7 +136,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
             updateIcons(synchPage);
 
-            if (mList.size() >= synchPage.end()) {
+            if (mList.size() > synchPage.end()) {
                 synchPage.nextPage(Math.min(20, mList.size() - synchPage.end()));
                 startSynchQuery(synchPage);
             }

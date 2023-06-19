@@ -19,7 +19,7 @@ import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
-import io.odysz.semantic.jprotocol.JProtocol.SCallbackV11;
+import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
@@ -46,7 +46,9 @@ public class HttpServClient {
 	 * @throws SemanticException 
 	 * @throws SQLException 
 	 */
-	public void post(String url, AnsonMsg<? extends AnsonBody> jreq, SCallbackV11 onResponse)
+	public void post(String url, AnsonMsg<? extends AnsonBody> jreq,
+			// SCallbackV11 onResponse)
+			OnOk onResponse)
 			throws IOException, SemanticException, SQLException, AnsonException {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -79,7 +81,8 @@ public class HttpServClient {
 				Utils.logi(x.toString());
 			}
 
-			onResponse.onCallback(x.code(), x.body(0));
+			// onResponse.onCallback(x.code(), x.body(0));
+			onResponse.ok(x.body(0));
 		}
 		else {
 			Utils.warn("HTTP ERROR: code: %s", responseCode);

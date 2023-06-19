@@ -30,13 +30,14 @@ import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
-import io.oz.jserv.docsync.Synclientier;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.PhotoRec;
 import io.oz.album.tier.PhotoMeta;
 
 /**
- * Photo client, a asynchronous wrapper of {@link Synclientier}.
+ * Photo client,
+ * 
+ * @deprecated MVP (0.2.1)
  * 
  * @author odys-z@github.com
  *
@@ -197,7 +198,8 @@ public class PhotoSyntier extends Synclientier {
 	 */
 	public PhotoSyntier asynQueryDocs(List<? extends SyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(new Runnable() {
-	        public void run() {
+	        @SuppressWarnings("deprecation")
+			public void run() {
 	        	DocsResp resp = null; 
 				try {
 					page.clear();
@@ -208,24 +210,25 @@ public class PhotoSyntier extends Synclientier {
 						else page.add(p.fullpath());
 					}
 
-					resp = synQueryPathsPage(page, meta.tbl);
+					resp = synQueryPathsPage(page, meta.tbl, AlbumPort.album);
 					try {
 						onOk.ok(resp);
 					} catch (AnsonException | SemanticException | IOException e) {
 						e.printStackTrace();
 					}
 				} catch (IOException e) {
-					onErr.err(MsgCode.exIo, e.getClass().getName(),
-						e.getMessage(), resp == null ? null : resp.msg());
+					onErr.err(MsgCode.exIo, e.getMessage(),
+							e.getClass().getName(), resp == null ? null : resp.msg());
 				} catch (AnsonException e) { 
-					onErr.err(MsgCode.exGeneral, e.getClass().getName(),
-						e.getMessage(), resp == null ? null : resp.msg());
-				} catch (SemanticException e) { 
-					onErr.err(MsgCode.exSemantic, e.getClass().getName(),
-						e.getMessage(), resp == null ? null : resp.msg());
+					onErr.err(MsgCode.exGeneral, e.getMessage(),
+							e.getClass().getName(), resp == null ? null : resp.msg());
+					e.printStackTrace();
+				} catch (SemanticException e) {
+					onErr.err(MsgCode.exSemantic, e.getMessage(),
+							e.getClass().getName(), resp == null ? null : resp.msg());
 				} catch (TransException e) {
-					onErr.err(MsgCode.exTransct, e.getClass().getName(),
-						e.getMessage(), resp == null ? null : resp.msg());
+					onErr.err(MsgCode.exTransct, e.getMessage(),
+							e.getClass().getName(), resp == null ? null : resp.msg());
 				}
 	        }
 	    }).start();

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +14,9 @@ import com.vincent.filepicker.FolderListHelper;
 
 import java.util.List;
 
+import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.JProtocol;
+import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
@@ -24,7 +28,7 @@ import pub.devrel.easypermissions.EasyPermissions;
  * Time: 16:21
  */
 
-public abstract class BaseActivity extends FragmentActivity implements EasyPermissions.PermissionCallbacks {
+public abstract class BaseActivity extends FragmentActivity implements EasyPermissions.PermissionCallbacks, JProtocol.OnError {
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
     private static final String TAG = BaseActivity.class.getName();
 
@@ -37,6 +41,8 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        AlbumContext.getInstance(this); // set error context
 
         isNeedFolderList = getIntent().getBooleanExtra(IS_NEED_FOLDER_LIST, false);
         if (isNeedFolderList) {
@@ -105,5 +111,13 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
 
     public void onBackClick(View view) {
         finish();
+    }
+
+    @Override
+    public void err(AnsonMsg.MsgCode c, String msg, String... args) {
+        runOnUiThread( () -> {
+            String m = String.format("Error: type: %s, args: %s", msg, args);
+            Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
+        } );
     }
 }
