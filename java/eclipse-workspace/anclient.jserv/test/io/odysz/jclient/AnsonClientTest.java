@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
@@ -29,13 +30,15 @@ import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
+import io.odysz.semantic.jserv.echo.EchoReq;
 import io.odysz.semantics.x.SemanticException;
 
 /**
  * Unit test for sample App. 
  */
 public class AnsonClientTest {
-	private static String jserv = "http://localhost:8080/jserv-album";
+	// private static String jserv = "http://localhost:8081/jserv-album";
+	private static String jserv = "http://localhost:8080/jserv-sample";
 	private static String pswd = "123456";
 	private static String filename = "res/Sun_Yat-sen_2.jpg";
 	
@@ -56,6 +59,11 @@ public class AnsonClientTest {
 //			fail("\nTo test Anclient.java, you need to configure user 'admin' and it's password at jsample server, then define @pswd like this to run test:\n" +
 //				"-Dpswd=*******");
 
+		// trigger factory registration, prevent error:
+		// io.odysz.anson.x.AnsonException: Invoking registered factory failed for value: session
+		// Field Type: io.odysz.semantic.jprotocol.IPort,
+		AnsonMsg.understandPorts(AnsonMsg.Port.echo);
+
     	Clients.init(jserv);
     	errCtx = new ErrorCtx() {
     		public void err(MsgCode code, String resp, String ...args ) {
@@ -71,7 +79,7 @@ public class AnsonClientTest {
 
     	String sys = "sys-sqlite";
     	
-    	client = Clients.login("admin", pswd);
+    	client = Clients.login("ody", pswd);
     	AnsonMsg<AnQueryReq> jreq = client.query(sys,
     			"a_users", "u",
     			-1, -1); // no paging
@@ -133,7 +141,7 @@ public class AnsonClientTest {
 			Utils.warn("getEcho() can only work with jsample");
 			return;
 		}
-		AnDatasetReq req = new AnDatasetReq(null, "sys-sqlite");
+		EchoReq req = new EchoReq(null);
 
 		String t = "menu";
 		String[] act = AnsonHeader.usrAct("SemanticClientTest", "init", t,
@@ -141,13 +149,15 @@ public class AnsonClientTest {
 		AnsonHeader header = client.header().act(act);
 
 		// AnsonMsg<? extends AnsonBody> jmsg = client.userReq(Port.echo, act, req);
-		AnsonMsg<? extends AnsonBody> jmsg = client.<AnDatasetReq>userReq("test/echo", Port.echo, req);//, act);
+		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq("test/echo", Port.echo, req);//, act);
 		jmsg.header(header);
 
 		// client.console(jmsg);
 		
+		Anson.verbose = true;
 		AnsonResp resp = client.commit(jmsg, errCtx);
-		assertTrue(((AnDatasetResp)resp).forest().size() > 0);
+		// assertTrue(((AnsonResp)resp).forest().size() > 0);
+		assertNotNull(resp.data());
 		/*
     	client.commit(jmsg, (code, data) -> {
 			List<?> rses = ((AnDatasetResp)data).forest();
