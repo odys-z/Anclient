@@ -80,7 +80,7 @@ public class Clients {
 			Utils.logi(resp.toString());
 
 		if (AnsonMsg.MsgCode.ok == resp.code()) {
-			SessionClient c = new SessionClient(((AnSessionResp) resp.body(0)).ssInf());
+			SessionClient c = new SessionClient(((AnSessionResp) resp.body(0)));
 
 			if (mac != null && mac.length > 0)
 				c.ssInfo().device(mac[0]);
@@ -121,7 +121,7 @@ public class Clients {
 						Utils.logi(resp.toString());
 
 					if (AnsonMsg.MsgCode.ok == resp.code()) {
-						onOk.ok(new SessionClient(((AnSessionResp) resp.body(0)).ssInf()));
+						onOk.ok(new SessionClient((AnSessionResp) resp.body(0)));
 					}
 					else 
 						onErr.err(resp.code(), "loging failed\ncode: %s\nerror: %s", resp.code().name(), ((AnsonResp)resp.body(0)).msg());	
