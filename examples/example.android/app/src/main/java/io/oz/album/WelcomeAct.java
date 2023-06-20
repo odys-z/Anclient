@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
@@ -32,13 +34,13 @@ import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.PrefsContentActivity;
+import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.PickingMode;
 
 import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
-import static io.oz.album.webview.WebAlbumAct.Act_Help;
 import static io.oz.album.webview.WebAlbumAct.Web_ActionName;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
@@ -75,7 +77,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_regist = getString(R.string.key_regist);
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
-        // singl = AlbumApp.singl;
         singl = AlbumContext.getInstance(this);
 
         // singl.init(getResources(), AlbumApp.keys, PreferenceManager.getDefaultSharedPreferences(this));
@@ -86,6 +87,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
 
         singl.init(homeName, uid, device, jserv);
+        AssetHelper.init(this, jserv);
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
@@ -154,7 +156,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             else
                 singl.pswd(sharedPref.getString(AlbumApp.keys.pswd, ""))
                      .login(
-                        (tier) -> { },
+                        (tier) -> {
+                            final VWebAlbum webView = new VWebAlbum();
+                            WebView wv = findViewById(R.id.wv_welcome);
+                            wv.setWebViewClient(webView);
+                            WebSettings webSettings = wv.getSettings();
+                            webSettings.setJavaScriptEnabled(true);
+                            wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
+                        },
                         (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
@@ -203,7 +212,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             return true;
         }
         else if (id == R.id.menu_help) {
-            startWebAct(Act_Help);
+            startWebAct(AssetHelper.Act_Help);
             return true;
         }
         return super.onOptionsItemSelected(item);

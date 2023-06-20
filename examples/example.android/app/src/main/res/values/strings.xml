@@ -38,7 +38,7 @@
     <string name="key_device" translatable="false">key-device</string>
     <string name="login_succeed">Logged in successfully.</string>
 
-    <string name="msg_templ_progress">%d / %d %s\n%.1f%%</string>
+    <string name="msg_templ_progress" translatable="false">%d / %d %s\n%.1f%%</string>
     <string name="msg_upload_failed">Uploading failed.\n%s\n%s</string>
     <string name="msg_device_uid">Login as %s @ %s</string>
     <string name="msg_pref_login_failed">\"Login failed!\n%s %s\"</string>
@@ -47,5 +47,6 @@
     <string name="url_home" translatable="false">https://odys-z.github.io/Anclient</string>
     <string name="url_album" translatable="false">http://%s/%s</string>
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
+    <string name="url_landing" translatable="true">https://odys-z.github.io/Anclient</string>
 
 </resources>

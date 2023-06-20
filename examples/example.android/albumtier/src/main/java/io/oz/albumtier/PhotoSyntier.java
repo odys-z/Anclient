@@ -33,6 +33,7 @@ import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.PhotoRec;
 import io.oz.album.tier.PhotoMeta;
+import io.oz.jserv.docsync.Synclientier;
 
 /**
  * Photo client,
@@ -116,7 +117,8 @@ public class PhotoSyntier extends Synclientier {
 	}
 	
 	/**
-	 * @see #syncVideos(List, OnProcess, OnDocOk, ErrorCtx...)
+	 * @see #syncVideos(List, OnProcess, OnDocOk, OnError...)
+     *
 	 * @param videos
 	 * @param proc
 	 * @param docOk
@@ -147,7 +149,7 @@ public class PhotoSyntier extends Synclientier {
 
 	/**
 	 * Push up videos (larg files) with
-	 * {@link #pushBlocks(String, List, OnProcess, OnDocOk, ErrorCtx...)}.
+	 * {@link #pushBlocks(String, List, OnProcess, OnDocOk, OnError...)}
 	 *
 	 * @param videos
 	 * @param proc
@@ -198,7 +200,6 @@ public class PhotoSyntier extends Synclientier {
 	 */
 	public PhotoSyntier asynQueryDocs(List<? extends SyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(new Runnable() {
-	        @SuppressWarnings("deprecation")
 			public void run() {
 	        	DocsResp resp = null; 
 				try {
@@ -250,7 +251,8 @@ public class PhotoSyntier extends Synclientier {
 	 * @throws IOException
 	 * @throws AnsonException
 	 */
-	public PhotoSyntier asyncPhotosUp(List<? extends SyncDoc> photos, SessionInf user, OnProcess proc, OnDocOk docOk, OnError onErr)
+	public PhotoSyntier asyncPhotosUp(List<? extends SyncDoc> photos,
+			SessionInf user, OnProcess proc, OnDocOk docOk, OnError onErr)
 			throws SemanticException, IOException, AnsonException {
 		new Thread(new Runnable() {
 	        public void run() {

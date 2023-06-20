@@ -16,14 +16,14 @@ import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
 
 public class AlbumContext {
-    public enum ConnState { Online, Disconnected, LoginFailed }
-
-    public static final String jdocbase  = "jserv-album";
-    public static final String albumHome = "dist/index.html";
-    public static final String synchPage = "dist/sync.html";
     public static boolean verbose = true;
 
+    public enum ConnState { Online, Disconnected, LoginFailed }
+
+
     static AlbumContext instance;
+
+    public static final String jdocbase  = "jserv-album";
 
     public final String clientUri = "album.and";
 
@@ -159,4 +159,5 @@ public class AlbumContext {
     }
 
     public String jserv() { return jserv; }
+
 }
