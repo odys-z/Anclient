@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
+import io.odysz.common.Radix64;
 import io.odysz.common.Utils;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.module.rs.AnResultset;
@@ -29,7 +30,6 @@ import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantic.jserv.echo.EchoReq;
-import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.x.SemanticException;
 
 /**
@@ -46,17 +46,6 @@ public class AnsonClientTest {
 	@BeforeAll
 	public static void init() {
 		Utils.printCaller(false);
-//		jserv = System.getProperty("jserv");
-//		if (jserv == null)
-//			fail("\nTo test AnsonClient, you need start a jsample server and define @jserv like this to run test:\n" +
-//				"-Djserv=http://localhost:8080/doc-base\n" +
-//				"In Eclipse, it is defined in:\n" +
-//				"Run -> Debug Configurations ... -> Junit [your test case name] -> Arguments");
-//   		pswd = System.getProperty("pswd");
-//   		if (pswd == null)
-//			fail("\nTo test Anclient.java, you need to configure user 'admin' and it's password at jsample server, then define @pswd like this to run test:\n" +
-//				"-Dpswd=*******");
-
 		// trigger factory registration, prevent error:
 		// io.odysz.anson.x.AnsonException: Invoking registered factory failed for value: session
 		// Field Type: io.odysz.semantic.jprotocol.IPort,
@@ -144,7 +133,7 @@ public class AnsonClientTest {
 				"test jclient.java loading menu from menu.sample");
 		AnsonHeader header = client.header().act(act);
 
-		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq("test/echo", Port.echo, req);//, act);
+		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq("test/echo", Port.echo, req);
 		jmsg.header(header);
 
 		Anson.verbose = true;
@@ -181,8 +170,9 @@ public class AnsonClientTest {
 		jmsg.header(client.header());
 
 		AnsonResp resp = client.commit(jmsg, errCtx);
-		String obj = ((SemanticObject) resp.data().get("resulved")).resulve("", "");
+		// String obj = ((SemanticObject) resp.data().get("resulved")).resulve("a_attaches", "");
+		String aid = resp.resulvedata("a_attaches", "attId");
 
-		assertEquals("", (String) resp.data().get("aid"));
+		assertTrue( Radix64.validate(aid) );
 	}
 }
