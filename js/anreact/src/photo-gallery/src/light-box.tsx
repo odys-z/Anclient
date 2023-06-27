@@ -28,14 +28,20 @@ export const settle = (val: number, target: number, range: number) => {
   return lowerRange || upperRange ? target : val;
 }
 
-export const getPointFromTouch = (touch: Touch) => {
+export function getTouchPt (touch: Touch) {
   return {
     x: touch.clientX,
     y: touch.clientY
   };
 }
 
-export const getDistanceBetweenPoints = (pointA: { x: any; y: any; }, pointB: { x: any; y: any; }) => {
+/**
+ * 
+ * @param pointA 
+ * @param pointB 
+ * @returns distance
+ */
+export function d (pointA: { x: number; y: number; }, pointB: { x: number; y: number; }) {
   return Math.sqrt(Math.pow(pointA.y - pointB.y, 2) + Math.pow(pointA.x - pointB.x, 2));
 }
 
@@ -215,16 +221,16 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
   }
 
   handlePinchStart(event: TouchEvent) {
-    const pointA = getPointFromTouch(event.touches[0]);
-    const pointB = getPointFromTouch(event.touches[1]);
-    this.lastDistance = getDistanceBetweenPoints(pointA, pointB);
+    const pointA = getTouchPt(event.touches[0]);
+    const pointB = getTouchPt(event.touches[1]);
+    this.lastDistance = d(pointA, pointB);
   }
 
   handlePinchMove(event: TouchEvent) {
     event.preventDefault();
-    const pointA = getPointFromTouch(event.touches[0]);
-    const pointB = getPointFromTouch(event.touches[1]);
-    const distance = getDistanceBetweenPoints(pointA, pointB);
+    const pointA = getTouchPt(event.touches[0]);
+    const pointB = getTouchPt(event.touches[1]);
+    const distance = d(pointA, pointB);
     const scale = between(MIN_SCALE - ADDITIONAL_LIMIT, MAX_SCALE + ADDITIONAL_LIMIT, this.config.scale * (distance / this.lastDistance));
     this.zoom(scale);
     this.lastDistance = distance;
