@@ -9,10 +9,11 @@ import io.oz.R;
  */
 public class AssetHelper {
 
-    public static final String albumHome = "dist/index.html";
-    public static final String synchPage = "dist/sync.html";
+    public static final String albumHome = "index.html";
+    public static final String synchPage = "sync.html";
 
     static String jserv;
+    static String homeroot;
     static Context ctx;
 
     /** Act: show help page */
@@ -21,18 +22,19 @@ public class AssetHelper {
     public static final int Act_Landing = 2;
     /** Act: show album home page */
     public static final int Act_Album = 3;
-    /** Act: show synchronizing report */
+    /** Act: show synchronizing report - not v 0.2.xx */
     public static final int Act_SyncReport = 4;
 
-    public static void init(Context context, String jservroot) {
+    public static void init(Context context, String jservroot, String webroot) {
         jserv = jservroot;
+        homeroot = webroot;
         ctx = context;
     }
 
     public static String loadUrls(int intent) {
         switch (intent) {
             case Act_Album:
-                return ctx.getString(R.string.url_album, jserv, albumHome);
+                return ctx.getString(R.string.url_album, homeroot, albumHome);
             case Act_SyncReport:
                 return ctx.getString(R.string.url_sync_report, jserv, synchPage);
             case Act_Help:

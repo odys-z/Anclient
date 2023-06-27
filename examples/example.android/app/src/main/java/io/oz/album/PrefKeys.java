@@ -18,6 +18,7 @@ public class PrefKeys {
     public String homeCate;
     public String home;
     public String jserv;
+    public String homepage;
     public String device;
     public String usrid;
     public String pswd;

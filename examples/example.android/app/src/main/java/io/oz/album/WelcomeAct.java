@@ -70,6 +70,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.home = getString(R.string.key_home);
         AlbumApp.keys.device = getString(R.string.key_device);
         AlbumApp.keys.jserv = getString(R.string.jserv_key);
+        AlbumApp.keys.homepage = getString(R.string.homepage_key);
         AlbumApp.keys.usrid = getString(R.string.userid_key);
         AlbumApp.keys.pswd = getString(R.string.pswd_key);
 
@@ -85,9 +86,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
         String device = sharedPref.getString(AlbumApp.keys.device, "");
         String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
+        String homepage = sharedPref.getString(AlbumApp.keys.homepage, "192.168.101.5:8888");
 
         singl.init(homeName, uid, device, jserv);
-        AssetHelper.init(this, jserv);
+        AssetHelper.init(this, jserv, homepage);
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
@@ -157,12 +159,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 singl.pswd(sharedPref.getString(AlbumApp.keys.pswd, ""))
                      .login(
                         (tier) -> {
+                          // All WebView methods must be called on the same thread.
+                          runOnUiThread( () -> {
                             final VWebAlbum webView = new VWebAlbum();
                             WebView wv = findViewById(R.id.wv_welcome);
                             wv.setWebViewClient(webView);
                             WebSettings webSettings = wv.getSettings();
                             webSettings.setJavaScriptEnabled(true);
                             wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
+                          } );
                         },
                         (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
         } catch (Exception e) {

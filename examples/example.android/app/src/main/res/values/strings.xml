@@ -13,6 +13,7 @@
     <string name="home_title" translatable="false">Home Name</string>
 
     <string name="jserv_key" translatable="false">jserv-key</string>
+    <string name="homepage_key" translatable="false">homepage-key</string>
     <string name="jserv_default" translatable="false">http://192.168.0.1:8888</string>
     <string name="jserv" translatable="false">http://192.168.0.1:8888</string>
     <string name="jserv_title" translatable="false">Home Server IP</string>
@@ -45,7 +46,7 @@
 
     <string name="url_help" translatable="false">https://odys-z.github.io/Anclient</string>
     <string name="url_home" translatable="false">https://odys-z.github.io/Anclient</string>
-    <string name="url_album" translatable="false">http://%s/%s</string>
+    <string name="url_album" translatable="false">%s/%s</string>
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
     <string name="url_landing" translatable="true">https://odys-z.github.io/Anclient</string>
 
