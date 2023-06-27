@@ -76,7 +76,7 @@ export class AlbumAdminTier extends StreeTier {
 				let src = that.imgSrc(p.recId);
 				let srcSet = [src];
 
-				let css = JSON.parse(p.css);
+				let css = JSON.parse(p.css as string);
 				let size = css?.size;
 				let width = size && size.length > 2 ? size[2] : 4;
 				let height = size && size.length > 3 ? size[3] : 3;
