@@ -1,11 +1,13 @@
 /**
  * Credit to: https://github.com/Ngineer101/react-image-video-lightbox/blob/master/src/index.js
- * 2023.6.27 baseline, MIT @ Ngineer
+ * 2023.6.27 baseline, by Ngineer, License: MIT
+ * 
  */
 import * as React from 'react';
 import {TouchEvent, Touch} from 'react'; // override global types
-import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
+import { AnTreeNode, StreeTier, PhotoRec } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
+import { GalleryView, ImageSlide } from '../../react/widgets/gallery-view';
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
@@ -50,7 +52,6 @@ export const between = (min: number, max: number, value: number) => {
   return Math.min(max, Math.max(min, value));
 }
 
-// class Lightbox extends React.Component {
 export class Lightbox extends CrudCompW<BoxProps & Comprops> {
   width: number;
   height: number;
@@ -61,10 +62,20 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
   swipeStartY: any;
   lastDistance: any;
 
-  config: { x: number; y: number; scale: number; width: number; height: number; index: any; swiping: boolean; loading: boolean; iconSize: number; };
+  config: {
+    index: number;
+    x: number; y: number;
+    scale: number; iconSize: number;
+    width: number; height: number;
+    swiping: boolean; loading: boolean;
+  };
+
+  tier: StreeTier;
 
   constructor(props: BoxProps & Comprops) {
     super(props);
+
+    this.tier = props.tier as StreeTier;
 
     this.config = {
       x: INITIAL_X,
@@ -72,7 +83,7 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
       scale: INITIAL_SCALE,
       width: window.innerWidth,
       height: window.innerHeight,
-      index: this.props.startIndex,
+      index: this.props.ix,
       swiping: false,
       loading: true,
       iconSize: window.innerWidth <= 500 ? MOBILE_ICON_SIZE : DESKTOP_ICON_SIZE
@@ -86,6 +97,10 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     this.onNavigationCallback = this.props.onNavigationCallback && typeof this.props.onNavigationCallback === 'function'
       ? this.props.onNavigationCallback
       : () => { };
+  }
+
+  carousel(rec: { photos: ImageSlide[]; current: number; onClose: () => void; }): React.ReactNode {
+	  throw new Error('Method not implemented.');
   }
 
   zoomTo(scale: number) {
@@ -169,12 +184,13 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     var currentIndex = this.config.index;
     if (currentIndex > 0) {
       setTimeout(() => {
-        this.setState({
+        this.config = Object.assign(this.config, {
           index: currentIndex - 1,
           swiping: false,
           x: INITIAL_X,
           loading: true
-        }, () => this.onNavigationCallback(currentIndex - 1));
+        });
+        this.setState({}, () => this.onNavigationCallback(currentIndex - 1));
       }, 500);
     } else {
       this.reset();
@@ -183,14 +199,15 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
 
   swipeRight() {
     var currentIndex = this.config.index;
-    if (currentIndex < (this.props.data.length - 1)) {
+    if (currentIndex < (this.props.photos.length - 1)) {
       setTimeout(() => {
-        this.setState({
+        this.config = Object.assign(this.config, {
           index: currentIndex + 1,
           swiping: false,
           x: INITIAL_X,
           loading: true
-        }, () => this.onNavigationCallback(currentIndex + 1));
+        });
+        this.setState({}, () => this.onNavigationCallback(currentIndex + 1));
       }, 500);
     } else {
       this.reset();
@@ -248,38 +265,48 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     });
   }
 
+  parse = (photos: AnTreeNode[]) => {
+    let slids = [];
+    photos.forEach( (p, x) => {
+      slids.push({
+        altTag: '',
+        url: GalleryView.imgSrcReq(p.id, this.tier),
+        mime: p.mime,
+        title: PhotoRec.toShareLable(p.node as PhotoRec),
+      });
+    } );
+
+    return slids;
+  }
+
   getResources() {
-    var items = [];
-    var data = this.props.data;
+    let items = [];
+    let data = this.parse(this.props.photos);
     for (var i = 0; i < data.length; i++) {
       var resource = data[i];
-      if (resource.type === 'photo') {
+      if (!resource.mime || resource.mime === 'photo') {
         items.push(<img key={i}
           alt={resource.altTag}
           src={resource.url}
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
-            maxWidth: '100%',
-            maxHeight: '100%',
+            maxWidth: '100%', maxHeight: '100%',
             transform: `translate(${this.config.x}px, ${this.config.y}px) scale(${this.config.scale})`,
             transition: 'transform 0.5s ease-out'
           }}
           onLoad={() => { this.setState({ loading: false }); }} />);
       }
 
-      if (resource.type === 'video') {
+      else if (resource.mime === 'video') {
         items.push(<iframe key={i}
-          width="560"
-          height="315"
+          allowFullScreen width="560" height="315"
           src={resource.url}
           frameBorder="0"
           allow="autoplay; encrypted-media"
           title={resource.title}
-          allowFullScreen
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
-            maxWidth: '100%',
-            maxHeight: '100%',
+            maxWidth: '100%', maxHeight: '100%',
             transform: `translate(${this.config.x}px, ${this.config.y}px)`,
             transition: 'transform 0.5s ease-out'
           }}
@@ -311,23 +338,17 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
   }
 
   render() {
-    var resources = this.getResources();
+    let resources = this.getResources();
     return (
       <div
         onTouchStart={this.handleTouchStart}
         onTouchMove={this.handleTouchMove}
         onTouchEnd={this.handleTouchEnd}
         style={{
-          top: '0px',
-          left: '0px',
-          overflow: 'hidden',
-          position: 'fixed',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'row',
-          height: '100%',
-          width: '100%',
+          top: '0px', left: '0px',
+          overflow: 'hidden', position: 'fixed', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', flexDirection: 'row',
+          height: '100%', width: '100%',
           backgroundColor: 'rgba(0,0,0,1)'
         }}>
 
@@ -335,28 +356,44 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
           this.props.showResourceCount &&
           <div
             style={{
-              position: 'absolute',
-              top: '0px',
-              left: '0px',
-              padding: '15px',
-              color: 'white',
-              fontWeight: 'bold'
+              position: 'absolute', top: '0px', left: '0px',
+              padding: '15px', color: 'white', fontWeight: 'bold'
             }}>
-            <span>{this.config.index + 1}</span> / <span>{this.props.data.length}</span>
+            <span>{this.config.index + 1}</span> / <span>{this.props.photos.length}</span>
           </div>
         }
+
+        {
+          this.config.loading &&
+          <div style={{ margin: 'auto', position: 'fixed' }}>
+            <style>
+              {
+                `@keyframes react_image_video_spinner {
+                  0% { transform: translate3d(-50 %, -50 %, 0) rotate(0deg); }
+                  100% { transform: translate3d(-50%, -50%, 0) rotate(360deg); }
+                }`
+              }
+            </style>
+            <div style={{
+              animation: '1.0s linear infinite react_image_video_spinner',
+              border: 'solid 5px #ffffff',
+              borderBottomColor: '#cfd0d1', borderRadius: '50%',
+              height: 30, width: 30, position: 'fixed',
+              transform: 'translate3d(-50%, -50%, 0)',
+            }}></div>
+          </div>
+        }
+        { resources[this.config.index || 0] }
 
         <div
           style={{
             position: 'absolute',
-            top: '0px',
-            right: '0px',
-            padding: '10px',
+            top: '0px', right: '0px',
+            padding: '10px', cursor: 'pointer',
             color: '#FFFFFF',
-            cursor: 'pointer',
             fontSize: `${this.config.iconSize * 0.8}px`
           }}
-          onClick={this.props.onCloseCallback}>
+          onClick={this.props.onClose}>
           <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#FFFFFF">
             <path d="M0 0h24v24H0z" fill="none" />
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
@@ -366,11 +403,9 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
           (this.config.index + 1 != 1) ?
             <div
               style={{
-                position: 'absolute',
-                left: '0px',
-                zIndex: 1,
+                position: 'absolute', left: '0px',
+                zIndex: 1, cursor: 'pointer',
                 color: '#FFFFFF',
-                cursor: 'pointer',
                 fontSize: `${this.config.iconSize}px`
               }}
               onClick={() => { this.swipeLeft(); }}>
@@ -383,14 +418,12 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
             <></>
         }
         {
-          (this.config.index + 1 != this.props.data.length) ?
+          (this.config.index + 1 != this.props.photos.length) ?
             <div
               style={{
                 position: 'absolute',
-                right: '0px',
-                zIndex: 1,
-                color: '#FFFFFF',
-                cursor: 'pointer',
+                right: '0px', zIndex: 1,
+                color: '#FFFFFF', cursor: 'pointer',
                 fontSize: `${this.config.iconSize}px`
               }}
               onClick={() => { this.swipeRight(); }}>
@@ -401,37 +434,6 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
             </div>
             :
             <></>
-        }
-        {
-          this.config.loading &&
-          <div style={{ margin: 'auto', position: 'fixed' }}>
-            <style>
-              {
-                `@keyframes react_image_video_spinner {
-                  0% {
-                    transform: translate3d(-50 %, -50 %, 0) rotate(0deg);
-                  }
-                  100% {
-                    transform: translate3d(-50%, -50%, 0) rotate(360deg);
-                  }
-                }`
-              }
-            </style>
-            <div style={{
-              animation: '1.0s linear infinite react_image_video_spinner',
-              border: 'solid 5px #ffffff',
-              borderBottomColor: '#cfd0d1',
-              borderRadius: '50%',
-              height: 30,
-              width: 30,
-              position: 'fixed',
-              transform: 'translate3d(-50%, -50%, 0)',
-            }}></div>
-          </div>
-        }
-
-        {
-          resources[this.config.index]
         }
       </div>
     );

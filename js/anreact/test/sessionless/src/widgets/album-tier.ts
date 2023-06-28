@@ -82,12 +82,9 @@ export class AlbumTier extends StreeTier {
 				let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
 
 				imgs.push( {
-					src,
-					srcSet,
-					width,
-					height,
-					alt,
-					legend: p.shareLable(), 
+					src,	srcSet,
+					width,	height,
+					alt,	legend: p.shareLable(), 
 					key: x.toString()
 				} );
 			} );
@@ -99,7 +96,7 @@ export class AlbumTier extends StreeTier {
 	 * Compose src of img tag, with AlbumReq request as anson64 parameter.
 	 * 
 	 * @param recId potho id
-	 * @returns 
+	 * @returns src of img tag 
 	 */
 	imgSrc(recId: string) : string {
 		/*

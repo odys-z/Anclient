@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
 
@@ -8,6 +7,8 @@ import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonServs, Login, CrudComp, AnTreeditor2
 } from '../../../src/an-components';
 import { AlbumTier } from './widgets/album-tier';
+import Lightbox from '../../../src/photo-gallery/src/light-box';
+import { MuiThemeProvider } from '@material-ui/core/styles';
 
 const { JsampleTheme } = jsample;
 
@@ -62,8 +63,6 @@ class Widgets extends React.Component<LessProps> {
 		this.state.servId = this.props.servId;
 		this.state.servs = this.props.servs;
 
-		// this.ssclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
-
 		this.errctx = {onError: this.onError, msg: ''};
 
 		this.state = Object.assign(this.state, {
@@ -75,7 +74,9 @@ class Widgets extends React.Component<LessProps> {
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
 
-		/* AnClient won't work like this as the client need to be built after logged in.
+		/* this.ssclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
+		 *
+		 * With SessionClient, AnClient.js won't work like this as the client need to be built after logged in.
 		 *
 			this.ssclient = new SessionClient();
 			this.ssclient.an.init(this.state.servs[this.props.servId]);
@@ -107,7 +108,7 @@ class Widgets extends React.Component<LessProps> {
 	 * 
 	 * TODO doc: this is another style of intitializing AnClient and SessionClient.
 	 * 
-	 * @param c 
+	 * @param c instenct of AnClient.js
 	 */
 	onLogin(c: SessionClient): void {
 		this.ssclient = c;
@@ -120,6 +121,11 @@ class Widgets extends React.Component<LessProps> {
 
 		this.setState({reload: true});
 	}
+
+
+	lightbox = (photos: AnTreeNode[], opts: {ix: number, onClose: (e: any) => {}}) => {
+		return (<Lightbox photos={photos} tier={this.albumtier} {...opts} />);
+	} 
 
 	render() {
 	  let reload =this.state.reload;
@@ -154,6 +160,7 @@ class Widgets extends React.Component<LessProps> {
 						  grid: {xs: false, sm: 6, md: 3} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
+					lightbox={this.lightbox}
 					onSelectChange={()=>{}}
 				/>}
 				<hr/>
@@ -171,10 +178,10 @@ class Widgets extends React.Component<LessProps> {
 					onSelectChange={()=>{}}
 				/>}
 				<hr/>
-				{this.state.hasError &&
-					<AnError onClose={this.onErrorClose} fullScreen={false}
-							uri={this.uri} tier={undefined}
-							title={L('Error')} msg={this.errctx.msg} />}
+				{ this.state.hasError && <AnError
+					title={L('Error')} msg={this.errctx.msg}
+					uri={this.uri} tier={undefined}
+				    fullScreen={false} onClose={this.onErrorClose} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}
