@@ -25,6 +25,7 @@ import { SimpleForm } from "./simple-form";
 import { L } from "../../utils/langstr";
 
 import { photos as _photos } from "./res/temp-photos";
+import Lightbox from "../../photo-gallery/src/light-box";
 
 const styles = (theme: Theme) => ({
   root: {
@@ -359,11 +360,10 @@ class TreeGallaryComp extends TreeCardComp {
 	toEditCard: ()=>void;
 	galleref: GalleryView;
 
-	constructor(props: TreecardProps) {
+	constructor(props: TreecardProps & {lightbox?: Lightbox}) {
 		super(props);
-		this.vistype = TreeNodeVisual.gallery;
 
-		// this.tier = props.tier as StreeTier;
+		this.vistype = TreeNodeVisual.gallery;
 		this.node = props.tnode;
 
 		this.expand = this.expand.bind(this);
@@ -378,21 +378,18 @@ class TreeGallaryComp extends TreeCardComp {
 		let that = this;
 		let {classes, tnode, onClick, media} = this.props;
 		let node = tnode.node;
-		return (
-		  <>
+		return (<>
 		  { this.galleryHead(that.props.columns, tnode, classes, media, onClick) }
 		  <Collapse in={this.state.expand}>
 			<GalleryView {... this.props} 
-				aid={''}
 				ref={undefined} // suppress type error
 				uri={this.uri} media={this.props.media}
 				cid={this.collect}
-				// tier={this.tier}
 				photos={node.children} // or fire a request to get photos?
+				lightbox={this.props.lightbox}
 			/>
 		  </Collapse>
-		  </>
-		  );
+		</>);
 	}
 
 	galleryHead (columns: AnTreegridCol[], tnode: AnTreeNode,
@@ -483,6 +480,8 @@ interface AnTreeditorProps extends AnTablistProps {
 	reload: boolean;
 
 	nodeFormatter?: (n: AnTreeNode, parent: ReactNode, opts: CompOpts) => JSX.Element;
+
+	lightbox?: Lightbox;
 }
 
 interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
@@ -700,7 +699,6 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 	  let that = this;
 	  let n = treenode.node;
 	  n.css = n.css || {};
-	  // let indentIcons = this.props.indentIcons;
 	  let expd = !!n.expandChildren;
 
 	  return (

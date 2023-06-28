@@ -5,7 +5,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
 
-import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, SessionClient, StreeTier, Tierec, isEmpty, len
+import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, Semantier, SessionClient, StreeTier, Tierec, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
@@ -39,8 +39,15 @@ export interface ImageSlide {
 	imgstyl?: CustomImgStyle
 }
 
+export interface GalleryProps {
+	cid: string;
+	photos?: AnTreeNode[];
+	tier?: Semantier;
+	lightbox?: (photos: AnTreeNode[], opts?: {ix: number, onClose: () => void}) => JSX.Element;
+}
 
-export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnTreeNode[]}> {
+// export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnTreeNode[]}> {
+export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	tier: StreeTier | undefined;
 	classes: any;
 	uri: any;
@@ -52,14 +59,15 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 	slides: ImageSlide[];
 	albumtier: StreeTier;
 	
-	constructor(props: Comprops & {tier: StreeTier, cid?: string, photos?: AnTreeNode[]}) {
+	// constructor(props: Comprops & {tier: StreeTier, cid?: string, photos?: AnTreeNode[]}) {
+	constructor(props: Comprops & GalleryProps) {
 		super(props);
 
 		this.classes = props.classes;
 		this.uri = props.uri;
 		this.cid = props.cid;
 
-		this.albumtier = props.tier;
+		this.albumtier = props.tier as StreeTier;
 
 		this.openLightbox = this.openLightbox.bind(this);
 		this.closeLightbox = this.closeLightbox.bind(this);
@@ -85,7 +93,7 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 		let imgstyl = len(nodes) === 1
 					? {width:'auto', maxHeight: '20vh'}
 					: undefined;
-		// console.log(len(nodes), imgstyl, nodes);
+
 		nodes?.forEach( (p, x) => {
 			let [_width, _height, w, h] = (
 				JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
@@ -140,15 +148,22 @@ export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnT
 	};
 
 	gallery(photos: Array<ImageSlide>) {
+		let that = this;
 		return (
 		  <div>
-			{this.showCarousel &&
-				<Modal isOpen={true} ariaHideApp={false}
+			{this.showCarousel && (
+				this.props.lightbox(this.props.tnode.node.children,
+				  { ix: this.currentImx,
+					onClose: () => {
+						that.showCarousel = false;
+						that.setState({});
+				  } } )
+			 || <Modal isOpen={true} ariaHideApp={false}
 					onRequestClose={this.closeLightbox}
 					contentLabel="Example Modal" >
 					{this.photoCarousel(photos, this.currentImx)}
 				</Modal>
-			}
+			) }
 			<Gallery<ImageSlide> photos={photos}
 			  	onClick={this.openLightbox}
 				targetRowHeight={containerWidth => {
