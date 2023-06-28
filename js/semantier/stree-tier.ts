@@ -1,12 +1,11 @@
 import * as CSS from 'csstype';
 
-import { AnClient, SessionClient } from './anclient';
+import { SessionClient } from './anclient';
 
 import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, DocsReq, AnsonBody } from './protocol';
 
 import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
 
-import { isEmpty } from "./helpers";
 
 /**
  * expand: 'T'; collpase: e.g. '+', ...,
@@ -136,17 +135,10 @@ export class StreeTier extends Semantier {
      * @param comp 
      */
 	stree(opts: DatasetOpts & {act?: LogAct, uri?: string}, errCtx: ErrorCtx): void {
-        // if (isEmpty(this.uiHelper))
-        //     this.uiHelper = opts.an;
-
         opts.port = opts.port || this.port;
 
         if (!opts.onOk)
             console.warn("StreeTier.stree(): Loading s-tree without result handling?", opts);
-
-		// let onload = opts.onOk || function (resp: AnsonMsg<AnDatasetResp>) {
-		// 	comp?.setState({forest: resp.Body().forest});
-		// }
 
 		// Semantier.stree(opts, this.client, onload, this.errCtx);
         // implemention 2:
@@ -162,8 +154,6 @@ export class StreeTier extends Semantier {
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 
-        // let context = comp.context as AnContextType;
-		// this.client.an.post(jreq, onload, context.error);
 		this.client.an.post(jreq, opts.onOk, errCtx);
     }
 }

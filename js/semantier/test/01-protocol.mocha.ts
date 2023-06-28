@@ -127,7 +127,7 @@ describe('TS: [01.1 Protocol.Port]', () => {
 		let an = new AnClient('http://localhost/jsample');
 		an.understandPorts(TestPorts);
 
-		assert.equal(Protocol.Port['echo'], "echo.serv11");
+		assert.equal(Protocol.Port['echo'], "echo.less");
 		assert.equal(Protocol.Port['test1'], "test.serv");
 		assert.equal(Protocol.Port['test2'], "hello.serv");
 
