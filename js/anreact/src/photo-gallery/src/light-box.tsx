@@ -3,6 +3,7 @@
  * 2023.6.27 baseline, MIT @ Ngineer
  */
 import * as React from 'react';
+import {TouchEvent, Touch} from 'react'; // override global types
 import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 
@@ -125,7 +126,7 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     this.animation = requestAnimationFrame(frame);
   }
 
-  handleTouchStart(event: TouchEvent ) {
+  handleTouchStart(event: any ) {
     this.animation && cancelAnimationFrame(this.animation);
     if (event.touches.length === 2) this.handlePinchStart(event);
     if (event.touches.length === 1) this.handleTapStart(event);
