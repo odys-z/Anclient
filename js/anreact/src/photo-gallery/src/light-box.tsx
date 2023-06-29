@@ -2,6 +2,9 @@
  * Credit to: https://github.com/Ngineer101/react-image-video-lightbox/blob/master/src/index.js
  * 2023.6.27 baseline, by Ngineer, License: MIT
  * 
+ * ISSUE: Performance problem since v0.4.26.
+ * It could be the anson64's random string makes browser always load the same images.
+ * Resource should be cached.
  */
 import * as React from 'react';
 import {TouchEvent, Touch} from 'react'; // override global types
@@ -308,7 +311,8 @@ export class Lightbox extends CrudCompW<Comprops> {
           }}
           onLoad={() => { 
             if (this.state.swiping || this.state.loading)
-              this.setState({ loading: false }); }} />);
+              this.setState({ loading: false }); }}
+        />);
       }
       // else if (!resource.mime || resource.mime === 'video') {
       else if (mime2type(resource.mime) === 'video') {
@@ -388,8 +392,7 @@ export class Lightbox extends CrudCompW<Comprops> {
           backgroundColor: 'rgba(0,0,0,1)'
         }}>
 
-        {
-          this.props.showResourceCount &&
+        { this.props.showResourceCount &&
           <div
             style={{
               position: 'absolute', top: '0px', left: '0px',
@@ -399,8 +402,7 @@ export class Lightbox extends CrudCompW<Comprops> {
           </div>
         }
 
-        {
-          this.state.loading &&
+        { this.state.loading &&
           <div style={{ margin: 'auto', position: 'fixed' }}>
             <style>
               {
@@ -435,8 +437,8 @@ export class Lightbox extends CrudCompW<Comprops> {
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
           </svg>
         </div>
-        {
-          (this.config.index + 1 != 1) ?
+
+        { (this.config.index + 1 != 1) ?
             <div
               style={{
                 position: 'absolute', left: '0px',
@@ -453,8 +455,7 @@ export class Lightbox extends CrudCompW<Comprops> {
             :
             <></>
         }
-        {
-          (this.config.index + 1 != this.props.photos.length) ?
+        { (this.config.index + 1 != this.props.photos.length) ?
             <div
               style={{
                 position: 'absolute',
