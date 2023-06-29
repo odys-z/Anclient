@@ -3,8 +3,10 @@
  * 2023.6.27 baseline, by Ngineer, License: MIT
  * 
  * ISSUE: Performance problem since v0.4.26.
- * It could be the anson64's random string makes browser always load the same images.
- * Resource should be cached.
+ * It could be the anson64's random string makes browser always load the same images, see
+ * <a href='https://stackoverflow.com/q/10240110'>discussions</a>.
+ * 
+ * FIXME: Resource should be cached.
  */
 import * as React from 'react';
 import {TouchEvent, Touch} from 'react'; // override global types
@@ -63,6 +65,11 @@ export const between = (min: number, max: number, value: number) => {
   return Math.min(max, Math.max(min, value));
 }
 
+/**
+ * Show a fullscreen carousel.
+ * 
+ * This function have a performance issue.
+ */
 export class Lightbox extends CrudCompW<Comprops> {
   width: number;
   height: number;
