@@ -4,10 +4,9 @@ import ReactDOM from 'react-dom';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreeditor2
+	jsample, JsonServs, Login, CrudComp, AnTreeditor2, Lightbox
 } from '../../../src/an-components';
-import { AlbumTier } from './widgets/album-tier';
-import Lightbox from '../../../src/photo-gallery/src/light-box';
+import { AlbumTier } from './tiers/album-tier';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 const { JsampleTheme } = jsample;

@@ -5,7 +5,7 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, AnsonBody,
 	AnTreeNode, ErrorCtx, an, SessionClient
 } from '@anclient/semantier';
 
-import { L, Langstrs, AnContext, AnError, AnReactExt,
+import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW, AnContextType,
 } from '@anclient/anreact';
 import { GalleryTier } from './gallerytier-less';
@@ -125,6 +125,10 @@ export class App extends CrudCompW<AlbumProps> {
 		this.setState({tobeLoaded: true})
 	}
 
+	lightbox = (photos: AnTreeNode[], opts: {ix: number, onClose: (e: any) => {}}) => {
+		return (<Lightbox photos={photos} tier={this.albumtier} {...opts} />);
+	}
+
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r.Body()?.msg(), r);
 		this.error.msg = r.Body()?.msg();
@@ -166,6 +170,7 @@ export class App extends CrudCompW<AlbumProps> {
 					{ type: 'text', field: 'shareby',label: L('By'), grid: {xs: false, sm: 3} },
 					{ type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
 				]}
+				lightbox={this.lightbox}
 			/> }
 		  { this.state.hasError &&
 			<AnError onClose={this.onErrorClose} fullScreen={false}

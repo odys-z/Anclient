@@ -2,7 +2,6 @@ import { Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
 	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode, PhotoRec
 } from '@anclient/semantier';
-import { PhotoProps } from '../react-photo-gallery/src/Photo';
 
 const debug = true;
 
