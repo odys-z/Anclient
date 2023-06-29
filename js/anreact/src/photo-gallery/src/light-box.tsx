@@ -11,10 +11,11 @@
 import * as React from 'react';
 import {TouchEvent, Touch} from 'react'; // override global types
 import { AnTreeNode, StreeTier, PhotoRec } from '@anclient/semantier';
+import { Comprops, CrudCompW } from '../../react/crud';
+import { GalleryView } from '../../react/widgets/gallery-view';
+import { regex } from '../../utils/regex';
 
-import { utils, GalleryView, Comprops, CrudCompW } from '../../../../anreact/src/an-components';
-
-let { mime2type } = utils.regex;
+let { mime2type } = regex;
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
