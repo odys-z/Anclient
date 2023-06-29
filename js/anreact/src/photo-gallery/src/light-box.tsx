@@ -269,7 +269,8 @@ export class Lightbox extends CrudCompW<Comprops> {
     const pointA = getTouchPt(event.touches[0]);
     const pointB = getTouchPt(event.touches[1]);
     const distance = d(pointA, pointB);
-    const scale = between(MIN_SCALE - ADDITIONAL_LIMIT, MAX_SCALE + ADDITIONAL_LIMIT, this.config.scale * (distance / this.lastDistance));
+    const scale = between(MIN_SCALE - ADDITIONAL_LIMIT, MAX_SCALE + ADDITIONAL_LIMIT,
+                          this.config.scale * (distance / this.lastDistance));
     this.zoom(scale);
     this.lastDistance = distance;
   }
