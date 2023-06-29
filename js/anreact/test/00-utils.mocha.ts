@@ -1,29 +1,10 @@
 import { assert } from 'chai';
 
-// import { toBool, isEmpty } from '@anclient/semantier';
 import { L, Langstrs } from '../../anreact/src/utils/langstr';
 import { regex } from '../../anreact/src/utils/regex';
 import { swap } from '../src/utils/lang-ext';
 
 describe('case: [0.0] utils', () => {
-// 	it('helpers: toBool, isEmpty', () =>{
-// 		assert.equal(isEmpty(''), true, '0.1');
-// 		assert.equal(toBool(''), false, '0.3');
-// 		assert.equal(isEmpty(undefined), true, '0.6');
-// 		assert.equal(toBool(undefined), false, '0.7');
-// 		assert.equal(isEmpty(null), true, '0.6');
-// 		assert.equal(toBool(null), false, '0.7');
-// 		assert.equal(isEmpty(0), false, '0.6');
-// 		assert.equal(toBool(0), false, '0.7');
-
-// 		assert.equal(toBool(1), true, '0.8');
-// 		assert.equal(toBool('1'), true, '0.9');
-// 		assert.equal(toBool('true'), true, '0.10');
-// 		assert.equal(toBool('false'), false, '0.11');
-// 		assert.equal(toBool(true), true, '0.12');
-// 		assert.equal(toBool(false), false, '0.13');
-// 	} );
-
 	it('Array pathc', () => {
 		let arr = [1, 2, 3];
 		swap(arr, 0, 1);
@@ -32,32 +13,6 @@ describe('case: [0.0] utils', () => {
 		assert.equal(arr[1], 1);
 		assert.equal(arr[2], 3);
 	});
-
-// 	it('toBool', () => {
-// 		assert.isTrue(toBool('1'), '1');
-// 		assert.isTrue(toBool('2'), '2');
-// 		assert.isTrue(toBool(1), '3');
-// 		assert.isTrue(toBool(2), '4');
-// 		assert.isTrue(toBool(true), '5');
-// 		assert.isTrue(toBool('true'), '6');
-
-// 		assert.isFalse(toBool('0'), 'A');
-// 		assert.isFalse(toBool(' '), 'B');
-// 		assert.isFalse(toBool(0), 'C');
-// 		assert.isFalse(toBool(undefined), 'D');
-// 		assert.isFalse(toBool(null), 'E');
-// 		assert.isFalse(toBool('false'), 'F');
-// 	} );
-
-// 	it('toBool 2', () =>{
-// 		assert.isFalse(toBool('0', true), 'x');
-// 		assert.isFalse(toBool(' ', true), 'y');
-// 		assert.isFalse(toBool('' , true), 'z');
-// 		assert.isTrue(toBool(undefined , true), 'r');
-// 		assert.isFalse(toBool(undefined), 's');
-// 		assert.isFalse(toBool(null), 's');
-// 		assert.isFalse(toBool(null, null), 't');
-// 	} );
 } );
 
 let { mime2type, type2mime } = regex;
@@ -67,6 +22,8 @@ describe('case: [00.1 regex]', () => {
 		assert.equal(mime2type('image/png'), 'image', '00.1 png');
 		assert.equal(mime2type('image/png;base64'), 'image', '00.1 image');
 		assert.equal(mime2type('image/svg+xml'), 'image', '00.1 svg');
+		assert.equal(mime2type('video/ogg'), 'video', '00.1 video');
+		assert.equal(mime2type('audio/mpeg'), 'audio', '00.1 audio');
 		assert.equal(mime2type('application/pdf'), '.pdf', '00.1 pdf');
 		assert.equal(mime2type('application/xml'), '.xml', '00.1 xml');
 		assert.equal(mime2type(''), '', '00.1 ""');
