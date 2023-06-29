@@ -279,6 +279,7 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     return slids;
   }
 
+  // branch temp-try
   getResources() {
     let items = [];
     let data = this.parse(this.props.photos);
