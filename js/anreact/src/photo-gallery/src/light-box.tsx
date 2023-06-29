@@ -2,12 +2,19 @@
  * Credit to: https://github.com/Ngineer101/react-image-video-lightbox/blob/master/src/index.js
  * 2023.6.27 baseline, by Ngineer, License: MIT
  * 
+ * ISSUE: Performance problem since v0.4.26.
+ * It could be the anson64's random string makes browser always load the same images, see
+ * <a href='https://stackoverflow.com/q/10240110'>discussions</a>.
+ * 
+ * FIXME: Resource should be cached.
  */
 import * as React from 'react';
 import {TouchEvent, Touch} from 'react'; // override global types
 import { AnTreeNode, StreeTier, PhotoRec } from '@anclient/semantier';
-import { Comprops, CrudCompW } from '../../react/crud';
-import { GalleryView, ImageSlide } from '../../react/widgets/gallery-view';
+
+import { utils, GalleryView, Comprops, CrudCompW } from '../../../../anreact/src/an-components';
+
+let { mime2type } = utils.regex;
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
@@ -22,7 +29,13 @@ const INITIAL_SCALE = 1;
 const MOBILE_ICON_SIZE = 35;
 const DESKTOP_ICON_SIZE = 50;
 
-export type BoxProps = {
+export type NgineerSlideProps = {
+  mime: string;
+  id?: string;
+  src: string;
+  title?: string;
+  altag?: string;
+  poster?: string;
 }
 
 export const settle = (val: number, target: number, range: number) => {
@@ -52,7 +65,12 @@ export const between = (min: number, max: number, value: number) => {
   return Math.min(max, Math.max(min, value));
 }
 
-export class Lightbox extends CrudCompW<BoxProps & Comprops> {
+/**
+ * Show a fullscreen carousel.
+ * 
+ * This function have a performance issue.
+ */
+export class Lightbox extends CrudCompW<Comprops> {
   width: number;
   height: number;
   onNavigationCallback: any;
@@ -67,12 +85,12 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     x: number; y: number;
     scale: number; iconSize: number;
     width: number; height: number;
-    swiping: boolean; loading: boolean;
+    // swiping: boolean;// loading: boolean;
   };
 
   tier: StreeTier;
 
-  constructor(props: BoxProps & Comprops) {
+  constructor(props: NgineerSlideProps & Comprops) {
     super(props);
 
     this.tier = props.tier as StreeTier;
@@ -84,10 +102,13 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
       width: window.innerWidth,
       height: window.innerHeight,
       index: this.props.ix,
-      swiping: false,
-      loading: true,
+      // swiping: false,
+      // loading: true,
       iconSize: window.innerWidth <= 500 ? MOBILE_ICON_SIZE : DESKTOP_ICON_SIZE
     };
+
+    this.state.loading = true;
+    this.state.swiping = false;
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -97,10 +118,6 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     this.onNavigationCallback = this.props.onNavigationCallback && typeof this.props.onNavigationCallback === 'function'
       ? this.props.onNavigationCallback
       : () => { };
-  }
-
-  carousel(rec: { photos: ImageSlide[]; current: number; onClose: () => void; }): React.ReactNode {
-	  throw new Error('Method not implemented.');
   }
 
   zoomTo(scale: number) {
@@ -127,13 +144,14 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
       const nextWidth = this.width * targetScale;
       const nextHeight = this.height * targetScale;
 
-      this.setState({
+      this.config = Object.assign(this.config, {
         scale: targetScale,
         width: nextWidth,
         height: nextHeight,
         x: INITIAL_X,
         y: INITIAL_Y
-      }, () => {
+      });
+      this.setState({swiping: false, loading: true}, () => {
         this.animation = requestAnimationFrame(frame);
       });
     };
@@ -162,7 +180,7 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
       this.reset();
     }
 
-    if (this.config.swiping && this.config.scale === 1) {
+    if (this.state.swiping && this.config.scale === 1) {
       this.handleSwipe(event);
     }
 
@@ -170,13 +188,15 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
   }
 
   handleSwipe(event: TouchEvent) {
-    var swipeDelta = event.changedTouches[0].clientX - this.swipeStartX;
-    if (swipeDelta < -(this.width / 3)) {
-      this.swipeRight();
-    } else if (swipeDelta > (this.width / 3)) {
-      this.swipeLeft();
-    } else {
-      this.reset();
+    if (this.state.swiping) {
+      var swipeDelta = event.changedTouches[0].clientX - this.swipeStartX;
+      if (swipeDelta < -(this.width / 3)) {
+        this.swipeRight();
+      } else if (swipeDelta > (this.width / 3)) {
+        this.swipeLeft();
+      } else {
+        this.reset();
+      }
     }
   }
 
@@ -186,11 +206,12 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
       setTimeout(() => {
         this.config = Object.assign(this.config, {
           index: currentIndex - 1,
-          swiping: false,
           x: INITIAL_X,
-          loading: true
         });
-        this.setState({}, () => this.onNavigationCallback(currentIndex - 1));
+        this.setState({
+          swiping: false,
+          loading: true
+        }, () => this.onNavigationCallback(currentIndex - 1));
       }, 500);
     } else {
       this.reset();
@@ -203,11 +224,12 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
       setTimeout(() => {
         this.config = Object.assign(this.config, {
           index: currentIndex + 1,
-          swiping: false,
           x: INITIAL_X,
-          loading: true
         });
-        this.setState({}, () => this.onNavigationCallback(currentIndex + 1));
+        this.setState({
+          swiping: false,
+          loading: true
+        }, () => this.onNavigationCallback(currentIndex + 1));
       }, 500);
     } else {
       this.reset();
@@ -226,15 +248,13 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
 
   handlePanMove(event: TouchEvent) {
     if (this.config.scale === 1) {
-      this.setState({
-        x: event.touches[0].clientX - this.swipeStartX
-      });
+      this.config.x = event.touches[0].clientX - this.swipeStartX
+      this.setState({ });
     } else {
       event.preventDefault();
-      this.setState({
-        x: event.touches[0].clientX - this.swipeStartX,
-        y: event.touches[0].clientY - this.swipeStartY
-      });
+      this.config.x = event.touches[0].clientX - this.swipeStartX,
+      this.config.y = event.touches[0].clientY - this.swipeStartY
+      this.setState({ });
     }
   }
 
@@ -258,19 +278,19 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     const nextWidth = this.width * scale;
     const nextHeight = this.height * scale;
 
-    this.setState({
-      width: nextWidth,
-      height: nextHeight,
-      scale
-    });
+    this.config.width = nextWidth;
+    this.config.height = nextHeight;
+    this.config.scale = scale;
+    this.setState({ });
   }
 
-  parse = (photos: AnTreeNode[]) => {
+  parse = (photos: AnTreeNode[]) : NgineerSlideProps[] => {
     let slids = [];
     photos.forEach( (p, x) => {
       slids.push({
-        altTag: '',
-        url: GalleryView.imgSrcReq(p.id, this.tier),
+        altTag: p.title,
+        poster: p.preview,
+        src: GalleryView.imgSrcReq(p.id, this.tier),
         mime: p.mime,
         title: PhotoRec.toShareLable(p.node as PhotoRec),
       });
@@ -285,19 +305,41 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
     let data = this.parse(this.props.photos);
     for (var i = 0; i < data.length; i++) {
       var resource = data[i];
-      if (!resource.mime || resource.mime === 'photo') {
+      // if (!resource.mime || resource.mime === 'photo') {
+      if (!resource.mime || mime2type(resource.mime) === 'image') {
         items.push(<img key={i}
-          alt={resource.altTag}
-          src={resource.url}
+          alt={resource.altag}
+          src={resource.src}
+          loading='lazy'
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
             maxWidth: '100%', maxHeight: '100%',
             transform: `translate(${this.config.x}px, ${this.config.y}px) scale(${this.config.scale})`,
             transition: 'transform 0.5s ease-out'
           }}
-          onLoad={() => { this.setState({ loading: false }); }} />);
+          onLoad={() => { 
+            if (this.state.swiping || this.state.loading)
+              this.setState({ loading: false }); }}
+        />);
+      }
+      // else if (!resource.mime || resource.mime === 'video') {
+      else if (mime2type(resource.mime) === 'video') {
+        items.push(<video key={i}
+          preload='false' controls
+          poster={resource.poster}
+          src={resource.src}
+          style={{
+            pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
+            maxWidth: '100%', maxHeight: '100%',
+            transform: `translate(${this.config.x}px, ${this.config.y}px) scale(${this.config.scale})`,
+            transition: 'transform 0.5s ease-out'
+          }}
+          onLoad={() => { 
+            if (this.state.swiping || this.state.loading)
+              this.setState({ loading: false }); }} />);
       }
 
+      /* TODO third party online resources
       else if (resource.mime === 'video') {
         items.push(<iframe key={i}
           allowFullScreen width="560" height="315"
@@ -313,6 +355,7 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
           }}
           onLoad={() => { this.setState({ loading: false }); }}></iframe>);
       }
+      */
     }
 
     return items;
@@ -321,9 +364,11 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
   UNSAFE_componentWillMount() {
     window.addEventListener('resize', () => {
       if (window.innerWidth <= 500) {
-        this.setState({ iconSize: MOBILE_ICON_SIZE });
+        this.config.iconSize = MOBILE_ICON_SIZE;
+        this.setState({ });
       } else {
-        this.setState({ iconSize: DESKTOP_ICON_SIZE });
+        this.config.iconSize = DESKTOP_ICON_SIZE;
+        this.setState({ });
       }
     });
   }
@@ -331,9 +376,11 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
   componentWillUnmount() {
     window.removeEventListener('resize', () => {
       if (window.innerWidth <= 500) {
-        this.setState({ iconSize: MOBILE_ICON_SIZE });
+        this.config.iconSize = MOBILE_ICON_SIZE;
+        this.setState({ });
       } else {
-        this.setState({ iconSize: DESKTOP_ICON_SIZE });
+        this.config.iconSize = DESKTOP_ICON_SIZE;
+        this.setState({ });
       }
     });
   }
@@ -353,8 +400,7 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
           backgroundColor: 'rgba(0,0,0,1)'
         }}>
 
-        {
-          this.props.showResourceCount &&
+        { this.props.showResourceCount &&
           <div
             style={{
               position: 'absolute', top: '0px', left: '0px',
@@ -364,8 +410,7 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
           </div>
         }
 
-        {
-          this.config.loading &&
+        { this.state.loading &&
           <div style={{ margin: 'auto', position: 'fixed' }}>
             <style>
               {
@@ -400,8 +445,8 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
           </svg>
         </div>
-        {
-          (this.config.index + 1 != 1) ?
+
+        { (this.config.index + 1 != 1) ?
             <div
               style={{
                 position: 'absolute', left: '0px',
@@ -418,8 +463,7 @@ export class Lightbox extends CrudCompW<BoxProps & Comprops> {
             :
             <></>
         }
-        {
-          (this.config.index + 1 != this.props.photos.length) ?
+        { (this.config.index + 1 != this.props.photos.length) ?
             <div
               style={{
                 position: 'absolute',

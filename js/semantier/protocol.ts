@@ -81,7 +81,7 @@ export type AnsonValue = string | object | string | number | boolean | undefined
 export type NameValue = {name: string, value: AnsonValue};
 export type NV = {n: string, v: AnsonValue};
 export function isNV (obj: any) {
-	return !!obj && (obj.name || obj.n);  
+	return !!obj && (obj.name || obj.n);
 }
 
 export interface LogAct {
@@ -155,10 +155,6 @@ export interface DbRelations {
 	/** TODO: Multiple to mulitple */
 	m2m?: any,
 }
-
-// export interface UIRelations {
-//     [tabl: string]: AnTreeNode[];
-// }
 
 /**Issue: As pk fields is wrapped up at server side, should clients caring about the pk name?
  * example of this:
@@ -396,7 +392,7 @@ export class AnsonMsg<T extends AnsonBody> {
 	 * Get resultset's array mapping.
 	 * @param resp general response (AnsonResp)
 	 * @param rx resultset index
-	 * @returns array 
+	 * @returns array
 	 */
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
 		if (resp.body && resp.body[0] && resp.body[0].rs
@@ -786,8 +782,8 @@ export class QueryReq extends AnsonBody {
 
 	/**
 	 * limit clause.
-	 * @param expr1 
-	 * @param expr2 
+	 * @param expr1
+	 * @param expr2
 	 */
 	limit (expr1: string | number, expr2: string | number) {
 		this.limt = [];

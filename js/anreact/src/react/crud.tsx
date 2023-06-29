@@ -39,7 +39,7 @@ const styles = (theme: Theme) => ( {
  * @member uri: string
  */
 class CrudComp<T extends Comprops> extends React.Component<T> {
-	state = {};
+	state = {} as any;
 	uri: string = undefined;
 
 	constructor(props: T) {
