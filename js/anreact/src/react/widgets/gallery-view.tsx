@@ -160,20 +160,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		let that = this;
 		return (
 		  <div>
-			{this.showCarousel && (
-				this.props.lightbox(this.props.tnode.node.children,
-				  { ix: this.currentImx,
-					open: true,
-					onClose: () => {
-						that.showCarousel = false;
-						that.setState({});
-				  } } )
-			 || <Modal isOpen={true} ariaHideApp={false}
-					onRequestClose={this.closeLightbox}
-					contentLabel="Example Modal" >
-					{this.photoCarousel(photos, this.currentImx)}
-				</Modal>
-			) }
 			<Gallery<ImageSlide> photos={photos}
 			  	onClick={this.openLightbox}
 				targetRowHeight={containerWidth => {
@@ -197,6 +183,21 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 						return 12;
 				} }
 			/>
+
+			{this.showCarousel && (
+				this.props.lightbox(this.props.tnode.node.children,
+				  { ix: this.currentImx,
+					open: true,
+					onClose: () => {
+						that.showCarousel = false;
+						that.setState({});
+				  } } )
+			 || <Modal isOpen={true} ariaHideApp={false}
+					onRequestClose={this.closeLightbox}
+					contentLabel="Example Modal" >
+					{this.photoCarousel(photos, this.currentImx)}
+				</Modal>
+			) }
 		  </div>
 		);
 	}
