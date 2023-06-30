@@ -37,13 +37,21 @@ export interface ImageSlide {
 	 * defualt:  {maxWidth: '60%', width: 'auto', height: 'auto'}
 	 */
 	imgstyl?: CustomImgStyle
+
+	mime: 'video' | 'image' | 'heif' | string | undefined;
 }
 
 export interface GalleryProps {
 	cid: string;
 	photos?: AnTreeNode[];
 	tier?: Semantier;
-	lightbox?: (photos: AnTreeNode[], opts?: {ix: number, onClose: () => void}) => JSX.Element;
+	lightbox?: (photos: AnTreeNode[], opts?: {
+		/** current slide index */
+		ix: number,
+		/** command for enable resources loading (special performance problem caused by anson64) */
+		open: boolean,
+		/** callback */
+		onClose: () => void}) => JSX.Element;
 }
 
 // export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnTreeNode[]}> {
@@ -101,7 +109,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 				src: GalleryView.imgSrcReq(p.id, this.albumtier),
 				width: w, height: h,
 				legend: PhotoRec.toShareLable(p.node as PhotoRec),
-				imgstyl
+				imgstyl,
+				mime: p.node.mime as string
 			})
 		});
 
@@ -154,6 +163,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 			{this.showCarousel && (
 				this.props.lightbox(this.props.tnode.node.children,
 				  { ix: this.currentImx,
+					open: true,
 					onClose: () => {
 						that.showCarousel = false;
 						that.setState({});

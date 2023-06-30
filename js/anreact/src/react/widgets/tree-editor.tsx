@@ -69,6 +69,7 @@ const styles = (theme: Theme) => ({
   },
   th: {
 	  textAlign: 'center' as const,
+	  paddingBottom: '0.1em',
 	  borderBottom: '1px solid #bcd'
   },
   rowText: {
@@ -76,6 +77,7 @@ const styles = (theme: Theme) => ({
   },
   galleryHead: {
 	padding: theme.spacing(1),
+	paddingRight: theme.spacing(2),
   }
 });
 
@@ -406,7 +408,7 @@ class TreeGallaryComp extends TreeCardComp {
 				that.setState({})
 			}}
 		>
-		<Grid container spacing={0} key={tnode.id} >
+		<Grid container spacing={0} key={tnode.id} className={classes.galleryHead}>
 		  {columns
 			.filter( v => v.hide != true)
 			.map( (col: AnTreegridCol, ix: number) => {

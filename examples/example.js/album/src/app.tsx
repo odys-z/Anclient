@@ -159,10 +159,10 @@ export class App extends CrudCompW<AlbumProps> {
 				uri={this.uri} 
 				parent={ undefined }
 				columns={[
-					{ type: 'text', field: 'folder', label: 'Photo Folders', grid: {sm: 4, md: 3} },
+					{ type: 'text', field: 'folder', label: 'Folders', grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'tags',   label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'shareby',label: L('By'), grid: {xs: false, sm: 3} },
-					{ type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
+					// { type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
 				]}
 				lightbox={this.lightbox}
 			/> }
