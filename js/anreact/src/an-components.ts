@@ -1,6 +1,7 @@
 export * from './utils/consts';
 export * from './utils/langstr';
 export * from './utils/lang-ext';
+export * from './utils/regex';
 
 export * from './patch/react-portal-overlay';
 
@@ -55,8 +56,7 @@ export const jsample = {
 };
 
 import { uarr2Base64, dataOfurl, mimeOf, urlOfdata } from './utils/file-utils';
-import { regex } from './utils/regex';
 
 export const utils = {
-	uarr2Base64, dataOfurl, mimeOf, urlOfdata, regex
+	uarr2Base64, dataOfurl, mimeOf, urlOfdata
 }
