@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, AnsonBody,
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
 	AnTreeNode, ErrorCtx, an, SessionClient
 } from '@anclient/semantier';
 
@@ -78,9 +78,7 @@ export class App extends CrudCompW<AlbumProps> {
 
 		Protocol.sk.cbbViewType = 'v-type';
 
-		// this.tier = new GalleryTier({uri: this.uri, client: this.inclient, comp: this});
-
-        // design note: exendPorts shall be an automized processing
+        // DESIGN NOTES: exending ports shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
                         .extendPorts({
                             /* see jserv-album/album, port name: album */
@@ -92,8 +90,6 @@ export class App extends CrudCompW<AlbumProps> {
 		console.log(this.uri);
 
 		const ctx = this.context as unknown as AnContextType;
-		// this.anReact = ctx.uiHelper;
-		// this.state.tobeLoad = true;
 		this.login();
 	}
 
@@ -120,7 +116,6 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	toSearch() {
-		// let that = this;
 		this.editForm = undefined;
 		this.setState({tobeLoaded: true})
 	}
@@ -156,7 +151,6 @@ export class App extends CrudCompW<AlbumProps> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
-		  { /* {<GalleryView cid={''} port='album' uri={'/local/album'} aid={this.props.aid}/>} */ }
 		  { this.albumtier &&
 		    <AnTreeditor2 {... this.props} reload={this.state.tobeLoad}
 				pk={'pid'} sk={this.albumsk}
