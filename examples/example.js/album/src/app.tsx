@@ -120,8 +120,8 @@ export class App extends CrudCompW<AlbumProps> {
 		this.setState({tobeLoaded: true})
 	}
 
-	lightbox = (photos: AnTreeNode[], opts: {ix: number, onClose: (e: any) => {}}) => {
-		return (<Lightbox photos={photos} tier={this.albumtier} {...opts} />);
+	lightbox = (photos: AnTreeNode[], opts: {ix: number, open: boolean, onClose: (e: any) => {}}) => {
+		return (<Lightbox showResourceCount photos={photos} tier={this.albumtier} {...opts} />);
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
