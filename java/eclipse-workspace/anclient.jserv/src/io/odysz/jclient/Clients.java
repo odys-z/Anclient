@@ -69,7 +69,6 @@ public class Clients {
 			throw new SsException("AES encrpyt failed: %s\nCause: %s", e.getMessage(), e.getCause().getMessage());
 		}
 		
-		// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
 		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
 
 		HttpServClient httpClient = new HttpServClient();
@@ -102,7 +101,6 @@ public class Clients {
 	public static void loginAsync(String uid, String pswdPlain, OnLogin onOk, OnError onErr, String... mac) {
 		new Thread(new Runnable() {
 	        public void run() {
-	            // final Bitmap bitmap = processBitMap("image.png");
 				byte[] iv =   AESHelper.getRandom();
 				String iv64 = AESHelper.encode64(iv);
 				if (uid == null || pswdPlain == null)
@@ -110,7 +108,6 @@ public class Clients {
 				try {
 					String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 					
-					// formatLogin: {a: "login", logid: logId, pswd: tokenB64, iv: ivB64};
 					AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
 
 					HttpServClient httpClient = new HttpServClient();
@@ -139,7 +136,6 @@ public class Clients {
 	 */
 	static String servUrl(IPort port) {
 		// Since version for semantier, this will return without conn id. 
-		// return String.format("%s/%s?conn=%s", servRt, port.url(), conn);
 		return String.format("%s/%s", servRt, port.url());
 	}
 

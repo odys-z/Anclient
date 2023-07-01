@@ -16,12 +16,14 @@ import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.tier.docs.PathsPage;
+import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.SessionInf;
@@ -38,7 +40,7 @@ import io.oz.jserv.docsync.Synclientier;
 /**
  * Photo client,
  * 
- * @deprecated MVP (0.2.1)
+ * @deprecated only for MVP (0.2.1)
  * 
  * @author odys-z@github.com
  *
@@ -277,6 +279,25 @@ public class PhotoSyntier extends Synclientier {
 	}
 
 	public DocsResp del(String device, String clientpath) {
-		return synDel(meta.tbl, device, clientpath);
+		DocsReq req = (DocsReq) new DocsReq(meta.tbl)
+				.device(device)
+				.clientpath(clientpath)
+				.a(A.del);
+
+		DocsResp resp = null;
+		try {
+			String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
+			AnsonHeader header = client.header().act(act);
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.album21, req)
+										.header(header);
+
+			resp = client.commit(q, errCtx);
+		} catch (AnsonException | SemanticException e) {
+			e.printStackTrace();
+			errCtx.err(MsgCode.exSemantic, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
+		} catch (IOException e) {
+			errCtx.err(MsgCode.exIo, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
+		}
+		return resp;
 	}
 }
