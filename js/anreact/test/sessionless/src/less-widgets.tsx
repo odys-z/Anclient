@@ -121,8 +121,8 @@ class Widgets extends React.Component<LessProps> {
 		this.setState({reload: true});
 	}
 
-	lightbox = (photos: AnTreeNode[], opts: {ix: number, onClose: (e: any) => {}}) => {
-		return (<Lightbox photos={photos} tier={this.albumtier} {...opts} />);
+	lightbox = (photos: AnTreeNode[], opts: {ix: number, open: boolean, onClose: (e: any) => {}}) => {
+		return (<Lightbox photos={photos} showResourceCount tier={this.albumtier} {...opts} />);
 	}
 
 	render() {

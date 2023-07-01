@@ -10,6 +10,7 @@ const Gallery = React.memo(function Gallery({
   photos,
   onClick,
   direction,
+  videoControl,
   margin,
   limitNodeSearch,
   targetRowHeight,
@@ -27,10 +28,11 @@ const Gallery = React.memo(function Gallery({
 
       // Ody Z, 2023/6/2
       // This stops endless animation of keeping shrinking photos. Yet the problem is not understood.
-      // if (containerWidth !== newWidth) {
+      // if (containerWidth !== newWidth)
       // ->
-      // ReactJS API, useLayoutEffect:
+      // if (Math.abs(containerWidth - newWidth) > 1)
       //
+      // ReactJS API, useLayoutEffect:
       // Reference
       // https://react.dev/reference/react/useLayoutEffect
       // Resize Observer API, MDN:
@@ -108,8 +110,10 @@ const Gallery = React.memo(function Gallery({
     <div className="react-photo-gallery--gallery">
       <div ref={galleryEl} style={galleryStyle}>
         {thumbs.map((thumb, index) => {
-          const { left, top, containerHeight, ...photo } = thumb;
+				  // console.log(thumb);
+          const { mime, left, top, containerHeight, ...photo } = thumb;
           return renderComponent({
+            mime,
             left,
             top,
             key: thumb.key || thumb.src,
@@ -129,6 +133,7 @@ const Gallery = React.memo(function Gallery({
 Gallery.propTypes = {
   photos: PropTypes.arrayOf(photoPropType).isRequired,
   direction: PropTypes.string,
+  videoControl: PropTypes.bool,
   onClick: PropTypes.func,
   columns: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
   targetRowHeight: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),

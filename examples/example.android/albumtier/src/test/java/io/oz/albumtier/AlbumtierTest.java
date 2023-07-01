@@ -28,7 +28,10 @@ import io.oz.album.AlbumPort;
 import io.oz.album.tier.PhotoRec;
 import io.oz.albumtier.AlbumContext.ConnState;
 
-
+/**
+ * @deprecated only for MVP (0.2.1)
+ * @author Ody
+ */
 public class AlbumtierTest {
     private static final String jserv = "http://localhost:8081";
 	private AlbumContext singleton;
@@ -45,16 +48,24 @@ public class AlbumtierTest {
 		mList = new ArrayList<SyncDoc>(1);
 		mList.add(new PhotoRec().create(testfile));
 		
+		// 1. create
 		onActivityCreate();
 		
 		Thread.sleep(1000); // wait for login
 		if (singleton.state != ConnState.Online)
 			fail("Why? Is server started? Or try to wait longer?");
 
-		singleton.tier.synDel("h_photos", singleton.photoUser.device, testfile);
+		// 2. clean
+//		try {
+//		} catch (SemanticException e) {
+//			Utils.warn(e.getMessage());
+//		}
+		singleton.tier.del(singleton.photoUser.device, testfile);
 		
+		// 3. upload photo
 		onImagePicked();
 
+		// 4. pause
 		pause("Press Enter when you think the test is finished ...");
 		Utils.logi(singleton.photoUser.device);
     }
@@ -71,7 +82,7 @@ public class AlbumtierTest {
 	}
 
 	void onActivityCreate() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
-		singleton = new AlbumContext()
+		singleton = new AlbumContext(new T_AndErrorCtx())
 			.init("f/zsu", "syrskyi", device, jserv)
 			.login( "syrskyi", "слава україні",
 					(client) -> refresh(mList),

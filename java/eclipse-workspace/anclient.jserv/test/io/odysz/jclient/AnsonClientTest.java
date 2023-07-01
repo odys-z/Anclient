@@ -36,7 +36,7 @@ import io.odysz.semantics.x.SemanticException;
  * Unit test for sample App. 
  */
 public class AnsonClientTest {
-	private static String jserv = "http://localhost:8080/jserv-sample";
+	private static String jserv = "http://localhost:8081/jserv-sample";
 	private static String pswd = "123456";
 	private static String filename = "res/Sun_Yat-sen_2.jpg";
 	
