@@ -1,7 +1,7 @@
 import { Protocol, AnsonBody, PageInf,
-	SessionClient, AnDatasetResp, AnTreeNode, StreeTier
+	SessionClient, AnDatasetResp, AnTreeNode, StreeTier, AlbumReq, AlbumRec, PhotoRec 
 } from '@anclient/semantier';
-import { Comprops, CrudComp, AlbumReq, PhotoCollect, PhotoRec, GalleryView, AlbumRec, PhotoProps
+import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps
 } from '@anclient/anreact';
 
 const debug = true;
@@ -85,6 +85,7 @@ export class AlbumAdminTier extends StreeTier {
 
 				imgs.push( {
 					src, srcSet, width, height,
+					shareLable: p.shareLable,
 					alt, title: alt, key: x.toString() } );
 			} );
 		}
@@ -138,7 +139,7 @@ class AlbumResp extends AnDatasetResp {
 		this.album = resp;
 		this.collect = resp.collect;
 		this.profils = resp.profiles;
-		this.collects = resp.collects;
+		this.collects = resp.collects as PhotoCollect[];
 	}
 }
 Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });

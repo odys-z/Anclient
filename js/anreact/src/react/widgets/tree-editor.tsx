@@ -1,537 +1,809 @@
-// import React, {ReactNode} from "react";
+import React, {ReactNode} from "react";
 
-// import withStyles from "@material-ui/core/styles/withStyles";
-// import withWidth from "@material-ui/core/withWidth";
-// import Grid from "@material-ui/core/Grid";
-// import Button from "@material-ui/core/Button";
-// import Collapse from "@material-ui/core/Collapse";
-// import Typography from "@material-ui/core/Typography";
+import withStyles from "@material-ui/core/styles/withStyles";
+import withWidth from "@material-ui/core/withWidth";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
+import Collapse from "@material-ui/core/Collapse";
+import Typography from "@material-ui/core/Typography";
 
-// import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, toBool } from "@anclient/semantier";
 
-// import { L } from '../../utils/langstr';
-// import { AnContext, AnContextType } from '../reactext';
-// import { AnTreeIcons } from './tree'
-// import { CrudCompW, DetailFormW } from '../crud';
-// import { JsampleIcons } from '../../jsample/styles';
+import { CRUD, AnTreeNode, AnlistColAttrs, AnTreeIconsType,
+	UIComponent, toBool, IndentIcons, IndentIconame, defltIcons, StreeTier, AnsonMsg, AnDatasetResp
+} from "@anclient/semantier";
 
-// import { SimpleForm } from './simple-form';
-// import { AnReactExt, ClassNames, CompOpts, Media } from "../anreact";
-// import { PropTypes, Theme } from "@material-ui/core";
-// import { AnTablistProps } from "./table-list";
-// import { swap } from "../../utils/lang-ext";
+import { GalleryView } from "./gallery-view";
+import { PropTypes, Theme } from "@material-ui/core";
+import { AnTablistProps } from "./table-list";
+import { CrudCompW, DetailFormW } from "../crud";
+import { swap } from "../../utils/lang-ext";
+import { AnReactExt, ClassNames, CompOpts, Media, hide } from "../anreact";
+import { JsampleIcons } from "../../jsample/styles";
+import { AnTreeIcons } from "./tree";
+import { AnContext, AnContextType } from "../reactext";
+import { SimpleForm } from "./simple-form";
+import { L } from "../../utils/langstr";
 
-// const styles = (theme: Theme) => ({
-//   root: {
-// 	width: "100%",
-//   },
-//   row: {
-// 	width: "100%",
-// 	"& :hover": {
-// 	  backgroundColor: "#ced"
-// 	}
-//   },
-//   rowHead: {
-// 	padding: theme.spacing(1),
-//   },
-//   folder: {
-// 	width: "100%"
-//   },
-//   folderHead: {
-// 	padding: theme.spacing(1),
-// 	borderBottom: "1px solid #bcd",
-// 	borderTop: "1px solid #bcd",
-// 	"& :hover": {
-// 	  backgroundColor: "#ccc"
-// 	}
-//   },
-//   forest: {
-// 	  height: '90vh',
-//   },
-//   treeItem: {
-// 	padding: theme.spacing(1),
-// 	borderLeft: "1px solid #bcd",
-//   },
-//   smallBtn: {
-// 	  minWidth: 24,
-//   },
-//   th: {
-// 	  textAlign: 'center' as const,
-// 	  border: '1px solid red'
-//   },
-//   rowText: {
-// 	marginTop: theme.spacing(1),
-//   }
-// });
+import { photos as _photos } from "./res/temp-photos";
+import Lightbox from "../../photo-gallery/src/light-box";
 
-// interface TreecardProps extends AnTablistProps {
-// 	/**Used as default rows - data is bound by TreeEditor itself. */
-// 	// rows : Tierec[];
-// };
+const styles = (theme: Theme) => ({
+  root: {
+	width: "100%",
+  },
+  row: {
+	width: "100%",
+	"& :hover": {
+	  backgroundColor: "#ced"
+	}
+  },
+  rowHead: {
+	padding: theme.spacing(1),
+	paddingTop: 0,
+	paddingBottom: 0,
+  },
+  folder: {
+	width: "100%"
+  },
+  folderHead: {
+	padding: theme.spacing(1),
+	paddingTop: 0,
+	paddingBottom: 0,
+	borderBottom: "1px solid #bcd",
+	borderTop: "1px solid #bcd",
+	"& :hover": {
+	  backgroundColor: "#ccc"
+	}
+  },
+  forest: {
+	  height: '90vh',
+  },
+  treeItem: {
+	padding: theme.spacing(1),
+	paddingTop: 0,
+	paddingBottom: 0,
+	borderLeft: "1px solid #bcd",
+  },
+  smallBtn: {
+	  minWidth: 24,
+  },
+  th: {
+	  textAlign: 'center' as const,
+	  paddingBottom: '0.1em',
+	  borderBottom: '1px solid #bcd'
+  },
+  rowText: {
+	textShadow: '2px 2px 8px #112244'
+  },
+  galleryHead: {
+	padding: theme.spacing(1),
+	paddingRight: theme.spacing(2),
+  }
+});
 
-// interface CssTreeItem extends React.CSSProperties {
-//     align: string
-// }
+interface TreecardProps extends AnTablistProps {
+	indentSettings?: IndentIcons;
+	parent: AnTreeNode | undefined;
+	tnode: AnTreeNode;
+};
 
-// class TreeCardComp extends DetailFormW<TreecardProps> {
-// 	state = {
-// 		node: {},
-// 	}
+interface CssTreeItem extends React.CSSProperties {
+    align: string
+}
 
-// 	newCard = undefined;
 
-// 	constructor(props: TreecardProps) {
-// 		super(props);
+export enum TreeNodeVisual {
+	/** data item presented by {@link TreeCard} */
+	card,
+	/** container */
+	gallery,
+	/** invisible */
+	hide,
+	/** e.g. a container */
+	collapsable
+};
 
-// 		// this.state.tnode = props.tnode;
-// 		this.toUp = this.toUp.bind(this);
-// 		this.toDown = this.toDown.bind(this);
-// 		this.toTop = this.toTop.bind(this);
-// 		this.toDown = this.toDown.bind(this);
-// 	}
+export interface AnreactreeItem {
+	node: AnTreeNode;
+	toUp    : (e: React.MouseEvent<HTMLElement>) => void;
+	toTop   : (e: React.MouseEvent<HTMLElement>) => void;
+	toDown  : (e: React.MouseEvent<HTMLElement>) => void;
+	toBottom: (e: React.MouseEvent<HTMLElement>) => void;
 
-// 	toUp(e: React.MouseEvent<HTMLElement>) {
-// 		let p = this.props.parent;
-// 		let n = this.props.tnode;
-// 		let children = p.node.children;
-// 		let me = children.indexOf(n);
-// 		let elder = me - 1;
-// 		if (elder >= 0)
-// 			// children.swap(me, elder);
-// 			swap(children, me, elder);
+	toEdit? : (e: React.MouseEvent<HTMLElement>) => void;
+	toDel?  : (e: React.MouseEvent<HTMLElement>) => void;
+	/** or just move to AnTreeReact and calculate with java? */
+	levelIcons?: Array<AnTreeIconsType>;
 
-// 		if (typeof this.props.onUpdate === 'function')
-// 			this.props.onUpdate(n, p, me, elder);
-// 	}
+	/** format leading icons, according node.level */
+	leadingIcons: () => JSX.Element | JSX.Element[];
+}
 
-// 	toTop(e: React.MouseEvent<HTMLElement>) {
-// 		let p = this.props.parent;
-// 		let n = this.props.tnode;
-// 		let children = p.node.children;
-// 		let me = children.indexOf(n);
-// 		if (me > 0)
-// 			// children.swap(me, 0);
-// 			swap(children, me, 0);
+class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem {
+	state = {
+		showCarousel: false,
+		expand: false
+	}
 
-// 		if (typeof this.props.onUpdate === 'function')
-// 			this.props.onUpdate(n, p, me, 0);
-// 	}
+	vistype: TreeNodeVisual;
 
-// 	toDown(e: React.MouseEvent<HTMLElement>) {
-// 		let p = this.props.parent;
-// 		let n = this.props.tnode;
-// 		let children = p.node.children;
-// 		let me = children.indexOf(n);
-// 		let younger = me + 1;
-// 		if (younger < children.length)
-// 			// children.swap(me, younger);
-// 			swap(children, me, younger);
+	node: AnTreeNode & {indentIcons?: IndentIconame[]};
 
-// 		if (typeof this.props.onUpdate === 'function')
-// 			this.props.onUpdate(n, p, me, younger);
-// 	}
+	constructor(props: TreecardProps) {
+		super(props);
+		this.vistype = TreeNodeVisual.card;
 
-// 	toBottom(e: React.MouseEvent<HTMLElement>) {
-// 		let p = this.props.parent;
-// 		let n = this.props.tnode;
-// 		let children = p.node.children;
-// 		let me = children.indexOf(n);
-// 		if (me < children.length - 1)
-// 			// children.swap(me, children.length - 1);
-// 			swap(children, me, children.length - 1);
-// 		if (typeof this.props.onUpdate === 'function')
-// 			this.props.onUpdate(n, p, me, children.length);
-// 	}
+		this.node = props.tnode;
+		this.state.expand = props.expand;
+		
+		this.toUp = this.toUp.bind(this);
+		this.toDown = this.toDown.bind(this);
+		this.toTop = this.toTop.bind(this);
+		this.toDown = this.toDown.bind(this);
 
-// 	render() {
-// 		let tnode = this.props.tnode;
-// 		let n = tnode.node;
-// 		n.css = n.css || {};
-// 		let { classes } = this.props;
-// 		return (
-// 		  <Grid container
-// 				key={tnode.id}
-// 				spacing={0}
-// 				className={classes.row} >
-// 			{ this.props.columns
-// 				.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible || true) )
-// 				.map( (col: AnlistColAttrs<JSX.Element, CompOpts>, cx: number) => {
-// 					if (cx === 0) return (
-// 						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
-// 							<Typography noWrap >
-// 								{this.props.leadingIcons(tnode, false)}
-// 								{icon(n.css.icon)}
-// 								{n.text}
-// 							</Typography>
-// 						</Grid> );
-// 					else if (col.type === 'actions') return (
-// 						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
-// 							<JsampleIcons.Up onClick={this.toUp} />
-// 							<JsampleIcons.Down onClick={this.toDown} />
-// 							{this.props.media.isMd ?
-// 								<> <Button onClick={this.props.toEdit}
-// 										data-me={tnode.id} data-parent={n.parentId}
-// 										startIcon={<JsampleIcons.Edit />} color="primary" >
-// 										{L('Edit')}
-// 									</Button>
-// 									<Button onClick={this.props.toDel}
-// 										data-me={tnode.id} data-parent={n.parentId}
-// 										startIcon={<JsampleIcons.Delete />} color="secondary" >
-// 										{L('Delete')}
-// 									</Button>
-// 								</>
-// 								:
-// 								<> <JsampleIcons.Edit onClick={this.props.toEdit} className={classes.smallBtn}
-// 										data-me={tnode.id} data-parent={n.parentId} color='primary' />
-// 									<JsampleIcons.Delete onClick={this.props.toDel} className={classes.smallBtn}
-// 										data-me={tnode.id} data-parent={n.parentId} color='secondary' />
-// 								</>
-// 							}
-// 						</Grid> );
-// 					else return (
-// 						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
-// 							{ typeof col.formatter === 'function'
-// 								? col.formatter(col, tnode) as ReactNode
-// 								: <Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
-// 									{n.text}
-// 								</Typography>
-// 							}
-// 						</Grid> );
-// 					} )
-// 			}
-// 		  </Grid> );
+		this.leadingIcons = this.leadingIcons.bind(this);
+	}
 
-// 		function icon(icon: string) {
-// 		  return AnTreeIcons[icon] || AnTreeIcons["deflt"];
-// 		}
+	componentDidMount() {
+		this.setState({});
+	}
 
-// 		function align(css: CssTreeItem): PropTypes.Alignment {
-// 		  return css.align ? css.align as PropTypes.Alignment : 'center';
-// 		}
-// 	}
-// }
-// TreeCardComp.contextType = AnContext;
+	toUp(_e: React.MouseEvent<HTMLElement>) {
+		let p = this.props.parent;
+		let n = this.props.tnode;
+		let children = p.node.children;
+		let me = children.indexOf(n);
+		let elder = me - 1;
+		if (elder >= 0)
+			// children.swap(me, elder);
+			swap(children, me, elder);
 
-// const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCardComp));
-// export { TreeCard, TreeCardComp }
+		if (typeof this.props.onUpdate === 'function')
+			this.props.onUpdate(n, p, me, elder);
+	}
 
-// interface AnTreeditorProps extends AnTablistProps {
-// 	columns: Array<AnTreegridCol>;
-// }
+	toTop(_e: React.MouseEvent<HTMLElement>) {
+		let p = this.props.parent;
+		let n = this.props.tnode;
+		let children = p.node.children;
+		let me = children.indexOf(n);
+		if (me > 0)
+			// children.swap(me, 0);
+			swap(children, me, 0);
 
-// interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
-// 	/**
-// 	 * Overide AnTablistProps#formatter
-// 	 * Formatt a tree item cell/grid from col and node.
-// 	 */
-// 	formatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => UIComponent;
-// }
+		if (typeof this.props.onUpdate === 'function')
+			this.props.onUpdate(n, p, me, 0);
+	}
 
-// class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
-// 	state = {
-// 		// window: undefined,
-// 		// [{id, node: {text, css, url}, level, children}. ... ]
-// 		forest: [] as AnTreeNode[],
+	toDown(_e: React.MouseEvent<HTMLElement>) {
+		let p = this.props.parent;
+		let n = this.props.tnode;
+		let children = p.node.children;
+		let me = children.indexOf(n);
+		let younger = me + 1;
+		if (younger < children.length)
+			// children.swap(me, younger);
+			swap(children, me, younger);
 
-// 		expandings: new Set(),
+		if (typeof this.props.onUpdate === 'function')
+			this.props.onUpdate(n, p, me, younger);
+	}
 
-//         sysName: '',
-//         window: Window
-// 	};
+	toBottom(_e: React.MouseEvent<HTMLElement>) {
+		let p = this.props.parent;
+		let n = this.props.tnode;
+		let children = p.node.children;
+		let me = children.indexOf(n);
+		if (me < children.length - 1)
+			// children.swap(me, children.length - 1);
+			swap(children, me, children.length - 1);
+		if (typeof this.props.onUpdate === 'function')
+			this.props.onUpdate(n, p, me, children.length);
+	}
 
-//     anReact: AnReactExt;
-//     addForm: JSX.Element;
-//     toDelCard: any; // FIXME bug by type checking
-//     onUpdate: any;  // FIXME bug by type checking
+	leadingIcons () {
+		let tnode = this.props.tnode;
+		let n = tnode.node;
+		return TreeCardComp.levelIcons(this.props.indentSettings, tnode.indents);
+			// n.css?.icon, islastSibling, n.children?.length > 0, this.state.expand, tnode)
+	}
 
-// 	constructor(props: TreecardProps) {
-// 		super(props);
-// 		this.state.sysName =
-// 			props.sys || props.sysName || props.name || this.state.sysName;
-// 		this.state.window = props.window;
+	// TODO merge with treegrid
+	/**
+	 * 
+	 * @see {@link IndentIconame}
+	 * @param iconNames 
+	 * @param lvlIcons 
+	 * @param itemIcon 
+	 * @param lastSibling 
+	 * @param hasChildren 
+	 * @param expand 
+	 * @returns indent fragment
+	 */
+	static levelIcons(iconNames: IndentIcons, lvls: IndentIconame[]) {
+		return (<React.Fragment >
+				{lvls && lvls.map( (i, x) => TreeCardComp.icon(iconNames, i, x) )}
+			</React.Fragment>);
+	}
 
-// 		this.th = this.th.bind(this);
-// 		this.folderHead = this.folderHead.bind(this);
-// 		this.toExpandItem = this.toExpandItem.bind(this);
-// 		this.toAddChild = this.toAddChild.bind(this);
-// 		this.toEdit = this.toEdit.bind(this);
+	static icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentIconame, k: string | number) {
+		let icon = AnTreeIcons[(iconNames || defltIcons)[name || 'deflt']]
+				|| AnTreeIcons[name]; // extend to all supported icons
+		if (!icon)
+			console.error(`Icon name, ${name}, is not one of supported names.`, defltIcons);
+		return React.cloneElement(icon, {key: k});
+	}
 
-// 		this.leadingIcons = this.leadingIcons.bind(this);
-// 		this.treeNodes = this.treeNodes.bind(this);
+	static actionFragment(tnode: AnTreeNode, col: AnTreegridCol,
+			fragKey: string | number, handler: AnreactreeItem, props: TreecardProps) {
 
-// 		this.toSearch = this.toSearch.bind(this);
-// 	}
+		let {classes, media} = props;
+		let parentId = tnode.parent;
+		<Grid key={`${tnode.id}.${fragKey}`} item {...col.grid} className={classes.treeItem}>
+			<JsampleIcons.Up onClick={handler.toUp} />
+			<JsampleIcons.Down onClick={handler.toDown} />
+			{media.isMd ?
+			  <><Button onClick={handler.toEdit}
+					data-me={tnode.id} data-parent={parentId}
+					startIcon={<JsampleIcons.Edit />} color="primary" >
+					{L('Edit')}
+					</Button>
+					<Button onClick={handler.toDel}
+					data-me={tnode.id} data-parent={parentId}
+					startIcon={<JsampleIcons.Delete />} color="secondary" >
+					{L('Delete')}
+					</Button>
+			  </>
+			  :
+			  <><JsampleIcons.Edit onClick={handler.toEdit}
+					className={classes.smallBtn}
+					data-me={tnode.id} data-parent={parentId}
+					color='primary'
+				/>
+					<JsampleIcons.Delete onClick={handler.toDel}
+					className={classes.smallBtn}
+					data-me={tnode.id} data-parent={parentId}
+					color='secondary'
+				/>
+			  </>
+			}
+		</Grid> 
+	} 
 
-// 	componentDidMount() {
-// 		console.log(this.props.uri);
+	render() {
+		let that = this;
+		let tnode = this.props.tnode;
+		let n = tnode.node;
+		n.css = n.css || {};
+		let { classes, media } = this.props;
 
-// 		const ctx = this.context as unknown as AnContextType;
-// 		this.anReact = ctx.uiHelper;
-// 		this.toSearch();
-// 	}
+		return (
+		  <Grid container
+				key={tnode.id}
+				spacing={0}
+				onClick={this.props.conClick}
+				className={classes.row} >
+			{ this.props.columns
+				.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible, true) )
+				.map( (col: AnlistColAttrs<JSX.Element, CompOpts>, cx: number) => {
+				  if (cx === 0) return (
+					hide(col.grid, media) ? undefined :
+					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
+						<Typography noWrap variant='body2'>
+							{that.leadingIcons()}
+							{n.text}
+						</Typography>
+					</Grid> );
+				  else if (col.type === 'actions') return (
+					hide(col.grid, media) ? undefined :
+					TreeCardComp.actionFragment(tnode, col, cx, this, this.props)
+					/*
+					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
+						<JsampleIcons.Up onClick={this.toUp} />
+						<JsampleIcons.Down onClick={this.toDown} />
+						{media.isMd ?
+							<><Button onClick={this.props.toEdit}
+								data-me={tnode.id} data-parent={n.parentId}
+								startIcon={<JsampleIcons.Edit />} color="primary" >
+								{L('Edit')}
+							  </Button>
+							  <Button onClick={this.props.toDel}
+								data-me={tnode.id} data-parent={n.parentId}
+								startIcon={<JsampleIcons.Delete />} color="secondary" >
+								{L('Delete')}
+							  </Button>
+							</>
+							:
+							<><JsampleIcons.Edit onClick={this.props.toEdit}
+								className={classes.smallBtn}
+								data-me={tnode.id} data-parent={n.parentId}
+								color='primary'
+							  />
+							  <JsampleIcons.Delete onClick={this.props.toDel}
+							  	className={classes.smallBtn}
+								data-me={tnode.id} data-parent={n.parentId}
+								color='secondary'
+							  />
+							</>
+						}
+					</Grid> */);
+				  else return (
+					// Note: return "true" will result in warning: 
+					// Warning: Failed prop type: Invalid prop `children` supplied to `ForwardRef(Grid)`, expected a ReactNode.
+					// hide(col.grid, media) ||
+					hide(col.grid, media) ? undefined :
+					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
+						{ typeof col.formatter === 'function' ?
+							col.formatter(col, tnode) :
+							<Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
+								{n.text}
+							</Typography>
+						}
+					</Grid> );
+				} )
+			}
+		  </Grid> );
 
-// 	toSearch() {
-// 		let { s_tree } = this.props;
-// 		if (s_tree)
-// 			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
+		function align(css: CssTreeItem): PropTypes.Alignment {
+		  return css?.align ? css.align as PropTypes.Alignment : 'center';
+		}
+	}
+}
+TreeCardComp.contextType = AnContext;
 
-// 		let { uri, sk } = this.props;
-// 		this.anReact.stree({ uri, sk }, this);
+const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCardComp));
+export { TreeCard, TreeCardComp }
 
-// 		this.addForm = undefined;
-// 		this.state.expandings.clear();
-// 	}
+class TreeGallaryComp extends TreeCardComp {
+	// tier: AlbumTier;
+	/** pic collection id */
+	collect: string;
 
-// 	toExpandItem(e: React.MouseEvent<HTMLElement>) {
-// 		e.stopPropagation();
-// 		let f = e.currentTarget.getAttribute("data-nid");
+	toEditCard: ()=>void;
+	galleref: GalleryView;
 
-// 		let expandings = this.state.expandings;
-// 		if (expandings.has(f)) expandings.delete(f);
-// 		else expandings.add(f);
-// 		this.setState({ expandings });
-// 	}
+	constructor(props: TreecardProps & {lightbox?: Lightbox}) {
+		super(props);
 
-// 	toAddChild (e: React.MouseEvent<HTMLElement>) {
-// 		e.stopPropagation();
-// 		let that = this;
+		this.vistype = TreeNodeVisual.gallery;
+		this.node = props.tnode;
 
-// 		let me = e.currentTarget.getAttribute("data-me");
+		this.expand = this.expand.bind(this);
+	}
 
-// 		this.addForm = (
-// 			<SimpleForm crud={CRUD.c} uri={this.props.uri}
-// 				mtabl={this.props.mtabl}
-// 				pk={this.props.pk} fields={this.props.fields}
-// 				pkval={undefined} parent={this.props.parent} parentId={me}
-// 				title={this.props.detailFormTitle || 'Add Tree Node'}
-// 				onClose={() => {that.addForm = undefined; that.setState({}); }}
-// 				onOk={() => {that.addForm = undefined; that.toSearch(); }}
-// 			/> );
-// 		this.setState({});
-// 	}
+	expand(e: React.UIEvent) {
+		console.log(e);
+		this.setState({expand: !this.state.expand});
+	}
 
-// 	toDel(e: React.MouseEvent<HTMLElement>) { }
+	render() {
+		let that = this;
+		let {classes, tnode, onClick, media} = this.props;
+		let node = tnode.node;
+		return (<>
+		  { this.galleryHead(that.props.columns, tnode, classes, media, onClick) }
+		  <Collapse in={this.state.expand}>
+			<GalleryView {... this.props} 
+				ref={undefined} // suppress type error
+				uri={this.uri} media={this.props.media}
+				cid={this.collect}
+				photos={node.children} // or fire a request to get photos?
+				lightbox={this.props.lightbox}
+			/>
+		  </Collapse>
+		</>);
+	}
 
-// 	toEdit(e: React.MouseEvent<HTMLElement>) {
-// 		e.stopPropagation();
-// 		let that = this;
+	galleryHead (columns: AnTreegridCol[], tnode: AnTreeNode,
+			classes: ClassNames, media: Media,
+			onClick: React.MouseEventHandler<HTMLElement>): React.ReactNode {
+		let that = this;
+		let n = tnode.node;
+		n.css = n.css || {};
+		let expd = that.state.expand;
 
-// 		let me = e.currentTarget.getAttribute("data-me");
-// 		let parentId = e.currentTarget.getAttribute("data-parent");
+		return (
+		<div onClick={ onClick ? onClick : (_e) => {
+				that.state.expand = !expd;
+				that.setState({})
+			}}
+		>
+		<Grid container spacing={0} key={tnode.id} className={classes.galleryHead}>
+		  {columns
+			.filter( v => v.hide != true)
+			.map( (col: AnTreegridCol, ix: number) => {
+				if (ix == 0) // row head
+					return (
+					hide(col.grid, media) ? undefined :
+					<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						<Typography noWrap variant='body2' >
+						{TreeCardComp.levelIcons(
+							that.props.indentSettings,
+							tnode.indents as IndentIconame[])}
+						{expd ? TreeCardComp.icon(that.props.indentIcons, "pic-lib", 0)
+							: TreeCardComp.icon(that.props.indentIcons, "collapse", 0)}
+						{n.text}
+						</Typography>
+					</Grid>);
+				else if (col.type === 'actions')
+					return (
+					hide(col.grid, media) ? undefined :
+					TreeCardComp.actionFragment(tnode, col, ix, this, this.props)
+					);
+				else if (col.type === 'formatter' || col.formatter)
+					return (
+					hide(col.grid, media) ? undefined :
+					<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						<Typography variant='body2' >
+							{col.formatter(col, tnode, {classes, media}) as ReactNode}
+						</Typography>
+					</Grid>);
+				else
+					return (
+					hide(col.grid, media) ? undefined :
+					<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
+						{formatFolderDesc(tnode, col.grid, media)}
+					</Grid>);
+			}) }
+		</Grid> 
+		</div>
+		);
 
-// 		this.addForm = (
-// 			<SimpleForm crud={CRUD.u} uri={this.props.uri}
-// 				mtabl={this.props.mtabl}
-// 				// pk={this.props.pk}
-// 				fields={this.props.fields}
-// 				pkval={{pk: this.props.pk, v: me}} parent={this.props.parent} parentId={parentId}
-// 				title={this.props.detailFormTitle || 'Edit Tree Node'}
-// 				onClose={() => {that.addForm = undefined; that.setState({}) }}
-// 				onOk={() => {
-// 					// Reshape in case fullpath has been changed.
-// 					// DESIGN NOTE:
-// 					// Is this a good reason that widgets shouldn't connected with datat tier?
-// 					// Explaination:
-// 					// 1. A simple UI form doesn't understand this special post updating data processing such as tree re-shaping.
-// 					// 2. As the tree is loaded via port "stree", why saving items with general updating? Should this been wrapped into a component?
-// 					// If a general purpose widget can't be good at handling data tier, is it resonable has an independant module for a samntics process, e.g. tree reshaping?
+		function formatFolderDesc(tnode: AnTreeNode, grid: {}, media: Media) {
+			let n = tnode.node;
 
-// 					// close as data saved, search later in case re-shape failed. (shouldn't be a transaction?)
-// 					let {uri, sk} = this.props;
-// 					(this.context as unknown as AnContextType).uiHelper
-//                         .rebuildTree({uri, sk, rootId: me}, () => {
-//                             that.toSearch();
-//                         });
-// 				}}
-// 			/> );
-// 		this.setState({});
-// 	}
+			return (
+			  <Typography noWrap variant='body2' className={classes.rowText} >
+				{hide(grid, media) ? undefined : `[${n.pname}]`}
+				{ Number(n.img) > 0 &&
+					[TreeCardComp.icon(that.props.indentIcons, "[]", 0),
+					`x ${n.img}`] } 
+				{ Number(n.geo) > 0 &&
+					[TreeCardComp.icon(that.props.indentIcons, "!", 0),
+					`x ${n.geo}`] } 
+				{ Number(n.mov) > 0 &&
+					[TreeCardComp.icon(that.props.indentIcons, ">", 0),
+					`x ${n.mov}`] }
+				{ Number(n.fav) > 0 &&
+					[TreeCardComp.icon(that.props.indentIcons, "b", 0),
+					`x ${n.fav}`] }
+			  </Typography>);
+		}
+	}
+}
 
-// 	// TODO merge with treegrid
-// 	leadingIcons(treeItem, expand, expIcon) {
-// 		return treeItem.levelIcons ?
-// 			treeItem.levelIcons.map((v: string, x: React.Key) => {
-// 				return x === treeItem.levelIcons.length - 1 && expand
-// 					? expIcon ? <React.Fragment key={x}>{icon(expIcon || '+')}</React.Fragment>
-// 							  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
-// 					: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
-// 			})
-// 			: new Array(treeItem.level + 1).fill(0).map((v, x) => {
-// 				return x === treeItem.level - 1 && expand
-// 					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
-// 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
-// 			})
+const TreeGallary = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeGallaryComp));
+export { TreeGallary, TreeGallaryComp }
 
-//         function icon(iconame?: string) {
-// 	        return AnTreeIcons[iconame || "deflt"];
-//         }
-// 	}
+interface AnTreeditorProps extends AnTablistProps {
+	columns: Array<AnTreegridCol>;
+	tier: StreeTier;
 
-// 	/**
-// 	 * @param compOts
-// 	 */
-// 	treeNodes(compOts: CompOpts) {
-// 		let { classes, media } = compOts;
-// 		let that = this;
+	reload: boolean;
 
-// 		let m = this.state.forest;
-// 		let mtree = buildTreegrid( m, undefined, compOts );
-// 		return (<div className={classes.forest}>{mtree}</div>);
+	nodeFormatter?: (n: AnTreeNode, parent: ReactNode, opts: CompOpts) => JSX.Element;
 
-// 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts: CompOpts) {
-// 		  if (Array.isArray(tnode)) {
-// 			return tnode.map((i, x) => {
-// 			  return buildTreegrid(i, parent, compOts);
-// 			});
-// 		  }
-// 		  else if (tnode) {
-// 			let open = that.state.expandings.has(tnode.id)
-// 					&& tnode.node.children && tnode.node.children.length > 0;
-// 			tnode.node.css = tnode.node.css || {};
+	lightbox?: Lightbox;
+}
 
-// 			if (that.props.isMidNode(tnode.node)) {
-// 			  return (
-// 				<div key={tnode.id} className={classes.folder}>
-// 				  { that.folderHead(that.props.columns, tnode, open, classes, media) }
-// 				  { open &&
-// 					<Collapse in={open} timeout="auto" unmountOnExit>
-// 						{buildTreegrid(tnode.node.children, tnode, compOts)}
-// 					</Collapse>
-// 				  }
-// 				</div>
-// 			  );
-// 			}
-// 			else
-// 			  return (
-// 				<TreeCard key={tnode.id} tnode={tnode} media={media}
-// 					{...that.props} parent={parent}
-// 					toEdit={that.toEdit}
-// 					leadingIcons={that.leadingIcons}
-// 					delete={that.toDelCard}
-// 					onUpdate={that.onUpdate} />
-// 			  );
-// 		  }
-// 		}
-// 	}
+interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
+	/**
+	 * Overide AnTablistProps#formatter
+	 * Formatt a tree item cell/grid from col and node.
+	 */
+	colFormatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => UIComponent;
+}
 
-// 	th( columns: Array<AnTreegridCol> = [],
-// 		classes: ClassNames, media: Media) {
-// 		return (
-// 			<Grid container className={classes.th} >
-// 				{columns
-// 					.filter( v => toBool(v.visible, true))
-// 					.map( (col: AnTreegridCol, ix: number) => {
-// 						if (col.type === 'actions') return (
-// 							<Grid item key={ix} {...col.grid}>
-// 								<Button onClick={this.toAddChild}
-// 									data-me={undefined} date-parent={undefined}
-// 									startIcon={<JsampleIcons.ListAdd />} color="primary" >
-// 									{media.isMd && L('New')}
-// 								</Button>
-// 							</Grid>);
-// 						else return (
-// 							<Grid item key={ix} {...col.grid}>
-// 								{col.label || col.field}
-// 							</Grid>);
-// 					} )
-// 				}
-// 			</Grid>);
-// 	}
+class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
+	state = {
+		forest: [] as AnTreeNode[],
+		tobeLoad: true
+	};
 
-// 	folderHead(columns=[], tnode, open, classes, media) {
-// 	  let n = tnode.node;
-// 	  n.css = n.css || {};
-// 	  return (
-// 		<div
-// 			onClick={this.toExpandItem}
-// 			data-nid={tnode.id}
-// 			className={classes.folderHead}
-// 		>
-// 		  <Grid container spacing={0} key={tnode.id} >
-// 			{columns
-// 				.filter( v => v.hide != true)
-// 				.map( (col: AnTreegridCol, ix: number) => {
-// 					if (ix == 0) // row head
-// 					  return (
-// 						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
-// 							<Typography noWrap variant='body2' >
-// 							{this.leadingIcons(tnode, open, n.expandIcon)}
-// 							{icon(n.css.icon)}
-// 							{n.text}
-// 							{open ? icon("expand") : icon("collapse")}
-// 							</Typography>
-// 						</Grid>);
-// 					else if (col.type === 'actions')
-// 					  return (
-// 						<Grid item key={`${tnode.id}.${ix}`} className={classes.actions}>
-// 							<Typography noWrap variant='body2' >
-// 								<Button onClick={this.toEdit}
-// 									data-me={tnode.id}
-// 									startIcon={<JsampleIcons.Edit />} color="primary" >
-// 									{media.isMd && L('Edit')}
-// 								</Button>
-// 								<Button onClick={this.toDel} data-me={tnode.id}
-// 									startIcon={<JsampleIcons.Delete />} color="secondary" >
-// 									{media.isMd && L('Delete')}
-// 								</Button>
-// 								{( this.props.isMidNode ? this.props.isMidNode(n) : true )
-// 								&& <Button onClick={this.toAddChild}
-// 										data-me={tnode.id} data-parent={n.parent}
-// 										startIcon={<JsampleIcons.ListAdd />} color="primary" >
-// 										{media.isMd && L('New')}
-// 								</Button>}
-// 							</Typography>
-// 						</Grid>
-// 						);
-// 					else if (col.type === 'formatter' || col.formatter)
-// 					  return (
-// 						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
-// 							<Typography variant='body2' >
-// 							  {col.formatter(col, tnode, {classes, media}) as ReactNode}
-// 							</Typography>
-// 						</Grid>);
-// 					else
-// 					  return (
-// 						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
-// 							<Typography variant='body2' >
-// 							{formatFolderDesc(tnode, media)}
-// 							</Typography>
-// 						</Grid>);
-// 				}) }
-// 		  </Grid>
-// 		</div>
-// 		);
+    sysName: '';
+    window: Window;
 
-// 		function formatFolderDesc(tnode, media) {
-// 			let {text, children} = tnode.node;
+    anReact: AnReactExt;
+    editForm: JSX.Element;
+	treetier: StreeTier;
 
-// 			if (children)
-// 				children = `[${media.isMd ? 'children' : ''} ${children.length}]`;
-// 			else children = '';
+	constructor(props: AnTreeditorProps) {
+		super(props);
+		this.sysName = props.sys || props.sysName || props.name || this.sysName;
+		this.window = props.window;
+		this.treetier = props.tier;
 
-// 			return `${media.isXl ? text : ''} ${children}`;
-// 		}
+		this.th = this.th.bind(this);
+		this.folderHead = this.folderHead.bind(this);
+		this.toAddChild = this.toAddChild.bind(this);
+		this.toEditCard = this.toEditCard.bind(this);
+		this.treeNodes = this.treeNodes.bind(this);
+		this.toSearch = this.toSearch.bind(this);
+		this.refresh = this.refresh.bind(this);
+	}
 
-// 		function icon(icon) {
-// 			return AnTreeIcons[icon || "deflt"];
-// 		}
-// 	}
+	componentDidMount() {
+		console.log(this.props.uri);
 
-// 	render() {
-// 		const { classes, width } = this.props;
+		const ctx = this.context as unknown as AnContextType;
+		this.anReact = ctx.uiHelper;
+		this.treetier.client = this.anReact.client;
+		if (this.props.reload && this.state.tobeLoad) {
+			this.toSearch();
+		}
+	}
 
-// 		let media = CrudCompW.getMedia(width);
+	toSearch() {
+		let that = this;
+		let { s_tree } = this.props;
+		if (s_tree)
+			throw Error("s_tree is used for defined tree semantics at client side - not supported yet.");
 
-// 		return (
-// 			<div className={classes.root}>
-// 				{this.th(this.props.columns, classes, media)}
-// 				{this.treeNodes({classes, media})}
-// 				{this.addForm}
-// 			</div>
-// 		);
-// 	}
-// }
-// AnTreeditorComp.contextType = AnContext;
+		let { uri, sk } = this.props;
+		this.state.tobeLoad = false;
+		this.treetier.stree({ uri, sk,// uiHelper: this.context.uiHelper,
+			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
+				that.setState({forest: resp.Body().forest});
+			}},
+			this.context.error);
 
-// const AnTreeditor = withStyles<any, any, TreecardProps>(styles)(withWidth()(AnTreeditorComp));
-// export { AnTreeditor, AnTreeditorComp, TreecardProps }
+		this.editForm = undefined;
+	}
+
+	toAddChild (e: React.MouseEvent<HTMLElement>) {
+		e.stopPropagation();
+		let that = this;
+
+		let me = e.currentTarget.getAttribute("data-me");
+
+		this.editForm = (
+			<SimpleForm crud={CRUD.c} uri={this.props.uri}
+				mtabl={this.props.mtabl}
+				pk={this.props.pk} fields={this.props.fields}
+				pkval={undefined} parent={this.props.parent} parentId={me}
+				title={this.props.detailFormTitle || 'Add Tree Node'}
+				onClose={() => {that.editForm = undefined; that.setState({}); }}
+				onOk={() => {that.editForm = undefined; that.toSearch(); }}
+			/> );
+		this.setState({});
+	}
+
+	toDel(e: React.MouseEvent<HTMLElement>) {
+		e.stopPropagation();
+		let that = this;
+
+		let me = e.currentTarget.getAttribute("data-me");
+		this.setState({});
+	}
+
+	toEditCard(e: React.UIEvent<HTMLElement>) {
+		e.stopPropagation();
+		let that = this;
+
+		let me = e.currentTarget.getAttribute("data-me");
+		let parentId = e.currentTarget.getAttribute("data-parent");
+
+		this.editForm = (
+			this.props.editorForm &&
+			this.props.editorForm(this, this.props, me, this.refresh) ||
+			<SimpleForm crud={CRUD.u} uri={this.props.uri}
+				mtabl={this.props.mtabl}
+				fields={this.props.fields}
+				pkval={{pk: this.props.pk, v: me}} parent={this.props.parent} parentId={parentId}
+				title={this.props.detailFormTitle || 'Edit Tree Node'}
+				onClose={() => {that.editForm = undefined; that.setState({}) }}
+				onOk={this.refresh}
+			/> );
+		this.setState({});
+	}
+
+	refresh(root: string): void {
+		let {uri, sk} = this.props;
+		let that = this;
+		(this.context as AnContextType).uiHelper
+			.rebuildTree({uri, sk, rootId: root}, () => {
+				that.toSearch();
+			});
+	}
+
+	/**
+	 * @param compOts
+	 */
+	treeNodes(compOts: CompOpts) {
+		let { classes, media } = compOts;
+		let that = this;
+
+		let m = this.state.forest;
+		let mtree = buildTreegrid( m, undefined, compOts );
+		return (<div className={classes.forest}>{mtree}</div>);
+
+		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[],
+				parent: AnTreeNode, compOpts: CompOpts) {
+		  if (Array.isArray(tnode)) {
+			return tnode.map((i, x) => {
+			  // return buildTreegrid(i, parent, parent?.node && x === parent.node.children?.length - 1, compOts);
+			  return buildTreegrid(i, parent, compOts);
+			});
+		  }
+		  else if (tnode) {
+			// tnode = incIndent(tnode, parent, isLastChild);
+			tnode.node.css = tnode.node.css || {};
+
+			// let ntype = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
+			let ntype = TreeNodeVisual[tnode.node.nodetype] || TreeNodeVisual.card;
+			if (ntype === TreeNodeVisual.card && tnode.node.children?.length > 0) {
+			  return (
+				<div key={tnode.id} className={classes.folder}>
+				  { that.folderHead(that.props.columns, tnode, classes, media) }
+				  { open &&
+					<Collapse in={tnode.node.expandChildren} timeout="auto" unmountOnExit>
+						{buildTreegrid(tnode.node.children, tnode, compOts)}
+					</Collapse>
+				  }
+				</div>
+			  );
+			}
+			else {
+			  return (
+				ntype === TreeNodeVisual.gallery ?
+				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)  
+					key={tnode.id} tier={that.treetier as StreeTier}
+					tnode={tnode} media={media}
+					parent={parent}
+					indentSettings={Object.assign(defltIcons, that.props.indentIcons)}
+					delete={that.toDel}
+					onUpdate={that.toEditCard}
+				  />
+				: ntype === TreeNodeVisual.card ?
+				<TreeCard {...that.props}
+					key={tnode.id} tier={that.treetier as StreeTier}
+					tnode={tnode} media={media}
+					parent={parent}
+					toEdit={that.toEditCard}
+					indentSettings={Object.assign(defltIcons, that.props.indentIcons)}
+					delete={that.toDel}
+					onUpdate={that.toEditCard}
+				  />
+				: that.props.nodeFormatter
+				? that.props.nodeFormatter(tnode, parent, compOpts)
+				: <>Unhandled tnode, id: {tnode.id}, visual type: {ntype}</>
+			  );
+			}
+		  }
+		}
+	}
+
+	th( columns: Array<AnTreegridCol> = [],
+		classes: ClassNames, media: Media ) {
+		return (
+			<Grid container className={classes.th} >
+			{columns
+				.filter( v => toBool(v.visible, true))
+				.map( (col: AnTreegridCol, ix: number) => {
+				  if (col.type === 'actions') return (
+					<Grid item key={ix} {...col.grid}>
+					  <Button onClick={this.toAddChild}
+						data-me={undefined} date-parent={undefined}
+						startIcon={<JsampleIcons.ListAdd />} color="primary" >
+						{media.isMd && L('New')}
+					  </Button>
+					</Grid>);
+				  else return (
+					<Grid item key={ix} {...col.grid}>
+						{col.label || col.field}
+					</Grid>);
+				} )
+			}
+			</Grid>);
+	}
+
+	folderHead( columns=[] as AnTreegridCol[], treenode: AnTreeNode, classes: ClassNames, media: Media) {
+	  let that = this;
+	  let n = treenode.node;
+	  n.css = n.css || {};
+	  let expd = !!n.expandChildren;
+
+	  return (
+		<div
+			onClick={(_e) => {
+				n.expandChildren = !n.expandChildren;
+				that.setState({})
+			}}
+			data-nid={treenode.id}
+			className={classes.folderHead}
+		>
+		  <Grid container spacing={0} key={treenode.id} >
+			{columns
+				.filter( v => v.hide != true)
+				.map( (col: AnTreegridCol, ix: number) => {
+					if (ix == 0) // row head
+					  return (
+						hide(col.grid, media) ? undefined :
+						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
+							<Typography noWrap variant='body2' >
+							{TreeCardComp.levelIcons(
+								that.props.indentSettings,
+								treenode.indents as IndentIconame[])}
+							{expd ? TreeCardComp.icon(that.props.indentIcons, "expand", 0)
+								: TreeCardComp.icon(that.props.indentIcons, "collapse", 0)}
+							{n.text}
+							</Typography>
+						</Grid>);
+					else if (col.type === 'actions')
+					  return (
+						hide(col.grid, media) ? undefined :
+						<Grid item key={`${treenode.id}.${ix}`} className={classes.actions}>
+							<Typography noWrap variant='body2' >
+								<Button onClick={that.toEditCard}
+									data-me={treenode.id}
+									startIcon={<JsampleIcons.Edit />} color="primary" >
+									{media.isMd && L('Edit')}
+								</Button>
+								<Button onClick={that.toDel} data-me={treenode.id}
+									startIcon={<JsampleIcons.Delete />} color="secondary" >
+									{media.isMd && L('Delete')}
+								</Button>
+								{n.nodetype === TreeNodeVisual[TreeNodeVisual.collapsable] &&
+									<Button onClick={that.toAddChild}
+										data-me={treenode.id} data-parent={n.parent}
+										startIcon={<JsampleIcons.ListAdd />} color="primary" >
+										{media.isMd && L('New')}
+									</Button>}
+							</Typography>
+						</Grid>
+						);
+					else if (col.type === 'formatter' || col.formatter)
+					  return (
+						hide(col.grid, media) ? undefined :
+						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
+							<Typography variant='body2' >
+							  {col.formatter(col, treenode, {classes, media}) as ReactNode}
+							</Typography>
+						</Grid>);
+					else
+					  return (
+						hide(col.grid, media) ? undefined :
+						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
+							<Typography noWrap variant='body2' >
+							{formatFolderDesc(treenode, media)}
+							</Typography>
+						</Grid>);
+				}) }
+		  </Grid>
+		</div>
+		);
+
+		function formatFolderDesc(tnode: AnTreeNode, media: Media) {
+			let {text, children} = tnode.node;
+
+			if (children)
+				children = `[${media.isMd ? 'children' : ''} ${children.length}]` as unknown as AnTreeNode[];
+			else children = [];
+
+			return `${media.isXl ? text : ''} ${children}`;
+		}
+	}
+
+	render() {
+		const { classes, width } = this.props;
+
+		let media = CrudCompW.getMedia(width);
+
+		if (this.props.reload && this.state.tobeLoad) {
+			this.toSearch();
+			this.state.tobeLoad = false;
+		}
+
+		return (
+			<div className={classes.root}>
+				{this.th(this.props.columns, classes, media)}
+				{this.treeNodes({classes, media})}
+				{this.editForm}
+			</div>
+		);
+	}
+}
+AnTreeditorComp2.contextType = AnContext;
+
+const AnTreeditor2 = withStyles<any, any, TreecardProps>(styles)(withWidth()(AnTreeditorComp2));
+export { AnTreeditor2, AnTreeditorComp2, TreecardProps }

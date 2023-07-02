@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, AnsonBody,
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
 	AnTreeNode, ErrorCtx, an, SessionClient
 } from '@anclient/semantier';
 
-import { L, Langstrs, AnContext, AnError, AnReactExt,
+import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW, AnContextType,
 } from '@anclient/anreact';
 import { GalleryTier } from './gallerytier-less';
@@ -78,9 +78,7 @@ export class App extends CrudCompW<AlbumProps> {
 
 		Protocol.sk.cbbViewType = 'v-type';
 
-		// this.tier = new GalleryTier({uri: this.uri, client: this.inclient, comp: this});
-
-        // design note: exendPorts shall be an automized processing
+        // DESIGN NOTES: exending ports shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
                         .extendPorts({
                             /* see jserv-album/album, port name: album */
@@ -92,8 +90,6 @@ export class App extends CrudCompW<AlbumProps> {
 		console.log(this.uri);
 
 		const ctx = this.context as unknown as AnContextType;
-		// this.anReact = ctx.uiHelper;
-		// this.state.tobeLoad = true;
 		this.login();
 	}
 
@@ -120,9 +116,12 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	toSearch() {
-		// let that = this;
 		this.editForm = undefined;
 		this.setState({tobeLoaded: true})
+	}
+
+	lightbox = (photos: AnTreeNode[], opts: {ix: number, open: boolean, onClose: (e: any) => {}}) => {
+		return (<Lightbox showResourceCount photos={photos} tier={this.albumtier} {...opts} />);
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
@@ -152,7 +151,6 @@ export class App extends CrudCompW<AlbumProps> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
-		  { /* {<GalleryView cid={''} port='album' uri={'/local/album'} aid={this.props.aid}/>} */ }
 		  { this.albumtier &&
 		    <AnTreeditor2 {... this.props} reload={this.state.tobeLoad}
 				pk={'pid'} sk={this.albumsk}
@@ -161,11 +159,12 @@ export class App extends CrudCompW<AlbumProps> {
 				uri={this.uri} 
 				parent={ undefined }
 				columns={[
-					{ type: 'text', field: 'folder', label: 'Photo Folders', grid: {sm: 4, md: 3} },
+					{ type: 'text', field: 'folder', label: 'Folders', grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'tags',   label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'shareby',label: L('By'), grid: {xs: false, sm: 3} },
-					{ type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
+					// { type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
 				]}
+				lightbox={this.lightbox}
 			/> }
 		  { this.state.hasError &&
 			<AnError onClose={this.onErrorClose} fullScreen={false}

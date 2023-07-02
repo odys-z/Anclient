@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { regex } from '../../utils/regex';
+
+const { mime2type } = regex;
 
 const imgWithClick = { cursor: 'pointer' };
 
-const Photo = ({ index, onClick, photo, margin, direction, top, left, key }) => {
+const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, key }) => {
   // ody: add user styles: photo.imgstyl
   const imgStyle = { margin: margin, display: 'block', ...photo.imgstyl };
   if (direction === 'column') {
@@ -16,7 +19,14 @@ const Photo = ({ index, onClick, photo, margin, direction, top, left, key }) => 
     onClick(event, { photo, index });
   };
 
-  return (
+  return ( mime2type(mime) === 'video' ?
+    <video
+      key={key}
+      style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
+      {...photo}
+      onClick={onClick ? handleClick : null}
+    />
+    :
     <img
       key={key}
       style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}

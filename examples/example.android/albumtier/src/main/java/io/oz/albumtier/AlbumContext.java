@@ -8,6 +8,7 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
+import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
@@ -71,7 +72,11 @@ public class AlbumContext {
         state = ConnState.Disconnected;
     }
 
-    /**
+	public AlbumContext(ErrorCtx ctx) {
+		this.errCtx = ctx;
+	}
+
+	/**
      * Init with preferences. Not login yet.
      * @since maven 0.1.0, this package no longer depends on android sdk.
      * public void init(PrefKeys prefkeys, SharedPreferences sharedPref)

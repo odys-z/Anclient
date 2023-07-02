@@ -1,6 +1,7 @@
 export * from './utils/consts';
 export * from './utils/langstr';
 export * from './utils/lang-ext';
+export * from './utils/regex';
 
 export * from './patch/react-portal-overlay';
 
@@ -24,7 +25,7 @@ export * from './react/widgets/tree';
 export * from './react/widgets/treegrid';
 export * from './react/widgets/ag-gridsheet';
 export * from './react/widgets/spreadsheet';
-export * from './react/widgets/tree-editor2';
+export * from './react/widgets/tree-editor';
 export * from './react/widgets/gallery-view';
 
 export * from './react/widgets/simple-form';
@@ -32,6 +33,7 @@ export * from './react/widgets/record-form';
 export * from './react/widgets/relation-tree';
 
 export * from './photo-gallery/src/Photo';
+export * from './photo-gallery/src/light-box';
 
 import { JsampleIcons, JsampleTheme, jstyles } from './jsample/styles';
 import { Domain, DomainComp } from './jsample/views/domain';
@@ -54,8 +56,7 @@ export const jsample = {
 };
 
 import { uarr2Base64, dataOfurl, mimeOf, urlOfdata } from './utils/file-utils';
-import { regex } from './utils/regex';
 
 export const utils = {
-	uarr2Base64, dataOfurl, mimeOf, urlOfdata, regex
+	uarr2Base64, dataOfurl, mimeOf, urlOfdata
 }

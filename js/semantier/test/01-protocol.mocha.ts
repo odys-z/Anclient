@@ -358,10 +358,6 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 	} );
 
     it('SessionResp response instancing', () => {
-		// console.log(respSession.body[0].type);
-		// console.log(Protocol.ansonTypes[respSession.body[0].type]);
-		// console.log(AnSessionResp.__type__);
-		// console.log("======");
 
 		let rp = new AnsonMsg(respSession);
         assert.equal(rp.code, 'ok', "1 ---");

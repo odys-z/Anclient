@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 /**
  * Use this style to force some change of calculation. Currrently only for 1 pic gallery.
@@ -86,5 +85,3 @@ export interface RenderImageProps<CustomPhotoProps extends object = {}> {
     top?: number
     left?: number
 }
-
-// export default Photo;

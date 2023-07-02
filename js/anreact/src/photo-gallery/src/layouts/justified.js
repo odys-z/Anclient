@@ -31,6 +31,12 @@ const makeGetNeighbors = (targetHeight, containerWidth, photos, limitNodeSearch,
   return results;
 };
 
+/**
+ * Set w/h of photos.
+ * 
+ * @param {*} param0 
+ * @returns photos 
+ */
 export const computeRowLayout = ({ containerWidth, limitNodeSearch, targetRowHeight, margin, photos }) => {
   // const t = +new Date();
   const getNeighbors = makeGetNeighbors(targetRowHeight, containerWidth, photos, limitNodeSearch, margin);

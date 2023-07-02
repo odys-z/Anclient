@@ -37,6 +37,8 @@ export interface GalleryProps<CustomPhotoProps extends object = {}> {
      * column or row based layout
      */
     direction?: string
+
+    videoControl?: boolean
   
     renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>
 }

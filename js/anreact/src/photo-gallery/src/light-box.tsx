@@ -1,20 +1,21 @@
 /**
  * Credit to: https://github.com/Ngineer101/react-image-video-lightbox/blob/master/src/index.js
  * 2023.6.27 baseline, by Ngineer, License: MIT
- * 
+ *
  * ISSUE: Performance problem since v0.4.26.
  * It could be the anson64's random string makes browser always load the same images, see
  * <a href='https://stackoverflow.com/q/10240110'>discussions</a>.
- * 
+ *
  * FIXME: Resource should be cached.
  */
 import * as React from 'react';
 import {TouchEvent, Touch} from 'react'; // override global types
 import { AnTreeNode, StreeTier, PhotoRec } from '@anclient/semantier';
+import { Comprops, CrudCompW } from '../../react/crud';
+import { GalleryView } from '../../react/widgets/gallery-view';
+import { regex } from '../../utils/regex';
 
-import { utils, GalleryView, Comprops, CrudCompW } from '../../../../anreact/src/an-components';
-
-let { mime2type } = utils.regex;
+let { mime2type } = regex;
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
@@ -52,9 +53,9 @@ export function getTouchPt (touch: Touch) {
 }
 
 /**
- * 
- * @param pointA 
- * @param pointB 
+ *
+ * @param pointA
+ * @param pointB
  * @returns distance
  */
 export function d (pointA: { x: number; y: number; }, pointB: { x: number; y: number; }) {
@@ -67,10 +68,12 @@ export const between = (min: number, max: number, value: number) => {
 
 /**
  * Show a fullscreen carousel.
- * 
+ *
  * This function have a performance issue.
  */
-export class Lightbox extends CrudCompW<Comprops> {
+export class Lightbox extends CrudCompW<Comprops & {
+    /* accepting command of parent to stop loading resources */
+    open: boolean }> {
   width: number;
   height: number;
   onNavigationCallback: any;
@@ -86,11 +89,12 @@ export class Lightbox extends CrudCompW<Comprops> {
     scale: number; iconSize: number;
     width: number; height: number;
     // swiping: boolean;// loading: boolean;
+    paused: boolean;
   };
 
   tier: StreeTier;
 
-  constructor(props: NgineerSlideProps & Comprops) {
+  constructor(props: Comprops) {
     super(props);
 
     this.tier = props.tier as StreeTier;
@@ -104,7 +108,9 @@ export class Lightbox extends CrudCompW<Comprops> {
       index: this.props.ix,
       // swiping: false,
       // loading: true,
-      iconSize: window.innerWidth <= 500 ? MOBILE_ICON_SIZE : DESKTOP_ICON_SIZE
+      iconSize: window.innerWidth <= 500 ? MOBILE_ICON_SIZE : DESKTOP_ICON_SIZE,
+
+      paused: true
     };
 
     this.state.loading = true;
@@ -269,7 +275,8 @@ export class Lightbox extends CrudCompW<Comprops> {
     const pointA = getTouchPt(event.touches[0]);
     const pointB = getTouchPt(event.touches[1]);
     const distance = d(pointA, pointB);
-    const scale = between(MIN_SCALE - ADDITIONAL_LIMIT, MAX_SCALE + ADDITIONAL_LIMIT, this.config.scale * (distance / this.lastDistance));
+    const scale = between(MIN_SCALE - ADDITIONAL_LIMIT, MAX_SCALE + ADDITIONAL_LIMIT,
+                          this.config.scale * (distance / this.lastDistance));
     this.zoom(scale);
     this.lastDistance = distance;
   }
@@ -291,7 +298,7 @@ export class Lightbox extends CrudCompW<Comprops> {
         altTag: p.title,
         poster: p.preview,
         src: GalleryView.imgSrcReq(p.id, this.tier),
-        mime: p.mime,
+        mime: p.node.mime,
         title: PhotoRec.toShareLable(p.node as PhotoRec),
       });
     } );
@@ -299,13 +306,13 @@ export class Lightbox extends CrudCompW<Comprops> {
     return slids;
   }
 
-  // branch temp-try
+  vidRef: HTMLVideoElement;
+
   getResources() {
     let items = [];
     let data = this.parse(this.props.photos);
     for (var i = 0; i < data.length; i++) {
       var resource = data[i];
-      // if (!resource.mime || resource.mime === 'photo') {
       if (!resource.mime || mime2type(resource.mime) === 'image') {
         items.push(<img key={i}
           alt={resource.altag}
@@ -317,14 +324,15 @@ export class Lightbox extends CrudCompW<Comprops> {
             transform: `translate(${this.config.x}px, ${this.config.y}px) scale(${this.config.scale})`,
             transition: 'transform 0.5s ease-out'
           }}
-          onLoad={() => { 
+          onLoad={() => {
             if (this.state.swiping || this.state.loading)
               this.setState({ loading: false }); }}
         />);
       }
-      // else if (!resource.mime || resource.mime === 'video') {
       else if (mime2type(resource.mime) === 'video') {
         items.push(<video key={i}
+          ref={(ref) => this.vidRef = ref}
+
           preload='false' controls
           poster={resource.poster}
           src={resource.src}
@@ -334,9 +342,23 @@ export class Lightbox extends CrudCompW<Comprops> {
             transform: `translate(${this.config.x}px, ${this.config.y}px) scale(${this.config.scale})`,
             transition: 'transform 0.5s ease-out'
           }}
-          onLoad={() => { 
+          onLoad={(e) => {
+            console.log('video loaded', e.currentTarget);
             if (this.state.swiping || this.state.loading)
-              this.setState({ loading: false }); }} />);
+              this.setState({ loading: false }); }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            // console.log(e.currentTarget);
+            // console.log(this.vidRef);
+            if (this.config.paused)
+              this.vidRef.play();
+            else
+              this.vidRef.pause();
+
+            this.config.paused = !this.config.paused;
+          }}
+          onEnded={e => this.config.paused = true}
+        />);
       }
 
       /* TODO third party online resources
@@ -386,6 +408,9 @@ export class Lightbox extends CrudCompW<Comprops> {
   }
 
   render() {
+    if (!this.props.open)
+      return <></>;
+
     let resources = this.getResources();
     return (
       <div
@@ -439,7 +464,9 @@ export class Lightbox extends CrudCompW<Comprops> {
             color: '#FFFFFF',
             fontSize: `${this.config.iconSize * 0.8}px`
           }}
-          onClick={this.props.onClose}>
+          onClick={() => {
+            this.props.onClose();
+          }}>
           <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#FFFFFF">
             <path d="M0 0h24v24H0z" fill="none" />
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
@@ -486,3 +513,6 @@ export class Lightbox extends CrudCompW<Comprops> {
 }
 
 export default Lightbox;
+function useRef(arg0: null) {
+  throw new Error('Function not implemented.');
+}
