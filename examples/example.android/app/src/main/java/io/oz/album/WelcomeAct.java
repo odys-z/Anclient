@@ -12,10 +12,11 @@ import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.activity.AudioPickActivity;
+import com.vincent.filepicker.activity.BaseActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
+import com.vincent.filepicker.activity.NormalFilePickActivity;
 import com.vincent.filepicker.activity.VideoPickActivity;
 import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
@@ -41,21 +43,26 @@ import io.oz.fpick.PickingMode;
 
 import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
-import static io.oz.album.webview.WebAlbumAct.Web_ActionName;
+import static com.vincent.filepicker.activity.BaseActivity.SUFFIX;
+import static io.odysz.common.LangExt.isNull;
+import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
+
     AlbumContext singl;
 
     /** Preference activity starter */
     ActivityResultLauncher<Intent> prefActStarter;
 
-    ActivityResultLauncher<Intent> imgPickActStarter;
+    // ActivityResultLauncher<Intent> imgPickActStarter;
 
-    ActivityResultLauncher<Intent> vidPickActStarter;
+    // ActivityResultLauncher<Intent> vidPickActStarter;
 
-    ActivityResultLauncher<Intent> audPickActStarter;
+    // ActivityResultLauncher<Intent> audPickActStarter;
 
-    ActivityResultLauncher<Intent> webActStarter;
+    ActivityResultLauncher<Intent> pickActStarter;
+
+    ActivityResultLauncher<Intent> helpActStarter;
 
     TextView msgv;
     AndErrorCtx errCtx;
@@ -95,42 +102,54 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         msgv = findViewById(R.id.tv_status);
         errCtx = new AndErrorCtx().context(this);
 
-        //
-        if (imgPickActStarter == null)
-            imgPickActStarter = registerForActivityResult(
+//        //
+//        if (imgPickActStarter == null)
+//            imgPickActStarter = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                result -> {
+//                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+//                        if (singl.state() == AlbumContext.ConnState.Online) {
+//                            onImagePicked(result);
+//                        }
+//                        else showMsg(R.string.msg_ignored_when_offline);
+//                    }
+//                });
+//
+//        if (vidPickActStarter == null)
+//            vidPickActStarter = registerForActivityResult(
+//                    new ActivityResultContracts.StartActivityForResult(),
+//                    result -> {
+//                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+//                            if (singl.state() == AlbumContext.ConnState.Online) {
+//                                    onVideoPicked(result);
+//                            }
+//                            else showMsg(R.string.msg_ignored_when_offline);
+//                        }
+//                    });
+//
+//        if (audPickActStarter == null)
+//            audPickActStarter = registerForActivityResult(
+//                    new ActivityResultContracts.StartActivityForResult(),
+//                    result -> {
+//                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+//                            if (singl.state() == AlbumContext.ConnState.Online) {
+//                                onImagePicked(result);
+//                            }
+//                            else showMsg(R.string.msg_ignored_when_offline);
+//                        }
+//                    });
+
+        if (pickActStarter == null)
+            pickActStarter = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         if (singl.state() == AlbumContext.ConnState.Online) {
-                            onImagePicked(result);
+                            onFilesPicked(result);
                         }
                         else showMsg(R.string.msg_ignored_when_offline);
                     }
                 });
-
-        if (vidPickActStarter == null)
-            vidPickActStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            if (singl.state() == AlbumContext.ConnState.Online) {
-                                    onVideoPicked(result);
-                            }
-                            else showMsg(R.string.msg_ignored_when_offline);
-                        }
-                    });
-
-        if (audPickActStarter == null)
-            audPickActStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            if (singl.state() == AlbumContext.ConnState.Online) {
-                                onImagePicked(result);
-                            }
-                            else showMsg(R.string.msg_ignored_when_offline);
-                        }
-                    });
 
         if (prefActStarter == null)
             prefActStarter = registerForActivityResult(
@@ -143,13 +162,19 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         // String name = sharePrefs.getString(AlbumApp.keys.usrid, "");
                         // String device = sharePrefs.getString(AlbumApp.keys.device, "");
                         showMsg(R.string.msg_device_uid, uid, device);
+
+                        WebView wv = findViewById(R.id.wv_welcome);
+                        wv.reload();
                     }
                 });
 
-        if (webActStarter == null)
-            webActStarter = registerForActivityResult(
+        if (helpActStarter == null)
+            helpActStarter = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                result -> { });
+                result -> {
+                    WebView wv = findViewById(R.id.wv_welcome);
+                    wv.reload();
+                });
 
         try {
             if (singl.needSetup())
@@ -158,7 +183,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             else
                 singl.pswd(sharedPref.getString(AlbumApp.keys.pswd, ""))
                      .login(
-                        (tier) -> {
+                        (client) -> {
                           // All WebView methods must be called on the same thread.
                           runOnUiThread( () -> {
                             final VWebAlbum webView = new VWebAlbum();
@@ -166,6 +191,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             wv.setWebViewClient(webView);
                             WebSettings webSettings = wv.getSettings();
                             webSettings.setJavaScriptEnabled(true);
+                            webSettings.setDomStorageEnabled(true);
                             wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
                           } );
                         },
@@ -217,7 +243,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             return true;
         }
         else if (id == R.id.menu_help) {
-            startWebAct(AssetHelper.Act_Help);
+            startHelpAct(AssetHelper.Act_Help);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -228,151 +254,166 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         prefActStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivity.class));
     }
 
-    protected void startImagePicking() {
-        clearMsg();
+//    protected void startImagePicking() {
+//        clearMsg();
+//
+//        Intent imgIntent = new Intent(this, ImagePickActivity.class);
+//        imgIntent.putExtra(IS_NEED_CAMERA, true);
+//        imgIntent.putExtra(Constant.MAX_NUMBER, 99);
+//        imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
+//        imgIntent.putExtra( Constant.PickingMode,
+//                    singl.state() == AlbumContext.ConnState.Disconnected ?
+//                    PickingMode.disabled : PickingMode.limit99 );
+//
+//        imgPickActStarter.launch(imgIntent);
+//    }
 
-        Intent imgIntent = new Intent(this, ImagePickActivity.class);
-        imgIntent.putExtra(IS_NEED_CAMERA, true);
-        imgIntent.putExtra(Constant.MAX_NUMBER, 99);
-        imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
-        imgIntent.putExtra( Constant.PickingMode,
-                    singl.state() == AlbumContext.ConnState.Disconnected ?
-                    PickingMode.disabled : PickingMode.limit99 );
-
-        imgPickActStarter.launch(imgIntent);
-    }
-
-    protected void onImagePicked(@NonNull ActivityResult result) {
+    protected void onFilesPicked(@NonNull ActivityResult result) {
         try {
             Intent data = result.getData();
             if (data != null) {
-                ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+                ArrayList<? extends SyncDoc> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
                 else
-                    /*
-                    singl.tier.asyncPhotosUp(list, singl.photoUser,
-                        null,
-                        (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
-                        (c, r, args) -> showMsg(R.string.msg_upload_failed, (Object[]) args));
-                     */
                     singl.tier.asyVideos(list,
-                       null,
+                            null,
                             (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
+
+                WebView wv = findViewById(R.id.wv_welcome);
+                wv.reload();
             }
         } catch (TransException | IOException | AnsonException e) {
             e.printStackTrace();
-            // showMsg(R.string.msg_upload_failed, e.getClass().getName(), e.getMessage());
             errCtx.prepare(msgv, R.string.msg_upload_failed)
-                  .err(null, e.getMessage(), e.getClass().getName());
+                    .err(null, e.getMessage(), e.getClass().getName());
         }
     }
 
-    protected void startVideoPiking() {
+//    protected void onImagePicked(@NonNull ActivityResult result) {
+//        try {
+//            Intent data = result.getData();
+//            if (data != null) {
+//                ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+//                if (singl.tier == null)
+//                    showMsg(R.string.txt_please_login);
+//                else
+//                    singl.tier.asyVideos(list,
+//                   null,
+//                        (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
+//                        errCtx.prepare(msgv, R.string.msg_upload_failed));
+//            }
+//        } catch (TransException | IOException | AnsonException e) {
+//            e.printStackTrace();
+//            errCtx.prepare(msgv, R.string.msg_upload_failed)
+//                  .err(null, e.getMessage(), e.getClass().getName());
+//        }
+//    }
+
+//    protected void startVideoPiking() {
+//        clearMsg();
+//
+//        Intent imgIntent = new Intent(this, VideoPickActivity.class);
+//        imgIntent.putExtra(IS_NEED_CAMERA, true);
+//        imgIntent.putExtra(Constant.MAX_NUMBER, 99);
+//        imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
+//        imgIntent.putExtra( Constant.PickingMode,
+//                singl.state() == AlbumContext.ConnState.Disconnected ?
+//                        PickingMode.disabled : PickingMode.limit99 );
+//
+//        vidPickActStarter.launch(imgIntent);
+//    }
+
+//    protected void onVideoPicked(@NonNull ActivityResult result) {
+//        Intent data = result.getData();
+//        if (data != null) {
+//            ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+//            if (singl.tier == null)
+//                showMsg(R.string.txt_please_login);
+//            else {
+//                try {
+//                    singl.tier.asyVideos(list,
+//                            (rows, rx, seq, total, resp) -> showProgress(rx, list, total, (DocsResp) resp),
+//                            (doc, resp) -> showMsg(R.string.t_synch_ok, list.size()),
+//                            errCtx.prepare(msgv, R.string.vw_no_video_play_app));
+//                } catch (TransException | IOException e) {
+//                    e.printStackTrace();
+//                    errCtx.prepare(msgv, R.string.msg_upload_failed)
+//                            .err(null, e.getMessage(), e.getClass().getName());
+//                }
+//            }
+//        }
+//    }
+
+//    protected void startAudioPiking() {
+//        clearMsg();
+//
+//        Intent imgIntent = new Intent(this, AudioPickActivity.class);
+//        imgIntent.putExtra(IS_NEED_CAMERA, true);
+//        imgIntent.putExtra(Constant.MAX_NUMBER, 99);
+//        imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
+//        imgIntent.putExtra( Constant.PickingMode,
+//                singl.state() == AlbumContext.ConnState.Disconnected ?
+//                        PickingMode.disabled : PickingMode.limit99 );
+//
+//        audPickActStarter.launch(imgIntent);
+//    }
+
+    protected void startPicking(Class<? extends BaseActivity> act, String ... suffices) {
         clearMsg();
 
-        Intent imgIntent = new Intent(this, VideoPickActivity.class);
+        Intent imgIntent = new Intent(this, act);
         imgIntent.putExtra(IS_NEED_CAMERA, true);
         imgIntent.putExtra(Constant.MAX_NUMBER, 99);
         imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
         imgIntent.putExtra( Constant.PickingMode,
                 singl.state() == AlbumContext.ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99 );
+        if (!isNull(suffices))
+            imgIntent.putExtra(SUFFIX, suffices);
 
-        vidPickActStarter.launch(imgIntent);
-    }
-
-    protected void onVideoPicked(@NonNull ActivityResult result) {
-        Intent data = result.getData();
-        if (data != null) {
-            ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
-            if (singl.tier == null)
-                showMsg(R.string.txt_please_login);
-            else {
-                try {
-                    singl.tier.asyVideos(list,
-                            (rows, rx, seq, total, resp) -> showProgress(rx, list, total, (DocsResp) resp),
-                            (doc, resp) -> showMsg(R.string.t_synch_ok, list.size()),
-                            errCtx.prepare(msgv, R.string.vw_no_video_play_app));
-                } catch (TransException | IOException e) {
-                    e.printStackTrace();
-                    errCtx.prepare(msgv, R.string.msg_upload_failed)
-                            .err(null, e.getMessage(), e.getClass().getName());
-                }
-            }
-        }
-    }
-
-    protected void startAudioPiking() {
-        clearMsg();
-
-        Intent imgIntent = new Intent(this, AudioPickActivity.class);
-        imgIntent.putExtra(IS_NEED_CAMERA, true);
-        imgIntent.putExtra(Constant.MAX_NUMBER, 99);
-        imgIntent.putExtra ( IS_NEED_FOLDER_LIST, true );
-        imgIntent.putExtra( Constant.PickingMode,
-                singl.state() == AlbumContext.ConnState.Disconnected ?
-                        PickingMode.disabled : PickingMode.limit99 );
-
-        audPickActStarter.launch(imgIntent);
+        pickActStarter.launch(imgIntent);
     }
 
     /**
      * Start help activities, etc.
      * @param action
      */
-    protected void startWebAct(int action) {
+    protected void startHelpAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
-        intent.putExtra(Web_ActionName, action);
-        webActStarter.launch(intent);
+        intent.putExtra(Help_ActionName, action);
+        helpActStarter.launch(intent);
     }
-
-//    protected void onAudioPicked(@NonNull ActivityResult result) {
-//        try {
-//        Intent data = result.getData();
-//        if (data != null) {
-//            ArrayList<BaseFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
-//            if (singl.tier == null)
-//                showMsg(R.string.txt_please_login);
-//            else
-//                singl.tier.asyncPhotos(list, singl.photoUser,
-//                        (resp) -> {
-//                            showMsg(R.string.t_synch_ok, list.size());
-//                        },
-//                        (c, r, args) -> {
-//                            showMsg(R.string.msg_upload_failed, args);
-//                        });
-//            }
-//        } catch (SemanticException | IOException | AnsonException e) {
-//            e.printStackTrace();
-//            showMsg(R.string.msg_upload_failed, e.getClass().getName(), e.getMessage());
-//        }
-//    }
 
     @Override
     public void onClick(@NonNull View v) {
         int id = v.getId();
         switch (id) {
             case R.id.btn_pick_image:
-                startImagePicking();
+                // startImagePicking();
+                startPicking(ImagePickActivity.class);
                 break;
             case R.id.btn_pick_video:
-                startVideoPiking();
+                // startVideoPiking();
+                startPicking(VideoPickActivity.class);
                 break;
             case R.id.btn_pick_audio:
-                startAudioPiking();
+                // startAudioPiking();
+                startPicking(AudioPickActivity.class);
                 break;
-                /*
             case R.id.btn_pick_file:
+                /*
                 Intent intent4 = new Intent(this, NormalFilePickActivity.class);
                 intent4.putExtra(Constant.MAX_NUMBER, 9);
                 intent4.putExtra ( IS_NEED_FOLDER_LIST, true );
                 intent4.putExtra(NormalFilePickActivity.SUFFIX,
                         new String[] {"xlsx", "xls", "doc", "dOcX", "ppt", ".pptx", "pdf"});
                 startActivityForResult(intent4, Constant.REQUEST_CODE_PICK_FILE);
-                break;
                  */
+                startPicking(NormalFilePickActivity.class,
+                        new String[] {"xlsx", "xls", "doc", "docx", "ppt", ".pptx", "pdf", "txt", "csv", "zip", "7z", "rar"});
+                break;
         }
     }
 

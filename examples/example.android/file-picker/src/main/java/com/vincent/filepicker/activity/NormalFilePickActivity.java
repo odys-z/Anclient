@@ -37,7 +37,6 @@ import io.oz.fpick.R;
 
 public class NormalFilePickActivity extends BaseActivity {
     public static final int DEFAULT_MAX_NUMBER = 9;
-    public static final String SUFFIX = "Suffix";
     private int mMaxNumber;
     private int mCurrentNumber = 0;
     private RecyclerView mRecyclerView;

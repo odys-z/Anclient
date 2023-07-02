@@ -324,13 +324,13 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 		json.code = Protocol.MsgCode.exIo,
 		json.body = [ {
 				type: 'io.odysz.semantic.jprotocol.AnsonResp',
-				m: 'Ajax: network failed!'
+				m: 'Ajax: Network failed!'
 			} ];
 		let rp = new AnsonMsg( json );
 		assert.equal(rp.type, 'io.odysz.semantic.jprotocol.AnsonMsg', "- 1 -");
 		assert.equal(rp.code, 'exIo', "- 2 -");
 		assert.equal(rp.Body()?.type, 'io.odysz.semantic.jprotocol.AnsonResp', "- 3 -");
-		assert.equal(rp.Body()?.msg(), 'Ajax: network failed!', "- 4 -");
+		assert.equal(rp.Body()?.msg(), 'Ajax: Network failed!', "- 4 -");
 	});
 
     it('Ajax error handling 2', () => {

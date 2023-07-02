@@ -21,7 +21,6 @@ public class AlbumContext {
 
     public enum ConnState { Online, Disconnected, LoginFailed }
 
-
     static AlbumContext instance;
 
     public static final String jdocbase  = "jserv-album";
@@ -32,7 +31,7 @@ public class AlbumContext {
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
-        Anson.verbose = true;
+        Anson.verbose = false;
     }
 
     private String pswd;
@@ -125,6 +124,8 @@ public class AlbumContext {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
+
+        // state = ConnState.LoginFailed;
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 

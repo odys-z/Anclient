@@ -86,15 +86,16 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         notifyDataSetChanged();
 
         synchPage = new PathsPage(0, Math.min(20, mList.size()));
-        // synchPage.taskNo = nextRandomInt();
         synchPage.device = singleton.photoUser.device;
-        if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
-            startSynchQuery(synchPage);
+
         try {
+            if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
+                startSynchQuery(synchPage);
+            else {
             singleton.login((r) -> startSynchQuery(synchPage),
-                // (c, r, args) -> { Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0])); }
-                singleton.errCtx
-                );
+                    // (c, r, args) -> { Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0])); }
+                    singleton.errCtx);
+            }
         } catch (GeneralSecurityException e) {
             singleton.errCtx.err(AnsonMsg.MsgCode.exSession, e.getMessage());
         } catch (SemanticException e) {
@@ -109,7 +110,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
             (c, r, args) -> {
                 // Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
                 singleton.errCtx.err(c, r, args);
-                // mContext.getApplicationContext();
             });
     }
 
@@ -167,7 +167,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
      * @param dataType "video/*" or "image/*"
      * @param path full path
      * @return false
-     */
     private boolean startMediaViewer(View view, String dataType, String path) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri uri;
@@ -188,6 +187,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
         return false;
     }
+     */
 
     /**
      * @param ctx the context

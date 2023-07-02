@@ -60,7 +60,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                     updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
 
                     // load settings
-                    Anson.verbose = true;
+                    Anson.verbose = false;
                     ((PhotoSyntier) singleton.tier).asyGetSettings(
                         (resp) -> {
                             singleton.homeName = ((AlbumResp) resp).profiles().home();

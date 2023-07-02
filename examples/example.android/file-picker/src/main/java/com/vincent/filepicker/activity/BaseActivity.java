@@ -29,6 +29,7 @@ import pub.devrel.easypermissions.EasyPermissions;
  */
 
 public abstract class BaseActivity extends FragmentActivity implements EasyPermissions.PermissionCallbacks, JProtocol.OnError {
+    public static final String SUFFIX = "Suffix";
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
     private static final String TAG = BaseActivity.class.getName();
 
