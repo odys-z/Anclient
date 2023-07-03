@@ -68,7 +68,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             params.height = width / ImagePickActivity.COLUMN_NUMBER;
         }
         ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
-        imagePickViewHolder.setIsRecyclable ( false );
+        imagePickViewHolder.setIsRecyclable ( true );
 
         return imagePickViewHolder;
     }

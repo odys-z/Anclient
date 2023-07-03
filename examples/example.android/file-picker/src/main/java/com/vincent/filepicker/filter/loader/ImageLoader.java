@@ -39,10 +39,11 @@ public class ImageLoader extends CursorLoader {
         setUri(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         setSortOrder(MediaStore.Images.Media.DATE_ADDED + " DESC");
 
-        setSelection(MIME_TYPE + "=? or " + MIME_TYPE + "=? or "+ MIME_TYPE + "=? or " + MIME_TYPE + "=?");
+        setSelection(MIME_TYPE + "=? or " + MIME_TYPE + "=? or "+ MIME_TYPE + "=? or " + MIME_TYPE + "=? or " + MIME_TYPE + "=? or " + MIME_TYPE + "=? or " + MIME_TYPE + "=?");
 
         String[] selectionArgs;
-        selectionArgs = new String[] { "image/jpeg", "image/png", "image/jpg","image/gif" };
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types#image_types
+        selectionArgs = new String[] { "image/apng", "image/avif", "image/gif", "image/jpeg", "image/png", "image/svg+xml", "image/webp" };
         setSelectionArgs(selectionArgs);
     }
 }

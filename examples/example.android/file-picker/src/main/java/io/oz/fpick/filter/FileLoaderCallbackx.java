@@ -43,7 +43,7 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
     public static final int TYPE_IMAGE = 0;
     public static final int TYPE_VIDEO = 1;
     public static final int TYPE_AUDIO = 2;
-    public static final int TYPE_FILE = 3;
+    public static final int TYPE_FILE  = 3;
 
     private WeakReference<Context> context;
     private FilterResultCallback resultCallback;
@@ -141,7 +141,6 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
             Directory<ImageFile> directory = new Directory<>();
             directory.setId(img.getLocalDirId());
             directory.setName(img.getLocalDirName());
-            // directory.setPath(img.fullpath());
             directory.setPath(img.path());
 
             if (!directories.contains(directory)) {
