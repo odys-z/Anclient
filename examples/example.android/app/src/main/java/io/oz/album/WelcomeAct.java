@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.activity.AudioPickActivity;
-import com.vincent.filepicker.activity.BaseActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.activity.NormalFilePickActivity;
 import com.vincent.filepicker.activity.VideoPickActivity;
@@ -40,11 +39,13 @@ import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.PickingMode;
+import io.oz.fpick.activity.BaseActivity;
 
-import static com.vincent.filepicker.activity.BaseActivity.IS_NEED_FOLDER_LIST;
-import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
-import static com.vincent.filepicker.activity.BaseActivity.SUFFIX;
+// import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
 import static io.odysz.common.LangExt.isNull;
+import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
+import static io.oz.fpick.activity.BaseActivity.SUFFIX;
+import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {

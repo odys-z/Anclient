@@ -127,7 +127,9 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
 
             if (mListener != null) {
                 // mListener.onAudioStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
-                mListener.onAudioStateChanged (
+                // mListener.onAudioStateChanged (
+                mListener.onSelectStateChanged(
+                        index,
                         holder.mCbx.isSelected(),
                         mList.get(holder.getAbsoluteAdapterPosition()),
                         holder.animation);

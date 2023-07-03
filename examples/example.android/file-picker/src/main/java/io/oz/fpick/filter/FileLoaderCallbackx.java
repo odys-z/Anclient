@@ -27,6 +27,7 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.Utils;
 
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Files.FileColumns.MIME_TYPE;
@@ -38,6 +39,8 @@ import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
 import static android.provider.MediaStore.MediaColumns.SIZE;
 import static android.provider.MediaStore.MediaColumns.TITLE;
 import static android.provider.MediaStore.Video.VideoColumns.DURATION;
+
+import org.apache.commons.io.FilenameUtils;
 
 public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final int TYPE_IMAGE = 0;
@@ -141,7 +144,8 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
             Directory<ImageFile> directory = new Directory<>();
             directory.setId(img.getLocalDirId());
             directory.setName(img.getLocalDirName());
-            directory.setPath(img.fullpath());
+            // directory.setPath(img.fullpath());
+            directory.setPath(img.path());
 
             if (!directories.contains(directory)) {
                 directory.addFile(img);
@@ -149,6 +153,7 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
             } else {
                 directories.get(directories.indexOf(directory)).addFile(img);
             }
+            Utils.logi("%d, %s", directories.size(), directory.getName());
         }
 
         if (resultCallback != null) {

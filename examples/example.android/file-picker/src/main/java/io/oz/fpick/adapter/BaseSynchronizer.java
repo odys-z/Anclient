@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.entity.BaseFile;
 
 import java.io.File;
@@ -32,8 +31,11 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
 
 public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+
+    public String mFilepath;
 
     protected boolean isNeedCamera;
     protected int mMaxNumber;
@@ -49,7 +51,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     protected Context mContext;
     protected ArrayList<T> mList;
-    protected OnSelectStateListener<T> mListener;
+    protected BaseActivity.OnSelectStateListener mListener;
 
     protected AlbumContext singleton;
 
@@ -59,6 +61,11 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         this.singleton = AlbumContext.getInstance(null);
         mContext = ctx;
         mList = list;
+    }
+
+    public BaseSynchronizer(BaseActivity act) {
+        this(act, new ArrayList<>());
+        this.singleton = AlbumContext.getInstance(act);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -158,7 +165,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         });
     }
 
-    public void selectListener(OnSelectStateListener<T> listener) {
+    public void selectListener(BaseActivity.OnSelectStateListener listener) {
         mListener = listener;
     }
 

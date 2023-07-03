@@ -1,16 +1,12 @@
 /**
- * Created by Vincent Woo
- * Date: 2016/10/26
- * Time: 10:23
- *
- * Modified by Ody Zhou
+ * Created by Ody Zhou
+ * Credits to Vincent Woo
  */
 
-package com.vincent.filepicker.adapter;
+package io.oz.fpick.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +15,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
@@ -30,9 +28,9 @@ import io.oz.fpick.R;
 
 
 /**
- * @deprecated replaced by io.oz.fpick.adapter.NormalFilePickAdapter
+ *
  */
-public class NormalFilePickAdapter extends BaseAdapter<NormalFile, NormalFilePickAdapter.NormalFilePickViewHolder> {
+public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFilePickAdapter.NormalFilePickViewHolder> {
     private int mMaxNumber;
     private int mCurrentNumber = 0;
 
@@ -115,7 +113,7 @@ public class NormalFilePickAdapter extends BaseAdapter<NormalFile, NormalFilePic
                 mList.get(holder.getAdapterPosition()).setSelected(holder.mCbx.isSelected());
 
                 if (mListener != null) {
-                    mListener.onFileStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
+                    mListener.onSelectStateChanged(holder.getAdapterPosition(), holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
                 }
             }
         });
@@ -154,8 +152,8 @@ public class NormalFilePickAdapter extends BaseAdapter<NormalFile, NormalFilePic
         }
     }
 
-    private boolean isUpToMax() {
-        return mCurrentNumber >= mMaxNumber;
-    }
+//    private boolean isUpToMax() {
+//        return mCurrentNumber >= mMaxNumber;
+//    }
 
 }

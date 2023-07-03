@@ -17,7 +17,6 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerListItemDecoration;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.AudioFile;
 import com.vincent.filepicker.filter.entity.BaseFile;
@@ -35,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import io.odysz.semantics.x.SemanticException;
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.AudioPickAdapter;
 import io.oz.fpick.filter.FileFilterx;
 
@@ -62,10 +62,10 @@ public class AudioPickActivity extends BaseActivity {
     private TextView tv_folder;
     private RelativeLayout tb_pick;
 
-    @Override
-    void permissionGranted() {
-        loadData();
-    }
+//    @Override
+//    void permissionGranted() {
+//        loadData();
+//    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,14 +90,15 @@ public class AudioPickActivity extends BaseActivity {
         mAdapter = new AudioPickAdapter(this, mMaxNumber);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.selectListener(new OnSelectStateListener<AudioFile>() {
+        mAdapter.selectListener(new OnSelectStateListener() {
             @Override
-            public void OnSelectStateChanged (int position, boolean state , AudioFile file , View animation ) { }
-
-            @Override
-            public void onAudioStateChanged ( boolean state, AudioFile file, View animation ) {
+            public void onSelectStateChanged(int position, boolean state, BaseFile file, View animation) {
+//            }
+//
+//            @Override
+//            public void onAudioStateChanged ( boolean state, AudioFile file, View animation ) {
                 if (state) {
-                    mSelectedList.add(file);
+                    mSelectedList.add((AudioFile) file);
                     mCurrentNumber++;
                     animation.setAlpha ( 1f );
                     AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground ();
@@ -113,8 +114,8 @@ public class AudioPickActivity extends BaseActivity {
                 tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
             }
 
-            @Override
-            public void onFileStateChanged ( boolean state , AudioFile file,View animation ) { }
+//            @Override
+//            public void onFileStateChanged ( boolean state , AudioFile file,View animation ) { }
 
         });
 
@@ -140,13 +141,13 @@ public class AudioPickActivity extends BaseActivity {
                 tv_folder.setText(directory.getName());
 
                 if (TextUtils.isEmpty(directory.getPath())) { //All
-                    refreshDirs(mAll);
+                    refreshAudioDirs(mAll);
                 } else {
                     for (Directory<AudioFile> dir : mAll) {
                         if (dir.getPath().equals(directory.getPath())) {
                             List<Directory<AudioFile>> list = new ArrayList<>();
                             list.add(dir);
-                            refreshDirs(list);
+                            refreshAudioDirs(list);
                             break;
                         }
                     }
@@ -168,7 +169,8 @@ public class AudioPickActivity extends BaseActivity {
         }
     }
 
-    private void loadData() {
+    @Override
+    protected void loadData(int t, String... suffix) {
         FileFilterx.getAudios(this, new FilterResultCallback<AudioFile>() {
             @Override
             public void onResult(List<Directory<AudioFile>> directories) {
@@ -184,7 +186,7 @@ public class AudioPickActivity extends BaseActivity {
 
                 mAll = directories;
                 try {
-                    refreshDirs(directories);
+                    refreshAudioDirs(directories);
                 } catch (GeneralSecurityException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -196,7 +198,7 @@ public class AudioPickActivity extends BaseActivity {
         });
     }
 
-    private void refreshDirs(List<Directory<AudioFile>> directories) throws GeneralSecurityException, IOException, SemanticException {
+    private void refreshAudioDirs(List<Directory<AudioFile>> directories) throws GeneralSecurityException, IOException, SemanticException {
         boolean tryToFindTaken = isTakenAutoSelected;
 
         // if auto-select taken file is enabled, make sure requirements are met
@@ -248,7 +250,7 @@ public class AudioPickActivity extends BaseActivity {
                     if (data.getData() != null) {
                         mAudioPath = data.getData().getPath();
                     }
-                    loadData();
+                    loadData(0); // 0 is ignored by overriding method, to be merged to base class
                 }
                 break;
         }

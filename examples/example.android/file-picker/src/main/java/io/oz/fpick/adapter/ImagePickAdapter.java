@@ -41,7 +41,7 @@ import io.oz.jserv.docsync.SyncFlag;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
-    public String mFilepath;
+    // public String mFilepath;
     public Uri mImageUri;
 
     public ImagePickAdapter(Context ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
@@ -194,7 +194,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 }
 
                 if ( mListener != null ) {
-                    mListener.OnSelectStateChanged ( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
+                    mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
                 }
             });
         }

@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 import com.vincent.filepicker.adapter.FolderListAdapter;
-import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.Directory;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.VideoPickAdapter;
 import io.oz.fpick.filter.FileFilterx;
 
@@ -44,7 +44,6 @@ import io.oz.fpick.filter.FileFilterx;
 
 public class VideoPickActivity extends BaseActivity {
     public static final String THUMBNAIL_PATH = "FilePick";
-    public static final String IS_NEED_CAMERA = "IsNeedCamera";
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
 
     public static final int DEFAULT_MAX_NUMBER = 9;
@@ -65,10 +64,10 @@ public class VideoPickActivity extends BaseActivity {
     private RelativeLayout rl_done;
     private RelativeLayout tb_pick;
 
-    @Override
-    void permissionGranted() {
-        loadData();
-    }
+//    @Override
+//    void permissionGranted() {
+//        loadData();
+//    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,36 +89,36 @@ public class VideoPickActivity extends BaseActivity {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
 
-        mAdapter = new VideoPickAdapter(this, isNeedCamera, mMaxNumber);
+        // mAdapter = new VideoPickAdapter(this, isNeedCamera, mMaxNumber);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.selectListener(new OnSelectStateListener<VideoFile>() {
-
-            @Override
-            public void OnSelectStateChanged (int position, boolean state , VideoFile file , View animation ) {
-                if (state) {
-                    mSelectedList.add(file);
-                    mCurrentNumber++;
-                    animation.setAlpha ( 1f );
-                    animation.setVisibility ( View.VISIBLE );
-
-                    AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground ( );
-                    animationDrawable.start ();
-                } else {
-                    mSelectedList.remove(file);
-                    mCurrentNumber--;
-                    animation.setAlpha ( 0f );
-                    animation.setVisibility ( View.GONE );
-                }
-                tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-            }
-
-            @Override
-            public void onAudioStateChanged ( boolean state, VideoFile file, View animation ) { }
-
-            @Override
-            public void onFileStateChanged ( boolean state, VideoFile file, View animation ) { }
-        } );
+//        mAdapter.selectListener(new OnSelectStateListener<VideoFile>() {
+//
+//            @Override
+//            public void OnSelectStateChanged (int position, boolean state , VideoFile file , View animation ) {
+//                if (state) {
+//                    mSelectedList.add(file);
+//                    mCurrentNumber++;
+//                    animation.setAlpha ( 1f );
+//                    animation.setVisibility ( View.VISIBLE );
+//
+//                    AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground ( );
+//                    animationDrawable.start ();
+//                } else {
+//                    mSelectedList.remove(file);
+//                    mCurrentNumber--;
+//                    animation.setAlpha ( 0f );
+//                    animation.setVisibility ( View.GONE );
+//                }
+//                tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
+//            }
+//
+//            @Override
+//            public void onAudioStateChanged ( boolean state, VideoFile file, View animation ) { }
+//
+//            @Override
+//            public void onFileStateChanged ( boolean state, VideoFile file, View animation ) { }
+//        } );
 
         mProgressBar = (ProgressBar) findViewById(R.id.pb_video_pick);
         File folder = new File(getExternalCacheDir().getAbsolutePath() + File.separator + THUMBNAIL_PATH);
@@ -161,13 +160,13 @@ public class VideoPickActivity extends BaseActivity {
                     tv_folder.setText(directory.getName());
 
                     if (TextUtils.isEmpty(directory.getPath())) { //All
-                        refreshDirs(mAll);
+                        refreshVideoDirs(mAll);
                     } else {
                         for (Directory<VideoFile> dir : mAll) {
                             if (dir.getPath().equals(directory.getPath())) {
                                 List<Directory<VideoFile>> list = new ArrayList<>();
                                 list.add(dir);
-                                refreshDirs(list);
+                                refreshVideoDirs(list);
                                 break;
                             }
                         }
@@ -211,12 +210,12 @@ public class VideoPickActivity extends BaseActivity {
                 }
 
                 mAll = directories;
-                refreshDirs(directories);
+                refreshVideoDirs(directories);
             }
         });
     }
 
-    private void refreshDirs(List<Directory<VideoFile>> directories) {
+    private void refreshVideoDirs(List<Directory<VideoFile>> directories) {
         boolean tryToFindTaken = isTakenAutoSelected;
 
         // if auto-select taken file is enabled, make sure requirements are met

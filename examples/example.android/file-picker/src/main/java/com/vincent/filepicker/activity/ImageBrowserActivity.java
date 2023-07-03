@@ -12,7 +12,6 @@ import com.bm.library.PhotoView;
 import com.bumptech.glide.Glide;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.ToastUtil;
-import com.vincent.filepicker.filter.FileFilter;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.ImageFile;
@@ -29,6 +28,8 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
+import io.oz.fpick.filter.FileFilterx;
 
 /**
  * Created by Vincent Woo
@@ -50,10 +51,10 @@ public class ImageBrowserActivity extends BaseActivity {
     private ImageView mSelectView;
     private ArrayList<ImageFile> mSelectedFiles;
 
-    @Override
-    void permissionGranted() {
-        loadData();
-    }
+//    @Override
+//    void permissionGranted() {
+//        loadData();
+//    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -131,7 +132,7 @@ public class ImageBrowserActivity extends BaseActivity {
     }
 
     private void loadData() {
-        FileFilter.getImages(this, new FilterResultCallback<ImageFile>() {
+        FileFilterx.getImages(this, new FilterResultCallback<ImageFile>() {
             @Override
             public void onResult(List<Directory<ImageFile>> directories) {
                 mList.clear();
