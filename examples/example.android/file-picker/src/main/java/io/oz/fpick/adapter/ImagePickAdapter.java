@@ -1,3 +1,9 @@
+/**
+ * Created by Ody Zhou
+ * Date: 15 Feb. 2022
+ *
+ * Credits to Vincent Woo
+ */
 package io.oz.fpick.adapter;
 
 import android.content.Context;
@@ -34,13 +40,6 @@ import io.oz.jserv.docsync.SyncFlag;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
-/**
- * Created by Ody Zhou
- * Date: 15 Feb. 2022
- *
- * Credits to Vincent Woo
- */
-
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
     public String mFilepath;
     public Uri mImageUri;
@@ -58,7 +57,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
     @NonNull
     @Override
     public ImagePickViewHolder onCreateViewHolder (@NonNull ViewGroup parent, int viewType ) {
-        View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick , parent , false );
+        View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick, parent, false );
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
             WindowManager wm = (WindowManager) mContext.getSystemService ( Context.WINDOW_SERVICE );
@@ -164,25 +163,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             }
 
             holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                Uri uri;
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                    File f = new File(file.getPath());
-//                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
-//                }
-//                else {
-//                    uri = Uri.parse("file://" + file.getPath());
-//                }
-//                // intent.setDataAndType(uri, "video/mp4");
-//                intent.setDataAndType(uri, "image/*");
-//                if (Util.detectIntent(mContext, intent)) {
-//                    mContext.startActivity(intent);
-//                }
-//                else {
-//                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
-//                }
-//                return false;
                 return startMediaViewer(mContext, view, "image/*", file.getPath());
             });
 
@@ -218,7 +198,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 }
             });
         }
-
     }
 
     @Override

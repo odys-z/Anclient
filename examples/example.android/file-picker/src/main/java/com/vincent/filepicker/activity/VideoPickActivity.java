@@ -20,6 +20,7 @@ import com.vincent.filepicker.DividerGridItemDecoration;
 import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
+import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
@@ -92,7 +93,7 @@ public class VideoPickActivity extends BaseActivity {
         mAdapter = new VideoPickAdapter(this, isNeedCamera, mMaxNumber);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnSelectStateListener (new OnSelectStateListener<VideoFile>() {
+        mAdapter.selectListener(new OnSelectStateListener<VideoFile>() {
 
             @Override
             public void OnSelectStateChanged (int position, boolean state , VideoFile file , View animation ) {
@@ -160,13 +161,13 @@ public class VideoPickActivity extends BaseActivity {
                     tv_folder.setText(directory.getName());
 
                     if (TextUtils.isEmpty(directory.getPath())) { //All
-                        refreshData(mAll);
+                        refreshDirs(mAll);
                     } else {
                         for (Directory<VideoFile> dir : mAll) {
                             if (dir.getPath().equals(directory.getPath())) {
                                 List<Directory<VideoFile>> list = new ArrayList<>();
                                 list.add(dir);
-                                refreshData(list);
+                                refreshDirs(list);
                                 break;
                             }
                         }
@@ -210,12 +211,12 @@ public class VideoPickActivity extends BaseActivity {
                 }
 
                 mAll = directories;
-                refreshData(directories);
+                refreshDirs(directories);
             }
         });
     }
 
-    private void refreshData(List<Directory<VideoFile>> directories) {
+    private void refreshDirs(List<Directory<VideoFile>> directories) {
         boolean tryToFindTaken = isTakenAutoSelected;
 
         // if auto-select taken file is enabled, make sure requirements are met
@@ -224,7 +225,7 @@ public class VideoPickActivity extends BaseActivity {
             tryToFindTaken = !mAdapter.isUpToMax() && takenFile.exists(); // try to select taken file only if max isn't reached and the file exists
         }
 
-        List<VideoFile> list = new ArrayList<>();
+        List<BaseFile> list = new ArrayList<>();
         for (Directory<VideoFile> directory : directories) {
             list.addAll(directory.getFiles());
 

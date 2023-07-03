@@ -1,15 +1,14 @@
 package com.vincent.filepicker.activity;
 
+import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_IMAGE;
+
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,6 +17,7 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
+import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
@@ -56,8 +56,11 @@ public class ImagePickActivity extends BaseActivity {
     private boolean isNeedCamera;
     private boolean isNeedImagePager;
     private boolean isTakenAutoSelected;
+
+    /** what if type of ArrayList<BaseFile> ? */
     public ArrayList<ImageFile> mSelectedList = new ArrayList<>();
-    private List<Directory<ImageFile>> mAll;
+    // private List<Directory<ImageFile>> mAll;
+    private List<Directory<BaseFile>> mAll;
 
     private TextView tv_count;
     private TextView tv_folder;
@@ -65,9 +68,12 @@ public class ImagePickActivity extends BaseActivity {
     private RelativeLayout rl_done;
     private RelativeLayout tb_pick;
 
+
+    private FileFilterx filefilter;
+
     @Override
     void permissionGranted() {
-        loadData();
+        loadData(TYPE_IMAGE);
     }
 
     @Override
@@ -96,7 +102,7 @@ public class ImagePickActivity extends BaseActivity {
         mAdapter = new ImagePickAdapter(this, isNeedCamera, isNeedImagePager, mMaxNumber);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnSelectStateListener (new OnSelectStateListener<ImageFile>() {
+        mAdapter.selectListener(new OnSelectStateListener<ImageFile>() {
 
             @Override
             public void OnSelectStateChanged (int position, boolean state , ImageFile file , View animation ) {
@@ -175,13 +181,13 @@ public class ImagePickActivity extends BaseActivity {
                     tv_folder.setText(directory.getName());
 
                     if (TextUtils.isEmpty(directory.getPath())) { //All
-                        refreshData(mAll);
+                        refreshDirs(mAll);
                     } else {
-                        for (Directory<ImageFile> dir : mAll) {
+                        for (Directory<BaseFile> dir : mAll) {
                             if (dir.getPath().equals(directory.getPath())) {
-                                List<Directory<ImageFile>> list = new ArrayList<>();
+                                List<Directory<BaseFile>> list = new ArrayList<>();
                                 list.add(dir);
-                                refreshData(list);
+                                refreshDirs(list);
                                 break;
                             }
                         }
@@ -191,46 +197,47 @@ public class ImagePickActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case Constant.REQUEST_CODE_TAKE_IMAGE:
-                if (resultCode == RESULT_OK) {
-                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    File file = new File(mAdapter.mFilepath);
-                    Uri contentUri = Uri.fromFile(file);
-                    mediaScanIntent.setData(contentUri);
-                    sendBroadcast(mediaScanIntent);
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch (requestCode) {
+//            case Constant.REQUEST_CODE_TAKE_IMAGE:
+//                if (resultCode == RESULT_OK) {
+//                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//                    File file = new File(mAdapter.mFilepath);
+//                    Uri contentUri = Uri.fromFile(file);
+//                    mediaScanIntent.setData(contentUri);
+//                    sendBroadcast(mediaScanIntent);
+//
+//                    loadData();
+//                } else {
+//                    //Delete the record in Media DB, when user select "Cancel" during take picture
+//                    getApplicationContext().getContentResolver().delete(mAdapter.mImageUri, null, null);
+//                }
+//                break;
+//            case Constant.REQUEST_CODE_BROWSER_IMAGE:
+//                if (resultCode == RESULT_OK) {
+//                    ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_BROWSER_IMAGE);
+//                    mCurrentNumber = list.size();
+//                    mAdapter.setCurrentNumber(mCurrentNumber);
+//                    tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
+//                    mSelectedList.clear();
+//                    mSelectedList.addAll(list);
+//
+//                    for (ImageFile file : mAdapter.getDataSet()) {
+//                        if (mSelectedList.contains(file)) {
+//                            file.setSelected(true);
+//                        } else {
+//                            file.setSelected(false);
+//                        }
+//                    }
+//                    mAdapter.notifyDataSetChanged();
+//                }
+//                break;
+//        }
+//    }
 
-                    loadData();
-                } else {
-                    //Delete the record in Media DB, when user select "Cancel" during take picture
-                    getApplicationContext().getContentResolver().delete(mAdapter.mImageUri, null, null);
-                }
-                break;
-            case Constant.REQUEST_CODE_BROWSER_IMAGE:
-                if (resultCode == RESULT_OK) {
-                    ArrayList<ImageFile> list = data.getParcelableArrayListExtra(Constant.RESULT_BROWSER_IMAGE);
-                    mCurrentNumber = list.size();
-                    mAdapter.setCurrentNumber(mCurrentNumber);
-                    tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-                    mSelectedList.clear();
-                    mSelectedList.addAll(list);
-
-                    for (ImageFile file : mAdapter.getDataSet()) {
-                        if (mSelectedList.contains(file)) {
-                            file.setSelected(true);
-                        } else {
-                            file.setSelected(false);
-                        }
-                    }
-                    mAdapter.notifyDataSetChanged();
-                }
-                break;
-        }
-    }
-
+    /*
     private void loadData() {
         FileFilterx.getImages(this, directories -> {
             // Refresh folder list
@@ -244,11 +251,30 @@ public class ImagePickActivity extends BaseActivity {
             }
 
             mAll = directories;
-            refreshData(directories);
+            refreshDirs(directories);
         });
     }
+    */
+    protected void loadData(int t, String... suffix) {
+        if (filefilter == null)
+            filefilter = new FileFilterx(t, directories -> {
+                // Refresh folder list
+                if (isNeedFolderList) {
+                    ArrayList<Directory> list = new ArrayList<>();
+                    Directory all = new Directory();
+                    all.setName(getResources().getString(R.string.vw_all));
+                    list.add(all);
+                    list.addAll(directories);
+                    mFolderHelper.fillData(list);
+                }
 
-    private void refreshData(List<Directory<ImageFile>> directories) {
+                mAll = directories;
+                refreshDirs(directories);
+            });
+        filefilter.filter(this, suffix);
+    }
+
+    private void refreshDirs(List<Directory<BaseFile>> directories) {
         boolean tryToFindTakenImage = isTakenAutoSelected;
 
         // if auto-select taken image is enabled, make sure requirements are met
@@ -257,13 +283,15 @@ public class ImagePickActivity extends BaseActivity {
             tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists(); // try to select taken image only if max isn't reached and the file exists
         }
 
-        List<ImageFile> list = new ArrayList<>();
-        for (Directory<ImageFile> directory : directories) {
-            list.addAll(directory.getFiles());
+        List<BaseFile> list = new ArrayList<>();
+        for (Directory<BaseFile> directory : directories) {
+            List<BaseFile> l = directory.getFiles();
+            list.addAll(l);
 
             // auto-select taken images?
             if (tryToFindTakenImage) {
-                findAndAddTakenImage(directory.getFiles());   // if taken image was found, we're done
+                // findAndAddTakenImage(directory.getFiles());   // if taken image was found, we're done
+                findAndAddTakenImage(l);
             }
         }
 
@@ -277,10 +305,10 @@ public class ImagePickActivity extends BaseActivity {
         mAdapter.refresh(list);
     }
 
-    private boolean findAndAddTakenImage(List<ImageFile> list) {
-        for (ImageFile imageFile : list) {
+    private boolean findAndAddTakenImage(List<BaseFile> list) {
+        for (BaseFile imageFile : list) {
             if (imageFile.getPath().equals(mAdapter.mFilepath)) {
-                mSelectedList.add(imageFile);
+                mSelectedList.add((ImageFile) imageFile);
                 mCurrentNumber++;
                 mAdapter.setCurrentNumber(mCurrentNumber);
                 tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
@@ -290,12 +318,4 @@ public class ImagePickActivity extends BaseActivity {
         }
         return false;    // taken image wasn't found
     }
-
-//    private void refreshSelectedList(List<ImageFile> list) {
-//        for (ImageFile file : list) {
-//            if(file.isSelected() && !mSelectedList.contains(file)) {
-//                mSelectedList.add(file);
-//            }
-//        }
-//    }
 }

@@ -11,7 +11,7 @@ import java.util.List;
  * Time: 17:31
  */
 
-public class Directory<T> {
+public class Directory<T extends BaseFile> {
     private String id;
     private String name;
     private String path;

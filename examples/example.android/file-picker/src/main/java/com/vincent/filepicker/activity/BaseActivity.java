@@ -39,6 +39,7 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
 
     abstract void permissionGranted();
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 
 import androidx.core.content.FileProvider;
@@ -21,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -79,10 +79,15 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     public List<T> getDataSet() { return mList; }
 
+    /**
+     * Add file list to my list, then start asynchronized matching.
+     * My list is used for feeding item holder used for buffered rendering (by Glide).
+     * @param list
+     */
     @SuppressLint("NotifyDataSetChanged")
-    public void refresh(List<T> list) {
+    public void refresh(List<BaseFile> list) {
         mList.clear();
-        mList.addAll(list);
+        mList.addAll((Collection<? extends T>) list); // why this with performance cost?
         notifyDataSetChanged();
 
         synchPage = new PathsPage(0, Math.min(20, mList.size()));
@@ -153,7 +158,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         });
     }
 
-    public void setOnSelectStateListener(OnSelectStateListener<T> listener) {
+    public void selectListener(OnSelectStateListener<T> listener) {
         mListener = listener;
     }
 

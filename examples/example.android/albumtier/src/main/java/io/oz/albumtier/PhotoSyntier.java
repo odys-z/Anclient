@@ -200,9 +200,8 @@ public class PhotoSyntier extends Synclientier {
 			throws TransException, IOException {
 
 		SessionInf user = client.ssInfo();
-
-       DocsResp resp0 = null;
-       DocsResp respi = null;
+		DocsResp resp0 = null;
+		DocsResp respi = null;
 
 		String[] act = AnsonHeader.usrAct("synclient.java", "sync", "c/sync", "push blocks");
 		AnsonHeader header = client.header().act(act);

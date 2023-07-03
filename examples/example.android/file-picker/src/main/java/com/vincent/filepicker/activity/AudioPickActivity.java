@@ -20,6 +20,7 @@ import com.vincent.filepicker.Util;
 import com.vincent.filepicker.adapter.OnSelectStateListener;
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.AudioFile;
+import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.Directory;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public class AudioPickActivity extends BaseActivity {
         mAdapter = new AudioPickAdapter(this, mMaxNumber);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnSelectStateListener(new OnSelectStateListener<AudioFile>() {
+        mAdapter.selectListener(new OnSelectStateListener<AudioFile>() {
             @Override
             public void OnSelectStateChanged (int position, boolean state , AudioFile file , View animation ) { }
 
@@ -139,13 +140,13 @@ public class AudioPickActivity extends BaseActivity {
                 tv_folder.setText(directory.getName());
 
                 if (TextUtils.isEmpty(directory.getPath())) { //All
-                    refreshData(mAll);
+                    refreshDirs(mAll);
                 } else {
                     for (Directory<AudioFile> dir : mAll) {
                         if (dir.getPath().equals(directory.getPath())) {
                             List<Directory<AudioFile>> list = new ArrayList<>();
                             list.add(dir);
-                            refreshData(list);
+                            refreshDirs(list);
                             break;
                         }
                     }
@@ -183,7 +184,7 @@ public class AudioPickActivity extends BaseActivity {
 
                 mAll = directories;
                 try {
-                    refreshData(directories);
+                    refreshDirs(directories);
                 } catch (GeneralSecurityException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -195,7 +196,7 @@ public class AudioPickActivity extends BaseActivity {
         });
     }
 
-    private void refreshData(List<Directory<AudioFile>> directories) throws GeneralSecurityException, IOException, SemanticException {
+    private void refreshDirs(List<Directory<AudioFile>> directories) throws GeneralSecurityException, IOException, SemanticException {
         boolean tryToFindTaken = isTakenAutoSelected;
 
         // if auto-select taken file is enabled, make sure requirements are met
@@ -204,7 +205,7 @@ public class AudioPickActivity extends BaseActivity {
             tryToFindTaken = !mAdapter.isUpToMax() && takenFile.exists(); // try to select taken file only if max isn't reached and the file exists
         }
 
-        List<AudioFile> list = new ArrayList<>();
+        List<BaseFile> list = new ArrayList<>();
         for (Directory<AudioFile> directory : directories) {
             list.addAll(directory.getFiles());
 
