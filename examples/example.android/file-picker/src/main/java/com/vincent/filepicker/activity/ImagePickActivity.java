@@ -184,10 +184,10 @@ public class ImagePickActivity extends BaseActivity {
 //        }
     }
 
-    @Override
-    protected void refreshDirs(List<Directory<BaseFile>> directories) {
-        super.refreshDirs(directories);
-    }
+//    @Override
+//    protected void refreshDirs(List<Directory<BaseFile>> directories) {
+//        super.refreshDirs(directories);
+//    }
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {

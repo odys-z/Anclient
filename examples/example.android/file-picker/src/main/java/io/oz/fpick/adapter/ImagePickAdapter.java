@@ -41,7 +41,6 @@ import io.oz.jserv.docsync.SyncFlag;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
-    // public String mFilepath;
     public Uri mImageUri;
 
     public ImagePickAdapter(Context ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
@@ -68,7 +67,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             params.height = width / ImagePickActivity.COLUMN_NUMBER;
         }
         ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
-        imagePickViewHolder.setIsRecyclable ( false );
+        imagePickViewHolder.setIsRecyclable ( true );
 
         return imagePickViewHolder;
     }

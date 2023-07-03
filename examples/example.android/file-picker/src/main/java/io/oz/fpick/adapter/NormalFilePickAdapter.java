@@ -47,7 +47,7 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
     public NormalFilePickViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.vw_layout_item_normal_file_pick, parent, false);
         NormalFilePickViewHolder holder = new NormalFilePickViewHolder ( itemView );
-        holder.setIsRecyclable ( false );
+        holder.setIsRecyclable ( true );
         return holder;
     }
 
