@@ -141,7 +141,8 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
             Directory<ImageFile> directory = new Directory<>();
             directory.setId(img.getLocalDirId());
             directory.setName(img.getLocalDirName());
-            directory.setPath(img.fullpath());
+            // directory.setPath(img.fullpath());
+            directory.setPath(img.path());
 
             if (!directories.contains(directory)) {
                 directory.addFile(img);
