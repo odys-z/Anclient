@@ -36,6 +36,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
 import io.oz.jserv.docsync.SyncFlag;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
@@ -43,11 +44,11 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
     public Uri mImageUri;
 
-    public ImagePickAdapter(Context ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
+    public ImagePickAdapter(ImagePickActivity ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
         this ( ctx, new ArrayList<ImageFile> ( ), needCamera , isNeedImagePager , max );
     }
 
-    public ImagePickAdapter(Context ctx, ArrayList<ImageFile> list, boolean needCamera, boolean needImagePager , int max ) {
+    public ImagePickAdapter(BaseActivity ctx, ArrayList<ImageFile> list, boolean needCamera, boolean needImagePager , int max ) {
         super ( ctx , list );
         isNeedCamera = needCamera;
         mMaxNumber = max;

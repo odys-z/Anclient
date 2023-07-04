@@ -78,6 +78,8 @@ public class ImagePickActivity extends BaseActivity {
         // isTakenAutoSelected = intt.getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
         // pickmode = (PickingMode) intt.getSerializableExtra(Constant.PickingMode);
 
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+        mSuffix = new String[] {"avif", "bmp", "gif", "ico", "jpeg", "jpg", "png", "svg", "tif", "tiff", "webp"};
         initView();
     }
 

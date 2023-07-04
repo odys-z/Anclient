@@ -21,6 +21,7 @@ import com.vincent.filepicker.filter.entity.AudioFile;
 import java.util.ArrayList;
 
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
 import io.oz.jserv.docsync.SyncFlag;
 
 /**
@@ -30,7 +31,7 @@ import io.oz.jserv.docsync.SyncFlag;
  * Credits to Vincent Woo
  */
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
-    public AudioPickAdapter(Context ctx, ArrayList<AudioFile> list, int max) {
+    public AudioPickAdapter(BaseActivity ctx, ArrayList<AudioFile> list, int max) {
         super(ctx, list);
         mMaxNumber = max;
     }

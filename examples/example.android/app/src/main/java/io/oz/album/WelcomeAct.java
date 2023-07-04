@@ -2,7 +2,10 @@ package io.oz.album;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -361,7 +364,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 //        audPickActStarter.launch(imgIntent);
 //    }
 
-    protected void startPicking(Class<? extends BaseActivity> act, String ... suffices) {
+    protected void startPicking(Class<? extends BaseActivity> act) {
         clearMsg();
 
         Intent imgIntent = new Intent(this, act);
@@ -371,8 +374,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         imgIntent.putExtra( Constant.PickingMode,
                 singl.state() == AlbumContext.ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99 );
-        if (!isNull(suffices))
-            imgIntent.putExtra(SUFFIX, suffices);
+//        if (!isNull(suffices))
+//            imgIntent.putExtra(SUFFIX, suffices);
 
         pickActStarter.launch(imgIntent);
     }
@@ -404,6 +407,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 startPicking(AudioPickActivity.class);
                 break;
             case R.id.btn_pick_file:
+                // startPicking(NormalFilePickActivity.class);
                 /*
                 Intent intent4 = new Intent(this, NormalFilePickActivity.class);
                 intent4.putExtra(Constant.MAX_NUMBER, 9);
@@ -412,8 +416,23 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         new String[] {"xlsx", "xls", "doc", "dOcX", "ppt", ".pptx", "pdf"});
                 startActivityForResult(intent4, Constant.REQUEST_CODE_PICK_FILE);
                  */
-                startPicking(NormalFilePickActivity.class,
-                        new String[] {"xlsx", "xls", "doc", "docx", "ppt", ".pptx", "pdf", "txt", "csv", "zip", "7z", "rar"});
+                //
+                Intent intent;
+                if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                    intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                } else {
+                    intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+                }
+                //  In this example we will set the type to video
+                intent.setType("application/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.putExtra("return-data", true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                }
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                // activityResultLauncher.launch(intent);
+                pickActStarter.launch(intent);
                 break;
         }
     }

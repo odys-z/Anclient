@@ -162,3 +162,112 @@ In histogram.jsx:
 ..
 
 These 2 steps should solve the problem.
+
+Query Android PDF / Office Files Results Empty
+----------------------------------------------
+
+About the issue
+_______________
+
+On Android 10, API lever 29 (Q) or lower, CursorLoader#on won't get any files
+because of the Scoped Storage natural.
+
+CursorLoader:
+
+.. code-block:: java
+
+    public class FileLoader extends CursorLoader {
+
+        public FileLoader(Context context) {
+            super(context);
+            setProjection(FILE_PROJECTION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                setUri(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL));
+            else
+                setUri(MediaStore.Files.getContentUri("external"));
+
+            setSortOrder(MediaStore.Files.FileColumns.DATE_ADDED + " DESC");
+        }
+    }
+..
+
+Usage (with performance issue):
+
+.. code-block:: java
+
+    filefilter = new FileFilterx(t, directories -> {
+        if (isNeedFolderList) {
+            ArrayList<Directory> list = new ArrayList<>();
+            Directory all = new Directory();
+            all.setName(getResources().getString(R.string.vw_all));
+            list.add(all);
+            list.addAll(directories);
+            mFolderHelper.fillData(list);
+        }
+        loadirs(directories); // parse files, can't find files other than medias
+    });
+    filefilter.filter(this, suffix);
+..
+
+Reference:
+
+[1] `Data and file storage overview, DOCUMENTATION at developers <https://developer.android.com/training/data-storage>`_ ,
+
+[2]  Android API Level and Cumulative Usage, `apilevels.com <https://apilevels.com>`_
+
+[3] Grant access to a directory's contents, Access documents and other files from shared storage
+    `DOCUMENTATION at developers <https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory>`_
+
+[4] `Android Developers, Storage access with Android 11, Youtube <https://www.youtube.com/watch?v=RjyYCUW-9tY>`_
+
+[5] `HBiSoft, PickiT <https://github.com/HBiSoft/PickiT>`_
+
+[6] `An up-voted answers <https://stackoverflow.com/a/71260711>`_
+
+[7] `Answer for Android 11 <https://stackoverflow.com/a/70562311>`_
+
+Decision
+________
+
+Let users pick local files then match the results with pushed records.
+
+Sample App: `PickiT <https://github.com/HBiSoft/PickiT>`_
+
+.. image:: ./imgs/02-pickit-mime of application.png
+..
+
+What's next
+___________
+
+Try on Android 11.
+
+See [4], [6] & [7].
+
+Code snipet of [6]:
+
+.. code-block:: java
+
+    List<String> getPdfList(
+            Uri collection,         // MediaStore.Downloads.getContentUri("external")
+            String[] projection,    // result list's columes index
+            String selection,       // mime of pdf
+            String[] selectionArgs, // mime
+            String sortOrder) {
+
+        List<String> pdfList = new ArrayList<>();
+
+        try (Cursor cursor = getContentResolver().query(collection, projection, selection, selectionArgs, sortOrder)) {
+            assert cursor != null;
+
+            if (cursor.moveToFirst()) {
+                int columnData = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+                do {
+                    pdfList.add((cursor.getString(columnData)));
+                    Log.d(TAG, "getPdf: " + cursor.getString(columnData));
+                    //you can get your pdf files
+                } while (cursor.moveToNext());
+            }
+        }
+        return pdfList;
+    }
+..

@@ -1,7 +1,5 @@
 package io.oz.fpick.activity;
 
-import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_IMAGE;
-
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -9,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +43,8 @@ import pub.devrel.easypermissions.EasyPermissions;
  * Credits by Vincent Woo
  */
 
-public abstract class BaseActivity extends FragmentActivity implements EasyPermissions.PermissionCallbacks, JProtocol.OnError {
+public abstract class BaseActivity extends FragmentActivity
+        implements EasyPermissions.PermissionCallbacks, JProtocol.OnError, IProgressBarAct {
 
     public interface OnSelectStateListener {
         void onSelectStateChanged(int position, boolean state, BaseFile file, View animation );
@@ -64,7 +64,7 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
     public ArrayList<BaseFile> mSelectedList = new ArrayList<>();
     private BaseSynchronizer mAdapter;
     /** file pattern */
-    private String[] mSuffix;
+    protected String[] mSuffix;
     protected FileFilterx filefilter;
     protected List<Directory<BaseFile>> mAll;
     protected boolean isTakenAutoSelected;
@@ -79,8 +79,8 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
     private RelativeLayout rl_done;
     private RelativeLayout tb_pick;
 
-    protected void linkAdapter(int atype, BaseSynchronizer adapter) {
-        this.fileType = atype;
+    protected void linkAdapter(int adaptye, BaseSynchronizer adapter) {
+        this.fileType = adaptye;
         tv_count = findViewById(R.id.tv_count);
         tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
 
@@ -138,28 +138,24 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
             tv_folder = (TextView) findViewById(R.id.tv_folder);
             tv_folder.setText(getResources().getString(R.string.vw_all));
 
-            mFolderHelper.setFolderListListener(new FolderListAdapter.FolderListListener() {
-                @Override
-                public void onFolderListClick(Directory directory) {
-                    mFolderHelper.toggle(tb_pick);
-                    tv_folder.setText(directory.getName());
+            mFolderHelper.setFolderListListener(directory -> {
+                mFolderHelper.toggle(tb_pick);
+                tv_folder.setText(directory.getName());
 
-                    if (TextUtils.isEmpty(directory.getPath())) //All
-                        refreshDirs(mAll);
-                    else
-                        for (Directory<BaseFile> dir : mAll)
-                            if (dir.getPath().equals(directory.getPath())) {
-                                List<Directory<BaseFile>> list = new ArrayList<>();
-                                list.add(dir);
-                                refreshDirs(list);
-                                break;
-                            }
-                }
+                if (TextUtils.isEmpty(directory.getPath())) //All
+                    loadirs(mAll);
+                else
+                    for (Directory<BaseFile> dir : mAll)
+                        if (dir.getPath().equals(directory.getPath())) {
+                            List<Directory<BaseFile>> list = new ArrayList<>();
+                            list.add(dir);
+                            loadirs(list);
+                            break;
+                        }
             });
         }
     }
 
-    //    abstract void permissionGranted();
     void permissionGranted() {
         loadData(fileType, mSuffix);
     }
@@ -169,6 +165,7 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
             filefilter = new FileFilterx(t, directories -> {
                 // Refresh folder list
                 if (isNeedFolderList) {
+                    // FIXME performance issue
                     ArrayList<Directory> list = new ArrayList<>();
                     Directory all = new Directory();
                     all.setName(getResources().getString(R.string.vw_all));
@@ -178,18 +175,19 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
                 }
 
                 mAll = directories;
-                refreshDirs(directories);
+                loadirs(directories);
             });
         filefilter.filter(this, suffix);
     }
 
-    protected void refreshDirs(List<Directory<BaseFile>> directories) {
+    protected void loadirs(List<Directory<BaseFile>> directories) {
         boolean tryToFindTakenImage = isTakenAutoSelected;
 
         // if auto-selecting taken files is enabled, make sure requirements are met
         if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mFilepath)) {
             File takenImageFile = new File(mAdapter.mFilepath);
-            tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists(); // try to select taken image only if max isn't reached and the file exists
+            // try to select taken image only if max isn't reached and the file exists
+            tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists();
         }
 
         List<BaseFile> list = new ArrayList<>();
@@ -204,17 +202,17 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
             }
         }
 
-        // So that's why max number is 9?
+        // max number is limited
         for (BaseFile file : mSelectedList) {
             int index = list.indexOf(file);
             if (index != -1) {
                 list.get(index).setSelected(true);
             }
         }
-        mAdapter.refresh(list);
+        mAdapter.refreshSyncs(list);
     }
 
-    private boolean findAndAddTakenFiles(List<BaseFile> list) {
+    protected boolean findAndAddTakenFiles(List<BaseFile> list) {
         for (BaseFile imageFile : list) {
             if (imageFile.getPath().equals(mAdapter.mFilepath)) {
                 mSelectedList.add(imageFile);
@@ -227,6 +225,7 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
         }
         return false;    // taken image wasn't found
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -312,5 +311,17 @@ public abstract class BaseActivity extends FragmentActivity implements EasyPermi
             String m = String.format("Error: type: %s, args: %s", msg, args);
             Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
         } );
+    }
+
+    @Override
+    public void onStartingJserv(int of, int all) {
+        ProgressBar b = (ProgressBar) findViewById(R.id.pb_video_pick);
+        if (b != null) runOnUiThread(() -> b.setVisibility(View.VISIBLE));
+    }
+
+    @Override
+    public void onEndingJserv(String resName) {
+        ProgressBar b = (ProgressBar) findViewById(R.id.pb_video_pick);
+        if (b != null) runOnUiThread(() -> b.setVisibility(View.GONE));
     }
 }

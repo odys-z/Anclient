@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
@@ -49,7 +48,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         mCurrentNumber = number;
     }
 
-    protected Context mContext;
+    protected BaseActivity mContext;
     protected ArrayList<T> mList;
     protected BaseActivity.OnSelectStateListener mListener;
 
@@ -57,7 +56,11 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 
     protected PathsPage synchPage;
 
-    public BaseSynchronizer(Context ctx, ArrayList<T> list) {
+    /**
+     * @param ctx
+     * @param list resource list
+     */
+    public BaseSynchronizer(BaseActivity ctx, ArrayList<T> list) {
         this.singleton = AlbumContext.getInstance(null);
         mContext = ctx;
         mList = list;
@@ -92,7 +95,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
      * @param list
      */
     @SuppressLint("NotifyDataSetChanged")
-    public void refresh(List<BaseFile> list) {
+    public void refreshSyncs(List<BaseFile> list) {
         mList.clear();
         mList.addAll((Collection<? extends T>) list); // why this with performance cost?
         notifyDataSetChanged();
@@ -101,6 +104,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         synchPage.device = singleton.photoUser.device;
 
         try {
+            mContext.onStartingJserv(0, 1);
             if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
                 startSynchQuery(synchPage);
             else {
@@ -152,7 +156,9 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
                 synchPage.nextPage(Math.min(20, mList.size() - synchPage.end()));
                 startSynchQuery(synchPage);
             }
+            else mContext.onEndingJserv(null);
         }
+        else mContext.onEndingJserv(null);
     };
 
     void updateIcons(PathsPage synpage) {
@@ -169,10 +175,10 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         mListener = listener;
     }
 
-    private static final Random RANDOM = new Random();
-    public static int nextRandomInt() {
-        return RANDOM.nextInt(1024 * 1024);
-    }
+//    private static final Random RANDOM = new Random();
+//    public static int nextRandomInt() {
+//        return RANDOM.nextInt(1024 * 1024);
+//    }
 
     /**
      * @param view the file view - not used currently

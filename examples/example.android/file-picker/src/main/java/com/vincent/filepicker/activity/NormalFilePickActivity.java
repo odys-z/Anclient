@@ -36,7 +36,6 @@ public class NormalFilePickActivity extends BaseActivity {
     private ArrayList<NormalFile> mSelectedList = new ArrayList<>();
     private List<Directory<NormalFile>> mAll;
     private ProgressBar mProgressBar;
-    private String[] mSuffix;
 
 //    private TextView tv_count;
 //    private TextView tv_folder;
@@ -55,7 +54,8 @@ public class NormalFilePickActivity extends BaseActivity {
         setContentView(R.layout.vw_activity_file_pick);
 
         mMaxNumber = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
-        mSuffix = getIntent().getStringArrayExtra(SUFFIX);
+
+        mSuffix = new String[] {"xlsx", "xls", "doc", "docx", "ppt", "pptx", "pdf", "txt", "csv", "zip", "7z", "rar"};
         initView();
     }
 
@@ -70,8 +70,8 @@ public class NormalFilePickActivity extends BaseActivity {
                 LinearLayoutManager.VERTICAL, R.drawable.vw_divider_rv_file));
         // mAdapter = new NormalFilePickAdapter(this, mMaxNumber);
         NormalFilePickAdapter adapter = new NormalFilePickAdapter(this, mMaxNumber);
-        super.linkAdapter(TYPE_FILE, adapter);
-        mRecyclerView.setAdapter(mAdapter);
+        linkAdapter(TYPE_FILE, adapter);
+        mRecyclerView.setAdapter(adapter);
 
 //        mAdapter.setOnSelectStateListener(new OnSelectStateListener<NormalFile>() {
 //            @Override

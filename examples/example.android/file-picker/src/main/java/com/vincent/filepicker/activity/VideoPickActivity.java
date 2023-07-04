@@ -1,40 +1,33 @@
 package com.vincent.filepicker.activity;
 
-import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_IMAGE;
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_VIDEO;
 
-import android.content.Intent;
-import android.graphics.drawable.AnimationDrawable;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
-import com.vincent.filepicker.adapter.FolderListAdapter;
-import com.vincent.filepicker.filter.callback.FilterResultCallback;
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.Directory;
-import com.vincent.filepicker.filter.entity.VideoFile;
-
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
+import io.odysz.common.Utils;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.VideoPickAdapter;
-import io.oz.fpick.filter.FileFilterx;
 
 /**
  * Modified by Ody Zhou
@@ -72,6 +65,9 @@ public class VideoPickActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vw_activity_video_pick);
 
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+        mSuffix = new String[] {"avi", "mp4", "mpeg", "ogv", "ts", "webm", "3gp", "3g2"};
+
         mMaxNumber = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
         boolean isNeedCamera = getIntent().getBooleanExtra(IS_NEED_CAMERA, false);
         isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
@@ -84,9 +80,12 @@ public class VideoPickActivity extends BaseActivity {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
 
-        VideoPickAdapter mAdapter = new VideoPickAdapter(this, isNeedCamera, mMaxNumber);
-        mRecyclerView.setAdapter(mAdapter);
-        linkAdapter(TYPE_VIDEO, mAdapter);
+        VideoPickAdapter adapter = new VideoPickAdapter(this, isNeedCamera, mMaxNumber);
+        mRecyclerView.setAdapter(adapter);
+        linkAdapter(TYPE_VIDEO, adapter);
+
+//        copyFileToInternal(null);
+//        getPdfList();
 
 //        mAdapter.selectListener(new OnSelectStateListener<VideoFile>() {
 //
@@ -116,22 +115,22 @@ public class VideoPickActivity extends BaseActivity {
 //            public void onFileStateChanged ( boolean state, VideoFile file, View animation ) { }
 //        } );
 
-//        mProgressBar = (ProgressBar) findViewById(R.id.pb_video_pick);
-//        File folder = new File(getExternalCacheDir().getAbsolutePath() + File.separator + THUMBNAIL_PATH);
+//        mprogressbar = (progressbar) findviewbyid(r.id.pb_video_pick);
+//        file folder = new file(getexternalcachedir().getabsolutepath() + file.separator + thumbnail_path);
 //        if (!folder.exists()) {
-//            mProgressBar.setVisibility(View.VISIBLE);
+//            mprogressbar.setvisibility(view.visible);
 //        } else {
-//            mProgressBar.setVisibility(View.GONE);
+//            mprogressbar.setvisibility(view.gone);
 //        }
 
-//        rl_done = (RelativeLayout) findViewById(R.id.rl_done);
-//        rl_done.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent();
-//                // intent.putParcelableArrayListExtra(Constant.RESULT_PICK_VIDEO, mSelectedList);
-//                intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
-//                setResult(RESULT_OK, intent);
+//        rl_done = (relativelayout) findviewbyid(r.id.rl_done);
+//        rl_done.setonclicklistener(new view.onclicklistener() {
+//            @override
+//            public void onclick(view v) {
+//                intent intent = new intent();
+//                // intent.putparcelablearraylistextra(constant.result_pick_video, mselectedlist);
+//                intent.putparcelablearraylistextra(constant.result_abstract, mselectedlist);
+//                setresult(result_ok, intent);
 //                finish();
 //            }
 //        });
@@ -257,4 +256,83 @@ public class VideoPickActivity extends BaseActivity {
 //        }
 //        return false;    // taken file wasn't found
 //    }
+
+    private String copyFileToInternal(Uri fileUri) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Cursor cursor = getContentResolver().query(MediaStore.Files.getContentUri("external"), new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null);
+            while(cursor.moveToFirst()) {
+                String displayName = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+                long size = cursor.getLong(cursor.getColumnIndexOrThrow(OpenableColumns.SIZE));
+                Utils.logi("%s, %s", displayName, size);
+            }
+
+//            String displayName = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+//            long size = cursor.getLong(cursor.getColumnIndexOrThrow(OpenableColumns.SIZE));
+//
+//            File file = new File(getFilesDir() + "/" + displayName);
+//            try {
+//                FileOutputStream fileOutputStream = new FileOutputStream(file);
+//                InputStream inputStream = getContentResolver().openInputStream(fileUri);
+//                byte buffers[] = new byte[1024];
+//                int read;
+//                while ((read = inputStream.read(buffers)) != -1) {
+//                    fileOutputStream.write(buffers, 0, read);
+//                }
+//                inputStream.close();
+//                fileOutputStream.close();
+//                return file.getPath();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+        }
+        return null;
+    }
+
+    /**
+     * @deprecated  test only
+     *
+     * @return
+     */
+    protected ArrayList<String> getPdfList() {
+        ArrayList<String> pdfList = new ArrayList<>();
+        Uri collection;
+
+        final String[] projection = new String[]{
+                MediaStore.Files.FileColumns.DISPLAY_NAME,
+                MediaStore.Files.FileColumns.DATE_ADDED,
+                MediaStore.Files.FileColumns.DATA,
+                MediaStore.Files.FileColumns.MIME_TYPE,
+        };
+
+        final String sortOrder = MediaStore.Files.FileColumns.DATE_ADDED + " DESC";
+
+        final String selection = MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
+
+        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf");
+        final String[] selectionArgs = new String[]{mimeType};
+
+        int v = Build.VERSION_CODES.JELLY_BEAN_MR2; // can multiple select
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL);
+        }else{
+            collection = MediaStore.Files.getContentUri("external");
+        }
+
+
+        try (Cursor cursor = getContentResolver().query(collection, projection, selection, selectionArgs, sortOrder)) {
+            assert cursor != null;
+
+            if (cursor.moveToFirst()) {
+                int columnData = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+                int columnName = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
+                do {
+                    pdfList.add((cursor.getString(columnData)));
+                    Log.d("TAG", "getPdf: " + cursor.getString(columnData));
+                    //you can get your pdf files
+                } while (cursor.moveToNext());
+            }
+        }
+        return pdfList;
+    }
 }

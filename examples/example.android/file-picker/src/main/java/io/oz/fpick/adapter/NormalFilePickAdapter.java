@@ -20,11 +20,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
+import com.vincent.filepicker.activity.NormalFilePickActivity;
 import com.vincent.filepicker.filter.entity.NormalFile;
 
 import java.util.ArrayList;
 
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
 
 
 /**
@@ -34,11 +36,11 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
     private int mMaxNumber;
     private int mCurrentNumber = 0;
 
-    public NormalFilePickAdapter(Context ctx, int max) {
+    public NormalFilePickAdapter(NormalFilePickActivity ctx, int max) {
         this(ctx, new ArrayList<NormalFile>(), max);
     }
 
-    public NormalFilePickAdapter(Context ctx, ArrayList<NormalFile> list, int max) {
+    public NormalFilePickAdapter(BaseActivity ctx, ArrayList<NormalFile> list, int max) {
         super(ctx, list);
         mMaxNumber = max;
     }

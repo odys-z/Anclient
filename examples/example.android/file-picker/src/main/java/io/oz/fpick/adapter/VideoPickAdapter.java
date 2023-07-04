@@ -27,6 +27,7 @@ import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;
 
+import io.oz.fpick.activity.BaseActivity;
 import io.oz.jserv.docsync.SyncFlag;
 import io.oz.fpick.R;
 
@@ -38,18 +39,14 @@ import io.oz.fpick.R;
  */
 
 public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapter.VideoPickViewHolder> {
-//    private boolean isNeedCamera;
-//    private int mMaxNumber;
-//    private int mCurrentNumber = 0;
     public String mFilepath;
-
     public Uri mVideoUri;
 
-    public VideoPickAdapter(Context ctx, boolean needCamera, int max ) {
+    public VideoPickAdapter(BaseActivity ctx, boolean needCamera, int max ) {
         this ( ctx, new ArrayList<VideoFile> ( ), needCamera , max );
     }
 
-    public VideoPickAdapter(Context ctx, ArrayList<VideoFile> list, boolean needCamera, int max ) {
+    public VideoPickAdapter(BaseActivity ctx, ArrayList<VideoFile> list, boolean needCamera, int max ) {
         super ( ctx , list );
         isNeedCamera = needCamera;
         mMaxNumber = max;
@@ -95,12 +92,12 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
 
             RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
-                    .load ( file.getPath ( ) )
-                    .apply ( options.centerCrop ( ) )
-                    .transition ( withCrossFade ( ) )
-                    .into ( holder.mIvThumbnail );
+                .load ( file.fullpath() )
+                // .load ( file.getPath ( ) )
+                .apply ( options.centerCrop() )
+                .transition ( withCrossFade() )
+                .into ( holder.mIvThumbnail );
 
-            // if (file.synchFlag == BaseFile.Synchronizing) {
             if (SyncFlag.pushing.equals(file.syncFlag)) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
@@ -108,7 +105,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            // else if (file.synchFlag == BaseFile.Synchronized) {
             else if (SyncFlag.publish.equals(file.syncFlag)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
@@ -232,10 +228,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
             mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
         }
-    }
-
-    public boolean isUpToMax () {
-        return mCurrentNumber >= mMaxNumber;
     }
 
     public void setCurrentNumber ( int number ) {
