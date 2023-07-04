@@ -23,3 +23,7 @@ see [here](https://www.typescriptlang.org/download)
 Currently the source (MIT) is copied from [original repository](https://github.dev/neptunian/react-photo-gallery).
 
 Not using dependency of npm for resolving react version confliction. See [PR #205, 2022-1-5](https://github.com/neptunian/react-photo-gallery/pull/210).
+
+- PickiT
+
+Document picking inspired by [PickiT](https://github.com/HBiSoft/PickiT).
