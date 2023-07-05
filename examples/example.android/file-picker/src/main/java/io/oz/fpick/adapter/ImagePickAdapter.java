@@ -44,11 +44,11 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
     public Uri mImageUri;
 
-    public ImagePickAdapter(ImagePickActivity ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
-        this ( ctx, new ArrayList<ImageFile> ( ), needCamera , isNeedImagePager , max );
+    public ImagePickAdapter(ImagePickActivity ctx, boolean needCamera, int max) {
+        this ( ctx, new ArrayList<ImageFile> ( ), needCamera , max );
     }
 
-    public ImagePickAdapter(BaseActivity ctx, ArrayList<ImageFile> list, boolean needCamera, boolean needImagePager , int max ) {
+    public ImagePickAdapter(BaseActivity ctx, ArrayList<ImageFile> list, boolean needCamera, int max) {
         super ( ctx , list );
         isNeedCamera = needCamera;
         mMaxNumber = max;
@@ -60,8 +60,8 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick, parent, false );
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
+            // TODO FIXME don't measure for every item
             WindowManager wm = (WindowManager) mContext.getSystemService ( Context.WINDOW_SERVICE );
-            // int width = wm.getDefaultDisplay ( ).getWidth ( );
             DisplayMetrics displaymetrics = new DisplayMetrics();
             wm.getDefaultDisplay().getMetrics(displaymetrics);
             int width = displaymetrics.widthPixels;
@@ -126,7 +126,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.icSynced.setVisibility(View.GONE);
             }
             // else if (file.synchFlag == BaseFile.Synchronized) {
-            else if (file.syncFlag.equals(SyncFlag.publish)) {
+            else if (file.syncFlag.equals(SyncFlag.publish) || file.syncFlag.equals(SyncFlag.hub)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -163,7 +163,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             }
 
             holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-                return startMediaViewer(mContext, view, "image/*", file.getPath());
+                return startMediaViewer(mContext, "image/*", file.getPath());
             });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {

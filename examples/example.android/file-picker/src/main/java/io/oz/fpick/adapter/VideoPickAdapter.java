@@ -105,7 +105,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            else if (SyncFlag.publish.equals(file.syncFlag)) {
+            // else if (SyncFlag.publish.equals(file.syncFlag)) {
+            else if (file.syncFlag.equals(SyncFlag.publish) || file.syncFlag.equals(SyncFlag.hub)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -141,7 +142,7 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             }
 
             holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-                return startMediaViewer(mContext, view, "video/*", file.getPath());
+                return startMediaViewer(mContext, "video/*", file.getPath());
 //                Intent intent = new Intent(Intent.ACTION_VIEW);
 //                Uri uri;
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

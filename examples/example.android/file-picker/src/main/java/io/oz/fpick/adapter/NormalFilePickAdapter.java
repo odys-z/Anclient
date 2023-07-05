@@ -5,7 +5,6 @@
 
 package io.oz.fpick.adapter;
 
-import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +27,8 @@ import java.util.ArrayList;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
 
-
 /**
- *
+ * Not used for Android 10.
  */
 public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFilePickAdapter.NormalFilePickViewHolder> {
     private int mMaxNumber;

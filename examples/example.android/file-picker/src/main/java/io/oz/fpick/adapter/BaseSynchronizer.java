@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.view.View;
 
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,6 +30,9 @@ import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.jserv.docsync.SyncFlag;
+
+import static io.odysz.common.LangExt.isblank;
 
 public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
@@ -134,16 +136,19 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
      */
     JProtocol.OnOk onSyncQueryResponse = (resp) -> {
         DocsResp rsp = (DocsResp) resp;
+        PathsPage synchPage = ((DocsResp) resp).syncing();
         if (synchPage.end() <= mList.size()) {
             // sequence order is guaranteed.
-            // [sync-flag, share-falg, share-by, share-date]
             HashMap<String, String[]> phts = rsp.syncing().paths();
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
                 T f = mList.get(i);
                 if (phts.containsKey(f.fullpath())) {
+                    // [sync-flag, share-falg, share-by, share-date]
                     String[] inf = phts.get(f.fullpath());
-                    // TODO f.parseFlags(inf);
-                    f.syncFlag = inf[0];
+
+                    // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
+                    f.syncFlag = isblank(inf[0]) ? SyncFlag.hub : inf[0];
+
                     f.shareflag = inf[1];
                     f.shareby = inf[2];
                     f.sharedate(inf[3]);
@@ -161,12 +166,24 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         else mContext.onEndingJserv(null);
     };
 
-    void updateIcons(PathsPage synpage) {
-        ((Activity)mContext).runOnUiThread( () -> {
-            try {
-                notifyItemRangeChanged(synpage.start(), synpage.end());
-            } catch (SemanticException e) {
-                e.printStackTrace();
+    void updateIcons(PathsPage page) {
+        ((Activity)mContext).runOnUiThread(new Runnable() {
+            // avoid multiple page range in error
+            int start;
+            int size;
+            {
+                try {
+                    start = page.start();
+                    size = page.end() - page.start();
+                } catch (SemanticException e) {
+                    e.printStackTrace();
+                    start = 0;
+                    size = 20;
+                }
+            }
+            @Override
+            public void run() {
+                notifyItemRangeChanged(start, size);
             }
         });
     }
@@ -181,40 +198,12 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
 //    }
 
     /**
-     * @param view the file view - not used currently
-     * @param dataType "video/*" or "image/*"
-     * @param path full path
-     * @return false
-    private boolean startMediaViewer(View view, String dataType, String path) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri uri;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            File f = new File(path);
-            uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
-        }
-        else {
-            uri = Uri.parse("file://" + path);
-        }
-        intent.setDataAndType(uri, dataType);
-        if (Util.detectIntent(mContext, intent)) {
-            mContext.startActivity(intent);
-        }
-        else {
-            ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
-        }
-        return false;
-    }
-     */
-
-    /**
      * @param ctx the context
-     * @param view the file view - not used currently
      * @param dataType "video/*" or "image/*"
      * @param path full path
      * @return false
      */
-    protected static boolean startMediaViewer(Context ctx, View view, String dataType, String path) {
+    protected static boolean startMediaViewer(Context ctx, String dataType, String path) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri uri;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

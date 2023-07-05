@@ -72,7 +72,8 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             holder.icSynced.setVisibility(View.GONE);
         }
         // else if (BaseFile.Synchronized.equals(file.syncFlag)) {
-        else if (SyncFlag.publish.equals(file.syncFlag)) {
+        // else if (SyncFlag.publish.equals(file.syncFlag)) {
+        else if (file.syncFlag.equals(SyncFlag.publish) || file.syncFlag.equals(SyncFlag.hub)) {
             holder.mCbx.setSelected(true);
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
@@ -161,13 +162,6 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             icAlbum = itemView.findViewById ( R.id.xiv_album_icon);
             icSyncing = itemView.findViewById ( R.id.xiv_syncing_icon);
             icSynced = itemView.findViewById ( R.id.xiv_synced_icon);
-
-//            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
-//            mShadow = itemView.findViewById ( R.id.x_shadow );
-//            mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
-//            animation = itemView.findViewById ( R.id.animationSquarevideo );
-//            mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
-//            mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
 
             mTvTitle = itemView.findViewById(R.id.tv_audio_title);
             mTvDuration = itemView.findViewById(R.id.tv_duration);

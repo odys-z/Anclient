@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.albumtier.AlbumContext;
@@ -50,12 +51,12 @@ public abstract class BaseActivity extends FragmentActivity
         void onSelectStateChanged(int position, boolean state, BaseFile file, View animation );
     }
 
-    public static final String SUFFIX = "Suffix";
+    // public static final String SUFFIX = "Suffix";
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
 
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
-    private static final String TAG = BaseActivity.class.getName();
+//    private static final String TAG = BaseActivity.class.getName();
     public  static final String IS_NEED_FOLDER_LIST = "isNeedFolderList";
 
     protected FolderListHelper mFolderHelper;
@@ -214,7 +215,7 @@ public abstract class BaseActivity extends FragmentActivity
 
     protected boolean findAndAddTakenFiles(List<BaseFile> list) {
         for (BaseFile imageFile : list) {
-            if (imageFile.getPath().equals(mAdapter.mFilepath)) {
+            if (imageFile.fullpath().equals(mAdapter.mFilepath)) {
                 mSelectedList.add(imageFile);
                 mCurrentNumber++;
                 mAdapter.setCurrentNumber(mCurrentNumber);
@@ -272,13 +273,15 @@ public abstract class BaseActivity extends FragmentActivity
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
-        Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size());
+        // Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size());
+        Utils.logi("onPermissionsGranted: %s : %s", requestCode, perms.size());
         permissionGranted();
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-        Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
+        // Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
+        Utils.logi("onPermissionsDenied: %s : %s", requestCode, perms.size());
         // If Permission permanently denied, ask user again
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             new AppSettingsDialog.Builder(this).build().show();

@@ -5,17 +5,12 @@ import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_IMAGE;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.Directory;
-
-import java.util.List;
 
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
@@ -88,7 +83,7 @@ public class ImagePickActivity extends BaseActivity {
         final GridLayoutManager layoutManager = new GridLayoutManager(this, COLUMN_NUMBER);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
-        ImagePickAdapter adapter = new ImagePickAdapter(this, isNeedCamera, isNeedImagePager, mMaxNumber);
+        ImagePickAdapter adapter = new ImagePickAdapter(this, isNeedCamera, mMaxNumber);
         linkAdapter(TYPE_IMAGE, adapter);
         mRecyclerView.setAdapter(adapter);
 

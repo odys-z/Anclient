@@ -262,7 +262,7 @@ public class PhotoSyntier extends Synclientier {
 				reslts.add(respi);
 			}
 			catch (IOException | TransException | AnsonException ex) { 
-				Utils.warn(ex.getMessage());
+				Utils.warn("[%s] %s", ex.getClass().getName(), ex.getMessage());
 
 				if (resp0 != null) {
 					req = new DocsReq(tbl).blockAbort(resp0, user);
