@@ -17,7 +17,7 @@ import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
 
 public class AlbumContext {
-    public static boolean verbose = true;
+    public boolean verbose = true;
 
     public enum ConnState { Online, Disconnected, LoginFailed }
 

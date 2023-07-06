@@ -221,7 +221,7 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
 
             //Create a Directory
             Directory<AudioFile> directory = new Directory<>();
-            directory.setName(Util.extractFileNameWithSuffix(Util.extractPathWithoutSeparator(audio.getPath())));
+            directory.setName(Util.extractFileNameWithSuffix(Util.extractPathWithoutSeparator(audio.fullpath())));
             directory.setPath(audio.path());
 
             if (!directories.contains(directory)) {
@@ -263,8 +263,8 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
 
                 //Create a Directory
                 Directory<NormalFile> directory = new Directory<>();
-                directory.setName(Util.extractFileNameWithSuffix(Util.extractPathWithoutSeparator(file.getPath())));
-                directory.setPath(Util.extractPathWithoutSeparator(file.getPath()));
+                directory.setName(Util.extractFileNameWithSuffix(Util.extractPathWithoutSeparator(file.fullpath())));
+                directory.setPath(Util.extractPathWithoutSeparator(file.fullpath()));
 
                 if (!directories.contains(directory)) {
                     directory.addFile(file);

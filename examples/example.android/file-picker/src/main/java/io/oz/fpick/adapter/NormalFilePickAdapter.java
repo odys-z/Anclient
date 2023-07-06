@@ -55,7 +55,7 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
     public void onBindViewHolder(final NormalFilePickViewHolder holder, final int position) {
         final NormalFile file = mList.get(position);
 
-        holder.mTvTitle.setText(Util.extractFileNameWithSuffix(file.getPath()));
+        holder.mTvTitle.setText(Util.extractFileNameWithSuffix(file.fullpath()));
         holder.mTvTitle.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         if (holder.mTvTitle.getMeasuredWidth() >
                 Util.getScreenWidth(mContext) - Util.dip2px(mContext, 10 + 32 + 10 + 48 + 10 * 2)) {
@@ -79,15 +79,15 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
             holder.animation.setAlpha ( 0f );
         }
 
-        if (file.getPath().endsWith("xls") || file.getPath().endsWith("xlsx")) {
+        if (file.fullpath().endsWith("xls") || file.fullpath().endsWith("xlsx")) {
             holder.mIvIcon.setImageResource(R.drawable.vw_ic_excel);
-        } else if (file.getPath().endsWith("doc") || file.getPath().endsWith("docx")){
+        } else if (file.fullpath().endsWith("doc") || file.fullpath().endsWith("docx")){
             holder.mIvIcon.setImageResource(R.drawable.vw_ic_word);
-        } else if (file.getPath().endsWith("ppt") || file.getPath().endsWith("pptx")){
+        } else if (file.fullpath().endsWith("ppt") || file.fullpath().endsWith("pptx")){
             holder.mIvIcon.setImageResource(R.drawable.vw_ic_ppt);
-        } else if (file.getPath().endsWith("pdf")){
+        } else if (file.fullpath().endsWith("pdf")){
             holder.mIvIcon.setImageResource(R.drawable.vw_ic_pdf);
-        } else if (file.getPath().endsWith("txt")){
+        } else if (file.fullpath().endsWith("txt")){
             holder.mIvIcon.setImageResource(R.drawable.vw_ic_txt);
         } else {
             holder.mIvIcon.setImageResource(R.drawable.vw_ic_file);
@@ -121,7 +121,7 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
 //        holder.itemView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                Uri uri = Uri.parse("file://" + file.getPath());
+//                Uri uri = Uri.parse("file://" + file.fullpath());
 //                Intent intent = new Intent(Intent.ACTION_VIEW);
 //                intent.setDataAndType(uri, "audio/mp3");
 //                if (Util.detectIntent(mContext, intent)) {

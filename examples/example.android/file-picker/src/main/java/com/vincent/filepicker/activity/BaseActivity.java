@@ -3,22 +3,18 @@
 //import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_IMAGE;
 //
 //import android.content.Intent;
-//import android.graphics.drawable.AnimationDrawable;
 //import android.os.Bundle;
 //import android.text.TextUtils;
 //import android.util.Log;
 //import android.view.View;
-//import android.view.ViewGroup;
 //import android.widget.TextView;
 //import android.widget.Toast;
 //
 //import androidx.annotation.NonNull;
 //import androidx.annotation.Nullable;
 //import androidx.fragment.app.FragmentActivity;
-//import androidx.recyclerview.widget.RecyclerView;
 //
 //import com.vincent.filepicker.FolderListHelper;
-//import com.vincent.filepicker.filter.entity.BaseFile;
 //import com.vincent.filepicker.filter.entity.Directory;
 //
 //import java.io.File;
@@ -28,6 +24,7 @@
 //import io.odysz.semantic.jprotocol.AnsonMsg;
 //import io.odysz.semantic.jprotocol.JProtocol;
 //import io.oz.albumtier.AlbumContext;
+//import io.oz.fpick.AndroidFile;
 //import io.oz.fpick.R;
 //import io.oz.fpick.adapter.BaseSynchronizer;
 //import io.oz.fpick.filter.FileFilterx;
@@ -52,10 +49,10 @@
 //    protected FolderListHelper mFolderHelper;
 //    protected boolean isNeedFolderList;
 //
-//    public ArrayList<BaseFile> mSelectedList = new ArrayList<>();
+//    public ArrayList<AndroidFile> mSelectedList = new ArrayList<AndroidFile>();
 //    protected BaseSynchronizer mAdapter;
 //    protected FileFilterx filefilter;
-//    protected List<Directory<BaseFile>> mAll;
+//    protected List<Directory<AndroidFile>> mAll;
 //    protected boolean isTakenAutoSelected;
 //
 //    private int mCurrentNumber = 0;
@@ -86,7 +83,7 @@
 //        filefilter.filter(this, suffix);
 //    }
 //
-//    protected void refreshDirs(List<Directory<BaseFile>> directories) {
+//    protected void refreshDirs(List<Directory<AndroidFile>> directories) {
 //        boolean tryToFindTakenImage = isTakenAutoSelected;
 //
 //        // if auto-selecting taken files is enabled, make sure requirements are met
@@ -95,9 +92,9 @@
 //            tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists(); // try to select taken image only if max isn't reached and the file exists
 //        }
 //
-//        List<BaseFile> list = new ArrayList<>();
-//        for (Directory<BaseFile> directory : directories) {
-//            List<BaseFile> l = directory.getFiles();
+//        List<AndroidFile> list = new ArrayList<>();
+//        for (Directory<AndroidFile> directory : directories) {
+//            List<AndroidFile> l = directory.getFiles();
 //            list.addAll(l);
 //
 //            // auto-select taken images?
@@ -108,7 +105,7 @@
 //        }
 //
 //        // So that's why max number is 9?
-//        for (BaseFile file : mSelectedList) {
+//        for (AndroidFile file : mSelectedList) {
 //            int index = list.indexOf(file);
 //            if (index != -1) {
 //                list.get(index).setSelected(true);
@@ -117,9 +114,9 @@
 //        mAdapter.refresh(list);
 //    }
 //
-//    private boolean findAndAddTakenFiles(List<BaseFile> list) {
-//        for (BaseFile imageFile : list) {
-//            if (imageFile.getPath().equals(mAdapter.mFilepath)) {
+//    private boolean findAndAddTakenFiles(List<AndroidFile> list) {
+//        for (AndroidFile imageFile : list) {
+//            if (imageFile.fullpath().equals(mAdapter.mFilepath)) {
 //                mSelectedList.add(imageFile);
 //                mCurrentNumber++;
 //                mAdapter.setCurrentNumber(mCurrentNumber);

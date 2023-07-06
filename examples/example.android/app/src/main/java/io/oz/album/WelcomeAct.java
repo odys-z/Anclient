@@ -6,10 +6,13 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +26,9 @@ import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.activity.VideoPickActivity;
 import com.vincent.filepicker.filter.entity.BaseFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -47,16 +52,16 @@ import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
+import io.oz.albumtier.IFileProvider;
+import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.activity.BaseActivity;
 
-// import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
-import static io.odysz.common.LangExt.isNull;
 import static com.hbisoft.pickit.DeviceHelper.getMultiplePaths;
 import static com.hbisoft.pickit.DeviceHelper.getPath;
+import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
-import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
 
@@ -104,6 +109,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
         errCtx = new AndErrorCtx().context(this);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+            // Since API 21, https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
+            findViewById(R.id.btn_pick_file).setVisibility(View.GONE);
 
         if (pickMediaStarter == null)
             pickMediaStarter = registerForActivityResult(
@@ -252,7 +261,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             Intent data = result.getData();
             if (data != null) {
                 ClipData clipData = Objects.requireNonNull(data).getClipData();
-                ArrayList<SyncDoc> paths;
+                ArrayList<AndroidFile> paths;
                 if (clipData != null) {
                     if (singl.verbose) for(int i = 0; i < clipData.getItemCount(); i++)
                         Utils.logi("[AlbumContext.verbose] URI: %s", clipData.getItemAt(i).getUri());
@@ -269,7 +278,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                         String.valueOf(data.getData()),
                                         getPath(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
                     }
-                    paths = new ArrayList<SyncDoc>(1);
+                    paths = new ArrayList<>(1);
                     paths.add( getPath(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT) );
                 }
 
@@ -277,11 +286,32 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     showMsg(R.string.txt_please_login);
                 else {
                     verifyStoragePermissions(this);
+                    singl.tier.fileProvider(new IFileProvider() {
+                        // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
+                        @Override
+                        public long meta(SyncDoc f) {
+                            Uri returnUri = ((AndroidFile) f).contentUri();
+                            Cursor returnCursor =
+                                    getContentResolver().query(returnUri, null, null, null, null);
+                            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                            returnCursor.moveToFirst();
+                            f.clientname(returnCursor.getString(nameIndex));
+                            f.size = returnCursor.getLong(sizeIndex);
+                            f.mime = getContentResolver().getType(returnUri);
+                            return f.size;
+                        }
+
+                        // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
+                        @Override
+                        public InputStream open(Object uri) throws FileNotFoundException {
+                            return getContentResolver().openInputStream((Uri)uri);
+                        }
+                    });
                     singl.tier.asyVideos(paths,
                             null,
                             (resp, v) -> showMsg(R.string.t_synch_ok, paths.size()),
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
-
                 }
 
                 WebView wv = findViewById(R.id.wv_welcome);
@@ -310,7 +340,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     /**
      * Start help activities, etc.
-     * @param action
      */
     protected void startHelpAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
@@ -400,5 +429,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+    }
+
+    public static void askDirectoriesPermissions(Activity activity) {
+        // https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
+        // https://developer.android.com/training/data-storage/shared/documents-files#persist-permissions
     }
 }

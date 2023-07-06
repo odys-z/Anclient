@@ -93,7 +93,7 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
                 .load ( file.fullpath() )
-                // .load ( file.getPath ( ) )
+                // .load ( file.fullpath ( ) )
                 .apply ( options.centerCrop() )
                 .transition ( withCrossFade() )
                 .into ( holder.mIvThumbnail );
@@ -142,16 +142,16 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             }
 
             holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-                return startMediaViewer(mContext, "video/*", file.getPath());
+                return startMediaViewer(mContext, "video/*", file.fullpath());
 //                Intent intent = new Intent(Intent.ACTION_VIEW);
 //                Uri uri;
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                    File f = new File(file.getPath());
+//                    File f = new File(file.fullpath());
 //                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
 //                }
 //                else {
-//                    uri = Uri.parse("file://" + file.getPath());
+//                    uri = Uri.parse("file://" + file.fullpath());
 //                }
 //                // intent.setDataAndType(uri, "video/mp4");
 //                intent.setDataAndType(uri, "video/*");

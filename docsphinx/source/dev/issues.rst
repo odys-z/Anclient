@@ -236,6 +236,9 @@ Sample App: `PickiT <https://github.com/HBiSoft/PickiT>`_
 .. image:: ./imgs/02-pickit-mime of application.png
 ..
 
+Using `Grant access to a directory's contents <https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory>`_
+and disable the function lower than API 21.
+
 What's next
 ___________
 

@@ -2,11 +2,8 @@ package io.oz.albumtier;
 
 import static io.odysz.common.LangExt.*;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,6 +87,11 @@ public class PhotoSyntier extends Synclientier {
 		}, err, device);
 
 		return this;
+	}
+
+	IFileProvider fileProvider;
+	public void fileProvider(IFileProvider p) {
+		this.fileProvider = p;
 	}
 
 	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
@@ -191,12 +193,13 @@ public class PhotoSyntier extends Synclientier {
 				OnProcess proc, OnDocOk docOk, OnError ... onErr)
 				throws TransException, IOException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, uri, tbl, videos, blocksize, proc, docOk, err);
+		return pushBlocks(client, uri, tbl, videos, fileProvider,
+        					proc, docOk, err, blocksize);
 	}
 
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
-			List<? extends SyncDoc> videos, int blocksize,
-			OnProcess proc, OnDocOk docOk, OnError errHandler)
+                                            List<? extends SyncDoc> videos, IFileProvider fileProvider,
+											OnProcess proc, OnDocOk docOk, OnError errHandler, int blocksize)
 			throws TransException, IOException {
 
 		SessionInf user = client.ssInfo();
@@ -228,15 +231,19 @@ public class PhotoSyntier extends Synclientier {
 			try {
 				resp0 = client.commit(q, errHandler);
 
+				fileProvider.meta(p);
 				String pth = p.fullpath();
 				if (!pth.equals(resp0.doc.fullpath()))
 					Utils.warn("Resp is not replied with exactly the same path: %s", resp0.doc.fullpath());
 
-				totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
+				// totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
+				totalBlocks = (int) ((p.size + 1) / blocksize);
+
 				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
 
 				DocLocks.reading(p.fullpath());
-				ifs = new FileInputStream(new File(p.fullpath()));
+				// ifs = new FileInputStream(new File(p.fullpath()));
+				ifs = fileProvider.open(p);
 
 				String b64 = AESHelper.encode64(ifs, blocksize);
 				while (b64 != null) {

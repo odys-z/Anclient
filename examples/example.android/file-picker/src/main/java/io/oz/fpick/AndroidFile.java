@@ -1,5 +1,12 @@
-package com.vincent.filepicker.filter.entity;
+/**
+ * Created by Ody Zhou
+ *
+ * Credits to Vincent Woo
+ */
 
+package io.oz.fpick;
+
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,27 +18,20 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.SyncDoc;
 
 
-/**
- * Modified by Ody Zhou
- *
- * Created by Vincent Woo
- * Date: 2016/10/10
- * Time: 17:32
- */
-
-public class BaseFile extends SyncDoc implements Parcelable {
+public class AndroidFile extends SyncDoc implements Parcelable {
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
     private long date;          //Added Date
     private boolean isSelected;
+    private Uri contUri;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BaseFile)) return false;
+        if (!(o instanceof AndroidFile)) return false;
 
-        BaseFile file = (BaseFile) o;
+        AndroidFile file = (AndroidFile) o;
         return this.clientpath.equals(file.clientpath);
     }
 
@@ -77,10 +77,10 @@ public class BaseFile extends SyncDoc implements Parcelable {
         this.localDirName = localDirName;
     }
 
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public long getDate() { return date; }
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public void setDate(long date) { this.date = date; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public long getDate() { return date; }
+    /** @deprecated removeing com.vincent.filepicker.filter */
+    public void setDate(long date) { this.date = date; }
 
     public boolean isSelected() { return isSelected; }
 
@@ -102,14 +102,14 @@ public class BaseFile extends SyncDoc implements Parcelable {
     @Override
     public int describeContents() { return 0; }
 
-    public static final Creator<BaseFile> CREATOR = new Creator<BaseFile>() {
+    public static final Creator<AndroidFile> CREATOR = new Creator<AndroidFile>() {
         @Override
-        public BaseFile[] newArray(int size) {
-            return new BaseFile[size];
+        public AndroidFile[] newArray(int size) {
+            return new AndroidFile[size];
         }
 
         @Override
-        public BaseFile createFromParcel(Parcel in) {
+        public AndroidFile createFromParcel(Parcel in) {
             throw new AnsonException(0, "No overriding?");
 //            BaseFile file = new BaseFile();
 //            file.id = in.readLong();
@@ -128,8 +128,19 @@ public class BaseFile extends SyncDoc implements Parcelable {
         return Util.extractPathWithoutSeparator(clientpath);
     }
 
-    public BaseFile cdate(long l) {
+    public AndroidFile cdate(long l) {
         cdate(new Date(l));
         return this;
+    }
+
+    SupportContentype contype;
+    public AndroidFile contentProvider(SupportContentype t, Uri uri) {
+        contype = t;
+        contUri = uri;
+        return this;
+    }
+
+    public Uri contentUri() {
+        return contUri;
     }
 }

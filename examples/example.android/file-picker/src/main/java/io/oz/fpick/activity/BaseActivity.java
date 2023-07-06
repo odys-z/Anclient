@@ -19,7 +19,6 @@ import androidx.fragment.app.FragmentActivity;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.FolderListHelper;
 import com.vincent.filepicker.adapter.FolderListAdapter;
-import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.Directory;
 
 import java.io.File;
@@ -30,6 +29,7 @@ import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.albumtier.AlbumContext;
+import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.BaseSynchronizer;
@@ -48,7 +48,7 @@ public abstract class BaseActivity extends FragmentActivity
         implements EasyPermissions.PermissionCallbacks, JProtocol.OnError, IProgressBarAct {
 
     public interface OnSelectStateListener {
-        void onSelectStateChanged(int position, boolean state, BaseFile file, View animation );
+        void onSelectStateChanged(int position, boolean state, AndroidFile file, View animation );
     }
 
     // public static final String SUFFIX = "Suffix";
@@ -62,12 +62,12 @@ public abstract class BaseActivity extends FragmentActivity
     protected FolderListHelper mFolderHelper;
     protected boolean isNeedFolderList;
 
-    public ArrayList<BaseFile> mSelectedList = new ArrayList<>();
+    public ArrayList<AndroidFile> mSelectedList = new ArrayList<>();
     private BaseSynchronizer mAdapter;
     /** file pattern */
     protected String[] mSuffix;
     protected FileFilterx filefilter;
-    protected List<Directory<BaseFile>> mAll;
+    protected List<Directory<AndroidFile>> mAll;
     protected boolean isTakenAutoSelected;
 
     PickingMode pickmode = PickingMode.disabled;
@@ -146,9 +146,9 @@ public abstract class BaseActivity extends FragmentActivity
                 if (TextUtils.isEmpty(directory.getPath())) //All
                     loadirs(mAll);
                 else
-                    for (Directory<BaseFile> dir : mAll)
+                    for (Directory<AndroidFile> dir : mAll)
                         if (dir.getPath().equals(directory.getPath())) {
-                            List<Directory<BaseFile>> list = new ArrayList<>();
+                            List<Directory<AndroidFile>> list = new ArrayList<>();
                             list.add(dir);
                             loadirs(list);
                             break;
@@ -181,7 +181,7 @@ public abstract class BaseActivity extends FragmentActivity
         filefilter.filter(this, suffix);
     }
 
-    protected void loadirs(List<Directory<BaseFile>> directories) {
+    protected void loadirs(List<Directory<AndroidFile>> directories) {
         boolean tryToFindTakenImage = isTakenAutoSelected;
 
         // if auto-selecting taken files is enabled, make sure requirements are met
@@ -191,9 +191,9 @@ public abstract class BaseActivity extends FragmentActivity
             tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists();
         }
 
-        List<BaseFile> list = new ArrayList<>();
-        for (Directory<BaseFile> directory : directories) {
-            List<BaseFile> l = directory.getFiles();
+        List<AndroidFile> list = new ArrayList<>();
+        for (Directory<AndroidFile> directory : directories) {
+            List<AndroidFile> l = directory.getFiles();
             list.addAll(l);
 
             // auto-select taken images?
@@ -204,7 +204,7 @@ public abstract class BaseActivity extends FragmentActivity
         }
 
         // max number is limited
-        for (BaseFile file : mSelectedList) {
+        for (AndroidFile file : mSelectedList) {
             int index = list.indexOf(file);
             if (index != -1) {
                 list.get(index).setSelected(true);
@@ -213,8 +213,8 @@ public abstract class BaseActivity extends FragmentActivity
         mAdapter.refreshSyncs(list);
     }
 
-    protected boolean findAndAddTakenFiles(List<BaseFile> list) {
-        for (BaseFile imageFile : list) {
+    protected boolean findAndAddTakenFiles(List<AndroidFile> list) {
+        for (AndroidFile imageFile : list) {
             if (imageFile.fullpath().equals(mAdapter.mFilepath)) {
                 mSelectedList.add(imageFile);
                 mCurrentNumber++;

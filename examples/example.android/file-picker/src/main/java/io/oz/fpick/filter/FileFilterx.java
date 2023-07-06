@@ -9,6 +9,8 @@ import com.vincent.filepicker.filter.callback.FilterResultCallback;
 import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
+import io.oz.fpick.AndroidFile;
+
 public class FileFilterx {
     /**
      * @deprecated to be removed once referencer removed
@@ -37,7 +39,7 @@ public class FileFilterx {
 //    }
 
     final int filetype;
-    final FilterResultCallback<? extends BaseFile> callback;
+    final FilterResultCallback<? extends AndroidFile> callback;
 
     /**
      * resType      : callback<br>
@@ -48,7 +50,7 @@ public class FileFilterx {
      * @param resType
      * @param callback
      */
-    public FileFilterx(int resType, FilterResultCallback<? extends BaseFile> callback) {
+    public FileFilterx(int resType, FilterResultCallback<? extends AndroidFile> callback) {
         this.filetype = resType;
         this.callback = callback;
     }

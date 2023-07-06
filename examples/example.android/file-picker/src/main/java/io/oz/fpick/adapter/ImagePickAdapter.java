@@ -97,11 +97,11 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
             // RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
-                .load ( file.getPath ( ) )
+                .load ( file.fullpath() )
                 .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
                         .centerCrop()
                         .error(R.drawable.vw_ic_synced))
-                .transition ( withCrossFade ( ) )
+                .transition ( withCrossFade() )
                 .listener(new RequestListener() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource) {
@@ -113,7 +113,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                     }
                 })
                 .into ( holder.mIvThumbnail );
-            // holder.mIvThumbnail.setImageURI(Uri.parse(file.getPath()));
+            // holder.mIvThumbnail.setImageURI(Uri.parse(file.fullpath()));
 
             if (file.syncFlag == null)
                 file.syncFlag = SyncFlag.device;
@@ -163,7 +163,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             }
 
             holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-                return startMediaViewer(mContext, "image/*", file.getPath());
+                return startMediaViewer(mContext, "image/*", file.fullpath());
             });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {

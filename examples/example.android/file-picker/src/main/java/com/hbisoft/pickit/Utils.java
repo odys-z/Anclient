@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 
 import java.io.File;
 
@@ -70,8 +71,8 @@ class Utils {
                         }
                     }
                 }
-
-            }else if (isRawDownloadsDocument(uri)){
+            }
+            else if (isRawDownloadsDocument(uri)){
                 String fileName = getFilePath(context, uri);
                 String subFolderName = getSubFolders(uri);
 
@@ -241,6 +242,43 @@ class Utils {
 
     private static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+    }
+
+    // Check different providers
+    static boolean isDropBox(Uri uri) {
+        return String.valueOf(uri).toLowerCase().contains("content://com.dropbox.");
+    }
+
+    static boolean isGoogleDrive(Uri uri) {
+        return String.valueOf(uri).toLowerCase().contains("com.google.android.apps");
+    }
+
+    static boolean isOneDrive(Uri uri) {
+        return String.valueOf(uri).toLowerCase().contains("com.microsoft.skydrive.content");
+    }
+
+    static String getDrvFileName(Uri uri, Context context) {
+        String result = null;
+        if (uri.getScheme() != null) {
+            if (uri.getScheme().equals("content")) {
+                Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+                }
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            assert result != null;
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 
 }

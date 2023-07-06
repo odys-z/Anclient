@@ -1,9 +1,9 @@
 package com.vincent.filepicker.filter.entity;
 
-import android.text.TextUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import io.oz.fpick.AndroidFile;
 
 /**
  * Created by Vincent Woo
@@ -11,7 +11,7 @@ import java.util.List;
  * Time: 17:31
  */
 
-public class Directory<T extends BaseFile> {
+public class Directory<T extends AndroidFile> {
     private String id;
     private String name;
     private String path;

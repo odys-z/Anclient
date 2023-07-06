@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.filter.entity.BaseFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,13 +27,14 @@ import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
+import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
 import io.oz.jserv.docsync.SyncFlag;
 
 import static io.odysz.common.LangExt.isblank;
 
-public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class BaseSynchronizer <T extends AndroidFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     public String mFilepath;
 
@@ -97,7 +97,7 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
      * @param list
      */
     @SuppressLint("NotifyDataSetChanged")
-    public void refreshSyncs(List<BaseFile> list) {
+    public void refreshSyncs(List<AndroidFile> list) {
         mList.clear();
         mList.addAll((Collection<? extends T>) list); // why this with performance cost?
         notifyDataSetChanged();

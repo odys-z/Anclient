@@ -3,6 +3,8 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import io.oz.fpick.AndroidFile;
+
 /**
  * Modified by Ody Zhou
  *
@@ -11,7 +13,7 @@ import android.os.Parcelable;
  * Time: 17:44
  */
 
-public class ImageFile extends BaseFile implements Parcelable {
+public class ImageFile extends AndroidFile implements Parcelable {
     private int orientation;   //0, 90, 180, 270
 
     public int getOrientation() {
@@ -43,9 +45,9 @@ public class ImageFile extends BaseFile implements Parcelable {
         public ImageFile createFromParcel(Parcel in) {
             ImageFile file = new ImageFile();
             file.setId(in.readLong());
-            file.setName(in.readString());
-            file.setPath(in.readString());
-            file.setSize(in.readLong());
+            file.clientname(in.readString());
+            file.clientpath = in.readString();
+            file.size = in.readLong();
             file.setLocalDirId(in.readString());
             file.setLocalDirName(in.readString());
             file.setDate(in.readLong());
