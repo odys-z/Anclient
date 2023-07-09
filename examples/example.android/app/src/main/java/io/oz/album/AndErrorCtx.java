@@ -28,8 +28,12 @@ public class AndErrorCtx extends ErrorCtx {
 
 	@Override
 	public void err(AnsonMsg.MsgCode code, String msg, String ... args) {
-		super.err(code, msg, args);
-		showMsg(template, code, msg, (Object[]) args);
+		try {
+			super.err(code, msg, args);
+			showMsg(template, code, msg, (Object[]) args);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

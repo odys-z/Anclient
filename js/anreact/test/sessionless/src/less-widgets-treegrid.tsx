@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreeditor2, Lightbox
+	jsample, JsonServs, Login, CrudComp, AnTreeditor2, Lightbox, AnTreegrid
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 import { MuiThemeProvider } from '@material-ui/core/styles';
@@ -146,7 +146,7 @@ class Widgets extends React.Component<LessProps> {
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
                 {this.albumtier && Date().toString()}
 				<hr/>
-                {this.albumtier && <AnTreeditor2 key={this.albumSk}
+                {this.albumtier && <AnTreegrid key={this.albumSk}
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}

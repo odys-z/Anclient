@@ -492,6 +492,8 @@ interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
 	 * Formatt a tree item cell/grid from col and node.
 	 */
 	colFormatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => UIComponent;
+
+	thFormatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, colx: number, opts?: CompOpts) => UIComponent;
 }
 
 class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
@@ -680,6 +682,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			{columns
 				.filter( v => toBool(v.visible, true))
 				.map( (col: AnTreegridCol, ix: number) => {
+				  if (col.thFormatter) return col.thFormatter(col, ix, {classes, media});
 				  if (col.type === 'actions') return (
 					<Grid item key={ix} {...col.grid}>
 					  <Button onClick={this.toAddChild}
@@ -806,4 +809,4 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 AnTreeditorComp2.contextType = AnContext;
 
 const AnTreeditor2 = withStyles<any, any, TreecardProps>(styles)(withWidth()(AnTreeditorComp2));
-export { AnTreeditor2, AnTreeditorComp2, TreecardProps }
+export { AnTreeditor2, AnTreeditorComp2, TreecardProps, AnTreegridCol }

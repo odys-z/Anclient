@@ -67,12 +67,6 @@ public class PhotoSyntier extends Synclientier {
 
 	/**
 	 * @param clientUri - the client function uri this instance will be used for.
-	 * @param device
-	 * @param errCtx
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws SQLException 
-	 * @throws SemanticException 
 	 */
 	public PhotoSyntier(String clientUri, String device, OnError errCtx)
 			throws SemanticException, IOException {
@@ -131,13 +125,7 @@ public class PhotoSyntier extends Synclientier {
 	/**
 	 * @see #syncVideos(List, OnProcess, OnDocOk, OnError...)
      *
-	 * @param videos
-	 * @param proc
-	 * @param docOk
-	 * @param onErr
 	 * @return list of response
-	 * @throws TransException
-	 * @throws IOException
 	 */
 	public PhotoSyntier asyVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, OnError ... onErr)
@@ -163,13 +151,7 @@ public class PhotoSyntier extends Synclientier {
 	 * Push up videos (larg files) with
 	 * {@link #pushBlocks(String, List, OnProcess, OnDocOk, OnError...)}
 	 *
-	 * @param videos
-	 * @param proc
-	 * @param docOk
-	 * @param onErr
 	 * @return list of response
-	 * @throws TransException
-	 * @throws IOException
 	 */
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, OnError ... onErr)
@@ -184,9 +166,6 @@ public class PhotoSyntier extends Synclientier {
 	 * @param videos any doc-table managed records, of which uri shouldn't be loaded,
 	 * e.g. use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) extFile()} as sql select expression.
 	 * - the method is working in stream mode
-	 * @param proc
-	 * @param docOk
-	 * @param onErr
 	 * @return list of response
 	 */
 	public List<DocsResp> pushBlocks(String tbl, List<? extends SyncDoc> videos,
@@ -203,7 +182,7 @@ public class PhotoSyntier extends Synclientier {
 			throws TransException, IOException {
 
 		SessionInf user = client.ssInfo();
-		DocsResp resp0 = null;
+		DocsResp startAck = null;
 		DocsResp respi = null;
 
 		String[] act = AnsonHeader.usrAct("synclient.java", "sync", "c/sync", "push blocks");
@@ -229,21 +208,23 @@ public class PhotoSyntier extends Synclientier {
 									.header(header);
 
 			try {
-				resp0 = client.commit(q, errHandler);
+				startAck = client.commit(q, errHandler);
 
+				if (fileProvider == null)
+					throw new SemanticException("Needing a file provider to accesse file %s.", p.clientname());
 				fileProvider.meta(p);
 				String pth = p.fullpath();
-				if (!pth.equals(resp0.doc.fullpath()))
-					Utils.warn("Resp is not replied with exactly the same path: %s", resp0.doc.fullpath());
+				if (!pth.equals(startAck.doc.fullpath()))
+					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.doc.fullpath());
 
 				// totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
-				totalBlocks = (int) ((p.size + 1) / blocksize);
+				totalBlocks = p.size == 0 ? 0 : 1 + (int) ((p.size - 1 ) / blocksize);
 
-				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
+				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, startAck);
 
 				DocLocks.reading(p.fullpath());
 				// ifs = new FileInputStream(new File(p.fullpath()));
-				ifs = fileProvider.open(p);
+				ifs = (FileInputStream) fileProvider.open(p);
 
 				String b64 = AESHelper.encode64(ifs, blocksize);
 				while (b64 != null) {
@@ -271,13 +252,28 @@ public class PhotoSyntier extends Synclientier {
 			catch (IOException | TransException | AnsonException ex) { 
 				Utils.warn("[%s] %s", ex.getClass().getName(), ex.getMessage());
 
-				if (resp0 != null) {
-					req = new DocsReq(tbl).blockAbort(resp0, user);
+				if (startAck != null) {
+					req = new DocsReq(tbl).blockAbort(startAck, user);
 					req.a(DocsReq.A.blockAbort);
-					q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
-								.header(header);
-					respi = client.commit(q, errHandler);
+					AnsonMsg<DocsReq> abt = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+							.header(header);
+					// Abort
+					new Thread( () -> {
+						try {
+							client.commit(abt, errHandler);
+						} catch (Exception e) {
+							e.printStackTrace();
+						} } ).start();
 				}
+
+//				try {
+//					req = new AlbumReq(tbl).blockEnd(respi, user);
+//					AnsonMsg<DocsReq> abt = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+//							.header(header);
+//
+//					respi = client.commit(abt, errHandler);
+//				}
+//				catch (Exception e) {}
 
 				if (ex instanceof IOException)
 					continue;
@@ -299,14 +295,8 @@ public class PhotoSyntier extends Synclientier {
 	}
 
 	/**
-	 * @param collId
-	 * @param localpath
-	 * @param clientname
 	 * @param share one of {@link io.odysz.semantic.ext.DocTableMeta.Share Share}'s consts.
 	 * @return response
-	 * @throws IOException 
-	 * @throws SQLException 
-	 * @throws TransException 
 	 */
 	public DocsResp insertPhoto(String collId, String localpath, String clientname, String share)
 			throws IOException, TransException, SQLException {
@@ -320,10 +310,6 @@ public class PhotoSyntier extends Synclientier {
 	/**
 	 * Asynchronously query synchronizing records.
 	 * 
-	 * @param files
-	 * @param page
-	 * @param onOk
-	 * @param onErr
 	 * @return this
 	 */
 	public PhotoSyntier asynQueryDocs(List<? extends SyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
@@ -371,13 +357,7 @@ public class PhotoSyntier extends Synclientier {
 	 * 
 	 * TODO: to be changed to handling short text.
 	 * 
-	 * @param photos
-	 * @param user
-	 * @param onErr
 	 * @return this
-	 * @throws SemanticException
-	 * @throws IOException
-	 * @throws AnsonException
 	 */
 	public PhotoSyntier asyncPhotosUp(List<? extends SyncDoc> photos,
 			SessionInf user, OnProcess proc, OnDocOk docOk, OnError onErr)

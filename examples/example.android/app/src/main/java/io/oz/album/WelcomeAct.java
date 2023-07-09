@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.view.Menu;
@@ -285,27 +284,29 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
                 else {
-                    verifyStoragePermissions(this);
+                    // verifyStoragePermissions(this);
+                    // askDirectoriesPermissions(this);
                     singl.tier.fileProvider(new IFileProvider() {
                         // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                         @Override
                         public long meta(SyncDoc f) {
                             Uri returnUri = ((AndroidFile) f).contentUri();
-                            Cursor returnCursor =
-                                    getContentResolver().query(returnUri, null, null, null, null);
-                            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-                            returnCursor.moveToFirst();
-                            f.clientname(returnCursor.getString(nameIndex));
-                            f.size = returnCursor.getLong(sizeIndex);
-                            f.mime = getContentResolver().getType(returnUri);
-                            return f.size;
+                            try (Cursor returnCursor = getContentResolver()
+                                    .query(returnUri, null, null, null, null)) {
+                                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                                returnCursor.moveToFirst();
+                                f.clientname(returnCursor.getString(nameIndex));
+                                f.size = returnCursor.getLong(sizeIndex);
+                                f.mime = getContentResolver().getType(returnUri);
+                                return f.size;
+                            }
                         }
 
                         // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
                         @Override
-                        public InputStream open(Object uri) throws FileNotFoundException {
-                            return getContentResolver().openInputStream((Uri)uri);
+                        public InputStream open(SyncDoc p) throws FileNotFoundException {
+                            return getContentResolver().openInputStream(((AndroidFile)p).contentUri());
                         }
                     });
                     singl.tier.asyVideos(paths,
@@ -364,25 +365,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 startPicking(AudioPickActivity.class);
                 break;
             case R.id.btn_pick_file:
-                // startPicking(NormalFilePickActivity.class);
-                /*
-                Intent intent4 = new Intent(this, NormalFilePickActivity.class);
-                intent4.putExtra(Constant.MAX_NUMBER, 9);
-                intent4.putExtra ( IS_NEED_FOLDER_LIST, true );
-                intent4.putExtra(NormalFilePickActivity.SUFFIX,
-                        new String[] {"xlsx", "xls", "doc", "dOcX", "ppt", ".pptx", "pdf"});
-                startActivityForResult(intent4, Constant.REQUEST_CODE_PICK_FILE);
-                 */
-                //
-                Intent intent;
-                if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                    intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                } else {
-                    intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-                }
+                // TODO: a simple synchronized files report, startPicking(NormalFilePickActivity.class);
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+
                 //  In this example we will set the type to video
                 intent.setType("application/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.putExtra("return-data", true);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -410,7 +399,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     };
 
     /**
-     * Checks if the app has permission to write to device storage
+     * Checks if the app has permission to write to device storage.
      *
      * If the app does not has permission then the user will be prompted to grant permissions
      *
@@ -431,8 +420,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         }
     }
 
-    public static void askDirectoriesPermissions(Activity activity) {
-        // https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
-        // https://developer.android.com/training/data-storage/shared/documents-files#persist-permissions
-    }
+//    public static void askDirectoriesPermissions(Activity activity) {
+//        // https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
+//        // https://developer.android.com/training/data-storage/shared/documents-files#persist-permissions
+//    }
 }

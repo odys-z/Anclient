@@ -191,7 +191,9 @@ public abstract class BaseActivity extends FragmentActivity
             tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists();
         }
 
-        List<AndroidFile> list = new ArrayList<>();
+        List<AndroidFile> list = mergeDirs(directories);
+        /*
+        new ArrayList<>();
         for (Directory<AndroidFile> directory : directories) {
             List<AndroidFile> l = directory.getFiles();
             list.addAll(l);
@@ -202,6 +204,7 @@ public abstract class BaseActivity extends FragmentActivity
                 findAndAddTakenFiles(l);
             }
         }
+        */
 
         // max number is limited
         for (AndroidFile file : mSelectedList) {
@@ -211,6 +214,11 @@ public abstract class BaseActivity extends FragmentActivity
             }
         }
         mAdapter.refreshSyncs(list);
+    }
+
+    private static List<AndroidFile> mergeDirs(List<Directory<AndroidFile>> directories) {
+        List<AndroidFile> lst = new ArrayList<>();
+        return lst;
     }
 
     protected boolean findAndAddTakenFiles(List<AndroidFile> list) {

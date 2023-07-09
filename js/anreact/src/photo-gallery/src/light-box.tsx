@@ -307,7 +307,7 @@ export class Lightbox extends CrudCompW<Comprops & {
   }
 
   vidRef: HTMLVideoElement;
-
+  
   getResources() {
     let items = [];
     let data = this.parse(this.props.photos);

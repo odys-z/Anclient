@@ -21,7 +21,7 @@ export type AnElemFormatter = ( (
 	col: DbCol,
 	/**column index or record for the row */
 	rec: number | Tierec | AnTreeNode,
-	opts?: object
+	opts?: any
 ) => JSX.Element );
 
 export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
@@ -103,9 +103,14 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     label?: string;
 
     opts?: FO;
-	/** Column cell formatter. Usually return type of F. */
+
+	/** Column cell formatter. Usually return type of F.
+	 * 
+	 * NOTE: for tree, gride etc. the formatter is AnTreegridCol.colFormatter() 
+	 */
     formatter?: AnElemFormatter;
 
+	/**Details form field formatter. */
     fieldFormatter?: AnFieldFormatter<F, FO>;
 
     valid?: boolean;

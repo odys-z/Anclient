@@ -15,6 +15,7 @@ import android.webkit.MimeTypeMap;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
@@ -22,6 +23,8 @@ import io.oz.fpick.AndroidFile;
 import io.oz.fpick.SupportContentype;
 
 import static com.hbisoft.pickit.Utils.*;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import org.apache.commons.io_odysz.FilenameUtils;
 
@@ -73,6 +76,7 @@ public class DeviceHelper {
                 return (AndroidFile) new AndroidFile()
                         .contentProvider(SupportContentype.download, uri)
                         .device(device)
+                        .cdate(new Date(DocumentFile.fromSingleUri(context, uri).lastModified() ))
                         .clientname(getDrvFileName(uri, context))
                         .fullpath(uri.getPath());
             }
@@ -99,7 +103,9 @@ public class DeviceHelper {
                             .contentProvider(SupportContentype.download, uri)
                             .device(device)
                             .clientname(fileName)
-                            .fullpath(uri.getPath());
+                            .cdate(new Date(DocumentFile.fromSingleUri(context, uri).lastModified() ))
+                            // .fullpath(uri.toString());
+                            .fullpath(String.format("%d/%s/%s", Build.VERSION.SDK_INT, uri.getEncodedPath(), fileName));
                 }catch (Exception e){
                     e.printStackTrace();
                     return null;
@@ -126,6 +132,7 @@ public class DeviceHelper {
                     return (AndroidFile) new AndroidFile()
                             .contentProvider(SupportContentype.shared, uri)
                             .device(device)
+                            .cdate(new Date(DocumentFile.fromSingleUri(context, uri).lastModified() ))
                             .clientname(f.getName())
                             .fullpath(returnedPath);
                 }
@@ -138,12 +145,13 @@ public class DeviceHelper {
             return (AndroidFile) new AndroidFile()
                     .contentProvider(SupportContentype.shared, uri)
                     .device(device)
+                    .cdate(new Date(DocumentFile.fromSingleUri(context, uri).lastModified() ))
                     .clientname(FilenameUtils.getName(pth))
                     .fullpath(pth);
         }
     }
 
-    public static String getFilePath(Context context, Uri uri) {
+    public static String getFilePath/* fileName */(Context context, Uri uri) {
         Cursor cursor = null;
         final String[] projection = {MediaStore.Files.FileColumns.DISPLAY_NAME};
         try {

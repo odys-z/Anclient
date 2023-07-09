@@ -226,6 +226,14 @@ Reference:
 
 [7] `Answer for Android 11 <https://stackoverflow.com/a/70562311>`_
 
+[8] `Manage all files on a storage device <https://developer.android.com/training/data-storage/manage-all-files>`_
+
+But Google Play has a `restrict policy <https://support.google.com/googleplay/android-developer/answer/10467955>`_ :
+
+If your app meets the policy requirements for acceptable use or is eligible for an
+exception, you will be required to declare this and any other high-risk permissions
+using the Permissions Declaration Form in Play Console.
+
 Decision
 ________
 

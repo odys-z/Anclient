@@ -1,6 +1,7 @@
 package io.oz.albumtier;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import io.odysz.semantic.tier.docs.SyncDoc;
@@ -14,13 +15,14 @@ public interface IFileProvider {
     /**
      * Default implementation example: return Files.size(Paths.get(f.fullpath());
      * @return size
+     * @throws IOException 
      */
-    long meta(SyncDoc f);
+    long meta(SyncDoc f) throws IOException;
 
     /**
      * Example for normal file system implementation:
      * <pre>new FileInputStream(new File(path));</pre>
      * @return readable stream
      */
-    InputStream open(Object pathUri) throws FileNotFoundException;
+    InputStream open(SyncDoc f) throws FileNotFoundException;
 }

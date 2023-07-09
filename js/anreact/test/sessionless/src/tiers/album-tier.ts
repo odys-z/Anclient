@@ -61,35 +61,36 @@ export class AlbumTier extends StreeTier {
         // this.records(this.page, onLoad);
     }
 
-	toGalleryImgs(idx: number) {
-		let that = this;
-		let imgs = [] as PhotoProps<ImageSlide>[];
-		if (this.collects) {
-			let album = this.collects[idx];
-			album.photos.forEach( (p, x) => {
-				console.log(p);
-				if (!p.recId) return;
+	// toGalleryImgs(idx: number) {
+	// 	let that = this;
+	// 	let imgs = [] as PhotoProps<ImageSlide>[];
+	// 	if (this.collects) {
+	// 		let album = this.collects[idx];
+	// 		album.photos.forEach( (p, x) => {
+	// 			console.log(p);
+	// 			if (!p.recId) return;
 
-				let src = that.imgSrc(p.recId);
-				let srcSet = [src];
+	// 			let src = that.imgSrc(p.recId);
+	// 			let srcSet = [src];
 
-				let css = typeof p.css === 'string' ? JSON.parse(p.css as string) : p.css;
-				let size = css?.size;
-				let width = size && size.length > 2 ? size[2] : 4;
-				let height = size && size.length > 3 ? size[3] : 3;
+	// 			let css = typeof p.css === 'string' ? JSON.parse(p.css as string) : p.css;
+	// 			let size = css?.size;
+	// 			let width = size && size.length > 2 ? size[2] : 4;
+	// 			let height = size && size.length > 3 ? size[3] : 3;
 
-				let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
+	// 			let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
 
-				imgs.push( {
-					src,	srcSet,
-					width,	height,
-					alt,	legend: p.shareLable(), 
-					key: x.toString()
-				} );
-			} );
-		}
-		return imgs;
-	}
+	// 			imgs.push( {
+	// 				src,	srcSet,
+	// 				width,	height,
+	// 				mime:	p.mime,
+	// 				alt,	legend: p.shareLable(), 
+	// 				key: x.toString()
+	// 			} );
+	// 		} );
+	// 	}
+	// 	return imgs;
+	// }
 
 	/**
 	 * Compose src of img tag, with AlbumReq request as anson64 parameter.
