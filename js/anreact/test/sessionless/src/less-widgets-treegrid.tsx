@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreeditor2, Lightbox, AnTreegrid
+	jsample, JsonServs, Login, CrudComp, AnTreegrid
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 import { MuiThemeProvider } from '@material-ui/core/styles';
@@ -46,8 +46,7 @@ class Widgets extends React.Component<LessProps> {
 		reload: false
 	};
 
-	albumSk = 'tree-album-family-folder';
-	rolefuncsk = 'trees.role_funcs';
+	doctreesk  = 'tree-dock-folder';
 	uri = '/album/tree';
 
 	constructor(props: LessProps | Readonly<LessProps>) {
@@ -69,9 +68,6 @@ class Widgets extends React.Component<LessProps> {
 			hasError: false,
 			msg: undefined
 		});
-
-		Protocol.sk.cbbOrg = 'org.all';
-		Protocol.sk.cbbRole = 'roles';
 
 		/* this.ssclient = new Inseclient({urlRoot: this.state.servs[this.props.servId]});
 		 *
@@ -121,10 +117,6 @@ class Widgets extends React.Component<LessProps> {
 		this.setState({reload: true});
 	}
 
-	lightbox = (photos: AnTreeNode[], opts: {ix: number, open: boolean, onClose: (e: any) => {}}) => {
-		return (<Lightbox photos={photos} showResourceCount tier={this.albumtier} {...opts} />);
-	}
-
 	render() {
 	  let reload =this.state.reload;
 	  this.state.reload = false;
@@ -146,11 +138,11 @@ class Widgets extends React.Component<LessProps> {
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
                 {this.albumtier && Date().toString()}
 				<hr/>
-                {this.albumtier && <AnTreegrid key={this.albumSk}
+                {this.albumtier && <AnTreegrid key={this.doctreesk}
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
-					pk={'NA'} sk={this.albumSk}
+					pk={'NA'} sk={this.doctreesk}
 					columns={[ // noly card for folder header
 						{ type: 'text', field: 'folder', label: 'Photo Folders',
 						  grid: {sm: 6, md: 3} },
@@ -158,24 +150,8 @@ class Widgets extends React.Component<LessProps> {
 						  grid: {xs: false, sm: 6, md: 3} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
-					lightbox={this.lightbox}
 					onSelectChange={undefined}
 				/>}
-				<hr/>
-				{this.albumtier && <AnTreeditor2 key={this.rolefuncsk}
-					parent={undefined} lastSibling={false}
-					uri={this.uri} reload={reload}
-					tnode={this.albumtier.sysroot()} tier={this.albumtier}
-					pk={'NA'} sk={this.rolefuncsk}
-					columns={[
-						{ type: 'text', field: 'nodeId', label: '',
-						  grid: {xs: 12, sm: 6, md: 3} },
-						{ type: 'text', field: 'text', label: L('Name'),
-						  grid: {xs: false, sm: 6, md: 3} },
-					]}
-					onSelectChange={undefined}
-				/>}
-				<hr/>
 				{ this.state.hasError && <AnError
 					title={L('Error')} msg={this.errctx.msg}
 					uri={this.uri} tier={undefined}
