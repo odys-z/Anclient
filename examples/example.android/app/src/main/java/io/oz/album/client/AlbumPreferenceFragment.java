@@ -59,7 +59,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         String devid = singleton.photoUser.device;
         if (!LangExt.isblank(devid)) {
             // homepref.setSummary(getString(R.string.devide_name, devid));
-            homepref.setSummary(AlbumContext.getInstance(null).homeName);
+            homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
             findPreference(AlbumApp.keys.device).setEnabled(false);
             cateHome.removePreference(btnRegist);
             device.setSummary(getString(R.string.devide_name, devid));
@@ -109,7 +109,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.home.equals(k)) {
-                singleton.homeName = stringValue;
+                singleton.profiles.home(stringValue);
                 preference.setSummary(stringValue);
             }
             return true;

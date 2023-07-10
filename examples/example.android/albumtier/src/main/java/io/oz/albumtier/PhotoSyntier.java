@@ -231,30 +231,13 @@ public class PhotoSyntier extends Synclientier {
 				if (!pth.equals(startAck.doc.fullpath()))
 					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.doc.fullpath());
 
-				// totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
 				totalBlocks = p.size == 0 ? 0 : 1 + (int) ((p.size - 1 ) / blocksize);
 
 				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, startAck);
 
 				DocLocks.reading(p.fullpath());
-				// ifs = new FileInputStream(new File(p.fullpath()));
 				ifs = (FileInputStream) fileProvider.open(p);
 
-				/*
-				String b64 = AESHelper.encode64(ifs, blocksize);
-				while (b64 != null) {
-					req = new AlbumReq(tbl).blockUp(seq, p, b64, user);
-					seq++;
-
-					q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
-								.header(header);
-
-					respi = client.commit(q, errHandler);
-					if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
-
-					b64 = AESHelper.encode64(ifs, blocksize);
-				}
-				 */
 				byte[] buf = new byte[blocksize];
 				int cur = 0;
 				while (cur < p.size) {

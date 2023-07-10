@@ -15,9 +15,11 @@ import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
+import io.oz.album.tier.Profiles;
 
 public class AlbumContext {
     public boolean verbose = true;
+    public Profiles profiles;
 
     public enum ConnState { Online, Disconnected, LoginFailed }
 
@@ -58,7 +60,7 @@ public class AlbumContext {
 
     String jserv;
 
-    public String homeName;
+//    public String homeName;
 
     public PhotoSyntier tier;
 
@@ -97,7 +99,7 @@ public class AlbumContext {
         photoUser = new SessionInf(null, uid);
         photoUser.device = device;
         */
-        homeName = family;
+        profiles = new Profiles(family);
         photoUser = new SessionInf(null, uid);
         photoUser.device = device;
         this.jserv = jserv;
