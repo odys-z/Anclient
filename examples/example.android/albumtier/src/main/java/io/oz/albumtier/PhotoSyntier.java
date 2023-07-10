@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.xml.sax.SAXException;
-
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.DocLocks;
@@ -176,6 +174,22 @@ public class PhotoSyntier extends Synclientier {
         					proc, docOk, err, blocksize);
 	}
 
+	/**
+	 * MEMO: what about have Anson.toBlock() support input stream field?
+	 * 
+	 * @param client
+	 * @param uri
+	 * @param tbl
+	 * @param videos
+	 * @param fileProvider
+	 * @param proc
+	 * @param docOk
+	 * @param errHandler
+	 * @param blocksize
+	 * @return response list for each block
+	 * @throws TransException
+	 * @throws IOException
+	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
                                             List<? extends SyncDoc> videos, IFileProvider fileProvider,
 											OnProcess proc, OnDocOk docOk, OnError errHandler, int blocksize)
