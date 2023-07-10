@@ -40,12 +40,12 @@ public class DeviceHelper {
         errCtx = err;
     }
 
-    public static ArrayList<AndroidFile> getMultiplePaths(Context context, String device, ClipData clipData) throws IOException {
+    public static ArrayList<AndroidFile> getMultipleDocs(Context context, String device, ClipData clipData) throws IOException {
 //        int countMultiple = clipData.getItemCount();
         ArrayList<AndroidFile> paths = new ArrayList<>(clipData.getItemCount());
         for (int i = 0; i < clipData.getItemCount(); i++) {
             Uri uri = clipData.getItemAt(i).getUri();
-            paths.add(getPath(context, device, uri, Build.VERSION.SDK_INT));
+            paths.add(getDocDescript(context, device, uri, Build.VERSION.SDK_INT));
         }
 //        if (!isDriveFile) {
 //            pickiTCallbacks.PickiTonMultipleCompleteListener(multiplePaths, true, "");
@@ -57,7 +57,20 @@ public class DeviceHelper {
         return paths;
     }
 
-    public static AndroidFile getPath(Context context, String device, Uri uri, int APILevel) throws IOException {
+    /**
+     * Get file record (implements IFileDescriptor).
+     *
+     * For uri of Android downloaded file, return file descriptor with fullptha of pattern
+     * [API-Level]//[content name, e.g. Documents]/file-name.ext .
+     *
+     * @param context
+     * @param device
+     * @param uri
+     * @param APILevel
+     * @return file object
+     * @throws IOException
+     */
+    public static AndroidFile getDocDescript (Context context, String device, Uri uri, int APILevel) throws IOException {
         String returnedPath;
         if (APILevel >= 19) {
             String docId = null;
@@ -104,7 +117,6 @@ public class DeviceHelper {
                             .device(device)
                             .clientname(fileName)
                             .cdate(new Date(DocumentFile.fromSingleUri(context, uri).lastModified() ))
-                            // .fullpath(uri.toString());
                             .fullpath(String.format("%d/%s/%s", Build.VERSION.SDK_INT, uri.getEncodedPath(), fileName));
                 }catch (Exception e){
                     e.printStackTrace();
@@ -138,7 +150,7 @@ public class DeviceHelper {
                 }
             }
         } else {
-            //Todo: Test API <19
+            // Todo: Test API <19
             // pickiTCallbacks.PickiTonCompleteListener(returnedPath, false, false, true, "");
             String pth = getRealPathFromURI_BelowAPI19(context, uri);
             FilenameUtils.getName(pth);
@@ -169,12 +181,4 @@ public class DeviceHelper {
         return null;
     }
 
-    /**
-     * Download a new online file from the Uri that was selected
-     * @param uri
-    private static void downloadFile(Uri uri) {
-        // asyntask = new DownloadAsyncTask(uri, context, this, mActivity);
-        // asyntask.execute();
-    }
-     */
 }

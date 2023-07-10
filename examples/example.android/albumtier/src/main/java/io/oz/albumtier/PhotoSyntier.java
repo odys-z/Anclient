@@ -226,6 +226,7 @@ public class PhotoSyntier extends Synclientier {
 				// ifs = new FileInputStream(new File(p.fullpath()));
 				ifs = (FileInputStream) fileProvider.open(p);
 
+				/*
 				String b64 = AESHelper.encode64(ifs, blocksize);
 				while (b64 != null) {
 					req = new AlbumReq(tbl).blockUp(seq, p, b64, user);
@@ -239,6 +240,23 @@ public class PhotoSyntier extends Synclientier {
 
 					b64 = AESHelper.encode64(ifs, blocksize);
 				}
+				 */
+				byte[] buf = new byte[blocksize];
+				int cur = 0;
+				while (cur < p.size) {
+					if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+
+					String b64 = AESHelper.encode64(buf, ifs, 0, blocksize - cur);
+					cur += blocksize;
+					req = new AlbumReq(tbl).blockUp(seq, p, b64, user);
+					seq++;
+
+					q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+							.header(header);
+
+					respi = client.commit(q, errHandler);
+				}
+                
 				req = new AlbumReq(tbl).blockEnd(respi, user);
 
 				q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
