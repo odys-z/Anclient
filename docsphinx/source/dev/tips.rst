@@ -45,3 +45,18 @@ context.xml:
       <Parameter name="io.oz.root-key" value="16 bytes root key" orride="false"/>
     </Context>
 ..
+
+Android Studio refuse to load latest Maven snapshot
+---------------------------------------------------
+
+This error will have gradle dependencies failed for updating or downloading the
+latest deployed Maven snapshot version.
+
+Solution
+________
+
+Brutally delete .gradle cache not always working. Slow down the updating or follow
+`this answer <https://stackoverflow.com/a/62600906/7362888>`_.
+
+.. images:: ./imgs/03-maven-snapshot-gradle-error.png
+   :height: 300px
