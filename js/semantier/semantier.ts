@@ -64,7 +64,7 @@ export interface ErrorCtx {
  * 
  * - dynamic-cbb' type is a combobox changing code/value options for each row.
  */
-export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'iconame' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {
 	/**
