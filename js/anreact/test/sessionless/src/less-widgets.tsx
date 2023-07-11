@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient, DatasetOpts, LogAct, AnDatasetResp } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonServs, Login, CrudComp, AnTreeditor2, Lightbox
@@ -152,9 +152,9 @@ class Widgets extends React.Component<LessProps> {
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[ // noly card for folder header
-						{ type: 'text', field: 'folder', label: 'Photo Folders',
+						{ colType: 'text', field: 'folder', label: 'Photo Folders',
 						  grid: {sm: 6, md: 3} },
-						{ type: 'text', field: 'tags', label: L('Summary'),
+						{ colType: 'text', field: 'tags', label: L('Summary'),
 						  grid: {xs: false, sm: 6, md: 3} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
@@ -219,6 +219,15 @@ class TestreeTier extends AlbumTier {
 	constructor(uri: string, tree: CrudComp<any>, client?: SessionClient) {
 		super({uri, client, comp: tree});
 		this.client = client;
+	}
+
+	override stree(opts: DatasetOpts & {act?: LogAct, uri?: string}, errCtx: ErrorCtx): void {
+		let onOk = opts.onOk;
+		opts.onOk = (resp: AnsonMsg<AnDatasetResp>) => {
+			console.log({forest: resp.Body().forest});
+			onOk(resp);
+		}
+		super.stree(opts, errCtx);
 	}
 
 	treeroot(): AnTreeNode {

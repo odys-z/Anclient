@@ -107,7 +107,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 					options={ fcbb.options || []} val={{n: undefined, v:rec[fcbb.field]} }
 					label={ fcbb.label }
 					className={clsx(fcbb.opts?.classes, classes && classes[fcbb.style])}
-					style={ toReactStyles(fcbb.css) || { width: 200 } }
+					style={ toReactStyles(fcbb.css) || { width: 200 } } // FIXME change fcbb.css to fcbb.opts.css and verify
 					invalidStyle={ fcbb.style }
 					onSelect={ (v) => {
 						rec[fcbb.field] = v.v;

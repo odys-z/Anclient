@@ -59,6 +59,7 @@ export function hide(grid: {
 export interface CompOpts {
 	classes: ClassNames;
 	media?: Media;
+    css?: CSSStyleDeclaration;
 	// box?: {};
     // grid?: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 }

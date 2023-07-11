@@ -1,13 +1,20 @@
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
+import { Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Collapse from "@material-ui/core/Collapse";
-
 import Typography from "@material-ui/core/Typography";
+import withStyles from "@material-ui/core/styles/withStyles";
+import withWidth from "@material-ui/core/withWidth";
 
-import { AnTreeIcons } from "./tree";
+import { AnTreeNode, AnlistColAttrs, IndentIconame, toBool } from "@anclient/semantier";
 
-const styles = (theme) => ({
+import { AnTreeIcons, icon, levelIcons } from "./tree";
+import { Comprops, CrudCompW } from "../crud";
+import { ClassNames, CompOpts, Media, hide } from "../anreact";
+import { AnTreegridCol, CssTreeItem, TreeCardComp } from "./tree-editor";
+import { AnTablistProps } from "./table-list";
+
+const styles = (theme: Theme) => ({
   root: {
 	display: "flex",
 	width: "100%",
@@ -44,193 +51,214 @@ const styles = (theme) => ({
   }
 });
 
-class AnTreegridComp extends React.Component {
+class AnTreegridComp extends CrudCompW<AnTablistProps> {
   state = {
 	window: undefined,
-	treeData: {
-	  funcId: "sys",
-	  funcName: "Anclient Lv-0",
-	  level: 0,
-	  levelIcons: ['+'],
-	  expandIcon: 'F',
-	  url: "/",
-	  css: { icon: "menu-lv0" },
-	  flags: "0",
-	  fullpath: "sys",
-	  parentId: undefined,
-	  sibling: 0,
-	  children: [
-		{
-		  funcId: "domain",
-		  funcName: "Domain 1.1",
-		  level: 1,
-		  levelIcons: ['|-', '-'],
-		  url: "/sys/domain",
-		  css: { icon: "menu-lv1", url: {align: 'left'} },
-		  flags: "0",
-		  fullpath: "sys.0 domain",
-		  parentId: "sys",
-		  sibling: 0
-		},
-		{
-		  funcId: "roles",
-		  funcName: "Sysem 1.2",
-		  level: 1,
-		  levelIcons: ['L', '+'],
-		  url: "/sys/roles",
-		  css: { icon: "menu-leaf", url: {align: 'left'} },
-		  flags: "0",
-		  fullpath: "sys.1 roles",
-		  parentId: "sys",
-		  sibling: 0,
 
-		  children: [
-			{
-			  funcId: "domain",
-			  funcName: "Domain 2.1",
-			  level: 2,
-			  levelIcons: ['.', '|-', '-'],
-			  url: "/sys/domain",
-			  css: { icon: "menu-lv1", url: {align: 'left'} },
-			  flags: "0",
-			  fullpath: "sys.0 domain",
-			  parentId: "sys",
-			  sibling: 0
-			},
-			{
-			  funcId: "roles",
-			  funcName: "Sysem 2.2",
-			  level: 2,
-			  levelIcons: ['.', 'L', '-'],
-			  url: "/sys/roles",
-			  css: { icon: "menu-leaf", url: {align: 'left'} },
-			  flags: "0",
-			  fullpath: "sys.1 roles",
-			  parentId: "sys",
-			  sibling: 0
-			}
-		  ]
-		}
-	  ]
-	},
+  treeData: [
+    { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+      "id": "sys",
+      "node": { "text": "Acadynamo", "fullpath": "1 sys", "checked": "0", "sort": "1",
+        "children": [
+         {"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+          "id": "sys-domain",
+          "node": { "text": "Domain Settings", "fullpath": "1 sys.1",
+              "children": [
+                { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+                  "node": { "text": "Profiles", "fullpath": "1 sys.1.1", "checked": "0", "sort": "1", "nodeId": "sys-d-profiles", "parentId": "sys-domain", "css": {} },
+                  "parent": "io.odysz.anson.utils.TreeIndenode",
+                  "indents": [ "vlink", "childx" ], "lastSibling": true, "level": 2,
+                  "id": "sys-d-profiles", "parentId": "sys-domain"
+                } ],
+              "checked": "0", "sort": "1",
+              "nodeId": "sys-domain", "parentId": "sys", "css": {}, "expandChildren": false
+          },
+          "indents": [ "childi" ], "lastSibling": false, "level": 1,
+          "parentId": "sys", "parent": "io.odysz.anson.utils.TreeIndenode"
+         },
+         {"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+          "node": { "text": "Role Manage", "fullpath": "1 sys.2", "checked": "0", "sort": "2", "nodeId": "sys-role", "parentId": "sys", "css": {} },
+          "id": "sys-role",
+          "parent": "io.odysz.anson.utils.TreeIndenode",
+          "indents": [ "childi" ], "lastSibling": false, "level": 1,
+          "parentId": "sys"
+         }],
+        "nodeId": "sys", "css": {},
+        "expandChildren": false
+      },
+      "indents": [], "lastSibling": false, "level": 0,
+      "parent": "io.odysz.anson.utils.TreeIndenode", "parentId": null
+    },
+    { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+      "id": "n01",
+      "node": { "text": "North Pole", "fullpath": "2 n01", "checked": "0", "sort": "2", "nodeId": "n01", "css": {}, "expandChildren": false },
+      "indents": [], "lastSibling": false, "level": 0,
+      "parent": "io.odysz.anson.utils.TreeIndenode", "parentId": null
+    }
+  ] as AnTreeNode[],
 
 	expandings: new Set()
   };
 
-  constructor(props) {
+  constructor(props: AnTablistProps) {
 	super(props);
-	// this.state.window = props.window;
 
 	this.toExpandItem = this.toExpandItem.bind(this);
 	this.treeNodes = this.treeNodes.bind(this);
   }
 
-  toExpandItem(e) {
+  toExpandItem(e: React.MouseEvent<HTMLDivElement>) {
 	e.stopPropagation();
-	let f = e.currentTarget.getAttribute("iid");
+	let id = e.currentTarget.id;
 
 	let expandings = this.state.expandings;
-	if (expandings.has(f)) expandings.delete(f);
-	else expandings.add(f);
+	if (expandings.has(id)) expandings.delete(id);
+	else expandings.add(id);
 	this.setState({ expandings });
   }
 
   /**
    * @param {object} classes
    */
-  treeNodes(classes) {
-	let that = this;
+  treeNodes(classes: ClassNames, media: Media) {
+    let that = this;
 
-	let m = this.state.treeData;
-	let expandItem = this.toExpandItem;
-	let mtree = buildTreegrid( m, classes );
-	return mtree;
+    let m = this.state.treeData;
+    let expandItem = this.toExpandItem;
+    let mtree = buildTreegrid( m );
+    return mtree;
 
-	function buildTreegrid(menu) {
-	  if (Array.isArray(menu)) {
-		return menu.map((i, x) => {
-		  return buildTreegrid(i);
-		});
-	  } else {
-		let open = that.state.expandings.has(menu.funcId);
-		if (menu.children && menu.children.length > 0)
-		  return (
-			<div key={menu.funcId} className={classes.folder}>
-			  <div
-				onClick={expandItem}
-				iid={menu.funcId}
-				className={classes.folderHead}
-			  >
-				<Grid container spacing={0}>
-				  <Grid item xs={8} >
-						<Typography noWrap>
-						  {leadingIcons(menu.levelIcons, open, menu.expandIcon)}
-						  {icon(menu.css.icon)}
-						  {menu.funcName}
-						</Typography>
-				  </Grid>
-				  <Grid item xs={3} >
-					<Typography>{menu.url}</Typography>
-				  </Grid>
-				  <Grid item xs={1}>
-					{open ? icon("expand") : icon("collapse")}
-				  </Grid>
-				</Grid>
-			  </div>
-			  <Collapse in={open} timeout="auto" unmountOnExit>
-				{buildTreegrid(menu.children)}
-			  </Collapse>
-			</div>
-		  );
-		else
-		  return (
-			<Grid container
-			  key={menu.funcId}
-			  spacing={0}
-			  className={classes.row}
-			>
-			  <Grid item xs={4} className={classes.rowHead}>
-				  <Typography noWrap>
-					{leadingIcons(menu.levelIcons)}
-					{icon(menu.css.icon)}
-					{menu.funcName}
-				  </Typography>
-			  </Grid>
-			  <Grid item xs={4} className={classes.treeItem}>
-				<Typography noWrap align={align(menu.css.level)}>{menu.level}</Typography>
-			  </Grid>
-			  <Grid item xs={4} className={classes.treeItem}>
-				<Typography align={align(menu.css.url)}>{menu.url}</Typography>
-			  </Grid>
-			</Grid>
-		  );
-	  }
-	}
+    function buildTreegrid(menu: AnTreeNode[] | AnTreeNode) {
+      if (Array.isArray(menu)) 
+        return menu.map((i, x) => buildTreegrid(i));
+      else {
+        let open = that.state.expandings.has(menu.id);
+        if (menu.node.children?.length > 0)
+          return folder(that.props.columns, menu, open);
+        else
+          return iconItem(that.props.columns, menu);
+          // gridItem(that.props.columns, menu);
+      }
+    }
 
-	function icon(icon) {
-	  return AnTreeIcons[icon || "deflt"];
-	}
+    function align(css?: CSSStyleDeclaration) {
+      // function align(css: CssTreeItem = {}) {
+      return css?.align ? css.align : 'center'; //
+    }
 
-	function align(css = {}) {
-	  return css.align ? css.align : 'center';
-	}
+    function folder(cols: AnTreegridCol[], menu: AnTreeNode, open: boolean) {
+      return (
+        <div key={menu.id} className={classes.folder}>
+          <div  id={menu.id} onClick={expandItem}
+                className={classes.folderHead} >
+            <Grid container spacing={0}>
+                <Grid item xs={6} >
+                <Typography noWrap>
+                    {levelIcons(
+                        that.props.indentSettings,
+                        menu.indents as IndentIconame[])}
+                    { open ?
+                        icon(that.props.indentIcons, "expand", 0) :
+                        icon(that.props.indentIcons, "collapse", 0)}
+                    {menu.node.text}
+                </Typography>
+                </Grid>
+                <Grid item xs={2} >
+                  { !open && <Typography>{`[${menu.node.children?.length}]`}</Typography> }
+                </Grid>
+                <Grid item xs={1}>
+                {icon(that.props.indentIcons, menu.node.css.icon || "[]", 0)}
+                </Grid>
+            </Grid>
+            </div>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              {buildTreegrid(menu.node.children)}
+            </Collapse>
+        </div>
+      );
+    }
 
-	function leadingIcons(icons, expand, expIcon) {
-	  return icons.map((v, x) => {
-		return x === icons.length - 1 && expand
-			? expIcon ? <React.Fragment key={x}>{icon(expIcon || '+')}</React.Fragment>
-					  : <React.Fragment key={x}>{icon('T')}</React.Fragment>
-			: <React.Fragment key={x}>{icon(v)}</React.Fragment>;
-	  });
-	}
+    function iconItem (cols: AnTreegridCol[], n: AnTreeNode) {
+      return (
+        <Grid container key={n.id} spacing={0} className={classes.row} >
+          {/*
+          <Grid item xs={4} className={classes.rowHead}>
+            <Typography noWrap>
+              {levelIcons(that.props.indentSettings, n.indents as IndentIconame[])}
+              {icon(that.props.indentIcons, "-", 0)}
+              {n.node.text}
+            </Typography>
+          </Grid>
+          <Grid item xs={4} className={classes.treeItem}>
+            <Typography noWrap align={align(n.node.css)}>{n.node.mime}</Typography>
+          </Grid>
+          <Grid item xs={4} className={classes.treeItem}>
+            <Typography align={align(n.node.css)}>{n.url}</Typography>
+          </Grid>*/}
+          { that.props.columns
+            .filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible, true) )
+            .map( (col: AnlistColAttrs<JSX.Element, CompOpts>, cx: number) => {
+              if (cx === 0) return (
+                hide(col.grid, media) ? undefined :
+                <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
+                  <Typography noWrap variant='body2'>
+                    {levelIcons(that.props.indentSettings, n.indents)}
+                    {n.node.text}
+                  </Typography>
+                </Grid> );
+              else if (col.type === 'actions')
+                return ( hide(col.grid, media) ? undefined :
+                  TreeCardComp.actionFragment(n, col, cx, this, that.props));
+              else return (
+                hide(col.grid, media) ? undefined :
+                <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
+                  { typeof col.formatter === 'function' ?
+                    col.formatter(col, n) :
+                    <Typography noWrap variant='body2' align={align(col.css)} >
+                      {n.node.text}
+                    </Typography>
+                  }
+                </Grid> );
+            } )
+          }
+        </Grid>);
+    }
+
+    function gridItem(cols: AnTreegridCol[], menu: AnTreeNode) {
+      return (
+        <Grid container
+          key={menu.id}
+          spacing={0}
+          className={classes.row}
+        >
+          <Grid item xs={4} className={classes.rowHead}>
+            <Typography noWrap>
+              {levelIcons(that.props.indentSettings, menu.indents as IndentIconame[])}
+              {icon(that.props.indentIcons, "-", 0)}
+              {menu.node.text}
+            </Typography>
+          </Grid>
+          <Grid item xs={4} className={classes.treeItem}>
+            <Typography noWrap align={align(menu.node.css)}>{menu.node.mime}</Typography>
+          </Grid>
+          <Grid item xs={4} className={classes.treeItem}>
+            <Typography align={align(menu.node.css)}>{menu.url}</Typography>
+          </Grid>
+        </Grid>);
+    }
   }
 
   render() {
-	const { classes } = this.props;
-
-	return <div className={classes.root}>{this.treeNodes(classes)}</div>;
+    const { classes, width } = this.props;
+		let media = CrudCompW.getMedia(width);
+    return this.treeNodes(classes, media);
   }
 }
 
-const AnTreegrid = withStyles(styles)(AnTreegridComp);
+/**
+ * Supported ColTypes: iconame, text, action, formatter (AnlistColAttrs.fomatter),
+ * 
+ * Where iconame is a combination of icon and text configured by 
+ */
+const AnTreegrid = withStyles<any, any, AnTablistProps>(styles)(withWidth()(AnTreegridComp));
 export { AnTreegrid, AnTreegridComp }

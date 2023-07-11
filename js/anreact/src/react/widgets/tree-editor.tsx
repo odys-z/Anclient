@@ -19,13 +19,13 @@ import { CrudCompW, DetailFormW } from "../crud";
 import { swap } from "../../utils/lang-ext";
 import { AnReactExt, ClassNames, CompOpts, Media, hide } from "../anreact";
 import { JsampleIcons } from "../../jsample/styles";
-import { AnTreeIcons } from "./tree";
 import { AnContext, AnContextType } from "../reactext";
 import { SimpleForm } from "./simple-form";
 import { L } from "../../utils/langstr";
 
 import { photos as _photos } from "./res/temp-photos";
 import Lightbox from "../../photo-gallery/src/light-box";
+import { icon, levelIcons } from "./tree";
 
 const styles = (theme: Theme) => ({
   root: {
@@ -87,8 +87,8 @@ interface TreecardProps extends AnTablistProps {
 	tnode: AnTreeNode;
 };
 
-interface CssTreeItem extends React.CSSProperties {
-    align: string
+export interface CssTreeItem extends React.CSSProperties {
+    align?: PropTypes.Alignment
 }
 
 
@@ -203,35 +203,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 
 	leadingIcons () {
 		let tnode = this.props.tnode;
-		let n = tnode.node;
-		return TreeCardComp.levelIcons(this.props.indentSettings, tnode.indents);
-			// n.css?.icon, islastSibling, n.children?.length > 0, this.state.expand, tnode)
-	}
-
-	// TODO merge with treegrid
-	/**
-	 * 
-	 * @see {@link IndentIconame}
-	 * @param iconNames 
-	 * @param lvlIcons 
-	 * @param itemIcon 
-	 * @param lastSibling 
-	 * @param hasChildren 
-	 * @param expand 
-	 * @returns indent fragment
-	 */
-	static levelIcons(iconNames: IndentIcons, lvls: IndentIconame[]) {
-		return (<React.Fragment >
-				{lvls && lvls.map( (i, x) => TreeCardComp.icon(iconNames, i, x) )}
-			</React.Fragment>);
-	}
-
-	static icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentIconame, k: string | number) {
-		let icon = AnTreeIcons[(iconNames || defltIcons)[name || 'deflt']]
-				|| AnTreeIcons[name]; // extend to all supported icons
-		if (!icon)
-			console.error(`Icon name, ${name}, is not one of supported names.`, defltIcons);
-		return React.cloneElement(icon, {key: k});
+		return levelIcons(this.props.indentSettings, tnode.indents);
 	}
 
 	static actionFragment(tnode: AnTreeNode, col: AnTreegridCol,
@@ -278,11 +250,9 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 		let { classes, media } = this.props;
 
 		return (
-		  <Grid container
-				key={tnode.id}
-				spacing={0}
+		  <Grid container key={tnode.id}
 				onClick={this.props.conClick}
-				className={classes.row} >
+				spacing={0} className={classes.row} >
 			{ this.props.columns
 				.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible, true) )
 				.map( (col: AnlistColAttrs<JSX.Element, CompOpts>, cx: number) => {
@@ -294,49 +264,18 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 							{n.text}
 						</Typography>
 					</Grid> );
-				  else if (col.type === 'actions') return (
-					hide(col.grid, media) ? undefined :
-					TreeCardComp.actionFragment(tnode, col, cx, this, this.props)
-					/*
-					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
-						<JsampleIcons.Up onClick={this.toUp} />
-						<JsampleIcons.Down onClick={this.toDown} />
-						{media.isMd ?
-							<><Button onClick={this.props.toEdit}
-								data-me={tnode.id} data-parent={n.parentId}
-								startIcon={<JsampleIcons.Edit />} color="primary" >
-								{L('Edit')}
-							  </Button>
-							  <Button onClick={this.props.toDel}
-								data-me={tnode.id} data-parent={n.parentId}
-								startIcon={<JsampleIcons.Delete />} color="secondary" >
-								{L('Delete')}
-							  </Button>
-							</>
-							:
-							<><JsampleIcons.Edit onClick={this.props.toEdit}
-								className={classes.smallBtn}
-								data-me={tnode.id} data-parent={n.parentId}
-								color='primary'
-							  />
-							  <JsampleIcons.Delete onClick={this.props.toDel}
-							  	className={classes.smallBtn}
-								data-me={tnode.id} data-parent={n.parentId}
-								color='secondary'
-							  />
-							</>
-						}
-					</Grid> */);
+				  else if (col.type === 'actions')
+				  	return ( hide(col.grid, media) ? undefined :
+							TreeCardComp.actionFragment(tnode, col, cx, this, this.props));
 				  else return (
-					// Note: return "true" will result in warning: 
-					// Warning: Failed prop type: Invalid prop `children` supplied to `ForwardRef(Grid)`, expected a ReactNode.
-					// hide(col.grid, media) ||
 					hide(col.grid, media) ? undefined :
 					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
 						{ typeof col.formatter === 'function' ?
 							col.formatter(col, tnode) :
-							<Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
-								{n.text}
+							<Typography noWrap variant='body2'
+								align={align(n.css[col.field])} // FIXME this is bug: n.css[col-name]
+								className={classes.rowText} >
+								{n.text} {/*FIXME shoulde be: n[col.field] */}
 							</Typography>
 						}
 					</Grid> );
@@ -352,7 +291,6 @@ class TreeCardComp extends DetailFormW<TreecardProps> implements AnreactreeItem 
 TreeCardComp.contextType = AnContext;
 
 const TreeCard = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeCardComp));
-export { TreeCard, TreeCardComp }
 
 class TreeGallaryComp extends TreeCardComp {
 	// tier: AlbumTier;
@@ -417,11 +355,11 @@ class TreeGallaryComp extends TreeCardComp {
 					hide(col.grid, media) ? undefined :
 					<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
 						<Typography noWrap variant='body2' >
-						{TreeCardComp.levelIcons(
+						{levelIcons(
 							that.props.indentSettings,
 							tnode.indents as IndentIconame[])}
-						{expd ? TreeCardComp.icon(that.props.indentIcons, "pic-lib", 0)
-							: TreeCardComp.icon(that.props.indentIcons, "collapse", 0)}
+						{expd ? icon(that.props.indentIcons, "pic-lib", 0)
+							: icon(that.props.indentIcons, "collapse", 0)}
 						{n.text}
 						</Typography>
 					</Grid>);
@@ -455,25 +393,16 @@ class TreeGallaryComp extends TreeCardComp {
 			return (
 			  <Typography noWrap variant='body2' className={classes.rowText} >
 				{hide(grid, media) ? undefined : `[${n.pname}]`}
-				{ Number(n.img) > 0 &&
-					[TreeCardComp.icon(that.props.indentIcons, "[]", 0),
-					`x ${n.img}`] } 
-				{ Number(n.geo) > 0 &&
-					[TreeCardComp.icon(that.props.indentIcons, "!", 0),
-					`x ${n.geo}`] } 
-				{ Number(n.mov) > 0 &&
-					[TreeCardComp.icon(that.props.indentIcons, ">", 0),
-					`x ${n.mov}`] }
-				{ Number(n.fav) > 0 &&
-					[TreeCardComp.icon(that.props.indentIcons, "b", 0),
-					`x ${n.fav}`] }
+				{ Number(n.img) > 0 && [icon(that.props.indentIcons, "[]", 0), `x ${n.img}`] } 
+				{ Number(n.geo) > 0 && [icon(that.props.indentIcons, "!", 0), `x ${n.geo}`] } 
+				{ Number(n.mov) > 0 && [icon(that.props.indentIcons, ">", 0), `x ${n.mov}`] }
+				{ Number(n.fav) > 0 && [icon(that.props.indentIcons, "b", 0), `x ${n.fav}`] }
 			  </Typography>);
 		}
 	}
 }
 
 const TreeGallary = withStyles<any, any, TreecardProps>(styles)(withWidth()(TreeGallaryComp));
-export { TreeGallary, TreeGallaryComp }
 
 interface AnTreeditorProps extends AnTablistProps {
 	columns: Array<AnTreegridCol>;
@@ -603,9 +532,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		let {uri, sk} = this.props;
 		let that = this;
 		(this.context as AnContextType).uiHelper
-			.rebuildTree({uri, sk, rootId: root}, () => {
-				that.toSearch();
-			});
+			.rebuildTree({uri, sk, rootId: root}, () => that.toSearch());
 	}
 
 	/**
@@ -622,16 +549,11 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[],
 				parent: AnTreeNode, compOpts: CompOpts) {
 		  if (Array.isArray(tnode)) {
-			return tnode.map((i, x) => {
-			  // return buildTreegrid(i, parent, parent?.node && x === parent.node.children?.length - 1, compOts);
-			  return buildTreegrid(i, parent, compOts);
-			});
+			return tnode.map((i, x) => buildTreegrid(i, parent, compOts));
 		  }
 		  else if (tnode) {
-			// tnode = incIndent(tnode, parent, isLastChild);
 			tnode.node.css = tnode.node.css || {};
 
-			// let ntype = tnode.node.nodetype || TreeNodeVisual[TreeNodeVisual.card];
 			let ntype = TreeNodeVisual[tnode.node.nodetype] || TreeNodeVisual.card;
 			if (ntype === TreeNodeVisual.card && tnode.node.children?.length > 0) {
 			  return (
@@ -724,11 +646,11 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 						hide(col.grid, media) ? undefined :
 						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
 							<Typography noWrap variant='body2' >
-							{TreeCardComp.levelIcons(
+							{levelIcons(
 								that.props.indentSettings,
 								treenode.indents as IndentIconame[])}
-							{expd ? TreeCardComp.icon(that.props.indentIcons, "expand", 0)
-								: TreeCardComp.icon(that.props.indentIcons, "collapse", 0)}
+							{expd ? icon(that.props.indentIcons, "expand", 0)
+								: icon(that.props.indentIcons, "collapse", 0)}
 							{n.text}
 							</Typography>
 						</Grid>);
@@ -808,5 +730,10 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 }
 AnTreeditorComp2.contextType = AnContext;
 
+/**
+ * Supported ColTypes: text, action, formatter (AnlistColAttrs.fomatter)
+ */
 const AnTreeditor2 = withStyles<any, any, TreecardProps>(styles)(withWidth()(AnTreeditorComp2));
-export { AnTreeditor2, AnTreeditorComp2, TreecardProps, AnTreegridCol }
+
+export { TreeCard, TreeCardComp, TreeGallary, TreeGallaryComp,
+	AnTreeditor2, AnTreeditorComp2, TreecardProps, AnTreegridCol }

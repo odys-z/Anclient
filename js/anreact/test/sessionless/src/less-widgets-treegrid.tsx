@@ -141,13 +141,15 @@ class Widgets extends React.Component<LessProps> {
                 {this.albumtier && <AnTreegrid key={this.doctreesk}
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
-					tnode={this.albumtier.treeroot()} tier={this.albumtier}
+					tier={this.albumtier}
 					pk={'NA'} sk={this.doctreesk}
 					columns={[ // noly card for folder header
-						{ type: 'text', field: 'folder', label: 'Photo Folders',
-						  grid: {sm: 6, md: 3} },
-						{ type: 'text', field: 'tags', label: L('Summary'),
-						  grid: {xs: false, sm: 6, md: 3} },
+						{ type: 'iconame', field: 'folder', label: L('Name'),
+						  grid: {sm: 4, md: 2} },
+						{ type: 'text', field: 'text', label: L('Summary'),
+						  grid: {xs: false, sm: 4, md: 2} },
+						{ type: 'text', field: 'text', label: L('Summary'),
+						  grid: {xs: false, sm: 4, md: 2} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
 					onSelectChange={undefined}
