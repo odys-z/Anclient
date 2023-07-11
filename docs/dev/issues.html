@@ -110,6 +110,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#id2">Solution</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#query-android-pdf-office-files-results-empty">Query Android PDF / Office Files Results Empty</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#about-the-issue">About the issue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#decision">Decision</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#what-s-next">What’s next</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tips.html">Tips</a></li>
@@ -307,6 +313,100 @@ npm install --save regenerator-runtime
 </pre></div>
 </div>
 <p>These 2 steps should solve the problem.</p>
+</div>
+</div>
+<div class="section" id="query-android-pdf-office-files-results-empty">
+<h2>Query Android PDF / Office Files Results Empty<a class="headerlink" href="#query-android-pdf-office-files-results-empty" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="about-the-issue">
+<h3>About the issue<a class="headerlink" href="#about-the-issue" title="Permalink to this headline">¶</a></h3>
+<p>On Android 10, API lever 29 (Q) or lower, CursorLoader#on won’t get any files
+because of the Scoped Storage natural.</p>
+<p>CursorLoader:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FileLoader</span> <span class="kd">extends</span> <span class="n">CursorLoader</span> <span class="p">{</span>
+
+    <span class="kd">public</span> <span class="nf">FileLoader</span><span class="p">(</span><span class="n">Context</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">super</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
+        <span class="n">setProjection</span><span class="p">(</span><span class="n">FILE_PROJECTION</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Build</span><span class="p">.</span><span class="na">VERSION</span><span class="p">.</span><span class="na">SDK_INT</span> <span class="o">&gt;=</span> <span class="n">Build</span><span class="p">.</span><span class="na">VERSION_CODES</span><span class="p">.</span><span class="na">Q</span><span class="p">)</span>
+            <span class="n">setUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">getContentUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">VOLUME_EXTERNAL</span><span class="p">));</span>
+        <span class="k">else</span>
+            <span class="n">setUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">getContentUri</span><span class="p">(</span><span class="s">&quot;external&quot;</span><span class="p">));</span>
+
+        <span class="n">setSortOrder</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">FileColumns</span><span class="p">.</span><span class="na">DATE_ADDED</span> <span class="o">+</span> <span class="s">&quot; DESC&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Usage (with performance issue):</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">filefilter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileFilterx</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">directories</span> <span class="o">-&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">isNeedFolderList</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Directory</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+        <span class="n">Directory</span> <span class="n">all</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Directory</span><span class="p">();</span>
+        <span class="n">all</span><span class="p">.</span><span class="na">setName</span><span class="p">(</span><span class="n">getResources</span><span class="p">().</span><span class="na">getString</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="na">string</span><span class="p">.</span><span class="na">vw_all</span><span class="p">));</span>
+        <span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">all</span><span class="p">);</span>
+        <span class="n">list</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">directories</span><span class="p">);</span>
+        <span class="n">mFolderHelper</span><span class="p">.</span><span class="na">fillData</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">loadirs</span><span class="p">(</span><span class="n">directories</span><span class="p">);</span> <span class="c1">// parse files, can&#39;t find files other than medias</span>
+<span class="p">});</span>
+<span class="n">filefilter</span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">suffix</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Reference:</p>
+<p>[1] <a class="reference external" href="https://developer.android.com/training/data-storage">Data and file storage overview, DOCUMENTATION at developers</a> ,</p>
+<p>[2]  Android API Level and Cumulative Usage, <a class="reference external" href="https://apilevels.com">apilevels.com</a></p>
+<dl class="simple">
+<dt>[3] Grant access to a directory’s contents, Access documents and other files from shared storage</dt><dd><p><a class="reference external" href="https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory">DOCUMENTATION at developers</a></p>
+</dd>
+</dl>
+<p>[4] <a class="reference external" href="https://www.youtube.com/watch?v=RjyYCUW-9tY">Android Developers, Storage access with Android 11, Youtube</a></p>
+<p>[5] <a class="reference external" href="https://github.com/HBiSoft/PickiT">HBiSoft, PickiT</a></p>
+<p>[6] <a class="reference external" href="https://stackoverflow.com/a/71260711">An up-voted answers</a></p>
+<p>[7] <a class="reference external" href="https://stackoverflow.com/a/70562311">Answer for Android 11</a></p>
+<p>[8] <a class="reference external" href="https://developer.android.com/training/data-storage/manage-all-files">Manage all files on a storage device</a></p>
+<p>But Google Play has a <a class="reference external" href="https://support.google.com/googleplay/android-developer/answer/10467955">restrict policy</a> :</p>
+<p>If your app meets the policy requirements for acceptable use or is eligible for an
+exception, you will be required to declare this and any other high-risk permissions
+using the Permissions Declaration Form in Play Console.</p>
+</div>
+<div class="section" id="decision">
+<h3>Decision<a class="headerlink" href="#decision" title="Permalink to this headline">¶</a></h3>
+<p>Let users pick local files then match the results with pushed records.</p>
+<p>Sample App: <a class="reference external" href="https://github.com/HBiSoft/PickiT">PickiT</a></p>
+<a class="reference internal image-reference" href="../_images/02-pickit-mime-application.png"><img alt="../_images/02-pickit-mime-application.png" src="../_images/02-pickit-mime-application.png" style="height: 360px;" /></a>
+<p>Using <a class="reference external" href="https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory">Grant access to a directory’s contents</a>
+and disable the function lower than API 21.</p>
+</div>
+<div class="section" id="what-s-next">
+<h3>What’s next<a class="headerlink" href="#what-s-next" title="Permalink to this headline">¶</a></h3>
+<p>Try on Android 11.</p>
+<p>See [4], [6] &amp; [7].</p>
+<p>Code snipet of [6]:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">getPdfList</span><span class="p">(</span>
+        <span class="n">Uri</span> <span class="n">collection</span><span class="p">,</span>         <span class="c1">// MediaStore.Downloads.getContentUri(&quot;external&quot;)</span>
+        <span class="n">String</span><span class="o">[]</span> <span class="n">projection</span><span class="p">,</span>    <span class="c1">// result list&#39;s columes index</span>
+        <span class="n">String</span> <span class="n">selection</span><span class="p">,</span>       <span class="c1">// mime of pdf</span>
+        <span class="n">String</span><span class="o">[]</span> <span class="n">selectionArgs</span><span class="p">,</span> <span class="c1">// mime</span>
+        <span class="n">String</span> <span class="n">sortOrder</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">pdfList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+    <span class="k">try</span> <span class="p">(</span><span class="n">Cursor</span> <span class="n">cursor</span> <span class="o">=</span> <span class="n">getContentResolver</span><span class="p">().</span><span class="na">query</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">selectionArgs</span><span class="p">,</span> <span class="n">sortOrder</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">assert</span> <span class="n">cursor</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">cursor</span><span class="p">.</span><span class="na">moveToFirst</span><span class="p">())</span> <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">columnData</span> <span class="o">=</span> <span class="n">cursor</span><span class="p">.</span><span class="na">getColumnIndex</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">FileColumns</span><span class="p">.</span><span class="na">DATA</span><span class="p">);</span>
+            <span class="k">do</span> <span class="p">{</span>
+                <span class="n">pdfList</span><span class="p">.</span><span class="na">add</span><span class="p">((</span><span class="n">cursor</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">columnData</span><span class="p">)));</span>
+                <span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;getPdf: &quot;</span> <span class="o">+</span> <span class="n">cursor</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">columnData</span><span class="p">));</span>
+                <span class="c1">//you can get your pdf files</span>
+            <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">cursor</span><span class="p">.</span><span class="na">moveToNext</span><span class="p">());</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">pdfList</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>

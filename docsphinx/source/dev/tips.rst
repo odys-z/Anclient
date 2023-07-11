@@ -58,5 +58,5 @@ ________
 Brutally delete .gradle cache not always working. Slow down the updating or follow
 `this answer <https://stackoverflow.com/a/62600906/7362888>`_.
 
-.. images:: ./imgs/03-maven-snapshot-gradle-error.png
+.. image:: ./imgs/03-maven-snapshot-gradle-error.png
    :height: 300px

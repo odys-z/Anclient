@@ -241,7 +241,8 @@ Let users pick local files then match the results with pushed records.
 
 Sample App: `PickiT <https://github.com/HBiSoft/PickiT>`_
 
-.. image:: ./imgs/02-pickit-mime of application.png
+.. image:: ./imgs/02-pickit-mime-application.png
+    :height: 360px
 ..
 
 Using `Grant access to a directory's contents <https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory>`_
