@@ -125,18 +125,20 @@ export class App extends CrudCompW<AlbumProps> {
 		this.setState({tobeLoaded: true})
 	}
 
-	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes: ClassNames, media: Media} | undefined) {
+	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes?: ClassNames, media?: Media} | undefined) {
+		let that = this;
 		return (
 			<Grid item key={ix as number} {...col.grid}>
 			<Button onClick={onToggle}
 				data-me={undefined} date-parent={undefined}
 				startIcon={<JsampleIcons.ResetSearch />} color="primary" >
-				{opts?.media.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
+				{opts?.media?.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
 			</Button>
 			</Grid> );
 
-		function onToggle() {
-
+		function onToggle(e: React.MouseEvent) {
+			that.setState({showingDocs: !that.state.showingDocs});
+			console.log(e);
 		}
 	}
 
@@ -174,6 +176,7 @@ export class App extends CrudCompW<AlbumProps> {
 		  { this.albumtier && (
 			this.state.showingDocs ?
 		    <AnTreegrid uri={this.uri}
+				pk={''} onSelectChange={()=>{}}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
 					{ text: L('Domain Name'), color: 'primary', field:"domainName"},

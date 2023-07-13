@@ -17,7 +17,7 @@ import FavoriteBorderOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 
 import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentIconame, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
 import { Comprops, CrudCompW } from "../crud";
-import { ClassNames, CompOpts, Media } from "../anreact";
+import { CompOpts } from "../anreact";
 import { AnTablistProps } from "./table-list";
 
 export const AnTreeIcons = {
@@ -188,9 +188,9 @@ interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
 	 * Overide AnTablistProps#formatter
 	 * Formatt a tree item cell/grid from col and node.
 	 */
-	colFormatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => JSX.Element;
+	colFormatter?: (col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts) => JSX.Element;
 
-	thFormatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, colx: number, opts?: CompOpts) => JSX.Element;
+	thFormatter?: (col: AnTreegridCol, colx: number, opts?: CompOpts) => JSX.Element;
 }
 
 enum TreeNodeVisual {
@@ -359,6 +359,5 @@ class AnTreeComp extends CrudCompW<Comprops> {
 }
 
 const AnTree = withStyles(styles)(AnTreeComp);
-export { levelIcons, icon, TreeNodeVisual,
-	AnTreegridCol, TreeItemProps,
-	AnreactreeItem, AnTree, AnTreeComp }
+export { levelIcons, icon, TreeNodeVisual, AnTreegridCol,
+		TreeItemProps, AnreactreeItem, AnTree, AnTreeComp }
