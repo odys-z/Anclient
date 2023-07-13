@@ -1,13 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
+import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
-
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonServs, Login, CrudComp, AnTreegrid
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
-import { MuiThemeProvider } from '@material-ui/core/styles';
 
 const { JsampleTheme } = jsample;
 
@@ -145,11 +143,11 @@ class Widgets extends React.Component<LessProps> {
 					pk={'NA'} sk={this.doctreesk}
 					columns={[ // noly card for folder header
 						{ type: 'iconame', field: 'folder', label: L('Name'),
-						  grid: {sm: 4, md: 2} },
+						  grid: {sm: 4, md: 3} },
 						{ type: 'text', field: 'text', label: L('Summary'),
-						  grid: {xs: false, sm: 4, md: 2} },
+						  grid: {xs: false, sm: 5, md: 3} },
 						{ type: 'text', field: 'text', label: L('Summary'),
-						  grid: {xs: false, sm: 4, md: 2} },
+						  grid: {xs: false, sm: 3, md: 2} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
 					onSelectChange={undefined}
@@ -157,7 +155,7 @@ class Widgets extends React.Component<LessProps> {
 				{ this.state.hasError && <AnError
 					title={L('Error')} msg={this.errctx.msg}
 					uri={this.uri} tier={undefined}
-				    fullScreen={false} onClose={this.onErrorClose} />}
+				    fullScreen={false} onClose={this.onErrorClose} /> }
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 	}

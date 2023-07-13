@@ -57,7 +57,7 @@ export function hide(grid: {
  * Component's visual options, e.g. options for field formatters.
  */
 export interface CompOpts {
-	classes: ClassNames;
+	classes?: ClassNames;
 	media?: Media;
     css?: CSSStyleDeclaration;
 	// box?: {};

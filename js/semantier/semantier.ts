@@ -104,7 +104,8 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
 
     opts?: FO;
 
-	/** Column cell formatter. Usually return type of F.
+	/**
+	 * Column cell formatter. Usually return type of F.
 	 * 
 	 * NOTE: for tree, gride etc. the formatter is AnTreegridCol.colFormatter() 
 	 */
@@ -116,7 +117,8 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     valid?: boolean;
 
 	/**TODO move this to @anclient/anreact */
-    css?: CSSStyleDeclaration;
+    // css?: CSSStyleDeclaration;
+
 	/**TODO move this to @anclient/anreact */
     grid?: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	/**TODO move this to @anclient/anreact */

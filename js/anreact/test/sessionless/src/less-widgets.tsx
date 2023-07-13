@@ -152,9 +152,9 @@ class Widgets extends React.Component<LessProps> {
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[ // noly card for folder header
-						{ colType: 'text', field: 'folder', label: 'Photo Folders',
+						{ type: 'text', field: 'folder', label: 'Photo Folders',
 						  grid: {sm: 6, md: 3} },
-						{ colType: 'text', field: 'tags', label: L('Summary'),
+						{ type: 'text', field: 'tags', label: L('Summary'),
 						  grid: {xs: false, sm: 6, md: 3} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
