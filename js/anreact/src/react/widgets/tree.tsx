@@ -15,8 +15,10 @@ import Wallpaper from '@material-ui/icons/Wallpaper';
 import MovieRounded from '@material-ui/icons/MovieRounded';
 import FavoriteBorderOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 
-import { AnTreeIconsType, IndentIconame, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
+import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentIconame, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
 import { Comprops, CrudCompW } from "../crud";
+import { ClassNames, CompOpts, Media } from "../anreact";
+import { AnTablistProps } from "./table-list";
 
 export const AnTreeIcons = {
 	expand: <ExpandMore style={{verticalAlign: 'middle'}} />,
@@ -117,7 +119,7 @@ function EIcon(props) {
   );
 }
 
-const styles = (theme: Theme) => ({
+const styles = (_theme: Theme) => ({
   root: {
 	display: "flex",
 	flexDirection: "column" as any,
@@ -181,6 +183,49 @@ function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentIconame, k: 
     return React.cloneElement(icon, {key: k});
 }
 
+interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
+	/**
+	 * Overide AnTablistProps#formatter
+	 * Formatt a tree item cell/grid from col and node.
+	 */
+	colFormatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, n: AnTreeNode, opts?: CompOpts) => JSX.Element;
+
+	thFormatter?: (col: AnlistColAttrs<JSX.Element, CompOpts>, colx: number, opts?: CompOpts) => JSX.Element;
+}
+
+enum TreeNodeVisual {
+	/** data item presented by {@link TreeCard} */
+	card,
+	/** container */
+	gallery,
+	/** invisible */
+	hide,
+	/** e.g. a container */
+	collapsable
+};
+
+interface TreeItemProps extends AnTablistProps {
+	indentSettings?: IndentIcons;
+	parent: AnTreeNode | undefined;
+	tnode: AnTreeNode;
+	columns: Array<AnTreegridCol>;
+};
+
+interface AnreactreeItem {
+	node: AnTreeNode;
+	toUp    : (e: React.MouseEvent<HTMLElement>) => void;
+	toTop   : (e: React.MouseEvent<HTMLElement>) => void;
+	toDown  : (e: React.MouseEvent<HTMLElement>) => void;
+	toBottom: (e: React.MouseEvent<HTMLElement>) => void;
+
+	toEdit? : (e: React.MouseEvent<HTMLElement>) => void;
+	toDel?  : (e: React.MouseEvent<HTMLElement>) => void;
+	/** or just move to AnTreeReact and calculate with java? */
+	levelIcons?: Array<AnTreeIconsType>;
+
+	/** format leading icons, according node.level */
+	leadingIcons: () => JSX.Element | JSX.Element[];
+}
 
 class AnTreeComp extends CrudCompW<Comprops> {
   state = {
@@ -217,13 +262,13 @@ class AnTreeComp extends CrudCompW<Comprops> {
 	let expandItem = this.toExpandItem;
 
 	return this.state.forest.map(
-		(tree, tx) => {return treeItems(tree);}
+		(tree, _tx) => {return treeItems(tree);}
 	);
 	// return treeItems(this.state.forest[0] || {});
 
 	function treeItems(stree) {
 	  if (Array.isArray(stree)) {
-		return stree.map((i, x) => {
+		return stree.map((i, _x) => {
 		  return treeItems(i);
 		});
 	  }
@@ -268,10 +313,10 @@ class AnTreeComp extends CrudCompW<Comprops> {
 			<Grid container key={id} className={classes.row}>
 			  <Grid item xs={9} className={classes.treeItem}>
 				<Typography >
-				  {leadingIcons(level)}
-				  {node.css && node.css.icon && icon(node.css.icon)}
-				  {that.props.checkbox
-					  && <Checkbox color="primary" checked={toBool(node.checked)}
+				  { leadingIcons(level) }
+				  { node.css && node.css.icon && icon(node.css.icon) }
+				  { that.props.checkbox
+					&& <Checkbox color="primary" checked={toBool(node.checked)}
 						onClick={(e) => {
 							e.stopPropagation();
 							node.checked = !toBool(node.checked);
@@ -300,7 +345,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
 	  return c;
 	}
 
-	function itemLabel(txt, l, css) {
+	function itemLabel(txt, _l, _css) {
 		return txt;
 	}
   }
@@ -314,4 +359,6 @@ class AnTreeComp extends CrudCompW<Comprops> {
 }
 
 const AnTree = withStyles(styles)(AnTreeComp);
-export { levelIcons, icon, AnTree, AnTreeComp }
+export { levelIcons, icon, TreeNodeVisual,
+	AnTreegridCol, TreeItemProps,
+	AnreactreeItem, AnTree, AnTreeComp }
