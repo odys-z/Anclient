@@ -65,40 +65,6 @@ export class GalleryTier extends StreeTier {
         this.collects(this.page, onLoad);
     }
 
-	// toGalleryImgs(idx: number) {
-	// 	let that = this;
-	// 	let imgs = [] as PhotoProps<PhotoRec>[];
-	// 	if (this.collectRecords) {
-	// 		let album = this.collectRecords[idx];
-	// 		album.photos.forEach( (p, x) => {
-	// 			// console.log(p);
-	// 			if (!p.recId) return;
-
-	// 			let src = that.imgSrc(p.recId);
-	// 			let srcSet = [src];
-
-	// 			let css = JSON.parse(p.css as string);
-	// 			let size = css?.size;
-	// 			let width = size && size.length > 2 ? size[2] : 4;
-	// 			let height = size && size.length > 3 ? size[3] : 3;
-
-	// 			let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
-
-	// 			imgs.push( {
-	// 				src: "",
-	// 				srcSet,
-	// 				width,
-	// 				height,
-	// 				alt,
-	// 				shareLable: () => PhotoRec.toShareLable(p),
-	// 				title: alt, 
-	// 				key: x.toString()
-	// 			} );
-	// 		} );
-	// 	}
-	// 	return imgs;
-	// }
-
 	/**
 	 * Compose src of img tag, with AlbumReq request as anson64 parameter.
 	 * 
@@ -214,17 +180,6 @@ class AlbumResp extends AnsonResp {
 
 	constructor (obj: AlbumResp) {
 		super({type: 'io.oz.album.tier.AlbumResp'});
-
-		// this.albumId = obj.albumId;
-		// this.ownerId = obj.ownerId;
-		// this.owner = obj.owner;
-		// this.collectRecords = obj.collectRecords;
-		// this.profils = obj.profils;
-		// this.photos = obj.photos;
-		// this.clientPaths = obj.clientPaths;
-		// this.photo = obj.photo;
-		// this.forest = obj.forest;
-
 		Object.assign(this, obj);
 	}
 }

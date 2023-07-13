@@ -21,7 +21,7 @@ export type AnElemFormatter = ( (
 	col: DbCol,
 	/**column index or record for the row */
 	rec: number | Tierec | AnTreeNode,
-	opts?: object
+	opts?: any
 ) => JSX.Element );
 
 export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
@@ -64,7 +64,7 @@ export interface ErrorCtx {
  * 
  * - dynamic-cbb' type is a combobox changing code/value options for each row.
  */
-export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'iconame' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
 
 export interface TierCol extends DbCol {
 	/**
@@ -103,15 +103,22 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     label?: string;
 
     opts?: FO;
-	/** Column cell formatter. Usually return type of F. */
+
+	/**
+	 * Column cell formatter. Usually return type of F.
+	 * 
+	 * NOTE: for tree, gride etc. the formatter is AnTreegridCol.colFormatter() 
+	 */
     formatter?: AnElemFormatter;
 
+	/**Details form field formatter. */
     fieldFormatter?: AnFieldFormatter<F, FO>;
 
     valid?: boolean;
 
 	/**TODO move this to @anclient/anreact */
-    css?: CSSStyleDeclaration;
+    // css?: CSSStyleDeclaration;
+
 	/**TODO move this to @anclient/anreact */
     grid?: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 	/**TODO move this to @anclient/anreact */

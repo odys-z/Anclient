@@ -230,7 +230,7 @@ class AnClient {
 						resp.code = Protocol.MsgCode.exIo;
 						resp.body = [ {
 								type: 'io.odysz.semantic.jprotocol.AnsonResp',
-								m: 'Network failed: ' + resp.statusText
+								m: `Network failed: ${url}`
 							} ];
 						let ansonResp = new AnsonMsg<AnsonResp>(resp);
 						if (typeof onErr.onError === 'function') {
@@ -244,8 +244,8 @@ class AnClient {
 							resp = new AnsonMsg({
 								port: resp.port,
 								header: resp.header,
-								body: [ { type: 'io.odysz.semantic.jprotocol.AnsonResp',
-										  m: 'Ajax: network failed: ' + resp.status } ]
+								body: [{type: 'io.odysz.semantic.jprotocol.AnsonResp',
+										m: `Network failed: ${url}` } ]
 							});
 						else resp = AnClient.fromAjaxError(resp);
 

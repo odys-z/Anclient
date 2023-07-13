@@ -15,12 +15,13 @@ import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
+import io.oz.album.tier.Profiles;
 
 public class AlbumContext {
-    public static boolean verbose = true;
+    public boolean verbose = true;
+    public Profiles profiles;
 
     public enum ConnState { Online, Disconnected, LoginFailed }
-
 
     static AlbumContext instance;
 
@@ -32,7 +33,7 @@ public class AlbumContext {
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
-        Anson.verbose = true;
+        Anson.verbose = false;
     }
 
     private String pswd;
@@ -59,7 +60,7 @@ public class AlbumContext {
 
     String jserv;
 
-    public String homeName;
+//    public String homeName;
 
     public PhotoSyntier tier;
 
@@ -98,7 +99,7 @@ public class AlbumContext {
         photoUser = new SessionInf(null, uid);
         photoUser.device = device;
         */
-        homeName = family;
+        profiles = new Profiles(family);
         photoUser = new SessionInf(null, uid);
         photoUser.device = device;
         this.jserv = jserv;
@@ -125,6 +126,8 @@ public class AlbumContext {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
+
+        // state = ConnState.LoginFailed;
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 

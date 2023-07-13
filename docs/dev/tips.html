@@ -100,6 +100,10 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tips</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#tips-for-test-jample-trouble">Tips for test/jample trouble</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#login-error-invalid-aes-key-length-26-bytes">Login error: Invalid AES key length: 26 bytes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#android-studio-refuse-to-load-latest-maven-snapshot">Android Studio refuse to load latest Maven snapshot</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#solution">Solution</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="mui-examples.html">CodeSandbox</a></li>
@@ -204,6 +208,17 @@ testing project, jsample won’t work as Protocol.sk been populated by test/jsam
 <p>If the user’s password is encrypted with a different root key, failed decryption
 will results in this error.</p>
 <p>context.xml:</p>
+</div>
+<div class="section" id="android-studio-refuse-to-load-latest-maven-snapshot">
+<h2>Android Studio refuse to load latest Maven snapshot<a class="headerlink" href="#android-studio-refuse-to-load-latest-maven-snapshot" title="Permalink to this headline">¶</a></h2>
+<p>This error will have gradle dependencies failed for updating or downloading the
+latest deployed Maven snapshot version.</p>
+<div class="section" id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+<p>Brutally delete .gradle cache not always working. Slow down the updating or follow
+<a class="reference external" href="https://stackoverflow.com/a/62600906/7362888">this answer</a>.</p>
+<a class="reference internal image-reference" href="../_images/03-maven-snapshot-gradle-error.png"><img alt="../_images/03-maven-snapshot-gradle-error.png" src="../_images/03-maven-snapshot-gradle-error.png" style="height: 300px;" /></a>
+</div>
 </div>
 </div>
 

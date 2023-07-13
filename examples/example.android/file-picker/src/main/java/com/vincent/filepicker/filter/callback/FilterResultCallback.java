@@ -3,11 +3,10 @@ package com.vincent.filepicker.filter.callback;
 import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.Directory;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.io.File;
 import java.util.List;
 
-import io.odysz.semantics.x.SemanticException;
+import io.oz.fpick.AndroidFile;
 
 /**
  * Created by Vincent Woo
@@ -15,6 +14,6 @@ import io.odysz.semantics.x.SemanticException;
  * Time: 11:39
  */
 
-public interface FilterResultCallback<T extends BaseFile> {
+public interface FilterResultCallback<T extends AndroidFile> {
     void onResult(List<Directory<T>> directories);
 }

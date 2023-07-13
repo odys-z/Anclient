@@ -20,10 +20,6 @@ import io.odysz.semantic.tier.docs.SyncDoc;
  */
 
 public class BaseFile extends SyncDoc implements Parcelable {
-//    public static int Synchronized = 1;
-//    public static int SynchUnknown = 0;
-//    public static int Synchronizing = -1;
-
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
@@ -52,20 +48,20 @@ public class BaseFile extends SyncDoc implements Parcelable {
         this.id = id;
     }
 
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public String getName() { return pname; }
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public void setName(String name) { this.pname = name; }
-
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public String getPath() { return clientpath; }
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public void setPath(String path) { this.clientpath = path; }
-
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public long getSize() { return size; }
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public void setSize(long size) { this.size = size; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public String getName() { return pname; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void setName(String name) { this.pname = name; }
+//
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public String getPath() { return clientpath; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void setPath(String path) { this.clientpath = path; }
+//
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public long getSize() { return size; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void setSize(long size) { this.size = size; }
 
     public String getLocalDirId() { return localDirId; }
 
@@ -81,10 +77,10 @@ public class BaseFile extends SyncDoc implements Parcelable {
         this.localDirName = localDirName;
     }
 
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public long getDate() { return date; }
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public void setDate(long date) { this.date = date; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public long getDate() { return date; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void setDate(long date) { this.date = date; }
 
     public boolean isSelected() { return isSelected; }
 

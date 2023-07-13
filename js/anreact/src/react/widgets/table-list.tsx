@@ -11,7 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, isEmpty, len, Tierec, toBool, UIComponent } from '@anclient/semantier';
+import { AnlistColAttrs, isEmpty, len, Tierec, toBool } from '@anclient/semantier';
 import { Comprops, DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 
@@ -28,7 +28,7 @@ interface AnTablistProps extends Comprops {
 	 */
 	selected?: {ids: Set<string>};
 
-	/** List's column definition. */
+	/** List's column definition.  */
 	columns: Array<AnlistColAttrs<JSX.Element, CompOpts> & Comprops>;
 
 	/**In tier mode, data is supposed to be bound by widget itself. */

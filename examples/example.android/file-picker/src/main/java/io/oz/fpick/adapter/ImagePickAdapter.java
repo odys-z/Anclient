@@ -1,3 +1,9 @@
+/**
+ * Created by Ody Zhou
+ * Date: 15 Feb. 2022
+ *
+ * Credits to Vincent Woo
+ */
 package io.oz.fpick.adapter;
 
 import android.content.Context;
@@ -30,26 +36,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
 import io.oz.jserv.docsync.SyncFlag;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
-/**
- * Created by Ody Zhou
- * Date: 15 Feb. 2022
- *
- * Credits to Vincent Woo
- */
-
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
-    public String mFilepath;
     public Uri mImageUri;
 
-    public ImagePickAdapter(Context ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
-        this ( ctx, new ArrayList<ImageFile> ( ), needCamera , isNeedImagePager , max );
+    public ImagePickAdapter(ImagePickActivity ctx, boolean needCamera, int max) {
+        this ( ctx, new ArrayList<ImageFile> ( ), needCamera , max );
     }
 
-    public ImagePickAdapter(Context ctx, ArrayList<ImageFile> list, boolean needCamera, boolean needImagePager , int max ) {
+    public ImagePickAdapter(BaseActivity ctx, ArrayList<ImageFile> list, boolean needCamera, int max) {
         super ( ctx , list );
         isNeedCamera = needCamera;
         mMaxNumber = max;
@@ -58,18 +57,18 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
     @NonNull
     @Override
     public ImagePickViewHolder onCreateViewHolder (@NonNull ViewGroup parent, int viewType ) {
-        View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick , parent , false );
+        View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick, parent, false );
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
+            // TODO FIXME don't measure for every item
             WindowManager wm = (WindowManager) mContext.getSystemService ( Context.WINDOW_SERVICE );
-            // int width = wm.getDefaultDisplay ( ).getWidth ( );
             DisplayMetrics displaymetrics = new DisplayMetrics();
             wm.getDefaultDisplay().getMetrics(displaymetrics);
             int width = displaymetrics.widthPixels;
             params.height = width / ImagePickActivity.COLUMN_NUMBER;
         }
         ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
-        imagePickViewHolder.setIsRecyclable ( false );
+        imagePickViewHolder.setIsRecyclable ( true );
 
         return imagePickViewHolder;
     }
@@ -98,11 +97,11 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
             // RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
-                .load ( file.getPath ( ) )
+                .load ( file.fullpath() )
                 .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
                         .centerCrop()
                         .error(R.drawable.vw_ic_synced))
-                .transition ( withCrossFade ( ) )
+                .transition ( withCrossFade() )
                 .listener(new RequestListener() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource) {
@@ -114,7 +113,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                     }
                 })
                 .into ( holder.mIvThumbnail );
-            // holder.mIvThumbnail.setImageURI(Uri.parse(file.getPath()));
+            // holder.mIvThumbnail.setImageURI(Uri.parse(file.fullpath()));
 
             if (file.syncFlag == null)
                 file.syncFlag = SyncFlag.device;
@@ -127,7 +126,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.icSynced.setVisibility(View.GONE);
             }
             // else if (file.synchFlag == BaseFile.Synchronized) {
-            else if (file.syncFlag.equals(SyncFlag.publish)) {
+            else if (file.syncFlag.equals(SyncFlag.publish) || file.syncFlag.equals(SyncFlag.hub)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -164,26 +163,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             }
 
             holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                Uri uri;
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                    File f = new File(file.getPath());
-//                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
-//                }
-//                else {
-//                    uri = Uri.parse("file://" + file.getPath());
-//                }
-//                // intent.setDataAndType(uri, "video/mp4");
-//                intent.setDataAndType(uri, "image/*");
-//                if (Util.detectIntent(mContext, intent)) {
-//                    mContext.startActivity(intent);
-//                }
-//                else {
-//                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_image_show_app));
-//                }
-//                return false;
-                return startMediaViewer(mContext, view, "image/*", file.getPath());
+                return startMediaViewer(mContext, "image/*", file.fullpath());
             });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
@@ -214,11 +194,10 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 }
 
                 if ( mListener != null ) {
-                    mListener.OnSelectStateChanged ( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
+                    mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
                 }
             });
         }
-
     }
 
     @Override

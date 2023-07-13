@@ -2,21 +2,24 @@ package io.oz.albumtier;
 
 import static io.odysz.common.LangExt.*;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.xml.sax.SAXException;
-
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.AESHelper;
+import io.odysz.common.DocLocks;
+import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
+import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
-import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
@@ -62,12 +65,6 @@ public class PhotoSyntier extends Synclientier {
 
 	/**
 	 * @param clientUri - the client function uri this instance will be used for.
-	 * @param device
-	 * @param errCtx
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws SQLException 
-	 * @throws SemanticException 
 	 */
 	public PhotoSyntier(String clientUri, String device, OnError errCtx)
 			throws SemanticException, IOException {
@@ -82,6 +79,11 @@ public class PhotoSyntier extends Synclientier {
 		}, err, device);
 
 		return this;
+	}
+
+	IFileProvider fileProvider;
+	public void fileProvider(IFileProvider p) {
+		this.fileProvider = p;
 	}
 
 	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
@@ -121,13 +123,7 @@ public class PhotoSyntier extends Synclientier {
 	/**
 	 * @see #syncVideos(List, OnProcess, OnDocOk, OnError...)
      *
-	 * @param videos
-	 * @param proc
-	 * @param docOk
-	 * @param onErr
 	 * @return list of response
-	 * @throws TransException
-	 * @throws IOException
 	 */
 	public PhotoSyntier asyVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, OnError ... onErr)
@@ -153,18 +149,159 @@ public class PhotoSyntier extends Synclientier {
 	 * Push up videos (larg files) with
 	 * {@link #pushBlocks(String, List, OnProcess, OnDocOk, OnError...)}
 	 *
-	 * @param videos
-	 * @param proc
-	 * @param docOk
-	 * @param onErr
 	 * @return list of response
-	 * @throws TransException
-	 * @throws IOException
 	 */
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, OnError ... onErr)
 			throws TransException, IOException {
 		return pushBlocks(meta.tbl, videos, proc, docOk, onErr);
+	}
+
+	/**
+	 * Upward pushing with BlockChain
+	 * 
+	 * @param tbl doc table name
+	 * @param videos any doc-table managed records, of which uri shouldn't be loaded,
+	 * e.g. use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) extFile()} as sql select expression.
+	 * - the method is working in stream mode
+	 * @return list of response
+	 */
+	public List<DocsResp> pushBlocks(String tbl, List<? extends SyncDoc> videos,
+				OnProcess proc, OnDocOk docOk, OnError ... onErr)
+				throws TransException, IOException {
+		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
+		return pushBlocks(client, uri, tbl, videos, fileProvider,
+        					proc, docOk, err, blocksize);
+	}
+
+	/**
+	 * MEMO: what about have Anson.toBlock() support input stream field?
+	 * 
+	 * @param client
+	 * @param uri
+	 * @param tbl
+	 * @param videos
+	 * @param fileProvider
+	 * @param proc
+	 * @param docOk
+	 * @param errHandler
+	 * @param blocksize
+	 * @return response list for each block
+	 * @throws TransException
+	 * @throws IOException
+	 */
+	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
+                                            List<? extends SyncDoc> videos, IFileProvider fileProvider,
+											OnProcess proc, OnDocOk docOk, OnError errHandler, int blocksize)
+			throws TransException, IOException {
+
+		SessionInf user = client.ssInfo();
+		DocsResp startAck = null;
+		DocsResp respi = null;
+
+		String[] act = AnsonHeader.usrAct("synclient.java", "sync", "c/sync", "push blocks");
+		AnsonHeader header = client.header().act(act);
+
+		List<DocsResp> reslts = new ArrayList<DocsResp>(videos.size());
+
+		for ( int px = 0; px < videos.size(); px++ ) {
+
+			FileInputStream ifs = null;
+			int seq = 0;
+			int totalBlocks = 0;
+
+			SyncDoc p = videos.get(px);
+			DocsReq req = (AlbumReq) new AlbumReq(uri)
+					.folder(p.folder())
+					.share(p)
+					.device(user.device)
+					.resetChain(true)
+					.blockStart(p, user);
+
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+									.header(header);
+
+			try {
+				startAck = client.commit(q, errHandler);
+
+				if (fileProvider == null)
+					throw new SemanticException("Needing a file provider to accesse file %s.", p.clientname());
+				fileProvider.meta(p);
+				String pth = p.fullpath();
+				if (!pth.equals(startAck.doc.fullpath()))
+					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.doc.fullpath());
+
+				totalBlocks = p.size == 0 ? 0 : 1 + (int) ((p.size - 1 ) / blocksize);
+
+				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, startAck);
+
+				DocLocks.reading(p.fullpath());
+				ifs = (FileInputStream) fileProvider.open(p);
+
+				byte[] buf = new byte[blocksize];
+				int cur = 0;
+				while (cur < p.size) {
+					if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+
+					String b64 = AESHelper.encode64(buf, ifs, 0, blocksize - cur);
+					cur += blocksize;
+					req = new AlbumReq(tbl).blockUp(seq, p, b64, user);
+					seq++;
+
+					q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+							.header(header);
+
+					respi = client.commit(q, errHandler);
+				}
+                
+				req = new AlbumReq(tbl).blockEnd(respi, user);
+
+				q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+							.header(header);
+				respi = client.commit(q, errHandler);
+				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+
+				if (docOk != null) docOk.ok(respi.doc, respi);
+				reslts.add(respi);
+			}
+			catch (IOException | TransException | AnsonException ex) { 
+				Utils.warn("[%s] %s", ex.getClass().getName(), ex.getMessage());
+
+				if (startAck != null) {
+					req = new DocsReq(tbl).blockAbort(startAck, user);
+					req.a(DocsReq.A.blockAbort);
+					AnsonMsg<DocsReq> abt = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+							.header(header);
+					// Abort
+					new Thread( () -> {
+						try {
+							client.commit(abt, errHandler);
+						} catch (Exception e) {
+							e.printStackTrace();
+						} } ).start();
+				}
+
+//				try {
+//					req = new AlbumReq(tbl).blockEnd(respi, user);
+//					AnsonMsg<DocsReq> abt = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+//							.header(header);
+//
+//					respi = client.commit(abt, errHandler);
+//				}
+//				catch (Exception e) {}
+
+				if (ex instanceof IOException)
+					continue;
+				else errHandler.err(MsgCode.exGeneral, ex.getMessage(), ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+			}
+			finally {
+				if (ifs != null)
+					ifs.close();
+				DocLocks.readed(p.fullpath());
+			}
+		}
+
+		return reslts;
 	}
 
 	public String download(PhotoRec photo, String localpath)
@@ -173,14 +310,8 @@ public class PhotoSyntier extends Synclientier {
 	}
 
 	/**
-	 * @param collId
-	 * @param localpath
-	 * @param clientname
 	 * @param share one of {@link io.odysz.semantic.ext.DocTableMeta.Share Share}'s consts.
 	 * @return response
-	 * @throws IOException 
-	 * @throws SQLException 
-	 * @throws TransException 
 	 */
 	public DocsResp insertPhoto(String collId, String localpath, String clientname, String share)
 			throws IOException, TransException, SQLException {
@@ -194,10 +325,6 @@ public class PhotoSyntier extends Synclientier {
 	/**
 	 * Asynchronously query synchronizing records.
 	 * 
-	 * @param files
-	 * @param page
-	 * @param onOk
-	 * @param onErr
 	 * @return this
 	 */
 	public PhotoSyntier asynQueryDocs(List<? extends SyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
@@ -245,13 +372,7 @@ public class PhotoSyntier extends Synclientier {
 	 * 
 	 * TODO: to be changed to handling short text.
 	 * 
-	 * @param photos
-	 * @param user
-	 * @param onErr
 	 * @return this
-	 * @throws SemanticException
-	 * @throws IOException
-	 * @throws AnsonException
 	 */
 	public PhotoSyntier asyncPhotosUp(List<? extends SyncDoc> photos,
 			SessionInf user, OnProcess proc, OnDocOk docOk, OnError onErr)
@@ -279,7 +400,7 @@ public class PhotoSyntier extends Synclientier {
 	}
 
 	public DocsResp del(String device, String clientpath) {
-		DocsReq req = (DocsReq) new DocsReq(meta.tbl)
+		DocsReq req = (DocsReq) new AlbumReq(meta.tbl)
 				.device(device)
 				.clientpath(clientpath)
 				.a(A.del);
@@ -288,7 +409,7 @@ public class PhotoSyntier extends Synclientier {
 		try {
 			String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
 			AnsonHeader header = client.header().act(act);
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.album21, req)
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
 										.header(header);
 
 			resp = client.commit(q, errCtx);

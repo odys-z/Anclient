@@ -21,6 +21,7 @@ import com.vincent.filepicker.filter.entity.AudioFile;
 import java.util.ArrayList;
 
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
 import io.oz.jserv.docsync.SyncFlag;
 
 /**
@@ -30,7 +31,7 @@ import io.oz.jserv.docsync.SyncFlag;
  * Credits to Vincent Woo
  */
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
-    public AudioPickAdapter(Context ctx, ArrayList<AudioFile> list, int max) {
+    public AudioPickAdapter(BaseActivity ctx, ArrayList<AudioFile> list, int max) {
         super(ctx, list);
         mMaxNumber = max;
     }
@@ -53,7 +54,7 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
     public void onBindViewHolder(@NonNull AudioPickViewHolder holder, int position) {
         final AudioFile file = mList.get(position);
 
-        holder.mTvTitle.setText(file.getName());
+        holder.mTvTitle.setText(file.clientname());
         holder.mTvTitle.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         if (holder.mTvTitle.getMeasuredWidth() >
                 Util.getScreenWidth(mContext) - Util.dip2px(mContext, 10 + 32 + 10 + 48 + 10 * 2)) {
@@ -71,7 +72,8 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             holder.icSynced.setVisibility(View.GONE);
         }
         // else if (BaseFile.Synchronized.equals(file.syncFlag)) {
-        else if (SyncFlag.publish.equals(file.syncFlag)) {
+        // else if (SyncFlag.publish.equals(file.syncFlag)) {
+        else if (file.syncFlag.equals(SyncFlag.publish) || file.syncFlag.equals(SyncFlag.hub)) {
             holder.mCbx.setSelected(true);
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
@@ -127,7 +129,9 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
 
             if (mListener != null) {
                 // mListener.onAudioStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
-                mListener.onAudioStateChanged (
+                // mListener.onAudioStateChanged (
+                mListener.onSelectStateChanged(
+                        index,
                         holder.mCbx.isSelected(),
                         mList.get(holder.getAbsoluteAdapterPosition()),
                         holder.animation);
@@ -158,13 +162,6 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             icAlbum = itemView.findViewById ( R.id.xiv_album_icon);
             icSyncing = itemView.findViewById ( R.id.xiv_syncing_icon);
             icSynced = itemView.findViewById ( R.id.xiv_synced_icon);
-
-//            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
-//            mShadow = itemView.findViewById ( R.id.x_shadow );
-//            mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
-//            animation = itemView.findViewById ( R.id.animationSquarevideo );
-//            mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
-//            mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
 
             mTvTitle = itemView.findViewById(R.id.tv_audio_title);
             mTvDuration = itemView.findViewById(R.id.tv_duration);

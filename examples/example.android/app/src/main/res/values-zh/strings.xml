@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Family Album</string>
+    <string name="app_name">文件柜</string>
     <string name="url_landing">http://dev.inforise.com.cn/album</string>
     <string name="t_synch_ok">%s 文件已同步</string>
     <string name="devide_title">设备名</string>
@@ -12,4 +12,8 @@
     <string name="txt_only_once">设备名只能命名一次。</string>
     <string name="devide_name">设备名称：%s</string>
     <string name="txt_prefs_summery_home">组织名称注册</string>
+    <string name="btn_add_file">+ 文件</string>
+    <string name="btn_add_audio">+ 音频</string>
+    <string name="btn_add_video">+ 视频</string>
+    <string name="btn_add_img">+ 图片</string>
 </resources>

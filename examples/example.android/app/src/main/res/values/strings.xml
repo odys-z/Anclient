@@ -50,4 +50,9 @@
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
     <string name="url_landing" translatable="true">https://odys-z.github.io/Anclient</string>
 
+    <string name="btn_add_file">+ File</string>
+    <string name="btn_add_audio">+ Audio</string>
+    <string name="btn_add_video">+ Video</string>
+    <string name="btn_add_img">+ Image</string>
+
 </resources>

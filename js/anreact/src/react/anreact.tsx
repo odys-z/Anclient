@@ -57,8 +57,9 @@ export function hide(grid: {
  * Component's visual options, e.g. options for field formatters.
  */
 export interface CompOpts {
-	classes: ClassNames;
+	classes?: ClassNames;
 	media?: Media;
+    css?: CSSStyleDeclaration;
 	// box?: {};
     // grid?: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 }

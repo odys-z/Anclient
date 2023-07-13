@@ -19,6 +19,7 @@ import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.tier.AlbumResp;
+import io.oz.album.tier.Profiles;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.PhotoSyntier;
 
@@ -60,16 +61,19 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                     updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
 
                     // load settings
-                    Anson.verbose = true;
+                    Anson.verbose = false;
                     ((PhotoSyntier) singleton.tier).asyGetSettings(
                         (resp) -> {
-                            singleton.homeName = ((AlbumResp) resp).profiles().home();
-                            updateSummery(prefFragment.homepref, singleton.homeName);
+                            Profiles prf = ((AlbumResp) resp).profiles();
+                            singleton.profiles = prf;
+
+                            updateSummery(prefFragment.homepref, prf.home);
 
                             SharedPreferences sharedPref =
                                     PreferenceManager.getDefaultSharedPreferences(this);
                             SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putString(AlbumApp.keys.home, singleton.homeName);
+                            editor.putString(AlbumApp.keys.home, prf.home);
+                            editor.putString(AlbumApp.keys.homepage, prf.webroot);
                             editor.apply();
                         },
                         showErrSummary);

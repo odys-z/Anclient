@@ -330,7 +330,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         />);
       }
       else if (mime2type(resource.mime) === 'video') {
-        items.push(<video key={i} 
+        items.push(<video key={i}
           ref={(ref) => this.vidRef = ref}
 
           preload='false' controls
@@ -345,7 +345,7 @@ export class Lightbox extends CrudCompW<Comprops & {
           onLoad={(e) => {
             console.log('video loaded', e.currentTarget);
             if (this.state.swiping || this.state.loading)
-              this.setState({ loading: false }); }} 
+              this.setState({ loading: false }); }}
           onTouchStart={(e) => {
             e.stopPropagation();
             // console.log(e.currentTarget);
@@ -516,4 +516,3 @@ export default Lightbox;
 function useRef(arg0: null) {
   throw new Error('Function not implemented.');
 }
-

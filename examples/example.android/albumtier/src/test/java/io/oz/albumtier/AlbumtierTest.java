@@ -5,8 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,6 +92,19 @@ public class AlbumtierTest {
 			.login( "syrskyi", "слава україні",
 					(client) -> refresh(mList),
 					(c, t, v) -> fail(t));
+		singleton.tier.fileProvider(new IFileProvider() {
+
+			@Override
+			public long meta(SyncDoc f) throws IOException {
+				long size = Files.size(Paths.get(f.fullpath()));
+				f.size = size;
+				return size;
+			}
+
+			@Override
+			public InputStream open(SyncDoc pht) throws FileNotFoundException {
+				return new FileInputStream(pht.fullpath());
+			}});
 	}
 
 	void refresh(List<? extends SyncDoc> mlist) {

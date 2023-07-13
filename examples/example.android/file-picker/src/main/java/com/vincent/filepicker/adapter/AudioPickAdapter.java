@@ -53,7 +53,7 @@ public class AudioPickAdapter extends BaseAdapter<AudioFile, AudioPickAdapter.Au
     public void onBindViewHolder(final AudioPickViewHolder holder, final int position) {
         final AudioFile file = mList.get(position);
 
-        holder.mTvTitle.setText(file.getName());
+        holder.mTvTitle.setText(file.clientname());
         holder.mTvTitle.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         if (holder.mTvTitle.getMeasuredWidth() >
                 Util.getScreenWidth(mContext) - Util.dip2px(mContext, 10 + 32 + 10 + 48 + 10 * 2)) {

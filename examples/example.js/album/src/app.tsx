@@ -7,8 +7,11 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 
 import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW, AnContextType,
+	AnTreegridCol, Media, ClassNames, AnTreegrid
 } from '@anclient/anreact';
 import { GalleryTier } from './gallerytier-less';
+import { Button, Grid } from '@material-ui/core';
+import { JsampleIcons } from '@anclient/anreact/src/jsample/styles';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -48,10 +51,11 @@ export class App extends CrudCompW<AlbumProps> {
 	state = {
 		hasError: false,
 		tobeLoad: true,
+		showingDocs: false
 	};
 
-	editForm: undefined;
-	ssclient: SessionClient | undefined;
+	editForm : undefined;
+	ssclient : SessionClient | undefined;
 	albumtier: GalleryTier | undefined;
 
 	/**
@@ -66,6 +70,7 @@ export class App extends CrudCompW<AlbumProps> {
 		this.error   = {onError: this.onError, msg: ''};
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.toSearch = this.toSearch.bind(this);
+		this.switchDocMedias = this.switchDocMedias.bind(this);
 
 		this.config.servId = this.props.servId;
 		this.config.servs = this.props.servs;
@@ -120,8 +125,23 @@ export class App extends CrudCompW<AlbumProps> {
 		this.setState({tobeLoaded: true})
 	}
 
-	lightbox = (photos: AnTreeNode[], opts: {ix: number, onClose: (e: any) => {}}) => {
-		return (<Lightbox photos={photos} tier={this.albumtier} {...opts} />);
+	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes: ClassNames, media: Media} | undefined) {
+		return (
+			<Grid item key={ix as number} {...col.grid}>
+			<Button onClick={onToggle}
+				data-me={undefined} date-parent={undefined}
+				startIcon={<JsampleIcons.ResetSearch />} color="primary" >
+				{opts?.media.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
+			</Button>
+			</Grid> );
+
+		function onToggle() {
+
+		}
+	}
+
+	lightbox = (photos: AnTreeNode[], opts: {ix: number, open: boolean, onClose: (e: any) => {}}) => {
+		return (<Lightbox showResourceCount photos={photos} tier={this.albumtier} {...opts} />);
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
@@ -151,27 +171,38 @@ export class App extends CrudCompW<AlbumProps> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
-		  { this.albumtier &&
+		  { this.albumtier && (
+			this.state.showingDocs ?
+		    <AnTreegrid uri={this.uri}
+				columns={[
+					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
+					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
+					{ text: L('parent'), color: 'primary', field:"parentId", thFormatter: this.switchDocMedias }
+				]}
+				rows = {this.albumtier.rows}
+			/> :
 		    <AnTreeditor2 {... this.props} reload={this.state.tobeLoad}
 				pk={'pid'} sk={this.albumsk}
 				tier={this.albumtier} tnode={this.albumtier.root()} title={this.albumtier.albumTitle}
 				onSelectChange={() => undefined}
-				uri={this.uri} 
+				uri={this.uri}
 				parent={ undefined }
 				columns={[
 					{ type: 'text', field: 'folder', label: 'Folders', grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'tags',   label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'shareby',label: L('By'), grid: {xs: false, sm: 3} },
 					// { type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
+					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 4, sm: 3} }
 				]}
 				lightbox={this.lightbox}
-			/> }
+			/>) }
 		  { this.state.hasError &&
 			<AnError onClose={this.onErrorClose} fullScreen={false}
 				uri={"/login"} tier={undefined}
 				title={L('Error')} msg={this.error.msg || ''} />}
 		</AnContext.Provider>
 		);
+
 	}
 
 	/**
