@@ -120,7 +120,8 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     // css?: CSSStyleDeclaration;
 
 	/**TODO move this to @anclient/anreact */
-    grid?: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
+    grid: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
+
 	/**TODO move this to @anclient/anreact */
 	box?: {};
 

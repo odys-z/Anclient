@@ -79,7 +79,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
           "node": { "text": "Role Manage", "fullpath": "1 sys.2", "checked": "0", "sort": "2", "nodeId": "sys-role", "parentId": "sys", "css": {} },
           "id": "sys-role",
           "parent": "io.odysz.anson.utils.TreeIndenode",
-          "indents": [ "childi" ], "lastSibling": false, "level": 1,
+          "indents": [ "childi" ], "lastSibling": true, "level": 1,
           "parentId": "sys"
          }],
         "nodeId": "sys", "css": {},

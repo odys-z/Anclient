@@ -43,7 +43,7 @@ export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 export function hide(grid: {
 		xs?: boolean | GridSize; sm?: boolean | GridSize;
 		md?: boolean | GridSize; lg?: boolean | GridSize; },
-		media: Media) {
+		media: Media = {}) {
 	return (
 	 	grid.lg === false && media.isLg === true
 	 || grid.md === false && media.isMd === true && !!media.isLg === false

@@ -50,7 +50,6 @@ export class App extends CrudCompW<AlbumProps> {
 
 	state = {
 		hasError: false,
-		tobeLoad: true,
 		showingDocs: false
 	};
 
@@ -130,8 +129,7 @@ export class App extends CrudCompW<AlbumProps> {
 		return (
 			<Grid item key={ix as number} {...col.grid}>
 			<Button onClick={onToggle}
-				data-me={undefined} date-parent={undefined}
-				startIcon={<JsampleIcons.ResetSearch />} color="primary" >
+				startIcon={<JsampleIcons.ThirdStateCheck />} color="primary" >
 				{opts?.media?.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
 			</Button>
 			</Grid> );
@@ -178,13 +176,17 @@ export class App extends CrudCompW<AlbumProps> {
 		    <AnTreegrid uri={this.uri}
 				pk={''} onSelectChange={()=>{}}
 				columns={[
-					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
-					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
-					{ text: L('parent'), color: 'primary', field:"parentId", thFormatter: this.switchDocMedias }
+					{ text: L('Domain ID'), field:"domainId", color: 'primary',
+					  grid: {sm: 4, md: 3},
+					  className: 'bold' },
+					{ text: L('Domain Name'), color: 'primary', field:"domainName",
+					  grid: {sm: 4, md: 3} },
+					{ text: L('parent'), color: 'primary', field:"parentId",
+					  grid: {sm: 4, md: 3}, thFormatter: this.switchDocMedias }
 				]}
 				rows = {this.albumtier.rows}
 			/> :
-		    <AnTreeditor2 {... this.props} reload={this.state.tobeLoad}
+		    <AnTreeditor2 {... this.props} reload={!this.state.showingDocs}
 				pk={'pid'} sk={this.albumsk}
 				tier={this.albumtier} tnode={this.albumtier.root()} title={this.albumtier.albumTitle}
 				onSelectChange={() => undefined}
@@ -193,7 +195,7 @@ export class App extends CrudCompW<AlbumProps> {
 				columns={[
 					{ type: 'text', field: 'folder', label: 'Folders', grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'tags',   label: L('Summary'), grid: {sm: 4, md: 3} },
-					{ type: 'text', field: 'shareby',label: L('By'), grid: {xs: false, sm: 3} },
+					{ type: 'text', field: 'shareby',label: L('By'), grid: {sm: false, md: 3} },
 					// { type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
 					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 4, sm: 3} }
 				]}

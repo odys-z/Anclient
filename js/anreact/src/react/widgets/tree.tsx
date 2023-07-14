@@ -17,7 +17,7 @@ import FavoriteBorderOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 
 import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentIconame, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
 import { Comprops, CrudCompW } from "../crud";
-import { CompOpts } from "../anreact";
+import { ClassNames, CompOpts, Media } from "../anreact";
 import { AnTablistProps } from "./table-list";
 
 export const AnTreeIcons = {
@@ -235,7 +235,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
 	expandings: new Set()
   };
 
-  constructor(props) {
+  constructor(props: Comprops) {
 	super(props);
 	this.state.forest = props.forest || [];
 
@@ -243,7 +243,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
 	this.buildTree = this.buildTree.bind(this);
   }
 
-  toExpandItem(e) {
+  toExpandItem(e: React.UIEvent) {
 	e.stopPropagation();
 	let f = e.currentTarget.getAttribute("data-nid");
 
@@ -256,7 +256,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
   /**
    * @param {object} classes
    */
-  buildTree(classes) {
+  buildTree(classes: ClassNames) {
 	let that = this;
 
 	let expandItem = this.toExpandItem;
@@ -334,11 +334,11 @@ class AnTreeComp extends CrudCompW<Comprops> {
 	  }
 	}
 
-	function icon(icon) {
+	function icon(icon: string) {
 	  return AnTreeIcons[icon || "deflt"];
 	}
 
-	function leadingIcons(count) {
+	function leadingIcons(count: number) {
 	  let c = [];
 	  for (let i = 0; i < count; i++)
 		c.push(<React.Fragment key={i}>{icon(".")}</React.Fragment>);
