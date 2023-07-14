@@ -79,7 +79,7 @@ export class App extends CrudCompW<AlbumProps> {
 
 		Protocol.sk.cbbViewType = 'v-type';
 
-        // DESIGN NOTES: exending ports shall be an automized processing
+        // DESIGN NOTES: extending ports shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
                         .extendPorts({
                             /* see jserv-album/album, port name: album */
@@ -95,7 +95,7 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	login() {
-		// MEMO: a word for future modification, App is context provider, not consumer.
+		// TODO doc: App is context provider, not consumer.
 		// So this.context won't work here.
 		// const ctx = this.context as unknown as AnContextType;
 		// let serv = ctx.servId || 'host';
