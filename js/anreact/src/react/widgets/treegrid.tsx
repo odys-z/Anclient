@@ -77,10 +77,10 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
          },
          {"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
           "node": { "text": "Role Manage", "fullpath": "1 sys.2", "checked": "0", "sort": "2", "nodeId": "sys-role", "parentId": "sys", "css": {} },
-          "id": "sys-role",
-          "parent": "io.odysz.anson.utils.TreeIndenode",
-          "indents": [ "childi" ], "lastSibling": true, "level": 1,
-          "parentId": "sys"
+            "id": "sys-role",
+            "parent": "io.odysz.anson.utils.TreeIndenode",
+            "indents": [ "childx" ], "lastSibling": true, "level": 1,
+            "parentId": "sys"
          }],
         "nodeId": "sys", "css": {},
         "expandChildren": false
@@ -222,8 +222,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                       {open ?
                         icon(that.props.indentIcons, "expand", 0) :
                         icon(that.props.indentIcons, "collapse", 0)}
-                      {n.node.text}
-                      {open || ` [${n.node.children?.length}]`}
+                      {`${n.node.text} ${open ? '' : `[${n.node.children?.length}]`}`}
                     </Typography>
                   </Grid> );
                 else if (col.type === 'actions')

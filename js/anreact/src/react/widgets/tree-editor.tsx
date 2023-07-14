@@ -8,7 +8,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
 
-import { CRUD, AnTreeNode, AnlistColAttrs, 
+import { CRUD, AnTreeNode, AnlistColAttrs,
 	toBool, IndentIconame, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons
 } from "@anclient/semantier";
 
@@ -94,7 +94,7 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 
 		this.node = props.tnode;
 		this.state.expand = props.expand;
-		
+
 		this.toUp = this.toUp.bind(this);
 		this.toDown = this.toDown.bind(this);
 		this.toTop = this.toTop.bind(this);
@@ -198,8 +198,8 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 				/>
 			  </>
 			}
-		</Grid> 
-	} 
+		</Grid>
+	}
 
 	render() {
 		let that = this;
@@ -281,7 +281,7 @@ class TreeGallaryComp extends TreeCardComp {
 		return (<>
 		  { this.galleryHead(that.props.columns, tnode, classes, media, onClick) }
 		  <Collapse in={this.state.expand}>
-			<GalleryView {... this.props} 
+			<GalleryView {... this.props}
 				ref={undefined} // suppress type error
 				uri={this.uri} media={this.props.media}
 				cid={this.collect}
@@ -343,7 +343,7 @@ class TreeGallaryComp extends TreeCardComp {
 						{TreeGallaryComp.formatFolderIcons(that.props.indentIcons, tnode, {grid: col.grid, media, classes})}
 					</Grid>);
 			}) }
-		</Grid> 
+		</Grid>
 		</div>
 		);
 
@@ -351,10 +351,10 @@ class TreeGallaryComp extends TreeCardComp {
 
 	/**
 	 * Ui helper for a summary of mime types.
-	 * 
-	 * @param iconpool 
-	 * @param tnode 
-	 * @param opts 
+	 *
+	 * @param iconpool
+	 * @param tnode
+	 * @param opts
 	 * @returns the element
 	 */
 	static formatFolderIcons(iconpool: IndentIcons, tnode: AnTreeNode, opts: {grid: any, media: Media, classes: ClassNames}) {
@@ -364,8 +364,8 @@ class TreeGallaryComp extends TreeCardComp {
 		return (
 		  <Typography noWrap variant='body2' className={classes.rowText} >
 			{hide(grid, media) ? undefined : `[${n.pname}]`}
-			{ Number(n.img) > 0 && [icon(iconpool, "[]", 0), `x ${n.img}`] } 
-			{ Number(n.geo) > 0 && [icon(iconpool, "!", 0), `x ${n.geo}`] } 
+			{ Number(n.img) > 0 && [icon(iconpool, "[]", 0), `x ${n.img}`] }
+			{ Number(n.geo) > 0 && [icon(iconpool, "!", 0), `x ${n.geo}`] }
 			{ Number(n.mov) > 0 && [icon(iconpool, ">", 0), `x ${n.mov}`] }
 			{ Number(n.fav) > 0 && [icon(iconpool, "b", 0), `x ${n.fav}`] }
 		  </Typography>);
@@ -531,7 +531,7 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 			else {
 			  return (
 				ntype === TreeNodeVisual.gallery ?
-				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)  
+				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)
 					key={tnode.id} tier={that.treetier as StreeTier}
 					tnode={tnode} media={media}
 					parent={parent}
@@ -557,31 +557,6 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		  }
 		}
 	}
-
-	// th( columns: Array<AnTreegridCol> = [],
-	// 	classes: ClassNames, media: Media ) {
-	//   return (
-	// 	<Grid container className={classes.th} >
-	// 	{columns
-	// 		.filter( v => toBool(v.visible, true))
-	// 		.map( (col: AnTreegridCol, ix: number) => {
-	// 			if (col.thFormatter) return col.thFormatter(col, ix, {classes, media});
-	// 			if (col.type === 'actions') return (
-	// 			<Grid item key={ix} {...col.grid}>
-	// 				<Button onClick={this.toAddChild}
-	// 				data-me={undefined} date-parent={undefined}
-	// 				startIcon={<JsampleIcons.ListAdd />} color="primary" >
-	// 				{media.isMd && L('New')}
-	// 				</Button>
-	// 			</Grid>);
-	// 			else return (
-	// 			<Grid item key={ix} {...col.grid}>
-	// 				{col.label || col.field}
-	// 			</Grid>);
-	// 		} )
-	// 	}
-	// 	</Grid>);
-	// }
 
 	folderHead( columns=[] as AnTreegridCol[], treenode: AnTreeNode, classes: ClassNames, media: Media) {
 	  let that = this;

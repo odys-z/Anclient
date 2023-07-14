@@ -37,9 +37,6 @@ export class App extends CrudCompW<AlbumProps> {
 	error: ErrorCtx;
 
 	config = {
-		// iportal: '#',
-		// nextAction: undefined, // e.g. re-login
-
 		/** json object specifying host's urls */
 		servs: {} as JsonServs,
 		/** the serv id for picking url */
@@ -191,7 +188,6 @@ export class App extends CrudCompW<AlbumProps> {
 				tier={this.albumtier} tnode={this.albumtier.root()} title={this.albumtier.albumTitle}
 				onSelectChange={() => undefined}
 				uri={this.uri}
-				parent={ undefined }
 				columns={[
 					{ type: 'text', field: 'folder', label: 'Folders', grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'tags',   label: L('Summary'), grid: {sm: 4, md: 3} },
