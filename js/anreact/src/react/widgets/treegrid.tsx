@@ -216,6 +216,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
               .filter( (v: AnTreegridCol) => toBool(v.visible, true) )
               .map( (col: AnTreegridCol, cx: number) => {
                 if (cx === 0) return (
+                  // no array of p is allowed as Typography' children
                   <Grid key={`${n.id}.${cx}`} item {...col.grid} >
                     <Typography noWrap variant='body2'>
                       {levelIcons(that.props.indentSettings, n.indents)}
