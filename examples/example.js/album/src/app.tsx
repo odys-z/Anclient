@@ -104,8 +104,12 @@ export class App extends CrudCompW<AlbumProps> {
 		let {userid, passwd} = this.props;
 
 		let that = this;
-		let reload = (client: SessionClient) => {
+		let loggedin = (client: SessionClient) => {
 			that.ssclient = client;
+
+			this.anReact  = new AnReactExt(client, that.error)
+				.extendPorts({album: 'album.less'});
+
 			that.albumtier = new GalleryTier({uri: this.uri, comp: this, client});
 			that.toSearch();
 		}
@@ -113,7 +117,7 @@ export class App extends CrudCompW<AlbumProps> {
 		console.warn("Auto login with configured userid & passwd.",
 					 hosturl, userid, passwd);
 		an.init ( hosturl );
-		an.login( userid as string, passwd as string, reload, this.error );
+		an.login( userid as string, passwd as string, loggedin, this.error );
 	}
 
 	toSearch() {
@@ -181,7 +185,6 @@ export class App extends CrudCompW<AlbumProps> {
 					{ text: L('parent'), color: 'primary', field:"parentId",
 					  grid: {sm: 4, md: 3}, thFormatter: this.switchDocMedias }
 				]}
-				rows = {this.albumtier.rows}
 			/> :
 		    <AnTreeditor2 {... this.props} reload={!this.state.showingDocs}
 				pk={'pid'} sk={this.albumsk}

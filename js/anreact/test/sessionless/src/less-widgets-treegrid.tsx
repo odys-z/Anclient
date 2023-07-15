@@ -21,8 +21,14 @@ type LessProps = {
  * Widgets Tests
  */
 class Widgets extends React.Component<LessProps> {
-	/** {@link InsercureClient} */
+	/**
+	 * {@link InsercureClient}
+	 */
 	ssclient: SessionClient;
+
+	/** 
+	 * The uiHelper of @anclient/anreact.
+	 */
 	anReact: AnReactExt;  // helper for React
 
 	albumtier: TestreeTier;
@@ -143,11 +149,13 @@ class Widgets extends React.Component<LessProps> {
 					pk={'NA'} sk={this.doctreesk}
 					columns={[ // noly card for folder header
 						{ type: 'iconame', field: 'folder', label: L('Name'),
-						  grid: {sm: 4, md: 3} },
-						{ type: 'text', field: 'text', label: L('Summary'),
-						  grid: {xs: false, sm: 5, md: 3} },
-						{ type: 'text', field: 'text', label: L('Summary'),
+						  grid: {sm: 3, md: 3} },
+						{ type: 'text', field: 'text', label: L('-- A --'),
+						  grid: {xs: false, sm: 4, md: 2} },
+						{ type: 'text', field: 'text', label: L('-- B --'),
 						  grid: {xs: false, sm: 3, md: 2} },
+						{ type: 'text', field: 'text', label: L('-- C --'),
+						  grid: {xs: false, sm: 2, md: 2} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
 					onSelectChange={undefined}

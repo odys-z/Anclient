@@ -6,11 +6,11 @@ import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 
-import { AnTreeNode, AnlistColAttrs, IndentIconame, toBool } from "@anclient/semantier";
+import { AnTreeNode, IndentIconame, toBool } from "@anclient/semantier";
 
 import { AnTreegridCol, TreeItemProps, icon, levelIcons } from "./tree";
 import { CrudCompW } from "../crud";
-import { ClassNames, CompOpts, Media, hide } from "../anreact";
+import { ClassNames, Media, hide } from "../anreact";
 import { TreeCardComp } from "./tree-editor";
 import { AnTablistProps } from "./table-list";
 import { Button, PropTypes } from "@material-ui/core";
@@ -25,8 +25,10 @@ const styles = (theme: Theme) => ({
   },
   th: {
 	  textAlign: 'center' as const,
-	  paddingBottom: '0.1em',
-	  borderBottom: '1px solid #bcd'
+	  paddingTop: '0.25em',
+	  paddingBottom: '0.25em',
+	  borderBottom: '1px solid #bcd',
+    BackgroundCollor: "#dde5ed"
   },
   rowHead: {
     padding: theme.spacing(1),
