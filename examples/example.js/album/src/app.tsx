@@ -12,6 +12,8 @@ import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 import { GalleryTier } from './gallerytier-less';
 import { Button, Grid } from '@material-ui/core';
 import { JsampleIcons } from '@anclient/anreact/src/jsample/styles';
+import { z7 } from './icons/7zip';
+import { DocIcon } from './icons/doc-ico';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -57,6 +59,7 @@ export class App extends CrudCompW<AlbumProps> {
 	editForm : undefined;
 	ssclient : SessionClient | undefined;
 	albumtier: GalleryTier | undefined;
+	docIcon: DocIcon;
 
 	/**
 	 * Restore session from window.localStorage
@@ -78,6 +81,8 @@ export class App extends CrudCompW<AlbumProps> {
 		this.nextAction = 're-login',
 
 		this.config = Object.assign({}, this.config);
+
+		this.docIcon = new DocIcon();
 
 		Protocol.sk.cbbViewType = 'v-type';
 
@@ -150,10 +155,8 @@ export class App extends CrudCompW<AlbumProps> {
 			</Grid> );
 
 		function onToggle(e: React.MouseEvent) {
-			// that.setState({showingDocs: !that.state.showingDocs});
 			that.state.showingDocs = !that.state.showingDocs;
 			that.toSearch();
-			// console.log(e);
 		}
 	}
 
@@ -176,6 +179,7 @@ export class App extends CrudCompW<AlbumProps> {
 
 	render() {
 	  console.log(this.uri);
+	  let that = this;
 	  return (
 		<AnContext.Provider value={{
 			servId: this.config.servId,
@@ -192,14 +196,16 @@ export class App extends CrudCompW<AlbumProps> {
 			this.state.showingDocs ?
 		    <AnTreegrid
 				pk={''} onSelectChange={()=>{}}
+				tier={this.albumtier}
 				columns={[
-					{ text: L('Domain ID'), field:"domainId", color: 'primary',
-					  grid: {sm: 4, md: 3},
-					  className: 'bold' },
-					{ text: L('Domain Name'), color: 'primary', field:"domainName",
-					  grid: {sm: 4, md: 3} },
-					{ text: L('parent'), color: 'primary', field:"parentId",
-					  grid: {sm: 4, md: 3}, thFormatter: this.switchDocMedias }
+				  { type: 'iconame', field: 'pname', label: L('Name'),
+					grid: {sm: 6, md: 5} },
+				  { type: 'text', field: 'mime', label: L('type'), colFormatter: typeParser,
+					grid: {xs: 1} },
+				  { type: 'text', field: 'shareby', label: L('share by'),
+					grid: {xs: false, sm: 3, md: 2} },
+				  { type: 'text', field: 'img', label: L('size'), colFormatter: folderSum,
+					grid: {xs: false, sm: 2, md: 2}, thFormatter: this.switchDocMedias }
 				]}
 			/> :
 		    <AnTreeditor2 {... this.props} reload={!this.state.showingDocs}
@@ -223,6 +229,13 @@ export class App extends CrudCompW<AlbumProps> {
 		</AnContext.Provider>
 		);
 
+		function typeParser(c: AnTreegridCol, n: AnTreeNode, opt: {classes: ClassNames, media: Media}) {
+			if (n.node.children?.length as number > 0) return <></>;
+			else return that.docIcon.typeParser(c, n, opt);
+		}
+
+		function folderSum() {
+		}
 	}
 
 	/**

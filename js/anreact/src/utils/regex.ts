@@ -39,6 +39,9 @@ export const regex = {
 	 * Find preview type (not doc type) of mime:
 	 * https://docs.w3cub.com/http/basics_of_http/mime_types/complete_list_of_mime_types
 	 * 
+	 * see also example.android\file-picker\src\main\java\com\vincent\filepicker\filter\loader\ImageLoader.java
+	 * and example.android\file-picker\src\main\java\com\vincent\filepicker\filter\loader\FileLoader.java
+	 * 
 	 * Note: heif is a special image type that can be uploaded by iPhone but Safari won't support,
 	 * which is not a W3C type and needs decoding.
 	 * @param mime

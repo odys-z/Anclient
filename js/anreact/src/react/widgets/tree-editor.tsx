@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 
 
 import { CRUD, AnTreeNode, AnlistColAttrs,
-	toBool, IndentIconame, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons
+	toBool, IndentIconame, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons, AnsonResp
 } from "@anclient/semantier";
 
 import { GalleryView } from "./gallery-view";
@@ -190,7 +190,7 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 					className={classes.smallBtn}
 					data-me={tnode.id} data-parent={parentId}
 					color='primary'
-				/>
+				    />
 					<JsampleIcons.Delete onClick={handler.toDel}
 					className={classes.smallBtn}
 					data-me={tnode.id} data-parent={parentId}
@@ -394,8 +394,8 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
     sysName: '';
     window: Window;
 
-    anReact: AnReactExt;
-    editForm: JSX.Element;
+    anReact: AnReactExt | undefined;
+    editForm: JSX.Element | undefined;
 	treetier: StreeTier;
 
 	constructor(props: AnTreeditorProps) {
@@ -436,8 +436,8 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 		let { uri, sk } = this.props;
 		this.state.tobeLoad = false;
 		this.treetier.stree({ uri, sk, // uiHelper: this.context.uiHelper,
-			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
-				that.setState({forest: resp.Body().forest});
+			onOk: (resp: AnsonMsg<AnsonResp>) => {
+				that.setState({forest: (resp.Body() as AnDatasetResp).forest});
 			}},
 			this.context.error);
 

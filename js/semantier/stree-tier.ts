@@ -63,6 +63,8 @@ export class AnTreeNode implements Tierec {
 		/** With icon as a special field? */
 		css?: CSS.Properties & {icon?: AnTreeIconsType, size?: number[]};
 
+		mime?: string;
+
 		/** Any data by jserv */
 		[d: string]: AnsonValue;
 	};
@@ -115,6 +117,8 @@ export class StreeTier extends Semantier {
 
     /** DESIGN MEMO: Once semantier can be generated, port will be force to be required. */
     port: string;
+
+	forest: AnTreeNode[];
 
     /**
      * @param opts uri: client id; port: jserv port
