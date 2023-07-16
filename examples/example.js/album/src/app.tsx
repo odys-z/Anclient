@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, 
 	AnTreeNode, ErrorCtx, an, SessionClient
 } from '@anclient/semantier';
 
@@ -43,11 +43,15 @@ export class App extends CrudCompW<AlbumProps> {
 		servId: '',
 	};
     nextAction: string | undefined;
-	albumsk: string;
+
+	albumsk = "tree-album-family-folder";
+	doctreesk = 'tree-docs-folder';
+	uri = 'example.js/album';
 
 	state = {
 		hasError: false,
-		showingDocs: false
+		showingDocs: false,
+		sk: undefined,
 	};
 
 	editForm : undefined;
@@ -59,8 +63,6 @@ export class App extends CrudCompW<AlbumProps> {
 	 */
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
-		this.uri = 'example.js/album';
-		this.albumsk = "tree-album-family-folder";
 
 		this.onError = this.onError.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
@@ -79,7 +81,7 @@ export class App extends CrudCompW<AlbumProps> {
 
 		Protocol.sk.cbbViewType = 'v-type';
 
-        // DESIGN NOTES: exending ports shall be an automized processing
+        // DESIGN NOTES: extending ports shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
                         .extendPorts({
                             /* see jserv-album/album, port name: album */
@@ -95,7 +97,7 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	login() {
-		// MEMO: a word for future modification, App is context provider, not consumer.
+		// TODO doc: App is context provider, not consumer.
 		// So this.context won't work here.
 		// const ctx = this.context as unknown as AnContextType;
 		// let serv = ctx.servId || 'host';
@@ -104,8 +106,12 @@ export class App extends CrudCompW<AlbumProps> {
 		let {userid, passwd} = this.props;
 
 		let that = this;
-		let reload = (client: SessionClient) => {
+		let loggedin = (client: SessionClient) => {
 			that.ssclient = client;
+
+			this.anReact  = new AnReactExt(client, that.error)
+				.extendPorts({album: 'album.less'});
+
 			that.albumtier = new GalleryTier({uri: this.uri, comp: this, client});
 			that.toSearch();
 		}
@@ -113,12 +119,24 @@ export class App extends CrudCompW<AlbumProps> {
 		console.warn("Auto login with configured userid & passwd.",
 					 hosturl, userid, passwd);
 		an.init ( hosturl );
-		an.login( userid as string, passwd as string, reload, this.error );
+		an.login( userid as string, passwd as string, loggedin, this.error );
 	}
 
 	toSearch() {
-		this.editForm = undefined;
-		this.setState({tobeLoaded: true})
+		let that = this;
+		let tier = this.albumtier as GalleryTier;
+
+		if (!tier) return;
+
+		tier.stree({ uri: this.uri, sk: this.albumsk,
+			onOk: (rep: AnsonMsg<AnsonResp>) => {
+				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[]; 
+				console.log(tier.forest);
+				that.setState({});
+			}},
+			this.error);
+
+		this.onErrorClose();
 	}
 
 	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes?: ClassNames, media?: Media} | undefined) {
@@ -132,8 +150,10 @@ export class App extends CrudCompW<AlbumProps> {
 			</Grid> );
 
 		function onToggle(e: React.MouseEvent) {
-			that.setState({showingDocs: !that.state.showingDocs});
-			console.log(e);
+			// that.setState({showingDocs: !that.state.showingDocs});
+			that.state.showingDocs = !that.state.showingDocs;
+			that.toSearch();
+			// console.log(e);
 		}
 	}
 
@@ -170,7 +190,7 @@ export class App extends CrudCompW<AlbumProps> {
 		}} >
 		  { this.albumtier && (
 			this.state.showingDocs ?
-		    <AnTreegrid uri={this.uri}
+		    <AnTreegrid
 				pk={''} onSelectChange={()=>{}}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary',
@@ -181,7 +201,6 @@ export class App extends CrudCompW<AlbumProps> {
 					{ text: L('parent'), color: 'primary', field:"parentId",
 					  grid: {sm: 4, md: 3}, thFormatter: this.switchDocMedias }
 				]}
-				rows = {this.albumtier.rows}
 			/> :
 		    <AnTreeditor2 {... this.props} reload={!this.state.showingDocs}
 				pk={'pid'} sk={this.albumsk}

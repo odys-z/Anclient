@@ -6,11 +6,11 @@ import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 
-import { AnTreeNode, AnlistColAttrs, IndentIconame, toBool } from "@anclient/semantier";
+import { AnTreeNode, IndentIconame, StreeTier, toBool } from "@anclient/semantier";
 
 import { AnTreegridCol, TreeItemProps, icon, levelIcons } from "./tree";
 import { CrudCompW } from "../crud";
-import { ClassNames, CompOpts, Media, hide } from "../anreact";
+import { ClassNames, Media, hide } from "../anreact";
 import { TreeCardComp } from "./tree-editor";
 import { AnTablistProps } from "./table-list";
 import { Button, PropTypes } from "@material-ui/core";
@@ -25,8 +25,10 @@ const styles = (theme: Theme) => ({
   },
   th: {
 	  textAlign: 'center' as const,
-	  paddingBottom: '0.1em',
-	  borderBottom: '1px solid #bcd'
+	  paddingTop: '0.25em',
+	  paddingBottom: '0.25em',
+	  borderBottom: '1px solid #bcd',
+    BackgroundCollor: "#dde5ed"
   },
   rowHead: {
     padding: theme.spacing(1),
@@ -52,60 +54,21 @@ const styles = (theme: Theme) => ({
 
 class AnTreegridComp extends CrudCompW<TreeItemProps> {
   state = {
-	window: undefined,
-
-  treeData: [
-    { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-      "id": "sys",
-      "node": { "text": "Acadynamo", "fullpath": "1 sys", "checked": "0", "sort": "1",
-        "children": [
-         {"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-          "id": "sys-domain",
-          "node": { "text": "Domain Settings", "fullpath": "1 sys.1",
-              "children": [
-                { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-                  "node": { "text": "Profiles", "fullpath": "1 sys.1.1", "checked": "0", "sort": "1", "nodeId": "sys-d-profiles", "parentId": "sys-domain", "css": {} },
-                  "parent": "io.odysz.anson.utils.TreeIndenode",
-                  "indents": [ "vlink", "childx" ], "lastSibling": true, "level": 2,
-                  "id": "sys-d-profiles", "parentId": "sys-domain"
-                } ],
-              "checked": "0", "sort": "1",
-              "nodeId": "sys-domain", "parentId": "sys", "css": {}, "expandChildren": false
-          },
-          "indents": [ "childi" ], "lastSibling": false, "level": 1,
-          "parentId": "sys", "parent": "io.odysz.anson.utils.TreeIndenode"
-         },
-         {"type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-          "node": { "text": "Role Manage", "fullpath": "1 sys.2", "checked": "0", "sort": "2", "nodeId": "sys-role", "parentId": "sys", "css": {} },
-            "id": "sys-role",
-            "parent": "io.odysz.anson.utils.TreeIndenode",
-            "indents": [ "childx" ], "lastSibling": true, "level": 1,
-            "parentId": "sys"
-         }],
-        "nodeId": "sys", "css": {},
-        "expandChildren": false
-      },
-      "indents": [], "lastSibling": false, "level": 0,
-      "parent": "io.odysz.anson.utils.TreeIndenode", "parentId": null
-    },
-    { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-      "id": "n01",
-      "node": { "text": "North Pole", "fullpath": "2 n01", "checked": "0", "sort": "2", "nodeId": "n01", "css": {}, "expandChildren": false },
-      "indents": [], "lastSibling": false, "level": 0,
-      "parent": "io.odysz.anson.utils.TreeIndenode", "parentId": null
-    }
-  ] as AnTreeNode[],
-
-	expandings: new Set()
+	  window: undefined,
+    expandings: new Set(),
+    // tobeLoad: true
   };
 
   editForm: JSX.Element;
+  stier: StreeTier;
 
   constructor(props: AnTablistProps) {
     super(props);
 
+    this.stier = this.props.tier as StreeTier;
+
     this.toExpandItem = this.toExpandItem.bind(this);
-      this.treeNodes = this.treeNodes.bind(this);
+    this.treeNodes = this.treeNodes.bind(this);
   }
 
   toExpandItem(e: React.MouseEvent<HTMLDivElement>) {
@@ -117,9 +80,6 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
     if (expandings.has(id)) expandings.delete(id);
     else expandings.add(id);
       this.setState({ expandings });
-  }
-
-  toChange(e: React.MouseEvent<HTMLButtonElement>, colx: number) {
   }
 
 	static th(columns: Array<AnTreegridCol> = [],
@@ -154,7 +114,8 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
   treeNodes(classes: ClassNames, media: Media) {
     let that = this;
 
-    let m = this.state.treeData;
+    let m = this.stier.forest || this.props.testData;
+
     let expandItem = this.toExpandItem;
     // let mtree = buildTreegrid( m );
     // return mtree;
@@ -176,37 +137,37 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
       return css?.textAlign ? css.textAlign as PropTypes.Alignment : 'center'; //
     }
 
-    function folder_back(cols: AnTreegridCol[], menu: AnTreeNode, open: boolean) {
-      return (
-        <div key={menu.id} className={classes.folder}>
-          <div  id={menu.id} onClick={expandItem}
-                className={classes.folderHead} >
-            <Grid container spacing={0}>
-                <Grid item xs={6} >
-                <Typography noWrap>
-                    {levelIcons(
-                      that.props.indentSettings,
-                      menu.indents as IndentIconame[])}
-                    {open ?
-                      icon(that.props.indentIcons, "expand", 0) :
-                      icon(that.props.indentIcons, "collapse", 0)}
-                    {menu.node.text}
-                </Typography>
-                </Grid>
-                <Grid item xs={2} >
-                  {!open && <Typography>{`[${menu.node.children?.length}]`}</Typography>}
-                </Grid>
-                <Grid item xs={1}>
-                  {icon(that.props.indentIcons, menu.node.css.icon || "[]", 0)}
-                </Grid>
-            </Grid>
-            </div>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              {buildTreegrid(menu.node.children)}
-            </Collapse>
-        </div>
-      );
-    }
+    // function folder_back(cols: AnTreegridCol[], menu: AnTreeNode, open: boolean) {
+    //   return (
+    //     <div key={menu.id} className={classes.folder}>
+    //       <div  id={menu.id} onClick={expandItem}
+    //             className={classes.folderHead} >
+    //         <Grid container spacing={0}>
+    //             <Grid item xs={6} >
+    //             <Typography noWrap>
+    //                 {levelIcons(
+    //                   that.props.indentSettings,
+    //                   menu.indents as IndentIconame[])}
+    //                 {open ?
+    //                   icon(that.props.indentIcons, "expand", 0) :
+    //                   icon(that.props.indentIcons, "collapse", 0)}
+    //                 {menu.node.text}
+    //             </Typography>
+    //             </Grid>
+    //             <Grid item xs={2} >
+    //               {!open && <Typography>{`[${menu.node.children?.length}]`}</Typography>}
+    //             </Grid>
+    //             <Grid item xs={1}>
+    //               {icon(that.props.indentIcons, menu.node.css.icon || "[]", 0)}
+    //             </Grid>
+    //         </Grid>
+    //         </div>
+    //         <Collapse in={open} timeout="auto" unmountOnExit>
+    //           {buildTreegrid(menu.node.children)}
+    //         </Collapse>
+    //     </div>
+    //   );
+    // }
 
     function folder(cols: AnTreegridCol[], n: AnTreeNode, open: boolean) {
       return (
@@ -223,7 +184,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                       {open ?
                         icon(that.props.indentIcons, "expand", 0) :
                         icon(that.props.indentIcons, "collapse", 0)}
-                      {`${n.node.text} ${open ? '' : `[${n.node.children?.length}]`}`}
+                      {`${n.node[col.field]} ${open ? '' : `[${n.node.children?.length}]`}`}
                     </Typography>
                   </Grid> );
                 else if (col.type === 'actions')
@@ -260,7 +221,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
                   <Typography noWrap variant='body2'>
                     {levelIcons(that.props.indentSettings, n.indents)}
-                    {n.node.text}
+                    {n.node[col.field]}
                   </Typography>
                 </Grid> );
               else if (col.type === 'actions')
@@ -270,9 +231,9 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 hide(col.grid, media) ? undefined :
                 <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
                   { typeof col.colFormatter === 'function' ?
-                    col.formatter(col, n) :
+                    col.colFormatter(col, n) :
                     <Typography noWrap variant='body2' align={align(n.node.css)} >
-                      {n.node.text}
+                      {n.node[col.field]}
                     </Typography>
                   }
                 </Grid> );
@@ -281,37 +242,37 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
         </Grid>);
     }
 
-    function gridItem(cols: AnTreegridCol[], menu: AnTreeNode) {
-      return (
-        <Grid container
-          key={menu.id}
-          spacing={0}
-          className={classes.row}
-        >
-          <Grid item xs={4} className={classes.rowHead}>
-            <Typography noWrap>
-              {levelIcons(that.props.indentSettings, menu.indents as IndentIconame[])}
-              {icon(that.props.indentIcons, "-", 0)}
-              {menu.node.text}
-            </Typography>
-          </Grid>
-          <Grid item xs={4} className={classes.treeItem}>
-            <Typography noWrap align={align(menu.node.css)}>{menu.node.mime}</Typography>
-          </Grid>
-          <Grid item xs={4} className={classes.treeItem}>
-            <Typography align={align(menu.node.css)}>{menu.url}</Typography>
-          </Grid>
-        </Grid>);
-    }
+    // function gridItem(cols: AnTreegridCol[], menu: AnTreeNode) {
+    //   return (
+    //     <Grid container
+    //       key={menu.id}
+    //       spacing={0}
+    //       className={classes.row}
+    //     >
+    //       <Grid item xs={4} className={classes.rowHead}>
+    //         <Typography noWrap>
+    //           {levelIcons(that.props.indentSettings, menu.indents as IndentIconame[])}
+    //           {icon(that.props.indentIcons, "-", 0)}
+    //           {menu.node.text}
+    //         </Typography>
+    //       </Grid>
+    //       <Grid item xs={4} className={classes.treeItem}>
+    //         <Typography noWrap align={align(menu.node.css)}>{menu.node.mime}</Typography>
+    //       </Grid>
+    //       <Grid item xs={4} className={classes.treeItem}>
+    //         <Typography align={align(menu.node.css)}>{menu.url}</Typography>
+    //       </Grid>
+    //     </Grid>);
+    // }
   }
 
   render() {
     const { classes, width } = this.props;
 		let media = CrudCompW.getMedia(width);
+
     return (
-      //this.treeNodes(classes, media);
       <div className={classes.root}>
-        {AnTreegridComp.th(this.props.columns, classes, media, {onThClick: this.toChange})}
+        {AnTreegridComp.th(this.props.columns, classes, media, {onThClick: this.props.th})}
         {this.treeNodes(classes, media)}
         {this.editForm}
       </div>);

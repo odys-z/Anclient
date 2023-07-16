@@ -418,12 +418,15 @@ class AnTreeditorComp2 extends DetailFormW<AnTreeditorProps> {
 
 		const ctx = this.context as unknown as AnContextType;
 		this.anReact = ctx.uiHelper;
-		this.treetier.client = this.anReact.client;
+		// this.treetier.client = this.anReact.client;
 		if (this.props.reload && this.state.tobeLoad) {
 			this.toSearch();
 		}
 	}
 
+	/**
+	 * @deprecated the AnTreegrid update schema is prefered.
+	 */
 	toSearch() {
 		let that = this;
 		let { s_tree } = this.props;

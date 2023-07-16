@@ -98,8 +98,14 @@ export function toReactStyles(styles: CSSStyleDeclaration | undefined): CSSPrope
  */
 export class AnReact {
 
+	/**
+	 * @deprecated This pattern is planned to be deprecated in the future of 0.4.35,
+	 * because this instance will be a redundant one of the tier.client and will cause trouble like ssinf lost.
+	 */
     client: SessionClient;
+
     ssInf: any;
+
 	errCtx: ErrorCtx;
 	/**@param {SessionClient} ssClient client created via login
 	 * @param {object} errCtx, AnContext.error, the app error handler

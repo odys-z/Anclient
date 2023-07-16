@@ -12,6 +12,7 @@ export class GalleryTier extends StreeTier {
 	page: AlbumPage;
 	collectRecords?: PhotoCollect[];
 	albumTitle: string = 'title';
+	forest?: AnTreeNode[];
 
 	/**
 	 * @param props
@@ -65,21 +66,21 @@ export class GalleryTier extends StreeTier {
         this.collects(this.page, onLoad);
     }
 
-	/**
-	 * Compose src of img tag, with AlbumReq request as anson64 parameter.
-	 * 
-	 * @param recId potho id
-	 * @returns 
-	 */
-	imgSrc(recId: string) : string {
-		let req = new AlbumReq(this.uri, this.page);
-		req.a = AlbumReq.A.download;
-		req.docId = recId;
+	// /**
+	//  * Compose src of img tag, with AlbumReq request as anson64 parameter.
+	//  * 
+	//  * @param recId potho id
+	//  * @returns 
+	//  */
+	// imgSrc(recId: string) : string {
+	// 	let req = new AlbumReq(this.uri, this.page);
+	// 	req.a = AlbumReq.A.download;
+	// 	req.docId = recId;
 
-		let msg = this.client.an.getReq<AlbumReq>(this.port, req);
+	// 	let msg = this.client.an.getReq<AlbumReq>(this.port, req);
 
-		return GalleryTier.servUrl(this.client.an.servUrl(this.port), msg);
-	}
+	// 	return GalleryTier.servUrl(this.client.an.servUrl(this.port), msg);
+	// }
 
 	static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
 		if (debug)

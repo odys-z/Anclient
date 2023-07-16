@@ -818,9 +818,9 @@ class Inseclient extends SessionClient {
 	 * {func, cate, cmd, remarks};
 	 * @return the logged in header */
 	getHeader(act: LogAct) {
-		var header = Protocol.formatHeader({ssid: undefined, uid: this.userId});
-
-		return new AnHeader(this.ssInf.ssid, this.ssInf.uid);
+		let header = Protocol.formatHeader({ssid: this.ssInf.ssid, uid: this.ssInf.uid});
+		return header;
+		// return new AnHeader(this.ssInf.ssid, this.ssInf.uid);
 	}
 }
 

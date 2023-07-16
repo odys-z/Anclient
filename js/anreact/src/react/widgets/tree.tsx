@@ -204,11 +204,15 @@ enum TreeNodeVisual {
 	collapsable
 };
 
-interface TreeItemProps extends AnTablistProps {
+interface TreegridProps extends AnTablistProps {
 	indentSettings?: IndentIcons;
 	parent?: AnTreeNode | undefined;
 	tnode: AnTreeNode;
 	columns: Array<AnTreegridCol>;
+
+	onThClick?: (col: AnTreegridCol, cx: number) => void;
+
+	testData?: Array<AnTreeNode>;
 };
 
 interface AnreactreeItem {
@@ -360,4 +364,4 @@ class AnTreeComp extends CrudCompW<Comprops> {
 
 const AnTree = withStyles(styles)(AnTreeComp);
 export { levelIcons, icon, TreeNodeVisual, AnTreegridCol,
-		TreeItemProps, AnreactreeItem, AnTree, AnTreeComp }
+		TreegridProps as TreeItemProps, AnreactreeItem, AnTree, AnTreeComp }

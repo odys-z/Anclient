@@ -120,6 +120,9 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	/**
 	 * Create an HTTP GET request for src of img tag.
 	 * 
+	 * TODO: depend on FileStream.A.download, having being PhotoRec independent of Album.
+	 * Then move AlbumReq to test. 
+	 * 
 	 * @param pid 
 	 * @param opts 
 	 * @returns src for img, i.e. jserv?anst64=message-string 
