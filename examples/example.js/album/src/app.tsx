@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, 
 	AnTreeNode, ErrorCtx, an, SessionClient
 } from '@anclient/semantier';
 
@@ -43,11 +43,15 @@ export class App extends CrudCompW<AlbumProps> {
 		servId: '',
 	};
     nextAction: string | undefined;
-	albumsk: string;
+
+	albumsk = "tree-album-family-folder";
+	doctreesk = 'tree-docs-folder';
+	uri = 'example.js/album';
 
 	state = {
 		hasError: false,
-		showingDocs: false
+		showingDocs: false,
+		sk: undefined,
 	};
 
 	editForm : undefined;
@@ -59,8 +63,6 @@ export class App extends CrudCompW<AlbumProps> {
 	 */
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
-		this.uri = 'example.js/album';
-		this.albumsk = "tree-album-family-folder";
 
 		this.onError = this.onError.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
@@ -121,8 +123,20 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	toSearch() {
-		this.editForm = undefined;
-		this.setState({tobeLoaded: true})
+		let that = this;
+		let tier = this.albumtier as GalleryTier;
+
+		if (!tier) return;
+
+		tier.stree({ uri: this.uri, sk: this.albumsk,
+			onOk: (rep: AnsonMsg<AnsonResp>) => {
+				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[]; 
+				console.log(tier.forest);
+				that.setState({});
+			}},
+			this.error);
+
+		this.onErrorClose();
 	}
 
 	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes?: ClassNames, media?: Media} | undefined) {
@@ -136,8 +150,10 @@ export class App extends CrudCompW<AlbumProps> {
 			</Grid> );
 
 		function onToggle(e: React.MouseEvent) {
-			that.setState({showingDocs: !that.state.showingDocs});
-			console.log(e);
+			// that.setState({showingDocs: !that.state.showingDocs});
+			that.state.showingDocs = !that.state.showingDocs;
+			that.toSearch();
+			// console.log(e);
 		}
 	}
 
@@ -174,7 +190,7 @@ export class App extends CrudCompW<AlbumProps> {
 		}} >
 		  { this.albumtier && (
 			this.state.showingDocs ?
-		    <AnTreegrid uri={this.uri}
+		    <AnTreegrid
 				pk={''} onSelectChange={()=>{}}
 				columns={[
 					{ text: L('Domain ID'), field:"domainId", color: 'primary',

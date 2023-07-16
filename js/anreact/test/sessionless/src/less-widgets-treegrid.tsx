@@ -1,13 +1,107 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
-import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
+	SessionClient, AnDatasetResp, AlbumRec, PhotoRec } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreegrid
+	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 
 const { JsampleTheme } = jsample;
+
+const testData: AnTreeNode[] = [
+  { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+	"id": "f/zsu.2019_08",
+	"node": {
+		"folder": "f/zsu",
+		"pname": "2019_08",
+		"nodetype": "gallery",
+		"shareby": "ody",
+		"mime": "image/jpeg",
+		"pid": "f/zsu.2019_08",
+		"sort": "2019_08",
+		"img": "1",
+		"geo": "0",
+		"mov": "0",
+		"children": [
+			{ "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+			"node": {
+					"img": "147456",
+					"folder": "f/zsu.2019_08",
+					"nodetype": "p",
+					"shareby": "ody",
+					"pname": "my.jpg",
+					"fullpath": "f/zsu.2019_08000000HC",
+					"mime": "image/jpeg",
+					"pid": "000000HC",
+					"sort": "2019-08-18 01:38:21"
+				},
+				"parent": "io.odysz.anson.utils.TreeIndenode",
+				"indents": [
+					"childx"
+				],
+				"lastSibling": true,
+				"level": 1,
+				"id": "000000HC",
+				"parentId": "f/zsu.2019_08"
+			}
+		],
+		"fullpath": "f/zsu.2019_08",
+		"fav": "0"
+	},
+	"parent": "io.odysz.anson.utils.TreeIndenode",
+	"indents": [], "lastSibling": false,
+	"level": 0,
+	"parentId": null
+  },
+  { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+    "node": {
+        "pname": "tractor-brigade",
+        "img": "0",
+        "nodetype": "gallery",
+        "shareby": "syrskyi",
+        "mime": "video/mp4",
+        "pid": "f/zsu.tractor-brigade",
+        "sort": "tractor-brigade",
+        "geo": "0",
+        "folder": "f/zsu",
+        "mov": "1",
+        "children": [
+          { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
+			"node": {
+				"img": "4128768",
+				"folder": "f/zsu.tractor-brigade",
+				"nodetype": "p",
+				"shareby": "syrskyi",
+				"pname": "Amelia Anisovych.mp4",
+				"fullpath": "f/zsu.tractor-brigade000000FM",
+				"mime": "video/mp4",
+				"pid": "000000FM",
+				"sort": "2022-11-14 15:23:50"
+			},
+			"parent": "io.odysz.anson.utils.TreeIndenode",
+			"indents": [
+				"childx"
+			],
+			"lastSibling": true,
+			"level": 1,
+			"id": "000000FM",
+			"parentId": "f/zsu.tractor-brigade"
+		  }
+        ],
+        "fullpath": "f/zsu.tractor-brigade",
+        "fav": "0"
+    },
+    "parent": "io.odysz.anson.utils.TreeIndenode",
+    "indents": [],
+    "lastSibling": false,
+    "level": 0,
+    "id": "f/zsu.tractor-brigade",
+    "parentId": null
+  }
+];
+
 
 type LessProps = {
 	servs: JsonServs;
@@ -50,8 +144,10 @@ class Widgets extends React.Component<LessProps> {
 		reload: false
 	};
 
-	doctreesk  = 'tree-dock-folder';
+	doctreesk  = 'tree-docs-folder';
 	uri = '/album/tree';
+
+	// forest: AnTreeNode[];
 
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
@@ -118,7 +214,29 @@ class Widgets extends React.Component<LessProps> {
 
 		this.albumtier = new TestreeTier(this.uri, this, c);
 
-		this.setState({reload: true});
+		// use this to show fake data:
+		this.setState({});
+		// this.toSearch();
+	}
+
+	toSearch() {
+		let that = this;
+
+		this.albumtier.stree({ uri: this.uri, sk: this.doctreesk,
+			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
+				that.albumtier.forest = resp.Body().forest as AnTreeNode[]; 
+				console.log(that.albumtier.forest);
+				that.setState({});
+			}},
+			this.errctx);
+
+		this.onErrorClose();
+	}
+
+	typeParser() {
+	}
+
+	folderSum() {
 	}
 
 	render() {
@@ -148,17 +266,19 @@ class Widgets extends React.Component<LessProps> {
 					tier={this.albumtier}
 					pk={'NA'} sk={this.doctreesk}
 					columns={[ // noly card for folder header
-						{ type: 'iconame', field: 'folder', label: L('Name'),
+						{ type: 'iconame', field: 'pname', label: L('Name'),
 						  grid: {sm: 3, md: 3} },
-						{ type: 'text', field: 'text', label: L('-- A --'),
+						{ type: 'text', field: 'mime', label: L('type'), colFormatter: this.typeParser,
 						  grid: {xs: false, sm: 4, md: 2} },
-						{ type: 'text', field: 'text', label: L('-- B --'),
+						{ type: 'text', field: 'shareby', label: L('share by'),
 						  grid: {xs: false, sm: 3, md: 2} },
-						{ type: 'text', field: 'text', label: L('-- C --'),
+						{ type: 'text', field: 'img', label: L('size'), colFormatter: this.folderSum,
 						  grid: {xs: false, sm: 2, md: 2} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
 					onSelectChange={undefined}
+					onThClick={()=> this.toSearch()}
+					testData={testData}
 				/>}
 				{ this.state.hasError && <AnError
 					title={L('Error')} msg={this.errctx.msg}
@@ -188,6 +308,8 @@ class Widgets extends React.Component<LessProps> {
 }
 
 class TestreeTier extends AlbumTier {
+	forest: AnTreeNode[];
+
 	sysroot(): AnTreeNode {
 		return {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
@@ -217,5 +339,32 @@ class TestreeTier extends AlbumTier {
 		}
 	}
 }
+
+class AlbumResp extends AnDatasetResp {
+	static __type__ = 'io.oz.album.tier.AlbumResp';
+	album?: AlbumRec;
+
+	// profils?: Profiles;
+
+	collect?: Array<string>;
+	collects?: Array<PhotoCollect>;
+
+	photo?: PhotoRec;
+
+	constructor (resp: AlbumRec & {
+			forest: AnTreeNode[], // profiles?: Profiles,
+			photo?: PhotoRec, collect?: Array<string>}) {
+		super({
+			forest: resp.forest
+		});
+
+		this.album = resp;
+		this.collect = resp.collect;
+		// this.profils = resp.profiles;
+		this.collects = resp.collects as PhotoCollect[];
+	}
+}
+Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });
+
 
 export { Widgets };
