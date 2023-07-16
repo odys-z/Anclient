@@ -206,7 +206,7 @@ enum TreeNodeVisual {
 
 interface TreeItemProps extends AnTablistProps {
 	indentSettings?: IndentIcons;
-	parent: AnTreeNode | undefined;
+	parent?: AnTreeNode | undefined;
 	tnode: AnTreeNode;
 	columns: Array<AnTreegridCol>;
 };
