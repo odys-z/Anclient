@@ -42,6 +42,10 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     protected int mMaxNumber;
     protected int mCurrentNumber = 0;
 
+    /** Prevent measuring for every item */
+    protected int itemWidth = -1;
+
+
     public boolean isUpToMax () {
         return mCurrentNumber >= mMaxNumber;
     }
@@ -111,7 +115,6 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
                 startSynchQuery(synchPage);
             else {
             singleton.login((r) -> startSynchQuery(synchPage),
-                    // (c, r, args) -> { Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0])); }
                     singleton.errCtx);
             }
         } catch (GeneralSecurityException e) {
