@@ -37,8 +37,6 @@ export class DocIcon {
         if (!this.buf.hasOwnProperty(src))
             this.buf[src] = new Blob([t], {type: 'image/svg+xml'});
 
-        // const blob = new Blob([z7], {type: 'image/svg+xml'});
-        // return (<img className={opts.classes.iconClass} src={URL.createObjectURL(blob)}></img>);
         return (<img className={opts.classes.icon} src={URL.createObjectURL(this.buf[src])}></img>);
     }
 }

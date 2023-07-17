@@ -12,7 +12,6 @@ import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 import { GalleryTier } from './gallerytier-less';
 import { Button, Grid } from '@material-ui/core';
 import { JsampleIcons } from '@anclient/anreact/src/jsample/styles';
-import { z7 } from './icons/7zip';
 import { DocIcon } from './icons/doc-ico';
 
 type AlbumProps = {

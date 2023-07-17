@@ -45,10 +45,16 @@ const styles = (theme: Theme) => ({
   },
   hide: { display: "none" },
   treeItem: {
-    padding: theme.spacing(1),
-    paddingTop: 0,
-    paddingBottom: 0,
+    padding: theme.spacing(0.25),
+    // paddingTop: theme.spacing(1),
+    // paddingBottom: 0,
     borderLeft: "1px solid #bcd",
+    // marginTop: "auto",
+    // marginBottom: "auto",
+  },
+  icon: {
+    verticalAlign: 'middle',
+    height: theme.spacing(3),
   }
 });
 
