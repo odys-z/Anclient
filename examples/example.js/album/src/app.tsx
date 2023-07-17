@@ -132,7 +132,8 @@ export class App extends CrudCompW<AlbumProps> {
 
 		if (!tier) return;
 
-		tier.stree({ uri: this.uri, sk: this.albumsk,
+		tier.stree({ uri: this.uri,
+			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
 				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[]; 
 				console.log(tier.forest);

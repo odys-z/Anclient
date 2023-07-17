@@ -59,8 +59,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
             WindowManager wm = (WindowManager) mContext.getSystemService ( Context.WINDOW_SERVICE );
-            int width = wm.getDefaultDisplay ( ).getWidth ( );
-            params.height = width / ImagePickActivity.COLUMN_NUMBER;
+            itemWidth = wm.getDefaultDisplay ( ).getWidth ( );
+            params.height = itemWidth / ImagePickActivity.COLUMN_NUMBER;
         }
         VideoPickViewHolder videoViewHolder = new VideoPickViewHolder ( itemView );
         videoViewHolder.setIsRecyclable ( false );
@@ -106,7 +106,7 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.icSynced.setVisibility(View.GONE);
             }
             // else if (SyncFlag.publish.equals(file.syncFlag)) {
-            else if (file.syncFlag.equals(SyncFlag.publish) || file.syncFlag.equals(SyncFlag.hub)) {
+            else if (SyncFlag.publish.equals(file.syncFlag) || SyncFlag.hub.equals(file.syncFlag)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -141,28 +141,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.mShadow.setVisibility ( View.INVISIBLE );
             }
 
-            holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-                return startMediaViewer(mContext, "video/*", file.fullpath());
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                Uri uri;
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                    File f = new File(file.fullpath());
-//                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
-//                }
-//                else {
-//                    uri = Uri.parse("file://" + file.fullpath());
-//                }
-//                // intent.setDataAndType(uri, "video/mp4");
-//                intent.setDataAndType(uri, "video/*");
-//                if (Util.detectIntent(mContext, intent)) {
-//                    mContext.startActivity(intent);
-//                }
-//                else {
-//                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_video_play_app));
-//                }
-//                return false;
-            });
+            holder.mIvThumbnail.setOnLongClickListener((View view)
+                    -> startMediaViewer(mContext, "video/*", file.fullpath()));
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
