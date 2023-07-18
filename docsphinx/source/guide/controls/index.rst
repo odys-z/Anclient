@@ -9,3 +9,4 @@ Anreact Widgets (some of)
    query-form
    img-upload
    formatters
+   tree
