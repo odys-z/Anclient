@@ -12,7 +12,7 @@ export class GalleryTier extends StreeTier {
 	page: AlbumPage;
 	collectRecords?: PhotoCollect[];
 	albumTitle: string = 'title';
-	forest?: AnTreeNode[];
+	// forest?: AnTreeNode[];
 
 	/**
 	 * @param props

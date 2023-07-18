@@ -82,8 +82,9 @@ public class PhotoSyntier extends Synclientier {
 	}
 
 	IFileProvider fileProvider;
-	public void fileProvider(IFileProvider p) {
+	public PhotoSyntier fileProvider(IFileProvider p) {
 		this.fileProvider = p;
+		return this;
 	}
 
 	public AlbumResp getCollect(String collectId) throws SemanticException, IOException, AnsonException {
@@ -92,32 +93,37 @@ public class PhotoSyntier extends Synclientier {
 		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req);
 		return client.commit(q, errCtx);
 	}
-	
-	public PhotoSyntier asyGetSettings(OnOk onOk, OnError... onErr) {
-		new Thread(new Runnable() {
-			public void run() {
-			try {
-				AnsonHeader header = client.header()
-						.act("album.java", "profile", "r/settings", "load profile");
 
-				AlbumReq req = new AlbumReq(uri);
-				req.a(A.getPrefs);
-				AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req)
-						.header(header);
-				AnsonResp resp = client.commit(q, errCtx);
-				onOk.ok(resp);
-			} catch (IOException e) {
-				if (isNull(onErr))
-					errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
-				else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
-			} catch (AnsonException | SemanticException e) { 
-				if (isNull(onErr))
-					errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
-				else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
-			} 
-		} } ).start();
-		
-		return this;
+	/**
+	 * Get this user's settings from port album.less.
+	 *
+	 * For album-jserv 0.6.50, the webroot is configured in org's field.
+	 *
+	 * @return this
+	 */
+	public PhotoSyntier asyGetSettings(OnOk onOk, OnError... onErr) {
+	  new Thread(() -> {
+		try {
+			AnsonHeader header = client.header()
+					.act("album.java", "profile", "r/settings", "load profile");
+
+			AlbumReq req = new AlbumReq(uri);
+			req.a(A.getPrefs);
+			AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req)
+					.header(header);
+			AnsonResp resp = client.commit(q, errCtx);
+			onOk.ok(resp);
+		} catch (IOException e) {
+			if (isNull(onErr))
+				errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
+			else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
+		} catch (AnsonException | SemanticException e) {
+			if (isNull(onErr))
+				errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
+			else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
+		}
+	  }).start();
+	  return this;
 	}
 	
 	/**
@@ -177,23 +183,14 @@ public class PhotoSyntier extends Synclientier {
 	/**
 	 * MEMO: what about have Anson.toBlock() support input stream field?
 	 * 
-	 * @param client
-	 * @param uri
-	 * @param tbl
-	 * @param videos
-	 * @param fileProvider
-	 * @param proc
-	 * @param docOk
-	 * @param errHandler
-	 * @param blocksize
 	 * @return response list for each block
-	 * @throws TransException
-	 * @throws IOException
+	 * @throws SemanticException block information is incorrect, e.g. con not find device id.
+	 * @throws IOException file access error
 	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
                                             List<? extends SyncDoc> videos, IFileProvider fileProvider,
 											OnProcess proc, OnDocOk docOk, OnError errHandler, int blocksize)
-			throws TransException, IOException {
+			throws SemanticException, IOException {
 
 		SessionInf user = client.ssInfo();
 		DocsResp startAck = null;

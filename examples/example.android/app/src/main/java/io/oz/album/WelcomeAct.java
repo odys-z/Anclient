@@ -1,6 +1,11 @@
 package io.oz.album;
 
-import android.Manifest;
+import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
+import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
+import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
+import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
+import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
+
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,24 +22,26 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.TextView;
 
-import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.activity.AudioPickActivity;
-import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.activity.VideoPickActivity;
-import com.vincent.filepicker.filter.entity.BaseFile;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Objects;
-
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
+
+import com.vincent.filepicker.Constant;
+import com.vincent.filepicker.activity.AudioPickActivity;
+import com.vincent.filepicker.activity.ImagePickActivity;
+import com.vincent.filepicker.activity.VideoPickActivity;
+import com.vincent.filepicker.filter.entity.BaseFile;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Objects;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
@@ -53,12 +60,6 @@ import io.oz.albumtier.IFileProvider;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.activity.BaseActivity;
-
-import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
-import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
-import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
-import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
-import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
 
@@ -100,7 +101,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
         String device = sharedPref.getString(AlbumApp.keys.device, "");
         String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
-        String homepage = sharedPref.getString(AlbumApp.keys.homepage, "https://odys-z.github.io/Anclient");
+        String homepage = sharedPref.getString(AlbumApp.keys.homepage, "https://192.160.0.93:8888");
 
         singl.init(homeName, uid, device, jserv);
         AssetHelper.init(this, jserv, homepage);
@@ -161,18 +162,18 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             else singl
                     .pswd(sharedPref.getString(AlbumApp.keys.pswd, ""))
                     .login((client) -> {
-                                // All WebView methods must be called on the same thread.
-                                runOnUiThread(() -> {
-                                    final VWebAlbum webView = new VWebAlbum();
-                                    WebView wv = findViewById(R.id.wv_welcome);
-                                    wv.setWebViewClient(webView);
-                                    WebSettings webSettings = wv.getSettings();
-                                    webSettings.setJavaScriptEnabled(true);
-                                    webSettings.setDomStorageEnabled(true);
-                                    wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
-                                });
-                            },
-                            (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
+                        // All WebView methods must be called on the same thread.
+                        runOnUiThread(() -> {
+                            final VWebAlbum webView = new VWebAlbum();
+                            WebView wv = findViewById(R.id.wv_welcome);
+                            wv.setWebViewClient(webView);
+                            WebSettings webSettings = wv.getSettings();
+                            webSettings.setJavaScriptEnabled(true);
+                            webSettings.setDomStorageEnabled(true);
+                            wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
+                        });
+                    },
+                    (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
         }
@@ -187,8 +188,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     void showMsg(int template, Object... args) {
         runOnUiThread(() -> {
             String msg = String.format(getString(template), args);
-            // not working:
-            // Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG);
             msgv.setText(msg);
             msgv.setVisibility(View.VISIBLE);
         });
@@ -239,8 +238,18 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
                 else
-                    singl.tier.asyVideos(list,
-                            null,
+                    singl.tier.fileProvider(new IFileProvider() {
+                        @Override
+                        public long meta(SyncDoc f) throws IOException {
+                            f.size = new File(f.fullpath()).length();
+                            return f.size;
+                        }
+
+                        @Override
+                        public InputStream open(SyncDoc f) throws FileNotFoundException {
+                            return new FileInputStream(f.fullpath());
+                        }
+                    }).asyVideos(list, null,
                             (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
 
@@ -305,12 +314,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         @Override
                         public InputStream open(SyncDoc p) throws FileNotFoundException {
                             return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
-                        }
-                    });
-                    singl.tier.asyVideos(paths,
-                            null,
-                            (resp, v) -> showMsg(R.string.t_synch_ok, paths.size()),
-                            errCtx.prepare(msgv, R.string.msg_upload_failed));
+                        } })
+                    .asyVideos(paths,
+                        null,
+                        (resp, v) -> showMsg(R.string.t_synch_ok, paths.size()),
+                        errCtx.prepare(msgv, R.string.msg_upload_failed));
                 }
 
                 WebView wv = findViewById(R.id.wv_welcome);
@@ -390,11 +398,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
+//    private static final String[] PERMISSIONS_STORAGE = {
+//            Manifest.permission.READ_EXTERNAL_STORAGE,
+//            Manifest.permission.WRITE_EXTERNAL_STORAGE
+//    };
 
 //    /**
 //     * Checks if the app has permission to write to device storage.

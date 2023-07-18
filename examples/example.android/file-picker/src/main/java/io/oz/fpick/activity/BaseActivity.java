@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -18,7 +17,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.FolderListHelper;
-import com.vincent.filepicker.adapter.FolderListAdapter;
 import com.vincent.filepicker.filter.entity.Directory;
 
 import java.io.File;
@@ -182,28 +180,17 @@ public abstract class BaseActivity extends FragmentActivity
     }
 
     protected void loadirs(List<Directory<AndroidFile>> directories) {
-        boolean tryToFindTakenImage = isTakenAutoSelected;
+//        boolean tryToFindTakenImage = isTakenAutoSelected;
 
         // if auto-selecting taken files is enabled, make sure requirements are met
-        if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mFilepath)) {
-            File takenImageFile = new File(mAdapter.mFilepath);
-            // try to select taken image only if max isn't reached and the file exists
-            tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists();
-        }
+//        if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mFilepath)) {
+//            File takenImageFile = new File(mAdapter.mFilepath);
+//            // try to select taken image only if max isn't reached and the file exists
+//            tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists();
+//        }
 
-        List<AndroidFile> list = mergeDirs(directories);
+        List<AndroidFile> list = mergeDirs(directories, isTakenAutoSelected);
         /*
-        new ArrayList<>();
-        for (Directory<AndroidFile> directory : directories) {
-            List<AndroidFile> l = directory.getFiles();
-            list.addAll(l);
-
-            // auto-select taken images?
-            if (tryToFindTakenImage) {
-                // findAndAddTakenImage(directory.getFiles());   // if taken image was found, we're done
-                findAndAddTakenFiles(l);
-            }
-        }
         */
 
         // max number is limited
@@ -216,12 +203,29 @@ public abstract class BaseActivity extends FragmentActivity
         mAdapter.refreshSyncs(list);
     }
 
-    private static List<AndroidFile> mergeDirs(List<Directory<AndroidFile>> directories) {
+    private List<AndroidFile> mergeDirs(List<Directory<AndroidFile>> directories, boolean tryToFindTakenImage) {
+        // boolean tryToFindTakenImage = isTakenAutoSelected;
+        if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mFilepath)) {
+            File takenImageFile = new File(mAdapter.mFilepath);
+            // try to select taken image only if max isn't reached and the file exists
+            tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists();
+        }
+
         List<AndroidFile> lst = new ArrayList<>();
+        for (Directory<AndroidFile> directory : directories) {
+            List<AndroidFile> l = directory.getFiles();
+            lst.addAll(l);
+
+            // auto-select taken images?
+            if (tryToFindTakenImage) {
+                // findAndAddTakenImage(directory.getFiles());   // if taken image was found, we're done
+                markTakenFiles(l);
+            }
+        }
         return lst;
     }
 
-    protected boolean findAndAddTakenFiles(List<AndroidFile> list) {
+    protected boolean markTakenFiles(List<AndroidFile> list) {
         for (AndroidFile imageFile : list) {
             if (imageFile.fullpath().equals(mAdapter.mFilepath)) {
                 mSelectedList.add(imageFile);

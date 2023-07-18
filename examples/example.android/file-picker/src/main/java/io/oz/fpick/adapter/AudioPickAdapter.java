@@ -1,6 +1,11 @@
+/**
+ * Created by Ody Zhou
+ * Date: 23 Feb. 2022
+ *
+ * Credits to Vincent Woo
+ */
 package io.oz.fpick.adapter;
 
-import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.view.LayoutInflater;
@@ -24,12 +29,6 @@ import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
 import io.oz.jserv.docsync.SyncFlag;
 
-/**
- * Created by Ody Zhou
- * Date: 23 Feb. 2022
- *
- * Credits to Vincent Woo
- */
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
     public AudioPickAdapter(BaseActivity ctx, ArrayList<AudioFile> list, int max) {
         super(ctx, list);
@@ -46,7 +45,7 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
     public AudioPickViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.vw_layout_item_audio_pick, parent, false);
         AudioPickViewHolder holder= new AudioPickViewHolder(itemView);
-        holder.setIsRecyclable ( false );
+        holder.setIsRecyclable ( true );
         return holder;
     }
 
@@ -64,32 +63,31 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         }
 
         holder.mTvDuration.setText(Util.getDurationString(file.getDuration()));
-        // if (BaseFile.Synchronizing.equals(file.syncFlag)) {
         if (SyncFlag.priv.equals(file.syncFlag)) {
             holder.mCbx.setSelected ( false );
-            holder.icAlbum.setVisibility(View.GONE);
-            holder.icSyncing.setVisibility(View.VISIBLE);
-            holder.icSynced.setVisibility(View.GONE);
+            holder.icAlbum.setVisibility(View.INVISIBLE);
+            holder.icSyncing.setVisibility(View.GONE);
+            holder.icSynced.setVisibility(View.VISIBLE);
         }
-        // else if (BaseFile.Synchronized.equals(file.syncFlag)) {
-        // else if (SyncFlag.publish.equals(file.syncFlag)) {
-        else if (file.syncFlag.equals(SyncFlag.publish) || file.syncFlag.equals(SyncFlag.hub)) {
+        else if (SyncFlag.publish.equals(file.syncFlag) || SyncFlag.hub.equals(file.syncFlag)) {
             holder.mCbx.setSelected(true);
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
             holder.icSynced.setVisibility(View.VISIBLE);
         }
         else if (file.isSelected()) {
+            holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.mCbx.setSelected(true);
-            holder.animation.setVisibility ( View.VISIBLE );
+            holder.animation.setVisibility (View.VISIBLE);
             holder.animation.setAlpha ( 1f );
             AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
-//            Animation a = AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
             animationDrawable.start();
         } else {
             holder.mCbx.setSelected(false);
-            holder.animation.setVisibility ( View.INVISIBLE );
+            holder.icAlbum.setVisibility(View.GONE);
+            holder.animation.setVisibility (View.INVISIBLE);
             holder.animation.setAlpha ( 0f );
+            holder.icSynced.setVisibility(View.INVISIBLE);
         }
 
         holder.itemView.setOnLongClickListener((View view) -> {
@@ -128,8 +126,6 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             }
 
             if (mListener != null) {
-                // mListener.onAudioStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
-                // mListener.onAudioStateChanged (
                 mListener.onSelectStateChanged(
                         index,
                         holder.mCbx.isSelected(),

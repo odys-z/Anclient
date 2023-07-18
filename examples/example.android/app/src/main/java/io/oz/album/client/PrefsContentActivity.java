@@ -26,10 +26,9 @@ import io.oz.albumtier.PhotoSyntier;
 /**
  */
 public class PrefsContentActivity extends AppCompatActivity implements JProtocol.OnError {
-
-    // static AlbumContext singleton = AlbumContext.getInstance(this);
     static AlbumContext singleton;
 
+    /** uid in preference */
     static String oldUid;
     private AlbumPreferenceFragment prefFragment;
 
@@ -37,7 +36,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (singleton == null) {
-            // singleton = AlbumApp.singl;
             singleton = AlbumContext.getInstance(this);
             oldUid = null;
         } else oldUid = singleton.photoUser.uid();
@@ -56,7 +54,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         try {
             singleton.login(
                 (client) -> {
-                    // singleton.tier = (PhotoSyntier) tier;
                     updateSummery(prefFragment.summery, getString(R.string.login_succeed));
                     updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
 
