@@ -312,7 +312,7 @@ export class Lightbox extends CrudCompW<Comprops & {
     let items = [];
     let data = this.parse(this.props.photos);
     for (var i = 0; i < data.length; i++) {
-      var resource = data[i];
+      let resource = data[i];
       if (!resource.mime || mime2type(resource.mime) === 'image') {
         items.push(<img key={i}
           alt={resource.altag}
@@ -330,6 +330,38 @@ export class Lightbox extends CrudCompW<Comprops & {
         />);
       }
       else if (mime2type(resource.mime) === 'video') {
+        items.push(<video key={i}
+          ref={(ref) => this.vidRef = ref}
+
+          preload='false' controls
+          poster={resource.poster}
+          style={{
+            pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
+            maxWidth: '100%', maxHeight: '100%',
+            transform: `translate(${this.config.x}px, ${this.config.y}px) scale(${this.config.scale})`,
+            transition: 'transform 0.5s ease-out'
+          }}
+          onLoad={(e) => {
+            console.log('video loaded', e.currentTarget);
+            if (this.state.swiping || this.state.loading)
+              this.setState({ loading: false }); }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            // console.log(e.currentTarget);
+            // console.log(this.vidRef);
+            if (this.config.paused)
+              this.vidRef.play();
+            else
+              this.vidRef.pause();
+
+            this.config.paused = !this.config.paused;
+          }}
+          onEnded={e => this.config.paused = true}
+        >
+          <source src={resource.src} type={resource.mime}/>
+        </video>);
+
+      /*
         items.push(<video key={i}
           ref={(ref) => this.vidRef = ref}
 
@@ -359,6 +391,7 @@ export class Lightbox extends CrudCompW<Comprops & {
           }}
           onEnded={e => this.config.paused = true}
         />);
+        */
       }
 
       /* TODO third party online resources
