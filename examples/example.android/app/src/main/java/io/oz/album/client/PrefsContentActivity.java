@@ -26,8 +26,6 @@ import io.oz.albumtier.PhotoSyntier;
 /**
  */
 public class PrefsContentActivity extends AppCompatActivity implements JProtocol.OnError {
-
-    // static AlbumContext singleton = AlbumContext.getInstance(this);
     static AlbumContext singleton;
 
     /** uid in preference */

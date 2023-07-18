@@ -1,3 +1,9 @@
+/**
+ * Created by Ody Zhou
+ * Date: 23 Feb. 2022
+ *
+ * Credits to Vincent Woo
+ */
 package io.oz.fpick.adapter;
 
 import android.graphics.drawable.AnimationDrawable;
@@ -23,12 +29,6 @@ import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
 import io.oz.jserv.docsync.SyncFlag;
 
-/**
- * Created by Ody Zhou
- * Date: 23 Feb. 2022
- *
- * Credits to Vincent Woo
- */
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
     public AudioPickAdapter(BaseActivity ctx, ArrayList<AudioFile> list, int max) {
         super(ctx, list);
