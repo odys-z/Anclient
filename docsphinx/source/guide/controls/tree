@@ -11,7 +11,9 @@ Install Docker, start the container with scripts::
 
     ./docker-start
 
-This will pull a docker image, odysz/jsandbox:treeditor, into local container.
+This will pull a docker image, `odysz/jsandbox:treeditor <https://hub.docker.com/layers/odysz/jsandbox/treeditor/images/sha256-d40f6faa7596e33627457c245f33e825fc3ba287422b79d7f62841996845073b?context=explore>`_,
+into local container, download the `volume resources <https://github.com/odys-z/semantic-jserv/blob/master/jserv-sandbox/volume-treeditor-0.2.2.zip>`_
+for test.
 
 Then start VS Code, load dist/widgets.html with Anprism.
 
