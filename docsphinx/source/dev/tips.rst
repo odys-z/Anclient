@@ -60,3 +60,17 @@ Brutally delete .gradle cache not always working. Slow down the updating or foll
 
 .. image:: ./imgs/03-maven-snapshot-gradle-error.png
    :height: 300px
+
+.. _tip-docker-https:
+
+Forward https jserv to docker container with Nginx
+--------------------------------------------------
+
+Http Jserv service working as Docker container can be accessed from Nginx https port.
+
+Nginx.conf::
+
+
+To start docker container::
+
+Example: Semantic-jserv/jserv-sandbox.
