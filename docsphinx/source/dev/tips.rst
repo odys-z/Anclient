@@ -70,7 +70,6 @@ Http Jserv service working as Docker container can be accessed from Nginx https 
 
 Nginx.conf::
 
+To start docker container, see example,
 
-To start docker container::
-
-Example: Semantic-jserv/jserv-sandbox.
+Semantic-jserv/jserv-sandbox.
