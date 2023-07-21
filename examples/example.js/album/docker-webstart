@@ -1,0 +1,6 @@
+# docker pull odysz/album-web
+docker volume rm album.host
+docker volume create album.host
+sudo cp dist/private/host.json /var/lib/docker/volumes/album.host/_data
+
+docker run --mount source=album.host,target=/usr/share/nginx/html/private -p 8889:80 --name curr-web --rm -d odysz/album-web

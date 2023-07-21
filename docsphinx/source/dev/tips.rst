@@ -103,3 +103,7 @@ In Dockerfile::
     EXPOSE 80
 
 See this `answer <https://stackoverflow.com/a/65678446/7362888>`_.
+
+Ngninx Document:
+
+`add_header <https://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header>`_
