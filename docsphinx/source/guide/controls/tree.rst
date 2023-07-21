@@ -7,6 +7,8 @@ In the js/anreact/test/sessionless folder,
     npm i
     webpack
 
+.. _controls_treeditor:
+
 Test AnTreeditor
 ----------------
 
@@ -23,12 +25,10 @@ To install Docker, start the container with scripts::
 
 This will pull a docker image, odysz/jsandbox:treeditor, into local container.
 
-Then start VS Code, load dist/widgets.html with Anprism.
-
-You should see a tree like this:
+Start VS Code, load dist/widgets.html with Anprism. Follwing is what is expected:
 
 .. image:: ../../imgs/04-treeditor-1.jpg
-   :height: 240px
+   :height: 20em
 
 .. image:: ../../imgs/04-treeditor-2.jpg
    :height: 20em
