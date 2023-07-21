@@ -15,7 +15,7 @@ Test page::
     js/anreact/test/sessionless/dist/widgets.html
 
 This front page work with `jserv-sandbox <https://github.com/odys-z/semantic-jserv/tree/master/jserv-sandbox>`_.
-For @anclient/anreact v0.4.35, a docker image for testing AnTreeditor is published.
+For @anclient/anreact v0.4.36, a docker image for testing AnTreeditor is published.
 
 To install Docker, start the container with scripts::
 
