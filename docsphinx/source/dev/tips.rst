@@ -58,6 +58,10 @@ ________
 Brutally delete .gradle cache not always working. Slow down the updating or follow
 `this answer <https://stackoverflow.com/a/62600906/7362888>`_.
 
+::
+
+    File > Project Structure > Dependencies
+
 .. image:: ./imgs/03-maven-snapshot-gradle-error.png
    :height: 300px
 
@@ -70,6 +74,20 @@ Http Jserv service working as Docker container can be accessed from Nginx https 
 
 Nginx.conf::
 
-To start docker container, see example,
+    server {
+        listen       443 ssl http2;
+        listen       [::]:443 ssl http2;
+        server_name  ...;
 
-Semantic-jserv/jserv-sandbox.
+        ssl_certificate /etc/letsencrypt/live/...
+        ssl_certificate_key /etc/letsencrypt/live/...
+
+        location /jsandbox {
+            proxy_pass http://docker-ip:port/jserv-sandbox/;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
+
+Start docker container normally.
+
+Example: :ref:`Semantic-jserv/jserv-sandbox <controls_treeditor>`.
