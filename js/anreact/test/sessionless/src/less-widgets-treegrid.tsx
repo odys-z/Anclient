@@ -4,7 +4,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 	SessionClient, AnDatasetResp, AlbumRec, PhotoRec } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect
+	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 
@@ -147,6 +147,8 @@ class Widgets extends React.Component<LessProps> {
 	doctreesk  = 'tree-docs-folder';
 	uri = '/album/tree';
 
+	docIcon: any;
+
 	// forest: AnTreeNode[];
 
 	constructor(props: LessProps | Readonly<LessProps>) {
@@ -215,8 +217,9 @@ class Widgets extends React.Component<LessProps> {
 		this.albumtier = new TestreeTier(this.uri, this, c);
 
 		// use this to show fake data:
-		this.setState({});
-		// this.toSearch();
+		// this.setState({});
+
+		this.toSearch();
 	}
 
 	toSearch() {
@@ -233,7 +236,14 @@ class Widgets extends React.Component<LessProps> {
 		this.onErrorClose();
 	}
 
-	typeParser() {
+	typeParser(c: AnTreegridCol, n: AnTreeNode, opt: {classes: ClassNames, media: Media}) {
+		if (n.node.children?.length as number > 0) return <></>;
+
+		else {
+			let mime = n.node['mime'] || '?';
+			let src = regex.mime2type(mime as string);
+			return (<>{`[${src}]`}</>)
+		}
 	}
 
 	folderSum() {

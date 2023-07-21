@@ -91,3 +91,7 @@ Nginx.conf::
 Start docker container normally.
 
 Example: :ref:`Semantic-jserv/jserv-sandbox <controls_treeditor>`.
+
+Ngninx Document:
+
+`add_header <https://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header>`_
