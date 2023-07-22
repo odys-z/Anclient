@@ -11,7 +11,6 @@ import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 } from '@anclient/anreact';
 import { GalleryTier } from './gallerytier-less';
 import { Button, Grid } from '@material-ui/core';
-import { JsampleIcons } from '@anclient/anreact/src/jsample/styles';
 import { DocIcon } from './icons/doc-ico';
 
 type AlbumProps = {
@@ -149,12 +148,15 @@ export class App extends CrudCompW<AlbumProps> {
 		return (
 			<Grid item key={ix as number} {...col.grid}>
 			<Button onClick={onToggle}
-				startIcon={<JsampleIcons.ThirdStateCheck />} color="primary" >
+				className={opts?.classes?.toggle}
+				startIcon={that.docIcon.toggleButton(opts)}
+				// startIcon={<JsampleIcons.ThirdStateCheck />}
+				color="primary" >
 				{opts?.media?.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
 			</Button>
 			</Grid> );
 
-		function onToggle(e: React.MouseEvent) {
+		function onToggle(_e: React.MouseEvent) {
 			that.state.showingDocs = !that.state.showingDocs;
 			that.toSearch();
 		}

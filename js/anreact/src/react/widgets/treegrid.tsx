@@ -30,6 +30,10 @@ const styles = (theme: Theme) => ({
 	  borderBottom: '1px solid #bcd',
     BackgroundCollor: "#dde5ed"
   },
+  thCell: {
+    margin: 'auto',
+    verticalAlgin: 'middle'
+  },
   rowHead: {
     padding: theme.spacing(1),
     paddingTop: 0,
@@ -46,15 +50,16 @@ const styles = (theme: Theme) => ({
   hide: { display: "none" },
   treeItem: {
     padding: theme.spacing(0.25),
-    // paddingTop: theme.spacing(1),
-    // paddingBottom: 0,
     borderLeft: "1px solid #bcd",
-    // marginTop: "auto",
-    // marginBottom: "auto",
   },
   icon: {
     verticalAlign: 'middle',
     height: theme.spacing(3),
+  },
+  toggle: {
+    padding: 0,
+    verticalAlign: 'middle',
+    height: theme.spacing(4),
   }
 });
 
@@ -98,7 +103,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
         .map( (col: AnTreegridCol, ix: number) => {
           if (col.thFormatter) return col.thFormatter(col, ix, {classes, media});
           if (col.type === 'actions') return (
-            <Grid item key={ix} {...col.grid}>
+            <Grid item key={ix} {...col.grid} className={classes.thCell}>
               <Button onClick={(e) => opts.onThClick(e, ix)}
                 data-me={undefined} date-parent={undefined}
                 startIcon={<JsampleIcons.ListAdd />} color="primary" >

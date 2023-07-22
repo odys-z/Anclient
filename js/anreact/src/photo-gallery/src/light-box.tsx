@@ -332,6 +332,7 @@ export class Lightbox extends CrudCompW<Comprops & {
 
           preload='false' controls
           poster={resource.poster}
+          src={resource.src}
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
             maxWidth: '100%', maxHeight: '100%',
