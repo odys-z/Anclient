@@ -6,7 +6,6 @@ COPY dist/* /usr/share/nginx/html/
 #
 # check the private/host.json didn't been included in /usr/share/nginx/html/
 # docker run -p 8889:80 --name emr --rm -it 5ef /bin/sh
-# URL: http://192.168.0.201:8889
 #
 # setup configuration of dist/private/host.json
 # docker volume create private.host

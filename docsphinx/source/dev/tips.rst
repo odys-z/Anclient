@@ -67,8 +67,8 @@ Brutally delete .gradle cache not always working. Slow down the updating or foll
 
 .. _tip-docker-https:
 
-Forward https jserv to docker container with Nginx
---------------------------------------------------
+Forward https request to docker container with Nginx
+----------------------------------------------------
 
 Http Jserv service working as Docker container can be accessed from Nginx https port.
 
@@ -91,6 +91,18 @@ Nginx.conf::
 Start docker container normally.
 
 Example: :ref:`Semantic-jserv/jserv-sandbox <controls_treeditor>`.
+
+Tip: Bind Tomcat to port 80
+___________________________
+
+In Dockerfile::
+
+    FROM tomcat:9.0
+    RUN sed -i 's/port="8080"/port="80"/' ${CATALINA_HOME}/conf/server.xml
+    COPY ...
+    EXPOSE 80
+
+See this `answer <https://stackoverflow.com/a/65678446/7362888>`_.
 
 Ngninx Document:
 
