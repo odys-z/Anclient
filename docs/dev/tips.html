@@ -1,15 +1,20 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Tips &mdash; Anclient Anclient documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -17,42 +22,39 @@
   
 
   
+  
 
   
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
-        <link rel="up" title="For developers" href="index.html"/>
-        <link rel="next" title="CodeSandbox" href="mui-examples.html"/>
-        <link rel="prev" title="Issues &amp; Handling" href="issues.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CodeSandbox" href="mui-examples.html" />
+    <link rel="prev" title="Issues &amp; Handling" href="issues.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
+   
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -79,11 +81,15 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
             
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../starter/index.html">Ancient.ts Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../guide/index.html">Guide &amp; Tips</a></li>
@@ -98,6 +104,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#solution">Solution</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#forward-https-request-to-docker-container-with-nginx">Forward https request to docker container with Nginx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tip-bind-tomcat-to-port-80">Tip: Bind Tomcat to port 80</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="mui-examples.html">CodeSandbox</a></li>
@@ -108,40 +118,63 @@
             
           
         </div>
+        
       </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">Anclient</a>
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Anclient</a>
+        
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="index.html">For developers</a> &raquo;</li>
-      
-    <li>Tips</li>
+        
+      <li>Tips</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -170,8 +203,8 @@ testing project, jsample won’t work as Protocol.sk been populated by test/jsam
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Load such things from server at runtime?</p>
+<p class="admonition-title">Note</p>
+<p>Load such things from server at runtime?</p>
 </div>
 </div>
 <div class="section" id="login-error-invalid-aes-key-length-26-bytes">
@@ -188,38 +221,77 @@ latest deployed Maven snapshot version.</p>
 <h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
 <p>Brutally delete .gradle cache not always working. Slow down the updating or follow
 <a class="reference external" href="https://stackoverflow.com/a/62600906/7362888">this answer</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">File</span> <span class="o">&gt;</span> <span class="n">Project</span> <span class="n">Structure</span> <span class="o">&gt;</span> <span class="n">Dependencies</span>
+</pre></div>
+</div>
 <a class="reference internal image-reference" href="../_images/03-maven-snapshot-gradle-error.png"><img alt="../_images/03-maven-snapshot-gradle-error.png" src="../_images/03-maven-snapshot-gradle-error.png" style="height: 300px;" /></a>
+</div>
+</div>
+<div class="section" id="forward-https-request-to-docker-container-with-nginx">
+<span id="tip-docker-https"></span><h2>Forward https request to docker container with Nginx<a class="headerlink" href="#forward-https-request-to-docker-container-with-nginx" title="Permalink to this headline">¶</a></h2>
+<p>Http Jserv service working as Docker container can be accessed from Nginx https port.</p>
+<p>Nginx.conf:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>server {
+    listen       443 ssl http2;
+    listen       [::]:443 ssl http2;
+    server_name  ...;
+
+    ssl_certificate /etc/letsencrypt/live/...
+    ssl_certificate_key /etc/letsencrypt/live/...
+
+    location /jsandbox {
+        proxy_pass http://docker-ip:port/jserv-sandbox/;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+</pre></div>
+</div>
+<p>Start docker container normally.</p>
+<p>Example: <a class="reference internal" href="../guide/controls/tree.html#controls-treeditor"><span class="std std-ref">Semantic-jserv/jserv-sandbox</span></a>.</p>
+<div class="section" id="tip-bind-tomcat-to-port-80">
+<h3>Tip: Bind Tomcat to port 80<a class="headerlink" href="#tip-bind-tomcat-to-port-80" title="Permalink to this headline">¶</a></h3>
+<p>In Dockerfile:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>FROM tomcat:9.0
+RUN sed -i &#39;s/port=&quot;8080&quot;/port=&quot;80&quot;/&#39; ${CATALINA_HOME}/conf/server.xml
+COPY ...
+EXPOSE 80
+</pre></div>
+</div>
+<p>See this <a class="reference external" href="https://stackoverflow.com/a/65678446/7362888">answer</a>.</p>
+<p>Ngninx Document:</p>
+<p><a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header">add_header</a></p>
 </div>
 </div>
 </div>
 
 
            </div>
+           
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="mui-examples.html" class="btn btn-neutral float-right" title="CodeSandbox" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="issues.html" class="btn btn-neutral" title="Issues &amp; Handling" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="mui-examples.html" class="btn btn-neutral float-right" title="CodeSandbox" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="issues.html" class="btn btn-neutral float-left" title="Issues &amp; Handling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2023, Ody Zhou.
+        &#169; Copyright 2023, Ody Zhou.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -228,37 +300,15 @@ latest deployed Maven snapshot version.</p>
   </div>
   
 
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'Anclient',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  false
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

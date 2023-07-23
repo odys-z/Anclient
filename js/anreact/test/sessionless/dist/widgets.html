@@ -8,17 +8,18 @@
 </head>
 
 <body>
-    <p>This widget must work with jserv docker image: odysz/jsandbox:treeditor, see
+    <p>This widget must work with jserv docker image:
+	  <a href='https://hub.docker.com/r/odysz/jsandbox/tags'>odysz/jsandbox:treeditor</a>, see
       <a href='https://odys-z.github.io/Anclient/guide/controls/index.html'>doc</a>.</p>
     <div id="app"></div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script src="AnWidgets-1.0.0.min.js"></script>
     <script>
-      // let searchParams = new URLSearchParams(window.location.search)
-      // let serv = searchParams ? searchParams.get('serv') : undefined;
+      let searchParams = new URLSearchParams(window.location.search)
+      let serv = searchParams ? searchParams.get('serv') : undefined;
       less.Widgets.bindHtml('app', {
           jsonUrl: 'http://localhost:8889/github.json',
-          serv: 'sandbox', Window, portal: '#'});
+          serv: serv || 'sandbox', Window, portal: '#'});
     </script>
     <hr>
 </body>

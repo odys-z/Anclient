@@ -61,10 +61,6 @@ public class AlbumtierTest {
 			fail("Why? Is server started? Or try to wait longer?");
 
 		// 2. clean
-//		try {
-//		} catch (SemanticException e) {
-//			Utils.warn(e.getMessage());
-//		}
 		singleton.tier.del(singleton.photoUser.device, testfile);
 		
 		// 3. upload photo

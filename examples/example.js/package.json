@@ -18,7 +18,6 @@
     "@material-ui/icons": "^4.11.2",
     "@types/dateformat": "^5.0.0",
     "@types/react-dom": "^17.0.14",
-    "@types/react-images": "^1.1.0",
     "@types/react-modal": "^3.13.1",
     "chai": "^4.3.6",
     "earcut": "^2.2.3",

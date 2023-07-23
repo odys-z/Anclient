@@ -36,6 +36,15 @@ const styles = (theme: Theme) => ({
 	  backgroundColor: "#ced"
 	}
   },
+  th: {
+	  textAlign: 'center' as const,
+	  paddingBottom: '0.1em',
+	  borderBottom: '1px solid #bcd'
+  },
+  thCell: {
+    margin: 'auto',
+    verticalAlgin: 'middle'
+  },
   rowHead: {
 	padding: theme.spacing(1),
 	paddingTop: 0,
@@ -64,17 +73,17 @@ const styles = (theme: Theme) => ({
   smallBtn: {
 	  minWidth: 24,
   },
-  th: {
-	  textAlign: 'center' as const,
-	  paddingBottom: '0.1em',
-	  borderBottom: '1px solid #bcd'
-  },
   rowText: {
 	textShadow: '2px 2px 8px #112244'
   },
   galleryHead: {
 	padding: theme.spacing(1),
 	paddingRight: theme.spacing(2),
+  },
+  toggle: {
+    padding: 0,
+    verticalAlign: 'middle',
+    height: theme.spacing(4),
   }
 });
 

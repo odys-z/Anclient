@@ -106,10 +106,7 @@ export class Lightbox extends CrudCompW<Comprops & {
       width: window.innerWidth,
       height: window.innerHeight,
       index: this.props.ix,
-      // swiping: false,
-      // loading: true,
       iconSize: window.innerWidth <= 500 ? MOBILE_ICON_SIZE : DESKTOP_ICON_SIZE,
-
       paused: true
     };
 
@@ -335,38 +332,6 @@ export class Lightbox extends CrudCompW<Comprops & {
 
           preload='false' controls
           poster={resource.poster}
-          style={{
-            pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
-            maxWidth: '100%', maxHeight: '100%',
-            transform: `translate(${this.config.x}px, ${this.config.y}px) scale(${this.config.scale})`,
-            transition: 'transform 0.5s ease-out'
-          }}
-          onLoad={(e) => {
-            console.log('video loaded', e.currentTarget);
-            if (this.state.swiping || this.state.loading)
-              this.setState({ loading: false }); }}
-          onTouchStart={(e) => {
-            e.stopPropagation();
-            // console.log(e.currentTarget);
-            // console.log(this.vidRef);
-            if (this.config.paused)
-              this.vidRef.play();
-            else
-              this.vidRef.pause();
-
-            this.config.paused = !this.config.paused;
-          }}
-          onEnded={e => this.config.paused = true}
-        >
-          <source src={resource.src} type={resource.mime}/>
-        </video>);
-
-      /*
-        items.push(<video key={i}
-          ref={(ref) => this.vidRef = ref}
-
-          preload='false' controls
-          poster={resource.poster}
           src={resource.src}
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
@@ -380,8 +345,6 @@ export class Lightbox extends CrudCompW<Comprops & {
               this.setState({ loading: false }); }}
           onTouchStart={(e) => {
             e.stopPropagation();
-            // console.log(e.currentTarget);
-            // console.log(this.vidRef);
             if (this.config.paused)
               this.vidRef.play();
             else
@@ -390,8 +353,9 @@ export class Lightbox extends CrudCompW<Comprops & {
             this.config.paused = !this.config.paused;
           }}
           onEnded={e => this.config.paused = true}
-        />);
-        */
+        >
+          <source src={resource.src} type={resource.mime}/>
+        </video>);
       }
 
       /* TODO third party online resources
