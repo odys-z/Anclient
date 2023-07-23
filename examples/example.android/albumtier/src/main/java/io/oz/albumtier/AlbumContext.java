@@ -25,7 +25,7 @@ public class AlbumContext {
 
     static AlbumContext instance;
 
-    public static final String jdocbase  = "jserv-album";
+    public static final String jdocbase  = ""; // jserv-album
 
     public final String clientUri = "album.and";
 
