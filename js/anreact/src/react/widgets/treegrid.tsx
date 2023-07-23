@@ -131,8 +131,6 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
       console.info('context.verbose', m);
 
     let expandItem = this.toExpandItem;
-    // let mtree = buildTreegrid( m );
-    // return mtree;
 		return (<div>{buildTreegrid(m)}</div>);
 
     function buildTreegrid(tn: AnTreeNode[] | AnTreeNode) {
