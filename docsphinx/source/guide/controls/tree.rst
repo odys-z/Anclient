@@ -40,3 +40,19 @@ Start VS Code, load dist/widgets.html with Anprism. Follwing is what is expected
 
 To deploy docker container behind a Nginx proxy for https protocol,
 see :ref:`Tip: deploy docker as Nginx backend server working as a https domain<tip-docker-https>`
+
+Customize Tree Grid
+-------------------
+
+See `Anclient/examples/example.js/album/app.tsx <https://github.com/odys-z/Anclient/blob/master/examples/example.js/album/src/app.tsx>`_,
+function rander().typeParser().
+
+.. _controls_typeparser:
+
+.. code-block:: typescript
+
+    function typeParser(c: AnTreegridCol, n: AnTreeNode, opt: {classes: ClassNames, media: Media}) {
+        if (n.node.children?.length as number > 0) return <></>;
+        else return that.docIcon.typeParser(c, n, opt);
+    }
+..
