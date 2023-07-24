@@ -17,9 +17,11 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script src="Doctree-1.0.0.min.js"></script>
     <script>
+      let searchParams = new URLSearchParams(window.location.search)
+      let serv = searchParams ? searchParams.get('serv') : undefined;
       less.Widgets.bindHtml('app', {
           jsonUrl: 'http://localhost:8889/github.json',
-          serv: 'album', Window, portal: '#'});
+          serv: serv || 'album', Window, portal: '#'});
     </script>
     <hr>
 </body>
