@@ -1,5 +1,6 @@
 package io.oz.album.client;
 
+import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +23,7 @@ import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Profiles;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.PhotoSyntier;
+import io.oz.albumtier.Plicies;
 
 /**
  */
@@ -63,6 +65,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         (resp) -> {
                             Profiles prf = ((AlbumResp) resp).profiles();
                             singleton.profiles = prf;
+                            singleton.policies = new Plicies(prf);
 
                             updateSummery(prefFragment.homepref, prf.home);
 

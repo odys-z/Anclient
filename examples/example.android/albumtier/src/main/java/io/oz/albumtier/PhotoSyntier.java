@@ -25,6 +25,7 @@ import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
+import io.odysz.semantic.jserv.JSingleton;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -208,8 +209,10 @@ public class PhotoSyntier extends Synclientier {
 			int totalBlocks = 0;
 
 			SyncDoc p = videos.get(px);
+			fileProvider.meta(p);
 			DocsReq req = (AlbumReq) new AlbumReq(uri)
-					.folder(p.folder())
+					// .folder(p.folder())
+					.folder(fileProvider.saveFolder())
 					.share(p)
 					.device(user.device)
 					.resetChain(true)
@@ -223,7 +226,6 @@ public class PhotoSyntier extends Synclientier {
 
 				if (fileProvider == null)
 					throw new SemanticException("Needing a file provider to accesse file %s.", p.clientname());
-				fileProvider.meta(p);
 				String pth = p.fullpath();
 				if (!pth.equals(startAck.doc.fullpath()))
 					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.doc.fullpath());

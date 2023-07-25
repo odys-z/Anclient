@@ -7,6 +7,7 @@ import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -15,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.system.Os;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +29,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
 
 import com.vincent.filepicker.Constant;
@@ -40,10 +43,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
@@ -57,6 +65,7 @@ import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.IFileProvider;
+import io.oz.albumtier.Plicies;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.activity.BaseActivity;
@@ -95,6 +104,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
         singl = AlbumContext.getInstance(this);
+        singl.appCtx = getApplicationContext();
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String homeName = sharedPref.getString(AlbumApp.keys.home, "");
@@ -239,10 +249,30 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     showMsg(R.string.txt_please_login);
                 else
                     singl.tier.fileProvider(new IFileProvider() {
+                        private String saveFolder;
+
                         @Override
                         public long meta(SyncDoc f) throws IOException {
-                            f.size = new File(f.fullpath()).length();
+                            File file = new File(f.fullpath());
+                            f.size = file.length();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+
+                                FileTime d = attr.creationTime();
+                                f.cdate(d);
+                                saveFolder = DateFormat.formatYYmm(d);
+                            }
+                            else {
+                                Date d = new Date(file.lastModified());
+                                f.cdate(d);
+                                saveFolder = DateFormat.formatYYmm(d);
+                            }
                             return f.size;
+                        }
+
+                        @Override
+                        public String saveFolder() {
+                            return saveFolder;
                         }
 
                         @Override
@@ -294,6 +324,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     // verifyStoragePermissions(this);
                     // askDirectoriesPermissions(this);
                     singl.tier.fileProvider(new IFileProvider() {
+                        private String saveFolder;
+                        private Plicies policies = singl.policies;
+
                         // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                         @Override
                         public long meta(SyncDoc f) {
@@ -306,8 +339,17 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 f.clientname(returnCursor.getString(nameIndex));
                                 f.size = returnCursor.getLong(sizeIndex);
                                 f.mime = getContentResolver().getType(returnUri);
+
+                                Date lastmodify = new Date(DocumentFile.fromSingleUri(singl.appCtx, returnUri).lastModified());
+                                f.cdate(lastmodify);
+                                saveFolder = DateFormat.formatYYmm(lastmodify);
                                 return f.size;
                             }
+                        }
+
+                        @Override
+                        public String saveFolder() {
+                            return saveFolder;
                         }
 
                         // https://developer.android.com/training/data-storage/shared/documents-files#input_stream

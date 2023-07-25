@@ -1,5 +1,7 @@
 package io.oz.albumtier;
 
+import android.content.Context;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
@@ -20,6 +22,8 @@ import io.oz.album.tier.Profiles;
 public class AlbumContext {
     public boolean verbose = true;
     public Profiles profiles;
+    public Plicies policies;
+    public Context appCtx;
 
     public enum ConnState { Online, Disconnected, LoginFailed }
 
