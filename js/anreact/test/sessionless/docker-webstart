@@ -2,4 +2,4 @@ docker volume rm sessionless.host
 docker volume create sessionless.host
 sudo cp dist/private/host.json /var/lib/docker/volumes/sessionless.host/_data
 
-docker run --mount source=sessionless.host,target=/usr/share/nginx/html/private -p 8081:80 --name sessionless --rm -d odysz/sessionless:1.2.0
+docker run --mount source=sessionless.host,target=/usr/share/nginx/html/private -p 8801:80 --name sessionless --rm -d odysz/sessionless:0.4.38
