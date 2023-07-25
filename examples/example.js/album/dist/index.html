@@ -14,10 +14,10 @@
   <script>
 	let searchParams = new URLSearchParams(window.location.search)
 	let aid = searchParams ? searchParams.get('album') : 'a-002';
+	let serv = searchParams ? searchParams.get('serv') : 'host';
 
 	album.App.bindHtml('app', {
-    aid,
-		serv: 'host', Window, portal: 'index.html'});
+    aid, serv, Window, portal: 'index.html'});
   </script>
 </body>
 </html>
