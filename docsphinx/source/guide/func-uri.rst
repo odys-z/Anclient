@@ -18,7 +18,7 @@ Implementation
 
 Typescript client: @anclient/semantier, currently declared as::
 
-    Semantier.uri: stirng.
+    Semantier.uri: stirng. 
 
 .. code-block:: typescript
 

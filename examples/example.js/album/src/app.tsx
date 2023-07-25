@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, 
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 	AnTreeNode, ErrorCtx, an, SessionClient
 } from '@anclient/semantier';
 
@@ -118,7 +118,7 @@ export class App extends CrudCompW<AlbumProps> {
 			that.albumtier = new GalleryTier({uri: this.uri, comp: this, client});
 			that.toSearch();
 		}
-	
+
 		console.warn("Auto login with configured userid & passwd.",
 					 hosturl, userid, passwd);
 		an.init ( hosturl );
@@ -134,7 +134,7 @@ export class App extends CrudCompW<AlbumProps> {
 		tier.stree({ uri: this.uri,
 			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
-				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[]; 
+				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[];
 				console.log(tier.forest);
 				that.setState({});
 			}},
@@ -202,7 +202,8 @@ export class App extends CrudCompW<AlbumProps> {
 				columns={[
 				  { type: 'iconame', field: 'pname', label: L('Name'),
 					grid: {sm: 6, md: 5} },
-				  { type: 'text', field: 'mime', label: L('type'), colFormatter: typeParser,
+				  { type: 'text', field: 'mime', label: L('type'),
+					colFormatter: typeParser, // Customize a cell
 					grid: {xs: 1} },
 				  { type: 'text', field: 'shareby', label: L('share by'),
 					grid: {xs: false, sm: 3, md: 2} },

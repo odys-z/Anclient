@@ -227,7 +227,20 @@
 </div>
 <div class="section" id="treegrid-cell-formatter">
 <h2>Treegrid Cell Formatter<a class="headerlink" href="#treegrid-cell-formatter" title="Permalink to this headline">¶</a></h2>
-<p>TODO …</p>
+<p>Called by Treegrid#render().</p>
+<p id="api-widgets-tree">Signature defined in <a class="reference external" href="https://github.com/odys-z/Anclient/blob/master/js/anreact/src/react/widgets/tree.tsx">tree.tsx</a>:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kd">interface</span> <span class="nx">AnTreegridCol</span> <span class="k">extends</span> <span class="nx">AnlistColAttrs</span><span class="o">&lt;</span><span class="nx">JSX</span><span class="p">.</span><span class="nx">Element</span><span class="p">,</span> <span class="nx">CompOpts</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="cm">/**</span>
+<span class="cm">     * Overide AnTablistProps#formatter</span>
+<span class="cm">     * Formatt a tree item cell/grid from col and node.</span>
+<span class="cm">     */</span>
+    <span class="nx">colFormatter</span><span class="o">?:</span> <span class="p">(</span><span class="nx">col</span>: <span class="kt">AnTreegridCol</span><span class="p">,</span> <span class="nx">n</span>: <span class="kt">AnTreeNode</span><span class="p">,</span> <span class="nx">opts?</span>: <span class="kt">CompOpts</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">JSX</span><span class="p">.</span><span class="nx">Element</span><span class="p">;</span>
+
+    <span class="nx">thFormatter</span><span class="o">?:</span> <span class="p">(</span><span class="nx">col</span>: <span class="kt">AnTreegridCol</span><span class="p">,</span> <span class="nx">colx</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">opts?</span>: <span class="kt">CompOpts</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">JSX</span><span class="p">.</span><span class="nx">Element</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For example, see <a class="reference internal" href="tree.html#controls-typeparser"><span class="std std-ref">Doc type parser</span></a>.</p>
 </div>
 </div>
 
