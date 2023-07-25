@@ -105,6 +105,7 @@
 <li class="toctree-l3"><a class="reference internal" href="formatters.html">Formatters (AnReact)</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Trees</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#test-antreeditor">Test AnTreeditor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#customize-tree-grid">Customize Tree Grid</a></li>
 </ul>
 </li>
 </ul>
@@ -208,6 +209,48 @@ for testing AnTreeditor is published.</p>
 <a class="reference internal image-reference" href="../../_images/04-treeditor-3.jpg"><img alt="../../_images/04-treeditor-3.jpg" src="../../_images/04-treeditor-3.jpg" style="height: 10em;" /></a>
 <p>To deploy docker container behind a Nginx proxy for https protocol,
 see <a class="reference internal" href="../../dev/tips.html#tip-docker-https"><span class="std std-ref">Tip: deploy docker as Nginx backend server working as a https domain</span></a></p>
+</div>
+<div class="section" id="customize-tree-grid">
+<h2>Customize Tree Grid<a class="headerlink" href="#customize-tree-grid" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="https://github.com/odys-z/Anclient/blob/master/examples/example.js/album/src/app.tsx">Anclient/examples/example.js/album/app.tsx</a>,
+function rander().typeParser().</p>
+<a class="reference internal image-reference" href="../../_images/05-treegrid-formatter.jpg"><img alt="../../_images/05-treegrid-formatter.jpg" src="../../_images/05-treegrid-formatter.jpg" style="height: 16em;" /></a>
+<p>To Customize cells in AnTreegrid (also AnTreeditor), feed the control with a formatter,</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">AnTreegrid</span>
+    <span class="na">pk</span><span class="o">=</span><span class="s">{&#39;&#39;}</span> <span class="na">onSelectChange</span><span class="o">=</span><span class="s">{()=</span><span class="p">&gt;</span>{}}
+    tier={this.albumtier}
+    columns={[
+      { type: &#39;iconame&#39;, field: &#39;pname&#39;, label: L(&#39;Name&#39;),
+        grid: {sm: 6, md: 5} },
+      { type: &#39;text&#39;, field: &#39;mime&#39;, label: L(&#39;type&#39;),
+        colFormatter: typeParser, // Customize a cell
+        grid: {xs: 1} },
+      { type: &#39;text&#39;, field: &#39;shareby&#39;, label: L(&#39;share by&#39;),
+        grid: {xs: false, sm: 3, md: 2} },
+      { type: &#39;text&#39;, field: &#39;img&#39;, label: L(&#39;size&#39;), colFormatter: folderSum,
+        grid: {xs: false, sm: 2, md: 2}, thFormatter: this.switchDocMedias }
+    ]}
+/&gt;
+</pre></div>
+</div>
+<div class="highlight-typescript notranslate" id="controls-typeparser"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * In @anclient/anreact/src/react/anreact.tsx:</span>
+<span class="cm"> * export interface ClassNames {[c: string]: string};</span>
+<span class="cm"> * export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };</span>
+<span class="cm"> *</span>
+<span class="cm"> * Generate an JSX.Element for rendering a grid cell.</span>
+<span class="cm"> */</span>
+<span class="kd">function</span> <span class="nx">typeParser</span><span class="p">(</span><span class="nx">c</span>: <span class="kt">AnTreegridCol</span><span class="p">,</span> <span class="nx">n</span>: <span class="kt">AnTreeNode</span><span class="p">,</span>
+        <span class="nx">opt</span><span class="o">:</span> <span class="p">{</span><span class="nx">classes</span>: <span class="kt">ClassNames</span><span class="p">,</span> <span class="nx">media</span>: <span class="kt">Media</span><span class="p">})</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">node</span><span class="p">.</span><span class="nx">children</span><span class="o">?</span><span class="p">.</span><span class="nx">length</span> <span class="kr">as</span> <span class="kt">number</span> <span class="o">&gt;</span> <span class="mf">0</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="k">return</span> <span class="nx">that</span><span class="p">.</span><span class="nx">docIcon</span><span class="p">.</span><span class="nx">typeParser</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The typeParser() implements <a class="reference internal" href="formatters.html#api-widgets-tree"><span class="std std-ref">API of anreact/widgets/Treegrid#colFormatter()</span></a>.</p>
 </div>
 </div>
 
