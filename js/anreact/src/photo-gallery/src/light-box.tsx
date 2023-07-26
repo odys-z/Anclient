@@ -364,9 +364,9 @@ export class Lightbox extends CrudCompW<Comprops & {
         items.push(<div>
           <audio key={i}
             ref={(ref) => this.audRef = ref}
-            poster={resource.poster}
+            // poster={resource.poster}
           />
-          <Typography >{}</Typography>
+          <Typography >{resource.title}</Typography>
         </div>);
       }
       /* TODO third party online resources

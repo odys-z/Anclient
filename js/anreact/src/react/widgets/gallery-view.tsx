@@ -9,7 +9,7 @@ import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, Semantier, SessionClient, Str
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
-import { CustomImgStyle, PhotoProps } from '../../photo-gallery/src/Photo';
+import { ForcedStyle, PhotoProps } from '../../photo-gallery/src/Photo';
 
 const _photos = [];
 
@@ -22,7 +22,8 @@ export interface PhotoCollect extends Tierec {
 	photos: Array<PhotoProps<PhotoRec>>;
 };
 
-export interface ImageSlide {
+export interface ImageSlide  {
+	index: number,
 	width: number,
 	height: number,
 	src: string,
@@ -36,10 +37,10 @@ export interface ImageSlide {
 	 * 
 	 * defualt:  {maxWidth: '60%', width: 'auto', height: 'auto'}
 	 */
-	imgstyl?: CustomImgStyle
+	imgstyl?: ForcedStyle
 
 	mime: 'video' | 'image' | 'heif' | 'audio' | string | undefined;
-}
+};
 
 export interface GalleryProps {
 	cid: string;
@@ -104,9 +105,10 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 			let [_width, _height, w, h] = (
 				JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
 			photos.push({
-				src: GalleryView.imgSrcReq(p.id, this.albumtier),
-				width: w, height: h,
+				index: x,
 				legend: PhotoRec.toShareLable(p.node as PhotoRec),
+				width: w, height: h,
+				src: GalleryView.imgSrcReq(p.id, this.albumtier),
 				imgstyl,
 				mime: p.node.mime as string
 			})
@@ -136,8 +138,9 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
 	}
 
-	openLightbox (_event: React.MouseEvent, photo: ImageSlide) {
-		this.currentImx = photo.index;
+	// openLightbox (_event: React.MouseEvent, photo: PhotoSlide<{}>) {
+	openLightbox (_event: React.MouseEvent, ix: number) {
+		this.currentImx = ix;
 		this.showCarousel = true;
 		this.setState({});
 	}
@@ -152,7 +155,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		let that = this;
 		return (
 		  <div>
-			<Gallery<ImageSlide> photos={photos}
+			<Gallery photos={photos}
 			  	onClick={this.openLightbox}
 				targetRowHeight={containerWidth => {
 					if (containerWidth < 320)

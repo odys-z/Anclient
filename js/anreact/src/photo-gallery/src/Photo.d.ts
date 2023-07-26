@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Use this style to force some change of calculation. Currrently only for 1 pic gallery.
  */
-export type CustomImgStyle = {
+export type ForcedStyle = {
     width?: string;
     height?: string;
     maxWidth?: string
@@ -52,7 +52,7 @@ export type PhotoProps<CustomPhotoProps extends object = {}> = {
      * 
      * For one pic row align's reference value: {maxHeight: '20vh', width: 'auto'}
      */
-    imgstyl?: CustomImgStyle
+    imgstyl?: ForcedStyle
 } & CustomPhotoProps
   
 export type renderImageClickHandler = (

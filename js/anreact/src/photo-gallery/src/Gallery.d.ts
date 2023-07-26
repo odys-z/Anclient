@@ -1,8 +1,9 @@
 import React from 'react';
 import { PhotoProps, RenderImageProps } from './Photo';
 
-export interface GalleryProps<CustomPhotoProps extends object = {}> {
-    photos: Array<PhotoProps<CustomPhotoProps>>
+// export interface GalleryProps<CustomPhotoProps extends object = {}> {
+export interface GalleryProps {
+    photos: Array<PhotoProps>
     /**
      * applies to column layouts only (direction=column)
      * number of columns or a function which receives the container width
@@ -27,7 +28,8 @@ export interface GalleryProps<CustomPhotoProps extends object = {}> {
      * receives arguments event and an object containing the index,
      * photo obj originally sent and the next and previous photos in the gallery if they exist
      */
-    onClick?: PhotoClickHandler<CustomPhotoProps>
+    // onClick?: PhotoClickHandler<CustomPhotoProps>
+    onClick?: PhotoClickHandler
   
     /**
      * number of margin pixels around each entire image
@@ -40,20 +42,26 @@ export interface GalleryProps<CustomPhotoProps extends object = {}> {
 
     videoControl?: boolean
   
-    renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>
+    // renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>
+    renderImage?: React.ComponentType<RenderImageProps>
 }
 
-export interface PhotoSlide<T extends {}> {
-    index: number
-    next: PhotoProps<T> | null
-    photo: PhotoProps<T>
-    previous: PhotoProps<T> | null
-}
+// export interface PhotoSlide<T extends {}> {
+//     index: number
+//     next: PhotoProps<T> | null
+//     photo: PhotoProps<T>
+//     previous: PhotoProps<T> | null
+// }
 
-export type PhotoClickHandler<CustomPhotoProps extends object = {}> = (
+// export type PhotoClickHandler<CustomPhotoProps extends object = {}> = (
+//   event: React.MouseEvent,
+//   photos: PhotoSlide<CustomPhotoProps>,
+// ) => void
+export type PhotoClickHandler = (
   event: React.MouseEvent,
-  photos: PhotoSlide<CustomPhotoProps>,
+  ix: number
 ) => void
 
-export default class Gallery<T extends object> extends React.Component<GalleryProps<T>> {
+
+export default class Gallery extends React.Component<GalleryProps> {
 }

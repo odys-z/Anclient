@@ -55,12 +55,13 @@ const Gallery = React.memo(function Gallery({
   });
 
   const handleClick = (event, { index }) => {
-    onClick(event, {
-      index,
-      photo: photos[index],
-      previous: photos[index - 1] || null,
-      next: photos[index + 1] || null,
-    });
+    // onClick(event, {
+    //   index,
+    //   photo: photos[index],
+    //   previous: photos[index - 1] || null,
+    //   next: photos[index + 1] || null,
+    // });
+    onClick(event, index);
   };
 
   // no containerWidth until after first render with refs, skip calculations and render nothing
