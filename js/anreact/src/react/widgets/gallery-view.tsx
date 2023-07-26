@@ -3,13 +3,13 @@ import Modal from 'react-modal';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-import Gallery from '../../photo-gallery/src/Gallery';
+import Gallery from '../../photo-gallery/src/gallery-ts';
 
 import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, Semantier, SessionClient, StreeTier, Tierec, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
-import { ForcedStyle, PhotoProps } from '../../photo-gallery/src/Photo';
+import { ForcedStyle, PhotoProps } from '../../photo-gallery/src/photo-ts';
 
 const _photos = [];
 

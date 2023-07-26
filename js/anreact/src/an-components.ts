@@ -32,7 +32,8 @@ export * from './react/widgets/simple-form';
 export * from './react/widgets/record-form';
 export * from './react/widgets/relation-tree';
 
-export * from './photo-gallery/src/Photo';
+// export * from './photo-gallery/src/Photo.d.tsl';
+export * from './photo-gallery/src/photo-ts';
 export * from './photo-gallery/src/light-box';
 
 import { JsampleIcons, JsampleTheme, jstyles } from './jsample/styles';

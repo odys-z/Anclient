@@ -1,3 +1,4 @@
+/*
 import React from 'react';
 import PropTypes from 'prop-types';
 import { regex } from '../../utils/regex';
@@ -19,12 +20,20 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, key 
     onClick(event, { photo, index });
   };
 
-  return ( mime2type(mime) === 'video' ?
+  return (
+    mime2type(mime) === 'video' ?
     <video
       key={key}
       style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
       {...photo}
       onClick={onClick ? handleClick : null}
+    />
+    : mime2type(mime) === 'audio' ?
+    <AudioBox key={key} 
+      style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
+      {...photo}
+      onClick={onClick ? handleClick : null}
+      loading="lazy"
     />
     :
     <img
@@ -67,3 +76,4 @@ Photo.propTypes = {
 };
 
 export default Photo;
+*/

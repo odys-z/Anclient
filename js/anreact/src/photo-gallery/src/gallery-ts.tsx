@@ -1,13 +1,63 @@
-/*
 import React, { useState, useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
-import Photo, { photoPropType } from './Photo';
 import { computeColumnLayout } from './layouts/columns';
 import { computeRowLayout } from './layouts/justified';
 import { findIdealNodeSearch } from './utils/findIdealNodeSearch';
+import Photo, { PhotoProps, RenderImageProps, PhotoPropType } from './photo-ts';
 
-const Gallery = React.memo(function Gallery({
+export type PhotoClickHandler = (
+  event: React.MouseEvent,
+  ix: number
+) => void
+
+
+export interface GalleryProps {
+    photos: Array<PhotoProps>
+    /**
+     * applies to column layouts only (direction=column)
+     * number of columns or a function which receives the container width
+     * and should return the desired number of columns; defaults to Gallery's breakpoint choosing
+     */
+    columns?: number | ((containerWidth: number) => number)
+    /**
+     * applies to row layouts only (direction=row)
+     * the ideal height of each row or a function which receives the container width
+     * and should return the desired ideal height for each row; defaults to 300px
+     */
+    targetRowHeight?: number | ((containerWidth: number) => number)
+    /**
+     * applies to row layouts only (direction=row)
+     * the maximum amount of neighboring nodes to measure per current node visiting
+     * don't change unless you understand the algorithm, see docs
+     * defaults to a couple breakpoints
+     */
+    limitNodeSearch?: number | ((containerWidth: number) => number)
+    /**
+     * do something when the user clicks a photo;
+     * receives arguments event and an object containing the index,
+     * photo obj originally sent and the next and previous photos in the gallery if they exist
+     */
+    // onClick?: PhotoClickHandler<CustomPhotoProps>
+    onClick?: PhotoClickHandler
+  
+    /**
+     * number of margin pixels around each entire image
+     */
+    margin?: number
+    /**
+     * column or row based layout
+     */
+    direction?: string
+
+    videoControl?: boolean
+  
+    // renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>
+    renderImage?: React.ComponentType<RenderImageProps>
+}
+
+// const Gallery = React.memo(
+const Gallery = function Gallery({
   photos,
   onClick,
   direction,
@@ -17,7 +67,7 @@ const Gallery = React.memo(function Gallery({
   targetRowHeight,
   columns,
   renderImage,
-}) {
+} : GalleryProps) {
   const [containerWidth, setContainerWidth] = useState(0);
   const galleryEl = useRef(null);
 
@@ -55,15 +105,7 @@ const Gallery = React.memo(function Gallery({
     };
   });
 
-  const handleClick = (event, { index }) => {
-    // onClick(event, {
-    //   index,
-    //   photo: photos[index],
-    //   previous: photos[index - 1] || null,
-    //   next: photos[index + 1] || null,
-    // });
-    onClick(event, index);
-  };
+  const handleClick = (event, { index }) => onClick(event, index);
 
   // no containerWidth until after first render with refs, skip calculations and render nothing
   if (!containerWidth) return <div ref={galleryEl}>&nbsp;</div>;
@@ -107,7 +149,8 @@ const Gallery = React.memo(function Gallery({
     galleryStyle.height = thumbs[thumbs.length - 1].containerHeight;
   }
 
-  const renderComponent = renderImage || Photo;
+  // const renderComponent = renderImage || Photo;
+  const renderComponent = Photo;
   return (
     <div className="react-photo-gallery--gallery">
       <div ref={galleryEl} style={galleryStyle}>
@@ -130,10 +173,11 @@ const Gallery = React.memo(function Gallery({
       </div>
     </div>
   );
-});
+}
+// );
 
 Gallery.propTypes = {
-  photos: PropTypes.arrayOf(photoPropType).isRequired,
+  photos: PropTypes.arrayOf(PhotoPropType).isRequired,
   direction: PropTypes.string,
   videoControl: PropTypes.bool,
   onClick: PropTypes.func,
@@ -150,6 +194,7 @@ Gallery.defaultProps = {
   targetRowHeight: 300,
 };
 
+const GalleryMem = React.memo(Gallery);
+
 export { Photo };
-export default Gallery;
-*/
+export default GalleryMem;

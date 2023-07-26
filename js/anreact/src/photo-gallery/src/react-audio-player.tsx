@@ -10,7 +10,7 @@
 import React, { Component, ReactNode, CSSProperties } from 'react';
 import PropTypes from 'prop-types';
 
-interface AudioCardProps {
+interface AudioBoxProps {
   autoPlay?: boolean
   children?: ReactNode
   className?: string
@@ -44,10 +44,10 @@ interface ConditionalProps {
   [key: string]: any
 }
 
-class AudioCard extends Component<AudioCardProps> {
+class AudioBox extends Component<AudioBoxProps> {
   static propTypes: Object
 
-  static defaultProps: AudioCardProps
+  static defaultProps: AudioBoxProps
 
   audioEl = React.createRef<HTMLAudioElement>();
 
@@ -151,7 +151,7 @@ class AudioCard extends Component<AudioCardProps> {
     audio.removeEventListener('volumechange', this.onVolumeChanged);
   }
 
-  componentDidUpdate(prevProps: AudioCardProps) {
+  componentDidUpdate(prevProps: AudioBoxProps) {
     this.updateVolume(this.props.volume);
   }
 
@@ -227,7 +227,7 @@ class AudioCard extends Component<AudioCardProps> {
   }
 }
 
-AudioCard.defaultProps = {
+AudioBox.defaultProps = {
   autoPlay: false,
   children: null,
   className: '',
@@ -254,7 +254,7 @@ AudioCard.defaultProps = {
   volume: 1.0,
 };
 
-AudioCard.propTypes = {
+AudioBox.propTypes = {
   autoPlay: PropTypes.bool,
   children: PropTypes.element,
   className: PropTypes.string,
@@ -283,4 +283,4 @@ AudioCard.propTypes = {
   volume: PropTypes.number,
 };
 
-export default AudioCard;
+export { AudioBox, AudioBoxProps };
