@@ -3,13 +3,13 @@ import Modal from 'react-modal';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-import Gallery, { PhotoSlide } from '../../photo-gallery/src/Gallery';
+import Gallery from '../../photo-gallery/src/gallery';
 
 import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, Semantier, SessionClient, StreeTier, Tierec, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
-import { CustomImgStyle, PhotoProps } from '../../photo-gallery/src/Photo';
+// import { CustomImgStyle, PhotoProps } from '../../photo-gallery/src/photo';
 
 const _photos = [];
 
@@ -38,7 +38,7 @@ export interface ImageSlide {
 	 */
 	imgstyl?: CustomImgStyle
 
-	mime: 'video' | 'image' | 'heif' | string | undefined;
+	mime: 'video' | 'image' | 'heif' | 'audio' | string | undefined;
 }
 
 export interface GalleryProps {
@@ -54,7 +54,6 @@ export interface GalleryProps {
 		onClose: () => void}) => JSX.Element;
 }
 
-// export class GalleryView extends CrudCompW<Comprops & {cid: string, photos?: AnTreeNode[]}> {
 export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	tier: StreeTier | undefined;
 	classes: any;
@@ -67,7 +66,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	slides: ImageSlide[];
 	albumtier: StreeTier;
 	
-	// constructor(props: Comprops & {tier: StreeTier, cid?: string, photos?: AnTreeNode[]}) {
 	constructor(props: Comprops & GalleryProps) {
 		super(props);
 
@@ -120,7 +118,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	/**
 	 * Create an HTTP GET request for src of img tag.
 	 * 
-	 * TODO: depend on FileStream.A.download, having being PhotoRec independent of Album.
+	 * TODO: depend on FileStream.A.download, having PhotoRec independent of Album.
 	 * Then move AlbumReq to test. 
 	 * 
 	 * @param pid 
@@ -138,16 +136,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
 	}
 
-	/**
-	 * FIXME or this one?
-	 * 
-	 * https://www.cssscript.com/fullscreen-image-viewer-lightbox/
-	 * 
-	 * @param event 
-	 * @param photo 
-	 */
-	openLightbox (event: React.MouseEvent, photo: PhotoSlide<{}>) {
-		// console.log(event);
+	openLightbox (_event: React.MouseEvent, photo: ImageSlide) {
 		this.currentImx = photo.index;
 		this.showCarousel = true;
 		this.setState({});
@@ -170,11 +159,11 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 						return containerWidth;
 					else if (containerWidth < 580)
 						return containerWidth / 2;
-					else if (containerWidth < 720)
+					else if (containerWidth < 800)
 						return containerWidth / 3;
-					else if (containerWidth < 960)
-						return containerWidth / 4;
 					else if (containerWidth < 1200)
+						return containerWidth / 4;
+					else if (containerWidth < 1920)
 						return containerWidth / 5;
 					else
 						return containerWidth / 6;
@@ -207,19 +196,19 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 	photoCarousel(photos: Array<ImageSlide>, imgx: number) : JSX.Element {
 		return (
-			<Carousel showArrows={true} dynamicHeight={false} selectedItem={imgx} showThumbs={false} width={'80vw'} >
-				{photos.map( (ph, x) => {
-				  let src = (isEmpty( ph.src ) && ph?.srcSet) ? ph.srcSet[ph.srcSet.length - 1] : ph.src || '';
-				  let legend = ph.legend;
-				  return (
-					<div key={x} onClick={this.closeLightbox}>
-						<img src={src} loading="lazy"></img>
-						{legend && <p className="legend">{legend}</p>}
-					</div>);
-				  }
-				)}
-			</Carousel>
-		);
+		<Carousel showArrows={true} dynamicHeight={false}
+				  selectedItem={imgx} showThumbs={false} width={'80vw'} >
+		  { photos.map( (ph, x) => {
+			let src = (isEmpty( ph.src ) && ph?.srcSet) ? ph.srcSet[ph.srcSet.length - 1] : ph.src || '';
+			let legend = ph.legend;
+			return (
+			<div key={x} onClick={this.closeLightbox}>
+				<img src={src} loading="lazy"></img>
+				{legend && <p className="legend">{legend}</p>}
+			</div>);
+			}
+		  )}
+		</Carousel>);
 	}
 
 	render() {
