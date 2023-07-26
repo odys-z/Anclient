@@ -14,6 +14,7 @@ import { AnTreeNode, StreeTier, PhotoRec } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { GalleryView } from '../../react/widgets/gallery-view';
 import { regex } from '../../utils/regex';
+import { Typography } from '@material-ui/core';
 
 let { mime2type } = regex;
 
@@ -304,13 +305,15 @@ export class Lightbox extends CrudCompW<Comprops & {
   }
 
   vidRef: HTMLVideoElement;
+  audRef: HTMLAudioElement;
   
   getResources() {
     let items = [];
     let data = this.parse(this.props.photos);
     for (var i = 0; i < data.length; i++) {
       let resource = data[i];
-      if (!resource.mime || mime2type(resource.mime) === 'image') {
+      let mime = mime2type(resource.mime);
+      if (!resource.mime || mime === 'image') {
         items.push(<img key={i}
           alt={resource.altag}
           src={resource.src}
@@ -326,13 +329,13 @@ export class Lightbox extends CrudCompW<Comprops & {
               this.setState({ loading: false }); }}
         />);
       }
-      else if (mime2type(resource.mime) === 'video') {
+      else if (mime === 'video') {
         items.push(<video key={i}
           ref={(ref) => this.vidRef = ref}
 
           preload='false' controls
           poster={resource.poster}
-          src={resource.src}
+          // src={resource.src}
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
             maxWidth: '100%', maxHeight: '100%',
@@ -357,7 +360,15 @@ export class Lightbox extends CrudCompW<Comprops & {
           <source src={resource.src} type={resource.mime}/>
         </video>);
       }
-
+      else if (mime === 'audio') {
+        items.push(<div>
+          <audio key={i}
+            ref={(ref) => this.audRef = ref}
+            poster={resource.poster}
+          />
+          <Typography >{}</Typography>
+        </div>);
+      }
       /* TODO third party online resources
       else if (resource.mime === 'video') {
         items.push(<iframe key={i}
