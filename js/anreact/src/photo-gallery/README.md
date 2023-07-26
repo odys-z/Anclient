@@ -14,4 +14,9 @@ client side data handling and is not used by this repo based on a provisional de
 - React image & video lightbox
 
 [The source (MIT) by Ngineer101](https://github.com/Ngineer101/react-image-video-lightbox)
-is used as a baseline to exending events handling and adapting to load from jserv-album.
+is used as a baseline to exending events handling and adapting to load from jserv-*.
+
+- React Audio Player
+
+[The source (MIT) by Justin McCandless](https://github.com/justinmc/react-audio-player)
+is used as a baseline to exending events handling and adapting to load from jserv-*.
