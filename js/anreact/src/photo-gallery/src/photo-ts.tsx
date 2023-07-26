@@ -120,7 +120,6 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, cont
       style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
       {...photo}
       onClick={onClick ? handleClick : null}
-      loading="lazy"
     />
     :
     <img

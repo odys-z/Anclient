@@ -8,7 +8,6 @@
  * License: MIT
  */
 import React, { Component, ReactNode, CSSProperties } from 'react';
-import PropTypes from 'prop-types';
 
 interface AudioBoxProps {
   autoPlay?: boolean
@@ -36,6 +35,7 @@ interface AudioBoxProps {
   src?: string, // Not required b/c can use <source>
   style?: CSSProperties
   title?: string
+  legend?: string,
   volume: number
 }
 
@@ -151,7 +151,7 @@ class AudioBox extends Component<AudioBoxProps> {
     audio.removeEventListener('volumechange', this.onVolumeChanged);
   }
 
-  componentDidUpdate(prevProps: AudioBoxProps) {
+  componentDidUpdate(_p: AudioBoxProps) {
     this.updateVolume(this.props.volume);
   }
 
@@ -197,7 +197,7 @@ class AudioBox extends Component<AudioBoxProps> {
     const controls = !(this.props.controls === false);
 
     // Set lockscreen / process audio title on devices
-    const title = this.props.title ? this.props.title : this.props.src;
+    const title = this.props.title ? this.props.title : this.props.legend;
 
     // Some props should only be added if specified
     const conditionalProps: ConditionalProps = {};
@@ -254,33 +254,33 @@ AudioBox.defaultProps = {
   volume: 1.0,
 };
 
-AudioBox.propTypes = {
-  autoPlay: PropTypes.bool,
-  children: PropTypes.element,
-  className: PropTypes.string,
-  controls: PropTypes.bool,
-  controlsList: PropTypes.string,
-  crossOrigin: PropTypes.string,
-  id: PropTypes.string,
-  listenInterval: PropTypes.number,
-  loop: PropTypes.bool,
-  muted: PropTypes.bool,
-  onAbort: PropTypes.func,
-  onCanPlay: PropTypes.func,
-  onCanPlayThrough: PropTypes.func,
-  onEnded: PropTypes.func,
-  onError: PropTypes.func,
-  onListen: PropTypes.func,
-  onLoadedMetadata: PropTypes.func,
-  onPause: PropTypes.func,
-  onPlay: PropTypes.func,
-  onSeeked: PropTypes.func,
-  onVolumeChanged: PropTypes.func,
-  preload: PropTypes.oneOf(['', 'none', 'metadata', 'auto']),
-  src: PropTypes.string, // Not required b/c can use <source>
-  style: PropTypes.objectOf(PropTypes.string),
-  title: PropTypes.string,
-  volume: PropTypes.number,
-};
+// AudioBox.propTypes = {
+//   autoPlay: PropTypes.bool,
+//   children: PropTypes.element,
+//   className: PropTypes.string,
+//   controls: PropTypes.bool,
+//   controlsList: PropTypes.string,
+//   crossOrigin: PropTypes.string,
+//   id: PropTypes.string,
+//   listenInterval: PropTypes.number,
+//   loop: PropTypes.bool,
+//   muted: PropTypes.bool,
+//   onAbort: PropTypes.func,
+//   onCanPlay: PropTypes.func,
+//   onCanPlayThrough: PropTypes.func,
+//   onEnded: PropTypes.func,
+//   onError: PropTypes.func,
+//   onListen: PropTypes.func,
+//   onLoadedMetadata: PropTypes.func,
+//   onPause: PropTypes.func,
+//   onPlay: PropTypes.func,
+//   onSeeked: PropTypes.func,
+//   onVolumeChanged: PropTypes.func,
+//   preload: PropTypes.oneOf(['', 'none', 'metadata', 'auto']),
+//   src: PropTypes.string, // Not required b/c can use <source>
+//   style: PropTypes.objectOf(PropTypes.string),
+//   title: PropTypes.string,
+//   volume: PropTypes.number,
+// };
 
 export { AudioBox, AudioBoxProps };
