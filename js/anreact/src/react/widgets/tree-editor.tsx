@@ -262,7 +262,6 @@ TreeCardComp.contextType = AnContext;
 const TreeCard = withStyles<any, any, TreeItemProps>(styles)(withWidth()(TreeCardComp));
 
 class TreeGallaryComp extends TreeCardComp {
-	// tier: AlbumTier;
 	/** pic collection id */
 	collect: string;
 

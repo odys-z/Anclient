@@ -67,11 +67,9 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
   state = {
 	  window: undefined,
     expandings: new Set(),
-    // tobeLoad: true
   };
 
   editForm: JSX.Element;
-  // stier: StreeTier;
 
   constructor(props: AnTablistProps) {
     super(props);
