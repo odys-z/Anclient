@@ -1,13 +1,30 @@
 /**
- * Credits to Justin McCandless, React Audio Player,
+ * Credits to:
+ * 
+ * Justin McCandless, React Audio Player,
  * https://github.com/justinmc/react-audio-player
- * 
  * Retrieved on Jul. 26, 2023,
- * Modified by Ody Z.
- * 
  * License: MIT
+ * 
+ * Adulik (arusikpaloyan), Audio player (forked at Code Sandbox),
+ * https://codesandbox.io/s/audio-player-forked-lxuloi?file=/src/App.js
+ * Retrieved on Jul. 27, 2023,
+ * 
+ * Modified by Ody Z.
  */
 import React, { Component, ReactNode, CSSProperties } from 'react';
+
+// import theme from "./audio-theme"
+import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
+
+import ClosedCaption from '@material-ui/icons/ClosedCaption';
+
+import { Paper, Box, Grid, Dialog, DialogTitle, Typography, DialogContent, DialogActions, Button, GridSpacing } from '@material-ui/core';
+import AudioPlayer from 'material-ui-audio-player';
+import { AudioPlayerVariation } from 'material-ui-audio-player/dist/components/AudioPlayer';
+// import { JsampleTheme } from '../../jsample/styles';
+import audioTheme from './audio-theme';
+import { VerticalAlignCenter } from '@material-ui/icons';
 
 interface AudioBoxProps {
   autoPlay?: boolean
@@ -36,7 +53,10 @@ interface AudioBoxProps {
   style?: CSSProperties
   title?: string
   legend?: string,
-  volume: number
+  volume: number,
+
+  width: string,
+  height: string,
 }
 
 interface ConditionalProps {
@@ -188,6 +208,115 @@ class AudioBox extends Component<AudioBoxProps> {
     }
   }
 
+  RegisPlayer = ({
+    useStyles = {},
+    // color = "primary" as keyof typeof AudioPlayerVariation,
+    color = 'primary' as 'inherit' | 'primary' | 'secondary' | 'action' | 'disabled' | 'error',
+    size = "default",
+    elevation = 1,
+    transcript = "",
+    src="",
+    ...rest
+  }) => {
+    const [openDialog, setOpenDialog] = React.useState(false);
+
+    const iconSize = { small: 20, default: 24, large: 36, inherit: "inherit" }[size];
+
+    const fontSize = {
+      small  : audioTheme.typography.body2.fontSize,
+      default: audioTheme.typography.body1.fontSize,
+      large  : audioTheme.typography.body1.fontSize
+    }[size];
+
+    const spacing = {
+      small  : { x: 1,   y: 0.5,  z: 1 },
+      default: { x: 1,   y: 0.75, z: 1 },
+      large  : { x: 1.5, y: 1.5,  z: 2 }
+    }[size];
+
+    const minWidth = { small: 180, default: 250, large: 320 }[size];
+
+    let spatial = true;
+    try { spatial = Number(this.props.width) > 2 * minWidth; }
+    catch (e) {}
+
+    const useClasses = makeStyles((theme) => ({
+      paper: { minWidth: minWidth },
+      root: {
+        background: "none",
+        "& .MuiGrid-item": {
+          display: "flex",
+          alignItems: "center"
+        },
+        // "& div[class*='volumeControlContainer']": { display: "none" },
+        "& .MuiSvgIcon-root": { fontSize: iconSize }
+      },
+      progressTime: { fontSize: fontSize },
+      mainSlider: { display: spatial ? "block" : "none", },
+      ...useStyles
+    }));
+
+    const customIcon = makeStyles((theme) => ({
+      root: {
+        cursor: "pointer",
+        "&:hover": {
+          color:
+            theme.palette[["primary", "secondary"].includes(color) ? color : "primary"].light
+        }
+      }
+    }));
+
+    const classes = useClasses();
+    const customIconClasses = customIcon();
+
+    return (
+      <React.Fragment >
+        <Paper elevation={elevation} className={classes.paper} >
+          <Box px={spacing.x} py={spacing.y} my={"16px"} style={{height: "fit-content", width: "90%"}}>
+            <Grid container alignItems="center">
+              <Grid item xs>
+                <AudioPlayer
+                  {...rest}
+                  src={src}
+                  variation={color as keyof typeof AudioPlayerVariation}
+                  elevation={0}
+                  useStyles={useClasses}
+                  spacing={spacing.z as GridSpacing}
+                />
+              </Grid>
+              {transcript !== "" && (
+                <Grid item style={{ display: "flex" }}>
+                  <ClosedCaption
+                    fontSize={size as "small" | "inherit" | "default" | "large" | "medium"}
+                    className={customIconClasses.root}
+                    color={color}
+                    onClick={() => setOpenDialog(true)}
+                  />
+                </Grid>
+              )}
+            </Grid>
+          </Box>
+        </Paper>
+        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+          <DialogTitle disableTypography>
+            <Typography variant="h3">Audio transcript</Typography>
+          </DialogTitle>
+          <DialogContent dividers>
+            {transcript !== "" &&
+              transcript.split("\n").map((item, index) => (
+                <Typography paragraph key={index}>
+                  {item}
+                </Typography>
+              ))}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDialog(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
+    );
+  };
+
   render() {
     const incompatibilityMessage = this.props.children || (
       <p>Your browser does not support the <code>audio</code> element.</p>
@@ -206,23 +335,42 @@ class AudioBox extends Component<AudioBoxProps> {
     }
 
     return (
-      <audio
-        autoPlay={this.props.autoPlay}
-        className={`react-audio-player ${this.props.className}`}
-        controls={controls}
-        crossOrigin={this.props.crossOrigin}
-        id={this.props.id}
-        loop={this.props.loop}
-        muted={this.props.muted}
-        preload={this.props.preload}
-        ref={this.audioEl}
-        src={this.props.src}
-        style={this.props.style}
-        title={title}
-        {...conditionalProps}
-      >
-        {incompatibilityMessage}
-      </audio>
+      // <div style={{width: '100%'}}>
+      //   <img src='' style={this.props.style}/>
+      //   <audio
+      //     autoPlay={this.props.autoPlay}
+      //     className={`react-audio-player ${this.props.className}`}
+      //     controls
+      //     crossOrigin={this.props.crossOrigin}
+      //     id={this.props.id}
+      //     loop={this.props.loop}
+      //     muted={this.props.muted}
+      //     preload={this.props.preload}
+      //     ref={this.audioEl}
+      //     src={this.props.src}
+      //     style={this.props.style}
+      //     title={title}
+      //     {...conditionalProps}
+      //   >
+      //     {incompatibilityMessage}
+      //   </audio>
+      // </div>
+      <React.Fragment >
+        <ThemeProvider theme={audioTheme}>
+          <Box width={this.props.width} height={this.props.height}
+              style={{alignItems: "center", display: "flex", flexFlow: "column"}} >
+            <Typography paragraph align='center' >
+              {`${this.props.legend}`}
+            </Typography>
+            <this.RegisPlayer
+              // color="secondary"
+              size="small"
+              transcript={title || this.props.legend}
+              src={this.props.src}
+            />
+          </Box>
+        </ThemeProvider>
+      </React.Fragment>
     );
   }
 }
@@ -252,6 +400,9 @@ AudioBox.defaultProps = {
   style: {},
   title: '',
   volume: 1.0,
+
+  width: "16wh",
+  height: "9wh",
 };
 
 // AudioBox.propTypes = {

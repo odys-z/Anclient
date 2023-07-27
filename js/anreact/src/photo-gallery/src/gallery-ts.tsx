@@ -53,7 +53,7 @@ export interface GalleryProps {
     videoControl?: boolean
   
     // renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>
-    renderImage?: React.ComponentType<RenderImageProps>
+    // renderImage?: React.ComponentType<RenderImageProps>
 }
 
 // const Gallery = React.memo(
@@ -66,7 +66,7 @@ const Gallery = function Gallery({
   limitNodeSearch,
   targetRowHeight,
   columns,
-  renderImage,
+  // renderImage,
 } : GalleryProps) {
   const [containerWidth, setContainerWidth] = useState(0);
   const galleryEl = useRef(null);
@@ -149,8 +149,9 @@ const Gallery = function Gallery({
     galleryStyle.height = thumbs[thumbs.length - 1].containerHeight;
   }
 
-  // const renderComponent = renderImage || Photo;
   const renderComponent = Photo;
+  // const renderComponent = renderImage || Photo;
+
   return (
     <div className="react-photo-gallery--gallery">
       <div ref={galleryEl} style={galleryStyle}>
@@ -158,16 +159,11 @@ const Gallery = function Gallery({
 				  // console.log(thumb);
           const { mime, left, top, containerHeight, ...photo } = thumb;
           return renderComponent({
-            mime,
-            left,
-            top,
-            key: thumb.key || thumb.src,
-            containerHeight,
-            index,
-            margin,
-            direction,
+            index, key: thumb.key || thumb.src,
+            left, top, containerHeight,
+            margin, direction,
             onClick: onClick ? handleClick : null,
-            photo
+            mime, photo
           });
         })}
       </div>

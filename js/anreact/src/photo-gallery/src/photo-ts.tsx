@@ -116,11 +116,13 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, cont
       onClick={onClick ? handleClick : null}
     />
     : mime2type(mime) === 'audio' ?
-    <AudioBox key={key} 
+    <div key={key}>
+    <AudioBox key={key}
       style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
       {...photo}
       onClick={onClick ? handleClick : null}
     />
+    </div>
     :
     <img
       key={key}
