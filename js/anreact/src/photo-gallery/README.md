@@ -18,4 +18,4 @@ is used as a baseline to exending events handling and adapting to load from jser
 
 - React Audio Player
 
-[Adulik (arusikpaloyan), Audio player (forked at Code Sandbox)](https://codesandbox.io/s/audio-player-forked-lxuloi?file=/src/App.js), which is based upon 
+[Adulik (arusikpaloyan), Audio player (forked at Code Sandbox)](https://codesandbox.io/s/audio-player-forked-lxuloi?file=/src/App.js), which is based upon [Material UI Audio Player](https://github.com/Werter12/material-ui-audio-player).
