@@ -106,7 +106,7 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, cont
     imgStyle.top = top;
   };
 
-  const handleClick = event => {
+  const handleClick = (event: React.UIEvent) => {
     onClick(event, { photo, index });
   };
 

@@ -62,7 +62,7 @@ interface AudioBoxProps {
   width: number | string,
   height: number | string,
   // onLoad: (p: ImageSlide) => void,
-  onClick?: (e: UIEvent) => void
+  onClick?: (e: React.UIEvent) => void
 }
 
 interface ConditionalProps {
