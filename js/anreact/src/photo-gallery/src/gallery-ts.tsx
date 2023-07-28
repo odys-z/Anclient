@@ -149,7 +149,6 @@ const Gallery = function Gallery({
     galleryStyle.height = thumbs[thumbs.length - 1].containerHeight;
   }
 
-  const renderComponent = Photo;
   // const renderComponent = renderImage || Photo;
 
   return (
@@ -158,11 +157,12 @@ const Gallery = function Gallery({
         {thumbs.map((thumb, index) => {
 				  // console.log(thumb);
           const { mime, left, top, containerHeight, ...photo } = thumb;
-          return renderComponent({
+          return Photo({
             index, key: thumb.key || thumb.src,
             left, top, containerHeight,
             margin, direction,
             onClick: onClick ? handleClick : null,
+            onSlideLoad: (p) => {},
             mime, photo
           });
         })}

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { regex } from '../../utils/regex';
 import { AudioBox } from './react-audio-player';
+import { ImageSlide } from '../../react/widgets/gallery-view';
 
 const { mime2type } = regex;
 
@@ -29,7 +30,7 @@ export type PhotoProps<CustomPhotoProps extends object = {}> = {
     /**
      * srcSet attribute of the image
      */
-    srcSet?: string[]
+    srcSet?: string
     /**
      * sizes attribute of the image
      */
@@ -37,11 +38,11 @@ export type PhotoProps<CustomPhotoProps extends object = {}> = {
     /**
      *  original width of the gallery image (only used for calculating aspect ratio)
      */
-    width: number
+    width: number | string
     /**
      *  original height of the gallery image (only used for calculating aspect ratio)
      */
-    height: number
+    height: number | string
     /**
      *  alt text of the gallery image
      */
@@ -94,14 +95,16 @@ export interface RenderImageProps<CustomPhotoProps extends object = {}> {
     left?: number
 }
 
-const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, containerHeight, key }) => {
+const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, containerHeight, key, onSlideLoad }
+    : {photo: ImageSlide, [x: string]: any}) => {
+
   // ody: add user styles: photo.imgstyl
-  const imgStyle = { margin: margin, display: 'block', ...photo.imgstyl };
+  const imgStyle = { margin: margin, display: 'block', ...photo.imgstyl } as any;
   if (direction === 'column') {
     imgStyle.position = 'absolute';
     imgStyle.left = left;
     imgStyle.top = top;
-  }
+  };
 
   const handleClick = event => {
     onClick(event, { photo, index });
@@ -117,9 +120,10 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, cont
     />
     : mime2type(mime) === 'audio' ?
     <div key={key}>
-    <AudioBox key={key}
+    <AudioBox key={key} width={"90%"} height={"50%"}
       style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
       {...photo}
+      onCanPlay={() => onSlideLoad(photo)}
       onClick={onClick ? handleClick : null}
     />
     </div>

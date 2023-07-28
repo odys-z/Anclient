@@ -24,10 +24,11 @@ export interface PhotoCollect extends Tierec {
 
 export interface ImageSlide  {
 	index: number,
-	width: number,
-	height: number,
+	width: number | string,
+	height: number | string,
 	src: string,
-	srcSet?: string[],
+	srcSet?: string,
+	srcArr?: string[],
 	legend: string,
 
 	/**

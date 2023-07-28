@@ -10,12 +10,8 @@ import { createTheme } from "@material-ui/core/styles";
 */
 const palette = {
   //type: "dark",
-  primary: {
-    main: "#2040b0"
-  },
-  secondary: {
-    main: "#F78E1E"
-  },
+  primary: { main: "#2040b0" },
+  secondary: { main: "#F78E1E" },
   tertiary: {
     main: "#FFD200",
     dark: "#DFB200",
@@ -27,18 +23,10 @@ const palette = {
   },
   divider: grey[200],
   background: {},
-  error: {
-    main: red[500]
-  },
-  success: {
-    main: green[500]
-  },
-  warning: {
-    main: orange[500]
-  },
-  info: {
-    main: blue[500]
-  },
+  error: { main: red[500] },
+  success: { main: green[500] },
+  warning: { main: orange[500] },
+  info: { main: blue[500] },
   action: {}
 };
 
@@ -204,21 +192,15 @@ const overrides = {
       minWidth: 40
     }
   },
+
   // Matching font size with body1
   MuiButton: {
-    label: {
-      fontSize: 18
-    },
-    text: {
-      textTransform: "none"
-    },
-    contained: {
-      textTransform: "none"
-    },
-    outlined: {
-      textTransform: "none"
-    }
+    label: { fontSize: 18 },
+    text: { textTransform: "none" },
+    contained: { textTransform: "none" },
+    outlined: { textTransform: "none" }
   },
+
   // Changing default table border to match divider color
   MuiTableCell: {
     root: {
@@ -228,10 +210,9 @@ const overrides = {
   // Matching input font size with body1
   MuiInput: {
     fontSize: 18,
-    root: {
-      fontSize: 18
-    }
+    root: { fontSize: 18 }
   },
+
   MuiStepper: {
     root: {
       background: "none",
@@ -239,6 +220,7 @@ const overrides = {
       padding: 0
     }
   },
+
   // Colors for Completed/Active icons in steppers
   MuiStepIcon: {
     root: {},
@@ -249,6 +231,7 @@ const overrides = {
       color: palette.warning.main + "!important"
     }
   },
+
   // Matching font size with body1
   MuiTab: {
     wrapper: {
@@ -256,63 +239,81 @@ const overrides = {
       textTransform: "none"
     }
   },
+
   // Matching font size with body1
   MuiTooltip: {
-    tooltip: {
-      fontSize: 18
-    }
+    tooltip: { fontSize: 18 }
   },
+  
   // Matching font size with body1
   MuiAlert: {
-    root: {
-      fontSize: 18
-    }
+    root: { fontSize: 18 }
   },
+
   // Making progress indicator thicker
   MuiLinearProgress: {
     root: {
       height: "8px",
       borderRadius: shape.borderRadius
     },
-    bar: {
-      borderRadius: shape.borderRadius
-    }
+    bar: { borderRadius: shape.borderRadius }
   },
+
   // Making progress indicator thicker and adding round caps
   MuiCircularProgress: {
-    circle: {
-      strokeLinecap: "round"
-    }
+    circle: { strokeLinecap: "round" }
   },
+
   // Matching font size with body1
   MuiChip: {
-    label: {
-      fontSize: 18
-    }
+    label: { fontSize: 18 }
   }
 };
 
-// const theme = {
-//   title: "Regis project theme",
-//   palette: palette,
-//   typography: typography,
-//   shape: shape,
-//   spacing: 8,
-//   transitions: transitions,
-//   props: props,
-//   overrides: overrides
-// };
-
 export default createTheme({
-//   title: "Regis project theme",
+  // title: "Regis project theme" as any,
   palette: palette,
-//   typography: typography,
+  typography: typography as any,
   shape: shape,
   spacing: 8,
   transitions: transitions,
-//   props: props,
-//   overrides: overrides
+  props: props as any,
+  overrides: overrides as any
 });
 
-// export default createMuiTheme(theme);
-// export { theme as sourceTheme };
+/**
+ * Elegant Themes, GPL, via Wikimedia Commons,
+ * https://commons.wikimedia.org/wiki/File:Circle-icons-music.svg
+ * , retrieved on Jul 28, 2023,
+ */
+export const audioSVG = `
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+version="1.1" x="0px" y="0px" viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" 
+xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#76C2AF;}
+	.st1{opacity:0.2;}
+	.st2{fill:#231F20;}
+	.st3{fill:#FFFFFF;}
+</style>
+<g id="Layer_1">
+	<g> <circle class="st0" cx="32" cy="32" r="32"/> </g>
+	<g class="st1">
+		<g>
+			<path class="st2"
+        d="M13.9,49.4c1.6,2.1,4.9,2.2,7.4,0.3c1-0.8,2.8-2.9,2.8-7.2V29.2l19-3.6V34c0,3-2.4,3.7-3.2,3.8
+        c-0.1,0-0.1,0-0.2,0c0,0-0.1,0-0.1,0l0,0c-1,0.2-1.9,0.6-2.8,1.2c-2.5,1.9-3.2,5.1-1.6,7.2c1.6,2.1,4.9,2.2,7.4,0.3
+        c1.3-1,2.5-2.8,2.5-5.7V18.5c0-1.2-1-1.8-2.1-1.5l-19.2,3.6C22.5,21,22,22.3,22,23.4v13c0,3-2.7,4.4-3.5,4.5c0,0-0.1,0-0.1,0
+        c-0.1,0-0.2,0-0.2,0l0,0c-0.9,0.2-1.9,0.6-2.7,1.2C13,44.1,12.3,47.3,13.9,49.4z"/>
+		</g>
+	</g>
+	<g>
+		<g>
+			<path class="st3" d="M13.9,47.4c1.6,2.1,4.9,2.2,7.4,0.3c1-0.8,2.8-2.9,2.8-7.2V27.2l19-3.6V32c0,3-2.4,3.7-3.2,3.8
+        c-0.1,0-0.1,0-0.2,0c0,0-0.1,0-0.1,0l0,0c-1,0.2-1.9,0.6-2.8,1.2c-2.5,1.9-3.2,5.1-1.6,7.2c1.6,2.1,4.9,2.2,7.4,0.3
+        c1.3-1,2.5-2.8,2.5-5.7V16.5c0-1.2-1-1.8-2.1-1.5l-19.2,3.6C22.5,19,22,20.3,22,21.4v13c0,3-2.7,4.4-3.5,4.5c0,0-0.1,0-0.1,0
+        c-0.1,0-0.2,0-0.2,0l0,0c-0.9,0.2-1.9,0.6-2.7,1.2C13,42.1,12.3,45.3,13.9,47.4z"/>
+		</g>
+	</g>
+</g>
+</svg>`

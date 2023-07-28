@@ -15,6 +15,7 @@ import { Comprops, CrudCompW } from '../../react/crud';
 import { GalleryView } from '../../react/widgets/gallery-view';
 import { regex } from '../../utils/regex';
 import { Typography } from '@material-ui/core';
+import { AudioBox } from './react-audio-player';
 
 let { mime2type } = regex;
 
@@ -155,6 +156,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         x: INITIAL_X,
         y: INITIAL_Y
       });
+
       this.setState({swiping: false, loading: true}, () => {
         this.animation = requestAnimationFrame(frame);
       });
@@ -305,7 +307,7 @@ export class Lightbox extends CrudCompW<Comprops & {
   }
 
   vidRef: HTMLVideoElement;
-  audRef: HTMLAudioElement;
+  audRef: AudioBox;
   
   getResources() {
     let items = [];
@@ -335,7 +337,6 @@ export class Lightbox extends CrudCompW<Comprops & {
 
           preload='false' controls
           poster={resource.poster}
-          // src={resource.src}
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
             maxWidth: '100%', maxHeight: '100%',
@@ -361,13 +362,18 @@ export class Lightbox extends CrudCompW<Comprops & {
         </video>);
       }
       else if (mime === 'audio') {
-        items.push(<div>
-          <audio key={i}
-            ref={(ref) => this.audRef = ref}
-            // poster={resource.poster}
-          />
-          <Typography >{resource.title}</Typography>
-        </div>);
+        items.push(
+        <AudioBox lightMode
+          key={i}
+          ref={(ref) => this.audRef = ref}
+          poster={resource.poster}
+          width='80%'
+          height='50%'
+          onCanPlay={()=> {
+            if (this.state.swiping || this.state.loading)
+              this.setState({ loading: false }); }}
+        > <Typography >{resource.title}</Typography>
+        </AudioBox>);
       }
       /* TODO third party online resources
       else if (resource.mime === 'video') {
@@ -446,10 +452,9 @@ export class Lightbox extends CrudCompW<Comprops & {
         { this.state.loading &&
           <div style={{ margin: 'auto', position: 'fixed' }}>
             <style>
-              {
-                `@keyframes react_image_video_spinner {
-                  0% { transform: translate3d(-50 %, -50 %, 0) rotate(0deg); }
-                  100% { transform: translate3d(-50%, -50%, 0) rotate(360deg); }
+              { `@keyframes react_image_video_spinner {
+                 0% { transform: translate3d(-50 %, -50 %, 0) rotate(0deg); }
+                 100% { transform: translate3d(-50%, -50%, 0) rotate(360deg); }
                 }`
               }
             </style>
