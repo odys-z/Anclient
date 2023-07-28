@@ -18,7 +18,4 @@ is used as a baseline to exending events handling and adapting to load from jser
 
 - React Audio Player
 
-[The source (MIT) by Justin McCandless](https://github.com/justinmc/react-audio-player)
-is used as a baseline to exending events handling and adapting to load from jserv-*.
-
-Also credits to [Adulik (arusikpaloyan), Audio player (forked at Code Sandbox)](https://codesandbox.io/s/audio-player-forked-lxuloi?file=/src/App.js)
+[Adulik (arusikpaloyan), Audio player (forked at Code Sandbox)](https://codesandbox.io/s/audio-player-forked-lxuloi?file=/src/App.js), which is based upon 

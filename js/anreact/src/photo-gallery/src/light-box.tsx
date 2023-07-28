@@ -15,7 +15,7 @@ import { Comprops, CrudCompW } from '../../react/crud';
 import { GalleryView } from '../../react/widgets/gallery-view';
 import { regex } from '../../utils/regex';
 import { Typography } from '@material-ui/core';
-import { AudioBox } from './react-audio-player';
+import { AudioBox } from './audio-box';
 
 let { mime2type } = regex;
 

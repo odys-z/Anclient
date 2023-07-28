@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { regex } from '../../utils/regex';
-import { AudioBox } from './react-audio-player';
+import { AudioBox } from './audio-box';
 import { ImageSlide } from '../../react/widgets/gallery-view';
 
 const { mime2type } = regex;

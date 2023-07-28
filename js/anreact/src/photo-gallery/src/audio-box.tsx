@@ -79,145 +79,23 @@ class AudioBox extends Component<AudioBoxProps> {
 
   listenTracker?: number
 
-  // onError = (e: Event) => this.props.onError?.(e);
   onCanPlay = (e: Event) => this.props.onCanPlay?.(e);
-  // onCanPlayThrough = (e: Event) => this.props.onCanPlayThrough?.(e);
-  // onPlay = (e: Event) => {
-  //   this.setListenTrack();
-  //   this.props.onPlay?.(e);
-  // }
-  // onAbort = (e: Event) => {
-  //   this.clearListenTrack();
-  //   this.props.onAbort?.(e);
-  // }
-  // onEnded = (e: Event) => {
-  //   this.clearListenTrack();
-  //   this.props.onEnded?.(e);
-  // }
-  // onPause = (e: Event) => {
-  //   this.clearListenTrack();
-  //   this.props.onPause?.(e);
-  // }
-  // onSeeked = (e: Event) => {
-  //   this.props.onSeeked?.(e);
-  // }
-  // onLoadedMetadata = (e: Event) => {
-  //   this.props.onLoadedMetadata?.(e);
-  // }
-  // onVolumeChanged = (e: Event) => {
-  //   this.props.onVolumeChanged?.(e);
-  // }
+
 
   componentDidMount() {
     this.props.onCanPlay(undefined);
-    // const audio = this.audioEl.current;
-
-    // if (!audio) return;
-
-    // this.updateVolume(this.props.volume);
-
-    // audio.addEventListener('error', this.onError);
-
-    // // When enough of the file has downloaded to start playing
-    // audio.addEventListener('canplay', this.onCanPlay);
-
-    // // When enough of the file has downloaded to play the entire file
-    // audio.addEventListener('canplaythrough', this.onCanPlayThrough);
-
-    // // When audio play starts
-    // audio.addEventListener('play', this.onPlay);
-
-    // // When unloading the audio player (switching to another src)
-    // audio.addEventListener('abort', this.onAbort);
-
-    // // When the file has finished playing to the end
-    // audio.addEventListener('ended', this.onEnded);
-
-    // // When the user pauses playback
-    // audio.addEventListener('pause', this.onPause);
-
-    // // When the user drags the time indicator to a new time
-    // audio.addEventListener('seeked', this.onSeeked);
-
-    // audio.addEventListener('loadedmetadata', this.onLoadedMetadata);
-
-    // audio.addEventListener('volumechange', this.onVolumeChanged);
   }
 
   // Remove all event listeners
   componentWillUnmount() {
-    // const audio = this.audioEl.current;
-
-    // if (!audio) return;
-
-    // audio.removeEventListener('error', this.onError);
-
-    // // When enough of the file has downloaded to start playing
-    // audio.removeEventListener('canplay', this.onCanPlay);
-
-    // // When enough of the file has downloaded to play the entire file
-    // audio.removeEventListener('canplaythrough', this.onCanPlayThrough);
-
-    // // When audio play starts
-    // audio.removeEventListener('play', this.onPlay);
-
-    // // When unloading the audio player (switching to another src)
-    // audio.removeEventListener('abort', this.onAbort);
-
-    // // When the file has finished playing to the end
-    // audio.removeEventListener('ended', this.onEnded);
-
-    // // When the user pauses playback
-    // audio.removeEventListener('pause', this.onPause);
-
-    // // When the user drags the time indicator to a new time
-    // audio.removeEventListener('seeked', this.onSeeked);
-
-    // audio.removeEventListener('loadedmetadata', this.onLoadedMetadata);
-
-    // audio.removeEventListener('volumechange', this.onVolumeChanged);
   }
 
   componentDidUpdate(_p: AudioBoxProps) {
     // this.updateVolume(this.props.volume);
   }
 
-  // /**
-  //  * Set an interval to call props.onListen every props.listenInterval time period
-  //  */
-  // setListenTrack() {
-  //   if (!this.listenTracker) {
-  //     const listenInterval = this.props.listenInterval;
-  //     this.listenTracker = window.setInterval(() => {
-  //       this.audioEl.current && this.props.onListen?.(this.audioEl.current.currentTime);
-  //     }, listenInterval);
-  //   }
-  // }
-
-  // /**
-  //  * Set the volume on the audio element from props
-  //  * @param {Number} volume
-  //  */
-  // updateVolume(volume: number) {
-  //   const audio = this.audioEl.current;
-  //   if (audio !== null && typeof volume === 'number' && volume !== audio?.volume) {
-  //     audio.volume = volume;
-  //   }
-  // }
-
-  // /**
-  //  * Clear the onListen interval
-  //  */
-  // clearListenTrack() {
-  //   if (this.listenTracker) {
-  //     clearInterval(this.listenTracker);
-  //     delete this.listenTracker;
-  //   }
-  // }
-
   RegisPlayer = ({
     useStyles = {},
-    // color = "primary" as keyof typeof AudioPlayerVariation,
     color = 'primary' as 'inherit' | 'primary' | 'secondary' | 'action' | 'disabled' | 'error',
     size = "default",
     elevation = 1,
@@ -266,7 +144,6 @@ class AudioBox extends Component<AudioBoxProps> {
         "& .MuiSvgIcon-root": { fontSize: iconSize }
       },
       progressTime: { fontSize: fontSize },
-      // sliderContainer: { display: spatial() ? "block" : "none", },
       ...useStyles
     }));
 
@@ -318,7 +195,6 @@ class AudioBox extends Component<AudioBoxProps> {
             <Typography variant="h3">Audio transcript</Typography>
           </DialogTitle>
           <DialogContent dividers>
-            {/* {transcript !== "" && */}
             {!isEmpty(transcript) &&
               transcript.split("\n").map((item, index) => (
                 <Typography paragraph key={index}>
@@ -335,12 +211,12 @@ class AudioBox extends Component<AudioBoxProps> {
   };
 
   render() {
-    const incompatibilityMessage = this.props.children || (
-      <p>Your browser does not support the <code>audio</code> element.</p>
-    );
+    // const incompatibilityMessage = this.props.children || (
+    //   <p>Your browser does not support the <code>audio</code> element.</p>
+    // );
 
-    // Set controls to be true by default unless explicity stated otherwise
-    const controls = !(this.props.controls === false);
+    // // Set controls to be true by default unless explicity stated otherwise
+    // const controls = !(this.props.controls === false);
 
     // Set lockscreen / process audio title on devices
     const title = this.props.title ? this.props.title : this.props.legend;
@@ -399,17 +275,11 @@ AudioBox.defaultProps = {
   listenInterval: 10000,
   loop: false,
   muted: false,
-  // onAbort: () => {},
   onCanPlay: () => {},
-  // onCanPlayThrough: () => {},
-  // onEnded: () => {},
-  // onError: () => {},
-  // onListen: () => {},
   onPause: () => {},
   onPlay: () => {},
   onSeeked: () => {},
   onVolumeChanged: () => {},
-  // onLoadedMetadata: () => {},
   preload: 'metadata',
   style: {},
   title: '',
