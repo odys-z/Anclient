@@ -1,15 +1,11 @@
 /**
  * Credit to: https://github.com/Ngineer101/react-image-video-lightbox/blob/master/src/index.js
  * 2023.6.27 baseline, by Ngineer, License: MIT
- *
- * ISSUE: Performance problem since v0.4.26.
- * It could be the anson64's random string makes browser always load the same images, see
- * <a href='https://stackoverflow.com/q/10240110'>discussions</a>.
- *
- * FIXME: Resource should be cached.
+ * 
+ * Modified by Ody Zhou
  */
 import * as React from 'react';
-import {TouchEvent, Touch} from 'react'; // override global types
+import {TouchEvent, Touch} from 'react';
 import { AnTreeNode, StreeTier, PhotoRec } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { GalleryView } from '../../react/widgets/gallery-view';
@@ -143,10 +139,10 @@ export class Lightbox extends CrudCompW<Comprops & {
     const frame = () => {
       if (this.config.scale === INITIAL_SCALE && this.config.x === INITIAL_X && this.config.y === INITIAL_Y) return;
 
-      const scaleDelta = INITIAL_SCALE - this.config.scale;
+      const scaleDelta  = INITIAL_SCALE - this.config.scale;
       const targetScale = settle(this.config.scale + (RESET_ANIMATION_SPEED * scaleDelta), INITIAL_SCALE, SETTLE_RANGE);
 
-      const nextWidth = this.width * targetScale;
+      const nextWidth  = this.width * targetScale;
       const nextHeight = this.height * targetScale;
 
       this.config = Object.assign(this.config, {
@@ -376,23 +372,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         > <Typography >{resource.title}</Typography>
         </AudioBox>);
       }
-      /* TODO third party online resources
-      else if (resource.mime === 'video') {
-        items.push(<iframe key={i}
-          allowFullScreen width="560" height="315"
-          src={resource.url}
-          frameBorder="0"
-          allow="autoplay; encrypted-media"
-          title={resource.title}
-          style={{
-            pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
-            maxWidth: '100%', maxHeight: '100%',
-            transform: `translate(${this.config.x}px, ${this.config.y}px)`,
-            transition: 'transform 0.5s ease-out'
-          }}
-          onLoad={() => { this.setState({ loading: false }); }}></iframe>);
-      }
-      */
+      // TODO third party online resources
     }
 
     return items;
