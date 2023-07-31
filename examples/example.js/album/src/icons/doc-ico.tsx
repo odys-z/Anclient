@@ -1,5 +1,5 @@
 import React from "react";
-import { AnTreegridCol, ClassNames, Media, regex } from "@anclient/anreact";
+import { AnTreegridCol, ClassNames, Media, regex, svgImgSrc } from "@anclient/anreact";
 import { AnTreeNode } from '@anclient/semantier';
 import { z7 } from "./7zip";
 import { img } from "./image";
