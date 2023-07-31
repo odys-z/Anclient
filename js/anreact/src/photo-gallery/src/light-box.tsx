@@ -367,6 +367,7 @@ export class Lightbox extends CrudCompW<Comprops & {
           key={i}
           ref={(ref) => this.audRef = ref}
           poster={resource.poster}
+          src={resource.src}
           width='80%'
           height='50%'
           onCanPlay={()=> {

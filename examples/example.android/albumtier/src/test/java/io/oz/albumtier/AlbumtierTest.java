@@ -100,6 +100,11 @@ public class AlbumtierTest {
 			@Override
 			public InputStream open(SyncDoc pht) throws FileNotFoundException {
 				return new FileInputStream(pht.fullpath());
+			}
+
+			@Override
+			public String saveFolder() {
+				return "syrskyi";
 			}});
 	}
 

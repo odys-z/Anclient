@@ -50,7 +50,7 @@ interface AudioBoxProps {
   onSeeked?: (e: Event) => void
   onVolumeChanged?: (e: Event) => void
   preload?: '' | 'none' | 'metadata' | 'auto'
-  src?: string, // Not required b/c can use <source>
+  src: string, 
   style?: CSSProperties
   volume: number,
 
@@ -266,6 +266,7 @@ class AudioBox extends Component<AudioBoxProps> {
 }
 
 AudioBox.defaultProps = {
+  src: undefined,
   autoPlay: false,
   children: null,
   className: '',

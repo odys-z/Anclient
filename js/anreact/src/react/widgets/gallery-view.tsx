@@ -129,17 +129,23 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 * @returns src for img, i.e. jserv?anst64=message-string 
 	 */
 	static imgSrcReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) : string {
-		let {uri, port, client} = opts;
-		let req = StreeTier.reqFactories[port]({uri, sk: ''}).A(AlbumReq.A.download) as AlbumReq;
-		req.docId = pid;
 
-		let msg = client.an.getReq<AlbumReq>(port, req);
+		let {client, port} = opts;
+		// let {uri, port, client} = opts;
+
+		// let req = StreeTier
+		// 	.reqFactories[port]({uri, sk: ''})
+		// 	.A(AlbumReq.A.download) as AlbumReq;
+
+		// req.docId = pid;
+		// let msg = client.an.getReq<AlbumReq>(port, req);
+
+		let msg = getDownloadReq(pid, opts);
 
 		let jserv = client.an.servUrl(port);
-		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
+		return `${jserv}?anson64=${window.btoa( JSON.stringify(msg))}`;
 	}
 
-	// openLightbox (_event: React.MouseEvent, photo: PhotoSlide<{}>) {
 	openLightbox (_event: React.MouseEvent, ix: number) {
 		this.currentImx = ix;
 		this.showCarousel = true;
@@ -223,3 +229,20 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		</div>);
 	}
 }
+
+const reqMsgs = {};
+
+function getDownloadReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) {
+	let {uri, port, client} = opts;
+
+	if (reqMsgs[pid] === undefined) {
+		let req = StreeTier
+			.reqFactories[port]({uri, sk: ''})
+			.A(AlbumReq.A.download) as AlbumReq;
+
+		req.docId = pid;
+		reqMsgs[pid] = client.an.getReq<AlbumReq>(port, req);
+	}
+	return reqMsgs[pid];
+}
+
