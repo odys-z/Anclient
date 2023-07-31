@@ -2,6 +2,7 @@ export * from './utils/consts';
 export * from './utils/langstr';
 export * from './utils/lang-ext';
 export * from './utils/regex';
+export * from './utils/file-utils';
 
 export * from './patch/react-portal-overlay';
 

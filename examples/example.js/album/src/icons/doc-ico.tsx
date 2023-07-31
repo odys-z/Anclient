@@ -1,5 +1,5 @@
 import React from "react";
-import { AnTreegridCol, ClassNames, Media, regex, imgSvgSrc } from "@anclient/anreact";
+import { AnTreegridCol, ClassNames, Media, regex } from "@anclient/anreact";
 import { AnTreeNode } from '@anclient/semantier';
 import { z7 } from "./7zip";
 import { img } from "./image";
@@ -37,7 +37,7 @@ export class DocIcon {
 
         if (!this.buf.hasOwnProperty(src))
             // this.buf[src] = new Blob([t], {type: 'image/svg+xml'});
-            this.buf[src] = imgSvgSrc(t);
+            this.buf[src] = svgImgSrc(t);
 
         // return (<img className={opts.classes.icon} src={URL.createObjectURL(this.buf[src])}></img>);
         return (<img className={opts.classes.icon} src={this.buf[src]}></img>);
