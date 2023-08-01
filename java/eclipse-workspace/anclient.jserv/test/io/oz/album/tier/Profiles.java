@@ -11,8 +11,9 @@ import static io.odysz.common.LangExt.isblank;
 public class Profiles extends Anson {
 	String uid;
 	String defltAlbum;
-
+	String webroot;
 	String home;
+
 	public String home() { return home; }
 
 	int maxUsers;
@@ -31,12 +32,12 @@ public class Profiles extends Anson {
 		this.home = rs.getString(m.org);
 		this.uid = rs.getString(m.pk);
 		this.defltAlbum = rs.getString("album");
+		this.webroot = rs.getString("webroot");
 		
 		if (isblank(defltAlbum))
 			this.defltAlbum = "a-001";
 	}
 
-	String webroot;
 	public Profiles webroot(String cfg) {
 		this.webroot = cfg;
 		return this;

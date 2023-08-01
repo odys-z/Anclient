@@ -25,7 +25,6 @@ import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
-import io.odysz.semantic.jserv.JSingleton;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -38,8 +37,8 @@ import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.PhotoRec;
-import io.oz.album.tier.PhotoMeta;
 import io.oz.jserv.docsync.Synclientier;
+import io.oz.album.tier.PhotoMeta;
 
 /**
  * Photo client,
@@ -224,8 +223,6 @@ public class PhotoSyntier extends Synclientier {
 			try {
 				startAck = client.commit(q, errHandler);
 
-				if (fileProvider == null)
-					throw new SemanticException("Needing a file provider to accesse file %s.", p.clientname());
 				String pth = p.fullpath();
 				if (!pth.equals(startAck.doc.fullpath()))
 					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.doc.fullpath());

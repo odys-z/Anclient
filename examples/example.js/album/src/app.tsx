@@ -253,9 +253,9 @@ export class App extends CrudCompW<AlbumProps> {
 	 * - serv: string,
 	 * - portal: string
 	 */
-	static bindHtml(elem: string, opts: AnreactAppOptions & {aid: string}) : void {
+	static bindHtml(elem: string, opts: AnreactAppOptions & {aid: string, uid: string, pswd: string}) : void {
 		let portal = opts.portal ?? 'index.html';
-		let aid = opts.aid;
+		let { aid, uid, pswd } = opts;
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
@@ -264,7 +264,8 @@ export class App extends CrudCompW<AlbumProps> {
 			ReactDOM.render(
 			  <App servs={json} servId={opts.serv || 'album'}
 				aid={aid} iportal={portal} iwindow={window}
-				userid={'ody'} passwd={'123456'}
+				// userid={'ody'} passwd={'123456'}
+				userid={uid} passwd={pswd}
 			  />, dom);
 		}
 	}

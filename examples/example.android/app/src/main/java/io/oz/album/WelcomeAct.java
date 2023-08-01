@@ -7,7 +7,6 @@ import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -16,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.system.Os;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,6 +51,7 @@ import java.util.Objects;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
+import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -104,14 +103,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
         singl = AlbumContext.getInstance(this);
-        singl.appCtx = getApplicationContext();
+//        singl.appCtx = getApplicationContext();
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String homeName = sharedPref.getString(AlbumApp.keys.home, "");
         String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
         String device = sharedPref.getString(AlbumApp.keys.device, "");
         String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
-        String homepage = sharedPref.getString(AlbumApp.keys.homepage, "https://192.160.0.93:8888");
+        String homepage = sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing));
 
         singl.init(homeName, uid, device, jserv);
         AssetHelper.init(this, jserv, homepage);
@@ -126,52 +125,59 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         if (pickMediaStarter == null)
             pickMediaStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            if (singl.state() == AlbumContext.ConnState.Online) {
-                                onMediasPicked(result);
-                            } else showMsg(R.string.msg_ignored_when_offline);
-                        }
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        if (singl.state() == AlbumContext.ConnState.Online) {
+                            onMediasPicked(result);
+                        } else showMsg(R.string.msg_ignored_when_offline);
+                    }
+                    // WebView wv = findViewById(R.id.wv_welcome);
+                    // wv.reload();
+                    reloadAlbum();
+                });
 
         if (pickFileStarter == null)
             pickFileStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            if (singl.state() == AlbumContext.ConnState.Online) {
-                                onFilesPicked(result);
-                            } else showMsg(R.string.msg_ignored_when_offline);
-                        }
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        if (singl.state() == AlbumContext.ConnState.Online) {
+                            onFilesPicked(result);
+                        } else showMsg(R.string.msg_ignored_when_offline);
+                    }
+                    reloadAlbum();
+                });
 
         if (prefStarter == null)
             prefStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            showMsg(R.string.msg_device_uid, uid, device);
-                            WebView wv = findViewById(R.id.wv_welcome);
-                            wv.reload();
-                        }
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        showMsg(R.string.msg_device_uid, uid, device);
+                    }
+                    // WebView wv = findViewById(R.id.wv_welcome);
+                    // wv.reload();
+                    reloadAlbum();
+                });
 
         if (helpActStarter == null)
             helpActStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        WebView wv = findViewById(R.id.wv_welcome);
-                        wv.reload();
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // WebView wv = findViewById(R.id.wv_welcome);
+                    // wv.reload();
+                    reloadAlbum();
+                });
 
         try {
             if (singl.needSetup())
                 // settings are cleared
                 startPrefsAct();
-            else singl
-                    .pswd(sharedPref.getString(AlbumApp.keys.pswd, ""))
-                    .login((client) -> {
+            else {
+                String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
+                singl.pswd(pswd)
+                     .login((client) -> {
                         // All WebView methods must be called on the same thread.
                         runOnUiThread(() -> {
                             final VWebAlbum webView = new VWebAlbum();
@@ -180,13 +186,29 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             WebSettings webSettings = wv.getSettings();
                             webSettings.setJavaScriptEnabled(true);
                             webSettings.setDomStorageEnabled(true);
+
+                            /*
+                            wv.setWebViewClient(new WebViewClient() {
+                                public void onPageFinished(WebView view, String url) {
+                                    // https://www.techyourchance.com/communication-webview-javascript-android/
+                                    wv.evaluateJavascript(String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd), null);
+                                }
+                            });
                             wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
+                             */
                         });
+                        reloadAlbum(client);
                     },
                     (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
+            }
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
         }
+    }
+
+    void reloadAlbum (SessionClient ... client) {
+        if (client == null)
+            client = singl.tier;
     }
 
     /**
@@ -340,7 +362,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 f.size = returnCursor.getLong(sizeIndex);
                                 f.mime = getContentResolver().getType(returnUri);
 
-                                Date lastmodify = new Date(DocumentFile.fromSingleUri(singl.appCtx, returnUri).lastModified());
+                                Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
                                 f.cdate(lastmodify);
                                 saveFolder = DateFormat.formatYYmm(lastmodify);
                                 return f.size;

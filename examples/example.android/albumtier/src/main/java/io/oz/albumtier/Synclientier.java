@@ -42,12 +42,14 @@
 //import io.odysz.semantic.jserv.R.AnQueryReq;
 //import io.odysz.semantic.jserv.x.SsException;
 //import io.odysz.semantic.jsession.JUser.JUserMeta;
+//import io.odysz.semantic.syn.SynodeMode;
 //import io.odysz.semantic.tier.docs.DocsReq;
 //import io.odysz.semantic.tier.docs.DocsReq.A;
 //import io.odysz.semantic.tier.docs.DocsResp;
 //import io.odysz.semantic.tier.docs.IFileDescriptor;
 //import io.odysz.semantic.tier.docs.PathsPage;
 //import io.odysz.semantic.tier.docs.SyncDoc;
+//import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 //import io.odysz.semantics.IUser;
 //import io.odysz.semantics.SemanticObject;
 //import io.odysz.semantics.SessionInf;
@@ -57,8 +59,6 @@
 //import io.odysz.transact.sql.parts.Resulving;
 //import io.odysz.transact.x.TransException;
 //import io.oz.album.tier.AlbumReq;
-//import io.oz.jserv.docsync.SyncFlag;
-//import io.oz.jserv.docsync.SynodeMode;
 //
 ///**
 // * Redundant to docsync.jser/Synclientier.
@@ -234,7 +234,7 @@
 //			DocTableMeta meta, SyncDoc doc, String syncflag, SyncRobot robot)
 //			throws TransException, SQLException {
 //		localSt.update(meta.tbl, robot)
-//			.nv(meta.syncflag, SyncFlag.hub)
+//			.nv(meta.syncflag, SyncDoc.SyncFlag.hub)
 //			.whereEq(meta.pk, doc.recId)
 //			.u(localSt.instancontxt(conn, robot));
 //	}
@@ -557,7 +557,7 @@
 //		Insert ins = st.insert(meta.tbl, usr)
 //				.nv(meta.org(), usr.orgId())
 //				.nv(meta.uri, doc.uri)
-//				.nv(meta.resname, doc.pname)
+//				.nv(meta.clientname, doc.pname)
 //				.nv(meta.synoder, usr.deviceId())
 //				.nv(meta.fullpath, doc.fullpath())
 //				.nv(meta.folder, doc.folder())
