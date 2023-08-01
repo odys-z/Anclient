@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
@@ -83,6 +84,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +107,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         singl = AlbumContext.getInstance(this);
 //        singl.appCtx = getApplicationContext();
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String homeName = sharedPref.getString(AlbumApp.keys.home, "");
         String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
         String device = sharedPref.getString(AlbumApp.keys.device, "");
@@ -180,6 +182,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                      .login((client) -> {
                         // All WebView methods must be called on the same thread.
                         runOnUiThread(() -> {
+                            /*
                             final VWebAlbum webView = new VWebAlbum();
                             WebView wv = findViewById(R.id.wv_welcome);
                             wv.setWebViewClient(webView);
@@ -187,7 +190,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             webSettings.setJavaScriptEnabled(true);
                             webSettings.setDomStorageEnabled(true);
 
-                            /*
                             wv.setWebViewClient(new WebViewClient() {
                                 public void onPageFinished(WebView view, String url) {
                                     // https://www.techyourchance.com/communication-webview-javascript-android/
@@ -196,8 +198,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             });
                             wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
                              */
+                            reloadAlbum();
                         });
-                        reloadAlbum(client);
                     },
                     (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
             }
@@ -206,9 +208,27 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         }
     }
 
-    void reloadAlbum (SessionClient ... client) {
-        if (client == null)
-            client = singl.tier;
+    void reloadAlbum () {
+        SessionClient client = singl.tier.client();
+        if (client == null || sharedPref == null)
+            return;
+
+        String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
+
+        WebView wv = findViewById(R.id.wv_welcome);
+        final VWebAlbum webView = new VWebAlbum();
+        wv.setWebViewClient(webView);
+        WebSettings webSettings = wv.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+
+        wv.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                // https://www.techyourchance.com/communication-webview-javascript-android/
+                wv.evaluateJavascript(String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd), null);
+            }
+        });
+        wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
     }
 
     /**

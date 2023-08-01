@@ -1,8 +1,8 @@
-var path = require('path')
-var webpack = require('webpack')
+let path = require('path')
+let webpack = require('webpack')
 
-var v = 'production'; // "production" | "development" | "none"
-var version = "0.1.5";
+let v = 'development'; // "production" | "development" | "none"
+let version = "0.1.5";
 
 module.exports = {
 	mode: v,
