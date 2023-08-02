@@ -44,11 +44,12 @@ export function hide(grid: {
 		xs?: boolean | GridSize; sm?: boolean | GridSize;
 		md?: boolean | GridSize; lg?: boolean | GridSize; },
 		media: Media = {}) {
+	let {isXl, isLg, isMd, isSm, isXs} = media;
 	return (
-	 	grid.lg === false && media.isLg === true
-	 || grid.md === false && media.isMd === true && !!media.isLg === false
-	 || grid.sm === false && media.isSm === true && !!media.isMd === false
-	 || grid.xs === false && media.isXs === true && !!media.isSm === false
+	 	grid.lg === false && !isXl && (isLg || isMd || isSm || isXs)
+	 || grid.md === false && !isLg && !isXl && (isMd || isSm || isXs)
+	 || grid.sm === false && !isMd && !isLg && !isXl && (isSm || isXs)
+	 || grid.xs === false && !isSm && !isMd && !isLg && !isXl && isXs
 	);
 }
 

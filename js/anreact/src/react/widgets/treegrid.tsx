@@ -24,10 +24,10 @@ const styles = (theme: Theme) => ({
     "& :hover": { backgroundColor: "#ced" }
   },
   th: {
-	  textAlign: 'center' as const,
-	  paddingTop: '0.25em',
-	  paddingBottom: '0.25em',
-	  borderBottom: '1px solid #bcd',
+    textAlign: 'center' as const,
+    paddingTop: theme.spacing(1.25),
+    paddingBottom: theme.spacing(1),
+    borderBottom: '1px solid #bcd',
     BackgroundCollor: "#dde5ed"
   },
   thCell: {
@@ -101,6 +101,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
         .map( (col: AnTreegridCol, ix: number) => {
           if (col.thFormatter) return col.thFormatter(col, ix, {classes, media});
           if (col.type === 'actions') return (
+            hide(col.grid, media) ? undefined :
             <Grid item key={ix} {...col.grid} className={classes.thCell}>
               <Button onClick={(e) => opts.onThClick(e, ix)}
                 data-me={undefined} date-parent={undefined}
@@ -109,6 +110,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
               </Button>
             </Grid>);
           else return (
+            hide(col.grid, media) ? undefined :
             <Grid item key={ix} {...col.grid}>
               {col.label || col.field}
             </Grid>);

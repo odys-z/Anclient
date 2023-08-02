@@ -131,17 +131,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	static imgSrcReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) : string {
 
 		let {client, port} = opts;
-		// let {uri, port, client} = opts;
-
-		// let req = StreeTier
-		// 	.reqFactories[port]({uri, sk: ''})
-		// 	.A(AlbumReq.A.download) as AlbumReq;
-
-		// req.docId = pid;
-		// let msg = client.an.getReq<AlbumReq>(port, req);
 
 		let msg = getDownloadReq(pid, opts);
-
 		let jserv = client.an.servUrl(port);
 		return `${jserv}?anson64=${window.btoa( JSON.stringify(msg))}`;
 	}

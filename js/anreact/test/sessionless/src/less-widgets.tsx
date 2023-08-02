@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient, DatasetOpts, LogAct, AnDatasetResp } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreeditor2, Lightbox
+	jsample, JsonServs, Login, CrudComp, AnTreeditor, Lightbox
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 import { MuiThemeProvider } from '@material-ui/core/styles';
@@ -146,23 +146,25 @@ class Widgets extends React.Component<LessProps> {
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
                 {this.albumtier && Date().toString()}
 				<hr/>
-                {this.albumtier && <AnTreeditor2 key={this.albumSk}
+                {this.albumtier && <AnTreeditor key={this.albumSk}
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[ // noly card for folder header
-						{ type: 'text', field: 'folder', label: 'Photo Folders',
-						  grid: {sm: 6, md: 3} },
-						{ type: 'text', field: 'tags', label: L('Summary'),
-						  grid: {xs: false, sm: 6, md: 3} },
+						{ type: 'text', field: 'pname', label: 'Folder',
+						  grid: {sm: 6, md: 4} },
+						{ type: 'icon-sum', field: '', label: L('Summary'),
+						  grid: {sm: 6, md: 4} },
+						{ type: 'text', field: 'text', label: L('Tags'),
+						  grid: {sm: false, md: 3} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
 					lightbox={this.lightbox}
 					onSelectChange={undefined}
 				/>}
 				<hr/>
-				{this.albumtier && <AnTreeditor2 key={this.rolefuncsk}
+				{this.albumtier && <AnTreeditor key={this.rolefuncsk}
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tnode={this.albumtier.sysroot()} tier={this.albumtier}
@@ -221,6 +223,12 @@ class TestreeTier extends AlbumTier {
 		this.client = client;
 	}
 
+	/**
+	 * Override super.stree(), print responsed forest.
+	 * 
+	 * @param opts 
+	 * @param errCtx 
+	 */
 	override stree(opts: DatasetOpts & {act?: LogAct, uri?: string}, errCtx: ErrorCtx): void {
 		let onOk = opts.onOk;
 		opts.onOk = (resp: AnsonMsg<AnDatasetResp>) => {
