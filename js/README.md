@@ -51,3 +51,9 @@ The jsapmple server side is needed to login. (Docker image avialable)
 ## His Home page
 
 [It's here!](https://odys-z.github.io)
+
+# Credits
+
+* [PDF.js](https://github.com/mozilla/pdf.js)
+
+* [docx4j](https://www.docx4java.org/trac/docx4j)
