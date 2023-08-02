@@ -51,7 +51,7 @@ public class AlbumtierTest {
     public void testRefreshPage0() throws AnsonException,
     		GeneralSecurityException, IOException, TransException, InterruptedException {
 		mList = new ArrayList<SyncDoc>(1);
-		mList.add(new PhotoRec().create(testfile));
+		mList.add(new PhotoRec().createTest(testfile));
 		
 		// 1. create
 		onActivityCreate();

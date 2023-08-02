@@ -37,8 +37,8 @@ import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.PhotoRec;
-import io.oz.jserv.docsync.Synclientier;
 import io.oz.album.tier.PhotoMeta;
+import io.oz.jserv.docsync.Synclientier;
 
 /**
  * Photo client,
@@ -93,6 +93,8 @@ public class PhotoSyntier extends Synclientier {
 		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req);
 		return client.commit(q, errCtx);
 	}
+
+	public SessionClient client () { return this.client; }
 
 	/**
 	 * Get this user's settings from port album.less.
