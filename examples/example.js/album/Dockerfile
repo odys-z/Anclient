@@ -2,6 +2,8 @@ FROM nginx:stable-alpine
 
 COPY dist/* /usr/share/nginx/html/
 
+COPY ../../../../ever/products/album-web/index.html /usr/share/nginx/html/
+
 # then, mount with volume
 #
 # check the private/host.json didn't been included in /usr/share/nginx/html/

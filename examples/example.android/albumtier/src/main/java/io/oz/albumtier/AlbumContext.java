@@ -128,8 +128,6 @@ public class AlbumContext {
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
 
-        // state = ConnState.LoginFailed;
-
         Clients.init(jserv + "/" + jdocbase, verbose);
 
         tier = (PhotoSyntier) new PhotoSyntier(clientUri, photoUser.device, errCtx)

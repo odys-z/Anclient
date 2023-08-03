@@ -41,8 +41,7 @@ dependencies {
     implementation 'pub.devrel:easypermissions:3.0.0'
 
     implementation group: 'io.github.odys-z', name: 'semantic.jserv', version: "$jserv_ver"
-    implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver")
-//    implementation (group: 'io.github.odys-z', name: 'albumtier', version: "${albumtier_ver}") {
+    //    implementation (group: 'io.github.odys-z', name: 'albumtier', version: "${albumtier_ver}") {
 //        exclude group: "org.apache.tika", module: "tika-core"
 //        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
 //        changing = true;

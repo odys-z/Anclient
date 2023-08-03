@@ -105,7 +105,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
         singl = AlbumContext.getInstance(this);
-//        singl.appCtx = getApplicationContext();
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String homeName = sharedPref.getString(AlbumApp.keys.home, "");
@@ -225,7 +224,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         wv.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 // https://www.techyourchance.com/communication-webview-javascript-android/
-                wv.evaluateJavascript(String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd), null);
+                wv.evaluateJavascript(String.format("loadAlbum('%s', '%s');",
+                        client.ssInfo().uid(), pswd), null);
             }
         });
         wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
