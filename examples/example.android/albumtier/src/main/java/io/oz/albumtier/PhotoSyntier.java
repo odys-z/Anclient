@@ -1,12 +1,11 @@
 package io.oz.albumtier;
 
-import static io.odysz.common.LangExt.*;
+import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.isblank;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import io.odysz.anson.x.AnsonException;
@@ -25,9 +24,9 @@ import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
-import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
@@ -36,9 +35,8 @@ import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
-import io.oz.album.tier.PhotoRec;
 import io.oz.album.tier.PhotoMeta;
-import io.oz.jserv.docsync.Synclientier;
+import io.oz.album.tier.PhotoRec;
 
 /**
  * Photo client,
@@ -310,7 +308,6 @@ public class PhotoSyntier extends Synclientier {
 	/**
 	 * @param share one of {@link io.odysz.semantic.ext.DocTableMeta.Share Share}'s consts.
 	 * @return response
-	 */
 	public DocsResp insertPhoto(String collId, String localpath, String clientname, String share)
 			throws IOException, TransException, SQLException {
 		PhotoRec doc = (PhotoRec) new PhotoRec()
@@ -319,6 +316,7 @@ public class PhotoSyntier extends Synclientier {
 
 		return synInsertDoc(meta.tbl, doc, (SyncDoc d, AnsonResp resp) -> { } );
 	}
+	 */
 
 	/**
 	 * Asynchronously query synchronizing records.

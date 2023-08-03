@@ -32,7 +32,7 @@ dependencies {
 
     implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver")
     implementation (group: 'io.github.odys-z', name: 'album-lib', version: "${album_lib_ver}")
-    implementation (group: 'io.github.odys-z', name: 'docsync.jserv', version: "${jserv_ext_syncdoc}")
+//    implementation (group: 'io.github.odys-z', name: 'docsync.jserv', version: "${jserv_ext_syncdoc}")
 //    {
 //        exclude group: "org.apache.tika", module: "tika-core"
 //        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
