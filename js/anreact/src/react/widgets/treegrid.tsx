@@ -32,7 +32,8 @@ const styles = (theme: Theme) => ({
   },
   thCell: {
     margin: 'auto',
-    verticalAlgin: 'middle'
+    verticalAlign: 'middle',
+    textShadow: `${theme.spacing(0.5)}px ${theme.spacing(0.5)}px ${theme.spacing(1)}px #112244`
   },
   rowHead: {
     paddingRight: theme.spacing(1),
@@ -42,7 +43,7 @@ const styles = (theme: Theme) => ({
   },
   folder: { width: "100%" },
   folderHead: {
-    padding: theme.spacing(1),
+    paddingLeft: 0,
     paddingTop: 0,
     paddingBottom: 0,
     borderBottom: "1px solid #bcd",
@@ -112,7 +113,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
             </Grid>);
           else return (
             hide(col.grid, media) ? undefined :
-            <Grid item key={ix} {...col.grid}>
+            <Grid item key={ix} {...col.grid} className={classes.thCell}>
               {col.label || col.field}
             </Grid>);
           } )

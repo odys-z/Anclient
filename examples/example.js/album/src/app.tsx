@@ -221,7 +221,7 @@ export class App extends CrudCompW<AlbumProps> {
 					{ type: 'icon-sum', field: '',   label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'shareby',label: L('By'), grid: {sm: false, md: 3} },
 					// { type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
-					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 3, sm: 4} }
+					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 3, sm: 4, md: 3} }
 				]}
 				lightbox={this.lightbox}
 			/>) }
@@ -264,7 +264,6 @@ export class App extends CrudCompW<AlbumProps> {
 			ReactDOM.render(
 			  <App servs={json} servId={opts.serv || 'album'}
 				aid={aid} iportal={portal} iwindow={window}
-				// userid={'ody'} passwd={'123456'}
 				userid={uid} passwd={pswd}
 			  />, dom);
 		}

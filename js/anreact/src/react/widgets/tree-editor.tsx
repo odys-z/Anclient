@@ -44,7 +44,8 @@ const styles = (theme: Theme) => ({
   },
   thCell: {
     margin: 'auto',
-    verticalAlgin: 'middle'
+    verticalAlign: 'middle',
+    textShadow: `${theme.spacing(0.5)}px ${theme.spacing(0.5)}px ${theme.spacing(1)}px #112244`
   },
   rowHead: {
 	padding: theme.spacing(1),
