@@ -175,12 +175,20 @@ function levelIcons(iconNames: IndentIcons, lvls: IndentIconame[]) {
         </React.Fragment>);
 }
 
-function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentIconame, k: string | number) {
+function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentIconame, k: string | number, classes?: string) {
     let icon = AnTreeIcons[(iconNames || defltIcons)[name || 'deflt']]
             || AnTreeIcons[name]; // extend to all supported icons
     if (!icon)
         console.error(`Icon name, ${name}, is not one of supported names.`, defltIcons);
-    return React.cloneElement(icon, {key: k});
+
+	// icon 'pic-lib' is not exists
+	// if (!name)
+	//	return <div style={{paddingLeft: "8px"}}>{React.cloneElement(icon, {key:k})}</div>;
+	
+	if (classes)
+		return (<div className={classes}>{React.cloneElement(icon, {key:k})}</div>);
+	else
+		return React.cloneElement(icon, {key: k});
 }
 
 interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {

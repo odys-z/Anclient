@@ -6,7 +6,7 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
-	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW, AnContextType,
+	JsonServs, AnreactAppOptions, AnTreeditor, CrudCompW, AnContextType,
 	AnTreegridCol, Media, ClassNames, AnTreegrid
 } from '@anclient/anreact';
 import { GalleryTier } from './gallerytier-less';
@@ -211,17 +211,17 @@ export class App extends CrudCompW<AlbumProps> {
 					grid: {xs: false, sm: 2, md: 2}, thFormatter: this.switchDocMedias }
 				]}
 			/> :
-		    <AnTreeditor2 {... this.props} reload={!this.state.showingDocs}
+		    <AnTreeditor {... this.props} reload={!this.state.showingDocs}
 				pk={'pid'} sk={this.albumsk}
 				tier={this.albumtier} tnode={this.albumtier.root()} title={this.albumtier.albumTitle}
 				onSelectChange={() => undefined}
 				uri={this.uri}
 				columns={[
-					{ type: 'text', field: 'folder', label: 'Folders', grid: {sm: 4, md: 3} },
-					{ type: 'text', field: 'tags',   label: L('Summary'), grid: {sm: 4, md: 3} },
+					{ type: 'text', field: 'pname', label: 'Folders', grid: {xs: 5, sm: 4, md: 3} },
+					{ type: 'icon-sum', field: '',   label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'shareby',label: L('By'), grid: {sm: false, md: 3} },
 					// { type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
-					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 4, sm: 3} }
+					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 3, sm: 4} }
 				]}
 				lightbox={this.lightbox}
 			/>) }

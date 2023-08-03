@@ -12,16 +12,14 @@
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <script src="./Album-0.1.5.min.js" type="text/javascript"></script>
   <script>
-	let searchParams = new URLSearchParams(window.location.search)
-	let aid = searchParams ? searchParams.get('album') : 'a-002';
-	let serv = searchParams ? searchParams.get('serv') : 'host';
+    let searchParams = new URLSearchParams(window.location.search)
+    let aid = searchParams ? searchParams.get('album') : 'album-landing';
+    let serv = searchParams ? searchParams.get('serv') : 'landing';
 
-  function loadAlbum(uid, pswd) {
-    // alert(typeof album.App.bindHtml);
-    album.App.bindHtml('app', {uid, pswd,
-      aid, serv, Window, portal: 'index.html'});
-  }
-
+    function loadAlbum(uid, pswd) {
+      album.App.bindHtml('app', {uid, pswd,
+        aid, serv, Window, portal: 'index.html'});
+    }
   </script>
 </body>
 </html>

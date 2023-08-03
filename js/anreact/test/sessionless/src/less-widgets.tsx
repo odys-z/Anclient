@@ -153,7 +153,7 @@ class Widgets extends React.Component<LessProps> {
 					pk={'NA'} sk={this.albumSk}
 					columns={[ // noly card for folder header
 						{ type: 'text', field: 'pname', label: 'Folder',
-						  grid: {sm: 6, md: 4} },
+						  grid: {xs: 6, sm: 6, md: 4} },
 						{ type: 'icon-sum', field: '', label: L('Summary'),
 						  grid: {sm: 6, md: 4} },
 						{ type: 'text', field: 'text', label: L('Tags'),

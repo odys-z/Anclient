@@ -62,9 +62,13 @@ export interface ErrorCtx {
  * Should be a valid HTML5 input type. (extended with enum, select)
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
  * 
- * - dynamic-cbb' type is a combobox changing code/value options for each row.
+ * - dynamic-cbb: column / cell is a combobox changing code/value options for each row.
+ * 
+ * - icon-sum   : column / cell is formatted by hard coded formatters,
+ * 
+ *		for anreact/src/react/widgets/tree-editor/TreeGallaryComp [columns], the cell is formatted by formatFolderIcons().
  */
-export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'iconame' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+export type ColType = 'formatter' | 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'iconame' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'icon-sum';
 
 export interface TierCol extends DbCol {
 	/**
@@ -79,7 +83,7 @@ export interface TierCol extends DbCol {
 	 * Activated style e.g. invalide style, and is different form AnlistColAttrs.css
      * TODO: style?: 'maxLen' | 'notNull' | 'ok';// any; //string;
 	 */
-    style?: string;
+    style?: any;
 
 	validator?: AnFieldValidator | AnFieldValidation;
 

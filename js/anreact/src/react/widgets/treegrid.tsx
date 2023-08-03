@@ -35,7 +35,8 @@ const styles = (theme: Theme) => ({
     verticalAlgin: 'middle'
   },
   rowHead: {
-    padding: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    paddingLeft: 0,
     paddingTop: 0,
     paddingBottom: 0,
   },
