@@ -201,7 +201,7 @@ export class App extends CrudCompW<AlbumProps> {
 				tier={this.albumtier}
 				columns={[
 				  { type: 'iconame', field: 'pname', label: L('Name'),
-					grid: {sm: 6, md: 5} },
+					grid: {xs: 6, sm: 6, md: 5} },
 				  { type: 'text', field: 'mime', label: L('type'),
 					colFormatter: typeParser, // Customize a cell
 					grid: {xs: 1} },
