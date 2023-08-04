@@ -3,4 +3,4 @@ docker volume rm album-web.host
 docker volume create album-web.host
 sudo cp dist/private/host.json /var/lib/docker/volumes/album-web.host/_data
 
-docker run --mount source=album-web.host,target=/usr/share/nginx/html/private -p 127.0.0.1:8802:80 --name album-web --rm -d odysz/album-web:0.1.2
+docker run --mount source=album-web.host,target=/usr/share/nginx/html/private -p 127.0.0.1:8802:80 --name album-web --rm -d odysz/album-web:0.2.0
