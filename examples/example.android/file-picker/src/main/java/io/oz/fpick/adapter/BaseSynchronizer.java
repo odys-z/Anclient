@@ -25,12 +25,13 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
-import io.oz.jserv.docsync.SyncFlag;
+//import io.oz.jserv.docsync.SyncFlag;
 
 import static io.odysz.common.LangExt.isblank;
 
@@ -113,10 +114,9 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
             mContext.onStartingJserv(0, 1);
             if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
                 startSynchQuery(synchPage);
-            else {
-            singleton.login((r) -> startSynchQuery(synchPage),
+            else
+                singleton.login((c) -> startSynchQuery(synchPage),
                     singleton.errCtx);
-            }
         } catch (GeneralSecurityException e) {
             singleton.errCtx.err(AnsonMsg.MsgCode.exSession, e.getMessage());
         } catch (SemanticException e) {
@@ -150,7 +150,7 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
                     String[] inf = phts.get(f.fullpath());
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
-                    f.syncFlag = isblank(inf[0]) ? SyncFlag.hub : inf[0];
+                    f.syncFlag = isblank(inf[0]) ? SyncDoc.SyncFlag.hub : inf[0];
 
                     f.shareflag = inf[1];
                     f.shareby = inf[2];

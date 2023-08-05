@@ -37,9 +37,10 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import io.odysz.common.Utils;
+import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
-import io.oz.jserv.docsync.SyncFlag;
+//import io.oz.jserv.docsync.SyncFlag;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static io.odysz.common.LangExt.isblank;

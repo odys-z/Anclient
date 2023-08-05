@@ -25,9 +25,10 @@ import com.vincent.filepicker.filter.entity.AudioFile;
 
 import java.util.ArrayList;
 
+import io.odysz.semantic.tier.docs.SyncDoc;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
-import io.oz.jserv.docsync.SyncFlag;
+//import io.oz.jserv.docsync.SyncFlag;
 
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
     public AudioPickAdapter(BaseActivity ctx, ArrayList<AudioFile> list, int max) {
@@ -63,13 +64,13 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         }
 
         holder.mTvDuration.setText(Util.getDurationString(file.getDuration()));
-        if (SyncFlag.priv.equals(file.syncFlag)) {
+        if (SyncDoc.SyncFlag.priv.equals(file.syncFlag)) {
             holder.mCbx.setSelected ( false );
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
             holder.icSynced.setVisibility(View.VISIBLE);
         }
-        else if (SyncFlag.publish.equals(file.syncFlag) || SyncFlag.hub.equals(file.syncFlag)) {
+        else if (SyncDoc.SyncFlag.publish.equals(file.syncFlag) || SyncDoc.SyncFlag.hub.equals(file.syncFlag)) {
             holder.mCbx.setSelected(true);
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);

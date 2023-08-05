@@ -7,7 +7,6 @@ import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
-import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
@@ -122,7 +121,7 @@ public class AlbumContext {
      * @throws AnsonException
      * @throws IOException
      */
-    AlbumContext login(String uid, String pswd, OnLogin onOk, OnError onErr)
+    AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
@@ -144,7 +143,7 @@ public class AlbumContext {
         return this;
     }
 
-    public void login(OnLogin onOk, OnError onErr)
+    public void login(Clients.OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
         login(photoUser.uid(), pswd, onOk, onErr);
     }

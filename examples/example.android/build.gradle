@@ -12,22 +12,22 @@ buildscript {
 
 allprojects {
     ext {
-        app_ver = "0.2.1"
+        app_ver = "0.2.2"
         appcompat_version = "1.4.1"
         glide_version = "4.12.0"
         bm_photoview_version = "1.4.1"
-        anclient_ver = "0.5.0-SNAPSHOT"
-        jserv_ver = "1.5.0-SNAPSHOT"
-        jserv_ext_syncdoc = "0.1.50-SNAPSHOT"
-        album_lib_ver = "0.5.0-SNAPSHOT"
+        anclient_ver = "0.4.26"
+        jserv_ver = "1.4.25"
+        album_lib_ver = "0.4.27"
     }
 
     repositories {
-        mavenLocal()
-        mavenCentral()
+//        mavenLocal()
+        mavenCentral(){ mavenContent { releasesOnly() } }
         google()
         jcenter()
-        maven() { url "https://oss.sonatype.org/content/repositories/snapshots" }
+//        maven() { url "https://oss.sonatype.org/content/repositories/snapshots"
+//        }
     }
 }
 
