@@ -199,7 +199,7 @@ public class PhotoSyntier extends Synclientier {
 		String[] act = AnsonHeader.usrAct("synclient.java", "sync", "c/sync", "push blocks");
 		AnsonHeader header = client.header().act(act);
 
-		List<DocsResp> reslts = new ArrayList<DocsResp>(videos.size());
+		List<DocsResp> reslts = new ArrayList<>(videos.size());
 
 		for ( int px = 0; px < videos.size(); px++ ) {
 
@@ -209,15 +209,14 @@ public class PhotoSyntier extends Synclientier {
 
 			SyncDoc p = videos.get(px);
 			fileProvider.meta(p);
-			DocsReq req = (AlbumReq) new AlbumReq(uri)
-					// .folder(p.folder())
+			DocsReq req = new AlbumReq(uri)
 					.folder(fileProvider.saveFolder())
 					.share(p)
 					.device(user.device)
 					.resetChain(true)
 					.blockStart(p, user);
 
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+			AnsonMsg<DocsReq> q = client.userReq(uri, AlbumPort.album, req)
 									.header(header);
 
 			try {
@@ -244,7 +243,7 @@ public class PhotoSyntier extends Synclientier {
 					req = new AlbumReq(tbl).blockUp(seq, p, b64, user);
 					seq++;
 
-					q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+					q = client.userReq(uri, AlbumPort.album, req)
 							.header(header);
 
 					respi = client.commit(q, errHandler);
@@ -252,7 +251,7 @@ public class PhotoSyntier extends Synclientier {
                 
 				req = new AlbumReq(tbl).blockEnd(respi, user);
 
-				q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+				q = client.userReq(uri, AlbumPort.album, req)
 							.header(header);
 				respi = client.commit(q, errHandler);
 				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);

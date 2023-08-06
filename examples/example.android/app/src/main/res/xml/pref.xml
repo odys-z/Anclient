@@ -5,11 +5,13 @@
         android:id="@+id/pref_home_regist"
         >
         <EditTextPreference
+            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:enabled="false"
             android:defaultValue="home"
             android:key="@string/key_home"
             android:title="@string/home_title" />
         <EditTextPreference
+            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:enabled="false"
             android:key="@string/key_device"
             android:summary="@string/txt_only_once"
@@ -23,16 +25,19 @@
         android:id="@+id/id_login_cate"
         >
         <EditTextPreference
+            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:defaultValue="@string/jserv_default"
             android:key="@string/jserv_key"
             android:summary="@string/jserv"
             android:title="@string/jserv_title" />
         <EditTextPreference
+            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:key="@string/userid_key"
             android:defaultValue=""
             android:summary="@string/userid_summery"
             android:title="@string/userid_title" />
         <EditTextPreference
+            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:key="@string/pswd_key"
             android:inputType="textPassword"
             android:defaultValue=""

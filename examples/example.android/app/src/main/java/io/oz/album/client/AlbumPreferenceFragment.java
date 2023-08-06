@@ -6,6 +6,9 @@ import android.app.Activity;
 import android.app.AutomaticZenRule;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,19 +24,17 @@ import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.albumtier.AlbumContext;
 
-public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
-    Preference btnLogin;
+/**
+ * <h4>Preference Fragment</h4>
+ * <a href='https://stackoverflow.com/a/15612006/7362888'>
+ * This class shouldn't have a constructor,</a> to prevent exception when restore state (turn over screen).
+ */
+public class AlbumPreferenceFragment extends PreferenceFragmentCompat { Preference btnLogin;
     Preference summery;
     Preference homepref;
     EditTextPreference device;
     Preference btnRegist;
     PreferenceCategory cateHome;
-
-    Activity ctx;
-
-    public AlbumPreferenceFragment(PrefsContentActivity ctx) {
-        this.ctx = ctx;
-    }
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
