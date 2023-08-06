@@ -16,4 +16,5 @@ node_modules
 **/*.back.*
 private
 _build
+album/products
 package-lock.json

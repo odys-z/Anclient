@@ -44,7 +44,9 @@ dependencies {
 //        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
 //        changing = true;
 //    }
-    implementation (group: 'io.github.odys-z', name: 'docsync.jserv', version: "${jserv_ext_syncdoc}")
+
+//    implementation (group: 'io.github.odys-z', name: 'docsync.jserv', version: "${jserv_ext_syncdoc}")
+    implementation 'androidx.documentfile:documentfile:1.0.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

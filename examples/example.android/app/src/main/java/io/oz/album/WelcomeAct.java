@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
@@ -27,6 +28,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
 
 import com.vincent.filepicker.Constant;
@@ -40,11 +42,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
+import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -57,6 +65,7 @@ import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.IFileProvider;
+import io.oz.albumtier.Plicies;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.activity.BaseActivity;
@@ -75,6 +84,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,12 +106,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         singl = AlbumContext.getInstance(this);
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String homeName = sharedPref.getString(AlbumApp.keys.home, "");
         String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
         String device = sharedPref.getString(AlbumApp.keys.device, "");
         String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
-        String homepage = sharedPref.getString(AlbumApp.keys.homepage, "https://192.160.0.93:8888");
+        String homepage = sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing));
 
         singl.init(homeName, uid, device, jserv);
         AssetHelper.init(this, jserv, homepage);
@@ -116,67 +126,109 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         if (pickMediaStarter == null)
             pickMediaStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            if (singl.state() == AlbumContext.ConnState.Online) {
-                                onMediasPicked(result);
-                            } else showMsg(R.string.msg_ignored_when_offline);
-                        }
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        if (singl.state() == AlbumContext.ConnState.Online) {
+                            onMediasPicked(result);
+                        } else showMsg(R.string.msg_ignored_when_offline);
+                    }
+                    // WebView wv = findViewById(R.id.wv_welcome);
+                    // wv.reload();
+                    reloadAlbum();
+                });
 
         if (pickFileStarter == null)
             pickFileStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            if (singl.state() == AlbumContext.ConnState.Online) {
-                                onFilesPicked(result);
-                            } else showMsg(R.string.msg_ignored_when_offline);
-                        }
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        if (singl.state() == AlbumContext.ConnState.Online) {
+                            onFilesPicked(result);
+                        } else showMsg(R.string.msg_ignored_when_offline);
+                    }
+                    reloadAlbum();
+                });
 
         if (prefStarter == null)
             prefStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            showMsg(R.string.msg_device_uid, uid, device);
-                            WebView wv = findViewById(R.id.wv_welcome);
-                            wv.reload();
-                        }
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        showMsg(R.string.msg_device_uid, uid, device);
+                    }
+                    // WebView wv = findViewById(R.id.wv_welcome);
+                    // wv.reload();
+                    reloadAlbum();
+                });
 
         if (helpActStarter == null)
             helpActStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        WebView wv = findViewById(R.id.wv_welcome);
-                        wv.reload();
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // WebView wv = findViewById(R.id.wv_welcome);
+                    // wv.reload();
+                    reloadAlbum();
+                });
 
         try {
             if (singl.needSetup())
                 // settings are cleared
                 startPrefsAct();
-            else singl
-                    .pswd(sharedPref.getString(AlbumApp.keys.pswd, ""))
-                    .login((client) -> {
+            else {
+                String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
+                singl.pswd(pswd)
+                     .login((client) -> {
                         // All WebView methods must be called on the same thread.
                         runOnUiThread(() -> {
+                            /*
                             final VWebAlbum webView = new VWebAlbum();
                             WebView wv = findViewById(R.id.wv_welcome);
                             wv.setWebViewClient(webView);
                             WebSettings webSettings = wv.getSettings();
                             webSettings.setJavaScriptEnabled(true);
                             webSettings.setDomStorageEnabled(true);
+
+                            wv.setWebViewClient(new WebViewClient() {
+                                public void onPageFinished(WebView view, String url) {
+                                    // https://www.techyourchance.com/communication-webview-javascript-android/
+                                    wv.evaluateJavascript(String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd), null);
+                                }
+                            });
                             wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
+                             */
+                            reloadAlbum();
                         });
                     },
                     (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
+            }
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
         }
+    }
+
+    void reloadAlbum () {
+        SessionClient client = singl.tier.client();
+        if (client == null || sharedPref == null)
+            return;
+
+        String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
+
+        WebView wv = findViewById(R.id.wv_welcome);
+        final VWebAlbum webView = new VWebAlbum();
+        wv.setWebViewClient(webView);
+        WebSettings webSettings = wv.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+
+        wv.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                // https://www.techyourchance.com/communication-webview-javascript-android/
+                wv.evaluateJavascript(String.format("loadAlbum('%s', '%s');",
+                        client.ssInfo().uid(), pswd), null);
+            }
+        });
+        wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
     }
 
     /**
@@ -239,10 +291,30 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     showMsg(R.string.txt_please_login);
                 else
                     singl.tier.fileProvider(new IFileProvider() {
+                        private String saveFolder;
+
                         @Override
                         public long meta(SyncDoc f) throws IOException {
-                            f.size = new File(f.fullpath()).length();
+                            File file = new File(f.fullpath());
+                            f.size = file.length();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+
+                                FileTime d = attr.creationTime();
+                                f.cdate(d);
+                                saveFolder = DateFormat.formatYYmm(d);
+                            }
+                            else {
+                                Date d = new Date(file.lastModified());
+                                f.cdate(d);
+                                saveFolder = DateFormat.formatYYmm(d);
+                            }
                             return f.size;
+                        }
+
+                        @Override
+                        public String saveFolder() {
+                            return saveFolder;
                         }
 
                         @Override
@@ -294,6 +366,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     // verifyStoragePermissions(this);
                     // askDirectoriesPermissions(this);
                     singl.tier.fileProvider(new IFileProvider() {
+                        private String saveFolder;
+                        private Plicies policies = singl.policies;
+
                         // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                         @Override
                         public long meta(SyncDoc f) {
@@ -306,8 +381,17 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 f.clientname(returnCursor.getString(nameIndex));
                                 f.size = returnCursor.getLong(sizeIndex);
                                 f.mime = getContentResolver().getType(returnUri);
+
+                                Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
+                                f.cdate(lastmodify);
+                                saveFolder = DateFormat.formatYYmm(lastmodify);
                                 return f.size;
                             }
+                        }
+
+                        @Override
+                        public String saveFolder() {
+                            return saveFolder;
                         }
 
                         // https://developer.android.com/training/data-storage/shared/documents-files#input_stream

@@ -124,13 +124,13 @@ public class AnsonClientTest {
 			throws SemanticException, IOException, SQLException, AnsonException {
 		if (!jserv.contains("jserv-sample")) {
 			Utils.warn("getEcho() can only work with jsample");
-			return;
+			Utils.warn(jserv);
 		}
 		EchoReq req = new EchoReq(null);
 
 		String t = "menu";
 		String[] act = AnsonHeader.usrAct("SemanticClientTest", "init", t,
-				"test jclient.java loading menu from menu.sample");
+				"test jclient.java getEcho()");
 		AnsonHeader header = client.header().act(act);
 
 		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq("test/echo", Port.echo, req);
@@ -152,7 +152,6 @@ public class AnsonClientTest {
 		((AnUpdateReq) jmsg.body(0))
 			.nv("nationId", "CN")
 			.whereEq("userId", "admin")
-			// .post(((UpdateReq) new UpdateReq(null, "a_attach")
 			.post(AnUpdateReq
 				.formatDelReq(furi, null, "a_attaches")
 				.whereEq("busiTbl", "a_users")
@@ -161,7 +160,7 @@ public class AnsonClientTest {
 					.formatInsertReq(furi, null, "a_attaches")
 					.cols("attName", "busiId", "busiTbl", "uri")
 					.nv("attName", "'s Portrait")
-					// The parent pk can't be resulved, we must provide the value.
+					// The parent pk can't be resulved, we must provide the value. FIXME
 					// See https://odys-z.github.io/notes/semantics/best-practices.html#fk-ins-cate
 					.nv("busiId", "admin")
 					.nv("busiTbl", "a_users")
@@ -170,7 +169,6 @@ public class AnsonClientTest {
 		jmsg.header(client.header());
 
 		AnsonResp resp = client.commit(jmsg, errCtx);
-		// String obj = ((SemanticObject) resp.data().get("resulved")).resulve("a_attaches", "");
 		String aid = resp.resulvedata("a_attaches", "attId");
 
 		assertTrue( Radix64.validate(aid) );

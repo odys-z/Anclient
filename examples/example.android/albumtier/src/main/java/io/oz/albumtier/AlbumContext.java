@@ -7,7 +7,6 @@ import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
-import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
@@ -20,6 +19,7 @@ import io.oz.album.tier.Profiles;
 public class AlbumContext {
     public boolean verbose = true;
     public Profiles profiles;
+    public Plicies policies;
 
     public enum ConnState { Online, Disconnected, LoginFailed }
 
@@ -27,9 +27,9 @@ public class AlbumContext {
 
     public static final String jdocbase  = "jserv-album";
 
-    public final String clientUri = "album.and";
+    public static final String clientUri = "album.and";
 
-    public OnError errCtx; // = new AndErrorCtx();
+    public OnError errCtx;
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
@@ -59,8 +59,6 @@ public class AlbumContext {
     }
 
     String jserv;
-
-//    public String homeName;
 
     public PhotoSyntier tier;
 
@@ -121,13 +119,12 @@ public class AlbumContext {
      * @throws AnsonException
      * @throws IOException
      */
-    AlbumContext login(String uid, String pswd, OnLogin onOk, OnError onErr)
+    @SuppressWarnings("deprecation")
+	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
-
-        // state = ConnState.LoginFailed;
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 
@@ -145,7 +142,7 @@ public class AlbumContext {
         return this;
     }
 
-    public void login(OnLogin onOk, OnError onErr)
+    public void login(Clients.OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
         login(photoUser.uid(), pswd, onOk, onErr);
     }

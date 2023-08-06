@@ -1,12 +1,11 @@
 package io.oz.albumtier;
 
-import static io.odysz.common.LangExt.*;
+import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.isblank;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import io.odysz.anson.x.AnsonException;
@@ -25,9 +24,9 @@ import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
-import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
@@ -36,9 +35,8 @@ import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
-import io.oz.album.tier.PhotoRec;
 import io.oz.album.tier.PhotoMeta;
-import io.oz.jserv.docsync.Synclientier;
+import io.oz.album.tier.PhotoRec;
 
 /**
  * Photo client,
@@ -93,6 +91,8 @@ public class PhotoSyntier extends Synclientier {
 		AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req);
 		return client.commit(q, errCtx);
 	}
+
+	public SessionClient client () { return this.client; }
 
 	/**
 	 * Get this user's settings from port album.less.
@@ -208,8 +208,10 @@ public class PhotoSyntier extends Synclientier {
 			int totalBlocks = 0;
 
 			SyncDoc p = videos.get(px);
+			fileProvider.meta(p);
 			DocsReq req = (AlbumReq) new AlbumReq(uri)
-					.folder(p.folder())
+					// .folder(p.folder())
+					.folder(fileProvider.saveFolder())
 					.share(p)
 					.device(user.device)
 					.resetChain(true)
@@ -221,9 +223,6 @@ public class PhotoSyntier extends Synclientier {
 			try {
 				startAck = client.commit(q, errHandler);
 
-				if (fileProvider == null)
-					throw new SemanticException("Needing a file provider to accesse file %s.", p.clientname());
-				fileProvider.meta(p);
 				String pth = p.fullpath();
 				if (!pth.equals(startAck.doc.fullpath()))
 					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.doc.fullpath());
@@ -277,16 +276,6 @@ public class PhotoSyntier extends Synclientier {
 							e.printStackTrace();
 						} } ).start();
 				}
-
-//				try {
-//					req = new AlbumReq(tbl).blockEnd(respi, user);
-//					AnsonMsg<DocsReq> abt = client.<DocsReq>userReq(uri, AlbumPort.album, req)
-//							.header(header);
-//
-//					respi = client.commit(abt, errHandler);
-//				}
-//				catch (Exception e) {}
-
 				if (ex instanceof IOException)
 					continue;
 				else errHandler.err(MsgCode.exGeneral, ex.getMessage(), ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
@@ -309,7 +298,6 @@ public class PhotoSyntier extends Synclientier {
 	/**
 	 * @param share one of {@link io.odysz.semantic.ext.DocTableMeta.Share Share}'s consts.
 	 * @return response
-	 */
 	public DocsResp insertPhoto(String collId, String localpath, String clientname, String share)
 			throws IOException, TransException, SQLException {
 		PhotoRec doc = (PhotoRec) new PhotoRec()
@@ -318,6 +306,7 @@ public class PhotoSyntier extends Synclientier {
 
 		return synInsertDoc(meta.tbl, doc, (SyncDoc d, AnsonResp resp) -> { } );
 	}
+	 */
 
 	/**
 	 * Asynchronously query synchronizing records.

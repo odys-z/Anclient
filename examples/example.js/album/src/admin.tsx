@@ -5,8 +5,7 @@ import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclien
 
 import { L, Langstrs,
 	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
-	AnTreeditor2,
-	Comprops, CrudCompW, ConfirmDialog
+	AnTreeditor, Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
 import { AlbumAdminTier } from './admin-tier';
 
@@ -102,7 +101,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
-		  <AnTreeditor2 {... this.props}
+		  <AnTreeditor {... this.props}
 			pk={'pid'}
 			sk={Protocol.sk.collectree} tnode={this.tier.root()}
 			onSelectChange={ids => undefined}

@@ -29,4 +29,16 @@ public interface IFileProvider {
      * @return readable stream
      */
     InputStream open(SyncDoc f) throws FileNotFoundException;
+
+    /**
+     * Resolve the initial folder (with Policies).
+     *
+     * Currently, the save folder policy is simple last modified date for documents and creating date
+     * for medias if API version later than Build.VERSION_CODES.O, otherwise use last modified.
+     * (Audio file in Andriod is named with date string).
+     *
+     * @since 0.2.1 (Albumtier)
+     * @return initial folder to save the file at server side
+     */
+    String saveFolder();
 }

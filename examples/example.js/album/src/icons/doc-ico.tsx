@@ -1,5 +1,5 @@
 import React from "react";
-import { AnTreegridCol, ClassNames, regex } from "@anclient/anreact";
+import { AnTreegridCol, ClassNames, Media, regex, svgImgSrc } from "@anclient/anreact";
 import { AnTreeNode } from '@anclient/semantier';
 import { z7 } from "./7zip";
 import { img } from "./image";
@@ -10,6 +10,7 @@ import { ppt } from "./ppt";
 import { pdf } from "./pdf";
 import { txt } from "./txt";
 import { unknown } from "./unknown";
+import { toggle } from "./toggle";
 
 const knownBlobs = {
     image: img, video: video,
@@ -35,8 +36,16 @@ export class DocIcon {
 		else t = unknown;
 
         if (!this.buf.hasOwnProperty(src))
-            this.buf[src] = new Blob([t], {type: 'image/svg+xml'});
+            // this.buf[src] = new Blob([t], {type: 'image/svg+xml'});
+            this.buf[src] = svgImgSrc(t);
 
-        return (<img className={opts.classes.icon} src={URL.createObjectURL(this.buf[src])}></img>);
+        // return (<img className={opts.classes.icon} src={URL.createObjectURL(this.buf[src])}></img>);
+        return (<img className={opts.classes.icon} src={this.buf[src]}></img>);
+    }
+
+    toggleButton(opts: {classes?: ClassNames, media?: Media} = {}) {
+        if (!this.buf.toggle)
+            this.buf.toggle = new Blob([toggle], {type: 'image/svg+xml'});
+        return (<img className={opts.classes?.toggle} src={URL.createObjectURL(this.buf.toggle)}></img>);
     }
 }

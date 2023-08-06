@@ -48,4 +48,23 @@ TRecordForm Formatter
 Treegrid Cell Formatter
 -----------------------
 
-TODO ...
+Called by Treegrid#render().
+
+.. _api_widgets_tree:
+
+Signature defined in `tree.tsx <https://github.com/odys-z/Anclient/blob/master/js/anreact/src/react/widgets/tree.tsx>`_:
+
+.. code-block:: typescript
+
+    interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
+        /**
+         * Overide AnTablistProps#formatter
+         * Formatt a tree item cell/grid from col and node.
+         */
+        colFormatter?: (col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts) => JSX.Element;
+
+        thFormatter?: (col: AnTreegridCol, colx: number, opts?: CompOpts) => JSX.Element;
+    }
+..
+
+For the example, see :ref:`Doc type parser<controls_typeparser>`.

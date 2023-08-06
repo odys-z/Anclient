@@ -283,3 +283,64 @@ Code snipet of [6]:
         return pdfList;
     }
 ..
+
+Nginx Request Size Limit
+------------------------
+
+About the issue
+_______________
+
+Nginx reverse proxy by default will limit the request's body size [#ref1]_, which will result in failure of pushing blocks.
+Block size currently is a hard coded parameter. Returned http code for this is 413 [#ref2]. 
+
+TODO: Best Practice
+___________________
+
+Multiple Nginx proxy example [#ref3]:
+
+.. code-block:: json
+
+    http {
+        # Server B
+        server {
+            listen 127.0.0.1:5001;
+            server_name 127.0.0.1;
+
+            location / {
+                proxy_pass http://127.0.0.1:5000;
+            }
+        }
+
+        # Server A
+        server {
+            listen 4999;
+            server_name domain.com;
+
+            location / {
+                proxy_pass http://127.0.0.1:5001;
+                proxy_set_header  X-Forwarded-User 'username';
+            }
+        }
+    }
+..
+
+Resposnse Header::
+
+    GET / HTTP/1.0
+    Host: 127.0.0.1:5000
+    Connection: close
+    ...
+    X-Forwarded-User: username
+    User-Agent: curl/7.58.0
+    Accept: */*
+    X-size: 20M
+    X-size: 30M
+    ...
+
+.. https://www.scm.com/doc/Metadocumentation/ReST_overview.html#citations-references
+
+.. [#ref1] `Request Body Size Limit <https://docs.nginx.com/nginx-management-suite/acm/how-to/policies/request-body-size-limit/>`_
+
+.. [#ref2] `413 Content Too Large, MDN <https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413>`_
+
+.. [#ref3] `Nginx proxy_pass through 2 servers and and custom headers <https://stackoverflow.com/q/60591298/7362888>`_

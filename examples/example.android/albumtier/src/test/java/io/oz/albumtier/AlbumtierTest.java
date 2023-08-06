@@ -34,7 +34,7 @@ import io.oz.album.tier.PhotoRec;
 import io.oz.albumtier.AlbumContext.ConnState;
 
 /**
- * @deprecated only for MVP (0.2.1)
+ * @deprecated only for MVP (0.2.x)
  * @author Ody
  */
 public class AlbumtierTest {
@@ -51,7 +51,7 @@ public class AlbumtierTest {
     public void testRefreshPage0() throws AnsonException,
     		GeneralSecurityException, IOException, TransException, InterruptedException {
 		mList = new ArrayList<SyncDoc>(1);
-		mList.add(new PhotoRec().create(testfile));
+		mList.add(new PhotoRec().createTest(testfile));
 		
 		// 1. create
 		onActivityCreate();
@@ -100,6 +100,11 @@ public class AlbumtierTest {
 			@Override
 			public InputStream open(SyncDoc pht) throws FileNotFoundException {
 				return new FileInputStream(pht.fullpath());
+			}
+
+			@Override
+			public String saveFolder() {
+				return "syrskyi";
 			}});
 	}
 

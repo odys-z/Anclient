@@ -1,17 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp, 
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 	AnTreeNode, ErrorCtx, an, SessionClient
 } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
-	JsonServs, AnreactAppOptions, AnTreeditor2, CrudCompW, AnContextType,
+	JsonServs, AnreactAppOptions, AnTreeditor, CrudCompW, AnContextType,
 	AnTreegridCol, Media, ClassNames, AnTreegrid
 } from '@anclient/anreact';
 import { GalleryTier } from './gallerytier-less';
 import { Button, Grid } from '@material-ui/core';
-import { JsampleIcons } from '@anclient/anreact/src/jsample/styles';
 import { DocIcon } from './icons/doc-ico';
 
 type AlbumProps = {
@@ -119,7 +118,7 @@ export class App extends CrudCompW<AlbumProps> {
 			that.albumtier = new GalleryTier({uri: this.uri, comp: this, client});
 			that.toSearch();
 		}
-	
+
 		console.warn("Auto login with configured userid & passwd.",
 					 hosturl, userid, passwd);
 		an.init ( hosturl );
@@ -135,7 +134,7 @@ export class App extends CrudCompW<AlbumProps> {
 		tier.stree({ uri: this.uri,
 			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
-				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[]; 
+				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[];
 				console.log(tier.forest);
 				that.setState({});
 			}},
@@ -149,12 +148,15 @@ export class App extends CrudCompW<AlbumProps> {
 		return (
 			<Grid item key={ix as number} {...col.grid}>
 			<Button onClick={onToggle}
-				startIcon={<JsampleIcons.ThirdStateCheck />} color="primary" >
+				className={opts?.classes?.toggle}
+				startIcon={that.docIcon.toggleButton(opts)}
+				// startIcon={<JsampleIcons.ThirdStateCheck />}
+				color="primary" >
 				{opts?.media?.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
 			</Button>
 			</Grid> );
 
-		function onToggle(e: React.MouseEvent) {
+		function onToggle(_e: React.MouseEvent) {
 			that.state.showingDocs = !that.state.showingDocs;
 			that.toSearch();
 		}
@@ -198,9 +200,10 @@ export class App extends CrudCompW<AlbumProps> {
 				pk={''} onSelectChange={()=>{}}
 				tier={this.albumtier}
 				columns={[
-				  { type: 'iconame', field: 'pname', label: L('Name'),
-					grid: {sm: 6, md: 5} },
-				  { type: 'text', field: 'mime', label: L('type'), colFormatter: typeParser,
+				  { type: 'iconame', field: 'pname', label: L('File Name'),
+					grid: {xs: 6, sm: 6, md: 5} },
+				  { type: 'text', field: 'mime', label: L('type'),
+					colFormatter: typeParser, // Customize a cell
 					grid: {xs: 1} },
 				  { type: 'text', field: 'shareby', label: L('share by'),
 					grid: {xs: false, sm: 3, md: 2} },
@@ -208,17 +211,17 @@ export class App extends CrudCompW<AlbumProps> {
 					grid: {xs: false, sm: 2, md: 2}, thFormatter: this.switchDocMedias }
 				]}
 			/> :
-		    <AnTreeditor2 {... this.props} reload={!this.state.showingDocs}
+		    <AnTreeditor {... this.props} reload={!this.state.showingDocs}
 				pk={'pid'} sk={this.albumsk}
 				tier={this.albumtier} tnode={this.albumtier.root()} title={this.albumtier.albumTitle}
 				onSelectChange={() => undefined}
 				uri={this.uri}
 				columns={[
-					{ type: 'text', field: 'folder', label: 'Folders', grid: {sm: 4, md: 3} },
-					{ type: 'text', field: 'tags',   label: L('Summary'), grid: {sm: 4, md: 3} },
+					{ type: 'text', field: 'pname', label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
+					{ type: 'icon-sum', field: '',   label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text', field: 'shareby',label: L('By'), grid: {sm: false, md: 3} },
 					// { type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
-					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 4, sm: 3} }
+					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 3, sm: 4, md: 3} }
 				]}
 				lightbox={this.lightbox}
 			/>) }
@@ -250,9 +253,9 @@ export class App extends CrudCompW<AlbumProps> {
 	 * - serv: string,
 	 * - portal: string
 	 */
-	static bindHtml(elem: string, opts: AnreactAppOptions & {aid: string}) : void {
+	static bindHtml(elem: string, opts: AnreactAppOptions & {aid: string, uid: string, pswd: string}) : void {
 		let portal = opts.portal ?? 'index.html';
-		let aid = opts.aid;
+		let { aid, uid, pswd } = opts;
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
@@ -261,7 +264,7 @@ export class App extends CrudCompW<AlbumProps> {
 			ReactDOM.render(
 			  <App servs={json} servId={opts.serv || 'album'}
 				aid={aid} iportal={portal} iwindow={window}
-				userid={'ody'} passwd={'123456'}
+				userid={uid} passwd={pswd}
 			  />, dom);
 		}
 	}

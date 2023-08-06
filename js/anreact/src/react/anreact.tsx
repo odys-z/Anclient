@@ -44,14 +44,14 @@ export function hide(grid: {
 		xs?: boolean | GridSize; sm?: boolean | GridSize;
 		md?: boolean | GridSize; lg?: boolean | GridSize; },
 		media: Media = {}) {
+	let {isXl, isLg, isMd, isSm, isXs} = media;
 	return (
-	 	grid.lg === false && media.isLg === true
-	 || grid.md === false && media.isMd === true && !!media.isLg === false
-	 || grid.sm === false && media.isSm === true && !!media.isMd === false
-	 || grid.xs === false && media.isXs === true && !!media.isSm === false
+	 	grid.lg === false && !isXl && (isLg || isMd || isSm || isXs)
+	 || grid.md === false && !isLg && !isXl && (isMd || isSm || isXs)
+	 || grid.sm === false && !isMd && !isLg && !isXl && (isSm || isXs)
+	 || grid.xs === false && !isSm && !isMd && !isLg && !isXl && isXs
 	);
 }
-
 
 /**
  * Component's visual options, e.g. options for field formatters.
@@ -71,9 +71,7 @@ export interface QueryPage {
 
 export function toPageInf(query: QueryPage) : PageInf {
 	let p = new PageInf(query.pageInf.page, query.pageInf.size);
-	// p.condts = [];
 	query.query?.forEach( (q, x) => {
-		// p.condts.push( [q.field, typeof q.val === 'string' ? q.val : q.val?.v] );
 		p.nv(q.field, typeof q.val === 'string' ? q.val : q.val?.v);
 	});
 
@@ -129,15 +127,11 @@ export class AnReact {
 	}
 
 	/**
-	 * Post a request, qmsg.req of AnsonMsg to jserv.
+	 * Post a request, qmsg.req of AnsonMsg, to jserv.
 	 * If suceed, call qmsg.onOk (onLoad) or set rs' rows in respons to component's state.
 	 * This is a helper of simple form load & bind a record.
-	 * @param {object} qmsg
-	 * @param {AnContext.error} errCtx
-	 * @param {React.Component} compont
-	 * @return {AnReact} this
-	 * */
-	bindStateRec( qmsg: { onOk?: any; onLoad?: any; req?: any; }, errCtx: ErrorCtx,
+	 */
+	bindStateRec( qmsg: { onOk?; onLoad?; req?; }, errCtx: ErrorCtx,
 				  compont: { setState: (arg0: { record: {}; }) => void; }) {
 		let onload = qmsg.onOk || qmsg.onLoad ||
 			// try figure out the fields
@@ -159,7 +153,8 @@ export class AnReact {
 		return this;
 	}
 
-	/**Try figure out serv root, then bind to html tag.
+	/**
+	 * Try figure out serv root, then bind to html tag.
 	 * First try ./private/host.json<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
@@ -263,7 +258,8 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
-	/** Load jsample.serv dataset. (using DatasetReq or menu.serv).
+	/**
+	 * Load jsample.serv dataset. (using DatasetReq or menu.serv).
 	 * If opts.onOk is provided, will try to bind stree like this:
 	 @example
 	let onload = onOk || function (c, resp) {

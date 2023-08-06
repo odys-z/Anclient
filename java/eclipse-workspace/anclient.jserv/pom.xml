@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>anclient.java</artifactId>
-  <version>0.5.0-SNAPSHOT</version>
+  <version>0.4.28-SNAPSHOT</version>
   <name>anclient.java</name>
   <description>Anclient java version. A basic lib only depends on semantic.jserv</description>
   <packaging>jar</packaging>
@@ -73,7 +73,7 @@
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>semantic.jserv</artifactId>
-	    <version>1.5.0-SNAPSHOT</version>
+	    <version>1.4.27</version>
 	</dependency>
 
   </dependencies>
@@ -204,7 +204,7 @@
 		<version>1.5</version>
 		<executions>
 			<execution>
-			  <id>semantics.transact</id>
+			  <id>anclient.java</id>
 			  <phase>verify</phase>
 			  <goals>
 				<goal>sign</goal>

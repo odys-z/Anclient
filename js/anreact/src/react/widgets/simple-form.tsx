@@ -197,7 +197,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		}
 	}
 
-	toSave(e: React.MouseEvent<HTMLInputElement>) {
+	toSave(e: React.UIEvent) {
 		e.stopPropagation();
 
 		if (!this.validate(this.props.invalidStyle)) {
@@ -256,7 +256,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		}, ctx.error);
 	}
 
-	toCancel (e: React.MouseEvent<HTMLInputElement>) {
+	toCancel (e: React.UIEvent) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose({code: 'cancel'});

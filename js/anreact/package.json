@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.4.36",
+  "version": "0.4.43",
   "description": "Anclient built on ReactJs.",
   "main": "./src/an-components.ts",
   "directories": {
@@ -26,7 +26,7 @@
   "author": "Ody Zhou",
   "license": "MIT",
   "dependencies": {
-    "@anclient/semantier": "^0.9.92",
+    "@anclient/semantier": "^0.9.93",
     "@emotion/react": "^11.11.0",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
@@ -35,6 +35,7 @@
     "ag-grid-community": "^29.3.4",
     "ag-grid-react": "^29.3.4",
     "core-js": "^3.17.1",
+    "material-ui-audio-player": "^1.7.1",
     "mime-types-no-nodejs": "^0.9.1",
     "qrcode": "^1.5.1",
     "react-modal": "^3.16.1",

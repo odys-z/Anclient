@@ -1,19 +1,17 @@
 /**
  * Credit to: https://github.com/Ngineer101/react-image-video-lightbox/blob/master/src/index.js
  * 2023.6.27 baseline, by Ngineer, License: MIT
- *
- * ISSUE: Performance problem since v0.4.26.
- * It could be the anson64's random string makes browser always load the same images, see
- * <a href='https://stackoverflow.com/q/10240110'>discussions</a>.
- *
- * FIXME: Resource should be cached.
+ * 
+ * Modified by Ody Zhou
  */
 import * as React from 'react';
-import {TouchEvent, Touch} from 'react'; // override global types
+import {TouchEvent, Touch} from 'react';
 import { AnTreeNode, StreeTier, PhotoRec } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { GalleryView } from '../../react/widgets/gallery-view';
 import { regex } from '../../utils/regex';
+import { Typography } from '@material-ui/core';
+import { AudioBox } from './audio-box';
 
 let { mime2type } = regex;
 
@@ -141,10 +139,10 @@ export class Lightbox extends CrudCompW<Comprops & {
     const frame = () => {
       if (this.config.scale === INITIAL_SCALE && this.config.x === INITIAL_X && this.config.y === INITIAL_Y) return;
 
-      const scaleDelta = INITIAL_SCALE - this.config.scale;
+      const scaleDelta  = INITIAL_SCALE - this.config.scale;
       const targetScale = settle(this.config.scale + (RESET_ANIMATION_SPEED * scaleDelta), INITIAL_SCALE, SETTLE_RANGE);
 
-      const nextWidth = this.width * targetScale;
+      const nextWidth  = this.width * targetScale;
       const nextHeight = this.height * targetScale;
 
       this.config = Object.assign(this.config, {
@@ -154,6 +152,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         x: INITIAL_X,
         y: INITIAL_Y
       });
+
       this.setState({swiping: false, loading: true}, () => {
         this.animation = requestAnimationFrame(frame);
       });
@@ -304,13 +303,15 @@ export class Lightbox extends CrudCompW<Comprops & {
   }
 
   vidRef: HTMLVideoElement;
+  audRef: AudioBox;
   
   getResources() {
     let items = [];
     let data = this.parse(this.props.photos);
     for (var i = 0; i < data.length; i++) {
       let resource = data[i];
-      if (!resource.mime || mime2type(resource.mime) === 'image') {
+      let mime = mime2type(resource.mime);
+      if (!resource.mime || mime === 'image') {
         items.push(<img key={i}
           alt={resource.altag}
           src={resource.src}
@@ -326,7 +327,7 @@ export class Lightbox extends CrudCompW<Comprops & {
               this.setState({ loading: false }); }}
         />);
       }
-      else if (mime2type(resource.mime) === 'video') {
+      else if (mime === 'video') {
         items.push(<video key={i}
           ref={(ref) => this.vidRef = ref}
 
@@ -356,24 +357,22 @@ export class Lightbox extends CrudCompW<Comprops & {
           <source src={resource.src} type={resource.mime}/>
         </video>);
       }
-
-      /* TODO third party online resources
-      else if (resource.mime === 'video') {
-        items.push(<iframe key={i}
-          allowFullScreen width="560" height="315"
-          src={resource.url}
-          frameBorder="0"
-          allow="autoplay; encrypted-media"
-          title={resource.title}
-          style={{
-            pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
-            maxWidth: '100%', maxHeight: '100%',
-            transform: `translate(${this.config.x}px, ${this.config.y}px)`,
-            transition: 'transform 0.5s ease-out'
-          }}
-          onLoad={() => { this.setState({ loading: false }); }}></iframe>);
+      else if (mime === 'audio') {
+        items.push(
+        <AudioBox lightMode
+          key={i}
+          ref={(ref) => this.audRef = ref}
+          poster={resource.poster}
+          src={resource.src}
+          width='80%'
+          height='50%'
+          onCanPlay={()=> {
+            if (this.state.swiping || this.state.loading)
+              this.setState({ loading: false }); }}
+        > <Typography >{resource.title}</Typography>
+        </AudioBox>);
       }
-      */
+      // TODO third party online resources
     }
 
     return items;
@@ -434,10 +433,9 @@ export class Lightbox extends CrudCompW<Comprops & {
         { this.state.loading &&
           <div style={{ margin: 'auto', position: 'fixed' }}>
             <style>
-              {
-                `@keyframes react_image_video_spinner {
-                  0% { transform: translate3d(-50 %, -50 %, 0) rotate(0deg); }
-                  100% { transform: translate3d(-50%, -50%, 0) rotate(360deg); }
+              { `@keyframes react_image_video_spinner {
+                 0% { transform: translate3d(-50 %, -50 %, 0) rotate(0deg); }
+                 100% { transform: translate3d(-50%, -50%, 0) rotate(360deg); }
                 }`
               }
             </style>
