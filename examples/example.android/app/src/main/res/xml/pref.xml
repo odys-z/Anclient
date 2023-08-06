@@ -4,6 +4,8 @@
         android:key="@string/key_home_cate"
         android:id="@+id/pref_home_regist"
         >
+        <!-- Issue: Target fragment must implement TargetFragment interface
+            https://stackoverflow.com/questions/69504256/preferencedialog-in-preferenceactivity-target-fragment-must-implement-targetfr -->
         <EditTextPreference
             android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:enabled="false"
