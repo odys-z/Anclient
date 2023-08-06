@@ -67,4 +67,4 @@ Signature defined in `tree.tsx <https://github.com/odys-z/Anclient/blob/master/j
     }
 ..
 
-For example, see :ref:`Doc type parser<controls_typeparser>`.
+For the example, see :ref:`Doc type parser<controls_typeparser>`.
