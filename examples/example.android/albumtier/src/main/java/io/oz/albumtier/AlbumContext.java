@@ -25,11 +25,11 @@ public class AlbumContext {
 
     static AlbumContext instance;
 
-    public static final String jdocbase  = ""; // jserv-album
+    public static final String jdocbase  = "jserv-album";
 
-    public final String clientUri = "album.and";
+    public static final String clientUri = "album.and";
 
-    public OnError errCtx; // = new AndErrorCtx();
+    public OnError errCtx;
 
     static {
         AnsonMsg.understandPorts(AlbumPort.album);
@@ -59,8 +59,6 @@ public class AlbumContext {
     }
 
     String jserv;
-
-//    public String homeName;
 
     public PhotoSyntier tier;
 
@@ -121,7 +119,8 @@ public class AlbumContext {
      * @throws AnsonException
      * @throws IOException
      */
-    AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
+    @SuppressWarnings("deprecation")
+	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
         if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))

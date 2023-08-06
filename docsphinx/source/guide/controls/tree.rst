@@ -17,7 +17,7 @@ Test page::
 
     js/anreact/test/sessionless/dist/widgets.html
 
-This front page work with `jserv-sandbox <https://github.com/odys-z/semantic-jserv/tree/master/jserv-sandbox>`_.
+This front page works with `jserv-sandbox <https://github.com/odys-z/semantic-jserv/tree/master/jserv-sandbox>`_.
 For @anclient/anreact v0.4.36, a docker image, `jsandbox:treeditor <https://hub.docker.com/r/odysz/jsandbox/tags>`_,
 for testing AnTreeditor is published.
 
@@ -25,9 +25,9 @@ To install Docker, start the container with scripts::
 
     ./docker-start
 
-This will pull a docker image, odysz/jsandbox:treeditor, into local container.
+This will pull a docker image, odysz/jsandbox:treeditor, into a local container.
 
-Start VS Code, load dist/widgets.html with Anprism. Follwing is what is expected:
+Start VS Code, load dist/widgets.html with Anprism. Following is what is expected:
 
 .. image:: ../imgs/04-treeditor-1.jpg
    :height: 10em
@@ -50,7 +50,7 @@ function rander().typeParser().
 .. image:: ../imgs/05-treegrid-formatter.jpg
    :height: 16em
 
-To Customize cells in AnTreegrid (also AnTreeditor), feed the control with a formatter,
+To Customize cells in AnTreegrid (also AnTreeditor), feed the control with a formatter:
 
 .. code-block:: html
 
@@ -92,4 +92,4 @@ To Customize cells in AnTreegrid (also AnTreeditor), feed the control with a for
     }
 ..
 
-The typeParser() implements :ref:`API of anreact/widgets/Treegrid#colFormatter() <api_widgets_tree>`.
+The typeParser() implements :ref:`the API of anreact/widgets/Treegrid#colFormatter() <api_widgets_tree>`.

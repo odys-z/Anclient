@@ -34,7 +34,7 @@ import io.oz.album.tier.PhotoRec;
 import io.oz.albumtier.AlbumContext.ConnState;
 
 /**
- * @deprecated only for MVP (0.2.1)
+ * @deprecated only for MVP (0.2.x)
  * @author Ody
  */
 public class AlbumtierTest {

@@ -1,10 +1,12 @@
 package io.odysz.jclient;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
@@ -115,7 +117,6 @@ public class HttpServClient {
 		// Send post request
 		con.setDoOutput(true);
 
-		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
 		jreq.toBlock(con.getOutputStream());
 
 		if (Clients.verbose) Utils.logi(url);
@@ -138,8 +139,17 @@ public class HttpServClient {
 			return x;
 		}
 		else {
-			Utils.warn("HTTP ERROR: code: %s", responseCode);
-			throw new IOException("HTTP ERROR: code: " + responseCode + "\n" + url);
+			InputStream i = con.getInputStream();
+	        String res = String.format("%d\n%s\n", responseCode, url);
+	        InputStreamReader in = new InputStreamReader(i);
+	        BufferedReader br = new BufferedReader(in);
+	        String output;
+	        while ((output = br.readLine()) != null) {
+	            res += (output);
+	        }
+
+			Utils.warn(res);
+			throw new IOException(res);
 		}
 	}
 
