@@ -276,16 +276,6 @@ public class PhotoSyntier extends Synclientier {
 							e.printStackTrace();
 						} } ).start();
 				}
-
-//				try {
-//					req = new AlbumReq(tbl).blockEnd(respi, user);
-//					AnsonMsg<DocsReq> abt = client.<DocsReq>userReq(uri, AlbumPort.album, req)
-//							.header(header);
-//
-//					respi = client.commit(abt, errHandler);
-//				}
-//				catch (Exception e) {}
-
 				if (ex instanceof IOException)
 					continue;
 				else errHandler.err(MsgCode.exGeneral, ex.getMessage(), ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
