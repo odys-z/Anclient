@@ -76,8 +76,6 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
   constructor(props: AnTablistProps) {
     super(props);
 
-    // this.stier = this.props.tier as StreeTier;
-
     this.toExpandItem = this.toExpandItem.bind(this);
     this.treeNodes = this.treeNodes.bind(this);
   }

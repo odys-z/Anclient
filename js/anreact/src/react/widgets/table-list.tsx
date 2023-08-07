@@ -34,7 +34,7 @@ interface AnTablistProps extends Comprops {
 	/**In tier mode, data is supposed to be bound by widget itself. */
 	rows?: Tierec[];
 
-	onSelectChange: (ids: Array<string>) => void;
+	onSelectChange?: (ids: Array<string>) => void;
 	onPageChange?: (page: number, size?: number) => void;
 
 	/**Page size options, Default [10, 25, 50]. */
@@ -99,7 +99,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		return this.state.selected.has(k);
 	}
 
-	handleClick(e: React.MouseEvent<HTMLElement>, newSelct: string) {
+	handleClick(e: React.UIEvent, newSelct: string) {
 		let selected = this.state.selected;
 		if (this.props.singleCheck) {
 			selected.clear();
@@ -192,14 +192,14 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 					{columns.filter( (v, x) => //!toBool(v.hide)
 								!toBool(v.hide) && toBool(v.visible, true)
 								&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
-							.map( (colObj, x) => {
-								if (colObj.field === undefined)
-									throw Error("Column field is required: " + JSON.stringify(colObj));
-								let v = row[colObj.field];
-								let cell = colObj.formatter && colObj.formatter(v as any, x, row); //v: bug?
+							.map( (col, x) => {
+								if (col.field === undefined)
+									throw Error("Column field is required: " + JSON.stringify(col));
+								let v = row[col.field];
+								let cell = col.formatter && col.formatter(v as any, x, row); //v: bug?
 								if (cell)
-									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
-								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
+									cell = <TableCell key={col.field + x}>{cell}</TableCell>;
+								return cell || <TableCell key={col.field + x}>{v}</TableCell>;
 							} )}
 				</TableRow>)
 		});

@@ -5,12 +5,13 @@ import withWidth from "@material-ui/core/withWidth";
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
-import { Semantier } from '@anclient/semantier';
+import { AnlistColAttrs, Semantier } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTreegrid } from '../../react/widgets/treegrid'
+import { CompOpts } from '../../an-components';
 
 const styles = (_theme: Theme) => ( {
 	root: {
@@ -56,11 +57,12 @@ class OrgsComp extends CrudCompW<Comprops> {
 				</Typography>
 			</Card>
 			{this.tier && <AnTreegrid uri={this.uri}
+				pk='' onSelectChange={undefined}
 				className={classes.root}
 				columns={[
-					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
-					{ text: L('Domain Name'), color: 'primary', field:"domainName"},
-					{ text: L('parent'), color: 'primary',field:"parentId" }
+					{ text: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold', grid: {} },
+					{ text: L('Domain Name'), color: 'primary', field:"domainName", grid: {}},
+					{ text: L('parent'), color: 'primary',field:"parentId", grid: {} }
 				]}
 				rows = {this.tier.rows}
 			/>}

@@ -1,12 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
+
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
-	SessionClient, AnDatasetResp, AlbumRec, PhotoRec } from '@anclient/semantier';
+	SessionClient, AnDatasetResp, AlbumRec, PhotoRec, len } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
+import PdfViewer from './ext/pdf-dist';
 
 const { JsampleTheme } = jsample;
 
@@ -148,8 +150,7 @@ class Widgets extends React.Component<LessProps> {
 	uri = '/album/tree';
 
 	docIcon: any;
-
-	// forest: AnTreeNode[];
+	pdfview: JSX.Element;
 
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
@@ -249,6 +250,13 @@ class Widgets extends React.Component<LessProps> {
 	folderSum() {
 	}
 
+	viewFile = (ids: string[]) => {
+		if (len(ids) > 0) {
+			ids[len(ids) - 1];
+			this.pdfview = (<PdfViewer url={'./private/CDSFL.pdf'}></PdfViewer>);
+		}
+	};
+
 	render() {
 	  let reload =this.state.reload;
 	  this.state.reload = false;
@@ -286,10 +294,11 @@ class Widgets extends React.Component<LessProps> {
 						  grid: {xs: false, sm: 2, md: 2} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
-					onSelectChange={undefined}
+					onSelectChange={this.viewFile}
 					onThClick={()=> this.toSearch()}
 					testData={testData}
 				/>}
+				{this.pdfview}
 				{ this.state.hasError && <AnError
 					title={L('Error')} msg={this.errctx.msg}
 					uri={this.uri} tier={undefined}
@@ -370,11 +379,9 @@ class AlbumResp extends AnDatasetResp {
 
 		this.album = resp;
 		this.collect = resp.collect;
-		// this.profils = resp.profiles;
 		this.collects = resp.collects as PhotoCollect[];
 	}
 }
 Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });
-
 
 export { Widgets };
