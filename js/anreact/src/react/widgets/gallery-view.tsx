@@ -5,7 +5,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AlbumReq, AnTreeNode, PhotoCSS, PhotoRec, Semantier, SessionClient, StreeTier, Tierec, isEmpty, len
+import { AlbumReq, AnTreeNode, AnsonValue, PhotoCSS, PhotoRec, Semantier, SessionClient, StreeTier, Tierec, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
@@ -128,12 +128,12 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 * @param opts 
 	 * @returns src for img, i.e. jserv?anst64=message-string 
 	 */
-	static imgSrcReq(pid: string, opts: Semantier & {port: string}) : string {
+	static imgSrcReq(pid: AnsonValue, opts: Semantier & {port: string}) : string {
 	// static imgSrcReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) : string {
 
 		let {client, port} = opts;
 
-		let msg = getDownloadReq(pid, opts);
+		let msg = getDownloadReq(pid as string, opts);
 		let jserv = client.an.servUrl(port);
 		return `${jserv}?anson64=${window.btoa( JSON.stringify(msg))}`;
 
