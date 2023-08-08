@@ -32,7 +32,7 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
 
     let that = this;
     loadingTask.promise
-      .then((pdf: { getPage: (arg0: number) => Promise<{ getViewport: (arg0: { scale: number; }) => any; render: (arg0: { canvasContext: any; viewport: any; }) => void; }>; }) => {
+      .then((pdf: { getPage: (p: number) => Promise<{ getViewport: (ref: { scale: number; }) => any; render: (ctx: { canvasContext: any; viewport: any; }) => void; }>; }) => {
         pdf.getPage(1).then(
             function ( page: {
                 getViewport: (arg0: { scale: number; }) => any;
