@@ -8,7 +8,8 @@ import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
-import PdfViewer from './ext/pdf-dist';
+// import PdfViewer from './ext/pdf-dist';
+import { PdfViewer } from './ext/pdf-viewer';
 
 const { JsampleTheme } = jsample;
 
@@ -146,7 +147,7 @@ class Widgets extends React.Component<LessProps> {
 		reload: false
 	};
 
-	doctreesk  = 'tree-docs-folder';
+	doctreesk  = 'tree-album-family-folder';
 	uri = '/album/tree';
 
 	docIcon: any;
@@ -242,8 +243,8 @@ class Widgets extends React.Component<LessProps> {
 
 		else {
 			let mime = n.node['mime'] || '?';
-			let src = regex.mime2type(mime as string);
-			return (<>{`[${src}]`}</>)
+			let ext = regex.mime2type(mime as string);
+			return (<>{`[${ext}]`}</>)
 		}
 	}
 
@@ -252,9 +253,17 @@ class Widgets extends React.Component<LessProps> {
 
 	viewFile = (ids: string[]) => {
 		if (len(ids) > 0) {
-			ids[len(ids) - 1];
-			this.pdfview = (<PdfViewer url={'./private/CDSFL.pdf'}></PdfViewer>);
+			console.log(ids[len(ids) - 1]);
+			this.pdfview = (<PdfViewer
+				close={(e) => {
+					console.log(e);
+					this.pdfview = undefined;
+					this.setState({});
+				} }
+				src={'./private/CDSFL.pdf'}></PdfViewer>);
 		}
+		else this.pdfview = undefined;
+		this.setState({});
 	};
 
 	render() {

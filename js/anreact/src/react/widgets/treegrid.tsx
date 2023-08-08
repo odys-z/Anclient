@@ -69,6 +69,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
   state = {
 	  window: undefined,
     expandings: new Set(),
+    selected: new Set<string>()
   };
 
   editForm: JSX.Element;
@@ -78,6 +79,8 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
 
     this.toExpandItem = this.toExpandItem.bind(this);
     this.treeNodes = this.treeNodes.bind(this);
+    this.isSelected = this.isSelected.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   toExpandItem(e: React.MouseEvent<HTMLDivElement>) {
@@ -90,6 +93,32 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
     else expandings.add(id);
       this.setState({ expandings });
   }
+
+  isSelected(k: string) {
+		return this.state.selected.has(k);
+	}
+
+  updateSelectd (set: Set<string> | undefined) {
+		if (typeof this.props.onSelectChange === 'function')
+			this.props.onSelectChange(Array.from(set || []));
+	}
+
+	handleClick(e: React.UIEvent, newSelct: string) {
+		let selected = this.state.selected;
+		if (this.props.singleCheck) {
+			selected.clear();
+			selected.add(newSelct);
+		}
+		else {
+			if (selected.has(newSelct)) {
+				selected.delete(newSelct);
+			}
+			else selected.add(newSelct);
+		}
+
+		this.setState({});
+		this.updateSelectd(selected);
+	};
 
 	static th(columns: Array<AnTreegridCol> = [],
             classes: ClassNames, media: Media,
@@ -192,8 +221,11 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
 
     function iconItem (cols: AnTreegridCol[], n: AnTreeNode) {
       return (
-        <Grid container key={n.id} spacing={0} className={classes.row} >
-          { that.props.columns
+        <Grid container key={n.id}
+            spacing={0} className={classes.row}
+            onClick= { (e) => that.handleClick(e, n.id) }
+        > {/* { that.props.columns */}
+          { cols
             .filter( (v: AnTreegridCol) => toBool(v.visible, true) )
             .map( (col: AnTreegridCol, cx: number) => {
               if (cx === 0) return (
@@ -206,7 +238,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 </Grid> );
               else if (col.type === 'actions')
                 return ( hide(col.grid, media) ? undefined :
-                  TreeCardComp.actionFragment(n, col, cx, this, that.props));
+                  TreeCardComp.actionFragment(n, col, cx, undefined, that.props));
               else return (
                 hide(col.grid, media) ? undefined :
                 <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.treeItem}>

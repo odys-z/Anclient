@@ -185,32 +185,32 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 	}
 
 	static actionFragment(tnode: AnTreeNode, col: AnTreegridCol,
-			fragKey: string | number, handler: AnreactreeItem, props: TreeItemProps) {
+			fragKey: string | number, handler: AnreactreeItem | undefined, props: TreeItemProps) {
 
 		let {classes, media} = props;
 		let parentId = tnode.parent;
 		<Grid key={`${tnode.id}.${fragKey}`} item {...col.grid} className={classes.treeCell}>
-			<JsampleIcons.Up onClick={handler.toUp} />
-			<JsampleIcons.Down onClick={handler.toDown} />
+			<JsampleIcons.Up onClick={handler?.toUp} />
+			<JsampleIcons.Down onClick={handler?.toDown} />
 			{media.isMd ?
-			  <><Button onClick={handler.toEdit}
+			  <><Button onClick={handler?.toEdit}
 					data-me={tnode.id} data-parent={parentId}
 					startIcon={<JsampleIcons.Edit />} color="primary" >
 					{L('Edit')}
 					</Button>
-					<Button onClick={handler.toDel}
+					<Button onClick={handler?.toDel}
 					data-me={tnode.id} data-parent={parentId}
 					startIcon={<JsampleIcons.Delete />} color="secondary" >
 					{L('Delete')}
 					</Button>
 			  </>
 			  :
-			  <><JsampleIcons.Edit onClick={handler.toEdit}
+			  <><JsampleIcons.Edit onClick={handler?.toEdit}
 					className={classes.smallBtn}
 					data-me={tnode.id} data-parent={parentId}
 					color='primary'
 				    />
-					<JsampleIcons.Delete onClick={handler.toDel}
+					<JsampleIcons.Delete onClick={handler?.toDel}
 					className={classes.smallBtn}
 					data-me={tnode.id} data-parent={parentId}
 					color='secondary'

@@ -1,7 +1,7 @@
 import { Protocol, PageInf, SessionClient,
 	AnDatasetResp, AnTreeNode, StreeTier, AlbumReq, AlbumRec, PhotoRec
 } from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView, ImageSlide, PhotoProps
+import { Comprops, CrudComp, PhotoCollect, GalleryView
 } from '../../../../src/an-components';
 
 const debug = true;
