@@ -84,7 +84,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 	componentDidMount() {
 		let uri = this.uri;
-		console.log("super.uri", uri);
+		// console.log("super.uri", uri);
 
 		this.photos = this.props.tnode.node.children;
 		this.slides = this.parse(this.props.tnode.node.children);

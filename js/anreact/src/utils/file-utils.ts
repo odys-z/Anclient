@@ -36,6 +36,10 @@ export function mimeOf(dataUrl: string) {
 	else return undefined;
 }
 
+export function isPdf(str: string) {
+
+}
+
 export function urlOfdata(mime: string, data) {
 	return ['data:' + mime, data].join(',');
 }

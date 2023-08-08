@@ -26,7 +26,7 @@ interface AnTablistProps extends Comprops {
 	/**
 	 * Selected row ids - not used if no need to update data?
 	 */
-	selected?: {ids: Set<string>};
+	selected?: {ids: Map<string, any>};
 
 	/** List's column definition.  */
 	columns: Array<AnlistColAttrs<JSX.Element, CompOpts> & Comprops>;
@@ -34,7 +34,7 @@ interface AnTablistProps extends Comprops {
 	/**In tier mode, data is supposed to be bound by widget itself. */
 	rows?: Tierec[];
 
-	onSelectChange?: (ids: Array<string>) => void;
+	onSelectChange?: (ids: Map<string, Tierec>) => void;
 	onPageChange?: (page: number, size?: number) => void;
 
 	/**Page size options, Default [10, 25, 50]. */
@@ -51,7 +51,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		page: 0,
 		size: 10,
 
-		selected: undefined as unknown as Set<string>
+		selected: undefined as Map<string, Tierec>
 	}
 
 	checkAllBox: HTMLButtonElement | null;
@@ -94,17 +94,17 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		return this.state.selected.has(k);
 	}
 
-	handleClick(e: React.UIEvent, newSelct: string) {
+	handleClick(e: React.UIEvent, newSelct: string, row: Tierec) {
 		let selected = this.state.selected;
 		if (this.props.singleCheck) {
 			selected.clear();
-			selected.add(newSelct);
+			selected.set(newSelct, row);
 		}
 		else {
 			if (selected.has(newSelct)) {
 				selected.delete(newSelct);
 			}
-			else selected.add(newSelct);
+			else selected.set(newSelct, row);
 		}
 
 		this.setState({});
@@ -114,19 +114,19 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
 		let ids = this.props.selected?.ids;
 		if (e.target.checked) {
-			this.props.rows?.forEach((r) => ids?.add(r[this.props.pk] as string));
-			this.updateSelectd(ids);
+			this.props.rows?.forEach((r) => ids?.set(r[this.props.pk] as string, r));
 		}
 		else {
 			ids?.clear();
-			this.updateSelectd(ids);
 		}
+		this.updateSelectd(ids);
+
 		this.setState({});
 	};
 
-	updateSelectd (set: Set<string> | undefined) {
+	updateSelectd (map: Map<string, Tierec> | undefined) {
 		if (typeof this.props.onSelectChange === 'function')
-			this.props.onSelectChange(Array.from(set || []));
+			this.props.onSelectChange(map);
 	}
 
 	changePage(_event: React.MouseEvent<any, any> | null, page: number) {
@@ -163,7 +163,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		let pkv = row[this.props.pk] as string;
 
 		if (this.props.checkbox && toBool(row.checked)) {
-			this.state.selected.add(pkv)
+			this.state.selected.set(pkv, row)
 			row.checked = 0; // later events don't need ths
 		}
 		let isItemSelected = this.isSelected(pkv);
@@ -172,7 +172,7 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			<TableRow key= {row[this.props.pk] as string} hover
 				selected={isItemSelected}
 				onClick= { (event) => {
-					this.handleClick(event, pkv);
+					this.handleClick(event, pkv, row);
 				} }
 				role="checkbox" aria-checked={isItemSelected}
 			>

@@ -69,7 +69,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
   state = {
 	  window: undefined,
     expandings: new Set(),
-    selected: new Set<string>()
+    selected: new Map<string, AnTreeNode>()
   };
 
   editForm: JSX.Element;
@@ -98,22 +98,22 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
 		return this.state.selected.has(k);
 	}
 
-  updateSelectd (set: Set<string> | undefined) {
+  updateSelectd (map: Map<string, AnTreeNode> | undefined) {
 		if (typeof this.props.onSelectChange === 'function')
-			this.props.onSelectChange(Array.from(set || []));
+			this.props.onSelectChange(map);
 	}
 
-	handleClick(e: React.UIEvent, newSelct: string) {
+	handleClick(e: React.UIEvent, nid: string, node: AnTreeNode) {
 		let selected = this.state.selected;
 		if (this.props.singleCheck) {
 			selected.clear();
-			selected.add(newSelct);
+			selected.set(nid, node);
 		}
 		else {
-			if (selected.has(newSelct)) {
-				selected.delete(newSelct);
+			if (selected.has(nid)) {
+				selected.delete(nid);
 			}
-			else selected.add(newSelct);
+			else selected.set(nid, node);
 		}
 
 		this.setState({});
@@ -223,13 +223,12 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
       return (
         <Grid container key={n.id}
             spacing={0} className={classes.row}
-            onClick= { (e) => that.handleClick(e, n.id) }
-        > {/* { that.props.columns */}
+            onClick= { (e) => that.handleClick(e, n.id, n) }
+        > 
           { cols
             .filter( (v: AnTreegridCol) => toBool(v.visible, true) )
             .map( (col: AnTreegridCol, cx: number) => {
               if (cx === 0) return (
-                // hide(col.grid, media) ? undefined :
                 <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
                   <Typography noWrap variant='body2'>
                     {levelIcons(that.props.indentSettings, n.indents)}
