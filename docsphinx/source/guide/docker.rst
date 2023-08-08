@@ -54,7 +54,7 @@ Error: There is insufficient memory for the JRE::
     722e46b76cd9dab4d18a463953c6cc5782d135cfe2874223c193b54f39ddf3e0
     $ docker ps
     CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
-    $ docker run --name album -v ...:/var/local/volume -p 127.0.0.1:8083:80 -it --rm odysz/...
+    $ docker run --name album -v ...:/var/local/volume -p 127.0.0.1:8080:80 -it --rm odysz/...
     Using CATALINA_BASE:   /usr/local/tomcat
     Using CATALINA_HOME:   /usr/local/tomcat
     Using CATALINA_TMPDIR: /usr/local/tomcat/temp
