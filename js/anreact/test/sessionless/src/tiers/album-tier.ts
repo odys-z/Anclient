@@ -77,7 +77,8 @@ export class AlbumTier extends StreeTier {
 
 		return AlbumTier.servUrl(this.client.an.servUrl(this.port), msg);
 		*/
-		return GalleryView.imgSrcReq(recId, { uri: this.uri, port: this.port, client: this.client});
+		return GalleryView.imgSrcReq(recId, this);
+		// return GalleryView.imgSrcReq(recId, { uri: this.uri, port: this.port, client: this.client});
 	}
 };
 

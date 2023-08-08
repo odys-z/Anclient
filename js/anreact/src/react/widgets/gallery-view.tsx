@@ -128,13 +128,28 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 * @param opts 
 	 * @returns src for img, i.e. jserv?anst64=message-string 
 	 */
-	static imgSrcReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) : string {
+	static imgSrcReq(pid: string, opts: Semantier & {port: string}) : string {
+	// static imgSrcReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) : string {
 
 		let {client, port} = opts;
 
 		let msg = getDownloadReq(pid, opts);
 		let jserv = client.an.servUrl(port);
 		return `${jserv}?anson64=${window.btoa( JSON.stringify(msg))}`;
+
+		function getDownloadReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) {
+			let {uri, port, client} = opts;
+
+			if (reqMsgs[pid] === undefined) {
+				let req = StreeTier
+					.reqFactories[port]({uri, sk: ''})
+					.A(AlbumReq.A.download) as AlbumReq;
+
+				req.docId = pid;
+				reqMsgs[pid] = client.an.getReq<AlbumReq>(port, req);
+			}
+			return reqMsgs[pid];
+		}
 	}
 
 	openLightbox (_event: React.MouseEvent, ix: number) {
@@ -215,7 +230,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	render() {
 		let phs = this.slides || _photos;
 		return (<div>
-			{/* {(this.photos?.title || ' - ') + ` [${phs.length}]`} */}
 			{this.gallery( phs )}
 		</div>);
 	}
@@ -223,6 +237,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 const reqMsgs = {};
 
+/*
 function getDownloadReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) {
 	let {uri, port, client} = opts;
 
@@ -237,3 +252,4 @@ function getDownloadReq(pid: string, opts: {uri: string, port: string, client: S
 	return reqMsgs[pid];
 }
 
+*/
