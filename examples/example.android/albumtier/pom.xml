@@ -2,7 +2,18 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>albumtier</artifactId>
-  <version>0.2.2</version>
+  <version>0.2.3</version>
+
+  <name>Album Tier MVP</name>
+  <url>http://github.com/odys-z/anclient</url>
+  <description>Album Tier for Android (MVP)</description>
+  
+  <licenses>
+    <license>
+    	<name>MIT License</name>
+    	<url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -10,6 +21,13 @@
 	<maven.compiler.target>1.8</maven.compiler.target>
 	<osgi.core.version>6.0.0</osgi.core.version>
   </properties>
+
+  <scm>
+  	<connection>scm:git:git://github.com/odys-z/Anclient.git</connection>
+  	<developerConnection>scm:git:odys-z@github.com:odys-z/Anclient.git</developerConnection>
+  	<url>https://odys-z.github.io/Anclient</url>
+  	<tag>HEAD</tag>
+  </scm>
 
   <developers>
     <developer>

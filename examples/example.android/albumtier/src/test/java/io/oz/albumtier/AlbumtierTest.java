@@ -119,7 +119,7 @@ public class AlbumtierTest {
         singleton.tier.asynQueryDocs(mList, page,
 			onSyncQueryRespons,
 			(c, r, args) -> {
-				Utils.warn("%s, %s, %s", singleton.clientUri, r, args == null ? "null" : args[0]);
+				Utils.warn("%s, %s, %s", AlbumContext.clientUri, r, args == null ? "null" : args[0]);
 			});
     }
 
