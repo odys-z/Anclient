@@ -30,7 +30,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	sizeOptions = [10, 25, 50];
 
 	state = {
-		selected: undefined as unknown as Set<string>
+		selected: undefined as Map<string, Tierec>
 	};
 
     page: PageInf;
@@ -86,17 +86,17 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 		return `${from}–${to} in page ${this.page.page} of ${count !== -1 ? count : `more than ${to}`}`;
 	}
 
-	handleClick(e: React.MouseEvent<HTMLElement>, newSelct: string) {
+	handleClick(e: React.MouseEvent<HTMLElement>, newSelct: string, node: Tierec) {
 		let selected = this.state.selected;
 		if (this.props.singleCheck) {
 			selected.clear();
-			selected.add(newSelct);
+			selected.set(newSelct, node);
 		}
 		else {
 			if (selected.has(newSelct)) {
 				selected.delete(newSelct);
 			}
-			else selected.add(newSelct);
+			else selected.set(newSelct, node);
 		}
 
 		this.setState({});
@@ -104,9 +104,9 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	};
 
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
-		let ids = this.props.selected?.ids || new Set<string>();
+		let ids = this.props.selected?.ids || new Map<string, Tierec>();
 		if (e.target.checked) {
-			this.props.rows?.forEach((r) => ids.add(r[this.props.pk] as string));
+			this.props.rows?.forEach((r) => ids.set(r[this.props.pk] as string, r));
 			this.updateSelectd(ids);
 		}
 		else {
@@ -116,9 +116,9 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 		this.setState({});
 	};
 
-	updateSelectd (set: Set<string>) {
+	updateSelectd (set: Map<string, Tierec>) {
 		if (typeof this.props.onSelectChange === 'function')
-			this.props.onSelectChange(Array.from(set));
+			this.props.onSelectChange(set);
 	}
 
 	changePage(_event: React.MouseEvent<HTMLElement> | null, page: number) {
@@ -156,7 +156,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			let pkv = row[this.props.pk] as string;
 
 			if (this.props.checkbox && toBool(row.checked)) {
-				this.state.selected.add(pkv)
+				this.state.selected.set(pkv, row)
 				row.checked = 0; // later events don't need ths
 			}
 			let isItemSelected = this.isSelected(pkv);
@@ -165,7 +165,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 				<TableRow key= {row[this.props.pk] as string} hover
 					selected={isItemSelected}
 					onClick= { (event) => {
-						this.handleClick(event, pkv);
+						this.handleClick(event, pkv, row);
 					} }
 					role="checkbox" aria-checked={isItemSelected}
 				>
@@ -186,7 +186,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 								let v = row[colObj.field];
 								let cell = colObj.formatter && colObj.formatter(v as DbCol, x, row); // bug?
 								if (cell)
-									cell = <TableCell key={colObj.field + x}>{cell}</TableCell> as UIComponent;
+									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
 								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
 							} )}
 				</TableRow>)

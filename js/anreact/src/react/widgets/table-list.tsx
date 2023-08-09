@@ -26,7 +26,7 @@ interface AnTablistProps extends Comprops {
 	/**
 	 * Selected row ids - not used if no need to update data?
 	 */
-	selected?: {ids: Set<string>};
+	selected?: {ids: Map<string, any>};
 
 	/** List's column definition.  */
 	columns: Array<AnlistColAttrs<JSX.Element, CompOpts> & Comprops>;
@@ -34,7 +34,7 @@ interface AnTablistProps extends Comprops {
 	/**In tier mode, data is supposed to be bound by widget itself. */
 	rows?: Tierec[];
 
-	onSelectChange: (ids: Array<string>) => void;
+	onSelectChange?: (ids: Map<string, Tierec>) => void;
 	onPageChange?: (page: number, size?: number) => void;
 
 	/**Page size options, Default [10, 25, 50]. */
@@ -51,10 +51,8 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		page: 0,
 		size: 10,
 
-		selected: undefined as unknown as Set<string>
+		selected: undefined as Map<string, Tierec>
 	}
-
-	// sizeOptions:[10, 25, 50],
 
 	checkAllBox: HTMLButtonElement | null;
 
@@ -68,9 +66,6 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		this.state.selected = selected.ids;
 		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
 			throw Error("selected.ids must be a set");
-
-		// if (sizeOptions)
-		// 	this.state.sizeOptions = sizeOptions;
 
 		let {total, page, size} = props.pageInf || {};
 		this.state.total = total || -1;
@@ -99,17 +94,17 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 		return this.state.selected.has(k);
 	}
 
-	handleClick(e: React.MouseEvent<HTMLElement>, newSelct: string) {
+	handleClick(e: React.UIEvent, newSelct: string, row: Tierec) {
 		let selected = this.state.selected;
 		if (this.props.singleCheck) {
 			selected.clear();
-			selected.add(newSelct);
+			selected.set(newSelct, row);
 		}
 		else {
 			if (selected.has(newSelct)) {
 				selected.delete(newSelct);
 			}
-			else selected.add(newSelct);
+			else selected.set(newSelct, row);
 		}
 
 		this.setState({});
@@ -119,19 +114,19 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	toSelectAll (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) : void {
 		let ids = this.props.selected?.ids;
 		if (e.target.checked) {
-			this.props.rows?.forEach((r) => ids?.add(r[this.props.pk] as string));
-			this.updateSelectd(ids);
+			this.props.rows?.forEach((r) => ids?.set(r[this.props.pk] as string, r));
 		}
 		else {
 			ids?.clear();
-			this.updateSelectd(ids);
 		}
+		this.updateSelectd(ids);
+
 		this.setState({});
 	};
 
-	updateSelectd (set: Set<string> | undefined) {
+	updateSelectd (map: Map<string, Tierec> | undefined) {
 		if (typeof this.props.onSelectChange === 'function')
-			this.props.onSelectChange(Array.from(set || []));
+			this.props.onSelectChange(map);
 	}
 
 	changePage(_event: React.MouseEvent<any, any> | null, page: number) {
@@ -164,45 +159,46 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	}
 
 	tr(rows: Tierec[] & {checked: boolean | number | undefined | null}[] | undefined, columns : AnlistColAttrs<JSX.Element, CompOpts>[]) {
-		return rows?.map(row => {
-			let pkv = row[this.props.pk] as string;
+	  return rows?.map(row => {
+		let pkv = row[this.props.pk] as string;
 
-			if (this.props.checkbox && toBool(row.checked)) {
-				this.state.selected.add(pkv)
-				row.checked = 0; // later events don't need ths
-			}
-			let isItemSelected = this.isSelected(pkv);
+		if (this.props.checkbox && toBool(row.checked)) {
+			this.state.selected.set(pkv, row)
+			row.checked = 0; // later events don't need ths
+		}
+		let isItemSelected = this.isSelected(pkv);
 
-			return (
-				<TableRow key= {row[this.props.pk] as string} hover
-					selected={isItemSelected}
-					onClick= { (event) => {
-						this.handleClick(event, pkv);
-					} }
-					role="checkbox" aria-checked={isItemSelected}
-				>
-					{this.props.checkbox && (
-						<TableCell component="th" scope="row" padding="checkbox">
-							<Checkbox
-								color="primary"
-								checked ={isItemSelected}
-							/>
-						</TableCell>)
-					}
-					{columns.filter( (v, x) => //!toBool(v.hide)
-								!toBool(v.hide) && toBool(v.visible, true)
-								&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
-							.map( (colObj, x) => {
-								if (colObj.field === undefined)
-									throw Error("Column field is required: " + JSON.stringify(colObj));
-								let v = row[colObj.field];
-								let cell = colObj.formatter && colObj.formatter(v as any, x, row); //v: bug?
-								if (cell)
-									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
-								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
-							} )}
-				</TableRow>)
-		});
+		return (
+			<TableRow key= {row[this.props.pk] as string} hover
+				selected={isItemSelected}
+				onClick= { (event) => {
+					this.handleClick(event, pkv, row);
+				} }
+				role="checkbox" aria-checked={isItemSelected}
+			>
+				{this.props.checkbox && (
+					<TableCell component="th" scope="row" padding="checkbox">
+						<Checkbox
+							color="primary"
+							checked ={isItemSelected}
+						/>
+					</TableCell>)
+				}
+				{columns
+					.filter( (v, x) => //!toBool(v.hide)
+						!toBool(v.hide) && toBool(v.visible, true)
+						&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
+					.map( (col, x) => {
+						if (col.field === undefined)
+							throw Error("Column field is required: " + JSON.stringify(col));
+						let v = row[col.field];
+						let cell = col.formatter && col.formatter(v as any, x, row); //v: bug?
+						if (cell)
+							cell = <TableCell key={col.field + x}>{cell}</TableCell>;
+						return cell || <TableCell key={col.field + x}>{v}</TableCell>;
+					} )}
+			</TableRow>)
+	  });
 	}
 
 	render() {

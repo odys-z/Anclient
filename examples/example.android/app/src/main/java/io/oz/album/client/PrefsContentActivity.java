@@ -1,6 +1,5 @@
 package io.oz.album.client;
 
-import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.vincent.filepicker.ToastUtil;
+
+import java.util.Objects;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
@@ -32,20 +33,19 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     /** uid in preference */
     static String oldUid;
-    private AlbumPreferenceFragment prefFragment;
+    final AlbumPreferenceFragment prefFragment = new AlbumPreferenceFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (singleton == null) {
             singleton = AlbumContext.getInstance(this);
             oldUid = null;
-        } else oldUid = singleton.photoUser.uid();
+        }
+        else oldUid = singleton.photoUser.uid();
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // load settings fragment
-        prefFragment = new AlbumPreferenceFragment(this);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, prefFragment)

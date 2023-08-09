@@ -209,7 +209,7 @@ class UserstComp extends CrudCompW<Comprops> {
 				className={classes.root}
 				checkbox={tier.checkbox}
 				selected={this.state.selected}
-				columns={tier.columns()}
+				columns={tier.columns() as AnlistColAttrs<JSX.Element, CompOpts>[]}
 				rows={tier.rows}
 				sizeOptions={[5, 8, 10]}
 				pageInf={this.q}

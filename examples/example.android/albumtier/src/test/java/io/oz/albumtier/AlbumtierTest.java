@@ -38,7 +38,7 @@ import io.oz.albumtier.AlbumContext.ConnState;
  * @author Ody
  */
 public class AlbumtierTest {
-    private static final String jserv = "http://localhost:8081";
+    private static final String jserv = "";
 	private AlbumContext singleton;
 	private PathsPage synchPage;
 	

@@ -69,6 +69,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
   state = {
 	  window: undefined,
     expandings: new Set(),
+    selected: new Map<string, AnTreeNode>()
   };
 
   editForm: JSX.Element;
@@ -76,10 +77,10 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
   constructor(props: AnTablistProps) {
     super(props);
 
-    // this.stier = this.props.tier as StreeTier;
-
     this.toExpandItem = this.toExpandItem.bind(this);
     this.treeNodes = this.treeNodes.bind(this);
+    this.isSelected = this.isSelected.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   toExpandItem(e: React.MouseEvent<HTMLDivElement>) {
@@ -92,6 +93,32 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
     else expandings.add(id);
       this.setState({ expandings });
   }
+
+  isSelected(k: string) {
+		return this.state.selected.has(k);
+	}
+
+  updateSelectd (map: Map<string, AnTreeNode> | undefined) {
+		if (typeof this.props.onSelectChange === 'function')
+			this.props.onSelectChange(map);
+	}
+
+	handleClick(e: React.UIEvent, nid: string, node: AnTreeNode) {
+		let selected = this.state.selected;
+		if (this.props.singleCheck) {
+			selected.clear();
+			selected.set(nid, node);
+		}
+		else {
+			if (selected.has(nid)) {
+				selected.delete(nid);
+			}
+			else selected.set(nid, node);
+		}
+
+		this.setState({});
+		this.updateSelectd(selected);
+	};
 
 	static th(columns: Array<AnTreegridCol> = [],
             classes: ClassNames, media: Media,
@@ -194,12 +221,14 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
 
     function iconItem (cols: AnTreegridCol[], n: AnTreeNode) {
       return (
-        <Grid container key={n.id} spacing={0} className={classes.row} >
-          { that.props.columns
+        <Grid container key={n.id}
+            spacing={0} className={classes.row}
+            onClick= { (e) => that.handleClick(e, n.id, n) }
+        > 
+          { cols
             .filter( (v: AnTreegridCol) => toBool(v.visible, true) )
             .map( (col: AnTreegridCol, cx: number) => {
               if (cx === 0) return (
-                // hide(col.grid, media) ? undefined :
                 <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
                   <Typography noWrap variant='body2'>
                     {levelIcons(that.props.indentSettings, n.indents)}
@@ -208,7 +237,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 </Grid> );
               else if (col.type === 'actions')
                 return ( hide(col.grid, media) ? undefined :
-                  TreeCardComp.actionFragment(n, col, cx, this, that.props));
+                  TreeCardComp.actionFragment(n, col, cx, undefined, that.props));
               else return (
                 hide(col.grid, media) ? undefined :
                 <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.treeItem}>

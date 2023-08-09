@@ -205,7 +205,7 @@ class RolesComp extends CrudCompW<Comprops> {
 
 			{this.tier && <AnTablist
 				className={classes.root} checkbox={true}
-				columns={this.tier.columns()}
+				columns={this.tier.columns() as AnlistColAttrs<JSX.Element, CompOpts>[]}
 				rows={this.state.rows} pk={this.tier.pkval.pk}
 				selected={this.state.selected}
 				pageInf={this.state.pageInf}

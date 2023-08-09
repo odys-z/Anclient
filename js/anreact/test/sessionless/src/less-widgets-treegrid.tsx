@@ -1,12 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
+
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
-	SessionClient, AnDatasetResp, AlbumRec, PhotoRec } from '@anclient/semantier';
+	SessionClient, AnDatasetResp, AlbumRec, PhotoRec, len, size } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex
+	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex, mimeOf, GalleryView
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
+// import PdfViewer from './ext/pdf-dist';
+import { PdfViewer } from './ext/pdf-viewer';
 
 const { JsampleTheme } = jsample;
 
@@ -144,12 +147,11 @@ class Widgets extends React.Component<LessProps> {
 		reload: false
 	};
 
-	doctreesk  = 'tree-docs-folder';
+	doctreesk  = 'tree-album-family-folder';
 	uri = '/album/tree';
 
 	docIcon: any;
-
-	// forest: AnTreeNode[];
+	pdfview: JSX.Element;
 
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
@@ -241,13 +243,44 @@ class Widgets extends React.Component<LessProps> {
 
 		else {
 			let mime = n.node['mime'] || '?';
-			let src = regex.mime2type(mime as string);
-			return (<>{`[${src}]`}</>)
+			let ext = regex.mime2type(mime as string);
+			return (<>{`[${ext}]`}</>)
 		}
 	}
 
 	folderSum() {
 	}
+
+	viewFile = (ids: Map<string, AnTreeNode>) => {
+		if (size(ids) > 0) {
+			let fid = ids.keys()[size(ids) - 1];
+			let file = ids.get(fid);
+			let t = regex.mime2type(file.node.mime);
+			if (t !== 'pdf') {
+				console.log(fid);
+				this.pdfview = (<PdfViewer
+					close={(e) => {
+						console.log(e);
+						this.pdfview = undefined;
+						this.setState({});
+					} }
+					// src={'./private/CDSFL.pdf'}
+					src={GalleryView.imgSrcReq(file.node.id, this.albumtier)}
+				></PdfViewer>);
+			}
+			else {
+				this.pdfview = undefined;
+				this.errctx.msg = L(`Type ${t} is not supported yet.`);
+				this.setState({
+					hasError: true,
+					nextAction: 'ignore'});
+			}
+		}
+		else {
+			this.pdfview = undefined;
+		}
+		this.setState({});
+	};
 
 	render() {
 	  let reload =this.state.reload;
@@ -257,15 +290,15 @@ class Widgets extends React.Component<LessProps> {
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
-				servId: this.state.servId,
-				servs: this.props.servs,
+				servId  : this.state.servId,
+				servs   : this.props.servs,
 				anClient: this.ssclient,
 				uiHelper: this.anReact,
 				hasError: this.state.hasError,
-				iparent: this.props.iparent,
-				ihome: this.props.iportal || 'portal.html',
-				error: this.errctx,
-				ssInf: undefined,
+				iparent : this.props.iparent,
+				ihome   : this.props.iportal || 'portal.html',
+				error   : this.errctx,
+				ssInf   : undefined,
 			}} >
 				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
                 {this.albumtier && Date().toString()}
@@ -286,10 +319,11 @@ class Widgets extends React.Component<LessProps> {
 						  grid: {xs: false, sm: 2, md: 2} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}
-					onSelectChange={undefined}
+					onSelectChange={this.viewFile}
 					onThClick={()=> this.toSearch()}
 					testData={testData}
 				/>}
+				{this.pdfview}
 				{ this.state.hasError && <AnError
 					title={L('Error')} msg={this.errctx.msg}
 					uri={this.uri} tier={undefined}
@@ -354,8 +388,6 @@ class AlbumResp extends AnDatasetResp {
 	static __type__ = 'io.oz.album.tier.AlbumResp';
 	album?: AlbumRec;
 
-	// profils?: Profiles;
-
 	collect?: Array<string>;
 	collects?: Array<PhotoCollect>;
 
@@ -370,11 +402,9 @@ class AlbumResp extends AnDatasetResp {
 
 		this.album = resp;
 		this.collect = resp.collect;
-		// this.profils = resp.profiles;
 		this.collects = resp.collects as PhotoCollect[];
 	}
 }
 Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });
-
 
 export { Widgets };

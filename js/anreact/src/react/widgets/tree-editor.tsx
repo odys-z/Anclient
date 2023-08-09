@@ -7,7 +7,6 @@ import Button from "@material-ui/core/Button";
 import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
-
 import { CRUD, AnTreeNode, AnlistColAttrs,
 	toBool, IndentIconame, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons, AnsonResp
 } from "@anclient/semantier";
@@ -133,7 +132,6 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 		let me = children.indexOf(n);
 		let elder = me - 1;
 		if (elder >= 0)
-			// children.swap(me, elder);
 			swap(children, me, elder);
 
 		if (typeof this.props.onUpdate === 'function')
@@ -146,7 +144,6 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 		let children = p.node.children;
 		let me = children.indexOf(n);
 		if (me > 0)
-			// children.swap(me, 0);
 			swap(children, me, 0);
 
 		if (typeof this.props.onUpdate === 'function')
@@ -160,7 +157,6 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 		let me = children.indexOf(n);
 		let younger = me + 1;
 		if (younger < children.length)
-			// children.swap(me, younger);
 			swap(children, me, younger);
 
 		if (typeof this.props.onUpdate === 'function')
@@ -173,7 +169,6 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 		let children = p.node.children;
 		let me = children.indexOf(n);
 		if (me < children.length - 1)
-			// children.swap(me, children.length - 1);
 			swap(children, me, children.length - 1);
 		if (typeof this.props.onUpdate === 'function')
 			this.props.onUpdate(n, p, me, children.length);
@@ -185,32 +180,32 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 	}
 
 	static actionFragment(tnode: AnTreeNode, col: AnTreegridCol,
-			fragKey: string | number, handler: AnreactreeItem, props: TreeItemProps) {
+			fragKey: string | number, handler: AnreactreeItem | undefined, props: TreeItemProps) {
 
 		let {classes, media} = props;
 		let parentId = tnode.parent;
 		<Grid key={`${tnode.id}.${fragKey}`} item {...col.grid} className={classes.treeCell}>
-			<JsampleIcons.Up onClick={handler.toUp} />
-			<JsampleIcons.Down onClick={handler.toDown} />
+			<JsampleIcons.Up onClick={handler?.toUp} />
+			<JsampleIcons.Down onClick={handler?.toDown} />
 			{media.isMd ?
-			  <><Button onClick={handler.toEdit}
+			  <><Button onClick={handler?.toEdit}
 					data-me={tnode.id} data-parent={parentId}
 					startIcon={<JsampleIcons.Edit />} color="primary" >
 					{L('Edit')}
 					</Button>
-					<Button onClick={handler.toDel}
+					<Button onClick={handler?.toDel}
 					data-me={tnode.id} data-parent={parentId}
 					startIcon={<JsampleIcons.Delete />} color="secondary" >
 					{L('Delete')}
 					</Button>
 			  </>
 			  :
-			  <><JsampleIcons.Edit onClick={handler.toEdit}
+			  <><JsampleIcons.Edit onClick={handler?.toEdit}
 					className={classes.smallBtn}
 					data-me={tnode.id} data-parent={parentId}
 					color='primary'
 				    />
-					<JsampleIcons.Delete onClick={handler.toDel}
+					<JsampleIcons.Delete onClick={handler?.toDel}
 					className={classes.smallBtn}
 					data-me={tnode.id} data-parent={parentId}
 					color='secondary'
@@ -293,7 +288,7 @@ class TreeGallaryComp extends TreeCardComp {
 
 	render() {
 		let that = this;
-		let {classes, tnode, onClick, media, style} = this.props;
+		let {classes, tnode, onClick, media} = this.props;
 		let node = tnode.node;
 		return (<>
 		  { this.galleryHead(that.props.columns, tnode, classes, media, onClick) }
@@ -556,7 +551,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 			  );
 			}
 			else {
-			  console.log(Object.assign(defltIcons, that.props.indentIcons));
+			  // console.log(Object.assign(defltIcons, that.props.indentIcons));
 			  return (
 				ntype === TreeNodeVisual.gallery ?
 				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)
