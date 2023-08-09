@@ -1,6 +1,6 @@
 package io.odysz.jclient.tier;
 
-import io.odysz.semantic.jprotocol.JProtocol.CRUD;
+import io.odysz.semantic.CRUD;
 
 public class Semantier {
     /**main table name - replace with TableMeta? */
