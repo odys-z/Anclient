@@ -188,8 +188,8 @@ public class PhotoSyntier extends Synclientier {
 	 * @throws IOException file access error
 	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
-                                            List<? extends SyncDoc> videos, IFileProvider fileProvider,
-											OnProcess proc, OnDocOk docOk, OnError errHandler, int blocksize)
+								List<? extends SyncDoc> videos, IFileProvider fileProvider,
+								OnProcess proc, OnDocOk docOk, OnError errHandler, int blocksize)
 			throws SemanticException, IOException {
 
 		SessionInf user = client.ssInfo();

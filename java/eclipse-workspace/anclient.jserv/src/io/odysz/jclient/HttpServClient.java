@@ -32,7 +32,7 @@ import io.odysz.semantics.x.SemanticException;
  *
  */
 public class HttpServClient {
-	protected static final String USER_AGENT = "Anclient.java/1.0";
+	protected static final String USER_AGENT = "Anclient.java/0.4.28";
 
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
