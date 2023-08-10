@@ -60,7 +60,8 @@ public class AlbumContext {
 
     String jserv;
 
-    public PhotoSyntier tier;
+    @SuppressWarnings("deprecation")
+	public PhotoSyntier tier;
 
     public SessionInf photoUser;
 
