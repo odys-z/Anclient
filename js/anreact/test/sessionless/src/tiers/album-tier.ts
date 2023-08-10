@@ -4,8 +4,6 @@ import { Protocol, PageInf, SessionClient,
 import { Comprops, CrudComp, PhotoCollect, GalleryView
 } from '../../../../src/an-components';
 
-const debug = true;
-
 export class AlbumTier extends StreeTier {
 	comp: CrudComp<Comprops>;
 	port: string = "album";
@@ -86,8 +84,6 @@ class AlbumResp extends AnDatasetResp {
 	static __type__ = 'io.oz.sandbox.album.AlbumResp';
 	album?: AlbumRec;
 
-	// profils?: Profiles;
-
 	collect?: Array<string>;
 	collects?: Array<PhotoCollect>;
 
@@ -102,7 +98,6 @@ class AlbumResp extends AnDatasetResp {
 
 		this.album = resp;
 		this.collect = resp.collect;
-		// this.profils = resp.profiles;
 		this.collects = resp.collects as PhotoCollect[];
 	}
 }
