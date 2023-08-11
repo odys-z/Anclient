@@ -71,6 +71,13 @@ public class HttpServClient {
 		if (Clients.verbose) Utils.logi(url);
 
 		int responseCode = con.getResponseCode();
+		
+		if (responseCode == 206) {
+			// since 0.4.28
+			Utils.warn("\nFatal Warning\n\nAnclient.java/Clients is not supposed to support ranged resourse query. Resoponse code of 206 is forced to change to 200 at client side.\n\n");
+			responseCode = 200;
+		}
+
 		if (responseCode == 200) {
 
 			if (con.getContentLengthLong() == 0)
@@ -122,6 +129,12 @@ public class HttpServClient {
 		if (Clients.verbose) Utils.logi(url);
 
 		int responseCode = con.getResponseCode();
+		if (responseCode == 206) {
+			// since 0.4.28
+			Utils.warn("\nFatal Warning\n\nAnclient.java/Clients is not supposed to support ranged resourse query. Resoponse code of 206 is forced to change to 200 at client side.\n\n");
+			responseCode = 200;
+		}
+
 		if (responseCode == 200) {
 
 			if (con.getContentLengthLong() == 0)
