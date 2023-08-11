@@ -9,9 +9,21 @@
 
 <body>
     <p>This widget must work with jserv docker image:
-	  <a href='https://hub.docker.com/r/odysz/jserv-album/tags'>odysz/jserv-album:treegrid</a>,<br>
-      Front end source: <a href='https://github.com/odys-z/Anclient/tree/master/js/anreact/test/sessionless'>
-        @anclient/anreact 0.4.38 test/sessionless</a></p>
+	  <a href='https://hub.docker.com/r/odysz/jserv-album/tags'>odysz/jserv-album:treegrid</a>.</p>
+    <p>Quick Start</p>
+    <ol>
+      <li>download <a href='https://github.com/odys-z/semantic-jserv/blob/master/jserv-sandbox/volume-treeditor-sessionless-0.4.38.zip'>
+        volume assets here</a>;
+      </li>
+      <li>use the sript,<a href='https://github.com/odys-z/semantic-jserv/blob/master/jserv-sandbox/docker-start'>
+        docker-start</a>, to start docker container;
+      </li>
+      <li>cline front end source: <a href='https://github.com/odys-z/Anclient/tree/master/js/anreact/test/sessionless'>
+        @anclient/anreact 0.4.38 test/sessionless</a>, run <code>webpack</code>
+      </li>
+      <li>eidt dist/private/host.json, point jserv to web service in docker container. See github.json for example.</li>
+      <li>load this page with a web server, e.g. Python -m http.server 8888</li>
+    </ol>
 	  <p>See also
       <a href='https://odys-z.github.io/Anclient/guide/controls/tree.html#test-antreeditor'>
           AnTreeditor doc</a>for quick start, and
@@ -19,8 +31,7 @@
           Example: doc type parser</a> for customizing cells.<br>
       </p>
     <p>Asset Credit: <a href='https://americainclass.org/sources/makingrevolution/rebellion/text7/text7.htm'>
-      7. Common Sense? REBELLION: 1775-1776, America in Classic</a>,
-      <a href='https://americainclass.org/sources/makingrevolution/rebellion/text7/painecommonsense3and4.pdf'>download pdf</a>.</p>
+      7. Common Sense? REBELLION: 1775-1776, America in Classic</a>.
     <div id="app"></div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script src="Doctree-1.0.0.min.js"></script>

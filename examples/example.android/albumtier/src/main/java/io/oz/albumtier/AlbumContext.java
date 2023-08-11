@@ -37,6 +37,7 @@ public class AlbumContext {
     }
 
     private String pswd;
+    public String pswd() { return pswd; }
     public AlbumContext pswd(String pswd) {
         this.pswd = pswd;
         return this;

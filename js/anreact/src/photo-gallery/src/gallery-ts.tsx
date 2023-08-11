@@ -4,7 +4,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import { computeColumnLayout } from './layouts/columns';
 import { computeRowLayout } from './layouts/justified';
 import { findIdealNodeSearch } from './utils/findIdealNodeSearch';
-import Photo, { PhotoProps, RenderImageProps, PhotoPropType } from './photo-ts';
+import Photo, { PhotoProps, PhotoPropType } from './photo-ts';
 
 export type PhotoClickHandler = (
   event: React.MouseEvent,
@@ -13,50 +13,45 @@ export type PhotoClickHandler = (
 
 
 export interface GalleryProps {
-    photos: Array<PhotoProps>
-    /**
-     * applies to column layouts only (direction=column)
-     * number of columns or a function which receives the container width
-     * and should return the desired number of columns; defaults to Gallery's breakpoint choosing
-     */
-    columns?: number | ((containerWidth: number) => number)
-    /**
-     * applies to row layouts only (direction=row)
-     * the ideal height of each row or a function which receives the container width
-     * and should return the desired ideal height for each row; defaults to 300px
-     */
-    targetRowHeight?: number | ((containerWidth: number) => number)
-    /**
-     * applies to row layouts only (direction=row)
-     * the maximum amount of neighboring nodes to measure per current node visiting
-     * don't change unless you understand the algorithm, see docs
-     * defaults to a couple breakpoints
-     */
-    limitNodeSearch?: number | ((containerWidth: number) => number)
-    /**
-     * do something when the user clicks a photo;
-     * receives arguments event and an object containing the index,
-     * photo obj originally sent and the next and previous photos in the gallery if they exist
-     */
-    // onClick?: PhotoClickHandler<CustomPhotoProps>
-    onClick?: PhotoClickHandler
-  
-    /**
-     * number of margin pixels around each entire image
-     */
-    margin?: number
-    /**
-     * column or row based layout
-     */
-    direction?: string
+  photos: Array<PhotoProps>
+  /**
+   * applies to column layouts only (direction=column)
+   * number of columns or a function which receives the container width
+   * and should return the desired number of columns; defaults to Gallery's breakpoint choosing
+   */
+  columns?: number | ((containerWidth: number) => number)
+  /**
+   * applies to row layouts only (direction=row)
+   * the ideal height of each row or a function which receives the container width
+   * and should return the desired ideal height for each row; defaults to 300px
+   */
+  targetRowHeight?: number | ((containerWidth: number) => number)
+  /**
+   * applies to row layouts only (direction=row)
+   * the maximum amount of neighboring nodes to measure per current node visiting
+   * don't change unless you understand the algorithm, see docs
+   * defaults to a couple breakpoints
+   */
+  limitNodeSearch?: number | ((containerWidth: number) => number)
+  /**
+   * do something when the user clicks a photo;
+   * receives arguments event and an object containing the index,
+   * photo obj originally sent and the next and previous photos in the gallery if they exist
+   */
+  onClick?: PhotoClickHandler
 
-    videoControl?: boolean
-  
-    // renderImage?: React.ComponentType<RenderImageProps<CustomPhotoProps>>
-    // renderImage?: React.ComponentType<RenderImageProps>
+  /**
+   * number of margin pixels around each entire image
+   */
+  margin?: number
+  /**
+   * column or row based layout
+   */
+  direction?: string
+
+  videoControl?: boolean
 }
 
-// const Gallery = React.memo(
 const Gallery = function Gallery({
   photos,
   onClick,
@@ -66,7 +61,6 @@ const Gallery = function Gallery({
   limitNodeSearch,
   targetRowHeight,
   columns,
-  // renderImage,
 } : GalleryProps) {
   const [containerWidth, setContainerWidth] = useState(0);
   const galleryEl = useRef(null);
@@ -149,13 +143,10 @@ const Gallery = function Gallery({
     galleryStyle.height = thumbs[thumbs.length - 1].containerHeight;
   }
 
-  // const renderComponent = renderImage || Photo;
-
   return (
     <div className="react-photo-gallery--gallery">
       <div ref={galleryEl} style={galleryStyle}>
         {thumbs.map((thumb, index) => {
-				  // console.log(thumb);
           const { mime, left, top, containerHeight, ...photo } = thumb;
           return Photo({
             index, key: thumb.key || thumb.src,
@@ -170,7 +161,6 @@ const Gallery = function Gallery({
     </div>
   );
 }
-// );
 
 Gallery.propTypes = {
   photos: PropTypes.arrayOf(PhotoPropType).isRequired,
