@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>anclient.java</artifactId>
-  <version>0.4.28-SNAPSHOT</version>
+  <version>0.4.29</version>
   <name>anclient.java</name>
   <description>Anclient java version. A basic lib only depends on semantic.jserv</description>
   <packaging>jar</packaging>
@@ -46,6 +46,7 @@
   	<tag>HEAD</tag>
   </scm>
 
+  <!-- 
   <distributionManagement>
   	<snapshotRepository>
   		<id>ossrh</id>
@@ -57,6 +58,7 @@
   		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 	</repository>
   </distributionManagement>
+   -->
 
   <dependencies>
 	<dependency>
@@ -73,7 +75,7 @@
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>semantic.jserv</artifactId>
-	    <version>1.4.28-SNAPSHOT</version>
+	    <version>1.4.28</version>
 	</dependency>
 
   </dependencies>
