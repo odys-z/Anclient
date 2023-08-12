@@ -2,6 +2,7 @@ package io.oz.album;
 
 import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
+import static io.odysz.common.LangExt.str;
 import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
@@ -221,7 +222,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      */
     void showMsg(int template, Object... args) {
         runOnUiThread(() -> {
-            String msg = String.format(getString(template), args);
+            String msg = str(getString(template), args);
             msgv.setText(msg);
             msgv.setVisibility(View.VISIBLE);
         });
@@ -272,7 +273,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
                 else
-                    singl.tier.fileProvider(new IFileProvider() {
+                    singl.tier
+                        .fileProvider(new IFileProvider() {
                         private String saveFolder;
 
                         @Override
@@ -303,7 +305,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         public InputStream open(SyncDoc f) throws FileNotFoundException {
                             return new FileInputStream(f.fullpath());
                         }
-                    }).asyVideos(list, null,
+                    })
+                        .asyVideos(list,
+                            //void proc(int rows, int rx, int seqBlock, int totalBlocks, AnsonResp resp)
+                            (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
                             (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
 

@@ -5,7 +5,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 	SessionClient, AnDatasetResp, AlbumRec, PhotoRec, size } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex, GalleryView, AnTreegridComp
+	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex, GalleryView
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 import { PdfViewer } from '../../../src/react/widgets/pdf-view';
@@ -299,7 +299,6 @@ class Widgets extends React.Component<LessProps> {
                 {this.albumtier && Date().toString()}
 				<hr/>
                 {this.albumtier && <AnTreegrid key={this.doctreesk}
-					// ref={(ref: typeof AnTreegrid) => this.gridref = ref}
 					singleCheck
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}

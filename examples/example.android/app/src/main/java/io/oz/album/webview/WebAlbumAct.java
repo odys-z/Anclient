@@ -36,9 +36,6 @@ public class WebAlbumAct extends AppCompatActivity {
 
 		WebView wv = findViewById(R.id.wv);
 		wv.getSettings().setJavaScriptEnabled(true);
-		// WebSettings webSettings = wv.getSettings();
-		// webSettings.setJavaScriptEnabled(true);
-		// wv.setWebViewClient(webView);
 		wv.loadUrl(AssetHelper.url4intent(this, act));
 	}
 }

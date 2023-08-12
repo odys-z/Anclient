@@ -7,7 +7,7 @@
     <string name="login_succeed">登录成功。</string>
 
     <string name="msg_ignore_offline">選項無效 - 未登錄</string>
-    <string name="msg_templ_progress">%d / %d %s\n%.1f%%</string>
+    <string name="msg_templ_progress">進度 %d / %d, 文件頁 %s (%.1f%%)</string>
     <string name="msg_upload_failed" >上传失败。\\n%s\\n%s</string>
     <string name="msg_device_uid"    >登录名 %s @ %s</string>
     <string name="err_pref_login"    >登录失败。\\n%s %s</string>

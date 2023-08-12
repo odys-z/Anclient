@@ -16,9 +16,9 @@ allprojects {
         appcompat_version = "1.4.1"
         glide_version = "4.15.1"
         bm_photoview_version = "1.4.1"
-        anclient_ver = "0.4.28-SNAPSHOT"
-        jserv_ver = "1.4.28-SNAPSHOT"
-        album_lib_ver = "0.4.28-SNAPSHOT"
+        anclient_ver = "0.4.28"
+        jserv_ver = "1.4.28"
+        album_lib_ver = "0.4.29"
     }
 
     repositories {
@@ -26,9 +26,9 @@ allprojects {
         mavenCentral(){ mavenContent { releasesOnly() } }
         google()
         jcenter()
-        maven() {
-            url "https://oss.sonatype.org/content/repositories/snapshots"
-        }
+//        maven() {
+//            url "https://oss.sonatype.org/content/repositories/snapshots"
+//        }
     }
 }
 
