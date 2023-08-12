@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/txt_prefs_summery_home"
+    <PreferenceCategory
+        android:title="@string/txt_prefs_summery_home"
         android:key="@string/key_home_cate"
         android:id="@+id/pref_home_regist"
         >
         <!-- Issue: Target fragment must implement TargetFragment interface
             https://stackoverflow.com/questions/69504256/preferencedialog-in-preferenceactivity-target-fragment-must-implement-targetfr -->
+        <!--            android:fragment="io.oz.album.client.AlbumPreferenceFragment"-->
         <EditTextPreference
-            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:enabled="false"
             android:defaultValue="home"
             android:key="@string/key_home"
             android:title="@string/home_title" />
+        <!--            android:fragment="io.oz.album.client.AlbumPreferenceFragment"-->
         <EditTextPreference
-            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:enabled="false"
             android:key="@string/key_device"
             android:summary="@string/txt_only_once"
@@ -23,23 +24,20 @@
             android:layout="@layout/bt_regist_device" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/txt_prefs_title"
-        android:id="@+id/id_login_cate"
-        >
+    <PreferenceCategory
+        android:title="@string/txt_prefs_title"
+        android:id="@+id/id_login_cate" >
         <EditTextPreference
-            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:defaultValue="@string/jserv_default"
             android:key="@string/jserv_key"
             android:summary="@string/jserv"
             android:title="@string/jserv_title" />
         <EditTextPreference
-            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:key="@string/userid_key"
             android:defaultValue=""
             android:summary="@string/userid_summery"
             android:title="@string/userid_title" />
         <EditTextPreference
-            android:fragment="io.oz.album.client.AlbumPreferenceFragment"
             android:key="@string/pswd_key"
             android:inputType="textPassword"
             android:defaultValue=""

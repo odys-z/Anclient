@@ -330,7 +330,6 @@ export class Lightbox extends CrudCompW<Comprops & {
       else if (mime === 'video') {
         items.push(<video key={i}
           ref={(ref) => this.vidRef = ref}
-
           preload='false' controls
           poster={resource.poster}
           style={{

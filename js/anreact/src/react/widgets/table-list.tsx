@@ -28,6 +28,8 @@ interface AnTablistProps extends Comprops {
 	 */
 	selected?: {ids: Map<string, any>};
 
+	singleCheck?: boolean;
+
 	/** List's column definition.  */
 	columns: Array<AnlistColAttrs<JSX.Element, CompOpts> & Comprops>;
 

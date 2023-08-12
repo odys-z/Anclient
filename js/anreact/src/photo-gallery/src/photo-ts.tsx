@@ -115,9 +115,10 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, cont
     <video
       key={key}
       style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
-      {...photo}
+      // {...photo}
       onClick={onClick ? handleClick : null}
-    />
+    ><source src={photo.src}/>
+    </video>
     : mime2type(mime) === 'audio' ?
     <div key={key}>
     <AudioBox key={key} width={"90%"} height={"50%"}

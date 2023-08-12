@@ -1,6 +1,9 @@
 package io.oz.album.client;
 
+import static io.odysz.common.LangExt.isblank;
+
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -23,7 +26,6 @@ import io.oz.R;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Profiles;
 import io.oz.albumtier.AlbumContext;
-import io.oz.albumtier.PhotoSyntier;
 import io.oz.albumtier.Plicies;
 
 /**
@@ -50,38 +52,47 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 .beginTransaction()
                 .replace(android.R.id.content, prefFragment)
                 .commit();
+
+        //https://issuetracker.google.com/issues/146166988/resources
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
     }
 
     public void onLogin(View btn) {
+        if (isblank(singleton.pswd())) {
+            updateSummery(prefFragment.pswd, "");
+            updateSummery(prefFragment.summery, getString(R.string.err_empty_pswd));
+            updateSummery(prefFragment.pswd, getString(R.string.pswd_title));
+            return;
+        }
         try {
-            singleton.login(
-                (client) -> {
-                    updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                    updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
+          singleton.login(
+            (client) -> {
+                updateSummery(prefFragment.summery, getString(R.string.login_succeed));
+                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
 
-                    // load settings
-                    Anson.verbose = false;
-                    ((PhotoSyntier) singleton.tier).asyGetSettings(
-                        (resp) -> {
-                            Profiles prf = ((AlbumResp) resp).profiles();
-                            singleton.profiles = prf;
-                            singleton.policies = new Plicies(prf);
+                // load settings
+                Anson.verbose = false;
+                singleton.tier.asyGetSettings(
+                    (resp) -> {
+                        Profiles prf = ((AlbumResp) resp).profiles();
+                        singleton.profiles = prf;
+                        singleton.policies = new Plicies(prf);
 
-                            updateSummery(prefFragment.homepref, prf.home);
+                        updateSummery(prefFragment.homepref, prf.home);
 
-                            SharedPreferences sharedPref =
-                                    PreferenceManager.getDefaultSharedPreferences(this);
-                            SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putString(AlbumApp.keys.home, prf.home);
-                            editor.putString(AlbumApp.keys.homepage, prf.webroot);
-                            editor.apply();
-                        },
-                        showErrSummary);
-                },
-                showErrSummary);
+                        SharedPreferences sharedPref =
+                                PreferenceManager.getDefaultSharedPreferences(this);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString(AlbumApp.keys.home, prf.home);
+                        editor.putString(AlbumApp.keys.homepage, prf.webroot);
+                        editor.apply();
+                    },
+                    showErrSummary);
+            },
+            showErrSummary);
         } catch (Exception e) {
-            Log.e(singleton.clientUri, e.getClass().getName() + e.getMessage());
-            updateSummery(prefFragment.summery, getString(R.string.msg_pref_login_failed, e.getClass().getName(), e.getMessage()));
+            Log.e(AlbumContext.clientUri, e.getClass().getName() + e.getMessage());
+            updateSummery(prefFragment.summery, getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
         }
     }
 

@@ -98,7 +98,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
 		return this.state.selected.has(k);
 	}
 
-  updateSelectd (map: Map<string, AnTreeNode> | undefined) {
+  updateSelected (map: Map<string, AnTreeNode> | undefined) {
 		if (typeof this.props.onSelectChange === 'function')
 			this.props.onSelectChange(map);
 	}
@@ -117,7 +117,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
 		}
 
 		this.setState({});
-		this.updateSelectd(selected);
+		this.updateSelected(selected);
 	};
 
 	static th(columns: Array<AnTreegridCol> = [],
@@ -220,16 +220,17 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
     }
 
     function iconItem (cols: AnTreegridCol[], n: AnTreeNode) {
+      let it = n; // fix
       return (
         <Grid container key={n.id}
             spacing={0} className={classes.row}
-            onClick= { (e) => that.handleClick(e, n.id, n) }
+            onClick= { (e) => that.handleClick(e, n.id, it) }
         > 
           { cols
             .filter( (v: AnTreegridCol) => toBool(v.visible, true) )
             .map( (col: AnTreegridCol, cx: number) => {
               if (cx === 0) return (
-                <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
+                <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.rowHead}>
                   <Typography noWrap variant='body2'>
                     {levelIcons(that.props.indentSettings, n.indents)}
                     {n.node[col.field]}
@@ -240,7 +241,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                   TreeCardComp.actionFragment(n, col, cx, undefined, that.props));
               else return (
                 hide(col.grid, media) ? undefined :
-                <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
+                <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.treeItem}>
                   { typeof col.colFormatter === 'function' ?
                     col.colFormatter(col, n, {media, classes}) :
                     <Typography noWrap variant='body2' align={align(n.node.css)} >

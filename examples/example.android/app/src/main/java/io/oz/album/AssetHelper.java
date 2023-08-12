@@ -1,6 +1,10 @@
 package io.oz.album;
 
+import static java.security.AccessController.getContext;
+
+import android.app.Application;
 import android.content.Context;
+import android.content.res.Resources;
 
 import io.oz.R;
 
@@ -14,7 +18,7 @@ public class AssetHelper {
 
     static String jserv;
     static String homeroot;
-    static Context ctx;
+//    Context ctx;
 
     /** Act: show help page */
     public static final int Act_Help = 1;
@@ -28,10 +32,9 @@ public class AssetHelper {
     public static void init(Context context, String jservroot, String webroot) {
         jserv = jservroot;
         homeroot = webroot;
-        ctx = context;
     }
 
-    public static String loadUrls(int intent) {
+    public static String url4intent(Context ctx, int intent) {
         switch (intent) {
             case Act_Album:
                 return ctx.getString(R.string.url_album, homeroot, albumHome);

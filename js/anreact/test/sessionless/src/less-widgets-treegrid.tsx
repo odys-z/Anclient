@@ -5,7 +5,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 	SessionClient, AnDatasetResp, AlbumRec, PhotoRec, size } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex, GalleryView
+	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex, GalleryView, AnTreegridComp
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 import { PdfViewer } from '../../../src/react/widgets/pdf-view';
@@ -150,6 +150,7 @@ class Widgets extends React.Component<LessProps> {
 
 	docIcon: any;
 	pdfview: JSX.Element;
+	gridref: typeof AnTreegrid;
 
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
@@ -246,9 +247,6 @@ class Widgets extends React.Component<LessProps> {
 		}
 	}
 
-	folderSum() {
-	}
-
 	viewFile = (ids: Map<string, AnTreeNode>) => {
 		if (size(ids) > 0) {
 			let fid = ids.keys().next().value;
@@ -301,18 +299,20 @@ class Widgets extends React.Component<LessProps> {
                 {this.albumtier && Date().toString()}
 				<hr/>
                 {this.albumtier && <AnTreegrid key={this.doctreesk}
+					// ref={(ref: typeof AnTreegrid) => this.gridref = ref}
+					singleCheck
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
 					tier={this.albumtier}
 					pk={'NA'} sk={this.doctreesk}
 					columns={[ // noly card for folder header
 						{ type: 'iconame', field: 'pname', label: L('Name'),
-						  grid: {sm: 3, md: 3} },
+						  grid: {xs: 9, sm: 6, md: 4} },
 						{ type: 'text', field: 'mime', label: L('type'), colFormatter: this.typeParser,
-						  grid: {xs: false, sm: 4, md: 2} },
+						  grid: {xs: 1, sm: 1, md: 1} },
 						{ type: 'text', field: 'shareby', label: L('share by'),
 						  grid: {xs: false, sm: 3, md: 2} },
-						{ type: 'text', field: 'img', label: L('size'), colFormatter: this.folderSum,
+						{ type: 'text', field: 'filesize', label: L('size'),
 						  grid: {xs: false, sm: 2, md: 2} },
 						// { type: 'actions', field: 'NA', label: '', grid: {xs: 3, md: 3} }
 					]}

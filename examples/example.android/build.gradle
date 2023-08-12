@@ -12,7 +12,7 @@ buildscript {
 
 allprojects {
     ext {
-        app_ver = "0.2.2"
+        app_ver = "0.2.3"
         appcompat_version = "1.4.1"
         glide_version = "4.15.1"
         bm_photoview_version = "1.4.1"

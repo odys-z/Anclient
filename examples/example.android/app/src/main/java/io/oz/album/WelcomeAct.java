@@ -5,7 +5,9 @@ import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
 import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
+import static io.odysz.common.LangExt.isblank;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -108,9 +110,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String homeName = sharedPref.getString(AlbumApp.keys.home, "");
-        String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
-        String device = sharedPref.getString(AlbumApp.keys.device, "");
-        String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
+        String uid      = sharedPref.getString(AlbumApp.keys.usrid, "");
+        String device   = sharedPref.getString(AlbumApp.keys.device, "");
+        String jserv    = sharedPref.getString(AlbumApp.keys.jserv, "");
         String homepage = sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing));
 
         singl.init(homeName, uid, device, jserv);
@@ -131,10 +133,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         if (singl.state() == AlbumContext.ConnState.Online) {
                             onMediasPicked(result);
-                        } else showMsg(R.string.msg_ignored_when_offline);
+                        } else showMsg(R.string.msg_ignore_offline);
                     }
-                    // WebView wv = findViewById(R.id.wv_welcome);
-                    // wv.reload();
                     reloadAlbum();
                 });
 
@@ -145,7 +145,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         if (singl.state() == AlbumContext.ConnState.Online) {
                             onFilesPicked(result);
-                        } else showMsg(R.string.msg_ignored_when_offline);
+                        } else showMsg(R.string.msg_ignore_offline);
                     }
                     reloadAlbum();
                 });
@@ -157,48 +157,24 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         showMsg(R.string.msg_device_uid, uid, device);
                     }
-                    // WebView wv = findViewById(R.id.wv_welcome);
-                    // wv.reload();
                     reloadAlbum();
                 });
 
         if (helpActStarter == null)
             helpActStarter = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    // WebView wv = findViewById(R.id.wv_welcome);
-                    // wv.reload();
-                    reloadAlbum();
-                });
+                result -> reloadAlbum() );
 
         try {
             if (singl.needSetup())
                 // settings are cleared
                 startPrefsAct();
             else {
-                String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
+                String pswd = sharedPref.getString(AlbumApp.keys.pswd, "-");
                 singl.pswd(pswd)
                      .login((client) -> {
                         // All WebView methods must be called on the same thread.
-                        runOnUiThread(() -> {
-                            /*
-                            final VWebAlbum webView = new VWebAlbum();
-                            WebView wv = findViewById(R.id.wv_welcome);
-                            wv.setWebViewClient(webView);
-                            WebSettings webSettings = wv.getSettings();
-                            webSettings.setJavaScriptEnabled(true);
-                            webSettings.setDomStorageEnabled(true);
-
-                            wv.setWebViewClient(new WebViewClient() {
-                                public void onPageFinished(WebView view, String url) {
-                                    // https://www.techyourchance.com/communication-webview-javascript-android/
-                                    wv.evaluateJavascript(String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd), null);
-                                }
-                            });
-                            wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
-                             */
-                            reloadAlbum();
-                        });
+                        runOnUiThread( () -> reloadAlbum() );
                     },
                     (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
             }
@@ -207,12 +183,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     void reloadAlbum () {
         SessionClient client = singl.tier.client();
         if (client == null || sharedPref == null)
             return;
 
-        String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
+        // String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
+        String pswd = singl.pswd();
 
         WebView wv = findViewById(R.id.wv_welcome);
         final VWebAlbum webView = new VWebAlbum();
@@ -223,12 +201,16 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         wv.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
-                // https://www.techyourchance.com/communication-webview-javascript-android/
-                wv.evaluateJavascript(String.format("loadAlbum('%s', '%s');",
-                        client.ssInfo().uid(), pswd), null);
+                if (!isblank(pswd)) {
+                    String script = String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd);
+                    Utils.warn("\n[Load page script]: %s", script);
+                    // https://www.techyourchance.com/communication-webview-javascript-android/
+                    wv.evaluateJavascript(script, null);
+                }
             }
         });
-        wv.loadUrl(AssetHelper.loadUrls(AssetHelper.Act_Album));
+        Utils.logi("\nLoading home page: %s", AssetHelper.url4intent(this, AssetHelper.Act_Album));
+        wv.loadUrl(AssetHelper.url4intent(this, AssetHelper.Act_Album));
     }
 
     /**

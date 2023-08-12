@@ -2,13 +2,8 @@ package io.oz.album.client;
 
 import static io.oz.album.client.PrefsContentActivity.singleton;
 
-import android.app.Activity;
-import android.app.AutomaticZenRule;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,12 +24,15 @@ import io.oz.albumtier.AlbumContext;
  * <a href='https://stackoverflow.com/a/15612006/7362888'>
  * This class shouldn't have a constructor,</a> to prevent exception when restore state (turn over screen).
  */
-public class AlbumPreferenceFragment extends PreferenceFragmentCompat { Preference btnLogin;
+public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
+    Preference btnLogin;
     Preference summery;
     Preference homepref;
     EditTextPreference device;
     Preference btnRegist;
     PreferenceCategory cateHome;
+
+    EditTextPreference pswd;
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
@@ -46,12 +44,12 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat { Preferen
         bindPref2Val(findPreference(AlbumApp.keys.usrid));
         bindPref2Val(findPreference(AlbumApp.keys.pswd));
 
-        cateHome = findPreference(AlbumApp.keys.homeCate);
+        cateHome  = findPreference(AlbumApp.keys.homeCate);
         btnRegist = findPreference(AlbumApp.keys.bt_regist);
-        btnLogin = findPreference(AlbumApp.keys.bt_login);
-        device = findPreference(AlbumApp.keys.device);
+        btnLogin  = findPreference(AlbumApp.keys.bt_login);
+        device    = findPreference(AlbumApp.keys.device);
+        pswd      = findPreference(AlbumApp.keys.pswd);
 
-        EditTextPreference pswd = findPreference(AlbumApp.keys.pswd);
         pswd.setSummary("");
         pswd.setOnBindEditTextListener(editText ->
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
@@ -59,7 +57,6 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat { Preferen
         homepref = findPreference(AlbumApp.keys.home);
         String devid = singleton.photoUser.device;
         if (!LangExt.isblank(devid)) {
-            // homepref.setSummary(getString(R.string.devide_name, devid));
             homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
             findPreference(AlbumApp.keys.device).setEnabled(false);
             cateHome.removePreference(btnRegist);
