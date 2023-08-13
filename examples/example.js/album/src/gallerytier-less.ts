@@ -1,6 +1,6 @@
 import { Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
-	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode, PhotoRec
+	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode, SyncDoc
 } from '@anclient/semantier';
 
 const debug = true;
@@ -27,10 +27,10 @@ export class GalleryTier extends StreeTier {
 	}
 
 	/**
-	 * Get photo for my album. 
+	 * Get photo for my album.
 	 * File system uri is not replaced with file. The img tag should use delay attributes and load file according to uri.
 	 * The file uri is an identifier of files managed by jserv, not same as function uri for Anclient component.
-	 * 
+	 *
 	 * @override(Semantier)
 	 */
     collects(conds: PageInf, onLoad: ((collects?: PhotoCollect[]) => void)) : void {
@@ -68,9 +68,9 @@ export class GalleryTier extends StreeTier {
 
 	// /**
 	//  * Compose src of img tag, with AlbumReq request as anson64 parameter.
-	//  * 
+	//  *
 	//  * @param recId potho id
-	//  * @returns 
+	//  * @returns
 	//  */
 	// imgSrc(recId: string) : string {
 	// 	let req = new AlbumReq(this.uri, this.page);
@@ -91,63 +91,63 @@ export class GalleryTier extends StreeTier {
 	}
 };
 
-interface AlbumRec extends Tierec {
-	/** Album Id (h_albems.aid) */
-	album?: string;
+// interface AlbumRec extends Tierec {
+// 	/** Album Id (h_albems.aid) */
+// 	album?: string;
+//
+// 	/** Collects' ids */
+// 	collects?: Array<string>;
+//
+// 	/** Collects' default length (first page size) */
+// 	collectSize?: number;
+//
+// 	/** Photos ids */
+// 	photos?: Array<string>;
+//
+// 	/** Photo id */
+// 	pid?: string;
+// }
 
-	/** Collects' ids */
-	collects?: Array<string>;
+// class AlbumPage extends PageInf {
+// 	/** A temperoray solution before PageInf.condts evolved to Tierec. */
+// 	qrec?: AlbumRec;
+//
+// 	constructor (query?: AlbumRec) {
+// 		super();
+// 		this.qrec = query;
+// 	}
+// }
 
-	/** Collects' default length (first page size) */
-	collectSize?: number;
+// class AlbumReq extends DocsReq {
+// 	static A = {
+// 		records: 'r/collects',
+// 		collect: 'r/photos',
+// 		rec: 'r/photo',
+// 		download: 'r/download',
+// 		update: 'u',
+// 		insert: 'c',
+// 		upload: 'c/doc',
+// 		del: 'd',
+// 	};
 
-	/** Photos ids */
-	photos?: Array<string>;
+// 	pageInf: PageInf;
+// 	albumId: string | undefined;
+// 	cids?: string[];
+// 	pids?: string[];
 
-	/** Photo id */
-	pid?: string;
-}
+// 	constructor (uri: string, page: AlbumPage) {
+// 		super(uri, {docId: ''});
+// 		this.type = 'io.oz.album.tier.AlbumReq';
 
-class AlbumPage extends PageInf {
-	/** A temperoray solution before PageInf.condts evolved to Tierec. */
-	qrec?: AlbumRec;
+// 		this.pageInf = new PageInf(page);
 
-	constructor (query?: AlbumRec) {
-		super();
-		this.qrec = query;
-	}
-}
-
-class AlbumReq extends DocsReq {
-	static A = {
-		records: 'r/collects',
-		collect: 'r/photos',
-		rec: 'r/photo',
-		download: 'r/download',
-		update: 'u',
-		insert: 'c',
-		upload: 'c/doc',
-		del: 'd',
-	};
-
-	pageInf: PageInf;
-	albumId: string | undefined;
-	cids?: string[];
-	pids?: string[];
-
-	constructor (uri: string, page: AlbumPage) {
-		super(uri, {docId: ''});
-		this.type = 'io.oz.album.tier.AlbumReq';
-
-		this.pageInf = new PageInf(page);
-
-		if (page.qrec) {
-			this.albumId = page.qrec.album;
-			this.cids = page.qrec.collects;
-			this.pids = page.qrec.photos;
-		}
-	}
-}
+// 		if (page.qrec) {
+// 			this.albumId = page.qrec.album;
+// 			this.cids = page.qrec.collects;
+// 			this.pids = page.qrec.photos;
+// 		}
+// 	}
+// }
 
 class Profiles extends AnsonBody {
 
@@ -170,8 +170,8 @@ class AlbumResp extends AnsonResp {
 	ownerId: string | undefined;
 	owner: string | undefined;
 
-	photo: PhotoRec | undefined;
-	photos: Array<PhotoRec[]> | undefined;
+	photo: SyncDoc | undefined;
+	photos: Array<SyncDoc[]> | undefined;
 	collectRecords: Array<PhotoCollect> | undefined;
 	forest: Array<PhotoCollect> | undefined;
 

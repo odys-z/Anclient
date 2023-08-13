@@ -5,22 +5,14 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AlbumReq, AnTreeNode, AnsonValue, PhotoCSS, PhotoRec, Semantier, SessionClient, StreeTier, Tierec, isEmpty, len
+import { AnTreeNode, AnsonValue, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
-import { ForcedStyle, PhotoProps } from '../../photo-gallery/src/photo-ts';
+import { ForcedStyle } from '../../photo-gallery/src/photo-ts';
+import { AlbumReq, PhotoCSS, PhotoCollect } from '../../photo-gallery/src/tier/photo-rec';
 
 const _photos = [];
-
-export interface PhotoCollect extends Tierec {
-	title?: string;
-	thumbUps?: Set<string>;
-	hashtags?: Array<string>;
-	shareby?: string;
-	extlinks?: any; // another table?
-	photos: Array<PhotoProps<PhotoRec>>;
-};
 
 export interface ImageSlide  {
 	index: number,
@@ -59,7 +51,7 @@ export interface GalleryProps {
 export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	tier: StreeTier | undefined;
 	classes: any;
-	uri: any;
+	uri: string;
 	currentImx: number = -1;
 	showCarousel: boolean = false;
 
@@ -83,9 +75,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	componentDidMount() {
-		let uri = this.uri;
-		// console.log("super.uri", uri);
-
 		this.photos = this.props.tnode.node.children;
 		this.slides = this.parse(this.props.tnode.node.children);
 	}
@@ -102,12 +91,12 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					? {width:'auto', maxHeight: '20vh'}
 					: undefined;
 
-		nodes?.forEach( (p, x) => {
+		nodes?.forEach( (p: AnTreeNode, x) => {
 			let [_width, _height, w, h] = (
 				JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
 			photos.push({
 				index: x,
-				legend: PhotoRec.toShareLable(p.node as PhotoRec),
+				legend: SyncDoc.shareLable(p as {shareby?: string, device?: string}),
 				width: w, height: h,
 				src: GalleryView.imgSrcReq(p.id, this.albumtier),
 				imgstyl,
@@ -129,7 +118,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 * @returns src for img, i.e. jserv?anst64=message-string 
 	 */
 	static imgSrcReq(pid: AnsonValue, opts: Semantier & {port: string}) : string {
-	// static imgSrcReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) : string {
 
 		let {client, port} = opts;
 
@@ -251,5 +239,4 @@ function getDownloadReq(pid: string, opts: {uri: string, port: string, client: S
 	}
 	return reqMsgs[pid];
 }
-
 */

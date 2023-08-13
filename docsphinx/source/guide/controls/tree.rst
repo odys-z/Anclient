@@ -38,6 +38,9 @@ Start VS Code, load dist/widgets.html with Anprism. Following is what is expecte
 .. image:: ../imgs/04-treeditor-3.jpg
    :height: 10em
 
+.. image:: ../imgs/05-treeditor-4.jpg
+   :height: 10em
+
 To deploy docker container behind a Nginx proxy for https protocol,
 see :ref:`Tip: deploy docker as Nginx backend server working as a https domain<tip-docker-https>`
 

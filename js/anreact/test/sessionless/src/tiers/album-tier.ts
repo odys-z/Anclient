@@ -1,7 +1,5 @@
-import { Protocol, PageInf, SessionClient,
-	AnDatasetResp, AnTreeNode, StreeTier, AlbumReq, AlbumRec, PhotoRec
-} from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView
+import { PageInf, SessionClient, StreeTier } from '@anclient/semantier';
+import { Comprops, CrudComp, PhotoCollect, GalleryView, AlbumReq, AlbumResp
 } from '../../../../src/an-components';
 
 export class AlbumTier extends StreeTier {
@@ -66,39 +64,29 @@ export class AlbumTier extends StreeTier {
 	 * @returns src of img tag
 	 */
 	imgSrc(recId: string) : string {
-		/*
-		let req = new AlbumReq({uri: this.uri, page: this.page});
-		req.a = AlbumReq.A.download;
-		req.queryRec.album = recId;
-
-		let msg = this.client.an.getReq<AlbumReq>(this.port, req);
-
-		return AlbumTier.servUrl(this.client.an.servUrl(this.port), msg);
-		*/
 		return GalleryView.imgSrcReq(recId, this);
-		// return GalleryView.imgSrcReq(recId, { uri: this.uri, port: this.port, client: this.client});
 	}
 };
 
-class AlbumResp extends AnDatasetResp {
-	static __type__ = 'io.oz.sandbox.album.AlbumResp';
-	album?: AlbumRec;
+// class AlbumResp extends AnDatasetResp {
+// 	static __type__ = 'io.oz.sandbox.album.AlbumResp';
+// 	album?: AlbumRec;
 
-	collect?: Array<string>;
-	collects?: Array<PhotoCollect>;
+// 	collect?: Array<string>;
+// 	collects?: Array<PhotoCollect>;
 
-	photo?: PhotoRec;
+// 	photo?: PhotoRec;
 
-	constructor (resp: AlbumRec & {
-			forest: AnTreeNode[], // profiles?: Profiles,
-			photo?: PhotoRec, collect?: Array<string>}) {
-		super({
-			forest: resp.forest
-		});
+// 	constructor (resp: AlbumRec & {
+// 			forest: AnTreeNode[], // profiles?: Profiles,
+// 			photo?: PhotoRec, collect?: Array<string>}) {
+// 		super({
+// 			forest: resp.forest
+// 		});
 
-		this.album = resp;
-		this.collect = resp.collect;
-		this.collects = resp.collects as PhotoCollect[];
-	}
-}
-Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });
+// 		this.album = resp;
+// 		this.collect = resp.collect;
+// 		this.collects = resp.collects as PhotoCollect[];
+// 	}
+// }
+// Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });

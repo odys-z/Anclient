@@ -2,7 +2,7 @@ import * as CSS from 'csstype';
 
 import { SessionClient } from './anclient';
 
-import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, DocsReq, AnsonBody } from './protocol';
+import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody } from './protocol';
 
 import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
 
@@ -149,7 +149,7 @@ export class StreeTier extends Semantier {
         if (!opts.port)
 		 	throw Error('Decision since @anclient/anreact 0.4.25, port name is needed to load a tree.');
         if (!StreeTier.reqFactories[opts.port])
-		 	throw Error("User request's factory must registered. Need factory for port: " + opts.port);
+		 	throw Error("To handle tree with StreeTier, user request's factory must registered. Need factory for port: " + opts.port);
         
         if (!(this.client instanceof SessionClient))
             throw Error('Needing a intance of AnClient.');
@@ -162,81 +162,125 @@ export class StreeTier extends Semantier {
     }
 }
 
-export class PhotoRec implements Tierec {
-	static __type__: 'io.oz.album.tier.PhotoRec';
-
-    [f: string]: string | number | boolean | object;
+/** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
+export class SyncDoc implements Tierec {
+	static __type0__: 'io.odysz.semantic.tier.docs.SynDoc';
+    [f: string]: AnsonValue; // string | number | boolean | object;
 
 	type?: string;
 
 	/** pid */
-	recId?: string;
+	docId?: string;
+
 	/** card title */
 	pname?: string;
 	shareby?: string | undefined;
 	sharedate?: string;
-	css?: PhotoCSS | string;
+	// css?: object | string;
 	device?: string;
 
 	src: string;
-	srcSet?: Array<string>;
-	width: number;
-	height: number
+	// srcSet?: Array<string>;
+	// width: number;
+	// height: number
 
-	constructor (opt: { recId: any; src?: any; device?: string}) {
-		this.type = PhotoRec.__type__;
+	constructor (opt: { recId: any; src?: any; device?: string, type: string}) {
+		// this.type = SyncDoc.__type0__;
+		this.type = opt.type;
 		this.src = opt.src
-		this.recId = opt.recId;
+		this.docId = opt.recId;
 		this.device = opt.device;
 	}
 
-	shareLable() {
-		return PhotoRec.toShareLable(this);
-	}
-
-	static toShareLable(p: {shareby?: string, device?: string}) {
+	/**
+	 * A helper for compse shared-by label, with only text handling.
+	 * @param p photo, doc etc. 
+	 * @returns 
+	 */
+	static shareLable(p: {shareby?: string, device?: string}): string {
 		return ((p.shareby && p.device)
 			? `shared by ${p.shareby} @ ${p.device}`
-			: p.shareby ?
-			`shared by ${p.shareby}`
+			: p.shareby
+			?  `shared by ${p.shareby}`
 			: undefined );
 	}
-};
-
-export class AlbumReq extends DocsReq {
- 	static __type__ = 'io.oz.album.tier.AlbumReq';
-	static A = {
-		stree: DatasetierReq.A.stree,
-		records: 'r/collects',
-		collect: 'r/photos',
-		rec: 'r/photo',
-		download: 'r/download',
-		update: 'u',
-		insert: 'c',
-		upload: 'c/doc',
-		del: 'd',
-	};
-
-	pageInf: PageInf;
-	sk: string;
-	photo: PhotoRec;
-
-	pid: string;
-
-	constructor (opts: {uri?: string, sk?: string, qrec?: PhotoRec, page?: PageInf}) {
-		super(opts.uri, {docId: opts.sk});
-		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
-
-		let {sk} = opts;
-		this.pageInf = opts.page;
-		this.sk = sk;
-
-		this.photo = opts.qrec || new PhotoRec({recId: sk});
-	}
 }
-StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
 
-export class PhotoCSS {
-	type: 'io.oz.album.tier.PhotoCSS';
-	size: [0, 0, 0, 0];
-}
+// export class PhotoRec implements Tierec {
+// 	static __type__: 'io.oz.album.tier.PhotoRec';
+
+//     [f: string]: string | number | boolean | object;
+
+// 	type?: string;
+
+// 	/** pid */
+// 	recId?: string;
+// 	/** card title */
+// 	pname?: string;
+// 	shareby?: string | undefined;
+// 	sharedate?: string;
+// 	css?: PhotoCSS | string;
+// 	device?: string;
+
+// 	src: string;
+// 	srcSet?: Array<string>;
+// 	width: number;
+// 	height: number
+
+// 	constructor (opt: { recId: any; src?: any; device?: string}) {
+// 		this.type = PhotoRec.__type__;
+// 		this.src = opt.src
+// 		this.recId = opt.recId;
+// 		this.device = opt.device;
+// 	}
+
+// 	shareLable() {
+// 		return PhotoRec.toShareLable(this);
+// 	}
+
+// 	static toShareLable(p: {shareby?: string, device?: string}) {
+// 		return ((p.shareby && p.device)
+// 			? `shared by ${p.shareby} @ ${p.device}`
+// 			: p.shareby ?
+// 			`shared by ${p.shareby}`
+// 			: undefined );
+// 	}
+// };
+
+// export class AlbumReq extends DocsReq {
+//  	static __type__ = 'io.oz.album.tier.AlbumReq';
+// 	static A = {
+// 		stree: DatasetierReq.A.stree,
+// 		records: 'r/collects',
+// 		collect: 'r/photos',
+// 		rec: 'r/photo',
+// 		download: 'r/download',
+// 		update: 'u',
+// 		insert: 'c',
+// 		upload: 'c/doc',
+// 		del: 'd',
+// 	};
+
+// 	pageInf: PageInf;
+// 	sk: string;
+// 	photo: PhotoRec;
+
+// 	pid: string;
+
+// 	constructor (opts: {uri?: string, sk?: string, qrec?: PhotoRec, page?: PageInf}) {
+// 		super(opts.uri, {docId: opts.sk});
+// 		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
+
+// 		let {sk} = opts;
+// 		this.pageInf = opts.page;
+// 		this.sk = sk;
+
+// 		this.photo = opts.qrec || new PhotoRec({recId: sk});
+// 	}
+// }
+// StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
+
+// export class PhotoCSS {
+// 	type: 'io.oz.album.tier.PhotoCSS';
+// 	size: [0, 0, 0, 0];
+// }
