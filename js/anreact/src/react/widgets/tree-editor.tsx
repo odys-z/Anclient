@@ -351,7 +351,7 @@ class TreeGallaryComp extends TreeCardComp {
 							<Grid item key={`${tnode.id}.${ix}`} {...col.grid} className={classes.treeCell}>
 								{TreeGallaryComp.formatFolderIcons(that.props.indentIcons, tnode, {grid: col.grid, media, classes})}
 							</Grid>);
-					else 
+					else
 						return (
 						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} className={classes.treeCell}>
 							<Typography variant='body2' > {n[col.field]} </Typography>
@@ -552,7 +552,6 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 			  );
 			}
 			else {
-			  // console.log(Object.assign(defltIcons, that.props.indentIcons));
 			  return (
 				ntype === TreeNodeVisual.gallery ?
 				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)
@@ -692,7 +691,7 @@ AnTreeditorComp.contextType = AnContext;
 
 /**
  * Supported ColTypes: text, action, formatter (AnlistColAttrs.fomatter)
- * 
+ *
  * Supported node type: {@link TreeNodeVisual.card} & {@link TreeNodeVisual.gallery}.
  */
 const AnTreeditor = withStyles<any, any, TreeItemProps>(styles)(withWidth()(AnTreeditorComp));

@@ -76,30 +76,6 @@ export class AnTreeNode implements Tierec {
 	indents?: Array<IndentIconame>;
 }
 
-// export class AlbumRec {
-// 	static __type__: "io.oz.sandbox.album.AlbumRec";
-
-// 	type: string;
-
-// 	/** Album Id (h_albems.aid) */
-// 	album?: string;
-
-// 	/** Collects' ids */
-// 	collects?: Array<Tierec>;
-
-// 	/** Collects' default length (first page size) */
-// 	collectSize?: number;
-
-// 	/** Photos ids, but what's for? */
-// 	collect?: Array<string>;
-
-// 	// [f: string]: string | number | boolean | object;
-
-// 	contructor () {
-// 		this.type = AlbumRec.__type__;
-// 	}
-// }
-
 /**
  * Light weight wrapper of Anreact.stree(), in consists with Semantier style.
  * A helper of binding tree data to anreact Treeditor.
@@ -197,12 +173,12 @@ export class SyncDoc implements Tierec {
 	 * @param p photo, doc etc. 
 	 * @returns 
 	 */
-	static shareLable(p: {shareby?: string, device?: string}): string {
-		return ((p.shareby && p.device)
-			? `shared by ${p.shareby} @ ${p.device}`
-			: p.shareby
-			?  `shared by ${p.shareby}`
-			: undefined );
+	static shareLable(p: {node: {shareby: string, pname: string, device?: string}}): string {
+		return ((p.node.shareby && p.node.device)
+			? `shared by ${p.node.shareby} @ ${p.node.device}`
+			: p.node.shareby
+			?  `shared by ${p.node.shareby}`
+			: p.node.pname );
 	}
 }
 

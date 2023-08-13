@@ -40,7 +40,7 @@ class ErrorComp extends CrudComp<Comprops> {
 	}
 
 	toSubmit() {
-		console.log('TODO');
+		// console.log('TODO');
 	}
 
 	render() {

@@ -33,17 +33,15 @@ const makeGetNeighbors = (targetHeight, containerWidth, photos, limitNodeSearch,
 
 /**
  * Set w/h of photos.
- * 
- * @param {*} param0 
- * @returns photos 
+ *
+ * @param {*} param0
+ * @returns photos
  */
 export const computeRowLayout = ({ containerWidth, limitNodeSearch, targetRowHeight, margin, photos }) => {
-  // const t = +new Date();
   const getNeighbors = makeGetNeighbors(targetRowHeight, containerWidth, photos, limitNodeSearch, margin);
 
   let path = findShortestPath(getNeighbors, '0', photos.length);
   path = path.map(node => +node);
-  // console.log(`time to find the shortest path: ${(+new Date() - t)} ms`);
 
   for (let i = 1; i < path.length; ++i) {
     const row = photos.slice(path[i - 1], path[i]);

@@ -116,6 +116,10 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
                 return;
             }
 
+            String sync = mList.get(index).syncFlag;
+            if ( SyncDoc.SyncFlag.publish.equals(sync) || SyncDoc.SyncFlag.pushing.equals(sync) )
+                return;
+
             if (holder.mCbx.isSelected()) {
                 holder.mCbx.setSelected(false);
                 mCurrentNumber--;

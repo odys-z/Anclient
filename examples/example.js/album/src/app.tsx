@@ -135,7 +135,7 @@ export class App extends CrudCompW<AlbumProps> {
 			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
 				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[];
-				console.log(tier.forest);
+				// console.log(tier.forest);
 				that.setState({});
 			}},
 			this.error);
@@ -180,7 +180,6 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	render() {
-	  console.log(this.uri);
 	  let that = this;
 	  return (
 		<AnContext.Provider value={{

@@ -19,24 +19,24 @@ export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 
 /**
  * Find out hide an element or not for the grid setting and media width.
- * 
+ *
  * TIP: to avoid ReactJS reporting warning like this:
- * 
+ *
  * Invalid prop supplied to `ForwardRef(Grid)`, expected a ReactNode,
- * 
+ *
  * do not return boolean in render() like this:
- * 
+ *
  * <Grid>hide(col.grid, this.props.media) || <></></Grid>
- * 
- * @param grid 
- * @param media 
+ *
+ * @param grid
+ * @param media
  * @returns expample:
- * 
+ *
  * grid {xs: false, sm: false}
- * 
- * for 
+ *
+ * for
  * media {xs: true, sm: true, md: true}, will return false
- * 
+ *
  * for
  * media {xs: true, sm: true, md: false}, will return true
  */
@@ -266,11 +266,11 @@ export class AnReactExt extends AnReact {
 		if (compont)
 			compont.setState({stree: resp.Body().forest});
 	}
-	
+
 	// usage:
 	let that = this;
 	let ds = {uri, sk: this.sk, t: 'tagtrees',
-	  port?: 'optional-port-name', // default s-tree.serv 
+	  port?: 'optional-port-name', // default s-tree.serv
 	  onOk: (e) => {
 	    that.confirm = (<ConfirmDialog
 			title={L('Info')}
@@ -304,7 +304,7 @@ export class AnReactExt extends AnReact {
 			throw Error('opts.uri is required. Since v0.9.50, Anclient requests need client function uri to find datasource.');
 
 		if (!rootId)
-			console.log('Rebuild tree without rootId ?');
+			console.warn('Rebuild tree without rootId ?');
 
 		opts.port = 'stree';
 
@@ -314,7 +314,7 @@ export class AnReactExt extends AnReact {
 		}
 
 		let onload = onOk || function (resp: any) {
-			console.log("Rebuilt successfully: ", resp);
+			// console.log("Rebuilt successfully: ", resp);
 		}
 
 		this.dataset(opts, onload);

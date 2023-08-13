@@ -7,7 +7,6 @@
  * @return base64
  */
 export function uarr2Base64 (u8Arr: Uint8Array, mime: string): string {
-	// console.log(e, freader.result);
 	// var CHUNK_SIZE = 0x8000; //arbitrary number
 	// Common Multiple of 6 and 8 should result in 0 padding in the middle?
 	// a smaller size for test: var CHUNK_SIZE = 0x8 * 0x6;
@@ -42,9 +41,9 @@ export function urlOfdata(mime: string, data) {
 
 /**
  * Creat blob url for img tag' src attribute.
- * 
- * @param svg 
- * @returns blob url 
+ *
+ * @param svg
+ * @returns blob url
  */
 export function svgImgSrc(svg: string) {
 	return URL.createObjectURL(new Blob([svg], {type: 'image/svg+xml'}));

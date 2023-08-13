@@ -228,8 +228,6 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		if (parentId && this.state.parent?.field)
 			nvs.push({name: this.state.parent?.field, value: this.state.parentId});
 
-		// console.log(nvs);
-
 		// 2. request (insert / update)
 		let {pk} = this.pkval;
 		if (this.state.crud === CRUD.c) {
@@ -242,7 +240,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			req = client
 				.usrAct(this.funcId, CRUD.u, 'edit card')
 				.update(this.uri, this.state.mtabl, this.pkval, nvs);
-			
+
 			if (pk)
 				req.Body()?.whereEq(pk, str_(rec[pk]));
 		}

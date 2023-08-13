@@ -16,16 +16,16 @@ export interface PdfObject {
 /**
  * The dependency PDF.js required by @anclient/anreact is saved as develope. Users must install:
  * <pre>npm install pdfjs-dist</pre>
- * 
+ *
  * Experiment results (loading on mobile device is more expensive):
  *
  * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/build/pdf.min.js  :  87.8 KB, 1.39s
- * 
+ *
  * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/build/pdf.worker.js  :  391 KB, 2.03s
- * 
+ *
  * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/web/pdf_viewer.min.css  :  5.4 KB, 972ms
- * 
- * local pdf: 1.4 M, 7ms 
+ *
+ * local pdf: 1.4 M, 7ms
  */
 export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
 
@@ -76,7 +76,7 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
   }
 
   prevpage() {
-    if (this.state.currentPage <= 1) 
+    if (this.state.currentPage <= 1)
       return;
     this.state.currentPage--;
     this.queueRenderPage(this.state.currentPage);
@@ -87,7 +87,7 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
         return;
       this.state.currentPage++;
       this.queueRenderPage(this.state.currentPage);
-  
+
   }
 
   renderPage = (pdf: PdfObject, canvas: HTMLCanvasElement, pageNum: number) => {
@@ -110,8 +110,8 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
                 ? [outputScale, 0, 0, outputScale, 0, 0]
                 : null;
 
-          console.log(canvas.width, canvas.height, "scale 1.0", viewport.width, viewport.height, outputScale)
-  
+          // console.log(canvas.width, canvas.height, "scale 1.0", viewport.width, viewport.height, outputScale)
+
           const renderContext = {
               canvasContext: canvas.getContext('2d'),
               viewport: viewport,

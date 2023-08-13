@@ -1,4 +1,4 @@
-import { AlbumPage, AlbumReq, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
+import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
 	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode, SyncDoc
 } from '@anclient/semantier';
@@ -12,7 +12,6 @@ export class GalleryTier extends StreeTier {
 	page: AlbumPage;
 	collectRecords?: PhotoCollect[];
 	albumTitle: string = 'title';
-	// forest?: AnTreeNode[];
 
 	/**
 	 * @param props
@@ -49,8 +48,7 @@ export class GalleryTier extends StreeTier {
 			(resp) => {
 				let body = resp.Body() as AlbumResp;
 				if (body) {
-					// let {cols, rows} = AnsonResp.rs2arr(body.Rs());
-					this.collectRecords = body.collectRecords;
+					this.collectRecords = body.collects;
 					onLoad(this.collectRecords);
 				}
 			},
@@ -66,22 +64,6 @@ export class GalleryTier extends StreeTier {
         this.collects(this.page, onLoad);
     }
 
-	// /**
-	//  * Compose src of img tag, with AlbumReq request as anson64 parameter.
-	//  *
-	//  * @param recId potho id
-	//  * @returns
-	//  */
-	// imgSrc(recId: string) : string {
-	// 	let req = new AlbumReq(this.uri, this.page);
-	// 	req.a = AlbumReq.A.download;
-	// 	req.docId = recId;
-
-	// 	let msg = this.client.an.getReq<AlbumReq>(this.port, req);
-
-	// 	return GalleryTier.servUrl(this.client.an.servUrl(this.port), msg);
-	// }
-
 	static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
 		if (debug)
 			console.log(msg);
@@ -90,64 +72,6 @@ export class GalleryTier extends StreeTier {
 		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
 	}
 };
-
-// interface AlbumRec extends Tierec {
-// 	/** Album Id (h_albems.aid) */
-// 	album?: string;
-//
-// 	/** Collects' ids */
-// 	collects?: Array<string>;
-//
-// 	/** Collects' default length (first page size) */
-// 	collectSize?: number;
-//
-// 	/** Photos ids */
-// 	photos?: Array<string>;
-//
-// 	/** Photo id */
-// 	pid?: string;
-// }
-
-// class AlbumPage extends PageInf {
-// 	/** A temperoray solution before PageInf.condts evolved to Tierec. */
-// 	qrec?: AlbumRec;
-//
-// 	constructor (query?: AlbumRec) {
-// 		super();
-// 		this.qrec = query;
-// 	}
-// }
-
-// class AlbumReq extends DocsReq {
-// 	static A = {
-// 		records: 'r/collects',
-// 		collect: 'r/photos',
-// 		rec: 'r/photo',
-// 		download: 'r/download',
-// 		update: 'u',
-// 		insert: 'c',
-// 		upload: 'c/doc',
-// 		del: 'd',
-// 	};
-
-// 	pageInf: PageInf;
-// 	albumId: string | undefined;
-// 	cids?: string[];
-// 	pids?: string[];
-
-// 	constructor (uri: string, page: AlbumPage) {
-// 		super(uri, {docId: ''});
-// 		this.type = 'io.oz.album.tier.AlbumReq';
-
-// 		this.pageInf = new PageInf(page);
-
-// 		if (page.qrec) {
-// 			this.albumId = page.qrec.album;
-// 			this.cids = page.qrec.collects;
-// 			this.pids = page.qrec.photos;
-// 		}
-// 	}
-// }
 
 class Profiles extends AnsonBody {
 
@@ -162,27 +86,25 @@ class Profiles extends AnsonBody {
 		this.servtype = obj.servtype;
 	}
 }
-
 Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
 
-class AlbumResp extends AnsonResp {
-	albumId: string | undefined;
-	ownerId: string | undefined;
-	owner: string | undefined;
+// class AlbumResp extends AnsonResp {
+// 	albumId: string | undefined;
+// 	ownerId: string | undefined;
+// 	owner: string | undefined;
 
-	photo: SyncDoc | undefined;
-	photos: Array<SyncDoc[]> | undefined;
-	collectRecords: Array<PhotoCollect> | undefined;
-	forest: Array<PhotoCollect> | undefined;
+// 	photo: SyncDoc | undefined;
+// 	photos: Array<SyncDoc[]> | undefined;
+// 	collectRecords: Array<PhotoCollect> | undefined;
+// 	forest: Array<PhotoCollect> | undefined;
 
-	clientPaths: object | undefined;
+// 	clientPaths: object | undefined;
 
-	profils: Profiles | undefined;
+// 	profils: Profiles | undefined;
 
-	constructor (obj: AlbumResp) {
-		super({type: 'io.oz.album.tier.AlbumResp'});
-		Object.assign(this, obj);
-	}
-}
-
-Protocol.registerBody('io.oz.album.tier.AlbumResp', (jsonBd) => { return new AlbumResp(jsonBd); });
+// 	constructor (obj: AlbumResp) {
+// 		super({type: 'io.oz.album.tier.AlbumResp'});
+// 		Object.assign(this, obj);
+// 	}
+// }
+// Protocol.registerBody('io.oz.album.tier.AlbumResp', (jsonBd) => { return new AlbumResp(jsonBd); });

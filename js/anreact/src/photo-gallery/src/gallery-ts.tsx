@@ -149,7 +149,7 @@ const Gallery = function Gallery({
         {thumbs.map((thumb, index) => {
           const { mime, left, top, containerHeight, ...photo } = thumb;
           return Photo({
-            index, key: thumb.key || thumb.src,
+            index, key: thumb.key || thumb.src, legend: thumb.legend,
             left, top, containerHeight,
             margin, direction, videoControl,
             onClick: onClick ? handleClick : null,

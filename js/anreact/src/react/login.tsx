@@ -114,7 +114,7 @@ class LoginComp extends React.Component<LoginProps> {
 		if (!this.config.loggedin) {
 			let serv = ctx.servId || 'host';
 			let hosturl = ctx.servs[serv];
-			console.log("login url & serv-id: ", hosturl, serv);
+			// console.log("login url & serv-id: ", hosturl, serv);
 
 			an.init(hosturl);
 			an.login( uid, pwd, reload, {onError} );
@@ -138,7 +138,6 @@ class LoginComp extends React.Component<LoginProps> {
 		}
 
 		function onError (code: string, resp: AnsonMsg<AnsonResp>) {
-			console.log(an);
 			if (typeof ctx.error === 'object') {
 				let errCtx = ctx.error;
 				errCtx.msg = resp.Body().msg();

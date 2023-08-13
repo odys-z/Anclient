@@ -1,7 +1,7 @@
 /**
  * Credit to: https://github.com/Ngineer101/react-image-video-lightbox/blob/master/src/index.js
  * 2023.6.27 baseline, by Ngineer, License: MIT
- * 
+ *
  * Modified by Ody Zhou
  */
 import * as React from 'react';
@@ -305,7 +305,7 @@ export class Lightbox extends CrudCompW<Comprops & {
 
   vidRef: HTMLVideoElement;
   audRef: AudioBox;
-  
+
   getResources() {
     let items = [];
     let data = this.parse(this.props.photos);
@@ -340,7 +340,7 @@ export class Lightbox extends CrudCompW<Comprops & {
             transition: 'transform 0.5s ease-out'
           }}
           onLoad={(e) => {
-            console.log('video loaded', e.currentTarget);
+            console.log('--- video loaded ---', e.currentTarget);
             if (this.state.swiping || this.state.loading)
               this.setState({ loading: false }); }}
           onTouchStart={(e) => {

@@ -272,9 +272,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 ArrayList<? extends SyncDoc> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
-                else
-                    singl.tier
-                        .fileProvider(new IFileProvider() {
+                else singl.tier
+                    .fileProvider(new IFileProvider() {
                         private String saveFolder;
 
                         @Override
@@ -306,11 +305,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             return new FileInputStream(f.fullpath());
                         }
                     })
-                        .asyVideos(list,
-                            //void proc(int rows, int rx, int seqBlock, int totalBlocks, AnsonResp resp)
-                            (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
-                            (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
-                            errCtx.prepare(msgv, R.string.msg_upload_failed));
+                    .asyVideos(list,
+                        (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
+                        (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
+                        errCtx.prepare(msgv, R.string.msg_upload_failed));
 
                 WebView wv = findViewById(R.id.wv_welcome);
                 wv.reload();

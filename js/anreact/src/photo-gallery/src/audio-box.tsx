@@ -247,7 +247,7 @@ class AudioBox extends Component<AudioBoxProps> {
               </Card>
               :
               <Typography paragraph align='center' >
-                {`${this.props.legend}`}
+                {`${this.props.legend} || ${this.props.title} || ''`}
               </Typography>
             }
             <this.RegisPlayer

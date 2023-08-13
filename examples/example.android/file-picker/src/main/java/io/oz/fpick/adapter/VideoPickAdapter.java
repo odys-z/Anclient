@@ -149,7 +149,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
 
                 String sync = mList.get(index).syncFlag;
-                // if ( sync == BaseFile.Synchronized || sync == BaseFile.Synchronizing)
                 if ( SyncFlag.publish.equals(sync) || SyncFlag.pushing.equals(sync) )
                     return;
 
