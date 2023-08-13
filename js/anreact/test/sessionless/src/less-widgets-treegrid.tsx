@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
-	SessionClient, AnDatasetResp, AlbumRec, PhotoRec, size } from '@anclient/semantier';
+	SessionClient, AnDatasetResp, AlbumRec, size, DocsReq } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol, ClassNames, Media, regex, GalleryView
+	jsample, JsonServs, Login, CrudComp, AnTreegrid, PhotoCollect, AnTreegridCol,
+	ClassNames, Media, regex, GalleryView, PdfViewer, PhotoRec
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
-import { PdfViewer } from '../../../src/react/widgets/pdf-view';
+// import { PdfViewer } from '../../../src/react/widgets/pdf-view';
+// import { PhotoRec } from '../../../src/photo-gallery/src/tier/photo-rec';
 
 const { JsampleTheme } = jsample;
 
@@ -217,9 +219,6 @@ class Widgets extends React.Component<LessProps> {
 
 		this.albumtier = new TestreeTier(this.uri, this, c);
 
-		// use this to show fake data:
-		// this.setState({});
-
 		this.toSearch();
 	}
 
@@ -252,7 +251,7 @@ class Widgets extends React.Component<LessProps> {
 			let fid = ids.keys().next().value;
 			let file = ids.get(fid);
 			let t = regex.mime2type(file.node.mime);
-			if (t !== 'pdf') {
+			if (t === '.pdf') {
 				console.log(fid);
 				this.pdfview = (<PdfViewer
 					close={(e) => {
@@ -380,27 +379,27 @@ class TestreeTier extends AlbumTier {
 	}
 }
 
-class AlbumResp extends AnDatasetResp {
-	static __type__ = 'io.oz.album.tier.AlbumResp';
-	album?: AlbumRec;
+// class AlbumResp extends AnDatasetResp {
+// 	static __type__ = 'io.oz.album.tier.AlbumResp';
+// 	album?: AlbumRec;
 
-	collect?: Array<string>;
-	collects?: Array<PhotoCollect>;
+// 	collect?: Array<string>;
+// 	collects?: Array<PhotoCollect>;
 
-	photo?: PhotoRec;
+// 	photo?: DocsReq;
 
-	constructor (resp: AlbumRec & {
-			forest: AnTreeNode[], // profiles?: Profiles,
-			photo?: PhotoRec, collect?: Array<string>}) {
-		super({
-			forest: resp.forest
-		});
+// 	constructor (resp: AlbumRec & {
+// 			forest: AnTreeNode[], // profiles?: Profiles,
+// 			photo?: PhotoRec, collect?: Array<string>}) {
+// 		super({
+// 			forest: resp.forest
+// 		});
 
-		this.album = resp;
-		this.collect = resp.collect;
-		this.collects = resp.collects as PhotoCollect[];
-	}
-}
-Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });
+// 		this.album = resp;
+// 		this.collect = resp.collect;
+// 		this.collects = resp.collects as PhotoCollect[];
+// 	}
+// }
+// Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });
 
 export { Widgets };

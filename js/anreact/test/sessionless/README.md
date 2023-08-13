@@ -29,3 +29,20 @@ v 1.0.1, working together with sandbox v0.2.1.
     npm i tslint --save-dev
     npx tslint --init
 ```
+
+# load HTML page with Anprism
+
+Setup vs code project in test/sessionless by copy this to ./vscode/launch.json::
+
+    {
+      "version": "0.2.0",
+      "configurations": [
+        { "name": "Launch Chrome",
+          "request": "launch",
+          "type": "pwa-chrome",
+          "url": "http://localhost:8888",
+          "webRoot": "${workspaceFolder}/dist"
+        },
+    }
+
+Then load treegrid.html etc. with Anprism. (Right click the file)

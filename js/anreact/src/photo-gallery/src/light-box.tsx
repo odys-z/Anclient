@@ -6,12 +6,13 @@
  */
 import * as React from 'react';
 import {TouchEvent, Touch} from 'react';
-import { AnTreeNode, StreeTier, PhotoRec } from '@anclient/semantier';
+import { AnTreeNode, StreeTier, SyncDoc } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { GalleryView } from '../../react/widgets/gallery-view';
 import { regex } from '../../utils/regex';
 import { Typography } from '@material-ui/core';
 import { AudioBox } from './audio-box';
+import { PhotoRec } from './tier/photo-rec';
 
 let { mime2type } = regex;
 
@@ -295,7 +296,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         poster: p.preview,
         src: GalleryView.imgSrcReq(p.id, this.tier),
         mime: p.node.mime,
-        title: PhotoRec.toShareLable(p.node as PhotoRec),
+        title: SyncDoc.shareLable(p as {shareby?: string, device?: string})
       });
     } );
 
