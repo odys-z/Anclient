@@ -87,24 +87,3 @@ class Profiles extends AnsonBody {
 	}
 }
 Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
-
-// class AlbumResp extends AnsonResp {
-// 	albumId: string | undefined;
-// 	ownerId: string | undefined;
-// 	owner: string | undefined;
-
-// 	photo: SyncDoc | undefined;
-// 	photos: Array<SyncDoc[]> | undefined;
-// 	collectRecords: Array<PhotoCollect> | undefined;
-// 	forest: Array<PhotoCollect> | undefined;
-
-// 	clientPaths: object | undefined;
-
-// 	profils: Profiles | undefined;
-
-// 	constructor (obj: AlbumResp) {
-// 		super({type: 'io.oz.album.tier.AlbumResp'});
-// 		Object.assign(this, obj);
-// 	}
-// }
-// Protocol.registerBody('io.oz.album.tier.AlbumResp', (jsonBd) => { return new AlbumResp(jsonBd); });
