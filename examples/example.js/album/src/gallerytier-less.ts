@@ -1,4 +1,4 @@
-import { Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
+import { AlbumPage, AlbumReq, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
 	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode, SyncDoc
 } from '@anclient/semantier';
@@ -42,7 +42,7 @@ export class GalleryTier extends StreeTier {
 		let client = this.client;
 
 		let req = client.userReq( this.uri, this.port,
-					new AlbumReq( this.uri, conds as AlbumPage )
+					new AlbumReq( {uri: this.uri, page: conds as AlbumPage} )
 					.A(AlbumReq.A.records) );
 
 		client.commit(req,

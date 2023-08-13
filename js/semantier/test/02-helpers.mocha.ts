@@ -1,4 +1,4 @@
-import { Semantier } from '../semantier';
+import { Semantier, len } from '../semantier';
 import { assert } from 'chai';
 
 import {ErrorCtx, SessionClient, SessionInf} from '../anclient';
@@ -199,8 +199,6 @@ describe('case: [02.0 dataset + s-tree]', () => {
 					  "jserv": undefined,
 					  "uid": "admin", "roleId": undefined, "ssid": "001eysTj"
 					} as SessionInf;
-		// let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
-		// let anReact = new AnReact(client, AnContext.error);
 		let semantier = new Semantier({uri: 'test'});
 
 		let columnMap = {
@@ -226,5 +224,23 @@ describe('case: [02.0 dataset + s-tree]', () => {
 		assert.equal(rf.nvss[1][0][0], 'funcId', '[ funcId, ... ]');
 		assert.equal(rf.nvss[1][0][1], 'sys-role', '[ funcId, ... ]');
 		assert.equal(rf.nvss[1][1][1], 'r-001', '[ ..., r-001 ]');
+	});
+
+
+	it('[Helper] len()', () => {
+		let m = new Map<string, any>();
+		assert.equal(0, len(m));
+
+		m.set("v", 1);
+		assert.equal(1, len(m));
+
+		let s = new Set<string>();
+		assert.equal(0, len(s));
+
+		s.add("")
+		assert.equal(1, len(s));
+
+		assert.equal(0, len(""));
+		assert.equal(1, len("0"));
 	});
 });

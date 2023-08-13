@@ -147,6 +147,9 @@ class AnClient {
 	/**
 	 * Create a user request AnsonMsg for no-ssession request
 	 * (create header and link body.parent, and no connId can be specified).
+	 * 
+	 * For request with session header, use {@link SessionClient#userReq()}.
+	 * 
 	 * @param port
 	 * @param bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
 	 * @return AnsonMsg<T extends UserReq>

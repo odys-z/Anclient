@@ -47,9 +47,10 @@ const styles = (theme: Theme) => ({
     textShadow: `${theme.spacing(0.5)}px ${theme.spacing(0.5)}px ${theme.spacing(1)}px #112244`
   },
   rowHead: {
-	padding: theme.spacing(1),
-	paddingTop: 0,
-	paddingBottom: 0,
+    paddingRight: theme.spacing(1),
+    paddingLeft: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   folder: { width: "100%" },
   folderHead: {

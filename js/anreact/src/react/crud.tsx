@@ -112,8 +112,8 @@ class CrudCompW<T extends Comprops> extends CrudComp<T> {
 	}
 
 	/**A simple helper: Array.from(ids)[x]; */
-	getByIx(ids: Set<string>, x = 0): string {
-		return Array.from(ids)[x];
+	getByIx(ids: Map<string, any>, x = 0): string {
+		return Array.from(ids.keys())[x];
 	}
 }
 CrudCompW.contextType = AnContext;

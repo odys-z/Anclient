@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, Tierec,
-	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
+	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf, len
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -43,7 +43,7 @@ class UserstComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
 		pageInf: { page: 0, size: 10, total: 0 },
-		selected: {ids: new Set<string>()},
+		selected: {ids: new Map<string, any>()},
 	};
 
 	tier = undefined as UsersTier;
@@ -54,7 +54,7 @@ class UserstComp extends CrudCompW<Comprops> {
 	constructor(props: Comprops) {
 		super(props);
 
-		this.state.selected.ids = new Set();
+		this.state.selected.ids = new Map<string, any>();
 		this.q = new PageInf(0, 10);
 
 		this.closeDetails = this.closeDetails.bind(this);
@@ -99,12 +99,13 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.toSearch(this.q);
 	}
 
-	onTableSelect(rowIds: Array<string>) {
+	onTableSelect(ids: Map<string, any>) {
+		let rowIds: Array<string> = [];
 		this.setState( {
 			buttons: {
 				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.length === 1,
+				edit: len(ids) === 1, // rowIds && rowIds.length === 1,
 				del: rowIds &&  rowIds.length >= 1,
 			},
 		} );
@@ -173,7 +174,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.recForm = undefined;
 		this.tier.resetFormSession();
 		this.toSearch(undefined);
-		this.onTableSelect([]);
+		this.onTableSelect(new Map<string, any>());
 	}
 
 	render() {

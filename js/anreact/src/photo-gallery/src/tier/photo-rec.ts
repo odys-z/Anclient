@@ -24,7 +24,7 @@ export class PhotoRec extends SyncDoc {
 	srcSet?: Array<string>;
 	width: number;
 	height: number
-    wh: number[];
+    wh?: number[];
 
 	constructor (opt: {
             recId: string; src?: string; device?: string;

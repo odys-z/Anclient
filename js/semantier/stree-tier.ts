@@ -45,7 +45,7 @@ export type IndentIcons = {
  */
 export const defltIcons: IndentIcons = {
     expand: 'T', collapse: '+', childi: '|-', childx: 'L',
-    vlink: '|', spacex: '.', hlink: '-', deflt: '.'
+    vlink : '|', spacex  : '.', hlink : '-',  deflt: '.'
 };
 
 /** Tree data node */
@@ -76,29 +76,29 @@ export class AnTreeNode implements Tierec {
 	indents?: Array<IndentIconame>;
 }
 
-export class AlbumRec {
-	static __type__: "io.oz.sandbox.album.AlbumRec";
+// export class AlbumRec {
+// 	static __type__: "io.oz.sandbox.album.AlbumRec";
 
-	type: string;
+// 	type: string;
 
-	/** Album Id (h_albems.aid) */
-	album?: string;
+// 	/** Album Id (h_albems.aid) */
+// 	album?: string;
 
-	/** Collects' ids */
-	collects?: Array<Tierec>;
+// 	/** Collects' ids */
+// 	collects?: Array<Tierec>;
 
-	/** Collects' default length (first page size) */
-	collectSize?: number;
+// 	/** Collects' default length (first page size) */
+// 	collectSize?: number;
 
-	/** Photos ids, but what's for? */
-	collect?: Array<string>;
+// 	/** Photos ids, but what's for? */
+// 	collect?: Array<string>;
 
-	// [f: string]: string | number | boolean | object;
+// 	// [f: string]: string | number | boolean | object;
 
-	contructor () {
-		this.type = AlbumRec.__type__;
-	}
-}
+// 	contructor () {
+// 		this.type = AlbumRec.__type__;
+// 	}
+// }
 
 /**
  * Light weight wrapper of Anreact.stree(), in consists with Semantier style.

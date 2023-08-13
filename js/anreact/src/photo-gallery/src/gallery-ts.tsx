@@ -151,7 +151,7 @@ const Gallery = function Gallery({
           return Photo({
             index, key: thumb.key || thumb.src,
             left, top, containerHeight,
-            margin, direction,
+            margin, direction, videoControl,
             onClick: onClick ? handleClick : null,
             onSlideLoad: (p) => {},
             mime, photo

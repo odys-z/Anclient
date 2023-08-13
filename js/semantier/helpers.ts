@@ -69,9 +69,14 @@ export function size(arg: Set<any> | Map<any, any> | string | Array<any> | undef
 				arg.size : len(arg);
 }
 
-export function len(arg: string | Array<any> | undefined | null) {
-	return Array.isArray(arg) ?
-		arg.length :
-		isEmpty(arg) ?
-		0 : (arg as string).length;
+export function len(arg: string | Array<any> | Set<any> | Map<any, any> | undefined | null) {
+	return Array.isArray(arg)
+		? arg.length
+		: isEmpty(arg)
+		? 0
+		: typeof arg === 'string'
+		? arg.length
+		: typeof arg.size === 'number'
+		? (arg as Set<any>).size
+		: size(arg);
 }

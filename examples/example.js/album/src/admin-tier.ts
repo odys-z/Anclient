@@ -1,7 +1,7 @@
 import { Protocol, AnsonBody, PageInf,
-	SessionClient, AnDatasetResp, AnTreeNode, StreeTier, AlbumReq, AlbumRec, PhotoRec 
+	SessionClient, AnDatasetResp, AnTreeNode, StreeTier
 } from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps
+import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, AlbumReq, PhotoRec, AlbumRec
 } from '@anclient/anreact';
 
 const debug = true;
@@ -72,8 +72,8 @@ export class AlbumAdminTier extends StreeTier {
 				console.log(p);
 				if (!p.recId) return;
 
-				let src = that.imgSrc(p.recId);
-				let srcSet = [src];
+				let src = that.imgSrc(p.docId || 'missing');
+				let srcSet = [src] as any;
 
 				let css = JSON.parse(p.css as string);
 				let size = css?.size;
@@ -83,6 +83,7 @@ export class AlbumAdminTier extends StreeTier {
 				let alt = `${p.title? ' # ' + p.title : p.sharedate || ''} by ${p.shareby || 'Anonym'}`;
 
 				imgs.push( {
+					type: PhotoRec.__type__,
 					src, srcSet, width, height,
 					shareLable: p.shareLable,
 					alt, title: alt, key: x.toString() } );
