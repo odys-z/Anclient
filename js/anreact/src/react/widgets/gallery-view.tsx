@@ -5,7 +5,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnHeader, AnTreeNode, AnsonValue, Protocol, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
+import { AnTreeNode, AnsonValue, Semantier, SessionClient, StreeTier, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
@@ -21,7 +21,9 @@ export interface ImageSlide  {
 	src: string,
 	srcSet?: string,
 	srcArr?: string[],
-	legend: string,
+	legend?: string | JSX.Element,
+	/** AnTreeNode.node */
+	node?  : object & {shareby: string, device?: string, pname?: string},
 
 	/**
 	 * Use maxWidth to limit picture size when too few pictures;
@@ -92,11 +94,11 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					: undefined;
 
 		nodes?.forEach( (p: AnTreeNode, x) => {
-			let [_width, _height, w, h] = (
-				JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
+			let [_width, _height, w, h] = (JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
+
 			photos.push({
 				index: x,
-				legend: SyncDoc.shareLable(p as {shareby?: string, device?: string}),
+				node: p.node,
 				width: w, height: h,
 				src: GalleryView.imgSrcReq(p.id, this.albumtier),
 				imgstyl,
@@ -109,9 +111,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 	/**
 	 * Create an HTTP GET request for src of img tag.
-	 * 
-	 * TODO: depend on FileStream.A.download, having PhotoRec independent of Album.
-	 * Then move AlbumReq to test. 
 	 * 
 	 * @param pid 
 	 * @param opts 
@@ -134,8 +133,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					.A(AlbumReq.A.download) as AlbumReq;
 
 				req.docId = pid;
-				reqMsgs[pid] = // client.an.getReq<AlbumReq>(port, req);
-							   client.userReq(uri, port, req);
+				reqMsgs[pid] = client.userReq(uri, port, req);
 			}
 			return reqMsgs[pid];
 		}
@@ -225,19 +223,3 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 }
 
 const reqMsgs = {};
-
-/*
-function getDownloadReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) {
-	let {uri, port, client} = opts;
-
-	if (reqMsgs[pid] === undefined) {
-		let req = StreeTier
-			.reqFactories[port]({uri, sk: ''})
-			.A(AlbumReq.A.download) as AlbumReq;
-
-		req.docId = pid;
-		reqMsgs[pid] = client.an.getReq<AlbumReq>(port, req);
-	}
-	return reqMsgs[pid];
-}
-*/

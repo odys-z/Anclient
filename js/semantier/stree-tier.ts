@@ -65,6 +65,8 @@ export class AnTreeNode implements Tierec {
 
 		mime?: string;
 
+		shareby: string;
+
 		/** Any data by jserv */
 		[d: string]: AnsonValue;
 	};
@@ -166,19 +168,6 @@ export class SyncDoc implements Tierec {
 		this.src = opt.src
 		this.docId = opt.recId;
 		this.device = opt.device;
-	}
-
-	/**
-	 * A helper for compse shared-by label, with only text handling.
-	 * @param p photo, doc etc. 
-	 * @returns 
-	 */
-	static shareLable(p: {node: {shareby: string, pname: string, device?: string}}): string {
-		return ((p.node.shareby && p.node.device)
-			? `shared by ${p.node.shareby} @ ${p.node.device}`
-			: p.node.shareby
-			?  `shared by ${p.node.shareby}`
-			: p.node.pname );
 	}
 }
 

@@ -150,7 +150,6 @@ export class App extends CrudCompW<AlbumProps> {
 			<Button onClick={onToggle}
 				className={opts?.classes?.toggle}
 				startIcon={that.docIcon.toggleButton(opts)}
-				// startIcon={<JsampleIcons.ThirdStateCheck />}
 				color="primary" >
 				{opts?.media?.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
 			</Button>
@@ -163,7 +162,7 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	lightbox = (photos: AnTreeNode[], opts: {ix: number, open: boolean, onClose: (e: any) => {}}) => {
-		return (<Lightbox showResourceCount photos={photos} tier={this.albumtier} {...opts} />);
+		return (<Lightbox {...opts} showResourceCount photos={photos} tier={this.albumtier} />);
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
@@ -206,7 +205,7 @@ export class App extends CrudCompW<AlbumProps> {
 					grid: {xs: 1} },
 				  { type: 'text', field: 'shareby', label: L('share by'),
 					grid: {xs: false, sm: 3, md: 2} },
-				  { type: 'text', field: 'img', label: L('size'), colFormatter: folderSum,
+				  { type: 'text', field: 'filesize', label: L('size'), 
 					grid: {xs: false, sm: 2, md: 2}, thFormatter: this.switchDocMedias }
 				]}
 			/> :
@@ -234,9 +233,6 @@ export class App extends CrudCompW<AlbumProps> {
 		function typeParser(c: AnTreegridCol, n: AnTreeNode, opt: {classes: ClassNames, media: Media}) {
 			if (n.node.children?.length as number > 0) return <></>;
 			else return that.docIcon.typeParser(c, n, opt);
-		}
-
-		function folderSum() {
 		}
 	}
 

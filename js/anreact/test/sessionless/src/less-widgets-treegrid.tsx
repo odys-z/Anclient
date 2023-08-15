@@ -351,6 +351,7 @@ class TestreeTier extends AlbumTier {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
 			node: {
 				nodetype: 'card',
+				shareby: 'tester'
 			},
 			id: 'n01',
 			level: 0,
@@ -368,6 +369,7 @@ class TestreeTier extends AlbumTier {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
 			node: {
 				nodetype: 'card',
+				shareby: 'tester'
 			},
 			id: 'p0',
 			level: 0,
@@ -375,28 +377,5 @@ class TestreeTier extends AlbumTier {
 		}
 	}
 }
-
-// class AlbumResp extends AnDatasetResp {
-// 	static __type__ = 'io.oz.album.tier.AlbumResp';
-// 	album?: AlbumRec;
-
-// 	collect?: Array<string>;
-// 	collects?: Array<PhotoCollect>;
-
-// 	photo?: DocsReq;
-
-// 	constructor (resp: AlbumRec & {
-// 			forest: AnTreeNode[], // profiles?: Profiles,
-// 			photo?: PhotoRec, collect?: Array<string>}) {
-// 		super({
-// 			forest: resp.forest
-// 		});
-
-// 		this.album = resp;
-// 		this.collect = resp.collect;
-// 		this.collects = resp.collects as PhotoCollect[];
-// 	}
-// }
-// Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });
 
 export { Widgets };

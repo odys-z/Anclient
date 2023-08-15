@@ -6,13 +6,11 @@
  */
 import * as React from 'react';
 import {TouchEvent, Touch} from 'react';
-import { AnTreeNode, StreeTier, SyncDoc } from '@anclient/semantier';
+import { AnTreeNode, StreeTier } from '@anclient/semantier';
 import { Comprops, CrudCompW } from '../../react/crud';
 import { GalleryView } from '../../react/widgets/gallery-view';
 import { regex } from '../../utils/regex';
-import { Typography } from '@material-ui/core';
 import { AudioBox } from './audio-box';
-import { PhotoRec } from './tier/photo-rec';
 
 let { mime2type } = regex;
 
@@ -33,7 +31,8 @@ export type NgineerSlideProps = {
   mime: string;
   id?: string;
   src: string;
-  title?: string;
+  // title?: string;
+  node: {shareby: string, device: string, pname: string};
   altag?: string;
   poster?: string;
 }
@@ -296,7 +295,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         poster: p.preview,
         src: GalleryView.imgSrcReq(p.id, this.tier),
         mime: p.node.mime,
-        title: SyncDoc.shareLable(p as {shareby?: string, device?: string})
+        node: p.node
       });
     } );
 
@@ -310,12 +309,12 @@ export class Lightbox extends CrudCompW<Comprops & {
     let items = [];
     let data = this.parse(this.props.photos);
     for (var i = 0; i < data.length; i++) {
-      let resource = data[i];
-      let mime = mime2type(resource.mime);
-      if (!resource.mime || mime === 'image') {
+      let photo = data[i];
+      let mime = mime2type(photo.mime);
+      if (!photo.mime || mime === 'image') {
         items.push(<img key={i}
-          alt={resource.altag}
-          src={resource.src}
+          alt={photo.altag}
+          src={photo.src}
           loading='lazy'
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
@@ -332,7 +331,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         items.push(<video key={i}
           ref={(ref) => this.vidRef = ref}
           preload='false' controls
-          poster={resource.poster}
+          poster={photo.poster}
           style={{
             pointerEvents: this.config.scale === 1 ? 'auto' : 'none',
             maxWidth: '100%', maxHeight: '100%',
@@ -354,7 +353,7 @@ export class Lightbox extends CrudCompW<Comprops & {
           }}
           onEnded={e => this.config.paused = true}
         >
-          <source src={resource.src} type={resource.mime}/>
+          <source src={photo.src} type={photo.mime}/>
         </video>);
       }
       else if (mime === 'audio') {
@@ -362,14 +361,15 @@ export class Lightbox extends CrudCompW<Comprops & {
         <AudioBox lightMode
           key={i}
           ref={(ref) => this.audRef = ref}
-          poster={resource.poster}
-          src={resource.src}
+          poster={photo.poster}
+          src={photo.src}
           width='80%'
           height='50%'
           onCanPlay={()=> {
             if (this.state.swiping || this.state.loading)
               this.setState({ loading: false }); }}
-        > <Typography >{resource.title}</Typography>
+          node={photo.node}
+        >
         </AudioBox>);
       }
       // TODO third party online resources
@@ -507,6 +507,3 @@ export class Lightbox extends CrudCompW<Comprops & {
 }
 
 export default Lightbox;
-function useRef(arg0: null) {
-  throw new Error('Function not implemented.');
-}

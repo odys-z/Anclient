@@ -54,7 +54,11 @@ interface AudioBoxProps {
 
   lightMode?: boolean, 
   title?: string
-  legend?: string,
+  legend?: JSX.Element | string,
+  /** AnTreeNode.node */
+  node: {shareby: string, device?: string, pname?: string},
+  /** copyright */
+  transcript?: string,
   poster?: string | ((v: AudioBoxProps) => string),
 
   width: number | string,
@@ -68,6 +72,10 @@ interface ConditionalProps {
   [key: string]: any
 }
 
+/**
+ * AudioBox in gallery typically requires jserv to return an aspect ratio of 64:27.
+ * Ratio of w < h can be ugly ranged in gallery when only 1 child exists.
+ */
 class AudioBox extends Component<AudioBoxProps> {
   static propTypes: Object
 
@@ -160,7 +168,8 @@ class AudioBox extends Component<AudioBoxProps> {
     return (
       <React.Fragment >
         <Paper elevation={elevation} className={classes.paper} >
-          <Box px={spacing.x} py={spacing.y} my={"16px"} style={{height: "fit-content", width: "90%"}}>
+          <Box px={spacing.x} py={spacing.y} my={"16px"} style={{height: "fit-content", width: "90%"}}
+					    onClick={(e) => e.stopPropagation()}>
             <Grid container alignItems="center">
               <Grid item xs>
                 <AudioPlayer
@@ -208,17 +217,6 @@ class AudioBox extends Component<AudioBoxProps> {
   };
 
   render() {
-    // const incompatibilityMessage = this.props.children || (
-    //   <p>Your browser does not support the <code>audio</code> element.</p>
-    // );
-
-    // // Set controls to be true by default unless explicity stated otherwise
-    // const controls = !(this.props.controls === false);
-
-    // Set lockscreen / process audio title on devices
-    const title = this.props.title ? this.props.title : this.props.legend;
-
-    // Some props should only be added if specified
     const conditionalProps: ConditionalProps = {};
     if (this.props.controlsList) {
       conditionalProps.controlsList = this.props.controlsList;
@@ -237,28 +235,66 @@ class AudioBox extends Component<AudioBoxProps> {
         <ThemeProvider theme={audioTheme}>
           <Box width={this.props.width} height={this.props.height} 
               style={{alignItems: "center", display: "flex", flexFlow: "column", justifyContent: "center",
-              backgroundImage: `url('data:image/svg+xml,${audioSVG}')` }} >
+              backgroundImage: `url(${JSON.stringify(svgImgSrc(audioSVG))}`,
+              backgroundRepeat: 'no-repeat', backgroundPosition: '50% 5%', backgroundSize: audioTheme.spacing(3)
+            }}
+              onClick={this.props.onClick}>
             { this.props.lightMode ?
-              <Card style={{width: "100%", height: "52%", alignItems: "center", display: "flex", flexFlow: "column"}}>
-                <img src={poster(this.props.poster)} style={{width: "fit-content", height: "64%", margin: audioTheme.spacing(1)}}/>
-                <Typography paragraph align='center' color='textSecondary' >
-                  {this.props.legend || this.props.title}
-                </Typography>
-              </Card>
-              :
-              <Typography paragraph align='center' >
-                {`${this.props.legend} || ${this.props.title} || ''`}
-              </Typography>
+              lightLegend(this.props, this.props.node) :
+              legend(this.props.node)
             }
             <this.RegisPlayer
               size="small"
-              transcript={title || this.props.legend}
+              transcript={this.props.transcript}
               src={this.props.src}
             />
           </Box>
         </ThemeProvider>
       </React.Fragment>
     );
+
+    /**
+     * A helper for compse shared-by label, with only text handling.
+     * @param node AnTreeNode.node. 
+     * @returns 
+     */
+    function legend(node: {shareby: string, device?: string, pname?: string}) {
+      let {shareby, device, pname} = node;
+      device = device ? ` @ ${device}` : '';
+      return (<>
+        <Typography variant='h5' align='center' style={{opacity: 1}}>
+            {pname || ''}
+        </Typography>
+        <Typography paragraph align='center' style={{opacity: 1}} >
+          {`${shareby || ''} ${device}`}
+        </Typography>
+        </>);
+    }
+
+    /**
+     * A helper for compse shared-by label.
+     * 
+     * @param node type of AnTreeNode.node
+     */
+    function lightLegend(props: AudioBoxProps, node: {shareby: string, device?: string, pname?: string}) {
+      let {shareby, device, pname} = node;
+      return (
+        <Card style={{opacity: 1, width: "100%", alignItems: "center", display: "flex", flexFlow: "column"}}>
+          {[0,1,2].map((e, x) => {
+            if (x === 0) return (
+              <img key={x} src={poster(props.poster)}
+                  style={{width: "fit-content", height: audioTheme.spacing(12), margin: audioTheme.spacing(1)}}/>);
+            else if (x === 1) return (
+              <Typography key={x} paragraph align='center' style={{minHeight: audioTheme.spacing(12)}}> 
+                {pname || ''}
+              </Typography>);
+            else if (x === 2) return (
+              <Typography key={x} paragraph align='center'>
+                {`shared by ${shareby || ''} @ ${device || ''}`}
+              </Typography>);
+          })}
+        </Card>);
+    }
   }
 }
 
@@ -280,8 +316,9 @@ AudioBox.defaultProps = {
   onVolumeChanged: () => {},
   preload: 'metadata',
   style: {},
-  title: '',
+  // title: '',
   volume: 1.0,
+  node: {shareby: ''},
 
   width: "16wh",
   height: "9wh"

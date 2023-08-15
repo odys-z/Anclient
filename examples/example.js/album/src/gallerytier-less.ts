@@ -1,10 +1,12 @@
 import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
-import { Protocol, AnsonMsg, AnsonResp, AnsonBody, DocsReq,
-	PageInf, SessionClient, StreeTier, Tierec, AnTreeNode, SyncDoc
-} from '@anclient/semantier';
+import { Protocol, AnsonMsg, AnsonBody, 
+	PageInf, SessionClient, StreeTier, AnTreeNode} from '@anclient/semantier';
 
 const debug = true;
 
+/**
+ * TODO this is not sessionless.
+ */
 export class GalleryTier extends StreeTier {
 	comp: CrudComp<Comprops>;
 	port: string = "album";
@@ -18,7 +20,7 @@ export class GalleryTier extends StreeTier {
 	 */
 	constructor(props: {uri: string, client: SessionClient, comp: CrudComp<Comprops>}, ) {
 		super(props);
-		console.log(this.uri);
+		// console.log(this.uri);
 		this.comp = props.comp;
 		this.client = props.client;
 

@@ -761,6 +761,18 @@ class SessionClient {
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
 
+	/**
+	 * Create a user request AnsonMsg, without session tocken.
+	 * 
+	 * @param port 
+	 * @param string 
+	 * @param body body.uri must be providen
+	 * @returns 
+	 */
+	userReqInec<T extends AnsonBody>(port: string, body: T) {
+		return an.getReq<T>(port, body);
+	}
+
 	/**Set user's current action to be logged.
 	 * @param funcId curent function id
 	 * @param cate category flag

@@ -67,26 +67,3 @@ export class AlbumTier extends StreeTier {
 		return GalleryView.imgSrcReq(recId, this);
 	}
 };
-
-// class AlbumResp extends AnDatasetResp {
-// 	static __type__ = 'io.oz.sandbox.album.AlbumResp';
-// 	album?: AlbumRec;
-
-// 	collect?: Array<string>;
-// 	collects?: Array<PhotoCollect>;
-
-// 	photo?: PhotoRec;
-
-// 	constructor (resp: AlbumRec & {
-// 			forest: AnTreeNode[], // profiles?: Profiles,
-// 			photo?: PhotoRec, collect?: Array<string>}) {
-// 		super({
-// 			forest: resp.forest
-// 		});
-
-// 		this.album = resp;
-// 		this.collect = resp.collect;
-// 		this.collects = resp.collects as PhotoCollect[];
-// 	}
-// }
-// Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });

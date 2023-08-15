@@ -25,7 +25,6 @@ const styles = (_theme: Theme) => ({
 });
 
 class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier}>{
-	// tier: MyWorkbookTier;
 	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
@@ -85,9 +84,6 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 	}
 
 	toDel(e: React.UIEvent) {
-		// let that = this;
-		// // if (this.currentId)
-		// this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
 		this.tier.del({ids: [str(this.tier.pkval.v)]}, this.bindSheet);
 	}
 

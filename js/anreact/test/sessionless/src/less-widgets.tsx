@@ -211,6 +211,7 @@ class TestreeTier extends AlbumTier {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
 			node: {
 				nodetype: 'card',
+				shareby: 'tester'
 			},
 			id: 'n01',
 			level: 0,
@@ -243,6 +244,7 @@ class TestreeTier extends AlbumTier {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
 			node: {
 				nodetype: 'card',
+				shareby: 'tester'
 			},
 			id: 'p0',
 			level: 0,
