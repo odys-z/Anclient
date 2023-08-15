@@ -78,23 +78,23 @@ export const Langstrs = {
 
 const argex = /{(\s*(\w|\d)*\s*)}/g;
 
-/**var L = require('language');
- * or import L from Langstr;
- * Usage:
- * Langstrs.using('en'); // optional, default en
- * var the_string = L('Welcome {name}', {name: 'Joe'});
- * see https://stackoverflow.com/a/30191493/7362888
- * and https://stackoverflow.com/a/57882370/7362888
- *
- * @param t template
- * @param o arg object
- * @returns
- */
 /**
+ * var L = require('language');
+ * 
+ * or import L from Langstr;
+ * 
+ * Usage:
+ * @example
+ * Langstrs.using('en'); // optional, default en, see resolv/lang.json
+ * var the_string = L('Welcome {name}', {name: 'Joe'}); // Welcome Joe
+ * 
+ * @Reference 
+ * <a href='https://stackoverflow.com/a/30191493/7362888'>[1]</a>,
+ * <a href='https://stackoverflow.com/a/57882370/7362888'>[2]</a>.
  *
  * @param t template
  * @param vals optional: value args
- * @returns
+ * @returns translation
  */
 export function L(t: string | undefined, vals?: {[name: string]: string | number}): string {
 	if (! (t in Langstrs.s[Langstrs.lang]) )

@@ -315,7 +315,7 @@ class Widgets extends React.Component<LessProps> {
 					onThClick={()=> this.toSearch()}
 					testData={testData}
 				/>}
-				{this.pdfview}
+				{ this.pdfview }
 				{ this.state.hasError && <AnError
 					title={L('Error')} msg={this.errctx.msg}
 					uri={this.uri} tier={undefined}
@@ -351,7 +351,8 @@ class TestreeTier extends AlbumTier {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
 			node: {
 				nodetype: 'card',
-				shareby: 'tester'
+				shareby: 'tester',
+				mime: "image/jepg"
 			},
 			id: 'n01',
 			level: 0,
@@ -369,7 +370,8 @@ class TestreeTier extends AlbumTier {
 			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
 			node: {
 				nodetype: 'card',
-				shareby: 'tester'
+				shareby: 'tester',
+				mime: "image/jepg"
 			},
 			id: 'p0',
 			level: 0,

@@ -2,12 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
-	AnTreeNode, ErrorCtx, an, SessionClient
+	AnTreeNode, ErrorCtx, an, SessionClient, Tierec, size
 } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 	JsonServs, AnreactAppOptions, AnTreeditor, CrudCompW, AnContextType,
-	AnTreegridCol, Media, ClassNames, AnTreegrid
+	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView
 } from '@anclient/anreact';
 import { GalleryTier } from './gallerytier-less';
 import { Button, Grid } from '@material-ui/core';
@@ -58,6 +58,7 @@ export class App extends CrudCompW<AlbumProps> {
 	ssclient : SessionClient | undefined;
 	albumtier: GalleryTier | undefined;
 	docIcon: DocIcon;
+	pdfview: JSX.Element | undefined;
 
 	/**
 	 * Restore session from window.localStorage
@@ -165,6 +166,35 @@ export class App extends CrudCompW<AlbumProps> {
 		return (<Lightbox {...opts} showResourceCount photos={photos} tier={this.albumtier} />);
 	}
 
+	viewFile = (ids: Map<string, Tierec>) => {
+		if (size(ids) > 0 && this.albumtier) {
+			let fid = ids.keys().next().value;
+			let file = ids.get(fid) as AnTreeNode;
+			let t = regex.mime2type(file.node.mime || "");
+			if (t === '.pdf') {
+				console.log(fid);
+				this.pdfview = (<PdfViewer
+					close={(e) => {
+						this.pdfview = undefined;
+						this.setState({});
+					} }
+					src={GalleryView.imgSrcReq(file?.id, this.albumtier)}
+				></PdfViewer>);
+			}
+			else {
+				this.pdfview = undefined;
+				this.error.msg = L('Type {t} is not supported yet.', {t});
+				this.setState({
+					hasError: true,
+					nextAction: 'ignore'});
+			}
+		}
+		else {
+			this.pdfview = undefined;
+		}
+		this.setState({});
+	};
+
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r.Body()?.msg(), r);
 		this.error.msg = r.Body()?.msg();
@@ -195,7 +225,7 @@ export class App extends CrudCompW<AlbumProps> {
 		  { this.albumtier && (
 			this.state.showingDocs ?
 		    <AnTreegrid
-				pk={''} onSelectChange={()=>{}}
+				pk={''} singleCheck
 				tier={this.albumtier}
 				columns={[
 				  { type: 'iconame', field: 'pname', label: L('File Name'),
@@ -208,6 +238,7 @@ export class App extends CrudCompW<AlbumProps> {
 				  { type: 'text', field: 'filesize', label: L('size'), 
 					grid: {xs: false, sm: 2, md: 2}, thFormatter: this.switchDocMedias }
 				]}
+				onSelectChange={this.viewFile}
 			/> :
 		    <AnTreeditor {... this.props} reload={!this.state.showingDocs}
 				pk={'pid'} sk={this.albumsk}
@@ -223,10 +254,11 @@ export class App extends CrudCompW<AlbumProps> {
 				]}
 				lightbox={this.lightbox}
 			/>) }
+		  { this.pdfview }
 		  { this.state.hasError &&
 			<AnError onClose={this.onErrorClose} fullScreen={false}
 				uri={"/login"} tier={undefined}
-				title={L('Error')} msg={this.error.msg || ''} />}
+				title={L('Error')} msg={this.error.msg || ''} /> }
 		</AnContext.Provider>
 		);
 
