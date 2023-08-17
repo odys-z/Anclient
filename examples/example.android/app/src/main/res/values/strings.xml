@@ -45,7 +45,7 @@
     <string name="err_pref_login"    >\"Login failed!\n%s %s\"</string>
     <string name="err_empty_pswd"    >Password is empty!</string>
 
-    <string name="url_help" translatable="false">https://odys-z.github.io/Anclient</string>
+    <string name="url_help" >https://odys-z.github.io/products/album</string>
     <string name="url_home" translatable="false">https://odys-z.github.io/Anclient</string>
     <string name="url_album" translatable="false">%s/%s</string>
     <string name="url_sync_report" translatable="false">http://%s/%s</string>

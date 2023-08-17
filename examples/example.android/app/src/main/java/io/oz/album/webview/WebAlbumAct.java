@@ -3,6 +3,8 @@ package io.oz.album.webview;
 import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.oz.R;
@@ -36,6 +38,8 @@ public class WebAlbumAct extends AppCompatActivity {
 
 		WebView wv = findViewById(R.id.wv);
 		wv.getSettings().setJavaScriptEnabled(true);
+		wv.setWebViewClient(new WebViewClient() {
+		});
 		wv.loadUrl(AssetHelper.url4intent(this, act));
 	}
 }

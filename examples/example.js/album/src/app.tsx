@@ -172,7 +172,7 @@ export class App extends CrudCompW<AlbumProps> {
 			let file = ids.get(fid) as AnTreeNode;
 			let t = regex.mime2type(file.node.mime || "");
 			if (t === '.pdf') {
-				console.log(fid);
+				// console.log(fid);
 				this.pdfview = (<PdfViewer
 					close={(e) => {
 						this.pdfview = undefined;

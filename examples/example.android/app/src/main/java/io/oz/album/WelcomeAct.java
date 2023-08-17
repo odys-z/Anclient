@@ -155,6 +155,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             prefStarter = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
+                    AssetHelper.init(this,
+                            sharedPref.getString(AlbumApp.keys.jserv, ""),
+                            sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         showMsg(R.string.msg_device_uid, uid, device);
                     }
@@ -174,6 +177,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 String pswd = sharedPref.getString(AlbumApp.keys.pswd, "-");
                 singl.pswd(pswd)
                      .login((client) -> {
+                         AssetHelper.init(this,
+                                 sharedPref.getString(AlbumApp.keys.jserv, ""),
+                                 sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
                         // All WebView methods must be called on the same thread.
                         runOnUiThread( () -> reloadAlbum() );
                     },
@@ -186,6 +192,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     @SuppressLint("SetJavaScriptEnabled")
     void reloadAlbum () {
+        if (singl.tier == null)
+            return;
+
         SessionClient client = singl.tier.client();
         if (client == null || sharedPref == null)
             return;
@@ -210,8 +219,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 }
             }
         });
-        Utils.logi("\nLoading home page: %s", AssetHelper.url4intent(this, AssetHelper.Act_Album));
-        wv.loadUrl(AssetHelper.url4intent(this, AssetHelper.Act_Album));
+        String albumweb = AssetHelper.url4intent(this, AssetHelper.Act_Album);
+        Utils.logi("\n\nLoading home page: %s", albumweb);
+        wv.loadUrl(albumweb);
     }
 
     /**

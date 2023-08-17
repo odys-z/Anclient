@@ -23,6 +23,10 @@
             android:name="io.oz.album.client.PrefsContentActivity"
             android:exported="false" />
 
+        <activity
+            android:name="io.oz.album.webview.WebAlbumAct"
+            android:exported="false" />
+
         <activity android:name="io.oz.album.WelcomeAct"
             android:exported="true" >
             <intent-filter>
