@@ -8,6 +8,7 @@ import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static io.odysz.common.LangExt.isblank;
+import static io.oz.albumtier.AlbumContext.*;
 
 import android.annotation.SuppressLint;
 import android.content.ClipData;
@@ -133,7 +134,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        if (singl.state() == AlbumContext.ConnState.Online) {
+                        if (singl.state() == ConnState.Online) {
                             onMediasPicked(result);
                         } else showMsg(R.string.msg_ignore_offline);
                     }
@@ -145,7 +146,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        if (singl.state() == AlbumContext.ConnState.Online) {
+                        if (singl.state() == ConnState.Online) {
                             onFilesPicked(result);
                         } else showMsg(R.string.msg_ignore_offline);
                     }
@@ -428,8 +429,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         intt.putExtra(Constant.MAX_NUMBER, 99);
         intt.putExtra(IS_NEED_FOLDER_LIST, true);
         intt.putExtra(Constant.PickingMode,
-                singl.state() == AlbumContext.ConnState.Disconnected ?
-                        PickingMode.disabled : PickingMode.limit99);
+                singl.state() == ConnState.Disconnected ?
+                PickingMode.disabled : PickingMode.limit99);
 
         pickMediaStarter.launch(intt);
     }
