@@ -2,6 +2,7 @@ package io.oz.album;
 
 import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
+import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
 import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
@@ -220,7 +221,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             }
         });
         String albumweb = AssetHelper.url4intent(this, AssetHelper.Act_Album);
-        Utils.logi("\n\nLoading home page: %s", albumweb);
+        if (singl.verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
         wv.loadUrl(albumweb);
     }
 
@@ -232,9 +233,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      */
     void showMsg(int template, Object... args) {
         runOnUiThread(() -> {
-            String msg = str(getString(template), args);
-            msgv.setText(msg);
-            msgv.setVisibility(View.VISIBLE);
+            String templ = getString(template);
+            if (templ != null && len(args) > 0) {
+                String msg = str(templ, args);
+                msgv.setText(msg);
+                msgv.setVisibility(View.VISIBLE);
+            }
         });
     }
 
@@ -275,6 +279,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         prefStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivity.class));
     }
 
+    /**
+     * https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
+     *
+     * https://developer.android.com/training/data-storage/shared/documents-files#persist-permissions
+     * @param result
+     */
     protected void onMediasPicked(@NonNull ActivityResult result) {
         try {
             Intent data = result.getData();
@@ -475,37 +485,4 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             msgv.setVisibility(View.VISIBLE);
         });
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-//    private static final String[] PERMISSIONS_STORAGE = {
-//            Manifest.permission.READ_EXTERNAL_STORAGE,
-//            Manifest.permission.WRITE_EXTERNAL_STORAGE
-//    };
-
-//    /**
-//     * Checks if the app has permission to write to device storage.
-//     * <p>
-//     * If the app does not has permission then the user will be prompted to grant permissions
-//     *
-//     * @param activity
-//     */
-//    public static void verifyStoragePermissions(Activity activity) {
-//        // Check if we have write permission
-//        int permission = ActivityCompat.checkSelfPermission(activity,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//
-//        if (permission != PackageManager.PERMISSION_GRANTED) {
-//            // We don't have permission so prompt the user
-//            ActivityCompat.requestPermissions(
-//                    activity,
-//                    PERMISSIONS_STORAGE,
-//                    REQUEST_EXTERNAL_STORAGE
-//            );
-//        }
-//    }
-
-//    public static void askDirectoriesPermissions(Activity activity) {
-//        // https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
-//        // https://developer.android.com/training/data-storage/shared/documents-files#persist-permissions
-//    }
 }

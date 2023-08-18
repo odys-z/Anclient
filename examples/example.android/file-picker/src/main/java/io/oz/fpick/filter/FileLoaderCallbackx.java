@@ -152,7 +152,7 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
             } else {
                 directories.get(directories.indexOf(directory)).addFile(img);
             }
-            Utils.logi("%d, %s", directories.size(), directory.getName());
+//            Utils.logi("%d, %s", directories.size(), directory.getName());
         }
 
         if (resultCallback != null) {
@@ -249,7 +249,7 @@ public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor
 
         while (data.moveToNext()) {
             String path = data.getString(data.getColumnIndexOrThrow(DATA));
-            if ( Anson.verbose ) Utils.logi(path);
+            // if ( Anson.verbose ) Utils.logi(path);
             if (path != null && contains(path)) {
                 //Create a File instance
                 NormalFile file = new NormalFile();

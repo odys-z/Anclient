@@ -135,9 +135,9 @@ public class SyncRobot extends SemanticObject implements IUser {
 	@Override
 	public SemanticObject logout() {
 		if (tempDirs != null)
-		for (String temp : tempDirs) {
+		  for (String temp : tempDirs) {
 			try {
-				Utils.logi("Deleting: %s", temp);
+				// Utils.logi("Deleting: %s", temp);
 				FileUtils.deleteDirectory(new File(temp));
 			} catch (IOException e) {
 				Utils.warn("Can not delete folder: %s.\n%s", temp, e.getMessage());

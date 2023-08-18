@@ -345,6 +345,8 @@ public class Synclientier extends Semantier {
 				if (!pth.equals(resp0.doc.fullpath()))
 					Utils.warn("Resp is not replied with exactly the same path: %s", resp0.doc.fullpath());
 
+				// FIXME Call requires API level 26 (current min is 17): `java.nio.file.Files#size`
+				// FIXME Call requires API level 26 (current min is 17): `java.nio.file.Paths#get`
 				totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
 				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
 

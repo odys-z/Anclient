@@ -67,7 +67,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             DisplayMetrics displaymetrics = new DisplayMetrics();
             wm.getDefaultDisplay().getMetrics(displaymetrics);
             itemWidth = displaymetrics.widthPixels;
-            Utils.logi("w: %s", itemWidth);
+            // Utils.logi("w: %s", itemWidth);
             params.height = itemWidth / ImagePickActivity.COLUMN_NUMBER;
         }
         ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );

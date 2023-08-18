@@ -112,25 +112,23 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, cont
 
   return (
     mime2type(mime) === 'video' ?
-    <video
-      key={key}
+    <video key={key}
+      {...photo}
       style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
-      // {...photo}
       onClick={onClick ? handleClick : null}
     ><source src={photo.src}/>
     </video>
     : mime2type(mime) === 'audio' ?
     <AudioBox key={key} width={"90%"} height={"50%"}
-      style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
       {...photo}
+      style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
       onCanPlay={() => onSlideLoad(photo)}
       onClick={onClick ? handleClick : null}
     />
     :
-    <img
-      key={key}
-      style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
+    <img key={key}
       {...photo}
+      style={onClick ? { ...imgStyle, ...imgWithClick } : imgStyle}
       onClick={onClick ? handleClick : null}
       loading="lazy"
     />

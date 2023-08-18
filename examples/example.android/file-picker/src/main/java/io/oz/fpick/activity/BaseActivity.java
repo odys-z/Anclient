@@ -286,14 +286,15 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         // Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size());
-        Utils.logi("onPermissionsGranted: %s : %s", requestCode, perms.size());
+        // Utils.logi("onPermissionsGranted: %s : %s", requestCode, perms.size());
         permissionGranted();
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         // Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
-        Utils.logi("onPermissionsDenied: %s : %s", requestCode, perms.size());
+        // Utils.logi("onPermissionsDenied: %s : %s", requestCode, perms.size());
+
         // If Permission permanently denied, ask user again
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             new AppSettingsDialog.Builder(this).build().show();

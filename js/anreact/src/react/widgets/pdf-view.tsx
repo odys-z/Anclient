@@ -96,9 +96,6 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
         getViewport: (arg0: { scale: number; }) => any;
         render: (arg0: { canvasContext: any; viewport: any; }) => void; }) => {
           let viewport = page.getViewport({scale: 1.00});
-          // let canvas = that.canvasRef;
-          // canvas.height = viewport.height;
-          // canvas.width = viewport.width;
 
           const outputScale = window.devicePixelRatio || 1;
           canvas.width  = Math.floor(viewport.width * outputScale);
@@ -109,8 +106,6 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
           let transform = outputScale !== 1
                 ? [outputScale, 0, 0, outputScale, 0, 0]
                 : null;
-
-          // console.log(canvas.width, canvas.height, "scale 1.0", viewport.width, viewport.height, outputScale)
 
           const renderContext = {
               canvasContext: canvas.getContext('2d'),
@@ -136,6 +131,7 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
       <canvas style={{width: "90%", height: "90%"}} ref={(ref) => this.canvasRef = ref}></canvas>
 
       <div style={{
+          background: '#cacaca77',
           position: 'absolute',
           top: '0px', right: '0px',
           padding: '10px', cursor: 'pointer',
