@@ -222,6 +222,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             }
         });
         String albumweb = AssetHelper.url4intent(this, AssetHelper.Act_Album);
+
+        // Tag: environment runtime test here
+        // albumweb = "http://192.168.0.3:8888/index.html?serv=info";
         if (singl.verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
         wv.loadUrl(albumweb);
     }
