@@ -28,6 +28,9 @@ public class Clients {
 	@FunctionalInterface
 	public interface OnLogin { void ok(SessionClient client); }
 
+	/**
+	 * @since 0.4.31 default verbose is false.
+	 */
 	public static boolean verbose = true;
 
 	public static String servRt;

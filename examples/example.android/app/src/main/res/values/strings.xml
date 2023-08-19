@@ -1,42 +1,42 @@
 <resources>
-    <string name="app_name" translatable="false">Family Album</string>
+    <string name="app_name">Family Album</string>
 
-    <string name="menu_prefs" translatable="false">Settings</string>
-    <string name="menu_help" translatable="false">Help</string>
+    <string name="menu_prefs">Settings</string>
+    <string name="menu_help">Help</string>
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
     <string name="txt_prefs_summery_home">Home Registration</string>
     <string name="devide_name">Device ID: %s</string>
-    <string name="txt_only_once">You can name a device only once.</string>
+    <string name="txt_only_once">Name a unique device. Device can be name only once.</string>
 
     <string name="key_home" translatable="false">home_key</string>
-    <string name="home_title" translatable="false">Home Name</string>
+    <string name="home_title" >Home Name</string>
 
     <string name="jserv_key" translatable="false">jserv-key</string>
     <string name="homepage_key" translatable="false">homepage-key</string>
     <string name="jserv_default" translatable="false">@string/inforise</string>
     <string name="jserv" translatable="false">@string/inforise_default</string>
-    <string name="jserv_title" translatable="false">Home Server IP</string>
+    <string name="jserv_title">Home Server IP</string>
 
     <string name="key_regist" translatable="false">btn-register</string>
     <string name="txt_regist">Save Device Name</string>
 
-    <string name="t_login_failed"     translatable="false">Login to home server failed.\nUserId: %s\nService:%s</string>
-    <string name="userid_key"     translatable="false">my</string>
+    <string name="t_login_failed" translatable="false">Login to home server failed.\nUserId: %s\nService:%s</string>
     <string name="userid_summery" translatable="false">Name used for sub-folder (created at server)</string>
-    <string name="userid_title"   translatable="false">Login ID</string>
+    <string name="userid_title">Login ID</string>
+    <string name="pswd_title"  >Password</string>
+    <string name="userid_key" translatable="false">my</string>
     <string name="pswd_key"   translatable="false">pswd_key</string>
-    <string name="pswd_title" translatable="false">Password</string>
     <string name="btn_login"  translatable="false">bt_login</string>
-    <string name="txt_login"  translatable="false">User Login</string>
-    <string name="txt_please_login"  translatable="false">Please Login</string>
-    <string name="summery_login"     translatable="false">Login to upload files your own folder</string>
-    <string name="txt_prefs_title"   translatable="false">Album User Settings</string>
+    <string name="txt_login"       >User Login</string>
+    <string name="txt_please_login">Please Login</string>
+    <string name="summery_login"   >Login to upload files your own folder</string>
+    <string name="txt_prefs_title" >Album User Settings</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
-    <string name="t_synch_ok">%s files has been synchronized</string>
-    <string name="devide_title">Device Name</string>
+    <string name="t_synch_ok"      >%s files has been synchronized</string>
+    <string name="devide_title"    >Device Name</string>
     <string name="key_device" translatable="false">key-device</string>
-    <string name="login_succeed">Logged in successfully.</string>
+    <string name="login_succeed"   >Logged in successfully.</string>
 
     <string name="msg_ignore_offline">Selection / files ignored - not logged in.</string>
     <string name="msg_templ_progress">Total files: %d / %d, File Blocks: %s (%.1f%%)</string>
@@ -51,9 +51,9 @@
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
     <string name="url_landing" translatable="true">https://odys-z.github.io/Anclient</string>
 
-    <string name="btn_add_file">+ File</string>
+    <string name="btn_add_file" >+ File</string>
     <string name="btn_add_audio">+ Audio</string>
     <string name="btn_add_video">+ Video</string>
-    <string name="btn_add_img">+ Image</string>
+    <string name="btn_add_img"  >+ Image</string>
 
 </resources>

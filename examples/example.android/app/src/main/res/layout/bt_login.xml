@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <Button
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/resetButton"
         android:text="@string/txt_login"
         android:layout_width="match_parent"
