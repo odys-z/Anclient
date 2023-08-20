@@ -2,11 +2,11 @@
     <string name="app_name">Family Album</string>
 
     <string name="menu_prefs">Settings</string>
-    <string name="menu_help">Help</string>
+    <string name="menu_help" >Help</string>
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
     <string name="txt_prefs_summery_home">Home Registration</string>
-    <string name="devide_name">Device ID: %s</string>
+    <string name="devide_name"  >Device ID: %s</string>
     <string name="txt_only_once">Name a unique device. Device can be name only once.</string>
 
     <string name="key_home" translatable="false">home_key</string>
