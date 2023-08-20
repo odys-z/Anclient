@@ -4,7 +4,7 @@ import { CSSProperties } from '@material-ui/styles';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, Column, ColumnApi, GridApi,
 	ColumnFunctionCallbackParams, GetContextMenuItems, GetContextMenuItemsParams,
-	GridReadyEvent, ICellRendererParams, RowNode, ICellRendererComp, ICellRendererFunc
+	GridReadyEvent, ICellRendererParams, RowNode, ICellRendererComp, ICellRendererFunc, CellClickedEvent, EditableCallback, CellEditingStoppedEvent
 } from 'ag-grid-community';
 
 // import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -58,25 +58,21 @@ export interface CellEvent extends RowEvent {
     value: any;
 }
 
-export interface CellClickedEvent extends CellEvent {
-}
+// export interface CellClickedEvent<T, F> extends CellEvent { }
 
-export interface EditableCallbackParams extends ColumnFunctionCallbackParams {
-}
+// export interface EditableCallbackParams extends ColumnFunctionCallbackParams { }
 
-export interface EditableCallback {
-    (params: EditableCallbackParams): boolean;
-}
+// export interface EditableCallback { (params: EditableCallbackParams): boolean; }
 
 /**
  * Short-cut for ag-grid-community (License: MID)
  */
-export interface CellEditingStoppedEvent extends CellEvent {
-    /** The old value before editing */
-    oldValue: any;
-    /** The new value after editing */
-    newValue: any;
-}
+// export interface CellEditingStoppedEvent extends CellEvent {
+//     /** The old value before editing */
+//     oldValue: any;
+//     /** The new value after editing */
+//     newValue: any;
+// }
 
 /**
  * For ag-grid column options, see
@@ -358,7 +354,7 @@ export class Spreadsheetier extends Semantier {
 		return `[${n}]`; // [] for tagging the invalid data in database
 	}
 
-	onCellClick (e: CellClickedEvent) {
+	onCellClick (e: CellClickedEvent<any, any>) {
 		this.pkval.v = e.data[str(this.pkval.pk) || ''];
 	};
 
@@ -484,7 +480,7 @@ export interface SpreadsheetProps extends Comprops {
 	/** not used - only for AgGridReact community version */
 	contextMenu?: object;
 
-    onCellClicked?: (e: CellClickedEvent) => void;
+    onCellClicked?: (e: CellClickedEvent<any, any>) => void;
 
 	onSheetReady?: (e: GridReadyEvent) => void;
 }
@@ -657,7 +653,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	type: "cellClicked"
 	value: "2021-09-14"
 	*/
-	onCellClicked = (p: CellClickedEvent) => {
+	onCellClicked = (p: CellClickedEvent<any, any>) => {
 		if (typeof this.props.onCellClicked === 'function')
 			this.props.onCellClicked(p);
 	};

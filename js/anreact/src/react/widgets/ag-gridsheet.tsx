@@ -6,8 +6,8 @@ import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
 // import 'ag-grid-community/dist/styles/ag-grid.css';
 // import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { CrudComp } from '../crud';
-import { GetContextMenuItems } from 'ag-grid-community';
-import { CellClickedEvent, CellEditingStoppedEvent, EditableCallback, SpreadsheetRec } from './spreadsheet';
+import { CellClickedEvent, CellEditingStoppedEvent, EditableCallback, GetContextMenuItems } from 'ag-grid-community';
+import { SpreadsheetRec } from './spreadsheet';
 
 export interface SheetProps {
     defaultColDef: {
@@ -166,7 +166,7 @@ export class AnGridsheet extends CrudComp<SheetProps & AgGridReactProps> {
 	/** Grid event API:
 	 * https://www.ag-grid.com/javascript-data-grid/grid-events/
 	 */
-	onEditStop (p: CellEditingStoppedEvent<any, any>) {
+	onEditStop (p: CellEditingStoppedEvent) {
 		if (typeof this.editHandlers[p.colDef.field] === 'function')
 			this.editHandlers[p.colDef.field](p);
 	}

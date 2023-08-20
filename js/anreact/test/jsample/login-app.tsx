@@ -5,8 +5,9 @@ import { AnContext, AnError, AnReact, L, Login } from '../../../anreact/src/an-c
 import { Comprops } from '../../../anreact/src/react/crud';
 import { AnreactAppOptions, JsonServs } from '../../../anreact/src/an-components';
 import { SessionInf } from '@anclient/semantier/anclient';
+import { Theme } from '@material-ui/core/styles';
 
-const styles = (theme) => ({
+const styles = (theme: Theme) => ({
 	root: {
 	    '& *': { margin: theme.spacing(1) }
 	},
@@ -83,8 +84,14 @@ class LoginApp extends React.Component<LoginProps> {
 				iparent: this.props.iparent,
 				error: this.errCtx,
 			}} >
-				<Login onLoginOk={this.onLogin} />
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} title={L('Error')} msg={this.errCtx.msg} />}
+				<Login onLogin={this.onLogin} />
+				{ this.state.hasError &&
+				  <AnError
+				  	onClose={this.onErrorClose}
+					// fullScreen={true}
+					title={L('Error')}
+					msg={this.errCtx.msg}
+				  /> }
 			</AnContext.Provider>
 		);
 	}

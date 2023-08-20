@@ -14,11 +14,16 @@ import { an, SessionClient } from '@anclient/semantier';
 	import {L} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
 import { Comprops } from './crud';
+import { ClassNames } from './anreact';
 
 const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 	root: {
 	    '& *': { margin: theme.spacing(1) }
 	},
+	container: {
+		maxWidth: "20vw",
+		maxHeight: "20vh"
+	}
 });
 
 interface LoginProps extends Comprops {
@@ -85,12 +90,18 @@ class LoginComp extends React.Component<LoginProps> {
 		this.state.userId = this.config.userid;
 	}
 
-	alert() {
+	alert(classes: ClassNames) {
 		let that = this;
-		this.confirm = <ConfirmDialog
+		this.confirm = <ConfirmDialog className={classes.container}
 			ok={L('OK')} title={L('Info')} cancel={false}
-			open={true} onClose={ () => { that.confirm = undefined; } }
+			open={true} onClose={ () => {
+				that.confirm = undefined;
+				// TODO verify in sessionless
+				this.setState({});
+			} }
 			msg={ L('User Id or password is not correct.') } />
+		// TODO verify in sessionless
+		this.setState({});
 	}
 
 	onErrorClose() {
@@ -100,12 +111,12 @@ class LoginComp extends React.Component<LoginProps> {
 	 * Login and go main page (sys.jsx). Target html page is first specified by
 	 * login.serv (SessionInf.home).
 	 */
-	toLogin() {
+	toLogin(classes? : ClassNames) {
 		let that = this;
 		let uid = this.state.userId;
 		let pwd = this.state.pswd;
 		if (!uid || !pwd) {
-			this.alert();
+			this.alert(classes);
 			return;
 		}
 
@@ -114,7 +125,6 @@ class LoginComp extends React.Component<LoginProps> {
 		if (!this.config.loggedin) {
 			let serv = ctx.servId || 'host';
 			let hosturl = ctx.servs[serv];
-			// console.log("login url & serv-id: ", hosturl, serv);
 
 			an.init(hosturl);
 			an.login( uid, pwd, reload, {onError} );
@@ -124,13 +134,10 @@ class LoginComp extends React.Component<LoginProps> {
 			that.ssClient = client;
 			that.setState( {loggedin: true} );
 			if (typeof that.props.onLogin === 'function')
-				// that.props.onLoginOk(client);
 				that.props.onLogin(client);
 			else if (ctx.iparent) {
 				ctx.ssInf = client.ssInf;
 				SessionClient.persistorage(client.ssInf);
-				// ctx.iparent.location = client.ssInf.home ?
-				// 			client.ssInf.home : `${ctx.ihome}?serv=${ctx.servId}`;
 				ctx.iparent.location = `${ctx.ihome}?serv=${ctx.servId}`;
 			}
 			else
@@ -184,13 +191,13 @@ class LoginComp extends React.Component<LoginProps> {
 					id="pswd" label={L("Password")}
 					type="password"
 					autoComplete="new-password"
-					onKeyUp={(e) => {if (e.code === "Enter") that.toLogin();} }
+					onKeyUp={(e) => {if (e.code === "Enter") that.toLogin(classes);} }
 					defaultValue={this.config.pswd}
 					onChange={event => this.setState({pswd: event.target.value})} />
 				<Button className={classes.field2}
 					variant="contained"
 					color="primary"
-					onClick={this.toLogin} >{L('Login')}</Button>
+					onClick={() => this.toLogin(classes)} >{L('Login')}</Button>
 			</Collapse>
 			{this.confirm}
 		</div>);

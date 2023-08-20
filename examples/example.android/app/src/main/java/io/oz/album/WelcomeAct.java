@@ -325,9 +325,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         public InputStream open(SyncDoc f) throws FileNotFoundException {
                             return new FileInputStream(f.fullpath());
                         }
-                    })
-                    .asyVideos(list,
-                        (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
+                    }).asyVideos(list,
+                        (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress,
+                                r, rx, total, (float) seq / total * 100),
                         (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
                         errCtx.prepare(msgv, R.string.msg_upload_failed));
 

@@ -36,7 +36,7 @@ export class PageInf {
 	total?: number;
 
 	/** Read via {@link PageInf#condtsRec()} */
-	private condts?: Array<string[]>;
+	condts?: Array<string[]>;
 
 	constructor(page?: number | PageInf, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.transact.sql.PageInf';
