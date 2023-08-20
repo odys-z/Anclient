@@ -18,7 +18,8 @@ import io.odysz.semantic.jsession.AnSessionResp;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
-/**Anclient.jave raw api - jserv protocol handler
+/**
+ * Anclient.jave raw api - jserv protocol handler
  * 
  * <p>js equivalent: AnClient</p>
  * 
@@ -28,6 +29,9 @@ public class Clients {
 	@FunctionalInterface
 	public interface OnLogin { void ok(SessionClient client); }
 
+	/**
+	 * @since 0.4.31 default verbose is false.
+	 */
 	public static boolean verbose = true;
 
 	public static String servRt;

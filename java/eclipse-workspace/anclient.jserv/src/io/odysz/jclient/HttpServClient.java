@@ -68,7 +68,7 @@ public class HttpServClient {
 		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
 		jreq.toBlock(con.getOutputStream());
 
-		if (Clients.verbose) Utils.logi(url);
+		if (Clients.verbose) Utils.logi("[Clients.verbose] %s", url);
 
 		int responseCode = con.getResponseCode();
 		
@@ -87,7 +87,7 @@ public class HttpServClient {
 			AnsonMsg<AnsonResp> x = (AnsonMsg<AnsonResp>) Anson.fromJson(con.getInputStream());
 			if (Clients.verbose) {
 				Utils.printCaller(false);
-				Utils.logi(x.toString());
+				Utils.logi("[Clients.verbose]\n%s", x.toString());
 			}
 
 			// onResponse.onCallback(x.code(), x.body(0));
@@ -126,7 +126,7 @@ public class HttpServClient {
 
 		jreq.toBlock(con.getOutputStream());
 
-		if (Clients.verbose) Utils.logi(url);
+		if (Clients.verbose) Utils.logi("[Clients.verbose] %s", url);
 
 		int responseCode = con.getResponseCode();
 		if (responseCode == 206) {
@@ -144,7 +144,7 @@ public class HttpServClient {
 			AnsonMsg<AnsonResp> x = (AnsonMsg<AnsonResp>) Anson.fromJson(con.getInputStream());
 			if (Clients.verbose) {
 				Utils.printCaller(false);
-				Utils.logi(x.toString());
+				Utils.logi("[Clients.verbose]\n%s", x);
 			}
 
 			if (x.code() != MsgCode.ok)

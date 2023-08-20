@@ -157,6 +157,7 @@ public class AlbumContext {
 
     OnError onLinkBroken = ((c, r, args) -> {
         state = ConnState.Disconnected;
+        // TODO toast or change an icon, c: exSession r: heart link broken
     });
 
     public AlbumContext jserv(String newVal) {
