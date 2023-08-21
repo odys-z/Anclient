@@ -17,7 +17,7 @@ import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
 export interface ComboItem extends NV {};
 
 /**E.g. form's combobox field declaration */
-type ComboFieldType = TierComboField<JSX.Element, CompOpts>;
+// type ComboFieldType = TierComboField;
 
 export interface ComboProps extends Comprops {
 	/**Intial options (default values), will be replaced after data binding with field's options */
@@ -97,7 +97,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		else console.warn("DatasetCombo used for null sk?", this.props.label);
 	}
 
-	onCbbRefChange( refcbb: React.RefObject<HTMLDivElement> ) : (
+	onCbbRefChange( _refcbb: React.RefObject<HTMLDivElement> ) : (
 			event: React.ChangeEvent<{}>,
 			value: Value<ComboItem, boolean, boolean, boolean>,
 			reason: AutocompleteChangeReason | AutocompleteInputChangeReason,
@@ -105,8 +105,11 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	) => void {
 		let that = this;
 
-		return (e, item: Value<ComboItem, boolean, boolean, boolean>) => {
+		return (e, item: Value<ComboItem, boolean, boolean, boolean>, reson: string) => {
+			console.log(reson);
+
 			if (e) e.stopPropagation();
+
 			let selectedItem = item ? item as NV : AnConst.cbbAllItem;
 
 			if (typeof that.props.onSelect === 'function')
@@ -117,18 +120,10 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	}
 
 	render() {
-		// let cmb = this.state.combo
 		let { classes, val } = this.props;
 
 		// let refcbb = React.createRef(); // FIXME why not this.refcbb?
 
-		/** Desgin Notes:
-		 * SimpleForm's first render triggered this constructor and componentDidMount() been called, first.
-		 * When it called render again when data been loaded in it's componentDidMount() (then render),
-		 * this constructor and componentDidMount() won't be called.
-		 * So here is necessary to check the initial selected value.
-		 * This shouldn't be an issue in semantier pattern?
-		 */
 		let selectedItem = this.state.selectedItem;
 		if (!selectedItem && this.props.val != undefined) {
 			selectedItem = findOption(this.combo.options || this.props.options, val);

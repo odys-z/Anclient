@@ -1,5 +1,5 @@
 import { SessionClient, Inseclient, AnTreeNode } from "./anclient";
-import { toBool, isEmpty, str } from "./helpers";
+import { toBool, isEmpty, str, len } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
@@ -141,23 +141,35 @@ export interface Tierec {
 	[f: string]: string | number | boolean | object | undefined | null;
 }
 
-/**E.g. form's combobox field declaration */
-export interface TierComboField<F, FO> extends AnlistColAttrs<F, FO> {
+/**E.g. form's combobox field declaration
+ * 
+ * TODO rename as QueryField
+ */
+export interface TierComboField extends AnlistColAttrs<any, any> {
 	uri: string;
+	/** Only for cbb */
 	sk : string;
 	nv?: NV;
 	options?: Array<NV>
+ 	noAllItem?: boolean;
 
+ 	/** is cbb clean */
+ 	clean?: boolean; 
 	loading?: boolean;
 	sqlArgs?: string[];
 	sqlArg? : string;
+
+	/** UI Dom etc. for data operation */
+	ref: any;
 }
 
 export interface Tierelations extends DbRelations {
 }
 
-/**Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
- * @deprecated
+/**
+ * Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
+ * 
+ * @deprecated: Aug 21. 2023, not yet?
  */
 export interface QueryConditions {
 	pageInf?: PageInf;
@@ -494,14 +506,14 @@ export class Semantier {
      * @param onOk: ;
      */
     del(opts: {
-        ids: Array<string>;
+        ids: Map<string, Tierec>;
         posts?: Array<AnsonBody>;
     }, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;
 		let { ids, posts } = opts;
 
-		if (ids && ids.length > 0) {
+		if (ids && len(ids) > 0) {
 			let req = client
 				.usrAct(this.pkval.tabl, CRUD.d, 'delete')
 				.deleteMulti(this.uri, this.pkval.tabl, this.pkval.pk, [...ids]);

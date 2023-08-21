@@ -26,11 +26,11 @@ const styles = (theme: Theme) => {
 			height: "100%"
 		},
 		root: {
-			marginTop: 60,
+			marginTop: theme.spacing(7.5),
 			minHeight: "60vh",
 			maxHeight: "86vh",
 			maxWidth: "70vw",
-			minWidth: 600,
+			minWidth: theme.spacing(75),
 			margin: "auto"
 		},
 		title: {

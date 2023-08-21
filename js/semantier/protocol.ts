@@ -1,5 +1,5 @@
 import { SessionClient, SessionInf } from './anclient';
-import { str } from './helpers';
+import { arr, str } from './helpers';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
@@ -36,7 +36,9 @@ export class PageInf {
 	total?: number;
 
 	/** Read via {@link PageInf#condtsRec()} */
-	private condts?: Array<string[]>;
+	arrCondts?: Array<string[]>;
+
+	mapCondts?: {[p: string]: AnsonValue};
 
 	constructor(page?: number | PageInf, size?: number, total?: number, condts?: Array<string[]>) {
 		this.type = 'io.odysz.transact.sql.PageInf';
@@ -44,20 +46,20 @@ export class PageInf {
 			this.page = page || 0;
 			this.size = size || -1;
 			this.total = total || 0;
-			this.condts = condts;
+			this.arrCondts = condts;
 		}
 		else {// type safe: PageInf
 			this.page = page?.page || 0;
 			this.size = page?.size || -1;
 			this.total = page?.total || 0;
-			this.condts = page?.condts;
+			this.arrCondts = page?.arrCondts;
 		}
 	}
 
 	nv(k: string, v: string) {
-		if (!this.condts)
-			this.condts = [];
-		this.condts.push([k, v]);
+		if (!this.arrCondts)
+			this.arrCondts = [];
+		this.arrCondts.push([k, v]);
 		return this;
 	}
 
@@ -68,7 +70,7 @@ export class PageInf {
 	 */
 	condtsRec () {
 		let rec = {} as Tierec;
-		for(let nv of this.condts) {
+		for(let nv of this.arrCondts) {
 			if (nv && nv[0])
 				rec[nv[0]] = nv[1];
 		}
@@ -646,8 +648,10 @@ export class QueryReq extends AnsonBody {
 		this.joins = [];
 		this.where = [];
 
-		if (pageInf)
+		if (pageInf) {
 			this.Page(pageInf.size, pageInf.page);
+			this.where = pageInf.arrCondts || arr(pageInf.mapCondts);
+		}
 	}
 
 	Page (size : number, idx : number): QueryReq {
@@ -714,12 +718,16 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-    /**Add where clause condition
+    /**
+	 * Add where clause condition
      * @param logic logic type
      * @param loper left operator
      * @param roper right operator
      * @return this */
 	public whereCond (logic: string, loper: string, roper: string): QueryReq {
+		if (!this.where)
+			this.where = [];
+
 		if (Array.isArray(logic))
 			this.where = this.where.concat(logic);
 		else if (logic !== undefined)

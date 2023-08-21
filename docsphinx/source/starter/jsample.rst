@@ -1,3 +1,6 @@
+.. TODO LIST
+.. 1. ADD guide for how to start application's jserv from jsample 
+
 About jserv-sample
 ==================
 
@@ -226,10 +229,3 @@ The result is :ref:`explained here<login-serv-get>`.
 
 .. image:: ./imgs/02-jsample-docker.png
     :width: 320px
-
-
-
-
-
-
-

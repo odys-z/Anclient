@@ -1,4 +1,5 @@
 
+import * as CSS from 'csstype';
 import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
@@ -93,12 +94,12 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		}
 	}
 
-	getField(f: AnlistColAttrs<JSX.Element, CompOpts>, rec: Tierec, classes: ClassNames | undefined, media: Media) {
+	getField(f: AnlistColAttrs<JSX.Element, CompOpts> & { css: CSS.Properties }, rec: Tierec, classes: ClassNames | undefined, media: Media) {
 		let {isSm} = media;
 		let that = this;
 
 		if (f.type === 'cbb') {
-			let fcbb = f as TierComboField<JSX.Element, CompOpts>;
+			let fcbb = f as TierComboField & { css: CSS.Properties };
 			return (
 				<DatasetCombo uri={ this.props.uri }
 					sk={fcbb.sk} nv={ fcbb.nv }

@@ -1,6 +1,7 @@
 
 import $ from 'jquery';
 
+import * as CSS from 'csstype';
 import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames,
 	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
@@ -59,9 +60,6 @@ export function hide(grid: {
 export interface CompOpts {
 	classes?: ClassNames;
 	media?: Media;
-    css?: CSSStyleDeclaration;
-	// box?: {};
-    // grid?: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
 }
 
 export interface QueryPage {
@@ -86,7 +84,8 @@ export const invalidStyles = {
 	minLen : { border: "1px solid red" },
 } as {[n in InvalidClassNames]: CSSProperties};
 
-export function toReactStyles(styles: CSSStyleDeclaration | undefined): CSSProperties {
+export function toReactStyles(styles: CSS.Properties ) {
+// export function toReactStyles(styles: CSSStyleDeclaration | undefined): CSSProperties {
 	return styles as unknown as CSSProperties;
 }
 

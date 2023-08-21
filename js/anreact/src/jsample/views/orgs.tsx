@@ -5,13 +5,12 @@ import withWidth from "@material-ui/core/withWidth";
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, Semantier } from '@anclient/semantier';
+import { Semantier } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTreegrid } from '../../react/widgets/treegrid'
-import { CompOpts } from '../../an-components';
 
 const styles = (_theme: Theme) => ( {
 	root: {

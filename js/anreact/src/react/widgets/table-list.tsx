@@ -66,13 +66,13 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			throw Error('Type safe checking: @anclient/react now using ref ids: Set<string> to save selected row ids. (props selectedIds renamed as selected)')
 
 		this.state.selected = selected.ids;
-		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
-			throw Error("selected.ids must be a set");
+		if (!this.state.selected || this.state.selected.constructor.name !== 'Map')
+			throw Error("Since @anclient/anreact 0.4.48, selected.ids must be a Map<stirng, Tierec>.");
 
 		let {total, page, size} = props.pageInf || {};
 		this.state.total = total || -1;
-		this.state.page = page || 0;
-		this.state.size = size || 25;
+		this.state.page  = page  || 0;
+		this.state.size  = size  || 25;
 
 
 		this.isSelected = this.isSelected.bind(this);

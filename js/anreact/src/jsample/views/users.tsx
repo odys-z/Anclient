@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, Tierec,
-	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf, len
+	OnCommitOk, AnlistColAttrs, OnLoadOk, DbRelations, PageInf, len, TierComboField
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -16,7 +16,7 @@ import { Comprops, CrudCompW } from '../../react/crud';
 import { AnContext, AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnTablPager } from '../../react/widgets/table-pager';
-import { AnQueryst, ComboCondType } from '../../react/widgets/query-form';
+import { AnQueryst } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
@@ -232,7 +232,7 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student'),
 		  grid: {sm: 3, md: 2} } as AnlistColAttrs<any, any>,
 		{ name: 'orgId',    field: 'orgId', type: 'cbb',  val: undefined, label: L('Class'),
-		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'}, grid: {sm: 3, md: 2} } as ComboCondType,
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'}, grid: {sm: 3, md: 2} } as TierComboField,
 		// { name: 'roleId',   field: 'roleId', type: 'cbb',  val: undefined, label: L('Role'),
 		//   sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'}, grid: {md: 2, sm: 3} },
 	];
@@ -278,11 +278,11 @@ export class UsersTier extends Semantier {
 		{ type: 'cbb', field: 'roleId', label: L('Role'),
 		  grid: {md: 5},
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
+		  validator: {notNull: true} } as TierComboField,
 		{ type: 'cbb', field: 'orgId', label: L('Organization'),
 		  grid: {md: 5},
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
+		  validator: {notNull: true} } as TierComboField,
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	_cols = [

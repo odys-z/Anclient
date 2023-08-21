@@ -148,8 +148,6 @@ export class MyInfTier extends Semantier {
 	constructor(comp: UIComponent) {
 		super(comp);
 		// FIXME move to super class?
-		// this.uri = comp.uri;
-		// this.mtabl = 'a_users';
 		this.pkval.tabl = 'a_users';
 		this.pkval.pk = 'userId';
 
@@ -157,11 +155,11 @@ export class MyInfTier extends Semantier {
 	}
 
 	_fields = [
-		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-		{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
-		{ field: 'roleId',   label: L('Role'), disabled: true,
-		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
-		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+		{ type : 'text', field: 'userId',   label: L('Log ID'),    grid: {sm: 6, lg: 4}, disabled: true },
+		{ type : 'text', field: 'userName', label: L('User Name'), grid: {sm: 6, lg: 4} },
+		{ type : 'cbb',  field: 'roleId',   label: L('Role'),      grid: {sm: 6, lg: 4}, disabled: true,
+		  cbbStyle: {width: "100%"},
+		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 		{ field: this.imgProp, label: L('Avatar'), grid: {sm: 6, lg: 4}, fieldFormatter: this.loadAvatar.bind(this) }
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 

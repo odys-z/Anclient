@@ -14,13 +14,13 @@
  */
 import React, { Component, ReactNode, CSSProperties } from 'react';
 
+import { Paper, Box, Grid, Dialog, DialogTitle, Typography, DialogContent, DialogActions,
+  Button, GridSpacing, Card } from '@material-ui/core';
 import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
-
 import ClosedCaption from '@material-ui/icons/ClosedCaption';
-
-import { Paper, Box, Grid, Dialog, DialogTitle, Typography, DialogContent, DialogActions, Button, GridSpacing, Card } from '@material-ui/core';
 import AudioPlayer from 'material-ui-audio-player';
 import { AudioPlayerVariation } from 'material-ui-audio-player/dist/components/AudioPlayer';
+
 import audioTheme, { audioSVG } from './audio-theme';
 import { isEmpty } from '@anclient/semantier/helpers';
 import { svgImgSrc } from '../../utils/file-utils';

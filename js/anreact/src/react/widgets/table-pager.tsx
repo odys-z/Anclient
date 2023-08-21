@@ -11,7 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination, { LabelDisplayedRowsArgs } from '@material-ui/core/TablePagination';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { AnlistColAttrs, Tierec, isEmpty, PageInf, toBool, len, DbCol, UIComponent } from '@anclient/semantier';
+import { AnlistColAttrs, Tierec, isEmpty, PageInf, toBool, len, DbCol } from '@anclient/semantier';
 import { DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 import { AnTablistProps } from './table-list';
@@ -43,9 +43,12 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 		let {selected} = props;
 		if (!selected || !selected.ids)
 			throw Error('Type safe checking: @anclient/react now using ref ids: Set<string> to save selected row ids. (props selectedIds renamed as selected)')
+
 		this.state.selected = selected.ids;
-		if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
-			throw Error("selected.ids must be a set");
+		// if (!this.state.selected || this.state.selected.constructor.name !== 'Set')
+		// 	throw Error("selected.ids must be a set");
+		if (!this.state.selected || this.state.selected.constructor.name !== 'Map')
+			throw Error("Since @anclient/anreact 0.4.48, selected.ids must be a Map<stirng, Tierec>.");
 
         this.sizeOptions = props.sizeOptions || [10, 25, 50];
 
@@ -177,18 +180,19 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 							/>
 						</TableCell>)
 					}
-					{columns.filter( (v, x) => //!toBool(v.hide)
-									!toBool(v.hide) && toBool(v.visible, true)
-									&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
-							.map( (colObj, x) => {
-								if (colObj.field === undefined)
-									throw Error("Column field is required: " + JSON.stringify(colObj));
-								let v = row[colObj.field];
-								let cell = colObj.formatter && colObj.formatter(v as DbCol, x, row); // bug?
-								if (cell)
-									cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
-								return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
-							} )}
+					{columns
+						.filter( (v, x) => //!toBool(v.hide)
+								!toBool(v.hide) && toBool(v.visible, true)
+								&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
+						.map( (colObj, x) => {
+							if (colObj.field === undefined)
+								throw Error("Column field is required: " + JSON.stringify(colObj));
+							let v = row[colObj.field];
+							let cell = colObj.formatter && colObj.formatter(v as DbCol, x, row); // bug?
+							if (cell)
+								cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
+							return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
+						} )}
 				</TableRow>)
 		});
 	}
