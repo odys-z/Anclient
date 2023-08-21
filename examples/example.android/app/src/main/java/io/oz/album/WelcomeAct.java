@@ -358,9 +358,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 String.valueOf(data.getData()),
                                 getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT));
                         errCtx.prepare(msgv, R.string.msg_upload_failed)
-                                .err(null, "URI: %s\nPath: %s",
-                                        String.valueOf(data.getData()),
-                                        getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
+                              .err(null, "URI: %s\nPath: %s",
+                                    String.valueOf(data.getData()),
+                                    getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
                     }
                     paths = new ArrayList<>(1);
                     paths.add(getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT));
