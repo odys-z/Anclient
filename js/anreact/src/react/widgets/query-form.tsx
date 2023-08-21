@@ -150,9 +150,11 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		reason: AutocompleteChangeReason | AutocompleteInputChangeReason,
 		details?: AutocompleteChangeDetails<ComboItem>
 	  ) => void {
+
 		let _ref = refcbb;
 		let _that = this;
-		return (e, item, reason : 'reset' | 'clear' | 'select-option') => {
+
+		return (e, item, reason: 'reset' | 'clear' | 'select-option' | 'input', _de) => {
 			if (e) e.stopPropagation();
 
 			let x = _ref?.getAttribute('data-name');
@@ -160,12 +162,13 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				_that.qFields[x].val = '';
 			else if (x && reason === 'select-option') 
 				_that.qFields[x].val = item ? item : AnConst.cbbAllItem;
+
 			_that.setState({});
 		}
 	}
 
 	toSearch( _e : React.UIEvent ) {
-		if (!this.props?.onSearch) {
+		if ( !this.props?.onSearch ) {
 			console.warn("Search handler is undefined.");
 			return;
 		}
@@ -205,32 +208,33 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		let { checked } = this.state;
 		let { classes, media } = this.props;
 		return (
-		<div className={classes?.root} >
+		  <div className={classes?.root} >
 			<Switch checked={checked} onChange={this.handleChange} />
 			<Collapse in={checked} >
-				<Grid container alignContent="flex-end" >
-					{ conditions(this.qFields, classes, media) }
-					<Grid item className={classes?.buttons} >
-						<Button variant="contained"
-							color="primary"
-							className={classes?.button}
-							onClick={this.toSearch}
-							startIcon={<Search />}
-						>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Search')}
-						</Button>
-						<Button variant="contained"
-							color="primary"
-							className={classes?.button}
-							onClick={this.toClear}
-							startIcon={<Replay />}
-						>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Reset')}
-						</Button>
-					</Grid>
+			  <Grid container alignContent="flex-end" >
+				{ conditions(this.qFields, classes, media) }
+				<Grid item className={classes?.buttons} >
+					<Button variant="contained"
+						color="primary"
+						className={classes?.button}
+						onClick={this.toSearch}
+						startIcon={<Search />}
+					>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Search')}
+					</Button>
+					<Button variant="contained"
+						color="primary"
+						className={classes?.button}
+						onClick={this.toClear}
+						startIcon={<Replay />}
+					>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Reset')}
+					</Button>
 				</Grid>
+			  </Grid>
 			</Collapse>
-		</div>);
+		  </div>);
 
-		/** Render query form controls
+		/**
+		 * Render query form controls
 		 * @param{array} [conds] conditions
 		 * @return (auto complete) combobox
 		 */

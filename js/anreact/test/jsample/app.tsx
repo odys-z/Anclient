@@ -177,7 +177,7 @@ class App extends React.Component<Approps> {
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				anClient: this.anClient, // as typeof SessionClient | Inseclient,
+				anClient: this.anClient,
 				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,

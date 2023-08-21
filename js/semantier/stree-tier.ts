@@ -154,98 +154,14 @@ export class SyncDoc implements Tierec {
 	pname?: string;
 	shareby?: string | undefined;
 	sharedate?: string;
-	// css?: object | string;
 	device?: string;
 
 	src: string;
-	// srcSet?: Array<string>;
-	// width: number;
-	// height: number
 
 	constructor (opt: { recId: any; src?: any; device?: string, type: string}) {
-		// this.type = SyncDoc.__type0__;
 		this.type = opt.type;
 		this.src = opt.src
 		this.docId = opt.recId;
 		this.device = opt.device;
 	}
 }
-
-// export class PhotoRec implements Tierec {
-// 	static __type__: 'io.oz.album.tier.PhotoRec';
-
-//     [f: string]: string | number | boolean | object;
-
-// 	type?: string;
-
-// 	/** pid */
-// 	recId?: string;
-// 	/** card title */
-// 	pname?: string;
-// 	shareby?: string | undefined;
-// 	sharedate?: string;
-// 	css?: PhotoCSS | string;
-// 	device?: string;
-
-// 	src: string;
-// 	srcSet?: Array<string>;
-// 	width: number;
-// 	height: number
-
-// 	constructor (opt: { recId: any; src?: any; device?: string}) {
-// 		this.type = PhotoRec.__type__;
-// 		this.src = opt.src
-// 		this.recId = opt.recId;
-// 		this.device = opt.device;
-// 	}
-
-// 	shareLable() {
-// 		return PhotoRec.toShareLable(this);
-// 	}
-
-// 	static toShareLable(p: {shareby?: string, device?: string}) {
-// 		return ((p.shareby && p.device)
-// 			? `shared by ${p.shareby} @ ${p.device}`
-// 			: p.shareby ?
-// 			`shared by ${p.shareby}`
-// 			: undefined );
-// 	}
-// };
-
-// export class AlbumReq extends DocsReq {
-//  	static __type__ = 'io.oz.album.tier.AlbumReq';
-// 	static A = {
-// 		stree: DatasetierReq.A.stree,
-// 		records: 'r/collects',
-// 		collect: 'r/photos',
-// 		rec: 'r/photo',
-// 		download: 'r/download',
-// 		update: 'u',
-// 		insert: 'c',
-// 		upload: 'c/doc',
-// 		del: 'd',
-// 	};
-
-// 	pageInf: PageInf;
-// 	sk: string;
-// 	photo: PhotoRec;
-
-// 	pid: string;
-
-// 	constructor (opts: {uri?: string, sk?: string, qrec?: PhotoRec, page?: PageInf}) {
-// 		super(opts.uri, {docId: opts.sk});
-// 		this.type = AlbumReq.__type__; // 'io.oz.album.tier.AlbumReq';
-
-// 		let {sk} = opts;
-// 		this.pageInf = opts.page;
-// 		this.sk = sk;
-
-// 		this.photo = opts.qrec || new PhotoRec({recId: sk});
-// 	}
-// }
-// StreeTier.registTierequest('album', (opts) => { return new AlbumReq(opts); });
-
-// export class PhotoCSS {
-// 	type: 'io.oz.album.tier.PhotoCSS';
-// 	size: [0, 0, 0, 0];
-// }

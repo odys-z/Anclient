@@ -80,3 +80,6 @@ export function len(arg: string | Array<any> | Set<any> | Map<any, any> | undefi
 		? (arg as Set<any>).size
 		: size(arg);
 }
+export function arr(obj: object) {
+	return Object.entries(obj);
+}

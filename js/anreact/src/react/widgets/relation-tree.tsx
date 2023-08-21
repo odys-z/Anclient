@@ -21,7 +21,6 @@ const styles = (theme: Theme) => ({
   root: {
 	display: "flex",
 	flexDirection: "column" as const,
-	// textAlign: "left",
 	width: "100%"
   },
   row: {
@@ -179,11 +178,11 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 				<Grid container key={id} className={classes.row}>
 				  <Grid item xs={9} className={classes.treeItem}>
 					<Typography >
-					  {leadingIcons(level)}
-					  {node.css && node.css.icon && icon(node.css.icon)}
-					  {checkbox
-						  && <Checkbox color="primary" checked={toBool(node.checked)}
-							onChange={(e) => {
+					  { leadingIcons(level)}
+					  { node.css && node.css.icon && icon(node.css.icon)}
+					  { checkbox
+						&& <Checkbox color="primary" checked={toBool(node.checked)}
+								onChange={(e) => {
 									node.checked = e.target.checked;
 									that.setState({});
 								}} />

@@ -1,14 +1,14 @@
 /** This is the error page of CRUD, not the error message box (AnError). */
 import React from 'react';
-	import { withStyles } from "@material-ui/core/styles";
-	import Button from '@material-ui/core/Button';
+import { Theme, withStyles } from "@material-ui/core/styles";
+import Button from '@material-ui/core/Button';
 
 import { Comprops, CrudComp } from './crud';
 import { AnContext, AnContextType } from './reactext';
 import { TextField } from '@material-ui/core';
 import { L } from '../utils/langstr';
 
-const styles = (theme) => ( {
+const styles = (theme: Theme) => ( {
 	root: {
 		"& :hover": {
 			backgroundColor: '#777'

@@ -328,9 +328,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         public InputStream open(SyncDoc f) throws FileNotFoundException {
                             return new FileInputStream(f.fullpath());
                         }
-                    })
-                    .asyVideos(list,
-                        (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
+                    }).asyVideos(list,
+                        (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress,
+                                r, rx, total, (float) seq / total * 100),
                         (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
                         errCtx.prepare(msgv, R.string.msg_upload_failed));
 
@@ -361,9 +361,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 String.valueOf(data.getData()),
                                 getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT));
                         errCtx.prepare(msgv, R.string.msg_upload_failed)
-                                .err(null, "URI: %s\nPath: %s",
-                                        String.valueOf(data.getData()),
-                                        getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
+                              .err(null, "URI: %s\nPath: %s",
+                                    String.valueOf(data.getData()),
+                                    getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
                     }
                     paths = new ArrayList<>(1);
                     paths.add(getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT));

@@ -37,6 +37,7 @@ import {
 } from './crud'
 import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
+import withWidth from '@material-ui/core/withWidth';
 
 export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
@@ -84,7 +85,7 @@ const _comps = { }
 const drawerWidth = 240;
 
 const styles = (theme: Theme) => ({
-	direction: theme.direction || 'ltr',
+	direction: theme.direction || 'ltr' as any,
 	root: {
 		display: 'flex',
 	},
@@ -207,7 +208,9 @@ export function parseMenus(json = []): {
 			funcId = funcId || id;
 			funcName = funcName || text;
 
-			if (! url.startsWith('/')) url = '/' + url;
+			if (url && !url.startsWith('/'))
+				url = '/' + url;
+
 			paths.push({path: url, params: {flags, css}})
 
 			if (children)
@@ -245,7 +248,7 @@ class SysComp extends CrudCompW<SysProps> {
 		paths: [],
 
 		menuTitle: 'Sys Menu',
-		showMenu: false,
+		showMenu: false, 
 		expandings: new Set(),
 		showMine: false,
 		currentPage: undefined as MenuItem
@@ -533,5 +536,5 @@ SysComp.extendLinks([
 	{path: '/sys/error', comp: ErrorPage}
 ]);
 
-const Sys = withStyles<any, any, SysProps>(styles)(SysComp);
+const Sys = withStyles<any, any, Comprops>(styles)(withWidth()(SysComp));
 export { Sys, SysComp };

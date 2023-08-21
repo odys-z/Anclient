@@ -112,13 +112,15 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 
 	showOk(txt: string | string[]) {
 		let that = this;
-		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
-					title={L('Info')}
-					cancel={false} msg={txt}
-					onClose={() => {
-						that.ok = undefined;
-						that.setState( {dirty: false} );
-					} } />);
+		this.ok = (
+			<ConfirmDialog ok={L('OK')} open={true}
+				title={L('Info')}
+				cancel={false} msg={txt}
+				onClose={() => {
+					that.ok = undefined;
+					that.setState( {dirty: false} );
+				}}
+			/>);
 
 		if (typeof this.props.onSave === 'function')
 			this.props.onSave({code: 'ok'});
@@ -160,7 +162,6 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 					mtabl='a_roles' reltabl='a_role_func' relcolumn='nodeId'
 					sqlArgs={[this.pkval.v]}
 				/>
-					{/* relcolumn='nodeId' */}
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
 			  {crud &&

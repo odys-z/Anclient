@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode, SessionClient, DatasetOpts, LogAct, AnDatasetResp } from '@anclient/semantier';
+import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
+	SessionClient, DatasetOpts, LogAct, AnDatasetResp
+} from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonServs, Login, CrudComp, AnTreeditor, Lightbox

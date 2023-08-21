@@ -422,7 +422,7 @@ export class Semantier {
 	 * @param conds QueryConditions type is deprecated
 	 * @param onLoad
 	 */
-    records(conds: QueryConditions | PageInf, onLoad: OnLoadOk<Tierec>) : void {
+    records(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
 	}
 
     /**
