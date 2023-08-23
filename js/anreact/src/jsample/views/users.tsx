@@ -439,13 +439,10 @@ export class UserstReq extends UserReq {
 	deletings: string[];
 	page: PageInf;
 
-	// constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
 	constructor (uri: string, query: PageInf | any) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
-
-		/// FIXME: obviousely this is should be refactored to the chained calls API
 
 		/// case r
 		if (query.page === undefined && typeof query.condtsRec === 'function')
