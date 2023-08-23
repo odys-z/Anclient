@@ -41,12 +41,12 @@ import io.oz.album.tier.PhotoRec;
 /**
  * Photo client,
  * 
- * @deprecated only for MVP (0.2.1)
+ * @deprecated only for MVP (0.2.x)
  * 
  * @author odys-z@github.com
  *
  */
-public class PhotoSyntier extends Synclientier {
+public class PhotoSyntier extends SynclientierMvp {
 	public static int blocksize = 3 * 1024 * 1024;
 
 	protected static PhotoMeta meta;

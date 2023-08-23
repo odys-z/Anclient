@@ -56,12 +56,9 @@ import io.odysz.transact.x.TransException;
 /**
  * Redundant to docsync.jser/Synclientier.
  * 
- * @deprecated MVP 0.2.1 To be deleted
- * 
  * @author odys-z@github.com
- *
  */
-public class Synclientier extends Semantier {
+public class SynclientierMvp extends Semantier {
 	public boolean verbose = false;
 
 	protected SessionClient client;
@@ -75,17 +72,19 @@ public class Synclientier extends Semantier {
 
 	/**
 	 * Change default block size for performance. Default is 3 Mib.
-	 * 
-	 * @param s must be multiple of 12
+	 *
+	 * @param size must be multiple of 12
 	 * @throws SemanticException
 	 */
-	public void bloksize(int s) throws SemanticException {
-		if (s % 12 != 0)
-			throw new SemanticException("Block size must be multiple of 12.");
-		blocksize = s;
-	}
+//	public void bloksize(int s) throws SemanticException {
+//		if (s % 12 != 0)
+//			throw new SemanticException("Block size must be multiple of 12.");
+//		blocksize = s;
+//	}
 	
-	public Synclientier blockSize(int size) {
+	public SynclientierMvp blockSize(int size) throws SemanticException {
+		if (size % 12 != 0)
+			throw new SemanticException("Block size must be multiple of 12.");
 		blocksize = size;
 		return this;
 	}
@@ -98,7 +97,7 @@ public class Synclientier extends Semantier {
 	 * @throws SQLException 
 	 * @throws SemanticException 
 	 */
-	public Synclientier(String clientUri, OnError errCtx)
+	public SynclientierMvp(String clientUri, OnError errCtx)
 			throws SemanticException, IOException {
 		this.errCtx = errCtx;
 		this.uri = clientUri;
@@ -112,7 +111,7 @@ public class Synclientier extends Semantier {
 	 * @param root
 	 * @return this
 	 */
-	public Synclientier tempRoot(String root) {
+	public SynclientierMvp tempRoot(String root) {
 		tempath = root; 
 		return this;
 	}
@@ -130,7 +129,7 @@ public class Synclientier extends Semantier {
 	 * @throws IOException
 	 * @throws TransException 
 	 */
-	public Synclientier login(String workerId, String device, String pswd)
+	public SynclientierMvp login(String workerId, String device, String pswd)
 			throws AnsonException, SsException, IOException, TransException {
 
 		client = Clients.login(workerId, pswd, device);
@@ -147,7 +146,7 @@ public class Synclientier extends Semantier {
 	 * @return this
 	 * @throws TransException 
 	 */
-	public Synclientier onLogin(SessionClient client) {
+	public SynclientierMvp onLogin(SessionClient client) {
 		SessionInf ssinf = client.ssInfo();
 		try {
 			robot = new SyncRobot(ssinf.uid())
