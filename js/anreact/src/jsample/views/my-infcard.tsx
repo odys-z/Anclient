@@ -4,8 +4,8 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 
 import { Protocol, CRUD,
-	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs,
-	OnCommitOk, OnLoadOk, QueryConditions, SessionInf, UIComponent, str
+	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, PageInf,
+	OnCommitOk, OnLoadOk, SessionInf, UIComponent, str
 } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { dataOfurl, urlOfdata } from '../../utils/file-utils';
@@ -180,8 +180,8 @@ export class MyInfTier extends Semantier {
 			/>);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk<MyInfRec>) {
-		let { userId } = conds;
+	record(conds: PageInf, onLoad: OnLoadOk<MyInfRec>) {
+		let { userId } = conds.mapCondts;
 
 		let client = this.client;
 		if (!client)

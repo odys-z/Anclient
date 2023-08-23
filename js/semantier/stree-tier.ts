@@ -2,7 +2,7 @@ import * as CSS from 'csstype';
 
 import { SessionClient } from './anclient';
 
-import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody } from './protocol';
+import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody, DatasetReq, stree_t } from './protocol';
 
 import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
 
@@ -113,6 +113,8 @@ export class StreeTier extends Semantier {
      * 
      * Note: Response of stree() must be subclass of AnDatasetResp.
      * 
+	 * @since 0.9.98, this method visit 'stree' port with AnDatasetReq as defualt tree loading.
+	 * 
      * @param opts 
      * @param comp 
      */
@@ -121,18 +123,20 @@ export class StreeTier extends Semantier {
 
         if (!opts.onOk)
             console.warn("StreeTier.stree(): Loading s-tree without result handling?", opts);
-
-		// Semantier.stree(opts, this.client, onload, this.errCtx);
-        // implemention 2:
         if (!opts.port)
 		 	throw Error('Decision since @anclient/anreact 0.4.25, port name is needed to load a tree.');
-        if (!StreeTier.reqFactories[opts.port])
+        else if (opts.port !== 'stree' && !StreeTier.reqFactories[opts.port])
 		 	throw Error("To handle tree with StreeTier, user request's factory must registered. Need factory for port: " + opts.port);
         
         if (!(this.client instanceof SessionClient))
             throw Error('Needing a intance of AnClient.');
 
-		let reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
+		let reqbody: AnsonBody;
+		
+		if (opts.sk)
+			reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
+		else
+			reqbody = new DatasetReq(opts).A(stree_t.sqltree);
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 

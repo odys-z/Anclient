@@ -347,17 +347,17 @@ class TestreeTier extends AlbumTier {
 	forest: AnTreeNode[];
 
 	sysroot(): AnTreeNode {
-		return {
-			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
-			node: {
-				nodetype: 'card',
-				shareby: 'tester',
-				mime: "image/jepg"
-			},
-			id: 'n01',
-			level: 0,
-			parent: undefined,
-		}
+	  return {
+		type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
+		node: {
+			nodetype: 'card',
+			shareby: 'tester',
+			mime: "image/jepg"
+		},
+		id: 'n01',
+		level: 0,
+		parent: undefined,
+	  }
 	}
 
 	constructor(uri: string, tree: CrudComp<any>, client?: SessionClient) {
@@ -366,17 +366,17 @@ class TestreeTier extends AlbumTier {
 	}
 
 	treeroot(): AnTreeNode {
-		return {
-			type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
-			node: {
-				nodetype: 'card',
-				shareby: 'tester',
-				mime: "image/jepg"
-			},
-			id: 'p0',
-			level: 0,
-			parent: undefined,
-		}
+	  return {
+		type: "io.odysz.semantic.DA.DatasetCfg.AnTreeNode",
+		node: {
+			nodetype: 'card',
+			shareby: 'tester',
+			mime: "image/jepg"
+		},
+		id: 'p0',
+		level: 0,
+		parent: undefined,
+	  }
 	}
 }
 

@@ -1,5 +1,5 @@
 import { SessionClient, SessionInf } from './anclient';
-import { arr, str } from './helpers';
+import { arr, len, size, str } from './helpers';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
@@ -38,15 +38,20 @@ export class PageInf {
 	/** Read via {@link PageInf#condtsRec()} */
 	arrCondts?: Array<string[]>;
 
+	/**
+	 * Generic query can't parse this parameter.
+	 * 
+	 * Only used for tier pattern and temp args at client side.
+	 */
 	mapCondts?: {[p: string]: AnsonValue};
 
-	constructor(page?: number | PageInf, size?: number, total?: number, condts?: Array<string[]>) {
+	constructor(page?: number | PageInf, size?: number, total?: number, arrCondts?: Array<string[]>, mapCondts?: {[p: string]: AnsonValue}) {
 		this.type = 'io.odysz.transact.sql.PageInf';
 		if (typeof page === 'number') {
 			this.page = page || 0;
 			this.size = size || -1;
 			this.total = total || 0;
-			this.arrCondts = condts;
+			this.arrCondts = arrCondts;
 		}
 		else {// type safe: PageInf
 			this.page = page?.page || 0;
@@ -54,6 +59,7 @@ export class PageInf {
 			this.total = page?.total || 0;
 			this.arrCondts = page?.arrCondts;
 		}
+		this.mapCondts = mapCondts || {};
 	}
 
 	nv(k: string, v: string) {
@@ -70,11 +76,11 @@ export class PageInf {
 	 */
 	condtsRec () {
 		let rec = {} as Tierec;
-		for(let nv of this.arrCondts) {
-			if (nv && nv[0])
-				rec[nv[0]] = nv[1];
-		}
-		return rec;
+		if (this.arrCondts)
+			for(let nv of this.arrCondts)
+				if (nv && nv[0])
+					rec[nv[0]] = nv[1];
+		return Object.assign(rec, this.mapCondts);
 	}
 }
 
@@ -650,7 +656,9 @@ export class QueryReq extends AnsonBody {
 
 		if (pageInf) {
 			this.Page(pageInf.size, pageInf.page);
-			this.where = pageInf.arrCondts || arr(pageInf.mapCondts);
+			this.where = pageInf.arrCondts;
+			if (size(pageInf.mapCondts as any) > 0)
+				console.warn("Parameter map is ignored in QueryReq:", pageInf.mapCondts);
 		}
 	}
 

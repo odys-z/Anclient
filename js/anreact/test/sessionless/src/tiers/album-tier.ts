@@ -44,7 +44,6 @@ export class AlbumTier extends StreeTier {
 			(resp) => {
 				let body = resp.Body() as AlbumResp;
 				if (body) {
-					// let {cols, rows} = AnsonResp.rs2arr(body.Rs());
 					this.collects = body.collects;
 					onLoad(this.collects);
 				}

@@ -119,7 +119,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	/**
 	 * @param classes
 	 */
-	buildTree(forest: AnTreeNode[], classes: ClassNames) {
+	buildTree(forest: AnTreeNode[], classes: ClassNames = {}) {
 		let that = this;
 
 		let expandItem = this.toExpandItem;
@@ -129,7 +129,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			(tree, tx) => {return treeItems(tree);}
 		);
 
-		function treeItems(stree) {
+		function treeItems(stree: AnTreeNode | AnTreeNode[]) {
 		  if (Array.isArray(stree)) {
 			return stree.map((i, x) => {
 			  return treeItems(i);
@@ -218,11 +218,11 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 	render() {
 		const { classes } = this.props;
-		const forest = this.tier.rels[this.props.reltabl || ''];
+		const forest = this.tier?.rels && this.tier.rels[this.props.reltabl];
 
 		return (
 			<div className={classes?.root}>
-				{forest && this.buildTree(forest, classes || {})}
+				{forest && this.buildTree(forest, classes)}
 			</div> );
 	}
 }

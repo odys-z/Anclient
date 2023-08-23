@@ -267,7 +267,7 @@ class RoleTier extends Semantier {
 	// records(conds = {} as {roleId?: string; orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk<Tierec>) {
 	records(conds = {} as PageInf, onLoad: OnLoadOk<Tierec>) {
 
-		let { orgId, roleName } = conds.mapCondts;
+		let { orgId, roleName } = conds.mapCondts || {};
 		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'r', conds)
 		let req = queryReq.Body()
 			.expr('r.roleId').expr('roleName').expr('r.remarks').expr('orgName')
@@ -293,10 +293,8 @@ class RoleTier extends Semantier {
 		let that = this;
 
 		// temp id avoiding update my pk status
-		let roleId = conds[this.pkval.pk] as string;
+		let roleId = conds.mapCondts[this.pkval.pk] as string;
 
-		// NOTE
-		// Is this senario an illustration of general query is also necessity?
 		let req = client.query(this.uri, 'a_roles', 'r')
 		req.Body()
 			.col('roleId').col('roleName').col('remarks')

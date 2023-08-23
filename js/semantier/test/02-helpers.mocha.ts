@@ -1,4 +1,4 @@
-import { Semantier, len } from '../semantier';
+import { Semantier, isEmpty, len } from '../semantier';
 import { assert } from 'chai';
 
 import {ErrorCtx, SessionClient, SessionInf} from '../anclient';
@@ -83,6 +83,7 @@ const forest2 = [
                 "parentId": "sys"
             },
             "parent": "sys-uesr",
+			"shareby": 'abc',
             "level": 1,
             "id": "Uesr Manage"
           },
@@ -93,7 +94,8 @@ const forest2 = [
                 "text": "Workflow Settings",
                 "sort": "sys-wf",
                 "nodeId": "sys-wf",
-                "parentId": "sys"
+                "parentId": "sys",
+				"shareby": 'abc',
             },
             "parent": "sys-wf",
             "level": 1,
@@ -133,6 +135,7 @@ const forest2 = [
         "text": "System v1.1",
         "sort": "sys-1.1",
         "nodeId": "sys-1.1",
+		"shareby": "abc",
         "parentId": ""
     },
     "parent": "sys-1.1",
@@ -167,7 +170,7 @@ describe('case: [02.0 dataset + s-tree]', () => {
 		};
 
 		let rf = semantier.inserTreeChecked(
-					checkBoxForest,
+					checkBoxForest as any,
 					{ table: 'a_role_func',
 					  columnMap,
 					  check: 'checked',
@@ -179,7 +182,7 @@ describe('case: [02.0 dataset + s-tree]', () => {
 		let n = checkBoxForest[0].node.children[0].node as unknown as {checked: boolean}; //.checked = true;
 		n.checked = true; // reshaped
 		rf = semantier.inserTreeChecked(
-					checkBoxForest,
+					checkBoxForest as any,
 					{ table: 'a_role_func',
 					  columnMap,
 					  check: 'checked',
@@ -207,7 +210,7 @@ describe('case: [02.0 dataset + s-tree]', () => {
 		};
 
 		let rf = semantier.inserTreeChecked(
-					forest2,
+					forest2 as any,
 					{ table: 'a_role_func',
 					  columnMap,
 					  check: 'checked',
@@ -229,18 +232,22 @@ describe('case: [02.0 dataset + s-tree]', () => {
 
 	it('[Helper] len()', () => {
 		let m = new Map<string, any>();
-		assert.equal(0, len(m));
+		assert.equal(0, len(m), '1');
 
 		m.set("v", 1);
-		assert.equal(1, len(m));
+		console.log(isEmpty(m), typeof m, Object.keys(m));
+		assert.equal(1, m.size, '2a');
+		assert.equal(1, len(m), '2');
 
 		let s = new Set<string>();
-		assert.equal(0, len(s));
+		assert.equal(0, len(s), '3');
 
 		s.add("")
-		assert.equal(1, len(s));
+		assert.equal(1, len(s), '4');
 
-		assert.equal(0, len(""));
-		assert.equal(1, len("0"));
+		assert.equal(0, len(""), '5');
+		assert.equal(1, len("0"), '6');
+
+		assert.equal(2, len({roleName: '', orgId: 'ap02'}), '7')
 	});
 });

@@ -171,10 +171,10 @@ export interface Tierelations extends DbRelations {
  * 
  * @deprecated: Aug 21. 2023, not yet?
  */
-export interface QueryConditions {
-	pageInf?: PageInf;
-	[q: string]: string | number | object | boolean;
-}
+// export interface QueryConditions {
+// 	pageInf?: PageInf;
+// 	[q: string]: string | number | object | boolean;
+// }
 
 /**
  * Client side context for Anclient to work in.
@@ -205,17 +205,6 @@ export interface UIComponent {
  */
 export class Semantier {
     uiHelper: any;
-    /**
-     *
-     * @param props
-     */
-    constructor(props: UIComponent & {pkval?: PkVal}) {
-        if (!props || !props.uri)
-            throw Error("uri is required!");
-
-        this.uri = props.uri;
-        this.pkval = props.pkval || {pk: undefined, v: undefined};
-    }
 
     /** list's columns */
     _cols: Array<TierCol>;
@@ -236,14 +225,24 @@ export class Semantier {
     /** All sub table's relationships */
     relMeta: {[tabl: string]: Tierelations};
 
-    /** currrent relation table - wrong */
-    // reltabl: string;
+    /**
+     *
+     * @param props
+     */
+    constructor(props: UIComponent & {pkval?: PkVal}) {
+        if (!props || !props.uri)
+            throw Error("uri is required!");
+
+        this.uri = props.uri;
+        this.pkval = props.pkval || {pk: undefined, v: undefined};
+		this.rels = {};
+    }
 
     /** current relations - the last loaded relation of this.rel (problem?)
 	 *
 	 * Looks like all relationship records are item of main tree.
 	 */
-    rels: {};
+    rels: {[tbl: string]: AnTreeNode[]};
 
     /**
      * @param context
@@ -258,12 +257,11 @@ export class Semantier {
 		return this;
 	}
 
-	/**TODO check widgets right
-	 *
+	/**
 	 * @param field
-	 * @returns
-	 */
-	isReadonly(field: TierCol) {
+	 * @returns read only
+	*/
+	isReadonly(_field: TierCol) {
 		return false;
 	}
 
@@ -403,7 +401,7 @@ export class Semantier {
 
 		Semantier.stree(ds, client,
 				(resp: AnsonMsg<AnDatasetResp>) => {
-					that.rels[reltabl] = resp.Body().forest;
+					that.rels[reltabl] = resp.Body().forest as AnTreeNode[];
 					onOk(resp)
 				},
 			this.errCtx);
@@ -414,7 +412,7 @@ export class Semantier {
 	 * @param conds
 	 * @param onLoad
 	 */
-    record(conds: QueryConditions | PageInf, onLoad: OnLoadOk<Tierec>) : void {
+    record(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
     }
 
 	/** Load records of conditions.
@@ -694,7 +692,6 @@ export class Semantier {
 	 * @param errCtx
 	 */
 	static dataset(ds: DatasetOpts, client: SessionClient | Inseclient, onLoad: OnCommitOk, errCtx: ErrorCtx): void {
-		// let ssInf = this.client.ssInf;
 		let {uri, sk, sqlArgs, t, rootId} = ds;
 		sqlArgs = sqlArgs || [];
 		let port = ds.port ||'dataset';

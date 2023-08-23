@@ -11,7 +11,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, Semantier, TierComboField, Tierec, str_, toBool } from '@anclient/semantier';
+import { AnlistColAttrs, PageInf, Semantier, TierComboField, Tierec, str_, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { DatasetCombo } from './dataset-combo';
@@ -86,8 +86,8 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				console.warn("TRecordFormComp is supposed to load form data with pkval by itself.");
 
 			let that = this;
-			let cond = {};
-			cond[str_(this.tier.pkval.pk)] = this.tier.pkval.v;
+			let cond = new PageInf(0, -1);
+			cond.mapCondts[str_(this.tier.pkval.pk)] = this.tier.pkval.v;
 			this.tier.record(cond, (_cols, _rows) => {
 				that.setState({});
 			} );

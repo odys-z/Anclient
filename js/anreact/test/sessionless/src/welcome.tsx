@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
-import { OnLoadOk, QueryConditions, Semantier, Tierec } from '@anclient/semantier';
+import { OnLoadOk, PageInf, Semantier, Tierec } from '@anclient/semantier';
 import { ClassNames, Comprops, CrudComp, jsample } from '../../../src/an-components';
 
 const styles = (theme: Theme) => ( {
@@ -124,7 +124,7 @@ class WelcomeTier extends Semantier {
 	 * @param onLoad 
 	 * @returns 
 	 */
-	override records<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
+	override records<T extends Tierec>(conds: PageInf, onLoad: OnLoadOk<T>) {
 		this.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
 		onLoad([], this.rows as unknown as Array<T>);
 		return this.rows;

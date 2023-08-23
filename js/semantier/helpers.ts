@@ -64,22 +64,27 @@ export function str_(obj: any) {
 	return str(obj) || '';
 }
 
-export function size(arg: Set<any> | Map<any, any> | string | Array<any> | undefined | null) {
+export function size(arg: Set<any> | Map<any, any> | object | string | Array<any> | undefined | null) : number {
 		return  arg instanceof Set || arg instanceof Map ?
-				arg.size : len(arg);
+				arg.size : 
+				typeof arg === 'object' ?
+				Object.keys(arg).length : len(arg);
 }
 
-export function len(arg: string | Array<any> | Set<any> | Map<any, any> | undefined | null) {
+export function len(arg: object | string | Array<any> | Set<any> | Map<any, any> | undefined | null) {
 	return Array.isArray(arg)
 		? arg.length
 		: isEmpty(arg)
 		? 0
 		: typeof arg === 'string'
 		? arg.length
-		: typeof arg.size === 'number'
-		? (arg as Set<any>).size
+		: typeof (arg as any).size === 'number'
+		? (arg as any).size
+		: typeof arg === 'object'
+		? Object.keys(arg).length
 		: size(arg);
 }
+
 export function arr(obj: object) {
-	return Object.entries(obj);
+	return Object.entries(obj || {});
 }

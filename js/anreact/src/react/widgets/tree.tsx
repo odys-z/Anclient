@@ -199,6 +199,8 @@ interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
 	colFormatter?: (col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts) => JSX.Element;
 
 	thFormatter?: (col: AnTreegridCol, colx: number, opts?: CompOpts) => JSX.Element;
+
+	className?: string;
 }
 
 enum TreeNodeVisual {
@@ -215,7 +217,8 @@ enum TreeNodeVisual {
 interface TreegridProps extends AnTablistProps {
 	indentSettings?: IndentIcons;
 	parent?: AnTreeNode | undefined;
-	tnode: AnTreeNode;
+	/** Root node, optional for possible of a forest, or provided by tier. */
+	tnode? : AnTreeNode;
 	columns: Array<AnTreegridCol>;
 
 	onThClick?: (col: AnTreegridCol, cx: number) => void;

@@ -668,7 +668,6 @@ class SessionClient {
 	}
 
 	inserts(uri: string | undefined, maintbl: string, nvss: Array<Array<[string, string]>> | Array<NV[]> | Array<NameValue[]>) {
-		debugger
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");

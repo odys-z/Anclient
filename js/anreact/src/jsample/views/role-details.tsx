@@ -130,7 +130,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 
 	render () {
 		const { classes, width } = this.props;
-		const smallSize = new Set(["xs", "sm"]).has(width);
+		// const smallSize = new Set(["xs", "sm"]).has(width);
 
 		let crud = this.state.crud;
 

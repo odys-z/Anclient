@@ -165,7 +165,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
     function buildTreegrid(tn: AnTreeNode[] | AnTreeNode) {
       if (Array.isArray(tn)) 
         return <div>{tn.map((i, x) => buildTreegrid(i))}</div>;
-      else {
+      else if (tn) {
         let open = that.state.expandings.has(tn.id);
         if (tn.node.children?.length > 0)
           return folder(that.props.columns, tn, open);
@@ -220,11 +220,10 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
     }
 
     function iconItem (cols: AnTreegridCol[], n: AnTreeNode) {
-      let it = n; // fix
       return (
         <Grid container key={n.id}
             spacing={0} className={classes.row}
-            onClick= { (e) => that.handleClick(e, n.id, it) }
+            onClick={ (e) => that.handleClick(e, n.id, n) }
         > 
           { cols
             .filter( (v: AnTreegridCol) => toBool(v.visible, true) )
@@ -273,5 +272,5 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
  * 
  * Where iconame is a combination of icon and text configured by 
  */
-const AnTreegrid = withStyles<any, any, AnTablistProps>(styles)(withWidth()(AnTreegridComp));
+const AnTreegrid = withStyles<any, any, TreeItemProps>(styles)(withWidth()(AnTreegridComp));
 export { AnTreegrid, AnTreegridComp }

@@ -174,7 +174,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		}
 
 		let conds = query(this.qFields);
-		this.props?.onSearch(conds);
+		this.props?.onSearch(new PageInf(0, -1, 0, undefined, conds));
 
 		function query(fields: TierComboField[]) {
 			conds = {};
