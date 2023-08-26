@@ -6,7 +6,7 @@ import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, AlbumReq, Ph
 
 const debug = true;
 
-export class AlbumAdminTier extends StreeTier {
+export class AlbumEditier extends StreeTier {
 	root(): AnTreeNode {
 		throw new Error('Method not implemented.');
 	}

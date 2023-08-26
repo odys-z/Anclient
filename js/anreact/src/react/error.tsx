@@ -34,13 +34,10 @@ class ErrorComp extends CrudComp<Comprops> {
 	toShowDetails() {
 		const ctx = this.context as unknown as AnContextType;
 		ctx.error.msg = this.state.msg;
-		// if (typeof ctx.error.onError === 'function')
-		// 	ctx.error.onError(this.state.msg, undefined);
-		// TODO ...
 	}
 
-	toSubmit() {
-		// console.log('TODO');
+	toReport() {
+		console.log('TODO submit error report');
 	}
 
 	render() {
@@ -54,7 +51,7 @@ class ErrorComp extends CrudComp<Comprops> {
 			<Button onClick={this.toShowDetails} color="secondary">
 				{L('Details')}
 			</Button>
-			<Button onClick={this.toSubmit} color="primary">
+			<Button onClick={this.toReport} color="primary">
 				{L('Submit')}
 			</Button>
 		</>);

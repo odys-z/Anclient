@@ -9,7 +9,7 @@ import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 	JsonServs, AnreactAppOptions, AnTreeditor, CrudCompW, AnContextType,
 	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView
 } from '@anclient/anreact';
-import { GalleryTier } from './gallerytier-less';
+import { GalleryTier } from './gallerytier';
 import { Button, Grid } from '@material-ui/core';
 import { DocIcon } from './icons/doc-ico';
 
