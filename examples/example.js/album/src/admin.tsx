@@ -26,7 +26,6 @@ type AlbumProps = {
 export class Admin extends CrudCompW<AlbumProps & Comprops> {
 	servId: string;
 
-    // ssclient: SessionClient;
 	tier: AlbumAdminTier;
 
 	anReact: AnReactExt;  // helper for React
@@ -40,7 +39,6 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
  
 	detailForm = undefined;
 
-	// AnElemFormatter | undefined;
 	preview = (_col: any, rec: any) => {
 		return <></>;
 	};
@@ -106,9 +104,6 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			sk={Protocol.sk.collectree} tnode={this.tier.root()}
 			onSelectChange={ids => undefined}
 			uri={this.uri} mtabl='ind_emotion'
-			// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
-			// parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
-			// parent={ undefined }
 			columns={[
 				{ type: 'text', field: 'share', label: L('Share'),
 					grid: {xs: 6, sm: 6} },
