@@ -364,8 +364,6 @@ export class AnReactExt extends AnReact {
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		// let loading = true;
-
 		this.dataset( {
 				port: 'dataset',
 				uri,

@@ -133,16 +133,20 @@ export class StreeTier extends Semantier {
 
 		let reqbody: AnsonBody;
 		
-		if (opts.sk)
-			reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
-		else
-			reqbody = new DatasetReq(opts).A(stree_t.sqltree);
+		// if (opts.port !== 'stree')
+		// 	reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
+		// else
+		// 	reqbody = new DatasetReq(opts).A(stree_t.sqltree);
+		reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 
 		this.client.an.post(jreq, opts.onOk, errCtx);
     }
 }
+// default s-tree request (AnDatasetReq)
+StreeTier.registTierequest('stree', (opts) => new DatasetReq(opts));
+
 
 /** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
 export class SyncDoc implements Tierec {

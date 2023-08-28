@@ -14,9 +14,6 @@ import { AnTreegrid } from '../../react/widgets/treegrid'
 
 const styles = (_theme: Theme) => ( {
 	root: {
-		"& :hover": {
-			backgroundColor: '#777'
-		}
 	}
 } );
 
@@ -66,7 +63,6 @@ class OrgsComp extends CrudCompW<Comprops> {
 			<AnTreegrid uri={this.uri}
 				pk='' onSelectChange={undefined}
 				tier={this.tier} sk={'orgs'}
-				className={classes.root}
 				columns={[
 					{ label: L('ID'),           field:"orgId", grid: {xs: 6, sm: 4}, className: 'rowHead' },
 					{ label: L('Organization'), field:"text",  grid: {xs: 6, sm: 4} },

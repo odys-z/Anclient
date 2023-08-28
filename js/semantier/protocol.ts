@@ -1368,14 +1368,15 @@ export interface DatasetOpts {
 	/** semantic key configured in WEB-INF/dataset.xml */
 	sk: string;
 	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
-	t?: /** load dataset configured and format into tree with semantics defined by sk. */
-		"sqltree" |
-		/** Reformat the tree structure - reformat the 'fullpath', from the root */
-		"retree" |
-		/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
-		"reforest" |
-		/** Query with client provided QueryReq object, and format the result into tree. */
-		"query",
+	// t?: /** load dataset configured and format into tree with semantics defined by sk. */
+	// 	"sqltree" |
+	// 	/** Reformat the tree structure - reformat the 'fullpath', from the root */
+	// 	"retree" |
+	// 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+	// 	"reforest" |
+	// 	/** Query with client provided QueryReq object, and format the result into tree. */
+	// 	"query",
+	t?: stree_t;
 	a?: string;
 	/**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
 	mtabl?: string;
@@ -1494,9 +1495,16 @@ export class DatasetReq extends QueryReq {
     }
 }
 
+/**
+ * @deprecated replaced by {@link DatasetierReq.A}
+ */
 export enum stree_t {
-	/** load dataset configured and format into tree with semantics defined by sk. */
+	/**
+	 * Load dataset configured and format into tree with semantics defined by sk.
+	 * @deprecated replaced by {@link DatasetierReq.A.stree}
+	 */
 	sqltree = 'sqltree',
+
 	/** Reformat the tree structure - reformat the 'fullpath', from the root */
 	retree = 'retree',
 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
@@ -1510,13 +1518,22 @@ export class DatasetierReq extends AnsonBody {
 
     static A = {
         sks: 'r/sks',
-		stree: 'r/stree'
+
+		/** Load dataset configured and format into tree with semantics defined by sk. */
+		stree: 'r/stree',
+
+		/** Reformat the tree structure - reformat the 'fullpath', from the root */
+		retree: 'retree',
+		/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+		reforest: 'reforest',
+		/** Query with client provided QueryReq object, and format the result into tree. */
+		query: 'query'
     };
 
     constructor(opts: any) {
 		super(opts);
-	    this.type = DatasetierReq.__type__;
-    }
+		this.type = DatasetierReq.__type__;
+	}
 }
 Protocol.registerBody(DatasetierReq.__type__, (json) => new DatasetierReq(json));
 

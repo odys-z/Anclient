@@ -15,12 +15,12 @@
     let searchParams = new URLSearchParams(window.location.search)
     let serv = searchParams ? searchParams.get('serv') : 'admin';
 
-    // album.App.bindHtml('div', {
-    //   serv, Window, portal: 'index.html'});
+    album.App.bindHtml('div', {uis: 'ody', pswd: '123456',
+      serv, Window, portal: 'index.html'});
 
     function loadAlbum(uid, pswd) {
-      admin.App.bindHtml('app', {uid, pswd,
-        aid, serv, Window, portal: 'index.html'});
+      album.App.bindHtml('app', {uid, pswd,
+        serv, Window, portal: 'index.html'});
     }
 
   </script>
