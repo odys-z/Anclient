@@ -3,7 +3,7 @@ import { toBool, isEmpty, str, len } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, NV, PageInf, PkVal, NameValue, DatasetOpts, DatasetReq
+	DbCol, DbRelations, NV, PageInf, PkVal, NameValue, DatasetOpts, DatasetReq, DatasetierReq
 } from "./protocol";
 
 export { toBool, isEmpty };
@@ -393,17 +393,19 @@ export class Semantier {
 		if (!stree)
 			throw Error('TODO ...');
 
-		let t = stree_t.sqltree;
+		let t = DatasetierReq.A.stree;
 
 		let ds = {uri : this.uri,
 			sk: stree.sk, t, sqlArgs,
 		};
 
-		Semantier.stree(ds, client,
-				(resp: AnsonMsg<AnDatasetResp>) => {
-					that.rels[reltabl] = resp.Body().forest as AnTreeNode[];
-					onOk(resp)
-				},
+		Semantier.stree(
+			ds as DatasetOpts,
+			client,
+			(resp: AnsonMsg<AnDatasetResp>) => {
+				that.rels[reltabl] = resp.Body().forest as AnTreeNode[];
+				onOk(resp)
+			},
 			this.errCtx);
     }
 
@@ -692,16 +694,16 @@ export class Semantier {
 	 * @param errCtx
 	 */
 	static dataset(ds: DatasetOpts, client: SessionClient | Inseclient, onLoad: OnCommitOk, errCtx: ErrorCtx): void {
-		let {uri, sk, sqlArgs, t, rootId} = ds;
+		let {uri, sk, sqlArgs, t, a, rootId} = ds;
 		sqlArgs = sqlArgs || [];
 		let port = ds.port ||'dataset';
 
 		let reqbody = new DatasetReq({
-				uri, port,
+				uri, port, t, a,
 				mtabl: undefined,
 				sk, sqlArgs, rootId
 			})
-			.TA(t || stree_t.query);
+			.TA(t || DatasetierReq.A.query);
 		let jreq = client.userReq(uri, port, reqbody, undefined);
 
 		client.an.post(jreq, onLoad, errCtx);
@@ -729,7 +731,11 @@ export class Semantier {
 			throw Error('Since v0.9.50, Anclient request needs function uri to find datasource.');
 
 		if (opts.sk && !opts.t)
-			opts.a = stree_t.sqltree;
+			// opts.a = stree_t.sqltree;
+			opts.a = DatasetierReq.A.stree;
+		
+		if (!opts.a)    // FIXME, t should be deprecated
+			opts.a = opts.t;
 
 		opts.port = opts.port || 'stree';
 

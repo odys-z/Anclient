@@ -1376,7 +1376,8 @@ export interface DatasetOpts {
 	// 	"reforest" |
 	// 	/** Query with client provided QueryReq object, and format the result into tree. */
 	// 	"query",
-	t?: stree_t;
+	t?: stree_t | keyof DatasetierReq['A'];
+
 	a?: string;
 	/**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
 	mtabl?: string;
@@ -1410,7 +1411,7 @@ export class DatasetReq extends QueryReq {
 		this.rootId = rootId;
 
 		this.TA(t || a);
-		this.checkt((t || a) as unknown as string);
+		// this.checkt((t || a) as unknown as string);
 	}
 
     maintbl: string;
@@ -1449,13 +1450,19 @@ export class DatasetReq extends QueryReq {
 			/** Query with client provided QueryReq object, and format the result into tree. */
 			query: string;
 		}) {
-		if (typeof ask === 'string' && ask.length > 0 && ask !== stree_t.sqltree) {
+
+		if (typeof ask === 'string' && ask.length > 0 && ask === stree_t.sqltree) {
+			console.info('Since @anclient/semantier 0.9.98, A = stree_t.sqltree is deprecated and replaced with DatasetierREq.A.stree, ', DatasetierReq.A.stree);
+			this.a = DatasetierReq.A.stree;
+		}
+
+		if (typeof ask === 'string' && ask.length > 0 && ask !== DatasetierReq.A.stree) {
 			console.info('DatasetReq.a is ignored for sk is defined.', ask);
-			this.a = stree_t.sqltree;
+			this.a = DatasetierReq.A.stree;
 		}
 		else {
 			this.a = ask as string;
-			this.checkt(ask as string);
+			// this.checkt(ask as string);
 		}
 		return this;
 	}
@@ -1481,12 +1488,16 @@ export class DatasetReq extends QueryReq {
 		return this;
     }
 
-    /**@deprecated let's user type checking
-     * Check is t can be undertood by s-tree.serv
-     * TODO why not asking server for stree_t?
-     * @param {string} t*/
+    /**
+	 * @deprecated lagacy of without type checking 
+	 * 
+     * Check is t if port is stree can be undertood by s-tree.serv
+	 * 
+     * @param {string} t
+	 * @return this
+	 */
     checkt(t: string): DatasetReq {
-		if (t !== undefined && !stree_t.hasOwnProperty(t)) {
+		if (t !== undefined && !DatasetierReq.A.hasOwnProperty(t)) {
 			console.warn(
 				"DatasetReq.t won't be understood by server:", t, "\n 't (a)' should be one of Protocol.stree_t's key.",
 				Object.keys(stree_t));
