@@ -131,13 +131,7 @@ export class StreeTier extends Semantier {
         if (!(this.client instanceof SessionClient))
             throw Error('Needing a intance of AnClient.');
 
-		let reqbody: AnsonBody;
-		
-		// if (opts.port !== 'stree')
-		// 	reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
-		// else
-		// 	reqbody = new DatasetReq(opts).A(stree_t.sqltree);
-		reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
+		let reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 
