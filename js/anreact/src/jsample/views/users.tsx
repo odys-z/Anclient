@@ -36,7 +36,6 @@ const styles = (theme: Theme) => ( {
 	}
 } );
 
-
 class UserstComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
@@ -98,13 +97,11 @@ class UserstComp extends CrudCompW<Comprops> {
 	}
 
 	onTableSelect(ids: Map<string, any>) {
-		let rowIds: Array<string> = [];
 		this.setState( {
 			buttons: {
-				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				edit: len(ids) === 1, // rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
+				edit: len(ids) === 1,
+				del: ids &&  len(ids) >= 1,
 			},
 		} );
 	}
@@ -392,7 +389,7 @@ export class UsersTier extends Semantier {
 
 		if (ids && ids.size > 0) {
 			let req = this.client.userReq(uri, this.port,
-				new UserstReq( uri, { deletings: [...Array.from(ids)] } )
+				new UserstReq( uri, { deletings: [...Array.from(ids.keys())] } )
 				.A(UserstReq.A.del) );
 
 			client.commit(req, onOk, this.errCtx);
@@ -443,19 +440,13 @@ export class UserstReq extends UserReq {
 
 		if (query.condtsRec) {
 			let args = query.condtsRec() as Tierec & { record? : {userId?: string} };
-			this.userId = (args.userId || args.record?.userId) as string;
+			this.userId   = (args.userId || args.record?.userId) as string;
 			this.userName = args.userName as string;
-			this.orgId = args.orgId as string;
-			this.roleId = args.roleId as string;
+			this.orgId    = args.orgId as string;
+			this.roleId   = args.roleId as string;
 			this.hasTodos = toBool(args.hasTodos as string | boolean);
 
 			this.page = new PageInf(query.page, query.size);
-		}
-		/// case A = rec (TRecordForm loading)
-		else if (query.userId) {
-			this.record = query as Tierec;
-			this.userId = query.userId;
-			this.page = new PageInf(0, -1);
 		}
 		/// case A = u
 		else if (query.pk) {
@@ -463,7 +454,13 @@ export class UserstReq extends UserReq {
 			this.record = query.record as Tierec;
 			this.relations = query.relations as DbRelations;
 		}
-
+		/// case A = c 
+		else if (query.record) {
+			let {record} = query;
+			this.record = record;
+			this.userId = record.userId;
+			this.page = new PageInf(0, -1);
+		}
 		/// case d
 		this.deletings = query.deletings as string[];
 	}
