@@ -183,7 +183,9 @@ export interface Tierelations extends DbRelations {
  * { client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx }
  */
 export interface Semantext {
-    anClient: SessionClient;
+	/** For Login, this can be undefined */
+    anClient?: SessionClient;
+
 	/**
 	 * FIXME rename as presentier:
 	 * 

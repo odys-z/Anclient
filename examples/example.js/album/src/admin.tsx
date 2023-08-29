@@ -5,8 +5,8 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { StandardProps } from '@material-ui/core';
 
-import { Protocol, SessionClient, ErrorCtx, SessionInf,
-	AnsonMsg, AnsonResp
+import { Protocol, SessionClient, ErrorCtx, 
+	AnsonMsg, AnsonResp, isEmpty
 } from '@anclient/semantier';
 
 import {
@@ -25,7 +25,7 @@ interface Approps extends StandardProps<any, string> {
 };
 
 /** The application main, context singleton and error handler */
-class App extends React.Component<Approps> {
+class Admin extends React.Component<Approps> {
 	state = {
 		servId: 'host',
 		hasError: false,
@@ -60,20 +60,22 @@ class App extends React.Component<Approps> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.logout = this.logout.bind(this);
+		this.goPortal = this.goPortal.bind(this);
 
 		this.errorCtx = {onError: this.onError, msg: ''};
 
-		// nothing from localStorage.
-		this.anClient = new SessionClient(undefined, undefined, true);
+		// Will load anclient from localStorage.
+		this.anClient = new SessionClient();
+		if (!isEmpty(this.anClient.ssInf?.ssid))
+			this.state.loggedin = true;
+		else
+			this.state.loggedin = false;
 
 		this.anReact = new AnReactExt(this.anClient, this.errorCtx);
-								// .extendPorts(StarPorts);
 
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.logout  = this.logout.bind(this);
+		this.goPortal  = this.goPortal.bind(this);
 		this.onLogin = this.onLogin.bind(this);
-
 
 		// singleton error handler
 		if (!this.anClient || !this.anClient.ssInf) {
@@ -83,26 +85,22 @@ class App extends React.Component<Approps> {
 				msg: L('Setup session failed! Please re-login.')
 			});
 		}
+		else {
+			this.anReact = new AnReactExt(this.anClient, this.errorCtx)
+				.extendPorts({
+					menu     : "menu.serv",
+					userstier: "users.tier",
+				});
 
-		this.anReact = new AnReactExt(this.anClient, this.errorCtx)
-						.extendPorts({
-							menu: "menu.serv",
-							userstier: "users.tier",
-							gpatier: "gpa.tier",
-							mykidstier: "mykids.tier"
-						});
+			// loaded from dataset.xml
+			this.anClient.getSks((sks) => {
+				Object.assign(Protocol.sk, sks);
+				console.log(sks);
+			}, this.errorCtx);
+		}
 
-		// loaded from dataset.xml
-		this.anClient.getSks((sks) => {
-			Object.assign(Protocol.sk, sks);
-			console.log(sks);
-		}, this.errorCtx);
-
-		Protocol.sk.xvec = 'x.cube.vec';
 		Protocol.sk.cbbOrg = 'org.all';
 		Protocol.sk.cbbRole = 'roles';
-		Protocol.sk.cbbMyClass = 'north.my-class';
-		console.log(Protocol.sk);
 
 		// extending pages
 		// Each Component is added as the route, with uri = path
@@ -131,7 +129,7 @@ class App extends React.Component<Approps> {
 
 	onErrorClose(code: string) {
 		if (code === Protocol.MsgCode.exSession) {
-			this.logout();
+			this.goPortal();
 		}
 		this.errorMsgbox = undefined;
 		this.setState({});
@@ -141,37 +139,12 @@ class App extends React.Component<Approps> {
 
 	}
 
-	/** For navigate to portal page
-	 * FIXME this should be done in SysComp, while firing goLogoutPage() instead.
+	/**
+	 * For navigating to portal page
 	 * */
-	logout() {
-		let that = this;
-		// leaving
-		try {
-			this.anClient.logout(
-				() => {
-					if (this.props.iwindow)
-						this.props.iwindow.location = this.state.iportal;
-				},
-				{ onError: (c, e) => { cleanup (that); } }
-				);
-		}
-		catch(_) {
-			cleanup (that);
-		}
-		finally {
-			this.anClient.ssInf = {} as SessionInf;
-			this.setState({loggedin: false});
-		}
-
-		function cleanup(app: App) {
-			if (app.anClient.ssInf) {
-				localStorage.removeItem(SessionClient.ssInfo);
-				that.anClient.ssInf = {} as SessionInf;
-			}
-			if (app.props.iwindow)
-				app.props.iwindow.location = app.state.iportal;
-		}
+	goPortal() {
+		if (this.props.iwindow)
+			this.props.iwindow.location = this.state.iportal;
 	}
 
 	render() {
@@ -179,24 +152,24 @@ class App extends React.Component<Approps> {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
-				ssInf: undefined,
 				pageOrigin: window ? window.origin : 'localhost',
+				ssInf : undefined,
 				servId: this.state.servId,
-				servs: this.props.servs,
+				servs : this.props.servs,
 				anClient: this.anClient,
 				uiHelper: this.anReact,
 				hasError: this.state.hasError,
-				iparent: this.props.iparent,
+				iparent : this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
 				error: this.errorCtx,
 			}} >
-			  { this.state.loggedin ?
+			  { !this.state.loggedin ?
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
 				:
 				<Sys menu='sys.menu.jsample'
 					sys={L('AnReact')} menuTitle={L('Sys Menu')}
 					myInfo={myInfoPanels}
-					onLogout={this.logout} />
+					onLogout={this.goPortal} />
 			  }
 			  {this.errorMsgbox}
 			</AnContext.Provider>
@@ -222,15 +195,8 @@ class App extends React.Component<Approps> {
 	}
 
 	/**
-	 * Try figure out serv root, then bind to html tag.
-	 * First try ./private.host/<serv-id>,
-	 * then  ./github.json/<serv-id>,
-	 * where serv-id = this.context.servId || host
-	 *
-	 * For test, have elem = undefined
-	 * @param elem html element id, null for test
-	 * [opts.serv='host'] serv id
-	 * [opts.iportal='index.html'] page showed after logout
+	 * @param elem 
+	 * @param opts 
 	 */
 	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
 		let portal = opts.portal || 'index.html';
@@ -239,7 +205,7 @@ class App extends React.Component<Approps> {
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<Admin servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
 	}
 
@@ -248,4 +214,4 @@ class App extends React.Component<Approps> {
 	}
 }
 
-export {App};
+export {Admin};

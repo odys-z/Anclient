@@ -37,8 +37,6 @@ const styles = (theme: Theme) => ( {
 } );
 
 
-// GIT: task: AnTablist Paginator
-
 class UserstComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
@@ -243,10 +241,9 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 	}
 
 	collect(pageInf: PageInf) : PageInf {
-		// return new PageInf()
 		return pageInf
-				.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
-				.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
+			.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
+			.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
 	}
 
 	/**
@@ -265,6 +262,11 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 	}
 }
 
+/**
+ * port = 'userstier', i.e. io.odysz.jsample.protocol.Samport#usertier("users.tier"),
+ * 
+ * A = UserstReq.A
+ */
 export class UsersTier extends Semantier {
 	port = 'userstier';
 	checkbox = true;
@@ -337,7 +339,6 @@ export class UsersTier extends Semantier {
 		client.commit(req,
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				// that.rows = rows;
 				that.rec = rows && rows[0];
 				onLoad(cols, rows as Tierec[]);
 			},
@@ -354,15 +355,7 @@ export class UsersTier extends Semantier {
 		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		/**
-		 *  This is intial password
-		let {cipher, iv} = this.client.encryptoken(this.rec.pswd as string);
-		this.rec.pswd = cipher;
-		this.rec.iv = iv;
-		*/
-
-		// this.rec.iv = undefined; // won't work - didn't sent by Chrome
-		this.rec.iv = null; // working - but why?
+		this.rec.iv = null;
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )
@@ -425,7 +418,7 @@ export class UserstReq extends UserReq {
 		insert: 'c',
 		del: 'd',
 
-		mykids: 'r/kids',
+		// mykids: 'r/kids',
 	}
 
 	pk: any;

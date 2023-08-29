@@ -1,5 +1,5 @@
 import { SessionClient, SessionInf } from './anclient';
-import { arr, len, size, str } from './helpers';
+import { arr, isEmpty, len, size, str } from './helpers';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
@@ -323,6 +323,8 @@ export class Protocol {
 	}
 
     static formatHeader(ssInf: any): AnHeader {
+		if (isEmpty(ssInf))
+			throw Error("Can't format a header without ssInf.");
 		return new AnHeader(ssInf.ssid, ssInf.uid);
     }
 
@@ -1568,7 +1570,6 @@ export class DocsReq extends AnsonBody {
 
 	static A = {
 		records: 'r/list',
-		// mydocs: 'r/my-docs',
 		rec: 'r/rec',
 		upload: 'c/doc',
 		insert: 'c',
@@ -1590,7 +1591,6 @@ export class DocsReq extends AnsonBody {
 	 */
 	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super({uri, type: DocsReq.__type__});
-		// this.type = DocsReq.__type__;
 		this.docId = args.docId;
 		this.docName = args.docName;
 		this.mime = args.mime;

@@ -7,7 +7,7 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 
 import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 	JsonServs, AnreactAppOptions, AnTreeditor, CrudCompW, AnContextType,
-	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView
+	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView, CompOpts
 } from '@anclient/anreact';
 import { GalleryTier } from './gallerytier';
 import { Button, Grid } from '@material-ui/core';
@@ -245,11 +245,11 @@ export class App extends CrudCompW<AlbumProps> {
 				onSelectChange={() => undefined}
 				uri={this.uri}
 				columns={[
-					{ type: 'text', field: 'pname', label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
-					{ type: 'icon-sum', field: '',   label: L('Summary'), grid: {sm: 4, md: 3} },
-					{ type: 'text', field: 'shareby',label: L('By'), grid: {sm: false, md: 3} },
-					// { type: 'actions', field: '',    label: '',      grid: {xs: 4, sm: 3} }
-					{ type: 'actions', field: '', label: '', thFormatter: this.switchDocMedias, grid: {xs: 3, sm: 4, md: 3} }
+					{ type: 'text',     field: 'pname',  label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
+					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {sm: 4, md: 3} },
+					{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
+					// { type: 'actions', field: '',     label: '',           grid: {xs: 4, sm: 3} }
+					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3}, thFormatter: this.switchDocMedias }
 				]}
 				lightbox={this.lightbox}
 			/>) }
@@ -261,7 +261,7 @@ export class App extends CrudCompW<AlbumProps> {
 		</AnContext.Provider>
 		);
 
-		function typeParser(c: AnTreegridCol, n: AnTreeNode, opt: {classes: ClassNames, media: Media}) {
+		function typeParser(c: AnTreegridCol, n: AnTreeNode, opt?: CompOpts) {
 			if (n.node.children?.length as number > 0) return <></>;
 			else return that.docIcon.typeParser(c, n, opt);
 		}

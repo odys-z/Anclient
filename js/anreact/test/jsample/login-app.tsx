@@ -24,11 +24,10 @@ class LoginApp extends React.Component<LoginProps> {
 	state = {
 		hasError: false,
 		home: 'index.html',
-		servId: 'host',
 	};
-	anClient: SessionClient;
+	anClient: SessionClient | undefined;
 
-	servId: string;
+	servId: string = 'host';
 
 	/** jserv root url */
 	jserv: string;
@@ -41,7 +40,7 @@ class LoginApp extends React.Component<LoginProps> {
 		super(props);
 
 		this.servId = props.servId ? props.servId : 'host';
-		this.jserv = props.servs[this.servId];
+		this.jserv  = props.servs[this.servId];
 
 		this.errCtx.onError = this.errCtx.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -64,7 +63,7 @@ class LoginApp extends React.Component<LoginProps> {
 			if (!mainpage)
 				console.error('Login succeed, but no home page be found.');
 			else {
-				this.props.iparent.location = `${mainpage}?serv=${this.state.servId}`;
+				this.props.iparent.location = `${mainpage}?serv=${this.servId}`;
 				this.setState({anClient: clientInf});
 			}
 		}
@@ -74,15 +73,15 @@ class LoginApp extends React.Component<LoginProps> {
 		return (
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
-				ssInf: undefined,
-				ihome: '',
+				ssInf   : undefined,
+				ihome   : '',
 				uiHelper: undefined,
-				servId: this.state.servId,
-				servs: this.props.servs,
+				servId  : this.servId,
+				servs   : this.props.servs,
 				anClient: this.anClient,
 				hasError: this.state.hasError,
-				iparent: this.props.iparent,
-				error: this.errCtx,
+				iparent : this.props.iparent,
+				error   : this.errCtx,
 			}} >
 				<Login onLogin={this.onLogin} />
 				{ this.state.hasError &&

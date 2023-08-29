@@ -2,7 +2,7 @@ import * as CSS from 'csstype';
 
 import { SessionClient } from './anclient';
 
-import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody, DatasetReq, stree_t } from './protocol';
+import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody, DatasetReq } from './protocol';
 
 import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
 
@@ -145,7 +145,7 @@ StreeTier.registTierequest('stree', (opts) => new DatasetReq(opts));
 /** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
 export class SyncDoc implements Tierec {
 	static __type0__: 'io.odysz.semantic.tier.docs.SynDoc';
-    [f: string]: AnsonValue; // string | number | boolean | object;
+    [f: string]: AnsonValue;
 
 	type?: string;
 
