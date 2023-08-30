@@ -36,9 +36,6 @@ const styles = (theme: Theme) => ( {
 	}
 } );
 
-
-// GIT: task: AnTablist Paginator
-
 class UserstComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
@@ -100,13 +97,11 @@ class UserstComp extends CrudCompW<Comprops> {
 	}
 
 	onTableSelect(ids: Map<string, any>) {
-		let rowIds: Array<string> = [];
 		this.setState( {
 			buttons: {
-				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				edit: len(ids) === 1, // rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
+				edit: len(ids) === 1,
+				del: ids &&  len(ids) >= 1,
 			},
 		} );
 	}
@@ -243,10 +238,9 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 	}
 
 	collect(pageInf: PageInf) : PageInf {
-		// return new PageInf()
 		return pageInf
-				.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
-				.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
+			.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
+			.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
 	}
 
 	/**
@@ -265,6 +259,11 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 	}
 }
 
+/**
+ * port = 'userstier', i.e. io.odysz.jsample.protocol.Samport#usertier("users.tier"),
+ * 
+ * A = UserstReq.A
+ */
 export class UsersTier extends Semantier {
 	port = 'userstier';
 	checkbox = true;
@@ -337,7 +336,6 @@ export class UsersTier extends Semantier {
 		client.commit(req,
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				// that.rows = rows;
 				that.rec = rows && rows[0];
 				onLoad(cols, rows as Tierec[]);
 			},
@@ -354,15 +352,7 @@ export class UsersTier extends Semantier {
 		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		/**
-		 *  This is intial password
-		let {cipher, iv} = this.client.encryptoken(this.rec.pswd as string);
-		this.rec.pswd = cipher;
-		this.rec.iv = iv;
-		*/
-
-		// this.rec.iv = undefined; // won't work - didn't sent by Chrome
-		this.rec.iv = null; // working - but why?
+		this.rec.iv = null;
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )
@@ -399,7 +389,7 @@ export class UsersTier extends Semantier {
 
 		if (ids && ids.size > 0) {
 			let req = this.client.userReq(uri, this.port,
-				new UserstReq( uri, { deletings: [...Array.from(ids)] } )
+				new UserstReq( uri, { deletings: [...Array.from(ids.keys())] } )
 				.A(UserstReq.A.del) );
 
 			client.commit(req, onOk, this.errCtx);
@@ -425,7 +415,7 @@ export class UserstReq extends UserReq {
 		insert: 'c',
 		del: 'd',
 
-		mykids: 'r/kids',
+		// mykids: 'r/kids',
 	}
 
 	pk: any;
@@ -450,19 +440,13 @@ export class UserstReq extends UserReq {
 
 		if (query.condtsRec) {
 			let args = query.condtsRec() as Tierec & { record? : {userId?: string} };
-			this.userId = (args.userId || args.record?.userId) as string;
+			this.userId   = (args.userId || args.record?.userId) as string;
 			this.userName = args.userName as string;
-			this.orgId = args.orgId as string;
-			this.roleId = args.roleId as string;
+			this.orgId    = args.orgId as string;
+			this.roleId   = args.roleId as string;
 			this.hasTodos = toBool(args.hasTodos as string | boolean);
 
 			this.page = new PageInf(query.page, query.size);
-		}
-		/// case A = rec (TRecordForm loading)
-		else if (query.userId) {
-			this.record = query as Tierec;
-			this.userId = query.userId;
-			this.page = new PageInf(0, -1);
 		}
 		/// case A = u
 		else if (query.pk) {
@@ -470,7 +454,13 @@ export class UserstReq extends UserReq {
 			this.record = query.record as Tierec;
 			this.relations = query.relations as DbRelations;
 		}
-
+		/// case A = c 
+		else if (query.record) {
+			let {record} = query;
+			this.record = record;
+			this.userId = record.userId;
+			this.page = new PageInf(0, -1);
+		}
 		/// case d
 		this.deletings = query.deletings as string[];
 	}

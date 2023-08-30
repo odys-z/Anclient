@@ -80,7 +80,6 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	rowPageLabel (_paginationInfo: LabelDisplayedRowsArgs) : ReactNode {
 		let {count, from, to, page} = _paginationInfo;
 		let sz = _paginationInfo.from - _paginationInfo.to + 1;
-
 		let pages = count > 0
 			? Math.floor((count + sz - 1) / sz)
 			: 0;

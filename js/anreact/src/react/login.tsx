@@ -165,9 +165,9 @@ class LoginComp extends React.Component<LoginProps> {
 			this.props.onLogout();
 	}
 
-	update(val: any) {
-		this.setState(val);
-	}
+	// update(val: any) {
+	// 	this.setState(val);
+	// }
 
 	render() {
 		let that = this;

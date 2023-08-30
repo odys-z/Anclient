@@ -95,10 +95,10 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 	componentDidMount() {
 		let that = this;
-		this.tier.relations((this.context as unknown as AnContextType).anClient,
-			{ uri: this.props.uri,
+		this.tier.relations((this.context as AnContextType).anClient,
+			{ uri    : this.props.uri,
 			  reltabl: this.props.reltabl,
-			  sqlArg: str(this.tier.pkval.v),
+			  sqlArg : str(this.tier.pkval.v),
 			},
 			(rels: AnsonMsg<AnDatasetResp>) => {
 				// that.forest = rels.Body().forest as AnTreeNode[];

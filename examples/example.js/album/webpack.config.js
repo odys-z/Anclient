@@ -2,12 +2,13 @@ let path = require('path')
 let webpack = require('webpack')
 
 let v = 'development'; // "production" | "development" | "none"
-let version = "0.4.45";
+let version = "0.3.0";
 
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
 	entry: {"Album": "./src/app.tsx",
+			"Login": "./src/login-admin.tsx",
 			"Admin": "./src/admin.tsx" },
 
 	output: {

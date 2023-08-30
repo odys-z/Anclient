@@ -1,10 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AnsonMsg, AnsonResp, SessionClient } from '../../../semantier/anclient';
-import { AnContext, AnError, AnReact, L, Login } from '../../../anreact/src/an-components';
-import { Comprops } from '../../../anreact/src/react/crud';
-import { AnreactAppOptions, JsonServs } from '../../../anreact/src/an-components';
-import { SessionInf } from '@anclient/semantier/anclient';
+import { AnContext, AnError, AnReact, L, Login, Comprops, AnreactAppOptions, JsonServs
+} from '@anclient/anreact';
+import { AnsonMsg, AnsonResp, SessionClient, SessionInf } from '@anclient/semantier';
 import { Theme } from '@material-ui/core/styles';
 
 const styles = (theme: Theme) => ({
@@ -25,9 +23,10 @@ class LoginApp extends React.Component<LoginProps> {
 		hasError: false,
 		home: 'index.html',
 	};
+
 	anClient: SessionClient | undefined;
 
-	servId: string = 'host';
+	servId: string;
 
 	/** jserv root url */
 	jserv: string;
@@ -40,7 +39,7 @@ class LoginApp extends React.Component<LoginProps> {
 		super(props);
 
 		this.servId = props.servId ? props.servId : 'host';
-		this.jserv  = props.servs[this.servId];
+		this.jserv = props.servs[this.servId];
 
 		this.errCtx.onError = this.errCtx.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -73,21 +72,21 @@ class LoginApp extends React.Component<LoginProps> {
 		return (
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
-				ssInf   : undefined,
-				ihome   : '',
+				ssInf: undefined,
+				ihome: '',
 				uiHelper: undefined,
-				servId  : this.servId,
-				servs   : this.props.servs,
-				anClient: this.anClient,
+				servId: this.servId,
+				servs: this.props.servs,
+				anClient: this.anClient as SessionClient,
 				hasError: this.state.hasError,
-				iparent : this.props.iparent,
-				error   : this.errCtx,
+				iparent: this.props.iparent,
+				error: this.errCtx,
 			}} >
 				<Login onLogin={this.onLogin} />
 				{ this.state.hasError &&
 				  <AnError
 				  	onClose={this.onErrorClose}
-					// fullScreen={true}
+					fullScreen={false}
 					title={L('Error')}
 					msg={this.errCtx.msg}
 				  /> }
