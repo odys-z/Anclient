@@ -2,7 +2,7 @@ import * as CSS from 'csstype';
 
 import { SessionClient } from './anclient';
 
-import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody, DatasetReq, stree_t } from './protocol';
+import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody, DatasetReq } from './protocol';
 
 import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
 
@@ -131,23 +131,21 @@ export class StreeTier extends Semantier {
         if (!(this.client instanceof SessionClient))
             throw Error('Needing a intance of AnClient.');
 
-		let reqbody: AnsonBody;
-		
-		if (opts.sk)
-			reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
-		else
-			reqbody = new DatasetReq(opts).A(stree_t.sqltree);
+		let reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 
 		this.client.an.post(jreq, opts.onOk, errCtx);
     }
 }
+// default s-tree request (AnDatasetReq)
+StreeTier.registTierequest('stree', (opts) => new DatasetReq(opts));
+
 
 /** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
 export class SyncDoc implements Tierec {
 	static __type0__: 'io.odysz.semantic.tier.docs.SynDoc';
-    [f: string]: AnsonValue; // string | number | boolean | object;
+    [f: string]: AnsonValue;
 
 	type?: string;
 

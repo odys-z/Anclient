@@ -271,7 +271,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
   /**
    * @param {object} classes
    */
-  buildTree(classes: ClassNames) {
+  buildTree(classes: ClassNames, media: Media) {
 	let that = this;
 
 	let expandItem = this.toExpandItem;
@@ -366,10 +366,10 @@ class AnTreeComp extends CrudCompW<Comprops> {
   }
 
   render() {
-	const { classes } = this.props;
+	const { classes, media } = this.props;
 	this.state.forest = this.props.forest;
 
-	return <div className={classes.root}>{this.buildTree(classes)}</div>;
+	return <div className={classes.root}>{this.buildTree(classes, media)}</div>;
   }
 }
 

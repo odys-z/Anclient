@@ -8,11 +8,11 @@
 
 <body>
   <!-- To load page, in console: loadAlbum(uid, pswd) -->
-  <div id="app">Album Web v0.2.2
+  <div id="app">Album Web v0.3.0
       <img src=''></img>
   </div>
   <noscript>You need to enable JavaScript to run this app.</noscript>
-  <script src="./Album-0.4.45.min.js" type="text/javascript"></script>
+  <script src="./Album-0.3.0.min.js" type="text/javascript"></script>
   <script>
     let searchParams = new URLSearchParams(window.location.search)
     let aid = searchParams ? searchParams.get('album') : 'album-landing';
@@ -22,7 +22,6 @@
       album.App.bindHtml('app', {uid, pswd,
         aid, serv, Window, portal: 'index.html'});
     }
-    // console.log(loadAlbum);
   </script>
 </body>
 </html>

@@ -10,17 +10,17 @@
 <body>
   <div id="div"></div>
   <noscript>You need to enable JavaScript to run this app.</noscript>
-  <script src="Admin-0.4.45.min.js"></script>
+  <script src="Admin-0.3.0.min.js"></script>
   <script>
     let searchParams = new URLSearchParams(window.location.search)
     let serv = searchParams ? searchParams.get('serv') : 'admin';
 
-    // album.App.bindHtml('div', {
-    //   serv, Window, portal: 'index.html'});
+    album.Admin.bindHtml('div', {uis: 'ody', pswd: '123456',
+      serv, Window, portal: 'index.html'});
 
     function loadAlbum(uid, pswd) {
-      admin.App.bindHtml('app', {uid, pswd,
-        aid, serv, Window, portal: 'index.html'});
+      album.Admin.bindHtml('app', {uid, pswd,
+        serv, Window, portal: 'index.html'});
     }
 
   </script>

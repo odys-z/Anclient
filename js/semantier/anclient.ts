@@ -389,6 +389,7 @@ class SessionClient {
 		remarks: '',
 		cate: ''
 	};
+	/** Get name of persisted item in local storage. */
 	static get ssInfo() { return "ss-info"; }
 
 	/**Create SessionClient with credential information or load from localStorage.
@@ -513,10 +514,6 @@ class SessionClient {
 		}
 		return header;
 	}
-
-	// SsInf(ssInf: SessionInf) {
-	// 	throw new Error('Method not implemented.');
-	// }
 
 	setPswd(oldPswd: string, newPswd : string, opts) {
 		let usrId = this.ssInf.uid;
