@@ -15,6 +15,7 @@ import { AnlistColAttrs, Tierec, isEmpty, PageInf, toBool, len, DbCol } from '@a
 import { DetailFormW } from '../crud';
 import { CompOpts } from '../anreact';
 import { AnTablistProps } from './table-list';
+import { L } from '../../utils/langstr';
 
 const styles = (theme: Theme) => ( {
 	root: {
@@ -77,16 +78,19 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	}
 
 	rowPageLabel (_paginationInfo: LabelDisplayedRowsArgs) : ReactNode {
-		let sz = this.page.size || 0;
-		let total = this.page.total || 0;
+		let {count, from, to, page} = _paginationInfo;
+		let sz = _paginationInfo.from - _paginationInfo.to + 1;
+		// let total = this.page.total || 0;
 
-		let from = this.page.page * sz;
-		let to = sz > 0 ? (this.page.page + 1) * sz : 0;
-		let count = total > 0
-			? Math.round((total + sz - 1) / sz)
-			: -1;
+		// let from  = this.page.page * sz;
+		// let to    = sz > 0 ? (this.page.page + 1) * sz : 0;
+		let pages = count > 0
+			? Math.floor((count + sz - 1) / sz)
+			: 0;
 
-		return `${from}–${to} in page ${this.page.page} of ${count !== -1 ? count : `more than ${to}`}`;
+		// return `${from}–${to} in page ${this.page.page} of ${count !== -1 ? count : `more than ${to}`}`;
+		// let {page} = this.page;
+		return L('{from} - {to}, page {page} / {pages}', {from, to, page, pages});
 	}
 
 	handleClick(e: React.MouseEvent<HTMLElement>, newSelct: string, node: Tierec) {
