@@ -179,9 +179,10 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 						</TableCell>)
 					}
 					{columns
-						.filter( (v, x) => //!toBool(v.hide)
+						// first column as checkbox
+						.filter( (v, x) => 
 								!toBool(v.hide) && toBool(v.visible, true)
-								&& (!this.props.checkbox || x !== 0)) // first columen as checkbox
+								&& (!this.props.checkbox || x !== 0))
 						.map( (colObj, x) => {
 							if (colObj.field === undefined)
 								throw Error("Column field is required: " + JSON.stringify(colObj));
@@ -196,23 +197,23 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 	}
 
 	render() {
-		return (<>
+	  return (<>
 		<TableContainer>
 		  <Table style={{width:"100%"}} aria-label="simple table">
 			<TableHead>
-				<TableRow>
-					{ this.props.checkbox &&
-						(<TableCell padding="checkbox" >
-						  <Checkbox ref={ref => (this.checkAllBox = ref)}
-							indeterminate={this.state.selected.size > 0 && this.state.selected.size < len(this.props.rows)}
-							checked={this.state.selected.size > 0 && this.state.selected.size === len(this.props.rows)}
-							color="primary"
-							inputProps={{ 'aria-label': 'checkAll' }}
-							onChange={this.toSelectAll}/>
-						</TableCell>)
-					}
-					{this.th(this.props.columns)}
-				</TableRow>
+			  <TableRow>
+				{ this.props.checkbox &&
+				  ( <TableCell padding="checkbox" >
+					<Checkbox ref={ref => (this.checkAllBox = ref)}
+						indeterminate={this.state.selected.size > 0 && this.state.selected.size < len(this.props.rows)}
+						checked={this.state.selected.size > 0 && this.state.selected.size === len(this.props.rows)}
+						color="primary"
+						inputProps={{ 'aria-label': 'checkAll' }}
+						onChange={this.toSelectAll}/>
+				  </TableCell> )
+				}
+				{this.th(this.props.columns)}
+			  </TableRow>
 			</TableHead>
 			<TableBody>
 				{this.tr(this.props.rows, this.props.columns)}
@@ -229,7 +230,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			rowsPerPageOptions={this.sizeOptions}
 			labelDisplayedRows={this.rowPageLabel}
 		/>}
-		</>);
+	  </>);
 	}
 }
 
