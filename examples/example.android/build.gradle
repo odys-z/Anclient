@@ -16,9 +16,9 @@ allprojects {
         appcompat_version = "1.4.1"
         glide_version = "4.15.1"
         bm_photoview_version = "1.4.1"
-        anclient_ver = "0.4.33"
-        jserv_ver = "1.4.33"
-        album_lib_ver = "0.4.33"
+        anclient_ver = "0.4.34"
+        jserv_ver = "1.4.35-SNAPSHOT"
+        album_lib_ver = "0.4.34"
     }
 
     repositories {

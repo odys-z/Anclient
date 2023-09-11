@@ -24,6 +24,7 @@ import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
+import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.PathsPage;
@@ -212,7 +213,7 @@ public class PhotoSyntier extends SynclientierMvp {
 			DocsReq req = new AlbumReq(uri)
 					.folder(fileProvider.saveFolder())
 					.share(p)
-					.device(user.device)
+					.device(new Device(user.device, null))
 					.resetChain(true)
 					.blockStart(p, user);
 
