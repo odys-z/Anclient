@@ -104,7 +104,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 		  <AnTreeditor {... this.props}
 			pk={'pid'}
 			sk={Protocol.sk.collectree} tnode={this.tier.root()}
-			onSelectChange={ids => undefined}
+			onSelectChange={undefined}
 			uri={this.uri} mtabl='ind_emotion'
 			// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
 			// parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
@@ -153,6 +153,4 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			  />, dom);
 		}
 	}
-
-
 }

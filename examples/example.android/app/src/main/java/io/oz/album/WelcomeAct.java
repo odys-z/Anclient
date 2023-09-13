@@ -4,7 +4,7 @@ import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
-import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
+import static io.oz.album.webview.WebAlbumAct.Web_PageName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static io.odysz.common.LangExt.isblank;
@@ -85,7 +85,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     ActivityResultLauncher<Intent> prefStarter;
     ActivityResultLauncher<Intent> pickMediaStarter;
     ActivityResultLauncher<Intent> pickFileStarter;
-    ActivityResultLauncher<Intent> helpActStarter;
+    ActivityResultLauncher<Intent> webAtcStarter;
 
     TextView msgv;
     AndErrorCtx errCtx;
@@ -166,8 +166,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     reloadAlbum();
                 });
 
-        if (helpActStarter == null)
-            helpActStarter = registerForActivityResult(
+        if (webAtcStarter == null)
+            webAtcStarter = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> reloadAlbum() );
 
@@ -178,8 +178,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             else {
                 String pswd = sharedPref.getString(AlbumApp.keys.pswd, "-");
                 singl.pswd(pswd)
-                     .login((client) -> {
-                         AssetHelper.init(this,
+                    .login((client) -> {
+                        AssetHelper.init(this,
                                  sharedPref.getString(AlbumApp.keys.jserv, ""),
                                  sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
                         // All WebView methods must be called on the same thread.
@@ -201,7 +201,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         if (client == null || sharedPref == null)
             return;
 
-        // String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
         String pswd = singl.pswd();
 
         WebView wv = findViewById(R.id.wv_welcome);
@@ -443,8 +442,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      */
     protected void startHelpAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
-        intent.putExtra(Help_ActionName, action);
-        helpActStarter.launch(intent);
+        intent.putExtra(Web_PageName, action);
+        webAtcStarter.launch(intent);
     }
 
     @Override

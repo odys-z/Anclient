@@ -1,3 +1,8 @@
+/**
+ * Created by Ody
+ *
+ * Credits to Vincent Woo
+ */
 package io.oz.fpick.activity;
 
 import android.content.Intent;
@@ -35,12 +40,6 @@ import io.oz.fpick.filter.FileFilterx;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
-
-/**
- * Created by Ody
- *
- * Credits by Vincent Woo
- */
 
 public abstract class BaseActivity extends FragmentActivity
         implements EasyPermissions.PermissionCallbacks, JProtocol.OnError, IProgressBarAct {
@@ -180,18 +179,7 @@ public abstract class BaseActivity extends FragmentActivity
     }
 
     protected void loadirs(List<Directory<AndroidFile>> directories) {
-//        boolean tryToFindTakenImage = isTakenAutoSelected;
-
-        // if auto-selecting taken files is enabled, make sure requirements are met
-//        if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mFilepath)) {
-//            File takenImageFile = new File(mAdapter.mFilepath);
-//            // try to select taken image only if max isn't reached and the file exists
-//            tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists();
-//        }
-
         List<AndroidFile> list = mergeDirs(directories, isTakenAutoSelected);
-        /*
-        */
 
         // max number is limited
         for (AndroidFile file : mSelectedList) {
@@ -218,7 +206,7 @@ public abstract class BaseActivity extends FragmentActivity
 
             // auto-select taken images?
             if (tryToFindTakenImage) {
-                // findAndAddTakenImage(directory.getFiles());   // if taken image was found, we're done
+                // if taken image was found, we're done
                 markTakenFiles(l);
             }
         }

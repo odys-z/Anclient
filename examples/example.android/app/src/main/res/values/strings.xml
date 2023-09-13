@@ -5,9 +5,9 @@
     <string name="menu_help" >Help</string>
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
-    <string name="txt_prefs_summery_home">Home Registration</string>
+    <string name="txt_prefs_summery_home">Group Registration</string>
     <string name="devide_name"  >Device ID: %s</string>
-    <string name="txt_only_once">Name a unique device. Device can be name only once.</string>
+    <string name="txt_only_once">Unique Device Name (can be name only once)</string>
 
     <string name="key_home" translatable="false">home_key</string>
     <string name="home_title" >Home Name</string>
@@ -31,7 +31,7 @@
     <string name="txt_login"       >User Login</string>
     <string name="txt_please_login">Please Login</string>
     <string name="summery_login"   >Login to upload files your own folder</string>
-    <string name="txt_prefs_title" >Album User Settings</string>
+    <string name="txt_prefs_title" >User &amp; Device Settings</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
     <string name="t_synch_ok"      >%s files has been synchronized</string>
     <string name="devide_title"    >Device Name</string>
@@ -55,5 +55,6 @@
     <string name="btn_add_audio">+ Audio</string>
     <string name="btn_add_video">+ Video</string>
     <string name="btn_add_img"  >+ Image</string>
+    <string name="my_group">Current Group</string>
 
 </resources>

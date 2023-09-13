@@ -23,12 +23,13 @@ allprojects {
 
     repositories {
 //        mavenLocal()
-        mavenCentral(){ mavenContent { releasesOnly() } }
+        // mavenCentral(){ mavenContent { releasesOnly() } }
+        mavenCentral()
         google()
         jcenter()
-//        maven() {
-//            url "https://oss.sonatype.org/content/repositories/snapshots"
-//        }
+        maven() {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
     }
 }
 

@@ -40,7 +40,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
 
         bindPref2Val(findPreference(AlbumApp.keys.home));
         bindPref2Val(findPreference(AlbumApp.keys.device));
-        bindPref2Val(findPreference(AlbumApp.keys.jserv));
+        // bindPref2Val(findPreference(AlbumApp.keys.jserv));
         bindPref2Val(findPreference(AlbumApp.keys.usrid));
         bindPref2Val(findPreference(AlbumApp.keys.pswd));
 
@@ -72,6 +72,8 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     }
 
     static void bindPref2Val(@NonNull Preference preference) {
+        if (preference == null)
+            return;
         preference.setOnPreferenceChangeListener(prefsListener);
 
         prefsListener.onPreferenceChange(preference,

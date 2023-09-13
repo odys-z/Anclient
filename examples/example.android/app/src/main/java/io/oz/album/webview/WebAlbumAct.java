@@ -14,9 +14,9 @@ import io.oz.albumtier.AlbumContext;
 
 public class WebAlbumAct extends AppCompatActivity {
 
-	public static final String Help_ActionName = "WebAction";
+	public static final String Web_PageName = "WebAction";
 
-	protected static final VWebAlbum webView = new VWebAlbum();
+	// protected static final VWebAlbum webView = new VWebAlbum();
 
 	/** Landing uril such as error page, e.g. http://odys-z.github.io/Anclient */
 	static String url_landing;
@@ -34,12 +34,12 @@ public class WebAlbumAct extends AppCompatActivity {
 		url_landing = getString(R.string.url_landing);
 
 		Intent intt = getIntent();
-		int act = intt.getIntExtra(Help_ActionName, AssetHelper.Act_Landing);
+		int webId = intt.getIntExtra(Web_PageName, AssetHelper.Act_Landing);
 
 		WebView wv = findViewById(R.id.wv);
 		wv.getSettings().setJavaScriptEnabled(true);
 		wv.setWebViewClient(new WebViewClient() {
 		});
-		wv.loadUrl(AssetHelper.url4intent(this, act));
+		wv.loadUrl(AssetHelper.url4intent(this, webId));
 	}
 }
