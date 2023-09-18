@@ -199,7 +199,6 @@ class App extends React.Component<Approps> {
 	 * [opts.iportal='index.html'] page showed after logout
 	 */
 	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
-	// static bindHtml(elem: string, opts: {serv: string, portal?: string}) : void {
 		let portal = opts.portal || 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
