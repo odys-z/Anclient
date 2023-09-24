@@ -117,7 +117,9 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	}
 
 	/**
-	 * @param classes
+	 * @param forest 
+	 * @param classes 
+	 * @returns tree: React.Node
 	 */
 	buildTree(forest: AnTreeNode[], classes: ClassNames = {}) {
 		let that = this;
