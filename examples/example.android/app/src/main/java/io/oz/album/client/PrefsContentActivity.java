@@ -68,7 +68,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
           singleton.login(
             (client) -> {
                 updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                updateSummery(prefFragment.homepref, getString(R.string.devide_name, singleton.photoUser.device));
+                updateSummery(prefFragment.homepref, getString(R.string.device_name, singleton.photoUser.device));
 
                 // load settings
                 Anson.verbose = false;

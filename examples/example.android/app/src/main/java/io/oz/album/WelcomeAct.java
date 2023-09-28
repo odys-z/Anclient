@@ -85,7 +85,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     ActivityResultLauncher<Intent> prefStarter;
     ActivityResultLauncher<Intent> pickMediaStarter;
     ActivityResultLauncher<Intent> pickFileStarter;
-    ActivityResultLauncher<Intent> webAtcStarter;
+    ActivityResultLauncher<Intent> webHelpStarter;
 
     TextView msgv;
     AndErrorCtx errCtx;
@@ -166,10 +166,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     reloadAlbum();
                 });
 
-        if (webAtcStarter == null)
-            webAtcStarter = registerForActivityResult(
+        if (webHelpStarter == null)
+            webHelpStarter = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> reloadAlbum() );
+
+//        if (webAdminStarter == null)
+//            webAdminStarter = registerForActivityResult(
+//                    new ActivityResultContracts.StartActivityForResult(),
+//                    result -> reloadAlbum() );
 
         try {
             if (singl.needSetup())
@@ -269,6 +274,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         int id = item.getItemId();
         if (id == R.id.menu_settings) {
             startPrefsAct();
+            return true;
+        } else if (id == R.id.menu_admin) {
+            startHelpAct(AssetHelper.Act_Admin);
             return true;
         } else if (id == R.id.menu_help) {
             startHelpAct(AssetHelper.Act_Help);
@@ -443,7 +451,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     protected void startHelpAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
         intent.putExtra(Web_PageName, action);
-        webAtcStarter.launch(intent);
+        webHelpStarter.launch(intent);
     }
 
     @Override

@@ -60,7 +60,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
             findPreference(AlbumApp.keys.device).setEnabled(false);
             cateHome.removePreference(btnRegist);
-            device.setSummary(getString(R.string.devide_name, devid));
+            device.setSummary(getString(R.string.device_name, devid));
         }
         else {
             findPreference(AlbumApp.keys.device).setEnabled(true);

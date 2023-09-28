@@ -14,6 +14,7 @@ import io.oz.R;
 public class AssetHelper {
 
     public static final String albumHome = "index.html";
+    public static final String adminHome = "admin.html";
     public static final String synchPage = "sync.html";
 
     static String jserv;
@@ -28,6 +29,8 @@ public class AssetHelper {
     public static final int Act_Album = 3;
     /** Act: show synchronizing report - not v 0.2.xx */
     public static final int Act_SyncReport = 4;
+    /** Act: show admin page */
+    public static final int Act_Admin = 5;
 
     public static void init(Context context, String jservroot, String webroot) {
         jserv = jservroot;
@@ -38,6 +41,8 @@ public class AssetHelper {
         switch (intent) {
             case Act_Album:
                 return ctx.getString(R.string.url_album, homeroot, albumHome);
+            case Act_Admin:
+                return ctx.getString(R.string.url_admin, homeroot, adminHome);
             case Act_SyncReport:
                 return ctx.getString(R.string.url_sync_report, jserv, synchPage);
             case Act_Help:

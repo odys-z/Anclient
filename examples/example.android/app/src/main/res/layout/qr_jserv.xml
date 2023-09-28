@@ -5,30 +5,41 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:layout_constraintTop_toTopOf="@id/pref_layout">
-
     <LinearLayout
-        android:id="@+id/events"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="right"
+        android:orientation="vertical"
         >
 
-        <EditText
-            android:defaultValue="@string/jserv_default"
-            android:key="@string/jserv_key"
-            android:summary="@string/jserv"
-            android:title="@string/jserv_title"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="right"
+            >
 
-        <ImageButton
-            android:layout_width="wrap_content"
+            <AutoCompleteTextView
+                android:defaultValue="@string/jserv_default"
+                android:key="@string/jserv_key"
+                android:summary="@string/jserv"
+                android:title="@string/jserv_title"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_gravity="right"
+                android:src="@drawable/scan_qr" />
+        </LinearLayout>
+        <Button
+            android:id="@+id/btn_login"
+            android:text="@string/test_connect"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_gravity="right"
-            android:src="@drawable/scan_qr" />
+            android:onClick="onTestConn" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
