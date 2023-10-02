@@ -8,5 +8,4 @@
     <string name="vw_no_audio_app">没有可用的音频录制应用</string>
     <string name="vw_all">全部</string>
 
-    <string name="vprf_blank_device">手机等文件设备名不能为空!</string>
 </resources>

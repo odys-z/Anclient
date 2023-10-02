@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="right"
+    >
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.8"
+            android:enabled="false"
+            android:key="@string/key_device"
+            android:minHeight="60dp"
+            android:summary="@string/msg_only_once"
+            android:title="@string/devide_title" />
+        <Button
+            android:id="@+id/setNewButton"
+            android:text="@string/txt_loadused"
+            android:layout_weight="0.1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="onRegisterDevice" />
+        <ImageButton
+            android:layout_weight="0.1"
+            android:layout_width="40dp"
+            android:background="#00C8C8C8"
+            android:layout_height="wrap_content"
+            android:onClick="onRegisterDevice"
+            android:layout_gravity="right"
+            android:src="@drawable/ic_question" />
+</LinearLayout>

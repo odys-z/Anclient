@@ -8,7 +8,7 @@
     <Button
         android:id="@+id/btn_manage_groups"
         android:visibility="invisible"
-        android:text="@string/txt_manage_groups"
+        android:text="@string/txt_set_groups"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onManageGroups" />

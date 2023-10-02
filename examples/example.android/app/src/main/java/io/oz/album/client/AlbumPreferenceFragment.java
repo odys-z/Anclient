@@ -64,7 +64,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         }
         else {
             findPreference(AlbumApp.keys.device).setEnabled(true);
-            device.setSummary(R.string.txt_only_once);
+            device.setSummary(R.string.msg_only_once);
 
             btnLogin.setEnabled(false);
         }

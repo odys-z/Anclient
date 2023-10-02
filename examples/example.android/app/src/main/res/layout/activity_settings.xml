@@ -10,7 +10,7 @@
         android:id="@+id/id_login_cate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:title="@string/txt_prefs_title"
+        android:title="@string/txt_prefs_user"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,6 +43,6 @@
             android:ems="10"
             android:inputType="none"
             android:focusable="false"
-            android:text="@string/txt_only_once" />
+            android:text="@string/msg_only_once" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

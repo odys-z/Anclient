@@ -17,7 +17,7 @@
         <EditTextPreference
             android:enabled="false"
             android:key="@string/key_device"
-            android:summary="@string/txt_only_once"
+            android:summary="@string/msg_only_once"
             android:title="@string/devide_title" />
         <Preference
             android:key="@string/key_regist"
@@ -25,7 +25,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/txt_prefs_title"
+        android:title="@string/txt_prefs_user"
         android:id="@+id/id_login_cate" >
         <EditTextPreference
             android:defaultValue="@string/jserv_default"

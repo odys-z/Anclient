@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Family Album</string>
+    <string name="app_name"  >Portfolio</string>
 
     <string name="menu_prefs">User Settings</string>
     <string name="menu_help" >Help</string>
@@ -7,82 +7,89 @@
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
     <string name="txt_prefs_summery_home">Group Registration</string>
-    <string name="device_name">Device ID: %s</string>
-    <string name="txt_only_once">A Device can be named only once.</string>
+    <string name="device_name"     >Device ID: %s</string>
+    <string name="msg_only_once"   >A Device can be named only once.</string>
+    <string name="msg_blank_device">Device name can not be empty.</string>
 
     <string name="key_home" translatable="false">home_key</string>
-    <string name="home_title">Home Name</string>
+    <string name="home_title"      >Home Name</string>
+    <string name="txt_test_connect">Test Connection</string>
 
-    <string name="jserv_key" translatable="false">jserv-key</string>
-    <string name="homepage_key" translatable="false">homepage-key</string>
+    <string name="txt_prefs_jserv">File Service Address</string>
+    <string name="jserv_title"    >Home Server Address</string>
+    <string name="jserv_key"     translatable="false">jserv-key</string>
+    <string name="homepage_key"  translatable="false">homepage-key</string>
     <string name="jserv_default" translatable="false">@string/product_jserv_default</string>
-    <string name="jserv" translatable="false">@string/product_landing</string>
-    <string name="jserv_title">Home Server Address</string>
+    <string name="jserv"         translatable="false">@string/product_landing</string>
 
     <string name="key_regist" translatable="false">btn-register</string>
-    <string name="txt_regist">Verify Device Name</string>
+    <string name="txt_loadused" >Restore a\nUsed Name</string>
+    <string name="txt_regist"   >Save Device Name</string>
+    <string name="txt_scanjserv">Scan jserv address.</string>
 
     <string name="t_login_failed" translatable="false">Login to home server failed.\nUserId: %s\nService:%s</string>
-    <string name="userid_summery" translatable="false">Name used for sub-folder (created at server)</string>
-    <string name="userid_title">Login ID</string>
-    <string name="pswd_title">Password</string>
+    <string name="userid_summery">Also used as folder name for saving files</string>
+    <string name="userid_title"  >Login ID</string>
+    <string name="pswd_title"    >Password</string>
     <string name="userid_key" translatable="false">my</string>
-    <string name="pswd_key" translatable="false">pswd_key</string>
-    <string name="btn_login" translatable="false">bt_login</string>
-    <string name="txt_login">User Login</string>
+    <string name="pswd_key"   translatable="false">pswd_key</string>
+    <string name="btn_login"  translatable="false">bt_login</string>
+    <string name="txt_login"       >User Login</string>
     <string name="txt_please_login">Please Login</string>
-    <string name="summery_login">Login to upload files to your own folder</string>
-    <string name="txt_prefs_title">User &amp; Device Settings</string>
+    <string name="summery_login"   >Login to upload files to your own folder</string>
+    <string name="txt_prefs_user"  >User Account</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
-    <string name="t_synch_ok">%s files has been synchronized</string>
-    <string name="devide_title">Device Name</string>
+    <string name="t_synch_ok"      >%s files has been synchronized</string>
+    <string name="txt_prefs_device">Device Information</string>
+    <string name="devide_title"    >Device Name</string>
     <string name="key_device" translatable="false">key-device</string>
-    <string name="login_succeed">Logged in successfully.</string>
+    <string name="login_succeed"   >Logged in successfully.</string>
 
     <string name="msg_ignore_offline">Selection / files ignored - not logged in.</string>
     <string name="msg_templ_progress">Total files: %d / %d, File Blocks: %s (%.1f%%)</string>
-    <string name="msg_upload_failed">Uploading failed.\n%s\n%s</string>
-    <string name="msg_device_uid">Login as %s @ %s</string>
-    <string name="err_pref_login">\"Login failed!\n%s %s\"</string>
-    <string name="err_empty_pswd">Password is empty!</string>
+    <string name="msg_upload_failed" >Uploading failed.\n%s\n%s</string>
+    <string name="msg_device_uid"    >Login as %s @ %s</string>
+    <string name="err_pref_login"    >\"Login failed!\n%s %s\"</string>
+    <string name="err_empty_pswd"    >Password is empty!</string>
 
     <string name="url_help">https://odys-z.github.io/products/album</string>
-    <string name="url_home"  translatable="false">https://odys-z.github.io/Anclient</string>
-    <string name="url_album" translatable="false">%s/%s</string>
-    <string name="url_admin" translatable="false">%s/%s</string>
+    <string name="url_home"        translatable="false">https://odys-z.github.io/Anclient</string>
+    <string name="url_album"       translatable="false">%s/%s</string>
+    <string name="url_admin"       translatable="false">%s/%s</string>
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
-    <string name="url_landing" translatable="true">https://odys-z.github.io/Anclient</string>
+    <string name="url_landing"     translatable="true">https://odys-z.github.io/Anclient</string>
 
-    <string name="btn_add_file">+ File</string>
+    <string name="btn_add_file" >+ File</string>
     <string name="btn_add_audio">+ Audio</string>
     <string name="btn_add_video">+ Video</string>
-    <string name="btn_add_img">+ Image</string>
-    <string name="my_group">Current Group</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="btn_add_img"  >+ Image</string>
+    <string name="my_group"     >Current Group</string>
+    <string name="txt_set_groups">Set Sharing Group</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+<!--    <string name="prfmsg_blank_device">End user device Id can not be empty!</string>-->
+<!--    <string name="messages_header">Messages</string>-->
+<!--    <string name="sync_header">Sync</string>-->
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+<!--    <string name="signature_title">Your signature</string>-->
+<!--    <string name="reply_title">Default reply action</string>-->
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
+<!--    <string name="sync_title">Sync email periodically</string>-->
+<!--    <string name="attachment_title">Download incoming attachments</string>-->
+<!--    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>-->
+<!--    <string name="attachment_summary_off">Only download attachments when manually requested</string>-->
+<!--    <string name="tab_text_1">Tab 1</string>-->
+<!--    <string name="tab_text_2">Tab 2</string>-->
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
+<!--    <string name="first_fragment_label">First Fragment</string>-->
+<!--    <string name="second_fragment_label">Second Fragment</string>-->
+<!--    <string name="next">Next</string>-->
+<!--    <string name="previous">Previous</string>-->
+<!--    <string name="blank" />-->
 
-<!--    <string name="lorem_ipsum">-->
+    <!--    <string name="lorem_ipsum">-->
 <!--        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris-->
 <!--        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus-->
 <!--        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad-->

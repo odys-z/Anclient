@@ -9,11 +9,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
-
-import com.vincent.filepicker.ToastUtil;
 
 import java.util.Objects;
 
@@ -23,6 +22,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.client.widgets.ComfirmDlg;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Profiles;
 import io.oz.albumtier.AlbumContext;
@@ -104,19 +104,33 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                       String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)));
 
     public void onRegisterDevice(View btn) {
-
         String dev = singleton.photoUser.device;
         if (LangExt.isblank(dev)) {
-            ToastUtil.getInstance ( getApplicationContext() )
-                    .showToast(io.oz.fpick.R.string.vprf_blank_device);
+            new ComfirmDlg()
+                .dlgMsg(R.string.msg_blank_device)
+                .onOk((dialog, id) -> {
+                })
+                .showDlg(this, "device");
             return;
         }
 
-        if (prefFragment.btnRegist != null) {
-            prefFragment.cateHome.removePreference(prefFragment.btnRegist);
+        if (singleton.tier.verifyDeviceId(dev)) {
+            // passed
+
+            if (prefFragment.btnRegist != null) {
+                prefFragment.cateHome.removePreference(prefFragment.btnRegist);
+            }
+            prefFragment.device.setEnabled(false);
+            prefFragment.btnLogin.setEnabled(true);
         }
-        prefFragment.device.setEnabled(false);
-        prefFragment.btnLogin.setEnabled(true);
+        else {
+            // failed
+            DialogFragment _dlg = new ComfirmDlg()
+                    .dlgMsg(R.string.msg_device_uid)
+                    .onOk((dialog, id) -> {
+                    })
+                    .showDlg(this, "device");
+        }
     }
 
     /**

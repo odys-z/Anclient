@@ -33,11 +33,12 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:layout_gravity="right"
+                android:contentDescription="@string/txt_scanjserv"
                 android:src="@drawable/scan_qr" />
         </LinearLayout>
         <Button
             android:id="@+id/btn_login"
-            android:text="@string/test_connect"
+            android:text="@string/txt_test_connect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onTestConn" />
