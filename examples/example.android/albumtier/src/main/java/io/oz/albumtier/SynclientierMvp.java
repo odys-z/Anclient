@@ -605,4 +605,13 @@ public class SynclientierMvp extends Semantier {
 		String clientpath = f.fullpath().replaceAll(":", "");
 		return EnvPath.decodeUri(tempath, f.device(), FilenameUtils.getName(clientpath));
 	}
+
+    public boolean verifyDeviceId(String dev) {
+		try {
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+    }
 }

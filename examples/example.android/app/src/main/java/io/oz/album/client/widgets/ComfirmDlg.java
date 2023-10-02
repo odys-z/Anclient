@@ -14,7 +14,7 @@ import static io.odysz.common.LangExt.is;
 
 public class ComfirmDlg extends DialogFragment {
     boolean showCancel;
-    int dlg_msg = R.string.blank;
+    int dlg_msg;
     private DialogInterface.OnClickListener onOk;
     private DialogInterface.OnClickListener onCancel;
 
