@@ -69,6 +69,7 @@ import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.PrefsContentActivity;
+import io.oz.album.client.PrefsContentActivityV2;
 import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
@@ -301,7 +302,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     protected void startPrefsAct() {
         clearMsg();
-        prefStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivity.class));
+        prefStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivityV2.class));
     }
 
     /**

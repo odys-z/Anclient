@@ -9,9 +9,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import java.util.Objects;
@@ -30,7 +30,7 @@ import io.oz.albumtier.Plicies;
 
 /**
  */
-public class PrefsContentActivity extends AppCompatActivity implements JProtocol.OnError {
+public class PrefsContentActivityV2 extends AppCompatActivity implements JProtocol.OnError {
     static AlbumContext singleton;
 
     /** uid in preference */
@@ -55,6 +55,15 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
         //https://issuetracker.google.com/issues/146166988/resources
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+    }
+
+    public void onTestConn(View btn) {
+        DialogFragment _dlg = new ComfirmDlg()
+                .dlgMsg(R.string.txt_test_connect)
+                .onOk((dialog, id) -> {
+                    System.out.println(id);
+                })
+                .showDlg(this, "test-conn");
     }
 
     public void onLogin(View btn) {
