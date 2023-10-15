@@ -22,8 +22,9 @@
     <string name="jserv_default" translatable="false">@string/product_jserv_default</string>
     <string name="jserv"         translatable="false">@string/product_landing</string>
 
-    <string name="key_regist" translatable="false">btn-register</string>
-    <string name="txt_loadused" >Restore a\nUsed Name</string>
+    <string name="key_regist"      translatable="false">btn-register</string>
+    <string name="key_restore_dev" translatable="false">btn-restore-dev</string>
+    <string name="txt_loadused" >Restore a used device</string>
     <string name="txt_regist"   >Save Device Name</string>
     <string name="txt_scanjserv">Scan jserv address.</string>
 

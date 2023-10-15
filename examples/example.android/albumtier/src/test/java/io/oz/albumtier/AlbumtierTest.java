@@ -61,14 +61,14 @@ public class AlbumtierTest {
 			fail("Why? Is server started? Or try to wait longer?");
 
 		// 2. clean
-		singleton.tier.del(singleton.photoUser.device, testfile);
+		singleton.tier.del(singleton.userInf.device, testfile);
 		
 		// 3. upload photo
 		onImagePicked();
 
 		// 4. pause
 		pause("Press Enter when you think the test is finished ...");
-		Utils.logi(singleton.photoUser.device);
+		Utils.logi(singleton.userInf.device);
     }
 
 	public static void pause(String msg) {
@@ -110,7 +110,7 @@ public class AlbumtierTest {
 
 	void refresh(List<? extends SyncDoc> mlist) {
 		synchPage = new PathsPage(0, Math.min(20, mlist.size()));
-		synchPage.device = singleton.photoUser.device;
+		synchPage.device = singleton.userInf.device;
 		if (singleton.tier != null)
 			startSynchQuery(synchPage);
 	}
@@ -132,7 +132,7 @@ public class AlbumtierTest {
             for (long i = synchPage.start(); i < synchPage.end(); i++) {
                 SyncDoc f = mList.get((int)i);
                 if (phts.keySet().contains(f.fullpath())) {
-                	assertEquals(singleton.photoUser.device, f.device());
+                	assertEquals(singleton.userInf.device, f.device());
                 	assertEquals(3, phts.get(f.fullpath()).length, "needing sync, share, share-date");
                 }
             }

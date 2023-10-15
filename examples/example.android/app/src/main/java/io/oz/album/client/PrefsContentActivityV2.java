@@ -45,7 +45,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
             singleton = AlbumContext.getInstance(this);
             oldUid = null;
         }
-        else oldUid = singleton.photoUser.uid();
+        else oldUid = singleton.userInf.uid();
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportFragmentManager()
@@ -77,7 +77,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
           singleton.login(
             (client) -> {
                 updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                updateSummery(prefFragment.homepref, getString(R.string.device_name, singleton.photoUser.device));
+                // updateSummery(prefFragment.homepref, getString(R.string.device_name, singleton.userInf.device));
 
                 // load settings
                 Anson.verbose = false;
@@ -87,7 +87,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         singleton.profiles = prf;
                         singleton.policies = new Plicies(prf);
 
-                        updateSummery(prefFragment.homepref, prf.home);
+                        // updateSummery(prefFragment.homepref, prf.home);
 
                         SharedPreferences sharedPref =
                                 PreferenceManager.getDefaultSharedPreferences(this);
@@ -113,7 +113,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                       String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)));
 
     public void onRegisterDevice(View btn) {
-        String dev = singleton.photoUser.device;
+        String dev = singleton.userInf.device;
         if (LangExt.isblank(dev)) {
             new ComfirmDlg()
                 .dlgMsg(R.string.msg_blank_device)
@@ -126,8 +126,8 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         if (singleton.tier.verifyDeviceId(dev)) {
             // passed
 
-            if (prefFragment.btnRegist != null) {
-                prefFragment.cateHome.removePreference(prefFragment.btnRegist);
+            if (prefFragment.btnRegistDev != null) {
+                prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
             }
             prefFragment.device.setEnabled(false);
             prefFragment.btnLogin.setEnabled(true);
@@ -140,6 +140,9 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                     })
                     .showDlg(this, "device");
         }
+    }
+
+    public void onRestoreDev(View btn) {
     }
 
     /**

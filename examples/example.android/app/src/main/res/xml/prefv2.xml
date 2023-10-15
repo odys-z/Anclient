@@ -5,6 +5,7 @@
     <PreferenceCategory
         android:title="@string/txt_prefs_jserv">
         <Preference
+            android:key="@string/jserv_key"
             android:layout="@layout/qr_jserv" />
     </PreferenceCategory>
     <PreferenceCategory
@@ -27,14 +28,19 @@
         <Preference
             android:key="@string/btn_login"
             android:layout="@layout/bt_login" />
-<!--        <Preference-->
-<!--            android:layout="@layout/bt_managegroups" />-->
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/txt_prefs_device"
         android:id="@+id/id_device_cate" >
+        <EditTextPreference
+            android:enabled="false"
+            android:layout_width="match_parent"
+            android:defaultValue=""
+            android:key="@string/key_device"
+            android:summary="@string/msg_only_once"
+            android:title="@string/devide_title" />
         <Preference
-            android:key="@string/key_regist"
+            android:key="@string/key_restore_dev"
             android:layout="@layout/edit_device" />
         <Preference
             android:key="@string/key_regist"

@@ -55,7 +55,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
         homepref = findPreference(AlbumApp.keys.home);
-        String devid = singleton.photoUser.device;
+        String devid = singleton.userInf.device;
         if (!LangExt.isblank(devid)) {
             homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
             findPreference(AlbumApp.keys.device).setEnabled(false);
@@ -99,13 +99,13 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 preference.setSummary("");
             }
             else if (AlbumApp.keys.usrid.equals(k)) {
-                String device = singleton.photoUser.device;
-                singleton.photoUser = new SessionInf(singleton.photoUser.ssid(), stringValue);
-                singleton.photoUser.device = device;
+                String device = singleton.userInf.device;
+                singleton.userInf = new SessionInf(singleton.userInf.ssid(), stringValue);
+                singleton.userInf.device = device;
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.device.equals(k)) {
-                singleton.photoUser.device = stringValue;
+                singleton.userInf.device = stringValue;
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.home.equals(k)) {

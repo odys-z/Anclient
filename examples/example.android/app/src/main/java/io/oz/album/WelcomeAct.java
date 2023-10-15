@@ -68,7 +68,6 @@ import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
-import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.client.PrefsContentActivityV2;
 import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
@@ -104,6 +103,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.homeCate = getString(R.string.key_home_cate);
         AlbumApp.keys.home = getString(R.string.key_home);
         AlbumApp.keys.device = getString(R.string.key_device);
+        AlbumApp.keys.restoreDev = getString(R.string.key_restore_dev);
         AlbumApp.keys.jserv = getString(R.string.jserv_key);
         AlbumApp.keys.homepage = getString(R.string.homepage_key);
         AlbumApp.keys.usrid = getString(R.string.userid_key);
@@ -194,10 +194,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         // All WebView methods must be called on the same thread.
                         runOnUiThread( () -> reloadAlbum() );
                     },
-                    (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
+                    (c, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv()));
             }
         } catch (Exception e) {
-            showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
+            showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv());
         }
     }
 
@@ -375,20 +375,20 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (clipData != null) {
                     if (singl.verbose) for (int i = 0; i < clipData.getItemCount(); i++)
                         Utils.logi("[AlbumContext.verbose] URI: %s", clipData.getItemAt(i).getUri());
-                    paths = getMultipleDocs(this, singl.photoUser.device, clipData);
+                    paths = getMultipleDocs(this, singl.userInf.device, clipData);
                     if (singl.verbose) Utils.logi(paths);
                 } else {
                     if (singl.verbose) {
                         Utils.logi("[AlbumContext.verbose] URI: %s\nPath: %s",
                                 String.valueOf(data.getData()),
-                                getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT));
+                                getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT));
                         errCtx.prepare(msgv, R.string.msg_upload_failed)
                               .err(null, "URI: %s\nPath: %s",
                                     String.valueOf(data.getData()),
-                                    getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
+                                    getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
                     }
                     paths = new ArrayList<>(1);
-                    paths.add(getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT));
+                    paths.add(getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT));
                 }
 
                 if (singl.tier == null)

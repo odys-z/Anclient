@@ -20,6 +20,9 @@
             android:name=".album.client.PrefsContentActivity"
             android:exported="false" />
         <activity
+            android:name=".album.client.PrefsContentActivityV2"
+            android:exported="false" />
+        <activity
             android:name=".album.webview.WebAlbumAct"
             android:exported="false" />
         <activity

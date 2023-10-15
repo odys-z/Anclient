@@ -1,11 +1,14 @@
 package io.oz.album.client;
 
-import static io.oz.album.client.PrefsContentActivity.singleton;
+import static io.oz.album.client.PrefsContentActivityV2.singleton;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,10 +38,13 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
 
     Preference btnLogin;
     Preference summery;
-    Preference homepref;
+    // Preference homepref;
     EditTextPreference device;
-    Preference btnRegist;
-    PreferenceCategory cateHome;
+
+    /** Preference category: device info */
+    PreferenceCategory prefcateDev;
+
+    Preference btnRegistDev;
 
     EditTextPreference pswd;
 
@@ -46,29 +52,32 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         addPreferencesFromResource(R.xml.prefv2);
 
+        prefcateDev  = findPreference(AlbumApp.keys.homeCate);
+        btnRegistDev = findPreference(AlbumApp.keys.bt_regist);
+        btnLogin     = findPreference(AlbumApp.keys.bt_login);
+        device       = findPreference(AlbumApp.keys.device);
+        pswd         = findPreference(AlbumApp.keys.pswd);
+
+        // not working
         bindPref2Val(findPreference(AlbumApp.keys.jserv));
 
-        bindPref2Val(findPreference(AlbumApp.keys.home));
-        bindPref2Val(findPreference(AlbumApp.keys.device));
+        // bindPref2Val(findPreference(AlbumApp.keys.home));
+        bindPref2Val(device);
         bindPref2Val(findPreference(AlbumApp.keys.usrid));
-        bindPref2Val(findPreference(AlbumApp.keys.pswd));
+        bindPref2Val(pswd);
 
-        cateHome  = findPreference(AlbumApp.keys.homeCate);
-        btnRegist = findPreference(AlbumApp.keys.bt_regist);
-        btnLogin  = findPreference(AlbumApp.keys.bt_login);
-        device    = findPreference(AlbumApp.keys.device);
-        pswd      = findPreference(AlbumApp.keys.pswd);
 
         pswd.setSummary("");
         pswd.setOnBindEditTextListener(editText ->
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
-        homepref = findPreference(AlbumApp.keys.home);
-        String devid = singleton.photoUser.device;
+        // homepref = findPreference(AlbumApp.keys.home);
+        String devid = singleton.userInf.device;
         if (!LangExt.isblank(devid)) {
-            homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
+            // homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
             findPreference(AlbumApp.keys.device).setEnabled(false);
-            cateHome.removePreference(btnRegist);
+            findPreference(AlbumApp.keys.restoreDev).setEnabled(false);
+            prefcateDev.removePreference(btnRegistDev);
             device.setSummary(getString(R.string.device_name, devid));
         }
         else {
@@ -78,6 +87,22 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
             btnLogin.setEnabled(false);
         }
         summery = findPreference(AlbumApp.keys.login_summery);
+
+        //
+        AutoCompleteTextView autotxt = (AutoCompleteTextView) getLayoutInflater()
+                .inflate(findPreference(AlbumApp.keys.jserv).getLayoutResource(), null)
+                .findViewById(R.id.auto_txt);
+        autotxt.setOnFocusChangeListener(
+                (view, hasFocus) -> {
+//                    if (hasFocus) {
+                        autotxt.showDropDown();
+//                    }
+                }
+        );
+        autotxt.setText("vvvvvv");
+        autotxt.setAdapter(new ArrayAdapter<>(
+                getContext(), android.R.layout.select_dialog_item,
+                new String[]{"aaa", "bbb"}));
     }
 
     static void bindPref2Val(@NonNull Preference preference) {
@@ -108,13 +133,13 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
                 preference.setSummary("");
             }
             else if (AlbumApp.keys.usrid.equals(k)) {
-                String device = singleton.photoUser.device;
-                singleton.photoUser = new SessionInf(singleton.photoUser.ssid(), stringValue);
-                singleton.photoUser.device = device;
+                String device = singleton.userInf.device;
+                singleton.userInf = new SessionInf(singleton.userInf.ssid(), stringValue);
+                singleton.userInf.device = device;
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.device.equals(k)) {
-                singleton.photoUser.device = stringValue;
+                singleton.userInf.device = stringValue;
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.home.equals(k)) {
