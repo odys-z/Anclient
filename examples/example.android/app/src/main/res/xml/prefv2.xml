@@ -4,9 +4,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:title="@string/txt_prefs_jserv">
-        <Preference
+<!--        <Preference-->
+<!--            android:key="@string/jserv_key"-->
+<!--            android:layout="@layout/qr_jserv" />-->
+        <ListPreference
             android:key="@string/jserv_key"
-            android:layout="@layout/qr_jserv" />
+            />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/txt_prefs_user"
