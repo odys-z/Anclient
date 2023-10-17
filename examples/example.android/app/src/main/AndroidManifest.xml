@@ -17,6 +17,9 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".album.client.widgets.AddJservActivity"
+            android:exported="false" />
+        <activity
             android:name=".album.client.PrefsContentActivity"
             android:exported="false" />
         <activity
@@ -27,8 +30,8 @@
             android:exported="false" />
         <activity
             android:name=".album.WelcomeAct"
-            android:exported="true"
-            android:configChanges="orientation|screenSize">
+            android:configChanges="orientation|screenSize"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -25,11 +25,10 @@
             android:onClick="onRegisterDevice" />
         <ImageButton
             android:layout_weight="0.1"
-            android:layout_width="40dp"
+            android:layout_width="wrap_content"
             android:background="#00C8C8C8"
             android:layout_height="wrap_content"
             android:onClick="onRegisterDevice"
             android:layout_gravity="right"
-            android:layout_marginHorizontal="10dp"
             android:src="@drawable/ic_question" />
 </LinearLayout>

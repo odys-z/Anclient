@@ -20,6 +20,7 @@ public class PrefKeys {
     public String jserv;
     public String homepage;
     public String device;
+    public String devCate;
     public String restoreDev;
     public String usrid;
     public String pswd;

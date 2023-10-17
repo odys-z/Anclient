@@ -1,28 +1,27 @@
 package io.oz.album.client;
 
+import static io.odysz.common.LangExt.isblank;
 import static io.oz.album.client.PrefsContentActivityV2.singleton;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
 import io.odysz.semantics.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
-import io.oz.albumtier.AlbumContext;
 
 /**
  * <h4>Preference Fragment</h4>
@@ -33,7 +32,7 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
     /**
      * Pref key: AlbumApp.keys.jserv
      */
-    AutoCompleteTextView txtJserv;
+    ListPreference lstJserv;
     Preference btnTestConn;
 
     Preference btnLogin;
@@ -52,14 +51,14 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         addPreferencesFromResource(R.xml.prefv2);
 
-        prefcateDev  = findPreference(AlbumApp.keys.homeCate);
+        prefcateDev  = findPreference(AlbumApp.keys.devCate);
         btnRegistDev = findPreference(AlbumApp.keys.bt_regist);
         btnLogin     = findPreference(AlbumApp.keys.bt_login);
+        lstJserv     = findPreference(AlbumApp.keys.jserv);
         device       = findPreference(AlbumApp.keys.device);
         pswd         = findPreference(AlbumApp.keys.pswd);
 
-        // not working
-        bindPref2Val(findPreference(AlbumApp.keys.jserv));
+        bindPref2Val(lstJserv);
 
         // bindPref2Val(findPreference(AlbumApp.keys.home));
         bindPref2Val(device);
@@ -77,6 +76,7 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
             // homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
             findPreference(AlbumApp.keys.device).setEnabled(false);
             findPreference(AlbumApp.keys.restoreDev).setEnabled(false);
+            prefcateDev.removePreference(findPreference(AlbumApp.keys.restoreDev));
             prefcateDev.removePreference(btnRegistDev);
             device.setSummary(getString(R.string.device_name, devid));
         }
@@ -89,20 +89,25 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
         summery = findPreference(AlbumApp.keys.login_summery);
 
         //
-        AutoCompleteTextView autotxt = (AutoCompleteTextView) getLayoutInflater()
-                .inflate(findPreference(AlbumApp.keys.jserv).getLayoutResource(), null)
-                .findViewById(R.id.auto_txt);
-        autotxt.setOnFocusChangeListener(
-                (view, hasFocus) -> {
-//                    if (hasFocus) {
-                        autotxt.showDropDown();
-//                    }
-                }
-        );
-        autotxt.setText("vvvvvv");
-        autotxt.setAdapter(new ArrayAdapter<>(
-                getContext(), android.R.layout.select_dialog_item,
-                new String[]{"aaa", "bbb"}));
+//        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+//        String anstr = sharedPref.getString(AlbumApp.keys.jserv, "");
+//        AnPrefEntries ents = isblank(anstr)
+//            ? new AnPrefEntries(
+//                getResources().getStringArray(R.array.jserv_entries),
+//                getResources().getStringArray(R.array.jserv_entvals) )
+//            : (AnPrefEntries) Anson.fromJson(anstr);
+
+        lstJserv.setEntries(PrefsContentActivityV2.jsvEnts.entries);
+        lstJserv.setEntryValues(PrefsContentActivityV2.jsvEnts.entVals);
+
+        lstJserv.setOnPreferenceChangeListener((v, k)->{
+            if (null != v) {
+                PrefsContentActivityV2.jsvEnts.select(k.toString());
+                v.setTitle(PrefsContentActivityV2.jsvEnts.entry());
+                v.setSummary(k.toString());
+            }
+            return true;
+        });
     }
 
     static void bindPref2Val(@NonNull Preference preference) {

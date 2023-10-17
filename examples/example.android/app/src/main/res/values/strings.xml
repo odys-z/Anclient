@@ -1,70 +1,82 @@
 <resources>
-    <string name="app_name"  >Portfolio</string>
+    <string name="app_name">Portfolio</string>
 
     <string name="menu_prefs">User Settings</string>
-    <string name="menu_help" >Help</string>
+    <string name="menu_help">Help</string>
     <string name="menu_admin">Sharing Policies</string>
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
     <string name="txt_prefs_summery_home">Group Registration</string>
-    <string name="device_name"     >Device ID: %s</string>
-    <string name="msg_only_once"   >A Device can be named only once.</string>
+    <string name="device_name">Device ID: %s</string>
+    <string name="msg_only_once">A Device can be named only once.</string>
     <string name="msg_blank_device">Device name can not be empty.</string>
 
     <string name="key_home" translatable="false">home_key</string>
-    <string name="home_title"      >Home Name</string>
+    <string name="home_title">Home Name</string>
     <string name="txt_test_connect">Test Connection</string>
 
     <string name="txt_prefs_jserv">File Service Address</string>
-    <string name="jserv_title"    >Home Server Address</string>
-    <string name="jserv_key"     translatable="false">jserv-key</string>
-    <string name="homepage_key"  translatable="false">homepage-key</string>
+    <string name="jserv_title">Home Server Address</string>
+    <string name="jserv_key" translatable="false">jserv-key</string>
+    <string name="homepage_key" translatable="false">homepage-key</string>
     <string name="jserv_default" translatable="false">@string/product_jserv_default</string>
-    <string name="jserv"         translatable="false">@string/product_landing</string>
+    <string name="jserv_name0" translatable="false">@string/product_jserv_name0</string>
+    <string name="jserv" translatable="false">@string/product_landing</string>
 
-    <string name="key_regist"      translatable="false">btn-register</string>
+    <string name="key_regist" translatable="false">btn-register</string>
     <string name="key_restore_dev" translatable="false">btn-restore-dev</string>
-    <string name="txt_loadused" >Restore a used device</string>
-    <string name="txt_regist"   >Save Device Name</string>
+    <string name="txt_loadused">Restore a used device</string>
+    <string name="txt_regist">Save Device Name</string>
     <string name="txt_scanjserv">Scan jserv address.</string>
 
     <string name="t_login_failed" translatable="false">Login to home server failed.\nUserId: %s\nService:%s</string>
     <string name="userid_summery">Also used as folder name for saving files</string>
-    <string name="userid_title"  >Login ID</string>
-    <string name="pswd_title"    >Password</string>
+    <string name="userid_title">Login ID</string>
+    <string name="pswd_title">Password</string>
     <string name="userid_key" translatable="false">my</string>
-    <string name="pswd_key"   translatable="false">pswd_key</string>
-    <string name="btn_login"  translatable="false">bt_login</string>
-    <string name="txt_login"       >User Login</string>
+    <string name="pswd_key" translatable="false">pswd_key</string>
+    <string name="btn_login" translatable="false">bt_login</string>
+    <string name="txt_login">User Login</string>
     <string name="txt_please_login">Please Login</string>
-    <string name="summery_login"   >Login to upload files to your own folder</string>
-    <string name="txt_prefs_user"  >User Account</string>
+    <string name="summery_login">Login to upload files to your own folder</string>
+    <string name="txt_prefs_user">User Account</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
-    <string name="t_synch_ok"      >%s files has been synchronized</string>
+    <string name="t_synch_ok">%s files has been synchronized</string>
     <string name="txt_prefs_device">Device Information</string>
-    <string name="devide_title"    >Device Name</string>
+    <string name="devide_title">Device Name</string>
+    <string name="key_dev_cate" translatable="false">key-device-cate</string>
     <string name="key_device" translatable="false">key-device</string>
-    <string name="login_succeed"   >Logged in successfully.</string>
+    <string name="login_succeed">Logged in successfully.</string>
 
     <string name="msg_ignore_offline">Selection / files ignored - not logged in.</string>
     <string name="msg_templ_progress">Total files: %d / %d, File Blocks: %s (%.1f%%)</string>
-    <string name="msg_upload_failed" >Uploading failed.\n%s\n%s</string>
-    <string name="msg_device_uid"    >Login as %s @ %s</string>
-    <string name="err_pref_login"    >\"Login failed!\n%s %s\"</string>
-    <string name="err_empty_pswd"    >Password is empty!</string>
+    <string name="msg_upload_failed">Uploading failed.\n%s\n%s</string>
+    <string name="msg_device_uid">Login as %s @ %s</string>
+    <string name="err_pref_login">\"Login failed!\n%s %s\"</string>
+    <string name="err_empty_pswd">Password is empty!</string>
 
     <string name="url_help">https://odys-z.github.io/products/album</string>
-    <string name="url_home"        translatable="false">https://odys-z.github.io/Anclient</string>
-    <string name="url_album"       translatable="false">%s/%s</string>
-    <string name="url_admin"       translatable="false">%s/%s</string>
+    <string name="url_landing">https://odys-z.github.io/Anclient</string>
+    <string name="url_home" translatable="false">https://odys-z.github.io/Anclient</string>
+    <string name="url_album" translatable="false">%s/%s</string>
+    <string name="url_admin" translatable="false">%s/%s</string>
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
-    <string name="url_landing"     translatable="true">https://odys-z.github.io/Anclient</string>
 
-    <string name="btn_add_file" >+ File</string>
+    <string name="btn_add_file">+ File</string>
     <string name="btn_add_audio">+ Audio</string>
     <string name="btn_add_video">+ Video</string>
-    <string name="btn_add_img"  >+ Image</string>
-    <string name="my_group"     >Current Group</string>
+    <string name="btn_add_img">+ Image</string>
+    <string name="my_group">Current Group</string>
     <string name="txt_set_groups">Set Sharing Group</string>
+    <string name="qrformat">QR_CODE</string>
+    <string name="unknown_qrformat">Unknow QR format: %s</string>
 
+    <array name="jserv_entries">
+        <item>localhost:8888</item>
+        <item>@string/jserv_name0</item>
+    </array>
+    <array name="jserv_entvals">
+        <item>http://localhost:8888</item>
+        <item>@string/product_jserv_default</item>
+    </array>
 </resources>

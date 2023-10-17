@@ -103,6 +103,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.homeCate = getString(R.string.key_home_cate);
         AlbumApp.keys.home = getString(R.string.key_home);
         AlbumApp.keys.device = getString(R.string.key_device);
+        AlbumApp.keys.devCate = getString(R.string.key_dev_cate);
         AlbumApp.keys.restoreDev = getString(R.string.key_restore_dev);
         AlbumApp.keys.jserv = getString(R.string.jserv_key);
         AlbumApp.keys.homepage = getString(R.string.homepage_key);

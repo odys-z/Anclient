@@ -10,5 +10,6 @@
         android:text="@string/txt_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="60dp"
         android:onClick="onLogin" />
 </LinearLayout>

@@ -8,39 +8,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="right"
-            >
-
-            <AutoCompleteTextView
-                android:id="@+id/auto_txt"
-                android:defaultValue="@string/jserv_default"
-                android:key="@string/jserv_key"
-                android:summary="@string/jserv"
-                android:title="@string/jserv_title"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_weight="1" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_gravity="right"
-                android:contentDescription="@string/txt_scanjserv"
-                android:src="@drawable/scan_qr" />
-        </LinearLayout>
-        <Button
-            android:id="@+id/btn_login"
-            android:text="@string/txt_test_connect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onTestConn" />
+       <Button
+           android:id="@+id/btn_login"
+           android:text="@string/txt_test_connect"
+           android:layout_weight="0.8"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="60dp"
+           android:onClick="onTestConn" />
+       <ImageButton
+           android:layout_weight="0.1"
+           android:layout_width="wrap_content"
+           android:layout_height="match_parent"
+           android:layout_marginHorizontal="10dp"
+           android:layout_gravity="right"
+           android:contentDescription="@string/txt_scanjserv"
+           android:src="@drawable/scan_qr"
+           android:onClick="onAddJserv" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
