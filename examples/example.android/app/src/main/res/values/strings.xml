@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">Portfolio</string>
 
-    <string name="menu_prefs">User Settings</string>
-    <string name="menu_help">Help</string>
-    <string name="menu_admin">Sharing Policies</string>
+    <string name="menu_prefs" >User Settings</string>
+    <string name="menu_help"  >Help</string>
+    <string name="menu_admin" >Sharing Policies</string>
+
+    <string name="txt0_ok"    >OK</string>
+    <string name="txt0_cancel">Cancel</string>
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
     <string name="txt_prefs_summery_home">Group Registration</string>
@@ -17,11 +20,12 @@
 
     <string name="txt_prefs_jserv">File Service Address</string>
     <string name="jserv_title">Home Server Address</string>
-    <string name="jserv_key" translatable="false">jserv-key</string>
-    <string name="homepage_key" translatable="false">homepage-key</string>
+    <string name="jserv_key"     translatable="false">jserv-key</string>
+    <string name="homepage_key"  translatable="false">homepage-key</string>
     <string name="jserv_default" translatable="false">@string/product_jserv_default</string>
-    <string name="jserv_name0" translatable="false">@string/product_jserv_name0</string>
-    <string name="jserv" translatable="false">@string/product_landing</string>
+    <string name="jserv_name0"   translatable="false">@string/product_jserv_name0</string>
+    <string name="jserv"         translatable="false">@string/product_landing</string>
+    <string name="qrformat"      translatable="false">QR_CODE</string>
 
     <string name="key_regist" translatable="false">btn-register</string>
     <string name="key_restore_dev" translatable="false">btn-restore-dev</string>
@@ -62,14 +66,15 @@
     <string name="url_admin" translatable="false">%s/%s</string>
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
 
-    <string name="btn_add_file">+ File</string>
+    <string name="btn_add_file" >+ File</string>
     <string name="btn_add_audio">+ Audio</string>
     <string name="btn_add_video">+ Video</string>
-    <string name="btn_add_img">+ Image</string>
-    <string name="my_group">Current Group</string>
-    <string name="txt_set_groups">Set Sharing Group</string>
-    <string name="qrformat">QR_CODE</string>
-    <string name="unknown_qrformat">Unknow QR format: %s</string>
+    <string name="btn_add_img"  >+ Image</string>
+
+    <string name="my_group"         >Current Group</string>
+    <string name="txt_set_groups"   >Set Sharing Group</string>
+    <string name="unknown_qrformat" >Unknow QR format: %s</string>
+    <string name="unknown_qrcontent">QR code or content is not recognized.</string>
 
     <array name="jserv_entries">
         <item>localhost:8888</item>

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,7 @@ import androidx.preference.PreferenceManager;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import io.odysz.anson.Anson;
@@ -84,28 +86,19 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
     public void onTestConn(View btn) {
         DialogFragment _dlg = new ComfirmDlg()
-                .dlgMsg(R.string.txt_test_connect)
+                .dlgMsg(R.string.txt_test_connect, 0)
                 .onOk((dialog, id) -> {
                     System.out.println(id);
                 })
-                .showDlg(this, "test-conn");
+                .showDlg(this, "test-conn")
+                .live(5000);
+//        new CountDownTimer(5000, 1000) {
+//            @Override public void onTick(long millisUntilFinished) { }
+//            @Override public void onFinish() { _dlg.dismiss(); }
+//        }.start();
     }
 
-    ActivityResultLauncher<Intent> addJservStarter;
     public void onAddJserv(View btn) {
-//        if (addJservStarter == null)
-//            addJservStarter = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                result -> {
-//                    Intent data = result.getData();
-//                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-//                        String jsv = data.getStringExtra(AddJservActivity.Result_Jserv);
-//
-//                    }
-//                    // reloadAlbum();
-//                });
-//        Intent intt = new Intent(this, AddJservActivity.class);
-//        addJservStarter.launch(intt);
         IntentIntegrator intentIntegrator = new IntentIntegrator(this);
         intentIntegrator.initiateScan();
     }
@@ -119,12 +112,21 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
             if (content != null) {
                 String format  = intentResult.getFormatName();
                 if (eq(format, getString(R.string.qrformat))) {
-                    jsvEnts.insert(content);
-                    prefFragment.lstJserv.setEntries(jsvEnts.entries);
-                    prefFragment.lstJserv.setEntryValues(jsvEnts.entVals);
+                    if (jsvEnts.insert(content)) {
+                        prefFragment.lstJserv.setEntries(jsvEnts.entries);
+                        prefFragment.lstJserv.setEntryValues(jsvEnts.entVals);
 
-                    prefFragment.lstJserv.setValue(jsvEnts.entVals[0]);
-                    prefFragment.lstJserv.setTitle(jsvEnts.entries[0]);
+                        prefFragment.lstJserv.setValue(jsvEnts.entVals[0]);
+                        prefFragment.lstJserv.setTitle(jsvEnts.entries[0]);
+
+                        try {
+                            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                            sharedPref.edit().putString(AlbumApp.keys.jserv, jsvEnts.toBlock());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else err(MsgCode.exGeneral, getString(R.string.unknown_qrcontent));
                 }
                 else err(MsgCode.exGeneral, getString(R.string.unknown_qrformat, format));
             }
@@ -183,7 +185,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         String dev = singleton.userInf.device;
         if (LangExt.isblank(dev)) {
             new ComfirmDlg()
-                .dlgMsg(R.string.msg_blank_device)
+                .dlgMsg(R.string.msg_blank_device, 0)
                 .onOk((dialog, id) -> {
                 })
                 .showDlg(this, "device");
@@ -202,7 +204,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         else {
             // failed
             DialogFragment _dlg = new ComfirmDlg()
-                    .dlgMsg(R.string.msg_device_uid)
+                    .dlgMsg(R.string.msg_device_uid, 0)
                     .onOk((dialog, id) -> {
                     })
                     .showDlg(this, "device");

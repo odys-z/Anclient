@@ -1,12 +1,18 @@
 package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.isblank;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AnPrefEntries {
+import io.odysz.anson.Anson;
+
+/**
+ * @since 0.3.0
+ */
+public class AnPrefEntries extends Anson {
     /** current selected index */
     int ix = -1;
     public String[] entries;
@@ -17,10 +23,18 @@ public class AnPrefEntries {
         this.entVals = entvals;
     }
 
-    static <T> int forLoopIndex(T[] numbers, T target) {
-        for (int index = 0; index < numbers.length; index++) {
-            if (numbers[index] == target
-                    || target instanceof String && eq((String)numbers[index], (String) target)) {
+
+    /**
+     * Using for-loop to find the index.
+     * @param arr array
+     * @param target
+     * @return index
+     * @param <T>
+     */
+    static <T> int indexOf(T[] arr, T target) {
+        for (int index = 0; index < arr.length; index++) {
+            if (arr[index] == target
+                    || target instanceof String && eq((String)arr[index], (String) target)) {
                 return index;
             }
         }
@@ -35,7 +49,7 @@ public class AnPrefEntries {
         }
     }
 
-    private static <T> T[] insertAt(T[] arr, T element, int position) {
+    static <T> T[] insertAt(T[] arr, T element, int position) {
         List<T> list = new ArrayList<>(Arrays.asList(arr));
         list.add(position, element);
         return list.toArray(arr);
@@ -43,7 +57,7 @@ public class AnPrefEntries {
 
 
     public String select(String val) {
-        ix = forLoopIndex(entVals, val);
+        ix = indexOf(entVals, val);
         if (ix >= 0 && ix < entries.length)
             return entries[ix];
         return null;
@@ -52,12 +66,14 @@ public class AnPrefEntries {
     /**
      * Insert a new name-url pair, if already exists, swap to the first
      *
-     * @param jserv name\nurl
+     * @param jserv 0.3.0: name\nurl
+     * @return true if content seems usable
+     * @since 0.3.0
      */
-    public void insert(String jserv) {
+    public boolean insert(String jserv) {
         String[] jss = jserv.split("\n");
-        if (jss != null && jss.length >= 2) {
-            int i = forLoopIndex(entVals, jss[1]);
+        if (jss != null && jss.length >= 2 && !isblank(jss[0]) && !isblank(jss[1])) {
+            int i = indexOf(entVals, jss[1]);
             if (i > 0) {
                 swap(entVals, 0, i);
                 swap(entries, 0, i);
@@ -68,7 +84,9 @@ public class AnPrefEntries {
                 entVals = insertAt(entVals, jss[1], 0);
                 ix = 0;
             }
+            return true;
         }
+        return false;
     }
 
     /** get current entry */

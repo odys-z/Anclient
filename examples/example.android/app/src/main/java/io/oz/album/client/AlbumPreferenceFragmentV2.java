@@ -17,6 +17,8 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import java.io.IOException;
+
 import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
 import io.odysz.semantics.SessionInf;
@@ -100,14 +102,14 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
         lstJserv.setEntries(PrefsContentActivityV2.jsvEnts.entries);
         lstJserv.setEntryValues(PrefsContentActivityV2.jsvEnts.entVals);
 
-        lstJserv.setOnPreferenceChangeListener((v, k)->{
-            if (null != v) {
-                PrefsContentActivityV2.jsvEnts.select(k.toString());
-                v.setTitle(PrefsContentActivityV2.jsvEnts.entry());
-                v.setSummary(k.toString());
-            }
-            return true;
-        });
+//        lstJserv.setOnPreferenceChangeListener((v, k)->{
+//            if (null != v) {
+//                PrefsContentActivityV2.jsvEnts.select(k.toString());
+//                v.setTitle(PrefsContentActivityV2.jsvEnts.entry());
+//                v.setSummary(k.toString());
+//            }
+//            return true;
+//        });
     }
 
     static void bindPref2Val(@NonNull Preference preference) {
@@ -131,6 +133,8 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
             String k = preference.getKey();
             if (k.equals(AlbumApp.keys.jserv)) {
                 singleton.jserv(stringValue);
+                PrefsContentActivityV2.jsvEnts.select(stringValue);
+                preference.setTitle(PrefsContentActivityV2.jsvEnts.entry());
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.pswd.equals(k)) {

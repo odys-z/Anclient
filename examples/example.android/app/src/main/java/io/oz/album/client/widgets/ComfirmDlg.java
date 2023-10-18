@@ -3,6 +3,7 @@ package io.oz.album.client.widgets;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -15,6 +16,9 @@ import static io.odysz.common.LangExt.is;
 public class ComfirmDlg extends DialogFragment {
     boolean showCancel;
     int dlg_msg;
+    int txt_ok;
+    int txt_cancel;
+    int livingms;
     private DialogInterface.OnClickListener onOk;
     private DialogInterface.OnClickListener onCancel;
 
@@ -22,8 +26,18 @@ public class ComfirmDlg extends DialogFragment {
         this.showCancel = is(showCancel);
     }
 
-    public ComfirmDlg dlgMsg(int msg) {
+
+    /**
+     *
+     * @param msg
+     * @param ok OK button text, 0 for default
+     * @param cancel Cancel button text, 0 for default
+     * @return this
+     */
+    public ComfirmDlg dlgMsg(int msg, int ok, int... cancel) {
         dlg_msg = msg;
+        txt_ok = ok > 0 ? ok : R.string.txt0_ok;
+        txt_cancel = cancel == null || cancel.length == 0 ? R.string.txt0_cancel : cancel[0];
         return this;
     }
 
@@ -52,8 +66,19 @@ public class ComfirmDlg extends DialogFragment {
         return builder.create();
     }
 
-    public DialogFragment showDlg(FragmentActivity act, String tag) {
+    public ComfirmDlg showDlg(FragmentActivity act, String tag) {
         show(act.getSupportFragmentManager(), tag);
+        if (livingms > 0) {
+            new CountDownTimer(livingms, livingms) {
+                @Override public void onTick(long millisUntilFinished) { }
+                @Override public void onFinish() { dismiss(); }
+            }.start();
+        }
+        return this;
+    }
+
+    public ComfirmDlg live(int milliseconds) {
+        livingms = milliseconds;
         return this;
     }
 }
