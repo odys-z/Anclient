@@ -106,7 +106,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     public void onRegisterDevice(View btn) {
         String dev = singleton.userInf.device;
         if (LangExt.isblank(dev)) {
-            new ComfirmDlg()
+            new ComfirmDlg(this)
                 .dlgMsg(R.string.msg_blank_device, 0)
                 .onOk((dialog, id) -> {
                 })
@@ -125,10 +125,9 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         }
         else {
             // failed
-            DialogFragment _dlg = new ComfirmDlg()
+            DialogFragment _dlg = new ComfirmDlg(this)
                     .dlgMsg(R.string.msg_device_uid, 0)
-                    .onOk((dialog, id) -> {
-                    })
+                    .onOk((dialog, id) -> { })
                     .showDlg(this, "device");
         }
     }

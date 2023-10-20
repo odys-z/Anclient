@@ -38,7 +38,7 @@
         </LinearLayout>
         <Button
             android:id="@+id/btn_login"
-            android:text="@string/txt_test_connect"
+            android:text="@string/msg_conn_err"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onTestConn" />

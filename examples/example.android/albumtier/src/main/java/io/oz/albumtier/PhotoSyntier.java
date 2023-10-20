@@ -2,20 +2,24 @@ package io.oz.albumtier;
 
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
+import static io.oz.albumtier.AlbumContext.clientUri;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.DocLocks;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
+import io.odysz.jclient.InsecureClient;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
+import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
@@ -24,6 +28,7 @@ import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
+import io.odysz.semantic.jserv.echo.EchoReq;
 import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -42,7 +47,7 @@ import io.oz.album.tier.PhotoRec;
 /**
  * Photo client,
  * 
- * @deprecated only for MVP (0.2.x)
+ * @deprecated only for MVP (0.3.x)
  * 
  * @author odys-z@github.com
  *
@@ -406,5 +411,46 @@ public class PhotoSyntier extends SynclientierMvp {
 			errCtx.err(MsgCode.exIo, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
 		}
 		return resp;
+	}
+
+	/**
+	 * TODO: move to Clients
+	 * Ping port echo without session.
+	 *
+	 * @param funcUri
+	 * @param errCtx
+	 * @return echo message
+	 * @throws IOException
+	 * @throws AnsonException
+	 * @throws SemanticException
+	 */
+	public static AnsonResp pingLess(String funcUri, OnError errCtx)
+			throws SemanticException, AnsonException, IOException {
+		Utils.warn("Use Clients.pingLess() instead!");
+		EchoReq req = new EchoReq(null);
+		req.a(EchoReq.A.echo);
+
+		InsecureClient client = new InsecureClient(null);
+		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
+
+		Anson.verbose = true;
+		AnsonResp resp = client.commit(jmsg, errCtx);
+
+		return resp;
+	}
+
+	public static void asyPing(String funcUri, OnOk ok, OnError err) {
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					AnsonResp resp = pingLess(clientUri, err);
+					ok.ok(resp);
+					;
+				} catch (IOException e) {
+					err.err(MsgCode.exIo, e.getMessage());
+				} catch (SemanticException e) {
+					err.err(MsgCode.exSemantic, e.getMessage());
+				}
+			}}).start();
 	}
 }

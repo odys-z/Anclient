@@ -125,8 +125,10 @@ public class AlbumContext {
 	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
+    	/* 0.3.0 allowed
         if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
+        */
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 

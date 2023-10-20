@@ -46,13 +46,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#DFF1F1F1"
-            android:maxWidth="72sp"
-            android:minWidth="72sp"
+            android:maxWidth="64sp"
+            android:minWidth="56sp"
             android:onClick="onClick"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
             android:text="@string/btn_add_file"
-            android:textSize="14sp"
+            android:textSize="12sp"
             tools:ignore="TouchTargetSizeCheck" />
 
         <Button
@@ -61,13 +61,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10sp"
             android:background="#DFF1F1F1"
-            android:maxWidth="72sp"
-            android:minWidth="72sp"
+            android:maxWidth="64sp"
+            android:minWidth="56sp"
             android:onClick="onClick"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
             android:text="@string/btn_add_audio"
-            android:textSize="14sp"
+            android:textSize="12sp"
             tools:ignore="TouchTargetSizeCheck" />
 
         <Button
@@ -76,13 +76,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10sp"
             android:background="#DFF1F1F1"
-            android:maxWidth="72sp"
-            android:minWidth="72sp"
+            android:maxWidth="64sp"
+            android:minWidth="56sp"
             android:onClick="onClick"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
             android:text="@string/btn_add_video"
-            android:textSize="14sp"
+            android:textSize="12sp"
             tools:ignore="TouchTargetSizeCheck" />
 
         <Button
@@ -91,13 +91,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10sp"
             android:background="#DFF1F1F1"
-            android:maxWidth="72sp"
-            android:minWidth="72sp"
+            android:maxWidth="64sp"
+            android:minWidth="56sp"
             android:onClick="onClick"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
             android:text="@string/btn_add_img"
-            android:textSize="14sp"
+            android:textSize="12sp"
             tools:ignore="TouchTargetSizeCheck" />
 
     </LinearLayout>

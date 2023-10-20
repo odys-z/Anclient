@@ -1,5 +1,6 @@
 package io.oz.album.client.widgets;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import io.oz.R;
 import static io.odysz.common.LangExt.is;
 
 public class ComfirmDlg extends DialogFragment {
+    private final Activity acty;
     boolean showCancel;
     int dlg_msg;
     int txt_ok;
@@ -22,22 +24,22 @@ public class ComfirmDlg extends DialogFragment {
     private DialogInterface.OnClickListener onOk;
     private DialogInterface.OnClickListener onCancel;
 
-    public ComfirmDlg(boolean... showCancel) {
+    public ComfirmDlg(final Activity acty, boolean... showCancel) {
+        this.acty = acty;
         this.showCancel = is(showCancel);
     }
-
 
     /**
      *
      * @param msg
-     * @param ok OK button text, 0 for default
-     * @param cancel Cancel button text, 0 for default
+     * @param txtOk OK button text, 0 for default
+     * @param txtCancel Cancel button text, 0 for default
      * @return this
      */
-    public ComfirmDlg dlgMsg(int msg, int ok, int... cancel) {
+    public ComfirmDlg dlgMsg(int msg, int txtOk, int... txtCancel) {
         dlg_msg = msg;
-        txt_ok = ok > 0 ? ok : R.string.txt0_ok;
-        txt_cancel = cancel == null || cancel.length == 0 ? R.string.txt0_cancel : cancel[0];
+        txt_ok = txtOk > 0 ? txtOk : R.string.txt0_ok;
+        txt_cancel = txtCancel == null || txtCancel.length == 0 ? R.string.txt0_cancel : txtCancel[0];
         return this;
     }
 
@@ -55,11 +57,12 @@ public class ComfirmDlg extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(dlg_msg)
-                .setPositiveButton(dlg_msg, (dialog, id) -> {
+                .setPositiveButton(txt_ok, (dialog, id) -> {
                     if (onOk != null)
                         onOk.onClick(dialog, id);
-                })
-                .setNegativeButton(dlg_msg, (dialog, id) -> {
+                });
+        if (showCancel)
+            builder.setNegativeButton(txt_cancel, (dialog, id) -> {
                     if (onCancel != null)
                         onCancel.onClick(dialog, id);
                 });
@@ -67,18 +70,41 @@ public class ComfirmDlg extends DialogFragment {
     }
 
     public ComfirmDlg showDlg(FragmentActivity act, String tag) {
-        show(act.getSupportFragmentManager(), tag);
-        if (livingms > 0) {
-            new CountDownTimer(livingms, livingms) {
-                @Override public void onTick(long millisUntilFinished) { }
-                @Override public void onFinish() { dismiss(); }
-            }.start();
-        }
+        show(getActivity().getSupportFragmentManager(), tag);
+        dismissin(livingms);
         return this;
+    }
+
+    private void dismissin(int ms) {
+        if (ms > 0) {
+            acty.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new CountDownTimer(ms, ms) {
+                        @Override public void onTick(long millisUntilFinished) { }
+                        @Override public void onFinish() { dismiss(); }
+                    }.start();
+                }
+            } );
+        }
+//            new CountDownTimer(ms, ms) {
+//                @Override public void onTick(long millisUntilFinished) { }
+//                @Override public void onFinish() { dismiss(); }
+////                @Override public void onFinish() {
+////                    getActivity().runOnUiThread(new Runnable() {
+////                        @Override
+////                        public void run() {
+////                            dismiss();
+////                        }
+////                    });
+////                }
+////            }.start();
+//        }
     }
 
     public ComfirmDlg live(int milliseconds) {
         livingms = milliseconds;
+        dismissin(livingms);
         return this;
     }
 }

@@ -3,18 +3,17 @@ package io.oz.album.client;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import static io.oz.albumtier.AlbumContext.clientUri;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
@@ -36,9 +35,11 @@ import io.oz.album.client.widgets.ComfirmDlg;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Profiles;
 import io.oz.albumtier.AlbumContext;
+import io.oz.albumtier.PhotoSyntier;
 import io.oz.albumtier.Plicies;
 
 /**
+ * @since 0.3.0
  */
 public class PrefsContentActivityV2 extends AppCompatActivity implements JProtocol.OnError {
     static AlbumContext singleton;
@@ -85,17 +86,29 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
     }
 
     public void onTestConn(View btn) {
-        DialogFragment _dlg = new ComfirmDlg()
-                .dlgMsg(R.string.txt_test_connect, 0)
+        PhotoSyntier.asyPing(clientUri,
+            (m) -> {
+                confirm(R.string.msg_conn_ok, 3000);
+            },
+            (c, m, a) -> {
+                new ComfirmDlg(this)
+                        .dlgMsg(R.string.msg_conn_err, 0)
+                        .onOk((dialog, id) -> {
+                            dialog.dismiss();
+                        })
+                        .showDlg(this, "")
+                        .live(5000);
+            });
+    }
+
+    private void confirm(int msgid, int live, int... msgOk) {
+        new ComfirmDlg(this)
+                .dlgMsg(msgid, msgOk == null ? 0 : msgOk[0])
                 .onOk((dialog, id) -> {
-                    System.out.println(id);
+                    dialog.dismiss();
                 })
-                .showDlg(this, "test-conn")
-                .live(5000);
-//        new CountDownTimer(5000, 1000) {
-//            @Override public void onTick(long millisUntilFinished) { }
-//            @Override public void onFinish() { _dlg.dismiss(); }
-//        }.start();
+                .showDlg(this, "")
+                .live(live);
     }
 
     public void onAddJserv(View btn) {
@@ -103,6 +116,12 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         intentIntegrator.initiateScan();
     }
 
+    /**
+     * On qr-scanning results.
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -137,16 +156,18 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
     public void onLogin(View btn) {
         if (isblank(singleton.pswd())) {
-            updateSummery(prefFragment.pswd, "");
-            updateSummery(prefFragment.summery, getString(R.string.err_empty_pswd));
-            updateSummery(prefFragment.pswd, getString(R.string.pswd_title));
+            // updateSummery(prefFragment.pswd, "");
+            // updateSummery(prefFragment.summery, getString(R.string.err_empty_pswd));
+            confirm(R.string.err_empty_pswd, 5000);
+            // updateSummery(prefFragment.pswd, getString(R.string.pswd_title));
+            // confirm(R.string.pswd_title, 5000);
             return;
         }
         try {
           singleton.login(
             (client) -> {
-                updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                // updateSummery(prefFragment.homepref, getString(R.string.device_name, singleton.userInf.device));
+                // updateSummery(prefFragment.summery, getString(R.string.login_succeed));
+                confirm(R.string.login_succeed, 3000);
 
                 // load settings
                 Anson.verbose = false;
@@ -165,30 +186,37 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         editor.putString(AlbumApp.keys.homepage, prf.webroot);
                         editor.apply();
                     },
-                    showErrSummary);
+                    // showErrSummary);
+                    showErrConfirm);
             },
-            showErrSummary);
+            // showErrSummary);
+            showErrConfirm);
         } catch (Exception e) {
-            Log.e(AlbumContext.clientUri, e.getClass().getName() + e.getMessage());
+            Log.e(clientUri, e.getClass().getName() + e.getMessage());
             updateSummery(prefFragment.summery, getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
         }
     }
 
     /**
      * common function for error handling
+     * @deprecated replaced wity {@link io.oz.album.client.widgets.ComfirmDlg}
      */
     JProtocol.OnError showErrSummary = (c, t, args) ->
         updateSummery(prefFragment.summery,
                       String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)));
 
+    JProtocol.OnError showErrConfirm = (c, t, args) ->
+            // confirm(String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)), 5000);
+            confirm(R.string.app_name, 5000);
+
     public void onRegisterDevice(View btn) {
         String dev = singleton.userInf.device;
         if (LangExt.isblank(dev)) {
-            new ComfirmDlg()
-                .dlgMsg(R.string.msg_blank_device, 0)
-                .onOk((dialog, id) -> {
-                })
-                .showDlg(this, "device");
+            new ComfirmDlg(this)
+                    .dlgMsg(R.string.msg_blank_device, 0)
+                    .onOk((dialog, id) -> {
+                    })
+                    .showDlg(this, "device");
             return;
         }
 
@@ -199,11 +227,10 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                 prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
             }
             prefFragment.device.setEnabled(false);
-            prefFragment.btnLogin.setEnabled(true);
         }
         else {
             // failed
-            DialogFragment _dlg = new ComfirmDlg()
+            DialogFragment _dlg = new ComfirmDlg(this)
                     .dlgMsg(R.string.msg_device_uid, 0)
                     .onOk((dialog, id) -> {
                     })

@@ -10,16 +10,18 @@
 
     <string name="key_home_cate" translatable="false">key-home-cate</string>
     <string name="txt_prefs_summery_home">Group Registration</string>
-    <string name="device_name">Device ID: %s</string>
-    <string name="msg_only_once">A Device can be named only once.</string>
-    <string name="msg_blank_device">Device name can not be empty.</string>
+    <string name="device_name"           >Device ID: %s</string>
+    <string name="msg_only_once"         >A Device can be named only once.</string>
+    <string name="msg_blank_device"      >Device name can not be empty.</string>
 
     <string name="key_home" translatable="false">home_key</string>
-    <string name="home_title">Home Name</string>
-    <string name="txt_test_connect">Test Connection</string>
-
+    <string name="home_title"     >Home Name</string>
     <string name="txt_prefs_jserv">File Service Address</string>
-    <string name="jserv_title">Home Server Address</string>
+    <string name="jserv_title"    >Home Server Address</string>
+    <string name="txt_test_conn"  >Test Connection</string>
+    <string name="msg_conn_ok"    >Connecting to server succeed.</string>
+    <string name="msg_conn_err"   >Connecting to server failed.</string>
+
     <string name="jserv_key"     translatable="false">jserv-key</string>
     <string name="homepage_key"  translatable="false">homepage-key</string>
     <string name="jserv_default" translatable="false">@string/product_jserv_default</string>

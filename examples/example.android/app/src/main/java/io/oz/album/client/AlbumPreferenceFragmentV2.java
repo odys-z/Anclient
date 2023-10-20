@@ -86,7 +86,7 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
             findPreference(AlbumApp.keys.device).setEnabled(true);
             device.setSummary(R.string.msg_only_once);
 
-            btnLogin.setEnabled(false);
+            // btnLogin.setEnabled(false);
         }
         summery = findPreference(AlbumApp.keys.login_summery);
 
