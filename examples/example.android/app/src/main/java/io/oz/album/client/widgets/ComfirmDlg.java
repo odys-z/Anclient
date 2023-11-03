@@ -17,12 +17,15 @@ import static io.odysz.common.LangExt.is;
 public class ComfirmDlg extends DialogFragment {
     private final Activity acty;
     boolean showCancel;
-    int dlg_msg;
+    int msgid;
+    /** default for msgid == 0 */
+    String msg;
+
     int txt_ok;
     int txt_cancel;
     int livingms;
-    private DialogInterface.OnClickListener onOk;
-    private DialogInterface.OnClickListener onCancel;
+    DialogInterface.OnClickListener onOk;
+    DialogInterface.OnClickListener onCancel;
 
     public ComfirmDlg(final Activity acty, boolean... showCancel) {
         this.acty = acty;
@@ -37,9 +40,14 @@ public class ComfirmDlg extends DialogFragment {
      * @return this
      */
     public ComfirmDlg dlgMsg(int msg, int txtOk, int... txtCancel) {
-        dlg_msg = msg;
+        msgid = msg;
         txt_ok = txtOk > 0 ? txtOk : R.string.txt0_ok;
         txt_cancel = txtCancel == null || txtCancel.length == 0 ? R.string.txt0_cancel : txtCancel[0];
+        return this;
+    }
+
+    public ComfirmDlg msg(String msg) {
+        this.msg = msg;
         return this;
     }
 
@@ -56,8 +64,12 @@ public class ComfirmDlg extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(dlg_msg)
-                .setPositiveButton(txt_ok, (dialog, id) -> {
+        if (msgid == 0)
+            builder.setMessage(this.msg);
+        else
+            builder.setMessage(msgid);
+
+        builder.setPositiveButton(txt_ok, (dialog, id) -> {
                     if (onOk != null)
                         onOk.onClick(dialog, id);
                 });
