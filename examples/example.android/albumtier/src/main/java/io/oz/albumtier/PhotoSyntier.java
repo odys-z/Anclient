@@ -455,7 +455,7 @@ public class PhotoSyntier extends SynclientierMvp {
 		EchoReq req = new EchoReq(null);
 		req.a(EchoReq.A.echo);
 
-		InsecureClient client = new InsecureClient(null);
+		InsecureClient client = new InsecureClient();
 		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
 
 		Anson.verbose = true;
