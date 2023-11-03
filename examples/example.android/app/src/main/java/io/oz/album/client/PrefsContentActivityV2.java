@@ -101,16 +101,6 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
             });
     }
 
-    private void confirm(int msgid, int live, int... msgOk) {
-        new ComfirmDlg(this)
-                .dlgMsg(msgid, msgOk == null ? 0 : msgOk[0])
-                .onOk((dialog, id) -> {
-                    dialog.dismiss();
-                })
-                .showDlg(this, "")
-                .live(live);
-    }
-
     public void onAddJserv(View btn) {
         IntentIntegrator intentIntegrator = new IntentIntegrator(this);
         intentIntegrator.initiateScan();
@@ -212,11 +202,12 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
     public void onRegisterDevice(View btn) {
         String dev = singleton.userInf.device;
         if (LangExt.isblank(dev)) {
-            new ComfirmDlg(this)
-                    .dlgMsg(R.string.msg_blank_device, 0)
-                    .onOk((dialog, id) -> {
-                    })
-                    .showDlg(this, "device");
+//            new ComfirmDlg(this)
+//                    .dlgMsg(R.string.msg_blank_device, 0)
+//                    .onOk((dialog, id) -> {
+//                    })
+//                    .showDlg(this, "device");
+            confirm(R.string.msg_blank_device, 3000);
             return;
         }
 
@@ -230,16 +221,20 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         }
         else {
             // failed
-            DialogFragment _dlg = new ComfirmDlg(this)
-                    .dlgMsg(R.string.msg_device_uid, 0)
-                    .onOk((dialog, id) -> {
-                    })
-                    .showDlg(this, "device");
+//            DialogFragment _dlg = new ComfirmDlg(this)
+//                    .dlgMsg(R.string.msg_device_uid, 0)
+//                    .onOk((dialog, id) -> {
+//                    })
+//                    .showDlg(this, "device");
+            confirm(R.string.msg_device_uid, 0);
         }
     }
 
     public void onRestoreDev(View btn) {
     }
+
+
+    ////////////////// TODO side task: new confirm dialog pattern /////////////////////////
 
     /**
      * Set text into EditText's summery, running in ui thread.
@@ -263,4 +258,15 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
     public void err(MsgCode c, String msg, String... args) {
         this.showErrSummary.err(c, msg, args);
     }
+    void confirm(int msgid, int live, int... msgOk) {
+        new ComfirmDlg(this)
+                .dlgMsg(msgid, msgOk == null ? 0 : msgOk[0])
+                .onOk((dialog, id) -> {
+                    dialog.dismiss();
+                })
+                .showDlg(this, "")
+                .live(live);
+    }
+
+
 }
