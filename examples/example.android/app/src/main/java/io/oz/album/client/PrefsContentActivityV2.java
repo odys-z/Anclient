@@ -4,6 +4,7 @@ import static java.security.AccessController.getContext;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import static io.oz.AlbumApp.keys;
 import static io.oz.albumtier.AlbumContext.clientUri;
 
 import android.content.Context;
@@ -66,7 +67,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         else oldUid = singleton.userInf.uid();
 
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        String anstr = sharedPref.getString(AlbumApp.keys.jserv, "");
+        String anstr = sharedPref.getString(keys.jserv, "");
         jsvEnts = isblank(anstr)
                 ? new AnPrefEntries(
                 getResources().getStringArray(R.array.jserv_entries),
@@ -105,16 +106,6 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         .live(5000);
             });
     }
-
-//    void confirm(int msgid, int live, int... msgOk) {
-//        new ComfirmDlg(this)
-//            .dlgMsg(msgid, msgOk == null ? 0 : msgOk[0])
-//            .onOk((dialog, id) -> {
-//                dialog.dismiss();
-//            })
-//            .showDlg("")
-//            .live(live);
-//    }
 
     void errorDlg(String msg, int live) {
         new ComfirmDlg(this)
@@ -157,7 +148,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
                         try {
                             SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-                            sharedPref.edit().putString(AlbumApp.keys.jserv, jsvEnts.toBlock());
+                            sharedPref.edit().putString(keys.jserv, jsvEnts.toBlock());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -199,8 +190,8 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         SharedPreferences sharedPref =
                                 PreferenceManager.getDefaultSharedPreferences(this);
                         SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString(AlbumApp.keys.home, prf.home);
-                        editor.putString(AlbumApp.keys.homepage, prf.webroot);
+                        editor.putString(keys.home, prf.home);
+                        editor.putString(keys.homepage, prf.webroot);
                         editor.apply();
                     },
                     // showErrSummary);
@@ -266,13 +257,17 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
         try {
             singleton.tier.asyAvailableDevices( (resp) -> {
-                String[] choices = {"Item One", "Item Two", "Item Three"};
+                // String[] choices = {"Item One", "Item Two", "Item Three"};
                 try {
-                    choices = ((AnResultset)resp.rs(0)).toArr("device").toArray(new String[] {});
+                    final String[] choices = ((AnResultset)resp.rs(0)).toArr("device").toArray(new String[] {});
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder .setTitle("I am the title")
-                            .setPositiveButton("Positive", (dialog, which) -> { })
+                    String dev_usedby = "Device name used by " + singleton.userInf.userName();
+                    builder .setTitle(dev_usedby)
+                            .setPositiveButton("Positive", (dialog, which) -> {
+                                updateTitle(prefFragment.findPreference(keys.device), choices[which]);
+                                updateSummery(prefFragment.findPreference(keys.device), dev_usedby);
+                            })
                             .setNegativeButton("Negative", (dialog, which) -> { })
                             .setSingleChoiceItems(choices, 0, (dialog, which) -> { });
 
@@ -286,7 +281,6 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         }
     }
 
-
     ////////////////// TODO side task: new confirm dialog pattern /////////////////////////
 
     /**
@@ -297,6 +291,10 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
      */
     void updateSummery(Preference of, String s) {
         runOnUiThread(() -> of.setSummary(s));
+    }
+
+    void updateTitle(Preference of, String s) {
+        runOnUiThread(() -> of.setTitle(s));
     }
 
     @Override
