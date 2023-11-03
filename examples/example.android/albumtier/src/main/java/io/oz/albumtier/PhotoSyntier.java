@@ -131,7 +131,32 @@ public class PhotoSyntier extends SynclientierMvp {
 	  }).start();
 	  return this;
 	}
-	
+
+	public PhotoSyntier asyAvailableDevices(OnOk ok, ErrorCtx... onErr) throws IOException, SemanticException {
+		new Thread(() -> {
+			try {
+				AnsonHeader header = client.header()
+						.act(uri, "devices", "r/devices", "restore devices");
+
+				AlbumReq req = new AlbumReq(uri);
+				req.a(DocsReq.A.devices);
+				AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req)
+						.header(header);
+				AnsonResp resp = client.commit(q, errCtx);
+				ok.ok(resp);
+			} catch (IOException e) {
+				if (isNull(onErr))
+					errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
+				else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
+			} catch (AnsonException | SemanticException e) {
+				if (isNull(onErr))
+					errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
+				else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
+			}
+		}).start();
+		return this;
+	}
+
 	/**
 	 * @see #syncVideos(List, OnProcess, OnDocOk, OnError...)
      *

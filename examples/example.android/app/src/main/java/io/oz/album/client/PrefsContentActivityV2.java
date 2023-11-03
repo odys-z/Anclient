@@ -1,5 +1,6 @@
 package io.oz.album.client;
 
+import static java.security.AccessController.getContext;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
@@ -24,11 +26,14 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Objects;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
+import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.widgets.ComfirmDlg;
@@ -96,10 +101,32 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         .onOk((dialog, id) -> {
                             dialog.dismiss();
                         })
-                        .showDlg(this, "")
+                        .showDlg("")
                         .live(5000);
             });
     }
+
+//    void confirm(int msgid, int live, int... msgOk) {
+//        new ComfirmDlg(this)
+//            .dlgMsg(msgid, msgOk == null ? 0 : msgOk[0])
+//            .onOk((dialog, id) -> {
+//                dialog.dismiss();
+//            })
+//            .showDlg("")
+//            .live(live);
+//    }
+
+    void errorDlg(String msg, int live) {
+        new ComfirmDlg(this)
+                .dlgMsg(0, 0)
+                .msg(msg)
+                .onOk((dialog, id) -> {
+                    dialog.dismiss();
+                })
+                .showDlg("")
+                .live(live);
+    }
+
 
     public void onAddJserv(View btn) {
         IntentIntegrator intentIntegrator = new IntentIntegrator(this);
@@ -183,7 +210,8 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
             showErrConfirm);
         } catch (Exception e) {
             Log.e(clientUri, e.getClass().getName() + e.getMessage());
-            updateSummery(prefFragment.summery, getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
+            // updateSummery(prefFragment.summery, getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
+            showErrConfirm.err(MsgCode.exGeneral, getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
         }
     }
 
@@ -197,7 +225,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
     JProtocol.OnError showErrConfirm = (c, t, args) ->
             // confirm(String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)), 5000);
-            confirm(R.string.app_name, 5000);
+            errorDlg(t, 5000);
 
     public void onRegisterDevice(View btn) {
         String dev = singleton.userInf.device;
@@ -221,16 +249,41 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         }
         else {
             // failed
-//            DialogFragment _dlg = new ComfirmDlg(this)
-//                    .dlgMsg(R.string.msg_device_uid, 0)
-//                    .onOk((dialog, id) -> {
-//                    })
-//                    .showDlg(this, "device");
+//            new ComfirmDlg(this)
+//                .dlgMsg(R.string.msg_device_uid, 0)
+//                .onOk((dialog, id) -> {
+//                })
+//                .showDlg(this, "device");
             confirm(R.string.msg_device_uid, 0);
         }
     }
 
     public void onRestoreDev(View btn) {
+        if (singleton.state() != AlbumContext.ConnState.Online) {
+            confirm(R.string.msg_log4device, 5000);
+            return;
+        }
+
+        try {
+            singleton.tier.asyAvailableDevices( (resp) -> {
+                String[] choices = {"Item One", "Item Two", "Item Three"};
+                try {
+                    choices = ((AnResultset)resp.rs(0)).toArr("device").toArray(new String[] {});
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder .setTitle("I am the title")
+                            .setPositiveButton("Positive", (dialog, which) -> { })
+                            .setNegativeButton("Negative", (dialog, which) -> { })
+                            .setSingleChoiceItems(choices, 0, (dialog, which) -> { });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } });
+        } catch (IOException | SemanticException e) {
+            errorDlg(e.getMessage(), 0);
+        }
     }
 
 
@@ -258,15 +311,15 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
     public void err(MsgCode c, String msg, String... args) {
         this.showErrSummary.err(c, msg, args);
     }
+
     void confirm(int msgid, int live, int... msgOk) {
         new ComfirmDlg(this)
                 .dlgMsg(msgid, msgOk == null ? 0 : msgOk[0])
                 .onOk((dialog, id) -> {
                     dialog.dismiss();
                 })
-                .showDlg(this, "")
+                .showDlg( "")
                 .live(live);
     }
-
 
 }

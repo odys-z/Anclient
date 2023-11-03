@@ -77,6 +77,7 @@
     <string name="txt_set_groups"   >Set Sharing Group</string>
     <string name="unknown_qrformat" >Unknow QR format: %s</string>
     <string name="unknown_qrcontent">QR code or content is not recognized.</string>
+    <string name="msg_log4device">Login first to restore a previous used device ID.</string>
 
     <array name="jserv_entries">
         <item>localhost:8888</item>
