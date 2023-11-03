@@ -14,7 +14,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 
-import QRCode from 'qrcode'
+import QRCode, { QRCodeToDataURLOptions } from 'qrcode'
 
 import { L, copyToClipboard } from '../../utils/langstr';
 import { Comprops, CrudComp, CrudCompW } from '../crud';
@@ -43,14 +43,14 @@ const styles = theme => ({
 });
 
 export interface DialogProps extends Comprops {
-	onOk?: (sender: React.ReactNode) => void;
-	onCancel?: (sender: React.ReactNode) => void;
+	onOk?: (sender: React.ReactNode | HTMLElement) => void;
+	onCancel?: (sender: React.ReactNode | HTMLElement) => void;
 	onClose?: () => void;
 
 	title: string;
 
 	/**with cancel button label ("false" will disable button) */
-	cancel?: string | false;
+	cancel?: string | boolean;
 	ok?: string;
 
 	/**dialog message */
@@ -64,8 +64,6 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 	state = {
 		closed: false,
 	};
-
-	// handleClose: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
 
 	constructor (props: DialogProps) {
 		super(props);
@@ -81,7 +79,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 			this.props.onClose();
 	}
 
-	toCancel(e: React.MouseEvent<HTMLElement>, reason?) {
+	toCancel(e: React.MouseEvent<HTMLElement>, _reason?) {
 		this.setState({closed: true});
 		if (typeof this.props.onCancel === 'function')
 			this.props.onCancel(e.currentTarget);
@@ -104,9 +102,9 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 		// let open = props.open && !this.state.closed;
 		this.state.closed = false;
 		let title = props.title ? props.title : '';
-		// this.state.title = title;
+
 		let displayCancel = props.cancel === false ? 'none' : 'block';
-		let txtCancel = props.cancel || "Cancel";
+		let txtCancel = props.cancel === true ? L("Cancel") : props.cancel as string;
 		let txtOk = props.ok || "OK";
 
 		let txtLines = this.textLines(props.msg);
@@ -115,9 +113,8 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 
 		let full = this.props.fullScreen || this.props.fullWidth;
 
-		// if (full)
-		  return (
-			<Dialog className={classes.root}
+		return (
+			<Dialog className={classes?.root}
 				open={true}
 				fullScreen={full}
 				fullWidth={!full}
@@ -126,14 +123,14 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				aria-labelledby="alert-dialog-title"
 				aria-describedby="alert-dialog-description" >
 
-				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle}
+				<DialogTitle id="alert-dialog-title" className={classes?.dialogTitle}
 					style={{/*textAlign: "center"*/}}>
 				  {L(title)}
 				</DialogTitle>
 				<DialogContent>
 					{txtLines}
 				</DialogContent>
-				<DialogActions className={classes.dlgAct}>
+				<DialogActions className={classes?.dlgAct}>
 				  <Button onClick={this.toOk} color="primary" autoFocus={displayCancel === 'none'} >
 						{L(txtOk)}
 				  </Button>
@@ -144,7 +141,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				  </Box>
 				</DialogActions>
 			</Dialog>
-		  );
+		);
 	}
 }
 const ConfirmDialog = withStyles(styles)(ConfirmDialogComp);
@@ -157,9 +154,6 @@ export interface ErrorProps extends DialogProps {
 }
 
 export class AnError extends CrudCompW<ErrorProps> {
-	// props = undefined;
-	// context: React.ContextType<typeof AnContext>
-
 	state = {
 	};
 
@@ -234,7 +228,7 @@ class QrSharingComp extends CrudComp<DialogProps & { imgId: string; qr: {serv: s
 				dark:"#010599FF",
 				light:"#FFBF60FF"
 			}
-		}
+		} as QRCodeToDataURLOptions;
 
 		let urlTxt = this.url();
 		this.state.url = urlTxt;
@@ -246,12 +240,12 @@ class QrSharingComp extends CrudComp<DialogProps & { imgId: string; qr: {serv: s
 		})
 
 		return (
-			<Card className={classes.root}>
+			<Card className={classes?.root}>
 			  <CardActionArea>
-				<CardMedia className={classes.media} >
+				<CardMedia className={classes?.media} >
 					<img id={'qrcode ' + this.props.imgId}/>
 				</CardMedia>
-			    <CardContent onClick={this.onCopy} className={classes.centerbox}>
+			    <CardContent onClick={this.onCopy} className={classes?.centerbox}>
 			      <Typography gutterBottom variant="h5" component="h2">
 			        Click to Copy:
 			      </Typography>

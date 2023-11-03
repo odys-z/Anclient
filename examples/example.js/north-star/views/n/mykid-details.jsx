@@ -11,7 +11,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol } from '@anclient/semantier-st';
+import { Protocol, CRUD } from '@anclient/semantier';
 import { L, AnConst,
 	AnContext, AnError,
 	DetailFormW, ConfirmDialog,
@@ -109,14 +109,6 @@ class KidDetailstComp extends DetailFormW {
 	}
 
 	componentDidMount() {
-		// if (this.tier.pkval) {
-		// 	let that = this;
-		// 	let cond = {};
-		// 	cond[this.tier.pk] = this.tier.pkval;
-		// 	this.tier.record(cond, (cols, rows, fkOpts) => {
-		// 		that.setState({record: rows[0]});
-		// 	} );
-		// }
 	}
 
 	toSave(e) {
@@ -131,8 +123,8 @@ class KidDetailstComp extends DetailFormW {
 				  pkval: this.props.tier.pkval }, // Array
 				resp => {
 					// NOTE should crud moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
+					if (that.state.crud === CRUD.c) {
+						that.state.crud = CRUD.u;
 					}
 					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
 				} );
@@ -158,13 +150,13 @@ class KidDetailstComp extends DetailFormW {
 	render () {
 		const { tier, classes, width } = this.props;
 
-		let c = this.state.crud === Protocol.CRUD.c;
-		let u = this.state.crud === Protocol.CRUD.u;
+		let c = this.state.crud === CRUD.c;
+		let u = this.state.crud === CRUD.u;
 		let title = c ? L('Create Account')
 					  : u ? L('Edit Student')
 					  : L('Student Details');
 
-		let rec = this.state.record;
+		// let rec = this.state.record;
 
 		return (<>
 		  <Dialog className={classes.root}

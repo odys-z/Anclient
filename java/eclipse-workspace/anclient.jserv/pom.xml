@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>anclient.java</artifactId>
-  <version>0.4.13</version>
+  <version>0.4.35-SNAPSHOT</version>
   <name>anclient.java</name>
   <description>Anclient java version. A basic lib only depends on semantic.jserv</description>
   <packaging>jar</packaging>
@@ -25,7 +25,7 @@
 
   <developers>
     <developer>
-      <name>Odys Zhou</name>
+      <name>Ody Zhou</name>
       <email>odys.zhou@gmail.com</email>
       <organization>odys-z.github.io</organization>
       <organizationUrl>https://odys-z.github.io</organizationUrl>
@@ -46,6 +46,7 @@
   	<tag>HEAD</tag>
   </scm>
 
+  <!--
   <distributionManagement>
   	<snapshotRepository>
   		<id>ossrh</id>
@@ -57,12 +58,13 @@
   		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 	</repository>
   </distributionManagement>
+   -->
 
   <dependencies>
 	<dependency>
     	<groupId>org.junit.jupiter</groupId>
     	<artifactId>junit-jupiter-engine</artifactId>
-    	<version>5.3.1</version>
+    	<version>5.9.1</version>
     	<scope>test</scope>
     </dependency>
 
@@ -73,13 +75,7 @@
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>semantic.jserv</artifactId>
-	    <version>[1.4.4,)</version>
-	</dependency>
-
-	<dependency>
-		<groupId>org.vishag</groupId>
-		<artifactId>async-helper</artifactId>
-		<version>[4.0.0,)</version>
+	    <version>1.4.35-SNAPSHOT</version>
 	</dependency>
 
   </dependencies>
@@ -210,7 +206,7 @@
 		<version>1.5</version>
 		<executions>
 			<execution>
-			  <id>semantics.transact</id>
+			  <id>anclient.java</id>
 			  <phase>verify</phase>
 			  <goals>
 				<goal>sign</goal>

@@ -2,9 +2,9 @@
 
 A sample app that can be used for start up new app developement.
 
-v0.1:
+v1.0 (docker image 0.6.1):
 
-Only quizzes sheet & quiz polling can work smoothly.
+Works with docker image odysz/connect-polestar:0.6.1.
 
 # quick start
 
@@ -23,6 +23,11 @@ host: http://[your-server-ip]:8080/connects
     ./docker-webstart
 ```
 
+To use the data server with docker image, ***odysz/connect-polestar*** wich is
+available at docker hub. The server side docker image must work with these two
+[sqlite3 db file](./polestar-docker/volume/polestar.zip) - put it in the volume configured
+for the docker container.
+
 3. check both of your docker containers are runing:
 
 ```
@@ -40,19 +45,19 @@ There issue of invalid hook makes the test project in trouble linking the lib. S
 to run this example from source, it's needed to install React manually::
 
 ```
-    npm install react react-dom react-router react-router-dom
+    npm install react react-dom
     npm install @anclient/anreact @anclient/semantier
 ```
 
 # Release Log
 
-- v0.5
+- v0.6.1
 
     docker image:
 
 ```
-	odysz/connect-polestar:0.5
-	odysz/emr-web:0.5
+	odysz/connect-polestar:0.6.1
+	odysz/emr-web:0.6.1
 ```
 
-Volume north.sqlite can be found in Polestar.
+Volume's db files, north.sqlite & systme.sqlite can be found in polestar-docker/volume.

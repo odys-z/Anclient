@@ -4,7 +4,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 import { Button, Typography } from '@material-ui/core';
 
-import { UserReq } from '@anclient/semantier-st'
+import { isEmpty, UserReq } from '@anclient/semantier'
 import {
 	L, AnConst,
     AnContext, CrudCompW, AnTablist, AnQueryst
@@ -29,14 +29,14 @@ class MyPollsComp extends CrudCompW {
 	state = {
 		polls: {cols:[], rows: []},
 
-		condTitl: { type: 'text', val: '', label: L('Title') },
-		condTags: { type: 'text', val: '', label: L('Tags') },
-		condIssr: { type: 'cbb',  val: AnConst.cbbAllItem,
+		condTitl: { type: 'text', field: 'title',   val: '', label: L('Title') },
+		condTags: { type: 'text', field: 'tags',    val: '', label: L('Tags') },
+		condIssr: { type: 'cbb',  field: 'issuer',val: AnConst.cbbAllItem,
 					sk: 'center.my-polls.issuers', nv: {n: 'txt', v: 'val'},
 					sqlArgs: undefined, //['pollee-id', 'pollee-role', 'issuer-role'],
 					options: [ AnConst.cbbAllItem ],
 					label: L('Issuers') },
-		condWait: { type: 'switch', val: true, label: L('Has waitings') },
+		condWait: { type: 'switch',field: 'qwait',  val: true, label: L('Has waitings') },
 
 		selected: {ids: new Set()},
 		waitingPollIds: new Set(),
@@ -59,7 +59,7 @@ class MyPollsComp extends CrudCompW {
 		this.toSearch();
 	}
 
-	toSearch(e, query) {
+	toSearch(query) {
 
 		let client = this.context.anClient;
 		let req = client.userReq( this.uri, 'center',
@@ -68,11 +68,17 @@ class MyPollsComp extends CrudCompW {
 
 		let reqBd = req.Body();
 
-		if (query && query.qWait)
+		if (!query || query.qwait)
 			reqBd.set(CenterProtocol.pollState, CenterProtocol.PollState.wait);
 
-		if (query && query.qIssr.val && query.qIssr.val != AnConst.cbbAllItem.v)
-			reqBd.set(CenterProtocol.pollIssuer, qIssr.val);
+		if (query) {
+			// if (query && query.issuer.val && query.issuer.val != AnConst.cbbAllItem.v)
+			if (!isEmpty(query.issuer, '') && query.issuer != AnConst.cbbAllItem.v)
+				reqBd.set(CenterProtocol.pollIssuer, query.issuer);
+
+				reqBd.set(CenterProtocol.quizTag, query.tags);
+				reqBd.set(CenterProtocol.quizTitle, query.title);
+		}
 
 		this.state.req = req;
 
@@ -86,7 +92,7 @@ class MyPollsComp extends CrudCompW {
 
 				// reset flags
 				let myTaskIds = centerResp.myTaskIds();
-				console.log(myTaskIds);
+				console.log(polls?.rows?.length, myTaskIds);
 				that.state.waitingPollIds = myTaskIds;
 			},
 			this.context.error);
@@ -114,13 +120,7 @@ class MyPollsComp extends CrudCompW {
 			{ this.state.condIssr.sqlArgs && // must load userId before reandering issuers cbb.
 			  <AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
-				conds={[ this.state.condTitl, this.state.condTags, this.state.condIssr, this.state.condWait ]}
-				query={ (q) => { return {
-					qTitl: q.state.conds[0].val,
-					qTags: q.state.conds[1].val,
-					qIssr: q.state.conds[2].val && q.state.conds[2].val.v,
-					qWait: q.state.conds[3].val,
-				}} }
+				fields={[ this.state.condTitl, this.state.condTags, this.state.condIssr, this.state.condWait ]}
 			/>}
 
 			<Typography color='secondary' className={classes.smalltip}>

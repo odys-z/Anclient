@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { Theme, withStyles } from "@material-ui/core/styles";
 import clsx from 'clsx';
 import Grid from '@material-ui/core/Grid';
 import Drawer from '@material-ui/core/Drawer';
@@ -22,33 +22,36 @@ import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import {
-	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School
+	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School, SettingsOutlined, BarChart,
+	GroupAdd, MoreHoriz, Description, Ballot, ScreenShareOutlined, FolderSharedOutlined, HowToRegSharp
 } from '@material-ui/icons';
 
-// import { MemoryRouter as Router, Routes } from 'react-router';
-// import { Link as RouterLink } from 'react-router-dom';
-// import { Route } from 'react-router-dom'
-
 import { AnContext, AnContextType } from './reactext';
-	import { ConfirmDialog } from './widgets/messagebox';
-	import { MyIcon } from './widgets/my-icon';
-	import { MyInfo } from './widgets/my-info';
-	import { L } from '../utils/langstr';
+import { ConfirmDialog } from './widgets/messagebox';
+import { MyIcon } from './widgets/my-icon';
+import { MyInfo } from './widgets/my-info';
+import { L } from '../utils/langstr';
 
 import {
-	Home, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW 
+	Home, ErrorPage, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW
 } from './crud'
-import { ClassNameMap } from '@material-ui/styles';
 import { AnReactExt, ClassNames } from './anreact';
-import { AnDatasetResp, AnsonMsg } from '@anclient/semantier-st/protocol';
+import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
+import withWidth from '@material-ui/core/withWidth';
+import { SessionClient, SessionInf } from '@anclient/semantier/anclient';
 
 export interface SysProps extends Comprops {
+	/** Dataset (stree) sk of system menu */
+	menu: string;
     /**Welcome page formatter */
-    welcome?: (classes: ClassNameMap, context: typeof AnContext, comp: SysComp) => JSX.Element;
+    welcome?: (
+		/** @deprecated not used */
+		classes: ClassNames | undefined,
+		context: AnContextType, comp: SysComp) => JSX.Element;
     // classes: {[x: string]: string};
-    hrefDoc: string;
+    hrefDoc?: string;
     onLogout: () => void;
-    myInfo: JSX.Element | ((context: typeof AnContext) => JSX.Element);
+    myInfo: JSX.Element | ((context: AnContextType) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
 }
 
 const _icons = {
@@ -58,24 +61,17 @@ const _icons = {
 	'menu-lv1': <Drafts />,
 	'menu-leaf': <Sms />,
 	'deflt': <Inbox />,
-}
 
-export function uri(comp: CrudComp<Comprops>, uri: string) {
-	return comp;
-	/* FIXME this function is unnecessary if moved URI to Semantier.
-	if (comp.Naked)
-		comp.Naked.prototype.uri = uri;
-
-	// for SysComp using Route: component={_comps[c.path]}
-	else if (comp.prototype)
-		comp.prototype.uri = uri;
-
-	// for direct component rendering, e.g. less-app/App#render()
-	else if (comp.type && comp.type.Naked)
-		comp.type.Naked.prototype.uri = uri;
-
-	return comp;
-	*/
+	'sys': <Ballot />,
+	'settings': <SettingsOutlined />,
+	'users': <GroupAdd />,
+	'children': <School />,
+	'paper': <Description />,
+	'blank': <MoreHoriz />,
+	'send': <ScreenShareOutlined />,
+	'doc': <FolderSharedOutlined />,
+	'chart': <BarChart />,
+	'mystudent': <HowToRegSharp />,
 }
 
 /**
@@ -89,8 +85,8 @@ const _comps = { }
 
 const drawerWidth = 240;
 
-const styles = theme => ({
-	direction: theme.direction || 'ltr',
+const styles = (theme: Theme) => ({
+	direction: theme.direction || 'ltr' as any,
 	root: {
 		display: 'flex',
 	},
@@ -171,11 +167,14 @@ const styles = theme => ({
 });
 
 export interface MenuItem {
+	/** additonal proterties directly passed on to CRUD page component */
+	props: object;
+
 	funcId: string;
 	id: string;
 	funcName: string;
 	url: string;
-	css: React.CSSProperties;
+	css: React.CSSProperties & {icon: string};
 	flags: string;
 	parentId: string;
 	sort: number;
@@ -185,7 +184,7 @@ export interface MenuItem {
 
 /**
  * Parse lagacy json format.
- * @return {menu, paths} 
+ * @return {menu, paths}
  * */
 export function parseMenus(json = []): {
 	menu: Array<MenuItem>;
@@ -203,11 +202,16 @@ export function parseMenus(json = []): {
 			let {funcId, id, funcName, text, url, css, flags, parentId, sort, sibling, children}
 				= json.node;
 
+			if (typeof css === 'string')
+				try { css = eval('(' + css + ')'); } catch {}
+
 			sibling = sibling || sort;
 			funcId = funcId || id;
 			funcName = funcName || text;
 
-			if (! url.startsWith('/')) url = '/' + url;
+			if (url && !url.startsWith('/'))
+				url = '/' + url;
+
 			paths.push({path: url, params: {flags, css}})
 
 			if (children)
@@ -217,10 +221,6 @@ export function parseMenus(json = []): {
 		}
 	}
 }
-
-// const Tag = (tagName, props, children = undefined): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> => (
-// 	React.createElement(tagName, props , children)
-//   )
 
 /**
  * <pre>a_functions
@@ -237,20 +237,19 @@ export function parseMenus(json = []): {
  * @class SysComp
  */
 class SysComp extends CrudCompW<SysProps> {
-// class SysComp extends React.Component<SysProps, any, any> {
 	state = {
 		window: undefined,
 		welcome: true,
 		sysName: 'Anreact Sample',
 		skMenu: undefined, // e.g. 'sys.menu.jserv-sample';
-		// {funcId, funcName,url, css: {icon}, fullpath, parentId, sibling, children: [] }
+		// { funcId, funcName, url, css: {icon}, fullpath, parentId, sibling, children: [] }
 		sysMenu: [ ] as MenuItem[],
-	
+
 		cruds: [{path: '/', params: undefined, comp: Home}],
 		paths: [],
 
 		menuTitle: 'Sys Menu',
-		showMenu: false,
+		showMenu: false, 
 		expandings: new Set(),
 		showMine: false,
 		currentPage: undefined as MenuItem
@@ -258,15 +257,15 @@ class SysComp extends CrudCompW<SysProps> {
 
 	anreact: AnReactExt;
 
-    confirmLogout: any;
+	confirmLogout: any;
 
 	static extendLinks(links) {
-		links.forEach( (l, x) => {
+		links.forEach( (l: { path: string ; comp: CrudComp<Comprops>; }, _x: number) => {
 			_comps[l.path] = l.comp; // uri(l.comp, l.path);
 		});
 	}
 
-	constructor(props) {
+	constructor(props: SysProps) {
 		super(props);
 		this.state.window = props.window;
 
@@ -284,33 +283,34 @@ class SysComp extends CrudCompW<SysProps> {
 		this.welcomePaper = this.welcomePaper.bind(this);
 	}
 
-	welcomePaper(classes: ClassNames) {
+	welcomePaper(classes = {} as ClassNames) {
 		if (typeof this.props.welcome !== 'function') {
-			return (
-			  <Card >
-				<Typography gutterBottom variant='h4'
-							className={classes.welcomeHead}
-				> Welcome! </Typography>
-				<Paper elevation={4} style={{ margin: 24 }}
-						className={classes.welcome}>
-					<IconButton onClick={this.showMenu} >
-						<Menu color='primary'/>
-						<Box component='span' display='inline' className={classes.cardText} >
-							Please click menu to start.
-						</Box>
-					</IconButton>
-				</Paper>
-				<Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
-					<School color='primary'/>
-					<Box component='span' display='inline'>Documents:
-						<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
-							{`${this.state.sysName}`}</Link>
+		  return (
+			<Card >
+			  <Typography gutterBottom variant='h4'
+						className={classes.welcomeHead}
+			  >Welcome!</Typography>
+			  <Paper elevation={4} style={{ margin: 24 }}
+					className={classes.welcome}>
+				<IconButton onClick={this.showMenu} >
+					<Menu color='primary'/>
+					<Box component='span' display='inline' className={classes.cardText} >
+						Please click menu to start.
 					</Box>
-				</Paper>
-			  </Card>);
+				</IconButton>
+			  </Paper>
+			  <Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
+				<School color='primary'/>
+				<Box component='span' display='inline'>Documents:
+					<Link style={{ marginLeft: 4 }} target='_blank'
+						href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
+						{`${this.state.sysName}`}</Link>
+				</Box>
+			  </Paper>
+			</Card>);
 		}
 		else {
-			return this.props.welcome(classes, this.context, this);
+			return this.props.welcome(classes, this.context as AnContextType, this);
 		}
 	}
 
@@ -318,7 +318,7 @@ class SysComp extends CrudCompW<SysProps> {
 		const ctx = this.context as unknown as AnContextType;
 
 		// load menu
-		this.anreact = ctx.anReact;
+		this.anreact = ctx.uiHelper;
 
 		let that = this;
 		this.anreact.loadMenu(
@@ -341,15 +341,27 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	toLogout() {
-		// Notify children? - not so simple for each target CrudComp needs to be notified.
-
 		let that = this;
-		this.confirmLogout =
-		<ConfirmDialog ok={L('Good Bye')} title={L('Info')} // cancel={false}
-			// open={true}
+		const ctx = this.context as unknown as AnContextType;
+		this.confirmLogout = <ConfirmDialog
+			ok={L('Good Bye')} title={L('Info')} // cancel={false}
 			onOk={() => {
 				that.confirmLogout = undefined;
-				that.props.onLogout();
+				// clean session
+				try {
+					that.anreact.client.logout(
+						() => {},
+						{ onError: (c, e) => { cleanup (that.anreact.client); } }
+						);
+				}
+				catch(_) {
+					try {cleanup (that.anreact.client);} catch (_) {}
+				}
+				finally {
+					that.anreact.client.ssInf = undefined;
+					if (that.props.onLogout)
+						that.props.onLogout();
+				}
 			} }
 			onCancel={ () => {
 				that.confirmLogout = undefined;
@@ -358,6 +370,13 @@ class SysComp extends CrudCompW<SysProps> {
 			msg={L('Logging out?')} />
 
 		this.setState({});
+
+		function cleanup(client: SessionClient) {
+			if (client.ssInf) {
+				localStorage.removeItem(SessionClient.ssInfo);
+				this.anClient.ssInf = undefined;
+			}
+		}
 	}
 
 	toExpandItem(e: React.MouseEvent<HTMLElement>) {
@@ -380,13 +399,13 @@ class SysComp extends CrudCompW<SysProps> {
 
 		let m = this.state.sysMenu;
 		let expandItem = this.toExpandItem;
-		let mtree = buildMenu(m);
+		let mtree = buildMenu(-1, m);
 		return mtree;
 
-		function buildMenu( menu : MenuItem | MenuItem[] ) {
+		function buildMenu( depth: number, menu : MenuItem | MenuItem[] ) {
 			if (Array.isArray(menu)) {
 				return menu.map( (i, x) => {
-						return buildMenu(i);
+						return buildMenu( depth + 1, i );
 					} );
 			}
 			else {
@@ -395,51 +414,54 @@ class SysComp extends CrudCompW<SysProps> {
 				  return (
 				  <div key={menu.funcId}>
 					<ListItem button onClick={expandItem} data-iid={menu.funcId}>
-						<ListItemIcon>{icon(menu.css?.icon)}</ListItemIcon>
+						<ListItemIcon key={menu.funcId}>{icon(depth, menu.css?.icon)}</ListItemIcon>
 						<ListItemText primary={L(menu.funcName)} />
-						{ open ? icon('expand') : icon('collapse') }
+						{ open ? icon(0, 'expand') : icon(0, 'collapse') }
 					</ListItem>
 					<Collapse in={open} timeout="auto" unmountOnExit>
 						<List component="div" disablePadding>
-							{buildMenu(menu.children)}
+							{buildMenu(depth, menu.children)}
 						</List>
 					</Collapse>
 				  </div>);
 				else
 				  return (menu && menu.funcId ?
 					<div key={menu.funcId} >
-						{/* <Link component={RouterLink} to={menu.url}> */}
-							<ListItem button className={classes.nested} onClick={
-								e => {
-									if (that.state.welcome)
-										that.setState( {welcome: false} );
-									
-									if (that.state.currentPage?.url !== menu.url)
-										that.setState( {currentPage: menu} );
-								} } >
-							<ListItemIcon>{icon(menu.css)}</ListItemIcon>
-							<ListItemText primary={L(menu.funcName)} />
-							</ListItem>
-						{/* </Link> */}
+						<ListItem button className={classes.nested} onClick={
+							e => {
+								if (that.state.welcome)
+									that.setState( {welcome: false} );
+
+								if (that.state.currentPage?.url !== menu.url)
+									that.setState( {currentPage: menu} );
+							} } >
+						<ListItemIcon>{icon(depth, menu.css?.icon)}</ListItemIcon>
+						<ListItemText primary={L(menu.funcName)} />
+						</ListItem>
 					</div> : '');
 			}
 		}
 
-		function icon(icon: string) {
-			// shall we use theme here?
-			return _icons[icon] || _icons['deflt'];
+		function icon(levelIndent: number, icon: string) {
+			// return _icons[icon] || _icons['deflt'];
+			let indent = []
+			for (let i = 0; i < levelIndent; i++)
+				indent.push( <div key={i}>{_icons.blank}</div> );
+			indent.push( <div key={indent.length}>{_icons[icon] || _icons.deflt}</div> );
+
+			return indent;
 		}
 	}
 
 	route() {
-		// return this.state.cruds
-		// 	.map( (c, x) =>
-		// 		(<Route exact path={c.path} key={x} component={_comps[c.path]} params={c.params}/>)
-		// 		// (<Route exact path={c.path} key={x} element={React.cloneElement(_comps[c.path] || Home, [{uri: c.path}, {...c.params}]) }/>)
-		// 	);
-
 		const TagName = _comps[this.state.currentPage?.url || '/home'];
-		return <TagName uri={this.state.currentPage?.url || '/'} />;
+		if (TagName)
+		  return (
+			<TagName
+				uri={this.state.currentPage?.url || '/'}
+				{...this.state.currentPage.props}
+				ssInf={(this.context as AnContextType).anClient?.ssInf} /> );
+		else return <Home />;
 	}
 
 	render() {
@@ -457,7 +479,7 @@ class SysComp extends CrudCompW<SysProps> {
 				})}
 			>
 			<Toolbar>
-				<Grid container spacing={1} >
+			   <Grid container spacing={1} >
 				<Grid item sm={5}>
 				<Box flexWrap="nowrap" display="flex" >
 					<IconButton
@@ -470,7 +492,7 @@ class SysComp extends CrudCompW<SysProps> {
 					>
 					<Menu />
 					</IconButton>
-					<Typography variant="h5" className={classes.sysName} noWrap >{L(this.state.sysName)}</Typography>
+					<Typography variant="h5" className={claz.sysName} noWrap >{L(this.state.sysName)}</Typography>
 				</Box>
 				</Grid>
 
@@ -482,17 +504,15 @@ class SysComp extends CrudCompW<SysProps> {
 						</Button>
 					</DialogActions>
 				</Grid>
-				</Grid>
+			  </Grid>
 			</Toolbar>
 			</AppBar>
-			{/* <Router><React.Fragment> */}
-				<Drawer
-					className={claz.drawer}
+			<Drawer className={claz.drawer}
 					variant="persistent"
 					anchor="left"
 					open={open}
 					classes={{paper: claz.drawerPaper}}
-				>
+			>
 				<div className={claz.drawerHeader}>
 					<IconButton onClick={this.hideMenu}>
 						<ListItemText>{this.state.menuTitle}</ListItemText>
@@ -503,24 +523,24 @@ class SysComp extends CrudCompW<SysProps> {
 				<List>
 					{this.menuItems(claz)}
 				</List>
-			  </Drawer>
-			  {/* </React.Fragment> */}
-			  <main onClick={this.hideMenu}
+			</Drawer>
+
+			<main onClick={this.hideMenu}
 				className={clsx(claz.content, {
 					[claz.contentShift]: open,
 				})}
-			  >
+			>
 				<div className={claz.drawerHeader} />
 				{this.state.welcome ?
 					this.welcomePaper(classes) :
 					<div className="content">
 						{this.route()}
 					</div>}
-			  </main>
-			{/* </Router> */}
+			</main>
 
 			{this.state.showMine && <MyInfo
-				panels={typeof this.props.myInfo === 'function' ? this.props.myInfo(this.context) : this.props.myInfo}
+				panels={typeof this.props.myInfo === 'function'
+					? this.props.myInfo(this.context as AnContextType) : this.props.myInfo}
 				onClose={() => this.setState({ showMine: false })} />}
 			{this.confirmLogout}
 		  </div>);
@@ -536,8 +556,8 @@ SysComp.extendLinks([
 	{path: '/views/sys/org/users.html', comp: Users},
 	{path: '/views/sys/workflow/workflows.html', comp: CheapFlow},
 	{path: '/v2/users-v2.0', comp: Users},
-	{path: '/sys/error', comp: Error} // FIXME bug
+	{path: '/sys/error', comp: ErrorPage}
 ]);
 
-const Sys = withStyles(styles)(SysComp);
+const Sys = withStyles<any, any, Comprops>(styles)(withWidth()(SysComp));
 export { Sys, SysComp };

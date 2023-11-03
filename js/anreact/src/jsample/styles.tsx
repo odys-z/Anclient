@@ -57,7 +57,7 @@ export const JsampleIcons = {
 export const JsampleTheme = responsiveFontSizes(createTheme({
   palette: {
     primary: {
-      light: "#fff",
+      light: "rgb(84 174 186)",
       main: "rgb(23, 105, 170)",
       dark: "#000"
     },

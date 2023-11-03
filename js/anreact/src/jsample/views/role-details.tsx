@@ -8,46 +8,49 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { CRUD, PkMeta, Tierec } from '@anclient/semantier-st';
+import { CRUD, PkVal, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-import { AnContext, } from '../../react/reactext'
-import { JsampleIcons } from '../styles'
-import { Comprops, DetailFormW } from '../../react/crud'
-import { ConfirmDialog } from '../../react/widgets/messagebox'
+import { AnContext, } from '../../react/reactext';
+import { JsampleIcons } from '../styles';
+import { Comprops, DetailFormW } from '../../react/crud';
+import { ConfirmDialog } from '../../react/widgets/messagebox';
 import { AnRelationTree } from '../../react/widgets/relation-tree';
-import { TRecordForm } from '../../react/widgets/t-record-form';
+import { TRecordForm } from '../../react/widgets/record-form';
 import { RoleTier } from './roles';
+import { Theme } from '@material-ui/core';
 
-const styles = theme => ({
-  dialogPaper: {
-	height: "100%"
-  },
-  root: {
-	marginTop: 60,
-	minHeight: "60vh",
-	maxHeight: "86vh",
-	maxWidth: "70vw",
-	minWidth: 600,
-	margin: "auto"
-  },
-  title: {
-	backgroundColor: "linen",
-	height: "5ch",
-	width: "100%",
-	color: "primary"
-  },
-  content: {
-	height: "100%",
-  },
-  buttons: {
-	justifyContent: "center",
-	verticalAlign: "middle",
-	"& > button": {
-	  width: "20ch"
-	}
-  },
-});
+const styles = (theme: Theme) => {
+	return ({
+		dialogPaper: {
+			height: "100%"
+		},
+		root: {
+			marginTop: theme.spacing(7.5),
+			minHeight: "60vh",
+			maxHeight: "86vh",
+			maxWidth: "70vw",
+			minWidth: theme.spacing(75),
+			margin: "auto"
+		},
+		title: {
+			backgroundColor: "linen",
+			height: "5ch",
+			width: "100%",
+			color: "primary"
+		},
+		content: {
+			height: "100%",
+		},
+		buttons: {
+			justifyContent: "center",
+			verticalAlign: "middle",
+			"& > button": {
+				width: "20ch"
+			}
+		},
+	});
+};
 
 class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk: string }> {
 
@@ -60,7 +63,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 		record: undefined as Tierec,
 	};
 
-	pkval: PkMeta = {pk: undefined, v: undefined};
+	pkval: PkVal = {pk: undefined, v: undefined};
 	tier: RoleTier;
 	ok: JSX.Element;
 
@@ -109,13 +112,15 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 
 	showOk(txt: string | string[]) {
 		let that = this;
-		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
-					title={L('Info')}
-					cancel={false} msg={txt}
-					onClose={() => {
-						that.ok = undefined;
-						that.setState( {dirty: false} );
-					} } />);
+		this.ok = (
+			<ConfirmDialog ok={L('OK')} open={true}
+				title={L('Info')}
+				cancel={false} msg={txt}
+				onClose={() => {
+					that.ok = undefined;
+					that.setState( {dirty: false} );
+				}}
+			/>);
 
 		if (typeof this.props.onSave === 'function')
 			this.props.onSave({code: 'ok'});
@@ -125,7 +130,6 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 
 	render () {
 		const { classes, width } = this.props;
-		const smallSize = new Set(["xs", "sm"]).has(width);
 
 		let crud = this.state.crud;
 

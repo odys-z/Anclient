@@ -21,20 +21,17 @@ namespace io.odysz.anclient
 
 		public static string servRt;
 
-        /// <summary> DB connection ID. same in connects.xml/t/C/id at server side.
-        /// </summary>
-        // private static string conn;
-
 		/// <summary>Initialize configuration.
 		/// </summary>
 		/// <param>servRoot</param>
-		public static void Init(string servRoot)
+		public static void Init(string servRoot, bool verbose = false)
 		{
             // c# problem - must use the assembly name for consturcting object instance
 			// JSONAnsonListener.setAssembly(Assembly.GetExecutingAssembly().GetName().Name);
 			JSONAnsonListener.setAssembly("anclient.net");
 
 			servRt = servRoot;
+            AnClient.verbose = verbose;
 		}
 
         /// <summary>
@@ -98,5 +95,9 @@ namespace io.odysz.anclient
             return string.Format("{0:S}/{1:S}", servRt, port.Url());
         }
 
+        //public static void loginAsync(string uid, string pswd, JProtocol.OnOk onLogin, JProtocol.OnError err, string device)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

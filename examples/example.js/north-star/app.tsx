@@ -2,10 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, AnsonMsg, SessionClient, AnsonResp } from '@anclient/semantier-st'
+import { Protocol, AnsonMsg, SessionClient, ErrorCtx, AnsonResp } from '@anclient/semantier'
 import { L, Langstrs,
 	Sys, SysComp,
-	AnContext, AnError, AnReactExt, jsample
+	AnContext, AnError, AnReactExt, jsample, AnContextType, AnreactAppOptions
 } from '@anclient/anreact';
 const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
 
@@ -13,27 +13,21 @@ import { StarPorts } from './common/port';
 
 import { Dashboard } from './views/n/dashboard';
 import { Indicators } from './views/n-tsx/indicators';
-import { Quizzes } from './views/n/quizzes';
+import { Quizzes } from './views/n-tsx/quizzes';
 import { Polls } from './views/n-tsx/polls';
 import { MyStudents } from './views/n/my-students';
-import { GPAsheet } from './views/n/gpa';
-import { Docshares } from './views/n/docshares';
+import { GPAsheet } from './views/n-tsx/gpa';
+import { Docshares } from './views/n-tsx/docshares';
 
 import { MyStatus } from './views/c/status';
 import { MyPolls } from './views/c/my-polls';
 import { MyDocs } from './views/c/my-docs';
-// import { PhotoGallery } from './views/c-tsx/photo-gallery';
-// import { MyConnect } from './views/c/connect';
 
-import { welcome } from './views/c-tsx/nwelcome';
 import { Northprops } from './common/north';
 
 /** The application main, context singleton and error handler */
 class App extends React.Component<Northprops, any> {
 	state = {
-		anClient: undefined, // SessionClient
-		anReact: undefined,  // helper for React
-
 		iportal: 'portal.html',
         jserv: undefined,
         servs: {},
@@ -41,8 +35,11 @@ class App extends React.Component<Northprops, any> {
 
 		hasError: false,
 		nextAction: undefined, // e.g. re-login
-		error: undefined,
 	};
+
+	anClient: SessionClient;
+	anReact: AnReact;  // helper for React
+	error: ErrorCtx;
 
 	/**Restore session from window.localStorage
 	 */
@@ -56,9 +53,9 @@ class App extends React.Component<Northprops, any> {
 		this.logout = this.logout.bind(this);
 
 		// design: will load anclient from localStorage
-		this.state.error = {onError: this.onError, msg: ''};
-		this.state.anClient = new SessionClient();
-		this.state.anReact = new AnReactExt(this.state.anClient, this.state.error)
+		this.error = {onError: this.onError, msg: ''};
+		this.anClient = new SessionClient();
+		this.anReact = new AnReactExt(this.anClient, this.error)
 								.extendPorts(StarPorts);
 
 		// Protocol.sk.xvec = 'x.cube.vec';
@@ -67,8 +64,8 @@ class App extends React.Component<Northprops, any> {
 		Protocol.sk.cbbMyClass = 'north.my-class';
 
 		// singleton error handler
-		if ( !this.state.anClient || !this.state.anClient.ssInf
-		  || !this.state.anClient || !this.state.anClient.ssInf) {
+		if ( !this.anClient || !this.anClient.ssInf
+		  || !this.anClient || !this.anClient.ssInf) {
 			this.state = Object.assign(this.state, {
 				nextAction: 're-login',
 				hasError: true,
@@ -109,7 +106,7 @@ class App extends React.Component<Northprops, any> {
 	 */
 	onError(c: string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
-		this.state.error.msg = r.Body().msg();
+		this.error.msg = r.Body().msg();
 		this.setState({
 			hasError: !!c,
 			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
@@ -131,21 +128,21 @@ class App extends React.Component<Northprops, any> {
 		let that = this;
 		// leaving
 		try {
-			this.state.anClient.logout(
+			this.anClient.logout(
 				() => {
 					if (this.props.iwindow)
 						this.props.iwindow.location.href = this.state.iportal;
 				},
-				(c, e) => {
+				{ onError: (c, e) => {
 					// something wrong
 					cleanup (that);
-				});
+				} } );
 		}
 		catch(_) {
 			cleanup (that);
 		}
 		finally {
-			this.state.anClient = undefined;
+			this.anClient = undefined;
 		}
 
 		function cleanup(app) {
@@ -161,39 +158,40 @@ class App extends React.Component<Northprops, any> {
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
-				ssInf: this.state.anClient.ssInf,
-				anReact: this.state.anReact,
+				ssInf: this.anClient.ssInf,
+				anReact: this.anReact,
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				anClient: this.state.anClient,
+				anClient: this.anClient,
+				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
-				error: this.state.error,
+				error: this.error,
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys='Emotion Regulation - TSX' menuTitle='Sys Menu'
 					myInfo={myInfoPanels}
 					hrefDoc={'docs/index.html'}
-					welcome={welcome}
+					// welcome={welcome}
 					onLogout={this.logout} />
 				{this.state.hasError &&
 					<AnError onClose={this.onErrorClose} fullScreen={false}
-						msg={this.state.error.msg} title={L('Error')} />}
+						msg={this.error.msg} title={L('Error')} />}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
-		function myInfoPanels(anContext) {
+		function myInfoPanels(anContext: AnContextType) {
 			return [
 				{ title: L('Basic'),
 				  panel: <jsample.MyInfCard uri={'/sys/session'}
 								anContext={anContext}
-								ssInf={that.state.anClient.ssInf} /> },
+								ssInf={that.anClient.ssInf} /> },
 				{ title: L('Password'),
 				  panel: <jsample.MyPswd uri={'/sys/session'}
 								anContext={anContext}
-								ssInf={that.state.anClient.ssInf} /> }
+								ssInf={that.anClient.ssInf} /> }
 			  ];
 		}
 	}
@@ -205,14 +203,16 @@ class App extends React.Component<Northprops, any> {
 	 *
 	 * For test, have elem = undefined
 	 * @param elem html element id, null for test
-	 * @param opts {serv: string, portal: string} default: {host, index.html}
+	 * @param opts default: {serv: 'host', portal: 'index.html'}
+	 * - serv: string,
+	 * - portal: string
 	 */
-	static bindHtml(elem: string, opts = {portal: 'indexe.html'}): void {
+	static bindHtml(elem: string, opts : AnreactAppOptions = {portal: 'indexe.html'}): void {
 		let portal = opts.portal ? opts.portal : 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: {serv: string, portal: string}, json: any) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: any) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

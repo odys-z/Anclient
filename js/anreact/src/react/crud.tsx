@@ -4,22 +4,23 @@ import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
 import { Media, ClassNames } from './anreact';
-import { CRUD, Semantier, UIComponent } from '@anclient/semantier-st';
+import { CRUD, Semantier, SessionInf, UIComponent } from '@anclient/semantier';
 
 interface Comprops extends StandardProps<any, string>, UIComponent {
 	/**The matching url in React.Route */
 	match?: {path: string};
 
-	/** CRUD */
+	/** CRUD, if none of CRUD enum value is correct, use a R to indicate it's read only. */
 	crud?: CRUD;
 
-	/**MUI as default */
-	color?: PropTypes.Color;
-
 	/** Semantier */
-	classes?: ClassNames;
 	readonly tier?: Semantier;
+	ssInf?: SessionInf;
+
+	classes?: ClassNames;
+	/**MUI as default */
 	readonly width?: Breakpoint;
+	color?: PropTypes.Color;
 }
 
 const styles = (theme: Theme) => ( {
@@ -38,8 +39,8 @@ const styles = (theme: Theme) => ( {
  * @member uri: string
  */
 class CrudComp<T extends Comprops> extends React.Component<T> {
-	state = {};
-	uri = undefined;
+	state = {} as any;
+	uri: string = undefined;
 
 	constructor(props: T) {
 		super(props);
@@ -79,7 +80,7 @@ class CrudCompW<T extends Comprops> extends CrudComp<T> {
 		CrudCompW.prototype.media = CrudCompW.getMedia(width);
 	}
 
-	static getMedia(width: string) {
+	static getMedia(width: string | undefined) {
 		let media = {} as Media;
 
 		if (width === 'lg') {
@@ -111,18 +112,26 @@ class CrudCompW<T extends Comprops> extends CrudComp<T> {
 	}
 
 	/**A simple helper: Array.from(ids)[x]; */
-	getByIx(ids: Set<string>, x = 0): string {
-		return Array.from(ids)[x];
+	getByIx(ids: Map<string, any>, x = 0): string {
+		return Array.from(ids.keys())[x];
 	}
 }
 CrudCompW.contextType = AnContext;
 
 class HomeComp extends CrudComp<Comprops> {
 	render() {
-		return (<>Welcome to AnReact (Anclient JS)</>);
+		return (<>Home Page (wrong role - function configuration?)</>);
 	}
 }
 const Home = withStyles(styles)(HomeComp);
+
+class ErrorPageComp extends CrudComp<Comprops>  {
+	render() {
+		return (<>Error Page</>);
+	}
+}
+const ErrorPage = withStyles(styles)(ErrorPageComp);
+
 
 class DomainComp extends CrudComp<Comprops>  {
 	render() {
@@ -191,6 +200,7 @@ export {
 	Comprops, CrudComp,
 	CrudCompW, DetailFormW,
 	Home, HomeComp,
+	ErrorPage, ErrorPageComp,
 	Domain, DomainComp,
 	Roles, RolesComp,
 	Users, UsersComp,

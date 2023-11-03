@@ -6,6 +6,8 @@ import android.view.View;
  * Created by Vincent Woo
  * Date: 2016/10/14
  * Time: 16:06
+ *
+ * @deprecated
  */
 
 public interface OnSelectStateListener<T> {

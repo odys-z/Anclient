@@ -1,0 +1,6 @@
+# docker pull odysz/emr-web
+docker volume rm curriculum.host
+docker volume create curriculum.host
+sudo cp dist/private/host.json /var/lib/docker/volumes/curriculum.host/_data
+
+docker run --mount source=curriculum.host,target=/usr/share/nginx/html/private -p 8889:80 --name curr-web --rm -d odysz/curricula-web

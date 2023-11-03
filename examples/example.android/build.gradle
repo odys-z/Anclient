@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.4.1'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    ext {
+        app_ver = "0.3.0"
+        appcompat_version = "1.4.1"
+        glide_version = "4.15.1"
+        bm_photoview_version = "1.4.1"
+        anclient_ver = "0.4.35-SNAPSHOT"
+        jserv_ver = "1.4.35-SNAPSHOT"
+        album_lib_ver = "0.4.34"
+    }
+
+    repositories {
+//        mavenLocal()
+        // mavenCentral(){ mavenContent { releasesOnly() } }
+        mavenCentral()
+        google()
+        jcenter()
+        maven() {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
+    }
+}
+
+configurations {
+    // compile.exclude module: 'albumtier'
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

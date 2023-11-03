@@ -10,7 +10,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, toBool } from '@anclient/semantier-st';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, str, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
@@ -21,7 +21,6 @@ const styles = (theme: Theme) => ({
   root: {
 	display: "flex",
 	flexDirection: "column" as const,
-	// textAlign: "left",
 	width: "100%"
   },
   row: {
@@ -55,13 +54,20 @@ const styles = (theme: Theme) => ({
   }
 });
 
+/** FIXME shouldn't merge with relTree? */
 interface RelationTreeProps extends Comprops {
-	reltabl: string;
-	sk: string;
+	reltabl?: string;
+	sk?: string;
 
 	/**Semantier.formatRel() use this name to format relationship records,
-	 * where in UI component the FK value comes from */
-	relcolumn: string;
+	 * where in UI component the FK value comes from
+	 *
+	 * FIXME shouldn't be changed to colProp
+	 * */
+	// relcolumn?: string;
+	colProp?: string;
+
+	tier: Semantier;
 };
 
 /**
@@ -78,7 +84,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	};
 	tier: Semantier;
 
-	constructor(props) {
+	constructor(props: RelationTreeProps) {
 		super(props);
 
 		this.tier = this.props.tier;
@@ -89,10 +95,10 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 	componentDidMount() {
 		let that = this;
-		this.tier.relations((this.context as unknown as AnContextType).anClient,
-			{ uri: this.props.uri,
+		this.tier.relations((this.context as AnContextType).anClient,
+			{ uri    : this.props.uri,
 			  reltabl: this.props.reltabl,
-			  sqlArg: this.tier.pkval.v,
+			  sqlArg : str(this.tier.pkval.v),
 			},
 			(rels: AnsonMsg<AnDatasetResp>) => {
 				// that.forest = rels.Body().forest as AnTreeNode[];
@@ -100,7 +106,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			} );
 	}
 
-	toExpandItem(e: React.MouseEvent<HTMLElement>) {
+	toExpandItem(e: React.UIEvent<HTMLElement>) {
 		e.stopPropagation();
 		let f = e.currentTarget.getAttribute("data-nid");
 
@@ -111,9 +117,11 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	}
 
 	/**
-	 * @param classes
+	 * @param forest 
+	 * @param classes 
+	 * @returns tree: React.Node
 	 */
-	buildTree(forest: AnTreeNode[], classes: ClassNames) {
+	buildTree(forest: AnTreeNode[], classes: ClassNames = {}) {
 		let that = this;
 
 		let expandItem = this.toExpandItem;
@@ -123,7 +131,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			(tree, tx) => {return treeItems(tree);}
 		);
 
-		function treeItems(stree) {
+		function treeItems(stree: AnTreeNode | AnTreeNode[]) {
 		  if (Array.isArray(stree)) {
 			return stree.map((i, x) => {
 			  return treeItems(i);
@@ -150,12 +158,8 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 								onChange={(e) => {
 								  e.stopPropagation();
 								  node.checked = !toBool(node.checked);
-								  // if (typeof that.props.onCheck === 'function')
-									// that.props.onCheck(e);
-
-									// checkAll(e.target.checked, node.children)
-									node.children.forEach( c => { c.node.checked = e.target.checked } );
-									that.setState({});
+								  node.children.forEach( c => { c.node.checked = e.target.checked } );
+								  that.setState({});
 								}}/>
 						  }
 						  {node.text}
@@ -176,11 +180,11 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 				<Grid container key={id} className={classes.row}>
 				  <Grid item xs={9} className={classes.treeItem}>
 					<Typography >
-					  {leadingIcons(level)}
-					  {node.css && node.css.icon && icon(node.css.icon)}
-					  {checkbox
-						  && <Checkbox color="primary" checked={toBool(node.checked)}
-							onChange={(e) => {
+					  { leadingIcons(level)}
+					  { node.css && node.css.icon && icon(node.css.icon)}
+					  { checkbox
+						&& <Checkbox color="primary" checked={toBool(node.checked)}
+								onChange={(e) => {
 									node.checked = e.target.checked;
 									that.setState({});
 								}} />
@@ -198,11 +202,11 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		  }
 		}
 
-		function icon(icon) {
+		function icon(icon: string) {
 			return AnTreeIcons[icon || "deflt"];
 		}
 
-		function leadingIcons(count) {
+		function leadingIcons(count: number) {
 			let c = [];
 			for (let i = 0; i < count; i++)
 				c.push(<React.Fragment key={i}>{icon(".")}</React.Fragment>);
@@ -216,10 +220,10 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 	render() {
 		const { classes } = this.props;
-		const forest = this.tier.rels[this.props.reltabl];
+		const forest = this.tier?.rels && this.tier.rels[this.props.reltabl];
 
 		return (
-			<div className={classes.root}>
+			<div className={classes?.root}>
 				{forest && this.buildTree(forest, classes)}
 			</div> );
 	}

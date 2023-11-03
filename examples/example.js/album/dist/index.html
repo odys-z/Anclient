@@ -1,22 +1,27 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
-  <title>AnClient for react test</title>
+  <title>Album Home</title>
 </head>
 
 <body>
-  <div id="app"></div>
+  <!-- To load page, in console: loadAlbum(uid, pswd) -->
+  <div id="app">Album Web v0.3.0
+      <img src=''></img>
+  </div>
   <noscript>You need to enable JavaScript to run this app.</noscript>
-  <script src="Album-1.0.0.min.js"></script>
+  <script src="./Album-0.3.0.min.js" type="text/javascript"></script>
   <script>
-	// let searchParams = new URLSearchParams(window.location.search)
-	// let serv = searchParams ? searchParams.get('serv') : undefined;
-	album.App.bindHtml('app', {
-		jsonUrl: 'http://localhost:8889/github.json',
-		serv: 'sandbox', Window, portal: 'index.html'});
+    let searchParams = new URLSearchParams(window.location.search)
+    let aid = searchParams ? searchParams.get('album') : 'album-landing';
+    let serv = searchParams ? searchParams.get('serv') : 'landing';
+
+    function loadAlbum(uid, pswd) {
+      album.App.bindHtml('app', {uid, pswd,
+        aid, serv, Window, portal: 'index.html'});
+    }
   </script>
 </body>
 </html>

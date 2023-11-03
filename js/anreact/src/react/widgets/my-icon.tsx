@@ -6,7 +6,7 @@ import SvgIcon from "@material-ui/core/SvgIcon";
 
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops } from '../crud';
-import { SessionClient } from '@anclient/semantier-st/anclient';
+import { SessionClient } from '@anclient/semantier/anclient';
 
 const styles = theme => ({
   root: {
@@ -33,9 +33,10 @@ export const AvatarIcon = function (props: AvatarIconProps) {
 		props.viewBox = gCameraViewBox;
 
   let { width, height, left, top, position } = props;
-  let style = Object.assign ({ width: 64, height: 64,
-	 				  position: 'inherit', left: 0, top: 32},
-					{ width, height, top, left, position});
+  let style = Object.assign (
+	{ width: 64, height: 64, position: 'inherit', left: 0, top: 32},
+	{ width, height, top, left, position}) as React.CSSProperties;
+
   return (
 	<SvgIcon style={style} fontSize="inherit" {...props} >
 		<g> <path d="M76.8,121.6C34.385,121.6,0,155.985,0,198.4V480h89.6V121.6H76.8z"/>
@@ -88,7 +89,7 @@ class MyIconComp extends React.Component<AvatarIconProps> {
 		return (<>
 		<Button
 			variant="contained"
-			className={classes.root}
+			className={classes?.root}
 			color="primary"
 			onClick={this.onClick}
 			startIcon={<AccountCircleIcon />} >

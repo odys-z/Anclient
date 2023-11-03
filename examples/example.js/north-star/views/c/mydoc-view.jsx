@@ -10,15 +10,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { Protocol } from '@anclient/semantier-st';
+import { CRUD } from '@anclient/semantier';
 import { L, AnContext,
 	DetailFormW, ConfirmDialog, utils
 } from '@anclient/anreact';
 
 import { starTheme } from '../../common/star-theme';
-import { docListyle } from '../n/docshares';
+import { docListyle } from '../n-tsx/docshares';
 
-const { CRUD } = Protocol;
 const { regex } = utils;
 
 const styles = (theme) => Object.assign(starTheme(theme),
@@ -50,39 +49,39 @@ class MyDocViewComp extends DetailFormW {
 		this.tier = props.tier;
 
 		this.toCancel = this.toCancel.bind(this);
-		this.toSave = this.toSave.bind(this);
+		// this.toSave = this.toSave.bind(this);
 		this.showConfirm = this.showConfirm.bind(this);
 	}
 
 	componentDidMount() {
-		if (this.tier.pkval) {
+		if (this.tier.pkval.v) {
 			let that = this;
 			let cond = {};
-			cond[this.tier.pk] = this.tier.pkval;
+			cond[this.tier.pk] = this.tier.pkval.v;
 			this.tier.record(cond, (cols, rows, fkOpts) => {
 				that.setState({record: rows[0]});
 			} );
 		}
 	}
 
-	toSave(e) {
-		if (e) e.stopPropagation();
+	// toSave(e) {
+	// 	if (e) e.stopPropagation();
 
-		let that = this;
+	// 	let that = this;
 
-		if (this.tier.validate(this.tier.rec, this.recfields)) // field style updated
-			this.tier.saveRec(
-				{ crud: CRUD.u,
-				  disableForm: true },
-				resp => {
-					// NOTE should crud moved to tier, just like the pkval?
-					if (that.state.crud === Protocol.CRUD.c) {
-						that.state.crud = Protocol.CRUD.u;
-					}
-					that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
-				} );
-		else this.setState({});
-	}
+	// 	if (this.tier.validate(this.tier.rec, this.recfields)) // field style updated
+	// 		this.tier.saveRec(
+	// 			{ crud: CRUD.u,
+	// 			  disableForm: true },
+	// 			resp => {
+	// 				// NOTE should crud moved to tier, just like the pkval?
+	// 				if (that.state.crud === CRUD.c) {
+	// 					that.state.crud = CRUD.u;
+	// 				}
+	// 				that.showConfirm(L('Saving Succeed!\n') + (resp.Body().msg() || ''));
+	// 			} );
+	// 	else this.setState({});
+	// }
 
 	toCancel (e) {
 		e.stopPropagation();
@@ -116,8 +115,8 @@ class MyDocViewComp extends DetailFormW {
 	render () {
 		const { tier, classes, width } = this.props;
 
-		let c = this.state.crud === Protocol.CRUD.c;
-		let u = this.state.crud === Protocol.CRUD.u;
+		let c = this.state.crud === CRUD.c;
+		let u = this.state.crud === CRUD.u;
 		let title = L('Share Documents');
 
 		let rec = this.state.record;

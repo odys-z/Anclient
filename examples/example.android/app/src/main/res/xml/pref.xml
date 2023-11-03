@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/txt_prefs_summery_home"
+    <PreferenceCategory
+        android:title="@string/txt_prefs_summery_home"
         android:key="@string/key_home_cate"
         android:id="@+id/pref_home_regist"
         >
+        <!-- Issue: Target fragment must implement TargetFragment interface
+            https://stackoverflow.com/questions/69504256/preferencedialog-in-preferenceactivity-target-fragment-must-implement-targetfr -->
+        <!--            android:fragment="io.oz.album.client.AlbumPreferenceFragment"-->
         <EditTextPreference
             android:enabled="false"
             android:defaultValue="home"
             android:key="@string/key_home"
             android:title="@string/home_title" />
+        <!--            android:fragment="io.oz.album.client.AlbumPreferenceFragment"-->
         <EditTextPreference
             android:enabled="false"
             android:key="@string/key_device"
-            android:summary="@string/txt_only_once"
+            android:summary="@string/msg_only_once"
             android:title="@string/devide_title" />
         <Preference
             android:key="@string/key_regist"
             android:layout="@layout/bt_regist_device" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/txt_prefs_title"
-        android:id="@+id/id_login_cate"
-        >
+    <PreferenceCategory
+        android:title="@string/txt_prefs_user"
+        android:id="@+id/id_login_cate" >
         <EditTextPreference
             android:defaultValue="@string/jserv_default"
             android:key="@string/jserv_key"

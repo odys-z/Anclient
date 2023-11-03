@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Typography } from '@material-ui/core';
 
-import { Protocol, UserReq } from '@anclient/semantier-st'
+import { Protocol, UserReq } from '@anclient/semantier'
 import {L, AnContext, CrudCompW, AnTablist
 } from '@anclient/anreact';
 

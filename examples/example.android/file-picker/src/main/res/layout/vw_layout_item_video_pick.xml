@@ -40,19 +40,20 @@
 
         <ImageView
             android:id="@+id/xiv_syncing_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
             android:src="@drawable/vw_ic_syncing" />
+
         <ImageView
             android:id="@+id/xiv_synced_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
             android:src="@drawable/vw_ic_synced" />
 
         <RelativeLayout
@@ -75,25 +76,27 @@
 
         </RelativeLayout>
     </RelativeLayout>
+
     <RelativeLayout
-        android:alpha="0"
+        android:id="@+id/animationSquarevideo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/anim_square"
-        android:id="@+id/animationSquarevideo">
+        android:alpha="0"
+        android:background="@drawable/anim_square">
+
         <RelativeLayout
 
-            android:layout_alignParentTop="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/anim_square"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
+            android:background="@drawable/anim_square">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_check_circle_24"
-                />
+                android:src="@drawable/ic_baseline_check_circle_24" />
         </RelativeLayout>
 
     </RelativeLayout>

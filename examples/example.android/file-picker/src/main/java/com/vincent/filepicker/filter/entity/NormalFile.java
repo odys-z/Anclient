@@ -3,13 +3,17 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.IOException;
+
+import io.oz.fpick.AndroidFile;
+
 /**
  * Created by Vincent Woo
  * Date: 2016/10/12
  * Time: 14:45
  */
 
-public class NormalFile extends BaseFile implements Parcelable {
+public class NormalFile extends AndroidFile implements Parcelable {
     private String mimeType;
 
     public String getMimeType() {
@@ -23,11 +27,11 @@ public class NormalFile extends BaseFile implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(getId());
-        dest.writeString(getName());
-        dest.writeString(getPath());
-        dest.writeLong(getSize());
-        dest.writeString(getBucketId());
-        dest.writeString(getBucketName());
+        dest.writeString(clientname());
+        dest.writeString(fullpath());
+        dest.writeLong(size);
+        dest.writeString(getLocalDirId());
+        dest.writeString(getLocalDirName());
         dest.writeLong(getDate());
         dest.writeByte((byte) (isSelected() ? 1 : 0));
         dest.writeString(getMimeType());
@@ -48,11 +52,11 @@ public class NormalFile extends BaseFile implements Parcelable {
         public NormalFile createFromParcel(Parcel in) {
             NormalFile file = new NormalFile();
             file.setId(in.readLong());
-            file.setName(in.readString());
-            file.setPath(in.readString());
-            file.setSize(in.readLong());
-            file.setBucketId(in.readString());
-            file.setBucketName(in.readString());
+            file.clientname(in.readString());
+            file.clientpath = in.readString();
+            file.size = in.readLong();
+            file.setLocalDirId(in.readString());
+            file.setLocalDirName(in.readString());
             file.setDate(in.readLong());
             file.setSelected(in.readByte() != 0);
             file.setMimeType(in.readString());

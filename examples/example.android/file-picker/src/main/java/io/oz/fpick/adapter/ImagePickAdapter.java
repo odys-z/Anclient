@@ -1,10 +1,15 @@
+/**
+ * Created by Ody Zhou
+ * Date: 15 Feb. 2022
+ *
+ * Credits to Vincent Woo
+ */
 package io.oz.fpick.adapter;
-
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +18,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -27,29 +28,30 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.util.ArrayList;
 
-import io.oz.fpick.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
-/**
- * Created by Ody Zhou
- * Date: 15 Feb. 2022
- *
- * Credits to Vincent Woo
- */
+import io.odysz.common.Utils;
+import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
+import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+import static io.odysz.common.LangExt.isblank;
 
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
-    public String mFilepath;
     public Uri mImageUri;
 
-    public ImagePickAdapter(Context ctx, boolean needCamera, boolean isNeedImagePager, int max ) {
-        this ( ctx, new ArrayList<ImageFile> ( ), needCamera , isNeedImagePager , max );
+    public ImagePickAdapter(ImagePickActivity ctx, boolean needCamera, int max) {
+        this ( ctx, new ArrayList<ImageFile> ( ), needCamera , max );
     }
 
-    public ImagePickAdapter(Context ctx, ArrayList<ImageFile> list, boolean needCamera, boolean needImagePager , int max ) {
+    public ImagePickAdapter(BaseActivity ctx, ArrayList<ImageFile> list, boolean needCamera, int max) {
         super ( ctx , list );
         isNeedCamera = needCamera;
         mMaxNumber = max;
@@ -58,15 +60,18 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
     @NonNull
     @Override
     public ImagePickViewHolder onCreateViewHolder (@NonNull ViewGroup parent, int viewType ) {
-        View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick , parent , false );
+        View itemView = LayoutInflater.from ( mContext ).inflate ( R.layout.vw_layout_item_image_pick, parent, false );
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
             WindowManager wm = (WindowManager) mContext.getSystemService ( Context.WINDOW_SERVICE );
-            int width = wm.getDefaultDisplay().getWidth();
-            params.height = width / ImagePickActivity.COLUMN_NUMBER;
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(displaymetrics);
+            itemWidth = displaymetrics.widthPixels;
+            // Utils.logi("w: %s", itemWidth);
+            params.height = itemWidth / ImagePickActivity.COLUMN_NUMBER;
         }
-        ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder( itemView );
-        imagePickViewHolder.setIsRecyclable ( false );
+        ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
+        imagePickViewHolder.setIsRecyclable ( true );
 
         return imagePickViewHolder;
     }
@@ -93,34 +98,34 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 file = mList.get ( position );
             }
 
-            // RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
-                    .load ( file.getPath ( ) )
-                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
-                            .centerCrop()
-                            .error(R.drawable.vw_ic_syncing))
-                    .transition ( withCrossFade ( ) )
-                    .listener(new RequestListener() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource) {
-                            return false;
-                        }
-                        @Override
-                        public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
-                            return false;
-                        }
-                    })
-                    .into ( holder.mIvThumbnail );
-            // holder.mIvThumbnail.setImageURI(Uri.parse(file.getPath()));
+                .load ( file.fullpath() )
+                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
+                        .centerCrop()
+                        .error(R.drawable.vw_ic_synced))
+                .transition ( withCrossFade() )
+                .listener(new RequestListener() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource) {
+                        return false;
+                    }
+                    @Override
+                    public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
+                        return false;
+                    }
+                })
+                .into ( holder.mIvThumbnail );
 
-            if (file.synchFlag == BaseFile.Synchronizing) {
+            if (isblank(file.syncFlag))
+                file.syncFlag = SyncFlag.device;
+            if (SyncFlag.pushing.equals(file.syncFlag)) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            else if (file.synchFlag == BaseFile.Synchronized) {
+            else if (SyncFlag.publish.equals(file.syncFlag) || SyncFlag.hub.equals(file.syncFlag)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -156,14 +161,17 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.mShadow.setVisibility ( View.INVISIBLE );
             }
 
-            holder.mIvThumbnail.setOnLongClickListener((View view)
-                  -> startMediaViewer(mContext, view, "image/*", file.getPath()));
+            holder.mIvThumbnail.setOnLongClickListener((View view) -> {
+                return startMediaViewer(mContext, "image/*", file.fullpath());
+            });
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
-                int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
+                // int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
+                int index = isNeedCamera ? holder.getAbsoluteAdapterPosition( ) - 1
+                                         : holder.getAbsoluteAdapterPosition( );
 
-                int sync = mList.get(index).synchFlag;
-                if ( sync == BaseFile.Synchronized || sync == BaseFile.Synchronizing)
+                String sync = mList.get(index).syncFlag;
+                if ( SyncFlag.publish.equals(sync) || SyncFlag.pushing.equals(sync))
                     return;
 
                 if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {
@@ -185,11 +193,10 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 }
 
                 if ( mListener != null ) {
-                    mListener.OnSelectStateChanged ( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
+                    mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
                 }
             });
         }
-
     }
 
     @Override
@@ -208,13 +215,13 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
         public ImagePickViewHolder ( View itemView ) {
             super ( itemView );
-            icAlbum = (ImageView) itemView.findViewById ( R.id.xiv_album_icon);
-            icSyncing = (ImageView) itemView.findViewById ( R.id.xiv_syncing_icon);
-            icSynced = (ImageView) itemView.findViewById ( R.id.xiv_synced_icon);
+            icAlbum = itemView.findViewById ( R.id.xiv_album_icon);
+            icSyncing = itemView.findViewById ( R.id.xiv_syncing_icon);
+            icSynced = itemView.findViewById ( R.id.xiv_synced_icon);
 
-            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
+            mIvThumbnail = itemView.findViewById ( R.id.xiv_thumbnail );
             mShadow = itemView.findViewById ( R.id.x_shadow );
-            mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
+            mCbx = itemView.findViewById ( R.id.x_check );
             animation = itemView.findViewById ( R.id.animationSquare );
         }
     }

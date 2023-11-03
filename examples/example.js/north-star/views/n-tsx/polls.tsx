@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
 	OnLoadOk, QueryConditions, AnlistColAttrs, Tierec
-} from "@anclient/semantier-st";
+} from "@anclient/semantier";
 
 import {
 	L, AnConst, Comprops,
@@ -101,12 +101,6 @@ class PollsComp extends CrudCompW<PollsProp> {
 	onPageInf(page: number, size: number) {
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
-		// let query = this.state.queryReq;
-		// if (query) {
-		// 	query.Body().Page(size, page);
-		// 	this.state.pageInf = {page, size, total: this.state.pageInf.total};
-		// 	this.context.anReact.bindTablist(query, this, this.context.error);
-		// }
 	}
 
 	onTableSelect(rowIds: string[]) {
@@ -141,7 +135,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 							  users: users.Body().msg() });
 				that.confirm =
 					(<ConfirmDialog open={true}
-						ok={L('OK')} cancel={true} 
+						ok={L('OK')} cancel={true}
 						title={L('Info')} msg={txt}
 						onOk={ () => {
 								that.tier.stopolls(this.uri, this.getByIx(ids),
@@ -168,11 +162,6 @@ class PollsComp extends CrudCompW<PollsProp> {
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				fields={[ this.state.condQzName, this.state.condTag, this.state.condUser ]}
-				// query={ (q: typeof AnQueryst) => { return {
-				// 	qzName:q.conds[0].val ? q.conds[0].val : undefined,
-				// 	tag:   q.conds[1].val ? q.conds[1].val : undefined,
-				// 	orgId: q.conds[2].val ? q.conds[2].val.v : undefined,
-				// } } }
 				onLoaded={this.toSearch}
 			/>
 			<Grid container alignContent="flex-end" >

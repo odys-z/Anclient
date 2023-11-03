@@ -2,7 +2,6 @@ export const photos = [
     {
       src: "https://source.unsplash.com/2ShvY8Lf6l0/800x599",
       title: 'B',
-      source: '',
       width: 4,
       height: 3
     },
@@ -47,4 +46,3 @@ export const photos = [
       height: 3
     }
   ];
-  

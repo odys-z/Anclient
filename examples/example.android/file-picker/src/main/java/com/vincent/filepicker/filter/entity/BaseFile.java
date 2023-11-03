@@ -3,38 +3,28 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.vincent.filepicker.Util;
+
 import java.util.Date;
 
-import io.odysz.common.DateFormat;
-import io.odysz.semantic.tier.docs.IFileDescriptor;
-import io.oz.album.tier.Photo;
+import io.odysz.anson.x.AnsonException;
+import io.odysz.semantic.tier.docs.SyncDoc;
+
 
 /**
- * Modyfied by Ody Zhou
+ * Modified by Ody Zhou
  *
  * Created by Vincent Woo
  * Date: 2016/10/10
  * Time: 17:32
  */
 
-public class BaseFile implements Parcelable, IFileDescriptor {
-    public static int Synchronized = 1;
-    public static int SynchUnknown = 0;
-    public static int Synchronizing = -1;
-
+public class BaseFile extends SyncDoc implements Parcelable {
     private long id;
-    private String name;
-    private String path;
-    private long size;          //byte
-    private String bucketId;    //Directory ID
-    private String bucketName;  //Directory Name
+    private String localDirId;  //Directory ID
+    private String localDirName;//Directory Name
     private long date;          //Added Date
     private boolean isSelected;
-
-    public int synchFlag = SynchUnknown;
 
     @Override
     public boolean equals(Object o) {
@@ -42,12 +32,12 @@ public class BaseFile implements Parcelable, IFileDescriptor {
         if (!(o instanceof BaseFile)) return false;
 
         BaseFile file = (BaseFile) o;
-        return this.path.equals(file.path);
+        return this.clientpath.equals(file.clientpath);
     }
 
     @Override
     public int hashCode() {
-        return path.hashCode();
+        return clientpath.hashCode();
     }
 
     public long getId() {
@@ -58,72 +48,55 @@ public class BaseFile implements Parcelable, IFileDescriptor {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public String getName() { return pname; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void setName(String name) { this.pname = name; }
+//
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public String getPath() { return clientpath; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void setPath(String path) { this.clientpath = path; }
+//
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public long getSize() { return size; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void setSize(long size) { this.size = size; }
+
+    public String getLocalDirId() { return localDirId; }
+
+    public void setLocalDirId(String localDirId) {
+        this.localDirId = localDirId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getLocalDirName() {
+        return localDirName;
     }
 
-    public String getPath() {
-        return path;
+    public void setLocalDirName(String localDirName) {
+        this.localDirName = localDirName;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public long getDate() { return date; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void setDate(long date) { this.date = date; }
 
-    public long getSize() {
-        return size;
-    }
+    public boolean isSelected() { return isSelected; }
 
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public String getBucketId() {
-        return bucketId;
-    }
-
-    public void setBucketId(String bucketId) {
-        this.bucketId = bucketId;
-    }
-
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
-
-    public long getDate() {
-        return date;
-    }
-
-    public void setDate(long date) {
-        this.date = date;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
+    public void setSelected(boolean selected) { isSelected = selected; }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeString(name);
-        dest.writeString(path);
+        dest.writeString(pname);
+        dest.writeString(clientpath);
         dest.writeLong(size);
-        dest.writeString(bucketId);
-        dest.writeString(bucketName);
+        dest.writeString(localDirId);
+        dest.writeString(localDirName);
         dest.writeLong(date);
         dest.writeByte((byte) (isSelected ? 1 : 0));
+        dest.writeString(folder);
     }
 
     @Override
@@ -137,51 +110,26 @@ public class BaseFile implements Parcelable, IFileDescriptor {
 
         @Override
         public BaseFile createFromParcel(Parcel in) {
-            BaseFile file = new BaseFile();
-            file.id = in.readLong();
-            file.name = in.readString();
-            file.path = in.readString();
-            file.size = in.readLong();
-            file.bucketId = in.readString();
-            file.bucketName = in.readString();
-            file.date = in.readLong();
-            file.isSelected = in.readByte() != 0;
-            return file;
+            throw new AnsonException(0, "No overriding?");
+//            BaseFile file = new BaseFile();
+//            file.id = in.readLong();
+//            file.name = in.readString();
+//            file.clientpath = in.readString();
+//            file.size = in.readLong();
+//            file.localDirId = in.readString();
+//            file.localDirName = in.readString();
+//            file.date = in.readLong();
+//            file.isSelected = in.readByte() != 0;
+//            return file;
         }
     };
 
-    // String recId; @Override public String recId() { return recId; }
-
-//    @Override
-//    public IFileDescriptor recId(String rid) {
-//        this.recId = rid;
-//        return this;
-//    }
-
-    @Override
-    public String fullpath() {
-        return path;
+    public String path() {
+        return Util.extractPathWithoutSeparator(clientpath);
     }
 
-    @Override
-    public IFileDescriptor fullpath(String clientpath) throws IOException {
-        path = clientpath;
+    public BaseFile cdate(long l) {
+        cdate(new Date(l));
         return this;
     }
-
-    @Override
-    public String clientname() {
-        Path p = Paths.get(path);
-        return p.getFileName().toString();
-    }
-
-    @Override
-    public String cdate() {
-        return DateFormat.format(new Date(date));
-    }
-
-//    public BaseFile synchFlag(int syncFlag) {
-//        this.synchFlag = syncFlag;
-//        return this;
-//    }
 }

@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import { AnsonMsg, DatasetReq, AnDatasetResp } from '../../semantier-st/protocol'
 import { parseMenus } from '../src/react/sys'
+import { AnsonMsg, DatasetReq, AnDatasetResp, AnTreeNode } from '@anclient/semantier'
 
 const dsTestResp = {
 	"type": "io.odysz.semantic.jprotocol.test.AnsonMsg",
@@ -105,7 +105,7 @@ describe('case: [03.1 Jsample.menu]', () => {
 
 	it('Convert AnsonResp to menu', () => {
 		let msg = new AnsonMsg<AnDatasetResp>(dsMenu);
-		let forest = msg.Body().forest;
+		let forest = msg.Body().forest as AnTreeNode[];
 
 		assert.equal(msg.Body().type, "io.odysz.semantic.ext.AnDatasetResp", "1 ---");
 		assert.equal(forest.length, 2, "2 ---");

@@ -1,6 +1,6 @@
 {
   "name": "@anclient/album",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "description": "Photo gallery built on Anclient",
   "main": "index.js",
   "scripts": {
@@ -14,9 +14,7 @@
   "author": "Ody Zhou",
   "license": "MIT",
   "devDependencies": {
-    "tslint": "^6.1.3"
-  },
-  "dependencies": {
-    "webpack": "^5.68.0"
+    "tslint": "^6.1.3",
+    "webpack": "^5.86.0"
   }
 }

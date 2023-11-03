@@ -8,7 +8,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value
 } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 
-import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField } from '@anclient/semantier-st';
+import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField, Tierec } from '@anclient/semantier';
 import { AnConst } from '../../utils/consts';
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops, CrudCompW } from '../crud';
@@ -17,14 +17,20 @@ import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
 export interface ComboItem extends NV {};
 
 /**E.g. form's combobox field declaration */
-type ComboFieldType = TierComboField<JSX.Element, CompOpts>;
+// type ComboFieldType = TierComboField;
 
 export interface ComboProps extends Comprops {
 	/**Intial options (default values), will be replaced after data binding with field's options */
 	options?: Array<ComboItem>;
 	label?: string;
 	// style: CSSStyleDeclaration;
-	onSelect?: (it: NV) => void
+	onSelect?: (it: NV) => void;
+	onLoad?: OnLoadOk<ComboItem>;
+
+	sk?: string,
+	noAllItem?: boolean,
+
+	autoHighlight?: boolean,
 }
 
 const styles = (theme: Theme) => (Object.assign(
@@ -43,26 +49,20 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		// sk: undefined,
 		// combo: {label: undefined, val: undefined, initVal: undefined, ref: undefined, options: []},
 		// options: [] as Array<ComboItem>,
-
-
 		selectedItem: undefined,
 	};
 
 	combo = {
-		options: undefined as Array<ComboItem>,
+		options: [] as Array<ComboItem>,
 		loading: false,
-		// initVal: undefined
 	};
 
 	refcbb = React.createRef<HTMLDivElement>();
 	loading = false;
-	items: NV[];
 
 	constructor(props: ComboProps) {
 		super(props);
-		this.combo.options = props.options;
-		// this.state.combo.label = props.label;
-		// this.combo.initVal = props.val;
+		this.combo.options = props.options || [];
 
 		if (this.props.sk && !this.props.uri)
 			console.warn("DatasetCombo is configured as loading data with sk, but uri is undefined.")
@@ -72,67 +72,65 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	componentDidMount() {
 		let ctx = this.context as unknown as AnContextType;
-		let anreact = ctx?.anReact as AnReactExt;
+		let anreact = ctx?.uiHelper as AnReactExt;
 		if (!anreact)
 			throw new Error('DatasetCombo can\'t bind controls without AnContext initialized with AnReact.');
 
 		if (this.props.sk ) {
 			let that = this;
 			this.ds2cbbOptions({
-				uri: this.props.uri,
+				uri: this.props.uri || '',
 				sk: this.props.sk,
 				// user uses this, e.g. name and value to access data
 				nv: this.props.nv || {n: 'name', v: 'value'},
 				// cond: this.state.condits, TODO: not used?
+				noAllItem: this.props.noAllItem,
 				onDone: (cols, rows) => {
 					that.combo.options = rows as Array<ComboItem>;
 					that.setState({});
+
+					if(typeof that.props.onLoad === 'function')
+						that.props.onLoad(cols, rows as Array<ComboItem>);
 				}
 			});
 		}
+		else console.warn("DatasetCombo used for null sk?", this.props.label);
 	}
 
-	onCbbRefChange( refcbb: React.RefObject<HTMLDivElement> ) : (
+	onCbbRefChange( _refcbb: React.RefObject<HTMLDivElement> ) : (
 			event: React.ChangeEvent<{}>,
 			value: Value<ComboItem, boolean, boolean, boolean>,
 			reason: AutocompleteChangeReason | AutocompleteInputChangeReason,
 			details?: AutocompleteChangeDetails<ComboItem>
 	) => void {
-		let _ref = refcbb;
-		let _that = this;
-		// let _cmb = this.state.combo;
-		// _cmb.ref = _ref;
-		return (e, item: NV) => {
+		let that = this;
+
+		return (e, item: Value<ComboItem, boolean, boolean, boolean>, reson: string) => {
+			console.log(reson);
+
 			if (e) e.stopPropagation();
-			let selectedItem = item ? item : AnConst.cbbAllItem;
 
-			if (typeof _that.props.onSelect === 'function')
-				_that.props.onSelect(selectedItem);
+			let selectedItem = item ? item as NV : AnConst.cbbAllItem;
 
-			_that.setState({selectedItem});
+			if (typeof that.props.onSelect === 'function')
+				that.props.onSelect(selectedItem);
+
+			that.setState({selectedItem});
 		};
 	}
 
 	render() {
-		// let cmb = this.state.combo
 		let { classes, val } = this.props;
 
 		// let refcbb = React.createRef(); // FIXME why not this.refcbb?
 
-		/** Desgin Notes:
-		 * SimpleForm's first render triggered this constructor and componentDidMount() been called, first.
-		 * When it called render again when data been loaded in it's componentDidMount() (then render),
-		 * this constructor and componentDidMount() won't be called.
-		 * So here is necessary to check the initial selected value.
-		 * This shouldn't be an issue in semantier pattern?
-		 */
 		let selectedItem = this.state.selectedItem;
 		if (!selectedItem && this.props.val != undefined) {
 			selectedItem = findOption(this.combo.options || this.props.options, val);
 			this.state.selectedItem = selectedItem;
 		}
 		let v = selectedItem ? selectedItem : AnConst.cbbAllItem;
-		let opts = this.combo && this.combo.options || this.props.options; 
+		let opts = this.combo && this.combo.options || this.props.options;
 		return (
 		  // avoid set defaultValue before loaded
 		  opts ?
@@ -140,18 +138,19 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			ref={this.refcbb}
 			disabled={this.props.disabled || this.props.readonly || this.props.readOnly}
 			// defaultValue={this.props.val}
-			value={v}
+			value={this.props.noAllItem ? undefined : v}
 			onChange={ this.onCbbRefChange(this.refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'
 			options={opts}
+			autoHighlight={this.props.autoHighlight}
 			style={this.props.style}
-			className={classes[this.props.invalidStyle || 'ok']}
+			className={classes ? classes[this.props.invalidStyle || 'ok'] : ''}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
 			renderInput={
 				(params) => <TextField {...params}
-					label={this.props.showLable && v ? v.n : ''}
+					label={this.props.showLable && v ? v.n : this.props.label || ''}
 					variant="outlined" /> }
 		  /> : <></>);
 
@@ -165,7 +164,8 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		}
 	}
 
-	/**Bind dataset to combobox options (comp.state.condCbb).
+	/**
+	 * Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
 	 * <h6>About React Rendering Events</h6>
@@ -187,7 +187,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	public ds2cbbOptions(opts: { uri: string; sk: string; sqlArgs?: string[];
 						nv: NV;
 						//cond?: {loading: boolean, options: NV[], clean: boolean};
-						onDone: OnLoadOk;
+						onDone: OnLoadOk<Tierec>;
 						/**don't add "-- ALL --" item */
 						noAllItem?: boolean; } ): DatasetComboComp {
 		let {uri, sk, sqlArgs, nv, onDone, noAllItem} = opts;
@@ -196,14 +196,14 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		// cond.loading = true;
 		this.loading = true;
 
-		let ctx = this.context as unknown as AnContextType;
-		let an = ctx.anReact as AnReactExt;
+		let ctx = this.context as AnContextType;
+		let an = ctx.uiHelper as AnReactExt;
+
 		an.dataset( { port: 'dataset', uri, sqlArgs, sk },
 			(dsResp: AnsonMsg<AnsonResp>) => {
-				let rs = dsResp.Body().Rs();
+				let rs = dsResp.Body()?.Rs();
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
 					console.error("Can't find data in rs for option label. column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");
@@ -211,7 +211,6 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				this.items = rows;
 
 				this.loading = false;
 
@@ -225,4 +224,3 @@ DatasetComboComp.contextType = AnContext;
 
 const DatasetCombo = withStyles<any, any, ComboProps>(styles)(withWidth()(DatasetComboComp));
 export { DatasetCombo, DatasetComboComp }
-

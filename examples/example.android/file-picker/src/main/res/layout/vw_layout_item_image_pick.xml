@@ -39,18 +39,18 @@
 
         <ImageView
             android:id="@+id/xiv_syncing_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="5dp"
             android:layout_marginTop="0dp"
             android:src="@drawable/vw_ic_syncing" />
         <ImageView
             android:id="@+id/xiv_synced_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:src="@drawable/vw_ic_synced" />
     </RelativeLayout>

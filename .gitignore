@@ -4,3 +4,4 @@ bin
 debug
 release
 .vs
+.vscode

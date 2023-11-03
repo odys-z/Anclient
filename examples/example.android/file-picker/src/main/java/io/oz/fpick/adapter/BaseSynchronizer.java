@@ -6,35 +6,46 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
-import android.view.View;
 
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.adapter.OnSelectStateListener;
-import com.vincent.filepicker.filter.entity.BaseFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
+import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.SyncingPage;
-import io.oz.album.tier.AlbumResp;
+import io.odysz.semantic.tier.docs.PathsPage;
+import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.SyncDoc;
+import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
+import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
+import io.oz.fpick.activity.BaseActivity;
+//import io.oz.jserv.docsync.SyncFlag;
 
-public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+import static io.odysz.common.LangExt.isblank;
+
+public abstract class BaseSynchronizer <T extends AndroidFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+
+    public String mFilepath;
 
     protected boolean isNeedCamera;
     protected int mMaxNumber;
     protected int mCurrentNumber = 0;
-    private RecyclerView recyclerView;
+
+    /** Prevent measuring for every item */
+    protected int itemWidth = -1;
+
 
     public boolean isUpToMax () {
         return mCurrentNumber >= mMaxNumber;
@@ -44,18 +55,27 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         mCurrentNumber = number;
     }
 
-    protected Context mContext;
+    protected BaseActivity mContext;
     protected ArrayList<T> mList;
-    protected OnSelectStateListener<T> mListener;
+    protected BaseActivity.OnSelectStateListener mListener;
 
     protected AlbumContext singleton;
 
-    protected SyncingPage synchPage;
+    protected PathsPage synchPage;
 
-    public BaseSynchronizer(Context ctx, ArrayList<T> list) {
-        this.singleton = AlbumContext.getInstance();
+    /**
+     * @param ctx
+     * @param list resource list
+     */
+    public BaseSynchronizer(BaseActivity ctx, ArrayList<T> list) {
+        this.singleton = AlbumContext.getInstance(null);
         mContext = ctx;
         mList = list;
+    }
+
+    public BaseSynchronizer(BaseActivity act) {
+        this(act, new ArrayList<>());
+        this.singleton = AlbumContext.getInstance(act);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -74,74 +94,119 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         notifyItemChanged(index);
     }
 
-    public List<T> getDataSet() { return (List<T>) mList; }
+    public List<T> getDataSet() { return mList; }
 
+    /**
+     * Add file list to my list, then start asynchronized matching.
+     * My list is used for feeding item holder used for buffered rendering (by Glide).
+     * @param list
+     */
     @SuppressLint("NotifyDataSetChanged")
-    public void refresh(List<T> list, RecyclerView ... mRecyclerView) {
-        this.recyclerView = mRecyclerView == null ? null : mRecyclerView[0];
-
+    public void refreshSyncs(List<AndroidFile> list) {
         mList.clear();
-        mList.addAll(list);
+        mList.addAll((Collection<? extends T>) list); // why this with performance cost?
         notifyDataSetChanged();
 
-        synchPage = new SyncingPage(0, Math.min(20, mList.size()));
-        synchPage.taskNo = nextRandomInt();
-        synchPage.device = singleton.photoUser.device;
-        if (singleton.tier != null)
-            startSynchQuery(synchPage);
-    }
+        synchPage = new PathsPage(0, Math.min(20, mList.size()));
+        synchPage.device = singleton.userInf.device;
 
-    void startSynchQuery(SyncingPage page) {
-        singleton.tier.asyncQuerySyncs(mList, page,
-                onSyncQueryRespons,
-                (c, r, args) -> {
-                    Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
-                });
-    }
-
-    JProtocol.OnOk onSyncQueryRespons = (resp) -> {
-        AlbumResp rsp = (AlbumResp) resp;
-        if (synchPage.taskNo == rsp.syncing().taskNo && synchPage.end < mList.size()) {
-            HashMap<String, Object> phts = rsp.syncPaths();
-            for (int i = synchPage.start; i < synchPage.end; i++) {
-                T f = mList.get(i);
-                if (phts.keySet().contains(f.fullpath())) {
-                    f.synchFlag = 1;
-                }
-            }
-
-            updateIcons(rsp.syncing());
-
-            if (mList.size() >= synchPage.end) {
-                synchPage.nextPage(Math.min(20, mList.size() - synchPage.end));
+        try {
+            mContext.onStartingJserv(0, 1);
+            if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
                 startSynchQuery(synchPage);
-            }
+            else
+                singleton.login((c) -> startSynchQuery(synchPage),
+                    singleton.errCtx);
+        } catch (GeneralSecurityException e) {
+            singleton.errCtx.err(AnsonMsg.MsgCode.exSession, e.getMessage());
+        } catch (SemanticException e) {
+            singleton.errCtx.err(AnsonMsg.MsgCode.exSemantic, e.getMessage());
+        } catch (IOException e) {
+            singleton.errCtx.err(AnsonMsg.MsgCode.exIo, e.getMessage());
         }
-    };
-
-    void updateIcons(SyncingPage syncPage) {
-        ((Activity)mContext).runOnUiThread( () -> {
-            notifyItemRangeChanged(syncPage.start, syncPage.end);
-        });
     }
 
-    public void setOnSelectStateListener(OnSelectStateListener<T> listener) {
-        mListener = listener;
-    }
-
-    private static final Random RANDOM = new Random();
-    public static int nextRandomInt() {
-        return RANDOM.nextInt(1024 * 1024);
+    void startSynchQuery(PathsPage page) {
+        singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
+            (c, r, args) -> {
+                // Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
+                singleton.errCtx.err(c, r, args);
+            });
     }
 
     /**
+     * Query response handler, triggering query on following pages.
+     */
+    JProtocol.OnOk onSyncQueryResponse = (resp) -> {
+        DocsResp rsp = (DocsResp) resp;
+        PathsPage synchPage = ((DocsResp) resp).syncing();
+        if (synchPage.end() <= mList.size()) {
+            // sequence order is guaranteed.
+            HashMap<String, String[]> phts = rsp.syncing().paths();
+            for (int i = synchPage.start(); i < synchPage.end(); i++) {
+                T f = mList.get(i);
+                if (phts.containsKey(f.fullpath())) {
+                    // [sync-flag, share-falg, share-by, share-date]
+                    String[] inf = phts.get(f.fullpath());
+
+                    // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
+                    f.syncFlag = isblank(inf[0]) ? SyncDoc.SyncFlag.hub : inf[0];
+
+                    f.shareflag = inf[1];
+                    f.shareby = inf[2];
+                    f.sharedate(inf[3]);
+                }
+            }
+
+            updateIcons(synchPage);
+
+            if (mList.size() > synchPage.end()) {
+                synchPage.nextPage(Math.min(20, mList.size() - synchPage.end()));
+                startSynchQuery(synchPage);
+            }
+            else mContext.onEndingJserv(null);
+        }
+        else mContext.onEndingJserv(null);
+    };
+
+    void updateIcons(PathsPage page) {
+        ((Activity)mContext).runOnUiThread(new Runnable() {
+            // avoid multiple page range in error
+            int start;
+            int size;
+            {
+                try {
+                    start = page.start();
+                    size = page.end() - page.start();
+                } catch (SemanticException e) {
+                    e.printStackTrace();
+                    start = 0;
+                    size = 20;
+                }
+            }
+            @Override
+            public void run() {
+                notifyItemRangeChanged(start, size);
+            }
+        });
+    }
+
+    public void selectListener(BaseActivity.OnSelectStateListener listener) {
+        mListener = listener;
+    }
+
+//    private static final Random RANDOM = new Random();
+//    public static int nextRandomInt() {
+//        return RANDOM.nextInt(1024 * 1024);
+//    }
+
+    /**
      * @param ctx the context
-     * @param view the file view - not used currently
      * @param dataType "video/*" or "image/*"
      * @param path full path
      * @return false
      */
-    protected static boolean startMediaViewer(Context ctx, View view, String dataType, String path) {
+    protected static boolean startMediaViewer(Context ctx, String dataType, String path) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri uri;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -161,5 +226,6 @@ public abstract class BaseSynchronizer <T extends BaseFile, VH extends RecyclerV
         }
         return false;
     }
+
 }
 

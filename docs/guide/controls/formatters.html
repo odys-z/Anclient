@@ -1,20 +1,15 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Formatters (AnReact) &mdash; Anclient Anclient documentation</title>
   
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -22,39 +17,42 @@
   
 
   
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   
 
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Anclient Anclient documentation" href="../../index.html"/>
+        <link rel="up" title="Anreact Widgets (some of)" href="index.html"/>
+        <link rel="next" title="Trees" href="tree.html"/>
+        <link rel="prev" title="Image Upload Example (React.js)" href="img-upload.html"/> 
 
-    
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Play with Docker" href="../docker.html" />
-    <link rel="prev" title="Image Upload Example (React.js)" href="img-upload.html" /> 
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
-   
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -81,20 +79,21 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
             
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+                <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../starter/index.html">Quick Start (js only)</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Guid (Tips)</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../starter/index.html">Ancient.ts Quick Start</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Guide &amp; Tips</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../framework.html">Application Framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/north.html">Example: North Star</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/xvisual.html">Example: xvisual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docker.html">Deploy docker layers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../func-uri.html">Func URI &amp; Datasource Mapping</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Guid (Tips)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Anreact Widgets (some of)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="about-anreact.html">About Anreact</a></li>
 <li class="toctree-l3"><a class="reference internal" href="query-form.html">QueryForm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="img-upload.html">Image Upload Example (React.js)</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Formatters (AnReact)</a><ul>
@@ -102,9 +101,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#treegrid-cell-formatter">Treegrid Cell Formatter</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="tree.html">Trees</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../docker.html">Play with Docker</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../dev/index.html">For developers</a></li>
@@ -113,67 +112,42 @@
             
           
         </div>
-        
       </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">Anclient</a>
-        
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">Anclient</a>
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
-
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../index.html">Guid (Tips)</a> &raquo;</li>
-        
-          <li><a href="index.html">Guid (Tips)</a> &raquo;</li>
-        
-      <li>Formatters (AnReact)</li>
-    
-    
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Guide &amp; Tips</a> &raquo;</li>
+      
+          <li><a href="index.html">Anreact Widgets (some of)</a> &raquo;</li>
+      
+    <li>Formatters (AnReact)</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../../_sources/guide/controls/formatters.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -184,13 +158,13 @@
 <div class="section" id="trecordform-formatter">
 <h2>TRecordForm Formatter<a class="headerlink" href="#trecordform-formatter" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>called by</p></li>
+<li>called by</li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TRecordForm</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>signature</p></li>
+<li>signature</li>
 </ul>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
 <span class="cm"> * @param {object} record</span>
@@ -202,7 +176,7 @@
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>example</p></li>
+<li>example</li>
 </ul>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
 <span class="cm"> * Format an image upload component.</span>
@@ -214,7 +188,7 @@
 <span class="nx">loadAvatar</span><span class="p">(</span><span class="nx">rec</span><span class="p">,</span> <span class="nx">field</span><span class="p">,</span> <span class="nx">tier</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="p">(</span>
                 <span class="o">&lt;</span><span class="nx">ImageUpload</span>
-                        <span class="nx">blankIcon</span><span class="o">=</span><span class="p">{{</span><span class="nx">color</span><span class="o">:</span> <span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="mf">32</span><span class="p">,</span> <span class="nx">height</span><span class="o">:</span> <span class="mf">32</span><span class="p">}}</span>
+                        <span class="nx">blankIcon</span><span class="o">=</span><span class="p">{{</span><span class="nx">color</span><span class="o">:</span> <span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="mi">32</span><span class="p">,</span> <span class="nx">height</span><span class="o">:</span> <span class="mi">32</span><span class="p">}}</span>
                         <span class="nx">tier</span><span class="o">=</span><span class="p">{</span><span class="nx">tier</span><span class="p">}</span> <span class="nx">field</span><span class="o">=</span><span class="p">{</span><span class="nx">field</span><span class="p">}</span>
                         <span class="nx">src64</span><span class="o">=</span><span class="p">{</span><span class="nx">rec</span> <span class="o">&amp;&amp;</span> <span class="nx">field</span> <span class="o">&amp;&amp;</span> <span class="nx">rec</span><span class="p">[</span><span class="nx">field</span><span class="p">.</span><span class="nx">field</span><span class="p">]}</span>
                 <span class="o">/&gt;</span><span class="p">);</span>
@@ -224,38 +198,50 @@
 </div>
 <div class="section" id="treegrid-cell-formatter">
 <h2>Treegrid Cell Formatter<a class="headerlink" href="#treegrid-cell-formatter" title="Permalink to this headline">¶</a></h2>
-<p>TODO …</p>
+<p>Called by Treegrid#render().</p>
+<p id="api-widgets-tree">Signature defined in <a class="reference external" href="https://github.com/odys-z/Anclient/blob/master/js/anreact/src/react/widgets/tree.tsx">tree.tsx</a>:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">interface</span> <span class="nx">AnTreegridCol</span> <span class="kr">extends</span> <span class="nx">AnlistColAttrs</span><span class="o">&lt;</span><span class="nx">JSX</span><span class="p">.</span><span class="nx">Element</span><span class="p">,</span> <span class="nx">CompOpts</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="cm">/**</span>
+<span class="cm">     * Overide AnTablistProps#formatter</span>
+<span class="cm">     * Formatt a tree item cell/grid from col and node.</span>
+<span class="cm">     */</span>
+    <span class="nx">colFormatter</span><span class="o">?:</span> <span class="p">(</span><span class="nx">col</span>: <span class="kt">AnTreegridCol</span><span class="p">,</span> <span class="nx">n</span>: <span class="kt">AnTreeNode</span><span class="p">,</span> <span class="nx">opts?</span>: <span class="kt">CompOpts</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">JSX</span><span class="p">.</span><span class="nx">Element</span><span class="p">;</span>
+
+    <span class="nx">thFormatter</span><span class="o">?:</span> <span class="p">(</span><span class="nx">col</span>: <span class="kt">AnTreegridCol</span><span class="p">,</span> <span class="nx">colx</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">opts?</span>: <span class="kt">CompOpts</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">JSX</span><span class="p">.</span><span class="nx">Element</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For the example, see <a class="reference internal" href="tree.html#controls-typeparser"><span class="std std-ref">Doc type parser</span></a>.</p>
 </div>
 </div>
 
 
            </div>
-           
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../docker.html" class="btn btn-neutral float-right" title="Play with Docker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="img-upload.html" class="btn btn-neutral float-left" title="Image Upload Example (React.js)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="tree.html" class="btn btn-neutral float-right" title="Trees" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="img-upload.html" class="btn btn-neutral" title="Image Upload Example (React.js)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2022, Odys Zhou.
+        &copy; Copyright 2023, Ody Zhou.
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 
@@ -264,15 +250,37 @@
   </div>
   
 
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'Anclient',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  false
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+
+  
 
   
   
-    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
    
 
 </body>

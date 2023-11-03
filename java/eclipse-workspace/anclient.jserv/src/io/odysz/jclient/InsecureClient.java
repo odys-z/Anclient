@@ -1,10 +1,10 @@
 package io.odysz.jclient;
 
-import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantics.SessionInf;
 
 public class InsecureClient extends SessionClient {
 
-	public InsecureClient(String servRt) {
+	public InsecureClient() {
 		super(robotSsInf());
 	}
 

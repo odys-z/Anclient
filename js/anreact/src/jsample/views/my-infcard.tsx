@@ -4,14 +4,14 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 
 import { Protocol, CRUD,
-	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs,
-	OnCommitOk, OnLoadOk, QueryConditions, SessionInf
-} from '@anclient/semantier-st';
+	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, PageInf,
+	OnCommitOk, OnLoadOk, SessionInf, UIComponent, str
+} from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { dataOfurl, urlOfdata } from '../../utils/file-utils';
 import { AnContext, AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
-import { TRecordForm } from '../../react/widgets/t-record-form';
+import { TRecordForm } from '../../react/widgets/record-form';
 import { ImageUpload } from '../../react/widgets/image-upload';
 import { Comprops, DetailFormW } from '../../react/crud';
 import { CompOpts } from '../../an-components';
@@ -25,9 +25,14 @@ interface MyInfRec extends Tierec {
 	roleId?: string,
 	userName: string,
 	img?: string,
+	/**mime readed from server. */
 	mime?: string,
+	/**filename readed from server. */
 	attName?: string,
 	attId?: string,
+
+	/**The local file description - note that mime & attName are readed from server. */
+	fileMeta?: {name: string, mime: string}
 }
 
 interface MyInfProps extends Comprops {
@@ -92,7 +97,7 @@ class MyInfCardComp extends DetailFormW<MyInfProps> {
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.tier.crud,
-				  pkval: this.tier.pkval.v,
+				  pkval: this.tier.pkval.v as string,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
@@ -130,6 +135,7 @@ class MyInfCardComp extends DetailFormW<MyInfProps> {
 }
 MyInfCardComp.contextType = AnContext;
 
+// const MyInfCard = withStyles<any, any, MyInfProps>(styles)(withWidth()(MyInfCardComp));
 const MyInfCard = withWidth()(withStyles(styles)(MyInfCardComp));
 
 export class MyInfTier extends Semantier {
@@ -139,22 +145,21 @@ export class MyInfTier extends Semantier {
 
 	rec = {} as MyInfRec; // Tierec & {mime: string, attName: string, attId: string};
 
-	constructor(comp) {
+	constructor(comp: UIComponent) {
 		super(comp);
 		// FIXME move to super class?
-		// this.uri = comp.uri;
-		this.mtabl = 'a_users';
+		this.pkval.tabl = 'a_users';
 		this.pkval.pk = 'userId';
 
 		this.loadAvatar = this.loadAvatar.bind(this);
 	}
 
 	_fields = [
-		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-		{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
-		{ field: 'roleId',   label: L('Role'), disabled: true,
-		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
-		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+		{ type : 'text', field: 'userId',   label: L('Log ID'),    grid: {sm: 6, lg: 4}, disabled: true },
+		{ type : 'text', field: 'userName', label: L('User Name'), grid: {sm: 6, lg: 4} },
+		{ type : 'cbb',  field: 'roleId',   label: L('Role'),      grid: {sm: 6, lg: 4}, disabled: true,
+		  cbbStyle: {width: "100%"},
+		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 		{ field: this.imgProp, label: L('Avatar'), grid: {sm: 6, lg: 4}, fieldFormatter: this.loadAvatar.bind(this) }
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
@@ -175,8 +180,8 @@ export class MyInfTier extends Semantier {
 			/>);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk<MyInfRec>) {
-		let { userId } = conds;
+	record(conds: PageInf, onLoad: OnLoadOk<MyInfRec>) {
+		let { userId } = conds.mapCondts;
 
 		let client = this.client;
 		if (!client)
@@ -200,8 +205,9 @@ export class MyInfTier extends Semantier {
 				// NOTE because of using general query, extra hanling is needed
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0] as MyInfRec;
-				that.pkval.v = that.rec && that.rec[that.pkval.pk];
-				that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
+				that.pkval.v = str(that.rec && that.rec[that.pkval.pk]);
+				if (that.rec[that.imgProp])
+					that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
 				onLoad(cols, rows as Array<MyInfRec>);
 			},
 			this.errCtx);
@@ -219,7 +225,7 @@ export class MyInfTier extends Semantier {
 
 		let req = this.client
 					.usrAct(this.uri, CRUD.u, "save", "save my info")
-					.update(this.uri, this.mtabl,
+					.update(this.uri, this.pkval.tabl,
 							{pk: this.pkval.pk, v: opts.pkval},
 							{roleId, userName});
 		// about attached image:
@@ -231,13 +237,15 @@ export class MyInfTier extends Semantier {
 			req.Body()
 				.post( new DeleteReq(this.uri, "a_attaches", undefined)
 					.whereEq('busiId', rec[this.pkval.pk] as string || '')
-					.whereEq('busiTbl', this.mtabl) );
+					.whereEq('busiTbl', this.pkval.tabl) );
 		if ( rec[this.imgProp] ) {
+			if (!rec.fileMeta)
+				console.error("Uploading file without fileMeta information?");
+
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
-					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v)
-					.nv('attName', rec.attName)
-					.nv('mime', rec.mime)
+					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v as string)
+					.nv('attName', rec.fileMeta?.name).nv('mime', rec.fileMeta?.mime)
 					.nv('uri', dataOfurl(rec[this.imgProp] as string)) );
 		}
 
@@ -247,7 +255,7 @@ export class MyInfTier extends Semantier {
 				if (crud === CRUD.c)
 					// NOTE:
 					// resulving auto-k is a typicall semantic processing, don't expose this to caller
-					that.pkval.v = bd.resulve(that.mtabl, that.pkval.pk, that.rec);
+					that.pkval.v = bd.resulve(that.pkval.tabl, that.pkval.pk, that.rec);
 				onOk(resp);
 			},
 			this.errCtx);

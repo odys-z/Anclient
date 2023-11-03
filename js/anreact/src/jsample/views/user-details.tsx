@@ -9,12 +9,12 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 
-import { CRUD, TierCol } from '@anclient/semantier-st';
+import { CRUD, TierCol } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';
 import { ConfirmDialog } from '../../react/widgets/messagebox';
-import { TRecordForm } from '../../react/widgets/t-record-form';
+import { TRecordForm } from '../../react/widgets/record-form';
 import { UsersTier } from './users';
 
 const styles = (theme: Theme) => ({
@@ -93,7 +93,7 @@ class UserDetailstComp extends DetailFormW<Comprops & {tier: UsersTier}> {
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.crud,
-				  pkval: this.props.tier.pkval.v,
+				  pkval: this.props.tier.pkval.v as string,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
@@ -114,7 +114,7 @@ class UserDetailstComp extends DetailFormW<Comprops & {tier: UsersTier}> {
 			this.props.onClose({code: 'cancel'});
 	}
 
-	showConfirm(msg) {
+	showConfirm(msg: string) {
 		let that = this;
 		this.confirm = (
 			<ConfirmDialog title={L('Info')}
@@ -137,8 +137,6 @@ class UserDetailstComp extends DetailFormW<Comprops & {tier: UsersTier}> {
 		let title = c ? L('Create User')
 					  : u ? L('Edit User')
 					  : L('User Details');
-
-		// let rec = this.state.record;
 
 		return (<>
 		  <Dialog className={classes.root}

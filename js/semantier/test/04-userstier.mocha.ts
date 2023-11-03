@@ -1,7 +1,7 @@
 
 import { assert } from 'chai'
 
-import {AnsonMsg, AnsonResp} from '../protocol-v2';
+import {AnsonMsg, AnsonResp} from '../protocol';
 
 const respInsUser = {
   "type": "io.odysz.semantic.jprotocol.AnsonResp",
@@ -22,7 +22,7 @@ describe('case: [04.1 Userst] AnsonResp Insert', () => {
     it('Resulve userId', () => {
 		let msg = new AnsonMsg<AnsonResp>({body: [respInsUser]});
 		let rp = msg.Body();
-		assert.equal(rp.map['inserted'][0], 1, "1 ---");
-		assert.equal(rp.map['resulved'], null, "2 ---");
+		assert.equal(rp?.map['inserted'][0], 1, "1 ---");
+		assert.equal(rp?.map['resulved'], null, "2 ---");
 	} );
 });

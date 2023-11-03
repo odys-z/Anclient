@@ -1,10 +1,10 @@
-import { ErrorCtx, Semantext, SessionInf } from '@anclient/semantier-st';
+import { ErrorCtx, Semantext, SessionInf } from '@anclient/semantier';
 import React from 'react';
 
 import { AnReact } from './anreact';
 
 /**
- * The configuration used by user App to setup jserv root URL.
+ * The configuration data object used by user App to setup jserv root URL.
  */
 export interface JsonServs {
 	host?: string;
@@ -13,12 +13,18 @@ export interface JsonServs {
 
 export interface AnContextType extends Semantext {
 	ssInf?: SessionInf,
+	/** AnReact instance. currently neccessary */
+	anReact?: AnReact,   
 
 	pageOrigin?: string,
-	iparent?: any,    // usually the parent window of ifram
+	/** Usually the parent window of ifram. */
+	iparent?: Window,
 	ihome?: string,
 
-	/**default: host */
+	/**
+	 * Jserv id configured within index.html for jserv url directing.
+	 * default: host
+	 */
 	servId: string,
 
 	servs: JsonServs, 
@@ -42,7 +48,7 @@ export const AnContext = React.createContext({
 	anReact: undefined,
 
 	error: {
-        /**@function (code: string, AnsonMsg<AnsonResp>) => void */
+		/**@function (code: string, AnsonMsg<AnsonResp>) => void */
 		onError: undefined,
 		msg: undefined
 	} as ErrorCtx,
@@ -50,4 +56,4 @@ export const AnContext = React.createContext({
 
 	/** Only nullable for Login */
 	reactHelper: undefined as AnReact,
-} as AnContextType);
+} as unknown as AnContextType);

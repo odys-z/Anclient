@@ -1,0 +1,55 @@
+var path = require('path')
+var webpack = require('webpack')
+
+var v = 'development';// "production" | "development" | "none"
+var version = "1.0.0";
+
+module.exports = {
+	mode: v,
+	devtool: 'source-map',
+	entry: {'AnHome': './src/less-app.tsx',
+			'AnWidgets': './src/less-widgets.tsx',
+			'Doctree': './src/less-widgets-treegrid.tsx',
+			'AnSheet': './src/workbook/sheet-app.tsx' },
+	
+	// external: {
+	// 	pdfjs: ''
+	// },
+
+	output: {
+	  filename: "[name]-" + version + ".min.js",
+	  path: path.resolve(__dirname, 'dist'),
+	  library: 'less',
+	  libraryTarget: 'umd'
+	},
+
+	plugins: [ ],
+
+	resolve: {
+		extensions: ['*', '.ts', '.js', '.jsx', '.tsx']
+	},
+
+	module: {
+		rules: [
+		{ test: /\.jsx?$/,
+		  loader: 'babel-loader',
+		  options: {
+		  presets: ['@babel/preset-react', '@babel/preset-env'] }
+		},
+		{ test: /\.tsx?$/,
+		  loader : 'babel-loader',
+		  options: { presets: [
+				'@babel/preset-react',
+				'@babel/preset-typescript',
+				'@emotion/babel-preset-css-prop',
+				'@babel/preset-env' ] }
+		},
+		{   test: /\.css$/,
+			use : ["style-loader", "css-loader"]
+		},
+		{   test: /\.svg$/,
+			use : [ { loader: "babel-loader" },
+					{ loader: "react-svg-loader" } ]
+		} ]
+	}
+}
