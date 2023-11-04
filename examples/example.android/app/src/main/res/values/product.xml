@@ -1,7 +1,10 @@
 <resources>
-    <string name="product_jserv_default" translatable="true">https://localhost:8888/jserv-album</string>
-    <string name="product_jserv_name0"   translatable="true">jserv-album.github</string>
-    <string name="product_landing"       translatable="true">https://localhost:8888/album</string>
+    <string name="product_jserv_default" translatable="true" >https://www.inforise.com.cn/</string>
+    <string name="product_jserv_name0"   translatable="true" >jserv-album.inforise</string>
+    <string name="product_jserv_1"       translatable="false">http://10.0.0.245:8080/</string>
+    <string name="product_jserv_name1"   translatable="false">omni</string>
+
+    <string name="product_landing"       translatable="true">https://www.inforise.com.cn/album</string>
 
     <string name="product_url_help"      >https://odys-z.github.io/products/album</string>
     <string name="product_url_landing"   >https://odys-z.github.io/Anclient</string>

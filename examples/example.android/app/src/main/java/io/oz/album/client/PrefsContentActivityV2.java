@@ -234,7 +234,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
             prefFragment.device.setEnabled(false);
 
             // write through
-            singleton.tier.asyRegisterDevice(buff_devname, buff_device, (resp) -> {
+            singleton.tier.asyRegisterDevice( buff_device, (resp) -> {
                 singleton.userInf.device(buff_device);
             });
         }

@@ -87,10 +87,6 @@ public class ComfirmDlg extends DialogFragment {
     }
 
     public ComfirmDlg showDlg(AppCompatActivity act, String tag) {
-//        show(getParentFragmentManager(), tag);
-//        dismissin(livingms);
-//        return this;
-
         FragmentManager fm = act.getSupportFragmentManager();
         // issue: no end transaction?
         // https://developer.android.com/reference/android/app/DialogFragment.html#alert-dialog
@@ -98,35 +94,17 @@ public class ComfirmDlg extends DialogFragment {
         ft.addToBackStack(null);
         // DialogFragment newFragment = MyDialogFragment.newInstance(mStackLevel);
         dismissin(livingms);
-        show(ft, "dialog");
+        show(ft, tag);
         return this;
     }
 
     private void dismissin(int ms) {
         if (ms > 0) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    new CountDownTimer(ms, ms) {
-                        @Override public void onTick(long millisUntilFinished) { }
-                        @Override public void onFinish() { dismiss(); }
-                    }.start();
-                }
-            } );
+            getActivity().runOnUiThread(() -> new CountDownTimer(ms, ms) {
+                @Override public void onTick(long millisUntilFinished) { }
+                @Override public void onFinish() { dismiss(); }
+            }.start());
         }
-//            new CountDownTimer(ms, ms) {
-//                @Override public void onTick(long millisUntilFinished) { }
-//                @Override public void onFinish() { dismiss(); }
-////                @Override public void onFinish() {
-////                    getActivity().runOnUiThread(new Runnable() {
-////                        @Override
-////                        public void run() {
-////                            dismiss();
-////                        }
-////                    });
-////                }
-////            }.start();
-//        }
     }
 
     public ComfirmDlg live(int milliseconds) {
