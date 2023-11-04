@@ -47,11 +47,13 @@
     <string name="summery_login"   >登錄后可上傳文件</string>
     <string name="txt_login"       >点击登录</string>
 
-    <string name="my_group"         >當前組</string>
-    <string name="txt_set_groups"   >設置當前共享組</string>
-    <string name="unknown_qrformat" >未知二維碼格式: %s</string>
-    <string name="unknown_qrcontent">二維碼内容無法識別。</string>
-    <string name="msg_log4device"   >Login first to restore a previous used device ID.</string>
-    <string name="msg_no_used_dev"  >No available devices.</string>
+    <string name="my_group"          >當前組</string>
+    <string name="txt_set_groups"    >設置當前共享組</string>
+    <string name="unknown_qrformat"  >未知二維碼格式: %s</string>
+    <string name="unknown_qrcontent" >二維碼内容無法識別。</string>
+    <string name="msg_log4device"    >Login first to restore a previous used device ID.</string>
+    <string name="msg_no_used_dev"   >No available devices.</string>
+    <string name="dev_usedby"        >Device name used by %s (%s)</string>
+    <string name="msg_repace_devname">Using this device to replace old name %s [id: %s] ?</string>
 
 </resources>

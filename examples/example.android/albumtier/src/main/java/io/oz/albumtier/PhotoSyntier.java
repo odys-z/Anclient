@@ -115,7 +115,7 @@ public class PhotoSyntier extends SynclientierMvp {
 
 			AlbumReq req = new AlbumReq(uri);
 			req.a(A.getPrefs);
-			AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req)
+			AnsonMsg<AlbumReq> q = client.userReq(uri, AlbumPort.album, req)
 					.header(header);
 			AnsonResp resp = client.commit(q, errCtx);
 			onOk.ok(resp);
@@ -140,7 +140,7 @@ public class PhotoSyntier extends SynclientierMvp {
 
 				AlbumReq req = new AlbumReq(uri);
 				req.a(DocsReq.A.devices);
-				AnsonMsg<AlbumReq> q = client.<AlbumReq>userReq(uri, AlbumPort.album, req)
+				AnsonMsg<AlbumReq> q = client.userReq(uri, AlbumPort.album, req)
 						.header(header);
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);

@@ -114,7 +114,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             return;
         }
 
-        if (singleton.tier.verifyDeviceId(dev)) {
+        if (singleton.tier.verifyDeviceId(dev, null)) {
             // passed
 
             if (prefFragment.btnRegistDev != null) {

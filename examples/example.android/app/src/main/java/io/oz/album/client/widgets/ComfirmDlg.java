@@ -20,7 +20,7 @@ import io.oz.R;
 import static io.odysz.common.LangExt.is;
 
 public class ComfirmDlg extends DialogFragment {
-    private final Activity acty;
+    // private final Activity acty;
     boolean showCancel;
     int msgid;
     /** default for msgid == 0 */
@@ -33,7 +33,7 @@ public class ComfirmDlg extends DialogFragment {
     DialogInterface.OnClickListener onCancel;
 
     public ComfirmDlg(final Activity acty, boolean... showCancel) {
-        this.acty = acty;
+        // this.acty = acty;
         this.showCancel = is(showCancel);
     }
 
@@ -104,7 +104,7 @@ public class ComfirmDlg extends DialogFragment {
 
     private void dismissin(int ms) {
         if (ms > 0) {
-            acty.runOnUiThread(new Runnable() {
+            getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     new CountDownTimer(ms, ms) {

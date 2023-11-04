@@ -1,15 +1,17 @@
 package io.oz.album.client;
 
-import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.isNull;
+import static io.oz.album.client.PrefsContentActivityV2.buff_device;
+import static io.oz.album.client.PrefsContentActivityV2.buff_devname;
 import static io.oz.album.client.PrefsContentActivityV2.singleton;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -17,13 +19,11 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
-import java.io.IOException;
-
-import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
 import io.odysz.semantics.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.client.widgets.ComfirmDlg;
 
 /**
  * <h4>Preference Fragment</h4>
@@ -90,29 +90,11 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
         }
         summery = findPreference(AlbumApp.keys.login_summery);
 
-        //
-//        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-//        String anstr = sharedPref.getString(AlbumApp.keys.jserv, "");
-//        AnPrefEntries ents = isblank(anstr)
-//            ? new AnPrefEntries(
-//                getResources().getStringArray(R.array.jserv_entries),
-//                getResources().getStringArray(R.array.jserv_entvals) )
-//            : (AnPrefEntries) Anson.fromJson(anstr);
-
         lstJserv.setEntries(PrefsContentActivityV2.jsvEnts.entries);
         lstJserv.setEntryValues(PrefsContentActivityV2.jsvEnts.entVals);
-
-//        lstJserv.setOnPreferenceChangeListener((v, k)->{
-//            if (null != v) {
-//                PrefsContentActivityV2.jsvEnts.select(k.toString());
-//                v.setTitle(PrefsContentActivityV2.jsvEnts.entry());
-//                v.setSummary(k.toString());
-//            }
-//            return true;
-//        });
     }
 
-    static void bindPref2Val(@NonNull Preference preference) {
+    void bindPref2Val(@NonNull Preference preference) {
         if (preference == null)
             return;
         preference.setOnPreferenceChangeListener(prefsListener);
@@ -127,7 +109,7 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static final Preference.OnPreferenceChangeListener prefsListener =
+    private final Preference.OnPreferenceChangeListener prefsListener =
         (preference, newValue) -> {
             String stringValue = newValue.toString();
             String k = preference.getKey();
@@ -143,13 +125,27 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
             }
             else if (AlbumApp.keys.usrid.equals(k)) {
                 String device = singleton.userInf.device;
-                singleton.userInf = new SessionInf(singleton.userInf.ssid(), stringValue);
-                singleton.userInf.device = device;
+                singleton.userInf = new SessionInf(singleton.userInf.ssid(), stringValue).device(device);
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.device.equals(k)) {
-                singleton.userInf.device = stringValue;
-                preference.setSummary(stringValue);
+                if (eq(stringValue, PrefsContentActivityV2.buff_devname)) {
+                    new ComfirmDlg(null)
+                        .dlgMsg(0, 0)
+                        .msg(getString(R.string.msg_repace_devname, buff_devname, buff_device))
+                        .onOk((dialog, id) -> {
+                            dialog.dismiss();
+                            // replace old name with new Id
+                            PrefsContentActivityV2.buff_device  = null;
+                        })
+                        .showDlg((AppCompatActivity) getActivity(), "FIXME")
+                        .live(3000);
+                }
+                else
+                    PrefsContentActivityV2.buff_device  = null;
+
+                preference.setTitle(String.format("%s [%s]",
+                                    stringValue, buff_device == null ? "" : buff_device));
             }
             else if (AlbumApp.keys.home.equals(k)) {
                 singleton.profiles.home(stringValue);

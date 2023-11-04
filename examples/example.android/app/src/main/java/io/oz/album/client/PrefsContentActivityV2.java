@@ -32,7 +32,6 @@ import java.util.Objects;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
-import io.odysz.common.Utils;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantics.x.SemanticException;
@@ -55,7 +54,16 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
     static String oldUid;
     final AlbumPreferenceFragmentV2 prefFragment = new AlbumPreferenceFragmentV2();
 
+    /** jserv url options */
     static public AnPrefEntries jsvEnts;
+
+    /** Buffered device id for registering or applying when user loading old names or updating
+     * TextEdit. The device name is intended to be a new one if {@link #buff_devname} is null.
+     */
+    static String buff_device;
+
+    /** @see #buff_device */
+    static String buff_devname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +134,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
     /**
      * On qr-scanning results.
+     * For content format, see {@link AnPrefEntries#insert(String)}
      * @param requestCode
      * @param resultCode
      * @param data
@@ -164,11 +173,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
     public void onLogin(View btn) {
         if (isblank(singleton.pswd())) {
-            // updateSummery(prefFragment.pswd, "");
-            // updateSummery(prefFragment.summery, getString(R.string.err_empty_pswd));
-            confirm(R.string.err_empty_pswd, 5000);
-            // updateSummery(prefFragment.pswd, getString(R.string.pswd_title));
-            // confirm(R.string.pswd_title, 5000);
+            confirm(R.string.err_empty_pswd, 3000);
             return;
         }
         try {
@@ -185,8 +190,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         singleton.profiles = prf;
                         singleton.policies = new Plicies(prf);
 
-                        // updateSummery(prefFragment.homepref, prf.home);
-
+                        // update summery?
                         SharedPreferences sharedPref =
                                 PreferenceManager.getDefaultSharedPreferences(this);
                         SharedPreferences.Editor editor = sharedPref.edit();
@@ -194,10 +198,8 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         editor.putString(keys.homepage, prf.webroot);
                         editor.apply();
                     },
-                    // showErrSummary);
                     showErrConfirm);
             },
-            // showErrSummary);
             showErrConfirm);
         } catch (Exception e) {
             Log.e(clientUri, e.getClass().getName() + e.getMessage());
@@ -208,14 +210,8 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
     /**
      * common function for error handling
-     * @deprecated replaced wity {@link io.oz.album.client.widgets.ComfirmDlg}
      */
-    JProtocol.OnError showErrSummary = (c, t, args) ->
-        updateSummery(prefFragment.summery,
-                      String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)));
-
     JProtocol.OnError showErrConfirm = (c, t, args) ->
-            // confirm(String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)), 5000);
             errorDlg(t, 5000);
 
     /**
@@ -223,31 +219,24 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
      * @param btn
      */
     public void onRegisterDevice(View btn) {
-        String dev = singleton.userInf.device;
-        if (LangExt.isblank(dev)) {
+        // String dev = singleton.userInf.device;
+        if (LangExt.isblank(buff_devname)) {
             confirm(R.string.msg_blank_device, 3000);
             return;
         }
 
-        if (singleton.tier.verifyDeviceId(dev)) {
+        if (singleton.tier.verifyDeviceId(buff_device, buff_devname)) {
             // passed
             if (prefFragment.btnRegistDev != null) {
                 prefFragment.prefcateDev.removePreference(prefFragment.findPreference(AlbumApp.keys.restoreDev));
                 prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
-//                prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
-//                prefFragment.prefcateDev.removePreference(prefFragment.prefcateDev);
             }
             prefFragment.device.setEnabled(false);
 
-            if (isNull(dev))
-                // Utils.warn("!!!\n!!!\n!!! to bo verified: %s", dev);
-                confirm(R.string.msg_blank_device, 3000);
-            else {
-                // write through
-                singleton.tier.asyRegisterDevice(dev, (resp) -> {
-                    singleton.userInf.device = dev;
-                });
-            }
+            // write through
+            singleton.tier.asyRegisterDevice(buff_devname, buff_device, (resp) -> {
+                singleton.userInf.device(buff_device);
+            });
         }
         else {
             // failed
@@ -267,26 +256,33 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
         try {
             singleton.tier.asyAvailableDevices( (resp) -> {
-                // String[] choices = {"Item One", "Item Two", "Item Three"};
                 try {
-                    final String[] choices = ((AnResultset)resp.rs(0)).toArr("device").toArray(new String[] {});
-                    if (len(choices) <= 0) {
+                    final String[] oldevId = ((AnResultset)resp.rs(0)).toArr("device").toArray(new String[] {});
+                    final String[] oldevnm = ((AnResultset)resp.rs(0)).toArr("devname").toArray(new String[] {});
+                    if (len(oldevId) <= 0) {
                         confirm(R.string.msg_no_used_dev, 3000);
                         return;
                     }
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    String dev_usedby = "Device name used by " + singleton.userInf.userName();
-                    builder .setTitle(dev_usedby)
-                            .setPositiveButton("Positive", (dialog, which) -> {
-                                updateTitle(prefFragment.findPreference(keys.device), choices[which]);
+                    runOnUiThread(() -> {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        String uname = (String) resp.data().get("owner-name");
+                        String org   = (String) resp.data().get("org");
+                        String dev_usedby = getString(R.string.dev_usedby, uname, org);
+                        builder.setTitle(dev_usedby)
+                            .setPositiveButton("Use It", (dialog, which) -> {
+                                buff_device  = oldevId[which];
+                                buff_devname = oldevnm[which];
+                                updateTitle(prefFragment.findPreference(keys.device),
+                                        String.format("%s [%s]", buff_devname, buff_device));
                                 updateSummery(prefFragment.findPreference(keys.device), dev_usedby);
                             })
-                            .setNegativeButton("Negative", (dialog, which) -> { })
-                            .setSingleChoiceItems(choices, 0, (dialog, which) -> { });
+                            .setNegativeButton("Cancel", (dialog, which) -> { })
+                            .setSingleChoiceItems(oldevnm, 0, (dialog, which) -> { });
 
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    });
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 } });
@@ -321,7 +317,6 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
     @Override
     public void err(MsgCode c, String msg, String... args) {
-        // this.showErrSummary.err(c, msg, args);
         errorDlg(String.format(msg, (Object[]) (args == null ? new String[]{"", ""} : args)), 0 );
     }
 
