@@ -7,8 +7,13 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import io.oz.R;
 
@@ -81,9 +86,19 @@ public class ComfirmDlg extends DialogFragment {
         return builder.create();
     }
 
-    public ComfirmDlg showDlg(String tag) {
-        show(getActivity().getSupportFragmentManager(), tag);
+    public ComfirmDlg showDlg(AppCompatActivity act, String tag) {
+//        show(getParentFragmentManager(), tag);
+//        dismissin(livingms);
+//        return this;
+
+        FragmentManager fm = act.getSupportFragmentManager();
+        // issue: no end transaction?
+        // https://developer.android.com/reference/android/app/DialogFragment.html#alert-dialog
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.addToBackStack(null);
+        // DialogFragment newFragment = MyDialogFragment.newInstance(mStackLevel);
         dismissin(livingms);
+        show(ft, "dialog");
         return this;
     }
 

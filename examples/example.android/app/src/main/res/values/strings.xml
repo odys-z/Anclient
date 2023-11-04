@@ -26,6 +26,8 @@
     <string name="homepage_key"  translatable="false">homepage-key</string>
     <string name="jserv_default" translatable="false">@string/product_jserv_default</string>
     <string name="jserv_name0"   translatable="false">@string/product_jserv_name0</string>
+    <string name="jserv_1"       translatable="false">@string/product_jserv_1</string>
+    <string name="jserv_name1"   translatable="false">@string/product_jserv_name1</string>
     <string name="jserv"         translatable="false">@string/product_landing</string>
     <string name="qrformat"      translatable="false">QR_CODE</string>
 
@@ -77,14 +79,17 @@
     <string name="txt_set_groups"   >Set Sharing Group</string>
     <string name="unknown_qrformat" >Unknow QR format: %s</string>
     <string name="unknown_qrcontent">QR code or content is not recognized.</string>
-    <string name="msg_log4device">Login first to restore a previous used device ID.</string>
+    <string name="msg_log4device"   >Login first to restore a previous used device ID.</string>
+    <string name="msg_no_used_dev"  >No available devices.</string>
 
     <array name="jserv_entries">
         <item>localhost:8888</item>
         <item>@string/jserv_name0</item>
+        <item>@string/jserv_name1</item>
     </array>
     <array name="jserv_entvals">
         <item>http://localhost:8888</item>
         <item>@string/product_jserv_default</item>
+        <item>@string/product_jserv_1</item>
     </array>
 </resources>

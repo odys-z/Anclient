@@ -326,58 +326,69 @@ public class PhotoSyntier extends SynclientierMvp {
 	}
 
 	/**
-	 * @param share one of {@link io.odysz.semantic.ext.DocTableMeta.Share Share}'s consts.
-	 * @return response
-	public DocsResp insertPhoto(String collId, String localpath, String clientname, String share)
-			throws IOException, TransException, SQLException {
-		PhotoRec doc = (PhotoRec) new PhotoRec()
-					.share(client.ssInfo().uid(), share, new Date())
-					.fullpath(localpath);
-
-		return synInsertDoc(meta.tbl, doc, (SyncDoc d, AnsonResp resp) -> { } );
-	}
-	 */
-
-	/**
 	 * Asynchronously query synchronizing records.
 	 * 
 	 * @return this
 	 */
 	public PhotoSyntier asynQueryDocs(List<? extends SyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
-		new Thread(new Runnable() {
-			public void run() {
-	        	DocsResp resp = null; 
-				try {
-					page.clear();
-					for (int i = page.start(); i < page.end() & i < files.size(); i++) {
-						SyncDoc p = files.get((int)i);
-						if (isblank(p.fullpath()))
-							continue;
-						else page.add(p.fullpath());
-					}
-
-					resp = synQueryPathsPage(page, meta.tbl, AlbumPort.album);
-					try {
-						onOk.ok(resp);
-					} catch (AnsonException | SemanticException | IOException e) {
-						e.printStackTrace();
-					}
-				} catch (IOException e) {
-					onErr.err(MsgCode.exIo, e.getMessage(),
-							e.getClass().getName(), resp == null ? null : resp.msg());
-				} catch (AnsonException e) { 
-					onErr.err(MsgCode.exGeneral, e.getMessage(),
-							e.getClass().getName(), resp == null ? null : resp.msg());
-					e.printStackTrace();
-				} catch (SemanticException e) {
-					onErr.err(MsgCode.exSemantic, e.getMessage(),
-							e.getClass().getName(), resp == null ? null : resp.msg());
-				} catch (TransException e) {
-					onErr.err(MsgCode.exTransct, e.getMessage(),
-							e.getClass().getName(), resp == null ? null : resp.msg());
+		new Thread(() -> {
+			DocsResp resp = null;
+			try {
+				page.clear();
+				for (int i = page.start(); i < page.end() & i < files.size(); i++) {
+					SyncDoc p = files.get((int)i);
+					if (isblank(p.fullpath()))
+						continue;
+					else page.add(p.fullpath());
 				}
-	        }
-	    }).start();
+
+				resp = synQueryPathsPage(page, meta.tbl, AlbumPort.album);
+				try {
+					onOk.ok(resp);
+				} catch (AnsonException | SemanticException | IOException e) {
+					e.printStackTrace();
+				}
+			} catch (IOException e) {
+				onErr.err(MsgCode.exIo, e.getMessage(),
+						e.getClass().getName(), resp == null ? null : resp.msg());
+			} catch (AnsonException e) {
+				onErr.err(MsgCode.exGeneral, e.getMessage(),
+						e.getClass().getName(), resp == null ? null : resp.msg());
+				e.printStackTrace();
+			} catch (SemanticException e) {
+				onErr.err(MsgCode.exSemantic, e.getMessage(),
+						e.getClass().getName(), resp == null ? null : resp.msg());
+			} catch (TransException e) {
+				onErr.err(MsgCode.exTransct, e.getMessage(),
+						e.getClass().getName(), resp == null ? null : resp.msg());
+			}
+		}).start();
+		return this;
+	}
+
+	public PhotoSyntier asyRegisterDevice(String devname, OnOk ok, OnError... onErr) {
+		new Thread(() -> {
+			try {
+				AnsonHeader header = client.header()
+						.act(uri, "devices", "r/devices", "restore devices");
+
+				DocsReq req = new DocsReq(uri)
+						.device(new Device(null, null, devname));
+				req.a(DocsReq.A.registDev);
+				AnsonMsg<DocsReq> q = client.userReq(uri, AlbumPort.album, req)
+						.header(header);
+				AnsonResp resp = client.commit(q, errCtx);
+				ok.ok(resp);
+			} catch (IOException e) {
+				if (isNull(onErr))
+					errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
+				else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
+			} catch (AnsonException | SemanticException e) {
+				if (isNull(onErr))
+					errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
+				else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
+			}
+		}).start();
 		return this;
 	}
 
@@ -391,23 +402,20 @@ public class PhotoSyntier extends SynclientierMvp {
 	 * @return this
 	 */
 	public PhotoSyntier asyncPhotosUp(List<? extends SyncDoc> photos,
-			SessionInf user, OnProcess proc, OnDocOk docOk, OnError onErr)
-			throws SemanticException, IOException, AnsonException {
-		new Thread(new Runnable() {
-	        public void run() {
-				try {
-					syncUp(meta.tbl, photos, client.ssInfo().uid(), proc, docOk);
-				} catch (IOException e) {
-					onErr.err(MsgCode.exIo, e.getClass().getName());
-				} catch (AnsonException e) { 
-					onErr.err(MsgCode.exGeneral, e.getClass().getName());
-				} catch (SemanticException e) { 
-					onErr.err(MsgCode.exSemantic, e.getClass().getName());
-				} catch (TransException e) { 
-					onErr.err(MsgCode.exTransct, e.getClass().getName());
-				}
-
-	    } } ).start();
+									  OnProcess proc, OnDocOk docOk, OnError onErr) {
+		new Thread(() -> {
+			try {
+				syncUp(meta.tbl, photos, client.ssInfo().uid(), proc, docOk);
+			} catch (IOException e) {
+				onErr.err(MsgCode.exIo, e.getClass().getName());
+			} catch (AnsonException e) {
+				onErr.err(MsgCode.exGeneral, e.getClass().getName());
+			} catch (SemanticException e) {
+				onErr.err(MsgCode.exSemantic, e.getClass().getName());
+			} catch (TransException e) {
+				onErr.err(MsgCode.exTransct, e.getClass().getName());
+			}
+		}).start();
 		return this;
 	}
 
@@ -478,4 +486,5 @@ public class PhotoSyntier extends SynclientierMvp {
 				}
 			}}).start();
 	}
+
 }

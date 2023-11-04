@@ -1,8 +1,9 @@
 package io.oz.album.client;
 
-import static java.security.AccessController.getContext;
-import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.len;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import static io.oz.AlbumApp.keys;
 import static io.oz.albumtier.AlbumContext.clientUri;
@@ -19,7 +20,6 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
@@ -32,6 +32,7 @@ import java.util.Objects;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
+import io.odysz.common.Utils;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantics.x.SemanticException;
@@ -102,7 +103,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         .onOk((dialog, id) -> {
                             dialog.dismiss();
                         })
-                        .showDlg("")
+                        .showDlg(this, "")
                         .live(5000);
             });
     }
@@ -114,10 +115,9 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                 .onOk((dialog, id) -> {
                     dialog.dismiss();
                 })
-                .showDlg("")
+                .showDlg(this, "")
                 .live(live);
     }
-
 
     public void onAddJserv(View btn) {
         IntentIntegrator intentIntegrator = new IntentIntegrator(this);
@@ -218,37 +218,47 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
             // confirm(String.format(t, (Object[]) (args == null ? new String[]{"", ""} : args)), 5000);
             errorDlg(t, 5000);
 
+    /**
+     * Deep write preference: device
+     * @param btn
+     */
     public void onRegisterDevice(View btn) {
         String dev = singleton.userInf.device;
         if (LangExt.isblank(dev)) {
-//            new ComfirmDlg(this)
-//                    .dlgMsg(R.string.msg_blank_device, 0)
-//                    .onOk((dialog, id) -> {
-//                    })
-//                    .showDlg(this, "device");
             confirm(R.string.msg_blank_device, 3000);
             return;
         }
 
         if (singleton.tier.verifyDeviceId(dev)) {
             // passed
-
             if (prefFragment.btnRegistDev != null) {
+                prefFragment.prefcateDev.removePreference(prefFragment.findPreference(AlbumApp.keys.restoreDev));
                 prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
+//                prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
+//                prefFragment.prefcateDev.removePreference(prefFragment.prefcateDev);
             }
             prefFragment.device.setEnabled(false);
+
+            if (isNull(dev))
+                // Utils.warn("!!!\n!!!\n!!! to bo verified: %s", dev);
+                confirm(R.string.msg_blank_device, 3000);
+            else {
+                // write through
+                singleton.tier.asyRegisterDevice(dev, (resp) -> {
+                    singleton.userInf.device = dev;
+                });
+            }
         }
         else {
             // failed
-//            new ComfirmDlg(this)
-//                .dlgMsg(R.string.msg_device_uid, 0)
-//                .onOk((dialog, id) -> {
-//                })
-//                .showDlg(this, "device");
             confirm(R.string.msg_device_uid, 0);
         }
     }
 
+    /**
+     * Shallow wirth preference: device
+     * @param btn
+     */
     public void onRestoreDev(View btn) {
         if (singleton.state() != AlbumContext.ConnState.Online) {
             confirm(R.string.msg_log4device, 5000);
@@ -260,6 +270,10 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                 // String[] choices = {"Item One", "Item Two", "Item Three"};
                 try {
                     final String[] choices = ((AnResultset)resp.rs(0)).toArr("device").toArray(new String[] {});
+                    if (len(choices) <= 0) {
+                        confirm(R.string.msg_no_used_dev, 3000);
+                        return;
+                    }
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     String dev_usedby = "Device name used by " + singleton.userInf.userName();
@@ -307,16 +321,17 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
     @Override
     public void err(MsgCode c, String msg, String... args) {
-        this.showErrSummary.err(c, msg, args);
+        // this.showErrSummary.err(c, msg, args);
+        errorDlg(String.format(msg, (Object[]) (args == null ? new String[]{"", ""} : args)), 0 );
     }
 
     void confirm(int msgid, int live, int... msgOk) {
         new ComfirmDlg(this)
-                .dlgMsg(msgid, msgOk == null ? 0 : msgOk[0])
+                .dlgMsg(msgid, isNull(msgOk) ? 0 : msgOk[0])
                 .onOk((dialog, id) -> {
                     dialog.dismiss();
                 })
-                .showDlg( "")
+                .showDlg(this,  "")
                 .live(live);
     }
 

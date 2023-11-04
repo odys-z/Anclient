@@ -110,7 +110,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 .dlgMsg(R.string.msg_blank_device, 0)
                 .onOk((dialog, id) -> {
                 })
-                .showDlg("device");
+                .showDlg(this, "device");
             return;
         }
 
@@ -128,7 +128,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             DialogFragment _dlg = new ComfirmDlg(this)
                     .dlgMsg(R.string.msg_device_uid, 0)
                     .onOk((dialog, id) -> { })
-                    .showDlg("device");
+                    .showDlg(this, "device");
         }
     }
 
