@@ -25,7 +25,7 @@ public class PrefKeys {
     public String usrid;
     public String pswd;
 
-    public String login_summery;
+//    public String login_summery;
 
     /** button key in prefs screen for registering device */
     public String bt_regist;

@@ -105,6 +105,8 @@ public class PhotoSyntier extends SynclientierMvp {
 	 *
 	 * For album-jserv 0.6.50, the webroot is configured in org's field.
 	 *
+	 * port: album + A.getPrefs
+	 *
 	 * @return this
 	 */
 	public PhotoSyntier asyGetSettings(OnOk onOk, OnError... onErr) {

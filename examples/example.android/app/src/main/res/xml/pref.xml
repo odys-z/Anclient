@@ -42,9 +42,9 @@
             android:inputType="textPassword"
             android:defaultValue=""
             android:title="@string/pswd_title" />
-        <Preference
-            android:key="@string/key_login_summery"
-            android:summary="@string/summery_login" />
+<!--        <Preference-->
+<!--            android:key="@string/key_login_summery"-->
+<!--            android:summary="@string/summery_login" />-->
         <Preference
             android:key="@string/btn_login"
             android:layout="@layout/bt_login" />

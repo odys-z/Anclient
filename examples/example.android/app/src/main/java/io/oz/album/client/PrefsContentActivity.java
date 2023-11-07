@@ -35,7 +35,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     /** uid in preference */
     static String oldUid;
-    final AlbumPreferenceFragmentV2 prefFragment = new AlbumPreferenceFragmentV2();
+    final AlbumPreferenceFragment prefFragment = new AlbumPreferenceFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,9 +117,9 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         if (singleton.tier.verifyDeviceId(dev, null)) {
             // passed
 
-            if (prefFragment.btnRegistDev != null) {
-                prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
-            }
+//            if (prefFragment.btnRegistDev != null) {
+//                prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
+//            }
             prefFragment.device.setEnabled(false);
             prefFragment.btnLogin.setEnabled(true);
         }

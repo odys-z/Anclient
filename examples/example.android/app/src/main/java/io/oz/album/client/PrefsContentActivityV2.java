@@ -34,6 +34,7 @@ import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
@@ -154,6 +155,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
 
                         prefFragment.lstJserv.setValue(jsvEnts.entVals[0]);
                         prefFragment.lstJserv.setTitle(jsvEnts.entries[0]);
+                        prefFragment.lstJserv.setSummary(jsvEnts.entVals[0]);
 
                         try {
                             SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
@@ -179,9 +181,6 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
         try {
           singleton.login(
             (client) -> {
-                // updateSummery(prefFragment.summery, getString(R.string.login_succeed));
-                confirm(R.string.login_succeed, 3000);
-
                 // load settings
                 Anson.verbose = false;
                 singleton.tier.asyGetSettings(
@@ -197,14 +196,16 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         editor.putString(keys.home, prf.home);
                         editor.putString(keys.homepage, prf.webroot);
                         editor.apply();
+
+                        confirm(R.string.login_succeed, 3000);
                     },
                     showErrConfirm);
             },
             showErrConfirm);
         } catch (Exception e) {
             Log.e(clientUri, e.getClass().getName() + e.getMessage());
-            // updateSummery(prefFragment.summery, getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
-            showErrConfirm.err(MsgCode.exGeneral, getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
+            showErrConfirm.err(MsgCode.exGeneral,
+                getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
         }
     }
 
@@ -212,14 +213,13 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
      * common function for error handling
      */
     JProtocol.OnError showErrConfirm = (c, t, args) ->
-            errorDlg(String.format("Code: %s\n%s", c, String.format(t, args)), 5000);
+            errorDlg(String.format("Code: %s\n%s", c, String.format(t, args == null ? null : args)), 5000);
 
     /**
      * Deep write preference: device
      * @param btn
      */
     public void onRegisterDevice(View btn) {
-        // String dev = singleton.userInf.device;
         if (LangExt.isblank(buff_devname)) {
             confirm(R.string.msg_blank_device, 3000);
             return;
@@ -231,16 +231,17 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                 prefFragment.prefcateDev.removePreference(prefFragment.findPreference(AlbumApp.keys.restoreDev));
                 prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
             }
-            prefFragment.device.setEnabled(false);
 
             // write through
             singleton.tier.asyRegisterDevice( buff_device, buff_devname,
                 (resp) -> {
+                    buff_device = ((DocsResp)resp).device().id;
                     singleton.userInf.device(buff_device);
+
+                    runOnUiThread(()-> prefFragment.device.setEnabled(false));
                 });
         }
         else {
-            // failed
             confirm(R.string.msg_device_uid, 0);
         }
     }
@@ -271,13 +272,6 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         String org   = (String) resp.data().get("org");
                         String dev_usedby = getString(R.string.dev_usedby, uname, org);
                         builder.setTitle(dev_usedby)
-//                            .setPositiveButton("Use It", (dialog, which) -> {
-//                                buff_device  = oldevId[which];
-//                                buff_devname = oldevnm[which];
-//                                updateTitle(prefFragment.findPreference(keys.device),
-//                                        String.format("%s [%s]", buff_devname, buff_device));
-//                                updateSummery(prefFragment.findPreference(keys.device), dev_usedby);
-//                            })
                             .setNegativeButton("Cancel", (dialog, which) -> { })
                             .setSingleChoiceItems(oldevnm, 0, (dialog, which) -> {
                                 buff_device  = oldevId[which];
@@ -337,5 +331,4 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                 .showDlg(this,  "")
                 .live(live);
     }
-
 }

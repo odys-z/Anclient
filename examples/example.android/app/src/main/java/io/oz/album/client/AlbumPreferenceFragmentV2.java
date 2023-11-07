@@ -1,8 +1,7 @@
 package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
-import static io.odysz.common.LangExt.ifnull;
-import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.isblank;
 import static io.oz.album.client.PrefsContentActivityV2.buff_device;
 import static io.oz.album.client.PrefsContentActivityV2.buff_devname;
 import static io.oz.album.client.PrefsContentActivityV2.jsvEnts;
@@ -38,15 +37,18 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
      */
     ListPreference lstJserv;
     Preference btnLogin;
-    Preference summery;
+//    Preference summery;
     EditTextPreference device;
     /** Preference category: device info */
     PreferenceCategory prefcateDev;
     Preference btnRegistDev;
     EditTextPreference pswd;
 
+    /** Suppress dialog, etc. */
+    boolean initing;
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+        initing = true;
         addPreferencesFromResource(R.xml.prefv2);
 
         prefcateDev  = findPreference(AlbumApp.keys.devCate);
@@ -78,15 +80,16 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
             findPreference(AlbumApp.keys.device).setEnabled(true);
             device.setSummary(R.string.msg_only_once);
         }
-        summery = findPreference(AlbumApp.keys.login_summery);
+//        summery = findPreference(AlbumApp.keys.login_summery);
 
-       //  lstJserv.setSummary(PrefsContentActivityV2.jsvEnts.entries[0]);
         if (lstJserv.getTitle() == null) {
             lstJserv.setTitle(jsvEnts.entries[0]);
             lstJserv.setSummary(jsvEnts.entVals[0]);
         }
         lstJserv.setEntries(PrefsContentActivityV2.jsvEnts.entries);
         lstJserv.setEntryValues(PrefsContentActivityV2.jsvEnts.entVals);
+
+        initing = false;
     }
 
     void bindPref2Val(@NonNull Preference preference) {
@@ -124,25 +127,25 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.device.equals(k)) {
-                if (eq(stringValue, PrefsContentActivityV2.buff_devname)) {
+                if (eq(stringValue, buff_devname) && !initing) {
                     new ComfirmDlg(null)
                         .dlgMsg(0, 0)
                         .msg(getString(R.string.msg_repace_devname, buff_devname, buff_device))
                         .onOk((dialog, id) -> {
                             dialog.dismiss();
                             // replace old name with new Id
-                            PrefsContentActivityV2.buff_device  = null;
+                            buff_device  = null;
                         })
                         .showDlg((AppCompatActivity) getActivity(), "FIXME")
                         .live(3000);
                 }
                 else {
-                    PrefsContentActivityV2.buff_devname  = stringValue;
-                    PrefsContentActivityV2.buff_device  = null;
+                    buff_devname = stringValue;
+                    buff_device  = null;
                 }
 
                 preference.setTitle(buff_device == null ?
-                        stringValue : String.format("%s [%s]", stringValue, buff_device));
+                    stringValue : String.format("%s [%s]", stringValue, buff_device));
             }
             else if (AlbumApp.keys.home.equals(k)) {
                 singleton.profiles.home(stringValue);

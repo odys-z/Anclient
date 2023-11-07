@@ -68,7 +68,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
 
             btnLogin.setEnabled(false);
         }
-        summery = findPreference(AlbumApp.keys.login_summery);
+//        summery = findPreference(AlbumApp.keys.login_summery);
     }
 
     static void bindPref2Val(@NonNull Preference preference) {

@@ -44,7 +44,7 @@
     <string name="btn_add_img"     >+ 图片</string>
     <string name="pswd_title"      >密 码</string>
     <string name="txt_please_login">請先登錄</string>
-    <string name="summery_login"   >登錄后可上傳文件</string>
+<!--    <string name="summery_login"   >登錄后可上傳文件</string>-->
     <string name="txt_login"       >点击登录</string>
 
     <string name="my_group"          >當前組</string>

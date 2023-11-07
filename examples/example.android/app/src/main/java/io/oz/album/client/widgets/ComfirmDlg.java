@@ -99,9 +99,11 @@ public class ComfirmDlg extends DialogFragment {
 
     private void dismissin(int ms) {
         if (ms > 0) {
-            this.acty.runOnUiThread(() -> new CountDownTimer(ms, ms) {
+            acty.runOnUiThread(() -> new CountDownTimer(ms, ms) {
                 @Override public void onTick(long millisUntilFinished) { }
-                @Override public void onFinish() { dismiss(); }
+                @Override public void onFinish() {
+                    acty.runOnUiThread( () -> dismiss() );
+                }
             }.start());
         }
     }

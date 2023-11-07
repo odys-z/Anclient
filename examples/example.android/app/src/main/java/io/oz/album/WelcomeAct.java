@@ -110,7 +110,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.usrid = getString(R.string.userid_key);
         AlbumApp.keys.pswd = getString(R.string.pswd_key);
 
-        AlbumApp.keys.login_summery = getString(R.string.key_login_summery);
+//        AlbumApp.keys.login_summery = getString(R.string.key_login_summery);
         AlbumApp.keys.bt_regist = getString(R.string.key_regist);
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
