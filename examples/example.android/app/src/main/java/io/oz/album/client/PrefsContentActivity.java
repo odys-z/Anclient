@@ -48,12 +48,12 @@ import io.oz.albumtier.Plicies;
 /**
  * @since 0.3.0
  */
-public class PrefsContentActivityV2 extends AppCompatActivity implements JProtocol.OnError {
+public class PrefsContentActivity extends AppCompatActivity implements JProtocol.OnError {
     static AlbumContext singleton;
 
     /** uid in preference */
     static String oldUid;
-    final AlbumPreferenceFragmentV2 prefFragment = new AlbumPreferenceFragmentV2();
+    final AlbumPreferenceFragment prefFragment = new AlbumPreferenceFragment();
 
     /** jserv url options */
     static public AnPrefEntries jsvEnts;

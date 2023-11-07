@@ -2,10 +2,10 @@ package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.isblank;
-import static io.oz.album.client.PrefsContentActivityV2.buff_device;
-import static io.oz.album.client.PrefsContentActivityV2.buff_devname;
-import static io.oz.album.client.PrefsContentActivityV2.jsvEnts;
-import static io.oz.album.client.PrefsContentActivityV2.singleton;
+import static io.oz.album.client.PrefsContentActivity.buff_device;
+import static io.oz.album.client.PrefsContentActivity.buff_devname;
+import static io.oz.album.client.PrefsContentActivity.jsvEnts;
+import static io.oz.album.client.PrefsContentActivity.singleton;
 
 import android.os.Bundle;
 import android.text.InputType;
@@ -31,7 +31,7 @@ import io.oz.album.client.widgets.ComfirmDlg;
  * <a href='https://stackoverflow.com/a/15612006/7362888'>
  * This class shouldn't have a constructor,</a> to prevent exception when restore state (turn over screen).
  */
-public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
+public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     /**
      * Pref key: AlbumApp.keys.jserv
      */
@@ -49,7 +49,7 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         initing = true;
-        addPreferencesFromResource(R.xml.prefv2);
+        addPreferencesFromResource(R.xml.prefv);
 
         prefcateDev  = findPreference(AlbumApp.keys.devCate);
         btnRegistDev = findPreference(AlbumApp.keys.bt_regist);
@@ -86,8 +86,8 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
             lstJserv.setTitle(jsvEnts.entries[0]);
             lstJserv.setSummary(jsvEnts.entVals[0]);
         }
-        lstJserv.setEntries(PrefsContentActivityV2.jsvEnts.entries);
-        lstJserv.setEntryValues(PrefsContentActivityV2.jsvEnts.entVals);
+        lstJserv.setEntries(PrefsContentActivity.jsvEnts.entries);
+        lstJserv.setEntryValues(PrefsContentActivity.jsvEnts.entVals);
 
         initing = false;
     }
@@ -113,8 +113,8 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
             String k = preference.getKey();
             if (k.equals(AlbumApp.keys.jserv)) {
                 singleton.jserv(stringValue);
-                PrefsContentActivityV2.jsvEnts.select(stringValue);
-                preference.setTitle(PrefsContentActivityV2.jsvEnts.entry());
+                PrefsContentActivity.jsvEnts.select(stringValue);
+                preference.setTitle(PrefsContentActivity.jsvEnts.entry());
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.pswd.equals(k)) {
