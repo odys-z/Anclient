@@ -212,7 +212,7 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
      * common function for error handling
      */
     JProtocol.OnError showErrConfirm = (c, t, args) ->
-            errorDlg(t, 5000);
+            errorDlg(String.format("Code: %s\n%s", c, String.format(t, args)), 5000);
 
     /**
      * Deep write preference: device
@@ -234,9 +234,10 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
             prefFragment.device.setEnabled(false);
 
             // write through
-            singleton.tier.asyRegisterDevice( buff_device, (resp) -> {
-                singleton.userInf.device(buff_device);
-            });
+            singleton.tier.asyRegisterDevice( buff_device, buff_devname,
+                (resp) -> {
+                    singleton.userInf.device(buff_device);
+                });
         }
         else {
             // failed
@@ -270,15 +271,22 @@ public class PrefsContentActivityV2 extends AppCompatActivity implements JProtoc
                         String org   = (String) resp.data().get("org");
                         String dev_usedby = getString(R.string.dev_usedby, uname, org);
                         builder.setTitle(dev_usedby)
-                            .setPositiveButton("Use It", (dialog, which) -> {
+//                            .setPositiveButton("Use It", (dialog, which) -> {
+//                                buff_device  = oldevId[which];
+//                                buff_devname = oldevnm[which];
+//                                updateTitle(prefFragment.findPreference(keys.device),
+//                                        String.format("%s [%s]", buff_devname, buff_device));
+//                                updateSummery(prefFragment.findPreference(keys.device), dev_usedby);
+//                            })
+                            .setNegativeButton("Cancel", (dialog, which) -> { })
+                            .setSingleChoiceItems(oldevnm, 0, (dialog, which) -> {
                                 buff_device  = oldevId[which];
                                 buff_devname = oldevnm[which];
                                 updateTitle(prefFragment.findPreference(keys.device),
                                         String.format("%s [%s]", buff_devname, buff_device));
                                 updateSummery(prefFragment.findPreference(keys.device), dev_usedby);
-                            })
-                            .setNegativeButton("Cancel", (dialog, which) -> { })
-                            .setSingleChoiceItems(oldevnm, 0, (dialog, which) -> { });
+                                dialog.dismiss();
+                            });
 
                         AlertDialog dialog = builder.create();
                         dialog.show();

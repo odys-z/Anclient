@@ -366,14 +366,14 @@ public class PhotoSyntier extends SynclientierMvp {
 		return this;
 	}
 
-	public PhotoSyntier asyRegisterDevice(String devname, OnOk ok, OnError... onErr) {
+	public PhotoSyntier asyRegisterDevice(String device, String devname, OnOk ok, OnError... onErr) {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
 						.act(uri, "devices", "r/devices", "restore devices");
 
 				DocsReq req = new DocsReq(uri)
-						.device(new Device(null, null, devname));
+						.device(new Device(device, null, devname));
 				req.a(DocsReq.A.registDev);
 				AnsonMsg<DocsReq> q = client.userReq(uri, AlbumPort.album, req)
 						.header(header);

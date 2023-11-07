@@ -8,10 +8,7 @@ import android.os.CountDownTimer;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -20,7 +17,8 @@ import io.oz.R;
 import static io.odysz.common.LangExt.is;
 
 public class ComfirmDlg extends DialogFragment {
-    // private final Activity acty;
+    private Activity acty;
+
     boolean showCancel;
     int msgid;
     /** default for msgid == 0 */
@@ -87,6 +85,7 @@ public class ComfirmDlg extends DialogFragment {
     }
 
     public ComfirmDlg showDlg(AppCompatActivity act, String tag) {
+        this.acty = act;
         FragmentManager fm = act.getSupportFragmentManager();
         // issue: no end transaction?
         // https://developer.android.com/reference/android/app/DialogFragment.html#alert-dialog
@@ -100,7 +99,7 @@ public class ComfirmDlg extends DialogFragment {
 
     private void dismissin(int ms) {
         if (ms > 0) {
-            getActivity().runOnUiThread(() -> new CountDownTimer(ms, ms) {
+            this.acty.runOnUiThread(() -> new CountDownTimer(ms, ms) {
                 @Override public void onTick(long millisUntilFinished) { }
                 @Override public void onFinish() { dismiss(); }
             }.start());

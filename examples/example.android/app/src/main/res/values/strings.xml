@@ -80,7 +80,7 @@
     <string name="unknown_qrformat"  >Unknow QR format: %s</string>
     <string name="unknown_qrcontent" >QR code or content is not recognized.</string>
     <string name="msg_log4device"    >Login first to restore a previous used device ID.</string>
-    <string name="msg_no_used_dev"   >No available devices.</string>
+    <string name="msg_no_used_dev"   >No available devices previously used.</string>
     <string name="dev_usedby"        >Device name used by %s (%s)</string>
     <string name="msg_repace_devname">Using this device to replace old name %s [id: %s] ?</string>
 

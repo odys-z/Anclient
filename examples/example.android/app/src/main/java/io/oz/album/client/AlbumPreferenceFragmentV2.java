@@ -1,9 +1,11 @@
 package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.ifnull;
 import static io.odysz.common.LangExt.isNull;
 import static io.oz.album.client.PrefsContentActivityV2.buff_device;
 import static io.oz.album.client.PrefsContentActivityV2.buff_devname;
+import static io.oz.album.client.PrefsContentActivityV2.jsvEnts;
 import static io.oz.album.client.PrefsContentActivityV2.singleton;
 
 import android.os.Bundle;
@@ -35,18 +37,12 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
      * Pref key: AlbumApp.keys.jserv
      */
     ListPreference lstJserv;
-    Preference btnTestConn;
-
     Preference btnLogin;
     Preference summery;
-    // Preference homepref;
     EditTextPreference device;
-
     /** Preference category: device info */
     PreferenceCategory prefcateDev;
-
     Preference btnRegistDev;
-
     EditTextPreference pswd;
 
     @Override
@@ -61,8 +57,6 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
         pswd         = findPreference(AlbumApp.keys.pswd);
 
         bindPref2Val(lstJserv);
-
-        // bindPref2Val(findPreference(AlbumApp.keys.home));
         bindPref2Val(device);
         bindPref2Val(findPreference(AlbumApp.keys.usrid));
         bindPref2Val(pswd);
@@ -72,10 +66,8 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
         pswd.setOnBindEditTextListener(editText ->
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
-        // homepref = findPreference(AlbumApp.keys.home);
         String devid = singleton.userInf.device;
         if (!LangExt.isblank(devid)) {
-            // homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
             findPreference(AlbumApp.keys.device).setEnabled(false);
             findPreference(AlbumApp.keys.restoreDev).setEnabled(false);
             prefcateDev.removePreference(findPreference(AlbumApp.keys.restoreDev));
@@ -85,11 +77,14 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
         else {
             findPreference(AlbumApp.keys.device).setEnabled(true);
             device.setSummary(R.string.msg_only_once);
-
-            // btnLogin.setEnabled(false);
         }
         summery = findPreference(AlbumApp.keys.login_summery);
 
+       //  lstJserv.setSummary(PrefsContentActivityV2.jsvEnts.entries[0]);
+        if (lstJserv.getTitle() == null) {
+            lstJserv.setTitle(jsvEnts.entries[0]);
+            lstJserv.setSummary(jsvEnts.entVals[0]);
+        }
         lstJserv.setEntries(PrefsContentActivityV2.jsvEnts.entries);
         lstJserv.setEntryValues(PrefsContentActivityV2.jsvEnts.entVals);
     }
@@ -100,7 +95,7 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
         preference.setOnPreferenceChangeListener(prefsListener);
 
         prefsListener.onPreferenceChange(preference,
-                PreferenceManager
+                    PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
     }
@@ -141,11 +136,13 @@ public class AlbumPreferenceFragmentV2 extends PreferenceFragmentCompat {
                         .showDlg((AppCompatActivity) getActivity(), "FIXME")
                         .live(3000);
                 }
-                else
+                else {
+                    PrefsContentActivityV2.buff_devname  = stringValue;
                     PrefsContentActivityV2.buff_device  = null;
+                }
 
-                preference.setTitle(String.format("%s [%s]",
-                                    stringValue, buff_device == null ? "" : buff_device));
+                preference.setTitle(buff_device == null ?
+                        stringValue : String.format("%s [%s]", stringValue, buff_device));
             }
             else if (AlbumApp.keys.home.equals(k)) {
                 singleton.profiles.home(stringValue);
