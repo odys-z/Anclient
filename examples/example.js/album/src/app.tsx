@@ -28,7 +28,10 @@ type AlbumProps = {
 	passwd?: string;
 }
 
-/** The application main, context singleton and error handler */
+/**
+ * Home page,
+ * application main, context singleton and error handler
+ */
 export class App extends CrudCompW<AlbumProps> {
     inclient: Inseclient;
 
@@ -283,7 +286,7 @@ export class App extends CrudCompW<AlbumProps> {
 		let portal = opts.portal ?? 'index.html';
 		let { aid, uid, pswd } = opts;
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
-		AnReactExt.bindDom(elem, opts, onJsonServ);
+		AnReactExt.initPage(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);

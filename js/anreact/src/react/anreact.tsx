@@ -162,6 +162,7 @@ export class AnReact {
 	 * @param {string} elem html element id, null for test
 	 * @param {object} opts {serv, home, parent window}
 	 * @param {function} onJsonServ function to render React Dom, i. e.
+	 * @since 0.4.50
 	 * @example
 	 * // see Anclient/js/test/jsample/login-app.tsx
 	 * (elem, json) => {
@@ -175,7 +176,7 @@ export class AnReact {
 	 * 	ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 	 * }
 	 */
-	static bindDom( elem: string, opts: AnreactAppOptions,
+	static initPage( elem: string, opts: AnreactAppOptions,
 				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
@@ -187,7 +188,7 @@ export class AnReact {
 				url: opts.jsonPath || 'private/host.json',
 			})
 			.done( (json: JsonServs) => onJsonServ(elem, opts, json) )
-			.fail( (e: any) => {
+			.fail( (_e: any) => {
 				$.ajax({
 					dataType: "json",
 					url: 'github.json',
@@ -197,9 +198,27 @@ export class AnReact {
 			} )
 		}
 	}
+
+	/**
+	 * @deprecated for the name is confusing. Use initPage() instead.
+	 * @since 0.4.50
+	 * @param elem 
+	 * @param opts 
+	 * @param onJsonLoaded 
+	 * @returns 
+	 */
+	static bindDom( elem: string, opts: AnreactAppOptions,
+				onJsonLoaded: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
+		return AnReact.initPage(elem, opts, onJsonLoaded);
+	}
 }
 
 export interface AnreactAppOptions {
+	/**
+	 * @since 0.4.50, jserv services from host.json.
+	 * Sometimes a main page can login before context is aviliable.
+	 */
+	servs?: {[s:string]:string}
 	/** serv id, default: host */
 	serv?: string;
 

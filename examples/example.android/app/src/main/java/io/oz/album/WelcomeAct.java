@@ -11,6 +11,7 @@ import static io.odysz.common.LangExt.isblank;
 import static io.oz.albumtier.AlbumContext.*;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -99,7 +100,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         super.onCreate(savedInstanceState);
 
         AlbumApp.keys = new PrefKeys();
-        // ISSUE to be simplified
+
         AlbumApp.keys.homeCate = getString(R.string.key_home_cate);
         AlbumApp.keys.home = getString(R.string.key_home);
         AlbumApp.keys.device = getString(R.string.key_device);
@@ -110,7 +111,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         AlbumApp.keys.usrid = getString(R.string.userid_key);
         AlbumApp.keys.pswd = getString(R.string.pswd_key);
 
-//        AlbumApp.keys.login_summery = getString(R.string.key_login_summery);
         AlbumApp.keys.bt_regist = getString(R.string.key_regist);
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
@@ -215,16 +215,19 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     @SuppressLint("SetJavaScriptEnabled")
     void reloadAlbum () {
-        if (singl.tier == null)
+        if (singl.tier == null || sharedPref == null)
             return;
 
+        WebView wv = findViewById(R.id.wv_welcome);
+        reloadWeb(singl, wv, this, AssetHelper.Act_Album);
+
+        /*
         SessionClient client = singl.tier.client();
         if (client == null || sharedPref == null)
             return;
 
         String pswd = singl.pswd();
 
-        WebView wv = findViewById(R.id.wv_welcome);
         final VWebAlbum webView = new VWebAlbum();
         wv.setWebViewClient(webView);
         WebSettings webSettings = wv.getSettings();
@@ -243,8 +246,38 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         });
         String albumweb = AssetHelper.url4intent(this, AssetHelper.Act_Album);
 
-        // Tag: environment runtime test here
-        // albumweb = "http://192.168.0.3:8888/index.html?serv=info";
+        // E.g. albumweb = "http://192.168.0.3:8888/index.html?serv=info";
+        if (singl.verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
+        wv.loadUrl(albumweb);
+        */
+    }
+
+    public static void reloadWeb(AlbumContext singl, WebView wv, Activity act, int webId) {
+        SessionClient client = singl.tier.client();
+        if (client == null)
+            return;
+
+        String pswd = singl.pswd();
+
+        final VWebAlbum webView = new VWebAlbum();
+        wv.setWebViewClient(webView);
+        WebSettings webSettings = wv.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+
+        wv.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                if (!isblank(pswd)) {
+                    String script = String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd);
+                    Utils.warn("\n[Load page script]: %s", script);
+                    // https://www.techyourchance.com/communication-webview-javascript-android/
+                    wv.evaluateJavascript(script, null);
+                }
+            }
+        });
+        String albumweb = AssetHelper.url4intent(act, webId);
+
+        // E.g. albumweb = "http://192.168.0.3:8888/index.html?serv=info";
         if (singl.verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
         wv.loadUrl(albumweb);
     }

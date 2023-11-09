@@ -58,6 +58,9 @@ export interface DialogProps extends Comprops {
 
 	fullScreen?: boolean;
 	fullWidth?: boolean;
+
+	/** Dialog won't alwasy access jserv */
+	uri?: string;
 }
 
 class ConfirmDialogComp extends React.Component<DialogProps, any, any> {

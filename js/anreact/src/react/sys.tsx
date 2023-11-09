@@ -50,7 +50,17 @@ export interface SysProps extends Comprops {
 		context: AnContextType, comp: SysComp) => JSX.Element;
     // classes: {[x: string]: string};
     hrefDoc?: string;
-    onLogout: () => void;
+	/**
+	 * On logout handler.
+	 * When called, the client is already logged out.
+	 * @since 0.4.50 If this is undefined or not provided, will ignore rendering logout button. 
+	 */
+    onLogout?: () => void;
+
+	/**
+	 * My-info (profile, account etc.) pannels provider.
+	 * @since 0.4.50 If undefined, the event handler for clicking on user icon will not be called.
+	 */
     myInfo: JSX.Element | ((context: AnContextType) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
 }
 
@@ -443,7 +453,6 @@ class SysComp extends CrudCompW<SysProps> {
 		}
 
 		function icon(levelIndent: number, icon: string) {
-			// return _icons[icon] || _icons['deflt'];
 			let indent = []
 			for (let i = 0; i < levelIndent; i++)
 				indent.push( <div key={i}>{_icons.blank}</div> );
@@ -465,6 +474,7 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	render() {
+		let that = this;
     	const { classes } = this.props;
 		let claz = Object.assign({}, classes);
 
@@ -498,10 +508,12 @@ class SysComp extends CrudCompW<SysProps> {
 
 				<Grid item sm={7}>
 					<DialogActions className={claz.loginfo} >
-						<MyIcon onClick={() => this.setState({ showMine: true })} />
-						<Button onClick={this.toLogout}  color='inherit' >
+						<MyIcon onClick={() => { if (that.props.myInfo) that.setState({ showMine: true }); } } />
+						{ this.props.onLogout
+						  && <Button onClick={this.toLogout}  color='inherit' >
 							{L('Logout')}
-						</Button>
+						  </Button>
+						}
 					</DialogActions>
 				</Grid>
 			  </Grid>

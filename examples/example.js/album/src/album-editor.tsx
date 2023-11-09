@@ -40,7 +40,6 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
  
 	detailForm = undefined;
 
-	// AnElemFormatter | undefined;
 	preview = (_col: any, rec: any) => {
 		return <></>;
 	};
@@ -125,7 +124,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 
 		  {this.hasError &&
 			<AnError onClose={this.onErrorClose} fullScreen={false}
-				uri={"/login"} tier={undefined}
+				tier={undefined}
 				title={L('Error')} msg={this.error.msg || ''} />}
 		  </AnContext.Provider>
 		);

@@ -6,17 +6,18 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { StandardProps } from '@material-ui/core';
 
 import { Protocol, SessionClient, ErrorCtx, 
-	AnsonMsg, AnsonResp, isEmpty
-} from '@anclient/semantier';
+	AnsonMsg, AnsonResp, an} from '@anclient/semantier';
 
 import {
 	L, Langstrs, AnContext, AnContextType, JsonServs,
 	AnReact, AnReactExt, AnreactAppOptions, AnError,
 	jsample, Sys, SysComp, Login
 } from '@anclient/anreact';
-import { JsampleTheme } from '@anclient/anreact/src/jsample/styles';
 
-const {Userst, Domain, Roles, Orgs, MyInfCard, MyPswd} = jsample;
+import { JsampleTheme } from '@anclient/anreact/src/jsample/styles';
+import { SharePolicies } from './views/share-policies';
+
+const {MyInfCard, MyPswd} = jsample;
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
@@ -65,11 +66,13 @@ class Admin extends React.Component<Approps> {
 		this.errorCtx = {onError: this.onError, msg: ''};
 
 		// Will load anclient from localStorage.
-		this.anClient = new SessionClient();
-		if (!isEmpty(this.anClient.ssInf?.ssid))
-			this.state.loggedin = true;
-		else
-			this.state.loggedin = false;
+		// this.anClient = new SessionClient();
+		this.anClient = props.client;
+
+		// if (!isEmpty(this.anClient.ssInf?.ssid))
+		// 	this.state.loggedin = true;
+		// else
+		// 	this.state.loggedin = false;
 
 		this.anReact = new AnReactExt(this.anClient, this.errorCtx);
 
@@ -80,12 +83,14 @@ class Admin extends React.Component<Approps> {
 		// singleton error handler
 		if (!this.anClient || !this.anClient.ssInf) {
 			this.state = Object.assign(this.state, {
+				loggedin: true,
 				nextAction: 're-login',
 				hasError: true,
 				msg: L('Setup session failed! Please re-login.')
 			});
 		}
 		else {
+			this.state.loggedin = true;
 			this.anReact = new AnReactExt(this.anClient, this.errorCtx)
 				.extendPorts({
 					menu     : "menu.serv",
@@ -105,11 +110,12 @@ class Admin extends React.Component<Approps> {
 		// extending pages
 		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
-			{path: '/sys/domain', comp: Domain},
-			{path: '/sys/roles', comp: Roles},
-			{path: '/sys/orgs', comp: Orgs},
-			{path: '/sys/users', comp: Userst},
-			{path: '/tier/users', comp: Userst},
+			// {path: '/sys/domain', comp: Domain},
+			// {path: '/sys/roles', comp: Roles},
+			// {path: '/sys/orgs', comp: Orgs},
+			// {path: '/sys/users', comp: Userst},
+			// {path: '/tier/users', comp: Userst},
+			{path: '/c/myconn', comp: SharePolicies},
 		] );
 	}
 
@@ -160,18 +166,17 @@ class Admin extends React.Component<Approps> {
 				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent : this.props.iparent,
-				ihome: this.props.iportal || 'portal.html',
+				ihome: "#", // this.props.iportal || 'portal.html',
 				error: this.errorCtx,
 			}} >
 			  { !this.state.loggedin ?
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
 				:
 				<Sys menu='sys.menu.jsample'
-					sys={L('AnReact')} menuTitle={L('Sys Menu')}
-					myInfo={myInfoPanels}
-					onLogout={this.goPortal} />
+					sys={L('Album 0.3')} menuTitle={L('Menu')}
+				/>
 			  }
-			  {this.errorMsgbox}
+			  { this.errorMsgbox }
 			</AnContext.Provider>
 		</MuiThemeProvider>);
 
@@ -195,17 +200,32 @@ class Admin extends React.Component<Approps> {
 	}
 
 	/**
+	 * This function automatically login, then load app dom. Since jserv-root is not got via login,
+	 * this 
+	 * @param uid 
+	 * @param pswd 
+	 * @param jservRoot e.g. http://localhost:8081/jserv-album 
 	 * @param elem 
 	 * @param opts 
 	 */
-	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
-		let portal = opts.portal || 'index.html';
-		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
-		AnReactExt.bindDom(elem, opts, onJsonServ);
+	static bindHtml(uid: string, pswd: string,
+					elem: string, opts: AnreactAppOptions) : void {
+		AnReact.initPage(elem, opts, login);
 
-		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions & {client: SessionClient}, json: JsonServs) {
+			let portal = opts.portal || 'index.html';
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<Admin servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<Admin client={opts.client} servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+		}
+		
+		function login(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+			let jserv = json[opts.serv || 'host'];
+			an.init(jserv)
+			  .login( uid, pswd,
+				(client: SessionClient) => {
+					onJsonServ(elem, Object.assign(opts, {client}), json);
+				},
+				{onError: (c, r) => { console.error(c, r); }} );
 		}
 	}
 

@@ -7,9 +7,6 @@ import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, AlbumReq, Ph
 const debug = true;
 
 export class AlbumEditier extends StreeTier {
-	root(): AnTreeNode {
-		throw new Error('Method not implemented.');
-	}
 	comp: CrudComp<Comprops>;
 	port: string = "album";
 
@@ -26,6 +23,11 @@ export class AlbumEditier extends StreeTier {
 		this.client = props.client;
 
 		this.page = new PageInf();
+	}
+
+	root() {
+		// throw new Error('Method not implemented.');
+		return undefined;
 	}
 
 	/**
