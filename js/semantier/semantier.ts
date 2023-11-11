@@ -720,6 +720,7 @@ export class Semantier {
 			compont.setState({stree: resp.Body().forest});
 	}</pre>
 	 * @since 0.9.86 opts.port can be overriden, with which user can modify s-tree service at server side.
+	 * @deprecated since 0.9.99, this method is planned to be replaced by {@link StreeTier.stree()}.
 	 * @param opts dataset info {sk, sqlArgs, onOk, port}
 	 * where port is using s-tree if undefined.
 	 * @param client

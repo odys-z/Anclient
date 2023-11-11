@@ -65,8 +65,9 @@ class AnClient {
 				+ Protocol.Port[port];
 		else {
 			ulr = `${this.cfg.defaultServ}/${port}`;
-			console.error("The url for the named port is probably not resolved. Call Anclient.understandPorts() or AnReactExt.extendPorts().",
-					"prot: ", port, "url", ulr);
+			console.error("The url for the named port is probably not resolved.\nCall Anclient.understandPorts() or AnReactExt.extendPorts().",
+					`\nFor AnReact, set context.anReact = new AnReactExt(client, err_ctx).extendPorts({ ${port}: "url-pattern" })`,
+					"\nprot: ", port, "\nurl", ulr);
 		}
 
 		return ulr;

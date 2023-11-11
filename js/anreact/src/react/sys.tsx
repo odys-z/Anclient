@@ -62,6 +62,12 @@ export interface SysProps extends Comprops {
 	 * @since 0.4.50 If undefined, the event handler for clicking on user icon will not be called.
 	 */
     myInfo: JSX.Element | ((context: AnContextType) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
+
+	/**
+	 * Default page url when SysComp is loaded. 
+	 * Will showing this or the home page
+	 */
+	landingUrl?: string;
 }
 
 const _icons = {
@@ -325,6 +331,7 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	componentDidMount() {
+		console.log(this.uri);
 		const ctx = this.context as unknown as AnContextType;
 
 		// load menu
@@ -338,7 +345,27 @@ class SysComp extends CrudCompW<SysProps> {
 				let {menu, paths} = parseMenus((dsResp as AnsonMsg<AnDatasetResp>).Body().forest);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
+
+				if (that.props.landingUrl) {
+					that.setState( {
+						currentPage: that.findMenuItem(that.props.landingUrl),
+						// currentPage: that.state.sysMenu[1].children[1],
+						welcome: false
+					} );
+				}
 			} );
+	}
+
+	findMenuItem(path: string, m?: MenuItem[]): MenuItem | undefined {
+		m = m || this.state.sysMenu;
+		for (let x = 0; x < m.length; x++) {
+			if (m[x].url === path)
+				return m[x];
+			else if (m[x].children) {
+				let it = this.findMenuItem(path, m[x].children);
+				if (it) return it;
+			}
+		}
 	}
 
 	showMenu(e: React.MouseEvent<HTMLElement>) {
@@ -468,7 +495,7 @@ class SysComp extends CrudCompW<SysProps> {
 		  return (
 			<TagName
 				uri={this.state.currentPage?.url || '/'}
-				{...this.state.currentPage.props}
+				{...this.state.currentPage?.props}
 				ssInf={(this.context as AnContextType).anClient?.ssInf} /> );
 		else return <Home />;
 	}

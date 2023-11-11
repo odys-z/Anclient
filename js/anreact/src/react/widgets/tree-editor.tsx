@@ -185,7 +185,8 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 
 		let {classes, media} = props;
 		let parentId = tnode.parent;
-		<Grid key={`${tnode.id}.${fragKey}`} item {...col.grid} className={classes.treeCell}>
+		return (
+		  <Grid key={`${tnode.id}.${fragKey}`} item {...col.grid} className={classes.treeCell}>
 			<JsampleIcons.Up onClick={handler?.toUp} />
 			<JsampleIcons.Down onClick={handler?.toDown} />
 			{media.isMd ?
@@ -213,7 +214,7 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 				/>
 			  </>
 			}
-		</Grid>
+		  </Grid>);
 	}
 
 	render() {
@@ -337,15 +338,15 @@ class TreeGallaryComp extends TreeCardComp {
 						</Typography>
 					</Grid>);
 				else if (!hide(col.grid, media)) {
-					if (col.type === 'actions')
-						return ( TreeCardComp.actionFragment(tnode, col, ix, this, this.props));
-					else if (col.type === 'formatter' || col.formatter)
+					if (col.type === 'formatter' || col.formatter)
 						return (
 							<Grid item key={`${tnode.id}.${ix}`} {...col.grid} className={classes.treeCell} >
 								<Typography variant='body2' >
 									{col.formatter(col, tnode, {classes, media}) as ReactNode}
 								</Typography>
 							</Grid>);
+					else if (col.type === 'actions')
+						return ( TreeCardComp.actionFragment(tnode, col, ix, this, this.props));
 					else if (col.type === 'icon-sum')
 						return (
 							<Grid item key={`${tnode.id}.${ix}`} {...col.grid} className={classes.treeCell}>
@@ -440,14 +441,14 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 		const ctx = this.context as unknown as AnContextType;
 		this.anReact = ctx.uiHelper;
-		// this.treetier.client = this.anReact.client;
 		if (this.props.reload && this.state.tobeLoad) {
 			this.toSearch();
 		}
 	}
 
 	/**
-	 * @deprecated the AnTreegrid update schema is prefered.
+	 * @deprecated the {@link AnTreegrid} update schema is prefered.
+	 * @see example test/sessionles/src/less-widgets-treegrid.tsx
 	 */
 	toSearch() {
 		let that = this;
@@ -527,7 +528,8 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		let { classes, media } = compOts;
 		let that = this;
 
-		let m = this.state.forest;
+		let m = this.treetier?.forest || this.state.forest; // there are two different way to load tree
+
 		return (<div className={classes.forest}>{buildTreegrid( m, undefined, compOts )}</div>);
 
 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[],

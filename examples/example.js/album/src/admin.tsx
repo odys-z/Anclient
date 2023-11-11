@@ -9,7 +9,7 @@ import { Protocol, SessionClient, ErrorCtx,
 	AnsonMsg, AnsonResp, an} from '@anclient/semantier';
 
 import {
-	L, Langstrs, AnContext, AnContextType, JsonServs,
+	L, Langstrs, AnContext, JsonServs,
 	AnReact, AnReactExt, AnreactAppOptions, AnError,
 	jsample, Sys, SysComp, Login
 } from '@anclient/anreact';
@@ -61,24 +61,13 @@ class Admin extends React.Component<Approps> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.goPortal = this.goPortal.bind(this);
+		this.onLogin = this.onLogin.bind(this);
 
 		this.errorCtx = {onError: this.onError, msg: ''};
 
-		// Will load anclient from localStorage.
-		// this.anClient = new SessionClient();
 		this.anClient = props.client;
-
-		// if (!isEmpty(this.anClient.ssInf?.ssid))
-		// 	this.state.loggedin = true;
-		// else
-		// 	this.state.loggedin = false;
-
 		this.anReact = new AnReactExt(this.anClient, this.errorCtx);
 
-		this.onErrorClose = this.onErrorClose.bind(this);
-		this.goPortal  = this.goPortal.bind(this);
-		this.onLogin = this.onLogin.bind(this);
 
 		// singleton error handler
 		if (!this.anClient || !this.anClient.ssInf) {
@@ -95,6 +84,7 @@ class Admin extends React.Component<Approps> {
 				.extendPorts({
 					menu     : "menu.serv",
 					userstier: "users.tier",
+					album    : "album.less",
 				});
 
 			// loaded from dataset.xml
@@ -104,8 +94,10 @@ class Admin extends React.Component<Approps> {
 			}, this.errorCtx);
 		}
 
-		Protocol.sk.cbbOrg = 'org.all';
-		Protocol.sk.cbbRole = 'roles';
+		Protocol.sk = Object.assign( Protocol.sk, {
+			//cbbOrg   : 'org.all', cbbRole  : 'roles',
+			stree_sharings: 'tree-album-sharing'
+		});
 
 		// extending pages
 		// Each Component is added as the route, with uri = path
@@ -134,9 +126,9 @@ class Admin extends React.Component<Approps> {
 	}
 
 	onErrorClose(code: string) {
-		if (code === Protocol.MsgCode.exSession) {
-			this.goPortal();
-		}
+		// if (code === Protocol.MsgCode.exSession) {
+		// 	this.goPortal();
+		// }
 		this.errorMsgbox = undefined;
 		this.setState({});
 	}
@@ -147,11 +139,11 @@ class Admin extends React.Component<Approps> {
 
 	/**
 	 * For navigating to portal page
-	 * */
 	goPortal() {
 		if (this.props.iwindow)
 			this.props.iwindow.location = this.state.iportal;
 	}
+	 * */
 
 	render() {
 	  let that = this;
@@ -173,6 +165,7 @@ class Admin extends React.Component<Approps> {
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
 				:
 				<Sys menu='sys.menu.jsample'
+					landingUrl='/c/myconn'
 					sys={L('Album 0.3')} menuTitle={L('Menu')}
 				/>
 			  }
@@ -184,7 +177,6 @@ class Admin extends React.Component<Approps> {
 		 * Create MyInfCard.
 		 * To avoid create component before context avialable, this function need the caller' context as parameter.
 		 * @param anContext
-		 */
 		function myInfoPanels(anContext: AnContextType) {
 			return [
 				{ title: L('Basic'),
@@ -197,6 +189,7 @@ class Admin extends React.Component<Approps> {
 							ssInf={that.anClient.ssInf} /> }
 			  ];
 		}
+		 */
 	}
 
 	/**

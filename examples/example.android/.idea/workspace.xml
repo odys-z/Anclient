@@ -14,28 +14,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/WebAlbumAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/webview/WebAlbumAct.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../example.js/album/dist/admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/../example.js/album/dist/admin.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../example.js/album/src/admin.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../example.js/album/src/admin.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../example.js/album/src/album-editier.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../example.js/album/src/album-editier.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../example.js/album/src/album-editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../example.js/album/src/album-editor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../example.js/album/src/app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../example.js/album/src/app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/src/react/anreact.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/src/react/anreact.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/src/react/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/src/react/login.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/src/react/sys.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/src/react/sys.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/src/react/widgets/messagebox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/src/react/widgets/messagebox.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/src/utils/langstr.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/src/utils/langstr.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/test/jsample/app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/test/jsample/app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/test/jsample/login-app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/test/jsample/login-app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/less-app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/less-app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/less-widgets-treegrid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/less-widgets-treegrid.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/less-widgets.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/less-widgets.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/welcome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/welcome.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/workbook/sheet-app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/test/sessionless/src/workbook/sheet-app.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

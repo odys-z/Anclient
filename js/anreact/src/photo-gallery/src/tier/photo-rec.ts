@@ -90,7 +90,9 @@ export class AlbumReq extends DocsReq {
 		update: 'u',
 		insert: 'c',
 		upload: 'c/doc',
-		del: 'd'
+		del: 'd',
+
+		shareRelation: 'r/share-relat',
 	};
 
 	pageInf: PageInf;

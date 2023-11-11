@@ -244,15 +244,16 @@ export class App extends CrudCompW<AlbumProps> {
 			/> :
 		    <AnTreeditor {... this.props} reload={!this.state.showingDocs}
 				pk={'pid'} sk={this.albumsk}
-				tier={this.albumtier} tnode={this.albumtier.root()} title={this.albumtier.albumTitle}
+				tier={this.albumtier}
+				tnode={this.albumtier.root()} title={this.albumtier.albumTitle}
 				onSelectChange={() => undefined}
 				uri={this.uri}
 				columns={[
 					{ type: 'text',     field: 'pname',  label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
 					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
-					// { type: 'actions', field: '',     label: '',           grid: {xs: 4, sm: 3} }
-					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3}, thFormatter: this.switchDocMedias }
+					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},
+					  thFormatter: this.switchDocMedias, formatter: ()=>{} }
 				]}
 				lightbox={this.lightbox}
 			/>) }

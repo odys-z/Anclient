@@ -114,7 +114,7 @@ export class StreeTier extends Semantier {
      * Note: Response of stree() must be subclass of AnDatasetResp.
      * 
 	 * @since 0.9.98, this method visit 'stree' port with AnDatasetReq as defualt tree loading.
-	 * 
+	 * @since 0.9.99, this mehtod is planned to replace {@link Semantier.stree()}
      * @param opts 
      * @param comp 
      */
@@ -141,7 +141,6 @@ export class StreeTier extends Semantier {
 // default s-tree request (AnDatasetReq)
 StreeTier.registTierequest('stree', (opts) => new DatasetReq(opts));
 
-
 /** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
 export class SyncDoc implements Tierec {
 	static __type0__: 'io.odysz.semantic.tier.docs.SynDoc';
@@ -160,7 +159,7 @@ export class SyncDoc implements Tierec {
 
 	src: string;
 
-	constructor (opt: { recId: any; src?: any; device?: string, type: string}) {
+	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
 		this.type = opt.type;
 		this.src = opt.src
 		this.docId = opt.recId;

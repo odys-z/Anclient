@@ -29,6 +29,7 @@ export interface JsonOptions {
  * So use this to send by query form status.
  *  */
 export class PageInf {
+	/** Don't set directly, use constructor to set this. */
 	type: string;
 
 	page: number;

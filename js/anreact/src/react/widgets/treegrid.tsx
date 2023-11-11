@@ -128,7 +128,9 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
       {columns
         .filter( v => toBool(v.visible, true))
         .map( (col: AnTreegridCol, ix: number) => {
-          if (col.thFormatter) return col.thFormatter(col, ix, {classes, media});
+          if (col.thFormatter)
+            return col.thFormatter(col, ix, {classes, media});
+
           if (col.type === 'actions') return (
             hide(col.grid, media) ? undefined :
             <Grid item key={ix} {...col.grid} className={classes.thCell}>
@@ -138,6 +140,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 {media.isMd && L('New')}
               </Button>
             </Grid>);
+
           else return (
             hide(col.grid, media) ? undefined :
             <Grid item key={ix} {...col.grid} className={classes.thCell}>

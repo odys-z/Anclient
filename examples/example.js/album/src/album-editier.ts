@@ -1,4 +1,4 @@
-import { Protocol, AnsonBody, PageInf,
+import { Protocol, AnsonBody, PageInf, ErrorCtx,
 	SessionClient, AnDatasetResp, AnTreeNode, StreeTier
 } from '@anclient/semantier';
 import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, AlbumReq, PhotoRec, AlbumRec
@@ -37,14 +37,16 @@ export class AlbumEditier extends StreeTier {
 	 * 
 	 * @override(Semantier)
 	 */
-    loadCollects(conds: PageInf, onLoad: ((collects?: PhotoCollect[]) => void)) : void {
+    loadCollects(pageInf: PageInf, onLoad: ((collects?: PhotoCollect[]) => void)) : void {
 		if (!this.client) {
 			console.error("Anclient is not ready yet.");
 			return;
 		}
 
-		let client = this.client;
+		let that = this;
 
+		/*
+		let client = this.client;
 		let req = client.userReq( this.uri, this.port,
 					new AlbumReq( {uri: this.uri, page: conds} )
 					.A(AlbumReq.A.stree) );
@@ -53,12 +55,22 @@ export class AlbumEditier extends StreeTier {
 			(resp) => {
 				let body = resp.Body() as AlbumResp;
 				if (body) {
-					this.collects = body.collects;
-					onLoad(this.collects);
+					that.collects = body.collects;
+					onLoad(that.collects);
 				}
 			},
 			this.errCtx);
-		onLoad(this.collects);
+		*/
+		let sk = Protocol.sk.collectree;
+		let {client, uri, port} = this;
+
+		AlbumEditier.stree(
+			{uri, port, sk, pageInf},
+			client,
+			(rep) => {
+				that.collects = (rep.Body(0) as (AlbumResp)).forest as PhotoCollect[]; 
+				onLoad(that.collects);
+			}, this.errCtx);
 	}
 
     loadCollect(onLoad: ((collect?: PhotoCollect) => void)): void {
@@ -104,6 +116,31 @@ export class AlbumEditier extends StreeTier {
 		return GalleryView.imgSrcReq(recId, { uri: this.uri, port: this.port, client: this.client});
 	}
 
+	loadSharePolicy(pageInf: PageInf, onLoad: ((collects?: PhotoCollect[]) => void)) : void {
+		if (!this.client) {
+			console.error("Anclient is not ready yet.");
+			return;
+		}
+
+		let that = this;
+		// AlbumEditier.loadStreeExt(
+		// 	{client: this.client, uri: this.uri, port: this.port, a: AlbumReq.A.shareRelation, conds},
+		// 	(coll) => {
+		// 		that.collects = coll;
+		// 		onLoad(coll);
+		// 	}, this.errCtx);
+
+		let sk = Protocol.sk.stree_sharings;
+		let {uri, port} = this;
+
+		this.stree(
+			{ uri, port, sk, pageInf,
+			  onOk: (rep) => {
+					that.forest = (rep.Body(0) as (AlbumResp)).forest as AnTreeNode[];
+					onLoad(that.collects);
+				} },
+			this.errCtx);
+	}
 };
 
 class Profiles extends AnsonBody {
