@@ -39,7 +39,7 @@ export class DocIcon {
         if (!this.buf.hasOwnProperty(src))
             this.buf[src] = svgImgSrc(t);
 
-        return (<img className={opts?.classes?.icon} src={this.buf[src]}></img>);
+        return (<img key={n.id+mime} className={opts?.classes?.icon} src={this.buf[src]}></img>);
     }
 
     toggleButton(opts: {classes?: ClassNames, media?: Media} = {}) {
