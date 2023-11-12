@@ -11,9 +11,10 @@ import { pdf } from "./pdf";
 import { txt } from "./txt";
 import { unknown } from "./unknown";
 import { toggle } from "./toggle";
+import { audio } from "./audio";
 
 const knownBlobs = {
-    image: img, video: video,
+    image: img, video: video, audio,
     '.txt': txt, '.csv': txt,
     '.doc': docx, '.docx': docx, '.ppt': ppt, '.pptx': ppt, '.xlsx': xls, '.xls': xls,
     '.zip': z7,

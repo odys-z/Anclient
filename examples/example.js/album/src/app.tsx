@@ -60,8 +60,8 @@ export class App extends CrudCompW<AlbumProps> {
 	editForm : undefined;
 	ssclient : SessionClient | undefined;
 	albumtier: GalleryTier | undefined;
-	docIcon: DocIcon;
-	pdfview: JSX.Element | undefined;
+	docIcon  : DocIcon;
+	pdfview  : JSX.Element | undefined;
 
 	/**
 	 * Restore session from window.localStorage
@@ -214,15 +214,15 @@ export class App extends CrudCompW<AlbumProps> {
 	  let that = this;
 	  return (
 		<AnContext.Provider value={{
-			servId: this.config.servId,
-			servs: this.props.servs,
+			servId  : this.config.servId,
+			servs   : this.props.servs,
 			anClient: this.ssclient as SessionClient,
 			uiHelper: this.anReact,
 			hasError: this.state.hasError,
-			iparent: this.props.iparent,
-			ihome: this.props.iportal || 'portal.html',
-			error: this.error,
-			ssInf: undefined,
+			iparent : this.props.iparent,
+			ihome   : this.props.iportal || 'portal.html',
+			error   : this.error,
+			ssInf   : undefined,
 		}} >
 		  { this.albumtier && (
 			this.state.showingDocs ?

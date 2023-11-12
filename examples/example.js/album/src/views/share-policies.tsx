@@ -1,12 +1,17 @@
 import React, { ReactNode } from 'react';
 import withStyles from "@material-ui/core/styles/withStyles";
 
-import { Protocol, Inseclient, AnsonValue, PageInf, Tierec } from '@anclient/semantier';
-
-import { AnContext, JsonServs, CrudCompW, AnTablistProps, AnTreeditor, AnError, L, AnContextType, PhotoCollect, ClassNames, Media
+import { Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
+import { AnContext, JsonServs, CrudCompW,
+    AnTablistProps, AnTreeditor, AnError, L, AnContextType, 
+    CompOpts, AnTreegridCol, AnTreegrid, jsample, regex
 } from '@anclient/anreact';
-import { Theme, withWidth } from '@material-ui/core';
+
+import { Button, Grid, Theme, Typography, withWidth } from '@material-ui/core';
 import { AlbumEditier } from '../album-editier';
+import { DocIcon } from '../icons/doc-ico';
+
+const {JsampleIcons} = jsample;
 
 const styles = (theme: Theme) => ( {
 } );
@@ -36,13 +41,18 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
     tier?: AlbumEditier;
     detailForm: JSX.Element | undefined;
     confirm: JSX.Element | undefined;
+	docIcon  : DocIcon;
     hasError: boolean;
     onErrorClose: any;
     error: any;
 
 	constructor(props: SharePolicyProps) {
 		super(props);
+		this.docIcon = new DocIcon();
+
 		this.hasError = false;
+        this.switchButton = this.switchButton.bind(this);
+        this.toggle = this.toggle.bind(this);
     }
 
 	componentDidMount() {
@@ -53,52 +63,48 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
 		    this.tier = new AlbumEditier({uri: this.uri, client, comp: this});
 		    this.tier.setContext(this.context as AnContextType);
             this.tier.loadSharePolicy(new PageInf(), (sharing) => {
-                that.setState({});
+                that.setState({preview: true});
             })
         }
         else
             console.error("Requires logged in. (client can not be undefined)");
     }
 
-	// toSearch(e?: React.UIEvent) {
-    //     if (!this.tier)
-    //         return;
-
-    //     let tier = this.tier;
-	// 	let that = this;
-
-	// 	tier && tier.stree({
-	// 		sk: 'orgs',
-	// 		pageInf: new PageInf(0, -1, 0, []),
-	// 		onOk: (resp) => {
-	// 			tier.forest = (resp.Body(0) as AnDatasetResp).forest as AnTreeNode[];
-	// 			that.setState({});
-	// 		}}, that.context.error);
-	// }
-
     render() {
 		const { classes, width } = this.props;
 
 		let media = CrudCompW.getMedia(width);
-
-		// if (this.props.reload && this.state.tobeLoad) {
-        //     this.tier?.loadSharePolicy({
-        //         type: '',
-        //         page: 0,
-        //         nv: function (k: string, v: string): PageInf {
-        //             throw new Error('Function not implemented.');
-        //         },
-        //         condtsRec: function (): Tierec & { [p: string]: AnsonValue; } {
-        //             throw new Error('Function not implemented.');
-        //         }
-        //     },
-        //         (collects: Array<PhotoCollect>) => {
-        //         });
-		// 	this.state.tobeLoad = false;
-		// }
+        let that = this;
 
 		return (<>
-          { this.tier &&
+          { this.tier && this.state.preview ?
+            <AnTreegrid
+                pk={''} singleCheck
+                tier={this.tier}
+                columns={[
+                { type: 'iconame', field: 'pname', label: L('File Name'),
+                    grid: {xs: 6, sm: 6, md: 5} },
+                { type: 'text', field: 'mime', label: L('type'),
+                    colFormatter: typeParser, // Customize a cell
+                    grid: {xs: 1} },
+                { type: 'text', field: 'shareby', label: L('share by'),
+                    grid: {xs: false, sm: 3, md: 2} },
+                { type: 'text', field: 'filesize', label: L('size'), 
+                    grid: {xs: false, sm: 2, md: 2},
+                      formatter: (col, n, opts) => {
+                        return (<>
+                        { (n as AnTreeNode).node.children ?
+                          <Typography noWrap variant='body2' key={(n as AnTreeNode).id}
+                            className={opts.classes.rowText} >
+                            {'Edit'}
+                          </Typography>
+                          : <></>
+                        } </>) },
+                      thFormatter: this.switchButton }
+                ]}
+                onSelectChange={this.editPolicy}
+            />
+            :
             <AnTreeditor
                 {... this.props}
                 pk={'pid'}
@@ -107,16 +113,18 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                 uri={this.uri} mtabl='ind_emotion'
                 tier={this.tier}
                 columns={[
-                    { type: 'text', field: 'pname', label: L('Share'),
+                    { type: 'text', field: 'pname', label: L('Name'),
                         grid: {xs: 6, sm: 6} },
                     { type: 'text', field: 'shareby', label: L('By'),
                         grid: {xs: 3, sm: 2} },
                     { type: 'actions', field: '', label: '', grid: {xs: 3, md: 2},
-                        formatter: () => <>{'Edit'}</> }
+                        formatter: () => <></>,
+                        thFormatter: this.switchButton }
                 ]}
                 isMidNode={(n: { rowtype: string; }) => n.rowtype === 'cate' || !n.rowtype}
                 editForm={this.detailForm}
-            />}
+            />
+          }
           { this.confirm }
 
 		  { this.hasError &&
@@ -124,14 +132,46 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
 				tier={undefined}
 				title={L('Error')} msg={this.error.msg || ''} /> }
         </>);
+
+        function typeParser(c: AnTreegridCol, n: AnTreeNode, opt?: CompOpts) {
+            if (n.node.children?.length as number > 0) return <></>;
+            else return that.docIcon.typeParser(c, n, opt);
+        }
 	}
 
-    // treeNodes = (opts: {
-    //         classes: ClassNames | undefined;
-    //         media: Media; }): React.ReactNode => {
-    //     return (<>
-    //     </>);
-    // }
+	editPolicy = (ids: Map<string, Tierec>) => {
+		if (size(ids) > 0 && this.tier) {
+			let fid = ids.keys().next().value;
+			let file = ids.get(fid) as AnTreeNode;
+			let t = regex.mime2type(file.node.mime || "");
+		}
+		this.setState({});
+	};
+
+    switchButton(col: AnTreegridCol, colx: number, opts?: CompOpts ) {
+		const { classes, width } = this.props;
+		let media = CrudCompW.getMedia(width);
+
+		return (
+          <Grid key={`th-${colx}`} item {...col.grid} className={classes?.treeCell}>
+            { this.state.preview ?
+			  <><Button onClick={this.toggle}
+				    startIcon={<JsampleIcons.Search />} color="primary" >
+                </Button>
+			  {media?.isMd && L('Edit') }
+              </>
+              :
+			  <><Button onClick={this.toggle}
+				    startIcon={<JsampleIcons.Check />} color="primary" >
+                </Button>
+			    {media?.isMd && L('Preview') }
+              </>}
+          </Grid>);
+    }
+
+    toggle(e: React.UIEvent) {
+        this.setState({preview: !this.state.preview})
+    }
 }
 SharePoliciesComp.contextType = AnContext;
 

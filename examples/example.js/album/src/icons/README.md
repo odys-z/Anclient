@@ -2,6 +2,9 @@
 
 [SVG Editor](https://editsvgcode.com/)
 
+audio.svg:
+[CREATIVE COMMONS BY-SA 3.0, File:Antu audio-x-flac.svg](https://commons.wikimedia.org/wiki/File:Antu_audio-x-flac.svg)
+
 7zip.svg:
 
 [GNU, Wikimedia](https://commons.wikimedia.org/wiki/File:7zip_archive_icon.svg)

@@ -238,6 +238,8 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                     {n.node[col.field]}
                   </Typography>
                 </Grid> );
+              else if (col.formatter)
+                return col.formatter(col, n, {classes, media});
               else if (col.type === 'actions')
                 return ( hide(col.grid, media) ? undefined :
                   TreeCardComp.actionFragment(n, col, cx, undefined, that.props));
