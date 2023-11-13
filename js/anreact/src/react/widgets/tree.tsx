@@ -196,7 +196,14 @@ interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
 	 * Overide AnTablistProps#formatter
 	 * Formatt a tree item cell/grid from col and node.
 	 */
-	colFormatter?: (col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts) => JSX.Element;
+	colFormatter?: (col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts & {
+		classes?: ClassNames, media?: Media,
+		/**
+		 * Column index while rendering.
+		 * React children can use this to generati key
+		 */
+		colx: number
+	}) => JSX.Element;
 
 	thFormatter?: (col: AnTreegridCol, colx: number, opts?: CompOpts) => JSX.Element;
 

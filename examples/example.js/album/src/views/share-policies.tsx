@@ -10,10 +10,14 @@ import { AnContext, JsonServs, CrudCompW,
 import { Button, Grid, Theme, Typography, withWidth } from '@material-ui/core';
 import { AlbumEditier } from '../album-editier';
 import { DocIcon } from '../icons/doc-ico';
+import { SharePolicyDetails } from './sahre-policy-details';
 
 const {JsampleIcons} = jsample;
 
 const styles = (theme: Theme) => ( {
+    action: {
+        padding: 0
+    }
 } );
 
 interface SharePolicyProps extends AnTablistProps {
@@ -91,18 +95,17 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                     grid: {xs: false, sm: 3, md: 2} },
                 { type: 'text', field: 'filesize', label: L('size'), 
                     grid: {xs: false, sm: 2, md: 2},
-                      formatter: (col, n, opts) => {
-                        return (<>
-                        { (n as AnTreeNode).node.children ?
-                          <Typography noWrap variant='body2' key={(n as AnTreeNode).id}
-                            className={opts.classes.rowText} >
-                            {'Edit'}
-                          </Typography>
-                          : <></>
-                        } </>) },
+                      colFormatter: (col, n, opts) => {return (
+                            <Button key={`${n.id}.${opts?.colx}`}
+                                onClick={() => this.editPolicy(n)}
+                                startIcon={ n.node.children? <JsampleIcons.Edit /> : <JsampleIcons.Check/>}
+                                color="primary" className={classes?.action}>
+                                {media.isMd && L('Shares')}
+                            </Button>
+                      )},
                       thFormatter: this.switchButton }
                 ]}
-                onSelectChange={this.editPolicy}
+                onSelectChange={this.selectPolicy}
             />
             :
             <AnTreeditor
@@ -118,7 +121,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                     { type: 'text', field: 'shareby', label: L('By'),
                         grid: {xs: 3, sm: 2} },
                     { type: 'actions', field: '', label: '', grid: {xs: 3, md: 2},
-                        formatter: () => <></>,
+                        formatter: () => undefined,
                         thFormatter: this.switchButton }
                 ]}
                 isMidNode={(n: { rowtype: string; }) => n.rowtype === 'cate' || !n.rowtype}
@@ -139,7 +142,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
         }
 	}
 
-	editPolicy = (ids: Map<string, Tierec>) => {
+	selectPolicy = (ids: Map<string, Tierec>) => {
 		if (size(ids) > 0 && this.tier) {
 			let fid = ids.keys().next().value;
 			let file = ids.get(fid) as AnTreeNode;
@@ -172,6 +175,20 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
     toggle(e: React.UIEvent) {
         this.setState({preview: !this.state.preview})
     }
+
+    editPolicy = (n: AnTreeNode) => {
+        let that = this;
+        this.confirm = (
+          <SharePolicyDetails {...this}
+            tier={this.tier}
+            onClose={() => {
+                that.confirm = undefined;
+                that.setState({});
+            }}
+          >
+          </SharePolicyDetails>);
+
+    };
 }
 SharePoliciesComp.contextType = AnContext;
 

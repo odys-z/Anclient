@@ -131,22 +131,24 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
           if (col.thFormatter)
             return col.thFormatter(col, ix, {classes, media});
 
-          if (col.type === 'actions') return (
-            hide(col.grid, media) ? undefined :
-            <Grid item key={ix} {...col.grid} className={classes.thCell}>
-              <Button onClick={(e) => opts.onThClick(e, ix)}
-                data-me={undefined} date-parent={undefined}
-                startIcon={<JsampleIcons.ListAdd />} color="primary" >
-                {media.isMd && L('New')}
-              </Button>
-            </Grid>);
+          if (col.type === 'actions')
+            return (
+              hide(col.grid, media) ? undefined :
+              <Grid item key={ix} {...col.grid} className={classes.thCell}>
+                <Button onClick={(e) => opts.onThClick(e, ix)}
+                  data-me={undefined} date-parent={undefined}
+                  startIcon={<JsampleIcons.ListAdd />} color="primary" >
+                  {media.isMd && L('New')}
+                </Button>
+              </Grid>);
 
-          else return (
-            hide(col.grid, media) ? undefined :
-            <Grid item key={ix} {...col.grid} className={classes.thCell}>
-              {col.label || col.field}
-            </Grid>);
-          } )
+          else
+            return (
+              hide(col.grid, media) ? undefined :
+              <Grid item key={ix} {...col.grid} className={classes.thCell}>
+                {col.label || col.field}
+              </Grid>);
+            } )
       }
       </Grid>);
   }
@@ -202,11 +204,13 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 else if (col.type === 'actions')
                   return ( hide(col.grid, media) ? undefined :
                     TreeCardComp.actionFragment(n, col, cx, this, that.props));
+                else if (col.type === 'formatter' || col.formatter) 
+                  console.error("AnTreegridCol.formatter is replaced with colFormatter.");
                 else return (
                   hide(col.grid, media) ? undefined :
                   <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
                     { typeof col.colFormatter === 'function' ?
-                      col.colFormatter(col, n, {media, classes}) :
+                      col.colFormatter(col, n, {media, classes, colx: cx}) :
                       <Typography noWrap variant='body2' align={align(n.node.css)} >
                         {n.node[col.field]}
                       </Typography>
@@ -231,6 +235,11 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
           { cols
             .filter( (v: AnTreegridCol) => toBool(v.visible, true) )
             .map( (col: AnTreegridCol, cx: number) => {
+              // if (col.formatter) return (
+              //   <Grid key={`${n.id}.${cx}`} item {...col.grid} >
+              //     {col.formatter(col, n, {classes, media, cx})}
+              //   </Grid>);
+              // else
               if (cx === 0) return (
                 <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.rowHead}>
                   <Typography noWrap variant='body2'>
@@ -238,16 +247,16 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                     {n.node[col.field]}
                   </Typography>
                 </Grid> );
-              else if (col.formatter)
-                return col.formatter(col, n, {classes, media});
               else if (col.type === 'actions')
                 return ( hide(col.grid, media) ? undefined :
                   TreeCardComp.actionFragment(n, col, cx, undefined, that.props));
+              else if (col.type === 'formatter' || col.formatter) 
+                console.error("AnTreegridCol.formatter is replaced with colFormatter.");
               else return (
                 hide(col.grid, media) ? undefined :
                 <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.treeItem}>
                   { typeof col.colFormatter === 'function' ?
-                    col.colFormatter(col, n, {media, classes}) :
+                    col.colFormatter(col, n, {media, classes, colx: cx}) :
                     <Typography noWrap variant='body2' align={align(n.node.css)} >
                       {n.node[col.field]}
                     </Typography>

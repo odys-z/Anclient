@@ -94,7 +94,8 @@ const styles = (theme: Theme) => ({
     padding: 0,
     verticalAlign: 'middle',
     height: theme.spacing(4),
-  }
+  },
+  action: {}
 });
 
 class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem {

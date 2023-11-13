@@ -342,12 +342,15 @@ export class Semantier {
 			return this._cols;
     }
 
-    /**Get form fields data specification
+    /**
+	 * Get a TRecordForm's field data specification
 	 *
-	 * Businsess semantics binding: If the loading with a record Id, the Id field will be disabled.
+	 * Businsess semantics binding: If loading with a record Id, the Id field will be disabled.
 	 *
-     * @param modifier {field: AnElemFormatter | object }
-	 * e.g. for anreact, object can be {gird, box, ...}.
+     * @param modifier {field: AnElemFormatter | object }, additional fields or callback function
+	 * e.g. for anreact, object can be {Bird, Box, ...}.
+	 * 
+	 * @since 0.9.99 FIXME: since this should be overriden in each tier, this modifier design doesn't make sense. 
      */
 	 fields (modifier?: {[x: string]: AnElemFormatter | object}): Array<TierCol> {
 		if (!this._fields)
@@ -374,6 +377,7 @@ export class Semantier {
 	 * @param client
 	 * @param opts
 	 * @param onOk
+	 * @deprecated @since 0.9.99 replaced by {@link Stree.relations()}.
 	 */
     relations( client: SessionClient | Inseclient,
 		opts: { uri?: string;

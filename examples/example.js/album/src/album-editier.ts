@@ -1,7 +1,6 @@
-import { Protocol, AnsonBody, PageInf, ErrorCtx,
-	SessionClient, AnDatasetResp, AnTreeNode, StreeTier
-} from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, AlbumReq, PhotoRec, AlbumRec
+import { Protocol, AnsonBody, PageInf, 
+	SessionClient, AnDatasetResp, AnTreeNode, StreeTier} from '@anclient/semantier';
+import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumRec
 } from '@anclient/anreact';
 
 const debug = true;
@@ -12,6 +11,8 @@ export class AlbumEditier extends StreeTier {
 
 	page: PageInf;
 	collects?: PhotoCollect[];
+
+	_fields = [{field: 'shareFlag', label: 'Public'}];
 
 	/**
 	 * @param props

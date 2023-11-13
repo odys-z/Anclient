@@ -96,7 +96,10 @@ class Admin extends React.Component<Approps> {
 
 		Protocol.sk = Object.assign( Protocol.sk, {
 			//cbbOrg   : 'org.all', cbbRole  : 'roles',
-			stree_sharings: 'tree-album-sharing'
+			/** Doc-tree to be managed */
+			stree_sharings: 'tree-album-sharing',
+			/** Relationship tree of h_photo_user */
+			rel_photo_user: 'tree-rel-photo-user',
 		});
 
 		// extending pages

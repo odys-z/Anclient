@@ -10,7 +10,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, str, toBool } from '@anclient/semantier';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, str, Tierelations, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
@@ -59,12 +59,17 @@ interface RelationTreeProps extends Comprops {
 	reltabl?: string;
 	sk?: string;
 
+	/** Override tier's relMeta. */
+	relMeta?: {[tabl: string]: Tierelations};
+
 	/**Semantier.formatRel() use this name to format relationship records,
 	 * where in UI component the FK value comes from
 	 *
 	 * FIXME shouldn't be changed to colProp
 	 * */
 	// relcolumn?: string;
+	//
+
 	colProp?: string;
 
 	tier: Semantier;
@@ -74,7 +79,6 @@ interface RelationTreeProps extends Comprops {
  * Tiered relationshp tree is a component for UI relation tree layout, automaitcally bind data,
  * resolving FK's auto-cbb.
  *
- * See also {@link AnRelationTreeComp}
  */
 class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	state = {
@@ -88,6 +92,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		super(props);
 
 		this.tier = this.props.tier;
+		this.tier.relMeta = this.props.relMeta || this.tier.relMeta;
 
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.buildTree = this.buildTree.bind(this);

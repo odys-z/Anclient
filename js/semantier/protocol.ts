@@ -134,10 +134,10 @@ export interface relFK {
 	/**child table pk */
 	pk: string,
 
-	/**child foreign column in DB table */
+	/**child FK column in DB table */
 	col: string,
 
-	/**value for col - column-map's key for where to get the value */
+	/**value for col - column-map's key for where to get the value from UI component */
 	relcolumn: string,
 }
 
@@ -158,6 +158,8 @@ export interface relStree {
 }
 
 export interface DbRelations {
+	/** Child field to m-tabl */
+	childField: string,
 	fk?: relFK,
 	/** semantic tree */
 	stree?: relStree,
@@ -1397,6 +1399,9 @@ export interface DatasetOpts {
 	onOk?: OnCommitOk;
 }
 
+/**
+ * @deprecated renamed as AnDatasetReq
+ */
 export class DatasetReq extends QueryReq {
     /**
      * @param opts this parameter should be refactored
@@ -1508,6 +1513,122 @@ export class DatasetReq extends QueryReq {
         return this;
     }
 }
+
+export class AnDatasetReq extends QueryReq {
+	static __type__ = "io.odysz.semantic.ext.AnDatasetReq";
+
+    /**
+     * @param opts this parameter should be refactored
+     */
+    constructor(opts?: DatasetOpts ) {
+
+		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
+
+		super(uri, Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf);
+		this.type = "io.odysz.semantic.ext.AnDatasetReq";
+
+		this.uri = uri;
+		this.sk = sk;
+		this.sqlArgs = sqlArgs;
+		this.rootId = rootId;
+
+		this.TA(t || a);
+		// this.checkt((t || a) as unknown as string);
+	}
+
+    maintbl: string;
+    alias: string;
+    pageInf: object;
+
+    sk: string;
+    sqlArgs: any[];
+    rootId: any;
+
+	get geTreeSemtcs() { return this.trSmtcs; }
+
+    /**Set tree semantics<br>
+     * You are recommended not to use this except your are the semantic-* developer.
+     * @param {TreeSemantics} semtcs */
+    treeSemtcs(semtcs: any): DatasetReq {
+		this.trSmtcs = semtcs;
+		return this;
+    }
+
+    trSmtcs: any;
+
+	/**Set t/a of message.
+	 * FIXME this is not a typed way
+	 *
+	 * @param ask
+	 * @returns
+	 */
+	TA(ask: string | {
+			/** load dataset configured and format into tree with semantics defined by sk. */
+			sqltree: string;
+			/** Reformat the tree structure - reformat the 'fullpath', from the root */
+			retree: string;
+			/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+			reforest: string;
+			/** Query with client provided QueryReq object, and format the result into tree. */
+			query: string;
+		}) {
+
+		if (typeof ask === 'string' && ask.length > 0 && ask === stree_t.sqltree) {
+			console.info('Since @anclient/semantier 0.9.98, A = stree_t.sqltree is deprecated and replaced with DatasetierREq.A.stree, ', DatasetierReq.A.stree);
+			this.a = DatasetierReq.A.stree;
+		}
+
+		if (typeof ask === 'string' && ask.length > 0 && ask !== DatasetierReq.A.stree) {
+			console.info('DatasetReq.a is ignored for sk is defined.', ask);
+			this.a = DatasetierReq.A.stree;
+		}
+		else {
+			this.a = ask as string;
+			// this.checkt(ask as string);
+		}
+		return this;
+	}
+
+    SqlArgs(args: any): AnDatasetReq {
+		return this.args(args);
+    }
+
+    /**@deprecated
+     * Handle differnet args */
+    args(args: any): AnDatasetReq {
+        if (this.sqlArgs === undefined){
+                this.sqlArgs = [];
+		}
+
+		if (typeof args === 'string' || Array.isArray(args)) {
+			this.sqlArgs = this.sqlArgs.concat(args);
+		}
+		else {
+			console.error('sql args is not an arry: ', args);
+			this.sqlArgs = this.sqlArgs.concat(args);
+		}
+		return this;
+    }
+
+    /**
+	 * @deprecated lagacy of without type checking 
+	 * 
+     * Check is t if port is stree can be undertood by s-tree.serv
+	 * 
+     * @param {string} t
+	 * @return this
+	 */
+    checkt(t: string): DatasetReq {
+		if (t !== undefined && !DatasetierReq.A.hasOwnProperty(t)) {
+			console.warn(
+				"DatasetReq.t won't be understood by server:", t, "\n 't (a)' should be one of Protocol.stree_t's key.",
+				Object.keys(stree_t));
+		}
+        return this;
+    }
+}
+// StreeTier will register this
+// Protocol.registerBody(AnDatasetReq.__type__, (json) => new AnDatasetReq(json));
 
 /**
  * @deprecated replaced by {@link DatasetierReq.A}

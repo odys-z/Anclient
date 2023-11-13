@@ -2,9 +2,10 @@ import * as CSS from 'csstype';
 
 import { SessionClient } from './anclient';
 
-import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody, DatasetReq } from './protocol';
+import { AnsonValue, Protocol, DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
+	LogAct, PageInf, AnsonBody, OnCommitOk } from './protocol';
 
-import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
+import { Semantier, Tierec, UIComponent, ErrorCtx, Tierelations } from './semantier';
 
 
 /**
@@ -137,9 +138,43 @@ export class StreeTier extends Semantier {
 
 		this.client.an.post(jreq, opts.onOk, errCtx);
     }
+
+    /**
+	 * Load relationships
+	 * @param client
+	 * @param opts
+	 * @param onOk
+	 */
+    relations( client: SessionClient,
+		opts: { uri?: string;
+				reltabl?: string;
+				sqlArgs?: string[];
+				sqlArg?: string;
+				ok: OnCommitOk }): void {
+
+		let that = this;
+
+		// typically relationships are tree data
+		let { reltabl, sqlArgs, sqlArg } = opts;
+		let fkRel = this.relMeta[reltabl] as Tierelations;
+		// let { stree, fk, fullpath } = fkRel;
+		let stree = fkRel.stree;
+
+		sqlArgs = sqlArgs || [sqlArg];
+		if (!stree)
+			throw Error('TODO ...');
+
+		this.stree(
+			{ sk: stree,
+			  sqlArgs,
+			  onOk: (resp) => {
+				that.rels[reltabl] = (resp.Body() as AnDatasetResp).forest as AnTreeNode[];
+				opts.ok(resp)
+			}},
+			this.errCtx);
+    }
 }
-// default s-tree request (AnDatasetReq)
-StreeTier.registTierequest('stree', (opts) => new DatasetReq(opts));
+StreeTier.registTierequest('stree', (opts) => new AnDatasetReq(opts));
 
 /** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
 export class SyncDoc implements Tierec {
@@ -166,3 +201,4 @@ export class SyncDoc implements Tierec {
 		this.device = opt.device;
 	}
 }
+

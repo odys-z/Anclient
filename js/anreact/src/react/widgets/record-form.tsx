@@ -48,19 +48,19 @@ export interface RecordFormProps extends Comprops {
 };
 
 /**
- * A Tiered record component is designed for UI record layout rendering, handling
- * user action (change text, etc.) in a levle-up style. It's parent's responsibilty
- * to load all binding data in sychronous.
+ * A Tiered record component which is designed for UI record layout rendering, handling
+ * user action (change text, etc.) in a levle-up style - it's parent's responsibilty
+ * to load all binding data in sychronous way.
+ * 
  * TRecordForm won't resolving FK's auto-cbb.
  * But TRecordFormComp do has a state for local udpating, See performance issue:
  * https://stackoverflow.com/a/66934465
  *
- * In case of child relation table, this component currently is not planned to supprt.
- * <p>Usally a CRUD process needs to update multiple tables in one transaction,
- * so this component leveled up state for saving. Is this a co-accident with React
- * or is required by semantics?</p>
- * <p>Issue: FK binding are triggered only once ? What about cascade cbbs ineraction?</p>
+ * In case of one or more child relation tables, this component currently is not planned to supprt.
+ * To support relationship tables, in the upper component, use the {@link AnRelationTreeComp}.
  *
+ * See also {@link AnRelationTreeComp}
+ * 
  * NOTE: Desgin Memo
  * Level-up way is NOT working! So having tier as the common state/data manager.
  */
@@ -98,7 +98,11 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		let {isSm} = media;
 		let that = this;
 
-		if (f.type === 'cbb') {
+		if (f.type === 'formatter' || f.formatter) 
+			console.warn("This branch is deprecated.");
+		else if (f.fieldFormatter)
+			return (<>{f.fieldFormatter(rec, f, {classes: classes || {}, media})}</>);
+		else if (f.type === 'cbb') {
 			let fcbb = f as TierComboField & { css: CSS.Properties };
 			return (
 				<DatasetCombo uri={ this.props.uri }
@@ -116,15 +120,6 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 						that.setState({dirty: true});
 					} }
 				/>);
-		}
-		else if (f.type === 'formatter' || f.formatter) {
-			console.warn("This branch is deprecated.");
-			// if (len(f.formatter?.length != 2)
-			// 	console.warn('TRecordFormComp need formatter with signature of f(record, field, tier).', f.formatter)
-			// return (<>{f.formatter(f, rec)}</>);
-		}
-		else if (f.fieldFormatter) {
-			return (<>{f.fieldFormatter(rec, f, {classes: classes || {}, media})}</>);
 		}
 		else {
 			let type = 'text';
