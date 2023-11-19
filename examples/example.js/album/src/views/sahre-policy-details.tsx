@@ -145,7 +145,8 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 					mtabl='h_photos' pk='pid'
 					fields={[
 						{type: 'switch', field: 'shareFlag', grid: {sm: 6, md: 4}},
-						{type: 'text',   field: 'remarks',   grid: {sm: 6, md: 4}}
+						{type: 'text',   field: 'shareby',   grid: {sm: 6, md: 4}},
+						{type: 'text',   field: 'remarks',   grid: {sm: 12}}
 					]}
 				/>
 				<AnRelationTree uri={this.props.uri}
@@ -163,7 +164,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 			  { crud &&
 				<Button onClick={this.toSave} variant="contained" color="primary">
 					{L("Save")}
-				</Button>}
+				</Button> }
 			  <Button onClick={this.toCancel} variant="contained" color="primary">
 				{crud ? L('Close') : L("Cancel")}
 			  </Button>
