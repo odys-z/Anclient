@@ -165,7 +165,7 @@ export class StreeTier extends Semantier {
 			throw Error('TODO ...');
 
 		this.stree(
-			{ sk: stree,
+			{ sk: stree.sk,
 			  sqlArgs,
 			  onOk: (resp) => {
 				that.rels[reltabl] = (resp.Body() as AnDatasetResp).forest as AnTreeNode[];

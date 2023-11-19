@@ -199,7 +199,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 				  </Grid>
 				  <Grid item xs={3} className={classes.treeItem} >
 					<Typography className={classes.treeLabel} >
-						{itemLabel(node.label || node.text, level, node.css)}
+						{itemLabel(str(node.label || node.text), level, node.css)}
 					</Typography>
 				  </Grid>
 				</Grid>
@@ -218,7 +218,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			return c;
 		}
 
-		function itemLabel(txt, l, css) {
+		function itemLabel(txt: string, _level: number, _css: any) {
 			return L(txt);
 		}
 	}

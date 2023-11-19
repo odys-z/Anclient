@@ -150,9 +150,9 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 				/>
 				<AnRelationTree uri={this.props.uri}
 					relMeta={{h_photo_user: {
-                        stree: Protocol.sk.rel_photo_user,
+                        stree: {sk: Protocol.sk.rel_photo_user, col: '', fk: 'org'},
                         childField: 'pid',
-                        fk: {tabl: 'a_users', pk: 'userId', col: 'uid', relcolumn: 'user'}}
+                        fk: {tabl: 'a_orgs', pk: 'orgId', col: 'org', relcolumn: 'org'}}
                     }}
 					tier={this.tier} sk={undefined}
 					mtabl='h_photos' reltabl='h_photo_user'

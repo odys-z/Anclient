@@ -148,11 +148,16 @@ export interface relFK {
  * Used by {@link Semantier.formatRel()}
  */
 export interface relStree {
-	sk : string, 		// s-tree semantic key
-	childTabl?: string,	// child table (optional when loading / binding records)
-	col: string,		// check col at client side
-	colProp?: string,	// propterty name (of which the value will be collected)
-	fk : string,		// fk to main table
+	/** s-tree semantic key */
+	sk?: string, 		
+	/** child table (optional when loading / binding records) */
+	childTabl?: string,
+	/** check col at client side */
+	col: string,
+	/** propterty name (of which the value will be collected) */
+	colProp?: string,	
+	/** fk to main table */
+	fk : string,	
 	sort?: string,
 	fullpath?: string,
 }
