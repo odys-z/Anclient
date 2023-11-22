@@ -15,7 +15,7 @@ import Wallpaper from '@material-ui/icons/Wallpaper';
 import MovieRounded from '@material-ui/icons/MovieRounded';
 import FavoriteBorderOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 
-import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentIconame, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
+import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentName, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
 import { Comprops, CrudCompW } from "../crud";
 import { ClassNames, CompOpts, Media } from "../anreact";
 import { AnTablistProps } from "./table-list";
@@ -160,7 +160,7 @@ const styles = (_theme: Theme) => ({
 /**
  * NOTE: Not used by AnTreeComp yet within 0.4.27 
  * 
- * @see {@link IndentIconame}
+ * @see {@link IndentName}
  * @param iconNames 
  * @param lvlIcons 
  * @param itemIcon 
@@ -169,13 +169,13 @@ const styles = (_theme: Theme) => ({
  * @param expand 
  * @returns indent fragment
  */
-function levelIcons(iconNames: IndentIcons, lvls: IndentIconame[]) {
+function levelIcons(iconNames: IndentIcons, lvls: IndentName[]) {
     return (<React.Fragment >
             {lvls && lvls.map( (i, x) => icon(iconNames, i, x) )}
         </React.Fragment>);
 }
 
-function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentIconame, k: string | number, classes?: string) {
+function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentName, k: string | number, classes?: string) {
     let icon = AnTreeIcons[(iconNames || defltIcons)[name || 'deflt']]
             || AnTreeIcons[name]; // extend to all supported icons
     if (!icon)

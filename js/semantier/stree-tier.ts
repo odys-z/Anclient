@@ -3,9 +3,9 @@ import * as CSS from 'csstype';
 import { SessionClient } from './anclient';
 
 import { AnsonValue, Protocol, DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
-	LogAct, PageInf, AnsonBody, OnCommitOk } from './protocol';
+	LogAct, PageInf, AnsonBody, OnCommitOk, DbRelations } from './protocol';
 
-import { Semantier, Tierec, UIComponent, ErrorCtx, Tierelations } from './semantier';
+import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
 
 
 /**
@@ -66,7 +66,7 @@ export class AnTreeNode implements Tierec {
 
 		mime?: string;
 
-		shareby: string;
+		shareby?: string;
 
 		/** Any data by jserv */
 		[d: string]: AnsonValue;
@@ -156,7 +156,7 @@ export class StreeTier extends Semantier {
 
 		// typically relationships are tree data
 		let { reltabl, sqlArgs, sqlArg } = opts;
-		let fkRel = this.relMeta[reltabl] as Tierelations;
+		let fkRel = this.relMeta[reltabl] as DbRelations;
 		// let { stree, fk, fullpath } = fkRel;
 		let stree = fkRel.stree;
 

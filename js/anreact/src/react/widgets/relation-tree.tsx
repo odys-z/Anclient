@@ -10,7 +10,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, str, Tierelations, toBool } from '@anclient/semantier';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, DbRelations, Semantier, str, StreeTier, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
@@ -60,19 +60,15 @@ interface RelationTreeProps extends Comprops {
 	sk?: string;
 
 	/** Override tier's relMeta. */
-	relMeta?: {[tabl: string]: Tierelations};
+	relMeta?: {[tabl: string]: DbRelations};
 
-	/**Semantier.formatRel() use this name to format relationship records,
+	/**
+	 * Semantier.formatRel() use this name to format relationship records,
 	 * where in UI component the FK value comes from
-	 *
-	 * FIXME shouldn't be changed to colProp
-	 * */
-	// relcolumn?: string;
-	//
-
+	 */
 	colProp?: string;
 
-	tier: Semantier;
+	tier: StreeTier;
 };
 
 /**
@@ -86,7 +82,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 		expandings: new Set(),
 	};
-	tier: Semantier;
+	tier: StreeTier;
 
 	constructor(props: RelationTreeProps) {
 		super(props);
@@ -104,11 +100,8 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			{ uri    : this.props.uri,
 			  reltabl: this.props.reltabl,
 			  sqlArg : str(this.tier.pkval.v),
-			},
-			(rels: AnsonMsg<AnDatasetResp>) => {
-				// that.forest = rels.Body().forest as AnTreeNode[];
-				that.setState({});
-			} );
+			  ok     : (rels: AnsonMsg<AnDatasetResp>) => { that.setState({}); }
+			});
 	}
 
 	toExpandItem(e: React.UIEvent<HTMLElement>) {

@@ -8,7 +8,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
 import { CRUD, AnTreeNode, AnlistColAttrs,
-	toBool, IndentIconame, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons, AnsonResp
+	toBool, IndentName, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons, AnsonResp
 } from "@anclient/semantier";
 
 import { GalleryView } from "./gallery-view";
@@ -106,7 +106,7 @@ class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem 
 
 	vistype: TreeNodeVisual;
 
-	node: AnTreeNode & {indentIcons?: IndentIconame[]};
+	node: AnTreeNode & {indentIcons?: IndentName[]};
 
 	constructor(props: TreeItemProps) {
 		super(props);
@@ -332,7 +332,7 @@ class TreeGallaryComp extends TreeCardComp {
 						<Typography noWrap variant='body2' className={expd ? classes.galleryHeadExpandIcon : ''}>
 						{levelIcons(
 							that.props.indentSettings,
-							tnode.indents as IndentIconame[])}
+							tnode.indents as IndentName[])}
 						{expd ? icon(that.props.indentIcons, "pic-lib", 0)
 							: icon(that.props.indentIcons, "collapse", 0)}
 						{n[col.field]}
@@ -610,7 +610,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 							<Typography noWrap variant='body2' >
 							{levelIcons(
 								that.props.indentSettings,
-								treenode.indents as IndentIconame[])}
+								treenode.indents as IndentName[])}
 							{expd ? icon(that.props.indentIcons, "expand", 0)
 								: icon(that.props.indentIcons, "collapse", 0)}
 							{n.text}

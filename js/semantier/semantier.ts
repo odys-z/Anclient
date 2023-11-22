@@ -163,8 +163,8 @@ export interface TierComboField extends AnlistColAttrs<any, any> {
 	ref: any;
 }
 
-export interface Tierelations extends DbRelations {
-}
+// export interface Tierelations extends DbRelations {
+// }
 
 /**
  * Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
@@ -225,7 +225,7 @@ export class Semantier {
     rec: Tierec | undefined;
 
     /** All sub table's relationships */
-    relMeta: {[tabl: string]: Tierelations};
+    relMeta: {[tabl: string]: DbRelations};
 
     /**
      *
@@ -295,7 +295,7 @@ export class Semantier {
 			return true;
 
 		let valid = true;
-		fields.forEach( (f, x) => {
+		fields.forEach( (f, _x) => {
 			f.style = validField(rec, f);
 			valid &&= f.style === 'ok';
 		} );
@@ -377,7 +377,7 @@ export class Semantier {
 	 * @param client
 	 * @param opts
 	 * @param onOk
-	 * @deprecated @since 0.9.99 replaced by {@link Stree.relations()}.
+	 * @deprecated since 0.9.99 replaced by {@link Stree.relations()}.
 	 */
     relations( client: SessionClient | Inseclient,
 		opts: { uri?: string;
@@ -390,7 +390,7 @@ export class Semantier {
 
 		// typically relationships are tree data
 		let { reltabl, sqlArgs, sqlArg } = opts;
-		let fkRel = this.relMeta[reltabl] as Tierelations;
+		let fkRel = this.relMeta[reltabl] as DbRelations;
 		// let { stree, fk, fullpath } = fkRel;
 		let stree = fkRel.stree;
 
@@ -418,17 +418,19 @@ export class Semantier {
 	/**
 	 * Load a jserv record.
 	 * @param conds
-	 * @param onLoad
+	 * @param _onLoad
 	 */
-    record(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
+    record(_conds: PageInf, _onLoad: OnLoadOk<Tierec>) : void {
+		console.warn('This method is supposed to be overriden by subclasses.');
     }
 
 	/** Load records of conditions.
 	 *
-	 * @param conds QueryConditions type is deprecated
-	 * @param onLoad
+	 * @param _conds QueryConditions type is deprecated
+	 * @param _onLoad
 	 */
-    records(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
+    records(_conds: PageInf, _onLoad: OnLoadOk<Tierec>) : void {
+		console.warn('This method is supposed to be overriden by subclasses.');
 	}
 
     /**
@@ -526,7 +528,7 @@ export class Semantier {
 
 			if (posts) {
 				let d = req.Body();
-				posts.forEach( (p, x) => {
+				posts.forEach( (p, _x) => {
 					d.post(p);
 				} );
 			}
@@ -552,7 +554,7 @@ export class Semantier {
 	 * @param parentpkv pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
-	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Tierelations, parentpkv: PkVal ) : AnsonMsg<T> {
+	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: DbRelations, parentpkv: PkVal ) : AnsonMsg<T> {
 		if (relation.fk || relation.m2m)
 			throw Error('TODO ...');
 
@@ -724,7 +726,7 @@ export class Semantier {
 			compont.setState({stree: resp.Body().forest});
 	}</pre>
 	 * @since 0.9.86 opts.port can be overriden, with which user can modify s-tree service at server side.
-	 * @deprecated since 0.9.99, this method is planned to be replaced by {@link StreeTier.stree()}.
+	 * @deprecated since 0.9.99, this method is planned to be replaced by StreeTier.stree().
 	 * @param opts dataset info {sk, sqlArgs, onOk, port}
 	 * where port is using s-tree if undefined.
 	 * @param client

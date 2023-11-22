@@ -1308,7 +1308,9 @@ export class AnsonResp extends AnsonBody {
     Code(): string { return this.code };
 
     rs: AnResultset | Array<AnResultset>;
-    Rs(rx = 0): AnResultset { return this.rs.length ? this.rs[rx] : this.rs; }
+    Rs(rx = 0): AnResultset {
+		return this.rs?.length ? this.rs[rx] : this.rs;
+	}
 
     data: {props?: {}};
     getProp(prop: string): object {
@@ -1366,7 +1368,7 @@ export class AnDatasetResp extends AnsonResp {
 	}
 
 	Rs(rx = 0) {
-		return this.rs[rx];
+		return this.rs? this.rs[rx] : undefined;
 	}
 }
 

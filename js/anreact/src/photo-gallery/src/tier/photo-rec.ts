@@ -69,12 +69,14 @@ export interface AlbumRec extends Tierec {
 }
 
 export class AlbumPage extends PageInf {
-	/** A temperoray solution before PageInf.condts evolved to Tierec. */
+	/** A temperoray solution before PageInf.condts evolved to Tierec.
+	 * @deprecated
+	 */
 	qrec?: AlbumRec;
 
 	constructor (query?: AlbumRec) {
 		super();
-		this.qrec = query;
+		this.mapCondts = query;
 	}
 }
 
@@ -135,6 +137,7 @@ export class AlbumResp extends AnDatasetResp {
 		});
 
 		this.album = resp;
+		this.photo = resp.photo;
 		this.collect = resp.collect;
 		this.collects = resp.collects;
 	}

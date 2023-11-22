@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree, TierComboField, len, str
+	OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree, TierComboField, len, str, StreeTier
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -65,6 +65,8 @@ class RolesComp extends CrudCompW<Comprops> {
 		pageInf: { page: 0, size: 25, total: 0 } as PageInf,
 		selected: {ids: new Map<string, Tierec>()},
 	};
+
+	port: string;
 
 	tier: RoleTier;
 	confirm: JSX.Element;
@@ -220,7 +222,7 @@ RolesComp.contextType = AnContext;
 
 const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
 
-class RoleTier extends Semantier {
+class RoleTier extends StreeTier {
 	checkbox = true;
 
 	_cols = [
@@ -242,7 +244,7 @@ class RoleTier extends Semantier {
 	 * @param {string} comp.uri the client function uri.
 	 * @constructor
 	 */
-	constructor(comp: UIComponent) {
+	constructor(comp: UIComponent & {uri: string, port: string}) {
 		super(comp);
 
 		this.pkval.tabl = 'a_roles';

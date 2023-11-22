@@ -89,7 +89,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                 { type: 'iconame', field: 'pname', label: L('File Name'),
                     grid: {xs: 6, sm: 6, md: 5} },
                 { type: 'text', field: 'mime', label: L('type'),
-                    colFormatter: typeParser, // Customize a cell
+                    colFormatter: typeParser,
                     grid: {xs: 1} },
                 { type: 'text', field: 'shareby', label: L('share by'),
                     grid: {xs: false, sm: 3, md: 2} },
@@ -180,9 +180,12 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
         let that = this;
         this.confirm = (
           <SharePolicyDetails {...this}
+            pk={n.id}
             tier={this.tier}
             onClose={() => {
                 that.confirm = undefined;
+                if (that.tier)
+                    that.tier.rec = undefined;
                 that.setState({});
             }}
           >

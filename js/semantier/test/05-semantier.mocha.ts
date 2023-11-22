@@ -296,8 +296,10 @@ describe('case: [05.0 dataset + s-tree]', () => {
 		let req = new AnsonMsg<InsertReq>({body: [body]});
 
 		semantier.formatRel('test 05', req,
-					{stree: {sk: 'fake-test', childTabl: 'a_role_func', fk: 'roleId', col: 'funcId', colProp: 'nodeId'}},
-					{pk: 'roleId', v: 'r00'});
+				  { stree: { sk: 'fake-test', childTabl: 'a_role_func', fk: 'roleId', col: 'funcId', colProp: 'nodeId' },
+					childField: ''
+				  },
+				  { pk: 'roleId', v: 'r00' });
 
 		let del = req.Body()?.postUpds[0] as UpdateReq;
 

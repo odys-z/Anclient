@@ -17,7 +17,7 @@ import {
 import { JsampleTheme } from '@anclient/anreact/src/jsample/styles';
 import { SharePolicies } from './views/share-policies';
 
-const {MyInfCard, MyPswd} = jsample;
+const {Roles} = jsample;
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
@@ -106,7 +106,7 @@ class Admin extends React.Component<Approps> {
 		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
 			// {path: '/sys/domain', comp: Domain},
-			// {path: '/sys/roles', comp: Roles},
+			{path: '/sys/roles', comp: Roles},
 			// {path: '/sys/orgs', comp: Orgs},
 			// {path: '/sys/users', comp: Userst},
 			// {path: '/tier/users', comp: Userst},
@@ -129,9 +129,6 @@ class Admin extends React.Component<Approps> {
 	}
 
 	onErrorClose(code: string) {
-		// if (code === Protocol.MsgCode.exSession) {
-		// 	this.goPortal();
-		// }
 		this.errorMsgbox = undefined;
 		this.setState({});
 	}
@@ -140,16 +137,7 @@ class Admin extends React.Component<Approps> {
 
 	}
 
-	/**
-	 * For navigating to portal page
-	goPortal() {
-		if (this.props.iwindow)
-			this.props.iwindow.location = this.state.iportal;
-	}
-	 * */
-
 	render() {
-	  let that = this;
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
@@ -175,24 +163,6 @@ class Admin extends React.Component<Approps> {
 			  { this.errorMsgbox }
 			</AnContext.Provider>
 		</MuiThemeProvider>);
-
-		/**
-		 * Create MyInfCard.
-		 * To avoid create component before context avialable, this function need the caller' context as parameter.
-		 * @param anContext
-		function myInfoPanels(anContext: AnContextType) {
-			return [
-				{ title: L('Basic'),
-				  panel: <MyInfCard
-							uri={'/sys/session'} anContext={anContext}
-							ssInf={that.anClient.ssInf} /> },
-				{ title: L('Password'),
-				  panel: <MyPswd
-							uri={'/sys/session'} anContext={anContext}
-							ssInf={that.anClient.ssInf} /> }
-			  ];
-		}
-		 */
 	}
 
 	/**

@@ -9,7 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Theme } from '@material-ui/core';
 
-import { CRUD, PkVal, Protocol, Tierec } from '@anclient/semantier';
+import { CRUD, PkVal, Protocol } from '@anclient/semantier';
 
 import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree, TRecordForm
 } from '@anclient/anreact'
@@ -59,26 +59,29 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		record: undefined,
 	};
 
-	pkval: PkVal = {pk: undefined, v: undefined};
+	// pkval: PkVal = {pk: undefined, v: undefined};
 	tier: AlbumEditier;
 	ok: JSX.Element | undefined;
 
 	constructor (props: Comprops & {tier: AlbumEditier} & { relsk: string }) {
 		super(props);
 
-		this.tier = props.tier;
+		this.tier  = props.tier;
+		this.tier.pkval = { pk: 'pid', v: props.pk };
 
 		this.state.crud = props.crud || CRUD.c;
 
 		this.toSave = this.toSave.bind(this);
 		this.toCancel = this.toCancel.bind(this);
-		this.showOk = this.showOk.bind(this);
+		this.comfirm = this.comfirm.bind(this);
 	}
 
 	componentDidMount() {
 	}
 
-	handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined;
+	handleClose = ((event: {}, reason: "backdropClick" | "escapeKeyDown") => {
+		this.tier.rec = undefined;
+	});
 
 	toSave(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
@@ -92,7 +95,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 				() => {
 					if (that.state.crud === CRUD.c)
 						that.setState({ crud: CRUD.u} );
-					that.showOk(L('Data Saved!'));
+					that.comfirm(L('Data Saved!'));
 				});
 		}
 	}
@@ -104,7 +107,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
         else console.warn('OnClose event ignored.');
 	}
 
-	showOk(txt: string | string[]) {
+	comfirm(txt: string | string[]) {
 		let that = this;
 		this.ok = (
 			<ConfirmDialog ok={L('OK')} open={true}
@@ -125,8 +128,6 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 	render () {
 		const { classes, width } = this.props;
 		let crud = this.state.crud;
-
-        console.log(Protocol.sk);
 
 		return (<>
 		  <Dialog className={classes?.root}
@@ -155,9 +156,9 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
                         childField: 'pid',
                         fk: {tabl: 'a_orgs', pk: 'orgId', col: 'org', relcolumn: 'org'}}
                     }}
-					tier={this.tier} sk={undefined}
+					tier={this.tier}
 					mtabl='h_photos' reltabl='h_photo_user'
-					sqlArgs={[this.pkval.v]}
+					sqlArgs={[this.tier.pkval.v]}
 				/>
 			</DialogContent>
 			<DialogActions className={classes?.buttons}>

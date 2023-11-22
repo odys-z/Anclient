@@ -231,11 +231,21 @@ class AnClient {
 			error: function (resp: any) {
 				if (typeof onErr === "function" || onErr && typeof onErr.onError === 'function') {
 					if (resp.statusText) {
-						resp.code = Protocol.MsgCode.exIo;
-						resp.body = [ {
-								type: 'io.odysz.semantic.jprotocol.AnsonResp',
-								m: `Network failed: ${url}`
-							} ];
+						if (/Parse.*|parse.*/.test(resp.statusText)) {
+							console.error("Parse error (check network results for escaped characters):", resp.responseText);
+							resp.code = Protocol.MsgCode.exGeneral;
+							resp.body = [ {
+									type: 'io.odysz.semantic.jprotocol.AnsonResp',
+									m: `Json block parsing error: ${resp.statusText}`
+								} ];
+						}
+						else {
+							resp.code = Protocol.MsgCode.exIo;
+							resp.body = [ {
+									type: 'io.odysz.semantic.jprotocol.AnsonResp',
+									m: `Network failed: ${url}`
+								} ];
+						}
 						let ansonResp = new AnsonMsg<AnsonResp>(resp);
 						if (typeof onErr.onError === 'function') {
 							onErr.msg = ansonResp.Body().msg();

@@ -120,7 +120,7 @@ public class SynclientierMvp extends Semantier {
 		AnsonHeader header = client.header().act(act);
 
 		DocsReq req = (DocsReq) new DocsReq("doc_devices").uri(uri);
-		req.page = new PageInf(0, -1, devname);
+		req.pageInf = new PageInf(0, -1, devname);
 		req.a(A.devices);
 
 		AnsonMsg<DocsReq> q = client
@@ -155,7 +155,7 @@ public class SynclientierMvp extends Semantier {
 		AnsonHeader header = client.header().act(act);
 
 		DocsReq req = (DocsReq) new DocsReq("doc_devices").uri(uri);
-		req.page = new PageInf(0, -1, devname);
+		req.pageInf = new PageInf(0, -1, devname);
 		req.a(A.registDev);
 
 		AnsonMsg<DocsReq> q = client

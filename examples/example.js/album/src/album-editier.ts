@@ -1,6 +1,6 @@
-import { Protocol, AnsonBody, PageInf, 
-	SessionClient, AnDatasetResp, AnTreeNode, StreeTier} from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumRec
+import { Protocol, AnsonBody, PageInf, QueryReq, AnsonResp, AnsonMsg,
+	SessionClient, AnDatasetResp, AnTreeNode, StreeTier, Tierec, OnLoadOk} from '@anclient/semantier';
+import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumRec, AlbumReq, AlbumPage, AlbumResp
 } from '@anclient/anreact';
 
 const debug = true;
@@ -124,24 +124,44 @@ export class AlbumEditier extends StreeTier {
 		}
 
 		let that = this;
-		// AlbumEditier.loadStreeExt(
-		// 	{client: this.client, uri: this.uri, port: this.port, a: AlbumReq.A.shareRelation, conds},
-		// 	(coll) => {
-		// 		that.collects = coll;
-		// 		onLoad(coll);
-		// 	}, this.errCtx);
-
 		let sk = Protocol.sk.stree_sharings;
 		let {uri, port} = this;
 
-		this.stree(
-			{ uri, port, sk, pageInf,
-			  onOk: (rep) => {
+		this.stree( {
+			uri, port, sk, pageInf,
+			onOk: (rep) => {
 					that.forest = (rep.Body(0) as (AlbumResp)).forest as AnTreeNode[];
 					onLoad(that.collects);
-				} },
-			this.errCtx);
+				}
+			}, this.errCtx);
 	}
+
+	/**
+	 * TRecordForm use this method to load record.
+	 * 
+	 * @param conds 
+	 * @param onLoad 
+	 */
+	record(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
+		if (!this.client) return;
+
+		let client = this.client;
+		let that = this;
+
+		let page = new AlbumPage({pid: this.pkval.v as string});
+		let reqbd = new AlbumReq({page})
+					.A(AlbumReq.A.rec);
+
+		let req = client.userReq(this.uri, this.port, reqbd);
+		client.commit(req,
+			(resp: AnsonMsg<AnsonResp>) => {
+				let {photo} = (resp.Body() as AlbumResp);
+				let {cols} = AnsonResp.rs2arr((resp.Body() as AnsonResp).Rs());
+				that.rec = photo;
+				onLoad(cols, [photo || {}]);
+			},
+			this.errCtx);
+    }
 };
 
 class Profiles extends AnsonBody {
@@ -158,28 +178,28 @@ class Profiles extends AnsonBody {
 }
 Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
 
-class AlbumResp extends AnDatasetResp {
-	static __type__ = 'io.oz.sandbox.album.AlbumResp';
-	album?: AlbumRec;
+// class AlbumResp extends AnDatasetResp {
+// 	static __type__ = 'io.oz.sandbox.album.AlbumResp';
+// 	album?: AlbumRec;
 
-	profils?: Profiles;
+// 	profils?: Profiles;
 
-	collect?: Array<string>;
-	collects?: Array<PhotoCollect>;
+// 	collect?: Array<string>;
+// 	collects?: Array<PhotoCollect>;
 
-	photo?: PhotoRec;
+// 	photo?: PhotoRec;
 
-	constructor (resp: AlbumRec & {
-			forest: AnTreeNode[], profiles?: Profiles,
-			photo?: PhotoRec, collect?: Array<string>}) {
-		super({
-			forest: resp.forest
-		});
+// 	constructor (resp: AlbumRec & {
+// 			forest: AnTreeNode[], profiles?: Profiles,
+// 			photo?: PhotoRec, collect?: Array<string>}) {
+// 		super({
+// 			forest: resp.forest
+// 		});
 
-		this.album = resp;
-		this.collect = resp.collect;
-		this.profils = resp.profiles;
-		this.collects = resp.collects as PhotoCollect[];
-	}
-}
-Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });
+// 		this.album = resp;
+// 		this.collect = resp.collect;
+// 		this.profils = resp.profiles;
+// 		this.collects = resp.collects as PhotoCollect[];
+// 	}
+// }
+// Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });

@@ -173,7 +173,8 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 
 		let rec = this.tier?.rec;
 
-		if (!rec) console.warn("TRecordForm used without records, for empty UI?");
+		// if (!rec)
+		// 	console.warn("TRecordForm used without records, for empty UI?");
 
 		return rec ?
 			<Grid container className={classes?.root} direction='row'>
