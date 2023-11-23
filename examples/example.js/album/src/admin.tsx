@@ -8,8 +8,7 @@ import { StandardProps } from '@material-ui/core';
 import { Protocol, SessionClient, ErrorCtx, 
 	AnsonMsg, AnsonResp, an} from '@anclient/semantier';
 
-import {
-	L, Langstrs, AnContext, JsonServs,
+import { L, Langstrs, AnContext, JsonServs,
 	AnReact, AnReactExt, AnreactAppOptions, AnError,
 	jsample, Sys, SysComp, Login
 } from '@anclient/anreact';
@@ -95,7 +94,7 @@ class Admin extends React.Component<Approps> {
 		}
 
 		Protocol.sk = Object.assign( Protocol.sk, {
-			//cbbOrg   : 'org.all', cbbRole  : 'roles',
+			// cbbOrg   : 'org.all', cbbRole  : 'roles',
 			/** Doc-tree to be managed */
 			stree_sharings: 'tree-album-sharing',
 			/** Relationship tree of h_photo_user */

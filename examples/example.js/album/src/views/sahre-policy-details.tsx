@@ -9,7 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Theme } from '@material-ui/core';
 
-import { CRUD, PkVal, Protocol } from '@anclient/semantier';
+import { CRUD, Tierec, AnlistColAttrs, Protocol } from '@anclient/semantier';
 
 import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree, TRecordForm
 } from '@anclient/anreact'
@@ -57,6 +57,8 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 
 		pk: undefined,
 		record: undefined,
+
+		showTree: false
 	};
 
 	// pkval: PkVal = {pk: undefined, v: undefined};
@@ -128,6 +130,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 	render () {
 		const { classes, width } = this.props;
 		let crud = this.state.crud;
+		let that = this;
 
 		return (<>
 		  <Dialog className={classes?.root}
@@ -145,12 +148,16 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 					tier={this.tier}
 					mtabl='h_photos' pk='pid'
 					fields={[
-						{type: 'switch', field: 'shareFlag', grid: {sm: 6, md: 4}},
-						{type: 'text',   field: 'shareby',   grid: {sm: 6, md: 4}},
-						{type: 'text',   field: 'remarks',   grid: {sm: 12}}
+						{type: 'text',          field: 'shareby',   grid: {xs: 8, md: 10}},
+						{type: 'button-switch', field: 'shareFlag', grid: {xs: 4, md: 2}, labels: [L('Private'), L('Customize')]},
+						{type: 'text',          field: 'text',      grid: {xs: 12}}
 					]}
+					onToggle={(r: Tierec, f: AnlistColAttrs<any, Comprops>, _state: boolean, toggled: boolean) => {
+						that.setState({showTree: toggled})
+					}}
 				/>
-				<AnRelationTree uri={this.props.uri}
+				{ this.state.showTree && 
+				  <AnRelationTree uri={this.props.uri}
 					relMeta={{h_photo_user: {
                         stree: {sk: Protocol.sk.rel_photo_user, col: '', fk: 'org'},
                         childField: 'pid',
@@ -159,7 +166,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 					tier={this.tier}
 					mtabl='h_photos' reltabl='h_photo_user'
 					sqlArgs={[this.tier.pkval.v]}
-				/>
+				  /> }
 			</DialogContent>
 			<DialogActions className={classes?.buttons}>
 			  { crud &&
