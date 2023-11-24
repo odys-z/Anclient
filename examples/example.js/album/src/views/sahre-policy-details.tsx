@@ -7,13 +7,19 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import ViewQuiltIcon from '@material-ui/icons/ViewQuilt'
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+
 import { Theme } from '@material-ui/core';
 
-import { CRUD, Tierec, AnlistColAttrs, Protocol } from '@anclient/semantier';
+import { CRUD, Protocol, Tierec, AnlistColAttrs, DbCol } from '@anclient/semantier';
 
-import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree, TRecordForm
-} from '@anclient/anreact'
-import { AlbumEditier } from '../album-editier';
+import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree,
+	TRecordForm, Media, ClassNames } from '@anclient/anreact'
+import { AlbumEditier, Share } from '../album-editier';
 const {JsampleIcons} = jsample;
 
 const styles = (theme: Theme) => {
@@ -55,10 +61,14 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		dirty: false,
 		closed: false,
 
-		pk: undefined,
+		// pk: undefined,
 		record: undefined,
 
-		showTree: false
+		// showTree: false,
+
+		switchOn: undefined as unknown as boolean,
+		toggleOn: undefined as unknown as boolean,
+		toggleView: undefined as unknown as string,
 	};
 
 	// pkval: PkVal = {pk: undefined, v: undefined};
@@ -148,15 +158,23 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 					tier={this.tier}
 					mtabl='h_photos' pk='pid'
 					fields={[
-						{type: 'text',          field: 'shareby',   grid: {xs: 8, md: 10}},
-						{type: 'button-switch', field: 'shareFlag', grid: {xs: 4, md: 2}, labels: [L('Private'), L('Customize')]},
-						{type: 'text',          field: 'text',      grid: {xs: 12}}
+						{type: 'text',      field: 'shareby',   grid: {xs: 8, md: 10}, readOnly: true},
+						// {type: 'button-switch', field: 'shareFlag', grid: {xs: 4, md: 2},
+						//  labels: [L('Private'), L('Public'), L('Customize')]},
+						{type: 'formatter', field: 'shareFlag', grid: {xs: 4, md: 2}, fieldFormatter: this.buttonSwitch},
+						{type: 'text',      field: 'text',      grid: {xs: 12}, readOnly: true}
 					]}
+					onLoad={(_cols: Array<DbCol>, rows: Array<Tierec>) => {
+						that.setState({
+							switchOn: rows[0].shareFlag === Share.priv, 
+							toggleOn: rows[0].shareFlag !== Share.priv && (rows[0].orgs as number) > 0 });
+					}}
 					onToggle={(r: Tierec, f: AnlistColAttrs<any, Comprops>, _state: boolean, toggled: boolean) => {
-						that.setState({showTree: toggled})
+						// that.setState({showTree: toggled})
+						that.setState({toggleOn: !toggled});
 					}}
 				/>
-				{ this.state.showTree && 
+				{ !this.state.switchOn && this.state.toggleOn && 
 				  <AnRelationTree uri={this.props.uri}
 					relMeta={{h_photo_user: {
                         stree: {sk: Protocol.sk.rel_photo_user, col: '', fk: 'org'},
@@ -181,6 +199,60 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		  {this.ok}
 	  </>);
 	}
+
+	buttonSwitch = ( (rec: Tierec, f: DbCol, fx: number,
+		opts?: Comprops & {classes?: ClassNames, media?: Media}) => {
+		let label = rec[f.field];
+		let {classes, media} = opts || {};
+
+		let that = this;
+
+		let isPriv = this.state.switchOn === undefined ? rec.shareFlag === Share.priv : this.state.switchOn;
+		let isCust = this.state.toggleOn === undefined ? rec.shareFlag !== Share.priv && rec.orgs as number > 0 : this.state.toggleOn;
+		return (
+			<FormControlLabel key={'swch' + fx} className={classes?.rowBox}
+				control={<>
+					<Switch key={f.field}
+						checked={!isPriv}
+						color='primary'
+						onChange = { _e => {
+							that.setState({switchOn: !isPriv});
+						} } />
+					{ !isPriv && 
+						// <ToggleButtonGroup value={this.state.toggleView === undefined && rec[f.field] === Share.pub ? 't1' : this.state.toggleView} exclusive onChange={toggle}>
+						// <ToggleButton value={'t1'} disabled={!isPriv} onClick={ _e => {
+						// 	that.props.onToggle &&
+						// 	that.setState({showTree: (this.state.toggleView === undefined && rec[f.field] === Share.pub ? 't1' : this.state.toggleView) === 't1'})
+						// }}>
+						// 	<ViewQuiltIcon color={ (this.state.toggleView === undefined && rec[f.field] === Share.pub ? 't1' : this.state.toggleView) === 't1' ? 'primary' : 'disabled'}/>
+						// 	{ toggleLabel('t1') }
+						// </ToggleButton>
+						// </ToggleButtonGroup>
+						<Button variant='contained'
+							color='primary' size='small'
+							className={classes?.button}
+							onClick={toggle}
+							startIcon={<ViewQuiltIcon />}
+						> { toggleLabel(isCust) }
+						</Button>
+					}
+				</> }
+				label={ switchLabel(isPriv) } />
+		);
+		
+		function toggle ( _e: React.UIEvent ) {
+			that.setState( {toggleOn: !isCust});
+		}
+
+		function switchLabel( isPriv: boolean ) {
+			return isPriv ? L('Share') : undefined;
+		}
+
+		function toggleLabel( isCustom: boolean ) {
+			// return that.state.toggleView === view ? L('Customize') : L('Public');
+			return isCustom ? L('Publice') : L('Customize');
+		}
+	});
 }
 SharePolicyDetailsComp.contextType = AnContext;
 

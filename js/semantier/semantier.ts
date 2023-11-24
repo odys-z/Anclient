@@ -32,13 +32,16 @@ export type AnFieldValidator = ((
 	fld: TierCol,
 ) => InvalidClassNames );
 
-/**(Form) field formatter
+/**
+ * (Form) field formatter
  * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
  *
  * F: field element type, e.g. JSX.Element
  * FO: options, e.g. {classes?: ClassNames, media?: Media}
+ * 
+ * @since 0.4.50, add colx, the column / field index in a row (a form).
  */
-export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, opts?: FO) => F);
+export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, colx: number, opts?: FO) => F);
 
 export type AnFieldValidation = {
 	notNull?: boolean | number,
@@ -62,13 +65,19 @@ export interface ErrorCtx {
  * Should be a valid HTML5 input type. (extended with enum, select)
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
  * 
- * - dynamic-cbb: column / cell is a combobox changing code/value options for each row.
+ * - dynamic-cbb : column / cell is a combobox changing code/value options for each row.
  * 
- * - icon-sum   : column / cell is formatted by hard coded formatters,
+ * - icon-sum      : column / cell is formatted by hard coded formatters,
  * 
  *		for anreact/src/react/widgets/tree-editor/TreeGallaryComp [columns], the cell is formatted by formatFolderIcons().
+ * 
+ * - button-swith: a button with a swith can disable it. This widget uses AnlistColAttrs.labels as lable,
+ *   where label in labels be showing is
+ *      labels [0]: swith true, [1] swith false, toggle true; [2] swith false, toggle false
  */
-export type ColType = 'formatter' | 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'iconame' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'icon-sum';
+export type ColType = 'autocbb' | 'formatter' | 'cbb'  | 'dynamic-cbb' |
+					  'text'    | 'iconame'   | 'date' | 'button-switch' |
+					  'number'  | 'float'     | 'bool' | 'int' | 'actions' | 'icon-sum';
 
 export interface TierCol extends DbCol {
 	/**
@@ -104,7 +113,15 @@ export interface TierCol extends DbCol {
 */
 export interface AnlistColAttrs<F, FO> extends TierCol {
     /** Readable text (field name) */
-    label?: string;
+    label? : string;
+
+	/**
+	 * For widgets with states like TRecordForm swith-button field
+	 * labels [0]: swith false, [1] swith true, toggle flase; [2] swith true, toggle true
+	 * 
+	 * @see ColType."button-swith",
+	 */
+    labels?: string[];
 
     opts?: FO;
 
@@ -162,19 +179,6 @@ export interface TierComboField extends AnlistColAttrs<any, any> {
 	/** UI Dom etc. for data operation */
 	ref: any;
 }
-
-// export interface Tierelations extends DbRelations {
-// }
-
-/**
- * Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
- * 
- * @deprecated: Aug 21. 2023, not yet?
- */
-// export interface QueryConditions {
-// 	pageInf?: PageInf;
-// 	[q: string]: string | number | object | boolean;
-// }
 
 /**
  * Client side context for Anclient to work in.
@@ -260,8 +264,10 @@ export class Semantier {
 	}
 
 	/**
-	 * @param field
+	 * @param _field
 	 * @returns read only
+	 * @deprecated: use fields.readOnly, like:
+	 * RecordFormProps.fields: Array<AnlistColAttrs<any, Comprops> & {readOnly?: boolean}>
 	*/
 	isReadonly(_field: TierCol) {
 		return false;

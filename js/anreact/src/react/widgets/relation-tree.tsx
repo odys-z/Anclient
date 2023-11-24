@@ -148,10 +148,10 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 					<Grid container spacing={0}>
 					  <Grid item xs={11}>
 						<Typography>
-						  {leadingIcons(level)}
-						  {node.css && node.css.icon && icon(node.css.icon)}
-					  	  {checkbox
-						   && <Checkbox color="primary" checked={toBool(node.checked)}
+						  { leadingIcons(level) }
+						  { node.css && node.css.icon && icon(node.css.icon) }
+					  	  { checkbox
+						    && <Checkbox color="primary" checked={toBool(node.checked)}
 								onClick={e => e.stopPropagation()}
 								onChange={(e) => {
 								  e.stopPropagation();
@@ -160,7 +160,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 								  that.setState({});
 								}}/>
 						  }
-						  {node.text}
+						  { node.text }
 						</Typography>
 					  </Grid>
 					  <Grid item xs={1}>
@@ -192,7 +192,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 				  </Grid>
 				  <Grid item xs={3} className={classes.treeItem} >
 					<Typography className={classes.treeLabel} >
-						{itemLabel(str(node.label || node.text), level, node.css)}
+						{itemLabel(str(node.label), level, node.css)}
 					</Typography>
 				  </Grid>
 				</Grid>

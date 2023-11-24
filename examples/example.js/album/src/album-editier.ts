@@ -1,9 +1,14 @@
-import { Protocol, AnsonBody, PageInf, QueryReq, AnsonResp, AnsonMsg,
-	SessionClient, AnDatasetResp, AnTreeNode, StreeTier, Tierec, OnLoadOk} from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumRec, AlbumReq, AlbumPage, AlbumResp
+import { Protocol, AnsonBody, PageInf, AnsonResp, AnsonMsg,
+	SessionClient, AnTreeNode, StreeTier, Tierec, OnLoadOk} from '@anclient/semantier';
+import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumReq, AlbumPage, AlbumResp
 } from '@anclient/anreact';
 
 const debug = true;
+
+export const Share = {
+	pub : 'pub',
+	priv: 'priv',
+}
 
 export class AlbumEditier extends StreeTier {
 	comp: CrudComp<Comprops>;
