@@ -165,6 +165,7 @@ export interface relStree {
 export interface DbRelations {
 	/** Child field to m-tabl */
 	childField: string,
+	/** FK relation handled in UI */
 	fk?: relFK,
 	/** semantic tree */
 	stree?: relStree,

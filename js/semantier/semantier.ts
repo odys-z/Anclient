@@ -572,7 +572,7 @@ export class Semantier {
 		// semantics handler can only resulve fk at inserting when master pk is auto-pk
 		columnMap[parentpkv.pk] = parentpkv.v;
 
-		let insRels = this.inserTreeChecked(
+		let insRels = Semantier.inserTreeChecked(
 				this.rels[rel.childTabl] as AnTreeNode[],
 				{ table: rel.childTabl,
 				  columnMap,
@@ -615,7 +615,7 @@ export class Semantier {
 	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checed.
 	 * @return subclass of AnsonBody
 	 */
-	inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: {}; check: string; reshape: boolean; }): InsertReq {
+	static inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: {}; check: string; reshape: boolean; }): InsertReq {
 		let {table, columnMap, check, reshape} = opts;
 		reshape = reshape === undefined? true : reshape;
 

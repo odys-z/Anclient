@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { CRUD, PkVal, Tierec } from '@anclient/semantier';
+import { AnlistColAttrs, CRUD, PkVal, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnContext, } from '../../react/reactext';
@@ -154,7 +154,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 					mtabl='a_roles' pk='roleId'
 					fields={this.tier.fields({
 						remarks: {grid: {sm: 12, md: 12, lg: 12}}
-					})}
+					}) as AnlistColAttrs<JSX.Element, Comprops>[]}
 				/>
 				<AnRelationTree uri={this.props.uri}
 					tier={this.tier} sk={undefined}

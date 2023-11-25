@@ -182,29 +182,3 @@ class Profiles extends AnsonBody {
 	}
 }
 Protocol.registerBody('io.oz.album.tier.Profiles', (jsonBd) => { return new Profiles(jsonBd); });
-
-// class AlbumResp extends AnDatasetResp {
-// 	static __type__ = 'io.oz.sandbox.album.AlbumResp';
-// 	album?: AlbumRec;
-
-// 	profils?: Profiles;
-
-// 	collect?: Array<string>;
-// 	collects?: Array<PhotoCollect>;
-
-// 	photo?: PhotoRec;
-
-// 	constructor (resp: AlbumRec & {
-// 			forest: AnTreeNode[], profiles?: Profiles,
-// 			photo?: PhotoRec, collect?: Array<string>}) {
-// 		super({
-// 			forest: resp.forest
-// 		});
-
-// 		this.album = resp;
-// 		this.collect = resp.collect;
-// 		this.profils = resp.profiles;
-// 		this.collects = resp.collects as PhotoCollect[];
-// 	}
-// }
-// Protocol.registerBody(AlbumResp.__type__, (jsonBd) => { return new AlbumResp(jsonBd); });

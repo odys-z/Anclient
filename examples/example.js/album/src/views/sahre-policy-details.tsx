@@ -103,7 +103,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		}
 		else {
 			let that = this;
-			this.tier.saveRec({crud: this.state.crud, reltabl: 'a_role_func'},
+			this.tier.saveRec({crud: this.state.crud, reltabl: 'h_photo_orgs'},
 				() => {
 					if (that.state.crud === CRUD.c)
 						that.setState({ crud: CRUD.u} );
@@ -159,8 +159,6 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 					mtabl='h_photos' pk='pid'
 					fields={[
 						{type: 'text',      field: 'shareby',   grid: {xs: 8, md: 10}, readOnly: true},
-						// {type: 'button-switch', field: 'shareFlag', grid: {xs: 4, md: 2},
-						//  labels: [L('Private'), L('Public'), L('Customize')]},
 						{type: 'formatter', field: 'shareFlag', grid: {xs: 4, md: 2}, fieldFormatter: this.buttonSwitch},
 						{type: 'text',      field: 'text',      grid: {xs: 12}, readOnly: true}
 					]}
@@ -176,13 +174,14 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 				/>
 				{ !this.state.switchOn && this.state.toggleOn && 
 				  <AnRelationTree uri={this.props.uri}
-					relMeta={{h_photo_user: {
-                        stree: {sk: Protocol.sk.rel_photo_user, col: '', fk: 'org'},
+					relMeta={{h_photo_orgs: {
+                        stree: {sk: Protocol.sk.rel_photo_orgs, col: '', fk: 'org',
+								childTabl : 'h_photo_orgs' },
                         childField: 'pid',
-                        fk: {tabl: 'a_orgs', pk: 'orgId', col: 'org', relcolumn: 'org'}}
-                    }}
+                        // fk: {tabl: 'a_orgs', pk: 'orgId', col: 'org', relcolumn: 'org'}}
+                    }}}
 					tier={this.tier}
-					mtabl='h_photos' reltabl='h_photo_user'
+					mtabl='h_photos' reltabl='h_photo_orgs'
 					sqlArgs={[this.tier.pkval.v]}
 				  /> }
 			</DialogContent>
@@ -219,15 +218,6 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 							that.setState({switchOn: !isPriv});
 						} } />
 					{ !isPriv && 
-						// <ToggleButtonGroup value={this.state.toggleView === undefined && rec[f.field] === Share.pub ? 't1' : this.state.toggleView} exclusive onChange={toggle}>
-						// <ToggleButton value={'t1'} disabled={!isPriv} onClick={ _e => {
-						// 	that.props.onToggle &&
-						// 	that.setState({showTree: (this.state.toggleView === undefined && rec[f.field] === Share.pub ? 't1' : this.state.toggleView) === 't1'})
-						// }}>
-						// 	<ViewQuiltIcon color={ (this.state.toggleView === undefined && rec[f.field] === Share.pub ? 't1' : this.state.toggleView) === 't1' ? 'primary' : 'disabled'}/>
-						// 	{ toggleLabel('t1') }
-						// </ToggleButton>
-						// </ToggleButtonGroup>
 						<Button variant='contained'
 							color='primary' size='small'
 							className={classes?.button}

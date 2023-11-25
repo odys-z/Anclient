@@ -97,8 +97,8 @@ class Admin extends React.Component<Approps> {
 			// cbbOrg   : 'org.all', cbbRole  : 'roles',
 			/** Doc-tree to be managed */
 			stree_sharings: 'tree-album-sharing',
-			/** Relationship tree of h_photo_user */
-			rel_photo_user: 'tree-rel-photo-user',
+			/** Relationship tree of h_photo_orgs */
+			rel_photo_orgs: 'tree-rel-photo-orgs',
 		});
 
 		// extending pages
