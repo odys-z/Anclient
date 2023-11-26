@@ -51,22 +51,6 @@ export class AlbumEditier extends StreeTier {
 
 		let that = this;
 
-		/*
-		let client = this.client;
-		let req = client.userReq( this.uri, this.port,
-					new AlbumReq( {uri: this.uri, page: conds} )
-					.A(AlbumReq.A.stree) );
-
-		client.commit(req,
-			(resp) => {
-				let body = resp.Body() as AlbumResp;
-				if (body) {
-					that.collects = body.collects;
-					onLoad(that.collects);
-				}
-			},
-			this.errCtx);
-		*/
 		let sk = Protocol.sk.collectree;
 		let {client, uri, port} = this;
 

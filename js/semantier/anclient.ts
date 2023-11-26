@@ -596,7 +596,7 @@ class SessionClient {
 	/**
 	 * create a query message.
 	 * @param uri component uri
-	 * @param maintbl target table
+	 * @param mtabl target table
 	 * @param alias target table alias
 	 * @param pageInf<br>
 	 * page: page index, -1 for no paging<br>
@@ -605,9 +605,9 @@ class SessionClient {
 	 * {func, cate, cmd, remarks};
 	 * @return the request message
 	 */
-	query ( uri: string, maintbl: string, alias: string, pageInf?: PageInf,
+	query ( uri: string, mtabl: string, alias: string, pageInf?: PageInf,
 			act?: {func: string, cate: string, cmd: string, remarks: string} ) : AnsonMsg<QueryReq> {
-		let qryItem = new QueryReq(uri, maintbl, alias, pageInf);
+		let qryItem = new QueryReq({ uri, mtabl, mAlias: alias, pageInf});
 
 		if (typeof act === 'object') {
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);

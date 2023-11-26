@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import withStyles from "@material-ui/core/styles/withStyles";
 
-import { Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
+import { CRUD, Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
 import { AnContext, JsonServs, CrudCompW,
     AnTablistProps, AnTreeditor, AnError, L, AnContextType, 
     CompOpts, AnTreegridCol, AnTreegrid, jsample, regex
@@ -180,6 +180,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
         let that = this;
         this.confirm = (
           <SharePolicyDetails {...this}
+            crud={CRUD.u}
             pk={n.id}
             tier={this.tier}
             onClose={() => {

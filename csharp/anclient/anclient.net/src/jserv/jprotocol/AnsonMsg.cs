@@ -40,16 +40,16 @@ namespace io.odysz.semantic.jprotocol
 			/// <summary>r.serv11</summary>
 			public const int query = 2;
 
-			/// <summary>u.serv11</summary>
+			/// <summary>u.serv</summary>
 			public const int update = 3;
 
-			/// <summary>c.serv11</summary>
+			/// <summary>c.serv</summary>
 			public const int insert = 4;
 
-			/// <summary>d.serv11</summary>
+			/// <summary>d.serv</summary>
 			public const int delete = 5;
 
-			/// <summary>echo.serv11</summary>
+			/// <summary>echo.less</summary>
 			public const int echo = 6;
 
 			/// <summary>file.serv11:
@@ -64,14 +64,14 @@ namespace io.odysz.semantic.jprotocol
 			/// use this port</summary>
 			public const int user = 8;
 
-			/// <summary>s-tree.serv11:
+			/// <summary>s-tree.serv:
 			/// semantic tree of dataset extensions</summary>
 			/// <seealso>
 			/// <see cref="ext.SemanticTree"/>
 			/// </seealso>
 			public const int stree = 9;
 
-			/// <summary>ds.serv11:
+			/// <summary>ds.serv:
 			/// dataset extensions<br /></summary>
 			/// <seealso>
 			/// <see cref="ext.Dataset"/>

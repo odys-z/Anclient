@@ -149,7 +149,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 	});
 
 	it('QueryReq', () => {
-		let qr = new QueryReq('con-1', 'a_users', 'u', undefined)
+		let qr = new QueryReq({uri: 'con-1', mtabl: 'a_users', mAlias: 'u', pageInf: undefined})
 			.expr("vid").expr("val", "amount")
 			.expr("dim1", "agegrp").expr("dim2", "tex").expr("dim3", "indust")
 			.expr("dim4").expr("dim5").expr("dim6")

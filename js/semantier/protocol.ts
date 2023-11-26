@@ -222,11 +222,11 @@ export class Protocol {
 	/** @deprecated replaced by enum CRUD. */
 	static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
-	static Port = {	heartbeat: "ping.serv11",
+	static Port = {	heartbeat: "ping.serv",
 		echo: "echo.less",
-		session: "login.serv11",
-		query: "r.serv11", update: "u.serv11",
-		insert: "c.serv11", delete: "d.serv11",
+		session: "login.serv",
+		query: "r.serv", update: "u.serv",
+		insert: "c.serv", delete: "d.serv",
 		dataset: "ds.serv",
 		stree: "s-tree.serv",
 		datasetier: "ds.tier"
@@ -323,7 +323,7 @@ export class Protocol {
     static formatSessionLogin(uid: string, tk64: string, iv64: string): AnsonMsg<AnSessionReq> {
 		let login = new AnsonMsg<AnSessionReq>({
 			type: 'io.odysz.semantic.jprotocol.AnsonMsg',
-			port: 'session', //Protocol.Port.session,
+			port: 'session',
 			body: [{type: 'io.odysz.semantic.jsession.AnSessionReq',
 					uid, token: tk64, iv: iv64}]
 		});
@@ -445,8 +445,8 @@ export class AnsonMsg<T extends AnsonBody> {
 			// 	body = new AnSessionResp(body);
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 				body = new AnSessionReq(body.uid, body.token, body.iv);
-			else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
-				body = new QueryReq(body.uri, body.mtabl, body.mAlias);
+			// else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
+			// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
 			else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 				body = new UserReq(json.port, header, [body]);
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
@@ -477,7 +477,7 @@ export class AnsonMsg<T extends AnsonBody> {
 
 			if (a) body.A(a);
 
-			// moc the ajax error
+			// imitate the ajax error
 			if (json.ajax)
 				body.ajax = json.ajax;
 		}
@@ -638,6 +638,8 @@ export class AnSessionReq extends AnsonBody {
  * @class
  */
 export class QueryReq extends AnsonBody {
+	static __type__ = 'io.odysz.semantic.jserv.R.AnQueryReq';
+
     mtabl: string;
     mAlias: string;
 
@@ -655,12 +657,19 @@ export class QueryReq extends AnsonBody {
     pgsize: number;
     limt: string[];
 
-	constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
+	// constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
+	// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
+	constructor(json: {uri: string, mtabl: string, mAlias: string, pageInf: PageInf}) {
+
 		super();
-		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
+
+		this.type = QueryReq.__type__; // "io.odysz.semantic.jserv.R.AnQueryReq";
+		
+		let {uri, mtabl, mAlias, pageInf} = json;
+
 		this.uri = uri;
-		this.mtabl = tabl;
-		this.mAlias = alias;
+		this.mtabl = mtabl;
+		this.mAlias = mAlias;
 		this.exprs = [];
 		this.joins = [];
 		this.where = [];
@@ -679,7 +688,8 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	/**add joins to the query request object
+	/**
+	 * Add joins to the query request object
 	 * @param jt join type, example: "j" for inner join, "l" for left outer join
 	 * @param t table, example: "a_roles"
 	 * @param a alias, example: "r"
@@ -837,6 +847,7 @@ export class QueryReq extends AnsonBody {
         throw new Error("Method not implemented.");
     }
 }
+Protocol.registerBody(QueryReq.__type__, (json) => new QueryReq(json));
 
 export class UpdateReq extends AnsonBody {
     /**Create an update / insert request.
@@ -937,7 +948,8 @@ export class UpdateReq extends AnsonBody {
 		return this;
 	}
 
-	/**Wrapper of #whereCond(), will take rop as consts and add "''".<br>
+	/**
+	 * Wrapper of #whereCond(), will take rop as consts and add "''".<br>
 	 * whereCond(logic, lop, Jregex.quote(rop));
 	 * @param logic logic operator
 	 * @param lop left operand
@@ -1035,6 +1047,7 @@ export class InsertReq extends UpdateReq {
 		super (uri, tabl, undefined);
 		this.a = CRUD.c;
 		this.type = InsertReq.__type__;
+		delete this.where;
 	}
 
 	/**
@@ -1418,7 +1431,7 @@ export class DatasetReq extends QueryReq {
 
 		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
 
-		super(uri, Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf);
+		super({uri, mtabl: Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf});
 		this.type = "io.odysz.semantic.ext.AnDatasetReq";
 
 		this.uri = uri;
@@ -1532,7 +1545,7 @@ export class AnDatasetReq extends QueryReq {
 
 		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
 
-		super(uri, Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf);
+		super({uri, mtabl: Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf});
 		this.type = "io.odysz.semantic.ext.AnDatasetReq";
 
 		this.uri = uri;

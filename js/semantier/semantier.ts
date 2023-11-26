@@ -268,10 +268,10 @@ export class Semantier {
 	 * @returns read only
 	 * @deprecated: use fields.readOnly, like:
 	 * RecordFormProps.fields: Array<AnlistColAttrs<any, Comprops> & {readOnly?: boolean}>
-	*/
 	isReadonly(_field: TierCol) {
 		return false;
 	}
+	*/
 
     client: SessionClient | Inseclient;
     // anReact: any; // for anreact/AnReact. TODO rename as UIHelper

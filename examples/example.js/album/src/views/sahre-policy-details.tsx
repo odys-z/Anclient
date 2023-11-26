@@ -79,7 +79,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		super(props);
 
 		this.tier  = props.tier;
-		this.tier.pkval = { pk: 'pid', v: props.pk };
+		this.tier.pkval = { pk: 'pid', v: props.pk, tabl: 'h_photos' };
 
 		this.state.crud = props.crud || CRUD.c;
 
@@ -103,7 +103,8 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		}
 		else {
 			let that = this;
-			this.tier.saveRec({crud: this.state.crud, reltabl: 'h_photo_orgs'},
+			this.tier.rec = {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv};
+			this.tier.saveRec({crud: this.state.crud, reltabl: 'h_photo_org'},
 				() => {
 					if (that.state.crud === CRUD.c)
 						that.setState({ crud: CRUD.u} );
@@ -164,24 +165,22 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 					]}
 					onLoad={(_cols: Array<DbCol>, rows: Array<Tierec>) => {
 						that.setState({
-							switchOn: rows[0].shareFlag === Share.priv, 
+							switchOn: rows[0].shareFlag !== Share.priv, 
 							toggleOn: rows[0].shareFlag !== Share.priv && (rows[0].orgs as number) > 0 });
 					}}
 					onToggle={(r: Tierec, f: AnlistColAttrs<any, Comprops>, _state: boolean, toggled: boolean) => {
-						// that.setState({showTree: toggled})
 						that.setState({toggleOn: !toggled});
 					}}
 				/>
-				{ !this.state.switchOn && this.state.toggleOn && 
+				{ this.state.switchOn && this.state.toggleOn && 
 				  <AnRelationTree uri={this.props.uri}
-					relMeta={{h_photo_orgs: {
-                        stree: {sk: Protocol.sk.rel_photo_orgs, col: '', fk: 'org',
-								childTabl : 'h_photo_orgs' },
+					relMeta={{ h_photo_org: {
+                        stree: {sk: Protocol.sk.rel_photo_orgs, col: 'oid' as string, fk: 'pid',
+								childTabl : 'h_photo_org' },
                         childField: 'pid',
-                        // fk: {tabl: 'a_orgs', pk: 'orgId', col: 'org', relcolumn: 'org'}}
                     }}}
 					tier={this.tier}
-					mtabl='h_photos' reltabl='h_photo_orgs'
+					mtabl='h_photos' reltabl='h_photo_org'
 					sqlArgs={[this.tier.pkval.v]}
 				  /> }
 			</DialogContent>
@@ -206,41 +205,40 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 
 		let that = this;
 
-		let isPriv = this.state.switchOn === undefined ? rec.shareFlag === Share.priv : this.state.switchOn;
-		let isCust = this.state.toggleOn === undefined ? rec.shareFlag !== Share.priv && rec.orgs as number > 0 : this.state.toggleOn;
+		let isSharing = that.state.switchOn === undefined ? rec.shareFlag !== Share.priv : that.state.switchOn;
+		let isCustomi = that.state.toggleOn === undefined ? rec.shareFlag !== Share.priv && rec.orgs as number > 0 : that.state.toggleOn;
 		return (
 			<FormControlLabel key={'swch' + fx} className={classes?.rowBox}
 				control={<>
 					<Switch key={f.field}
-						checked={!isPriv}
+						checked={isSharing}
 						color='primary'
 						onChange = { _e => {
-							that.setState({switchOn: !isPriv});
+							that.setState({switchOn: !isSharing});
 						} } />
-					{ !isPriv && 
+					{ isSharing && 
 						<Button variant='contained'
-							color='primary' size='small'
+							color={isCustomi? 'secondary' : 'primary'} size='small'
 							className={classes?.button}
 							onClick={toggle}
 							startIcon={<ViewQuiltIcon />}
-						> { toggleLabel(isCust) }
+						> { toggleLabel(isCustomi) }
 						</Button>
 					}
 				</> }
-				label={ switchLabel(isPriv) } />
+				label={ switchLabel(isSharing) } />
 		);
 		
 		function toggle ( _e: React.UIEvent ) {
-			that.setState( {toggleOn: !isCust});
+			that.setState( {toggleOn: !isCustomi});
 		}
 
-		function switchLabel( isPriv: boolean ) {
-			return isPriv ? L('Share') : undefined;
+		function switchLabel( isharing: boolean ) {
+			return isharing ? undefined : L('Share');
 		}
 
 		function toggleLabel( isCustom: boolean ) {
-			// return that.state.toggleView === view ? L('Customize') : L('Public');
-			return isCustom ? L('Publice') : L('Customize');
+			return isCustom ? L('Customize') : L('Publice');
 		}
 	});
 }
