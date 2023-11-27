@@ -7,14 +7,14 @@ import { AnContext, JsonServs, CrudCompW,
     CompOpts, AnTreegridCol, AnTreegrid, jsample, regex
 } from '@anclient/anreact';
 
-import { Button, Grid, Theme, Typography, withWidth } from '@material-ui/core';
+import { Button, Grid, Theme, withWidth } from '@material-ui/core';
 import { AlbumEditier } from '../album-editier';
 import { DocIcon } from '../icons/doc-ico';
-import { SharePolicyDetails } from './sahre-policy-details';
+import { SharePolicyDetails } from './share-policy-details';
 
 const {JsampleIcons} = jsample;
 
-const styles = (theme: Theme) => ( {
+const styles = (_theme: Theme) => ( {
     action: {
         padding: 0
     }
@@ -39,7 +39,7 @@ interface SharePolicyProps extends AnTablistProps {
 class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
     inclient?: Inseclient;
 
-    toSetPolicy = (e: React.UIEvent, colx: number) => {};
+    toSetPolicy = (_e: React.UIEvent, _colx: number) => {};
 
     editForm: ReactNode;
     tier?: AlbumEditier;
@@ -66,7 +66,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
         if (client) {
 		    this.tier = new AlbumEditier({uri: this.uri, client, comp: this});
 		    this.tier.setContext(this.context as AnContextType);
-            this.tier.loadSharePolicy(new PageInf(), (sharing) => {
+            this.tier.loadSharePolicy(new PageInf(), (_sharing) => {
                 that.setState({preview: true});
             })
         }
@@ -95,7 +95,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                     grid: {xs: false, sm: 3, md: 2} },
                 { type: 'text', field: 'filesize', label: L('size'), 
                     grid: {xs: false, sm: 2, md: 2},
-                      colFormatter: (col, n, opts) => {return (
+                      colFormatter: (_col, n, opts) => {return (
                             <Button key={`${n.id}.${opts?.colx}`}
                                 onClick={() => this.editPolicy(n)}
                                 startIcon={ n.node.children? <JsampleIcons.Edit /> : <JsampleIcons.Check/>}
@@ -151,7 +151,14 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
 		this.setState({});
 	};
 
-    switchButton(col: AnTreegridCol, colx: number, opts?: CompOpts ) {
+    /**
+     * Generate Tree switch to from preview.
+     * @param col column defintions.
+     * @param colx 
+     * @param _opts 
+     * @returns  
+     */
+    switchButton(col: AnTreegridCol, colx: number, _opts?: CompOpts ) {
 		const { classes, width } = this.props;
 		let media = CrudCompW.getMedia(width);
 
@@ -172,7 +179,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
           </Grid>);
     }
 
-    toggle(e: React.UIEvent) {
+    toggle(_e: React.UIEvent) {
         this.setState({preview: !this.state.preview})
     }
 

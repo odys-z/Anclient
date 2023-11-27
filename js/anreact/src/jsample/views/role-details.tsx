@@ -158,7 +158,8 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 				/>
 				<AnRelationTree uri={this.props.uri}
 					tier={this.tier} sk={undefined}
-					mtabl='a_roles' reltabl='a_role_func' relcolumn='nodeId'
+					mtabl='a_roles' reltabl='a_role_func'
+					// relcolumn='nodeId'
 					sqlArgs={[this.pkval.v]}
 				/>
 			</DialogContent>

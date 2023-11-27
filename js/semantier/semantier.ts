@@ -263,16 +263,6 @@ export class Semantier {
 		return this;
 	}
 
-	/**
-	 * @param _field
-	 * @returns read only
-	 * @deprecated: use fields.readOnly, like:
-	 * RecordFormProps.fields: Array<AnlistColAttrs<any, Comprops> & {readOnly?: boolean}>
-	isReadonly(_field: TierCol) {
-		return false;
-	}
-	*/
-
     client: SessionClient | Inseclient;
     // anReact: any; // for anreact/AnReact. TODO rename as UIHelper
     errCtx: ErrorCtx;
@@ -470,10 +460,10 @@ export class Semantier {
 		if (!disableForm) {
 			// console.log(crud, CRUD.c);
 			if ( crud === CRUD.c ) {
-				req = this.client.userReq<UpdateReq>(uri, 'insert',
+				req = this.client.userReq<InsertReq>(uri, 'insert',
 							new InsertReq( uri, this.pkval.tabl )
 							.columns(this._fields)
-							.record(this.rec) );
+							.record(this.rec) as InsertReq );
 
 				// TODO to be verified
 				// Try figure out pk value - auto-key shouldn't have user fill in the value in a form
@@ -601,18 +591,20 @@ export class Semantier {
 		return req;
 	}
 
-	/**- todo move this to a semantics handler, e.g. shFK ?
+	/**
+	 * - todo move this to a semantics handler, e.g. shFK ?
 	 * @description Generate an insert request according to tree/forest checked items.
 	 * @param forest forest of tree nodes, the forest / tree data, tree node: {id, node}
 	 * @param opts options
 	 * - opts.table: relationship table name
-	 * - opts.columnMap: column's value to be inserted
+	 * - opts.columnMap: column's value to be inserted,
+	 *   e. g. {orgId: 'org'}, where org is the tree field in AnTreeNode.node, which is used for binding tree items.
 	 *
 	 * If the item has a same named property, the value is collected from the item;<br>
 	 * Otherwise the argument's value will be used.
 	 *
 	 * - opts.check: checking column name
-	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checed.
+	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checked.
 	 * @return subclass of AnsonBody
 	 */
 	static inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: {}; check: string; reshape: boolean; }): InsertReq {

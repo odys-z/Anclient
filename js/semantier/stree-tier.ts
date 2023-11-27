@@ -154,10 +154,8 @@ export class StreeTier extends Semantier {
 
 		let that = this;
 
-		// typically relationships are tree data
 		let { reltabl, sqlArgs, sqlArg } = opts;
 		let fkRel = this.relMeta[reltabl] as DbRelations;
-		// let { stree, fk, fullpath } = fkRel;
 		let stree = fkRel.stree;
 
 		sqlArgs = sqlArgs || [sqlArg];

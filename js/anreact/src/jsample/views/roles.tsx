@@ -256,11 +256,11 @@ class RoleTier extends StreeTier {
 		this.relMeta = {'a_role_func':
 			{ stree: {
 				childTabl: 'a_role_func',
-				pk: 'roleId',	// fk to main table
-				fk: 'roleId',	// fk to main table
-				col: 'funcId',	// checking col
-				colProp: 'nodeId',
-				sk: 'trees.role_funcs'
+				pk       : 'roleId',	// fk to main table
+				fk       : 'roleId',	// fk to main table
+				col      : 'funcId',	// checking col
+				colProp  : 'nodeId',
+				sk       : 'trees.role_funcs'
 			  } as relStree,
 			} as DbRelations
 		};

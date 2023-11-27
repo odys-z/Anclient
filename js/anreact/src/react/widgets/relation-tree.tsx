@@ -59,7 +59,26 @@ interface RelationTreeProps extends Comprops {
 	reltabl?: string;
 	sk?: string;
 
-	/** Override tier's relMeta. */
+	/**
+	 * Override tier's relMeta.
+	 * @example
+	CREATE TABLE a_role_func(
+		roleId TEXT(20) not null,  // FK to a_roles.roleId
+		funcId TEXT(20) not null,  // FK to a_funcs.funcId
+	PRIMARY KEY (roleId, funcId));
+
+	// collect a role's function tree 
+	this.tier.relMeta = {'a_role_func':
+	  { stree: {
+		childTabl: 'a_role_func',
+		pk       : 'roleId',	// fk to main table
+		fk       : 'roleId',	// fk to main table
+		col      : 'funcId',	// checking col
+		colProp  : 'nodeId',
+		sk       : 'trees.role_funcs'
+		} as relStree,
+	  } as DbRelations
+	*/
 	relMeta?: {[tabl: string]: DbRelations};
 
 	/**

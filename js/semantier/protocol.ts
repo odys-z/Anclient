@@ -152,9 +152,15 @@ export interface relStree {
 	sk?: string, 		
 	/** child table (optional when loading / binding records) */
 	childTabl?: string,
-	/** check col at client side */
+	/**
+	 * AnTreeNode.node field name for updating fk in relation table.
+	 * E. g. 'funcId' in a_role_func, where roleId is provided as pkval.v
+	 */
 	col: string,
-	/** propterty name (of which the value will be collected) */
+	/**
+	 * propterty name (of which the value will be collected)
+	 * @deprecated replaced by #col
+	 */
 	colProp?: string,	
 	/** fk to main table */
 	fk : string,	
