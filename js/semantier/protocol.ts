@@ -166,6 +166,9 @@ export interface relStree {
 	fk : string,	
 	sort?: string,
 	fullpath?: string,
+
+	/** additional args, e. g. for string format in dataset.xml */
+	sqlArgs?: AnsonValue[]
 }
 
 export interface DbRelations {

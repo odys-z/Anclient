@@ -128,10 +128,10 @@ export class AlbumEditier extends StreeTier {
 	/**
 	 * TRecordForm use this method to load record.
 	 * 
-	 * @param conds 
+	 * @param _conds 
 	 * @param onLoad 
 	 */
-	record(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
+	record(_conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
 		if (!this.client) return;
 
 		let client = this.client;

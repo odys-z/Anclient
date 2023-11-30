@@ -118,7 +118,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		this.tier.relations((this.context as AnContextType).anClient,
 			{ uri    : this.props.uri,
 			  reltabl: this.props.reltabl,
-			  sqlArg : str(this.tier.pkval.v),
+			  sqlArgs: [str(this.tier.pkval.v)],
 			  ok     : (rels: AnsonMsg<AnDatasetResp>) => { that.setState({}); }
 			});
 	}
@@ -174,8 +174,9 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 								onClick={e => e.stopPropagation()}
 								onChange={(e) => {
 								  e.stopPropagation();
-								  node.checked = !toBool(node.checked);
-								  node.children.forEach( c => { c.node.checked = e.target.checked } );
+								  changeSubtree(node, !toBool(node.checked));
+								  // node.checked = !toBool(node.checked);
+								  // node.children.forEach( c => { c.node.checked = e.target.checked } );
 								  that.setState({});
 								}}/>
 						  }
@@ -217,6 +218,14 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 				</Grid>
 			  );
 		  }
+		}
+
+		function changeSubtree(root: AnTreeNode["node"], check: boolean) {
+			root.checked = check;
+			root.children?.forEach( c => {
+				// c.node.checked = check;
+				changeSubtree(c.node, check);
+			} );
 		}
 
 		function icon(icon: string) {

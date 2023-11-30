@@ -7,8 +7,6 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ViewQuiltIcon from '@material-ui/icons/ViewQuilt'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
@@ -57,7 +55,7 @@ const styles = (theme: Theme) => {
 class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier} & { relsk: string }> {
 
 	state = {
-		crud: CRUD.r,
+		// crud: CRUD.r,
 		dirty: false,
 		closed: false,
 
@@ -74,6 +72,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 	// pkval: PkVal = {pk: undefined, v: undefined};
 	tier: AlbumEditier;
 	ok: JSX.Element | undefined;
+	refRelations: any;
 
 	constructor (props: Comprops & {tier: AlbumEditier} & { relsk: string }) {
 		super(props);
@@ -81,9 +80,9 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		this.tier  = props.tier;
 		this.tier.pkval = { pk: 'pid', v: props.pk, tabl: 'h_photos' };
 
-		this.state.crud = props.crud || CRUD.c;
+		// this.state.crud = props.crud || CRUD.c;
 
-		this.toSave = this.toSave.bind(this);
+		this.saveSharing = this.saveSharing.bind(this);
 		this.toCancel = this.toCancel.bind(this);
 		this.comfirm = this.comfirm.bind(this);
 	}
@@ -95,7 +94,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		this.tier.rec = undefined;
 	});
 
-	toSave(e: React.MouseEvent<HTMLElement>) {
+	saveSharing(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 
 		if (!this.tier.validate()) {
@@ -104,11 +103,14 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		else {
 			let that = this;
 			this.tier.rec = {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv};
-			this.tier.saveRec({crud: this.state.crud, reltabl: 'h_photo_org'},
+			let clearelation = this.tier.rec.shareFlag === Share.priv || !this.state.toggleOn;
+
+			this.tier.saveRec({crud: CRUD.u, reltabl: 'h_photo_org', clearelation},
 				() => {
-					if (that.state.crud === CRUD.c)
-						that.setState({ crud: CRUD.u} );
+					// if (that.state.crud === CRUD.c)
+					// 	that.setState({ crud: CRUD.u} );
 					that.comfirm(L('Data Saved!'));
+					that.setState({});
 				});
 		}
 	}
@@ -140,7 +142,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 
 	render () {
 		const { classes, width } = this.props;
-		let crud = this.state.crud;
+		// let crud = this.state.crud;
 		let that = this;
 
 		return (<>
@@ -156,12 +158,14 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 			</DialogTitle>
 			<DialogContent className={classes?.content}>
 				<TRecordForm uri={this.props.uri}
+					ref={(ref: any) => this.refRelations = ref}
 					tier={this.tier}
 					mtabl='h_photos' pk='pid'
 					fields={[
-						{type: 'text',      field: 'shareby',   grid: {xs: 8, md: 10}, readOnly: true},
-						{type: 'formatter', field: 'shareFlag', grid: {xs: 4, md: 2}, fieldFormatter: this.buttonSwitch},
-						{type: 'text',      field: 'text',      grid: {xs: 12}, readOnly: true}
+						{type: 'text',      field: 'shareby',   grid: {xs: 8,  md: 10}, readOnly: true},
+						{type: 'formatter', field: 'shareFlag', grid: {xs: 4,  md: 2},  fieldFormatter: this.buttonSwitch},
+						{type: 'text',      field: 'pname',     grid: {xs: 12, md: 6},  readOnly: true},
+						{type: 'datetime',  field: 'createDate',grid: {xs: 12, md: 6},  readOnly: true}
 					]}
 					onLoad={(_cols: Array<DbCol>, rows: Array<Tierec>) => {
 						that.setState({
@@ -179,7 +183,8 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 								fk: 'pid',
 								col: 'oid' as string,
 								colProp: 'nodeId',
-								childTabl : 'h_photo_org' },
+								childTabl : 'h_photo_org',
+								sqlArgs: [this.tier.pkval.v] },
                         childField: 'pid',
                     }}}
 					tier={this.tier}
@@ -188,12 +193,11 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 				  /> }
 			</DialogContent>
 			<DialogActions className={classes?.buttons}>
-			  { crud &&
-				<Button onClick={this.toSave} variant="contained" color="primary">
-					{L("Save")}
-				</Button> }
+			  <Button onClick={this.saveSharing} variant="contained" color="primary">
+				{L("Save")}
+			  </Button>
 			  <Button onClick={this.toCancel} variant="contained" color="primary">
-				{crud ? L('Close') : L("Cancel")}
+				{L('Close')}
 			  </Button>
 			</DialogActions>
 		  </Dialog>

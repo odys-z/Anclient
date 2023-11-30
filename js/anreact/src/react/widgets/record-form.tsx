@@ -10,17 +10,12 @@ import Grid from '@material-ui/core/Grid';
 import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import ViewQuiltIcon from '@material-ui/icons/ViewQuilt'
 
 import { AnlistColAttrs, PageInf, Semantier, TierComboField, Tierec, str_, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { DatasetCombo } from './dataset-combo';
 import { ClassNames, CompOpts, invalidStyles, Media, toReactStyles } from '../anreact';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles,
@@ -42,7 +37,11 @@ const styles = (theme: Theme) => (Object.assign(
 	  labelText_dense: {
 		paddingLeft: theme.spacing(1),
 		paddingRight: theme.spacing(1),
-		borderLeft: '1px solid #bcd' }
+		borderLeft: '1px solid #bcd'
+	  },
+	  date_disable: {
+		color: 'black'
+	  }
 	}
 ) );
 
@@ -195,13 +194,33 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 			}
 		}
 		*/
+		else if (f.type === 'date') {
+			return (<TextField
+				id="datetime-local" disabled={f.readOnly}
+				label={f.label}
+				type="date"
+				defaultValue={rec[f.field]}
+				className={f.readOnly ? classes.date_disable : classes.textField}
+				InputLabelProps={{ shrink: true, }}
+				InputProps={{ classes: { input: f.readOnly ? classes.date_disable : classes.textField } }}
+			/>);
+		}
+		else if (f.type === 'datetime') {
+			return (<TextField
+				id="datetime-local" disabled={f.readOnly}
+				label={f.label}
+				type="datetime-local"
+				defaultValue={rec[f.field]}
+				className={classes.textField}
+				InputLabelProps={{ shrink: true, }}
+				InputProps={{ classes: { input: f.readOnly ? classes.date_disable : classes.textField } }}
+			/>);
+		}
 		else {
 			let type = 'text';
 			if (f.type === 'float' || f.type === 'int')
 				type = 'number';
 
-			// let readOnly = (typeof this.tier.isReadonly === 'function') ?
-			// 				this.tier.isReadonly(f) : this.tier.isReadonly;
 			let {readOnly} = f;
 
 			return (

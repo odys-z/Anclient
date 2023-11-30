@@ -173,7 +173,7 @@ export class App extends CrudCompW<AlbumProps> {
 		if (size(ids) > 0 && this.albumtier) {
 			let fid = ids.keys().next().value;
 			let file = ids.get(fid) as AnTreeNode;
-			let t = regex.mime2type(file.node.mime || "");
+			let t = regex.mime2type(file.node.mime as string || "");
 			if (t === '.pdf') {
 				this.pdfview = (<PdfViewer
 					close={(e) => {
@@ -283,7 +283,8 @@ export class App extends CrudCompW<AlbumProps> {
 	 * - serv: string,
 	 * - portal: string
 	 */
-	static bindHtml(elem: string, opts: AnreactAppOptions & {aid: string, uid: string, pswd: string}) : void {
+	static bindHtml(elem: string,
+					opts: AnreactAppOptions & {aid: string, uid: string, pswd: string}) {
 		let portal = opts.portal ?? 'index.html';
 		let { aid, uid, pswd } = opts;
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}

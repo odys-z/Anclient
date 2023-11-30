@@ -75,9 +75,9 @@ export interface ErrorCtx {
  *   where label in labels be showing is
  *      labels [0]: swith true, [1] swith false, toggle true; [2] swith false, toggle false
  */
-export type ColType = 'autocbb' | 'formatter' | 'cbb'  | 'dynamic-cbb' |
-					  'text'    | 'iconame'   | 'date' | 'button-switch' |
-					  'number'  | 'float'     | 'bool' | 'int' | 'actions' | 'icon-sum';
+export type ColType = 'autocbb' | 'cbb'  | 'formatter' | 'dynamic-cbb'   |
+		'text'   | 'iconame'    | 'date' | 'datetime'  | 'button-switch' |
+		'number' | 'float'      | 'bool' | 'actions'   | 'int' | 'icon-sum';
 
 export interface TierCol extends DbCol {
 	/**
@@ -244,7 +244,8 @@ export class Semantier {
 		this.rels = {};
     }
 
-    /** current relations - the last loaded relation of this.rel (problem?)
+    /**
+	 * Current relations - the last loaded relation of this.rel (problem?)
 	 *
 	 * Looks like all relationship records are item of main tree.
 	 */

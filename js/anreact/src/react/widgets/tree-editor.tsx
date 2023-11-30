@@ -11,7 +11,7 @@ import { CRUD, AnTreeNode, AnlistColAttrs,
 	toBool, IndentName, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons, AnsonResp
 } from "@anclient/semantier";
 
-import { GalleryView } from "./gallery-view";
+import { GalleryView, lightboxFomatter as lightboxFormatter } from "./gallery-view";
 import { PropTypes, Theme } from "@material-ui/core";
 import { AnTablistProps } from "./table-list";
 import { CrudCompW, DetailFormW } from "../crud";
@@ -98,7 +98,7 @@ const styles = (theme: Theme) => ({
   action: {}
 });
 
-class TreeCardComp extends DetailFormW<TreeItemProps> implements AnreactreeItem {
+class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements AnreactreeItem {
 	state = {
 		showCarousel: false,
 		expand: false
@@ -268,14 +268,14 @@ TreeCardComp.contextType = AnContext;
 
 const TreeCard = withStyles<any, any, TreeItemProps>(styles)(withWidth()(TreeCardComp));
 
-class TreeGallaryComp extends TreeCardComp {
+class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 	/** pic collection id */
 	collect: string;
 
 	toEditCard: ()=>void;
 	galleref: GalleryView;
 
-	constructor(props: TreeItemProps & {lightbox?: Lightbox}) {
+	constructor(props: TreeItemProps & {lightbox?: lightboxFormatter}) {
 		super(props);
 
 		this.vistype = TreeNodeVisual.gallery;
@@ -399,7 +399,7 @@ interface AnTreeditorProps extends AnTablistProps {
 
 	nodeFormatter?: (n: AnTreeNode, parent: ReactNode, opts: CompOpts) => JSX.Element;
 
-	lightbox?: Lightbox;
+	lightbox?: lightboxFormatter;
 }
 
 class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
@@ -558,6 +558,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 			  return (
 				ntype === TreeNodeVisual.gallery ?
 				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)
+					lightbox={that.props.lightbox}
 					key={tnode.id} tier={that.treetier as StreeTier}
 					tnode={tnode} media={media}
 					parent={parent}

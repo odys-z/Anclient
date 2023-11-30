@@ -105,7 +105,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                       )},
                       thFormatter: this.switchButton }
                 ]}
-                onSelectChange={this.selectPolicy}
+                onSelectChange={this.selectPhoto}
             />
             :
             <AnTreeditor
@@ -142,13 +142,16 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
         }
 	}
 
-	selectPolicy = (ids: Map<string, Tierec>) => {
+	selectPhoto = (ids: Map<string, Tierec>) => {
 		if (size(ids) > 0 && this.tier) {
 			let fid = ids.keys().next().value;
-			let file = ids.get(fid) as AnTreeNode;
-			let t = regex.mime2type(file.node.mime || "");
+			// let file = ids.get(fid) as AnTreeNode;
+			// let t = regex.mime2type(file.node.mime || "");
+
+            this.tier.pkval.v = fid;
+
+		    this.setState({});
 		}
-		this.setState({});
 	};
 
     /**

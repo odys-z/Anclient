@@ -13,7 +13,7 @@ import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
  * 
  * A tree widget uses this to find indent structure, then translate to icons via AnTreeIconsType.
  */
-export type IndentIconame = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
+export type IndentName = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
 export type AnTreeIconsType =
         'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
         'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand' | 'pic-lib' | '!' | '[]' | '>' | 'b';
@@ -30,7 +30,7 @@ export type AnTreeIconsType =
        └─ webpack-cli
  */
 export type IndentIcons = {
-	[i in IndentIconame]: AnTreeIconsType;
+	[i in IndentName]: AnTreeIconsType;
 }
 
 /**
@@ -54,29 +54,36 @@ export class AnTreeNode implements Tierec {
     [f: string]: string | number | boolean | object;
 
 	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	/** json data node, for ui node composition */
+
+	/**
+	 * Json data node, for ui node composition
+	 * 
+	 * FIXME: but why field of application's business here, such as mime and shareby?
+	 * (no such things in java peer)
+	 * */
 	node : {
-		nodetype?: string;
-		// id: string;
+		checked? : boolean;
+		nodetype?: 'p' | 'card' | 'gallery' | undefined;  // string;
 		children?: Array<AnTreeNode>;
 		expandChildren?: boolean;
 
 		/** With icon as a special field? */
 		css?: CSS.Properties & {icon?: AnTreeIconsType, size?: number[]};
 
-		mime?: string;
-
-		shareby?: string;
+		// mime?: string;
+		// shareby?: string;
 
 		/** Any data by jserv */
 		[d: string]: AnsonValue;
 	};
+
 	id: string;
 	parent: string;
 	islastSibling?: boolean;
 	level: number;
+
 	/** Indent icon names */
-	indents?: Array<IndentIconame>;
+	indents?: Array<IndentName>;
 }
 
 /**
@@ -119,7 +126,7 @@ export class StreeTier extends Semantier {
      * @param opts 
      * @param comp 
      */
-	stree(opts: DatasetOpts & {act?: LogAct, uri?: string}, errCtx: ErrorCtx): void {
+	stree(opts: DatasetOpts & {act?: LogAct, uri?: string, page?: PageInf}, errCtx: ErrorCtx): void {
         opts.port = opts.port || this.port;
 
         if (!opts.onOk)
@@ -145,7 +152,7 @@ export class StreeTier extends Semantier {
 	 * @param opts
 	 * @param onOk
 	 */
-    relations( client: SessionClient,
+    relations( _client: SessionClient,
 		opts: { uri?: string;
 				reltabl?: string;
 				sqlArgs?: string[];
@@ -164,7 +171,7 @@ export class StreeTier extends Semantier {
 
 		this.stree(
 			{ sk: stree.sk,
-			  sqlArgs,
+			  page: new PageInf(0, -1, 0, [sqlArgs]),
 			  onOk: (resp) => {
 				that.rels[reltabl] = (resp.Body() as AnDatasetResp).forest as AnTreeNode[];
 				opts.ok(resp)
