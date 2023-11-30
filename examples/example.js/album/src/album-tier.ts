@@ -32,7 +32,6 @@ export class AlbumEditier extends StreeTier {
 	}
 
 	root() {
-		// throw new Error('Method not implemented.');
 		return undefined;
 	}
 
@@ -63,9 +62,8 @@ export class AlbumEditier extends StreeTier {
 			}, this.errCtx);
 	}
 
-    loadCollect(onLoad: ((collect?: PhotoCollect) => void)): void {
-        // this.records(this.page, onLoad);
-    }
+    // loadCollect(onLoad: ((collect?: PhotoCollect) => void)): void {
+    // }
 
 	toGalleryImgs(idx: number) {
 		let that = this;

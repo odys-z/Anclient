@@ -17,7 +17,7 @@ import { CRUD, Protocol, Tierec, AnlistColAttrs, DbCol } from '@anclient/semanti
 
 import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree,
 	TRecordForm, Media, ClassNames } from '@anclient/anreact'
-import { AlbumEditier, Share } from '../album-editier';
+import { AlbumEditier, Share } from '../album-tier';
 const {JsampleIcons} = jsample;
 
 const styles = (theme: Theme) => {

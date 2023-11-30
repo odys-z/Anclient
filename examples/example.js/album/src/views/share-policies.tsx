@@ -4,11 +4,10 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import { CRUD, Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
 import { AnContext, JsonServs, CrudCompW,
     AnTablistProps, AnTreeditor, AnError, L, AnContextType, 
-    CompOpts, AnTreegridCol, AnTreegrid, jsample, regex
-} from '@anclient/anreact';
+    CompOpts, AnTreegridCol, AnTreegrid, jsample} from '@anclient/anreact';
 
 import { Button, Grid, Theme, withWidth } from '@material-ui/core';
-import { AlbumEditier } from '../album-editier';
+import { AlbumEditier } from '../album-tier';
 import { DocIcon } from '../icons/doc-ico';
 import { SharePolicyDetails } from './share-policy-details';
 

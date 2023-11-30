@@ -1,0 +1,268 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
+	AnTreeNode, ErrorCtx, an, SessionClient, Tierec, size
+} from '@anclient/semantier';
+
+import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
+	JsonServs, AnreactAppOptions, AnTreeditor, CrudCompW, AnContextType,
+	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView, CompOpts
+} from '@anclient/anreact';
+import { GalleryTier } from '../gallerytier';
+import { Button, Grid } from '@material-ui/core';
+import { DocIcon } from '../icons/doc-ico';
+
+type AlbumProps = {
+	servs: JsonServs;
+	servId: string;
+
+	/** album id */
+	aid: string;
+
+	iportal?: string;
+	iparent?: any; // parent of iframe
+	iwindow?: Window | undefined; // window object
+
+	userid?: string;
+	passwd?: string;
+}
+
+/**
+ * Home page,
+ * application main, context singleton and error handler
+ */
+export class Docview extends CrudCompW<AlbumProps> {
+    inclient?: Inseclient;
+
+	anReact? : AnReactExt;  // helper for React
+
+	error: ErrorCtx;
+
+	config = {
+		/** json object specifying host's urls */
+		servs: {} as JsonServs,
+		/** the serv id for picking url */
+		servId: '',
+	};
+    nextAction: string | undefined;
+
+	albumsk = "tree-album-family-folder";
+	doctreesk = 'tree-docs-folder';
+	uri = 'example.js/album';
+
+	state = {
+		hasError: false,
+		showingDocs: false,
+		sk: undefined,
+	};
+
+	editForm : undefined;
+	ssclient : SessionClient | undefined;
+	albumtier: GalleryTier | undefined;
+	docIcon  : DocIcon;
+	pdfview  : JSX.Element | undefined;
+
+	/**
+	 * Restore session from window.localStorage
+	 */
+	constructor(props: AlbumProps | Readonly<AlbumProps>) {
+		super(props);
+
+		this.onError = this.onError.bind(this);
+		this.error   = {onError: this.onError, msg: ''};
+		this.onErrorClose = this.onErrorClose.bind(this);
+		this.toSearch = this.toSearch.bind(this);
+		this.switchDocMedias = this.switchDocMedias.bind(this);
+
+		this.config.servId = this.props.servId;
+		this.config.servs = this.props.servs;
+		this.config = Object.assign({}, this.config);
+
+		this.nextAction = 're-login',
+		Protocol.sk.cbbViewType = 'v-type';
+		this.docIcon = new DocIcon();
+
+		if (this.config.servs) {
+			// initialize as an App
+			this.inclient = new Inseclient({urlRoot: this.config.servs[this.props.servId]});
+			// DESIGN NOTES: extending ports shall be an automized processing
+			this.anReact = new AnReactExt(this.inclient, this.error)
+				.extendPorts({
+					/* see jserv-album/album, port name: album */
+					album: "album.less",
+				});
+		}
+	}
+
+	componentDidMount() {
+		console.log(this.uri);
+
+		const ctx = this.context as unknown as AnContextType;
+
+		if (!this.config.servs) {
+			// initialized as component
+			this.config.servs = ctx.servs;
+			this.inclient = ctx.anClient as Inseclient;
+			this.anReact = ctx.anReact as AnReactExt;
+		}
+		else
+			this.login();
+	}
+
+	login() {
+		// TODO doc: App is context provider, not consumer.
+		// So this.context won't work here.
+		// const ctx = this.context as unknown as AnContextType;
+		// let serv = ctx.servId || 'host';
+
+		let hosturl = this.config.servs[this.config.servId];
+		let {userid, passwd} = this.props;
+
+		let that = this;
+		let loggedin = (client: SessionClient) => {
+			that.ssclient = client;
+
+			this.anReact  = new AnReactExt(client, that.error)
+				.extendPorts({album: 'album.less'});
+
+			that.albumtier = new GalleryTier({uri: this.uri, comp: this, client});
+			that.toSearch();
+		}
+
+		console.warn("Auto login with configured userid & passwd.",
+					 hosturl, userid, passwd);
+		an.init ( hosturl );
+		an.login( userid as string, passwd as string, loggedin, this.error );
+	}
+
+	toSearch() {
+		let that = this;
+		let tier = this.albumtier as GalleryTier;
+
+		if (!tier) return;
+
+		tier.stree({ uri: this.uri,
+			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
+			onOk: (rep: AnsonMsg<AnsonResp>) => {
+				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[];
+				that.setState({});
+			}},
+			this.error);
+
+		this.onErrorClose();
+	}
+
+	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes?: ClassNames, media?: Media} | undefined) {
+		let that = this;
+		return (
+			<Grid item key={ix as number} {...col.grid}>
+			<Button onClick={onToggle}
+				className={opts?.classes?.toggle}
+				startIcon={that.docIcon.toggleButton(opts)}
+				color="primary" >
+				{opts?.media?.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
+			</Button>
+			</Grid> );
+
+		function onToggle(_e: React.MouseEvent) {
+			that.state.showingDocs = !that.state.showingDocs;
+			that.toSearch();
+		}
+	}
+
+	lightbox = (photos: AnTreeNode[], opts: {ix: number, open: boolean, onClose: (e: any) => {}}) => {
+		return (<Lightbox {...opts} showResourceCount photos={photos} tier={this.albumtier} />);
+	}
+
+	viewFile = (ids: Map<string, Tierec>) => {
+		if (size(ids) > 0 && this.albumtier) {
+			let fid = ids.keys().next().value;
+			let file = ids.get(fid) as AnTreeNode;
+			let t = regex.mime2type(file.node.mime as string || "");
+			if (t === '.pdf') {
+				this.pdfview = (<PdfViewer
+					close={(e) => {
+						this.pdfview = undefined;
+						this.setState({});
+					} }
+					src={GalleryView.imgSrcReq(file?.id, this.albumtier)}
+				></PdfViewer>);
+			}
+			else {
+				this.pdfview = undefined;
+				this.error.msg = L('Type {t} is not supported yet.', {t});
+				this.setState({
+					hasError: true,
+					nextAction: 'ignore'});
+			}
+		}
+		else {
+			this.pdfview = undefined;
+		}
+		this.setState({});
+	};
+
+	onError(c: string, r: AnsonMsg<AnsonResp> ) {
+		console.error(c, r.Body()?.msg(), r);
+		this.error.msg = r.Body()?.msg();
+		this.state.hasError = !!c;
+		this.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
+		this.setState({});
+	}
+
+	onErrorClose() {
+        this.state.hasError = false;
+		this.setState({});
+	}
+
+	render() {
+	  let that = this;
+	  return (<>
+		  { this.albumtier && (
+			this.state.showingDocs ?
+		    <AnTreegrid
+				pk={''} singleCheck
+				tier={this.albumtier}
+				columns={[
+				  { type: 'iconame', field: 'pname', label: L('File Name'),
+					grid: {xs: 6, sm: 6, md: 5} },
+				  { type: 'text', field: 'mime', label: L('type'),
+					colFormatter: typeParser, // Customize a cell
+					grid: {xs: 1} },
+				  { type: 'text', field: 'shareby', label: L('share by'),
+					grid: {xs: false, sm: 3, md: 2} },
+				  { type: 'text', field: 'filesize', label: L('size'), 
+					grid: {xs: false, sm: 2, md: 2}, thFormatter: this.switchDocMedias }
+				]}
+				onSelectChange={this.viewFile}
+			/> :
+		    <AnTreeditor {... this.props} reload={!this.state.showingDocs}
+				pk={'pid'} sk={this.albumsk}
+				tier={this.albumtier}
+				tnode={this.albumtier.root()} title={this.albumtier.albumTitle}
+				onSelectChange={() => undefined}
+				uri={this.uri}
+				columns={[
+					{ type: 'text',     field: 'pname',  label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
+					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {sm: 4, md: 3} },
+					{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
+					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},
+					  thFormatter: this.switchDocMedias, formatter: ()=>{} }
+				]}
+				lightbox={this.lightbox}
+			/>) }
+		  { this.pdfview }
+		  { this.state.hasError &&
+			<AnError onClose={this.onErrorClose} fullScreen={false}
+				uri={"/login"} tier={undefined}
+				title={L('Error')} msg={this.error.msg || ''} /> }
+	  </>);
+
+	  function typeParser(c: AnTreegridCol, n: AnTreeNode, opt?: CompOpts) {
+		if (n.node.children?.length as number > 0) return <></>;
+		else return that.docIcon.typeParser(c, n, opt);
+	  }
+	}
+
+}

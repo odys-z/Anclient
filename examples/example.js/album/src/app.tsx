@@ -12,6 +12,7 @@ import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
 import { GalleryTier } from './gallerytier';
 import { Button, Grid } from '@material-ui/core';
 import { DocIcon } from './icons/doc-ico';
+import { Docview } from './views/album-docview';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -39,17 +40,18 @@ export class App extends CrudCompW<AlbumProps> {
 
 	error: ErrorCtx;
 
-	config = {
-		/** json object specifying host's urls */
-		servs: {} as JsonServs,
-		/** the serv id for picking url */
-		servId: '',
-	};
+	servs: JsonServs;
+	// config = {
+	// 	/** json object specifying host's urls */
+	// 	servs: {} as JsonServs,
+	// 	/** the serv id for picking url */
+	// 	servId: '',
+	// };
     nextAction: string | undefined;
 
-	albumsk = "tree-album-family-folder";
-	doctreesk = 'tree-docs-folder';
-	uri = 'example.js/album';
+	// albumsk   = "tree-album-family-folder";
+	// doctreesk = 'tree-docs-folder';
+	// uri       = 'example.js/album';
 
 	state = {
 		hasError: false,
@@ -71,18 +73,19 @@ export class App extends CrudCompW<AlbumProps> {
 
 		this.onError = this.onError.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
-		this.onErrorClose = this.onErrorClose.bind(this);
-		this.toSearch = this.toSearch.bind(this);
-		this.switchDocMedias = this.switchDocMedias.bind(this);
+		// this.onErrorClose = this.onErrorClose.bind(this);
+		// this.toSearch = this.toSearch.bind(this);
+		// this.switchDocMedias = this.switchDocMedias.bind(this);
 
-		this.config.servId = this.props.servId;
-		this.config.servs = this.props.servs;
+		// this.config.servId = this.props.servId;
+		// this.config.servs = this.props.servs;
 
-		this.inclient = new Inseclient({urlRoot: this.config.servs[this.props.servId]});
+		this.servs = this.props.servs;
+		this.inclient = new Inseclient({urlRoot: this.servs[this.props.servId]});
 
 		this.nextAction = 're-login',
 
-		this.config = Object.assign({}, this.config);
+		// this.config = Object.assign({}, this.config);
 
 		this.docIcon = new DocIcon();
 
@@ -96,6 +99,7 @@ export class App extends CrudCompW<AlbumProps> {
                         });
 	}
 
+	/*
 	componentDidMount() {
 		console.log(this.uri);
 
@@ -139,7 +143,6 @@ export class App extends CrudCompW<AlbumProps> {
 			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
 				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[];
-				// console.log(tier.forest);
 				that.setState({});
 			}},
 			this.error);
@@ -196,19 +199,6 @@ export class App extends CrudCompW<AlbumProps> {
 		}
 		this.setState({});
 	};
-
-	onError(c: string, r: AnsonMsg<AnsonResp> ) {
-		console.error(c, r.Body()?.msg(), r);
-		this.error.msg = r.Body()?.msg();
-		this.state.hasError = !!c;
-		this.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
-		this.setState({});
-	}
-
-	onErrorClose() {
-        this.state.hasError = false;
-		this.setState({});
-	}
 
 	render() {
 	  let that = this;
@@ -269,7 +259,21 @@ export class App extends CrudCompW<AlbumProps> {
 			if (n.node.children?.length as number > 0) return <></>;
 			else return that.docIcon.typeParser(c, n, opt);
 		}
+	} */
+
+	onError(c: string, r: AnsonMsg<AnsonResp> ) {
+		console.error(c, r.Body()?.msg(), r);
+		this.error.msg = r.Body()?.msg();
+		this.state.hasError = !!c;
+		this.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
+		this.setState({});
 	}
+
+	onErrorClose() {
+        this.state.hasError = false;
+		this.setState({});
+	}
+
 
 	/**
 	 * Try figure out serv root, then bind to html tag.
@@ -293,7 +297,7 @@ export class App extends CrudCompW<AlbumProps> {
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
-			  <App servs={json} servId={opts.serv || 'album'}
+			  <Docview servs={json} servId={opts.serv || 'album'}
 				aid={aid} iportal={portal} iwindow={window}
 				userid={uid} passwd={pswd}
 			  />, dom);

@@ -15,6 +15,7 @@ import { L, Langstrs, AnContext, JsonServs,
 
 import { JsampleTheme } from '@anclient/anreact/src/jsample/styles';
 import { SharePolicies } from './views/share-policies';
+import { Docview } from './views/album-docview';
 
 const {Roles} = jsample;
 
@@ -109,7 +110,8 @@ class Admin extends React.Component<Approps> {
 			// {path: '/sys/orgs', comp: Orgs},
 			// {path: '/sys/users', comp: Userst},
 			// {path: '/tier/users', comp: Userst},
-			{path: '/c/myconn', comp: SharePolicies},
+			{path: '/c/mydocs', comp: SharePolicies},
+			{path: '/c/myconn', comp: Docview},
 		] );
 	}
 
@@ -127,13 +129,12 @@ class Admin extends React.Component<Approps> {
 			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
-	onErrorClose(code: string) {
+	onErrorClose(_c: string) {
 		this.errorMsgbox = undefined;
 		this.setState({});
 	}
 
 	onLogin () {
-
 	}
 
 	render() {
@@ -155,7 +156,7 @@ class Admin extends React.Component<Approps> {
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
 				:
 				<Sys menu='sys.menu.jsample'
-					landingUrl='/c/myconn'
+					landingUrl='/c/mydocs'
 					sys={L('Album 0.3')} menuTitle={L('Menu')}
 				/>
 			  }
