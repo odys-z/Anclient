@@ -185,7 +185,7 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 		an.init("localhost");
 		an.understandPorts(TestPorts);
 
-		assert.equal(an.servUrl(port), "localhost/r.serv11", "- 11 -");
+		assert.equal(an.servUrl(port), "localhost/r.serv", "- 11 -");
 	} );
 
 	it('UserReq', () => {

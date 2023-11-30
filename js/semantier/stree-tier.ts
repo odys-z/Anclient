@@ -62,7 +62,7 @@ export class AnTreeNode implements Tierec {
 	 * (no such things in java peer)
 	 * */
 	node : {
-		checked? : boolean;
+		checked? : boolean | '0' | '1' | 0 | 1 | 'true' | 'false' | 'True' | 'False' | 'TRUE' | 'FALSE';
 		nodetype?: 'p' | 'card' | 'gallery' | undefined;  // string;
 		children?: Array<AnTreeNode>;
 		expandChildren?: boolean;

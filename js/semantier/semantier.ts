@@ -440,10 +440,14 @@ export class Semantier {
 	 * ( all semantics handling is planned to move to server side as possible ). 
 	 *
 	 * @param opts semantic options for saving a maintable record
+	 * - opts.clearelation: delete child relationships
 	 * @param onOk callback
 	 * @returns
 	 */
-    saveRec(opts: {crud: CRUD; disableForm?: boolean; disableRelations?: boolean, reltabl?: string}, onOk: OnCommitOk): void {
+    saveRec(opts: { crud: CRUD;disableForm?: boolean;
+					disableRelations?: boolean,
+					clearelation?: boolean,
+					reltabl?: string}, onOk: OnCommitOk): void {
 		if (!this.client) {
 			console.error("Saving with undefined AnClient. Ever called setContext(context) ?");
 			return;
@@ -479,13 +483,13 @@ export class Semantier {
 		}
 
 		if (!disableRelations && !reltabl)
-			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
+			throw Error("Semantier can support only relationship table refering to mtabl. - this will be changed in the future.");
 
 		if (!disableRelations) {
 			if (crud === CRUD.c && !isEmpty(this.pkval?.v))
 				console.warn( "FIXME: empty pkval.v only suitable for auto-key. This change has a profound effection.",
 							  this.pkval);
-			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl],
+			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl], opts.clearelation,
 						// crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
 						this.pkval);
 		}
@@ -551,7 +555,7 @@ export class Semantier {
 	 * @param parentpkv pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
-	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: DbRelations, parentpkv: PkVal ) : AnsonMsg<T> {
+	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: DbRelations, clear: boolean, parentpkv: PkVal ) : AnsonMsg<T> {
 		if (relation.fk || relation.m2m)
 			throw Error('TODO ...');
 
@@ -563,7 +567,9 @@ export class Semantier {
 		// semantics handler can only resulve fk at inserting when master pk is auto-pk
 		columnMap[parentpkv.pk] = parentpkv.v;
 
-		let insRels = Semantier.inserTreeChecked(
+		let insRels;
+		if (!clear)
+			insRels = Semantier.inserTreeChecked(
 				this.rels[rel.childTabl] as AnTreeNode[],
 				{ table: rel.childTabl,
 				  columnMap,
@@ -582,7 +588,8 @@ export class Semantier {
 			// e.g. delete from a_role_func where roleId = '003'
 			let del_rf = new DeleteReq(uri, rel.childTabl,
 							[rel.fk, str(parentpkv.v)])
-							.post(insRels);
+			if (!clear)
+				del_rf.post(insRels);
 
 			if (req)
 				req.Body().post(del_rf);

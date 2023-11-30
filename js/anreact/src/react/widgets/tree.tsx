@@ -1,5 +1,6 @@
 import React from "react";
 import { Theme, withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth/withWidth";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
@@ -181,10 +182,6 @@ function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentName, k: str
     if (!icon)
         console.error(`Icon name, ${name}, is not one of supported names.`, defltIcons);
 
-	// icon 'pic-lib' is not exists
-	// if (!name)
-	//	return <div style={{paddingLeft: "8px"}}>{React.cloneElement(icon, {key:k})}</div>;
-	
 	if (classes)
 		return (<div className={classes}>{React.cloneElement(icon, {key:k})}</div>);
 	else
@@ -380,6 +377,6 @@ class AnTreeComp extends CrudCompW<Comprops> {
   }
 }
 
-const AnTree = withStyles(styles)(AnTreeComp);
+const AnTree = withStyles<any, any, Comprops>(styles)(withWidth()(AnTreeComp));
 export { levelIcons, icon, TreeNodeVisual, AnTreegridCol,
 		TreegridProps as TreeItemProps, AnreactreeItem, AnTree, AnTreeComp }

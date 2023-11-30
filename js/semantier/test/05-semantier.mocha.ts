@@ -1,6 +1,6 @@
 
 import { assert } from 'chai'
-import { UpdateReq } from '../anclient';
+import { AnTreeNode, UpdateReq } from '../anclient';
 import {Protocol, AnsonMsg, InsertReq} from '../protocol';
 import { Semantier } from '../semantier';
 
@@ -290,7 +290,7 @@ describe('case: [05.0 dataset + s-tree]', () => {
 
 		console.log(Protocol.ansonTypes);
 		let semantier = new Semantier({uri: 'test'});
-		semantier.rels = {a_role_func: relationRoleFuncs};
+		semantier.rels = {a_role_func: relationRoleFuncs as unknown as AnTreeNode[]};
 
 		let body = {type: InsertReq.__type__, uri: 'test-05'};
 		let req = new AnsonMsg<InsertReq>({body: [body]});
@@ -299,6 +299,7 @@ describe('case: [05.0 dataset + s-tree]', () => {
 				  { stree: { sk: 'fake-test', childTabl: 'a_role_func', fk: 'roleId', col: 'funcId', colProp: 'nodeId' },
 					childField: ''
 				  },
+				  false,
 				  { pk: 'roleId', v: 'r00' });
 
 		let del = req.Body()?.postUpds[0] as UpdateReq;

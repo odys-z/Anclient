@@ -72,7 +72,6 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 	// pkval: PkVal = {pk: undefined, v: undefined};
 	tier: AlbumEditier;
 	ok: JSX.Element | undefined;
-	refRelations: any;
 
 	constructor (props: Comprops & {tier: AlbumEditier} & { relsk: string }) {
 		super(props);
@@ -90,7 +89,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 	componentDidMount() {
 	}
 
-	handleClose = ((event: {}, reason: "backdropClick" | "escapeKeyDown") => {
+	handleClose = ((_event: {}, _reason: "backdropClick" | "escapeKeyDown") => {
 		this.tier.rec = undefined;
 	});
 
@@ -158,21 +157,20 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 			</DialogTitle>
 			<DialogContent className={classes?.content}>
 				<TRecordForm uri={this.props.uri}
-					ref={(ref: any) => this.refRelations = ref}
 					tier={this.tier}
 					mtabl='h_photos' pk='pid'
 					fields={[
-						{type: 'text',      field: 'shareby',   grid: {xs: 8,  md: 10}, readOnly: true},
-						{type: 'formatter', field: 'shareFlag', grid: {xs: 4,  md: 2},  fieldFormatter: this.buttonSwitch},
-						{type: 'text',      field: 'pname',     grid: {xs: 12, md: 6},  readOnly: true},
-						{type: 'datetime',  field: 'createDate',grid: {xs: 12, md: 6},  readOnly: true}
+						{type: 'text',      field: 'shareby',   grid: {xs: 7,  lg: 9}, readOnly: true},
+						{type: 'formatter', field: 'shareFlag', grid: {xs: 5,  lg: 3}, fieldFormatter: this.buttonSwitch},
+						{type: 'text',      field: 'pname',     grid: {xs: 12, md: 6}, readOnly: true},
+						{type: 'datetime',  field: 'createDate',grid: {xs: 12, md: 6}, readOnly: true}
 					]}
 					onLoad={(_cols: Array<DbCol>, rows: Array<Tierec>) => {
 						that.setState({
 							switchOn: rows[0].shareFlag !== Share.priv, 
 							toggleOn: rows[0].shareFlag !== Share.priv && (rows[0].orgs as number) > 0 });
 					}}
-					onToggle={(r: Tierec, f: AnlistColAttrs<any, Comprops>, _state: boolean, toggled: boolean) => {
+					onToggle={(_r: Tierec, _f: AnlistColAttrs<any, Comprops>, _state: boolean, toggled: boolean) => {
 						that.setState({toggleOn: !toggled});
 					}}
 				/>

@@ -244,6 +244,10 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		}
 	}
 
+	clearCheck() {
+		console.log('here');
+	}
+
 	render() {
 		const { classes } = this.props;
 		const forest = this.tier?.rels && this.tier.rels[this.props.reltabl];
