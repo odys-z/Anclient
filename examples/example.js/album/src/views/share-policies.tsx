@@ -85,14 +85,13 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                 pk={''} singleCheck
                 tier={this.tier}
                 columns={[
-                { type: 'iconame', field: 'pname', label: L('File Name'),
+                  { type: 'iconame', field: 'pname', label: L('File Name'),
                     grid: {xs: 6, sm: 6, md: 5} },
-                { type: 'text', field: 'mime', label: L('type'),
-                    colFormatter: typeParser,
+                  { type: 'text', field: 'mime', label: L('type'), colFormatter: typeParser,
                     grid: {xs: 1} },
-                { type: 'text', field: 'shareby', label: L('share by'),
+                  { type: 'text', field: 'shareby', label: L('share by'),
                     grid: {xs: false, sm: 3, md: 2} },
-                { type: 'text', field: 'filesize', label: L('size'), 
+                  { type: 'text', field: 'filesize', label: L('size'), 
                     grid: {xs: false, sm: 2, md: 2},
                       colFormatter: (_col, n, opts) => {return (
                             <Button key={`${n.id}.${opts?.colx}`}
@@ -144,11 +143,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
 	selectPhoto = (ids: Map<string, Tierec>) => {
 		if (size(ids) > 0 && this.tier) {
 			let fid = ids.keys().next().value;
-			// let file = ids.get(fid) as AnTreeNode;
-			// let t = regex.mime2type(file.node.mime || "");
-
             this.tier.pkval.v = fid;
-
 		    this.setState({});
 		}
 	};
@@ -167,17 +162,16 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
 		return (
           <Grid key={`th-${colx}`} item {...col.grid} className={classes?.treeCell}>
             { this.state.preview ?
-			  <><Button onClick={this.toggle}
+			  <Button onClick={this.toggle}
 				    startIcon={<JsampleIcons.Search />} color="primary" >
+			        {media?.isMd && L('Edit') }
                 </Button>
-			  {media?.isMd && L('Edit') }
-              </>
               :
-			  <><Button onClick={this.toggle}
+			  <Button onClick={this.toggle}
 				    startIcon={<JsampleIcons.Check />} color="primary" >
-                </Button>
-			    {media?.isMd && L('Preview') }
-              </>}
+			        {media?.isMd && L('Preview') }
+              </Button>
+            }
           </Grid>);
     }
 
@@ -187,20 +181,22 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
 
     editPolicy = (n: AnTreeNode) => {
         let that = this;
-        this.confirm = (
-          <SharePolicyDetails {...this}
-            crud={CRUD.u}
-            pk={n.id}
-            tier={this.tier}
-            onClose={() => {
-                that.confirm = undefined;
-                if (that.tier)
-                    that.tier.rec = undefined;
-                that.setState({});
-            }}
-          >
-          </SharePolicyDetails>);
 
+        // FIXME incase this.confirm created by folder action and showed by other events (not updated if failed loading)
+        if (n.nodetype !== 'p')
+            this.confirm = (
+            <SharePolicyDetails {...this}
+                crud={CRUD.u}
+                pk={n.id}
+                tier={this.tier}
+                onClose={() => {
+                    that.confirm = undefined;
+                    if (that.tier)
+                        that.tier.rec = undefined;
+                    that.setState({});
+                }}
+            >
+            </SharePolicyDetails>);
     };
 }
 SharePoliciesComp.contextType = AnContext;
