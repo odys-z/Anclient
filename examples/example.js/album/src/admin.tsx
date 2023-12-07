@@ -15,7 +15,7 @@ import { L, Langstrs, AnContext, JsonServs,
 
 import { JsampleTheme } from '@anclient/anreact/src/jsample/styles';
 import { SharePolicies } from './views/share-policies';
-import { Docview } from './views/album-docview';
+import { AlbumDocview } from './views/album-docview';
 
 const {Roles} = jsample;
 
@@ -27,6 +27,10 @@ interface Approps extends StandardProps<any, string> {
 
 /** The application main, context singleton and error handler */
 class Admin extends React.Component<Approps> {
+	/** fnction's url path shared by App & Admin. */
+	static func_AlbumDocview = '/c/myconn';
+	static func_SharePolicies= '/c/mydocs';
+
 	state = {
 		servId: 'host',
 		hasError: false,
@@ -110,8 +114,9 @@ class Admin extends React.Component<Approps> {
 			// {path: '/sys/orgs', comp: Orgs},
 			// {path: '/sys/users', comp: Userst},
 			// {path: '/tier/users', comp: Userst},
-			{path: '/c/mydocs', comp: SharePolicies},
-			{path: '/c/myconn', comp: Docview},
+
+			{path: Admin.func_SharePolicies, comp: SharePolicies},
+			{path: Admin.func_AlbumDocview, comp: AlbumDocview},
 		] );
 	}
 
@@ -155,7 +160,7 @@ class Admin extends React.Component<Approps> {
 			  { !this.state.loggedin ?
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
 				:
-				<Sys menu='sys.menu.jsample'
+				<Sys menu='sys.menu.jsample' id={'sys-admin'}
 					landingUrl='/c/mydocs'
 					sys={L('Album 0.3')} menuTitle={L('Menu')}
 				/>
@@ -176,7 +181,7 @@ class Admin extends React.Component<Approps> {
 	 */
 	static bindHtml(uid: string, pswd: string,
 					elem: string, opts: AnreactAppOptions) : void {
-		AnReact.initPage(elem, opts, login);
+		AnReact.loadServs(elem, opts, login);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions & {client: SessionClient}, json: JsonServs) {
 			let portal = opts.portal || 'index.html';

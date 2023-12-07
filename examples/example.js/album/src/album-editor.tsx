@@ -7,7 +7,7 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
 	AnTreeditor, Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
-import { AlbumEditier } from './album-tier';
+import { AlbumEditier } from './tiers/album-tier';
 
 type AlbumProps = {
 	servs: JsonServs;

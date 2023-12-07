@@ -107,7 +107,7 @@ class LoginApp extends React.Component<LoginProps> {
 	 * optional opts.parent=undefined: parent window if for redirecting target
 	 */
 	static bindHtml(elem: string, opts: AnreactAppOptions = {serv: 'localhost'}) {
-		AnReact.initPage(elem, opts, onJsonServ);
+		AnReact.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);

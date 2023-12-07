@@ -49,14 +49,9 @@ export interface GalleryProps {
 	cid: string;
 	photos?: AnTreeNode[];
 	tier?: Semantier;
+
+	/** Modal dialog for picture slids. */
 	lightbox: lightboxFomatter;
-	// lightbox: (photos: AnTreeNode[], opts?: {
-	// 	/** current slide index */
-	// 	ix: number,
-	// 	/** command for enable resources loading (special performance problem caused by anson64) */
-	// 	open: boolean,
-	// 	/** callback */
-	// 	onClose: () => void}) => JSX.Element;
 }
 
 export class GalleryView extends CrudCompW<Comprops & GalleryProps> {

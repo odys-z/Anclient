@@ -7,7 +7,7 @@ import { AnContext, JsonServs, CrudCompW,
     CompOpts, AnTreegridCol, AnTreegrid, jsample} from '@anclient/anreact';
 
 import { Button, Grid, Theme, withWidth } from '@material-ui/core';
-import { AlbumEditier } from '../album-tier';
+import { AlbumEditier } from '../tiers/album-tier';
 import { DocIcon } from '../icons/doc-ico';
 import { SharePolicyDetails } from './share-policy-details';
 

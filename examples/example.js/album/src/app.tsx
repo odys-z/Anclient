@@ -1,18 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
-	AnTreeNode, ErrorCtx, an, SessionClient, Tierec, size
-} from '@anclient/semantier';
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
+	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
-import { L, Langstrs, AnContext, AnError, AnReactExt, Lightbox,
-	JsonServs, AnreactAppOptions, AnTreeditor, CrudCompW, AnContextType,
-	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView, CompOpts
-} from '@anclient/anreact';
-import { GalleryTier } from './gallerytier';
-import { Button, Grid } from '@material-ui/core';
-import { DocIcon } from './icons/doc-ico';
-import { Docview } from './views/album-docview';
+import { Langstrs, AnContext, AnReactExt, 
+	JsonServs, AnreactAppOptions, CrudCompW, AnContextType} from '@anclient/anreact';
+import { AlbumDocview } from './views/album-docview';
+import { Admin } from './admin';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -41,17 +36,13 @@ export class App extends CrudCompW<AlbumProps> {
 	error: ErrorCtx;
 
 	servs: JsonServs;
-	// config = {
-	// 	/** json object specifying host's urls */
-	// 	servs: {} as JsonServs,
-	// 	/** the serv id for picking url */
-	// 	servId: '',
-	// };
+	config = {
+		/** json object specifying host's urls */
+		servs: {} as JsonServs,
+		/** the serv id for picking url */
+		servId: '',
+	};
     nextAction: string | undefined;
-
-	// albumsk   = "tree-album-family-folder";
-	// doctreesk = 'tree-docs-folder';
-	// uri       = 'example.js/album';
 
 	state = {
 		hasError: false,
@@ -61,9 +52,6 @@ export class App extends CrudCompW<AlbumProps> {
 
 	editForm : undefined;
 	ssclient : SessionClient | undefined;
-	albumtier: GalleryTier | undefined;
-	docIcon  : DocIcon;
-	pdfview  : JSX.Element | undefined;
 
 	/**
 	 * Restore session from window.localStorage
@@ -73,23 +61,12 @@ export class App extends CrudCompW<AlbumProps> {
 
 		this.onError = this.onError.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
-		// this.onErrorClose = this.onErrorClose.bind(this);
-		// this.toSearch = this.toSearch.bind(this);
-		// this.switchDocMedias = this.switchDocMedias.bind(this);
-
-		// this.config.servId = this.props.servId;
-		// this.config.servs = this.props.servs;
-
+		this.config.servId = this.props.servId;
+		this.config.servs = this.props.servs;
 		this.servs = this.props.servs;
 		this.inclient = new Inseclient({urlRoot: this.servs[this.props.servId]});
-
 		this.nextAction = 're-login',
-
-		// this.config = Object.assign({}, this.config);
-
-		this.docIcon = new DocIcon();
-
-		Protocol.sk.cbbViewType = 'v-type';
+		// Protocol.sk.cbbViewType = 'v-type';
 
         // DESIGN NOTES: extending ports shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
@@ -99,7 +76,6 @@ export class App extends CrudCompW<AlbumProps> {
                         });
 	}
 
-	/*
 	componentDidMount() {
 		console.log(this.uri);
 
@@ -108,11 +84,6 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	login() {
-		// TODO doc: App is context provider, not consumer.
-		// So this.context won't work here.
-		// const ctx = this.context as unknown as AnContextType;
-		// let serv = ctx.servId || 'host';
-
 		let hosturl = this.config.servs[this.config.servId];
 		let {userid, passwd} = this.props;
 
@@ -120,19 +91,18 @@ export class App extends CrudCompW<AlbumProps> {
 		let loggedin = (client: SessionClient) => {
 			that.ssclient = client;
 
-			this.anReact  = new AnReactExt(client, that.error)
+			that.anReact  = new AnReactExt(client, that.error)
 				.extendPorts({album: 'album.less'});
-
-			that.albumtier = new GalleryTier({uri: this.uri, comp: this, client});
-			that.toSearch();
+			that.setState({});
 		}
 
-		console.warn("Auto login with configured userid & passwd.",
-					 hosturl, userid, passwd);
+		console.warn("Auto login with configured host-url, userid & passwd.",
+					 hosturl, userid, `${passwd?.substring(0, 2)} ...`);
 		an.init ( hosturl );
 		an.login( userid as string, passwd as string, loggedin, this.error );
 	}
 
+	/*
 	toSearch() {
 		let that = this;
 		let tier = this.albumtier as GalleryTier;
@@ -261,6 +231,25 @@ export class App extends CrudCompW<AlbumProps> {
 		}
 	} */
 
+	render() {
+		return (
+		  <AnContext.Provider value={{
+			  servId  : this.config.servId,
+			  servs   : this.props.servs,
+			  anClient: this.ssclient as SessionClient,
+			  uiHelper: this.anReact,
+			  hasError: this.state.hasError,
+			  iparent : this.props.iparent,
+			  ihome   : this.props.iportal || 'portal.html',
+			  error   : this.error,
+			  ssInf   : undefined,
+		  }} >
+			<AlbumDocview uri={Admin.func_AlbumDocview} aid={''}
+			/>
+		  </AnContext.Provider>);
+
+	}
+
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r.Body()?.msg(), r);
 		this.error.msg = r.Body()?.msg();
@@ -292,12 +281,12 @@ export class App extends CrudCompW<AlbumProps> {
 		let portal = opts.portal ?? 'index.html';
 		let { aid, uid, pswd } = opts;
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
-		AnReactExt.initPage(elem, opts, onJsonServ);
+		AnReactExt.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
-			  <Docview servs={json} servId={opts.serv || 'album'}
+			  <App servs={json} servId={opts.serv || 'album'}
 				aid={aid} iportal={portal} iwindow={window}
 				userid={uid} passwd={pswd}
 			  />, dom);

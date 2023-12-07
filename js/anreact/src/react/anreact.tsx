@@ -153,10 +153,12 @@ export class AnReact {
 	}
 
 	/**
-	 * Try figure out serv root, then bind to html tag.
+	 * Try two step of loading host.json.
 	 * First try ./private/host.json<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
+	 * 
+	 * If one of the resource is loaded, call onJsonServ.
 	 *
 	 * For test, have elem = undefined
 	 * @param {string} elem html element id, null for test
@@ -164,19 +166,19 @@ export class AnReact {
 	 * @param {function} onJsonServ function to render React Dom, i. e.
 	 * @since 0.4.50
 	 * @example
-	 * // see Anclient/js/test/jsample/login-app.tsx
+	 * // see Anclient/js/anreact/test/jsample/login-app.tsx
 	 * (elem, json) => {
 	 * 	let dom = document.getElementById(elem);
 	 * 	ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
 	 * }
 	 *
-	 * // see Anclient/js/test/jsample/app.tsx
+	 * // see Anclient/js/anreact/test/jsample/app.tsx
 	 * function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 	 * 	let dom = document.getElementById(elem);
 	 * 	ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 	 * }
 	 */
-	static initPage( elem: string, opts: AnreactAppOptions,
+	static loadServs( elem: string, opts: AnreactAppOptions,
 				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
@@ -209,7 +211,7 @@ export class AnReact {
 	 */
 	static bindDom( elem: string, opts: AnreactAppOptions,
 				onJsonLoaded: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
-		return AnReact.initPage(elem, opts, onJsonLoaded);
+		return AnReact.loadServs(elem, opts, onJsonLoaded);
 	}
 }
 

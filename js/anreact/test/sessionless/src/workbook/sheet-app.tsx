@@ -168,7 +168,7 @@ class App extends React.Component<LessProps, State> {
 	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
 		let portal = opts.portal ?? 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
-		AnReactExt.initPage(elem, opts, onJsonServ);
+		AnReactExt.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
 			let dom = document.getElementById(elem);
