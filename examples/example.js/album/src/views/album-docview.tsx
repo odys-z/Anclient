@@ -1,4 +1,7 @@
 import React from 'react';
+import FlipCameraIosIcon from '@material-ui/icons/FlipCameraIos';
+import GroupAddIcon from '@material-ui/icons/GroupAdd';
+import ArtTrackIcon from '@material-ui/icons/ArtTrack';
 
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 	AnTreeNode, ErrorCtx, SessionClient, Tierec, size
@@ -89,10 +92,18 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 			<Grid item key={ix as number} {...col.grid}>
 			<Button onClick={onToggle}
 				className={opts?.classes?.toggle}
-				startIcon={that.docIcon.toggleButton(opts)}
+				// startIcon={that.docIcon.toggleButton(opts)}
+				startIcon={that.state.showingDocs ? <FlipCameraIosIcon/> : <ArtTrackIcon/>}
 				color="primary" >
-				{opts?.media?.isMd && L(`Filter: ${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
+				{opts?.media?.isMd && L(`${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
 			</Button>
+			<Button onClick={onToggle}
+				className={opts?.classes?.toggle}
+				startIcon={<GroupAddIcon/>}
+				color="primary" >
+				{opts?.media?.isMd && L('Groups')}
+			</Button>
+
 			</Grid> );
 
 		function onToggle(_e: React.MouseEvent) {
@@ -167,7 +178,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				]}
 				onSelectChange={this.viewFile}
 			/> :
-		    <AnTreeditor {... this.props} reload={!this.state.showingDocs}
+		    <AnTreeditor {... this.props} // reload={!this.state.showingDocs}
 				pk={'pid'} sk={this.albumsk}
 				tier={this.tier}
 				tnode={this.tier.root()} title={this.tier.albumTitle}

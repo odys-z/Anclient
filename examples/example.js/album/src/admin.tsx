@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { DOMElement } from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
@@ -181,12 +181,14 @@ class Admin extends React.Component<Approps> {
 	 */
 	static bindHtml(uid: string, pswd: string,
 					elem: string, opts: AnreactAppOptions) : void {
+		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReact.loadServs(elem, opts, login);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions & {client: SessionClient}, json: JsonServs) {
 			let portal = opts.portal || 'index.html';
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<Admin client={opts.client} servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<Admin client={opts.client} servs={json} servId={opts.serv}
+								   iportal={portal} iwindow={window}/>, dom);
 		}
 		
 		function login(elem: string, opts: AnreactAppOptions, json: JsonServs) {
@@ -196,7 +198,12 @@ class Admin extends React.Component<Approps> {
 				(client: SessionClient) => {
 					onJsonServ(elem, Object.assign(opts, {client}), json);
 				},
-				{onError: (c, r) => { console.error(c, r); }} );
+				{onError: (c, r) => {
+					console.error(c, r);
+					const bd = document.querySelector(`#${elem}`);
+					if (bd)
+						bd.innerHTML = L(`<h3>Login failed!</h3><p>${r.Body(0)?.msg() }</p>`);
+				}} );
 		}
 	}
 

@@ -12,6 +12,7 @@ import { txt } from "./txt";
 import { unknown } from "./unknown";
 import { toggle } from "./toggle";
 import { audio } from "./audio";
+import { userCheck } from "./user-check";
 
 const knownBlobs = {
     image: img, video: video, audio,
@@ -27,6 +28,9 @@ export class DocIcon {
 
     constructor() {
         this.typeParser = this.typeParser.bind(this);
+
+        this.buf.toggle = new Blob([toggle], {type: 'image/svg+xml'});
+        this.buf.userCheck = new Blob([userCheck], {type: 'image/svg+xml'});
     }
 
     typeParser(col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts) {
@@ -46,5 +50,11 @@ export class DocIcon {
         if (!this.buf.toggle)
             this.buf.toggle = new Blob([toggle], {type: 'image/svg+xml'});
         return (<img className={opts.classes?.toggle} src={URL.createObjectURL(this.buf.toggle)}></img>);
+    }
+
+    svgIcon(name: 'toggle' | 'userCheck', opts: {classes?: ClassNames, media?: Media} = {}) {
+        return (<img className={opts.classes ? opts.classes[name] : undefined}
+                     src={URL.createObjectURL(this.buf[name])}>
+                </img>);
     }
 }

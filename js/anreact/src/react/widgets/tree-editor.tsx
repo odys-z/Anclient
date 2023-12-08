@@ -92,6 +92,7 @@ const styles = (theme: Theme) => ({
   },
   toggle: {
     padding: 0,
+    paddingLeft: theme.spacing(0.5),
     verticalAlign: 'middle',
     height: theme.spacing(4),
   },

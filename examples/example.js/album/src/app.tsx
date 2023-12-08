@@ -232,7 +232,7 @@ export class App extends CrudCompW<AlbumProps> {
 	} */
 
 	render() {
-		return (
+		return (this.ssclient &&
 		  <AnContext.Provider value={{
 			  servId  : this.config.servId,
 			  servs   : this.props.servs,
@@ -244,10 +244,9 @@ export class App extends CrudCompW<AlbumProps> {
 			  error   : this.error,
 			  ssInf   : undefined,
 		  }} >
-			<AlbumDocview uri={Admin.func_AlbumDocview} aid={''}
-			/>
-		  </AnContext.Provider>);
-
+			<AlbumDocview uri={Admin.func_AlbumDocview} aid={''} />
+		  </AnContext.Provider>
+		|| <></>);
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
