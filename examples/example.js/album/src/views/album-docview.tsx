@@ -1,7 +1,8 @@
 import React from 'react';
 import FlipCameraIosIcon from '@material-ui/icons/FlipCameraIos';
-import GroupAddIcon from '@material-ui/icons/GroupAdd';
-import ArtTrackIcon from '@material-ui/icons/ArtTrack';
+import FolderSharedIcon from '@material-ui/icons/FolderShared';
+import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
+// import ArtTrackIcon from '@material-ui/icons/ArtTrack';
 
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 	AnTreeNode, ErrorCtx, SessionClient, Tierec, size
@@ -14,6 +15,7 @@ import { L, AnError, AnReactExt, Lightbox,
 import { GalleryTier } from '../tiers/gallerytier';
 import { Button, Grid } from '@material-ui/core';
 import { DocIcon } from '../icons/doc-ico';
+import { ConnectionDetails } from './album-doconn-details';
 
 interface AlbumDocProps extends Comprops {
 	/** album id */
@@ -39,10 +41,11 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 		sk: undefined,
 	};
 
-	client   : SessionClient | undefined;
-	tier     : GalleryTier | undefined;
-	docIcon  : DocIcon;
-	pdfview  : JSX.Element | undefined;
+	client : SessionClient | undefined;
+	tier   : GalleryTier | undefined;
+	docIcon: DocIcon;
+	pdfview: JSX.Element | undefined;
+	orgview: JSX.Element | undefined;
 
 	/**
 	 * Restore session from window.localStorage
@@ -89,27 +92,34 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes?: ClassNames, media?: Media} | undefined) {
 		let that = this;
 		return (
-			<Grid item key={ix as number} {...col.grid}>
-			<Button onClick={onToggle}
+		  <Grid item key={ix as number} {...col.grid}>
+			<Button onClick={toToggleView}
 				className={opts?.classes?.toggle}
-				// startIcon={that.docIcon.toggleButton(opts)}
-				startIcon={that.state.showingDocs ? <FlipCameraIosIcon/> : <ArtTrackIcon/>}
+				startIcon={that.state.showingDocs ? <FolderSharedIcon style={{ fontSize: 30 }}/> : <FlipCameraIosIcon style={{ fontSize: 30 }}/>}
 				color="primary" >
 				{opts?.media?.isMd && L(`${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
 			</Button>
-			<Button onClick={onToggle}
+			{/* TODO Let's filter connection later
+			<Button onClick={this.toFilterOrgs}
 				className={opts?.classes?.toggle}
-				startIcon={<GroupAddIcon/>}
+				startIcon={<LibraryAddCheckIcon/>}
 				color="primary" >
 				{opts?.media?.isMd && L('Groups')}
 			</Button>
+			*/}
+		  </Grid> );
 
-			</Grid> );
-
-		function onToggle(_e: React.MouseEvent) {
+		function toToggleView(_e: React.UIEvent) {
 			that.state.showingDocs = !that.state.showingDocs;
 			that.toSearch();
 		}
+	}
+
+	toFilterOrgs = (_: React.UIEvent) => {
+		this.orgview = (<ConnectionDetails
+			tier={this.tier}
+		>
+		</ConnectionDetails>);
 	}
 
 	lightbox = (photos: AnTreeNode[], opts: {ix: number, open: boolean, onClose: (e: any) => {}}) => {
@@ -194,6 +204,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				lightbox={this.lightbox}
 			/>) }
 		  { this.pdfview }
+		  { this.orgview }
 		  { this.state.hasError &&
 			<AnError onClose={this.onErrorClose} fullScreen={false}
 				uri={"/login"} tier={undefined}

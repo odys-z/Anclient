@@ -46,12 +46,23 @@ export class DocIcon {
         return (<img key={n.id+mime} className={opts?.classes?.icon} src={this.buf[src]}></img>);
     }
 
+    /**
+     * @deprecated
+     * @param opts
+     * @returns 
+     */
     toggleButton(opts: {classes?: ClassNames, media?: Media} = {}) {
         if (!this.buf.toggle)
             this.buf.toggle = new Blob([toggle], {type: 'image/svg+xml'});
         return (<img className={opts.classes?.toggle} src={URL.createObjectURL(this.buf.toggle)}></img>);
     }
 
+    /**
+     * @deprecated
+     * @param name 
+     * @param opts 
+     * @returns 
+     */
     svgIcon(name: 'toggle' | 'userCheck', opts: {classes?: ClassNames, media?: Media} = {}) {
         return (<img className={opts.classes ? opts.classes[name] : undefined}
                      src={URL.createObjectURL(this.buf[name])}>

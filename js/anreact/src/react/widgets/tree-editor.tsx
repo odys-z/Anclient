@@ -23,7 +23,6 @@ import { SimpleForm } from "./simple-form";
 import { L } from "../../utils/langstr";
 
 import { photos as _photos } from "./res/temp-photos";
-import Lightbox from "../../photo-gallery/src/light-box";
 import { icon, levelIcons, AnTreegridCol, TreeItemProps, AnreactreeItem, TreeNodeVisual } from "./tree";
 import { AnTreegridComp } from "./treegrid";
 
@@ -92,7 +91,8 @@ const styles = (theme: Theme) => ({
   },
   toggle: {
     padding: 0,
-    paddingLeft: theme.spacing(0.5),
+    paddingRight: theme.spacing(1),
+    paddingLeft : theme.spacing(1),
     verticalAlign: 'middle',
     height: theme.spacing(4),
   },

@@ -163,13 +163,13 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
           <Grid key={`th-${colx}`} item {...col.grid} className={classes?.treeCell}>
             { this.state.preview ?
 			  <Button onClick={this.toggle}
-				    startIcon={<JsampleIcons.Search />} color="primary" >
-			        {media?.isMd && L('Edit') }
-                </Button>
+				startIcon={<JsampleIcons.Search />} color="primary" >
+			    {media?.isMd && L('Edit') }
+              </Button>
               :
 			  <Button onClick={this.toggle}
-				    startIcon={<JsampleIcons.Check />} color="primary" >
-			        {media?.isMd && L('Preview') }
+				startIcon={<JsampleIcons.Check />} color="primary" >
+			    {media?.isMd && L('Preview') }
               </Button>
             }
           </Grid>);
