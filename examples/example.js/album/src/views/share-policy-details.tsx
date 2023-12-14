@@ -52,7 +52,7 @@ const styles = (theme: Theme) => {
 	});
 };
 
-class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier} & { relsk: string }> {
+class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier, relsk: string, recType: 'doc' | 'folder' }> {
 
 	state = {
 		// crud: CRUD.r,
@@ -69,7 +69,6 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		toggleView: undefined as unknown as string,
 	};
 
-	// pkval: PkVal = {pk: undefined, v: undefined};
 	tier: AlbumEditier;
 	ok: JSX.Element | undefined;
 
@@ -78,8 +77,6 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 
 		this.tier  = props.tier;
 		this.tier.pkval = { pk: 'pid', v: props.pk, tabl: 'h_photos' };
-
-		// this.state.crud = props.crud || CRUD.c;
 
 		this.saveSharing = this.saveSharing.bind(this);
 		this.toCancel = this.toCancel.bind(this);
@@ -93,22 +90,36 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 		this.tier.rec = undefined;
 	});
 
+	/**
+	 * Save relationships (checked items)
+	 * 
+	 * DESIGN MEMO this should be the complementary use case for Prism.
+	 * @param e 
+	 */
 	saveSharing(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
 
 		if (!this.tier.validate()) {
 			this.setState({});
 		}
-		else {
+		else if (this.props.recType === 'doc') {
 			let that = this;
 			this.tier.rec = {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv};
 			let clearelation = this.tier.rec.shareFlag === Share.priv || !this.state.toggleOn;
 
 			this.tier.saveRec({crud: CRUD.u, reltabl: 'h_photo_org', clearelation},
 				() => {
-					// if (that.state.crud === CRUD.c)
-					// 	that.setState({ crud: CRUD.u} );
 					that.comfirm(L('Data Saved!'));
+					that.setState({});
+				});
+		}
+		else if (this.props.recType === 'folder') {
+			let that = this;
+			this.tier.rec = {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv};
+			let clearelation = this.tier.rec.shareFlag === Share.priv || !this.state.toggleOn;
+			this.tier.saveFolderPolicy({clearelation},
+				() => {
+					that.comfirm(L('Folder\'s sharing policy Saved!'));
 					that.setState({});
 				});
 		}
@@ -141,7 +152,6 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier}
 
 	render () {
 		const { classes, width } = this.props;
-		// let crud = this.state.crud;
 		let that = this;
 
 		return (<>

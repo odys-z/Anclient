@@ -446,6 +446,7 @@ export class Semantier {
 	 */
     saveRec(opts: { crud: CRUD;disableForm?: boolean;
 					disableRelations?: boolean,
+					/** true for only clear al relations */
 					clearelation?: boolean,
 					reltabl?: string}, onOk: OnCommitOk): void {
 		if (!this.client) {
@@ -463,7 +464,6 @@ export class Semantier {
 
 		let req: AnsonMsg<AnsonBody>;
 		if (!disableForm) {
-			// console.log(crud, CRUD.c);
 			if ( crud === CRUD.c ) {
 				req = this.client.userReq<InsertReq>(uri, 'insert',
 							new InsertReq( uri, this.pkval.tabl )
@@ -489,9 +489,7 @@ export class Semantier {
 			if (crud === CRUD.c && !isEmpty(this.pkval?.v))
 				console.warn( "FIXME: empty pkval.v only suitable for auto-key. This change has a profound effection.",
 							  this.pkval);
-			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl], opts.clearelation,
-						// crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
-						this.pkval);
+			req = this.formatRel<AnsonBody>(client, uri, req, this.relMeta[reltabl], opts.clearelation, this.pkval);
 		}
 
 		if (req)
@@ -546,16 +544,20 @@ export class Semantier {
     }
 
 	/**
-	 * Formatting relationship records - only relStree is supported
+	 * Formatting relationship records - only rel-stree is supported
 	 *
 	 * TODO change to static
-	 * @param uri
-	 * @param req
-	 * @param relation
+	 * 
+	 * @param uri 
+	 * @param req 
+	 * @param relation 
+	 * @param clearRels only for clear relations
 	 * @param parentpkv pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
-	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: DbRelations, clear: boolean, parentpkv: PkVal ) : AnsonMsg<T> {
+	formatRel<T extends AnsonBody>(client: SessionClient, uri: string, req: AnsonMsg<T>,
+			relation: DbRelations, clearRels: boolean, parentpkv: PkVal) : AnsonMsg<T> {
+
 		if (relation.fk || relation.m2m)
 			throw Error('TODO ...');
 
@@ -568,7 +570,7 @@ export class Semantier {
 		columnMap[parentpkv.pk] = parentpkv.v;
 
 		let insRels;
-		if (!clear)
+		if (!clearRels)
 			insRels = Semantier.inserTreeChecked(
 				this.rels[rel.childTabl] as AnTreeNode[],
 				{ table: rel.childTabl,
@@ -582,19 +584,18 @@ export class Semantier {
 			if (req)
 				req.Body().post(insRels);
 			else
-				req = this.client.userReq<InsertReq>(uri, 'insert', insRels) as unknown as AnsonMsg<T>;
+				req = client.userReq<InsertReq>(uri, 'insert', insRels) as unknown as AnsonMsg<T>;
 		}
 		else {
-			// e.g. delete from a_role_func where roleId = '003'
 			let del_rf = new DeleteReq(uri, rel.childTabl,
 							[rel.fk, str(parentpkv.v)])
-			if (!clear)
+			if (!clearRels)
 				del_rf.post(insRels);
 
 			if (req)
 				req.Body().post(del_rf);
 			else
-				req = this.client.userReq(uri, 'update', del_rf) as unknown as AnsonMsg<T>;
+				req = client.userReq(uri, 'update', del_rf) as unknown as AnsonMsg<T>;
 		}
 		return req;
 	}

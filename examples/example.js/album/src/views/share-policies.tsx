@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import withStyles from "@material-ui/core/styles/withStyles";
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 
 import { CRUD, Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
 import { AnContext, JsonServs, CrudCompW,
@@ -96,7 +97,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                       colFormatter: (_col, n, opts) => {return (
                             <Button key={`${n.id}.${opts?.colx}`}
                                 onClick={() => this.editPolicy(n)}
-                                startIcon={ n.node.children? <JsampleIcons.Edit /> : <JsampleIcons.Check/>}
+                                startIcon={ n.node.children? <PlaylistAddCheckIcon /> : <JsampleIcons.Check/>}
                                 color="primary" className={classes?.action}>
                                 {media.isMd && L('Shares')}
                             </Button>
@@ -186,7 +187,21 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
         if (n.nodetype !== 'p')
             this.confirm = (
             <SharePolicyDetails {...this}
-                crud={CRUD.u}
+                type={'doc'}
+                pk={n.id}
+                tier={this.tier}
+                onClose={() => {
+                    that.confirm = undefined;
+                    if (that.tier)
+                        that.tier.rec = undefined;
+                    that.setState({});
+                }}
+            >
+            </SharePolicyDetails>);
+        else 
+            this.confirm = (
+            <SharePolicyDetails {...this}
+                type={'folder'}
                 pk={n.id}
                 tier={this.tier}
                 onClose={() => {

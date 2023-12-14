@@ -1,4 +1,4 @@
-import { Protocol, AnsonBody, PageInf, AnsonResp, AnsonMsg,
+import { Protocol, AnsonBody, PageInf, AnsonResp, AnsonMsg, Semantier, NameValue, relStree,
 	SessionClient, AnTreeNode, StreeTier, Tierec, OnLoadOk} from '@anclient/semantier';
 import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumReq, AlbumPage, AlbumResp
 } from '@anclient/anreact';
@@ -61,9 +61,6 @@ export class AlbumEditier extends StreeTier {
 				onLoad(that.collects);
 			}, this.errCtx);
 	}
-
-    // loadCollect(onLoad: ((collect?: PhotoCollect) => void)): void {
-    // }
 
 	toGalleryImgs(idx: number) {
 		let that = this;
@@ -149,6 +146,41 @@ export class AlbumEditier extends StreeTier {
 			},
 			this.errCtx);
     }
+
+	saveFolderPolicy(opts: {clearelation: boolean}, onSaved: (resp: AnsonMsg<AnsonResp>) => void) {
+		if (!this.client) {
+			console.error("Sholdn't reach here: saving without logged in?");
+			return;
+		}
+
+		if (!this.pkval.pk) {
+			console.error("Sholdn't reach here: saving without folder Id?");
+			return;
+		}
+
+
+		let client = this.client;
+		let reqbd = new AlbumReq({})
+					.clearelations(opts.clearelation)
+					.shareFolder(this.collectRels(this.forest), this.pkval.pk as string)
+					.A(AlbumReq.A.updateFolderel);
+
+		let req = client.userReq(this.uri, this.port, reqbd);
+		client.commit(req, onSaved, this.errCtx);
+	}
+
+	collectRels(forest: AnTreeNode[]) {
+		let columnMap: {[k: string]: any} = {};
+		let rel = this.relMeta["h_photo_org"].stree as relStree;
+		columnMap[rel.col] = rel.colProp || rel.col; // columnMap[rel.col] = 'nodeId';
+
+		// semantics handler can only resulve fk at inserting when master pk is auto-pk
+		columnMap[this.pkval.pk as string] = this.pkval.v;
+
+		let rows = [] as  Array<NameValue[]>;
+		Semantier.collectTree(forest, rows, columnMap, rel.col);
+		return rows;
+	}
 };
 
 class Profiles extends AnsonBody {
