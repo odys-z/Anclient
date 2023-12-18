@@ -13,7 +13,7 @@ import Switch from '@material-ui/core/Switch';
 
 import { Theme } from '@material-ui/core';
 
-import { CRUD, Protocol, Tierec, AnlistColAttrs, DbCol } from '@anclient/semantier';
+import { CRUD, Protocol, Tierec, AnTreeNode, AnlistColAttrs, DbCol } from '@anclient/semantier';
 
 import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree,
 	TRecordForm, Media, ClassNames } from '@anclient/anreact'
@@ -55,18 +55,13 @@ const styles = (theme: Theme) => {
 class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier, relsk: string, recType: 'doc' | 'folder' }> {
 
 	state = {
-		// crud: CRUD.r,
 		dirty: false,
 		closed: false,
 
-		// pk: undefined,
-		record: undefined,
-
-		// showTree: false,
-
-		switchOn: undefined as unknown as boolean,
-		toggleOn: undefined as unknown as boolean,
-		toggleView: undefined as unknown as string,
+		chkFolder : undefined as string | undefined,
+		switchOn  : undefined as boolean | undefined,
+		toggleOn  : undefined as boolean | undefined,
+		toggleView: undefined as string | undefined,
 	};
 
 	tier: AlbumEditier;
@@ -102,9 +97,10 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 		if (!this.tier.validate()) {
 			this.setState({});
 		}
-		else if (this.props.recType === 'doc') {
+		else if (this.props.rectype === 'p') {
 			let that = this;
-			this.tier.rec = {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv};
+			this.tier.rec = Object.assign( this.tier.rec || {},
+										  {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv});
 			let clearelation = this.tier.rec.shareFlag === Share.priv || !this.state.toggleOn;
 
 			this.tier.saveRec({crud: CRUD.u, reltabl: 'h_photo_org', clearelation},
@@ -113,11 +109,13 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 					that.setState({});
 				});
 		}
-		else if (this.props.recType === 'folder') {
+		else if (this.props.rectype === 'folder') {
 			let that = this;
-			this.tier.rec = {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv};
+			// this.tier.rec = {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv};
+			this.tier.rec = Object.assign( this.tier.rec || {},
+										  {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv});
 			let clearelation = this.tier.rec.shareFlag === Share.priv || !this.state.toggleOn;
-			this.tier.saveFolderPolicy({clearelation},
+			this.tier.saveFolderPolicy({clearelation, subfolder: this.state.chkFolder as string},
 				() => {
 					that.comfirm(L('Folder\'s sharing policy Saved!'));
 					that.setState({});
@@ -186,6 +184,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 				/>
 				{ this.state.switchOn && this.state.toggleOn && 
 				  <AnRelationTree uri={this.props.uri}
+				    onFolderChange={(n: AnTreeNode, check: boolean) => {this.state.chkFolder = check ? n.nodeId as string : undefined;}}
 					relMeta={{ h_photo_org: {
                         stree: {sk: Protocol.sk.rel_photo_orgs,
 								fk: 'pid',

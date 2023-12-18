@@ -86,7 +86,10 @@ export class PageInf {
 }
 
 export type AnsonValue = string | object | string | number | boolean | undefined | null;
-/**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
+/**
+ * @depcated Lagecy from jquery & easyui, replaced by NV
+ * - no need to collect form using JQuery in the future.
+ */
 export type NameValue = {name: string, value: AnsonValue};
 export type NV = {n: string, v: AnsonValue};
 export function isNV (obj: any) {

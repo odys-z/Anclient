@@ -616,55 +616,58 @@ export class Semantier {
 	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checked.
 	 * @return subclass of AnsonBody
 	 */
-	static inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: {}; check: string; reshape: boolean; }): InsertReq {
+	static inserTreeChecked (forest: AnTreeNode[], opts: {
+			table: string;
+			columnMap: {};
+			check: string; reshape: boolean; }): InsertReq {
 		let {table, columnMap, check, reshape} = opts;
-		reshape = reshape === undefined? true : reshape;
-
-		// FIXME shouldn't we map this at server side?
-		let dbCols = Object.keys(columnMap);
 
 		let ins = new InsertReq(null, table)
 			.A<InsertReq>(CRUD.c)
-			.columns(dbCols);
+			.columns(Object.keys(columnMap));
 
 		let rows = [];
 
-		collectTree(forest, rows);
+		Semantier.collectTree(forest, rows, columnMap, check, reshape);
 
 		ins.rows(rows);
 		return ins;
+	}
 
-		/**
-		 * Design Notes:
-		 * 
-		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
-		 * 
-		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
-		 * 
-		 * @param forest 
-		 * @param rows 
-		 * @returns 
-		 */
-		function collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>) {
-			let cnt = 0;
-			forest.forEach( (tree: AnTreeNode, _i: number) => {
-				if (tree && tree.node) {
-					if (tree.node.children && tree.node.children.length > 0) {
-						let childCnt = collectTree(tree.node.children, rows);
+	/**
+	 * Design Notes:
+	 * 
+	 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
+	 * 
+	 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
+	 * 
+	 * @param forest the UI tree object
+	 * @param rows records
+	 * @param colMap column names
+	 * @param checkcol column name for check box 
+	 * @param reshape check middle nodes if therei are children checked
+	 * @returns check count
+	 */
+	static collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>, colMap: {}, checkcol: string, reshape?: boolean) {
+		reshape = reshape === undefined? true : reshape;
+		let cnt = 0;
+		forest.forEach( (tree: AnTreeNode, _i: number) => {
+			if (tree && tree.node) {
+				if (tree.node.children && tree.node.children.length > 0) {
+					let childCnt = Semantier.collectTree(tree.node.children, rows, colMap, checkcol, reshape);
 
-						if (childCnt > 0 && reshape)
-							tree.node[check] = 1;
-						else if (childCnt === 0)
-							tree.node[check] = 0;
-					}
-					if ( toBool(tree.node[check]) ) {
-						rows.push(toNvRow(tree.node, dbCols, columnMap));
-						cnt++;
-					}
+					if (childCnt > 0 && reshape)
+						tree.node[checkcol] = 1;
+					else if (childCnt === 0)
+						tree.node[checkcol] = 0;
 				}
-			});
-			return cnt;
-		}
+				if ( toBool(tree.node[checkcol]) ) {
+					rows.push(toNvRow(tree.node, colMap));
+					cnt++;
+				}
+			}
+		});
+		return cnt;
 
 		/**
 		 * Convert tree item (AnTreeNode) to [name-value, ...] as a nv record (Array<{name, value}>),
@@ -683,11 +686,11 @@ export class Semantier {
 		 * @returns
 		 */
 		function toNvRow(node: AnTreeNode["node"],
-				  dbcols: string[], colMap: { [x: string]: any; })
+				colMap: { [x: string]: any; })
 				: Array<NameValue> {
 
 			let r = [];
-			dbcols.forEach( (col: string) => {
+			Object.keys(colMap).forEach( (col: string) => {
 				let mapto = colMap[col];
 				if (node.hasOwnProperty(mapto))
 					// e.g. roleName: 'text'

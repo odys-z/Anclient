@@ -96,7 +96,10 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                     grid: {xs: false, sm: 2, md: 2},
                       colFormatter: (_col, n, opts) => {return (
                             <Button key={`${n.id}.${opts?.colx}`}
-                                onClick={() => this.editPolicy(n)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    this.editPolicy(n)}
+                                }
                                 startIcon={ n.node.children? <PlaylistAddCheckIcon /> : <JsampleIcons.Check/>}
                                 color="primary" className={classes?.action}>
                                 {media.isMd && L('Shares')}
@@ -184,10 +187,10 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
         let that = this;
 
         // FIXME incase this.confirm created by folder action and showed by other events (not updated if failed loading)
-        if (n.nodetype !== 'p')
+        if (n.node.nodetype !== 'p')
             this.confirm = (
             <SharePolicyDetails {...this}
-                type={'doc'}
+                rectype={'folder'}
                 pk={n.id}
                 tier={this.tier}
                 onClose={() => {
@@ -201,7 +204,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
         else 
             this.confirm = (
             <SharePolicyDetails {...this}
-                type={'folder'}
+                rectype={'p'}
                 pk={n.id}
                 tier={this.tier}
                 onClose={() => {
@@ -212,6 +215,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                 }}
             >
             </SharePolicyDetails>);
+        this.setState({});
     };
 }
 SharePoliciesComp.contextType = AnContext;

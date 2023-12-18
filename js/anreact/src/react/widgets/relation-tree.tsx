@@ -10,7 +10,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, DbRelations, Semantier, str, StreeTier, toBool } from '@anclient/semantier';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, DbRelations, str, StreeTier, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
@@ -175,8 +175,6 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 								onChange={(e) => {
 								  e.stopPropagation();
 								  changeSubtree(node, !toBool(node.checked));
-								  // node.checked = !toBool(node.checked);
-								  // node.children.forEach( c => { c.node.checked = e.target.checked } );
 								  that.setState({});
 								}}/>
 						  }
@@ -226,6 +224,10 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 				// c.node.checked = check;
 				changeSubtree(c.node, check);
 			} );
+			if (root.children && root.children.length > 0) 
+				that.props.onFolderChange(root, check);
+			else
+				that.props.onLeafChange(root, check);
 		}
 
 		function icon(icon: string) {

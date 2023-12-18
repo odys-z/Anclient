@@ -147,7 +147,8 @@ export class AlbumEditier extends StreeTier {
 			this.errCtx);
     }
 
-	saveFolderPolicy(opts: {clearelation: boolean}, onSaved: (resp: AnsonMsg<AnsonResp>) => void) {
+	saveFolderPolicy(opts: {clearelation: boolean, subfolder: string},
+					 onSaved: (resp: AnsonMsg<AnsonResp>) => void) {
 		if (!this.client) {
 			console.error("Sholdn't reach here: saving without logged in?");
 			return;
@@ -162,23 +163,23 @@ export class AlbumEditier extends StreeTier {
 		let client = this.client;
 		let reqbd = new AlbumReq({})
 					.clearelations(opts.clearelation)
-					.shareFolder(this.collectRels(this.forest), this.pkval.pk as string)
+					.shareFolder(this.collectRels(), this.pkval.pk as string)
 					.A(AlbumReq.A.updateFolderel);
 
 		let req = client.userReq(this.uri, this.port, reqbd);
 		client.commit(req, onSaved, this.errCtx);
 	}
 
-	collectRels(forest: AnTreeNode[]) {
+	collectRels() {
 		let columnMap: {[k: string]: any} = {};
 		let rel = this.relMeta["h_photo_org"].stree as relStree;
-		columnMap[rel.col] = rel.colProp || rel.col; // columnMap[rel.col] = 'nodeId';
+		let forest: AnTreeNode[] = this.rels["h_photo_org"];
 
-		// semantics handler can only resulve fk at inserting when master pk is auto-pk
-		columnMap[this.pkval.pk as string] = this.pkval.v;
+		columnMap[rel.col] = rel.colProp || rel.col;           // columnMap[rel.col] = 'nodeId';
+		columnMap[this.pkval.pk as string] = this.rec?.folder; // this.pkval.v; // pid the col name, 2003-12 the folder value
 
 		let rows = [] as  Array<NameValue[]>;
-		Semantier.collectTree(forest, rows, columnMap, rel.col);
+		Semantier.collectTree(forest, rows, columnMap, "checked");
 		return rows;
 	}
 };
