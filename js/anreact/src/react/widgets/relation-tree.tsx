@@ -225,9 +225,9 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 				changeSubtree(c.node, check);
 			} );
 			if (root.children && root.children.length > 0) 
-				that.props.onFolderChange(root, check);
+				that.props.onFolderChange && that.props.onFolderChange(root, check);
 			else
-				that.props.onLeafChange(root, check);
+				that.props.onLeafChange && that.props.onLeafChange(root, check);
 		}
 
 		function icon(icon: string) {

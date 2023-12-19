@@ -58,7 +58,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 		dirty: false,
 		closed: false,
 
-		chkFolder : undefined as string | undefined,
+		// chkFolder : undefined as string | undefined,
 		switchOn  : undefined as boolean | undefined,
 		toggleOn  : undefined as boolean | undefined,
 		toggleView: undefined as string | undefined,
@@ -115,7 +115,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 			this.tier.rec = Object.assign( this.tier.rec || {},
 										  {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv});
 			let clearelation = this.tier.rec.shareFlag === Share.priv || !this.state.toggleOn;
-			this.tier.saveFolderPolicy({clearelation, subfolder: this.state.chkFolder as string},
+			this.tier.saveFolderPolicy({clearelation, subfolder: this.props.pk},
 				() => {
 					that.comfirm(L('Folder\'s sharing policy Saved!'));
 					that.setState({});
@@ -184,13 +184,12 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 				/>
 				{ this.state.switchOn && this.state.toggleOn && 
 				  <AnRelationTree uri={this.props.uri}
-				    onFolderChange={(n: AnTreeNode, check: boolean) => {this.state.chkFolder = check ? n.nodeId as string : undefined;}}
+				    // onFolderChange={(n: AnTreeNode, check: boolean) => {this.state.chkFolder = check ? n.nodeId as string : undefined;}}
 					relMeta={{ h_photo_org: {
-                        stree: {sk: Protocol.sk.rel_photo_orgs,
-								fk: 'pid',
-								col: 'oid' as string,
-								colProp: 'nodeId',
-								childTabl : 'h_photo_org',
+                        stree: {sk: this.props.recType === 'folder' ?
+									Protocol.sk.rel_folder_org : Protocol.sk.rel_photo_org,
+								fk: 'pid',  colProp: 'nodeId',
+								col: 'oid', childTabl : 'h_photo_org',
 								sqlArgs: [this.tier.pkval.v] },
                         childField: 'pid',
                     }}}

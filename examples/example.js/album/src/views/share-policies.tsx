@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import withStyles from "@material-ui/core/styles/withStyles";
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 
-import { CRUD, Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
+import { Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
 import { AnContext, JsonServs, CrudCompW,
     AnTablistProps, AnTreeditor, AnError, L, AnContextType, 
     CompOpts, AnTreegridCol, AnTreegrid, jsample} from '@anclient/anreact';
@@ -95,16 +95,15 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                   { type: 'text', field: 'filesize', label: L('size'), 
                     grid: {xs: false, sm: 2, md: 2},
                       colFormatter: (_col, n, opts) => {return (
-                            <Button key={`${n.id}.${opts?.colx}`}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    this.editPolicy(n)}
-                                }
-                                startIcon={ n.node.children? <PlaylistAddCheckIcon /> : <JsampleIcons.Check/>}
-                                color="primary" className={classes?.action}>
-                                {media.isMd && L('Shares')}
-                            </Button>
-                      )},
+                        <Button key={`${n.id}.${opts?.colx}`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                this.editPolicy(n)}
+                            }
+                            startIcon={ n.node.children? <PlaylistAddCheckIcon /> : <JsampleIcons.Check/>}
+                            color="primary" className={classes?.action}>
+                            {media.isMd && L('Shares')}
+                        </Button>)},
                       thFormatter: this.switchButton }
                 ]}
                 onSelectChange={this.selectPhoto}
@@ -186,12 +185,13 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
     editPolicy = (n: AnTreeNode) => {
         let that = this;
 
-        // FIXME incase this.confirm created by folder action and showed by other events (not updated if failed loading)
-        if (n.node.nodetype !== 'p')
+        // FIXME in case this.confirm created by folder action and showed by other events (not be updated if in a failed loading)
+        if (n.node.nodetype !== 'p') {
+            (this.tier as AlbumEditier).pkval =  {pk: 'folder', v: n.node.folder};
             this.confirm = (
             <SharePolicyDetails {...this}
                 rectype={'folder'}
-                pk={n.id}
+                pk={n.node.folder}
                 tier={this.tier}
                 onClose={() => {
                     that.confirm = undefined;
@@ -201,7 +201,9 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                 }}
             >
             </SharePolicyDetails>);
-        else 
+        }
+        else {  // photo
+            (this.tier as AlbumEditier).pkval =  {pk: 'pid', v: n.id};
             this.confirm = (
             <SharePolicyDetails {...this}
                 rectype={'p'}
@@ -215,7 +217,9 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                 }}
             >
             </SharePolicyDetails>);
+        }
         this.setState({});
+
     };
 }
 SharePoliciesComp.contextType = AnContext;

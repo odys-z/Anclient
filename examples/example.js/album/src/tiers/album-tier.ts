@@ -1,4 +1,4 @@
-import { Protocol, AnsonBody, PageInf, AnsonResp, AnsonMsg, Semantier, NameValue, relStree,
+import { Protocol, AnsonBody, PageInf, AnsonResp, AnsonMsg, Semantier, NV, relStree,
 	SessionClient, AnTreeNode, StreeTier, Tierec, OnLoadOk} from '@anclient/semantier';
 import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumReq, AlbumPage, AlbumResp
 } from '@anclient/anreact';
@@ -126,13 +126,14 @@ export class AlbumEditier extends StreeTier {
 	 * @param _conds 
 	 * @param onLoad 
 	 */
-	record(_conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
+	record(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
 		if (!this.client) return;
 
 		let client = this.client;
 		let that = this;
 
 		let page = new AlbumPage({pid: this.pkval.v as string});
+
 		let reqbd = new AlbumReq({page})
 					.A(AlbumReq.A.rec);
 
@@ -159,11 +160,11 @@ export class AlbumEditier extends StreeTier {
 			return;
 		}
 
-
+		let {clearelation, subfolder} = opts;
 		let client = this.client;
 		let reqbd = new AlbumReq({})
-					.clearelations(opts.clearelation)
-					.shareFolder(this.collectRels(), this.pkval.pk as string)
+					.clearelations(clearelation)
+					.shareTree(this.collectRels(), subfolder)
 					.A(AlbumReq.A.updateFolderel);
 
 		let req = client.userReq(this.uri, this.port, reqbd);
@@ -178,7 +179,7 @@ export class AlbumEditier extends StreeTier {
 		columnMap[rel.col] = rel.colProp || rel.col;           // columnMap[rel.col] = 'nodeId';
 		columnMap[this.pkval.pk as string] = this.rec?.folder; // this.pkval.v; // pid the col name, 2003-12 the folder value
 
-		let rows = [] as  Array<NameValue[]>;
+		let rows = [] as  Array<NV[]>;
 		Semantier.collectTree(forest, rows, columnMap, "checked");
 		return rows;
 	}

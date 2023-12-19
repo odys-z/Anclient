@@ -103,7 +103,8 @@ class Admin extends React.Component<Approps> {
 			/** Doc-tree to be managed */
 			stree_sharings: 'tree-album-sharing',
 			/** Relationship tree of h_photo_orgs */
-			rel_photo_orgs: 'tree-rel-photo-orgs',
+			rel_photo_org : 'tree-rel-photo-org',
+			rel_folder_org: 'tree-rel-folder-org'
 		});
 
 		// extending pages
