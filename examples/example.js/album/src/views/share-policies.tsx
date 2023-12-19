@@ -185,9 +185,10 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
     editPolicy = (n: AnTreeNode) => {
         let that = this;
 
+        let tier = this.tier as AlbumEditier;
         // FIXME in case this.confirm created by folder action and showed by other events (not be updated if in a failed loading)
         if (n.node.nodetype !== 'p') {
-            (this.tier as AlbumEditier).pkval =  {pk: 'folder', v: n.node.folder};
+            tier.pkval =  {pk: 'folder', v: n.node.folder};
             this.confirm = (
             <SharePolicyDetails {...this}
                 rectype={'folder'}
@@ -203,7 +204,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
             </SharePolicyDetails>);
         }
         else {  // photo
-            (this.tier as AlbumEditier).pkval =  {pk: 'pid', v: n.id};
+            tier.pkval =  {pk: 'pid', v: n.id};
             this.confirm = (
             <SharePolicyDetails {...this}
                 rectype={'p'}

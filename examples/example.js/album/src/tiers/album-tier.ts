@@ -135,7 +135,7 @@ export class AlbumEditier extends StreeTier {
 		let page = new AlbumPage({pid: this.pkval.v as string});
 
 		let reqbd = new AlbumReq({page})
-					.A(AlbumReq.A.rec);
+					.A(this.pkval.pk === 'folder' ? AlbumReq.A.folder : AlbumReq.A.rec);
 
 		let req = client.userReq(this.uri, this.port, reqbd);
 		client.commit(req,

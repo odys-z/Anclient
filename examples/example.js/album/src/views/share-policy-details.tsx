@@ -71,7 +71,8 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 		super(props);
 
 		this.tier  = props.tier;
-		this.tier.pkval = { pk: 'pid', v: props.pk, tabl: 'h_photos' };
+		// this.tier.pkval = { pk: 'pid', v: props.pk, tabl: 'h_photos' };
+		this.tier.pkval.tabl = 'h_photos';
 
 		this.saveSharing = this.saveSharing.bind(this);
 		this.toCancel = this.toCancel.bind(this);
@@ -103,7 +104,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 										  {shareFlag: this.state.switchOn && this.state.toggleOn ? Share.pub : Share.priv});
 			let clearelation = this.tier.rec.shareFlag === Share.priv || !this.state.toggleOn;
 
-			this.tier.saveRec({crud: CRUD.u, reltabl: 'h_photo_org', clearelation},
+			this.tier.saveRec({crud: CRUD.u, disableForm: true, reltabl: 'h_photo_org', clearelation},
 				() => {
 					that.comfirm(L('Data Saved!'));
 					that.setState({});
@@ -160,7 +161,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 			scroll='paper'
 		  >
 			<DialogTitle id="u-title" color="primary" >
-				{ L('Sharing with Groups') }
+				{ L('Sharing {t} with Groups', {t: this.props.recType === 'folder' ? L('folder') : L('doc')}) }
 				{ this.state.dirty ? <JsampleIcons.Star color="secondary"/> : "" }
 			</DialogTitle>
 			<DialogContent className={classes?.content}>
