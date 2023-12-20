@@ -1,22 +1,23 @@
 
-import React from 'react';
+import React, { DOMElement } from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { StandardProps } from '@material-ui/core';
 
 import { Protocol, SessionClient, ErrorCtx, 
-	AnsonMsg, AnsonResp, isEmpty
-} from '@anclient/semantier';
+	AnsonMsg, AnsonResp, an} from '@anclient/semantier';
 
-import {
-	L, Langstrs, AnContext, AnContextType, JsonServs,
+import { L, Langstrs, AnContext, JsonServs,
 	AnReact, AnReactExt, AnreactAppOptions, AnError,
 	jsample, Sys, SysComp, Login
 } from '@anclient/anreact';
-import { JsampleTheme } from '@anclient/anreact/src/jsample/styles';
 
-const {Userst, Domain, Roles, Orgs, MyInfCard, MyPswd} = jsample;
+import { JsampleTheme } from '@anclient/anreact/src/jsample/styles';
+import { SharePolicies } from './views/share-policies';
+import { AlbumDocview } from './views/album-docview';
+
+const {Roles} = jsample;
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
@@ -26,6 +27,10 @@ interface Approps extends StandardProps<any, string> {
 
 /** The application main, context singleton and error handler */
 class Admin extends React.Component<Approps> {
+	/** fnction's url path shared by App & Admin. */
+	static func_AlbumDocview = '/c/myconn';
+	static func_SharePolicies= '/c/mydocs';
+
 	state = {
 		servId: 'host',
 		hasError: false,
@@ -60,36 +65,30 @@ class Admin extends React.Component<Approps> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.goPortal = this.goPortal.bind(this);
+		this.onLogin = this.onLogin.bind(this);
 
 		this.errorCtx = {onError: this.onError, msg: ''};
 
-		// Will load anclient from localStorage.
-		this.anClient = new SessionClient();
-		if (!isEmpty(this.anClient.ssInf?.ssid))
-			this.state.loggedin = true;
-		else
-			this.state.loggedin = false;
-
+		this.anClient = props.client;
 		this.anReact = new AnReactExt(this.anClient, this.errorCtx);
 
-		this.onErrorClose = this.onErrorClose.bind(this);
-		this.goPortal  = this.goPortal.bind(this);
-		this.onLogin = this.onLogin.bind(this);
 
 		// singleton error handler
 		if (!this.anClient || !this.anClient.ssInf) {
 			this.state = Object.assign(this.state, {
+				loggedin: true,
 				nextAction: 're-login',
 				hasError: true,
 				msg: L('Setup session failed! Please re-login.')
 			});
 		}
 		else {
+			this.state.loggedin = true;
 			this.anReact = new AnReactExt(this.anClient, this.errorCtx)
 				.extendPorts({
 					menu     : "menu.serv",
 					userstier: "users.tier",
+					album    : "album.less",
 				});
 
 			// loaded from dataset.xml
@@ -99,17 +98,30 @@ class Admin extends React.Component<Approps> {
 			}, this.errorCtx);
 		}
 
-		Protocol.sk.cbbOrg = 'org.all';
-		Protocol.sk.cbbRole = 'roles';
+		Protocol.sk = Object.assign( Protocol.sk, {
+			// cbbOrg   : 'org.all', cbbRole  : 'roles',
+
+			/** Doc-tree to be managed */
+			stree_sharings: 'tree-album-sharing',
+
+			/** Relationship tree of h_photo_orgs */
+			rel_photo_org : 'tree-rel-photo-org',
+
+			/** Relationship tree of folder */
+			rel_folder_org: 'tree-rel-folder-org'
+		});
 
 		// extending pages
 		// Each Component is added as the route, with uri = path
 		SysComp.extendLinks( [
-			{path: '/sys/domain', comp: Domain},
+			// {path: '/sys/domain', comp: Domain},
 			{path: '/sys/roles', comp: Roles},
-			{path: '/sys/orgs', comp: Orgs},
-			{path: '/sys/users', comp: Userst},
-			{path: '/tier/users', comp: Userst},
+			// {path: '/sys/orgs', comp: Orgs},
+			// {path: '/sys/users', comp: Userst},
+			// {path: '/tier/users', comp: Userst},
+
+			{path: Admin.func_SharePolicies, comp: SharePolicies},
+			{path: Admin.func_AlbumDocview, comp: AlbumDocview},
 		] );
 	}
 
@@ -127,28 +139,15 @@ class Admin extends React.Component<Approps> {
 			nextAction: c === Protocol.MsgCode.exSession ? 're-login' : 'ignore'});
 	}
 
-	onErrorClose(code: string) {
-		if (code === Protocol.MsgCode.exSession) {
-			this.goPortal();
-		}
+	onErrorClose(_c: string) {
 		this.errorMsgbox = undefined;
 		this.setState({});
 	}
 
 	onLogin () {
-
-	}
-
-	/**
-	 * For navigating to portal page
-	 * */
-	goPortal() {
-		if (this.props.iwindow)
-			this.props.iwindow.location = this.state.iportal;
 	}
 
 	render() {
-	  let that = this;
 	  return (
 		<MuiThemeProvider theme={JsampleTheme}>
 			<AnContext.Provider value={{
@@ -160,52 +159,56 @@ class Admin extends React.Component<Approps> {
 				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent : this.props.iparent,
-				ihome: this.props.iportal || 'portal.html',
+				ihome: "#", // this.props.iportal || 'portal.html',
 				error: this.errorCtx,
 			}} >
 			  { !this.state.loggedin ?
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
 				:
-				<Sys menu='sys.menu.jsample'
-					sys={L('AnReact')} menuTitle={L('Sys Menu')}
-					myInfo={myInfoPanels}
-					onLogout={this.goPortal} />
+				<Sys menu='sys.menu.jsample' id={'sys-admin'}
+					landingUrl='/c/mydocs'
+					sys={L('Album 0.3')} menuTitle={L('Menu')}
+				/>
 			  }
-			  {this.errorMsgbox}
+			  { this.errorMsgbox }
 			</AnContext.Provider>
 		</MuiThemeProvider>);
-
-		/**
-		 * Create MyInfCard.
-		 * To avoid create component before context avialable, this function need the caller' context as parameter.
-		 * @param anContext
-		 */
-		function myInfoPanels(anContext: AnContextType) {
-			return [
-				{ title: L('Basic'),
-				  panel: <MyInfCard
-							uri={'/sys/session'} anContext={anContext}
-							ssInf={that.anClient.ssInf} /> },
-				{ title: L('Password'),
-				  panel: <MyPswd
-							uri={'/sys/session'} anContext={anContext}
-							ssInf={that.anClient.ssInf} /> }
-			  ];
-		}
 	}
 
 	/**
+	 * This function automatically login, then load app dom. Since jserv-root is not got via login,
+	 * this 
+	 * @param uid 
+	 * @param pswd 
+	 * @param jservRoot e.g. http://localhost:8081/jserv-album 
 	 * @param elem 
 	 * @param opts 
 	 */
-	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
-		let portal = opts.portal || 'index.html';
+	static bindHtml(uid: string, pswd: string,
+					elem: string, opts: AnreactAppOptions) : void {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
-		AnReactExt.bindDom(elem, opts, onJsonServ);
+		AnReact.loadServs(elem, opts, login);
 
-		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions & {client: SessionClient}, json: JsonServs) {
+			let portal = opts.portal || 'index.html';
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<Admin servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<Admin client={opts.client} servs={json} servId={opts.serv}
+								   iportal={portal} iwindow={window}/>, dom);
+		}
+		
+		function login(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+			let jserv = json[opts.serv || 'host'];
+			an.init(jserv)
+			  .login( uid, pswd,
+				(client: SessionClient) => {
+					onJsonServ(elem, Object.assign(opts, {client}), json);
+				},
+				{onError: (c, r) => {
+					console.error(c, r);
+					const bd = document.querySelector(`#${elem}`);
+					if (bd)
+						bd.innerHTML = L(`<h3>Login failed!</h3><p>${r.Body(0)?.msg() }</p>`);
+				}} );
 		}
 	}
 

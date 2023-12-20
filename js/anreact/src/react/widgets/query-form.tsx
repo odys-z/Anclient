@@ -14,15 +14,6 @@ import { Comprops, CrudCompW } from '../crud'
 import { ComboItem } from './dataset-combo';
 import { AnReactExt, ClassNames, CompOpts, Media } from '../anreact';
 
-// export interface ComboCondType extends TierComboField<JSX.Element, CompOpts> {
-// 	/** is cbb clean */
-// 	clean?: boolean; 
-// 	// sk: string,
-// 	type: 'cbb' | 'autocbb';
-// 	/** Without '-- ALL --' option */
-// 	noAllItem?: boolean;
-// };
-
 const styles = (theme: Theme) => ( {
 	root: {
 		"& :hover": {
@@ -95,7 +86,8 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		const that = this;
 
 		this.qFields
-		  .filter ( (c: AnlistColAttrs<any, any>, x ) => !!c && !(c as TierComboField).loading && !(c as TierComboField).clean)
+		  .filter ((c: AnlistColAttrs<any, any>, x ) =>
+		  			!!c && !(c as TierComboField).loading && !(c as TierComboField).clean)
 		  .forEach( (c: AnlistColAttrs<any, any>, cx) => {
 			let cond = c as TierComboField;
 			if (cond.sk && (cond.type === 'cbb' || cond.type === 'autocbb')) {
@@ -286,6 +278,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				else if (cond.type === "bool") {
 					let v = toBool(cond.val);
 					return (
+					  // see also record-form.tsx/TRecordForm#getField() type === 'swithc'
 					<Grid key={'q-' + x} item className={classes?.container} {...cond.grid}>
 						<FormControlLabel key={'sch' + x}
 					        control={ <Switch key={x}

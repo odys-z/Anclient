@@ -10,7 +10,7 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, str, toBool } from '@anclient/semantier';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, DbRelations, str, StreeTier, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
@@ -59,22 +59,41 @@ interface RelationTreeProps extends Comprops {
 	reltabl?: string;
 	sk?: string;
 
-	/**Semantier.formatRel() use this name to format relationship records,
+	/**
+	 * Override tier's relMeta.
+	 * @example
+	CREATE TABLE a_role_func(
+		roleId TEXT(20) not null,  // FK to a_roles.roleId
+		funcId TEXT(20) not null,  // FK to a_funcs.funcId
+	PRIMARY KEY (roleId, funcId));
+
+	// collect a role's function tree 
+	this.tier.relMeta = {'a_role_func':
+	  { stree: {
+		childTabl: 'a_role_func',
+		pk       : 'roleId',	// fk to main table
+		fk       : 'roleId',	// fk to main table
+		col      : 'funcId',	// checking col
+		colProp  : 'nodeId',
+		sk       : 'trees.role_funcs'
+		} as relStree,
+	  } as DbRelations
+	*/
+	relMeta?: {[tabl: string]: DbRelations};
+
+	/**
+	 * Semantier.formatRel() use this name to format relationship records,
 	 * where in UI component the FK value comes from
-	 *
-	 * FIXME shouldn't be changed to colProp
-	 * */
-	// relcolumn?: string;
+	 */
 	colProp?: string;
 
-	tier: Semantier;
+	tier: StreeTier;
 };
 
 /**
  * Tiered relationshp tree is a component for UI relation tree layout, automaitcally bind data,
  * resolving FK's auto-cbb.
  *
- * See also {@link AnRelationTreeComp}
  */
 class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	state = {
@@ -82,12 +101,13 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 		expandings: new Set(),
 	};
-	tier: Semantier;
+	tier: StreeTier;
 
 	constructor(props: RelationTreeProps) {
 		super(props);
 
 		this.tier = this.props.tier;
+		this.tier.relMeta = this.props.relMeta || this.tier.relMeta;
 
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.buildTree = this.buildTree.bind(this);
@@ -98,12 +118,9 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		this.tier.relations((this.context as AnContextType).anClient,
 			{ uri    : this.props.uri,
 			  reltabl: this.props.reltabl,
-			  sqlArg : str(this.tier.pkval.v),
-			},
-			(rels: AnsonMsg<AnDatasetResp>) => {
-				// that.forest = rels.Body().forest as AnTreeNode[];
-				that.setState({});
-			} );
+			  sqlArgs: [str(this.tier.pkval.v)],
+			  ok     : (rels: AnsonMsg<AnDatasetResp>) => { that.setState({}); }
+			});
 	}
 
 	toExpandItem(e: React.UIEvent<HTMLElement>) {
@@ -150,19 +167,18 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 					<Grid container spacing={0}>
 					  <Grid item xs={11}>
 						<Typography>
-						  {leadingIcons(level)}
-						  {node.css && node.css.icon && icon(node.css.icon)}
-					  	  {checkbox
-						   && <Checkbox color="primary" checked={toBool(node.checked)}
+						  { leadingIcons(level) }
+						  { node.css && node.css.icon && icon(node.css.icon) }
+					  	  { checkbox
+						    && <Checkbox color="primary" checked={toBool(node.checked)}
 								onClick={e => e.stopPropagation()}
 								onChange={(e) => {
 								  e.stopPropagation();
-								  node.checked = !toBool(node.checked);
-								  node.children.forEach( c => { c.node.checked = e.target.checked } );
+								  changeSubtree(node, !toBool(node.checked));
 								  that.setState({});
 								}}/>
 						  }
-						  {node.text}
+						  { node.text }
 						</Typography>
 					  </Grid>
 					  <Grid item xs={1}>
@@ -194,12 +210,24 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 				  </Grid>
 				  <Grid item xs={3} className={classes.treeItem} >
 					<Typography className={classes.treeLabel} >
-						{itemLabel(node.label || node.text, level, node.css)}
+						{itemLabel(str(node.label), level, node.css)}
 					</Typography>
 				  </Grid>
 				</Grid>
 			  );
 		  }
+		}
+
+		function changeSubtree(root: AnTreeNode["node"], check: boolean) {
+			root.checked = check;
+			root.children?.forEach( c => {
+				// c.node.checked = check;
+				changeSubtree(c.node, check);
+			} );
+			if (root.children && root.children.length > 0) 
+				that.props.onFolderChange && that.props.onFolderChange(root, check);
+			else
+				that.props.onLeafChange && that.props.onLeafChange(root, check);
 		}
 
 		function icon(icon: string) {
@@ -213,9 +241,13 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			return c;
 		}
 
-		function itemLabel(txt, l, css) {
+		function itemLabel(txt: string, _level: number, _css: any) {
 			return L(txt);
 		}
+	}
+
+	clearCheck() {
+		console.log('here');
 	}
 
 	render() {

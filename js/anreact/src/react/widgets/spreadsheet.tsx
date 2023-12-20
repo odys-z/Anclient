@@ -339,7 +339,7 @@ export class Spreadsheetier extends Semantier {
 	 * Encode record's FK value to get db value - called by spread tier for updating.
 	 *
 	 * @param field
-	 * @param n
+	 * @param n n of NV
 	 * @param rec not used
 	 * @returns
 	 */

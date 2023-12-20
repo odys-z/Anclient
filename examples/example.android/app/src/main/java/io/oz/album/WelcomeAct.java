@@ -4,16 +4,18 @@ import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
-import static io.oz.album.webview.WebAlbumAct.Help_ActionName;
+import static io.oz.album.webview.WebAlbumAct.Web_PageName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
 import static io.odysz.common.LangExt.isblank;
 import static io.oz.albumtier.AlbumContext.*;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -41,6 +43,8 @@ import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.activity.VideoPickActivity;
 import com.vincent.filepicker.filter.entity.BaseFile;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -85,7 +89,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     ActivityResultLauncher<Intent> prefStarter;
     ActivityResultLauncher<Intent> pickMediaStarter;
     ActivityResultLauncher<Intent> pickFileStarter;
-    ActivityResultLauncher<Intent> helpActStarter;
+    ActivityResultLauncher<Intent> webHelpStarter;
 
     TextView msgv;
     AndErrorCtx errCtx;
@@ -96,16 +100,17 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         super.onCreate(savedInstanceState);
 
         AlbumApp.keys = new PrefKeys();
-        // ISSUE to be simplified
+
         AlbumApp.keys.homeCate = getString(R.string.key_home_cate);
         AlbumApp.keys.home = getString(R.string.key_home);
         AlbumApp.keys.device = getString(R.string.key_device);
+        AlbumApp.keys.devCate = getString(R.string.key_dev_cate);
+        AlbumApp.keys.restoreDev = getString(R.string.key_restore_dev);
         AlbumApp.keys.jserv = getString(R.string.jserv_key);
         AlbumApp.keys.homepage = getString(R.string.homepage_key);
         AlbumApp.keys.usrid = getString(R.string.userid_key);
         AlbumApp.keys.pswd = getString(R.string.pswd_key);
 
-        AlbumApp.keys.login_summery = getString(R.string.key_login_summery);
         AlbumApp.keys.bt_regist = getString(R.string.key_regist);
         AlbumApp.keys.bt_login = getString(R.string.btn_login);
 
@@ -166,10 +171,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     reloadAlbum();
                 });
 
-        if (helpActStarter == null)
-            helpActStarter = registerForActivityResult(
+        if (webHelpStarter == null)
+            webHelpStarter = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> reloadAlbum() );
+
+//        if (webAdminStarter == null)
+//            webAdminStarter = registerForActivityResult(
+//                    new ActivityResultContracts.StartActivityForResult(),
+//                    result -> reloadAlbum() );
 
         try {
             if (singl.needSetup())
@@ -178,33 +188,46 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             else {
                 String pswd = sharedPref.getString(AlbumApp.keys.pswd, "-");
                 singl.pswd(pswd)
-                     .login((client) -> {
-                         AssetHelper.init(this,
+                    .login((client) -> {
+                        AssetHelper.init(this,
                                  sharedPref.getString(AlbumApp.keys.jserv, ""),
                                  sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
                         // All WebView methods must be called on the same thread.
                         runOnUiThread( () -> reloadAlbum() );
                     },
-                    (c, t, args) -> showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv()));
+                    (c, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv()));
             }
         } catch (Exception e) {
-            showMsg(R.string.t_login_failed, singl.photoUser.uid(), singl.jserv());
+            showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv());
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
         }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     void reloadAlbum () {
-        if (singl.tier == null)
+        if (singl.tier == null || sharedPref == null)
             return;
 
+        WebView wv = findViewById(R.id.wv_welcome);
+        reloadWeb(singl, wv, this, AssetHelper.Act_Album);
+
+        /*
         SessionClient client = singl.tier.client();
         if (client == null || sharedPref == null)
             return;
 
-        // String pswd = sharedPref.getString(AlbumApp.keys.pswd, "");
         String pswd = singl.pswd();
 
-        WebView wv = findViewById(R.id.wv_welcome);
         final VWebAlbum webView = new VWebAlbum();
         wv.setWebViewClient(webView);
         WebSettings webSettings = wv.getSettings();
@@ -223,8 +246,38 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         });
         String albumweb = AssetHelper.url4intent(this, AssetHelper.Act_Album);
 
-        // Tag: environment runtime test here
-        // albumweb = "http://192.168.0.3:8888/index.html?serv=info";
+        // E.g. albumweb = "http://192.168.0.3:8888/index.html?serv=info";
+        if (singl.verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
+        wv.loadUrl(albumweb);
+        */
+    }
+
+    public static void reloadWeb(AlbumContext singl, WebView wv, Activity act, int webId) {
+        SessionClient client = singl.tier.client();
+        if (client == null)
+            return;
+
+        String pswd = singl.pswd();
+
+        final VWebAlbum webView = new VWebAlbum();
+        wv.setWebViewClient(webView);
+        WebSettings webSettings = wv.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+
+        wv.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                if (!isblank(pswd)) {
+                    String script = String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd);
+                    Utils.warn("\n[Load page script]: %s", script);
+                    // https://www.techyourchance.com/communication-webview-javascript-android/
+                    wv.evaluateJavascript(script, null);
+                }
+            }
+        });
+        String albumweb = AssetHelper.url4intent(act, webId);
+
+        // E.g. albumweb = "http://192.168.0.3:8888/index.html?serv=info";
         if (singl.verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
         wv.loadUrl(albumweb);
     }
@@ -270,6 +323,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         int id = item.getItemId();
         if (id == R.id.menu_settings) {
             startPrefsAct();
+            return true;
+        } else if (id == R.id.menu_admin) {
+            startHelpAct(AssetHelper.Act_Admin);
             return true;
         } else if (id == R.id.menu_help) {
             startHelpAct(AssetHelper.Act_Help);
@@ -353,20 +409,20 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (clipData != null) {
                     if (singl.verbose) for (int i = 0; i < clipData.getItemCount(); i++)
                         Utils.logi("[AlbumContext.verbose] URI: %s", clipData.getItemAt(i).getUri());
-                    paths = getMultipleDocs(this, singl.photoUser.device, clipData);
+                    paths = getMultipleDocs(this, singl.userInf.device, clipData);
                     if (singl.verbose) Utils.logi(paths);
                 } else {
                     if (singl.verbose) {
                         Utils.logi("[AlbumContext.verbose] URI: %s\nPath: %s",
                                 String.valueOf(data.getData()),
-                                getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT));
+                                getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT));
                         errCtx.prepare(msgv, R.string.msg_upload_failed)
                               .err(null, "URI: %s\nPath: %s",
                                     String.valueOf(data.getData()),
-                                    getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
+                                    getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
                     }
                     paths = new ArrayList<>(1);
-                    paths.add(getDocDescript(this, singl.photoUser.device, data.getData(), Build.VERSION.SDK_INT));
+                    paths.add(getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT));
                 }
 
                 if (singl.tier == null)
@@ -443,8 +499,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      */
     protected void startHelpAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
-        intent.putExtra(Help_ActionName, action);
-        helpActStarter.launch(intent);
+        intent.putExtra(Web_PageName, action);
+        webHelpStarter.launch(intent);
     }
 
     @Override

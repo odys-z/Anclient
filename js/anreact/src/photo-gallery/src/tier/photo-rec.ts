@@ -1,5 +1,5 @@
 
-import { AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec
+import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec
 } from '@anclient/semantier';
 import { PhotoProps } from '../photo-ts';
 
@@ -69,12 +69,14 @@ export interface AlbumRec extends Tierec {
 }
 
 export class AlbumPage extends PageInf {
-	/** A temperoray solution before PageInf.condts evolved to Tierec. */
+	/** A temperoray solution before PageInf.condts evolved to Tierec.
+	 * @deprecated
+	 */
 	qrec?: AlbumRec;
 
 	constructor (query?: AlbumRec) {
 		super();
-		this.qrec = query;
+		this.mapCondts = query;
 	}
 }
 
@@ -90,14 +92,20 @@ export class AlbumReq extends DocsReq {
 		update: 'u',
 		insert: 'c',
 		upload: 'c/doc',
-		del: 'd'
+		del: 'd',
+
+		shareRelation : 'r/share-relat',
+		updateFolderel: 'u/folder-rel',
 	};
 
-	pageInf: PageInf;
-	albumId: string | undefined;
-	cids?: string[];
-	pids?: string[];
-	sk: string;
+	pageInf   : PageInf;
+	albumId   : string | undefined;
+	cids?     : string[];
+	pids?     : string[];
+	sk        : string;
+	clearels? : boolean;
+	checkRels?: Array<NV[]>;
+	sharefolder : string;
 
 	constructor (opt: {uri?: string, page?: AlbumPage, sk?: string}) {
 		super(opt.uri, {docId: ''});
@@ -112,6 +120,17 @@ export class AlbumReq extends DocsReq {
 			this.cids = page.qrec.collects?.map((c) => c.recId as string);
 			this.pids = page.qrec.photos;
 		}
+	}
+
+	clearelations(clearel: boolean) {
+		this.clearels = clearel;
+		return this;
+	}
+	
+	shareFolder(rows: Array<NV[]>, folder: string) {
+		this.checkRels = rows;
+		this.sharefolder = folder;
+		return this;
 	}
 }
 StreeTier.registTierequest('album', (opts) => new AlbumReq(opts));
@@ -133,6 +152,7 @@ export class AlbumResp extends AnDatasetResp {
 		});
 
 		this.album = resp;
+		this.photo = resp.photo;
 		this.collect = resp.collect;
 		this.collects = resp.collects;
 	}

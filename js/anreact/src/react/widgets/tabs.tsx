@@ -30,7 +30,7 @@ interface TabPanelProps extends Comprops {
     px : number;
 };
 
-class TabPanel extends CrudCompW<TabPanelProps> {
+class TabPanelComp extends CrudCompW<TabPanelProps> {
 	state = {}
     title: string;
     panel: ReactNode;
@@ -52,9 +52,10 @@ class TabPanel extends CrudCompW<TabPanelProps> {
 	  );
 	}
 }
+const TabPanel = withStyles<any, any, TabPanelProps>(styles)(withWidth()(TabPanelComp));
 
 interface TabsProps extends Comprops {
-    panels: Array<TabPanel>;
+    panels: Array<TabPanelComp>;
 }
 
 class TabsComp extends CrudCompW<TabsProps> {
@@ -122,4 +123,4 @@ class TabsComp extends CrudCompW<TabsProps> {
 TabsComp.contextType = AnContext;
 
 const AnTabs = withStyles<any, any, TabsProps>(styles)(withWidth()(TabsComp));
-export {AnTabs, TabsComp, TabsProps, TabPanel, TabPanelProps};
+export {AnTabs, TabsComp, TabsProps, TabPanelComp as TabPanel, TabPanelProps};

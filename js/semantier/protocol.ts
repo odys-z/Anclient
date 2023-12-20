@@ -29,6 +29,7 @@ export interface JsonOptions {
  * So use this to send by query form status.
  *  */
 export class PageInf {
+	/** Don't set directly, use constructor to set this. */
 	type: string;
 
 	page: number;
@@ -85,7 +86,10 @@ export class PageInf {
 }
 
 export type AnsonValue = string | object | string | number | boolean | undefined | null;
-/**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
+/**
+ * @depcated Lagecy from jquery & easyui, replaced by NV
+ * - no need to collect form using JQuery in the future.
+ */
 export type NameValue = {name: string, value: AnsonValue};
 export type NV = {n: string, v: AnsonValue};
 export function isNV (obj: any) {
@@ -133,10 +137,10 @@ export interface relFK {
 	/**child table pk */
 	pk: string,
 
-	/**child foreign column in DB table */
+	/**child FK column in DB table */
 	col: string,
 
-	/**value for col - column-map's key for where to get the value */
+	/**value for col - column-map's key for where to get the value from UI component */
 	relcolumn: string,
 }
 
@@ -147,16 +151,33 @@ export interface relFK {
  * Used by {@link Semantier.formatRel()}
  */
 export interface relStree {
-	sk : string, 		// s-tree semantic key
-	childTabl?: string,	// child table (optional when loading / binding records)
-	col: string,		// check col at client side
-	colProp?: string,	// propterty name (of which the value will be collected)
-	fk : string,		// fk to main table
+	/** s-tree semantic key */
+	sk?: string, 		
+	/** child table (optional when loading / binding records) */
+	childTabl?: string,
+	/**
+	 * AnTreeNode.node field name for updating fk in relation table.
+	 * E. g. 'funcId' in a_role_func, where roleId is provided as pkval.v
+	 */
+	col: string,
+	/**
+	 * propterty name (of which the value will be collected)
+	 * @deprecated replaced by #col
+	 */
+	colProp?: string,	
+	/** fk to main table */
+	fk : string,	
 	sort?: string,
 	fullpath?: string,
+
+	/** additional args, e. g. for string format in dataset.xml */
+	sqlArgs?: AnsonValue[]
 }
 
 export interface DbRelations {
+	/** Child field to m-tabl */
+	childField: string,
+	/** FK relation handled in UI */
 	fk?: relFK,
 	/** semantic tree */
 	stree?: relStree,
@@ -213,11 +234,11 @@ export class Protocol {
 	/** @deprecated replaced by enum CRUD. */
 	static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
-	static Port = {	heartbeat: "ping.serv11",
+	static Port = {	heartbeat: "ping.serv",
 		echo: "echo.less",
-		session: "login.serv11",
-		query: "r.serv11", update: "u.serv11",
-		insert: "c.serv11", delete: "d.serv11",
+		session: "login.serv",
+		query: "r.serv", update: "u.serv",
+		insert: "c.serv", delete: "d.serv",
 		dataset: "ds.serv",
 		stree: "s-tree.serv",
 		datasetier: "ds.tier"
@@ -314,7 +335,7 @@ export class Protocol {
     static formatSessionLogin(uid: string, tk64: string, iv64: string): AnsonMsg<AnSessionReq> {
 		let login = new AnsonMsg<AnSessionReq>({
 			type: 'io.odysz.semantic.jprotocol.AnsonMsg',
-			port: 'session', //Protocol.Port.session,
+			port: 'session',
 			body: [{type: 'io.odysz.semantic.jsession.AnSessionReq',
 					uid, token: tk64, iv: iv64}]
 		});
@@ -436,8 +457,8 @@ export class AnsonMsg<T extends AnsonBody> {
 			// 	body = new AnSessionResp(body);
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 				body = new AnSessionReq(body.uid, body.token, body.iv);
-			else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
-				body = new QueryReq(body.uri, body.mtabl, body.mAlias);
+			// else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
+			// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
 			else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
 				body = new UserReq(json.port, header, [body]);
 			else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
@@ -468,7 +489,7 @@ export class AnsonMsg<T extends AnsonBody> {
 
 			if (a) body.A(a);
 
-			// moc the ajax error
+			// imitate the ajax error
 			if (json.ajax)
 				body.ajax = json.ajax;
 		}
@@ -629,6 +650,8 @@ export class AnSessionReq extends AnsonBody {
  * @class
  */
 export class QueryReq extends AnsonBody {
+	static __type__ = 'io.odysz.semantic.jserv.R.AnQueryReq';
+
     mtabl: string;
     mAlias: string;
 
@@ -646,12 +669,19 @@ export class QueryReq extends AnsonBody {
     pgsize: number;
     limt: string[];
 
-	constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
+	// constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
+	// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
+	constructor(json: {uri: string, mtabl: string, mAlias: string, pageInf: PageInf}) {
+
 		super();
-		this.type = "io.odysz.semantic.jserv.R.AnQueryReq";
+
+		this.type = QueryReq.__type__; // "io.odysz.semantic.jserv.R.AnQueryReq";
+		
+		let {uri, mtabl, mAlias, pageInf} = json;
+
 		this.uri = uri;
-		this.mtabl = tabl;
-		this.mAlias = alias;
+		this.mtabl = mtabl;
+		this.mAlias = mAlias;
 		this.exprs = [];
 		this.joins = [];
 		this.where = [];
@@ -670,7 +700,8 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	/**add joins to the query request object
+	/**
+	 * Add joins to the query request object
 	 * @param jt join type, example: "j" for inner join, "l" for left outer join
 	 * @param t table, example: "a_roles"
 	 * @param a alias, example: "r"
@@ -828,6 +859,7 @@ export class QueryReq extends AnsonBody {
         throw new Error("Method not implemented.");
     }
 }
+Protocol.registerBody(QueryReq.__type__, (json) => new QueryReq(json));
 
 export class UpdateReq extends AnsonBody {
     /**Create an update / insert request.
@@ -928,7 +960,8 @@ export class UpdateReq extends AnsonBody {
 		return this;
 	}
 
-	/**Wrapper of #whereCond(), will take rop as consts and add "''".<br>
+	/**
+	 * Wrapper of #whereCond(), will take rop as consts and add "''".<br>
 	 * whereCond(logic, lop, Jregex.quote(rop));
 	 * @param logic logic operator
 	 * @param lop left operand
@@ -1026,6 +1059,7 @@ export class InsertReq extends UpdateReq {
 		super (uri, tabl, undefined);
 		this.a = CRUD.c;
 		this.type = InsertReq.__type__;
+		delete this.where;
 	}
 
 	/**
@@ -1300,7 +1334,9 @@ export class AnsonResp extends AnsonBody {
     Code(): string { return this.code };
 
     rs: AnResultset | Array<AnResultset>;
-    Rs(rx = 0): AnResultset { return this.rs.length ? this.rs[rx] : this.rs; }
+    Rs(rx = 0): AnResultset {
+		return this.rs?.length ? this.rs[rx] : this.rs;
+	}
 
     data: {props?: {}};
     getProp(prop: string): object {
@@ -1358,7 +1394,7 @@ export class AnDatasetResp extends AnsonResp {
 	}
 
 	Rs(rx = 0) {
-		return this.rs[rx];
+		return this.rs? this.rs[rx] : undefined;
 	}
 }
 
@@ -1396,6 +1432,9 @@ export interface DatasetOpts {
 	onOk?: OnCommitOk;
 }
 
+/**
+ * @deprecated renamed as AnDatasetReq
+ */
 export class DatasetReq extends QueryReq {
     /**
      * @param opts this parameter should be refactored
@@ -1404,7 +1443,7 @@ export class DatasetReq extends QueryReq {
 
 		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
 
-		super(uri, Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf);
+		super({uri, mtabl: Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf});
 		this.type = "io.odysz.semantic.ext.AnDatasetReq";
 
 		this.uri = uri;
@@ -1507,6 +1546,122 @@ export class DatasetReq extends QueryReq {
         return this;
     }
 }
+
+export class AnDatasetReq extends QueryReq {
+	static __type__ = "io.odysz.semantic.ext.AnDatasetReq";
+
+    /**
+     * @param opts this parameter should be refactored
+     */
+    constructor(opts?: DatasetOpts ) {
+
+		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
+
+		super({uri, mtabl: Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf});
+		this.type = "io.odysz.semantic.ext.AnDatasetReq";
+
+		this.uri = uri;
+		this.sk = sk;
+		this.sqlArgs = sqlArgs;
+		this.rootId = rootId;
+
+		this.TA(t || a);
+		// this.checkt((t || a) as unknown as string);
+	}
+
+    maintbl: string;
+    alias: string;
+    pageInf: object;
+
+    sk: string;
+    sqlArgs: any[];
+    rootId: any;
+
+	get geTreeSemtcs() { return this.trSmtcs; }
+
+    /**Set tree semantics<br>
+     * You are recommended not to use this except your are the semantic-* developer.
+     * @param {TreeSemantics} semtcs */
+    treeSemtcs(semtcs: any): DatasetReq {
+		this.trSmtcs = semtcs;
+		return this;
+    }
+
+    trSmtcs: any;
+
+	/**Set t/a of message.
+	 * FIXME this is not a typed way
+	 *
+	 * @param ask
+	 * @returns
+	 */
+	TA(ask: string | {
+			/** load dataset configured and format into tree with semantics defined by sk. */
+			sqltree: string;
+			/** Reformat the tree structure - reformat the 'fullpath', from the root */
+			retree: string;
+			/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+			reforest: string;
+			/** Query with client provided QueryReq object, and format the result into tree. */
+			query: string;
+		}) {
+
+		if (typeof ask === 'string' && ask.length > 0 && ask === stree_t.sqltree) {
+			console.info('Since @anclient/semantier 0.9.98, A = stree_t.sqltree is deprecated and replaced with DatasetierREq.A.stree, ', DatasetierReq.A.stree);
+			this.a = DatasetierReq.A.stree;
+		}
+
+		if (typeof ask === 'string' && ask.length > 0 && ask !== DatasetierReq.A.stree) {
+			console.info('DatasetReq.a is ignored for sk is defined.', ask);
+			this.a = DatasetierReq.A.stree;
+		}
+		else {
+			this.a = ask as string;
+			// this.checkt(ask as string);
+		}
+		return this;
+	}
+
+    SqlArgs(args: any): AnDatasetReq {
+		return this.args(args);
+    }
+
+    /**@deprecated
+     * Handle differnet args */
+    args(args: any): AnDatasetReq {
+        if (this.sqlArgs === undefined){
+                this.sqlArgs = [];
+		}
+
+		if (typeof args === 'string' || Array.isArray(args)) {
+			this.sqlArgs = this.sqlArgs.concat(args);
+		}
+		else {
+			console.error('sql args is not an arry: ', args);
+			this.sqlArgs = this.sqlArgs.concat(args);
+		}
+		return this;
+    }
+
+    /**
+	 * @deprecated lagacy of without type checking 
+	 * 
+     * Check is t if port is stree can be undertood by s-tree.serv
+	 * 
+     * @param {string} t
+	 * @return this
+	 */
+    checkt(t: string): DatasetReq {
+		if (t !== undefined && !DatasetierReq.A.hasOwnProperty(t)) {
+			console.warn(
+				"DatasetReq.t won't be understood by server:", t, "\n 't (a)' should be one of Protocol.stree_t's key.",
+				Object.keys(stree_t));
+		}
+        return this;
+    }
+}
+// StreeTier will register this
+// Protocol.registerBody(AnDatasetReq.__type__, (json) => new AnDatasetReq(json));
 
 /**
  * @deprecated replaced by {@link DatasetierReq.A}

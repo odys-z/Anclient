@@ -6,9 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <Button
-        android:id="@+id/resetButton"
+        android:id="@+id/btn_login"
         android:text="@string/txt_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="60dp"
         android:onClick="onLogin" />
 </LinearLayout>

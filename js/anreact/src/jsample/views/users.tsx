@@ -370,9 +370,9 @@ export class UsersTier extends Semantier {
 			this.errCtx);
 	}
 
-	collectRelations(): DbRelations {
-		return {}; // user doesn't implys a relationship?
-	}
+	// collectRelations(): DbRelations {
+	// 	return {}; // user doesn't implys a relationship?
+	// }
 
 	/**
 	 * @param opts

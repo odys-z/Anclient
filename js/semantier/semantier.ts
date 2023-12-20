@@ -32,13 +32,16 @@ export type AnFieldValidator = ((
 	fld: TierCol,
 ) => InvalidClassNames );
 
-/**(Form) field formatter
+/**
+ * (Form) field formatter
  * E.g. TRecordForm will use this to format a field in form. see also {@link AnRowFormatter}
  *
  * F: field element type, e.g. JSX.Element
  * FO: options, e.g. {classes?: ClassNames, media?: Media}
+ * 
+ * @since 0.4.50, add colx, the column / field index in a row (a form).
  */
-export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, opts?: FO) => F);
+export type AnFieldFormatter<F, FO> = ((rec: Tierec, col: DbCol, colx: number, opts?: FO) => F);
 
 export type AnFieldValidation = {
 	notNull?: boolean | number,
@@ -62,13 +65,19 @@ export interface ErrorCtx {
  * Should be a valid HTML5 input type. (extended with enum, select)
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
  * 
- * - dynamic-cbb: column / cell is a combobox changing code/value options for each row.
+ * - dynamic-cbb : column / cell is a combobox changing code/value options for each row.
  * 
- * - icon-sum   : column / cell is formatted by hard coded formatters,
+ * - icon-sum      : column / cell is formatted by hard coded formatters,
  * 
  *		for anreact/src/react/widgets/tree-editor/TreeGallaryComp [columns], the cell is formatted by formatFolderIcons().
+ * 
+ * - button-swith: a button with a swith can disable it. This widget uses AnlistColAttrs.labels as lable,
+ *   where label in labels be showing is
+ *      labels [0]: swith true, [1] swith false, toggle true; [2] swith false, toggle false
  */
-export type ColType = 'formatter' | 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'iconame' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'icon-sum';
+export type ColType = 'autocbb' | 'cbb'  | 'formatter' | 'dynamic-cbb'   |
+		'text'   | 'iconame'    | 'date' | 'datetime'  | 'button-switch' |
+		'number' | 'float'      | 'bool' | 'actions'   | 'int' | 'icon-sum';
 
 export interface TierCol extends DbCol {
 	/**
@@ -104,7 +113,15 @@ export interface TierCol extends DbCol {
 */
 export interface AnlistColAttrs<F, FO> extends TierCol {
     /** Readable text (field name) */
-    label?: string;
+    label? : string;
+
+	/**
+	 * For widgets with states like TRecordForm swith-button field
+	 * labels [0]: swith false, [1] swith true, toggle flase; [2] swith true, toggle true
+	 * 
+	 * @see ColType."button-swith",
+	 */
+    labels?: string[];
 
     opts?: FO;
 
@@ -163,19 +180,6 @@ export interface TierComboField extends AnlistColAttrs<any, any> {
 	ref: any;
 }
 
-export interface Tierelations extends DbRelations {
-}
-
-/**
- * Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
- * 
- * @deprecated: Aug 21. 2023, not yet?
- */
-// export interface QueryConditions {
-// 	pageInf?: PageInf;
-// 	[q: string]: string | number | object | boolean;
-// }
-
 /**
  * Client side context for Anclient to work in.
  * Not the same as java Semantext.
@@ -225,7 +229,7 @@ export class Semantier {
     rec: Tierec | undefined;
 
     /** All sub table's relationships */
-    relMeta: {[tabl: string]: Tierelations};
+    relMeta: {[tabl: string]: DbRelations};
 
     /**
      *
@@ -240,7 +244,8 @@ export class Semantier {
 		this.rels = {};
     }
 
-    /** current relations - the last loaded relation of this.rel (problem?)
+    /**
+	 * Current relations - the last loaded relation of this.rel (problem?)
 	 *
 	 * Looks like all relationship records are item of main tree.
 	 */
@@ -257,14 +262,6 @@ export class Semantier {
 		this.uiHelper = context.uiHelper;
 		this.errCtx = context.error;
 		return this;
-	}
-
-	/**
-	 * @param field
-	 * @returns read only
-	*/
-	isReadonly(_field: TierCol) {
-		return false;
 	}
 
     client: SessionClient | Inseclient;
@@ -295,7 +292,7 @@ export class Semantier {
 			return true;
 
 		let valid = true;
-		fields.forEach( (f, x) => {
+		fields.forEach( (f, _x) => {
 			f.style = validField(rec, f);
 			valid &&= f.style === 'ok';
 		} );
@@ -342,12 +339,15 @@ export class Semantier {
 			return this._cols;
     }
 
-    /**Get form fields data specification
+    /**
+	 * Get a TRecordForm's field data specification
 	 *
-	 * Businsess semantics binding: If the loading with a record Id, the Id field will be disabled.
+	 * Businsess semantics binding: If loading with a record Id, the Id field will be disabled.
 	 *
-     * @param modifier {field: AnElemFormatter | object }
-	 * e.g. for anreact, object can be {gird, box, ...}.
+     * @param modifier {field: AnElemFormatter | object }, additional fields or callback function
+	 * e.g. for anreact, object can be {Bird, Box, ...}.
+	 * 
+	 * @since 0.9.99 FIXME: since this should be overriden in each tier, this modifier design doesn't make sense. 
      */
 	 fields (modifier?: {[x: string]: AnElemFormatter | object}): Array<TierCol> {
 		if (!this._fields)
@@ -374,6 +374,7 @@ export class Semantier {
 	 * @param client
 	 * @param opts
 	 * @param onOk
+	 * @deprecated since 0.9.99 replaced by {@link Stree.relations()}.
 	 */
     relations( client: SessionClient | Inseclient,
 		opts: { uri?: string;
@@ -386,7 +387,7 @@ export class Semantier {
 
 		// typically relationships are tree data
 		let { reltabl, sqlArgs, sqlArg } = opts;
-		let fkRel = this.relMeta[reltabl] as Tierelations;
+		let fkRel = this.relMeta[reltabl] as DbRelations;
 		// let { stree, fk, fullpath } = fkRel;
 		let stree = fkRel.stree;
 
@@ -414,17 +415,19 @@ export class Semantier {
 	/**
 	 * Load a jserv record.
 	 * @param conds
-	 * @param onLoad
+	 * @param _onLoad
 	 */
-    record(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
+    record(_conds: PageInf, _onLoad: OnLoadOk<Tierec>) : void {
+		console.warn('This method is supposed to be overriden by subclasses.');
     }
 
 	/** Load records of conditions.
 	 *
-	 * @param conds QueryConditions type is deprecated
-	 * @param onLoad
+	 * @param _conds QueryConditions type is deprecated
+	 * @param _onLoad
 	 */
-    records(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
+    records(_conds: PageInf, _onLoad: OnLoadOk<Tierec>) : void {
+		console.warn('This method is supposed to be overriden by subclasses.');
 	}
 
     /**
@@ -437,10 +440,15 @@ export class Semantier {
 	 * ( all semantics handling is planned to move to server side as possible ). 
 	 *
 	 * @param opts semantic options for saving a maintable record
+	 * - opts.clearelation: delete child relationships
 	 * @param onOk callback
 	 * @returns
 	 */
-    saveRec(opts: {crud: CRUD; disableForm?: boolean; disableRelations?: boolean, reltabl?: string}, onOk: OnCommitOk): void {
+    saveRec(opts: { crud: CRUD;disableForm?: boolean;
+					disableRelations?: boolean,
+					/** true for only clear al relations */
+					clearelation?: boolean,
+					reltabl?: string}, onOk: OnCommitOk): void {
 		if (!this.client) {
 			console.error("Saving with undefined AnClient. Ever called setContext(context) ?");
 			return;
@@ -456,12 +464,11 @@ export class Semantier {
 
 		let req: AnsonMsg<AnsonBody>;
 		if (!disableForm) {
-			// console.log(crud, CRUD.c);
 			if ( crud === CRUD.c ) {
-				req = this.client.userReq<UpdateReq>(uri, 'insert',
+				req = this.client.userReq<InsertReq>(uri, 'insert',
 							new InsertReq( uri, this.pkval.tabl )
 							.columns(this._fields)
-							.record(this.rec) );
+							.record(this.rec) as InsertReq );
 
 				// TODO to be verified
 				// Try figure out pk value - auto-key shouldn't have user fill in the value in a form
@@ -476,15 +483,13 @@ export class Semantier {
 		}
 
 		if (!disableRelations && !reltabl)
-			throw Error("Semantier can support on relationship table to mtabl. - this will be changed in the future.");
+			throw Error("Semantier can support only relationship table refering to mtabl. - this will be changed in the future.");
 
 		if (!disableRelations) {
 			if (crud === CRUD.c && !isEmpty(this.pkval?.v))
 				console.warn( "FIXME: empty pkval.v only suitable for auto-key. This change has a profound effection.",
 							  this.pkval);
-			req = this.formatRel<AnsonBody>(uri, req, this.relMeta[reltabl],
-						// crud === CRUD.c ? {pk: this.pkval.pk, v: undefined} : this.pkval);
-						this.pkval);
+			req = this.formatRel<AnsonBody>(client, uri, req, this.relMeta[reltabl], opts.clearelation, this.pkval);
 		}
 
 		if (req)
@@ -522,7 +527,7 @@ export class Semantier {
 
 			if (posts) {
 				let d = req.Body();
-				posts.forEach( (p, x) => {
+				posts.forEach( (p, _x) => {
 					d.post(p);
 				} );
 			}
@@ -539,16 +544,20 @@ export class Semantier {
     }
 
 	/**
-	 * Formatting relationship records - only relStree is supported
+	 * Formatting relationship records - only rel-stree is supported
 	 *
 	 * TODO change to static
-	 * @param uri
-	 * @param req
-	 * @param relation
+	 * 
+	 * @param uri 
+	 * @param req 
+	 * @param relation 
+	 * @param clearRels only for clear relations
 	 * @param parentpkv pk: field name, val: record id
 	 * @returns req with post updating semantics
 	 */
-	formatRel<T extends AnsonBody>(uri: string, req: AnsonMsg<T>, relation: Tierelations, parentpkv: PkVal ) : AnsonMsg<T> {
+	formatRel<T extends AnsonBody>(client: SessionClient, uri: string, req: AnsonMsg<T>,
+			relation: DbRelations, clearRels: boolean, parentpkv: PkVal) : AnsonMsg<T> {
+
 		if (relation.fk || relation.m2m)
 			throw Error('TODO ...');
 
@@ -560,7 +569,9 @@ export class Semantier {
 		// semantics handler can only resulve fk at inserting when master pk is auto-pk
 		columnMap[parentpkv.pk] = parentpkv.v;
 
-		let insRels = this.inserTreeChecked(
+		let insRels;
+		if (!clearRels)
+			insRels = Semantier.inserTreeChecked(
 				this.rels[rel.childTabl] as AnTreeNode[],
 				{ table: rel.childTabl,
 				  columnMap,
@@ -573,85 +584,90 @@ export class Semantier {
 			if (req)
 				req.Body().post(insRels);
 			else
-				req = this.client.userReq<InsertReq>(uri, 'insert', insRels) as unknown as AnsonMsg<T>;
+				req = client.userReq<InsertReq>(uri, 'insert', insRels) as unknown as AnsonMsg<T>;
 		}
 		else {
-			// e.g. delete from a_role_func where roleId = '003'
 			let del_rf = new DeleteReq(uri, rel.childTabl,
 							[rel.fk, str(parentpkv.v)])
-							.post(insRels);
+			if (!clearRels)
+				del_rf.post(insRels);
 
 			if (req)
 				req.Body().post(del_rf);
 			else
-				req = this.client.userReq(uri, 'update', del_rf) as unknown as AnsonMsg<T>;
+				req = client.userReq(uri, 'update', del_rf) as unknown as AnsonMsg<T>;
 		}
 		return req;
 	}
 
-	/**- todo move this to a semantics handler, e.g. shFK ?
+	/**
+	 * - todo move this to a semantics handler, e.g. shFK ?
 	 * @description Generate an insert request according to tree/forest checked items.
 	 * @param forest forest of tree nodes, the forest / tree data, tree node: {id, node}
 	 * @param opts options
 	 * - opts.table: relationship table name
-	 * - opts.columnMap: column's value to be inserted
+	 * - opts.columnMap: column's value to be inserted,
+	 *   e. g. {orgId: 'org'}, where org is the tree field in AnTreeNode.node, which is used for binding tree items.
 	 *
 	 * If the item has a same named property, the value is collected from the item;<br>
 	 * Otherwise the argument's value will be used.
 	 *
 	 * - opts.check: checking column name
-	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checed.
+	 * - opts.reshape: set middle tree node while traverse - check parent node if some children checked.
 	 * @return subclass of AnsonBody
 	 */
-	inserTreeChecked (forest: AnTreeNode[], opts: { table: string; columnMap: {}; check: string; reshape: boolean; }): InsertReq {
+	static inserTreeChecked (forest: AnTreeNode[], opts: {
+			table: string;
+			columnMap: {};
+			check: string; reshape: boolean; }): InsertReq {
 		let {table, columnMap, check, reshape} = opts;
-		reshape = reshape === undefined? true : reshape;
-
-		// FIXME shouldn't we map this at server side?
-		let dbCols = Object.keys(columnMap);
 
 		let ins = new InsertReq(null, table)
 			.A<InsertReq>(CRUD.c)
-			.columns(dbCols);
+			.columns(Object.keys(columnMap));
 
 		let rows = [];
 
-		collectTree(forest, rows);
+		Semantier.collectTree(forest, rows, columnMap, check, reshape);
 
 		ins.rows(rows);
 		return ins;
+	}
 
-		/**
-		 * Design Notes:
-		 * 
-		 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
-		 * 
-		 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
-		 * 
-		 * @param forest 
-		 * @param rows 
-		 * @returns 
-		 */
-		function collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>) {
-			let cnt = 0;
-			forest.forEach( (tree: AnTreeNode, _i: number) => {
-				if (tree && tree.node) {
-					if (tree.node.children && tree.node.children.length > 0) {
-						let childCnt = collectTree(tree.node.children, rows);
+	/**
+	 * Design Notes:
+	 * 
+	 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
+	 * 
+	 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
+	 * 
+	 * @param forest the UI tree object
+	 * @param rows records
+	 * @param colMap column names
+	 * @param checkcol column name for check box 
+	 * @param reshape check middle nodes if therei are children checked
+	 * @returns check count
+	 */
+	static collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>, colMap: {}, checkcol: string, reshape?: boolean) {
+		reshape = reshape === undefined? true : reshape;
+		let cnt = 0;
+		forest.forEach( (tree: AnTreeNode, _i: number) => {
+			if (tree && tree.node) {
+				if (tree.node.children && tree.node.children.length > 0) {
+					let childCnt = Semantier.collectTree(tree.node.children, rows, colMap, checkcol, reshape);
 
-						if (childCnt > 0 && reshape)
-							tree.node[check] = 1;
-						else if (childCnt === 0)
-							tree.node[check] = 0;
-					}
-					if ( toBool(tree.node[check]) ) {
-						rows.push(toNvRow(tree.node, dbCols, columnMap));
-						cnt++;
-					}
+					if (childCnt > 0 && reshape)
+						tree.node[checkcol] = 1;
+					else if (childCnt === 0)
+						tree.node[checkcol] = 0;
 				}
-			});
-			return cnt;
-		}
+				if ( toBool(tree.node[checkcol]) ) {
+					rows.push(toNvRow(tree.node, colMap));
+					cnt++;
+				}
+			}
+		});
+		return cnt;
 
 		/**
 		 * Convert tree item (AnTreeNode) to [name-value, ...] as a nv record (Array<{name, value}>),
@@ -670,11 +686,11 @@ export class Semantier {
 		 * @returns
 		 */
 		function toNvRow(node: AnTreeNode["node"],
-				  dbcols: string[], colMap: { [x: string]: any; })
+				colMap: { [x: string]: any; })
 				: Array<NameValue> {
 
 			let r = [];
-			dbcols.forEach( (col: string) => {
+			Object.keys(colMap).forEach( (col: string) => {
 				let mapto = colMap[col];
 				if (node.hasOwnProperty(mapto))
 					// e.g. roleName: 'text'
@@ -720,6 +736,7 @@ export class Semantier {
 			compont.setState({stree: resp.Body().forest});
 	}</pre>
 	 * @since 0.9.86 opts.port can be overriden, with which user can modify s-tree service at server side.
+	 * @deprecated since 0.9.99, this method is planned to be replaced by StreeTier.stree().
 	 * @param opts dataset info {sk, sqlArgs, onOk, port}
 	 * where port is using s-tree if undefined.
 	 * @param client

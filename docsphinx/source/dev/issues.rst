@@ -453,10 +453,21 @@ located in jar:tika-core-2.8.0.jar!tika-externals.xml
     </external-parsers>
 ..
 
-The constructor of CompositeExternalParser as configured above using a factory to
-check and load the parser, which actually using java runtime.exec() to call the
+The constructor of CompositeExternalParser as configured above uses a factory to
+check and load the parser, which is actually using java runtime.exec() to call the
 configured commands, with org.apache.tika.parser.external.ExternalParsersConfigReader
 parsing the xml file.
+
+::
+    TikaConfig.init() ->
+        XmlLoader.loadOverAll() -> loadOne() ->
+            ParserXmlLoader.createComposit() ->
+                ...
+                new CompositeExternalParser() ->
+                    ExternalParsersFactory.create() ->
+                        ExternalParsersConfigReader.read(element) -> // element: xml/external-parsers
+                            ExternalParsersConfigReader.readCheckTagAndCheck() ->
+                                ExternalParser.check()
 
 The check commands is run at loading,
 
@@ -502,7 +513,7 @@ The check commands is run at loading,
     }
 ..
 
-The parse command is called by user,
+The parsing command is called by user,
 
 .. code-block:: java
 
@@ -516,3 +527,24 @@ The parse command is called by user,
         }
     }
 ..
+
+Load exiftool in Windows 
+________________________
+
+The problem is the checking and running command connfigured in package org.apache.tika.parser.external,
+in tika-external-parsers.xml, won't work in Windows.
+
+The jserv-album way
++++++++++++++++++++
+
+Replace ExternalParsersFactory.create():
+
+.. java-code::
+
+    if (windows) {
+        filepath = new File(filepath).getAbsolutePath();
+        return create(new File(filepath).toURI().toURL());
+    }
+..
+
+The give user a chance to configure the file.

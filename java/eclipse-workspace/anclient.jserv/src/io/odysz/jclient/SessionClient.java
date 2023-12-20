@@ -299,7 +299,7 @@ public class SessionClient {
 		return this;
 	}
 
-	/**@deprecated This is an asynchronous API but works synchronously.
+	/* NOTE: This is an asynchronous API but works synchronously.
 	 * The {@link ErrorCtx} API pattern is better.
 	 * @see HttpServClient#post(String, AnsonMsg)
 	 * @see #commit(AnsonMsg, ErrorCtx)
@@ -338,6 +338,7 @@ public class SessionClient {
   				});
 	}
 	 */
+
 	//
 
 	/**

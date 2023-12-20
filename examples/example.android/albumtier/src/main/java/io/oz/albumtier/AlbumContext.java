@@ -55,8 +55,8 @@ public class AlbumContext {
 
     public boolean needSetup() {
         return LangExt.isblank(jserv, "/", ".", "http://", "https://")
-                || LangExt.isblank(photoUser.device, "/", ".")
-                || LangExt.isblank(photoUser.uid());
+                || LangExt.isblank(userInf.device, "/", ".")
+                || LangExt.isblank(userInf.uid());
     }
 
     String jserv;
@@ -64,7 +64,7 @@ public class AlbumContext {
     @SuppressWarnings("deprecation")
 	public PhotoSyntier tier;
 
-    public SessionInf photoUser;
+    public SessionInf userInf;
 
     ConnState state;
     public ConnState state() { return state; }
@@ -100,8 +100,8 @@ public class AlbumContext {
         photoUser.device = device;
         */
         profiles = new Profiles(family);
-        photoUser = new SessionInf(null, uid);
-        photoUser.device = device;
+        userInf = new SessionInf(null, uid);
+        userInf.device = device;
         this.jserv = jserv;
 
         Clients.init(jserv + "/" + jdocbase, verbose);
@@ -125,13 +125,15 @@ public class AlbumContext {
 	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
 
-        if (LangExt.isblank(photoUser.device, "\\.", "/", "\\?", ":"))
+    	/* 0.3.0 allowed
+        if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
+        */
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 
-        tier = (PhotoSyntier) new PhotoSyntier(clientUri, photoUser.device, errCtx)
-				.asyLogin(uid, pswd, photoUser.device,
+        tier = (PhotoSyntier) new PhotoSyntier(clientUri, userInf.device, errCtx)
+				.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;
 				    client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min (FIXME too long)
@@ -146,7 +148,7 @@ public class AlbumContext {
 
     public void login(Clients.OnLogin onOk, OnError onErr)
             throws GeneralSecurityException, SemanticException, AnsonException, IOException {
-        login(photoUser.uid(), pswd, onOk, onErr);
+        login(userInf.uid(), pswd, onOk, onErr);
     }
 
     OnOk onHeartbeat = ((resp) -> {

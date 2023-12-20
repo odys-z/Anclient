@@ -65,8 +65,9 @@ class AnClient {
 				+ Protocol.Port[port];
 		else {
 			ulr = `${this.cfg.defaultServ}/${port}`;
-			console.error("The url for the named port is probably not resolved. Call Anclient.understandPorts() or AnReactExt.extendPorts().",
-					"prot: ", port, "url", ulr);
+			console.error("The url for the named port is probably not resolved.\nCall Anclient.understandPorts() or AnReactExt.extendPorts().",
+					`\nFor AnReact, set context.anReact = new AnReactExt(client, err_ctx).extendPorts({ ${port}: "url-pattern" })`,
+					"\nprot: ", port, "\nurl", ulr);
 		}
 
 		return ulr;
@@ -230,11 +231,21 @@ class AnClient {
 			error: function (resp: any) {
 				if (typeof onErr === "function" || onErr && typeof onErr.onError === 'function') {
 					if (resp.statusText) {
-						resp.code = Protocol.MsgCode.exIo;
-						resp.body = [ {
-								type: 'io.odysz.semantic.jprotocol.AnsonResp',
-								m: `Network failed: ${url}`
-							} ];
+						if (/Parse.*|parse.*/.test(resp.statusText)) {
+							console.error("Parse error (check network results for escaped characters):", resp.responseText);
+							resp.code = Protocol.MsgCode.exGeneral;
+							resp.body = [ {
+									type: 'io.odysz.semantic.jprotocol.AnsonResp',
+									m: `Json block parsing error: ${resp.statusText}`
+								} ];
+						}
+						else {
+							resp.code = Protocol.MsgCode.exIo;
+							resp.body = [ {
+									type: 'io.odysz.semantic.jprotocol.AnsonResp',
+									m: `Network failed: ${url}`
+								} ];
+						}
 						let ansonResp = new AnsonMsg<AnsonResp>(resp);
 						if (typeof onErr.onError === 'function') {
 							onErr.msg = ansonResp.Body().msg();
@@ -585,7 +596,7 @@ class SessionClient {
 	/**
 	 * create a query message.
 	 * @param uri component uri
-	 * @param maintbl target table
+	 * @param mtabl target table
 	 * @param alias target table alias
 	 * @param pageInf<br>
 	 * page: page index, -1 for no paging<br>
@@ -594,9 +605,9 @@ class SessionClient {
 	 * {func, cate, cmd, remarks};
 	 * @return the request message
 	 */
-	query ( uri: string, maintbl: string, alias: string, pageInf?: PageInf,
+	query ( uri: string, mtabl: string, alias: string, pageInf?: PageInf,
 			act?: {func: string, cate: string, cmd: string, remarks: string} ) : AnsonMsg<QueryReq> {
-		let qryItem = new QueryReq(uri, maintbl, alias, pageInf);
+		let qryItem = new QueryReq({ uri, mtabl, mAlias: alias, pageInf});
 
 		if (typeof act === 'object') {
 			this.usrAct(act.func, act.cate, act.cmd, act.remarks);

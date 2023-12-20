@@ -11,9 +11,11 @@ import { pdf } from "./pdf";
 import { txt } from "./txt";
 import { unknown } from "./unknown";
 import { toggle } from "./toggle";
+import { audio } from "./audio";
+import { userCheck } from "./user-check";
 
 const knownBlobs = {
-    image: img, video: video,
+    image: img, video: video, audio,
     '.txt': txt, '.csv': txt,
     '.doc': docx, '.docx': docx, '.ppt': ppt, '.pptx': ppt, '.xlsx': xls, '.xls': xls,
     '.zip': z7,
@@ -26,6 +28,9 @@ export class DocIcon {
 
     constructor() {
         this.typeParser = this.typeParser.bind(this);
+
+        this.buf.toggle = new Blob([toggle], {type: 'image/svg+xml'});
+        this.buf.userCheck = new Blob([userCheck], {type: 'image/svg+xml'});
     }
 
     typeParser(col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts) {
@@ -38,12 +43,29 @@ export class DocIcon {
         if (!this.buf.hasOwnProperty(src))
             this.buf[src] = svgImgSrc(t);
 
-        return (<img className={opts?.classes?.icon} src={this.buf[src]}></img>);
+        return (<img key={n.id+mime} className={opts?.classes?.icon} src={this.buf[src]}></img>);
     }
 
+    /**
+     * @deprecated
+     * @param opts
+     * @returns 
+     */
     toggleButton(opts: {classes?: ClassNames, media?: Media} = {}) {
         if (!this.buf.toggle)
             this.buf.toggle = new Blob([toggle], {type: 'image/svg+xml'});
         return (<img className={opts.classes?.toggle} src={URL.createObjectURL(this.buf.toggle)}></img>);
+    }
+
+    /**
+     * @deprecated
+     * @param name 
+     * @param opts 
+     * @returns 
+     */
+    svgIcon(name: 'toggle' | 'userCheck', opts: {classes?: ClassNames, media?: Media} = {}) {
+        return (<img className={opts.classes ? opts.classes[name] : undefined}
+                     src={URL.createObjectURL(this.buf[name])}>
+                </img>);
     }
 }

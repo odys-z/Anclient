@@ -3,15 +3,19 @@ package io.odysz.jclient;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
+import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
+import io.odysz.semantic.jserv.echo.EchoReq;
+import io.odysz.semantic.jserv.echo.EchoReq.A;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
@@ -157,4 +161,27 @@ public class Clients {
 	}
 	*/
 
+	/**
+	 * Ping port echo without session.
+	 * @param funcUri
+	 * @param errCtx 
+	 * @return echo message
+	 * @throws IOException 
+	 * @throws AnsonException 
+	 * @throws SemanticException 
+	 * @since 0.4.35
+	 */
+	public static AnsonResp pingLess(String funcUri, OnError errCtx)
+			throws SemanticException, AnsonException, IOException {
+		EchoReq req = new EchoReq(null);
+		req.a(A.echo);
+
+		InsecureClient client = new InsecureClient();
+		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
+
+		Anson.verbose = true;
+		AnsonResp resp = client.commit(jmsg, errCtx);
+
+		return resp;
+	}
 }

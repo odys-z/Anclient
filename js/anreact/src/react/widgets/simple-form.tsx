@@ -278,7 +278,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 		if (f.type === 'cbb') {
 			let that = this;
-			let fd = f as TierComboField<JSX.Element, CompOpts>;
+			let fd = f as TierComboField;
 			return (<DatasetCombo uri={this.props.uri} crud={CRUD.r}
 				options={fd.options} val={rec[fd.field]}
 				label={f.label} style={fd.style}

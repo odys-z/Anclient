@@ -6,7 +6,7 @@ import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 	SessionClient, AnDatasetResp, size } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonServs, Login, CrudComp, AnTreegrid, AnTreegridCol,
-	ClassNames, Media, regex, GalleryView, PdfViewer} from '../../../src/an-components';
+	Comprops, regex, GalleryView, PdfViewer} from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 
 const { JsampleTheme } = jsample;
@@ -233,7 +233,7 @@ class Widgets extends React.Component<LessProps> {
 		this.onErrorClose();
 	}
 
-	typeParser(c: AnTreegridCol, n: AnTreeNode, opt: {classes: ClassNames, media: Media}) {
+	typeParser(c: AnTreegridCol, n: AnTreeNode, opt: Comprops) {
 		if (n.node.children?.length as number > 0) return <></>;
 
 		else {
@@ -247,7 +247,7 @@ class Widgets extends React.Component<LessProps> {
 		if (size(ids) > 0) {
 			let fid = ids.keys().next().value;
 			let file = ids.get(fid);
-			let t = regex.mime2type(file.node.mime);
+			let t = regex.mime2type(file.node.mime as string);
 			if (t === '.pdf') {
 				console.log(fid);
 				this.pdfview = (<PdfViewer
@@ -330,7 +330,7 @@ class Widgets extends React.Component<LessProps> {
 	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
 		let portal = opts.portal ?? 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
-		AnReactExt.bindDom(elem, opts, onJsonServ);
+		AnReactExt.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
 			let dom = document.getElementById(elem);

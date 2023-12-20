@@ -84,7 +84,9 @@ class WelcomeComp extends CrudComp<Comprops>{
 				<Box component='span' className={this.classes.cardText} >
 					<span>From:<br/></span>
 					{this.icon(e)}
-					<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
+					<Link style={{ marginLeft: 4 }}
+						target='_blank'
+						href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
 						{`${e.publisher || 'Anbox Robot'}`}</Link>
 				</Box>
 			</Paper>

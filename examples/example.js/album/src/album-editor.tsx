@@ -7,7 +7,7 @@ import { L, Langstrs,
 	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
 	AnTreeditor, Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
-import { AlbumEditier } from './album-editier';
+import { AlbumEditier } from './tiers/album-tier';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -40,7 +40,6 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
  
 	detailForm = undefined;
 
-	// AnElemFormatter | undefined;
 	preview = (_col: any, rec: any) => {
 		return <></>;
 	};
@@ -104,11 +103,8 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 		  <AnTreeditor {... this.props}
 			pk={'pid'}
 			sk={Protocol.sk.collectree} tnode={this.tier.root()}
-			onSelectChange={ids => undefined}
+			onSelectChange={undefined}
 			uri={this.uri} mtabl='ind_emotion'
-			// pk={{ type: 'text', field: 'indId', label: L('Indicator Id'), hide: 1, validator: {len: 12} }}
-			// parent={{ type: 'text', field: 'parent', label: L('Album'), hide: 1, validator: {len: 12} }}
-			// parent={ undefined }
 			columns={[
 				{ type: 'text', field: 'share', label: L('Share'),
 					grid: {xs: 6, sm: 6} },
@@ -121,12 +117,12 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			isMidNode={(n: { rowtype: string; }) => n.rowtype === 'cate' || !n.rowtype}
 			editForm={this.detailForm}
 		  />
-		  {this.confirm}
+		  { this.confirm }
 
-		  {this.hasError &&
+		  { this.hasError &&
 			<AnError onClose={this.onErrorClose} fullScreen={false}
-				uri={"/login"} tier={undefined}
-				title={L('Error')} msg={this.error.msg || ''} />}
+				tier={undefined}
+				title={L('Error')} msg={this.error.msg || ''} /> }
 		  </AnContext.Provider>
 		);
 	}
@@ -153,6 +149,4 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			  />, dom);
 		}
 	}
-
-
 }

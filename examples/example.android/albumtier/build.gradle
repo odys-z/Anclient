@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdk 30
+    compileSdk 31
 
     defaultConfig {
         minSdk 26
@@ -35,7 +35,7 @@ dependencies {
 //        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
 //    }
     implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver")
-    implementation (group: 'io.github.odys-z', name: 'album-lib', version: "${album_lib_ver}")
+    implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver")
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

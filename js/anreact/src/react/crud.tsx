@@ -50,7 +50,7 @@ class CrudComp<T extends Comprops> extends React.Component<T> {
 	}
 
 	render() {
-		return (<>CrudComp</>);
+		return (<>CrudComp: {this.uri}</>);
 	}
 }
 CrudComp.contextType = AnContext;

@@ -108,7 +108,7 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
         notifyDataSetChanged();
 
         synchPage = new PathsPage(0, Math.min(20, mList.size()));
-        synchPage.device = singleton.photoUser.device;
+        synchPage.device = singleton.userInf.device;
 
         try {
             mContext.onStartingJserv(0, 1);

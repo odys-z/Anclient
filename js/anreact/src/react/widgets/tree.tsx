@@ -1,5 +1,6 @@
 import React from "react";
 import { Theme, withStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth/withWidth";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
@@ -15,7 +16,7 @@ import Wallpaper from '@material-ui/icons/Wallpaper';
 import MovieRounded from '@material-ui/icons/MovieRounded';
 import FavoriteBorderOutlined from '@material-ui/icons/FavoriteBorderOutlined';
 
-import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentIconame, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
+import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentName, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
 import { Comprops, CrudCompW } from "../crud";
 import { ClassNames, CompOpts, Media } from "../anreact";
 import { AnTablistProps } from "./table-list";
@@ -160,7 +161,7 @@ const styles = (_theme: Theme) => ({
 /**
  * NOTE: Not used by AnTreeComp yet within 0.4.27 
  * 
- * @see {@link IndentIconame}
+ * @see {@link IndentName}
  * @param iconNames 
  * @param lvlIcons 
  * @param itemIcon 
@@ -169,22 +170,18 @@ const styles = (_theme: Theme) => ({
  * @param expand 
  * @returns indent fragment
  */
-function levelIcons(iconNames: IndentIcons, lvls: IndentIconame[]) {
+function levelIcons(iconNames: IndentIcons, lvls: IndentName[]) {
     return (<React.Fragment >
             {lvls && lvls.map( (i, x) => icon(iconNames, i, x) )}
         </React.Fragment>);
 }
 
-function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentIconame, k: string | number, classes?: string) {
+function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentName, k: string | number, classes?: string) {
     let icon = AnTreeIcons[(iconNames || defltIcons)[name || 'deflt']]
             || AnTreeIcons[name]; // extend to all supported icons
     if (!icon)
         console.error(`Icon name, ${name}, is not one of supported names.`, defltIcons);
 
-	// icon 'pic-lib' is not exists
-	// if (!name)
-	//	return <div style={{paddingLeft: "8px"}}>{React.cloneElement(icon, {key:k})}</div>;
-	
 	if (classes)
 		return (<div className={classes}>{React.cloneElement(icon, {key:k})}</div>);
 	else
@@ -196,7 +193,14 @@ interface AnTreegridCol extends AnlistColAttrs<JSX.Element, CompOpts> {
 	 * Overide AnTablistProps#formatter
 	 * Formatt a tree item cell/grid from col and node.
 	 */
-	colFormatter?: (col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts) => JSX.Element;
+	colFormatter?: (col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts & {
+		// classes?: ClassNames, media?: Media,
+		/**
+		 * Column index while rendering.
+		 * React children can use this to generati key
+		 */
+		colx: number
+	}) => JSX.Element;
 
 	thFormatter?: (col: AnTreegridCol, colx: number, opts?: CompOpts) => JSX.Element;
 
@@ -373,6 +377,6 @@ class AnTreeComp extends CrudCompW<Comprops> {
   }
 }
 
-const AnTree = withStyles(styles)(AnTreeComp);
+const AnTree = withStyles<any, any, Comprops>(styles)(withWidth()(AnTreeComp));
 export { levelIcons, icon, TreeNodeVisual, AnTreegridCol,
 		TreegridProps as TreeItemProps, AnreactreeItem, AnTree, AnTreeComp }

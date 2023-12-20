@@ -10,19 +10,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import io.oz.R;
 import io.oz.album.AndErrorCtx;
 import io.oz.album.AssetHelper;
+import io.oz.album.WelcomeAct;
 import io.oz.albumtier.AlbumContext;
 
 public class WebAlbumAct extends AppCompatActivity {
 
-	public static final String Help_ActionName = "WebAction";
-
-	protected static final VWebAlbum webView = new VWebAlbum();
+	public static final String Web_PageName = "WebAction";
 
 	/** Landing uril such as error page, e.g. http://odys-z.github.io/Anclient */
 	static String url_landing;
 
 	AlbumContext singleton;
 	AndErrorCtx errCtx;
+	int webpageId;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,12 +34,20 @@ public class WebAlbumAct extends AppCompatActivity {
 		url_landing = getString(R.string.url_landing);
 
 		Intent intt = getIntent();
-		int act = intt.getIntExtra(Help_ActionName, AssetHelper.Act_Landing);
+		webpageId = intt.getIntExtra(Web_PageName, AssetHelper.Act_Landing);
 
 		WebView wv = findViewById(R.id.wv);
 		wv.getSettings().setJavaScriptEnabled(true);
 		wv.setWebViewClient(new WebViewClient() {
 		});
-		wv.loadUrl(AssetHelper.url4intent(this, act));
+		wv.loadUrl(AssetHelper.url4intent(this, webpageId));
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		WebView wv = findViewById(R.id.wv);
+		WelcomeAct.reloadWeb(singleton, wv, this, webpageId);
 	}
 }
