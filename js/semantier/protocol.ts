@@ -83,6 +83,12 @@ export class PageInf {
 					rec[nv[0]] = nv[1];
 		return Object.assign(rec, this.mapCondts);
 	}
+
+	addCondt(name: string, val: AnsonValue) {
+		if (!this.mapCondts) this.mapCondts = {};
+		this.mapCondts[name] = val;
+		return this;
+	}
 }
 
 export type AnsonValue = string | object | string | number | boolean | undefined | null;
@@ -1720,6 +1726,23 @@ export class DatasetierResp extends AnsonResp {
 }
 Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json));
 
+export class DocsResp extends AnsonResp {
+	static __type__ = 'io.odysz.semantic.tier.docs.DocsResp';
+
+	collectId: string;
+	doc: object;
+	device: string;
+
+	constructor(dsJson: any) {
+		super(dsJson);
+		this.type      = DocsResp.__type__;
+		this.collectId = dsJson.collectId;
+		this.doc       = dsJson.doc;
+		this.device    = dsJson.device;
+	}
+}
+Protocol.registerBody(DocsResp.__type__, (json) => new DocsResp(json));
+
 export class DocsReq extends AnsonBody {
 	static __type__ = 'io.odysz.semantic.tier.docs.DocsReq';
 
@@ -1737,6 +1760,7 @@ export class DocsReq extends AnsonBody {
 	mime: string;
 	uri64: string;
 	deletings: string[];
+	subfolder: string;
 
 	/**
 	 *

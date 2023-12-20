@@ -374,7 +374,7 @@ export class Semantier {
 	 * @param client
 	 * @param opts
 	 * @param onOk
-	 * @deprecated since 0.9.99 replaced by {@link Stree.relations()}.
+	 * @deprecated since 0.9.99 replaced by {@link StreeTier.relations()}.
 	 */
     relations( client: SessionClient | Inseclient,
 		opts: { uri?: string;
@@ -648,7 +648,7 @@ export class Semantier {
 	 * @param reshape check middle nodes if therei are children checked
 	 * @returns check count
 	 */
-	static collectTree(forest: AnTreeNode[], rows: Array<NameValue[]>, colMap: {}, checkcol: string, reshape?: boolean) {
+	static collectTree(forest: AnTreeNode[], rows: Array<NV[]>, colMap: {}, checkcol: string, reshape?: boolean) {
 		reshape = reshape === undefined? true : reshape;
 		let cnt = 0;
 		forest.forEach( (tree: AnTreeNode, _i: number) => {
@@ -687,7 +687,7 @@ export class Semantier {
 		 */
 		function toNvRow(node: AnTreeNode["node"],
 				colMap: { [x: string]: any; })
-				: Array<NameValue> {
+				: Array<NV> {
 
 			let r = [];
 			Object.keys(colMap).forEach( (col: string) => {

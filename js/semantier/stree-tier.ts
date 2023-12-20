@@ -123,10 +123,11 @@ export class StreeTier extends Semantier {
      * 
 	 * @since 0.9.98, this method visit 'stree' port with AnDatasetReq as defualt tree loading.
 	 * @since 0.9.99, this mehtod is planned to replace {@link Semantier.stree()}
+	 * @since 0.9.102, opts.A can be used to override default DatasetierReq.A.stree
      * @param opts 
      * @param comp 
      */
-	stree(opts: DatasetOpts & {act?: LogAct, uri?: string, page?: PageInf}, errCtx: ErrorCtx): void {
+	stree(opts: DatasetOpts & {act?: LogAct, uri?: string, page?: PageInf, A?: string}, errCtx: ErrorCtx): void {
         opts.port = opts.port || this.port;
 
         if (!opts.onOk)
@@ -139,7 +140,7 @@ export class StreeTier extends Semantier {
         if (!(this.client instanceof SessionClient))
             throw Error('Needing a intance of AnClient.');
 
-		let reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
+		let reqbody = StreeTier.reqFactories[opts.port](opts).A(opts.A || DatasetierReq.A.stree);
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
@@ -118,7 +117,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		this.tier.relations((this.context as AnContextType).anClient,
 			{ uri    : this.props.uri,
 			  reltabl: this.props.reltabl,
-			  sqlArgs: [str(this.tier.pkval.v)],
+			  sqlArgs: Array.isArray(this.props.sqlArgs) ? this.props.sqlArgs : [str(this.tier.pkval.v)],
 			  ok     : (rels: AnsonMsg<AnDatasetResp>) => { that.setState({}); }
 			});
 	}

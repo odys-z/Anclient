@@ -84,17 +84,19 @@ export class AlbumReq extends DocsReq {
 	static __type__ = 'io.oz.album.tier.AlbumReq';
 
 	static A = {
- 		stree: DatasetierReq.A.stree,
-		records: 'r/collects',
-		collect: 'r/photos',
-		rec: 'r/photo',
+ 		stree   : DatasetierReq.A.stree,
+		records : 'r/collects',
+		collect : 'r/photos',
+		rec     : 'r/photo',
+		folder  : 'r/folder',
 		download: 'r/download',
-		update: 'u',
-		insert: 'c',
-		upload: 'c/doc',
-		del: 'd',
+		update  : 'u',
+		insert  : 'c',
+		upload  : 'c/doc',
+		del     : 'd',
 
 		shareRelation : 'r/share-relat',
+		folderel      : 'r/rel-folder-org',
 		updateFolderel: 'u/folder-rel',
 	};
 
@@ -105,7 +107,6 @@ export class AlbumReq extends DocsReq {
 	sk        : string;
 	clearels? : boolean;
 	checkRels?: Array<NV[]>;
-	sharefolder : string;
 
 	constructor (opt: {uri?: string, page?: AlbumPage, sk?: string}) {
 		super(opt.uri, {docId: ''});
@@ -127,9 +128,15 @@ export class AlbumReq extends DocsReq {
 		return this;
 	}
 	
-	shareFolder(rows: Array<NV[]>, folder: string) {
+	/**
+	 * 
+	 * @param rows relation table records
+	 * @param folder the current folder to update checked rows (of child relation table)
+	 * @returns this
+	 */
+	shareTree(rows: Array<NV[]>, folder) {
 		this.checkRels = rows;
-		this.sharefolder = folder;
+		this.subfolder = folder;
 		return this;
 	}
 }
