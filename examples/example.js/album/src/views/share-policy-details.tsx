@@ -187,7 +187,7 @@ class SharePolicyDetailsComp extends DetailFormW<Comprops & {tier: AlbumEditier,
 				  <AnRelationTree uri={this.props.uri}
 				    // onFolderChange={(n: AnTreeNode, check: boolean) => {this.state.chkFolder = check ? n.nodeId as string : undefined;}}
 					relMeta={{ h_photo_org: {
-                        stree: {sk: this.props.recType === 'folder' ?
+                        stree: {sk: this.props.rectype === 'folder' ?
 									Protocol.sk.rel_folder_org : Protocol.sk.rel_photo_org,
 								fk: 'pid',  colProp: 'nodeId',
 								col: 'oid', childTabl : 'h_photo_org',
