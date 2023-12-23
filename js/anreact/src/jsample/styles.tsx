@@ -80,7 +80,7 @@ JsampleTheme.typography.body2 = {
   fontSize: 16,
 };
 
-export const jstyles = (theme) => ({
+export const jstyles = (_theme) => ({
 	"field1": { width: 80 },
 	"field2": { width: 120 }
 });

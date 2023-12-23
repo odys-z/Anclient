@@ -371,7 +371,7 @@ export class UsersTier extends Semantier {
 	}
 
 	collectRelations(): DbRelations {
-		return {}; // user doesn't implys a relationship?
+		return {} as DbRelations; // user doesn't implys a relationship?
 	}
 
 	/**
