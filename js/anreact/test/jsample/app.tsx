@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, ErrorCtx, SessionInf,
+import { Protocol, SessionClient, ErrorCtx,
 	AnsonMsg, AnsonResp
 } from '@anclient/semantier';
 

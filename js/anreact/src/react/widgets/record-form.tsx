@@ -11,7 +11,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnlistColAttrs, PageInf, Semantier, TierComboField, Tierec, str_, toBool } from '@anclient/semantier';
+import { AnlistColAttrs, PageInf, Semantier, TierCol, TierComboField, Tierec, str_, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { Comprops, CrudCompW } from '../crud';
 import { DatasetCombo } from './dataset-combo';
@@ -49,7 +49,7 @@ export interface RecordFormProps extends Comprops {
 	/**Default: true */
 	enableValidate? : boolean,
 	tier            : Semantier,
-	fields          : Array<AnlistColAttrs<any, Comprops> & {readOnly?: boolean}>
+	fields          : Array<TierCol & {readOnly?: boolean}>
 
 	onSwitchChange? : (r: Tierec, f: AnlistColAttrs<any, CompOpts>, switchState: boolean) => void,
 	onToggle?       : (r: Tierec, f: AnlistColAttrs<any, CompOpts>, switchState: boolean, toggleState: boolean) => void
