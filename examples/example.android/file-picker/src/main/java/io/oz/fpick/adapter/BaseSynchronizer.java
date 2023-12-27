@@ -152,7 +152,7 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
                     f.syncFlag = isblank(inf[0]) ? SyncDoc.SyncFlag.hub : inf[0];
 
-                    f.shareflag = inf[1];
+                    f.shareFlag = inf[1];
                     f.shareby = inf[2];
                     f.sharedate(inf[3]);
                 }

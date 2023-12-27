@@ -61,6 +61,7 @@ import java.util.Objects;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
+import io.odysz.jclient.Clients;
 import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
@@ -124,7 +125,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         String homepage = sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing));
 
         singl.init(homeName, uid, device, jserv);
-        AssetHelper.init(this, jserv, homepage);
+        AssetHelper.init(this, jserv);
+        AssetHelper.webroot(homepage);
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
@@ -163,8 +165,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     AssetHelper.init(this,
-                            sharedPref.getString(AlbumApp.keys.jserv, ""),
-                            sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
+                            sharedPref.getString(AlbumApp.keys.jserv, "")
+                            // sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
+                    );
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         showMsg(R.string.msg_device_uid, uid, device);
                     }
@@ -176,11 +179,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> reloadAlbum() );
 
-//        if (webAdminStarter == null)
-//            webAdminStarter = registerForActivityResult(
-//                    new ActivityResultContracts.StartActivityForResult(),
-//                    result -> reloadAlbum() );
-
         try {
             if (singl.needSetup())
                 // settings are cleared
@@ -190,9 +188,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 singl.pswd(pswd)
                     .login((client) -> {
                         AssetHelper.init(this,
-                                 sharedPref.getString(AlbumApp.keys.jserv, ""),
-                                 sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
-                        // All WebView methods must be called on the same thread.
+                                sharedPref.getString(AlbumApp.keys.jserv, "")
+                                // sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing))
+                                );
+                                // All WebView methods must be called on the same thread.
                         runOnUiThread( () -> reloadAlbum() );
                     },
                     (c, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv()));
@@ -303,14 +302,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         runOnUiThread(() -> msgv.setVisibility(View.GONE));
     }
 
-    void showProgress(int listIx, ArrayList<BaseFile> list, int blocks, DocsResp resp) {
-        runOnUiThread(() -> {
-            String msg = String.format(getString(R.string.msg_templ_progress),
-                    listIx, list.size(), resp.doc.clientname(), (float) resp.blockSeq() / blocks * 100);
-            msgv.setText(msg);
-            msgv.setVisibility(View.VISIBLE);
-        });
-    }
+//    void showProgress(int listIx, ArrayList<BaseFile> list, int blocks, DocsResp resp) {
+//        runOnUiThread(() -> {
+//            String msg = String.format(getString(R.string.msg_templ_progress),
+//                    listIx, list.size(), resp.doc.clientname(), (float) resp.blockSeq() / blocks * 100);
+//            msgv.setText(msg);
+//            msgv.setVisibility(View.VISIBLE);
+//        });
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

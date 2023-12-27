@@ -190,8 +190,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         singleton.policies = new Plicies(prf);
 
                         // update summery?
-                        SharedPreferences sharedPref =
-                                PreferenceManager.getDefaultSharedPreferences(this);
+                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString(keys.home, prf.home);
                         editor.putString(keys.homepage, prf.webroot);
@@ -216,7 +215,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             errorDlg(String.format("Code: %s\n%s", c, String.format(t, args == null ? null : args)), 5000);
 
     /**
-     * Deep write preference: device
+     * when succeed, deep write preference: device
      * @param btn
      */
     public void onRegisterDevice(View btn) {
@@ -233,12 +232,17 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             }
 
             // write through
-            singleton.tier.asyRegisterDevice( buff_device, buff_devname,
+            singleton.tier.asyRegisterDevice(buff_device, buff_devname,
                 (resp) -> {
                     buff_device = ((DocsResp)resp).device().id;
                     singleton.userInf.device(buff_device);
 
                     runOnUiThread(()-> prefFragment.device.setEnabled(false));
+
+                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString(keys.device, buff_device);
+                    editor.apply();
                 });
         }
         else {

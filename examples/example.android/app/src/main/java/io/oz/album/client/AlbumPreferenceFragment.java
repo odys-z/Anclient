@@ -2,11 +2,14 @@ package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.isblank;
+import static io.oz.AlbumApp.keys;
 import static io.oz.album.client.PrefsContentActivity.buff_device;
 import static io.oz.album.client.PrefsContentActivity.buff_devname;
 import static io.oz.album.client.PrefsContentActivity.jsvEnts;
 import static io.oz.album.client.PrefsContentActivity.singleton;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 

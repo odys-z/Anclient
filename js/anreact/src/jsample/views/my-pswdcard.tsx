@@ -34,7 +34,7 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	tier: PswdTier;
 	confirm: JSX.Element;
 
-	constructor(props){
+	constructor(props: Comprops){
 		super(props)
 		this.uri = this.props.uri;
 
@@ -78,7 +78,7 @@ class MyPswdComp extends DetailFormW<Comprops> {
 	changePswd(e: React.MouseEvent<HTMLElement>) {
 		let that = this;
 		if (!this.tier.changePswd({uri: this.props.uri},
-			(resp) => { that.showConfirm(L('Password changed successfully!')); })) {
+			(resp: any) => { that.showConfirm(L('Password changed successfully!')); })) {
 			this.setState({});
 		}
 	}
@@ -124,9 +124,9 @@ class PswdTier extends MyInfTier {
 		  validator: {notNull: true} },
 		{ field: 'pswd2', type: 'password', label: L('Confirm New'),  grid: {md: 6, lg: 4},
 		  autocomplete: "on",
-		  validator: (v, rec, f) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ] as Array<any>;
+		  validator: (v: any, rec: { pswd1: any; }, f: any) => !!v && rec.pswd1 === v ? 'ok' : 'notNull' } ] as Array<any>;
 
-	changePswd(opts, onOk) {
+	changePswd(_opts: { uri: string; }, onOk: (resp: any) => void) {
 		if (!this.client) return;
 
 		let { pswd, pswd1 } = this.rec;

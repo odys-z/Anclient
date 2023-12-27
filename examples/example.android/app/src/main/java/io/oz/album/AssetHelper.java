@@ -18,6 +18,10 @@ public class AssetHelper {
     public static final String synchPage = "sync.html";
 
     static String jserv;
+
+    /**
+     * Inited by {@link #init(Context, String, String)}.
+     */
     static String homeroot;
 //    Context ctx;
 
@@ -32,11 +36,30 @@ public class AssetHelper {
     /** Act: show admin page */
     public static final int Act_Admin = 5;
 
-    public static void init(Context context, String jservroot, String webroot) {
+    /**
+     * Init {@link #jserv}
+     *
+     * @param context
+     * @param jservroot
+     */
+    public static void init(Context context, String jservroot) {
         jserv = jservroot;
-        homeroot = webroot;
+        // homeroot = webroot;
     }
 
+    public static void webroot(String url) {
+        homeroot = url;
+    }
+
+
+    /**
+     * Get web page url.
+     * @param ctx
+     * @param intent
+     * @return intent: return =<br>
+     * {@link #Act_Album}: {@link #homeroot},<br>
+     * {@link #Act_Admin}: {@link #adminHome}
+     */
     public static String url4intent(Context ctx, int intent) {
         switch (intent) {
             case Act_Album:

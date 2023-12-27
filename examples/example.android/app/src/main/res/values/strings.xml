@@ -48,7 +48,7 @@
     <string name="txt_please_login">Please Login</string>
     <string name="txt_prefs_user">User Account</string>
 <!--    <string name="summery_login">Login to upload files to your own folder</string>-->
-<!--    <string name="key_login_summery" translatable="false">key_login_msg</string>-->
+    <string name="key_login_summery" translatable="false">key_login_msg</string>
     <string name="t_synch_ok">%s files has been synchronized</string>
     <string name="txt_prefs_device">Device Information</string>
     <string name="devide_title">Device Name</string>

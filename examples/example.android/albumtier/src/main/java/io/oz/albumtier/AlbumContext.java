@@ -79,26 +79,8 @@ public class AlbumContext {
 
 	/**
      * Init with preferences. Not login yet.
-     * @since maven 0.1.0, this package no longer depends on android sdk.
-     * public void init(PrefKeys prefkeys, SharedPreferences sharedPref)
-     <pre>
-        homeName = sharedPref.getString(prefkeys.home, "");
-        String uid = sharedPref.getString(prefkeys.usrid, "");
-        String device = sharedPref.getString(prefkeys.device, "");
-        photoUser = new SessionInf(null, uid);
-        photoUser.device = device;
-        pswd = sharedPref.getString(prefkeys.pswd, "");
-        jserv = sharedPref.getString(prefkeys.jserv, "");
-     </pre>
      */
     public AlbumContext init(String family, String uid, String device, String jserv) {
-    	/*
-        homeName = sharedPref.getString(prefkeys.home, "");
-        String uid = sharedPref.getString(prefkeys.usrid, "");
-        String device = sharedPref.getString(prefkeys.device, "");
-        photoUser = new SessionInf(null, uid);
-        photoUser.device = device;
-        */
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
         userInf.device = device;
@@ -132,7 +114,7 @@ public class AlbumContext {
 
         Clients.init(jserv + "/" + jdocbase, verbose);
 
-        tier = (PhotoSyntier) new PhotoSyntier(clientUri, userInf.device, errCtx)
+        tier = new PhotoSyntier(clientUri, userInf.device, errCtx)
 				.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;

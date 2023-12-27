@@ -50,8 +50,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")
 
     implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver") {
-        exclude group: "org.apache.tika", module: "tika-core"
-        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
+//        exclude group: "org.apache.tika", module: "tika-core"
+//        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
     }
 
     implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver")

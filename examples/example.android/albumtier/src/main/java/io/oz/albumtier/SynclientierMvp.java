@@ -187,9 +187,9 @@ public class SynclientierMvp extends Semantier {
 	}
 	
 	/**
-	 * Start heart beat, create robot for synchronizing,
+	 * Create robot for synchronizing,
 	 * clean and create local temporary directory for downloading,
-	 * load user information.
+	 * load user information, org and homepage url.
 	 * 
 	 * @param client
 	 * @return this
@@ -214,13 +214,13 @@ public class SynclientierMvp extends Semantier {
 			AnsonMsg<AnQueryReq> q = client.query(uri, um.tbl, "u", 0, -1);
 			q.body(0)
 			 .j(um.orgTbl, "o", String.format("o.%1$s = u.%1$s", um.org))
-			 .whereEq("=", "u." + um.pk, robot.userId);
+			 .whereEq("u." + um.pk, robot.userId);
 
 			AnsonResp resp = client.commit(q, errCtx);
 			AnResultset rs = resp.rs(0).beforeFirst();
 			if (rs.next())
 				robot.orgId(rs.getString(um.org))
-					.orgName(rs.getString(um.orgName));
+					 .orgName(rs.getString(um.orgName));
 			else throw new SemanticException("Synode haven't been reqistered: %s", robot.userId);
 		} catch (TransException | AnsonException | SQLException | IOException e) {
 			e.printStackTrace();
@@ -228,18 +228,16 @@ public class SynclientierMvp extends Semantier {
 
 		return this;
 	}
-	
+
 	/**
-	 * Synchronizing files to hub using block chain, accessing port {@link Port#docsync}.
-	 * This method will use meta to create entity object of doc.
-	 * @param meta for creating {@link SyncDoc} object 
+	 * @deprecated
+	 * @param meta for creating {@link SyncDoc} object
 	 * @param rs tasks, rows should be limited
-	 * @param workerId 
+	 * @param workerId
 	 * @param onProc
-	 * @return Sync response list
-	 * @throws TransException 
-	 * @throws AnsonException 
-	 * @throws IOException 
+	 * @throws TransException
+	 * @throws AnsonException
+	 * @throws IOException
 	 */
 	List<DocsResp> syncUp(DocTableMeta meta, AnResultset rs, String workerId, OnProcess onProc)
 			throws TransException, AnsonException, IOException {
@@ -255,6 +253,20 @@ public class SynclientierMvp extends Semantier {
 		}
 	}
 
+	/**
+	 * Synchronizing files to hub using block chain, accessing port {@link Port#docsync}.
+	 * This method will use meta to create entity object of doc.
+	 *
+	 * @param tabl
+	 * @param videos
+	 * @param workerId
+	 * @param onProc
+	 * @param docOk
+	 * @return Sync response list
+	 * @throws TransException
+	 * @throws AnsonException
+	 * @throws IOException
+	 */
 	public List<DocsResp> syncUp(String tabl, List<? extends SyncDoc> videos, String workerId,
 			OnProcess onProc, OnDocOk... docOk)
 			throws TransException, AnsonException, IOException {
