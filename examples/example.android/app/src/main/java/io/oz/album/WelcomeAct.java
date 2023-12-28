@@ -119,9 +119,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String homeName = sharedPref.getString(AlbumApp.keys.home, "");
-        String uid      = sharedPref.getString(AlbumApp.keys.usrid, "");
-        String device   = sharedPref.getString(AlbumApp.keys.device, "");
-        String jserv    = sharedPref.getString(AlbumApp.keys.jserv, "");
+        String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
+        String device = sharedPref.getString(AlbumApp.keys.device, "");
+        String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
         String homepage = sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing));
 
         singl.init(homeName, uid, device, jserv);
@@ -138,46 +138,46 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         if (pickMediaStarter == null)
             pickMediaStarter = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        if (singl.state() == ConnState.Online) {
-                            onMediasPicked(result);
-                        } else showMsg(R.string.msg_ignore_offline);
-                    }
-                    reloadAlbum();
-                });
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                            if (singl.state() == ConnState.Online) {
+                                onMediasPicked(result);
+                            } else showMsg(R.string.msg_ignore_offline);
+                        }
+                        reloadAlbum();
+                    });
 
         if (pickFileStarter == null)
             pickFileStarter = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        if (singl.state() == ConnState.Online) {
-                            onFilesPicked(result);
-                        } else showMsg(R.string.msg_ignore_offline);
-                    }
-                    reloadAlbum();
-                });
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                            if (singl.state() == ConnState.Online) {
+                                onFilesPicked(result);
+                            } else showMsg(R.string.msg_ignore_offline);
+                        }
+                        reloadAlbum();
+                    });
 
         if (prefStarter == null)
             prefStarter = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    AssetHelper.init(this,
-                            sharedPref.getString(AlbumApp.keys.jserv, "")
-                            // sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
-                    );
-                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        showMsg(R.string.msg_device_uid, uid, device);
-                    }
-                    reloadAlbum();
-                });
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        AssetHelper.init(this,
+                                sharedPref.getString(AlbumApp.keys.jserv, "")
+                                // sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
+                        );
+                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                            showMsg(R.string.msg_device_uid, uid, device);
+                        }
+                        reloadAlbum();
+                    });
 
         if (webHelpStarter == null)
             webHelpStarter = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> reloadAlbum() );
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> reloadAlbum());
 
         try {
             if (singl.needSetup())
@@ -186,15 +186,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             else {
                 String pswd = sharedPref.getString(AlbumApp.keys.pswd, "-");
                 singl.pswd(pswd)
-                    .login((client) -> {
-                        AssetHelper.init(this,
-                                sharedPref.getString(AlbumApp.keys.jserv, "")
-                                // sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing))
-                                );
-                                // All WebView methods must be called on the same thread.
-                        runOnUiThread( () -> reloadAlbum() );
-                    },
-                    (c, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv()));
+                        .login((client) -> {
+                                    AssetHelper.init(this,
+                                            sharedPref.getString(AlbumApp.keys.jserv, "")
+                                            // sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing))
+                                    );
+                                    // All WebView methods must be called on the same thread.
+                                    runOnUiThread(() -> reloadAlbum());
+                                },
+                                (c, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv()));
             }
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv());
@@ -207,13 +207,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
         }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    void reloadAlbum () {
+    void reloadAlbum() {
         if (singl.tier == null || sharedPref == null)
             return;
 
@@ -340,8 +340,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     /**
      * https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
-     *
+     * <p>
      * https://developer.android.com/training/data-storage/shared/documents-files#persist-permissions
+     *
      * @param result
      */
     protected void onMediasPicked(@NonNull ActivityResult result) {
@@ -352,42 +353,41 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (singl.tier == null)
                     showMsg(R.string.txt_please_login);
                 else singl.tier
-                    .fileProvider(new IFileProvider() {
-                        private String saveFolder;
+                        .fileProvider(new IFileProvider() {
+                            private String saveFolder;
 
-                        @Override
-                        public long meta(SyncDoc f) throws IOException {
-                            File file = new File(f.fullpath());
-                            f.size = file.length();
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                            @Override
+                            public long meta(SyncDoc f) throws IOException {
+                                File file = new File(f.fullpath());
+                                f.size = file.length();
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
 
-                                FileTime d = attr.creationTime();
-                                f.cdate(d);
-                                saveFolder = DateFormat.formatYYmm(d);
+                                    FileTime d = attr.creationTime();
+                                    f.cdate(d);
+                                    saveFolder = DateFormat.formatYYmm(d);
+                                } else {
+                                    Date d = new Date(file.lastModified());
+                                    f.cdate(d);
+                                    saveFolder = DateFormat.formatYYmm(d);
+                                }
+                                return f.size;
                             }
-                            else {
-                                Date d = new Date(file.lastModified());
-                                f.cdate(d);
-                                saveFolder = DateFormat.formatYYmm(d);
+
+                            @Override
+                            public String saveFolder() {
+                                return saveFolder;
                             }
-                            return f.size;
-                        }
 
-                        @Override
-                        public String saveFolder() {
-                            return saveFolder;
-                        }
-
-                        @Override
-                        public InputStream open(SyncDoc f) throws FileNotFoundException {
-                            return new FileInputStream(f.fullpath());
-                        }
-                    }).asyVideos(list,
-                        (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress,
-                                r, rx, total, (float) seq / total * 100),
-                        (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
-                        errCtx.prepare(msgv, R.string.msg_upload_failed));
+                            @Override
+                            public InputStream open(SyncDoc f) throws FileNotFoundException {
+                                return new FileInputStream(f.fullpath());
+                            }
+                        }).asyVideos(list,
+                                (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress,
+                                        r, rx, total, (float) seq / total * 100),
+                                (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
+                                errCtx.prepare(msgv, R.string.msg_upload_failed));
 
                 WebView wv = findViewById(R.id.wv_welcome);
                 wv.reload();
@@ -416,9 +416,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 String.valueOf(data.getData()),
                                 getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT));
                         errCtx.prepare(msgv, R.string.msg_upload_failed)
-                              .err(null, "URI: %s\nPath: %s",
-                                    String.valueOf(data.getData()),
-                                    getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
+                                .err(null, "URI: %s\nPath: %s",
+                                        String.valueOf(data.getData()),
+                                        getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
                     }
                     paths = new ArrayList<>(1);
                     paths.add(getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT));
@@ -430,43 +430,44 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     // verifyStoragePermissions(this);
                     // askDirectoriesPermissions(this);
                     singl.tier.fileProvider(new IFileProvider() {
-                        private String saveFolder;
-                        private Plicies policies = singl.policies;
+                                private String saveFolder;
+                                private Plicies policies = singl.policies;
 
-                        // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
-                        @Override
-                        public long meta(SyncDoc f) {
-                            Uri returnUri = ((AndroidFile) f).contentUri();
-                            try (Cursor returnCursor = getContentResolver()
-                                    .query(returnUri, null, null, null, null)) {
-                                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-                                returnCursor.moveToFirst();
-                                f.clientname(returnCursor.getString(nameIndex));
-                                f.size = returnCursor.getLong(sizeIndex);
-                                f.mime = getContentResolver().getType(returnUri);
+                                // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
+                                @Override
+                                public long meta(SyncDoc f) {
+                                    Uri returnUri = ((AndroidFile) f).contentUri();
+                                    try (Cursor returnCursor = getContentResolver()
+                                            .query(returnUri, null, null, null, null)) {
+                                        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                                        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                                        returnCursor.moveToFirst();
+                                        f.clientname(returnCursor.getString(nameIndex));
+                                        f.size = returnCursor.getLong(sizeIndex);
+                                        f.mime = getContentResolver().getType(returnUri);
 
-                                Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
-                                f.cdate(lastmodify);
-                                saveFolder = DateFormat.formatYYmm(lastmodify);
-                                return f.size;
-                            }
-                        }
+                                        Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
+                                        f.cdate(lastmodify);
+                                        saveFolder = DateFormat.formatYYmm(lastmodify);
+                                        return f.size;
+                                    }
+                                }
 
-                        @Override
-                        public String saveFolder() {
-                            return saveFolder;
-                        }
+                                @Override
+                                public String saveFolder() {
+                                    return saveFolder;
+                                }
 
-                        // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
-                        @Override
-                        public InputStream open(SyncDoc p) throws FileNotFoundException {
-                            return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
-                        } })
-                    .asyVideos(paths,
-                        null,
-                        (resp, v) -> showMsg(R.string.t_synch_ok, paths.size()),
-                        errCtx.prepare(msgv, R.string.msg_upload_failed));
+                                // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
+                                @Override
+                                public InputStream open(SyncDoc p) throws FileNotFoundException {
+                                    return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
+                                }
+                            })
+                            .asyVideos(paths,
+                                    null,
+                                    (resp, v) -> showMsg(R.string.t_synch_ok, paths.size()),
+                                    errCtx.prepare(msgv, R.string.msg_upload_failed));
                 }
 
                 WebView wv = findViewById(R.id.wv_welcome);
@@ -488,7 +489,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         intt.putExtra(IS_NEED_FOLDER_LIST, true);
         intt.putExtra(Constant.PickingMode,
                 singl.state() == ConnState.Disconnected ?
-                PickingMode.disabled : PickingMode.limit99);
+                        PickingMode.disabled : PickingMode.limit99);
 
         pickMediaStarter.launch(intt);
     }
