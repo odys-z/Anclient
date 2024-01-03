@@ -40,18 +40,21 @@ namespace io.odysz.semantic.ext
 			return this;
 		}
 
-		public AnDatasetReq(AnsonMsg parent, string conn)
-			: base(parent, conn)
+		public AnDatasetReq(string uri, AnsonMsg parent)
+			: base(uri, parent)
 		{
 			a = "ds";
 		}
 
 		internal string sk { get; set; }
-		// public virtual string sk() { return sk; }
+		public AnDatasetReq Sk(string sk) {
+			this.sk = sk;
+			return this;
+		}
 
-		public static AnDatasetReq formatReq(string conn, AnsonMsg parent, string sk)
+		public static AnDatasetReq formatReq(string uri, AnsonMsg parent, string sk)
 		{
-			AnDatasetReq bdItem = new AnDatasetReq(parent, conn);
+			AnDatasetReq bdItem = new AnDatasetReq(uri, parent);
 			bdItem.sk = sk;
 			return bdItem;
 		}

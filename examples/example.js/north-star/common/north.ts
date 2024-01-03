@@ -1,7 +1,7 @@
 
 import React from "react";
 import { AnContext, Comprops, Media, SysComp } from "@anclient/anreact";
-import { QueryConditions } from "@anclient/semantier-st/semantier";
+import { QueryConditions } from "@anclient/semantier/semantier";
 
 /** App North's props */
 export interface Northprops {

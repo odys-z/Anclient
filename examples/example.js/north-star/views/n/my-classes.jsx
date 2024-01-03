@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import withWidth from "@material-ui/core/withWidth";
 import { Card, TextField, Typography } from '@material-ui/core';
 
-import { AnClient, SessionClient, Protocol, stree_t } from '@anclient/semantier-st';
+import { AnClient, SessionClient, Protocol, stree_t } from '@anclient/semantier';
 import { L, Langstrs,
     AnContext, AnError, CrudCompW, AnReactExt,
     AnTree
@@ -34,7 +34,7 @@ class MyClassTreeComp extends CrudCompW {
 					sqlArgs: [this.context.anClient.userInfo.uid],
 					// onOk: resp => {that.setState({}); console.log(resp)}
 				  };
-		this.context.anReact.stree(ds, this.context.error, this);
+		this.context.uiHelper.stree(ds, this.context.error, this);
 	}
 
 	render () {

@@ -2,7 +2,7 @@
 // import { Protocol, AnsonResp, AnsonBody } from '../../node_modules/anclient/lib/protocol.js';
 // import { L } from '../../node_modules/anclient/lib/utils/langstr.js';
 // for jsample, use
-import { Protocol, AnsonResp, AnsonBody } from '@anclient/semantier-st';
+import { Protocol, AnsonResp, AnsonBody } from '@anclient/semantier';
 import { L } from '@anclient/anreact';
 
 export class QuizReq {
@@ -278,7 +278,6 @@ export const QuizProtocol = {
 		},
 
 		agRenderer: (p) => {
-			// return '**' + p.value + '**';
 			return QuizProtocol.Qtype.decode(p.value);
 		},
 
@@ -290,7 +289,7 @@ export const QuizProtocol = {
 /**
  */
 export const CenterProtocol = {
-	// Prameter names
+	// Parameter names
 	pollId: "pollId",
 
 	myClasses: "classes",
@@ -301,6 +300,8 @@ export const CenterProtocol = {
 	pollResults: "poll-results",
 	pollState: "poll-state",
 	pollIssuer: "poll-issuer",
+	quizTag: "quiz-tag",
+	quizTitle: "quiz-title",
 
 	A: {
 		getClasses: "classes",

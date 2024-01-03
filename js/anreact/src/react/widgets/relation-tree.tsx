@@ -10,12 +10,12 @@ import Collapse from "@material-ui/core/Collapse";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
 
-import { Semantier, Tierec } from '@anclient/semantier-st';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, Semantier, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
-import { toBool } from '../../utils/helpers';
 import { Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
 import { ClassNames } from '../anreact';
+import { AnContextType } from '../reactext';
 
 const styles = (theme: Theme) => ({
   root: {
@@ -55,9 +55,18 @@ const styles = (theme: Theme) => ({
   }
 });
 
+/** FIXME shouldn't merge with relTree? */
 interface RelationTreeProps extends Comprops {
-	reltabl: string;
-	sk: string
+	reltabl?: string;
+	sk?: string;
+
+	/**Semantier.formatRel() use this name to format relationship records,
+	 * where in UI component the FK value comes from
+	 *
+	 * FIXME shouldn't be changed to colProp
+	 * */
+	// relcolumn?: string;
+	colProp?: string;
 };
 
 /**
@@ -73,7 +82,6 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 		expandings: new Set(),
 	};
 	tier: Semantier;
-	forest: Array<Tierec>;
 
 	constructor(props) {
 		super(props);
@@ -86,19 +94,20 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 	componentDidMount() {
 		let that = this;
-		this.tier.relations({
-			uri: this.props.uri,
-			reltabl: this.props.reltabl,
-			sqlArg: this.tier.pkval,
-		},
-		(rels) => {
-			that.setState({});
-		} );
+		this.tier.relations((this.context as unknown as AnContextType).anClient,
+			{ uri: this.props.uri,
+			  reltabl: this.props.reltabl,
+			  sqlArg: this.tier.pkval.v,
+			},
+			(rels: AnsonMsg<AnDatasetResp>) => {
+				// that.forest = rels.Body().forest as AnTreeNode[];
+				that.setState({});
+			} );
 	}
 
 	toExpandItem(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
-		let f = e.currentTarget.getAttribute("nid");
+		let f = e.currentTarget.getAttribute("data-nid");
 
 		let expandings = this.state.expandings;
 		if (expandings.has(f)) expandings.delete(f);
@@ -109,13 +118,13 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 	/**
 	 * @param classes
 	 */
-	buildTree(classes: ClassNames) {
+	buildTree(forest: AnTreeNode[], classes: ClassNames) {
 		let that = this;
 
 		let expandItem = this.toExpandItem;
 		let checkbox = !this.props.disableCheckbox;
 
-		return this.forest.map(
+		return forest.map(
 			(tree, tx) => {return treeItems(tree);}
 		);
 
@@ -131,7 +140,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			if (node.children && node.children.length > 0)
 			  return (
 				<Box key={id} className={classes.folder}>
-				  <Box  nid={id}
+				  <Box  data-nid={id}
 						onClick={expandItem}
 						className={classes.folderHead}
 				  >
@@ -146,12 +155,8 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 								onChange={(e) => {
 								  e.stopPropagation();
 								  node.checked = !toBool(node.checked);
-								  // if (typeof that.props.onCheck === 'function')
-									// that.props.onCheck(e);
-
-									// checkAll(e.target.checked, node.children)
-									node.children.forEach( c => { c.node.checked = e.target.checked } );
-									that.setState({});
+								  node.children.forEach( c => { c.node.checked = e.target.checked } );
+								  that.setState({});
 								}}/>
 						  }
 						  {node.text}
@@ -212,11 +217,11 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 
 	render() {
 		const { classes } = this.props;
-		this.forest = this.tier.rels;
+		const forest = this.tier.rels[this.props.reltabl];
 
 		return (
 			<div className={classes.root}>
-				{this.forest && this.buildTree(classes)}
+				{forest && this.buildTree(forest, classes)}
 			</div> );
 	}
 }

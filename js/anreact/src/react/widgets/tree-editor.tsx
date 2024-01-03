@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ReactNode} from "react";
 
 import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
@@ -7,10 +7,9 @@ import Button from "@material-ui/core/Button";
 import Collapse from "@material-ui/core/Collapse";
 import Typography from "@material-ui/core/Typography";
 
-import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, Tierec } from "@anclient/semantier-st";
+import { CRUD, AnTreeNode, AnlistColAttrs, UIComponent, toBool } from "@anclient/semantier";
 
 import { L } from '../../utils/langstr';
-import { toBool } from '../../utils/helpers';
 import { AnContext, AnContextType } from '../reactext';
 import { AnTreeIcons } from './tree'
 import { CrudCompW, DetailFormW } from '../crud';
@@ -19,7 +18,8 @@ import { JsampleIcons } from '../../jsample/styles';
 import { SimpleForm } from './simple-form';
 import { AnReactExt, ClassNames, CompOpts, Media } from "../anreact";
 import { PropTypes, Theme } from "@material-ui/core";
-import { AnTablistProps } from "@anclient/anreact/src/react/widgets/table-list";
+import { AnTablistProps } from "./table-list";
+import { swap } from "../../utils/lang-ext";
 
 const styles = (theme: Theme) => ({
   root: {
@@ -44,6 +44,9 @@ const styles = (theme: Theme) => ({
 	"& :hover": {
 	  backgroundColor: "#ccc"
 	}
+  },
+  forest: {
+	  height: '90vh',
   },
   treeItem: {
 	padding: theme.spacing(1),
@@ -94,7 +97,8 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 		let me = children.indexOf(n);
 		let elder = me - 1;
 		if (elder >= 0)
-			children.swap(me, elder);
+			// children.swap(me, elder);
+			swap(children, me, elder);
 
 		if (typeof this.props.onUpdate === 'function')
 			this.props.onUpdate(n, p, me, elder);
@@ -106,7 +110,8 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 		let children = p.node.children;
 		let me = children.indexOf(n);
 		if (me > 0)
-			children.swap(me, 0);
+			// children.swap(me, 0);
+			swap(children, me, 0);
 
 		if (typeof this.props.onUpdate === 'function')
 			this.props.onUpdate(n, p, me, 0);
@@ -119,7 +124,8 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 		let me = children.indexOf(n);
 		let younger = me + 1;
 		if (younger < children.length)
-			children.swap(me, younger);
+			// children.swap(me, younger);
+			swap(children, me, younger);
 
 		if (typeof this.props.onUpdate === 'function')
 			this.props.onUpdate(n, p, me, younger);
@@ -131,7 +137,8 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 		let children = p.node.children;
 		let me = children.indexOf(n);
 		if (me < children.length - 1)
-			children.swap(me, children.length - 1);
+			// children.swap(me, children.length - 1);
+			swap(children, me, children.length - 1);
 		if (typeof this.props.onUpdate === 'function')
 			this.props.onUpdate(n, p, me, children.length);
 	}
@@ -184,7 +191,7 @@ class TreeCardComp extends DetailFormW<TreecardProps> {
 					else return (
 						<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
 							{ typeof col.formatter === 'function'
-								? col.formatter(col, tnode)
+								? col.formatter(col, tnode) as ReactNode
 								: <Typography noWrap variant='body2' align={align(n.css[col.field])} className={classes.rowText} >
 									{n.text}
 								</Typography>
@@ -259,7 +266,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		console.log(this.props.uri);
 
 		const ctx = this.context as unknown as AnContextType;
-		this.anReact = ctx.anReact;
+		this.anReact = ctx.uiHelper;
 		this.toSearch();
 	}
 
@@ -315,8 +322,9 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		this.addForm = (
 			<SimpleForm crud={CRUD.u} uri={this.props.uri}
 				mtabl={this.props.mtabl}
-				pk={this.props.pk} fields={this.props.fields}
-				pkval={me} parent={this.props.parent} parentId={parentId}
+				// pk={this.props.pk}
+				fields={this.props.fields}
+				pkval={{pk: this.props.pk, v: me}} parent={this.props.parent} parentId={parentId}
 				title={this.props.detailFormTitle || 'Edit Tree Node'}
 				onClose={() => {that.addForm = undefined; that.setState({}) }}
 				onOk={() => {
@@ -330,7 +338,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 					// close as data saved, search later in case re-shape failed. (shouldn't be a transaction?)
 					let {uri, sk} = this.props;
-					(this.context as unknown as AnContextType).anReact
+					(this.context as unknown as AnContextType).uiHelper
                         .rebuildTree({uri, sk, rootId: me}, () => {
                             that.toSearch();
                         });
@@ -353,7 +361,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 					? <React.Fragment key={x}>{AnTreeIcons[expIcon || 'T']}</React.Fragment>
 					: <React.Fragment key={x}>{AnTreeIcons['.']}</React.Fragment>;
 			})
-        
+
         function icon(iconame?: string) {
 	        return AnTreeIcons[iconame || "deflt"];
         }
@@ -369,7 +377,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 		let m = this.state.forest;
 		let mtree = buildTreegrid( m, undefined, compOts );
-		return mtree;
+		return (<div className={classes.forest}>{mtree}</div>);
 
 		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode, compOpts: CompOpts) {
 		  if (Array.isArray(tnode)) {
@@ -480,7 +488,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 					  return (
 						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} >
 							<Typography variant='body2' >
-							  {col.formatter(col, tnode, {classes, media})}
+							  {col.formatter(col, tnode, {classes, media}) as ReactNode}
 							</Typography>
 						</Grid>);
 					else

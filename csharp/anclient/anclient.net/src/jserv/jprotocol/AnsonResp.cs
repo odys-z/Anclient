@@ -9,26 +9,26 @@ namespace io.odysz.semantic.jprotocol
 	{
 		protected internal string m;
 
-		protected internal List<AnResultset> rs;
+		protected List<AnResultset> rs;
 
-		protected internal Dictionary<string, object> map;
+		public Dictionary<string, object> map;
 
 		public AnsonResp() : base(null, null)
 		{
 		}
 
-		public AnsonResp(AnsonMsg parent) : base(parent, null)
+		public AnsonResp(AnsonMsg parent) : base(null, parent)
 		{
 		}
 
-		public AnsonResp(AnsonMsg parent, string txt) : base(parent, null)
+		public AnsonResp(AnsonMsg parent, string msg) : base(null, parent)
 		{
-			this.m = txt;
+			this.m = msg;
 		}
 
-		public AnsonResp(string txt) : base(null, null)
+		public AnsonResp(string msg) : base(null, null)
 		{
-			this.m = txt;
+			this.m = msg;
 		}
 
 		public virtual string Msg()

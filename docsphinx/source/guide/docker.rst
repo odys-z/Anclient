@@ -1,5 +1,5 @@
-Play with Docker
-================
+Deploy docker layers
+====================
 
 Building & Publishing
 ---------------------

@@ -1,6 +1,13 @@
+[![Ukraine](https://cdn3.emoji.gg/emojis/6101-ukraine.gif)](https://emoji.gg/emoji/6101-ukraine)
+[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/semantier)
+
 # About @anclient/semantier
 
-The anclient's sub package depending on pure js object that can be used for js unit test.
+ @client/semantier is a sub-module of Anclient, implementing the Typescript version of semantic tier
+ for communicating with json data service implemented by Semantic.jserv.
+ 
+# Install
 
-Since v0.9.21, @anclient/semantier is deprecated, replaced by the typescript
-version, @anclient/semantier-st.
+```
+    npm install @anclient/semantier
+```

@@ -9,8 +9,8 @@ import { AnConst } from '../../utils/consts';
 import { Comprops, CrudCompW } from '../../react/crud'
 import { AnContext, AnContextType } from '../../react/reactext'
 import { AnTablist } from '../../react/widgets/table-list'
-import { QueryConditions, Semantier } from '@anclient/semantier-st';
-import { AnQueryst } from '../../react/widgets/query-form-st';
+import { AnsonResp, PageInf, QueryConditions, Semantier } from '@anclient/semantier';
+import { AnQueryst } from '../../react/widgets/query-form';
 
 const styles = (theme: Theme) => ( {
 	root: {
@@ -36,7 +36,7 @@ class DomainComp extends CrudCompW<Comprops> {
 					label: 'autocbb'},
 		condDate: {type: 'date', val: '', label: 'operTime'},
 		*/
-		pageInf : { page: 0, size: 25, total: 0 },
+		pageInf : new PageInf(0, 25, 0 ),
 
 		selected: {ids: new Set<string>()},
 	};
@@ -85,19 +85,20 @@ class DomainComp extends CrudCompW<Comprops> {
 
 		this.q = query || this.q || {};
 
-		ctx.anReact.bindTablist(queryReq, this, ctx.error);
+		let that = this;
+		ctx.anClient.commit(queryReq,
+			(qrsp) => {
+				let rs = qrsp.Body().Rs();
+				let {rows} = AnsonResp.rs2arr( rs );
+				that.setState({});
+				that.tier.rows = rows;
+			}, ctx.error );
 	}
 
 	onPageInf(page, size) {
 		const ctx = this.context as unknown as AnContextType;
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
-		// let query = this.queryReq;
-		// if (query) {
-		// 	query.Body().Page(size, page);
-		// 	this.state.pageInf = {page, size, total: this.state.pageInf.total};
-		// 	ctx.anReact.bindTablist(query, this, ctx.error);
-		// }
 		this.toSearch(undefined);
 	}
 
@@ -122,7 +123,7 @@ class DomainComp extends CrudCompW<Comprops> {
 				columns={[
 					{ label: L('Domain ID'), field:"domainId", color: 'primary', className: 'bold' },
 					{ label: L('Domain Name'), color: 'primary', field:"domainName"},
-					{ label: L('parent'), color: 'primary',field:"parentId" }
+					{ label: L('Parent Domain'), color: 'primary',field:"parentId" }
 				]}
 				rows={this.tier.rows} pk='domainId'
 				pageInf={this.state.pageInf}

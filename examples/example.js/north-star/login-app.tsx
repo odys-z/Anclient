@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { SessionClient } from '@anclient/semantier-st'
+import { AnsonMsg, AnsonResp, SessionClient } from '@anclient/semantier'
 import { L, Langstrs, AnContext, AnError, AnReact, Login, jsample } from '@anclient/anreact';
 import { Northprops } from './common/north';
+import { Theme } from '@material-ui/core/styles';
 
-const styles = (theme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
   jsample.jstyles(theme),
   { root: {
 	    '& *': { margin: theme.spacing(1) }
@@ -38,9 +39,9 @@ class LoginApp extends React.Component<Northprops> {
 		this.onLogin = this.onLogin.bind(this);
 	}
 
-	onError(c, r) {
+	onError(c : string, r: AnsonMsg<AnsonResp>) {
 		console.error(c, r);
-		this.setState({hasError: !!c, err: r.msg()});
+		this.setState({hasError: !!c, err: r.Body().msg()});
 	}
 
 	onErrorClose() {
@@ -84,14 +85,13 @@ class LoginApp extends React.Component<Northprops> {
 	 * First try ./private/host.json/<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
-	 * 
+	 *
 	 *
 	 * For test, have elem = undefined
-	 * @param {string} elem html element id, null for test
-	 * @param {object} [opts={}] serv id
-	 * @param {string} [opts.serv='host'] serv id
-	 * @param {string} [opts.home='index.html'] system main page
-	 * @param {Window} [opts.parent=undefined] parent window if for redirecting target
+	 * @param elem html element id, null for test
+	 * @param opts default: {serv: 'host', portal: 'index.html'}
+	 * - serv: string,
+	 * - portal: string
 	 */
 	static bindHtml(elem, opts = {}) {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}

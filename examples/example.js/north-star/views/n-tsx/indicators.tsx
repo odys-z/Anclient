@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Theme } from '@material-ui/core/styles';
 import withStyles from "@material-ui/core/styles/withStyles";
 import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
@@ -11,7 +10,8 @@ import { L, AnContext,
 } from '@anclient/anreact';
 
 import { QuizProtocol } from '../../common/protocol.quiz.js';
-import { AnTreeNode } from '@anclient/semantier-st/protocol';
+import { AnTreeNode } from '@anclient/semantier/protocol';
+import { Theme } from '@material-ui/core/styles';
 
 const styles = (theme: Theme) => ( {
 	button: {
@@ -42,7 +42,6 @@ class IndicatorsComp extends CrudCompW<Comprops> {
 
 	reshape(e) {
 		// ask server tag all subtrees
-		let client = this.context.anClient;
 		let that = this;
 
 		let uri = this.uri;
@@ -57,7 +56,7 @@ class IndicatorsComp extends CrudCompW<Comprops> {
 			that.setState({});
 		}};
 
-		that.context.anReact.stree(ds, that.context.error);
+		that.context?.uiHelper?.stree(ds, that.context.error);
 	}
 
 	render () {

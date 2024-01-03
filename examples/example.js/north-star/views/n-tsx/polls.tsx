@@ -7,8 +7,8 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
 import { Semantier, Protocol, AnsonMsg, AnsonBody, AnsonResp, AnResultset,
-	OnLoadOk, QueryConditions, AnlistColAttrs
-} from "@anclient/semantier-st";
+	OnLoadOk, QueryConditions, AnlistColAttrs, Tierec
+} from "@anclient/semantier";
 
 import {
 	L, AnConst, Comprops,
@@ -101,12 +101,6 @@ class PollsComp extends CrudCompW<PollsProp> {
 	onPageInf(page: number, size: number) {
 		this.state.pageInf.size = size;
 		this.state.pageInf.page = page;
-		// let query = this.state.queryReq;
-		// if (query) {
-		// 	query.Body().Page(size, page);
-		// 	this.state.pageInf = {page, size, total: this.state.pageInf.total};
-		// 	this.context.anReact.bindTablist(query, this, this.context.error);
-		// }
 	}
 
 	onTableSelect(rowIds: string[]) {
@@ -121,7 +115,7 @@ class PollsComp extends CrudCompW<PollsProp> {
 	}
 
     toShowDetails(e: React.UIEvent): void {
-		this.tier.pkval = this.getByIx(this.state.selected.ids, 0);
+		this.tier.pkval.v = this.getByIx(this.state.selected.ids, 0);
         this.detailsForm = (
             <PollDetails uri={this.uri}
 				tier={this.tier}
@@ -168,11 +162,6 @@ class PollsComp extends CrudCompW<PollsProp> {
 			<AnQueryst uri={this.uri}
 				onSearch={this.toSearch}
 				fields={[ this.state.condQzName, this.state.condTag, this.state.condUser ]}
-				// query={ (q: typeof AnQueryst) => { return {
-				// 	qzName:q.conds[0].val ? q.conds[0].val : undefined,
-				// 	tag:   q.conds[1].val ? q.conds[1].val : undefined,
-				// 	orgId: q.conds[2].val ? q.conds[2].val.v : undefined,
-				// } } }
 				onLoaded={this.toSearch}
 			/>
 			<Grid container alignContent="flex-end" >
@@ -252,7 +241,7 @@ class PollsTier extends Semantier {
      * @param errCtx
      * @returns
      */
-    records(opts: QueryConditions, onLoad: OnLoadOk) {
+    records(opts: QueryConditions, onLoad: OnLoadOk<Tierec>) {
 		let {pollIds, states} = opts;
 		let opt = {};
 		opt[NPollsReq.pollIds] = pollIds;
@@ -284,12 +273,12 @@ class PollsTier extends Semantier {
 	 * @param onLoad
 	 * @returns
 	 */
-    record(opts: {pkval: string}, onLoad: OnLoadOk) {
+    record(opts: {pkval: string}, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let { pkval } = opts;
 
-		pkval = pkval || this.pkval ;
+		pkval = pkval || this.pkval.v ;
 		if (!pkval) {
 			console.warn("Calling record() with empty pk.");
 			return;

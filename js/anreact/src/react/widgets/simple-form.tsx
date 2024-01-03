@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
 
@@ -13,7 +13,7 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnFieldValidation, AnFieldValidator, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, TierCol, Tierec } from '@anclient/semantier-st';
+import { AnFieldValidation, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, PkMeta, TierCol, TierComboField, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 	import { toBool } from '../../utils/helpers';
@@ -59,8 +59,8 @@ interface SimpleFormProps extends Comprops {
     // funcId: string;
     crud: CRUD;
     fields: TierCol[];
-    pk: string;
-    pkval: any;
+    // pk: string;
+    pkval: PkMeta;
     parent: JSX.Element;
     parentId: string;
 	mtabl: string;
@@ -72,6 +72,8 @@ interface SimpleFormProps extends Comprops {
 class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 	uri = undefined;
 
+    pkval: PkMeta = { pk: undefined, v: undefined };
+
 	state = {
 		crud: undefined,
 		dirty: false,
@@ -81,8 +83,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		nodeId: undefined,
 		node: undefined,
 
-        pk: undefined,
-        pkval: undefined,
+        // pk: undefined as PkMeta,
 
 		mtabl: '',
 		// indId, indName, parent, sort, fullpath, css, weight, qtype, remarks, extra
@@ -122,8 +123,8 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		this.state.crud = props.crud;
 		this.state.mtabl = props.mtabl;
 
-		this.state.pk = props.pk;
-		this.state.pkval = props.pkval;
+		// this.state.pk = props.pk;
+		this.pkval = props.pkval;
 
 		this.state.parent = props.parent;
 		this.state.parentId = props.parentId;
@@ -144,15 +145,15 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		let that = this;
 
 		if (this.state.crud !== CRUD.c) {
-			if (!this.state.pkval)
+			if (!this.pkval.v)
 				throw Error("The pkval property not been set correctly. Record can not be loaded.");
 
 			// load the record
 			const ctx = this.context as unknown as AnContextType;
 			let queryReq = ctx.anClient.query(this.uri, this.props.mtabl, 'r')
-			queryReq.Body().whereEq(this.state.pk.field, this.state.pkval);
+			queryReq.Body().whereEq(this.pkval.pk, this.pkval.v);
 			// FIXME but sometimes we have FK in record. Meta here?
-			ctx.anReact.bindStateRec({req: queryReq,
+			(ctx.uiHelper as AnContextType).bindStateRec({req: queryReq,
 				onOk: (resp: AnsonMsg<AnsonResp>) => {
 						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
 						if (!rows || rows.length !== 1)
@@ -232,9 +233,9 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		// console.log(nvs);
 
 		// 2. request (insert / update)
-		let pk = this.state.pk;
+		let {pk} = this.pkval;
 		if (this.state.crud === CRUD.c) {
-			nvs.push({name: pk.field, value: rec[pk.field]});
+			nvs.push({name: pk, value: rec[pk]});
 			req = client
 				.usrAct(this.uri, CRUD.c, this.props.title || 'new record')
 				.insert(this.uri, this.state.mtabl, nvs);
@@ -242,9 +243,9 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		else {
 			req = client
 				.usrAct(this.funcId, CRUD.u, 'edit card')
-				.update(this.uri, this.state.mtabl, pk.field, nvs);
+				.update(this.uri, this.state.mtabl, this.pkval, nvs);
 			req.Body()
-				.whereEq(pk.field, rec[pk.field]);
+				.whereEq(pk, rec[pk]);
 		}
 
 		let that = this;
@@ -256,7 +257,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		}, ctx.error);
 	}
 
-	toCancel (e) {
+	toCancel (e: React.MouseEvent<HTMLInputElement>) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose({code: 'cancel'});
@@ -275,14 +276,15 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		that.setState({dirty: false});
 	}
 
-	getField(f, rec, media) {
+	getField(f: AnlistColAttrs<JSX.Element, CompOpts>, rec: Tierec, media: { classes?: ClassNames; media?: Media; isSm?: any; }) {
 		let {isSm} = media;
 
-		if (f.type === 'enum' || f.type === 'cbb') {
+		if (f.type === 'cbb') {
 			let that = this;
+			let fd = f as TierComboField<JSX.Element, CompOpts>;
 			return (<DatasetCombo uri={this.props.uri}
-				options={f.options} val={rec[f.field]}
-				label={f.label} style={f.style}
+				options={fd.options} val={rec[fd.field]}
+				label={f.label} style={fd.style}
 				onSelect={ (v) => {
 					rec[f.field] = v.v;
 					that.setState({dirty: true});

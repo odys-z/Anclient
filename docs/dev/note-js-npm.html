@@ -91,20 +91,16 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../starter/index.html">Quick Start (js only)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guide/index.html">Guid (Tips)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../starter/index.html">Ancient.ts Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/index.html">Guide &amp; Tips</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">For developers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="note-react.html">Design Note</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Hard learnt lessons: JS</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#how-is-anclient-aneact-evolved">How is &#64;anclient/aneact evolved</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#v0-9-92-protocol-instances">[v0.9.92] Protocol Instances</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#anclient-anreact-decision">&#64;anclient/anreact decision</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tips-for-test-jample-trouble">Tips for test/jample trouble</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#anclient-anreact-decision">&#64;anclient/anreact decision</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="issues.html">Issues &amp; Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tips.html">Tips</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mui-examples.html">CodeSandbox</a></li>
 </ul>
 </li>
@@ -164,8 +160,6 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/dev/note-js-npm.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -179,84 +173,42 @@
             
   <div class="section" id="hard-learnt-lessons-js">
 <h1>Hard learnt lessons: JS<a class="headerlink" href="#hard-learnt-lessons-js" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="how-is-anclient-aneact-evolved">
-<span id="how-anreact-evolved"></span><h2>How is &#64;anclient/aneact evolved<a class="headerlink" href="#how-is-anclient-aneact-evolved" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="v0-9-92-protocol-instances">
-<h3>[v0.9.92] Protocol Instances<a class="headerlink" href="#v0-9-92-protocol-instances" title="Permalink to this headline">¶</a></h3>
-<p>Solved: Example app can test protocol depending on &#64;anclient/semantier.</p>
-<p>Problem: Protocol not shared between &#64;anclient/semantier and example app.</p>
-<p>This structure can leads to Protocol referencing error, though it’s a nice try to
-separate core parts for js unit test - without depending on document &amp; window.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">anclient</span><span class="o">/</span><span class="n">js</span>
-  <span class="o">|--&gt;</span> <span class="n">lib</span><span class="o">/.../</span><span class="n">userst</span><span class="o">.</span><span class="n">jsx</span> <span class="p">:</span> <span class="n">constructor</span>
-  <span class="o">|</span>      <span class="p">:</span> <span class="kn">import</span> <span class="p">{</span> <span class="n">Protocol</span> <span class="p">}</span> <span class="kn">from</span> <span class="s1">&#39;../../../semantier/protocol&#39;</span><span class="p">;</span>
-  <span class="o">|</span>      <span class="o">|</span>
-  <span class="o">|</span>      <span class="o">|--&gt;</span> <span class="n">anclient</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">semantier</span><span class="o">/</span><span class="n">protocol</span><span class="o">.</span><span class="n">js</span> <span class="p">:</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">sk</span>
-  <span class="o">|</span>
-  <span class="o">|--&gt;</span> <span class="n">test</span><span class="o">/</span><span class="n">jsample</span><span class="o">/</span><span class="n">app</span><span class="o">.</span><span class="n">jsx</span> <span class="p">:</span> <span class="n">constructor</span>
-         <span class="p">:</span> <span class="kn">import</span> <span class="p">{</span> <span class="n">Protocol</span> <span class="p">}</span> <span class="kn">from</span> <span class="s1">&#39;@anclient/semantier&#39;</span><span class="p">;</span> <span class="p">(</span><span class="n">npm</span> <span class="n">link</span> <span class="nd">@anclient</span><span class="o">/</span><span class="n">semantier</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Where anclient/js/semantier in v0.9.92 is a separate scope module:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@anclient</span><span class="o">/</span><span class="n">semantier</span>
-</pre></div>
-</div>
-<p>Obviously the above code referencing the same Protocol module.</p>
-<p>This structure results in the following node modules’ tree in example.js:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">node_modules</span>
-  <span class="o">|--&gt;</span> <span class="nd">@anclient</span>
-  <span class="o">|</span>       <span class="o">|--&gt;</span> <span class="n">semantier</span>
-  <span class="o">|</span>              <span class="o">|--&gt;</span> <span class="n">protocol</span><span class="o">.</span><span class="n">js</span> <span class="p">:</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">sk</span>
-  <span class="o">|</span>
-  <span class="o">|--&gt;</span> <span class="n">anclient</span>
-          <span class="o">|--&gt;</span> <span class="n">lib</span><span class="o">/.../</span><span class="n">userst</span><span class="o">.</span><span class="n">jsx</span>
-          <span class="o">|</span>      <span class="p">:</span> <span class="kn">import</span> <span class="p">{</span> <span class="n">Protocol</span> <span class="p">}</span> <span class="kn">from</span> <span class="s1">&#39;../../../semantier/protocol&#39;</span><span class="p">;</span>
-          <span class="o">|</span>
-          <span class="o">|--&gt;</span> <span class="n">semantier</span>
-                 <span class="o">|--&gt;</span> <span class="n">protocol</span><span class="o">.</span><span class="n">js</span> <span class="p">:</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">sk</span>
-</pre></div>
-</div>
-<p>This results in using different instance.</p>
-</div>
 <div class="section" id="anclient-anreact-decision">
-<h3>&#64;anclient/anreact decision<a class="headerlink" href="#anclient-anreact-decision" title="Permalink to this headline">¶</a></h3>
+<span id="anreact-tree"></span><h2>&#64;anclient/anreact decision<a class="headerlink" href="#anclient-anreact-decision" title="Permalink to this headline">¶</a></h2>
 <p>Since &#64;anclient/anreact v0.2.0, Anclient/js is using the following structure, for
 both test, shareing Protocol and avoid “invalid hook call”.</p>
 <p>The basic idea of resolve “invalid hook call” is sharing React package for both
 &#64;anclient/anreact &amp; depending application.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>js
 ├── anreact
+|   ├── node_modules
+|   |   └── react &amp; react-dom
 │   ├── src
 │   │   ├── an-components.js
 │   │   ├── jsample
 │   │   ├── patch
 │   │   ├── react
 │   │   └── utils
+|   ├── test
+|   │   ├── app.jsx
+|   │   ├── dist
+|   │   ├── login-app.jsx
+|   │   ├── package.json
+|   │   └── webpack.config.js
 │   └── webpack.config.js
-├── semantier
-│   ├── anclient.js
-│   ├── package.json
-│   ├── protocol.js
-│   └── semantier.js
-└── test
-    ├── all-jsunits.js
-    ├── jsample
-    │   ├── app.jsx
-    │   ├── dist
-    │   ├── login-app.jsx
-    │   ├── package.json
-    │   └── webpack.config.js
-    └── jsunit
-        ├── 00-aes.mocha.js
-        └── ...
+└── semantier
+    ├── anclient.js
+    ├── package.json
+    ├── protocol.js
+    ├── semantier.js
+    └── test
+        ├── all-jsunits.js
+        └── jsunit
+            ├── 00-aes.mocha.js
+            └── ...
 </pre></div>
 </div>
-<p>Both &#64;anclient/anreact &amp; &#64;anclient/semantier are published separately. To transpile
-test/jsample, in both anreact &amp; semantier folder:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">npm</span> <span class="n">link</span>
-</pre></div>
-</div>
-<p>in test/jsample:</p>
+<p>in anreact/test/jsample:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">npm</span> <span class="n">link</span> <span class="nd">@anclient</span><span class="o">/</span><span class="n">anreact</span>
 <span class="n">npm</span> <span class="n">link</span> <span class="nd">@anclient</span><span class="o">/</span><span class="n">semantier</span>
 </pre></div>
@@ -268,32 +220,6 @@ test/jsample, in both anreact &amp; semantier folder:</p>
 </pre></div>
 </div>
 <p>This makes Protocol and React been shared between Anclient/js and application.</p>
-</div>
-<div class="section" id="tips-for-test-jample-trouble">
-<h3>Tips for test/jample trouble<a class="headerlink" href="#tips-for-test-jample-trouble" title="Permalink to this headline">¶</a></h3>
-<p>Additionally, if &#64;anlient/semantier is installed in js/anreact/node_modules, the
-testing project, jsample won’t work as Protocol.sk been populated by test/jsample/app.jsx.</p>
-<p>test/jsample will use different Protocol than &#64;anclient/anreact.</p>
-<p>For &#64;anclient/anreact, it will use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">js</span><span class="o">/</span><span class="n">anreact</span><span class="o">/</span><span class="n">node_modules</span><span class="o">/</span><span class="nd">@anclient</span><span class="o">/</span><span class="n">semantier</span><span class="o">/</span><span class="n">protocol</span><span class="o">.</span><span class="n">js</span><span class="o">/</span><span class="n">Protocol</span>
-</pre></div>
-</div>
-<p>For test/jsample, it will use (via npm link):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">js</span><span class="o">/</span><span class="n">semantier</span><span class="o">/</span><span class="n">protocol</span><span class="o">.</span><span class="n">js</span><span class="o">/</span><span class="n">Protocol</span>
-</pre></div>
-</div>
-<p>This will leads to failed on binding DatasetCombos.</p>
-<p><strong>Solution</strong></p>
-<p>To avoid this, link from anreact to semantier.</p>
-<p>In js/anreact:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">npm</span> <span class="n">link</span> <span class="nd">@anclient</span><span class="o">/</span><span class="n">semantier</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Load such things from server at runtime?</p>
-</div>
-</div>
 </div>
 </div>
 
@@ -311,7 +237,7 @@ testing project, jsample won’t work as Protocol.sk been populated by test/jsam
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Odys Zhou.
+        &#169; Copyright 2023, Ody Zhou.
 
     </p>
   </div>

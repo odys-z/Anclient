@@ -1,10 +1,10 @@
 import React from 'react';
-import { Color, PropTypes, StandardProps, Theme, withStyles } from '@material-ui/core';
+import { PropTypes, StandardProps, Theme, withStyles } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
 import { AnContext } from './reactext';
 import { Media, ClassNames } from './anreact';
-import { CRUD, UIComponent } from '@anclient/semantier-st';
+import { CRUD, Semantier, SessionInf, UIComponent } from '@anclient/semantier';
 
 interface Comprops extends StandardProps<any, string>, UIComponent {
 	/**The matching url in React.Route */
@@ -18,8 +18,10 @@ interface Comprops extends StandardProps<any, string>, UIComponent {
 
 	/** Semantier */
 	classes?: ClassNames;
-	readonly tier?: any;
+	readonly tier?: Semantier;
 	readonly width?: Breakpoint;
+
+	ssInf?: SessionInf;
 }
 
 const styles = (theme: Theme) => ( {
@@ -119,10 +121,18 @@ CrudCompW.contextType = AnContext;
 
 class HomeComp extends CrudComp<Comprops> {
 	render() {
-		return (<>Welcome to AnReact (Anclient JS)</>);
+		return (<>Home Page (wrong role - function configuration?)</>);
 	}
 }
 const Home = withStyles(styles)(HomeComp);
+
+class ErrorPageComp extends CrudComp<Comprops>  {
+	render() {
+		return (<>Error Page</>);
+	}
+}
+const ErrorPage = withStyles(styles)(ErrorPageComp);
+
 
 class DomainComp extends CrudComp<Comprops>  {
 	render() {
@@ -191,6 +201,7 @@ export {
 	Comprops, CrudComp,
 	CrudCompW, DetailFormW,
 	Home, HomeComp,
+	ErrorPage, ErrorPageComp,
 	Domain, DomainComp,
 	Roles, RolesComp,
 	Users, UsersComp,

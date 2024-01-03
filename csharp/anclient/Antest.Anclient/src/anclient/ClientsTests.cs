@@ -1,29 +1,32 @@
-﻿using io.odysz.common;
+﻿using anclient.net.jserv.tier;
+using io.odysz.common;
 using io.odysz.semantic.ext;
 using io.odysz.semantic.jprotocol;
 using io.odysz.semantic.jserv.U;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using static io.odysz.semantic.jprotocol.AnsonMsg;
+using static io.odysz.semantic.jprotocol.JProtocol;
 
 namespace io.odysz.anclient
 {
     [TestClass()]
     public class ClientsTests
     {
-        private const string jserv = "http://192.168.0.201:8080/jserv-sample";
+        const string uri = "test.cs";
+
+        private const string jserv = "http://localhost:8080/jserv-sample";
         private const string pswd = "----------123456"; // TODO needing 16/32 padding
         private const string uid =  "admin";
-        private static AnsonClient client;
+        static SessionClient client;
 
         static ClientsTests()
         {
-            Clients.Init(jserv);
+            AnClient.Init(jserv);
         }
 
         [TestMethod()]
@@ -32,53 +35,74 @@ namespace io.odysz.anclient
             await Login();
         }
 
-        internal async Task Login(Action<AnsonClient, AnsonResp> onLogin = null) {
-            bool succeed = false;
-            await Clients.Login(uid, pswd,
-                (code, resp) =>
-                {
-                    succeed = true;
-                    client = new AnsonClient(resp.ssInf);
-                    Assert.AreEqual(uid, resp.ssInf.uid);
-                    Assert.IsNotNull(resp.ssInf.ssid);
-                    if (onLogin != null)
-                        onLogin(client, resp);
-                });
+        static bool succeed = false;
+        class OnTestLogin : OnLogin
+        {
+            public void ok(SessionClient client)
+            {
+                succeed = true;
+                ClientsTests.client = client;
+                Assert.AreEqual(uid, client.ssInf.uid);
+                Assert.IsNotNull(client.ssInf.ssid);
+            }
+        }
+
+        internal async Task Login(OnLogin login = null) {
+            await AnClient.Login(uid, pswd, "device.c#", login == null ? new OnTestLogin() : login);
             if (!succeed)
-                Assert.Fail("onOk not called.");
+                Assert.Fail("Failed: onOk not called.");
             Assert.IsNotNull(client);
         }
 
+        class OnTestOk : OnOk
+        {
+            public void ok(AnsonResp resp)
+            {
+                IList rses = (IList)((AnDatasetResp)resp).Forest();
+                Utils.Logi(rses);;
+            }
+        }
         // [TestMethod()]
         public void TestMenu(string s, string roleId)
         {
-            AnDatasetReq req = new AnDatasetReq(null, "sys-sqlite");
+            AnDatasetReq req = new AnDatasetReq(uri, null);
 
             string t = "menu";
             AnsonHeader header = client.Header()
                     .UsrAct("SemanticClientTest", "init", t,
                         "test jclient.java loading menu from menu.sample");
 
-            AnsonMsg jmsg = client.UserReq(new Port(Port.echo), null, req);
+            AnsonMsg jmsg = client.UserReq(uri, new Port(Port.echo), null, req);
             jmsg.Header(header);
 
             client.Console(jmsg);
-            
-            client.Commit(jmsg, (code, data) => {
-                    IList rses = (IList)((AnDatasetResp)data.Body()?[0]).Forest();
-                    Utils.Logi(rses);;
-                });
+
+            client.CommitAsync(jmsg, new OnTestOk());
+                //(code, data) => {
+                //    IList rses = (IList)((AnDatasetResp)data.Body()?[0]).Forest();
+                //    Utils.Logi(rses);;
+                //});
+        }
+
+        static CancellationTokenSource waker;
+        class OnloginUpload : OnLogin
+        {
+            public void ok(SessionClient _client)
+            {
+                client = _client;
+                UploadTransaction(waker, client, "Sun Yet-sen.jpg");
+            }
         }
 
         [TestMethod()]
         public async Task TestUpload()
         {
-            CancellationTokenSource waker = new CancellationTokenSource();
-            await Login(
-                (client, resp) =>
-                {
-                    UploadTransaction(waker, client, "Sun Yet-sen.jpg");
-                });
+            waker = new CancellationTokenSource();
+            await Login(new OnloginUpload());
+                //(client, resp) =>
+                //{
+                //    UploadTransaction(waker, client, "Sun Yet-sen.jpg");
+                //});
             try
             {   // should waken by SessionCleint.Commit()
                 Task.Delay(60 * 1000, waker.Token).Wait();
@@ -88,25 +112,33 @@ namespace io.odysz.anclient
             {
                 // waked up
                 // we can access the file now
-                Debug.WriteLine("waken");
+                // Debug.WriteLine("waken");
             }
             finally { waker.Dispose(); }
         }
-        static void UploadTransaction(CancellationTokenSource waker, AnsonClient client, string p)
+
+        class OnUploadError : ErrorCtx
+        {
+            public override void onError(MsgCode code, string msg, string[] args = null)
+            {
+                Assert.Fail(string.Format(@"code: {0}, error: {1}", code.Name(), msg));
+            }
+        }
+        static void UploadTransaction(CancellationTokenSource waker, SessionClient client, string p)
         {
             // string p = Path.get(filename);
             byte[] f = File.ReadAllBytes(p);
             string b64 = AESHelper.Encode64(f);
 
-            AnsonMsg jmsg = client.Update(null, "a_users");
+            AnsonMsg jmsg = client.Update(uri, "a_users");
             AnUpdateReq upd = (AnUpdateReq)jmsg.Body(0);
             upd.Nv("nationId", "CN")
                 .WhereEq("userId", "admin")
                 // .post(((UpdateReq) new UpdateReq(null, "a_attach")
-                .Post(AnUpdateReq.formatDelReq(null, null, "a_attaches")
+                .Post(AnUpdateReq.formatDelReq(uri, null, "a_attaches")
                         .WhereEq("busiTbl", "a_users")
                         .WhereEq("busiId", "admin")
-                        .Post((AnInsertReq.formatInsertReq(null, null, "a_attaches")
+                        .Post((AnInsertReq.formatInsertReq(null, "a_attaches", "a_attaches")
                                 .Cols("attName", "busiId", "busiTbl", "uri")
                                 .Nv("attName", "-Anclient.cs Test")
                                 // The parent pk can't be resulved, we must provide the value.
@@ -120,15 +152,17 @@ namespace io.odysz.anclient
             client.Console(jmsg);
             
             client.Commit(jmsg,
-                (code, data) => {
-                    if (MsgCode.ok == code.code)
-                        Utils.Logi(code.ToString());
-                    else Utils.Warn(data.ToString());
-                },
-                onErr: (c, err) => {
-                    Assert.Fail(string.Format(@"code: {0}, error: {1}", c, err.Msg()));
-                },
-                waker);
+                //(code, data) => {
+                //    if (MsgCode.ok == code.code)
+                //        Utils.Logi(code.ToString());
+                //    else Utils.Warn(data.ToString());
+                //},
+                // onErr: (c, err) => { Assert.Fail(string.Format(@"code: {0}, error: {1}", c, err.Msg())); },
+                // waker );
+                new OnUploadError() );
+
+            succeed = true;
+            waker.Cancel();
         }
     }
 }

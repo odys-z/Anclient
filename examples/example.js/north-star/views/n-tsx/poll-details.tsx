@@ -2,6 +2,7 @@
 import React, { UIEvent } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
+import { Theme } from '@material-ui/core/styles';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -11,14 +12,13 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
-import { Tierec, CRUD, TierCol } from '@anclient/semantier-st';
-import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Media } from '@anclient/anreact';
+import { Tierec, CRUD, TierCol } from '@anclient/semantier';
+import { L, AnContext, ConfirmDialog, invalidStyles, DetailFormW, ClassNames, Media, CrudCompW } from '@anclient/anreact';
 
-import { starTheme } from '../../common/star-theme';
 import { PollsTier } from './polls';
 import { CardsForm, CardsFormProps } from './card-form';
 
-const styles = (theme: starTheme) => (Object.assign(
+const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
 		root: {},
 		fromBody: {},
@@ -70,16 +70,6 @@ class PollDetailsComp extends DetailFormW<CardsFormProps> {
 	componentDidMount() {
 		// Only CardForm needing to load records
 		// Poll details form is actually a list form
-		if (this.tier.pollId) {
-
-		}
-		// if (this.tier.pkval) {
-		// 	let that = this;
-		// 	this.tier.record(undefined, // use tier.pkval
-		// 		(_cols, rows) => {
-		// 			that.setState({record: rows[0]});
-		// 		} );
-		// }
 	}
 
 	toStop(e: UIEvent) {
@@ -104,6 +94,8 @@ class PollDetailsComp extends DetailFormW<CardsFormProps> {
 
 	render () {
 		const { classes, width } = this.props;
+
+		let media = CrudCompW.getMedia(width);
 
 		let title = L('Poll\'s Details');
 

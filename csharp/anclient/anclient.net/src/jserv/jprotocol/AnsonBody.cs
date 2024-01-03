@@ -10,23 +10,31 @@ namespace io.odysz.semantic.jprotocol
 		[AnsonField(refer=AnsonField.enclosing)]
 		public AnsonMsg parent { get; internal set; }
 
-		public AnsonBody Parent(AnsonMsg p)
+		public AnsonBody Parent(AnsonMsg p, string uri)
         {
 			parent = p;
+			this.uri = uri;
 			return this;
         }
-
-		public string conn { get; protected set; }
 
 		/// <summary>
 		/// Action: login | C | R | U | D | any serv extension
 		/// </summary>
 		protected string a { get; set; }
 
-        /// <summary>
-        /// @return Action: login | C | R | U | D | any serv extension
-        /// </summary>
-        // public string a() { return _a; }
+		protected string uri;
+		public string Uri() { return uri; }
+		public AnsonBody Uri(string uri)
+		{
+			if (this.uri == null)
+				this.uri = uri;
+			return this;
+		}
+
+		/// <summary>
+		/// @return Action: login | C | R | U | D | any serv extension
+		/// </summary>
+		public string A() { return a; }
 
         public AnsonBody A(string act)
         {
@@ -34,10 +42,10 @@ namespace io.odysz.semantic.jprotocol
             return this;
         }
 
-        public AnsonBody(AnsonMsg parent, string conn)
+        public AnsonBody(string uri, AnsonMsg parent)
 		{
 			this.parent = parent;
-			this.conn = conn;
+			this.uri = uri;
 		}
 	}
 }

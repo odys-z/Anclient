@@ -1,14 +1,14 @@
 package io.odysz.jclient;
 
-import io.odysz.semantic.jsession.SessionInf;
+import io.odysz.semantics.SessionInf;
 
-public class InsecureClient extends AnsonClient {
+public class InsecureClient extends SessionClient {
 
-	InsecureClient(String servRt, String conn) {
+	public InsecureClient(String servRt) {
 		super(robotSsInf());
 	}
 
-	private static SessionInf robotSsInf() {
+	protected static SessionInf robotSsInf() {
 		return new SessionInf("uid", "robot"); // mac?
 	}
 

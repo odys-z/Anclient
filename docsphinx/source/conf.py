@@ -21,8 +21,8 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = u'Anclient'
-copyright = u'2020, Odys Zhou'
-author = u'Odys Zhou'
+copyright = u'2023, Ody Zhou'
+author = u'Ody Zhou'
 
 # The short X.Y version
 version = u''
@@ -178,6 +178,9 @@ epub_title = project
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
-
+ 
+# https://stackoverflow.com/a/62061439
+html_copy_source = False
+html_show_sourcelink = False
 
 # -- Extension configuration -------------------------------------------------

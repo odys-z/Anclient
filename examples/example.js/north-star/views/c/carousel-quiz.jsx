@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/core/styles';
 import withWidth from "@material-ui/core/withWidth";
 import PropTypes from "prop-types";
 
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -13,13 +12,11 @@ import MobileStepper from "@material-ui/core/MobileStepper";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 
-import { Protocol, SessionClient, AnClient, UserReq } from '@anclient/semantier-st'
-import { L, Langstrs, AnConst,
-    AnContext, CrudCompW, AnReactExt
-} from '@anclient/anreact';
+import { CRUD, UserReq } from '@anclient/semantier'
+import { L, AnContext, CrudCompW} from '@anclient/anreact';
 
 import { CenterProtocol } from "../../common/protocol.quiz.js";
-import { JQuiz } from '../../common/an-quiz.js';
+import { JQuiz } from '../../common/an-quiz';
 import { CarouselCard, CarouselSubmitCard } from "./carousel-card";
 
 const styles = (theme) => ( {
@@ -93,7 +90,7 @@ class CarouselQuizComp extends CrudCompW {
 			this.props.uri,
 			{pollId: this.state.pollId, questions: this.state.quiz.questions},
 			() => {
-				that.state.crud = Protocol.CRUD.u;
+				that.state.crud = CRUD.u;
 				that.setState({submitted: true});
 				// that.loadQuiz();
 				that.props.onSubmit();
@@ -195,6 +192,7 @@ class CarouselQuizComp extends CrudCompW {
 						</Button>
 					}
 			/>
+			{this.agreement}
 		  </Dialog>
 		);
 	}

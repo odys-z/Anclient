@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
+import { Theme, withStyles } from "@material-ui/core/styles";
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -10,12 +10,12 @@ import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 
 import {L} from '../../utils/langstr';
-	import { AnContext, AnContextType } from '../reactext';
-	import { AnTabs, TabPanel } from './tabs';
+import { AnContext, AnContextType } from '../reactext';
+import { AnTabs, TabPanel } from './tabs';
 import { Comprops, DetailFormW } from '../crud';
 import { DialogProps } from './messagebox';
 
-const styles = theme => ({
+const styles = (_theme: Theme) => ({
   root: {
 	backgroundColor: "mint-cream",
 	textAlign: "center" as const,
@@ -61,11 +61,11 @@ class MyInfoComp extends DetailFormW<MyInfoProps> {
 		let ssInf = ctx.anClient.ssInf;
 		return (
 			<DialogContentText id="myinfo-txt" component={'span'} >
-				{ssInf ? ssInf.userName : 'User Info'}
+				{ssInf ? ssInf.usrName : 'User Info'}
 				<TextField id="qtitle" label={L('User Name')}
 				  variant="outlined" color="primary" disabled
 				  onChange={e => this.setState({qtitle: e.currentTarget.value})}
-				  value={ssInf.userName || ''} />
+				  value={ssInf.usrName || ''} />
 
 				<TextField id="quizinfo" label={L("Role")}
 				  variant="outlined" color="secondary" disabled
