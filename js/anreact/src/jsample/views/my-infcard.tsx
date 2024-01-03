@@ -4,8 +4,8 @@ import withWidth from "@material-ui/core/withWidth";
 import Button from '@material-ui/core/Button';
 
 import { Protocol, CRUD,
-	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs,
-	OnCommitOk, OnLoadOk, QueryConditions, SessionInf, UIComponent
+	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, PageInf,
+	OnCommitOk, OnLoadOk, SessionInf, UIComponent, str
 } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { dataOfurl, urlOfdata } from '../../utils/file-utils';
@@ -97,7 +97,7 @@ class MyInfCardComp extends DetailFormW<MyInfProps> {
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.tier.crud,
-				  pkval: this.tier.pkval.v,
+				  pkval: this.tier.pkval.v as string,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?
@@ -148,8 +148,6 @@ export class MyInfTier extends Semantier {
 	constructor(comp: UIComponent) {
 		super(comp);
 		// FIXME move to super class?
-		// this.uri = comp.uri;
-		// this.mtabl = 'a_users';
 		this.pkval.tabl = 'a_users';
 		this.pkval.pk = 'userId';
 
@@ -157,11 +155,11 @@ export class MyInfTier extends Semantier {
 	}
 
 	_fields = [
-		{ field: 'userId',   label: L('Log ID'), grid: {sm: 6, lg: 4}, disabled: true },
-		{ field: 'userName', label: L('User Name'),   grid: {sm: 6, lg: 4} },
-		{ field: 'roleId',   label: L('Role'), disabled: true,
-		  grid: {sm: 6, lg: 4}, cbbStyle: {width: "100%"},
-		  type : 'cbb', sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
+		{ type : 'text', field: 'userId',   label: L('Log ID'),    grid: {sm: 6, lg: 4}, disabled: true },
+		{ type : 'text', field: 'userName', label: L('User Name'), grid: {sm: 6, lg: 4} },
+		{ type : 'cbb',  field: 'roleId',   label: L('Role'),      grid: {sm: 6, lg: 4}, disabled: true,
+		  cbbStyle: {width: "100%"},
+		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'} },
 		{ field: this.imgProp, label: L('Avatar'), grid: {sm: 6, lg: 4}, fieldFormatter: this.loadAvatar.bind(this) }
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
@@ -182,8 +180,8 @@ export class MyInfTier extends Semantier {
 			/>);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk<MyInfRec>) {
-		let { userId } = conds;
+	record(conds: PageInf, onLoad: OnLoadOk<MyInfRec>) {
+		let { userId } = conds.mapCondts;
 
 		let client = this.client;
 		if (!client)
@@ -207,7 +205,7 @@ export class MyInfTier extends Semantier {
 				// NOTE because of using general query, extra hanling is needed
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				that.rec = rows && rows[0] as MyInfRec;
-				that.pkval.v = that.rec && that.rec[that.pkval.pk];
+				that.pkval.v = str(that.rec && that.rec[that.pkval.pk]);
 				if (that.rec[that.imgProp])
 					that.rec[that.imgProp] = urlOfdata(that.rec.mime, that.rec[that.imgProp]);
 				onLoad(cols, rows as Array<MyInfRec>);
@@ -246,7 +244,7 @@ export class MyInfTier extends Semantier {
 
 			req.Body().post(
 				new InsertReq(this.uri, "a_attaches")
-					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v)
+					.nv('busiTbl', 'a_users').nv('busiId', this.pkval.v as string)
 					.nv('attName', rec.fileMeta?.name).nv('mime', rec.fileMeta?.mime)
 					.nv('uri', dataOfurl(rec[this.imgProp] as string)) );
 		}

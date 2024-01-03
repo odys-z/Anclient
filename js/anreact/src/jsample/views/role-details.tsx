@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { CRUD, PkMeta, Tierec } from '@anclient/semantier';
+import { AnlistColAttrs, CRUD, PkVal, Tierec } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnContext, } from '../../react/reactext';
@@ -26,11 +26,11 @@ const styles = (theme: Theme) => {
 			height: "100%"
 		},
 		root: {
-			marginTop: 60,
+			marginTop: theme.spacing(7.5),
 			minHeight: "60vh",
 			maxHeight: "86vh",
 			maxWidth: "70vw",
-			minWidth: 600,
+			minWidth: theme.spacing(75),
 			margin: "auto"
 		},
 		title: {
@@ -63,7 +63,7 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 		record: undefined as Tierec,
 	};
 
-	pkval: PkMeta = {pk: undefined, v: undefined};
+	pkval: PkVal = {pk: undefined, v: undefined};
 	tier: RoleTier;
 	ok: JSX.Element;
 
@@ -112,13 +112,15 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 
 	showOk(txt: string | string[]) {
 		let that = this;
-		this.ok = (<ConfirmDialog ok={L('OK')} open={true}
-					title={L('Info')}
-					cancel={false} msg={txt}
-					onClose={() => {
-						that.ok = undefined;
-						that.setState( {dirty: false} );
-					} } />);
+		this.ok = (
+			<ConfirmDialog ok={L('OK')} open={true}
+				title={L('Info')}
+				cancel={false} msg={txt}
+				onClose={() => {
+					that.ok = undefined;
+					that.setState( {dirty: false} );
+				}}
+			/>);
 
 		if (typeof this.props.onSave === 'function')
 			this.props.onSave({code: 'ok'});
@@ -128,7 +130,6 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 
 	render () {
 		const { classes, width } = this.props;
-		const smallSize = new Set(["xs", "sm"]).has(width);
 
 		let crud = this.state.crud;
 
@@ -153,14 +154,14 @@ class RoleDetailsComp extends DetailFormW<Comprops & {tier: RoleTier} & { relsk:
 					mtabl='a_roles' pk='roleId'
 					fields={this.tier.fields({
 						remarks: {grid: {sm: 12, md: 12, lg: 12}}
-					})}
+					}) as AnlistColAttrs<JSX.Element, Comprops>[]}
 				/>
 				<AnRelationTree uri={this.props.uri}
 					tier={this.tier} sk={undefined}
-					mtabl='a_roles' reltabl='a_role_func' relcolumn='nodeId'
+					mtabl='a_roles' reltabl='a_role_func'
+					// relcolumn='nodeId'
 					sqlArgs={[this.pkval.v]}
 				/>
-					{/* relcolumn='nodeId' */}
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
 			  {crud &&

@@ -2,7 +2,7 @@ var path = require('path')
 var webpack = require('webpack')
 
 var v = 'development';// "production" | "development" | "none"
-var version = "1.0.0";
+var version = "1.1.0";
 
 module.exports = {
 	mode: v,
@@ -13,7 +13,7 @@ module.exports = {
 	output: {
 	  filename: "[name]-" + version + ".min.js",
 	  path: path.resolve(__dirname, 'dist'),
-	  library: 'test',
+	  library: 'jsample',
 	  libraryTarget: 'umd'
 	},
 

@@ -18,8 +18,6 @@ import { L, AnContext,
 import { Theme } from '@material-ui/core/styles';
 import { ThumbUpAltTwoTone } from '@material-ui/icons';
 
-// const convert = require('heic-convert');
-
 const { regex } = utils;
 
 const styles = (_theme: Theme) => ({

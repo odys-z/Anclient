@@ -1,7 +1,7 @@
 
 import { assert } from 'chai'
-import { UpdateReq } from '../anclient';
-import {Protocol, AnsonMsg, InsertReq} from '../protocol';
+import { AnTreeNode } from '../anclient';
+import {Protocol, InsertReq} from '../protocol';
 import { Semantier } from '../semantier';
 
 const dstier1 = {
@@ -279,7 +279,7 @@ const relationRoleFuncs = [
   "parent": "",
   "level": 0,
   "id": "c01"
-} ];
+} ] as AnTreeNode[];
 
 Protocol.registerBody(InsertReq.__type__, (jsonBd) => {
 	return new InsertReq(jsonBd.uri, jsonBd.tabl);
@@ -288,18 +288,22 @@ Protocol.registerBody(InsertReq.__type__, (jsonBd) => {
 describe('case: [05.0 dataset + s-tree]', () => {
 	it('[semantics] checkTree -> relation records', () => {
 
+		/*
 		console.log(Protocol.ansonTypes);
 		let semantier = new Semantier({uri: 'test'});
-		semantier.rels = {a_role_func: relationRoleFuncs};
+		semantier.rels = {a_role_func: relationRoleFuncs as unknown as AnTreeNode[]};
 
 		let body = {type: InsertReq.__type__, uri: 'test-05'};
 		let req = new AnsonMsg<InsertReq>({body: [body]});
 
 		semantier.formatRel('test 05', req,
-					{stree: {sk: 'fake-test', childTabl: 'a_role_func', fk: 'roleId', col: 'funcId', colProp: 'nodeId'}},
-					{pk: 'roleId', v: 'r00'});
+				  { stree: { sk: 'fake-test', childTabl: 'a_role_func', fk: 'roleId', col: 'funcId', colProp: 'nodeId' },
+					childField: ''
+				  },
+				  false,
+				  { pk: 'roleId', v: 'r00' });
 
-		let del = req.Body().postUpds[0] as UpdateReq;
+		let del = req.Body()?.postUpds[0] as UpdateReq;
 
 		let ins = del.postUpds[0] as InsertReq;
 		let nvss = ins.nvss;
@@ -321,5 +325,24 @@ describe('case: [05.0 dataset + s-tree]', () => {
 		assert.equal(nvss[1][0][1], 'sys-role');
 		assert.equal(nvss[1][1][0], 'roleId');
 		assert.equal(nvss[1][1][1], 'r00');
+		*/
+
+		let columnMap = {funcId: 'nodeId', roleId: 'r00'};
+		let check = "checked";
+		let rows = [];
+		let cnt = Semantier.collectTree(
+			relationRoleFuncs,
+			rows, columnMap, check, true
+		);
+		assert.equal(cnt, 1, 'nvs length');
+		assert.equal(rows[0][0].name,  'funcId', "5.0");
+		assert.equal(rows[0][0].value, 'sys-domain', "5.1");
+		assert.equal(rows[0][1].name,  'roleId', "5.2");
+		assert.equal(rows[0][1].value, 'r00', "5.3");
+
+		assert.equal(rows[1][0].name,  'funcId', "5.4");
+		assert.equal(rows[1][0].value, 'sys-role', "5.5");
+		assert.equal(rows[1][1].name,  'roleId', "5.6");
+		assert.equal(rows[1][1].value, 'r00', "5.7");
 	});
 });

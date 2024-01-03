@@ -57,7 +57,7 @@ export const JsampleIcons = {
 export const JsampleTheme = responsiveFontSizes(createTheme({
   palette: {
     primary: {
-      light: "#fff",
+      light: "rgb(84 174 186)",
       main: "rgb(23, 105, 170)",
       dark: "#000"
     },
@@ -80,7 +80,7 @@ JsampleTheme.typography.body2 = {
   fontSize: 16,
 };
 
-export const jstyles = (theme) => ({
+export const jstyles = (_theme) => ({
 	"field1": { width: 80 },
 	"field2": { width: 120 }
 });

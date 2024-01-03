@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 31
 
     defaultConfig {
         minSdk 26
-        targetSdk 32
+        targetSdk 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -30,13 +30,12 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
 
-    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver")
-    implementation (group: 'io.github.odys-z', name: 'album-lib', version: "${album_lib_ver}")
 //    {
 //        exclude group: "org.apache.tika", module: "tika-core"
 //        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
 //    }
-    implementation (group: 'io.github.odys-z', name: 'docsync.jserv', version: "${jserv_ext_syncdoc}")
+    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver")
+    implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver")
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

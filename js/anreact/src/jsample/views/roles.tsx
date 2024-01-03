@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	QueryConditions, OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree, TierComboField
+	OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree, TierComboField, len, str, StreeTier
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -55,7 +55,7 @@ class RolesComp extends CrudCompW<Comprops> {
 		condOrg : { type: 'cbb',  field: 'orgId',    val: AnConst.cbbAllItem,
 					sk: 'org.all', nv: {n: 'text', v: 'value'},
 					options: [ AnConst.cbbAllItem ],
-					label: L('Organization') } as TierComboField<JSX.Element, any>,
+					label: L('Organization') } as TierComboField,
 
 		// active buttons
 		buttons: { add: true, edit: false, del: false},
@@ -63,11 +63,12 @@ class RolesComp extends CrudCompW<Comprops> {
 		total: 0,
 		rows: [] as Tierec[],
 		pageInf: { page: 0, size: 25, total: 0 } as PageInf,
-		selected: {ids: new Set<string>()},
+		selected: {ids: new Map<string, Tierec>()},
 	};
 
+	port: string;
+
 	tier: RoleTier;
-	q?: QueryConditions;
 	confirm: JSX.Element;
 	roleForm: JSX.Element;
 	props: { classes: ClassNames; };
@@ -91,33 +92,34 @@ class RolesComp extends CrudCompW<Comprops> {
 			this.tier.setContext(this.context as unknown as AnContextType);
 		}
 
-		this.toSearch(undefined);
+		this.toSearch();
 	}
 
-	toSearch(q?: QueryConditions, pageInf?: PageInf) {
+	toSearch(pageInf: PageInf = new PageInf(0, -1)) {
 		let that = this;
-		this.q = q || this.q || {};
-		this.q.pageInf = pageInf;
-		this.tier.records( this.q,
+		// this.q = q || this.q || {};
+		// this.q.pageInf = pageInf;
+		this.tier.records( pageInf,
 			(_cols, rows) => {
 				that.state.selected.ids.clear();
 				that.setState({rows});
 			} );
+		this.setState({pageInf});
 	}
 
 	onPageInf(page: number, size?: number) {
 		this.state.pageInf.size = size || 0;
 		this.state.pageInf.page = page;
 
-		this.toSearch(this.q, this.state.pageInf);
+		this.toSearch(this.state.pageInf);
 	}
 
-	onTableSelect(rowIds: Array<string>) {
+	onTableSelect(rowIds: Map<string, Tierec>) {
 		this.setState( {
 			buttons: {
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
+				edit: len(rowIds) === 1, // rowIds && rowIds.length === 1,
+				del:  len(rowIds) >=  1, // rowIds &&  rowIds.length >= 1,
 			},
 		} );
 	}
@@ -131,20 +133,19 @@ class RolesComp extends CrudCompW<Comprops> {
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
 				onOk={ () => {
-						that.tier.del({ids: Array.from(that.state.selected.ids)},
-						(_resp) => {
-							that.confirm = (
-								<ConfirmDialog open={true}
-									ok={L('OK')} cancel={false}
-									title={L('Info')} msg={L('Data Deleted!')}
-									onOk={ () => {
-										that.confirm = undefined;
-										// that.setState({});
-										that.toSearch();
-									} }
-								/>);
-							that.setState({});
-						} ); } }
+					that.tier.del({ids: that.state.selected.ids},
+					(_resp) => {
+					  that.confirm = (
+						<ConfirmDialog open={true}
+							ok={L('OK')} cancel={false}
+							title={L('Info')} msg={L('Data Deleted!')}
+							onOk={ () => {
+								that.confirm = undefined;
+								that.toSearch();
+							} }
+						/>);
+					  that.setState({});
+					} ); } }
 				onClose={ () => {
 					that.confirm = undefined;
 					that.setState({});
@@ -166,7 +167,7 @@ class RolesComp extends CrudCompW<Comprops> {
 
 		this.roleForm = (<RoleDetails crud={CRUD.u} uri={this.uri}
 			tier={this.tier}
-			onOk={(_r) => that.toSearch(that.q)}
+			onOk={(_r) => that.toSearch(that.state.pageInf)}
 			onClose={this.closeDetails} />);
 	}
 
@@ -174,8 +175,8 @@ class RolesComp extends CrudCompW<Comprops> {
 		this.roleForm = undefined;
 		this.tier.resetFormSession();
 		this.setState({});
-		this.onTableSelect([]);
-		this.toSearch();
+		this.onTableSelect(new Map());
+		this.toSearch(undefined);
 	}
 
 	render() {
@@ -205,7 +206,7 @@ class RolesComp extends CrudCompW<Comprops> {
 
 			{this.tier && <AnTablist
 				className={classes.root} checkbox={true}
-				columns={this.tier.columns()}
+				columns={this.tier.columns() as AnlistColAttrs<JSX.Element, CompOpts>[]}
 				rows={this.state.rows} pk={this.tier.pkval.pk}
 				selected={this.state.selected}
 				pageInf={this.state.pageInf}
@@ -221,7 +222,7 @@ RolesComp.contextType = AnContext;
 
 const Roles = withStyles<any, any, Comprops>(styles)(withWidth()(RolesComp));
 
-class RoleTier extends Semantier {
+class RoleTier extends StreeTier {
 	checkbox = true;
 
 	_cols = [
@@ -243,7 +244,7 @@ class RoleTier extends Semantier {
 	 * @param {string} comp.uri the client function uri.
 	 * @constructor
 	 */
-	constructor(comp: UIComponent) {
+	constructor(comp: UIComponent & {uri: string, port: string}) {
 		super(comp);
 
 		this.pkval.tabl = 'a_roles';
@@ -255,25 +256,27 @@ class RoleTier extends Semantier {
 		this.relMeta = {'a_role_func':
 			{ stree: {
 				childTabl: 'a_role_func',
-				pk: 'roleId',	 // fk to main table
-				fk: 'roleId',	 // fk to main table
-				col: 'funcId', // checking col
-				colProp: 'nodeId',
-				sk: 'trees.role_funcs'
-			} as relStree,
+				pk       : 'roleId',	// fk to main table
+				fk       : 'roleId',	// fk to main table
+				col      : 'funcId',	// checking col
+				colProp  : 'nodeId',
+				sk       : 'trees.role_funcs'
+			  } as relStree,
 			} as DbRelations
 		};
 	}
 
-	records(conds = {} as {roleId?: string; orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk<Tierec>) {
-		let { orgId, roleName, pageInf } = conds;
-		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'r', pageInf)
+	// records(conds = {} as {roleId?: string; orgId?: string; roleName?: string; pageInf?: PageInf}, onLoad: OnLoadOk<Tierec>) {
+	records(conds = {} as PageInf, onLoad: OnLoadOk<Tierec>) {
+
+		let { orgId, roleName } = conds.mapCondts || {};
+		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'r', conds)
 		let req = queryReq.Body()
 			.expr('r.roleId').expr('roleName').expr('r.remarks').expr('orgName')
 			.l('a_orgs', 'o', 'o.orgId = r.orgId');
 
 		if (orgId)
-			req.whereEq('r.orgId', orgId);
+			req.whereEq('r.orgId', str(orgId));
 		if (roleName)
 			req.whereCond('%', 'roleName', `'${roleName}'`);
 
@@ -285,17 +288,15 @@ class RoleTier extends Semantier {
 			this.errCtx);
 	}
 
-	record(conds: QueryConditions, onLoad: OnLoadOk<Tierec>) {
+	record(conds: PageInf, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let client = this.client;
 		let that = this;
 
 		// temp id avoiding update my pk status
-		let roleId = conds[this.pkval.pk] as string;
+		let roleId = conds.mapCondts[this.pkval.pk] as string;
 
-		// NOTE
-		// Is this senario an illustration of general query is also necessity?
 		let req = client.query(this.uri, 'a_roles', 'r')
 		req.Body()
 			.col('roleId').col('roleName').col('remarks')

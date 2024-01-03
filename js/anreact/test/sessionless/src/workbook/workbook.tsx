@@ -2,13 +2,13 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
+import { AnsonMsg, AnsonResp, PageInf, str } from '@anclient/semantier';
 
 import {
 	L, ComboCondType, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, AnContextType, Spreadsheetier,
 } from '../../../../src/an-components';
-import { JsampleIcons } from '../../../../src/jsample/styles';
+const {JsampleIcons} = jsample;
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -25,7 +25,6 @@ const styles = (_theme: Theme) => ({
 });
 
 class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spreadsheetier}>{
-	// tier: MyWorkbookTier;
 	tier: Spreadsheetier;
 
 	confirm: JSX.Element;
@@ -85,10 +84,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 	}
 
 	toDel(e: React.UIEvent) {
-		// let that = this;
-		// // if (this.currentId)
-		// this.tier.del({ids: [this.tier.currentRecId]}, this.bindSheet);
-		this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
+		this.tier.del({ids: [str(this.tier.pkval.v)]}, this.bindSheet);
 	}
 
 	render() {

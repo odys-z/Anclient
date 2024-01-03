@@ -1,6 +1,6 @@
 {
   "name": "@anclient/semantier",
-  "version": "0.9.82",
+  "version": "0.9.102",
   "description": "The anclient's common package depending on pure js object that can be used for js unit test.",
   "main": "./anclient.ts",
   "directories": {},
@@ -21,8 +21,25 @@
   ],
   "author": "Ody Zhou",
   "license": "MIT",
-
   "publishConfig": {
-    "registry":"https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-typescript": "^7.21.0",
+    "@types/chai": "^4.3.5",
+    "@types/jquery": "^3.5.16",
+    "@types/mocha": "^10.0.1",
+    "babel": "^6.23.0",
+    "babel-loader": "^9.1.2",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "webpack": "^5.77.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "csstype": "^3.1.2",
+    "jquery": "^3.7.0"
   }
 }

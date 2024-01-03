@@ -1,20 +1,15 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>About Anclient.ts &mdash; Anclient Anclient documentation</title>
   
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -22,39 +17,42 @@
   
 
   
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   
 
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
+        <link rel="up" title="Ancient.ts Quick Start" href="index.html"/>
+        <link rel="next" title="About jserv-sample" href="jsample.html"/>
+        <link rel="prev" title="Ancient.ts Quick Start" href="index.html"/> 
 
-    
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="About jserv-sample" href="jsample.html" />
-    <link rel="prev" title="Ancient.ts Quick Start" href="index.html" /> 
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
-   
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -81,15 +79,11 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
             
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+                <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Ancient.ts Quick Start</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">About Anclient.ts</a></li>
@@ -113,63 +107,40 @@
             
           
         </div>
-        
       </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Anclient</a>
-        
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Anclient</a>
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
-
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
           <li><a href="index.html">Ancient.ts Quick Start</a> &raquo;</li>
-        
-      <li>About Anclient.ts</li>
-    
-    
+      
+    <li>About Anclient.ts</li>
       <li class="wy-breadcrumbs-aside">
         
           
         
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -180,8 +151,8 @@
 <p>Anclient is the client side API for semantic-jserv service like <a class="reference external" href="https://github.com/odys-z/semantic-jserv/tree/master/jserv-sample">jserv-sample</a>.
 The typescript client version includes:</p>
 <ul class="simple">
-<li><p>&#64;anclient/semantier &amp;</p></li>
-<li><p>&#64;anclient/anreact,</p></li>
+<li>&#64;anclient/semantier &amp;</li>
+<li>&#64;anclient/anreact,</li>
 </ul>
 <p>Since 0.9.42, &#64;anclient/semantier is a semantics supported protocol layer, and
 <em>Semantier</em> is short for Semantics Tier, a low level ts client API for accessing
@@ -198,11 +169,11 @@ npm packages, which can be useful for kick start.</p>
 <p>This sample project consists of two parts, one from the test project of
 semantic-jserv, one from the test of &#64;anclient/anreact.</p>
 <ol class="arabic simple">
-<li><p>Deploy a data service using Semantic-jserv</p></li>
+<li>Deploy a data service using Semantic-jserv</li>
 </ol>
 <p>Say, <a class="reference internal" href="jsample.html#jsample-quick-start"><span class="std std-ref">tsample</span></a>.</p>
 <ol class="arabic simple" start="2">
-<li><p>Install Anclient.ts.</p></li>
+<li>Install Anclient.ts.</li>
 </ol>
 <p>Anclient.js is actually implemented in Typescript.</p>
 <p>It’s two npm packages:</p>
@@ -211,7 +182,7 @@ semantic-jserv, one from the test of &#64;anclient/anreact.</p>
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
-<li><p>Create a Typescript client</p></li>
+<li>Create a Typescript client</li>
 </ol>
 <p>See <a class="reference external" href="https://github.com/odys-z/Anclient/blob/master/js/test/sessionless/dist/index.html">Anclient/js/areact/test/tsample/dist/index.html</a>
 for a reactJS client, which can accessing data service, an implementation based
@@ -225,7 +196,7 @@ on semantic-jserv.</p>
 as an example for quick start, which won’t verify HTTP requests session token at
 server side.</p>
 <ol class="arabic simple" start="0">
-<li><p>Prerequisite</p></li>
+<li>Prerequisite</li>
 </ol>
 <p>Downalod 2 zip at <a class="reference external" href="https://github.com/odys-z/Anclient/releases/tag/Tutorial-sessionless-quickstart">Anclient release section</a>.</p>
 <blockquote>
@@ -233,7 +204,7 @@ server side.</p>
 <p><a class="reference download external" download="" href="https://github.com/odys-z/Anclient/releases/download/Tutorial-sessionless-quickstart/jserv-sandbox.zip"><code class="xref download docutils literal notranslate"><span class="pre">jserv-sandbox.zip</span></code></a></p>
 </div></blockquote>
 <ol class="arabic simple">
-<li><p>Deploy a web application of jserv-sandbox</p></li>
+<li>Deploy a web application of jserv-sandbox</li>
 </ol>
 <p>Extract the java web project, <em>jserv-sandbox.zip</em>, then open it as an existing
 maven project,</p>
@@ -263,7 +234,7 @@ domain to the web page server, where the html pages are loaded from.</p>
 </pre></div>
 </div>
 <ol class="arabic simple" id="inst-anclient-sessionless" start="2">
-<li><p>Install Anclient.ts/sessionless.</p></li>
+<li>Install Anclient.ts/sessionless.</li>
 </ol>
 <p>Extract <em>anclient.sessionless.zip</em> to local folder, e.g. <em>anclient.sessionless</em>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">anclient</span><span class="o">.</span><span class="n">sessionless</span>
@@ -278,6 +249,11 @@ Then load the page at:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8888</span>
 </pre></div>
 </div>
+<p>The final result load with <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ody-zhou.anprism">Anprism</a>
+should like this:</p>
+<a class="reference internal image-reference" href="../_images/05-sessionless-vscode.png"><img alt="../_images/05-sessionless-vscode.png" src="../_images/05-sessionless-vscode.png" style="height: 160px;" /></a>
+<a class="reference internal image-reference" href="../_images/03-sessionless.png"><img alt="../_images/03-sessionless.png" src="../_images/03-sessionless.png" style="height: 160px;" /></a>
+<p>Now it is the time to have a look how the application is loaded by the html page.</p>
 <p>The App with a HTML page’s source can be found at
 <a class="reference external" href="https://github.com/odys-z/Anclient/blob/master/js/anreact/test/sessionless/dist/index.html">Anclient/js/anreact/test/sessionless/dist/index.html</a>.</p>
 <div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;app&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
@@ -307,7 +283,7 @@ should like this:</p>
 for data service, and can be even simpler than the way of starting from Eclipse
 project. Users only care about JS pages can benefited from this docker layer.</p>
 <ol class="arabic simple">
-<li><p>Setup docker</p></li>
+<li>Setup docker</li>
 </ol>
 <p>Download <strong>docker-start</strong> &amp; <strong>volume.zip</strong> at the <a class="reference external" href="https://github.com/odys-z/Anclient/releases/tag/Tutorial-sessionless-quickstart">release section</a>.</p>
 <blockquote>
@@ -319,11 +295,11 @@ project. Users only care about JS pages can benefited from this docker layer.</p
 <p>Now the docker container should report like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">ps</span>
 <span class="n">CONTAINER</span> <span class="n">ID</span>   <span class="n">IMAGE</span>                 <span class="n">COMMAND</span>             <span class="n">CREATED</span>          <span class="n">STATUS</span>          <span class="n">PORTS</span>                                       <span class="n">NAMES</span>
-<span class="mi">4</span><span class="n">a1a0b3a7bf6</span>   <span class="n">odysz</span><span class="o">/</span><span class="n">jserv</span><span class="o">-</span><span class="n">sandbox</span>   <span class="s2">&quot;catalina.sh run&quot;</span>   <span class="mi">20</span> <span class="n">minutes</span> <span class="n">ago</span>   <span class="n">Up</span> <span class="mi">20</span> <span class="n">minutes</span>   <span class="mf">0.0.0.0</span><span class="p">:</span><span class="mi">8080</span><span class="o">-&gt;</span><span class="mi">8080</span><span class="o">/</span><span class="n">tcp</span><span class="p">,</span> <span class="p">:::</span><span class="mi">8080</span><span class="o">-&gt;</span><span class="mi">8080</span><span class="o">/</span><span class="n">tcp</span>   <span class="n">jsandbox</span>
+<span class="mi">4</span><span class="n">a1a0b3a7bf6</span>   <span class="n">odysz</span><span class="o">/</span><span class="n">jserv</span><span class="o">-</span><span class="n">sandbox</span>   <span class="s2">&quot;catalina.sh run&quot;</span>   <span class="mi">20</span> <span class="n">minutes</span> <span class="n">ago</span>   <span class="n">Up</span> <span class="mi">20</span> <span class="n">minutes</span>   <span class="mf">0.0</span><span class="o">.</span><span class="mf">0.0</span><span class="p">:</span><span class="mi">8080</span><span class="o">-&gt;</span><span class="mi">8080</span><span class="o">/</span><span class="n">tcp</span><span class="p">,</span> <span class="p">:::</span><span class="mi">8080</span><span class="o">-&gt;</span><span class="mi">8080</span><span class="o">/</span><span class="n">tcp</span>   <span class="n">jsandbox</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
-<li><p>Setup client project</p></li>
+<li>Setup client project</li>
 </ol>
 <p>Please follow <a class="reference internal" href="#inst-anclient-sessionless"><span class="std std-ref">the same step</span></a> in the way of using
 jserv-sandbox package.</p>
@@ -333,32 +309,31 @@ jserv-sandbox package.</p>
 
 
            </div>
-           
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="jsample.html" class="btn btn-neutral float-right" title="About jserv-sample" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Ancient.ts Quick Start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="jsample.html" class="btn btn-neutral float-right" title="About jserv-sample" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Ancient.ts Quick Start" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2023, Ody Zhou.
+        &copy; Copyright 2023, Ody Zhou.
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 
@@ -367,15 +342,37 @@ jserv-sandbox package.</p>
   </div>
   
 
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'Anclient',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  false
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+
+  
 
   
   
-    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
    
 
 </body>

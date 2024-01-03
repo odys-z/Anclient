@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Card, IconButton, Link, Paper, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 
-import { OnLoadOk, QueryConditions, Semantier, Tierec } from '@anclient/semantier';
+import { OnLoadOk, PageInf, Semantier, Tierec } from '@anclient/semantier';
 import { ClassNames, Comprops, CrudComp, jsample } from '../../../src/an-components';
 
 const styles = (theme: Theme) => ( {
@@ -84,7 +84,9 @@ class WelcomeComp extends CrudComp<Comprops>{
 				<Box component='span' className={this.classes.cardText} >
 					<span>From:<br/></span>
 					{this.icon(e)}
-					<Link style={{ marginLeft: 4 }} target='_blank' href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
+					<Link style={{ marginLeft: 4 }}
+						target='_blank'
+						href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
 						{`${e.publisher || 'Anbox Robot'}`}</Link>
 				</Box>
 			</Paper>
@@ -119,9 +121,12 @@ class WelcomeTier extends Semantier {
 	}
 
 	/**
-	 * @override(Semantier)
+	 * 
+	 * @param conds 
+	 * @param onLoad 
+	 * @returns 
 	 */
-	records<T extends Tierec>(conds: QueryConditions, onLoad: OnLoadOk<T>) {
+	override records<T extends Tierec>(conds: PageInf, onLoad: OnLoadOk<T>) {
 		this.rows = [{eid: '01', ename: 'Abc@D', edate: '2021-10-10', extra: '100'}];
 		onLoad([], this.rows as unknown as Array<T>);
 		return this.rows;

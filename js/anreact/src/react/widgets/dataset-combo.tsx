@@ -17,7 +17,7 @@ import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
 export interface ComboItem extends NV {};
 
 /**E.g. form's combobox field declaration */
-type ComboFieldType = TierComboField<JSX.Element, CompOpts>;
+// type ComboFieldType = TierComboField;
 
 export interface ComboProps extends Comprops {
 	/**Intial options (default values), will be replaced after data binding with field's options */
@@ -53,7 +53,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	};
 
 	combo = {
-		options: undefined as Array<ComboItem>,
+		options: [] as Array<ComboItem>,
 		loading: false,
 	};
 
@@ -62,7 +62,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 	constructor(props: ComboProps) {
 		super(props);
-		this.combo.options = props.options;
+		this.combo.options = props.options || [];
 
 		if (this.props.sk && !this.props.uri)
 			console.warn("DatasetCombo is configured as loading data with sk, but uri is undefined.")
@@ -79,7 +79,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		if (this.props.sk ) {
 			let that = this;
 			this.ds2cbbOptions({
-				uri: this.props.uri,
+				uri: this.props.uri || '',
 				sk: this.props.sk,
 				// user uses this, e.g. name and value to access data
 				nv: this.props.nv || {n: 'name', v: 'value'},
@@ -97,7 +97,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		else console.warn("DatasetCombo used for null sk?", this.props.label);
 	}
 
-	onCbbRefChange( refcbb: React.RefObject<HTMLDivElement> ) : (
+	onCbbRefChange( _refcbb: React.RefObject<HTMLDivElement> ) : (
 			event: React.ChangeEvent<{}>,
 			value: Value<ComboItem, boolean, boolean, boolean>,
 			reason: AutocompleteChangeReason | AutocompleteInputChangeReason,
@@ -105,9 +105,12 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	) => void {
 		let that = this;
 
-		return (e, item: NV) => {
+		return (e, item: Value<ComboItem, boolean, boolean, boolean>, reson: string) => {
+			console.log(reson);
+
 			if (e) e.stopPropagation();
-			let selectedItem = item ? item : AnConst.cbbAllItem;
+
+			let selectedItem = item ? item as NV : AnConst.cbbAllItem;
 
 			if (typeof that.props.onSelect === 'function')
 				that.props.onSelect(selectedItem);
@@ -117,18 +120,10 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	}
 
 	render() {
-		// let cmb = this.state.combo
 		let { classes, val } = this.props;
 
 		// let refcbb = React.createRef(); // FIXME why not this.refcbb?
 
-		/** Desgin Notes:
-		 * SimpleForm's first render triggered this constructor and componentDidMount() been called, first.
-		 * When it called render again when data been loaded in it's componentDidMount() (then render),
-		 * this constructor and componentDidMount() won't be called.
-		 * So here is necessary to check the initial selected value.
-		 * This shouldn't be an issue in semantier pattern?
-		 */
 		let selectedItem = this.state.selectedItem;
 		if (!selectedItem && this.props.val != undefined) {
 			selectedItem = findOption(this.combo.options || this.props.options, val);
@@ -150,7 +145,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			options={opts}
 			autoHighlight={this.props.autoHighlight}
 			style={this.props.style}
-			className={classes[this.props.invalidStyle || 'ok']}
+			className={classes ? classes[this.props.invalidStyle || 'ok'] : ''}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
 			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
 			renderInput={
@@ -169,7 +164,8 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 		}
 	}
 
-	/**Bind dataset to combobox options (comp.state.condCbb).
+	/**
+	 * Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
 	 * <h6>About React Rendering Events</h6>
@@ -207,7 +203,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 
 		an.dataset( { port: 'dataset', uri, sqlArgs, sk },
 			(dsResp: AnsonMsg<AnsonResp>) => {
-				let rs = dsResp.Body().Rs();
+				let rs = dsResp.Body()?.Rs();
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
 					console.error("Can't find data in rs for option label. column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}");

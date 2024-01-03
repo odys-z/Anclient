@@ -20,21 +20,13 @@ type LessProps = {
 	iwindow?: any; // window object
 }
 
-type State = {
-	servs?: JsonServs;
-	servId: string;
-	iportal?: string;
-	hasError?: boolean;
-	nextAction?: string;
-}
-
 /**
  * The main application, context singleton and error handler.
  * 
  * This application is used for test @anclient/anreact, and also as an example
  * used in the sessionless tutorials. See Anclient/docs.
  */
-class App extends React.Component<LessProps, State> {
+class App extends React.Component<LessProps> {
 	/** {@link InsercureClient} */
 	inclient: Inseclient;
 	anReact: AnReactExt;  // helper for React
@@ -79,9 +71,9 @@ class App extends React.Component<LessProps, State> {
 		Protocol.sk.cbbRole = 'roles';
 
 		this.anReact = new AnReactExt(this.inclient, this.error)
-								.extendPorts({
-									userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
-								});
+					.extendPorts({
+						userstier: "users.less", // see jserv-sandbox/UsersTier, port name: usersteir, filter: users.less
+					});
 	}
 
 	onError(c: any, r: AnsonMsg<AnsonResp> ) {
@@ -143,7 +135,7 @@ class App extends React.Component<LessProps, State> {
 	static bindHtml(elem: string, opts: { portal?: string; serv?: "host"; home?: string; jsonUrl: string; }) {
 		let portal = opts.portal ?? 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
-		AnReactExt.bindDom(elem, opts, onJsonServ);
+		AnReactExt.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
 			let dom = document.getElementById(elem);

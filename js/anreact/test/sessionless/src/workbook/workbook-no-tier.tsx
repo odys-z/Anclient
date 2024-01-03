@@ -5,10 +5,11 @@ import { Theme, withStyles } from '@material-ui/core/styles';
 import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
 
 import {
-	L, ComboCondType, Comprops, CrudComp,
-	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, AnContextType,
+	L, ComboCondType, Comprops, CrudComp, AnContext,
+	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec,
+	QueryPage, toPageInf, Spreadsheetier, AnContextType,
 } from '../../../../src/an-components';
-import { JsampleIcons } from '../../../../src/jsample/styles';
+const { JsampleIcons } = jsample;
 
 const styles = (_theme: Theme) => ({
 	root: {
@@ -84,7 +85,7 @@ class WorkbookComp extends CrudComp<Comprops & {conn_state: string, tier: Spread
 	}
 
 	toDel(e: React.UIEvent) {
-		this.tier.del({ids: [this.tier.pkval.v]}, this.bindSheet);
+		this.tier.del({ids: [this.tier.pkval.v as string]}, this.bindSheet);
 	}
 
 	render() {

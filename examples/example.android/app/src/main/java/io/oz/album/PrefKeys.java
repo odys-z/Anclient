@@ -18,11 +18,14 @@ public class PrefKeys {
     public String homeCate;
     public String home;
     public String jserv;
+    public String homepage;
     public String device;
+    public String devCate;
+    public String restoreDev;
     public String usrid;
     public String pswd;
 
-    public String login_summery;
+//    public String login_summery;
 
     /** button key in prefs screen for registering device */
     public String bt_regist;

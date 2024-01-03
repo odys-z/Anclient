@@ -1,6 +1,6 @@
 {
   "name": "anclient-sessionless",
-  "version": "1.0.0",
+  "version": "0.4.38",
   "description": "Test for session less client - for sandbox examples.",
   "main": "",
   "scripts": {

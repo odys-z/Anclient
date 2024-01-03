@@ -2,52 +2,52 @@ package io.oz.album.webview;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.oz.R;
+import io.oz.album.AndErrorCtx;
+import io.oz.album.AssetHelper;
+import io.oz.album.WelcomeAct;
 import io.oz.albumtier.AlbumContext;
 
 public class WebAlbumAct extends AppCompatActivity {
 
-	public static final String Web_ActionName = "WebAction";
+	public static final String Web_PageName = "WebAction";
 
-	public static final int Act_Help = 1;
-	public static final int Act_Landing = 2;
-	public static final int Act_Album = 3;
-	public static final int Act_SyncReport = 4;
+	/** Landing uril such as error page, e.g. http://odys-z.github.io/Anclient */
+	static String url_landing;
 
-	private static final VWebAlbum appView = new VWebAlbum();
-
-	private static final String url_landing = "https://odys-z.github.io/Anclient";
+	AlbumContext singleton;
+	AndErrorCtx errCtx;
+	int webpageId;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.wv);
 
+		errCtx = new AndErrorCtx().context(this);
+		singleton = AlbumContext.getInstance(errCtx);
+
+		url_landing = getString(R.string.url_landing);
+
 		Intent intt = getIntent();
-		int act = intt.getIntExtra(Web_ActionName, Act_Landing);
-		String url = loadUrls(act);
+		webpageId = intt.getIntExtra(Web_PageName, AssetHelper.Act_Landing);
 
 		WebView wv = findViewById(R.id.wv);
-		wv.setWebViewClient(appView);
-		WebSettings webSettings = wv.getSettings();
-		webSettings.setJavaScriptEnabled(true);
-		wv.loadUrl(url);
+		wv.getSettings().setJavaScriptEnabled(true);
+		wv.setWebViewClient(new WebViewClient() {
+		});
+		wv.loadUrl(AssetHelper.url4intent(this, webpageId));
 	}
 
-	private String loadUrls(int act) {
-	    switch (act) {
-			case Act_Album:
-				return getString(R.string.url_album, AlbumContext.getInstance().jserv(), AlbumContext.getInstance().albumHome);
-			case Act_SyncReport:
-				return getString(R.string.url_sync_report, AlbumContext.getInstance().jserv(), AlbumContext.getInstance().synchPage);
-			case Act_Help:
-				return getString(R.string.url_help);
-			case Act_Landing:
-			default:
-				return url_landing;
-		}
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		WebView wv = findViewById(R.id.wv);
+		WelcomeAct.reloadWeb(singleton, wv, this, webpageId);
 	}
 }

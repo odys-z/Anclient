@@ -13,7 +13,7 @@ import { Comprops, DetailFormW } from '../crud';
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
 	imgUploadBox: {
-		height: 48,
+		height: theme.spacing(6),
 		border: "solid 1px #aaa2" }
 	}
 ) );

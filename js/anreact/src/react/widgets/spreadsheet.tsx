@@ -1,17 +1,17 @@
 import React from 'react';
 import { CSSProperties } from '@material-ui/styles';
 
-import { AgGridColumnProps, AgGridReact } from 'ag-grid-react';
+import { AgGridReact } from 'ag-grid-react';
 import { ColDef, Column, ColumnApi, GridApi,
 	ColumnFunctionCallbackParams, GetContextMenuItems, GetContextMenuItemsParams,
-	GridReadyEvent, ICellRendererParams, RowNode, ICellRendererComp, ICellRendererFunc
+	GridReadyEvent, ICellRendererParams, RowNode, ICellRendererComp, ICellRendererFunc, CellClickedEvent, EditableCallback, CellEditingStoppedEvent
 } from 'ag-grid-community';
 
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+// import 'ag-grid-community/dist/styles/ag-grid.css';
+// import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Comprops, CrudComp } from '../crud';
-import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkMeta,
-	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, ColType
+import { TierCol, Tierec, Semantier, Semantext, NV, toBool, Inseclient, PkVal,
+	OnCommitOk, AnElemFormatter, PageInf, OnLoadOk, AnsonResp, UserReq, CRUD, ErrorCtx, Protocol, ColType, str
 } from '@anclient/semantier';
 import { utils, AnConst, AnReactExt, AnContextType } from '../../an-components';
 
@@ -58,31 +58,27 @@ export interface CellEvent extends RowEvent {
     value: any;
 }
 
-export interface CellClickedEvent extends CellEvent {
-}
+// export interface CellClickedEvent<T, F> extends CellEvent { }
 
-export interface EditableCallbackParams extends ColumnFunctionCallbackParams {
-}
+// export interface EditableCallbackParams extends ColumnFunctionCallbackParams { }
 
-export interface EditableCallback {
-    (params: EditableCallbackParams): boolean;
-}
+// export interface EditableCallback { (params: EditableCallbackParams): boolean; }
 
 /**
  * Short-cut for ag-grid-community (License: MID)
  */
-export interface CellEditingStoppedEvent extends CellEvent {
-    /** The old value before editing */
-    oldValue: any;
-    /** The new value after editing */
-    newValue: any;
-}
+// export interface CellEditingStoppedEvent extends CellEvent {
+//     /** The old value before editing */
+//     oldValue: any;
+//     /** The new value after editing */
+//     newValue: any;
+// }
 
 /**
  * For ag-grid column options, see
  * https://www.ag-grid.com/react-data-grid/column-properties/
  */
-export interface SheetCol extends TierCol, AgGridColumnProps {
+export interface SheetCol extends TierCol  {
 	label: string;
 	field: string;
 
@@ -91,8 +87,8 @@ export interface SheetCol extends TierCol, AgGridColumnProps {
 	 * - cbb: bind options with sk
 	 * - autocbb: same to cbb for anreact
 	 * - dynamic-cbb: options changing for each rows, work together with cbbOptions
-	 */
 	type?: ColType;
+	 */
 	/** dynamic options per record. */
 	cbbOptions?: (rec: SpreadsheetRec) => string[]
 
@@ -214,8 +210,8 @@ export class SpreadsheetReq extends UserReq {
 	}
 	page: PageInf;
 
-	constructor(opts: {type: string, tabl?: string, query: PageInf}) {
-		super(undefined, opts.tabl);
+	constructor(opts: {type: string, tabl: string, query: PageInf}) {
+		super(undefined as any, opts.tabl);
 
 		if (!opts)
 			throw Error("Argument opts is required. If this is not checked by Typescript, it's probably the registered constructor doesn't work.")
@@ -236,14 +232,14 @@ export class SpreadsheetReq extends UserReq {
 export class Spreadsheetier extends Semantier {
 	static reqfactory: (conds: PageInf, rec?: SpreadsheetRec) => SpreadsheetReq;
 
-	static registerReq(factory: (conds: PageInf, rec: SpreadsheetRec) => SpreadsheetReq) {
+	static registerReq(factory: (conds: PageInf, rec?: SpreadsheetRec) => SpreadsheetReq) {
 		Spreadsheetier.reqfactory = factory;
 	}
 
 	/**jserv port name, e.g. 'workbook' */
 	port: string;
 
-	constructor(port: string, props: {uri: string, pkval: PkMeta, cols: SheetCol[],
+	constructor(port: string, props: {uri: string, pkval: PkVal, cols: SheetCol[],
 		/** e.g. {gridOptions: { rowHeight: 50 } } - not working */
 		aggrid?: any}) {
 		super(props);
@@ -260,7 +256,7 @@ export class Spreadsheetier extends Semantier {
 		let that = this;
 		let an = ctx.uiHelper as AnReactExt;
 		// load all options
-		this._cols?.forEach((c: SheetCol, x: number) => {
+		(this._cols as SheetCol[])?.forEach((c: SheetCol, x: number) => {
 			if (c.type === 'cbb') {
 				if (c.sk) {
 				  an.ds2cbbOptions({
@@ -271,7 +267,7 @@ export class Spreadsheetier extends Semantier {
 					sqlArgs: c.sqlArgs,
 					onLoad: (_cols, rows) => {
 						if (rows) {
-							let ns = [];
+							let ns: string[] = [];
 							rows.forEach( (nv: NV, x) => ns.push(nv.n) )
 							that.cbbOptions[c.field] = ns;
 							that.cbbItems[c.field] = rows;
@@ -282,7 +278,7 @@ export class Spreadsheetier extends Semantier {
 						}
 						if ( c.delItemName ) {
 							that.cbbOptions[c.field].unshift(c.delItemName)
-							that.cbbItems[c.field].unshift( { n: c.delItemName, v: undefined } );
+							that.cbbItems[c.field].unshift( { n: c.delItemName, v: undefined as any } );
 						}
 					}
 				  });
@@ -315,7 +311,7 @@ export class Spreadsheetier extends Semantier {
 	 * @returns options
 	 */
 	cbbCellOptions(p: CbbCellValue): string[] {
-		return this.cbbOptions[p.colDef?.field] || [p.value];
+		return this.cbbOptions[p.colDef?.field || ''] || [p.value];
 	}
 
 	/**
@@ -336,13 +332,14 @@ export class Spreadsheetier extends Semantier {
 					return nvs[i].n;
 			return v;
 		}
+		return field || "";
 	}
 
 	/**
 	 * Encode record's FK value to get db value - called by spread tier for updating.
 	 *
 	 * @param field
-	 * @param n
+	 * @param n n of NV
 	 * @param rec not used
 	 * @returns
 	 */
@@ -353,22 +350,22 @@ export class Spreadsheetier extends Semantier {
 
 		for (let i = 0; i < nvs.length; i++)
 			if (nvs[i].n === n)
-				return nvs[i].v;
+				return str(nvs[i].v);
 		return `[${n}]`; // [] for tagging the invalid data in database
 	}
 
-	onCellClick (e: CellClickedEvent) {
-		this.pkval.v = e.data[this.pkval.pk];
+	onCellClick (e: CellClickedEvent<any, any>) {
+		this.pkval.v = e.data[str(this.pkval.pk) || ''];
 	};
 
-	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk, err: ErrorCtx) {
+	update(crud: CRUD, rec: SpreadsheetRec, ok: OnCommitOk | undefined, err: ErrorCtx) {
 		console.log(rec);
 
 		if (!this.client) return;
 		let client = this.client;
 
 		let req = client.userReq(this.uri, this.port,
-						Spreadsheetier.reqfactory( undefined, rec)
+						Spreadsheetier.reqfactory( undefined as any, rec)
 						.A( crud === CRUD.d ? SpreadsheetReq.A.delete :
 							crud === CRUD.c ? SpreadsheetReq.A.insert :
 							SpreadsheetReq.A.update ) );
@@ -394,7 +391,7 @@ export class Spreadsheetier extends Semantier {
 
 		let rec = {} as SpreadsheetRec;
 		// rec[this.pkval.pk] = this.currentRecId;
-		rec[this.pkval.pk] = this.pkval.v;
+		rec[str(this.pkval.pk) || ''] = this.pkval.v;
 
 		let {value, oldValue} = p;
 		if (value !== oldValue && (value || oldValue)) {
@@ -418,9 +415,12 @@ export class Spreadsheetier extends Semantier {
 
 		client.commit(req,
 			(resp) => {
-				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				that.rec = rows? rows[0] : undefined;
-				onLoad(cols, rows as T[]);
+				let rs = resp.Body()?.Rs();
+				if (rs) {
+					let {cols, rows} = AnsonResp.rs2arr(rs);
+					that.rec = rows? rows[0] : undefined;
+					onLoad(cols, rows as T[]);
+				}
 			},
 			this.errCtx);
 	}
@@ -439,16 +439,19 @@ export class Spreadsheetier extends Semantier {
 
 		client.commit(req,
 			(resp) => {
-				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				that.rows = rows;
-				onLoad(cols, rows as T[]);
+				let rs = resp.Body()?.Rs()
+				if (rs) {
+					let {cols, rows} = AnsonResp.rs2arr(rs);
+					that.rows = rows;
+					onLoad(cols, rows as T[]);
+				}
 			},
 			this.errCtx);
 	}
 
 	insert(onOk: OnCommitOk) {
 		console.log('can be abstracted?');
-		let bd = Spreadsheetier.reqfactory(undefined).A(SpreadsheetReq.A.insert);
+		let bd = Spreadsheetier.reqfactory(undefined as any).A(SpreadsheetReq.A.insert);
 		let req = this.client.userReq(this.uri,
 			this.port, bd);
 			// new MyBookReq( undefined ).A(MyBookReq.A.insert));
@@ -458,12 +461,12 @@ export class Spreadsheetier extends Semantier {
 
 	/**FIXME move to Docstier */
 	uri2src() {
-		return utils.urlOfdata(this.rec.mime as string, this.rec.uri64);
+		return utils.urlOfdata(this.rec?.mime as string, this.rec?.uri64);
 	}
 
 	/**FIXME move to Docstier */
 	heic2src() {
-		return utils.urlOfdata(this.rec.mime as string, this.rec.uri64);
+		return utils.urlOfdata(this.rec?.mime as string, this.rec?.uri64);
 	}
 }
 
@@ -477,7 +480,7 @@ export interface SpreadsheetProps extends Comprops {
 	/** not used - only for AgGridReact community version */
 	contextMenu?: object;
 
-    onCellClicked?: (e: CellClickedEvent) => void;
+    onCellClicked?: (e: CellClickedEvent<any, any>) => void;
 
 	onSheetReady?: (e: GridReadyEvent) => void;
 }
@@ -515,7 +518,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	isEditable = true;
 	tier: Spreadsheetier;
 
-	ref: AgGridReact;
+	ref: AgGridReact | null;
 	api: GridApi;
 
 	constructor(props: SpreadsheetProps) {
@@ -535,7 +538,8 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 		if (this.props.columns) {
 			this.props.columns.forEach( (c, x) =>  {
 				let headerName = c.label;
-				delete c.label;
+				// delete c.label;
+				c.label = undefined as any;
 
 				let anEditStop = c.onEditStop;
 				if (anEditStop) {
@@ -544,7 +548,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 				}
 				let width = 120;
 				if (x === this.coldefs.length - 1)
-					width = undefined;
+					width = undefined as any;
 				let col = Object.assign(
 					  { headerName: '--',
 						field: '--',
@@ -583,7 +587,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 		this.tier.loadCbbOptions(this.context as AnContextType);
 
 		let that = this;
-		this.tier.records(undefined, () => that.setState({ready: true}));
+		this.tier.records(undefined as any, () => that.setState({ready: true}));
 	}
 
 	getRef() { return this.ref; }
@@ -605,7 +609,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 		if (this.props.contextMenu) {
 			result.push('separator');
 			for (let colname in this.props.contextMenu)
-				if (colname === para.column.getColDef().field)
+				if (colname === para.column?.getColDef().field)
 					result.push(this.props.contextMenu[colname]);
 		}
 
@@ -649,7 +653,7 @@ export class AnSpreadsheet extends CrudComp<SpreadsheetProps> {
 	type: "cellClicked"
 	value: "2021-09-14"
 	*/
-	onCellClicked = (p: CellClickedEvent) => {
+	onCellClicked = (p: CellClickedEvent<any, any>) => {
 		if (typeof this.props.onCellClicked === 'function')
 			this.props.onCellClicked(p);
 	};
@@ -722,7 +726,7 @@ export class AnNumerCellEdit {
     // only start edit if key pressed is a number, not a letter
     const charPressIsNotANumber =
       params.charPress && '1234567890'.indexOf(params.charPress) < 0;
-    this.cancelBeforeStart = charPressIsNotANumber;
+    this.cancelBeforeStart = Boolean(charPressIsNotANumber);
   }
 
   isKeyPressedNavigation(event: KeyboardEvent) {

@@ -14,7 +14,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 
-import QRCode from 'qrcode'
+import QRCode, { QRCodeToDataURLOptions } from 'qrcode'
 
 import { L, copyToClipboard } from '../../utils/langstr';
 import { Comprops, CrudComp, CrudCompW } from '../crud';
@@ -58,6 +58,9 @@ export interface DialogProps extends Comprops {
 
 	fullScreen?: boolean;
 	fullWidth?: boolean;
+
+	/** Dialog won't alwasy access jserv */
+	uri?: string;
 }
 
 class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
@@ -114,7 +117,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 		let full = this.props.fullScreen || this.props.fullWidth;
 
 		return (
-			<Dialog className={classes.root}
+			<Dialog className={classes?.root}
 				open={true}
 				fullScreen={full}
 				fullWidth={!full}
@@ -123,14 +126,14 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				aria-labelledby="alert-dialog-title"
 				aria-describedby="alert-dialog-description" >
 
-				<DialogTitle id="alert-dialog-title" className={classes.dialogTitle}
+				<DialogTitle id="alert-dialog-title" className={classes?.dialogTitle}
 					style={{/*textAlign: "center"*/}}>
 				  {L(title)}
 				</DialogTitle>
 				<DialogContent>
 					{txtLines}
 				</DialogContent>
-				<DialogActions className={classes.dlgAct}>
+				<DialogActions className={classes?.dlgAct}>
 				  <Button onClick={this.toOk} color="primary" autoFocus={displayCancel === 'none'} >
 						{L(txtOk)}
 				  </Button>
@@ -228,7 +231,7 @@ class QrSharingComp extends CrudComp<DialogProps & { imgId: string; qr: {serv: s
 				dark:"#010599FF",
 				light:"#FFBF60FF"
 			}
-		}
+		} as QRCodeToDataURLOptions;
 
 		let urlTxt = this.url();
 		this.state.url = urlTxt;
@@ -240,12 +243,12 @@ class QrSharingComp extends CrudComp<DialogProps & { imgId: string; qr: {serv: s
 		})
 
 		return (
-			<Card className={classes.root}>
+			<Card className={classes?.root}>
 			  <CardActionArea>
-				<CardMedia className={classes.media} >
+				<CardMedia className={classes?.media} >
 					<img id={'qrcode ' + this.props.imgId}/>
 				</CardMedia>
-			    <CardContent onClick={this.onCopy} className={classes.centerbox}>
+			    <CardContent onClick={this.onCopy} className={classes?.centerbox}>
 			      <Typography gutterBottom variant="h5" component="h2">
 			        Click to Copy:
 			      </Typography>

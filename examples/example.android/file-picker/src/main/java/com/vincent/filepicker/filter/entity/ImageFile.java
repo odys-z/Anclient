@@ -3,6 +3,8 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import io.oz.fpick.AndroidFile;
+
 /**
  * Modified by Ody Zhou
  *
@@ -11,7 +13,7 @@ import android.os.Parcelable;
  * Time: 17:44
  */
 
-public class ImageFile extends BaseFile implements Parcelable {
+public class ImageFile extends AndroidFile implements Parcelable {
     private int orientation;   //0, 90, 180, 270
 
     public int getOrientation() {
@@ -24,16 +26,6 @@ public class ImageFile extends BaseFile implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeLong(getId());
-//        dest.writeString(getName());
-//        dest.writeString(getPath());
-//        dest.writeLong(getSize());
-//        dest.writeString(getLocalDirId());
-//        dest.writeString(getLocalDirName());
-//        dest.writeLong(getDate());
-//        dest.writeByte((byte) (isSelected() ? 1 : 0));
-//        dest.writeInt(orientation);
-
         super.writeToParcel(dest, flags);
         dest.writeInt(orientation);
     }
@@ -53,9 +45,9 @@ public class ImageFile extends BaseFile implements Parcelable {
         public ImageFile createFromParcel(Parcel in) {
             ImageFile file = new ImageFile();
             file.setId(in.readLong());
-            file.setName(in.readString());
-            file.setPath(in.readString());
-            file.setSize(in.readLong());
+            file.clientname(in.readString());
+            file.clientpath = in.readString();
+            file.size = in.readLong();
             file.setLocalDirId(in.readString());
             file.setLocalDirName(in.readString());
             file.setDate(in.readLong());

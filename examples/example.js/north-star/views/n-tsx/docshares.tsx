@@ -412,7 +412,7 @@ export class DocsTier extends Semantier {
 	 * @param mime
 	 * @param rec
 	 * @param classes
-	 * @param iconpath 
+	 * @param iconpath
 	 * @return &lt;img/&gt;
 	 */
 	static getMimeIcon(mime: string, rec: Tierec, classes: ClassNames, iconpath = '/res-vol/icons') {
@@ -428,7 +428,6 @@ export class DocsTier extends Semantier {
 
 		return (<img className={classes.iconCell} src={`${iconpath}/${src}`}></img>);
 	}
-
 }
 
 export class DocsReq extends AnsonBody {
@@ -457,10 +456,10 @@ export class DocsReq extends AnsonBody {
     deletings: string[];
 
 	/**
-	 * 
-	 * @param uri 
+	 *
+	 * @param uri
 	 * @param args
-	 * args.deletings: old docId to be deleted 
+	 * args.deletings: old docId to be deleted
 	 */
 	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super();

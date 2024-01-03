@@ -7,7 +7,6 @@
  * @return base64
  */
 export function uarr2Base64 (u8Arr: Uint8Array, mime: string): string {
-	// console.log(e, freader.result);
 	// var CHUNK_SIZE = 0x8000; //arbitrary number
 	// Common Multiple of 6 and 8 should result in 0 padding in the middle?
 	// a smaller size for test: var CHUNK_SIZE = 0x8 * 0x6;
@@ -15,7 +14,7 @@ export function uarr2Base64 (u8Arr: Uint8Array, mime: string): string {
 	let index = 0;
 	let length = u8Arr.length;
 	let result = mime || '';
-	let slice;
+	let slice: Uint8Array;
 	while (index < length) {
 		slice = u8Arr.subarray(index, Math.min(index + CHUNK_SIZE, length));
 		result += String.fromCharCode.apply(null, slice);
@@ -38,4 +37,14 @@ export function mimeOf(dataUrl: string) {
 
 export function urlOfdata(mime: string, data) {
 	return ['data:' + mime, data].join(',');
+}
+
+/**
+ * Creat blob url for img tag' src attribute.
+ *
+ * @param svg
+ * @returns blob url
+ */
+export function svgImgSrc(svg: string) {
+	return URL.createObjectURL(new Blob([svg], {type: 'image/svg+xml'}));
 }

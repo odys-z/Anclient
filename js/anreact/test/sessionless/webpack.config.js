@@ -8,7 +8,13 @@ module.exports = {
 	mode: v,
 	devtool: 'source-map',
 	entry: {'AnHome': './src/less-app.tsx',
+			'AnWidgets': './src/less-widgets.tsx',
+			'Doctree': './src/less-widgets-treegrid.tsx',
 			'AnSheet': './src/workbook/sheet-app.tsx' },
+	
+	// external: {
+	// 	pdfjs: ''
+	// },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",

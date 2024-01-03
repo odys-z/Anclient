@@ -1,0 +1,11 @@
+<resources>
+    <string name="product_jserv_default" translatable="true" >https://www.inforise.com.cn/</string>
+    <string name="product_jserv_name0"   translatable="true" >jserv-album.inforise</string>
+    <string name="product_jserv_1"       translatable="false">http://192.168.182.1:8081/</string>
+    <string name="product_jserv_name1"   translatable="false">522 Standford St.</string>
+
+    <string name="product_landing"       translatable="true">https://www.inforise.com.cn/album</string>
+
+    <string name="product_url_help"      >https://odys-z.github.io/products/album</string>
+    <string name="product_url_landing"   >https://odys-z.github.io/Anclient</string>
+</resources>

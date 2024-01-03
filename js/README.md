@@ -48,12 +48,12 @@ Open
 
 The jsapmple server side is needed to login. (Docker image avialable)
 
-# Examples
-
-Anclient.js' most recently working exmaple is Nort-star, a quiz mimic. The working
-docker images are [odysz/emr-web:0.6.1](https://hub.docker.com/repository/docker/odysz/emr-web) &
-[odysz/connect-polestar:0.6.1](https://hub.docker.com/repository/docker/odysz/connect-polestar). 
-
 ## His Home page
 
 [It's here!](https://odys-z.github.io)
+
+# Credits
+
+* [PDF.js](https://github.com/mozilla/pdf.js)
+
+* [docx4j](https://www.docx4java.org/trac/docx4j)

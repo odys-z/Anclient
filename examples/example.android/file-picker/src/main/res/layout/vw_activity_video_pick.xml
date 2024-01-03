@@ -20,9 +20,13 @@
         android:layout_below="@id/rv_top_divider"
         android:background="@color/vw_BgRv" />
 
-    <ProgressBar android:id="@+id/pb_video_pick"
-        android:layout_height="wrap_content"
+    <ProgressBar
+        android:id="@+id/pb_video_pick"
         android:layout_width="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tb_pick"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp" />
 
 </RelativeLayout>

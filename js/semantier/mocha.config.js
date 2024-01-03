@@ -25,15 +25,15 @@ var config = {
 		{   test: /\.js$/,
 			loader: 'babel-loader',
 			options: {
-			  presets: ['@babel/preset-react', '@babel/preset-env'] }
+			  // presets: ['@babel/preset-react', '@babel/preset-env']
+		  }
 		},
 		{ test: /\.ts$/,
 		  loader : 'babel-loader',
 		  options: { presets: [
-				'@babel/preset-react',
 				'@babel/preset-typescript',
-				'@emotion/babel-preset-css-prop',
-				'@babel/preset-env' ] }
+				'@babel/preset-env'
+			] }
 		}
 	]
   }
