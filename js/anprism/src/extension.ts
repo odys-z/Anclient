@@ -31,6 +31,13 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
+		vscode.commands.registerCommand('anprism.parse',
+			(uri, uris) => {
+				AnprismPanel.parse(context, uri);
+			})
+	);
+
+	context.subscriptions.push(
 		vscode.commands.registerCommand('anprism.refresh', () => {
 			if (AnPagePanel.currentPanel) {
 				AnPagePanel.currentPanel.refresh(undefined);
@@ -81,7 +88,7 @@ export function deactivate() {
  *
  */
 class AnPagePanel {
-	static log: vscode.OutputChannel;
+	public static log: vscode.OutputChannel;
 	static _extensionUri: vscode.Uri;
 
 	/**
@@ -98,8 +105,6 @@ class AnPagePanel {
 	 * Html page information of which is loaded in this panel.
 	 */
 	page: Page = {
-		// port: "8888",
-		// host: "localhost",
 		html: vscode.Uri.file("index.html"),
 		style: `background-color: #ccc`,
 		reload: false,
@@ -128,8 +133,9 @@ class AnPagePanel {
 
 	/**
 	 * Load a page, in current active column - creat panel if necessary.
-	 * @param extensionUri
-	 * @returns
+	 * @param context 
+	 * @param localhtml 
+	 * @returns 
 	 */
 	public static async load(context: vscode.ExtensionContext, localhtml: vscode.Uri) {
 		let p = AnPagePanel.currentPanel;
@@ -377,6 +383,58 @@ class AnPagePanel {
 
 	public static filename(uri: vscode.Uri): string {
 		return path.basename(uri.path);
+	}
+
+}
+
+export class AnprismPanel {
+	static currentPanel: any;
+	static readonly viewType = 'anprism';
+
+	public static async parse(context: vscode.ExtensionContext, envelope: vscode.Uri) {
+		const column = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+
+		// no panel, must be the first time, create a new panel.
+		if (!AnprismPanel.currentPanel) {
+			try {
+				const panel = vscode.window.createWebviewPanel(
+					AnprismPanel.viewType,
+					`Anprism - ${AnPagePanel.filename(envelope)}`,
+					column || vscode.ViewColumn.One,
+					{ enableScripts: true }
+				);
+				panel.webview.options = { enableScripts: true }
+
+				AnPagePanel.log.appendLine("Open page " + AnPagePanel.filename(envelope));
+				AnprismPanel.currentPanel = new AnprismPanel(context, panel);
+			}
+			catch (e) {
+				if (e instanceof AnprismException) {
+					vscode.window.showErrorMessage((e as AnprismException).getMessage());
+					return;
+				}
+			}
+		}
+
+		AnprismPanel.currentPanel._panel.webview.onDidReceiveMessage(
+			(message: string) => AnprismPanel.currentPanel.handleWebviewMessage(message)
+		);
+
+		// show it.
+		try {
+			AnprismPanel.currentPanel.refresh(envelope);
+		}
+		catch (e) {
+			if (e instanceof AnprismException)
+				vscode.window.showErrorMessage((e as AnprismException).getMessage());
+		}
+		AnprismPanel.currentPanel._panel.reveal(column);
+
+	}
+
+	constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel) {
 	}
 
 }
