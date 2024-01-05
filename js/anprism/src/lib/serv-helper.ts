@@ -61,7 +61,6 @@ export class ServHelper {
      * @returns
      */
 	public findRoot(uri: vscode.Uri): ServHelper {
-
         const wscfg = vscode.workspace.getConfiguration('launch', uri);
         const cfgs = wscfg?.get<any[]>("configurations");
 
@@ -96,14 +95,14 @@ export class ServHelper {
 
     /**Change the absolute path back to relative url (remove the leading absolute path).
 	 * @param page
-	 * @returns url: http://...; sub: base file name
+	 * @returns url: http://...; pagename: base file name
 	 */
-	public url(page: Page): {url: string, sub: string} {
-        let sub = path.relative(this.webrootPath(), page.html.fsPath);
-        let subfile = path.basename(sub, ".html");
+	public url(page: Page): {url: string, pagename: string} {
+        let pagename = path.relative(this.webrootPath(), page.html.fsPath);
+        let subfile = path.basename(pagename, ".html");
 		const url = `http://${this.serv.host}/${getNonce()}.html?nonce=${subfile}`;
         console.log(url);
-        return {url, sub};
+        return {url, pagename};
 
         function getNonce() {
             let text = '';
@@ -114,7 +113,6 @@ export class ServHelper {
             return text;
         }
 	}
-
 
     /**
      * Check is the html located in webroot. If yes, change it.

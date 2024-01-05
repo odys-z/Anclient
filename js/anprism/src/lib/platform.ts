@@ -257,7 +257,7 @@ export function isLittleEndian(): boolean {
 
 /**
  * 
- * @param pypath user know the path without knowing os and python command?
+ * @param pypath always '', user knows the path without knowing os and python command?
  * @returns fullpath command without PATH evironment involved
  */
 export function pythonCmd(pypath: string) {
