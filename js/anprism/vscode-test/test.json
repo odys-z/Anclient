@@ -1,1 +1,13 @@
-{"type": "antson.queryReq", "version": "1.0", "seq": 123456, "port": "query", "body": [] }
+{ "type": "antson.AnsonMessage",
+  "version": "1.0",
+  "seq": 123456,
+  "port": "query",
+  "body": [
+  { "type": "anston.QueryReq",
+    "page": {
+      "page": 0,
+      "size": 10
+    },
+    "args": ["role01", "org01"]
+  }]
+}

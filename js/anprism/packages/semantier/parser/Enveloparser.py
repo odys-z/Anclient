@@ -30,7 +30,11 @@ class Enveloparser(JSONVisitor):
         return self.ast.env.fields[key]
 
     def visitArray(self, ctx: JSONParser.ArrayContext):
-        return [ctx.getText()]
+        arr = []
+        for i in range(1, ctx.getChildCount(), 2):
+            val = self.visit(ctx.getChild(i))
+            arr.append(val)
+        return arr
 
     def visitObj(self, ctx:JSONParser.ObjContext):
         return ValueNode(ctx.getChildren())
