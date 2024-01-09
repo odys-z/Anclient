@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 
+import io.oz.AlbumApp;
 import io.oz.R;
 
 /**
@@ -17,12 +18,12 @@ public class AssetHelper {
     public static final String adminHome = "admin.html";
     public static final String synchPage = "sync.html";
 
-    static String jserv;
+    // static String jserv;
 
     /**
      * Inited by {@link #init(Context, String, String)}.
      */
-    static String homeroot;
+    // static String homeroot;
 //    Context ctx;
 
     /** Act: show help page */
@@ -36,20 +37,19 @@ public class AssetHelper {
     /** Act: show admin page */
     public static final int Act_Admin = 5;
 
-    /**
-     * Init {@link #jserv}
-     *
-     * @param context
-     * @param jservroot
-     */
-    public static void init(Context context, String jservroot) {
-        jserv = jservroot;
-        // homeroot = webroot;
-    }
+//    /**
+//     * Init {@link #jserv}
+//     *
+//     * @param context
+//     * @param jservroot
+//     */
+//    public static void init(Context context, String jservroot) {
+//        jserv = jservroot;
+//    }
 
-    public static void webroot(String url) {
-        homeroot = url;
-    }
+//    public static void webroot(String url) {
+//        AlbumApp.config.homepage = url;
+//    }
 
 
     /**
@@ -57,17 +57,17 @@ public class AssetHelper {
      * @param ctx
      * @param intent
      * @return intent: return =<br>
-     * {@link #Act_Album}: {@link #homeroot},<br>
+     * {@link #Act_Album}: {@link #homepage},<br>
      * {@link #Act_Admin}: {@link #adminHome}
      */
     public static String url4intent(Context ctx, int intent) {
         switch (intent) {
             case Act_Album:
-                return ctx.getString(R.string.url_album, homeroot, albumHome);
+                return ctx.getString(R.string.url_album, AlbumApp.config.homepage, albumHome);
             case Act_Admin:
-                return ctx.getString(R.string.url_admin, homeroot, adminHome);
+                return ctx.getString(R.string.url_admin, AlbumApp.config.homepage, adminHome);
             case Act_SyncReport:
-                return ctx.getString(R.string.url_sync_report, jserv, synchPage);
+                return ctx.getString(R.string.url_sync_report, AlbumApp.config.jserv, synchPage);
             case Act_Help:
                 return ctx.getString(R.string.url_help);
             case Act_Landing:

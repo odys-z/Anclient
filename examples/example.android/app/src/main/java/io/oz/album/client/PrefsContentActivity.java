@@ -38,12 +38,13 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.AssetHelper;
 import io.oz.album.client.widgets.ComfirmDlg;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Profiles;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.PhotoSyntier;
-import io.oz.albumtier.Plicies;
+import io.oz.albumtier.Policies;
 
 /**
  * @since 0.3.0
@@ -187,7 +188,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                     (resp) -> {
                         Profiles prf = ((AlbumResp) resp).profiles();
                         singleton.profiles = prf;
-                        singleton.policies = new Plicies(prf);
+                        singleton.policies = new Policies(prf);
 
                         // update summery?
                         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -195,6 +196,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         editor.putString(keys.home, prf.home);
                         editor.putString(keys.homepage, prf.webroot);
                         editor.apply();
+
+                        AlbumApp.localConfig(sharedPref);
 
                         confirm(R.string.login_succeed, 3000);
                     },

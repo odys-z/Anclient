@@ -17,9 +17,16 @@ import io.oz.album.AlbumPort;
 import io.oz.album.tier.Profiles;
 
 public class AlbumContext {
+
     public boolean verbose = true;
+
+    /**
+     * Profiles loaded from server, not local config.
+     */
     public Profiles profiles;
-    public Plicies policies;
+    public Policies policies;
+
+    String jserv;
 
     public enum ConnState { Online, Disconnected, LoginFailed }
 
@@ -59,7 +66,6 @@ public class AlbumContext {
                 || LangExt.isblank(userInf.uid());
     }
 
-    String jserv;
 
     @SuppressWarnings("deprecation")
 	public PhotoSyntier tier;
@@ -84,7 +90,7 @@ public class AlbumContext {
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
         userInf.device = device;
-        this.jserv = jserv;
+        jserv = jserv;
 
         Clients.init(jserv + "/" + jdocbase, verbose);
         

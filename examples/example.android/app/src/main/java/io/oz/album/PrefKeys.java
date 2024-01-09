@@ -1,5 +1,10 @@
 package io.oz.album;
 
+import android.content.Context;
+
+import io.oz.AlbumApp;
+import io.oz.R;
+
 /**
  * The contract between string.xml items and app constants.
  *
@@ -25,9 +30,24 @@ public class PrefKeys {
     public String usrid;
     public String pswd;
 
-//    public String login_summery;
-
     /** button key in prefs screen for registering device */
     public String bt_regist;
     public String bt_login;
+
+    public PrefKeys(Context ctx) {
+        AlbumApp.keys = this;
+
+        homeCate = ctx.getString(R.string.key_home_cate);
+        home = ctx.getString(R.string.key_home);
+        device = ctx.getString(R.string.key_device);
+        devCate = ctx.getString(R.string.key_dev_cate);
+        restoreDev = ctx.getString(R.string.key_restore_dev);
+        jserv = ctx.getString(R.string.jserv_key);
+        homepage = ctx.getString(R.string.homepage_key);
+        usrid = ctx.getString(R.string.userid_key);
+        pswd = ctx.getString(R.string.pswd_key);
+
+        bt_regist = ctx.getString(R.string.key_regist);
+        bt_login = ctx.getString(R.string.btn_login);
+    }
 }

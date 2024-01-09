@@ -16,7 +16,13 @@
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/product.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/product.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/Plicies.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/Policies.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/AssetHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/AssetHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -199,7 +205,7 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="C:/Users/Alice/github/anclient/examples/example.android" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="C:/Users/Alice/github/anclient/examples/example.android" type="GradleRunConfiguration" factoryName="Gradle">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -262,7 +268,6 @@
       <list>
         <item itemvalue="Gradle.example.android" />
         <item itemvalue="Gradle.example.android [mylibrary:tasks]" />
-        <item itemvalue="Gradle.C:/Users/Alice/github/anclient/examples/example.android" />
       </list>
     </recent_temporary>
   </component>
@@ -296,8 +301,23 @@
           <line>11</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.odys-z/album-lib/0.4.36/f78d89a034f3b38d33bdf5f6068ba8fa114df235/album-lib-0.4.36-sources.jar!/io/oz/album/tier/Profiles.java</url>
+          <line>56</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.odys-z/album-lib/0.4.36/f78d89a034f3b38d33bdf5f6068ba8fa114df235/album-lib-0.4.36-sources.jar!/io/oz/album/tier/Profiles.java</url>
+          <line>49</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="java.util.HashMap$Node" memberName="value" />
+      </pinned-members>
+    </pin-to-top-manager>
     <watches-manager>
       <configuration name="AndroidRunConfigurationType">
         <watch expression=" lstJserv.getTitle()" />

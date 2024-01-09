@@ -42,7 +42,6 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.activity.AudioPickActivity;
 import com.vincent.filepicker.activity.ImagePickActivity;
 import com.vincent.filepicker.activity.VideoPickActivity;
-import com.vincent.filepicker.filter.entity.BaseFile;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,11 +60,9 @@ import java.util.Objects;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
-import io.odysz.jclient.Clients;
 import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
@@ -75,7 +72,7 @@ import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.IFileProvider;
-import io.oz.albumtier.Plicies;
+import io.oz.albumtier.Policies;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.activity.BaseActivity;
@@ -94,39 +91,19 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
-    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AlbumApp.keys = new PrefKeys();
-
-        AlbumApp.keys.homeCate = getString(R.string.key_home_cate);
-        AlbumApp.keys.home = getString(R.string.key_home);
-        AlbumApp.keys.device = getString(R.string.key_device);
-        AlbumApp.keys.devCate = getString(R.string.key_dev_cate);
-        AlbumApp.keys.restoreDev = getString(R.string.key_restore_dev);
-        AlbumApp.keys.jserv = getString(R.string.jserv_key);
-        AlbumApp.keys.homepage = getString(R.string.homepage_key);
-        AlbumApp.keys.usrid = getString(R.string.userid_key);
-        AlbumApp.keys.pswd = getString(R.string.pswd_key);
-
-        AlbumApp.keys.bt_regist = getString(R.string.key_regist);
-        AlbumApp.keys.bt_login = getString(R.string.btn_login);
+        PrefKeys keys = new PrefKeys(this);
 
         singl = AlbumContext.getInstance(this);
 
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String homeName = sharedPref.getString(AlbumApp.keys.home, "");
-        String uid = sharedPref.getString(AlbumApp.keys.usrid, "");
-        String device = sharedPref.getString(AlbumApp.keys.device, "");
-        String jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
-        String homepage = sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing));
-
-        singl.init(homeName, uid, device, jserv);
-        AssetHelper.init(this, jserv);
-        AssetHelper.webroot(homepage);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        AlbumApp.localConfig(sharedPrefs, getString(R.string.url_landing));
+        AlbumApp.Config c = AlbumApp.config;
+        singl.init(c.homeName, c.uid, c.device, c.jserv);
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
@@ -164,12 +141,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             prefStarter = registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
-                        AssetHelper.init(this,
-                                sharedPref.getString(AlbumApp.keys.jserv, "")
-                                // sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing)));
-                        );
+                        // AssetHelper.init(this, sharedPref.getString(AlbumApp.keys.jserv, ""));
+                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                        AlbumApp.config.jserv = sharedPref.getString(AlbumApp.keys.jserv, "");
                         if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            showMsg(R.string.msg_device_uid, uid, device);
+                            showMsg(R.string.msg_device_uid, AlbumApp.config.uid, AlbumApp.config.device);
                         }
                         reloadAlbum();
                     });
@@ -184,17 +160,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 // settings are cleared
                 startPrefsAct();
             else {
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
                 String pswd = sharedPref.getString(AlbumApp.keys.pswd, "-");
                 singl.pswd(pswd)
-                        .login((client) -> {
-                                    AssetHelper.init(this,
-                                            sharedPref.getString(AlbumApp.keys.jserv, "")
-                                            // sharedPref.getString(AlbumApp.keys.homepage, getString(R.string.url_landing))
-                                    );
-                                    // All WebView methods must be called on the same thread.
-                                    runOnUiThread(() -> reloadAlbum());
-                                },
-                                (c, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv()));
+                     .login((client) -> {
+                            // AssetHelper.init(this,sharedPref.getString(AlbumApp.keys.jserv, ""));
+                            // All WebView methods must be called on the same thread.
+                            runOnUiThread(() -> reloadAlbum());
+                        },
+                        (code, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv()));
             }
         } catch (Exception e) {
             showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv());
@@ -214,41 +188,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     @SuppressLint("SetJavaScriptEnabled")
     void reloadAlbum() {
-        if (singl.tier == null || sharedPref == null)
+        if (singl.tier == null || AlbumApp.config == null)
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
         reloadWeb(singl, wv, this, AssetHelper.Act_Album);
-
-        /*
-        SessionClient client = singl.tier.client();
-        if (client == null || sharedPref == null)
-            return;
-
-        String pswd = singl.pswd();
-
-        final VWebAlbum webView = new VWebAlbum();
-        wv.setWebViewClient(webView);
-        WebSettings webSettings = wv.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-
-        wv.setWebViewClient(new WebViewClient() {
-            public void onPageFinished(WebView view, String url) {
-                if (!isblank(pswd)) {
-                    String script = String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd);
-                    Utils.warn("\n[Load page script]: %s", script);
-                    // https://www.techyourchance.com/communication-webview-javascript-android/
-                    wv.evaluateJavascript(script, null);
-                }
-            }
-        });
-        String albumweb = AssetHelper.url4intent(this, AssetHelper.Act_Album);
-
-        // E.g. albumweb = "http://192.168.0.3:8888/index.html?serv=info";
-        if (singl.verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
-        wv.loadUrl(albumweb);
-        */
     }
 
     public static void reloadWeb(AlbumContext singl, WebView wv, Activity act, int webId) {
@@ -431,7 +375,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     // askDirectoriesPermissions(this);
                     singl.tier.fileProvider(new IFileProvider() {
                                 private String saveFolder;
-                                private Plicies policies = singl.policies;
+                                private Policies policies = singl.policies;
 
                                 // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                                 @Override
