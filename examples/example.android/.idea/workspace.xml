@@ -16,13 +16,7 @@
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/Plicies.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/Policies.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/AssetHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/AssetHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefKeys.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,6 +110,7 @@
     &quot;PROJECT_TRUSTED_KEY&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_directory_selection&quot;: &quot;C:/Users/Alice/github/anclient/examples/example.android/app/src/main/java/io/oz/album&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.17&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
@@ -130,6 +125,9 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Alice\github\anclient\examples\example.android\file-picker\src\main\res\drawable" />
+    </key>
+    <key name="MoveInnerDialog.RECENTS_KEY">
+      <recent name="io.oz.album" />
     </key>
   </component>
   <component name="RunAnythingCache">
