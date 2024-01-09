@@ -102,7 +102,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         AlbumApp.localConfig(sharedPrefs, getString(R.string.url_landing));
-        AlbumApp.Config c = AlbumApp.config;
+        PrefsWrapper c = AlbumApp.config;
         singl.init(c.homeName, c.uid, c.device, c.jserv);
 
         setContentView(R.layout.welcome);

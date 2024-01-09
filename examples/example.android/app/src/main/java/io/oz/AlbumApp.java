@@ -6,30 +6,19 @@ import android.app.Application;
 import android.content.SharedPreferences;
 
 import io.oz.album.PrefKeys;
+import io.oz.album.PrefsWrapper;
 
 public class AlbumApp extends Application {
 
     public static PrefKeys keys;
 
-    /**
-     * Wrapper of shared preference, for wrapping unstructured data for business layer,
-     * a data wrapper for avoid manage local preferences everywhere.
-     */
-    public static class Config {
-        public String homeName;
-        public String jserv;
-        public String uid;
-        public String device;
-        public String homepage;
-    }
-
-    public static Config config = new Config();
+    public static PrefsWrapper config = new PrefsWrapper();
 
     public AlbumApp() {
         super();
     }
 
-    static public Config localConfig(SharedPreferences sharedPref, String... landingUrl) {
+    static public PrefsWrapper localConfig(SharedPreferences sharedPref, String... landingUrl) {
         config.homeName = sharedPref.getString(AlbumApp.keys.home, "");
         config.uid = sharedPref.getString(AlbumApp.keys.usrid, "");
         config.device = sharedPref.getString(AlbumApp.keys.device, "");
