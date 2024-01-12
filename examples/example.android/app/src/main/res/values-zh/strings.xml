@@ -21,6 +21,7 @@
     <string name="msg_device_uid"    >登录名 %s @ %s</string>
     <string name="err_pref_login"    >登录失败。\\n%s %s</string>
     <string name="err_empty_pswd"    >密碼為空！</string>
+    <string name="err_empty_uid"     >用戶名不能為空！</string>
 
     <string name="txt_prefs_jserv" >文 件 服 務 地 址</string>
     <string name="home_title"      >组 织 名 称</string>

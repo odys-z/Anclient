@@ -451,7 +451,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	/**
 	 * TODO: move to Clients
 	 * Ping port echo without session.
-	 *
+	 * @deprecated replaced by {@link Clients#pingLess(String, OnError)}
 	 * @param funcUri
 	 * @param errCtx
 	 * @return echo message
@@ -474,19 +474,18 @@ public class PhotoSyntier extends SynclientierMvp {
 		return resp;
 	}
 
-	public static void asyPing(String funcUri, OnOk ok, OnError err) {
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					AnsonResp resp = pingLess(clientUri, err);
-					ok.ok(resp);
-					;
-				} catch (IOException e) {
-					err.err(MsgCode.exIo, e.getMessage());
-				} catch (SemanticException e) {
-					err.err(MsgCode.exSemantic, e.getMessage());
-				}
-			}}).start();
+	public static void asyPing(OnOk ok, OnError err) {
+		new Thread(() -> {
+			try {
+				AnsonResp resp = pingLess(clientUri, err);
+				ok.ok(resp);
+				;
+			} catch (IOException e) {
+				err.err(MsgCode.exIo, e.getMessage());
+			} catch (SemanticException e) {
+				err.err(MsgCode.exSemantic, e.getMessage());
+			}
+		}).start();
 	}
 
 }

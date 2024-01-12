@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.odysz.anson.Anson;
+import io.oz.albumtier.AlbumContext;
 
 /**
  * @since 0.3.0
@@ -17,6 +18,9 @@ public class AnPrefEntries extends Anson {
     int ix = -1;
     public String[] entries;
     public String[] entVals;
+
+    public AnPrefEntries() {
+    }
 
     public AnPrefEntries(String[] entries, String[] entvals) {
         this.entries = entries;
@@ -56,12 +60,19 @@ public class AnPrefEntries extends Anson {
     }
 
 
-    public String select(String val) {
-        ix = indexOf(entVals, val);
-        if (ix >= 0 && ix < entries.length)
+    public String select(AlbumContext singleton, int ix) {
+        if (ix >= 0 && ix < entries.length) {
+            this.ix = ix;
+            singleton.jserv(entryVal());
             return entries[ix];
+        }
         return null;
+
     }
+
+    public String select(AlbumContext singleton, String val) {
+        return select(singleton, indexOf(entVals, val));
+   }
 
     /**
      * Insert a new name-url pair, if already exists, swap to the first
@@ -92,6 +103,12 @@ public class AnPrefEntries extends Anson {
     /** get current entry */
     public String entry() {
         return entries != null && ix >= 0 && ix < entries.length ?
-                entries[ix] : null;
+                entries[ix] : "";
+    }
+
+    /** get current entry value, the default jserv url */
+    public String entryVal() {
+        return entVals != null && ix >= 0 && ix < entVals.length ?
+                entVals[ix] : "";
     }
 }

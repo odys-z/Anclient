@@ -187,13 +187,13 @@ export class AnReact {
 		if (typeof elem === 'string') {
 			$.ajax({
 				dataType: "json",
-				url: opts.jsonPath || 'private/host.json',
+				url: (opts.jsonPath || 'private/host.json') + `?q=${Date.now()}`,
 			})
 			.done( (json: JsonServs) => onJsonServ(elem, opts, json) )
 			.fail( (_e: any) => {
 				$.ajax({
 					dataType: "json",
-					url: 'github.json',
+					url: `github.json?q=${Date.now()}`,
 				})
 				.done((json: JsonServs) => onJsonServ(elem, opts, json))
 				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )

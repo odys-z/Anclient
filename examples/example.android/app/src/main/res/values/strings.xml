@@ -42,32 +42,34 @@
     <string name="userid_title">Login ID</string>
     <string name="pswd_title">Password</string>
     <string name="userid_key" translatable="false">my</string>
-    <string name="pswd_key" translatable="false">pswd_key</string>
-    <string name="btn_login" translatable="false">bt_login</string>
-    <string name="txt_login">User Login</string>
-    <string name="txt_please_login">Please Login</string>
-    <string name="txt_prefs_user">User Account</string>
-<!--    <string name="summery_login">Login to upload files to your own folder</string>-->
+    <string name="pswd_key"   translatable="false">pswd_key</string>
+    <string name="btn_login"  translatable="false">bt_login</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
-    <string name="t_synch_ok">%s files has been synchronized</string>
+    <string name="key_dev_cate"      translatable="false">key-device-cate</string>
+    <string name="key_device"        translatable="false">key-device</string>
+
+    <string name="t_synch_ok"      >%s files has been synchronized</string>
+    <string name="txt_login"       >User Login</string>
+    <string name="txt_please_login">Please Login</string>
     <string name="txt_prefs_device">Device Information</string>
-    <string name="devide_title">Device Name</string>
-    <string name="key_dev_cate" translatable="false">key-device-cate</string>
-    <string name="key_device" translatable="false">key-device</string>
-    <string name="login_succeed">Logged in successfully.</string>
+    <string name="txt_prefs_user"  >User Account</string>
+
+    <string name="devide_title"    >Device Name</string>
+    <string name="login_succeed"   >Logged in successfully.</string>
 
     <string name="msg_ignore_offline">Selection / files ignored - not logged in.</string>
     <string name="msg_templ_progress">Total files: %d / %d, File Blocks: %s (%.1f%%)</string>
-    <string name="msg_upload_failed">Uploading failed.\n%s\n%s</string>
-    <string name="msg_device_uid">Login as %s @ %s</string>
-    <string name="err_pref_login">\"Login failed!\n%s %s\"</string>
-    <string name="err_empty_pswd">Password is empty!</string>
+    <string name="msg_upload_failed" >Uploading failed.\n%s\n%s</string>
+    <string name="msg_device_uid"    >Login as %s @ %s</string>
+    <string name="err_pref_login"    >\"Login failed!\n%s %s\"</string>
+    <string name="err_empty_pswd"    >Password is empty!</string>
+    <string name="err_empty_uid"     >User ID is empty!</string>
 
-    <string name="url_help">https://odys-z.github.io/products/album</string>
+    <string name="url_help"   >https://odys-z.github.io/products/album</string>
     <string name="url_landing">https://odys-z.github.io/Anclient</string>
-    <string name="url_home" translatable="false">https://odys-z.github.io/Anclient</string>
-    <string name="url_album" translatable="false">%s/%s</string>
-    <string name="url_admin" translatable="false">%s/%s</string>
+    <string name="url_home"        translatable="false">https://odys-z.github.io/Anclient</string>
+    <string name="url_album"       translatable="false">%s/%s</string>
+    <string name="url_admin"       translatable="false">%s/%s</string>
     <string name="url_sync_report" translatable="false">http://%s/%s</string>
 
     <string name="btn_add_file" >+ File</string>

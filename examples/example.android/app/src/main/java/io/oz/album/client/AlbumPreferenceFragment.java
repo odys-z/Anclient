@@ -1,19 +1,13 @@
 package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
-import static io.odysz.common.LangExt.isblank;
-import static io.oz.AlbumApp.keys;
 import static io.oz.album.client.PrefsContentActivity.buff_device;
 import static io.oz.album.client.PrefsContentActivity.buff_devname;
-import static io.oz.album.client.PrefsContentActivity.jsvEnts;
 import static io.oz.album.client.PrefsContentActivity.singleton;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.EditTextPreference;
@@ -21,7 +15,6 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
 
 import io.odysz.common.LangExt;
 import io.odysz.semantics.SessionInf;
@@ -38,15 +31,15 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     /**
      * Pref key: AlbumApp.keys.jserv
      */
-    ListPreference lstJserv;
+    ListPreference listJserv;
     Preference btnLogin;
-//    Preference summery;
     EditTextPreference device;
     /** Preference category: device info */
     PreferenceCategory prefcateDev;
     Preference btnRegistDev;
     EditTextPreference pswd;
 
+    EditTextPreference userid;
     /** Suppress dialog, etc. */
     boolean initing;
     @Override
@@ -57,15 +50,33 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         prefcateDev  = findPreference(AlbumApp.keys.devCate);
         btnRegistDev = findPreference(AlbumApp.keys.bt_regist);
         btnLogin     = findPreference(AlbumApp.keys.bt_login);
-        lstJserv     = findPreference(AlbumApp.keys.jserv);
+        listJserv    = findPreference(AlbumApp.keys.jserv);
         device       = findPreference(AlbumApp.keys.device);
         pswd         = findPreference(AlbumApp.keys.pswd);
+        userid       = findPreference(AlbumApp.keys.usrid);
 
-        bindPref2Val(lstJserv);
-        bindPref2Val(device);
-        bindPref2Val(findPreference(AlbumApp.keys.usrid));
-        bindPref2Val(pswd);
+        // bindPref2Val(listJserv);
+        listJserv.setOnPreferenceChangeListener(prefsListener);
+        AnPrefEntries jservlist = AlbumApp.sharedPrefs
+                .loadPrefs(getContext(), this.getPreferenceManager().getSharedPreferences(), getString(R.string.url_landing))
+                .jservlist;
+        if (jservlist.ix < 0)
+            jservlist.select(singleton, 0);
+        listJserv.setTitle(jservlist.entry());
+        listJserv.setSummary(jservlist.entryVal());
+        ((ListPreference)listJserv).setValueIndex(jservlist.ix);
 
+        // bindPref2Val(device);
+        device.setOnPreferenceChangeListener(prefsListener);
+        prefsListener.onPreferenceChange(device, AlbumApp.sharedPrefs.device);
+
+        // bindPref2Val(findPreference(AlbumApp.keys.usrid));
+        userid.setOnPreferenceChangeListener(prefsListener);
+        prefsListener.onPreferenceChange(userid, AlbumApp.sharedPrefs.uid);
+
+        // bindPref2Val(pswd);
+        pswd.setOnPreferenceChangeListener(prefsListener);
+        prefsListener.onPreferenceChange(pswd, AlbumApp.sharedPrefs.pswd());
 
         pswd.setSummary("");
         pswd.setOnBindEditTextListener(editText ->
@@ -83,28 +94,27 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             findPreference(AlbumApp.keys.device).setEnabled(true);
             device.setSummary(R.string.msg_only_once);
         }
-//        summery = findPreference(AlbumApp.keys.login_summery);
 
-        if (lstJserv.getTitle() == null) {
-            lstJserv.setTitle(jsvEnts.entries[0]);
-            lstJserv.setSummary(jsvEnts.entVals[0]);
+        if (listJserv.getTitle() == null) {
+            listJserv.setTitle(AlbumApp.sharedPrefs.jservlist.entry());
+            listJserv.setSummary(AlbumApp.sharedPrefs.jservlist.entryVal());
         }
-        lstJserv.setEntries(PrefsContentActivity.jsvEnts.entries);
-        lstJserv.setEntryValues(PrefsContentActivity.jsvEnts.entVals);
+        listJserv.setEntries(AlbumApp.sharedPrefs.jservlist.entries);
+        listJserv.setEntryValues(AlbumApp.sharedPrefs.jservlist.entVals);
 
         initing = false;
     }
 
+    /*
     void bindPref2Val(@NonNull Preference preference) {
         if (preference == null)
             return;
         preference.setOnPreferenceChangeListener(prefsListener);
 
-        prefsListener.onPreferenceChange(preference,
-                    PreferenceManager
+        prefsListener.onPreferenceChange(preference, PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
-    }
+    } */
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -115,10 +125,10 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             String stringValue = newValue.toString();
             String k = preference.getKey();
             if (k.equals(AlbumApp.keys.jserv)) {
-                singleton.jserv(stringValue);
-                PrefsContentActivity.jsvEnts.select(stringValue);
-                preference.setTitle(PrefsContentActivity.jsvEnts.entry());
-                preference.setSummary(stringValue);
+                AnPrefEntries jservlist = AlbumApp.sharedPrefs.jservlist;
+                jservlist.select(singleton, stringValue);
+                preference.setTitle(jservlist.entry());
+                preference.setSummary(jservlist.entryVal());
             }
             else if (AlbumApp.keys.pswd.equals(k)) {
                 singleton.pswd(stringValue);

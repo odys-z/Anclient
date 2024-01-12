@@ -16,14 +16,30 @@
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/Policies.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/Policies.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/AssetHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/AssetHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefsWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefsWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AnPrefEntries.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AnPrefEntries.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/widgets/ComfirmDlg.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/widgets/ComfirmDlg.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values-zh/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values-zh/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example.js/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../example.js/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../js/anreact/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../js/anreact/src/react/anreact.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/src/react/anreact.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\Alice\.android\avd\Nexus_5_API_26.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[adb-RZCW81VYR7Y-XyhQUp._adb-tls-connect._tcp]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -299,20 +315,11 @@
           <line>11</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.odys-z/album-lib/0.4.36/f78d89a034f3b38d33bdf5f6068ba8fa114df235/album-lib-0.4.36-sources.jar!/io/oz/album/tier/Profiles.java</url>
-          <line>56</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.odys-z/album-lib/0.4.36/f78d89a034f3b38d33bdf5f6068ba8fa114df235/album-lib-0.4.36-sources.jar!/io/oz/album/tier/Profiles.java</url>
-          <line>49</line>
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
+        <PinnedItemInfo parentTag="android.app.SharedPreferencesImpl" memberName="mFile" />
         <PinnedItemInfo parentTag="java.util.HashMap$Node" memberName="value" />
       </pinned-members>
     </pin-to-top-manager>

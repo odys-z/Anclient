@@ -24,7 +24,6 @@ public class AlbumContext {
      * Profiles loaded from server, not local config.
      */
     public Profiles profiles;
-    public Policies policies;
 
     String jserv;
 
@@ -86,13 +85,13 @@ public class AlbumContext {
 	/**
      * Init with preferences. Not login yet.
      */
-    public AlbumContext init(String family, String uid, String device, String jserv) {
+    public AlbumContext init(String family, String uid, String device, String jservroot) {
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
         userInf.device = device;
-        jserv = jserv;
+        jserv = jservroot;
 
-        Clients.init(jserv + "/" + jdocbase, verbose);
+        Clients.init(jserv + "/" + jdocbase, false);
         
         return this;
     }
@@ -104,14 +103,13 @@ public class AlbumContext {
      * @param onOk
      * @param onErr
      * @return this
-     * @throws GeneralSecurityException
      * @throws SemanticException
      * @throws AnsonException
      * @throws IOException
      */
     @SuppressWarnings("deprecation")
 	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
-            throws GeneralSecurityException, SemanticException, AnsonException, IOException {
+            throws SemanticException, AnsonException, IOException {
 
     	/* 0.3.0 allowed
         if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))

@@ -35,8 +35,6 @@ public class PrefKeys {
     public String bt_login;
 
     public PrefKeys(Context ctx) {
-        AlbumApp.keys = this;
-
         homeCate = ctx.getString(R.string.key_home_cate);
         home = ctx.getString(R.string.key_home);
         device = ctx.getString(R.string.key_device);
@@ -45,7 +43,7 @@ public class PrefKeys {
         jserv = ctx.getString(R.string.jserv_key);
         homepage = ctx.getString(R.string.homepage_key);
         usrid = ctx.getString(R.string.userid_key);
-        pswd = ctx.getString(R.string.pswd_key);
+        pswd  = ctx.getString(R.string.pswd_key);
 
         bt_regist = ctx.getString(R.string.key_regist);
         bt_login = ctx.getString(R.string.btn_login);

@@ -91,9 +91,8 @@ public class ComfirmDlg extends DialogFragment {
         // https://developer.android.com/reference/android/app/DialogFragment.html#alert-dialog
         FragmentTransaction ft = fm.beginTransaction();
         ft.addToBackStack(null);
-        // DialogFragment newFragment = MyDialogFragment.newInstance(mStackLevel);
         dismissin(livingms);
-        show(ft, tag);
+        try { show(ft, tag); } catch (Throwable t) {} // Events and UI states no always have a parent fragment
         return this;
     }
 

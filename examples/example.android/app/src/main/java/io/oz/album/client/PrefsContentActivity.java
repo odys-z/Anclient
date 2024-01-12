@@ -38,13 +38,11 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
-import io.oz.album.AssetHelper;
 import io.oz.album.client.widgets.ComfirmDlg;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.Profiles;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.PhotoSyntier;
-import io.oz.albumtier.Policies;
 
 /**
  * @since 0.3.0
@@ -57,9 +55,10 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     final AlbumPreferenceFragment prefFragment = new AlbumPreferenceFragment();
 
     /** jserv url options */
-    static public AnPrefEntries jsvEnts;
+    // static public AnPrefEntries jsvEnts;
 
-    /** Buffered device id for registering or applying when user loading old names or updating
+    /**
+     * Buffered device id for registering or applying when user loading old names or updating
      * TextEdit. The device name is intended to be a new one if {@link #buff_devname} is null.
      */
     static String buff_device;
@@ -77,13 +76,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         }
         else oldUid = singleton.userInf.uid();
 
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        String anstr = sharedPref.getString(keys.jserv, "");
-        jsvEnts = isblank(anstr)
-                ? new AnPrefEntries(
-                getResources().getStringArray(R.array.jserv_entries),
-                getResources().getStringArray(R.array.jserv_entvals) )
-                : (AnPrefEntries) Anson.fromJson(anstr);
+        // SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        // jsvEnts = AlbumApp.sharedPrefs.jservs(sharedPref);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportFragmentManager()
@@ -91,7 +85,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 .replace(android.R.id.content, prefFragment)
                 .commit();
 
-        //https://issuetracker.google.com/issues/146166988/resources
+        // https://issuetracker.google.com/issues/146166988/resources
         // this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
@@ -103,7 +97,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     }
 
     public void onTestConn(View btn) {
-        PhotoSyntier.asyPing(clientUri,
+        PhotoSyntier.asyPing(
             (m) -> {
                 confirm(R.string.msg_conn_ok, 3000);
             },
@@ -150,20 +144,19 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             if (content != null) {
                 String format  = intentResult.getFormatName();
                 if (eq(format, getString(R.string.qrformat))) {
+                    AnPrefEntries jsvEnts = AlbumApp.sharedPrefs.jservlist;
                     if (jsvEnts.insert(content)) {
-                        prefFragment.lstJserv.setEntries(jsvEnts.entries);
-                        prefFragment.lstJserv.setEntryValues(jsvEnts.entVals);
+                        prefFragment.listJserv.setEntries(jsvEnts.entries);
+                        prefFragment.listJserv.setEntryValues(jsvEnts.entVals);
 
-                        prefFragment.lstJserv.setValue(jsvEnts.entVals[0]);
-                        prefFragment.lstJserv.setTitle(jsvEnts.entries[0]);
-                        prefFragment.lstJserv.setSummary(jsvEnts.entVals[0]);
+                        prefFragment.listJserv.setValue(jsvEnts.entryVal());
+                        prefFragment.listJserv.setTitle(jsvEnts.entry());
+                        prefFragment.listJserv.setSummary(jsvEnts.entryVal());
 
-                        try {
-                            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-                            sharedPref.edit().putString(keys.jserv, jsvEnts.toBlock());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                        // sharedPref.edit().putString(keys.jserv, jsvEnts.toBlock());
+                        AlbumApp.sharedPrefs.jservs(singleton, sharedPref, jsvEnts);
+                        // singleton.jserv(jsvEnts.entryVal());
                     }
                     else err(MsgCode.exGeneral, getString(R.string.unknown_qrcontent));
                 }
@@ -179,6 +172,10 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             confirm(R.string.err_empty_pswd, 3000);
             return;
         }
+        else if (isblank(singleton.userInf.uid())) {
+            confirm(R.string.err_empty_uid, 3000);
+            return;
+        }
         try {
           singleton.login(
             (client) -> {
@@ -188,16 +185,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                     (resp) -> {
                         Profiles prf = ((AlbumResp) resp).profiles();
                         singleton.profiles = prf;
-                        singleton.policies = new Policies(prf);
-
-                        // update summery?
                         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString(keys.home, prf.home);
-                        editor.putString(keys.homepage, prf.webroot);
-                        editor.apply();
-
-                        AlbumApp.localConfig(sharedPref);
+                        AlbumApp.sharedPrefs.policy2Prefs(sharedPref, prf);
 
                         confirm(R.string.login_succeed, 3000);
                     },
@@ -239,13 +228,17 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 (resp) -> {
                     buff_device = ((DocsResp)resp).device().id;
                     singleton.userInf.device(buff_device);
+                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                    AlbumApp.sharedPrefs.device(sharedPref, buff_device);
 
                     runOnUiThread(()-> prefFragment.device.setEnabled(false));
 
+                    /*
                     SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString(keys.device, buff_device);
                     editor.apply();
+                     */
                 });
         }
         else {
