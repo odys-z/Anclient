@@ -761,5 +761,3 @@ export class Semantier {
 		Semantier.dataset(opts, client, onLoad, errCtx);
 	}
 }
-
-

@@ -1,3 +1,4 @@
+import AES from './aes';
 import { SessionClient, SessionInf } from './anclient';
 import { arr, isEmpty, len, size, str } from './helpers';
 import { Tierec } from './semantier';
@@ -349,10 +350,10 @@ export class Protocol {
 		return login;
 	}
 
-    static formatHeader(ssInf: any): AnHeader {
+    static formatHeader(ssInf: SessionInf): AnHeader {
 		if (isEmpty(ssInf))
 			throw Error("Can't format a header without ssInf.");
-		return new AnHeader(ssInf.ssid, ssInf.uid);
+		return new AnHeader(ssInf.ssid, ssInf.uid, ssInf.ssToken);
     }
 
 	static rs2arr (rs) {
@@ -450,7 +451,7 @@ export class AnsonMsg<T extends AnsonBody> {
 		let header = json.header;
 		if (header)
 			this.header = header;
-		else this.header = new AnHeader(undefined, undefined);
+		else this.header = new AnHeader(undefined, undefined, undefined);
 
 		let [body] = json.body ? json.body : [{}] as any[];
 		let a = body.a;
@@ -575,16 +576,22 @@ export class AnsonBody {
 	}
 }
 
+const aes = new AES();
 export class AnHeader {
-    constructor(ssid: string, userId: string) {
+    constructor(ssid: string, userId: string, ssToken: string) {
 		this.type = "io.odysz.semantic.jprotocol.AnsonHeader";
 		this.ssid = ssid;
 		this.uid = userId;
+		this.ssToken = ssToken;
 	}
 
     type: string;
     ssid: string;
     uid : string;
+
+	iv: string;
+	/** repackec session token */
+	ssToken: string;
 
     /**Set user action (for DB log on DB transaction)
      * @param {object} act {funcId(tolerate func), remarks, cate, cmd}
@@ -599,6 +606,13 @@ export class AnHeader {
     }
 
     usrAct: any[];
+
+	// Seq(seq: number) {
+	// 	let iv = aes.getIv128() as unknown as Uint8Array;
+	// 	this.ssToken = aes.encrypt(`${this.ssid} ${seq}`, this.ssid, iv);
+	// 	this.iv = aes.bytesToB64(iv);
+	// 	return this;
+	// }
 }
 
 export class UserReq extends AnsonBody {
@@ -861,6 +875,7 @@ export class QueryReq extends AnsonBody {
 						orders: this.order,
 						group: this.groupings}]};
 	}
+
     formatHeader() {
         throw new Error("Method not implemented.");
     }

@@ -39,6 +39,8 @@ import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import withWidth from '@material-ui/core/withWidth';
 import { SessionClient, SessionInf } from '@anclient/semantier/anclient';
+import ReactDOM from 'react-dom';
+import Fab from '@material-ui/core/Fab';
 
 export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
@@ -68,6 +70,8 @@ export interface SysProps extends Comprops {
 	 * Will showing this or the home page
 	 */
 	landingUrl?: string;
+
+	msHideAppBar?: number 
 }
 
 const _icons = {
@@ -105,16 +109,22 @@ const styles = (theme: Theme) => ({
 	direction: theme.direction || 'ltr' as any,
 	root: {
 		display: 'flex',
+
 	},
 	appBar: {
 		transition: theme.transitions.create(['margin', 'width'], {
-		easing: theme.transitions.easing.sharp,
-		duration: theme.transitions.duration.leavingScreen,
+		easing:     theme.transitions.easing.sharp,
+		duration:   theme.transitions.duration.leavingScreen,
 		}),
+	},
+	hiddenMenu: {
+		top:     theme.spacing(1),
+		padding: theme.spacing(1),
+		color:   'white'
 	},
 	loginfo: {
 		textAlign: 'end' as const,
-		color: 'wheat',
+		color:     'wheat',
 		"& :hover": {
 			backgroundColor: 'Indigo'
 		}
@@ -153,7 +163,8 @@ const styles = (theme: Theme) => ({
 	},
 	content: {
 		flexGrow: 1,
-		padding: theme.spacing(3),
+		padding: theme.spacing(2),
+		paddingTop: theme.spacing(0),
 		transition: theme.transitions.create('margin', {
 		easing: theme.transitions.easing.sharp,
 		duration: theme.transitions.duration.leavingScreen,
@@ -266,6 +277,7 @@ class SysComp extends CrudCompW<SysProps> {
 
 		menuTitle: 'Sys Menu',
 		showMenu: false, 
+		showAppBar: true,
 		expandings: new Set(),
 		showMine: false,
 		currentPage: undefined as MenuItem
@@ -291,12 +303,19 @@ class SysComp extends CrudCompW<SysProps> {
 
 		this.showMenu = this.showMenu.bind(this);
 		this.hideMenu = this.hideMenu.bind(this);
+		this.showAppBar = this.showAppBar.bind(this);
+
 		this.toExpandItem = this.toExpandItem.bind(this);
 		this.menuItems = this.menuItems.bind(this);
 
 		this.toLogout = this.toLogout.bind(this);
 
 		this.welcomePaper = this.welcomePaper.bind(this);
+
+		// this.ref = React.createRef();
+		// let m = ReactDOM.findDOMNode(this.ref)
+        // m.addEventListener('scroll', (e: UIEvent) => {console.log(e, e.target);});
+		window.addEventListener('scroll', (e: UIEvent) => { console.log(e.target); });
 	}
 
 	welcomePaper(classes = {} as ClassNames) {
@@ -330,8 +349,12 @@ class SysComp extends CrudCompW<SysProps> {
 		}
 	}
 
+	barAutoHidden = true;
+
 	componentDidMount() {
 		console.log(this.uri);
+		this.barAutoHidden = true;
+
 		const ctx = this.context as unknown as AnContextType;
 
 		// load menu
@@ -356,6 +379,16 @@ class SysComp extends CrudCompW<SysProps> {
 			} );
 	}
 
+	componentDidUpdate(_: Readonly<SysProps>, _p: Readonly<{}>, _s?: any): void {
+		if (this.props.msHideAppBar > 0 && this.barAutoHidden) {
+			let that = this;
+			setTimeout(()=>{
+				this.barAutoHidden = false;
+				that.setState({showAppBar: false});
+			}, this.props.msHideAppBar);
+		}
+	}
+
 	findMenuItem(path: string, m?: MenuItem[]): MenuItem | undefined {
 		m = m || this.state.sysMenu;
 		for (let x = 0; x < m.length; x++) {
@@ -375,6 +408,20 @@ class SysComp extends CrudCompW<SysProps> {
 
 	hideMenu() {
 		this.setState({ showMenu: false });
+	}
+
+	norepeat: boolean = false;
+
+	showAppBar(_: React.UIEvent) {
+		if (this.props.msHideAppBar > 0 && !this.norepeat) {
+			this.norepeat = true;
+			let that = this;
+			this.setState({showAppBar: true});
+			setTimeout(()=>{
+				this.norepeat = false;
+				that.setState({showAppBar: false});
+			}, this.props.msHideAppBar);
+		}
 	}
 
 	toLogout() {
@@ -505,19 +552,19 @@ class SysComp extends CrudCompW<SysProps> {
     	const { classes } = this.props;
 		let claz = Object.assign({}, classes);
 
-		let open = this.state.showMenu;
+		let {showMenu, showAppBar} = this.state;
 
 		return (
-		  <div className={claz.root}>
-			<AppBar
+		  <div id={'root.sys.anreact'} className={claz.root} >
+			{ showAppBar && <AppBar
 				position="fixed"
 				className={clsx(claz.appBar, {
-					[claz.appBarShift]: open,
+					[claz.appBarShift]: showMenu,
 				})}
 			>
 			<Toolbar>
 			   <Grid container spacing={1} >
-				<Grid item sm={5}>
+				<Grid item sm={7}>
 				<Box flexWrap="nowrap" display="flex" >
 					<IconButton
 						color="inherit"
@@ -525,7 +572,7 @@ class SysComp extends CrudCompW<SysProps> {
 						onClick={this.showMenu}
 						edge="start"
 						autoFocus
-						className={clsx(claz.menuButton, open && claz.hide)}
+						className={clsx(claz.menuButton, showMenu && claz.hide)}
 					>
 					<Menu />
 					</IconButton>
@@ -533,7 +580,7 @@ class SysComp extends CrudCompW<SysProps> {
 				</Box>
 				</Grid>
 
-				<Grid item sm={7}>
+				<Grid item sm={5}>
 					<DialogActions className={claz.loginfo} >
 						<MyIcon onClick={() => { if (that.props.myInfo) that.setState({ showMine: true }); } } />
 						{ this.props.onLogout
@@ -545,11 +592,11 @@ class SysComp extends CrudCompW<SysProps> {
 				</Grid>
 			  </Grid>
 			</Toolbar>
-			</AppBar>
+			</AppBar>}
 			<Drawer className={claz.drawer}
 					variant="persistent"
 					anchor="left"
-					open={open}
+					open={showMenu}
 					classes={{paper: claz.drawerPaper}}
 			>
 				<div className={claz.drawerHeader}>
@@ -564,19 +611,30 @@ class SysComp extends CrudCompW<SysProps> {
 				</List>
 			</Drawer>
 
-			<main onClick={this.hideMenu}
+			<main onClick={this.hideMenu} onScroll={this.showAppBar}
 				className={clsx(claz.content, {
-					[claz.contentShift]: open,
+					[claz.contentShift]: showMenu,
 				})}
 			>
-				<div className={claz.drawerHeader} />
-				{this.state.welcome ?
+				{ showAppBar && <div className={claz.drawerHeader} />}
+				{ this.state.welcome ?
 					this.welcomePaper(classes) :
 					<div className="content">
 						{this.route()}
 					</div>}
 			</main>
-
+			{ !showAppBar
+			  && <Fab color="primary" size="small" style={{position: 'absolute'}} aria-label="open drawer"
+					onClick={this.showMenu} >
+			      {/* <IconButton
+				 	color="inherit"
+					aria-label="open drawer"
+					edge="start"
+					className={clsx(claz.menuButton, claz.hiddenMenu)}
+				  /> */}
+				  <Menu/>
+				</Fab>
+			}
 			{this.state.showMine && <MyInfo
 				panels={typeof this.props.myInfo === 'function'
 					? this.props.myInfo(this.context as AnContextType) : this.props.myInfo}

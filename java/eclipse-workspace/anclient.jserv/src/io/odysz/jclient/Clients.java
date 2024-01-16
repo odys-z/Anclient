@@ -58,7 +58,7 @@ public class Clients {
 	 * @param mac  client device name - server can required this or not
 	 * @return a SessionClient instance if login succeed.
 	 * @throws SemanticException Request can not parsed correctly 
-	 * @throws SsException  encrypting password error
+	 * @throws SsException 
 	 * @throws Exception, most likely the network failed
 	 */
 	public static SessionClient login(String uid, String pswdPlain, String... mac)
@@ -151,15 +151,6 @@ public class Clients {
 		HttpServClient httpClient = new HttpServClient();
 		return httpClient.streamdown(url, req, localpath);
 	}
-
-	/*
-	public AnsonMsg<AnsonResp> upload(IPort port, AnsonMsg<? extends DocsReq> req, String localpath)
-			throws SemanticException, IOException, AnsonException {
-		String url = servUrl(port);
-		HttpServClient httpClient = new HttpServClient();
-		return httpClient.streamup(url, req, localpath);
-	}
-	*/
 
 	/**
 	 * Ping port echo without session.

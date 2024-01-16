@@ -54,9 +54,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     static String oldUid;
     final AlbumPreferenceFragment prefFragment = new AlbumPreferenceFragment();
 
-    /** jserv url options */
-    // static public AnPrefEntries jsvEnts;
-
     /**
      * Buffered device id for registering or applying when user loading old names or updating
      * TextEdit. The device name is intended to be a new one if {@link #buff_devname} is null.
@@ -75,9 +72,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             oldUid = null;
         }
         else oldUid = singleton.userInf.uid();
-
-        // SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        // jsvEnts = AlbumApp.sharedPrefs.jservs(sharedPref);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportFragmentManager()
@@ -112,17 +106,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             });
     }
 
-    void errorDlg(String msg, int live) {
-        new ComfirmDlg(this)
-                .dlgMsg(0, 0)
-                .msg(msg)
-                .onOk((dialog, id) -> {
-                    dialog.dismiss();
-                })
-                .showDlg(this, "")
-                .live(live);
-    }
-
     public void onAddJserv(View btn) {
         IntentIntegrator intentIntegrator = new IntentIntegrator(this);
         intentIntegrator.initiateScan();
@@ -154,9 +137,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         prefFragment.listJserv.setSummary(jsvEnts.entryVal());
 
                         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-                        // sharedPref.edit().putString(keys.jserv, jsvEnts.toBlock());
                         AlbumApp.sharedPrefs.jservs(singleton, sharedPref, jsvEnts);
-                        // singleton.jserv(jsvEnts.entryVal());
                     }
                     else err(MsgCode.exGeneral, getString(R.string.unknown_qrcontent));
                 }
@@ -199,12 +180,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
         }
     }
-
-    /**
-     * common function for error handling
-     */
-    JProtocol.OnError showErrConfirm = (c, t, args) ->
-            errorDlg(String.format("Code: %s\n%s", c, String.format(t, args == null ? null : args)), 5000);
 
     /**
      * when succeed, deep write preference: device
@@ -293,8 +268,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         }
     }
 
-    ////////////////// TODO side task: new confirm dialog pattern /////////////////////////
-
     /**
      * Set text into EditText's summery, running in ui thread.
      *
@@ -317,9 +290,28 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         return super.onOptionsItemSelected(item);
     }
 
+    //////////////////////////////// new confirm dialog pattern ////////////////////////////////////
+
+    /**
+     * common function for error handling
+     */
+    JProtocol.OnError showErrConfirm = (c, t, args) ->
+            errorDlg(String.format("Code: %s\n%s", c, String.format(t, args == null ? null : args)), 5000);
+
     @Override
     public void err(MsgCode c, String msg, String... args) {
         errorDlg(String.format(msg, (Object[]) (args == null ? new String[]{"", ""} : args)), 0 );
+    }
+
+    void errorDlg(String msg, int live) {
+        new ComfirmDlg(this)
+                .dlgMsg(0, 0)
+                .msg(msg)
+                .onOk((dialog, id) -> {
+                    dialog.dismiss();
+                })
+                .showDlg(this, "")
+                .live(live);
     }
 
     void confirm(int msgid, int live, int... msgOk) {

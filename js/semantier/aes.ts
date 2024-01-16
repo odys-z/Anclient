@@ -19,10 +19,10 @@ export default function AES () {
 	var verbose = false;
 	let hook = {aesjs: undefined}
 	var aesLib = new AESLib(hook);
-	// aesLib(window);
 	let aesjs = hook.aesjs;
 
-	/**get byte[] of random 128bits iv
+	/**
+	 * get byte[] of random 128bits iv
 	 * @return iv
 	 */
 	this.getIv128 = function (): Uint8Array {
@@ -34,7 +34,6 @@ export default function AES () {
 	}
 
 	this.encrypt = function (txt, key, iv) {
-		//txt = pad(txt, 16);
 		txt = this.pad16m(txt);
 		if (this.verbose) console.log("txt: " + txt);
 		var textBytes = aesjs.utils.utf8.toBytes(txt);
@@ -58,6 +57,8 @@ export default function AES () {
 			return Buffer.from(byteArr, 'binary').toString('base64')
 	}
 
+	this.encode64 = this.bytesToB64;
+
 	this.b64ToBytes = function (b64Str) {
 		return new Uint8Array(
 			(typeof atob === 'function' ? atob(b64Str)
@@ -67,6 +68,8 @@ export default function AES () {
 			})
 		);
 	}
+
+	this.decode64 = this.b64ToBytes;
 
 	this.decrypt = function (cipherB64, key, iv) {
 		// check https://stackoverflow.com/questions/12710001/how-to-convert-uint8-array-to-base64-encoded-string
@@ -91,11 +94,12 @@ export default function AES () {
 		return this.pad(str, len * 16, paddings, dir);
 	}
 
-	var STR_PAD_LEFT = 1;
-	var STR_PAD_RIGHT = 2;
-	var STR_PAD_BOTH = 3;
+	const STR_PAD_LEFT = 1;
+	const STR_PAD_RIGHT = 2;
+	const STR_PAD_BOTH = 3;
 
-	this.pad = function (str, len, paddings, dir) {
+	this.pad = function (str: string | any[], len: number, paddings: string,
+						dir: typeof STR_PAD_LEFT | typeof STR_PAD_RIGHT | typeof STR_PAD_BOTH) {
 		if (typeof(len) == "undefined") { len = 0; }
 		if (typeof(paddings) == "undefined") { paddings = '-'; }
 		if (typeof(dir) == "undefined") { dir = STR_PAD_LEFT; }
@@ -118,21 +122,61 @@ export default function AES () {
 		}
 		return str;
 	}
+
+	/**
+	 * <pre>
+	 * ssToken = cipher : iv, len(cipher) = 16
+	 * plain = decrypt(cipher, key, iv)
+	 * token = encrypt(pad(uid) : plain, key, iv2)
+	 * return token : iv2
+	 * </pre>
+	 */
+	this.repackSessionToken = (ssToken: string, key: string, uid: string) => {
+		/*
+		let ss = ssToken.split(":");
+		console.log(ss[0], ss[1]);
+		let plain = this.decrypt(ss[0], this.pad16m(key), this.decode64(ss[1]));
+		console.log(plain);
+
+		let iv = this.getIv128();
+		let cipher = this.encrypt(uid + ":" + plain, this.pad16m(key), iv);
+
+		console.log(cipher + ":" + this.encode64(iv));
+		return cipher + ":" + this.encode64(iv);
+		*/
+		return this.repackSessionToken_test_version(ssToken, key, uid, this.getIv128());
+	};
+
+	this.repackSessionToken_test_version = (ssToken: string, key: string, uid: string, iv: Uint8Array) => {
+		let ss = ssToken.split(":");
+		console.log(ss[0], ss[1]);
+		let plain = this.decrypt(ss[0], this.pad16m(key), this.decode64(ss[1]));
+		console.log(plain);
+
+		// let iv = this.getIv128();
+		let cipher = this.encrypt(uid + ":" + plain, this.pad16m(key), iv);
+
+		console.log(cipher + ":" + this.encode64(iv));
+		return cipher + ":" + this.encode64(iv);
+	};
+
 }
 
 /**
  * @constructor
  * Test JS AES
  * @class*/
-export function testAES() {
+export function testAES(plain: string) {
 	var aes = new AES();
 
 	var iv = aes.getIv128();
 	var k = aes.pad16m("my-password");
 
-	var c = aes.encrypt("plain-text", k, iv);
+	var c = aes.encrypt(plain, k, iv);
+	// var c = aes.encrypt("plain-text", k, iv);
 	console.log(c);
 
 	var p = aes.decrypt(c, k, iv);
-	console.log(p);
+	// console.log(p);
+	return p;
 }

@@ -4,7 +4,7 @@
 import * as $ from 'jquery';
 import AES from './aes';
 import {
-	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
+	Protocol, AnsonMsg, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
 	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
 	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV, OnLoginOk
 } from './protocol';
@@ -48,7 +48,9 @@ class AnClient {
 		}
 	}
 
-    /**Get port url of the port.
+    /**
+	 * Get port url of the port.
+	 * 
      * @param port the port name
      * @return the url
      */
@@ -117,7 +119,7 @@ class AnClient {
 
 		let that = this;
 		this.post(req,
-			/**@param {object} resp
+			/**@param resp
 			 * code: "ok"
 			 * data: Object { uid: "admin", ssid: "3sjUJk2JszDm", "user-name": "admin" }
 			 * port: "session"
@@ -125,7 +127,8 @@ class AnClient {
 			(resp: AnsonMsg<AnsonResp>) => {
 				let ssInf = resp.Body().ssInf;
 				ssInf.jserv = an.cfg.defaultServ;
-				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
+				ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, usrId);
+				let sessionClient = new SessionClient(ssInf, iv, true);
 				sessionClient.an = that;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
@@ -156,15 +159,19 @@ class AnClient {
 	 * @return AnsonMsg<T extends UserReq>
 	 */
 	getReq<T extends AnsonBody>(port: string, bodyItem: T): AnsonMsg<T> {
-		let header = Protocol.formatHeader({});
+		let header = Protocol.formatHeader({} as SessionInf);
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
 
-    /**Post a request, using Ajax.
+    /**
+	 * Post a request, using Ajax.
+	 * 
      * @param jreq
      * @param onOk
-     * @param onErr must present. since 0.9.32, Anclient won't handle error anymore, and data accessing errors should be handled by App singleton.
-     * @param ajaxOpts */
+     * @param onErr must present. since 0.9.32, Anclient won't handle error anymore,
+	 * and data accessing errors should be handled by App singleton.
+     * @param ajaxOpts
+	 */
 	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk | undefined, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
 		if (!onErr || !onErr.onError) {
 			console.error("Since 0.9.32, this global error handler must present - error handling is supposed to be the app singleton's responsiblity.")
@@ -204,7 +211,6 @@ class AnClient {
 			success: function (resp: AnsonMsg<AnsonResp>) {
 				// response Content-Type = application/json;charset=UTF-8
 				if (typeof resp === 'string') {
-					// why?
 					resp = JSON.parse(resp);
 				}
 				resp = new AnsonMsg(resp);
@@ -382,6 +388,7 @@ export type SessionInf = {
 	usrName?: string;
 	iv?: string;
 	ssid: string;
+	ssToken: string;
 
 	roleId?: string;
 	roleName?: string
@@ -403,7 +410,8 @@ class SessionClient {
 	/** Get name of persisted item in local storage. */
 	static get ssInfo() { return "ss-info"; }
 
-	/**Create SessionClient with credential information or load from localStorage.
+	/**
+	 * Create SessionClient with credential information or load from localStorage.
 	 * Because of two senarios of login / home page integration, there are 2 typical useses:
 	 *
 	 * Use Case 1 (persisted):
@@ -574,7 +582,8 @@ class SessionClient {
 		return {cipher, iv}
 	}
 
-	/**Post the request message (AnsonMsg with body of subclass of AnsonBody).
+	/**
+	 * Post the request message (AnsonMsg with body of subclass of AnsonBody).
 	 * @param jmsg request message
 	 * @param onOk
 	 * @param errCtx error handler of singleton. Since 0.9.32, this arg is required.
@@ -583,7 +592,8 @@ class SessionClient {
 		an.post(jmsg, onOk, errCtx, undefined);
 	}
 
-	/**Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
+	/**
+	 * Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
 	 * onOk, onError will be called after request finished.
 	 * @param jmsg request message
 	 * @param onOk
@@ -839,10 +849,12 @@ class Inseclient extends SessionClient {
 	 * @param {Object} act user's action for logging<br>
 	 * {func, cate, cmd, remarks};
 	 * @return the logged in header */
-	getHeader(act: LogAct) {
-		let header = Protocol.formatHeader({ssid: this.ssInf.ssid, uid: this.ssInf.uid});
+	getHeader(act?: LogAct) {
+		let header = Protocol.formatHeader({
+			ssid: this.ssInf.ssid,
+			uid: this.ssInf.uid,
+			ssToken: this.ssInf.ssToken} as SessionInf);
 		return header;
-		// return new AnHeader(this.ssInf.ssid, this.ssInf.uid);
 	}
 }
 

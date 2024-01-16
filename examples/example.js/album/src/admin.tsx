@@ -165,7 +165,7 @@ class Admin extends React.Component<Approps> {
 			  { !this.state.loggedin ?
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
 				:
-				<Sys menu='sys.menu.jsample' id={'sys-admin'}
+				<Sys menu='sys.menu.jsample' id={'sys-admin'} msHideAppBar={5000}
 					landingUrl='/c/mydocs'
 					sys={L('Album 0.3')} menuTitle={L('Menu')}
 				/>

@@ -105,17 +105,6 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         initing = false;
     }
 
-    /*
-    void bindPref2Val(@NonNull Preference preference) {
-        if (preference == null)
-            return;
-        preference.setOnPreferenceChangeListener(prefsListener);
-
-        prefsListener.onPreferenceChange(preference, PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
-    } */
-
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
