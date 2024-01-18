@@ -127,7 +127,11 @@ class AnClient {
 			(resp: AnsonMsg<AnsonResp>) => {
 				let ssInf = resp.Body().ssInf;
 				ssInf.jserv = an.cfg.defaultServ;
+
+				console.log(ssInf.ssToken);
 				ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, usrId);
+				console.log(ssInf.ssToken);
+
 				let sessionClient = new SessionClient(ssInf, iv, true);
 				sessionClient.an = that;
 				if (typeof onLogin === "function")

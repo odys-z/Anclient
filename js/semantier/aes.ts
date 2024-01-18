@@ -144,19 +144,19 @@ export default function AES () {
 		console.log(cipher + ":" + this.encode64(iv));
 		return cipher + ":" + this.encode64(iv);
 		*/
-		return this.repackSessionToken_test_version(ssToken, key, uid, this.getIv128());
+		return this.repackSessionToken_test(ssToken, key, uid, this.getIv128());
 	};
 
-	this.repackSessionToken_test_version = (ssToken: string, key: string, uid: string, iv: Uint8Array) => {
+	this.repackSessionToken_test = (ssToken: string, key: string, uid: string, iv: Uint8Array) => {
 		let ss = ssToken.split(":");
-		console.log(ss[0], ss[1]);
+
 		let plain = this.decrypt(ss[0], this.pad16m(key), this.decode64(ss[1]));
-		console.log(plain);
+		console.log(plain.length, plain);
+		if (plain.length == 32)
+			plain = plain.substring(8);
+		console.log(plain.length, plain);
 
-		// let iv = this.getIv128();
 		let cipher = this.encrypt(uid + ":" + plain, this.pad16m(key), iv);
-
-		console.log(cipher + ":" + this.encode64(iv));
 		return cipher + ":" + this.encode64(iv);
 	};
 

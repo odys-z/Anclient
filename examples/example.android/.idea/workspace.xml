@@ -16,17 +16,9 @@
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/SynclientierMvp.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/SynclientierMvp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../example.js/album/src/admin.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../example.js/album/src/admin.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/Clients.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/Clients.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/SessionClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../java/eclipse-workspace/anclient.jserv/src/io/odysz/jclient/SessionClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/anreact/src/react/sys.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/src/react/sys.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../js/anreact/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/anreact/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../js/semantier/aes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/semantier/aes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/semantier/anclient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/semantier/anclient.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../js/semantier/protocol.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/semantier/protocol.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../js/semantier/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../js/semantier/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
