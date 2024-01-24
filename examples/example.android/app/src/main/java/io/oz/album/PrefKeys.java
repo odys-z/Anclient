@@ -2,7 +2,6 @@ package io.oz.album;
 
 import android.content.Context;
 
-import io.oz.AlbumApp;
 import io.oz.R;
 
 /**
