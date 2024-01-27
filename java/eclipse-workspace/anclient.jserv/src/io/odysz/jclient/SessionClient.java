@@ -66,12 +66,13 @@ public class SessionClient {
 	/**
 	 * @since 0.5.0
 	 * @param r session login response from server.
+	 * @param pswdPlain 
 	 * @throws SsException 
 	 */
-	public SessionClient(AnSessionResp r) throws SsException {
+	public SessionClient(AnSessionResp r, String pswdPlain) throws SsException {
 		try {
 			ssInf = r.ssInf();
-			ssInf.ssToken = AESHelper.repackSessionToken(ssInf.ssToken, syncFlag, syncFlag);
+			ssInf.ssToken = AESHelper.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
 			profile = r.profile();
 		} catch (GeneralSecurityException | IOException e) {
 			throw new SsException(e.getMessage());
@@ -231,9 +232,9 @@ public class SessionClient {
 		// let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri(uri);
 		if (act != null && act.length > 0)
-			header.act(act[0]); 
+			header().act(act[0]); 
 
-		return new AnsonMsg<T>(port).header(header).body(bodyItem);
+		return new AnsonMsg<T>(port).header(header()).body(bodyItem);
 	}
 
 	public AnsonMsg<?> insert(String conn, String tbl, String ... act) throws SemanticException {
@@ -266,9 +267,9 @@ public class SessionClient {
 		// let header = Protocol.formatHeader(this.ssInf);
 		body.uri(uri);
 		if (act != null && act.length > 0)
-			header.act(act[0]); 
+			header().act(act[0]); 
 
-		AnsonMsg<T> msg = new AnsonMsg<T>(port).header(header).body(body);
+		AnsonMsg<T> msg = new AnsonMsg<T>(port).header(header()).body(body);
 		if (Clients.verbose) Utils.logi(msg.toString());
     	HttpServClient httpClient = new HttpServClient();
   		return httpClient.streamdown(Clients.servUrl(port), msg, localpath);

@@ -9,17 +9,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.DocLocks;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
-import io.odysz.jclient.InsecureClient;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
-import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
@@ -28,7 +25,6 @@ import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
-import io.odysz.semantic.jserv.echo.EchoReq;
 import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -448,36 +444,36 @@ public class PhotoSyntier extends SynclientierMvp {
 		return resp;
 	}
 
-	/**
-	 * TODO: move to Clients
-	 * Ping port echo without session.
-	 * @deprecated replaced by {@link Clients#pingLess(String, OnError)}
-	 * @param funcUri
-	 * @param errCtx
-	 * @return echo message
-	 * @throws IOException
-	 * @throws AnsonException
-	 * @throws SemanticException
-	 */
-	public static AnsonResp pingLess(String funcUri, OnError errCtx)
-			throws SemanticException, AnsonException, IOException {
-		Utils.warn("Use Clients.pingLess() instead!");
-		EchoReq req = new EchoReq(null);
-		req.a(EchoReq.A.echo);
-
-		InsecureClient client = new InsecureClient();
-		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
-
-		Anson.verbose = true;
-		AnsonResp resp = client.commit(jmsg, errCtx);
-
-		return resp;
-	}
+//	/**
+//	 * TODO: move to Clients
+//	 * Ping port echo without session.
+//	 * @deprecated replaced by {@link Clients#pingLess(String, OnError)}
+//	 * @param funcUri
+//	 * @param errCtx
+//	 * @return echo message
+//	 * @throws IOException
+//	 * @throws AnsonException
+//	 * @throws SemanticException
+//	 */
+//	public static AnsonResp pingLess(String funcUri, OnError errCtx)
+//			throws SemanticException, AnsonException, IOException {
+//		Utils.warn("Use Clients.pingLess() instead!");
+//		EchoReq req = new EchoReq(null);
+//		req.a(EchoReq.A.echo);
+//
+//		InsecureClient client = new InsecureClient();
+//		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
+//
+//		Anson.verbose = true;
+//		AnsonResp resp = client.commit(jmsg, errCtx);
+//
+//		return resp;
+//	}
 
 	public static void asyPing(OnOk ok, OnError err) {
 		new Thread(() -> {
 			try {
-				AnsonResp resp = pingLess(clientUri, err);
+				AnsonResp resp = Clients.pingLess(clientUri, err);
 				ok.ok(resp);
 				;
 			} catch (IOException e) {

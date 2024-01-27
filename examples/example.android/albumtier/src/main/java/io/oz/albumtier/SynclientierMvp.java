@@ -618,12 +618,12 @@ public class SynclientierMvp extends Semantier {
 		return EnvPath.decodeUri(tempath, f.device(), FilenameUtils.getName(clientpath));
 	}
 
-    public boolean verifyDeviceId(String dev, String devname) {
-		try {
-			return true;
-		}
-		catch (Exception e) {
-			return false;
-		}
-    }
+//    public boolean verifyDeviceId(String dev, String devname) {
+//		try {
+//			return true;
+//		}
+//		catch (Exception e) {
+//			return false;
+//		}
+//    }
 }
