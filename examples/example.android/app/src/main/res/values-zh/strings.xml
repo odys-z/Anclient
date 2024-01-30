@@ -18,7 +18,7 @@
     <string name="msg_ignore_offline">選項無效 - 未登錄</string>
     <string name="msg_templ_progress">進度 %d / %d, 文件頁 %s (%.1f%%)</string>
     <string name="msg_upload_failed" >上传失败。\\n%s\\n%s</string>
-    <string name="msg_device_uid"    >登录名 %s @ %s</string>
+    <string name="msg_login_uid"    >登录名 %s</string>
     <string name="err_pref_login"    >登录失败。\\n%s %s</string>
     <string name="err_empty_pswd"    >密碼為空！</string>
     <string name="err_empty_uid"     >用戶名不能為空！</string>

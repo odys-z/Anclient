@@ -11,7 +11,7 @@ import io.oz.albumtier.AlbumContext;
  */
 public class AnPrefEntries extends Anson {
     /** current selected index */
-    int ix = -1;
+    public int ix = -1;
     public String[] entries;
     public String[] entVals;
 
@@ -22,39 +22,6 @@ public class AnPrefEntries extends Anson {
         this.entries = entries;
         this.entVals = entvals;
     }
-
-
-    // /**
-    //  * Using for-loop to find the index.
-    //  * @param arr array
-    //  * @param target
-    //  * @return index
-    //  * @param <T>
-    //  */
-    // static <T> int indexOf(T[] arr, T target) {
-    //     for (int index = 0; index < arr.length; index++) {
-    //         if (arr[index] == target
-    //                 || target instanceof String && eq((String)arr[index], (String) target)) {
-    //             return index;
-    //         }
-    //     }
-    //     return -1;
-    // }
-    //
-    // static <T> void swap(T[] arr, int a, int b) {
-    //     if (arr != null && 0 <= a && a < arr.length && 0 <= b && b <= arr.length) {
-    //         T x = arr[b];
-    //         arr[b] = arr[a];
-    //         arr[a] = x;
-    //     }
-    // }
-    //
-    // static <T> T[] insertAt(T[] arr, T element, int position) {
-    //     List<T> list = new ArrayList<>(Arrays.asList(arr));
-    //     list.add(position, element);
-    //     return list.toArray(arr);
-    // }
-
 
     public String select(AlbumContext singleton, int ix) {
         if (ix >= 0 && ix < entries.length) {

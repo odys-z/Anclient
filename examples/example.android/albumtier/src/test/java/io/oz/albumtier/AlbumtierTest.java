@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,7 +31,6 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.PhotoRec;
-import io.oz.albumtier.AlbumContext.ConnState;
 
 /**
  * only for MVP (0.3.x)
@@ -47,6 +46,7 @@ public class AlbumtierTest {
 	
 	ArrayList<SyncDoc> mList;
 
+	@SuppressWarnings("deprecation")
 	@Test
     public void testRefreshPage0() throws AnsonException,
     		GeneralSecurityException, IOException, TransException, InterruptedException {
@@ -176,7 +176,8 @@ public class AlbumtierTest {
      * @throws IOException 
      * @throws TransException 
      */
-   	void onImagePicked() throws TransException, IOException {
+   	@SuppressWarnings("deprecation")
+	void onImagePicked() throws TransException, IOException {
    		singleton.tier.asyVideos(mList,
    				photoProc, photoPushed, singleton.errCtx);
 	}
@@ -189,6 +190,7 @@ public class AlbumtierTest {
 		// ! also make sure files are saved in volume/user-id
 		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());
    		
+		@SuppressWarnings("deprecation")
 		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testfile), "h_photos", AlbumPort.album);
 		PathsPage pthpage = pths.pathsPage();
 		assertEquals(device, pthpage.device);

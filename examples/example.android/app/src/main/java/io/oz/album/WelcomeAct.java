@@ -114,37 +114,37 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         if (pickMediaStarter == null)
             pickMediaStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            if (singl.state() == ConnState.Online) {
-                                onMediasPicked(result);
-                            } else showMsg(R.string.msg_ignore_offline);
-                        }
-                        reloadAlbum();
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        if (singl.state() == ConnState.Online) {
+                            onMediasPicked(result);
+                        } else showMsg(R.string.msg_ignore_offline);
+                    }
+                    reloadAlbum();
+                });
 
         if (pickFileStarter == null)
             pickFileStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            if (singl.state() == ConnState.Online) {
-                                onFilesPicked(result);
-                            } else showMsg(R.string.msg_ignore_offline);
-                        }
-                        reloadAlbum();
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        if (singl.state() == ConnState.Online) {
+                            onFilesPicked(result);
+                        } else showMsg(R.string.msg_ignore_offline);
+                    }
+                    reloadAlbum();
+                });
 
         if (prefStarter == null)
             prefStarter = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                            showMsg(R.string.msg_device_uid, AlbumApp.sharedPrefs.uid, AlbumApp.sharedPrefs.device);
-                        }
-                        reloadAlbum();
-                    });
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        showMsg(R.string.msg_login_uid, AlbumApp.sharedPrefs.uid, AlbumApp.sharedPrefs.device);
+                    }
+                    reloadAlbum();
+                });
 
         if (webHelpStarter == null)
             webHelpStarter = registerForActivityResult(
@@ -152,19 +152,24 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     result -> reloadAlbum());
 
         try {
-            if (singl.needSetup())
+            singl.jserv(AlbumApp.sharedPrefs.jserv());
+
+            if (singl.needSetup() || AlbumApp.sharedPrefs.needSetup())
                 // settings are cleared
                 startPrefsAct();
             else {
+                singl.jserv(AlbumApp.sharedPrefs.jserv());
+
                 String pswd = AlbumApp.sharedPrefs.pswd();
                 singl.pswd(pswd)
                      .login((client) -> {
                             runOnUiThread(() -> reloadAlbum());
                         },
-                        (code, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv()));
+                        (code, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(),
+                                                    AlbumApp.sharedPrefs.jserv()));
             }
         } catch (Exception e) {
-            showMsg(R.string.t_login_failed, singl.userInf.uid(), singl.jserv());
+            showMsg(R.string.t_login_failed, singl.userInf.uid(), AlbumApp.sharedPrefs.jserv());
         }
     }
 
@@ -435,35 +440,27 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     @Override
     public void onClick(@NonNull View v) {
         int id = v.getId();
-        switch (id) {
-            case R.id.btn_pick_image:
-                // startImagePicking();
-                startPicking(ImagePickActivity.class);
-                break;
-            case R.id.btn_pick_video:
-                // startVideoPiking();
-                startPicking(VideoPickActivity.class);
-                break;
-            case R.id.btn_pick_audio:
-                // startAudioPiking();
-                startPicking(AudioPickActivity.class);
-                break;
-            case R.id.btn_pick_file:
-                // TODO: a simple synchronized files report, startPicking(NormalFilePickActivity.class);
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        if (id == R.id.btn_pick_image)
+            startPicking(ImagePickActivity.class);
+        else if (id == R.id.btn_pick_video)
+            startPicking(VideoPickActivity.class);
+        else if (id == R.id.btn_pick_audio)
+            startPicking(AudioPickActivity.class);
+        else if (id == R.id.btn_pick_file) {
+            // TODO: a simple synchronized files report, startPicking(NormalFilePickActivity.class);
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
 
-                //  In this example we will set the type to video
-                intent.setType("application/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+            //  In this example we will set the type to video
+            intent.setType("application/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            intent.putExtra("return-data", true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.putExtra("return-data", true);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                }
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                pickFileStarter.launch(intent);
-                break;
+            pickFileStarter.launch(intent);
         }
     }
 

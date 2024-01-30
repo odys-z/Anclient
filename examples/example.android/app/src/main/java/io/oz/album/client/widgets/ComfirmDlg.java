@@ -9,13 +9,19 @@ import android.os.CountDownTimer;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import io.oz.R;
+import io.oz.album.client.PrefsContentActivity;
 
 import static io.odysz.common.LangExt.is;
+import static io.odysz.common.LangExt.isNull;
 
+/**
+ * Ussage: call {@link #confirm(AppCompatActivity, int, int, int[])}.
+ */
 public class ComfirmDlg extends DialogFragment {
     private Activity acty;
 
@@ -30,9 +36,18 @@ public class ComfirmDlg extends DialogFragment {
     DialogInterface.OnClickListener onOk;
     DialogInterface.OnClickListener onCancel;
 
-    public ComfirmDlg(final Activity acty, boolean... showCancel) {
-        // this.acty = acty;
+    public ComfirmDlg(boolean... showCancel) {
         this.showCancel = is(showCancel);
+    }
+
+    public static void confirm(AppCompatActivity acty, int msgid, int live, int[] msgOk) {
+        new ComfirmDlg()
+                .dlgMsg(msgid, isNull(msgOk) ? 0 : msgOk[0])
+                .onOk((dialog, id) -> {
+                    dialog.dismiss();
+                })
+                .showDlg(acty,  "")
+                .live(live);
     }
 
     /**
@@ -84,9 +99,9 @@ public class ComfirmDlg extends DialogFragment {
         return builder.create();
     }
 
-    public ComfirmDlg showDlg(AppCompatActivity act, String tag) {
-        this.acty = act;
-        FragmentManager fm = act.getSupportFragmentManager();
+    public ComfirmDlg showDlg(FragmentActivity fragment, String tag) {
+        this.acty = fragment;
+        FragmentManager fm = fragment.getSupportFragmentManager();
         // issue: no end transaction?
         // https://developer.android.com/reference/android/app/DialogFragment.html#alert-dialog
         FragmentTransaction ft = fm.beginTransaction();
@@ -95,6 +110,18 @@ public class ComfirmDlg extends DialogFragment {
         try { show(ft, tag); } catch (Throwable t) {} // Events and UI states no always have a parent fragment
         return this;
     }
+
+//    public ComfirmDlg showDlg(Activity act, String tag) {
+//        this.acty = act;
+//        android.app.FragmentManager fm = act.getFragmentManager();
+//        // issue: no end transaction?
+//        // https://developer.android.com/reference/android/app/DialogFragment.html#alert-dialog
+//        android.app.FragmentTransaction ft = fm.beginTransaction();
+//        ft.addToBackStack(null);
+//        dismissin(livingms);
+//        try { show(ft, tag); } catch (Throwable t) {} // Events and UI states no always have a parent fragment
+//        return this;
+//    }
 
     private void dismissin(int ms) {
         if (ms > 0) {

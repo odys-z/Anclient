@@ -6,6 +6,7 @@ import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import static io.oz.AlbumApp.keys;
+import static io.oz.AlbumApp.sharedPrefs;
 import static io.oz.albumtier.AlbumContext.clientUri;
 
 import android.content.Context;
@@ -40,7 +41,6 @@ import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.widgets.ComfirmDlg;
 import io.oz.album.tier.AlbumResp;
-import io.oz.album.tier.Profiles;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.PhotoSyntier;
 
@@ -62,6 +62,17 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     /** @see #buff_device */
     static String buff_devname;
+
+    /**
+     * Modified singlet.jservs
+     * null for clean
+     */
+    private AnPrefEntries jsvEntsDirty;
+    protected AnPrefEntries jsvEntsDirty(SharedPreferences sharedPrefs) {
+        if (jsvEntsDirty == null)
+            jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
+        return jsvEntsDirty;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +107,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 confirm(R.string.msg_conn_ok, 3000);
             },
             (c, m, a) -> {
-                new ComfirmDlg(this)
+                new ComfirmDlg()
                         .dlgMsg(R.string.msg_conn_err, 0)
                         .onOk((dialog, id) -> {
                             dialog.dismiss();
@@ -127,7 +138,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             if (content != null) {
                 String format  = intentResult.getFormatName();
                 if (eq(format, getString(R.string.qrformat))) {
-                    AnPrefEntries jsvEnts = AlbumApp.sharedPrefs.jservlist;
+                    SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                    AnPrefEntries jsvEnts = jsvEntsDirty(sharedPref);
                     if (jsvEnts.insert(content)) {
                         prefFragment.listJserv.setEntries(jsvEnts.entries);
                         prefFragment.listJserv.setEntryValues(jsvEnts.entVals);
@@ -136,8 +148,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         prefFragment.listJserv.setTitle(jsvEnts.entry());
                         prefFragment.listJserv.setSummary(jsvEnts.entryVal());
 
-                        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-                        AlbumApp.sharedPrefs.jservs(singleton, sharedPref, jsvEnts);
+                        // AlbumApp.sharedPrefs.jservs(singleton, sharedPref, jsvEnts);
+                        singleton.jserv(jsvEnts.entryVal());
                     }
                     else err(MsgCode.exGeneral, getString(R.string.unknown_qrcontent));
                 }
@@ -164,10 +176,10 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 Anson.verbose = false;
                 singleton.tier.asyGetSettings(
                     (resp) -> {
-                        Profiles prf = ((AlbumResp) resp).profiles();
-                        singleton.profiles = prf;
+                        singleton.profiles = ((AlbumResp) resp).profiles();
                         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        AlbumApp.sharedPrefs.policy2Prefs(sharedPref, prf);
+                        AlbumApp.sharedPrefs.policy2Prefs(sharedPref, singleton.profiles);
+                        AlbumApp.sharedPrefs.jservs(singleton, sharedPref, jsvEntsDirty(sharedPref));
 
                         confirm(R.string.login_succeed, 3000);
                     },
@@ -217,7 +229,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 });
         }
         else {
-            confirm(R.string.msg_device_uid, 0);
+            errorDlg(getString(R.string.msg_login_uid, singleton.userInf.userName()), 0);
         }
     }
 
@@ -304,7 +316,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     }
 
     void errorDlg(String msg, int live) {
-        new ComfirmDlg(this)
+        new ComfirmDlg()
                 .dlgMsg(0, 0)
                 .msg(msg)
                 .onOk((dialog, id) -> {
@@ -315,12 +327,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     }
 
     void confirm(int msgid, int live, int... msgOk) {
-        new ComfirmDlg(this)
-                .dlgMsg(msgid, isNull(msgOk) ? 0 : msgOk[0])
-                .onOk((dialog, id) -> {
-                    dialog.dismiss();
-                })
-                .showDlg(this,  "")
-                .live(live);
+        ComfirmDlg.confirm(this, msgid, live, msgOk);
     }
 }

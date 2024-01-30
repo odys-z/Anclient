@@ -60,7 +60,7 @@
     <string name="msg_ignore_offline">Selection / files ignored - not logged in.</string>
     <string name="msg_templ_progress">Total files: %d / %d, File Blocks: %s (%.1f%%)</string>
     <string name="msg_upload_failed" >Uploading failed.\n%s\n%s</string>
-    <string name="msg_device_uid"    >Login as %s @ %s</string>
+    <string name="msg_login_uid"    >Login as %s</string>
     <string name="err_pref_login"    >\"Login failed!\n%s %s\"</string>
     <string name="err_empty_pswd"    >Password is empty!</string>
     <string name="err_empty_uid"     >User ID is empty!</string>

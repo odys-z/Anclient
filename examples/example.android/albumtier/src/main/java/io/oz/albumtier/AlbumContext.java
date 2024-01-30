@@ -1,11 +1,13 @@
 package io.oz.albumtier;
 
+import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.LangExt.isNull;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -18,13 +20,18 @@ import io.oz.album.tier.Profiles;
 
 public class AlbumContext {
 
-    public boolean verbose = true;
+    public boolean verbose = false;
 
     /**
      * Profiles loaded from server, not local config.
      */
     public Profiles profiles;
 
+    /**
+     * <p>Design Notes:</p>
+     * Since AlbumContext is designed not to depends on Android packages and using jserv is a must,
+     * this value is designed to be use as a variable without being persisted, and without a get method.
+     */
     String jserv;
 
     public enum ConnState { Online, Disconnected, LoginFailed }
@@ -49,24 +56,36 @@ public class AlbumContext {
         return this;
     }
 
-    public static AlbumContext getInstance(OnError err) {
+    /**
+     * @param err can be ignored if no error message to show
+     * @return
+     */
+    public static AlbumContext getInstance(OnError ... err) {
         if (instance == null)
             instance = new AlbumContext();
 
-        if (err != null)
-            instance.errCtx = err;
+        if (!isNull(err))
+            instance.errCtx = err[0];
+        else
+            instance.errCtx = null;
 
         return instance;
     }
 
+    /**
+     * Needing setting user info.
+     * This method need to be called together with pref wrapper's checking jserv.
+     * @return true if user info is empty.
+     * @since 0.3.0
+     * @see #jserv
+     * jserv design notes
+     */
     public boolean needSetup() {
-        return LangExt.isblank(jserv, "/", ".", "http://", "https://")
-                || LangExt.isblank(userInf.device, "/", ".")
-                || LangExt.isblank(userInf.uid());
+        return isblank(jserv, "/", ".", "http://", "https://")
+                || isblank(userInf.device, "/", ".")
+                || isblank(userInf.uid());
     }
 
-
-    @SuppressWarnings("deprecation")
 	public PhotoSyntier tier;
 
     public SessionInf userInf;
@@ -89,10 +108,11 @@ public class AlbumContext {
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
         userInf.device = device;
-        jserv = jservroot;
+        // jserv = jservroot;
 
-        Clients.init(jserv + "/" + jdocbase, false);
-        
+        // Clients.init(jservroot + "/" + jdocbase, false);
+        Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
+
         return this;
     }
 
@@ -107,7 +127,6 @@ public class AlbumContext {
      * @throws AnsonException
      * @throws IOException
      */
-    @SuppressWarnings("deprecation")
 	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
             throws SemanticException, AnsonException, IOException {
 
@@ -116,7 +135,8 @@ public class AlbumContext {
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
         */
 
-        Clients.init(jserv + "/" + jdocbase, verbose);
+        // Clients.init(jserv + "/" + jdocbase, verbose);
+        Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
 
         tier = new PhotoSyntier(clientUri, userInf.device, errCtx)
 				.asyLogin(uid, pswd, userInf.device,
@@ -150,10 +170,11 @@ public class AlbumContext {
 
     public AlbumContext jserv(String newVal) {
         jserv = newVal;
-        Clients.init(jserv + "/" + jdocbase, verbose);
+        // Clients.init(jserv + "/" + jdocbase, verbose);
+        Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
         return this;
     }
 
-    public String jserv() { return jserv; }
+//    public String jserv() { return jserv; }
 
 }

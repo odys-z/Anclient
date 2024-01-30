@@ -43,8 +43,9 @@ import io.oz.album.tier.PhotoRec;
 /**
  * Photo client,
  * 
- * @deprecated only for MVP (0.3.x)
- * 
+ * - only for MVP (0.3.x)
+ *
+ * <p>This tier won't access local db.</p>
  * @author odys-z@github.com
  *
  */
@@ -56,7 +57,6 @@ public class PhotoSyntier extends SynclientierMvp {
 	static {
 		AnsonMsg.understandPorts(AlbumPort.album);
 		try {
-			// this tier won't access local db.
 			meta = new PhotoMeta(null);
 		} catch (TransException e) {
 			e.printStackTrace();
@@ -393,8 +393,8 @@ public class PhotoSyntier extends SynclientierMvp {
 	/**
 	 * Asynchronously push photos. This is different from push/pull of jserv nodes.
 	 * 
-	 * @deprecated since Albumtier 0.1.9, this method also uses block chain for uploading. 
-	 * 
+	 * since Albumtier 0.1.9, this method also uses block chain for uploading.
+	 *
 	 * TODO: to be changed to handling short text.
 	 * 
 	 * @return this
@@ -444,38 +444,11 @@ public class PhotoSyntier extends SynclientierMvp {
 		return resp;
 	}
 
-//	/**
-//	 * TODO: move to Clients
-//	 * Ping port echo without session.
-//	 * @deprecated replaced by {@link Clients#pingLess(String, OnError)}
-//	 * @param funcUri
-//	 * @param errCtx
-//	 * @return echo message
-//	 * @throws IOException
-//	 * @throws AnsonException
-//	 * @throws SemanticException
-//	 */
-//	public static AnsonResp pingLess(String funcUri, OnError errCtx)
-//			throws SemanticException, AnsonException, IOException {
-//		Utils.warn("Use Clients.pingLess() instead!");
-//		EchoReq req = new EchoReq(null);
-//		req.a(EchoReq.A.echo);
-//
-//		InsecureClient client = new InsecureClient();
-//		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
-//
-//		Anson.verbose = true;
-//		AnsonResp resp = client.commit(jmsg, errCtx);
-//
-//		return resp;
-//	}
-
 	public static void asyPing(OnOk ok, OnError err) {
 		new Thread(() -> {
 			try {
 				AnsonResp resp = Clients.pingLess(clientUri, err);
 				ok.ok(resp);
-				;
 			} catch (IOException e) {
 				err.err(MsgCode.exIo, e.getMessage());
 			} catch (SemanticException e) {

@@ -68,7 +68,7 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
      * @param list resource list
      */
     public BaseSynchronizer(BaseActivity ctx, ArrayList<T> list) {
-        this.singleton = AlbumContext.getInstance(null);
+        this.singleton = AlbumContext.getInstance();
         mContext = ctx;
         mList = list;
     }

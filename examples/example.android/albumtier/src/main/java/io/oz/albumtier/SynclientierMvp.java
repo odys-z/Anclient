@@ -228,7 +228,6 @@ public class SynclientierMvp extends Semantier {
 	}
 
 	/**
-	 * @deprecated
 	 * @param meta for creating {@link SyncDoc} object
 	 * @param rs tasks, rows should be limited
 	 * @param workerId
@@ -586,7 +585,7 @@ public class SynclientierMvp extends Semantier {
 	}
 	
 	/**
-	 * @deprecated now clients only match paths with local DB.
+	 * Now clients only match paths with local DB.
 	 * 
 	 * @param page
 	 * @param tabl
@@ -618,12 +617,7 @@ public class SynclientierMvp extends Semantier {
 		return EnvPath.decodeUri(tempath, f.device(), FilenameUtils.getName(clientpath));
 	}
 
-//    public boolean verifyDeviceId(String dev, String devname) {
-//		try {
-//			return true;
-//		}
-//		catch (Exception e) {
-//			return false;
-//		}
-//    }
+    public boolean verifyDeviceId(String device, String devname) {
+		return true;
+    }
 }

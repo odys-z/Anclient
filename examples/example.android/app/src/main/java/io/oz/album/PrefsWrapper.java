@@ -1,6 +1,5 @@
 package io.oz.album;
 
-import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
 
@@ -8,10 +7,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
+import androidx.preference.ListPreference;
+
 import java.io.IOException;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.LangExt;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.AnPrefEntries;
@@ -60,6 +62,9 @@ public class PrefsWrapper {
             config.jservlist = new AnPrefEntries(
                     r.getStringArray(R.array.jserv_entries),
                     r.getStringArray(R.array.jserv_entvals));
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO wring string from preference and no message to user?
         }
 
         if (isblank(config.albumroot) && !isNull(landingUrl))
@@ -80,6 +85,13 @@ public class PrefsWrapper {
         editor.apply();
     }
 
+    /**
+     * Write through jservs list.
+     * @param singleton
+     * @param pref
+     * @param anlist
+     * @return
+     */
     public PrefsWrapper jservs(AlbumContext singleton, SharedPreferences pref, AnPrefEntries anlist) {
         this.jservlist = anlist;
         try {
@@ -95,13 +107,13 @@ public class PrefsWrapper {
     }
 
     /**
-     * Write throug jservs string.
+     * Read jservs list, if null, load from shared preference.
      * @param sharepref
      * @return jservs' list
      */
     public AnPrefEntries jservs(SharedPreferences sharepref) {
         String jservs = sharepref.getString(AlbumApp.keys.jserv, "");
-        if (!isblank(jservs))
+        if (isNull(jservlist) && !isblank(jservs))
             jservlist = (AnPrefEntries) Anson.fromJson(jservs);
         return this.jservlist;
     }
@@ -113,7 +125,7 @@ public class PrefsWrapper {
     public String jserv(int ... index) {
         if (isNull(jservlist)) return "";
         if (isNull(index))
-            return jservlist.entVals[0];
+            return jservlist.ix < 0 ? jservlist.entVals[0] : jservlist.entVals[jservlist.ix];
         else
             return jservlist.entVals[index[0]];
     }
@@ -126,6 +138,22 @@ public class PrefsWrapper {
         SharedPreferences.Editor editor = pref.edit();
         editor.putString(AlbumApp.keys.device, dev);
         editor.apply();
+        return this;
+    }
+
+    public boolean needSetup() {
+        return LangExt.isblank(jserv(), "/", ".", "http://", "https://", "https?://localhost");
+    }
+
+    public PrefsWrapper selectDefaultJserv(ListPreference listJserv) {
+        if (jservlist.ix < 0) {
+            jservlist.ix = 0;
+        }
+
+        jservlist.select(AlbumContext.getInstance(), jservlist.ix);
+        listJserv.setValueIndex(jservlist.ix);
+        listJserv.setTitle(jservlist.entry());
+        listJserv.setSummary(jservlist.entryVal());
         return this;
     }
 }

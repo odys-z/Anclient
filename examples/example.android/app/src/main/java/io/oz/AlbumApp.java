@@ -1,7 +1,5 @@
 package io.oz;
 
-import static io.odysz.common.LangExt.isNull;
-
 import android.app.Application;
 
 import io.oz.album.PrefKeys;

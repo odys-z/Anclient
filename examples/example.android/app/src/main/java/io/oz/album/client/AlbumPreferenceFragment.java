@@ -20,6 +20,7 @@ import io.odysz.common.LangExt;
 import io.odysz.semantics.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.PrefsWrapper;
 import io.oz.album.client.widgets.ComfirmDlg;
 
 /**
@@ -56,15 +57,30 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         userid       = findPreference(AlbumApp.keys.usrid);
 
         // bindPref2Val(listJserv);
+        listJserv.setEntries(AlbumApp.sharedPrefs.jservlist.entries);
+        listJserv.setEntryValues(AlbumApp.sharedPrefs.jservlist.entVals);
+        AlbumApp.sharedPrefs.selectDefaultJserv(listJserv);
         listJserv.setOnPreferenceChangeListener(prefsListener);
+//        PrefsWrapper sharedPrefs = PrefsWrapper
+//                .loadPrefs(getContext(), this.getPreferenceManager().getSharedPreferences(), getString(R.string.url_landing));
+
+//        if (listJserv.getTitle() == null) {
+//            listJserv.setTitle(AlbumApp.sharedPrefs.jservlist.entry());
+//            listJserv.setSummary(AlbumApp.sharedPrefs.jservlist.entryVal());
+//        }
+
+        /*
         AnPrefEntries jservlist = AlbumApp.sharedPrefs
                 .loadPrefs(getContext(), this.getPreferenceManager().getSharedPreferences(), getString(R.string.url_landing))
                 .jservlist;
-        if (jservlist.ix < 0)
-            jservlist.select(singleton, 0);
+        if (jservlist.ix < 0) {
+            jservlist.ix = 0;
+        }
+        jservlist.select(singleton, jservlist.ix);
+        ((ListPreference)listJserv).setValueIndex(jservlist.ix);
         listJserv.setTitle(jservlist.entry());
         listJserv.setSummary(jservlist.entryVal());
-        ((ListPreference)listJserv).setValueIndex(jservlist.ix);
+         */
 
         // bindPref2Val(device);
         device.setOnPreferenceChangeListener(prefsListener);
@@ -94,14 +110,6 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             findPreference(AlbumApp.keys.device).setEnabled(true);
             device.setSummary(R.string.msg_only_once);
         }
-
-        if (listJserv.getTitle() == null) {
-            listJserv.setTitle(AlbumApp.sharedPrefs.jservlist.entry());
-            listJserv.setSummary(AlbumApp.sharedPrefs.jservlist.entryVal());
-        }
-        listJserv.setEntries(AlbumApp.sharedPrefs.jservlist.entries);
-        listJserv.setEntryValues(AlbumApp.sharedPrefs.jservlist.entVals);
-
         initing = false;
     }
 
