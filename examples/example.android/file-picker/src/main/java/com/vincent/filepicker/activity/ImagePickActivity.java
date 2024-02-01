@@ -3,7 +3,9 @@ package com.vincent.filepicker.activity;
 
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_IMAGE;
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -58,5 +60,13 @@ public class ImagePickActivity extends BaseActivity {
         ImagePickAdapter adapter = new ImagePickAdapter(this, isNeedCamera, mMaxNumber);
         linkAdapter(TYPE_IMAGE, adapter);
         mRecyclerView.setAdapter(adapter);
+    }
+
+    protected String[] permissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return new String[]{Manifest.permission.READ_MEDIA_IMAGES,};
+        } else {
+            return storage_permissions;
+        }
     }
 }

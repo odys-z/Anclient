@@ -5,9 +5,6 @@
     <string name="menu_help"  >Help</string>
     <string name="menu_admin" >Sharing Policies</string>
 
-    <string name="txt0_ok"    >OK</string>
-    <string name="txt0_cancel">Cancel</string>
-
     <string name="key_home_cate" translatable="false">key-home-cate</string>
     <string name="txt_prefs_summery_home">Group Registration</string>
     <string name="device_name"           >Device ID: %s</string>

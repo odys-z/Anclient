@@ -5,7 +5,9 @@
  */
 package io.oz.fpick.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -18,6 +20,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.vincent.filepicker.Constant;
@@ -28,7 +32,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.albumtier.AlbumContext;
@@ -37,30 +40,30 @@ import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.BaseSynchronizer;
 import io.oz.fpick.filter.FileFilterx;
-import pub.devrel.easypermissions.AfterPermissionGranted;
-import pub.devrel.easypermissions.AppSettingsDialog;
-import pub.devrel.easypermissions.EasyPermissions;
 
+/**
+ * @since 0.3.0, no longer uses easypermissions, as per the similar reports.
+ * <a href='https://github.com/googlesamples/easypermissions/issues/231'>[1]</a> and
+ * <a href='https://github.com/googlesamples/easypermissions/issues/233'>[2]</a> and the close decision.
+ */
 public abstract class BaseActivity extends FragmentActivity
-        implements EasyPermissions.PermissionCallbacks, JProtocol.OnError, IProgressBarAct {
+        implements JProtocol.OnError, IProgressBarAct {
 
     public interface OnSelectStateListener {
         void onSelectStateChanged(int position, boolean state, AndroidFile file, View animation );
     }
 
-    // public static final String SUFFIX = "Suffix";
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
 
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
-//    private static final String TAG = BaseActivity.class.getName();
     public  static final String IS_NEED_FOLDER_LIST = "isNeedFolderList";
 
     protected FolderListHelper mFolderHelper;
     protected boolean isNeedFolderList;
 
     public ArrayList<AndroidFile> mSelectedList = new ArrayList<>();
-    private BaseSynchronizer mAdapter;
+    private BaseSynchronizer<?, ?> mAdapter;
     /** file pattern */
     protected String[] mSuffix;
     protected FileFilterx filefilter;
@@ -77,10 +80,10 @@ public abstract class BaseActivity extends FragmentActivity
     private RelativeLayout rl_done;
     private RelativeLayout tb_pick;
 
-    protected void linkAdapter(int adaptye, BaseSynchronizer adapter) {
+    protected void linkAdapter(int adaptye, BaseSynchronizer<?, ?> adapter) {
         this.fileType = adaptye;
         tv_count = findViewById(R.id.tv_count);
-        tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
+        tv_count.setText(getString(R.string.n_of_total, mCurrentNumber, mMaxNumber));
 
         mAdapter = adapter;
 
@@ -92,7 +95,6 @@ public abstract class BaseActivity extends FragmentActivity
                 animation.setVisibility ( View.VISIBLE );
 
                 AnimationDrawable animationDrawable = (AnimationDrawable) animation.getBackground ();
-                // Animation a = AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
                 animationDrawable.start ();
             } else {
                 mSelectedList.remove(file);
@@ -254,56 +256,98 @@ public abstract class BaseActivity extends FragmentActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // Forward results to EasyPermissions
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        // EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            permissionGranted();
     }
 
     /**
      * Read external storage file
      */
-    @AfterPermissionGranted(RC_READ_EXTERNAL_STORAGE)
     private void readExternalStorage() {
+        /*
         boolean isGranted = EasyPermissions.hasPermissions(this, "android.permission.READ_EXTERNAL_STORAGE");
         if (isGranted) {
             permissionGranted();
         } else {
             EasyPermissions.requestPermissions(this, getString(R.string.vw_rationale_storage),
-                    RC_READ_EXTERNAL_STORAGE, "android.permission.READ_EXTERNAL_STORAGE");
+                    RC_READ_EXTERNAL_STORAGE,
+                   // "android.permission.READ_EXTERNAL_STORAGE");
+                    permissions());
         }
-    }
+        */
+        for (String p : permissions())
+            if (ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(this, permissions(), RC_READ_EXTERNAL_STORAGE);
+                return;
+            }
 
-    @Override
-    public void onPermissionsGranted(int requestCode, List<String> perms) {
-        // Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size());
-        // Utils.logi("onPermissionsGranted: %s : %s", requestCode, perms.size());
         permissionGranted();
     }
 
-    @Override
-    public void onPermissionsDenied(int requestCode, List<String> perms) {
-        // Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
-        // Utils.logi("onPermissionsDenied: %s : %s", requestCode, perms.size());
+    public static String[] storage_permissions = {
+            // Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
 
-        // If Permission permanently denied, ask user again
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            new AppSettingsDialog.Builder(this).build().show();
-        } else {
-            finish();
-        }
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+//    public static String[] storage_permissions_33 = {
+//            Manifest.permission.READ_MEDIA_IMAGES,
+//            Manifest.permission.READ_MEDIA_AUDIO,
+//            Manifest.permission.READ_MEDIA_VIDEO
+//    };
+    abstract protected String[] permissions();
+//    {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            return storage_permissions_33;
+//        } else {
+//            return storage_permissions;
+//        }
+//    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+//    @Override
+//    public void onPermissionsGranted(int requestCode, List<String> perms) {
+//        // Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size());
+//        // Utils.logi("onPermissionsGranted: %s : %s", requestCode, perms.size());
+//        permissionGranted();
+//    }
+//
+//    @Override
+//    public void onPermissionsDenied(int requestCode, List<String> perms) {
+//        // Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
+//        // Utils.logi("onPermissionsDenied: %s : %s", requestCode, perms.size());
+//
+//        // If Permission permanently denied, ask user again
+//        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+//            new AppSettingsDialog.Builder(this).build().show();
+//        } else {
+//            finish();
+//        }
+//    }
 
-        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
-            // Do something after user returned from app settings screen, like showing a Toast.
-            if (EasyPermissions.hasPermissions(this, "android.permission.READ_EXTERNAL_STORAGE")) {
-                permissionGranted();
-            } else {
-                finish();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+////        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+////            // Do something after user returned from app settings screen, like showing a Toast.
+////            /*
+////            if (EasyPermissions.hasPermissions(this, "android.permission.READ_EXTERNAL_STORAGE")) {
+////                permissionGranted();
+////            } else {
+////                finish();
+////            }
+////            */
+////            for (String p : permissions())
+////                if (ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_DENIED) {
+////                    finish();
+////                    ComfirmDlg.confirm(this, R.string.vw_rationale_storage, 3000);
+////                    break;
+////                }
+////            permissionGranted();
+////        }
+//    }
 
     public void onBackClick(View view) {
         finish();
@@ -317,15 +361,20 @@ public abstract class BaseActivity extends FragmentActivity
         } );
     }
 
+    /**
+     * Show progress bar.
+     * @param of current index
+     * @param all all blocks
+     */
     @Override
     public void onStartingJserv(int of, int all) {
-        ProgressBar b = (ProgressBar) findViewById(R.id.pb_video_pick);
+        ProgressBar b = findViewById(R.id.pb_video_pick);
         if (b != null) runOnUiThread(() -> b.setVisibility(View.VISIBLE));
     }
 
     @Override
     public void onEndingJserv(String resName) {
-        ProgressBar b = (ProgressBar) findViewById(R.id.pb_video_pick);
+        ProgressBar b = findViewById(R.id.pb_video_pick);
         if (b != null) runOnUiThread(() -> b.setVisibility(View.GONE));
     }
 }

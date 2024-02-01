@@ -2,12 +2,14 @@ package io.oz.album;
 
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
+import static io.oz.AlbumApp.context;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
 import androidx.preference.ListPreference;
+import androidx.preference.PreferenceManager;
 
 import java.io.IOException;
 
@@ -86,20 +88,19 @@ public class PrefsWrapper {
     }
 
     /**
-     * Write through jservs list.
-     * @param singleton
-     * @param pref
+     * Write jservs list through shared preferences.
+     *
      * @param anlist
-     * @return
+     * @return this
      */
-    public PrefsWrapper jservs(AlbumContext singleton, SharedPreferences pref, AnPrefEntries anlist) {
+    public PrefsWrapper jservs(AnPrefEntries anlist) {
         this.jservlist = anlist;
         try {
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(AlbumApp.context);
             SharedPreferences.Editor editor = pref.edit();
             editor.putString(AlbumApp.keys.jserv, anlist.toBlock());
             editor.apply();
-
-            singleton.jserv(jservlist.entryVal());
+            // singleton.jserv(jservlist.entryVal());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,6 +123,10 @@ public class PrefsWrapper {
         return this.jservlist;
     }
 
+    /**
+     * Get jservs[index = 0]
+     * @return jserv
+     */
     public String jserv(int ... index) {
         if (isNull(jservlist)) return "";
         if (isNull(index))

@@ -18,9 +18,12 @@ import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.Profiles;
 
+/**
+ * Album client context.
+ */
 public class AlbumContext {
 
-    public boolean verbose = false;
+    public static boolean verbose = false;
 
     /**
      * Profiles loaded from server, not local config.
@@ -33,6 +36,10 @@ public class AlbumContext {
      * this value is designed to be use as a variable without being persisted, and without a get method.
      */
     String jserv;
+
+    public boolean needLogin() {
+        return tier != null && state() == AlbumContext.ConnState.Online;
+    }
 
     public enum ConnState { Online, Disconnected, LoginFailed }
 
@@ -58,7 +65,7 @@ public class AlbumContext {
 
     /**
      * @param err can be ignored if no error message to show
-     * @return
+     * @return single instance
      */
     public static AlbumContext getInstance(OnError ... err) {
         if (instance == null)
@@ -108,24 +115,16 @@ public class AlbumContext {
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
         userInf.device = device;
-        // jserv = jservroot;
-
-        // Clients.init(jservroot + "/" + jdocbase, false);
         Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
-
         return this;
     }
 
     /**
      * Call {@link PhotoSyntier#login(String, String, String)} to login.
-     * @param uid
-     * @param pswd
-     * @param onOk
-     * @param onErr
+     *
+     * <p><b></b>Note:</b><br>
+     * For Android client, don't call this directly. Call App's login instead.</p>
      * @return this
-     * @throws SemanticException
-     * @throws AnsonException
-     * @throws IOException
      */
 	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
             throws SemanticException, AnsonException, IOException {
@@ -134,8 +133,6 @@ public class AlbumContext {
         if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
         */
-
-        // Clients.init(jserv + "/" + jdocbase, verbose);
         Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
 
         tier = new PhotoSyntier(clientUri, userInf.device, errCtx)
@@ -168,13 +165,14 @@ public class AlbumContext {
         // TODO toast or change an icon, c: exSession r: heart link broken
     });
 
-    public AlbumContext jserv(String newVal) {
-        jserv = newVal;
-        // Clients.init(jserv + "/" + jdocbase, verbose);
+    /**
+     * Set jserv-root to {@link Clients}.
+     * @param root new value
+     * @return this
+     */
+    public AlbumContext jserv(String root) {
+        jserv = root;
         Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
         return this;
     }
-
-//    public String jserv() { return jserv; }
-
 }

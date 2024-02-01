@@ -29,24 +29,11 @@ import io.oz.fpick.adapter.NormalFilePickAdapter;
 
 public class NormalFilePickActivity extends BaseActivity {
     public static final int DEFAULT_MAX_NUMBER = 9;
-//    private int mMaxNumber;
-//    private int mCurrentNumber = 0;
     private RecyclerView mRecyclerView;
     private NormalFilePickAdapter mAdapter;
     private ArrayList<NormalFile> mSelectedList = new ArrayList<>();
     private List<Directory<NormalFile>> mAll;
     private ProgressBar mProgressBar;
-
-//    private TextView tv_count;
-//    private TextView tv_folder;
-//    private LinearLayout ll_folder;
-//    private RelativeLayout rl_done;
-//    private RelativeLayout tb_pick;
-
-//    @Override
-//    void permissionGranted() {
-//        loadData();
-//    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,131 +47,19 @@ public class NormalFilePickActivity extends BaseActivity {
     }
 
     private void initView() {
-//        tv_count = (TextView) findViewById(R.id.tv_count);
-//        tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_file_pick);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerListItemDecoration(this,
                 LinearLayoutManager.VERTICAL, R.drawable.vw_divider_rv_file));
-        // mAdapter = new NormalFilePickAdapter(this, mMaxNumber);
+
         NormalFilePickAdapter adapter = new NormalFilePickAdapter(this, mMaxNumber);
         linkAdapter(TYPE_FILE, adapter);
         mRecyclerView.setAdapter(adapter);
 
-//        mAdapter.setOnSelectStateListener(new OnSelectStateListener<NormalFile>() {
-//            @Override
-//            public void OnSelectStateChanged (int position, boolean state , NormalFile file , View animation ) { }
-//
-//            @Override
-//            public void onAudioStateChanged ( boolean state , NormalFile file,View animation ) { }
-//
-//            @Override
-//            public void onFileStateChanged ( boolean state , NormalFile file,View animation ) {
-//                if (state) {
-//                    mSelectedList.add(file);
-//                    mCurrentNumber++;
-//                    animation.setAlpha ( 1f );
-//                    animation.setVisibility ( View.VISIBLE );
-//
-//                    AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground ( );
-//                    animationDrawable.start ();
-//
-//                } else {
-//                    mSelectedList.remove(file);
-//                    mCurrentNumber--;
-//                    animation.setAlpha ( 0f );
-//                    animation.setVisibility ( View.GONE );
-//
-//                }
-//                tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-//            }
-//        });
-
         mProgressBar = (ProgressBar) findViewById(R.id.pb_file_pick);
-
-//        rl_done = (RelativeLayout) findViewById(R.id.rl_done);
-//        rl_done.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent();
-//                intent.putParcelableArrayListExtra(Constant.RESULT_PICK_FILE, mSelectedList);
-//                setResult(RESULT_OK, intent);
-//                finish();
-//            }
-//        });
-//
-//        tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
-//        ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
-//        if (isNeedFolderList) {
-//            ll_folder.setVisibility(View.VISIBLE);
-//            ll_folder.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mFolderHelper.toggle(tb_pick);
-//                }
-//            });
-//            tv_folder = (TextView) findViewById(R.id.tv_folder);
-//            tv_folder.setText(getResources().getString(R.string.vw_all));
-//
-//            mFolderHelper.setFolderListListener(new FolderListAdapter.FolderListListener() {
-//                @Override
-//                public void onFolderListClick(Directory directory) {
-//                    mFolderHelper.toggle(tb_pick);
-//                    tv_folder.setText(directory.getName());
-//
-//                    if (TextUtils.isEmpty(directory.getPath())) { //All
-//                        refreshData(mAll);
-//                    } else {
-//                        for (Directory<NormalFile> dir : mAll) {
-//                            if (dir.getPath().equals(directory.getPath())) {
-//                                List<Directory<NormalFile>> list = new ArrayList<>();
-//                                list.add(dir);
-//                                refreshData(list);
-//                                break;
-//                            }
-//                        }
-//                    }
-//                }
-//            });
-//        }
     }
 
-//    private void loadData() {
-//        FileFilter.getFiles(this, new FilterResultCallback<NormalFile>() {
-//            @Override
-//            public void onResult(List<Directory<NormalFile>> directories) {
-//                // Refresh folder list
-//                if (isNeedFolderList) {
-//                    ArrayList<Directory> list = new ArrayList<>();
-//                    Directory all = new Directory();
-//                    all.setName(getResources().getString(R.string.vw_all));
-//                    list.add(all);
-//                    list.addAll(directories);
-//                    mFolderHelper.fillData(list);
-//                }
-//
-//                mAll = directories;
-//                refreshData(directories);
-//            }
-//        }, mSuffix);
-//    }
+    protected String[] permissions() { return storage_permissions; }
 
-//    private void refreshData(List<Directory<NormalFile>> directories) {
-//        mProgressBar.setVisibility(View.GONE);
-//        List<NormalFile> list = new ArrayList<>();
-//        for (Directory<NormalFile> directory : directories) {
-//            list.addAll(directory.getFiles());
-//        }
-//
-//        for (NormalFile file : mSelectedList) {
-//            int index = list.indexOf(file);
-//            if (index != -1) {
-//                list.get(index).setSelected(true);
-//            }
-//        }
-//
-//        mAdapter.refresh(list);
-//    }
 }

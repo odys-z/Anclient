@@ -78,7 +78,7 @@ import io.oz.fpick.activity.BaseActivity;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
 
-    AlbumContext singl;
+    AlbumContext clientext;
 
     /**
      * Preference activity starter
@@ -97,12 +97,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         AlbumApp.keys = new PrefKeys(this);
 
-        singl = AlbumContext.getInstance(this);
+        clientext = AlbumContext.getInstance(this);
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         PrefsWrapper c = AlbumApp.sharedPrefs
                 = PrefsWrapper.loadPrefs(getApplicationContext(), sharedPrefs, getString(R.string.url_landing));
-        singl.init(c.homeName, c.uid, c.device, c.jserv());
+        clientext.init(c.homeName, c.uid, c.device, c.jserv());
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
@@ -117,7 +117,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        if (singl.state() == ConnState.Online) {
+                        if (clientext.state() == ConnState.Online) {
                             onMediasPicked(result);
                         } else showMsg(R.string.msg_ignore_offline);
                     }
@@ -129,7 +129,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        if (singl.state() == ConnState.Online) {
+                        if (clientext.state() == ConnState.Online) {
                             onFilesPicked(result);
                         } else showMsg(R.string.msg_ignore_offline);
                     }
@@ -152,14 +152,15 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     result -> reloadAlbum());
 
         try {
-            singl.jserv(AlbumApp.sharedPrefs.jserv());
+            // clientext.jserv(AlbumApp.sharedPrefs.jserv());
 
-            if (singl.needSetup() || AlbumApp.sharedPrefs.needSetup())
+            if (clientext.needSetup() || AlbumApp.sharedPrefs.needSetup())
                 // settings are cleared
                 startPrefsAct();
             else {
-                singl.jserv(AlbumApp.sharedPrefs.jserv());
+                clientext.jserv(AlbumApp.sharedPrefs.jserv());
 
+                /*
                 String pswd = AlbumApp.sharedPrefs.pswd();
                 singl.pswd(pswd)
                      .login((client) -> {
@@ -167,9 +168,17 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         },
                         (code, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(),
                                                     AlbumApp.sharedPrefs.jserv()));
+                );
+                 */
+                AlbumApp.login(
+                        (client) -> {
+                            runOnUiThread(this::reloadAlbum);
+                        },
+                        (code, t, args) -> showMsg(R.string.t_login_failed, clientext.userInf.uid(),
+                                AlbumApp.sharedPrefs.jserv()));
             }
         } catch (Exception e) {
-            showMsg(R.string.t_login_failed, singl.userInf.uid(), AlbumApp.sharedPrefs.jserv());
+            showMsg(R.string.t_login_failed, clientext.userInf.uid(), AlbumApp.sharedPrefs.jserv());
         }
     }
 
@@ -186,11 +195,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     @SuppressLint("SetJavaScriptEnabled")
     void reloadAlbum() {
-        if (singl.tier == null || AlbumApp.sharedPrefs == null)
+        if (clientext.tier == null || AlbumApp.sharedPrefs == null)
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
-        reloadWeb(singl, wv, this, AssetHelper.Act_Album);
+        reloadWeb(clientext, wv, this, AssetHelper.Act_Album);
     }
 
     public static void reloadWeb(AlbumContext singl, WebView wv, Activity act, int webId) {
@@ -286,9 +295,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             Intent data = result.getData();
             if (data != null) {
                 ArrayList<? extends SyncDoc> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
-                if (singl.tier == null)
+                if (clientext.tier == null)
                     showMsg(R.string.txt_please_login);
-                else singl.tier
+                else clientext.tier
                         .fileProvider(new IFileProvider() {
                             private String saveFolder;
 
@@ -342,30 +351,30 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 ClipData clipData = Objects.requireNonNull(data).getClipData();
                 ArrayList<AndroidFile> paths;
                 if (clipData != null) {
-                    if (singl.verbose) for (int i = 0; i < clipData.getItemCount(); i++)
+                    if (clientext.verbose) for (int i = 0; i < clipData.getItemCount(); i++)
                         Utils.logi("[AlbumContext.verbose] URI: %s", clipData.getItemAt(i).getUri());
-                    paths = getMultipleDocs(this, singl.userInf.device, clipData);
-                    if (singl.verbose) Utils.logi(paths);
+                    paths = getMultipleDocs(this, clientext.userInf.device, clipData);
+                    if (clientext.verbose) Utils.logi(paths);
                 } else {
-                    if (singl.verbose) {
+                    if (clientext.verbose) {
                         Utils.logi("[AlbumContext.verbose] URI: %s\nPath: %s",
                                 String.valueOf(data.getData()),
-                                getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT));
+                                getDocDescript(this, clientext.userInf.device, data.getData(), Build.VERSION.SDK_INT));
                         errCtx.prepare(msgv, R.string.msg_upload_failed)
                                 .err(null, "URI: %s\nPath: %s",
                                         String.valueOf(data.getData()),
-                                        getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
+                                        getDocDescript(this, clientext.userInf.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
                     }
                     paths = new ArrayList<>(1);
-                    paths.add(getDocDescript(this, singl.userInf.device, data.getData(), Build.VERSION.SDK_INT));
+                    paths.add(getDocDescript(this, clientext.userInf.device, data.getData(), Build.VERSION.SDK_INT));
                 }
 
-                if (singl.tier == null)
+                if (clientext.tier == null)
                     showMsg(R.string.txt_please_login);
                 else {
                     // verifyStoragePermissions(this);
                     // askDirectoriesPermissions(this);
-                    singl.tier.fileProvider(new IFileProvider() {
+                    clientext.tier.fileProvider(new IFileProvider() {
                         private String saveFolder;
                         // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                         @Override
@@ -398,8 +407,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                         }
                     })
-                    .asyVideos(paths,
-                            null,
+                    .asyVideos(paths, null,
                             (resp, v) -> showMsg(R.string.t_synch_ok, paths.size()),
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
                 }
@@ -422,7 +430,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         intt.putExtra(Constant.MAX_NUMBER, 99);
         intt.putExtra(IS_NEED_FOLDER_LIST, true);
         intt.putExtra(Constant.PickingMode,
-                singl.state() == ConnState.Disconnected ?
+                clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
 
         pickMediaStarter.launch(intt);

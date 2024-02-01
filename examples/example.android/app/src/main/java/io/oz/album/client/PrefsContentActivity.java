@@ -6,10 +6,8 @@ import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import static io.oz.AlbumApp.keys;
-import static io.oz.AlbumApp.sharedPrefs;
 import static io.oz.albumtier.AlbumContext.clientUri;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -31,7 +29,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import io.odysz.anson.Anson;
 import io.odysz.common.LangExt;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
@@ -39,8 +36,7 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
-import io.oz.album.client.widgets.ComfirmDlg;
-import io.oz.album.tier.AlbumResp;
+import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.albumtier.AlbumContext;
 import io.oz.albumtier.PhotoSyntier;
 
@@ -68,11 +64,11 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
      * null for clean
      */
     private AnPrefEntries jsvEntsDirty;
-    protected AnPrefEntries jsvEntsDirty(SharedPreferences sharedPrefs) {
-        if (jsvEntsDirty == null)
-            jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
-        return jsvEntsDirty;
-    }
+//    protected AnPrefEntries jsvEntsDirty(SharedPreferences sharedPrefs) {
+//        if (jsvEntsDirty == null)
+//            jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
+//        return jsvEntsDirty;
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +85,9 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 .beginTransaction()
                 .replace(android.R.id.content, prefFragment)
                 .commit();
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
 
         // https://issuetracker.google.com/issues/146166988/resources
         // this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
@@ -138,8 +137,9 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             if (content != null) {
                 String format  = intentResult.getFormatName();
                 if (eq(format, getString(R.string.qrformat))) {
-                    SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-                    AnPrefEntries jsvEnts = jsvEntsDirty(sharedPref);
+                    // SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                    // AnPrefEntries jsvEnts = jsvEntsDirty(sharedPref);
+                    AnPrefEntries jsvEnts = jsvEntsDirty;
                     if (jsvEnts.insert(content)) {
                         prefFragment.listJserv.setEntries(jsvEnts.entries);
                         prefFragment.listJserv.setEntryValues(jsvEnts.entVals);
@@ -148,7 +148,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         prefFragment.listJserv.setTitle(jsvEnts.entry());
                         prefFragment.listJserv.setSummary(jsvEnts.entryVal());
 
-                        // AlbumApp.sharedPrefs.jservs(singleton, sharedPref, jsvEnts);
+                        // Have clients using temporary jserv root.
                         singleton.jserv(jsvEnts.entryVal());
                     }
                     else err(MsgCode.exGeneral, getString(R.string.unknown_qrcontent));
@@ -170,7 +170,13 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             return;
         }
         try {
-          singleton.login(
+            AlbumApp.login((resp) -> {
+                // persist dirty
+                AlbumApp.sharedPrefs.jservs(jsvEntsDirty);
+                confirm(R.string.login_succeed, 3000);
+            }, showErrConfirm);
+            /*
+            singleton.login(
             (client) -> {
                 // load settings
                 Anson.verbose = false;
@@ -184,8 +190,10 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         confirm(R.string.login_succeed, 3000);
                     },
                     showErrConfirm);
+                confirm(R.string.login_succeed, 3000);
             },
             showErrConfirm);
+                 */
         } catch (Exception e) {
             Log.e(clientUri, e.getClass().getName() + e.getMessage());
             showErrConfirm.err(MsgCode.exGeneral,
@@ -195,7 +203,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     /**
      * when succeed, deep write preference: device
-     * @param btn
+     * @param btn clicked button
      */
     public void onRegisterDevice(View btn) {
         if (LangExt.isblank(buff_devname)) {
@@ -235,7 +243,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     /**
      * Shallow wirth preference: device
-     * @param btn
+     * @param btn clicked button
      */
     public void onRestoreDev(View btn) {
         if (singleton.state() != AlbumContext.ConnState.Online) {
@@ -308,7 +316,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
      * common function for error handling
      */
     JProtocol.OnError showErrConfirm = (c, t, args) ->
-            errorDlg(String.format("Code: %s\n%s", c, String.format(t, args == null ? null : args)), 5000);
+            errorDlg(String.format("Code: %s\n%s", c, String.format(t, (Object[])args)), 5000);
 
     @Override
     public void err(MsgCode c, String msg, String... args) {

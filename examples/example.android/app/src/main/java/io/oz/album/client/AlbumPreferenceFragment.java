@@ -20,8 +20,7 @@ import io.odysz.common.LangExt;
 import io.odysz.semantics.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
-import io.oz.album.PrefsWrapper;
-import io.oz.album.client.widgets.ComfirmDlg;
+import io.oz.fpick.activity.ComfirmDlg;
 
 /**
  * <h4>Preference Fragment</h4>

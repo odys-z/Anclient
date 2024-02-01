@@ -2,6 +2,7 @@ package com.vincent.filepicker.activity;
 
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_VIDEO;
 
+import android.Manifest;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -68,18 +69,6 @@ public class VideoPickActivity extends BaseActivity {
 
     }
 
-//    private String copyFileToInternal(Uri fileUri) {
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//            Cursor cursor = getContentResolver().query(MediaStore.Files.getContentUri("external"), new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null);
-//            while(cursor.moveToFirst()) {
-//                String displayName = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
-//                long size = cursor.getLong(cursor.getColumnIndexOrThrow(OpenableColumns.SIZE));
-//                Utils.logi("%s, %s", displayName, size);
-//            }
-//        }
-//        return null;
-//    }
-
     /**
      * @deprecated  test only
      *
@@ -103,8 +92,6 @@ public class VideoPickActivity extends BaseActivity {
         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf");
         final String[] selectionArgs = new String[]{mimeType};
 
-        int v = Build.VERSION_CODES.JELLY_BEAN_MR2; // can multiple select
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL);
         }else{
@@ -117,7 +104,6 @@ public class VideoPickActivity extends BaseActivity {
 
             if (cursor.moveToFirst()) {
                 int columnData = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-                int columnName = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
                 do {
                     pdfList.add((cursor.getString(columnData)));
                     Log.d("TAG", "getPdf: " + cursor.getString(columnData));
@@ -126,5 +112,12 @@ public class VideoPickActivity extends BaseActivity {
             }
         }
         return pdfList;
+    }
+
+    protected String[] permissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            return new String[]{Manifest.permission.READ_MEDIA_VIDEO};
+        else
+            return storage_permissions;
     }
 }

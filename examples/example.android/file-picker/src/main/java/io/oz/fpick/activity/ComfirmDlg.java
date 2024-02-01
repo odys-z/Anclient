@@ -1,4 +1,4 @@
-package io.oz.album.client.widgets;
+package io.oz.fpick.activity;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -13,8 +13,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import io.oz.R;
-import io.oz.album.client.PrefsContentActivity;
+import io.oz.fpick.R;
 
 import static io.odysz.common.LangExt.is;
 import static io.odysz.common.LangExt.isNull;
@@ -40,7 +39,15 @@ public class ComfirmDlg extends DialogFragment {
         this.showCancel = is(showCancel);
     }
 
-    public static void confirm(AppCompatActivity acty, int msgid, int live, int[] msgOk) {
+    /**
+     * Show confirm messagebox.
+     *
+     * @param acty  parent activity
+     * @param msgid R.string
+     * @param live  milliseconds
+     * @param msgOk ok button
+     */
+    public static void confirm(FragmentActivity acty, int msgid, int live, int... msgOk) {
         new ComfirmDlg()
                 .dlgMsg(msgid, isNull(msgOk) ? 0 : msgOk[0])
                 .onOk((dialog, id) -> {
@@ -110,18 +117,6 @@ public class ComfirmDlg extends DialogFragment {
         try { show(ft, tag); } catch (Throwable t) {} // Events and UI states no always have a parent fragment
         return this;
     }
-
-//    public ComfirmDlg showDlg(Activity act, String tag) {
-//        this.acty = act;
-//        android.app.FragmentManager fm = act.getFragmentManager();
-//        // issue: no end transaction?
-//        // https://developer.android.com/reference/android/app/DialogFragment.html#alert-dialog
-//        android.app.FragmentTransaction ft = fm.beginTransaction();
-//        ft.addToBackStack(null);
-//        dismissin(livingms);
-//        try { show(ft, tag); } catch (Throwable t) {} // Events and UI states no always have a parent fragment
-//        return this;
-//    }
 
     private void dismissin(int ms) {
         if (ms > 0) {

@@ -42,7 +42,7 @@ dependencies {
 
     implementation "com.bm.photoview:library:$bm_photoview_version"
 
-    implementation 'pub.devrel:easypermissions:3.0.0'
+    // implementation 'pub.devrel:easypermissions:3.0.0'
 
     implementation group: 'io.github.odys-z', name: 'semantic.jserv', version: "$jserv_ver"
     implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver")

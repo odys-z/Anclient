@@ -1,5 +1,7 @@
 package io.oz.fpick.adapter;
 
+import static io.odysz.common.LangExt.isNull;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -31,7 +33,6 @@ import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
-//import io.oz.jserv.docsync.SyncFlag;
 
 import static io.odysz.common.LangExt.isblank;
 
@@ -112,11 +113,18 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
 
         try {
             mContext.onStartingJserv(0, 1);
+            if (singleton.needLogin())
+                // AlbumApp.login( (r) -> startSynchQuery(synchPage), singleton.errCtx);
+                singleton.login((c) -> startSynchQuery(synchPage), singleton.errCtx);
+            else
+                startSynchQuery(synchPage);
+            /*
             if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
                 startSynchQuery(synchPage);
             else
                 singleton.login((c) -> startSynchQuery(synchPage),
                     singleton.errCtx);
+             */
         } catch (GeneralSecurityException e) {
             singleton.errCtx.err(AnsonMsg.MsgCode.exSession, e.getMessage());
         } catch (SemanticException e) {
@@ -127,6 +135,7 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     }
 
     void startSynchQuery(PathsPage page) {
+        if (!isNull(singleton.tier))
         singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
             (c, r, args) -> {
                 // Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));

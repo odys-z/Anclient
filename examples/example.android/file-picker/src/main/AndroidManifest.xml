@@ -2,10 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
-    <!--
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    -->
+    <!-- -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
@@ -21,10 +20,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/vw_FilePickerTheme" />
 
-        <activity android:name="com.vincent.filepicker.activity.ImageBrowserActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/vw_FilePickerTheme"
-            android:hardwareAccelerated="false" />
+<!--        <activity android:name="com.vincent.filepicker.activity.ImageBrowserActivity"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:theme="@style/vw_FilePickerTheme"-->
+<!--            android:hardwareAccelerated="false" />-->
 
         <activity android:name="com.vincent.filepicker.activity.VideoPickActivity"
             android:screenOrientation="portrait"
