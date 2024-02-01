@@ -64,7 +64,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             params.height = itemWidth / ImagePickActivity.COLUMN_NUMBER;
         }
         VideoPickViewHolder videoViewHolder = new VideoPickViewHolder ( itemView );
-        videoViewHolder.setIsRecyclable ( false );
+
+        videoViewHolder.setIsRecyclable (false);
 
         return videoViewHolder;
     }
@@ -176,6 +177,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             });
 
             holder.mDuration.setText(Util.getDurationString(file.getDuration()));
+
+            holder.setIsRecyclable ( true );
         }
     }
 

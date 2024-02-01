@@ -45,7 +45,7 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
     public AudioPickViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.vw_layout_item_audio_pick, parent, false);
         AudioPickViewHolder holder= new AudioPickViewHolder(itemView);
-        holder.setIsRecyclable ( true );
+        holder.setIsRecyclable (false);
         return holder;
     }
 
@@ -137,6 +137,8 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
                         holder.animation);
             }
         });
+
+        holder.setIsRecyclable(true);
     }
 
     @Override
