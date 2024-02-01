@@ -1,7 +1,7 @@
 //package com.vincent.filepicker.activity;
 //
 //import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-//import static com.vincent.filepicker.activity.ImagePickActivity.DEFAULT_MAX_NUMBER;
+//import static io.oz.fpick.activity.ImagePickActivity.DEFAULT_MAX_NUMBER;
 //
 //import android.content.Intent;
 //import android.os.Bundle;

@@ -1,4 +1,4 @@
-package com.vincent.filepicker.activity;
+package io.oz.fpick.activity;
 
 
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_IMAGE;
@@ -19,14 +19,11 @@ import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.ImagePickAdapter;
 
 /**
- * Modified by Ody Zhou
+ * Created by Ody Zhou
  * Date 2022/02/11
  *
- * Created by Vincent Woo
- * Date: 2016/10/12
- * Time: 16:41
+ * Credits to Vincent Woo
  */
-
 public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
     public static final String IS_NEED_IMAGE_PAGER = "IsNeedImagePager";

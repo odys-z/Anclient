@@ -1,4 +1,4 @@
-package com.vincent.filepicker.activity;
+package io.oz.fpick.activity;
 
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_AUDIO;
 
@@ -21,14 +21,10 @@ import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
-import io.oz.fpick.activity.IProgressBarAct;
 import io.oz.fpick.adapter.AudioPickAdapter;
 
 /**
- * Created by Vincent Woo
- * Date: 2016/10/21
- * Time: 17:31
+ * Credits to Vincent Woo
  */
 
 public class AudioPickActivity extends BaseActivity implements IProgressBarAct {

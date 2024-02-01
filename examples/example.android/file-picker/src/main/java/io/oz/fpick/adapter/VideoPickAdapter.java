@@ -22,7 +22,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.activity.ImagePickActivity;
+import io.oz.fpick.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;

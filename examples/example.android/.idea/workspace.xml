@@ -32,30 +32,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/BaseActivity_del.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/AlbumContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/AlbumApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefsWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/PrefsWrapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/AlbumPreferenceFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/widgets/ComfirmDlg.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/ComfirmDlg.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file-picker/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/AudioPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/AudioPickActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/AudioPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/AudioPickActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImageBrowserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImageBrowserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImagePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImagePickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/NormalFilePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/NormalFilePickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/VideoPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/VideoPickActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImagePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/ImagePickActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/NormalFilePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/NormalFilePickActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/VideoPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/VideoPickActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/ImagePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/BaseActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/BaseActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values-zh/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values-zh/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/VideoPickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/BaseActivity_del.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/NormalFilePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/NormalFilePickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,6 +166,7 @@
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="io.oz.fpick.activity" />
+      <recent name="com.vincent.filepicker.activity" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="io.oz.fpick.activity" />

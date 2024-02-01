@@ -27,7 +27,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
-import com.vincent.filepicker.activity.ImagePickActivity;
+import io.oz.fpick.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import io.odysz.common.Utils;
 import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;

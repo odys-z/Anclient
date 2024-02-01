@@ -1,4 +1,4 @@
-package com.vincent.filepicker.activity;
+package io.oz.fpick.activity;
 
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_FILE;
 
@@ -22,9 +22,7 @@ import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.NormalFilePickAdapter;
 
 /**
- * Created by Vincent Woo
- * Date: 2016/10/26
- * Time: 10:14
+ * Credits Vincent Woo
  */
 
 public class NormalFilePickActivity extends BaseActivity {

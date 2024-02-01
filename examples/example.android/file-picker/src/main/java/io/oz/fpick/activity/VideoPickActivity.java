@@ -1,4 +1,4 @@
-package com.vincent.filepicker.activity;
+package io.oz.fpick.activity;
 
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_VIDEO;
 
@@ -31,16 +31,13 @@ import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.VideoPickAdapter;
 
 /**
- * Modified by Ody Zhou
+ * Created by Ody Zhou
  * 20 Feb, 2022
  *
- * Created by Vincent Woo
- * Date: 2016/10/21
- * Time: 14:02
+ * Credits to Vincent Woo
  */
 
 public class VideoPickActivity extends BaseActivity {
-//    public static final String THUMBNAIL_PATH = "FilePick";
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
 
     public static final int DEFAULT_MAX_NUMBER = 9;
@@ -58,7 +55,7 @@ public class VideoPickActivity extends BaseActivity {
         boolean isNeedCamera = getIntent().getBooleanExtra(IS_NEED_CAMERA, false);
         isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_video_pick);
+        RecyclerView mRecyclerView = findViewById(R.id.rv_video_pick);
         GridLayoutManager layoutManager = new GridLayoutManager(this, COLUMN_NUMBER);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));

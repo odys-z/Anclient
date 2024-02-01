@@ -39,9 +39,9 @@ import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
 
 import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.activity.AudioPickActivity;
-import com.vincent.filepicker.activity.ImagePickActivity;
-import com.vincent.filepicker.activity.VideoPickActivity;
+import io.oz.fpick.activity.AudioPickActivity;
+import io.oz.fpick.activity.ImagePickActivity;
+import io.oz.fpick.activity.VideoPickActivity;
 
 import org.jetbrains.annotations.NotNull;
 
