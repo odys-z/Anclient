@@ -1,7 +1,6 @@
 /**
  * Created by Ody Zhou
  * Date: 15 Feb. 2022
- *
  * Credits to Vincent Woo
  */
 package io.oz.fpick.adapter;
@@ -44,10 +43,10 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 import static io.odysz.common.LangExt.isblank;
 
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
-    public Uri mImageUri;
+    // public Uri mImageUri;
 
     public ImagePickAdapter(ImagePickActivity ctx, boolean needCamera, int max) {
-        this ( ctx, new ArrayList<ImageFile> ( ), needCamera , max );
+        this ( ctx, new ArrayList<>(), needCamera , max );
     }
 
     public ImagePickAdapter(BaseActivity ctx, ArrayList<ImageFile> list, boolean needCamera, int max) {
@@ -68,7 +67,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             itemWidth = displaymetrics.widthPixels;
             params.height = itemWidth / ImagePickActivity.COLUMN_NUMBER;
         }
-        ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
+        ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder(itemView);
 
         // see https://github.com/wasabeef/recyclerview-animators/issues/85#issuecomment-235149939
         imagePickViewHolder.setIsRecyclable ( false );
@@ -77,7 +76,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
     }
 
     @Override
-    public void onBindViewHolder ( final ImagePickViewHolder holder , final int position ) {
+    public void onBindViewHolder (@NonNull final ImagePickViewHolder holder , final int position ) {
         if ( isNeedCamera && position == 0 ) {
             holder.icAlbum.setVisibility ( View.VISIBLE );
             holder.icSynced.setVisibility ( View.INVISIBLE );
@@ -106,11 +105,11 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 .transition ( withCrossFade() )
                 .listener(new RequestListener() {
                     @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource) {
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, @NonNull Target target, boolean isFirstResource) {
                         return false;
                     }
                     @Override
-                    public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
+                    public boolean onResourceReady(@NonNull Object resource, @NonNull Object model, Target target, @NonNull DataSource dataSource, boolean isFirstResource) {
                         return false;
                     }
                 })
@@ -206,7 +205,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         return isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
     }
 
-    class ImagePickViewHolder extends RecyclerView.ViewHolder {
+    static class ImagePickViewHolder extends RecyclerView.ViewHolder {
         private final ImageView icAlbum;
         private final ImageView icSynced;
         private final ImageView icSyncing;

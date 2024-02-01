@@ -27,13 +27,12 @@ import java.util.ArrayList;
 
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
 
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
-    public AudioPickAdapter(BaseActivity ctx, ArrayList<AudioFile> list, int max) {
-        super(ctx, list);
-        mMaxNumber = max;
-    }
+//    public AudioPickAdapter(BaseActivity ctx, ArrayList<AudioFile> list, int max) {
+//        super(ctx, list);
+//        mMaxNumber = max;
+//    }
 
     public AudioPickAdapter(AudioPickActivity ctx, int max) {
         super(ctx, new ArrayList<>());
@@ -156,8 +155,8 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         private final ImageView mCbx;
         private final RelativeLayout animation;
 
-        private TextView mDuration;
-        private RelativeLayout mDurationLayout;
+        // private TextView mDuration;
+        // private RelativeLayout mDurationLayout;
 
         public AudioPickViewHolder(@NonNull View itemView) {
             super ( itemView );
