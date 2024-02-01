@@ -33,20 +33,8 @@
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/AudioPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/AudioPickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImageBrowserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImageBrowserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/ImagePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/ImagePickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/NormalFilePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/NormalFilePickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/activity/VideoPickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/VideoPickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/ImagePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/vincent/filepicker/adapter/VideoPickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/BaseActivity_del.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/NormalFilePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/NormalFilePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -344,11 +332,6 @@
           <url>file://$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java</url>
           <line>349</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java</url>
-          <line>138</line>
-          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

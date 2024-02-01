@@ -66,11 +66,12 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             DisplayMetrics displaymetrics = new DisplayMetrics();
             wm.getDefaultDisplay().getMetrics(displaymetrics);
             itemWidth = displaymetrics.widthPixels;
-            // Utils.logi("w: %s", itemWidth);
             params.height = itemWidth / ImagePickActivity.COLUMN_NUMBER;
         }
         ImagePickViewHolder imagePickViewHolder = new ImagePickViewHolder ( itemView );
-        imagePickViewHolder.setIsRecyclable ( true );
+
+        // see https://github.com/wasabeef/recyclerview-animators/issues/85#issuecomment-235149939
+        imagePickViewHolder.setIsRecyclable ( false );
 
         return imagePickViewHolder;
     }
@@ -195,6 +196,8 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                     mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
                 }
             });
+
+            holder.setIsRecyclable ( true );
         }
     }
 

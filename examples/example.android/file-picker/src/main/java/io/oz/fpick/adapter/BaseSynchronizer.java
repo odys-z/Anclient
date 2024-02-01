@@ -136,11 +136,8 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
 
     void startSynchQuery(PathsPage page) {
         if (!isNull(singleton.tier))
-        singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
-            (c, r, args) -> {
-                // Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
-                singleton.errCtx.err(c, r, args);
-            });
+            singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
+                (c, r, args) -> { singleton.errCtx.err(c, r, args); });
     }
 
     /**
