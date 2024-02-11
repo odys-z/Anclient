@@ -59,16 +59,15 @@ class Utils {
                             root = s+"/"+split[1];
                         }
                     }
-                    if (root.contains(type)){
+                    if (root.contains(type))
                         return "storage" + "/" + docId.replace(":", "/");
-                    }else{
-                        if (root.startsWith("/storage/")||root.startsWith("storage/")) {
+                    else {
+                        if (root.startsWith("/storage/")||root.startsWith("storage/"))
                             return root;
-                        }else if (root.startsWith("/")){
+                        else if (root.startsWith("/"))
                             return "/storage"+root;
-                        }else{
+                        else
                             return "/storage/"+root;
-                        }
                     }
                 }
             }
@@ -119,9 +118,11 @@ class Utils {
                 } else if ("audio".equals(type)) {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
+                else // shouldn't be here
+                    contentUri = uri;
 
                 final String selection = "_id=?";
-                final String[] selectionArgs = new String[]{
+                final String[] selectionArgs = new String[] {
                         split[1]
                 };
 
@@ -180,6 +181,11 @@ class Utils {
         return result;
     }
 
+    /**
+     * Get _data column with ContentResolver.
+     * {@link android.content.ContentResolver#query(Uri, String[], String, String[], String) qury()}
+     * @return data column
+     */
     private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         final String column = "_data";
@@ -198,7 +204,6 @@ class Utils {
         }
         return null;
     }
-
 
     @SuppressWarnings("TryFinallyCanBeTryWithResources")
     public static String getFilePath(Context context, Uri uri) {
@@ -220,11 +225,9 @@ class Utils {
         return null;
     }
 
-
     private static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
-
 
     public static boolean isDownloadsDocument(Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());

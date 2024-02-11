@@ -33,11 +33,13 @@
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/IFileProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/IFileProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/NormalFilePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/NormalFilePickActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/BaseSynchronizer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/ImagePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/NormalFilePickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/NormalFilePickAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/VideoPickAdapter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +49,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[adb-RZCW81VYR7Y-XyhQUp._adb-tls-connect._tcp]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\Alice\.android\avd\Pixel_2_API_26.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -332,9 +334,24 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java</url>
-          <line>349</line>
-          <option name="timeStamp" value="1" />
+          <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java</url>
+          <line>152</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java</url>
+          <line>113</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java</url>
+          <line>174</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java</url>
+          <line>73</line>
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -348,6 +365,7 @@
       <configuration name="AndroidRunConfigurationType">
         <watch expression=" lstJserv.getTitle()" />
         <watch expression="getPreferenceManager().getDefaultSharedPreferences(this)" language="JAVA" />
+        <watch expression="Paths.get(f.fullpath()).getFileName().toString()" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>

@@ -41,7 +41,6 @@ public class DeviceHelper {
     }
 
     public static ArrayList<AndroidFile> getMultipleDocs(Context context, String device, ClipData clipData) throws IOException {
-//        int countMultiple = clipData.getItemCount();
         ArrayList<AndroidFile> paths = new ArrayList<>(clipData.getItemCount());
         for (int i = 0; i < clipData.getItemCount(); i++) {
             Uri uri = clipData.getItemAt(i).getUri();
@@ -71,7 +70,7 @@ public class DeviceHelper {
      * @throws IOException
      */
     public static AndroidFile getDocDescript (Context context, String device, Uri uri, int APILevel) throws IOException {
-        String returnedPath;
+//        String returnedPath;
         if (APILevel >= 19) {
             String docId = null;
             // This is only used when a file is selected from a sub-directory inside the Downloads folder
@@ -125,11 +124,12 @@ public class DeviceHelper {
             }
             // Local file was selected
             else {
+                /*
                 returnedPath = getRealPathFromURI_API19(context, uri);
                 //Get the file extension
                 final MimeTypeMap mime = MimeTypeMap.getSingleton();
-                String subStringExtension = String.valueOf(returnedPath).substring(String.valueOf(returnedPath).lastIndexOf(".") + 1);
-                String extensionFromMime = mime.getExtensionFromMimeType(context.getContentResolver().getType(uri));
+                // String subStringExtension = String.valueOf(returnedPath).substring(String.valueOf(returnedPath).lastIndexOf(".") + 1);
+                // String extensionFromMime = mime.getExtensionFromMimeType(context.getContentResolver().getType(uri));
 
                 // Path is null
                 if (returnedPath == null || returnedPath.equals("")) {
@@ -148,6 +148,14 @@ public class DeviceHelper {
                             .clientname(f.getName())
                             .fullpath(returnedPath);
                 }
+                 */
+
+                return (AndroidFile) new AndroidFile()
+                        .contentProvider(SupportContentype.shared, uri)
+                        .device(device)
+                        .cdate(new Date(DocumentFile.fromSingleUri(context, uri).lastModified() ))
+                        .clientname(getFilePath(context, uri))
+                        .fullpath(uri.toString());
             }
         } else {
             // Todo: Test API <19

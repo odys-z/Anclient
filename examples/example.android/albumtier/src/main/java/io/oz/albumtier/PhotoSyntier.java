@@ -6,6 +6,7 @@ import static io.oz.albumtier.AlbumContext.clientUri;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,20 +164,19 @@ public class PhotoSyntier extends SynclientierMvp {
 	public PhotoSyntier asyVideos(List<? extends SyncDoc> videos,
 				OnProcess proc, OnDocOk docOk, OnError ... onErr)
 			throws TransException, IOException {
-		new Thread(new Runnable() {
-	        public void run() {
-				try {
-					syncVideos(videos, proc, docOk, onErr);
-				} catch (TransException e) {
-					e.printStackTrace();
-					if (!isNull(onErr))
-						onErr[0].err(MsgCode.exTransct, e.getMessage(), e.getClass().getName());
-				} catch (IOException e) {
-					e.printStackTrace();
-					if (!isNull(onErr))
-						onErr[0].err(MsgCode.exIo, e.getMessage(), e.getClass().getName());
-				}
-	    } } ).start();
+		new Thread(() -> {
+			try {
+				syncVideos(videos, proc, docOk, onErr);
+			} catch (TransException e) {
+				e.printStackTrace();
+				if (!isNull(onErr))
+					onErr[0].err(MsgCode.exTransct, e.getMessage(), e.getClass().getName());
+			} catch (IOException e) {
+				e.printStackTrace();
+				if (!isNull(onErr))
+					onErr[0].err(MsgCode.exIo, e.getMessage(), e.getClass().getName());
+			}
+		}).start();
 		return this;	
 	}
 
@@ -232,7 +232,7 @@ public class PhotoSyntier extends SynclientierMvp {
 
 		for ( int px = 0; px < videos.size(); px++ ) {
 
-			FileInputStream ifs = null;
+			InputStream ifs = null;
 			int seq = 0;
 			int totalBlocks = 0;
 
@@ -260,7 +260,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, startAck);
 
 				DocLocks.reading(p.fullpath());
-				ifs = (FileInputStream) fileProvider.open(p);
+				ifs = fileProvider.open(p);
 
 				byte[] buf = new byte[blocksize];
 				int cur = 0;
@@ -304,9 +304,12 @@ public class PhotoSyntier extends SynclientierMvp {
 							e.printStackTrace();
 						} } ).start();
 				}
-				if (ex instanceof IOException)
-					continue;
-				else errHandler.err(MsgCode.exGeneral, ex.getMessage(), ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+				if (!(ex instanceof IOException))
+					errHandler.err(MsgCode.exGeneral, ex.getMessage(), ex.getClass().getName(),
+						isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 			finally {
 				if (ifs != null)
@@ -392,11 +395,8 @@ public class PhotoSyntier extends SynclientierMvp {
 
 	/**
 	 * Asynchronously push photos. This is different from push/pull of jserv nodes.
-	 * 
 	 * since Albumtier 0.1.9, this method also uses block chain for uploading.
-	 *
 	 * TODO: to be changed to handling short text.
-	 * 
 	 * @return this
 	 */
 	public PhotoSyntier asyncPhotosUp(List<? extends SyncDoc> photos,

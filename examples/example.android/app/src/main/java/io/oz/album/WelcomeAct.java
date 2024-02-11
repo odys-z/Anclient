@@ -38,6 +38,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.PreferenceManager;
 
+import com.hbisoft.pickit.DeviceHelper;
 import com.vincent.filepicker.Constant;
 import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.ImagePickActivity;
@@ -46,11 +47,11 @@ import io.oz.fpick.activity.VideoPickActivity;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
@@ -152,24 +153,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     result -> reloadAlbum());
 
         try {
-            // clientext.jserv(AlbumApp.sharedPrefs.jserv());
-
             if (clientext.needSetup() || AlbumApp.sharedPrefs.needSetup())
                 // settings are cleared
                 startPrefsAct();
             else {
                 clientext.jserv(AlbumApp.sharedPrefs.jserv());
-
-                /*
-                String pswd = AlbumApp.sharedPrefs.pswd();
-                singl.pswd(pswd)
-                     .login((client) -> {
-                            runOnUiThread(() -> reloadAlbum());
-                        },
-                        (code, t, args) -> showMsg(R.string.t_login_failed, singl.userInf.uid(),
-                                                    AlbumApp.sharedPrefs.jserv()));
-                );
-                 */
                 AlbumApp.login(
                         (client) -> {
                             runOnUiThread(this::reloadAlbum);
@@ -231,7 +219,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         String albumweb = AssetHelper.url4intent(act, webId);
 
         // E.g. albumweb = "http://192.168.0.3:8888/index.html?serv=info";
-        if (singl.verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
+        if (verbose) Utils.logi("\n\nLoading home page: %s", albumweb);
         wv.loadUrl(albumweb);
     }
 
@@ -284,11 +272,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     /**
-     * https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory
-     * <p>
-     * https://developer.android.com/training/data-storage/shared/documents-files#persist-permissions
+     * <a href="https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory">
+     *     Grant accessing directory, Android Developer</a><br/>
+     * <a href="https://developer.android.com/training/data-storage/shared/documents-files#persist-permissions">
+     *     Persist permission, Android Developer</a>
      *
-     * @param result
+     * @param result user's selection
      */
     protected void onMediasPicked(@NonNull ActivityResult result) {
         try {
@@ -303,6 +292,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                             @Override
                             public long meta(SyncDoc f) throws IOException {
+                                if (f == null)
+                                    throw new IOException("Doc descriptor is null");
+
                                 File file = new File(f.fullpath());
                                 f.size = file.length();
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -325,10 +317,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             }
 
                             @Override
-                            public InputStream open(SyncDoc f) throws FileNotFoundException {
-                                return new FileInputStream(f.fullpath());
+                            public InputStream open(SyncDoc f) throws IOException {
+                                return Files.newInputStream(Paths.get(f.fullpath()));
+                                // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
-                        }).asyVideos(list,
+                        })
+                        .asyVideos(list,
                                 (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
                                 (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
@@ -348,22 +342,27 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         try {
             Intent data = result.getData();
             if (data != null) {
-                ClipData clipData = Objects.requireNonNull(data).getClipData();
+                DeviceHelper.init(errCtx);
+                ClipData clipData = data.getClipData();
+                Uri d = data.getData();
                 ArrayList<AndroidFile> paths;
+
                 if (clipData != null) {
-                    if (clientext.verbose) for (int i = 0; i < clipData.getItemCount(); i++)
+                    if (verbose) for (int i = 0; i < clipData.getItemCount(); i++)
                         Utils.logi("[AlbumContext.verbose] URI: %s", clipData.getItemAt(i).getUri());
                     paths = getMultipleDocs(this, clientext.userInf.device, clipData);
-                    if (clientext.verbose) Utils.logi(paths);
+                    if (verbose) Utils.logi(paths);
                 } else {
-                    if (clientext.verbose) {
+                    if (verbose) {
                         Utils.logi("[AlbumContext.verbose] URI: %s\nPath: %s",
                                 String.valueOf(data.getData()),
-                                getDocDescript(this, clientext.userInf.device, data.getData(), Build.VERSION.SDK_INT));
+                                getDocDescript(this, clientext.userInf.device, data.getData(),
+                                                       Build.VERSION.SDK_INT));
                         errCtx.prepare(msgv, R.string.msg_upload_failed)
                                 .err(null, "URI: %s\nPath: %s",
-                                        String.valueOf(data.getData()),
-                                        getDocDescript(this, clientext.userInf.device, data.getData(), Build.VERSION.SDK_INT).fullpath());
+                                    String.valueOf(data.getData()),
+                                    getDocDescript(this, clientext.userInf.device,
+                                                   data.getData(), Build.VERSION.SDK_INT).fullpath());
                     }
                     paths = new ArrayList<>(1);
                     paths.add(getDocDescript(this, clientext.userInf.device, data.getData(), Build.VERSION.SDK_INT));
@@ -372,42 +371,47 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 if (clientext.tier == null)
                     showMsg(R.string.txt_please_login);
                 else {
-                    // verifyStoragePermissions(this);
-                    // askDirectoriesPermissions(this);
-                    clientext.tier.fileProvider(new IFileProvider() {
-                        private String saveFolder;
-                        // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
-                        @Override
-                        public long meta(SyncDoc f) {
-                            Uri returnUri = ((AndroidFile) f).contentUri();
-                            try (Cursor returnCursor = getContentResolver()
-                                    .query(returnUri, null, null, null, null)) {
-                                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-                                returnCursor.moveToFirst();
-                                f.clientname(returnCursor.getString(nameIndex));
-                                f.size = returnCursor.getLong(sizeIndex);
-                                f.mime = getContentResolver().getType(returnUri);
+                    clientext.tier
+                        .fileProvider(new IFileProvider() {
+                            private String saveFolder;
+                            // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
+                            @Override
+                            public long meta(SyncDoc f) throws IOException {
+                                if (f == null) {
+                                    throw new IOException("Descriptor f is null");
+                                }
 
-                                Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
-                                f.cdate(lastmodify);
-                                saveFolder = DateFormat.formatYYmm(lastmodify);
-                                return f.size;
+                                Uri returnUri = ((AndroidFile) f).contentUri();
+                                try (Cursor returnCursor = getContentResolver()
+                                        .query(returnUri, null, null, null, null)) {
+                                    int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                                    int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                                    returnCursor.moveToFirst();
+                                    f.clientname(returnCursor.getString(nameIndex));
+                                    f.size = returnCursor.getLong(sizeIndex);
+                                    f.mime = getContentResolver().getType(returnUri);
+
+                                    Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
+                                    f.cdate(lastmodify);
+                                    saveFolder = DateFormat.formatYYmm(lastmodify);
+                                    return f.size;
+                                }
                             }
-                        }
 
-                        @Override
-                        public String saveFolder() {
-                                                 return saveFolder;
-                                                                   }
+                            @Override
+                            public String saveFolder() {
+                                                             return saveFolder;
+                                                                               }
 
-                        // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
-                        @Override
-                        public InputStream open(SyncDoc p) throws FileNotFoundException {
-                            return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
-                        }
-                    })
-                    .asyVideos(paths, null,
+                            // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
+                            @Override
+                            public InputStream open(SyncDoc p) throws FileNotFoundException {
+                                return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
+                            }
+                        })
+                        .asyVideos(paths,
+                            (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress,
+                                    r, rx, total, (float) seq / total * 100),
                             (resp, v) -> showMsg(R.string.t_synch_ok, paths.size()),
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
                 }

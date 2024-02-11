@@ -3,7 +3,6 @@ package io.oz.fpick.activity;
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_FILE;
 
 import android.os.Bundle;
-import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,14 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerListItemDecoration;
-import com.vincent.filepicker.filter.entity.Directory;
-import com.vincent.filepicker.filter.entity.NormalFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.NormalFilePickAdapter;
 
 /**
@@ -28,10 +21,6 @@ import io.oz.fpick.adapter.NormalFilePickAdapter;
 public class NormalFilePickActivity extends BaseActivity {
     public static final int DEFAULT_MAX_NUMBER = 9;
     private RecyclerView mRecyclerView;
-    private NormalFilePickAdapter mAdapter;
-    private ArrayList<NormalFile> mSelectedList = new ArrayList<>();
-    private List<Directory<NormalFile>> mAll;
-    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,7 +34,7 @@ public class NormalFilePickActivity extends BaseActivity {
     }
 
     private void initView() {
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_file_pick);
+        mRecyclerView = findViewById(R.id.rv_file_pick);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerListItemDecoration(this,
@@ -54,8 +43,6 @@ public class NormalFilePickActivity extends BaseActivity {
         NormalFilePickAdapter adapter = new NormalFilePickAdapter(this, mMaxNumber);
         linkAdapter(TYPE_FILE, adapter);
         mRecyclerView.setAdapter(adapter);
-
-        mProgressBar = (ProgressBar) findViewById(R.id.pb_file_pick);
     }
 
     protected String[] permissions() { return storage_permissions; }
