@@ -46,7 +46,6 @@ public class AlbumtierTest {
 	
 	ArrayList<SyncDoc> mList;
 
-	@SuppressWarnings("deprecation")
 	@Test
     public void testRefreshPage0() throws AnsonException,
     		GeneralSecurityException, IOException, TransException, InterruptedException {
@@ -82,7 +81,6 @@ public class AlbumtierTest {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	void onActivityCreate() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
 		singleton = new AlbumContext(new T_AndErrorCtx())
 			.init("f/zsu", "syrskyi", device, jserv)
@@ -120,7 +118,6 @@ public class AlbumtierTest {
 			startSynchQuery(synchPage);
 	}
 
-    @SuppressWarnings("deprecation")
 	void startSynchQuery(PathsPage page) {
         singleton.tier.asynQueryDocs(mList, page,
 			onSyncQueryRespons,
@@ -176,8 +173,7 @@ public class AlbumtierTest {
      * @throws IOException 
      * @throws TransException 
      */
-   	@SuppressWarnings("deprecation")
-	void onImagePicked() throws TransException, IOException {
+   	void onImagePicked() throws TransException, IOException {
    		singleton.tier.asyVideos(mList,
    				photoProc, photoPushed, singleton.errCtx);
 	}
@@ -190,7 +186,6 @@ public class AlbumtierTest {
 		// ! also make sure files are saved in volume/user-id
 		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());
    		
-		@SuppressWarnings("deprecation")
 		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testfile), "h_photos", AlbumPort.album);
 		PathsPage pthpage = pths.pathsPage();
 		assertEquals(device, pthpage.device);
@@ -199,4 +194,10 @@ public class AlbumtierTest {
    	};
 
 	JProtocol.OnProcess photoProc = (rs, rx, bx, bs, rsp) -> {};
+	
+	void onUserSelectFiles() throws TransException, IOException {
+   		List<? extends SyncDoc> filelist = null;
+		singleton.tier.asyVideos(filelist,
+   				photoProc, photoPushed, singleton.errCtx);
+	}
 }

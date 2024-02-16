@@ -4,12 +4,12 @@ import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
 import static io.oz.albumtier.AlbumContext.clientUri;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.DocLocks;
@@ -40,6 +40,7 @@ import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.PhotoMeta;
 import io.oz.album.tier.PhotoRec;
+import io.oz.album.x.DocsException;
 
 /**
  * Photo client,
@@ -249,7 +250,16 @@ public class PhotoSyntier extends SynclientierMvp {
 									.header(header);
 
 			try {
-				startAck = client.commit(q, errHandler);
+				startAck = client.commit(q,
+					(c, m, args) -> {
+					if (c == MsgCode.ext) {
+						DocsException docx = (DocsException)Anson.fromJson(m);
+						if (docx.code() == DocsException.Duplicate) {
+							reslts.add((DocsResp) new DocsResp().msg("Ignoring duplicate file: " + p.pname));
+						}
+					}
+					else errHandler.err(c, m, args);
+				});
 
 				String pth = p.fullpath();
 				if (!pth.equals(startAck.doc.fullpath()))
@@ -304,6 +314,7 @@ public class PhotoSyntier extends SynclientierMvp {
 							e.printStackTrace();
 						} } ).start();
 				}
+
 				if (!(ex instanceof IOException))
 					errHandler.err(MsgCode.exGeneral, ex.getMessage(), ex.getClass().getName(),
 						isblank(ex.getCause()) ? null : ex.getCause().getMessage());

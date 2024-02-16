@@ -115,6 +115,7 @@ public class AlbumContext {
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
         userInf.device = device;
+        jserv = jservroot;
         Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
         return this;
     }

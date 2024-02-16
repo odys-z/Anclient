@@ -32,14 +32,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../docsphinx/source/conf.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../docsphinx/source/conf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/IFileProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/IFileProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/test/java/io/oz/albumtier/AlbumtierTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/test/java/io/oz/albumtier/AlbumtierTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/Utils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/NormalFilePickActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/NormalFilePickActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/adapter/AudioPickAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/ComfirmDlg.java" beforeDir="false" afterPath="$PROJECT_DIR$/file-picker/src/main/java/io/oz/fpick/activity/ComfirmDlg.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,6 +140,7 @@
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
     &quot;last_directory_selection&quot;: &quot;C:/Users/Alice/github/anclient/examples/example.android/app/src/main/java/io/oz/album&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Alice/.gradle&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Dependencies&quot;,
@@ -335,23 +339,18 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java</url>
-          <line>152</line>
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java</url>
           <line>113</line>
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java</url>
-          <line>174</line>
+          <line>176</line>
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/DeviceHelper.java</url>
-          <line>73</line>
-          <option name="timeStamp" value="24" />
+          <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/Utils.java</url>
+          <line>194</line>
+          <option name="timeStamp" value="34" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -366,6 +365,9 @@
         <watch expression=" lstJserv.getTitle()" />
         <watch expression="getPreferenceManager().getDefaultSharedPreferences(this)" language="JAVA" />
         <watch expression="Paths.get(f.fullpath()).getFileName().toString()" language="JAVA" />
+        <watch expression=" getDataColumn(context, null, selection, selectionArgs)" language="JAVA" />
+        <watch expression="uri.getAuthority()" language="JAVA" />
+        <watch expression="uri.getAuthority()" />
       </configuration>
     </watches-manager>
   </component>

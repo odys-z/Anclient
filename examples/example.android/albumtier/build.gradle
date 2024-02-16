@@ -33,10 +33,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
 
-//    {
-//        exclude group: "org.apache.tika", module: "tika-core"
-//        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
-//    }
     implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver")
     implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver")
 

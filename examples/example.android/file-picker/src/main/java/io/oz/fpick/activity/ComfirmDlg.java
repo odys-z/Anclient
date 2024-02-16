@@ -123,7 +123,10 @@ public class ComfirmDlg extends DialogFragment {
             acty.runOnUiThread(() -> new CountDownTimer(ms, ms) {
                 @Override public void onTick(long millisUntilFinished) { }
                 @Override public void onFinish() {
-                    acty.runOnUiThread( () -> dismiss() );
+                    acty.runOnUiThread( () -> {
+                        try { dismiss(); }
+                        catch (Exception e) {}
+                    } );
                 }
             }.start());
         }

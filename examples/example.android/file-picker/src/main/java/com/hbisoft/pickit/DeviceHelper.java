@@ -124,12 +124,11 @@ public class DeviceHelper {
             }
             // Local file was selected
             else {
-                /*
-                returnedPath = getRealPathFromURI_API19(context, uri);
+                String returnedPath = getRealPathFromURI_API19(context, uri);
                 //Get the file extension
                 final MimeTypeMap mime = MimeTypeMap.getSingleton();
-                // String subStringExtension = String.valueOf(returnedPath).substring(String.valueOf(returnedPath).lastIndexOf(".") + 1);
-                // String extensionFromMime = mime.getExtensionFromMimeType(context.getContentResolver().getType(uri));
+                String subStringExtension = String.valueOf(returnedPath).substring(String.valueOf(returnedPath).lastIndexOf(".") + 1);
+                String extensionFromMime = mime.getExtensionFromMimeType(context.getContentResolver().getType(uri));
 
                 // Path is null
                 if (returnedPath == null || returnedPath.equals("")) {
@@ -140,6 +139,8 @@ public class DeviceHelper {
                 // Path is not null
                 else {
                     // Path can be returned, no need to make a "copy"
+                    DocumentFile doc = DocumentFile.fromSingleUri(context, uri);
+                    String n = doc.getName();
                     File f = new File(returnedPath);
                     return (AndroidFile) new AndroidFile()
                             .contentProvider(SupportContentype.shared, uri)
@@ -148,14 +149,15 @@ public class DeviceHelper {
                             .clientname(f.getName())
                             .fullpath(returnedPath);
                 }
-                 */
 
+                /*
                 return (AndroidFile) new AndroidFile()
                         .contentProvider(SupportContentype.shared, uri)
                         .device(device)
                         .cdate(new Date(DocumentFile.fromSingleUri(context, uri).lastModified() ))
                         .clientname(getFilePath(context, uri))
                         .fullpath(uri.toString());
+                 */
             }
         } else {
             // Todo: Test API <19

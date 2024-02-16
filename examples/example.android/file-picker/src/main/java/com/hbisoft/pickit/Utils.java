@@ -3,7 +3,8 @@
  */
 package com.hbisoft.pickit;
 
-import android.annotation.SuppressLint;
+import static io.odysz.common.LangExt.eq;
+
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -23,7 +24,6 @@ class Utils {
         return failReason;
     }
 
-    @SuppressLint("NewApi")
     static String getRealPathFromURI_API19(final Context context, final Uri uri) {
 
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
@@ -72,7 +72,7 @@ class Utils {
                 }
             }
             else if (isRawDownloadsDocument(uri)){
-                String fileName = getFilePath(context, uri);
+                String fileName = getFileDisplayName(context, uri);
                 String subFolderName = getSubFolders(uri);
 
                 if (fileName != null) {
@@ -84,7 +84,7 @@ class Utils {
                 return getDataColumn(context, contentUri, null, null);
             }
             else if (isDownloadsDocument(uri)) {
-                String fileName = getFilePath(context, uri);
+                String fileName = getFileDisplayName(context, uri);
 
                 if (fileName != null) {
                     return Environment.getExternalStorageDirectory().toString() + "/Download/"+ fileName;
@@ -133,10 +133,15 @@ class Utils {
             if (isGooglePhotosUri(uri)) {
                 return uri.getLastPathSegment();
             }
-            if (getDataColumn(context, uri, null, null) == null){
+//            if (getDataColumn(context, uri, null, null) == null){
+//                failReason = "dataReturnedNull";
+//            }
+//            return getDataColumn(context, uri, null, null);
+
+            String columns = getDataColumn(context, uri, null, null);
+            if (columns == null)
                 failReason = "dataReturnedNull";
-            }
-            return getDataColumn(context, uri, null, null);
+            return columns;
         }
         else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
@@ -206,7 +211,7 @@ class Utils {
     }
 
     @SuppressWarnings("TryFinallyCanBeTryWithResources")
-    public static String getFilePath(Context context, Uri uri) {
+    public static String getFileDisplayName(Context context, Uri uri) {
         Cursor cursor = null;
         final String[] projection = {MediaStore.Files.FileColumns.DISPLAY_NAME};
         try {
@@ -230,7 +235,9 @@ class Utils {
     }
 
     public static boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+        // return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+        return eq("com.android.providers.downloads.documents", uri.getAuthority())
+            || eq("com.android.providers.media.documents", uri.getAuthority());
     }
 
     private static boolean isRawDownloadsDocument(Uri uri) {
