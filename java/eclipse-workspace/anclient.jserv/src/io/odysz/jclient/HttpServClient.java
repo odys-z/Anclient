@@ -33,6 +33,20 @@ import io.odysz.semantics.x.SemanticException;
  */
 public class HttpServClient {
 	protected static final String USER_AGENT = "Anclient.java/0.4.32";
+	
+	/**
+	 * HttpServClient use this to put message code into exception object.
+	 * Upper layer use this to get exception code (SemanticException must
+	 * carry multiple error handled differently at client side)
+	 * 
+	 * FIXME This is a design error, will be eliminated in the future version, Enveloparser.py. 
+	 */
+	public static String EXCODE_KEY = "io.odysz.jclient.HttpServClient#ex-code";
+	
+	/**
+	 * @See {@link #EXCODE_KEY}
+	 */
+	public static String EXMSG_KEY = "io.odysz.jclient.HttpServClient#ex-msg";
 
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
@@ -107,6 +121,7 @@ public class HttpServClient {
 	 * @return response if succeed
 	 * @throws IOException connection error
 	 * @throws SemanticException jserv replied with error message
+	 * (since 1.4.39, a code return by jserv is also included in the exception object)
 	 * @throws AnsonException
 	 */
 	public AnsonMsg<AnsonResp> post(String url, AnsonMsg<? extends AnsonBody> jreq)
@@ -147,8 +162,14 @@ public class HttpServClient {
 				Utils.logi("[Clients.verbose]\n%s", x);
 			}
 
-			if (x.code() != MsgCode.ok)
-				throw new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body(0).msg());
+			if (x.code() != MsgCode.ok) {
+				SemanticException ex = new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body(0).msg());
+				// @since 1.4.39, semantic exception can be handled differently for different errors, this used for save error code at client.
+				ex.ex().put(EXCODE_KEY, x.code())
+						.put(EXMSG_KEY, x.body(0).msg());
+				throw ex;
+			}
+
 			return x;
 		}
 		else {
@@ -210,9 +231,6 @@ public class HttpServClient {
 		AnsonMsg<AnsonResp> s = null;
 		String type = null; 
 		try {
-			// FileInputStream ifs = new FileInputStream(localpath);
-			// type = detector.detect(ifs);
-			// ifs.close();
 			if (localpath.endsWith(".json"))
 				type = "json";
 		}
@@ -235,50 +253,4 @@ public class HttpServClient {
 		return localpath;
 	}
 	
-	/* Introduction stream field in Anson?
-	public AnsonMsg<AnsonResp> streamup(String url, AnsonMsg<? extends DocsReq> req, String localpath) throws IOException, AnsonException, SemanticException {
-		URL obj = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-		//add reuqest header
-		con.setRequestMethod("POST");
-		con.setRequestProperty("User-Agent", USER_AGENT);
-		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		con.setRequestProperty("Content-Type", "text/plain"); 
-	    con.setRequestProperty("charset", "utf-8");
-
-		// Send post request
-		con.setDoOutput(true);
-
-		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
-		OutputStream ups = con.getOutputStream();
-
-		if (Clients.verbose) Utils.logi(url);
-
-		req.toBlockStream(ups);
-
-		int repcode = con.getResponseCode();
-		if (repcode == 200) {
-
-			if (con.getContentLengthLong() == 0)
-				throw new SemanticException("Error: server return null at %s ", url);
-
-			@SuppressWarnings("unchecked")
-			AnsonMsg<AnsonResp> x = (AnsonMsg<AnsonResp>) Anson.fromJson(con.getInputStream());
-			if (Clients.verbose) {
-				Utils.printCaller(false);
-				Utils.logi(x.toString());
-			}
-
-			if (x.code() != MsgCode.ok)
-				throw new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body().toString());
-			return x;
-		}
-		else {
-			Utils.warn("HTTP ERROR: code: %s", repcode);
-			throw new IOException("HTTP ERROR: code: " + repcode + "\n" + url);
-		}
-	}
-	*/
-
 }

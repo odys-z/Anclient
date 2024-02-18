@@ -5,15 +5,9 @@ import static io.odysz.common.LangExt.isblank;
 import static io.oz.albumtier.AlbumContext.clientUri;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
-import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.AESHelper;
-import io.odysz.common.DocLocks;
-import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.SessionClient;
@@ -22,7 +16,7 @@ import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
-import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
+import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
@@ -31,7 +25,7 @@ import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.SyncDoc;
-import io.odysz.semantics.SessionInf;
+import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
@@ -40,7 +34,6 @@ import io.oz.album.tier.AlbumReq.A;
 import io.oz.album.tier.AlbumResp;
 import io.oz.album.tier.PhotoMeta;
 import io.oz.album.tier.PhotoRec;
-import io.oz.album.x.DocsException;
 
 /**
  * Photo client,
@@ -80,12 +73,6 @@ public class PhotoSyntier extends SynclientierMvp {
 			ok.ok(client);
 		}, err, device);
 
-		return this;
-	}
-
-	IFileProvider fileProvider;
-	public PhotoSyntier fileProvider(IFileProvider p) {
-		this.fileProvider = p;
 		return this;
 	}
 
@@ -163,11 +150,11 @@ public class PhotoSyntier extends SynclientierMvp {
 	 * @return list of response
 	 */
 	public PhotoSyntier asyVideos(List<? extends SyncDoc> videos,
-				OnProcess proc, OnDocOk docOk, OnError ... onErr)
+				OnProcess proc, OnDocsOk docsOk, OnError ... onErr)
 			throws TransException, IOException {
 		new Thread(() -> {
 			try {
-				syncVideos(videos, proc, docOk, onErr);
+				syncVideos(videos, proc, docsOk, onErr);
 			} catch (TransException e) {
 				e.printStackTrace();
 				if (!isNull(onErr))
@@ -188,7 +175,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	 * @return list of response
 	 */
 	public List<DocsResp> syncVideos(List<? extends SyncDoc> videos,
-				OnProcess proc, OnDocOk docOk, OnError ... onErr)
+				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 			throws TransException, IOException {
 		return pushBlocks(meta.tbl, videos, proc, docOk, onErr);
 	}
@@ -201,26 +188,27 @@ public class PhotoSyntier extends SynclientierMvp {
 	 * e.g. use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) extFile()} as sql select expression.
 	 * - the method is working in stream mode
 	 * @return list of response
-	 */
 	public List<DocsResp> pushBlocks(String tbl, List<? extends SyncDoc> videos,
-				OnProcess proc, OnDocOk docOk, OnError ... onErr)
+				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
 		return pushBlocks(client, uri, tbl, videos, fileProvider,
         					proc, docOk, err, blocksize);
 	}
+	 */
 
 	/**
 	 * MEMO: what about have Anson.toBlock() support input stream field?
 	 * 
 	 * @return response list for each block
-	 * @throws SemanticException block information is incorrect, e.g. con not find device id.
 	 * @throws IOException file access error
-	 */
+	 * @throws TransException 
+	 * @throws AnsonException 
+	 *
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
 								List<? extends SyncDoc> videos, IFileProvider fileProvider,
-								OnProcess proc, OnDocOk docOk, OnError errHandler, int blocksize)
-			throws SemanticException, IOException {
+								OnProcess proc, OnDocsOk docOk, OnError errHandler, int blocksize)
+			throws IOException, AnsonException, TransException {
 
 		SessionInf user = client.ssInfo();
 		DocsResp startAck = null;
@@ -295,7 +283,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				respi = client.commit(q, errHandler);
 				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
 
-				if (docOk != null) docOk.ok(respi.doc, respi);
+				// if (docOk != null) docOk.ok(respi.doc, respi);
 				reslts.add(respi);
 			}
 			catch (IOException | TransException | AnsonException ex) { 
@@ -328,9 +316,11 @@ public class PhotoSyntier extends SynclientierMvp {
 				DocLocks.readed(p.fullpath());
 			}
 		}
+		if (docOk != null) docOk.ok(reslts);
 
 		return reslts;
 	}
+	*/
 
 	public String download(PhotoRec photo, String localpath)
 			throws SemanticException, AnsonException, IOException {
@@ -411,7 +401,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	 * @return this
 	 */
 	public PhotoSyntier asyncPhotosUp(List<? extends SyncDoc> photos,
-									  OnProcess proc, OnDocOk docOk, OnError onErr) {
+									  OnProcess proc, OnDocsOk docOk, OnError onErr) {
 		new Thread(() -> {
 			try {
 				syncUp(meta.tbl, photos, client.ssInfo().uid(), proc, docOk);
@@ -466,6 +456,28 @@ public class PhotoSyntier extends SynclientierMvp {
 				err.err(MsgCode.exSemantic, e.getMessage());
 			}
 		}).start();
+	}
+
+	/**
+	 * Helper for compose file uploading responses to readable string
+	 * @param template, "size {resps.size}, ignored {duplicate error}"
+	 * @param resps e.g response of calling {@link #pushBlocks(String, List, OnProcess, OnDocsOk, OnError...)}. 
+	 * @return readable message
+	 */
+	public static String composeFilesMsg(String template, List<DocsResp> resps) {
+		String msg = null;
+		if (resps != null) {
+			int ignore = 0;
+			int size = 0;
+			for(DocsResp r : resps) {
+				if (r.doc.syncFlag == SyncFlag.deny)
+					ignore++;
+				size++;
+			}
+			msg = String.format(template, size, ignore);
+		}
+
+		return msg;
 	}
 
 }

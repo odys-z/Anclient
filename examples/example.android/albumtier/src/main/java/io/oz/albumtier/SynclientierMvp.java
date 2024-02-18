@@ -4,8 +4,8 @@ import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -18,12 +18,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io_odysz.FilenameUtils;
 import org.xml.sax.SAXException;
 
+import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.DocLocks;
 import io.odysz.common.EnvPath;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
+import io.odysz.jclient.HttpServClient;
 import io.odysz.jclient.SessionClient;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.jclient.tier.Semantier;
@@ -37,7 +39,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
-import io.odysz.semantic.jprotocol.JProtocol.OnDocOk;
+import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.jserv.R.AnQueryReq;
@@ -50,10 +52,14 @@ import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.PageInf;
 import io.odysz.transact.x.TransException;
+import io.oz.album.AlbumPort;
+import io.oz.album.tier.AlbumReq;
+import io.oz.album.x.DocsException;
 
 /**
  * Redundant to docsync.jser/Synclientier.
@@ -112,6 +118,12 @@ public class SynclientierMvp extends Semantier {
 		return this;
 	}
 	
+	IFileProvider fileProvider;
+	public SynclientierMvp fileProvider(IFileProvider p) {
+		this.fileProvider = p;
+		return this;
+	}
+
 	public DocsResp queryDevices(String devname)
 			throws SemanticException, AnsonException, IOException {
 		String[] act = AnsonHeader.usrAct("synclient.java", "query", A.devices, Port.docsync.name());
@@ -235,7 +247,6 @@ public class SynclientierMvp extends Semantier {
 	 * @throws TransException
 	 * @throws AnsonException
 	 * @throws IOException
-	 */
 	List<DocsResp> syncUp(DocTableMeta meta, AnResultset rs, String workerId, OnProcess onProc)
 			throws TransException, AnsonException, IOException {
 		List<SyncDoc> videos = new ArrayList<SyncDoc>();
@@ -249,6 +260,7 @@ public class SynclientierMvp extends Semantier {
 			return null;
 		}
 	}
+	 */
 
 	/**
 	 * Synchronizing files to hub using block chain, accessing port {@link Port#docsync}.
@@ -265,17 +277,17 @@ public class SynclientierMvp extends Semantier {
 	 * @throws IOException
 	 */
 	public List<DocsResp> syncUp(String tabl, List<? extends SyncDoc> videos, String workerId,
-			OnProcess onProc, OnDocOk... docOk)
+			OnProcess onProc, OnDocsOk... docOk)
 			throws TransException, AnsonException, IOException {
 		SessionInf photoUser = client.ssInfo();
 		photoUser.device = workerId;
 
 		return pushBlocks(
 				tabl, videos, onProc,
-				isNull(docOk) ? new OnDocOk() {
+				isNull(docOk) ? new OnDocsOk() {
 					@Override
-					public void ok(SyncDoc doc, AnsonResp resp)
-							throws IOException, AnsonException, TransException { }
+					public void ok(List<DocsResp> resps)
+						throws IOException, AnsonException, TransException { }
 				} : docOk[0],
 				errCtx);
 	}
@@ -355,21 +367,28 @@ public class SynclientierMvp extends Semantier {
 	 * @param docOk
 	 * @param onErr
 	 * @return list of response
-	 */
 	public List<DocsResp> pushBlocks(String tbl, List<? extends SyncDoc> videos,
-				OnProcess proc, OnDocOk docOk, OnError ... onErr)
+				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
 		return pushBlocks(client, uri, tbl, videos, blocksize, proc, docOk, err);
 	}
+	 */
+	public List<DocsResp> pushBlocks(String tbl, List<? extends SyncDoc> videos,
+			OnProcess proc, OnDocsOk docOk, OnError ... onErr)
+			throws TransException, IOException {
+		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
+		return pushBlocks(client, uri, tbl, videos, fileProvider,
+							proc, docOk, err, blocksize);
+	}
 
+	/*
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
 			List<? extends SyncDoc> videos, int blocksize,
-			OnProcess proc, OnDocOk docOk, OnError errHandler)
+			OnProcess proc, OnDocsOk docOk, OnError errHandler)
 			throws TransException, IOException {
 
 		SessionInf user = client.ssInfo();
-
         DocsResp resp0 = null;
         DocsResp respi = null;
 
@@ -430,7 +449,7 @@ public class SynclientierMvp extends Semantier {
 				respi = client.commit(q, errHandler);
 				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
 
-				if (docOk != null) docOk.ok(respi.doc, respi);
+				// if (docOk != null) docOk.ok(respi.doc, respi);
 				reslts.add(respi);
 			}
 			catch (IOException | TransException | AnsonException ex) { 
@@ -454,6 +473,149 @@ public class SynclientierMvp extends Semantier {
 				DocLocks.readed(p.fullpath());
 			}
 		}
+
+		if (docOk != null) docOk.ok(reslts);
+
+		return reslts;
+	}
+	*/
+	/**
+	 * MEMO: what about have Anson.toBlock() support input stream field?
+	 * 
+	 * @return response list for each block
+	 * @throws IOException file access error
+	 * @throws TransException 
+	 * @throws AnsonException 
+	 */
+	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
+								List<? extends SyncDoc> videos, IFileProvider fileProvider,
+								OnProcess proc, OnDocsOk docOk, OnError errHandler, int blocksize)
+			throws IOException, AnsonException, TransException {
+
+		SessionInf user = client.ssInfo();
+		DocsResp startAck = null;
+		DocsResp respi = null;
+
+		String[] act = AnsonHeader.usrAct("synclient.java", "sync", "c/sync", "push blocks");
+		AnsonHeader header = client.header().act(act);
+
+		List<DocsResp> reslts = new ArrayList<>(videos.size());
+
+		for ( int px = 0; px < videos.size(); px++ ) {
+
+			InputStream ifs = null;
+			int seq = 0;
+			int totalBlocks = 0;
+
+			SyncDoc p = videos.get(px);
+			fileProvider.meta(p);
+			DocsReq req = new AlbumReq(uri)
+					.folder(fileProvider.saveFolder())
+					.share(p)
+					.device(new Device(user.device, null))
+					.resetChain(true)
+					.blockStart(p, user);
+
+			AnsonMsg<DocsReq> q = client.userReq(uri, AlbumPort.album, req)
+									.header(header);
+
+			try {
+				startAck = client.commit(q,
+					/*
+					(c, m, args) -> {
+					if (c == MsgCode.ext) {
+						DocsException docx = (DocsException)Anson.fromJson(m);
+						if (docx.code() == DocsException.Duplicate) {
+							reslts.add((DocsResp) new DocsResp().msg("Ignoring duplicate file: " + p.pname));
+						}
+					}
+					else errHandler.err(c, m, args);
+					}*/
+					errHandler);
+
+				String pth = p.fullpath();
+				if (!pth.equals(startAck.doc.fullpath()))
+					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.doc.fullpath());
+
+				totalBlocks = p.size == 0 ? 0 : 1 + (int) ((p.size - 1 ) / blocksize);
+
+				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, startAck);
+
+				DocLocks.reading(p.fullpath());
+				ifs = fileProvider.open(p);
+
+				byte[] buf = new byte[blocksize];
+				int cur = 0;
+				while (cur < p.size) {
+					if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+
+					String b64 = AESHelper.encode64(buf, ifs, 0, blocksize - cur);
+					cur += blocksize;
+					req = new AlbumReq(tbl).blockUp(seq, p, b64, user);
+					seq++;
+
+					q = client.userReq(uri, AlbumPort.album, req)
+							.header(header);
+
+					respi = client.commit(q, errHandler);
+				}
+                
+				req = new AlbumReq(tbl).blockEnd(respi, user);
+
+				q = client.userReq(uri, AlbumPort.album, req)
+							.header(header);
+				respi = client.commit(q, errHandler);
+				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+
+				// if (docOk != null) docOk.ok(respi.doc, respi);
+				reslts.add(respi);
+			}
+			catch (IOException | TransException | AnsonException ex) {
+				if (ex instanceof SemanticException
+					&& ((MsgCode)((SemanticException)ex).ex().get(HttpServClient.EXCODE_KEY)) == MsgCode.ext) {
+
+					// Design Notes:
+					// For Anprism.Enveloparser, it should be the object of DocsException been deserialized here.
+					SemanticObject docx = (SemanticObject)Anson.fromJson(
+							Anson.unescape(((SemanticException)ex).ex().getString(HttpServClient.EXMSG_KEY)));
+					if (Integer.valueOf(docx.code()) == DocsException.Duplicate) {
+						reslts.add((DocsResp) new DocsResp()
+								.doc(p.syncFlag(SyncFlag.deny))
+								.msg("Ignoring duplicate file: " + p.pname));
+						continue;
+					}
+				}
+
+				Utils.warn("[%s] %s", ex.getClass().getName(), ex.getMessage());
+
+				if (startAck != null) {
+					req = new DocsReq(tbl).blockAbort(startAck, user);
+					req.a(DocsReq.A.blockAbort);
+					AnsonMsg<DocsReq> abt = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+							.header(header);
+					// Abort
+					new Thread( () -> {
+						try {
+							client.commit(abt, errHandler);
+						} catch (Exception e) {
+							e.printStackTrace();
+						} } ).start();
+				}
+
+				if (!(ex instanceof IOException))
+					errHandler.err(MsgCode.exGeneral, ex.getMessage(), ex.getClass().getName(),
+						isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			finally {
+				if (ifs != null)
+					ifs.close();
+				DocLocks.readed(p.fullpath());
+			}
+		}
+		if (docOk != null) docOk.ok(reslts);
 
 		return reslts;
 	}
