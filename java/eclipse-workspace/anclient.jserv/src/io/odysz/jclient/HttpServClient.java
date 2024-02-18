@@ -26,13 +26,13 @@ import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 
 /**
- * Js equivalent: Ajax.
+ * Semantic.jserv client, java version.
  * 
- * @author Alice
+ * @author Ody
  *
  */
 public class HttpServClient {
-	protected static final String USER_AGENT = "Anclient.java/0.4.32";
+	protected static final String USER_AGENT = "Anclient.java/0.5.0";
 	
 	/**
 	 * HttpServClient use this to put message code into exception object.
