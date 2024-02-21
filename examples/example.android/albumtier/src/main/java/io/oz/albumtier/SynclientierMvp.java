@@ -76,7 +76,7 @@ public class SynclientierMvp extends Semantier {
 
 	protected String tempath;
 
-	int blocksize = 3 * 1024 * 1024;
+	int blocksize = 24 * 1024 * 1024;
 
 	/**
 	 * Change default block size for performance. Default is 3 Mib.
@@ -508,7 +508,14 @@ public class SynclientierMvp extends Semantier {
 			int totalBlocks = 0;
 
 			SyncDoc p = videos.get(px);
-			fileProvider.meta(p);
+			if (fileProvider.meta(p) <= 0) {
+				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
+				reslts.add((DocsResp) new DocsResp()
+						.doc(p.syncFlag(SyncFlag.end))
+						.msg(p.pname));
+				continue;
+			}
+
 			DocsReq req = new AlbumReq(uri)
 					.folder(fileProvider.saveFolder())
 					.share(p)
@@ -557,10 +564,11 @@ public class SynclientierMvp extends Semantier {
 					q = client.userReq(uri, AlbumPort.album, req)
 							.header(header);
 
+					// start a thread?
 					respi = client.commit(q, errHandler);
 				}
                 
-				req = new AlbumReq(tbl).blockEnd(respi, user);
+				req = new AlbumReq(tbl).blockEnd(startAck, user);
 
 				q = client.userReq(uri, AlbumPort.album, req)
 							.header(header);
@@ -581,7 +589,7 @@ public class SynclientierMvp extends Semantier {
 					if (Integer.valueOf(docx.code()) == DocsException.Duplicate) {
 						reslts.add((DocsResp) new DocsResp()
 								.doc(p.syncFlag(SyncFlag.deny))
-								.msg("Ignoring duplicate file: " + p.pname));
+								.msg(p.pname));
 						continue;
 					}
 				}
