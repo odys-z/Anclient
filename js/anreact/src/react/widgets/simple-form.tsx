@@ -1,5 +1,5 @@
 
-import React, { MouseEvent } from 'react';
+import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import withWidth from "@material-ui/core/withWidth";
 
@@ -13,10 +13,11 @@ import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import { AnFieldValidation, AnlistColAttrs, AnsonMsg, AnsonResp, CRUD, PkMeta, TierCol, TierComboField, Tierec } from '@anclient/semantier';
+import { AnFieldValidation, AnlistColAttrs, AnsonMsg, AnsonResp,
+	CRUD, NameValue, PkVal, TierCol, TierComboField, Tierec, UpdateReq, str_, toBool
+} from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	import { toBool } from '../../utils/helpers';
 	import { AnContext, AnContextType } from '../reactext';
 	import { Comprops, CrudCompW, DetailFormW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
@@ -56,11 +57,8 @@ const styles = (theme) => ({
 });
 
 interface SimpleFormProps extends Comprops {
-    // funcId: string;
-    crud: CRUD;
     fields: TierCol[];
-    // pk: string;
-    pkval: PkMeta;
+    pkval: PkVal;
     parent: JSX.Element;
     parentId: string;
 	mtabl: string;
@@ -70,25 +68,24 @@ interface SimpleFormProps extends Comprops {
  * Use record form for UI record layout.
  */
 class SimpleFormComp extends DetailFormW<SimpleFormProps> {
-	uri = undefined;
+	// uri : string | undefined = undefined;
 
-    pkval: PkMeta = { pk: undefined, v: undefined };
+    pkval: PkVal = { pk: undefined, v: undefined };
 
 	state = {
-		crud: undefined,
+		crud: CRUD.r,
 		dirty: false,
-		parent: undefined,
-		parentId: undefined,
+		// parent: undefined as unknown as JSX.Element,
+		parent: undefined as AnlistColAttrs<JSX.Element, CompOpts> | undefined,
+		parentId: undefined as string | undefined,
 
-		nodeId: undefined,
+		nodeId: undefined as string | undefined,
 		node: undefined,
 
         // pk: undefined as PkMeta,
 
 		mtabl: '',
 		// indId, indName, parent, sort, fullpath, css, weight, qtype, remarks, extra
-		// type: Material UI: Type of the input element. It should be a valid HTML5 input type. (extended with enum, select)
-		// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
 		fields: [
 			{ type: 'text', field: 'parent', label: L('Parent Indicator'), hide: 1,
 			  validator: {len: 12} },
@@ -120,16 +117,15 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 		this.funcId = props.funcId || 'SimpleForm';
 
-		this.state.crud = props.crud;
+		this.state.crud = props.crud || CRUD.r;
 		this.state.mtabl = props.mtabl;
 
-		// this.state.pk = props.pk;
 		this.pkval = props.pkval;
 
-		this.state.parent = props.parent;
+		// this.state.parent = props.parent;
 		this.state.parentId = props.parentId;
 
-		this.uri = this.props.uri;
+		this.uri = this.props.uri || '';
 
 		this.formFields = this.formFields.bind(this);
 		this.getField = this.getField.bind(this);
@@ -150,22 +146,24 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 			// load the record
 			const ctx = this.context as unknown as AnContextType;
-			let queryReq = ctx.anClient.query(this.uri, this.props.mtabl, 'r')
-			queryReq.Body().whereEq(this.pkval.pk, this.pkval.v);
-			// FIXME but sometimes we have FK in record. Meta here?
-			(ctx.uiHelper as AnContextType).bindStateRec({req: queryReq,
+			let queryReq = ctx.anClient.query(str_(this.uri), this.props.mtabl, 'r')
+			queryReq.Body()?.whereEq(this.pkval.pk as string, str_(this.pkval.v));
+			ctx.uiHelper.bindStateRec({req: queryReq,
 				onOk: (resp: AnsonMsg<AnsonResp>) => {
-						let {rows, cols} = AnsonResp.rs2arr(resp.Body().Rs());
-						if (!rows || rows.length !== 1)
-							console.error("Query reults not correct. One and only one row is needed.", rows, queryReq)
-						that.setState({record: rows[0]});
+						let rs = resp.Body()?.Rs();
+						if (rs) {
+							let {rows, cols} = AnsonResp.rs2arr(rs);
+							if (!rows || rows.length !== 1)
+								console.error("Query reults not correct. One and only one row is needed.", rows, queryReq)
+							that.setState({record: rows[0]});
+						}
 					}
 				},
 				ctx.error);
 		}
 	}
 
-	validate(invalidStyle) {
+	validate(invalidStyle: any) {
 		let that = this;
 
 	    const invalid = Object.assign(invalidStyle || {}, { border: "2px solid red" });
@@ -199,7 +197,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		}
 	}
 
-	toSave(e: React.MouseEvent<HTMLInputElement>) {
+	toSave(e: React.UIEvent) {
 		e.stopPropagation();
 
 		if (!this.validate(this.props.invalidStyle)) {
@@ -209,33 +207,31 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 		let ctx = this.context as unknown as AnContextType;
 		let client = ctx.anClient;
-		let rec = this.state.record;
-		let c = this.state.crud === CRUD.c;
+		let rec: Tierec = this.state.record;
+		// let c = this.state.crud === CRUD.c;
 
-		let req;
+		let req: AnsonMsg<UpdateReq>;
 
 		// 1. collect record
 		// nvs data must keep consists with jquery serializeArray()
 		// https://api.jquery.com/serializearray/
-		let nvs = [];
-		let parentId = this.state.parentId;
+		let nvs: NameValue[] = [];
+		let parentId : string | undefined = this.state.parentId;
 		this.state.fields.forEach( (f, x) => {
-			if (f.field === this.state.parent.field) {
+			if (f.field === this.state.parent?.field) {
 				rec[f.field] = parentId;
 				parentId = undefined;
 			}
 			nvs.push({name: f.field, value: rec[f.field]});
 		} );
 
-		if (parentId)
-			nvs.push({name: this.state.parent.field, value: this.state.parentId});
-
-		// console.log(nvs);
+		if (parentId && this.state.parent?.field)
+			nvs.push({name: this.state.parent?.field, value: this.state.parentId});
 
 		// 2. request (insert / update)
 		let {pk} = this.pkval;
 		if (this.state.crud === CRUD.c) {
-			nvs.push({name: pk, value: rec[pk]});
+			nvs.push({name: pk || '', value: pk && rec[pk]});
 			req = client
 				.usrAct(this.uri, CRUD.c, this.props.title || 'new record')
 				.insert(this.uri, this.state.mtabl, nvs);
@@ -244,8 +240,9 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			req = client
 				.usrAct(this.funcId, CRUD.u, 'edit card')
 				.update(this.uri, this.state.mtabl, this.pkval, nvs);
-			req.Body()
-				.whereEq(pk, rec[pk]);
+
+			if (pk)
+				req.Body()?.whereEq(pk, str_(rec[pk]));
 		}
 
 		let that = this;
@@ -257,7 +254,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		}, ctx.error);
 	}
 
-	toCancel (e: React.MouseEvent<HTMLInputElement>) {
+	toCancel (e: React.UIEvent) {
 		e.stopPropagation();
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose({code: 'cancel'});
@@ -282,7 +279,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		if (f.type === 'cbb') {
 			let that = this;
 			let fd = f as TierComboField<JSX.Element, CompOpts>;
-			return (<DatasetCombo uri={this.props.uri}
+			return (<DatasetCombo uri={this.props.uri} crud={CRUD.r}
 				options={fd.options} val={rec[fd.field]}
 				label={f.label} style={fd.style}
 				onSelect={ (v) => {
@@ -292,7 +289,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 			/>);
 		}
 		else{
-			let type = undefined;
+			let type: string | undefined = undefined;
 			if (f.type === 'float' || f.type === 'int')
 				type = 'number'
 			return (

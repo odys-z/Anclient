@@ -4,8 +4,10 @@ import { AnsonMsg, AnsonResp, SessionClient } from '../../../semantier/anclient'
 import { AnContext, AnError, AnReact, L, Login } from '../../../anreact/src/an-components';
 import { Comprops } from '../../../anreact/src/react/crud';
 import { AnreactAppOptions, JsonServs } from '../../../anreact/src/an-components';
+import { SessionInf } from '@anclient/semantier/anclient';
+import { Theme } from '@material-ui/core/styles';
 
-const styles = (theme) => ({
+const styles = (theme: Theme) => ({
 	root: {
 	    '& *': { margin: theme.spacing(1) }
 	},
@@ -22,11 +24,10 @@ class LoginApp extends React.Component<LoginProps> {
 	state = {
 		hasError: false,
 		home: 'index.html',
-		servId: 'host',
 	};
-	anClient: SessionClient;
+	anClient: SessionClient | undefined;
 
-	servId: string;
+	servId: string = 'host';
 
 	/** jserv root url */
 	jserv: string;
@@ -39,7 +40,7 @@ class LoginApp extends React.Component<LoginProps> {
 		super(props);
 
 		this.servId = props.servId ? props.servId : 'host';
-		this.jserv = props.servs[this.servId];
+		this.jserv  = props.servs[this.servId];
 
 		this.errCtx.onError = this.errCtx.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -55,14 +56,14 @@ class LoginApp extends React.Component<LoginProps> {
 		this.setState({hasError: false});
 	}
 
-	onLogin(clientInf: { ssInf: { home: string; }; }) {
+	onLogin(clientInf: { ssInf: SessionInf & {home?: string} }) {
 		SessionClient.persistorage(clientInf.ssInf);
 		if (this.props.iparent) {
 			let mainpage = clientInf.ssInf.home || this.props.ihome;
 			if (!mainpage)
 				console.error('Login succeed, but no home page be found.');
 			else {
-				this.props.iparent.location = `${mainpage}?serv=${this.state.servId}`;
+				this.props.iparent.location = `${mainpage}?serv=${this.servId}`;
 				this.setState({anClient: clientInf});
 			}
 		}
@@ -72,18 +73,24 @@ class LoginApp extends React.Component<LoginProps> {
 		return (
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
-				ssInf: undefined,
-				ihome: '',
-				// anReact: undefined,
-				servId: this.state.servId,
-				servs: this.props.servs,
+				ssInf   : undefined,
+				ihome   : '',
+				uiHelper: undefined,
+				servId  : this.servId,
+				servs   : this.props.servs,
 				anClient: this.anClient,
 				hasError: this.state.hasError,
-				iparent: this.props.iparent,
-				error: this.errCtx,
+				iparent : this.props.iparent,
+				error   : this.errCtx,
 			}} >
-				<Login onLoginOk={this.onLogin}/>
-				{this.state.hasError && <AnError onClose={this.onErrorClose} fullScreen={true} title={L('Error')} msg={this.errCtx.msg} />}
+				<Login onLogin={this.onLogin} />
+				{ this.state.hasError &&
+				  <AnError
+				  	onClose={this.onErrorClose}
+					// fullScreen={true}
+					title={L('Error')}
+					msg={this.errCtx.msg}
+				  /> }
 			</AnContext.Provider>
 		);
 	}

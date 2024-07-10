@@ -44,9 +44,9 @@ describe('case: [01.2 Ext dataset]', () => {
     it('convert to AnReact bombobox', () => {
 		let rp = new AnsonMsg(dsResp);
 
-		assert.equal(rp.Body().type, "io.odysz.semantic.ext.AnDatasetResp", "1 ---");
+		assert.equal(rp.Body()?.type, "io.odysz.semantic.ext.AnDatasetResp", "1 ---");
 
-		let rs = rp.Body().Rs();
+		let rs = rp.Body()?.Rs();
 		assert.equal(rs.type, "io.odysz.module.rs.AnResultset", "2 ---");
 		assert.equal(rs.total, 10, "3 ---");
 

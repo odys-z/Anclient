@@ -25,7 +25,7 @@
 
   <developers>
     <developer>
-      <name>Odys Zhou</name>
+      <name>Ody Zhou</name>
       <email>odys.zhou@gmail.com</email>
       <organization>odys-z.github.io</organization>
       <organizationUrl>https://odys-z.github.io</organizationUrl>
@@ -46,6 +46,7 @@
   	<tag>HEAD</tag>
   </scm>
 
+  <!--
   <distributionManagement>
   	<snapshotRepository>
   		<id>ossrh</id>
@@ -57,12 +58,13 @@
   		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 	</repository>
   </distributionManagement>
+   -->
 
   <dependencies>
 	<dependency>
     	<groupId>org.junit.jupiter</groupId>
     	<artifactId>junit-jupiter-engine</artifactId>
-    	<version>5.3.1</version>
+    	<version>5.9.1</version>
     	<scope>test</scope>
     </dependency>
 
@@ -204,7 +206,7 @@
 		<version>1.5</version>
 		<executions>
 			<execution>
-			  <id>semantics.transact</id>
+			  <id>anclient.java</id>
 			  <phase>verify</phase>
 			  <goals>
 				<goal>sign</goal>

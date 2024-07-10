@@ -3,11 +3,8 @@ package io.oz.fpick.adapter;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +27,9 @@ import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;
 
-import io.oz.jserv.sync.SyncFlag;
+import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
+import io.oz.fpick.activity.BaseActivity;
+//import io.oz.jserv.docsync.SyncFlag;
 import io.oz.fpick.R;
 
 /**
@@ -41,18 +40,14 @@ import io.oz.fpick.R;
  */
 
 public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapter.VideoPickViewHolder> {
-//    private boolean isNeedCamera;
-//    private int mMaxNumber;
-//    private int mCurrentNumber = 0;
     public String mFilepath;
-
     public Uri mVideoUri;
 
-    public VideoPickAdapter(Context ctx, boolean needCamera, int max ) {
+    public VideoPickAdapter(BaseActivity ctx, boolean needCamera, int max ) {
         this ( ctx, new ArrayList<VideoFile> ( ), needCamera , max );
     }
 
-    public VideoPickAdapter(Context ctx, ArrayList<VideoFile> list, boolean needCamera, int max ) {
+    public VideoPickAdapter(BaseActivity ctx, ArrayList<VideoFile> list, boolean needCamera, int max ) {
         super ( ctx , list );
         isNeedCamera = needCamera;
         mMaxNumber = max;
@@ -65,8 +60,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
         ViewGroup.LayoutParams params = itemView.getLayoutParams ( );
         if ( params != null ) {
             WindowManager wm = (WindowManager) mContext.getSystemService ( Context.WINDOW_SERVICE );
-            int width = wm.getDefaultDisplay ( ).getWidth ( );
-            params.height = width / ImagePickActivity.COLUMN_NUMBER;
+            itemWidth = wm.getDefaultDisplay ( ).getWidth ( );
+            params.height = itemWidth / ImagePickActivity.COLUMN_NUMBER;
         }
         VideoPickViewHolder videoViewHolder = new VideoPickViewHolder ( itemView );
         videoViewHolder.setIsRecyclable ( false );
@@ -98,12 +93,12 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
 
             RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
-                    .load ( file.getPath ( ) )
-                    .apply ( options.centerCrop ( ) )
-                    .transition ( withCrossFade ( ) )
-                    .into ( holder.mIvThumbnail );
+                .load ( file.fullpath() )
+                // .load ( file.fullpath ( ) )
+                .apply ( options.centerCrop() )
+                .transition ( withCrossFade() )
+                .into ( holder.mIvThumbnail );
 
-            // if (file.synchFlag == BaseFile.Synchronizing) {
             if (SyncFlag.pushing.equals(file.syncFlag)) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
@@ -111,8 +106,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            // else if (file.synchFlag == BaseFile.Synchronized) {
-            else if (SyncFlag.publish.equals(file.syncFlag)) {
+            // else if (SyncFlag.publish.equals(file.syncFlag)) {
+            else if (SyncFlag.publish.equals(file.syncFlag) || SyncFlag.hub.equals(file.syncFlag)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -147,34 +142,13 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.mShadow.setVisibility ( View.INVISIBLE );
             }
 
-            holder.mIvThumbnail.setOnLongClickListener((View view) -> {
-                return startMediaViewer(mContext, view, "video/*", file.getPath());
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                Uri uri;
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                    File f = new File(file.getPath());
-//                    uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
-//                }
-//                else {
-//                    uri = Uri.parse("file://" + file.getPath());
-//                }
-//                // intent.setDataAndType(uri, "video/mp4");
-//                intent.setDataAndType(uri, "video/*");
-//                if (Util.detectIntent(mContext, intent)) {
-//                    mContext.startActivity(intent);
-//                }
-//                else {
-//                    ToastUtil.getInstance(mContext).showToast(mContext.getString(R.string.vw_no_video_play_app));
-//                }
-//                return false;
-            });
+            holder.mIvThumbnail.setOnLongClickListener((View view)
+                    -> startMediaViewer(mContext, "video/*", file.fullpath()));
 
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
 
                 String sync = mList.get(index).syncFlag;
-                // if ( sync == BaseFile.Synchronized || sync == BaseFile.Synchronizing)
                 if ( SyncFlag.publish.equals(sync) || SyncFlag.pushing.equals(sync) )
                     return;
 
@@ -197,7 +171,7 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 }
 
                 if ( mListener != null ) {
-                    mListener.OnSelectStateChanged ( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
+                    mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
                 }
             });
 
@@ -235,10 +209,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
             mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
         }
-    }
-
-    public boolean isUpToMax () {
-        return mCurrentNumber >= mMaxNumber;
     }
 
     public void setCurrentNumber ( int number ) {

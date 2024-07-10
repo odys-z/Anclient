@@ -114,7 +114,7 @@ public class VideoPickAdapter extends BaseAdapter<VideoFile, VideoPickAdapter.Vi
 
             RequestOptions options = new RequestOptions();
             Glide.with(mContext)
-                    .load(file.getPath())
+                    .load(file.fullpath())
                     .apply(options.centerCrop())
                     .transition(withCrossFade())
 //                    .transition(new DrawableTransitionOptions().crossFade(500))
@@ -201,11 +201,11 @@ public class VideoPickAdapter extends BaseAdapter<VideoFile, VideoPickAdapter.Vi
                     Uri uri;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        File f = new File(file.getPath());
+                        File f = new File(file.fullpath());
                         uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".provider", f);
 
                     }else{
-                        uri = Uri.parse("file://" + file.getPath());
+                        uri = Uri.parse("file://" + file.fullpath());
                     }
                     intent.setDataAndType(uri, "video/mp4");
                     if (Util.detectIntent(mContext, intent)) {

@@ -2,8 +2,6 @@ package io.oz.album.client;
 
 import static io.oz.album.client.PrefsContentActivity.singleton;
 
-import android.app.Activity;
-import android.app.AutomaticZenRule;
 import android.os.Bundle;
 import android.text.InputType;
 
@@ -21,6 +19,11 @@ import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.albumtier.AlbumContext;
 
+/**
+ * <h4>Preference Fragment</h4>
+ * <a href='https://stackoverflow.com/a/15612006/7362888'>
+ * This class shouldn't have a constructor,</a> to prevent exception when restore state (turn over screen).
+ */
 public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     Preference btnLogin;
     Preference summery;
@@ -29,11 +32,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     Preference btnRegist;
     PreferenceCategory cateHome;
 
-    Activity ctx;
-
-    public AlbumPreferenceFragment(PrefsContentActivity ctx) {
-        this.ctx = ctx;
-    }
+    EditTextPreference pswd;
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
@@ -41,32 +40,31 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
 
         bindPref2Val(findPreference(AlbumApp.keys.home));
         bindPref2Val(findPreference(AlbumApp.keys.device));
-        bindPref2Val(findPreference(AlbumApp.keys.jserv));
+        // bindPref2Val(findPreference(AlbumApp.keys.jserv));
         bindPref2Val(findPreference(AlbumApp.keys.usrid));
         bindPref2Val(findPreference(AlbumApp.keys.pswd));
 
-        cateHome = findPreference(AlbumApp.keys.homeCate);
+        cateHome  = findPreference(AlbumApp.keys.homeCate);
         btnRegist = findPreference(AlbumApp.keys.bt_regist);
-        btnLogin = findPreference(AlbumApp.keys.bt_login);
-        device = findPreference(AlbumApp.keys.device);
+        btnLogin  = findPreference(AlbumApp.keys.bt_login);
+        device    = findPreference(AlbumApp.keys.device);
+        pswd      = findPreference(AlbumApp.keys.pswd);
 
-        EditTextPreference pswd = findPreference(AlbumApp.keys.pswd);
         pswd.setSummary("");
         pswd.setOnBindEditTextListener(editText ->
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
         homepref = findPreference(AlbumApp.keys.home);
-        String devid = singleton.photoUser.device;
+        String devid = singleton.userInf.device;
         if (!LangExt.isblank(devid)) {
-            // homepref.setSummary(getString(R.string.devide_name, devid));
-            homepref.setSummary(AlbumContext.getInstance().homeName);
+            homepref.setSummary(AlbumContext.getInstance(null).profiles.home);
             findPreference(AlbumApp.keys.device).setEnabled(false);
             cateHome.removePreference(btnRegist);
-            device.setSummary(getString(R.string.devide_name, devid));
+            device.setSummary(getString(R.string.device_name, devid));
         }
         else {
             findPreference(AlbumApp.keys.device).setEnabled(true);
-            device.setSummary(R.string.txt_only_once);
+            device.setSummary(R.string.msg_only_once);
 
             btnLogin.setEnabled(false);
         }
@@ -74,6 +72,8 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     }
 
     static void bindPref2Val(@NonNull Preference preference) {
+        if (preference == null)
+            return;
         preference.setOnPreferenceChangeListener(prefsListener);
 
         prefsListener.onPreferenceChange(preference,
@@ -99,17 +99,17 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 preference.setSummary("");
             }
             else if (AlbumApp.keys.usrid.equals(k)) {
-                String device = singleton.photoUser.device;
-                singleton.photoUser = new SessionInf(singleton.photoUser.ssid(), stringValue);
-                singleton.photoUser.device = device;
+                String device = singleton.userInf.device;
+                singleton.userInf = new SessionInf(singleton.userInf.ssid(), stringValue);
+                singleton.userInf.device = device;
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.device.equals(k)) {
-                singleton.photoUser.device = stringValue;
+                singleton.userInf.device = stringValue;
                 preference.setSummary(stringValue);
             }
             else if (AlbumApp.keys.home.equals(k)) {
-                singleton.homeName = stringValue;
+                singleton.profiles.home(stringValue);
                 preference.setSummary(stringValue);
             }
             return true;

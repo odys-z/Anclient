@@ -93,7 +93,7 @@ class UserDetailstComp extends DetailFormW<Comprops & {tier: UsersTier}> {
 			this.tier.saveRec(
 				{ uri: this.props.uri,
 				  crud: this.crud,
-				  pkval: this.props.tier.pkval.v,
+				  pkval: this.props.tier.pkval.v as string,
 				},
 				resp => {
 					// NOTE should crud be moved to tier, just like the pkval?

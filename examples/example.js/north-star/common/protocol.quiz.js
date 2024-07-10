@@ -269,6 +269,7 @@ export const QuizProtocol = {
 			]
 		},
 
+		/** Find n of v from nvs (Qtype.options). */
 		decode: (v) => {
 			let opts = QuizProtocol.Qtype.options();
 			for (let i = 0; i < opts.length; i++)

@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.Utils;
-import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -20,6 +20,7 @@ import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
+import io.odysz.semantic.jsession.AnSessionResp;
 import io.odysz.semantic.jsession.HeartBeat;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.SessionInf;
@@ -33,8 +34,13 @@ public class SessionClient {
 	static boolean verbose;
 	public static void verbose(boolean v) { verbose = v;}
 
-	private SessionInf ssInf;
+	protected SessionInf ssInf;
 	public SessionInf ssInfo () { return ssInf; }
+
+	/** * @since 0.5.0 */
+	protected Anson profile;
+	/** * @since 0.5.0 */
+	public Anson profile() { return profile; }
 	
 	private ArrayList<String[]> urlparas;
 	private AnsonHeader header;
@@ -43,14 +49,26 @@ public class SessionClient {
 	private String syncFlag;
 	private AnsonMsg<HeartBeat> beatReq;
 	private int msInterval;
+
 	
-	/**Session login response from server.
+	/**
+	 * @deprecated replaced by {@link #SessionClient(AnSessionResp)}
+	 * Session login response from server.
 	 * @param sessionInfo
 	 */
 	SessionClient(SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 	}
 	
+	/**
+	 * @since 0.5.0
+	 * @param r session login response from server.
+	 */
+	public SessionClient(AnSessionResp r) {
+		this.ssInf = r.ssInf();
+		this.profile = r.profile();
+	}
+
 	/**
 	 * Start a heart beat thread which is sleeping on thread signal {@link #syncFlag}.
 	 * @param clientUri
@@ -281,7 +299,7 @@ public class SessionClient {
 		return this;
 	}
 
-	/**@deprecated This is an asynchronous API but works synchronously.
+	/* NOTE: This is an asynchronous API but works synchronously.
 	 * The {@link ErrorCtx} API pattern is better.
 	 * @see HttpServClient#post(String, AnsonMsg)
 	 * @see #commit(AnsonMsg, ErrorCtx)
@@ -320,6 +338,7 @@ public class SessionClient {
   				});
 	}
 	 */
+
 	//
 
 	/**
@@ -334,7 +353,7 @@ public class SessionClient {
 	 * @throws AnsonException
 	 */
 	@SuppressWarnings("unchecked")
-	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, ErrorCtx err)
+	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, OnError err)
 			throws SemanticException, IOException, AnsonException {
     	if (verbose) {
     		Utils.logi(Clients.servUrl(req.port()));

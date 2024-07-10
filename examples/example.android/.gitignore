@@ -1,6 +1,7 @@
 *.iml
 .gradle
 .idea
+.idea-temp
 build
 target
 .settings

@@ -3,25 +3,35 @@
     package="io.oz">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".AlbumApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/AppTheme">
-
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
         <activity
-            android:name="io.oz.album.client.PrefsContentActivity"
+            android:name=".album.client.widgets.AddJservActivity"
             android:exported="false" />
-
-        <activity android:name="io.oz.album.WelcomeAct"
-            android:exported="true" >
+        <activity
+            android:name=".album.client.PrefsContentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".album.client.PrefsContentActivityV2"
+            android:exported="false" />
+        <activity
+            android:name=".album.webview.WebAlbumAct"
+            android:exported="false" />
+        <activity
+            android:name=".album.WelcomeAct"
+            android:configChanges="orientation|screenSize"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,4 +39,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>

@@ -1,12 +1,12 @@
 
 import React from 'react';
-	import { withStyles } from '@material-ui/core/styles';
+	import { Theme, withStyles } from '@material-ui/core/styles';
 	import Collapse from '@material-ui/core/Collapse';
 	import Button from '@material-ui/core/Button';
 	import TextField from '@material-ui/core/TextField';
 	import Box from '@material-ui/core/Box';
 
-import { AnClient, AnsonMsg, AnsonResp, OnCommitOk, Protocol } from '@anclient/semantier';
+import { AnClient, AnsonMsg, AnsonResp, OnLoginOk, Protocol } from '@anclient/semantier';
 
 import { an, SessionClient } from '@anclient/semantier';
 	import {AnContext, AnContextType} from './reactext';
@@ -14,15 +14,25 @@ import { an, SessionClient } from '@anclient/semantier';
 	import {L} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
 import { Comprops } from './crud';
+import { ClassNames } from './anreact';
 
-const styles = (theme) => Object.assign(jstyles(theme), {
+const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 	root: {
 	    '& *': { margin: theme.spacing(1) }
 	},
+	container: {
+		maxWidth: "20vw",
+		maxHeight: "20vh"
+	}
 });
 
 interface LoginProps extends Comprops {
-	onLogin: OnCommitOk;
+	/** Providing a callback to handle login-ok event will override auto re-direction. */
+	onLogin?: OnLoginOk;
+	// onLogin: OnCommitOk;
+
+	/** Default pswd and user-id, usually for debug. */
+	config: {pswd?: string, userid?: string}
 }
 
 /**
@@ -52,7 +62,7 @@ class LoginComp extends React.Component<LoginProps> {
 	};
 
 	/**
-	 * initialize a instance of Anclient visition jserv service.
+	 * Initialize an instance of Anclient with which visiting jserv service.
 	 * @param props
 	 * @param props.jserv e.g. "http://127.0.0.1:8080/jserv-quiz"); url to the jserv web root.
 	 * @constructor
@@ -62,11 +72,17 @@ class LoginComp extends React.Component<LoginProps> {
 
 		this.an = an;
 
+		this.config = Object.assign(this.config, props.config);
+
 		this.state = {userId: this.config.userid, pswd: this.config.pswd};
+
+		// backward tolerence
+		if (!props.onLogin && props.onLoginOk)
+			throw Error("LoginProps.onLoginOk is renamed to onLogin");
 
 		this.alert = this.alert.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.onLogin = this.onLogin.bind(this);
+		this.toLogin = this.toLogin.bind(this);
 	}
 
 	componentDidMount() {
@@ -74,11 +90,18 @@ class LoginComp extends React.Component<LoginProps> {
 		this.state.userId = this.config.userid;
 	}
 
-	alert() {
+	alert(classes: ClassNames) {
 		let that = this;
-		this.confirm = <ConfirmDialog ok={L('OK')} title={L('Info')} cancel={false}
-					open={true} onClose={ () => { that.confirm = undefined; } }
-					msg={ L('User Id or password is not correct.') } />
+		this.confirm = <ConfirmDialog className={classes.container}
+			ok={L('OK')} title={L('Info')} cancel={false}
+			open={true} onClose={ () => {
+				that.confirm = undefined;
+				// TODO verify in sessionless
+				this.setState({});
+			} }
+			msg={ L('User Id or password is not correct.') } />
+		// TODO verify in sessionless
+		this.setState({});
 	}
 
 	onErrorClose() {
@@ -88,13 +111,12 @@ class LoginComp extends React.Component<LoginProps> {
 	 * Login and go main page (sys.jsx). Target html page is first specified by
 	 * login.serv (SessionInf.home).
 	 */
-	onLogin() {
+	toLogin(classes? : ClassNames) {
 		let that = this;
-		// console.log(that.context);
 		let uid = this.state.userId;
 		let pwd = this.state.pswd;
 		if (!uid || !pwd) {
-			this.alert();
+			this.alert(classes);
 			return;
 		}
 
@@ -103,7 +125,6 @@ class LoginComp extends React.Component<LoginProps> {
 		if (!this.config.loggedin) {
 			let serv = ctx.servId || 'host';
 			let hosturl = ctx.servs[serv];
-			console.log("login url & serv-id: ", hosturl, serv);
 
 			an.init(hosturl);
 			an.login( uid, pwd, reload, {onError} );
@@ -112,13 +133,11 @@ class LoginComp extends React.Component<LoginProps> {
 		function reload (client: SessionClient) {
 			that.ssClient = client;
 			that.setState( {loggedin: true} );
-			if (typeof that.props.onLoginOk === 'function')
-				that.props.onLoginOk(client);
+			if (typeof that.props.onLogin === 'function')
+				that.props.onLogin(client);
 			else if (ctx.iparent) {
 				ctx.ssInf = client.ssInf;
 				SessionClient.persistorage(client.ssInf);
-				// ctx.iparent.location = client.ssInf.home ?
-				// 			client.ssInf.home : `${ctx.ihome}?serv=${ctx.servId}`;
 				ctx.iparent.location = `${ctx.ihome}?serv=${ctx.servId}`;
 			}
 			else
@@ -126,7 +145,6 @@ class LoginComp extends React.Component<LoginProps> {
 		}
 
 		function onError (code: string, resp: AnsonMsg<AnsonResp>) {
-			console.log(an);
 			if (typeof ctx.error === 'object') {
 				let errCtx = ctx.error;
 				errCtx.msg = resp.Body().msg();
@@ -147,9 +165,9 @@ class LoginComp extends React.Component<LoginProps> {
 			this.props.onLogout();
 	}
 
-	update(val: any) {
-		this.setState(val);
-	}
+	// update(val: any) {
+	// 	this.setState(val);
+	// }
 
 	render() {
 		let that = this;
@@ -158,7 +176,7 @@ class LoginComp extends React.Component<LoginProps> {
 			<Box display={!this.config.show ? "flex" : "none"}>
 				<Button variant="contained" color="primary"
 						style={{'whiteSpace': 'nowrap'}}
-						onClick={() => { this.setState({show: !this.config.show}) } } >
+						onClick={() => { that.setState({show: !that.config.show}) } } >
 					{this.config.show ? L('Cancel') : L('Login')}
 				</Button>
 			</Box>
@@ -173,13 +191,13 @@ class LoginComp extends React.Component<LoginProps> {
 					id="pswd" label={L("Password")}
 					type="password"
 					autoComplete="new-password"
-					onKeyUp={(e) => {if (e.code === "Enter") that.onLogin();} }
+					onKeyUp={(e) => {if (e.code === "Enter") that.toLogin(classes);} }
 					defaultValue={this.config.pswd}
 					onChange={event => this.setState({pswd: event.target.value})} />
 				<Button className={classes.field2}
 					variant="contained"
 					color="primary"
-					onClick={this.onLogin} >{L('Login')}</Button>
+					onClick={() => this.toLogin(classes)} >{L('Login')}</Button>
 			</Collapse>
 			{this.confirm}
 		</div>);
@@ -188,4 +206,4 @@ class LoginComp extends React.Component<LoginProps> {
 LoginComp.contextType = AnContext;
 
 const Login = withStyles(styles)(LoginComp);
-export { Login, LoginComp };
+export { Login, LoginComp, LoginProps };

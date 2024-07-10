@@ -76,7 +76,7 @@ class TabsComp extends CrudCompW<TabsProps> {
 		this.handleChange = this.handleChange.bind(this);
 	}
 
-	handleChange (e: React.ChangeEvent<HTMLElement>, v: number) {
+	handleChange (e: React.ChangeEvent<any>, v: number) {
 		e.stopPropagation();
 		this.setState({ px: v });
 	};
@@ -86,30 +86,30 @@ class TabsComp extends CrudCompW<TabsProps> {
 		let that = this;
 		if (this.props.panels) {
 			return (
-			<div className={classes.root}>
+			<div className={classes?.root}>
 			  <AppBar position="static">
 				<Tabs value={this.state.px}
 					  onChange={this.handleChange} >
-						{this.props.panels.filter(p => !!p.title).map( (p, x) => {
-				  			return (<Tab key={x} value={x} label={p.title} className={classes.tab} />);
-						})}
+					{this.props.panels.filter(p => !!p.title).map( (p, x) => {
+				 		return (<Tab key={x} value={x} label={p.title} className={classes?.tab} />);
+					})}
 				</Tabs>
 			  </AppBar>
-				{this.props.panels.filter(p => !!p.title).map( (p, x) => {
+			  {this.props.panels.filter(p => !!p.title).map( (p, x) => {
 					return (<TabPanel key={x} px={this.state.px} pid={x} children={p.panel} />);
-				} ) }
+			  } ) }
 			</div> );
 		}
 		else return demo(classes);
 
-		function demo(classes: ClassNames) {
-			return ( <div className={classes.root}>
+		function demo(classes: ClassNames | undefined) {
+			return ( <div className={classes?.root}>
 			  <AppBar position="static">
 				<Tabs value={that.state.px}
 					  onChange={that.handleChange} >
-				  <Tab value={0} label={L('panels[0].title')} className={classes.tab} />
-				  <Tab value={1} label={L('panels[1].title')} className={classes.tab} />
-				  <Tab value={2} label={L('panels[2].title')} className={classes.tab} />
+				  <Tab value={0} label={L('panels[0].title')} className={classes?.tab} />
+				  <Tab value={1} label={L('panels[1].title')} className={classes?.tab} />
+				  <Tab value={2} label={L('panels[2].title')} className={classes?.tab} />
 				</Tabs>
 			  </AppBar>
 				<TabPanel px={that.state.px} pid={0} key={0} children={that.state.panels[0]} />
@@ -122,4 +122,4 @@ class TabsComp extends CrudCompW<TabsProps> {
 TabsComp.contextType = AnContext;
 
 const AnTabs = withStyles<any, any, TabsProps>(styles)(withWidth()(TabsComp));
-export {AnTabs, TabsComp, TabPanel, TabPanelProps};
+export {AnTabs, TabsComp, TabsProps, TabPanel, TabPanelProps};

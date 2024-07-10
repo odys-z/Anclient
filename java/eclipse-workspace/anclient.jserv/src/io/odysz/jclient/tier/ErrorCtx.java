@@ -3,6 +3,8 @@ package io.odysz.jclient.tier;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 
+import static io.odysz.common.LangExt.str;
+
 /**This type is used for keeping error handling consist with React TS version, 
  * which is the error handler provided by React context provide. It's the optimized
  * way of abstracting error handling.
@@ -19,7 +21,7 @@ public class ErrorCtx implements OnError {
 	@Override
 	public void err(MsgCode code, String msg, String ... args) {
 		this.code = code;
-		this.msg = String.format(msg, args);
+		this.msg = str(msg, args);
 	}
 
 	public ErrorCtx setSignal(String signal) { return this; };

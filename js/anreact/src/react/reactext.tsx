@@ -4,7 +4,7 @@ import React from 'react';
 import { AnReact } from './anreact';
 
 /**
- * The configuration used by user App to setup jserv root URL.
+ * The configuration data object used by user App to setup jserv root URL.
  */
 export interface JsonServs {
 	host?: string;
@@ -13,13 +13,18 @@ export interface JsonServs {
 
 export interface AnContextType extends Semantext {
 	ssInf?: SessionInf,
-	anReact?: AnReact, // currently neccessary
+	/** AnReact instance. currently neccessary */
+	anReact?: AnReact,   
 
 	pageOrigin?: string,
-	iparent?: any,    // usually the parent window of ifram
+	/** Usually the parent window of ifram. */
+	iparent?: Window,
 	ihome?: string,
 
-	/**default: host */
+	/**
+	 * Jserv id configured within index.html for jserv url directing.
+	 * default: host
+	 */
 	servId: string,
 
 	servs: JsonServs, 

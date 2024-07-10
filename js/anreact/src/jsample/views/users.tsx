@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, Tierec,
-	OnCommitOk, AnlistColAttrs, OnLoadOk, TierComboField, DbRelations, PageInf
+	OnCommitOk, AnlistColAttrs, OnLoadOk, DbRelations, PageInf, len, TierComboField
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
@@ -16,7 +16,7 @@ import { Comprops, CrudCompW } from '../../react/crud';
 import { AnContext, AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnTablPager } from '../../react/widgets/table-pager';
-import { AnQueryst, ComboCondType } from '../../react/widgets/query-form';
+import { AnQueryst } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
@@ -36,14 +36,11 @@ const styles = (theme: Theme) => ( {
 	}
 } );
 
-
-// GIT: task: AnTablist Paginator
-
 class UserstComp extends CrudCompW<Comprops> {
 	state = {
 		buttons: { add: true, edit: false, del: false},
 		pageInf: { page: 0, size: 10, total: 0 },
-		selected: {ids: new Set<string>()},
+		selected: {ids: new Map<string, any>()},
 	};
 
 	tier = undefined as UsersTier;
@@ -54,7 +51,7 @@ class UserstComp extends CrudCompW<Comprops> {
 	constructor(props: Comprops) {
 		super(props);
 
-		this.state.selected.ids = new Set();
+		this.state.selected.ids = new Map<string, any>();
 		this.q = new PageInf(0, 10);
 
 		this.closeDetails = this.closeDetails.bind(this);
@@ -99,13 +96,12 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.toSearch(this.q);
 	}
 
-	onTableSelect(rowIds: Array<string>) {
+	onTableSelect(ids: Map<string, any>) {
 		this.setState( {
 			buttons: {
-				// is this als CRUD semantics?
 				add: this.state.buttons.add,
-				edit: rowIds && rowIds.length === 1,
-				del: rowIds &&  rowIds.length >= 1,
+				edit: len(ids) === 1,
+				del: ids &&  len(ids) >= 1,
 			},
 		} );
 	}
@@ -173,7 +169,7 @@ class UserstComp extends CrudCompW<Comprops> {
 		this.recForm = undefined;
 		this.tier.resetFormSession();
 		this.toSearch(undefined);
-		this.onTableSelect([]);
+		this.onTableSelect(new Map<string, any>());
 	}
 
 	render() {
@@ -209,7 +205,7 @@ class UserstComp extends CrudCompW<Comprops> {
 				className={classes.root}
 				checkbox={tier.checkbox}
 				selected={this.state.selected}
-				columns={tier.columns()}
+				columns={tier.columns() as AnlistColAttrs<JSX.Element, CompOpts>[]}
 				rows={tier.rows}
 				sizeOptions={[5, 8, 10]}
 				pageInf={this.q}
@@ -231,7 +227,7 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 		{ name: 'userName', field: 'userName', type: 'text', val: undefined, label: L('Student'),
 		  grid: {sm: 3, md: 2} } as AnlistColAttrs<any, any>,
 		{ name: 'orgId',    field: 'orgId', type: 'cbb',  val: undefined, label: L('Class'),
-		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'}, grid: {sm: 3, md: 2} } as ComboCondType,
+		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'}, grid: {sm: 3, md: 2} } as TierComboField,
 		// { name: 'roleId',   field: 'roleId', type: 'cbb',  val: undefined, label: L('Role'),
 		//   sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'}, grid: {md: 2, sm: 3} },
 	];
@@ -242,10 +238,9 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 	}
 
 	collect(pageInf: PageInf) : PageInf {
-		// return new PageInf()
 		return pageInf
-				.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
-				.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
+			.nv("userName", this.conds[0].val ? this.conds[0].val : undefined)
+			.nv("orgId", (this.conds[1].val as {n: string, v: string})?.v);
 	}
 
 	/**
@@ -264,6 +259,11 @@ class UsersQuery extends CrudCompW<Comprops & {pageInf: PageInf, onQuery: (conds
 	}
 }
 
+/**
+ * port = 'userstier', i.e. io.odysz.jsample.protocol.Samport#usertier("users.tier"),
+ * 
+ * A = UserstReq.A
+ */
 export class UsersTier extends Semantier {
 	port = 'userstier';
 	checkbox = true;
@@ -277,11 +277,11 @@ export class UsersTier extends Semantier {
 		{ type: 'cbb', field: 'roleId', label: L('Role'),
 		  grid: {md: 5},
 		  sk: Protocol.sk.cbbRole, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
+		  validator: {notNull: true} } as TierComboField,
 		{ type: 'cbb', field: 'orgId', label: L('Organization'),
 		  grid: {md: 5},
 		  sk: Protocol.sk.cbbOrg, nv: {n: 'text', v: 'value'},
-		  validator: {notNull: true} } as TierComboField<JSX.Element, CompOpts>,
+		  validator: {notNull: true} } as TierComboField,
 	] as AnlistColAttrs<JSX.Element, CompOpts>[];
 
 	_cols = [
@@ -336,7 +336,6 @@ export class UsersTier extends Semantier {
 		client.commit(req,
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				// that.rows = rows;
 				that.rec = rows && rows[0];
 				onLoad(cols, rows as Tierec[]);
 			},
@@ -353,15 +352,7 @@ export class UsersTier extends Semantier {
 		if (crud === CRUD.u && !this.pkval)
 			throw Error("Can't update with null ID.");
 
-		/**
-		 *  This is intial password
-		let {cipher, iv} = this.client.encryptoken(this.rec.pswd as string);
-		this.rec.pswd = cipher;
-		this.rec.iv = iv;
-		*/
-
-		// this.rec.iv = undefined; // won't work - didn't sent by Chrome
-		this.rec.iv = null; // working - but why?
+		this.rec.iv = null;
 
 		let req = this.client.userReq(uri, this.port,
 			new UserstReq( uri, { record: this.rec, relations: this.collectRelations(), pk: this.pkval.v } )
@@ -398,7 +389,7 @@ export class UsersTier extends Semantier {
 
 		if (ids && ids.size > 0) {
 			let req = this.client.userReq(uri, this.port,
-				new UserstReq( uri, { deletings: [...Array.from(ids)] } )
+				new UserstReq( uri, { deletings: [...Array.from(ids.keys())] } )
 				.A(UserstReq.A.del) );
 
 			client.commit(req, onOk, this.errCtx);
@@ -424,7 +415,7 @@ export class UserstReq extends UserReq {
 		insert: 'c',
 		del: 'd',
 
-		mykids: 'r/kids',
+		// mykids: 'r/kids',
 	}
 
 	pk: any;
@@ -438,13 +429,10 @@ export class UserstReq extends UserReq {
 	deletings: string[];
 	page: PageInf;
 
-	// constructor (uri: string, args = {} as Tierec & { record? : {userId?: string}}) {
 	constructor (uri: string, query: PageInf | any) {
 		super(uri, "a_users");
 		this.type = UserstReq.__type__;
 		this.uri = uri;
-
-		/// FIXME: obviousely this is should be refactored to the chained calls API
 
 		/// case r
 		if (query.page === undefined && typeof query.condtsRec === 'function')
@@ -452,19 +440,13 @@ export class UserstReq extends UserReq {
 
 		if (query.condtsRec) {
 			let args = query.condtsRec() as Tierec & { record? : {userId?: string} };
-			this.userId = (args.userId || args.record?.userId) as string;
+			this.userId   = (args.userId || args.record?.userId) as string;
 			this.userName = args.userName as string;
-			this.orgId = args.orgId as string;
-			this.roleId = args.roleId as string;
+			this.orgId    = args.orgId as string;
+			this.roleId   = args.roleId as string;
 			this.hasTodos = toBool(args.hasTodos as string | boolean);
 
 			this.page = new PageInf(query.page, query.size);
-		}
-		/// case A = rec (TRecordForm loading)
-		else if (query.userId) {
-			this.record = query as Tierec;
-			this.userId = query.userId;
-			this.page = new PageInf(0, -1);
 		}
 		/// case A = u
 		else if (query.pk) {
@@ -472,7 +454,13 @@ export class UserstReq extends UserReq {
 			this.record = query.record as Tierec;
 			this.relations = query.relations as DbRelations;
 		}
-
+		/// case A = c 
+		else if (query.record) {
+			let {record} = query;
+			this.record = record;
+			this.userId = record.userId;
+			this.page = new PageInf(0, -1);
+		}
 		/// case d
 		this.deletings = query.deletings as string[];
 	}

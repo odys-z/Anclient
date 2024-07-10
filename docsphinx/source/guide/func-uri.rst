@@ -16,9 +16,9 @@ Implementation
 
 - Client provide function uri
 
-TS: @anclient/semantier-st
+Typescript client: @anclient/semantier, currently declared as::
 
-(currently decleared as uri: stirng)
+    Semantier.uri: stirng. 
 
 .. code-block:: typescript
 
@@ -57,12 +57,12 @@ TS: @anclient/semantier-st
 
     <t id="conn-uri" pk='uri' columns="uri, conn">
    	<c>
-  		<uri>/local/*</uri>
-  		<conn>sys-sqlite</conn>
-  	</c>
-   	<c>
-  		<uri>/cloud/*</uri>
-  		<conn>album-cloud</conn>
-  	</c>
+      <uri>/local/*</uri>
+      <conn>sys-sqlite</conn>
+    </c>
+    <c>
+      <uri>/cloud/*</uri>
+      <conn>album-cloud</conn>
+    </c>
     </t>
 ..

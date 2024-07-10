@@ -4,11 +4,13 @@
 import * as $ from 'jquery';
 import AES from './aes';
 import {
-	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq,
-	AnSessionReq, QueryReq, UpdateReq, InsertReq,
-	LogAct, AnsonBody, JsonOptions, OnCommitOk, OnLoadOk, CRUD, DatasetierResp, PkVal, PageInf
+	Protocol, AnsonMsg, AnHeader, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
+	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
+	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV, OnLoginOk
 } from './protocol';
-import { ErrorCtx, Tierec } from './semantier';
+import { ErrorCtx, Tierec, isEmpty, len } from './semantier';
+
+export * from './stree-tier';
 
 export interface AjaxOptions {async?: boolean; timeout?: number}
 
@@ -37,11 +39,12 @@ class AnClient {
 		defaultServ: string;
 	};
 
-	/**@param urlRoot serv path root, e.g. 'http://localhost/jsample'
+	/**
+	 * @param urlRoot serv path root, e.g. 'http://localhost/jsample'
 	 */
-	constructor (urlRoot: string) {
+	constructor (urlRoot: string | undefined) {
 	 	this.cfg = {
-			defaultServ: urlRoot,
+			defaultServ: urlRoot || '',
 		}
 	}
 
@@ -74,6 +77,7 @@ class AnClient {
      * @retun this */
 	init (urlRoot: string) : this {
 		this.cfg.defaultServ = urlRoot;
+		console.info("AnClient initialized with url-root:", urlRoot);
         return this;
 	}
 
@@ -83,7 +87,6 @@ class AnClient {
      * @param newPorts
      * @return this */
 	understandPorts (newPorts: { [p: string]: string; }) : this {
-		// Object.assign(Protocol.Port, newPorts);
 		Protocol.extend(newPorts);
         return this;
 	}
@@ -104,27 +107,29 @@ class AnClient {
      * @param onError error handler
      */
 	login (usrId: string, pswd: string,
-		onLogin: { (ssClient: any): void; (arg0: SessionClient): void; },
+		onLogin: OnLoginOk,
 		onError: ErrorCtx): this {
 
 		let iv = aes.getIv128() as unknown as Uint8Array;
 		let cpwd = aes.encrypt(usrId, pswd, iv);
 		let req = Protocol.formatSessionLogin(usrId, cpwd, aes.bytesToB64(iv));
 
+		let that = this;
 		this.post(req,
 			/**@param {object} resp
 			 * code: "ok"
 			 * data: Object { uid: "admin", ssid: "3sjUJk2JszDm", "user-name": "admin" }
 			 * port: "session"
 			 */
-			function(resp) {
+			(resp: AnsonMsg<AnsonResp>) => {
 				let ssInf = resp.Body().ssInf;
 				ssInf.jserv = an.cfg.defaultServ;
 				let sessionClient = new SessionClient(resp.Body().ssInf, iv, true);
-				sessionClient.an = this;
+				sessionClient.an = that;
 				if (typeof onLogin === "function")
 					onLogin(sessionClient);
-				else console.log(sessionClient);
+				else
+					console.log(sessionClient);
 			},
 			onError);
 		return this;
@@ -139,30 +144,27 @@ class AnClient {
 		});
 	}
 
-	/**Create a user request AnsonMsg for no-ssession request (no connId can be specified).
+	/**
+	 * Create a user request AnsonMsg for no-ssession request
+	 * (create header and link body.parent, and no connId can be specified).
+	 * 
+	 * For request with session header, use {@link SessionClient#userReq()}.
+	 * 
 	 * @param port
 	 * @param bodyItem request body, created by like: new jvue.UserReq(conn, tabl).
-	 * @return AnsonMsg<T extends UserReq> */
+	 * @return AnsonMsg<T extends UserReq>
+	 */
 	getReq<T extends AnsonBody>(port: string, bodyItem: T): AnsonMsg<T> {
 		let header = Protocol.formatHeader({});
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
-
-    /**Check Response form jserv
-     * @param {any} resp
-	static checkResponse(resp: any) : false | "err_NA" {
-		if (typeof resp === "undefined" || resp === null || resp.length < 2)
-			return "err_NA";
-		else return false;
-	}
-     */
 
     /**Post a request, using Ajax.
      * @param jreq
      * @param onOk
      * @param onErr must present. since 0.9.32, Anclient won't handle error anymore, and data accessing errors should be handled by App singleton.
      * @param ajaxOpts */
-	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
+	post<T extends AnsonBody> (jreq: AnsonMsg<T>, onOk: OnCommitOk | undefined, onErr: ErrorCtx, ajaxOpts? : AjaxOptions) {
 		if (!onErr || !onErr.onError) {
 			console.error("Since 0.9.32, this global error handler must present - error handling is supposed to be the app singleton's responsiblity.")
 		}
@@ -171,7 +173,8 @@ class AnClient {
 			console.error('jreq is null');
 			return;
 		}
-		if (jreq.port === undefined || jreq.port == '') {
+		// if (jreq.port === undefined || jreq.port == '') {
+		if (isEmpty(jreq.port)) {
 			// TODO docs...
 			console.error('Port is null - you probably created a requesting AnsonMsg with "new [User|Query|...]Req()".\n',
 				'Creating a new request message can mainly throught one of 2 ways:\n',
@@ -211,9 +214,6 @@ class AnClient {
 				}
 
 				if (resp.code !== Protocol.MsgCode.ok)
-					// if (typeof onErr === "function")
-					// 	onErr(resp.code, resp);
-					// else
 					if (onErr && typeof onErr.onError === "function"){
 						// a special case of AnContext.error
 						onErr.msg = resp.Body().msg();
@@ -224,19 +224,16 @@ class AnClient {
 				else {
 					if (typeof onOk === "function")
 						onOk(resp);
-					else console.log(resp);
+					else console.error("A successful response ignored for no handler is provided.", resp);
 				}
 			},
 			error: function (resp: any) {
-				// JSON.stringify(resp):
-				// {"readyState":0,"status":0,"statusText":"error"};
-
 				if (typeof onErr === "function" || onErr && typeof onErr.onError === 'function') {
 					if (resp.statusText) {
 						resp.code = Protocol.MsgCode.exIo;
 						resp.body = [ {
 								type: 'io.odysz.semantic.jprotocol.AnsonResp',
-								m: 'Network failed: ' + resp.statusText
+								m: `Network failed: ${url}`
 							} ];
 						let ansonResp = new AnsonMsg<AnsonResp>(resp);
 						if (typeof onErr.onError === 'function') {
@@ -250,8 +247,8 @@ class AnClient {
 							resp = new AnsonMsg({
 								port: resp.port,
 								header: resp.header,
-								body: [ { type: 'io.odysz.semantic.jprotocol.AnsonResp',
-										  m: 'Ajax: network failed: ' + resp.status } ]
+								body: [{type: 'io.odysz.semantic.jprotocol.AnsonResp',
+										m: `Network failed: ${url}` } ]
 							});
 						else resp = AnClient.fromAjaxError(resp);
 
@@ -369,11 +366,7 @@ export const an = new AnClient(undefined);
 
 export type SessionInf = {
 	type: "io.odysz.semantic.jsession.SessionInf";
-	/**A facillity for page redirection.
-	 * Value is set by Login into local storage, and be restored by SessionClient constructor.
-	 * Usually these two steps are used in different html pages.
-	 */
-	jserv: string;
+	jserv: string | undefined;
 	uid: string;
 	usrName?: string;
 	iv?: string;
@@ -396,39 +389,40 @@ class SessionClient {
 		remarks: '',
 		cate: ''
 	};
+	/** Get name of persisted item in local storage. */
 	static get ssInfo() { return "ss-info"; }
 
 	/**Create SessionClient with credential information or load from localStorage.
 	 * Because of two senarios of login / home page integration, there are 2 typical useses:
-	 * 
+	 *
 	 * Use Case 1 (persisted):
-	 * 
+	 *
 	 * logged in, then create a client with response, save in local storage, then load it in new page.
-	 * 
+	 *
 	 * Use Case 2 (not persisted):
-	 * 
+	 *
 	 * logged in, then create a client with response, user's app handled the object,
 	 * then provided to other functions, typicall a home.vue component.
-	 * 
+	 *
 	 * Note
-	 * 
+	 *
 	 * Local storage may be sometimes confusing if not familiar with W3C standars.
-	 * 
+	 *
 	 * The local storage can't be cross domain referenced. It's can not been loaded by home page
 	 * if you linked from login page like this, as showed by this example in login.vue:
-	 * 
+	 *
 	 * window.top.location = response.home
-	 * 
+	 *
 	 * One recommended practice is initializing home.vue with login credential
 	 * by login.vue, in app.vue.
-	 * 
+	 *
 	 * But this design makes home page and login component integrated. It's not
 	 * friedly to application pattern like a port page with login which is independent
 	 * to the system background home page.
-	 * 
+	 *
 	 * How should this pattern can be improved is open for discussion.
 	 * If your are interested in this subject, leave any comments in wiki page please.
-	 * 
+	 *
 	 * @param ssInf login response form server: {ssid, uid}, if null, will try restore window.for localStorage
 	 * @param iv iv used for cipher when login.
 	 * @param dontPersist don't save into local storage.
@@ -476,7 +470,7 @@ class SessionClient {
 		return ssInf;
 	}
 
-	static persistorage(ssInf) {
+	static persistorage(ssInf: SessionInf) {
 		if (window && localStorage) {
 			var sstr = JSON.stringify(ssInf);
 			localStorage.setItem(SessionClient.ssInfo, sstr);
@@ -521,10 +515,6 @@ class SessionClient {
 		return header;
 	}
 
-	SsInf(ssInf: SessionInf) {
-		throw new Error('Method not implemented.');
-	}
-
 	setPswd(oldPswd: string, newPswd : string, opts) {
 		let usrId = this.ssInf.uid;
 		let iv_tok = aes.getIv128();
@@ -561,7 +551,7 @@ class SessionClient {
 
 	/**
 	 * Encrypt text with ssInf token - the client side for de-encrypt semantics
-	 * 
+	 *
 	 * @param plain plain text
 	 * @return {cipher, iv: base64}
 	 */
@@ -578,7 +568,7 @@ class SessionClient {
 	 * @param onOk
 	 * @param errCtx error handler of singleton. Since 0.9.32, this arg is required.
 	 */
-	commit (jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk, errCtx: ErrorCtx) {
+	commit (jmsg: AnsonMsg<AnsonBody>, onOk: OnCommitOk | undefined, errCtx: ErrorCtx) {
 		an.post(jmsg, onOk, errCtx, undefined);
 	}
 
@@ -628,7 +618,7 @@ class SessionClient {
 		return jreq as AnsonMsg<QueryReq>;
 	}
 
-	update(uri: string, maintbl: string, pk: PkVal, nvs: string | string[] | Tierec) {
+	update(uri: string, maintbl: string, pk: PkVal, nvs: [string, string][] | NV[] | NameValue[] | Tierec) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("Anclient is designed to support user updating log natively. User action with function Id shouldn't be ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -644,15 +634,18 @@ class SessionClient {
 
 		if (nvs !== undefined) {
 			if (Array.isArray(nvs))
-				upd.nv(nvs, undefined);
+				// FIXME no bugs here!
+				if (len(nvs) > 0 && isNV(nvs[0]))
+					upd.addNvrow(nvs as NV[]);
+				else ;
 			else if (typeof nvs === 'object')
 				upd.record(nvs)
-			else console.error("updating nvs must be an array of name-value.", nvs)
+			else console.error("Updating nvs must be an array of name-value.", nvs)
 		}
 		return jmsg;
 	}
 
-	insert(uri: string, maintbl: string, nvs: string | string[]) {
+	insert(uri: string | undefined, maintbl: string, nvs: Array<[string, string]> | Array<NV> | Array<NameValue>) {
 		if (this.currentAct === undefined || this.currentAct.func === undefined)
 			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
 						"To setup user's action information, call ssClient.usrAct().");
@@ -662,10 +655,31 @@ class SessionClient {
 		var jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
 
 		if (nvs !== undefined) {
-			if (Array.isArray(nvs))
-				ins.valus(nvs, undefined);
-			else console.error("updating nvs must be an array of name-value.", nvs)
+			if (Array.isArray(nvs) && nvs.length > 0 && Array.isArray(nvs[0]))
+				ins.addArrow(nvs as Array<[string, string]>);
+			else if (Array.isArray(nvs) && nvs.length > 0 && isNV(nvs[0]))
+				ins.addNvrow(nvs as NV[] | NameValue[]);
+			else console.error("Inserting row must be an array of name-value.", nvs)
 		}
+		return jmsg;
+	}
+
+	inserts(uri: string | undefined, maintbl: string, nvss: Array<Array<[string, string]>> | Array<NV[]> | Array<NameValue[]>) {
+		if (this.currentAct === undefined || this.currentAct.func === undefined)
+			console.error("jclient is designed to support user updating log natively, User action with function Id shouldn't ignored.",
+						"To setup user's action information, call ssClient.usrAct().");
+
+		let ins = new InsertReq(uri, maintbl);
+		this.currentAct.cmd = 'insert';
+		let jmsg = this.userReq(uri, 'insert', ins, this.currentAct);
+
+		nvss.forEach ((nvs: Array<[string, string]> | NV[] | NameValue[]) => {
+			if (Array.isArray(nvs) && nvs.length > 0 && Array.isArray(nvs[0]))
+				ins.addArrow(nvs as Array<[string, string]>);
+			else if (Array.isArray(nvs) && nvs.length > 0 && isNV(nvs[0]))
+				ins.addNvrow(nvs as NV[] | NameValue[]);
+			else console.error("Rows must be an array of name-values' array.", nvs)
+		});
 		return jmsg;
 	}
 
@@ -743,6 +757,18 @@ class SessionClient {
 		return new AnsonMsg({ port, header, body: [bodyItem] });
 	}
 
+	/**
+	 * Create a user request AnsonMsg, without session tocken.
+	 * 
+	 * @param port 
+	 * @param string 
+	 * @param body body.uri must be providen
+	 * @returns 
+	 */
+	userReqInec<T extends AnsonBody>(port: string, body: T) {
+		return an.getReq<T>(port, body);
+	}
+
 	/**Set user's current action to be logged.
 	 * @param funcId curent function id
 	 * @param cate category flag
@@ -803,13 +829,14 @@ class Inseclient extends SessionClient {
 	 * {func, cate, cmd, remarks};
 	 * @return the logged in header */
 	getHeader(act: LogAct) {
-		var header = Protocol.formatHeader({ssid: undefined, uid: this.userId});
-
-		return new AnHeader(this.ssInf.ssid, this.ssInf.uid);
+		let header = Protocol.formatHeader({ssid: this.ssInf.ssid, uid: this.ssInf.uid});
+		return header;
+		// return new AnHeader(this.ssInf.ssid, this.ssInf.uid);
 	}
 }
 
 export * from './helpers';
 export * from './protocol';
 export * from './semantier';
+export * from './stree-tier';
 export {AnClient, SessionClient, Inseclient, aes};

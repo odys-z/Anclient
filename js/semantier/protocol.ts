@@ -1,5 +1,5 @@
-import { SessionInf } from './anclient';
-import * as CSS from 'csstype';
+import { SessionClient, SessionInf } from './anclient';
+import { arr, isEmpty, len, size, str } from './helpers';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
@@ -8,6 +8,8 @@ export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void
  * T is the record type
  */
 export type OnLoadOk<T extends Tierec> = (cols: Array<string>, rows: Array<T>) => void
+
+export type OnLoginOk = (resp: SessionClient) => void
 
 export type OnCommitErr = (code: string, resp: AnsonMsg<AnsonResp>) => void
 
@@ -33,29 +35,37 @@ export class PageInf {
 	size?: number;
 	total?: number;
 
-	/** @deprected replaced by condtRec */
-	condts?: Array<string[]>;
+	/** Read via {@link PageInf#condtsRec()} */
+	arrCondts?: Array<string[]>;
 
-	constructor(page?: number | PageInf, size?: number, total?: number, condts?: Array<string[]>) {
+	/**
+	 * Generic query can't parse this parameter.
+	 * 
+	 * Only used for tier pattern and temp args at client side.
+	 */
+	mapCondts?: {[p: string]: AnsonValue};
+
+	constructor(page?: number | PageInf, size?: number, total?: number, arrCondts?: Array<string[]>, mapCondts?: {[p: string]: AnsonValue}) {
 		this.type = 'io.odysz.transact.sql.PageInf';
 		if (typeof page === 'number') {
 			this.page = page || 0;
 			this.size = size || -1;
 			this.total = total || 0;
-			this.condts = condts;
+			this.arrCondts = arrCondts;
 		}
 		else {// type safe: PageInf
 			this.page = page?.page || 0;
 			this.size = page?.size || -1;
 			this.total = page?.total || 0;
-			this.condts = page?.condts;
+			this.arrCondts = page?.arrCondts;
 		}
+		this.mapCondts = mapCondts || {};
 	}
 
 	nv(k: string, v: string) {
-		if (!this.condts)
-			this.condts = [];
-		this.condts.push([k, v]);
+		if (!this.arrCondts)
+			this.arrCondts = [];
+		this.arrCondts.push([k, v]);
 		return this;
 	}
 
@@ -66,17 +76,21 @@ export class PageInf {
 	 */
 	condtsRec () {
 		let rec = {} as Tierec;
-		for(let nv in this.condts) {
-			if (nv && nv[0])
-				rec[nv[0]] = rec[nv[1]];
-		}
-		return rec;
+		if (this.arrCondts)
+			for(let nv of this.arrCondts)
+				if (nv && nv[0])
+					rec[nv[0]] = nv[1];
+		return Object.assign(rec, this.mapCondts);
 	}
 }
 
+export type AnsonValue = string | object | string | number | boolean | undefined | null;
 /**Lagecy from jquery & easyui, replaced by NV - no need to collect form using JQuery in the future. */
-export type NameValue = {name: string, value: object};
-export type NV = {n: string, v: string | object};
+export type NameValue = {name: string, value: AnsonValue};
+export type NV = {n: string, v: AnsonValue};
+export function isNV (obj: any) {
+	return !!obj && (obj.name || obj.n);
+}
 
 export interface LogAct {
     func   : string;
@@ -143,7 +157,6 @@ export interface relStree {
 }
 
 export interface DbRelations {
-	/** TODO:  [tabl: string]: Semantics; */
 	fk?: relFK,
 	/** semantic tree */
 	stree?: relStree,
@@ -151,17 +164,13 @@ export interface DbRelations {
 	m2m?: any,
 }
 
-export interface UIRelations {
-    [tabl: string]: AnTreeNode[];
-}
-
 /**Issue: As pk fields is wrapped up at server side, should clients caring about the pk name?
  * example of this:
  * that.pkval.v = that.rec && that.rec[that.pk];
 */
 export interface PkVal {
-    v: any;
-    pk: string;
+    v: AnsonValue;// string | number | boolean | undefined;
+    pk: string | undefined;
     tabl?: string;
 }
 
@@ -205,10 +214,12 @@ export class Protocol {
 	static CRUD = {c: 'I', r: 'R', u: 'U', d: 'D'};
 
 	static Port = {	heartbeat: "ping.serv11",
-		echo: "echo.serv11", session: "login.serv11",
+		echo: "echo.less",
+		session: "login.serv11",
 		query: "r.serv11", update: "u.serv11",
 		insert: "c.serv11", delete: "d.serv11",
-		dataset: "ds.serv11", stree: "s-tree.serv11",
+		dataset: "ds.serv",
+		stree: "s-tree.serv",
 		datasetier: "ds.tier"
 	};
 
@@ -312,6 +323,8 @@ export class Protocol {
 	}
 
     static formatHeader(ssInf: any): AnHeader {
+		if (isEmpty(ssInf))
+			throw Error("Can't format a header without ssInf.");
 		return new AnHeader(ssInf.ssid, ssInf.uid);
     }
 
@@ -319,15 +332,15 @@ export class Protocol {
 		return AnsonResp.rs2arr(rs);
 	}
 
-	static nv2cell (nv: NameValue): [string, string] {
-		return [nv.name, nv.value as unknown as string];
+	static nv2cell (nv: NameValue | NV): [string, string] {
+		return [(nv as NV).n || (nv as NameValue).name, str((nv as NV).v || (nv as NameValue).value)];
 	}
 
-	static nvs2row (nvs) {
-		var row = [];
+	static nvs2row (nvs: NameValue[] | NV[]) {
+		var row = [] as [string, string][];
 		if (nvs) {
 			for (var ix = 0; ix < nvs.length; ix++)
-				row.push(this.nv2cell(nvs[ix]));
+				row.push(Protocol.nv2cell(nvs[ix]));
 		}
 		return row;
 	}
@@ -336,20 +349,23 @@ export class Protocol {
      * @param {Array} [n-v, ...]
      * @return {Array} [n1, n2, ...]
      */
-    static nvs2cols(nvArr: Array<NameValue>): Array<string> {
+    static nvs2cols(nvArr: Array<NameValue> | Array<NV> | Array<string>): Array<string> {
 		var cols = [];
 		if (nvArr) {
 			for (var ix = 0; ix < nvArr.length; ix++) {
-				if (nvArr[ix].name) {
-					cols.push(nvArr[ix].name);
+				if ((nvArr[ix] as NameValue).name) {
+					cols.push((nvArr[ix] as NameValue).name);
+				}
+				else if ((nvArr[ix] as NV).n) {
+					cols.push((nvArr[ix] as NV).n);
 				}
 				else
 					cols.push(ix);
 			}
 		}
 		return cols;
-
     }
+
     /** convert [[{name, value}]] to [[[name, value]]]
      * @param {Array} 2d array of n-v pairs
      * @return {Array} 3d array that can be used by server as nv rows
@@ -382,13 +398,24 @@ export class AnsonMsg<T extends AnsonBody> {
     static __type__ = '';
 
 
+	/**
+	 * Get resultset's array mapping.
+	 * @param resp general response (AnsonResp)
+	 * @param rx resultset index
+	 * @returns array
+	 */
     static rsArr(resp: AnsonMsg<AnsonResp>, rx?: number): any {
-		if (resp.body && resp.body[0] && resp.body[0].rs && resp.body[0].rs.length > 0) {
+		if (resp.body && resp.body[0] && resp.body[0].rs
+			// A legacy of js. Type of rs will be changed to Array<AnResultset>
+			&& (resp.body[0].rs as Array<AnResultset>).length > 0) {
 			return AnsonResp.rsArr(resp.body, rx);
 		}
 		return [];
 	}
 
+	/**
+	 * @param json a json object to be deserialized.
+	 */
     constructor(json: any) {
 		if (typeof json !== 'object')
 			throw new Error("AnClient is upgraded, takes only one arg, the json obj.");
@@ -398,15 +425,15 @@ export class AnsonMsg<T extends AnsonBody> {
 			this.header = header;
 		else this.header = new AnHeader(undefined, undefined);
 
-		let [body] = json.body ? json.body : [{}];
+		let [body] = json.body ? json.body : [{}] as any[];
 		let a = body.a;
 
 		// initiating json to class
 		if (body.constructor.name === 'Object') {
 			if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
 				body = new AnsonResp(body);
-			else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
-				body = new AnSessionResp(body);
+			// else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
+			// 	body = new AnSessionResp(body);
 			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
 				body = new AnSessionReq(body.uid, body.token, body.iv);
 			else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
@@ -508,6 +535,8 @@ export class AnsonBody {
     a: string;
     parent: string; // AnsonMsg<AnsonBody>;
     uri: string;
+	version?: string;
+	seq?: number;
 
     /**set A tag a.<br>
      * a() can only been called once.
@@ -627,8 +656,12 @@ export class QueryReq extends AnsonBody {
 		this.joins = [];
 		this.where = [];
 
-		if (pageInf)
+		if (pageInf) {
 			this.Page(pageInf.size, pageInf.page);
+			this.where = pageInf.arrCondts;
+			if (size(pageInf.mapCondts as any) > 0)
+				console.warn("Parameter map is ignored in QueryReq:", pageInf.mapCondts);
+		}
 	}
 
 	Page (size : number, idx : number): QueryReq {
@@ -695,12 +728,16 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-    /**Add where clause condition
+    /**
+	 * Add where clause condition
      * @param logic logic type
      * @param loper left operator
      * @param roper right operator
      * @return this */
 	public whereCond (logic: string, loper: string, roper: string): QueryReq {
+		if (!this.where)
+			this.where = [];
+
 		if (Array.isArray(logic))
 			this.where = this.where.concat(logic);
 		else if (logic !== undefined)
@@ -740,7 +777,7 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	groupby (expr) {
+	groupby (expr: string) {
 		// console.warn("groupby() is still to be implemented");
 		if (this.groups === undefined)
 			this.groups = [];
@@ -748,7 +785,7 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	groupbys (exprss) {
+	groupbys (exprss: string[]) {
 		// console.warn("groupby() is still to be implemented");
 		if (Array.isArray(exprss)) {
 			for (var ix = 0; ix < exprss.length; ix++) {
@@ -761,17 +798,18 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	/**limit clause.
-	 * @param {string} expr1
-	 * @param {string} expr2
+	/**
+	 * limit clause.
+	 * @param expr1
+	 * @param expr2
 	 */
-	limit (expr1, expr2) {
+	limit (expr1: string | number, expr2: string | number) {
 		this.limt = [];
 		if (expr1)
-			this.limt.push(expr1);
+			this.limt.push(str(expr1));
 
 		if (expr2)
-			this.limt.push(expr2);
+			this.limt.push(str(expr2));
 	}
 
 	commit () {
@@ -830,15 +868,29 @@ export class UpdateReq extends AnsonBody {
      * @param v
      * @return this
      */
-    nv(n: string | Array<string>, v: string): UpdateReq {
+    nv(n: string, v: string): UpdateReq {
 		if (Array.isArray(n)) {
-			this.nvs = this.nvs.concat(Protocol.nvs2row(n));
+			// TODO cannot publish till all pages are bring up
+			throw Error('This branch is replaced with addArrow()')
+			// this.nvs = this.nvs.concat(Protocol.nvs2row(n));
+			// this.nvs = this.nvs.concat(n);
 		}
 		else {
-			this.nvs.push([n, v]);
+			this.nvs.push([n as string, v]);
 		}
 		return this;
     }
+
+	addNvrow (nv_row : NameValue[] | NV[]) : this {
+		this.nvs = this.nvs.concat(Protocol.nvs2row(nv_row));
+		return this;
+	}
+
+	addArrow (nvs: [string, string][]): UpdateReq {
+		// this.nvs = this.nvs.concat(Protocol.nvs2row(n));
+		this.nvs = this.nvs.concat(nvs);
+		return this;
+	}
 
     /** add n-v
      * @param rec
@@ -857,11 +909,11 @@ export class UpdateReq extends AnsonBody {
     /**Take exp as an expression
      * @param n
      * @param exp the expression string like "3 * 2"
-     * @return this*/
+     * @return this
     nExpr(n: string, exp: string): UpdateReq {
         console.error("bug !!");
 		return this.nv(n, exp);
-    }
+    }*/
 
 	/**Append where clause condiont
 	 * @param logic "=" | "<>" , ...
@@ -934,9 +986,9 @@ export class UpdateReq extends AnsonBody {
 	}
 
 	/**Add post operation
-	 * @param {UpdateReq | InsertReq} pst post request
-	 * @return {UpdateReq} this */
-	post (pst) {
+	 * @param pst post request
+	 * @return this */
+	post (pst: AnsonBody) {
 		if (pst === undefined) {
 			console.warn('You really wanna an undefined post operation?');
 			return this;
@@ -969,7 +1021,6 @@ export class InsertReq extends UpdateReq {
 
 
     cols: Array<string>;
-    nvss: any;
 
 	constructor (uri: string, tabl: string) {
 		super (uri, tabl, undefined);
@@ -1000,25 +1051,62 @@ export class InsertReq extends UpdateReq {
 		return this;
 	}
 
-	/**Override Update.nv() - the insert statement uses valus() for nvss.
+	/**
+	 * Override Update.nv() - the insert statement uses valus() for nvss.
 	 * @param n
 	 * @param v
 	 * @return this*/
 	nv (n: string, v: string): this {
-		return this.valus(n, v);
+		if (this.nvss === undefined)
+			this.nvss = [];
+
+		this.columns(n);
+		if (this.nvss.length == 0) {
+			this.nvss.push([[n, v]]);
+		}
+		else {
+			this.nvss[this.nvss.length - 1].push([n, v]);
+		}
+		return this;
+	}
+
+	newrow () : InsertReq {
+		if (this.nvss === undefined)
+			this.nvss = [];
+		this.nvss.push([]);
+		return this;
 	}
 
 	/**Take exp as an expression
 	 * @param n
 	 * @param exp the expression string like "3 * 2"
 	 * @return this
-	 **/
 	nExpr(n : string, exp : any): this {
         console.error("Bug!!");
 		return this.nv(n, exp);
 	}
+	 **/
 
-	/**Set inserting value(s).
+	addNvrow (n_row : NameValue[] | NV[]) : this {
+		if (this.nvss === undefined)
+			this.nvss = [];
+
+		if (this.cols === undefined)
+			this.columns(Protocol.nvs2cols(n_row as NV[]));
+		this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
+		return this;
+	}
+
+	addArrow (arrow : Array<[string, string]>) : this {
+		if (this.nvss === undefined)
+			this.nvss = [];
+
+		this.nvss = this.nvss.concat([arrow]);
+		return this;
+	}
+
+	/**
+	 * Set inserting value(s).
 	 * Becareful about function name - 'values' shall be reserved.
 	 * @param n_row field name or n-v array<br>
 	 * n_row can be typically return of jqueyr serializeArray, a.k.a [{name, value}, ...].<br>
@@ -1028,38 +1116,40 @@ export class InsertReq extends UpdateReq {
 	 * @param v value if n_row is name. Optional.
 	 * @return this
 	 */
-	valus (n_row : string | Array<string>, v : string) : this {
+	valuss (n_row : string | Array<string[]> | Array<NV>, v? : string) : this {
 		if (this.nvss === undefined)
 			this.nvss = [];
 
-		var warned = false;
+		// var warned = false;
 		if (Array.isArray(n_row)) {
 			if (Array.isArray(n_row[0])) {
-				// already a 2-d array
-				if (Array.isArray(n_row[0][0]) && !warned) {
-					console.warn('InsertReq is trying to handle multi rows in on value call, it is wrong. You must use InsertReq.nvRows(rows) instead.',
-							n_row);
-					warned = true;
-					this.nvss = this.nvss.concat(n_row);
-				}
-				else {this.nvss = this.nvss.concat([n_row]);}
+				throw Error("This branch is replaced by addArrow().");
+				// // already a 2-d array
+				// if (Array.isArray(n_row[0][0]) && !warned) {
+				// 	console.warn('InsertReq is trying to handle multi rows in on value call, it is wrong. You must use InsertReq.addArrows(rows) instead.',
+				// 			n_row);
+				// 	warned = true;
+				// 	this.nvss = this.nvss.concat(n_row);
+				// }
+				// else this.nvss = this.nvss.concat([n_row]);
 			}
 			else {
 				// guess as a n-v array
-				if (this.cols === undefined)
-					this.columns(Protocol.nvs2cols(n_row as unknown as NameValue[]));
-				this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
+				throw Error("This branch is replaced by addNvrow().");
+				// if (this.cols === undefined)
+				// 	this.columns(Protocol.nvs2cols(n_row as NV[]));
+				// this.nvss = this.nvss.concat([Protocol.nvs2row(n_row)]);
 			}
 		}
 		else if (typeof n_row === 'string'){
-            console.error("shouldn't reach here in ts.");
-			this.columns(n_row as unknown as DbCol);
-			if (this.nvss.length == 0) {
-				this.nvss.push([[n_row, v]]);
-			}
-			else {
-				this.nvss[0].push([n_row, v]);
-			}
+			throw Error("This branch is replaced by nv().");
+			// this.columns(n_row as unknown as DbCol);
+			// if (this.nvss.length == 0) {
+			// 	this.nvss.push([[n_row, v]]);
+			// }
+			// else {
+			// 	this.nvss[0].push([n_row, v]);
+			// }
 		}
 		else console.error('Error when setting n-v with', n_row, v,
 			'Check the type of n - only string for column, or n is an array represeting a row\'s n-vs!');
@@ -1070,10 +1160,21 @@ export class InsertReq extends UpdateReq {
 	 * Actrually we only need this final data for protocol. Let's avoid redundent conversion.
 	 * [[["funcId", "sys"], ["roleId", "R911"]], [["funcId", "sys-1.1"], ["roleId", "R911"]]]
 	*/
-	nvRows(rows) {
-		if (Array.isArray(rows)) {
-			for (var ix = 0; ix < rows.length && Array.isArray(rows[ix]); ix++) {
-				this.valus(rows[ix], undefined);
+	rows(rows: Array<NameValue[]> | Array<NV[]>) {
+		if (Array.isArray(rows) && rows.length > 0 && Array.isArray(rows[0])) {
+			for (var ix = 0; ix < rows.length; ix++) {
+				// this.valuss(rows[ix]);
+				this.addNvrow(rows[ix]);
+			}
+		}
+		return this;
+	}
+
+	rowsArr(rows: Array<Array<[string, string]>>) {
+		if (Array.isArray(rows) && rows.length > 0 && Array.isArray(rows[0])) {
+			for (var ix = 0; ix < rows.length; ix++) {
+				// this.valuss(rows[ix]);
+				this.addArrow(rows[ix]);
 			}
 		}
 		return this;
@@ -1151,10 +1252,13 @@ export class AnsonResp extends AnsonBody {
      * rows: array like [ {col1: val1, ...}, ... ], <br>
      * e.g. if [results: {'01', 'fname'}], return [{n: 'fname', v: '01'}, ...]
      */
-    static rs2nvs(rs: AnResultset, nv: NV): {cols: Array<string>, rows: Array<NV>} {
+    static rs2nvs(rs: AnResultset | undefined, nv: NV): {cols: Array<string>, rows: Array<NV>} {
 		let cols = [];
 		let rows = [];
 		let ncol = -1, vcol = -1;
+
+		if (!rs)
+			return {cols: [], rows: []};
 
 		if (typeof(rs.colnames) === 'object') {
 			// rs with column index
@@ -1224,32 +1328,31 @@ export class AnsonResp extends AnsonBody {
 }
 
 export class AnSessionResp extends AnsonResp {
+	static __type__ = "io.odysz.semantic.jsession.AnSessionResp";
+
 	ssInf: SessionInf;
+
+	/** Any type of Anson.
+	 * @since 0.9.99 (Semantic.jser v 1.5.0)
+	 */
+	profile: object;
 
 	constructor(ssResp) {
 		super(ssResp);
 		this.ssInf = ssResp.ssInf;
+		this.profile = ssResp.profile;
 	}
 }
+Protocol.registerBody(AnSessionResp.__type__, (json) => new AnSessionResp(json));
 
-export class AnTreeNode {
-	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	node : {
-		// id: string;
-		children?: Array<AnTreeNode>;
-		css?: CSS.Properties;
-		/** Any data by jserv */
-		[d: string]: any;
-	};
-	id: string;
-	level: number;
-	parent: string;
-}
-
+/**
+ * type: io.odysz.semantic.ext.AnDatasetResp,
+ * planned to be replaced by DatasetierResp
+ */
 export class AnDatasetResp extends AnsonResp {
-	forest: Array<AnTreeNode>;
+	forest: Array<Tierec>;
 
-	constructor(dsJson: { forest: AnTreeNode[]; }) {
+	constructor(dsJson: { forest: Tierec[]; }) {
 		super(dsJson);
 		this.forest = dsJson.forest;
 	}
@@ -1263,18 +1366,20 @@ export interface DatasetOpts {
 	/** API args should ignore this */
 	port?: string;
 	/**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
-	uri: string;
+	uri?: string;
 	/** semantic key configured in WEB-INF/dataset.xml */
 	sk: string;
 	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
-	t?: /** load dataset configured and format into tree with semantics defined by sk. */
-		"sqltree" |
-		/** Reformat the tree structure - reformat the 'fullpath', from the root */
-		"retree" |
-		/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
-		"reforest" |
-		/** Query with client provided QueryReq object, and format the result into tree. */
-		"query",
+	// t?: /** load dataset configured and format into tree with semantics defined by sk. */
+	// 	"sqltree" |
+	// 	/** Reformat the tree structure - reformat the 'fullpath', from the root */
+	// 	"retree" |
+	// 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+	// 	"reforest" |
+	// 	/** Query with client provided QueryReq object, and format the result into tree. */
+	// 	"query",
+	t?: stree_t | keyof DatasetierReq['A'];
+
 	a?: string;
 	/**if t is null or undefined, use this to replace maintbl in super (QueryReq), other than let it = sk. */
 	mtabl?: string;
@@ -1308,7 +1413,7 @@ export class DatasetReq extends QueryReq {
 		this.rootId = rootId;
 
 		this.TA(t || a);
-		this.checkt((t || a) as unknown as string);
+		// this.checkt((t || a) as unknown as string);
 	}
 
     maintbl: string;
@@ -1337,7 +1442,7 @@ export class DatasetReq extends QueryReq {
 	 * @param ask
 	 * @returns
 	 */
-	TA(ask: string | any[] | {
+	TA(ask: string | {
 			/** load dataset configured and format into tree with semantics defined by sk. */
 			sqltree: string;
 			/** Reformat the tree structure - reformat the 'fullpath', from the root */
@@ -1347,13 +1452,19 @@ export class DatasetReq extends QueryReq {
 			/** Query with client provided QueryReq object, and format the result into tree. */
 			query: string;
 		}) {
-		if (typeof ask === 'string' && ask.length > 0 && ask !== stree_t.sqltree) {
+
+		if (typeof ask === 'string' && ask.length > 0 && ask === stree_t.sqltree) {
+			console.info('Since @anclient/semantier 0.9.98, A = stree_t.sqltree is deprecated and replaced with DatasetierREq.A.stree, ', DatasetierReq.A.stree);
+			this.a = DatasetierReq.A.stree;
+		}
+
+		if (typeof ask === 'string' && ask.length > 0 && ask !== DatasetierReq.A.stree) {
 			console.info('DatasetReq.a is ignored for sk is defined.', ask);
-			this.a = stree_t.sqltree;
+			this.a = DatasetierReq.A.stree;
 		}
 		else {
 			this.a = ask as string;
-			this.checkt(ask as string);
+			// this.checkt(ask as string);
 		}
 		return this;
 	}
@@ -1379,12 +1490,16 @@ export class DatasetReq extends QueryReq {
 		return this;
     }
 
-    /**@deprecated let's user type checking
-     * Check is t can be undertood by s-tree.serv
-     * TODO why not asking server for stree_t?
-     * @param {string} t*/
+    /**
+	 * @deprecated lagacy of without type checking 
+	 * 
+     * Check is t if port is stree can be undertood by s-tree.serv
+	 * 
+     * @param {string} t
+	 * @return this
+	 */
     checkt(t: string): DatasetReq {
-		if (t !== undefined && !stree_t.hasOwnProperty(t)) {
+		if (t !== undefined && !DatasetierReq.A.hasOwnProperty(t)) {
 			console.warn(
 				"DatasetReq.t won't be understood by server:", t, "\n 't (a)' should be one of Protocol.stree_t's key.",
 				Object.keys(stree_t));
@@ -1393,9 +1508,16 @@ export class DatasetReq extends QueryReq {
     }
 }
 
+/**
+ * @deprecated replaced by {@link DatasetierReq.A}
+ */
 export enum stree_t {
-	/** load dataset configured and format into tree with semantics defined by sk. */
+	/**
+	 * Load dataset configured and format into tree with semantics defined by sk.
+	 * @deprecated replaced by {@link DatasetierReq.A.stree}
+	 */
 	sqltree = 'sqltree',
+
 	/** Reformat the tree structure - reformat the 'fullpath', from the root */
 	retree = 'retree',
 	/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
@@ -1408,16 +1530,29 @@ export class DatasetierReq extends AnsonBody {
 	static __type__ = "io.odysz.semantic.tier.DatasetierReq";
 
     static A = {
-        sks: 'r/sks'
+        sks: 'r/sks',
+
+		/** Load dataset configured and format into tree with semantics defined by sk. */
+		stree: 'r/stree',
+
+		/** Reformat the tree structure - reformat the 'fullpath', from the root */
+		retree: 'retree',
+		/** Reformat the forest structure - reformat the 'fullpath', for the entire table */
+		reforest: 'reforest',
+		/** Query with client provided QueryReq object, and format the result into tree. */
+		query: 'query'
     };
 
     constructor(opts: any) {
 		super(opts);
-	    this.type = DatasetierReq.__type__;
-    }
+		this.type = DatasetierReq.__type__;
+	}
 }
 Protocol.registerBody(DatasetierReq.__type__, (json) => new DatasetierReq(json));
 
+/**
+ * type: io.odysz.semantic.tier.DatasetierResp
+ */
 export class DatasetierResp extends AnsonResp {
 	static __type__ = "io.odysz.semantic.tier.DatasetierResp";
 	sks: string[];
@@ -1432,18 +1567,9 @@ Protocol.registerBody(DatasetierResp.__type__, (json) => new DatasetierResp(json
 
 export class DocsReq extends AnsonBody {
 	static __type__ = 'io.odysz.semantic.tier.docs.DocsReq';
-	// static __init__ = function () {
-	// 	// Design Note:
-	// 	// can we use dynamic Protocol?
-	// 	Protocol.registerBody(DocsReq.__type__, (jsonBd) => {
-	// 		return new DocsReq(jsonBd);
-	// 	});
-	// 	return undefined;
-	// }();
 
 	static A = {
 		records: 'r/list',
-		// mydocs: 'r/my-docs',
 		rec: 'r/rec',
 		upload: 'c/doc',
 		insert: 'c',
@@ -1465,7 +1591,6 @@ export class DocsReq extends AnsonBody {
 	 */
 	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super({uri, type: DocsReq.__type__});
-		// this.type = DocsReq.__type__;
 		this.docId = args.docId;
 		this.docName = args.docName;
 		this.mime = args.mime;

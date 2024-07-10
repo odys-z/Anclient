@@ -14,6 +14,7 @@ The app can running on Android accessing local files and synchronizing files wit
 
 - The media file picker is based on [fishwjy/MultiType-FilePicker](https://github.com/fishwjy/MultiType-FilePicker)
 
+- Documents picker is based on [HBiSoft/PickiT](https://github.com/HBiSoft/PickiT)
 
 # Troubleshootings
 

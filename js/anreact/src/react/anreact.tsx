@@ -1,8 +1,10 @@
 
 import $ from 'jquery';
 
+import * as CSS from 'csstype';
 import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames, NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
+	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames,
+	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
@@ -14,11 +16,49 @@ export interface ClassNames {[c: string]: string};
 
 export interface Media { isLg?: boolean; isMd?: boolean; isSm?: boolean; isXs?: boolean; isXl?: boolean; };
 
+export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+/**
+ * Find out hide an element or not for the grid setting and media width.
+ *
+ * TIP: to avoid ReactJS reporting warning like this:
+ *
+ * Invalid prop supplied to `ForwardRef(Grid)`, expected a ReactNode,
+ *
+ * do not return boolean in render() like this:
+ *
+ * <Grid>hide(col.grid, this.props.media) || <></></Grid>
+ *
+ * @param grid
+ * @param media
+ * @returns expample:
+ *
+ * grid {xs: false, sm: false}
+ *
+ * for
+ * media {xs: true, sm: true, md: true}, will return false
+ *
+ * for
+ * media {xs: true, sm: true, md: false}, will return true
+ */
+export function hide(grid: {
+		xs?: boolean | GridSize; sm?: boolean | GridSize;
+		md?: boolean | GridSize; lg?: boolean | GridSize; },
+		media: Media = {}) {
+	let {isXl, isLg, isMd, isSm, isXs} = media;
+	return (
+	 	grid.lg === false && !isXl && (isLg || isMd || isSm || isXs)
+	 || grid.md === false && !isLg && !isXl && (isMd || isSm || isXs)
+	 || grid.sm === false && !isMd && !isLg && !isXl && (isSm || isXs)
+	 || grid.xs === false && !isSm && !isMd && !isLg && !isXl && isXs
+	);
+}
+
 /**
  * Component's visual options, e.g. options for field formatters.
  */
 export interface CompOpts {
-	classes: ClassNames;
+	classes?: ClassNames;
 	media?: Media;
 }
 
@@ -29,9 +69,8 @@ export interface QueryPage {
 
 export function toPageInf(query: QueryPage) : PageInf {
 	let p = new PageInf(query.pageInf.page, query.pageInf.size);
-	p.condts = [];
 	query.query?.forEach( (q, x) => {
-		p.condts.push( [q.field, typeof q.val === 'string' ? q.val : q.val?.v] );
+		p.nv(q.field, typeof q.val === 'string' ? q.val : q.val?.v);
 	});
 
 	return p;
@@ -45,7 +84,8 @@ export const invalidStyles = {
 	minLen : { border: "1px solid red" },
 } as {[n in InvalidClassNames]: CSSProperties};
 
-export function toReactStyles(styles: CSSStyleDeclaration): CSSProperties {
+export function toReactStyles(styles: CSS.Properties ) {
+// export function toReactStyles(styles: CSSStyleDeclaration | undefined): CSSProperties {
 	return styles as unknown as CSSProperties;
 }
 
@@ -55,8 +95,14 @@ export function toReactStyles(styles: CSSStyleDeclaration): CSSProperties {
  */
 export class AnReact {
 
+	/**
+	 * @deprecated This pattern is planned to be deprecated in the future of 0.4.35,
+	 * because this instance will be a redundant one of the tier.client and will cause trouble like ssinf lost.
+	 */
     client: SessionClient;
+
     ssInf: any;
+
 	errCtx: ErrorCtx;
 	/**@param {SessionClient} ssClient client created via login
 	 * @param {object} errCtx, AnContext.error, the app error handler
@@ -73,29 +119,18 @@ export class AnReact {
 	 */
 	bindTablist(req: AnsonMsg<AnsonBody>, comp: CrudComp<Comprops>, errCtx: ErrorCtx) {
 		this.client.commit(req, (qrsp) => {
-			// if (req.onLoad)
-			// 	req.onLoad(qrsp);
-			// else if (req.onOk)
-			// 	req.onLoad(qrsp);
-			// else {
-				let rs = qrsp.Body().Rs();
-				let {rows} = AnsonResp.rs2arr( rs );
-				// comp.pageInf?.total! = rs.total;
-				comp.setState({rows});
-			// }
+			let rs = qrsp.Body().Rs();
+			let {rows} = AnsonResp.rs2arr( rs );
+			comp.setState({rows});
 		}, errCtx );
 	}
 
 	/**
-	 * Post a request, qmsg.req of AnsonMsg to jserv.
-	 * If suceed, call qmsg.onOk (onLoad) or set rs in respons to component's state.
+	 * Post a request, qmsg.req of AnsonMsg, to jserv.
+	 * If suceed, call qmsg.onOk (onLoad) or set rs' rows in respons to component's state.
 	 * This is a helper of simple form load & bind a record.
-	 * @param {object} qmsg
-	 * @param {AnContext.error} errCtx
-	 * @param {React.Component} compont
-	 * @return {AnReact} this
-	 * */
-	bindStateRec( qmsg: { onOk?: any; onLoad?: any; req?: any; }, errCtx: ErrorCtx,
+	 */
+	bindStateRec( qmsg: { onOk?; onLoad?; req?; }, errCtx: ErrorCtx,
 				  compont: { setState: (arg0: { record: {}; }) => void; }) {
 		let onload = qmsg.onOk || qmsg.onLoad ||
 			// try figure out the fields
@@ -117,7 +152,8 @@ export class AnReact {
 		return this;
 	}
 
-	/**Try figure out serv root, then bind to html tag.
+	/**
+	 * Try figure out serv root, then bind to html tag.
 	 * First try ./private/host.json<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
@@ -221,19 +257,36 @@ export class AnReactExt extends AnReact {
 		return this;
 	}
 
-	/** Load jsample.serv dataset. (using DatasetReq or menu.serv).
+	/**
+	 * Load jsample.serv dataset. (using DatasetReq or menu.serv).
 	 * If opts.onOk is provided, will try to bind stree like this:
-	 <pre>
+	 @example
 	let onload = onOk || function (c, resp) {
 		if (compont)
 			compont.setState({stree: resp.Body().forest});
-	}</pre>
+	}
+
+	// usage:
+	let that = this;
+	let ds = {uri, sk: this.sk, t: 'tagtrees',
+	  port?: 'optional-port-name', // default s-tree.serv
+	  onOk: (e) => {
+	    that.confirm = (<ConfirmDialog
+			title={L('Info')}
+			ok={L('OK')} cancel={false} open
+			onOk={ that.del }
+			onClose={() => {that.confirm = undefined;} }
+			msg={L('Updating quiz teamplates finished!')}
+	    />);
+	    that.setState({});
+	  }};
+	this.context.uiHelper.stree(ds, this.context.error);
+
 	 * @param opts dataset info {sk, sqlArgs, onOk}
 	 * @param component
 	 * @return this
 	 */
 	stree(opts: DatasetOpts, component: CrudComp<Comprops>): void {
-		// let {uri, onOk} = opts;
 		let {onOk} = opts;
 
 		let onload = onOk || function (resp: AnsonMsg<AnDatasetResp>) {
@@ -247,10 +300,10 @@ export class AnReactExt extends AnReact {
 	rebuildTree(opts: DatasetOpts, onOk: (resp: any) => void) {
 		let {uri, rootId} = opts;
 		if (!uri)
-			throw Error('Since v0.9.50, Anclient need request need uri to find datasource.');
+			throw Error('opts.uri is required. Since v0.9.50, Anclient requests need client function uri to find datasource.');
 
 		if (!rootId)
-			console.log('Rebuild tree without rootId ?');
+			console.warn('Rebuild tree without rootId ?');
 
 		opts.port = 'stree';
 
@@ -260,13 +313,14 @@ export class AnReactExt extends AnReact {
 		}
 
 		let onload = onOk || function (resp: any) {
-			console.log("Rebuilt successfully: ", resp);
+			// console.log("Rebuilt successfully: ", resp);
 		}
 
 		this.dataset(opts, onload);
 	}
 
-	/**Bind dataset to combobox options (comp.state.condCbb).
+	/**
+	 * Bind dataset to combobox options (comp.state.condCbb).
 	 * Option object is defined by opts.nv.
 	 *
 	 * <h6>About React Rendering Events</h6>
@@ -310,8 +364,6 @@ export class AnReactExt extends AnReact {
 
 		nv = nv || {n: 'name', v: 'value'};
 
-		// let loading = true;
-
 		this.dataset( {
 				port: 'dataset',
 				uri,
@@ -323,14 +375,11 @@ export class AnReactExt extends AnReact {
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
 					console.error("Can't find data in rs for cbb item's label - needing column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}",
-						 "rs columns: ", rs?.colnames);
+						"rs columns: ", rs?.colnames);
 
 				let { cols, rows } = AnsonResp.rs2nvs( rs, nv );
 				if (!noAllItem)
 					rows.unshift(AnConst.cbbAllItem);
-				// this.options = rows;
-
-				// loading = false;
 
 				if (onLoad)
 					onLoad(cols, rows);

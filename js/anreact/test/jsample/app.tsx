@@ -62,7 +62,7 @@ class App extends React.Component<Approps> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.logout = this.logout.bind(this);
+		this.goPortal = this.goPortal.bind(this);
 
 		this.errorCtx = {onError: this.onError, msg: ''};
 		// Will load anclient from localStorage.
@@ -71,7 +71,7 @@ class App extends React.Component<Approps> {
 								// .extendPorts(StarPorts);
 
 		this.onErrorClose = this.onErrorClose.bind(this);
-		this.logout = this.logout.bind(this);
+		this.goPortal = this.goPortal.bind(this);
 
 
 		// singleton error handler
@@ -130,42 +130,18 @@ class App extends React.Component<Approps> {
 
 	onErrorClose(code: string) {
 		if (code === Protocol.MsgCode.exSession) {
-			this.logout();
+			this.goPortal();
 		}
 		this.errorMsgbox = undefined;
 		this.setState({});
 	}
 
-	/** For navigate to portal page
-	 * FIXME this should be done in SysComp, while firing goLogoutPage() instead.
-	 * */
-	logout() {
-		let that = this;
-		// leaving
-		try {
-			this.anClient.logout(
-				() => {
-					if (this.props.iwindow)
-						this.props.iwindow.location = this.state.iportal;
-				},
-				{ onError: (c, e) => { cleanup (that); } }
-				);
-		}
-		catch(_) {
-			cleanup (that);
-		}
-		finally {
-			this.anClient.ssInf = undefined as unknown as SessionInf;
-		}
-
-		function cleanup(app: App) {
-			if (app.anClient.ssInf) {
-				localStorage.removeItem(SessionClient.ssInfo);
-				this.anClient.ssInf = undefined;
-			}
-			if (app.props.iwindow)
-				app.props.iwindow.location = app.state.iportal;
-		}
+	/**
+	 * For navigating to portal page
+	 */
+	goPortal() {
+		if (this.props.iwindow)
+			this.props.iwindow.location = this.state.iportal;
 	}
 
 	render() {
@@ -177,7 +153,7 @@ class App extends React.Component<Approps> {
 				pageOrigin: window ? window.origin : 'localhost',
 				servId: this.state.servId,
 				servs: this.props.servs,
-				anClient: this.anClient, // as typeof SessionClient | Inseclient,
+				anClient: this.anClient,
 				uiHelper: this.anReact,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
@@ -187,7 +163,7 @@ class App extends React.Component<Approps> {
 				<Sys menu='sys.menu.jsample'
 					sys={L('AnReact')} menuTitle={L('Sys Menu')}
 					myInfo={myInfoPanels}
-					onLogout={this.logout} />
+					onLogout={this.goPortal} />
 				{this.errorMsgbox}
 			</AnContext.Provider>
 		</MuiThemeProvider>);
@@ -223,7 +199,6 @@ class App extends React.Component<Approps> {
 	 * [opts.iportal='index.html'] page showed after logout
 	 */
 	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
-	// static bindHtml(elem: string, opts: {serv: string, portal?: string}) : void {
 		let portal = opts.portal || 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);

@@ -1,14 +1,17 @@
-import { SessionClient, Inseclient } from "./anclient";
-import { toBool, isEmpty } from "./helpers";
+import { SessionClient, Inseclient, AnTreeNode } from "./anclient";
+import { toBool, isEmpty, str, len } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
 	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, NV, PageInf, AnTreeNode, PkVal, NameValue, DatasetOpts, DatasetReq, UIRelations, relFK
+	DbCol, DbRelations, NV, PageInf, PkVal, NameValue, DatasetOpts, DatasetReq, DatasetierReq
 } from "./protocol";
 
+export { toBool, isEmpty };
+export * from "./helpers";
 export type GridSize = 'auto' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-/**UI Element Formatter
+/**
+ * UI Element Formatter
  *
  * E.g. TRecordForm will use this to format a field in form.
  * Currently tiers also accept this as field modifier. (FIXME - to be optimized)
@@ -18,8 +21,8 @@ export type AnElemFormatter = ( (
 	col: DbCol,
 	/**column index or record for the row */
 	rec: number | Tierec | AnTreeNode,
-	opts?: object
-) => UIComponent );
+	opts?: any
+) => any );
 
 export type InvalidClassNames = "ok" | "anyErr" | "notNull" | "maxLen" | "minLen";
 
@@ -53,20 +56,34 @@ export interface ErrorCtx {
 		code: string, resp: AnsonMsg<AnsonResp>) => void
 }
 
-/** List column / record field (UI) Type
- * - dynamic-cbb' type is a combobox changing code/value options for each row.
+/**
+ * List column / record field (UI) Type
+ * 
+ * Should be a valid HTML5 input type. (extended with enum, select)
+ * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Form_%3Cinput%3E_types
+ * 
+ * - dynamic-cbb: column / cell is a combobox changing code/value options for each row.
+ * 
+ * - icon-sum   : column / cell is formatted by hard coded formatters,
+ * 
+ *		for anreact/src/react/widgets/tree-editor/TreeGallaryComp [columns], the cell is formatted by formatFolderIcons().
  */
-export type ColType = 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'formatter';
+export type ColType = 'formatter' | 'autocbb' | 'cbb' | 'dynamic-cbb' | 'text' | 'iconame' | 'date' | 'number' | 'int' | 'float' | 'bool' | 'actions' | 'icon-sum';
 
 export interface TierCol extends DbCol {
-	/**input type / form type, not db type
+	/**
+	 * Input type / form type, not db type.
+	 * 
 	 * - actions: user bottons, to be removed
 	 * - formatter: user function for UI element
 	 */
 	type?: ColType;
 
-    /**Activated style e.g. invalide style, and is different form AnlistColAttrs.css */
-    style?: string;
+    /**
+	 * Activated style e.g. invalide style, and is different form AnlistColAttrs.css
+     * TODO: style?: 'maxLen' | 'notNull' | 'ok';// any; //string;
+	 */
+    style?: any;
 
 	validator?: AnFieldValidator | AnFieldValidation;
 
@@ -76,8 +93,9 @@ export interface TierCol extends DbCol {
     checkbox?: boolean;
 }
 
-/**Meta data handled from tier (DB field).
- *
+/**
+ * List's columns to be handled by tier.
+ * 
  * This type need 2 parameters:
  *
  * F: UI field type, e.g. JSX.Element;
@@ -89,56 +107,89 @@ export interface AnlistColAttrs<F, FO> extends TierCol {
     label?: string;
 
     opts?: FO;
+
+	/**
+	 * Column cell formatter. Usually return type of F.
+	 * 
+	 * NOTE: for tree, gride etc. the formatter is AnTreegridCol.colFormatter() 
+	 */
     formatter?: AnElemFormatter;
+
+	/**Details form field formatter. */
     fieldFormatter?: AnFieldFormatter<F, FO>;
 
     valid?: boolean;
 
-    css?: CSSStyleDeclaration;
-    grid?: {sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
+	/**TODO move this to @anclient/anreact */
+    // css?: CSSStyleDeclaration;
+
+	/**TODO move this to @anclient/anreact */
+    grid: {xs?: boolean | GridSize; sm?: boolean | GridSize; md?: boolean | GridSize; lg?: boolean | GridSize};
+
+	/**TODO move this to @anclient/anreact */
 	box?: {};
 
 	val?: any;  // FIXME: should we extends a editable type?  (check ag-grid)
 }
 
-/**Record handled from tier */
+/**
+ * Record handled from tier.
+ * 
+ * Java equivolant for this is java.lang.Object.
+ */
 export interface Tierec {
-	[f: string]: string | number | boolean | object | undefined;
+	[f: string]: string | number | boolean | object | undefined | null;
 }
 
-/**E.g. form's combobox field declaration */
-export interface TierComboField<F, FO> extends AnlistColAttrs<F, FO> {
+/**E.g. form's combobox field declaration
+ * 
+ * TODO rename as QueryField
+ */
+export interface TierComboField extends AnlistColAttrs<any, any> {
 	uri: string;
+	/** Only for cbb */
 	sk : string;
 	nv?: NV;
 	options?: Array<NV>
+ 	noAllItem?: boolean;
 
+ 	/** is cbb clean */
+ 	clean?: boolean; 
 	loading?: boolean;
 	sqlArgs?: string[];
 	sqlArg? : string;
+
+	/** UI Dom etc. for data operation */
+	ref: any;
 }
 
 export interface Tierelations extends DbRelations {
 }
 
-/**Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
- * @deprecated
+/**
+ * Query condition item, used by AnQueryForm, saved by CrudComp as last search conditions - for pagination.
+ * 
+ * @deprecated: Aug 21. 2023, not yet?
  */
-export interface QueryConditions {
-	pageInf?: PageInf;
-	[q: string]: string | number | object | boolean;
-}
+// export interface QueryConditions {
+// 	pageInf?: PageInf;
+// 	[q: string]: string | number | object | boolean;
+// }
 
 /**
+ * Client side context for Anclient to work in.
  * Not the same as java Semantext.
+ * 
  * { client: SessionClient | InsecureClient, anReact: AnReact, errCtx : ErrorCtx }
  */
 export interface Semantext {
-    anClient: SessionClient;
+	/** For Login, this can be undefined */
+    anClient?: SessionClient;
+
 	/**
-	 * FIXME rename as TSHelper:
+	 * FIXME rename as presentier:
 	 * 
-	 * Gloabal UI helper, e.g. AnReact
+	 * Gloabal UI presentation tier toolkit, e.g. AnReact
 	 */
     uiHelper: any;
     error: ErrorCtx;
@@ -156,17 +207,6 @@ export interface UIComponent {
  */
 export class Semantier {
     uiHelper: any;
-    /**
-     *
-     * @param props
-     */
-    constructor(props: UIComponent & {pkval?: PkVal}) {
-        if (!props || !props.uri)
-            throw Error("uri is required!");
-
-        this.uri = props.uri;
-        this.pkval = props.pkval || {pk: undefined, v: undefined};
-    }
 
     /** list's columns */
     _cols: Array<TierCol>;
@@ -182,19 +222,29 @@ export class Semantier {
     /** current pk value */
     pkval: PkVal = {pk: undefined, v: undefined};
     /** current record */
-    rec: Tierec;
+    rec: Tierec | undefined;
 
     /** All sub table's relationships */
     relMeta: {[tabl: string]: Tierelations};
 
-    /** currrent relation table - wrong */
-    // reltabl: string;
+    /**
+     *
+     * @param props
+     */
+    constructor(props: UIComponent & {pkval?: PkVal}) {
+        if (!props || !props.uri)
+            throw Error("uri is required!");
+
+        this.uri = props.uri;
+        this.pkval = props.pkval || {pk: undefined, v: undefined};
+		this.rels = {};
+    }
 
     /** current relations - the last loaded relation of this.rel (problem?)
 	 *
 	 * Looks like all relationship records are item of main tree.
 	 */
-    rels: UIRelations = {};
+    rels: {[tbl: string]: AnTreeNode[]};
 
     /**
      * @param context
@@ -209,12 +259,11 @@ export class Semantier {
 		return this;
 	}
 
-	/**TODO check widgets right
-	 *
+	/**
 	 * @param field
-	 * @returns
-	 */
-	isReadonly(field: TierCol) {
+	 * @returns read only
+	*/
+	isReadonly(_field: TierCol) {
 		return false;
 	}
 
@@ -264,7 +313,7 @@ export class Semantier {
 				let vd = f.validator;
 				if(vd.notNull && (v === undefined || v === null || (v as string | Array<any>).length === 0))
 					return 'notNull';
-				else if (vd.len && v && (v as string | Array<any>).length > vd.len)
+				else if (vd.len && v && (v as string | Array<any>).length > Number(vd.len))
 					return 'maxLen';
 				return 'ok';
 			}
@@ -327,8 +376,10 @@ export class Semantier {
 	 * @param onOk
 	 */
     relations( client: SessionClient | Inseclient,
-		opts: { uri: string; reltabl: string;
-				sqlArgs?: string[]; sqlArg?: string; } ,
+		opts: { uri?: string;
+				reltabl?: string;
+				sqlArgs?: string[];
+				sqlArg?: string; } ,
 		onOk: OnCommitOk): void {
 
 		let that = this;
@@ -344,17 +395,19 @@ export class Semantier {
 		if (!stree)
 			throw Error('TODO ...');
 
-		let t = stree_t.sqltree;
+		let t = DatasetierReq.A.stree;
 
 		let ds = {uri : this.uri,
 			sk: stree.sk, t, sqlArgs,
 		};
 
-		Semantier.stree(ds, client,
-				(resp: AnsonMsg<AnDatasetResp>) => {
-					that.rels[reltabl] = resp.Body().forest;
-					onOk(resp)
-				},
+		Semantier.stree(
+			ds as DatasetOpts,
+			client,
+			(resp: AnsonMsg<AnDatasetResp>) => {
+				that.rels[reltabl] = resp.Body().forest as AnTreeNode[];
+				onOk(resp)
+			},
 			this.errCtx);
     }
 
@@ -363,7 +416,7 @@ export class Semantier {
 	 * @param conds
 	 * @param onLoad
 	 */
-    record(conds: QueryConditions | PageInf, onLoad: OnLoadOk<Tierec>) : void {
+    record(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
     }
 
 	/** Load records of conditions.
@@ -371,7 +424,7 @@ export class Semantier {
 	 * @param conds QueryConditions type is deprecated
 	 * @param onLoad
 	 */
-    records(conds: QueryConditions | PageInf, onLoad: OnLoadOk<Tierec>) : void {
+    records(conds: PageInf, onLoad: OnLoadOk<Tierec>) : void {
 	}
 
     /**
@@ -413,7 +466,7 @@ export class Semantier {
 				// TODO to be verified
 				// Try figure out pk value - auto-key shouldn't have user fill in the value in a form
 				if (isEmpty(this.pkval.v))
-					this.pkval.v = this.rec[this.pkval.pk];
+					this.pkval.v = str(this.rec[this.pkval.pk]);
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, 'update',
@@ -455,14 +508,14 @@ export class Semantier {
      * @param onOk: ;
      */
     del(opts: {
-        ids: Array<string>;
+        ids: Map<string, Tierec>;
         posts?: Array<AnsonBody>;
     }, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;
 		let { ids, posts } = opts;
 
-		if (ids && ids.length > 0) {
+		if (ids && len(ids) > 0) {
 			let req = client
 				.usrAct(this.pkval.tabl, CRUD.d, 'delete')
 				.deleteMulti(this.uri, this.pkval.tabl, this.pkval.pk, [...ids]);
@@ -525,9 +578,7 @@ export class Semantier {
 		else {
 			// e.g. delete from a_role_func where roleId = '003'
 			let del_rf = new DeleteReq(uri, rel.childTabl,
-							[rel.fk, parentpkv.v])
-							//[rel.fk, rel.col])
-							// .whereEq(rel.col, parentpkv.v)
+							[rel.fk, str(parentpkv.v)])
 							.post(insRels);
 
 			if (req)
@@ -567,7 +618,7 @@ export class Semantier {
 
 		collectTree(forest, rows);
 
-		ins.nvRows(rows);
+		ins.rows(rows);
 		return ins;
 
 		/**
@@ -645,31 +696,32 @@ export class Semantier {
 	 * @param errCtx
 	 */
 	static dataset(ds: DatasetOpts, client: SessionClient | Inseclient, onLoad: OnCommitOk, errCtx: ErrorCtx): void {
-		// let ssInf = this.client.ssInf;
-		let {uri, sk, sqlArgs, t, rootId} = ds;
+		let {uri, sk, sqlArgs, t, a, rootId} = ds;
 		sqlArgs = sqlArgs || [];
 		let port = ds.port ||'dataset';
 
 		let reqbody = new DatasetReq({
-				uri, port,
+				uri, port, t, a,
 				mtabl: undefined,
 				sk, sqlArgs, rootId
 			})
-			.TA(t || stree_t.query);
+			.TA(t || DatasetierReq.A.query);
 		let jreq = client.userReq(uri, port, reqbody, undefined);
 
 		client.an.post(jreq, onLoad, errCtx);
 	}
 
-	/** Load jsample.serv dataset. (using DatasetReq or menu.serv).
+	/**
+	 * Load jsample.serv dataset. (using DatasetReq or menu.serv).
 	 * If opts.onOk is provided, will try to bind stree like this:
 	 <pre>
 	let onload = onOk || function (c, resp) {
 		if (compont)
 			compont.setState({stree: resp.Body().forest});
 	}</pre>
-	 *
-	 * @param opts dataset info {sk, sqlArgs, onOk}
+	 * @since 0.9.86 opts.port can be overriden, with which user can modify s-tree service at server side.
+	 * @param opts dataset info {sk, sqlArgs, onOk, port}
+	 * where port is using s-tree if undefined.
 	 * @param client
 	 * @param onLoad
 	 * @param errCtx
@@ -681,10 +733,16 @@ export class Semantier {
 			throw Error('Since v0.9.50, Anclient request needs function uri to find datasource.');
 
 		if (opts.sk && !opts.t)
-			opts.a = stree_t.sqltree;
+			// opts.a = stree_t.sqltree;
+			opts.a = DatasetierReq.A.stree;
+		
+		if (!opts.a)    // FIXME, t should be deprecated
+			opts.a = opts.t;
 
-		opts.port = 'stree';
+		opts.port = opts.port || 'stree';
 
 		Semantier.dataset(opts, client, onLoad, errCtx);
 	}
 }
+
+

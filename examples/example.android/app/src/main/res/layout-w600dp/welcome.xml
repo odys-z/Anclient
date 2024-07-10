@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/events"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="@id/activity_main">
+
+        <TextView
+            android:visibility="invisible"
+            android:id="@+id/tv_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <WebView
+            android:id="@+id/wv_welcome"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bar_home_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingTop="18dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        tools:context="com.vincent.filepickersample.MainActivity">
+
+        <Button
+            android:id="@+id/btn_pick_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="126sp"
+            android:maxWidth="126sp"
+            android:onClick="onClick"
+            android:text="@string/btn_add_file"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="24sp"
+            android:background="#DFF1F180"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <Button
+            android:id="@+id/btn_pick_audio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="126sp"
+            android:maxWidth="126sp"
+            android:layout_marginStart="20sp"
+            android:onClick="onClick"
+            android:text="@string/btn_add_audio"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="24sp"
+            android:background="#DFF1F180"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <Button
+            android:id="@+id/btn_pick_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="126sp"
+            android:maxWidth="126sp"
+            android:layout_marginStart="20sp"
+            android:onClick="onClick"
+            android:text="@string/btn_add_video"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="24sp"
+            android:background="#DFF1F180"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <Button
+            android:id="@+id/btn_pick_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="126sp"
+            android:maxWidth="126sp"
+            android:layout_marginStart="20sp"
+            android:onClick="onClick"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="@string/btn_add_img"
+            android:textSize="24sp"
+            android:background="#DFF1F180"
+            tools:ignore="TouchTargetSizeCheck" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

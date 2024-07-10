@@ -7,5 +7,4 @@
     <string name="vw_no_image_show_app">No image App in this phone!</string>
     <string name="vw_all">All</string>
 
-    <string name="vprf_blank_device">End user device Id can not be empty!</string>
 </resources>

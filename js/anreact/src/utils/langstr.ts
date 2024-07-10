@@ -1,5 +1,29 @@
 import $ from 'jquery';
 
+/* experimental for next L function.
+const R_ = [
+  {
+	edit: 'a',
+	add: 'x',
+  },
+  {
+	edit: 'v',
+  }
+]
+
+class R {
+	/** jsdoc ... * /
+	static lang = 0;
+	static edit = R_[R.lang].edit;
+	static add  = R_[R.lang].add
+}
+
+R.lang;
+*/
+
+/**
+ * 
+ */
 export interface StrResource {[x: string]: string };
 /**
  * A dynamic extending {string-key: parameterized-instance} translation mapper.
@@ -54,25 +78,25 @@ export const Langstrs = {
 
 const argex = /{(\s*(\w|\d)*\s*)}/g;
 
-/**var L = require('language');
- * or import L from Langstr;
- * Usage:
- * Langstrs.using('en'); // optional, default en
- * var the_string = L('Welcome {name}', {name: 'Joe'});
- * see https://stackoverflow.com/a/30191493/7362888
- * and https://stackoverflow.com/a/57882370/7362888
- *
- * @param t template
- * @param o arg object
- * @returns
- */
 /**
+ * var L = require('language');
+ * 
+ * or import L from Langstr;
+ * 
+ * Usage:
+ * @example
+ * Langstrs.using('en'); // optional, default en, see resolv/lang.json
+ * var the_string = L('Welcome {name}', {name: 'Joe'}); // Welcome Joe
+ * 
+ * @Reference 
+ * <a href='https://stackoverflow.com/a/30191493/7362888'>[1]</a>,
+ * <a href='https://stackoverflow.com/a/57882370/7362888'>[2]</a>.
  *
  * @param t template
  * @param vals optional: value args
- * @returns
+ * @returns translation
  */
-export function L(t: string, vals?: {[name: string]: string | number}): string {
+export function L(t: string | undefined, vals?: {[name: string]: string | number}): string {
 	if (! (t in Langstrs.s[Langstrs.lang]) )
 			Langstrs.s.en.add(t);
 	else t = Langstrs.lang === 'en' ?
@@ -83,7 +107,7 @@ export function L(t: string, vals?: {[name: string]: string | number}): string {
 	else
 		return t;
 
-	function replaceArg(t, args) {
+	function replaceArg(t: string, args? : object) {
 		if (t) {
 			t = t.replace(argex,
 				function(match, argname) {
